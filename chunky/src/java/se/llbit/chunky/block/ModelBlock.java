@@ -8,6 +8,9 @@ import se.llbit.math.Ray;
 @PluginApi
 public interface ModelBlock {
 
-  @PluginApi
   BlockModel getModel();
+
+  default boolean intersect(Ray ray, Scene scene) {
+    return getModel().intersect(ray, scene);
+  }
 }
