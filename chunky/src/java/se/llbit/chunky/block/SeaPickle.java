@@ -1,13 +1,10 @@
 package se.llbit.chunky.block;
 
-import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.SeaPickleModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Ray;
 
-public class SeaPickle extends MinecraftBlockTranslucent implements ModelBlock {
-  private final SeaPickleModel model;
+public class SeaPickle extends AbstractModelBlock {
+
   private final String description;
   public final boolean live;
   public final int pickles;
@@ -19,21 +16,10 @@ public class SeaPickle extends MinecraftBlockTranslucent implements ModelBlock {
     this.pickles = pickles;
     this.live = live;
     this.model = new SeaPickleModel(pickles, live);
-    localIntersect = true;
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return model.intersect(ray, scene);
   }
 
   @Override
   public String description() {
     return description;
-  }
-
-  @Override
-  public BlockModel getModel() {
-    return model;
   }
 }

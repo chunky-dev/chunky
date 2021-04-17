@@ -1,22 +1,18 @@
 package se.llbit.chunky.block;
 
-import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.AttachedStemModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Ray;
 
 /**
  * Attached melon or pumpkin stem.
  */
-public class AttachedStem extends MinecraftBlockTranslucent implements ModelBlock {
-  private final AttachedStemModel model;
+public class AttachedStem extends AbstractModelBlock {
+
   private final String description;
 
   public AttachedStem(String name, String facingString) {
     super(name, Texture.stemBent);
     description = "facing=" + facingString;
-    localIntersect = true;
     int facing;
     switch (facingString) {
       default:
@@ -37,17 +33,7 @@ public class AttachedStem extends MinecraftBlockTranslucent implements ModelBloc
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return model.intersect(ray, scene);
-  }
-
-  @Override
   public String description() {
     return description;
-  }
-
-  @Override
-  public BlockModel getModel() {
-    return model;
   }
 }

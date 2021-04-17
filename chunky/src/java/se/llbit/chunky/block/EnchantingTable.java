@@ -4,23 +4,17 @@ import se.llbit.chunky.entity.Book;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.EnchantmentTableModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 public class EnchantingTable extends MinecraftBlockTranslucent implements ModelBlock {
+
   private static final EnchantmentTableModel model = new EnchantmentTableModel();
 
   public EnchantingTable() {
     super("enchanting_table", Texture.enchantmentTableSide);
-    localIntersect = true;
     solid = false;
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return model.intersect(ray, scene);
+    localIntersect = true;
   }
 
   @Override
