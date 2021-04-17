@@ -37,7 +37,7 @@ import se.llbit.math.Octree;
 public class OctreeFileFormat {
 
   private static final int MIN_OCTREE_VERSION = 3;
-  private static final int OCTREE_VERSION = 5;
+  private static final int OCTREE_VERSION = 6;
 
   /**
    * Load octrees and grass/foliage textures from a file.
@@ -61,6 +61,7 @@ public class OctreeFileFormat {
     if (version >= 4) {
       data.waterColors = WorldTexture.load(in);
     }
+    data.version = version;
     return data;
   }
 
@@ -137,5 +138,6 @@ public class OctreeFileFormat {
     public Octree worldTree, waterTree;
     public WorldTexture grassColors, foliageColors, waterColors;
     public BlockPalette palette;
+    public int version;
   }
 }

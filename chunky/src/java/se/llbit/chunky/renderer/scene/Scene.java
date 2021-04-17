@@ -826,7 +826,7 @@ public class Scene implements JsonSerializable, Refreshable {
         return;
       }
 
-      int requiredDepth = calculateOctreeOrigin(chunksToLoad);
+      int requiredDepth = calculateOctreeOrigin(chunksToLoad, false);
 
       // Create new octree to fit all chunks.
       palette = new BlockPalette();
@@ -892,6 +892,9 @@ public class Scene implements JsonSerializable, Refreshable {
       boolean usingFirstChunkData = true;
 
       ChunkPosition[] chunkPositions = chunksToLoad.toArray(new ChunkPosition[0]);
+
+      int[] cubeWorldBlocks = new int[16*16*16];
+      int[] cubeWaterBlocks = new int[16*16*16];
 
       ExecutorService executor = Executors.newSingleThreadExecutor();
       Future<?> nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
@@ -985,196 +988,207 @@ public class Scene implements JsonSerializable, Refreshable {
           }
         }
 
-        for (int cy = yMin; cy < yMax; ++cy) { //Uses chunk min and max, rather than global - minor optimisation for pre1.13 worlds
-          for (int cz = 0; cz < 16; ++cz) {
-            int z = cz + cp.z * 16 - origin.z;
-            for (int cx = 0; cx < 16; ++cx) {
-              int x = cx + cp.x * 16 - origin.x;
+        int yCubeMin = yMin / 16;
+        int yCubeMax = (yMax+15) / 16;
+        for(int yCube = yCubeMin; yCube <= yCubeMax; ++yCube) {
+          // Reset the cubes
+          Arrays.fill(cubeWorldBlocks, 0);
+          Arrays.fill(cubeWaterBlocks, 0);
+          for(int cy = 0; cy < 16; ++cy) { //Uses chunk min and max, rather than global - minor optimisation for pre1.13 worlds
+            int y = yCube * 16 + cy;
+            if(y < yMin || y >= yMax)
+              continue;
+            for(int cz = 0; cz < 16; ++cz) {
+              int z = cz + cp.z * 16 - origin.z;
+              for(int cx = 0; cx < 16; ++cx) {
+                int x = cx + cp.x * 16 - origin.x;
 
-              // Change the type of hidden blocks to ANY_TYPE
-              boolean notOnEdge = !chunkData.isBlockOnEdge(cx, cy, cz);
-              boolean isHidden = notOnEdge
-                  && palette.get(chunkData.getBlockAt(cx + 1, cy, cz)).opaque
-                  && palette.get(chunkData.getBlockAt(cx - 1, cy, cz)).opaque
-                  && palette.get(chunkData.getBlockAt(cx, cy + 1, cz)).opaque
-                  && palette.get(chunkData.getBlockAt(cx, cy - 1, cz)).opaque
-                  && palette.get(chunkData.getBlockAt(cx, cy, cz + 1)).opaque
-                  && palette.get(chunkData.getBlockAt(cx, cy, cz - 1)).opaque;
+                int cubeIndex = (cz * 16 + cy) * 16 + cx;
 
-              if (isHidden) {
-                worldOctree.set(Octree.ANY_TYPE, x, cy - origin.y, z);
-              } else {
-                int currentBlock = chunkData.getBlockAt(cx, cy, cz);
-                Octree.Node octNode = new Octree.Node(currentBlock);
-                Block block = palette.get(currentBlock);
+                // Change the type of hidden blocks to ANY_TYPE
+                boolean notOnEdge = !chunkData.isBlockOnEdge(cx, cy, cz);
+                boolean isHidden = notOnEdge
+                        && palette.get(chunkData.getBlockAt(cx + 1, y, cz)).opaque
+                        && palette.get(chunkData.getBlockAt(cx - 1, y, cz)).opaque
+                        && palette.get(chunkData.getBlockAt(cx, y + 1, cz)).opaque
+                        && palette.get(chunkData.getBlockAt(cx, y - 1, cz)).opaque
+                        && palette.get(chunkData.getBlockAt(cx, y, cz + 1)).opaque
+                        && palette.get(chunkData.getBlockAt(cx, y, cz - 1)).opaque;
 
-                if (block.isEntity()) {
-                  Vector3 position = new Vector3(cx + cp.x * 16, cy, cz + cp.z * 16);
-                  Entity entity = block.toEntity(position);
+                if(isHidden) {
+                  cubeWorldBlocks[cubeIndex] = Octree.ANY_TYPE;
+                } else {
+                  int currentBlock = chunkData.getBlockAt(cx, y, cz);
+                  int octNode = currentBlock;
+                  Block block = palette.get(currentBlock);
 
-                  if (entity instanceof Poseable && !(entity instanceof Lectern && !((Lectern)entity).hasBook())) {
-                    // don't add the actor again if it was already loaded from json
-                    if (actors.stream().noneMatch(actor -> {
-                      if (actor.getClass().equals(entity.getClass())) {
-                        Vector3 distance = new Vector3(actor.position);
-                        distance.sub(entity.position);
-                        return distance.lengthSquared() < Ray.EPSILON;
-                      }
-                      return false;
-                    })) {
-                      actors.add(entity);
-                    }
-                  } else {
-                    entities.add(entity);
-                    if (emitterGrid != null) {
-                      for (Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
-                        emitterPos.x -= origin.x;
-                        emitterPos.y -= origin.y;
-                        emitterPos.z -= origin.z;
-                        emitterGrid.addEmitter(emitterPos);
-                      }
-                    }
-                  }
+                  if(block.isEntity()) {
+                    Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
+                    Entity entity = block.toEntity(position);
 
-                  if (!block.isBlockWithEntity()) {
-                    if (block.waterlogged) {
-                      block = palette.water;
-                      octNode = new Octree.Node(palette.waterId);
-                    } else {
-                      block = Air.INSTANCE;
-                      octNode = new Octree.Node(palette.airId);
-                    }
-                  }
-                }
-
-                if (block.isWaterFilled()) {
-                  Octree.Node waterNode = new Octree.Node(palette.waterId);
-                  if (cy + 1 < yMax) {
-                    if (palette.get(chunkData.getBlockAt(cx, cy + 1, cz)).isWaterFilled()) {
-                      waterNode = new Octree.Node(palette.getWaterId(0, 1 << Water.FULL_BLOCK));
-                    }
-                  }
-                  if (block.isWater()) {
-                    // Move plain water blocks to the water octree.
-                    octNode = new Octree.Node(palette.airId);
-
-                    if (notOnEdge) {
-                      // Perform water computation now for water blocks that are not on th edge of the chunk
-                      // Test if the block has not already be marked as full
-                      if (((Water) palette.get(waterNode.type)).data == 0) {
-                        int level0 = 8 - ((Water) block).level;
-                        int corner0 = level0;
-                        int corner1 = level0;
-                        int corner2 = level0;
-                        int corner3 = level0;
-
-                        int level = Chunk.waterLevelAt(chunkData, palette, cx - 1, cy, cz, level0);
-                        corner3 += level;
-                        corner0 += level;
-
-                        level = Chunk.waterLevelAt(chunkData, palette, cx - 1, cy, cz + 1, level0);
-                        corner0 += level;
-
-                        level = Chunk.waterLevelAt(chunkData, palette, cx, cy, cz + 1, level0);
-                        corner0 += level;
-                        corner1 += level;
-
-                        level = Chunk.waterLevelAt(chunkData, palette, cx + 1, cy, cz + 1, level0);
-                        corner1 += level;
-
-                        level = Chunk.waterLevelAt(chunkData, palette, cx + 1, cy, cz, level0);
-                        corner1 += level;
-                        corner2 += level;
-
-                        level = Chunk.waterLevelAt(chunkData, palette, cx + 1, cy, cz - 1, level0);
-                        corner2 += level;
-
-                        level = Chunk.waterLevelAt(chunkData, palette, cx, cy, cz - 1, level0);
-                        corner2 += level;
-                        corner3 += level;
-
-                        level = Chunk.waterLevelAt(chunkData, palette, cx - 1, cy, cz - 1, level0);
-                        corner3 += level;
-
-                        corner0 = Math.min(7, 8 - (corner0 / 4));
-                        corner1 = Math.min(7, 8 - (corner1 / 4));
-                        corner2 = Math.min(7, 8 - (corner2 / 4));
-                        corner3 = Math.min(7, 8 - (corner3 / 4));
-                        waterNode = new Octree.Node(
-                            palette.getWaterId(((Water) block).level, (corner0 << Water.CORNER_0)
-                                | (corner1 << Water.CORNER_1)
-                                | (corner2 << Water.CORNER_2)
-                                | (corner3 << Water.CORNER_3)));
+                    if(entity instanceof Poseable && !(entity instanceof Lectern && !((Lectern) entity).hasBook())) {
+                      // don't add the actor again if it was already loaded from json
+                      if(actors.stream().noneMatch(actor -> {
+                        if(actor.getClass().equals(entity.getClass())) {
+                          Vector3 distance = new Vector3(actor.position);
+                          distance.sub(entity.position);
+                          return distance.lengthSquared() < Ray.EPSILON;
+                        }
+                        return false;
+                      })) {
+                        actors.add(entity);
                       }
                     } else {
-                      // Water computation for water blocks on the edge of a chunk is done by the OctreeFinalizer but we need the water level information
-                      waterNode = new Octree.Node(
-                          palette.getWaterId(((Water) block).level, 0));
+                      entities.add(entity);
+                      if(emitterGrid != null) {
+                        for(Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
+                          emitterPos.x -= origin.x;
+                          emitterPos.y -= origin.y;
+                          emitterPos.z -= origin.z;
+                          emitterGrid.addEmitter(emitterPos);
+                        }
+                      }
+                    }
+
+                    if(!block.isBlockWithEntity()) {
+                      if(block.waterlogged) {
+                        block = palette.water;
+                        octNode = palette.waterId;
+                      } else {
+                        block = Air.INSTANCE;
+                        octNode = palette.airId;
+                      }
                     }
                   }
-                  waterOctree.set(waterNode, x, cy - origin.y, z);
-                } else if (cy + 1 < yMax && block instanceof Lava) {
-                  if (palette.get(chunkData.getBlockAt(cx, cy+1, cz)) instanceof Lava) {
-                    octNode = new Octree.Node(palette.getLavaId(0, 1 << Water.FULL_BLOCK));
-                  } else if (notOnEdge) {
-                    // Compute lava level for blocks not on edge
-                    Lava lava = (Lava) block;
-                    int level0 = 8 - lava.level;
-                    int corner0 = level0;
-                    int corner1 = level0;
-                    int corner2 = level0;
-                    int corner3 = level0;
 
-                    int level = Chunk.lavaLevelAt(chunkData, palette, cx - 1, cy, cz, level0);
-                    corner3 += level;
-                    corner0 += level;
+                  if(block.isWaterFilled()) {
+                    int waterNode = palette.waterId;
+                    if(y + 1 < yMax) {
+                      if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)).isWaterFilled()) {
+                        waterNode = palette.getWaterId(0, 1 << Water.FULL_BLOCK);
+                      }
+                    }
+                    if(block.isWater()) {
+                      // Move plain water blocks to the water octree.
+                      octNode = palette.airId;
 
-                    level = Chunk.lavaLevelAt(chunkData, palette, cx - 1, cy, cz + 1, level0);
-                    corner0 += level;
+                      if(notOnEdge) {
+                        // Perform water computation now for water blocks that are not on th edge of the chunk
+                        // Test if the block has not already be marked as full
+                        if(((Water) palette.get(waterNode)).data == 0) {
+                          int level0 = 8 - ((Water) block).level;
+                          int corner0 = level0;
+                          int corner1 = level0;
+                          int corner2 = level0;
+                          int corner3 = level0;
 
-                    level = Chunk.lavaLevelAt(chunkData, palette, cx, cy, cz + 1, level0);
-                    corner0 += level;
-                    corner1 += level;
+                          int level = Chunk.waterLevelAt(chunkData, palette, cx - 1, y, cz, level0);
+                          corner3 += level;
+                          corner0 += level;
 
-                    level = Chunk.lavaLevelAt(chunkData, palette, cx + 1, cy, cz + 1, level0);
-                    corner1 += level;
+                          level = Chunk.waterLevelAt(chunkData, palette, cx - 1, y, cz + 1, level0);
+                          corner0 += level;
 
-                    level = Chunk.lavaLevelAt(chunkData, palette, cx + 1, cy, cz, level0);
-                    corner1 += level;
-                    corner2 += level;
+                          level = Chunk.waterLevelAt(chunkData, palette, cx, y, cz + 1, level0);
+                          corner0 += level;
+                          corner1 += level;
 
-                    level = Chunk.lavaLevelAt(chunkData, palette, cx + 1, cy, cz - 1, level0);
-                    corner2 += level;
+                          level = Chunk.waterLevelAt(chunkData, palette, cx + 1, y, cz + 1, level0);
+                          corner1 += level;
 
-                    level = Chunk.lavaLevelAt(chunkData, palette, cx, cy, cz - 1, level0);
-                    corner2 += level;
-                    corner3 += level;
+                          level = Chunk.waterLevelAt(chunkData, palette, cx + 1, y, cz, level0);
+                          corner1 += level;
+                          corner2 += level;
 
-                    level = Chunk.lavaLevelAt(chunkData, palette, cx - 1, cy, cz - 1, level0);
-                    corner3 += level;
+                          level = Chunk.waterLevelAt(chunkData, palette, cx + 1, y, cz - 1, level0);
+                          corner2 += level;
 
-                    corner0 = Math.min(7, 8 - (corner0 / 4));
-                    corner1 = Math.min(7, 8 - (corner1 / 4));
-                    corner2 = Math.min(7, 8 - (corner2 / 4));
-                    corner3 = Math.min(7, 8 - (corner3 / 4));
-                    octNode = new Octree.Node(palette.getLavaId(
-                        lava.level,
-                        (corner0 << Water.CORNER_0)
-                            | (corner1 << Water.CORNER_1)
-                            | (corner2 << Water.CORNER_2)
-                            | (corner3 << Water.CORNER_3)
-                    ));
+                          level = Chunk.waterLevelAt(chunkData, palette, cx, y, cz - 1, level0);
+                          corner2 += level;
+                          corner3 += level;
+
+                          level = Chunk.waterLevelAt(chunkData, palette, cx - 1, y, cz - 1, level0);
+                          corner3 += level;
+
+                          corner0 = Math.min(7, 8 - (corner0 / 4));
+                          corner1 = Math.min(7, 8 - (corner1 / 4));
+                          corner2 = Math.min(7, 8 - (corner2 / 4));
+                          corner3 = Math.min(7, 8 - (corner3 / 4));
+                          waterNode = palette.getWaterId(((Water) block).level, (corner0 << Water.CORNER_0)
+                                          | (corner1 << Water.CORNER_1)
+                                          | (corner2 << Water.CORNER_2)
+                                          | (corner3 << Water.CORNER_3));
+                        }
+                      } else {
+                        // Water computation for water blocks on the edge of a chunk is done by the OctreeFinalizer but we need the water level information
+                        waterNode = palette.getWaterId(((Water) block).level, 0);
+                      }
+                    }
+                    cubeWaterBlocks[cubeIndex] = waterNode;
+                  } else if(cy + 1 < yMax && block instanceof Lava) {
+                    if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)) instanceof Lava) {
+                      octNode = palette.getLavaId(0, 1 << Water.FULL_BLOCK);
+                    } else if(notOnEdge) {
+                      // Compute lava level for blocks not on edge
+                      Lava lava = (Lava) block;
+                      int level0 = 8 - lava.level;
+                      int corner0 = level0;
+                      int corner1 = level0;
+                      int corner2 = level0;
+                      int corner3 = level0;
+
+                      int level = Chunk.lavaLevelAt(chunkData, palette, cx - 1, y, cz, level0);
+                      corner3 += level;
+                      corner0 += level;
+
+                      level = Chunk.lavaLevelAt(chunkData, palette, cx - 1, y, cz + 1, level0);
+                      corner0 += level;
+
+                      level = Chunk.lavaLevelAt(chunkData, palette, cx, y, cz + 1, level0);
+                      corner0 += level;
+                      corner1 += level;
+
+                      level = Chunk.lavaLevelAt(chunkData, palette, cx + 1, y, cz + 1, level0);
+                      corner1 += level;
+
+                      level = Chunk.lavaLevelAt(chunkData, palette, cx + 1, y, cz, level0);
+                      corner1 += level;
+                      corner2 += level;
+
+                      level = Chunk.lavaLevelAt(chunkData, palette, cx + 1, y, cz - 1, level0);
+                      corner2 += level;
+
+                      level = Chunk.lavaLevelAt(chunkData, palette, cx, y, cz - 1, level0);
+                      corner2 += level;
+                      corner3 += level;
+
+                      level = Chunk.lavaLevelAt(chunkData, palette, cx - 1, y, cz - 1, level0);
+                      corner3 += level;
+
+                      corner0 = Math.min(7, 8 - (corner0 / 4));
+                      corner1 = Math.min(7, 8 - (corner1 / 4));
+                      corner2 = Math.min(7, 8 - (corner2 / 4));
+                      corner3 = Math.min(7, 8 - (corner3 / 4));
+                      octNode = palette.getLavaId(
+                              lava.level,
+                              (corner0 << Water.CORNER_0)
+                                      | (corner1 << Water.CORNER_1)
+                                      | (corner2 << Water.CORNER_2)
+                                      | (corner3 << Water.CORNER_3)
+                      );
+                    }
+                  }
+                  cubeWorldBlocks[cubeIndex] = octNode;
+
+                  if(emitterGrid != null && block.emittance > 1e-4) {
+                    emitterGrid.addEmitter(new Grid.EmitterPosition(x + 0.5f, y - origin.y + 0.5f, z + 0.5f));
                   }
                 }
-                worldOctree.set(octNode, x, cy - origin.y, z);
-
-                if (emitterGrid != null && block.emittance > 1e-4) {
-                  emitterGrid.addEmitter(new Grid.EmitterPosition(x + 0.5f, cy - origin.y + 0.5f, z + 0.5f));
-                }
-
               }
             }
           }
+          worldOctree.setCube(4, cubeWorldBlocks, cp.x*16 - origin.x, yCube*16, cp.z*16 - origin.z);
+          waterOctree.setCube(4, cubeWaterBlocks, cp.x*16 - origin.x, yCube*16, cp.z*16 - origin.z);
         }
 
         // Block entities are also called "tile entities". These are extra bits of metadata
@@ -1388,7 +1402,7 @@ public class Scene implements JsonSerializable, Refreshable {
     refresh();
   }
 
-  private int calculateOctreeOrigin(Collection<ChunkPosition> chunksToLoad) {
+  private int calculateOctreeOrigin(Collection<ChunkPosition> chunksToLoad, boolean centerOctree) {
     int xmin = Integer.MAX_VALUE;
     int xmax = Integer.MIN_VALUE;
     int zmin = Integer.MAX_VALUE;
@@ -1418,11 +1432,15 @@ public class Scene implements JsonSerializable, Refreshable {
     int maxDimension = Math.max(yMax - yMin, Math.max(xmax - xmin, zmax - zmin));
     int requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
 
-    int xroom = (1 << requiredDepth) - (xmax - xmin);
-    int yroom = (1 << requiredDepth) - (yMax - yMin);
-    int zroom = (1 << requiredDepth) - (zmax - zmin);
+    if(centerOctree) {
+      int xroom = (1 << requiredDepth) - (xmax - xmin);
+      int yroom = (1 << requiredDepth) - (yMax - yMin);
+      int zroom = (1 << requiredDepth) - (zmax - zmin);
 
-    origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
+      origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
+    } else {
+      origin.set(xmin, 0, zmin);
+    }
     return requiredDepth;
   }
 
@@ -2113,7 +2131,7 @@ public class Scene implements JsonSerializable, Refreshable {
         palette = data.palette;
         palette.applyMaterials();
         Log.info("Octree loaded");
-        calculateOctreeOrigin(chunks);
+        calculateOctreeOrigin(chunks, data.version < 6);
         camera.setWorldSize(1 << worldOctree.getDepth());
 
         try (TaskTracker.Task bvhTask = taskTracker.task("(2/3) Building world BVH")) {
