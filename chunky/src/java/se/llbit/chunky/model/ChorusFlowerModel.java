@@ -18,36 +18,31 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
-import se.llbit.math.Ray;
 
-public class ChorusFlowerModel {
-  private static AABB[] boxes = {
+import java.util.Arrays;
+
+public class ChorusFlowerModel extends AABBModel {
+  private static final AABB[] boxes = {
       new AABB(0, 1, 2 / 16., 14 / 16., 2 / 16., 14 / 16.),
       new AABB(2 / 16., 14 / 16., 0, 1, 2 / 16., 14 / 16.),
       new AABB(2 / 16., 14 / 16., 2 / 16., 14 / 16., 0, 1),
   };
 
-  public static boolean intersect(Ray ray) {
-    int age = ray.getBlockData();
-    return intersect(ray, age);
+  private final Texture[][] textures;
+
+  public ChorusFlowerModel(int age) {
+    Texture tex = age < 5 ? Texture.chorusFlower : Texture.chorusFlowerDead;
+    textures = new Texture[3][6];
+    for (int i = 0; i < 3; i++) Arrays.fill(textures[i], tex);
   }
 
-  public static boolean intersect(Ray ray, int age) {
-    boolean hit = false;
-    Texture texture = age < 5 ? Texture.chorusFlower : Texture.chorusFlowerDead;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (AABB aabb : boxes) {
-      if (aabb.intersect(ray)) {
-        texture.getColor(ray);
-        ray.t = ray.tNext;
-        hit = true;
-      }
-    }
+  @Override
+  public AABB[] getBoxes() {
+    return boxes;
+  }
 
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Texture[][] getTextures() {
+    return textures;
   }
 }

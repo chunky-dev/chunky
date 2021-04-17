@@ -39,14 +39,13 @@ public abstract class AABBModel implements BlockModel {
   public abstract Texture[][] getTextures();
 
   @PluginApi
-  public TintType[][] getTintedFaces() {
+  public Tint[][] getTints() {
     return null;
   }
 
   @PluginApi
   public UVMapping[][] getUVMapping() {
-    Texture[][] textureSize = this.getTextures();
-    return new UVMapping[textureSize.length][textureSize[0].length];
+    return null;
   }
 
   @Override
@@ -54,34 +53,40 @@ public abstract class AABBModel implements BlockModel {
     AABB[] boxes = getBoxes();
     Texture[][] textures = getTextures();
     UVMapping[][] mapping = getUVMapping();
-    TintType[][] tintedFaces = getTintedFaces();
+    Tint[][] tintedFaces = getTints();
 
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     for (int i = 0; i < boxes.length; ++i) {
       if (boxes[i].intersect(ray)) {
-        TintType[] tintedFacesBox = tintedFaces != null ? tintedFaces[i] : null;
+        Tint[] tintedFacesBox = tintedFaces != null ? tintedFaces[i] : null;
         if (ray.n.y > 0) { // top
           ray.v = 1 - ray.v;
-          if (intersectFace(ray, scene, textures[i][4], mapping[i][4],
-              tintedFacesBox != null ? tintedFacesBox[4] : TintType.NONE)) {
+          if (intersectFace(ray, scene, textures[i][4],
+              mapping != null ? mapping[i][4] : null,
+              tintedFacesBox != null ? tintedFacesBox[4] : Tint.NONE)) {
             hit = true;
           }
         } else if (ray.n.y < 0) { // bottom
-          hit = intersectFace(ray, scene, textures[i][5], mapping[i][5],
-              tintedFacesBox != null ? tintedFacesBox[5] : TintType.NONE) || hit;
+          hit = intersectFace(ray, scene, textures[i][5],
+              mapping != null ? mapping[i][4] : null,
+              tintedFacesBox != null ? tintedFacesBox[5] : Tint.NONE) || hit;
         } else if (ray.n.z < 0) { // north
-          hit = intersectFace(ray, scene, textures[i][0], mapping[i][0],
-              tintedFacesBox != null ? tintedFacesBox[0] : TintType.NONE) || hit;
+          hit = intersectFace(ray, scene, textures[i][0],
+              mapping != null ? mapping[i][4] : null,
+              tintedFacesBox != null ? tintedFacesBox[0] : Tint.NONE) || hit;
         } else if (ray.n.z > 0) { // south
-          hit = intersectFace(ray, scene, textures[i][2], mapping[i][2],
-              tintedFacesBox != null ? tintedFacesBox[2] : TintType.NONE) || hit;
+          hit = intersectFace(ray, scene, textures[i][2],
+              mapping != null ? mapping[i][4] : null,
+              tintedFacesBox != null ? tintedFacesBox[2] : Tint.NONE) || hit;
         } else if (ray.n.x < 0) { // west
-          hit = intersectFace(ray, scene, textures[i][3], mapping[i][3],
-              tintedFacesBox != null ? tintedFacesBox[3] : TintType.NONE) || hit;
+          hit = intersectFace(ray, scene, textures[i][3],
+              mapping != null ? mapping[i][4] : null,
+              tintedFacesBox != null ? tintedFacesBox[3] : Tint.NONE) || hit;
         } else if (ray.n.x > 0) { // east
-          hit = intersectFace(ray, scene, textures[i][1], mapping[i][1],
-              tintedFacesBox != null ? tintedFacesBox[1] : TintType.NONE) || hit;
+          hit = intersectFace(ray, scene, textures[i][1],
+              mapping != null ? mapping[i][4] : null,
+              tintedFacesBox != null ? tintedFacesBox[1] : Tint.NONE) || hit;
         }
         if (hit) {
           ray.t = ray.tNext;
@@ -98,7 +103,7 @@ public abstract class AABBModel implements BlockModel {
     return hit;
   }
 
-  private boolean intersectFace(Ray ray, Scene scene, Texture texture, UVMapping mapping, TintType tintType) {
+  private boolean intersectFace(Ray ray, Scene scene, Texture texture, UVMapping mapping, Tint tintType) {
     // This is the method that handles intersecting faces of all AABB-based models.
     // Do normal mapping, parallax occlusion mapping, specular maps and all the good stuff here!
 
@@ -134,27 +139,7 @@ public abstract class AABBModel implements BlockModel {
 
     float[] color = texture.getColor(ray.u, ray.v);
     if (color[3] > Ray.EPSILON) {
-      if (tintType != TintType.NONE) {
-        float[] biomeColor;
-        switch (tintType) {
-          case BIOME_FOLIAGE:
-            biomeColor = ray.getBiomeFoliageColor(scene);
-            break;
-          case BIOME_GRASS:
-            biomeColor = ray.getBiomeGrassColor(scene);
-            break;
-          case BIOME_WATER:
-            biomeColor = ray.getBiomeWaterColor(scene);
-            break;
-          default:
-            Log.warn("Unsupported TintType: " + tintType);
-            biomeColor = new float[]{1, 1, 1};
-            break;
-        }
-        color[0] *= biomeColor[0];
-        color[1] *= biomeColor[1];
-        color[2] *= biomeColor[2];
-      }
+      tintType.tint(color, ray, scene);
       ray.color.set(color);
       return true;
     }

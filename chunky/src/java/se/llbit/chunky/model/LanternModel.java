@@ -2,13 +2,15 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class LanternModel {
+import java.util.Arrays;
 
-  private static final Quad[] quads =
+public class LanternModel extends QuadModel {
+
+  //region Model
+  private static final Quad[] model =
       new Quad[]{
           new Quad(
               new Vector3(5 / 16.0, 7 / 16.0, 11 / 16.0),
@@ -90,8 +92,10 @@ public class LanternModel {
               new Vector4(14 / 16.0, 11 / 16.0, 6 / 16.0, 4 / 16.0)
           )
       };
+  //endregion
 
-  private static final Quad[] quadsHanging =
+  //region Hanging
+  private static final Quad[] modelHanging =
       Model.join(
           new Quad[]{
               new Quad(
@@ -183,27 +187,24 @@ public class LanternModel {
                   )
               },
               Math.toRadians(45)));
+  //endregion
 
-  public static boolean intersect(Ray ray, boolean hanging, Texture texture) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
+  private final Quad[] quads;
+  private final Texture[] textures;
 
-    for (Quad quad : (hanging ? quadsHanging : quads)) {
-      if (quad.intersect(ray)) {
-        float[] color = texture.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          hit = true;
-        }
-      }
-    }
+  public LanternModel(Texture texture, boolean hanging) {
+    quads = hanging ? modelHanging : model;
+    textures = new Texture[quads.length];
+    Arrays.fill(textures, texture);
+  }
 
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

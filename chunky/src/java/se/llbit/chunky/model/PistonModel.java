@@ -18,17 +18,11 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-/**
- * Piston
- *
- * @author Jesper Öqvist <jesper@llbit.se>
- */
-public class PistonModel {
-  protected static Quad[][] retracted = {
+public class PistonModel extends QuadModel {
+  private static final Quad[][] retracted = {
       // down
       {},
 
@@ -70,7 +64,7 @@ public class PistonModel {
       // facing east
       {},};
 
-  protected static Quad[][] extended = {
+  private static final Quad[][] extended = {
       // down
       {},
 
@@ -153,43 +147,28 @@ public class PistonModel {
         Texture.pistonSide, Texture.pistonSide,
       },
     },
-    {
-      {
+    {{
         Texture.pistonInnerTop, Texture.pistonBottom, Texture.pistonSide, Texture.pistonSide,
         Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
         Texture.pistonSide, Texture.pistonSide,
-      }, {
-        Texture.pistonInnerTop, Texture.pistonBottom, Texture.pistonSide, Texture.pistonSide,
-        Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
-        Texture.pistonSide, Texture.pistonSide,
-      },
-    },
+    }},
   };
 
-  public static boolean intersect(Ray ray, int isSticky) {
-    int isExtended = ray.getBlockData() >> 3;
-    int facing = (ray.getBlockData() & 7) % 6;
-    return intersect(ray, isSticky, isExtended, facing);
+  public final Quad[] quads;
+  public final Texture[] textures;
+
+  public PistonModel(boolean sticky, boolean isExtended, int facing) {
+    quads = isExtended ? extended[facing] : retracted[facing];
+    textures = isExtended ? texture[1][0] : (sticky ? texture[0][1] : texture[0][0]);
   }
 
-  public static boolean intersect(Ray ray, int isSticky, int isExtended, int facing) {
-    boolean hit = false;
-    Quad[] rot = isExtended == 1 ? extended[facing] : retracted[facing];
-    ray.t = Double.POSITIVE_INFINITY;
-    for (int i = 0; i < rot.length; ++i) {
-      Quad side = rot[i];
-      if (side.intersect(ray)) {
-        texture[isExtended][isSticky][i].getColor(ray);
-        ray.n.set(side.n);
-        ray.t = ray.tNext;
-        hit = true;
-      }
-    }
-    if (hit) {
-      ray.color.w = 1;
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

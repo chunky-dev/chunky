@@ -1,5 +1,6 @@
 package se.llbit.chunky.block;
 
+import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.ComparatorModel;
 import se.llbit.chunky.model.RedstoneRepeaterModel;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -7,39 +8,48 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 // TODO: render locked repeaters.
-public class Comparator extends MinecraftBlockTranslucent {
-  private final int facing, powered, mode;
+public class Comparator extends MinecraftBlockTranslucent implements ModelBlock {
   private final String description;
+  private final ComparatorModel model;
 
-  public Comparator(String facing, String mode, boolean powered) {
+  public Comparator(String facingString, String modeString, boolean powered) {
     super("repeater", Texture.redstoneRepeaterOn);
     this.description = String.format("facing=%s, mode=%s, powered=%s",
-        facing, mode, powered);
+        facingString, modeString, powered);
     localIntersect = true;
-    this.powered = powered ? 1 : 0;
-    this.mode = mode.equals("compare") ? 0 : 1;
-    switch (facing) {
+    int mode = modeString.equals("compare") ? 0 : 1;
+    int facing;
+    switch (facingString) {
       default:
       case "north":
-        this.facing = 2;
+        facing = 2;
         break;
       case "south":
-        this.facing = 0;
+        facing = 0;
         break;
       case "west":
-        this.facing = 1;
+        facing = 1;
         break;
       case "east":
-        this.facing = 3;
+        facing = 3;
         break;
     }
+
+    this.model = new ComparatorModel(facing, mode, powered ? 1 : 0);
   }
 
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return ComparatorModel.intersect(ray, facing, mode, powered);
+  @Override
+  public boolean intersect(Ray ray, Scene scene) {
+    return model.intersect(ray, scene);
   }
 
-  @Override public String description() {
+  @Override
+  public String description() {
     return description;
+  }
+
+  @Override
+  public BlockModel getModel() {
+    return model;
   }
 }

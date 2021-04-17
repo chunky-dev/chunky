@@ -1,9 +1,6 @@
 package se.llbit.chunky.block;
 
-import se.llbit.chunky.model.TexturedBlockModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Ray;
 
 public class FrostedIce extends MinecraftBlockTranslucent {
   private static final Texture[] texture = {
@@ -13,13 +10,8 @@ public class FrostedIce extends MinecraftBlockTranslucent {
   private final int age;
 
   public FrostedIce(int age) {
-    super("frosted_ice", Texture.frostedIce3);
-    localIntersect = true;
+    super("frosted_ice", texture[age & 3]);
     this.age = age & 3;
-  }
-
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return TexturedBlockModel.intersect(ray, texture[age]);
   }
 
   @Override public String description() {

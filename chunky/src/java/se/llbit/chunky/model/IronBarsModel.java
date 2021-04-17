@@ -17,17 +17,18 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class IronBarsModel {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
-  private static Quad[] core = {
+public class IronBarsModel extends QuadModel {
+
+  private static final Quad[] core = {
       new DoubleSidedQuad(new Vector3(.5, 1, 7 / 16.), new Vector3(.5, 1, 9 / 16.),
           new Vector3(.5, 0, 7 / 16.), new Vector4(7 / 16., 9 / 16., 1, 0)),
 
@@ -35,7 +36,7 @@ public class IronBarsModel {
           new Vector3(7 / 16., 0, .5), new Vector4(7 / 16., 9 / 16., 1, 0)),
   };
 
-  private static Quad[] coreTop = {
+  private static final Quad[] coreTop = {
       // Top face.
       new DoubleSidedQuad(new Vector3(9 / 16., 1, 7 / 16.), new Vector3(7 / 16., 1, 7 / 16.),
           new Vector3(9 / 16., 1, 9 / 16.), new Vector4(9 / 16., 7 / 16., 7 / 16., 9 / 16.)),
@@ -45,7 +46,7 @@ public class IronBarsModel {
           new Vector3(7 / 16., 0, 9 / 16.), new Vector4(7 / 16., 9 / 16., 7 / 16., 9 / 16.)),
   };
 
-  private static Quad[][] connector = {
+  private static final Quad[][] connector = {
       // Front side.
       {
           // Center face.
@@ -77,7 +78,7 @@ public class IronBarsModel {
       },
   };
 
-  private static Quad[][] panes = new Quad[4][];
+  private static final Quad[][] panes = new Quad[4][];
 
   static {
     panes[0] = connector[0];
@@ -87,58 +88,32 @@ public class IronBarsModel {
     }
   }
 
-  public static boolean intersect(Ray ray) {
-    int connections = 0xF & (ray.getCurrentData() >> BlockData.GLASS_PANE_OFFSET);
-    return intersect(ray, connections);
+  private final Quad[] quads;
+  private final Texture[] textures;
+
+  public IronBarsModel(int connections) {
+    ArrayList<Quad> quads = new ArrayList<>();
+    Collections.addAll(quads, coreTop);
+    if (connections == 0) {
+      Collections.addAll(quads, core);
+    } else {
+      for (int i = 0; i < 4; ++i) {
+        if ((connections & (1 << i)) != 0)
+          Collections.addAll(quads, panes[i]);
+      }
+    }
+    this.quads = quads.toArray(new Quad[0]);
+    this.textures = new Texture[this.quads.length];
+    Arrays.fill(this.textures, Texture.ironBars);
   }
 
-  public static boolean intersect(Ray ray, int connections) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    if (connections == 0) {
-      for (Quad quad : core) {
-        if (quad.intersect(ray)) {
-          Texture.ironBars.getColor(ray);
-          if (ray.color.w > 0) {
-            ray.n.set(quad.n);
-            ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
-            ray.t = ray.tNext;
-            hit = true;
-          }
-        }
-      }
-    }
-    for (Quad quad : coreTop) {
-      if (quad.intersect(ray)) {
-        Texture.ironBars.getColor(ray);
-        if (ray.color.w > 0) {
-          ray.n.set(quad.n);
-          ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
-          ray.t = ray.tNext;
-          hit = true;
-        }
-      }
-    }
-    for (int i = 0; i < 4; ++i) {
-      if ((connections & (1 << i)) != 0) {
-        for (int j = 0; j < panes[i].length; ++j) {
-          Quad quad = panes[i][j];
-          if (quad.intersect(ray)) {
-            Texture.ironBars.getColor(ray);
-            if (ray.color.w > 0) {
-              ray.n.set(quad.n);
-              ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
-              ray.t = ray.tNext;
-              hit = true;
-            }
-          }
-        }
-      }
-    }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

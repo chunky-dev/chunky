@@ -17,15 +17,15 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class BedModel {
-  // Facing south.
-  private static Quad[] foot = {
+import java.util.Arrays;
+
+public class BedModel extends QuadModel {
+  //region Bed Foot
+  private static final Quad[] foot = {
       // Mattress:
       new Quad(
           new Vector3(0, 9 / 16.0, 16 / 16.0),
@@ -105,8 +105,10 @@ public class BedModel {
           new Vector3(0, 3 / 16.0, 3 / 16.0),
           new Vector4(56 / 64.0, 59 / 64.0, 49 / 64.0, 46 / 64.0)),
   };
+  //endregion
 
-  private static Quad[] head = {
+  //region Bed Head
+  private static final Quad[] head = {
       // Mattress:
       new Quad(
           new Vector3(0, 9 / 16.0, 16 / 16.0),
@@ -186,52 +188,25 @@ public class BedModel {
           new Vector3(13 / 16.0, 3 / 16.0, 16 / 16.0),
           new Vector4(50 / 64.0, 53 / 64.0, 52 / 64.0, 55 / 64.0)),
    };
+  //endregion
 
-  private static Quad[][][] rot = new Quad[2][4][];
+  private final Texture[] textures;
+  private final Quad[] quads;
 
-  private static Texture[] texture = {
-      Texture.bedWhite, Texture.bedOrange, Texture.bedMagenta, Texture.bedLightBlue,
-      Texture.bedYellow, Texture.bedLime, Texture.bedPink, Texture.bedGray, Texture.bedSilver,
-      Texture.bedCyan, Texture.bedPurple, Texture.bedBlue, Texture.bedBrown, Texture.bedGreen,
-      Texture.bedRed, Texture.bedBlack
-  };
+  public BedModel(boolean isHead, int facing, Texture color) {
+    quads = Model.rotateY(isHead ? head : foot, -Math.toRadians(90 * facing));
 
-  static {
-    rot[0][0] = foot;
-    rot[1][0] = head;
-    for (int isHead = 0; isHead < 2; ++isHead) {
-      for (int angle = 1; angle < 4; ++angle) {
-        rot[isHead][angle] = Model.rotateY(rot[isHead][angle - 1]);
-      }
-    }
+    textures = new Texture[quads.length];
+    Arrays.fill(textures, color);
   }
 
-  public static boolean intersect(Ray ray) {
-    int isHead = (ray.getBlockData() >> 3) & 1;
-    int angle = ray.getBlockData() & 3;
-    int bedColor = 0xF & (ray.getCurrentData() >> BlockData.BED_COLOR);
-    return intersect(ray, texture[bedColor], isHead, angle);
+  @Override
+  public Quad[] getQuads() {
+    return quads;
   }
 
-  public static boolean intersect(Ray ray, Texture texture, int isHead, int angle) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-
-    for (Quad quad : rot[isHead][angle]) {
-      if (quad.intersect(ray)) {
-        float[] color = texture.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.n.set(quad.n);
-          ray.t = ray.tNext;
-          hit = true;
-        }
-      }
-    }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

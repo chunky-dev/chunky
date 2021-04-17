@@ -19,18 +19,13 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-/**
- * This block model is used to render blocks which can face east, west, north, south, up and down.
- * For example, command blocks and observer blocks.
- */
-public class ObserverModel {
+public class ObserverModel extends QuadModel {
 
   // Facing up:
-  private static final Quad[] up = new Quad[] {
+  private static final Quad[] observer = new Quad[] {
       // Bottom face.
       new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 0),
           new Vector4(1, 0, 1, 0)),
@@ -60,8 +55,8 @@ public class ObserverModel {
 
   static {
     // Rotate faces for all directions.
-    faces[1] = up;
-    Quad[] temp = Model.rotateX(up);
+    faces[1] = observer;
+    Quad[] temp = Model.rotateX(observer);
     // Facing down:
     faces[0] = Model.rotateX(temp);
     // Facing north:
@@ -75,34 +70,36 @@ public class ObserverModel {
     // Facing down:
     faces[6] = faces[1];
     // Facing up:
-    faces[7] = up;
+    faces[7] = observer;
   }
 
-  // Index 0 = back, 1 = front, 2 = side, 3 = top/bottom.
-  private static final int[] textureIndex = {3, 3, 2, 2, 1, 0};
+  private static final Texture[] texturesOff = {
+      Texture.observerTop, Texture.observerTop,
+      Texture.observerSide, Texture.observerSide,
+      Texture.observerFront, Texture.observerBack
+  };
 
-  public static boolean intersect(Ray ray, Texture[] textures) {
-    int direction = ray.getBlockData() & 7;
-    return intersect(ray, textures, direction);
+  private static final Texture[] texturesOn = {
+      Texture.observerTop, Texture.observerTop,
+      Texture.observerSide, Texture.observerSide,
+      Texture.observerFront, Texture.observerBackOn
+  };
+
+  private final Quad[] quads;
+  private final Texture[] textures;
+
+  public ObserverModel(int facing, boolean powered) {
+    quads = faces[facing];
+    textures = powered ? texturesOn : texturesOff;
   }
 
-  public static boolean intersect(Ray ray, Texture[] textures, int direction) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (int i = 0; i < 6; ++i) {
-      Quad face = faces[direction][i];
-      if (face.intersect(ray)) {
-        textures[textureIndex[i]].getColor(ray);
-        ray.n.set(face.n);
-        ray.t = ray.tNext;
-        hit = true;
-      }
-    }
-    if (hit) {
-      ray.color.w = 1;
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

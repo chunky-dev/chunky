@@ -18,17 +18,18 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
+
+import java.util.Arrays;
 
 /**
  * This block model is used to render blocks which can face east, west, north, south,
  * with the same texture assignments as glazed terracotta blocks.
  */
-public class TerracottaModel {
+public class TerracottaModel extends QuadModel {
 
-  // Facing north:
+  //region Model
   private static final Quad[] north = new Quad[] {
       // Side ? face.
       new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 0),
@@ -54,6 +55,7 @@ public class TerracottaModel {
       new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
           new Vector4(0, 1, 0, 1)),
   };
+  //endregion
 
   private static final Quad[][] faces = new Quad[8][];
 
@@ -69,28 +71,22 @@ public class TerracottaModel {
     faces[3] = Model.rotateY(faces[2]);
   }
 
-  public static boolean intersect(Ray ray, Texture texture) {
-    int direction = ray.getBlockData() & 3;
-    return intersect(ray, texture, direction);
+  private final Quad[] quads;
+  private final Texture[] textures;
+
+  public TerracottaModel(Texture texture, int direction) {
+    quads = faces[direction];
+    textures = new Texture[quads.length];
+    Arrays.fill(textures, texture);
   }
 
-  public static boolean intersect(Ray ray, Texture texture, int direction) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (int i = 0; i < 6; ++i) {
-      Quad face = faces[direction][i];
-      if (face.intersect(ray)) {
-        texture.getColor(ray);
-        ray.n.set(face.n);
-        ray.t = ray.tNext;
-        hit = true;
-      }
-    }
-    if (hit) {
-      ray.color.w = 1;
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

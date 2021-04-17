@@ -18,11 +18,13 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class DragonEggModel {
+import java.util.Arrays;
+
+public class DragonEggModel extends QuadModel {
+  //region Dragon Egg
   private static final Quad[] quads =
       new Quad[] {
         new Quad(
@@ -266,27 +268,18 @@ public class DragonEggModel {
             new Vector3(13 / 16.0, 0 / 16.0, 13 / 16.0),
             new Vector4(13 / 16.0, 3 / 16.0, 16 / 16.0, 15 / 16.0))
       };
+  //endregion
 
-  public static boolean intersect(Ray ray) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
+  private static final Texture[] textures = new Texture[quads.length];
+  static { Arrays.fill(textures, Texture.dragonEgg); }
 
-    for (Quad quad : quads) {
-      if (quad.intersect(ray)) {
-        float[] color = Texture.dragonEgg.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          hit = true;
-        }
-      }
-    }
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
 
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

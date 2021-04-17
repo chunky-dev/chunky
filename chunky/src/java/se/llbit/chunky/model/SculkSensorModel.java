@@ -2,11 +2,12 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class SculkSensorModel {
+import java.util.Arrays;
+
+public class SculkSensorModel extends QuadModel {
 
   private static final Texture bottom = Texture.sculkSensorBottom;
   private static final Texture side = Texture.sculkSensorSide;
@@ -15,6 +16,7 @@ public class SculkSensorModel {
       top, bottom, side, side, side, side
   };
 
+  //region Model
   private static final Quad[] quads = Model.join(
       new Quad[]{
           new Quad(
@@ -111,43 +113,24 @@ public class SculkSensorModel {
           )
       }, Math.toRadians(-45), new Vector3(3 / 16.0, 0, 13 / 16.0))
   );
+  //endregion
 
-  public static boolean intersect(Ray ray, boolean active) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
+  private final Texture[] textures;
 
-    for (int i = 0; i < 6; i++) {
-      Quad quad = quads[i];
-      if (quad.intersect(ray)) {
-        float[] color = tex[i].getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          hit = true;
-        }
-      }
-    }
+  public SculkSensorModel(boolean active) {
+    textures = new Texture[quads.length];
+    System.arraycopy(tex, 0, textures, 0, tex.length);
+    Arrays.fill(textures, tex.length, textures.length,
+        active ? Texture.sculkSensorTendrilActive : Texture.sculkSensorTendrilInactive);
+  }
 
-    Texture tendril =
-        active ? Texture.sculkSensorTendrilActive : Texture.sculkSensorTendrilInactive;
-    for (int i = 6; i < quads.length; i++) {
-      Quad quad = quads[i];
-      if (quad.intersect(ray)) {
-        float[] color = tendril.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          hit = true;
-        }
-      }
-    }
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
 
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

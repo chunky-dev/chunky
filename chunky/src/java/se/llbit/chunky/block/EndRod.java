@@ -1,47 +1,57 @@
 package se.llbit.chunky.block;
 
+import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.EndRodModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
-public class EndRod extends MinecraftBlock {
-  private final int facing;
+public class EndRod extends MinecraftBlock implements ModelBlock {
+  private final EndRodModel model;
   private final String description;
 
-  public EndRod(String facing) {
+  public EndRod(String facingString) {
     super("end_rod", Texture.endRod);
-    this.description = "facing=" + facing;
+    this.description = "facing=" + facingString;
     localIntersect = true;
     opaque = false;
-    switch (facing) {
+    int facing;
+    switch (facingString) {
       case "down":
-        this.facing = 0;
+        facing = 0;
         break;
       default:
       case "up":
-        this.facing = 1;
+        facing = 1;
         break;
       case "north":
-        this.facing = 2;
+        facing = 2;
         break;
       case "south":
-        this.facing = 3;
+        facing = 3;
         break;
       case "west":
-        this.facing = 4;
+        facing = 4;
         break;
       case "east":
-        this.facing = 5;
+        facing = 5;
         break;
     }
+    model = new EndRodModel(facing);
   }
 
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return EndRodModel.intersect(ray, facing);
+  @Override
+  public boolean intersect(Ray ray, Scene scene) {
+    return model.intersect(ray, scene);
   }
 
-  @Override public String description() {
+  @Override
+  public String description() {
     return description;
+  }
+
+  @Override
+  public BlockModel getModel() {
+    return model;
   }
 }

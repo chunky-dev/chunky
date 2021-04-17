@@ -33,6 +33,11 @@ public class AnimatedTexture extends Texture {
     updateNumFrames();
   }
 
+  @Override
+  public float[] getColor(double u, double v) {
+    return getColor(u, v, 0);
+  }
+
   /**
    * Get color for animation frame.
    */

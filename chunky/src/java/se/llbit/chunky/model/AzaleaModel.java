@@ -2,12 +2,12 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class AzaleaModel {
+public class AzaleaModel extends QuadModel {
 
+  //region Azalea Model
   private static final Quad[] quads = Model.join(
       new Quad[]{
           // top
@@ -103,54 +103,25 @@ public class AzaleaModel {
           )
       }, Math.toRadians(45))
   );
+  //endregion
 
-  public static boolean intersect(Ray ray, Texture top, Texture side) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
+  private final Texture[] textures;
 
-    for (int i = 0; i < 2; i++) {
-      Quad quad = quads[i];
-      if (quad.intersect(ray)) {
-        float[] color = top.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          hit = true;
-        }
-      }
-    }
+  public AzaleaModel(Texture top, Texture side) {
+    Texture plant = Texture.azaleaPlant;
+    textures = new Texture[14];
+    for (int i = 0; i < 2; i++) textures[i] = top;
+    for (int i = 2; i < 10; i++) textures[i] = side;
+    for (int i = 10; i < 14; i++) textures[i] = plant;
+  }
 
-    for (int i = 2; i < 10; i++) {
-      Quad quad = quads[i];
-      if (quad.intersect(ray)) {
-        float[] color = side.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          hit = true;
-        }
-      }
-    }
+  @Override
+  public Quad[] getQuads() {
+      return quads;
+  }
 
-    for (int i = 10; i < 14; i++) {
-      Quad quad = quads[i];
-      if (quad.intersect(ray)) {
-        float[] color = Texture.azaleaPlant.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          hit = true;
-        }
-      }
-    }
-
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

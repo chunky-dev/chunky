@@ -17,6 +17,7 @@
 package se.llbit.chunky.model;
 
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.AnimatedTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
@@ -26,19 +27,37 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 import se.llbit.util.MinecraftPRNG;
 
-public class FireModel {
-  protected static Quad[] quads =
-      {new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 1), new Vector3(0, 1, 0),
+public class FireModel extends QuadModel {
+  private final static Quad[] quads = {
+      new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 1), new Vector3(0, 1, 0),
           new Vector4(0, 1, 0, 1)),
 
-          new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 1, 0),
-              new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 1, 0),
+          new Vector4(0, 1, 0, 1)),
 
-          new Quad(new Vector3(1, 0, 1), new Vector3(0, 0, 0), new Vector3(1, 1, 1),
-              new Vector4(1, 0, 0, 1)),
+      new Quad(new Vector3(1, 0, 1), new Vector3(0, 0, 0), new Vector3(1, 1, 1),
+          new Vector4(1, 0, 0, 1)),
 
-          new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 0), new Vector3(0, 1, 1),
-              new Vector4(1, 0, 0, 1)),};
+      new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 0), new Vector3(0, 1, 1),
+          new Vector4(1, 0, 0, 1)),
+  };
+
+  private final Texture[] textures;
+
+  public FireModel(AnimatedTexture tex0, AnimatedTexture tex1) {
+    //TODO: Animated textures
+    this.textures = new Texture[] {tex0, tex1, tex0, tex1};
+  }
+
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public boolean intersect(Ray ray, Scene scene) {
+    return intersect(ray, (AnimatedTexture[]) textures, scene.getAnimationTime());
+  }
 
   public static boolean intersect(Ray ray, AnimatedTexture[] texture, double time) {
     boolean hit = false;
@@ -66,5 +85,10 @@ public class FireModel {
       ray.o.scaleAdd(ray.t, ray.d);
     }
     return hit;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

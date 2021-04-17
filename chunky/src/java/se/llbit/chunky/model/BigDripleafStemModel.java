@@ -2,12 +2,14 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class BigDripleafStemModel {
+import java.util.Arrays;
 
+public class BigDripleafStemModel extends QuadModel {
+
+  //region Big Dripleaf Stem
   private static final Quad[] quadsNorth =
       Model.join(
           Model.rotateY(new Quad[]{
@@ -41,50 +43,38 @@ public class BigDripleafStemModel {
               },
               Math.toRadians(-45), new Vector3(0.5, 0, 12 / 16.0)) // TODO rescale
       );
+  //endregion
 
-  private static final Quad[][] orientedQuads = new Quad[4][];
+  private static final Texture[] textures = new Texture[quadsNorth.length];
+  static { Arrays.fill(textures, Texture.bigDripleafStem); }
 
-  static {
-    orientedQuads[0] = quadsNorth;
-    orientedQuads[1] = Model.rotateY(orientedQuads[0]);
-    orientedQuads[2] = Model.rotateY(orientedQuads[1]);
-    orientedQuads[3] = Model.rotateY(orientedQuads[2]);
-  }
+  private final Quad[] quads;
 
-  public static boolean intersect(Ray ray, String facing) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-
-    for (Quad quad : orientedQuads[getOrientationIndex(facing)]) {
-      if (quad.intersect(ray)) {
-        float[] color = Texture.bigDripleafStem.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          hit = true;
-        }
-      }
-    }
-
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
-  }
-
-  private static int getOrientationIndex(String facing) {
+  public BigDripleafStemModel(String facing) {
     switch (facing) {
-      case "east":
-        return 1;
-      case "south":
-        return 2;
-      case "west":
-        return 3;
       case "north":
       default:
-        return 0;
+        quads = quadsNorth;
+        break;
+      case "east":
+        quads = Model.rotateY(quadsNorth, -Math.toRadians(90));
+        break;
+      case "south":
+        quads = Model.rotateY(quadsNorth, -Math.toRadians(180));
+        break;
+      case "west":
+        quads = Model.rotateY(quadsNorth, -Math.toRadians(270));
+        break;
     }
+  }
+
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

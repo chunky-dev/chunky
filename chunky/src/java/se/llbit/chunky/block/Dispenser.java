@@ -1,23 +1,17 @@
 package se.llbit.chunky.block;
 
+import se.llbit.chunky.model.BlockModel;
+import se.llbit.chunky.model.DispenserModel;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.Ray;
 
 /**
  * The dispenser behaves almost like a TopBottomOrientedTexturedBlock. If it's facing up or down, it
  * has different textures (and thus different texture orientation logic).
  */
-public class Dispenser extends TopBottomOrientedTexturedBlock {
-
-  private static final int[][] verticalUvRotationMap = {
-      {0, 0, 0, 0, 2, 0}, // up
-      {2, 2, 2, 2, 2, 0}, // down
-  };
-
-  private static final int[][] verticalTextureOrientationMap = {
-      {4, 4, 4, 4, 0, 4}, // up
-      {4, 4, 4, 4, 4, 0}, // down
-  };
-
+public class Dispenser extends MinecraftBlock implements ModelBlock {
+  private final DispenserModel model;
   private final String description;
 
   public Dispenser(String facing) {
@@ -27,10 +21,15 @@ public class Dispenser extends TopBottomOrientedTexturedBlock {
 
   public Dispenser(String name, String facing, Texture front, Texture frontVertical, Texture side,
       Texture back) {
-    super(name, facing,
-        facing.equals("up") || facing.equals("down") ? frontVertical : front,
-        side, back);
+    super(name, front);
+    localIntersect = true;
+    this.model = new DispenserModel(facing, front, frontVertical, side, back);
     this.description = "facing=" + facing;
+  }
+
+  @Override
+  public boolean intersect(Ray ray, Scene scene) {
+    return model.intersect(ray, scene);
   }
 
   @Override
@@ -39,12 +38,7 @@ public class Dispenser extends TopBottomOrientedTexturedBlock {
   }
 
   @Override
-  protected int[][] getUvRotationMap() {
-    return facing <= 1 ? verticalUvRotationMap : super.getUvRotationMap();
-  }
-
-  @Override
-  protected int[][] getTextureOrientationMap() {
-    return facing <= 1 ? verticalTextureOrientationMap : super.getTextureOrientationMap();
+  public BlockModel getModel() {
+    return model;
   }
 }

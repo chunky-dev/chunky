@@ -3261,6 +3261,9 @@ public class TexturePackLoader {
     allTextures.put("barrel_top",
         new SimpleTexture("assets/minecraft/textures/block/barrel_top",
             Texture.barrelTop));
+    allTextures.put("barrel_top_open",
+        new SimpleTexture("assets/minecraft/textures/block/barrel_top_open",
+            Texture.barrelOpen));
     allTextures.put("barrel_side",
         new SimpleTexture("assets/minecraft/textures/block/barrel_side",
             Texture.barrelSide));

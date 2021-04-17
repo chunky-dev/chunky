@@ -23,8 +23,8 @@ import se.llbit.math.Ray;
 
 public class TallGrassModel extends SpriteModel {
 
-  private static final TintType[] tinting = new TintType[]{
-      TintType.BIOME_GRASS, TintType.BIOME_GRASS, TintType.BIOME_GRASS, TintType.BIOME_GRASS
+  private static final Tint[] tinting = new Tint[]{
+      Tint.BIOME_GRASS, Tint.BIOME_GRASS, Tint.BIOME_GRASS, Tint.BIOME_GRASS
   };
   // private static final Texture[] tex = { Texture.deadBush, Texture.tallGrass, Texture.fern };
 
@@ -63,7 +63,7 @@ public class TallGrassModel extends SpriteModel {
   */
 
   @Override
-  public TintType[] getTintedQuads() {
+  public Tint[] getTints() {
     return tinting;
   }
 
