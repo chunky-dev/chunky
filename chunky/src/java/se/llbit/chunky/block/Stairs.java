@@ -1,17 +1,14 @@
 package se.llbit.chunky.block;
 
-import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.StairModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Ray;
 
-public class Stairs extends MinecraftBlockTranslucent implements ModelBlock {
+public class Stairs extends AbstractModelBlock {
+
   private final int flipped, facing, corner;
   private final boolean isCorner;
   private final Texture side, top, bottom;
   private final String description;
-  private final StairModel model;
 
   public Stairs(String name, Texture texture, String half, String shape, String facing) {
     this(name, texture, texture, texture, half, shape, facing);
@@ -24,7 +21,6 @@ public class Stairs extends MinecraftBlockTranslucent implements ModelBlock {
     this.side = side;
     this.top = top;
     this.bottom = bottom;
-    localIntersect = true;
     solid = false;
     flipped = (half.equals("top")) ? 1 : 0;
     switch (facing) {
@@ -86,16 +82,16 @@ public class Stairs extends MinecraftBlockTranslucent implements ModelBlock {
         switch (facing) {
           default:
           case "east":
-            this.corner = 0+4;
+            this.corner = 0 + 4;
             break;
           case "west":
-            this.corner = 3+4;
+            this.corner = 3 + 4;
             break;
           case "south":
-            this.corner = 1+4;
+            this.corner = 1 + 4;
             break;
           case "north":
-            this.corner = 2+4;
+            this.corner = 2 + 4;
             break;
         }
         break;
@@ -103,16 +99,16 @@ public class Stairs extends MinecraftBlockTranslucent implements ModelBlock {
         switch (facing) {
           default:
           case "east":
-            this.corner = 2+4;
+            this.corner = 2 + 4;
             break;
           case "west":
-            this.corner = 1+4;
+            this.corner = 1 + 4;
             break;
           case "south":
-            this.corner = 0+4;
+            this.corner = 0 + 4;
             break;
           case "north":
-            this.corner = 3+4;
+            this.corner = 3 + 4;
             break;
         }
         break;
@@ -121,16 +117,8 @@ public class Stairs extends MinecraftBlockTranslucent implements ModelBlock {
     this.model = new StairModel(side, top, bottom, flipped, isCorner, corner, this.facing);
   }
 
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return model.intersect(ray,scene);
-  }
-
-  @Override public String description() {
-    return description;
-  }
-
   @Override
-  public BlockModel getModel() {
-    return model;
+  public String description() {
+    return description;
   }
 }

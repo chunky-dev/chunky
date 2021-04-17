@@ -1,24 +1,19 @@
 package se.llbit.chunky.block;
 
-import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.RailModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Ray;
 
-public class Rail extends MinecraftBlock implements ModelBlock {
-  private final RailModel model;
+public class Rail extends AbstractModelBlock {
+
   private final String description;
 
   public Rail(String name, Texture straightTrack, String shape) {
     super(name, Texture.dispenserFront);
-    Texture[] texture = new Texture[] {
+    Texture[] texture = new Texture[]{
         straightTrack, straightTrack, straightTrack, straightTrack, straightTrack, straightTrack,
         Texture.railsCurved, Texture.railsCurved, Texture.railsCurved, Texture.railsCurved
     };
     this.description = "shape=" + shape;
-    localIntersect = true;
-    opaque = false;
     solid = false;
 
     int variation;
@@ -59,17 +54,7 @@ public class Rail extends MinecraftBlock implements ModelBlock {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return model.intersect(ray, scene);
-  }
-
-  @Override
   public String description() {
     return description;
-  }
-
-  @Override
-  public BlockModel getModel() {
-    return model;
   }
 }
