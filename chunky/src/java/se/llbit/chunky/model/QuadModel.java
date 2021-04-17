@@ -6,6 +6,10 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 
+/**
+ * A block model that is made out of textured quads.
+ */
+@PluginApi
 public abstract class QuadModel implements BlockModel {
 
   // Epsilons to clip ray intersections to the current block.
@@ -27,7 +31,7 @@ public abstract class QuadModel implements BlockModel {
   public boolean intersect(Ray ray, Scene scene) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
-    
+
     Quad[] quads = getQuads();
     Texture[] textures = getTextures();
     Tint[] tintedQuads = getTints();
