@@ -1,14 +1,15 @@
 package se.llbit.chunky.block;
 
-import se.llbit.chunky.model.LargeFlowerModel;
+import se.llbit.chunky.model.BlockModel;
+import se.llbit.chunky.model.SunFlowerModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 // TODO: refactor me!
 // TODO: render the sunflower actually facing the sun.
-public class Sunflower extends MinecraftBlockTranslucent {
-  private final int top;
+public class Sunflower extends MinecraftBlockTranslucent implements ModelBlock {
+  private final SunFlowerModel model;
 
   public Sunflower(String half) {
     super("sunflower",
@@ -17,10 +18,16 @@ public class Sunflower extends MinecraftBlockTranslucent {
             : Texture.sunflowerBottom);
     localIntersect = true;
     solid = false;
-    top = half.equals("upper") ? 1 : 0;
+    this.model = new SunFlowerModel(half.equals("upper"));
   }
 
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return LargeFlowerModel.intersect(ray, scene, 0, top);
+  @Override
+  public boolean intersect(Ray ray, Scene scene) {
+    return model.intersect(ray, scene);
+  }
+
+  @Override
+  public BlockModel getModel() {
+    return model;
   }
 }

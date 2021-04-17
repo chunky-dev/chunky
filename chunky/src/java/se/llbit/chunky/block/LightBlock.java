@@ -8,6 +8,11 @@ import se.llbit.math.Ray;
 
 public class LightBlock extends MinecraftBlockTranslucent {
 
+  private static final TexturedBlockModel previewBlockModel = new TexturedBlockModel(
+      Texture.light, Texture.light, Texture.light,
+      Texture.light, Texture.light, Texture.light
+  );
+
   private final int level;
 
   public LightBlock(String name, int level) {
@@ -24,7 +29,7 @@ public class LightBlock extends MinecraftBlockTranslucent {
   @Override
   public boolean intersect(Ray ray, Scene scene) {
     if (scene.getMode() == RenderMode.PREVIEW) {
-      return TexturedBlockModel.intersect(ray, Texture.light);
+      return previewBlockModel.intersect(ray, scene);
     }
     if (scene.getMode() != RenderMode.PREVIEW &&
         (!scene.getEmittersEnabled() || emittance < Ray.EPSILON

@@ -1,30 +1,35 @@
 package se.llbit.chunky.block;
 
+import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.SmallDripleafModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
-public class SmallDripleaf extends MinecraftBlockTranslucent {
-
-  private final String facing;
-  private final String half;
+public class SmallDripleaf extends MinecraftBlockTranslucent implements ModelBlock {
+  private final SmallDripleafModel model;
+  private final String description;
 
   public SmallDripleaf(String facing, String half) {
     super("small_dripleaf", Texture.smallDripleafTop);
-    this.facing = facing;
-    this.half = half;
+    this.description = "facing=" + facing + ", half=" + half;
+    this.model = new SmallDripleafModel(facing, half);
     localIntersect = true;
     solid = false;
   }
 
   @Override
   public boolean intersect(Ray ray, Scene scene) {
-    return SmallDripleafModel.intersect(ray, facing, half);
+    return model.intersect(ray, scene);
   }
 
   @Override
   public String description() {
-    return "facing=" + facing + ", half=" + half;
+    return description;
+  }
+
+  @Override
+  public BlockModel getModel() {
+    return model;
   }
 }

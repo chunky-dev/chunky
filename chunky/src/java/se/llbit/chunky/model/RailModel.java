@@ -19,8 +19,6 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
@@ -29,8 +27,8 @@ import se.llbit.math.Vector4;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class RailModel {
-  private static Quad[] rails = {
+public class RailModel extends QuadModel {
+  private static final Quad[] rails = {
       // Flat north-south.
       new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
           new Vector4(0, 1, 0, 1)),
@@ -73,24 +71,21 @@ public class RailModel {
 
   };
 
-  public static boolean intersect(Ray ray, Texture texture, int type) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    Quad quad = rails[type];
-    if (quad.intersect(ray)) {
-      float[] color = texture.getColor(ray.u, ray.v);
-      if (color[3] > Ray.EPSILON) {
-        ray.color.set(color);
-        ray.t = ray.tNext;
-        ray.n.set(quad.n);
-        ray.n.scale(-QuickMath.signum(ray.d.dot(quad.n)));
-        hit = true;
-      }
-    }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  private final Quad[] quads;
+  private final Texture[] textures;
+
+  public RailModel(Texture texture, int type) {
+    this.quads = new Quad[] { rails[type] };
+    this.textures = new Texture[] { texture };
+  }
+
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

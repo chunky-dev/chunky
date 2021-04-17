@@ -1,43 +1,50 @@
 package se.llbit.chunky.block;
 
+import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.TripwireHookModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
-public class TripwireHook extends MinecraftBlockTranslucent {
-    private final int facing;
-    private final boolean attached, powered;
+public class TripwireHook extends MinecraftBlockTranslucent implements ModelBlock {
+    private final TripwireHookModel model;
+    private final String description;
 
-    public TripwireHook(String facing, boolean attached, boolean powered) {
+    public TripwireHook(String facingString, boolean attached, boolean powered) {
         super("tripwire_hook", Texture.tripwire);
         localIntersect = true;
-        this.attached = attached;
-        this.powered = powered;
-        switch (facing) {
+        this.description = String.format("facing=%s,attached=%s,powered=%s", facingString, attached, powered);
+        int facing;
+        switch (facingString) {
             default:
             case "north":
-                this.facing = 0;
+                facing = 0;
                 break;
             case "south":
-                this.facing = 2;
+                facing = 2;
                 break;
             case "west":
-                this.facing = 3;
+                facing = 3;
                 break;
             case "east":
-                this.facing = 1;
+                facing = 1;
                 break;
         }
+        this.model = new TripwireHookModel(facing, attached, powered);
     }
 
     @Override
     public boolean intersect(Ray ray, Scene scene) {
-        return TripwireHookModel.intersect(ray, facing, attached, powered);
+        return model.intersect(ray, scene);
     }
 
     @Override
     public String description() {
-        return String.format("facing=%s,attached=%s,powered=%s", facing, attached, powered);
+        return description;
+    }
+
+    @Override
+    public BlockModel getModel() {
+        return model;
     }
 }

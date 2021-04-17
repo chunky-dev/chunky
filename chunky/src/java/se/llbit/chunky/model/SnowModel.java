@@ -17,70 +17,64 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Quad;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 
-public class SnowModel {
-  protected static Quad[][] quads = new Quad[8][];
+public class SnowModel extends QuadModel {
+  protected static Quad[][] model = new Quad[8][];
 
   static {
     for (int i = 0; i < 8; ++i) {
       double height = (i + 1) * .125;
 
-      quads[i] = new Quad[6];
+      model[i] = new Quad[6];
 
       // front
-      quads[i][0] =
+      model[i][0] =
           new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, height, 0),
               new Vector4(1, 0, 0, height));
       // back
-      quads[i][1] =
+      model[i][1] =
           new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 1), new Vector3(0, height, 1),
               new Vector4(0, 1, 0, height));
 
       // right
-      quads[i][2] =
+      model[i][2] =
           new Quad(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, height, 0),
               new Vector4(0, 1, 0, height));
 
       // left
-      quads[i][3] =
+      model[i][3] =
           new Quad(new Vector3(1, 0, 1), new Vector3(1, 0, 0), new Vector3(1, height, 1),
               new Vector4(1, 0, 0, height));
 
       // top
-      quads[i][4] = new Quad(new Vector3(1, height, 0), new Vector3(0, height, 0),
+      model[i][4] = new Quad(new Vector3(1, height, 0), new Vector3(0, height, 0),
           new Vector3(1, height, 1), new Vector4(1, 0, 0, 1));
 
       // bottom
-      quads[i][5] = new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+      model[i][5] = new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
           new Vector4(0, 1, 0, 1));
     }
   }
 
-  public static boolean intersect(Ray ray) {
-    int layers = ray.getBlockData();
-    return intersect(ray, layers);
+  private final static Texture[] textures = {
+      Texture.snowBlock, Texture.snowBlock,Texture.snowBlock,
+      Texture.snowBlock, Texture.snowBlock,Texture.snowBlock
+  };
+
+  private final Quad[] quads;
+
+  public SnowModel(int layers) {
+    quads = model[(int) QuickMath.clamp(layers-1, 0, model.length-1)];
   }
 
-  public static boolean intersect(Ray ray, int layers) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (Quad quad : quads[layers - 1]) {
-      if (quad.intersect(ray)) {
-        Texture.snowBlock.getColor(ray);
-        ray.n.set(quad.n);
-        ray.t = ray.tNext;
-        hit = true;
-      }
-    }
-    if (hit) {
-      ray.color.w = 1;
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

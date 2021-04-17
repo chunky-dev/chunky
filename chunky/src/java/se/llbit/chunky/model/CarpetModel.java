@@ -18,20 +18,26 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
-import se.llbit.math.Ray;
 
-public class CarpetModel {
-  private static AABB aabb = new AABB(0, 1, 0, 1 / 16., 0, 1);
+import java.util.Arrays;
 
-  public static boolean intersect(Ray ray, Texture texture) {
-    ray.t = Double.POSITIVE_INFINITY;
-    if (aabb.intersect(ray)) {
-      texture.getColor(ray);
-      ray.color.w = 1;
-      ray.distance += ray.tNext;
-      ray.o.scaleAdd(ray.tNext, ray.d);
-      return true;
-    }
-    return false;
+public class CarpetModel extends AABBModel {
+  private static final AABB[] aabbs = { new AABB(0, 1, 0, 1 / 16., 0, 1) };
+
+  private final Texture[][] textures;
+
+  public CarpetModel(Texture color) {
+    textures = new Texture[1][6];
+    Arrays.fill(textures[0], color);
+  }
+
+  @Override
+  public AABB[] getBoxes() {
+    return aabbs;
+  }
+
+  @Override
+  public Texture[][] getTextures() {
+    return textures;
   }
 }

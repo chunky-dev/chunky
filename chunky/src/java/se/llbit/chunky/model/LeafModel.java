@@ -16,55 +16,45 @@
  */
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
-import se.llbit.math.ColorUtil;
-import se.llbit.math.Ray;
 
-public class LeafModel {
-  private static final AABB block = new AABB(0, 1, 0, 1, 0, 1);
+public class LeafModel extends AABBModel {
+  private static final AABB[] boxes = { new AABB(0, 1, 0, 1, 0, 1) };
 
-  /**
-   * Get leaf color at ray intersection, based on biome.
-   */
-  public static boolean intersect(Ray ray, Scene scene, Texture texture) {
-    ray.t = Double.POSITIVE_INFINITY;
-    if (block.intersect(ray)) {
-      float[] color = texture.getColor(ray.u, ray.v);
-      if (color[3] > Ray.EPSILON) {
-        ray.color.set(color);
-        float[] biomeColor = ray.getBiomeFoliageColor(scene);
-        ray.color.x *= biomeColor[0];
-        ray.color.y *= biomeColor[1];
-        ray.color.z *= biomeColor[2];
-        ray.distance += ray.tNext;
-        ray.o.scaleAdd(ray.tNext, ray.d);
-        return true;
-      }
-    }
-    return false;
+  private final Texture[][] textures;
+  private final Tint[][] tints;
+
+  public LeafModel(Texture texture) {
+    this.textures = new Texture[][] {
+        {texture, texture, texture, texture, texture, texture}
+    };
+    this.tints = new Tint[][] {{
+        Tint.BIOME_FOLIAGE, Tint.BIOME_FOLIAGE, Tint.BIOME_FOLIAGE,
+        Tint.BIOME_FOLIAGE, Tint.BIOME_FOLIAGE, Tint.BIOME_FOLIAGE
+    }};
   }
 
-  /**
-   * Get leaf color at ray intersection, using base leaf color.
-   *
-   * @param leafColor base leaf color to blend the leaf texture with.
-   */
-  public static boolean intersect(Ray ray, Texture texture, float[] leafColor) {
-    ray.t = Double.POSITIVE_INFINITY;
-    if (block.intersect(ray)) {
-      float[] color = texture.getColor(ray.u, ray.v);
-      if (color[3] > Ray.EPSILON) {
-        ray.color.set(color);
-        ray.color.x *= leafColor[0];
-        ray.color.y *= leafColor[1];
-        ray.color.z *= leafColor[2];
-        ray.distance += ray.tNext;
-        ray.o.scaleAdd(ray.tNext, ray.d);
-        return true;
-      }
-    }
-    return false;
+  public LeafModel(Texture texture, int tint) {
+    this.textures = new Texture[][] {
+        {texture, texture, texture, texture, texture, texture}
+    };
+    Tint t = new Tint(tint);
+    this.tints = new Tint[][] {{t, t, t, t, t, t}};
+  }
+
+  @Override
+  public AABB[] getBoxes() {
+    return boxes;
+  }
+
+  @Override
+  public Texture[][] getTextures() {
+    return textures;
+  }
+
+  @Override
+  public Tint[][] getTints() {
+    return tints;
   }
 }

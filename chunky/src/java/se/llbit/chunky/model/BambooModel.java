@@ -13,6 +13,7 @@ public class BambooModel extends QuadModel {
       Texture.bambooStalk, Texture.bambooStalk
   };
 
+  //region Bamboo Stem
   private static final Quad[][] stemQuads = new Quad[][]{
       // age = 0
       new Quad[]{
@@ -94,12 +95,14 @@ public class BambooModel extends QuadModel {
           )
       }
   };
+  //endregion
 
   private static final Texture[] smallLeavesTex = new Texture[]{
       Texture.bambooSmallLeaves, Texture.bambooSmallLeaves, Texture.bambooSmallLeaves,
       Texture.bambooSmallLeaves,
   };
 
+  //region Bamboo Small Leaves
   private static final Quad[] smallLeaves = new Quad[]{
       new Quad(
           new Vector3(15.2 / 16.0, 0 / 16.0, 8 / 16.0),
@@ -126,12 +129,14 @@ public class BambooModel extends QuadModel {
           new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
       )
   };
+  //endregion
 
   private static final Texture[] largeLeavesTex = new Texture[]{
       Texture.bambooLargeLeaves, Texture.bambooLargeLeaves, Texture.bambooLargeLeaves,
       Texture.bambooLargeLeaves
   };
 
+  //region Bamboo Large Leaves
   private static final Quad[] largeLeaves = new Quad[]{
       new Quad(
           new Vector3(15.2 / 16.0, 0 / 16.0, 8 / 16.0),
@@ -158,6 +163,8 @@ public class BambooModel extends QuadModel {
           new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
       )
   };
+  //endregion
+
   private final Quad[] quads;
   private final Texture[] textures;
 

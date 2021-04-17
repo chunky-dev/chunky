@@ -1,12 +1,17 @@
 package se.llbit.chunky.model;
 
-import static se.llbit.chunky.model.TintType.BIOME_GRASS;
-import static se.llbit.chunky.model.TintType.NONE;
+import static se.llbit.chunky.model.Tint.BIOME_GRASS;
+import static se.llbit.chunky.model.Tint.NONE;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 
 public class GrassBlockModel extends AABBModel {
+
+  private final static Tint[][] tints = new Tint[][] {
+      {BIOME_GRASS, BIOME_GRASS, BIOME_GRASS, BIOME_GRASS, NONE, NONE},
+      {NONE, NONE, NONE, NONE, BIOME_GRASS, NONE}
+  };
 
   private final static AABB[] boxes = new AABB[]{
       new AABB(0, 1, 0, 1, 0, 1),
@@ -37,10 +42,7 @@ public class GrassBlockModel extends AABBModel {
   }
 
   @Override
-  public TintType[][] getTintedFaces() {
-    return new TintType[][]{
-        {BIOME_GRASS, BIOME_GRASS, BIOME_GRASS, BIOME_GRASS, NONE, NONE},
-        {NONE, NONE, NONE, NONE, BIOME_GRASS, NONE}
-    };
+  public Tint[][] getTints() {
+    return tints;
   }
 }

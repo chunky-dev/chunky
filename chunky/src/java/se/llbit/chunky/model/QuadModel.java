@@ -3,12 +3,14 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.resources.pbr.NormalMap;
-import se.llbit.log.Log;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 
 public abstract class QuadModel implements BlockModel {
+
+  // Epsilons to clip ray intersections to the current block.
+  private static final double E0 = -Ray.EPSILON;
+  private static final double E1 = 1 + Ray.EPSILON;
 
   @PluginApi
   public abstract Quad[] getQuads();
@@ -17,7 +19,7 @@ public abstract class QuadModel implements BlockModel {
   public abstract Texture[] getTextures();
 
   @PluginApi
-  public TintType[] getTintedQuads() {
+  public Tint[] getTints() {
     return null;
   }
 
@@ -25,48 +27,37 @@ public abstract class QuadModel implements BlockModel {
   public boolean intersect(Ray ray, Scene scene) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
-
+    
     Quad[] quads = getQuads();
     Texture[] textures = getTextures();
-    TintType[] tintedQuads = getTintedQuads();
+    Tint[] tintedQuads = getTints();
 
+    float[] color = null;
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
       if (quad.intersect(ray)) {
-        float[] color = textures[i].getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          TintType tintType = tintedQuads == null ? TintType.NONE : tintedQuads[i];
-          if (tintType != TintType.NONE) {
-            float[] biomeColor;
-            switch (tintType) {
-              case BIOME_FOLIAGE:
-                biomeColor = ray.getBiomeFoliageColor(scene);
-                break;
-              case BIOME_GRASS:
-                biomeColor = ray.getBiomeGrassColor(scene);
-                break;
-              case BIOME_WATER:
-                biomeColor = ray.getBiomeWaterColor(scene);
-                break;
-              default:
-                Log.warn("Unsupported TintType: " + tintType);
-                biomeColor = new float[]{1, 1, 1};
-                break;
-            }
-            color[0] *= biomeColor[0];
-            color[1] *= biomeColor[1];
-            color[2] *= biomeColor[2];
-          }
-          ray.color.set(color);
+        float[] c = textures[i].getColor(ray.u, ray.v);
+        if (c[3] > Ray.EPSILON) {
+          Tint tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
+          tint.tint(c, ray, scene);
+          color = c;
           ray.t = ray.tNext;
           ray.n.set(quad.n);
-          NormalMap.apply(ray, quad, textures[i]);
           hit = true;
         }
       }
     }
 
     if (hit) {
+      double px = ray.o.x - Math.floor(ray.o.x + ray.d.x * Ray.OFFSET) + ray.d.x * ray.tNext;
+      double py = ray.o.y - Math.floor(ray.o.y + ray.d.y * Ray.OFFSET) + ray.d.y * ray.tNext;
+      double pz = ray.o.z - Math.floor(ray.o.z + ray.d.z * Ray.OFFSET) + ray.d.z * ray.tNext;
+      if (px < E0 || px > E1 || py < E0 || py > E1 || pz < E0 || pz > E1) {
+        // TODO this check is only really needed for wall torches
+        return false;
+      }
+
+      ray.color.set(color);
       ray.distance += ray.t;
       ray.o.scaleAdd(ray.t, ray.d);
     }
