@@ -244,6 +244,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean waterPlaneEnabled = false;
   protected double waterPlaneHeight = World.SEA_LEVEL;
   protected boolean waterPlaneOffsetEnabled = true;
+  protected boolean waterPlaneClip = true;
 
   /**
    * Enables fast fog algorithm
@@ -486,6 +487,7 @@ public class Scene implements JsonSerializable, Refreshable {
     waterPlaneEnabled = other.waterPlaneEnabled;
     waterPlaneHeight = other.waterPlaneHeight;
     waterPlaneOffsetEnabled = other.waterPlaneOffsetEnabled;
+    waterPlaneClip = other.waterPlaneClip;
 
     spp = other.spp;
     renderTime = other.renderTime;
@@ -1794,6 +1796,17 @@ public class Scene implements JsonSerializable, Refreshable {
     return waterPlaneOffsetEnabled;
   }
 
+  public void setWaterPlaneClip(boolean enabled) {
+    if (enabled != waterPlaneClip) {
+      waterPlaneClip = enabled;
+      refresh();
+    }
+  }
+
+  public boolean getWaterPlaneClip() {
+    return waterPlaneClip;
+  }
+
   /**
    * @return the dumpFrequency
    */
@@ -2449,6 +2462,17 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
+   * Query if a position is loaded.
+   */
+  public boolean isChunkLoaded(int x, int z) {
+    if (waterTexture != null && waterTexture.contains(x, z)) {
+      float[] color = waterTexture.get(x, z);
+      return color[0] > 0 || color[1] > 0 || color[2] > 0;
+    }
+    return false;
+  }
+
+  /**
    * Merge a render dump into this scene.
    */
   public void mergeDump(File dumpFile, TaskTracker taskTracker) {
@@ -2588,6 +2612,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("waterWorldEnabled", waterPlaneEnabled);
     json.add("waterWorldHeight", waterPlaneHeight);
     json.add("waterWorldHeightOffsetEnabled", waterPlaneOffsetEnabled);
+    json.add("waterWorldClipEnabled", waterPlaneClip);
     json.add("renderActors", renderActors);
 
     if (!worldPath.isEmpty()) {
@@ -2866,6 +2891,7 @@ public class Scene implements JsonSerializable, Refreshable {
       waterPlaneHeight = json.get("waterWorldHeight").doubleValue(waterPlaneHeight);
       waterPlaneOffsetEnabled = json.get("waterWorldHeightOffsetEnabled")
         .boolValue(waterPlaneOffsetEnabled);
+      waterPlaneClip = json.get("waterWorldClipEnabled").boolValue(waterPlaneClip);
     }
 
     renderActors = json.get("renderActors").boolValue(renderActors);

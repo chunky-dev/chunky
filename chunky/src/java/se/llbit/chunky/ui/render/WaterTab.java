@@ -49,6 +49,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @FXML private CheckBox waterPlaneEnabled;
   @FXML private DoubleAdjuster waterPlaneHeight;
   @FXML private CheckBox waterPlaneOffsetEnabled;
+  @FXML private CheckBox waterPlaneClip;
 
   private RenderControlsFxController renderControls;
   private RenderController controller;
@@ -88,6 +89,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterPlaneHeight.setRange(scene.yClipMin, scene.yClipMax);
     waterPlaneHeight.set(scene.getWaterPlaneHeight());
     waterPlaneOffsetEnabled.setSelected(scene.isWaterPlaneOffsetEnabled());
+    waterPlaneClip.setSelected(scene.getWaterPlaneClip());
   }
 
   @Override
@@ -150,6 +152,10 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
 
     waterPlaneOffsetEnabled.selectedProperty().addListener((observable, oldValue, newValue) ->
       scene.setWaterPlaneOffsetEnabled(newValue)
+    );
+
+    waterPlaneClip.selectedProperty().addListener((observable, oldValue, newValue) ->
+        scene.setWaterPlaneClip(newValue)
     );
   }
 
