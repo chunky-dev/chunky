@@ -17,7 +17,7 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
     opaque = false;
   }
 
-  @PluginApi
+  @Override
   public BlockModel getModel() {
     return model;
   }

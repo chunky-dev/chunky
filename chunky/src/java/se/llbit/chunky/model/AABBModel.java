@@ -3,13 +3,13 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.log.Log;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
 /**
  * A block model that is made out of textured AABBs.
  */
+@PluginApi
 public abstract class AABBModel implements BlockModel {
 
   /**
@@ -103,7 +103,8 @@ public abstract class AABBModel implements BlockModel {
     return hit;
   }
 
-  private boolean intersectFace(Ray ray, Scene scene, Texture texture, UVMapping mapping, Tint tintType) {
+  private boolean intersectFace(Ray ray, Scene scene, Texture texture, UVMapping mapping,
+      Tint tintType) {
     // This is the method that handles intersecting faces of all AABB-based models.
     // Do normal mapping, parallax occlusion mapping, specular maps and all the good stuff here!
 
