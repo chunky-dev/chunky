@@ -105,21 +105,10 @@ import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
-import se.llbit.pfm.PfmFileWriter;
-import se.llbit.png.ITXT;
-import se.llbit.png.PngFileWriter;
-import se.llbit.tiff.TiffFileWriter;
 import se.llbit.util.*;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.stream.IntStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Encapsulates scene and render state.
@@ -320,9 +309,9 @@ public class Scene implements JsonSerializable, Refreshable {
   public int previewCount;
 
   /**
-   * Current time. Increments animated textures like fire.
+   * Current time in seconds. Adjusts animated blocks like fire.
    */
-  public int time = 0;
+  private double animationTime = 0;
 
   private WorldTexture grassTexture = new WorldTexture();
   private WorldTexture foliageTexture = new WorldTexture();
@@ -509,7 +498,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     octreeImplementation = other.octreeImplementation;
-    time = other.time;
+    animationTime = other.animationTime;
   }
 
   /**
@@ -1845,7 +1834,7 @@ public class Scene implements JsonSerializable, Refreshable {
     cameraPresets = other.cameraPresets;
     camera.copyTransients(other.camera);
     finalizeBuffer = other.finalizeBuffer;
-    time = other.time;
+    animationTime = other.animationTime;
   }
 
   /**
@@ -3253,8 +3242,12 @@ public class Scene implements JsonSerializable, Refreshable {
     refresh();
   }
 
-  public void setTime(int time) {
-    this.time = time;
+  public void setAnimationTime(double animationTime) {
+    this.animationTime = animationTime;
     refresh();
+  }
+
+  public double getAnimationTime() {
+    return animationTime;
   }
 }

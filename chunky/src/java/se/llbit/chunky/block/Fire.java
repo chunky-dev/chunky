@@ -1,7 +1,6 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.model.FireModel;
-import se.llbit.chunky.model.PistonModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.AnimatedTexture;
 import se.llbit.chunky.resources.Texture;
@@ -19,6 +18,6 @@ public class Fire extends MinecraftBlock {
 
   @Override
   public boolean intersect(Ray ray, Scene scene) {
-    return FireModel.intersect(ray, texture, scene.time);
+    return FireModel.intersect(ray, texture, scene.getAnimationTime());
   }
 }

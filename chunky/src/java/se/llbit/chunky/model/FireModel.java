@@ -40,14 +40,14 @@ public class FireModel {
           new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 0), new Vector3(0, 1, 1),
               new Vector4(1, 0, 0, 1)),};
 
-  public static boolean intersect(Ray ray, AnimatedTexture[] texture, int time) {
+  public static boolean intersect(Ray ray, AnimatedTexture[] texture, double time) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     Vector3 position = new Vector3(ray.o);
     position.scaleAdd(Ray.OFFSET, ray.d);
-    int i = 0xF & (ray.getCurrentData() >> BlockData.LILY_PAD_ROTATION)
+    int i = (0xF & (ray.getCurrentData() >> BlockData.LILY_PAD_ROTATION))
         + (int) Math.floorMod(MinecraftPRNG.rand((long) position.x, (long) position.y, (long) position.z), Integer.MAX_VALUE)
-        + time;
+        + (int) (time * 20);  // Fire animates at 20 fps
     int j = 0;
     for (Quad quad : quads) {
       if (quad.intersect(ray)) {

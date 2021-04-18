@@ -34,6 +34,7 @@ import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.ShutdownAlert;
@@ -66,7 +67,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML
   private IntegerAdjuster cacheResolution;
   @FXML
-  private IntegerAdjuster animationTime;
+  private DoubleAdjuster animationTime;
   @FXML
   private ChoiceBox<PictureExportFormat> outputMode;
   @FXML
@@ -139,13 +140,13 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     cacheResolution.onValueChange(value -> {
       scene.sky().setSkyCacheResolution(value);
     });
-    animationTime.setName("Current animation frame");
-    animationTime.setTooltip("Animation frame of animated textures to use.");
-    animationTime.setRange(0, 4096);
+    animationTime.setName("Current animation time");
+    animationTime.setTooltip("Current animation time in seconds.");
+    animationTime.setRange(0, 60);
     animationTime.clampMin();
     animationTime.set(0);
     animationTime.onValueChange(value -> {
-      scene.setTime(value);
+      scene.setAnimationTime(value);
     });
     renderThreads.setName("Render threads");
     renderThreads.setTooltip("Number of rendering threads.");
