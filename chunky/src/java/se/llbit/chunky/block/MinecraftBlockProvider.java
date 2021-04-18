@@ -1023,17 +1023,17 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "stripped_dark_oak_log":
         return log(tag, Texture.strippedDarkOakLog, Texture.strippedDarkOakLogTop);
       case "stripped_oak_wood":
-        return new MinecraftBlock(name, Texture.strippedOakLog);
+        return log(tag, Texture.strippedOakLog, Texture.strippedOakLog);
       case "stripped_spruce_wood":
-        return new MinecraftBlock(name, Texture.strippedSpruceLog);
+        return log(tag, Texture.strippedSpruceLog, Texture.strippedSpruceLog);
       case "stripped_birch_wood":
-        return new MinecraftBlock(name, Texture.strippedBirchLog);
+        return log(tag, Texture.strippedBirchLog, Texture.strippedBirchLog);
       case "stripped_jungle_wood":
-        return new MinecraftBlock(name, Texture.strippedJungleLog);
+        return log(tag, Texture.strippedJungleLog, Texture.strippedJungleLog);
       case "stripped_acacia_wood":
-        return new MinecraftBlock(name, Texture.strippedAcaciaLog);
+        return log(tag, Texture.strippedAcaciaLog, Texture.strippedAcaciaLog);
       case "stripped_dark_oak_wood":
-        return new MinecraftBlock(name, Texture.strippedDarkOakLog);
+        return log(tag, Texture.strippedDarkOakLog, Texture.strippedDarkOakLog);
       case "oak_wood":
         return new MinecraftBlock(name, Texture.oakWood);
       case "spruce_wood":
