@@ -11,7 +11,7 @@ public class BrewingStand extends MinecraftBlockTranslucent {
   private final String description;
 
   public BrewingStand(boolean bottle0, boolean bottle1, boolean bottle2) {
-    super("end_portal_frame", Texture.endPortalFrameSide);
+    super("brewing_stand", Texture.brewingStandBase);
     description = String.format("has_bottle_0=%s, has_bottle_1=%s, has_bottle_2=%s",
         bottle0, bottle1, bottle2);
     localIntersect = true;
