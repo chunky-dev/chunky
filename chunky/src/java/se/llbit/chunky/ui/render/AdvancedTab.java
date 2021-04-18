@@ -141,7 +141,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       scene.sky().setSkyCacheResolution(value);
     });
     animationTime.setName("Current animation time");
-    animationTime.setTooltip("Current animation time in seconds.");
+    animationTime.setTooltip("Current animation time in seconds, used for animated textures.");
     animationTime.setRange(0, 60);
     animationTime.clampMin();
     animationTime.set(0);
@@ -208,6 +208,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
     gridSize.set(scene.getGridSize());
     preventNormalEmitterWithSampling.setSelected(scene.isPreventNormalEmitterWithSampling());
+    animationTime.set(scene.getAnimationTime());
   }
 
   @Override
