@@ -111,7 +111,7 @@ public class PreviewRayTracer implements RayTracer {
 
   private static boolean waterIntersection(Scene scene, Ray ray) {
     double t = (scene.getEffectiveWaterPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
-    if (scene.waterPlaneClip) {
+    if (scene.getWaterPlaneChunkClip()) {
       Vector3 pos = new Vector3(ray.o);
       pos.scaleAdd(t, ray.d);
       if (scene.isChunkLoaded((int) pos.x, (int) pos.z))

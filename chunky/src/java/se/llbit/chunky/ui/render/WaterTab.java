@@ -89,7 +89,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterPlaneHeight.setRange(scene.yClipMin, scene.yClipMax);
     waterPlaneHeight.set(scene.getWaterPlaneHeight());
     waterPlaneOffsetEnabled.setSelected(scene.isWaterPlaneOffsetEnabled());
-    waterPlaneClip.setSelected(scene.getWaterPlaneClip());
+    waterPlaneClip.setSelected(scene.getWaterPlaneChunkClip());
   }
 
   @Override
@@ -155,7 +155,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     );
 
     waterPlaneClip.selectedProperty().addListener((observable, oldValue, newValue) ->
-        scene.setWaterPlaneClip(newValue)
+        scene.setWaterPlaneChunkClip(newValue)
     );
   }
 

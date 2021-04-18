@@ -105,21 +105,10 @@ import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
-import se.llbit.pfm.PfmFileWriter;
-import se.llbit.png.ITXT;
-import se.llbit.png.PngFileWriter;
-import se.llbit.tiff.TiffFileWriter;
 import se.llbit.util.*;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.stream.IntStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Encapsulates scene and render state.
@@ -244,7 +233,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean waterPlaneEnabled = false;
   protected double waterPlaneHeight = World.SEA_LEVEL;
   protected boolean waterPlaneOffsetEnabled = true;
-  protected boolean waterPlaneClip = true;
+  protected boolean waterPlaneChunkClip = true;
 
   /**
    * Enables fast fog algorithm
@@ -487,7 +476,7 @@ public class Scene implements JsonSerializable, Refreshable {
     waterPlaneEnabled = other.waterPlaneEnabled;
     waterPlaneHeight = other.waterPlaneHeight;
     waterPlaneOffsetEnabled = other.waterPlaneOffsetEnabled;
-    waterPlaneClip = other.waterPlaneClip;
+    waterPlaneChunkClip = other.waterPlaneChunkClip;
 
     spp = other.spp;
     renderTime = other.renderTime;
@@ -1796,15 +1785,15 @@ public class Scene implements JsonSerializable, Refreshable {
     return waterPlaneOffsetEnabled;
   }
 
-  public void setWaterPlaneClip(boolean enabled) {
-    if (enabled != waterPlaneClip) {
-      waterPlaneClip = enabled;
+  public void setWaterPlaneChunkClip(boolean enabled) {
+    if (enabled != waterPlaneChunkClip) {
+      waterPlaneChunkClip = enabled;
       refresh();
     }
   }
 
-  public boolean getWaterPlaneClip() {
-    return waterPlaneClip;
+  public boolean getWaterPlaneChunkClip() {
+    return waterPlaneChunkClip;
   }
 
   /**
@@ -2612,7 +2601,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("waterWorldEnabled", waterPlaneEnabled);
     json.add("waterWorldHeight", waterPlaneHeight);
     json.add("waterWorldHeightOffsetEnabled", waterPlaneOffsetEnabled);
-    json.add("waterWorldClipEnabled", waterPlaneClip);
+    json.add("waterWorldClipEnabled", waterPlaneChunkClip);
     json.add("renderActors", renderActors);
 
     if (!worldPath.isEmpty()) {
@@ -2891,7 +2880,7 @@ public class Scene implements JsonSerializable, Refreshable {
       waterPlaneHeight = json.get("waterWorldHeight").doubleValue(waterPlaneHeight);
       waterPlaneOffsetEnabled = json.get("waterWorldHeightOffsetEnabled")
         .boolValue(waterPlaneOffsetEnabled);
-      waterPlaneClip = json.get("waterWorldClipEnabled").boolValue(waterPlaneClip);
+      waterPlaneChunkClip = json.get("waterWorldClipEnabled").boolValue(waterPlaneChunkClip);
     }
 
     renderActors = json.get("renderActors").boolValue(renderActors);
