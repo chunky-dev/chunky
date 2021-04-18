@@ -16,20 +16,21 @@
  */
 package se.llbit.chunky.renderer.export;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import se.llbit.chunky.plugin.PluginApi;
-import se.llbit.chunky.renderer.export.PfmExportFormat;
-import se.llbit.chunky.renderer.export.PictureExportFormat;
-import se.llbit.chunky.renderer.export.PngExportFormat;
-import se.llbit.chunky.renderer.export.Tiff32ExportFormat;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public abstract class PictureExportFormats {
 
   public static final PictureExportFormat PNG;
-  private static final Map<String, PictureExportFormat> formats = new HashMap<>();
+
+  /**
+   * All available export formats sorted by name (key).
+   */
+  private static final SortedMap<String, PictureExportFormat> formats = new TreeMap<>();
 
   static {
     PictureExportFormat png = new PngExportFormat();
