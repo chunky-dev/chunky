@@ -1425,7 +1425,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "spruce_fence_gate":
         return fenceGate(tag, Texture.sprucePlanks);
       case "birch_fence_gate":
-        return fenceGate(tag, Texture.sprucePlanks);
+        return fenceGate(tag, Texture.birchPlanks);
       case "jungle_fence_gate":
         return fenceGate(tag, Texture.jungleTreePlanks);
       case "acacia_fence_gate":
