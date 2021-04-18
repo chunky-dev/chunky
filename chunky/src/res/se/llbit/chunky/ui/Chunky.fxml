@@ -156,11 +156,12 @@
           <Label wrapText="true" text="Chunky is Copyright (c) 2010-2021, Jesper Öqvist and Chunky contributors." />
           <FlowPane>
             <Label wrapText="true" text="Permission to modify and redistribute is granted under the terms of the " />
-            <Hyperlink fx:id="gplv3" wrapText="true" text="GPLv3 license.">
+            <Hyperlink fx:id="gplv3" wrapText="true" text="GNU General Public License v3">
               <padding>
                 <Insets/>
               </padding>
             </Hyperlink>
+            <Label wrapText="true" text="." />
           </FlowPane>
           <Button fx:id="creditsBtn" mnemonicParsing="false" text="View Credits"/>
         </VBox>

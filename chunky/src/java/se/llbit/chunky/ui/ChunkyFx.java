@@ -28,6 +28,7 @@ import javafx.stage.Stage;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.resources.SettingsDirectory;
+import se.llbit.log.Log;
 
 import java.io.File;
 
@@ -39,7 +40,7 @@ import java.io.File;
  */
 public class ChunkyFx extends Application {
 
-  private static HostServices hostServices;
+  private static HostServices hostServices = null;
   private static Chunky chunkyInstance;
 
   @Override public void start(Stage stage) {
@@ -82,7 +83,10 @@ public class ChunkyFx extends Application {
    * Launch a url in the default browser.
    */
   @PluginApi
-  public static void launchUrl(String url) {
-    hostServices.showDocument(url);
+  public static void openUrl(String url) {
+    if (hostServices != null)
+      hostServices.showDocument(url);
+    else
+      Log.error("ChunkyFX not started. Cannot open url.");
   }
 }

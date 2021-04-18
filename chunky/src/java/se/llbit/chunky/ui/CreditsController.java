@@ -78,7 +78,7 @@ public class CreditsController implements Initializable {
   }
 
   /**
-   * Add a plugin using this when running a plugin directly.
+   * Add a plugin. Use this when running a plugin directly.
    */
   @PluginApi
   public static void addPlugin(String name, String version, String author, String description) {
@@ -131,7 +131,7 @@ public class CreditsController implements Initializable {
   }
 
   private void launchAndReset(Hyperlink link, String url) {
-    ChunkyFx.launchUrl(url);
+    ChunkyFx.openUrl(url);
     link.setVisited(false);
   }
 
