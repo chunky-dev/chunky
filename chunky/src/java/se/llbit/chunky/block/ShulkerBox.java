@@ -5,7 +5,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
-public class ShulkerBox extends MinecraftBlockTranslucent {
+public class ShulkerBox extends MinecraftBlock {
   private final int facing;
   private final Texture[] texture;
   private final String description;

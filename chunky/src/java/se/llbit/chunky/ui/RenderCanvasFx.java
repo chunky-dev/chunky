@@ -40,6 +40,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.stage.PopupWindow;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.Renderer;
@@ -72,7 +73,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   private Vector2 target = new Vector2(0, 0);
   private Tooltip tooltip = new Tooltip();
 
-  private boolean fitToScreen = true;
+  private boolean fitToScreen = PersistentSettings.getCanvasFitToScreen();
 
   private RenderStatusListener renderListener;
 
@@ -171,21 +172,33 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     for (int percent : new int[] { 25, 50, 75, 100, 150, 200, 300, 400 }) {
       RadioMenuItem item = new RadioMenuItem(String.format("%d%%", percent));
       item.setToggleGroup(scaleGroup);
+      item.setSelected(PersistentSettings.getCanvasScale() == percent && !fitToScreen);
       item.setOnAction(e -> {
         updateCanvasScale(percent / 100.0);
-        fitToScreen = false;
+        PersistentSettings.setCanvasScale(percent);
+        if (fitToScreen) {
+          fitToScreen = false;
+          PersistentSettings.setCanvasFitToScreen(false);
+        }
       });
       canvasScale.getItems().add(item);
     }
 
     RadioMenuItem fit = new RadioMenuItem("Fit to Screen");
-    fit.setSelected(true);
+    fit.setSelected(fitToScreen);
     fit.setToggleGroup(scaleGroup);
     fit.setOnAction(e -> {
       fitToScreen = true;
+      PersistentSettings.setCanvasFitToScreen(true);
       updateCanvasFit();
     });
     canvasScale.getItems().add(fit);
+
+    if (fitToScreen) {
+      updateCanvasFit();
+    } else {
+      updateCanvasScale(PersistentSettings.getCanvasScale() / 100.0);
+    }
 
     contextMenu.getItems().addAll(setTarget, showGuides, canvasScale);
 

@@ -17,7 +17,7 @@ public class Piston extends MinecraftBlock {
     this.isSticky = sticky ? 1 : 0;
     this.isExtended = extended ? 1 : 0;
     localIntersect = true;
-    opaque = false;
+    opaque = !extended;
     solid = false;
     switch (facing) {
       case "down":

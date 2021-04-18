@@ -27,6 +27,8 @@ import se.llbit.chunky.world.Material;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static se.llbit.math.Octree.*;
 
@@ -89,6 +91,11 @@ public class PackedOctree implements Octree.OctreeImplementation {
    * single, individual block.
    */
   private int depth;
+
+  /**
+   * dense, temporary representation of a tree
+   */
+  List<int[]> tempTree = new ArrayList<>();
 
   /**
    * NodeId implementation for a int array PackedOctree.
@@ -370,6 +377,161 @@ public class PackedOctree implements Octree.OctreeImplementation {
   }
 
   /**
+   * Helper function that separate each bit of the input number
+   * by 3 (eg 0b0110 -> 0b0001001000)
+   *                      ^--^--^--^
+   * This version only supports number with up to 8 bits
+   */
+  static private int splitBy3(int a)
+  {
+    int x = a & 0xff; // we only look at the first 8 bits
+    // Here we have the bits          abcd efgh
+    x = (x | x << 8) & 0x0f00f00f; // shift left 32 bits, OR with self, and 0001000000001111000000001111000000001111000000001111000000000000
+    // Here we have         abcd 0000 0000 efgh
+    x = (x | x << 4) & 0xc30c30c3; // shift left 32 bits, OR with self, and 0001000011000011000011000011000011000011000011000011000100000000
+    // Here we have    ab00 00cd 0000 ef00 00gh
+    x = (x | x << 2) & 0x49249249;
+    // Here we have a0 0b00 c00d 00e0 0f00 g00h
+    return x;
+  }
+
+  /**
+   * Free a whole subtree recursively
+   */
+  private void freeSubTree(int nodeIndex) {
+    int childrenIdx = treeData[nodeIndex];
+    if(childrenIdx <= 0)
+      return;
+
+    for(int i = 0; i < 8; ++i)
+      freeSubTree(childrenIdx+i);
+
+    freeSpace(childrenIdx);
+  }
+
+  /**
+   * Recursively insert the temporary tree representation into the tree
+   * @param level the current level to insert
+   * @param startIdx the index in the current level of the children to insert
+   */
+  private int insertTempTree(int level, int startIdx) {
+    if(tempTree.get(level)[startIdx] <= 0)
+      return tempTree.get(level)[startIdx];
+
+    int childrenIdx = findSpace();
+    for(int i = 0; i < 8; ++i) {
+      int value = insertTempTree(level+1, startIdx*8 + i);
+      treeData[childrenIdx+i] = value;
+    }
+
+    return childrenIdx;
+  }
+
+  @Override
+  public void setCube(int cubeDepth, int[] types, int x, int y, int z) {
+    int size = 1 << cubeDepth;
+
+    for(int nextLevel = tempTree.size(); nextLevel <= cubeDepth; ++nextLevel)
+      tempTree.add(new int[1 << (3*nextLevel)]);
+
+    // Write all the types from in the last level of the temp tree in morton order
+    // (so children are back to back in the array)
+    for(int cz = 0; cz < size; ++cz) {
+      for(int cy = 0; cy < size; ++cy) {
+        for(int cx = 0; cx < size; ++cx) {
+          int linearIdx = (cz << (2*cubeDepth)) + (cy << cubeDepth) + cx;
+          int mortonIdx = (splitBy3(cx) << 2) | (splitBy3(cy) << 1) | splitBy3(cz);
+          tempTree.get(cubeDepth)[mortonIdx] = -types[linearIdx];
+        }
+      }
+    }
+
+    // Construct levels from the level deeper until the root of the temp tree
+    for(int curDepth = cubeDepth-1; curDepth >= 0; --curDepth) {
+      int numElem = (1 << (3 * curDepth));
+      for(int parentIdx = 0; parentIdx < numElem; ++parentIdx)
+      {
+        int childrenIdx = parentIdx * 8;
+        boolean mergeable = true;
+        int firstType = tempTree.get(curDepth+1)[childrenIdx];
+        for(int childNo = 1; childNo < 8; ++childNo) {
+          if(tempTree.get(curDepth+1)[childrenIdx+childNo] > 0) {
+            mergeable = false;
+            break;
+          }
+          if(firstType == -ANY_TYPE)
+            firstType = tempTree.get(curDepth+1)[childrenIdx+childNo];
+          else if(firstType != tempTree.get(curDepth+1)[childrenIdx+childNo] && tempTree.get(curDepth+1)[childrenIdx+childNo] != -ANY_TYPE) {
+            mergeable = false;
+            break;
+          }
+        }
+        if(mergeable)
+        {
+          tempTree.get(curDepth)[parentIdx] = firstType;
+        }
+        else
+        {
+          tempTree.get(curDepth)[parentIdx] = 1;
+        }
+      }
+    }
+
+    int type = tempTree.get(0)[0];
+
+    int[] parents = new int[depth]; // better to put as a field to prevent allocation at each invocation?
+    int nodeIndex = 0; // start at root
+    int position;
+
+    // Walk down the tree until the place to insert similar to `set`
+    for(int i = depth - 1; i >= cubeDepth; --i) {
+      parents[i] = nodeIndex;
+
+      if(type <= 0 && treeData[nodeIndex] == type) { // Everything in this region is already of this blocktype.
+        return;
+      }
+
+      if(treeData[nodeIndex] <= 0) { // It's a leaf node
+        subdivideNode(nodeIndex);
+      }
+
+      // Determine index of child (to go to next)
+      int xbit = 1 & (x >> i);
+      int ybit = 1 & (y >> i);
+      int zbit = 1 & (z >> i);
+      position = (xbit << 2) | (ybit << 1) | zbit;
+      nodeIndex = treeData[nodeIndex] + position;
+    }
+
+    freeSubTree(nodeIndex);
+
+    int value = insertTempTree(0, 0);
+    treeData[nodeIndex] = value;
+
+    // Merge nodes where all children have been set to the same type, starting from the bottom.
+    for(int i = 0; i < depth; ++i) {
+      int parentIndex = parents[i];
+
+      // assert each child is of same type
+      boolean allSame = true;
+      for(int j = 0; j < 8; ++j) {
+        int childIndex = treeData[parentIndex] + j;
+        if(!nodeEquals(childIndex, nodeIndex)) {
+          allSame = false;
+          break;
+        }
+      }
+
+      // If all same type, join them. Else, parents can't join, so break merge loop.
+      if(allSame) {
+        mergeNode(parentIndex, treeData[nodeIndex]);
+      } else {
+        break;
+      }
+    }
+  }
+
+  /**
    * Gets a NodeID and depth of the node that is (or contains) the specified block.
    *
    * @param outTypeAndLevel is the reusable output type and level parameters, this is to save on allocation of {@code org.apache.commons.math3.util.Pair} and {@code PackedOctree.NodeId}
@@ -548,6 +710,11 @@ public class PackedOctree implements Octree.OctreeImplementation {
     }
     // leaf node -> just this node
     return 1;
+  }
+
+  @Override
+  public void startFinalization() {
+    tempTree = null; // no longer needed
   }
 
   /**

@@ -145,7 +145,7 @@ public class Chunk {
    * Parse the chunk from the region file and render the current
    * layer, surface and cave maps.
    */
-  public synchronized void loadChunk(ChunkData chunkData) {
+  public synchronized void loadChunk(ChunkData chunkData, int yMax) {
     if (!shouldReloadChunk()) {
       return;
     }
@@ -163,7 +163,7 @@ public class Chunk {
 
     surfaceTimestamp = dataTimestamp;
     version = chunkVersion(data);
-    loadSurface(data, chunkData);
+    loadSurface(data, chunkData, yMax);
     biomesTimestamp = dataTimestamp;
     if (surface == IconLayer.MC_1_12) {
       biomes = IconLayer.MC_1_12;
@@ -173,7 +173,7 @@ public class Chunk {
     world.chunkUpdated(position);
   }
 
-  private void loadSurface(Map<String, Tag> data, ChunkData chunkData) {
+  private void loadSurface(Map<String, Tag> data, ChunkData chunkData, int yMax) {
     if (data == null) {
       surface = IconLayer.CORRUPT;
       return;
@@ -187,8 +187,8 @@ public class Chunk {
         BlockPalette palette = new BlockPalette();
         loadBlockData(data, chunkData, palette);
         int[] heightmapData = extractHeightmapData(data, chunkData);
-        updateHeightmap(heightmap, position, chunkData, heightmapData, palette);
-        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette);
+        updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
+        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, yMax);
         queueTopography();
       } else if (version.equals("1.12")) {
         surface = IconLayer.MC_1_12;
@@ -351,11 +351,11 @@ public class Chunk {
    * and insert into a quadtree.
    */
   public static void updateHeightmap(Heightmap heightmap, ChunkPosition pos, ChunkData chunkData,
-      int[] chunkHeightmap, BlockPalette palette) {
+      int[] chunkHeightmap, BlockPalette palette, int yMax) {
     for (int x = 0; x < 16; ++x) {
       for (int z = 0; z < 16; ++z) {
         int y = chunkHeightmap[z * 16 + x];
-        y = Math.max(1, y - 1);
+        y = Math.max(1, Math.min(y - 1, yMax));
         for (; y > 1; --y) {
           Block block = palette.get(chunkData.getBlockAt(x, y, z));
           if (block != Air.INSTANCE && !block.isWater())
