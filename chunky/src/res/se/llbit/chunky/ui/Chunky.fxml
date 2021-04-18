@@ -96,6 +96,9 @@
           <VBox alignment="CENTER_LEFT">
             <IntegerAdjuster fx:id="scale" name="Scale"/>
           </VBox>
+          <VBox alignment="CENTER_LEFT">
+            <IntegerAdjuster fx:id="yMax" name="Y level"/>
+          </VBox>
           <Label text="Coordinates"/>
           <HBox alignment="CENTER_LEFT" spacing="10.0">
             <Label text="X="/>
