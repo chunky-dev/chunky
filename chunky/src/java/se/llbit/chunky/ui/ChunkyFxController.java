@@ -1,4 +1,5 @@
-/* Copyright (c) 2016-2019 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -148,6 +149,7 @@ public class ChunkyFxController
   @FXML private Hyperlink forumLink;
   @FXML private Hyperlink discordLink;
   @FXML private Hyperlink guideLink;
+  @FXML private Hyperlink gplv3;
   @FXML private Button creditsBtn;
   @FXML private TextField xPosition;
   @FXML private TextField zPosition;
@@ -740,6 +742,10 @@ public class ChunkyFxController
 
     guideLink.setOnAction(
         e -> app.getHostServices().showDocument("https://jackjt8.github.io/ChunkyGuide/"));
+
+    gplv3.setOnAction(
+        e -> app.getHostServices().showDocument("https://github.com/chunky-dev/chunky/blob/master/LICENSE")
+    );
   }
 
   public void openSceneChooser() {
