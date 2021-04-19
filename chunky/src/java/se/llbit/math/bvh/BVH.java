@@ -31,8 +31,6 @@ import java.util.Map;
 
 /**
  * Bounding Volume Hierarchy based on AABBs.
- *
- * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
  */
 public interface BVH extends Intersectable {
   BVH EMPTY = ray -> false;
