@@ -391,22 +391,31 @@ public class ArmorStand extends Entity implements Poseable, Geared {
     gear = new JsonObject();
     Tag handItems = tag.get("HandItems");
     Tag armorItems = tag.get("ArmorItems");
-    CompoundTag boots = armorItems.get(0).asCompound();
-    // TODO: handle colored leather.
-    if (!boots.isEmpty()) {
-      gear.add("feet", PlayerEntity.parseItem(boots));
+    int armorItemsCount = armorItems.asList().size(); // in worlds upgraded from older versions the list only contains some gear pieces, see #895
+    if (armorItemsCount > 0) {
+      CompoundTag boots = armorItems.get(0).asCompound();
+      // TODO: handle colored leather.
+      if (!boots.isEmpty()) {
+        gear.add("feet", PlayerEntity.parseItem(boots));
+      }
     }
-    CompoundTag legs = armorItems.get(1).asCompound();
-    if (!legs.isEmpty()) {
-      gear.add("legs", PlayerEntity.parseItem(legs));
+    if (armorItemsCount > 1) {
+      CompoundTag legs = armorItems.get(1).asCompound();
+      if (!legs.isEmpty()) {
+        gear.add("legs", PlayerEntity.parseItem(legs));
+      }
     }
-    CompoundTag chest = armorItems.get(2).asCompound();
-    if (!chest.isEmpty()) {
-      gear.add("chest", PlayerEntity.parseItem(chest));
+    if (armorItemsCount > 2) {
+      CompoundTag chest = armorItems.get(2).asCompound();
+      if (!chest.isEmpty()) {
+        gear.add("chest", PlayerEntity.parseItem(chest));
+      }
     }
-    CompoundTag head = armorItems.get(3).asCompound();
-    if (!head.isEmpty()) {
-      gear.add("head", PlayerEntity.parseItem(head));
+    if (armorItemsCount > 3) {
+      CompoundTag head = armorItems.get(3).asCompound();
+      if (!head.isEmpty()) {
+        gear.add("head", PlayerEntity.parseItem(head));
+      }
     }
     showArms = tag.get("ShowArms").boolValue(false);
     if (tag.get("Small").boolValue(false)) {

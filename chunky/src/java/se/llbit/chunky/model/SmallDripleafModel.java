@@ -21,7 +21,7 @@ public class SmallDripleafModel {
               new Vector3(8 / 16.0, 2.99 / 16.0, 8 / 16.0),
               new Vector3(15 / 16.0, 2.99 / 16.0, 8 / 16.0),
               new Vector3(8 / 16.0, 2.99 / 16.0, 15 / 16.0),
-              new Vector4(8 / 16.0, 0 / 16.0, 16 / 16.0, 8 / 16.0)
+              new Vector4(8 / 16.0, 0 / 16.0, 8 / 16.0, 16 / 16.0)
           ),
           new Quad(
               new Vector3(1 / 16.0, 8 / 16.0, 8 / 16.0),
@@ -33,19 +33,19 @@ public class SmallDripleafModel {
               new Vector3(1 / 16.0, 8 / 16.0, 1 / 16.0),
               new Vector3(8 / 16.0, 8 / 16.0, 1 / 16.0),
               new Vector3(1 / 16.0, 8 / 16.0, 8 / 16.0),
-              new Vector4(0 / 16.0, 8 / 16.0, 8 / 16.0, 16 / 16.0)
+              new Vector4(0 / 16.0, 8 / 16.0, 16 / 16.0, 8 / 16.0)
           ),
           new Quad(
-              new Vector3(8 / 16.0, 14 / 16.0, 15 / 16.0),
-              new Vector3(8 / 16.0, 14 / 16.0, 8 / 16.0),
               new Vector3(1 / 16.0, 14 / 16.0, 15 / 16.0),
+              new Vector3(8 / 16.0, 14 / 16.0, 15 / 16.0),
+              new Vector3(1 / 16.0, 14 / 16.0, 8 / 16.0),
               new Vector4(0 / 16.0, 8 / 16.0, 8 / 16.0, 16 / 16.0)
           ),
           new Quad(
               new Vector3(1 / 16.0, 14 / 16.0, 8 / 16.0),
               new Vector3(8 / 16.0, 14 / 16.0, 8 / 16.0),
               new Vector3(1 / 16.0, 14 / 16.0, 15 / 16.0),
-              new Vector4(0 / 16.0, 8 / 16.0, 8 / 16.0, 16 / 16.0)
+              new Vector4(8 / 16.0, 0 / 16.0, 8 / 16.0, 16 / 16.0)
           ),
           // side
           new Quad(

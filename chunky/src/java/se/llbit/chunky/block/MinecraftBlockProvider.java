@@ -432,6 +432,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:lava",
       "minecraft:lectern",
       "minecraft:lever",
+      "minecraft:light",
       "minecraft:light_blue_banner",
       "minecraft:light_blue_bed",
       "minecraft:light_blue_candle_cake",
@@ -865,6 +866,10 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:oxidized_cut_copper",
       "minecraft:oxidized_cut_copper_slab",
       "minecraft:oxidized_cut_copper_stairs",
+      "minecraft:waxed_oxidized_copper",
+      "minecraft:waxed_oxidized_cut_copper",
+      "minecraft:waxed_oxidized_cut_copper_slab",
+      "minecraft:waxed_oxidized_cut_copper_stairs",
       "minecraft:weeping_vines",
       "minecraft:weeping_vines_plant",
       "minecraft:wet_sponge",
@@ -1018,17 +1023,17 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "stripped_dark_oak_log":
         return log(tag, Texture.strippedDarkOakLog, Texture.strippedDarkOakLogTop);
       case "stripped_oak_wood":
-        return new MinecraftBlock(name, Texture.strippedOakLog);
+        return log(tag, Texture.strippedOakLog, Texture.strippedOakLog);
       case "stripped_spruce_wood":
-        return new MinecraftBlock(name, Texture.strippedSpruceLog);
+        return log(tag, Texture.strippedSpruceLog, Texture.strippedSpruceLog);
       case "stripped_birch_wood":
-        return new MinecraftBlock(name, Texture.strippedBirchLog);
+        return log(tag, Texture.strippedBirchLog, Texture.strippedBirchLog);
       case "stripped_jungle_wood":
-        return new MinecraftBlock(name, Texture.strippedJungleLog);
+        return log(tag, Texture.strippedJungleLog, Texture.strippedJungleLog);
       case "stripped_acacia_wood":
-        return new MinecraftBlock(name, Texture.strippedAcaciaLog);
+        return log(tag, Texture.strippedAcaciaLog, Texture.strippedAcaciaLog);
       case "stripped_dark_oak_wood":
-        return new MinecraftBlock(name, Texture.strippedDarkOakLog);
+        return log(tag, Texture.strippedDarkOakLog, Texture.strippedDarkOakLog);
       case "oak_wood":
         return new MinecraftBlock(name, Texture.oakWood);
       case "spruce_wood":
@@ -1420,7 +1425,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "spruce_fence_gate":
         return fenceGate(tag, Texture.sprucePlanks);
       case "birch_fence_gate":
-        return fenceGate(tag, Texture.sprucePlanks);
+        return fenceGate(tag, Texture.birchPlanks);
       case "jungle_fence_gate":
         return fenceGate(tag, Texture.jungleTreePlanks);
       case "acacia_fence_gate":
@@ -2697,6 +2702,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "waxed_weathered_copper":
         return new MinecraftBlock(name, Texture.weatheredCopper);
       case "oxidized_copper":
+      case "waxed_oxidized_copper":
         return new MinecraftBlock(name, Texture.oxidizedCopper);
       case "cut_copper":
       case "waxed_cut_copper":
@@ -2708,6 +2714,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "waxed_weathered_cut_copper":
         return new MinecraftBlock(name, Texture.weatheredCutCopper);
       case "oxidized_cut_copper":
+      case "waxed_oxidized_cut_copper":
         return new MinecraftBlock(name, Texture.oxidizedCutCopper);
       case "cut_copper_stairs":
       case "waxed_cut_copper_stairs":
@@ -2719,6 +2726,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "waxed_weathered_cut_copper_stairs":
         return stairs(tag, Texture.weatheredCutCopper);
       case "oxidized_cut_copper_stairs":
+      case "waxed_oxidized_cut_copper_stairs":
         return stairs(tag, Texture.oxidizedCutCopper);
       case "cut_copper_slab":
       case "waxed_cut_copper_slab":
@@ -2730,6 +2738,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "waxed_weathered_cut_copper_slab":
         return slab(tag, Texture.weatheredCutCopper);
       case "oxidized_cut_copper_slab":
+      case "waxed_oxidized_cut_copper_slab":
         return slab(tag, Texture.oxidizedCutCopper);
       case "lava_cauldron":
         return new LavaCauldron();
@@ -2859,6 +2868,8 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.deepslateCopperOre);
       case "deepslate_emerald_ore":
         return new MinecraftBlock(name, Texture.deepslateEmeraldOre);
+      case "light":
+        return new LightBlock(name, BlockProvider.stringToInt(tag.get("Properties").get("level"), 15));
       case "structure_void":
       case "barrier":
         // Invisible.

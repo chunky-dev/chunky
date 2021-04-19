@@ -49,7 +49,7 @@ public class LightningRodModel {
           new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
           new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
           new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
-          new Vector4(0 / 16.0, 2 / 16.0, 0 / 16.0, 12 / 16.0)
+          new Vector4(0 / 16.0, 2 / 16.0, 10 / 16.0, 12 / 16.0)
       ),
       new Quad(
           new Vector3(7 / 16.0, 12 / 16.0, 9 / 16.0),

@@ -68,7 +68,7 @@ public class RegionParser extends Thread {
         }
         for (Chunk chunk : region) {
           if (map.shouldPreload(chunk)) {
-            chunk.loadChunk(chunkData);
+            chunk.loadChunk(chunkData, mapView.getYMax());
           }
           chunkData.clear();
         }

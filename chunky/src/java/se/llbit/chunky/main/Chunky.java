@@ -46,6 +46,7 @@ import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.ChunkyFx;
+import se.llbit.chunky.ui.CreditsController;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.chunky.world.MaterialStore;
 import se.llbit.json.JsonArray;
@@ -266,6 +267,7 @@ public class Chunky {
         try {
           ChunkyPlugin
               .load(pluginsPath.resolve(jarName).toRealPath().toFile(), (plugin, manifest) -> {
+                CreditsController.addPlugin(manifest);
                 String pluginName = manifest.get("name").asString("");
                 if (loadedPlugins.contains(pluginName)) {
                   Log.warnf(

@@ -425,6 +425,7 @@ public final class PersistentSettings {
 
   public static void setGridSizeDefault(int value) {
     settings.setInt("gridSize", value);
+    save();
   }
 
   public static int getGridSizeDefault() {
@@ -433,6 +434,7 @@ public final class PersistentSettings {
 
   public static void setPreventNormalEmitterWithSampling(boolean value) {
     settings.setBool("preventNormalEmitterWithSampling", value);
+    save();
   }
 
   public static boolean getPreventNormalEmitterWithSampling() {
@@ -450,6 +452,24 @@ public final class PersistentSettings {
 
   public static void setDisableDefaultTextures(boolean value) {
     settings.setBool("disableDefaultTextures", value);
+    save();
+  }
+
+  public static int getCanvasScale() {
+    return settings.getInt("canvasScale", 100);
+  }
+
+  public static void setCanvasScale(int scale) {
+    settings.setInt("canvasScale", scale);
+    save();
+  }
+
+  public static boolean getCanvasFitToScreen() {
+    return settings.getBool("canvasFitToScreen", true);
+  }
+
+  public static void setCanvasFitToScreen(boolean fitToScreen) {
+    settings.setBool("canvasFitToScreen", fitToScreen);
+    save();
   }
 }
-

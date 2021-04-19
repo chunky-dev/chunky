@@ -82,6 +82,33 @@ public class Octree {
       }
       outTypeAndLevel.right(level).left(getType(node));
     }
+
+    /**
+     * Set a whole 2^n * 2^n * 2^n cube of blocks
+     * @param cubeDepth the n
+     * @param types a flat array representation of a 3d array of the types to insert indexed by z then y then x
+     * @param x the x of the position of the mi corner of the cube
+     * @param y the y of the position of the mi corner of the cube
+     * @param z the z of the position of the mi corner of the cube
+     */
+    default void setCube(int cubeDepth, int[] types, int x, int y, int z) {
+      // Default implementation sets block one by one
+      int size = 1 << cubeDepth;
+      assert x % size == 0;
+      assert y % size == 0;
+      assert z % size == 0;
+      for(int localZ = 0; localZ < size; ++localZ) {
+        for(int localY = 0; localY < size; ++localY) {
+          for(int localX = 0; localX < size; ++localX) {
+            int globalX = x + localX;
+            int globalY = y + localY;
+            int globalZ = z + localZ;
+            int index = (localZ * size + localY) * size + localX;
+            set(types[index], globalX, globalY, globalZ);
+          }
+        }
+      }
+    }
   }
 
   public interface NodeId {}
@@ -754,6 +781,10 @@ public class Octree {
 
   public void endFinalization() {
     implementation.endFinalization();
+  }
+
+  public void setCube(int cubeDepth, int[] types, int x, int y, int z) {
+    implementation.setCube(cubeDepth, types, x, y, z);
   }
 
   /**
