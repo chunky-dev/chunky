@@ -15,24 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.math;
+package se.llbit.math.bvh;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntStack;
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.math.AABB;
+import se.llbit.math.Ray;
 import se.llbit.math.primitive.Primitive;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 
-import static se.llbit.math.BVH.SPLIT_LIMIT;
 import static se.llbit.math.Ray.OFFSET;
 
 /**
  * An abstract class for BinaryBVHs. This provides helper methods for packing a node based BVH into a more compact
  * and faster array based BVH. It also provides an implementation for {@code closestIntersection}.
  */
-public abstract class BinaryBVH implements BVH.BVHImplementation {
+public abstract class BinaryBVH implements BVH {
+
+    public static final int SPLIT_LIMIT = 4;
+
     /** Note: This is public for some plugins. Stability is not guaranteed. */
     public int[] packed;
     public int depth;

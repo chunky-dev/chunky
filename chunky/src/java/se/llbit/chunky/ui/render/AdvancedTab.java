@@ -37,14 +37,13 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.ShutdownAlert;
-import se.llbit.math.BVH;
+import se.llbit.math.bvh.BVH;
 import se.llbit.math.Octree;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -170,7 +169,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
     ArrayList<String> bvhNames = new ArrayList<>();
     StringBuilder bvhMethodBuilder = new StringBuilder();
-    for (Map.Entry<String, BVH.ImplementationFactory> entry : BVH.factories.entrySet()) {
+    for (Map.Entry<String, BVH.Factory.BVHBuilder> entry : BVH.Factory.implementations.entrySet()) {
       bvhNames.add(entry.getKey());
       bvhMethodBuilder.append(entry.getKey());
       bvhMethodBuilder.append(": ");

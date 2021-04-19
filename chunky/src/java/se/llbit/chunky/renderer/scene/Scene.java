@@ -35,7 +35,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -92,7 +91,7 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
 import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
-import se.llbit.math.BVH;
+import se.llbit.math.bvh.BVH;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Grid;
 import se.llbit.math.Octree;
@@ -299,8 +298,8 @@ public class Scene implements JsonSerializable, Refreshable {
   /** Upper Y clip plane. */
   public int yClipMax = PersistentSettings.getYClipMax();
 
-  private BVH bvh = new BVH(Collections.emptyList(), new Vector3(), TaskTracker.Task.NONE);
-  private BVH actorBvh = new BVH(Collections.emptyList(), new Vector3(), TaskTracker.Task.NONE);
+  private BVH bvh = BVH.EMPTY;
+  private BVH actorBvh = BVH.EMPTY;
 
   /**
    * Preview frame interlacing counter.
@@ -1325,12 +1324,12 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private void buildBvh(TaskTracker.Task task) {
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    bvh = new BVH(entities, worldOffset, task);
+    bvh = BVH.Factory.create(entities, worldOffset, task);
   }
 
   private void buildActorBvh(TaskTracker.Task task) {
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    actorBvh = new BVH(actors, worldOffset, task);
+    actorBvh = BVH.Factory.create(actors, worldOffset, task);
   }
 
   /**

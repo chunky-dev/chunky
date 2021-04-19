@@ -15,24 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.math;
+package se.llbit.math.bvh;
 
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.log.Log;
+import se.llbit.math.AABB;
+import se.llbit.math.Vector3;
+import se.llbit.math.primitive.MutableAABB;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.util.TaskTracker;
 
 import java.util.*;
 import java.util.function.IntConsumer;
 
-import static se.llbit.math.BVH.SPLIT_LIMIT;
-
-public class MidpointBVH extends BinaryBVH {
+public class SahMaBVH extends BinaryBVH {
     public static void initImplementation() {
-        BVH.factories.put("MIDPOINT", new BVH.ImplementationFactory() {
+        Factory.implementations.put("SAH_MA", new Factory.BVHBuilder() {
             @Override
-            public BVH.BVHImplementation create(Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task) {
+            public BVH create(Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task) {
                 task.update(1000, 0);
                 double entityScaler = 500.0 / entities.size();
                 int done = 0;
@@ -48,20 +49,20 @@ public class MidpointBVH extends BinaryBVH {
                 primitives = null; // Allow the collection to be garbage collected during construction when only the array is used
 
                 double primitiveScaler = 500.0 / allPrimitives.length;
-                return new MidpointBVH(allPrimitives, i -> task.updateInterval((int) (i * primitiveScaler) + 500, 1));
+                return new SahMaBVH(allPrimitives, i -> task.updateInterval((int) (i * primitiveScaler) + 500, 1));
             }
 
             @Override
             public String getTooltip() {
-                return "Fast and simple, but not optimal BVH building method.";
+                return "Fast and nearly optimal BVH building method.";
             }
         });
     }
 
-    public MidpointBVH(Primitive[] primitives, IntConsumer task) {
-        Node root = constructMidpointSplit(primitives, task);
+    public SahMaBVH(Primitive[] primitives, IntConsumer task) {
+        Node root = constructSAH_MA(primitives, task);
         pack(root);
-        Log.info("Built MIDPOINT BVH with depth " + this.depth);
+        Log.info("Built SAH_MA BVH with depth " + this.depth);
     }
 
     private enum Action {
@@ -70,11 +71,10 @@ public class MidpointBVH extends BinaryBVH {
     }
 
     /**
-     * Simple BVH construction using splitting by major axis.
-     *
-     * @return root node of constructed BVH
+     * Construct a BVH using Surface Area Heuristic (SAH)
+     * This splits along the major axis which usually gets good results.
      */
-    private Node constructMidpointSplit(Primitive[] primitives, IntConsumer task) {
+    private Node constructSAH_MA(Primitive[] primitives, IntConsumer task) {
         int progress = 0;
 
         Stack<Node> nodes = new Stack<>();
@@ -94,7 +94,7 @@ public class MidpointBVH extends BinaryBVH {
                     progress += chunk.length;
                     task.accept(progress);
                 } else {
-                    splitMidpointMajorAxis(chunk, actions, chunks);
+                    splitSAH_MA(chunk, actions, chunks);
                 }
             }
         }
@@ -102,37 +102,49 @@ public class MidpointBVH extends BinaryBVH {
     }
 
     /**
-     * Split a chunk on the major axis.
+     * Split a chunk based on Surface Area Heuristic of all possible splits on the major axis.
      */
-    private void splitMidpointMajorAxis(Primitive[] chunk, Stack<Action> actions,
-                                        Stack<Primitive[]> chunks) {
+    private void splitSAH_MA(Primitive[] chunk, Stack<Action> actions, Stack<Primitive[]> chunks) {
         AABB bb = bb(chunk);
         double xl = bb.xmax - bb.xmin;
         double yl = bb.ymax - bb.ymin;
         double zl = bb.zmax - bb.zmin;
-        double splitPos;
-        Selector selector;
+        Comparator<Primitive> cmp;
         if (xl >= yl && xl >= zl) {
-            splitPos = bb.xmin + (bb.xmax - bb.xmin) / 2;
-            selector = selectX;
-            Chunky.getCommonThreads().submit(() -> Arrays.parallelSort(chunk, cmpX)).join();
+            cmp = cmpX;
         } else if (yl >= xl && yl >= zl) {
-            splitPos = bb.ymin + (bb.ymax - bb.ymin) / 2;
-            selector = selectY;
-            Chunky.getCommonThreads().submit(() -> Arrays.parallelSort(chunk, cmpY)).join();
+            cmp = cmpY;
         } else {
-            splitPos = bb.zmin + (bb.zmax - bb.zmin) / 2;
-            selector = selectZ;
-            Chunky.getCommonThreads().submit(() -> Arrays.parallelSort(chunk, cmpZ)).join();
+            cmp = cmpZ;
         }
 
-        int split;
+        MutableAABB bounds = new MutableAABB(0, 0, 0, 0, 0, 0);
+        double cmin = Double.POSITIVE_INFINITY;
+        int split = 0;
         int end = chunk.length;
-        for (split = 1; split < end; ++split) {
-            if (!selector.select(chunk[split].bounds(), splitPos)) {
-                break;
+
+        double[] sl = new double[end];
+        double[] sr = new double[end];
+
+        Chunky.getCommonThreads().submit(() -> Arrays.parallelSort(chunk, cmp)).join();
+        for (int i = 0; i < end - 1; ++i) {
+            bounds.expand(chunk[i].bounds());
+            sl[i] = bounds.surfaceArea();
+        }
+        bounds = new MutableAABB(0, 0, 0, 0, 0, 0);
+        for (int i = end - 1; i > 0; --i) {
+            bounds.expand(chunk[i].bounds());
+            sr[i - 1] = bounds.surfaceArea();
+        }
+        for (int i = 0; i < end - 1; ++i) {
+            double c = sl[i] * (i + 1) + sr[i] * (end - i - 1);
+            if (c < cmin) {
+                cmin = c;
+                split = i;
             }
         }
+
+        split += 1;
 
         actions.push(Action.MERGE);
         Primitive[] cons = new Primitive[split];
