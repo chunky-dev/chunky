@@ -16,7 +16,8 @@ public class SoulFire extends MinecraftBlock {
     solid = false;
   }
 
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return FireModel.intersect(ray, texture);
+  @Override
+  public boolean intersect(Ray ray, Scene scene) {
+    return FireModel.intersect(ray, texture, scene.getAnimationTime());
   }
 }

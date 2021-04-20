@@ -319,6 +319,11 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public int previewCount;
 
+  /**
+   * Current time in seconds. Adjusts animated blocks like fire.
+   */
+  private double animationTime = 0;
+
   private WorldTexture grassTexture = new WorldTexture();
   private WorldTexture foliageTexture = new WorldTexture();
   private WorldTexture waterTexture = new WorldTexture();
@@ -504,6 +509,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     octreeImplementation = other.octreeImplementation;
+    animationTime = other.animationTime;
   }
 
   /**
@@ -1857,6 +1863,7 @@ public class Scene implements JsonSerializable, Refreshable {
     cameraPresets = other.cameraPresets;
     camera.copyTransients(other.camera);
     finalizeBuffer = other.finalizeBuffer;
+    animationTime = other.animationTime;
   }
 
   /**
@@ -2654,6 +2661,8 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("emitterSamplingStrategy", emitterSamplingStrategy.name());
     json.add("preventNormalEmitterWithSampling", preventNormalEmitterWithSampling);
 
+    json.add("animationTime", animationTime);
+
     return json;
   }
 
@@ -2958,6 +2967,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     emitterSamplingStrategy = EmitterSamplingStrategy.valueOf(json.get("emitterSamplingStrategy").asString("NONE"));
     preventNormalEmitterWithSampling = json.get("preventNormalEmitterWithSampling").asBoolean(PersistentSettings.getPreventNormalEmitterWithSampling());
+
+    animationTime = json.get("animationTime").doubleValue(animationTime);
   }
 
   /**
@@ -3262,5 +3273,14 @@ public class Scene implements JsonSerializable, Refreshable {
   public void setPreventNormalEmitterWithSampling(boolean preventNormalEmitterWithSampling) {
     this.preventNormalEmitterWithSampling = preventNormalEmitterWithSampling;
     refresh();
+  }
+
+  public void setAnimationTime(double animationTime) {
+    this.animationTime = animationTime;
+    refresh();
+  }
+
+  public double getAnimationTime() {
+    return animationTime;
   }
 }

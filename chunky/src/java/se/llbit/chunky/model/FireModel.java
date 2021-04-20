@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.model;
 
+import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.resources.AnimatedTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
@@ -23,6 +24,7 @@ import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
+import se.llbit.util.MinecraftPRNG;
 
 public class FireModel {
   protected static Quad[] quads =
@@ -38,10 +40,14 @@ public class FireModel {
           new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 0), new Vector3(0, 1, 1),
               new Vector4(1, 0, 0, 1)),};
 
-  public static boolean intersect(Ray ray, AnimatedTexture[] texture) {
+  public static boolean intersect(Ray ray, AnimatedTexture[] texture, double time) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
-    int i = 0xF & (ray.getCurrentData() >> BlockData.LILY_PAD_ROTATION);
+    Vector3 position = new Vector3(ray.o);
+    position.scaleAdd(Ray.OFFSET, ray.d);
+    int i = (0xF & (ray.getCurrentData() >> BlockData.LILY_PAD_ROTATION))
+        + (int) Math.floorMod(MinecraftPRNG.rand((long) position.x, (long) position.y, (long) position.z), Integer.MAX_VALUE)
+        + (int) (time * 20);  // Fire animates at 20 fps
     int j = 0;
     for (Quad quad : quads) {
       if (quad.intersect(ray)) {
