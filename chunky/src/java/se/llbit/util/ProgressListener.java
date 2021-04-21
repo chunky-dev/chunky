@@ -23,12 +23,7 @@ package se.llbit.util;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public interface ProgressListener {
-  ProgressListener NONE = new ProgressListener() {
-    @Override public void setProgress(String task, int done, int start, int target) {
-    }
-    @Override public void setProgress(String task, int done, int start, int target, String eta) {
-    }
-  };
+  ProgressListener NONE = (task, done, start, target) -> {};
 
   /**
    * Update progress without ETA.
@@ -38,5 +33,7 @@ public interface ProgressListener {
   /**
    * Update progress with ETA.
    */
-  void setProgress(String task, int done, int start, int target, String eta);
+  default void setProgress(String task, int done, int start, int target, String eta) {
+    setProgress(task, done, start, target);
+  }
 }
