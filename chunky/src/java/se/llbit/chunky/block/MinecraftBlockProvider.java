@@ -2814,7 +2814,7 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new SporeBlossom();
       case "deepslate":
       case "infested_deepslate":
-        return new TexturedBlock(name, Texture.deepslate, Texture.deepslateTop);
+        return log(tag, Texture.deepslate, Texture.deepslateTop);
       case "deepslate_gold_ore":
         return new MinecraftBlock(name, Texture.deepslateGoldOre);
       case "deepslate_iron_ore":
