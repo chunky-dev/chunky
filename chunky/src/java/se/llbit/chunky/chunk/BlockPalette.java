@@ -274,6 +274,10 @@ public class BlockPalette {
       block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.9);
     });
+    materialProperties.put("minecraft:raw_gold_block", block -> {
+      block.metalness = 0.8f;
+      block.setPerceptualSmoothness(0.5);
+    });
     materialProperties.put("minecraft:diamond_block", block -> {
       block.specular = 0.04f;
     });
@@ -281,6 +285,10 @@ public class BlockPalette {
       block.specular = 0.04f;
       block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.9);
+    });
+    materialProperties.put("minecraft:raw_iron_block", block -> {
+      block.metalness = 0.66f;
+      block.setPerceptualSmoothness(0.3);
     });
     materialProperties.put("minecraft:iron_bars", block -> {
       block.specular = 0.04f;
@@ -455,6 +463,10 @@ public class BlockPalette {
       block.setPerceptualSmoothness(0.75);
     };
     materialProperties.put("minecraft:copper_block", copperConfig);
+    materialProperties.put("minecraft:raw_copper_block", block -> {
+      block.metalness = 0.66f;
+      block.setPerceptualSmoothness(0.5);
+    });
     materialProperties.put("minecraft:exposed_copper", lightlyWeatheredCopperConfig);
     materialProperties.put("minecraft:weathered_copper", semiWeatheredCopperConfig);
     materialProperties.put("minecraft:cut_copper", copperConfig);

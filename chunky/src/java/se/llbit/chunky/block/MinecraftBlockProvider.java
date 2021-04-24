@@ -679,6 +679,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:quartz_slab",
       "minecraft:quartz_stairs",
       "minecraft:rail",
+      "minecraft:raw_copper_block",
+      "minecraft:raw_gold_block",
+      "minecraft:raw_iron_block",
       "minecraft:red_banner",
       "minecraft:red_bed",
       "minecraft:red_candle_cake",
@@ -2870,6 +2873,12 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.deepslateEmeraldOre);
       case "light":
         return new LightBlock(name, BlockProvider.stringToInt(tag.get("Properties").get("level"), 15));
+      case "raw_copper_block":
+        return new MinecraftBlock(name, Texture.rawCopperBlock);
+      case "raw_gold_block":
+        return new MinecraftBlock(name, Texture.rawGoldBlock);
+      case "raw_iron_block":
+        return new MinecraftBlock(name, Texture.rawIronBlock);
       case "structure_void":
       case "barrier":
         // Invisible.

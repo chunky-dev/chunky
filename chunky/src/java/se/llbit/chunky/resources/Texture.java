@@ -987,6 +987,9 @@ public class Texture {
   public static final Texture deepslateEmeraldOre = new Texture();
   public static final Texture lightningRodOn = new Texture();
   public static final Texture light = new Texture();
+  public static final Texture rawCopperBlock = new Texture();
+  public static final Texture rawGoldBlock = new Texture();
+  public static final Texture rawIronBlock = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
