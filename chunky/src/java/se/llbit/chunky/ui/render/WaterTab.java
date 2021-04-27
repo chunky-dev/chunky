@@ -1,4 +1,5 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -49,6 +50,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @FXML private CheckBox waterPlaneEnabled;
   @FXML private DoubleAdjuster waterPlaneHeight;
   @FXML private CheckBox waterPlaneOffsetEnabled;
+  @FXML private CheckBox waterPlaneClip;
 
   private RenderControlsFxController renderControls;
   private RenderController controller;
@@ -88,6 +90,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterPlaneHeight.setRange(scene.yClipMin, scene.yClipMax);
     waterPlaneHeight.set(scene.getWaterPlaneHeight());
     waterPlaneOffsetEnabled.setSelected(scene.isWaterPlaneOffsetEnabled());
+    waterPlaneClip.setSelected(scene.getWaterPlaneChunkClip());
   }
 
   @Override
@@ -150,6 +153,10 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
 
     waterPlaneOffsetEnabled.selectedProperty().addListener((observable, oldValue, newValue) ->
       scene.setWaterPlaneOffsetEnabled(newValue)
+    );
+
+    waterPlaneClip.selectedProperty().addListener((observable, oldValue, newValue) ->
+        scene.setWaterPlaneChunkClip(newValue)
     );
   }
 

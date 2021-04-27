@@ -244,6 +244,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean waterPlaneEnabled = false;
   protected double waterPlaneHeight = World.SEA_LEVEL;
   protected boolean waterPlaneOffsetEnabled = true;
+  protected boolean waterPlaneChunkClip = true;
 
   /**
    * Enables fast fog algorithm
@@ -491,6 +492,7 @@ public class Scene implements JsonSerializable, Refreshable {
     waterPlaneEnabled = other.waterPlaneEnabled;
     waterPlaneHeight = other.waterPlaneHeight;
     waterPlaneOffsetEnabled = other.waterPlaneOffsetEnabled;
+    waterPlaneChunkClip = other.waterPlaneChunkClip;
 
     spp = other.spp;
     renderTime = other.renderTime;
@@ -728,19 +730,17 @@ public class Scene implements JsonSerializable, Refreshable {
       hit = true;
     }
     if (start.getCurrentMaterial().isWater()) {
-      if(start.getCurrentMaterial() != Water.OCEAN_WATER) {
-        r = new Ray(start);
-        r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
-        if(waterOctree.exitWater(this, r, palette) && r.distance < ray.t - Ray.EPSILON) {
-          ray.t = r.distance;
-          ray.n.set(r.n);
-          ray.color.set(r.color);
-          ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
-          ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
-          hit = true;
-        } else if(ray.getPrevMaterial() == Air.INSTANCE) {
-          ray.setPrevMaterial(Water.INSTANCE, 1 << Water.FULL_BLOCK);
-        }
+      r = new Ray(start);
+      r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
+      if(waterOctree.exitWater(this, r, palette) && r.distance < ray.t - Ray.EPSILON) {
+        ray.t = r.distance;
+        ray.n.set(r.n);
+        ray.color.set(r.color);
+        ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
+        ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
+        hit = true;
+      } else if(ray.getPrevMaterial() == Air.INSTANCE) {
+        ray.setPrevMaterial(Water.INSTANCE, 1 << Water.FULL_BLOCK);
       }
     } else {
       r = new Ray(start);
@@ -1820,6 +1820,17 @@ public class Scene implements JsonSerializable, Refreshable {
     return waterPlaneOffsetEnabled;
   }
 
+  public void setWaterPlaneChunkClip(boolean enabled) {
+    if (enabled != waterPlaneChunkClip) {
+      waterPlaneChunkClip = enabled;
+      refresh();
+    }
+  }
+
+  public boolean getWaterPlaneChunkClip() {
+    return waterPlaneChunkClip;
+  }
+
   /**
    * @return the dumpFrequency
    */
@@ -2476,6 +2487,17 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
+   * Query if a position is loaded.
+   */
+  public boolean isChunkLoaded(int x, int z) {
+    if (waterTexture != null && waterTexture.contains(x, z)) {
+      float[] color = waterTexture.get(x, z);
+      return color[0] > 0 || color[1] > 0 || color[2] > 0;
+    }
+    return false;
+  }
+
+  /**
    * Merge a render dump into this scene.
    */
   public void mergeDump(File dumpFile, TaskTracker taskTracker) {
@@ -2615,6 +2637,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("waterWorldEnabled", waterPlaneEnabled);
     json.add("waterWorldHeight", waterPlaneHeight);
     json.add("waterWorldHeightOffsetEnabled", waterPlaneOffsetEnabled);
+    json.add("waterWorldClipEnabled", waterPlaneChunkClip);
     json.add("renderActors", renderActors);
 
     if (!worldPath.isEmpty()) {
@@ -2895,6 +2918,7 @@ public class Scene implements JsonSerializable, Refreshable {
       waterPlaneHeight = json.get("waterWorldHeight").doubleValue(waterPlaneHeight);
       waterPlaneOffsetEnabled = json.get("waterWorldHeightOffsetEnabled")
         .boolValue(waterPlaneOffsetEnabled);
+      waterPlaneChunkClip = json.get("waterWorldClipEnabled").boolValue(waterPlaneChunkClip);
     }
 
     renderActors = json.get("renderActors").boolValue(renderActors);
