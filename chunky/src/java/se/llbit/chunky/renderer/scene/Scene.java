@@ -2490,11 +2490,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Query if a position is loaded.
    */
   public boolean isChunkLoaded(int x, int z) {
-    if (waterTexture != null && waterTexture.contains(x, z)) {
-      float[] color = waterTexture.get(x, z);
-      return color[0] > 0 || color[1] > 0 || color[2] > 0;
-    }
-    return false;
+    return waterTexture != null && waterTexture.contains(x, z);
   }
 
   /**
