@@ -159,6 +159,8 @@ public class InternalRenderManager extends Thread implements RenderManager {
 
     // Initialize callbacks here since java will complain `bufferedScene` is not initialized yet.
     previewCallback = () -> {
+      sendSceneStatus(bufferedScene.sceneStatus());
+
       renderStatusListeners.forEach(listener -> {
         listener.setRenderTime(System.currentTimeMillis() - renderStart);
         listener.setSamplesPerSecond(0);
@@ -167,7 +169,7 @@ public class InternalRenderManager extends Thread implements RenderManager {
 
       this.finalizeFrame(true);
 
-      return !finalizeAllFrames || bufferedScene.previewCount <= 0 || sceneProvider.pollSceneStateChange();
+      return !finalizeAllFrames || sceneProvider.pollSceneStateChange();
     };
 
     renderCallback = () -> {
@@ -387,6 +389,10 @@ public class InternalRenderManager extends Thread implements RenderManager {
   @Override
   public void setRenderTask(TaskTracker.Task task) {
     renderTask = task;
+  }
+
+  public TaskTracker.Task getRenderTask() {
+    return renderTask;
   }
 
   /**

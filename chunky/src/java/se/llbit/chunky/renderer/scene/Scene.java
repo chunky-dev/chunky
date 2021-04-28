@@ -315,11 +315,6 @@ public class Scene implements JsonSerializable, Refreshable {
   private BVH actorBvh = new BVH(Collections.emptyList());
 
   /**
-   * Preview frame interlacing counter.
-   */
-  public int previewCount;
-
-  /**
    * Current time in seconds. Adjusts animated blocks like fire.
    */
   private double animationTime = 0;

@@ -16,10 +16,9 @@ public class PathTracingRenderer extends TileBasedRenderer {
     Scene scene = manager.bufferedScene;
 
     while (scene.spp < scene.getTargetSpp()) {
-      submitTiles(manager, tracer, false);
+      int pass = submitRenderTiles(manager, tracer);
       manager.pool.awaitEmpty();
-
-      scene.spp += 1;
+      scene.spp += pass;
       if (postRender.getAsBoolean()) return;
     }
   }
