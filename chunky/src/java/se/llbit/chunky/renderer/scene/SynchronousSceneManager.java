@@ -20,7 +20,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.RenderStatus;
-import se.llbit.chunky.renderer.Renderer;
+import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.SceneProvider;
 import se.llbit.chunky.world.ChunkPosition;
@@ -40,7 +40,7 @@ import java.util.function.Consumer;
  * <p>The scene manager stores the current scene state and pending
  * scene state changes. The scene manager is responsible for protecting
  * parts of the scene data from concurrent writes & reads by
- * the user (through the UI) and renderer.
+ * the user (through the UI) and renderManager.
  */
 public class SynchronousSceneManager implements SceneProvider, SceneManager {
   /**
@@ -65,22 +65,22 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
 
   private final RenderContext context;
 
-  private final Renderer renderer;
+  private final RenderManager renderManager;
 
   private RenderResetHandler resetHandler = () -> true;
   private TaskTracker taskTracker = new TaskTracker(ProgressListener.NONE);
   private Runnable onSceneLoaded = () -> {};
   private Runnable onChunksLoaded = () -> {};
 
-  public SynchronousSceneManager(RenderContext context, Renderer renderer) {
+  public SynchronousSceneManager(RenderContext context, RenderManager renderManager) {
     this.context = context;
-    this.renderer = renderer;
+    this.renderManager = renderManager;
 
     scene = context.getChunky().getSceneFactory().newScene();
     scene.initBuffers();
 
     // The stored scene is a copy of the mutable scene. They even share
-    // some data structures that are only used by the renderer.
+    // some data structures that are only used by the renderManager.
     storedScene = context.getChunky().getSceneFactory().copyScene(scene);
   }
 
@@ -123,8 +123,8 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         storedScene.backupFile(context, context.getSceneDescriptionFile(sceneName));
         storedScene.backupFile(context, new File(sceneDir, sceneName + ".dump"));
 
-        // Copy render status over from the renderer.
-        RenderStatus status = renderer.getRenderStatus();
+        // Copy render status over from the renderManager.
+        RenderStatus status = renderManager.getRenderStatus();
         storedScene.renderTime = status.getRenderTime();
         storedScene.spp = status.getSpp();
         storedScene.saveScene(context, taskTracker);
@@ -207,7 +207,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
           scene.clearResetFlags();
           return reason;
         } else if (scene.getMode() != storedScene.getMode()) {
-          // Make sure the renderer sees the updated render mode.
+          // Make sure the renderManager sees the updated render mode.
           // TODO: handle buffer finalization updates as state change.
           synchronized (storedScene) {
             storedScene.mode = scene.mode;
@@ -249,7 +249,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
    */
   protected void mergeDump(File dumpFile) {
     synchronized (scene) {
-      renderer.withSampleBufferProtected((samples, width, height) -> {
+      renderManager.withSampleBufferProtected((samples, width, height) -> {
         if (width != scene.width || height != scene.height) {
           throw new Error("Failed to merge render dump - wrong canvas size.");
         }

@@ -72,13 +72,12 @@ public class TestBlankRender {
     options.renderThreads = 1;
     Chunky chunky = new Chunky(options);
     RenderContext context = new RenderContext(chunky);
-    context.workerFactory =
-        (renderManager, index, seed) -> new RenderWorker(renderManager, index, 0);
-    RenderManager renderer = new RenderManager(context, true);
+    context.renderPoolFactory = (threads, seed) -> new RenderWorkerPool(threads, 0);
+    InternalRenderManager renderer = new InternalRenderManager(context, true);
     renderer.setSceneProvider(new MockSceneProvider(scene));
     renderer.start();
     renderer.join();
-    return renderer.getBufferedScene().getSampleBuffer();
+    return renderer.bufferedScene.getSampleBuffer();
   }
 
   /** Compares two sample buffers. */

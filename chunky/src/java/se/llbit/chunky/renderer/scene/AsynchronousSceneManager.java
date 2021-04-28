@@ -17,7 +17,7 @@
 package se.llbit.chunky.renderer.scene;
 
 import se.llbit.chunky.renderer.RenderContext;
-import se.llbit.chunky.renderer.Renderer;
+import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.SceneProvider;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
@@ -40,10 +40,10 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
   private final SynchronousSceneManager sceneManager;
   private Runnable currentTask = null;
 
-  public AsynchronousSceneManager(RenderContext context, Renderer renderer) {
+  public AsynchronousSceneManager(RenderContext context, RenderManager renderManager) {
     super("Scene Manager");
 
-    sceneManager = new SynchronousSceneManager(context, renderer);
+    sceneManager = new SynchronousSceneManager(context, renderManager);
   }
 
   public SceneProvider getSceneProvider() {

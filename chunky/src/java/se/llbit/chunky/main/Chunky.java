@@ -25,16 +25,8 @@ import se.llbit.chunky.main.CommandLineOptions.Mode;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.plugin.ChunkyPlugin;
 import se.llbit.chunky.plugin.TabTransformer;
-import se.llbit.chunky.renderer.ConsoleProgressListener;
-import se.llbit.chunky.renderer.RayTracerFactory;
-import se.llbit.chunky.renderer.RenderContext;
-import se.llbit.chunky.renderer.RenderContextFactory;
-import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.RenderManager;
-import se.llbit.chunky.renderer.Renderer;
-import se.llbit.chunky.renderer.RendererFactory;
-import se.llbit.chunky.renderer.SceneProvider;
-import se.llbit.chunky.renderer.SnapshotControl;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.PathTracer;
@@ -92,7 +84,7 @@ public class Chunky {
   private RenderController renderController;
   private SceneFactory sceneFactory = SceneFactory.DEFAULT;
   private RenderContextFactory renderContextFactory = RenderContext::new;
-  private RendererFactory rendererFactory = RenderManager::new;
+  private RenderManagerFactory renderManagerFactory = InternalRenderManager::new;
   private RayTracerFactory previewRayTracerFactory = PreviewRayTracer::new;
   private RayTracerFactory rayTracerFactory = PathTracer::new;
   private RenderControlsTabTransformer renderControlsTabTransformer = tabs -> tabs;
@@ -127,7 +119,7 @@ public class Chunky {
 
     SynchronousSceneManager sceneManager = (SynchronousSceneManager) getRenderController()
         .getSceneManager();
-    Renderer renderer = getRenderController().getRenderer();
+    RenderManager renderManager = getRenderController().getRenderer();
     TaskTracker taskTracker = new TaskTracker(new ConsoleProgressListener(),
         (tracker, previous, name, size) -> new TaskTracker.Task(tracker, previous, name, size) {
           @Override
@@ -139,8 +131,8 @@ public class Chunky {
           }
         });
     sceneManager.setTaskTracker(taskTracker);
-    renderer.setSnapshotControl(SnapshotControl.DEFAULT);
-    renderer.setOnFrameCompleted((scene, spp) -> {
+    renderManager.setSnapshotControl(SnapshotControl.DEFAULT);
+    renderManager.setOnFrameCompleted((scene, spp) -> {
       if (SnapshotControl.DEFAULT.saveSnapshot(scene, spp)) {
         scene.saveSnapshot(new File(getRenderContext().getSceneDirectory(), "snapshots"),
             taskTracker, getRenderContext().numRenderThreads());
@@ -155,8 +147,8 @@ public class Chunky {
         }
       }
     });
-    renderer.setRenderTask(taskTracker.backgroundTask());
-    renderer.setOnRenderCompleted((time, sps) -> {
+    renderManager.setRenderTask(taskTracker.backgroundTask());
+    renderManager.setOnRenderCompleted((time, sps) -> {
       System.out.println("Render job finished.");
       int seconds = (int) ((time / 1000) % 60);
       int minutes = (int) ((time / 60000) % 60);
@@ -181,8 +173,8 @@ public class Chunky {
       }
       sceneManager.getScene().startHeadlessRender();
 
-      renderer.start();
-      renderer.join();
+      renderManager.start();
+      renderManager.join();
       return 0;
     } catch (FileNotFoundException e) {
       System.err.format("Scene \"%s\" not found!%n", options.sceneName);
@@ -197,7 +189,7 @@ public class Chunky {
       e.printStackTrace();
       return 1;
     } finally {
-      renderer.shutdown();
+      renderManager.shutdown();
     }
   }
 
@@ -353,28 +345,28 @@ public class Chunky {
   }
 
   @PluginApi
-  public void setRendererFactory(RendererFactory rendererFactory) {
-    this.rendererFactory = rendererFactory;
+  public void setRendererFactory(RenderManagerFactory renderManagerFactory) {
+    this.renderManagerFactory = renderManagerFactory;
   }
 
   public RenderController getRenderController() {
     if (renderController == null) {
       // The renderController initialization is deferred to its first usage because plugins may want to overwrite
-      // factories (which would require a new RenderController) but still add listeners e.g. to the Renderer which would
+      // factories (which would require a new RenderController) but still add listeners e.g. to the RenderManager which would
       // then be overwritten.
       RenderContext context = renderContextFactory.newRenderContext(this);
-      Renderer renderer = rendererFactory.newRenderer(context, headless);
+      RenderManager renderManager = renderManagerFactory.newRenderManager(context, headless);
       if (headless) {
-        SynchronousSceneManager sceneManager = new SynchronousSceneManager(context, renderer);
-        renderer.setSceneProvider(sceneManager);
-        renderController = new RenderController(context, renderer, sceneManager, sceneManager);
+        SynchronousSceneManager sceneManager = new SynchronousSceneManager(context, renderManager);
+        renderManager.setSceneProvider(sceneManager);
+        renderController = new RenderController(context, renderManager, sceneManager, sceneManager);
       } else {
-        AsynchronousSceneManager sceneManager = new AsynchronousSceneManager(context, renderer);
+        AsynchronousSceneManager sceneManager = new AsynchronousSceneManager(context, renderManager);
         SceneProvider sceneProvider = sceneManager.getSceneProvider();
-        renderer.setSceneProvider(sceneProvider);
-        renderer.start();
+        renderManager.setSceneProvider(sceneProvider);
+        renderManager.start();
         sceneManager.start();
-        renderController = new RenderController(context, renderer, sceneManager, sceneProvider);
+        renderController = new RenderController(context, renderManager, sceneManager, sceneProvider);
       }
     }
     return renderController;

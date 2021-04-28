@@ -20,8 +20,10 @@ import org.junit.Test;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ChunkyOptions;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.log.Log;
+
+import java.util.Arrays;
+import java.util.function.Consumer;
 
 /**
  * Tests for thread liveness issues in the renderer.
@@ -30,23 +32,14 @@ public class TestDeadlock {
   private static final int WIDTH = Math.max(10, Scene.MIN_CANVAS_WIDTH);
   private static final int HEIGHT = Math.max(10, Scene.MIN_CANVAS_HEIGHT);
 
-  static class PointlessWorker extends RenderWorker {
-    PointlessWorker(AbstractRenderManager manager, int id) {
-      super(manager, id, 0);
+  static class PointlessPool extends RenderWorkerPool {
+    public PointlessPool(int threads, long seed) {
+      super(1, 0);
+      Arrays.stream(workers).forEach(Thread::interrupt);
     }
-
-    @Override public void run() {
-      try {
-        while (!isInterrupted()) {
-          manager.getNextJob();
-          manager.jobDone();
-        }
-      } catch (InterruptedException ignored) {
-        // Interrupted.
-      } catch (Throwable e) {
-        Log.error("Render worker " + id + " crashed with uncaught exception.", e);
-      }
-    }
+    @Override public void submit(Consumer<RenderWorker> task) {}
+    @Override public void awaitEmpty() {}
+    @Override public void interrupt() {}
   }
 
   /**
@@ -59,10 +52,9 @@ public class TestDeadlock {
     options.tileWidth = Math.max(WIDTH, HEIGHT);
     Chunky chunky = new Chunky(options);
     RenderContext context = new RenderContext(chunky);
-    context.workerFactory =
-        (renderManager, id, seed) -> new PointlessWorker(renderManager, id);
+    context.renderPoolFactory = PointlessPool::new;
     for (int i = 0; i < 2019; ++i) {
-      RenderManager renderer = new RenderManager(context, true);
+      InternalRenderManager renderer = new InternalRenderManager(context, true);
       renderer.setSceneProvider(new MockSceneProvider(scene));
       renderer.start();
       renderer.join();

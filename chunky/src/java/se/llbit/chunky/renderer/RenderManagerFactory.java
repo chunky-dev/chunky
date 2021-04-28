@@ -17,6 +17,6 @@
  */
 package se.llbit.chunky.renderer;
 
-public interface RendererFactory {
-  Renderer newRenderer(RenderContext context, boolean headless);
+public interface RenderManagerFactory {
+  RenderManager newRenderManager(RenderContext context, boolean headless);
 }

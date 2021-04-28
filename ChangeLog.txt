@@ -9,11 +9,11 @@ LATEST
 * Removed block highlighting in the 2D map.
 * Added Update Site url setting in the launcher.
 * The render thread count setting now takes effect after restarting Chunky.
-* Fixed concurrency issues in the renderer.
-* Fixed issue causing the renderer to hang if clouds were enabled.
+* Fixed concurrency issues in the renderManager.
+* Fixed issue causing the renderManager to hang if clouds were enabled.
 * Added option to disable sun texture in the Lighting tab.
 * Added new texture paths to support Minecraft 1.13+ resource packs.
-* Fixed deadlock issue in the renderer.
+* Fixed deadlock issue in the renderManager.
   Render workers could get deadlocked when waiting for the next frame to start
   rendering. This issue seems to be most common at the start of a render job.
 * Added sky fog blending setting in the Sky&Fog tab.
@@ -115,7 +115,7 @@ LATEST
 * Removed old features that were not well supported. The goal is to
   make these into separate plugins:
     * Removed the benchmark tool.
-    * Removed the experimental OpenCL renderer.
+    * Removed the experimental OpenCL renderManager.
 * Holding Control while moving the camera multiplies move distance by 100.
 * The render preview scaling option has been moved into a context menu.
   Right clicking the render preview window brings up the scaling menu.
@@ -640,7 +640,7 @@ LATEST
       state of the render (was bugged in 1.0.11 and 1.0.12)
     * The scene description file is automatically backed up when a manual
       scene save is performed
-    * The renderer will stop at a user selected target SPP count.
+    * The renderManager will stop at a user selected target SPP count.
       Render progress is now tracked relative to this SPP count, rather
       than the intermediate render dumps.
 
@@ -704,7 +704,7 @@ LATEST
     * Fixed flipped texture on the right hand side of stair blocks
     * Added atmospheric effects
     * Save canvas size when using the Halve and Double buttons
-    * Made renderer more robust in the handling of transparent textures
+    * Made renderManager more robust in the handling of transparent textures
     * Preview images are rendered with a quick gamma adjustment (not correct,
       but close enough and much quicker)
     * Removed gamma adjustment options from Render Controls dialog
@@ -750,7 +750,7 @@ LATEST
     * Chunky remembers the last skymap used
     * Chunky uses the sun texture from the current texture pack to draw the sun
     * Fixed rare bug when rendering iron bars or glass panes with certain
-      textures that caused the renderer to hang
+      textures that caused the renderManager to hang
     * Fixed soft shadow rendering error due to incorrect sampling of sunlight
 
 1.0.7 - 2012-06-15
@@ -842,8 +842,8 @@ LATEST
     * Set default ray depth to 5 (was 6)
     * Modified water displacement function
     * Added option to disable biome colors
-    * It is now possible to pause the renderer
-    * When loading a saved scene the renderer will start in the paused mode
+    * It is now possible to pause the renderManager
+    * When loading a saved scene the renderManager will start in the paused mode
     * Slight render performance increase
     * Increased responsiveness of the preview render (using interlacing)
     * Jack-O-Lantern now emits light
@@ -878,7 +878,7 @@ LATEST
       (flowers, cobweb, fire, etc.)
 
 1.0.0 - 20120526
-    * Added 3D chunk rendering using a new path tracing renderer
+    * Added 3D chunk rendering using a new path tracing renderManager
     * Support for texture packs
     * Fixed selection color bug making the selections opaque
     * Fixed selection off-by one error that showed some unselected chunks
