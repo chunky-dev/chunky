@@ -1830,6 +1830,11 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
+  /**
+   * Check if water plane chunk clipping is enabled. If so, the water plane is hidden in loaded
+   * chunks (i.e. it is ignored inside of loaded chunks).
+   * @return {@code true} if the water plane chunk clipping is enabled
+   */
   public boolean getWaterPlaneChunkClip() {
     return waterPlaneChunkClip;
   }
@@ -2520,7 +2525,13 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public boolean isInWater(Ray ray) {
     if (isWaterPlaneEnabled() && ray.o.y < getEffectiveWaterPlaneHeight()) {
-      return true;
+      if (getWaterPlaneChunkClip()) {
+        if (!isChunkLoaded((int)Math.floor(ray.o.x), (int)Math.floor(ray.o.z))) {
+          return true;
+        }
+      } else {
+        return true;
+      }
     }
     if (waterOctree.isInside(ray.o)) {
       int x = (int) QuickMath.floor(ray.o.x);

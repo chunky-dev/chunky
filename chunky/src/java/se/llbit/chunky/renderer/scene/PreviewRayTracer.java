@@ -93,7 +93,7 @@ public class PreviewRayTracer implements RayTracer {
       hit = scene.sky().cloudIntersection(scene, ray);
     }
     if (scene.isWaterPlaneEnabled()) {
-      hit = waterIntersection(scene, ray) || hit;
+      hit = waterPlaneIntersection(scene, ray) || hit;
     }
     if (scene.intersect(ray)) {
       // Octree tracer handles updating distance.
@@ -110,7 +110,7 @@ public class PreviewRayTracer implements RayTracer {
     }
   }
 
-  private static boolean waterIntersection(Scene scene, Ray ray) {
+  private static boolean waterPlaneIntersection(Scene scene, Ray ray) {
     double t = (scene.getEffectiveWaterPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
     if (scene.getWaterPlaneChunkClip()) {
       Vector3 pos = new Vector3(ray.o);
