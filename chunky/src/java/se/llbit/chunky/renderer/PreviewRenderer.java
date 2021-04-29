@@ -15,6 +15,11 @@ public class PreviewRenderer extends TileBasedRenderer {
   }
 
   @Override
+  public String getIdString() {
+    return "InternalPreview";
+  }
+
+  @Override
   public void render(InternalRenderManager manager) throws InterruptedException {
     TaskTracker.Task task = manager.getRenderTask();
     task.update("Preview", 2, 0, "");

@@ -147,6 +147,7 @@ public class InternalRenderManager extends Thread implements RenderManager {
    * This renderer does nothing. Is used when there is an invalid renderer.
    */
   private static final Renderer EMPTY_RENDERER = new Renderer() {
+    @Override public String getIdString() { return "Empty"; }
     @Override public void setPostRender(BooleanSupplier callback) {}
     @Override public void render(InternalRenderManager manager) {}
   };

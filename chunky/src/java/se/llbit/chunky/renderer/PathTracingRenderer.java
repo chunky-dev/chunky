@@ -13,6 +13,11 @@ public class PathTracingRenderer extends TileBasedRenderer {
   }
 
   @Override
+  public String getIdString() {
+    return "InternalRender";
+  }
+
+  @Override
   public void render(InternalRenderManager manager) throws InterruptedException {
     Scene scene = manager.bufferedScene;
     int width = scene.width;

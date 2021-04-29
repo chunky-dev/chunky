@@ -4,6 +4,11 @@ import java.util.function.BooleanSupplier;
 
 public interface Renderer {
   /**
+   * Get a short id string representing this renderer.
+   */
+  String getIdString();
+
+  /**
    * The post render callback. This should be run after rendering a frame.
    * It will return {@code true} if the render should terminate.
    *

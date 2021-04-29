@@ -419,23 +419,11 @@ public class Chunky {
 
   @PluginApi
   @Deprecated
-  public RayTracerFactory getPreviewRayTracerFactory() {
-    return PreviewRayTracer::new;
-  }
-
-  @PluginApi
-  @Deprecated
   public void setRayTracerFactory(RayTracerFactory rayTracerFactory) {
     if (InternalRenderManager.renderers.containsKey("Plugin Renderer"))
       Log.error("Attempted to register 2 plugin renderers.");
     InternalRenderManager.renderers.computeIfAbsent("Plugin Renderer", name ->
         new PathTracingRenderer(rayTracerFactory.newRayTracer()));
-  }
-
-  @PluginApi
-  @Deprecated
-  public RayTracerFactory getRayTracerFactory() {
-    return PathTracer::new;
   }
 
   /**

@@ -18,12 +18,13 @@ package se.llbit.chunky.main;
 
 import org.junit.Test;
 import se.llbit.chunky.plugin.TabTransformer;
-import se.llbit.chunky.renderer.RayTracerFactory;
-import se.llbit.chunky.renderer.RenderContextFactory;
+import se.llbit.chunky.renderer.*;
+import se.llbit.chunky.renderer.scene.RayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneFactory;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
 
 import static org.junit.Assert.assertNotSame;
@@ -52,20 +53,46 @@ public class PluginApiTest {
     assertSame(myFactory, chunky.getSceneFactory());
   }
 
-  @Test public void testSetPreviewRayTracerFactory() {
+  @Test public void testSetPreviewRayTracerFactory() throws Exception {
     Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
-    RayTracerFactory myFactory = () -> null;
+    RayTracer tracer = (scene, state) -> state.ray.color.set(0, 0, 0, 1);
+    RayTracerFactory myFactory = () -> tracer;
     chunky.setPreviewRayTracerFactory(myFactory);
-    assertSame(myFactory, chunky.getPreviewRayTracerFactory());
-    assertNotSame(myFactory, chunky.getRayTracerFactory());
+
+    // Get ray tracer through reflection
+    Renderer renderer = InternalRenderManager.previewRenderers.get("Plugin Preview Renderer");
+    Field rayTracer = renderer.getClass().getDeclaredField("tracer");
+    rayTracer.setAccessible(true);
+    assertSame(tracer, rayTracer.get(renderer));
   }
 
-  @Test public void testSetRayTracerFactory() {
+  @Test public void testSetRayTracerFactory() throws Exception {
     Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
-    RayTracerFactory myFactory = () -> null;
+    RayTracer tracer = (scene, state) -> state.ray.color.set(0, 0, 0, 1);
+    RayTracerFactory myFactory = () -> tracer;
     chunky.setRayTracerFactory(myFactory);
-    assertSame(myFactory, chunky.getRayTracerFactory());
-    assertNotSame(myFactory, chunky.getPreviewRayTracerFactory());
+
+    // Get ray tracer through reflection
+    Renderer renderer = InternalRenderManager.renderers.get("Plugin Renderer");
+    Field rayTracer = renderer.getClass().getDeclaredField("tracer");
+    rayTracer.setAccessible(true);
+    assertSame(tracer, rayTracer.get(renderer));
+  }
+
+  @Test
+  public void testSetCustomPreviewRenderer() {
+    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
+    Renderer renderer = new PreviewRenderer(null);
+    chunky.addRenderer("Test Preview Renderer", renderer);
+    assertSame(renderer, InternalRenderManager.renderers.get("Test Preview Renderer"));
+  }
+
+  @Test
+  public void testSetCustomRenderer() {
+    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
+    Renderer renderer = new PathTracingRenderer(null);
+    chunky.addRenderer("Test Renderer", renderer);
+    assertSame(renderer, InternalRenderManager.renderers.get("Test Renderer"));
   }
 
   @Test public void testSetRenderControlsTabTransformer() {
