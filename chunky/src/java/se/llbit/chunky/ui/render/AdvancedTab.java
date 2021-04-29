@@ -29,6 +29,7 @@ import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
@@ -52,30 +53,20 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   private RenderController controller;
   private Scene scene;
 
-  @FXML
-  private IntegerAdjuster renderThreads;
-  @FXML
-  private IntegerAdjuster cpuLoad;
-  @FXML
-  private IntegerAdjuster rayDepth;
-  @FXML
-  private Button mergeRenderDump;
-  @FXML
-  private CheckBox shutdown;
-  @FXML
-  private CheckBox fastFog;
-  @FXML
-  private IntegerAdjuster cacheResolution;
-  @FXML
-  private DoubleAdjuster animationTime;
-  @FXML
-  private ChoiceBox<PictureExportFormat> outputMode;
-  @FXML
-  private ChoiceBox<String> octreeImplementation;
-  @FXML
-  private IntegerAdjuster gridSize;
-  @FXML
-  private CheckBox preventNormalEmitterWithSampling;
+  @FXML private IntegerAdjuster renderThreads;
+  @FXML private IntegerAdjuster cpuLoad;
+  @FXML private IntegerAdjuster rayDepth;
+  @FXML private Button mergeRenderDump;
+  @FXML private CheckBox shutdown;
+  @FXML private CheckBox fastFog;
+  @FXML private IntegerAdjuster cacheResolution;
+  @FXML private DoubleAdjuster animationTime;
+  @FXML private ChoiceBox<PictureExportFormat> outputMode;
+  @FXML private ChoiceBox<String> octreeImplementation;
+  @FXML private IntegerAdjuster gridSize;
+  @FXML private CheckBox preventNormalEmitterWithSampling;
+  @FXML private ChoiceBox<String> rendererSelect;
+  @FXML private ChoiceBox<String> previewSelect;
 
   public AdvancedTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("AdvancedTab.fxml"));
@@ -192,6 +183,14 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       scene.setPreventNormalEmitterWithSampling(newvalue);
       PersistentSettings.setPreventNormalEmitterWithSampling(newvalue);
     });
+
+    rendererSelect.setTooltip(new Tooltip("The renderer to use on a final render."));
+    rendererSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+        controller.getRenderer().setRenderer(newValue));
+
+    previewSelect.setTooltip(new Tooltip("The renderer to use when previewing."));
+    previewSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+        controller.getRenderer().setPreviewRenderer(newValue));
   }
 
   public boolean shutdownAfterCompletedRender() {
@@ -232,5 +231,13 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
         new ShutdownAlert(null);
       }
     });
+
+    if (rendererSelect.getItems().isEmpty()) {
+      RenderManager renderManager = controller.getRenderer();
+      rendererSelect.getItems().addAll(renderManager.getRenderers());
+      rendererSelect.getSelectionModel().select(renderManager.getRendererName());
+      previewSelect.getItems().addAll(renderManager.getPreviewRenderers());
+      previewSelect.getSelectionModel().select(renderManager.getPreviewRendererName());
+    }
   }
 }

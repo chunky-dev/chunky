@@ -28,17 +28,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 /**
- * This class manages render workers. Each worker renders one tile at a time,
- * and the render manager ensures that each worker is assigned unique tiles.
- *
- * <p>The secondary purpose of the render manager is to manage the scene state
- * which the workers use.
+ * This class serves to interface {@code Renderer}s with Chunky.
+ * It holds a pool of render workers and manages the scene state. It starts
+ * the desired {@code Renderer} when rendering starts.
  *
  * <p>Scene state is kept in Scene objects. The render controls dialog
  * stores the scene state in its own Scene object, which is read by
@@ -48,12 +45,21 @@ import java.util.function.Consumer;
  *
  * <p>A snapshot of the current render can be accessed by calling withSnapshot().
  *
- * @author Jesper Öqvist <jesper@llbit.se>
+ * <p>All available final renderers are stored in {@code renderers} and preview renderers
+ * are stored in {@code previewRenderers}.
  */
 public class InternalRenderManager extends Thread implements RenderManager {
+  /**
+   * Map containing all the final render {@code Renderer}s. The renderer corresponding to
+   * {@code getRendererName()} is used when a render is requested.
+   */
   @PluginApi
   public static final Map<String, Renderer> renderers = new HashMap<>();
 
+  /**
+   * Map containing all the preview render {@code Renderer}s. The renderer corresponding to
+   * {@code getPreviewRendererName()} is used when a preview is needed.
+   */
   @PluginApi
   public static final Map<String, Renderer> previewRenderers = new HashMap<>();
 
@@ -61,6 +67,12 @@ public class InternalRenderManager extends Thread implements RenderManager {
     renderers.computeIfAbsent("Chunky Path Tracer", name -> new PathTracingRenderer(new PathTracer()));
     previewRenderers.computeIfAbsent("Chunky Preview", name -> new PreviewRenderer(new PreviewRayTracer()));
   }
+
+  /**
+   * The current renderer selections.
+   */
+  private String renderer = "Chunky Path Tracer";
+  private String previewRenderer = "Chunky Preview";
 
   /**
    * This is a buffered scene which render workers should use while rendering.
@@ -83,11 +95,7 @@ public class InternalRenderManager extends Thread implements RenderManager {
    */
   public final RenderWorkerPool pool;
 
-  /**
-   * The current renderer selections.
-   */
-  private String renderer = "Chunky Path Tracer";
-  private String previewRenderer = "Chunky Preview";
+  private int cpuLoad = 100;
 
   /**
    * The render canvas. This is redrawn on every frame (if applicable).
@@ -95,19 +103,23 @@ public class InternalRenderManager extends Thread implements RenderManager {
   private Repaintable canvas = () -> {};
 
   /**
-   * Decides if the canvas is in view and every frame needs to be finalized.
+   * Decides if the canvas is in view and every frame needs to be finalized. If not, only
+   * the frames before a snapshot are finalized.
    */
   private boolean finalizeAllFrames = false;
 
   /**
-   * Listeners that need to be called on every frame.
+   * Listeners that need to be called on every frame when rendering.
    */
   private final Collection<RenderStatusListener> renderStatusListeners = new ArrayList<>();
+
+  /**
+   * Listeners that need to be called on every frame when previewing.
+   */
   private final Collection<SceneStatusListener> sceneStatusListeners = new ArrayList<>();
 
   private BiConsumer<Long, Integer> renderCompletionListener = (time, sps) -> {};
   private BiConsumer<Scene, Integer> frameCompletionListener = (scene, spp) -> {};
-
 
   private TaskTracker.Task renderTask = TaskTracker.Task.NONE;
 
@@ -132,17 +144,15 @@ public class InternalRenderManager extends Thread implements RenderManager {
   public final RenderContext context;
 
   /**
-   * This renderer does nothing.
+   * This renderer does nothing. Is used when there is an invalid renderer.
    */
   private static final Renderer EMPTY_RENDERER = new Renderer() {
     @Override public void setPostRender(BooleanSupplier callback) {}
-    @Override public void render(InternalRenderManager manager) throws InterruptedException {}
+    @Override public void render(InternalRenderManager manager) {}
   };
 
   private final BooleanSupplier previewCallback;
   private final BooleanSupplier renderCallback;
-
-  private int cpuLoad = 100;
 
   /**
    * @param headless {@code true} if rendering threads should be shut
@@ -153,12 +163,14 @@ public class InternalRenderManager extends Thread implements RenderManager {
 
     this.context = context;
     this.headless = headless;
-    bufferedScene = context.getChunky().getSceneFactory().newScene();
+    this.bufferedScene = context.getChunky().getSceneFactory().newScene();
 
-    pool = context.renderPoolFactory.create(context.numRenderThreads(), System.currentTimeMillis());
+    // Create a new pool. Set the seed to the current time in milliseconds.
+    this.pool = context.renderPoolFactory.create(context.numRenderThreads(), System.currentTimeMillis());
 
     // Initialize callbacks here since java will complain `bufferedScene` is not initialized yet.
-    previewCallback = () -> {
+    // (nothing important in the rest of the constructor)
+    this.previewCallback = () -> {
       sendSceneStatus(bufferedScene.sceneStatus());
 
       renderStatusListeners.forEach(listener -> {
@@ -172,7 +184,7 @@ public class InternalRenderManager extends Thread implements RenderManager {
       return !finalizeAllFrames || sceneProvider.pollSceneStateChange();
     };
 
-    renderCallback = () -> {
+    this.renderCallback = () -> {
       sceneProvider.withSceneProtected(scene -> {
         synchronized (bufferedScene) {
           bufferedScene.copyTransients(scene);
@@ -201,12 +213,17 @@ public class InternalRenderManager extends Thread implements RenderManager {
     };
   }
 
+  /**
+   * This controls most of the render manager logic.
+   */
   @Override
   public void run() {
     try {
       while (!isInterrupted()) {
+        // Wait for something to happen
         ResetReason reason = sceneProvider.awaitSceneStateChange();
 
+        // Copy the new scene state to the bufferedScene
         final boolean[] sceneReset = {false};
         synchronized (bufferedScene) {
           sceneProvider.withSceneProtected(scene -> {
@@ -237,14 +254,16 @@ public class InternalRenderManager extends Thread implements RenderManager {
           });
         }
 
+        // Select the correct renderer
         Renderer render = mode == RenderMode.PREVIEW ? getPreviewRenderer() : getRenderer();
-        renderStart = System.currentTimeMillis();
 
         if (sceneReset[0]) {
           render.sceneReset(this, reason);
         }
 
+        renderStart = System.currentTimeMillis();
         if (mode == RenderMode.PREVIEW) {
+          // Preview with no CPU limit
           pool.setCpuLoad(100);
           render.setPostRender(previewCallback);
           render.render(this);
@@ -262,9 +281,7 @@ public class InternalRenderManager extends Thread implements RenderManager {
           }
         }
 
-        if (headless) {
-          break;
-        }
+        if (headless) break;
       }
     } catch (InterruptedException e) {
       // Interrupted
@@ -281,18 +298,32 @@ public class InternalRenderManager extends Thread implements RenderManager {
     return previewRenderers.getOrDefault(previewRenderer, EMPTY_RENDERER);
   }
 
+  @Override
+  public String[] getRenderers() {
+    return renderers.keySet().toArray(new String[0]);
+  }
+
+  @Override
+  public String[] getPreviewRenderers() {
+    return previewRenderers.keySet().toArray(new String[0]);
+  }
+
+  @Override
   public String getRendererName() {
     return renderer;
   }
 
+  @Override
   public String getPreviewRendererName() {
     return previewRenderer;
   }
 
+  @Override
   public void setRenderer(String value) {
     renderer = value;
   }
 
+  @Override
   public void setPreviewRenderer(String value) {
     previewRenderer = value;
   }

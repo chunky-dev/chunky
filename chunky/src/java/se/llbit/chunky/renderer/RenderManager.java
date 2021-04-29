@@ -35,6 +35,36 @@ public interface RenderManager {
   void setCanvas(Repaintable canvas);
 
   /**
+   * Get all available {@code Renderer} names.
+   */
+  String[] getRenderers();
+
+  /**
+   * Set the current {@code Renderer} by name.
+   */
+  void setRenderer(String value);
+
+  /**
+   * Get the current {@code Renderer} name.
+   */
+  String getRendererName();
+
+  /**
+   * Get all available preview {@code Renderer} names.
+   */
+  String[] getPreviewRenderers();
+
+  /**
+   * Set the current preview {@code Renderer} by name.
+   */
+  void setPreviewRenderer(String value);
+
+  /**
+   * Get the current preview {@code Renderer} name.
+   */
+  String getPreviewRendererName();
+
+  /**
    * Instructs the renderer to change its CPU load.
    */
   void setCPULoad(int loadPercent);
