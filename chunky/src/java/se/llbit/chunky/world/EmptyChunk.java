@@ -47,7 +47,7 @@ public class EmptyChunk extends Chunk {
 
   @Override public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette) {
     if (reuseChunkData == null) {
-      reuseChunkData = new EmptyChunkData();
+      reuseChunkData = EmptyChunkData.INSTANCE;
     } else {
       reuseChunkData.clear();
     }

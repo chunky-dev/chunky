@@ -25,12 +25,14 @@ public class SimpleChunkData implements ChunkData {
   private final byte[] biomes;
   private final Collection<CompoundTag> tileEntities;
   private final Collection<CompoundTag> entities;
+  private boolean isEmpty;
 
   public SimpleChunkData() {
     blocks = new int[X_MAX * Y_MAX * Z_MAX];
     biomes = new byte[X_MAX * Z_MAX];
     tileEntities = new ArrayList<>();
     entities = new ArrayList<>();
+    isEmpty = true;
   }
 
   @Override public int minY() {
@@ -49,11 +51,12 @@ public class SimpleChunkData implements ChunkData {
   }
 
   @Override public void setBlockAt(int x, int y, int z, int block) {
-    if(block == 0)
-      return;
     if(y < 0 || y > 255) {
       return;
     }
+    isEmpty = false;
+    if(block == 0)
+      return;
     blocks[chunkIndex(x & (X_MAX - 1), y, z & (Z_MAX - 1))] = block;
   }
 
@@ -68,6 +71,7 @@ public class SimpleChunkData implements ChunkData {
   @Override
   public void addTileEntity(CompoundTag tileEntity) {
     tileEntities.add(tileEntity);
+    isEmpty = false;
   }
 
   @Override public Collection<CompoundTag> getEntities() {
@@ -77,6 +81,7 @@ public class SimpleChunkData implements ChunkData {
   @Override
   public void addEntity(CompoundTag entity) {
     entities.add(entity);
+    isEmpty = false;
   }
 
   @Override public byte getBiomeAt(int x, int y, int z) {
@@ -93,6 +98,7 @@ public class SimpleChunkData implements ChunkData {
     System.arraycopy(emptyBiomes, 0, biomes, 0, emptyBiomes.length);
     tileEntities.clear();
     entities.clear();
+    isEmpty = true;
   }
 
   @Override public boolean equals(Object o) {
@@ -107,5 +113,10 @@ public class SimpleChunkData implements ChunkData {
     result = 31 * result + Arrays.hashCode(blocks);
     result = 31 * result + Arrays.hashCode(biomes);
     return result;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return isEmpty;
   }
 }

@@ -78,6 +78,7 @@ import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.EmptyChunk;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.ExtraMaterials;
 import se.llbit.chunky.world.Heightmap;
@@ -879,6 +880,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
 
+    Set<ChunkPosition> nonEmptyChunks = new HashSet<>();
     Heightmap biomeIdMap = new Heightmap();
 
     ChunkData chunkData1;
@@ -1254,6 +1256,10 @@ public class Scene implements JsonSerializable, Refreshable {
             */
           }
         }
+
+        if (!chunkData.isEmpty()){
+          nonEmptyChunks.add(cp);
+        }
       }
       executor.shutdown();
     }
@@ -1264,17 +1270,14 @@ public class Scene implements JsonSerializable, Refreshable {
     foliageTexture = new WorldTexture();
     waterTexture = new WorldTexture();
 
-    Set<ChunkPosition> chunkSet = new HashSet<>(chunksToLoad);
-
     try (TaskTracker.Task task = taskTracker.task("(4/6) Finalizing octree")) {
 
       worldOctree.startFinalization();
       waterOctree.startFinalization();
 
       int done = 0;
-      int target = chunksToLoad.size();
-      for (ChunkPosition cp : chunksToLoad) {
-
+      int target = nonEmptyChunks.size();
+      for (ChunkPosition cp : nonEmptyChunks) {
         // Finalize grass and foliage textures.
         // 3x3 box blur.
         for (int x = 0; x < 16; ++x) {
@@ -1290,7 +1293,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 int wz = cp.z * 16 + sz;
 
                 ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
-                if (chunkSet.contains(ccp)) {
+                if (nonEmptyChunks.contains(ccp)) {
                   nsum += 1;
                   int biomeId = biomeIdMap.get(wx, wz);
                   float[] grassColor = Biomes.getGrassColorLinear(biomeId);
