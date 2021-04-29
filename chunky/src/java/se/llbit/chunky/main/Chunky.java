@@ -85,8 +85,6 @@ public class Chunky {
   private SceneFactory sceneFactory = SceneFactory.DEFAULT;
   private RenderContextFactory renderContextFactory = RenderContext::new;
   private RenderManagerFactory renderManagerFactory = InternalRenderManager::new;
-  private RayTracerFactory previewRayTracerFactory = PreviewRayTracer::new;
-  private RayTracerFactory rayTracerFactory = PathTracer::new;
   private RenderControlsTabTransformer renderControlsTabTransformer = tabs -> tabs;
   private TabTransformer mainTabTransformer = tabs -> tabs;
   private boolean headless = false;
@@ -119,7 +117,7 @@ public class Chunky {
 
     SynchronousSceneManager sceneManager = (SynchronousSceneManager) getRenderController()
         .getSceneManager();
-    RenderManager renderManager = getRenderController().getRenderer();
+    RenderManager renderManager = getRenderController().getRenderManager();
     TaskTracker taskTracker = new TaskTracker(new ConsoleProgressListener(),
         (tracker, previous, name, size) -> new TaskTracker.Task(tracker, previous, name, size) {
           @Override
@@ -397,23 +395,47 @@ public class Chunky {
   }
 
   @PluginApi
+  public void addPreviewRenderer(String name, Renderer renderer) {
+    if (InternalRenderManager.previewRenderers.containsKey(name))
+      Log.error("Preview renderer already exists (do you have the same plugin loaded twice?): " + name);
+    InternalRenderManager.previewRenderers.computeIfAbsent(name, n -> renderer);
+  }
+
+  @PluginApi
+  public void addRenderer(String name, Renderer renderer) {
+    if (InternalRenderManager.renderers.containsKey(name))
+      Log.error("Renderer already exists (do you have the same plugin loaded twice?): " + name);
+    InternalRenderManager.renderers.computeIfAbsent(name, n -> renderer);
+  }
+
+  @PluginApi
+  @Deprecated
   public void setPreviewRayTracerFactory(RayTracerFactory previewRayTracerFactory) {
-    this.previewRayTracerFactory = previewRayTracerFactory;
+    if (InternalRenderManager.previewRenderers.containsKey("Plugin Preview Renderer"))
+      Log.error("Attempted to register 2 plugin preview renderers.");
+    InternalRenderManager.previewRenderers.computeIfAbsent("Plugin Preview Renderer", name ->
+        new PreviewRenderer(previewRayTracerFactory.newRayTracer()));
   }
 
   @PluginApi
+  @Deprecated
   public RayTracerFactory getPreviewRayTracerFactory() {
-    return previewRayTracerFactory;
+    return PreviewRayTracer::new;
   }
 
   @PluginApi
+  @Deprecated
   public void setRayTracerFactory(RayTracerFactory rayTracerFactory) {
-    this.rayTracerFactory = rayTracerFactory;
+    if (InternalRenderManager.renderers.containsKey("Plugin Renderer"))
+      Log.error("Attempted to register 2 plugin renderers.");
+    InternalRenderManager.renderers.computeIfAbsent("Plugin Renderer", name ->
+        new PathTracingRenderer(rayTracerFactory.newRayTracer()));
   }
 
   @PluginApi
+  @Deprecated
   public RayTracerFactory getRayTracerFactory() {
-    return rayTracerFactory;
+    return PathTracer::new;
   }
 
   /**

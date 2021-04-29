@@ -84,7 +84,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     cpuLoad.clampBoth();
     cpuLoad.onValueChange(value -> {
       PersistentSettings.setCPULoad(value);
-      controller.getRenderer().setCPULoad(value);
+      controller.getRenderManager().setCPULoad(value);
     });
     rayDepth.setName("Ray depth");
     rayDepth.setTooltip("Sets the minimum recursive ray depth.");
@@ -186,11 +186,11 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
     rendererSelect.setTooltip(new Tooltip("The renderer to use on a final render."));
     rendererSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-        controller.getRenderer().setRenderer(newValue));
+        controller.getRenderManager().setRenderer(newValue));
 
     previewSelect.setTooltip(new Tooltip("The renderer to use when previewing."));
     previewSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-        controller.getRenderer().setPreviewRenderer(newValue));
+        controller.getRenderManager().setPreviewRenderer(newValue));
   }
 
   public boolean shutdownAfterCompletedRender() {
@@ -225,7 +225,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     this.renderControls = controls;
     this.controller = controls.getRenderController();
     scene = controller.getSceneManager().getScene();
-    controller.getRenderer().setOnRenderCompleted((time, sps) -> {
+    controller.getRenderManager().setOnRenderCompleted((time, sps) -> {
       if(shutdownAfterCompletedRender()) {
         // TODO: rewrite the shutdown alert in JavaFX.
         new ShutdownAlert(null);
@@ -233,7 +233,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     });
 
     if (rendererSelect.getItems().isEmpty()) {
-      RenderManager renderManager = controller.getRenderer();
+      RenderManager renderManager = controller.getRenderManager();
       rendererSelect.getItems().addAll(renderManager.getRenderers());
       rendererSelect.getSelectionModel().select(renderManager.getRendererName());
       previewSelect.getItems().addAll(renderManager.getPreviewRenderers());

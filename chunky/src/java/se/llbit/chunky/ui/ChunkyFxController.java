@@ -322,7 +322,7 @@ public class ChunkyFxController
   @Override public void initialize(URL fxmlUrl, ResourceBundle resources) {
     scene = chunky.getSceneManager().getScene();
     renderController = chunky.getRenderController();
-    renderManager = renderController.getRenderer();
+    renderManager = renderController.getRenderManager();
     asyncSceneManager =
         (AsynchronousSceneManager) renderController.getSceneManager();
     asyncSceneManager.setResetHandler(this);
@@ -676,11 +676,11 @@ public class ChunkyFxController
     });
 
     canvas = new RenderCanvasFx(chunky.getSceneManager().getScene(),
-        chunky.getRenderController().getRenderer());
+        chunky.getRenderController().getRenderManager());
     canvas.setRenderListener(renderTracker);
     previewTab.setContent(canvas);
     sceneControls = new RenderControlsFxController(this, renderControls, canvas,
-        chunky.getRenderController().getRenderer());
+        chunky.getRenderController().getRenderManager());
     showWorldMap();
     mainTabs.getSelectionModel().selectedItemProperty().addListener(
         (observable, oldValue, newValue) -> {

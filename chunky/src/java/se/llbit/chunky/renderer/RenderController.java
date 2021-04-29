@@ -39,7 +39,7 @@ public class RenderController {
     return sceneManager;
   }
 
-  public RenderManager getRenderer() {
+  public RenderManager getRenderManager() {
     return renderManager;
   }
 
