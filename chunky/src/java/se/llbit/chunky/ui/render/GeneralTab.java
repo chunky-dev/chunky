@@ -32,7 +32,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
-import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.RenderController;
@@ -41,6 +40,7 @@ import se.llbit.chunky.ui.ChunkyFxController;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderCanvasFx;
 import se.llbit.chunky.ui.RenderControlsFxController;
+import se.llbit.chunky.ui.SilentNumberStringConverter;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
@@ -177,7 +177,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
       scene.setBiomeColorsEnabled(newValue);
     });
-    dumpFrequency.setConverter(new NumberStringConverter());
+    dumpFrequency.setConverter(new SilentNumberStringConverter());
     dumpFrequency.getItems().addAll(50, 100, 500, 1000, 2500, 5000);
     dumpFrequency.setValue(Scene.DEFAULT_DUMP_FREQUENCY);
     dumpFrequency.setEditable(true);
