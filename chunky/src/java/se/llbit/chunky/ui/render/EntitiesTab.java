@@ -61,6 +61,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.AngleAdjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
+import se.llbit.chunky.ui.IntegerTextField;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.world.material.BeaconBeamMaterial;
 import se.llbit.fx.LuxColorPicker;
@@ -360,15 +361,13 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
             scene.rebuildActorBvh();
           }
         });
-        IntegerProperty layerHeightProp = new SimpleIntegerProperty();
-        TextField layerInput = new TextField();
+        IntegerTextField layerInput = new IntegerTextField();
         layerInput.setMaxWidth(50);
-        layerInput.textProperty().bindBidirectional(layerHeightProp, new NumberStringConverter());
         Button addButton = new Button("Add");
         addButton.setOnAction(e -> {
-          if (!beam.getMaterials().containsKey(layerHeightProp.get())) { //Don't allow duplicate indices
-            beam.getMaterials().put(layerHeightProp.get(), new BeaconBeamMaterial(BeaconBeamMaterial.DEFAULT_COLOR));
-            colorHeightList.getItems().add(layerHeightProp.get());
+          if (!beam.getMaterials().containsKey(layerInput.valueProperty().get())) { //Don't allow duplicate indices
+            beam.getMaterials().put(layerInput.valueProperty().get(), new BeaconBeamMaterial(BeaconBeamMaterial.DEFAULT_COLOR));
+            colorHeightList.getItems().add(layerInput.valueProperty().get());
             scene.rebuildActorBvh();
           }
         });

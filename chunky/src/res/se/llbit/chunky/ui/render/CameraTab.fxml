@@ -7,7 +7,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -16,6 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.ScrollPane?>
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
+<?import se.llbit.chunky.ui.DoubleTextField?>
 
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
     <VBox spacing="10.0">
@@ -49,16 +49,16 @@
               </rowConstraints>
               <children>
                 <Label text="Orientation:" GridPane.rowIndex="1" />
-                <TextField fx:id="yawField" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                <TextField fx:id="pitchField" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                <TextField fx:id="rollField" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                <DoubleTextField fx:id="yawField" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <DoubleTextField fx:id="pitchField" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                <DoubleTextField fx:id="rollField" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                 <Label text="Position:" />
-                <TextField fx:id="posX" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="1" />
-                <TextField fx:id="posY" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="2" />
-                <TextField fx:id="posZ" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="3" />
+                <DoubleTextField fx:id="posX" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="1" />
+                <DoubleTextField fx:id="posY" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="2" />
+                <DoubleTextField fx:id="posZ" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="3" />
                 <Label text="Lens shift:" GridPane.rowIndex="2" />
-                <TextField fx:id="shiftX" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                <TextField fx:id="shiftY" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                <DoubleTextField fx:id="shiftX" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <DoubleTextField fx:id="shiftY" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
               </children>
             </GridPane>
           </content>

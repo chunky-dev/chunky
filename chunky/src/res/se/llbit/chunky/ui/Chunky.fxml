@@ -24,6 +24,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import se.llbit.chunky.ui.IntegerAdjuster?>
+<?import se.llbit.chunky.ui.DoubleTextField?>
 <?import se.llbit.fx.ToolPane?>
 <?import javafx.scene.layout.FlowPane?>
 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
@@ -103,9 +104,9 @@
           <Label text="Coordinates"/>
           <HBox alignment="CENTER_LEFT" spacing="10.0">
             <Label text="X="/>
-            <TextField prefWidth="80.0" fx:id="xPosition"/>
+            <DoubleTextField prefWidth="80.0" fx:id="xPosition"/>
             <Label text="Z="/>
-            <TextField fx:id="zPosition" prefWidth="80.0"/>
+            <DoubleTextField fx:id="zPosition" prefWidth="80.0"/>
           </HBox>
           <HBox spacing="10.0">
             <ToggleButton fx:id="trackPlayerBtn" mnemonicParsing="false" text="track player">

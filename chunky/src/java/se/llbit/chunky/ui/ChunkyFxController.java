@@ -151,8 +151,8 @@ public class ChunkyFxController
   @FXML private Hyperlink guideLink;
   @FXML private Hyperlink gplv3;
   @FXML private Button creditsBtn;
-  @FXML private TextField xPosition;
-  @FXML private TextField zPosition;
+  @FXML private DoubleTextField xPosition;
+  @FXML private DoubleTextField zPosition;
   @FXML private Button deleteChunks;
   @FXML private Button exportZip;
   @FXML private Button renderPng;
@@ -489,8 +489,8 @@ public class ChunkyFxController
     DoubleProperty zProperty = new SimpleDoubleProperty(initialView.z);
 
     // Bind controls with properties.
-    xPosition.textProperty().bindBidirectional(xProperty, new NumberStringConverter());
-    zPosition.textProperty().bindBidirectional(zProperty, new NumberStringConverter());
+    xPosition.valueProperty().bindBidirectional(xProperty);
+    zPosition.valueProperty().bindBidirectional(zProperty);
     scale.setRange(ChunkView.BLOCK_SCALE_MIN, ChunkView.BLOCK_SCALE_MAX);
     scale.clampBoth();
     scale.set(initialView.scale);
