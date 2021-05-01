@@ -1,11 +1,18 @@
 package se.llbit.chunky.chunk;
 
+import java.util.Collection;
+import java.util.Collections;
 import se.llbit.nbt.CompoundTag;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 public class EmptyChunkData implements ChunkData {
+
+  /**
+   * Singleton instance.
+   */
+  public static final EmptyChunkData INSTANCE = new EmptyChunkData();
+
+  private EmptyChunkData(){}
+
   @Override
   public int minY() {
     return 0;
@@ -31,7 +38,7 @@ public class EmptyChunkData implements ChunkData {
 
   @Override
   public Collection<CompoundTag> getTileEntities() {
-    return new ArrayList<>();
+    return Collections.emptyList();
   }
 
   @Override
@@ -39,7 +46,7 @@ public class EmptyChunkData implements ChunkData {
 
   @Override
   public Collection<CompoundTag> getEntities() {
-    return new ArrayList<>();
+    return Collections.emptyList();
   }
 
   @Override
@@ -54,5 +61,12 @@ public class EmptyChunkData implements ChunkData {
   public void setBiomeAt(int x, int y, int z, byte biome) { }
 
   @Override
-  public void clear() { }
+  public void clear() {
+    throw new IllegalStateException("EmptyChunkData may not be re-used, this is a bug. Please report it!");
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return true;
+  }
 }

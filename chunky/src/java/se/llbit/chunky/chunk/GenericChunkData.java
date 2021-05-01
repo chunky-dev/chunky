@@ -114,6 +114,11 @@ public class GenericChunkData implements ChunkData {
     return result;
   }
 
+  @Override
+  public boolean isEmpty() {
+    return sections.isEmpty() && entities.isEmpty() && tileEntities.isEmpty();
+  }
+
   private static class SectionData {
     public final int sectionY;
     public final int[] blocks;

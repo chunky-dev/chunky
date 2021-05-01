@@ -78,6 +78,7 @@ import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.EmptyChunk;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.ExtraMaterials;
 import se.llbit.chunky.world.Heightmap;
@@ -879,6 +880,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
 
+    Set<ChunkPosition> nonEmptyChunks = new HashSet<>();
     Heightmap biomeIdMap = new Heightmap();
 
     ChunkData chunkData1;
@@ -1254,6 +1256,10 @@ public class Scene implements JsonSerializable, Refreshable {
             */
           }
         }
+
+        if (!chunkData.isEmpty()){
+          nonEmptyChunks.add(cp);
+        }
       }
       executor.shutdown();
     }
@@ -1264,17 +1270,14 @@ public class Scene implements JsonSerializable, Refreshable {
     foliageTexture = new WorldTexture();
     waterTexture = new WorldTexture();
 
-    Set<ChunkPosition> chunkSet = new HashSet<>(chunksToLoad);
-
     try (TaskTracker.Task task = taskTracker.task("(4/6) Finalizing octree")) {
 
       worldOctree.startFinalization();
       waterOctree.startFinalization();
 
       int done = 0;
-      int target = chunksToLoad.size();
-      for (ChunkPosition cp : chunksToLoad) {
-
+      int target = nonEmptyChunks.size();
+      for (ChunkPosition cp : nonEmptyChunks) {
         // Finalize grass and foliage textures.
         // 3x3 box blur.
         for (int x = 0; x < 16; ++x) {
@@ -1290,7 +1293,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 int wz = cp.z * 16 + sz;
 
                 ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
-                if (chunkSet.contains(ccp)) {
+                if (nonEmptyChunks.contains(ccp)) {
                   nsum += 1;
                   int biomeId = biomeIdMap.get(wx, wz);
                   float[] grassColor = Biomes.getGrassColorLinear(biomeId);
@@ -1827,6 +1830,11 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
+  /**
+   * Check if water plane chunk clipping is enabled. If so, the water plane is hidden in loaded
+   * chunks (i.e. it is ignored inside of loaded chunks).
+   * @return {@code true} if the water plane chunk clipping is enabled
+   */
   public boolean getWaterPlaneChunkClip() {
     return waterPlaneChunkClip;
   }
@@ -2490,11 +2498,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Query if a position is loaded.
    */
   public boolean isChunkLoaded(int x, int z) {
-    if (waterTexture != null && waterTexture.contains(x, z)) {
-      float[] color = waterTexture.get(x, z);
-      return color[0] > 0 || color[1] > 0 || color[2] > 0;
-    }
-    return false;
+    return waterTexture != null && waterTexture.contains(x, z);
   }
 
   /**
@@ -2521,7 +2525,13 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public boolean isInWater(Ray ray) {
     if (isWaterPlaneEnabled() && ray.o.y < getEffectiveWaterPlaneHeight()) {
-      return true;
+      if (getWaterPlaneChunkClip()) {
+        if (!isChunkLoaded((int)Math.floor(ray.o.x), (int)Math.floor(ray.o.z))) {
+          return true;
+        }
+      } else {
+        return true;
+      }
     }
     if (waterOctree.isInside(ray.o)) {
       int x = (int) QuickMath.floor(ray.o.x);
