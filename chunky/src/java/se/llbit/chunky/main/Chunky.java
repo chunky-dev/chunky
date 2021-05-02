@@ -424,7 +424,7 @@ public class Chunky {
     Log.info("`setRayTracerFactory` is deprecated. Use `addRenderer` instead.");
     if (DefaultRenderManager.renderers.containsKey("Plugin Renderer"))
       Log.warn("2+ plugin renderers installed.");
-    DefaultRenderManager.addRenderer(new PreviewRenderer(rayTracerFactory.newRayTracer(),
+    DefaultRenderManager.addRenderer(new PathTracingRenderer(rayTracerFactory.newRayTracer(),
         "Plugin Renderer", "PluginRenderer"));
   }
 
