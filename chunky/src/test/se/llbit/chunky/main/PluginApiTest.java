@@ -60,7 +60,7 @@ public class PluginApiTest {
     chunky.setPreviewRayTracerFactory(myFactory);
 
     // Get ray tracer through reflection
-    Renderer renderer = InternalRenderManager.previewRenderers.get("Plugin Preview Renderer");
+    Renderer renderer = DefaultRenderManager.previewRenderers.get("Plugin Preview Renderer");
     Field rayTracer = renderer.getClass().getDeclaredField("tracer");
     rayTracer.setAccessible(true);
     assertSame(tracer, rayTracer.get(renderer));
@@ -73,7 +73,7 @@ public class PluginApiTest {
     chunky.setRayTracerFactory(myFactory);
 
     // Get ray tracer through reflection
-    Renderer renderer = InternalRenderManager.renderers.get("Plugin Renderer");
+    Renderer renderer = DefaultRenderManager.renderers.get("Plugin Renderer");
     Field rayTracer = renderer.getClass().getDeclaredField("tracer");
     rayTracer.setAccessible(true);
     assertSame(tracer, rayTracer.get(renderer));
@@ -81,18 +81,16 @@ public class PluginApiTest {
 
   @Test
   public void testSetCustomPreviewRenderer() {
-    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
-    Renderer renderer = new PreviewRenderer(null);
-    chunky.addRenderer("Test Preview Renderer", renderer);
-    assertSame(renderer, InternalRenderManager.renderers.get("Test Preview Renderer"));
+    Renderer renderer = new PreviewRenderer(null, "Test Preview Renderer", "TestPreviewRenderer");
+    Chunky.addPreviewRenderer(renderer);
+    assertSame(renderer, DefaultRenderManager.previewRenderers.get("Test Preview Renderer"));
   }
 
   @Test
   public void testSetCustomRenderer() {
-    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
-    Renderer renderer = new PathTracingRenderer(null);
-    chunky.addRenderer("Test Renderer", renderer);
-    assertSame(renderer, InternalRenderManager.renderers.get("Test Renderer"));
+    Renderer renderer = new PathTracingRenderer(null, "Test Renderer", "TestRenderer");
+    Chunky.addRenderer(renderer);
+    assertSame(renderer, DefaultRenderManager.renderers.get("Test Renderer"));
   }
 
   @Test public void testSetRenderControlsTabTransformer() {

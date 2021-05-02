@@ -8,19 +8,28 @@ import se.llbit.math.Ray;
 import se.llbit.util.TaskTracker;
 
 public class PreviewRenderer extends TileBasedRenderer {
+  protected final String nameString;
+  protected final String idString;
   protected RayTracer tracer;
 
-  public PreviewRenderer(RayTracer tracer) {
+  public PreviewRenderer(RayTracer tracer, String name, String id) {
     this.tracer = tracer;
+    this.nameString = name;
+    this.idString = id;
   }
 
   @Override
   public String getIdString() {
-    return "InternalPreview";
+    return idString;
   }
 
   @Override
-  public void render(InternalRenderManager manager) throws InterruptedException {
+  public String getNameString() {
+    return nameString;
+  }
+
+  @Override
+  public void render(DefaultRenderManager manager) throws InterruptedException {
     TaskTracker.Task task = manager.getRenderTask();
     task.update("Preview", 2, 0, "");
 
@@ -90,7 +99,7 @@ public class PreviewRenderer extends TileBasedRenderer {
 
       manager.pool.awaitEmpty();
       task.update(i+1);
-      if (postRender.getAsBoolean()) return;
+      if (postRender.getAsBoolean()) break;
     }
   }
 }

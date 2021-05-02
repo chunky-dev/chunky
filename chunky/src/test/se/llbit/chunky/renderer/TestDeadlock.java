@@ -20,7 +20,6 @@ import org.junit.Test;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ChunkyOptions;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.log.Log;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -54,7 +53,7 @@ public class TestDeadlock {
     RenderContext context = new RenderContext(chunky);
     context.renderPoolFactory = PointlessPool::new;
     for (int i = 0; i < 2019; ++i) {
-      InternalRenderManager renderer = new InternalRenderManager(context, true);
+      DefaultRenderManager renderer = new DefaultRenderManager(context, true);
       renderer.setSceneProvider(new MockSceneProvider(scene));
       renderer.start();
       renderer.join();

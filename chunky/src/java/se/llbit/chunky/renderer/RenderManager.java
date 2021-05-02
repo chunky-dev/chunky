@@ -21,6 +21,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.util.TaskTracker;
 
+import java.util.Collection;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -37,7 +38,7 @@ public interface RenderManager {
   /**
    * Get all available {@code Renderer} names.
    */
-  String[] getRenderers();
+  Collection<String> getRenderers();
 
   /**
    * Set the current {@code Renderer} by name.
@@ -52,7 +53,7 @@ public interface RenderManager {
   /**
    * Get all available preview {@code Renderer} names.
    */
-  String[] getPreviewRenderers();
+  Collection<String> getPreviewRenderers();
 
   /**
    * Set the current preview {@code Renderer} by name.

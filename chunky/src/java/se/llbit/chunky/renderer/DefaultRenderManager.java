@@ -48,7 +48,7 @@ import java.util.function.Consumer;
  * <p>All available final renderers are stored in {@code renderers} and preview renderers
  * are stored in {@code previewRenderers}.
  */
-public class InternalRenderManager extends Thread implements RenderManager {
+public class DefaultRenderManager extends Thread implements RenderManager {
   /**
    * Map containing all the final render {@code Renderer}s. The renderer corresponding to
    * {@code getRendererName()} is used when a render is requested.
@@ -64,8 +64,8 @@ public class InternalRenderManager extends Thread implements RenderManager {
   public static final Map<String, Renderer> previewRenderers = new HashMap<>();
 
   static {
-    renderers.computeIfAbsent("Chunky Path Tracer", name -> new PathTracingRenderer(new PathTracer()));
-    previewRenderers.computeIfAbsent("Chunky Preview", name -> new PreviewRenderer(new PreviewRayTracer()));
+    addRenderer(new PathTracingRenderer(new PathTracer(), "Chunky Path Tracer", "PathTracingRenderer"));
+    addPreviewRenderer(new PreviewRenderer(new PreviewRayTracer(), "Chunky Preview", "PreviewRenderer"));
   }
 
   /**
@@ -148,8 +148,9 @@ public class InternalRenderManager extends Thread implements RenderManager {
    */
   private static final Renderer EMPTY_RENDERER = new Renderer() {
     @Override public String getIdString() { return "Empty"; }
+    @Override public String getNameString() { return "Empty"; }
     @Override public void setPostRender(BooleanSupplier callback) {}
-    @Override public void render(InternalRenderManager manager) {}
+    @Override public void render(DefaultRenderManager manager) {}
   };
 
   private final BooleanSupplier previewCallback;
@@ -159,7 +160,7 @@ public class InternalRenderManager extends Thread implements RenderManager {
    * @param headless {@code true} if rendering threads should be shut
    * down after reaching the render target.
    */
-  public InternalRenderManager(RenderContext context, boolean headless) {
+  public DefaultRenderManager(RenderContext context, boolean headless) {
     super("Internal Render Manager");
 
     this.context = context;
@@ -271,7 +272,7 @@ public class InternalRenderManager extends Thread implements RenderManager {
           pool.setCpuLoad(cpuLoad);
         } else {
           // Bail early if render is already done
-          if (bufferedScene.spp > bufferedScene.getTargetSpp()) {
+          if (bufferedScene.spp >= bufferedScene.getTargetSpp()) {
             sceneProvider.withSceneProtected(scene -> {
               scene.pauseRender();
               updateRenderState(scene);
@@ -300,13 +301,13 @@ public class InternalRenderManager extends Thread implements RenderManager {
   }
 
   @Override
-  public String[] getRenderers() {
-    return renderers.keySet().toArray(new String[0]);
+  public Collection<String> getRenderers() {
+    return renderers.keySet();
   }
 
   @Override
-  public String[] getPreviewRenderers() {
-    return previewRenderers.keySet().toArray(new String[0]);
+  public Collection<String> getPreviewRenderers() {
+    return previewRenderers.keySet();
   }
 
   @Override
@@ -474,6 +475,9 @@ public class InternalRenderManager extends Thread implements RenderManager {
     interrupt();
   }
 
+  /**
+   * Finalize the frame if necessary. This uses the internal {@code RenderWorkerPool}.
+   */
   public void finalizeFrame(boolean force) {
     if (force || finalizeAllFrames || snapshotControl.saveSnapshot(bufferedScene, bufferedScene.spp)) {
       // Split up to 10 tasks per thread
@@ -498,5 +502,21 @@ public class InternalRenderManager extends Thread implements RenderManager {
       bufferedScene.swapBuffers();
       canvas.repaint();
     }
+  }
+
+  /**
+   * Add a new renderer.
+   * Do not use, use {@code Chunky.addRenderer()}.
+   */
+  public static void addRenderer(Renderer renderer) {
+    renderers.put(renderer.getNameString(), renderer);
+  }
+
+  /**
+   * Add a new preview renderer.
+   * Do not use, use {@code Chunky.addPreviewRenderer()}.
+   */
+  public static void addPreviewRenderer(Renderer renderer) {
+    previewRenderers.put(renderer.getNameString(), renderer);
   }
 }

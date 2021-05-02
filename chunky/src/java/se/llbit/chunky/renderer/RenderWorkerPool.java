@@ -146,6 +146,8 @@ public class RenderWorkerPool {
   }
 
   public void interrupt() {
-    Arrays.stream(workers).forEach(Thread::interrupt);
+    for (RenderWorker worker : workers) {
+      worker.interrupt();
+    }
   }
 }

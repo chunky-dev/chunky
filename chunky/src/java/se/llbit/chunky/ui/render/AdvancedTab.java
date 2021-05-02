@@ -184,11 +184,11 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       PersistentSettings.setPreventNormalEmitterWithSampling(newvalue);
     });
 
-    rendererSelect.setTooltip(new Tooltip("The renderer to use on a final render."));
+    rendererSelect.setTooltip(new Tooltip("The renderer to use for rendering."));
     rendererSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
         controller.getRenderManager().setRenderer(newValue));
 
-    previewSelect.setTooltip(new Tooltip("The renderer to use when previewing."));
+    previewSelect.setTooltip(new Tooltip("The renderer to use for the preview."));
     previewSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
         controller.getRenderManager().setPreviewRenderer(newValue));
   }

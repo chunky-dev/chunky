@@ -3,7 +3,7 @@ package se.llbit.chunky.renderer.scene;
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.renderer.InternalRenderManager;
+import se.llbit.chunky.renderer.DefaultRenderManager;
 import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.math.Ray;
@@ -38,18 +38,6 @@ public abstract class TileBasedRenderer implements Renderer {
     }
   }
 
-  /**
-   * Set the post-render callback. This should be called after each frame is complete.
-   * Generally the render loop will look like:
-   * {@code
-   *   while (scene.spp < scene.getTargetSpp()) {
-   *     submitTiles(manager, (state, pixel) -> {});
-   *     manager.pool.awaitEmpty();
-   *     scene.spp += 1; // update spp
-   *     if (postRender.getAsBoolean()) return;
-   *   }
-   * }
-   */
   @Override
   public void setPostRender(BooleanSupplier callback) {
     postRender = callback;
@@ -62,7 +50,7 @@ public abstract class TileBasedRenderer implements Renderer {
    * @param perPixel This is called on every pixel. The first argument is the worker state.
    *                 The second argument is the current pixel (x, y).
    */
-  protected void submitTiles(InternalRenderManager manager, BiConsumer<WorkerState, IntIntPair> perPixel) {
+  protected void submitTiles(DefaultRenderManager manager, BiConsumer<WorkerState, IntIntPair> perPixel) {
     initTiles(manager);
 
     cachedTiles.forEach(tile ->
@@ -83,7 +71,7 @@ public abstract class TileBasedRenderer implements Renderer {
     );
   }
 
-  private void initTiles(InternalRenderManager manager) {
+  private void initTiles(DefaultRenderManager manager) {
     Scene bufferedScene = manager.bufferedScene;
     int width = bufferedScene.width;
     int height = bufferedScene.height;

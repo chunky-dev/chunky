@@ -6,19 +6,28 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.TileBasedRenderer;
 
 public class PathTracingRenderer extends TileBasedRenderer {
+  protected final String nameString;
+  protected final String idString;
   protected RayTracer tracer;
 
-  public PathTracingRenderer(RayTracer tracer) {
+  public PathTracingRenderer(RayTracer tracer, String name, String id) {
     this.tracer = tracer;
+    this.nameString = name;
+    this.idString = id;
   }
 
   @Override
   public String getIdString() {
-    return "InternalRender";
+    return idString;
   }
 
   @Override
-  public void render(InternalRenderManager manager) throws InterruptedException {
+  public String getNameString() {
+    return nameString;
+  }
+
+  @Override
+  public void render(DefaultRenderManager manager) throws InterruptedException {
     Scene scene = manager.bufferedScene;
     int width = scene.width;
     int height = scene.height;
@@ -65,7 +74,7 @@ public class PathTracingRenderer extends TileBasedRenderer {
 
       manager.pool.awaitEmpty();
       scene.spp += sppPerPass;
-      if (postRender.getAsBoolean()) return;
+      if (postRender.getAsBoolean()) break;
     }
   }
 }

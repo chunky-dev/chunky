@@ -29,8 +29,6 @@ import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
-import se.llbit.chunky.renderer.scene.PathTracer;
-import se.llbit.chunky.renderer.scene.PreviewRayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneFactory;
 import se.llbit.chunky.renderer.scene.SceneManager;
@@ -84,7 +82,7 @@ public class Chunky {
   private RenderController renderController;
   private SceneFactory sceneFactory = SceneFactory.DEFAULT;
   private RenderContextFactory renderContextFactory = RenderContext::new;
-  private RenderManagerFactory renderManagerFactory = InternalRenderManager::new;
+  private RenderManagerFactory renderManagerFactory = DefaultRenderManager::new;
   private RenderControlsTabTransformer renderControlsTabTransformer = tabs -> tabs;
   private TabTransformer mainTabTransformer = tabs -> tabs;
   private boolean headless = false;
@@ -343,7 +341,7 @@ public class Chunky {
   }
 
   @PluginApi
-  public void setRendererFactory(RenderManagerFactory renderManagerFactory) {
+  public void setRenderManagerFactory(RenderManagerFactory renderManagerFactory) {
     this.renderManagerFactory = renderManagerFactory;
   }
 
@@ -395,35 +393,39 @@ public class Chunky {
   }
 
   @PluginApi
-  public void addPreviewRenderer(String name, Renderer renderer) {
-    if (InternalRenderManager.previewRenderers.containsKey(name))
-      Log.error("Preview renderer already exists (do you have the same plugin loaded twice?): " + name);
-    InternalRenderManager.previewRenderers.computeIfAbsent(name, n -> renderer);
+  public static void addPreviewRenderer(Renderer renderer) {
+    String name = renderer.getNameString();
+    if (DefaultRenderManager.previewRenderers.containsKey(name))
+      Log.warn("Preview renderer already exists (do you have the same plugin loaded twice?): " + name);
+    DefaultRenderManager.addPreviewRenderer(renderer);
   }
 
   @PluginApi
-  public void addRenderer(String name, Renderer renderer) {
-    if (InternalRenderManager.renderers.containsKey(name))
-      Log.error("Renderer already exists (do you have the same plugin loaded twice?): " + name);
-    InternalRenderManager.renderers.computeIfAbsent(name, n -> renderer);
+  public static void addRenderer(Renderer renderer) {
+    String name = renderer.getNameString();
+    if (DefaultRenderManager.renderers.containsKey(name))
+      Log.warn("Renderer already exists (do you have the same plugin loaded twice?): " + name);
+    DefaultRenderManager.addRenderer(renderer);
   }
 
   @PluginApi
   @Deprecated
   public void setPreviewRayTracerFactory(RayTracerFactory previewRayTracerFactory) {
-    if (InternalRenderManager.previewRenderers.containsKey("Plugin Preview Renderer"))
-      Log.error("Attempted to register 2 plugin preview renderers.");
-    InternalRenderManager.previewRenderers.computeIfAbsent("Plugin Preview Renderer", name ->
-        new PreviewRenderer(previewRayTracerFactory.newRayTracer()));
+    Log.info("`setPreviewRayTracerFactory` is deprecated. Use `addPreviewRenderer` instead.");
+    if (DefaultRenderManager.previewRenderers.containsKey("Plugin Preview Renderer"))
+      Log.warn("2+ plugin preview renderers installed.");
+    DefaultRenderManager.addPreviewRenderer(new PreviewRenderer(previewRayTracerFactory.newRayTracer(),
+        "Plugin Preview Renderer", "PluginPreviewRenderer"));
   }
 
   @PluginApi
   @Deprecated
   public void setRayTracerFactory(RayTracerFactory rayTracerFactory) {
-    if (InternalRenderManager.renderers.containsKey("Plugin Renderer"))
-      Log.error("Attempted to register 2 plugin renderers.");
-    InternalRenderManager.renderers.computeIfAbsent("Plugin Renderer", name ->
-        new PathTracingRenderer(rayTracerFactory.newRayTracer()));
+    Log.info("`setRayTracerFactory` is deprecated. Use `addRenderer` instead.");
+    if (DefaultRenderManager.renderers.containsKey("Plugin Renderer"))
+      Log.warn("2+ plugin renderers installed.");
+    DefaultRenderManager.addRenderer(new PreviewRenderer(rayTracerFactory.newRayTracer(),
+        "Plugin Renderer", "PluginRenderer"));
   }
 
   /**
