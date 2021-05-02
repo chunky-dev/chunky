@@ -1,4 +1,5 @@
-/* Copyright (c) 2012-2019 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -18,8 +19,6 @@ package se.llbit.chunky.renderer;
 
 import se.llbit.log.Log;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
