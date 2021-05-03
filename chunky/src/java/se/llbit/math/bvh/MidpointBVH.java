@@ -30,7 +30,7 @@ import java.util.function.IntConsumer;
 
 public class MidpointBVH extends BinaryBVH {
     public static void initImplementation() {
-        Factory.implementations.put("MIDPOINT", new Factory.BVHBuilder() {
+        Factory.addBVHBuilder(new Factory.BVHBuilder() {
             @Override
             public BVH create(Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task) {
                 task.update(1000, 0);
@@ -52,7 +52,12 @@ public class MidpointBVH extends BinaryBVH {
             }
 
             @Override
-            public String getTooltip() {
+            public String getName() {
+                return "MIDPOINT";
+            }
+
+            @Override
+            public String getDescription() {
                 return "Fast and simple, but not optimal BVH building method.";
             }
         });

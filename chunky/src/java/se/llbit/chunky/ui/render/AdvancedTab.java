@@ -169,11 +169,11 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
     ArrayList<String> bvhNames = new ArrayList<>();
     StringBuilder bvhMethodBuilder = new StringBuilder();
-    for (Map.Entry<String, BVH.Factory.BVHBuilder> entry : BVH.Factory.implementations.entrySet()) {
-      bvhNames.add(entry.getKey());
-      bvhMethodBuilder.append(entry.getKey());
+    for (String entry : BVH.Factory.getImplementationStrings()) {
+      bvhNames.add(entry);
+      bvhMethodBuilder.append(entry);
       bvhMethodBuilder.append(": ");
-      bvhMethodBuilder.append(entry.getValue().getTooltip());
+      bvhMethodBuilder.append(BVH.Factory.getImplementation(entry).getDescription());
       bvhMethodBuilder.append('\n');
     }
     bvhMethodBuilder.append("Requires reloading chunks to take effect.");

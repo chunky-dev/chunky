@@ -20,6 +20,7 @@ package se.llbit.math.bvh;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.plugin.PluginApi;
+import se.llbit.log.Log;
 import se.llbit.math.Intersectable;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -48,20 +49,38 @@ public interface BVH extends Intersectable {
     public interface BVHBuilder {
       BVH create(Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task);
 
-      String getTooltip();
+      String getName();
+      String getDescription();
     }
 
     /**
      * Map containing all known BVH implementations and their name.
      * Elements are addressed by the String name.
      */
-    @PluginApi
-    public static Map<String, BVHBuilder> implementations = new HashMap<>();
+    private static final Map<String, BVHBuilder> implementations = new HashMap<>();
 
     public static final BVHBuilder DEFAULT_IMPLEMENTATION;
 
     public static BVHBuilder getImplementation(String name) {
       return implementations.getOrDefault(name, DEFAULT_IMPLEMENTATION);
+    }
+
+    /**
+     * Get all the BVH implementation name strings.
+     */
+    @PluginApi
+    public static Collection<String> getImplementationStrings() {
+      return implementations.keySet();
+    }
+
+    /**
+     * Add a new BVH implementation. It's name will be taken from {@code BVHBuilder.getName()}.
+     */
+    @PluginApi
+    public static void addBVHBuilder(BVHBuilder builder) {
+      if (implementations.containsKey(builder.getName()))
+        Log.warn("Attempted to register 2+ BVH builders with the same name (do you have the same plugin installed twice?)");
+      implementations.put(builder.getName(), builder);
     }
 
     static {

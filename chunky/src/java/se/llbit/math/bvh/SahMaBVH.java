@@ -31,7 +31,7 @@ import java.util.function.IntConsumer;
 
 public class SahMaBVH extends BinaryBVH {
     public static void initImplementation() {
-        Factory.implementations.put("SAH_MA", new Factory.BVHBuilder() {
+        Factory.addBVHBuilder(new Factory.BVHBuilder() {
             @Override
             public BVH create(Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task) {
                 task.update(1000, 0);
@@ -53,7 +53,12 @@ public class SahMaBVH extends BinaryBVH {
             }
 
             @Override
-            public String getTooltip() {
+            public String getName() {
+                return "SAH_MA";
+            }
+
+            @Override
+            public String getDescription() {
                 return "Fast and nearly optimal BVH building method.";
             }
         });
