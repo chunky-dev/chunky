@@ -1014,7 +1014,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 int cubeIndex = (cz * 16 + cy) * 16 + cx;
 
                 // Change the type of hidden blocks to ANY_TYPE
-                boolean onEdge = chunkData.isBlockOnEdge(cx, y, cz) || y <= yMin || y >= yMax - 1;
+                boolean onEdge = y <= yMin || y >= yMax - 1 || chunkData.isBlockOnEdge(cx, y, cz);
                 boolean isHidden = !onEdge
                         && palette.get(chunkData.getBlockAt(cx + 1, y, cz)).opaque
                         && palette.get(chunkData.getBlockAt(cx - 1, y, cz)).opaque
