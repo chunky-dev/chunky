@@ -1014,7 +1014,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 int cubeIndex = (cz * 16 + cy) * 16 + cx;
 
                 // Change the type of hidden blocks to ANY_TYPE
-                boolean notOnEdge = !chunkData.isBlockOnEdge(cx, cy, cz);
+                boolean notOnEdge = !chunkData.isBlockOnEdge(cx, y, cz) && !(y <= yMin || y >= yMax - 1);
                 boolean isHidden = notOnEdge
                         && palette.get(chunkData.getBlockAt(cx + 1, y, cz)).opaque
                         && palette.get(chunkData.getBlockAt(cx - 1, y, cz)).opaque
@@ -1133,7 +1133,7 @@ public class Scene implements JsonSerializable, Refreshable {
                       }
                     }
                     cubeWaterBlocks[cubeIndex] = waterNode;
-                  } else if(cy + 1 < yMax && block instanceof Lava) {
+                  } else if(y + 1 < yMax && block instanceof Lava) {
                     if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)) instanceof Lava) {
                       octNode = palette.getLavaId(0, 1 << Water.FULL_BLOCK);
                     } else if(notOnEdge) {

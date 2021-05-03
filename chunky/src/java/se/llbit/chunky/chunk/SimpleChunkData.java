@@ -61,7 +61,7 @@ public class SimpleChunkData implements ChunkData {
   }
 
   @Override public boolean isBlockOnEdge(int x, int y, int z) {
-    return x <= 0 || x >= 15 || z <= 0 || z >= 15;
+    return x <= 0 || x >= 15 || z <= 0 || z >= 15 || y <= 0 || y >= 255;
   }
 
   @Override public Collection<CompoundTag> getTileEntities() {
