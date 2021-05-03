@@ -28,7 +28,8 @@ import javafx.scene.control.Tooltip;
  */
 public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
   private final Slider valueSlider = new Slider();
-  private double sliderMin = 0.01; // Lower limit for logarithmic calculations.
+  private static final double LOG_ARG_MIN = 0.01; // Lower limit for logarithm argument.
+  private double logScaleStart = LOG_ARG_MIN; 
   private double min = 0; // TODO: handle minimum.
   private double max = 100;
   protected boolean clampMax;
@@ -51,11 +52,11 @@ public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
   }
 
   public void setRange(double min, double max) {
-    setRange(min, max, min < 0.01 && min >= 0 ? 0.01 : min);
+    setRange(min, max, min < LOG_ARG_MIN && min >= 0 ? LOG_ARG_MIN : min);
   }
 
-  public void setRange(double min, double max, double sliderMin) {
-    this.sliderMin = sliderMin;
+  public void setRange(double min, double max, double logScaleStart) {
+    this.logScaleStart = logScaleStart;
     this.min = min;
     this.max = max;
     if (!logarithmic) {
@@ -77,15 +78,17 @@ public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
    */
   public void makeLogarithmic() {
     logarithmic = true;
-    valueSlider.setMin(0);
+    valueSlider.setMin(0); // In logarithmic case, slider value is always from 0 to 100.
     valueSlider.setMax(100);
     DoubleProperty sliderValue = new SimpleDoubleProperty();
     ChangeListener<Number> sliderListener = (observable, oldValue, newValue) -> {
       double result;
       if (maxInfinity && newValue.doubleValue() > 99.9) {
         result = Double.POSITIVE_INFINITY;
+      } else if (newValue.doubleValue() < logScaleStart) {
+        result = min; // Set value to lowest number.
       } else {
-        double logMin = Math.log(sliderMin);
+        double logMin = Math.log(logScaleStart);
         double logMax = Math.log(max);
         double range = logMax - logMin;
         result = Math.pow(Math.E, (newValue.doubleValue() / 100.0) * range + logMin);
@@ -94,13 +97,17 @@ public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
     };
     ChangeListener<Number> valueListener = (observable, oldValue, newValue) -> {
       double result;
-      double logMin = Math.log(sliderMin);
+      double logMin = Math.log(logScaleStart);
       double logMax = Math.log(max);
-      double logValue = Math.log(newValue.doubleValue());
-      logValue = Math.max(logMin, logValue);
-      logValue = Math.min(logMax, logValue);
-      double pos = (logValue - logMin) / (logMax - logMin);
-      result = pos * 100;
+      if (newValue.doubleValue() < logScaleStart) {
+        result = 0; // Set slider to lowest position.
+      } else {
+        double logValue = Math.log(newValue.doubleValue());
+        logValue = Math.max(logMin, logValue);
+        logValue = Math.min(logMax, logValue);
+        double pos = (logValue - logMin) / (logMax - logMin);
+        result = pos * 100;
+      }
       // Temporarily stop listening to avoid event recursion.
       sliderValue.removeListener(sliderListener);
       sliderValue.set(result);

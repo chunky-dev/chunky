@@ -24,7 +24,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import se.llbit.chunky.ui.IntegerAdjuster?>
+<?import se.llbit.chunky.ui.DoubleTextField?>
 <?import se.llbit.fx.ToolPane?>
+<?import javafx.scene.layout.FlowPane?>
 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
       xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
   <MenuBar>
@@ -96,12 +98,15 @@
           <VBox alignment="CENTER_LEFT">
             <IntegerAdjuster fx:id="scale" name="Scale"/>
           </VBox>
+          <VBox alignment="CENTER_LEFT">
+            <IntegerAdjuster fx:id="yMax" name="Y level"/>
+          </VBox>
           <Label text="Coordinates"/>
           <HBox alignment="CENTER_LEFT" spacing="10.0">
             <Label text="X="/>
-            <TextField prefWidth="80.0" fx:id="xPosition"/>
+            <DoubleTextField prefWidth="80.0" fx:id="xPosition"/>
             <Label text="Z="/>
-            <TextField fx:id="zPosition" prefWidth="80.0"/>
+            <DoubleTextField fx:id="zPosition" prefWidth="80.0"/>
           </HBox>
           <HBox spacing="10.0">
             <ToggleButton fx:id="trackPlayerBtn" mnemonicParsing="false" text="track player">
@@ -130,6 +135,7 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
           </padding>
           <Button fx:id="editResourcePacks" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Edit resource packs"/>
+          <CheckBox fx:id="disableDefaultTexturesBtn" mnemonicParsing="false" text="Disable default textures (needs restart)"/>
           <CheckBox fx:id="singleColorBtn" mnemonicParsing="false" text="Single color textures (needs restart)"/>
           <CheckBox fx:id="showLauncherBtn" mnemonicParsing="false" text="Show launcher when starting Chunky"/>
           <Button fx:id="openSceneDirBtn" mnemonicParsing="false" text="Open Scenes Directory"/>
@@ -148,9 +154,19 @@
           <Hyperlink fx:id="issueTrackerLink" text="Issue Tracker"/>
           <Hyperlink fx:id="forumLink" text="Discussion Forum"/>
           <Hyperlink fx:id="discordLink" text="Discord Server" />
-          <Hyperlink fx:id="guideLink" text="jackt8's Guide to Chunky" />
+          <Hyperlink fx:id="guideLink" text="jackjt8's Guide to Chunky" />
           <Separator />
-          <Label text="Chunky was created by Jesper Öqvist (jesper@llbit.se)"/>
+          <Label wrapText="true" text="Chunky was created by Jesper Öqvist (jesper@llbit.se)"/>
+          <Label wrapText="true" text="Chunky is Copyright (c) 2010-2021, Jesper Öqvist and Chunky contributors." />
+          <FlowPane>
+            <Label wrapText="true" text="Permission to modify and redistribute is granted under the terms of the " />
+            <Hyperlink fx:id="gplv3" wrapText="true" text="GNU General Public License v3">
+              <padding>
+                <Insets/>
+              </padding>
+            </Hyperlink>
+            <Label wrapText="true" text="." />
+          </FlowPane>
           <Button fx:id="creditsBtn" mnemonicParsing="false" text="View Credits"/>
         </VBox>
       </Tab>

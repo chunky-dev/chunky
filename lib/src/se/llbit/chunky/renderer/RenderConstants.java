@@ -19,9 +19,9 @@ package se.llbit.chunky.renderer;
 public interface RenderConstants {
 
   /**
-   * Samples per pixel per pass.
+   * Default samples per pixel per pass
    */
-  int SPP_PER_PASS = 1;
+  int SPP_PER_PASS_DEFAULT = 1;
 
   /**
    * Default number of worker threads.

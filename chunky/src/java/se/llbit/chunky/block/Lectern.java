@@ -5,7 +5,6 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
-import se.llbit.nbt.CompoundTag;
 
 public class Lectern extends MinecraftBlockTranslucent {
     private final String facing;
@@ -26,12 +25,12 @@ public class Lectern extends MinecraftBlockTranslucent {
     }
 
     @Override
-    public boolean isBlockEntity() {
+    public boolean isEntity() {
         return true;
     }
 
     @Override
-    public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+    public Entity toEntity(Vector3 position) {
         return new se.llbit.chunky.entity.Lectern(position, this.facing, this.hasBook);
     }
 }

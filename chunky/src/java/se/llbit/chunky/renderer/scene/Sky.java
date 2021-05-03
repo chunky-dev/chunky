@@ -1,4 +1,5 @@
-/* Copyright (c) 2012-2019 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012 - 2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012 - 2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -41,10 +42,7 @@ import se.llbit.util.JsonUtil;
 import se.llbit.util.NotNull;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -146,7 +144,6 @@ public class Sky implements JsonSerializable {
   private final Scene scene;
   private double rotation = 0;
   private boolean mirrored = true;
-  private double horizonOffset = 0.1;
   private boolean cloudsEnabled = false;
   private double cloudSize = DEFAULT_CLOUD_SIZE;
   private final Vector3 cloudOffset = new Vector3(0, DEFAULT_CLOUD_HEIGHT, 0);
@@ -162,9 +159,24 @@ public class Sky implements JsonSerializable {
   /** Current sky rendering mode. */
   private SkyMode mode = SkyMode.DEFAULT;
 
+  /** Simulated skies. */
+  public final static List<SimulatedSky> skies = new ArrayList<>();
+
+  static {
+    skies.add(new PreethamSky());
+    skies.add(new NishitaSky());
+  }
+
+  /** Simulated sky mode. */
+  private SimulatedSky simulatedSkyMode = skies.get(0);
+  double horizonOffset = 0;
+
+  private final SkyCache skyCache;
+
   public Sky(Scene sceneDescription) {
     this.scene = sceneDescription;
     makeDefaultGradient(gradient);
+    skyCache = new SkyCache(this);
   }
 
   /**
@@ -202,7 +214,6 @@ public class Sky implements JsonSerializable {
    * Set the sky equal to other sky.
    */
   public void set(Sky other) {
-    horizonOffset = other.horizonOffset;
     cloudsEnabled = other.cloudsEnabled;
     cloudOffset.set(other.cloudOffset);
     cloudSize = other.cloudSize;
@@ -214,9 +225,16 @@ public class Sky implements JsonSerializable {
     gradient = new ArrayList<>(other.gradient);
     color.set(other.color);
     mode = other.mode;
+    horizonOffset = other.horizonOffset;
     for (int i = 0; i < 6; ++i) {
       skybox[i] = other.skybox[i];
       skyboxFileName[i] = other.skyboxFileName[i];
+    }
+
+    simulatedSkyMode = other.simulatedSkyMode;
+    skyCache.set(other.skyCache);
+    if (simulatedSkyMode.updateSun(scene.sun, horizonOffset)) {
+      skyCache.precalculateSky();
     }
   }
 
@@ -251,7 +269,8 @@ public class Sky implements JsonSerializable {
         break;
       }
       case SIMULATED: {
-        scene.sun().calcSkyLight(ray, horizonOffset);
+        Vector3 color = skyCache.calcIncidentLight(ray);
+        ray.color.set(color.x, color.y, color.z, 1);
         break;
       }
       case SKYMAP_PANORAMIC: {
@@ -411,9 +430,7 @@ public class Sky implements JsonSerializable {
         getSkyDiffuseColorInner(ray);
       }
     }
-    if (scene.sunEnabled) {
-      addSunColor(ray);
-    }
+    addSunColor(ray);
     //ray.color.scale(skyLightModifier);
     ray.color.w = 1;
   }
@@ -423,9 +440,7 @@ public class Sky implements JsonSerializable {
    */
   public void getSkySpecularColor(Ray ray) {
     getSkyColor(ray);
-    if (scene.sunEnabled) {
-      addSunColor(ray);
-    }
+    addSunColor(ray);
   }
 
   /**
@@ -503,6 +518,39 @@ public class Sky implements JsonSerializable {
     return mode;
   }
 
+  /**
+   * Set the simulated sky rendering mode.
+   */
+  public void setSimulatedSkyMode(int mode) {
+    this.simulatedSkyMode = skies.get(mode);
+    this.simulatedSkyMode.updateSun(scene.sun, horizonOffset);
+    skyCache.setSimulatedSkyMode(this.simulatedSkyMode);
+    scene.refresh();
+  }
+
+  /**
+   * @return Current simulated sky.
+   */
+  public SimulatedSky getSimulatedSky() {
+    return simulatedSkyMode;
+  }
+
+  /**
+   * Update the current simulated sky
+   */
+  public void updateSimulatedSky(Sun sun) {
+    if (simulatedSkyMode.updateSun(sun, horizonOffset)) {
+      skyCache.precalculateSky();
+    }
+  }
+
+  /**
+   * Set the simulated sky cache resolution
+   */
+  public void setSkyCacheResolution(int resolution) {
+    skyCache.setSkyResolution(resolution);
+  }
+
   @Override public JsonObject toJson() {
     JsonObject sky = new JsonObject();
     sky.add("skyYaw", rotation);
@@ -537,6 +585,11 @@ public class Sky implements JsonSerializable {
           }
         }
         sky.add("skybox", array);
+        break;
+      }
+      case SIMULATED: {
+        sky.add("simulatedSky", simulatedSkyMode.getName());
+        sky.add("skyCacheResolution", skyCache.getSkyResolution());
         break;
       }
       default: {
@@ -581,6 +634,19 @@ public class Sky implements JsonSerializable {
           JsonValue value = array.get(i);
           skyboxFileName[i] = value.stringValue(skyboxFileName[i]);
         }
+        break;
+      }
+      case SIMULATED: {
+        skyCache.setSkyResolution(json.get("skyCacheResolution").asInt(skyCache.getSkyResolution()));
+
+        String simSkyName = json.get("simulatedSky").asString(simulatedSkyMode.getName());
+        Optional<SimulatedSky> match = skies.stream().filter(skyMode -> skyMode.getName().equals(simSkyName)).findAny();
+
+        simulatedSkyMode = match.orElseGet(() -> simulatedSkyMode);
+        simulatedSkyMode.updateSun(scene.sun(), horizonOffset);
+        skyCache.setSimulatedSkyMode(simulatedSkyMode);
+        skyCache.precalculateSky();
+        scene.refresh();
         break;
       }
       default:
@@ -717,7 +783,6 @@ public class Sky implements JsonSerializable {
   public double getHorizonOffset() {
     return horizonOffset;
   }
-
 
   public void setCloudSize(double newValue) {
     if (newValue != cloudSize) {
@@ -969,13 +1034,13 @@ public class Sky implements JsonSerializable {
   private static void enterCloud(Ray ray, double t) {
     ray.t = t;
     ray.color.set(CloudMaterial.color);
-    ray.setCurrentMaterial(CloudMaterial.INSTANCE, 0);
+    ray.setCurrentMaterial(CloudMaterial.INSTANCE);
   }
 
   private static void exitCloud(Ray ray, double t) {
     ray.t = t;
     ray.color.set(CloudMaterial.color);
-    ray.setCurrentMaterial(Air.INSTANCE, 0);
+    ray.setCurrentMaterial(Air.INSTANCE);
   }
 
   private static boolean inCloud(double x, double z) {

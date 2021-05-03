@@ -6,17 +6,22 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class Cauldron extends MinecraftBlockTranslucent {
+
   private final int level;
 
-  public Cauldron(int level) {
-    super("cauldron", Texture.cauldronSide);
+  public Cauldron(String name, int level) {
+    super(name, Texture.cauldronSide);
     this.level = level;
     localIntersect = true;
   }
 
+  public int getLevel() {
+    return level;
+  }
+
   @Override
   public boolean intersect(Ray ray, Scene scene) {
-    return CauldronModel.intersect(ray, scene.stillWaterEnabled(), level);
+    return CauldronModel.intersectWithWater(ray, scene.stillWaterEnabled(), level);
   }
 
   @Override

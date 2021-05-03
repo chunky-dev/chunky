@@ -35,7 +35,6 @@ public final class PersistentSettings {
 
   public static final double DEFAULT_WATER_OPACITY = .42;
   public static final double DEFAULT_WATER_VISIBILITY = 9;
-  public static final int DEFAULT_WATER_HEIGHT = 0;
 
   public static final double DEFAULT_WATER_RED = 0.03;
   public static final double DEFAULT_WATER_GREEN = 0.13;
@@ -305,15 +304,6 @@ public final class PersistentSettings {
     return settings.getDouble("waterVisibility", DEFAULT_WATER_VISIBILITY);
   }
 
-  public static void setWaterHeight(int value) {
-    settings.setInt("waterHeight", value);
-    save();
-  }
-
-  public static int getWaterHeight() {
-    return settings.getInt("waterHeight", DEFAULT_WATER_HEIGHT);
-  }
-
   public static void setUseCustomWaterColor(boolean value) {
     settings.setBool("useCustomWaterColor", value);
     save();
@@ -422,5 +412,54 @@ public final class PersistentSettings {
   public static String getOctreeImplementation() {
     return settings.getString("octreeImplementation", "PACKED");
   }
-}
 
+  public static void setGridSizeDefault(int value) {
+    settings.setInt("gridSize", value);
+    save();
+  }
+
+  public static int getGridSizeDefault() {
+    return settings.getInt("gridSize", 10);
+  }
+
+  public static void setPreventNormalEmitterWithSampling(boolean value) {
+    settings.setBool("preventNormalEmitterWithSampling", value);
+    save();
+  }
+
+  public static boolean getPreventNormalEmitterWithSampling() {
+    return settings.getBool("preventNormalEmitterWithSampling", false);
+  }
+
+  /**
+   * Checks if Chunky should try to load the default textures from the latest Minecraft version it can find if they
+   * are not found in the selected resource packs.
+   * For deterministic renders (independent of installed Minecraft versions), this option should be enabled.
+   */
+  public static boolean getDisableDefaultTextures() {
+    return settings.getBool("disableDefaultTextures", false);
+  }
+
+  public static void setDisableDefaultTextures(boolean value) {
+    settings.setBool("disableDefaultTextures", value);
+    save();
+  }
+
+  public static int getCanvasScale() {
+    return settings.getInt("canvasScale", 100);
+  }
+
+  public static void setCanvasScale(int scale) {
+    settings.setInt("canvasScale", scale);
+    save();
+  }
+
+  public static boolean getCanvasFitToScreen() {
+    return settings.getBool("canvasFitToScreen", true);
+  }
+
+  public static void setCanvasFitToScreen(boolean fitToScreen) {
+    settings.setBool("canvasFitToScreen", fitToScreen);
+    save();
+  }
+}

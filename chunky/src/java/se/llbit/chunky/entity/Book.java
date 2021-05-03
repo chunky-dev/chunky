@@ -250,7 +250,7 @@ public class Book extends Entity implements Poseable {
       }
       if (i == 4 && (pageAngleA <= (Math.PI - openAngle) / 2
           || pageAngleB <= (Math.PI - openAngle) / 2)) {
-            continue; // a single page is clamped to the right pages box, which would overlay this face
+        continue; // a single page is clamped to the right pages box, which would overlay this face
       }
       rightPages[i].addTriangles(faces, new TextureMaterial(Texture.book),
           Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(pageAngle)
@@ -293,7 +293,7 @@ public class Book extends Entity implements Poseable {
     return json;
   }
 
-  public static Entity fromJson(JsonObject json) {
+  public static Book fromJson(JsonObject json) {
     return new Book(json);
   }
 

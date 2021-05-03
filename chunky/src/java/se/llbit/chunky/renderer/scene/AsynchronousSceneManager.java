@@ -243,10 +243,7 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
     if (c < '\u0020') {
       return false;
     }
-    if (c > '\u007e' && c < '\u00a0') {
-      return false;
-    }
-    return true;
+    return c <= '\u007e' || c >= '\u00a0';
   }
 
   /**

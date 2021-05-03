@@ -231,8 +231,8 @@ public class Region implements Iterable<Chunk> {
       int sectorOffset = loc >> 8;
       file.seek(SECTOR_SIZE + 4 * index);
       int timestamp = file.readInt();
-      if (length < (sectorOffset + numSectors) * SECTOR_SIZE) {
-        System.err.println("Chunk is outside region file!");
+      if (length < sectorOffset * SECTOR_SIZE + 4) {
+        System.err.printf("Chunk %s is outside of region file %s! Expected chunk data at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), sectorOffset * SECTOR_SIZE, length);
         return null;
       }
       file.seek(sectorOffset * SECTOR_SIZE);
@@ -244,11 +244,22 @@ public class Region implements Iterable<Chunk> {
         return null;
       }
 
+      if (length < sectorOffset * SECTOR_SIZE + 4 + chunkSize) {
+        System.err.printf("Chunk %s is outside of region file %s! Expected %d bytes at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), chunkSize, sectorOffset * SECTOR_SIZE, length);
+        return null;
+      }
+
       byte type = file.readByte();
       if (type != 1 && type != 2) {
         System.err.println("Error: unknown chunk data compression method: " + type + "!");
         return null;
       }
+
+      if (chunkSize <= 0) {
+        System.err.println("Error: invalid chunk size: " + chunkSize);
+        return null;
+      }
+
       byte[] buf = new byte[chunkSize - 1];
       file.read(buf);
       ByteArrayInputStream in = new ByteArrayInputStream(buf);

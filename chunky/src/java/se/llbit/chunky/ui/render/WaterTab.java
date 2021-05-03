@@ -1,4 +1,5 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -16,19 +17,13 @@
  */
 package se.llbit.chunky.ui.render;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
-import javafx.util.converter.NumberStringConverter;
+import javafx.scene.control.*;
+import javafx.scene.paint.Color;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -49,20 +44,21 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @FXML private CheckBox stillWater;
   @FXML private DoubleAdjuster waterVisibility;
   @FXML private DoubleAdjuster waterOpacity;
-  @FXML private CheckBox waterPlane;
-  @FXML private TextField waterHeight;
   @FXML private CheckBox useCustomWaterColor;
   @FXML private LuxColorPicker waterColor;
   @FXML private Button saveDefaults;
+  @FXML private CheckBox waterPlaneEnabled;
+  @FXML private DoubleAdjuster waterPlaneHeight;
+  @FXML private CheckBox waterPlaneOffsetEnabled;
+  @FXML private CheckBox waterPlaneClip;
 
-  private IntegerProperty waterHeightProp = new SimpleIntegerProperty();
   private RenderControlsFxController renderControls;
   private RenderController controller;
-  private final ChangeListener<javafx.scene.paint.Color> waterColorListener =
-      (observable, oldValue, newValue) -> {
-        scene.setWaterColor(ColorUtil.fromFx(newValue));
-        useCustomWaterColor.setSelected(true);
-      };
+  private final ChangeListener<Color> waterColorListener =
+    (observable, oldValue, newValue) -> {
+      scene.setWaterColor(ColorUtil.fromFx(newValue));
+      useCustomWaterColor.setSelected(true);
+    };
 
   public WaterTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("WaterTab.fxml"));
@@ -71,18 +67,15 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     loader.load();
   }
 
-  @Override public void setController(RenderControlsFxController controller) {
+  @Override
+  public void setController(RenderControlsFxController controller) {
     renderControls = controller;
     this.controller = controller.getRenderController();
     scene = this.controller.getSceneManager().getScene();
   }
 
-  @Override public void update(Scene scene) {
-    int waterHeight = scene.getWaterHeight();
-    if (waterHeight != 0) {
-      waterHeightProp.set(scene.getWaterHeight());
-    }
-    waterPlane.setSelected(scene.getWaterHeight() != 0);
+  @Override
+  public void update(Scene scene) {
     useCustomWaterColor.setSelected(scene.getUseCustomWaterColor());
     stillWater.setSelected(scene.stillWaterEnabled());
     waterVisibility.set(scene.getWaterVisibility());
@@ -92,17 +85,26 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterColor.colorProperty().removeListener(waterColorListener);
     waterColor.setColor(ColorUtil.toFx(scene.getWaterColor()));
     waterColor.colorProperty().addListener(waterColorListener);
+
+    waterPlaneEnabled.setSelected(scene.isWaterPlaneEnabled());
+    waterPlaneHeight.setRange(scene.yClipMin, scene.yClipMax);
+    waterPlaneHeight.set(scene.getWaterPlaneHeight());
+    waterPlaneOffsetEnabled.setSelected(scene.isWaterPlaneOffsetEnabled());
+    waterPlaneClip.setSelected(scene.getWaterPlaneChunkClip());
   }
 
-  @Override public String getTabTitle() {
+  @Override
+  public String getTabTitle() {
     return "Water";
   }
 
-  @Override public Node getTabContent() {
+  @Override
+  public Node getTabContent() {
     return this;
   }
 
-  @Override public void initialize(URL location, ResourceBundle resources) {
+  @Override
+  public void initialize(URL location, ResourceBundle resources) {
     waterVisibility.setName("Water visibility");
     waterVisibility.setTooltip("Visibility depth under water.");
     waterVisibility.setRange(0, 50);
@@ -115,36 +117,13 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterOpacity.clampBoth();
     waterOpacity.onValueChange(value -> scene.setWaterOpacity(value));
 
-    stillWater.selectedProperty()
-        .addListener((observable, oldValue, newValue) -> scene.setStillWater(newValue));
+    stillWater.selectedProperty().addListener((observable, oldValue, newValue) ->
+      scene.setStillWater(newValue)
+    );
 
-    int initialWaterHeight = PersistentSettings.getWaterHeight();
-    if (initialWaterHeight == 0) {
-      initialWaterHeight = World.SEA_LEVEL;
-    }
-    waterHeight.textProperty().bindBidirectional(waterHeightProp, new NumberStringConverter());
-    waterHeightProp.set(initialWaterHeight);
-    waterHeightProp.addListener((observable, oldValue, newValue) -> {
-      if (waterPlane.isSelected()) {
-        scene.setWaterHeight(newValue.intValue());
-      } else {
-        scene.setWaterHeight(0);
-      }
-    });
-
-    waterPlane.setTooltip(
-        new Tooltip("In Water World mode, an infinite ocean surrounds the loaded chunks."));
-    waterPlane.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      if (newValue) {
-        scene.setWaterHeight(waterHeightProp.get());
-      } else {
-        scene.setWaterHeight(0);
-      }
-    });
-
-    useCustomWaterColor.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      scene.setUseCustomWaterColor(newValue);
-    });
+    useCustomWaterColor.selectedProperty().addListener((observable, oldValue, newValue) ->
+      scene.setUseCustomWaterColor(newValue)
+    );
 
     waterColor.colorProperty().addListener(waterColorListener);
 
@@ -153,7 +132,6 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       PersistentSettings.setStillWater(scene.stillWaterEnabled());
       PersistentSettings.setWaterOpacity(scene.getWaterOpacity());
       PersistentSettings.setWaterVisibility(scene.getWaterVisibility());
-      PersistentSettings.setWaterHeight(scene.getWaterHeight());
       boolean useCustomWaterColor = scene.getUseCustomWaterColor();
       PersistentSettings.setUseCustomWaterColor(useCustomWaterColor);
       if (useCustomWaterColor) {
@@ -161,6 +139,25 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
         PersistentSettings.setWaterColor(color.x, color.y, color.z);
       }
     });
+
+    waterPlaneEnabled.setTooltip(
+      new Tooltip("If enabled, an infinite ocean fills the scene. This ignores air from loaded chunks."));
+    waterPlaneEnabled.selectedProperty().addListener((observable, oldValue, newValue) ->
+      scene.setWaterPlaneEnabled(newValue)
+    );
+
+    waterPlaneHeight.setName("Water height");
+    waterPlaneHeight.setTooltip("The default ocean height is " + World.SEA_LEVEL + ".");
+    waterPlaneHeight.clampBoth();
+    waterPlaneHeight.onValueChange(value -> scene.setWaterPlaneHeight(value));
+
+    waterPlaneOffsetEnabled.selectedProperty().addListener((observable, oldValue, newValue) ->
+      scene.setWaterPlaneOffsetEnabled(newValue)
+    );
+
+    waterPlaneClip.selectedProperty().addListener((observable, oldValue, newValue) ->
+        scene.setWaterPlaneChunkClip(newValue)
+    );
   }
 
 }

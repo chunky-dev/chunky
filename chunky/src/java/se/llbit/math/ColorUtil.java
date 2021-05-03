@@ -1,4 +1,5 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -27,6 +28,15 @@ import se.llbit.chunky.renderer.scene.Scene;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public final class ColorUtil {
+
+  // Look up table used to speed up gamma correction
+  private static final float[] toLinearLut = new float[256];
+
+  static {
+    for (int i = 0; i < 256; i++) {
+      toLinearLut[i] = (float)Math.pow(i / 255.0, Scene.DEFAULT_GAMMA);
+    }
+  }
 
   private ColorUtil() {
   }
@@ -171,6 +181,16 @@ public final class ColorUtil {
   }
 
   /**
+   * Get the RGBA color component gamma corrected from an ARGB int
+   */
+  public static void getRGBAComponentsGammaCorrected(int argb, float[] components) {
+    components[3] = (argb >>> 24) / 255.0f;
+    components[0] = toLinearLut[(0xFF & (argb >> 16))];
+    components[1] = toLinearLut[(0xFF & (argb >> 8))];
+    components[2] = toLinearLut[(0xFF & argb)];
+  }
+
+  /**
    * @return Get INT RGB value corresponding to the given color
    */
   public static int getRGB(float[] frgb) {
@@ -230,6 +250,36 @@ public final class ColorUtil {
   public static String toString(Vector3 color) {
     int rgb = getRGB(color.x, color.y, color.z);
     return String.format("%02X%02X%02X", (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
+  }
+
+  public static void RGBtoHSL(Vector3 hsl, double r, double g, double b) {
+    r = QuickMath.clamp(r, 0, 1);
+    g = QuickMath.clamp(g, 0, 1);
+    b = QuickMath.clamp(b, 0, 1);
+
+    double cmax = FastMath.max(FastMath.max(r, g), b);
+    double cmin = FastMath.min(FastMath.min(r, g), b);
+    double delta = cmax - cmin;
+    double lightness = (cmax + cmin) / 2;
+
+    double hue;
+    if (delta == 0) {
+      hue = 0;
+    } else if (cmax == r) {
+      hue = (((g - b) / delta) % 6) / 6.0;
+    } else if (cmax == g) {
+      hue = (((b - r) / delta) + 2) / 6.0;
+    } else {
+      hue = (((r - g) / delta) + 4) / 6.0;
+    }
+
+    hsl.set(hue, delta < Ray.EPSILON ? 0 : delta / (1 - FastMath.abs(2*lightness - 1)), lightness);
+  }
+
+  public static Vector3 RGBtoHSL(double r, double g, double b) {
+    Vector3 color = new Vector3();
+    RGBtoHSL(color, r, g, b);
+    return color;
   }
 
   public static void RGBfromHSL(Vector3 rgb, double hue, double saturation, double lightness) {

@@ -146,12 +146,16 @@ public class HeadEntity extends Entity {
   /**
    * Download the skin or take it from the cache.
    *
+   * @param skin The URL of the skin
    * @return The downloaded/cached skin or the steve skin if the download failed
    */
-  private EntityTexture downloadSkin() {
+  public static EntityTexture downloadTexture(String skin) {
     return textureCache.computeIfAbsent(skin, (skinUrl) -> {
       EntityTexture texture = new EntityTexture();
       EntityTextureLoader loader = new EntityTextureLoader(skinUrl, texture);
+      if (!PersistentSettings.cacheDirectory().isDirectory()) {
+        PersistentSettings.cacheDirectory().mkdirs();
+      }
       File cacheFile = new File(PersistentSettings.cacheDirectory(),
           Util.cacheEncode((skin + ":skin").hashCode()));
       if (cacheFile.exists()) {
@@ -179,6 +183,15 @@ public class HeadEntity extends Entity {
 
       return EntityTexture.steve;
     });
+  }
+
+  /**
+   * Download the skin or take it from the cache.
+   *
+   * @return The downloaded/cached skin or the steve skin if the download failed
+   */
+  private EntityTexture downloadSkin() {
+    return downloadTexture(skin);
   }
 
   @Override

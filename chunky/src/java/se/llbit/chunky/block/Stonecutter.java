@@ -6,16 +6,22 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class Stonecutter extends MinecraftBlockTranslucent {
-    private final String facing;
 
-    public Stonecutter(String facing) {
-        super("stonecutter", Texture.stonecutterSide);
-        localIntersect = true;
-        this.facing = facing;
-    }
+  private final String facing;
 
-    @Override
-    public boolean intersect(Ray ray, Scene scene) {
-        return StonecutterModel.intersect(ray, facing);
-    }
+  public Stonecutter(String facing) {
+    super("stonecutter", Texture.stonecutterSide);
+    localIntersect = true;
+    this.facing = facing;
+  }
+
+  @Override
+  public boolean intersect(Ray ray, Scene scene) {
+    return StonecutterModel.intersect(ray, facing);
+  }
+
+  @Override
+  public String description() {
+    return "facing=" + facing;
+  }
 }

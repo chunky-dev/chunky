@@ -1,4 +1,5 @@
-/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2013-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -19,11 +20,10 @@ package se.llbit.chunky.renderer.scene;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.MinecraftBlock;
 import se.llbit.chunky.block.Water;
-import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.WorkerState;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -36,9 +36,9 @@ public class PreviewRayTracer implements RayTracer {
   @Override public void trace(Scene scene, WorkerState state) {
     Ray ray = state.ray;
     if (scene.isInWater(ray)) {
-      ray.setCurrentMaterial(Water.INSTANCE, 0);
+      ray.setCurrentMaterial(Water.INSTANCE);
     } else {
-      ray.setCurrentMaterial(Air.INSTANCE, 0);
+      ray.setCurrentMaterial(Air.INSTANCE);
     }
     while (true) {
       if (!nextIntersection(scene, ray)) {
@@ -92,8 +92,8 @@ public class PreviewRayTracer implements RayTracer {
     if (scene.sky().cloudsEnabled()) {
       hit = scene.sky().cloudIntersection(scene, ray);
     }
-    if (scene.waterHeight > 0) {
-      hit = waterIntersection(scene, ray) || hit;
+    if (scene.isWaterPlaneEnabled()) {
+      hit = waterPlaneIntersection(scene, ray) || hit;
     }
     if (scene.intersect(ray)) {
       // Octree tracer handles updating distance.
@@ -105,55 +105,94 @@ public class PreviewRayTracer implements RayTracer {
       scene.updateOpacity(ray);
       return true;
     } else {
-      ray.setCurrentMaterial(Air.INSTANCE, 0);
+      ray.setCurrentMaterial(Air.INSTANCE);
       return false;
     }
   }
 
-  private static boolean waterIntersection(Scene scene, Ray ray) {
+  private static boolean waterPlaneIntersection(Scene scene, Ray ray) {
+    double t = (scene.getEffectiveWaterPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
+    if (scene.getWaterPlaneChunkClip()) {
+      Vector3 pos = new Vector3(ray.o);
+      pos.scaleAdd(t, ray.d);
+      if (scene.isChunkLoaded((int)Math.floor(pos.x), (int)Math.floor(pos.z)))
+        return false;
+    }
     if (ray.d.y < 0) {
-      double t = (scene.waterHeight - .125 - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < ray.t) {
         ray.t = t;
         Water.INSTANCE.getColor(ray);
         ray.n.set(0, 1, 0);
-        ray.setCurrentMaterial(Water.OCEAN_WATER, 1 << Water.FULL_BLOCK);
+        ray.setCurrentMaterial(scene.getPalette().water);
         return true;
       }
     }
     if (ray.d.y > 0) {
-      double t = (scene.waterHeight - .125 - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < ray.t) {
         ray.t = t;
         Water.INSTANCE.getColor(ray);
         ray.n.set(0, -1, 0);
-        ray.setCurrentMaterial(Air.INSTANCE, 0);
+        ray.setCurrentMaterial(Air.INSTANCE);
         return true;
       }
     }
     return false;
   }
 
+  // Chunk pattern config
+  private static final double chunkPatternLineWidth = 0.5; // in blocks
+  private static final double chunkPatternLinePosition = 8 - chunkPatternLineWidth / 2;
+  private static final Vector4 chunkPatternFillColor =
+    new Vector4(0.8, 0.8, 0.8, 1.0);
+  private static final Vector4 chunkPatternLineColor =
+    new Vector4(0.25, 0.25, 0.25, 1.0);
+  private static final Vector4 chunkPatternFillColorSubmerged =
+    new Vector4(0.6, 0.6, 0.8, 1.0);
+  private static final Vector4 chunkPatternLineColorSubmerged =
+    new Vector4(0.05, 0.05, 0.25, 1.0);
+  private static final double chunkPatternInsideOctreeColorFactor = 0.75;
+
+  /**
+   * Projects a chunk border pattern onto the bottom plane of the octree (yMin).
+   * Changes colors for chunks inside the octree and submerged scenes.
+   * Use only in preview mode - the ray should hit the sky in a real render.
+   */
   private static boolean mapIntersection(Scene scene, Ray ray) {
-    if (ray.d.y < 0) {
-      double t = (scene.waterHeight - .125 - ray.o.y - scene.origin.y) / ray.d.y;
+    if (ray.d.y < 0) { // ray going below horizon
+      double t = (scene.yMin - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < ray.t) {
         Vector3 vec = new Vector3();
         vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
-        if (!scene.isInsideOctree(vec)) {
-          ray.t = t;
-          ray.o.set(vec);
-          double xm = (ray.o.x % 16.0 + 16.0) % 16.0;
-          double zm = (ray.o.z % 16.0 + 16.0) % 16.0;
-          if (xm > 0.6 && zm > 0.6) {
-            ray.color.set(0.8, 0.8, 0.8, 1);
+        // must be submerged if water plane is enabled otherwise ray already had collided with water
+        boolean isSubmerged = scene.isWaterPlaneEnabled();
+        boolean insideOctree = scene.isInsideOctree(vec);
+        ray.t = t;
+        ray.o.set(vec);
+        double xm = ((ray.o.x) % 16.0 + 16.0) % 16.0;
+        double zm = ((ray.o.z) % 16.0 + 16.0) % 16.0;
+        if (
+          (xm < chunkPatternLinePosition || xm > chunkPatternLinePosition + chunkPatternLineWidth) &&
+            (zm < chunkPatternLinePosition || zm > chunkPatternLinePosition + chunkPatternLineWidth)
+        ) { // chunk fill
+          if (isSubmerged) {
+            ray.color.set(chunkPatternFillColorSubmerged);
           } else {
-            ray.color.set(0.25, 0.25, 0.25, 1);
+            ray.color.set(chunkPatternFillColor);
           }
-          ray.setCurrentMaterial(MinecraftBlock.STONE, 0);
-          ray.n.set(0, 1, 0);
-          return true;
+        } else { // chunk border
+          if (isSubmerged) {
+            ray.color.set(chunkPatternLineColorSubmerged);
+          } else {
+            ray.color.set(chunkPatternLineColor);
+          }
         }
+        if(insideOctree) {
+          ray.color.scale(chunkPatternInsideOctreeColorFactor);
+        }
+        // handle like a solid horizontal plane
+        ray.setCurrentMaterial(MinecraftBlock.STONE);
+        ray.n.set(0, 1, 0);
+        return true;
       }
     }
     return false;

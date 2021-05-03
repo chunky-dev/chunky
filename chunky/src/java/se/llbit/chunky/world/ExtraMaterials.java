@@ -16,27 +16,35 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.chunky.world.material.CloudMaterial;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import se.llbit.chunky.block.Candle;
+import se.llbit.chunky.entity.Campfire;
+import se.llbit.chunky.world.material.CloudMaterial;
+
 public class ExtraMaterials {
+
   public static final Map<String, Material> collections = new HashMap<>();
   public static final Map<String, Material> idMap = new HashMap<>();
+
   static {
     idMap.put("cloud", CloudMaterial.INSTANCE);
+    idMap.put("candle_flame", Candle.flameMaterial);
+    idMap.put("campfire_flame", Campfire.flameMaterial);
+    idMap.put("soul_campfire_flame", Campfire.soulFlameMaterial);
   }
 
   public static void loadDefaultMaterialProperties() {
-    for (Material material : idMap.values()) {
-      material.opaque = false;
-      material.solid = true;
-      material.localIntersect = false;
-      material.invisible = false;
-      material.emittance = 0;
-      material.specular = 0;
-      material.ior = 1.000293f;
-    }
+    CloudMaterial.INSTANCE.restoreDefaults();
+
+    Candle.flameMaterial.restoreDefaults();
+    Candle.flameMaterial.emittance = 1.0f;
+
+    Campfire.flameMaterial.restoreDefaults();
+    Campfire.flameMaterial.emittance = 1.0f;
+
+    Campfire.soulFlameMaterial.restoreDefaults();
+    Campfire.soulFlameMaterial.emittance = 0.6f;
   }
 }

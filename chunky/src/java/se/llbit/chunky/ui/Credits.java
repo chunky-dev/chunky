@@ -1,4 +1,5 @@
-/* Copyright (c) 2012-2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -33,6 +34,7 @@ public class Credits extends Stage {
     CreditsController controller = loader.getController();
     setTitle("Chunky Credits");
     setScene(new Scene(root));
+    this.resizableProperty().setValue(false);
     controller.setStage(this);
   }
 }

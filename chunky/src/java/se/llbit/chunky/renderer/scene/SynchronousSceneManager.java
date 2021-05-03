@@ -222,10 +222,9 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   @Override public boolean pollSceneStateChange() {
     if (scene.shouldRefresh() && (scene.getForceReset() || resetHandler.allowSceneRefresh())) {
       return true;
-    } else if (scene.getMode() != storedScene.getMode()) {
-      return true;
+    } else {
+      return scene.getMode() != storedScene.getMode();
     }
-    return false;
   }
 
   @Override public void withSceneProtected(Consumer<Scene> fun) {
@@ -250,13 +249,14 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
    */
   protected void mergeDump(File dumpFile) {
     synchronized (scene) {
-      renderer.withSampleBufferProtected((samples, width, height) ->{
+      renderer.withSampleBufferProtected((samples, width, height) -> {
         if (width != scene.width || height != scene.height) {
           throw new Error("Failed to merge render dump - wrong canvas size.");
         }
         scene.mergeDump(dumpFile, taskTracker);
       });
       scene.setResetReason(ResetReason.SCENE_LOADED);
+      scene.pauseRender();
     }
   }
 

@@ -17,22 +17,29 @@ public class Lava extends MinecraftBlockTranslucent {
   private static final AABB fullBlock = new AABB(0, 1, 0, 1, 0, 1);
 
   public final int level;
+  public final int data;
 
-  public Lava(int level) {
+  public Lava(int level, int data) {
     super("lava", Texture.lava);
-    this.level = level;
+    this.level = level % 8;
+    this.data = data;
     solid = false;
     localIntersect = true;
     emittance = 1.0f;
   }
 
+  public Lava(int level) {
+    this(level, 1 << FULL_BLOCK);
+  }
+
+  public boolean isFullBlock() {
+    return (this.data & (1 << FULL_BLOCK)) != 0;
+  }
+
   @Override public boolean intersect(Ray ray, Scene scene) {
     ray.t = Double.POSITIVE_INFINITY;
 
-    int data = ray.getCurrentData();
-    int isFull = (data >> FULL_BLOCK) & 1;
-
-    if (isFull != 0) {
+    if (isFullBlock()) {
       if (fullBlock.intersect(ray)) {
         texture.getColor(ray);
         ray.distance += ray.tNext;

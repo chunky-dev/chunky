@@ -21,6 +21,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.texturepack.FontTexture;
+import se.llbit.fxutil.FxImageUtil;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -313,6 +314,7 @@ public class Texture {
   public static final Texture potatoes2 = new Texture();
   public static final Texture potatoes3 = new Texture();
   public static final Texture beacon = new Texture();
+  public static final Texture beaconBeam = new Texture();
   public static final Texture anvilSide = new Texture();
   public static final Texture anvilTop = new Texture();
   public static final Texture anvilTopDamaged1 = new Texture();
@@ -885,6 +887,110 @@ public class Texture {
   public static final Texture chain = new Texture();
   public static final Texture jigsawLock = new Texture();
 
+  // [1.17]
+  public static final Texture candle = new Texture();
+  public static final Texture whiteCandle = new Texture();
+  public static final Texture orangeCandle = new Texture();
+  public static final Texture magentaCandle = new Texture();
+  public static final Texture lightBlueCandle = new Texture();
+  public static final Texture yellowCandle = new Texture();
+  public static final Texture limeCandle = new Texture();
+  public static final Texture pinkCandle = new Texture();
+  public static final Texture grayCandle = new Texture();
+  public static final Texture lightGrayCandle = new Texture();
+  public static final Texture cyanCandle = new Texture();
+  public static final Texture purpleCandle = new Texture();
+  public static final Texture blueCandle = new Texture();
+  public static final Texture brownCandle = new Texture();
+  public static final Texture greenCandle = new Texture();
+  public static final Texture redCandle = new Texture();
+  public static final Texture blackCandle = new Texture();
+  public static final Texture flameParticle = new Texture();
+  public static final Texture copperOre = new Texture();
+  public static final Texture calcite = new Texture();
+  public static final Texture tuff = new Texture();
+  public static final Texture amethyst = new Texture();
+  public static final Texture buddingAmethyst = new Texture();
+  public static final Texture copperBlock = new Texture();
+  public static final Texture exposedCopper = new Texture();
+  public static final Texture weatheredCopper = new Texture();
+  public static final Texture oxidizedCopper = new Texture();
+  public static final Texture cutCopper = new Texture();
+  public static final Texture exposedCutCopper = new Texture();
+  public static final Texture weatheredCutCopper = new Texture();
+  public static final Texture oxidizedCutCopper = new Texture();
+  public static final Texture lightningRod = new Texture();
+  public static final Texture smallAmethystBud = new Texture();
+  public static final Texture mediumAmethystBud = new Texture();
+  public static final Texture largeAmethystBud = new Texture();
+  public static final Texture amethystCluster = new Texture();
+  public static final Texture tintedGlass = new Texture();
+  public static final Texture powderSnow = new Texture();
+  public static final Texture dripstoneBlock = new Texture();
+  public static final Texture pointedDripstoneDownBase = new Texture();
+  public static final Texture pointedDripstoneDownFrustum = new Texture();
+  public static final Texture pointedDripstoneDownMiddle = new Texture();
+  public static final Texture pointedDripstoneDownTip = new Texture();
+  public static final Texture pointedDripstoneDownTipMerge = new Texture();
+  public static final Texture pointedDripstoneUpBase = new Texture();
+  public static final Texture pointedDripstoneUpFrustum = new Texture();
+  public static final Texture pointedDripstoneUpMiddle = new Texture();
+  public static final Texture pointedDripstoneUpTip = new Texture();
+  public static final Texture pointedDripstoneUpTipMerge = new Texture();
+  public static final Texture sculkSensorBottom = new Texture();
+  public static final Texture sculkSensorSide = new Texture();
+  public static final Texture sculkSensorTendrilActive = new Texture();
+  public static final Texture sculkSensorTendrilInactive = new Texture();
+  public static final Texture sculkSensorTop = new Texture();
+  public static final Texture glowLichen = new Texture();
+  public static final Texture azaleaTop = new Texture();
+  public static final Texture azaleaSide = new Texture();
+  public static final Texture azaleaPlant = new Texture();
+  public static final Texture floweringAzaleaTop = new Texture();
+  public static final Texture floweringAzaleaSide = new Texture();
+  public static final Texture azaleaLeaves = new Texture();
+  public static final Texture azaleaLeavesFlowers = new Texture();
+  public static final Texture mossBlock = new Texture();
+  public static final Texture caveVinesPlant = new Texture();
+  public static final Texture caveVinesPlantLit = new Texture();
+  public static final Texture caveVines = new Texture();
+  public static final Texture caveVinesLit = new Texture();
+  public static final Texture hangingRoots = new Texture();
+  public static final Texture rootedDirt = new Texture();
+  public static final Texture bigDripleafStem = new Texture();
+  public static final Texture bigDripleafTop = new Texture();
+  public static final Texture bigDripleafSide = new Texture();
+  public static final Texture bigDripleafTip = new Texture();
+  public static final Texture smallDripleafTop = new Texture();
+  public static final Texture smallDripleafSide = new Texture();
+  public static final Texture smallDripleafStemTop = new Texture();
+  public static final Texture smallDripleafStemBottom = new Texture();
+  public static final Texture sporeBlossom = new Texture();
+  public static final Texture sporeBlossomBase = new Texture();
+  public static final Texture deepslate = new Texture();
+  public static final Texture deepslateTop = new Texture();
+  public static final Texture polishedDeepslate = new Texture();
+  public static final Texture chiseledDeepslate = new Texture();
+  public static final Texture deepslateBricks = new Texture();
+  public static final Texture deepslateTiles = new Texture();
+  public static final Texture smoothBasalt = new Texture();
+  public static final Texture cobbledDeepslate = new Texture();
+  public static final Texture deepslateGoldOre = new Texture();
+  public static final Texture deepslateIronOre = new Texture();
+  public static final Texture deepslateDiamondOre = new Texture();
+  public static final Texture deepslateLapisOre = new Texture();
+  public static final Texture deepslateRedstoneOre = new Texture();
+  public static final Texture crackedDeepslateBricks = new Texture();
+  public static final Texture crackedDeepslateTiles = new Texture();
+  public static final Texture deepslateCoalOre = new Texture();
+  public static final Texture deepslateCopperOre = new Texture();
+  public static final Texture deepslateEmeraldOre = new Texture();
+  public static final Texture lightningRodOn = new Texture();
+  public static final Texture light = new Texture();
+  public static final Texture rawCopperBlock = new Texture();
+  public static final Texture rawGoldBlock = new Texture();
+  public static final Texture rawIronBlock = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 
@@ -931,7 +1037,8 @@ public class Texture {
   protected int height;
   protected int avgColor;
   private float[] avgColorLinear;
-  private float[] linear;
+  private boolean useAverageColor = false;
+  private float[] avgColorFlat;
 
   private Image fxImage = null;
 
@@ -960,38 +1067,26 @@ public class Texture {
     int[] data = image.data;
     width = image.width;
     height = image.height;
-    linear = new float[width * height * 4];
     float[] pixelBuffer = new float[4];
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
         int index = width * y + x;
-        ColorUtil.getRGBAComponents(data[index], pixelBuffer);
-        linear[index*4] = (float) FastMath.pow(pixelBuffer[0], Scene.DEFAULT_GAMMA);
-        linear[index*4 + 1] = (float) FastMath.pow(pixelBuffer[1], Scene.DEFAULT_GAMMA);
-        linear[index*4 + 2] = (float) FastMath.pow(pixelBuffer[2], Scene.DEFAULT_GAMMA);
-        linear[index*4 + 3] = pixelBuffer[3];
-        avgColorLinear[0] += linear[index*4 + 3] * linear[index*4];
-        avgColorLinear[1] += linear[index*4 + 3] * linear[index*4 + 1];
-        avgColorLinear[2] += linear[index*4 + 3] * linear[index*4 + 2];
-        avgColorLinear[3] += linear[index*4 + 3];
+        ColorUtil.getRGBAComponentsGammaCorrected(data[index], pixelBuffer);
+        avgColorLinear[0] += pixelBuffer[3] * pixelBuffer[0];
+        avgColorLinear[1] += pixelBuffer[3] * pixelBuffer[1];
+        avgColorLinear[2] += pixelBuffer[3] * pixelBuffer[2];
+        avgColorLinear[3] += pixelBuffer[3];
       }
     }
 
-    if (PersistentSettings.getSingleColorTextures()) {
-      float[] avgColorFlat = {0, 0, 0};
+    useAverageColor = PersistentSettings.getSingleColorTextures();
+    if (useAverageColor) {
+      avgColorFlat = new float[4];
       if (avgColorLinear[3] > 0.001) {
         avgColorFlat[0] = avgColorLinear[0] / avgColorLinear[3];
         avgColorFlat[1] = avgColorLinear[1] / avgColorLinear[3];
         avgColorFlat[2] = avgColorLinear[2] / avgColorLinear[3];
-      }
-      for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-          int index = width * y + x;
-          linear[index*4] = avgColorFlat[0];
-          linear[index*4 + 1] = avgColorFlat[1];
-          linear[index*4 + 2] = avgColorFlat[2];
-          linear[index*4 + 3] = 1;
-        }
+        avgColorFlat[3] = 1;
       }
     }
 
@@ -1036,9 +1131,10 @@ public class Texture {
    * @return color
    */
   public final float[] getColor(int x, int y) {
-    // TODO Not allocate here
+    if(useAverageColor)
+      return avgColorFlat;
     float[] result = new float[4];
-    System.arraycopy(linear, (width * y + x) * 4, result, 0, 4);
+    ColorUtil.getRGBAComponentsGammaCorrected(image.data[width*y + x], result);
     return result;
   }
 
@@ -1119,7 +1215,7 @@ public class Texture {
 
   public Image fxImage() {
     if (fxImage == null) {
-      fxImage = ImageTools.toFxImage(image);
+      fxImage = FxImageUtil.toFxImage(image);
     }
     return fxImage;
   }

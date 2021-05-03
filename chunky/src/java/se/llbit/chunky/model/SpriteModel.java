@@ -23,6 +23,7 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class SpriteModel {
+
   protected static Quad[] quads =
       {new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 1), new Vector3(0, 1, 0),
           new Vector4(0, 1, 0, 1)),
@@ -35,6 +36,17 @@ public class SpriteModel {
 
           new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 0), new Vector3(0, 1, 1),
               new Vector4(0, 1, 0, 1)),};
+
+  static final Quad[][] orientedQuads = new Quad[6][];
+
+  static {
+    orientedQuads[4] = quads;
+    orientedQuads[0] = Model.rotateX(Model.rotateX(quads));
+    orientedQuads[2] = Model.rotateNegX(quads);
+    orientedQuads[1] = Model.rotateY(orientedQuads[2]);
+    orientedQuads[3] = Model.rotateY(orientedQuads[1]);
+    orientedQuads[5] = Model.rotateY(orientedQuads[3]);
+  }
 
   public static boolean intersect(Ray ray, Texture material) {
     boolean hit = false;
@@ -55,5 +67,45 @@ public class SpriteModel {
       ray.o.scaleAdd(ray.t, ray.d);
     }
     return hit;
+  }
+
+  public static boolean intersect(Ray ray, Texture material, String facing) {
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
+    for (Quad quad : orientedQuads[getOrientationIndex(facing)]) {
+      if (quad.intersect(ray)) {
+        float[] color = material.getColor(ray.u, ray.v);
+        if (color[3] > Ray.EPSILON) {
+          ray.color.set(color);
+          ray.t = ray.tNext;
+          ray.n.set(quad.n);
+          hit = true;
+        }
+      }
+    }
+    if (hit) {
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
+
+  private static int getOrientationIndex(String facing) {
+    switch (facing) {
+      case "down":
+        return 0;
+      case "east":
+        return 1;
+      case "north":
+        return 2;
+      case "south":
+        return 3;
+      case "up":
+        return 4;
+      case "west":
+        return 5;
+      default:
+        return 4;
+    }
   }
 }

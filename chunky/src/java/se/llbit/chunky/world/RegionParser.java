@@ -16,6 +16,9 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.GenericChunkData;
+import se.llbit.chunky.chunk.SimpleChunkData;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.log.Log;
@@ -54,12 +57,20 @@ public class RegionParser extends Thread {
       }
       ChunkView map = mapView.getMapView();
       if (map.isRegionVisible(position)) {
-        Region region = mapLoader.getWorld().getRegion(position);
+        World world = mapLoader.getWorld();
+        Region region = world.getRegion(position);
         region.parse();
+        ChunkData chunkData;
+        if(world.getVersionId() >= World.VERSION_21W06A) {
+          chunkData = new GenericChunkData();
+        } else {
+          chunkData = new SimpleChunkData();
+        }
         for (Chunk chunk : region) {
           if (map.shouldPreload(chunk)) {
-            chunk.loadChunk();
+            chunk.loadChunk(chunkData, mapView.getYMax());
           }
+          chunkData.clear();
         }
       }
     }

@@ -68,7 +68,8 @@ public class CommandLineOptions {
           "  -snapshot <SCENE> [PNG] create a snapshot of the specified scene",
           "  -scene-dir <DIR>       use the directory DIR for loading/saving scenes",
           "  -threads <NUM>         use the specified number of threads for rendering",
-          "  -tile-width <NUM>      use the specified job tile width",
+          "  -tile-width <NUM>      use the specified tile width for rendering",
+          "  -spp-per-pass <NUM>    use the specified samples per pixel per pass for rendering",
           "  -target <NUM>          override target SPP to be NUM in headless mode",
           "  -set <NAME> <VALUE>    set a global configuration option and exit",
           "  -set <NAME> <VALUE> <SCENE>",
@@ -94,9 +95,18 @@ public class CommandLineOptions {
           "  --verbose             verbose logging in the launcher",
           "  --console             show the GUI console in headless mode");
 
+  /**
+   * True if any command line option provided was invalid.
+   */
   protected boolean configurationError = false;
 
   protected Mode mode = Mode.DEFAULT;
+
+  /**
+   * Exit code to exit the application with if mode is DEFAULT
+   * (i.e. if the argument handlers did all the work).
+   */
+  protected int exitCode = 0;
 
   protected ChunkyOptions options = ChunkyOptions.getDefaults();
 
@@ -164,7 +174,7 @@ public class CommandLineOptions {
           } else {
             throw new ArgumentError(String.format(
                 "Missing argument for %s option. Found %d arguments, expected %d.",
-                flag, i + 1, numOptions.start));
+                flag, i, numOptions.start));
           }
         }
         optionArguments.add(arguments.remove(0));
@@ -210,6 +220,9 @@ public class CommandLineOptions {
 
     registerOption("-tile-width", new Range(1),
         arguments -> options.tileWidth = Math.max(1, Integer.parseInt(arguments.get(0))));
+
+    registerOption("-spp-per-pass", new Range(1),
+        arguments -> options.sppPerPass = Math.max(1, Integer.parseInt(arguments.get(0))));
 
     registerOption("-version", new Range(0), arguments -> {
       mode = Mode.NOTHING;
@@ -327,10 +340,13 @@ public class CommandLineOptions {
         System.out.println("Done!");
       } catch (MalformedURLException e) {
         System.err.println("Malformed URL (" + e.getMessage() + ")");
+        exitCode = 1;
       } catch (FileNotFoundException e) {
         System.err.println("File not found (" + e.getMessage() + ")");
+        exitCode = 1;
       } catch (IOException e) {
         System.err.println("Download failed (" + e.getMessage() + ")");
+        exitCode = 1;
       }
     });
 
@@ -342,12 +358,14 @@ public class CommandLineOptions {
       if (!dumpfile.isFile()) {
         Log.error("Not a valid render dump file: " + dumpPath);
         configurationError = true;
+        exitCode = 1;
         return;
       }
       File sceneFile = options.getSceneDescriptionFile();
       if (!sceneFile.isFile()) {
         Log.error("Not a valid scene: " + options.sceneName);
         configurationError = true;
+        exitCode = 1;
         return;
       }
       try {
@@ -374,6 +392,7 @@ public class CommandLineOptions {
         }
       } catch (IOException e) {
         Log.error("Failed to merge render dump.", e);
+        exitCode = 1;
       }
     });
 

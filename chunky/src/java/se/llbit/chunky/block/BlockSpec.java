@@ -7,9 +7,11 @@ import java.util.LinkedList;
 import java.util.List;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
+import se.llbit.util.NbtUtil;
 import se.llbit.util.NotNull;
 
 public class BlockSpec {
+
   public static final List<BlockProvider> blockProviders = new LinkedList<>();
 
   private final Tag tag;
@@ -27,8 +29,7 @@ public class BlockSpec {
   }
 
   public void serialize(DataOutputStream out) throws IOException {
-    System.out.format("tag: 0x%08X %s%n", tag.hashCode(), tag.toString());
-    tag.write(out);
+    NbtUtil.safeSerialize(out, tag);
   }
 
   @Override
@@ -41,7 +42,9 @@ public class BlockSpec {
     return (obj instanceof BlockSpec) && ((BlockSpec) obj).tag.equals(tag);
   }
 
-  /** Converts NBT block data to Chunky block object. */
+  /**
+   * Converts NBT block data to Chunky block object.
+   */
   public Block toBlock() {
     String name = tag.get("Name").stringValue("unknown:unknown");
     for (BlockProvider provider : blockProviders) {

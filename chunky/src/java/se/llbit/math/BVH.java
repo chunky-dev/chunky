@@ -1,4 +1,5 @@
-/* Copyright (c) 2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2014-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2014-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -23,6 +24,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Stack;
+import java.util.function.IntConsumer;
 
 /**
  * Bounding Volume Hierarchy based on AABBs.
@@ -43,10 +45,10 @@ public class BVH {
     SAH_MA,
   }
 
-
-  static abstract class Node {
-    protected final AABB bb;
-    protected final Primitive[] primitives;
+  /** Note: this is public for some plugins. Stability is not guaranteed. */
+  public static abstract class Node {
+    public final AABB bb;
+    public final Primitive[] primitives;
 
     /**
      * Create a new BVH node.
@@ -71,10 +73,10 @@ public class BVH {
     abstract public int size();
   }
 
-
-  static class Group extends Node {
-    protected final Node child1;
-    protected final Node child2;
+  /** Note: this is public for some plugins. Stability is not guaranteed. */
+  public static class Group extends Node {
+    public final Node child1;
+    public final Node child2;
     private final int numPrimitives;
 
     /**
@@ -125,8 +127,8 @@ public class BVH {
     }
   }
 
-
-  static class Leaf extends Node {
+  /** Note: this is public for some plugins. Stability is not guaranteed. */
+  public static class Leaf extends Node {
 
     public Leaf(Primitive[] primitives) {
       super(primitives);
@@ -202,18 +204,22 @@ public class BVH {
   /**
    * Construct a new BVH containing the given primitives.
    */
-  public BVH(List<Primitive> primitives) {
+  public BVH(List<Primitive> primitives, IntConsumer task) {
     switch (METHOD) {
       case MIDPOINT:
-        root = constructMidpointSplit(primitives.toArray(new Primitive[primitives.size()]));
+        root = constructMidpointSplit(primitives.toArray(new Primitive[primitives.size()]), task);
         break;
       case SAH:
-        root = constructSAH(primitives.toArray(new Primitive[primitives.size()]));
+        root = constructSAH(primitives.toArray(new Primitive[primitives.size()]), task);
         break;
       case SAH_MA:
-        root = constructSAH_MA(primitives.toArray(new Primitive[primitives.size()]));
+        root = constructSAH_MA(primitives.toArray(new Primitive[primitives.size()]), task);
         break;
     }
+  }
+
+  public BVH(List<Primitive> primitives) {
+    this(primitives, i -> {});
   }
 
   enum Action {
@@ -226,7 +232,9 @@ public class BVH {
    *
    * @return root node of constructed BVH
    */
-  private Node constructMidpointSplit(Primitive[] primitives) {
+  private Node constructMidpointSplit(Primitive[] primitives, IntConsumer task) {
+    int progress = 0;
+
     Stack<Node> nodes = new Stack<>();
     Stack<Action> actions = new Stack<>();
     Stack<Primitive[]> chunks = new Stack<>();
@@ -240,6 +248,9 @@ public class BVH {
         Primitive[] chunk = chunks.pop();
         if (chunk.length < SPLIT_LIMIT) {
           nodes.push(new Leaf(chunk));
+
+          progress += chunk.length;
+          task.accept(progress);
         } else {
           splitMidpointMajorAxis(chunk, actions, chunks);
         }
@@ -298,7 +309,9 @@ public class BVH {
    *
    * @return root node of constructed BVH
    */
-  private Node constructSAH(Primitive[] primitives) {
+  private Node constructSAH(Primitive[] primitives, IntConsumer task) {
+    int progress = 0;
+
     Stack<Node> nodes = new Stack<>();
     Stack<Action> actions = new Stack<>();
     Stack<Primitive[]> chunks = new Stack<>();
@@ -312,6 +325,9 @@ public class BVH {
         Primitive[] chunk = chunks.pop();
         if (chunk.length < SPLIT_LIMIT) {
           nodes.push(new Leaf(chunk));
+
+          progress += chunk.length;
+          task.accept(progress);
         } else {
           splitSAH(chunk, actions, chunks);
         }
@@ -325,7 +341,9 @@ public class BVH {
    *
    * @return root node of constructed BVH
    */
-  private Node constructSAH_MA(Primitive[] primitives) {
+  private Node constructSAH_MA(Primitive[] primitives, IntConsumer task) {
+    int progress = 0;
+
     Stack<Node> nodes = new Stack<>();
     Stack<Action> actions = new Stack<>();
     Stack<Primitive[]> chunks = new Stack<>();
@@ -339,6 +357,9 @@ public class BVH {
         Primitive[] chunk = chunks.pop();
         if (chunk.length < SPLIT_LIMIT) {
           nodes.push(new Leaf(chunk));
+
+          progress += chunk.length;
+          task.accept(progress);
         } else {
           splitSAH_MA(chunk, actions, chunks);
         }
@@ -538,4 +559,7 @@ public class BVH {
     return root.bb.hitTest(ray) && root.anyIntersection(ray);
   }
 
+  public Node getRoot() {
+    return root;
+  }
 }

@@ -65,8 +65,11 @@ public class PngFileWriter implements AutoCloseable {
    * Writes the IEND chunk and closes the stream.
    */
   @Override public void close() throws IOException {
-    writeChunk(new IEND());
-    out.close();
+    try {
+      writeChunk(new IEND());
+    } finally {
+      out.close();
+    }
   }
 
   /**
@@ -150,17 +153,18 @@ public class PngFileWriter implements AutoCloseable {
     private void writeChunk() throws IOException {
       out.writeInt(outputSize);
 
-      CrcOutputStream crcOut = new CrcOutputStream();
-      DataOutputStream crc = new DataOutputStream(crcOut);
+      try (
+        CrcOutputStream crcOut = new CrcOutputStream();
+        DataOutputStream crc = new DataOutputStream(crcOut);
+      ) {
+        crc.writeInt(IDAT.CHUNK_TYPE);
+        out.writeInt(IDAT.CHUNK_TYPE);
 
-      crc.writeInt(IDAT.CHUNK_TYPE);
-      out.writeInt(IDAT.CHUNK_TYPE);
+        crc.write(outputBuf, 0, outputSize);
+        out.write(outputBuf, 0, outputSize);
 
-      crc.write(outputBuf, 0, outputSize);
-      out.write(outputBuf, 0, outputSize);
-
-      out.writeInt(crcOut.getCRC());
-      crc.close();
+        out.writeInt(crcOut.getCRC());
+      }
 
       outputSize = 0;
     }

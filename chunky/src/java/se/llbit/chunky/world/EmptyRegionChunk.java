@@ -17,11 +17,10 @@
 package se.llbit.chunky.world;
 
 import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.MapTile;
-import se.llbit.nbt.CompoundTag;
-
-import java.util.Collection;
 
 /**
  * Empty or non-existent chunk.
@@ -46,16 +45,13 @@ public class EmptyRegionChunk extends Chunk {
     surface = IconLayer.CORRUPT;
   }
 
-  @Override public synchronized void getBlockData(int[] blocks, byte[] biomes,
-      Collection<CompoundTag> tileEntities, Collection<CompoundTag> entities,
-      BlockPalette palette) {
-    for (int i = 0; i < X_MAX * Y_MAX * Z_MAX; ++i) {
-      blocks[i] = 0;
+  @Override public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette) {
+    if (reuseChunkData == null) {
+      reuseChunkData = EmptyChunkData.INSTANCE;
+    } else {
+      reuseChunkData.clear();
     }
-
-    for (int i = 0; i < X_MAX * Z_MAX; ++i) {
-      biomes[i] = 0;
-    }
+    return reuseChunkData;
   }
 
   @Override public void renderSurface(MapTile tile) {
@@ -88,7 +84,7 @@ public class EmptyRegionChunk extends Chunk {
     // do nothing
   }
 
-  @Override public synchronized void loadChunk() {
+  @Override public synchronized void loadChunk(ChunkData chunkData, int yMax) {
     // do nothing
   }
 

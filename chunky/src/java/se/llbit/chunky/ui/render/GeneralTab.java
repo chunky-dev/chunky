@@ -32,7 +32,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
-import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.RenderController;
@@ -41,7 +40,11 @@ import se.llbit.chunky.ui.ChunkyFxController;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderCanvasFx;
 import se.llbit.chunky.ui.RenderControlsFxController;
+import se.llbit.chunky.ui.SilentNumberStringConverter;
+import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Icon;
+import se.llbit.chunky.world.World;
+import se.llbit.fxutil.Dialogs;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.log.Log;
@@ -113,6 +116,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     biomeColors.setSelected(scene.biomeColorsEnabled());
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
     reloadChunks.setDisable(scene.numberOfChunks() == 0);
+    loadSelectedChunks.setDisable(mapLoader.getWorld() instanceof EmptyWorld || mapLoader.getWorld() == null);
   }
 
   @Override public String getTabTitle() {
@@ -153,7 +157,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
 
     restoreDefaults.setOnAction(
         event -> {
-          Alert alert = new Alert(AlertType.CONFIRMATION);
+          Alert alert = Dialogs.createAlert(AlertType.CONFIRMATION);
           alert.setTitle("Restore default settings");
           alert.setContentText("Do you really want to reset all scene settings?");
           if (alert.showAndWait().get() == ButtonType.OK) {
@@ -173,7 +177,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
       scene.setBiomeColorsEnabled(newValue);
     });
-    dumpFrequency.setConverter(new NumberStringConverter());
+    dumpFrequency.setConverter(new SilentNumberStringConverter());
     dumpFrequency.getItems().addAll(50, 100, 500, 1000, 2500, 5000);
     dumpFrequency.setValue(Scene.DEFAULT_DUMP_FREQUENCY);
     dumpFrequency.setEditable(true);
@@ -202,14 +206,12 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     canvasSize.setEditable(true);
     canvasSize.getItems().addAll("400x400", "1024x768", "960x540", "1920x1080");
     canvasSize.valueProperty().addListener(canvasSizeListener);
-    yMax.setRange(0, 256);
     yMax.setTooltip(
         "Blocks above this Y value are not loaded. Requires reloading chunks to take effect.");
     yMax.onValueChange(value -> {
       scene.setYClipMax(value);
       renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
     });
-    yMin.setRange(0, 256);
     yMin.setTooltip(
         "Blocks below this Y value are not loaded. Requires reloading chunks to take effect.");
     yMin.onValueChange(value -> {
@@ -289,7 +291,22 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     this.renderControls = controls;
     this.chunkyFxController = controls.getChunkyController();
     this.mapLoader = chunkyFxController.getMapLoader();
+    mapLoader.addWorldLoadListener((world, reloaded) -> {
+      loadSelectedChunks.setDisable(world instanceof EmptyWorld || world == null);
+    });
+    mapLoader.addWorldLoadListener((world, reloaded) -> updateYClipSlidersRanges(world));
+    updateYClipSlidersRanges(mapLoader.getWorld());
     this.controller = controls.getRenderController();
     this.scene = this.controller.getSceneManager().getScene();
+  }
+
+  private void updateYClipSlidersRanges(World world) {
+    if (world != null && world.getVersionId() >= World.VERSION_21W06A) {
+      yMin.setRange(-64, 320);
+      yMax.setRange(-64, 320);
+    } else {
+      yMin.setRange(0, 256);
+      yMax.setRange(0, 256);
+    }
   }
 }

@@ -30,10 +30,12 @@ public class GrassModel {
       if (ray.n.y == -1) {
         // Bottom face.
         Texture.dirt.getColor(ray);
+        ray.color.w = 1;
         ray.t = ray.tNext;
       } else if (ray.n.y == 0 && (ray.getCurrentData() & (1 << 8)) != 0) {
         // Snowy side face.
         Texture.snowSide.getColor(ray);
+        ray.color.w = 1;
         ray.t = ray.tNext;
       } else {
         float[] color;

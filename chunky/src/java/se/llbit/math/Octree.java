@@ -1,4 +1,5 @@
-/* Copyright (c) 2010-2019 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2010-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -20,15 +21,19 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
+import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import org.apache.commons.math3.util.FastMath;
 
-import org.apache.commons.math3.util.Pair;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.model.WaterModel;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
 import se.llbit.log.Log;
@@ -36,12 +41,21 @@ import se.llbit.log.Log;
 /**
  * A simple voxel Octree.
  *
+ * An octree is like a binary tree, except instead of being "bi"nary, it is an
+ * "oct"tree, where each parent node has eight children instead of two. Octrees
+ * are better suited for 3d scenes such as storing voxels (since subdividing a
+ * cube gives 8 cubes of half the side length.)
+ *
+ * In this class, blocks are stored such that a ray that is traversing the scene
+ * can determine what block it is in or will hit in O(log(n)) time.
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class Octree {
 
   public interface OctreeImplementation {
     void set(int type, int x, int y, int z);
+    @Deprecated
     void set(Node data, int x, int y, int z);
     Node get(int x, int y, int z);
     Material getMaterial(int x, int y, int z, BlockPalette palette);
@@ -52,10 +66,11 @@ public class Octree {
     boolean isBranch(NodeId node);
     NodeId getChild(NodeId parent, int childNo);
     int getType(NodeId node);
+    @Deprecated
     int getData(NodeId node);
     default void startFinalization() {}
     default void endFinalization() {}
-    default Pair<NodeId, Integer> getWithLevel(int x, int y, int z) {
+    default void getWithLevel(IntIntMutablePair outTypeAndLevel, int x, int y, int z) {
       NodeId node = getRoot();
       int level = getDepth();
       while(isBranch(node)) {
@@ -65,7 +80,34 @@ public class Octree {
         int lz = z >>> level;
         node = getChild(node, (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)));
       }
-      return new Pair<>(node, level);
+      outTypeAndLevel.right(level).left(getType(node));
+    }
+
+    /**
+     * Set a whole 2^n * 2^n * 2^n cube of blocks
+     * @param cubeDepth the n
+     * @param types a flat array representation of a 3d array of the types to insert indexed by z then y then x
+     * @param x the x of the position of the mi corner of the cube
+     * @param y the y of the position of the mi corner of the cube
+     * @param z the z of the position of the mi corner of the cube
+     */
+    default void setCube(int cubeDepth, int[] types, int x, int y, int z) {
+      // Default implementation sets block one by one
+      int size = 1 << cubeDepth;
+      assert x % size == 0;
+      assert y % size == 0;
+      assert z % size == 0;
+      for(int localZ = 0; localZ < size; ++localZ) {
+        for(int localY = 0; localY < size; ++localY) {
+          for(int localX = 0; localX < size; ++localX) {
+            int globalX = x + localX;
+            int globalY = y + localY;
+            int globalZ = z + localZ;
+            int index = (localZ * size + localY) * size + localX;
+            set(types[index], globalX, globalY, globalZ);
+          }
+        }
+      }
     }
   }
 
@@ -202,6 +244,7 @@ public class Octree {
       }
     }
 
+    @Deprecated
     public int getData() {
       return 0;
     }
@@ -217,7 +260,9 @@ public class Octree {
 
   /**
    * An octree node with extra data.
+   * @deprecated Not used anymore, only kept for compatibility with plugins
    */
+  @Deprecated
   static public final class DataNode extends Node {
     final int data;
 
@@ -315,7 +360,7 @@ public class Octree {
   /**
    * @return The voxel type at the given coordinates
    */
-  public synchronized Node get(int x, int y, int z) {
+  public Node get(int x, int y, int z) {
     return implementation.get(x, y, z);
   }
 
@@ -452,15 +497,29 @@ public class Octree {
 
     int depth = implementation.getDepth();
 
+    double distance = 0;
+
+    // floating point division are slower than multiplication so we cache them
+    // We also try to limit the number of time the ray origin is updated
+    // as it would require to recompute those values
+    double invDx = 1 / ray.d.x;
+    double invDy = 1 / ray.d.y;
+    double invDz = 1 / ray.d.z;
+    double offsetX = -ray.o.x * invDx;
+    double offsetY = -ray.o.y * invDy;
+    double offsetZ = -ray.o.z * invDz;
+
+    IntIntMutablePair typeAndLevel = new IntIntMutablePair(0, 0);
+
     // Marching is done in a top-down fashion: at each step, the octree is descended from the root to find the leaf
     // node the ray is in. Terminating the march is then decided based on the block type in that leaf node. Finally the
     // ray is advanced to the boundary of the current leaf node and the next, ready for the next iteration.
     while (true) {
       // Add small offset past the intersection to avoid
       // recursion to the same octree node!
-      int x = (int) QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
-      int y = (int) QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
-      int z = (int) QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
+      int x = (int) Math.floor(ray.o.x + ray.d.x * (distance + Ray.OFFSET));
+      int y = (int) Math.floor(ray.o.y + ray.d.y * (distance + Ray.OFFSET));
+      int z = (int) Math.floor(ray.o.z + ray.d.z * (distance + Ray.OFFSET));
 
       int lx = x >>> depth;
       int ly = y >>> depth;
@@ -469,36 +528,56 @@ public class Octree {
       if (lx != 0 || ly != 0 || lz != 0)
         return false; // outside of octree!
 
-      Pair<NodeId, Integer> nodeAndLevel = implementation.getWithLevel(x, y, z);
-      NodeId node = nodeAndLevel.getFirst();
-      int level = nodeAndLevel.getSecond();
+      implementation.getWithLevel(typeAndLevel, x, y, z);
+      int type = typeAndLevel.leftInt();
+      int level = typeAndLevel.rightInt();
 
       lx = x >>> level;
       ly = y >>> level;
       lz = z >>> level;
 
       // Test intersection
-      Block currentBlock = palette.get(implementation.getType(node));
+      Block currentBlock = palette.get(type);
       Material prevBlock = ray.getCurrentMaterial();
 
       ray.setPrevMaterial(prevBlock, ray.getCurrentData());
-      ray.setCurrentMaterial(currentBlock, implementation.getData(node));
+      ray.setCurrentMaterial(currentBlock);
 
       if (currentBlock.localIntersect) {
+        // Other functions expect the ray origin to be in the block they test so here time
+        // to update it
+        // Updating the origin also means that new offsetX/offsetY/offsetZ must be computed
+        // but that is done a after the intersection test only if necessary
+        // and not if we are leaving the function anyway
+        ray.o.scaleAdd(distance, ray.d);
+        ray.distance += distance;
+        distance = 0;
         if (currentBlock.intersect(ray, scene)) {
           if (prevBlock != currentBlock)
             return true;
 
           ray.o.scaleAdd(Ray.OFFSET, ray.d);
+          offsetX = -ray.o.x * invDx;
+          offsetY = -ray.o.y * invDy;
+          offsetZ = -ray.o.z * invDz;
           continue;
         } else {
           // Exit ray from this local block.
-          ray.setCurrentMaterial(Air.INSTANCE, 0); // Current material is air.
+          ray.setCurrentMaterial(Air.INSTANCE); // Current material is air.
           ray.exitBlock(x, y, z);
+          offsetX = -ray.o.x * invDx;
+          offsetY = -ray.o.y * invDy;
+          offsetZ = -ray.o.z * invDz;
           continue;
         }
       } else if (!currentBlock.isSameMaterial(prevBlock) && currentBlock != Air.INSTANCE) {
+        // Origin and distance of ray need to be updated
+        ray.o.scaleAdd(distance, ray.d);
+        ray.distance += distance;
         TexturedBlockModel.getIntersectionColor(ray);
+        if (currentBlock.opaque) {
+          ray.color.w = 1;
+        }
         return true;
       }
 
@@ -507,51 +586,49 @@ public class Octree {
       double tNear = Double.POSITIVE_INFINITY;
 
       // Testing all six sides of the current leaf node and advancing to the closest intersection
-      double t = ((lx << level) - ray.o.x) / ray.d.x;
-      if (t > Ray.EPSILON) {
+      // Every side is unconditionally tested because the origin of the ray can be outside the block
+      // The computation involves a multiplication and an addition so we could use a fma (need java 9+)
+      // but according to measurement, performance are identical
+      double t = (lx << level) * invDx + offsetX;
+      if (t > distance + Ray.EPSILON) {
         tNear = t;
         nx = 1;
-        ny = nz = 0;
-      } else {
-        t = (((lx + 1) << level) - ray.o.x) / ray.d.x;
-        if (t < tNear && t > Ray.EPSILON) {
-          tNear = t;
-          nx = -1;
-          ny = nz = 0;
-        }
+      }
+      t = ((lx + 1) << level) * invDx + offsetX;
+      if (t < tNear && t > distance + Ray.EPSILON) {
+        tNear = t;
+        nx = -1;
       }
 
-      t = ((ly << level) - ray.o.y) / ray.d.y;
-      if (t < tNear && t > Ray.EPSILON) {
+      t = (ly << level) * invDy + offsetY;
+      if (t < tNear && t > distance + Ray.EPSILON) {
         tNear = t;
         ny = 1;
-        nx = nz = 0;
-      } else {
-        t = (((ly + 1) << level) - ray.o.y) / ray.d.y;
-        if (t < tNear && t > Ray.EPSILON) {
-          tNear = t;
-          ny = -1;
-          nx = nz = 0;
-        }
+        nx = 0;
+      }
+      t = ((ly + 1) << level) * invDy + offsetY;
+      if (t < tNear && t > distance + Ray.EPSILON) {
+        tNear = t;
+        ny = -1;
+        nx = 0;
       }
 
-      t = ((lz << level) - ray.o.z) / ray.d.z;
-      if (t < tNear && t > Ray.EPSILON) {
+      t = (lz << level) * invDz + offsetZ;
+      if (t < tNear && t > distance + Ray.EPSILON) {
         tNear = t;
         nz = 1;
         nx = ny = 0;
-      } else {
-        t = (((lz + 1) << level) - ray.o.z) / ray.d.z;
-        if (t < tNear && t > Ray.EPSILON) {
-          tNear = t;
-          nz = -1;
-          nx = ny = 0;
-        }
+      }
+      t = ((lz + 1) << level) * invDz + offsetZ;
+      if (t < tNear && t > distance + Ray.EPSILON) {
+        tNear = t;
+        nz = -1;
+        nx = ny = 0;
       }
 
-      ray.o.scaleAdd(tNear, ray.d);
       ray.n.set(nx, ny, nz);
-      ray.distance += tNear;
+
+      distance = tNear;
     }
   }
 
@@ -568,6 +645,8 @@ public class Octree {
     // Marching is done in a top-down fashion: at each step, the octree is descended from the root to find the leaf
     // node the ray is in. Terminating the march is then decided based on the block type in that leaf node. Finally the
     // ray is advanced to the boundary of the current leaf node and the next, ready for the next iteration.
+
+    IntIntMutablePair typeAndLevel = new IntIntMutablePair(0, 0);
     while (true) {
       // Add small offset past the intersection to avoid
       // recursion to the same octree node!
@@ -583,38 +662,41 @@ public class Octree {
         return false; // outside of octree!
 
       // Descend the tree to find the current leaf node
-      Pair<NodeId, Integer> nodeAndLevel = implementation.getWithLevel(x, y, z);
-      NodeId node = nodeAndLevel.getFirst();
-      int level = nodeAndLevel.getSecond();
+      implementation.getWithLevel(typeAndLevel, x, y, z);
+      int type = typeAndLevel.leftInt();
+      int level = typeAndLevel.rightInt();
 
       lx = x >>> level;
       ly = y >>> level;
       lz = z >>> level;
 
       // Test intersection
-      Block currentBlock = palette.get(implementation.getType(node));
+      Block currentBlock = palette.get(type);
       Material prevBlock = ray.getCurrentMaterial();
 
       ray.setPrevMaterial(prevBlock, ray.getCurrentData());
-      ray.setCurrentMaterial(currentBlock, implementation.getData(node));
+      ray.setCurrentMaterial(currentBlock);
 
       if (!currentBlock.isWater()) {
         if (currentBlock.localIntersect) {
           if (!currentBlock.intersect(ray, scene)) {
-            ray.setCurrentMaterial(Air.INSTANCE, 0);
+            ray.setCurrentMaterial(Air.INSTANCE);
           }
           return true;
         } else if (currentBlock != Air.INSTANCE) {
           TexturedBlockModel.getIntersectionColor(ray);
+          if (currentBlock.opaque) {
+            ray.color.w = 1;
+          }
           return true;
         } else {
           return true;
         }
       }
 
-      if ((implementation.getData(node) & (1 << Water.FULL_BLOCK)) == 0) {
+      if (!(currentBlock instanceof Water && ((Water) currentBlock).isFullBlock())) {
         if (WaterModel.intersectTop(ray)) {
-          ray.setCurrentMaterial(Air.INSTANCE, 0);
+          ray.setCurrentMaterial(Air.INSTANCE);
           return true;
         } else {
           ray.exitBlock(x, y, z);
@@ -701,6 +783,10 @@ public class Octree {
     implementation.endFinalization();
   }
 
+  public void setCube(int cubeDepth, int[] types, int x, int y, int z) {
+    implementation.setCube(cubeDepth, types, x, y, z);
+  }
+
   /**
    * Switch between any two implementation by reusing the load and store methods of
    * the octree implementations
@@ -721,17 +807,21 @@ public class Octree {
     // and reload it with another implementation
     long nodeCount = implementation.nodeCount();
     File tempFile = File.createTempFile("octree-conversion", ".bin");
-    DataOutputStream out = new DataOutputStream(new FileOutputStream(tempFile));
-    implementation.store(out);
-    out.flush();
-    out.close();
+    try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new FileOutputStream(tempFile)))) {
+      implementation.store(out);
+    }
     implementation = null; // Allow th gc to free memory during construction of the new octree
 
-    DataInputStream in = new DataInputStream(new FileInputStream(tempFile));
-    implementation = factory.loadWithNodeCount(nodeCount, in);
-    in.close();
+    try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new FileInputStream(tempFile)))) {
+      implementation = factory.loadWithNodeCount(nodeCount, in);
+    }
 
     tempFile.delete();
+  }
+
+  @PluginApi
+  public OctreeImplementation getImplementation() {
+    return implementation;
   }
 
   public static void addImplementationFactory(String name, ImplementationFactory factory) {

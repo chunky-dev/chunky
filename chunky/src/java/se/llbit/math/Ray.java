@@ -18,6 +18,8 @@ package se.llbit.math;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.Lava;
+import se.llbit.chunky.block.Water;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Material;
@@ -31,9 +33,9 @@ import java.util.Random;
  */
 public class Ray {
 
-  public static final double EPSILON = 0.000005;
+  public static final double EPSILON = 0.00000005;
 
-  public static final double OFFSET = 0.0001;
+  public static final double OFFSET = 0.000001;
 
   /**
    * Ray direction.
@@ -51,8 +53,8 @@ public class Ray {
   public Vector3 n = new Vector3();
 
   /**
-   * Distance traveled in current medium. This is updated after all intersection
-   * tests have run and the final t value has been found.
+   * Distance traveled in current medium. This is updated after all intersection tests have run and
+   * the final t value has been found.
    */
   public double distance;
 
@@ -97,9 +99,9 @@ public class Ray {
   public double t;
 
   /**
-   * Distance to next potential intersection. The tNext value is stored by
-   * subroutines when calculating a potential next hit point. This can then be
-   * stored in the t variable based on further decision making.
+   * Distance to next potential intersection. The tNext value is stored by subroutines when
+   * calculating a potential next hit point. This can then be stored in the t variable based on
+   * further decision making.
    */
   public double tNext;
 
@@ -163,8 +165,7 @@ public class Ray {
   }
 
   /**
-   * The block data value is a 4-bit integer value describing properties of the
-   * current block.
+   * The block data value is a 4-bit integer value describing properties of the current block.
    *
    * @return current block data (sometimes called metadata).
    */
@@ -185,8 +186,8 @@ public class Ray {
   }
 
   /**
-   * Find the exit point from the given block for this ray. This marches the ray
-   * forward - i.e. updates ray origin directly.
+   * Find the exit point from the given block for this ray. This marches the ray forward - i.e.
+   * updates ray origin directly.
    *
    * @param bx block x coordinate
    * @param by block y coordinate
@@ -259,6 +260,13 @@ public class Ray {
   }
 
   /**
+   * @return water color for the current block
+   */
+  public float[] getBiomeWaterColor(Scene scene) {
+    return scene.getWaterColor((int) (o.x + d.x * OFFSET), (int) (o.z + d.z * OFFSET));
+  }
+
+  /**
    * Set this ray to a random diffuse reflection of the input ray.
    */
   public final void diffuseReflection(Ray ray, Random random) {
@@ -316,11 +324,75 @@ public class Ray {
   /**
    * Set this ray to the specular reflection of the input ray.
    */
-  public final void specularReflection(Ray ray) {
+  public final void specularReflection(Ray ray, Random random) {
     set(ray);
-    d.scaleAdd(-2 * ray.d.dot(ray.n), ray.n, ray.d);
-    o.scaleAdd(0.00001, ray.n);
     currentMaterial = prevMaterial;
+
+    double roughness = ray.getCurrentMaterial().roughness;
+    if (roughness > Ray.EPSILON) {
+      // For rough specular reflections, we interpolate linearly between the diffuse ray direction and the specular direction,
+      // which is inspired by https://blog.demofox.org/2020/06/06/casual-shadertoy-path-tracing-2-image-improvement-and-glossy-reflections/
+      // This gives good-looking results, although a microfacet-based model would be more physically correct.
+
+      // 1. get specular reflection direction
+      Vector3 specularDirection = new Vector3(d);
+      specularDirection.scaleAdd(-2 * ray.d.dot(ray.n), ray.n, ray.d);
+
+      // 2. get diffuse reflection direction (stored in this.d)
+      // get random point on unit disk
+      double x1 = random.nextDouble();
+      double x2 = random.nextDouble();
+      double r = FastMath.sqrt(x1);
+      double theta = 2 * Math.PI * x2;
+
+      // project to point on hemisphere in tangent space
+      double tx = r * FastMath.cos(theta);
+      double ty = r * FastMath.sin(theta);
+      double tz = FastMath.sqrt(1 - x1);
+
+      // transform from tangent space to world space
+      double xx, xy, xz;
+      double ux, uy, uz;
+      double vx, vy, vz;
+
+      if (QuickMath.abs(n.x) > .1) {
+        xx = 0;
+        xy = 1;
+        xz = 0;
+      } else {
+        xx = 1;
+        xy = 0;
+        xz = 0;
+      }
+
+      ux = xy * n.z - xz * n.y;
+      uy = xz * n.x - xx * n.z;
+      uz = xx * n.y - xy * n.x;
+
+      r = 1 / FastMath.sqrt(ux * ux + uy * uy + uz * uz);
+
+      ux *= r;
+      uy *= r;
+      uz *= r;
+
+      vx = uy * n.z - uz * n.y;
+      vy = uz * n.x - ux * n.z;
+      vz = ux * n.y - uy * n.x;
+
+      d.x = ux * tx + vx * ty + n.x * tz;
+      d.y = uy * tx + vy * ty + n.y * tz;
+      d.z = uz * tx + vz * ty + n.z * tz;
+
+      // 3. scale d to be roughness * dDiffuse + (1 - roughness) * dSpecular
+      d.scale(roughness);
+      d.scaleAdd(1 - roughness, specularDirection);
+      d.normalize();
+      o.scaleAdd(0.00001, d);
+    } else {
+      // roughness is zero, do a specular reflection
+      d.scaleAdd(-2 * ray.d.dot(ray.n), ray.n, ray.d);
+      o.scaleAdd(0.00001, ray.n);
+    }
   }
 
   /**
@@ -377,6 +449,17 @@ public class Ray {
     this.prevData = data;
   }
 
+  public void setCurrentMaterial(Material mat) {
+    this.currentMaterial = mat;
+    if (mat instanceof Water) {
+      this.currentData = ((Water) mat).data;
+    } else if (mat instanceof Lava) {
+      this.currentData = ((Lava) mat).data;
+    } else {
+      this.currentData = 0;
+    }
+  }
+
   public void setCurrentMaterial(Material mat, int data) {
     this.currentMaterial = mat;
     this.currentData = data;
@@ -390,10 +473,24 @@ public class Ray {
     return currentMaterial;
   }
 
+  /**
+   * Get the data of the previous block. This used to contain the block data but as of Chunky 2,
+   * every block variant gets its own Block instance and this field is only used for water and lava
+   * levels.
+   *
+   * @return Data of the previous block (if water or lava), 0 otherwise
+   */
   public int getPrevData() {
     return prevData;
   }
 
+  /**
+   * Get the data of the current block. This used to contain the block data but as of Chunky 2,
+   * every block variant gets its own Block instance and this field is only used for water and lava
+   * levels.
+   *
+   * @return Data of the current block (if water or lava), 0 otherwise
+   */
   public int getCurrentData() {
     return currentData;
   }

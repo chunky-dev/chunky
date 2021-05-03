@@ -16,14 +16,12 @@
  */
 package se.llbit.chunky.model;
 
-import se.llbit.math.Quad;
-import se.llbit.math.Transform;
-import se.llbit.math.UVTriangle;
-import se.llbit.math.Vector3;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import se.llbit.math.Quad;
+import se.llbit.math.Transform;
+import se.llbit.math.Vector3;
 
 /**
  * Utility methods for quads and triangles.
@@ -31,6 +29,7 @@ import java.util.List;
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class Model {
+
   /**
    * @param src source quads
    * @return Quads rotated minus 90 degrees around the X axis
@@ -56,7 +55,7 @@ public class Model {
   }
 
   /**
-   * @param src   source quads
+   * @param src source quads
    * @return Quads rotated about the X axis by some angle
    */
   public static Quad[] rotateX(Quad[] src, double angle) {
@@ -68,16 +67,21 @@ public class Model {
   }
 
   /**
-   * @param src   source quads
-   * @return Quads rotated about the X axis by some angle
+   * @param src    source quads
+   * @param origin origin of the rotation axis, relative to  0,0,0 (the north/west/bottom corner of a block)
+   * @return Quads rotated about the X axis by some angle around the given origin
    */
   public static Quad[] rotateX(Quad[] src, double angle, Vector3 origin) {
     Quad[] rot = new Quad[src.length];
     for (int i = 0; i < src.length; ++i) {
-      rot[i] = src[i].transform(Transform.NONE
-              .translate(-origin.x + 0.5, -origin.y + 0.5, -origin.z + 0.5)
+      rot[i] = src[i]
+          .transform(Transform.NONE
+              .translate(-origin.x, -origin.y, -origin.z)
+              .translate(0.5, 0.5, 0.5)
               .rotateX(angle)
-              .translate(origin.x - 0.5, origin.y - 0.5, origin.z - 0.5));
+              .translate(origin)
+              .translate(-0.5, -0.5, -0.5)
+          );
     }
     return rot;
   }
@@ -121,24 +125,32 @@ public class Model {
 
   /**
    * @param src source quads
-   * @return UVTriangles rotated about the Y axis
-   */
-  public static UVTriangle[] rotateY(UVTriangle[] src) {
-    UVTriangle[] rot = new UVTriangle[src.length];
-    for (int i = 0; i < src.length; ++i) {
-      rot[i] = src[i].getYRotated();
-    }
-    return rot;
-  }
-
-  /**
-   * @param src   source quads
    * @return Quads rotated about the Y axis by some angle
    */
   public static Quad[] rotateY(Quad[] src, double angle) {
     Quad[] rot = new Quad[src.length];
     for (int i = 0; i < src.length; ++i) {
       rot[i] = src[i].transform(Transform.NONE.rotateY(angle));
+    }
+    return rot;
+  }
+
+  /**
+   * @param src    source quads
+   * @param origin origin of the rotation axis, relative to 0,0,0 (the north/west/bottom corner of a block)
+   * @return Quads rotated about the Y axis by some angle around the given origin
+   */
+  public static Quad[] rotateY(Quad[] src, double angle, Vector3 origin) {
+    Quad[] rot = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i]
+          .transform(Transform.NONE
+              .translate(-origin.x, -origin.y, -origin.z)
+              .translate(0.5, 0.5, 0.5)
+              .rotateY(angle)
+              .translate(origin)
+              .translate(-0.5, -0.5, -0.5)
+          );
     }
     return rot;
   }
@@ -156,13 +168,33 @@ public class Model {
   }
 
   /**
-   * @param src   source quads
+   * @param src source quads
    * @return Quads rotated about the Z axis by some angle
    */
   public static Quad[] rotateZ(Quad[] src, double angle) {
     Quad[] rot = new Quad[src.length];
     for (int i = 0; i < src.length; ++i) {
       rot[i] = src[i].transform(Transform.NONE.rotateZ(angle));
+    }
+    return rot;
+  }
+
+  /**
+   * @param src    source quads
+   * @param origin origin of the rotation axis, relative to 0,0,0 (the north/west/bottom corner of a block)
+   * @return Quads rotated about the Z axis by some angle around the given origin
+   */
+  public static Quad[] rotateZ(Quad[] src, double angle, Vector3 origin) {
+    Quad[] rot = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i]
+          .transform(Transform.NONE
+              .translate(-origin.x, -origin.y, -origin.z)
+              .translate(0.5, 0.5, 0.5)
+              .rotateZ(angle)
+              .translate(origin)
+              .translate(-0.5, -0.5, -0.5)
+          );
     }
     return rot;
   }
@@ -183,7 +215,7 @@ public class Model {
   }
 
   /**
-   * @param src   source quads
+   * @param src source quads
    * @return Scaled copies of the source quads
    */
   public static Quad[] scale(Quad[] src, double scale) {

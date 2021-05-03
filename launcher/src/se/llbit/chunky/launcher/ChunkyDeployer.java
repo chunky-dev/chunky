@@ -80,11 +80,11 @@ public final class ChunkyDeployer {
     }
 
     // Check version.
-    try {
+    try (
       FileInputStream in = new FileInputStream(versionFile);
-      JsonParser parser = new JsonParser(in);
+      JsonParser parser = new JsonParser(in)
+    ) {
       JsonObject obj = parser.parse().object();
-      in.close();
       String versionName = obj.get("name").stringValue("");
       if (!versionName.equals(version)) {
         System.err.println("Stored version name does not match file name");
@@ -157,11 +157,11 @@ public final class ChunkyDeployer {
 
     for (File versionFile : versionFiles) {
       if (versionFile.getName().endsWith(".json")) {
-        try {
+        try (
           FileInputStream in = new FileInputStream(versionFile);
-          JsonParser parser = new JsonParser(in);
+          JsonParser parser = new JsonParser(in)
+        ) {
           versions.add(new VersionInfo(parser.parse().object()));
-          in.close();
         } catch (IOException e) {
           System.err.println("Could not read version info file: " + e.getMessage());
         } catch (SyntaxError e) {
@@ -217,15 +217,16 @@ public final class ChunkyDeployer {
    */
   private static void unpackLibrary(ClassLoader parentCL, String name, File dest)
       throws IOException {
-
-    BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dest));
-    InputStream in = parentCL.getResourceAsStream(name);
-    byte[] buffer = new byte[4096];
-    int len;
-    while ((len = in.read(buffer)) != -1) {
-      out.write(buffer, 0, len);
+    try (
+      BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dest));
+      InputStream in = parentCL.getResourceAsStream(name)
+    ) {
+      byte[] buffer = new byte[4096];
+      int len;
+      while ((len = in.read(buffer)) != -1) {
+        out.write(buffer, 0, len);
+      }
     }
-    out.close();
   }
 
   /** Gets the version info descriptor for the Chunky version embedded in this Jar. */

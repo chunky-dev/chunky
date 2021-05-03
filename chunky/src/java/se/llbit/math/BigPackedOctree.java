@@ -1,7 +1,24 @@
+/* Copyright (c) 2020-2021 Chunky contributors
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package se.llbit.math;
 
 import se.llbit.chunky.block.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.world.Material;
 
 import java.io.DataInputStream;
@@ -26,8 +43,9 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
    *    and the lower 32 bits are the node data (that way, for a leaf node the sign bit will be set
    *    and the long can simply be compared with 0 to determine if it is a branch or a leaf)
    *
+   * Note: This is public for some plugins. Stability is not guaranteed.
    */
-  private ArrayList<long[]> treeData = new ArrayList<>();
+  public ArrayList<long[]> treeData = new ArrayList<>();
 
   /**
    * The max size of an array we allow is a bit less than the max value an integer can have
@@ -91,7 +109,7 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
 
   @Override
   public int getData(Octree.NodeId node) {
-    return dataFromValue(getAt(((NodeId)node).nodeIndex));
+    return 0;
   }
 
   /**
@@ -141,15 +159,11 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
   }
 
   private static int typeFromValue(long value) {
-    return -(int) ((value & 0xFFFFFFFF00000000L) >> 32);
+    return -(int) (value);
   }
 
-  private static int dataFromValue(long value) {
-    return (int) (value & 0xFFFFFFFFL);
-  }
-
-  private static long valueFromTypeData(int type, int data) {
-    return (long)(-type) << 32 | data;
+  private static long valueFromType(int type) {
+    return (long)(-type);
   }
 
   /**
@@ -277,8 +291,7 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
     if(firstIsBranch && secondIsBranch)
       return false;
     else if(!firstIsBranch && !secondIsBranch)
-      return typeFromValue(value1) == secondNode.type // compare types
-              && dataFromValue(value1) == secondNode.getData(); // compare data
+      return typeFromValue(value1) == secondNode.type; // compare types
     return false;
   }
 
@@ -311,7 +324,7 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
 
     }
     long finalNodeIndex = getAt(parents[0]) + position;
-    setAt(finalNodeIndex, valueFromTypeData(data.type, data.getData()));
+    setAt(finalNodeIndex, valueFromType(data.type));
 
     // Merge nodes where all children have been set to the same type.
     for (int i = 0; i <= parentLevel; ++i) {
@@ -351,7 +364,7 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
   public Octree.Node get(int x, int y, int z) {
     long nodeIndex = getNodeIndex(x, y, z);
     long value = getAt(nodeIndex);
-    Octree.Node node = new Octree.DataNode(value > 0 ? BRANCH_NODE : typeFromValue(value), dataFromValue(value));
+    Octree.Node node = new Octree.Node(value > 0 ? BRANCH_NODE : typeFromValue(value));
 
     // Return dummy Node, will work if only type and data are used, breaks if children are needed
     return node;
@@ -403,10 +416,10 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
       }
     } else {
       if ((type & DATA_FLAG) == 0) {
-        setAt(nodeIndex, valueFromTypeData(type, 0));
+        setAt(nodeIndex, valueFromType(type));
       } else {
         int data = in.readInt();
-        setAt(nodeIndex, valueFromTypeData(type ^ DATA_FLAG, 0));
+        setAt(nodeIndex, valueFromType(type ^ DATA_FLAG));
       }
     }
   }
@@ -414,19 +427,11 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
   private void storeNode(DataOutputStream out, long nodeIndex) throws IOException {
     long value = getAt(nodeIndex);
     int type = value > 0 ? BRANCH_NODE : typeFromValue(value);
+    out.writeInt(type);
     if(type == BRANCH_NODE) {
-      out.writeInt(type);
       for(int i = 0; i < 8; ++i) {
         long childIndex = getAt(nodeIndex) + i;
         storeNode(out, childIndex);
-      }
-    } else {
-      boolean isDataNode = (dataFromValue(value) != 0);
-      if(isDataNode) {
-        out.writeInt(type | DATA_FLAG);
-        out.writeInt(dataFromValue(value));
-      } else {
-        out.writeInt(type);
       }
     }
   }
@@ -456,7 +461,6 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
   private void finalizationNode(long nodeIndex) {
     boolean canMerge = true;
     int mergedType = ANY_TYPE;
-    int mergedData = 0;
     for(int i = 0; i < 8; ++i) {
       long childIndex = getAt(nodeIndex) + i;
       if(getAt(childIndex) > 0) {
@@ -470,14 +474,13 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
         if(mergedType == ANY_TYPE) {
           long value = getAt(childIndex);
           mergedType = typeFromValue(value);
-          mergedData = dataFromValue(value);
-        } else if(!(typeFromValue(getAt(childIndex)) == ANY_TYPE || getAt(childIndex) == valueFromTypeData(mergedType, mergedData))) {
+        } else if(!(typeFromValue(getAt(childIndex)) == ANY_TYPE || getAt(childIndex) == valueFromType(mergedType))) {
           canMerge = false;
         }
       }
     }
     if(canMerge) {
-      mergeNode(nodeIndex, valueFromTypeData(mergedType, mergedData));
+      mergeNode(nodeIndex, valueFromType(mergedType));
     }
   }
 

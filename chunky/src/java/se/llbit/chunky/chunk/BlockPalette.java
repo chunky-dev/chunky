@@ -1,18 +1,36 @@
+/* Copyright (c) 2019-2021 Chunky contributors
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package se.llbit.chunky.chunk;
 
 import se.llbit.chunky.block.*;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.math.Octree;
 import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.IntTag;
 import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 /**
@@ -22,6 +40,12 @@ import java.util.function.Consumer;
  * The numerical IDs are used to efficiently store the blocks in the octree.
  *
  * This class also manages material properties.
+ *
+ * <p>Before <code>{@link BlockPalette#unsynchronize()}</code> is called, <code>{@link BlockPalette}</code> is thread safe
+ * for N writer and N reader threads. It locks on <code>{@link BlockPalette#put(BlockSpec)}</code>, and has concurrent
+ * data structures to achieve this.</p>
+ *
+ * After <code>{@link BlockPalette#unsynchronize()}</code> is called, it is only safe to be read by multiple threads concurrently.
  */
 public class BlockPalette {
   private static final int BLOCK_PALETTE_VERSION = 4;
@@ -34,7 +58,9 @@ public class BlockPalette {
   public final Block stone, water;
 
   private final Map<BlockSpec, Integer> blockMap;
-  private final List<Block> palette;
+  private List<Block> palette;
+
+  private ReentrantLock lock = new ReentrantLock();
 
   public BlockPalette(Map<BlockSpec, Integer> initialMap, List<Block> initialList) {
     this.blockMap = initialMap;
@@ -54,7 +80,21 @@ public class BlockPalette {
   }
 
   public BlockPalette() {
-    this(new HashMap<>(), new ArrayList<>());
+    this(new ConcurrentHashMap<>(), new CopyOnWriteArrayList<>());
+  }
+
+  /**
+   * This method should be called when no threads are acting on the palette anymore.
+   *
+   * It replaces the lock with one that does nothing and switches the palette list for a non-concurrent one.
+   * This is done to not limit render performance once async chunk loading is done.
+   */
+  public void unsynchronize() {
+    palette = new ArrayList<>(palette);
+    lock = new ReentrantLock() {
+      @Override public void lock() { }
+      @Override public void unlock() { }
+    };
   }
 
   /**
@@ -67,23 +107,74 @@ public class BlockPalette {
     return put(new BlockSpec(tag));
   }
 
+  /**
+   * locks to avoid race conditions between writer threads
+   */
   public int put(BlockSpec spec) {
-    Integer id = blockMap.get(spec);
-    if (id != null) {
+    final ReentrantLock lock = this.lock;
+    lock.lock();
+    try {
+      Integer id = blockMap.get(spec);
+      if (id != null) {
+        return id;
+      }
+      id = palette.size();
+      blockMap.put(spec, id);
+      Block block = spec.toBlock();
+      applyMaterial(block);
+      palette.add(block);
       return id;
+    } finally {
+      lock.unlock();
     }
-    id = palette.size();
-    blockMap.put(spec, id);
-    Block block = spec.toBlock();
-    applyMaterial(block);
-    palette.add(block);
-    return id;
   }
 
   public Block get(int id) {
     if(id == ANY_ID)
       return stone;
     return palette.get(id);
+  }
+
+  /**
+   * Get the index for a water block with the given level and data. If it doesn't exist, it is
+   * created.
+   *
+   * @param level Water level
+   * @param data  Water data (for corner levels)
+   * @return Index of the water block in this palette
+   * @throws IllegalArgumentException If the level is out of range
+   */
+  public int getWaterId(int level, int data) {
+    if (level < 0 || level > 15) {
+      throw new IllegalArgumentException("Invalid water level " + level);
+    }
+    CompoundTag tag = new CompoundTag();
+    tag.add("Name", new StringTag("minecraft:water$chunky"));
+    tag.add("level", new IntTag(level));
+    tag.add("data", new IntTag(data));
+    BlockSpec spec = new BlockSpec(tag);
+    return put(spec);
+  }
+
+  /**
+   * Get the index for a lava block with the given level and data. If it doesn't exist, it is
+   * created.
+   *
+   * @param level Lava level
+   * @param data  Lava data (for corner levels)
+   * @return Index of the lava block in this palette
+   * @throws IllegalArgumentException If the level is out of range
+   */
+  public int getLavaId(int level, int data) {
+    if (level < 0 || level > 15) {
+      throw new IllegalArgumentException("Invalid lava level " + level);
+    }
+    CompoundTag tag = new CompoundTag();
+    tag.add("Name", new StringTag("minecraft:lava$chunky"));
+    tag.add("level", new IntTag(level));
+    tag.add("data", new IntTag(data));
+    BlockSpec spec = new BlockSpec(tag);
+    return put(spec);
   }
 
   /**
@@ -180,12 +271,54 @@ public class BlockPalette {
     materialProperties.put("minecraft:black_stained_glass_pane", glassConfig);
     materialProperties.put("minecraft:gold_block", block -> {
       block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.9);
+    });
+    materialProperties.put("minecraft:raw_gold_block", block -> {
+      block.metalness = 0.8f;
+      block.setPerceptualSmoothness(0.5);
     });
     materialProperties.put("minecraft:diamond_block", block -> {
       block.specular = 0.04f;
     });
     materialProperties.put("minecraft:iron_block", block -> {
       block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.9);
+    });
+    materialProperties.put("minecraft:raw_iron_block", block -> {
+      block.metalness = 0.66f;
+      block.setPerceptualSmoothness(0.3);
+    });
+    materialProperties.put("minecraft:iron_bars", block -> {
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.9);
+    });
+    materialProperties.put("minecraft:iron_door", block -> {
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.8);
+    });
+    materialProperties.put("minecraft:iron_trapdoor", block -> {
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.8);
+    });
+    materialProperties.put("minecraft:cauldron", block -> {
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.7);
+    });
+    materialProperties.put("minecraft:hopper", block -> {
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.7);
+    });
+    materialProperties.put("minecraft:chain", block -> {
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.9);
     });
     materialProperties.put("minecraft:redstone_torch", block -> {
       block.emittance = 1.0f;
@@ -252,6 +385,13 @@ public class BlockPalette {
     materialProperties.put("minecraft:tall_seagrass", block -> {
       block.waterlogged = true;
     });
+    materialProperties.put("minecraft:sea_pickle", block -> {
+      if (block instanceof SeaPickle) {
+        if (((SeaPickle) block).live) {
+          block.emittance = 1.0f / 15f * (3 * ((SeaPickle) block).pickles + 1);
+        }
+      }
+    });
     materialProperties.put("minecraft:campfire", block -> {
       if (block instanceof Campfire && ((Campfire)block).isLit) {
         block.emittance = 1.0f;
@@ -310,7 +450,102 @@ public class BlockPalette {
         }
       }
     });
+    Consumer<Block> copperConfig = block -> {
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.75);
+    };
+    Consumer<Block> lightlyWeatheredCopperConfig = block -> {
+      block.metalness = 0.66f;
+      block.setPerceptualSmoothness(0.75);
+    };
+    Consumer<Block> semiWeatheredCopperConfig = block -> {
+      block.metalness = 0.66f;
+      block.setPerceptualSmoothness(0.75);
+    };
+    materialProperties.put("minecraft:copper_block", copperConfig);
+    materialProperties.put("minecraft:raw_copper_block", block -> {
+      block.metalness = 0.66f;
+      block.setPerceptualSmoothness(0.5);
+    });
+    materialProperties.put("minecraft:exposed_copper", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:weathered_copper", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:cut_copper", copperConfig);
+    materialProperties.put("minecraft:exposed_cut_copper", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:weathered_cut_copper", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:cut_copper_stairs", copperConfig);
+    materialProperties.put("minecraft:exposed_cut_copper_stairs", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:weathered_cut_copper_stairs", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:cut_copper_slab", copperConfig);
+    materialProperties.put("minecraft:exposed_cut_copper_slab", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:weathered_cut_copper_slab", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_copper_block", copperConfig);
+    materialProperties.put("minecraft:waxed_exposed_copper", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_weathered_copper", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_cut_copper", copperConfig);
+    materialProperties.put("minecraft:waxed_exposed_cut_copper", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_weathered_cut_copper", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_cut_copper_stairs", copperConfig);
+    materialProperties.put("minecraft:waxed_exposed_cut_copper_stairs", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_weathered_cut_copper_stairs", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_cut_copper_slab", copperConfig);
+    materialProperties.put("minecraft:waxed_exposed_cut_copper_slab", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_weathered_cut_copper_slab", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:lightning_rod", block -> {
+      // apply copper attributes only to non-powered lightning rods
+      if (block instanceof LightningRod && !((LightningRod) block).isPowered()) {
+        copperConfig.accept(block);
+      }
+    });
+    materialProperties.put("minecraft:small_amethyst_bud", block -> {
+      if (block instanceof AmethystCluster && ((AmethystCluster) block).isLit()) {
+        block.emittance = 1.0f / 15f;
+      }
+    });
+    materialProperties.put("minecraft:medium_amethyst_bud", block -> {
+      if (block instanceof AmethystCluster && ((AmethystCluster) block).isLit()) {
+        block.emittance = 1.0f / 15f * 2;
+      }
+    });
+    materialProperties.put("minecraft:large_amethyst_bud", block -> {
+      if (block instanceof AmethystCluster && ((AmethystCluster) block).isLit()) {
+        block.emittance = 1.0f / 15f * 4;
+      }
+    });
+    materialProperties.put("minecraft:amethyst_cluster", block -> {
+      if (block instanceof AmethystCluster && ((AmethystCluster) block).isLit()) {
+        block.emittance = 1.0f / 15f * 5;
+      }
+    });
+    materialProperties.put("minecraft:tinted_glass", glassConfig);
+    materialProperties.put("minecraft:sculk_sensor", block -> {
+      if (block instanceof SculkSensor && ((SculkSensor) block).isActive()) {
+        block.emittance = 1.0f / 15f;
+      }
+    });
+    materialProperties.put("minecraft:glow_lichen", block -> {
+      block.emittance = 1.0f / 15f * 7;
+    });
+    materialProperties.put("minecraft:cave_vines_plant", block -> {
+      if (block instanceof CaveVines && ((CaveVines) block).hasBerries()) {
+        block.emittance = 1.0f / 15f * 14;
+      }
+    });
+    materialProperties.put("minecraft:cave_vines", block -> {
+      if (block instanceof CaveVines && ((CaveVines) block).hasBerries()) {
+        block.emittance = 1.0f / 15f * 14;
+      }
+    });
+    materialProperties.put("minecraft:light", block -> {
+      if (block instanceof LightBlock) {
+        block.emittance = 1.0f / 15f * ((LightBlock) block).getLevel();
+      }
+    });
     return materialProperties;
+  }
+
+  @PluginApi
+  public List<Block> getPalette() {
+    return palette;
   }
 
   /** Writes the block specifications to file. */

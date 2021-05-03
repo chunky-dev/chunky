@@ -52,7 +52,7 @@ public class TexturedBlockModel {
       } else if (ray.n.x < 0) {
         color = texture[3].getColor(ray.u, ray.v);
       } else if (ray.n.y > 0) {
-        color = texture[4].getColor(ray.u, 1 - ray.v);
+        color = texture[4].getColor(1 - ray.u, 1 - ray.v);
       } else {
         color = texture[5].getColor(ray.u, ray.v);
       }
@@ -88,7 +88,7 @@ public class TexturedBlockModel {
       } else if (ray.n.x < 0) {
         color = texture[index[3]].getColor(ray.u, ray.v);
       } else if (ray.n.y > 0) {
-        color = texture[index[4]].getColor(ray.u, 1 - ray.v);
+        color = texture[index[4]].getColor(1 - ray.u, 1 - ray.v);
       } else {
         color = texture[index[5]].getColor(ray.u, ray.v);
       }
@@ -163,6 +163,8 @@ public class TexturedBlockModel {
     if (ray.n.x > 0 || ray.n.z < 0) {
       ray.u = 1 - ray.u;
     }
+    if (ray.n.y > 0) {
+      ray.v = 1 - ray.v;
+    }
   }
-
 }

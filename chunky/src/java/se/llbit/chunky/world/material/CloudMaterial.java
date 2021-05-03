@@ -26,5 +26,4 @@ public class CloudMaterial extends Material {
   private CloudMaterial() {
     super("cloud", Texture.air);
   }
-
 }

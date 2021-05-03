@@ -33,39 +33,40 @@ public class ITXT extends PngChunk {
   }
 
   @Override protected void writeChunkData(DataOutputStream out) throws IOException {
-    CrcOutputStream crcOutputStream = new CrcOutputStream();
-    DataOutputStream crcOut = new DataOutputStream(crcOutputStream);
+    try (
+      CrcOutputStream crcOutputStream = new CrcOutputStream();
+      DataOutputStream crcOut = new DataOutputStream(crcOutputStream);
+    ) {
+      crcOut.writeInt(CHUNK_TYPE);
 
-    crcOut.writeInt(CHUNK_TYPE);
+      crcOut.writeBytes(keyword);
+      out.writeBytes(keyword);
 
-    crcOut.writeBytes(keyword);
-    out.writeBytes(keyword);
+      // null separator
+      crcOut.writeByte(0);
+      out.writeByte(0);
 
-    // null separator
-    crcOut.writeByte(0);
-    out.writeByte(0);
+      // compression flag
+      crcOut.writeByte(0);
+      out.writeByte(0);
 
-    // compression flag
-    crcOut.writeByte(0);
-    out.writeByte(0);
+      // compression method
+      crcOut.writeByte(0);
+      out.writeByte(0);
 
-    // compression method
-    crcOut.writeByte(0);
-    out.writeByte(0);
+      // language tag + null sep
+      crcOut.writeByte(0);
+      out.writeByte(0);
 
-    // language tag + null sep
-    crcOut.writeByte(0);
-    out.writeByte(0);
+      // translated keyword + null sep
+      crcOut.writeByte(0);
+      out.writeByte(0);
 
-    // translated keyword + null sep
-    crcOut.writeByte(0);
-    out.writeByte(0);
+      crcOut.writeBytes(text);
+      out.writeBytes(text);
 
-    crcOut.writeBytes(text);
-    out.writeBytes(text);
-
-    crc = crcOutputStream.getCRC();
-    crcOut.close();
+      crc = crcOutputStream.getCRC();
+    }
   }
 
   @Override public int getChunkLength() {

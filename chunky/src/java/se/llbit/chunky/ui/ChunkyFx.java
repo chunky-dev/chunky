@@ -1,4 +1,5 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -17,18 +18,17 @@
 package se.llbit.chunky.ui;
 
 import javafx.application.Application;
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Control;
 import javafx.scene.image.Image;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
-import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.resources.SettingsDirectory;
+import se.llbit.log.Log;
 
 import java.io.File;
 
@@ -40,10 +40,13 @@ import java.io.File;
  */
 public class ChunkyFx extends Application {
 
+  private static HostServices hostServices = null;
   private static Chunky chunkyInstance;
 
   @Override public void start(Stage stage) {
     try {
+      ChunkyFx.hostServices = this.getHostServices();
+
       FXMLLoader loader = new FXMLLoader(getClass().getResource("Chunky.fxml"));
       ChunkyFxController controller = new ChunkyFxController(chunkyInstance);
       loader.setController(controller);
@@ -74,5 +77,16 @@ public class ChunkyFx extends Application {
   public static void startChunkyUI(Chunky chunkyInstance) {
     ChunkyFx.chunkyInstance = chunkyInstance;
     launch();
+  }
+
+  /**
+   * Launch a url in the default browser.
+   */
+  @PluginApi
+  public static void openUrl(String url) {
+    if (hostServices != null)
+      hostServices.showDocument(url);
+    else
+      Log.error("ChunkyFX not started. Cannot open url.");
   }
 }

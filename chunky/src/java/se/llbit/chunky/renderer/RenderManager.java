@@ -100,13 +100,6 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
     this.headless = headless;
     bufferedScene = context.getChunky().getSceneFactory().newScene();
-
-    long seed = System.currentTimeMillis();
-    workers = new Thread[numThreads];
-    for (int i = 0; i < numThreads; ++i) {
-      workers[i] = workerFactory.buildWorker(this, i, seed + i);
-      workers[i].start();
-    }
   }
 
   @Override public synchronized void addRenderListener(RenderStatusListener listener) {
@@ -123,6 +116,13 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
   @Override public void run() {
     try {
+      long seed = System.currentTimeMillis();
+      workers = new Thread[numThreads];
+      for (int i = 0; i < numThreads; ++i) {
+        workers[i] = workerFactory.buildWorker(this, i, seed + i);
+        workers[i].start();
+      }
+
       while (!isInterrupted()) {
         ResetReason reason = sceneProvider.awaitSceneStateChange();
 
@@ -138,11 +138,15 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
             finalizeAllFrames = scene.shouldFinalizeBuffer();
             updateRenderState(scene);
             if (reason == ResetReason.SCENE_LOADED) {
+              // Make sure frame is finalized
+              bufferedScene.postProcessFrame(renderTask);
+
               // Swap buffers so the render canvas will see the current frame.
               bufferedScene.swapBuffers();
 
-              // Notify the scene listeners (this triggers a canvas repaint).
+              // Notify the scene listeners.
               sendSceneStatus(bufferedScene.sceneStatus());
+              canvas.repaint();
             }
           });
         }
@@ -221,7 +225,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
       canvas.repaint();
 
       synchronized (bufferedScene) {
-        bufferedScene.spp += RenderConstants.SPP_PER_PASS;
+        bufferedScene.spp += sppPerPass;
         int currentSpp = bufferedScene.spp;
         frameCompletionListener.accept(bufferedScene, currentSpp);
         updateRenderProgress();
@@ -347,7 +351,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
    * Adds new jobs to the job queue and releases the workers.
    */
   private void startNextFrame() {
-    int nextSpp = bufferedScene.spp + RenderConstants.SPP_PER_PASS;
+    int nextSpp = bufferedScene.spp + sppPerPass;
     bufferedScene.setBufferFinalization(finalizeAllFrames
         || snapshotControl.saveSnapshot(bufferedScene, nextSpp));
     frameFinished = new CountDownLatch(numJobs);
@@ -413,9 +417,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
    * Stop render workers.
    */
   private synchronized void stopWorkers() {
-    // Halt all worker threads.
-    for (int i = 0; i < numThreads; ++i) {
-      workers[i].interrupt();
+    for (Thread worker : workers) {
+      worker.interrupt();
     }
   }
 

@@ -17,6 +17,8 @@
  */
 package se.llbit.chunky.entity;
 
+import se.llbit.chunky.block.Head;
+import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.Texture;
@@ -41,6 +43,7 @@ import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Box;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
@@ -118,6 +121,14 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       // Skull type is stored in the damage field.
       int damage = tag.get("Damage").shortValue();
       item.add("type", damage);
+    } else if (id.equals("minecraft:player_head")) {
+      Tag skinTag = tag.get("tag").get("SkullOwner").get("Properties").get("textures").get(0).get("Value");
+      if (!skinTag.isError()) {
+        String skinUrl = Head.getTextureUrl(tag.get("tag").asCompound());
+        if (skinUrl != null && !skinUrl.isEmpty()) {
+          item.add("skin", skinUrl);
+        }
+      }
     }
     return item;
   }
@@ -192,38 +203,41 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         .rotateZ(allPose.z)
         .translate(worldOffset);
     Collection<Primitive> primitives = new LinkedList<>();
-    Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
-    head.transform(Transform.NONE
-        .translate(0, 4 / 16., 0)
-        .scale(headScale)
-        .rotateX(headPose.x)
-        .rotateY(headPose.y)
-        .rotateZ(headPose.z)
-        .translate(0, -4 / 16., 0)
-        .translate(0, 28 / 16., 0)
-        .chain(worldTransform));
-    head.addFrontFaces(primitives, texture, texture.headFront);
-    head.addBackFaces(primitives, texture, texture.headBack);
-    head.addLeftFaces(primitives, texture, texture.headLeft);
-    head.addRightFaces(primitives, texture, texture.headRight);
-    head.addTopFaces(primitives, texture, texture.headTop);
-    head.addBottomFaces(primitives, texture, texture.headBottom);
-    Box hat = new Box(-4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16.);
-    hat.transform(Transform.NONE
-        .translate(0, 4 / 16., 0)
-        .scale(headScale)
-        .rotateX(headPose.x)
-        .rotateY(headPose.y)
-        .rotateZ(headPose.z)
-        .translate(0, -4 / 16., 0)
-        .translate(0, 28.2 / 16., 0)
-        .chain(worldTransform));
-    hat.addFrontFaces(primitives, texture, texture.hatFront);
-    hat.addBackFaces(primitives, texture, texture.hatBack);
-    hat.addLeftFaces(primitives, texture, texture.hatLeft);
-    hat.addRightFaces(primitives, texture, texture.hatRight);
-    hat.addTopFaces(primitives, texture, texture.hatTop);
-    hat.addBottomFaces(primitives, texture, texture.hatBottom);
+    if (!shouldHidePlayerHead(gear.get("head").object().get("id").stringValue(""))) {
+      Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
+      head.transform(Transform.NONE
+          .translate(0, 4 / 16., 0)
+          .scale(headScale)
+          .rotateX(headPose.x)
+          .rotateY(headPose.y)
+          .rotateZ(headPose.z)
+          .translate(0, -4 / 16., 0)
+          .translate(0, 28 / 16., 0)
+          .chain(worldTransform));
+      head.addFrontFaces(primitives, texture, texture.headFront);
+      head.addBackFaces(primitives, texture, texture.headBack);
+      head.addLeftFaces(primitives, texture, texture.headLeft);
+      head.addRightFaces(primitives, texture, texture.headRight);
+      head.addTopFaces(primitives, texture, texture.headTop);
+      head.addBottomFaces(primitives, texture, texture.headBottom);
+
+      Box hat = new Box(-4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16.);
+      hat.transform(Transform.NONE
+          .translate(0, 4 / 16., 0)
+          .scale(headScale)
+          .rotateX(headPose.x)
+          .rotateY(headPose.y)
+          .rotateZ(headPose.z)
+          .translate(0, -4 / 16., 0)
+          .translate(0, 28.2 / 16., 0)
+          .chain(worldTransform));
+      hat.addFrontFaces(primitives, texture, texture.hatFront);
+      hat.addBackFaces(primitives, texture, texture.hatBack);
+      hat.addLeftFaces(primitives, texture, texture.hatLeft);
+      hat.addRightFaces(primitives, texture, texture.hatRight);
+      hat.addTopFaces(primitives, texture, texture.hatTop);
+      hat.addBottomFaces(primitives, texture, texture.hatBottom);
+    }
     Box chest = new Box(-4 / 16., 4 / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
     chest.transform(Transform.NONE
         .translate(0, -5 / 16., 0)
@@ -295,6 +309,21 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     return primitives;
   }
 
+  private static boolean shouldHidePlayerHead(String helmetItemId) {
+    switch (helmetItemId) {
+      case "minecraft:skull":
+      case "minecraft:skeleton_skull":
+      case "minecraft:player_head":
+      case "minecraft:zombie_head":
+      case "minecraft:wither_skeleton_skull":
+      case "minecraft:creeper_head":
+      case "minecraft:dragon_head":
+        return true;
+      default:
+        return false;
+    }
+  }
+
   public static void addArmor(Collection<Primitive> faces,
       JsonObject gear,
       JsonObject pose,
@@ -319,7 +348,30 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           .rotateZ(headPose.z)
           .translate(0, (28 - 4) / 16.0, 0)
           .chain(worldTransform);
-      addModel(faces, getHelmModel(headItem), transform);
+      String headItemId = headItem.get("id").asString("");
+      if (headItemId.equals("minecraft:dragon_head")) {
+        SkullEntity skull = new SkullEntity(new Vector3(), Kind.DRAGON, 0, 1);
+        faces.addAll(skull.dragonHeadPrimitives(Transform.NONE.translate(0.5, 0.5, 0.5).scale(1.2).chain(transform)));
+      } else if (headItemId.equals("minecraft:carved_pumpkin")) {
+        Box hat = new Box(-4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16.);
+        hat.transform(Transform.NONE
+            .translate(0, 4 / 16., 0)
+            .scale(headScale)
+            .rotateX(headPose.x)
+            .rotateY(headPose.y)
+            .rotateZ(headPose.z)
+            .translate(0, -4 / 16., 0)
+            .translate(0, 28.2 / 16., 0)
+            .chain(worldTransform));
+        hat.addFrontFaces(faces, Texture.pumpkinFront, new Vector4(0, 1, 0, 1));
+        hat.addBackFaces(faces, Texture.pumpkinSide, new Vector4(1, 0, 0, 1));
+        hat.addLeftFaces(faces, Texture.pumpkinSide, new Vector4(0, 1, 0, 1));
+        hat.addRightFaces(faces, Texture.pumpkinSide, new Vector4(0, 1, 0, 1));
+        hat.addTopFaces(faces, Texture.pumpkinTop, new Vector4(1, 0, 1, 0));
+        hat.addBottomFaces(faces, Texture.pumpkinTop, new Vector4(0, 1, 0, 1));
+      } else {
+        addModel(faces, getHelmModel(headItem), transform);
+      }
     }
 
     // Add chest armor.
@@ -417,9 +469,9 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       "{\"elements\":[{\"from\":[3,3,3],\"to\":[13,13,13],\"faces\":{\"up\":{\"uv\":[2,0,4,4],\"texture\":\"#texture\"},\"east\":{\"uv\":[0,4,2,8],\"texture\":\"#texture\"},\"west\":{\"uv\":[4,4,6,8],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,4,4,8],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,4,8,8],\"texture\":\"#texture\"}}}]}";
 
   private static final String headJson =
-      "{\"elements\":[{\"from\":[4,4,4],\"to\":[12,12,12],\"faces\":{\"up\":{\"uv\":[2,0,4,2],\"texture\":\"#texture\"},\"down\":{\"uv\":[4,0,6,2],\"texture\":\"#texture\"},\"east\":{\"uv\":[6,2,4,4],\"texture\":\"#texture\"},\"west\":{\"uv\":[2,2,0,4],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,2,4,4],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,2,8,4],\"texture\":\"#texture\"}}}]}";
+      "{\"elements\":[{\"from\":[4,4,4],\"to\":[12,12,12],\"faces\":{\"up\":{\"uv\":[4,2,2,0],\"texture\":\"#texture\"},\"down\":{\"uv\":[4,0,6,2],\"texture\":\"#texture\"},\"east\":{\"uv\":[6,2,4,4],\"texture\":\"#texture\"},\"west\":{\"uv\":[2,2,0,4],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,2,4,4],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,2,8,4],\"texture\":\"#texture\"}}},{\"from\":[3.75,3.75,3.75],\"to\":[12.25,12.25,12.25],\"faces\":{\"up\":{\"uv\":[12,2,10,0],\"texture\":\"#texture\"},\"down\":{\"uv\":[12,0,14,2],\"texture\":\"#texture\"},\"east\":{\"uv\":[14,2,12,4],\"texture\":\"#texture\"},\"west\":{\"uv\":[10,2,8,4],\"texture\":\"#texture\"},\"north\":{\"uv\":[10,2,12,4],\"texture\":\"#texture\"},\"south\":{\"uv\":[14,2,14,4],\"texture\":\"#texture\"}}}]}";
 
-  // The difference between skullJson/headJson is that skullJson is textured with a half as tall texture.
+  // The difference between skullJson/headJson is that skullJson is textured with a half as tall texture and has no hat.
   private static final String skullJson =
       "{\"elements\":[{\"from\":[4,4,4],\"to\":[12,12,12],\"faces\":{\"up\":{\"uv\":[2,0,4,4],\"texture\":\"#texture\"},\"down\":{\"uv\":[4,0,6,4],\"texture\":\"#texture\"},\"east\":{\"uv\":[6,4,4,8],\"texture\":\"#texture\"},\"west\":{\"uv\":[2,4,0,8],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,4,4,8],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,4,8,8],\"texture\":\"#texture\"}}}]}";
 
@@ -530,6 +582,11 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           json = parseJson(skullJson);
           break;
       }
+    } else if (id.equals("minecraft:player_head") || id.equals("minecraft:zombie_head")) {
+      json = parseJson(headJson);
+    } else if (id.equals("minecraft:skeleton_skull") || id.equals("minecraft:wither_skeleton_skull")
+        || id.equals("minecraft:creeper_head")) {
+      json = parseJson(skullJson);
     }
     Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
     return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
@@ -603,13 +660,27 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
               break;
             case 5:
               // Dragon head.
-              // TODO: fixme
-              textureId = "entity/skeleton/wither_skeleton";
+              textureId = "entity/enderdragon/dragon";
               break;
           }
           loader = simpleTexture(textureId, texture);
           break;
         }
+        case "skeleton_skull":
+          loader = simpleTexture("entity/skeleton/skeleton", texture);
+          break;
+        case "wither_skeleton_skull":
+          loader = simpleTexture("entity/skeleton/wither_skeleton", texture);
+          break;
+        case "zombie_head":
+          loader = simpleTexture("entity/zombie/zombie", texture);
+          break;
+        case "creeper_head":
+          loader = simpleTexture("entity/creeper/creeper", texture);
+          break;
+        case "dragon_head":
+          loader = simpleTexture("entity/enderdragon/dragon", texture);
+          break;
         case "leather_boots":
         case "leather_helmet":
         case "leather_chestplate":
@@ -662,6 +733,17 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           break;
         case "turtle_helmet":
           loader = simpleTexture("models/armor/turtle_layer_1", texture);
+          break;
+        case "player_head":
+          String skin = item.get("skin").asString("");
+          if (!skin.isEmpty()) {
+            texture = HeadEntity.downloadTexture(skin);
+          } else {
+            loader = simpleTexture("entity/steve", texture);
+          }
+          break;
+        case "carved_pumpkin":
+          // nothing to do but this item is supported
           break;
         default:
           Log.warnf("Unknown item ID: %s%n", id);

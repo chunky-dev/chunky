@@ -25,7 +25,7 @@ import se.llbit.chunky.block.Leaves;
 import se.llbit.chunky.block.TallGrass;
 import se.llbit.chunky.block.Vine;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
@@ -47,31 +47,31 @@ public class SurfaceLayer extends BitmapLayer {
    * Generate the surface bitmap.
    *
    * @param dim current dimension
-   * @param blocks block index array (indices into block palette)
+   * @param chunkData data for the chunk
    */
-  public SurfaceLayer(int dim, int[] blocks, byte[] biomes, BlockPalette palette) {
-
+  public SurfaceLayer(int dim, ChunkData chunkData, BlockPalette palette, int yMax) {
     bitmap = new int[Chunk.X_MAX * Chunk.Z_MAX];
     topo = new int[Chunk.X_MAX * Chunk.Z_MAX];
     for (int x = 0; x < Chunk.X_MAX; ++x) {
       for (int z = 0; z < Chunk.Z_MAX; ++z) {
 
         // Find the topmost non-empty block.
-        int y = Chunk.Y_MAX - 1;
-        for (; y > 0; --y) {
-          if (palette.get(blocks[Chunk.chunkIndex(x, y, z)]) != Air.INSTANCE) {
+        int y = Math.min(chunkData.maxY() - 1, yMax);
+        int minY = chunkData.minY();
+        for (; y > minY; --y) {
+          if (palette.get(chunkData.getBlockAt(x, y, z)) != Air.INSTANCE) {
             break;
           }
         }
         if (dim == -1) {
           // Nether worlds have a ceiling that we want to skip.
-          for (; y > 1; --y) {
-            if (palette.get(blocks[Chunk.chunkIndex(x, y, z)]) == Air.INSTANCE) {
+          for (; y > minY+1; --y) {
+            if (palette.get(chunkData.getBlockAt(x, y, z)) == Air.INSTANCE) {
               break;
             }
           }
-          for (; y > 1; --y) {
-            if (palette.get(blocks[Chunk.chunkIndex(x, y, z)]) != Air.INSTANCE) {
+          for (; y > minY+1; --y) {
+            if (palette.get(chunkData.getBlockAt(x, y, z)) != Air.INSTANCE) {
               break;
             }
           }
@@ -79,11 +79,11 @@ public class SurfaceLayer extends BitmapLayer {
 
         float[] color = new float[4];
 
-        for (; y >= 0 && color[3] < 1.f; ) {
-          Block block = palette.get(blocks[Chunk.chunkIndex(x, y, z)]);
+        while (y >= minY && color[3] < 1.f) {
+          Block block = palette.get(chunkData.getBlockAt(x, y, z));
           float[] blockColor = new float[4];
           ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
-          int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(x, z)];
+          int biomeId = 0xFF & chunkData.getBiomeAt(x, 0, z);
 
           if (block instanceof Leaves) {
             ColorUtil.getRGBComponents(Biomes.getFoliageColor(biomeId), blockColor);
@@ -96,12 +96,12 @@ public class SurfaceLayer extends BitmapLayer {
             blockColor[3] = 1.f;// grass colors don't include alpha
 
             y -= 1;
-          } else if (block.name == "minecraft:ice") {
+          } else if (block.name.equals("minecraft:ice")) {
             color = blend(color, blockColor);
             y -= 1;
 
-            for (; y >= 0; --y) {
-              Block block1 = palette.get(blocks[Chunk.chunkIndex(x, y, z)]);
+            for (; y >= minY; --y) {
+              Block block1 = palette.get(chunkData.getBlockAt(x, y, z));
               if (block1.opaque) {
                 ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
                 break;
@@ -110,17 +110,17 @@ public class SurfaceLayer extends BitmapLayer {
           } else if (block.isWater()) {
             int depth = 1;
             y -= 1;
-            for (; y >= 0; --y) {
-              Block block1 = palette.get(blocks[Chunk.chunkIndex(x, y, z)]);
+            for (; y >= minY; --y) {
+              Block block1 = palette.get(chunkData.getBlockAt(x, y, z));
               if (!block1.isWater())
                 break;
               depth += 1;
             }
 
-            ColorUtil.getRGBAComponents(Texture.water.getAvgColor(), blockColor);
+            ColorUtil.getRGBAComponents(Biomes.getWaterColor(biomeId), blockColor);
             blockColor[3] = QuickMath.max(.5f, 1.f - depth / 32.f);
           } else {
-            if (block.opaque && y > 64) {
+            if (block.opaque && y > World.SEA_LEVEL+1) {
               float fade = QuickMath.min(0.6f, (y - World.SEA_LEVEL) / 60.f);
               fade = QuickMath.max(0.f, fade);
               blockColor[0] = (1 - fade) * blockColor[0] + fade;

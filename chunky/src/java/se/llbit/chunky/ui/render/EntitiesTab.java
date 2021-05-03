@@ -16,39 +16,6 @@
  */
 package se.llbit.chunky.ui.render;
 
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-import se.llbit.chunky.entity.ArmorStand;
-import se.llbit.chunky.entity.Book;
-import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.entity.Geared;
-import se.llbit.chunky.entity.PlayerEntity;
-import se.llbit.chunky.entity.Poseable;
-import se.llbit.chunky.renderer.scene.PlayerModel;
-import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.ui.AngleAdjuster;
-import se.llbit.chunky.ui.DoubleAdjuster;
-import se.llbit.chunky.ui.RenderControlsFxController;
-import se.llbit.json.Json;
-import se.llbit.json.JsonArray;
-import se.llbit.json.JsonObject;
-import se.llbit.math.Vector3;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -57,11 +24,59 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Consumer;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.util.converter.NumberStringConverter;
+import se.llbit.chunky.entity.ArmorStand;
+import se.llbit.chunky.entity.BeaconBeam;
+import se.llbit.chunky.entity.Book;
+import se.llbit.chunky.entity.Entity;
+import se.llbit.chunky.entity.Geared;
+import se.llbit.chunky.entity.Lectern;
+import se.llbit.chunky.entity.PlayerEntity;
+import se.llbit.chunky.entity.Poseable;
+import se.llbit.chunky.renderer.scene.PlayerModel;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.AngleAdjuster;
+import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.IntegerAdjuster;
+import se.llbit.chunky.ui.IntegerTextField;
+import se.llbit.chunky.ui.RenderControlsFxController;
+import se.llbit.chunky.world.material.BeaconBeamMaterial;
+import se.llbit.fx.LuxColorPicker;
+import se.llbit.json.Json;
+import se.llbit.json.JsonArray;
+import se.llbit.json.JsonObject;
+import se.llbit.math.ColorUtil;
+import se.llbit.math.Vector3;
 
 public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initializable {
+
   private Scene scene;
 
   static class EntityData {
+
     public final Entity entity;
     public final String name;
     private String kind;
@@ -87,15 +102,18 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       return profile.get("name").stringValue("Unknown");
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
       return "" + entity;
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
       return entity.hashCode();
     }
 
-    @Override public boolean equals(Object obj) {
+    @Override
+    public boolean equals(Object obj) {
       // Identity comparison is used to ensure that the table in the
       // entities tab is properly updated after rebuilding the scene.
       if (obj instanceof EntityData) {
@@ -109,17 +127,28 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     }
   }
 
-  @FXML private TableView<EntityData> entityTable;
-  @FXML private TableColumn<EntityData, String> nameCol;
-  @FXML private TableColumn<EntityData, String> kindCol;
-  @FXML private Button delete;
-  @FXML private Button add;
-  @FXML private Button cameraToPlayer;
-  @FXML private Button playerToCamera;
-  @FXML private Button playerToTarget;
-  @FXML private Button faceCamera;
-  @FXML private Button faceTarget;
-  @FXML private VBox controls;
+  @FXML
+  private TableView<EntityData> entityTable;
+  @FXML
+  private TableColumn<EntityData, String> nameCol;
+  @FXML
+  private TableColumn<EntityData, String> kindCol;
+  @FXML
+  private Button delete;
+  @FXML
+  private Button add;
+  @FXML
+  private Button cameraToPlayer;
+  @FXML
+  private Button playerToCamera;
+  @FXML
+  private Button playerToTarget;
+  @FXML
+  private Button faceCamera;
+  @FXML
+  private Button faceTarget;
+  @FXML
+  private VBox controls;
 
   public EntitiesTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("EntitiesTab.fxml"));
@@ -128,7 +157,8 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     loader.load();
   }
 
-  @Override public void update(Scene scene) {
+  @Override
+  public void update(Scene scene) {
     // TODO: it might be better to always just rebuild the whole table.
     Collection<EntityData> missing = new HashSet<>(entityTable.getItems());
     for (Entity entity : scene.getActors()) {
@@ -141,11 +171,13 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     entityTable.getItems().removeAll(missing);
   }
 
-  @Override public String getTabTitle() {
+  @Override
+  public String getTabTitle() {
     return "Entities";
   }
 
-  @Override public Node getTabContent() {
+  @Override
+  public Node getTabContent() {
     return this;
   }
 
@@ -178,7 +210,8 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
           FileChooser fileChooser = new FileChooser();
           fileChooser.setTitle("Load Skin");
           fileChooser
-              .getExtensionFilters().add(new FileChooser.ExtensionFilter("Minecraft skin", "*.png"));
+              .getExtensionFilters()
+              .add(new FileChooser.ExtensionFilter("Minecraft skin", "*.png"));
           File skinFile = fileChooser.showOpenDialog(getScene().getWindow());
           if (skinFile != null) {
             player.setTexture(skinFile.getAbsolutePath());
@@ -191,41 +224,159 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         controls.getChildren().addAll(modelBox, skinBox);
       }
 
-      if (entity instanceof Book) {
-        Book book = (Book) entity;
+      if (entity instanceof Book || entity instanceof Lectern) {
+        Book book;
+        if (entity instanceof Lectern) {
+          book = ((Lectern) entity).getBook();
+        } else {
+          book = (Book) entity;
+        }
 
-        DoubleAdjuster openingAngle = new DoubleAdjuster();
-        openingAngle.setName("Opening angle");
-        openingAngle.setTooltip("Modifies the book's opening angle.");
-        openingAngle.set(Math.toDegrees(book.getOpenAngle()));
-        openingAngle.setRange(0, 180);
-        openingAngle.onValueChange(value -> {
-          book.setOpenAngle(Math.toRadians(value));
+        if (book != null) {
+          DoubleAdjuster openingAngle = new DoubleAdjuster();
+          openingAngle.setName("Opening angle");
+          openingAngle.setTooltip("Modifies the book's opening angle.");
+          openingAngle.set(Math.toDegrees(book.getOpenAngle()));
+          openingAngle.setRange(0, 180);
+          openingAngle.onValueChange(value -> {
+            book.setOpenAngle(Math.toRadians(value));
+            scene.rebuildActorBvh();
+          });
+          controls.getChildren().add(openingAngle);
+
+          DoubleAdjuster page1Angle = new DoubleAdjuster();
+          page1Angle.setName("Page 1 angle");
+          page1Angle.setTooltip("Modifies the book's first visible page's angle.");
+          page1Angle.set(Math.toDegrees(book.getPageAngleA()));
+          page1Angle.setRange(0, 180);
+          page1Angle.onValueChange(value -> {
+            book.setPageAngleA(Math.toRadians(value));
+            scene.rebuildActorBvh();
+          });
+          controls.getChildren().add(page1Angle);
+
+          DoubleAdjuster page2Angle = new DoubleAdjuster();
+          page2Angle.setName("Page 2 angle");
+          page2Angle.setTooltip("Modifies the book's second visible page's angle.");
+          page2Angle.set(Math.toDegrees(book.getPageAngleB()));
+          page2Angle.setRange(0, 180);
+          page2Angle.onValueChange(value -> {
+            book.setPageAngleB(Math.toRadians(value));
+            scene.rebuildActorBvh();
+          });
+          controls.getChildren().add(page2Angle);
+        }
+      }
+      else if(entity instanceof BeaconBeam) {
+        BeaconBeam beam = (BeaconBeam) entity;
+        IntegerAdjuster height = new IntegerAdjuster();
+        height.setName("Height");
+        height.setTooltip("Modifies the height of the beam. Useful if your scene is taller than the world height.");
+        height.set(beam.getHeight());
+        height.setRange(1, 512);
+        height.onValueChange(value -> {
+          beam.setHeight(value);
           scene.rebuildActorBvh();
         });
-        controls.getChildren().add(openingAngle);
+        controls.getChildren().add(height);
 
-        DoubleAdjuster page1Angle = new DoubleAdjuster();
-        page1Angle.setName("Page 1 angle");
-        page1Angle.setTooltip("Modifies the book's first visible page's angle.");
-        page1Angle.set(Math.toDegrees(book.getPageAngleA()));
-        page1Angle.setRange(0, 180);
-        page1Angle.onValueChange(value -> {
-          book.setPageAngleA(Math.toRadians(value));
-          scene.rebuildActorBvh();
-        });
-        controls.getChildren().add(page1Angle);
+        HBox beamColor = new HBox();
+        VBox listControls = new VBox();
+        VBox propertyControls = new VBox();
 
-        DoubleAdjuster page2Angle = new DoubleAdjuster();
-        page2Angle.setName("Page 2 angle");
-        page2Angle.setTooltip("Modifies the book's second visible page's angle.");
-        page2Angle.set(Math.toDegrees(book.getPageAngleB()));
-        page2Angle.setRange(0, 180);
-        page2Angle.onValueChange(value -> {
-          book.setPageAngleB(Math.toRadians(value));
-          scene.rebuildActorBvh();
+        listControls.setMaxWidth(200);
+        beamColor.setPadding(new Insets(10));
+        beamColor.setSpacing(15);
+        propertyControls.setSpacing(10);
+
+        DoubleAdjuster emittance = new DoubleAdjuster();
+        emittance.setName("Emittance");
+        emittance.setRange(0, 100);
+
+        DoubleAdjuster specular = new DoubleAdjuster();
+        specular.setName("Specular");
+        specular.setRange(0, 1);
+
+        DoubleAdjuster ior = new DoubleAdjuster();
+        ior.setName("IoR");
+        ior.setRange(0, 5);
+
+        DoubleAdjuster perceptualSmoothness = new DoubleAdjuster();
+        perceptualSmoothness.setName("Smoothness");
+        perceptualSmoothness.setRange(0, 1);
+
+        LuxColorPicker beamColorPicker = new LuxColorPicker();
+
+        ObservableList<Integer> colorHeights = FXCollections.observableArrayList();
+        colorHeights.addAll(beam.getMaterials().keySet());
+        ListView<Integer> colorHeightList = new ListView<>(colorHeights);
+        colorHeightList.setMaxHeight(150.0);
+        colorHeightList.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldValue, heightIndex) -> {
+
+              BeaconBeamMaterial beamMat = beam.getMaterials().get(heightIndex);
+              emittance.set(beamMat.emittance);
+              specular.set(beamMat.specular);
+              ior.set(beamMat.ior);
+              perceptualSmoothness.set(beamMat.getPerceptualSmoothness());
+              beamColorPicker.setColor(ColorUtil.toFx(beamMat.getColorInt()));
+
+              emittance.onValueChange(value -> {
+                beamMat.emittance = value.floatValue();
+                scene.rebuildActorBvh();
+              });
+              specular.onValueChange(value -> {
+                beamMat.specular = value.floatValue();
+                scene.rebuildActorBvh();
+              });
+              ior.onValueChange(value -> {
+                beamMat.ior = value.floatValue();
+                scene.rebuildActorBvh();
+              });
+              perceptualSmoothness.onValueChange(value -> {
+                beamMat.setPerceptualSmoothness(value);
+                scene.rebuildActorBvh();
+              });
+            }
+        );
+        beamColorPicker.colorProperty().addListener(
+            (observableColor, oldColorValue, newColorValue) -> {
+              Integer index = colorHeightList.getSelectionModel().getSelectedItem();
+              if (index != null) {
+                beam.getMaterials().get(index).updateColor(ColorUtil.getRGB(ColorUtil.fromFx(newColorValue)));
+                scene.rebuildActorBvh();
+              }
+            }
+        );
+        
+        HBox listButtons = new HBox();
+        listButtons.setPadding(new Insets(10));
+        listButtons.setSpacing(15);
+        Button deleteButton = new Button("Delete");
+        deleteButton.setOnAction(e -> { 
+          Integer index = colorHeightList.getSelectionModel().getSelectedItem();
+          if (index != null && index != 0) { //Prevent removal of the bottom layer
+            beam.getMaterials().remove(index);
+            colorHeightList.getItems().removeAll(index);
+            scene.rebuildActorBvh();
+          }
         });
-        controls.getChildren().add(page2Angle);
+        IntegerTextField layerInput = new IntegerTextField();
+        layerInput.setMaxWidth(50);
+        Button addButton = new Button("Add");
+        addButton.setOnAction(e -> {
+          if (!beam.getMaterials().containsKey(layerInput.valueProperty().get())) { //Don't allow duplicate indices
+            beam.getMaterials().put(layerInput.valueProperty().get(), new BeaconBeamMaterial(BeaconBeamMaterial.DEFAULT_COLOR));
+            colorHeightList.getItems().add(layerInput.valueProperty().get());
+            scene.rebuildActorBvh();
+          }
+        });
+        
+        listButtons.getChildren().addAll(deleteButton, layerInput, addButton);
+        propertyControls.getChildren().addAll(emittance, specular, perceptualSmoothness, ior, beamColorPicker);
+        listControls.getChildren().addAll(new Label("Start Height:"), colorHeightList, listButtons);
+        beamColor.getChildren().addAll(listControls, propertyControls);
+        controls.getChildren().add(beamColor);
       }
 
       DoubleAdjuster scale = new DoubleAdjuster();
@@ -280,11 +431,11 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       partList.getSelectionModel().selectedItemProperty().addListener(
           (observable, oldValue, part) ->
               withPose(entity, part, partPose -> {
-                pitch.set(Math.toDegrees(partPose.get(0).asDouble(0)));
-                yaw.set(Math.toDegrees(partPose.get(1).asDouble(0)));
-                roll.set(Math.toDegrees(partPose.get(2).asDouble(0)));
-            }
-          ));
+                    pitch.set(Math.toDegrees(partPose.get(0).asDouble(0)));
+                    yaw.set(Math.toDegrees(partPose.get(1).asDouble(0)));
+                    roll.set(Math.toDegrees(partPose.get(2).asDouble(0)));
+                  }
+              ));
 
       partList.getSelectionModel().selectFirst(); // Updates the pose parameters.
 
@@ -322,7 +473,9 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         TextField gearField = new TextField();
         gearField.setOnAction(event -> {
           JsonObject gear = new JsonObject();
-          gear.add("id", gearField.getText());
+          if (!gearField.getText().trim().isEmpty()) {
+            gear.add("id", gearField.getText());
+          }
           geared.getGear().set(slot, gear);
           scene.rebuildActorBvh();
         });
@@ -333,7 +486,8 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     }
   }
 
-  @Override public void initialize(URL location, ResourceBundle resources) {
+  @Override
+  public void initialize(URL location, ResourceBundle resources) {
     add.setTooltip(new Tooltip("Add a player at the target position."));
     add.setOnAction(e -> {
       Collection<Entity> entities = scene.getActors();
@@ -409,7 +563,8 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         scene.rebuildActorBvh();
       }
     }));
-    faceTarget.setTooltip(new Tooltip("Makes the selected player look at the current view target."));
+    faceTarget
+        .setTooltip(new Tooltip("Makes the selected player look at the current view target."));
     faceTarget.setOnAction(e -> withEntity(entity -> {
       Vector3 target = scene.getTargetPosition();
       if (target != null && entity instanceof Poseable) {
@@ -451,7 +606,8 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     }
   }
 
-  @Override public void setController(RenderControlsFxController controller) {
+  @Override
+  public void setController(RenderControlsFxController controller) {
     scene = controller.getRenderController().getSceneManager().getScene();
   }
 }

@@ -154,6 +154,7 @@ public class StairModel {
     }
 
     if (hit) {
+      ray.color.w = 1;
       ray.distance += ray.t;
       ray.o.scaleAdd(ray.t, ray.d);
     }
@@ -168,6 +169,7 @@ public class StairModel {
       } else if (ray.n.y < 0) {
         bottom.getColor(ray);
       }
+      ray.color.w = 1;
     }
     return hit;
   }
@@ -181,6 +183,7 @@ public class StairModel {
       } else if (ray.n.y < 0) {
         bottom.getColor(ray);
       }
+      ray.color.w = 1;
     }
     return hit;
   }

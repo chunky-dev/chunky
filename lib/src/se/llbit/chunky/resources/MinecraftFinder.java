@@ -159,10 +159,11 @@ public class MinecraftFinder {
           continue;
         }
         String releaseTime = "";
-        try {
-          File jsonFile = new File(directory, directory.getName() + ".json");
+        File jsonFile = new File(directory, directory.getName() + ".json");
+        try (
           FileInputStream in = new FileInputStream(jsonFile);
-          JsonParser parser = new JsonParser(in);
+          JsonParser parser = new JsonParser(in)
+        ) {
           JsonObject obj = parser.parse().object();
           releaseTime = obj.get("releaseTime").stringValue("");
         } catch (IOException | SyntaxError e) {

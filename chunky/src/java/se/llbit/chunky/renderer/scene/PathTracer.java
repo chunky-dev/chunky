@@ -43,9 +43,9 @@ public class PathTracer implements RayTracer {
   @Override public void trace(Scene scene, WorkerState state) {
     Ray ray = state.ray;
     if (scene.isInWater(ray)) {
-      ray.setCurrentMaterial(Water.INSTANCE, 0);
+      ray.setCurrentMaterial(Water.INSTANCE);
     } else {
-      ray.setCurrentMaterial(Air.INSTANCE, 0);
+      ray.setCurrentMaterial(Air.INSTANCE);
     }
     pathTrace(scene, ray, state, 1, true);
   }
@@ -125,19 +125,29 @@ public class PathTracer implements RayTracer {
         continue;
       }
 
-      if (pSpecular > Ray.EPSILON && random.nextFloat() < pSpecular) {
-        // Specular reflection.
+      float pMetal = currentMat.metalness;
+      boolean doMetal = pMetal > Ray.EPSILON && random.nextFloat() < pMetal;
+
+      if (doMetal || (pSpecular > Ray.EPSILON && random.nextFloat() < pSpecular)) {
+        // Specular reflection (metals only do specular reflection).
 
         firstReflection = false;
 
         if (!scene.kill(ray.depth + 1, random)) {
           Ray reflected = new Ray();
-          reflected.specularReflection(ray);
+          reflected.specularReflection(ray, random);
 
           if (pathTrace(scene, reflected, state, 1, false)) {
-            ray.color.x = reflected.color.x;
-            ray.color.y = reflected.color.y;
-            ray.color.z = reflected.color.z;
+            if (doMetal) {
+              // use the albedo color as specular color
+              ray.color.x *= reflected.color.x;
+              ray.color.y *= reflected.color.y;
+              ray.color.z *= reflected.color.z;
+            } else {
+              ray.color.x = reflected.color.x;
+              ray.color.y = reflected.color.y;
+              ray.color.z = reflected.color.z;
+            }
             hit = true;
           }
         }
@@ -156,7 +166,7 @@ public class PathTracer implements RayTracer {
 
             Vector4 indirectEmitterColor = new Vector4(0, 0, 0, 0);
 
-            if (scene.emittersEnabled && currentMat.emittance > Ray.EPSILON) {
+            if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance > Ray.EPSILON) {
 
               emittance = addEmitted;
               ray.emittance.x = ray.color.x * ray.color.x *
@@ -166,7 +176,7 @@ public class PathTracer implements RayTracer {
               ray.emittance.z = ray.color.z * ray.color.z *
                   currentMat.emittance * scene.emitterIntensity;
               hit = true;
-            } else if(scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE) {
+            } else if(scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
               // Sample emitter
               boolean sampleOne = scene.emitterSamplingStrategy == EmitterSamplingStrategy.ONE;
               if(sampleOne) {
@@ -221,6 +231,11 @@ public class PathTracer implements RayTracer {
                     reflected.color.y + reflected.emittance.y) + (indirectEmitterColor.y));
                 ray.color.z = ray.color.z * (emittance + directLightB * scene.sun.emittance.z + (
                     reflected.color.z + reflected.emittance.z) + (indirectEmitterColor.z));
+              } else if(indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
+                hit = true;
+                ray.color.x *= indirectEmitterColor.x;
+                ray.color.y *= indirectEmitterColor.y;
+                ray.color.z *= indirectEmitterColor.z;
               }
 
             } else {
@@ -234,6 +249,11 @@ public class PathTracer implements RayTracer {
                     ray.color.y * (emittance + (reflected.color.y + reflected.emittance.y) + (indirectEmitterColor.y));
                 ray.color.z =
                     ray.color.z * (emittance + (reflected.color.z + reflected.emittance.z) + (indirectEmitterColor.z));
+              } else if(indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
+                hit = true;
+                ray.color.x *= indirectEmitterColor.x;
+                ray.color.y *= indirectEmitterColor.y;
+                ray.color.z *= indirectEmitterColor.z;
               }
             }
           }
@@ -252,7 +272,7 @@ public class PathTracer implements RayTracer {
             // Total internal reflection.
             if (!scene.kill(ray.depth + 1, random)) {
               Ray reflected = new Ray();
-              reflected.specularReflection(ray);
+              reflected.specularReflection(ray, random);
               if (pathTrace(scene, reflected, state, 1, false)) {
 
                 ray.color.x = reflected.color.x;
@@ -277,7 +297,7 @@ public class PathTracer implements RayTracer {
 
               if (random.nextFloat() < Rtheta) {
                 Ray reflected = new Ray();
-                reflected.specularReflection(ray);
+                reflected.specularReflection(ray, random);
                 if (pathTrace(scene, reflected, state, 1, false)) {
                   ray.color.x = reflected.color.x;
                   ray.color.y = reflected.color.y;
@@ -376,7 +396,7 @@ public class PathTracer implements RayTracer {
           Ray.EPSILON, airDistance - Ray.EPSILON);
       atmos.o.scaleAdd(offset, od, ox);
       sun.getRandomSunDirection(atmos, random);
-      atmos.setCurrentMaterial(Air.INSTANCE, 0);
+      atmos.setCurrentMaterial(Air.INSTANCE);
 
       double fogDensity = scene.getFogDensity() * EXTINCTION_FACTOR;
       double extinction = Math.exp(-airDistance * fogDensity);
@@ -416,13 +436,23 @@ public class PathTracer implements RayTracer {
     Ray emitterRay = new Ray();
     emitterRay.set(ray);
     // TODO Sampling a random point on the model would be better than using a random point in the middle of the cube
-    Vector3 target = new Vector3(pos.x + 0.5 + (random.nextDouble() - 0.5) / 8, pos.y + 0.5 + (random.nextDouble() - 0.5) / 8, pos.z + 0.5 + (random.nextDouble() - 0.5) / 8);
+    Vector3 target = new Vector3(pos.x + (random.nextDouble() - 0.5) * pos.radius, pos.y + (random.nextDouble() - 0.5) * pos.radius, pos.z  + (random.nextDouble() - 0.5) * pos.radius);
     emitterRay.d.set(target);
     emitterRay.d.sub(emitterRay.o);
     double distance = emitterRay.d.length();
     emitterRay.d.normalize();
     double indirectEmitterCoef = emitterRay.d.dot(emitterRay.n);
     if(indirectEmitterCoef > 0) {
+      // Here We need to invert the material.
+      // The fact that the dot product is > 0 guarantees that the ray is going away from the surface
+      // it just met. This means the ray is going from the block just hit to the previous material (usually air or water)
+      // TODO If/when normal mapping is implemented, indirectEmitterCoef will be computed with the mapped normal
+      //      but the dot product with the original geometry normal will still need to be computed
+      //      to ensure the emitterRay isn't going through the geometry
+      Material prev = emitterRay.getPrevMaterial();
+      int prevData = emitterRay.getPrevData();
+      emitterRay.setPrevMaterial(emitterRay.getCurrentMaterial(), emitterRay.getCurrentData());
+      emitterRay.setCurrentMaterial(prev, prevData);
       emitterRay.emittance.set(0, 0, 0);
       emitterRay.o.scaleAdd(Ray.EPSILON, emitterRay.d);
       PreviewRayTracer.nextIntersection(scene, emitterRay);

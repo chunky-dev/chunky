@@ -55,12 +55,9 @@ public final class JsonSettings {
       JsonParser parser = new JsonParser(in);
       json = parser.parse().object();
       Log.infof("Settings loaded from %s", path);
-    } catch (IOException e) {
-      Log.warnf("Warning: Could not load settings from %s - defaults will be used", path);
-    } catch (SyntaxError e) {
-      Log.warnf(
-          "Warning: Could not load settings from %s - defaults will be used (%s)",
-          path, e.getMessage());
+    } catch (SyntaxError | IOException e) {
+      Log.warn(String.format("Warning: Could not load settings from %s - defaults will be used", path), e);
+      json = new JsonObject();
     }
   }
 
@@ -91,11 +88,9 @@ public final class JsonSettings {
         return;
       }
     }
-    try {
-      OutputStream out = new FileOutputStream(file);
-      PrettyPrinter pp = new PrettyPrinter("  ", new PrintStream(out));
+    try (OutputStream out = new FileOutputStream(file);
+         PrettyPrinter pp = new PrettyPrinter("  ", new PrintStream(out))) {
       json.prettyPrint(pp);
-      out.close();
       Log.info("Saved settings to " + file.getAbsolutePath());
     } catch (IOException e) {
       Log.warnf("Warning: Failed to save settings to %s: %s",

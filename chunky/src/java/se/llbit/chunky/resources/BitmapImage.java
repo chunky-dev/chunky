@@ -90,39 +90,37 @@ public class BitmapImage {
    * @return a copy of this bitmap that is vertically flipped.
    */
   public BitmapImage vFlipped() {
-    BitmapImage rotated = new BitmapImage(width, height);
+    BitmapImage flipped = new BitmapImage(width, height);
     for (int y = 0; y < height; ++y) {
-      for (int x = 0; x < width; ++x) {
-        rotated.setPixel(x, height - y - 1, getPixel(x, y));
-      }
+      System.arraycopy(data, width*y, flipped.data, width*(height-y-1), width);
     }
-    return rotated;
+    return flipped;
   }
 
   /**
    * @return a copy of this bitmap that is horizontally flipped.
    */
   public BitmapImage hFlipped() {
-    BitmapImage rotated = new BitmapImage(width, height);
+    BitmapImage flipped = new BitmapImage(width, height);
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
-        rotated.setPixel(width - x - 1, y, getPixel(x, y));
+        flipped.setPixel(width - x - 1, y, getPixel(x, y));
       }
     }
-    return rotated;
+    return flipped;
   }
 
   /**
    * @return a copy of this bitmap that is flipped in the diagonal.
    */
   public BitmapImage diagonalFlipped() {
-    BitmapImage rotated = new BitmapImage(height, width);
+    BitmapImage flipped = new BitmapImage(height, width);
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
-        rotated.setPixel(y, x, getPixel(x, y));
+        flipped.setPixel(y, x, getPixel(x, y));
       }
     }
-    return rotated;
+    return flipped;
   }
 
   /**
