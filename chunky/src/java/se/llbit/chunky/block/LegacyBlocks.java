@@ -1,8 +1,6 @@
 package se.llbit.chunky.block;
 
-import se.llbit.nbt.CompoundTag;
-import se.llbit.nbt.StringTag;
-import se.llbit.nbt.Tag;
+import se.llbit.nbt.*;
 
 public class LegacyBlocks {
 
@@ -13,7 +11,7 @@ public class LegacyBlocks {
     CompoundTag tag = new CompoundTag();
     switch (id) {
       case 0:   return nameTag(tag, "air");
-      case 2:   return nameTag(tag, "grass");
+      case 2:   return nameTag(tag, "grass_block");
       case 4:   return nameTag(tag, "cobblestone");
       case 7:   return nameTag(tag, "bedrock");
       case 8:
@@ -27,28 +25,22 @@ public class LegacyBlocks {
       case 20:  return nameTag(tag, "glass");
       case 21:  return nameTag(tag, "lapis_ore");
       case 22:  return nameTag(tag, "lapis_block");
-      case 23:  //TODO: dispenser
-      case 24:  //TODO: sandstone
+      case 23:  return facingTag(nameTag(tag, "dispenser"), data);
       case 25:  return nameTag(tag, "note_block");
       case 26:  return nameTag(tag, "red_bed");
       case 27:  return nameTag(tag, "powered_rail");
       case 28:  return nameTag(tag, "detector_rail");
       case 29:  return nameTag(tag, "sticky_piston");
       case 30:  return nameTag(tag, "cobweb");
-      case 31:  //TODO: grass
       case 32:  return nameTag(tag, "dead_bush");
       case 33:  return nameTag(tag, "piston");
       case 34:  return nameTag(tag, "piston_head");
-      case 35:  //TODO: wool
       case 36:  //TODO: none?
       case 37:  return nameTag(tag, "dandelion");
-      case 38:  //TODO: flower
       case 39:  return nameTag(tag, "brown_mushroom");
       case 40:  return nameTag(tag, "red_mushroom");
       case 41:  return nameTag(tag, "gold_block");
       case 42:  return nameTag(tag, "iron_block");
-      case 43:  //TODO: double slab
-      case 44:  //TODO: single slab
       case 45:  return nameTag(tag, "bricks");
       case 46:  return nameTag(tag, "tnt");
       case 47:  return nameTag(tag, "bookshelf");
@@ -65,8 +57,8 @@ public class LegacyBlocks {
       case 58:  return nameTag(tag, "crafting_table");
       case 59:  return nameTag(tag, "wheat");
       case 60:  return nameTag(tag, "farmland");
-      case 61:  return nameTag(tag, "furnace");
-      case 62:  return nameTag(tag, "furnace"); //TODO: lit furnace
+      case 61:  return litTag(facingTag(nameTag(tag, "furnace"), data), false);
+      case 62:  return litTag(facingTag(nameTag(tag, "furnace"), data), true);
       case 63:  return nameTag(tag, "oak_sign");
       case 64:  return nameTag(tag, "oak_door");
       case 65:  return nameTag(tag, "ladder");
@@ -77,10 +69,10 @@ public class LegacyBlocks {
       case 70:  return nameTag(tag, "stone_pressure_plate");
       case 71:  return nameTag(tag, "iron_door");
       case 72:  return nameTag(tag, "oak_door");
-      case 73:  return nameTag(tag, "redstone_ore");
-      case 74:  return nameTag(tag, "redstone_ore"); //TODO: lit redstone
-      case 75:  return nameTag(tag, "redstone_torch");  //TODO: unlit redstone
-      case 76:  return nameTag(tag, "redstone_torch");
+      case 73:  return litTag(nameTag(tag, "redstone_ore"), false);
+      case 74:  return litTag(nameTag(tag, "redstone_ore"), true);
+      case 75:  return redstoneTorchTag(tag, data, false);
+      case 76:  return redstoneTorchTag(tag, data, true);
       case 77:  return nameTag(tag, "stone_button");
       case 78:  return nameTag(tag, "snow");
       case 79:  return nameTag(tag, "ice");
@@ -90,19 +82,17 @@ public class LegacyBlocks {
       case 83:  return nameTag(tag, "sugar_cane");
       case 84:  return nameTag(tag, "jukebox");
       case 85:  return nameTag(tag, "oak_fence");
-      case 86:  return nameTag(tag, "carved_pumpkin");  //TODO: orientation
+      case 86:  return facing4Tag(nameTag(tag, "carved_pumpkin"), data);
       case 87:  return nameTag(tag, "netherrack");
       case 88:  return nameTag(tag, "soul_sand");
       case 89:  return nameTag(tag, "glowstone");
-      case 90:  return nameTag(tag, "nether_portal");   // TODO: orientatino
-      case 91:  return nameTag(tag, "jack_o_lantern");  //TODO: orientatnion
-      case 92:  return nameTag(tag, "cake");  //TODO: block states
-      case 93:  return nameTag(tag, "repeater");
-      case 94:  return nameTag(tag, "repeater");  //TODO: on
+      case 90:  return customTag(nameTag(tag, "nether_portal"), "axis", new StringTag(data == 2 ? "x" : "y"));
+      case 91:  return facing4Tag(nameTag(tag, "jack_o_lantern"), data);
+      case 92:  return customTag(nameTag(tag, "cake"), "bites", new IntTag(data % 6));
+      case 93:  return repeaterTag(nameTag(tag, "repeater"), data, false);
+      case 94:  return repeaterTag(nameTag(tag, "repeater"), data, true);
       case 95:  //TODO: stained glass
-      case 96:  return nameTag(tag, "oak_trapdoor"); //TODO: open
-      case 97:  //TODO: monster egg
-      case 98:  //TODO: stone bricks
+      case 96:  return trapdoorTag(nameTag(tag, "oak_trapdoor"), data);
       case 99:  return nameTag(tag, "brown_mushroom_block");  //TODO state
       case 100: return nameTag(tag, "red_mushroom_block");  //TODO state
       case 101: return nameTag(tag, "iron_bars"); //TODO state
@@ -171,7 +161,7 @@ public class LegacyBlocks {
       case 164: return nameTag(tag, "dark_oak_stairs");
       case 165: return nameTag(tag, "slime_block");
       case 166: return nameTag(tag, "barrier");
-      case 167: return nameTag(tag, "iron_trapdoor"); //TODO state
+      case 167: return trapdoorTag(nameTag(tag, "iron_trapdoor"), data);
       case 168: //TODO prismarine
       case 169: return nameTag(tag, "sea_lantern");
       case 170: return nameTag(tag, "hay_block");
@@ -326,6 +316,87 @@ public class LegacyBlocks {
           case 0: return nameTag(tag, "sponge");
           case 1: return nameTag(tag, "wet_sponge");
         }
+      case 24:
+        switch (data) {
+          default:
+          case 0: return nameTag(tag, "sandstone");
+          case 1: return nameTag(tag, "chiseled_sandstone");
+          case 2: return nameTag(tag, "smooth_sandstone");
+        }
+      case 31:
+        switch (data) {
+          case 0: return nameTag(tag, "dead_bush");
+          default:
+          case 1: return nameTag(tag, "grass");
+          case 2: return nameTag(tag, "fern");
+        }
+      case 35:
+        switch (data) {
+          default:
+          case 0:  return nameTag(tag, "white_wool");
+          case 1:  return nameTag(tag, "orange_wool");
+          case 2:  return nameTag(tag, "magenta_wool");
+          case 3:  return nameTag(tag, "light_blue_wool");
+          case 4:  return nameTag(tag, "yellow_wool");
+          case 5:  return nameTag(tag, "lime_wool");
+          case 6:  return nameTag(tag, "pink_wool");
+          case 7:  return nameTag(tag, "gray_wool");
+          case 8:  return nameTag(tag, "light_gray_wool");
+          case 9:  return nameTag(tag, "cyan_wool");
+          case 10: return nameTag(tag, "purple_wool");
+          case 11: return nameTag(tag, "blue_wool");
+          case 12: return nameTag(tag, "brown_wool");
+          case 13: return nameTag(tag, "green_wool");
+          case 14: return nameTag(tag, "red_wool");
+          case 15: return nameTag(tag, "black_wool");
+        }
+      case 38:
+        switch (data) {
+          default:
+          case 0: return nameTag(tag, "poppy");
+          case 1: return nameTag(tag, "blue_orchid");
+          case 2: return nameTag(tag, "allium");
+          case 3: return nameTag(tag, "azure_bluet");
+          case 4: return nameTag(tag, "red_tulip");
+          case 5: return nameTag(tag, "orange_tulip");
+          case 6: return nameTag(tag, "white_tulip");
+          case 7: return nameTag(tag, "pink_tulip");
+          case 8: return nameTag(tag, "oxeye_daisy");
+        }
+      case 43:
+      case 44: {
+        boolean both = id == 43;
+        boolean which = (data & 0x8) != 0;
+        switch (data) {
+          default:
+          case 0: return slabTag(nameTag(tag, "smooth_stone_slab"), both, which);
+          case 1: return slabTag(nameTag(tag, "sandstone_slab"), both, which);
+          case 2: return slabTag(nameTag(tag, "oak_slab"), both, which);
+          case 3: return slabTag(nameTag(tag, "cobblestone_slab"), both, which);
+          case 4: return slabTag(nameTag(tag, "brick_slab"), both, which);
+          case 5: return slabTag(nameTag(tag, "stone_brick_slab"), both, which);
+          case 6: return slabTag(nameTag(tag, "nether_brick_slab"), both, which);
+          case 7: return slabTag(nameTag(tag, "quartz_slab"), both, which);
+        }
+      }
+      case 97:
+        switch (data) {
+          default:
+          case 0: return nameTag(tag, "infested_stone");
+          case 1: return nameTag(tag, "infested_cobblestone");
+          case 2: return nameTag(tag, "infested_stone_bricks");
+          case 3: return nameTag(tag, "infested_mossy_stone_bricks");
+          case 4: return nameTag(tag, "infested_cracked_stone_bricks");
+          case 5: return nameTag(tag, "infested_chiseled_stone_bricks");
+        }
+      case 98:
+        switch (data) {
+          default:
+          case 0: return nameTag(tag, "stone_bricks");
+          case 1: return nameTag(tag, "mossy_stone_bricks");
+          case 2: return nameTag(tag, "cracked_stone_bricks");
+          case 3: return nameTag(tag, "chiseled_stone_bricks");
+        }
     }
     return nameTag(tag, "unknown");
   }
@@ -333,5 +404,57 @@ public class LegacyBlocks {
   private static CompoundTag nameTag(CompoundTag tag, String name) {
     tag.add("Name", new StringTag("minecraft:" + name));
     return tag;
+  }
+
+  private static CompoundTag facingTag(CompoundTag tag, int direction) {
+    return customTag(tag, "facing", new StringTag((new String[] {"down", "up", "north", "south", "east", "west"})[direction % 6]));
+  }
+
+  private static CompoundTag facing4Tag(CompoundTag tag, int data) {
+    return customTag(tag, "facing", new StringTag((new String[] {"south", "west", "north", "east"})[data % 4]));
+  }
+
+  private static CompoundTag customTag(CompoundTag tag, String name, SpecificTag newTag) {
+    tag.add(name, newTag);
+    return tag;
+  }
+
+  private static CompoundTag slabTag(CompoundTag tag, boolean both, boolean which) {
+    return customTag(tag, "type", new StringTag(both ? "double" : (which ? "top" : "bottom")));
+  }
+
+  private static CompoundTag litTag(CompoundTag tag, boolean lit) {
+    return customTag(tag, "lit", new StringTag(lit ? "true" : "false"));
+  }
+
+  private static CompoundTag redstoneTorchTag(CompoundTag tag, int data, boolean lit) {
+    switch (data % 6) {
+      case 1: return litTag(customTag(nameTag(tag, "redstone_wall_torch"), "facing", new StringTag("east")), lit);
+      case 2: return litTag(customTag(nameTag(tag, "redstone_wall_torch"), "facing", new StringTag("west")), lit);
+      case 3: return litTag(customTag(nameTag(tag, "redstone_wall_torch"), "facing", new StringTag("south")), lit);
+      case 4: return litTag(customTag(nameTag(tag, "redstone_wall_torch"), "facing", new StringTag("north")), lit);
+      default: return litTag(nameTag(tag, "redstone_torch"), lit);
+    }
+  }
+
+  private static CompoundTag repeaterTag(CompoundTag tag, int data, boolean on) {
+    int direction = data & 3;
+    int delay = (data >> 2) & 3;
+
+    tag.add("delay", new IntTag(delay));
+    facing4Tag(tag, direction);
+    tag.add("powered", new StringTag(on ? "true" : "false"));
+    return tag;
+  }
+
+  private static CompoundTag trapdoorTag(CompoundTag tag, int data) {
+    boolean open = (data & 4) != 0;
+    int state = open ? (data & 3) + 2 : data >> 3;
+    switch (state) {
+      case 0: return customTag(tag, "half", new StringTag("bottom"));
+      case 1: return customTag(tag, "half", new StringTag("top"));
+      default: return customTag(customTag(tag, "open", new StringTag("true")),
+          "facing", new StringTag((new String[] {"north", "south", "west", "east"})[state-2]));
+    }
   }
 }
