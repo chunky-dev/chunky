@@ -409,23 +409,6 @@ public class ChunkyFxController
           world.addChunkDeletionListener(chunkSelection);
           Optional<Vector3> playerPos = world.playerPos();
           world.addChunkUpdateListener(map);
-          world.addChunkUpdateListener(
-              new ChunkUpdateListener() {
-                private boolean warningShown = false;
-
-                @Override
-                public void chunkUpdated(ChunkPosition chunkPosition) {
-                  if (!warningShown) {
-                  String version = world.getChunk(chunkPosition).getVersion();
-                  if (version != null && !version.equals("1.13")) {
-                      warningShown = true;
-                      Log.warn(
-                          "This version of Chunky only supports worlds created with Minecraft 1.13 or later. " +
-                          "To render worlds from older Minecraft versions, please use Chunky 1.4.x or convert it to the new format using a current version of Minecraft.");
-                    }
-                  }
-                }
-              });
 
           Platform.runLater(
               () -> {
