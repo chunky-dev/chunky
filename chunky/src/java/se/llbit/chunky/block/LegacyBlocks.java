@@ -674,8 +674,20 @@ public class LegacyBlocks {
     return nameTag(tag, "unknown");
   }
 
+  private static CompoundTag nameTag(CompoundTag tag, String name) {
+    tag.add("Name", new StringTag("minecraft:" + name));
+    return tag;
+  }
+
   private static CompoundTag customTag(CompoundTag tag, String name, SpecificTag newTag) {
-    tag.add(name, newTag);
+    CompoundTag properties;
+    if (!tag.get("Properties").isCompoundTag()) {
+      properties = new CompoundTag();
+      tag.add("Properties", properties);
+    } else {
+      properties = tag.get("Properties").asCompound();
+    }
+    properties.add(name, newTag);
     return tag;
   }
 
@@ -689,10 +701,6 @@ public class LegacyBlocks {
 
   private static CompoundTag boolTag(CompoundTag tag, String name, boolean data) {
     return stringTag(tag, name, data ? "true" : "false");
-  }
-
-  private static CompoundTag nameTag(CompoundTag tag, String name) {
-    return stringTag(tag, "Name", "minecraft:" + name);
   }
 
   private static CompoundTag facingTag(CompoundTag tag, int direction) {
