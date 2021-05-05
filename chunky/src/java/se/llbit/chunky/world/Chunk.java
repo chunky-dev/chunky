@@ -328,7 +328,7 @@ public class Chunk {
             }
           }
         } else {
-          int yOffset = yTag.byteValue() & 0xFF;
+          int yOffset = sectionY & 0xFF;
 
           Tag dataTag = section.get("Data");
           byte[] blockDataBytes = new byte[(Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX) / 2];

@@ -6,7 +6,9 @@ public class LegacyBlocks {
 
   public static Tag getTag(int offset, byte[] blocks, byte[] blockData) {
     int id = blocks[offset] & 0xFF;
-    int data = (blockData[offset / 2] << (offset % 2 == 0 ? 0 : 4)) & 0xFF;
+    int data = 0xFF & blockData[offset / 2];
+    data >>= (offset % 2) * 4;
+    data &= 0xF;
 
     CompoundTag tag = new CompoundTag();
     switch (id) {
