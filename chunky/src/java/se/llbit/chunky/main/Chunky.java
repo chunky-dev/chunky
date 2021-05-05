@@ -21,6 +21,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.BlockProvider;
 import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.MinecraftBlockProvider;
+import se.llbit.chunky.block.legacy.LegacyMinecraftBlockProvider;
 import se.llbit.chunky.main.CommandLineOptions.Mode;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.plugin.ChunkyPlugin;
@@ -111,6 +112,7 @@ public class Chunky {
   public Chunky(ChunkyOptions options) {
     this.options = options;
     registerBlockProvider(new MinecraftBlockProvider());
+    registerBlockProvider(new LegacyMinecraftBlockProvider());
   }
 
   /**

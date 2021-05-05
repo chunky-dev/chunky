@@ -51,6 +51,7 @@ import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.*;
+import se.llbit.chunky.block.legacy.LegacyBlocksFinalizer;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
@@ -881,6 +882,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     Set<ChunkPosition> nonEmptyChunks = new HashSet<>();
+    Set<ChunkPosition> legacyChunks = new HashSet<>();
     Heightmap biomeIdMap = new Heightmap();
 
     ChunkData chunkData1;
@@ -1259,6 +1261,9 @@ public class Scene implements JsonSerializable, Refreshable {
 
         if (!chunkData.isEmpty()){
           nonEmptyChunks.add(cp);
+          if (world.getChunk(cp).getVersion().equals("1.12")) {
+            legacyChunks.add(cp);
+          }
         }
       }
       executor.shutdown();
@@ -1330,6 +1335,10 @@ public class Scene implements JsonSerializable, Refreshable {
         task.updateEta(target, done);
         done += 1;
         OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
+        if (legacyChunks.contains(cp)) {
+          LegacyBlocksFinalizer
+              .finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
+        }
       }
 
       worldOctree.endFinalization();

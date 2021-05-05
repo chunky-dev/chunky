@@ -63,7 +63,7 @@ public class LegacyBlocks {
       case 61:  return litTag(facingTag(nameTag(tag, "furnace"), data), false);
       case 62:  return litTag(facingTag(nameTag(tag, "furnace"), data), true);
       case 63:  return intTag(nameTag(tag, "oak_sign"), "rotation", data);
-      case 64:  return nameTag(tag, "oak_door"); //TODO state & finalize state
+      case 64:  return needsFinalization(nameTag(tag, "oak_door"), data); //TODO state & finalize state
       case 65:  return chestFurnaceLadderTag(nameTag(tag, "ladder"), data);
       case 67:  return stairTag(nameTag(tag, "cobblestone_stairs"), data); //TODO shape finalize
       case 68:  return wallSignTag(nameTag(tag, "oak_wall_sign"), data);
@@ -674,6 +674,14 @@ public class LegacyBlocks {
     return nameTag(tag, "unknown");
   }
 
+  private static Tag needsFinalization(CompoundTag blockTag, int data) {
+    CompoundTag tag = new CompoundTag();
+    tag.add("Name", (StringTag) blockTag.get("Name"));
+    tag.add("Data", new IntTag(data));
+    tag.add("Block", blockTag);
+    return tag;
+  }
+
   private static CompoundTag nameTag(CompoundTag tag, String name) {
     tag.add("Name", new StringTag("minecraft:" + name));
     return tag;
@@ -681,7 +689,7 @@ public class LegacyBlocks {
 
   private static CompoundTag customTag(CompoundTag tag, String name, SpecificTag newTag) {
     CompoundTag properties;
-    if (!tag.get("Properties").isCompoundTag()) {
+    if (tag.get("Properties").isCompoundTag()) {
       properties = new CompoundTag();
       tag.add("Properties", properties);
     } else {
