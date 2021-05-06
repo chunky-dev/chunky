@@ -44,25 +44,12 @@ public class ChunkPosition {
     return get(x >> 5, z >> 5);
   }
 
-  private static final Map<Integer, Map<Integer, ChunkPosition>> map = new ConcurrentHashMap<>();
+  //not using synchronized Long2ReferenceOpenHashMap due to using one lock. ConcurrentHashMap locks on buckets
+  private static final Map<Long, ChunkPosition> positions = new ConcurrentHashMap<>();
+  private static final long INT_BIT_MASK = (1L << 32) - 1;
 
   public static ChunkPosition get(int x, int z) {
-    Map<Integer, ChunkPosition> submap = map.get(x);
-    if (submap == null) {
-      submap = new ConcurrentHashMap<>();
-      map.put(x, submap);
-      ChunkPosition chunkPosition = new ChunkPosition(x, z);
-      submap.put(z, chunkPosition);
-      return chunkPosition;
-    }
-
-    ChunkPosition chunkPosition = submap.get(z);
-    if (chunkPosition == null) {
-      chunkPosition = new ChunkPosition(x, z);
-      submap.put(z, chunkPosition);
-    }
-
-    return chunkPosition;
+    return positions.computeIfAbsent((x & INT_BIT_MASK) | (z & INT_BIT_MASK) << 32, (position) -> new ChunkPosition(x, z));
   }
 
   /**
