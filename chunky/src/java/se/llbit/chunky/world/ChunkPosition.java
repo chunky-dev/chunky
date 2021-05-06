@@ -46,10 +46,9 @@ public class ChunkPosition {
 
   //not using synchronized Long2ReferenceOpenHashMap due to using one lock. ConcurrentHashMap locks on buckets
   private static final Map<Long, ChunkPosition> positions = new ConcurrentHashMap<>();
-  private static final long INT_BIT_MASK = (1L << 32) - 1;
 
   public static ChunkPosition get(int x, int z) {
-    return positions.computeIfAbsent((x & INT_BIT_MASK) | (z & INT_BIT_MASK) << 32, (position) -> new ChunkPosition(x, z));
+    return positions.computeIfAbsent((z & 0xFFFFFFFFL) | (x & 0xFFFFFFFFL) << 32, (position) -> new ChunkPosition(x, z));
   }
 
   /**
