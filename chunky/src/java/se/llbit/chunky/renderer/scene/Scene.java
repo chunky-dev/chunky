@@ -1014,8 +1014,8 @@ public class Scene implements JsonSerializable, Refreshable {
                 int cubeIndex = (cz * 16 + cy) * 16 + cx;
 
                 // Change the type of hidden blocks to ANY_TYPE
-                boolean notOnEdge = !chunkData.isBlockOnEdge(cx, cy, cz);
-                boolean isHidden = notOnEdge
+                boolean onEdge = y <= yMin || y >= yMax - 1 || chunkData.isBlockOnEdge(cx, y, cz);
+                boolean isHidden = !onEdge
                         && palette.get(chunkData.getBlockAt(cx + 1, y, cz)).opaque
                         && palette.get(chunkData.getBlockAt(cx - 1, y, cz)).opaque
                         && palette.get(chunkData.getBlockAt(cx, y + 1, cz)).opaque
@@ -1080,7 +1080,7 @@ public class Scene implements JsonSerializable, Refreshable {
                       // Move plain water blocks to the water octree.
                       octNode = palette.airId;
 
-                      if(notOnEdge) {
+                      if(!onEdge) {
                         // Perform water computation now for water blocks that are not on th edge of the chunk
                         // Test if the block has not already be marked as full
                         if(((Water) palette.get(waterNode)).data == 0) {
@@ -1133,10 +1133,10 @@ public class Scene implements JsonSerializable, Refreshable {
                       }
                     }
                     cubeWaterBlocks[cubeIndex] = waterNode;
-                  } else if(cy + 1 < yMax && block instanceof Lava) {
+                  } else if(y + 1 < yMax && block instanceof Lava) {
                     if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)) instanceof Lava) {
                       octNode = palette.getLavaId(0, 1 << Water.FULL_BLOCK);
-                    } else if(notOnEdge) {
+                    } else if(!onEdge) {
                       // Compute lava level for blocks not on edge
                       Lava lava = (Lava) block;
                       int level0 = 8 - lava.level;
