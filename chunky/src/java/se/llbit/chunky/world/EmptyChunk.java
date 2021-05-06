@@ -84,8 +84,8 @@ public class EmptyChunk extends Chunk {
     // Do nothing.
   }
 
-  @Override public synchronized void loadChunk(ChunkData chunkData, int yMax) {
-    // Do nothing.
+  @Override public synchronized boolean loadChunk(ChunkData chunkData, int yMax) {
+    return false;
   }
 
   @Override public String toString() {
