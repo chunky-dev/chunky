@@ -202,7 +202,7 @@ public abstract class BinaryBVH implements BVH {
                 // Is leaf
                 int primIndex = -packed[currentNode];
                 for (Primitive primitive : packedPrimitives[primIndex]) {
-                    hit = primitive.intersect(ray) || hit;
+                    hit = primitive.intersect(ray) | hit;
                 }
 
                 if (nodesToVisit.isEmpty()) break;
