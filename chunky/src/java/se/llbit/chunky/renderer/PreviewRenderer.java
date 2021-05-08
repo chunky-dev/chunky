@@ -20,29 +20,28 @@ package se.llbit.chunky.renderer;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.RayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.renderer.scene.TileBasedRenderer;
 import se.llbit.math.Ray;
 import se.llbit.util.TaskTracker;
 
 public class PreviewRenderer extends TileBasedRenderer {
-  protected final String nameString;
-  protected final String idString;
+  protected final String id;
+  protected final String name;
   protected RayTracer tracer;
 
-  public PreviewRenderer(RayTracer tracer, String name, String id) {
+  public PreviewRenderer(String id, String name, RayTracer tracer) {
+    this.id = id;
+    this.name = name;
     this.tracer = tracer;
-    this.nameString = name;
-    this.idString = id;
   }
 
   @Override
-  public String getIdString() {
-    return idString;
+  public String getId() {
+    return id;
   }
 
   @Override
-  public String getNameString() {
-    return nameString;
+  public String getDisplayName() {
+    return name;
   }
 
   @Override

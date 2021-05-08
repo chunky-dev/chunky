@@ -19,27 +19,26 @@ package se.llbit.chunky.renderer;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.RayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.renderer.scene.TileBasedRenderer;
 
 public class PathTracingRenderer extends TileBasedRenderer {
-  protected final String nameString;
-  protected final String idString;
+  protected final String id;
+  protected final String name;
   protected RayTracer tracer;
 
-  public PathTracingRenderer(RayTracer tracer, String name, String id) {
+  public PathTracingRenderer(String id, String name, RayTracer tracer) {
+    this.id = id;
+    this.name = name;
     this.tracer = tracer;
-    this.nameString = name;
-    this.idString = id;
   }
 
   @Override
-  public String getIdString() {
-    return idString;
+  public String getId() {
+    return id;
   }
 
   @Override
-  public String getNameString() {
-    return nameString;
+  public String getDisplayName() {
+    return name;
   }
 
   @Override

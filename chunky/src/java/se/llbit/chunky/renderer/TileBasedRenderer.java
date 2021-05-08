@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.scene;
+package se.llbit.chunky.renderer;
 
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
@@ -22,6 +22,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.DefaultRenderManager;
 import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.WorkerState;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Ray;
 
 import java.util.ArrayList;

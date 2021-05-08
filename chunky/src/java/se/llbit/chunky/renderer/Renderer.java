@@ -20,14 +20,14 @@ import java.util.function.BooleanSupplier;
 
 public interface Renderer {
   /**
-   * Get the short id string representing this renderer.
+   * Get the ID of this renderer.
    */
-  String getIdString();
+  String getId();
 
   /**
-   * Get the name string of this renderer.
+   * Get the friendly name of this renderer.
    */
-  String getNameString();
+  String getDisplayName();
 
   /**
    * The post render callback. This should be run after rendering a frame.

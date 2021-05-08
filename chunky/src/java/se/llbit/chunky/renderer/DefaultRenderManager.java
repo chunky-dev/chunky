@@ -64,16 +64,23 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   @PluginApi
   public static final Map<String, Renderer> previewRenderers = new HashMap<>();
 
+  /**
+   * The ID's for the builtin path tracer and preview renderers.
+   * DO NOT use these ID's other than for the builtin renderers.
+   */
+  public static final String ChunkyPathTracerID = "PathTracingRenderer";
+  public static final String ChunkyPreviewID = "PreviewRenderer";
+
   static {
-    addRenderer(new PathTracingRenderer(new PathTracer(), "Chunky Path Tracer", "PathTracingRenderer"));
-    addPreviewRenderer(new PreviewRenderer(new PreviewRayTracer(), "Chunky Preview", "PreviewRenderer"));
+    addRenderer(new PathTracingRenderer(ChunkyPathTracerID, "Chunky Path Tracer", new PathTracer()));
+    addPreviewRenderer(new PreviewRenderer(ChunkyPreviewID, "Chunky Preview", new PreviewRayTracer()));
   }
 
   /**
    * The current renderer selections.
    */
-  private String renderer = "Chunky Path Tracer";
-  private String previewRenderer = "Chunky Preview";
+  private String renderer = ChunkyPathTracerID;
+  private String previewRenderer = ChunkyPreviewID;
 
   /**
    * This is a buffered scene which render workers should use while rendering.
@@ -148,8 +155,8 @@ public class DefaultRenderManager extends Thread implements RenderManager {
    * This renderer does nothing. Is used when there is an invalid renderer.
    */
   private static final Renderer EMPTY_RENDERER = new Renderer() {
-    @Override public String getIdString() { return "Empty"; }
-    @Override public String getNameString() { return "Empty"; }
+    @Override public String getId() { return "Empty"; }
+    @Override public String getDisplayName() { return "Empty"; }
     @Override public void setPostRender(BooleanSupplier callback) {}
     @Override public void render(DefaultRenderManager manager) {}
   };
@@ -223,7 +230,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   public void run() {
     try {
       while (!isInterrupted()) {
-        // Wait for something to happen
+        // Wait for a scene state change (e.g. user editing the scene)
         ResetReason reason = sceneProvider.awaitSceneStateChange();
 
         // Copy the new scene state to the bufferedScene
@@ -293,42 +300,34 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     }
   }
 
-  private Renderer getRenderer() {
+  @Override
+  public Collection<Renderer> getRenderers() {
+    return renderers.values();
+  }
+
+  @Override
+  public Collection<Renderer> getPreviewRenderers() {
+    return previewRenderers.values();
+  }
+
+  @Override
+  public Renderer getRenderer() {
     return renderers.getOrDefault(renderer, EMPTY_RENDERER);
   }
 
-  private Renderer getPreviewRenderer() {
+  @Override
+  public Renderer getPreviewRenderer() {
     return previewRenderers.getOrDefault(previewRenderer, EMPTY_RENDERER);
   }
 
   @Override
-  public Collection<String> getRenderers() {
-    return renderers.keySet();
+  public void setRenderer(String id) {
+    renderer = id;
   }
 
   @Override
-  public Collection<String> getPreviewRenderers() {
-    return previewRenderers.keySet();
-  }
-
-  @Override
-  public String getRendererName() {
-    return renderer;
-  }
-
-  @Override
-  public String getPreviewRendererName() {
-    return previewRenderer;
-  }
-
-  @Override
-  public void setRenderer(String value) {
-    renderer = value;
-  }
-
-  @Override
-  public void setPreviewRenderer(String value) {
-    previewRenderer = value;
+  public void setPreviewRenderer(String id) {
+    previewRenderer = id;
   }
 
   @Override
@@ -355,7 +354,6 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     finalizeAllFrames = scene.shouldFinalizeBuffer();
     if (mode != scene.getMode()) {
       mode = scene.getMode();
-      // TODO: make render state update faster by moving this to Scene?
       renderStatusListeners.forEach(listener -> listener.renderStateChanged(mode));
     }
   }
@@ -510,7 +508,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
    * Do not use, use {@code Chunky.addRenderer()}.
    */
   public static void addRenderer(Renderer renderer) {
-    renderers.put(renderer.getNameString(), renderer);
+    renderers.put(renderer.getId(), renderer);
   }
 
   /**
@@ -518,6 +516,6 @@ public class DefaultRenderManager extends Thread implements RenderManager {
    * Do not use, use {@code Chunky.addPreviewRenderer()}.
    */
   public static void addPreviewRenderer(Renderer renderer) {
-    previewRenderers.put(renderer.getNameString(), renderer);
+    previewRenderers.put(renderer.getId(), renderer);
   }
 }

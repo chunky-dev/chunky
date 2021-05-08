@@ -82,14 +82,14 @@ public class PluginApiTest {
 
   @Test
   public void testSetCustomPreviewRenderer() {
-    Renderer renderer = new PreviewRenderer(null, "Test Preview Renderer", "TestPreviewRenderer");
+    Renderer renderer = new PreviewRenderer("TestPreviewRenderer", "Test Preview Renderer", null);
     Chunky.addPreviewRenderer(renderer);
     assertSame(renderer, DefaultRenderManager.previewRenderers.get("Test Preview Renderer"));
   }
 
   @Test
   public void testSetCustomRenderer() {
-    Renderer renderer = new PathTracingRenderer(null, "Test Renderer", "TestRenderer");
+    Renderer renderer = new PathTracingRenderer("TestRenderer", "Test Renderer", null);
     Chunky.addRenderer(renderer);
     assertSame(renderer, DefaultRenderManager.renderers.get("Test Renderer"));
   }

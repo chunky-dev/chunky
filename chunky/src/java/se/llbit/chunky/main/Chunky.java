@@ -394,7 +394,7 @@ public class Chunky {
 
   @PluginApi
   public static void addPreviewRenderer(Renderer renderer) {
-    String name = renderer.getNameString();
+    String name = renderer.getId();
     if (DefaultRenderManager.previewRenderers.containsKey(name))
       Log.warn("Preview renderer already exists (do you have the same plugin loaded twice?): " + name);
     DefaultRenderManager.addPreviewRenderer(renderer);
@@ -402,7 +402,7 @@ public class Chunky {
 
   @PluginApi
   public static void addRenderer(Renderer renderer) {
-    String name = renderer.getNameString();
+    String name = renderer.getId();
     if (DefaultRenderManager.renderers.containsKey(name))
       Log.warn("Renderer already exists (do you have the same plugin loaded twice?): " + name);
     DefaultRenderManager.addRenderer(renderer);
@@ -414,8 +414,8 @@ public class Chunky {
     Log.info("`setPreviewRayTracerFactory` is deprecated. Use `addPreviewRenderer` instead.");
     if (DefaultRenderManager.previewRenderers.containsKey("Plugin Preview Renderer"))
       Log.warn("2+ plugin preview renderers installed.");
-    DefaultRenderManager.addPreviewRenderer(new PreviewRenderer(previewRayTracerFactory.newRayTracer(),
-        "Plugin Preview Renderer", "PluginPreviewRenderer"));
+    DefaultRenderManager.addPreviewRenderer(new PreviewRenderer("PluginPreviewRenderer", "Plugin Preview Renderer", previewRayTracerFactory.newRayTracer()
+    ));
   }
 
   @PluginApi
@@ -424,8 +424,8 @@ public class Chunky {
     Log.info("`setRayTracerFactory` is deprecated. Use `addRenderer` instead.");
     if (DefaultRenderManager.renderers.containsKey("Plugin Renderer"))
       Log.warn("2+ plugin renderers installed.");
-    DefaultRenderManager.addRenderer(new PathTracingRenderer(rayTracerFactory.newRayTracer(),
-        "Plugin Renderer", "PluginRenderer"));
+    DefaultRenderManager.addRenderer(new PathTracingRenderer("PluginRenderer", "Plugin Renderer", rayTracerFactory.newRayTracer()
+    ));
   }
 
   /**

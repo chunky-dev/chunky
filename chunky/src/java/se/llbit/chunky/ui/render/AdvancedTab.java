@@ -30,6 +30,7 @@ import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderManager;
+import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
@@ -234,10 +235,20 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
     if (rendererSelect.getItems().isEmpty()) {
       RenderManager renderManager = controller.getRenderManager();
-      rendererSelect.getItems().addAll(renderManager.getRenderers());
-      rendererSelect.getSelectionModel().select(renderManager.getRendererName());
-      previewSelect.getItems().addAll(renderManager.getPreviewRenderers());
-      previewSelect.getSelectionModel().select(renderManager.getPreviewRendererName());
+      ArrayList<String> ids = new ArrayList<>();
+
+      for (Renderer renderer : renderManager.getRenderers())
+        ids.add(renderer.getId());
+
+      rendererSelect.getItems().addAll(ids);
+      rendererSelect.getSelectionModel().select(renderManager.getRenderer().getId());
+
+      ids.clear();
+      for (Renderer render : renderManager.getPreviewRenderers())
+        ids.add(render.getId());
+
+      previewSelect.getItems().addAll(ids);
+      previewSelect.getSelectionModel().select(renderManager.getPreviewRenderer().getId());
     }
   }
 }
