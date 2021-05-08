@@ -61,7 +61,7 @@ public class PluginApiTest {
     chunky.setPreviewRayTracerFactory(myFactory);
 
     // Get ray tracer through reflection
-    Renderer renderer = DefaultRenderManager.previewRenderers.get("Plugin Preview Renderer");
+    Renderer renderer = DefaultRenderManager.previewRenderers.get("PluginPreviewRenderer");
     Field rayTracer = renderer.getClass().getDeclaredField("tracer");
     rayTracer.setAccessible(true);
     assertSame(tracer, rayTracer.get(renderer));
@@ -74,7 +74,7 @@ public class PluginApiTest {
     chunky.setRayTracerFactory(myFactory);
 
     // Get ray tracer through reflection
-    Renderer renderer = DefaultRenderManager.renderers.get("Plugin Renderer");
+    Renderer renderer = DefaultRenderManager.renderers.get("PluginRenderer");
     Field rayTracer = renderer.getClass().getDeclaredField("tracer");
     rayTracer.setAccessible(true);
     assertSame(tracer, rayTracer.get(renderer));
@@ -84,14 +84,14 @@ public class PluginApiTest {
   public void testSetCustomPreviewRenderer() {
     Renderer renderer = new PreviewRenderer("TestPreviewRenderer", "Test Preview Renderer", null);
     Chunky.addPreviewRenderer(renderer);
-    assertSame(renderer, DefaultRenderManager.previewRenderers.get("Test Preview Renderer"));
+    assertSame(renderer, DefaultRenderManager.previewRenderers.get("TestPreviewRenderer"));
   }
 
   @Test
   public void testSetCustomRenderer() {
     Renderer renderer = new PathTracingRenderer("TestRenderer", "Test Renderer", null);
     Chunky.addRenderer(renderer);
-    assertSame(renderer, DefaultRenderManager.renderers.get("Test Renderer"));
+    assertSame(renderer, DefaultRenderManager.renderers.get("TestRenderer"));
   }
 
   @Test public void testSetRenderControlsTabTransformer() {
