@@ -412,7 +412,7 @@ public class Chunky {
   @Deprecated
   public void setPreviewRayTracerFactory(RayTracerFactory previewRayTracerFactory) {
     Log.info("`setPreviewRayTracerFactory` is deprecated. Use `addPreviewRenderer` instead.");
-    if (DefaultRenderManager.previewRenderers.containsKey("Plugin Preview Renderer"))
+    if (DefaultRenderManager.previewRenderers.containsKey("PluginPreviewRenderer"))
       Log.warn("2+ plugin preview renderers installed.");
     DefaultRenderManager.addPreviewRenderer(new PreviewRenderer("PluginPreviewRenderer", "Plugin Preview Renderer", previewRayTracerFactory.newRayTracer()
     ));
@@ -422,7 +422,7 @@ public class Chunky {
   @Deprecated
   public void setRayTracerFactory(RayTracerFactory rayTracerFactory) {
     Log.info("`setRayTracerFactory` is deprecated. Use `addRenderer` instead.");
-    if (DefaultRenderManager.renderers.containsKey("Plugin Renderer"))
+    if (DefaultRenderManager.renderers.containsKey("PluginRenderer"))
       Log.warn("2+ plugin renderers installed.");
     DefaultRenderManager.addRenderer(new PathTracingRenderer("PluginRenderer", "Plugin Renderer", rayTracerFactory.newRayTracer()
     ));
