@@ -687,7 +687,7 @@ public class LegacyBlocks {
     return tag;
   }
 
-  static CompoundTag createTag(String name) {
+  public static CompoundTag createTag(String name) {
     return nameTag(new CompoundTag(), name);
   }
 
@@ -708,7 +708,7 @@ public class LegacyBlocks {
     return tag;
   }
 
-  static CompoundTag stringTag(CompoundTag tag, String name, String data) {
+  public static CompoundTag stringTag(CompoundTag tag, String name, String data) {
     return customTag(tag, name, new StringTag(data));
   }
 
@@ -716,7 +716,7 @@ public class LegacyBlocks {
     return customTag(tag, name, new IntTag(data));
   }
 
-  static CompoundTag boolTag(CompoundTag tag, String name, boolean data) {
+  public static CompoundTag boolTag(CompoundTag tag, String name, boolean data) {
     return stringTag(tag, name, data ? "true" : "false");
   }
 
@@ -847,7 +847,7 @@ public class LegacyBlocks {
     }
   }
 
-  static CompoundTag vineTag(CompoundTag tag, int data, boolean forceUp) {
+  public static CompoundTag vineTag(CompoundTag tag, int data, boolean forceUp) {
     boolean up, north, south, east, west;
     up = north = south = east = west = false;
 
@@ -991,9 +991,5 @@ public class LegacyBlocks {
     stringTag(tag, "south", south ? "true" : "false");
     stringTag(tag, "west", west ? "true" : "false");
     return tag;
-  }
-
-  static CompoundTag snowCovered(CompoundTag tag) {
-    return boolTag(tag, "snowy", true);
   }
 }
