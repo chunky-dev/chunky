@@ -102,8 +102,8 @@ public class LegacyBlocks {
       case 101: return nameTag(tag, "iron_bars"); //TODO state finalize
       case 102: return nameTag(tag, "glass_pane");  //TODO state finalize
       case 103: return nameTag(tag, "melon");
-      case 104: return intTag(nameTag(tag, "pumpkin_stem"), "age", data&7);  //TODO attached finalize
-      case 105: return intTag(nameTag(tag, "melon_stem"), "age", data&7);  //TODO attached finalize
+      case 104: return needsFinalization(intTag(nameTag(tag, "pumpkin_stem"), "age", data&7), id, data);
+      case 105: return needsFinalization(intTag(nameTag(tag, "melon_stem"), "age", data&7), id, data);
       case 106: return needsFinalization(vineTag(nameTag(tag, "vine"), data, false), id, data);
       case 107: return fenceGate(nameTag(tag, "oak_fence_gate"), data); //TODO inwall finalize
       case 108: return stairTag(nameTag(tag, "brick_stairs"), data);  //TODO shape finalize
@@ -708,7 +708,7 @@ public class LegacyBlocks {
     return tag;
   }
 
-  private static CompoundTag stringTag(CompoundTag tag, String name, String data) {
+  static CompoundTag stringTag(CompoundTag tag, String name, String data) {
     return customTag(tag, name, new StringTag(data));
   }
 
@@ -720,7 +720,7 @@ public class LegacyBlocks {
     return stringTag(tag, name, data ? "true" : "false");
   }
 
-  private static CompoundTag facingTag(CompoundTag tag, int direction) {
+  static CompoundTag facingTag(CompoundTag tag, int direction) {
     return stringTag(tag, "facing", (new String[] {"down", "up", "north", "south", "west", "east"})[direction % 6]);
   }
 
