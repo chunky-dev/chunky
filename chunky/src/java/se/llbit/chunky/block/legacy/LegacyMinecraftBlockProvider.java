@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.BlockProvider;
+import se.llbit.chunky.block.legacy.blocks.Chest;
 import se.llbit.chunky.block.legacy.blocks.MelonStem;
 import se.llbit.chunky.block.legacy.blocks.PumpkinStem;
 import se.llbit.chunky.block.legacy.blocks.SnowCoverableBlock;
@@ -38,6 +39,9 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
         return new PumpkinStem(name, ctag);
       case "melon_stem":
         return new MelonStem(name, ctag);
+      case "chest":
+      case "trapped_chest":
+        return new Chest(name, ctag);
     }
     Log.warn("Unsupported legacy block: " + name);
     return null;

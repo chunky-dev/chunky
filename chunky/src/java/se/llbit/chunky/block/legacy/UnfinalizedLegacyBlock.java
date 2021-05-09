@@ -18,9 +18,24 @@ import se.llbit.nbt.CompoundTag;
  */
 public abstract class UnfinalizedLegacyBlock extends Block {
 
+  /**
+   * The wrapped block.
+   */
   protected final Block block;
+
+  /**
+   * The ID of the wrapped block.
+   */
   protected final int id;
+
+  /**
+   * The data value of the wrapped block.
+   */
   protected final int data;
+
+  /**
+   * The tag of the wrapped block.
+   */
   protected final CompoundTag tag;
 
   public UnfinalizedLegacyBlock(String name, CompoundTag tag) {

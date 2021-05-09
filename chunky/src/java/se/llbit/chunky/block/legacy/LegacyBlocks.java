@@ -57,7 +57,7 @@ public class LegacyBlocks {
       case 51:  return nameTag(tag, "fire"); //TODO shape finalize
       case 52:  return nameTag(tag, "spawner");
       case 53:  return stairTag(nameTag(tag, "oak_stairs"), data); //TODO shape finalize
-      case 54:  return chestFurnaceLadderTag(nameTag(tag, "chest"), data); //TODO shape finalize
+      case 54:  return needsFinalization(chestFurnaceLadderTag(nameTag(tag, "chest"), data), id, data);
       case 55:  return intTag(nameTag(tag, "redstone_wire"), "power", data); //TODO shape finalize
       case 56:  return nameTag(tag, "diamond_ore");
       case 57:  return nameTag(tag, "diamond_block");
@@ -153,7 +153,7 @@ public class LegacyBlocks {
       case 142: return intTag(nameTag(tag, "potatoes"), "age", data&7);
       case 143: return buttonTag(nameTag(tag, "oak_button"), data);
       case 144: //TODO skull tile entity
-      case 146: return chestFurnaceLadderTag(nameTag(tag, "trapped_chest"), data); //TODO shape finalize
+      case 146: return needsFinalization(chestFurnaceLadderTag(nameTag(tag, "trapped_chest"), data), id, data);
       case 147: return nameTag(tag, "light_weighted_pressure_plate");
       case 148: return nameTag(tag, "heavy_weighted_pressure_plate");
       case 149:
@@ -811,7 +811,7 @@ public class LegacyBlocks {
     }
   }
 
-  private static CompoundTag chestFurnaceLadderTag(CompoundTag tag, int data) {
+  public static CompoundTag chestFurnaceLadderTag(CompoundTag tag, int data) {
     switch (data) {
       default:
       case 2: return stringTag(tag, "facing", "north");
