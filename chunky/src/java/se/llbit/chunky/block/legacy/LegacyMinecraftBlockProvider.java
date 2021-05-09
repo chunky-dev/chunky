@@ -13,6 +13,7 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
   private static String[] blockList = new String[]{
       "#legacy_minecraft:oak_door",
       "#legacy_minecraft:grass_block",
+      "#legacy_minecraft:vine"
   };
 
   @Override
@@ -26,6 +27,7 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "grass_block":
       case "mycelium":
       case "podzol":
+      case "vine":
         return new UnfinalizedLegacyBlock(name, (CompoundTag) tag);
     }
     Log.warn("Unsupported legacy block: " + name);

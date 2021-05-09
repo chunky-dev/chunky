@@ -68,8 +68,20 @@ public class LegacyBlocksFinalizer {
             return;
           }
         }
-        finalizationState.replaceCurrentBlock(block.tag);
+      } else if (block.id == 106) {
+        // vines have an "up" part if the block above is solid
+        if (finalizationState.getY() < finalizationState.getYMax() - 1) {
+          Material above = finalizationState.getMaterial(0, 1, 0);
+          if (above.solid) {
+            finalizationState.replaceCurrentBlock(
+                LegacyBlocks.vineTag(LegacyBlocks.createTag("vine"), block.data, true));
+            return;
+          }
+        }
       }
+
+      // otherwise just unwrap the block
+      finalizationState.replaceCurrentBlock(block.tag);
     }
   }
 }

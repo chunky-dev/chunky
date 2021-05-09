@@ -104,7 +104,7 @@ public class LegacyBlocks {
       case 103: return nameTag(tag, "melon");
       case 104: return intTag(nameTag(tag, "pumpkin_stem"), "age", data&7);  //TODO attached finalize
       case 105: return intTag(nameTag(tag, "melon_stem"), "age", data&7);  //TODO attached finalize
-      case 106: return vineTag(nameTag(tag, "vine"), data); //TODO top finalize
+      case 106: return needsFinalization(vineTag(nameTag(tag, "vine"), data, false), id, data);
       case 107: return fenceGate(nameTag(tag, "oak_fence_gate"), data); //TODO inwall finalize
       case 108: return stairTag(nameTag(tag, "brick_stairs"), data);  //TODO shape finalize
       case 109: return stairTag(nameTag(tag, "stone_brick_stairs"), data);  //TODO shape finalize
@@ -716,7 +716,7 @@ public class LegacyBlocks {
     return customTag(tag, name, new IntTag(data));
   }
 
-  private static CompoundTag boolTag(CompoundTag tag, String name, boolean data) {
+  static CompoundTag boolTag(CompoundTag tag, String name, boolean data) {
     return stringTag(tag, name, data ? "true" : "false");
   }
 
@@ -847,11 +847,11 @@ public class LegacyBlocks {
     }
   }
 
-  private static CompoundTag vineTag(CompoundTag tag, int data) {
+  static CompoundTag vineTag(CompoundTag tag, int data, boolean forceUp) {
     boolean up, north, south, east, west;
     up = north = south = east = west = false;
 
-    if (data == 0) up = true;
+    if (data == 0 || forceUp) up = true;
     if ((data & 0b0001) != 0) south = true;
     if ((data & 0b0010) != 0) west = true;
     if ((data & 0b0100) != 0) north = true;
