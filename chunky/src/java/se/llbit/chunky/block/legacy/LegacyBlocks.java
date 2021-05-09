@@ -1,6 +1,10 @@
-package se.llbit.chunky.block;
+package se.llbit.chunky.block.legacy;
 
-import se.llbit.nbt.*;
+import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.IntTag;
+import se.llbit.nbt.SpecificTag;
+import se.llbit.nbt.StringTag;
+import se.llbit.nbt.Tag;
 
 public class LegacyBlocks {
 
@@ -13,7 +17,7 @@ public class LegacyBlocks {
     CompoundTag tag = new CompoundTag();
     switch (id) {
       case 0:   return nameTag(tag, "air");
-      case 2:   return nameTag(tag, "grass_block");
+      case 2:   return needsFinalization(nameTag(tag, "grass_block"), id, data);
       case 4:   return nameTag(tag, "cobblestone");
       case 7:   return nameTag(tag, "bedrock");
       case 8:
@@ -63,7 +67,7 @@ public class LegacyBlocks {
       case 61:  return litTag(facingTag(nameTag(tag, "furnace"), data), false);
       case 62:  return litTag(facingTag(nameTag(tag, "furnace"), data), true);
       case 63:  return intTag(nameTag(tag, "oak_sign"), "rotation", data);
-      case 64:  return needsFinalization(nameTag(tag, "oak_door"), data); //TODO state & finalize state
+      case 64:  return needsFinalization(nameTag(tag, "oak_door"), id, data); //TODO state & finalize state
       case 65:  return chestFurnaceLadderTag(nameTag(tag, "ladder"), data);
       case 67:  return stairTag(nameTag(tag, "cobblestone_stairs"), data); //TODO shape finalize
       case 68:  return wallSignTag(nameTag(tag, "oak_wall_sign"), data);
@@ -104,7 +108,7 @@ public class LegacyBlocks {
       case 107: return fenceGate(nameTag(tag, "oak_fence_gate"), data); //TODO inwall finalize
       case 108: return stairTag(nameTag(tag, "brick_stairs"), data);  //TODO shape finalize
       case 109: return stairTag(nameTag(tag, "stone_brick_stairs"), data);  //TODO shape finalize
-      case 110: return nameTag(tag, "mycelium");
+      case 110: return needsFinalization(nameTag(tag, "mycelium"), id, data);
       case 111: return nameTag(tag, "lily_pad");
       case 112: return nameTag(tag, "nether_bricks");
       case 113: return nameTag(tag, "nether_brick_fence"); //TODO state finalize
@@ -284,7 +288,7 @@ public class LegacyBlocks {
           default:
           case 0: return nameTag(tag, "dirt");
           case 1: return nameTag(tag, "coarse_dirt");
-          case 2: return nameTag(tag, "podzol");
+          case 2: return needsFinalization(nameTag(tag, "podzol"), id, data);
         }
       case 5:
         switch (data) {
@@ -674,26 +678,31 @@ public class LegacyBlocks {
     return nameTag(tag, "unknown");
   }
 
-  private static Tag needsFinalization(CompoundTag blockTag, int data) {
+  private static Tag needsFinalization(CompoundTag blockTag, int id, int data) {
     CompoundTag tag = new CompoundTag();
-    tag.add("Name", (StringTag) blockTag.get("Name"));
+    tag.add("Name", new StringTag("#legacy_" + blockTag.get("Name").stringValue()));
+    tag.add("Id", new IntTag(id));
     tag.add("Data", new IntTag(data));
     tag.add("Block", blockTag);
     return tag;
   }
 
-  private static CompoundTag nameTag(CompoundTag tag, String name) {
-    tag.add("Name", new StringTag("minecraft:" + name));
+  static CompoundTag createTag(String name) {
+    return nameTag(new CompoundTag(), name);
+  }
+
+  static CompoundTag nameTag(CompoundTag tag, String name) {
+    tag.add("Name", new StringTag(name.startsWith("minecraft:") ? name: "minecraft:" + name));
     return tag;
   }
 
   private static CompoundTag customTag(CompoundTag tag, String name, SpecificTag newTag) {
     CompoundTag properties;
     if (tag.get("Properties").isCompoundTag()) {
+      properties = tag.get("Properties").asCompound();
+    } else {
       properties = new CompoundTag();
       tag.add("Properties", properties);
-    } else {
-      properties = tag.get("Properties").asCompound();
     }
     properties.add(name, newTag);
     return tag;
@@ -982,5 +991,9 @@ public class LegacyBlocks {
     stringTag(tag, "south", south ? "true" : "false");
     stringTag(tag, "west", west ? "true" : "false");
     return tag;
+  }
+
+  static CompoundTag snowCovered(CompoundTag tag) {
+    return boolTag(tag, "snowy", true);
   }
 }

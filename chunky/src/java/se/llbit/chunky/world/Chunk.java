@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import se.llbit.chunky.block.*;
+import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.EmptyChunkData;

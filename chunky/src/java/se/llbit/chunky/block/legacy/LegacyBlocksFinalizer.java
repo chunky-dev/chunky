@@ -1,5 +1,9 @@
 package se.llbit.chunky.block.legacy;
 
+import se.llbit.chunky.block.Door;
+import se.llbit.chunky.block.FinalizationState;
+import se.llbit.chunky.block.OctreeFinalizationState;
+import se.llbit.chunky.block.Snow;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Material;
@@ -7,7 +11,8 @@ import se.llbit.math.Octree;
 import se.llbit.math.Vector3i;
 
 /**
- * Finalizer for pre-flattening (< 1.13) blocks.
+ * Finalizer for pre-flattening (< 1.13) blocks that have properties that depend on the surrounding
+ * blocks (e.g. doors, snow covered grass or fences).
  */
 public class LegacyBlocksFinalizer {
 
@@ -20,31 +25,47 @@ public class LegacyBlocksFinalizer {
    */
   public static void finalizeChunk(Octree worldTree, Octree waterTree, BlockPalette palette,
       Vector3i origin, ChunkPosition cp, int yMin, int yMax) {
+    OctreeFinalizationState finalizerState = new OctreeFinalizationState(worldTree, waterTree,
+        palette);
     for (int cy = yMin; cy < yMax; ++cy) {
+      int y = cy - origin.y;
       for (int cz = 0; cz < 16; ++cz) {
         int z = cz + cp.z * 16 - origin.z;
         for (int cx = 0; cx < 16; ++cx) {
           int x = cx + cp.x * 16 - origin.x;
           // TODO as in 1.13+ finalization we could finalize non-edge blocks during chunk loading
-          processBlock(worldTree, waterTree, palette, x, cy, z, origin);
+          finalizerState.setPosition(x, y, z);
+          processBlock(finalizerState);
         }
       }
     }
   }
 
-  private static void processBlock(Octree worldTree, Octree waterTree, BlockPalette palette, int x,
-      int cy, int z, Vector3i origin) {
-    int y = cy - origin.y;
-    Material mat = worldTree.getMaterial(x, y, z, palette);
-    if (mat instanceof LegacyBlock) {
-      int data = ((LegacyBlock) mat).data;
-      if ((data & 8) != 0) {
-        // top part of the door
-        if(cy > 0) {
+  private static void processBlock(FinalizationState finalizationState) {
+    Material mat = finalizationState.getMaterial();
+    if (mat instanceof UnfinalizedLegacyBlock) {
+      UnfinalizedLegacyBlock block = (UnfinalizedLegacyBlock) mat;
 
+      int data = block.data;
+      if (block.block instanceof Door) {
+        if ((data & 8) != 0) {
+          // top part of the door
+          // if (finalizationState.getMaterial(0, -1, 0))
+          // TODO
+        } else {
+          // bottom part of the door
         }
-      } else {
-        // bottom part of the door
+      } else if (block.id == 2 || (block.id == 3 && data == 2) || block.id == 110) {
+        // grass block, podzol or mycelium
+        if (finalizationState.getY() < finalizationState.getYMax() - 1) {
+          Material above = finalizationState.getMaterial(0, 1, 0);
+          if (above instanceof Snow || above.name.equals("minecraft:snow_block")) {
+            finalizationState.replaceCurrentBlock(LegacyBlocks
+                .snowCovered(LegacyBlocks.createTag(block.block.name)));
+            return;
+          }
+        }
+        finalizationState.replaceCurrentBlock(block.tag);
       }
     }
   }
