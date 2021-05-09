@@ -67,12 +67,12 @@ public class LegacyBlocks {
       case 61:  return litTag(facingTag(nameTag(tag, "furnace"), data), false);
       case 62:  return litTag(facingTag(nameTag(tag, "furnace"), data), true);
       case 63:  return intTag(nameTag(tag, "oak_sign"), "rotation", data);
-      case 64:  return needsFinalization(nameTag(tag, "oak_door"), id, data); //TODO state & finalize state
+      case 64:  return needsFinalization(nameTag(tag, "oak_door"), id, data);
       case 65:  return chestFurnaceLadderTag(nameTag(tag, "ladder"), data);
       case 67:  return stairTag(nameTag(tag, "cobblestone_stairs"), data); //TODO shape finalize
       case 68:  return wallSignTag(nameTag(tag, "oak_wall_sign"), data);
       case 70:  return nameTag(tag, "stone_pressure_plate");
-      case 71:  return nameTag(tag, "iron_door"); //TODO state & finalize state
+      case 71:  return needsFinalization(nameTag(tag, "iron_door"), id, data);
       case 72:  return nameTag(tag, "oak_pressure_plate");
       case 73:  return litTag(nameTag(tag, "redstone_ore"), false);
       case 74:  return litTag(nameTag(tag, "redstone_ore"), true);
@@ -208,11 +208,11 @@ public class LegacyBlocks {
       case 190: return nameTag(tag, "jungle_fence"); // TODO shape finalize
       case 191: return nameTag(tag, "dark_oak_fence"); // TODO shape finalize
       case 192: return nameTag(tag, "acacia_fence"); // TODO shape finalize
-      case 193: return nameTag(tag, "spruce_door"); //TODO state & finalize state
-      case 194: return nameTag(tag, "birch_door"); //TODO state & finalize state
-      case 195: return nameTag(tag, "jungle_door"); //TODO state & finalize state
-      case 196: return nameTag(tag, "acacia_door"); //TODO state & finalize state
-      case 197: return nameTag(tag, "dark_oak_door"); //TODO state & finalize state
+      case 193: return needsFinalization(nameTag(tag, "spruce_door"), id, data);
+      case 194: return needsFinalization(nameTag(tag, "birch_door"), id, data);
+      case 195: return needsFinalization(nameTag(tag, "jungle_door"), id, data);
+      case 196: return needsFinalization(nameTag(tag, "acacia_door"), id, data);
+      case 197: return needsFinalization(nameTag(tag, "dark_oak_door"), id, data);
       case 198: return facingTag(nameTag(tag, "end_rod"), data);
       case 199: return nameTag(tag, "chorus_plant"); //TODO shape finalize
       case 200: return nameTag(tag, "chorus_flower"); //TODO shape finalize

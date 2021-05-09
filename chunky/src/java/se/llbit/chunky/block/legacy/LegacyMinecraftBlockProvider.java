@@ -5,6 +5,7 @@ import java.util.Collections;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.BlockProvider;
 import se.llbit.chunky.block.legacy.blocks.Chest;
+import se.llbit.chunky.block.legacy.blocks.DoorPart;
 import se.llbit.chunky.block.legacy.blocks.MelonStem;
 import se.llbit.chunky.block.legacy.blocks.PumpkinStem;
 import se.llbit.chunky.block.legacy.blocks.SnowCoverableBlock;
@@ -27,8 +28,6 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
     CompoundTag ctag = (CompoundTag) tag;
 
     switch (name.substring(18)) {
-      // case "oak_door":
-      //   return new Door(name, ctag);
       case "grass_block":
       case "mycelium":
       case "podzol":
@@ -42,6 +41,14 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "chest":
       case "trapped_chest":
         return new Chest(name, ctag);
+      case "oak_door":
+      case "iron_door":
+      case "spruce_door":
+      case "birch_door":
+      case "jungle_door":
+      case "acacia_door":
+      case "dark_oak_door":
+        return new DoorPart(name, ctag);
     }
     Log.warn("Unsupported legacy block: " + name);
     return null;
