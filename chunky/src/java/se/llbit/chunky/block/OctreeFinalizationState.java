@@ -8,15 +8,19 @@ public class OctreeFinalizationState extends FinalizationState {
 
   private final Octree worldTree;
   private final Octree waterTree;
+  private final int yMin;
+  private final int yMax;
   private int x;
   private int y;
   private int z;
 
   public OctreeFinalizationState(Octree worldTree, Octree waterTree,
-      BlockPalette palette) {
+      BlockPalette palette, int yMin, int yMax) {
     super(palette);
     this.worldTree = worldTree;
     this.waterTree = waterTree;
+    this.yMin = yMin;
+    this.yMax = yMax;
   }
 
   @Override
@@ -52,12 +56,12 @@ public class OctreeFinalizationState extends FinalizationState {
 
   @Override
   public int getYMin() {
-    return 0; // TODO
+    return yMin;
   }
 
   @Override
   public int getYMax() {
-    return 255; // TODO
+    return yMax;
   }
 
   public void setPosition(int x, int y, int z) {
