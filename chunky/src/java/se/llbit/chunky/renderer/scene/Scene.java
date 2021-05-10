@@ -362,6 +362,11 @@ public class Scene implements JsonSerializable, Refreshable {
   private String octreeImplementation = PersistentSettings.getOctreeImplementation();
 
   /**
+   * The BVH implementation to use
+   */
+  private String bvhImplementation = PersistentSettings.getBvhMethod();
+
+  /**
    * Creates a scene with all default settings.
    *
    * <p>Note: this does not initialize the render buffers for the scene!
@@ -504,6 +509,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     octreeImplementation = other.octreeImplementation;
+    bvhImplementation = other.bvhImplementation;
   }
 
   /**
@@ -1351,12 +1357,12 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private void buildBvh(TaskTracker.Task task) {
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    bvh = BVH.Factory.create(entities, worldOffset, task);
+    bvh = BVH.Factory.create(bvhImplementation, entities, worldOffset, task);
   }
 
   private void buildActorBvh(TaskTracker.Task task) {
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    actorBvh = BVH.Factory.create(actors, worldOffset, task);
+    actorBvh = BVH.Factory.create(bvhImplementation, actors, worldOffset, task);
   }
 
   /**
@@ -2625,6 +2631,7 @@ public class Scene implements JsonSerializable, Refreshable {
       json.add("actors", actorArray);
     }
     json.add("octreeImplementation", octreeImplementation);
+    json.add("bvhImplementation", bvhImplementation);
     json.add("emitterSamplingStrategy", emitterSamplingStrategy.name());
     json.add("preventNormalEmitterWithSampling", preventNormalEmitterWithSampling);
 
@@ -2929,6 +2936,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     octreeImplementation = json.get("octreeImplementation").asString(PersistentSettings.getOctreeImplementation());
+    bvhImplementation = json.get("bvhImplementation").asString(PersistentSettings.getBvhMethod());
 
     emitterSamplingStrategy = EmitterSamplingStrategy.valueOf(json.get("emitterSamplingStrategy").asString("NONE"));
     preventNormalEmitterWithSampling = json.get("preventNormalEmitterWithSampling").asBoolean(PersistentSettings.getPreventNormalEmitterWithSampling());
@@ -3198,6 +3206,14 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void setOctreeImplementation(String octreeImplementation) {
     this.octreeImplementation = octreeImplementation;
+  }
+
+  public String getBvhImplementation() {
+    return bvhImplementation;
+  }
+
+  public void setBvhImplementation(String bvhImplementation) {
+    this.bvhImplementation = bvhImplementation;
   }
 
   @PluginApi

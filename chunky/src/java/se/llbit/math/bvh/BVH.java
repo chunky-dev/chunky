@@ -17,7 +17,6 @@
  */
 package se.llbit.math.bvh;
 
-import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.log.Log;
@@ -61,16 +60,18 @@ public interface BVH extends Intersectable {
 
     public static final BVHBuilder DEFAULT_IMPLEMENTATION;
 
-    public static BVHBuilder getImplementation(String name) {
-      return implementations.getOrDefault(name, DEFAULT_IMPLEMENTATION);
+    public static BVHBuilder getImplementation(String id) {
+      if (!implementations.containsKey(id))
+        Log.warn("Unknown BVH implementation: " + id + ". Using " + DEFAULT_IMPLEMENTATION.getName() + ".");
+      return implementations.getOrDefault(id, DEFAULT_IMPLEMENTATION);
     }
 
     /**
-     * Get all the BVH implementation name strings.
+     * Get all the BVH implementations.
      */
     @PluginApi
-    public static Collection<String> getImplementationStrings() {
-      return implementations.keySet();
+    public static Collection<BVHBuilder> getImplementations() {
+      return implementations.values();
     }
 
     /**
@@ -84,9 +85,9 @@ public interface BVH extends Intersectable {
     }
 
     static {
-      MidpointBVH.initImplementation();
-      SahBVH.initImplementation();
-      SahMaBVH.initImplementation();
+      MidpointBVH.registerImplementation();
+      SahBVH.registerImplementation();
+      SahMaBVH.registerImplementation();
       DEFAULT_IMPLEMENTATION = implementations.get("SAH_MA");
     }
 
@@ -94,12 +95,11 @@ public interface BVH extends Intersectable {
      * Construct a new BVH containing the given entities. This will generate the BVH using the
      * persistent BVH method (default is SAH_MA).
      */
-    public static BVH create(Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task) {
+    public static BVH create(String implementation, Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task) {
       if (entities.isEmpty()) {
         return BVH.EMPTY;
       } else {
-        return getImplementation(PersistentSettings.getBvhMethod())
-          .create(entities, worldOffset, task);
+        return getImplementation(implementation).create(entities, worldOffset, task);
       }
     }
   }

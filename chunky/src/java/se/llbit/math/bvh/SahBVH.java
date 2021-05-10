@@ -29,7 +29,7 @@ import java.util.*;
 import java.util.function.IntConsumer;
 
 public class SahBVH extends BinaryBVH {
-    public static void initImplementation() {
+    public static void registerImplementation() {
         Factory.addBVHBuilder(new Factory.BVHBuilder() {
             @Override
             public BVH create(Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task) {

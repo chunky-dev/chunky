@@ -169,18 +169,21 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
     ArrayList<String> bvhNames = new ArrayList<>();
     StringBuilder bvhMethodBuilder = new StringBuilder();
-    for (String entry : BVH.Factory.getImplementationStrings()) {
-      bvhNames.add(entry);
-      bvhMethodBuilder.append(entry);
+    for (BVH.Factory.BVHBuilder builder : BVH.Factory.getImplementations()) {
+      bvhNames.add(builder.getName());
+      bvhMethodBuilder.append(builder.getName());
       bvhMethodBuilder.append(": ");
-      bvhMethodBuilder.append(BVH.Factory.getImplementation(entry).getDescription());
+      bvhMethodBuilder.append(builder.getDescription());
       bvhMethodBuilder.append('\n');
     }
     bvhMethodBuilder.append("Requires reloading chunks to take effect.");
     bvhMethod.getItems().addAll(bvhNames);
     bvhMethod.getSelectionModel().select(PersistentSettings.getBvhMethod());
     bvhMethod.getSelectionModel().selectedItemProperty()
-            .addListener(((observable, oldValue, newValue) -> PersistentSettings.setBvhMethod(newValue)));
+            .addListener(((observable, oldValue, newValue) -> {
+              PersistentSettings.setBvhMethod(newValue);
+              scene.setBvhImplementation(newValue);
+            }));
     bvhMethod.setTooltip(new Tooltip(bvhMethodBuilder.toString()));
 
     gridSize.setRange(4, 64);
@@ -212,6 +215,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
+    bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
     gridSize.set(scene.getGridSize());
     preventNormalEmitterWithSampling.setSelected(scene.isPreventNormalEmitterWithSampling());
   }
