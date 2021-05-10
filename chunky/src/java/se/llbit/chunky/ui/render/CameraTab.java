@@ -45,6 +45,7 @@ import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.CameraPreset;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.DoubleTextField;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
@@ -63,30 +64,22 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   @FXML private Button duplicate;
   @FXML private Button removeCamera;
   @FXML private TitledPane positionOrientation;
-  @FXML private TextField posX;
-  @FXML private TextField posY;
-  @FXML private TextField posZ;
-  @FXML private TextField yawField;
-  @FXML private TextField pitchField;
-  @FXML private TextField rollField;
+  @FXML private DoubleTextField posX;
+  @FXML private DoubleTextField posY;
+  @FXML private DoubleTextField posZ;
+  @FXML private DoubleTextField yawField;
+  @FXML private DoubleTextField pitchField;
+  @FXML private DoubleTextField rollField;
   @FXML private Button cameraToPlayer;
   @FXML private Button centerCamera;
   @FXML private ChoiceBox<ProjectionMode> projectionMode;
   @FXML private DoubleAdjuster fov;
   @FXML private DoubleAdjuster dof;
   @FXML private DoubleAdjuster subjectDistance;
-  @FXML private TextField shiftX;
-  @FXML private TextField shiftY;
+  @FXML private DoubleTextField shiftX;
+  @FXML private DoubleTextField shiftY;
   @FXML private Button autofocus;
 
-  private DoubleProperty xpos = new SimpleDoubleProperty();
-  private DoubleProperty ypos = new SimpleDoubleProperty();
-  private DoubleProperty zpos = new SimpleDoubleProperty();
-  private DoubleProperty yaw = new SimpleDoubleProperty();
-  private DoubleProperty pitch = new SimpleDoubleProperty();
-  private DoubleProperty roll = new SimpleDoubleProperty();
-  private DoubleProperty xshift = new SimpleDoubleProperty();
-  private DoubleProperty yshift = new SimpleDoubleProperty();
   private MapView mapView;
   private CameraViewListener cameraViewListener;
 
@@ -126,7 +119,6 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
 
   private void updateDof() {
     dof.set(scene.camera().getDof());
-
   }
 
   private void updateFov() {
@@ -134,8 +126,8 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   }
 
   private void updateShift() {
-    xshift.set(scene.camera().getShiftX());
-    yshift.set(scene.camera().getShiftY());
+    shiftX.valueProperty().setValue(scene.camera().getShiftX());
+    shiftY.valueProperty().setValue(scene.camera().getShiftY());
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
@@ -213,29 +205,26 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       }
     });
 
-    posX.textProperty().bindBidirectional(xpos, new NumberStringConverter());
-    posY.textProperty().bindBidirectional(ypos, new NumberStringConverter());
-    posZ.textProperty().bindBidirectional(zpos, new NumberStringConverter());
-
     EventHandler<KeyEvent> positionHandler = e -> {
       if (e.getCode() == KeyCode.ENTER) {
         scene.camera()
-            .setPosition(new Vector3(xpos.getValue(), ypos.get(), zpos.get()));
+            .setPosition(new Vector3(
+                posX.valueProperty().get(),
+                posY.valueProperty().get(),
+                posZ.valueProperty().get()));
       }
     };
     posX.addEventFilter(KeyEvent.KEY_PRESSED, positionHandler);
     posY.addEventFilter(KeyEvent.KEY_PRESSED, positionHandler);
     posZ.addEventFilter(KeyEvent.KEY_PRESSED, positionHandler);
 
-    yawField.textProperty().bindBidirectional(yaw, new NumberStringConverter());
-    pitchField.textProperty().bindBidirectional(pitch, new NumberStringConverter());
-    rollField.textProperty().bindBidirectional(roll, new NumberStringConverter());
-
     EventHandler<KeyEvent> directionHandler = e -> {
       if (e.getCode() == KeyCode.ENTER) {
         scene.camera()
-            .setView(QuickMath.degToRad(yaw.get()), QuickMath.degToRad(pitch.get()),
-                QuickMath.degToRad(roll.get()));
+            .setView(
+                QuickMath.degToRad(yawField.valueProperty().get()),
+                QuickMath.degToRad(pitchField.valueProperty().get()),
+                QuickMath.degToRad(rollField.valueProperty().get()));
       }
     };
     yawField.setTooltip(new Tooltip("Camera yaw."));
@@ -293,13 +282,11 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     });
 
     shiftX.setTooltip(new Tooltip("Horizontal lens shift (relative to the image height)."));
-    shiftX.textProperty().bindBidirectional(xshift, new NumberStringConverter());
     shiftY.setTooltip(new Tooltip("Vertical lens shift (relative to the image height)."));
-    shiftY.textProperty().bindBidirectional(yshift, new NumberStringConverter());
 
     EventHandler<KeyEvent> shiftHandler = e -> {
       if (e.getCode() == KeyCode.ENTER) {
-        scene.camera().setShift(xshift.doubleValue(), yshift.doubleValue());
+        scene.camera().setShift(shiftX.valueProperty().get(), shiftY.valueProperty().get());
       }
     };
     shiftX.addEventFilter(KeyEvent.KEY_PRESSED, shiftHandler);
@@ -348,9 +335,9 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     Camera camera = scene.camera();
     Vector3 pos = camera.getPosition();
     if (positionOrientation.isExpanded()) {
-      xpos.set(pos.x);
-      ypos.set(pos.y);
-      zpos.set(pos.z);
+      posX.valueProperty().set(pos.x);
+      posY.valueProperty().set(pos.y);
+      posZ.valueProperty().set(pos.z);
     }
     if (PersistentSettings.getFollowCamera()) {
       mapView.panTo(pos);
@@ -361,9 +348,9 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   private void updateCameraDirection() {
     if (positionOrientation.isExpanded()) {
       Camera camera = scene.camera();
-      yaw.set(QuickMath.radToDeg(camera.getYaw()));
-      pitch.set(QuickMath.radToDeg(camera.getPitch()));
-      roll.set(QuickMath.radToDeg(camera.getRoll()));
+      yawField.valueProperty().set(QuickMath.radToDeg(camera.getYaw()));
+      pitchField.valueProperty().set(QuickMath.radToDeg(camera.getPitch()));
+      rollField.valueProperty().set(QuickMath.radToDeg(camera.getRoll()));
     }
     cameraViewListener.cameraViewUpdated();
   }

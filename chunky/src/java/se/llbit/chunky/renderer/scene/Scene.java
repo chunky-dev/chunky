@@ -78,6 +78,7 @@ import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.EmptyChunk;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.ExtraMaterials;
 import se.llbit.chunky.world.Heightmap;
@@ -244,6 +245,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean waterPlaneEnabled = false;
   protected double waterPlaneHeight = World.SEA_LEVEL;
   protected boolean waterPlaneOffsetEnabled = true;
+  protected boolean waterPlaneChunkClip = true;
 
   /**
    * Enables fast fog algorithm
@@ -318,6 +320,11 @@ public class Scene implements JsonSerializable, Refreshable {
    * Preview frame interlacing counter.
    */
   public int previewCount;
+
+  /**
+   * Current time in seconds. Adjusts animated blocks like fire.
+   */
+  private double animationTime = 0;
 
   private WorldTexture grassTexture = new WorldTexture();
   private WorldTexture foliageTexture = new WorldTexture();
@@ -491,6 +498,7 @@ public class Scene implements JsonSerializable, Refreshable {
     waterPlaneEnabled = other.waterPlaneEnabled;
     waterPlaneHeight = other.waterPlaneHeight;
     waterPlaneOffsetEnabled = other.waterPlaneOffsetEnabled;
+    waterPlaneChunkClip = other.waterPlaneChunkClip;
 
     spp = other.spp;
     renderTime = other.renderTime;
@@ -510,6 +518,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     octreeImplementation = other.octreeImplementation;
     bvhImplementation = other.bvhImplementation;
+
+    animationTime = other.animationTime;
   }
 
   /**
@@ -728,19 +738,17 @@ public class Scene implements JsonSerializable, Refreshable {
       hit = true;
     }
     if (start.getCurrentMaterial().isWater()) {
-      if(start.getCurrentMaterial() != Water.OCEAN_WATER) {
-        r = new Ray(start);
-        r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
-        if(waterOctree.exitWater(this, r, palette) && r.distance < ray.t - Ray.EPSILON) {
-          ray.t = r.distance;
-          ray.n.set(r.n);
-          ray.color.set(r.color);
-          ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
-          ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
-          hit = true;
-        } else if(ray.getPrevMaterial() == Air.INSTANCE) {
-          ray.setPrevMaterial(Water.INSTANCE, 1 << Water.FULL_BLOCK);
-        }
+      r = new Ray(start);
+      r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
+      if(waterOctree.exitWater(this, r, palette) && r.distance < ray.t - Ray.EPSILON) {
+        ray.t = r.distance;
+        ray.n.set(r.n);
+        ray.color.set(r.color);
+        ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
+        ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
+        hit = true;
+      } else if(ray.getPrevMaterial() == Air.INSTANCE) {
+        ray.setPrevMaterial(Water.INSTANCE, 1 << Water.FULL_BLOCK);
       }
     } else {
       r = new Ray(start);
@@ -879,6 +887,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
 
+    Set<ChunkPosition> nonEmptyChunks = new HashSet<>();
     Heightmap biomeIdMap = new Heightmap();
 
     ChunkData chunkData1;
@@ -1012,8 +1021,8 @@ public class Scene implements JsonSerializable, Refreshable {
                 int cubeIndex = (cz * 16 + cy) * 16 + cx;
 
                 // Change the type of hidden blocks to ANY_TYPE
-                boolean notOnEdge = !chunkData.isBlockOnEdge(cx, cy, cz);
-                boolean isHidden = notOnEdge
+                boolean onEdge = y <= yMin || y >= yMax - 1 || chunkData.isBlockOnEdge(cx, y, cz);
+                boolean isHidden = !onEdge
                         && palette.get(chunkData.getBlockAt(cx + 1, y, cz)).opaque
                         && palette.get(chunkData.getBlockAt(cx - 1, y, cz)).opaque
                         && palette.get(chunkData.getBlockAt(cx, y + 1, cz)).opaque
@@ -1078,7 +1087,7 @@ public class Scene implements JsonSerializable, Refreshable {
                       // Move plain water blocks to the water octree.
                       octNode = palette.airId;
 
-                      if(notOnEdge) {
+                      if(!onEdge) {
                         // Perform water computation now for water blocks that are not on th edge of the chunk
                         // Test if the block has not already be marked as full
                         if(((Water) palette.get(waterNode)).data == 0) {
@@ -1131,10 +1140,10 @@ public class Scene implements JsonSerializable, Refreshable {
                       }
                     }
                     cubeWaterBlocks[cubeIndex] = waterNode;
-                  } else if(cy + 1 < yMax && block instanceof Lava) {
+                  } else if(y + 1 < yMax && block instanceof Lava) {
                     if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)) instanceof Lava) {
                       octNode = palette.getLavaId(0, 1 << Water.FULL_BLOCK);
-                    } else if(notOnEdge) {
+                    } else if(!onEdge) {
                       // Compute lava level for blocks not on edge
                       Lava lava = (Lava) block;
                       int level0 = 8 - lava.level;
@@ -1254,6 +1263,10 @@ public class Scene implements JsonSerializable, Refreshable {
             */
           }
         }
+
+        if (!chunkData.isEmpty()){
+          nonEmptyChunks.add(cp);
+        }
       }
       executor.shutdown();
     }
@@ -1264,17 +1277,14 @@ public class Scene implements JsonSerializable, Refreshable {
     foliageTexture = new WorldTexture();
     waterTexture = new WorldTexture();
 
-    Set<ChunkPosition> chunkSet = new HashSet<>(chunksToLoad);
-
     try (TaskTracker.Task task = taskTracker.task("(4/6) Finalizing octree")) {
 
       worldOctree.startFinalization();
       waterOctree.startFinalization();
 
       int done = 0;
-      int target = chunksToLoad.size();
-      for (ChunkPosition cp : chunksToLoad) {
-
+      int target = nonEmptyChunks.size();
+      for (ChunkPosition cp : nonEmptyChunks) {
         // Finalize grass and foliage textures.
         // 3x3 box blur.
         for (int x = 0; x < 16; ++x) {
@@ -1290,7 +1300,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 int wz = cp.z * 16 + sz;
 
                 ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
-                if (chunkSet.contains(ccp)) {
+                if (nonEmptyChunks.contains(ccp)) {
                   nsum += 1;
                   int biomeId = biomeIdMap.get(wx, wz);
                   float[] grassColor = Biomes.getGrassColorLinear(biomeId);
@@ -1794,6 +1804,22 @@ public class Scene implements JsonSerializable, Refreshable {
     return waterPlaneOffsetEnabled;
   }
 
+  public void setWaterPlaneChunkClip(boolean enabled) {
+    if (enabled != waterPlaneChunkClip) {
+      waterPlaneChunkClip = enabled;
+      refresh();
+    }
+  }
+
+  /**
+   * Check if water plane chunk clipping is enabled. If so, the water plane is hidden in loaded
+   * chunks (i.e. it is ignored inside of loaded chunks).
+   * @return {@code true} if the water plane chunk clipping is enabled
+   */
+  public boolean getWaterPlaneChunkClip() {
+    return waterPlaneChunkClip;
+  }
+
   /**
    * @return the dumpFrequency
    */
@@ -1837,6 +1863,7 @@ public class Scene implements JsonSerializable, Refreshable {
     cameraPresets = other.cameraPresets;
     camera.copyTransients(other.camera);
     finalizeBuffer = other.finalizeBuffer;
+    animationTime = other.animationTime;
   }
 
   /**
@@ -2449,6 +2476,13 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
+   * Query if a position is loaded.
+   */
+  public boolean isChunkLoaded(int x, int z) {
+    return waterTexture != null && waterTexture.contains(x, z);
+  }
+
+  /**
    * Merge a render dump into this scene.
    */
   public void mergeDump(File dumpFile, TaskTracker taskTracker) {
@@ -2472,7 +2506,13 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public boolean isInWater(Ray ray) {
     if (isWaterPlaneEnabled() && ray.o.y < getEffectiveWaterPlaneHeight()) {
-      return true;
+      if (getWaterPlaneChunkClip()) {
+        if (!isChunkLoaded((int)Math.floor(ray.o.x), (int)Math.floor(ray.o.z))) {
+          return true;
+        }
+      } else {
+        return true;
+      }
     }
     if (waterOctree.isInside(ray.o)) {
       int x = (int) QuickMath.floor(ray.o.x);
@@ -2588,6 +2628,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("waterWorldEnabled", waterPlaneEnabled);
     json.add("waterWorldHeight", waterPlaneHeight);
     json.add("waterWorldHeightOffsetEnabled", waterPlaneOffsetEnabled);
+    json.add("waterWorldClipEnabled", waterPlaneChunkClip);
     json.add("renderActors", renderActors);
 
     if (!worldPath.isEmpty()) {
@@ -2634,6 +2675,8 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("bvhImplementation", bvhImplementation);
     json.add("emitterSamplingStrategy", emitterSamplingStrategy.name());
     json.add("preventNormalEmitterWithSampling", preventNormalEmitterWithSampling);
+
+    json.add("animationTime", animationTime);
 
     return json;
   }
@@ -2867,6 +2910,7 @@ public class Scene implements JsonSerializable, Refreshable {
       waterPlaneHeight = json.get("waterWorldHeight").doubleValue(waterPlaneHeight);
       waterPlaneOffsetEnabled = json.get("waterWorldHeightOffsetEnabled")
         .boolValue(waterPlaneOffsetEnabled);
+      waterPlaneChunkClip = json.get("waterWorldClipEnabled").boolValue(waterPlaneChunkClip);
     }
 
     renderActors = json.get("renderActors").boolValue(renderActors);
@@ -2940,6 +2984,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     emitterSamplingStrategy = EmitterSamplingStrategy.valueOf(json.get("emitterSamplingStrategy").asString("NONE"));
     preventNormalEmitterWithSampling = json.get("preventNormalEmitterWithSampling").asBoolean(PersistentSettings.getPreventNormalEmitterWithSampling());
+
+    animationTime = json.get("animationTime").doubleValue(animationTime);
   }
 
   /**
@@ -3252,5 +3298,14 @@ public class Scene implements JsonSerializable, Refreshable {
   public void setPreventNormalEmitterWithSampling(boolean preventNormalEmitterWithSampling) {
     this.preventNormalEmitterWithSampling = preventNormalEmitterWithSampling;
     refresh();
+  }
+
+  public void setAnimationTime(double animationTime) {
+    this.animationTime = animationTime;
+    refresh();
+  }
+
+  public double getAnimationTime() {
+    return animationTime;
   }
 }

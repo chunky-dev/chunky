@@ -31,6 +31,7 @@
           </padding>
           <DoubleAdjuster fx:id="waterPlaneHeight" />
           <CheckBox fx:id="waterPlaneOffsetEnabled" mnemonicParsing="false" text="Lower water by minecraft offset (default)" />
+          <CheckBox fx:id="waterPlaneClip" mnemonicParsing="false" text="Hide the water plane in loaded chunks" />
         </VBox>
       </TitledPane>
     </children>

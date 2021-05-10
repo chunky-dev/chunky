@@ -34,6 +34,7 @@ import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.ShutdownAlert;
@@ -66,6 +67,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   private CheckBox fastFog;
   @FXML
   private IntegerAdjuster cacheResolution;
+  @FXML
+  private DoubleAdjuster animationTime;
   @FXML
   private ChoiceBox<PictureExportFormat> outputMode;
   @FXML
@@ -139,6 +142,14 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     cacheResolution.set(128);
     cacheResolution.onValueChange(value -> {
       scene.sky().setSkyCacheResolution(value);
+    });
+    animationTime.setName("Current animation time");
+    animationTime.setTooltip("Current animation time in seconds, used for animated textures.");
+    animationTime.setRange(0, 60);
+    animationTime.clampMin();
+    animationTime.set(0);
+    animationTime.onValueChange(value -> {
+      scene.setAnimationTime(value);
     });
     renderThreads.setName("Render threads");
     renderThreads.setTooltip("Number of rendering threads.");
@@ -218,6 +229,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
     gridSize.set(scene.getGridSize());
     preventNormalEmitterWithSampling.setSelected(scene.isPreventNormalEmitterWithSampling());
+    animationTime.set(scene.getAnimationTime());
   }
 
   @Override
