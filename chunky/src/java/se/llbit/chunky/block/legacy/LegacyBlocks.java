@@ -99,7 +99,7 @@ public class LegacyBlocks {
       case 96:  return trapdoorTag(nameTag(tag, "oak_trapdoor"), data);
       case 99:  return mushroomTag(tag, data, false);
       case 100: return mushroomTag(tag, data, true);
-      case 101: return nameTag(tag, "iron_bars"); //TODO state finalize
+      case 101: return needsFinalization(nameTag(tag, "iron_bars"), id, data);
       case 102: return nameTag(tag, "glass_pane");  //TODO state finalize
       case 103: return nameTag(tag, "melon");
       case 104: return needsFinalization(intTag(nameTag(tag, "pumpkin_stem"), "age", data&7), id, data);
@@ -329,7 +329,7 @@ public class LegacyBlocks {
           default:
           case 0: return nameTag(tag, "oak_leaves");
           case 1: return nameTag(tag, "spruce_leaves");
-          case 2: return nameTag(tag, "brich_leaves");
+          case 2: return nameTag(tag, "birch_leaves");
           case 3: return nameTag(tag, "jungle_leaves");
         }
       case 19:

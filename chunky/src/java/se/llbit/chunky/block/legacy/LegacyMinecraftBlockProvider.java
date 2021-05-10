@@ -4,12 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.BlockProvider;
-import se.llbit.chunky.block.legacy.blocks.Chest;
-import se.llbit.chunky.block.legacy.blocks.DoorPart;
-import se.llbit.chunky.block.legacy.blocks.MelonStem;
-import se.llbit.chunky.block.legacy.blocks.PumpkinStem;
-import se.llbit.chunky.block.legacy.blocks.SnowCoverableBlock;
-import se.llbit.chunky.block.legacy.blocks.Vine;
+import se.llbit.chunky.block.legacy.blocks.*;
 import se.llbit.log.Log;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
@@ -49,6 +44,24 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "acacia_door":
       case "dark_oak_door":
         return new DoorPart(name, ctag);
+      case "oak_stairs":
+      case "cobblestone_stairs":
+      case "brick_stairs":
+      case "stone_brick_stairs":
+      case "nether_brick_stairs":
+      case "sandstone_stairs":
+      case "spruce_stairs":
+      case "birch_stairs":
+      case "jungle_stairs":
+      case "quartz_stairs":
+      case "acacia_stairs":
+      case "dark_oak_stairs":
+      case "red_sandstone_stairs":
+      case "purpur_stairs":
+        // stairs
+        break;
+      case "iron_bars":
+        return new LegacyIronBars(name, ctag);
     }
     Log.warn("Unsupported legacy block: " + name);
     return null;
