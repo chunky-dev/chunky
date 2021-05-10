@@ -97,10 +97,10 @@ public class RedstoneWireModel {
   private static final Quad westSide =
       new Quad(new Vector3(0, 1, 1), new Vector3(0, 0, 1), new Vector3(0, 1, 0),
           new Vector4(1, 0, 1, 0));
-  private static final Quad northSide =
+  private static final Quad southSide =
       new Quad(new Vector3(0, 1, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 0),
           new Vector4(1, 0, 1, 0));
-  private static final Quad southSide =
+  private static final Quad northSide =
       new Quad(new Vector3(1, 1, 1), new Vector3(1, 0, 1), new Vector3(0, 1, 1),
           new Vector4(1, 0, 1, 0));
 

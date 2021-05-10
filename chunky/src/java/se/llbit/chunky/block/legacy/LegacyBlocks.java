@@ -58,7 +58,7 @@ public class LegacyBlocks {
       case 52:  return nameTag(tag, "spawner");
       case 53:  return stairTag(nameTag(tag, "oak_stairs"), data); //TODO shape finalize
       case 54:  return needsFinalization(chestFurnaceLadderTag(nameTag(tag, "chest"), data), id, data);
-      case 55:  return intTag(nameTag(tag, "redstone_wire"), "power", data); //TODO shape finalize
+      case 55:  return needsFinalization(intTag(nameTag(tag, "redstone_wire"), "power", data), id, data);
       case 56:  return nameTag(tag, "diamond_ore");
       case 57:  return nameTag(tag, "diamond_block");
       case 58:  return nameTag(tag, "crafting_table");
@@ -158,13 +158,13 @@ public class LegacyBlocks {
       case 148: return nameTag(tag, "heavy_weighted_pressure_plate");
       case 149:
         nameTag(tag, "comparator");
-        repeaterComparatorFacingTag(tag, data&3);
+        facing4Tag(tag, data&3);
         stringTag(tag, "mode", (data&4) != 0 ? "subtract" : "compare");
         boolTag(tag, "powered", (data&8) != 0);
         return tag;
       case 150:
         nameTag(tag, "comparator");
-        repeaterComparatorFacingTag(tag, data&3);
+        facing4Tag(tag, data&3);
         stringTag(tag, "mode", (data&4) != 0 ? "subtract" : "compare");
         boolTag(tag, "powered", true);
         return tag;
@@ -712,7 +712,7 @@ public class LegacyBlocks {
     return customTag(tag, name, new StringTag(data));
   }
 
-  private static CompoundTag intTag(CompoundTag tag, String name, int data) {
+  public static CompoundTag intTag(CompoundTag tag, String name, int data) {
     return customTag(tag, name, new IntTag(data));
   }
 
@@ -726,10 +726,6 @@ public class LegacyBlocks {
 
   private static CompoundTag facing4Tag(CompoundTag tag, int data) {
     return stringTag(tag, "facing", (new String[] {"south", "west", "north", "east"})[data % 4]);
-  }
-
-  private static CompoundTag repeaterComparatorFacingTag(CompoundTag tag, int data) {
-    return stringTag(tag, "facing", (new String[] {"north", "east", "south", "west"})[data % 4]);
   }
 
   private static CompoundTag slabTag(CompoundTag tag, boolean both, boolean which) {
@@ -755,7 +751,7 @@ public class LegacyBlocks {
     int delay = (data >> 2) & 3;
 
     tag.add("delay", new IntTag(delay));
-    repeaterComparatorFacingTag(tag, direction);
+    facing4Tag(tag, direction);
     tag.add("powered", new StringTag(on ? "true" : "false"));
     return tag;
   }

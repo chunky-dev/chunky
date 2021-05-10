@@ -62,6 +62,8 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
         break;
       case "iron_bars":
         return new LegacyIronBars(name, ctag);
+      case "redstone_wire":
+        return new LegacyRedstoneWire(name, ctag);
     }
     Log.warn("Unsupported legacy block: " + name);
     return null;
