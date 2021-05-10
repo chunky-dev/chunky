@@ -29,6 +29,6 @@ public class LegacyIronBars extends UnfinalizedLegacyBlock {
   }
 
   private static boolean isIronBarConnector(Material block) {
-    return block.solid;
+    return block.solid || block.name.equals("minecraft:iron_bars") || block.name.equals("#legacy_minecraft:iron_bars");
   }
 }
