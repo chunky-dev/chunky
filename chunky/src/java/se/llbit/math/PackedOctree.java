@@ -509,7 +509,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
     treeData[nodeIndex] = value;
 
     // Merge nodes where all children have been set to the same type, starting from the bottom.
-    for(int i = 0; i < depth; ++i) {
+    for(int i = cubeDepth; i < depth; ++i) {
       int parentIndex = parents[i];
 
       // assert each child is of same type
