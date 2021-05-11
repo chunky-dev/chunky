@@ -73,6 +73,13 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
         return new LegacyFenceGate(name, ctag);
       case "chorus_plant":
         return new LegacyChorusPlant(name, ctag);
+      case "sunflower":
+      case "lilac":
+      case "tall_grass":
+      case "large_fern":
+      case "rose_bush":
+      case "peony":
+        return new LegacyLargeFlower(name, ctag);
     }
     Log.warn("Unsupported legacy block: " + name);
     return null;

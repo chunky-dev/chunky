@@ -188,7 +188,6 @@ public class LegacyBlocks {
       case 172: return nameTag(tag, "terracotta");
       case 173: return nameTag(tag, "coal_block");
       case 174: return nameTag(tag, "packed_ice");
-      case 175: //TODO double plant state finalize
       case 176: return intTag(nameTag(tag, "white_banner"), "rotation", data);
       case 177: return wallSignTag(nameTag(tag, "white_banner"), data);
       case 178:
@@ -617,6 +616,16 @@ public class LegacyBlocks {
           case 13: return nameTag(tag, "green_carpet");
           case 14: return nameTag(tag, "red_carpet");
           case 15: return nameTag(tag, "black_carpet");
+        }
+      case 175:
+        switch (data&7) {
+          default:
+          case 0: return needsFinalization(nameTag(tag, "sunflower"), id, data);
+          case 1: return needsFinalization(nameTag(tag, "lilac"), id, data);
+          case 2: return needsFinalization(nameTag(tag, "tall_grass"), id, data);
+          case 3: return needsFinalization(nameTag(tag, "large_fern"), id, data);
+          case 4: return needsFinalization(nameTag(tag, "rose_bush"), id, data);
+          case 5: return needsFinalization(nameTag(tag, "peony"), id, data);
         }
       case 179:
         switch (data) {
