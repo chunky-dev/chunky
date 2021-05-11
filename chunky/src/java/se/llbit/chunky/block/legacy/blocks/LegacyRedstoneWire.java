@@ -2,6 +2,7 @@ package se.llbit.chunky.block.legacy.blocks;
 
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.Repeater;
+import se.llbit.chunky.block.legacy.LegacyBlockUtils;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
 import se.llbit.chunky.world.Material;
@@ -14,7 +15,8 @@ public class LegacyRedstoneWire extends UnfinalizedLegacyBlock {
   }
 
   @Override
-  public void finalizeBlock(FinalizationState state) {
+  public void finalizeBlock(FinalizationState rawState) {
+    FinalizationState state = new LegacyBlockUtils.FinalizationStateCache(rawState);
     String east, north, south, west;
     east = north = south = west = "none";
 
@@ -60,11 +62,11 @@ public class LegacyRedstoneWire extends UnfinalizedLegacyBlock {
   }
 
   private static boolean isRedstone(Material block) {
-    return block.name.equals("minecraft:redstone_wire");
+    return LegacyBlockUtils.getName(block).equals("redstone_wire");
   }
 
   private static boolean isRedstoneConnector(Material block, int side) {
-    String name = block.name.substring(block.name.indexOf("minecraft:")+10);
+    String name = LegacyBlockUtils.getName(block);
     switch (name) {
       case "redstone_wire":
       case "redstone_torch":
@@ -85,6 +87,6 @@ public class LegacyRedstoneWire extends UnfinalizedLegacyBlock {
   }
 
   private static boolean isAir(Material block) {
-    return block.name.equals("minecraft:air");
+    return LegacyBlockUtils.getName(block).equals("air");
   }
 }
