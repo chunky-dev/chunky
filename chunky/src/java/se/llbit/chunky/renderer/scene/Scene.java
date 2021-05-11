@@ -1195,8 +1195,8 @@ public class Scene implements JsonSerializable, Refreshable {
               }
             }
           }
-          worldOctree.setCube(4, cubeWorldBlocks, cp.x*16 - origin.x, yCube*16, cp.z*16 - origin.z);
-          waterOctree.setCube(4, cubeWaterBlocks, cp.x*16 - origin.x, yCube*16, cp.z*16 - origin.z);
+          worldOctree.setCube(4, cubeWorldBlocks, cp.x*16 - origin.x, yCube*16 - origin.y, cp.z*16 - origin.z);
+          waterOctree.setCube(4, cubeWaterBlocks, cp.x*16 - origin.x, yCube*16 - origin.y, cp.z*16 - origin.z);
         }
 
         // Block entities are also called "tile entities". These are extra bits of metadata
@@ -1448,7 +1448,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
       origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
     } else {
-      origin.set(xmin, 0, zmin);
+      // Note: Math.floorDiv rather than integer division for round toward -infinity
+      origin.set(xmin, Math.floorDiv(yMin, 16) * 16, zmin);
     }
     return requiredDepth;
   }
