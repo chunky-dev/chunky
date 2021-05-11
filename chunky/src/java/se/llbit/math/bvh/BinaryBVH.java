@@ -263,7 +263,7 @@ public abstract class BinaryBVH implements BVH {
         double tmin = FastMath.max(FastMath.max(FastMath.min(tx1, tx2), FastMath.min(ty1, ty2)), FastMath.min(tz1, tz2));
         double tmax = FastMath.min(FastMath.min(FastMath.max(tx1, tx2), FastMath.max(ty1, ty2)), FastMath.max(tz1, tz2));
 
-        return tmin <= tmax+ OFFSET && tmin >= 0 ? tmin : -1;
+        return (tmin <= tmax + OFFSET) & (tmin >= 0) ? tmin : -1;
     }
 
     /**
