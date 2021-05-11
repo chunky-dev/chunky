@@ -64,6 +64,13 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
         return new LegacyIronBars(name, ctag);
       case "redstone_wire":
         return new LegacyRedstoneWire(name, ctag);
+      case "oak_fence_gate":
+      case "spruce_fence_gate":
+      case "birch_fence_gate":
+      case "jungle_fence_gate":
+      case "dark_oak_fence_gate":
+      case "acacia_fence_gate":
+        return new LegacyFenceGate(name, ctag);
     }
     Log.warn("Unsupported legacy block: " + name);
     return null;

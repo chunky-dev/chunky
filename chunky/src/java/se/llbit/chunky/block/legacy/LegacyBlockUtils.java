@@ -37,7 +37,7 @@ public class LegacyBlockUtils {
     }
 
     private static int getCacheIndex(int rx, int ry, int rz) {
-      return (rx + 1) + (ry + 1)*3 + (ry + 1)*9;
+      return (rx + 1) + (ry + 1)*3 + (rz + 1)*9;
     }
 
     @Override

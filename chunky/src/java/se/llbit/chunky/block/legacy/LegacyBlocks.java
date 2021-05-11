@@ -105,7 +105,7 @@ public class LegacyBlocks {
       case 104: return needsFinalization(intTag(nameTag(tag, "pumpkin_stem"), "age", data&7), id, data);
       case 105: return needsFinalization(intTag(nameTag(tag, "melon_stem"), "age", data&7), id, data);
       case 106: return needsFinalization(vineTag(nameTag(tag, "vine"), data, false), id, data);
-      case 107: return fenceGate(nameTag(tag, "oak_fence_gate"), data); //TODO inwall finalize
+      case 107: return needsFinalization(fenceGate(nameTag(tag, "oak_fence_gate"), data), id, data);
       case 108: return stairTag(nameTag(tag, "brick_stairs"), data);  //TODO shape finalize
       case 109: return stairTag(nameTag(tag, "stone_brick_stairs"), data);  //TODO shape finalize
       case 110: return needsFinalization(nameTag(tag, "mycelium"), id, data);
@@ -198,11 +198,11 @@ public class LegacyBlocks {
       case 180: return stairTag(nameTag(tag, "red_sandstone_stairs"), data); //TODO shape finalize
       case 181: return slabTag(nameTag(tag, "red_sandstone_slab"), true, false);
       case 182: return slabTag(nameTag(tag, "red_sandstone_slab"), false, (data&8) != 0);
-      case 183: return fenceGate(nameTag(tag, "spruce_fence_gate"), data); // TODO shape finalize
-      case 184: return fenceGate(nameTag(tag, "birch_fence_gate"), data); // TODO shape finalize
-      case 185: return fenceGate(nameTag(tag, "jungle_fence_gate"), data); // TODO shape finalize
-      case 186: return fenceGate(nameTag(tag, "dark_oak_fence_gate"), data); // TODO shape finalize
-      case 187: return fenceGate(nameTag(tag, "acacia_fence_gate"), data); // TODO shape finalize
+      case 183: return needsFinalization(fenceGate(nameTag(tag, "spruce_fence_gate"), data), id, data);
+      case 184: return needsFinalization(fenceGate(nameTag(tag, "birch_fence_gate"), data), id, data);
+      case 185: return needsFinalization(fenceGate(nameTag(tag, "jungle_fence_gate"), data), id, data);
+      case 186: return needsFinalization(fenceGate(nameTag(tag, "dark_oak_fence_gate"), data), id, data);
+      case 187: return needsFinalization(fenceGate(nameTag(tag, "acacia_fence_gate"), data), id, data);
       case 188: return nameTag(tag, "spruce_fence"); // TODO shape finalize
       case 189: return nameTag(tag, "birch_fence"); // TODO shape finalize
       case 190: return nameTag(tag, "jungle_fence"); // TODO shape finalize
@@ -495,8 +495,8 @@ public class LegacyBlocks {
       case 139: //TODO state finalize
         switch (data) {
           default:
-          case 0: return nameTag(tag, "cobblestone_wall");
-          case 1: return nameTag(tag, "mossy_cobblestone_wall");
+          case 0: return boolTag(nameTag(tag, "cobblestone_wall"), "up", true);
+          case 1: return boolTag(nameTag(tag, "mossy_cobblestone_wall"), "up", true);
         }
       case 140:
         switch (data) {
@@ -724,7 +724,7 @@ public class LegacyBlocks {
     return stringTag(tag, "facing", (new String[] {"down", "up", "north", "south", "west", "east"})[direction % 6]);
   }
 
-  private static CompoundTag facing4Tag(CompoundTag tag, int data) {
+  public static CompoundTag facing4Tag(CompoundTag tag, int data) {
     return stringTag(tag, "facing", (new String[] {"south", "west", "north", "east"})[data % 4]);
   }
 
