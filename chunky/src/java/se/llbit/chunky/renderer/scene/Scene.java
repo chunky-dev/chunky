@@ -981,7 +981,7 @@ public class Scene implements JsonSerializable, Refreshable {
             double y = pos.get(1).doubleValue();
             double z = pos.get(2).doubleValue();
 
-            if (y >= yClipMin && y <= yClipMax) {
+            if (y >= yClipMin && y < yClipMax) {
               String id = tag.get("id").stringValue("");
               if (id.equals("minecraft:painting") || id.equals("Painting")) {
                 // Before 1.12 paintings had id=Painting.
@@ -1204,7 +1204,7 @@ public class Scene implements JsonSerializable, Refreshable {
         // Block entities are loaded after the base block data so that metadata can be updated.
         for (CompoundTag entityTag : chunkData.getTileEntities()) {
           int y = entityTag.get("y").intValue(0);
-          if (y >= yClipMin && y <= yClipMax) {
+          if (y >= yMin && y < yMax) {
             int x = entityTag.get("x").intValue(0) - wx0; // Chunk-local coordinates.
             int z = entityTag.get("z").intValue(0) - wz0;
             if (x < 0 || x > 15 || z < 0 || z > 15) {
