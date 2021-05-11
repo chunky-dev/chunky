@@ -998,7 +998,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
         int yCubeMin = yMin / 16;
         int yCubeMax = (yMax+15) / 16;
-        for(int yCube = yCubeMin; yCube <= yCubeMax; ++yCube) {
+        for(int yCube = yCubeMin; yCube < yCubeMax; ++yCube) {
           // Reset the cubes
           Arrays.fill(cubeWorldBlocks, 0);
           Arrays.fill(cubeWaterBlocks, 0);
