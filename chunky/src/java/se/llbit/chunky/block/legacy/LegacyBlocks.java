@@ -214,8 +214,8 @@ public class LegacyBlocks {
       case 196: return needsFinalization(nameTag(tag, "acacia_door"), id, data);
       case 197: return needsFinalization(nameTag(tag, "dark_oak_door"), id, data);
       case 198: return facingTag(nameTag(tag, "end_rod"), data);
-      case 199: return nameTag(tag, "chorus_plant"); //TODO shape finalize
-      case 200: return nameTag(tag, "chorus_flower"); //TODO shape finalize
+      case 199: return needsFinalization(nameTag(tag, "chorus_plant"), id, data);
+      case 200: return nameTag(tag, "chorus_flower");
       case 201: return nameTag(tag, "purpur_block");
       case 202: return nameTag(tag, "purpur_pillar");
       case 203: return stairTag(nameTag(tag, "purpur_stairs"), data); //TODO shape finalize
