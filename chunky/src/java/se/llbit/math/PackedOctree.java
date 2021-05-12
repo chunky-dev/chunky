@@ -282,7 +282,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
   /**
    * Compare two nodes, in array, by index.
    *
-   * True if both branching, or same type.
+   * True if none branching, and same type.
    *
    * @param firstNodeIndex  The index of the first node
    * @param secondNodeIndex The index of the second node
@@ -291,13 +291,13 @@ public class PackedOctree implements Octree.OctreeImplementation {
   private boolean nodeEquals(int firstNodeIndex, int secondNodeIndex) {
     boolean firstIsBranch = treeData[firstNodeIndex] > 0;
     boolean secondIsBranch = treeData[secondNodeIndex] > 0;
-    return ((firstIsBranch && secondIsBranch) || treeData[firstNodeIndex] == treeData[secondNodeIndex]); // compare types
+    return (!firstIsBranch && !secondIsBranch && treeData[firstNodeIndex] == treeData[secondNodeIndex]); // compare types
   }
 
   /**
    * Compare two nodes.
    *
-   * True if both branching, or same type.
+   * True if none branching, and same type.
    *
    * @param firstNodeIndex The index of the first node
    * @param secondNode     The second node (most likely outside of tree)
@@ -306,7 +306,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
   private boolean nodeEquals(int firstNodeIndex, Octree.Node secondNode) {
     boolean firstIsBranch = treeData[firstNodeIndex] > 0;
     boolean secondIsBranch = (secondNode.type == BRANCH_NODE);
-    return ((firstIsBranch && secondIsBranch) || -treeData[firstNodeIndex] == secondNode.type); // compare types (don't forget that in the tree the negation of the type is stored)
+    return (!firstIsBranch && !secondIsBranch && -treeData[firstNodeIndex] == secondNode.type); // compare types (don't forget that in the tree the negation of the type is stored)
   }
 
   /**
@@ -512,7 +512,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
     for(int i = cubeDepth; i < depth; ++i) {
       int parentIndex = parents[i];
 
-      // assert each child is of same type
+      // check each child is of same type
       boolean allSame = true;
       for(int j = 0; j < 8; ++j) {
         int childIndex = treeData[parentIndex] + j;
