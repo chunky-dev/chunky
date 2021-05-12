@@ -58,8 +58,7 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "dark_oak_stairs":
       case "red_sandstone_stairs":
       case "purpur_stairs":
-        // stairs
-        break;
+        return new LegacyStairs(name, ctag);
       case "iron_bars":
         return new LegacyIronBars(name, ctag);
       case "redstone_wire":

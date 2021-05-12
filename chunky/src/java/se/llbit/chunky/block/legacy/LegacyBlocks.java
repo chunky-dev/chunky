@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy;
 
+import se.llbit.chunky.block.legacy.blocks.LegacyStairs;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.IntTag;
 import se.llbit.nbt.SpecificTag;
@@ -56,7 +57,7 @@ public class LegacyBlocks {
       case 49:  return nameTag(tag, "obsidian");
       case 51:  return nameTag(tag, "fire"); //TODO shape finalize
       case 52:  return nameTag(tag, "spawner");
-      case 53:  return stairTag(nameTag(tag, "oak_stairs"), data); //TODO shape finalize
+      case 53:  return needsFinalization(stairsTag(nameTag(tag, "oak_stairs"), data), id, data);
       case 54:  return needsFinalization(chestFurnaceLadderTag(nameTag(tag, "chest"), data), id, data);
       case 55:  return needsFinalization(intTag(nameTag(tag, "redstone_wire"), "power", data), id, data);
       case 56:  return nameTag(tag, "diamond_ore");
@@ -69,7 +70,7 @@ public class LegacyBlocks {
       case 63:  return intTag(nameTag(tag, "oak_sign"), "rotation", data);
       case 64:  return needsFinalization(nameTag(tag, "oak_door"), id, data);
       case 65:  return chestFurnaceLadderTag(nameTag(tag, "ladder"), data);
-      case 67:  return stairTag(nameTag(tag, "cobblestone_stairs"), data); //TODO shape finalize
+      case 67:  return needsFinalization(stairsTag(nameTag(tag, "cobblestone_stairs"), data), id, data);
       case 68:  return wallSignTag(nameTag(tag, "oak_wall_sign"), data);
       case 70:  return nameTag(tag, "stone_pressure_plate");
       case 71:  return needsFinalization(nameTag(tag, "iron_door"), id, data);
@@ -106,13 +107,13 @@ public class LegacyBlocks {
       case 105: return needsFinalization(intTag(nameTag(tag, "melon_stem"), "age", data&7), id, data);
       case 106: return needsFinalization(vineTag(nameTag(tag, "vine"), data, false), id, data);
       case 107: return needsFinalization(fenceGate(nameTag(tag, "oak_fence_gate"), data), id, data);
-      case 108: return stairTag(nameTag(tag, "brick_stairs"), data);  //TODO shape finalize
-      case 109: return stairTag(nameTag(tag, "stone_brick_stairs"), data);  //TODO shape finalize
+      case 108: return needsFinalization(stairsTag(nameTag(tag, "brick_stairs"), data), id, data);
+      case 109: return needsFinalization(stairsTag(nameTag(tag, "stone_brick_stairs"), data), id, data);
       case 110: return needsFinalization(nameTag(tag, "mycelium"), id, data);
       case 111: return nameTag(tag, "lily_pad");
       case 112: return nameTag(tag, "nether_bricks");
       case 113: return nameTag(tag, "nether_brick_fence"); //TODO state finalize
-      case 114: return stairTag(nameTag(tag, "nether_brick_stairs"), data); //TODO shape finalize
+      case 114: return needsFinalization(stairsTag(nameTag(tag, "nether_brick_stairs"), data), id, data);
       case 115: return intTag(nameTag(tag, "nether_wart"), "age", data&7);
       case 116: return nameTag(tag, "enchanting_table");
       case 117: return nameTag(tag, "brewing_stand");
@@ -128,7 +129,7 @@ public class LegacyBlocks {
       case 123: return stringTag(nameTag(tag, "redstone_lamp"), "lit", "false");
       case 124: return stringTag(nameTag(tag, "redstone_lamp"), "lit", "true");
       case 127: return intTag(facing4Tag(nameTag(tag, "cocoa"), data&4), "age", (data << 2) & 3);
-      case 128: return stairTag(nameTag(tag, "sandstone_stairs"), data); //TODO shape finalize
+      case 128: return needsFinalization(stairsTag(nameTag(tag, "sandstone_stairs"), data), id, data);
       case 129: return nameTag(tag, "emerald_ore");
       case 130: return chestFurnaceLadderTag(nameTag(tag, "ender_chest"), data);
       case 131:
@@ -144,9 +145,9 @@ public class LegacyBlocks {
         boolTag(tag, "disarmed", (data&8) != 0);
         return tag;
       case 133: return nameTag(tag, "emerald_block");
-      case 134: return stairTag(nameTag(tag, "spruce_stairs"), data); //TODO shape finalize
-      case 135: return stairTag(nameTag(tag, "birch_stairs"), data); //TODO shape finalize
-      case 136: return stairTag(nameTag(tag, "jungle_stairs"), data); //TODO shape finalize
+      case 134: return needsFinalization(stairsTag(nameTag(tag, "spruce_stairs"), data), id, data);
+      case 135: return needsFinalization(stairsTag(nameTag(tag, "birch_stairs"), data), id, data);
+      case 136: return needsFinalization(stairsTag(nameTag(tag, "jungle_stairs"), data), id, data);
       case 137: return commandBlockTag(nameTag(tag, "command_block"), data);
       case 138: return nameTag(tag, "beacon");
       case 141: return intTag(nameTag(tag, "carrots"), "age", data&7);
@@ -175,11 +176,11 @@ public class LegacyBlocks {
       case 152: return nameTag(tag, "redstone_block");
       case 153: return nameTag(tag, "nether_quartz_ore");
       case 154: return facingTag(nameTag(tag, "hopper"), data&7);
-      case 156: return stairTag(nameTag(tag, "quartz_stairs"), data); //TODO shape finalize
+      case 156: return needsFinalization(stairsTag(nameTag(tag, "quartz_stairs"), data), id, data);
       case 157: return utilityRailTag(nameTag(tag, "activator_rail"), data);
       case 158: return facingTag(nameTag(tag, "dropper"), data&7);
-      case 163: return stairTag(nameTag(tag, "acacia_stairs"), data); //TODO shape finalize
-      case 164: return stairTag(nameTag(tag, "dark_oak_stairs"), data); //TODO shape finalize
+      case 163: return needsFinalization(stairsTag(nameTag(tag, "acacia_stairs"), data), id, data);
+      case 164: return needsFinalization(stairsTag(nameTag(tag, "dark_oak_stairs"), data), id, data);
       case 165: return nameTag(tag, "slime_block");
       case 166: return nameTag(tag, "barrier");
       case 167: return trapdoorTag(nameTag(tag, "iron_trapdoor"), data);
@@ -194,7 +195,7 @@ public class LegacyBlocks {
         nameTag(tag, "daylight_detector");
         boolTag(tag, "inverted", true);
         return tag;
-      case 180: return stairTag(nameTag(tag, "red_sandstone_stairs"), data); //TODO shape finalize
+      case 180: return needsFinalization(stairsTag(nameTag(tag, "red_sandstone_stairs"), data), id, data);
       case 181: return slabTag(nameTag(tag, "red_sandstone_slab"), true, false);
       case 182: return slabTag(nameTag(tag, "red_sandstone_slab"), false, (data&8) != 0);
       case 183: return needsFinalization(fenceGate(nameTag(tag, "spruce_fence_gate"), data), id, data);
@@ -217,7 +218,7 @@ public class LegacyBlocks {
       case 200: return nameTag(tag, "chorus_flower");
       case 201: return nameTag(tag, "purpur_block");
       case 202: return nameTag(tag, "purpur_pillar");
-      case 203: return stairTag(nameTag(tag, "purpur_stairs"), data); //TODO shape finalize
+      case 203: return needsFinalization(stairsTag(nameTag(tag, "purpur_stairs"), data), id, data);
       case 204: return slabTag(nameTag(tag, "purpur_slab"), true, false);
       case 205: return slabTag(nameTag(tag, "purpur_slab"), false, (data&8) != 0);
       case 206: return nameTag(tag, "end_stone_bricks");
@@ -782,9 +783,9 @@ public class LegacyBlocks {
     return facing4Tag(tag, data & 4);
   }
 
-  private static CompoundTag stairTag(CompoundTag tag, int data) {
+  private static CompoundTag stairsTag(CompoundTag tag, int data) {
     stringTag(tag, "half", (data & 0b0100) == 0 ? "bottom" : "top");
-    return facing4Tag(tag, data & 4);
+    return stringTag(tag, "facing", LegacyStairs.getFacing(data));
   }
 
   private static CompoundTag commandBlockTag(CompoundTag tag, int data) {
