@@ -20,6 +20,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector3;
 
 public class StairModel {
   private static AABB[][][] corners = {
@@ -164,9 +165,10 @@ public class StairModel {
   public static boolean intersect(Ray ray, Texture side, Texture top, Texture bottom) {
     boolean hit = intersect(ray, side);
     if (hit) {
-      if (ray.n.y > 0) {
+      Vector3 n = ray.getN();
+      if (n.y > 0) {
         top.getColor(ray);
-      } else if (ray.n.y < 0) {
+      } else if (n.y < 0) {
         bottom.getColor(ray);
       }
       ray.color.w = 1;
@@ -178,9 +180,10 @@ public class StairModel {
       int flipped, boolean isCorner, int corner, int rotation) {
     boolean hit = intersect(ray, side, flipped, isCorner, corner, rotation);
     if (hit) {
-      if (ray.n.y > 0) {
+      Vector3 n = ray.getN();
+      if (n.y > 0) {
         top.getColor(ray);
-      } else if (ray.n.y < 0) {
+      } else if (n.y < 0) {
         bottom.getColor(ray);
       }
       ray.color.w = 1;

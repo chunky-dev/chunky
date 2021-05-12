@@ -4,6 +4,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector3;
 
 public class GrassBlock extends MinecraftBlock {
   private final static AABB aabb = new AABB(0, 1, 0, 1, 0, 1);
@@ -16,13 +17,14 @@ public class GrassBlock extends MinecraftBlock {
   @Override public boolean intersect(Ray ray, Scene scene) {
     ray.t = Double.POSITIVE_INFINITY;
     if (aabb.intersect(ray)) {
-      if (ray.n.y == -1) {
+      Vector3 n = ray.getN();
+      if (n.y == -1) {
         // Bottom face.
         Texture.dirt.getColor(ray);
         ray.t = ray.tNext;
       } else {
         float[] color;
-        if (ray.n.y > 0) {
+        if (n.y > 0) {
           color = Texture.grassTop.getColor(ray.u, ray.v);
         } else {
           color = Texture.grassSide.getColor(ray.u, ray.v);

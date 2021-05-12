@@ -146,7 +146,7 @@ public class RedstoneWireModel {
         ray.color.y = color[1] * wireColor[power][1];
         ray.color.z = color[2] * wireColor[power][2];
         ray.color.w = color[3];
-        ray.n.set(quad.n);
+        ray.setN(quad.n);
         ray.t = ray.tNext;
         hit = true;
       }
@@ -159,7 +159,7 @@ public class RedstoneWireModel {
           ray.color.y = color[1] * wireColor[power][1];
           ray.color.z = color[2] * wireColor[power][2];
           ray.color.w = color[3];
-          ray.n.set(eastSide.n);
+          ray.setN(eastSide.n);
           ray.t = ray.tNext;
           hit = true;
         }
@@ -173,7 +173,7 @@ public class RedstoneWireModel {
           ray.color.y = color[1] * wireColor[power][1];
           ray.color.z = color[2] * wireColor[power][2];
           ray.color.w = color[3];
-          ray.n.set(westSide.n);
+          ray.setN(westSide.n);
           ray.t = ray.tNext;
           hit = true;
         }
@@ -187,7 +187,7 @@ public class RedstoneWireModel {
           ray.color.y = color[1] * wireColor[power][1];
           ray.color.z = color[2] * wireColor[power][2];
           ray.color.w = color[3];
-          ray.n.set(northSide.n);
+          ray.setN(northSide.n);
           ray.t = ray.tNext;
           hit = true;
         }
@@ -201,7 +201,7 @@ public class RedstoneWireModel {
           ray.color.y = color[1] * wireColor[power][1];
           ray.color.z = color[2] * wireColor[power][2];
           ray.color.w = color[3];
-          ray.n.set(southSide.n);
+          ray.setN(southSide.n);
           ray.t = ray.tNext;
           hit = true;
         }

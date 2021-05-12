@@ -85,7 +85,7 @@ public class ButtonModel {
     for (Quad quad : rotated) {
       if (quad.intersect(ray)) {
         texture.getColor(ray);
-        ray.n.set(quad.n);
+        ray.setN(quad.n);
         ray.t = ray.tNext;
         hit = true;
       }

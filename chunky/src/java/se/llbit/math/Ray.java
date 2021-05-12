@@ -50,7 +50,13 @@ public class Ray {
   /**
    * Intersection normal.
    */
-  public Vector3 n = new Vector3();
+  private Vector3 n = new Vector3();
+
+  /**
+   * Geometry normal, almost always the same as normal except when a normal map is used
+   * This stays the real normal of the geometry
+   */
+  private Vector3 geomN = new Vector3();
 
   /**
    * Distance traveled in current medium. This is updated after all intersection tests have run and
@@ -159,6 +165,7 @@ public class Ray {
     o.set(other.o);
     d.set(other.d);
     n.set(other.n);
+    geomN.set(other.geomN);
     color.set(0, 0, 0, 0);
     emittance.set(0, 0, 0);
     specular = other.specular;
@@ -242,6 +249,7 @@ public class Ray {
 
     o.scaleAdd(tNext, d);
     n.set(nx, ny, nz);
+    geomN.set(nx, ny, nz);
     distance += tNext;
   }
 
@@ -493,5 +501,32 @@ public class Ray {
    */
   public int getCurrentData() {
     return currentData;
+  }
+
+  public Vector3 getN() {
+    return n;
+  }
+
+  public Vector3 getGeomN() {
+    return geomN;
+  }
+
+  public void setN(double x, double y, double z) {
+    n.set(x, y, z);
+    geomN.set(x, y, z);
+  }
+
+  public void setN(Vector3 newN) {
+    n = newN;
+    geomN.set(newN);
+  }
+
+  public void setShadingN(double x, double y, double z) {
+    n.set(x, y, z);
+  }
+
+  public void invertNormal() {
+    n.scale(-1);
+    geomN.scale(-1);
   }
 }

@@ -159,7 +159,7 @@ public class CocoaPlantModel {
         tex[age].getColor(ray);
         ray.color.w = 1;
         ray.t = ray.tNext;
-        ray.n.set(quad.n);
+        ray.setN(quad.n);
         hit = true;
       }
     }
@@ -168,8 +168,9 @@ public class CocoaPlantModel {
       if (color[3] > Ray.EPSILON) {
         ray.color.set(color);
         ray.t = ray.tNext;
-        ray.n.set(stem[facing].n);
-        ray.n.scale(QuickMath.signum(-ray.d.dot(stem[facing].n)));
+        Vector3 n = new Vector3(stem[facing].n);
+        n.scale(-QuickMath.signum(ray.d.dot(stem[facing].n)));
+        ray.setN(n);
         hit = true;
       }
     }

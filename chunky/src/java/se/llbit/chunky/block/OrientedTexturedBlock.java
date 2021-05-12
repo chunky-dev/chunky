@@ -105,7 +105,7 @@ public class OrientedTexturedBlock extends TexturedBlock {
       if (side.intersect(ray)) {
         rotateUV(ray, i);
         texture[textureOrientationMap[facing][i]].getColor(ray);
-        ray.n.set(side.n);
+        ray.setN(side.n);
         ray.t = ray.tNext;
         hit = true;
       }

@@ -70,7 +70,7 @@ public class CakeModel {
                     Texture.cakeSide.getColor(ray);
                 else
                     Texture.cakeInside.getColor(ray);
-                ray.n.set(quad.n);
+                ray.setN(quad.n);
                 ray.t = ray.tNext;
                 hit = true;
             }

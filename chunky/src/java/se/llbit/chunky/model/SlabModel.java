@@ -33,7 +33,7 @@ public class SlabModel {
     int which = (ray.getBlockData() & 0x8) >> 3;
     ray.t = Double.POSITIVE_INFINITY;
     if (aabb[which].intersect(ray)) {
-      if (ray.n.y != 0) {
+      if (ray.getN().y != 0) {
         topTexture.getColor(ray);
       } else {
         sideTexture.getColor(ray);
