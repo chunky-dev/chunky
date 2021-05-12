@@ -327,6 +327,13 @@ public class Ray {
     o.scaleAdd(Ray.OFFSET, d);
     currentMaterial = prevMaterial;
     specular = false;
+
+    // See specularReflection for explanation of why this is needed
+    if(QuickMath.signum(geomN.dot(d)) < 0) {
+      double factor = Ray.EPSILON - d.dot(geomN);
+      d.scaleAdd(factor, geomN);
+      d.normalize();
+    }
   }
 
   /**
@@ -400,6 +407,23 @@ public class Ray {
       // roughness is zero, do a specular reflection
       d.scaleAdd(-2 * ray.d.dot(ray.n), ray.n, ray.d);
       o.scaleAdd(0.00001, ray.n);
+    }
+
+    // After reflection, the dot product between the direction and the real surface normal
+    // should be positive, if not we need to fix that
+    if(QuickMath.signum(geomN.dot(d)) < 0) {
+      // The reflected ray goes is going through the geometry,
+      // we need to alter its direction so it doesn't
+      // The way we do that is by adding the geometry normal multiplied by some factor
+      // The factor can be determined by projecting the direction on the normal,
+      // ie doing a dot product because, for every unit vector d and n
+      // such that `d.n < 0`, we have the relation
+      // `(d - d.n * n) . n = 0`
+      // This tells us that if we chose `-d.n` as the factor we would have a dot product
+      // equals to 0, as we want something positive, we will use the factor `-d.n + epsilon`
+      double factor = Ray.EPSILON - d.dot(geomN);
+      d.scaleAdd(factor, geomN);
+      d.normalize();
     }
   }
 
