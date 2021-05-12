@@ -981,7 +981,7 @@ public class Scene implements JsonSerializable, Refreshable {
             double y = pos.get(1).doubleValue();
             double z = pos.get(2).doubleValue();
 
-            if (y >= yClipMin && y <= yClipMax) {
+            if (y >= yClipMin && y < yClipMax) {
               String id = tag.get("id").stringValue("");
               if (id.equals("minecraft:painting") || id.equals("Painting")) {
                 // Before 1.12 paintings had id=Painting.
@@ -998,7 +998,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
         int yCubeMin = yMin / 16;
         int yCubeMax = (yMax+15) / 16;
-        for(int yCube = yCubeMin; yCube <= yCubeMax; ++yCube) {
+        for(int yCube = yCubeMin; yCube < yCubeMax; ++yCube) {
           // Reset the cubes
           Arrays.fill(cubeWorldBlocks, 0);
           Arrays.fill(cubeWaterBlocks, 0);
@@ -1195,8 +1195,8 @@ public class Scene implements JsonSerializable, Refreshable {
               }
             }
           }
-          worldOctree.setCube(4, cubeWorldBlocks, cp.x*16 - origin.x, yCube*16, cp.z*16 - origin.z);
-          waterOctree.setCube(4, cubeWaterBlocks, cp.x*16 - origin.x, yCube*16, cp.z*16 - origin.z);
+          worldOctree.setCube(4, cubeWorldBlocks, cp.x*16 - origin.x, yCube*16 - origin.y, cp.z*16 - origin.z);
+          waterOctree.setCube(4, cubeWaterBlocks, cp.x*16 - origin.x, yCube*16 - origin.y, cp.z*16 - origin.z);
         }
 
         // Block entities are also called "tile entities". These are extra bits of metadata
@@ -1204,7 +1204,7 @@ public class Scene implements JsonSerializable, Refreshable {
         // Block entities are loaded after the base block data so that metadata can be updated.
         for (CompoundTag entityTag : chunkData.getTileEntities()) {
           int y = entityTag.get("y").intValue(0);
-          if (y >= yClipMin && y <= yClipMax) {
+          if (y >= yMin && y < yMax) {
             int x = entityTag.get("x").intValue(0) - wx0; // Chunk-local coordinates.
             int z = entityTag.get("z").intValue(0) - wz0;
             if (x < 0 || x > 15 || z < 0 || z > 15) {
@@ -1448,7 +1448,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
       origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
     } else {
-      origin.set(xmin, 0, zmin);
+      // Note: Math.floorDiv rather than integer division for round toward -infinity
+      origin.set(xmin, Math.floorDiv(yMin, 16) * 16, zmin);
     }
     return requiredDepth;
   }
