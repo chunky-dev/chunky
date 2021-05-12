@@ -222,6 +222,15 @@ public class LegacyStairs extends UnfinalizedLegacyBlock {
   }
 
   /**
+   * Get the facing of this stairs block.
+   *
+   * @return Facing, i.e. north, south, east, west
+   */
+  public String getFacing() {
+    return getFacing(data);
+  }
+
+  /**
    * Get the 1.13+ facing string from the given rotation.
    *
    * @param rotation Rotation data value

@@ -1,28 +1,40 @@
 package se.llbit.chunky.block.legacy;
 
 import se.llbit.chunky.block.FinalizationState;
+import se.llbit.chunky.block.Stairs;
+import se.llbit.chunky.block.legacy.blocks.LegacyStairs;
 import se.llbit.chunky.world.Material;
-
-import java.util.Arrays;
 
 /**
  * Class containing some utility classes and methods for legacy blocks.
  */
 public class LegacyBlockUtils {
-  private LegacyBlockUtils() {}
+
+  private LegacyBlockUtils() {
+  }
 
   /**
    * Get the name of a block. This will strip the `minecraft:` namespace id and anything before it.
-   *  * {@code getName("#legacy_minecraft:iron_bars")} -> {@code "iron_bars"}
+   * * {@code getName("#legacy_minecraft:iron_bars")} -> {@code "iron_bars"}
    */
   public static String getName(Material block) {
-    return block.name.substring(block.name.indexOf("minecraft:")+10);
+    return block.name.substring(block.name.indexOf("minecraft:") + 10);
+  }
+
+  public static String getStairsFacing(Material block) {
+    if (block instanceof LegacyStairs) {
+      return ((LegacyStairs) block).getFacing();
+    } else if (block instanceof Stairs) {
+      return ((Stairs) block).getFacing();
+    }
+    return null;
   }
 
   /**
    * A simple cache for FinalizationState.
    */
   public static class FinalizationStateCache extends FinalizationState {
+
     private final Material[] cache;
     private final FinalizationState state;
 
@@ -37,7 +49,7 @@ public class LegacyBlockUtils {
     }
 
     private static int getCacheIndex(int rx, int ry, int rz) {
-      return (rx + 1) + (ry + 1)*3 + (rz + 1)*9;
+      return (rx + 1) + (ry + 1) * 3 + (rz + 1) * 9;
     }
 
     @Override
@@ -49,7 +61,9 @@ public class LegacyBlockUtils {
     public Material getMaterial(int rx, int ry, int rz) {
       int index = getCacheIndex(rx, ry, rz);
 
-      if (cache[index] != null) return cache[index];
+      if (cache[index] != null) {
+        return cache[index];
+      }
       cache[index] = state.getMaterial(rx, ry, rz);
       return cache[index];
     }

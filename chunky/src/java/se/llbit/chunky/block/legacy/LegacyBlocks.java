@@ -101,7 +101,7 @@ public class LegacyBlocks {
       case 99:  return mushroomTag(tag, data, false);
       case 100: return mushroomTag(tag, data, true);
       case 101: return needsFinalization(nameTag(tag, "iron_bars"), id, data);
-      case 102: return nameTag(tag, "glass_pane");  //TODO state finalize
+      case 102: return needsFinalization(nameTag(tag, "glass_pane"), id, data);
       case 103: return nameTag(tag, "melon");
       case 104: return needsFinalization(intTag(nameTag(tag, "pumpkin_stem"), "age", data&7), id, data);
       case 105: return needsFinalization(intTag(nameTag(tag, "melon_stem"), "age", data&7), id, data);
@@ -559,25 +559,25 @@ public class LegacyBlocks {
           case 14: return nameTag(tag, "red_terracotta");
           case 15: return nameTag(tag, "black_terracotta");
         }
-      case 160: //TODO shape finalize
+      case 160:
         switch (data) {
           default:
-          case 0:  return nameTag(tag, "white_stained_glass_pane");
-          case 1:  return nameTag(tag, "orange_stained_glass_pane");
-          case 2:  return nameTag(tag, "magenta_stained_glass_pane");
-          case 3:  return nameTag(tag, "light_blue_stained_glass_pane");
-          case 4:  return nameTag(tag, "yellow_stained_glass_pane");
-          case 5:  return nameTag(tag, "lime_stained_glass_pane");
-          case 6:  return nameTag(tag, "pink_stained_glass_pane");
-          case 7:  return nameTag(tag, "gray_stained_glass_pane");
-          case 8:  return nameTag(tag, "light_gray_stained_glass_pane");
-          case 9:  return nameTag(tag, "cyan_stained_glass_pane");
-          case 10: return nameTag(tag, "purple_stained_glass_pane");
-          case 11: return nameTag(tag, "blue_stained_glass_pane");
-          case 12: return nameTag(tag, "brown_stained_glass_pane");
-          case 13: return nameTag(tag, "green_stained_glass_pane");
-          case 14: return nameTag(tag, "red_stained_glass_pane");
-          case 15: return nameTag(tag, "black_stained_glass_pane");
+          case 0:  return needsFinalization(nameTag(tag, "white_stained_glass_pane"), id, data);
+          case 1:  return needsFinalization(nameTag(tag, "orange_stained_glass_pane"), id, data);
+          case 2:  return needsFinalization(nameTag(tag, "magenta_stained_glass_pane"), id, data);
+          case 3:  return needsFinalization(nameTag(tag, "light_blue_stained_glass_pane"), id, data);
+          case 4:  return needsFinalization(nameTag(tag, "yellow_stained_glass_pane"), id, data);
+          case 5:  return needsFinalization(nameTag(tag, "lime_stained_glass_pane"), id, data);
+          case 6:  return needsFinalization(nameTag(tag, "pink_stained_glass_pane"), id, data);
+          case 7:  return needsFinalization(nameTag(tag, "gray_stained_glass_pane"), id, data);
+          case 8:  return needsFinalization(nameTag(tag, "light_gray_stained_glass_pane"), id, data);
+          case 9:  return needsFinalization(nameTag(tag, "cyan_stained_glass_pane"), id, data);
+          case 10: return needsFinalization(nameTag(tag, "purple_stained_glass_pane"), id, data);
+          case 11: return needsFinalization(nameTag(tag, "blue_stained_glass_pane"), id, data);
+          case 12: return needsFinalization(nameTag(tag, "brown_stained_glass_pane"), id, data);
+          case 13: return needsFinalization(nameTag(tag, "green_stained_glass_pane"), id, data);
+          case 14: return needsFinalization(nameTag(tag, "red_stained_glass_pane"), id, data);
+          case 15: return needsFinalization(nameTag(tag, "black_stained_glass_pane"), id, data);
         }
       case 161:
         switch (data) {

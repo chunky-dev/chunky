@@ -79,6 +79,24 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "rose_bush":
       case "peony":
         return new LegacyLargeFlower(name, ctag);
+      case "glass_pane":
+      case "white_stained_glass_pane":
+      case "orange_stained_glass_pane":
+      case "magenta_stained_glass_pane":
+      case "light_blue_stained_glass_pane":
+      case "yellow_stained_glass_pane":
+      case "lime_stained_glass_pane":
+      case "pink_stained_glass_pane":
+      case "gray_stained_glass_pane":
+      case "light_gray_stained_glass_pane":
+      case "cyan_stained_glass_pane":
+      case "purple_stained_glass_pane":
+      case "blue_stained_glass_pane":
+      case "brown_stained_glass_pane":
+      case "green_stained_glass_pane":
+      case "red_stained_glass_pane":
+      case "black_stained_glass_pane":
+        return new LegacyGlassPane(name, ctag);
     }
     Log.warn("Unsupported legacy block: " + name);
     return null;
