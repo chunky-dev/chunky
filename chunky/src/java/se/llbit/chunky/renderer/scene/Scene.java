@@ -2525,7 +2525,7 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public boolean isInWater(Ray ray) {
-    if (isWaterPlaneEnabled() && ray.o.y < getEffectiveWaterPlaneHeight()) {
+    if (isWaterPlaneEnabled() && ray.o.y + origin.y < getEffectiveWaterPlaneHeight()) {
       if (getWaterPlaneChunkClip()) {
         if (!isChunkLoaded((int)Math.floor(ray.o.x), (int)Math.floor(ray.o.z))) {
           return true;
