@@ -189,8 +189,8 @@ public class LegacyBlocks {
       case 172: return nameTag(tag, "terracotta");
       case 173: return nameTag(tag, "coal_block");
       case 174: return nameTag(tag, "packed_ice");
-      case 176: return intTag(nameTag(tag, "white_banner"), "rotation", data);
-      case 177: return wallSignTag(nameTag(tag, "white_banner"), data);
+      case 176: return needsFinalization(nameTag(tag, "banner"), id, data);
+      case 177: return needsFinalization(nameTag(tag, "wall_banner"), id, data);
       case 178:
         nameTag(tag, "daylight_detector");
         boolTag(tag, "inverted", true);

@@ -114,6 +114,10 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
         return new LegacyCobblestoneWall(name, ctag);
       case "skull":
         return new LegacySkull(name, ctag);
+      case "banner":
+        return new LegacyBanner(name, ctag);
+      case "wall_banner":
+        return new LegacyWallBanner(name, ctag);
     }
     Log.warn("Unsupported legacy block: " + name);
     return null;
