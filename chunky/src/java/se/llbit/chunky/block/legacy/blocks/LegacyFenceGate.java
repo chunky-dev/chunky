@@ -31,9 +31,11 @@ public class LegacyFenceGate extends UnfinalizedLegacyBlock {
     state.replaceCurrentBlock(newTag);
   }
 
+  private static final BlockFace[] facingMap = new BlockFace[]{
+    BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST
+  };
+
   public BlockFace getFacing() {
-    return new BlockFace[]{
-        BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST
-    }[data & 0b11];
+    return facingMap[data & 0b11];
   }
 }

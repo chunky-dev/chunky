@@ -8,6 +8,10 @@ import se.llbit.nbt.CompoundTag;
 
 public class PumpkinStem extends UnfinalizedLegacyBlock {
 
+  private static final BlockFace[] sides = new BlockFace[]{
+    BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
+  };
+
   public PumpkinStem(String name, CompoundTag tag) {
     super(name, tag);
   }
@@ -15,8 +19,7 @@ public class PumpkinStem extends UnfinalizedLegacyBlock {
   @Override
   public void finalizeBlock(FinalizationState state) {
     // pumpkin stem points to adjacent pumpkin or carved pumpkin (but not jack-o-lantern)
-    for (BlockFace side : new BlockFace[]{BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH,
-        BlockFace.SOUTH}) {
+    for (BlockFace side : sides) {
       if (hasName(state.getMaterial(side), "minecraft:pumpkin", "minecraft:carved_pumpkin")) {
         state.replaceCurrentBlock(
             LegacyBlocks

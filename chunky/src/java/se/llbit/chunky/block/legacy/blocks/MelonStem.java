@@ -8,6 +8,10 @@ import se.llbit.nbt.CompoundTag;
 
 public class MelonStem extends UnfinalizedLegacyBlock {
 
+  private static final BlockFace[] sides = new BlockFace[]{
+    BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
+  };
+
   public MelonStem(String name, CompoundTag tag) {
     super(name, tag);
   }
@@ -15,8 +19,7 @@ public class MelonStem extends UnfinalizedLegacyBlock {
   @Override
   public void finalizeBlock(FinalizationState state) {
     // melon stem points to adjacent melon
-    for (BlockFace side : new BlockFace[]{BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH,
-        BlockFace.SOUTH}) {
+    for (BlockFace side : sides) {
       if (state.getMaterial(side).name.equals("minecraft:melon")) {
         state.replaceCurrentBlock(
             LegacyBlocks

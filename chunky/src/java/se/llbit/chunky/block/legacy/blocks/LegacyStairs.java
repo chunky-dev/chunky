@@ -231,6 +231,13 @@ public class LegacyStairs extends UnfinalizedLegacyBlock {
     return getFacing(data);
   }
 
+  private static final BlockFace[] facingMap = new BlockFace[]{
+    BlockFace.EAST,
+    BlockFace.WEST,
+    BlockFace.SOUTH,
+    BlockFace.NORTH
+  };
+
   /**
    * Get the 1.13+ facing string from the given rotation.
    *
@@ -238,12 +245,7 @@ public class LegacyStairs extends UnfinalizedLegacyBlock {
    * @return Facing
    */
   public static BlockFace getFacing(int rotation) {
-    return new BlockFace[]{
-        BlockFace.EAST,
-        BlockFace.WEST,
-        BlockFace.SOUTH,
-        BlockFace.NORTH
-    }[rotation & 0b11];
+    return facingMap[rotation & 0b11];
   }
 
   /**

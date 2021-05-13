@@ -64,13 +64,15 @@ public class LegacyDoorPart extends UnfinalizedLegacyBlock {
     return (bottomData & 0b0100) != 0;
   }
 
+  private static final BlockFace[] bottomFacingMap = new BlockFace[]{
+    BlockFace.EAST,
+    BlockFace.SOUTH,
+    BlockFace.WEST,
+    BlockFace.NORTH
+  };
+
   private static BlockFace getFacing(int bottomData) {
-    return new BlockFace[]{
-        BlockFace.EAST,
-        BlockFace.SOUTH,
-        BlockFace.WEST,
-        BlockFace.NORTH
-    }[(bottomData & 0b011) % 4];
+    return bottomFacingMap[(bottomData & 0b011) % 4];
   }
 
   private static String getHinge(int topData) {
