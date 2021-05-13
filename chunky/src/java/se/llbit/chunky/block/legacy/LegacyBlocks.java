@@ -22,9 +22,9 @@ public class LegacyBlocks {
       case 4:   return nameTag(tag, "cobblestone");
       case 7:   return nameTag(tag, "bedrock");
       case 8:
-      case 9:   return nameTag(tag, "water"); //TODO state
+      case 9:   return intTag(nameTag(tag, "water"), "level", data & 0b111);
       case 10:
-      case 11:  return nameTag(tag, "lava"); //TODO state
+      case 11:  return intTag(nameTag(tag, "lava"), "level", data & 0b111);
       case 13:  return nameTag(tag, "gravel");
       case 14:  return nameTag(tag, "gold_ore");
       case 15:  return nameTag(tag, "iron_ore");
