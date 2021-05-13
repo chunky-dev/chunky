@@ -365,6 +365,9 @@ public class Octree {
   }
 
   public Material getMaterial(int x, int y, int z, BlockPalette palette) {
+    int size = (1 << implementation.getDepth());
+    if(x < 0 || y < 0 || z < 0 || x >= size || y >= size || z >= size)
+      return Air.INSTANCE;
     return implementation.getMaterial(x, y, z, palette);
   }
 
