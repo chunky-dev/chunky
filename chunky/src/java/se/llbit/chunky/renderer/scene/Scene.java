@@ -1217,10 +1217,13 @@ public class Scene implements JsonSerializable, Refreshable {
             // Metadata is the old block data (to be replaced in future Minecraft versions?).
             Vector3 position = new Vector3(x + wx0, y, z + wz0);
             if (block.isModifiedByBlockEntity()) {
-              int id = palette.put(block.getNewTagWithBlockEntity(palette.getTag(chunkData.getBlockAt(x, y, z)), entityTag));
-              block = palette.get(id);
-              chunkData.setBlockAt(x, y, z, id);
-              worldOctree.set(id, cp.x * 16 + x - origin.x, y - origin.y, cp.z * 16 + z - origin.z);
+              Tag newTag = block.getNewTagWithBlockEntity(palette.getTag(chunkData.getBlockAt(x, y, z)), entityTag);
+              if (newTag != null) {
+                int id = palette.put(newTag);
+                block = palette.get(id);
+                chunkData.setBlockAt(x, y, z, id);
+                worldOctree.set(id, cp.x * 16 + x - origin.x, y - origin.y, cp.z * 16 + z - origin.z);
+              }
             }
             if (block.isBlockEntity()) {
               Entity blockEntity = block.toBlockEntity(position, entityTag);
