@@ -329,8 +329,8 @@ public class Ray {
     specular = false;
 
     // See specularReflection for explanation of why this is needed
-    if(QuickMath.signum(geomN.dot(d)) < 0) {
-      double factor = Ray.EPSILON - d.dot(geomN);
+    if(QuickMath.signum(geomN.dot(d)) == QuickMath.signum(geomN.dot(ray.d))) {
+      double factor = QuickMath.signum(geomN.dot(ray.d)) * -Ray.EPSILON - d.dot(geomN);
       d.scaleAdd(factor, geomN);
       d.normalize();
     }
@@ -410,18 +410,22 @@ public class Ray {
     }
 
     // After reflection, the dot product between the direction and the real surface normal
-    // should be positive, if not we need to fix that
-    if(QuickMath.signum(geomN.dot(d)) < 0) {
+    // should have the opposite sign as the dot product between the incoming direction
+    // and the normal (because the incoming is going toward the volume enclosed
+    // by the surface and the reflected ray is going away)
+    // If this is not the case, we need to fix that
+    if(QuickMath.signum(geomN.dot(d)) == QuickMath.signum(geomN.dot(ray.d))) {
       // The reflected ray goes is going through the geometry,
-      // we need to alter its direction so it doesn't
+      // we need to alter its direction so it doesn't.
       // The way we do that is by adding the geometry normal multiplied by some factor
       // The factor can be determined by projecting the direction on the normal,
-      // ie doing a dot product because, for every unit vector d and n
-      // such that `d.n < 0`, we have the relation
+      // ie doing a dot product because, for every unit vector d and n,
+      // we have the relation:
       // `(d - d.n * n) . n = 0`
       // This tells us that if we chose `-d.n` as the factor we would have a dot product
-      // equals to 0, as we want something positive, we will use the factor `-d.n + epsilon`
-      double factor = Ray.EPSILON - d.dot(geomN);
+      // equals to 0, as we want something positive or negative,
+      // we will use the factor `-d.n +/- epsilon`
+      double factor = QuickMath.signum(geomN.dot(ray.d)) * -Ray.EPSILON - d.dot(geomN);
       d.scaleAdd(factor, geomN);
       d.normalize();
     }
@@ -541,7 +545,7 @@ public class Ray {
   }
 
   public void setN(Vector3 newN) {
-    n = newN;
+    n.set(newN);
     geomN.set(newN);
   }
 
