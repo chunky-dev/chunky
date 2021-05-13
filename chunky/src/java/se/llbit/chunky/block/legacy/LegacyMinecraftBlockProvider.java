@@ -107,6 +107,8 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "dark_oak_fence":
       case "acacia_fence":
         return new LegacyFence(name, ctag);
+      case "flower_pot":
+        return new LegacyFlowerPot(name, ctag);
     }
     Log.warn("Unsupported legacy block: " + name);
     return null;

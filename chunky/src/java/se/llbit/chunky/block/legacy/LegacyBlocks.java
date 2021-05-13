@@ -501,7 +501,8 @@ public class LegacyBlocks {
       case 140:
         switch (data) {
           default:
-          case 0:  return nameTag(tag, "flower_pot");
+          case 0:  return needsFinalization(nameTag(tag, "flower_pot"), id, data);
+          // prior to mc 1.7.2:
           case 1:  return nameTag(tag, "potted_poppy");
           case 2:  return nameTag(tag, "potted_dandelion");
           case 3:  return nameTag(tag, "potted_oak_sapling");
