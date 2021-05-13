@@ -323,9 +323,9 @@ public class PathTracer implements RayTracer {
 
                   // See Ray.specularReflection for information on why this is needed
                   // This is the same thing but for refraction instead of reflection
-                  // so there is some sign difference
-                  if(QuickMath.signum(refracted.getGeomN().dot(refracted.d)) > 0) {
-                    double factor = -Ray.EPSILON - refracted.d.dot(refracted.getGeomN());
+                  // so this time we want the signs of the dot product to be the same
+                  if(QuickMath.signum(refracted.getGeomN().dot(refracted.d)) != QuickMath.signum(refracted.getGeomN().dot(ray.d))) {
+                    double factor = QuickMath.signum(refracted.getGeomN().dot(ray.d)) * -Ray.EPSILON - refracted.d.dot(refracted.getGeomN());
                     refracted.d.scaleAdd(factor, refracted.getGeomN());
                     refracted.d.normalize();
                   }
