@@ -481,7 +481,7 @@ public class Octree {
       return false;
 
     ray.o.scaleAdd(tMin, ray.d);
-    ray.n.set(nx, ny, nz);
+    ray.setN(nx, ny, nz);
     ray.distance += tMin;
     return true;
   }
@@ -626,7 +626,7 @@ public class Octree {
         nx = ny = 0;
       }
 
-      ray.n.set(nx, ny, nz);
+      ray.setN(nx, ny, nz);
 
       distance = tNear;
     }
@@ -752,7 +752,7 @@ public class Octree {
       }
 
       ray.o.scaleAdd(tNear, ray.d);
-      ray.n.set(nx, ny, nz);
+      ray.setN(nx, ny, nz);
       ray.distance += tNear;
     }
   }

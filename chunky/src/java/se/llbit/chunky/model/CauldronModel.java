@@ -368,7 +368,7 @@ public class CauldronModel {
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
           ray.t = ray.tNext;
-          ray.n.set(quad.n);
+          ray.setN(quad.n);
           hit = true;
         }
       }
@@ -380,7 +380,7 @@ public class CauldronModel {
       if (color[3] > Ray.EPSILON) {
         ray.color.set(color);
         ray.t = ray.tNext;
-        ray.n.set(water.n);
+        ray.setN(water.n);
         hit = true;
       }
     }
@@ -402,7 +402,7 @@ public class CauldronModel {
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
           ray.t = ray.tNext;
-          ray.n.set(quad.n);
+          ray.setN(quad.n);
           hit = true;
         }
       }
@@ -414,7 +414,7 @@ public class CauldronModel {
       if (!stillWater) {
         WaterModel.doWaterDisplacement(ray);
       } else {
-        ray.n.set(water.n);
+        ray.setN(water.n);
       }
       ray.setPrevMaterial(ray.getCurrentMaterial(), ray.getCurrentData());
       ray.setCurrentMaterial(Water.INSTANCE);
@@ -438,7 +438,7 @@ public class CauldronModel {
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
           ray.t = ray.tNext;
-          ray.n.set(quad.n);
+          ray.setN(quad.n);
           hit = true;
         }
       }
@@ -450,7 +450,7 @@ public class CauldronModel {
       if (color[3] > Ray.EPSILON) {
         ray.color.set(color);
         ray.t = ray.tNext;
-        ray.n.set(lava.n);
+        ray.setN(lava.n);
         hit = true;
 
         // set the current material to lava so that only the lava is emissive and not the cauldron

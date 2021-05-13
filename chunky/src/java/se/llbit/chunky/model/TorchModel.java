@@ -135,7 +135,7 @@ public class TorchModel extends QuadModel {
         float[] c = texture.getColor(ray.u, ray.v);
         if (c[3] > Ray.EPSILON) {
           color = c;
-          ray.n.set(quad.n);
+          ray.setN(quad.n);
           ray.t = ray.tNext;
           hit = true;
         }

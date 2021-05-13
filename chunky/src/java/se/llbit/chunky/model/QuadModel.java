@@ -46,7 +46,7 @@ public abstract class QuadModel implements BlockModel {
           tint.tint(c, ray, scene);
           color = c;
           ray.t = ray.tNext;
-          ray.n.set(quad.n);
+          ray.setN(quad.n);
           hit = true;
         }
       }
