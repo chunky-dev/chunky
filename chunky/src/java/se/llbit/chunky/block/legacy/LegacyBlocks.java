@@ -153,7 +153,7 @@ public class LegacyBlocks {
       case 141: return intTag(nameTag(tag, "carrots"), "age", data&7);
       case 142: return intTag(nameTag(tag, "potatoes"), "age", data&7);
       case 143: return buttonTag(nameTag(tag, "oak_button"), data);
-      case 144: //TODO skull tile entity
+      case 144: return needsFinalization(nameTag(tag, "skull"), id, data);
       case 146: return needsFinalization(chestFurnaceLadderTag(nameTag(tag, "trapped_chest"), data), id, data);
       case 147: return nameTag(tag, "light_weighted_pressure_plate");
       case 148: return nameTag(tag, "heavy_weighted_pressure_plate");

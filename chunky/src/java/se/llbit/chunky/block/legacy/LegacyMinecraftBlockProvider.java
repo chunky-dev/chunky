@@ -112,6 +112,8 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "cobblestone_wall":
       case "mossy_cobblestone_wall":
         return new LegacyCobblestoneWall(name, ctag);
+      case "skull":
+        return new LegacySkull(name, ctag);
     }
     Log.warn("Unsupported legacy block: " + name);
     return null;
