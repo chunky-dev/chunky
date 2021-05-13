@@ -44,7 +44,7 @@ public class LegacyBlocks {
       case 33:  return pistonTag(nameTag(tag, "piston"), data);
       case 34:  return stringTag(facingTag(nameTag(tag, "piston_head"), data&7),
           "type", (data&8) != 0 ? "sticky" : "normal");
-      case 36:  //TODO: none?
+      // case 36: // unused
       case 37:  return nameTag(tag, "dandelion");
       case 39:  return nameTag(tag, "brown_mushroom");
       case 40:  return nameTag(tag, "red_mushroom");
@@ -269,8 +269,8 @@ public class LegacyBlocks {
       case 248: return facing4Tag(nameTag(tag, "green_glazed_terracotta"), data);
       case 249: return facing4Tag(nameTag(tag, "red_glazed_terracotta"), data);
       case 250: return facing4Tag(nameTag(tag, "black_glazed_terracotta"), data);
-      case 253: //TODO empty?
-      case 254: //TODO empty?
+      // case 253: // unused
+      // case 254: // unused
 
       case 1:
         switch (data) {
@@ -620,7 +620,7 @@ public class LegacyBlocks {
           case 15: return nameTag(tag, "black_carpet");
         }
       case 175:
-        switch (data&7) {
+        switch (data & 0b111) {
           default:
           case 0: return needsFinalization(nameTag(tag, "sunflower"), id, data);
           case 1: return needsFinalization(nameTag(tag, "lilac"), id, data);
