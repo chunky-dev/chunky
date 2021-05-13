@@ -364,7 +364,18 @@ public class Octree {
     return implementation.get(x, y, z);
   }
 
+  /**
+   * Get the material at the given position (relative to the octree origin).
+   * @param x x position
+   * @param y y position
+   * @param z z position
+   * @param palette Block palette
+   * @return Material at the given position or {@link Air#INSTANCE} if the position is outside of this octree
+   */
   public Material getMaterial(int x, int y, int z, BlockPalette palette) {
+    int size = (1 << implementation.getDepth());
+    if(x < 0 || y < 0 || z < 0 || x >= size || y >= size || z >= size)
+      return Air.INSTANCE;
     return implementation.getMaterial(x, y, z, palette);
   }
 
