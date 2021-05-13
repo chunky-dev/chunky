@@ -43,7 +43,7 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "jungle_door":
       case "acacia_door":
       case "dark_oak_door":
-        return new DoorPart(name, ctag);
+        return new LegacyDoorPart(name, ctag);
       case "oak_stairs":
       case "cobblestone_stairs":
       case "brick_stairs":

@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.Tripwire;
 import se.llbit.chunky.block.TripwireHook;
@@ -18,10 +19,10 @@ public class LegacyTripwire extends UnfinalizedLegacyBlock {
   @Override
   public void finalizeBlock(FinalizationState state) {
     boolean attached = (data & 0b0100) != 0;
-    boolean north = isTripwireConnector(state.getMaterial(0, 0, -1), "north");
-    boolean south = isTripwireConnector(state.getMaterial(0, 0, 1), "south");
-    boolean east = isTripwireConnector(state.getMaterial(1, 0, 0), "east");
-    boolean west = isTripwireConnector(state.getMaterial(-1, 0, 0), "west");
+    boolean north = isTripwireConnector(state.getMaterial(0, 0, -1), BlockFace.NORTH);
+    boolean south = isTripwireConnector(state.getMaterial(0, 0, 1), BlockFace.SOUTH);
+    boolean east = isTripwireConnector(state.getMaterial(1, 0, 0), BlockFace.EAST);
+    boolean west = isTripwireConnector(state.getMaterial(-1, 0, 0), BlockFace.WEST);
     state.replaceCurrentBlock(createTag(attached, north, south, east, west));
   }
 
@@ -36,23 +37,14 @@ public class LegacyTripwire extends UnfinalizedLegacyBlock {
     return tag;
   }
 
-  private static boolean isTripwireConnector(Material block, String direction) {
+  private static boolean isTripwireConnector(Material block, BlockFace direction) {
     if (block instanceof Tripwire || block instanceof LegacyTripwire) {
       return true;
     }
 
     if (block instanceof TripwireHook) {
-      String hookFacing = ((TripwireHook) block).getFacing();
-      switch (direction) {
-        case "north":
-          return hookFacing.equals("south");
-        case "south":
-          return hookFacing.equals("north");
-        case "east":
-          return hookFacing.equals("west");
-        case "west":
-          return hookFacing.equals("east");
-      }
+      BlockFace hookFacing = ((TripwireHook) block).getFacing();
+      return hookFacing.getOppositeFace() == direction;
     }
 
     return false;

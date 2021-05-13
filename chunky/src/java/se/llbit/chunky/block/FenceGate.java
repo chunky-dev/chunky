@@ -46,7 +46,9 @@ public class FenceGate extends MinecraftBlockTranslucent {
     return description;
   }
 
-  public String getFacing() {
-    return new String[]{"south", "west", "north", "east"}[facing];
+  public BlockFace getFacing() {
+    return new BlockFace[]{
+        BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST
+    }[facing];
   }
 }

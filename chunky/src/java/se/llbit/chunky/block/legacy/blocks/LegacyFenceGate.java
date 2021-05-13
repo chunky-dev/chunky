@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
@@ -30,7 +31,9 @@ public class LegacyFenceGate extends UnfinalizedLegacyBlock {
     state.replaceCurrentBlock(newTag);
   }
 
-  public String getFacing() {
-    return new String[]{"south", "west", "north", "east"}[data & 0b11];
+  public BlockFace getFacing() {
+    return new BlockFace[]{
+        BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST
+    }[data & 0b11];
   }
 }

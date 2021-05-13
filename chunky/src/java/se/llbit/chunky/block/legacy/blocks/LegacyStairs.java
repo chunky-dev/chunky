@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.Stairs;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
@@ -217,7 +218,7 @@ public class LegacyStairs extends UnfinalizedLegacyBlock {
     CompoundTag tag = LegacyBlocks.createTag(block.name);
     LegacyBlocks.stringTag(tag, "half", top ? "top" : "bottom");
     LegacyBlocks.stringTag(tag, "shape", shape);
-    LegacyBlocks.stringTag(tag, "facing", getFacing(rotation));
+    LegacyBlocks.stringTag(tag, "facing", getFacing(rotation).getName());
     return tag;
   }
 
@@ -226,7 +227,7 @@ public class LegacyStairs extends UnfinalizedLegacyBlock {
    *
    * @return Facing, i.e. north, south, east, west
    */
-  public String getFacing() {
+  public BlockFace getFacing() {
     return getFacing(data);
   }
 
@@ -236,8 +237,13 @@ public class LegacyStairs extends UnfinalizedLegacyBlock {
    * @param rotation Rotation data value
    * @return Facing
    */
-  public static String getFacing(int rotation) {
-    return new String[]{"east", "west", "south", "north"}[rotation & 0b11];
+  public static BlockFace getFacing(int rotation) {
+    return new BlockFace[]{
+        BlockFace.EAST,
+        BlockFace.WEST,
+        BlockFace.SOUTH,
+        BlockFace.NORTH
+    }[rotation & 0b11];
   }
 
   /**
@@ -271,13 +277,13 @@ public class LegacyStairs extends UnfinalizedLegacyBlock {
       return 0b11 & ((LegacyStairs) material).data;
     } else if (material instanceof Stairs) {
       switch (((Stairs) material).getFacing()) {
-        case "east":
+        case EAST:
           return 0;
-        case "west":
+        case WEST:
           return 1;
-        case "south":
+        case SOUTH:
           return 2;
-        case "north":
+        case NORTH:
         default:
           return 3;
       }

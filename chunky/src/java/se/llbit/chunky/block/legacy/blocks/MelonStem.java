@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
@@ -14,29 +15,15 @@ public class MelonStem extends UnfinalizedLegacyBlock {
   @Override
   public void finalizeBlock(FinalizationState state) {
     // melon stem points to adjacent melon
-    if (state.getMaterial(-1, 0, 0).name.equals("minecraft:melon")) {
-      state.replaceCurrentBlock(
-          LegacyBlocks
-              .stringTag(LegacyBlocks.createTag("attached_pumpkin_stem"), "facing", "west"));
-      return;
-    }
-    if (state.getMaterial(1, 0, 0).name.equals("minecraft:melon")) {
-      state.replaceCurrentBlock(
-          LegacyBlocks
-              .stringTag(LegacyBlocks.createTag("attached_pumpkin_stem"), "facing", "east"));
-      return;
-    }
-    if (state.getMaterial(0, 0, -1).name.equals("minecraft:melon")) {
-      state.replaceCurrentBlock(
-          LegacyBlocks
-              .stringTag(LegacyBlocks.createTag("attached_pumpkin_stem"), "facing", "north"));
-      return;
-    }
-    if (state.getMaterial(0, 0, 1).name.equals("minecraft:melon")) {
-      state.replaceCurrentBlock(
-          LegacyBlocks
-              .stringTag(LegacyBlocks.createTag("attached_pumpkin_stem"), "facing", "south"));
-      return;
+    for (BlockFace side : new BlockFace[]{BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH,
+        BlockFace.SOUTH}) {
+      if (state.getMaterial(side).name.equals("minecraft:melon")) {
+        state.replaceCurrentBlock(
+            LegacyBlocks
+                .stringTag(LegacyBlocks.createTag("attached_melon_stem"), "facing",
+                    side.getName()));
+        return;
+      }
     }
 
     // otherwise just unwrap the block

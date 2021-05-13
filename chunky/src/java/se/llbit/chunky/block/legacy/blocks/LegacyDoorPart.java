@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.block.Door;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
@@ -7,9 +8,9 @@ import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
 import se.llbit.chunky.world.Material;
 import se.llbit.nbt.CompoundTag;
 
-public class DoorPart extends UnfinalizedLegacyBlock {
+public class LegacyDoorPart extends UnfinalizedLegacyBlock {
 
-  public DoorPart(String name, CompoundTag tag) {
+  public LegacyDoorPart(String name, CompoundTag tag) {
     super(name, tag);
   }
 
@@ -31,9 +32,9 @@ public class DoorPart extends UnfinalizedLegacyBlock {
       // bottom part
       if (state.getY() < state.getYMax() - 1) {
         Material topPart = state.getMaterial(0, 1, 0);
-        if (topPart instanceof DoorPart) {
+        if (topPart instanceof LegacyDoorPart) {
           // finalization is from bottom to top, so the top part is not finalized yet
-          DoorPart doorAbove = (DoorPart) topPart;
+          LegacyDoorPart doorAbove = (LegacyDoorPart) topPart;
           state.replaceCurrentBlock(
               createTag("lower", getFacing(data), getHinge(doorAbove.data),
                   isOpen(data)));
@@ -46,10 +47,10 @@ public class DoorPart extends UnfinalizedLegacyBlock {
     state.replaceCurrentBlock(tag);
   }
 
-  private CompoundTag createTag(String half, String facing, String hinge, boolean open) {
+  private CompoundTag createTag(String half, BlockFace facing, String hinge, boolean open) {
     CompoundTag tag = LegacyBlocks.createTag(block.name);
     LegacyBlocks.stringTag(tag, "half", half);
-    LegacyBlocks.stringTag(tag, "facing", facing);
+    LegacyBlocks.stringTag(tag, "facing", facing.getName());
     LegacyBlocks.stringTag(tag, "hinge", hinge);
     LegacyBlocks.boolTag(tag, "open", open);
     return tag;
@@ -63,11 +64,16 @@ public class DoorPart extends UnfinalizedLegacyBlock {
     return (bottomData & 0b0100) != 0;
   }
 
-  private static String getFacing(int bottomData) {
-    return new String[]{"east", "south", "west", "north"}[(bottomData & 0b011) % 4];
+  private static BlockFace getFacing(int bottomData) {
+    return new BlockFace[]{
+        BlockFace.EAST,
+        BlockFace.SOUTH,
+        BlockFace.WEST,
+        BlockFace.NORTH
+    }[(bottomData & 0b011) % 4];
   }
 
   private static String getHinge(int topData) {
-    return ((topData & 0b0001) != 0) ? "right": "left";//"left" : "right";
+    return ((topData & 0b0001) != 0) ? "right" : "left";
   }
 }

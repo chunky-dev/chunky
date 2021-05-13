@@ -9,31 +9,31 @@ import se.llbit.math.Ray;
 public class Door extends MinecraftBlockTranslucent {
   private final int orientation, mirrored;
   private final String description;
-  private final String facing;
+  private final BlockFace facing;
   private final boolean open;
 
   public Door(String name, Texture texture, String facing, String half,
       String hinge, boolean open) {
     super(name, texture);
-    this.facing = facing;
+    this.facing = BlockFace.fromName(facing);
     this.open = open;
     this.description = String.format("facing=%s, half=%s, hinge=%s, open=%s",
         facing, half, hinge, open);
     localIntersect = true;
     this.mirrored = hinge.equals("left") ? 0 : 1;
     int direction;
-    switch (facing) {
+    switch (this.facing) {
       default:
-      case "north":
+      case NORTH:
         direction = 3;
         break;
-      case "south":
+      case SOUTH:
         direction = 1;
         break;
-      case "west":
+      case WEST:
         direction = 2;
         break;
-      case "east":
+      case EAST:
         direction = 0;
         break;
     }
@@ -55,7 +55,7 @@ public class Door extends MinecraftBlockTranslucent {
     return description;
   }
 
-  public String getFacing() {
+  public BlockFace getFacing() {
     return facing;
   }
 

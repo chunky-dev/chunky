@@ -781,7 +781,7 @@ public class LegacyBlocks {
 
   private static CompoundTag stairsTag(CompoundTag tag, int data) {
     stringTag(tag, "half", (data & 0b0100) == 0 ? "bottom" : "top");
-    return stringTag(tag, "facing", LegacyStairs.getFacing(data));
+    return stringTag(tag, "facing", LegacyStairs.getFacing(data).getName());
   }
 
   private static CompoundTag commandBlockTag(CompoundTag tag, int data) {

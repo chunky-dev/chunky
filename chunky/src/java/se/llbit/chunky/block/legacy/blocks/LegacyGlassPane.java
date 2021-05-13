@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlockUtils;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
@@ -15,10 +16,10 @@ public class LegacyGlassPane extends UnfinalizedLegacyBlock {
 
   @Override
   public void finalizeBlock(FinalizationState state) {
-    boolean north = isGlassPaneConnector(state.getMaterial(0, 0, -1), "north");
-    boolean south = isGlassPaneConnector(state.getMaterial(0, 0, 1), "south");
-    boolean east = isGlassPaneConnector(state.getMaterial(1, 0, 0), "east");
-    boolean west = isGlassPaneConnector(state.getMaterial(-1, 0, 0), "west");
+    boolean north = isGlassPaneConnector(state.getMaterial(0, 0, -1), BlockFace.NORTH);
+    boolean south = isGlassPaneConnector(state.getMaterial(0, 0, 1), BlockFace.SOUTH);
+    boolean east = isGlassPaneConnector(state.getMaterial(1, 0, 0), BlockFace.EAST);
+    boolean west = isGlassPaneConnector(state.getMaterial(-1, 0, 0), BlockFace.WEST);
 
     if (north || south || east || west) {
       state.replaceCurrentBlock(createTag(north, south, east, west));
@@ -28,7 +29,7 @@ public class LegacyGlassPane extends UnfinalizedLegacyBlock {
     }
   }
 
-  private static boolean isGlassPaneConnector(Material block, String direction) {
+  private static boolean isGlassPaneConnector(Material block, BlockFace direction) {
     String name = LegacyBlockUtils.getName(block);
     if (name.equals("cobblestone_wall") || name.equals("mossy_cobblestone_wall") || name
         .endsWith("_fence") || name
@@ -37,20 +38,9 @@ public class LegacyGlassPane extends UnfinalizedLegacyBlock {
     }
 
     // 1.12 (?) stairs connection logic (only connect to the high side)
-    String adjacentStairsFacing = LegacyBlockUtils.getStairsFacing(block);
+    BlockFace adjacentStairsFacing = LegacyBlockUtils.getStairsFacing(block);
     if (adjacentStairsFacing != null) {
-      switch (direction) {
-        case "north":
-          return adjacentStairsFacing.equals("south");
-        case "south":
-          return adjacentStairsFacing.equals("north");
-        case "east":
-          return adjacentStairsFacing.equals("west");
-        case "west":
-          return adjacentStairsFacing.equals("east");
-        default:
-          return false;
-      }
+      return adjacentStairsFacing.getOppositeFace() == direction;
     }
 
     return block.solid || block.name.endsWith("glass_pane");

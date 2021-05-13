@@ -16,6 +16,25 @@ public abstract class FinalizationState {
 
   public abstract Material getMaterial(int rx, int ry, int rz);
 
+  public Material getMaterial(BlockFace direction) {
+    switch (direction) {
+      case NORTH:
+        return getMaterial(0, 0, -1);
+      case EAST:
+        return getMaterial(1, 0, 0);
+      case SOUTH:
+        return getMaterial(0, 0, 1);
+      case WEST:
+        return getMaterial(-1, 0, 0);
+      case UP:
+        return getMaterial(0, 1, 0);
+      case DOWN:
+        return getMaterial(0, -1, 0);
+      default:
+        throw new IllegalArgumentException("Invalid direction: " + direction);
+    }
+  }
+
   public abstract void replaceCurrentBlock(int newBlock);
 
   public void replaceCurrentBlock(Tag tag) {

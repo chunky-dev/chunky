@@ -129,17 +129,17 @@ public class Stairs extends MinecraftBlockTranslucent {
     return flipped == 1 ? "top" : "bottom";
   }
 
-  public String getFacing() {
+  public BlockFace getFacing() {
     switch (facing) {
       case 0:
-        return "east";
+        return BlockFace.EAST;
       case 1:
-        return "west";
+        return BlockFace.WEST;
       case 2:
-        return "south";
+        return BlockFace.SOUTH;
       case 3:
       default:
-        return "north";
+        return BlockFace.NORTH;
     }
   }
 }
