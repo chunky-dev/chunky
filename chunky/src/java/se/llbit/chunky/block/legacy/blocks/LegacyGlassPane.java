@@ -28,7 +28,7 @@ public class LegacyGlassPane extends UnfinalizedLegacyBlock {
     }
   }
 
-  private boolean isGlassPaneConnector(Material block, String direction) {
+  private static boolean isGlassPaneConnector(Material block, String direction) {
     String name = LegacyBlockUtils.getName(block);
     if (name.equals("cobblestone_wall") || name.equals("mossy_cobblestone_wall") || name
         .endsWith("_fence") || name

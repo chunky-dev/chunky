@@ -492,11 +492,11 @@ public class LegacyBlocks {
           case 5: return slabTag(nameTag(tag, "dark_oak_slab"), both, which);
         }
       }
-      case 139: //TODO state finalize
+      case 139:
         switch (data) {
           default:
-          case 0: return boolTag(nameTag(tag, "cobblestone_wall"), "up", true);
-          case 1: return boolTag(nameTag(tag, "mossy_cobblestone_wall"), "up", true);
+          case 0: return needsFinalization(nameTag(tag, "cobblestone_wall"), id, data);
+          case 1: return needsFinalization(nameTag(tag, "mossy_cobblestone_wall"), id, data);
         }
       case 140:
         switch (data) {
