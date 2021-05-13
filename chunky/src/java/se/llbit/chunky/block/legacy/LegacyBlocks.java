@@ -34,8 +34,8 @@ public class LegacyBlocks {
       case 22:  return nameTag(tag, "lapis_block");
       case 23:  return facingTag(nameTag(tag, "dispenser"), data);
       case 25:  return nameTag(tag, "note_block");
-      case 26:  return stringTag(facing4Tag(nameTag(tag, "red_bed"), data&3),
-          "part", (data&8) != 0 ? "head" : "foot");
+      case 26:  return needsFinalization(stringTag(facing4Tag(nameTag(tag, "red_bed"), data&3),
+          "part", (data&8) != 0 ? "head" : "foot"), id, data);
       case 27:  return utilityRailTag(nameTag(tag, "powered_rail"), data);
       case 28:  return utilityRailTag(nameTag(tag, "detector_rail"), data);
       case 29:  return pistonTag(nameTag(tag, "sticky_piston"), data);

@@ -97,6 +97,8 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "red_stained_glass_pane":
       case "black_stained_glass_pane":
         return new LegacyGlassPane(name, ctag);
+      case "red_bed":
+        return new LegacyBed(name, ctag);
     }
     Log.warn("Unsupported legacy block: " + name);
     return null;

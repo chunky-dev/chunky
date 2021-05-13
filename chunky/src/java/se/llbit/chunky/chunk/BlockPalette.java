@@ -135,6 +135,12 @@ public class BlockPalette {
     return palette.get(id);
   }
 
+  public Tag getTag(int id) {
+    return blockMap.entrySet().stream().filter(item -> item.getValue() == id)
+        .map(item -> item.getKey().getTag())
+        .findFirst().orElse(null);
+  }
+
   /**
    * Get the index for a water block with the given level and data. If it doesn't exist, it is
    * created.
