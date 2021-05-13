@@ -87,7 +87,7 @@ public class LegacyBlocks {
       case 82:  return nameTag(tag, "clay");
       case 83:  return nameTag(tag, "sugar_cane");
       case 84:  return nameTag(tag, "jukebox");
-      case 85:  return nameTag(tag, "oak_fence"); //TODO state finalize
+      case 85:  return needsFinalization(nameTag(tag, "oak_fence"), id, data);
       case 86:  return facing4Tag(nameTag(tag, "carved_pumpkin"), data);
       case 87:  return nameTag(tag, "netherrack");
       case 88:  return nameTag(tag, "soul_sand");
@@ -112,7 +112,7 @@ public class LegacyBlocks {
       case 110: return needsFinalization(nameTag(tag, "mycelium"), id, data);
       case 111: return nameTag(tag, "lily_pad");
       case 112: return nameTag(tag, "nether_bricks");
-      case 113: return nameTag(tag, "nether_brick_fence"); //TODO state finalize
+      case 113: return needsFinalization(nameTag(tag, "nether_brick_fence"), id, data);
       case 114: return needsFinalization(stairsTag(nameTag(tag, "nether_brick_stairs"), data), id, data);
       case 115: return intTag(nameTag(tag, "nether_wart"), "age", data&7);
       case 116: return nameTag(tag, "enchanting_table");
@@ -203,11 +203,11 @@ public class LegacyBlocks {
       case 185: return needsFinalization(fenceGate(nameTag(tag, "jungle_fence_gate"), data), id, data);
       case 186: return needsFinalization(fenceGate(nameTag(tag, "dark_oak_fence_gate"), data), id, data);
       case 187: return needsFinalization(fenceGate(nameTag(tag, "acacia_fence_gate"), data), id, data);
-      case 188: return nameTag(tag, "spruce_fence"); // TODO shape finalize
-      case 189: return nameTag(tag, "birch_fence"); // TODO shape finalize
-      case 190: return nameTag(tag, "jungle_fence"); // TODO shape finalize
-      case 191: return nameTag(tag, "dark_oak_fence"); // TODO shape finalize
-      case 192: return nameTag(tag, "acacia_fence"); // TODO shape finalize
+      case 188: return needsFinalization(nameTag(tag, "spruce_fence"), id, data);
+      case 189: return needsFinalization(nameTag(tag, "birch_fence"), id, data);
+      case 190: return needsFinalization(nameTag(tag, "jungle_fence"), id, data);
+      case 191: return needsFinalization(nameTag(tag, "dark_oak_fence"), id, data);
+      case 192: return needsFinalization(nameTag(tag, "acacia_fence"), id, data);
       case 193: return needsFinalization(nameTag(tag, "spruce_door"), id, data);
       case 194: return needsFinalization(nameTag(tag, "birch_door"), id, data);
       case 195: return needsFinalization(nameTag(tag, "jungle_door"), id, data);

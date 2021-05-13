@@ -14,13 +14,13 @@ public class LegacyFenceGate extends UnfinalizedLegacyBlock {
   @Override
   public void finalizeBlock(FinalizationState state) {
     CompoundTag newTag = LegacyBlocks.createTag(this.name);
-    LegacyBlocks.facing4Tag(newTag, data&3);
-    LegacyBlocks.boolTag(newTag, "open", (data&4) != 0);
+    LegacyBlocks.facing4Tag(newTag, data & 0b11);
+    LegacyBlocks.boolTag(newTag, "open", (data & 4) != 0);
 
     if ((this.data & 3) % 2 == 0) {
       LegacyBlocks.boolTag(newTag, "in_wall",
           state.getMaterial(-1, 0, 0).name.endsWith("cobblestone_wall") ||
-          state.getMaterial(1, 0, 0).name.endsWith("cobblestone_wall"));
+              state.getMaterial(1, 0, 0).name.endsWith("cobblestone_wall"));
     } else {
       LegacyBlocks.boolTag(newTag, "in_wall",
           state.getMaterial(0, 0, -1).name.endsWith("cobblestone_wall") ||
@@ -28,5 +28,9 @@ public class LegacyFenceGate extends UnfinalizedLegacyBlock {
     }
 
     state.replaceCurrentBlock(newTag);
+  }
+
+  public String getFacing() {
+    return new String[]{"south", "west", "north", "east"}[data & 0b11];
   }
 }

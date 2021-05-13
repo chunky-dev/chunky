@@ -1,7 +1,9 @@
 package se.llbit.chunky.block.legacy;
 
+import se.llbit.chunky.block.FenceGate;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.Stairs;
+import se.llbit.chunky.block.legacy.blocks.LegacyFenceGate;
 import se.llbit.chunky.block.legacy.blocks.LegacyStairs;
 import se.llbit.chunky.world.Material;
 
@@ -26,6 +28,15 @@ public class LegacyBlockUtils {
       return ((LegacyStairs) block).getFacing();
     } else if (block instanceof Stairs) {
       return ((Stairs) block).getFacing();
+    }
+    return null;
+  }
+
+  public static String getFenceGateFacing(Material block) {
+    if (block instanceof LegacyFenceGate) {
+      return ((LegacyFenceGate) block).getFacing();
+    } else if (block instanceof FenceGate) {
+      return ((FenceGate) block).getFacing();
     }
     return null;
   }

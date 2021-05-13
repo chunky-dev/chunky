@@ -99,6 +99,14 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
         return new LegacyGlassPane(name, ctag);
       case "red_bed":
         return new LegacyBed(name, ctag);
+      case "oak_fence":
+      case "nether_brick_fence":
+      case "spruce_fence":
+      case "birch_fence":
+      case "jungle_fence":
+      case "dark_oak_fence":
+      case "acacia_fence":
+        return new LegacyFence(name, ctag);
     }
     Log.warn("Unsupported legacy block: " + name);
     return null;
