@@ -118,6 +118,8 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
         return new LegacyBanner(name, ctag);
       case "wall_banner":
         return new LegacyWallBanner(name, ctag);
+      case "tripwire":
+        return new LegacyTripwire(name, ctag);
     }
     Log.warn("Unsupported legacy block: " + name);
     return null;

@@ -134,16 +134,11 @@ public class LegacyBlocks {
       case 130: return chestFurnaceLadderTag(nameTag(tag, "ender_chest"), data);
       case 131:
         nameTag(tag, "tripwire_hook");
-        facing4Tag(tag, data&3);
-        boolTag(tag, "attached", (data&4) != 0);
-        boolTag(tag, "powered", (data&8) != 0);
+        facing4Tag(tag, data & 0b0011);
+        boolTag(tag, "attached", (data & 0b0100) != 0);
+        boolTag(tag, "powered", (data & 0b1000) != 0);
         return tag;
-      case 132: //TODO shape finalize
-        nameTag(tag, "tripwire");
-        boolTag(tag, "powered", (data&1) != 0);
-        boolTag(tag, "attached", (data&4) != 0);
-        boolTag(tag, "disarmed", (data&8) != 0);
-        return tag;
+      case 132: return needsFinalization(nameTag(tag, "tripwire"), id, data);
       case 133: return nameTag(tag, "emerald_block");
       case 134: return needsFinalization(stairsTag(nameTag(tag, "spruce_stairs"), data), id, data);
       case 135: return needsFinalization(stairsTag(nameTag(tag, "birch_stairs"), data), id, data);

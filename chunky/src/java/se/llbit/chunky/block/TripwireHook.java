@@ -40,4 +40,8 @@ public class TripwireHook extends MinecraftBlockTranslucent {
     public String description() {
         return String.format("facing=%s,attached=%s,powered=%s", facing, attached, powered);
     }
+
+    public String getFacing() {
+        return new String[]{"north", "east", "south", "west"}[facing];
+    }
 }

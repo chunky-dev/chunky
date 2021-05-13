@@ -1,6 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
-import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.WallBanner;
 import se.llbit.chunky.renderer.scene.Scene;
