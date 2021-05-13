@@ -85,7 +85,7 @@ public final class PersistentSettings {
     changeSettingsDirectory(directory);
   }
 
-  private static void save() {
+  public static void save() {
     settings.save(settingsDir, settingsFile);
   }
 

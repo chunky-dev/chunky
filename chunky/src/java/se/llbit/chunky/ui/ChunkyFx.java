@@ -25,9 +25,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.resources.SettingsDirectory;
+import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 
 import java.io.File;
@@ -57,6 +59,12 @@ public class ChunkyFx extends Application {
       controller.setApplication(this);
       stage.getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
       stage.setOnCloseRequest(event -> {
+        PersistentSettings.settings.setDouble("window.x", stage.getX());
+        PersistentSettings.settings.setDouble("window.y", stage.getY());
+        PersistentSettings.settings.setDouble("window.width", stage.getWidth());
+        PersistentSettings.settings.setDouble("window.height", stage.getHeight());
+        PersistentSettings.settings.setBool("window.maximized", stage.isMaximized());
+        PersistentSettings.save();
         Platform.exit();
         System.exit(0);
       });
@@ -66,8 +74,24 @@ public class ChunkyFx extends Application {
       } else {
         scene.getStylesheets().add("style.css");
       }
-      stage.setWidth(1800);
-      stage.setMaximized(true);
+
+      JsonValue windowX = PersistentSettings.settings.get("window.x");
+      JsonValue windowY = PersistentSettings.settings.get("window.y");
+      JsonValue windowWidth = PersistentSettings.settings.get("window.width");
+      JsonValue windowHeight = PersistentSettings.settings.get("window.height");
+      JsonValue windowMaximized = PersistentSettings.settings.get("window.maximized");
+
+      if(!windowX.isUnknown() && !windowY.isUnknown() && !windowWidth.isUnknown()
+              && !windowHeight.isUnknown() && !windowMaximized.isUnknown()) {
+        stage.setX(windowX.asDouble(0));
+        stage.setY(windowY.asDouble(0));
+        stage.setWidth(windowWidth.asDouble(1800));
+        stage.setHeight(windowHeight.asDouble(1000));
+        stage.setMaximized(windowMaximized.asBoolean(true));
+      } else {
+        stage.setWidth(1800);
+        stage.setMaximized(true);
+      }
       stage.show();
     } catch (Exception e) {
       e.printStackTrace(System.err);
