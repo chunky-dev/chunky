@@ -26,6 +26,7 @@ import se.llbit.math.primitive.Primitive;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Stack;
 
 import static se.llbit.math.Ray.OFFSET;
 
@@ -127,6 +128,16 @@ public abstract class BinaryBVH implements BVH {
         return centroid < split;
     };
 
+    private static class PackData {
+        public int index;
+        public Node node;
+
+        public PackData(int index, Node node) {
+            this.index = index;
+            this.node = node;
+        }
+    }
+
     /**
      * Helper method to pack a node-based BVH. Uses {@code packNode}.
      */
@@ -139,35 +150,48 @@ public abstract class BinaryBVH implements BVH {
     }
 
     /**
-     * Recursive algorithm to pack a node-based BVH into an int(ArrayList). Nodes are packed as follows:
+     * Recursive algorithm (utilizing a call stack) to pack a node-based BVH into an int(ArrayList).
+     * Nodes are packed as follows:
      * int 0: Second child index. If this is a leaf, it is the negation of the index of the corresponding list of primitives.
      *        The first child immediately follows this (byte 8+). The second child starts at the index pointed to by this int.
      * int 1-6: AABB bounds stored as floats. Float bits are converted into int bits for more compact storage.
      * This compact array storage helps decrease memory usage and increases intersection speed.
      */
-    public int packNode(Node node, IntArrayList data, ArrayList<Primitive[]> primitives) {
-        int index = data.size();
-        int depth;
-        data.add(0);  // Next child (to be set)
-        packAabb(node.bb, data);
+    public int packNode(Node startNode, IntArrayList dataArray, ArrayList<Primitive[]> primitives) {
+        Stack<PackData> callStack = new Stack<>();
+        int depth = 0;
 
-        if (node instanceof Group) {
-            Group group = (Group)node;
-            depth = packNode(group.child1, data, primitives);
-            group.child1 = null; // Make it possible to gc the subtree
-            data.set(index, data.size()); // Second child location
-            depth = FastMath.max(packNode(group.child2, data, primitives), depth);
-            group.child2 = null; // idem
-        } else if (node instanceof Leaf) {
-            depth = 1;
-            data.set(index, -primitives.size());  // Negative number = pointer to primitives array
-            primitives.add(((Leaf) node).primitives);
-        } else {
-            depth = 0;
-            data.set(index, index+7); // Skip this (should not happen)
+        // First call
+        callStack.add(new PackData(-1, startNode));
+
+        while (!callStack.isEmpty()) {
+            PackData call = callStack.pop();
+
+            if (call.index != -1) dataArray.set(call.index, dataArray.size());
+
+            int index = dataArray.size();
+            dataArray.add(0);
+            packAabb(call.node.bb, dataArray);
+
+            if (call.node instanceof Group) {
+                Group group = (Group) call.node;
+                callStack.add(new PackData(index, group.child2));
+                callStack.add(new PackData(-1, group.child1));
+
+                // Set these references to null so the GC can clean them up early.
+                group.child1 = null;
+                group.child2 = null;
+            } else if (call.node instanceof Leaf) {
+                dataArray.set(index, -primitives.size());
+                primitives.add(((Leaf) call.node).primitives);
+            } else {
+                dataArray.set(index, index+7); // Skip, this should never happen.
+            }
+
+            depth = FastMath.max(depth, callStack.size());
         }
 
-        return depth+1;
+        return depth;
     }
 
     /** Pack an AABB into 6 floats (and store the bits in 6 consecutive ints). */
