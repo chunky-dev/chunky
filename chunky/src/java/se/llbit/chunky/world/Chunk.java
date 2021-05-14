@@ -473,6 +473,7 @@ public class Chunk {
     if (data == null) {
       return reuseChunkData;
     }
+    version = chunkVersion(data);
     Tag sections = data.get(LEVEL_SECTIONS);
     Tag biomesTag = data.get(LEVEL_BIOMES);
     Tag entitiesTag = data.get(LEVEL_ENTITIES);
