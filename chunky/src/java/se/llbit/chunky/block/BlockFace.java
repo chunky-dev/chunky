@@ -3,38 +3,30 @@ package se.llbit.chunky.block;
 public enum BlockFace {
   NORTH("north"),
   EAST("east"),
-  SOUTH("south"),
-  WEST("west"),
+  SOUTH("south", NORTH),
+  WEST("west", EAST),
   UP("up"),
-  DOWN("down");
+  DOWN("down", UP);
 
   private final String name;
+  private BlockFace oppositeFace;
 
   BlockFace(String name) {
     this.name = name;
   }
 
-  public BlockFace getOppositeFace() {
-    switch (this) {
-      case NORTH:
-        return SOUTH;
-      case EAST:
-        return WEST;
-      case SOUTH:
-        return NORTH;
-      case WEST:
-        return EAST;
-      case UP:
-        return DOWN;
-      case DOWN:
-        return UP;
-      default:
-        throw new IllegalStateException("Unexpected BlockFace: " + this.name);
-    }
+  BlockFace(String name, BlockFace oppositeFace) {
+    this.name = name;
+    this.oppositeFace = oppositeFace;
+    oppositeFace.oppositeFace = this;
   }
 
   public String getName() {
     return name;
+  }
+
+  public BlockFace getOppositeFace() {
+    return oppositeFace;
   }
 
   @Override
