@@ -773,14 +773,14 @@ public class LegacyBlocks {
   }
 
   private static CompoundTag trapdoorTag(CompoundTag tag, int data) {
-    boolTag(tag, "open", (data&4) != 0);
-    boolTag(tag, "half", (data&8) != 0);
-    switch (data&3) {
+    boolTag(tag, "open", (data & 0b0100) != 0);
+    stringTag(tag, "half", (data & 0b1000) != 0 ? "top" : "bottom");
+    switch (data & 0b0011) {
       default:
-      case 0: return stringTag(tag, "facing", "south");
-      case 1: return stringTag(tag, "facing", "north");
-      case 2: return stringTag(tag, "facing", "east");
-      case 3: return stringTag(tag, "facing", "west");
+      case 0: return stringTag(tag, "facing", "north");
+      case 1: return stringTag(tag, "facing", "south");
+      case 2: return stringTag(tag, "facing", "west");
+      case 3: return stringTag(tag, "facing", "east");
     }
   }
 
