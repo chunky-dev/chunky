@@ -2,30 +2,39 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.AnimatedTexture;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.BlockData;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector3;
+import se.llbit.util.MinecraftPRNG;
 
-/**
- * A block model that is made out of textured quads.
- */
-@PluginApi
-public abstract class QuadModel implements BlockModel {
+public abstract class AnimatedQuadModel extends QuadModel {
+  public final static class AnimationMode {
+    public final int framerate;
+    public final boolean positional;
 
-  // Epsilons to clip ray intersections to the current block.
-  protected static final double E0 = -Ray.EPSILON;
-  protected static final double E1 = 1 + Ray.EPSILON;
-
-  @PluginApi
-  public abstract Quad[] getQuads();
-
-  @PluginApi
-  public abstract Texture[] getTextures();
-
-  @PluginApi
-  public Tint[] getTints() {
-    return null;
+    public AnimationMode(int framerate, boolean positional) {
+      this.framerate = framerate;
+      this.positional = positional;
+    }
   }
+
+  protected final AnimationMode animationMode;
+
+  public AnimatedQuadModel(int framerate, boolean positional) {
+    this.animationMode = new AnimationMode(framerate, positional);
+  }
+
+  @PluginApi
+  public AnimationMode getAnimationMode() {
+    return animationMode;
+  }
+
+  @PluginApi
+  @Override
+  public abstract AnimatedTexture[] getTextures();
 
   @Override
   public boolean intersect(Ray ray, Scene scene) {
@@ -33,14 +42,23 @@ public abstract class QuadModel implements BlockModel {
     ray.t = Double.POSITIVE_INFINITY;
 
     Quad[] quads = getQuads();
-    Texture[] textures = getTextures();
+    AnimatedTexture[] textures = getTextures();
     Tint[] tintedQuads = getTints();
+
+    // THe animation frame to use
+    int j = (int) (scene.getAnimationTime() * animationMode.framerate);
+    if (animationMode.positional) {
+      Vector3 position = new Vector3(ray.o);
+      position.scaleAdd(Ray.OFFSET, ray.d);
+
+      j += Math.floorMod(MinecraftPRNG.rand((long) position.x, (long) position.y, (long) position.z), Integer.MAX_VALUE);
+    }
 
     float[] color = null;
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
       if (quad.intersect(ray)) {
-        float[] c = textures[i].getColor(ray.u, ray.v);
+        float[] c = textures[i].getColor(ray.u, ray.v, j);
         if (c[3] > Ray.EPSILON) {
           Tint tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
           tint.tint(c, ray, scene);

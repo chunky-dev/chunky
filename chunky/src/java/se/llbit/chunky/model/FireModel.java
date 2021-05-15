@@ -16,18 +16,12 @@
  */
 package se.llbit.chunky.model;
 
-import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.AnimatedTexture;
-import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
-import se.llbit.util.MinecraftPRNG;
 
-public class FireModel extends QuadModel {
+public class FireModel extends AnimatedQuadModel {
   private final static Quad[] quads = {
       new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 1), new Vector3(0, 1, 0),
           new Vector4(0, 1, 0, 1)),
@@ -42,11 +36,11 @@ public class FireModel extends QuadModel {
           new Vector4(1, 0, 0, 1)),
   };
 
-  private final Texture[] textures;
+  private final AnimatedTexture[] textures;
 
   public FireModel(AnimatedTexture tex0, AnimatedTexture tex1) {
-    //TODO: Animated textures
-    this.textures = new Texture[] {tex0, tex1, tex0, tex1};
+    super(20, true);
+    this.textures = new AnimatedTexture[] {tex0, tex1, tex0, tex1};
   }
 
   @Override
@@ -55,40 +49,7 @@ public class FireModel extends QuadModel {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return intersect(ray, (AnimatedTexture[]) textures, scene.getAnimationTime());
-  }
-
-  public static boolean intersect(Ray ray, AnimatedTexture[] texture, double time) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    Vector3 position = new Vector3(ray.o);
-    position.scaleAdd(Ray.OFFSET, ray.d);
-    int i = (0xF & (ray.getCurrentData() >> BlockData.LILY_PAD_ROTATION))
-        + (int) Math.floorMod(MinecraftPRNG.rand((long) position.x, (long) position.y, (long) position.z), Integer.MAX_VALUE)
-        + (int) (time * 20);  // Fire animates at 20 fps
-    int j = 0;
-    for (Quad quad : quads) {
-      if (quad.intersect(ray)) {
-        float[] color = texture[j].getColor(ray.u, ray.v, i);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          hit = true;
-        }
-      }
-      j = 1 - j;
-    }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
-  }
-
-  @Override
-  public Texture[] getTextures() {
+  public AnimatedTexture[] getTextures() {
     return textures;
   }
 }
