@@ -688,12 +688,18 @@ public class Scene implements JsonSerializable, Refreshable {
       Vector3 d = state.ray.d;
       double t = 0;
       // simplified intersection test with the 6 planes that form the bounding box of the octree
-      t = Math.min(t, -o.x/d.x);
-      t = Math.min(t, (limit-o.x)/d.x);
-      t = Math.min(t, -o.y/d.y);
-      t = Math.min(t, (limit-o.y)/d.y);
-      t = Math.min(t, -o.z/d.z);
-      t = Math.min(t, (limit-o.z)/d.z);
+      if(Math.abs(d.x) > Ray.EPSILON) {
+        t = Math.min(t, -o.x / d.x);
+        t = Math.min(t, (limit - o.x) / d.x);
+      }
+      if(Math.abs(d.y) > Ray.EPSILON) {
+        t = Math.min(t, -o.y / d.y);
+        t = Math.min(t, (limit - o.y) / d.y);
+      }
+      if(Math.abs(d.z) > Ray.EPSILON) {
+        t = Math.min(t, -o.z / d.z);
+        t = Math.min(t, (limit - o.z) / d.z);
+      }
       // set the origin to the farthest intersection point behind
       // I theory, we only would need to set it to the closest intersection point behind
       // but this doesn't matter because the Octree.enterOctree function
