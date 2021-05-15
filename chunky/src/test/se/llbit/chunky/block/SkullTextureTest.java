@@ -1,16 +1,19 @@
 package se.llbit.chunky.block;
 
+import static org.junit.Assert.assertEquals;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
-import junit.framework.TestCase;
+import org.junit.Test;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
 
-public class SkullTextureTest extends TestCase {
+public class SkullTextureTest {
 
+  @Test
   public void testValidJson() {
     CompoundTag validOwnerTag = createSkullTag("Owner", Base64.getEncoder().encodeToString(
         "{ \"textures\": { \"SKIN\": { \"url\": \"http://textures.minecraft.net/texture/1acde954db327685201f785a6b248b73fdc8982c2aed430f697cdebec9b7e14\" } } }"
@@ -20,6 +23,7 @@ public class SkullTextureTest extends TestCase {
         Head.getTextureUrl(validOwnerTag));
   }
 
+  @Test
   public void testSkullOwner() {
     // player heads use SkullOwner, which should work too
     CompoundTag validOwnerTag = createSkullTag("SkullOwner", Base64.getEncoder().encodeToString(
@@ -30,6 +34,7 @@ public class SkullTextureTest extends TestCase {
         Head.getTextureUrl(validOwnerTag));
   }
 
+  @Test
   public void testInvalidJson() { // test for #680, #681
     CompoundTag validOwnerTag = createSkullTag("Owner", Base64.getEncoder().encodeToString(
         "{textures:{SKIN:{url:\"http://textures.minecraft.net/texture/1acde954db327685201f785a6b248b73fdc8982c2aed430f697cdebec9b7e14\"}}}"
@@ -39,6 +44,7 @@ public class SkullTextureTest extends TestCase {
         Head.getTextureUrl(validOwnerTag));
   }
 
+  @Test
   public void testAlexSkull() { // test for #749
     CompoundTag validJsonAlexTag = createSkullTag("Owner", Base64.getEncoder().encodeToString(
         "{ \"textures\": { \"SKIN\": {\"metadata\": {\"model\": \"slim\"}, \"url\": \"http://textures.minecraft.net/texture/1acde954db327685201f785a6b248b73fdc8982c2aed430f697cdebec9b7e14\" } } }"
@@ -55,6 +61,7 @@ public class SkullTextureTest extends TestCase {
         Head.getTextureUrl(invalidJsonAlexTag));
   }
 
+  @Test
   public void testBadBase64Padding() { // test for #900
     CompoundTag validOwnerTag = createSkullTag("Owner",
         // the following base64 string has intentional wrong padding
@@ -64,8 +71,9 @@ public class SkullTextureTest extends TestCase {
         Head.getTextureUrl(validOwnerTag));
   }
 
+  @Test
   public void testLinebreaks() { // test for #764
-    CompoundTag validOwnerTag = createSkullTag("Owner",Base64.getEncoder().encodeToString(
+    CompoundTag validOwnerTag = createSkullTag("Owner", Base64.getEncoder().encodeToString(
         "{ \"textures\":\n{ \"SKIN\": {\n  \"metadata\": {\n\"model\": \"slim\"},\n \"url\":\n \"http://textures.minecraft.net/texture/1acde954db327685201f785a6b248b73fdc8982c2aed430f697cdebec9b7e14\" } } }"
             .getBytes(StandardCharsets.UTF_8)));
     assertEquals(
