@@ -128,7 +128,7 @@ public class LegacyBlocks {
       case 122: return nameTag(tag, "dragon_egg");
       case 123: return stringTag(nameTag(tag, "redstone_lamp"), "lit", "false");
       case 124: return stringTag(nameTag(tag, "redstone_lamp"), "lit", "true");
-      case 127: return intTag(facing4Tag(nameTag(tag, "cocoa"), data&4), "age", (data << 2) & 3);
+      case 127: return intTag(facing4Tag(nameTag(tag, "cocoa"), data & 0b11), "age", (data & 0b1100) >> 2);
       case 128: return needsFinalization(stairsTag(nameTag(tag, "sandstone_stairs"), data), id, data);
       case 129: return nameTag(tag, "emerald_ore");
       case 130: return chestFurnaceLadderTag(nameTag(tag, "ender_chest"), data);
