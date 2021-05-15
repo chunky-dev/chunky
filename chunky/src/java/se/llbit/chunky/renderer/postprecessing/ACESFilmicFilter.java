@@ -12,7 +12,7 @@ public class ACESFilmicFilter extends IndependentPostProcessingFilter {
   private static final float aces_e = 0.14f;
   
   @Override
-  protected void processPixel(double[] pixel) {
+  public void processPixel(double[] pixel) {
     // https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
     for(int i = 0; i < 3; ++i) {
       pixel[i] = QuickMath.max(QuickMath.min((pixel[i] * (aces_a * pixel[i] + aces_b)) / (pixel[i] * (aces_c * pixel[i] + aces_d) + aces_e), 1), 0);

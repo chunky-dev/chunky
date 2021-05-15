@@ -18,6 +18,12 @@ public interface PostProcessingFilter {
   void processFrame(int width, int height, double[] input, BitmapImage output, double exposure, TaskTracker.Task task);
 
   /**
+   * Post process a single pixel
+   * @param pixel the rgb component of the pixel. Input/output parameter
+   */
+  void processPixel(double[] pixel);
+
+  /**
    * Get name of the post processing filter
    * @return The name of the post processing filter
    */

@@ -12,11 +12,7 @@ import java.util.stream.IntStream;
  * Base class for post processing filter that process each pixel independently
  */
 public abstract class IndependentPostProcessingFilter implements PostProcessingFilter {
-  /**
-   * Post process a single pixel
-   * @param pixel the rgb component of the pixel. Input/output parameter
-   */
-  protected abstract void processPixel(double[] pixel);
+
 
   @Override
   public void processFrame(int width, int height, double[] input, BitmapImage output, double exposure, TaskTracker.Task task) {

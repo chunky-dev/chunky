@@ -6,7 +6,7 @@ public class PreviewFilter extends IndependentPostProcessingFilter {
   public static final PreviewFilter Instance = new PreviewFilter();
 
   @Override
-  protected void processPixel(double[] pixel) {
+  public void processPixel(double[] pixel) {
     for(int i = 0; i < 3; ++i) {
       pixel[i] = FastMath.sqrt(pixel[i]);
     }

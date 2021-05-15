@@ -2,7 +2,7 @@ package se.llbit.chunky.renderer.postprecessing;
 
 public class NoneFilter extends IndependentPostProcessingFilter {
   @Override
-  protected void processPixel(double[] pixel) {
+  public void processPixel(double[] pixel) {
   }
 
   @Override

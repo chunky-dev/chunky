@@ -11,7 +11,7 @@ public class HableToneMappingFilter extends IndependentPostProcessingFilter {
   private static final float whiteScale = 1.0f / (((hW * (hA * hW + hC * hB) + hD * hE) / (hW * (hA * hW + hB) + hD * hF)) - hE / hF);
   
   @Override
-  protected void processPixel(double[] pixel) {
+  public void processPixel(double[] pixel) {
     // http://filmicworlds.com/blog/filmic-tonemapping-operators/
     // This adjusts the exposure by a factor of 16 so that the resulting exposure approximately matches the other
     // post-processing methods. Without this, the image would be very dark.

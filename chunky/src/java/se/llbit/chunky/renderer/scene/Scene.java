@@ -73,6 +73,10 @@ import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.postprecessing.GammaCorrectionFilter;
+import se.llbit.chunky.renderer.postprecessing.PostProcessingFilter;
+import se.llbit.chunky.renderer.postprecessing.PostProcessingFilters;
+import se.llbit.chunky.renderer.postprecessing.PreviewFilter;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
@@ -209,7 +213,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public int height;
 
-  public Postprocess postprocess = Postprocess.DEFAULT;
+  public PostProcessingFilter postProcessingFilter = PostProcessingFilters.getDefault();
   public PictureExportFormat outputMode = PictureExportFormats.PNG;
   public long renderTime;
   /**
@@ -1741,19 +1745,19 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * @return The current postprocessing mode
+   * @return The current postprocessing filter
    */
-  public Postprocess getPostprocess() {
-    return postprocess;
+  public PostProcessingFilter getPostProcessingFilter() {
+    return postProcessingFilter;
   }
 
   /**
-   * Change the postprocessing mode
+   * Change the postprocessing filter
    *
-   * @param p The new postprocessing mode
+   * @param p The new postprocessing filter
    */
-  public synchronized void setPostprocess(Postprocess p) {
-    postprocess = p;
+  public synchronized void setPostprocess(PostProcessingFilter p) {
+    postProcessingFilter = p;
     if (mode == RenderMode.PREVIEW) {
       // Don't interrupt the render if we are currently rendering.
       refresh();
@@ -1901,7 +1905,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public synchronized void copyTransients(Scene other) {
     name = other.name;
-    postprocess = other.postprocess;
+    postProcessingFilter = other.postProcessingFilter;
     exposure = other.exposure;
     dumpFrequency = other.dumpFrequency;
     saveSnapshots = other.saveSnapshots;
@@ -2055,17 +2059,12 @@ public class Scene implements JsonSerializable, Refreshable {
    * but in some cases an separate post processing pass is needed.
    */
   public void postProcessFrame(TaskTracker.Task task) {
-    task.update("Finalizing frame", width, 0);
-    AtomicInteger done = new AtomicInteger(0);
-    Chunky.getCommonThreads().submit(() -> {
-      IntStream.range(0, width).parallel().forEach(x -> {
-        for (int y = 0; y < height; y++) {
-          finalizePixel(x, y);
-        }
-
-        task.update(width, done.incrementAndGet());
-      });
-    }).join();
+    PostProcessingFilter filter = postProcessingFilter;
+    if(mode == RenderMode.PREVIEW) {
+      filter = PreviewFilter.Instance;
+    }
+    filter.processFrame(width, height, samples, backBuffer, exposure, task);
+    finalized = true;
   }
 
   public void postProcessFrame(TaskTracker taskTracker) {
@@ -2265,78 +2264,17 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void postProcessPixel(int x, int y, double[] result) {
     int index = (y * width + x) * 3;
-    double r = samples[index];
-    double g = samples[index + 1];
-    double b = samples[index + 2];
+    System.arraycopy(samples, index, result, 0, 3);
 
-    r *= exposure;
-    g *= exposure;
-    b *= exposure;
+    PostProcessingFilter filter = postProcessingFilter;
+    if(mode == RenderMode.PREVIEW)
+      filter = PreviewFilter.Instance;
 
-    if (mode != RenderMode.PREVIEW) {
-      switch (postprocess) {
-        case NONE:
-          break;
-        case TONEMAP1:
-          // http://filmicworlds.com/blog/filmic-tonemapping-operators/
-          r = QuickMath.max(0, r - 0.004);
-          r = (r * (6.2 * r + .5)) / (r * (6.2 * r + 1.7) + 0.06);
-          g = QuickMath.max(0, g - 0.004);
-          g = (g * (6.2 * g + .5)) / (g * (6.2 * g + 1.7) + 0.06);
-          b = QuickMath.max(0, b - 0.004);
-          b = (b * (6.2 * b + .5)) / (b * (6.2 * b + 1.7) + 0.06);
-          break;
-        case TONEMAP2:
-          // https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
-          float aces_a = 2.51f;
-          float aces_b = 0.03f;
-          float aces_c = 2.43f;
-          float aces_d = 0.59f;
-          float aces_e = 0.14f;
-          r = QuickMath.max(QuickMath.min((r * (aces_a * r + aces_b)) / (r * (aces_c * r + aces_d) + aces_e), 1), 0);
-          g = QuickMath.max(QuickMath.min((g * (aces_a * g + aces_b)) / (g * (aces_c * g + aces_d) + aces_e), 1), 0);
-          b = QuickMath.max(QuickMath.min((b * (aces_a * b + aces_b)) / (b * (aces_c * b + aces_d) + aces_e), 1), 0);
-          r = FastMath.pow(r, 1 / DEFAULT_GAMMA);
-          g = FastMath.pow(g, 1 / DEFAULT_GAMMA);
-          b = FastMath.pow(b, 1 / DEFAULT_GAMMA);
-          break;
-        case TONEMAP3:
-          // http://filmicworlds.com/blog/filmic-tonemapping-operators/
-          float hA = 0.15f;
-          float hB = 0.50f;
-          float hC = 0.10f;
-          float hD = 0.20f;
-          float hE = 0.02f;
-          float hF = 0.30f;
-          // This adjusts the exposure by a factor of 16 so that the resulting exposure approximately matches the other
-          // post-processing methods. Without this, the image would be very dark.
-          r *= 16;
-          g *= 16;
-          b *= 16;
-          r = ((r * (hA * r + hC * hB) + hD * hE) / (r * (hA * r + hB) + hD * hF)) - hE / hF;
-          g = ((g * (hA * g + hC * hB) + hD * hE) / (g * (hA * g + hB) + hD * hF)) - hE / hF;
-          b = ((b * (hA * b + hC * hB) + hD * hE) / (b * (hA * b + hB) + hD * hF)) - hE / hF;
-          float hW = 11.2f;
-          float whiteScale = 1.0f / (((hW * (hA * hW + hC * hB) + hD * hE) / (hW * (hA * hW + hB) + hD * hF)) - hE / hF);
-          r *= whiteScale;
-          g *= whiteScale;
-          b *= whiteScale;
-          break;
-        case GAMMA:
-          r = FastMath.pow(r, 1 / DEFAULT_GAMMA);
-          g = FastMath.pow(g, 1 / DEFAULT_GAMMA);
-          b = FastMath.pow(b, 1 / DEFAULT_GAMMA);
-          break;
-      }
-    } else {
-      r = FastMath.sqrt(r);
-      g = FastMath.sqrt(g);
-      b = FastMath.sqrt(b);
-    }
+    result[0] *= exposure;
+    result[1] *= exposure;
+    result[2] *= exposure;
 
-    result[0] = r;
-    result[1] = g;
-    result[2] = b;
+    filter.processPixel(result);
   }
 
   /**
@@ -2652,7 +2590,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("yMin", yMin);
     json.add("yMax", yMax);
     json.add("exposure", exposure);
-    json.add("postprocess", postprocess.name());
+    json.add("postprocess", postProcessingFilter.getId());
     json.add("outputMode", outputMode.getName());
     json.add("renderTime", renderTime);
     json.add("spp", spp);
@@ -2920,7 +2858,9 @@ public class Scene implements JsonSerializable, Refreshable {
     yMax = json.get("yMax").asInt(Math.min(yClipMax, yMax));
 
     exposure = json.get("exposure").doubleValue(exposure);
-    postprocess = Postprocess.get(json.get("postprocess").stringValue(postprocess.name()));
+    postProcessingFilter = PostProcessingFilters
+            .getPostProcessingFilterFromId(json.get("postprocess").stringValue(postProcessingFilter.getId()))
+            .orElse(PostProcessingFilters.getDefault());
     outputMode = PictureExportFormats
       .getFormat(json.get("outputMode").stringValue(outputMode.getName()))
       .orElse(PictureExportFormats.PNG);

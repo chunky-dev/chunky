@@ -4,7 +4,7 @@ import se.llbit.math.QuickMath;
 
 public class Tonemap1Filter extends IndependentPostProcessingFilter {
   @Override
-  protected void processPixel(double[] pixel) {
+  public void processPixel(double[] pixel) {
     // http://filmicworlds.com/blog/filmic-tonemapping-operators/
     for(int i = 0; i < 3; ++i) {
       pixel[i] = QuickMath.max(0, pixel[i] - 0.004);
