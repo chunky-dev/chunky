@@ -440,17 +440,17 @@ public class Octree {
 
     // If we have 0 < ray.o.x < octree_size, meaning the ray is correctly aligned in
     // x to intersect with the octree, [tXMin ; tXMax] will have the values
-    // [-Infinity ; Infinity] meaning its union with the interval [tMin ; tMax]
+    // [-Infinity ; Infinity] meaning its intersection with the interval [tMin ; tMax]
     // will keep the value [tMin ; tMax].
 
     // On the other hand if ray.o.x < 0 or if ray.o.x > octree_size then both
     // tXMin and tXMax will have the value -Infinity (resp. +Infinity)
-    // Meaning the interval [tXMin ; tXMax] (and [tMin ; tMax] once it is updated to be the union)
+    // Meaning the interval [tXMin ; tXMax] (and [tMin ; tMax] once it is updated to be the intersection)
     // will be reduced to a single values: -Infinity (resp. +Infinity)
     // (this description is not mathematically rigorous as infinity is not really a value
     // but is enough here).
     // As ray.d is not a null vector, at least one of its component is not 0
-    // and will have an associated interval with finite bounds, meaning the union of those interval
+    // and will have an associated interval with finite bounds, meaning the intersection of those interval
     // will give an empty set (in practice this is the condition
     // `if ((tMin > tXMax) || (tXMin > tMax)) return false;`) meaning no intersection is possible.
 
@@ -459,20 +459,20 @@ public class Octree {
     // neither really outside nor inside.
     // In this case tXMin or tXMax will be NaN (and the other will be +/- Infinity but
     // that will not pose any problem as seen previously).
-    // Every comparison involving a NaN return false, this means that when doing the union
+    // Every comparison involving a NaN returns false, this means that when doing the intersection
     // with [tMin ; tMax] (in practice the `if (tXMin > tMin) tMin = tXMin;` and
     // `if (tXMax < tMax) tMax = tXMax;`), the interval will not be changed, acting
     // as if the [tXMin ; tXMax] interval was [-Infinity ; +Infinity] and not disrupting
     // following computations.
-    // Additionally, given how the condition to test whether the union will be empty before
+    // Additionally, given how the condition to test whether the intersection will be empty before
     // updating it is written, (the `if ((tMin > tXMax) || (tXMin > tMax))`), it will
     // evaluate to false and not exit the function. This means that the ray is
-    // considered to be intersecting with the octree (if the other coordinate fulfill the condition
+    // considered to be intersecting with the octree (if the other coordinates fulfill the condition
     // to be intersecting as well).
-    // If instead we would like rays on the edge of the octree not be considered intersecting,
+    // If instead we would like rays on the edge of the octree not to be considered intersecting it,
     // the condition could be rewritten as `if(!(tMin <= tXMax) || !(tXMin <= tMax))`
     // which is equivalent to the current condition for every input not involving
-    // NaN but will evaluates to true if the presence of NaN
+    // NaN but will evaluates to true in the presence of NaN.
 
     // AABB intersection with the octree boundary
     double tXMin, tXMax;
