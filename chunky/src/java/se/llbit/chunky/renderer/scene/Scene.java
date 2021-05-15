@@ -2383,7 +2383,18 @@ public class Scene implements JsonSerializable, Refreshable {
           buf.append("\n");
         }
         Vector3 pos = camera.getPosition();
-        buf.append(String.format("pos: (%.1f, %.1f, %.1f)", pos.x, pos.y, pos.z));
+        buf.append(String.format("pos: (%.1f, %.1f, %.1f)\n", pos.x, pos.y, pos.z));
+
+        buf.append("facing: ");
+        double yaw = camera.getYaw();
+        yaw = (yaw + Math.PI*2) % (Math.PI*2);
+        int index = (int)Math.floor((yaw + Math.PI/8) / (Math.PI/4)) % 8;
+        buf.append(new String[]{"west", "southwest", "south", "southeast", "east", "northeast", "north", "northwest"}[index]);
+        index = (int)Math.floor((yaw + Math.PI/4) / (Math.PI/2)) % 4;
+        buf.append(" (towards ");
+        buf.append(new String[]{"negative X", "positive Z", "positive X", "negative Z"}[index]);
+        buf.append(")");
+
         return buf.toString();
       }
 
