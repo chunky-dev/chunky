@@ -33,6 +33,9 @@ public abstract class IndependentPostProcessingFilter implements PostProcessingF
             pixelBuffer[i] = input[pixelOffset + i] * exposure;
           }
           processPixel(pixelBuffer);
+          for(int i = 0; i < 3; ++i) {
+            pixelBuffer[i] = Math.min(1.0, pixelBuffer[i]);
+          }
           output.setPixel(x, y, ColorUtil.getRGB(pixelBuffer));
         }
 
