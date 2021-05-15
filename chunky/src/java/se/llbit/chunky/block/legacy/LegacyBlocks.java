@@ -859,22 +859,12 @@ public class LegacyBlocks {
     }
   }
 
-  public static CompoundTag vineTag(CompoundTag tag, int data, boolean forceUp) {
-    boolean up, north, south, east, west;
-    up = north = south = east = west = false;
-
-    if (data == 0 || forceUp) up = true;
-    if ((data & 0b0001) != 0) south = true;
-    if ((data & 0b0010) != 0) west = true;
-    if ((data & 0b0100) != 0) north = true;
-    if ((data & 0b1000) != 0) east = true;
-
-    stringTag(tag, "up", up ? "true" : "false");
-    stringTag(tag, "down", "false");
-    stringTag(tag, "north", north ? "true" : "false");
-    stringTag(tag, "east", east ? "true" : "false");
-    stringTag(tag, "south", south ? "true" : "false");
-    stringTag(tag, "west", west ? "true" : "false");
+  public static CompoundTag vineTag(CompoundTag tag, int data, boolean solidBlockAbove) {
+    boolTag(tag, "up", data == 0 || solidBlockAbove);
+    boolTag(tag, "north", (data & 0b0100) != 0);
+    boolTag(tag, "east", (data & 0b1000) != 0);
+    boolTag(tag, "south", (data & 0b0001) != 0);
+    boolTag(tag, "west", (data & 0b0010) != 0);
     return tag;
   }
 
