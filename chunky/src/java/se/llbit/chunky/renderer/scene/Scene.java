@@ -681,16 +681,23 @@ public class Scene implements JsonSerializable, Refreshable {
 
     if(camera.getProjectionMode() == ProjectionMode.PARALLEL
       && worldOctree.isInside(state.ray.o)) {
+      // When in parallel projection, push the ray origin back so the
+      // ray start outside the octree to prevent ray spawning inside some blocks
       int limit = (1 << worldOctree.getDepth());
       Vector3 o = state.ray.o;
       Vector3 d = state.ray.d;
       double t = 0;
+      // simplified intersection test with the 6 planes that form the bounding box of the octree
       t = Math.min(t, -o.x/d.x);
       t = Math.min(t, (limit-o.x)/d.x);
       t = Math.min(t, -o.y/d.y);
       t = Math.min(t, (limit-o.y)/d.y);
       t = Math.min(t, -o.z/d.z);
       t = Math.min(t, (limit-o.z)/d.z);
+      // set the origin to the farthest intersection point behind
+      // I theory, we only would need to set it to the closest intersection point behind
+      // but this doesn't because matter because the Octree.enterOctree function
+      // will do the same amount of math for the same result no matter what the exact point is
       o.scaleAdd(t, d);
     }
 
