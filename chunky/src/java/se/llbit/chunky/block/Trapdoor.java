@@ -14,6 +14,7 @@ public class Trapdoor extends MinecraftBlockTranslucent {
       String half, String facing, boolean open) {
     super(name, texture);
     localIntersect = true;
+    solid = false;
     this.description = String.format("half=%s, facing=%s, open=%s",
         half, facing, open);
     int state;
