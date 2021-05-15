@@ -10,6 +10,4 @@ public interface ModelBlock {
 
   @PluginApi
   BlockModel getModel();
-
-  boolean intersect(Ray ray, Scene scene);
 }
