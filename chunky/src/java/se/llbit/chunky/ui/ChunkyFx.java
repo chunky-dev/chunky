@@ -30,6 +30,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.resources.SettingsDirectory;
+import se.llbit.fxutil.WindowPosition;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 
@@ -60,12 +61,7 @@ public class ChunkyFx extends Application {
       controller.setApplication(this);
       stage.getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
       stage.setOnCloseRequest(event -> {
-        PersistentSettings.settings.setDouble("window.x", stage.getX());
-        PersistentSettings.settings.setDouble("window.y", stage.getY());
-        PersistentSettings.settings.setDouble("window.width", stage.getWidth());
-        PersistentSettings.settings.setDouble("window.height", stage.getHeight());
-        PersistentSettings.settings.setBool("window.maximized", stage.isMaximized());
-        PersistentSettings.save();
+        PersistentSettings.setWindowPosition(new WindowPosition(stage));
         Platform.exit();
         System.exit(0);
       });
@@ -76,25 +72,9 @@ public class ChunkyFx extends Application {
         scene.getStylesheets().add("style.css");
       }
 
-      JsonValue windowX = PersistentSettings.settings.get("window.x");
-      JsonValue windowY = PersistentSettings.settings.get("window.y");
-      JsonValue windowWidth = PersistentSettings.settings.get("window.width");
-      JsonValue windowHeight = PersistentSettings.settings.get("window.height");
-      JsonValue windowMaximized = PersistentSettings.settings.get("window.maximized");
-
-      if (!windowX.isUnknown() && !windowY.isUnknown() && !windowWidth.isUnknown()
-          && !windowHeight.isUnknown() && !windowMaximized.isUnknown()) {
-        double x = windowX.asDouble(0);
-        double y = windowY.asDouble(0);
-        double width = Math.max(300, windowWidth.asDouble(1800));
-        double height = Math.max(300, windowHeight.asDouble(1000));
-        if (!Screen.getScreensForRectangle(x, y, width, height).isEmpty()) {
-          stage.setX(x);
-          stage.setY(y);
-          stage.setWidth(width);
-          stage.setHeight(height);
-        }
-        stage.setMaximized(windowMaximized.asBoolean(true));
+      WindowPosition windowPosition = PersistentSettings.getPreviousWindowPosition();
+      if (windowPosition != null) {
+        windowPosition.apply(stage, 300, 300);
       } else {
         stage.setWidth(1800);
         stage.setMaximized(true);
