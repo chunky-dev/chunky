@@ -24,6 +24,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
@@ -81,12 +82,18 @@ public class ChunkyFx extends Application {
       JsonValue windowHeight = PersistentSettings.settings.get("window.height");
       JsonValue windowMaximized = PersistentSettings.settings.get("window.maximized");
 
-      if(!windowX.isUnknown() && !windowY.isUnknown() && !windowWidth.isUnknown()
-              && !windowHeight.isUnknown() && !windowMaximized.isUnknown()) {
-        stage.setX(windowX.asDouble(0));
-        stage.setY(windowY.asDouble(0));
-        stage.setWidth(windowWidth.asDouble(1800));
-        stage.setHeight(windowHeight.asDouble(1000));
+      if (!windowX.isUnknown() && !windowY.isUnknown() && !windowWidth.isUnknown()
+          && !windowHeight.isUnknown() && !windowMaximized.isUnknown()) {
+        double x = windowX.asDouble(0);
+        double y = windowY.asDouble(0);
+        double width = Math.max(300, windowWidth.asDouble(1800));
+        double height = Math.max(300, windowHeight.asDouble(1000));
+        if (!Screen.getScreensForRectangle(x, y, width, height).isEmpty()) {
+          stage.setX(x);
+          stage.setY(y);
+          stage.setWidth(width);
+          stage.setHeight(height);
+        }
         stage.setMaximized(windowMaximized.asBoolean(true));
       } else {
         stage.setWidth(1800);
