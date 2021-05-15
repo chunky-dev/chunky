@@ -1,4 +1,4 @@
-package se.llbit.chunky.renderer.postprecessing;
+package se.llbit.chunky.renderer.postprocessing;
 
 /**
  * Implementation of Hable tone mapping

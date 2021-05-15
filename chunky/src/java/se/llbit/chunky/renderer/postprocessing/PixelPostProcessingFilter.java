@@ -1,4 +1,4 @@
-package se.llbit.chunky.renderer.postprecessing;
+package se.llbit.chunky.renderer.postprocessing;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.resources.BitmapImage;
