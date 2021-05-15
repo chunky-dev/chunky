@@ -7,14 +7,13 @@ import se.llbit.chunky.model.EnchantmentTableModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Vector3;
 
-public class EnchantingTable extends MinecraftBlockTranslucent implements ModelBlock {
-
-  private static final EnchantmentTableModel model = new EnchantmentTableModel();
+public class EnchantingTable extends AbstractModelBlock {
 
   public EnchantingTable() {
     super("enchanting_table", Texture.enchantmentTableSide);
     solid = false;
     localIntersect = true;
+    this.model = new EnchantmentTableModel();
   }
 
   @Override
@@ -39,10 +38,5 @@ public class EnchantingTable extends MinecraftBlockTranslucent implements ModelB
     book.setPitch(Math.toRadians(80));
     book.setYaw(Math.toRadians(45));
     return book;
-  }
-
-  @Override
-  public BlockModel getModel() {
-    return model;
   }
 }

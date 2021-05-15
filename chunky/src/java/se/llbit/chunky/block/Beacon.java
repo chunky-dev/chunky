@@ -8,14 +8,13 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
-public class Beacon extends MinecraftBlockTranslucent implements ModelBlock {
-
-  private static final BeaconModel model = new BeaconModel();
+public class Beacon extends AbstractModelBlock {
 
   public Beacon() {
     super("beacon", Texture.beacon);
     localIntersect = true;
     solid = false;
+    this.model = new BeaconModel();
   }
 
   @Override
@@ -34,10 +33,5 @@ public class Beacon extends MinecraftBlockTranslucent implements ModelBlock {
       return new BeaconBeam(position);
     }
     return null;
-  }
-
-  @Override
-  public BlockModel getModel() {
-    return model;
   }
 }
