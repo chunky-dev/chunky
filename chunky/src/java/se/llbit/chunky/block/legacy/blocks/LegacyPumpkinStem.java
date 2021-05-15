@@ -22,9 +22,9 @@ public class LegacyPumpkinStem extends UnfinalizedLegacyBlock {
     for (BlockFace side : sides) {
       if (state.getMaterial(side).name.endsWith("pumpkin")) {
         state.replaceCurrentBlock(
-            LegacyBlocks
-                .stringTag(LegacyBlocks.createTag("attached_pumpkin_stem"), "facing",
-                    side.getName()));
+            LegacyBlocks.stringTag(
+                LegacyBlocks.createTag("attached_pumpkin_stem"), "facing", side.getName()
+            ));
         return;
       }
     }

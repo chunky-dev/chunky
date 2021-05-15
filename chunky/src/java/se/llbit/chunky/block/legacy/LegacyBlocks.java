@@ -697,7 +697,7 @@ public class LegacyBlocks {
     return nameTag(new CompoundTag(), name);
   }
 
-  static CompoundTag nameTag(CompoundTag tag, String name) {
+  private static CompoundTag nameTag(CompoundTag tag, String name) {
     tag.add("Name", new StringTag(name.startsWith("minecraft:") ? name: "minecraft:" + name));
     return tag;
   }
@@ -726,11 +726,11 @@ public class LegacyBlocks {
     return stringTag(tag, name, data ? "true" : "false");
   }
 
-  static CompoundTag facingTag(CompoundTag tag, int direction) {
+  private static CompoundTag facingTag(CompoundTag tag, int direction) {
     return stringTag(tag, "facing", (new String[] {"down", "up", "north", "south", "west", "east"})[direction % 6]);
   }
 
-  public static CompoundTag facing4Tag(CompoundTag tag, int data) {
+  private static CompoundTag facing4Tag(CompoundTag tag, int data) {
     return stringTag(tag, "facing", (new String[] {"south", "west", "north", "east"})[data % 4]);
   }
 

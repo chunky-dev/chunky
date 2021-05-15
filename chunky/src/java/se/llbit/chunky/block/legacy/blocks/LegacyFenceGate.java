@@ -15,7 +15,7 @@ public class LegacyFenceGate extends UnfinalizedLegacyBlock {
   @Override
   public void finalizeBlock(FinalizationState state) {
     CompoundTag newTag = LegacyBlocks.createTag(this.name);
-    LegacyBlocks.facing4Tag(newTag, data & 0b11);
+    LegacyBlocks.stringTag(newTag, "facing", getFacing().getName());
     LegacyBlocks.boolTag(newTag, "open", (data & 4) != 0);
 
     if ((this.data & 3) % 2 == 0) {
@@ -32,7 +32,7 @@ public class LegacyFenceGate extends UnfinalizedLegacyBlock {
   }
 
   private static final BlockFace[] facingMap = new BlockFace[]{
-    BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST
+      BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST
   };
 
   public BlockFace getFacing() {

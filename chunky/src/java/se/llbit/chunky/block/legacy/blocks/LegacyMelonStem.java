@@ -9,7 +9,7 @@ import se.llbit.nbt.CompoundTag;
 public class LegacyMelonStem extends UnfinalizedLegacyBlock {
 
   private static final BlockFace[] sides = new BlockFace[]{
-    BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
+      BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
   };
 
   public LegacyMelonStem(String name, CompoundTag tag) {
@@ -22,9 +22,9 @@ public class LegacyMelonStem extends UnfinalizedLegacyBlock {
     for (BlockFace side : sides) {
       if (state.getMaterial(side).name.equals("minecraft:melon")) {
         state.replaceCurrentBlock(
-            LegacyBlocks
-                .stringTag(LegacyBlocks.createTag("attached_melon_stem"), "facing",
-                    side.getName()));
+            LegacyBlocks.stringTag(
+                LegacyBlocks.createTag("attached_melon_stem"), "facing", side.getName()
+            ));
         return;
       }
     }
