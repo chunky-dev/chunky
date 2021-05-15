@@ -24,4 +24,9 @@ public class ACESFilmicFilter extends IndependentPostProcessingFilter {
   public String getName() {
     return "ACES filmic tone mapping";
   }
+
+  @Override
+  public String getId() {
+    return "TONEMAP2";
+  }
 }

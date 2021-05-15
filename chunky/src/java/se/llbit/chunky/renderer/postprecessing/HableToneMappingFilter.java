@@ -26,4 +26,9 @@ public class HableToneMappingFilter extends IndependentPostProcessingFilter {
   public String getName() {
     return "Hable tone mapping";
   }
+
+  @Override
+  public String getId() {
+    return "TONEMAP3";
+  }
 }

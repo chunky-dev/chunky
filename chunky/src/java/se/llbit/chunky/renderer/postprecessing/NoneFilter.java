@@ -9,4 +9,9 @@ public class NoneFilter extends IndependentPostProcessingFilter {
   public String getName() {
     return "None";
   }
+
+  @Override
+  public String getId() {
+    return "NONE";
+  }
 }

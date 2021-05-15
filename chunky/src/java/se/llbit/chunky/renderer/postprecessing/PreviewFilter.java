@@ -16,4 +16,9 @@ public class PreviewFilter extends IndependentPostProcessingFilter {
   public String getName() {
     return null;
   }
+
+  @Override
+  public String getId() {
+    return null;
+  }
 }

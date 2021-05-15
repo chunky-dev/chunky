@@ -15,4 +15,9 @@ public class GammaCorrectionFilter extends IndependentPostProcessingFilter {
   public String getName() {
     return "Gamma correction";
   }
+
+  @Override
+  public String getId() {
+    return "GAMMA";
+  }
 }

@@ -16,4 +16,9 @@ public class Tonemap1Filter extends IndependentPostProcessingFilter {
   public String getName() {
     return "Tonemap operator 1";
   }
+
+  @Override
+  public String getId() {
+    return "TONEMAP1";
+  }
 }

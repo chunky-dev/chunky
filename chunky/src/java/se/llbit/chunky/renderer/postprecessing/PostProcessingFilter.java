@@ -30,4 +30,10 @@ public interface PostProcessingFilter {
   default String getDescription() {
     return null;
   }
+
+  /**
+   * Get id of the post processing filter
+   * @return The id of the post processing filter
+   */
+  String getId();
 }
