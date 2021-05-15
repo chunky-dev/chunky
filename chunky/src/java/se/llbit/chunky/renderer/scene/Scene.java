@@ -701,7 +701,7 @@ public class Scene implements JsonSerializable, Refreshable {
         t = Math.min(t, (limit - o.z) / d.z);
       }
       // set the origin to the farthest intersection point behind
-      // I theory, we only would need to set it to the closest intersection point behind
+      // In theory, we only would need to set it to the closest intersection point behind
       // but this doesn't matter because the Octree.enterOctree function
       // will do the same amount of math for the same result no matter what the exact point is
       o.scaleAdd(t, d);
