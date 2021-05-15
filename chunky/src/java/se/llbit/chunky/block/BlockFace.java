@@ -1,11 +1,29 @@
 package se.llbit.chunky.block;
 
 public enum BlockFace {
+  /**
+   * Facing north, i.e. towards negative Z.
+   */
   NORTH("north"),
+  /**
+   * Facing east, i.e. towards positive X.
+   */
   EAST("east"),
+  /**
+   * Facing south, i.e. towards positive Z.
+   */
   SOUTH("south", NORTH),
+  /**
+   * Facing west, i.e. towards negative X.
+   */
   WEST("west", EAST),
+  /**
+   * Facing up, i.e. towards positive Y.
+   */
   UP("up"),
+  /**
+   * Facing down, i.e. towards negative Y.
+   */
   DOWN("down", UP);
 
   private final String name;

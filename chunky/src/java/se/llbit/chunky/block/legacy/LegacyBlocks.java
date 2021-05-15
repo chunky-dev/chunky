@@ -92,7 +92,17 @@ public class LegacyBlocks {
       case 87:  return nameTag(tag, "netherrack");
       case 88:  return nameTag(tag, "soul_sand");
       case 89:  return nameTag(tag, "glowstone");
-      case 90:  return stringTag(nameTag(tag, "nether_portal"), "axis", data == 2 ? "x" : "y");
+      case 90:
+        nameTag(tag, "nether_portal");
+        switch (data & 0b11) {
+          default:
+          case 0: // 1.6.4 or older, orientation based on neighboring blocks
+            return needsFinalization(tag, id, data);
+          case 1:
+            return stringTag(tag, "axis", "x");
+          case 2:
+            return stringTag(tag, "axis", "z");
+        }
       case 91:  return facing4Tag(nameTag(tag, "jack_o_lantern"), data);
       case 92:  return intTag(nameTag(tag, "cake"), "bites", data % 6);
       case 93:  return repeaterTag(nameTag(tag, "repeater"), data, false);

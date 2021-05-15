@@ -2403,7 +2403,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "spawner":
         return new MinecraftBlockTranslucent(name, Texture.monsterSpawner);
       case "nether_portal": {
-        String axis = tag.get("Properties").get("axis").stringValue("north");
+        String axis = tag.get("Properties").get("axis").stringValue("x");
         return new NetherPortal(axis);
       }
       case "end_portal":
