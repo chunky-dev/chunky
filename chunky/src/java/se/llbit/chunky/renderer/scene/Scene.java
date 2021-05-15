@@ -2263,18 +2263,11 @@ public class Scene implements JsonSerializable, Refreshable {
    * @param result the resulting color values are written to this array
    */
   public void postProcessPixel(int x, int y, double[] result) {
-    int index = (y * width + x) * 3;
-    System.arraycopy(samples, index, result, 0, 3);
-
     PostProcessingFilter filter = postProcessingFilter;
     if(mode == RenderMode.PREVIEW)
       filter = PreviewFilter.Instance;
 
-    result[0] *= exposure;
-    result[1] *= exposure;
-    result[2] *= exposure;
-
-    filter.processPixel(result);
+    filter.processPixel(width, height, samples, x, y, exposure, result);
   }
 
   /**
