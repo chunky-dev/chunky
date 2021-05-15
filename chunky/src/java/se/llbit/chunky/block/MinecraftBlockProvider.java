@@ -2323,7 +2323,7 @@ public class MinecraftBlockProvider implements BlockProvider {
             Texture.loomTop,
             Texture.loomBottom);
       case "barrel":
-        return new Barrel(tag.get("Properties").get("facing").stringValue(), tag.get("Properties").get("open").stringValue().equals("true"));
+        return new Barrel(tag.get("Properties").get("facing").stringValue(), tag.get("Properties").get("open").stringValue());
       case "smoker":
         return smoker(tag);
       case "blast_furnace":
