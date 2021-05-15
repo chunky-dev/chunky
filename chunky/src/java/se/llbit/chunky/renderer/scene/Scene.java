@@ -71,6 +71,7 @@ import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
@@ -2232,26 +2233,14 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Finalize a pixel. Calculates the resulting RGB color values for
-   * the pixel and sets these in the bitmap image.
-   */
-  public void finalizePixel(int x, int y) {
-    finalized = true;
-    double[] result = new double[3];
-    postProcessPixel(x, y, result);
-    backBuffer.data[y * width + x] = ColorUtil
-        .getRGB(QuickMath.min(1, result[0]), QuickMath.min(1, result[1]), QuickMath.min(1, result[2]));
-  }
-
-  /**
    * Postprocess a pixel. This applies gamma correction and clamps the color value to [0,1].
    *
    * @param result the resulting color values are written to this array
    */
-  public void postProcessPixel(int x, int y, double[] result) {
+  public void postProcessPixel(int x, int y, double[] result) throws ClassCastException {
     PostProcessingFilter filter = mode == RenderMode.PREVIEW ? PreviewFilter.INSTANCE : postProcessingFilter;
 
-    filter.processPixel(width, height, samples, x, y, exposure, result);
+    ((PixelPostProcessingFilter)filter).processPixel(width, height, samples, x, y, exposure, result);
   }
 
   /**

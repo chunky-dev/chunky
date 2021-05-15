@@ -8,7 +8,7 @@ import se.llbit.math.QuickMath;
  * Implementation of ACES filmic tone mapping
  * @link https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
  */
-public class ACESFilmicFilter extends PixelPostProcessingFilter {
+public class ACESFilmicFilter extends SimplePixelPostProcessingFilter {
   private static final float aces_a = 2.51f;
   private static final float aces_b = 0.03f;
   private static final float aces_c = 2.43f;

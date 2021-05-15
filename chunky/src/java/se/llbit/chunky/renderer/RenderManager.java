@@ -217,6 +217,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
         long frameStart = System.currentTimeMillis();
         startNextFrame();
         waitOnWorkers();
+        bufferedScene.postProcessFrame(TaskTracker.NONE);
         bufferedScene.swapBuffers();
         bufferedScene.renderTime += System.currentTimeMillis() - frameStart;
       }
@@ -297,6 +298,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
         frameStart = System.currentTimeMillis();
         startNextFrame();
         waitOnWorkers();
+        bufferedScene.postProcessFrame(TaskTracker.NONE);
         bufferedScene.swapBuffers();
         sendSceneStatus(bufferedScene.sceneStatus());
         bufferedScene.renderTime += System.currentTimeMillis() - frameStart;

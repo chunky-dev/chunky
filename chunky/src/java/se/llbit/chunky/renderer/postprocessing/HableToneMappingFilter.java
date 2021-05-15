@@ -4,7 +4,7 @@ package se.llbit.chunky.renderer.postprocessing;
  * Implementation of Hable tone mapping
  * @link http://filmicworlds.com/blog/filmic-tonemapping-operators/
  */
-public class HableToneMappingFilter extends PixelPostProcessingFilter {
+public class HableToneMappingFilter extends SimplePixelPostProcessingFilter {
   private static final float hA = 0.15f;
   private static final float hB = 0.50f;
   private static final float hC = 0.10f;

@@ -2,7 +2,7 @@ package se.llbit.chunky.renderer.postprocessing;
 
 import org.apache.commons.math3.util.FastMath;
 
-public class PreviewFilter extends PixelPostProcessingFilter {
+public class PreviewFilter extends SimplePixelPostProcessingFilter {
   public static final PreviewFilter INSTANCE = new PreviewFilter();
 
   @Override
