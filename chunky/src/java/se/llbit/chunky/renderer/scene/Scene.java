@@ -72,6 +72,7 @@ import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
+import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
@@ -677,6 +678,34 @@ public class Scene implements JsonSerializable, Refreshable {
     state.ray.o.x -= origin.x;
     state.ray.o.y -= origin.y;
     state.ray.o.z -= origin.z;
+
+    if(camera.getProjectionMode() == ProjectionMode.PARALLEL
+      && worldOctree.isInside(state.ray.o)) {
+      // When in parallel projection, push the ray origin back so the
+      // ray start outside the octree to prevent ray spawning inside some blocks
+      int limit = (1 << worldOctree.getDepth());
+      Vector3 o = state.ray.o;
+      Vector3 d = state.ray.d;
+      double t = 0;
+      // simplified intersection test with the 6 planes that form the bounding box of the octree
+      if(Math.abs(d.x) > Ray.EPSILON) {
+        t = Math.min(t, -o.x / d.x);
+        t = Math.min(t, (limit - o.x) / d.x);
+      }
+      if(Math.abs(d.y) > Ray.EPSILON) {
+        t = Math.min(t, -o.y / d.y);
+        t = Math.min(t, (limit - o.y) / d.y);
+      }
+      if(Math.abs(d.z) > Ray.EPSILON) {
+        t = Math.min(t, -o.z / d.z);
+        t = Math.min(t, (limit - o.z) / d.z);
+      }
+      // set the origin to the farthest intersection point behind
+      // In theory, we only would need to set it to the closest intersection point behind
+      // but this doesn't matter because the Octree.enterOctree function
+      // will do the same amount of math for the same result no matter what the exact point is
+      o.scaleAdd(t, d);
+    }
 
     rayTracer.trace(this, state);
   }
