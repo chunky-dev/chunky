@@ -7,9 +7,9 @@ import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
 import se.llbit.chunky.world.Material;
 import se.llbit.nbt.CompoundTag;
 
-public class SnowCoverableBlock extends UnfinalizedLegacyBlock {
+public class LegacySnowCoverableBlock extends UnfinalizedLegacyBlock {
 
-  public SnowCoverableBlock(String name, CompoundTag tag) {
+  public LegacySnowCoverableBlock(String name, CompoundTag tag) {
     super(name, tag);
   }
 

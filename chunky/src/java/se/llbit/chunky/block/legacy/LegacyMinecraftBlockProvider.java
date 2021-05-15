@@ -26,16 +26,16 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "grass_block":
       case "mycelium":
       case "podzol":
-        return new SnowCoverableBlock(name, ctag);
+        return new LegacySnowCoverableBlock(name, ctag);
       case "vine":
-        return new Vine(name, ctag);
+        return new LegacyVine(name, ctag);
       case "pumpkin_stem":
-        return new PumpkinStem(name, ctag);
+        return new LegacyPumpkinStem(name, ctag);
       case "melon_stem":
-        return new MelonStem(name, ctag);
+        return new LegacyMelonStem(name, ctag);
       case "chest":
       case "trapped_chest":
-        return new Chest(name, ctag);
+        return new LegacyChest(name, ctag);
       case "oak_door":
       case "iron_door":
       case "spruce_door":

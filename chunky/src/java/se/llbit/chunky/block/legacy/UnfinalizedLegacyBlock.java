@@ -4,7 +4,6 @@ import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.world.Material;
 import se.llbit.log.Log;
 import se.llbit.math.Ray;
 import se.llbit.nbt.CompoundTag;
@@ -80,13 +79,4 @@ public abstract class UnfinalizedLegacyBlock extends Block {
    * @param state Current finalization state
    */
   public abstract void finalizeBlock(FinalizationState state);
-
-  protected static boolean hasName(Material material, String... names) {
-    for (String name : names) {
-      if (material.name.equals(name)) {
-        return true;
-      }
-    }
-    return false;
-  }
 }

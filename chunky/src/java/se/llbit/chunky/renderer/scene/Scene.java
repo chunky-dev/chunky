@@ -1217,7 +1217,7 @@ public class Scene implements JsonSerializable, Refreshable {
             // Metadata is the old block data (to be replaced in future Minecraft versions?).
             Vector3 position = new Vector3(x + wx0, y, z + wz0);
             if (block.isModifiedByBlockEntity()) {
-              Tag newTag = block.getNewTagWithBlockEntity(palette.getTag(chunkData.getBlockAt(x, y, z)), entityTag);
+              Tag newTag = block.getNewTagWithBlockEntity(palette.getBlockSpec(chunkData.getBlockAt(x, y, z)).getTag(), entityTag);
               if (newTag != null) {
                 int id = palette.put(newTag);
                 block = palette.get(id);

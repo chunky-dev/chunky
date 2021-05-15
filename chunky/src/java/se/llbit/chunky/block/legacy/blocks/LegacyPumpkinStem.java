@@ -6,24 +6,24 @@ import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
 import se.llbit.nbt.CompoundTag;
 
-public class MelonStem extends UnfinalizedLegacyBlock {
+public class LegacyPumpkinStem extends UnfinalizedLegacyBlock {
 
   private static final BlockFace[] sides = new BlockFace[]{
-    BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
+      BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
   };
 
-  public MelonStem(String name, CompoundTag tag) {
+  public LegacyPumpkinStem(String name, CompoundTag tag) {
     super(name, tag);
   }
 
   @Override
   public void finalizeBlock(FinalizationState state) {
-    // melon stem points to adjacent melon
+    // pumpkin stem points to adjacent pumpkin or carved pumpkin (but not jack-o-lantern)
     for (BlockFace side : sides) {
-      if (state.getMaterial(side).name.equals("minecraft:melon")) {
+      if (state.getMaterial(side).name.endsWith("pumpkin")) {
         state.replaceCurrentBlock(
             LegacyBlocks
-                .stringTag(LegacyBlocks.createTag("attached_melon_stem"), "facing",
+                .stringTag(LegacyBlocks.createTag("attached_pumpkin_stem"), "facing",
                     side.getName()));
         return;
       }

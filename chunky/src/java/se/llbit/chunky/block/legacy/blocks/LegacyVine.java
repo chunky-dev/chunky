@@ -6,9 +6,9 @@ import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
 import se.llbit.chunky.world.Material;
 import se.llbit.nbt.CompoundTag;
 
-public class Vine extends UnfinalizedLegacyBlock {
+public class LegacyVine extends UnfinalizedLegacyBlock {
 
-  public Vine(String name, CompoundTag tag) {
+  public LegacyVine(String name, CompoundTag tag) {
     super(name, tag);
   }
 
