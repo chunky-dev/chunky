@@ -24,6 +24,9 @@ public abstract class PostProcessingFilters {
     return Optional.ofNullable(filters.get(id));
   }
 
+  // TODO Create a ChoiceBox that can use different string as ID and as visual representation
+  // so this isn't needed
+  @Deprecated
   public static Optional<PostProcessingFilter> getPostProcessingFilterFromName(String name) {
     return Optional.ofNullable(filtersByName.get(name));
   }

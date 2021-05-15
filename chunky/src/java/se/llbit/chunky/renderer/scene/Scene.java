@@ -48,7 +48,6 @@ import java.util.zip.GZIPOutputStream;
 
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
-import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.*;
 import se.llbit.chunky.chunk.BlockPalette;
@@ -65,7 +64,6 @@ import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
-import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderMode;
@@ -83,7 +81,6 @@ import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
-import se.llbit.chunky.world.EmptyChunk;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.ExtraMaterials;
 import se.llbit.chunky.world.Heightmap;
@@ -111,21 +108,11 @@ import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
-import se.llbit.pfm.PfmFileWriter;
-import se.llbit.png.ITXT;
-import se.llbit.png.PngFileWriter;
-import se.llbit.tiff.TiffFileWriter;
 import se.llbit.util.*;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.stream.IntStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Encapsulates scene and render state.
@@ -2061,7 +2048,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public void postProcessFrame(TaskTracker.Task task) {
     PostProcessingFilter filter = postProcessingFilter;
     if(mode == RenderMode.PREVIEW) {
-      filter = PreviewFilter.Instance;
+      filter = PreviewFilter.INSTANCE;
     }
     filter.processFrame(width, height, samples, backBuffer, exposure, task);
     finalized = true;
@@ -2263,9 +2250,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * @param result the resulting color values are written to this array
    */
   public void postProcessPixel(int x, int y, double[] result) {
-    PostProcessingFilter filter = postProcessingFilter;
-    if(mode == RenderMode.PREVIEW)
-      filter = PreviewFilter.Instance;
+    PostProcessingFilter filter = mode == RenderMode.PREVIEW ? PreviewFilter.INSTANCE : postProcessingFilter;
 
     filter.processPixel(width, height, samples, x, y, exposure, result);
   }
@@ -2853,7 +2838,13 @@ public class Scene implements JsonSerializable, Refreshable {
     exposure = json.get("exposure").doubleValue(exposure);
     postProcessingFilter = PostProcessingFilters
             .getPostProcessingFilterFromId(json.get("postprocess").stringValue(postProcessingFilter.getId()))
-            .orElse(PostProcessingFilters.getDefault());
+            .orElseGet(() -> {
+              if (json.get("postprocess").stringValue(null) != null) {
+                Log.warn("The post processing filter " + json +
+                        " is unknown. Maybe you're missing a plugin that was used to create this scene?");
+              }
+              return PostProcessingFilters.getDefault();
+            });
     outputMode = PictureExportFormats
       .getFormat(json.get("outputMode").stringValue(outputMode.getName()))
       .orElse(PictureExportFormats.PNG);

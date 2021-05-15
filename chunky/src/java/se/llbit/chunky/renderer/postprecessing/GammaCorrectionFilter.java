@@ -3,7 +3,7 @@ package se.llbit.chunky.renderer.postprecessing;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.Scene;
 
-public class GammaCorrectionFilter extends IndependentPostProcessingFilter {
+public class GammaCorrectionFilter extends PixelPostProcessingFilter {
   @Override
   public void processPixel(double[] pixel) {
     for(int i = 0; i < 3; ++i) {

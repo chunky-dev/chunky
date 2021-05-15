@@ -10,7 +10,7 @@ public interface PostProcessingFilter {
    * Post process the entire frame
    * @param width The width of the image
    * @param height The height of the image
-   * @param input The input linear image as double array
+   * @param input The input linear image as double array, exposure has not been applied
    * @param output The output image
    * @param exposure The exposure value
    * @param task Task

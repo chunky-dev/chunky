@@ -2,8 +2,8 @@ package se.llbit.chunky.renderer.postprecessing;
 
 import org.apache.commons.math3.util.FastMath;
 
-public class PreviewFilter extends IndependentPostProcessingFilter {
-  public static final PreviewFilter Instance = new PreviewFilter();
+public class PreviewFilter extends PixelPostProcessingFilter {
+  public static final PreviewFilter INSTANCE = new PreviewFilter();
 
   @Override
   public void processPixel(double[] pixel) {

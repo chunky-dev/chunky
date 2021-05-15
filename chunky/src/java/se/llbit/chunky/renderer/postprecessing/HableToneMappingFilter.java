@@ -1,6 +1,10 @@
 package se.llbit.chunky.renderer.postprecessing;
 
-public class HableToneMappingFilter extends IndependentPostProcessingFilter {
+/**
+ * Implementation of Hable tone mapping
+ * @link http://filmicworlds.com/blog/filmic-tonemapping-operators/
+ */
+public class HableToneMappingFilter extends PixelPostProcessingFilter {
   private static final float hA = 0.15f;
   private static final float hB = 0.50f;
   private static final float hC = 0.10f;
@@ -12,7 +16,6 @@ public class HableToneMappingFilter extends IndependentPostProcessingFilter {
   
   @Override
   public void processPixel(double[] pixel) {
-    // http://filmicworlds.com/blog/filmic-tonemapping-operators/
     // This adjusts the exposure by a factor of 16 so that the resulting exposure approximately matches the other
     // post-processing methods. Without this, the image would be very dark.
     for(int i = 0; i < 3; ++i) {
