@@ -72,6 +72,7 @@ import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
+import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
@@ -677,6 +678,21 @@ public class Scene implements JsonSerializable, Refreshable {
     state.ray.o.x -= origin.x;
     state.ray.o.y -= origin.y;
     state.ray.o.z -= origin.z;
+
+    if(camera.getProjectionMode() == ProjectionMode.PARALLEL
+      && worldOctree.isInside(state.ray.o)) {
+      int limit = (1 << worldOctree.getDepth());
+      Vector3 o = state.ray.o;
+      Vector3 d = state.ray.d;
+      double t = 0;
+      t = Math.min(t, -o.x/d.x);
+      t = Math.min(t, (limit-o.x)/d.x);
+      t = Math.min(t, -o.y/d.y);
+      t = Math.min(t, (limit-o.y)/d.y);
+      t = Math.min(t, -o.z/d.z);
+      t = Math.min(t, (limit-o.z)/d.z);
+      o.scaleAdd(t, d);
+    }
 
     rayTracer.trace(this, state);
   }
