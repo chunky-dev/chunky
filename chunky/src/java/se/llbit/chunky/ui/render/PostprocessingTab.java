@@ -69,7 +69,7 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
 
   @Override public void initialize(URL location, ResourceBundle resources) {
     postprocessingFilter.getItems().addAll(PostProcessingFilters.getFilters());
-    postprocessingFilter.getSelectionModel().select(PostProcessingFilters.getDefault());
+    postprocessingFilter.getSelectionModel().select(Scene.DEFAULT_POSTPROCESSING_FILTER);
     postprocessingFilter.getSelectionModel().selectedItemProperty().addListener(
         (observable, oldValue, newValue) -> {
           scene.setPostprocess(newValue);
@@ -84,7 +84,7 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
 
       @Override
       public PostProcessingFilter fromString(String string) {
-        return PostProcessingFilters.getPostProcessingFilterFromName(string).orElse(PostProcessingFilters.getDefault());
+        return PostProcessingFilters.getPostProcessingFilterFromName(string).orElse(PostProcessingFilters.NONE);
       }
     });
     exposure.setName("Exposure");

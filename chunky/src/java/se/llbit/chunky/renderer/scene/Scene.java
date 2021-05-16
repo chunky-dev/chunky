@@ -178,6 +178,12 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public static final double DEFAULT_FOG_DENSITY = 0.0;
 
+  /**
+   * Default post processing filter.
+   */
+  public static final PostProcessingFilter DEFAULT_POSTPROCESSING_FILTER = PostProcessingFilters
+      .getPostProcessingFilterFromId("GAMMA").orElse(PostProcessingFilters.NONE);
+
   protected final Sky sky = new Sky(this);
   protected final Camera camera = new Camera(this);
   protected final Sun sun = new Sun(this);
@@ -200,7 +206,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public int height;
 
-  public PostProcessingFilter postProcessingFilter = PostProcessingFilters.getDefault();
+  public PostProcessingFilter postProcessingFilter = DEFAULT_POSTPROCESSING_FILTER;
   public PictureExportFormat outputMode = PictureExportFormats.PNG;
   public long renderTime;
   /**
@@ -2831,7 +2837,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 Log.warn("The post processing filter " + json +
                         " is unknown. Maybe you're missing a plugin that was used to create this scene?");
               }
-              return PostProcessingFilters.getDefault();
+              return DEFAULT_POSTPROCESSING_FILTER;
             });
     outputMode = PictureExportFormats
       .getFormat(json.get("outputMode").stringValue(outputMode.getName()))
