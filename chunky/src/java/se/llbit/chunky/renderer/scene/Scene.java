@@ -2239,17 +2239,6 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Postprocess a pixel. This applies gamma correction and clamps the color value to [0,1].
-   *
-   * @param result the resulting color values are written to this array
-   */
-  public void postProcessPixel(int x, int y, double[] result) throws ClassCastException {
-    PostProcessingFilter filter = mode == RenderMode.PREVIEW ? PreviewFilter.INSTANCE : postProcessingFilter;
-
-    ((PixelPostProcessingFilter)filter).processPixel(width, height, samples, x, y, exposure, result);
-  }
-
-  /**
    * Compute the alpha channel based on sky visibility.
    */
   public void computeAlpha(int x, int y, WorkerState state) {

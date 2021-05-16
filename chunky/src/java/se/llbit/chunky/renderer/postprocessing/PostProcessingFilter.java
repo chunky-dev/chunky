@@ -4,6 +4,15 @@ import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.util.TaskTracker;
 
+/**
+ * A post processing filter.
+ * <p>
+ * These filters are used to convert the HDR sample buffer into an SDR image that can be displayed.
+ * Exposure is also applied by the filter.
+ * <p>
+ * Filters that support processing a single pixel at a time should implement {@link
+ * PixelPostProcessingFilter} instead.
+ */
 @PluginApi
 public interface PostProcessingFilter {
   /**
