@@ -4,8 +4,6 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.Scene;
 
 public class GammaCorrectionFilter extends SimplePixelPostProcessingFilter {
-  public static final String ID = "GAMMA";
-
   @Override
   public void processPixel(double[] pixel) {
     for(int i = 0; i < 3; ++i) {
@@ -20,6 +18,6 @@ public class GammaCorrectionFilter extends SimplePixelPostProcessingFilter {
 
   @Override
   public String getId() {
-    return ID;
+    return "GAMMA";
   }
 }

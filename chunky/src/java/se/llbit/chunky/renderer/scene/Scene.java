@@ -71,7 +71,6 @@ import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
-import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
