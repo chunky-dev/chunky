@@ -370,6 +370,11 @@ public class Scene implements JsonSerializable, Refreshable {
   private String octreeImplementation = PersistentSettings.getOctreeImplementation();
 
   /**
+   * Additional data that is associated with a scene, this can be used by plugins
+   */
+  private JsonObject additionalData = new JsonObject();
+
+  /**
    * Creates a scene with all default settings.
    *
    * <p>Note: this does not initialize the render buffers for the scene!
@@ -514,6 +519,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     octreeImplementation = other.octreeImplementation;
     animationTime = other.animationTime;
+
+    additionalData = other.additionalData;
   }
 
   /**
@@ -1913,6 +1920,7 @@ public class Scene implements JsonSerializable, Refreshable {
     camera.copyTransients(other.camera);
     finalizeBuffer = other.finalizeBuffer;
     animationTime = other.animationTime;
+    additionalData = other.additionalData;
   }
 
   /**
@@ -2737,6 +2745,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     json.add("animationTime", animationTime);
 
+    json.add("additionalData", additionalData);
+
     return json;
   }
 
@@ -3044,6 +3054,8 @@ public class Scene implements JsonSerializable, Refreshable {
     preventNormalEmitterWithSampling = json.get("preventNormalEmitterWithSampling").asBoolean(PersistentSettings.getPreventNormalEmitterWithSampling());
 
     animationTime = json.get("animationTime").doubleValue(animationTime);
+
+    additionalData = json.get("additionalData").object();
   }
 
   /**
@@ -3357,5 +3369,21 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public double getAnimationTime() {
     return animationTime;
+  }
+
+  /**
+   * Add additional data
+   */
+  @PluginApi
+  public void addData(String name, JsonValue value) {
+    additionalData.add(name, value);
+  }
+
+  /**
+   * Retrieve additional data
+   */
+  @PluginApi
+  public JsonValue getData(String name) {
+    return additionalData.get(name);
   }
 }
