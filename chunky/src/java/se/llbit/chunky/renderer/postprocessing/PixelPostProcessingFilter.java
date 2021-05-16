@@ -1,8 +1,11 @@
 package se.llbit.chunky.renderer.postprocessing;
 
+import se.llbit.chunky.plugin.PluginApi;
+
 /**
  * Post processing filter that support querying one pixel at a time
  */
+@PluginApi
 public interface PixelPostProcessingFilter extends PostProcessingFilter {
   /**
    * Post process a single pixel
