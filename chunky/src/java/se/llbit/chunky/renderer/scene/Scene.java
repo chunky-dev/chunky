@@ -3376,7 +3376,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Additional data is not used by chunky but can be used by plugins
    */
   @PluginApi
-  public void setData(String name, JsonValue value) {
+  public void setAdditionalData(String name, JsonValue value) {
     additionalData.add(name, value);
   }
 
@@ -3385,7 +3385,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Additional data is not used by chunky but can be used by plugins
    */
   @PluginApi
-  public JsonValue getData(String name) {
+  public JsonValue getAdditionalData(String name) {
     return additionalData.get(name);
   }
 
@@ -3394,17 +3394,17 @@ public class Scene implements JsonSerializable, Refreshable {
    * Additional data is not used by chunky but can be used by plugins
    */
   @PluginApi
-  public JsonObject getAdditionalData() {
+  public JsonObject getAllAdditionalData() {
     return additionalData;
   }
 
   /**
    * Sets the whole additional data object
    * Additional data is not used by chunky but can be used by plugins
-   * Prefer using `setData` to not remove the additional of another plugin
+   * Prefer using {@link #setAdditionalData} to not remove the additional of another plugin
    */
   @PluginApi
-  public void setAdditionalData(JsonObject additionalData) {
+  public void setAllAdditionalData(JsonObject additionalData) {
     this.additionalData = additionalData;
   }
 }
