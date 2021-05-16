@@ -71,7 +71,6 @@ import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
-import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
@@ -178,6 +177,12 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public static final double DEFAULT_FOG_DENSITY = 0.0;
 
+  /**
+   * Default post processing filter.
+   */
+  public static final PostProcessingFilter DEFAULT_POSTPROCESSING_FILTER = PostProcessingFilters
+      .getPostProcessingFilterFromId("GAMMA").orElse(PostProcessingFilters.NONE);
+
   protected final Sky sky = new Sky(this);
   protected final Camera camera = new Camera(this);
   protected final Sun sun = new Sun(this);
@@ -200,7 +205,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public int height;
 
-  public PostProcessingFilter postProcessingFilter = PostProcessingFilters.getDefault();
+  public PostProcessingFilter postProcessingFilter = DEFAULT_POSTPROCESSING_FILTER;
   public PictureExportFormat outputMode = PictureExportFormats.PNG;
   public long renderTime;
   /**
@@ -2241,17 +2246,6 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Postprocess a pixel. This applies gamma correction and clamps the color value to [0,1].
-   *
-   * @param result the resulting color values are written to this array
-   */
-  public void postProcessPixel(int x, int y, double[] result) throws ClassCastException {
-    PostProcessingFilter filter = mode == RenderMode.PREVIEW ? PreviewFilter.INSTANCE : postProcessingFilter;
-
-    ((PixelPostProcessingFilter)filter).processPixel(width, height, samples, x, y, exposure, result);
-  }
-
-  /**
    * Compute the alpha channel based on sky visibility.
    */
   public void computeAlpha(int x, int y, WorkerState state) {
@@ -2841,7 +2835,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 Log.warn("The post processing filter " + json +
                         " is unknown. Maybe you're missing a plugin that was used to create this scene?");
               }
-              return PostProcessingFilters.getDefault();
+              return DEFAULT_POSTPROCESSING_FILTER;
             });
     outputMode = PictureExportFormats
       .getFormat(json.get("outputMode").stringValue(outputMode.getName()))
