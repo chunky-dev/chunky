@@ -84,7 +84,7 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
 
       @Override
       public PostProcessingFilter fromString(String string) {
-        return PostProcessingFilters.getPostProcessingFilterFromName(string).orElse(PostProcessingFilters.NONE);
+        return PostProcessingFilters.getPostProcessingFilterFromName(string).orElse(Scene.DEFAULT_POSTPROCESSING_FILTER);
       }
     });
     exposure.setName("Exposure");
