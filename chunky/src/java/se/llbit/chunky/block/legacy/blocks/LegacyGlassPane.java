@@ -43,7 +43,7 @@ public class LegacyGlassPane extends UnfinalizedLegacyBlock {
       return adjacentStairsFacing.getOppositeFace() == direction;
     }
 
-    return block.solid || block.name.endsWith("glass_pane");
+    return block.solid || block.name.endsWith("glass_pane") || block.name.endsWith("glass");
   }
 
   private CompoundTag createTag(boolean north, boolean south, boolean east, boolean west) {

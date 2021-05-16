@@ -44,6 +44,6 @@ public class LegacyIronBars extends UnfinalizedLegacyBlock {
       return adjacentStairsFacing.getOppositeFace() == direction;
     }
 
-    return block.solid || name.equals("iron_bars");
+    return block.solid || name.equals("iron_bars") || name.endsWith("glass");
   }
 }
