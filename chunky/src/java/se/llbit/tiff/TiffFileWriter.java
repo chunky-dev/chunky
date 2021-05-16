@@ -18,7 +18,10 @@ package se.llbit.tiff;
 
 import java.io.File;
 import java.io.FileOutputStream;
+
+import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.log.Log;
 import se.llbit.util.TaskTracker;
 
 import java.io.DataOutputStream;
@@ -217,9 +220,15 @@ public class TiffFileWriter implements AutoCloseable {
    * Write an image as a 32-bit per channel TIFF file.
    */
   public void write32(Scene scene, TaskTracker.Task task) throws IOException {
+    if(!(scene.getPostProcessingFilter() instanceof PixelPostProcessingFilter)) {
+      Log.error("Can't write TIFF file because post processing filter doesn't support pixel based processing");
+      return;
+    }
+
     int width = scene.canvasWidth();
     int height = scene.canvasHeight();
     writeHeader(width, height, 4);
+
     for (int y = 0; y < height; ++y) {
       task.update(height, y);
       for (int x = 0; x < width; ++x) {
