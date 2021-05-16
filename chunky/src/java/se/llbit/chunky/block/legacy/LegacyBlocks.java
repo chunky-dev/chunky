@@ -55,7 +55,7 @@ public class LegacyBlocks {
       case 47:  return nameTag(tag, "bookshelf");
       case 48:  return nameTag(tag, "mossy_cobblestone");
       case 49:  return nameTag(tag, "obsidian");
-      case 51:  return nameTag(tag, "fire"); //TODO shape finalize
+      case 51:  return needsFinalization(nameTag(tag, "fire"), id, data);
       case 52:  return nameTag(tag, "spawner");
       case 53:  return needsFinalization(stairsTag(nameTag(tag, "oak_stairs"), data), id, data);
       case 54:  return needsFinalization(chestFurnaceLadderTag(nameTag(tag, "chest"), data), id, data);
