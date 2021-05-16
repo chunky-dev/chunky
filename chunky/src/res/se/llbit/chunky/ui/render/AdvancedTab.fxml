@@ -39,6 +39,12 @@
             <ChoiceBox fx:id="octreeImplementation" prefWidth="150.0" />
           </children>
         </HBox>
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+          <children>
+            <Label text="BVH build method:" />
+            <ChoiceBox fx:id="bvhMethod" prefWidth="150" />
+          </children>
+        </HBox>
         <IntegerAdjuster fx:id="gridSize" />
         <CheckBox fx:id="preventNormalEmitterWithSampling" mnemonicParsing="false" text="Prevent normal emitter when using emitter sampling" />
       </children>

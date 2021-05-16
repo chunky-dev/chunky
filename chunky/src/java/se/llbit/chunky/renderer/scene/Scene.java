@@ -94,7 +94,7 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
 import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
-import se.llbit.math.BVH;
+import se.llbit.math.bvh.BVH;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Grid;
 import se.llbit.math.Octree;
@@ -310,8 +310,8 @@ public class Scene implements JsonSerializable, Refreshable {
   /** Upper Y clip plane. */
   public int yClipMax = PersistentSettings.getYClipMax();
 
-  private BVH bvh = new BVH(Collections.emptyList());
-  private BVH actorBvh = new BVH(Collections.emptyList());
+  private BVH bvh = BVH.EMPTY;
+  private BVH actorBvh = BVH.EMPTY;
 
   /**
    * Preview frame interlacing counter.
@@ -364,6 +364,11 @@ public class Scene implements JsonSerializable, Refreshable {
    * The octree implementation to use
    */
   private String octreeImplementation = PersistentSettings.getOctreeImplementation();
+
+  /**
+   * The BVH implementation to use
+   */
+  private String bvhImplementation = PersistentSettings.getBvhMethod();
 
   /**
    * Additional data that is associated with a scene, this can be used by plugins
@@ -514,6 +519,8 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     octreeImplementation = other.octreeImplementation;
+    bvhImplementation = other.bvhImplementation;
+
     animationTime = other.animationTime;
 
     additionalData = other.additionalData;
@@ -1391,39 +1398,13 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   private void buildBvh(TaskTracker.Task task) {
-    double entityScaler = 500.0 / entities.size();
-    int done = 0;
-    task.update(1000, 0);
-
-    final List<Primitive> primitives = new LinkedList<>();
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    for (Entity entity : entities) {
-      primitives.addAll(entity.primitives(worldOffset));
-
-      done++;
-      task.updateInterval((int) (done * entityScaler), 1);
-    }
-
-    double primitiveScaler = 500.0 / primitives.size();
-    bvh = new BVH(primitives, i -> task.updateInterval((int) (i * primitiveScaler) + 500, 1));
+    bvh = BVH.Factory.create(bvhImplementation, entities, worldOffset, task);
   }
 
   private void buildActorBvh(TaskTracker.Task task) {
-    double entityScaler = 500.0 / entities.size();
-    int done = 0;
-    task.update(1000, 0);
-
-    final List<Primitive> actorPrimitives = new LinkedList<>();
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    for (Entity entity : actors) {
-      actorPrimitives.addAll(entity.primitives(worldOffset));
-
-      done++;
-      task.updateInterval((int) (done * entityScaler), 1);
-    }
-
-    double primitiveScaler = 500.0 / actorPrimitives.size();
-    actorBvh = new BVH(actorPrimitives, i -> task.updateInterval((int) (i * primitiveScaler) + 500, 1));
+    actorBvh = BVH.Factory.create(bvhImplementation, actors, worldOffset, task);
   }
 
   /**
@@ -2638,6 +2619,7 @@ public class Scene implements JsonSerializable, Refreshable {
       json.add("actors", actorArray);
     }
     json.add("octreeImplementation", octreeImplementation);
+    json.add("bvhImplementation", bvhImplementation);
     json.add("emitterSamplingStrategy", emitterSamplingStrategy.name());
     json.add("preventNormalEmitterWithSampling", preventNormalEmitterWithSampling);
 
@@ -2955,6 +2937,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     octreeImplementation = json.get("octreeImplementation").asString(PersistentSettings.getOctreeImplementation());
+    bvhImplementation = json.get("bvhImplementation").asString(PersistentSettings.getBvhMethod());
 
     emitterSamplingStrategy = EmitterSamplingStrategy.valueOf(json.get("emitterSamplingStrategy").asString("NONE"));
     preventNormalEmitterWithSampling = json.get("preventNormalEmitterWithSampling").asBoolean(PersistentSettings.getPreventNormalEmitterWithSampling());
@@ -3228,6 +3211,14 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void setOctreeImplementation(String octreeImplementation) {
     this.octreeImplementation = octreeImplementation;
+  }
+
+  public String getBvhImplementation() {
+    return bvhImplementation;
+  }
+
+  public void setBvhImplementation(String bvhImplementation) {
+    this.bvhImplementation = bvhImplementation;
   }
 
   @PluginApi
