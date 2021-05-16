@@ -17,9 +17,6 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import java.io.BufferedOutputStream;
@@ -689,16 +686,16 @@ public class Scene implements JsonSerializable, Refreshable {
       double t = 0;
       // simplified intersection test with the 6 planes that form the bounding box of the octree
       if(Math.abs(d.x) > Ray.EPSILON) {
-        t = min(t, -o.x / d.x);
-        t = min(t, (limit - o.x) / d.x);
+        t = Math.min(t, -o.x / d.x);
+        t = Math.min(t, (limit - o.x) / d.x);
       }
       if(Math.abs(d.y) > Ray.EPSILON) {
-        t = min(t, -o.y / d.y);
-        t = min(t, (limit - o.y) / d.y);
+        t = Math.min(t, -o.y / d.y);
+        t = Math.min(t, (limit - o.y) / d.y);
       }
       if(Math.abs(d.z) > Ray.EPSILON) {
-        t = min(t, -o.z / d.z);
-        t = min(t, (limit - o.z) / d.z);
+        t = Math.min(t, -o.z / d.z);
+        t = Math.min(t, (limit - o.z) / d.z);
       }
       // set the origin to the farthest intersection point behind
       // In theory, we only would need to set it to the closest intersection point behind
@@ -845,8 +842,8 @@ public class Scene implements JsonSerializable, Refreshable {
       yMax = yClipMax;
     } else {
       // treat as 0 - 256 world
-      yMin = max(0, yClipMin);
-      yMax = min(256, yClipMax);
+      yMin = Math.max(0, yClipMin);
+      yMax = Math.min(256, yClipMax);
     }
 
     loadedWorld = world;
@@ -930,10 +927,10 @@ public class Scene implements JsonSerializable, Refreshable {
     int zmin = Integer.MAX_VALUE;
     int zmax = Integer.MIN_VALUE;
     for (ChunkPosition cp : chunks) {
-      xmin = min(cp.x, xmin);
-      xmax = max(cp.x, xmax);
-      zmin = min(cp.z, zmin);
-      zmax = max(cp.z, zmax);
+      xmin = Math.min(cp.x, xmin);
+      xmax = Math.max(cp.x, xmax);
+      zmin = Math.min(cp.z, zmin);
+      zmax = Math.max(cp.z, zmax);
     }
     xmax += 1;
     zmax += 1;
@@ -976,7 +973,7 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   static int calculateOctreeRequiredDepth(BlockBounds bounds, int yMax, int yMin) {
-    int maxDimension = max(yMax - yMin, max(bounds.xmax - bounds.xmin, bounds.zmax - bounds.zmin));
+    int maxDimension = Math.max(yMax - yMin, Math.max(bounds.xmax - bounds.xmin, bounds.zmax - bounds.zmin));
     return QuickMath.log2(QuickMath.nextPow2(maxDimension));
   }
 
@@ -998,7 +995,7 @@ public class Scene implements JsonSerializable, Refreshable {
     int xcenter = (bounds.xmax + bounds.xmin) / 2;
     int zcenter = (bounds.zmax + bounds.zmin) / 2;
     int ycenter = (yMax + yMin) / 2;
-    for (int y = min(ycenter + 127, yMax); y >= max(ycenter - 128, yMin); --y) {
+    for (int y = Math.min(ycenter + 127, yMax); y >= Math.max(ycenter - 128, yMin); --y) {
       Material block = worldOctree.getMaterial(xcenter - origin.x, y - origin.y, zcenter - origin.z,
           palette);
       if (!(block instanceof Air)) {
@@ -1114,7 +1111,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Set the recursive ray depth limit
    */
   public synchronized void setRayDepth(int value) {
-    value = max(1, value);
+    value = Math.max(1, value);
     if (rayDepth != value) {
       rayDepth = value;
       PersistentSettings.setRayDepth(rayDepth);
@@ -1352,7 +1349,7 @@ public class Scene implements JsonSerializable, Refreshable {
    *              are disabled
    */
   public void setDumpFrequency(int value) {
-    value = max(0, value);
+    value = Math.max(0, value);
     if (value != dumpFrequency) {
       dumpFrequency = value;
     }
@@ -1407,8 +1404,8 @@ public class Scene implements JsonSerializable, Refreshable {
    * new canvas size is not identical to the current canvas size.
    */
   public synchronized void setCanvasSize(int canvasWidth, int canvasHeight) {
-    int newWidth = max(MIN_CANVAS_WIDTH, canvasWidth);
-    int newHeight = max(MIN_CANVAS_HEIGHT, canvasHeight);
+    int newWidth = Math.max(MIN_CANVAS_WIDTH, canvasWidth);
+    int newHeight = Math.max(MIN_CANVAS_HEIGHT, canvasHeight);
     if (newWidth != width || newHeight != height) {
       width = newWidth;
       height = newHeight;
@@ -2294,8 +2291,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     yClipMin = json.get("yClipMin").asInt(yClipMin);
     yClipMax = json.get("yClipMax").asInt(yClipMax);
-    yMin = json.get("yMin").asInt(max(yClipMin, yMin));
-    yMax = json.get("yMax").asInt(min(yClipMax, yMax));
+    yMin = json.get("yMin").asInt(Math.max(yClipMin, yMin));
+    yMax = json.get("yMax").asInt(Math.min(yClipMax, yMax));
 
     exposure = json.get("exposure").doubleValue(exposure);
     postProcessingFilter = PostProcessingFilters
