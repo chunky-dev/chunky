@@ -922,83 +922,24 @@ public class Scene implements JsonSerializable, Refreshable {
     Set<ChunkPosition> nonEmptyChunks = new HashSet<>();
     Heightmap biomeIdMap = new Heightmap();
 
-    ChunkData chunkData1;
-    ChunkData chunkData2;
-    if (isTallWorld) { //snapshot 21w06a, treat as -64 - 320
-      chunkData1 = new GenericChunkData(); // chunk loading will switch between these two, using one asynchronously to load the data
-      chunkData2 = new GenericChunkData(); // while the other is used to add to the octree
-    } else { //Treat as 0 - 256 world
-      chunkData1 = new SimpleChunkData();
-      chunkData2 = new SimpleChunkData();
-    }
+    ChunkReader chunkReader = new ChunkReader(
+        isTallWorld ? GenericChunkData::new : SimpleChunkData::new, world, palette, chunksToLoad,
+        Executors.newSingleThreadExecutor());
 
     try (TaskTracker.Task task = taskTracker.task("(3/6) Loading chunks")) {
-      int done = 1;
       int target = chunksToLoad.size();
 
-      boolean usingFirstChunkData = true;
+      int[] cubeWorldBlocks = new int[16 * 16 * 16];
+      int[] cubeWaterBlocks = new int[16 * 16 * 16];
 
-      ChunkPosition[] chunkPositions = chunksToLoad.toArray(new ChunkPosition[0]);
-
-      int[] cubeWorldBlocks = new int[16*16*16];
-      int[] cubeWaterBlocks = new int[16*16*16];
-
-      ExecutorService executor = Executors.newSingleThreadExecutor();
-      Future<?> nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
-        world.getChunk(chunkPositions[0]).getChunkData(chunkData1, palette);
-      });
-      for (int i = 0; i < chunkPositions.length; i++) {
-        ChunkPosition cp = chunkPositions[i];
-
-        task.updateEta(target, done);
-        done += 1;
+      chunkReader.forEach((cp, chunkData, progress) -> {
+        task.updateEta(target, progress);
 
         if (loadedChunks.contains(cp)) {
-          continue;
+          return;
         }
 
         loadedChunks.add(cp);
-
-        try {
-          nextChunkDataTask.get(50, TimeUnit.MILLISECONDS);
-        } catch(TimeoutException | InterruptedException logged) { // If except, load the chunk synchronously
-          if (logged instanceof TimeoutException) {
-            Log.info("Chunk loading timed out.");
-          } else {
-            Log.warn("Chunky loading interrupted.", logged);
-          }
-
-          if(usingFirstChunkData) {
-            world.getChunk(chunkPositions[i]).getChunkData(chunkData1, palette);
-          }
-          else {
-            world.getChunk(chunkPositions[i]).getChunkData(chunkData2, palette);
-          }
-        } catch(ExecutionException e) {
-          throw new RuntimeException(e.getCause());
-        }
-
-        ChunkData chunkData; //the chunk data to be used for THIS iteration
-        {
-          ChunkData nextChunkData; //the chunk data to be used for the next iteration
-          if (usingFirstChunkData) {
-            chunkData = chunkData1;
-            nextChunkData = chunkData2;
-          } else {
-            chunkData = chunkData2;
-            nextChunkData = chunkData1;
-          }
-          usingFirstChunkData = !usingFirstChunkData;
-
-          if (i + 1 < chunkPositions.length) { //if has next request next
-            final int finalI = i;
-            nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
-              world.getChunk(chunkPositions[finalI + 1]).getChunkData(nextChunkData, palette);
-            });
-          }
-        }
-
-        numChunks += 1;
 
         int wx0 = cp.x * 16; // Start of this chunk in world coordinates.
         int wz0 = cp.z * 16;
@@ -1299,8 +1240,7 @@ public class Scene implements JsonSerializable, Refreshable {
         if (!chunkData.isEmpty()){
           nonEmptyChunks.add(cp);
         }
-      }
-      executor.shutdown();
+      });
     }
 
     palette.unsynchronize();
