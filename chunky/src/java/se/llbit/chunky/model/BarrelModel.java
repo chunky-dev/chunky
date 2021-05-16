@@ -39,6 +39,7 @@ public class BarrelModel extends QuadModel {
     textures = new Texture[] {Texture.barrelSide, Texture.barrelSide, Texture.barrelSide, Texture.barrelSide,
         open.equals("true") ? Texture.barrelOpen : Texture.barrelTop, Texture.barrelBottom};
     switch (facing) {
+      default:
       case "up":
         quads = Model.rotateY(sides, Math.toRadians(180));
         break;
@@ -57,8 +58,6 @@ public class BarrelModel extends QuadModel {
       case "west":
         quads = Model.rotateY(Model.rotateX(sides));
         break;
-      default:
-        throw new IllegalArgumentException(("Invalid facing: " + facing));
     }
   }
 
