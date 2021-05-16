@@ -17,11 +17,17 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,29 +35,29 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
-import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.block.*;
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.Lava;
+import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.chunk.SimpleChunkData;
 import se.llbit.chunky.entity.ArmorStand;
@@ -63,17 +69,17 @@ import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
-import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
-import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
+import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
@@ -94,8 +100,6 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
 import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
-import se.llbit.math.bvh.BVH;
-import se.llbit.math.ColorUtil;
 import se.llbit.math.Grid;
 import se.llbit.math.Octree;
 import se.llbit.math.PackedOctree;
@@ -103,15 +107,16 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
-import se.llbit.math.primitive.Primitive;
+import se.llbit.math.bvh.BVH;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
-import se.llbit.util.*;
-
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.*;
+import se.llbit.util.JsonSerializable;
+import se.llbit.util.MCDownloader;
+import se.llbit.util.NotNull;
+import se.llbit.util.PositionalInputStream;
+import se.llbit.util.TaskTracker;
+import se.llbit.util.ZipExport;
 
 /**
  * Encapsulates scene and render state.
@@ -699,16 +704,16 @@ public class Scene implements JsonSerializable, Refreshable {
       double t = 0;
       // simplified intersection test with the 6 planes that form the bounding box of the octree
       if(Math.abs(d.x) > Ray.EPSILON) {
-        t = Math.min(t, -o.x / d.x);
-        t = Math.min(t, (limit - o.x) / d.x);
+        t = min(t, -o.x / d.x);
+        t = min(t, (limit - o.x) / d.x);
       }
       if(Math.abs(d.y) > Ray.EPSILON) {
-        t = Math.min(t, -o.y / d.y);
-        t = Math.min(t, (limit - o.y) / d.y);
+        t = min(t, -o.y / d.y);
+        t = min(t, (limit - o.y) / d.y);
       }
       if(Math.abs(d.z) > Ray.EPSILON) {
-        t = Math.min(t, -o.z / d.z);
-        t = Math.min(t, (limit - o.z) / d.z);
+        t = min(t, -o.z / d.z);
+        t = min(t, (limit - o.z) / d.z);
       }
       // set the origin to the farthest intersection point behind
       // In theory, we only would need to set it to the closest intersection point behind
@@ -854,8 +859,8 @@ public class Scene implements JsonSerializable, Refreshable {
       yMax = yClipMax;
     } else {
       // treat as 0 - 256 world
-      yMin = Math.max(0, yClipMin);
-      yMax = Math.min(256, yClipMax);
+      yMin = max(0, yClipMin);
+      yMax = min(256, yClipMax);
     }
 
     Set<ChunkPosition> loadedChunks = new HashSet<>();
@@ -1098,10 +1103,10 @@ public class Scene implements JsonSerializable, Refreshable {
                           level = Chunk.waterLevelAt(chunkData, palette, cx - 1, y, cz - 1, level0);
                           corner3 += level;
 
-                          corner0 = Math.min(7, 8 - (corner0 / 4));
-                          corner1 = Math.min(7, 8 - (corner1 / 4));
-                          corner2 = Math.min(7, 8 - (corner2 / 4));
-                          corner3 = Math.min(7, 8 - (corner3 / 4));
+                          corner0 = min(7, 8 - (corner0 / 4));
+                          corner1 = min(7, 8 - (corner1 / 4));
+                          corner2 = min(7, 8 - (corner2 / 4));
+                          corner3 = min(7, 8 - (corner3 / 4));
                           waterNode = palette.getWaterId(((Water) block).level, (corner0 << Water.CORNER_0)
                                           | (corner1 << Water.CORNER_1)
                                           | (corner2 << Water.CORNER_2)
@@ -1153,10 +1158,10 @@ public class Scene implements JsonSerializable, Refreshable {
                       level = Chunk.lavaLevelAt(chunkData, palette, cx - 1, y, cz - 1, level0);
                       corner3 += level;
 
-                      corner0 = Math.min(7, 8 - (corner0 / 4));
-                      corner1 = Math.min(7, 8 - (corner1 / 4));
-                      corner2 = Math.min(7, 8 - (corner2 / 4));
-                      corner3 = Math.min(7, 8 - (corner3 / 4));
+                      corner0 = min(7, 8 - (corner0 / 4));
+                      corner1 = min(7, 8 - (corner1 / 4));
+                      corner2 = min(7, 8 - (corner2 / 4));
+                      corner3 = min(7, 8 - (corner3 / 4));
                       octNode = palette.getLavaId(
                               lava.level,
                               (corner0 << Water.CORNER_0)
@@ -1364,26 +1369,20 @@ public class Scene implements JsonSerializable, Refreshable {
     refresh();
   }
 
-  private int calculateOctreeOrigin(Collection<ChunkPosition> chunksToLoad, boolean centerOctree) {
+  /**
+   * Find the bounds in blocks for a collection of chunks.
+   */
+  private static BlockBounds calculateBounds(Collection<ChunkPosition> chunks) {
     int xmin = Integer.MAX_VALUE;
     int xmax = Integer.MIN_VALUE;
     int zmin = Integer.MAX_VALUE;
     int zmax = Integer.MIN_VALUE;
-    for (ChunkPosition cp : chunksToLoad) {
-      if (cp.x < xmin) {
-        xmin = cp.x;
-      }
-      if (cp.x > xmax) {
-        xmax = cp.x;
-      }
-      if (cp.z < zmin) {
-        zmin = cp.z;
-      }
-      if (cp.z > zmax) {
-        zmax = cp.z;
-      }
+    for (ChunkPosition cp : chunks) {
+      xmin = min(cp.x, xmin);
+      xmax = max(cp.x, xmax);
+      zmin = min(cp.z, zmin);
+      zmax = max(cp.z, zmax);
     }
-
     xmax += 1;
     zmax += 1;
     xmin *= 16;
@@ -1391,18 +1390,38 @@ public class Scene implements JsonSerializable, Refreshable {
     zmin *= 16;
     zmax *= 16;
 
-    int maxDimension = Math.max(yMax - yMin, Math.max(xmax - xmin, zmax - zmin));
+    return new BlockBounds(xmin, xmax, zmin, zmax);
+  }
+
+  private static class BlockBounds {
+    private final int xmin;
+    private final int xmax;
+    private final int zmin;
+    private final int zmax;
+
+    private BlockBounds(int xmin, int xmax, int zmin, int zmax) {
+      this.xmin = xmin;
+      this.xmax = xmax;
+      this.zmin = zmin;
+      this.zmax = zmax;
+    }
+  }
+
+  private int calculateOctreeOrigin(Collection<ChunkPosition> chunksToLoad, boolean centerOctree) {
+    BlockBounds bounds = calculateBounds(chunksToLoad);
+
+    int maxDimension = max(yMax - yMin, max(bounds.xmax - bounds.xmin, bounds.zmax - bounds.zmin));
     int requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
 
-    if(centerOctree) {
-      int xroom = (1 << requiredDepth) - (xmax - xmin);
+    if (centerOctree) {
+      int xroom = (1 << requiredDepth) - (bounds.xmax - bounds.xmin);
       int yroom = (1 << requiredDepth) - (yMax - yMin);
-      int zroom = (1 << requiredDepth) - (zmax - zmin);
+      int zroom = (1 << requiredDepth) - (bounds.zmax - bounds.zmin);
 
-      origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
+      origin.set(bounds.xmin - xroom / 2, -yroom / 2, bounds.zmin - zroom / 2);
     } else {
       // Note: Math.floorDiv rather than integer division for round toward -infinity
-      origin.set(xmin, Math.floorDiv(yMin, 16) * 16, zmin);
+      origin.set(bounds.xmin, Math.floorDiv(yMin, 16) * 16, bounds.zmin);
     }
     return requiredDepth;
   }
@@ -1420,38 +1439,12 @@ public class Scene implements JsonSerializable, Refreshable {
    * @return The calculated camera position
    */
   public Vector3 calcCenterCamera() {
-    if (chunks.isEmpty()) {
-      return new Vector3(0, 128, 0);
-    }
+    BlockBounds bounds = calculateBounds(chunks);
 
-    int xmin = Integer.MAX_VALUE;
-    int xmax = Integer.MIN_VALUE;
-    int zmin = Integer.MAX_VALUE;
-    int zmax = Integer.MIN_VALUE;
-    for (ChunkPosition cp : chunks) {
-      if (cp.x < xmin) {
-        xmin = cp.x;
-      }
-      if (cp.x > xmax) {
-        xmax = cp.x;
-      }
-      if (cp.z < zmin) {
-        zmin = cp.z;
-      }
-      if (cp.z > zmax) {
-        zmax = cp.z;
-      }
-    }
-    xmax += 1;
-    zmax += 1;
-    xmin *= 16;
-    xmax *= 16;
-    zmin *= 16;
-    zmax *= 16;
-    int xcenter = (xmax + xmin) / 2;
-    int zcenter = (zmax + zmin) / 2;
+    int xcenter = (bounds.xmax + bounds.xmin) / 2;
+    int zcenter = (bounds.zmax + bounds.zmin) / 2;
     int ycenter = (yMax + yMin) / 2;
-    for (int y = Math.min(ycenter+127, yMax); y >= Math.max(ycenter-128, yMin); --y) {
+    for (int y = min(ycenter + 127, yMax); y >= max(ycenter - 128, yMin); --y) {
       Material block = worldOctree.getMaterial(xcenter - origin.x, y - origin.y, zcenter - origin.z,
           palette);
       if (!(block instanceof Air)) {
@@ -1567,7 +1560,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Set the recursive ray depth limit
    */
   public synchronized void setRayDepth(int value) {
-    value = Math.max(1, value);
+    value = max(1, value);
     if (rayDepth != value) {
       rayDepth = value;
       PersistentSettings.setRayDepth(rayDepth);
@@ -1805,7 +1798,7 @@ public class Scene implements JsonSerializable, Refreshable {
    *              are disabled
    */
   public void setDumpFrequency(int value) {
-    value = Math.max(0, value);
+    value = max(0, value);
     if (value != dumpFrequency) {
       dumpFrequency = value;
     }
@@ -1860,8 +1853,8 @@ public class Scene implements JsonSerializable, Refreshable {
    * new canvas size is not identical to the current canvas size.
    */
   public synchronized void setCanvasSize(int canvasWidth, int canvasHeight) {
-    int newWidth = Math.max(MIN_CANVAS_WIDTH, canvasWidth);
-    int newHeight = Math.max(MIN_CANVAS_HEIGHT, canvasHeight);
+    int newWidth = max(MIN_CANVAS_WIDTH, canvasWidth);
+    int newHeight = max(MIN_CANVAS_HEIGHT, canvasHeight);
     if (newWidth != width || newHeight != height) {
       width = newWidth;
       height = newHeight;
@@ -2746,8 +2739,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     yClipMin = json.get("yClipMin").asInt(yClipMin);
     yClipMax = json.get("yClipMax").asInt(yClipMax);
-    yMin = json.get("yMin").asInt(Math.max(yClipMin, yMin));
-    yMax = json.get("yMax").asInt(Math.min(yClipMax, yMax));
+    yMin = json.get("yMin").asInt(max(yClipMin, yMin));
+    yMax = json.get("yMax").asInt(min(yClipMax, yMax));
 
     exposure = json.get("exposure").doubleValue(exposure);
     postProcessingFilter = PostProcessingFilters
