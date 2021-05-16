@@ -298,7 +298,7 @@ public class LegacyBlocks {
       case 5:
         switch (data) {
           default:
-          case 0: return nameTag(tag, "oak_wood");
+          case 0: return nameTag(tag, "oak_planks");
           case 1: return nameTag(tag, "spruce_planks");
           case 2: return nameTag(tag, "birch_planks");
           case 3: return nameTag(tag, "jungle_planks");
