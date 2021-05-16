@@ -330,7 +330,7 @@ public class LegacyBlocks {
           case 3: return logTag(nameTag(tag, "jungle_log"), data);
         }
       case 18:
-        switch (data) {
+        switch (data & 0b11) {
           default:
           case 0: return nameTag(tag, "oak_leaves");
           case 1: return nameTag(tag, "spruce_leaves");
@@ -586,7 +586,7 @@ public class LegacyBlocks {
           case 15: return needsFinalization(nameTag(tag, "black_stained_glass_pane"), id, data);
         }
       case 161:
-        switch (data) {
+        switch (data & 0b1) {
           default:
           case 0: return nameTag(tag, "acacia_leaves");
           case 1: return nameTag(tag, "dark_oak_leaves");
