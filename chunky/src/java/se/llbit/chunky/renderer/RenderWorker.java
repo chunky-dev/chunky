@@ -138,10 +138,6 @@ public class RenderWorker extends Thread {
           samples[offset + 1] = (samples[offset + 1] * scene.spp + sg) * sinv;
           samples[offset + 2] = (samples[offset + 2] * scene.spp + sb) * sinv;
 
-          if (scene.shouldFinalizeBuffer()) {
-            scene.finalizePixel(x, y);
-          }
-
           offset += 3;
         }
       }
@@ -164,7 +160,6 @@ public class RenderWorker extends Thread {
             }
           } else {
             if (((x + y) % 2) != 0) {
-              scene.finalizePixel(x, y);
               continue;
             }
           }
@@ -175,7 +170,6 @@ public class RenderWorker extends Thread {
             samples[(y * width + x) * 3 + 0] = 0xFF;
             samples[(y * width + x) * 3 + 1] = 0xFF;
             samples[(y * width + x) * 3 + 2] = 0xFF;
-            scene.finalizePixel(x, y);
             continue;
           }
 
@@ -198,8 +192,6 @@ public class RenderWorker extends Thread {
           samples[(y * width + x) * 3 + 0] = ray.color.x;
           samples[(y * width + x) * 3 + 1] = ray.color.y;
           samples[(y * width + x) * 3 + 2] = ray.color.z;
-
-          scene.finalizePixel(x, y);
 
           if (firstFrame) {
             if (y % 2 == 0 && x < (width - 1)) {

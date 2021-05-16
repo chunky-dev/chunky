@@ -22,8 +22,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ScrollPane;
-import se.llbit.chunky.renderer.Postprocess;
-import se.llbit.chunky.renderer.RenderMode;
+import javafx.util.StringConverter;
+import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
+import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
@@ -39,7 +40,7 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
   private RenderControlsFxController controller;
 
   @FXML private DoubleAdjuster exposure;
-  @FXML private ChoiceBox<Postprocess> postprocessingMode;
+  @FXML private ChoiceBox<PostProcessingFilter> postprocessingFilter;
 
   public PostprocessingTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("PostprocessingTab.fxml"));
@@ -54,7 +55,7 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
   }
 
   @Override public void update(Scene scene) {
-    postprocessingMode.getSelectionModel().select(scene.getPostprocess());
+    postprocessingFilter.getSelectionModel().select(scene.getPostProcessingFilter());
     exposure.set(scene.getExposure());
   }
 
@@ -67,14 +68,25 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
-    postprocessingMode.getItems().addAll(Postprocess.values());
-    postprocessingMode.getSelectionModel().select(Postprocess.DEFAULT);
-    postprocessingMode.getSelectionModel().selectedItemProperty().addListener(
+    postprocessingFilter.getItems().addAll(PostProcessingFilters.getFilters());
+    postprocessingFilter.getSelectionModel().select(Scene.DEFAULT_POSTPROCESSING_FILTER);
+    postprocessingFilter.getSelectionModel().selectedItemProperty().addListener(
         (observable, oldValue, newValue) -> {
           scene.setPostprocess(newValue);
           scene.postProcessFrame(new TaskTracker(ProgressListener.NONE));
           controller.getCanvas().forceRepaint();
         });
+    postprocessingFilter.setConverter(new StringConverter<PostProcessingFilter>() {
+      @Override
+      public String toString(PostProcessingFilter object) {
+        return object.getName();
+      }
+
+      @Override
+      public PostProcessingFilter fromString(String string) {
+        return PostProcessingFilters.getPostProcessingFilterFromName(string).orElse(Scene.DEFAULT_POSTPROCESSING_FILTER);
+      }
+    });
     exposure.setName("Exposure");
     exposure.setRange(Scene.MIN_EXPOSURE, Scene.MAX_EXPOSURE);
     exposure.makeLogarithmic();

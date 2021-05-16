@@ -33,13 +33,13 @@ public class RedstoneWire extends MinecraftBlock {
     }
     if (!north.equals("none")) {
       state |= 1 << BlockData.RSW_NORTH_CONNECTION;
-      if (south.equals("up")) {
+      if (north.equals("up")) {
         state |= 1 << BlockData.RSW_NORTH_UP;
       }
     }
     if (!south.equals("none")) {
       state |= 1 << BlockData.RSW_SOUTH_CONNECTION;
-      if (north.equals("up")) {
+      if (south.equals("up")) {
         state |= 1 << BlockData.RSW_SOUTH_UP;
       }
     }
