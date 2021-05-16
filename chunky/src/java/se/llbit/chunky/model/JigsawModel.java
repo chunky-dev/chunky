@@ -43,8 +43,17 @@ public class JigsawModel extends QuadModel {
 
   static final Quad[][] orientedQuads = new Quad[12][];
 
-  private final static Texture[] textures = {
+  private final static Texture[] texturesLock = {
       Texture.jigsawLock,
+      Texture.jigsawSide,
+      Texture.jigsawSide,
+      Texture.jigsawSide,
+      Texture.jigsawTop,
+      Texture.jigsawBottom
+  };
+
+  private final static Texture[] textureNoLock = {
+      Texture.jigsawSide,
       Texture.jigsawSide,
       Texture.jigsawSide,
       Texture.jigsawSide,
@@ -68,8 +77,38 @@ public class JigsawModel extends QuadModel {
   }
 
   private final Quad[] quads;
+  private final Texture[] textures;
 
   public JigsawModel(String orientation) {
+    switch (orientation) {
+      case "up":
+        textures = textureNoLock;
+        orientation = "up_north";
+        break;
+      case "down":
+        textures = textureNoLock;
+        orientation = "down_north";
+        break;
+      case "north":
+        textures = texturesLock;
+        orientation = "north_up";
+        break;
+      case "south":
+        textures = texturesLock;
+        orientation = "south_up";
+        break;
+      case "east":
+        textures = texturesLock;
+        orientation = "east_up";
+        break;
+      case "west":
+        textures = texturesLock;
+        orientation = "west_up";
+        break;
+      default:
+        textures = texturesLock;
+        break;
+    }
     quads = orientedQuads[getOrientationIndex(orientation)];
   }
 

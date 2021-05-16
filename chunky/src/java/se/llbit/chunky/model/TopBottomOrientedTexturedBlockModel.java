@@ -5,7 +5,7 @@ import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class OrientedTexturedBlockModel extends QuadModel {
+public class TopBottomOrientedTexturedBlockModel extends QuadModel {
   private static final Quad[] side = {
       // north
       new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 0),
@@ -25,7 +25,7 @@ public class OrientedTexturedBlockModel extends QuadModel {
 
       // top
       new Quad(new Vector3(1, 1, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 1),
-          new Vector4(0, 1, 0, 1)),
+          new Vector4(1, 0, 1, 0)),
 
       // bottom
       new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
@@ -35,15 +35,9 @@ public class OrientedTexturedBlockModel extends QuadModel {
   private final Quad[] quads;
   private final Texture[] textures;
 
-  public OrientedTexturedBlockModel(String facing, Texture north, Texture east, Texture south,
-                                    Texture west, Texture top, Texture bottom) {
+  public TopBottomOrientedTexturedBlockModel(String facing, Texture north, Texture east, Texture south,
+                                             Texture west, Texture top, Texture bottom) {
     switch (facing) {
-      case "up":
-        quads = Model.rotateX(side);
-        break;
-      case "down":
-        quads = Model.rotateNegX(side);
-        break;
       case "north":
         quads = side;
         break;
@@ -59,6 +53,7 @@ public class OrientedTexturedBlockModel extends QuadModel {
       default:
         throw new IllegalArgumentException(("Invalid facing: " + facing));
     }
+
     textures = new Texture[] {
         north, south, west, east, top, bottom
     };
