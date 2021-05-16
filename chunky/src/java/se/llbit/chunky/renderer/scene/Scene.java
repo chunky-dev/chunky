@@ -2292,7 +2292,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Copies a pixel in-buffer.
    */
   public void copyPixel(int jobId, int offset) {
-    backBuffer.data[jobId + offset] = backBuffer.data[jobId];
+    System.arraycopy(samples, jobId * 3, samples, (jobId + offset) * 3, 3);
   }
 
   /**
