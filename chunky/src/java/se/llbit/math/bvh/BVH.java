@@ -80,7 +80,7 @@ public interface BVH extends Intersectable {
     @PluginApi
     public static void addBVHBuilder(BVHBuilder builder) {
       if (implementations.containsKey(builder.getName()))
-        Log.warn("Attempted to register 2+ BVH builders with the same name (do you have the same plugin installed twice?)");
+        Log.warn("Attempted to register 2+ BVH builders with the name " + builder.getName() + " (do you have the same plugin installed twice?)");
       implementations.put(builder.getName(), builder);
     }
 
