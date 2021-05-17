@@ -74,7 +74,7 @@ public class ChunkLoader {
   private final int yMax;
   private final int yClipMin;
   private final int yClipMax;
-  private EmitterSamplingStrategy emitterSamplingStrategy;
+  private final EmitterSamplingStrategy emitterSamplingStrategy;
   private final int gridSize;
 
   public ChunkLoader(String octreeImplementation, int yMin, int yMax, int yClipMin, int yClipMax,
