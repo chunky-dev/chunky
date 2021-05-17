@@ -131,7 +131,7 @@ public class ChunkReader {
 
     @Override
     public int maxY() {
-      return 0;
+      return chunkData.maxY();
     }
 
     @Override
@@ -158,7 +158,6 @@ public class ChunkReader {
     public byte getBiomeAt(int x, int y, int z) {
       return chunkData.getBiomeAt(x, y, z);
     }
-
 
     @Override
     public boolean isEmpty() {
@@ -189,6 +188,5 @@ public class ChunkReader {
     public void clear() {
       throw new UnsupportedOperationException("ChunkData is Read Only.");
     }
-
   }
 }
