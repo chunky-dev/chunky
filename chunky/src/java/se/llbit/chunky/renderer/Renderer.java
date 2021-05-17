@@ -64,4 +64,13 @@ public interface Renderer {
    * This is for {@code Renderer}s which need to export the scene data in some way.
    */
   default void sceneReset(DefaultRenderManager manager, ResetReason reason) {}
+
+  /**
+   * This should return if this renderer will postprocess on its own.
+   * {@code true}:  This renderer will <bold>NOT</bold> postprocessing on its own. Postprocessing will be handled by the
+   *                {@code RenderManager}.
+   * {@code false}: This renderer <bold>WILL</bold> postprocessing on its own. The {@code RenderManager} will only force
+   *                postprocessing on snapshots.
+   */
+  default boolean autoPostProcess() { return true; }
 }

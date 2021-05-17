@@ -189,7 +189,8 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         listener.setSpp(0);
       });
 
-      this.finalizeFrame(true);
+      if (getRenderer().autoPostProcess())
+        this.finalizeFrame(true);
 
       return !finalizeAllFrames || sceneProvider.pollSceneStateChange();
     };
@@ -205,10 +206,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
       synchronized (bufferedScene) {
         bufferedScene.renderTime = System.currentTimeMillis() - renderStart;
 
-        if (snapshotControl.saveSnapshot(bufferedScene, bufferedScene.spp))
-          bufferedScene.postProcessFrame(renderTask);
-        else
-          this.finalizeFrame(false);
+        this.finalizeFrame(getRenderer().autoPostProcess() && finalizeAllFrames);
 
         frameCompletionListener.accept(bufferedScene, bufferedScene.spp);
         updateRenderProgress();
@@ -478,7 +476,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
    * Finalize the frame if necessary. This uses the internal {@code RenderWorkerPool}.
    */
   public void finalizeFrame(boolean force) {
-    if (force || finalizeAllFrames || snapshotControl.saveSnapshot(bufferedScene, bufferedScene.spp)) {
+    if (force || snapshotControl.saveSnapshot(bufferedScene, bufferedScene.spp)) {
       // Split up to 10 tasks per thread
       int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.threads * 10 - 1);
 
