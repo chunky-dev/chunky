@@ -17,16 +17,19 @@
  */
 package se.llbit.math;
 
-import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
-import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.math3.util.FastMath;
-
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Water;
@@ -35,6 +38,7 @@ import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Material;
 import se.llbit.log.Log;
 
@@ -53,7 +57,7 @@ import se.llbit.log.Log;
  */
 public class Octree {
 
-  public interface OctreeImplementation {
+    public interface OctreeImplementation {
     void set(int type, int x, int y, int z);
     @Deprecated
     void set(Node data, int x, int y, int z);
@@ -900,5 +904,81 @@ public class Octree {
 
   public static Iterable<Map.Entry<String, ImplementationFactory>> getEntries() {
     return factories.entrySet();
+  }
+
+  /**
+   * Find the bounds in blocks for a collection of chunks.
+   */
+  public static BlockBounds calculateBounds(Collection<ChunkPosition> chunks) {
+    int xmin = Integer.MAX_VALUE;
+    int xmax = Integer.MIN_VALUE;
+    int zmin = Integer.MAX_VALUE;
+    int zmax = Integer.MIN_VALUE;
+    for (ChunkPosition cp : chunks) {
+      xmin = Math.min(cp.x, xmin);
+      xmax = Math.max(cp.x, xmax);
+      zmin = Math.min(cp.z, zmin);
+      zmax = Math.max(cp.z, zmax);
+    }
+    xmax += 1;
+    zmax += 1;
+    xmin *= 16;
+    xmax *= 16;
+    zmin *= 16;
+    zmax *= 16;
+
+    return new BlockBounds(xmin, xmax, zmin, zmax);
+  }
+
+  public static Vector3i calculateOctreeOrigin(int yMax, int yMin, BlockBounds bounds,
+      boolean centerOctree) {
+    int requiredDepth = calculateOctreeRequiredDepth(bounds, yMax, yMin);
+
+    if (centerOctree) {
+      int xroom = (1 << requiredDepth) - (bounds.getXmax() - bounds.getXmin());
+      int yroom = (1 << requiredDepth) - (yMax - yMin);
+      int zroom = (1 << requiredDepth) - (bounds.getZmax() - bounds.getZmin());
+
+      return new Vector3i(bounds.getXmin() - xroom / 2, -yroom / 2, bounds.getZmin() - zroom / 2);
+    } else {
+      // Note: Math.floorDiv rather than integer division for round toward -infinity
+      return new Vector3i(bounds.getXmin(), Math.floorDiv(yMin, 16) * 16, bounds.getZmin());
+    }
+  }
+
+  public static int calculateOctreeRequiredDepth(BlockBounds bounds, int yMax, int yMin) {
+    int maxDimension = Math.max(yMax - yMin, Math.max(
+        bounds.getXmax() - bounds.getXmin(), bounds.getZmax() - bounds.getZmin()));
+    return QuickMath.log2(QuickMath.nextPow2(maxDimension));
+  }
+
+  public static class BlockBounds {
+    private final int xmin;
+    private final int xmax;
+    private final int zmin;
+    private final int zmax;
+
+    private BlockBounds(int xmin, int xmax, int zmin, int zmax) {
+      this.xmin = xmin;
+      this.xmax = xmax;
+      this.zmin = zmin;
+      this.zmax = zmax;
+    }
+
+    public int getXmin() {
+      return xmin;
+    }
+
+    public int getXmax() {
+      return xmax;
+    }
+
+    public int getZmin() {
+      return zmin;
+    }
+
+    public int getZmax() {
+      return zmax;
+    }
   }
 }

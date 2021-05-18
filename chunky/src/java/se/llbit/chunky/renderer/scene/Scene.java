@@ -87,6 +87,7 @@ import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
 import se.llbit.math.Grid;
 import se.llbit.math.Octree;
+import se.llbit.math.Octree.BlockBounds;
 import se.llbit.math.PackedOctree;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -919,65 +920,6 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Find the bounds in blocks for a collection of chunks.
-   */
-  static BlockBounds calculateBounds(Collection<ChunkPosition> chunks) {
-    int xmin = Integer.MAX_VALUE;
-    int xmax = Integer.MIN_VALUE;
-    int zmin = Integer.MAX_VALUE;
-    int zmax = Integer.MIN_VALUE;
-    for (ChunkPosition cp : chunks) {
-      xmin = Math.min(cp.x, xmin);
-      xmax = Math.max(cp.x, xmax);
-      zmin = Math.min(cp.z, zmin);
-      zmax = Math.max(cp.z, zmax);
-    }
-    xmax += 1;
-    zmax += 1;
-    xmin *= 16;
-    xmax *= 16;
-    zmin *= 16;
-    zmax *= 16;
-
-    return new BlockBounds(xmin, xmax, zmin, zmax);
-  }
-
-  static class BlockBounds {
-    final int xmin;
-    final int xmax;
-    final int zmin;
-    final int zmax;
-
-    private BlockBounds(int xmin, int xmax, int zmin, int zmax) {
-      this.xmin = xmin;
-      this.xmax = xmax;
-      this.zmin = zmin;
-      this.zmax = zmax;
-    }
-  }
-
-  static Vector3i calculateOctreeOrigin(int yMax, int yMin, BlockBounds bounds,
-      boolean centerOctree) {
-    int requiredDepth = calculateOctreeRequiredDepth(bounds, yMax, yMin);
-
-    if (centerOctree) {
-      int xroom = (1 << requiredDepth) - (bounds.xmax - bounds.xmin);
-      int yroom = (1 << requiredDepth) - (yMax - yMin);
-      int zroom = (1 << requiredDepth) - (bounds.zmax - bounds.zmin);
-
-      return new Vector3i(bounds.xmin - xroom / 2, -yroom / 2, bounds.zmin - zroom / 2);
-    } else {
-      // Note: Math.floorDiv rather than integer division for round toward -infinity
-      return new Vector3i(bounds.xmin, Math.floorDiv(yMin, 16) * 16, bounds.zmin);
-    }
-  }
-
-  static int calculateOctreeRequiredDepth(BlockBounds bounds, int yMax, int yMin) {
-    int maxDimension = Math.max(yMax - yMin, Math.max(bounds.xmax - bounds.xmin, bounds.zmax - bounds.zmin));
-    return QuickMath.log2(QuickMath.nextPow2(maxDimension));
-  }
-
-  /**
    * @return <code>true</code> if the scene has loaded chunks
    */
   public synchronized boolean haveLoadedChunks() {
@@ -990,10 +932,10 @@ public class Scene implements JsonSerializable, Refreshable {
    * @return The calculated camera position
    */
   public Vector3 calcCenterCamera() {
-    BlockBounds bounds = calculateBounds(chunks);
+    BlockBounds bounds = Octree.calculateBounds(chunks);
 
-    int xcenter = (bounds.xmax + bounds.xmin) / 2;
-    int zcenter = (bounds.zmax + bounds.zmin) / 2;
+    int xcenter = (bounds.getXmax() + bounds.getXmin()) / 2;
+    int zcenter = (bounds.getZmax() + bounds.getZmin()) / 2;
     int ycenter = (yMax + yMin) / 2;
     for (int y = Math.min(ycenter + 127, yMax); y >= Math.max(ycenter - 128, yMin); --y) {
       Material block = worldOctree.getMaterial(xcenter - origin.x, y - origin.y, zcenter - origin.z,
@@ -1652,7 +1594,8 @@ public class Scene implements JsonSerializable, Refreshable {
         palette.applyMaterials();
         Log.info("Octree loaded");
 
-        origin = calculateOctreeOrigin(yMax, yMin, calculateBounds(chunks), data.version < 6);
+        origin = Octree
+            .calculateOctreeOrigin(yMax, yMin, Octree.calculateBounds(chunks), data.version < 6);
         camera.setWorldSize(1 << worldOctree.getDepth());
 
         try (TaskTracker.Task bvhTask = taskTracker.task("(2/3) Building world BVH")) {

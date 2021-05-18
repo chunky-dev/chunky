@@ -42,7 +42,6 @@ import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
-import se.llbit.chunky.renderer.scene.Scene.BlockBounds;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
@@ -54,6 +53,7 @@ import se.llbit.log.Log;
 import se.llbit.math.Grid;
 import se.llbit.math.Grid.EmitterPosition;
 import se.llbit.math.Octree;
+import se.llbit.math.Octree.BlockBounds;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
@@ -134,16 +134,15 @@ public class ChunkLoader {
    */
   public ChunkLoadResult loadChunks(World world, Collection<ChunkPosition> chunksToLoad,
       TaskTracker taskTracker, boolean loadActors) {
-    BlockBounds bounds = Scene.calculateBounds(chunksToLoad);
-    int requiredDepth = Scene.calculateOctreeRequiredDepth(bounds, yMax, yMin);
+    BlockBounds bounds = Octree.calculateBounds(chunksToLoad);
+    int requiredDepth = Octree.calculateOctreeRequiredDepth(bounds, yMax, yMin);
 
     ChunkLoadResult result = new ChunkLoadResult(octreeImplementation, requiredDepth,
         emitterSamplingStrategy, gridSize);
 
     try (Task task = taskTracker.task("(1/6) Loading regions")) {
       task.update(2, 1);
-      //TODO is this necessary? Are we intentionally mutating origin here?
-      result.origin.set(Scene.calculateOctreeOrigin(yMax, yMin, bounds, false));
+      result.origin.set(Octree.calculateOctreeOrigin(yMax, yMin, bounds, false));
 
       // Parse the regions first - force chunk lists to be populated!
       Set<ChunkPosition> regions = new HashSet<>();
