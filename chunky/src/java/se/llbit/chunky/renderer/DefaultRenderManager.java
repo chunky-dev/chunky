@@ -488,25 +488,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
    */
   public void finalizeFrame(boolean force) {
     if (force || snapshotControl.saveSnapshot(bufferedScene, bufferedScene.spp)) {
-      // Split up to 10 tasks per thread
-      int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.threads * 10 - 1);
-
-      for (int i = 0; i < bufferedScene.width * bufferedScene.height; i += pixelsPerTask) {
-        int start = i;
-        int end = Math.min(bufferedScene.width * bufferedScene.height, i + pixelsPerTask);
-        pool.submit(worker -> {
-          for (int j = start; j < end; j++) {
-            bufferedScene.finalizePixel(j % bufferedScene.width, j / bufferedScene.width);
-          }
-        });
-      }
-
-      try {
-        pool.awaitEmpty();
-      } catch (InterruptedException e) {
-        // Interrupted
-      }
-
+      bufferedScene.postProcessFrame(TaskTracker.NONE);
       bufferedScene.swapBuffers();
       canvas.repaint();
     }
