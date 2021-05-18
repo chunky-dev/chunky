@@ -267,6 +267,10 @@ public class DefaultRenderManager extends Thread implements RenderManager {
           });
         }
 
+        // Select the renderer from the scene
+        setRenderer(bufferedScene.getRenderer());
+        setPreviewRenderer(bufferedScene.getPreviewRenderer());
+
         // Select the correct renderer
         Renderer render = mode == RenderMode.PREVIEW ? getPreviewRenderer() : getRenderer();
 
@@ -313,24 +317,26 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     return previewRenderers.values();
   }
 
-  @Override
-  public Renderer getRenderer() {
+  protected Renderer getRenderer() {
     return renderers.getOrDefault(renderer, EMPTY_RENDERER);
   }
 
-  @Override
-  public Renderer getPreviewRenderer() {
+  protected Renderer getPreviewRenderer() {
     return previewRenderers.getOrDefault(previewRenderer, EMPTY_RENDERER);
   }
 
-  @Override
-  public void setRenderer(String id) {
-    renderer = id;
+  protected void setRenderer(String id) {
+    if (renderers.containsKey(id))
+      renderer = id;
+    else
+      renderer = ChunkyPathTracerID;
   }
 
-  @Override
-  public void setPreviewRenderer(String id) {
-    previewRenderer = id;
+  protected void setPreviewRenderer(String id) {
+    if (previewRenderers.containsKey(id))
+      previewRenderer = id;
+    else
+      previewRenderer = ChunkyPreviewID;
   }
 
   @Override

@@ -63,14 +63,8 @@ import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
-import se.llbit.chunky.renderer.EmitterSamplingStrategy;
+import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
-import se.llbit.chunky.renderer.Postprocess;
-import se.llbit.chunky.renderer.Refreshable;
-import se.llbit.chunky.renderer.RenderContext;
-import se.llbit.chunky.renderer.RenderMode;
-import se.llbit.chunky.renderer.ResetReason;
-import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.resources.BitmapImage;
@@ -361,6 +355,9 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   private String octreeImplementation = PersistentSettings.getOctreeImplementation();
 
+  private String renderer = DefaultRenderManager.ChunkyPathTracerID;
+  private String previewRenderer = DefaultRenderManager.ChunkyPreviewID;
+
   /**
    * Creates a scene with all default settings.
    *
@@ -505,6 +502,9 @@ public class Scene implements JsonSerializable, Refreshable {
 
     octreeImplementation = other.octreeImplementation;
     animationTime = other.animationTime;
+
+    renderer = other.renderer;
+    previewRenderer = other.previewRenderer;
   }
 
   /**
@@ -2658,6 +2658,9 @@ public class Scene implements JsonSerializable, Refreshable {
 
     json.add("animationTime", animationTime);
 
+    json.add("renderer", renderer);
+    json.add("previewRenderer", previewRenderer);
+
     return json;
   }
 
@@ -2964,6 +2967,9 @@ public class Scene implements JsonSerializable, Refreshable {
     preventNormalEmitterWithSampling = json.get("preventNormalEmitterWithSampling").asBoolean(PersistentSettings.getPreventNormalEmitterWithSampling());
 
     animationTime = json.get("animationTime").doubleValue(animationTime);
+
+    renderer = json.get("renderer").asString(renderer);
+    previewRenderer = json.get("previewRenderer").asString(previewRenderer);
   }
 
   /**
@@ -3277,5 +3283,23 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public double getAnimationTime() {
     return animationTime;
+  }
+
+  public void setRenderer(String renderer) {
+    this.renderer = renderer;
+    refresh();
+  }
+
+  public String getRenderer() {
+    return renderer;
+  }
+
+  public void setPreviewRenderer(String previewRenderer) {
+    this.previewRenderer = renderer;
+    refresh();
+  }
+
+  public String getPreviewRenderer() {
+    return previewRenderer;
   }
 }

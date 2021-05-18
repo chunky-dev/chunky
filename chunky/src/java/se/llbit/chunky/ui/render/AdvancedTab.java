@@ -188,11 +188,11 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
     rendererSelect.setTooltip(new Tooltip("The renderer to use for rendering."));
     rendererSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-        controller.getRenderManager().setRenderer(newValue));
+        scene.setRenderer(newValue));
 
     previewSelect.setTooltip(new Tooltip("The renderer to use for the preview."));
     previewSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-        controller.getRenderManager().setPreviewRenderer(newValue));
+        scene.setPreviewRenderer(newValue));
   }
 
   public boolean shutdownAfterCompletedRender() {
@@ -210,6 +210,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     gridSize.set(scene.getGridSize());
     preventNormalEmitterWithSampling.setSelected(scene.isPreventNormalEmitterWithSampling());
     animationTime.set(scene.getAnimationTime());
+    rendererSelect.getSelectionModel().select(scene.getRenderer());
+    previewSelect.getSelectionModel().select(scene.getPreviewRenderer());
   }
 
   @Override
@@ -243,7 +245,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       ids.add(renderer.getId());
 
     rendererSelect.getItems().addAll(ids);
-    rendererSelect.getSelectionModel().select(renderManager.getRenderer().getId());
+    rendererSelect.getSelectionModel().select(scene.getRenderer());
 
     // Set the preview renderers, reuse the `ids` ArrayList
     previewSelect.getItems().clear();
@@ -252,6 +254,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       ids.add(render.getId());
 
     previewSelect.getItems().addAll(ids);
-    previewSelect.getSelectionModel().select(renderManager.getPreviewRenderer().getId());
+    previewSelect.getSelectionModel().select(scene.getPreviewRenderer());
   }
 }

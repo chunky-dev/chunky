@@ -42,29 +42,9 @@ public interface RenderManager {
   Collection<? extends Registerable> getRenderers();
 
   /**
-   * Set the current {@code Renderer} by ID.
-   */
-  void setRenderer(String id);
-
-  /**
-   * Get the current {@code Renderer}.
-   */
-  Registerable getRenderer();
-
-  /**
    * Get all available preview {@code Renderer}s.
    */
   Collection<? extends Registerable> getPreviewRenderers();
-
-  /**
-   * Set the current preview {@code Renderer} by ID.
-   */
-  void setPreviewRenderer(String id);
-
-  /**
-   * Get the current preview {@code Renderer}.
-   */
-  Registerable getPreviewRenderer();
 
   /**
    * Instructs the renderer to change its CPU load.
