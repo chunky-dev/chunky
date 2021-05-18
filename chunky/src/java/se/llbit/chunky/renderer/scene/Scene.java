@@ -17,11 +17,14 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,27 +32,32 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
-import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.block.*;
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.Lava;
+import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
@@ -63,18 +71,19 @@ import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
-import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
-import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
+import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
+import se.llbit.chunky.renderer.scene.EmitterSamplerFactory.EmitterSampler;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.Biomes;
@@ -94,8 +103,6 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
 import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
-import se.llbit.math.bvh.BVH;
-import se.llbit.math.ColorUtil;
 import se.llbit.math.Grid;
 import se.llbit.math.Octree;
 import se.llbit.math.PackedOctree;
@@ -103,15 +110,16 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
-import se.llbit.math.primitive.Primitive;
+import se.llbit.math.bvh.BVH;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
-import se.llbit.util.*;
-
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.*;
+import se.llbit.util.JsonSerializable;
+import se.llbit.util.MCDownloader;
+import se.llbit.util.NotNull;
+import se.llbit.util.PositionalInputStream;
+import se.llbit.util.TaskTracker;
+import se.llbit.util.ZipExport;
 
 /**
  * Encapsulates scene and render state.
@@ -374,6 +382,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Additional data that is associated with a scene, this can be used by plugins
    */
   private JsonObject additionalData = new JsonObject();
+  private EmitterSampler emitterSampler = new EmitterSamplerFactory().create(emitterSamplingStrategy);
 
   /**
    * Creates a scene with all default settings.
@@ -1670,7 +1679,7 @@ public class Scene implements JsonSerializable, Refreshable {
     ray.o.x -= origin.x;
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
-    while (PreviewRayTracer.nextIntersection(this, ray)) {
+    while (RayTracers.nextIntersection(this, ray)) {
       if (ray.getCurrentMaterial() != Air.INSTANCE) {
         return true;
       }
@@ -2242,7 +2251,7 @@ public class Scene implements JsonSerializable, Refreshable {
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
 
-    double occlusion = PreviewRayTracer.skyOcclusion(this, state);
+    double occlusion = RayTracers.skyOcclusion(this, state);
 
     camera
         .calcViewRay(ray, -halfWidth + (x + 1 / 8.0) * invHeight, -.5 + (y + 3 / 8.0) * invHeight);
@@ -2250,7 +2259,7 @@ public class Scene implements JsonSerializable, Refreshable {
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
 
-    occlusion += PreviewRayTracer.skyOcclusion(this, state);
+    occlusion += RayTracers.skyOcclusion(this, state);
 
     camera
         .calcViewRay(ray, -halfWidth + (x - 1 / 8.0) * invHeight, -.5 + (y - 3 / 8.0) * invHeight);
@@ -2258,7 +2267,7 @@ public class Scene implements JsonSerializable, Refreshable {
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
 
-    occlusion += PreviewRayTracer.skyOcclusion(this, state);
+    occlusion += RayTracers.skyOcclusion(this, state);
 
     camera
         .calcViewRay(ray, -halfWidth + (x + 3 / 8.0) * invHeight, -.5 + (y - 1 / 8.0) * invHeight);
@@ -2266,7 +2275,7 @@ public class Scene implements JsonSerializable, Refreshable {
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
 
-    occlusion += PreviewRayTracer.skyOcclusion(this, state);
+    occlusion += RayTracers.skyOcclusion(this, state);
 
     alphaChannel[y * width + x] = (byte) (255 * occlusion * 0.25 + 0.5);
   }
@@ -3284,5 +3293,9 @@ public class Scene implements JsonSerializable, Refreshable {
   @PluginApi
   public JsonValue getAdditionalData(String name) {
     return additionalData.get(name);
+  }
+
+  public EmitterSampler getEmitterSampler() {
+    return emitterSampler;
   }
 }
