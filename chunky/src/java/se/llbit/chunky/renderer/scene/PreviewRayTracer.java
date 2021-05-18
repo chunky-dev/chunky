@@ -1,4 +1,5 @@
-/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2013-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -92,7 +93,7 @@ public class PreviewRayTracer implements RayTracer {
       hit = scene.sky().cloudIntersection(scene, ray);
     }
     if (scene.isWaterPlaneEnabled()) {
-      hit = waterIntersection(scene, ray) || hit;
+      hit = waterPlaneIntersection(scene, ray) || hit;
     }
     if (scene.intersect(ray)) {
       // Octree tracer handles updating distance.
@@ -109,19 +110,24 @@ public class PreviewRayTracer implements RayTracer {
     }
   }
 
-  private static boolean waterIntersection(Scene scene, Ray ray) {
+  private static boolean waterPlaneIntersection(Scene scene, Ray ray) {
+    double t = (scene.getEffectiveWaterPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
+    if (scene.getWaterPlaneChunkClip()) {
+      Vector3 pos = new Vector3(ray.o);
+      pos.scaleAdd(t, ray.d);
+      if (scene.isChunkLoaded((int)Math.floor(pos.x), (int)Math.floor(pos.z)))
+        return false;
+    }
     if (ray.d.y < 0) {
-      double t = (scene.getEffectiveWaterPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < ray.t) {
         ray.t = t;
         Water.INSTANCE.getColor(ray);
         ray.n.set(0, 1, 0);
-        ray.setCurrentMaterial(Water.OCEAN_WATER);
+        ray.setCurrentMaterial(scene.getPalette().water);
         return true;
       }
     }
     if (ray.d.y > 0) {
-      double t = (scene.getEffectiveWaterPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < ray.t) {
         ray.t = t;
         Water.INSTANCE.getColor(ray);

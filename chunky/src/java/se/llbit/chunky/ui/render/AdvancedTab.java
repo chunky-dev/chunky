@@ -40,6 +40,7 @@ import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.ShutdownAlert;
+import se.llbit.math.bvh.BVH;
 import se.llbit.math.Octree;
 import se.llbit.util.Registerable;
 
@@ -65,6 +66,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster animationTime;
   @FXML private ChoiceBox<PictureExportFormat> outputMode;
   @FXML private ChoiceBox<String> octreeImplementation;
+  @FXML private ChoiceBox<String> bvhMethod;
   @FXML private IntegerAdjuster gridSize;
   @FXML private CheckBox preventNormalEmitterWithSampling;
   @FXML private ChoiceBox<String> rendererSelect;
@@ -150,25 +152,42 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       renderControls.showPopup("This change takes effect after restarting Chunky.", renderThreads);
     });
 
-    ArrayList<String> implNames = new ArrayList<>();
+    ArrayList<String> octreeNames = new ArrayList<>();
     StringBuilder tooltipTextBuilder = new StringBuilder();
     for(Map.Entry<String, Octree.ImplementationFactory> entry : Octree.getEntries()) {
-      implNames.add(entry.getKey());
+      octreeNames.add(entry.getKey());
       tooltipTextBuilder.append(entry.getKey());
       tooltipTextBuilder.append(": ");
       tooltipTextBuilder.append(entry.getValue().getDescription());
       tooltipTextBuilder.append('\n');
     }
     tooltipTextBuilder.append("Requires reloading chunks to take effect.");
-    octreeImplementation.getItems().addAll(implNames.toArray(new String[implNames.size()]));
+    octreeImplementation.getItems().addAll(octreeNames);
     octreeImplementation.getSelectionModel().selectedItemProperty()
             .addListener((observable, oldvalue, newvalue) -> {
               scene.setOctreeImplementation(newvalue);
               PersistentSettings.setOctreeImplementation(newvalue);
             });
-    octreeImplementation.setTooltip(new Tooltip(
-            tooltipTextBuilder.toString()
-    ));
+    octreeImplementation.setTooltip(new Tooltip(tooltipTextBuilder.toString()));
+
+    ArrayList<String> bvhNames = new ArrayList<>();
+    StringBuilder bvhMethodBuilder = new StringBuilder();
+    for (BVH.Factory.BVHBuilder builder : BVH.Factory.getImplementations()) {
+      bvhNames.add(builder.getName());
+      bvhMethodBuilder.append(builder.getName());
+      bvhMethodBuilder.append(": ");
+      bvhMethodBuilder.append(builder.getDescription());
+      bvhMethodBuilder.append('\n');
+    }
+    bvhMethodBuilder.append("Requires reloading chunks to take effect.");
+    bvhMethod.getItems().addAll(bvhNames);
+    bvhMethod.getSelectionModel().select(PersistentSettings.getBvhMethod());
+    bvhMethod.getSelectionModel().selectedItemProperty()
+            .addListener(((observable, oldValue, newValue) -> {
+              PersistentSettings.setBvhMethod(newValue);
+              scene.setBvhImplementation(newValue);
+            }));
+    bvhMethod.setTooltip(new Tooltip(bvhMethodBuilder.toString()));
 
     gridSize.setRange(4, 64);
     gridSize.setName("Emitter grid size");
@@ -207,6 +226,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
+    bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
     gridSize.set(scene.getGridSize());
     preventNormalEmitterWithSampling.setSelected(scene.isPreventNormalEmitterWithSampling());
     animationTime.set(scene.getAnimationTime());

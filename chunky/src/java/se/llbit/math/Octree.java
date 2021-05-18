@@ -364,7 +364,18 @@ public class Octree {
     return implementation.get(x, y, z);
   }
 
+  /**
+   * Get the material at the given position (relative to the octree origin).
+   * @param x x position
+   * @param y y position
+   * @param z z position
+   * @param palette Block palette
+   * @return Material at the given position or {@link Air#INSTANCE} if the position is outside of this octree
+   */
   public Material getMaterial(int x, int y, int z, BlockPalette palette) {
+    int size = (1 << implementation.getDepth());
+    if(x < 0 || y < 0 || z < 0 || x >= size || y >= size || z >= size)
+      return Air.INSTANCE;
     return implementation.getMaterial(x, y, z, palette);
   }
 
@@ -414,25 +425,78 @@ public class Octree {
    * @return {@code false} if the ray doesn't intersect the octree.
    */
   private boolean enterOctree(Ray ray) {
-    double nx, ny, nz;
+    double nx = 0, ny = 0, nz = 0;
     double octree_size = 1 << getDepth();
 
+    double tMin = Double.NEGATIVE_INFINITY;
+    double tMax = Double.POSITIVE_INFINITY;
+
+    // Note: The following is made to be robust against edge cases (infinity/NaN)
+    // without additional branches, be careful when editing.
+
+    // Explanation:
+    // the ray can have its x coordinate be 0, which mean that invDirX is Infinity.
+    // This is not a problem as math works out well in this case:
+
+    // If we have 0 < ray.o.x < octree_size, meaning the ray is correctly aligned in
+    // x to intersect with the octree, [tXMin ; tXMax] will have the values
+    // [-Infinity ; Infinity] meaning its intersection with the interval [tMin ; tMax]
+    // will keep the value [tMin ; tMax].
+
+    // On the other hand if ray.o.x < 0 or if ray.o.x > octree_size then both
+    // tXMin and tXMax will have the value -Infinity (resp. +Infinity)
+    // Meaning the interval [tXMin ; tXMax] (and [tMin ; tMax] once it is updated to be the intersection)
+    // will be reduced to a single values: -Infinity (resp. +Infinity)
+    // (this description is not mathematically rigorous as infinity is not really a value
+    // but is enough here).
+    // As ray.d is not a null vector, at least one of its component is not 0
+    // and will have an associated interval with finite bounds, meaning the intersection of those interval
+    // will give an empty set (in practice this is the condition
+    // `if ((tMin > tXMax) || (tXMin > tMax)) return false;`) meaning no intersection is possible.
+
+    // Lastly the other edge case (literally) is when we have ray.o.x == 0 or
+    // ray.o.x == octree_size, meaning the ray is right on the edge and is
+    // neither really outside nor inside.
+    // In this case tXMin or tXMax will be NaN (and the other will be +/- Infinity but
+    // that will not pose any problem as seen previously).
+    // Every comparison involving a NaN returns false, this means that when doing the intersection
+    // with [tMin ; tMax] (in practice the `if (tXMin > tMin) tMin = tXMin;` and
+    // `if (tXMax < tMax) tMax = tXMax;`), the interval will not be changed, acting
+    // as if the [tXMin ; tXMax] interval was [-Infinity ; +Infinity] and not disrupting
+    // following computations.
+    // Additionally, given how the condition to test whether the intersection will be empty before
+    // updating it is written, (the `if ((tMin > tXMax) || (tXMin > tMax))`), it will
+    // evaluate to false and not exit the function. This means that the ray is
+    // considered to be intersecting with the octree (if the other coordinates fulfill the condition
+    // to be intersecting as well).
+    // If instead we would like rays on the edge of the octree not to be considered intersecting it,
+    // the condition could be rewritten as `if(!(tMin <= tXMax) || !(tXMin <= tMax))`
+    // which is equivalent to the current condition for every input not involving
+    // NaN but will evaluates to true in the presence of NaN.
+
     // AABB intersection with the octree boundary
-    double tMin, tMax;
+    double tXMin, tXMax;
     double invDirX = 1 / ray.d.x;
     if (invDirX >= 0) {
-      tMin = -ray.o.x * invDirX;
-      tMax = (octree_size - ray.o.x) * invDirX;
-
-      nx = -1;
-      ny = nz = 0;
+      tXMin = -ray.o.x * invDirX;
+      tXMax = (octree_size - ray.o.x) * invDirX;
     } else {
-      tMin = (octree_size - ray.o.x) * invDirX;
-      tMax = -ray.o.x * invDirX;
+      tXMin = (octree_size - ray.o.x) * invDirX;
+      tXMax = -ray.o.x * invDirX;
+    }
 
-      nx = 1;
+    if ((tMin > tXMax) || (tXMin > tMax))
+      return false;
+
+    if (tXMin > tMin) {
+      tMin = tXMin;
+
+      nx = -FastMath.signum(ray.d.x);
       ny = nz = 0;
     }
+
+    if (tXMax < tMax)
+      tMax = tXMax;
 
     double tYMin, tYMax;
     double invDirY = 1 / ray.d.y;

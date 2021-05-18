@@ -16,12 +16,18 @@
  */
 package se.llbit.chunky.world;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Lava;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.map.AbstractLayer;
 import se.llbit.chunky.map.BiomeLayer;
@@ -37,10 +43,6 @@ import se.llbit.nbt.SpecificTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.BitBuffer;
 import se.llbit.util.NotNull;
-
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.util.*;
 
 /**
  * This class represents a loaded or not-yet-loaded chunk in the world.
@@ -144,10 +146,11 @@ public class Chunk {
   /**
    * Parse the chunk from the region file and render the current
    * layer, surface and cave maps.
+   * @return whether the input chunkdata was modified
    */
-  public synchronized void loadChunk(ChunkData chunkData, int yMax) {
+  public synchronized boolean loadChunk(ChunkData chunkData, int yMax) {
     if (!shouldReloadChunk()) {
-      return;
+      return false;
     }
 
     Set<String> request = new HashSet<>();
@@ -158,7 +161,7 @@ public class Chunk {
     Map<String, Tag> data = getChunkData(request);
     // TODO: improve error handling here.
     if (data == null) {
-      return;
+      return false;
     }
 
     surfaceTimestamp = dataTimestamp;
@@ -171,6 +174,7 @@ public class Chunk {
       loadBiomes(data, chunkData);
     }
     world.chunkUpdated(position);
+    return true;
   }
 
   private void loadSurface(Map<String, Tag> data, ChunkData chunkData, int yMax) {
@@ -435,8 +439,9 @@ public class Chunk {
   /**
    * Load the block data for this chunk.
    *
-   * @param reuseChunkData to be reused, if null one is created
-   * @param palette
+   * @param reuseChunkData ChunkData object to be reused, if null one is created
+   * @param palette Block palette
+   * @return Loaded chunk data, guaranteed to be reuseChunkData unless null or EmptyChunkData was passed
    */
   public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette) {
     Set<String> request = new HashSet<>();
@@ -446,7 +451,7 @@ public class Chunk {
     request.add(LEVEL_ENTITIES);
     request.add(LEVEL_TILEENTITIES);
     Map<String, Tag> data = getChunkData(request);
-    if(reuseChunkData == null) {
+    if(reuseChunkData == null || reuseChunkData instanceof EmptyChunkData) {
       reuseChunkData = new GenericChunkData();
     } else {
       reuseChunkData.clear();

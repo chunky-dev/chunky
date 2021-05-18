@@ -3613,6 +3613,9 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/deepslate_emerald_ore", Texture.deepslateEmeraldOre);
     addSimpleTexture("assets/minecraft/textures/block/lightning_rod_on", Texture.lightningRodOn);
     addSimpleTexture("assets/minecraft/textures/item/light", Texture.light);
+    addSimpleTexture("assets/minecraft/textures/block/raw_copper_block", Texture.rawCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/raw_gold_block", Texture.rawGoldBlock);
+    addSimpleTexture("assets/minecraft/textures/block/raw_iron_block", Texture.rawIronBlock);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

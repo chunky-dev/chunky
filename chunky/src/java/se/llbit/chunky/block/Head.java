@@ -20,7 +20,7 @@ public class Head extends MinecraftBlockTranslucent {
   // the decoded string might not be valid json (sometimes keys are not quoted)
   // so we use a regex to extract the skin url
   private static final Pattern SKIN_URL_FROM_OBJECT = Pattern
-      .compile("\"?SKIN\"?\\s*:\\s*\\{.+?\"?url\"?\\s*:\\s*\"(.+?)\"", Pattern.DOTALL);
+      .compile("\"?SKIN\"?\\s*:\\s*\\{(.*)\"?url\"?\\s*:\\s*\"(.*)\"", Pattern.DOTALL);
   private final String description;
   private final int rotation;
   private final SkullEntity.Kind type;
@@ -82,7 +82,7 @@ public class Head extends MinecraftBlockTranslucent {
         String decoded = new String(Base64.getDecoder().decode(fixBase64Padding(textureBase64)));
         Matcher matcher = SKIN_URL_FROM_OBJECT.matcher(decoded);
         if (matcher.find()) {
-          return matcher.group(1);
+          return matcher.group(2);
         } else {
           Log.warn("Could not get skull texture from json: " + decoded);
         }

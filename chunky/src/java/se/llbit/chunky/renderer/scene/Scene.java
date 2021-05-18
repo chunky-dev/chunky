@@ -48,7 +48,6 @@ import java.util.zip.GZIPOutputStream;
 
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
-import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.*;
 import se.llbit.chunky.chunk.BlockPalette;
@@ -66,6 +65,10 @@ import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
+import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
+import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
+import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
@@ -86,7 +89,7 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
 import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
-import se.llbit.math.BVH;
+import se.llbit.math.bvh.BVH;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Grid;
 import se.llbit.math.Octree;
@@ -99,21 +102,11 @@ import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
-import se.llbit.pfm.PfmFileWriter;
-import se.llbit.png.ITXT;
-import se.llbit.png.PngFileWriter;
-import se.llbit.tiff.TiffFileWriter;
 import se.llbit.util.*;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.stream.IntStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Encapsulates scene and render state.
@@ -179,6 +172,12 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public static final double DEFAULT_FOG_DENSITY = 0.0;
 
+  /**
+   * Default post processing filter.
+   */
+  public static final PostProcessingFilter DEFAULT_POSTPROCESSING_FILTER = PostProcessingFilters
+      .getPostProcessingFilterFromId("GAMMA").orElse(PostProcessingFilters.NONE);
+
   protected final Sky sky = new Sky(this);
   protected final Camera camera = new Camera(this);
   protected final Sun sun = new Sun(this);
@@ -201,7 +200,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public int height;
 
-  public Postprocess postprocess = Postprocess.DEFAULT;
+  public PostProcessingFilter postProcessingFilter = DEFAULT_POSTPROCESSING_FILTER;
   public PictureExportFormat outputMode = PictureExportFormats.PNG;
   public long renderTime;
   /**
@@ -238,6 +237,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean waterPlaneEnabled = false;
   protected double waterPlaneHeight = World.SEA_LEVEL;
   protected boolean waterPlaneOffsetEnabled = true;
+  protected boolean waterPlaneChunkClip = true;
 
   /**
    * Enables fast fog algorithm
@@ -305,8 +305,8 @@ public class Scene implements JsonSerializable, Refreshable {
   /** Upper Y clip plane. */
   public int yClipMax = PersistentSettings.getYClipMax();
 
-  private BVH bvh = new BVH(Collections.emptyList());
-  private BVH actorBvh = new BVH(Collections.emptyList());
+  private BVH bvh = BVH.EMPTY;
+  private BVH actorBvh = BVH.EMPTY;
 
   /**
    * Current time in seconds. Adjusts animated blocks like fire.
@@ -354,6 +354,16 @@ public class Scene implements JsonSerializable, Refreshable {
    * The octree implementation to use
    */
   private String octreeImplementation = PersistentSettings.getOctreeImplementation();
+
+  /**
+   * The BVH implementation to use
+   */
+  private String bvhImplementation = PersistentSettings.getBvhMethod();
+
+  /**
+   * Additional data that is associated with a scene, this can be used by plugins
+   */
+  private JsonObject additionalData = new JsonObject();
 
   private String renderer = DefaultRenderManager.ChunkyPathTracerID;
   private String previewRenderer = DefaultRenderManager.ChunkyPreviewID;
@@ -483,6 +493,7 @@ public class Scene implements JsonSerializable, Refreshable {
     waterPlaneEnabled = other.waterPlaneEnabled;
     waterPlaneHeight = other.waterPlaneHeight;
     waterPlaneOffsetEnabled = other.waterPlaneOffsetEnabled;
+    waterPlaneChunkClip = other.waterPlaneChunkClip;
 
     spp = other.spp;
     renderTime = other.renderTime;
@@ -501,10 +512,14 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     octreeImplementation = other.octreeImplementation;
+    bvhImplementation = other.bvhImplementation;
+
     animationTime = other.animationTime;
 
     renderer = other.renderer;
     previewRenderer = other.previewRenderer;
+
+    additionalData = other.additionalData;
   }
 
   /**
@@ -670,6 +685,34 @@ public class Scene implements JsonSerializable, Refreshable {
     state.ray.o.y -= origin.y;
     state.ray.o.z -= origin.z;
 
+    if(camera.getProjectionMode() == ProjectionMode.PARALLEL
+      && worldOctree.isInside(state.ray.o)) {
+      // When in parallel projection, push the ray origin back so the
+      // ray start outside the octree to prevent ray spawning inside some blocks
+      int limit = (1 << worldOctree.getDepth());
+      Vector3 o = state.ray.o;
+      Vector3 d = state.ray.d;
+      double t = 0;
+      // simplified intersection test with the 6 planes that form the bounding box of the octree
+      if(Math.abs(d.x) > Ray.EPSILON) {
+        t = Math.min(t, -o.x / d.x);
+        t = Math.min(t, (limit - o.x) / d.x);
+      }
+      if(Math.abs(d.y) > Ray.EPSILON) {
+        t = Math.min(t, -o.y / d.y);
+        t = Math.min(t, (limit - o.y) / d.y);
+      }
+      if(Math.abs(d.z) > Ray.EPSILON) {
+        t = Math.min(t, -o.z / d.z);
+        t = Math.min(t, (limit - o.z) / d.z);
+      }
+      // set the origin to the farthest intersection point behind
+      // In theory, we only would need to set it to the closest intersection point behind
+      // but this doesn't matter because the Octree.enterOctree function
+      // will do the same amount of math for the same result no matter what the exact point is
+      o.scaleAdd(t, d);
+    }
+
     rayTracer.trace(this, state);
   }
 
@@ -723,19 +766,17 @@ public class Scene implements JsonSerializable, Refreshable {
       hit = true;
     }
     if (start.getCurrentMaterial().isWater()) {
-      if(start.getCurrentMaterial() != Water.OCEAN_WATER) {
-        r = new Ray(start);
-        r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
-        if(waterOctree.exitWater(this, r, palette) && r.distance < ray.t - Ray.EPSILON) {
-          ray.t = r.distance;
-          ray.n.set(r.n);
-          ray.color.set(r.color);
-          ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
-          ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
-          hit = true;
-        } else if(ray.getPrevMaterial() == Air.INSTANCE) {
-          ray.setPrevMaterial(Water.INSTANCE, 1 << Water.FULL_BLOCK);
-        }
+      r = new Ray(start);
+      r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
+      if(waterOctree.exitWater(this, r, palette) && r.distance < ray.t - Ray.EPSILON) {
+        ray.t = r.distance;
+        ray.n.set(r.n);
+        ray.color.set(r.color);
+        ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
+        ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
+        hit = true;
+      } else if(ray.getPrevMaterial() == Air.INSTANCE) {
+        ray.setPrevMaterial(Water.INSTANCE, 1 << Water.FULL_BLOCK);
       }
     } else {
       r = new Ray(start);
@@ -874,6 +915,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
 
+    Set<ChunkPosition> nonEmptyChunks = new HashSet<>();
     Heightmap biomeIdMap = new Heightmap();
 
     ChunkData chunkData1;
@@ -974,7 +1016,7 @@ public class Scene implements JsonSerializable, Refreshable {
             double y = pos.get(1).doubleValue();
             double z = pos.get(2).doubleValue();
 
-            if (y >= yClipMin && y <= yClipMax) {
+            if (y >= yClipMin && y < yClipMax) {
               String id = tag.get("id").stringValue("");
               if (id.equals("minecraft:painting") || id.equals("Painting")) {
                 // Before 1.12 paintings had id=Painting.
@@ -991,7 +1033,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
         int yCubeMin = yMin / 16;
         int yCubeMax = (yMax+15) / 16;
-        for(int yCube = yCubeMin; yCube <= yCubeMax; ++yCube) {
+        for(int yCube = yCubeMin; yCube < yCubeMax; ++yCube) {
           // Reset the cubes
           Arrays.fill(cubeWorldBlocks, 0);
           Arrays.fill(cubeWaterBlocks, 0);
@@ -1007,8 +1049,8 @@ public class Scene implements JsonSerializable, Refreshable {
                 int cubeIndex = (cz * 16 + cy) * 16 + cx;
 
                 // Change the type of hidden blocks to ANY_TYPE
-                boolean notOnEdge = !chunkData.isBlockOnEdge(cx, cy, cz);
-                boolean isHidden = notOnEdge
+                boolean onEdge = y <= yMin || y >= yMax - 1 || chunkData.isBlockOnEdge(cx, y, cz);
+                boolean isHidden = !onEdge
                         && palette.get(chunkData.getBlockAt(cx + 1, y, cz)).opaque
                         && palette.get(chunkData.getBlockAt(cx - 1, y, cz)).opaque
                         && palette.get(chunkData.getBlockAt(cx, y + 1, cz)).opaque
@@ -1073,7 +1115,7 @@ public class Scene implements JsonSerializable, Refreshable {
                       // Move plain water blocks to the water octree.
                       octNode = palette.airId;
 
-                      if(notOnEdge) {
+                      if(!onEdge) {
                         // Perform water computation now for water blocks that are not on th edge of the chunk
                         // Test if the block has not already be marked as full
                         if(((Water) palette.get(waterNode)).data == 0) {
@@ -1126,10 +1168,10 @@ public class Scene implements JsonSerializable, Refreshable {
                       }
                     }
                     cubeWaterBlocks[cubeIndex] = waterNode;
-                  } else if(cy + 1 < yMax && block instanceof Lava) {
+                  } else if(y + 1 < yMax && block instanceof Lava) {
                     if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)) instanceof Lava) {
                       octNode = palette.getLavaId(0, 1 << Water.FULL_BLOCK);
-                    } else if(notOnEdge) {
+                    } else if(!onEdge) {
                       // Compute lava level for blocks not on edge
                       Lava lava = (Lava) block;
                       int level0 = 8 - lava.level;
@@ -1188,8 +1230,8 @@ public class Scene implements JsonSerializable, Refreshable {
               }
             }
           }
-          worldOctree.setCube(4, cubeWorldBlocks, cp.x*16 - origin.x, yCube*16, cp.z*16 - origin.z);
-          waterOctree.setCube(4, cubeWaterBlocks, cp.x*16 - origin.x, yCube*16, cp.z*16 - origin.z);
+          worldOctree.setCube(4, cubeWorldBlocks, cp.x*16 - origin.x, yCube*16 - origin.y, cp.z*16 - origin.z);
+          waterOctree.setCube(4, cubeWaterBlocks, cp.x*16 - origin.x, yCube*16 - origin.y, cp.z*16 - origin.z);
         }
 
         // Block entities are also called "tile entities". These are extra bits of metadata
@@ -1197,7 +1239,7 @@ public class Scene implements JsonSerializable, Refreshable {
         // Block entities are loaded after the base block data so that metadata can be updated.
         for (CompoundTag entityTag : chunkData.getTileEntities()) {
           int y = entityTag.get("y").intValue(0);
-          if (y >= yClipMin && y <= yClipMax) {
+          if (y >= yMin && y < yMax) {
             int x = entityTag.get("x").intValue(0) - wx0; // Chunk-local coordinates.
             int z = entityTag.get("z").intValue(0) - wz0;
             if (x < 0 || x > 15 || z < 0 || z > 15) {
@@ -1249,6 +1291,10 @@ public class Scene implements JsonSerializable, Refreshable {
             */
           }
         }
+
+        if (!chunkData.isEmpty()){
+          nonEmptyChunks.add(cp);
+        }
       }
       executor.shutdown();
     }
@@ -1259,17 +1305,14 @@ public class Scene implements JsonSerializable, Refreshable {
     foliageTexture = new WorldTexture();
     waterTexture = new WorldTexture();
 
-    Set<ChunkPosition> chunkSet = new HashSet<>(chunksToLoad);
-
     try (TaskTracker.Task task = taskTracker.task("(4/6) Finalizing octree")) {
 
       worldOctree.startFinalization();
       waterOctree.startFinalization();
 
       int done = 0;
-      int target = chunksToLoad.size();
-      for (ChunkPosition cp : chunksToLoad) {
-
+      int target = nonEmptyChunks.size();
+      for (ChunkPosition cp : nonEmptyChunks) {
         // Finalize grass and foliage textures.
         // 3x3 box blur.
         for (int x = 0; x < 16; ++x) {
@@ -1285,7 +1328,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 int wz = cp.z * 16 + sz;
 
                 ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
-                if (chunkSet.contains(ccp)) {
+                if (nonEmptyChunks.contains(ccp)) {
                   nsum += 1;
                   int biomeId = biomeIdMap.get(wx, wz);
                   float[] grassColor = Biomes.getGrassColorLinear(biomeId);
@@ -1351,39 +1394,13 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   private void buildBvh(TaskTracker.Task task) {
-    double entityScaler = 500.0 / entities.size();
-    int done = 0;
-    task.update(1000, 0);
-
-    final List<Primitive> primitives = new LinkedList<>();
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    for (Entity entity : entities) {
-      primitives.addAll(entity.primitives(worldOffset));
-
-      done++;
-      task.updateInterval((int) (done * entityScaler), 1);
-    }
-
-    double primitiveScaler = 500.0 / primitives.size();
-    bvh = new BVH(primitives, i -> task.updateInterval((int) (i * primitiveScaler) + 500, 1));
+    bvh = BVH.Factory.create(bvhImplementation, entities, worldOffset, task);
   }
 
   private void buildActorBvh(TaskTracker.Task task) {
-    double entityScaler = 500.0 / entities.size();
-    int done = 0;
-    task.update(1000, 0);
-
-    final List<Primitive> actorPrimitives = new LinkedList<>();
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    for (Entity entity : actors) {
-      actorPrimitives.addAll(entity.primitives(worldOffset));
-
-      done++;
-      task.updateInterval((int) (done * entityScaler), 1);
-    }
-
-    double primitiveScaler = 500.0 / actorPrimitives.size();
-    actorBvh = new BVH(actorPrimitives, i -> task.updateInterval((int) (i * primitiveScaler) + 500, 1));
+    actorBvh = BVH.Factory.create(bvhImplementation, actors, worldOffset, task);
   }
 
   /**
@@ -1440,7 +1457,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
       origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
     } else {
-      origin.set(xmin, 0, zmin);
+      // Note: Math.floorDiv rather than integer division for round toward -infinity
+      origin.set(xmin, Math.floorDiv(yMin, 16) * 16, zmin);
     }
     return requiredDepth;
   }
@@ -1703,19 +1721,19 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * @return The current postprocessing mode
+   * @return The current postprocessing filter
    */
-  public Postprocess getPostprocess() {
-    return postprocess;
+  public PostProcessingFilter getPostProcessingFilter() {
+    return postProcessingFilter;
   }
 
   /**
-   * Change the postprocessing mode
+   * Change the postprocessing filter
    *
-   * @param p The new postprocessing mode
+   * @param p The new postprocessing filter
    */
-  public synchronized void setPostprocess(Postprocess p) {
-    postprocess = p;
+  public synchronized void setPostprocess(PostProcessingFilter p) {
+    postProcessingFilter = p;
     if (mode == RenderMode.PREVIEW) {
       // Don't interrupt the render if we are currently rendering.
       refresh();
@@ -1815,6 +1833,22 @@ public class Scene implements JsonSerializable, Refreshable {
     return waterPlaneOffsetEnabled;
   }
 
+  public void setWaterPlaneChunkClip(boolean enabled) {
+    if (enabled != waterPlaneChunkClip) {
+      waterPlaneChunkClip = enabled;
+      refresh();
+    }
+  }
+
+  /**
+   * Check if water plane chunk clipping is enabled. If so, the water plane is hidden in loaded
+   * chunks (i.e. it is ignored inside of loaded chunks).
+   * @return {@code true} if the water plane chunk clipping is enabled
+   */
+  public boolean getWaterPlaneChunkClip() {
+    return waterPlaneChunkClip;
+  }
+
   /**
    * @return the dumpFrequency
    */
@@ -1847,7 +1881,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public synchronized void copyTransients(Scene other) {
     name = other.name;
-    postprocess = other.postprocess;
+    postProcessingFilter = other.postProcessingFilter;
     exposure = other.exposure;
     dumpFrequency = other.dumpFrequency;
     saveSnapshots = other.saveSnapshots;
@@ -1859,6 +1893,7 @@ public class Scene implements JsonSerializable, Refreshable {
     camera.copyTransients(other.camera);
     finalizeBuffer = other.finalizeBuffer;
     animationTime = other.animationTime;
+    additionalData = other.additionalData;
   }
 
   /**
@@ -2001,17 +2036,12 @@ public class Scene implements JsonSerializable, Refreshable {
    * but in some cases an separate post processing pass is needed.
    */
   public void postProcessFrame(TaskTracker.Task task) {
-    task.update("Finalizing frame", width, 0);
-    AtomicInteger done = new AtomicInteger(0);
-    Chunky.getCommonThreads().submit(() -> {
-      IntStream.range(0, width).parallel().forEach(x -> {
-        for (int y = 0; y < height; y++) {
-          finalizePixel(x, y);
-        }
-
-        task.update(width, done.incrementAndGet());
-      });
-    }).join();
+    PostProcessingFilter filter = postProcessingFilter;
+    if(mode == RenderMode.PREVIEW) {
+      filter = PreviewFilter.INSTANCE;
+    }
+    filter.processFrame(width, height, samples, backBuffer, exposure, task);
+    finalized = true;
   }
 
   public void postProcessFrame(TaskTracker taskTracker) {
@@ -2193,99 +2223,6 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Finalize a pixel. Calculates the resulting RGB color values for
-   * the pixel and sets these in the bitmap image.
-   */
-  public void finalizePixel(int x, int y) {
-    finalized = true;
-    double[] result = new double[3];
-    postProcessPixel(x, y, result);
-    backBuffer.data[y * width + x] = ColorUtil
-        .getRGB(QuickMath.min(1, result[0]), QuickMath.min(1, result[1]), QuickMath.min(1, result[2]));
-  }
-
-  /**
-   * Postprocess a pixel. This applies gamma correction and clamps the color value to [0,1].
-   *
-   * @param result the resulting color values are written to this array
-   */
-  public void postProcessPixel(int x, int y, double[] result) {
-    int index = (y * width + x) * 3;
-    double r = samples[index];
-    double g = samples[index + 1];
-    double b = samples[index + 2];
-
-    r *= exposure;
-    g *= exposure;
-    b *= exposure;
-
-    if (mode != RenderMode.PREVIEW) {
-      switch (postprocess) {
-        case NONE:
-          break;
-        case TONEMAP1:
-          // http://filmicworlds.com/blog/filmic-tonemapping-operators/
-          r = QuickMath.max(0, r - 0.004);
-          r = (r * (6.2 * r + .5)) / (r * (6.2 * r + 1.7) + 0.06);
-          g = QuickMath.max(0, g - 0.004);
-          g = (g * (6.2 * g + .5)) / (g * (6.2 * g + 1.7) + 0.06);
-          b = QuickMath.max(0, b - 0.004);
-          b = (b * (6.2 * b + .5)) / (b * (6.2 * b + 1.7) + 0.06);
-          break;
-        case TONEMAP2:
-          // https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
-          float aces_a = 2.51f;
-          float aces_b = 0.03f;
-          float aces_c = 2.43f;
-          float aces_d = 0.59f;
-          float aces_e = 0.14f;
-          r = QuickMath.max(QuickMath.min((r * (aces_a * r + aces_b)) / (r * (aces_c * r + aces_d) + aces_e), 1), 0);
-          g = QuickMath.max(QuickMath.min((g * (aces_a * g + aces_b)) / (g * (aces_c * g + aces_d) + aces_e), 1), 0);
-          b = QuickMath.max(QuickMath.min((b * (aces_a * b + aces_b)) / (b * (aces_c * b + aces_d) + aces_e), 1), 0);
-          r = FastMath.pow(r, 1 / DEFAULT_GAMMA);
-          g = FastMath.pow(g, 1 / DEFAULT_GAMMA);
-          b = FastMath.pow(b, 1 / DEFAULT_GAMMA);
-          break;
-        case TONEMAP3:
-          // http://filmicworlds.com/blog/filmic-tonemapping-operators/
-          float hA = 0.15f;
-          float hB = 0.50f;
-          float hC = 0.10f;
-          float hD = 0.20f;
-          float hE = 0.02f;
-          float hF = 0.30f;
-          // This adjusts the exposure by a factor of 16 so that the resulting exposure approximately matches the other
-          // post-processing methods. Without this, the image would be very dark.
-          r *= 16;
-          g *= 16;
-          b *= 16;
-          r = ((r * (hA * r + hC * hB) + hD * hE) / (r * (hA * r + hB) + hD * hF)) - hE / hF;
-          g = ((g * (hA * g + hC * hB) + hD * hE) / (g * (hA * g + hB) + hD * hF)) - hE / hF;
-          b = ((b * (hA * b + hC * hB) + hD * hE) / (b * (hA * b + hB) + hD * hF)) - hE / hF;
-          float hW = 11.2f;
-          float whiteScale = 1.0f / (((hW * (hA * hW + hC * hB) + hD * hE) / (hW * (hA * hW + hB) + hD * hF)) - hE / hF);
-          r *= whiteScale;
-          g *= whiteScale;
-          b *= whiteScale;
-          break;
-        case GAMMA:
-          r = FastMath.pow(r, 1 / DEFAULT_GAMMA);
-          g = FastMath.pow(g, 1 / DEFAULT_GAMMA);
-          b = FastMath.pow(b, 1 / DEFAULT_GAMMA);
-          break;
-      }
-    } else {
-      r = FastMath.sqrt(r);
-      g = FastMath.sqrt(g);
-      b = FastMath.sqrt(b);
-    }
-
-    result[0] = r;
-    result[1] = g;
-    result[2] = b;
-  }
-
-  /**
    * Compute the alpha channel based on sky visibility.
    */
   public void computeAlpha(int x, int y, WorkerState state) {
@@ -2334,7 +2271,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Copies a pixel in-buffer.
    */
   public void copyPixel(int jobId, int offset) {
-    backBuffer.data[jobId + offset] = backBuffer.data[jobId];
+    System.arraycopy(samples, jobId * 3, samples, (jobId + offset) * 3, 3);
   }
 
   /**
@@ -2358,7 +2295,18 @@ public class Scene implements JsonSerializable, Refreshable {
           buf.append("\n");
         }
         Vector3 pos = camera.getPosition();
-        buf.append(String.format("pos: (%.1f, %.1f, %.1f)", pos.x, pos.y, pos.z));
+        buf.append(String.format("pos: (%.1f, %.1f, %.1f)\n", pos.x, pos.y, pos.z));
+
+        buf.append("facing: ");
+        double yaw = camera.getYaw();
+        yaw = (yaw + Math.PI*2) % (Math.PI*2);
+        int index = (int)Math.floor((yaw + Math.PI/8) / (Math.PI/4)) % 8;
+        buf.append(new String[]{"west", "southwest", "south", "southeast", "east", "northeast", "north", "northwest"}[index]);
+        index = (int)Math.floor((yaw + Math.PI/4) / (Math.PI/2)) % 4;
+        buf.append(" (towards ");
+        buf.append(new String[]{"negative X", "positive Z", "positive X", "negative Z"}[index]);
+        buf.append(")");
+
         return buf.toString();
       }
 
@@ -2471,6 +2419,13 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
+   * Query if a position is loaded.
+   */
+  public boolean isChunkLoaded(int x, int z) {
+    return waterTexture != null && waterTexture.contains(x, z);
+  }
+
+  /**
    * Merge a render dump into this scene.
    */
   public void mergeDump(File dumpFile, TaskTracker taskTracker) {
@@ -2493,8 +2448,14 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public boolean isInWater(Ray ray) {
-    if (isWaterPlaneEnabled() && ray.o.y < getEffectiveWaterPlaneHeight()) {
-      return true;
+    if (isWaterPlaneEnabled() && ray.o.y + origin.y < getEffectiveWaterPlaneHeight()) {
+      if (getWaterPlaneChunkClip()) {
+        if (!isChunkLoaded((int)Math.floor(ray.o.x), (int)Math.floor(ray.o.z))) {
+          return true;
+        }
+      } else {
+        return true;
+      }
     }
     if (waterOctree.isInside(ray.o)) {
       int x = (int) QuickMath.floor(ray.o.x);
@@ -2574,7 +2535,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("yMin", yMin);
     json.add("yMax", yMax);
     json.add("exposure", exposure);
-    json.add("postprocess", postprocess.name());
+    json.add("postprocess", postProcessingFilter.getId());
     json.add("outputMode", outputMode.getName());
     json.add("renderTime", renderTime);
     json.add("spp", spp);
@@ -2610,6 +2571,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("waterWorldEnabled", waterPlaneEnabled);
     json.add("waterWorldHeight", waterPlaneHeight);
     json.add("waterWorldHeightOffsetEnabled", waterPlaneOffsetEnabled);
+    json.add("waterWorldClipEnabled", waterPlaneChunkClip);
     json.add("renderActors", renderActors);
 
     if (!worldPath.isEmpty()) {
@@ -2653,6 +2615,7 @@ public class Scene implements JsonSerializable, Refreshable {
       json.add("actors", actorArray);
     }
     json.add("octreeImplementation", octreeImplementation);
+    json.add("bvhImplementation", bvhImplementation);
     json.add("emitterSamplingStrategy", emitterSamplingStrategy.name());
     json.add("preventNormalEmitterWithSampling", preventNormalEmitterWithSampling);
 
@@ -2660,6 +2623,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     json.add("renderer", renderer);
     json.add("previewRenderer", previewRenderer);
+
+    json.add("additionalData", additionalData);
 
     return json;
   }
@@ -2844,7 +2809,15 @@ public class Scene implements JsonSerializable, Refreshable {
     yMax = json.get("yMax").asInt(Math.min(yClipMax, yMax));
 
     exposure = json.get("exposure").doubleValue(exposure);
-    postprocess = Postprocess.get(json.get("postprocess").stringValue(postprocess.name()));
+    postProcessingFilter = PostProcessingFilters
+            .getPostProcessingFilterFromId(json.get("postprocess").stringValue(postProcessingFilter.getId()))
+            .orElseGet(() -> {
+              if (json.get("postprocess").stringValue(null) != null) {
+                Log.warn("The post processing filter " + json +
+                        " is unknown. Maybe you're missing a plugin that was used to create this scene?");
+              }
+              return DEFAULT_POSTPROCESSING_FILTER;
+            });
     outputMode = PictureExportFormats
       .getFormat(json.get("outputMode").stringValue(outputMode.getName()))
       .orElse(PictureExportFormats.PNG);
@@ -2893,6 +2866,7 @@ public class Scene implements JsonSerializable, Refreshable {
       waterPlaneHeight = json.get("waterWorldHeight").doubleValue(waterPlaneHeight);
       waterPlaneOffsetEnabled = json.get("waterWorldHeightOffsetEnabled")
         .boolValue(waterPlaneOffsetEnabled);
+      waterPlaneChunkClip = json.get("waterWorldClipEnabled").boolValue(waterPlaneChunkClip);
     }
 
     renderActors = json.get("renderActors").boolValue(renderActors);
@@ -2962,6 +2936,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     octreeImplementation = json.get("octreeImplementation").asString(PersistentSettings.getOctreeImplementation());
+    bvhImplementation = json.get("bvhImplementation").asString(PersistentSettings.getBvhMethod());
 
     emitterSamplingStrategy = EmitterSamplingStrategy.valueOf(json.get("emitterSamplingStrategy").asString("NONE"));
     preventNormalEmitterWithSampling = json.get("preventNormalEmitterWithSampling").asBoolean(PersistentSettings.getPreventNormalEmitterWithSampling());
@@ -2970,6 +2945,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     renderer = json.get("renderer").asString(renderer);
     previewRenderer = json.get("previewRenderer").asString(previewRenderer);
+
+    additionalData = json.get("additionalData").object();
   }
 
   /**
@@ -3238,6 +3215,14 @@ public class Scene implements JsonSerializable, Refreshable {
     this.octreeImplementation = octreeImplementation;
   }
 
+  public String getBvhImplementation() {
+    return bvhImplementation;
+  }
+
+  public void setBvhImplementation(String bvhImplementation) {
+    this.bvhImplementation = bvhImplementation;
+  }
+
   @PluginApi
   public Octree getWorldOctree() {
     return worldOctree;
@@ -3301,5 +3286,23 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public String getPreviewRenderer() {
     return previewRenderer;
+  }
+
+  /**
+   * Add additional data
+   * Additional data is not used by chunky but can be used by plugins
+   */
+  @PluginApi
+  public void setAdditionalData(String name, JsonValue value) {
+    additionalData.add(name, value);
+  }
+
+  /**
+   * Retrieve additional data
+   * Additional data is not used by chunky but can be used by plugins
+   */
+  @PluginApi
+  public JsonValue getAdditionalData(String name) {
+    return additionalData.get(name);
   }
 }

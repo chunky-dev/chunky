@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.ui;
 
+import java.util.function.Consumer;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleStringProperty;
@@ -23,30 +24,27 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
-import javafx.util.converter.NumberStringConverter;
-
-import java.util.function.Consumer;
 
 /**
  * A control for editing numeric values with a text field.
  */
 public abstract class Adjuster<T extends Number> extends HBox {
+
   private final StringProperty name = new SimpleStringProperty("Name");
   protected final Label nameLbl = new Label();
-  protected final TextField valueField = new TextField();
+  protected final NumericTextField<Property<Number>> valueField;
   protected final Property<Number> value;
   private ChangeListener<Number> listener;
 
   protected Adjuster(Property<Number> value) {
     this.value = value;
+    valueField = new NumericTextField<>(value);
     nameLbl.textProperty().bind(Bindings.concat(name, ":"));
     setAlignment(Pos.CENTER_LEFT);
     setSpacing(10);
     valueField.setPrefWidth(103);
-    valueField.textProperty().bindBidirectional(value, new NumberStringConverter());
     getChildren().addAll(nameLbl, valueField);
   }
 

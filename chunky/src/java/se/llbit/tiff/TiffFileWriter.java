@@ -16,14 +16,17 @@
  */
 package se.llbit.tiff;
 
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.util.TaskTracker;
-
-import java.io.DataOutputStream;
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
+import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
+import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.log.Log;
+import se.llbit.util.TaskTracker;
 
 /**
  * TIFF image output. This supports 32-bit floating point channel output.
@@ -59,7 +62,8 @@ public class TiffFileWriter implements AutoCloseable {
   /**
    * @throws IOException
    */
-  @Override public void close() throws IOException {
+  @Override
+  public void close() throws IOException {
     out.close();
   }
 
@@ -217,14 +221,24 @@ public class TiffFileWriter implements AutoCloseable {
    * Write an image as a 32-bit per channel TIFF file.
    */
   public void write32(Scene scene, TaskTracker.Task task) throws IOException {
+    PostProcessingFilter filter = scene.getPostProcessingFilter();
+    if (!(filter instanceof PixelPostProcessingFilter)) {
+      Log.warn("The selected post processing filter (" + filter.getName()
+          + ") doesn't support pixel based processing and can't be used to export TIFF files. "+
+          "The TIFF will be exported without post-processing instead.");
+      filter = PostProcessingFilters.NONE;
+    }
+
     int width = scene.canvasWidth();
     int height = scene.canvasHeight();
     writeHeader(width, height, 4);
+
     for (int y = 0; y < height; ++y) {
       task.update(height, y);
       for (int x = 0; x < width; ++x) {
         double[] pixel = new double[3];
-        scene.postProcessPixel(x, y, pixel);
+        ((PixelPostProcessingFilter) filter)
+            .processPixel(width, height, scene.getSampleBuffer(), x, y, scene.getExposure(), pixel);
         out.writeFloat((float) pixel[0]);
         out.writeFloat((float) pixel[1]);
         out.writeFloat((float) pixel[2]);
