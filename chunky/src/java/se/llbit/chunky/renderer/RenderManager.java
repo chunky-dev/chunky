@@ -19,6 +19,7 @@ package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.util.Registerable;
 import se.llbit.util.TaskTracker;
 
 import java.util.Collection;
@@ -38,7 +39,7 @@ public interface RenderManager {
   /**
    * Get all available {@code Renderer}s.
    */
-  Collection<Renderer> getRenderers();
+  Collection<? extends Registerable> getRenderers();
 
   /**
    * Set the current {@code Renderer} by ID.
@@ -48,12 +49,12 @@ public interface RenderManager {
   /**
    * Get the current {@code Renderer}.
    */
-  Renderer getRenderer();
+  Registerable getRenderer();
 
   /**
    * Get all available preview {@code Renderer}s.
    */
-  Collection<Renderer> getPreviewRenderers();
+  Collection<? extends Registerable> getPreviewRenderers();
 
   /**
    * Set the current preview {@code Renderer} by ID.
@@ -63,7 +64,7 @@ public interface RenderManager {
   /**
    * Get the current preview {@code Renderer}.
    */
-  Renderer getPreviewRenderer();
+  Registerable getPreviewRenderer();
 
   /**
    * Instructs the renderer to change its CPU load.

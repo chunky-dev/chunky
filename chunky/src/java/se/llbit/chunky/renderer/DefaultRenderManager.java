@@ -23,6 +23,7 @@ import se.llbit.chunky.renderer.scene.PreviewRayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
+import se.llbit.util.Registerable;
 import se.llbit.util.TaskTracker;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * This class serves to interface {@code Renderer}s with Chunky.
@@ -72,8 +74,10 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   public static final String ChunkyPreviewID = "PreviewRenderer";
 
   static {
-    addRenderer(new PathTracingRenderer(ChunkyPathTracerID, "Chunky Path Tracer", new PathTracer()));
-    addPreviewRenderer(new PreviewRenderer(ChunkyPreviewID, "Chunky Preview", new PreviewRayTracer()));
+    addRenderer(new PathTracingRenderer(ChunkyPathTracerID, "Chunky Path Tracer",
+        "A photorealistic Path Tracing renderer.", new PathTracer()));
+    addPreviewRenderer(new PreviewRenderer(ChunkyPreviewID, "Chunky Preview",
+        "A simple ray marching preview renderer.", new PreviewRayTracer()));
   }
 
   /**
@@ -156,7 +160,8 @@ public class DefaultRenderManager extends Thread implements RenderManager {
    */
   private static final Renderer EMPTY_RENDERER = new Renderer() {
     @Override public String getId() { return "Empty"; }
-    @Override public String getDisplayName() { return "Empty"; }
+    @Override public String getName() { return "Empty"; }
+    @Override public String getDescription() { return "Empty Renderer"; }
     @Override public void setPostRender(BooleanSupplier callback) {}
     @Override public void render(DefaultRenderManager manager) {}
   };

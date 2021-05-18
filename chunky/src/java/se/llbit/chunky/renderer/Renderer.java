@@ -16,18 +16,28 @@
  */
 package se.llbit.chunky.renderer;
 
+import se.llbit.util.Registerable;
+
 import java.util.function.BooleanSupplier;
 
-public interface Renderer {
+public interface Renderer extends Registerable {
   /**
    * Get the ID of this renderer.
    */
+  @Override
   String getId();
 
   /**
    * Get the friendly name of this renderer.
    */
-  String getDisplayName();
+  @Override
+  String getName();
+
+  /**
+   * Get the description of this renderer.
+   */
+  @Override
+  String getDescription();
 
   /**
    * The post render callback. This should be run after rendering a frame.

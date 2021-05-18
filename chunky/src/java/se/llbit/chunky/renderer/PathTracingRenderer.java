@@ -23,11 +23,13 @@ import se.llbit.chunky.renderer.scene.Scene;
 public class PathTracingRenderer extends TileBasedRenderer {
   protected final String id;
   protected final String name;
+  protected final String description;
   protected RayTracer tracer;
 
-  public PathTracingRenderer(String id, String name, RayTracer tracer) {
+  public PathTracingRenderer(String id, String name, String description, RayTracer tracer) {
     this.id = id;
     this.name = name;
+    this.description = description;
     this.tracer = tracer;
   }
 
@@ -37,8 +39,13 @@ public class PathTracingRenderer extends TileBasedRenderer {
   }
 
   @Override
-  public String getDisplayName() {
+  public String getName() {
     return name;
+  }
+
+  @Override
+  public String getDescription() {
+    return description;
   }
 
   @Override

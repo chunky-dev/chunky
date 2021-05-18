@@ -41,6 +41,7 @@ import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.ShutdownAlert;
 import se.llbit.math.Octree;
+import se.llbit.util.Registerable;
 
 import java.io.File;
 import java.io.IOException;
@@ -233,22 +234,24 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       }
     });
 
-    if (rendererSelect.getItems().isEmpty()) {
-      RenderManager renderManager = controller.getRenderManager();
-      ArrayList<String> ids = new ArrayList<>();
+    // Set the renderers
+    rendererSelect.getItems().clear();
+    RenderManager renderManager = controller.getRenderManager();
+    ArrayList<String> ids = new ArrayList<>();
 
-      for (Renderer renderer : renderManager.getRenderers())
-        ids.add(renderer.getId());
+    for (Registerable renderer : renderManager.getRenderers())
+      ids.add(renderer.getId());
 
-      rendererSelect.getItems().addAll(ids);
-      rendererSelect.getSelectionModel().select(renderManager.getRenderer().getId());
+    rendererSelect.getItems().addAll(ids);
+    rendererSelect.getSelectionModel().select(renderManager.getRenderer().getId());
 
-      ids.clear();
-      for (Renderer render : renderManager.getPreviewRenderers())
-        ids.add(render.getId());
+    // Set the preview renderers, reuse the `ids` ArrayList
+    previewSelect.getItems().clear();
+    ids.clear();
+    for (Registerable render : renderManager.getPreviewRenderers())
+      ids.add(render.getId());
 
-      previewSelect.getItems().addAll(ids);
-      previewSelect.getSelectionModel().select(renderManager.getPreviewRenderer().getId());
-    }
+    previewSelect.getItems().addAll(ids);
+    previewSelect.getSelectionModel().select(renderManager.getPreviewRenderer().getId());
   }
 }
