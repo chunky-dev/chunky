@@ -17,11 +17,14 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,56 +36,44 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
-import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.block.*;
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.chunk.ChunkData;
-import se.llbit.chunky.chunk.GenericChunkData;
-import se.llbit.chunky.chunk.SimpleChunkData;
-import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.entity.Lectern;
-import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
-import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
-import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
-import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
+import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
+import se.llbit.chunky.renderer.scene.ChunkLoader.ChunkLoadResult;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.Biomes;
-import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.ExtraMaterials;
-import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.MaterialStore;
 import se.llbit.chunky.world.World;
@@ -94,24 +85,21 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
 import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
-import se.llbit.math.bvh.BVH;
-import se.llbit.math.ColorUtil;
 import se.llbit.math.Grid;
 import se.llbit.math.Octree;
+import se.llbit.math.Octree.BlockBounds;
 import se.llbit.math.PackedOctree;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
-import se.llbit.math.primitive.Primitive;
-import se.llbit.nbt.CompoundTag;
-import se.llbit.nbt.ListTag;
-import se.llbit.nbt.Tag;
-import se.llbit.util.*;
-
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.*;
+import se.llbit.math.bvh.BVH;
+import se.llbit.util.JsonSerializable;
+import se.llbit.util.NotNull;
+import se.llbit.util.PositionalInputStream;
+import se.llbit.util.TaskTracker;
+import se.llbit.util.TaskTracker.Task;
+import se.llbit.util.ZipExport;
 
 /**
  * Encapsulates scene and render state.
@@ -843,12 +831,13 @@ public class Scene implements JsonSerializable, Refreshable {
    * The octree finalizer is then run to compute block properties like fence
    * connectedness.
    */
-  public synchronized void loadChunks(TaskTracker taskTracker, World world, Collection<ChunkPosition> chunksToLoad) {
-    if (world == null)
+  public synchronized void loadChunks(TaskTracker taskTracker, World world,
+      Collection<ChunkPosition> chunksToLoad) {
+    if (world == null || chunksToLoad.isEmpty()) {
       return;
+    }
 
-    boolean isTallWorld = world.getVersionId() >= World.VERSION_21W06A;
-    if (isTallWorld) {
+    if (ChunkLoader.isTallWorld(world)) {
       // snapshot 21w06a or later, don't limit yMin/yMax to allow custom height worlds
       yMin = yClipMin;
       yMax = yClipMax;
@@ -858,543 +847,49 @@ public class Scene implements JsonSerializable, Refreshable {
       yMax = Math.min(256, yClipMax);
     }
 
-    Set<ChunkPosition> loadedChunks = new HashSet<>();
-    int numChunks = 0;
-
-    try (TaskTracker.Task task = taskTracker.task("(1/6) Loading regions")) {
-      task.update(2, 1);
-
-      loadedWorld = world;
-      worldPath = loadedWorld.getWorldDirectory().getAbsolutePath();
-      worldDimension = world.currentDimension();
-
-      if (chunksToLoad.isEmpty()) {
-        return;
-      }
-
-      int requiredDepth = calculateOctreeOrigin(chunksToLoad, false);
-
-      // Create new octree to fit all chunks.
-      palette = new BlockPalette();
-      worldOctree = new Octree(octreeImplementation, requiredDepth);
-      waterOctree = new Octree(octreeImplementation, requiredDepth);
-      if(emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
-        emitterGrid = new Grid(gridSize);
-
-      // Parse the regions first - force chunk lists to be populated!
-      Set<ChunkPosition> regions = new HashSet<>();
-      for (ChunkPosition cp : chunksToLoad) {
-        regions.add(cp.getRegionPosition());
-      }
-
-      for (ChunkPosition region : regions) {
-        world.getRegion(region).parse();
-      }
-    }
-
-    try (TaskTracker.Task task = taskTracker.task("(2/6) Loading entities")) {
-      entities = new LinkedList<>();
-      if (actors.isEmpty() && PersistentSettings.getLoadPlayers()) {
-        // We don't load actor entities if some already exists. Loading actor entities
-        // risks resetting posed actors when reloading chunks for an existing scene.
-        actors = new LinkedList<>();
-        profiles = new HashMap<>();
-        Collection<PlayerEntity> players = world.playerEntities();
-        int done = 1;
-        int target = players.size();
-        for (PlayerEntity entity : players) {
-          entity.randomPose();
-          task.update(target, done);
-          done += 1;
-          JsonObject profile;
-          try {
-            profile = MCDownloader.fetchProfile(entity.uuid);
-          } catch (IOException e) {
-            Log.error(e);
-            profile = new JsonObject();
-          }
-          profiles.put(entity, profile);
-          actors.add(entity);
-        }
-      }
-    }
-
-    Set<ChunkPosition> nonEmptyChunks = new HashSet<>();
-    Heightmap biomeIdMap = new Heightmap();
-
-    ChunkData chunkData1;
-    ChunkData chunkData2;
-    if (isTallWorld) { //snapshot 21w06a, treat as -64 - 320
-      chunkData1 = new GenericChunkData(); // chunk loading will switch between these two, using one asynchronously to load the data
-      chunkData2 = new GenericChunkData(); // while the other is used to add to the octree
-    } else { //Treat as 0 - 256 world
-      chunkData1 = new SimpleChunkData();
-      chunkData2 = new SimpleChunkData();
-    }
-
-    try (TaskTracker.Task task = taskTracker.task("(3/6) Loading chunks")) {
-      int done = 1;
-      int target = chunksToLoad.size();
-
-      boolean usingFirstChunkData = true;
-
-      ChunkPosition[] chunkPositions = chunksToLoad.toArray(new ChunkPosition[0]);
-
-      int[] cubeWorldBlocks = new int[16*16*16];
-      int[] cubeWaterBlocks = new int[16*16*16];
-
-      ExecutorService executor = Executors.newSingleThreadExecutor();
-      Future<?> nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
-        world.getChunk(chunkPositions[0]).getChunkData(chunkData1, palette);
-      });
-      for (int i = 0; i < chunkPositions.length; i++) {
-        ChunkPosition cp = chunkPositions[i];
-
-        task.updateEta(target, done);
-        done += 1;
-
-        if (loadedChunks.contains(cp)) {
-          continue;
-        }
-
-        loadedChunks.add(cp);
-
-        try {
-          nextChunkDataTask.get(50, TimeUnit.MILLISECONDS);
-        } catch(TimeoutException | InterruptedException logged) { // If except, load the chunk synchronously
-          if (logged instanceof TimeoutException) {
-            Log.info("Chunk loading timed out.");
-          } else {
-            Log.warn("Chunky loading interrupted.", logged);
-          }
-
-          if(usingFirstChunkData) {
-            world.getChunk(chunkPositions[i]).getChunkData(chunkData1, palette);
-          }
-          else {
-            world.getChunk(chunkPositions[i]).getChunkData(chunkData2, palette);
-          }
-        } catch(ExecutionException e) {
-          throw new RuntimeException(e.getCause());
-        }
-
-        ChunkData chunkData; //the chunk data to be used for THIS iteration
-        {
-          ChunkData nextChunkData; //the chunk data to be used for the next iteration
-          if (usingFirstChunkData) {
-            chunkData = chunkData1;
-            nextChunkData = chunkData2;
-          } else {
-            chunkData = chunkData2;
-            nextChunkData = chunkData1;
-          }
-          usingFirstChunkData = !usingFirstChunkData;
-
-          if (i + 1 < chunkPositions.length) { //if has next request next
-            final int finalI = i;
-            nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
-              world.getChunk(chunkPositions[finalI + 1]).getChunkData(nextChunkData, palette);
-            });
-          }
-        }
-
-        numChunks += 1;
-
-        int wx0 = cp.x * 16; // Start of this chunk in world coordinates.
-        int wz0 = cp.z * 16;
-        for (int cz = 0; cz < 16; ++cz) {
-          int wz = cz + wz0;
-          for (int cx = 0; cx < 16; ++cx) {
-            int wx = cx + wx0;
-            int biomeId = 0xFF & chunkData.getBiomeAt(cx, 0, cz); // TODO add vertical biomes support (1.15+)
-            biomeIdMap.set(biomeId, wx, wz);
-          }
-        }
-
-        // Load entities from the chunk:
-        for (CompoundTag tag : chunkData.getEntities()) {
-          Tag posTag = tag.get("Pos");
-          if (posTag.isList()) {
-            ListTag pos = posTag.asList();
-            double x = pos.get(0).doubleValue();
-            double y = pos.get(1).doubleValue();
-            double z = pos.get(2).doubleValue();
-
-            if (y >= yClipMin && y < yClipMax) {
-              String id = tag.get("id").stringValue("");
-              if (id.equals("minecraft:painting") || id.equals("Painting")) {
-                // Before 1.12 paintings had id=Painting.
-                // After 1.12 paintings had id=minecraft:painting.
-                float yaw = tag.get("Rotation").get(0).floatValue();
-                entities.add(
-                    new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
-              } else if (id.equals("minecraft:armor_stand")) {
-                actors.add(new ArmorStand(new Vector3(x, y, z), tag));
-              }
-            }
-          }
-        }
-
-        int yCubeMin = yMin / 16;
-        int yCubeMax = (yMax+15) / 16;
-        for(int yCube = yCubeMin; yCube < yCubeMax; ++yCube) {
-          // Reset the cubes
-          Arrays.fill(cubeWorldBlocks, 0);
-          Arrays.fill(cubeWaterBlocks, 0);
-          for(int cy = 0; cy < 16; ++cy) { //Uses chunk min and max, rather than global - minor optimisation for pre1.13 worlds
-            int y = yCube * 16 + cy;
-            if(y < yMin || y >= yMax)
-              continue;
-            for(int cz = 0; cz < 16; ++cz) {
-              int z = cz + cp.z * 16 - origin.z;
-              for(int cx = 0; cx < 16; ++cx) {
-                int x = cx + cp.x * 16 - origin.x;
-
-                int cubeIndex = (cz * 16 + cy) * 16 + cx;
-
-                // Change the type of hidden blocks to ANY_TYPE
-                boolean onEdge = y <= yMin || y >= yMax - 1 || chunkData.isBlockOnEdge(cx, y, cz);
-                boolean isHidden = !onEdge
-                        && palette.get(chunkData.getBlockAt(cx + 1, y, cz)).opaque
-                        && palette.get(chunkData.getBlockAt(cx - 1, y, cz)).opaque
-                        && palette.get(chunkData.getBlockAt(cx, y + 1, cz)).opaque
-                        && palette.get(chunkData.getBlockAt(cx, y - 1, cz)).opaque
-                        && palette.get(chunkData.getBlockAt(cx, y, cz + 1)).opaque
-                        && palette.get(chunkData.getBlockAt(cx, y, cz - 1)).opaque;
-
-                if(isHidden) {
-                  cubeWorldBlocks[cubeIndex] = Octree.ANY_TYPE;
-                } else {
-                  int currentBlock = chunkData.getBlockAt(cx, y, cz);
-                  int octNode = currentBlock;
-                  Block block = palette.get(currentBlock);
-
-                  if(block.isEntity()) {
-                    Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
-                    Entity entity = block.toEntity(position);
-
-                    if(entity instanceof Poseable && !(entity instanceof Lectern && !((Lectern) entity).hasBook())) {
-                      // don't add the actor again if it was already loaded from json
-                      if(actors.stream().noneMatch(actor -> {
-                        if(actor.getClass().equals(entity.getClass())) {
-                          Vector3 distance = new Vector3(actor.position);
-                          distance.sub(entity.position);
-                          return distance.lengthSquared() < Ray.EPSILON;
-                        }
-                        return false;
-                      })) {
-                        actors.add(entity);
-                      }
-                    } else {
-                      entities.add(entity);
-                      if(emitterGrid != null) {
-                        for(Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
-                          emitterPos.x -= origin.x;
-                          emitterPos.y -= origin.y;
-                          emitterPos.z -= origin.z;
-                          emitterGrid.addEmitter(emitterPos);
-                        }
-                      }
-                    }
-
-                    if(!block.isBlockWithEntity()) {
-                      if(block.waterlogged) {
-                        block = palette.water;
-                        octNode = palette.waterId;
-                      } else {
-                        block = Air.INSTANCE;
-                        octNode = palette.airId;
-                      }
-                    }
-                  }
-
-                  if(block.isWaterFilled()) {
-                    int waterNode = palette.waterId;
-                    if(y + 1 < yMax) {
-                      if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)).isWaterFilled()) {
-                        waterNode = palette.getWaterId(0, 1 << Water.FULL_BLOCK);
-                      }
-                    }
-                    if(block.isWater()) {
-                      // Move plain water blocks to the water octree.
-                      octNode = palette.airId;
-
-                      if(!onEdge) {
-                        // Perform water computation now for water blocks that are not on th edge of the chunk
-                        // Test if the block has not already be marked as full
-                        if(((Water) palette.get(waterNode)).data == 0) {
-                          int level0 = 8 - ((Water) block).level;
-                          int corner0 = level0;
-                          int corner1 = level0;
-                          int corner2 = level0;
-                          int corner3 = level0;
-
-                          int level = Chunk.waterLevelAt(chunkData, palette, cx - 1, y, cz, level0);
-                          corner3 += level;
-                          corner0 += level;
-
-                          level = Chunk.waterLevelAt(chunkData, palette, cx - 1, y, cz + 1, level0);
-                          corner0 += level;
-
-                          level = Chunk.waterLevelAt(chunkData, palette, cx, y, cz + 1, level0);
-                          corner0 += level;
-                          corner1 += level;
-
-                          level = Chunk.waterLevelAt(chunkData, palette, cx + 1, y, cz + 1, level0);
-                          corner1 += level;
-
-                          level = Chunk.waterLevelAt(chunkData, palette, cx + 1, y, cz, level0);
-                          corner1 += level;
-                          corner2 += level;
-
-                          level = Chunk.waterLevelAt(chunkData, palette, cx + 1, y, cz - 1, level0);
-                          corner2 += level;
-
-                          level = Chunk.waterLevelAt(chunkData, palette, cx, y, cz - 1, level0);
-                          corner2 += level;
-                          corner3 += level;
-
-                          level = Chunk.waterLevelAt(chunkData, palette, cx - 1, y, cz - 1, level0);
-                          corner3 += level;
-
-                          corner0 = Math.min(7, 8 - (corner0 / 4));
-                          corner1 = Math.min(7, 8 - (corner1 / 4));
-                          corner2 = Math.min(7, 8 - (corner2 / 4));
-                          corner3 = Math.min(7, 8 - (corner3 / 4));
-                          waterNode = palette.getWaterId(((Water) block).level, (corner0 << Water.CORNER_0)
-                                          | (corner1 << Water.CORNER_1)
-                                          | (corner2 << Water.CORNER_2)
-                                          | (corner3 << Water.CORNER_3));
-                        }
-                      } else {
-                        // Water computation for water blocks on the edge of a chunk is done by the OctreeFinalizer but we need the water level information
-                        waterNode = palette.getWaterId(((Water) block).level, 0);
-                      }
-                    }
-                    cubeWaterBlocks[cubeIndex] = waterNode;
-                  } else if(y + 1 < yMax && block instanceof Lava) {
-                    if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)) instanceof Lava) {
-                      octNode = palette.getLavaId(0, 1 << Water.FULL_BLOCK);
-                    } else if(!onEdge) {
-                      // Compute lava level for blocks not on edge
-                      Lava lava = (Lava) block;
-                      int level0 = 8 - lava.level;
-                      int corner0 = level0;
-                      int corner1 = level0;
-                      int corner2 = level0;
-                      int corner3 = level0;
-
-                      int level = Chunk.lavaLevelAt(chunkData, palette, cx - 1, y, cz, level0);
-                      corner3 += level;
-                      corner0 += level;
-
-                      level = Chunk.lavaLevelAt(chunkData, palette, cx - 1, y, cz + 1, level0);
-                      corner0 += level;
-
-                      level = Chunk.lavaLevelAt(chunkData, palette, cx, y, cz + 1, level0);
-                      corner0 += level;
-                      corner1 += level;
-
-                      level = Chunk.lavaLevelAt(chunkData, palette, cx + 1, y, cz + 1, level0);
-                      corner1 += level;
-
-                      level = Chunk.lavaLevelAt(chunkData, palette, cx + 1, y, cz, level0);
-                      corner1 += level;
-                      corner2 += level;
-
-                      level = Chunk.lavaLevelAt(chunkData, palette, cx + 1, y, cz - 1, level0);
-                      corner2 += level;
-
-                      level = Chunk.lavaLevelAt(chunkData, palette, cx, y, cz - 1, level0);
-                      corner2 += level;
-                      corner3 += level;
-
-                      level = Chunk.lavaLevelAt(chunkData, palette, cx - 1, y, cz - 1, level0);
-                      corner3 += level;
-
-                      corner0 = Math.min(7, 8 - (corner0 / 4));
-                      corner1 = Math.min(7, 8 - (corner1 / 4));
-                      corner2 = Math.min(7, 8 - (corner2 / 4));
-                      corner3 = Math.min(7, 8 - (corner3 / 4));
-                      octNode = palette.getLavaId(
-                              lava.level,
-                              (corner0 << Water.CORNER_0)
-                                      | (corner1 << Water.CORNER_1)
-                                      | (corner2 << Water.CORNER_2)
-                                      | (corner3 << Water.CORNER_3)
-                      );
-                    }
-                  }
-                  cubeWorldBlocks[cubeIndex] = octNode;
-
-                  if(emitterGrid != null && block.emittance > 1e-4) {
-                    emitterGrid.addEmitter(new Grid.EmitterPosition(x + 0.5f, y - origin.y + 0.5f, z + 0.5f));
-                  }
-                }
-              }
-            }
-          }
-          worldOctree.setCube(4, cubeWorldBlocks, cp.x*16 - origin.x, yCube*16 - origin.y, cp.z*16 - origin.z);
-          waterOctree.setCube(4, cubeWaterBlocks, cp.x*16 - origin.x, yCube*16 - origin.y, cp.z*16 - origin.z);
-        }
-
-        // Block entities are also called "tile entities". These are extra bits of metadata
-        // about certain blocks or entities.
-        // Block entities are loaded after the base block data so that metadata can be updated.
-        for (CompoundTag entityTag : chunkData.getTileEntities()) {
-          int y = entityTag.get("y").intValue(0);
-          if (y >= yMin && y < yMax) {
-            int x = entityTag.get("x").intValue(0) - wx0; // Chunk-local coordinates.
-            int z = entityTag.get("z").intValue(0) - wz0;
-            if (x < 0 || x > 15 || z < 0 || z > 15) {
-              // Block entity is out of range (bad chunk data?), ignore it
-              continue;
-            }
-            Block block = palette.get(chunkData.getBlockAt(x, y, z));
-            // Metadata is the old block data (to be replaced in future Minecraft versions?).
-            Vector3 position = new Vector3(x + wx0, y, z + wz0);
-            if (block.isBlockEntity()) {
-              Entity blockEntity = block.toBlockEntity(position, entityTag);
-              if (blockEntity == null) {
-                continue;
-              }
-              if (blockEntity instanceof Poseable) {
-                // don't add the actor again if it was already loaded from json
-                if (actors.stream().noneMatch(actor -> {
-                  if (actor.getClass().equals(blockEntity.getClass())) {
-                    Vector3 distance = new Vector3(actor.position);
-                    distance.sub(blockEntity.position);
-                    return distance.lengthSquared() < Ray.EPSILON;
-                  }
-                  return false;
-                })) {
-                  actors.add(blockEntity);
-                }
-              } else {
-                entities.add(blockEntity);
-                if(emitterGrid != null) {
-                  for(Grid.EmitterPosition emitterPos : blockEntity.getEmitterPosition()) {
-                    emitterPos.x -= origin.x;
-                    emitterPos.y -= origin.y;
-                    emitterPos.z -= origin.z;
-                    emitterGrid.addEmitter(emitterPos);
-                  }
-                }
-              }
-            }
-            /*
-            switch (block) {
-              case Block.HEAD_ID:
-                entities.add(new SkullEntity(position, entityTag, metadata));
-                break;
-              case Block.WALL_BANNER_ID: {
-                entities.add(new WallBanner(position, metadata, entityTag));
-                break;
-              }
-            }
-            */
-          }
-        }
-
-        if (!chunkData.isEmpty()){
-          nonEmptyChunks.add(cp);
-        }
-      }
-      executor.shutdown();
-    }
-
-    palette.unsynchronize();
-
-    grassTexture = new WorldTexture();
-    foliageTexture = new WorldTexture();
-    waterTexture = new WorldTexture();
-
-    try (TaskTracker.Task task = taskTracker.task("(4/6) Finalizing octree")) {
-
-      worldOctree.startFinalization();
-      waterOctree.startFinalization();
-
-      int done = 0;
-      int target = nonEmptyChunks.size();
-      for (ChunkPosition cp : nonEmptyChunks) {
-        // Finalize grass and foliage textures.
-        // 3x3 box blur.
-        for (int x = 0; x < 16; ++x) {
-          for (int z = 0; z < 16; ++z) {
-
-            int nsum = 0;
-            float[] grassMix = {0, 0, 0};
-            float[] foliageMix = {0, 0, 0};
-            float[] waterMix = {0, 0, 0};
-            for (int sx = x - 1; sx <= x + 1; ++sx) {
-              int wx = cp.x * 16 + sx;
-              for (int sz = z - 1; sz <= z + 1; ++sz) {
-                int wz = cp.z * 16 + sz;
-
-                ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
-                if (nonEmptyChunks.contains(ccp)) {
-                  nsum += 1;
-                  int biomeId = biomeIdMap.get(wx, wz);
-                  float[] grassColor = Biomes.getGrassColorLinear(biomeId);
-                  grassMix[0] += grassColor[0];
-                  grassMix[1] += grassColor[1];
-                  grassMix[2] += grassColor[2];
-                  float[] foliageColor = Biomes.getFoliageColorLinear(biomeId);
-                  foliageMix[0] += foliageColor[0];
-                  foliageMix[1] += foliageColor[1];
-                  foliageMix[2] += foliageColor[2];
-                  float[] waterColor = Biomes.getWaterColorLinear(biomeId);
-                  waterMix[0] += waterColor[0];
-                  waterMix[1] += waterColor[1];
-                  waterMix[2] += waterColor[2];
-                }
-              }
-            }
-            grassMix[0] /= nsum;
-            grassMix[1] /= nsum;
-            grassMix[2] /= nsum;
-            grassTexture.set(cp.x * 16 + x - origin.x, cp.z * 16 + z - origin.z, grassMix);
-
-            foliageMix[0] /= nsum;
-            foliageMix[1] /= nsum;
-            foliageMix[2] /= nsum;
-            foliageTexture.set(cp.x * 16 + x - origin.x, cp.z * 16 + z - origin.z, foliageMix);
-
-            waterMix[0] /= nsum;
-            waterMix[1] /= nsum;
-            waterMix[2] /= nsum;
-            waterTexture.set(cp.x * 16 + x - origin.x, cp.z * 16 + z - origin.z, waterMix);
-          }
-        }
-        task.updateEta(target, done);
-        done += 1;
-        OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
-      }
-
-      worldOctree.endFinalization();
-      waterOctree.endFinalization();
-    }
-
-    for (Entity entity : actors) {
-      entity.loadDataFromOctree(worldOctree, palette, origin);
-    }
-
-    for (Entity entity : entities) {
-      entity.loadDataFromOctree(worldOctree, palette, origin);
-    }
-
-    if (emitterGrid != null)
-      emitterGrid.prepare();
-
-    chunks = loadedChunks;
-    camera.setWorldSize(1 << worldOctree.getDepth());
-    try (TaskTracker.Task task = taskTracker.task("(5/6) Building world BVH")) {
+    loadedWorld = world;
+    worldPath = loadedWorld.getWorldDirectory().getAbsolutePath();
+    worldDimension = world.currentDimension();
+
+    boolean loadActors = actors.isEmpty();
+    ChunkLoadResult chunkLoadResult = new ChunkLoader(octreeImplementation,
+        yMin,
+        yMax,
+        yClipMin,
+        yClipMax,
+        emitterSamplingStrategy,
+        gridSize)
+        .loadChunks(world, chunksToLoad, taskTracker, loadActors);
+
+    try (Task task = taskTracker.task("(5/6) Building world BVH")) {
       buildBvh(task);
     }
-    try (TaskTracker.Task task = taskTracker.task("(6/6) Building actor BVH")) {
+    try (Task task = taskTracker.task("(6/6) Building actor BVH")) {
       buildActorBvh(task);
     }
-    Log.info(String.format("Loaded %d chunks", numChunks));
+
+    // Set scene values to load results
+    palette = chunkLoadResult.blockPalette;
+    worldOctree = chunkLoadResult.worldOctree;
+    waterOctree = chunkLoadResult.waterOctree;
+    emitterGrid = chunkLoadResult.emitterGrid;
+    entities = chunkLoadResult.entities;
+
+    // We don't load actor entities if some already exists. Loading actor entities
+    // risks resetting posed actors when reloading chunks for an existing scene.
+    if (loadActors) {
+      actors = chunkLoadResult.actors;
+      profiles = chunkLoadResult.profiles;
+    }
+    origin = chunkLoadResult.origin;
+    foliageTexture = chunkLoadResult.foliageTexture;
+    waterTexture = chunkLoadResult.waterTexture;
+    grassTexture = chunkLoadResult.grassTexture;
+    chunks = chunkLoadResult.loadedChunks;
+
+    camera.setWorldSize(1 << chunkLoadResult.worldOctree.getDepth());
+
+    Log.info(String.format("Loaded %d chunks", chunks.size()));
   }
 
   private void buildBvh(TaskTracker.Task task) {
@@ -1424,49 +919,6 @@ public class Scene implements JsonSerializable, Refreshable {
     refresh();
   }
 
-  private int calculateOctreeOrigin(Collection<ChunkPosition> chunksToLoad, boolean centerOctree) {
-    int xmin = Integer.MAX_VALUE;
-    int xmax = Integer.MIN_VALUE;
-    int zmin = Integer.MAX_VALUE;
-    int zmax = Integer.MIN_VALUE;
-    for (ChunkPosition cp : chunksToLoad) {
-      if (cp.x < xmin) {
-        xmin = cp.x;
-      }
-      if (cp.x > xmax) {
-        xmax = cp.x;
-      }
-      if (cp.z < zmin) {
-        zmin = cp.z;
-      }
-      if (cp.z > zmax) {
-        zmax = cp.z;
-      }
-    }
-
-    xmax += 1;
-    zmax += 1;
-    xmin *= 16;
-    xmax *= 16;
-    zmin *= 16;
-    zmax *= 16;
-
-    int maxDimension = Math.max(yMax - yMin, Math.max(xmax - xmin, zmax - zmin));
-    int requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
-
-    if(centerOctree) {
-      int xroom = (1 << requiredDepth) - (xmax - xmin);
-      int yroom = (1 << requiredDepth) - (yMax - yMin);
-      int zroom = (1 << requiredDepth) - (zmax - zmin);
-
-      origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
-    } else {
-      // Note: Math.floorDiv rather than integer division for round toward -infinity
-      origin.set(xmin, Math.floorDiv(yMin, 16) * 16, zmin);
-    }
-    return requiredDepth;
-  }
-
   /**
    * @return <code>true</code> if the scene has loaded chunks
    */
@@ -1480,38 +932,12 @@ public class Scene implements JsonSerializable, Refreshable {
    * @return The calculated camera position
    */
   public Vector3 calcCenterCamera() {
-    if (chunks.isEmpty()) {
-      return new Vector3(0, 128, 0);
-    }
+    BlockBounds bounds = Octree.calculateBounds(chunks);
 
-    int xmin = Integer.MAX_VALUE;
-    int xmax = Integer.MIN_VALUE;
-    int zmin = Integer.MAX_VALUE;
-    int zmax = Integer.MIN_VALUE;
-    for (ChunkPosition cp : chunks) {
-      if (cp.x < xmin) {
-        xmin = cp.x;
-      }
-      if (cp.x > xmax) {
-        xmax = cp.x;
-      }
-      if (cp.z < zmin) {
-        zmin = cp.z;
-      }
-      if (cp.z > zmax) {
-        zmax = cp.z;
-      }
-    }
-    xmax += 1;
-    zmax += 1;
-    xmin *= 16;
-    xmax *= 16;
-    zmin *= 16;
-    zmax *= 16;
-    int xcenter = (xmax + xmin) / 2;
-    int zcenter = (zmax + zmin) / 2;
+    int xcenter = (bounds.getXmax() + bounds.getXmin()) / 2;
+    int zcenter = (bounds.getZmax() + bounds.getZmin()) / 2;
     int ycenter = (yMax + yMin) / 2;
-    for (int y = Math.min(ycenter+127, yMax); y >= Math.max(ycenter-128, yMin); --y) {
+    for (int y = Math.min(ycenter + 127, yMax); y >= Math.max(ycenter - 128, yMin); --y) {
       Material block = worldOctree.getMaterial(xcenter - origin.x, y - origin.y, zcenter - origin.z,
           palette);
       if (!(block instanceof Air)) {
@@ -2167,7 +1593,9 @@ public class Scene implements JsonSerializable, Refreshable {
         palette = data.palette;
         palette.applyMaterials();
         Log.info("Octree loaded");
-        calculateOctreeOrigin(chunks, data.version < 6);
+
+        origin = Octree
+            .calculateOctreeOrigin(yMax, yMin, Octree.calculateBounds(chunks), data.version < 6);
         camera.setWorldSize(1 << worldOctree.getDepth());
 
         try (TaskTracker.Task bvhTask = taskTracker.task("(2/3) Building world BVH")) {
