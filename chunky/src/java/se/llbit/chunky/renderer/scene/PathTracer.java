@@ -143,7 +143,7 @@ public class PathTracer implements RayTracer {
           Ray reflected = new Ray();
           reflected.specularReflection(ray, random);
 
-          if (pathTrace(scene, reflected, state, 1, false)) {
+          if (pathTrace(scene, reflected, state, 1, false, emitterSampler)) {
             if (doMetal) {
               // use the albedo color as specular color
               ray.color.x *= reflected.color.x;
@@ -223,7 +223,7 @@ public class PathTracer implements RayTracer {
               }
 
               reflected.diffuseReflection(ray, random);
-              hit = pathTrace(scene, reflected, state, 0, false) || hit;
+              hit = pathTrace(scene, reflected, state, 0, false, emitterSampler) || hit;
               if (hit) {
                 ray.color.x = ray.color.x * (emittance + directLightR * scene.sun.emittance.x + (
                     reflected.color.x + reflected.emittance.x) + (indirectEmitterColor.x));
@@ -242,7 +242,7 @@ public class PathTracer implements RayTracer {
             } else {
               reflected.diffuseReflection(ray, random);
 
-              hit = pathTrace(scene, reflected, state, 0, false) || hit;
+              hit = pathTrace(scene, reflected, state, 0, false, emitterSampler) || hit;
               if (hit) {
                 ray.color.x =
                     ray.color.x * (emittance + (reflected.color.x + reflected.emittance.x)
@@ -278,7 +278,7 @@ public class PathTracer implements RayTracer {
             if (!scene.kill(ray.depth + 1, random)) {
               Ray reflected = new Ray();
               reflected.specularReflection(ray, random);
-              if (pathTrace(scene, reflected, state, 1, false)) {
+              if (pathTrace(scene, reflected, state, 1, false, emitterSampler)) {
 
                 ray.color.x = reflected.color.x;
                 ray.color.y = reflected.color.y;
@@ -303,7 +303,7 @@ public class PathTracer implements RayTracer {
               if (random.nextFloat() < Rtheta) {
                 Ray reflected = new Ray();
                 reflected.specularReflection(ray, random);
-                if (pathTrace(scene, reflected, state, 1, false)) {
+                if (pathTrace(scene, reflected, state, 1, false, emitterSampler)) {
                   ray.color.x = reflected.color.x;
                   ray.color.y = reflected.color.y;
                   ray.color.z = reflected.color.z;
@@ -328,7 +328,7 @@ public class PathTracer implements RayTracer {
                   refracted.o.scaleAdd(Ray.OFFSET, refracted.d);
                 }
 
-                if (pathTrace(scene, refracted, state, 1, false)) {
+                if (pathTrace(scene, refracted, state, 1, false, emitterSampler)) {
                   ray.color.x = ray.color.x * pDiffuse + (1 - pDiffuse);
                   ray.color.y = ray.color.y * pDiffuse + (1 - pDiffuse);
                   ray.color.z = ray.color.z * pDiffuse + (1 - pDiffuse);
@@ -347,7 +347,7 @@ public class PathTracer implements RayTracer {
           transmitted.set(ray);
           transmitted.o.scaleAdd(Ray.OFFSET, transmitted.d);
 
-          if (pathTrace(scene, transmitted, state, 1, false)) {
+          if (pathTrace(scene, transmitted, state, 1, false, emitterSampler)) {
             ray.color.x = ray.color.x * pDiffuse + (1 - pDiffuse);
             ray.color.y = ray.color.y * pDiffuse + (1 - pDiffuse);
             ray.color.z = ray.color.z * pDiffuse + (1 - pDiffuse);
