@@ -1,4 +1,5 @@
-/* Copyright (c) 2017-2019 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2017-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2017-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -72,13 +73,12 @@ public class TestBlankRender {
     options.renderThreads = 1;
     Chunky chunky = new Chunky(options);
     RenderContext context = new RenderContext(chunky);
-    context.workerFactory =
-        (renderManager, index, seed) -> new RenderWorker(renderManager, index, 0);
-    RenderManager renderer = new RenderManager(context, true);
+    context.renderPoolFactory = (threads, seed) -> new RenderWorkerPool(threads, 0);
+    DefaultRenderManager renderer = new DefaultRenderManager(context, true);
     renderer.setSceneProvider(new MockSceneProvider(scene));
     renderer.start();
     renderer.join();
-    return renderer.getBufferedScene().getSampleBuffer();
+    return renderer.bufferedScene.getSampleBuffer();
   }
 
   /** Compares two sample buffers. */

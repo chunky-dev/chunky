@@ -29,6 +29,8 @@ import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.RenderManager;
+import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
@@ -40,6 +42,7 @@ import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.ShutdownAlert;
 import se.llbit.math.bvh.BVH;
 import se.llbit.math.Octree;
+import se.llbit.util.Registerable;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,32 +56,21 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   private RenderController controller;
   private Scene scene;
 
-  @FXML
-  private IntegerAdjuster renderThreads;
-  @FXML
-  private IntegerAdjuster cpuLoad;
-  @FXML
-  private IntegerAdjuster rayDepth;
-  @FXML
-  private Button mergeRenderDump;
-  @FXML
-  private CheckBox shutdown;
-  @FXML
-  private CheckBox fastFog;
-  @FXML
-  private IntegerAdjuster cacheResolution;
-  @FXML
-  private DoubleAdjuster animationTime;
-  @FXML
-  private ChoiceBox<PictureExportFormat> outputMode;
-  @FXML
-  private ChoiceBox<String> octreeImplementation;
-  @FXML
-  private ChoiceBox<String> bvhMethod;
-  @FXML
-  private IntegerAdjuster gridSize;
-  @FXML
-  private CheckBox preventNormalEmitterWithSampling;
+  @FXML private IntegerAdjuster renderThreads;
+  @FXML private IntegerAdjuster cpuLoad;
+  @FXML private IntegerAdjuster rayDepth;
+  @FXML private Button mergeRenderDump;
+  @FXML private CheckBox shutdown;
+  @FXML private CheckBox fastFog;
+  @FXML private IntegerAdjuster cacheResolution;
+  @FXML private DoubleAdjuster animationTime;
+  @FXML private ChoiceBox<PictureExportFormat> outputMode;
+  @FXML private ChoiceBox<String> octreeImplementation;
+  @FXML private ChoiceBox<String> bvhMethod;
+  @FXML private IntegerAdjuster gridSize;
+  @FXML private CheckBox preventNormalEmitterWithSampling;
+  @FXML private ChoiceBox<String> rendererSelect;
+  @FXML private ChoiceBox<String> previewSelect;
 
   public AdvancedTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("AdvancedTab.fxml"));
@@ -96,7 +88,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     cpuLoad.clampBoth();
     cpuLoad.onValueChange(value -> {
       PersistentSettings.setCPULoad(value);
-      controller.getRenderer().setCPULoad(value);
+      controller.getRenderManager().setCPULoad(value);
     });
     rayDepth.setName("Ray depth");
     rayDepth.setTooltip("Sets the minimum recursive ray depth.");
@@ -212,6 +204,14 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       scene.setPreventNormalEmitterWithSampling(newvalue);
       PersistentSettings.setPreventNormalEmitterWithSampling(newvalue);
     });
+
+    rendererSelect.setTooltip(new Tooltip("The renderer to use for rendering."));
+    rendererSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+        scene.setRenderer(newValue));
+
+    previewSelect.setTooltip(new Tooltip("The renderer to use for the preview."));
+    previewSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+        scene.setPreviewRenderer(newValue));
   }
 
   public boolean shutdownAfterCompletedRender() {
@@ -230,6 +230,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     gridSize.set(scene.getGridSize());
     preventNormalEmitterWithSampling.setSelected(scene.isPreventNormalEmitterWithSampling());
     animationTime.set(scene.getAnimationTime());
+    rendererSelect.getSelectionModel().select(scene.getRenderer());
+    previewSelect.getSelectionModel().select(scene.getPreviewRenderer());
   }
 
   @Override
@@ -247,11 +249,31 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     this.renderControls = controls;
     this.controller = controls.getRenderController();
     scene = controller.getSceneManager().getScene();
-    controller.getRenderer().setOnRenderCompleted((time, sps) -> {
+    controller.getRenderManager().setOnRenderCompleted((time, sps) -> {
       if(shutdownAfterCompletedRender()) {
         // TODO: rewrite the shutdown alert in JavaFX.
         new ShutdownAlert(null);
       }
     });
+
+    // Set the renderers
+    rendererSelect.getItems().clear();
+    RenderManager renderManager = controller.getRenderManager();
+    ArrayList<String> ids = new ArrayList<>();
+
+    for (Registerable renderer : renderManager.getRenderers())
+      ids.add(renderer.getId());
+
+    rendererSelect.getItems().addAll(ids);
+    rendererSelect.getSelectionModel().select(scene.getRenderer());
+
+    // Set the preview renderers, reuse the `ids` ArrayList
+    previewSelect.getItems().clear();
+    ids.clear();
+    for (Registerable render : renderManager.getPreviewRenderers())
+      ids.add(render.getId());
+
+    previewSelect.getItems().addAll(ids);
+    previewSelect.getSelectionModel().select(scene.getPreviewRenderer());
   }
 }
