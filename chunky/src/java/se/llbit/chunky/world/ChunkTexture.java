@@ -16,6 +16,8 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.math.ColorUtil;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -27,7 +29,7 @@ import java.io.IOException;
  */
 public class ChunkTexture {
 
-  float[] data = new float[Chunk.X_MAX * Chunk.Z_MAX * 3];
+  byte[] data = new byte[Chunk.X_MAX * Chunk.Z_MAX * 3];
 
   /**
    * Create new texture
@@ -41,10 +43,10 @@ public class ChunkTexture {
    * @param frgb RGB color components to set
    */
   public void set(int x, int z, float[] frgb) {
-    int index = x + z * Chunk.X_MAX;
-    data[index*3] = frgb[0];
-    data[index*3 + 1] = frgb[1];
-    data[index*3 + 2] = frgb[2];
+    int index = (x + z * Chunk.X_MAX) * 3;
+    data[index] = ColorUtil.RGBComponentFromLinear(frgb[0]);
+    data[index + 1] = ColorUtil.RGBComponentFromLinear(frgb[1]);
+    data[index + 2] = ColorUtil.RGBComponentFromLinear(frgb[2]);
   }
 
   /**
@@ -52,8 +54,10 @@ public class ChunkTexture {
    */
   public float[] get(int x, int z) {
     float[] result = new float[3];
-    int index = x + z * Chunk.X_MAX;
-    System.arraycopy(data, index*3, result, 0, 3);
+    int index = (x + z * Chunk.X_MAX) * 3;
+    result[0] = ColorUtil.RGBComponentToLinear(data[index]);
+    result[1] = ColorUtil.RGBComponentToLinear(data[index + 1]);
+    result[2] = ColorUtil.RGBComponentToLinear(data[index + 2]);
     return result;
   }
 
@@ -64,9 +68,9 @@ public class ChunkTexture {
    */
   public void store(DataOutputStream out) throws IOException {
     for (int i = 0; i < Chunk.X_MAX * Chunk.Z_MAX; ++i) {
-      out.writeFloat(data[i*3]);
-      out.writeFloat(data[i*3 + 1]);
-      out.writeFloat(data[i*3 + 2]);
+      out.writeFloat(ColorUtil.RGBComponentToLinear(data[i*3]));
+      out.writeFloat(ColorUtil.RGBComponentToLinear(data[i*3 + 1]));
+      out.writeFloat(ColorUtil.RGBComponentToLinear(data[i*3 + 2]));
     }
   }
 
@@ -79,9 +83,9 @@ public class ChunkTexture {
   public static ChunkTexture load(DataInputStream in) throws IOException {
     ChunkTexture texture = new ChunkTexture();
     for (int i = 0; i < Chunk.X_MAX * Chunk.Z_MAX; ++i) {
-      texture.data[i*3] = in.readFloat();
-      texture.data[i*3 + 1] = in.readFloat();
-      texture.data[i*3 + 2] = in.readFloat();
+      texture.data[i*3] = ColorUtil.RGBComponentFromLinear(in.readFloat());
+      texture.data[i*3 + 1] = ColorUtil.RGBComponentFromLinear(in.readFloat());
+      texture.data[i*3 + 2] = ColorUtil.RGBComponentFromLinear(in.readFloat());
     }
     return texture;
   }
