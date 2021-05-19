@@ -124,7 +124,7 @@ public class LegacyBlocks {
       case 112: return nameTag(tag, "nether_bricks");
       case 113: return needsFinalization(nameTag(tag, "nether_brick_fence"), id, data);
       case 114: return needsFinalization(stairsTag(nameTag(tag, "nether_brick_stairs"), data), id, data);
-      case 115: return intTag(nameTag(tag, "nether_wart"), "age", data&7);
+      case 115: return intTag(nameTag(tag, "nether_wart"), "age", data & 0b11);
       case 116: return nameTag(tag, "enchanting_table");
       case 117: return nameTag(tag, "brewing_stand");
       case 118: return intTag(nameTag(tag, "cauldron"), "level", data&3);
@@ -227,7 +227,7 @@ public class LegacyBlocks {
       case 204: return slabTag(nameTag(tag, "purpur_slab"), true, false);
       case 205: return slabTag(nameTag(tag, "purpur_slab"), false, (data&8) != 0);
       case 206: return nameTag(tag, "end_stone_bricks");
-      case 207: return nameTag(tag, "beetroots");
+      case 207: return intTag(nameTag(tag, "beetroots"), "age", data & 0b11);
       case 208: return nameTag(tag, "grass_path");
       case 209: return nameTag(tag, "end_gateway");
       case 210: return commandBlockTag(nameTag(tag, "repeating_command_block"), data);
