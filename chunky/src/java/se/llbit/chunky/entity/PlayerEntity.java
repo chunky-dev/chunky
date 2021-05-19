@@ -553,40 +553,46 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   static CubeModel getHelmModel(JsonObject item) {
     String id = item.get("id").asString("");
     JsonObject json = parseJson(helmJson);
-    if (id.equals("minecraft:skull")) {
-      // Reference: https://minecraft.gamepedia.com/Mob_head#Data_values
-      int type = item.get("type").asInt(3);
-      switch (type) {
-        case 0:
-          // Skeleton skull.
-          json = parseJson(skullJson);
-          break;
-        case 1:
-          // Wither skeleton skull.
-          json = parseJson(skullJson);
-          break;
-        case 2:
-          // Zombie head.
-          json = parseJson(headJson);
-          break;
-        case 3:
-          // Steve head.
-          json = parseJson(headJson);
-          break;
-        case 4:
-          // Creeper head.
-          json = parseJson(skullJson);
-          break;
-        case 5:
-          // Dragon head.
-          json = parseJson(skullJson);
-          break;
-      }
-    } else if (id.equals("minecraft:player_head") || id.equals("minecraft:zombie_head")) {
-      json = parseJson(headJson);
-    } else if (id.equals("minecraft:skeleton_skull") || id.equals("minecraft:wither_skeleton_skull")
-        || id.equals("minecraft:creeper_head")) {
-      json = parseJson(skullJson);
+    switch (id) {
+      case "minecraft:skull":
+        // Reference: https://minecraft.gamepedia.com/Mob_head#Data_values
+        int type = item.get("type").asInt(3);
+        switch (type) {
+          case 0:
+            // Skeleton skull.
+            json = parseJson(skullJson);
+            break;
+          case 1:
+            // Wither skeleton skull.
+            json = parseJson(skullJson);
+            break;
+          case 2:
+            // Zombie head.
+            json = parseJson(headJson);
+            break;
+          case 3:
+            // Steve head.
+            json = parseJson(headJson);
+            break;
+          case 4:
+            // Creeper head.
+            json = parseJson(skullJson);
+            break;
+          case 5:
+            // Dragon head.
+            json = parseJson(skullJson);
+            break;
+        }
+        break;
+      case "minecraft:player_head":
+      case "minecraft:zombie_head":
+        json = parseJson(headJson);
+        break;
+      case "minecraft:skeleton_skull":
+      case "minecraft:wither_skeleton_skull":
+      case "minecraft:creeper_head":
+        json = parseJson(skullJson);
+        break;
     }
     Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
     return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
