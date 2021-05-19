@@ -104,7 +104,7 @@ public class LegacyBlocks {
             return stringTag(tag, "axis", "z");
         }
       case 91:  return facing4Tag(nameTag(tag, "jack_o_lantern"), data);
-      case 92:  return intTag(nameTag(tag, "cake"), "bites", data % 6);
+      case 92:  return intTag(nameTag(tag, "cake"), "bites", data % 7);
       case 93:  return repeaterTag(nameTag(tag, "repeater"), data, false);
       case 94:  return repeaterTag(nameTag(tag, "repeater"), data, true);
       case 96:  return trapdoorTag(nameTag(tag, "oak_trapdoor"), data);
