@@ -190,7 +190,7 @@ public class LegacyBlocks {
       case 166: return nameTag(tag, "barrier");
       case 167: return trapdoorTag(nameTag(tag, "iron_trapdoor"), data);
       case 169: return nameTag(tag, "sea_lantern");
-      case 170: return nameTag(tag, "hay_block");
+      case 170: return logTag(nameTag(tag, "hay_block"), data);
       case 172: return nameTag(tag, "terracotta");
       case 173: return nameTag(tag, "coal_block");
       case 174: return nameTag(tag, "packed_ice");
