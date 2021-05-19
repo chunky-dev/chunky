@@ -24,10 +24,10 @@ import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.scene.EmitterSamplerFactory.EmitterSampler;
+import se.llbit.chunky.renderer.scene.FogStrategyFactory.FogStrategy;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 /**
@@ -37,10 +37,13 @@ import se.llbit.math.Vector4;
  */
 public class PathTracer implements RayTracer {
 
-  /**
-   * Extinction factor for fog rendering.
-   */
-  private static final double EXTINCTION_FACTOR = 0.04;
+  private final EmitterSamplerFactory emitterSamplerFactory;
+  private final FogStrategyFactory fogStrategyFactory;
+
+  public PathTracer() {
+    this.emitterSamplerFactory = new EmitterSamplerFactory();
+    this.fogStrategyFactory = new FogStrategyFactory();
+  }
 
   /**
    * Path trace the ray.
@@ -53,7 +56,8 @@ public class PathTracer implements RayTracer {
     } else {
       ray.setCurrentMaterial(Air.INSTANCE);
     }
-    pathTrace(scene, ray, state, 1, true, scene.getEmitterSampler());
+    pathTrace(scene, ray, state, 1, true,
+        emitterSamplerFactory.create(scene), fogStrategyFactory.create(scene));
   }
 
   /**
@@ -61,18 +65,16 @@ public class PathTracer implements RayTracer {
    *
    * @param firstReflection {@code true} if the ray has not yet hit the first diffuse or specular
    *                        reflection
+   * @param fogStrategy
    */
   private static boolean pathTrace(Scene scene, Ray ray, WorkerState state, int addEmitted,
-      boolean firstReflection, EmitterSampler emitterSampler) {
+      boolean firstReflection, EmitterSampler emitterSampler, FogStrategy fogStrategy) {
 
     boolean hit = false;
     Random random = state.random;
-    Vector3 ox = new Vector3(ray.o);
-    Vector3 od = new Vector3(ray.d);
     double airDistance = 0;
 
     while (true) {
-
       if (!RayTracers.nextIntersection(scene, ray)) {
         if (ray.getPrevMaterial().isWater()) {
           ray.color.set(0, 0, 0, 1);
@@ -143,7 +145,7 @@ public class PathTracer implements RayTracer {
           Ray reflected = new Ray();
           reflected.specularReflection(ray, random);
 
-          if (pathTrace(scene, reflected, state, 1, false, emitterSampler)) {
+          if (pathTrace(scene, reflected, state, 1, false, emitterSampler, fogStrategy)) {
             if (doMetal) {
               // use the albedo color as specular color
               ray.color.x *= reflected.color.x;
@@ -210,9 +212,8 @@ public class PathTracer implements RayTracer {
 
                 reflected.setCurrentMaterial(reflected.getPrevMaterial(), reflected.getPrevData());
 
-                getDirectLightAttenuation(scene, reflected, state);
+                Vector4 attenuation = getDirectLightAttenuation(scene, reflected);
 
-                Vector4 attenuation = state.attenuation;
                 if (attenuation.w > 0) {
                   double mult = QuickMath.abs(reflected.d.dot(ray.n));
                   directLightR = attenuation.x * attenuation.w * mult;
@@ -223,7 +224,8 @@ public class PathTracer implements RayTracer {
               }
 
               reflected.diffuseReflection(ray, random);
-              hit = pathTrace(scene, reflected, state, 0, false, emitterSampler) || hit;
+              hit = pathTrace(scene, reflected, state, 0, false, emitterSampler,
+                  fogStrategy) || hit;
               if (hit) {
                 ray.color.x = ray.color.x * (emittance + directLightR * scene.sun.emittance.x + (
                     reflected.color.x + reflected.emittance.x) + (indirectEmitterColor.x));
@@ -242,7 +244,8 @@ public class PathTracer implements RayTracer {
             } else {
               reflected.diffuseReflection(ray, random);
 
-              hit = pathTrace(scene, reflected, state, 0, false, emitterSampler) || hit;
+              hit = pathTrace(scene, reflected, state, 0, false, emitterSampler,
+                  fogStrategy) || hit;
               if (hit) {
                 ray.color.x =
                     ray.color.x * (emittance + (reflected.color.x + reflected.emittance.x)
@@ -278,7 +281,8 @@ public class PathTracer implements RayTracer {
             if (!scene.kill(ray.depth + 1, random)) {
               Ray reflected = new Ray();
               reflected.specularReflection(ray, random);
-              if (pathTrace(scene, reflected, state, 1, false, emitterSampler)) {
+              if (pathTrace(scene, reflected, state, 1, false, emitterSampler,
+                  fogStrategy)) {
 
                 ray.color.x = reflected.color.x;
                 ray.color.y = reflected.color.y;
@@ -303,7 +307,8 @@ public class PathTracer implements RayTracer {
               if (random.nextFloat() < Rtheta) {
                 Ray reflected = new Ray();
                 reflected.specularReflection(ray, random);
-                if (pathTrace(scene, reflected, state, 1, false, emitterSampler)) {
+                if (pathTrace(scene, reflected, state, 1, false, emitterSampler,
+                    fogStrategy)) {
                   ray.color.x = reflected.color.x;
                   ray.color.y = reflected.color.y;
                   ray.color.z = reflected.color.z;
@@ -328,7 +333,8 @@ public class PathTracer implements RayTracer {
                   refracted.o.scaleAdd(Ray.OFFSET, refracted.d);
                 }
 
-                if (pathTrace(scene, refracted, state, 1, false, emitterSampler)) {
+                if (pathTrace(scene, refracted, state, 1, false, emitterSampler,
+                    fogStrategy)) {
                   ray.color.x = ray.color.x * pDiffuse + (1 - pDiffuse);
                   ray.color.y = ray.color.y * pDiffuse + (1 - pDiffuse);
                   ray.color.z = ray.color.z * pDiffuse + (1 - pDiffuse);
@@ -347,7 +353,8 @@ public class PathTracer implements RayTracer {
           transmitted.set(ray);
           transmitted.o.scaleAdd(Ray.OFFSET, transmitted.d);
 
-          if (pathTrace(scene, transmitted, state, 1, false, emitterSampler)) {
+          if (pathTrace(scene, transmitted, state, 1, false, emitterSampler,
+              fogStrategy)) {
             ray.color.x = ray.color.x * pDiffuse + (1 - pDiffuse);
             ray.color.y = ray.color.y * pDiffuse + (1 - pDiffuse);
             ray.color.z = ray.color.z * pDiffuse + (1 - pDiffuse);
@@ -379,50 +386,7 @@ public class PathTracer implements RayTracer {
       }
     }
 
-    // This is a simplistic fog model which gives greater artistic freedom but
-    // less realism. The user can select fog color and density; in a more
-    // realistic model color would depend on viewing angle and sun color/position.
-    if (airDistance > 0 && scene.fogEnabled()) {
-      Sun sun = scene.sun;
-
-      // Pick point between ray origin and intersected object.
-      // The chosen point is used to test if the sun is lighting the
-      // fog between the camera and the first diffuse ray target.
-      // The sun contribution will be proportional to the amount of
-      // sunlit fog areas in the ray path, thus giving an approximation
-      // of the sun inscatter leading to effects like god rays.
-      // The way the sun contribution point is chosen is not
-      // entirely correct because the original ray may have
-      // travelled through glass or other materials between air gaps.
-      // However, the results are probably close enough to not be distracting,
-      // so this seems like a reasonable approximation.
-      Ray atmos = new Ray();
-      double offset = QuickMath.clamp(airDistance * random.nextFloat(),
-          Ray.EPSILON, airDistance - Ray.EPSILON);
-      atmos.o.scaleAdd(offset, od, ox);
-      sun.getRandomSunDirection(atmos, random);
-      atmos.setCurrentMaterial(Air.INSTANCE);
-
-      double fogDensity = scene.getFogDensity() * EXTINCTION_FACTOR;
-      double extinction = Math.exp(-airDistance * fogDensity);
-      ray.color.scale(extinction);
-
-      // Check sun visibility at random point to determine inscatter brightness.
-      getDirectLightAttenuation(scene, atmos, state);
-      Vector4 attenuation = state.attenuation;
-      if (attenuation.w > Ray.EPSILON) {
-        Vector3 fogColor = scene.getFogColor();
-        double inscatter;
-        if (scene.fastFog()) {
-          inscatter = (1 - extinction);
-        } else {
-          inscatter = airDistance * fogDensity * Math.exp(-offset * fogDensity);
-        }
-        ray.color.x += attenuation.x * attenuation.w * fogColor.x * inscatter;
-        ray.color.y += attenuation.y * attenuation.w * fogColor.y * inscatter;
-        ray.color.z += attenuation.z * attenuation.w * fogColor.z * inscatter;
-      }
-    }
+    fogStrategy.fog(scene, ray, random, airDistance);
 
     return hit;
   }
@@ -430,13 +394,8 @@ public class PathTracer implements RayTracer {
   /**
    * Calculate direct lighting attenuation.
    */
-  private static void getDirectLightAttenuation(Scene scene, Ray ray, WorkerState state) {
-
-    Vector4 attenuation = state.attenuation;
-    attenuation.x = 1;
-    attenuation.y = 1;
-    attenuation.z = 1;
-    attenuation.w = 1;
+  public static Vector4 getDirectLightAttenuation(Scene scene, Ray ray) {
+    Vector4 attenuation = new Vector4(1, 1, 1, 1);
     while (attenuation.w > 0) {
       ray.o.scaleAdd(Ray.OFFSET, ray.d);
       if (!RayTracers.nextIntersection(scene, ray)) {
@@ -456,6 +415,7 @@ public class PathTracer implements RayTracer {
         }
       }
     }
-  }
 
+    return attenuation;
+  }
 }

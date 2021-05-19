@@ -1,24 +1,26 @@
 package se.llbit.chunky.renderer.scene;
 
 import java.util.Random;
-import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.Grid;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
+/**
+ * Factory for creating {@link EmitterSampler}s.
+ */
 public class EmitterSamplerFactory {
 
-  public EmitterSampler create(EmitterSamplingStrategy strategy) {
-    switch (strategy) {
+  public EmitterSampler create(Scene scene) {
+    switch (scene.getEmitterSamplingStrategy()) {
       case ALL:
         return new AllEmittersSampler();
       case ONE:
         return new SingleEmitterSampler();
       case NONE:
       default:
-        return (scene, ray, random) -> new Vector4(0, 0, 0, 0);
+        return (s, ray, random) -> new Vector4(0, 0, 0, 0);
     }
   }
 

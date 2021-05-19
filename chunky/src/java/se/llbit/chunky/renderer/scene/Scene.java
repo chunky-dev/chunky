@@ -83,7 +83,6 @@ import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
-import se.llbit.chunky.renderer.scene.EmitterSamplerFactory.EmitterSampler;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.Biomes;
@@ -382,7 +381,6 @@ public class Scene implements JsonSerializable, Refreshable {
    * Additional data that is associated with a scene, this can be used by plugins
    */
   private JsonObject additionalData = new JsonObject();
-  private EmitterSampler emitterSampler = new EmitterSamplerFactory().create(emitterSamplingStrategy);
 
   /**
    * Creates a scene with all default settings.
@@ -3293,9 +3291,5 @@ public class Scene implements JsonSerializable, Refreshable {
   @PluginApi
   public JsonValue getAdditionalData(String name) {
     return additionalData.get(name);
-  }
-
-  public EmitterSampler getEmitterSampler() {
-    return emitterSampler;
   }
 }
