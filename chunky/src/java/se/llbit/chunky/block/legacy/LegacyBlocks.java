@@ -393,17 +393,17 @@ public class LegacyBlocks {
       case 43:
       case 44: {
         boolean both = id == 43;
-        boolean which = (data & 0x8) != 0;
+        boolean top = (data & 0x8) != 0;
         switch (data) {
           default:
-          case 0: return slabTag(nameTag(tag, "smooth_stone_slab"), both, which);
-          case 1: return slabTag(nameTag(tag, "sandstone_slab"), both, which);
-          case 2: return slabTag(nameTag(tag, "oak_slab"), both, which);
-          case 3: return slabTag(nameTag(tag, "cobblestone_slab"), both, which);
-          case 4: return slabTag(nameTag(tag, "brick_slab"), both, which);
-          case 5: return slabTag(nameTag(tag, "stone_brick_slab"), both, which);
-          case 6: return slabTag(nameTag(tag, "nether_brick_slab"), both, which);
-          case 7: return slabTag(nameTag(tag, "quartz_slab"), both, which);
+          case 0: return slabTag(nameTag(tag, "smooth_stone_slab"), both, top);
+          case 1: return slabTag(nameTag(tag, "sandstone_slab"), both, top);
+          case 2: return slabTag(nameTag(tag, "oak_slab"), both, top);
+          case 3: return slabTag(nameTag(tag, "cobblestone_slab"), both, top);
+          case 4: return slabTag(nameTag(tag, "brick_slab"), both, top);
+          case 5: return slabTag(nameTag(tag, "stone_brick_slab"), both, top);
+          case 6: return slabTag(nameTag(tag, "nether_brick_slab"), both, top);
+          case 7: return slabTag(nameTag(tag, "quartz_slab"), both, top);
         }
       }
       case 50:
@@ -486,15 +486,15 @@ public class LegacyBlocks {
       case 125:
       case 126: {
         boolean both = id == 125;
-        boolean which = (data & 0x8) != 0;
+        boolean top = (data & 0x8) != 0;
         switch (data) {
           default:
-          case 0: return slabTag(nameTag(tag, "oak_slab"), both, which);
-          case 1: return slabTag(nameTag(tag, "spruce_slab"), both, which);
-          case 2: return slabTag(nameTag(tag, "birch_slab"), both, which);
-          case 3: return slabTag(nameTag(tag, "jungle_slab"), both, which);
-          case 4: return slabTag(nameTag(tag, "acacia_slab"), both, which);
-          case 5: return slabTag(nameTag(tag, "dark_oak_slab"), both, which);
+          case 0: return slabTag(nameTag(tag, "oak_slab"), both, top);
+          case 1: return slabTag(nameTag(tag, "spruce_slab"), both, top);
+          case 2: return slabTag(nameTag(tag, "birch_slab"), both, top);
+          case 3: return slabTag(nameTag(tag, "jungle_slab"), both, top);
+          case 4: return slabTag(nameTag(tag, "acacia_slab"), both, top);
+          case 5: return slabTag(nameTag(tag, "dark_oak_slab"), both, top);
         }
       }
       case 139:
@@ -626,7 +626,7 @@ public class LegacyBlocks {
         }
       case 175:
         switch (data & 0b111) {
-          default:
+          default: // finalization will determine the flower from the block below
           case 0: return needsFinalization(nameTag(tag, "sunflower"), id, data);
           case 1: return needsFinalization(nameTag(tag, "lilac"), id, data);
           case 2: return needsFinalization(nameTag(tag, "tall_grass"), id, data);
@@ -744,8 +744,8 @@ public class LegacyBlocks {
     return stringTag(tag, "facing", (new String[] {"south", "west", "north", "east"})[data % 4]);
   }
 
-  private static CompoundTag slabTag(CompoundTag tag, boolean both, boolean which) {
-    return customTag(tag, "type", new StringTag(both ? "double" : (which ? "top" : "bottom")));
+  private static CompoundTag slabTag(CompoundTag tag, boolean both, boolean top) {
+    return customTag(tag, "type", new StringTag(both ? "double" : (top ? "top" : "bottom")));
   }
 
   private static CompoundTag litTag(CompoundTag tag, boolean lit) {
@@ -859,8 +859,8 @@ public class LegacyBlocks {
     }
   }
 
-  public static CompoundTag vineTag(CompoundTag tag, int data, boolean solidBlockAbove) {
-    boolTag(tag, "up", data == 0 || solidBlockAbove);
+  public static CompoundTag vineTag(CompoundTag tag, int data, boolean forceUp) {
+    boolTag(tag, "up", data == 0 || forceUp);
     boolTag(tag, "north", (data & 0b0100) != 0);
     boolTag(tag, "east", (data & 0b1000) != 0);
     boolTag(tag, "south", (data & 0b0001) != 0);
