@@ -18,12 +18,14 @@
 package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.plugin.PluginApi;
+import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
+import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.scene.PathTracer;
 import se.llbit.chunky.renderer.scene.PreviewRayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
-import se.llbit.util.Registerable;
+import se.llbit.math.ColorUtil;
 import se.llbit.util.TaskTracker;
 
 import java.util.ArrayList;
@@ -33,7 +35,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * This class serves to interface {@code Renderer}s with Chunky.
@@ -83,8 +84,8 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   /**
    * The current renderer selections.
    */
-  private String renderer = ChunkyPathTracerID;
-  private String previewRenderer = ChunkyPreviewID;
+  protected String renderer = ChunkyPathTracerID;
+  protected String previewRenderer = ChunkyPreviewID;
 
   /**
    * This is a buffered scene which render workers should use while rendering.
@@ -107,18 +108,18 @@ public class DefaultRenderManager extends Thread implements RenderManager {
    */
   public final RenderWorkerPool pool;
 
-  private int cpuLoad = 100;
+  protected int cpuLoad = 100;
 
   /**
    * The render canvas. This is redrawn on every frame (if applicable).
    */
-  private Repaintable canvas = () -> {};
+  protected Repaintable canvas = () -> {};
 
   /**
    * Decides if the canvas is in view and every frame needs to be finalized. If not, only
    * the frames before a snapshot are finalized.
    */
-  private boolean finalizeAllFrames = false;
+  protected boolean finalizeAllFrames = false;
 
   /**
    * Listeners that need to be called on every frame when rendering.
@@ -133,7 +134,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   private BiConsumer<Long, Integer> renderCompletionListener = (time, sps) -> {};
   private BiConsumer<Scene, Integer> frameCompletionListener = (scene, spp) -> {};
 
-  private TaskTracker.Task renderTask = TaskTracker.Task.NONE;
+  protected TaskTracker.Task renderTask = TaskTracker.Task.NONE;
 
   private long renderStart;
 
@@ -145,12 +146,12 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   /**
    * Current renderer mode.
    */
-  private RenderMode mode = RenderMode.PREVIEW;
+  protected RenderMode mode = RenderMode.PREVIEW;
 
   /**
    * Current snapshot mode. Frame will always be post processed if a snapshot will happen after that frame.
    */
-  private SnapshotControl snapshotControl = SnapshotControl.DEFAULT;
+  protected SnapshotControl snapshotControl = SnapshotControl.DEFAULT;
 
   protected SceneProvider sceneProvider;
   public final RenderContext context;
@@ -158,7 +159,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   /**
    * This renderer does nothing. Is used when there is an invalid renderer.
    */
-  private static final Renderer EMPTY_RENDERER = new Renderer() {
+  protected static final Renderer EMPTY_RENDERER = new Renderer() {
     @Override public String getId() { return "Empty"; }
     @Override public String getName() { return "Empty"; }
     @Override public String getDescription() { return "Empty Renderer"; }
@@ -166,8 +167,8 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     @Override public void render(DefaultRenderManager manager) {}
   };
 
-  private final BooleanSupplier previewCallback;
-  private final BooleanSupplier renderCallback;
+  protected final BooleanSupplier previewCallback;
+  protected final BooleanSupplier renderCallback;
 
   /**
    * @param headless {@code true} if rendering threads should be shut
@@ -307,14 +308,21 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     }
   }
 
-  @Override
-  public Collection<Renderer> getRenderers() {
-    return renderers.values();
+  /**
+   * Redraw the GUI screen. This should be run after postprocessing.
+   */
+  @PluginApi
+  public void redrawScreen() {
+    bufferedScene.swapBuffers();
+    canvas.repaint();
   }
 
-  @Override
-  public Collection<Renderer> getPreviewRenderers() {
-    return previewRenderers.values();
+  /**
+   * Get if there is a need for this frame to be finalized.
+   */
+  @PluginApi
+  public boolean shouldFinalize() {
+    return finalizeAllFrames || snapshotControl.saveSnapshot(bufferedScene, bufferedScene.spp);
   }
 
   protected Renderer getRenderer() {
@@ -337,26 +345,6 @@ public class DefaultRenderManager extends Thread implements RenderManager {
       previewRenderer = id;
     else
       previewRenderer = ChunkyPreviewID;
-  }
-
-  @Override
-  public synchronized void addRenderListener(RenderStatusListener listener) {
-    renderStatusListeners.add(listener);
-  }
-
-  @Override
-  public void removeRenderListener(RenderStatusListener listener) {
-    renderStatusListeners.remove(listener);
-  }
-
-  @Override
-  public void setSceneProvider(SceneProvider sceneProvider) {
-    this.sceneProvider = sceneProvider;
-  }
-
-  @Override
-  public void setCanvas(Repaintable canvas) {
-    this.canvas = canvas;
   }
 
   private void updateRenderState(Scene scene) {
@@ -405,6 +393,91 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   }
 
   /**
+   * Finalize the frame if necessary. This uses the internal {@code RenderWorkerPool}.
+   */
+  protected void finalizeFrame(boolean force) {
+    if (force || snapshotControl.saveSnapshot(bufferedScene, bufferedScene.spp)) {
+      PostProcessingFilter filter = bufferedScene.getPostProcessingFilter();
+
+      if (filter instanceof PixelPostProcessingFilter) {
+        PixelPostProcessingFilter pixelFilter = (PixelPostProcessingFilter) filter;
+
+        int width = bufferedScene.width;
+        int height = bufferedScene.height;
+        double[] sampleBuffer = bufferedScene.getSampleBuffer();
+        double exposure = bufferedScene.getExposure();
+
+        // Split up to 10 tasks per thread
+        int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.threads * 10 - 1);
+
+        for (int i = 0; i < bufferedScene.width * bufferedScene.height; i += pixelsPerTask) {
+          int start = i;
+          int end = Math.min(bufferedScene.width * bufferedScene.height, i + pixelsPerTask);
+          pool.submit(worker -> {
+            double[] pixelbuffer = new double[3];
+
+            for (int j = start; j < end; j++) {
+              int x = j % width;
+              int y = j / width;
+
+              pixelFilter.processPixel(width, height, sampleBuffer, x, y, exposure, pixelbuffer);
+              bufferedScene.getBackBuffer().setPixel(x, y, ColorUtil.getRGB(pixelbuffer));
+            }
+          });
+        }
+      } else {
+        bufferedScene.postProcessFrame(TaskTracker.NONE);
+      }
+
+      try {
+        pool.awaitEmpty();
+      } catch (InterruptedException e) {
+        // Interrupted
+      }
+
+      bufferedScene.postProcessFrame(TaskTracker.NONE);
+      redrawScreen();
+    }
+  }
+
+  /**
+   * Sends scene status text to the render preview tooltip.
+   */
+  private synchronized void sendSceneStatus(String status) {
+    sceneStatusListeners.forEach(listener -> listener.sceneStatus(status));
+  }
+
+  @Override
+  public Collection<Renderer> getRenderers() {
+    return renderers.values();
+  }
+
+  @Override
+  public Collection<Renderer> getPreviewRenderers() {
+    return previewRenderers.values();
+  }
+
+  @Override
+  public synchronized void addRenderListener(RenderStatusListener listener) {
+    renderStatusListeners.add(listener);
+  }
+
+  @Override
+  public void removeRenderListener(RenderStatusListener listener) {
+    renderStatusListeners.remove(listener);
+  }
+
+  @Override
+  public void setSceneProvider(SceneProvider sceneProvider) {
+    this.sceneProvider = sceneProvider;
+  }
+
+  @Override
+  public void setCanvas(Repaintable canvas) {
+    this.canvas = canvas;
+  }
+
+  /**
    * Call the consumer with the current front frame buffer.
    */
   @Override
@@ -447,22 +520,18 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     pool.setCpuLoad(value);
   }
 
-  /**
-   * Sends scene status text to the render preview tooltip.
-   */
-  private synchronized void sendSceneStatus(String status) {
-    sceneStatusListeners.forEach(listener -> listener.sceneStatus(status));
-  }
-
-  @Override public synchronized void addSceneStatusListener(SceneStatusListener listener) {
+  @Override
+  public synchronized void addSceneStatusListener(SceneStatusListener listener) {
     sceneStatusListeners.add(listener);
   }
 
-  @Override public synchronized void removeSceneStatusListener(SceneStatusListener listener) {
+  @Override
+  public synchronized void removeSceneStatusListener(SceneStatusListener listener) {
     sceneStatusListeners.remove(listener);
   }
 
-  @Override public RenderStatus getRenderStatus() {
+  @Override
+  public RenderStatus getRenderStatus() {
     RenderStatus status;
     synchronized (bufferedScene) {
       status = new RenderStatus(bufferedScene.renderTime, bufferedScene.spp);
@@ -481,17 +550,6 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   public void shutdown() {
     pool.interrupt();
     interrupt();
-  }
-
-  /**
-   * Finalize the frame if necessary. This uses the internal {@code RenderWorkerPool}.
-   */
-  public void finalizeFrame(boolean force) {
-    if (force || snapshotControl.saveSnapshot(bufferedScene, bufferedScene.spp)) {
-      bufferedScene.postProcessFrame(TaskTracker.NONE);
-      bufferedScene.swapBuffers();
-      canvas.repaint();
-    }
   }
 
   /**
