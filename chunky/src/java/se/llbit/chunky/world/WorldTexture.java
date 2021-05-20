@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.world;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import java.io.DataInputStream;
@@ -80,8 +81,8 @@ public class WorldTexture {
    */
   public void store(DataOutputStream out) throws IOException {
     out.writeInt(map.size());
-    for (Map.Entry<Long, ChunkTexture> entry : map.entrySet()) {
-      long pos = entry.getKey();
+    for (Long2ObjectMap.Entry<ChunkTexture> entry : map.long2ObjectEntrySet()) {
+      long pos = entry.getLongKey();
       ChunkTexture texture = entry.getValue();
       out.writeInt((int) (pos >> 32));
       out.writeInt((int) pos);

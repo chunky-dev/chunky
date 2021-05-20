@@ -60,15 +60,12 @@ public class JsonModel {
 
   private static Map<String, String> getTextures(JsonObject json) {
     Map<String, String> map = new HashMap<>();
-    while (true) {
+    do {
       for (JsonMember texture : json.get("textures").object()) {
         map.putIfAbsent(texture.name, texture.value.asString("#unknownTexture"));
       }
       json = json.get("parent").object();
-      if (json.isEmpty()) {
-        break;
-      }
-    }
+    } while (!json.isEmpty());
     return map;
   }
 
