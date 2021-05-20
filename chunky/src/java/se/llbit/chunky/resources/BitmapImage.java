@@ -40,6 +40,12 @@ public class BitmapImage implements Image {
     data = new int[width * height];
   }
 
+  public BitmapImage(int width, int height, int[] data) {
+    this.width = width;
+    this.height = height;
+    this.data = data;
+  }
+
   /**
    * Create a copy of another image.
    */
