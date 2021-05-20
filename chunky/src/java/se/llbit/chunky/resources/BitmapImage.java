@@ -26,7 +26,7 @@ import org.apache.commons.math3.util.FastMath;
  * raw pixel data is mutable. External synchronization is needed
  * if concurrent modification of pixels needs to be done.
  */
-public class BitmapImage {
+public class BitmapImage implements Image {
   public final int[] data;
   public final int width;
   public final int height;
@@ -48,6 +48,21 @@ public class BitmapImage {
     this.height = image.height;
     data = new int[width * height];
     System.arraycopy(image.data, 0, data, 0, width * height);
+  }
+
+  @Override
+  public int getWidth() {
+    return width;
+  }
+
+  @Override
+  public int getHeight() {
+    return height;
+  }
+
+  @Override
+  public int getPixel(int index) {
+    return data[index];
   }
 
   /** @return the ARGB value of the pixel (x, y). */
@@ -181,5 +196,9 @@ public class BitmapImage {
     img.blit(a, 0, 0);
     img.blit(b, 0, a.height, 0, 0, b.width, b.height);
     return img;
+  }
+
+  public BitmapImage asBitmap() {
+    return this;
   }
 }

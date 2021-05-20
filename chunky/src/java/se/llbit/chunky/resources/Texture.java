@@ -16,7 +16,6 @@
  */
 package se.llbit.chunky.resources;
 
-import javafx.scene.image.Image;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -1455,7 +1454,7 @@ public class Texture {
 
   public static final Texture armorStand = new Texture();
 
-  @NotNull protected BitmapImage image;
+  @NotNull protected Image image;
   protected int width;
   protected int height;
   protected int avgColor;
@@ -1463,7 +1462,7 @@ public class Texture {
   private boolean usesAverageColor = false;
   private float[] avgColorFlat;
 
-  private Image fxImage = null;
+  private javafx.scene.image.Image fxImage = null;
 
   public Texture() {
     this(ImageLoader.missingImage);
@@ -1473,7 +1472,7 @@ public class Texture {
     this(ImageLoader.readResourceNonNull("textures/" + resourceName + ".png"));
   }
 
-  public Texture(BitmapImage img) {
+  public Texture(Image img) {
     setTexture(img);
     useAverageColor(PersistentSettings.getSingleColorTextures());
   }
@@ -1489,20 +1488,19 @@ public class Texture {
     setTexture(texture.image);
   }
 
-  public void setTexture(BitmapImage newImage) {
+  public void setTexture(Image newImage) {
     image = newImage;
 
     // Gamma correct the texture.
     avgColorLinear = new float[] {0, 0, 0, 0};
 
-    int[] data = image.data;
-    width = image.width;
-    height = image.height;
+    width = image.getWidth();
+    height = image.getHeight();
     float[] pixelBuffer = new float[4];
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
         int index = width * y + x;
-        ColorUtil.getRGBAComponentsGammaCorrected(data[index], pixelBuffer);
+        ColorUtil.getRGBAComponentsGammaCorrected(image.getPixel(index), pixelBuffer);
         avgColorLinear[0] += pixelBuffer[3] * pixelBuffer[0];
         avgColorLinear[1] += pixelBuffer[3] * pixelBuffer[1];
         avgColorLinear[2] += pixelBuffer[3] * pixelBuffer[2];
@@ -1562,7 +1560,7 @@ public class Texture {
     if(usesAverageColor)
       return avgColorFlat;
     float[] result = new float[4];
-    ColorUtil.getRGBAComponentsGammaCorrected(image.data[width*y + x], result);
+    ColorUtil.getRGBAComponentsGammaCorrected(image.getPixel(width*y + x), result);
     return result;
   }
 
@@ -1647,19 +1645,14 @@ public class Texture {
     return false;
   }
 
-  public Image fxImage() {
+  public javafx.scene.image.Image fxImage() {
     if (fxImage == null) {
-      fxImage = FxImageUtil.toFxImage(image);
+      fxImage = FxImageUtil.toFxImage(image.asBitmap());
     }
     return fxImage;
   }
 
-  /** Access the raw image data for this texture. */
-  public int[] getData() {
-    return image.data;
-  }
-
   public BitmapImage getBitmap() {
-    return image;
+    return image.asBitmap();
   }
 }
