@@ -5,6 +5,11 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import se.llbit.math.QuickMath;
 
+/**
+ * Image using a palette compression to reduce memory usage.
+ * The size of the palette/number of bit each pixel takes
+ * is computed based on the number of colors used in the image to compress
+ */
 public class CompressedImage implements Image {
   private int width;
   private int height;
@@ -51,6 +56,12 @@ public class CompressedImage implements Image {
     return new BitmapImage(width, height, uncompressedData);
   }
 
+  /**
+   * Do the compression.
+   * The input image is first analyzed to count the number of color and determine
+   * the bit depth of the image.
+   * Then the image is compressed by storing the palette indexes
+   */
   private void compressFrom(Image source) {
     IntArrayList paletteBuilder = new IntArrayList();
     Int2IntOpenHashMap colorToIndex = new Int2IntOpenHashMap();
@@ -78,6 +89,7 @@ public class CompressedImage implements Image {
     pixelPerLong = 64 / bitDepth;
     mask = ((1L << bitDepth) - 1); // bitDepth 1s
 
+    // build the image
     LongArrayList compressedDataBuilder = new LongArrayList();
 
     int pixelIndex = 0;

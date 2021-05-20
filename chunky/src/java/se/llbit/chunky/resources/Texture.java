@@ -1656,6 +1656,9 @@ public class Texture {
     return image.asBitmap();
   }
 
+  /**
+   * Replace the current image by a compressed version of the image
+   */
   public void compress() {
     if(!(image instanceof CompressedImage))
       image = new CompressedImage(image);
