@@ -16,7 +16,7 @@ public class WallSign extends MinecraftBlockTranslucent {
   public WallSign(String name, String material, String facing) {
     super(name, SignEntity.textureFromMaterial(material));
     invisible = true;
-    opaque = false;
+    solid = false;
     localIntersect = true;
     this.material = material;
     switch (facing) {

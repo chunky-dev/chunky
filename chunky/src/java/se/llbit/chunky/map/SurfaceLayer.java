@@ -24,6 +24,7 @@ import se.llbit.chunky.block.GrassBlock;
 import se.llbit.chunky.block.Leaves;
 import se.llbit.chunky.block.TallGrass;
 import se.llbit.chunky.block.Vine;
+import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.world.Biomes;
@@ -81,6 +82,9 @@ public class SurfaceLayer extends BitmapLayer {
 
         while (y >= minY && color[3] < 1.f) {
           Block block = palette.get(chunkData.getBlockAt(x, y, z));
+          if (block instanceof UnfinalizedLegacyBlock) {
+            block = ((UnfinalizedLegacyBlock) block).getIncompleteBlock();
+          }
           float[] blockColor = new float[4];
           ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
           int biomeId = 0xFF & chunkData.getBiomeAt(x, 0, z);

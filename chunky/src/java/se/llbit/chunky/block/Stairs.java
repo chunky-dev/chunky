@@ -124,4 +124,22 @@ public class Stairs extends MinecraftBlockTranslucent {
   @Override public String description() {
     return description;
   }
+
+  public String getHalf() {
+    return flipped == 1 ? "top" : "bottom";
+  }
+
+  public BlockFace getFacing() {
+    switch (facing) {
+      case 0:
+        return BlockFace.EAST;
+      case 1:
+        return BlockFace.WEST;
+      case 2:
+        return BlockFace.SOUTH;
+      case 3:
+      default:
+        return BlockFace.NORTH;
+    }
+  }
 }

@@ -50,6 +50,7 @@ import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.*;
+import se.llbit.chunky.block.legacy.LegacyBlocksFinalizer;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
@@ -916,6 +917,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     Set<ChunkPosition> nonEmptyChunks = new HashSet<>();
+    Set<ChunkPosition> legacyChunks = new HashSet<>();
     Heightmap biomeIdMap = new Heightmap();
 
     ChunkData chunkData1;
@@ -1249,6 +1251,15 @@ public class Scene implements JsonSerializable, Refreshable {
             Block block = palette.get(chunkData.getBlockAt(x, y, z));
             // Metadata is the old block data (to be replaced in future Minecraft versions?).
             Vector3 position = new Vector3(x + wx0, y, z + wz0);
+            if (block.isModifiedByBlockEntity()) {
+              Tag newTag = block.getNewTagWithBlockEntity(palette.getBlockSpec(chunkData.getBlockAt(x, y, z)).getTag(), entityTag);
+              if (newTag != null) {
+                int id = palette.put(newTag);
+                block = palette.get(id);
+                chunkData.setBlockAt(x, y, z, id);
+                worldOctree.set(id, cp.x * 16 + x - origin.x, y - origin.y, cp.z * 16 + z - origin.z);
+              }
+            }
             if (block.isBlockEntity()) {
               Entity blockEntity = block.toBlockEntity(position, entityTag);
               if (blockEntity == null) {
@@ -1294,6 +1305,9 @@ public class Scene implements JsonSerializable, Refreshable {
 
         if (!chunkData.isEmpty()){
           nonEmptyChunks.add(cp);
+          if (world.getChunk(cp).getVersion().equals("1.12")) {
+            legacyChunks.add(cp);
+          }
         }
       }
       executor.shutdown();
@@ -1365,6 +1379,10 @@ public class Scene implements JsonSerializable, Refreshable {
         task.updateEta(target, done);
         done += 1;
         OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
+        if (legacyChunks.contains(cp)) {
+          LegacyBlocksFinalizer
+              .finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
+        }
       }
 
       worldOctree.endFinalization();

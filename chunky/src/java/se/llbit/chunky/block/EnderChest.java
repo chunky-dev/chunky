@@ -17,7 +17,7 @@ public class EnderChest extends MinecraftBlock {
   private final String description;
 
   public EnderChest(String facing) {
-    super("chest", Texture.chestFront);
+    super("ender_chest", Texture.chestFront);
     this.description = "facing=" + facing;
     localIntersect = true;
     opaque = false;

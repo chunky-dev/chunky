@@ -35,6 +35,10 @@ public class Repeater extends MinecraftBlockTranslucent {
     }
   }
 
+  public int getFacing() {
+    return facing;
+  }
+
   @Override public boolean intersect(Ray ray, Scene scene) {
     return RedstoneRepeaterModel.intersect(ray, delay, facing, powered, locked);
   }

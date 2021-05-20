@@ -271,7 +271,6 @@ public class SkullEntity extends Entity {
     this.type = type;
     this.rotation = rotation;
     this.placement = placement;
-    // TODO(jesper): add SkullOwner handling.
   }
 
   @Override public Collection<Primitive> primitives(Vector3 offset) {
