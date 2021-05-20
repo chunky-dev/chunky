@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -17,85 +16,71 @@
  */
 package se.llbit.chunky.renderer;
 
-import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.util.TaskTracker;
+import se.llbit.util.Registerable;
 
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.function.BooleanSupplier;
 
-/**
- * A renderer renders to a buffered image which is displayed by a render canvas.
- *
- * @author Jesper Öqvist <jesper@llbit.se>
- */
-public interface Renderer {
-  void setSceneProvider(SceneProvider sceneProvider);
-
-  void setCanvas(Repaintable canvas);
-
+public interface Renderer extends Registerable {
   /**
-   * Instructs the renderer to change its CPU load.
+   * Get the ID of this renderer.
    */
-  void setCPULoad(int loadPercent);
+  @Override
+  String getId();
 
   /**
-   * Set a listener for render completion.
+   * Get the friendly name of this renderer.
+   */
+  @Override
+  String getName();
+
+  /**
+   * Get the description of this renderer.
+   */
+  @Override
+  String getDescription();
+
+  /**
+   * The post render callback. This should be run after rendering a frame.
+   * It will return {@code true} if the render should terminate.
    *
-   * @param listener a listener which is passed the total rendering
-   * time and average samples per second.
-   */
-  void setOnRenderCompleted(BiConsumer<Long, Integer> listener);
-
-  /**
-   * Set a listener for frame completion.
+   * Generally the render loop will look like:
+   * {@code
+   *   while (scene.spp < scene.getTargetSpp()) {
+   *     submitTiles(manager, (state, pixel) -> {});
+   *     manager.pool.awaitEmpty();
+   *     scene.spp += 1; // update spp
+   *     if (postRender.getAsBoolean()) break;
+   *   }
+   * }
    *
-   * @param listener a listener which is called when a frame completes
-   * with the current scene and the current samples per pixel.
+   * Implementation details, this deals with:
+   *  * Checking if the render mode has changed
+   *  * Updating the task-tracker
+   *  * Repainting the canvas
+   *  * Updating the {@code bufferedScene}
    */
-  void setOnFrameCompleted(BiConsumer<Scene, Integer> listener);
-
-  void setSnapshotControl(SnapshotControl callback);
-
-  void setRenderTask(TaskTracker.Task task);
-
-  void addRenderListener(RenderStatusListener listener);
-
-  void removeRenderListener(RenderStatusListener listener);
-
-  void withBufferedImage(Consumer<BitmapImage> bitmap);
-
-  interface SampleBufferConsumer {
-    void accept(double[] samples, int width, int height);
-  }
-
-  void addSceneStatusListener(SceneStatusListener listener);
-
-  void removeSceneStatusListener(SceneStatusListener listener);
-
-  RenderStatus getRenderStatus();
+  void setPostRender(BooleanSupplier callback);
 
   /**
-   * Start up the renderer.
+   * This is called when a render is initiated.
    *
-   * <p>This should start all worker threads used by the renderer.
+   * * It should render a frame, merge that frame with {@code manager.bufferedScene}, and update the spp values.
+   * * It should call the post-render callback (set in {@code setPostRender(callback)}) and terminate if it returns {@code true}.
    */
-  void start();
+  void render(DefaultRenderManager manager) throws InterruptedException;
 
   /**
-   * Wait for the renderer to terminate. This should only be done
-   * in headless rendering, otherwise the renderer will not automatically
-   * shut down after the render completes.
-   * @throws InterruptedException
+   * This is called when the scene is reset. The default implementation does nothing.
+   * This is for {@code Renderer}s which need to export the scene data in some way.
    */
-  void join() throws InterruptedException;
-
-  void withSampleBufferProtected(SampleBufferConsumer consumer);
+  default void sceneReset(DefaultRenderManager manager, ResetReason reason) {}
 
   /**
-   * Shut down the renderer.
-   *
-   * <p>This should interrupt all worker threads used by the renderer.
+   * This should return if this renderer will postprocess on its own.
+   * {@code true}:  This renderer will <bold>NOT</bold> postprocessing on its own. Postprocessing will be handled by the
+   *                {@code RenderManager}.
+   * {@code false}: This renderer <bold>WILL</bold> postprocessing on its own. The {@code RenderManager} will only force
+   *                postprocessing on snapshots.
    */
-  void shutdown();
+  default boolean autoPostProcess() { return true; }
 }

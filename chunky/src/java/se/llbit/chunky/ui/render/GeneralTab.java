@@ -116,7 +116,18 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     biomeColors.setSelected(scene.biomeColorsEnabled());
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
     reloadChunks.setDisable(scene.numberOfChunks() == 0);
-    loadSelectedChunks.setDisable(mapLoader.getWorld() instanceof EmptyWorld || mapLoader.getWorld() == null);
+    loadSelectedChunks.setDisable(
+      mapLoader.getWorld() instanceof EmptyWorld ||
+      mapLoader.getWorld() == null ||
+      chunkyFxController.getChunkSelection().size() == 0
+    );
+    chunkyFxController.getChunkSelection().addSelectionListener(() -> {
+      loadSelectedChunks.setDisable(
+        mapLoader.getWorld() instanceof EmptyWorld ||
+        mapLoader.getWorld() == null ||
+        chunkyFxController.getChunkSelection().size() == 0
+      );
+    });
   }
 
   @Override public String getTabTitle() {

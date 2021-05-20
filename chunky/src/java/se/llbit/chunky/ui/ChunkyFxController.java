@@ -76,14 +76,9 @@ import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ZipExportJob;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
-import se.llbit.chunky.renderer.CameraViewListener;
+import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
-import se.llbit.chunky.renderer.RenderController;
-import se.llbit.chunky.renderer.RenderMode;
-import se.llbit.chunky.renderer.RenderStatusListener;
-import se.llbit.chunky.renderer.Renderer;
-import se.llbit.chunky.renderer.ResetReason;
-import se.llbit.chunky.renderer.SnapshotControl;
+import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Camera;
@@ -297,7 +292,7 @@ public class ChunkyFxController
   private AsynchronousSceneManager asyncSceneManager;
   private final RenderStatusListener renderTracker;
   private se.llbit.chunky.renderer.scene.Scene scene = null;
-  private Renderer renderer;
+  private RenderManager renderManager;
   private RenderController renderController;
 
   public ChunkyFxController(Chunky chunky) {
@@ -327,7 +322,7 @@ public class ChunkyFxController
   @Override public void initialize(URL fxmlUrl, ResourceBundle resources) {
     scene = chunky.getSceneManager().getScene();
     renderController = chunky.getRenderController();
-    renderer = renderController.getRenderer();
+    renderManager = renderController.getRenderManager();
     asyncSceneManager =
         (AsynchronousSceneManager) renderController.getSceneManager();
     asyncSceneManager.setResetHandler(this);
@@ -354,8 +349,8 @@ public class ChunkyFxController
         }
       }).start();
     });
-    renderer.setSnapshotControl(SnapshotControl.DEFAULT);
-    renderer.setOnFrameCompleted((scene1, spp) -> {
+    renderManager.setSnapshotControl(SnapshotControl.DEFAULT);
+    renderManager.setOnFrameCompleted((scene1, spp) -> {
       if (SnapshotControl.DEFAULT.saveSnapshot(scene1, spp)) {
 
         scene1.saveSnapshot(new File(renderController.getContext().getSceneDirectory(), "snapshots"), taskTracker, renderController.getContext().numRenderThreads());
@@ -367,8 +362,8 @@ public class ChunkyFxController
       }
     });
 
-    renderer.addRenderListener(renderTracker);
-    renderer.setRenderTask(taskTracker.backgroundTask());
+    renderManager.addRenderListener(renderTracker);
+    renderManager.setRenderTask(taskTracker.backgroundTask());
 
     saveScene.setGraphic(new ImageView(Icon.disk.fxImage()));
     saveScene.setOnAction(e -> saveSceneSafe(sceneNameField.getText()));
@@ -664,11 +659,11 @@ public class ChunkyFxController
     });
 
     canvas = new RenderCanvasFx(chunky.getSceneManager().getScene(),
-        chunky.getRenderController().getRenderer());
+        chunky.getRenderController().getRenderManager());
     canvas.setRenderListener(renderTracker);
     previewTab.setContent(canvas);
     sceneControls = new RenderControlsFxController(this, renderControls, canvas,
-        chunky.getRenderController().getRenderer());
+        chunky.getRenderController().getRenderManager());
     showWorldMap();
     mainTabs.getSelectionModel().selectedItemProperty().addListener(
         (observable, oldValue, newValue) -> {
@@ -756,7 +751,7 @@ public class ChunkyFxController
         e -> filters.get(e).equals(scene.outputMode))
         .findFirst().ifPresent(fileChooser::setSelectedExtensionFilter);
     fileChooser.setInitialFileName(String.format("%s-%d",
-        scene.name(), renderer.getRenderStatus().getSpp()));
+        scene.name(), renderManager.getRenderStatus().getSpp()));
     File target = fileChooser.showSaveDialog(saveFrameBtn.getScene().getWindow());
     if (target != null) {
       saveFrameDirectory = target.getParentFile();
@@ -789,7 +784,7 @@ public class ChunkyFxController
 
   @Override  public boolean allowSceneRefresh() {
     if (scene.getResetReason() == ResetReason.SCENE_LOADED
-        || renderer.getRenderStatus().getRenderTime() < SCENE_EDIT_GRACE_PERIOD) {
+        || renderManager.getRenderStatus().getRenderTime() < SCENE_EDIT_GRACE_PERIOD) {
       return true;
     } else {
       requestRenderReset();

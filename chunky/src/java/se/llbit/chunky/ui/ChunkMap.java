@@ -137,6 +137,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     MenuItem clearSelection = new MenuItem("Clear selection");
     clearSelection.setGraphic(new ImageView(Icon.clear.fxImage()));
     clearSelection.setOnAction(event -> chunkSelection.clearSelection());
+    clearSelection.setDisable(chunkSelection.size() == 0);
 
     MenuItem newScene = new MenuItem("New scene from selection");
     newScene.setGraphic(new ImageView(Icon.sky.fxImage()));
@@ -144,6 +145,12 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       SceneManager sceneManager = controller.getRenderController().getSceneManager();
       sceneManager
           .loadFreshChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
+    });
+    newScene.setDisable(chunkSelection.size() == 0);
+    chunkSelection.addSelectionListener(() -> {
+      boolean noChunksSelected = chunkSelection.size() == 0;
+      clearSelection.setDisable(noChunksSelected);
+      newScene.setDisable(noChunksSelected);
     });
 
     moveCameraHere.setOnAction(event -> {

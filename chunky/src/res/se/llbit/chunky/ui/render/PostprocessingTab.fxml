@@ -15,8 +15,8 @@
         <DoubleAdjuster fx:id="exposure" />
         <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
           <children>
-            <Label text="Postprocessing mode:" />
-            <ChoiceBox fx:id="postprocessingMode" prefWidth="150.0" />
+            <Label text="Postprocessing filter:" />
+            <ChoiceBox fx:id="postprocessingFilter" prefWidth="150.0" />
           </children>
         </HBox>
         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Postprocessing affects performance when preview window is visible." wrappingWidth="276.30859375" />

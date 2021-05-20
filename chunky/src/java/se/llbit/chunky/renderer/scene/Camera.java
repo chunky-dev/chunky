@@ -100,13 +100,13 @@ public class Camera implements JsonSerializable {
   private final Vector3 u = new Vector3();
 
   /**
-   * Yaw angle. Down = 0, forward = -PI/2, up = -PI.
+   * Yaw angle. Yaw = 0 corresponds to the camera pointing along the z axis,
+   * yaw = PI/2 corresponds to the negative x axis, etc.
    */
   private double yaw = -QuickMath.HALF_PI;
 
   /**
-   * Pitch angle. Pitch = 0 corresponds to the camera pointing along the z axis,
-   * pitch = PI/2 corresponds to the negative x axis, etc.
+   * Pitch angle. Down = 0, forward = -PI/2, up = -PI.
    */
   private double pitch = 0;
 

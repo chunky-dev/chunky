@@ -1,4 +1,5 @@
-/* Copyright (c) 2019 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2014-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2014-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -14,22 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer;
+package se.llbit.math;
 
 /**
- * Describes part of the canvas to be rendered by a render worker.
+ * Anything which can intersect a ray in space.
  */
-public class RenderTile {
-  public final int x0, x1, y0, y1;
-
-  public RenderTile(int x0, int x1, int y0, int y1) {
-    this.x0 = x0;
-    this.x1 = x1;
-    this.y0 = y0;
-    this.y1 = y1;
-  }
-
-  @Override public String toString() {
-    return String.format("[Tile: [%d %d]->[%d %d]]", x0, y0, x1, y1);
-  }
+public interface Intersectable {
+  /**
+   * Find closest intersection between the ray and this.
+   *
+   * @return {@code true} if there exists any intersection
+   */
+  boolean closestIntersection(Ray ray);
 }

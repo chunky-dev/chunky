@@ -24,10 +24,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.resources.SettingsDirectory;
+import se.llbit.fxutil.WindowPosition;
+import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 
 import java.io.File;
@@ -57,6 +61,7 @@ public class ChunkyFx extends Application {
       controller.setApplication(this);
       stage.getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
       stage.setOnCloseRequest(event -> {
+        PersistentSettings.setWindowPosition(new WindowPosition(stage));
         Platform.exit();
         System.exit(0);
       });
@@ -66,8 +71,14 @@ public class ChunkyFx extends Application {
       } else {
         scene.getStylesheets().add("style.css");
       }
-      stage.setWidth(1800);
-      stage.setMaximized(true);
+
+      WindowPosition windowPosition = PersistentSettings.getPreviousWindowPosition();
+      if (windowPosition != null) {
+        windowPosition.apply(stage, 300, 300);
+      } else {
+        stage.setWidth(1800);
+        stage.setMaximized(true);
+      }
       stage.show();
     } catch (Exception e) {
       e.printStackTrace(System.err);
