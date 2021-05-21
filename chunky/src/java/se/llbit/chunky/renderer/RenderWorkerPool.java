@@ -22,7 +22,6 @@ import se.llbit.log.Log;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 /**
  * Performs rendering work.
@@ -59,6 +58,9 @@ public class RenderWorkerPool {
       lastSleep = System.currentTimeMillis();
     }
 
+    /**
+     * Sleep to manage CPU usage.
+     */
     public void workSleep() throws InterruptedException {
       long workTime = System.currentTimeMillis() - lastSleep;
       if (workTime > SLEEP_INTERVAL) {
@@ -70,7 +72,17 @@ public class RenderWorkerPool {
       }
     }
 
-    protected void resetSleep() {
+    /**
+     * Reset the sleep interval. Call this if the worker has spent a long time waiting.
+     * For example: {@code
+     *    worker.workSleep()
+     *    synchronized(monitor) {
+     *      monitor.wait();
+     *    }
+     *    worker.resetSleep();
+     * }
+     */
+    public void resetSleep() {
       lastSleep = System.currentTimeMillis();
     }
 
@@ -90,7 +102,7 @@ public class RenderWorkerPool {
 
   private volatile int cpuLoad = 100;
 
-  private final ConcurrentLinkedQueue<Consumer<RenderWorker>> workQueue = new ConcurrentLinkedQueue<>();
+  private final ConcurrentLinkedQueue<RenderJobFuture> workQueue = new ConcurrentLinkedQueue<>();
   private final AtomicInteger progress = new AtomicInteger(0);
   private final AtomicInteger localProgress = new AtomicInteger(0);
 
@@ -115,9 +127,10 @@ public class RenderWorkerPool {
 
     worker.resetSleep();
 
-    Consumer<RenderWorker> work = workQueue.poll();
-    if (work == null) return;
-    work.accept(worker);
+    RenderJobFuture task = workQueue.poll();
+    if (task == null) return;
+    task.task.accept(worker);
+    task.finished();
 
     worker.workSleep();
 
@@ -125,17 +138,25 @@ public class RenderWorkerPool {
     synchronized (progress) { progress.notifyAll(); }
   }
 
-  public void submit(Consumer<RenderWorker> task) {
-    workQueue.add(task);
+  public RenderJobFuture submit(RenderJob task) {
+    RenderJobFuture future = new RenderJobFuture(task);
+    workQueue.add(future);
     synchronized (workQueue) { workQueue.notifyAll(); }
     localProgress.incrementAndGet();
+    return future;
   }
 
+  /**
+   * Set the cpu load. The pools will attempt (not guaranteed) to limit cpu usage to this value.
+   */
   public void setCpuLoad(int cpuLoad) {
     // Clamp to 1-100
     this.cpuLoad = Math.max(Math.min(cpuLoad, 100), 1);
   }
 
+  /**
+   * Wait for the pool to become empty.
+   */
   public void awaitEmpty() throws InterruptedException {
     synchronized (progress) {
       while (progress.get() != localProgress.get()) {
@@ -148,5 +169,43 @@ public class RenderWorkerPool {
     for (RenderWorker worker : workers) {
       worker.interrupt();
     }
+  }
+
+  /**
+   * The future to a job. It may be waited on to finish with {@code awaitFinish}.
+   */
+  public static class RenderJobFuture {
+    private volatile boolean done = false;
+    protected final RenderJob task;
+
+    protected RenderJobFuture(RenderJob task) {
+      this.task = task;
+    }
+
+    protected synchronized void finished() {
+      this.done = true;
+      this.notifyAll();
+    }
+
+    public boolean isDone() {
+      return done;
+    }
+
+    public void awaitFinish() throws InterruptedException {
+      if (done) return;
+      synchronized (this) {
+        while (!done) {
+          this.wait();
+        }
+      }
+    }
+  }
+
+  /**
+   * A render job. This may throw an {@code InterruptedException}.
+   */
+  @FunctionalInterface
+  interface RenderJob {
+    void accept(RenderWorker worker) throws InterruptedException;
   }
 }

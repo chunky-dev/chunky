@@ -20,6 +20,7 @@ package se.llbit.chunky.renderer;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
+import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
 import se.llbit.chunky.renderer.scene.PathTracer;
 import se.llbit.chunky.renderer.scene.PreviewRayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -28,10 +29,7 @@ import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
 import se.llbit.util.TaskTracker;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -398,6 +396,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   protected void finalizeFrame(boolean force) {
     if (force || snapshotControl.saveSnapshot(bufferedScene, bufferedScene.spp)) {
       PostProcessingFilter filter = bufferedScene.getPostProcessingFilter();
+      if (mode == RenderMode.RENDERING) filter = PreviewFilter.INSTANCE;
 
       if (filter instanceof PixelPostProcessingFilter) {
         PixelPostProcessingFilter pixelFilter = (PixelPostProcessingFilter) filter;
@@ -409,11 +408,12 @@ public class DefaultRenderManager extends Thread implements RenderManager {
 
         // Split up to 10 tasks per thread
         int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.threads * 10 - 1);
+        ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(pool.threads * 10);
 
         for (int i = 0; i < bufferedScene.width * bufferedScene.height; i += pixelsPerTask) {
           int start = i;
           int end = Math.min(bufferedScene.width * bufferedScene.height, i + pixelsPerTask);
-          pool.submit(worker -> {
+          jobs.add(pool.submit(worker -> {
             double[] pixelbuffer = new double[3];
 
             for (int j = start; j < end; j++) {
@@ -421,21 +421,23 @@ public class DefaultRenderManager extends Thread implements RenderManager {
               int y = j / width;
 
               pixelFilter.processPixel(width, height, sampleBuffer, x, y, exposure, pixelbuffer);
+              Arrays.setAll(pixelbuffer, k -> Math.min(1, pixelbuffer[k]));
               bufferedScene.getBackBuffer().setPixel(x, y, ColorUtil.getRGB(pixelbuffer));
             }
-          });
+          }));
+        }
+
+        try {
+          for (RenderWorkerPool.RenderJobFuture job : jobs) {
+            job.awaitFinish();
+          }
+        } catch (InterruptedException e) {
+          // Interrupted
         }
       } else {
-        bufferedScene.postProcessFrame(TaskTracker.NONE);
+        bufferedScene.postProcessFrame(TaskTracker.Task.NONE);
       }
 
-      try {
-        pool.awaitEmpty();
-      } catch (InterruptedException e) {
-        // Interrupted
-      }
-
-      bufferedScene.postProcessFrame(TaskTracker.NONE);
       redrawScreen();
     }
   }
