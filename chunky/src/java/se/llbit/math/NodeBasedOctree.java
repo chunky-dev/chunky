@@ -122,7 +122,6 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
     }
   }
 
-  @Override
   public Octree.Node get(int x, int y, int z) {
     while (cacheLevel < depth && ((x >>> cacheLevel) != cx ||
             (y >>> cacheLevel) != cy || (z >>> cacheLevel) != cz))

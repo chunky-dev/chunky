@@ -356,16 +356,6 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
   }
 
   @Override
-  public Octree.Node get(int x, int y, int z) {
-    long nodeIndex = getNodeIndex(x, y, z);
-    long value = getAt(nodeIndex);
-    Octree.Node node = new Octree.Node(value > 0 ? BRANCH_NODE : typeFromValue(value));
-
-    // Return dummy Node, will work if only type and data are used, breaks if children are needed
-    return node;
-  }
-
-  @Override
   public Material getMaterial(int x, int y, int z, BlockPalette palette) {
     // Building the dummy node is useless here
     long nodeIndex = getNodeIndex(x, y, z);

@@ -566,26 +566,6 @@ public class PackedOctree implements Octree.OctreeImplementation {
   }
 
   /**
-   * Creates an octree node which represents the PackedOctree node which is (or contains) the
-   * block specified.
-   *
-   * This node is not actually used within this PackedOctree, as it is stored inline in the
-   * array here. This is just a Node object which wraps the values that the PackedOctree node
-   * would have.
-   *
-   * x, y, z are in octree coordinates, NOT world coordinates.
-   */
-  @Override
-  public Octree.Node get(int x, int y, int z) {
-    int nodeIndex = getNodeIndex(x, y, z);
-
-    Octree.Node node = new Octree.Node(treeData[nodeIndex] > 0 ? BRANCH_NODE : -treeData[nodeIndex]);
-
-    // Return dummy Node, will work if only type and data are used, breaks if children are needed
-    return node;
-  }
-
-  /**
    * Gets the block material type from the BlockPalette of the node which is (or contains) the block specified.
    *
    * x, y, z are in octree coordinates, NOT world coordinates.

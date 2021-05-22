@@ -57,8 +57,6 @@ public class Octree {
     void set(int type, int x, int y, int z);
     @Deprecated
     void set(Node data, int x, int y, int z);
-    @Deprecated
-    Node get(int x, int y, int z);
     Material getMaterial(int x, int y, int z, BlockPalette palette);
     void store(DataOutputStream output) throws IOException;
     int getDepth();
