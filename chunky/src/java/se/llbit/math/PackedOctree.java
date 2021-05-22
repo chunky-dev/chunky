@@ -149,11 +149,6 @@ public class PackedOctree implements Octree.OctreeImplementation {
     return -treeData[nodeIndex];
   }
 
-  @Override
-  public int getData(Octree.NodeId node) {
-    return 0;
-  }
-
   /**
    * Constructor building a tree with capacity for some nodes
    *

@@ -188,10 +188,9 @@ public class OctreeFinalizer {
 
   private static int waterLevelAt(Octree worldTree, Octree waterTree,
       BlockPalette palette, int x, int cy, int z, int baseLevel) {
-    Octree.Node node = waterTree.get(x, cy, z);
-    Material corner = palette.get(node.type);
+    Material corner = waterTree.getMaterial(x, cy, z, palette);
     if (corner instanceof Water) {
-      Material above = palette.get(waterTree.get(x, cy + 1, z).type);
+      Material above = waterTree.getMaterial(x, cy + 1, z, palette);
       boolean isFullBlock = above.isWaterFilled();
       return isFullBlock ? 8 : 8 - ((Water) corner).level;
     } else if (corner.waterlogged) {
@@ -204,10 +203,9 @@ public class OctreeFinalizer {
 
   private static int lavaLevelAt(Octree octree, BlockPalette palette,
       int x, int cy, int z, int baseLevel) {
-    Octree.Node node = octree.get(x, cy, z);
-    Material corner = palette.get(node.type);
+    Material corner = octree.getMaterial(x, cy, z, palette);
     if (corner instanceof Lava) {
-      Material above = palette.get(octree.get(x, cy + 1, z).type);
+      Material above = octree.getMaterial(x, cy + 1, z, palette);
       boolean isFullBlock = above instanceof Lava;
       return isFullBlock ? 8 : 8 - ((Lava) corner).level;
     } else if (!corner.solid) {

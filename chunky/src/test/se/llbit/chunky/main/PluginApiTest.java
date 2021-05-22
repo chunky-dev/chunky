@@ -58,6 +58,7 @@ public class PluginApiTest {
     Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
     RayTracer tracer = (scene, state) -> state.ray.color.set(0, 0, 0, 1);
     RayTracerFactory myFactory = () -> tracer;
+    //noinspection deprecation
     chunky.setPreviewRayTracerFactory(myFactory);
 
     // Get ray tracer through reflection
@@ -71,6 +72,7 @@ public class PluginApiTest {
     Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
     RayTracer tracer = (scene, state) -> state.ray.color.set(0, 0, 0, 1);
     RayTracerFactory myFactory = () -> tracer;
+    //noinspection deprecation
     chunky.setRayTracerFactory(myFactory);
 
     // Get ray tracer through reflection

@@ -107,11 +107,6 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
     return typeFromValue(getAt(((NodeId)node).nodeIndex));
   }
 
-  @Override
-  public int getData(Octree.NodeId node) {
-    return 0;
-  }
-
   /**
    * Constructor building a tree with capacity for some nodes
    * @param depth The depth of the tree

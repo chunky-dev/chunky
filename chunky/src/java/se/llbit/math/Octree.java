@@ -57,6 +57,7 @@ public class Octree {
     void set(int type, int x, int y, int z);
     @Deprecated
     void set(Node data, int x, int y, int z);
+    @Deprecated
     Node get(int x, int y, int z);
     Material getMaterial(int x, int y, int z, BlockPalette palette);
     void store(DataOutputStream output) throws IOException;
@@ -66,8 +67,6 @@ public class Octree {
     boolean isBranch(NodeId node);
     NodeId getChild(NodeId parent, int childNo);
     int getType(NodeId node);
-    @Deprecated
-    int getData(NodeId node);
     default void startFinalization() {}
     default void endFinalization() {}
     default void getWithLevel(IntIntMutablePair outTypeAndLevel, int x, int y, int z) {
@@ -216,12 +215,7 @@ public class Octree {
           node.children[i] = loadNode(in);
         }
       } else {
-        if ((type & DATA_FLAG) == 0) {
-          node = new Node(type);
-        } else {
-          int data = in.readInt();
-          node = new DataNode(type ^ DATA_FLAG, data);
-        }
+        node = new Node(type);
       }
       return node;
     }
@@ -252,44 +246,6 @@ public class Octree {
     @Override public boolean equals(Object obj) {
       if (obj != null && obj.getClass() == Node.class) {
         return ((Node) obj).type == type;
-      }
-      return false;
-    }
-  }
-
-
-  /**
-   * An octree node with extra data.
-   * @deprecated Not used anymore, only kept for compatibility with plugins
-   */
-  @Deprecated
-  static public final class DataNode extends Node {
-    final int data;
-
-    public DataNode(int type, int data) {
-      super(type);
-      this.data = data;
-    }
-
-    @Override public void store(DataOutputStream out) throws IOException {
-      out.writeInt(type | DATA_FLAG);
-      if (type == BRANCH_NODE) {
-        for (int i = 0; i < 8; ++i) {
-          children[i].store(out);
-        }
-      } else {
-        out.writeInt(data);
-      }
-    }
-
-    @Override public int getData() {
-      return data;
-    }
-
-    @Override public boolean equals(Object obj) {
-      if (obj instanceof DataNode) {
-        DataNode node = ((DataNode) obj);
-        return node.type == type && node.data == data;
       }
       return false;
     }
@@ -335,33 +291,6 @@ public class Octree {
       }
       implementation.set(type, x, y, z);
     }
-  }
-
-  /**
-   * Set the voxel type at the given coordinates.
-   *
-   * @param data The new voxel to insert.
-   */
-  public synchronized void set(Node data, int x, int y, int z) {
-    try {
-      implementation.set(data, x, y, z);
-    } catch(PackedOctree.OctreeTooBigException e) {
-      // Octree is too big, switch implementation and retry
-      Log.warn("Octree is too big, falling back to old (slower and bigger) implementation.");
-      try {
-        switchImplementation("NODE");
-      } catch(IOException ioException) {
-        throw new RuntimeException("Couldn't switch the octree implementation to NODE", ioException);
-      }
-      implementation.set(data, x, y, z);
-    }
-  }
-
-  /**
-   * @return The voxel type at the given coordinates
-   */
-  public Node get(int x, int y, int z) {
-    return implementation.get(x, y, z);
   }
 
   /**
