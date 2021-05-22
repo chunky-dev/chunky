@@ -396,7 +396,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   protected void finalizeFrame(boolean force) {
     if (force || snapshotControl.saveSnapshot(bufferedScene, bufferedScene.spp)) {
       PostProcessingFilter filter = bufferedScene.getPostProcessingFilter();
-      if (mode == RenderMode.RENDERING) filter = PreviewFilter.INSTANCE;
+      if (mode == RenderMode.PREVIEW) filter = PreviewFilter.INSTANCE;
 
       if (filter instanceof PixelPostProcessingFilter) {
         PixelPostProcessingFilter pixelFilter = (PixelPostProcessingFilter) filter;
@@ -407,8 +407,9 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         double exposure = bufferedScene.getExposure();
 
         // Split up to 10 tasks per thread
-        int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.threads * 10 - 1);
-        ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(pool.threads * 10);
+        int tasksPerThread = 10;
+        int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.threads * tasksPerThread - 1);
+        ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(pool.threads * tasksPerThread);
 
         for (int i = 0; i < bufferedScene.width * bufferedScene.height; i += pixelsPerTask) {
           int start = i;

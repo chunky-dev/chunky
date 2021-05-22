@@ -25,8 +25,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Performs rendering work.
- *
- * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class RenderWorkerPool {
 
@@ -202,10 +200,14 @@ public class RenderWorkerPool {
   }
 
   /**
-   * A render job. This may throw an {@code InterruptedException}.
+   * A render job. It is essentially a {@code Consumer<RenderWorker>} but with
+   * the ability to throw an {@code InterruptedException}.
    */
   @FunctionalInterface
   interface RenderJob {
+    /**
+     * @throws InterruptedException when the Thread is interrupted while waiting.
+     */
     void accept(RenderWorker worker) throws InterruptedException;
   }
 }
