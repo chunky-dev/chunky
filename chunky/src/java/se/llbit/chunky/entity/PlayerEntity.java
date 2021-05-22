@@ -614,7 +614,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     for (int i = 0; i < model.quads.length; ++i) {
       Quad quad = model.quads[i];
       Texture texture = model.textures[i];
-      quad.addTriangles(primitives, new TextureMaterial(texture), baseTransform);
+      quad.addTriangles(primitives, TextureMaterial.getForTexture(texture), baseTransform);
     }
   }
 

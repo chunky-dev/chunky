@@ -129,7 +129,7 @@ public class WallSignEntity extends Entity {
         tex = frontTexture;
         quad = frontFaceWithText[orientation];
       }
-      quad.addTriangles(primitives, new TextureMaterial(tex), transform);
+      quad.addTriangles(primitives, TextureMaterial.getForTexture(tex), transform);
     }
     return primitives;
   }

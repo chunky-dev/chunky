@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.Json;
 import se.llbit.json.JsonObject;
@@ -216,19 +217,20 @@ public class Book extends Entity implements Poseable {
 
   public Collection<Primitive> primitives(Transform transform) {
     Collection<Primitive> faces = new LinkedList<>();
+    Material bookMaterial = TextureMaterial.getForTexture(Texture.book);
 
     double pageAngle = (Math.PI - openAngle) / 2;
     for (Quad quad : Model
         .translate(Model.rotateY(leftCover, -pageAngle),
             -1 / 16.0, 0, 0)) {
-      quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
+      quad.addTriangles(faces, bookMaterial, transform);
     }
 
     for (Quad quad : Model
         .translate(Model.rotateY(rightCover, pageAngle),
             1 / 16.0, 0,
             0)) {
-      quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
+      quad.addTriangles(faces, bookMaterial, transform);
     }
 
     double pagesDistance = (1 - Math.sin(Math.PI / 2 - pageAngle)) / 16.0;
@@ -241,7 +243,7 @@ public class Book extends Entity implements Poseable {
           || pageAngleB >= (Math.PI + openAngle) / 2)) {
         continue; // a single page is clamped to the left pages box, which would overlay this face
       }
-      leftPages[i].addTriangles(faces, new TextureMaterial(Texture.book),
+      leftPages[i].addTriangles(faces, bookMaterial,
           Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(-pageAngle)
               .translate(0.5, 0.5, 0.5 - 1.01 / 16.0 + pagesDistance).chain(transform));
     }
@@ -254,7 +256,7 @@ public class Book extends Entity implements Poseable {
           || pageAngleB <= (Math.PI - openAngle) / 2)) {
         continue; // a single page is clamped to the right pages box, which would overlay this face
       }
-      rightPages[i].addTriangles(faces, new TextureMaterial(Texture.book),
+      rightPages[i].addTriangles(faces, bookMaterial,
           Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(pageAngle)
               .translate(0.5, 0.5, 0.5 - 1.01 / 16.0 + pagesDistance).chain(transform));
     }
@@ -262,7 +264,7 @@ public class Book extends Entity implements Poseable {
     double clampedPageAngleA = Math
         .min((Math.PI + openAngle) / 2, Math.max((Math.PI - openAngle) / 2, pageAngleA));
     for (Quad quad : pageA) {
-      quad.addTriangles(faces, new TextureMaterial(Texture.book),
+      quad.addTriangles(faces, bookMaterial,
           Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(clampedPageAngleA)
               .translate(0.5, 0.5, 0.5 - 1.01 / 16.0 + pagesDistance).chain(transform));
     }
@@ -270,13 +272,13 @@ public class Book extends Entity implements Poseable {
     double clampedPageAngleB = Math
         .min((Math.PI + openAngle) / 2, Math.max((Math.PI - openAngle) / 2, pageAngleB));
     for (Quad quad : pageB) {
-      quad.addTriangles(faces, new TextureMaterial(Texture.book),
+      quad.addTriangles(faces, bookMaterial,
           Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(clampedPageAngleB)
               .translate(0.5, 0.5, 0.5 - 1.01 / 16.0 + pagesDistance).chain(transform));
     }
 
     for (Quad quad : middleCover) {
-      quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
+      quad.addTriangles(faces, bookMaterial, transform);
     }
 
     return faces;

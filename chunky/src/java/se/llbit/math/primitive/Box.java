@@ -86,7 +86,7 @@ public class Box implements Primitive {
   }
 
   public void addFrontFaces(Collection<Primitive> primitives, Texture texture, Vector4 uv) {
-    Material material = new TextureMaterial(texture);
+    Material material = TextureMaterial.getForTexture(texture);
     primitives.add(
         new TexturedTriangle(c000, c100, c010, new Vector2(uv.y, uv.z), new Vector2(uv.x, uv.z),
             new Vector2(uv.y, uv.w), material));
@@ -96,7 +96,7 @@ public class Box implements Primitive {
   }
 
   public void addBackFaces(Collection<Primitive> primitives, Texture texture, Vector4 uv) {
-    Material material = new TextureMaterial(texture);
+    Material material = TextureMaterial.getForTexture(texture);
     primitives.add(
         new TexturedTriangle(c101, c001, c111, new Vector2(uv.x, uv.z), new Vector2(uv.y, uv.z),
             new Vector2(uv.x, uv.w), material));
@@ -106,7 +106,7 @@ public class Box implements Primitive {
   }
 
   public void addLeftFaces(Collection<Primitive> primitives, Texture texture, Vector4 uv) {
-    Material material = new TextureMaterial(texture);
+    Material material = TextureMaterial.getForTexture(texture);
     primitives.add(
         new TexturedTriangle(c001, c000, c011, new Vector2(uv.y, uv.z), new Vector2(uv.x, uv.z),
             new Vector2(uv.y, uv.w), material));
@@ -116,7 +116,7 @@ public class Box implements Primitive {
   }
 
   public void addRightFaces(Collection<Primitive> primitives, Texture texture, Vector4 uv) {
-    Material material = new TextureMaterial(texture);
+    Material material = TextureMaterial.getForTexture(texture);
     primitives.add(
         new TexturedTriangle(c100, c101, c110, new Vector2(uv.y, uv.z), new Vector2(uv.x, uv.z),
             new Vector2(uv.y, uv.w), material));
@@ -126,7 +126,7 @@ public class Box implements Primitive {
   }
 
   public void addTopFaces(Collection<Primitive> primitives, Texture texture, Vector4 uv) {
-    Material material = new TextureMaterial(texture);
+    Material material = TextureMaterial.getForTexture(texture);
     primitives.add(
         new TexturedTriangle(c011, c110, c111, new Vector2(uv.y, uv.w), new Vector2(uv.x, uv.z),
             new Vector2(uv.x, uv.w), material));
@@ -136,7 +136,7 @@ public class Box implements Primitive {
   }
 
   public void addBottomFaces(Collection<Primitive> primitives, Texture texture, Vector4 uv) {
-    Material material = new TextureMaterial(texture);
+    Material material = TextureMaterial.getForTexture(texture);
     primitives.add(
         new TexturedTriangle(c000, c001, c100, new Vector2(uv.x, uv.z), new Vector2(uv.x, uv.w),
             new Vector2(uv.y, uv.z), material));

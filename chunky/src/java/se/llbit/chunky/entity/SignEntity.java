@@ -538,7 +538,7 @@ public class SignEntity extends Entity {
         tex = backTexture;
         quad = backFaceWithText[angle];
       }
-      quad.addTriangles(primitives, new TextureMaterial(tex), transform);
+      quad.addTriangles(primitives, TextureMaterial.getForTexture(tex), transform);
     }
     return primitives;
   }
