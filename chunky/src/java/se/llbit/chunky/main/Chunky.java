@@ -131,12 +131,12 @@ public class Chunky {
     sceneManager.setTaskTracker(taskTracker);
     renderManager.setSnapshotControl(SnapshotControl.DEFAULT);
     renderManager.setOnFrameCompleted((scene, spp) -> {
-      if (SnapshotControl.DEFAULT.saveSnapshot(scene, spp)) {
+      if (renderManager.getSnapshotControl().saveSnapshot(scene, spp)) {
         scene.saveSnapshot(new File(getRenderContext().getSceneDirectory(), "snapshots"),
             taskTracker, getRenderContext().numRenderThreads());
       }
 
-      if (SnapshotControl.DEFAULT.saveRenderDump(scene, spp)) {
+      if (renderManager.getSnapshotControl().saveRenderDump(scene, spp)) {
         // Save the scene description and current render dump.
         try {
           sceneManager.saveScene();

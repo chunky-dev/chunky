@@ -68,7 +68,12 @@ public interface RenderManager {
   void setOnFrameCompleted(BiConsumer<Scene, Integer> listener);
 
   /**
-   * Set the snapshot control mode.
+   * Get the snapshot controller.
+   */
+  SnapshotControl getSnapshotControl();
+
+  /**
+   * Set the snapshot controller.
    * Postprocessing should always occur if {@code SnapshotControl.saveSnapshot(...)} is true.
    */
   void setSnapshotControl(SnapshotControl callback);

@@ -496,6 +496,11 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   }
 
   @Override
+  public SnapshotControl getSnapshotControl() {
+    return this.snapshotControl;
+  }
+
+  @Override
   public void setSnapshotControl(SnapshotControl callback) {
     this.snapshotControl = callback;
   }
