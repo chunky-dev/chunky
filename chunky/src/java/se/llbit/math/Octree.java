@@ -55,8 +55,6 @@ public class Octree {
 
   public interface OctreeImplementation {
     void set(int type, int x, int y, int z);
-    @Deprecated
-    void set(Node data, int x, int y, int z);
     Material getMaterial(int x, int y, int z, BlockPalette palette);
     void store(DataOutputStream output) throws IOException;
     int getDepth();
@@ -135,12 +133,6 @@ public class Octree {
    * and so that when serialized with data, it is not confused for a branch node)
    */
   public static final int ANY_TYPE = 0x7FFFFFFE;
-
-  /**
-   * The top bit of the type field in a serialized octree node is reserved for indicating
-   * if the node is a data node.
-   */
-  public static final int DATA_FLAG = 0x80000000;
 
   /** An Octree node. */
   public static class Node {

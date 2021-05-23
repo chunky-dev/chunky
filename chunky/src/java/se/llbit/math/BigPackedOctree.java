@@ -292,11 +292,6 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
 
   @Override
   public void set(int type, int x, int y, int z) {
-    set(new Octree.Node(type), x, y, z);
-  }
-
-  @Override
-  public void set(Octree.Node data, int x, int y, int z) {
     long[] parents = new long[depth]; // better to put as a field to preventallocation at each invocation?
     long nodeIndex = 0;
     int parentLevel = depth - 1;
@@ -304,7 +299,7 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
     for (int i = depth - 1; i >= 0; --i) {
       parents[i] = nodeIndex;
 
-      if (nodeEquals(nodeIndex, data)) {
+      if (typeFromValue(getAt(nodeIndex)) == type) {
         return;
       } else if (getAt(nodeIndex) <= 0) { // It's a leaf node
         subdivideNode(nodeIndex);
@@ -319,7 +314,7 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
 
     }
     long finalNodeIndex = getAt(parents[0]) + position;
-    setAt(finalNodeIndex, valueFromType(data.type));
+    setAt(finalNodeIndex, valueFromType(type));
 
     // Merge nodes where all children have been set to the same type.
     for (int i = 0; i <= parentLevel; ++i) {
@@ -400,12 +395,7 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
         loadNode(in, childrenIndex + i);
       }
     } else {
-      if ((type & DATA_FLAG) == 0) {
-        setAt(nodeIndex, valueFromType(type));
-      } else {
-        int data = in.readInt();
-        setAt(nodeIndex, valueFromType(type ^ DATA_FLAG));
-      }
+      setAt(nodeIndex, valueFromType(type));
     }
   }
 

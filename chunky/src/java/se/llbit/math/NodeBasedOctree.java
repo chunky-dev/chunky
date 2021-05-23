@@ -76,7 +76,6 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
     set(new Octree.Node(type), x, y, z);
   }
 
-  @Override
   public void set(Octree.Node data, int x, int y, int z) {
     Octree.Node node = root;
     int parentLevel = depth - 1;
