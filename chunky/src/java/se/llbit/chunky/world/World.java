@@ -552,6 +552,13 @@ public class World implements Comparable<World> {
     }
   }
 
+  /** Remove a chunk discovery listener */
+  public void removeChunkTopographyListener(ChunkTopographyListener listener) {
+    synchronized (chunkTopographyListeners) {
+      chunkTopographyListeners.remove(listener);
+    }
+  }
+
   /**
    * Notifies listeners that the height gradient of a chunk may have changed.
    *
