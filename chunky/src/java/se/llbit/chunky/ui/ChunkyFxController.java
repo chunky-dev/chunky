@@ -351,12 +351,11 @@ public class ChunkyFxController
     });
     renderManager.setSnapshotControl(SnapshotControl.DEFAULT);
     renderManager.setOnFrameCompleted((scene1, spp) -> {
-      if (SnapshotControl.DEFAULT.saveSnapshot(scene1, spp)) {
-
+      if (renderManager.getSnapshotControl().saveSnapshot(scene1, spp)) {
         scene1.saveSnapshot(new File(renderController.getContext().getSceneDirectory(), "snapshots"), taskTracker, renderController.getContext().numRenderThreads());
       }
 
-      if (SnapshotControl.DEFAULT.saveRenderDump(scene1, spp)) {
+      if (renderManager.getSnapshotControl().saveRenderDump(scene1, spp)) {
         // Save the scene description and current render dump.
         asyncSceneManager.saveScene();
       }
