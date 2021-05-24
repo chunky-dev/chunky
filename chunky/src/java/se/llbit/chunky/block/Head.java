@@ -20,7 +20,7 @@ public class Head extends MinecraftBlockTranslucent {
   // the decoded string might not be valid json (sometimes keys are not quoted)
   // so we use a regex to extract the skin url
   private static final Pattern SKIN_URL_FROM_OBJECT = Pattern
-      .compile("\"?SKIN\"?\\s*:\\s*\\{(.*)\"?url\"?\\s*:\\s*\"(.+?)\"", Pattern.DOTALL);
+      .compile("\"?SKIN\"?\\s*:\\s*\\{(.*)\"?url\"?\\s*:\\s*\"([^\"]*)\"", Pattern.DOTALL);
   private final String description;
   private final int rotation;
   private final SkullEntity.Kind type;
