@@ -62,6 +62,16 @@ public class SkullTextureTest {
   }
 
   @Test
+  public void testMetadataAfterUrl() { // test for #969
+    CompoundTag validJsonAlexTag = createSkullTag("Owner", Base64.getEncoder().encodeToString(
+        "{\"timestamp\":1425828978186,\"profileId\":\"00000000000000000000000000000000\",\"profileName\":\"chunky\",\"isPublic\":true,\"textures\":{\"SKIN\":{\"url\":\"http://textures.minecraft.net/texture/8e9fa6f8f2a1141524ff37c4df642dc2da29a6c05a35c38f43fe4919b84b34f\",\"metadata\":{\"model\":\"slim\"}}}}"
+            .getBytes(StandardCharsets.UTF_8)));
+    assertEquals(
+        "http://textures.minecraft.net/texture/8e9fa6f8f2a1141524ff37c4df642dc2da29a6c05a35c38f43fe4919b84b34f",
+        Head.getTextureUrl(validJsonAlexTag));
+  }
+
+  @Test
   public void testBadBase64Padding() { // test for #900
     CompoundTag validOwnerTag = createSkullTag("Owner",
         // the following base64 string has intentional wrong padding
