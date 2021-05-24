@@ -33,6 +33,9 @@ import se.llbit.chunky.resources.texturepack.GrassColorTexture;
 import se.llbit.chunky.resources.texturepack.IndexedTexture;
 import se.llbit.chunky.resources.texturepack.LargeChestTexture;
 import se.llbit.chunky.resources.texturepack.LayeredTextureLoader;
+import se.llbit.chunky.resources.texturepack.PaintingBackTexture;
+import se.llbit.chunky.resources.texturepack.PaintingTexture;
+import se.llbit.chunky.resources.texturepack.PaintingTextureAdapter;
 import se.llbit.chunky.resources.texturepack.SplitLargeChestTexture;
 import se.llbit.chunky.resources.texturepack.RotatedTextureLoader;
 import se.llbit.chunky.resources.texturepack.ShulkerTextureLoader;
@@ -2452,9 +2455,38 @@ public class TexturePackLoader {
         new AnimatedTextureLoader("assets/minecraft/textures/blocks/fire_layer_1",
             Texture.fireLayer1)));
 
-    allTextures.put("paintings_zetterstrand",
-        new SimpleTexture("assets/minecraft/textures/painting/paintings_kristoffer_zetterstrand",
-            Texture.paintings));
+    allTextures.put("paintings_zetterstrand", new AlternateTextures(
+        new PaintingTextureAdapter(),
+        new AllTextures(
+            new PaintingTexture("assets/minecraft/textures/painting/alban", Texture.paintingAlban),
+            new PaintingTexture("assets/minecraft/textures/painting/aztec2", Texture.paintingAztec2),
+            new PaintingTexture("assets/minecraft/textures/painting/aztec", Texture.paintingAztec),
+            new PaintingTexture("assets/minecraft/textures/painting/back", Texture.paintingBack),
+            new PaintingTexture("assets/minecraft/textures/painting/bomb", Texture.paintingBomb),
+            new PaintingTexture("assets/minecraft/textures/painting/burning_skull", Texture.paintingBurningSkull),
+            new PaintingTexture("assets/minecraft/textures/painting/bust", Texture.paintingBust),
+            new PaintingTexture("assets/minecraft/textures/painting/courbet", Texture.paintingCourbet),
+            new PaintingTexture("assets/minecraft/textures/painting/creebet", Texture.paintingCreebet),
+            new PaintingTexture("assets/minecraft/textures/painting/donkey_kong", Texture.paintingDonkeyKong),
+            new PaintingTexture("assets/minecraft/textures/painting/fighters", Texture.paintingFighters),
+            new PaintingTexture("assets/minecraft/textures/painting/graham", Texture.paintingGraham),
+            new PaintingTexture("assets/minecraft/textures/painting/kebab", Texture.paintingKebab),
+            new PaintingTexture("assets/minecraft/textures/painting/match", Texture.paintingMatch),
+            new PaintingTexture("assets/minecraft/textures/painting/pigscene", Texture.paintingPigscene),
+            new PaintingTexture("assets/minecraft/textures/painting/plant", Texture.paintingPlant),
+            new PaintingTexture("assets/minecraft/textures/painting/pointer", Texture.paintingPointer),
+            new PaintingTexture("assets/minecraft/textures/painting/pool", Texture.paintingPool),
+            new PaintingTexture("assets/minecraft/textures/painting/sea", Texture.paintingSea),
+            new PaintingTexture("assets/minecraft/textures/painting/skeleton", Texture.paintingSkeleton),
+            new PaintingTexture("assets/minecraft/textures/painting/skull_and_roses", Texture.paintingSkullAndRoses),
+            new PaintingTexture("assets/minecraft/textures/painting/stage", Texture.paintingStage),
+            new PaintingTexture("assets/minecraft/textures/painting/sunset", Texture.paintingSunset),
+            new PaintingTexture("assets/minecraft/textures/painting/void", Texture.paintingVoid),
+            new PaintingTexture("assets/minecraft/textures/painting/wanderer", Texture.paintingWanderer),
+            new PaintingTexture("assets/minecraft/textures/painting/wasteland", Texture.paintingWasteland),
+            new PaintingTexture("assets/minecraft/textures/painting/wither", Texture.paintingWither),
+            new PaintingBackTexture("assets/minecraft/textures/painting/back", Texture.paintingBack)
+        )));
     allTextures.put("font_default", new AlternateTextures(
         new JsonFontTextureLoader("assets/minecraft/font/default.json"), // MC 1.13
         new AsciiFontTextureLoader("assets/minecraft/textures/font/ascii"))); // MC 1.6

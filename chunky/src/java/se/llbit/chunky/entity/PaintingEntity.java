@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2017 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2017-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -21,8 +22,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-
-import se.llbit.chunky.world.material.PaintingMaterial;
+import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.Material;
+import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Quad;
@@ -37,107 +39,104 @@ public class PaintingEntity extends Entity {
   static class Painting {
 
     protected final Quad[] quads;
+    protected final Material material;
     protected double ox;
     protected double oy;
 
-    public Painting(int px0, int px1, int py0, int py1) {
-      double x0 = px0 / 256.;
-      double x1 = px1 / 256.;
-      double y0 = (256 - py0) / 256.;
-      double y1 = (256 - py1) / 256.;
-      int pw = px1 - px0;
-      int ph = py1 - py0;
-      int w = pw / 16;
-      int h = ph / 16;
+    public Painting(Texture painting, int w, int h) {
       this.ox = -w / 2.0;
       this.oy = -h / 2.0;
 
       double offset = -.5 / 16.;
       double off = 0;
-      quads = new Quad[] {
+      int pw = w * 16;
+      int ph = h * 16;
+      quads = new Quad[]{
           // north (front)
           new Quad(new Vector3(w, 0, offset), new Vector3(0, 0, offset),
-              new Vector3(w, h, offset), new Vector4(x0, x1, y1, y0)),
+              new Vector3(w, h, offset), new Vector4(0, 1, 0, 1)),
 
           // south (back)
           new Quad(new Vector3(0, 0, off), new Vector3(w, 0, off), new Vector3(0, h, off),
-              new Vector4(192 / 256., (192 + pw) / 256., 1, (256 - ph) / 256.)),
+              new Vector4(0, w / 4., 1, 1 - h / 4.)),
 
           // west (left)
           new Quad(new Vector3(0, 0, offset), new Vector3(0, 0, off), new Vector3(0, h, offset),
-              new Vector4(192 / 256., 193 / 256., (256 - ph) / 256., 1)),
+              new Vector4(0, 1 / 64., 1 - h / 4., 1)),
 
           // east (right)
           new Quad(new Vector3(w, 0, off), new Vector3(w, 0, offset), new Vector3(w, h, off),
-              new Vector4(192 / 256., 193 / 256., (256 - ph) / 256., 1)),
+              new Vector4(0, 1 / 64., 1 - h / 4., 1)),
 
           // top
           new Quad(new Vector3(w, h, offset), new Vector3(0, h, offset), new Vector3(w, h, off),
-              new Vector4(192 / 256., (192 + pw) / 256., 255 / 256., 1)),
+              new Vector4(0, w / 4., 1 - 1 / 64., 1)),
 
           // bottom
-          new Quad(new Vector3(0, 0, offset), new Vector3(w, 0, 0.0), new Vector3(0, 0, off),
-              new Vector4(192 / 256., (192 + pw) / 256., 1, 255 / 256.)),};
+          new Quad(new Vector3(0, 0, offset), new Vector3(w, 0, offset), new Vector3(0, 0, off),
+              new Vector4(0, w / 4., 1, 1 - 1 / 64.)),};
+      material = new TextureMaterial(painting);
     }
   }
-
 
   static final Map<String, Painting> paintings = new HashMap<>();
 
   static {
-    paintings.put("Kebab", new Painting(0, 16, 0, 16));
-    paintings.put("minecraft:kebab", new Painting(0, 16, 0, 16));
-    paintings.put("Aztec", new Painting(16, 32, 0, 16));
-    paintings.put("minecraft:aztec", new Painting(16, 32, 0, 16));
-    paintings.put("Alban", new Painting(32, 48, 0, 16));
-    paintings.put("minecraft:alban", new Painting(32, 48, 0, 16));
-    paintings.put("Aztec2", new Painting(48, 64, 0, 16));
-    paintings.put("minecraft:aztec2", new Painting(48, 64, 0, 16));
-    paintings.put("Bomb", new Painting(64, 80, 0, 16));
-    paintings.put("minecraft:bomb", new Painting(64, 80, 0, 16));
-    paintings.put("Plant", new Painting(80, 96, 0, 16));
-    paintings.put("minecraft:plant", new Painting(80, 96, 0, 16));
-    paintings.put("Wasteland", new Painting(96, 112, 0, 16));
-    paintings.put("minecraft:wasteland", new Painting(96, 112, 0, 16));
-    paintings.put("Wanderer", new Painting(0, 16, 64, 96));
-    paintings.put("minecraft:wanderer", new Painting(0, 16, 64, 96));
-    paintings.put("Graham", new Painting(16, 32, 64, 96));
-    paintings.put("minecraft:graham", new Painting(16, 32, 64, 96));
-    paintings.put("Pool", new Painting(0, 32, 32, 48));
-    paintings.put("minecraft:pool", new Painting(0, 32, 32, 48));
-    paintings.put("Courbet", new Painting(32, 64, 32, 48));
-    paintings.put("minecraft:courbet", new Painting(32, 64, 32, 48));
-    paintings.put("Sunset", new Painting(96, 128, 32, 48));
-    paintings.put("minecraft:sunset", new Painting(96, 128, 32, 48));
-    paintings.put("Sea", new Painting(64, 96, 32, 48));
-    paintings.put("minecraft:sea", new Painting(64, 96, 32, 48));
-    paintings.put("Creebet", new Painting(128, 160, 32, 48));
-    paintings.put("minecraft:creebet", new Painting(128, 160, 32, 48));
-    paintings.put("Match", new Painting(0, 32, 128, 160));
-    paintings.put("minecraft:match", new Painting(0, 32, 128, 160));
-    paintings.put("Bust", new Painting(32, 64, 128, 160));
-    paintings.put("minecraft:bust", new Painting(32, 64, 128, 160));
-    paintings.put("Stage", new Painting(64, 96, 128, 160));
-    paintings.put("minecraft:stage", new Painting(64, 96, 128, 160));
-    paintings.put("Void", new Painting(96, 128, 128, 160));
-    paintings.put("minecraft:void", new Painting(96, 128, 128, 160));
-    paintings.put("SkullAndRoses", new Painting(128, 160, 128, 160));
-    paintings.put("minecraft:skull_and_roses", new Painting(128, 160, 128, 160));
-    paintings.put("Wither", new Painting(160, 192, 128, 160));
-    paintings.put("minecraft:wither", new Painting(160, 192, 128, 160));
-    paintings.put("Fighters", new Painting(0, 64, 96, 128));
-    paintings.put("minecraft:fighters", new Painting(0, 64, 96, 128));
-    paintings.put("Skeleton", new Painting(192, 256, 64, 112));
-    paintings.put("minecraft:skeleton", new Painting(192, 256, 64, 112));
-    paintings.put("DonkeyKong", new Painting(192, 256, 112, 160));
-    paintings.put("minecraft:donkey_kong", new Painting(192, 256, 112, 160));
-    paintings.put("Pointer", new Painting(0, 64, 192, 256));
-    paintings.put("minecraft:pointer", new Painting(0, 64, 192, 256));
-    paintings.put("Pigscene", new Painting(64, 128, 192, 256));
-    paintings.put("minecraft:pigscene", new Painting(64, 128, 192, 256));
-    paintings.put("BurningSkull", new Painting(128, 192, 192, 256));
-    paintings.put("minecraft:burning_skull", new Painting(128, 192, 192, 256));
+    paintings.put("Kebab", new Painting(Texture.paintingKebab, 1, 1));
+    paintings.put("minecraft:kebab", new Painting(Texture.paintingKebab, 1, 1));
+    paintings.put("Aztec", new Painting(Texture.paintingAztec, 1, 1));
+    paintings.put("minecraft:aztec", new Painting(Texture.paintingAztec, 1, 1));
+    paintings.put("Alban", new Painting(Texture.paintingAlban, 1, 1));
+    paintings.put("minecraft:alban", new Painting(Texture.paintingAlban, 1, 1));
+    paintings.put("Aztec2", new Painting(Texture.paintingAztec2, 1, 1));
+    paintings.put("minecraft:aztec2", new Painting(Texture.paintingAztec2, 1, 1));
+    paintings.put("Bomb", new Painting(Texture.paintingBomb, 1, 1));
+    paintings.put("minecraft:bomb", new Painting(Texture.paintingBomb, 1, 1));
+    paintings.put("Plant", new Painting(Texture.paintingPlant, 1, 1));
+    paintings.put("minecraft:plant", new Painting(Texture.paintingPlant, 1, 1));
+    paintings.put("Wasteland", new Painting(Texture.paintingWasteland, 1, 1));
+    paintings.put("minecraft:wasteland", new Painting(Texture.paintingWasteland, 1, 1));
+    paintings.put("Wanderer", new Painting(Texture.paintingWanderer, 1, 2));
+    paintings.put("minecraft:wanderer", new Painting(Texture.paintingWanderer, 1, 2));
+    paintings.put("Graham", new Painting(Texture.paintingGraham, 1, 2));
+    paintings.put("minecraft:graham", new Painting(Texture.paintingGraham, 1, 2));
+    paintings.put("Pool", new Painting(Texture.paintingPool, 2, 1));
+    paintings.put("minecraft:pool", new Painting(Texture.paintingPool, 2, 1));
+    paintings.put("Courbet", new Painting(Texture.paintingCourbet, 2, 1));
+    paintings.put("minecraft:courbet", new Painting(Texture.paintingCourbet, 2, 1));
+    paintings.put("Sunset", new Painting(Texture.paintingSunset, 2, 1));
+    paintings.put("minecraft:sunset", new Painting(Texture.paintingSunset, 2, 1));
+    paintings.put("Sea", new Painting(Texture.paintingSea, 2, 1));
+    paintings.put("minecraft:sea", new Painting(Texture.paintingSea, 2, 1));
+    paintings.put("Creebet", new Painting(Texture.paintingCreebet, 2, 1));
+    paintings.put("minecraft:creebet", new Painting(Texture.paintingCreebet, 2, 1));
+    paintings.put("Match", new Painting(Texture.paintingMatch, 2, 2));
+    paintings.put("minecraft:match", new Painting(Texture.paintingMatch, 2, 2));
+    paintings.put("Bust", new Painting(Texture.paintingBust, 2, 2));
+    paintings.put("minecraft:bust", new Painting(Texture.paintingBust, 2, 2));
+    paintings.put("Stage", new Painting(Texture.paintingStage, 2, 2));
+    paintings.put("minecraft:stage", new Painting(Texture.paintingStage, 2, 2));
+    paintings.put("Void", new Painting(Texture.paintingVoid, 2, 2));
+    paintings.put("minecraft:void", new Painting(Texture.paintingVoid, 2, 2));
+    paintings.put("SkullAndRoses", new Painting(Texture.paintingSkullAndRoses, 2, 2));
+    paintings.put("minecraft:skull_and_roses", new Painting(Texture.paintingSkullAndRoses, 2, 2));
+    paintings.put("Wither", new Painting(Texture.paintingWither, 2, 2));
+    paintings.put("minecraft:wither", new Painting(Texture.paintingWither, 2, 2));
+    paintings.put("Fighters", new Painting(Texture.paintingFighters, 4, 2));
+    paintings.put("minecraft:fighters", new Painting(Texture.paintingFighters, 4, 2));
+    paintings.put("Skeleton", new Painting(Texture.skeleton, 4, 3));
+    paintings.put("minecraft:skeleton", new Painting(Texture.skeleton, 4, 3));
+    paintings.put("DonkeyKong", new Painting(Texture.paintingDonkeyKong, 4, 3));
+    paintings.put("minecraft:donkey_kong", new Painting(Texture.paintingDonkeyKong, 4, 3));
+    paintings.put("Pointer", new Painting(Texture.paintingPointer, 4, 4));
+    paintings.put("minecraft:pointer", new Painting(Texture.paintingPointer, 4, 4));
+    paintings.put("Pigscene", new Painting(Texture.paintingPigscene, 4, 4));
+    paintings.put("minecraft:pigscene", new Painting(Texture.paintingPigscene, 4, 4));
+    paintings.put("BurningSkull", new Painting(Texture.paintingBurningSkull, 4, 4));
+    paintings.put("minecraft:burning_skull", new Painting(Texture.paintingBurningSkull, 4, 4));
   }
+
+  private static final Material BACK_MATERIAL = new TextureMaterial(Texture.paintingBack);
 
   private final double angle;
   private final String art;
@@ -148,7 +147,8 @@ public class PaintingEntity extends Entity {
     this.angle = angle;
   }
 
-  @Override public Collection<Primitive> primitives(Vector3 offset) {
+  @Override
+  public Collection<Primitive> primitives(Vector3 offset) {
     Collection<Primitive> primitives = new LinkedList<>();
     Painting painting = paintings.get(art);
     if (painting == null) {
@@ -156,15 +156,18 @@ public class PaintingEntity extends Entity {
     }
     double rot = QuickMath.degToRad(180 - angle);
     Transform transform = Transform.NONE.translate(painting.ox, painting.oy, 0).rotateY(rot)
-              .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
-    for (Quad quad : painting.quads) {
-      quad.addTriangles(primitives, PaintingMaterial.INSTANCE, transform);
+        .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
+    Quad[] quads = painting.quads;
+    quads[0].addTriangles(primitives, painting.material, transform); // front face
+    for (int i = 1; i < quads.length; i++) { // other faces
+      Quad quad = quads[i];
+      quad.addTriangles(primitives, BACK_MATERIAL, transform);
     }
-
     return primitives;
   }
 
-  @Override public JsonValue toJson() {
+  @Override
+  public JsonValue toJson() {
     JsonObject json = new JsonObject();
     json.add("kind", "painting");
     json.add("position", position.toJson());
