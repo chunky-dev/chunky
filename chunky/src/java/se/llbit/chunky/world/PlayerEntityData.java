@@ -1,4 +1,5 @@
 /* Copyright (c) 2015 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -16,33 +17,42 @@
  */
 package se.llbit.chunky.world;
 
+import java.util.UUID;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
 public class PlayerEntityData {
+
   public final double x;
   public final double y;
   public final double z;
   public final double rotation;
   public final double pitch;
   public final int dimension;
-  public final long uuidLo;
-  public final long uuidHi;
   public Tag feet = new CompoundTag();
   public Tag legs = new CompoundTag();
   public Tag head = new CompoundTag();
   public Tag chestplate = new CompoundTag();
   public Tag shield = new CompoundTag();
   public Tag mainHand = new CompoundTag();
-
   public final String uuid;
 
   public PlayerEntityData(Tag player) {
     Tag pos = player.get("Pos");
     Tag rotation = player.get("Rotation");
 
-    uuidLo = player.get("UUIDLeast").longValue(-1);
-    uuidHi = player.get("UUIDMost").longValue(-1);
+    long uuidHi;
+    long uuidLo;
+    if (player.get("UUID").isIntArray(4)) {
+      // since 20w12a (1.16) the UUID is saved in four 32-bit integers, ordered from most significant to least significant
+      int[] uuid = player.get("UUID").intArray();
+      uuidHi = (((long) uuid[0]) << 32) | (uuid[1] & 0xffffffffL);
+      uuidLo = (((long) uuid[2]) << 32) | (uuid[3] & 0xffffffffL);
+    } else {
+      // before 20w12a, the UUID was saved as two 32-bit integers
+      uuidLo = player.get("UUIDLeast").longValue(-1);
+      uuidHi = player.get("UUIDMost").longValue(-1);
+    }
     x = pos.get(0).doubleValue();
     y = pos.get(1).doubleValue();
     z = pos.get(2).doubleValue();
@@ -79,15 +89,18 @@ public class PlayerEntityData {
     uuid = String.format("%016X%016X", uuidHi, uuidLo);
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return String.format("%d: %d, %d, %d", dimension, (int) x, (int) y, (int) z);
   }
 
-  @Override public int hashCode() {
+  @Override
+  public int hashCode() {
     return uuid.hashCode();
   }
 
-  @Override public boolean equals(Object obj) {
+  @Override
+  public boolean equals(Object obj) {
     if (obj instanceof PlayerEntityData) {
       return ((PlayerEntityData) obj).uuid.equals(uuid);
     }
