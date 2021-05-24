@@ -27,7 +27,6 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
 import se.llbit.resources.ImageLoader;
-import se.llbit.util.ImageTools;
 import se.llbit.util.NotNull;
 
 /**
@@ -1023,42 +1022,6 @@ public class Texture {
   public static final Texture bannerBase = new Texture();
 
   public static final Texture armorStand = new Texture();
-
-  // All the wool variants, ordered after block ID.
-  public static final Texture[] wool = {
-      whiteWool, orangeWool, magentaWool, lightBlueWool, yellowWool, limeWool, pinkWool, grayWool,
-      lightGrayWool, cyanWool, purpleWool, blueWool, brownWool, greenWool, redWool, blackWool
-  };
-
-  public static final Texture[] concrete = {
-      concreteWhite, concreteOrange, concreteMagenta, concreteLightBlue, concreteYellow,
-      concreteLime, concretePink, concreteGray, concreteSilver, concreteCyan, concretePurple,
-      concreteBlue, concreteBrown, concreteGreen, concreteRed, concreteBlack
-  };
-
-  public static final Texture[] concretePowder = {
-      concretePowderWhite, concretePowderOrange, concretePowderMagenta, concretePowderLightBlue, concretePowderYellow,
-      concretePowderLime, concretePowderPink, concretePowderGray, concretePowderSilver, concretePowderCyan, concretePowderPurple,
-      concretePowderBlue, concretePowderBrown, concretePowderGreen, concretePowderRed, concretePowderBlack
-  };
-
-  public static final Texture[] stainedGlass = {
-      whiteGlass, orangeGlass, magentaGlass, lightBlueGlass, yellowGlass, limeGlass, pinkGlass,
-      grayGlass, lightGrayGlass, cyanGlass, purpleGlass, blueGlass, brownGlass, greenGlass,
-      redGlass, blackGlass
-  };
-
-  public static final Texture[] stainedGlassPaneSide = {
-      whiteGlassPaneSide, orangeGlassPaneSide, magentaGlassPaneSide, lightBlueGlassPaneSide,
-      yellowGlassPaneSide, limeGlassPaneSide, pinkGlassPaneSide, grayGlassPaneSide,
-      lightGrayGlassPaneSide, cyanGlassPaneSide, purpleGlassPaneSide, blueGlassPaneSide,
-      brownGlassPaneSide, greenGlassPaneSide, redGlassPaneSide, blackGlassPaneSide
-  };
-
-  public static final Texture[] stainedClay = {
-      whiteClay, orangeClay, magentaClay, lightBlueClay, yellowClay, limeClay, pinkClay, grayClay,
-      lightGrayClay, cyanClay, purpleClay, blueClay, brownClay, greenClay, redClay, blackClay
-  };
 
   @NotNull protected BitmapImage image;
   protected int width;
