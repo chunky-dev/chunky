@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.ui;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -104,20 +105,17 @@ public class ChunkyErrorDialog extends Stage implements Initializable {
     pane.setPrefHeight(Region.USE_COMPUTED_SIZE);
     pane.setCenter(text);
 
-    Button dismiss = new Button("Dismiss");
-    BorderPane.setAlignment(dismiss, Pos.BOTTOM_RIGHT);
-    BorderPane.setMargin(dismiss, new Insets(10, 0, 0, 0));
-    pane.setBottom(dismiss);
-
     Tab tab = new Tab(getLevelName(type) + " " + messageCount, pane);
     tabPane.getTabs().add(tab);
+  }
 
-    dismiss.setOnAction(event -> {
-      tabPane.getTabs().remove(tab);
-      if (tabPane.getTabs().isEmpty()) {
-        hide();
-      }
-    });
+  @FXML
+  protected void dismissMessage(ActionEvent event) {
+    int currentTabIndex = tabPane.getSelectionModel().getSelectedIndex();
+    tabPane.getTabs().remove(currentTabIndex);
+    if (tabPane.getTabs().isEmpty()) {
+      hide();
+    }
   }
 
   private String fxmlName(Level level)
