@@ -35,15 +35,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -221,7 +213,18 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         });
         skinBox.getChildren().addAll(new Label("Skin:"), skinField, selectSkin);
 
-        controls.getChildren().addAll(modelBox, skinBox);
+        CheckBox showOuterLayer = new CheckBox("Show 2nd Layer");
+        showOuterLayer.setSelected(player.showOuterLayer);
+        showOuterLayer.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+          player.showOuterLayer = newValue;
+          scene.rebuildActorBvh();
+        }));
+        HBox layerBox = new HBox();
+        layerBox.setSpacing(10.0);
+        layerBox.setAlignment(Pos.CENTER_LEFT);
+        layerBox.getChildren().addAll(showOuterLayer);
+
+        controls.getChildren().addAll(modelBox, skinBox, showOuterLayer);
       }
 
       if (entity instanceof Book || entity instanceof Lectern) {

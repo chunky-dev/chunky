@@ -41,6 +41,7 @@ public class EntityTexture extends Texture {
   public final Vector4 hatRight = new Vector4();
   public final Vector4 hatLeft = new Vector4();
 
+  // Chest layer coordinates
   public final Vector4 chestFront = new Vector4();
   public final Vector4 chestBack = new Vector4();
   public final Vector4 chestTop = new Vector4();
@@ -48,6 +49,15 @@ public class EntityTexture extends Texture {
   public final Vector4 chestRight = new Vector4();
   public final Vector4 chestLeft = new Vector4();
 
+  // Jacket layer coordinates
+  public final Vector4 jacketFront = new Vector4();
+  public final Vector4 jacketBack = new Vector4();
+  public final Vector4 jacketTop = new Vector4();
+  public final Vector4 jacketBottom = new Vector4();
+  public final Vector4 jacketRight = new Vector4();
+  public final Vector4 jacketLeft = new Vector4();
+
+  // Right leg layer coordinates
   public final Vector4 rightLegFront = new Vector4();
   public final Vector4 rightLegBack = new Vector4();
   public final Vector4 rightLegTop = new Vector4();
@@ -55,6 +65,15 @@ public class EntityTexture extends Texture {
   public final Vector4 rightLegRight = new Vector4();
   public final Vector4 rightLegLeft = new Vector4();
 
+  // Right pant layer coordinates
+  public final Vector4 rightPantFront = new Vector4();
+  public final Vector4 rightPantBack = new Vector4();
+  public final Vector4 rightPantTop = new Vector4();
+  public final Vector4 rightPantBottom = new Vector4();
+  public final Vector4 rightPantRight = new Vector4();
+  public final Vector4 rightPantLeft = new Vector4();
+
+  // Left leg layer coordinates
   public final Vector4 leftLegFront = new Vector4();
   public final Vector4 leftLegBack = new Vector4();
   public final Vector4 leftLegTop = new Vector4();
@@ -62,6 +81,15 @@ public class EntityTexture extends Texture {
   public final Vector4 leftLegRight = new Vector4();
   public final Vector4 leftLegLeft = new Vector4();
 
+  // Left pant layer coordinates
+  public final Vector4 leftPantFront = new Vector4();
+  public final Vector4 leftPantBack = new Vector4();
+  public final Vector4 leftPantTop = new Vector4();
+  public final Vector4 leftPantBottom = new Vector4();
+  public final Vector4 leftPantRight = new Vector4();
+  public final Vector4 leftPantLeft = new Vector4();
+
+  // Right arm layer coordinates
   public final Vector4 rightArmFront = new Vector4();
   public final Vector4 rightArmBack = new Vector4();
   public final Vector4 rightArmTop = new Vector4();
@@ -69,10 +97,27 @@ public class EntityTexture extends Texture {
   public final Vector4 rightArmRight = new Vector4();
   public final Vector4 rightArmLeft = new Vector4();
 
+  // Right sleeve layer coordinates
+  public final Vector4 rightSleeveFront = new Vector4();
+  public final Vector4 rightSleeveBack = new Vector4();
+  public final Vector4 rightSleeveTop = new Vector4();
+  public final Vector4 rightSleeveBottom = new Vector4();
+  public final Vector4 rightSleeveRight = new Vector4();
+  public final Vector4 rightSleeveLeft = new Vector4();
+
+  // Left arm layer coordinates
   public final Vector4 leftArmFront = new Vector4();
   public final Vector4 leftArmBack = new Vector4();
   public final Vector4 leftArmTop = new Vector4();
   public final Vector4 leftArmBottom = new Vector4();
   public final Vector4 leftArmRight = new Vector4();
   public final Vector4 leftArmLeft = new Vector4();
+
+  // Left sleeve layer coordinates
+  public final Vector4 leftSleeveFront = new Vector4();
+  public final Vector4 leftSleeveBack = new Vector4();
+  public final Vector4 leftSleeveTop = new Vector4();
+  public final Vector4 leftSleeveBottom = new Vector4();
+  public final Vector4 leftSleeveRight = new Vector4();
+  public final Vector4 leftSleeveLeft = new Vector4();
 }

@@ -17,6 +17,7 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Sun;
 import se.llbit.chunky.resources.texturepack.AllTextures;
 import se.llbit.chunky.resources.texturepack.AlternateTextures;
@@ -41,7 +42,6 @@ import se.llbit.chunky.resources.texturepack.RotatedTextureLoader;
 import se.llbit.chunky.resources.texturepack.ShulkerTextureLoader;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
 import se.llbit.chunky.resources.texturepack.TextureLoader;
-import se.llbit.chunky.resources.texturepack.ThinArmEntityTextureLoader;
 import se.llbit.log.Log;
 import se.llbit.resources.ImageLoader;
 import se.llbit.util.NotNull;
@@ -2492,7 +2492,7 @@ public class TexturePackLoader {
         new AsciiFontTextureLoader("assets/minecraft/textures/font/ascii"))); // MC 1.6
 
     allTextures.put("alex",
-        new ThinArmEntityTextureLoader("assets/minecraft/textures/entity/alex", Texture.alex));
+        new EntityTextureLoader("assets/minecraft/textures/entity/alex", Texture.alex, PlayerModel.ALEX));
     allTextures.put("steve",
         new EntityTextureLoader("assets/minecraft/textures/entity/steve", Texture.steve));
     allTextures.put("creeper",
