@@ -47,7 +47,7 @@ public class PaintingEntity extends Entity {
       this.ox = -w / 2.0;
       this.oy = -h / 2.0;
 
-      double offset = -.5 / 16.;
+      double offset = -1 / 16.;
       double off = 0;
       int pw = w * 16;
       int ph = h * 16;
@@ -155,7 +155,7 @@ public class PaintingEntity extends Entity {
       return primitives;
     }
     double rot = QuickMath.degToRad(180 - angle);
-    Transform transform = Transform.NONE.translate(painting.ox, painting.oy, 0).rotateY(rot)
+    Transform transform = Transform.NONE.translate(painting.ox, painting.oy, 0.5 / 16).rotateY(rot)
         .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     Quad[] quads = painting.quads;
     quads[0].addTriangles(primitives, painting.material, transform); // front face
