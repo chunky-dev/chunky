@@ -224,7 +224,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         layerBox.setAlignment(Pos.CENTER_LEFT);
         layerBox.getChildren().addAll(showOuterLayer);
 
-        controls.getChildren().addAll(modelBox, skinBox, showOuterLayer);
+        controls.getChildren().addAll(modelBox, skinBox, layerBox);
       }
 
       if (entity instanceof Book || entity instanceof Lectern) {
