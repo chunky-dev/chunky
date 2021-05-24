@@ -36,9 +36,7 @@ public class EntityTextureLoader extends TextureLoader {
   private final PlayerModel model;
 
   public EntityTextureLoader(String file, EntityTexture texture) {
-    this.file = file;
-    this.texture = texture;
-    this.model = PlayerModel.STEVE;
+    this(file, texture, PlayerModel.STEVE);
   }
 
   public EntityTextureLoader(String file, EntityTexture texture, PlayerModel model) {
