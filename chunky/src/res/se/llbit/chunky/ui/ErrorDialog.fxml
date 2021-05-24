@@ -18,6 +18,7 @@
       <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
          <children>
             <Button mnemonicParsing="false" onAction="#dismissMessage" text="Dismiss" />
+            <Button mnemonicParsing="false" onAction="#dismissAllMessages" text="Dismiss All" />
          </children>
       </HBox>
    </bottom>

@@ -118,6 +118,12 @@ public class ChunkyErrorDialog extends Stage implements Initializable {
     }
   }
 
+  @FXML
+  protected void dismissAllMessages(ActionEvent event) {
+    tabPane.getTabs().clear();
+    hide();
+  }
+
   private String fxmlName(Level level)
   {
     switch (level) {
