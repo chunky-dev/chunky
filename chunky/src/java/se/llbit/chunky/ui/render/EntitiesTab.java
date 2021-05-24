@@ -213,7 +213,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         });
         skinBox.getChildren().addAll(new Label("Skin:"), skinField, selectSkin);
 
-        CheckBox showOuterLayer = new CheckBox("Show 2nd Layer");
+        CheckBox showOuterLayer = new CheckBox("Show second layer");
         showOuterLayer.setSelected(player.showOuterLayer);
         showOuterLayer.selectedProperty().addListener(((observable, oldValue, newValue) -> {
           player.showOuterLayer = newValue;

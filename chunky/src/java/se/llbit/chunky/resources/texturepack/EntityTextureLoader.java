@@ -38,7 +38,7 @@ public class EntityTextureLoader extends TextureLoader {
   public EntityTextureLoader(String file, EntityTexture texture) {
     this.file = file;
     this.texture = texture;
-    this.model = PlayerModel.DEFAULT;
+    this.model = PlayerModel.STEVE;
   }
 
   public EntityTextureLoader(String file, EntityTexture texture, PlayerModel model) {
@@ -221,4 +221,3 @@ public class EntityTextureLoader extends TextureLoader {
   }
 
 }
-
