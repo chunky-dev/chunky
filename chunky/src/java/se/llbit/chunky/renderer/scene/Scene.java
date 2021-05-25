@@ -1014,7 +1014,6 @@ public class Scene implements JsonSerializable, Refreshable {
 
         // Load entities from the chunk:
         if (PersistentSettings.getLoadEntities()) {
-          System.out.println("Loading entities");
           for (CompoundTag tag : chunkData.getEntities()) {
             Tag posTag = tag.get("Pos");
             if (posTag.isList()) {

@@ -181,15 +181,19 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
 
     loadPlayers.setTooltip(new Tooltip("Enable/disable player entity loading. "
         + "Takes effect on next scene creation."));
-    loadEntities.setTooltip(new Tooltip("Enable/disable non-player entity loading. "
-            + "Takes effect on next scene creation."));
     loadPlayers.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setLoadPlayers(newValue);
-      renderControls.showPopup(
-          "This takes effect the next time a new scene is created.", loadPlayers);
     });
+    loadPlayers.setOnAction(event -> {
+      renderControls.showPopup(
+              "This takes effect the next time a new scene is created.", loadPlayers);
+    });
+    loadEntities.setTooltip(new Tooltip("Enable/disable non-player entity loading. "
+            + "Takes effect on next scene creation."));
     loadEntities.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setLoadEntities(newValue);
+    });
+    loadEntities.setOnAction(event -> {
       renderControls.showPopup(
               "This takes effect the next time a new scene is created.", loadEntities);
     });
