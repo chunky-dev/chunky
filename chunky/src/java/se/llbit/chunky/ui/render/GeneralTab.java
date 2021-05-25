@@ -76,6 +76,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private Button scale15;
   @FXML private Button scale20;
   @FXML private CheckBox loadPlayers;
+  @FXML private CheckBox loadEntities;
   @FXML private CheckBox biomeColors;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
