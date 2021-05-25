@@ -57,6 +57,7 @@ import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.chunk.SimpleChunkData;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
+import se.llbit.chunky.entity.HeadEntity;
 import se.llbit.chunky.entity.Lectern;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
@@ -906,6 +907,10 @@ public class Scene implements JsonSerializable, Refreshable {
           JsonObject profile;
           try {
             profile = MCDownloader.fetchProfile(entity.uuid);
+            String skinUrl = MCDownloader.getSkinUrlFromProfile(profile);
+            if (skinUrl != null) {
+              entity.skin = MCDownloader.downloadSkin(skinUrl).getAbsolutePath();
+            }
           } catch (IOException e) {
             Log.error(e);
             profile = new JsonObject();

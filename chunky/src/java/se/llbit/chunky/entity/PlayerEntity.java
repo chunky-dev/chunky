@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2017 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -72,6 +73,9 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   public double scale = 1.0;
   public double headScale = 1.0;
   public PlayerModel model;
+  /**
+   * Skin file path used for this player.
+   */
   public String skin = "";
   public boolean showOuterLayer = true;
 
@@ -99,6 +103,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     pose.add("rightLeg", JsonUtil.vec3ToJson(new Vector3(-0.4, 0, 0)));
     this.pose = pose;
   }
+
 
   public PlayerEntity(JsonObject settings) {
     super(JsonUtil.vec3FromJsonObject(settings.get("position")));
@@ -167,25 +172,25 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   }
 
   @Override public Collection<Primitive> primitives(Vector3 offset) {
-    PlayerTexture texture = Texture.steve;
+    PlayerTexture texture;
+    switch (model) {
+      case ALEX:
+        texture = Texture.alex;
+        break;
+      default:
+      case STEVE:
+        texture = Texture.steve;
+        break;
+    }
     double armWidth = model == PlayerModel.ALEX ? 1.5 : 2;
-    if (skin.isEmpty()) {
-      switch (model) {
-        case ALEX:
-          texture = Texture.alex;
-          break;
-        case STEVE:
-          texture = Texture.steve;
-          break;
-      }
-    } else {
-      texture = new PlayerTexture();
-      PlayerTextureLoader loader = new PlayerTextureLoader(skin, texture, model);
+    if (!skin.isEmpty()) {
+      PlayerTexture skinTexture = new PlayerTexture();
+      PlayerTextureLoader loader = new PlayerTextureLoader(skin, skinTexture, model);
       try {
         loader.load(new File(skin));
+        texture = skinTexture;
       } catch (IOException | TextureFormatError e) {
         Log.warn("Failed to load skin", e);
-        texture = Texture.steve;
       }
     }
     Vector3 allPose = JsonUtil.vec3FromJsonArray(pose.get("all"));
