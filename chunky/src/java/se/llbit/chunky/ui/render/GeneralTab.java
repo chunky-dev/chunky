@@ -114,6 +114,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       saveDumps.setSelected(false);
     }
     loadPlayers.setSelected(PersistentSettings.getLoadPlayers());
+    loadEntities.setSelected(PersistentSettings.getLoadEntities());
     biomeColors.setSelected(scene.biomeColorsEnabled());
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
     reloadChunks.setDisable(scene.numberOfChunks() == 0);
@@ -180,10 +181,17 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
 
     loadPlayers.setTooltip(new Tooltip("Enable/disable player entity loading. "
         + "Takes effect on next scene creation."));
+    loadEntities.setTooltip(new Tooltip("Enable/disable non-player entity loading. "
+            + "Takes effect on next scene creation."));
     loadPlayers.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setLoadPlayers(newValue);
       renderControls.showPopup(
           "This takes effect the next time a new scene is created.", loadPlayers);
+    });
+    loadEntities.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      PersistentSettings.setLoadEntities(newValue);
+      renderControls.showPopup(
+              "This takes effect the next time a new scene is created.", loadEntities);
     });
     biomeColors.setTooltip(new Tooltip("Colors grass and tree leaves according to biome."));
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
