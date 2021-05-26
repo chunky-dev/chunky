@@ -209,7 +209,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     });
     loadBooks.setOnAction(event -> {
       renderControls.showPopup(
-              "This takes effect the next time a new scene is created.", loadArmorStands);
+              "This takes effect the next time a new scene is created.", loadBooks);
     });
     loadPaintings.setTooltip(new Tooltip("Enable/disable painting entity loading. "
             + "Takes effect on next scene creation."));
@@ -218,7 +218,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     });
     loadPaintings.setOnAction(event -> {
       renderControls.showPopup(
-              "This takes effect the next time a new scene is created.", loadArmorStands);
+              "This takes effect the next time a new scene is created.", loadPaintings);
     });
     loadOtherEntities.setTooltip(new Tooltip("Enable/disable other entity loading. "
             + "Takes effect on next scene creation."));
@@ -227,7 +227,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     });
     loadOtherEntities.setOnAction(event -> {
       renderControls.showPopup(
-              "This takes effect the next time a new scene is created.", loadArmorStands);
+              "This takes effect the next time a new scene is created.", loadOtherEntities);
     });
     loadAllEntities.setOnAction(event -> {
       loadPlayers.setSelected(true);
