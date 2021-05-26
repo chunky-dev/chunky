@@ -1013,26 +1013,24 @@ public class Scene implements JsonSerializable, Refreshable {
         }
 
         // Load entities from the chunk:
-        if (PersistentSettings.getLoadArmorStands()) {
-          for (CompoundTag tag : chunkData.getEntities()) {
-            Tag posTag = tag.get("Pos");
-            if (posTag.isList()) {
-              ListTag pos = posTag.asList();
-              double x = pos.get(0).doubleValue();
-              double y = pos.get(1).doubleValue();
-              double z = pos.get(2).doubleValue();
+        for (CompoundTag tag : chunkData.getEntities()) {
+          Tag posTag = tag.get("Pos");
+          if (posTag.isList()) {
+            ListTag pos = posTag.asList();
+            double x = pos.get(0).doubleValue();
+            double y = pos.get(1).doubleValue();
+            double z = pos.get(2).doubleValue();
 
-              if (y >= yClipMin && y < yClipMax) {
-                String id = tag.get("id").stringValue("");
-                if (id.equals("minecraft:painting") || id.equals("Painting")) {
-                  // Before 1.12 paintings had id=Painting.
-                  // After 1.12 paintings had id=minecraft:painting.
-                  float yaw = tag.get("Rotation").get(0).floatValue();
-                  entities.add(
-                          new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
-                } else if (id.equals("minecraft:armor_stand")) {
-                  actors.add(new ArmorStand(new Vector3(x, y, z), tag));
-                }
+            if (y >= yClipMin && y < yClipMax) {
+              String id = tag.get("id").stringValue("");
+              if ((id.equals("minecraft:painting") || id.equals("Painting")) && PersistentSettings.getLoadPaintings()) {
+                // Before 1.12 paintings had id=Painting.
+                // After 1.12 paintings had id=minecraft:painting.
+                float yaw = tag.get("Rotation").get(0).floatValue();
+                entities.add(
+                        new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
+              } else if (id.equals("minecraft:armor_stand") && PersistentSettings.getLoadArmorStands()) {
+                actors.add(new ArmorStand(new Vector3(x, y, z), tag));
               }
             }
           }
@@ -1072,7 +1070,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   int octNode = currentBlock;
                   Block block = palette.get(currentBlock);
 
-                  if(block.isEntity() && PersistentSettings.getLoadArmorStands()) {
+                  if(block.isEntity()) {
                     Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
                     Entity entity = block.toEntity(position);
 
