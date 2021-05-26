@@ -79,6 +79,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private CheckBox loadArmorStands;
   @FXML private CheckBox loadBooks;
   @FXML private CheckBox loadPaintings;
+  @FXML private CheckBox loadOtherEntities;
   @FXML private CheckBox biomeColors;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
@@ -214,6 +215,15 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       PersistentSettings.setLoadPaintings(newValue);
     });
     loadPaintings.setOnAction(event -> {
+      renderControls.showPopup(
+              "This takes effect the next time a new scene is created.", loadArmorStands);
+    });
+    loadOtherEntities.setTooltip(new Tooltip("Enable/disable other entity loading. "
+            + "Takes effect on next scene creation."));
+    loadOtherEntities.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      PersistentSettings.setLoadOtherEntities(newValue);
+    });
+    loadOtherEntities.setOnAction(event -> {
       renderControls.showPopup(
               "This takes effect the next time a new scene is created.", loadArmorStands);
     });

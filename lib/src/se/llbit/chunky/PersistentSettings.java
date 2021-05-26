@@ -408,6 +408,15 @@ public final class PersistentSettings {
     save();
   }
 
+  public static boolean getLoadOtherEntities() {
+    return settings.getBool("loadOtherEntities", true);
+  }
+
+  public static void setLoadOtherEntities(boolean value) {
+    settings.setBool("loadOtherEntities", value);
+    save();
+  }
+
   public static boolean drawUnknownBlocks() {
     return settings.getBool("drawUnknownBlocks", false);
   }

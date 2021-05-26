@@ -55,10 +55,10 @@
                       </children>
                     </HBox>
                     <CheckBox fx:id="loadPlayers" mnemonicParsing="false" text="Players" />
-                    <CheckBox fx:id="loadEntities" mnemonicParsing="false" text="Load entities" />
                     <CheckBox fx:id="loadArmorStands" mnemonicParsing="false" text="Armor stands" />
                     <CheckBox fx:id="loadBooks" mnemonicParsing="false" text="Books" />
                     <CheckBox fx:id="loadPaintings" mnemonicParsing="false" text="Paintings" />
+                    <CheckBox fx:id="loadOtherEntities" mnemonicParsing="false" text="Other" />
                   </children>
                 </VBox>
               </content>
