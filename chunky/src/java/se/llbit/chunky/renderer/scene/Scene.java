@@ -1013,7 +1013,7 @@ public class Scene implements JsonSerializable, Refreshable {
         }
 
         // Load entities from the chunk:
-        if (PersistentSettings.getLoadEntities()) {
+        if (PersistentSettings.getLoadArmorStands()) {
           for (CompoundTag tag : chunkData.getEntities()) {
             Tag posTag = tag.get("Pos");
             if (posTag.isList()) {
@@ -1072,7 +1072,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   int octNode = currentBlock;
                   Block block = palette.get(currentBlock);
 
-                  if(block.isEntity() && PersistentSettings.getLoadEntities()) {
+                  if(block.isEntity() && PersistentSettings.getLoadArmorStands()) {
                     Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
                     Entity entity = block.toEntity(position);
 

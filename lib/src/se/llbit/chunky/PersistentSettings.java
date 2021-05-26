@@ -381,12 +381,12 @@ public final class PersistentSettings {
     save();
   }
 
-  public static boolean getLoadEntities() {
-    return settings.getBool("loadEntities", true);
+  public static boolean getLoadArmorStands() {
+    return settings.getBool("loadArmorStands", true);
   }
 
-  public static void setLoadEntities(boolean value) {
-    settings.setBool("loadEntities", value);
+  public static void setLoadArmorStands(boolean value) {
+    settings.setBool("loadArmorStands", value);
     save();
   }
 

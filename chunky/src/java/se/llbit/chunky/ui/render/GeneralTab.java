@@ -115,7 +115,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       saveDumps.setSelected(false);
     }
     loadPlayers.setSelected(PersistentSettings.getLoadPlayers());
-    loadArmorStands.setSelected(PersistentSettings.getLoadEntities());
+    loadArmorStands.setSelected(PersistentSettings.getLoadArmorStands());
     biomeColors.setSelected(scene.biomeColorsEnabled());
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
     reloadChunks.setDisable(scene.numberOfChunks() == 0);
@@ -192,7 +192,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     loadArmorStands.setTooltip(new Tooltip("Enable/disable non-player entity loading. "
             + "Takes effect on next scene creation."));
     loadArmorStands.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      PersistentSettings.setLoadEntities(newValue);
+      PersistentSettings.setLoadArmorStands(newValue);
     });
     loadArmorStands.setOnAction(event -> {
       renderControls.showPopup(
