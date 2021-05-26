@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.util;
+package se.llbit.util.mojangapi;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,11 +39,12 @@ import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonValue;
 import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
+import se.llbit.util.Util;
 
 /**
  * Utility class to download Minecraft Jars and player data.
  */
-public class MCDownloader {
+public class MojangApi {
 
   // the base64-encoded string might not be valid json (sometimes keys are not quoted)
   // so we use a regex to extract the skin url
@@ -53,7 +54,7 @@ public class MCDownloader {
   /**
    * Download a Minecraft Jar by version name.
    */
-  public static void downloadMC(String version, File destination) throws IOException {
+  public static void downloadMinecraft(String version, File destination) throws IOException {
     String theUrl = getClientUrl(getVersionManifestUrl(version));
     System.out.println("url: " + theUrl);
     System.out.println("destination: " + destination.getAbsolutePath());
@@ -152,14 +153,14 @@ public class MCDownloader {
    * @param profile Player profile
    * @return Skin URL (null if the player has no skin)
    */
-  public static Skin getSkinFromProfile(JsonObject profile) {
+  public static PlayerSkin getSkinFromProfile(JsonObject profile) {
     // TODO are there profiles where the payload is different?
     System.out.println(profile.toCompactString());
     JsonArray properties = profile.get("properties").asArray();
     Optional<String> textureBase64 = properties.elements.stream()
         .filter((p) -> p.asObject().get("name").stringValue("").equals("textures")).findFirst()
         .map(obj -> obj.asObject().get("value").stringValue(null));
-    return textureBase64.map(MCDownloader::getSkinFromEncodedTextures).orElse(null);
+    return textureBase64.map(MojangApi::getSkinFromEncodedTextures).orElse(null);
   }
 
   /**
@@ -169,15 +170,15 @@ public class MCDownloader {
    * @param textureBase64 Base64-encoded texture string
    * @return Skin information
    */
-  public static Skin getSkinFromEncodedTextures(String textureBase64) {
+  public static PlayerSkin getSkinFromEncodedTextures(String textureBase64) {
     String decoded = new String(Base64.getDecoder().decode(fixBase64Padding(textureBase64)));
     PlayerModel model = decoded.contains("\"slim\"") ? PlayerModel.ALEX : PlayerModel.STEVE;
     Matcher matcher = SKIN_URL_FROM_OBJECT.matcher(decoded);
     if (matcher.find()) {
-      return new Skin(matcher.group(2), model);
+      return new PlayerSkin(matcher.group(2), model);
     } else {
       Log.warn("Could not get skull texture from json: " + decoded);
-      return new Skin(null, model);
+      return new PlayerSkin(null, model);
     }
   }
 
@@ -207,7 +208,7 @@ public class MCDownloader {
    * Download a Minecraft player profile.
    *
    * @param uuid UUID of player
-   * @throws IOException
+   * @throws IOException if downloading the profile failed
    */
   public static JsonObject fetchProfile(String uuid) throws IOException {
     String key = uuid + ":profile";

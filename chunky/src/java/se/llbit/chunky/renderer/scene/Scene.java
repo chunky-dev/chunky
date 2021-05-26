@@ -35,7 +35,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -57,7 +56,6 @@ import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.chunk.SimpleChunkData;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.entity.HeadEntity;
 import se.llbit.chunky.entity.Lectern;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
@@ -92,7 +90,6 @@ import se.llbit.json.JsonValue;
 import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
 import se.llbit.math.bvh.BVH;
-import se.llbit.math.ColorUtil;
 import se.llbit.math.Grid;
 import se.llbit.math.Octree;
 import se.llbit.math.PackedOctree;
@@ -100,7 +97,6 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
-import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
@@ -109,6 +105,8 @@ import se.llbit.util.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
+import se.llbit.util.mojangapi.MojangApi;
+import se.llbit.util.mojangapi.PlayerSkin;
 
 /**
  * Encapsulates scene and render state.
@@ -906,11 +904,11 @@ public class Scene implements JsonSerializable, Refreshable {
           done += 1;
           JsonObject profile;
           try {
-            profile = MCDownloader.fetchProfile(entity.uuid);
-            Skin skin = MCDownloader.getSkinFromProfile(profile);
+            profile = MojangApi.fetchProfile(entity.uuid);
+            PlayerSkin skin = MojangApi.getSkinFromProfile(profile);
             String skinUrl = skin.getUrl();
             if (skinUrl != null) {
-              entity.skin = MCDownloader.downloadSkin(skinUrl).getAbsolutePath();
+              entity.skin = MojangApi.downloadSkin(skinUrl).getAbsolutePath();
             }
             entity.model = skin.getModel();
           } catch (IOException e) {

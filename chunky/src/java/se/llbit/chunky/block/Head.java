@@ -11,7 +11,7 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
-import se.llbit.util.MCDownloader;
+import se.llbit.util.mojangapi.MojangApi;
 
 public class Head extends MinecraftBlockTranslucent {
 
@@ -73,7 +73,7 @@ public class Head extends MinecraftBlockTranslucent {
         .get("Value").stringValue();
     if (!textureBase64.isEmpty()) {
       try {
-        return MCDownloader.getSkinFromEncodedTextures(textureBase64).getUrl();
+        return MojangApi.getSkinFromEncodedTextures(textureBase64).getUrl();
       } catch (IllegalArgumentException e) {
         // base64 decoding error
         Log.warn("Could not get skull texture", e);

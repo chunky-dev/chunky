@@ -1,13 +1,13 @@
-package se.llbit.util;
+package se.llbit.util.mojangapi;
 
 import se.llbit.chunky.renderer.scene.PlayerModel;
 
-public class Skin {
+public class PlayerSkin {
 
   private final String url;
   private final PlayerModel model;
 
-  public Skin(String url, PlayerModel model) {
+  public PlayerSkin(String url, PlayerModel model) {
     this.url = url;
     this.model = model;
   }
