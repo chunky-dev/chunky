@@ -73,7 +73,7 @@ public class Head extends MinecraftBlockTranslucent {
         .get("Value").stringValue();
     if (!textureBase64.isEmpty()) {
       try {
-        return MCDownloader.getSkinUrlFromEncodedTextures(textureBase64);
+        return MCDownloader.getSkinFromEncodedTextures(textureBase64).getUrl();
       } catch (IllegalArgumentException e) {
         // base64 decoding error
         Log.warn("Could not get skull texture", e);

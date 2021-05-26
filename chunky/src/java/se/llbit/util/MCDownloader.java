@@ -31,6 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.net.ssl.HttpsURLConnection;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
@@ -151,13 +152,14 @@ public class MCDownloader {
    * @param profile Player profile
    * @return Skin URL (null if the player has no skin)
    */
-  public static String getSkinUrlFromProfile(JsonObject profile) {
+  public static Skin getSkinFromProfile(JsonObject profile) {
     // TODO are there profiles where the payload is different?
+    System.out.println(profile.toCompactString());
     JsonArray properties = profile.get("properties").asArray();
     Optional<String> textureBase64 = properties.elements.stream()
         .filter((p) -> p.asObject().get("name").stringValue("").equals("textures")).findFirst()
         .map(obj -> obj.asObject().get("value").stringValue(null));
-    return textureBase64.map(MCDownloader::getSkinUrlFromEncodedTextures).orElse(null);
+    return textureBase64.map(MCDownloader::getSkinFromEncodedTextures).orElse(null);
   }
 
   /**
@@ -165,16 +167,17 @@ public class MCDownloader {
    * profiles and in entity tags of player heads.
    *
    * @param textureBase64 Base64-encoded texture string
-   * @return Skin URL or null if extracting the URL failed
+   * @return Skin information
    */
-  public static String getSkinUrlFromEncodedTextures(String textureBase64) {
+  public static Skin getSkinFromEncodedTextures(String textureBase64) {
     String decoded = new String(Base64.getDecoder().decode(fixBase64Padding(textureBase64)));
+    PlayerModel model = decoded.contains("\"slim\"") ? PlayerModel.ALEX : PlayerModel.STEVE;
     Matcher matcher = SKIN_URL_FROM_OBJECT.matcher(decoded);
     if (matcher.find()) {
-      return matcher.group(2);
+      return new Skin(matcher.group(2), model);
     } else {
       Log.warn("Could not get skull texture from json: " + decoded);
-      return null;
+      return new Skin(null, model);
     }
   }
 

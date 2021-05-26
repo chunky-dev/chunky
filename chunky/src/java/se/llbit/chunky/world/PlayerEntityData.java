@@ -53,6 +53,7 @@ public class PlayerEntityData {
       uuidLo = player.get("UUIDLeast").longValue(-1);
       uuidHi = player.get("UUIDMost").longValue(-1);
     }
+    uuid = String.format("%016X%016X", uuidHi, uuidLo);
     x = pos.get(0).doubleValue();
     y = pos.get(1).doubleValue();
     z = pos.get(2).doubleValue();
@@ -85,8 +86,6 @@ public class PlayerEntityData {
         mainHand = item;
       }
     }
-
-    uuid = String.format("%016X%016X", uuidHi, uuidLo);
   }
 
   @Override

@@ -907,10 +907,12 @@ public class Scene implements JsonSerializable, Refreshable {
           JsonObject profile;
           try {
             profile = MCDownloader.fetchProfile(entity.uuid);
-            String skinUrl = MCDownloader.getSkinUrlFromProfile(profile);
+            Skin skin = MCDownloader.getSkinFromProfile(profile);
+            String skinUrl = skin.getUrl();
             if (skinUrl != null) {
               entity.skin = MCDownloader.downloadSkin(skinUrl).getAbsolutePath();
             }
+            entity.model = skin.getModel();
           } catch (IOException e) {
             Log.error(e);
             profile = new JsonObject();
