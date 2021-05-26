@@ -198,6 +198,15 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       renderControls.showPopup(
               "This takes effect the next time a new scene is created.", loadArmorStands);
     });
+    loadBooks.setTooltip(new Tooltip("Enable/disable non-player entity loading. "
+            + "Takes effect on next scene creation."));
+    loadBooks.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      PersistentSettings.setLoadBooks(newValue);
+    });
+    loadBooks.setOnAction(event -> {
+      renderControls.showPopup(
+              "This takes effect the next time a new scene is created.", loadArmorStands);
+    });
     biomeColors.setTooltip(new Tooltip("Colors grass and tree leaves according to biome."));
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
       scene.setBiomeColorsEnabled(newValue);

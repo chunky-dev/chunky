@@ -390,6 +390,15 @@ public final class PersistentSettings {
     save();
   }
 
+  public static boolean getLoadBooks() {
+    return settings.getBool("loadBooks", true);
+  }
+
+  public static void setLoadBooks(boolean value) {
+    settings.setBool("loadBooks", value);
+    save();
+  }
+
   public static boolean drawUnknownBlocks() {
     return settings.getBool("drawUnknownBlocks", false);
   }
