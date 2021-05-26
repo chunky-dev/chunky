@@ -50,8 +50,8 @@
                   <children>
                     <HBox spacing="10.0">
                       <children>
-                        <Button mnemonicParsing="false" text="Select All" />
-                        <Button mnemonicParsing="false" text="Deselect All" />
+                        <Button fx:id="loadAllEntities" mnemonicParsing="false" text="Select All" />
+                        <Button fx:id="loadNoEntity" mnemonicParsing="false" text="Deselect All" />
                       </children>
                     </HBox>
                     <CheckBox fx:id="loadPlayers" mnemonicParsing="false" text="Players" />

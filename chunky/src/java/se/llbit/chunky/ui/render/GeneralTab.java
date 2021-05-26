@@ -75,6 +75,8 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private Button scale05;
   @FXML private Button scale15;
   @FXML private Button scale20;
+  @FXML private Button loadAllEntities;
+  @FXML private Button loadNoEntity;
   @FXML private CheckBox loadPlayers;
   @FXML private CheckBox loadArmorStands;
   @FXML private CheckBox loadBooks;
@@ -226,6 +228,20 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     loadOtherEntities.setOnAction(event -> {
       renderControls.showPopup(
               "This takes effect the next time a new scene is created.", loadArmorStands);
+    });
+    loadAllEntities.setOnAction(event -> {
+      loadPlayers.setSelected(true);
+      loadArmorStands.setSelected(true);
+      loadBooks.setSelected(true);
+      loadPaintings.setSelected(true);
+      loadOtherEntities.setSelected(true);
+    });
+    loadNoEntity.setOnAction(event -> {
+      loadPlayers.setSelected(false);
+      loadArmorStands.setSelected(false);
+      loadBooks.setSelected(false);
+      loadPaintings.setSelected(false);
+      loadOtherEntities.setSelected(false);
     });
 
     biomeColors.setTooltip(new Tooltip("Colors grass and tree leaves according to biome."));
