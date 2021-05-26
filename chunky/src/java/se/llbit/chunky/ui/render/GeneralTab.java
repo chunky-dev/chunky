@@ -76,7 +76,8 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private Button scale15;
   @FXML private Button scale20;
   @FXML private CheckBox loadPlayers;
-  @FXML private CheckBox loadEntities;
+  @FXML private CheckBox loadArmorStands;
+  @FXML private CheckBox loadBooks;
   @FXML private CheckBox biomeColors;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
@@ -114,7 +115,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       saveDumps.setSelected(false);
     }
     loadPlayers.setSelected(PersistentSettings.getLoadPlayers());
-    loadEntities.setSelected(PersistentSettings.getLoadEntities());
+    loadArmorStands.setSelected(PersistentSettings.getLoadEntities());
     biomeColors.setSelected(scene.biomeColorsEnabled());
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
     reloadChunks.setDisable(scene.numberOfChunks() == 0);
@@ -188,14 +189,14 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       renderControls.showPopup(
               "This takes effect the next time a new scene is created.", loadPlayers);
     });
-    loadEntities.setTooltip(new Tooltip("Enable/disable non-player entity loading. "
+    loadArmorStands.setTooltip(new Tooltip("Enable/disable non-player entity loading. "
             + "Takes effect on next scene creation."));
-    loadEntities.selectedProperty().addListener((observable, oldValue, newValue) -> {
+    loadArmorStands.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setLoadEntities(newValue);
     });
-    loadEntities.setOnAction(event -> {
+    loadArmorStands.setOnAction(event -> {
       renderControls.showPopup(
-              "This takes effect the next time a new scene is created.", loadEntities);
+              "This takes effect the next time a new scene is created.", loadArmorStands);
     });
     biomeColors.setTooltip(new Tooltip("Colors grass and tree leaves according to biome."));
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {

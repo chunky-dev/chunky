@@ -42,8 +42,28 @@
           </children>
         </HBox>
         <Separator />
-        <CheckBox fx:id="loadPlayers" mnemonicParsing="false" text="Load players" />
-        <CheckBox fx:id="loadEntities" mnemonicParsing="false" text="Load entities" />
+        <Accordion>
+          <panes>
+            <TitledPane animated="false" text="Load entities">
+              <content>
+                <VBox spacing="10.0">
+                  <children>
+                    <HBox spacing="10.0">
+                      <children>
+                        <Button mnemonicParsing="false" text="Select All" />
+                        <Button mnemonicParsing="false" text="Deselect All" />
+                      </children>
+                    </HBox>
+                    <CheckBox fx:id="loadPlayers" mnemonicParsing="false" text="Players" />
+                    <CheckBox fx:id="loadEntities" mnemonicParsing="false" text="Load entities" />
+                    <CheckBox fx:id="loadArmorStands" mnemonicParsing="false" text="Armor stands" />
+                    <CheckBox fx:id="loadBooks" mnemonicParsing="false" text="Books" />
+                  </children>
+                </VBox>
+              </content>
+            </TitledPane>
+          </panes>
+        </Accordion>
         <CheckBox fx:id="biomeColors" mnemonicParsing="false" text="Enable biome colors" />
         <HBox alignment="CENTER_LEFT" spacing="10.0">
           <children>
