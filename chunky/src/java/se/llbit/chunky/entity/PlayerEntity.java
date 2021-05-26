@@ -18,6 +18,7 @@
  */
 package se.llbit.chunky.entity;
 
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.Head;
 import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.PlayerModel;
@@ -951,5 +952,10 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
 
   @Override public JsonObject getGear() {
     return gear;
+  }
+
+  @Override
+  public boolean shouldLoad() {
+    return PersistentSettings.getLoadPlayers();
   }
 }

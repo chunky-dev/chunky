@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.entity;
 
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
@@ -619,5 +620,10 @@ public class ArmorStand extends Entity implements Poseable, Geared {
 
   @Override public JsonObject getGear() {
     return gear;
+  }
+
+  @Override
+  public boolean shouldLoad() {
+    return PersistentSettings.getLoadArmorStands();
   }
 }

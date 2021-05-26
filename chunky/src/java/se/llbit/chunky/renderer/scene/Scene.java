@@ -1074,37 +1074,39 @@ public class Scene implements JsonSerializable, Refreshable {
                     Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
                     Entity entity = block.toEntity(position);
 
-                    if(entity instanceof Poseable && !(entity instanceof Lectern && !((Lectern) entity).hasBook())) {
-                      // don't add the actor again if it was already loaded from json
-                      if(actors.stream().noneMatch(actor -> {
-                        if(actor.getClass().equals(entity.getClass())) {
-                          Vector3 distance = new Vector3(actor.position);
-                          distance.sub(entity.position);
-                          return distance.lengthSquared() < Ray.EPSILON;
+                    if (entity.shouldLoad()) {
+                      if(entity instanceof Poseable && !(entity instanceof Lectern && !((Lectern) entity).hasBook())) {
+                        // don't add the actor again if it was already loaded from json
+                        if(actors.stream().noneMatch(actor -> {
+                          if(actor.getClass().equals(entity.getClass())) {
+                            Vector3 distance = new Vector3(actor.position);
+                            distance.sub(entity.position);
+                            return distance.lengthSquared() < Ray.EPSILON;
+                          }
+                          return false;
+                        })) {
+                          actors.add(entity);
                         }
-                        return false;
-                      })) {
-                        actors.add(entity);
-                      }
-                    } else {
-                      entities.add(entity);
-                      if(emitterGrid != null) {
-                        for(Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
-                          emitterPos.x -= origin.x;
-                          emitterPos.y -= origin.y;
-                          emitterPos.z -= origin.z;
-                          emitterGrid.addEmitter(emitterPos);
-                        }
-                      }
-                    }
-
-                    if(!block.isBlockWithEntity()) {
-                      if(block.waterlogged) {
-                        block = palette.water;
-                        octNode = palette.waterId;
                       } else {
-                        block = Air.INSTANCE;
-                        octNode = palette.airId;
+                        entities.add(entity);
+                        if (emitterGrid != null) {
+                          for (Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
+                            emitterPos.x -= origin.x;
+                            emitterPos.y -= origin.y;
+                            emitterPos.z -= origin.z;
+                            emitterGrid.addEmitter(emitterPos);
+                          }
+                        }
+                      }
+
+                      if(!block.isBlockWithEntity()) {
+                        if(block.waterlogged) {
+                          block = palette.water;
+                          octNode = palette.waterId;
+                        } else {
+                          block = Air.INSTANCE;
+                          octNode = palette.airId;
+                        }
                       }
                     }
                   }
@@ -1268,26 +1270,29 @@ public class Scene implements JsonSerializable, Refreshable {
               if (blockEntity == null) {
                 continue;
               }
-              if (blockEntity instanceof Poseable) {
-                // don't add the actor again if it was already loaded from json
-                if (actors.stream().noneMatch(actor -> {
-                  if (actor.getClass().equals(blockEntity.getClass())) {
-                    Vector3 distance = new Vector3(actor.position);
-                    distance.sub(blockEntity.position);
-                    return distance.lengthSquared() < Ray.EPSILON;
+
+              if (blockEntity.shouldLoad()) {
+                if (blockEntity instanceof Poseable) {
+                  // don't add the actor again if it was already loaded from json
+                  if (actors.stream().noneMatch(actor -> {
+                    if (actor.getClass().equals(blockEntity.getClass())) {
+                      Vector3 distance = new Vector3(actor.position);
+                      distance.sub(blockEntity.position);
+                      return distance.lengthSquared() < Ray.EPSILON;
+                    }
+                    return false;
+                  })) {
+                    actors.add(blockEntity);
                   }
-                  return false;
-                })) {
-                  actors.add(blockEntity);
-                }
-              } else {
-                entities.add(blockEntity);
-                if(emitterGrid != null) {
-                  for(Grid.EmitterPosition emitterPos : blockEntity.getEmitterPosition()) {
-                    emitterPos.x -= origin.x;
-                    emitterPos.y -= origin.y;
-                    emitterPos.z -= origin.z;
-                    emitterGrid.addEmitter(emitterPos);
+                } else {
+                  entities.add(blockEntity);
+                  if (emitterGrid != null) {
+                    for (Grid.EmitterPosition emitterPos : blockEntity.getEmitterPosition()) {
+                      emitterPos.x -= origin.x;
+                      emitterPos.y -= origin.y;
+                      emitterPos.z -= origin.z;
+                      emitterGrid.addEmitter(emitterPos);
+                    }
                   }
                 }
               }
