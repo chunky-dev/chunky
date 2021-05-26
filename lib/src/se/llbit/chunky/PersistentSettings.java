@@ -399,6 +399,15 @@ public final class PersistentSettings {
     save();
   }
 
+  public static boolean getLoadPaintings() {
+    return settings.getBool("loadPaintings", true);
+  }
+
+  public static void setLoadPaintings(boolean value) {
+    settings.setBool("loadPaintings", value);
+    save();
+  }
+
   public static boolean drawUnknownBlocks() {
     return settings.getBool("drawUnknownBlocks", false);
   }

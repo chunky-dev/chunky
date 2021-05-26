@@ -78,6 +78,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private CheckBox loadPlayers;
   @FXML private CheckBox loadArmorStands;
   @FXML private CheckBox loadBooks;
+  @FXML private CheckBox loadPaintings;
   @FXML private CheckBox biomeColors;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
@@ -189,7 +190,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       renderControls.showPopup(
               "This takes effect the next time a new scene is created.", loadPlayers);
     });
-    loadArmorStands.setTooltip(new Tooltip("Enable/disable non-player entity loading. "
+    loadArmorStands.setTooltip(new Tooltip("Enable/disable armor stand entity loading. "
             + "Takes effect on next scene creation."));
     loadArmorStands.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setLoadArmorStands(newValue);
@@ -198,7 +199,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       renderControls.showPopup(
               "This takes effect the next time a new scene is created.", loadArmorStands);
     });
-    loadBooks.setTooltip(new Tooltip("Enable/disable non-player entity loading. "
+    loadBooks.setTooltip(new Tooltip("Enable/disable book entity loading. "
             + "Takes effect on next scene creation."));
     loadBooks.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setLoadBooks(newValue);
@@ -207,6 +208,16 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       renderControls.showPopup(
               "This takes effect the next time a new scene is created.", loadArmorStands);
     });
+    loadPaintings.setTooltip(new Tooltip("Enable/disable painting entity loading. "
+            + "Takes effect on next scene creation."));
+    loadPaintings.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      PersistentSettings.setLoadPaintings(newValue);
+    });
+    loadPaintings.setOnAction(event -> {
+      renderControls.showPopup(
+              "This takes effect the next time a new scene is created.", loadArmorStands);
+    });
+
     biomeColors.setTooltip(new Tooltip("Colors grass and tree leaves according to biome."));
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
       scene.setBiomeColorsEnabled(newValue);
