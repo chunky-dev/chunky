@@ -2652,39 +2652,39 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "black_candle_cake":
         return candleCake(tag, Texture.blackCandle);
       case "candle":
-        return candle(tag, Texture.candle);
+        return candle(tag, Texture.candle, Texture.candleLit);
       case "white_candle":
-        return candle(tag, Texture.whiteCandle);
+        return candle(tag, Texture.whiteCandle, Texture.whiteCandleLit);
       case "orange_candle":
-        return candle(tag, Texture.orangeCandle);
+        return candle(tag, Texture.orangeCandle, Texture.orangeCandleLit);
       case "magenta_candle":
-        return candle(tag, Texture.magentaCandle);
+        return candle(tag, Texture.magentaCandle, Texture.magentaCandleLit);
       case "light_blue_candle":
-        return candle(tag, Texture.lightBlueCandle);
+        return candle(tag, Texture.lightBlueCandle, Texture.lightBlueCandleLit);
       case "yellow_candle":
-        return candle(tag, Texture.yellowCandle);
+        return candle(tag, Texture.yellowCandle, Texture.yellowCandleLit);
       case "lime_candle":
-        return candle(tag, Texture.limeCandle);
+        return candle(tag, Texture.limeCandle, Texture.limeCandleLit);
       case "pink_candle":
-        return candle(tag, Texture.pinkCandle);
+        return candle(tag, Texture.pinkCandle, Texture.pinkCandleLit);
       case "gray_candle":
-        return candle(tag, Texture.grayCandle);
+        return candle(tag, Texture.grayCandle, Texture.grayCandleLit);
       case "light_gray_candle":
-        return candle(tag, Texture.lightGrayCandle);
+        return candle(tag, Texture.lightGrayCandle, Texture.lightGrayCandleLit);
       case "cyan_candle":
-        return candle(tag, Texture.cyanCandle);
+        return candle(tag, Texture.cyanCandle, Texture.cyanCandleLit);
       case "purple_candle":
-        return candle(tag, Texture.purpleCandle);
+        return candle(tag, Texture.purpleCandle, Texture.purpleCandleLit);
       case "blue_candle":
-        return candle(tag, Texture.blueCandle);
+        return candle(tag, Texture.blueCandle, Texture.blueCandleLit);
       case "brown_candle":
-        return candle(tag, Texture.brownCandle);
+        return candle(tag, Texture.brownCandle, Texture.brownCandleLit);
       case "green_candle":
-        return candle(tag, Texture.greenCandle);
+        return candle(tag, Texture.greenCandle, Texture.greenCandleLit);
       case "red_candle":
-        return candle(tag, Texture.redCandle);
+        return candle(tag, Texture.redCandle, Texture.redCandleLit);
       case "black_candle":
-        return candle(tag, Texture.blackCandle);
+        return candle(tag, Texture.blackCandle, Texture.blackCandleLit);
       case "copper_ore":
         return new MinecraftBlock("copper_ore", Texture.copperOre);
       case "calcite":
@@ -3357,9 +3357,9 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new MinecraftBlock("structure_block", texture);
   }
 
-  private static Block candle(Tag tag, Texture candleTexture) {
+  private static Block candle(Tag tag, Texture candleTexture, Texture candleTextureLit) {
     Tag properties = tag.get("Properties");
-    return new Candle(BlockProvider.blockName(tag), candleTexture,
+    return new Candle(BlockProvider.blockName(tag), candleTexture, candleTextureLit,
         BlockProvider.stringToInt(properties.get("candles"), 1),
         properties.get("lit").stringValue("false").equals("true"));
   }
