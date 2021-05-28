@@ -17,7 +17,6 @@
  */
 package se.llbit.chunky.world;
 
-import java.util.UUID;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
@@ -49,7 +48,7 @@ public class PlayerEntityData {
       uuidHi = (((long) uuid[0]) << 32) | (uuid[1] & 0xffffffffL);
       uuidLo = (((long) uuid[2]) << 32) | (uuid[3] & 0xffffffffL);
     } else {
-      // before 20w12a, the UUID was saved as two 32-bit integers
+      // before 20w12a, the UUID was saved as two longs (64-bit)
       uuidLo = player.get("UUIDLeast").longValue(-1);
       uuidHi = player.get("UUIDMost").longValue(-1);
     }
