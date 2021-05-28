@@ -146,6 +146,7 @@ public class RenderWorkerPool {
 
   /**
    * Set the cpu load. The pools will attempt (not guaranteed) to limit cpu usage to this value.
+   * @param cpuLoad percentage of cpu usage, will be clamped to [1..100]
    */
   public void setCpuLoad(int cpuLoad) {
     // Clamp to 1-100
