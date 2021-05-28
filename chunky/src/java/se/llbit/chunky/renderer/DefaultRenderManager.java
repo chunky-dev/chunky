@@ -98,6 +98,11 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   public final Scene bufferedScene;
 
   /**
+   * This stores the modification count of the bufferedScene. It is incremented whenever a reset occurs.
+   */
+  private int modCount = 1;
+
+  /**
    * This is the render worker pool {@code Renderer}s should use.
    *
    * {@code Renderer}s should submit small work-units to this pool. CPU usage is limited automatically, but if
@@ -236,16 +241,13 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         ResetReason reason = sceneProvider.awaitSceneStateChange();
 
         // Copy the new scene state to the bufferedScene
-        final boolean[] sceneReset = {false};
         synchronized (bufferedScene) {
           sceneProvider.withSceneProtected(scene -> {
             if (reason.overwriteState()) {
               bufferedScene.copyState(scene);
-              sceneReset[0] = true;
             }
             if (reason == ResetReason.MATERIALS_CHANGED || reason == ResetReason.SCENE_LOADED) {
               scene.importMaterials();
-              sceneReset[0] = true;
             }
 
             bufferedScene.copyTransients(scene);
@@ -270,12 +272,13 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         setRenderer(bufferedScene.getRenderer());
         setPreviewRenderer(bufferedScene.getPreviewRenderer());
 
+        // Notify renderers
+        modCount += 1;
+        getRenderer().sceneReset(this, reason, modCount);
+        getPreviewRenderer().sceneReset(this, reason, modCount);
+
         // Select the correct renderer
         Renderer render = mode == RenderMode.PREVIEW ? getPreviewRenderer() : getRenderer();
-
-        if (sceneReset[0]) {
-          render.sceneReset(this, reason);
-        }
 
         renderStart = System.currentTimeMillis();
         if (mode == RenderMode.PREVIEW) {
