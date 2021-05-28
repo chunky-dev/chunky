@@ -1007,6 +1007,11 @@ public class Texture {
   public static final Texture rawCopperBlock = new Texture();
   public static final Texture rawGoldBlock = new Texture();
   public static final Texture rawIronBlock = new Texture();
+  public static final Texture pottedAzaleaBushTop = new Texture();
+  public static final Texture pottedAzaleaBushSide = new Texture();
+  public static final Texture pottedAzaleaBushPlant = new Texture();
+  public static final Texture pottedFloweringAzaleaBushTop = new Texture();
+  public static final Texture pottedFloweringAzaleaBushSide = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

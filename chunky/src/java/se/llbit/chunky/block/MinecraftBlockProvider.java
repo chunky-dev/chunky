@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.model.FlowerPotModel;
+import se.llbit.chunky.model.FlowerPotModel.Kind;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
@@ -643,6 +644,12 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:potted_warped_roots",
       "minecraft:potted_white_tulip",
       "minecraft:potted_wither_rose",
+      "minecraft:potted_warped_fungus",
+      "minecraft:potted_crimson_fungus",
+      "minecraft:potted_crimson_roots",
+      "minecraft:potted_warped_roots",
+      "minecraft:potted_azalea_bush",
+      "minecraft:potted_flowering_azalea_bush",
       "minecraft:powder_snow",
       "minecraft:powder_snow_cauldron",
       "minecraft:powered_rail",
@@ -2218,6 +2225,10 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new FlowerPot(name, FlowerPotModel.Kind.CRIMSON_ROOTS);
       case "potted_warped_roots":
         return new FlowerPot(name, FlowerPotModel.Kind.WARPED_ROOTS);
+      case "potted_azalea_bush":
+        return new FlowerPot(name, Kind.AZALEA_BUSH);
+      case "potted_flowering_azalea_bush":
+        return new FlowerPot(name, Kind.FLOWERING_AZALEA_BUSH);
       case "carrots":
         return new Carrots(BlockProvider.stringToInt(tag.get("Properties").get("age"), 7));
       case "potatoes":

@@ -60,7 +60,9 @@ public class FlowerPotModel {
     WARPED_FUNGUS,
     CRIMSON_FUNGUS,
     WARPED_ROOTS,
-    CRIMSON_ROOTS
+    CRIMSON_ROOTS,
+    AZALEA_BUSH,
+    FLOWERING_AZALEA_BUSH
   }
 
   private static final AABB[] boxes = {
@@ -78,7 +80,7 @@ public class FlowerPotModel {
 
   private static final AABB cactus = new AABB(6 / 16., 10 / 16., 4 / 16., 1, 6 / 16., 10 / 16.);
 
-  protected static Quad[] flower = {
+  private static final Quad[] flower = {
       new Quad(new Vector3(0, 4 / 16., 0), new Vector3(1, 4 / 16., 1), new Vector3(0, 1, 0),
           new Vector4(0, 1, 0, 12 / 16.)),
 
@@ -92,7 +94,7 @@ public class FlowerPotModel {
           new Vector4(0, 1, 0, 12 / 16.)),
   };
 
-  protected static Quad[] flowerSmall = {
+  private static final Quad[] flowerSmall = {
       new Quad(new Vector3(2 / 16., 4 / 16., 2 / 16.), new Vector3(14 / 16., 4 / 16., 14 / 16.),
           new Vector3(2 / 16., 1, 2 / 16.), new Vector4(0, 1, 0, 1)),
 
@@ -109,7 +111,7 @@ public class FlowerPotModel {
           new Vector4(0, 1, 0, 1)),
   };
 
-  private static Quad[] bamboo = {
+  private static final Quad[] bamboo = {
       new Quad(
           new Vector3(7 / 16.0, 16 / 16.0, 9 / 16.0),
           new Vector3(9 / 16.0, 16 / 16.0, 9 / 16.0),
@@ -142,21 +144,133 @@ public class FlowerPotModel {
         new Vector4(6 / 16.0, 8 / 16.0, 0 / 16.0, 16 / 16.0))
   };
 
-  private static Quad[] bambooLeaf = {
+  private static final Quad[] bambooLeaf = {
       new Quad(
           new Vector3(16 / 16.0, 2 / 16.0, 8 / 16.0),
           new Vector3(0 / 16.0, 2 / 16.0, 8 / 16.0),
           new Vector3(16 / 16.0, 18 / 16.0, 8 / 16.0),
           new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)),
       new Quad(
-        new Vector3(0 / 16.0, 2 / 16.0, 8 / 16.0),
-        new Vector3(16 / 16.0, 2 / 16.0, 8 / 16.0),
-        new Vector3(0 / 16.0, 18 / 16.0, 8 / 16.0),
-        new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 16 / 16.0))
+          new Vector3(0 / 16.0, 2 / 16.0, 8 / 16.0),
+          new Vector3(16 / 16.0, 2 / 16.0, 8 / 16.0),
+          new Vector3(0 / 16.0, 18 / 16.0, 8 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 16 / 16.0))
   };
+
+  private static final Quad[] azaleaBush = Model.join(new Quad[]{
+          new Quad(
+              new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector4(4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0)
+          ),
+          new Quad(
+              new Vector3(4 / 16.0, 15.9 / 16.0, 4 / 16.0),
+              new Vector3(12 / 16.0, 15.9 / 16.0, 4 / 16.0),
+              new Vector3(4 / 16.0, 15.9 / 16.0, 12 / 16.0),
+              new Vector4(4 / 16.0, 12 / 16.0, 12 / 16.0, 4 / 16.0)
+          ),
+          new Quad(
+              new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(4 / 16.0, 8 / 16.0, 4 / 16.0),
+              new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
+          ),
+          new Quad(
+              new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(12 / 16.0, 8 / 16.0, 4 / 16.0),
+              new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
+          ),
+          new Quad(
+              new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(4 / 16.0, 8 / 16.0, 12 / 16.0),
+              new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
+          ),
+          new Quad(
+              new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(12 / 16.0, 8 / 16.0, 12 / 16.0),
+              new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
+          ),
+          new Quad(
+              new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(4 / 16.0, 8 / 16.0, 12 / 16.0),
+              new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
+          ),
+          new Quad(
+              new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(4 / 16.0, 8 / 16.0, 4 / 16.0),
+              new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
+          ),
+          new Quad(
+              new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(12 / 16.0, 8 / 16.0, 12 / 16.0),
+              new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
+          ),
+          new Quad(
+              new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(12 / 16.0, 8 / 16.0, 4 / 16.0),
+              new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
+          )
+      },
+      Model.rotateY(new Quad[]{
+          new Quad(
+              new Vector3(2.6 / 16.0, 16 / 16.0, 8 / 16.0),
+              new Vector3(13.4 / 16.0, 16 / 16.0, 8 / 16.0),
+              new Vector3(2.6 / 16.0, 4 / 16.0, 8 / 16.0),
+              new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+          ),
+          new Quad(
+              new Vector3(13.4 / 16.0, 16 / 16.0, 8 / 16.0),
+              new Vector3(2.6 / 16.0, 16 / 16.0, 8 / 16.0),
+              new Vector3(13.4 / 16.0, 4 / 16.0, 8 / 16.0),
+              new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+          )
+      }, Math.toRadians(45)),
+      Model.rotateY(new Quad[]{
+          new Quad(
+              new Vector3(8 / 16.0, 16 / 16.0, 13.4 / 16.0),
+              new Vector3(8 / 16.0, 16 / 16.0, 2.6 / 16.0),
+              new Vector3(8 / 16.0, 4 / 16.0, 13.4 / 16.0),
+              new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+          ),
+          new Quad(
+              new Vector3(8 / 16.0, 16 / 16.0, 2.6 / 16.0),
+              new Vector3(8 / 16.0, 16 / 16.0, 13.4 / 16.0),
+              new Vector3(8 / 16.0, 4 / 16.0, 2.6 / 16.0),
+              new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+          )
+      }, Math.toRadians(45))
+  );
 
   private static final Texture[] tex = {
       Texture.flowerPot, Texture.flowerPot, Texture.flowerPot, Texture.flowerPot, Texture.dirt,
+  };
+
+  private static final Texture[] azaleaBushTex = {
+      Texture.pottedAzaleaBushTop, Texture.pottedAzaleaBushTop,
+      Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
+      Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
+      Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
+      Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
+      Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant,
+      Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant
+  };
+
+  private static final Texture[] floweringAzaleaBushTex = {
+      Texture.pottedFloweringAzaleaBushTop, Texture.pottedFloweringAzaleaBushTop,
+      Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
+      Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
+      Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
+      Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
+      Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant,
+      Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant
   };
 
   public static boolean intersect(Ray ray, Scene scene) {
@@ -271,6 +385,12 @@ public class FlowerPotModel {
       case CRIMSON_ROOTS:
         hit |= intersect(flowerSmall, ray, Texture.crimsonRootsPot);
         break;
+      case AZALEA_BUSH:
+        hit |= intersect(azaleaBush, ray, azaleaBushTex);
+        break;
+      case FLOWERING_AZALEA_BUSH:
+        hit |= intersect(azaleaBush, ray, floweringAzaleaBushTex);
+        break;
     }
     if (hit) {
       ray.color.w = 1;
@@ -285,6 +405,23 @@ public class FlowerPotModel {
     for (Quad quad : quads) {
       if (quad.intersect(ray)) {
         float[] color = texture.getColor(ray.u, ray.v);
+        if (color[3] > Ray.EPSILON) {
+          ray.color.set(color);
+          ray.t = ray.tNext;
+          ray.n.set(quad.n);
+          hit = true;
+        }
+      }
+    }
+    return hit;
+  }
+
+  private static boolean intersect(Quad[] quads, Ray ray, Texture[] textures) {
+    boolean hit = false;
+    for (int i = 0; i < quads.length; i++) {
+      Quad quad = quads[i];
+      if (quad.intersect(ray)) {
+        float[] color = textures[i].getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
           ray.t = ray.tNext;

@@ -3633,6 +3633,11 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/raw_copper_block", Texture.rawCopperBlock);
     addSimpleTexture("assets/minecraft/textures/block/raw_gold_block", Texture.rawGoldBlock);
     addSimpleTexture("assets/minecraft/textures/block/raw_iron_block", Texture.rawIronBlock);
+    addSimpleTexture("assets/minecraft/textures/block/potted_azalea_bush_top", Texture.pottedAzaleaBushTop);
+    addSimpleTexture("assets/minecraft/textures/block/potted_azalea_bush_side", Texture.pottedAzaleaBushSide);
+    addSimpleTexture("assets/minecraft/textures/block/potted_azalea_bush_plant", Texture.pottedAzaleaBushPlant);
+    addSimpleTexture("assets/minecraft/textures/block/potted_flowering_azalea_bush_top", Texture.pottedFloweringAzaleaBushTop);
+    addSimpleTexture("assets/minecraft/textures/block/potted_flowering_azalea_bush_side", Texture.pottedFloweringAzaleaBushSide);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
