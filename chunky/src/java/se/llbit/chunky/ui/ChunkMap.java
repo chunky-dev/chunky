@@ -31,7 +31,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.stage.PopupWindow;
-import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
@@ -106,6 +105,10 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   private final Canvas canvas;
   private final Canvas mapOverlay;
 
+  private static final int VIEW_MAX_UPDATES = Math.max(Integer.parseInt(System.getProperty("chunky.mapviewfps", "30")), 1);
+
+  private volatile long lastUpdate = System.nanoTime();
+  private volatile boolean viewUpdateScheduled = false;
   private volatile boolean repaintQueued = false;
   private volatile boolean scheduledUpdate = false;
   private volatile long lastRedraw = 0;
@@ -337,12 +340,18 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   }
 
   @Override public void viewUpdated(ChunkView view) {
-    synchronized (this) {
-      this.view = view;
-      mapBuffer.updateView(view);
+    if (!viewUpdateScheduled) {
+      viewUpdateScheduled = true;
+      executor.schedule(() -> {
+        lastUpdate = System.nanoTime();
+        viewUpdateScheduled = false;
+
+        this.view = view;
+        mapBuffer.updateView(view);
+        mapBuffer.redrawView(mapLoader, chunkSelection);
+        repaintDeferred();
+      }, (1000000000/VIEW_MAX_UPDATES) - (System.nanoTime() - lastUpdate), TimeUnit.NANOSECONDS);
     }
-    mapBuffer.redrawView(mapLoader, chunkSelection);
-    repaintDirect();
   }
 
   public int getWidth() {
