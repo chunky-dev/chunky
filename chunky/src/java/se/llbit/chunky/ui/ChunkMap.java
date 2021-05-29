@@ -350,7 +350,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
         mapBuffer.updateView(view);
         mapBuffer.redrawView(mapLoader, chunkSelection);
         repaintDeferred();
-      }, (1000000000/VIEW_MAX_UPDATES) - (System.nanoTime() - lastUpdate), TimeUnit.NANOSECONDS);
+      }, (1_000_000_000 / VIEW_MAX_UPDATES) - (System.nanoTime() - lastUpdate), TimeUnit.NANOSECONDS);
     }
   }
 
