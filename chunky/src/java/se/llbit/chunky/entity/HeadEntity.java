@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.WeakHashMap;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.PlayerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.resources.texturepack.EntityTextureLoader;
@@ -128,19 +127,19 @@ public class HeadEntity extends Entity {
         break;
     }
     head.transform(transform);
-    head.addFrontFaces(faces, texture, texture.getUv().headFront);
-    head.addBackFaces(faces, texture, texture.getUv().headBack);
-    head.addTopFaces(faces, texture, texture.getUv().headTop);
-    head.addBottomFaces(faces, texture, texture.getUv().headBottom);
-    head.addRightFaces(faces, texture, texture.getUv().headRight);
-    head.addLeftFaces(faces, texture, texture.getUv().headLeft);
+    head.addFrontFaces(faces, texture, texture.getUV().headFront);
+    head.addBackFaces(faces, texture, texture.getUV().headBack);
+    head.addTopFaces(faces, texture, texture.getUV().headTop);
+    head.addBottomFaces(faces, texture, texture.getUV().headBottom);
+    head.addRightFaces(faces, texture, texture.getUV().headRight);
+    head.addLeftFaces(faces, texture, texture.getUV().headLeft);
     hat.transform(transform);
-    hat.addFrontFaces(faces, texture, texture.getUv().hatFront);
-    hat.addBackFaces(faces, texture, texture.getUv().hatBack);
-    hat.addLeftFaces(faces, texture, texture.getUv().hatLeft);
-    hat.addRightFaces(faces, texture, texture.getUv().hatRight);
-    hat.addTopFaces(faces, texture, texture.getUv().hatTop);
-    hat.addBottomFaces(faces, texture, texture.getUv().hatBottom);
+    hat.addFrontFaces(faces, texture, texture.getUV().hatFront);
+    hat.addBackFaces(faces, texture, texture.getUV().hatBack);
+    hat.addLeftFaces(faces, texture, texture.getUV().hatLeft);
+    hat.addRightFaces(faces, texture, texture.getUV().hatRight);
+    hat.addTopFaces(faces, texture, texture.getUV().hatTop);
+    hat.addBottomFaces(faces, texture, texture.getUV().hatBottom);
     return faces;
   }
 

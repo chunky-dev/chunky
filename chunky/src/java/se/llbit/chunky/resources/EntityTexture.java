@@ -29,7 +29,7 @@ public class EntityTexture extends Texture {
   private static final UVMap UV = new UVMap(false); // e.g. skeleton
   private static final UVMap UV_EXTENDED = new UVMap(true); // e.g. zombie
 
-  public UVMap getUv() {
+  public UVMap getUV() {
     return width == height ? UV_EXTENDED : UV;
   }
 

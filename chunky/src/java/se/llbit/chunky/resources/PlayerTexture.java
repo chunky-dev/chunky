@@ -29,7 +29,7 @@ public class PlayerTexture extends EntityTexture {
   private PlayerModel model = PlayerModel.STEVE;
 
   @Override
-  public UVMap getUv() {
+  public UVMap getUV() {
     if (width == height) {
       return model == PlayerModel.ALEX ? EXTENDED_UV_ALEX : EXTENDED_UV_STEVE;
     }

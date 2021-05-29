@@ -518,7 +518,7 @@ public class Texture {
   // Entity textures.
   public static final PlayerTexture alex = new PlayerTexture();
   public static final PlayerTexture steve = new PlayerTexture();
-  public static final EntityTexture zombie = new PlayerTexture();
+  public static final EntityTexture zombie = new EntityTexture();
   public static final EntityTexture creeper = new EntityTexture();
   public static final EntityTexture skeleton = new EntityTexture();
   public static final EntityTexture wither = new EntityTexture();
