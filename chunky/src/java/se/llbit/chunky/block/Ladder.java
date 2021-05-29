@@ -13,6 +13,7 @@ public class Ladder extends MinecraftBlockTranslucent {
     super("ladder", Texture.ladder);
     this.description = "facing=" + facing;
     localIntersect = true;
+    solid = false;
     switch (facing) {
       default:
       case "north":
