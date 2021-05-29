@@ -206,8 +206,6 @@ public class RenderWorkerPool {
     /**
      * @param worker      The render worker running this job.
      * @throws Throwable  Any unchecked exception.
-     *                    Note: {@code InterruptedException}s are ignored. All other {@code Throwable}s will be logged
-     *                    as an error.
      */
     void accept(RenderWorker worker) throws Throwable;
   }
