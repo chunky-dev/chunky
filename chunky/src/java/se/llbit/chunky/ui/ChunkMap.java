@@ -105,8 +105,6 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   private final Canvas canvas;
   private final Canvas mapOverlay;
 
-  private static final int VIEW_MAX_UPDATES = Math.max(Integer.parseInt(System.getProperty("chunky.mapviewfps", "30")), 1);
-
   private volatile long lastUpdate = System.currentTimeMillis();
   private volatile boolean viewUpdateScheduled = false;
   private volatile boolean repaintQueued = false;
@@ -196,6 +194,11 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     if (!repaintQueued) {
       repaintQueued = true;
       Platform.runLater(() -> {
+        if (viewUpdateScheduled) {
+          viewUpdateScheduled = false;
+          mapBuffer.updateView(view);
+          mapBuffer.redrawView(mapLoader, chunkSelection);
+        }
         repaint(canvas.getGraphicsContext2D());
         repaintQueued = false;
       });
@@ -340,18 +343,9 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   }
 
   @Override public void viewUpdated(ChunkView view) {
-    if (!viewUpdateScheduled) {
-      viewUpdateScheduled = true;
-      executor.schedule(() -> {
-        lastUpdate = System.currentTimeMillis();
-        viewUpdateScheduled = false;
-
-        this.view = view;
-        mapBuffer.updateView(view);
-        mapBuffer.redrawView(mapLoader, chunkSelection);
-        repaintDeferred();
-      }, (1000/VIEW_MAX_UPDATES) - (System.currentTimeMillis() - lastUpdate), TimeUnit.MILLISECONDS);
-    }
+    viewUpdateScheduled = true;
+    this.view = view;
+    repaintDeferred();
   }
 
   public int getWidth() {
