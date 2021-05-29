@@ -2479,8 +2479,7 @@ public class Scene implements JsonSerializable, Refreshable {
       int x = (int) QuickMath.floor(ray.o.x);
       int y = (int) QuickMath.floor(ray.o.y);
       int z = (int) QuickMath.floor(ray.o.z);
-      Octree.Node node = waterOctree.get(x, y, z);
-      Material block = palette.get(node.type);
+      Material block = waterOctree.getMaterial(x, y, z, palette);
       return block.isWater()
           && ((ray.o.y - y) < 0.875 || ((Water) block).isFullBlock());
     }

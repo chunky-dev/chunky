@@ -149,11 +149,6 @@ public class PackedOctree implements Octree.OctreeImplementation {
     return -treeData[nodeIndex];
   }
 
-  @Override
-  public int getData(Octree.NodeId node) {
-    return 0;
-  }
-
   /**
    * Constructor building a tree with capacity for some nodes
    *
@@ -295,37 +290,12 @@ public class PackedOctree implements Octree.OctreeImplementation {
   }
 
   /**
-   * Compare two nodes.
-   *
-   * True if none branching, and same type.
-   *
-   * @param firstNodeIndex The index of the first node
-   * @param secondNode     The second node (most likely outside of tree)
-   * @return true id the nodes compare equals, false otherwise
-   */
-  private boolean nodeEquals(int firstNodeIndex, Octree.Node secondNode) {
-    boolean firstIsBranch = treeData[firstNodeIndex] > 0;
-    boolean secondIsBranch = (secondNode.type == BRANCH_NODE);
-    return (!firstIsBranch && !secondIsBranch && -treeData[firstNodeIndex] == secondNode.type); // compare types (don't forget that in the tree the negation of the type is stored)
-  }
-
-  /**
    * Sets a specified block within the octree to a specific palette value, subdividing and merging as needed.
    *
    * x, y, z are in octree coordinates, NOT world coordinates.
    */
   @Override
   public void set(int type, int x, int y, int z) {
-    set(new Octree.Node(type), x, y, z);
-  }
-
-  /**
-   * Sets a specified block within the octree to a specific palette value, subdividing and merging as needed.
-   *
-   * x, y, z are in octree coordinates, NOT world coordinates.
-   */
-  @Override
-  public void set(Octree.Node data, int x, int y, int z) {
     int[] parents = new int[depth]; // better to put as a field to prevent allocation at each invocation?
     int nodeIndex = 0; // start at root
     int position;
@@ -334,7 +304,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
     for(int i = depth - 1; i >= 0; --i) {
       parents[i] = nodeIndex;
 
-      if(nodeEquals(nodeIndex, data)) { // Everything in this region is already of this blocktype.
+      if(treeData[nodeIndex] == -type) { // Everything in this region is already of this blocktype.
         return;
       }
 
@@ -351,7 +321,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
     }
     // store type into final node (this specific block coordinate's node)
-    treeData[nodeIndex] = -data.type; // Negation of BlockPalette type stored
+    treeData[nodeIndex] = -type; // Negation of BlockPalette type stored
 
     // Merge nodes where all children have been set to the same type, starting from the bottom.
     for(int i = 0; i < depth; ++i) {
@@ -571,26 +541,6 @@ public class PackedOctree implements Octree.OctreeImplementation {
   }
 
   /**
-   * Creates an octree node which represents the PackedOctree node which is (or contains) the
-   * block specified.
-   *
-   * This node is not actually used within this PackedOctree, as it is stored inline in the
-   * array here. This is just a Node object which wraps the values that the PackedOctree node
-   * would have.
-   *
-   * x, y, z are in octree coordinates, NOT world coordinates.
-   */
-  @Override
-  public Octree.Node get(int x, int y, int z) {
-    int nodeIndex = getNodeIndex(x, y, z);
-
-    Octree.Node node = new Octree.Node(treeData[nodeIndex] > 0 ? BRANCH_NODE : -treeData[nodeIndex]);
-
-    // Return dummy Node, will work if only type and data are used, breaks if children are needed
-    return node;
-  }
-
-  /**
    * Gets the block material type from the BlockPalette of the node which is (or contains) the block specified.
    *
    * x, y, z are in octree coordinates, NOT world coordinates.
@@ -661,12 +611,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
         loadNode(in, childrenIndex + i);
       }
     } else {
-      if((type & DATA_FLAG) == 0) {
-        treeData[nodeIndex] = -type; // negation of type
-      } else {
-        int data = in.readInt();
-        treeData[nodeIndex] = -(type ^ DATA_FLAG);
-      }
+      treeData[nodeIndex] = -type; // negation of type
     }
   }
 
