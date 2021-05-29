@@ -72,13 +72,14 @@ public class RenderWorkerPool {
 
     /**
      * Reset the sleep interval. Call this if the worker has spent a long time waiting.
-     * For example: {@code
+     * For example:
+     * <pre>
      *    worker.workSleep()
      *    synchronized(monitor) {
      *      monitor.wait();
      *    }
      *    worker.resetSleep();
-     * }
+     * </pre>
      */
     public void resetSleep() {
       lastSleep = System.currentTimeMillis();
@@ -116,7 +117,7 @@ public class RenderWorkerPool {
     }
   }
 
-  private void work(RenderWorker worker) throws InterruptedException {
+  private void work(RenderWorker worker) throws Throwable {
     synchronized (workQueue) {
       while (workQueue.isEmpty()) {
         workQueue.wait();
@@ -201,14 +202,11 @@ public class RenderWorkerPool {
   }
 
   /**
-   * A render job. It is essentially a {@code Consumer<RenderWorker>} but with
-   * the ability to throw an {@code InterruptedException}.
+   * A render job. Thrown exceptions are handled by the worker.
+   * Note: {@code InterruptedException}s are ignored. All other {@code Throwable}s will be logged as an error.
    */
   @FunctionalInterface
   interface RenderJob {
-    /**
-     * @throws InterruptedException when the Thread is interrupted while waiting.
-     */
-    void accept(RenderWorker worker) throws InterruptedException;
+    void accept(RenderWorker worker) throws Throwable;
   }
 }

@@ -75,10 +75,11 @@ public interface Renderer extends Registerable {
    *
    * The default implementation does nothing.
    *
-   * @param modCount This is the reset count. Any reset will increment this variable. Implementations may keep track
-   *                 of this count to see if it missed a reset. The starting value will be >= 1.
+   * @param resetCount This is the reset count. Any reset will increment this variable. Implementations may keep track
+   *                   of this count to see if it missed a reset (and should potentially re-export the scene).
+   *                   The starting value will be >= 1.
    */
-  default void sceneReset(DefaultRenderManager manager, ResetReason reason, int modCount) {}
+  default void sceneReset(DefaultRenderManager manager, ResetReason reason, int resetCount) {}
 
   /**
    * This should return if this renderer will postprocess on its own.

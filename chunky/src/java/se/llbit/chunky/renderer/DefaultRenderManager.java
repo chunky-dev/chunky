@@ -98,9 +98,9 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   public final Scene bufferedScene;
 
   /**
-   * This stores the modification count of the bufferedScene. It is incremented whenever a reset occurs.
+   * This stores the reset count of the bufferedScene. It is incremented whenever a reset occurs.
    */
-  private int modCount = 1;
+  private int resetCount = 1;
 
   /**
    * This is the render worker pool {@code Renderer}s should use.
@@ -273,9 +273,9 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         setPreviewRenderer(bufferedScene.getPreviewRenderer());
 
         // Notify renderers
-        modCount += 1;
-        getRenderer().sceneReset(this, reason, modCount);
-        getPreviewRenderer().sceneReset(this, reason, modCount);
+        resetCount += 1;
+        getRenderer().sceneReset(this, reason, resetCount);
+        getPreviewRenderer().sceneReset(this, reason, resetCount);
 
         // Select the correct renderer
         Renderer render = mode == RenderMode.PREVIEW ? getPreviewRenderer() : getRenderer();
