@@ -124,8 +124,8 @@ public class PaintingEntity extends Entity {
     paintings.put("minecraft:wither", new Painting(Texture.paintingWither, 2, 2));
     paintings.put("Fighters", new Painting(Texture.paintingFighters, 4, 2));
     paintings.put("minecraft:fighters", new Painting(Texture.paintingFighters, 4, 2));
-    paintings.put("Skeleton", new Painting(Texture.skeleton, 4, 3));
-    paintings.put("minecraft:skeleton", new Painting(Texture.skeleton, 4, 3));
+    paintings.put("Skeleton", new Painting(Texture.paintingSkeleton, 4, 3));
+    paintings.put("minecraft:skeleton", new Painting(Texture.paintingSkeleton, 4, 3));
     paintings.put("DonkeyKong", new Painting(Texture.paintingDonkeyKong, 4, 3));
     paintings.put("minecraft:donkey_kong", new Painting(Texture.paintingDonkeyKong, 4, 3));
     paintings.put("Pointer", new Painting(Texture.paintingPointer, 4, 4));
