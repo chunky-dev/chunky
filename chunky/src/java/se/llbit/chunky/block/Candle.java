@@ -18,9 +18,9 @@ public class Candle extends MinecraftBlockTranslucent {
   private final int candles;
   private final boolean lit;
 
-  public Candle(String name, Texture candle, int candles, boolean lit) {
+  public Candle(String name, Texture candle, Texture candleLit, int candles, boolean lit) {
     super(name, candle);
-    this.candle = candle;
+    this.candle = lit ? candleLit : candle;
     this.candles = Math.max(1, Math.min(4, candles));
     this.lit = lit;
     localIntersect = true;

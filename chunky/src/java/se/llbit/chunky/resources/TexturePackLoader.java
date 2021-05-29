@@ -3563,6 +3563,23 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/green_candle", Texture.greenCandle);
     addSimpleTexture("assets/minecraft/textures/block/red_candle", Texture.redCandle);
     addSimpleTexture("assets/minecraft/textures/block/black_candle", Texture.blackCandle);
+    addSimpleTexture("assets/minecraft/textures/block/candle_lit", Texture.candleLit);
+    addSimpleTexture("assets/minecraft/textures/block/white_candle_lit", Texture.whiteCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/orange_candle_lit", Texture.orangeCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/magenta_candle_lit", Texture.magentaCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/light_blue_candle_lit", Texture.lightBlueCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/yellow_candle_lit", Texture.yellowCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/lime_candle_lit", Texture.limeCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/pink_candle_lit", Texture.pinkCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/gray_candle_lit", Texture.grayCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/light_gray_candle_lit", Texture.lightGrayCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/cyan_candle_lit", Texture.cyanCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/purple_candle_lit", Texture.purpleCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/blue_candle_lit", Texture.blueCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/brown_candle_lit", Texture.brownCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/green_candle_lit", Texture.greenCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/red_candle_lit", Texture.redCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/black_candle_lit", Texture.blackCandleLit);
     addSimpleTexture("assets/minecraft/textures/particle/flame", Texture.flameParticle);
     addSimpleTexture("assets/minecraft/textures/block/copper_ore", Texture.copperOre);
     addSimpleTexture("assets/minecraft/textures/block/calcite", Texture.calcite);
@@ -3648,6 +3665,11 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/raw_copper_block", Texture.rawCopperBlock);
     addSimpleTexture("assets/minecraft/textures/block/raw_gold_block", Texture.rawGoldBlock);
     addSimpleTexture("assets/minecraft/textures/block/raw_iron_block", Texture.rawIronBlock);
+    addSimpleTexture("assets/minecraft/textures/block/potted_azalea_bush_top", Texture.pottedAzaleaBushTop);
+    addSimpleTexture("assets/minecraft/textures/block/potted_azalea_bush_side", Texture.pottedAzaleaBushSide);
+    addSimpleTexture("assets/minecraft/textures/block/potted_azalea_bush_plant", Texture.pottedAzaleaBushPlant);
+    addSimpleTexture("assets/minecraft/textures/block/potted_flowering_azalea_bush_top", Texture.pottedFloweringAzaleaBushTop);
+    addSimpleTexture("assets/minecraft/textures/block/potted_flowering_azalea_bush_side", Texture.pottedFloweringAzaleaBushSide);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
