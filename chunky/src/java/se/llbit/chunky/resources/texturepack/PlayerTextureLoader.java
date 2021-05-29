@@ -1,4 +1,5 @@
 /* Copyright (c) 2015 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -19,23 +20,21 @@ package se.llbit.chunky.resources.texturepack;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipFile;
+import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.chunky.resources.EntityTexture;
+import se.llbit.chunky.resources.PlayerTexture;
 import se.llbit.resources.ImageLoader;
 
-/**
- * Helper to load entity textures, i.e. creeper, zombie, skeleton etc. textures.
- *
- * @author Jesper Öqvist <jesper@llbit.se>
- */
-public class EntityTextureLoader extends TextureLoader {
+public class PlayerTextureLoader extends TextureLoader {
 
   private final String file;
-  protected final EntityTexture texture;
+  protected final PlayerTexture texture;
+  private final PlayerModel model;
 
-  public EntityTextureLoader(String file, EntityTexture texture) {
+  public PlayerTextureLoader(String file, PlayerTexture texture, PlayerModel model) {
     this.file = file;
     this.texture = texture;
+    this.model = model;
   }
 
   @Override
@@ -48,6 +47,7 @@ public class EntityTextureLoader extends TextureLoader {
     }
 
     texture.setTexture(image);
+    texture.setModel(model);
     return true;
   }
 

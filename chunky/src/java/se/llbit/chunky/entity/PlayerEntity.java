@@ -20,13 +20,14 @@ package se.llbit.chunky.entity;
 import se.llbit.chunky.block.Head;
 import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.PlayerModel;
-import se.llbit.chunky.resources.EntityTexture;
+import se.llbit.chunky.resources.PlayerTexture;
+import se.llbit.chunky.resources.PlayerTexture.ExtendedUVMap;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.resources.TextureCache;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.resources.texturepack.ColoredTexture;
-import se.llbit.chunky.resources.texturepack.EntityTextureLoader;
 import se.llbit.chunky.resources.texturepack.LayeredTextureLoader;
+import se.llbit.chunky.resources.texturepack.PlayerTextureLoader;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
 import se.llbit.chunky.resources.texturepack.TextureFormatError;
 import se.llbit.chunky.resources.texturepack.TextureLoader;
@@ -72,6 +73,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   public double headScale = 1.0;
   public PlayerModel model;
   public String skin = "";
+  public boolean showOuterLayer = true;
 
   public PlayerEntity(String uuid, Vector3 position) {
     this(uuid, position, 0, 0, new JsonObject());
@@ -103,6 +105,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     this.model = PlayerModel.get(settings.get("model").stringValue("STEVE"));
     this.uuid = settings.get("uuid").stringValue("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
     this.skin = settings.get("skin").stringValue("");
+    this.showOuterLayer = settings.get("outerLayer").asBoolean(true);
     this.scale = settings.get("scale").doubleValue(1.0);
     this.headScale = settings.get("headScale").doubleValue(1.0);
     this.pose = settings.get("pose").object();
@@ -164,7 +167,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   }
 
   @Override public Collection<Primitive> primitives(Vector3 offset) {
-    EntityTexture texture = Texture.steve;
+    PlayerTexture texture = Texture.steve;
     double armWidth = model == PlayerModel.ALEX ? 1.5 : 2;
     if (skin.isEmpty()) {
       switch (model) {
@@ -176,8 +179,8 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           break;
       }
     } else {
-      texture = new EntityTexture();
-      EntityTextureLoader loader = new EntityTextureLoader(skin, texture);
+      texture = new PlayerTexture();
+      PlayerTextureLoader loader = new PlayerTextureLoader(skin, texture, model);
       try {
         loader.load(new File(skin));
       } catch (IOException | TextureFormatError e) {
@@ -214,29 +217,31 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           .translate(0, -4 / 16., 0)
           .translate(0, 28 / 16., 0)
           .chain(worldTransform));
-      head.addFrontFaces(primitives, texture, texture.headFront);
-      head.addBackFaces(primitives, texture, texture.headBack);
-      head.addLeftFaces(primitives, texture, texture.headLeft);
-      head.addRightFaces(primitives, texture, texture.headRight);
-      head.addTopFaces(primitives, texture, texture.headTop);
-      head.addBottomFaces(primitives, texture, texture.headBottom);
+      head.addFrontFaces(primitives, texture, texture.getUV().headFront);
+      head.addBackFaces(primitives, texture, texture.getUV().headBack);
+      head.addLeftFaces(primitives, texture, texture.getUV().headLeft);
+      head.addRightFaces(primitives, texture, texture.getUV().headRight);
+      head.addTopFaces(primitives, texture, texture.getUV().headTop);
+      head.addBottomFaces(primitives, texture, texture.getUV().headBottom);
 
-      Box hat = new Box(-4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16.);
-      hat.transform(Transform.NONE
-          .translate(0, 4 / 16., 0)
-          .scale(headScale)
-          .rotateX(headPose.x)
-          .rotateY(headPose.y)
-          .rotateZ(headPose.z)
-          .translate(0, -4 / 16., 0)
-          .translate(0, 28.2 / 16., 0)
-          .chain(worldTransform));
-      hat.addFrontFaces(primitives, texture, texture.hatFront);
-      hat.addBackFaces(primitives, texture, texture.hatBack);
-      hat.addLeftFaces(primitives, texture, texture.hatLeft);
-      hat.addRightFaces(primitives, texture, texture.hatRight);
-      hat.addTopFaces(primitives, texture, texture.hatTop);
-      hat.addBottomFaces(primitives, texture, texture.hatBottom);
+      if (showOuterLayer) {
+        Box hat = new Box(-4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16.);
+        hat.transform(Transform.NONE
+                .translate(0, 4 / 16., 0)
+                .scale(headScale)
+                .rotateX(headPose.x)
+                .rotateY(headPose.y)
+                .rotateZ(headPose.z)
+                .translate(0, -4 / 16., 0)
+                .translate(0, 28.2 / 16., 0)
+                .chain(worldTransform));
+        hat.addFrontFaces(primitives, texture, texture.getUV().hatFront);
+        hat.addBackFaces(primitives, texture, texture.getUV().hatBack);
+        hat.addLeftFaces(primitives, texture, texture.getUV().hatLeft);
+        hat.addRightFaces(primitives, texture, texture.getUV().hatRight);
+        hat.addTopFaces(primitives, texture, texture.getUV().hatTop);
+        hat.addBottomFaces(primitives, texture, texture.getUV().hatBottom);
+      }
     }
     Box chest = new Box(-4 / 16., 4 / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
     chest.transform(Transform.NONE
@@ -246,12 +251,13 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         .rotateZ(chestPose.z)
         .translate(0, (5 + 18) / 16., 0)
         .chain(worldTransform));
-    chest.addFrontFaces(primitives, texture, texture.chestFront);
-    chest.addBackFaces(primitives, texture, texture.chestBack);
-    chest.addLeftFaces(primitives, texture, texture.chestLeft);
-    chest.addRightFaces(primitives, texture, texture.chestRight);
-    chest.addTopFaces(primitives, texture, texture.chestTop);
-    chest.addBottomFaces(primitives, texture, texture.chestBottom);
+    chest.addFrontFaces(primitives, texture, texture.getUV().chestFront);
+    chest.addBackFaces(primitives, texture, texture.getUV().chestBack);
+    chest.addLeftFaces(primitives, texture, texture.getUV().chestLeft);
+    chest.addRightFaces(primitives, texture, texture.getUV().chestRight);
+    chest.addTopFaces(primitives, texture, texture.getUV().chestTop);
+    chest.addBottomFaces(primitives, texture, texture.getUV().chestBottom);
+
     Box leftLeg = new Box(-2 / 16., 2 / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
     leftLeg.transform(Transform.NONE.translate(0, -6 / 16., 0)
         .rotateX(leftLegPose.x)
@@ -259,12 +265,13 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         .rotateZ(leftLegPose.z)
         .translate(-2 / 16., 12 / 16., 0)
         .chain(worldTransform));
-    leftLeg.addFrontFaces(primitives, texture, texture.leftLegFront);
-    leftLeg.addBackFaces(primitives, texture, texture.leftLegBack);
-    leftLeg.addLeftFaces(primitives, texture, texture.leftLegLeft);
-    leftLeg.addRightFaces(primitives, texture, texture.leftLegRight);
-    leftLeg.addTopFaces(primitives, texture, texture.leftLegTop);
-    leftLeg.addBottomFaces(primitives, texture, texture.leftLegBottom);
+    leftLeg.addFrontFaces(primitives, texture, texture.getUV().leftLegFront);
+    leftLeg.addBackFaces(primitives, texture, texture.getUV().leftLegBack);
+    leftLeg.addLeftFaces(primitives, texture, texture.getUV().leftLegLeft);
+    leftLeg.addRightFaces(primitives, texture, texture.getUV().leftLegRight);
+    leftLeg.addTopFaces(primitives, texture, texture.getUV().leftLegTop);
+    leftLeg.addBottomFaces(primitives, texture, texture.getUV().leftLegBottom);
+
     Box rightLeg = new Box(-2 / 16., 2 / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
     rightLeg.transform(Transform.NONE.translate(0, -6 / 16., 0)
         .rotateX(rightLegPose.x)
@@ -272,12 +279,13 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         .rotateZ(rightLegPose.z)
         .translate(2 / 16., 12 / 16., 0)
         .chain(worldTransform));
-    rightLeg.addFrontFaces(primitives, texture, texture.rightLegFront);
-    rightLeg.addBackFaces(primitives, texture, texture.rightLegBack);
-    rightLeg.addLeftFaces(primitives, texture, texture.rightLegLeft);
-    rightLeg.addRightFaces(primitives, texture, texture.rightLegRight);
-    rightLeg.addTopFaces(primitives, texture, texture.rightLegTop);
-    rightLeg.addBottomFaces(primitives, texture, texture.rightLegBottom);
+    rightLeg.addFrontFaces(primitives, texture, texture.getUV().rightLegFront);
+    rightLeg.addBackFaces(primitives, texture, texture.getUV().rightLegBack);
+    rightLeg.addLeftFaces(primitives, texture, texture.getUV().rightLegLeft);
+    rightLeg.addRightFaces(primitives, texture, texture.getUV().rightLegRight);
+    rightLeg.addTopFaces(primitives, texture, texture.getUV().rightLegTop);
+    rightLeg.addBottomFaces(primitives, texture, texture.getUV().rightLegBottom);
+
     Box leftArm = new Box(-armWidth / 16., armWidth / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
     leftArm.transform(Transform.NONE.translate(0, -5 / 16., 0)
         .rotateX(leftArmPose.x)
@@ -285,12 +293,13 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         .rotateZ(leftArmPose.z)
         .translate(-(4 + armWidth) / 16., 23 / 16., 0)
         .chain(worldTransform));
-    leftArm.addFrontFaces(primitives, texture, texture.leftArmFront);
-    leftArm.addBackFaces(primitives, texture, texture.leftArmBack);
-    leftArm.addLeftFaces(primitives, texture, texture.leftArmLeft);
-    leftArm.addRightFaces(primitives, texture, texture.leftArmRight);
-    leftArm.addTopFaces(primitives, texture, texture.leftArmTop);
-    leftArm.addBottomFaces(primitives, texture, texture.leftArmBottom);
+    leftArm.addFrontFaces(primitives, texture, texture.getUV().leftArmFront);
+    leftArm.addBackFaces(primitives, texture, texture.getUV().leftArmBack);
+    leftArm.addLeftFaces(primitives, texture, texture.getUV().leftArmLeft);
+    leftArm.addRightFaces(primitives, texture, texture.getUV().leftArmRight);
+    leftArm.addTopFaces(primitives, texture, texture.getUV().leftArmTop);
+    leftArm.addBottomFaces(primitives, texture, texture.getUV().leftArmBottom);
+
     Box rightArm = new Box(-armWidth / 16., armWidth / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
     rightArm.transform(Transform.NONE.translate(0, -5 / 16., 0)
         .rotateX(rightArmPose.x)
@@ -298,12 +307,87 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         .rotateZ(rightArmPose.z)
         .translate((4 + armWidth) / 16., 23 / 16., 0)
         .chain(worldTransform));
-    rightArm.addFrontFaces(primitives, texture, texture.rightArmFront);
-    rightArm.addBackFaces(primitives, texture, texture.rightArmBack);
-    rightArm.addLeftFaces(primitives, texture, texture.rightArmLeft);
-    rightArm.addRightFaces(primitives, texture, texture.rightArmRight);
-    rightArm.addTopFaces(primitives, texture, texture.rightArmTop);
-    rightArm.addBottomFaces(primitives, texture, texture.rightArmBottom);
+    rightArm.addFrontFaces(primitives, texture, texture.getUV().rightArmFront);
+    rightArm.addBackFaces(primitives, texture, texture.getUV().rightArmBack);
+    rightArm.addLeftFaces(primitives, texture, texture.getUV().rightArmLeft);
+    rightArm.addRightFaces(primitives, texture, texture.getUV().rightArmRight);
+    rightArm.addTopFaces(primitives, texture, texture.getUV().rightArmTop);
+    rightArm.addBottomFaces(primitives, texture, texture.getUV().rightArmBottom);
+
+    // Check if newer 64x64 texture
+    if (texture.getUV() instanceof PlayerTexture.ExtendedUVMap && showOuterLayer) {
+      PlayerTexture.ExtendedUVMap uv = (ExtendedUVMap) texture.getUV();
+      Box jacket = new Box(-4.25 / 16., 4.25 / 16., -6.25 / 16., 6.25 / 16., -2.25 / 16., 2.25 / 16.);
+      jacket.transform(Transform.NONE
+              .translate(0, -5 / 16., 0)
+              .rotateX(chestPose.x)
+              .rotateY(chestPose.y)
+              .rotateZ(chestPose.z)
+              .translate(0, (5 + 18.2) / 16., 0)
+              .chain(worldTransform));
+      jacket.addFrontFaces(primitives, texture, uv.jacketFront);
+      jacket.addBackFaces(primitives, texture, uv.jacketBack);
+      jacket.addLeftFaces(primitives, texture, uv.jacketLeft);
+      jacket.addRightFaces(primitives, texture, uv.jacketRight);
+      jacket.addTopFaces(primitives, texture, uv.jacketTop);
+      jacket.addBottomFaces(primitives, texture, uv.jacketBottom);
+
+      Box leftPant = new Box(-2.25 / 16., 2.25 / 16., -6.25 / 16., 6.25 / 16., -2.25 / 16., 2.25 / 16.);
+      leftPant.transform(Transform.NONE.translate(0, -6 / 16., 0)
+              .rotateX(leftLegPose.x)
+              .rotateY(leftLegPose.y)
+              .rotateZ(leftLegPose.z)
+              .translate(-2 / 16., 12.2 / 16., 0)
+              .chain(worldTransform));
+      leftPant.addFrontFaces(primitives, texture, uv.leftPantFront);
+      leftPant.addBackFaces(primitives, texture, uv.leftPantBack);
+      leftPant.addLeftFaces(primitives, texture, uv.leftPantLeft);
+      leftPant.addRightFaces(primitives, texture, uv.leftPantRight);
+      leftPant.addTopFaces(primitives, texture, uv.leftPantTop);
+      leftPant.addBottomFaces(primitives, texture, uv.leftPantBottom);
+
+      Box rightPant = new Box(-2.25 / 16., 2.25 / 16., -6.25 / 16., 6.25 / 16., -2.25 / 16., 2.25 / 16.);
+      rightPant.transform(Transform.NONE.translate(0, -6 / 16., 0)
+              .rotateX(rightLegPose.x)
+              .rotateY(rightLegPose.y)
+              .rotateZ(rightLegPose.z)
+              .translate(2 / 16., 12.2 / 16., 0)
+              .chain(worldTransform));
+      rightPant.addFrontFaces(primitives, texture, uv.rightPantFront);
+      rightPant.addBackFaces(primitives, texture, uv.rightPantBack);
+      rightPant.addLeftFaces(primitives, texture, uv.rightPantLeft);
+      rightPant.addRightFaces(primitives, texture, uv.rightPantRight);
+      rightPant.addTopFaces(primitives, texture, uv.rightPantTop);
+      rightPant.addBottomFaces(primitives, texture, uv.rightPantBottom);
+
+      Box leftSleeve = new Box((-armWidth - 0.25) / 16., (armWidth + 0.25) / 16., -6.25 / 16., 6.25 / 16., -2.25 / 16., 2.25 / 16.);
+      leftSleeve.transform(Transform.NONE.translate(0, -5 / 16., 0)
+              .rotateX(leftArmPose.x)
+              .rotateY(leftArmPose.y)
+              .rotateZ(leftArmPose.z)
+              .translate(-(4 + armWidth) / 16., 23.2 / 16., 0)
+              .chain(worldTransform));
+      leftSleeve.addFrontFaces(primitives, texture, uv.leftSleeveFront);
+      leftSleeve.addBackFaces(primitives, texture, uv.leftSleeveBack);
+      leftSleeve.addLeftFaces(primitives, texture, uv.leftSleeveLeft);
+      leftSleeve.addRightFaces(primitives, texture, uv.leftSleeveRight);
+      leftSleeve.addTopFaces(primitives, texture, uv.leftSleeveTop);
+      leftSleeve.addBottomFaces(primitives, texture, uv.leftSleeveBottom);
+
+      Box rightSleeve = new Box((-armWidth - 0.25) / 16., (armWidth + 0.25) / 16., -6.25 / 16., 6.25 / 16., -2.25 / 16., 2.25 / 16.);
+      rightSleeve.transform(Transform.NONE.translate(0, -5 / 16., 0)
+              .rotateX(rightArmPose.x)
+              .rotateY(rightArmPose.y)
+              .rotateZ(rightArmPose.z)
+              .translate((4 + armWidth) / 16., 23.2 / 16., 0)
+              .chain(worldTransform));
+      rightSleeve.addFrontFaces(primitives, texture, uv.rightSleeveFront);
+      rightSleeve.addBackFaces(primitives, texture, uv.rightSleeveBack);
+      rightSleeve.addLeftFaces(primitives, texture, uv.rightSleeveLeft);
+      rightSleeve.addRightFaces(primitives, texture, uv.rightSleeveRight);
+      rightSleeve.addTopFaces(primitives, texture, uv.rightSleeveTop);
+      rightSleeve.addBottomFaces(primitives, texture, uv.rightSleeveBottom);
+    }
 
     addArmor(primitives, gear, pose, armWidth, worldTransform, headScale);
     return primitives;
@@ -623,6 +707,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     json.add("position", position.toJson());
     json.add("model", model.name());
     json.add("skin", skin);
+    json.add("outerLayer", showOuterLayer);
     json.add("pose", pose);
     json.add("gear", gear);
     json.add("scale", scale);

@@ -340,12 +340,12 @@ public class SkullEntity extends Entity {
     }
     Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
     head.transform(transform);
-    head.addFrontFaces(faces, texture, texture.headFront);
-    head.addBackFaces(faces, texture, texture.headBack);
-    head.addTopFaces(faces, texture, texture.headTop);
-    head.addBottomFaces(faces, texture, texture.headBottom);
-    head.addRightFaces(faces, texture, texture.headRight);
-    head.addLeftFaces(faces, texture, texture.headLeft);
+    head.addFrontFaces(faces, texture, texture.getUV().headFront);
+    head.addBackFaces(faces, texture, texture.getUV().headBack);
+    head.addTopFaces(faces, texture, texture.getUV().headTop);
+    head.addBottomFaces(faces, texture, texture.getUV().headBottom);
+    head.addRightFaces(faces, texture, texture.getUV().headRight);
+    head.addLeftFaces(faces, texture, texture.getUV().headLeft);
     return faces;
   }
 
