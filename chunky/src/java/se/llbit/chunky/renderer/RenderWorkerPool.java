@@ -201,12 +201,14 @@ public class RenderWorkerPool {
     }
   }
 
-  /**
-   * A render job. Thrown exceptions are handled by the worker.
-   * Note: {@code InterruptedException}s are ignored. All other {@code Throwable}s will be logged as an error.
-   */
   @FunctionalInterface
   interface RenderJob {
+    /**
+     * @param worker      The render worker running this job.
+     * @throws Throwable  Any unchecked exception.
+     *                    Note: {@code InterruptedException}s are ignored. All other {@code Throwable}s will be logged
+     *                    as an error.
+     */
     void accept(RenderWorker worker) throws Throwable;
   }
 }
