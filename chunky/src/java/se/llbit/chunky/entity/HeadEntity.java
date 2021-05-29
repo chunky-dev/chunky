@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.EntityTexture;
+import se.llbit.chunky.resources.PlayerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.resources.texturepack.EntityTextureLoader;
 import se.llbit.chunky.resources.texturepack.TextureFormatError;
@@ -50,7 +51,7 @@ import se.llbit.util.Util;
  */
 public class HeadEntity extends Entity {
 
-  private static final Map<String, EntityTexture> textureCache = Collections
+  private static final Map<String, PlayerTexture> textureCache = Collections
       .synchronizedMap(new WeakHashMap<>());
 
   /**
@@ -77,7 +78,7 @@ public class HeadEntity extends Entity {
 
   @Override
   public Collection<Primitive> primitives(Vector3 offset) {
-    EntityTexture texture = Texture.steve;
+    PlayerTexture texture = Texture.steve;
     if (skin != null && !skin.isEmpty()) {
       texture = downloadSkin();
     }
@@ -127,19 +128,19 @@ public class HeadEntity extends Entity {
         break;
     }
     head.transform(transform);
-    head.addFrontFaces(faces, texture, texture.headFront);
-    head.addBackFaces(faces, texture, texture.headBack);
-    head.addTopFaces(faces, texture, texture.headTop);
-    head.addBottomFaces(faces, texture, texture.headBottom);
-    head.addRightFaces(faces, texture, texture.headRight);
-    head.addLeftFaces(faces, texture, texture.headLeft);
+    head.addFrontFaces(faces, texture, texture.getUv().headFront);
+    head.addBackFaces(faces, texture, texture.getUv().headBack);
+    head.addTopFaces(faces, texture, texture.getUv().headTop);
+    head.addBottomFaces(faces, texture, texture.getUv().headBottom);
+    head.addRightFaces(faces, texture, texture.getUv().headRight);
+    head.addLeftFaces(faces, texture, texture.getUv().headLeft);
     hat.transform(transform);
-    hat.addFrontFaces(faces, texture, texture.hatFront);
-    hat.addBackFaces(faces, texture, texture.hatBack);
-    hat.addLeftFaces(faces, texture, texture.hatLeft);
-    hat.addRightFaces(faces, texture, texture.hatRight);
-    hat.addTopFaces(faces, texture, texture.hatTop);
-    hat.addBottomFaces(faces, texture, texture.hatBottom);
+    hat.addFrontFaces(faces, texture, texture.getUv().hatFront);
+    hat.addBackFaces(faces, texture, texture.getUv().hatBack);
+    hat.addLeftFaces(faces, texture, texture.getUv().hatLeft);
+    hat.addRightFaces(faces, texture, texture.getUv().hatRight);
+    hat.addTopFaces(faces, texture, texture.getUv().hatTop);
+    hat.addBottomFaces(faces, texture, texture.getUv().hatBottom);
     return faces;
   }
 
@@ -149,9 +150,9 @@ public class HeadEntity extends Entity {
    * @param skin The URL of the skin
    * @return The downloaded/cached skin or the steve skin if the download failed
    */
-  public static EntityTexture downloadTexture(String skin) {
+  public static PlayerTexture downloadTexture(String skin) {
     return textureCache.computeIfAbsent(skin, (skinUrl) -> {
-      EntityTexture texture = new EntityTexture();
+      PlayerTexture texture = new PlayerTexture();
       EntityTextureLoader loader = new EntityTextureLoader(skinUrl, texture);
       if (!PersistentSettings.cacheDirectory().isDirectory()) {
         PersistentSettings.cacheDirectory().mkdirs();
@@ -181,7 +182,7 @@ public class HeadEntity extends Entity {
         Log.warn("Failed to load skin downloaded from " + skinUrl, e);
       }
 
-      return EntityTexture.steve;
+      return Texture.steve;
     });
   }
 
@@ -190,7 +191,7 @@ public class HeadEntity extends Entity {
    *
    * @return The downloaded/cached skin or the steve skin if the download failed
    */
-  private EntityTexture downloadSkin() {
+  private PlayerTexture downloadSkin() {
     return downloadTexture(skin);
   }
 

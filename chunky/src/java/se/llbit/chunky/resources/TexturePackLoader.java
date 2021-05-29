@@ -37,6 +37,7 @@ import se.llbit.chunky.resources.texturepack.LayeredTextureLoader;
 import se.llbit.chunky.resources.texturepack.PaintingBackTexture;
 import se.llbit.chunky.resources.texturepack.PaintingTexture;
 import se.llbit.chunky.resources.texturepack.PaintingTextureAdapter;
+import se.llbit.chunky.resources.texturepack.PlayerTextureLoader;
 import se.llbit.chunky.resources.texturepack.SplitLargeChestTexture;
 import se.llbit.chunky.resources.texturepack.RotatedTextureLoader;
 import se.llbit.chunky.resources.texturepack.ShulkerTextureLoader;
@@ -2492,9 +2493,9 @@ public class TexturePackLoader {
         new AsciiFontTextureLoader("assets/minecraft/textures/font/ascii"))); // MC 1.6
 
     allTextures.put("alex",
-        new EntityTextureLoader("assets/minecraft/textures/entity/alex", Texture.alex, PlayerModel.ALEX));
+        new PlayerTextureLoader("assets/minecraft/textures/entity/alex", Texture.alex, PlayerModel.ALEX));
     allTextures.put("steve",
-        new EntityTextureLoader("assets/minecraft/textures/entity/steve", Texture.steve));
+        new PlayerTextureLoader("assets/minecraft/textures/entity/steve", Texture.steve, PlayerModel.STEVE));
     allTextures.put("creeper",
         new EntityTextureLoader("assets/minecraft/textures/entity/creeper/creeper",
             Texture.creeper));
