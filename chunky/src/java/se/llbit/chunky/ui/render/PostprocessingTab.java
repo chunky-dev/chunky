@@ -22,10 +22,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
 import javafx.util.StringConverter;
+import se.llbit.chunky.renderer.postprocessing.NoneFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.util.ProgressListener;
@@ -34,6 +37,7 @@ import se.llbit.util.TaskTracker;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import se.llbit.util.TaskTracker.Task;
 
 public class PostprocessingTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
@@ -68,7 +72,13 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
-    postprocessingFilter.getItems().addAll(PostProcessingFilters.getFilters());
+    postprocessingFilter.getItems().add(PostProcessingFilters.NONE);
+    postprocessingFilter.getItems().add(new PostprocessingSeparator());
+    for (PostProcessingFilter filter : PostProcessingFilters.getFilters()) {
+      if (filter != PostProcessingFilters.NONE) {
+        postprocessingFilter.getItems().add(filter);
+      }
+    }
     postprocessingFilter.getSelectionModel().select(Scene.DEFAULT_POSTPROCESSING_FILTER);
     postprocessingFilter.getSelectionModel().selectedItemProperty().addListener(
         (observable, oldValue, newValue) -> {
@@ -96,5 +106,21 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
       scene.postProcessFrame(new TaskTracker(ProgressListener.NONE));
       controller.getCanvas().forceRepaint();
     });
+  }
+
+  /**
+   * Fake post processing filter that is also a seperator for the combobox.
+   */
+  private static class PostprocessingSeparator extends Separator implements PostProcessingFilter {
+
+    @Override
+    public void processFrame(int width, int height, double[] input, BitmapImage output,
+        double exposure, Task task) {
+    }
+
+    @Override
+    public String getName() {
+      return "";
+    }
   }
 }
