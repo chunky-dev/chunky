@@ -27,7 +27,6 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
 import se.llbit.resources.ImageLoader;
-import se.llbit.util.ImageTools;
 import se.llbit.util.NotNull;
 
 /**
@@ -56,7 +55,35 @@ public class Texture {
 
   public static Texture black = new SolidColorTexture(new Vector4(0, 0, 0, 1));
 
-  public static final Texture paintings = new Texture();
+  public static final Texture paintings = new Texture(); // 1.13 or older
+  public static final Texture paintingAlban = new Texture(); // 1.14 or newer
+  public static final Texture paintingAztec2 = new Texture();
+  public static final Texture paintingAztec = new Texture();
+  public static final Texture paintingBack = new Texture();
+  public static final Texture paintingBomb = new Texture();
+  public static final Texture paintingBurningSkull = new Texture();
+  public static final Texture paintingBust = new Texture();
+  public static final Texture paintingCourbet = new Texture();
+  public static final Texture paintingCreebet = new Texture();
+  public static final Texture paintingDonkeyKong = new Texture();
+  public static final Texture paintingFighters = new Texture();
+  public static final Texture paintingGraham = new Texture();
+  public static final Texture paintingKebab = new Texture();
+  public static final Texture paintingMatch = new Texture();
+  public static final Texture paintingPigscene = new Texture();
+  public static final Texture paintingPlant = new Texture();
+  public static final Texture paintingPointer = new Texture();
+  public static final Texture paintingPool = new Texture();
+  public static final Texture paintingSea = new Texture();
+  public static final Texture paintingSkeleton = new Texture();
+  public static final Texture paintingSkullAndRoses = new Texture();
+  public static final Texture paintingStage = new Texture();
+  public static final Texture paintingSunset = new Texture();
+  public static final Texture paintingVoid = new Texture();
+  public static final Texture paintingWanderer = new Texture();
+  public static final Texture paintingWasteland = new Texture();
+  public static final Texture paintingWither = new Texture();
+
   public static final FontTexture fonts = new FontTexture();
 
   public static final Texture air = new Texture("air");
@@ -995,42 +1022,6 @@ public class Texture {
   public static final Texture bannerBase = new Texture();
 
   public static final Texture armorStand = new Texture();
-
-  // All the wool variants, ordered after block ID.
-  public static final Texture[] wool = {
-      whiteWool, orangeWool, magentaWool, lightBlueWool, yellowWool, limeWool, pinkWool, grayWool,
-      lightGrayWool, cyanWool, purpleWool, blueWool, brownWool, greenWool, redWool, blackWool
-  };
-
-  public static final Texture[] concrete = {
-      concreteWhite, concreteOrange, concreteMagenta, concreteLightBlue, concreteYellow,
-      concreteLime, concretePink, concreteGray, concreteSilver, concreteCyan, concretePurple,
-      concreteBlue, concreteBrown, concreteGreen, concreteRed, concreteBlack
-  };
-
-  public static final Texture[] concretePowder = {
-      concretePowderWhite, concretePowderOrange, concretePowderMagenta, concretePowderLightBlue, concretePowderYellow,
-      concretePowderLime, concretePowderPink, concretePowderGray, concretePowderSilver, concretePowderCyan, concretePowderPurple,
-      concretePowderBlue, concretePowderBrown, concretePowderGreen, concretePowderRed, concretePowderBlack
-  };
-
-  public static final Texture[] stainedGlass = {
-      whiteGlass, orangeGlass, magentaGlass, lightBlueGlass, yellowGlass, limeGlass, pinkGlass,
-      grayGlass, lightGrayGlass, cyanGlass, purpleGlass, blueGlass, brownGlass, greenGlass,
-      redGlass, blackGlass
-  };
-
-  public static final Texture[] stainedGlassPaneSide = {
-      whiteGlassPaneSide, orangeGlassPaneSide, magentaGlassPaneSide, lightBlueGlassPaneSide,
-      yellowGlassPaneSide, limeGlassPaneSide, pinkGlassPaneSide, grayGlassPaneSide,
-      lightGrayGlassPaneSide, cyanGlassPaneSide, purpleGlassPaneSide, blueGlassPaneSide,
-      brownGlassPaneSide, greenGlassPaneSide, redGlassPaneSide, blackGlassPaneSide
-  };
-
-  public static final Texture[] stainedClay = {
-      whiteClay, orangeClay, magentaClay, lightBlueClay, yellowClay, limeClay, pinkClay, grayClay,
-      lightGrayClay, cyanClay, purpleClay, blueClay, brownClay, greenClay, redClay, blackClay
-  };
 
   @NotNull protected BitmapImage image;
   protected int width;
