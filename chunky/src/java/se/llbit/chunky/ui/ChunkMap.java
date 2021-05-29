@@ -105,7 +105,6 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   private final Canvas canvas;
   private final Canvas mapOverlay;
 
-  private volatile long lastUpdate = System.currentTimeMillis();
   private volatile boolean viewUpdateScheduled = false;
   private volatile boolean repaintQueued = false;
   private volatile boolean scheduledUpdate = false;
