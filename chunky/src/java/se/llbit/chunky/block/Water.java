@@ -7,14 +7,9 @@ import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
-import se.llbit.math.Transform;
 import se.llbit.math.Triangle;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
-import se.llbit.math.primitive.Primitive;
-
-import java.util.Collection;
-import java.util.List;
 
 public class Water extends MinecraftBlockTranslucent {
 
@@ -73,7 +68,7 @@ public class Water extends MinecraftBlockTranslucent {
           new Vector4(0, 1, 0, 1)),
   };
 
-  static final DoubleSidedQuad bot =
+  private static final DoubleSidedQuad bottom =
       new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
           new Vector4(0, 1, 0, 1));
   static final Triangle[][][] t012 = new Triangle[8][8][8];
@@ -202,9 +197,9 @@ public class Water extends MinecraftBlockTranslucent {
     }
 
     boolean hit = false;
-    if (bot.intersect(ray)) {
-      ray.n.set(bot.n);
-      ray.n.scale(-QuickMath.signum(ray.d.dot(bot.n)));
+    if (bottom.intersect(ray)) {
+      ray.n.set(bottom.n);
+      ray.n.scale(-QuickMath.signum(ray.d.dot(bottom.n)));
       ray.t = ray.tNext;
       hit = true;
     }
