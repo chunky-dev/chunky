@@ -139,7 +139,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
 
   protected TaskTracker.Task renderTask = TaskTracker.Task.NONE;
 
-  private long renderStart;
+  private long frameStart;
 
   /**
    * Decides if render threads shut down after reaching the target SPP.
@@ -193,7 +193,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
       sendSceneStatus(bufferedScene.sceneStatus());
 
       renderStatusListeners.forEach(listener -> {
-        listener.setRenderTime(System.currentTimeMillis() - renderStart);
+        listener.setRenderTime(System.currentTimeMillis() - frameStart);
         listener.setSamplesPerSecond(0);
         listener.setSpp(0);
       });
@@ -201,10 +201,13 @@ public class DefaultRenderManager extends Thread implements RenderManager {
       if (getRenderer().autoPostProcess())
         this.finalizeFrame(true);
 
+      frameStart = System.currentTimeMillis();
       return !finalizeAllFrames || sceneProvider.pollSceneStateChange();
     };
 
     this.renderCallback = () -> {
+      long elapsedTime = System.currentTimeMillis() - frameStart;
+
       sceneProvider.withSceneProtected(scene -> {
         synchronized (bufferedScene) {
           bufferedScene.copyTransients(scene);
@@ -213,7 +216,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
       });
 
       synchronized (bufferedScene) {
-        bufferedScene.renderTime = System.currentTimeMillis() - renderStart;
+        bufferedScene.renderTime += elapsedTime;
 
         this.finalizeFrame(getRenderer().autoPostProcess() && finalizeAllFrames);
 
@@ -226,6 +229,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         }
       }
 
+      frameStart = System.currentTimeMillis();
       return mode == RenderMode.PAUSED || sceneProvider.pollSceneStateChange();
     };
   }
@@ -258,6 +262,11 @@ public class DefaultRenderManager extends Thread implements RenderManager {
               // Make sure frame is finalized
               bufferedScene.postProcessFrame(renderTask);
 
+              // Reset the task
+              if (mode == RenderMode.PAUSED) {
+                updateRenderProgress();
+              }
+
               // Swap buffers so the render canvas will see the current frame.
               bufferedScene.swapBuffers();
 
@@ -280,13 +289,16 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         // Select the correct renderer
         Renderer render = mode == RenderMode.PREVIEW ? getPreviewRenderer() : getRenderer();
 
-        renderStart = System.currentTimeMillis();
+        frameStart = System.currentTimeMillis();
         if (mode == RenderMode.PREVIEW) {
-          // Preview with no CPU limit
-          pool.setCpuLoad(100);
-          render.setPostRender(previewCallback);
-          render.render(this);
-          pool.setCpuLoad(cpuLoad);
+          // Bail early if the preview is not visible
+          if (finalizeAllFrames) {
+            // Preview with no CPU limit
+            pool.setCpuLoad(100);
+            render.setPostRender(previewCallback);
+            render.render(this);
+            pool.setCpuLoad(cpuLoad);
+          }
         } else {
           // Bail early if render is already done
           if (bufferedScene.spp >= bufferedScene.getTargetSpp()) {
