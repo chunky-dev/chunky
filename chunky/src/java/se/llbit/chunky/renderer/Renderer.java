@@ -70,10 +70,16 @@ public interface Renderer extends Registerable {
   void render(DefaultRenderManager manager) throws InterruptedException;
 
   /**
-   * This is called when the scene is reset. The default implementation does nothing.
+   * This is called when the scene is reset and this {@code Renderer} is selected as either the preview or render.
    * This is for {@code Renderer}s which need to export the scene data in some way.
+   *
+   * The default implementation does nothing.
+   *
+   * @param resetCount This is the reset count. Any reset will increment this variable. Implementations may keep track
+   *                   of this count to see if it missed a reset (and should potentially re-export the scene).
+   *                   The starting value will be >= 1.
    */
-  default void sceneReset(DefaultRenderManager manager, ResetReason reason) {}
+  default void sceneReset(DefaultRenderManager manager, ResetReason reason, int resetCount) {}
 
   /**
    * This should return if this renderer will postprocess on its own.

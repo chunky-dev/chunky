@@ -37,7 +37,11 @@ public class TestDeadlock {
       super(1, 0);
       Arrays.stream(workers).forEach(Thread::interrupt);
     }
-    @Override public void submit(Consumer<RenderWorker> task) {}
+    @Override public RenderJobFuture submit(RenderJob task) {
+      RenderJobFuture future = new RenderJobFuture(worker -> {});
+      future.finished();
+      return future;
+    }
     @Override public void awaitEmpty() {}
     @Override public void interrupt() {}
   }

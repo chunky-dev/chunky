@@ -20,6 +20,7 @@ package se.llbit.chunky.renderer;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
+import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
 import se.llbit.chunky.renderer.scene.PathTracer;
 import se.llbit.chunky.renderer.scene.PreviewRayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -28,10 +29,7 @@ import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
 import se.llbit.util.TaskTracker;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -100,6 +98,11 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   public final Scene bufferedScene;
 
   /**
+   * This stores the reset count of the bufferedScene. It is incremented whenever a reset occurs.
+   */
+  private int resetCount = 1;
+
+  /**
    * This is the render worker pool {@code Renderer}s should use.
    *
    * {@code Renderer}s should submit small work-units to this pool. CPU usage is limited automatically, but if
@@ -136,7 +139,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
 
   protected TaskTracker.Task renderTask = TaskTracker.Task.NONE;
 
-  private long renderStart;
+  private long frameStart;
 
   /**
    * Decides if render threads shut down after reaching the target SPP.
@@ -190,7 +193,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
       sendSceneStatus(bufferedScene.sceneStatus());
 
       renderStatusListeners.forEach(listener -> {
-        listener.setRenderTime(System.currentTimeMillis() - renderStart);
+        listener.setRenderTime(System.currentTimeMillis() - frameStart);
         listener.setSamplesPerSecond(0);
         listener.setSpp(0);
       });
@@ -198,10 +201,13 @@ public class DefaultRenderManager extends Thread implements RenderManager {
       if (getRenderer().autoPostProcess())
         this.finalizeFrame(true);
 
+      frameStart = System.currentTimeMillis();
       return !finalizeAllFrames || sceneProvider.pollSceneStateChange();
     };
 
     this.renderCallback = () -> {
+      long elapsedTime = System.currentTimeMillis() - frameStart;
+
       sceneProvider.withSceneProtected(scene -> {
         synchronized (bufferedScene) {
           bufferedScene.copyTransients(scene);
@@ -210,7 +216,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
       });
 
       synchronized (bufferedScene) {
-        bufferedScene.renderTime = System.currentTimeMillis() - renderStart;
+        bufferedScene.renderTime += elapsedTime;
 
         this.finalizeFrame(getRenderer().autoPostProcess() && finalizeAllFrames);
 
@@ -223,6 +229,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         }
       }
 
+      frameStart = System.currentTimeMillis();
       return mode == RenderMode.PAUSED || sceneProvider.pollSceneStateChange();
     };
   }
@@ -238,16 +245,13 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         ResetReason reason = sceneProvider.awaitSceneStateChange();
 
         // Copy the new scene state to the bufferedScene
-        final boolean[] sceneReset = {false};
         synchronized (bufferedScene) {
           sceneProvider.withSceneProtected(scene -> {
             if (reason.overwriteState()) {
               bufferedScene.copyState(scene);
-              sceneReset[0] = true;
             }
             if (reason == ResetReason.MATERIALS_CHANGED || reason == ResetReason.SCENE_LOADED) {
               scene.importMaterials();
-              sceneReset[0] = true;
             }
 
             bufferedScene.copyTransients(scene);
@@ -257,6 +261,11 @@ public class DefaultRenderManager extends Thread implements RenderManager {
             if (reason == ResetReason.SCENE_LOADED) {
               // Make sure frame is finalized
               bufferedScene.postProcessFrame(renderTask);
+
+              // Reset the task
+              if (mode == RenderMode.PAUSED) {
+                updateRenderProgress();
+              }
 
               // Swap buffers so the render canvas will see the current frame.
               bufferedScene.swapBuffers();
@@ -272,20 +281,24 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         setRenderer(bufferedScene.getRenderer());
         setPreviewRenderer(bufferedScene.getPreviewRenderer());
 
+        // Notify renderers
+        resetCount += 1;
+        getRenderer().sceneReset(this, reason, resetCount);
+        getPreviewRenderer().sceneReset(this, reason, resetCount);
+
         // Select the correct renderer
         Renderer render = mode == RenderMode.PREVIEW ? getPreviewRenderer() : getRenderer();
 
-        if (sceneReset[0]) {
-          render.sceneReset(this, reason);
-        }
-
-        renderStart = System.currentTimeMillis();
+        frameStart = System.currentTimeMillis();
         if (mode == RenderMode.PREVIEW) {
-          // Preview with no CPU limit
-          pool.setCpuLoad(100);
-          render.setPostRender(previewCallback);
-          render.render(this);
-          pool.setCpuLoad(cpuLoad);
+          // Bail early if the preview is not visible
+          if (finalizeAllFrames) {
+            // Preview with no CPU limit
+            pool.setCpuLoad(100);
+            render.setPostRender(previewCallback);
+            render.render(this);
+            pool.setCpuLoad(cpuLoad);
+          }
         } else {
           // Bail early if render is already done
           if (bufferedScene.spp >= bufferedScene.getTargetSpp()) {
@@ -398,6 +411,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   protected void finalizeFrame(boolean force) {
     if (force || snapshotControl.saveSnapshot(bufferedScene, bufferedScene.spp)) {
       PostProcessingFilter filter = bufferedScene.getPostProcessingFilter();
+      if (mode == RenderMode.PREVIEW) filter = PreviewFilter.INSTANCE;
 
       if (filter instanceof PixelPostProcessingFilter) {
         PixelPostProcessingFilter pixelFilter = (PixelPostProcessingFilter) filter;
@@ -408,12 +422,14 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         double exposure = bufferedScene.getExposure();
 
         // Split up to 10 tasks per thread
-        int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.threads * 10 - 1);
+        int tasksPerThread = 10;
+        int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.threads * tasksPerThread - 1);
+        ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(pool.threads * tasksPerThread);
 
         for (int i = 0; i < bufferedScene.width * bufferedScene.height; i += pixelsPerTask) {
           int start = i;
           int end = Math.min(bufferedScene.width * bufferedScene.height, i + pixelsPerTask);
-          pool.submit(worker -> {
+          jobs.add(pool.submit(worker -> {
             double[] pixelbuffer = new double[3];
 
             for (int j = start; j < end; j++) {
@@ -421,21 +437,23 @@ public class DefaultRenderManager extends Thread implements RenderManager {
               int y = j / width;
 
               pixelFilter.processPixel(width, height, sampleBuffer, x, y, exposure, pixelbuffer);
+              Arrays.setAll(pixelbuffer, k -> Math.min(1, pixelbuffer[k]));
               bufferedScene.getBackBuffer().setPixel(x, y, ColorUtil.getRGB(pixelbuffer));
             }
-          });
+          }));
+        }
+
+        try {
+          for (RenderWorkerPool.RenderJobFuture job : jobs) {
+            job.awaitFinish();
+          }
+        } catch (InterruptedException e) {
+          // Interrupted
         }
       } else {
-        bufferedScene.postProcessFrame(TaskTracker.NONE);
+        bufferedScene.postProcessFrame(TaskTracker.Task.NONE);
       }
 
-      try {
-        pool.awaitEmpty();
-      } catch (InterruptedException e) {
-        // Interrupted
-      }
-
-      bufferedScene.postProcessFrame(TaskTracker.NONE);
       redrawScreen();
     }
   }

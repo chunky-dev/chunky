@@ -3302,7 +3302,7 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public void setPreviewRenderer(String previewRenderer) {
-    this.previewRenderer = renderer;
+    this.previewRenderer = previewRenderer;
     refresh();
   }
 
