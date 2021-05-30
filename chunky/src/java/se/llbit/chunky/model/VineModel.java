@@ -23,6 +23,7 @@ import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
+import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
@@ -44,57 +45,43 @@ public class VineModel {
       // West
       new DoubleSidedQuad(new Vector3(0.8 / 16, 0, 1), new Vector3(0.8 / 16, 0, 0),
           new Vector3(0.8 / 16, 1, 1), new Vector4(1, 0, 0, 1)),
-
-      // Top
-      new DoubleSidedQuad(new Vector3(0, 15.2 / 16, 0), new Vector3(1, 15.2 / 16, 0),
-          new Vector3(0, 15.2 / 16, 1), new Vector4(0, 1, 0, 1)),
   };
 
-  public static boolean intersect(Ray ray, Scene scene) {
-    int data = ray.getBlockData();
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (int i = 0; i < quads.length; ++i) {
-      if ((data & (1 << i)) != 0) {
-        Quad quad = quads[i];
-        if (quad.intersect(ray)) {
-          float[] color = Texture.vines.getColor(ray.u, ray.v);
-          if (color[3] > Ray.EPSILON) {
-            ray.color.set(color);
-            float[] biomeColor = ray.getBiomeFoliageColor(scene);
-            ray.color.x *= biomeColor[0];
-            ray.color.y *= biomeColor[1];
-            ray.color.z *= biomeColor[2];
-            ray.t = ray.tNext;
-            ray.n.set(quad.n);
-            ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
-            hit = true;
-          }
-        }
-      }
-    }
-    if (data == 0 || (ray.getCurrentData() & (1 << BlockData.VINE_TOP)) != 0) {
-      Quad quad = quads[4];
-      if (quad.intersect(ray)) {
-        float[] color = Texture.vines.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          float[] biomeColor = ray.getBiomeFoliageColor(scene);
-          ray.color.x *= biomeColor[0];
-          ray.color.y *= biomeColor[1];
-          ray.color.z *= biomeColor[2];
-          ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
-          hit = true;
-        }
-      }
-    }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  /**
+   * It's not in Minecraft's block model file, but the top part of vines rotates depending on
+   * the presence of other sides. By manually checking the rotation for all 16 states,
+   * the lookup table below was created.
+   */
+  protected static final Quad[] topQuads;
+
+  static {
+    DoubleSidedQuad top90 =
+        new DoubleSidedQuad(new Vector3(0, 15.2 / 16, 0), new Vector3(1, 15.2 / 16, 0),
+            new Vector3(0, 15.2 / 16, 1), new Vector4(0, 1, 0, 1));
+
+    DoubleSidedQuad top = top90.transform(Transform.NONE.rotateNegY());
+    DoubleSidedQuad top180 = top90.transform(Transform.NONE.rotateY());
+    DoubleSidedQuad top270 = top180.transform(Transform.NONE.rotateY());
+
+    // bits of the index are other sides in order west,east,south,north
+    topQuads = new Quad[]{
+        top90,  // 0000
+        top270, // 0001
+        top90,  // 0010
+        top180, // 0011
+        top,    // 0100
+        top90,  // 0101
+        top180, // 0110
+        top90,  // 0111
+        top180, // 1000
+        top,    // 1001
+        top270, // 1010
+        top270, // 1011
+        top90,  // 1100
+        top,    // 1101
+        top180, // 1110
+        top90,  // 1111
+    };
   }
 
   public static boolean intersect(Ray ray, Scene scene, int connections) {
@@ -119,6 +106,25 @@ public class VineModel {
         }
       }
     }
+
+    if ((connections & BlockData.CONNECTED_ABOVE) != 0) {
+      Quad top = topQuads[connections & 0b1111];
+      if (top.intersect(ray)) {
+        float[] color = Texture.vines.getColor(ray.u, ray.v);
+        if (color[3] > Ray.EPSILON) {
+          ray.color.set(color);
+          float[] biomeColor = ray.getBiomeFoliageColor(scene);
+          ray.color.x *= biomeColor[0];
+          ray.color.y *= biomeColor[1];
+          ray.color.z *= biomeColor[2];
+          ray.t = ray.tNext;
+          ray.n.set(top.n);
+          ray.n.scale(QuickMath.signum(-ray.d.dot(top.n)));
+          hit = true;
+        }
+      }
+    }
+
     if (hit) {
       ray.distance += ray.t;
       ray.o.scaleAdd(ray.t, ray.d);
