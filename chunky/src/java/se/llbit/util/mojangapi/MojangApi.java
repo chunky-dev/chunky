@@ -154,8 +154,6 @@ public class MojangApi {
    * @return Skin URL (null if the player has no skin)
    */
   public static PlayerSkin getSkinFromProfile(JsonObject profile) {
-    // TODO are there profiles where the payload is different?
-    System.out.println(profile.toCompactString());
     JsonArray properties = profile.get("properties").asArray();
     Optional<String> textureBase64 = properties.elements.stream()
         .filter((p) -> p.asObject().get("name").stringValue("").equals("textures")).findFirst()
@@ -237,7 +235,6 @@ public class MojangApi {
     if (responseCode == 200) {
       try (JsonParser parser = new JsonParser(conn.getInputStream())) {
         profile = parser.parse().object();
-        // TODO unparse base64 data.
       } catch (JsonParser.SyntaxError e) {
         e.printStackTrace(System.err);
         profile = new JsonObject();
