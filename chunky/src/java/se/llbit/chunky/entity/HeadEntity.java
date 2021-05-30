@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2017 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -18,20 +19,16 @@
 package se.llbit.chunky.entity;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.WeakHashMap;
-import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.PlayerTexture;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.resources.texturepack.EntityTextureLoader;
+import se.llbit.chunky.resources.texturepack.PlayerTextureLoader;
 import se.llbit.chunky.resources.texturepack.TextureFormatError;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
@@ -41,7 +38,7 @@ import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.primitive.Box;
 import se.llbit.math.primitive.Primitive;
-import se.llbit.util.Util;
+import se.llbit.util.mojangapi.MojangApi;
 
 /**
  * A mob head (skull) entity.
@@ -152,35 +149,19 @@ public class HeadEntity extends Entity {
   public static PlayerTexture downloadTexture(String skin) {
     return textureCache.computeIfAbsent(skin, (skinUrl) -> {
       PlayerTexture texture = new PlayerTexture();
-      EntityTextureLoader loader = new EntityTextureLoader(skinUrl, texture);
-      if (!PersistentSettings.cacheDirectory().isDirectory()) {
-        PersistentSettings.cacheDirectory().mkdirs();
-      }
-      File cacheFile = new File(PersistentSettings.cacheDirectory(),
-          Util.cacheEncode((skin + ":skin").hashCode()));
-      if (cacheFile.exists()) {
+      PlayerTextureLoader loader = new PlayerTextureLoader(skinUrl, texture, PlayerModel.STEVE);
+      try {
+        File cacheFile = MojangApi.downloadSkin(skin);
         try {
           loader.load(cacheFile);
           return texture;
-        } catch (IOException | TextureFormatError e) {
-          // ignore, try download below
+        } catch (IOException | TextureFormatError  e) {
+          Log.warn("Failed to load skin downloaded from " + skinUrl, e);
+          cacheFile.delete();
         }
-      }
-      try (ReadableByteChannel inChannel = Channels.newChannel(new URL(skinUrl).openStream());
-          FileOutputStream out = new FileOutputStream(cacheFile)) {
-        out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
       } catch (IOException e) {
         Log.warn("Failed to download skin from " + skinUrl, e);
-        return Texture.steve;
       }
-      try {
-        loader.load(cacheFile);
-        return texture;
-      } catch (IOException | TextureFormatError e) {
-        cacheFile.delete();
-        Log.warn("Failed to load skin downloaded from " + skinUrl, e);
-      }
-
       return Texture.steve;
     });
   }
