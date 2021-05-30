@@ -120,6 +120,9 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     }
     loadPlayers.setSelected(PersistentSettings.getLoadPlayers());
     loadArmorStands.setSelected(PersistentSettings.getLoadArmorStands());
+    loadBooks.setSelected(PersistentSettings.getLoadBooks());
+    loadPaintings.setSelected(PersistentSettings.getLoadPaintings());
+    loadOtherEntities.setSelected(PersistentSettings.getLoadOtherEntities());
     biomeColors.setSelected(scene.biomeColorsEnabled());
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
     reloadChunks.setDisable(scene.numberOfChunks() == 0);
