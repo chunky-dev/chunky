@@ -39,6 +39,7 @@ import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.scene.EntityLoadingPreferences;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.ChunkyFxController;
 import se.llbit.chunky.ui.IntegerAdjuster;
@@ -122,11 +123,14 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       dumpFrequency.setDisable(true);
       saveDumps.setSelected(false);
     }
-    loadPlayers.setSelected(PersistentSettings.getLoadPlayers());
-    loadArmorStands.setSelected(PersistentSettings.getLoadArmorStands());
-    loadBooks.setSelected(PersistentSettings.getLoadBooks());
-    loadPaintings.setSelected(PersistentSettings.getLoadPaintings());
-    loadOtherEntities.setSelected(PersistentSettings.getLoadOtherEntities());
+    {
+      EntityLoadingPreferences preferences = scene.getEntityLoadingPreferences();
+      loadPlayers.setSelected(preferences.shouldLoadClass(PlayerEntity.class));
+      loadArmorStands.setSelected(preferences.shouldLoadClass(ArmorStand.class));
+      loadBooks.setSelected(preferences.shouldLoadClass(Book.class));
+      loadPaintings.setSelected(preferences.shouldLoadClass(PaintingEntity.class));
+      loadOtherEntities.setSelected(preferences.shouldLoadClass(null));
+    }
     biomeColors.setSelected(scene.biomeColorsEnabled());
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
     reloadChunks.setDisable(scene.numberOfChunks() == 0);
