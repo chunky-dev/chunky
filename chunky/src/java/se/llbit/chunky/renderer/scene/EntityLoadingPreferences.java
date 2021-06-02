@@ -23,7 +23,7 @@ public class EntityLoadingPreferences {
     }
 
     public void fromJson(JsonValue json) {
-        if (!json.isObject())
+        if (json == null || !json.isObject())
             return;
         JsonObject object = json.asObject();
 

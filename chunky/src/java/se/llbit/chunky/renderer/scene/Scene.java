@@ -280,6 +280,8 @@ public class Scene implements JsonSerializable, Refreshable {
   private Octree worldOctree;
   private Octree waterOctree;
 
+  private EntityLoadingPreferences entityLoadingPreferences = new EntityLoadingPreferences();
+
   /**
    * Entities in the scene.
    */
@@ -2641,6 +2643,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (!actorArray.isEmpty()) {
       json.add("actors", actorArray);
     }
+    json.add("entityLoadingPreferences", entityLoadingPreferences.toJson());
     json.add("octreeImplementation", octreeImplementation);
     json.add("bvhImplementation", bvhImplementation);
     json.add("emitterSamplingStrategy", emitterSamplingStrategy.name());
@@ -2962,6 +2965,7 @@ public class Scene implements JsonSerializable, Refreshable {
         actors.add(entity);
       }
     }
+    entityLoadingPreferences.fromJson(json.get("entityLoadingPreferences"));
 
     actors.trimToSize();
     entities.trimToSize();
