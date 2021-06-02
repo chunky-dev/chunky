@@ -198,7 +198,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         listener.setSpp(0);
       });
 
-      if (getRenderer().autoPostProcess())
+      if (getPreviewRenderer().autoPostProcess())
         this.finalizeFrame(true);
 
       frameStart = System.currentTimeMillis();
