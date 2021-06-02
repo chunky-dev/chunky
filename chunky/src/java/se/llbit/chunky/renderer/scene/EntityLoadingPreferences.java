@@ -1,5 +1,6 @@
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.entity.*;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonMember;
@@ -15,11 +16,11 @@ public class EntityLoadingPreferences {
 
     public EntityLoadingPreferences() {
         loadingPreferences = new HashMap<>();
-        loadingPreferences.put(PlayerEntity.class, true);
-        loadingPreferences.put(ArmorStand.class, true);
-        loadingPreferences.put(Book.class, true);
-        loadingPreferences.put(PaintingEntity.class, true);
-        loadOtherEntities = true;
+        loadingPreferences.put(PlayerEntity.class, PersistentSettings.getLoadPlayers());
+        loadingPreferences.put(ArmorStand.class, PersistentSettings.getLoadArmorStands());
+        loadingPreferences.put(Book.class, PersistentSettings.getLoadBooks());
+        loadingPreferences.put(PaintingEntity.class, PersistentSettings.getLoadPaintings());
+        loadOtherEntities = PersistentSettings.getLoadOtherEntities();
     }
 
     public void fromJson(JsonValue json) {
@@ -29,12 +30,13 @@ public class EntityLoadingPreferences {
 
         for (JsonMember member : object) {
             if (member.name.equals("other")) {
-                loadOtherEntities = member.value.asBoolean(true);
+                loadOtherEntities = member.value.asBoolean(PersistentSettings.getLoadOtherEntities());
                 continue;
             }
 
             try {
                 Class<?> memberClass = Class.forName(member.name);
+                // TODO: the correct Persistent Setting should be retrieved instead of `true`
                 boolean value = member.value.asBoolean(true);
                 loadingPreferences.put(memberClass, value);
             } catch (ClassNotFoundException e) {
