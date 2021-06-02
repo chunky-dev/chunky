@@ -202,7 +202,7 @@ public class RenderWorkerPool {
   }
 
   @FunctionalInterface
-  interface RenderJob {
+  public interface RenderJob {
     /**
      * @param worker      The render worker running this job.
      * @throws Throwable  Any unchecked exception.
