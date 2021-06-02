@@ -302,7 +302,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         } else {
           // Bail early if render is already done
           if (bufferedScene.spp >= bufferedScene.getTargetSpp()) {
-            sceneProvider.withSceneProtected(scene -> {
+            sceneProvider.withEditSceneProtected(scene -> {
               scene.pauseRender();
               updateRenderState(scene);
             });
