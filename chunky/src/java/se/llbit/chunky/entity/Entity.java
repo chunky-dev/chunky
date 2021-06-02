@@ -118,13 +118,4 @@ abstract public class Entity {
   public void setPosition(Vector3 position) {
     this.position.set(position);
   }
-
-  /**
-   * Whether this entity should be loaded when loading chunks.
-   *
-   * @return true if this entity should be loaded.
-   */
-  public boolean shouldLoad() {
-    return PersistentSettings.getLoadOtherEntities();
-  }
 }

@@ -953,9 +953,4 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   @Override public JsonObject getGear() {
     return gear;
   }
-
-  @Override
-  public boolean shouldLoad() {
-    return PersistentSettings.getLoadPlayers();
-  }
 }

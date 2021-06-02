@@ -189,9 +189,4 @@ public class PaintingEntity extends Entity {
     double angle = json.get("angle").doubleValue(0.0);
     return new PaintingEntity(position, art, angle);
   }
-
-  @Override
-  public boolean shouldLoad() {
-      return PersistentSettings.getLoadPaintings();
-  }
 }

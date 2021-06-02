@@ -355,9 +355,4 @@ public class Book extends Entity implements Poseable {
   public void setPageAngleB(double pageAngleB) {
     this.pageAngleB = pageAngleB;
   }
-
-  @Override
-  public boolean shouldLoad() {
-    return PersistentSettings.getLoadBooks();
-  }
 }
