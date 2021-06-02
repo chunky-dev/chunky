@@ -2682,6 +2682,10 @@ public class Scene implements JsonSerializable, Refreshable {
     name = json.get("name").stringValue("default");
   }
 
+  public EntityLoadingPreferences getEntityLoadingPreferences() {
+    return entityLoadingPreferences;
+  }
+
   public Collection<Entity> getEntities() {
     return entities;
   }

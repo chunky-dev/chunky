@@ -33,6 +33,10 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.entity.ArmorStand;
+import se.llbit.chunky.entity.Book;
+import se.llbit.chunky.entity.PaintingEntity;
+import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -190,6 +194,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     loadPlayers.setTooltip(new Tooltip("Enable/disable player entity loading. "
         + "Takes effect on next scene creation."));
     loadPlayers.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(PlayerEntity.class, newValue);
       PersistentSettings.setLoadPlayers(newValue);
     });
     loadPlayers.setOnAction(event -> {
@@ -199,6 +204,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     loadArmorStands.setTooltip(new Tooltip("Enable/disable armor stand entity loading. "
             + "Takes effect on next scene creation."));
     loadArmorStands.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(ArmorStand.class, newValue);
       PersistentSettings.setLoadArmorStands(newValue);
     });
     loadArmorStands.setOnAction(event -> {
@@ -208,6 +214,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     loadBooks.setTooltip(new Tooltip("Enable/disable book entity loading. "
             + "Takes effect on next scene creation."));
     loadBooks.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(Book.class, newValue);
       PersistentSettings.setLoadBooks(newValue);
     });
     loadBooks.setOnAction(event -> {
@@ -217,6 +224,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     loadPaintings.setTooltip(new Tooltip("Enable/disable painting entity loading. "
             + "Takes effect on next scene creation."));
     loadPaintings.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(PaintingEntity.class, newValue);
       PersistentSettings.setLoadPaintings(newValue);
     });
     loadPaintings.setOnAction(event -> {
@@ -226,6 +234,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     loadOtherEntities.setTooltip(new Tooltip("Enable/disable other entity loading. "
             + "Takes effect on next scene creation."));
     loadOtherEntities.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(null, newValue);
       PersistentSettings.setLoadOtherEntities(newValue);
     });
     loadOtherEntities.setOnAction(event -> {
