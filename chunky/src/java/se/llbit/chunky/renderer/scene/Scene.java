@@ -1026,13 +1026,13 @@ public class Scene implements JsonSerializable, Refreshable {
 
             if (y >= yClipMin && y < yClipMax) {
               String id = tag.get("id").stringValue("");
-              if ((id.equals("minecraft:painting") || id.equals("Painting")) && PersistentSettings.getLoadPaintings()) {
+              if ((id.equals("minecraft:painting") || id.equals("Painting")) && entityLoadingPreferences.shouldLoadClass(PaintingEntity.class)) {
                 // Before 1.12 paintings had id=Painting.
                 // After 1.12 paintings had id=minecraft:painting.
                 float yaw = tag.get("Rotation").get(0).floatValue();
                 entities.add(
                         new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
-              } else if (id.equals("minecraft:armor_stand") && PersistentSettings.getLoadArmorStands()) {
+              } else if (id.equals("minecraft:armor_stand") && entityLoadingPreferences.shouldLoadClass(ArmorStand.class)) {
                 actors.add(new ArmorStand(new Vector3(x, y, z), tag));
               }
             }
@@ -1077,7 +1077,7 @@ public class Scene implements JsonSerializable, Refreshable {
                     Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
                     Entity entity = block.toEntity(position);
 
-                    if (entity.shouldLoad()) {
+                    if (entityLoadingPreferences.shouldLoad(entity)) {
                       if(entity instanceof Poseable && !(entity instanceof Lectern && !((Lectern) entity).hasBook())) {
                         // don't add the actor again if it was already loaded from json
                         if(actors.stream().noneMatch(actor -> {
@@ -1274,7 +1274,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 continue;
               }
 
-              if (blockEntity.shouldLoad()) {
+              if (entityLoadingPreferences.shouldLoad(blockEntity)) {
                 if (blockEntity instanceof Poseable) {
                   // don't add the actor again if it was already loaded from json
                   if (actors.stream().noneMatch(actor -> {

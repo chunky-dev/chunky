@@ -73,6 +73,10 @@ public class EntityLoadingPreferences {
      * @return
      */
     public boolean shouldLoad(Entity entity) {
-        return loadingPreferences.getOrDefault(entity.getClass(), loadOtherEntities);
+        return shouldLoadClass(entity.getClass());
+    }
+
+    public boolean shouldLoadClass(Class<?> entityClass) {
+        return loadingPreferences.getOrDefault(entityClass, loadOtherEntities);
     }
 }
