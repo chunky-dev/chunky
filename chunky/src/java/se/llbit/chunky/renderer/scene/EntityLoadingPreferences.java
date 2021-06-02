@@ -2,7 +2,6 @@ package se.llbit.chunky.renderer.scene;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.entity.*;
-import se.llbit.json.JsonArray;
 import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
@@ -57,9 +56,9 @@ public class EntityLoadingPreferences {
     }
 
     /**
-     * Sets the preference for a given Entity class, or null for other entities.
+     * Sets the loading preference for a given Entity class, or null for other entities.
      * @param entityClass
-     * @param value
+     * @param value true: load, false: do not load.
      */
     public void setPreference(Class<?> entityClass, boolean value) {
         if (entityClass == null)
@@ -68,6 +67,11 @@ public class EntityLoadingPreferences {
             loadingPreferences.put(entityClass, value);
     }
 
+    /**
+     * Returns true if the entity should be loaded in the scene.
+     * @param entity
+     * @return
+     */
     public boolean shouldLoad(Entity entity) {
         return loadingPreferences.getOrDefault(entity.getClass(), loadOtherEntities);
     }
