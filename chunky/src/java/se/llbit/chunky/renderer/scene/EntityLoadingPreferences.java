@@ -35,7 +35,9 @@ public class EntityLoadingPreferences {
 
             try {
                 Class<?> memberClass = Class.forName(member.name);
-                // TODO: the correct Persistent Setting should be retrieved instead of `true`
+                // We should probably retrieve the correct Persistent Setting as a default value, however during normal
+                // operation the default is never used. It would only happen in case of a bug or if you manually edit
+                // the scene's .json
                 boolean value = member.value.asBoolean(true);
                 loadingPreferences.put(memberClass, value);
             } catch (ClassNotFoundException e) {
