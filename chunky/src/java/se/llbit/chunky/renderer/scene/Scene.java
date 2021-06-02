@@ -446,6 +446,7 @@ public class Scene implements JsonSerializable, Refreshable {
       worldOctree = other.worldOctree;
       waterOctree = other.waterOctree;
       entities = other.entities;
+      entityLoadingPreferences = other.entityLoadingPreferences;
       actors.clear();
       actors.addAll(other.actors); // Create a copy so that entity changes can be reset.
       actors.trimToSize();
