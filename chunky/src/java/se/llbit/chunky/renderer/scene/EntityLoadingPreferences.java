@@ -22,24 +22,25 @@ public class EntityLoadingPreferences {
         loadOtherEntities = true;
     }
 
-    public static EntityLoadingPreferences fromJson(JsonValue json) {
-        EntityLoadingPreferences preferences = new EntityLoadingPreferences();
-
+    public void fromJson(JsonValue json) {
         if (!json.isObject())
-            return preferences;
+            return;
         JsonObject object = json.asObject();
 
         for (JsonMember member : object) {
+            if (member.name.equals("other")) {
+                loadOtherEntities = member.value.asBoolean(true);
+                continue;
+            }
+
             try {
                 Class<?> memberClass = Class.forName(member.name);
                 boolean value = member.value.asBoolean(true);
-                preferences.loadingPreferences.put(memberClass, value);
+                loadingPreferences.put(memberClass, value);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
-
-        return preferences;
     }
 
     public JsonValue toJson() {
