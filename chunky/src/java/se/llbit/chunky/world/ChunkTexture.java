@@ -21,6 +21,7 @@ import se.llbit.math.ColorUtil;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Chunk texture
@@ -90,4 +91,16 @@ public class ChunkTexture {
     return texture;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ChunkTexture that = (ChunkTexture) o;
+    return Arrays.equals(data, that.data);
+  }
+
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(data);
+  }
 }

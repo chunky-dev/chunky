@@ -1392,6 +1392,10 @@ public class Scene implements JsonSerializable, Refreshable {
 
       worldOctree.endFinalization();
       waterOctree.endFinalization();
+
+      grassTexture.endFinalization();
+      foliageTexture.endFinalization();
+      waterTexture.endFinalization();
     }
 
     for (Entity entity : actors) {

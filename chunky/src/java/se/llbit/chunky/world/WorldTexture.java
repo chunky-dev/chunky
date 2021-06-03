@@ -22,7 +22,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Map;
+import java.util.HashMap;
 
 /**
  * World texture.
@@ -33,6 +33,8 @@ public class WorldTexture {
 
   private final Long2ObjectOpenHashMap<ChunkTexture> map = new Long2ObjectOpenHashMap<>();
 
+  private boolean endFinalized = false;
+
   /**
    * Timestamp of last serialization.
    */
@@ -42,8 +44,11 @@ public class WorldTexture {
    * Set color at (x, z)
    *
    * @param frgb RGB color components
+   * @throws IllegalStateException if this WorldTexture has already been finalized.
    */
   public void set(int x, int z, float[] frgb) {
+    if (endFinalized) throw new IllegalStateException("Attempted to modify a finalized WorldTexture.");
+
     long cp = ((long) x >> 4) << 32 | ((z >> 4) & 0xffffffffL);
     ChunkTexture ct = map.get(cp);
     if (ct == null) {
@@ -98,14 +103,41 @@ public class WorldTexture {
    */
   public static WorldTexture load(DataInputStream in) throws IOException {
     WorldTexture texture = new WorldTexture();
+    HashMap<ChunkTexture, ChunkTexture> textureCache = new HashMap<>();
     int numTiles = in.readInt();
     for (int i = 0; i < numTiles; ++i) {
       int x = in.readInt();
       int z = in.readInt();
       ChunkTexture tile = ChunkTexture.load(in);
+
+      if (textureCache.containsKey(tile)) {
+        tile = textureCache.get(tile);
+      } else {
+        textureCache.put(tile, tile);
+      }
+
       texture.map.put(((long) x) << 32 | (z & 0xffffffffL), tile);
     }
     return texture;
+  }
+
+  /**
+   * Deduplicate this {@code WorldTexture} to save memory. This also makes this read-only.
+   */
+  public void endFinalization() {
+    if (endFinalized) return;
+    endFinalized = true;
+
+    HashMap<ChunkTexture, ChunkTexture> textureCache = new HashMap<>();
+    for (Long2ObjectMap.Entry<ChunkTexture> entry : map.long2ObjectEntrySet()) {
+      ChunkTexture tile = entry.getValue();
+
+      if (textureCache.containsKey(tile)) {
+        entry.setValue(textureCache.get(tile));
+      } else {
+        textureCache.put(tile, tile);
+      }
+    }
   }
 
   /**
