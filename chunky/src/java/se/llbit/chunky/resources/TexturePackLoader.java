@@ -3625,7 +3625,7 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/flowering_azalea_top", Texture.floweringAzaleaTop);
     addSimpleTexture("assets/minecraft/textures/block/flowering_azalea_side", Texture.floweringAzaleaSide);
     addSimpleTexture("assets/minecraft/textures/block/azalea_leaves", Texture.azaleaLeaves);
-    addSimpleTexture("assets/minecraft/textures/block/azalea_leaves_flowers", Texture.azaleaLeavesFlowers);
+    addSimpleTexture("assets/minecraft/textures/block/flowering_azalea_leaves", Texture.floweringAzaleaLeaves);
     addSimpleTexture("assets/minecraft/textures/block/moss_block", Texture.mossBlock);
     addSimpleTexture("assets/minecraft/textures/block/cave_vines_plant", Texture.caveVinesPlant);
     addSimpleTexture("assets/minecraft/textures/block/cave_vines", Texture.caveVines);
