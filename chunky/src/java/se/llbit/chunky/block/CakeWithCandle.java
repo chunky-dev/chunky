@@ -13,9 +13,9 @@ public class CakeWithCandle extends MinecraftBlockTranslucent {
   private final Texture candle;
   private final boolean lit;
 
-  public CakeWithCandle(String name, Texture candle, boolean lit) {
+  public CakeWithCandle(String name, Texture candle, Texture candleLit, boolean lit) {
     super(name, Texture.cakeTop);
-    this.candle = candle;
+    this.candle = lit ? candleLit : candle;
     this.lit = lit;
     localIntersect = true;
   }
@@ -26,7 +26,7 @@ public class CakeWithCandle extends MinecraftBlockTranslucent {
 
   @Override
   public boolean intersect(Ray ray, Scene scene) {
-    return CakeWithCandleModel.intersect(ray, candle, isLit());
+    return CakeWithCandleModel.intersect(ray, candle);
   }
 
   @Override

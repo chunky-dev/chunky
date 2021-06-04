@@ -2629,39 +2629,39 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "chain":
         return chain(tag, "chain", Texture.chain);
       case "candle_cake":
-        return candleCake(tag, Texture.candle);
+        return candleCake(tag, Texture.candle, Texture.candleLit);
       case "white_candle_cake":
-        return candleCake(tag, Texture.whiteCandle);
+        return candleCake(tag, Texture.whiteCandle, Texture.whiteCandleLit);
       case "orange_candle_cake":
-        return candleCake(tag, Texture.orangeCandle);
+        return candleCake(tag, Texture.orangeCandle, Texture.orangeCandleLit);
       case "magenta_candle_cake":
-        return candleCake(tag, Texture.magentaCandle);
+        return candleCake(tag, Texture.magentaCandle, Texture.magentaCandleLit);
       case "light_blue_candle_cake":
-        return candleCake(tag, Texture.lightBlueCandle);
+        return candleCake(tag, Texture.lightBlueCandle, Texture.lightBlueCandleLit);
       case "yellow_candle_cake":
-        return candleCake(tag, Texture.yellowCandle);
+        return candleCake(tag, Texture.yellowCandle, Texture.yellowCandleLit);
       case "lime_candle_cake":
-        return candleCake(tag, Texture.limeCandle);
+        return candleCake(tag, Texture.limeCandle, Texture.limeCandleLit);
       case "pink_candle_cake":
-        return candleCake(tag, Texture.pinkCandle);
+        return candleCake(tag, Texture.pinkCandle, Texture.pinkCandleLit);
       case "gray_candle_cake":
-        return candleCake(tag, Texture.grayCandle);
+        return candleCake(tag, Texture.grayCandle, Texture.grayCandleLit);
       case "light_gray_candle_cake":
-        return candleCake(tag, Texture.lightGrayCandle);
+        return candleCake(tag, Texture.lightGrayCandle, Texture.lightGrayCandleLit);
       case "cyan_candle_cake":
-        return candleCake(tag, Texture.cyanCandle);
+        return candleCake(tag, Texture.cyanCandle, Texture.cyanCandleLit);
       case "purple_candle_cake":
-        return candleCake(tag, Texture.purpleCandle);
+        return candleCake(tag, Texture.purpleCandle, Texture.purpleCandleLit);
       case "blue_candle_cake":
-        return candleCake(tag, Texture.blueCandle);
+        return candleCake(tag, Texture.blueCandle, Texture.blueCandleLit);
       case "brown_candle_cake":
-        return candleCake(tag, Texture.brownCandle);
+        return candleCake(tag, Texture.brownCandle, Texture.brownCandleLit);
       case "green_candle_cake":
-        return candleCake(tag, Texture.greenCandle);
+        return candleCake(tag, Texture.greenCandle, Texture.greenCandleLit);
       case "red_candle_cake":
-        return candleCake(tag, Texture.redCandle);
+        return candleCake(tag, Texture.redCandle, Texture.redCandleLit);
       case "black_candle_cake":
-        return candleCake(tag, Texture.blackCandle);
+        return candleCake(tag, Texture.blackCandle, Texture.blackCandleLit);
       case "candle":
         return candle(tag, Texture.candle, Texture.candleLit);
       case "white_candle":
@@ -3375,9 +3375,9 @@ public class MinecraftBlockProvider implements BlockProvider {
         properties.get("lit").stringValue("false").equals("true"));
   }
 
-  private static Block candleCake(Tag tag, Texture candleTexture) {
+  private static Block candleCake(Tag tag, Texture candleTexture, Texture candleTextureLit) {
     Tag properties = tag.get("Properties");
-    return new CakeWithCandle(BlockProvider.blockName(tag), candleTexture,
+    return new CakeWithCandle(BlockProvider.blockName(tag), candleTexture, candleTextureLit,
         properties.get("lit").stringValue("false").equals("true"));
   }
 }
