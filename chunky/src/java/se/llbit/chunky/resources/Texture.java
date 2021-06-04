@@ -993,7 +993,7 @@ public class Texture {
   public static final Texture floweringAzaleaTop = new Texture();
   public static final Texture floweringAzaleaSide = new Texture();
   public static final Texture azaleaLeaves = new Texture();
-  public static final Texture azaleaLeavesFlowers = new Texture();
+  public static final Texture floweringAzaleaLeaves = new Texture();
   public static final Texture mossBlock = new Texture();
   public static final Texture caveVinesPlant = new Texture();
   public static final Texture caveVinesPlantLit = new Texture();
