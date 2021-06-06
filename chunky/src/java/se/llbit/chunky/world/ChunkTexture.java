@@ -30,12 +30,19 @@ import java.util.Arrays;
  */
 public class ChunkTexture {
 
-  byte[] data = new byte[Chunk.X_MAX * Chunk.Z_MAX * 3];
+  protected final byte[] data = new byte[Chunk.X_MAX * Chunk.Z_MAX * 3];
 
   /**
    * Create new texture
    */
   public ChunkTexture() {
+  }
+
+  /**
+   * Copy an existing chunk texture
+   */
+  public ChunkTexture(ChunkTexture ct) {
+    System.arraycopy(ct.data, 0, data, 0, data.length);
   }
 
   /**

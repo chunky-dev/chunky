@@ -33,7 +33,7 @@ public class WorldTexture {
 
   private final Long2ObjectOpenHashMap<ChunkTexture> map = new Long2ObjectOpenHashMap<>();
 
-  private boolean endFinalized = false;
+  private boolean compacted = false;
 
   /**
    * Timestamp of last serialization.
@@ -47,10 +47,14 @@ public class WorldTexture {
    * @throws IllegalStateException if this WorldTexture has already been finalized.
    */
   public void set(int x, int z, float[] frgb) {
-    if (endFinalized) throw new IllegalStateException("Attempted to modify a finalized WorldTexture.");
-
     long cp = ((long) x >> 4) << 32 | ((z >> 4) & 0xffffffffL);
     ChunkTexture ct = map.get(cp);
+
+    // This chunk texture might be used in other places so we must create a copy
+    if (compacted) {
+      ct = new ChunkTexture(ct);
+    }
+
     if (ct == null) {
       ct = new ChunkTexture();
       map.put(cp, ct);
@@ -109,13 +113,7 @@ public class WorldTexture {
       int x = in.readInt();
       int z = in.readInt();
       ChunkTexture tile = ChunkTexture.load(in);
-
-      if (textureCache.containsKey(tile)) {
-        tile = textureCache.get(tile);
-      } else {
-        textureCache.put(tile, tile);
-      }
-
+      tile = textureCache.computeIfAbsent(tile, t -> t);
       texture.map.put(((long) x) << 32 | (z & 0xffffffffL), tile);
     }
     return texture;
@@ -124,9 +122,9 @@ public class WorldTexture {
   /**
    * Deduplicate this {@code WorldTexture} to save memory. This also makes this read-only.
    */
-  public void endFinalization() {
-    if (endFinalized) return;
-    endFinalized = true;
+  public void compact() {
+    if (compacted) return;
+    compacted = true;
 
     HashMap<ChunkTexture, ChunkTexture> textureCache = new HashMap<>();
     for (Long2ObjectMap.Entry<ChunkTexture> entry : map.long2ObjectEntrySet()) {
