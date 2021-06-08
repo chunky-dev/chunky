@@ -23,6 +23,7 @@ import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
@@ -41,38 +42,38 @@ public class CoralFanEntity extends Entity {
 
   private static final Quad[] quads = {
       // cube1
-      new Quad(new Quad(
+      new DoubleSidedQuad(new Quad(
           new Vector3(8 / 16.0, 0, 0),
           new Vector3(8 / 16.0, 0, 16 / 16.0),
           new Vector3(24 / 16.0, 0, 0),
-          new Vector4(0, 16 / 16.0, 0, 16 / 16.0), true),
+          new Vector4(0, 16 / 16.0, 0, 16 / 16.0)),
           Transform.NONE.translate(0, 0.5 / 1.0, 0.5 / 1.0)
               .rotateZ(0.39269908169872414 / 1.0)
               .translate(0, -0.5 / 1.0, -0.5 / 1.0)),
       // cube2
-      new Quad(new Quad(
+      new DoubleSidedQuad(new Quad(
           new Vector3(8 / 16.0, 0, 16 / 16.0),
           new Vector3(8 / 16.0, 0, 0),
           new Vector3(-8 / 16.0, 0, 16 / 16.0),
-          new Vector4(0, 16 / 16.0, 0, 16 / 16.0), true),
+          new Vector4(0, 16 / 16.0, 0, 16 / 16.0)),
           Transform.NONE.translate(0, 0.5 / 1.0, 0.5 / 1.0)
               .rotateZ(-0.39269908169872414 / 1.0)
               .translate(0, -0.5 / 1.0, -0.5 / 1.0)),
       // cube3
-      new Quad(new Quad(
+      new DoubleSidedQuad(new Quad(
           new Vector3(0, 0, 24 / 16.0),
           new Vector3(16 / 16.0, 0, 24 / 16.0),
           new Vector3(0, 0, 8 / 16.0),
-          new Vector4(16 / 16.0, 0, 16 / 16.0, 0), true),
+          new Vector4(16 / 16.0, 0, 16 / 16.0, 0)),
           Transform.NONE.translate(0.5 / 1.0, 0.5 / 1.0, 0)
               .rotateX(-0.39269908169872414 / 1.0)
               .translate(-0.5 / 1.0, -0.5 / 1.0, 0)),
       // cube4
-      new Quad(new Quad(
+      new DoubleSidedQuad(new Quad(
           new Vector3(0, 0, 8 / 16.0),
           new Vector3(16 / 16.0, 0, 8 / 16.0),
           new Vector3(0, 0, -8 / 16.0),
-          new Vector4(0, 16 / 16.0, 0, 16 / 16.0), true),
+          new Vector4(0, 16 / 16.0, 0, 16 / 16.0)),
           Transform.NONE.translate(0.5 / 1.0, 0.5 / 1.0, 0)
               .rotateX(0.39269908169872414 / 1.0)
               .translate(-0.5 / 1.0, -0.5 / 1.0, 0)),

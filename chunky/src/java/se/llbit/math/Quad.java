@@ -35,7 +35,6 @@ public class Quad {
   public Vector3 xv = new Vector3();
   public Vector3 yv = new Vector3();
   public Vector4 uv = new Vector4();
-  public boolean doubleSided = false;
 
   /**
    * Normal vector
@@ -66,7 +65,6 @@ public class Quad {
     yvl = other.yvl;
     d = -n.dot(o);
     uv.set(other.uv);
-    doubleSided = other.doubleSided;
   }
 
   /**
@@ -91,7 +89,6 @@ public class Quad {
     yvl = other.yvl;
     d = -n.dot(o);
     uv.set(other.uv);
-    doubleSided = other.doubleSided;
   }
 
   /**
@@ -103,19 +100,6 @@ public class Quad {
    * @param uv Minimum and maximum U/V texture coordinates
    */
   public Quad(Vector3 v0, Vector3 v1, Vector3 v2, Vector4 uv) {
-    this(v0, v1, v2, uv, false);
-  }
-
-  /**
-   * Create new quad
-   *
-   * @param v0 Bottom left vector
-   * @param v1 Top right vector
-   * @param v2 Bottom right vector
-   * @param uv Minimum and maximum U/V texture coordinates
-   * @param doubleSided Should this quad be intersectable from both sides
-   */
-  public Quad(Vector3 v0, Vector3 v1, Vector3 v2, Vector4 uv, boolean doubleSided) {
     o.set(v0);
     xv.sub(v1, v0);
     xvl = 1 / xv.lengthSquared();
@@ -127,9 +111,7 @@ public class Quad {
     this.uv.set(uv);
     this.uv.y -= uv.x;
     this.uv.w -= uv.z;
-    this.doubleSided = doubleSided;
   }
-
 
   /**
    * Find intersection between the given ray and this quad
@@ -145,7 +127,7 @@ public class Quad {
 
     // Test that the ray is heading toward the plane of this quad.
     double denom = ray.d.dot(n);
-    if (denom < -Ray.EPSILON || (doubleSided && denom > Ray.EPSILON)) {
+    if (denom < -Ray.EPSILON) {
 
       // Test for intersection with the plane at origin.
       double t = -(ix * n.x + iy * n.y + iz * n.z + d) / denom;
@@ -198,9 +180,9 @@ public class Quad {
     double v0 = uv.z;
     double v1 = uv.z + uv.w;
     primitives.add(new TexturedTriangle(c0, c2, c1, new Vector2(u0, v0), new Vector2(u0, v1),
-        new Vector2(u1, v0), material, doubleSided));
+        new Vector2(u1, v0), material, false));
     primitives.add(new TexturedTriangle(c1, c2, c3, new Vector2(u1, v0), new Vector2(u0, v1),
-        new Vector2(u1, v1), material, doubleSided));
+        new Vector2(u1, v1), material, false));
   }
 
   /**

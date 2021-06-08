@@ -17,6 +17,7 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -29,44 +30,44 @@ import se.llbit.math.Vector4;
 public class RailModel extends QuadModel {
   private static final Quad[] rails = {
       // Flat north-south.
-      new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
-          new Vector4(0, 1, 0, 1), true),
+      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1)),
 
       // Flat east-west.
-      new Quad(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 0, 0),
-          new Vector4(0, 1, 0, 1), true),
+      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 0, 0),
+          new Vector4(0, 1, 0, 1)),
 
       // Ascending east.
-      new Quad(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 1, 0),
-          new Vector4(0, 1, 0, 1), true),
+      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 1, 0),
+          new Vector4(0, 1, 0, 1)),
 
       // Ascending west.
-      new Quad(new Vector3(0, 1, 0), new Vector3(0, 1, 1), new Vector3(1, 0, 0),
-          new Vector4(0, 1, 0, 1), true),
+      new DoubleSidedQuad(new Vector3(0, 1, 0), new Vector3(0, 1, 1), new Vector3(1, 0, 0),
+          new Vector4(0, 1, 0, 1)),
 
       // Ascending north.
-      new Quad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 0, 1),
-          new Vector4(0, 1, 0, 1), true),
+      new DoubleSidedQuad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1)),
 
       // Ascending south
-      new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 1, 1),
-          new Vector4(0, 1, 0, 1), true),
+      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 1, 1),
+          new Vector4(0, 1, 0, 1)),
 
       // Nw corner
-      new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
-          new Vector4(0, 1, 1, 0), true),
+      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 1, 0)),
 
       // ne corner
-      new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
-          new Vector4(1, 0, 1, 0), true),
+      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+          new Vector4(1, 0, 1, 0)),
 
       // se corner
-      new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
-          new Vector4(1, 0, 0, 1), true),
+      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+          new Vector4(1, 0, 0, 1)),
 
       // sw corner
-      new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
-          new Vector4(0, 1, 0, 1), true),
+      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1)),
 
   };
 

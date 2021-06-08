@@ -1,6 +1,7 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -23,10 +24,10 @@ public class StemModel extends QuadModel {
 
   public StemModel(int height) {
     this.quads = new Quad[] {
-        new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 1),
-            new Vector3(0, (height + 1) / 8., 0), new Vector4(0, 1, (7 - height) / 8., 1), true),
-        new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 1),
-            new Vector3(1, (height + 1) / 8., 0), new Vector4(0, 1, (7 - height) / 8., 1), true),
+        new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 1),
+            new Vector3(0, (height + 1) / 8., 0), new Vector4(0, 1, (7 - height) / 8., 1)),
+        new DoubleSidedQuad(new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+            new Vector3(1, (height + 1) / 8., 0), new Vector4(0, 1, (7 - height) / 8., 1)),
     };
     this.tints = stemColors[height];
   }

@@ -17,6 +17,7 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -28,52 +29,52 @@ import java.util.Collections;
 public class IronBarsModel extends QuadModel {
 
   private static final Quad[] core = {
-      new Quad(new Vector3(.5, 1, 7 / 16.), new Vector3(.5, 1, 9 / 16.),
-          new Vector3(.5, 0, 7 / 16.), new Vector4(7 / 16., 9 / 16., 1, 0), true),
+      new DoubleSidedQuad(new Vector3(.5, 1, 7 / 16.), new Vector3(.5, 1, 9 / 16.),
+          new Vector3(.5, 0, 7 / 16.), new Vector4(7 / 16., 9 / 16., 1, 0)),
 
-      new Quad(new Vector3(7 / 16., 1, .5), new Vector3(9 / 16., 1, .5),
-          new Vector3(7 / 16., 0, .5), new Vector4(7 / 16., 9 / 16., 1, 0), true),
+      new DoubleSidedQuad(new Vector3(7 / 16., 1, .5), new Vector3(9 / 16., 1, .5),
+          new Vector3(7 / 16., 0, .5), new Vector4(7 / 16., 9 / 16., 1, 0)),
   };
 
   private static final Quad[] coreTop = {
       // Top face.
-      new Quad(new Vector3(9 / 16., 1, 7 / 16.), new Vector3(7 / 16., 1, 7 / 16.),
-          new Vector3(9 / 16., 1, 9 / 16.), new Vector4(9 / 16., 7 / 16., 7 / 16., 9 / 16.), true),
+      new DoubleSidedQuad(new Vector3(9 / 16., 1, 7 / 16.), new Vector3(7 / 16., 1, 7 / 16.),
+          new Vector3(9 / 16., 1, 9 / 16.), new Vector4(9 / 16., 7 / 16., 7 / 16., 9 / 16.)),
 
       // Bottom face.
-      new Quad(new Vector3(7 / 16., 0, 7 / 16.), new Vector3(9 / 16., 0, 7 / 16.),
-          new Vector3(7 / 16., 0, 9 / 16.), new Vector4(7 / 16., 9 / 16., 7 / 16., 9 / 16.), true),
+      new DoubleSidedQuad(new Vector3(7 / 16., 0, 7 / 16.), new Vector3(9 / 16., 0, 7 / 16.),
+          new Vector3(7 / 16., 0, 9 / 16.), new Vector4(7 / 16., 9 / 16., 7 / 16., 9 / 16.)),
   };
 
   private static final Quad[][] connector = {
       // Front side.
       {
           // Center face.
-          new Quad(new Vector3(.5, 1, .5), new Vector3(.5, 1, 0),
-              new Vector3(.5, 0, .5), new Vector4(.5, 0, 1, 0), true),
+          new DoubleSidedQuad(new Vector3(.5, 1, .5), new Vector3(.5, 1, 0),
+              new Vector3(.5, 0, .5), new Vector4(.5, 0, 1, 0)),
 
           // Top face.
-          new Quad(new Vector3(9 / 16., 1, 0), new Vector3(7 / 16., 1, 0),
-              new Vector3(9 / 16., 1, 7 / 16.), new Vector4(9 / 16., 7 / 16., 0, 7 / 16.), true),
+          new DoubleSidedQuad(new Vector3(9 / 16., 1, 0), new Vector3(7 / 16., 1, 0),
+              new Vector3(9 / 16., 1, 7 / 16.), new Vector4(9 / 16., 7 / 16., 0, 7 / 16.)),
 
           // Bottom face.
-          new Quad(new Vector3(7 / 16., 0, 0), new Vector3(9 / 16., 0, 0),
-              new Vector3(7 / 16., 0, 7 / 16.), new Vector4(7 / 16., 9 / 16., 0, 7 / 16.), true),
+          new DoubleSidedQuad(new Vector3(7 / 16., 0, 0), new Vector3(9 / 16., 0, 0),
+              new Vector3(7 / 16., 0, 7 / 16.), new Vector4(7 / 16., 9 / 16., 0, 7 / 16.)),
 
       },
       // Back side.
       {
           // Center face.
-          new Quad(new Vector3(.5, 1, 1), new Vector3(.5, 1, .5),
-              new Vector3(.5, 0, 1), new Vector4(1, .5, 1, 0), true),
+          new DoubleSidedQuad(new Vector3(.5, 1, 1), new Vector3(.5, 1, .5),
+              new Vector3(.5, 0, 1), new Vector4(1, .5, 1, 0)),
 
           // Top face.
-          new Quad(new Vector3(9 / 16., 1, 9 / 16.), new Vector3(7 / 16., 1, 9 / 16.),
-              new Vector3(9 / 16., 1, 1), new Vector4(9 / 16., 7 / 16., 9 / 16., 1), true),
+          new DoubleSidedQuad(new Vector3(9 / 16., 1, 9 / 16.), new Vector3(7 / 16., 1, 9 / 16.),
+              new Vector3(9 / 16., 1, 1), new Vector4(9 / 16., 7 / 16., 9 / 16., 1)),
 
           // Bottom face.
-          new Quad(new Vector3(7 / 16., 0, 9 / 16.), new Vector3(9 / 16., 0, 9 / 16.),
-              new Vector3(7 / 16., 0, 1), new Vector4(7 / 16., 9 / 16., 9 / 16., 1), true),
+          new DoubleSidedQuad(new Vector3(7 / 16., 0, 9 / 16.), new Vector3(9 / 16., 0, 9 / 16.),
+              new Vector3(7 / 16., 0, 1), new Vector4(7 / 16., 9 / 16., 9 / 16., 1)),
       },
   };
 

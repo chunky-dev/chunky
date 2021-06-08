@@ -17,7 +17,11 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.BlockData;
+import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
+import se.llbit.math.QuickMath;
+import se.llbit.math.Ray;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -127,9 +131,9 @@ public class CocoaPlantModel extends QuadModel {
   };
   //endregion
 
-  private static final Quad stemNorth = new Quad(
+  private static final Quad stemNorth = new DoubleSidedQuad(
       new Vector3(.5, 12 / 16., .5), new Vector3(.5, 12 / 16., 1),
-      new Vector3(.5, 1, .5), new Vector4(.5, 1, 12 / 16., 1), true);
+      new Vector3(.5, 1, .5), new Vector4(.5, 1, 12 / 16., 1));
 
   private static final Quad[][][] fruit = new Quad[3][4][];
   private static final Quad[] stem = new Quad[4];

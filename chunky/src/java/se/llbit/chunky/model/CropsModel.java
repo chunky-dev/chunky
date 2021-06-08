@@ -17,6 +17,7 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -25,17 +26,17 @@ import java.util.Arrays;
 
 public class CropsModel extends QuadModel {
   private static final Quad[] quads = {
-      new Quad(new Vector3(1, 0, .25), new Vector3(0, 0, .25),
-          new Vector3(1, 1, .25), new Vector4(1, 0, 0, 1), true),
+      new DoubleSidedQuad(new Vector3(1, 0, .25), new Vector3(0, 0, .25),
+          new Vector3(1, 1, .25), new Vector4(1, 0, 0, 1)),
 
-      new Quad(new Vector3(0, 0, .75), new Vector3(1, 0, .75),
-          new Vector3(0, 1, .75), new Vector4(0, 1, 0, 1), true),
+      new DoubleSidedQuad(new Vector3(0, 0, .75), new Vector3(1, 0, .75),
+          new Vector3(0, 1, .75), new Vector4(0, 1, 0, 1)),
 
-      new Quad(new Vector3(.25, 0, 0), new Vector3(.25, 0, 1),
-          new Vector3(.25, 1, 0), new Vector4(0, 1, 0, 1), true),
+      new DoubleSidedQuad(new Vector3(.25, 0, 0), new Vector3(.25, 0, 1),
+          new Vector3(.25, 1, 0), new Vector4(0, 1, 0, 1)),
 
-      new Quad(new Vector3(.75, 0, 1), new Vector3(.75, 0, 0),
-          new Vector3(.75, 1, 1), new Vector4(1, 0, 0, 1), true),
+      new DoubleSidedQuad(new Vector3(.75, 0, 1), new Vector3(.75, 0, 0),
+          new Vector3(.75, 1, 1), new Vector4(1, 0, 0, 1)),
   };
 
   private final Texture[] textures;
