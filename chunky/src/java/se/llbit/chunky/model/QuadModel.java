@@ -4,6 +4,7 @@ import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 
 /**
@@ -47,6 +48,9 @@ public abstract class QuadModel implements BlockModel {
           color = c;
           ray.t = ray.tNext;
           ray.n.set(quad.n);
+          if (quad.doubleSided) {
+            ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
+          }
           hit = true;
         }
       }

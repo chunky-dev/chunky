@@ -231,7 +231,6 @@ public class HopperModel extends QuadModel {
       )
   };
 
-
   private static final Quad[] quadsSide = new Quad[]{
       new Quad(
           new Vector3(0 / 16.0, 11 / 16.0, 16 / 16.0),
