@@ -19,7 +19,6 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.math.AABB;
-import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -64,9 +63,9 @@ public class HopperModel {
       new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),
   };
 
-  private static final Quad bottom = new DoubleSidedQuad(new Vector3(2 / 16., 10 / 16., 2 / 16.),
+  private static final Quad bottom = new Quad(new Vector3(2 / 16., 10 / 16., 2 / 16.),
       new Vector3(14 / 16., 10 / 16., 2 / 16.), new Vector3(2 / 16., 10 / 16., 14 / 16.),
-      new Vector4(2 / 16., 14 / 16., 2 / 16., 14 / 16.));
+      new Vector4(2 / 16., 14 / 16., 2 / 16., 14 / 16.), true);
 
   public static boolean intersect(Ray ray) {
     int direction = 7 & (ray.getCurrentData() >> BlockData.OFFSET);

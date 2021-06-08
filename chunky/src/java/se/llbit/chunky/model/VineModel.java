@@ -17,7 +17,6 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -28,24 +27,24 @@ import java.util.Arrays;
 public class VineModel extends QuadModel {
   private static final Quad[] model = {
       // North
-      new DoubleSidedQuad(new Vector3(0, 0, 0.8 / 16), new Vector3(1, 0, 0.8 / 16),
-          new Vector3(0, 1, 0.8 / 16), new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(0, 0, 0.8 / 16), new Vector3(1, 0, 0.8 / 16),
+          new Vector3(0, 1, 0.8 / 16), new Vector4(0, 1, 0, 1), true),
 
       // South
-      new DoubleSidedQuad(new Vector3(1, 0, 15.2 / 16), new Vector3(0, 0, 15.2 / 16),
-          new Vector3(1, 1, 15.2 / 16), new Vector4(1, 0, 0, 1)),
+      new Quad(new Vector3(1, 0, 15.2 / 16), new Vector3(0, 0, 15.2 / 16),
+          new Vector3(1, 1, 15.2 / 16), new Vector4(1, 0, 0, 1), true),
 
       // East
-      new DoubleSidedQuad(new Vector3(15.2 / 16, 0, 0), new Vector3(15.2 / 16, 0, 1),
-          new Vector3(15.2 / 16, 1, 0), new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(15.2 / 16, 0, 0), new Vector3(15.2 / 16, 0, 1),
+          new Vector3(15.2 / 16, 1, 0), new Vector4(0, 1, 0, 1), true),
 
       // West
-      new DoubleSidedQuad(new Vector3(0.8 / 16, 0, 1), new Vector3(0.8 / 16, 0, 0),
-          new Vector3(0.8 / 16, 1, 1), new Vector4(1, 0, 0, 1)),
+      new Quad(new Vector3(0.8 / 16, 0, 1), new Vector3(0.8 / 16, 0, 0),
+          new Vector3(0.8 / 16, 1, 1), new Vector4(1, 0, 0, 1), true),
 
       // Top
-      new DoubleSidedQuad(new Vector3(0, 15.2 / 16, 0), new Vector3(1, 15.2 / 16, 0),
-          new Vector3(0, 15.2 / 16, 1), new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(0, 15.2 / 16, 0), new Vector3(1, 15.2 / 16, 0),
+          new Vector3(0, 15.2 / 16, 1), new Vector4(0, 1, 0, 1), true),
   };
 
 
