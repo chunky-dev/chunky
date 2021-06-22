@@ -151,7 +151,7 @@ public class MojangApi {
    * Get the skin URL from the given profile. To get a profile, use {@link #fetchProfile(String)}.
    *
    * @param profile Player profile
-   * @return Skin URL (null if the player has no skin)
+   * @return Skin (null if the player has no skin)
    */
   public static PlayerSkin getSkinFromProfile(JsonObject profile) {
     JsonArray properties = profile.get("properties").asArray();

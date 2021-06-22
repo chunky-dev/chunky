@@ -906,11 +906,13 @@ public class Scene implements JsonSerializable, Refreshable {
           try {
             profile = MojangApi.fetchProfile(entity.uuid);
             PlayerSkin skin = MojangApi.getSkinFromProfile(profile);
-            String skinUrl = skin.getUrl();
-            if (skinUrl != null) {
-              entity.skin = MojangApi.downloadSkin(skinUrl).getAbsolutePath();
+            if (skin != null) {
+              String skinUrl = skin.getUrl();
+              if (skinUrl != null) {
+                entity.skin = MojangApi.downloadSkin(skinUrl).getAbsolutePath();
+              }
+              entity.model = skin.getModel();
             }
-            entity.model = skin.getModel();
           } catch (IOException e) {
             Log.error(e);
             profile = new JsonObject();
