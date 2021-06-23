@@ -57,7 +57,7 @@ public class Door extends AbstractModelBlock {
   }
 
   public String getHinge() {
-    return mirrored == 0 ? "left" : "right";
+    return hinge;
   }
 
   public boolean isOpen() {
