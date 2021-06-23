@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -17,6 +17,6 @@
  */
 package se.llbit.chunky.renderer;
 
-public interface RendererFactory {
-  Renderer newRenderer(RenderContext context, boolean headless);
+public interface RenderManagerFactory {
+  RenderManager newRenderManager(RenderContext context, boolean headless);
 }

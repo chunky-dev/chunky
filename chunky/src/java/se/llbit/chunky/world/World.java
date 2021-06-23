@@ -420,13 +420,8 @@ public class World implements Comparable<World> {
     Map<ChunkPosition, Set<ChunkPosition>> regionMap = new HashMap<>();
 
     for (ChunkPosition chunk : chunks) {
-
       ChunkPosition regionPosition = chunk.regionPosition();
-      Set<ChunkPosition> chunkSet = regionMap.get(regionPosition);
-      if (chunkSet == null) {
-        chunkSet = new HashSet<>();
-        regionMap.put(regionPosition, chunkSet);
-      }
+      Set<ChunkPosition> chunkSet = regionMap.computeIfAbsent(regionPosition, k -> new HashSet<>());
       chunkSet.add(ChunkPosition.get(chunk.x & 31, chunk.z & 31));
     }
 
@@ -554,6 +549,13 @@ public class World implements Comparable<World> {
   public void addChunkTopographyListener(ChunkTopographyListener listener) {
     synchronized (chunkTopographyListeners) {
       chunkTopographyListeners.add(listener);
+    }
+  }
+
+  /** Remove a chunk discovery listener */
+  public void removeChunkTopographyListener(ChunkTopographyListener listener) {
+    synchronized (chunkTopographyListeners) {
+      chunkTopographyListeners.remove(listener);
     }
   }
 

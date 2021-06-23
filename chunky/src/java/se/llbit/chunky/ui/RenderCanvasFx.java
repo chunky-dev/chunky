@@ -41,11 +41,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.stage.PopupWindow;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.renderer.RenderMode;
-import se.llbit.chunky.renderer.RenderStatusListener;
-import se.llbit.chunky.renderer.Renderer;
-import se.llbit.chunky.renderer.Repaintable;
-import se.llbit.chunky.renderer.SceneStatusListener;
+import se.llbit.chunky.renderer.*;
+import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.math.Vector2;
 
@@ -67,7 +64,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   private final Canvas canvas;
   private final Group guideGroup;
   private final StackPane canvasPane;
-  private final Renderer renderer;
+  private final RenderManager renderManager;
   private int lastX;
   private int lastY;
   private Vector2 target = new Vector2(0, 0);
@@ -77,10 +74,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
   private RenderStatusListener renderListener;
 
-  public RenderCanvasFx(se.llbit.chunky.renderer.scene.Scene scene, Renderer renderer) {
+  public RenderCanvasFx(se.llbit.chunky.renderer.scene.Scene scene, RenderManager renderManager) {
     this.renderScene = scene;
-    this.renderer = renderer;
-    renderer.addSceneStatusListener(this);
+    this.renderManager = renderManager;
+    renderManager.addSceneStatusListener(this);
 
     tooltip.setAutoHide(true);
     tooltip.setConsumeAutoHidingEvents(false);
@@ -222,7 +219,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
         camera.setFoV(newValue);
       }
     });
-    renderer.setCanvas(this);
+    renderManager.setCanvas(this);
 
     viewportBoundsProperty().addListener((observable, oldValue, newValue) -> updateCanvasPane());
 
@@ -369,7 +366,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
   public void forceRepaint() {
     painting.set(true);
-    renderer.withBufferedImage(bitmap -> {
+    renderManager.withBufferedImage(bitmap -> {
       if (bitmap.width == (int) image.getWidth()
           && bitmap.height == (int) image.getHeight()) {
         image.getPixelWriter().setPixels(0, 0, bitmap.width, bitmap.height, PIXEL_FORMAT,

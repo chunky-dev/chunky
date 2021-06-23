@@ -1,4 +1,5 @@
 /* Copyright (c) 2014-2015 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -14,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.util;
+package se.llbit.util.mojangapi;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,31 +25,43 @@ import java.io.PrintStream;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.util.Base64;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.net.ssl.HttpsURLConnection;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonValue;
 import se.llbit.json.PrettyPrinter;
+import se.llbit.log.Log;
+import se.llbit.util.Util;
 
 /**
  * Utility class to download Minecraft Jars and player data.
- *
- * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class MCDownloader {
+public class MojangApi {
 
-  /** Download a Minecraft Jar by version name. */
-  public static void downloadMC(String version, File destination) throws IOException {
+  // the base64-encoded string might not be valid json (sometimes keys are not quoted)
+  // so we use a regex to extract the skin url
+  private static final Pattern SKIN_URL_FROM_OBJECT = Pattern
+  .compile("\"?SKIN\"?\\s*:\\s*\\{(.*)\"?url\"?\\s*:\\s*\"([^\"]*)\"", Pattern.DOTALL);
+
+  /**
+   * Download a Minecraft Jar by version name.
+   */
+  public static void downloadMinecraft(String version, File destination) throws IOException {
     String theUrl = getClientUrl(getVersionManifestUrl(version));
     System.out.println("url: " + theUrl);
     System.out.println("destination: " + destination.getAbsolutePath());
     URL url = new URL(theUrl);
     try (
-      ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
-      FileOutputStream out = new FileOutputStream(destination)
+        ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
+        FileOutputStream out = new FileOutputStream(destination)
     ) {
       out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
     }
@@ -113,24 +126,87 @@ public class MCDownloader {
     }
   }
 
-  /** Download a player skin by player name. */
-  public static void downloadSkin(String name, File destDir) throws IOException {
-    String theUrl = String.format("http://s3.amazonaws.com/MinecraftSkins/%s.png", name);
-    File destination = new File(destDir, name + ".skin.png");
-    URL url = new URL(theUrl);
-    try (
-      ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
-      FileOutputStream out = new FileOutputStream(destination)
-    ) {
-      out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
+  /**
+   * Download a player skin by its URL or get it from the cache.
+   *
+   * @param url URL of the skin
+   * @return Cached file of the skin
+   */
+  public static File downloadSkin(String url) throws IOException {
+    if (!PersistentSettings.cacheDirectory().isDirectory()) {
+      PersistentSettings.cacheDirectory().mkdirs();
     }
+    File file = new File(PersistentSettings.cacheDirectory(),
+        Util.cacheEncode((url + ":skin").hashCode()));
+    if (!file.exists()) {
+      try (ReadableByteChannel inChannel = Channels.newChannel(new URL(url).openStream());
+          FileOutputStream out = new FileOutputStream(file)) {
+        out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
+      }
+    }
+    return file;
+  }
+
+  /**
+   * Get the skin URL from the given profile. To get a profile, use {@link #fetchProfile(String)}.
+   *
+   * @param profile Player profile
+   * @return Skin (null if the player has no skin)
+   */
+  public static PlayerSkin getSkinFromProfile(JsonObject profile) {
+    JsonArray properties = profile.get("properties").asArray();
+    Optional<String> textureBase64 = properties.elements.stream()
+        .filter((p) -> p.asObject().get("name").stringValue("").equals("textures")).findFirst()
+        .map(obj -> obj.asObject().get("value").stringValue(null));
+    return textureBase64.map(MojangApi::getSkinFromEncodedTextures).orElse(null);
+  }
+
+  /**
+   * Get the skin URL from the given base64-encoded texture string. This format is used in player
+   * profiles and in entity tags of player heads.
+   *
+   * @param textureBase64 Base64-encoded texture string
+   * @return Skin information
+   */
+  public static PlayerSkin getSkinFromEncodedTextures(String textureBase64) {
+    String decoded = new String(Base64.getDecoder().decode(fixBase64Padding(textureBase64)));
+    PlayerModel model = decoded.contains("\"slim\"") ? PlayerModel.ALEX : PlayerModel.STEVE;
+    Matcher matcher = SKIN_URL_FROM_OBJECT.matcher(decoded);
+    if (matcher.find()) {
+      return new PlayerSkin(matcher.group(2), model);
+    } else {
+      Log.warn("Could not get skull texture from json: " + decoded);
+      return new PlayerSkin(null, model);
+    }
+  }
+
+  /**
+   * Get the given Base64 string with proper padding. Sometimes the base64-encoded texture string
+   * isn't padded properly which would cause an IllegalArgumentException (wrong 4-byte ending unit)
+   * because Java can't handle that.
+   *
+   * @param base64String Base64 string with or without proper padding
+   * @return Base64 string with proper padding
+   */
+  private static String fixBase64Padding(String base64String) {
+    // the length of a base64 string must be a multiple of 4
+    int missingPadding = (4 - (base64String.length() % 4)) % 4;
+    if (missingPadding == 0) {
+      return base64String;
+    }
+
+    StringBuilder fixedBase64 = new StringBuilder(base64String);
+    for (int i = 0; i < missingPadding; i++) {
+      fixedBase64.append("=");
+    }
+    return fixedBase64.toString();
   }
 
   /**
    * Download a Minecraft player profile.
    *
    * @param uuid UUID of player
-   * @throws IOException
+   * @throws IOException if downloading the profile failed
    */
   public static JsonObject fetchProfile(String uuid) throws IOException {
     String key = uuid + ":profile";
@@ -159,7 +235,6 @@ public class MCDownloader {
     if (responseCode == 200) {
       try (JsonParser parser = new JsonParser(conn.getInputStream())) {
         profile = parser.parse().object();
-        // TODO unparse base64 data.
       } catch (JsonParser.SyntaxError e) {
         e.printStackTrace(System.err);
         profile = new JsonObject();

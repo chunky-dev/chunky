@@ -1,4 +1,5 @@
-/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -412,6 +413,15 @@ public final class PersistentSettings {
 
   public static String getOctreeImplementation() {
     return settings.getString("octreeImplementation", "PACKED");
+  }
+
+  public static void setBvhMethod(String method) {
+    settings.setString("bvhMethod", method);
+    save();
+  }
+
+  public static String getBvhMethod() {
+    return settings.getString("bvhMethod", "SAH_MA");
   }
 
   public static void setGridSizeDefault(int value) {

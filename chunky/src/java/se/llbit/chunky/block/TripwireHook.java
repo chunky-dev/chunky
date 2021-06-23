@@ -4,7 +4,7 @@ import se.llbit.chunky.model.TripwireHookModel;
 import se.llbit.chunky.resources.Texture;
 
 public class TripwireHook extends AbstractModelBlock {
-
+  private final BlockFace facing;
   private final String description;
 
   public TripwireHook(String facingString, boolean attached, boolean powered) {
@@ -28,10 +28,20 @@ public class TripwireHook extends AbstractModelBlock {
         break;
     }
     this.model = new TripwireHookModel(facing, attached, powered);
+    this.facing = new BlockFace[]{
+        BlockFace.NORTH,
+        BlockFace.EAST,
+        BlockFace.SOUTH,
+        BlockFace.WEST
+    }[facing];
   }
 
   @Override
   public String description() {
     return description;
   }
+
+    public BlockFace getFacing() {
+        return this.facing;
+    }
 }

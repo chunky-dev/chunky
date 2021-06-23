@@ -51,17 +51,17 @@ If you have any questions, please don't hesitate to reach out via Reddit, Discor
 </details>
 
 <details>
-<summary><strong>Why can I only open 1.12 worlds but not 1.13+ worlds (or vice versa)?</strong></summary>
+<summary><strong>Which Minecraft versions are supported?</strong></summary>
 
-> Minecraft 1.13 introduced a new world format that is incompatible with the old format. Chunky 2 is only compatible with the new world format and Chunky 1 is only compatible with the old world format.
+> Starting with Chunky 2.4.0, we support Minecraft 1.2 or later, including 1.17 worlds with increased height.
 > 
-> We [have plans][14] to improve this one day. For now, you'll need to use the appropriate Chunky version for your Minecraft version.
+> We add new blocks shortly after a new Minecraft snapshot is released. Use the latest Chunky snapshot to render them until a new Chunky version is released.
 </details>
 
 <details>
 <summary><strong>Is GPU rendering supported?</strong></summary>
 
-> GPU support is not actively being worked on right now. If you'd like to tackle this, PRs are welcome!
+> There is a work-in-progress [OpenCL plugin for Chunky][14]. If you'd like to help with this, PRs are welcome!
 </details>
 
 <details>
@@ -199,5 +199,5 @@ See the file `licenses/fast-util.txt` for the copyright notice.
 [11]: https://chunky.llbit.se/skymaps.html
 [12]: http://chunkyupdate.lemaik.de/ChunkyLauncher.jar
 [13]: https://www.java.com/en/download/manual.jsp
-[14]: https://github.com/llbit/chunky/issues/553
+[14]: https://github.com/alexhliu/ChunkyClPlugin
 [15]: https://discord.gg/VqcHpsF

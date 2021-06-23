@@ -17,6 +17,7 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Sun;
 import se.llbit.chunky.resources.texturepack.AllTextures;
 import se.llbit.chunky.resources.texturepack.AlternateTextures;
@@ -33,12 +34,15 @@ import se.llbit.chunky.resources.texturepack.GrassColorTexture;
 import se.llbit.chunky.resources.texturepack.IndexedTexture;
 import se.llbit.chunky.resources.texturepack.LargeChestTexture;
 import se.llbit.chunky.resources.texturepack.LayeredTextureLoader;
+import se.llbit.chunky.resources.texturepack.PaintingBackTexture;
+import se.llbit.chunky.resources.texturepack.PaintingTexture;
+import se.llbit.chunky.resources.texturepack.PaintingTextureAdapter;
+import se.llbit.chunky.resources.texturepack.PlayerTextureLoader;
 import se.llbit.chunky.resources.texturepack.SplitLargeChestTexture;
 import se.llbit.chunky.resources.texturepack.RotatedTextureLoader;
 import se.llbit.chunky.resources.texturepack.ShulkerTextureLoader;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
 import se.llbit.chunky.resources.texturepack.TextureLoader;
-import se.llbit.chunky.resources.texturepack.ThinArmEntityTextureLoader;
 import se.llbit.log.Log;
 import se.llbit.resources.ImageLoader;
 import se.llbit.util.NotNull;
@@ -2452,17 +2456,46 @@ public class TexturePackLoader {
         new AnimatedTextureLoader("assets/minecraft/textures/blocks/fire_layer_1",
             Texture.fireLayer1)));
 
-    allTextures.put("paintings_zetterstrand",
-        new SimpleTexture("assets/minecraft/textures/painting/paintings_kristoffer_zetterstrand",
-            Texture.paintings));
+    allTextures.put("paintings_zetterstrand", new AlternateTextures(
+        new PaintingTextureAdapter(),
+        new AllTextures(
+            new PaintingTexture("assets/minecraft/textures/painting/alban", Texture.paintingAlban),
+            new PaintingTexture("assets/minecraft/textures/painting/aztec2", Texture.paintingAztec2),
+            new PaintingTexture("assets/minecraft/textures/painting/aztec", Texture.paintingAztec),
+            new PaintingTexture("assets/minecraft/textures/painting/back", Texture.paintingBack),
+            new PaintingTexture("assets/minecraft/textures/painting/bomb", Texture.paintingBomb),
+            new PaintingTexture("assets/minecraft/textures/painting/burning_skull", Texture.paintingBurningSkull),
+            new PaintingTexture("assets/minecraft/textures/painting/bust", Texture.paintingBust),
+            new PaintingTexture("assets/minecraft/textures/painting/courbet", Texture.paintingCourbet),
+            new PaintingTexture("assets/minecraft/textures/painting/creebet", Texture.paintingCreebet),
+            new PaintingTexture("assets/minecraft/textures/painting/donkey_kong", Texture.paintingDonkeyKong),
+            new PaintingTexture("assets/minecraft/textures/painting/fighters", Texture.paintingFighters),
+            new PaintingTexture("assets/minecraft/textures/painting/graham", Texture.paintingGraham),
+            new PaintingTexture("assets/minecraft/textures/painting/kebab", Texture.paintingKebab),
+            new PaintingTexture("assets/minecraft/textures/painting/match", Texture.paintingMatch),
+            new PaintingTexture("assets/minecraft/textures/painting/pigscene", Texture.paintingPigscene),
+            new PaintingTexture("assets/minecraft/textures/painting/plant", Texture.paintingPlant),
+            new PaintingTexture("assets/minecraft/textures/painting/pointer", Texture.paintingPointer),
+            new PaintingTexture("assets/minecraft/textures/painting/pool", Texture.paintingPool),
+            new PaintingTexture("assets/minecraft/textures/painting/sea", Texture.paintingSea),
+            new PaintingTexture("assets/minecraft/textures/painting/skeleton", Texture.paintingSkeleton),
+            new PaintingTexture("assets/minecraft/textures/painting/skull_and_roses", Texture.paintingSkullAndRoses),
+            new PaintingTexture("assets/minecraft/textures/painting/stage", Texture.paintingStage),
+            new PaintingTexture("assets/minecraft/textures/painting/sunset", Texture.paintingSunset),
+            new PaintingTexture("assets/minecraft/textures/painting/void", Texture.paintingVoid),
+            new PaintingTexture("assets/minecraft/textures/painting/wanderer", Texture.paintingWanderer),
+            new PaintingTexture("assets/minecraft/textures/painting/wasteland", Texture.paintingWasteland),
+            new PaintingTexture("assets/minecraft/textures/painting/wither", Texture.paintingWither),
+            new PaintingBackTexture("assets/minecraft/textures/painting/back", Texture.paintingBack)
+        )));
     allTextures.put("font_default", new AlternateTextures(
         new JsonFontTextureLoader("assets/minecraft/font/default.json"), // MC 1.13
         new AsciiFontTextureLoader("assets/minecraft/textures/font/ascii"))); // MC 1.6
 
     allTextures.put("alex",
-        new ThinArmEntityTextureLoader("assets/minecraft/textures/entity/alex", Texture.alex));
+        new PlayerTextureLoader("assets/minecraft/textures/entity/alex", Texture.alex, PlayerModel.ALEX));
     allTextures.put("steve",
-        new EntityTextureLoader("assets/minecraft/textures/entity/steve", Texture.steve));
+        new PlayerTextureLoader("assets/minecraft/textures/entity/steve", Texture.steve, PlayerModel.STEVE));
     allTextures.put("creeper",
         new EntityTextureLoader("assets/minecraft/textures/entity/creeper/creeper",
             Texture.creeper));
@@ -3534,6 +3567,23 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/green_candle", Texture.greenCandle);
     addSimpleTexture("assets/minecraft/textures/block/red_candle", Texture.redCandle);
     addSimpleTexture("assets/minecraft/textures/block/black_candle", Texture.blackCandle);
+    addSimpleTexture("assets/minecraft/textures/block/candle_lit", Texture.candleLit);
+    addSimpleTexture("assets/minecraft/textures/block/white_candle_lit", Texture.whiteCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/orange_candle_lit", Texture.orangeCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/magenta_candle_lit", Texture.magentaCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/light_blue_candle_lit", Texture.lightBlueCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/yellow_candle_lit", Texture.yellowCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/lime_candle_lit", Texture.limeCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/pink_candle_lit", Texture.pinkCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/gray_candle_lit", Texture.grayCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/light_gray_candle_lit", Texture.lightGrayCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/cyan_candle_lit", Texture.cyanCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/purple_candle_lit", Texture.purpleCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/blue_candle_lit", Texture.blueCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/brown_candle_lit", Texture.brownCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/green_candle_lit", Texture.greenCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/red_candle_lit", Texture.redCandleLit);
+    addSimpleTexture("assets/minecraft/textures/block/black_candle_lit", Texture.blackCandleLit);
     addSimpleTexture("assets/minecraft/textures/particle/flame", Texture.flameParticle);
     addSimpleTexture("assets/minecraft/textures/block/copper_ore", Texture.copperOre);
     addSimpleTexture("assets/minecraft/textures/block/calcite", Texture.calcite);
@@ -3578,7 +3628,7 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/flowering_azalea_top", Texture.floweringAzaleaTop);
     addSimpleTexture("assets/minecraft/textures/block/flowering_azalea_side", Texture.floweringAzaleaSide);
     addSimpleTexture("assets/minecraft/textures/block/azalea_leaves", Texture.azaleaLeaves);
-    addSimpleTexture("assets/minecraft/textures/block/azalea_leaves_flowers", Texture.azaleaLeavesFlowers);
+    addSimpleTexture("assets/minecraft/textures/block/flowering_azalea_leaves", Texture.floweringAzaleaLeaves);
     addSimpleTexture("assets/minecraft/textures/block/moss_block", Texture.mossBlock);
     addSimpleTexture("assets/minecraft/textures/block/cave_vines_plant", Texture.caveVinesPlant);
     addSimpleTexture("assets/minecraft/textures/block/cave_vines", Texture.caveVines);
@@ -3619,6 +3669,11 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/raw_copper_block", Texture.rawCopperBlock);
     addSimpleTexture("assets/minecraft/textures/block/raw_gold_block", Texture.rawGoldBlock);
     addSimpleTexture("assets/minecraft/textures/block/raw_iron_block", Texture.rawIronBlock);
+    addSimpleTexture("assets/minecraft/textures/block/potted_azalea_bush_top", Texture.pottedAzaleaBushTop);
+    addSimpleTexture("assets/minecraft/textures/block/potted_azalea_bush_side", Texture.pottedAzaleaBushSide);
+    addSimpleTexture("assets/minecraft/textures/block/potted_azalea_bush_plant", Texture.pottedAzaleaBushPlant);
+    addSimpleTexture("assets/minecraft/textures/block/potted_flowering_azalea_bush_top", Texture.pottedFloweringAzaleaBushTop);
+    addSimpleTexture("assets/minecraft/textures/block/potted_flowering_azalea_bush_side", Texture.pottedFloweringAzaleaBushSide);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

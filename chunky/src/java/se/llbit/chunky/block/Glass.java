@@ -7,7 +7,7 @@ public class Glass extends MinecraftBlock {
   public Glass(String name, Texture texture) {
     super(name, texture);
     opaque = false;
-    solid = true;
+    solid = false;
     ior = 1.52f;
   }
 

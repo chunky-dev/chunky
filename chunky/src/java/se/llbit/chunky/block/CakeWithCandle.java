@@ -10,10 +10,10 @@ public class CakeWithCandle extends AbstractModelBlock {
 
   private final boolean lit;
 
-  public CakeWithCandle(String name, Texture candle, boolean lit) {
+  public CakeWithCandle(String name, Texture candle, Texture candleLit, boolean lit) {
     super(name, Texture.cakeTop);
     this.lit = lit;
-    this.model = new CakeWithCandleModel(candle);
+    this.model = new CakeWithCandleModel(lit ? candleLit : candle);
   }
 
   public boolean isLit() {

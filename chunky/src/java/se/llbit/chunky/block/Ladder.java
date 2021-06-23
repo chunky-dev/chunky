@@ -10,7 +10,7 @@ public class Ladder extends AbstractModelBlock {
   public Ladder(String facingString) {
     super("ladder", Texture.ladder);
     this.description = "facing=" + facingString;
-
+    solid = false;
     int facing;
     switch (facingString) {
       default:

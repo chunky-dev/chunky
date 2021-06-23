@@ -8,7 +8,7 @@ public class EnderChest extends AbstractModelBlock {
   private final String description;
 
   public EnderChest(String facingString) {
-    super("chest", Texture.chestFront);
+    super("ender_chest", Texture.chestFront);
     this.description = "facing=" + facingString;
     int facing;
     switch (facingString) {

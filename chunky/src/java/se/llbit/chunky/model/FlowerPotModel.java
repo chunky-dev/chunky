@@ -59,7 +59,9 @@ public class FlowerPotModel extends QuadModel {
     WARPED_FUNGUS,
     CRIMSON_FUNGUS,
     WARPED_ROOTS,
-    CRIMSON_ROOTS
+    CRIMSON_ROOTS,
+    AZALEA_BUSH,
+    FLOWERING_AZALEA_BUSH
   }
 
   private static final Texture flowerpot = Texture.flowerPot;
@@ -74,6 +76,26 @@ public class FlowerPotModel extends QuadModel {
   private static final Texture cactus = Texture.cactusSide;
   private static final Texture[] cactusTex = new Texture[] {
       cactus_top, cactus, cactus, cactus, cactus
+  };
+
+  private static final Texture[] azaleaBushTex = {
+      Texture.pottedAzaleaBushTop, Texture.pottedAzaleaBushTop,
+      Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
+      Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
+      Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
+      Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
+      Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant,
+      Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant
+  };
+
+  private static final Texture[] floweringAzaleaBushTex = {
+      Texture.pottedFloweringAzaleaBushTop, Texture.pottedFloweringAzaleaBushTop,
+      Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
+      Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
+      Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
+      Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
+      Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant,
+      Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant
   };
 
   //region Quads
@@ -245,7 +267,7 @@ public class FlowerPotModel extends QuadModel {
       )
   };
 
-  protected static Quad[] flower = {
+  private static final Quad[] flower = {
       new Quad(new Vector3(0, 4 / 16., 0), new Vector3(1, 4 / 16., 1), new Vector3(0, 1, 0),
           new Vector4(0, 1, 0, 12 / 16.)),
 
@@ -259,7 +281,7 @@ public class FlowerPotModel extends QuadModel {
           new Vector4(0, 1, 0, 12 / 16.)),
   };
 
-  protected static Quad[] flowerSmall = {
+  private static final Quad[] flowerSmall = {
       new Quad(new Vector3(2 / 16., 4 / 16., 2 / 16.), new Vector3(14 / 16., 4 / 16., 14 / 16.),
           new Vector3(2 / 16., 1, 2 / 16.), new Vector4(0, 1, 0, 1)),
 
@@ -276,7 +298,7 @@ public class FlowerPotModel extends QuadModel {
           new Vector4(0, 1, 0, 1)),
   };
 
-  private static Quad[] bamboo = {
+  private static final Quad[] bamboo = {
       new Quad(
           new Vector3(7 / 16.0, 16 / 16.0, 9 / 16.0),
           new Vector3(9 / 16.0, 16 / 16.0, 9 / 16.0),
@@ -309,18 +331,110 @@ public class FlowerPotModel extends QuadModel {
         new Vector4(6 / 16.0, 8 / 16.0, 0 / 16.0, 16 / 16.0))
   };
 
-  private static Quad[] bambooLeaf = {
+  private static final Quad[] bambooLeaf = {
       new Quad(
           new Vector3(16 / 16.0, 2 / 16.0, 8 / 16.0),
           new Vector3(0 / 16.0, 2 / 16.0, 8 / 16.0),
           new Vector3(16 / 16.0, 18 / 16.0, 8 / 16.0),
           new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)),
       new Quad(
-        new Vector3(0 / 16.0, 2 / 16.0, 8 / 16.0),
-        new Vector3(16 / 16.0, 2 / 16.0, 8 / 16.0),
-        new Vector3(0 / 16.0, 18 / 16.0, 8 / 16.0),
-        new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 16 / 16.0))
+          new Vector3(0 / 16.0, 2 / 16.0, 8 / 16.0),
+          new Vector3(16 / 16.0, 2 / 16.0, 8 / 16.0),
+          new Vector3(0 / 16.0, 18 / 16.0, 8 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 16 / 16.0))
   };
+
+  private static final Quad[] azaleaBush = Model.join(new Quad[]{
+          new Quad(
+              new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector4(4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0)
+          ),
+          new Quad(
+              new Vector3(4 / 16.0, 15.9 / 16.0, 4 / 16.0),
+              new Vector3(12 / 16.0, 15.9 / 16.0, 4 / 16.0),
+              new Vector3(4 / 16.0, 15.9 / 16.0, 12 / 16.0),
+              new Vector4(4 / 16.0, 12 / 16.0, 12 / 16.0, 4 / 16.0)
+          ),
+          new Quad(
+              new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(4 / 16.0, 8 / 16.0, 4 / 16.0),
+              new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
+          ),
+          new Quad(
+              new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(12 / 16.0, 8 / 16.0, 4 / 16.0),
+              new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
+          ),
+          new Quad(
+              new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(4 / 16.0, 8 / 16.0, 12 / 16.0),
+              new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
+          ),
+          new Quad(
+              new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(12 / 16.0, 8 / 16.0, 12 / 16.0),
+              new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
+          ),
+          new Quad(
+              new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(4 / 16.0, 8 / 16.0, 12 / 16.0),
+              new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
+          ),
+          new Quad(
+              new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(4 / 16.0, 8 / 16.0, 4 / 16.0),
+              new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
+          ),
+          new Quad(
+              new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(12 / 16.0, 8 / 16.0, 12 / 16.0),
+              new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
+          ),
+          new Quad(
+              new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
+              new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+              new Vector3(12 / 16.0, 8 / 16.0, 4 / 16.0),
+              new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
+          )
+      },
+      Model.rotateY(new Quad[]{
+          new Quad(
+              new Vector3(2.6 / 16.0, 16 / 16.0, 8 / 16.0),
+              new Vector3(13.4 / 16.0, 16 / 16.0, 8 / 16.0),
+              new Vector3(2.6 / 16.0, 4 / 16.0, 8 / 16.0),
+              new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+          ),
+          new Quad(
+              new Vector3(13.4 / 16.0, 16 / 16.0, 8 / 16.0),
+              new Vector3(2.6 / 16.0, 16 / 16.0, 8 / 16.0),
+              new Vector3(13.4 / 16.0, 4 / 16.0, 8 / 16.0),
+              new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+          )
+      }, Math.toRadians(45)),
+      Model.rotateY(new Quad[]{
+          new Quad(
+              new Vector3(8 / 16.0, 16 / 16.0, 13.4 / 16.0),
+              new Vector3(8 / 16.0, 16 / 16.0, 2.6 / 16.0),
+              new Vector3(8 / 16.0, 4 / 16.0, 13.4 / 16.0),
+              new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+          ),
+          new Quad(
+              new Vector3(8 / 16.0, 16 / 16.0, 2.6 / 16.0),
+              new Vector3(8 / 16.0, 16 / 16.0, 13.4 / 16.0),
+              new Vector3(8 / 16.0, 4 / 16.0, 2.6 / 16.0),
+              new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+          )
+      }, Math.toRadians(45))
+  );
   //endregion
 
   private final Quad[] quads;
@@ -357,6 +471,15 @@ public class FlowerPotModel extends QuadModel {
         System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
         Arrays.fill(textures, flowerPotTex.length, flowerPotTex.length + bamboo.length, Texture.bambooStalk);
         Arrays.fill(textures, flowerPotTex.length + bamboo.length, textures.length, Texture.bambooSingleLeaf);
+        break;
+      case AZALEA_BUSH:
+      case FLOWERING_AZALEA_BUSH:
+        quads = Model.join(flowerPot, azaleaBush);
+        textures = new Texture[flowerPotTex.length + azaleaBush.length];
+        tints = null;
+        System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
+        System.arraycopy(kind == Kind.AZALEA_BUSH ? azaleaBushTex : floweringAzaleaBushTex, 0, textures,
+            flowerPotTex.length, textures.length - flowerPotTex.length);
         break;
       default:
         quads = Model.join(flowerPot, flowerSmall);

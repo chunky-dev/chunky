@@ -1,4 +1,5 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -16,24 +17,21 @@
  */
 package se.llbit.chunky.renderer;
 
-import se.llbit.chunky.main.ChunkyOptions;
-import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.SceneManager;
-import se.llbit.chunky.world.ChunkSelectionTracker;
 
 /**
- * Contains all state for the renderer.
+ * Contains all state for the renderManager.
  */
 public class RenderController {
   private final SceneManager sceneManager;
   private final SceneProvider sceneProvider;
-  private final Renderer renderer;
+  private final RenderManager renderManager;
   private final RenderContext context;
 
-  public RenderController(RenderContext context, Renderer renderer, SceneManager sceneManager,
-      SceneProvider sceneProvider) {
+  public RenderController(RenderContext context, RenderManager renderManager, SceneManager sceneManager,
+                          SceneProvider sceneProvider) {
     this.context = context;
-    this.renderer = renderer;
+    this.renderManager = renderManager;
     this.sceneManager = sceneManager;
     this.sceneProvider = sceneProvider;
   }
@@ -42,8 +40,8 @@ public class RenderController {
     return sceneManager;
   }
 
-  public Renderer getRenderer() {
-    return renderer;
+  public RenderManager getRenderManager() {
+    return renderManager;
   }
 
   public RenderContext getContext() {

@@ -42,11 +42,44 @@ public class VineModel extends QuadModel {
       // West
       new DoubleSidedQuad(new Vector3(0.8 / 16, 0, 1), new Vector3(0.8 / 16, 0, 0),
           new Vector3(0.8 / 16, 1, 1), new Vector4(1, 0, 0, 1)),
-
-      // Top
-      new DoubleSidedQuad(new Vector3(0, 15.2 / 16, 0), new Vector3(1, 15.2 / 16, 0),
-          new Vector3(0, 15.2 / 16, 1), new Vector4(0, 1, 0, 1)),
   };
+
+  /**
+   * It's not in Minecraft's block model file, but the top part of vines rotates depending on
+   * the presence of other sides. By manually checking the rotation for all 16 states,
+   * the lookup table below was created.
+   */
+  protected static final Quad[] topQuads;
+
+  static {
+    DoubleSidedQuad top90 =
+        new DoubleSidedQuad(new Vector3(0, 15.2 / 16, 0), new Vector3(1, 15.2 / 16, 0),
+            new Vector3(0, 15.2 / 16, 1), new Vector4(0, 1, 0, 1));
+
+    DoubleSidedQuad top = top90.transform(Transform.NONE.rotateNegY());
+    DoubleSidedQuad top180 = top90.transform(Transform.NONE.rotateY());
+    DoubleSidedQuad top270 = top180.transform(Transform.NONE.rotateY());
+
+    // bits of the index are other sides in order west,east,south,north
+    topQuads = new Quad[]{
+        top90,  // 0000
+        top270, // 0001
+        top90,  // 0010
+        top180, // 0011
+        top,    // 0100
+        top90,  // 0101
+        top180, // 0110
+        top90,  // 0111
+        top180, // 1000
+        top,    // 1001
+        top270, // 1010
+        top270, // 1011
+        top90,  // 1100
+        top,    // 1101
+        top180, // 1110
+        top90,  // 1111
+    };
+  }
 
 
   private final Quad[] quads;
