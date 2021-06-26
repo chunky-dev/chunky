@@ -3044,7 +3044,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (mode == RenderMode.PAUSED) {
       mode = RenderMode.RENDERING;
     }
-    samples.reset();
+    if (samples!=null) samples.reset();
     spp = 0;
     renderTime = 0;
     setResetReason(reason);
