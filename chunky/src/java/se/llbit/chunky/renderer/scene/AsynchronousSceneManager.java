@@ -91,7 +91,7 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
         Log.error("Chunky has run out of memory! Increase the memory given to Chunky in the launcher.");
       }
 
-      Log.error(e);
+      Log.error("Scene manager has crashed due to uncaught exception:", e);
       throw e;
     }
   }
