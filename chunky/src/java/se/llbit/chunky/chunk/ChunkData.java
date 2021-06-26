@@ -92,4 +92,9 @@ public interface ChunkData {
    * Reset the internal data to the initial state
    */
   void clear();
+
+  /**
+   * @return <code>true</code> if this is an empty (non-existing) chunk
+   */
+  boolean isEmpty();
 }

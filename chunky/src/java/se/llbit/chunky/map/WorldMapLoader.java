@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.map;
 
+import java.util.function.BiConsumer;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.ui.ChunkyFxController;
@@ -50,7 +51,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   /** The dimension to load in the current world. */
   private int currentDimension = PersistentSettings.getDimension();
 
-  private List<Consumer<World>> worldLoadListeners = new ArrayList<>();
+  private List<BiConsumer<World, Boolean>> worldLoadListeners = new ArrayList<>();
 
   public WorldMapLoader(ChunkyFxController controller, MapView mapView) {
     this.controller = controller;
@@ -73,6 +74,9 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
    */
   public void loadWorld(File worldDir) {
     if (World.isWorldDir(worldDir)) {
+      if (world != null) {
+        world.removeChunkTopographyListener(this);
+      }
       World newWorld = World.loadWorld(worldDir, currentDimension, World.LoggedWarnings.NORMAL);
       newWorld.addChunkTopographyListener(this);
       synchronized (this) {
@@ -82,12 +86,12 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
           PersistentSettings.setLastWorld(newWorldDir);
         }
       }
-      worldLoadListeners.forEach(listener -> listener.accept(newWorld));
+      worldLoadListeners.forEach(listener -> listener.accept(newWorld, false));
     }
   }
 
   /** Adds a listener to be notified when a new world has been loaded. */
-  public void addWorldLoadListener(Consumer<World> callback) {
+  public void addWorldLoadListener(BiConsumer<World, Boolean> callback) {
     worldLoadListeners.add(callback);
   }
 
@@ -133,13 +137,15 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
    * for the current world.
    */
   public void reloadWorld() {
+    topographyUpdater.clearQueue();
+    world.removeChunkTopographyListener(this);
     World newWorld = World.loadWorld(world.getWorldDirectory(), currentDimension,
         World.LoggedWarnings.NORMAL);
     newWorld.addChunkTopographyListener(this);
     synchronized (this) {
       world = newWorld;
     }
-    worldLoadListeners.forEach(listener -> listener.accept(newWorld));
+    worldLoadListeners.forEach(listener -> listener.accept(newWorld, true));
   }
 
   /**

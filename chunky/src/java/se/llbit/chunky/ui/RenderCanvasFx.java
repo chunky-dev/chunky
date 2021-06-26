@@ -40,11 +40,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.stage.PopupWindow;
-import se.llbit.chunky.renderer.RenderMode;
-import se.llbit.chunky.renderer.RenderStatusListener;
-import se.llbit.chunky.renderer.Renderer;
-import se.llbit.chunky.renderer.Repaintable;
-import se.llbit.chunky.renderer.SceneStatusListener;
+import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.*;
+import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.math.Vector2;
@@ -79,20 +77,20 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   private final Canvas canvas;
   private final Group guideGroup;
   private final StackPane canvasPane;
-  private final Renderer renderer;
+  private final RenderManager renderManager;
   private int lastX;
   private int lastY;
   private Vector2 target = new Vector2(0, 0);
   private Tooltip tooltip = new Tooltip();
 
-  private boolean fitToScreen = true;
+  private boolean fitToScreen = PersistentSettings.getCanvasFitToScreen();
 
   private RenderStatusListener renderListener;
 
-  public RenderCanvasFx(se.llbit.chunky.renderer.scene.Scene scene, Renderer renderer) {
+  public RenderCanvasFx(se.llbit.chunky.renderer.scene.Scene scene, RenderManager renderManager) {
     this.renderScene = scene;
-    this.renderer = renderer;
-    renderer.addSceneStatusListener(this);
+    this.renderManager = renderManager;
+    renderManager.addSceneStatusListener(this);
 
     tooltip.setAutoHide(true);
     tooltip.setConsumeAutoHidingEvents(false);
@@ -185,21 +183,33 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     for (int percent : new int[]{25, 50, 75, 100, 150, 200, 300, 400}) {
       RadioMenuItem item = new RadioMenuItem(String.format("%d%%", percent));
       item.setToggleGroup(scaleGroup);
+      item.setSelected(PersistentSettings.getCanvasScale() == percent && !fitToScreen);
       item.setOnAction(e -> {
         updateCanvasScale(percent / 100.0);
-        fitToScreen = false;
+        PersistentSettings.setCanvasScale(percent);
+        if (fitToScreen) {
+          fitToScreen = false;
+          PersistentSettings.setCanvasFitToScreen(false);
+        }
       });
       canvasScale.getItems().add(item);
     }
 
     RadioMenuItem fit = new RadioMenuItem("Fit to Screen");
-    fit.setSelected(true);
+    fit.setSelected(fitToScreen);
     fit.setToggleGroup(scaleGroup);
     fit.setOnAction(e -> {
       fitToScreen = true;
+      PersistentSettings.setCanvasFitToScreen(true);
       updateCanvasFit();
     });
     canvasScale.getItems().add(fit);
+
+    if (fitToScreen) {
+      updateCanvasFit();
+    } else {
+      updateCanvasScale(PersistentSettings.getCanvasScale() / 100.0);
+    }
 
     contextMenu.getItems().addAll(setTarget, showGuides, canvasScale);
 
@@ -223,7 +233,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
         camera.setFoV(newValue);
       }
     });
-    renderer.setCanvas(this);
+    renderManager.setCanvas(this);
 
     viewportBoundsProperty().addListener((observable, oldValue, newValue) -> updateCanvasPane());
 
@@ -282,14 +292,6 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
           break;
         case F:
           renderScene.camera().moveDown(modifier);
-          e.consume();
-          break;
-        case J:
-          renderScene.camera().moveBackward(modifier);
-          e.consume();
-          break;
-        case K:
-          renderScene.camera().moveForward(modifier);
           e.consume();
           break;
         case SPACE:
@@ -379,7 +381,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
   public void forceRepaint() {
     painting.set(true);
-    renderer.withBufferedImage(bitmap -> {
+    renderManager.withBufferedImage(bitmap -> {
       Pair<Integer, Integer> scaledSize = getScaledSize(bitmap.width, bitmap.height, REDUCED_CANVAS_MAX_SIZE);
       int width = scaledSize.thing1;
       int height = scaledSize.thing2;

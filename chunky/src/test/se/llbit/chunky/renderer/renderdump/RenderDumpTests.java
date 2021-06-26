@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
+import org.junit.Before;
 import org.junit.Test;
 import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -34,6 +35,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class RenderDumpTests {
   protected static final int testWidth = Scene.MIN_CANVAS_WIDTH;
@@ -64,7 +66,22 @@ public class RenderDumpTests {
     }
   }
 
-  protected static final TaskTracker taskTracker = new TaskTracker(ProgressListener.NONE);
+  protected TaskTracker taskTracker;
+
+  @Before
+  public void init() {
+    taskTracker = new TaskTracker(new ProgressListener() {
+      final Map<String, Integer> previousProgress = new HashMap<>();
+
+      @Override
+      public void setProgress(String task, int done, int start, int target) {
+        int previous = previousProgress.getOrDefault(task, Integer.MIN_VALUE);
+        // check that progress is monotonically increasing
+        assertTrue("progress (" + done + ") should be greater or equal to previous progress (" + previous + ")", done >= previous);
+        previousProgress.put(task, done);
+      }
+    });
+  }
 
   protected Scene createTestScene(int width, int height, int spp, long renderTime) {
     Scene scene = new Scene();

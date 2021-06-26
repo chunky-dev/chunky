@@ -1,4 +1,5 @@
-/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -20,6 +21,7 @@ import java.io.File;
 
 import se.llbit.chunky.renderer.RenderConstants;
 import se.llbit.chunky.resources.SettingsDirectory;
+import se.llbit.fxutil.WindowPosition;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
 
@@ -85,7 +87,7 @@ public final class PersistentSettings {
     changeSettingsDirectory(directory);
   }
 
-  private static void save() {
+  public static void save() {
     settings.save(settingsDir, settingsFile);
   }
 
@@ -413,8 +415,18 @@ public final class PersistentSettings {
     return settings.getString("octreeImplementation", "PACKED");
   }
 
+  public static void setBvhMethod(String method) {
+    settings.setString("bvhMethod", method);
+    save();
+  }
+
+  public static String getBvhMethod() {
+    return settings.getString("bvhMethod", "SAH_MA");
+  }
+
   public static void setGridSizeDefault(int value) {
     settings.setInt("gridSize", value);
+    save();
   }
 
   public static int getGridSizeDefault() {
@@ -423,6 +435,7 @@ public final class PersistentSettings {
 
   public static void setPreventNormalEmitterWithSampling(boolean value) {
     settings.setBool("preventNormalEmitterWithSampling", value);
+    save();
   }
 
   public static boolean getPreventNormalEmitterWithSampling() {
@@ -440,6 +453,52 @@ public final class PersistentSettings {
 
   public static void setDisableDefaultTextures(boolean value) {
     settings.setBool("disableDefaultTextures", value);
+    save();
+  }
+
+  public static int getCanvasScale() {
+    return settings.getInt("canvasScale", 100);
+  }
+
+  public static void setCanvasScale(int scale) {
+    settings.setInt("canvasScale", scale);
+    save();
+  }
+
+  public static boolean getCanvasFitToScreen() {
+    return settings.getBool("canvasFitToScreen", true);
+  }
+
+  public static void setCanvasFitToScreen(boolean fitToScreen) {
+    settings.setBool("canvasFitToScreen", fitToScreen);
+    save();
+  }
+
+  public static WindowPosition getPreviousWindowPosition() {
+    JsonValue windowX = settings.get("window.x");
+    JsonValue windowY = settings.get("window.y");
+    JsonValue windowWidth = settings.get("window.width");
+    JsonValue windowHeight = settings.get("window.height");
+    JsonValue windowMaximized = settings.get("window.maximized");
+
+    if (!windowX.isUnknown() && !windowY.isUnknown() && !windowWidth.isUnknown()
+        && !windowHeight.isUnknown() && !windowMaximized.isUnknown()) {
+      return new WindowPosition(
+          windowX.doubleValue(0),
+          windowY.doubleValue(0),
+          windowWidth.doubleValue(1800),
+          windowHeight.doubleValue(1000),
+          windowMaximized.boolValue(false));
+    }
+    return null;
+  }
+
+  public static void setWindowPosition(WindowPosition position) {
+    settings.setDouble("window.x", position.getX());
+    settings.setDouble("window.y", position.getY());
+    settings.setDouble("window.width", position.getWidth());
+    settings.setDouble("window.height", position.getHeight());
+    settings.setBool("window.maximized", position.isMaximized());
+    save();
   }
 }
-

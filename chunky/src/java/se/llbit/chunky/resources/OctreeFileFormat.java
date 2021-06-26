@@ -16,16 +16,12 @@
  */
 package se.llbit.chunky.resources;
 
-import static se.llbit.math.Octree.DATA_FLAG;
-
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-
-import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
-import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Lava;
 import se.llbit.chunky.block.Water;
@@ -37,7 +33,13 @@ import se.llbit.math.Octree;
 public class OctreeFileFormat {
 
   private static final int MIN_OCTREE_VERSION = 3;
-  private static final int OCTREE_VERSION = 5;
+  private static final int OCTREE_VERSION = 6;
+
+  /**
+   * In octree v3-v4, the top bit of the type field in a serialized octree node is reserved for
+   * indicating if the node is a data node.
+   */
+  private static final int DATA_FLAG = 0x80000000;
 
   /**
    * Load octrees and grass/foliage textures from a file.
@@ -61,6 +63,7 @@ public class OctreeFileFormat {
     if (version >= 4) {
       data.waterColors = WorldTexture.load(in);
     }
+    data.version = version;
     return data;
   }
 
@@ -137,5 +140,6 @@ public class OctreeFileFormat {
     public Octree worldTree, waterTree;
     public WorldTexture grassColors, foliageColors, waterColors;
     public BlockPalette palette;
+    public int version;
   }
 }

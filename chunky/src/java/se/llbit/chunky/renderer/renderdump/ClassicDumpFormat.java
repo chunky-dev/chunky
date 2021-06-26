@@ -34,7 +34,7 @@ class ClassicDumpFormat extends DumpFormat {
   @Override
   public void readSamples(DataInputStream inputStream, Scene scene, PixelConsumer consumer, LongConsumer pixelProgress)
       throws IOException {
-    int pixelIndex;
+    int pixelIndex, progress = 0;
     double r, g, b;
     // Warning: This format writes in columns instead of rows
     for (int x = 0; x < scene.width; ++x) {
@@ -44,7 +44,7 @@ class ClassicDumpFormat extends DumpFormat {
         g = inputStream.readDouble();
         b = inputStream.readDouble();
         consumer.consume(pixelIndex, r, g, b);
-        pixelProgress.accept(pixelIndex);
+        pixelProgress.accept(progress++);
       }
     }
   }

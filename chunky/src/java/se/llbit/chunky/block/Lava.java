@@ -3,9 +3,12 @@ package se.llbit.chunky.block;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
+import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Triangle;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
 import static se.llbit.chunky.block.Water.CORNER_0;
 import static se.llbit.chunky.block.Water.CORNER_1;
@@ -15,6 +18,10 @@ import static se.llbit.chunky.block.Water.FULL_BLOCK;
 
 public class Lava extends MinecraftBlockTranslucent {
   private static final AABB fullBlock = new AABB(0, 1, 0, 1, 0, 1);
+
+  private static final Quad bottom =
+      new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1));
 
   public final int level;
   public final int data;
@@ -49,12 +56,19 @@ public class Lava extends MinecraftBlockTranslucent {
       return false;
     }
 
+    boolean hit = false;
+    if (bottom.intersect(ray)) {
+      ray.n.set(bottom.n);
+      ray.n.scale(-QuickMath.signum(ray.d.dot(bottom.n)));
+      ray.t = ray.tNext;
+      hit = true;
+    }
+
     int c0 = (0xF & (data >> CORNER_0)) % 8;
     int c1 = (0xF & (data >> CORNER_1)) % 8;
     int c2 = (0xF & (data >> CORNER_2)) % 8;
     int c3 = (0xF & (data >> CORNER_3)) % 8;
     Triangle triangle = Water.t012[c0][c1][c2];
-    boolean hit = false;
     if (triangle.intersect(ray)) {
       ray.n.set(triangle.n);
       ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));

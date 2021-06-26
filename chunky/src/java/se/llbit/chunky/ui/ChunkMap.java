@@ -31,7 +31,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.stage.PopupWindow;
-import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
@@ -106,6 +105,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   private final Canvas canvas;
   private final Canvas mapOverlay;
 
+  private volatile boolean viewUpdateScheduled = false;
   private volatile boolean repaintQueued = false;
   private volatile boolean scheduledUpdate = false;
   private volatile long lastRedraw = 0;
@@ -137,6 +137,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     MenuItem clearSelection = new MenuItem("Clear selection");
     clearSelection.setGraphic(new ImageView(Icon.clear.fxImage()));
     clearSelection.setOnAction(event -> chunkSelection.clearSelection());
+    clearSelection.setDisable(chunkSelection.size() == 0);
 
     MenuItem newScene = new MenuItem("New scene from selection");
     newScene.setGraphic(new ImageView(Icon.sky.fxImage()));
@@ -144,6 +145,12 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       SceneManager sceneManager = controller.getRenderController().getSceneManager();
       sceneManager
           .loadFreshChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
+    });
+    newScene.setDisable(chunkSelection.size() == 0);
+    chunkSelection.addSelectionListener(() -> {
+      boolean noChunksSelected = chunkSelection.size() == 0;
+      clearSelection.setDisable(noChunksSelected);
+      newScene.setDisable(noChunksSelected);
     });
 
     moveCameraHere.setOnAction(event -> {
@@ -186,6 +193,11 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     if (!repaintQueued) {
       repaintQueued = true;
       Platform.runLater(() -> {
+        if (viewUpdateScheduled) {
+          viewUpdateScheduled = false;
+          mapBuffer.updateView(view);
+          mapBuffer.redrawView(mapLoader, chunkSelection);
+        }
         repaint(canvas.getGraphicsContext2D());
         repaintQueued = false;
       });
@@ -330,12 +342,9 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   }
 
   @Override public void viewUpdated(ChunkView view) {
-    synchronized (this) {
-      this.view = view;
-      mapBuffer.updateView(view);
-    }
-    mapBuffer.redrawView(mapLoader, chunkSelection);
-    repaintDirect();
+    viewUpdateScheduled = true;
+    this.view = view;
+    repaintDeferred();
   }
 
   public int getWidth() {

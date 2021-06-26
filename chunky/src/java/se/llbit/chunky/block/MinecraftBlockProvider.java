@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.model.FlowerPotModel;
+import se.llbit.chunky.model.FlowerPotModel.Kind;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
@@ -43,7 +44,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:attached_pumpkin_stem",
       "minecraft:azalea",
       "minecraft:azalea_leaves",
-      "minecraft:azalea_leaves_flowers",
+      "minecraft:flowering_azalea_leaves",
       "minecraft:azure_bluet",
       "minecraft:bamboo",
       "minecraft:bamboo_sapling",
@@ -432,6 +433,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:lava",
       "minecraft:lectern",
       "minecraft:lever",
+      "minecraft:light",
       "minecraft:light_blue_banner",
       "minecraft:light_blue_bed",
       "minecraft:light_blue_candle_cake",
@@ -642,6 +644,12 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:potted_warped_roots",
       "minecraft:potted_white_tulip",
       "minecraft:potted_wither_rose",
+      "minecraft:potted_warped_fungus",
+      "minecraft:potted_crimson_fungus",
+      "minecraft:potted_crimson_roots",
+      "minecraft:potted_warped_roots",
+      "minecraft:potted_azalea_bush",
+      "minecraft:potted_flowering_azalea_bush",
       "minecraft:powder_snow",
       "minecraft:powder_snow_cauldron",
       "minecraft:powered_rail",
@@ -678,6 +686,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:quartz_slab",
       "minecraft:quartz_stairs",
       "minecraft:rail",
+      "minecraft:raw_copper_block",
+      "minecraft:raw_gold_block",
+      "minecraft:raw_iron_block",
       "minecraft:red_banner",
       "minecraft:red_bed",
       "minecraft:red_candle_cake",
@@ -1022,17 +1033,17 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "stripped_dark_oak_log":
         return log(tag, Texture.strippedDarkOakLog, Texture.strippedDarkOakLogTop);
       case "stripped_oak_wood":
-        return new MinecraftBlock(name, Texture.strippedOakLog);
+        return log(tag, Texture.strippedOakLog, Texture.strippedOakLog);
       case "stripped_spruce_wood":
-        return new MinecraftBlock(name, Texture.strippedSpruceLog);
+        return log(tag, Texture.strippedSpruceLog, Texture.strippedSpruceLog);
       case "stripped_birch_wood":
-        return new MinecraftBlock(name, Texture.strippedBirchLog);
+        return log(tag, Texture.strippedBirchLog, Texture.strippedBirchLog);
       case "stripped_jungle_wood":
-        return new MinecraftBlock(name, Texture.strippedJungleLog);
+        return log(tag, Texture.strippedJungleLog, Texture.strippedJungleLog);
       case "stripped_acacia_wood":
-        return new MinecraftBlock(name, Texture.strippedAcaciaLog);
+        return log(tag, Texture.strippedAcaciaLog, Texture.strippedAcaciaLog);
       case "stripped_dark_oak_wood":
-        return new MinecraftBlock(name, Texture.strippedDarkOakLog);
+        return log(tag, Texture.strippedDarkOakLog, Texture.strippedDarkOakLog);
       case "oak_wood":
         return new MinecraftBlock(name, Texture.oakWood);
       case "spruce_wood":
@@ -1424,7 +1435,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "spruce_fence_gate":
         return fenceGate(tag, Texture.sprucePlanks);
       case "birch_fence_gate":
-        return fenceGate(tag, Texture.sprucePlanks);
+        return fenceGate(tag, Texture.birchPlanks);
       case "jungle_fence_gate":
         return fenceGate(tag, Texture.jungleTreePlanks);
       case "acacia_fence_gate":
@@ -2214,6 +2225,10 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new FlowerPot(name, FlowerPotModel.Kind.CRIMSON_ROOTS);
       case "potted_warped_roots":
         return new FlowerPot(name, FlowerPotModel.Kind.WARPED_ROOTS);
+      case "potted_azalea_bush":
+        return new FlowerPot(name, Kind.AZALEA_BUSH);
+      case "potted_flowering_azalea_bush":
+        return new FlowerPot(name, Kind.FLOWERING_AZALEA_BUSH);
       case "carrots":
         return new Carrots(BlockProvider.stringToInt(tag.get("Properties").get("age"), 7));
       case "potatoes":
@@ -2399,7 +2414,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "spawner":
         return new MinecraftBlockTranslucent(name, Texture.monsterSpawner);
       case "nether_portal": {
-        String axis = tag.get("Properties").get("axis").stringValue("north");
+        String axis = tag.get("Properties").get("axis").stringValue("x");
         return new NetherPortal(axis);
       }
       case "end_portal":
@@ -2614,73 +2629,73 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "chain":
         return chain(tag, "chain", Texture.chain);
       case "candle_cake":
-        return candleCake(tag, Texture.candle);
+        return candleCake(tag, Texture.candle, Texture.candleLit);
       case "white_candle_cake":
-        return candleCake(tag, Texture.whiteCandle);
+        return candleCake(tag, Texture.whiteCandle, Texture.whiteCandleLit);
       case "orange_candle_cake":
-        return candleCake(tag, Texture.orangeCandle);
+        return candleCake(tag, Texture.orangeCandle, Texture.orangeCandleLit);
       case "magenta_candle_cake":
-        return candleCake(tag, Texture.magentaCandle);
+        return candleCake(tag, Texture.magentaCandle, Texture.magentaCandleLit);
       case "light_blue_candle_cake":
-        return candleCake(tag, Texture.lightBlueCandle);
+        return candleCake(tag, Texture.lightBlueCandle, Texture.lightBlueCandleLit);
       case "yellow_candle_cake":
-        return candleCake(tag, Texture.yellowCandle);
+        return candleCake(tag, Texture.yellowCandle, Texture.yellowCandleLit);
       case "lime_candle_cake":
-        return candleCake(tag, Texture.limeCandle);
+        return candleCake(tag, Texture.limeCandle, Texture.limeCandleLit);
       case "pink_candle_cake":
-        return candleCake(tag, Texture.pinkCandle);
+        return candleCake(tag, Texture.pinkCandle, Texture.pinkCandleLit);
       case "gray_candle_cake":
-        return candleCake(tag, Texture.grayCandle);
+        return candleCake(tag, Texture.grayCandle, Texture.grayCandleLit);
       case "light_gray_candle_cake":
-        return candleCake(tag, Texture.lightGrayCandle);
+        return candleCake(tag, Texture.lightGrayCandle, Texture.lightGrayCandleLit);
       case "cyan_candle_cake":
-        return candleCake(tag, Texture.cyanCandle);
+        return candleCake(tag, Texture.cyanCandle, Texture.cyanCandleLit);
       case "purple_candle_cake":
-        return candleCake(tag, Texture.purpleCandle);
+        return candleCake(tag, Texture.purpleCandle, Texture.purpleCandleLit);
       case "blue_candle_cake":
-        return candleCake(tag, Texture.blueCandle);
+        return candleCake(tag, Texture.blueCandle, Texture.blueCandleLit);
       case "brown_candle_cake":
-        return candleCake(tag, Texture.brownCandle);
+        return candleCake(tag, Texture.brownCandle, Texture.brownCandleLit);
       case "green_candle_cake":
-        return candleCake(tag, Texture.greenCandle);
+        return candleCake(tag, Texture.greenCandle, Texture.greenCandleLit);
       case "red_candle_cake":
-        return candleCake(tag, Texture.redCandle);
+        return candleCake(tag, Texture.redCandle, Texture.redCandleLit);
       case "black_candle_cake":
-        return candleCake(tag, Texture.blackCandle);
+        return candleCake(tag, Texture.blackCandle, Texture.blackCandleLit);
       case "candle":
-        return candle(tag, Texture.candle);
+        return candle(tag, Texture.candle, Texture.candleLit);
       case "white_candle":
-        return candle(tag, Texture.whiteCandle);
+        return candle(tag, Texture.whiteCandle, Texture.whiteCandleLit);
       case "orange_candle":
-        return candle(tag, Texture.orangeCandle);
+        return candle(tag, Texture.orangeCandle, Texture.orangeCandleLit);
       case "magenta_candle":
-        return candle(tag, Texture.magentaCandle);
+        return candle(tag, Texture.magentaCandle, Texture.magentaCandleLit);
       case "light_blue_candle":
-        return candle(tag, Texture.lightBlueCandle);
+        return candle(tag, Texture.lightBlueCandle, Texture.lightBlueCandleLit);
       case "yellow_candle":
-        return candle(tag, Texture.yellowCandle);
+        return candle(tag, Texture.yellowCandle, Texture.yellowCandleLit);
       case "lime_candle":
-        return candle(tag, Texture.limeCandle);
+        return candle(tag, Texture.limeCandle, Texture.limeCandleLit);
       case "pink_candle":
-        return candle(tag, Texture.pinkCandle);
+        return candle(tag, Texture.pinkCandle, Texture.pinkCandleLit);
       case "gray_candle":
-        return candle(tag, Texture.grayCandle);
+        return candle(tag, Texture.grayCandle, Texture.grayCandleLit);
       case "light_gray_candle":
-        return candle(tag, Texture.lightGrayCandle);
+        return candle(tag, Texture.lightGrayCandle, Texture.lightGrayCandleLit);
       case "cyan_candle":
-        return candle(tag, Texture.cyanCandle);
+        return candle(tag, Texture.cyanCandle, Texture.cyanCandleLit);
       case "purple_candle":
-        return candle(tag, Texture.purpleCandle);
+        return candle(tag, Texture.purpleCandle, Texture.purpleCandleLit);
       case "blue_candle":
-        return candle(tag, Texture.blueCandle);
+        return candle(tag, Texture.blueCandle, Texture.blueCandleLit);
       case "brown_candle":
-        return candle(tag, Texture.brownCandle);
+        return candle(tag, Texture.brownCandle, Texture.brownCandleLit);
       case "green_candle":
-        return candle(tag, Texture.greenCandle);
+        return candle(tag, Texture.greenCandle, Texture.greenCandleLit);
       case "red_candle":
-        return candle(tag, Texture.redCandle);
+        return candle(tag, Texture.redCandle, Texture.redCandleLit);
       case "black_candle":
-        return candle(tag, Texture.blackCandle);
+        return candle(tag, Texture.blackCandle, Texture.blackCandleLit);
       case "copper_ore":
         return new MinecraftBlock("copper_ore", Texture.copperOre);
       case "calcite":
@@ -2786,8 +2801,8 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new Azalea(name, Texture.floweringAzaleaTop, Texture.floweringAzaleaSide);
       case "azalea_leaves":
         return new AzaleaLeaves(name, Texture.azaleaLeaves);
-      case "azalea_leaves_flowers":
-        return new AzaleaLeaves(name, Texture.azaleaLeavesFlowers);
+      case "flowering_azalea_leaves":
+        return new AzaleaLeaves(name, Texture.floweringAzaleaLeaves);
       case "moss_block":
         return new MinecraftBlock(name, Texture.mossBlock);
       case "moss_carpet":
@@ -2810,7 +2825,7 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new SporeBlossom();
       case "deepslate":
       case "infested_deepslate":
-        return new TexturedBlock(name, Texture.deepslate, Texture.deepslateTop);
+        return log(tag, Texture.deepslate, Texture.deepslateTop);
       case "deepslate_gold_ore":
         return new MinecraftBlock(name, Texture.deepslateGoldOre);
       case "deepslate_iron_ore":
@@ -2867,6 +2882,14 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.deepslateCopperOre);
       case "deepslate_emerald_ore":
         return new MinecraftBlock(name, Texture.deepslateEmeraldOre);
+      case "light":
+        return new LightBlock(name, BlockProvider.stringToInt(tag.get("Properties").get("level"), 15));
+      case "raw_copper_block":
+        return new MinecraftBlock(name, Texture.rawCopperBlock);
+      case "raw_gold_block":
+        return new MinecraftBlock(name, Texture.rawGoldBlock);
+      case "raw_iron_block":
+        return new MinecraftBlock(name, Texture.rawIronBlock);
       case "structure_void":
       case "barrier":
         // Invisible.
@@ -3345,16 +3368,16 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new MinecraftBlock("structure_block", texture);
   }
 
-  private static Block candle(Tag tag, Texture candleTexture) {
+  private static Block candle(Tag tag, Texture candleTexture, Texture candleTextureLit) {
     Tag properties = tag.get("Properties");
-    return new Candle(BlockProvider.blockName(tag), candleTexture,
+    return new Candle(BlockProvider.blockName(tag), candleTexture, candleTextureLit,
         BlockProvider.stringToInt(properties.get("candles"), 1),
         properties.get("lit").stringValue("false").equals("true"));
   }
 
-  private static Block candleCake(Tag tag, Texture candleTexture) {
+  private static Block candleCake(Tag tag, Texture candleTexture, Texture candleTextureLit) {
     Tag properties = tag.get("Properties");
-    return new CakeWithCandle(BlockProvider.blockName(tag), candleTexture,
+    return new CakeWithCandle(BlockProvider.blockName(tag), candleTexture, candleTextureLit,
         properties.get("lit").stringValue("false").equals("true"));
   }
 }

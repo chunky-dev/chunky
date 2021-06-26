@@ -28,6 +28,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
@@ -133,6 +134,20 @@ public class BlockPalette {
     if(id == ANY_ID)
       return stone;
     return palette.get(id);
+  }
+
+  /**
+   * Get the block specification by its ID in this palette.
+   * @param id ID of a block in this palette
+   * @return Block specification or null if not found
+   */
+  public BlockSpec getBlockSpec(int id) {
+    for (Entry<BlockSpec, Integer> entry : blockMap.entrySet()) {
+      if (entry.getValue() == id){
+        return entry.getKey();
+      }
+    }
+    return null;
   }
 
   /**
@@ -274,6 +289,10 @@ public class BlockPalette {
       block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.9);
     });
+    materialProperties.put("minecraft:raw_gold_block", block -> {
+      block.metalness = 0.8f;
+      block.setPerceptualSmoothness(0.5);
+    });
     materialProperties.put("minecraft:diamond_block", block -> {
       block.specular = 0.04f;
     });
@@ -281,6 +300,10 @@ public class BlockPalette {
       block.specular = 0.04f;
       block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.9);
+    });
+    materialProperties.put("minecraft:raw_iron_block", block -> {
+      block.metalness = 0.66f;
+      block.setPerceptualSmoothness(0.3);
     });
     materialProperties.put("minecraft:iron_bars", block -> {
       block.specular = 0.04f;
@@ -377,6 +400,13 @@ public class BlockPalette {
     materialProperties.put("minecraft:tall_seagrass", block -> {
       block.waterlogged = true;
     });
+    materialProperties.put("minecraft:sea_pickle", block -> {
+      if (block instanceof SeaPickle) {
+        if (((SeaPickle) block).live) {
+          block.emittance = 1.0f / 15f * (3 * ((SeaPickle) block).pickles + 1);
+        }
+      }
+    });
     materialProperties.put("minecraft:campfire", block -> {
       if (block instanceof Campfire && ((Campfire)block).isLit) {
         block.emittance = 1.0f;
@@ -448,6 +478,10 @@ public class BlockPalette {
       block.setPerceptualSmoothness(0.75);
     };
     materialProperties.put("minecraft:copper_block", copperConfig);
+    materialProperties.put("minecraft:raw_copper_block", block -> {
+      block.metalness = 0.66f;
+      block.setPerceptualSmoothness(0.5);
+    });
     materialProperties.put("minecraft:exposed_copper", lightlyWeatheredCopperConfig);
     materialProperties.put("minecraft:weathered_copper", semiWeatheredCopperConfig);
     materialProperties.put("minecraft:cut_copper", copperConfig);
@@ -514,6 +548,11 @@ public class BlockPalette {
     materialProperties.put("minecraft:cave_vines", block -> {
       if (block instanceof CaveVines && ((CaveVines) block).hasBerries()) {
         block.emittance = 1.0f / 15f * 14;
+      }
+    });
+    materialProperties.put("minecraft:light", block -> {
+      if (block instanceof LightBlock) {
+        block.emittance = 1.0f / 15f * ((LightBlock) block).getLevel();
       }
     });
     return materialProperties;

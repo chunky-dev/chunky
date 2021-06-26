@@ -117,21 +117,4 @@ public interface BlockData {
   int COLOR_GREEN = 13;
   int COLOR_RED = 14;
   int COLOR_BLACK = 15;
-
-  int BANNER_WHITE = 15;
-  int BANNER_ORANGE = 14;
-  int BANNER_MAGENTA = 13;
-  int BANNER_LIGHT_BLUE = 12;
-  int BANNER_YELLOW = 11;
-  int BANNER_LIME = 10;
-  int BANNER_PINK = 9;
-  int BANNER_GRAY = 8;
-  int BANNER_SILVER = 7;
-  int BANNER_CYAN = 6;
-  int BANNER_PURPLE = 5;
-  int BANNER_BLUE = 4;
-  int BANNER_BROWN = 3;
-  int BANNER_GREEN = 2;
-  int BANNER_RED = 1;
-  int BANNER_BLACK = 0;
 }

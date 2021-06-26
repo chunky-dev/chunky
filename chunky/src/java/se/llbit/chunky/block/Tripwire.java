@@ -14,297 +14,323 @@ import static se.llbit.chunky.world.BlockData.CONNECTED_SOUTH;
 import static se.llbit.chunky.world.BlockData.CONNECTED_WEST;
 
 public class Tripwire extends MinecraftBlockTranslucent {
+
   private final String description;
   private final int connections;
 
   private static final Quad[] tripwire_n = {
-      // cube1
       new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(8.25 / 16.0, 1.5 / 16.0, 0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube2
-      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 0 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 0 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 0 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube3
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 12 / 16.0),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      )
   };
 
   private static final Quad[] tripwire_ne = {
-      // cube1
       new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(8.25 / 16.0, 1.5 / 16.0, 0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube2
-      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 0 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 0 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 0 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube3
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
           new Vector3(8 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
           new Vector3(12 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
           new Vector3(8 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
           new Vector3(8 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
           new Vector3(12 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
           new Vector3(8 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube4
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 14 / 16.0)
+      ),
       new Quad(
           new Vector3(12 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
           new Vector3(16 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
           new Vector3(12 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
           new Vector3(12 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
           new Vector3(16 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
           new Vector3(12 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 14 / 16.0)
+      )
   };
 
   private static final Quad[] tripwire_ns = {
-      // cube1
       new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(8.25 / 16.0, 1.5 / 16.0, 0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube2
-      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 0 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 0 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 0 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube3
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube4
-      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 16 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 16 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 16 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 12 / 16.0),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 16 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 12 / 16.0),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 16 / 16.0),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      )
   };
 
   private static final Quad[] tripwire_nse = {
-      // cube1
       new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(8.25 / 16.0, 1.5 / 16.0, 0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube2
-      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 0 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 0 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 0 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube3
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube4
-      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 16 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 16 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 16 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube5
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 12 / 16.0),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 16 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 12 / 16.0),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 16 / 16.0),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
           new Vector3(8 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
           new Vector3(12 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
           new Vector3(8 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
           new Vector3(8 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
           new Vector3(12 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
           new Vector3(8 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube6
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 14 / 16.0)
+      ),
       new Quad(
           new Vector3(12 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
           new Vector3(16 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
           new Vector3(12 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
           new Vector3(12 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
           new Vector3(16 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
           new Vector3(12 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 14 / 16.0)
+      )
   };
 
   private static final Quad[] tripwire_nsew = {
-      // cube1
       new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(8.25 / 16.0, 1.5 / 16.0, 0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube2
-      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 0 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 0 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 0 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 4 / 16.0),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 4 / 16.0),
-          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube3
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube4
-      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
           new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 16 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 8 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 12 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 8 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 16 / 16.0),
-          new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
           new Vector3(8.25 / 16.0, 1.5 / 16.0, 16 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube5
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 12 / 16.0),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 16 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
-          new Vector3(0, 1.5 / 16.0, 8.25 / 16.0),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 12 / 16.0),
+          new Vector3(8.25 / 16.0, 1.5 / 16.0, 16 / 16.0),
+          new Vector3(7.75 / 16.0, 1.5 / 16.0, 12 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+          new Vector3(0 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
           new Vector3(4 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
-          new Vector3(0, 1.5 / 16.0, 7.75 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector3(0 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
-          new Vector3(0, 1.5 / 16.0, 7.75 / 16.0),
+          new Vector3(0 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
           new Vector3(4 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
-          new Vector3(0, 1.5 / 16.0, 8.25 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube6
+          new Vector3(0 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 14 / 16.0)
+      ),
       new Quad(
           new Vector3(4 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
           new Vector3(8 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
           new Vector3(4 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
           new Vector3(4 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
           new Vector3(8 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
           new Vector3(4 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube7
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 14 / 16.0)
+      ),
       new Quad(
           new Vector3(8 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
           new Vector3(12 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
           new Vector3(8 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
           new Vector3(8 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
           new Vector3(12 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
           new Vector3(8 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
-      // cube8
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 14 / 16.0)
+      ),
       new Quad(
           new Vector3(12 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
           new Vector3(16 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
           new Vector3(12 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
-          new Vector4(0, 16 / 16.0, 14 / 16.0, 16 / 16.0)),
+          new Vector4(0 / 16.0, 16 / 16.0, 14 / 16.0, 16 / 16.0)
+      ),
       new Quad(
           new Vector3(12 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
           new Vector3(16 / 16.0, 1.5 / 16.0, 7.75 / 16.0),
           new Vector3(12 / 16.0, 1.5 / 16.0, 8.25 / 16.0),
-          new Vector4(0, 16 / 16.0, 16 / 16.0, 14 / 16.0)),
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 14 / 16.0)
+      )
   };
 
   private static final Quad[][] quads = new Quad[16][];
@@ -313,15 +339,22 @@ public class Tripwire extends MinecraftBlockTranslucent {
     quads[0] = tripwire_ns; // If no side is elected, render north-south.
     quads[CONNECTED_NORTH | CONNECTED_SOUTH | CONNECTED_EAST | CONNECTED_WEST] = tripwire_nsew;
     quads[CONNECTED_NORTH | CONNECTED_EAST | CONNECTED_SOUTH] = tripwire_nse;
-    quads[CONNECTED_EAST | CONNECTED_SOUTH | CONNECTED_WEST] = Model.rotateY(quads[CONNECTED_NORTH | CONNECTED_EAST | CONNECTED_SOUTH]);
-    quads[CONNECTED_SOUTH | CONNECTED_WEST | CONNECTED_NORTH] = Model.rotateY(quads[CONNECTED_EAST | CONNECTED_SOUTH | CONNECTED_WEST]);
-    quads[CONNECTED_WEST | CONNECTED_NORTH | CONNECTED_EAST] = Model.rotateY(quads[CONNECTED_SOUTH | CONNECTED_WEST | CONNECTED_NORTH]);
+    quads[CONNECTED_EAST | CONNECTED_SOUTH | CONNECTED_WEST] = Model
+        .rotateY(quads[CONNECTED_NORTH | CONNECTED_EAST | CONNECTED_SOUTH]);
+    quads[CONNECTED_SOUTH | CONNECTED_WEST | CONNECTED_NORTH] = Model
+        .rotateY(quads[CONNECTED_EAST | CONNECTED_SOUTH | CONNECTED_WEST]);
+    quads[CONNECTED_WEST | CONNECTED_NORTH | CONNECTED_EAST] = Model
+        .rotateY(quads[CONNECTED_SOUTH | CONNECTED_WEST | CONNECTED_NORTH]);
     quads[CONNECTED_NORTH | CONNECTED_SOUTH] = tripwire_ns;
-    quads[CONNECTED_EAST | CONNECTED_WEST] = Model.rotateY(quads[CONNECTED_NORTH | CONNECTED_SOUTH]);
+    quads[CONNECTED_EAST | CONNECTED_WEST] = Model
+        .rotateY(quads[CONNECTED_NORTH | CONNECTED_SOUTH]);
     quads[CONNECTED_NORTH | CONNECTED_EAST] = tripwire_ne;
-    quads[CONNECTED_EAST | CONNECTED_SOUTH] = Model.rotateY(quads[CONNECTED_NORTH | CONNECTED_EAST]);
-    quads[CONNECTED_SOUTH | CONNECTED_WEST] = Model.rotateY(quads[CONNECTED_EAST | CONNECTED_SOUTH]);
-    quads[CONNECTED_WEST | CONNECTED_NORTH] = Model.rotateY(quads[CONNECTED_SOUTH | CONNECTED_WEST]);
+    quads[CONNECTED_EAST | CONNECTED_SOUTH] = Model
+        .rotateY(quads[CONNECTED_NORTH | CONNECTED_EAST]);
+    quads[CONNECTED_SOUTH | CONNECTED_WEST] = Model
+        .rotateY(quads[CONNECTED_EAST | CONNECTED_SOUTH]);
+    quads[CONNECTED_WEST | CONNECTED_NORTH] = Model
+        .rotateY(quads[CONNECTED_SOUTH | CONNECTED_WEST]);
     quads[CONNECTED_NORTH] = tripwire_n;
     quads[CONNECTED_EAST] = Model.rotateY(quads[CONNECTED_NORTH]);
     quads[CONNECTED_SOUTH] = Model.rotateY(quads[CONNECTED_EAST]);
@@ -349,7 +382,8 @@ public class Tripwire extends MinecraftBlockTranslucent {
     this.connections = connections;
   }
 
-  @Override public boolean intersect(Ray ray, Scene scene) {
+  @Override
+  public boolean intersect(Ray ray, Scene scene) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     for (Quad quad : quads[connections]) {
@@ -367,7 +401,8 @@ public class Tripwire extends MinecraftBlockTranslucent {
     return hit;
   }
 
-  @Override public String description() {
+  @Override
+  public String description() {
     return description;
   }
 }

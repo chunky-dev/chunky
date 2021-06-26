@@ -34,3 +34,32 @@ Label {
 Text {
     -fx-fill: #faebd7;
 }
+
+Hyperlink {
+    -fx-text-fill: orange;
+    -fx-underline: false;
+}
+
+Hyperlink:visited {
+    -fx-text-fill: orange;
+}
+
+Hyperlink:hover {
+    -fx-text-fill: #faebd7;
+    -fx-underline: true;
+}
+
+.text-field.invalid {
+    -fx-text-fill: #FF434A;
+    -fx-text-box-border: #FF434A;
+    -fx-focus-color: #FF434A;
+}
+
+.menu-item:disabled:focused {
+    -fx-background: unset;
+    -fx-background-color: transparent;
+}
+
+.menu-item:disabled:focused > .label {
+    -fx-text-fill: white;
+}

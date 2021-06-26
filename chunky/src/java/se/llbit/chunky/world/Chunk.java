@@ -16,12 +16,17 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.chunky.block.Air;
-import se.llbit.chunky.block.Block;
-import se.llbit.chunky.block.Lava;
-import se.llbit.chunky.block.Water;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import se.llbit.chunky.block.*;
+import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.map.AbstractLayer;
 import se.llbit.chunky.map.BiomeLayer;
@@ -37,10 +42,6 @@ import se.llbit.nbt.SpecificTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.BitBuffer;
 import se.llbit.util.NotNull;
-
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.util.*;
 
 /**
  * This class represents a loaded or not-yet-loaded chunk in the world.
@@ -144,10 +145,11 @@ public class Chunk {
   /**
    * Parse the chunk from the region file and render the current
    * layer, surface and cave maps.
+   * @return whether the input chunkdata was modified
    */
-  public synchronized void loadChunk(ChunkData chunkData) {
+  public synchronized boolean loadChunk(ChunkData chunkData, int yMax) {
     if (!shouldReloadChunk()) {
-      return;
+      return false;
     }
 
     Set<String> request = new HashSet<>();
@@ -158,12 +160,12 @@ public class Chunk {
     Map<String, Tag> data = getChunkData(request);
     // TODO: improve error handling here.
     if (data == null) {
-      return;
+      return false;
     }
 
     surfaceTimestamp = dataTimestamp;
     version = chunkVersion(data);
-    loadSurface(data, chunkData);
+    loadSurface(data, chunkData, yMax);
     biomesTimestamp = dataTimestamp;
     if (surface == IconLayer.MC_1_12) {
       biomes = IconLayer.MC_1_12;
@@ -171,9 +173,10 @@ public class Chunk {
       loadBiomes(data, chunkData);
     }
     world.chunkUpdated(position);
+    return true;
   }
 
-  private void loadSurface(Map<String, Tag> data, ChunkData chunkData) {
+  private void loadSurface(Map<String, Tag> data, ChunkData chunkData, int yMax) {
     if (data == null) {
       surface = IconLayer.CORRUPT;
       return;
@@ -183,15 +186,13 @@ public class Chunk {
     Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
       extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
-      if (version.equals("1.13")) {
+      if (version.equals("1.13") || version.equals("1.12")) {
         BlockPalette palette = new BlockPalette();
         loadBlockData(data, chunkData, palette);
         int[] heightmapData = extractHeightmapData(data, chunkData);
-        updateHeightmap(heightmap, position, chunkData, heightmapData, palette);
-        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette);
+        updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
+        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, yMax);
         queueTopography();
-      } else if (version.equals("1.12")) {
-        surface = IconLayer.MC_1_12;
       }
     } else {
       surface = IconLayer.CORRUPT;
@@ -330,17 +331,33 @@ public class Chunk {
             }
           }
         } else {
-          //Log.error(">>> WIP <<< Old chunk format temp disabled.");
-          /*Tag blocksTag = section.get("Blocks");
-          if (blocksTag.isByteArray(SECTION_BYTES)) {
-            System.arraycopy(blocksTag.byteArray(), 0, blocks, SECTION_BYTES * yOffset,
-                SECTION_BYTES);
-          }
+          int yOffset = sectionY & 0xFF;
+
           Tag dataTag = section.get("Data");
+          byte[] blockDataBytes = new byte[(Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX) / 2];
           if (dataTag.isByteArray(SECTION_HALF_NIBBLES)) {
-            System.arraycopy(dataTag.byteArray(), 0, blockData, SECTION_HALF_NIBBLES * sectionY,
+            System.arraycopy(dataTag.byteArray(), 0, blockDataBytes, SECTION_HALF_NIBBLES * yOffset,
                 SECTION_HALF_NIBBLES);
-          }*/
+          }
+
+          Tag blocksTag = section.get("Blocks");
+          if (blocksTag.isByteArray(SECTION_BYTES)) {
+            byte[] blocksBytes = new byte[Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX];
+            System.arraycopy(blocksTag.byteArray(), 0, blocksBytes, SECTION_BYTES * yOffset,
+                SECTION_BYTES);
+
+            int offset = SECTION_BYTES * yOffset;
+            for (int y = 0; y < SECTION_Y_MAX; y++) {
+              int blockY = sectionMinBlockY + y;
+              for (int z = 0; z < Z_MAX; z++) {
+                for (int x = 0; x < X_MAX; x++) {
+                  chunkData.setBlockAt(x, blockY, z, blockPalette.put(
+                      LegacyBlocks.getTag(offset, blocksBytes, blockDataBytes)));
+                  offset += 1;
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -351,11 +368,11 @@ public class Chunk {
    * and insert into a quadtree.
    */
   public static void updateHeightmap(Heightmap heightmap, ChunkPosition pos, ChunkData chunkData,
-      int[] chunkHeightmap, BlockPalette palette) {
+      int[] chunkHeightmap, BlockPalette palette, int yMax) {
     for (int x = 0; x < 16; ++x) {
       for (int z = 0; z < 16; ++z) {
         int y = chunkHeightmap[z * 16 + x];
-        y = Math.max(1, y - 1);
+        y = Math.max(1, Math.min(y - 1, yMax));
         for (; y > 1; --y) {
           Block block = palette.get(chunkData.getBlockAt(x, y, z));
           if (block != Air.INSTANCE && !block.isWater())
@@ -435,8 +452,9 @@ public class Chunk {
   /**
    * Load the block data for this chunk.
    *
-   * @param reuseChunkData to be reused, if null one is created
-   * @param palette
+   * @param reuseChunkData ChunkData object to be reused, if null one is created
+   * @param palette Block palette
+   * @return Loaded chunk data, guaranteed to be reuseChunkData unless null or EmptyChunkData was passed
    */
   public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette) {
     Set<String> request = new HashSet<>();
@@ -446,7 +464,7 @@ public class Chunk {
     request.add(LEVEL_ENTITIES);
     request.add(LEVEL_TILEENTITIES);
     Map<String, Tag> data = getChunkData(request);
-    if(reuseChunkData == null) {
+    if(reuseChunkData == null || reuseChunkData instanceof EmptyChunkData) {
       reuseChunkData = new GenericChunkData();
     } else {
       reuseChunkData.clear();
@@ -455,6 +473,7 @@ public class Chunk {
     if (data == null) {
       return reuseChunkData;
     }
+    version = chunkVersion(data);
     Tag sections = data.get(LEVEL_SECTIONS);
     Tag biomesTag = data.get(LEVEL_BIOMES);
     Tag entitiesTag = data.get(LEVEL_ENTITIES);

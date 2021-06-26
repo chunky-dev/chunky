@@ -21,24 +21,15 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.BlockProvider;
 import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.MinecraftBlockProvider;
+import se.llbit.chunky.block.legacy.LegacyMinecraftBlockProvider;
 import se.llbit.chunky.main.CommandLineOptions.Mode;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.plugin.ChunkyPlugin;
 import se.llbit.chunky.plugin.TabTransformer;
-import se.llbit.chunky.renderer.ConsoleProgressListener;
-import se.llbit.chunky.renderer.RayTracerFactory;
-import se.llbit.chunky.renderer.RenderContext;
-import se.llbit.chunky.renderer.RenderContextFactory;
-import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.RenderManager;
-import se.llbit.chunky.renderer.Renderer;
-import se.llbit.chunky.renderer.RendererFactory;
-import se.llbit.chunky.renderer.SceneProvider;
-import se.llbit.chunky.renderer.SnapshotControl;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
-import se.llbit.chunky.renderer.scene.PathTracer;
-import se.llbit.chunky.renderer.scene.PreviewRayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneFactory;
 import se.llbit.chunky.renderer.scene.SceneManager;
@@ -46,6 +37,7 @@ import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.ChunkyFx;
+import se.llbit.chunky.ui.CreditsController;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.chunky.world.MaterialStore;
 import se.llbit.json.JsonArray;
@@ -91,9 +83,7 @@ public class Chunky {
   private RenderController renderController;
   private SceneFactory sceneFactory = SceneFactory.DEFAULT;
   private RenderContextFactory renderContextFactory = RenderContext::new;
-  private RendererFactory rendererFactory = RenderManager::new;
-  private RayTracerFactory previewRayTracerFactory = PreviewRayTracer::new;
-  private RayTracerFactory rayTracerFactory = PathTracer::new;
+  private RenderManagerFactory renderManagerFactory = DefaultRenderManager::new;
   private RenderControlsTabTransformer renderControlsTabTransformer = tabs -> tabs;
   private TabTransformer mainTabTransformer = tabs -> tabs;
   private boolean headless = false;
@@ -110,6 +100,7 @@ public class Chunky {
   public Chunky(ChunkyOptions options) {
     this.options = options;
     registerBlockProvider(new MinecraftBlockProvider());
+    registerBlockProvider(new LegacyMinecraftBlockProvider());
   }
 
   /**
@@ -126,7 +117,7 @@ public class Chunky {
 
     SynchronousSceneManager sceneManager = (SynchronousSceneManager) getRenderController()
         .getSceneManager();
-    Renderer renderer = getRenderController().getRenderer();
+    RenderManager renderManager = getRenderController().getRenderManager();
     TaskTracker taskTracker = new TaskTracker(new ConsoleProgressListener(),
         (tracker, previous, name, size) -> new TaskTracker.Task(tracker, previous, name, size) {
           @Override
@@ -138,14 +129,14 @@ public class Chunky {
           }
         });
     sceneManager.setTaskTracker(taskTracker);
-    renderer.setSnapshotControl(SnapshotControl.DEFAULT);
-    renderer.setOnFrameCompleted((scene, spp) -> {
-      if (SnapshotControl.DEFAULT.saveSnapshot(scene, spp)) {
+    renderManager.setSnapshotControl(SnapshotControl.DEFAULT);
+    renderManager.setOnFrameCompleted((scene, spp) -> {
+      if (renderManager.getSnapshotControl().saveSnapshot(scene, spp)) {
         scene.saveSnapshot(new File(getRenderContext().getSceneDirectory(), "snapshots"),
             taskTracker, getRenderContext().numRenderThreads());
       }
 
-      if (SnapshotControl.DEFAULT.saveRenderDump(scene, spp)) {
+      if (renderManager.getSnapshotControl().saveRenderDump(scene, spp)) {
         // Save the scene description and current render dump.
         try {
           sceneManager.saveScene();
@@ -154,8 +145,8 @@ public class Chunky {
         }
       }
     });
-    renderer.setRenderTask(taskTracker.backgroundTask());
-    renderer.setOnRenderCompleted((time, sps) -> {
+    renderManager.setRenderTask(taskTracker.backgroundTask());
+    renderManager.setOnRenderCompleted((time, sps) -> {
       System.out.println("Render job finished.");
       int seconds = (int) ((time / 1000) % 60);
       int minutes = (int) ((time / 60000) % 60);
@@ -180,8 +171,8 @@ public class Chunky {
       }
       sceneManager.getScene().startHeadlessRender();
 
-      renderer.start();
-      renderer.join();
+      renderManager.start();
+      renderManager.join();
       return 0;
     } catch (FileNotFoundException e) {
       System.err.format("Scene \"%s\" not found!%n", options.sceneName);
@@ -196,7 +187,7 @@ public class Chunky {
       e.printStackTrace();
       return 1;
     } finally {
-      renderer.shutdown();
+      renderManager.shutdown();
     }
   }
 
@@ -266,6 +257,7 @@ public class Chunky {
         try {
           ChunkyPlugin
               .load(pluginsPath.resolve(jarName).toRealPath().toFile(), (plugin, manifest) -> {
+                CreditsController.addPlugin(manifest);
                 String pluginName = manifest.get("name").asString("");
                 if (loadedPlugins.contains(pluginName)) {
                   Log.warnf(
@@ -351,28 +343,28 @@ public class Chunky {
   }
 
   @PluginApi
-  public void setRendererFactory(RendererFactory rendererFactory) {
-    this.rendererFactory = rendererFactory;
+  public void setRenderManagerFactory(RenderManagerFactory renderManagerFactory) {
+    this.renderManagerFactory = renderManagerFactory;
   }
 
   public RenderController getRenderController() {
     if (renderController == null) {
       // The renderController initialization is deferred to its first usage because plugins may want to overwrite
-      // factories (which would require a new RenderController) but still add listeners e.g. to the Renderer which would
+      // factories (which would require a new RenderController) but still add listeners e.g. to the RenderManager which would
       // then be overwritten.
       RenderContext context = renderContextFactory.newRenderContext(this);
-      Renderer renderer = rendererFactory.newRenderer(context, headless);
+      RenderManager renderManager = renderManagerFactory.newRenderManager(context, headless);
       if (headless) {
-        SynchronousSceneManager sceneManager = new SynchronousSceneManager(context, renderer);
-        renderer.setSceneProvider(sceneManager);
-        renderController = new RenderController(context, renderer, sceneManager, sceneManager);
+        SynchronousSceneManager sceneManager = new SynchronousSceneManager(context, renderManager);
+        renderManager.setSceneProvider(sceneManager);
+        renderController = new RenderController(context, renderManager, sceneManager, sceneManager);
       } else {
-        AsynchronousSceneManager sceneManager = new AsynchronousSceneManager(context, renderer);
+        AsynchronousSceneManager sceneManager = new AsynchronousSceneManager(context, renderManager);
         SceneProvider sceneProvider = sceneManager.getSceneProvider();
-        renderer.setSceneProvider(sceneProvider);
-        renderer.start();
+        renderManager.setSceneProvider(sceneProvider);
+        renderManager.start();
         sceneManager.start();
-        renderController = new RenderController(context, renderer, sceneManager, sceneProvider);
+        renderController = new RenderController(context, renderManager, sceneManager, sceneProvider);
       }
     }
     return renderController;
@@ -403,23 +395,41 @@ public class Chunky {
   }
 
   @PluginApi
+  public static void addPreviewRenderer(Renderer renderer) {
+    String name = renderer.getId();
+    if (DefaultRenderManager.previewRenderers.containsKey(name))
+      Log.warn("Preview renderer already exists (do you have the same plugin loaded twice?): " + name);
+    DefaultRenderManager.addPreviewRenderer(renderer);
+  }
+
+  @PluginApi
+  public static void addRenderer(Renderer renderer) {
+    String name = renderer.getId();
+    if (DefaultRenderManager.renderers.containsKey(name))
+      Log.warn("Renderer already exists (do you have the same plugin loaded twice?): " + name);
+    DefaultRenderManager.addRenderer(renderer);
+  }
+
+  @PluginApi
+  @Deprecated
   public void setPreviewRayTracerFactory(RayTracerFactory previewRayTracerFactory) {
-    this.previewRayTracerFactory = previewRayTracerFactory;
+    Log.info("`setPreviewRayTracerFactory` is deprecated. Use `addPreviewRenderer` instead.");
+    if (DefaultRenderManager.previewRenderers.containsKey("PluginPreviewRenderer"))
+      Log.warn("2+ plugin preview renderers installed.");
+    DefaultRenderManager.addPreviewRenderer(new PreviewRenderer("PluginPreviewRenderer", "Plugin Preview Renderer",
+        "A preview renderer added by a plugin.", previewRayTracerFactory.newRayTracer()
+    ));
   }
 
   @PluginApi
-  public RayTracerFactory getPreviewRayTracerFactory() {
-    return previewRayTracerFactory;
-  }
-
-  @PluginApi
+  @Deprecated
   public void setRayTracerFactory(RayTracerFactory rayTracerFactory) {
-    this.rayTracerFactory = rayTracerFactory;
-  }
-
-  @PluginApi
-  public RayTracerFactory getRayTracerFactory() {
-    return rayTracerFactory;
+    Log.info("`setRayTracerFactory` is deprecated. Use `addRenderer` instead.");
+    if (DefaultRenderManager.renderers.containsKey("PluginRenderer"))
+      Log.warn("2+ plugin renderers installed.");
+    DefaultRenderManager.addRenderer(new PathTracingRenderer("PluginRenderer", "Plugin Renderer",
+        "A renderer added by a plugin.", rayTracerFactory.newRayTracer()
+    ));
   }
 
   /**

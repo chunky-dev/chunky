@@ -51,7 +51,7 @@ public class MapView {
   public void setMapSize(int width, int height) {
     ChunkView mapView = map.get();
     if (width != mapView.width || height != mapView.height) {
-      map.set(new ChunkView(mapView.x, mapView.z, width, height, mapView.scale));
+      map.set(new ChunkView(mapView.x, mapView.z, width, height, mapView.scale, mapView.yMax));
       notifyViewUpdated();
     }
   }
@@ -76,7 +76,7 @@ public class MapView {
   public synchronized void panTo(double x, double z) {
     ChunkView mapView = map.get();
     map.set(new ChunkView(x, z,
-        mapView.width, mapView.height, mapView.scale));
+        mapView.width, mapView.height, mapView.scale, mapView.yMax));
     notifyViewUpdated();
   }
 
@@ -95,7 +95,7 @@ public class MapView {
     ChunkView mapView = map.get();
     blockScale = ChunkView.clampScale(blockScale);
     if (blockScale != mapView.scale) {
-      map.set(new ChunkView(mapView.x, mapView.z, mapView.width, mapView.height, blockScale));
+      map.set(new ChunkView(mapView.x, mapView.z, mapView.width, mapView.height, blockScale, mapView.yMax));
       notifyViewUpdated();
     }
   }
@@ -127,5 +127,20 @@ public class MapView {
    */
   public ObjectProperty<ChunkView> getMapViewProperty() {
     return map;
+  }
+
+  public int getYMax() {
+    return map.get().yMax;
+  }
+
+  /**
+   * Change the maximum y layer that is shown.
+   */
+  public void setYMax(int yMax) {
+    ChunkView mapView = map.get();
+    if (yMax != mapView.yMax) {
+      map.set(new ChunkView(mapView.x, mapView.z, mapView.width, mapView.height, mapView.scale, yMax));
+      notifyViewUpdated();
+    }
   }
 }

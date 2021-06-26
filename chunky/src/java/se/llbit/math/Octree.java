@@ -55,9 +55,6 @@ public class Octree {
 
   public interface OctreeImplementation {
     void set(int type, int x, int y, int z);
-    @Deprecated
-    void set(Node data, int x, int y, int z);
-    Node get(int x, int y, int z);
     Material getMaterial(int x, int y, int z, BlockPalette palette);
     void store(DataOutputStream output) throws IOException;
     int getDepth();
@@ -66,8 +63,6 @@ public class Octree {
     boolean isBranch(NodeId node);
     NodeId getChild(NodeId parent, int childNo);
     int getType(NodeId node);
-    @Deprecated
-    int getData(NodeId node);
     default void startFinalization() {}
     default void endFinalization() {}
     default void getWithLevel(IntIntMutablePair outTypeAndLevel, int x, int y, int z) {
@@ -81,6 +76,33 @@ public class Octree {
         node = getChild(node, (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)));
       }
       outTypeAndLevel.right(level).left(getType(node));
+    }
+
+    /**
+     * Set a whole 2^n * 2^n * 2^n cube of blocks
+     * @param cubeDepth the n
+     * @param types a flat array representation of a 3d array of the types to insert indexed by z then y then x
+     * @param x the x of the position of the mi corner of the cube
+     * @param y the y of the position of the mi corner of the cube
+     * @param z the z of the position of the mi corner of the cube
+     */
+    default void setCube(int cubeDepth, int[] types, int x, int y, int z) {
+      // Default implementation sets block one by one
+      int size = 1 << cubeDepth;
+      assert x % size == 0;
+      assert y % size == 0;
+      assert z % size == 0;
+      for(int localZ = 0; localZ < size; ++localZ) {
+        for(int localY = 0; localY < size; ++localY) {
+          for(int localX = 0; localX < size; ++localX) {
+            int globalX = x + localX;
+            int globalY = y + localY;
+            int globalZ = z + localZ;
+            int index = (localZ * size + localY) * size + localX;
+            set(types[index], globalX, globalY, globalZ);
+          }
+        }
+      }
     }
   }
 
@@ -111,12 +133,6 @@ public class Octree {
    * and so that when serialized with data, it is not confused for a branch node)
    */
   public static final int ANY_TYPE = 0x7FFFFFFE;
-
-  /**
-   * The top bit of the type field in a serialized octree node is reserved for indicating
-   * if the node is a data node.
-   */
-  public static final int DATA_FLAG = 0x80000000;
 
   /** An Octree node. */
   public static class Node {
@@ -189,12 +205,7 @@ public class Octree {
           node.children[i] = loadNode(in);
         }
       } else {
-        if ((type & DATA_FLAG) == 0) {
-          node = new Node(type);
-        } else {
-          int data = in.readInt();
-          node = new DataNode(type ^ DATA_FLAG, data);
-        }
+        node = new Node(type);
       }
       return node;
     }
@@ -225,44 +236,6 @@ public class Octree {
     @Override public boolean equals(Object obj) {
       if (obj != null && obj.getClass() == Node.class) {
         return ((Node) obj).type == type;
-      }
-      return false;
-    }
-  }
-
-
-  /**
-   * An octree node with extra data.
-   * @deprecated Not used anymore, only kept for compatibility with plugins
-   */
-  @Deprecated
-  static public final class DataNode extends Node {
-    final int data;
-
-    public DataNode(int type, int data) {
-      super(type);
-      this.data = data;
-    }
-
-    @Override public void store(DataOutputStream out) throws IOException {
-      out.writeInt(type | DATA_FLAG);
-      if (type == BRANCH_NODE) {
-        for (int i = 0; i < 8; ++i) {
-          children[i].store(out);
-        }
-      } else {
-        out.writeInt(data);
-      }
-    }
-
-    @Override public int getData() {
-      return data;
-    }
-
-    @Override public boolean equals(Object obj) {
-      if (obj instanceof DataNode) {
-        DataNode node = ((DataNode) obj);
-        return node.type == type && node.data == data;
       }
       return false;
     }
@@ -311,33 +284,17 @@ public class Octree {
   }
 
   /**
-   * Set the voxel type at the given coordinates.
-   *
-   * @param data The new voxel to insert.
+   * Get the material at the given position (relative to the octree origin).
+   * @param x x position
+   * @param y y position
+   * @param z z position
+   * @param palette Block palette
+   * @return Material at the given position or {@link Air#INSTANCE} if the position is outside of this octree
    */
-  public synchronized void set(Node data, int x, int y, int z) {
-    try {
-      implementation.set(data, x, y, z);
-    } catch(PackedOctree.OctreeTooBigException e) {
-      // Octree is too big, switch implementation and retry
-      Log.warn("Octree is too big, falling back to old (slower and bigger) implementation.");
-      try {
-        switchImplementation("NODE");
-      } catch(IOException ioException) {
-        throw new RuntimeException("Couldn't switch the octree implementation to NODE", ioException);
-      }
-      implementation.set(data, x, y, z);
-    }
-  }
-
-  /**
-   * @return The voxel type at the given coordinates
-   */
-  public Node get(int x, int y, int z) {
-    return implementation.get(x, y, z);
-  }
-
   public Material getMaterial(int x, int y, int z, BlockPalette palette) {
+    int size = (1 << implementation.getDepth());
+    if(x < 0 || y < 0 || z < 0 || x >= size || y >= size || z >= size)
+      return Air.INSTANCE;
     return implementation.getMaterial(x, y, z, palette);
   }
 
@@ -387,25 +344,78 @@ public class Octree {
    * @return {@code false} if the ray doesn't intersect the octree.
    */
   private boolean enterOctree(Ray ray) {
-    double nx, ny, nz;
+    double nx = 0, ny = 0, nz = 0;
     double octree_size = 1 << getDepth();
 
+    double tMin = Double.NEGATIVE_INFINITY;
+    double tMax = Double.POSITIVE_INFINITY;
+
+    // Note: The following is made to be robust against edge cases (infinity/NaN)
+    // without additional branches, be careful when editing.
+
+    // Explanation:
+    // the ray can have its x coordinate be 0, which mean that invDirX is Infinity.
+    // This is not a problem as math works out well in this case:
+
+    // If we have 0 < ray.o.x < octree_size, meaning the ray is correctly aligned in
+    // x to intersect with the octree, [tXMin ; tXMax] will have the values
+    // [-Infinity ; Infinity] meaning its intersection with the interval [tMin ; tMax]
+    // will keep the value [tMin ; tMax].
+
+    // On the other hand if ray.o.x < 0 or if ray.o.x > octree_size then both
+    // tXMin and tXMax will have the value -Infinity (resp. +Infinity)
+    // Meaning the interval [tXMin ; tXMax] (and [tMin ; tMax] once it is updated to be the intersection)
+    // will be reduced to a single values: -Infinity (resp. +Infinity)
+    // (this description is not mathematically rigorous as infinity is not really a value
+    // but is enough here).
+    // As ray.d is not a null vector, at least one of its component is not 0
+    // and will have an associated interval with finite bounds, meaning the intersection of those interval
+    // will give an empty set (in practice this is the condition
+    // `if ((tMin > tXMax) || (tXMin > tMax)) return false;`) meaning no intersection is possible.
+
+    // Lastly the other edge case (literally) is when we have ray.o.x == 0 or
+    // ray.o.x == octree_size, meaning the ray is right on the edge and is
+    // neither really outside nor inside.
+    // In this case tXMin or tXMax will be NaN (and the other will be +/- Infinity but
+    // that will not pose any problem as seen previously).
+    // Every comparison involving a NaN returns false, this means that when doing the intersection
+    // with [tMin ; tMax] (in practice the `if (tXMin > tMin) tMin = tXMin;` and
+    // `if (tXMax < tMax) tMax = tXMax;`), the interval will not be changed, acting
+    // as if the [tXMin ; tXMax] interval was [-Infinity ; +Infinity] and not disrupting
+    // following computations.
+    // Additionally, given how the condition to test whether the intersection will be empty before
+    // updating it is written, (the `if ((tMin > tXMax) || (tXMin > tMax))`), it will
+    // evaluate to false and not exit the function. This means that the ray is
+    // considered to be intersecting with the octree (if the other coordinates fulfill the condition
+    // to be intersecting as well).
+    // If instead we would like rays on the edge of the octree not to be considered intersecting it,
+    // the condition could be rewritten as `if(!(tMin <= tXMax) || !(tXMin <= tMax))`
+    // which is equivalent to the current condition for every input not involving
+    // NaN but will evaluates to true in the presence of NaN.
+
     // AABB intersection with the octree boundary
-    double tMin, tMax;
+    double tXMin, tXMax;
     double invDirX = 1 / ray.d.x;
     if (invDirX >= 0) {
-      tMin = -ray.o.x * invDirX;
-      tMax = (octree_size - ray.o.x) * invDirX;
-
-      nx = -1;
-      ny = nz = 0;
+      tXMin = -ray.o.x * invDirX;
+      tXMax = (octree_size - ray.o.x) * invDirX;
     } else {
-      tMin = (octree_size - ray.o.x) * invDirX;
-      tMax = -ray.o.x * invDirX;
+      tXMin = (octree_size - ray.o.x) * invDirX;
+      tXMax = -ray.o.x * invDirX;
+    }
 
-      nx = 1;
+    if ((tMin > tXMax) || (tXMin > tMax))
+      return false;
+
+    if (tXMin > tMin) {
+      tMin = tXMin;
+
+      nx = -FastMath.signum(ray.d.x);
       ny = nz = 0;
     }
+
+    if (tXMax < tMax)
+      tMax = tXMax;
 
     double tYMin, tYMax;
     double invDirY = 1 / ray.d.y;
@@ -754,6 +764,10 @@ public class Octree {
 
   public void endFinalization() {
     implementation.endFinalization();
+  }
+
+  public void setCube(int cubeDepth, int[] types, int x, int y, int z) {
+    implementation.setCube(cubeDepth, types, x, y, z);
   }
 
   /**

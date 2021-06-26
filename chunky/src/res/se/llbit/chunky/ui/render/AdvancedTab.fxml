@@ -11,6 +11,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import se.llbit.chunky.ui.IntegerAdjuster?>
 
+<?import se.llbit.chunky.ui.DoubleAdjuster?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
     <VBox spacing="10.0">
       <children>
@@ -24,6 +25,7 @@
         <CheckBox fx:id="shutdown" mnemonicParsing="false" text="Shutdown computer when render completes" />
         <CheckBox fx:id="fastFog" mnemonicParsing="false" text="Fast fog" />
         <IntegerAdjuster fx:id="cacheResolution" />
+        <DoubleAdjuster fx:id="animationTime" />
         <HBox alignment="CENTER_LEFT" spacing="10.0">
           <children>
             <Label text="Output mode:" />
@@ -37,8 +39,28 @@
             <ChoiceBox fx:id="octreeImplementation" prefWidth="150.0" />
           </children>
         </HBox>
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+          <children>
+            <Label text="BVH build method:" />
+            <ChoiceBox fx:id="bvhMethod" prefWidth="150" />
+          </children>
+        </HBox>
         <IntegerAdjuster fx:id="gridSize" />
         <CheckBox fx:id="preventNormalEmitterWithSampling" mnemonicParsing="false" text="Prevent normal emitter when using emitter sampling" />
+
+        <Separator prefWidth="200.0" />
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+          <children>
+            <Label text="Renderer:" />
+            <ChoiceBox fx:id="rendererSelect" prefWidth="150.0" />
+          </children>
+        </HBox>
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+          <children>
+            <Label text="Preview Renderer:" />
+            <ChoiceBox fx:id="previewSelect" prefWidth="150.0" />
+          </children>
+        </HBox>
       </children>
       <padding>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
