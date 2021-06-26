@@ -18,6 +18,7 @@ package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.RayTracer;
+import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 
 public class PathTracingRenderer extends TileBasedRenderer {
@@ -59,12 +60,10 @@ public class PathTracingRenderer extends TileBasedRenderer {
     double halfWidth = width / (2.0 * height);
     double invHeight = 1.0 / height;
 
-    double[] sampleBuffer = scene.getSampleBuffer();
+    SampleBuffer sampleBuffer = scene.getSampleBuffer();
 
     while (scene.spp < scene.getTargetSpp()) {
       int spp = scene.spp;
-      double passinv = 1.0 / sppPerPass;
-      double sinv = 1.0 / (sppPerPass + spp);
 
       submitTiles(manager, (state, pixel) -> {
         int x = pixel.firstInt();
@@ -88,10 +87,7 @@ public class PathTracingRenderer extends TileBasedRenderer {
           sb += state.ray.color.z;
         }
 
-        int offset = 3 * (y*width + x);
-        sampleBuffer[offset + 0] = (sampleBuffer[offset + 0] * spp + (sr * passinv)) * sinv;
-        sampleBuffer[offset + 1] = (sampleBuffer[offset + 1] * spp + (sg * passinv)) * sinv;
-        sampleBuffer[offset + 2] = (sampleBuffer[offset + 2] * spp + (sb * passinv)) * sinv;
+        sampleBuffer.addSamples(x,y,sr,sg,sb,sppPerPass);
       });
 
       manager.pool.awaitEmpty();

@@ -130,6 +130,6 @@ public interface RenderManager {
   void shutdown();
 
   interface SampleBufferConsumer {
-    void accept(double[] samples, int width, int height);
+    void accept(SampleBuffer samples);
   }
 }

@@ -238,7 +238,7 @@ public class TiffFileWriter implements AutoCloseable {
       task.update(height, y);
       for (int x = 0; x < width; ++x) {
         double[] pixel = new double[3];
-        pixelFilter.processPixel(width, height, scene.getSampleBuffer(), x, y, scene.getExposure(), pixel);
+        pixelFilter.processPixel(scene.getSampleBuffer(), x, y, scene.getExposure(), pixel);
         out.writeFloat((float) pixel[0]);
         out.writeFloat((float) pixel[1]);
         out.writeFloat((float) pixel[2]);

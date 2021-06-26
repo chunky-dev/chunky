@@ -19,6 +19,7 @@ package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.RayTracer;
+import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Ray;
 import se.llbit.util.TaskTracker;
@@ -70,7 +71,7 @@ public class PreviewRenderer extends TileBasedRenderer {
     int ty = (int) Math.floor(target.o.y + target.d.y * Ray.OFFSET);
     int tz = (int) Math.floor(target.o.z + target.d.z * Ray.OFFSET);
 
-    double[] sampleBuffer = scene.getSampleBuffer();
+    SampleBuffer sampleBuffer = scene.getSampleBuffer();
 
     for (int i = 0; i < 2; i++) {
       int sampleNum = i;
@@ -87,9 +88,7 @@ public class PreviewRenderer extends TileBasedRenderer {
         // Draw crosshairs
         if (x == width / 2 && (y >= height / 2 - 5 && y <= height / 2 + 5) || y == height / 2 && (
             x >= width / 2 - 5 && x <= width / 2 + 5)) {
-          sampleBuffer[offset + 0] = 0xFF;
-          sampleBuffer[offset + 1] = 0xFF;
-          sampleBuffer[offset + 2] = 0xFF;
+          sampleBuffer.setPixel(x, y, 0xFF, 0xFF, 0xFF);
           return;
         }
 
@@ -109,14 +108,10 @@ public class PreviewRenderer extends TileBasedRenderer {
           state.ray.color.w = 1;
         }
 
-        sampleBuffer[offset + 0] = state.ray.color.x;
-        sampleBuffer[offset + 1] = state.ray.color.y;
-        sampleBuffer[offset + 2] = state.ray.color.z;
+        sampleBuffer.setPixel(x, y, state.ray.color.x, state.ray.color.y, state.ray.color.z);
 
         if (sampleNum == 0 && x < (width - 1)) {
-          sampleBuffer[offset + 3] = state.ray.color.x;
-          sampleBuffer[offset + 4] = state.ray.color.y;
-          sampleBuffer[offset + 5] = state.ray.color.z;
+          sampleBuffer.setPixel(x+1, y, state.ray.color.x, state.ray.color.y, state.ray.color.z);
         }
       });
 
