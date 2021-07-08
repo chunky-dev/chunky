@@ -368,6 +368,8 @@ public class Scene implements JsonSerializable, Refreshable {
   private String renderer = DefaultRenderManager.ChunkyPathTracerID;
   private String previewRenderer = DefaultRenderManager.ChunkyPreviewID;
 
+  protected volatile boolean isLoading = false;
+
   /**
    * Creates a scene with all default settings.
    *
@@ -558,6 +560,8 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public synchronized void loadScene(RenderContext context, String sceneName, TaskTracker taskTracker)
       throws IOException {
+    isLoading = true;
+
     try {
       loadDescription(context.getSceneDescriptionInputStream(sceneName));
     } catch (FileNotFoundException e) {
@@ -607,6 +611,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     notifyAll();
+    isLoading = false;
   }
 
   /**
@@ -842,6 +847,8 @@ public class Scene implements JsonSerializable, Refreshable {
   public synchronized void loadChunks(TaskTracker taskTracker, World world, Collection<ChunkPosition> chunksToLoad) {
     if (world == null)
       return;
+
+    isLoading = true;
 
     boolean isTallWorld = world.getVersionId() >= World.VERSION_21W06A;
     if (isTallWorld) {
@@ -1416,6 +1423,8 @@ public class Scene implements JsonSerializable, Refreshable {
       buildActorBvh(task);
     }
     Log.info(String.format("Loaded %d chunks", numChunks));
+
+    isLoading = false;
   }
 
   private void buildBvh(TaskTracker.Task task) {
@@ -3310,6 +3319,10 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public String getPreviewRenderer() {
     return previewRenderer;
+  }
+
+  public boolean getIsLoading() {
+    return isLoading;
   }
 
   /**
