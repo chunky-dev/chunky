@@ -20,6 +20,8 @@ import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -68,7 +70,7 @@ public class RenderDump {
     if (magicNumberLength == pushbackInputStream.read(magicNumber, 0, magicNumberLength)
         && Arrays.equals(DUMP_FORMAT_MAGIC_NUMBER, magicNumber)) {
 
-      DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
+      DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(pushbackInputStream));
       int dumpVersion = dataInputStream.readInt();
       getDumpFormatForVersion(dumpVersion).load(dataInputStream, scene, taskTracker);
     } else {
@@ -96,20 +98,20 @@ public class RenderDump {
     if (magicNumberLength == pushbackInputStream.read(magicNumber, 0, magicNumberLength)
         && Arrays.equals(DUMP_FORMAT_MAGIC_NUMBER, magicNumber)) {
 
-      DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
+      DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(pushbackInputStream));
       int dumpVersion = dataInputStream.readInt();
       getDumpFormatForVersion(dumpVersion).merge(dataInputStream, scene, taskTracker);
     } else {
       // Old format that is a gzipped stream, the header needs to be pushed back
       pushbackInputStream.unread(magicNumber, 0, 4);
-      DataInputStream dataInputStream = new DataInputStream(new GZIPInputStream(pushbackInputStream));
+      DataInputStream dataInputStream = new DataInputStream(new GZIPInputStream(new BufferedInputStream(pushbackInputStream)));
       getDumpFormatForVersion(0).merge(dataInputStream, scene, taskTracker);
     }
   }
 
   public static void save(OutputStream outputStream, Scene scene, TaskTracker taskTracker) throws IOException {
     outputStream.write(DUMP_FORMAT_MAGIC_NUMBER);
-    DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+    DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(outputStream));
     DumpFormat format = getDumpFormatForVersion(CURRENT_DUMP_VERSION);
     dataOutputStream.writeInt(CURRENT_DUMP_VERSION);
     format.save(dataOutputStream, scene, taskTracker);
