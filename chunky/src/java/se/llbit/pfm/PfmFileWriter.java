@@ -1,6 +1,24 @@
+/* Copyright (c) 2020-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2020-2021 Chunky contributors
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package se.llbit.pfm;
 
 import se.llbit.chunky.renderer.Postprocess;
+import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
@@ -50,7 +68,7 @@ public class PfmFileWriter implements AutoCloseable {
     out.write(0x0a);
 
     // Declare Image Size
-    out.write((scene.canvasWidth()+" "+scene.canvasHeight()).getBytes(StandardCharsets.US_ASCII));
+    out.write((scene.subareaWidth()+" "+scene.subareaHeight()).getBytes(StandardCharsets.US_ASCII));
     out.write(0x0a);
 
     // Declare Byte Order
@@ -60,12 +78,12 @@ public class PfmFileWriter implements AutoCloseable {
 
   private void writePixelData(Scene scene, ByteOrder byteOrder, TaskTracker.Task task) throws IOException
   {
-    int width = scene.canvasWidth();
-    int height = scene.canvasHeight();
+    int width = scene.subareaWidth();
+    int height = scene.subareaHeight();
 
     // one or the other will be used, depending on if postprocessing is enabled.
     double[] pixel = new double[3];
-    double[] sampleBuffer = scene.getSampleBuffer();
+    SampleBuffer sampleBuffer = scene.getSampleBuffer();
 
     // write each row...
     for (int y = height-1; y >= 0; y--) {
@@ -75,10 +93,12 @@ public class PfmFileWriter implements AutoCloseable {
       ByteBuffer buffer = ByteBuffer.allocate(width*3*4).order(byteOrder);
       FloatBuffer floatBuffer = buffer.asFloatBuffer();
 
-      // get the row's data as floats from raw pixel data
-      // (ignore post processing because that would clip the color range and defeat the purpose of HDR)
-        for (int x = 0; x < 3*width; x++)
-          floatBuffer.put((float)sampleBuffer[y*width*3+x]);
+      // from raw pixel data
+      for (int x = 0; x < width; x++) {
+        floatBuffer.put((float)sampleBuffer.get(x, y, 0));
+        floatBuffer.put((float)sampleBuffer.get(x, y, 1));
+        floatBuffer.put((float)sampleBuffer.get(x, y, 2));
+      }
 
       // Write buffer to stream
       out.write(buffer.array());

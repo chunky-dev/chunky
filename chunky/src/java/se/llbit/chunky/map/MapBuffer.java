@@ -1,4 +1,5 @@
-/* Copyright (c) 2010-2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2010-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -21,6 +22,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
+import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
@@ -273,7 +275,7 @@ public class MapBuffer {
     int[] pixels = new int[width * height];
     image.getPixelReader().getPixels(0, 0, width, height, PIXEL_FORMAT, pixels, 0, width);
     try (PngFileWriter pngWriter = new PngFileWriter(new FileOutputStream(targetFile))) {
-      pngWriter.write(pixels, width, height, TaskTracker.Task.NONE);
+      pngWriter.write(new BitmapImage(pixels, width, height), width, height, TaskTracker.Task.NONE);
     }
   }
 }

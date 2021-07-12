@@ -1,3 +1,19 @@
+/* Copyright (c) 2021 Chunky contributors
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package se.llbit.chunky.renderer.export;
 
 import java.io.IOException;
@@ -34,11 +50,12 @@ public class PngExportFormat implements PictureExportFormat {
     try (TaskTracker.Task task = taskTracker.task("Writing PNG");
         PngFileWriter writer = new PngFileWriter(out)) {
       BitmapImage backBuffer = scene.getBackBuffer();
+      int width = scene.subareaWidth();
+      int height = scene.subareaHeight();
       if (scene.transparentSky()) {
-        writer.write(backBuffer.data, scene.getAlphaChannel(), scene.canvasWidth(),
-            scene.canvasHeight(), task);
+        writer.write(backBuffer, scene.getSampleBuffer(), width, height, task);
       } else {
-        writer.write(backBuffer.data, scene.canvasWidth(), scene.canvasHeight(), task);
+        writer.write(backBuffer, width, height, task);
       }
       if (scene.camera().getProjectionMode() == ProjectionMode.PANORAMIC
           && scene.camera().getFov() >= 179
@@ -48,18 +65,18 @@ public class PngExportFormat implements PictureExportFormat {
         xmp += " <rdf:Description rdf:about=''\n";
         xmp += "   xmlns:GPano='http://ns.google.com/photos/1.0/panorama/'>\n";
         xmp += " <GPano:CroppedAreaImageHeightPixels>";
-        xmp += scene.canvasHeight();
+        xmp += scene.renderHeight();
         xmp += "</GPano:CroppedAreaImageHeightPixels>\n";
         xmp += " <GPano:CroppedAreaImageWidthPixels>";
-        xmp += scene.canvasWidth();
+        xmp += scene.renderWidth();
         xmp += "</GPano:CroppedAreaImageWidthPixels>\n";
         xmp += " <GPano:CroppedAreaLeftPixels>0</GPano:CroppedAreaLeftPixels>\n";
         xmp += " <GPano:CroppedAreaTopPixels>0</GPano:CroppedAreaTopPixels>\n";
         xmp += " <GPano:FullPanoHeightPixels>";
-        xmp += scene.canvasHeight();
+        xmp += scene.renderHeight();
         xmp += "</GPano:FullPanoHeightPixels>\n";
         xmp += " <GPano:FullPanoWidthPixels>";
-        xmp += scene.canvasWidth();
+        xmp += scene.renderWidth();
         xmp += "</GPano:FullPanoWidthPixels>\n";
         xmp += " <GPano:ProjectionType>equirectangular</GPano:ProjectionType>\n";
         xmp += " <GPano:UsePanoramaViewer>True</GPano:UsePanoramaViewer>\n";

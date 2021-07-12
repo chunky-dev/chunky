@@ -17,10 +17,11 @@
 package se.llbit.chunky.renderer.renderdump;
 
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
-import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -37,14 +38,16 @@ import java.util.zip.GZIPInputStream;
  * TODO for diligent contributors: clean up code duplication
  */
 public class RenderDump {
-  static final byte[] DUMP_FORMAT_MAGIC_NUMBER = {0x44, 0x55, 0x4D, 0x50};
+  static final byte[] DUMP_FORMAT_MAGIC_NUMBER = {0x44, 0x55, 0x4D, 0x50}; // ASCII for "DUMP"
 
-  static final int CURRENT_DUMP_VERSION = 1;
+  static final int CURRENT_DUMP_VERSION = 2;
 
   private static DumpFormat getDumpFormatForVersion(int version) {
     switch (version) {
       case 1:
         return CompressedFloatDumpFormat.INSTANCE;
+      case 2:
+        return IntegratedSppDumpFormat.INSTANCE;
       default:
         return ClassicDumpFormat.INSTANCE;
     }
@@ -67,7 +70,7 @@ public class RenderDump {
     if (magicNumberLength == pushbackInputStream.read(magicNumber, 0, magicNumberLength)
         && Arrays.equals(DUMP_FORMAT_MAGIC_NUMBER, magicNumber)) {
 
-      DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
+      DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(pushbackInputStream));
       int dumpVersion = dataInputStream.readInt();
       getDumpFormatForVersion(dumpVersion).load(dataInputStream, scene, taskTracker);
     } else {
@@ -95,20 +98,20 @@ public class RenderDump {
     if (magicNumberLength == pushbackInputStream.read(magicNumber, 0, magicNumberLength)
         && Arrays.equals(DUMP_FORMAT_MAGIC_NUMBER, magicNumber)) {
 
-      DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
+      DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(pushbackInputStream));
       int dumpVersion = dataInputStream.readInt();
       getDumpFormatForVersion(dumpVersion).merge(dataInputStream, scene, taskTracker);
     } else {
       // Old format that is a gzipped stream, the header needs to be pushed back
       pushbackInputStream.unread(magicNumber, 0, 4);
-      DataInputStream dataInputStream = new DataInputStream(new GZIPInputStream(pushbackInputStream));
+      DataInputStream dataInputStream = new DataInputStream(new GZIPInputStream(new BufferedInputStream(pushbackInputStream)));
       getDumpFormatForVersion(0).merge(dataInputStream, scene, taskTracker);
     }
   }
 
   public static void save(OutputStream outputStream, Scene scene, TaskTracker taskTracker) throws IOException {
     outputStream.write(DUMP_FORMAT_MAGIC_NUMBER);
-    DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+    DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(outputStream));
     DumpFormat format = getDumpFormatForVersion(CURRENT_DUMP_VERSION);
     dataOutputStream.writeInt(CURRENT_DUMP_VERSION);
     format.save(dataOutputStream, scene, taskTracker);

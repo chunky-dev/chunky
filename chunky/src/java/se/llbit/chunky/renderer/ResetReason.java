@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -25,6 +25,7 @@ public enum ResetReason {
   MODE_CHANGE(false),
   MATERIALS_CHANGED(true),
   SETTINGS_CHANGED(true),
+  SETTINGS_CHANGED_FORCE_RESET(true),
   SCENE_LOADED(true);
 
   /** Determines if the non-transitive scene state needs to be modified. */

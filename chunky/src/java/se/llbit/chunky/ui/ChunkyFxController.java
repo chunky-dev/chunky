@@ -332,7 +332,7 @@ public class ChunkyFxController
       Platform.runLater(() -> {
         synchronized (scene) {
           sceneNameField.setText(scene.name());
-          canvas.setCanvasSize(scene.width, scene.height);
+          canvas.setCanvasSize(scene.subareaWidth(), scene.subareaHeight());
         }
         updateTitle();
         refreshSettings();
@@ -793,6 +793,7 @@ public class ChunkyFxController
 
   @Override  public boolean allowSceneRefresh() {
     if (scene.getResetReason() == ResetReason.SCENE_LOADED
+        || scene.getResetReason() == ResetReason.SETTINGS_CHANGED_FORCE_RESET
         || renderManager.getRenderStatus().getRenderTime() < SCENE_EDIT_GRACE_PERIOD) {
       return true;
     } else {

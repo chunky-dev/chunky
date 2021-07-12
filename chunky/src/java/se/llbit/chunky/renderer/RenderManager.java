@@ -1,5 +1,5 @@
-/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
- * Copyright (C) 2016-2021 Chunky contributors
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -17,6 +17,8 @@
  */
 package se.llbit.chunky.renderer;
 
+import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.util.Registerable;
@@ -128,6 +130,6 @@ public interface RenderManager {
   void shutdown();
 
   interface SampleBufferConsumer {
-    void accept(double[] samples, int width, int height);
+    void accept(SampleBuffer samples);
   }
 }

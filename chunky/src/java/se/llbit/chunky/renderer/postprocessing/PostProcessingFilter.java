@@ -1,6 +1,7 @@
 package se.llbit.chunky.renderer.postprocessing;
 
 import se.llbit.chunky.plugin.PluginApi;
+import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.util.TaskTracker;
 
@@ -17,14 +18,12 @@ import se.llbit.util.TaskTracker;
 public interface PostProcessingFilter {
   /**
    * Post process the entire frame
-   * @param width The width of the image
-   * @param height The height of the image
-   * @param input The input linear image as double array, exposure has not been applied
+   * @param input The input 2D image as double matrix contained within a SampleBuffer. Exposure has not yet been applied.
    * @param output The output image
    * @param exposure The exposure value
    * @param task Task
    */
-  void processFrame(int width, int height, double[] input, BitmapImage output, double exposure, TaskTracker.Task task);
+  void processFrame(SampleBuffer input, BitmapImage output, double exposure, TaskTracker.Task task);
 
   /**
    * Get name of the post processing filter

@@ -1,4 +1,5 @@
-/* Copyright (c) 2015 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2015-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2015-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -228,17 +229,16 @@ public class TiffFileWriter implements AutoCloseable {
           "The TIFF will be exported without post-processing instead.");
       filter = PostProcessingFilters.NONE;
     }
-
-    int width = scene.canvasWidth();
-    int height = scene.canvasHeight();
+    PixelPostProcessingFilter pixelFilter = ((PixelPostProcessingFilter) filter);
+    int width = scene.subareaWidth();
+    int height = scene.subareaHeight();
     writeHeader(width, height, 4);
 
     for (int y = 0; y < height; ++y) {
       task.update(height, y);
       for (int x = 0; x < width; ++x) {
         double[] pixel = new double[3];
-        ((PixelPostProcessingFilter) filter)
-            .processPixel(width, height, scene.getSampleBuffer(), x, y, scene.getExposure(), pixel);
+        pixelFilter.processPixel(scene.getSampleBuffer(), x, y, scene.getExposure(), pixel);
         out.writeFloat((float) pixel[0]);
         out.writeFloat((float) pixel[1]);
         out.writeFloat((float) pixel[2]);

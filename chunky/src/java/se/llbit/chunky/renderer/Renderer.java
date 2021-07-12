@@ -1,4 +1,5 @@
-/* Copyright (c) 2021 Chunky contributors
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -16,6 +17,9 @@
  */
 package se.llbit.chunky.renderer;
 
+import se.llbit.chunky.renderer.scene.SampleBuffer;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.util.Registerable;
 
 import java.util.function.BooleanSupplier;
@@ -60,6 +64,10 @@ public interface Renderer extends Registerable {
    *  * Updating the {@code bufferedScene}
    */
   void setPostRender(BooleanSupplier callback);
+
+  interface SampleBufferConsumer {
+    void accept(double[] samples, int width, int height);
+  }
 
   /**
    * This is called when a render is initiated.

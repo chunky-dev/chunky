@@ -120,7 +120,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public static final String EXTENSION = ".json";
 
   /** The current Scene Description Format (SDF) version. */
-  public static final int SDF_VERSION = 9;
+  public static final int SDF_VERSION = 10;
 
   protected static final double fSubSurface = 0.3;
 
@@ -190,15 +190,19 @@ public class Scene implements JsonSerializable, Refreshable {
   public int sdfVersion = -1;
   public String name = "default_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
 
-  /**
-   * Canvas width.
-   */
+  /** Rendering canvas width. */
+  public int subareaWidth;
+  /** Full output image's width. */
   public int width;
 
-  /**
-   * Canvas height.
-   */
+  /** Canvas height. */
+  public int subareaHeight;
+  /** Full output image's height. */
   public int height;
+
+  // From top left corner:
+  public int crop_x;
+  public int crop_y;
 
   public PostProcessingFilter postProcessingFilter = DEFAULT_POSTPROCESSING_FILTER;
   public PictureExportFormat outputMode = PictureExportFormats.PNG;
@@ -334,9 +338,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * should really be moved somewhere else and not be so tightly
    * coupled to the scene settings.
    */
-  protected double[] samples;
-
-  private byte[] alphaChannel;
+  protected SampleBuffer samples;
 
   private boolean finalized = false;
 
@@ -378,6 +380,9 @@ public class Scene implements JsonSerializable, Refreshable {
   public Scene() {
     width = PersistentSettings.get3DCanvasWidth();
     height = PersistentSettings.get3DCanvasHeight();
+    crop_x = crop_y = 0;
+    subareaWidth = width;
+    subareaHeight = height;
     sppTarget = PersistentSettings.getSppTargetDefault();
 
     palette = new BlockPalette();
@@ -416,10 +421,12 @@ public class Scene implements JsonSerializable, Refreshable {
    * scene and after scene canvas size changes.
    */
   public synchronized void initBuffers() {
-    frontBuffer = new BitmapImage(width, height);
-    backBuffer = new BitmapImage(width, height);
-    alphaChannel = new byte[width * height];
-    samples = new double[width * height * 3];
+    frontBuffer = new BitmapImage(subareaWidth, subareaHeight);
+    backBuffer = new BitmapImage(subareaWidth, subareaHeight);
+    samples = new SampleBuffer(subareaWidth, subareaHeight);
+    spp = 0;
+    if (transparentSky())
+      samples.enableAlpha();
   }
 
   /**
@@ -505,9 +512,12 @@ public class Scene implements JsonSerializable, Refreshable {
     if (samples != other.samples) {
       width = other.width;
       height = other.height;
+      crop_x = other.crop_x;
+      crop_y = other.crop_y;
+      subareaWidth = other.subareaWidth;
+      subareaHeight = other.subareaHeight;
       backBuffer = other.backBuffer;
       frontBuffer = other.frontBuffer;
-      alphaChannel = other.alphaChannel;
       samples = other.samples;
     }
 
@@ -546,7 +556,10 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       saveOctree(context, taskTracker);
-      saveDump(context, taskTracker);
+      if (spp>0)
+        saveDump(context, taskTracker);
+//    else
+//      delete existing dumps;
       saveEmitterGrid(context, taskTracker);
     }
   }
@@ -1786,6 +1799,9 @@ public class Scene implements JsonSerializable, Refreshable {
   public void setTransparentSky(boolean value) {
     if (value != transparentSky) {
       transparentSky = value;
+      if (transparentSky) {
+        getSampleBuffer().enableAlpha();
+      }
       refresh();
     }
   }
@@ -1943,26 +1959,35 @@ public class Scene implements JsonSerializable, Refreshable {
   public synchronized void setCanvasSize(int canvasWidth, int canvasHeight) {
     int newWidth = Math.max(MIN_CANVAS_WIDTH, canvasWidth);
     int newHeight = Math.max(MIN_CANVAS_HEIGHT, canvasHeight);
-    if (newWidth != width || newHeight != height) {
+    if (newWidth != width || newHeight != height || crop_x != 0 || crop_y != 0 || subareaWidth != width || subareaHeight != height) {
       width = newWidth;
       height = newHeight;
+      crop_x = crop_y = 0;
+      subareaWidth = width;
+      subareaHeight = height;
       initBuffers();
       refresh();
     }
   }
 
-  /**
-   * @return Canvas width
-   */
-  public int canvasWidth() {
+  /** @return Canvas width */
+  public int renderWidth() {
     return width;
   }
 
-  /**
-   * @return Canvas height
-   */
-  public int canvasHeight() {
+  /** @return Canvas height */
+  public int renderHeight() {
     return height;
+  }
+
+  /** @return Subarea width */
+  public int subareaWidth() {
+    return subareaWidth;
+  }
+
+  /** @return Subarea height */
+  public int subareaHeight() {
+    return subareaHeight;
   }
 
   /**
@@ -2065,10 +2090,16 @@ public class Scene implements JsonSerializable, Refreshable {
     if(mode == RenderMode.PREVIEW) {
       filter = PreviewFilter.INSTANCE;
     }
-    filter.processFrame(width, height, samples, backBuffer, exposure, task);
+    filter.processFrame(samples, backBuffer, exposure, task);
     finalized = true;
   }
 
+  /**
+   * Post-process all pixels in the current frame.
+   *
+   * <p>This is normally done by the render workers during rendering,
+   * but in some cases an separate post processing pass is needed.
+   */
   public void postProcessFrame(TaskTracker taskTracker) {
     try (TaskTracker.Task task = taskTracker.task("Finalizing frame")) {
       postProcessFrame(task);
@@ -2207,12 +2238,17 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public synchronized boolean loadDump(RenderContext context, TaskTracker taskTracker) {
-    if (!tryLoadDump(context, name + ".dump", taskTracker)) {
+    Runnable logWarning;
+    if (null != (logWarning=tryLoadDump(context, name + ".dump", taskTracker))) {
       // Failed to load the default render dump - try the backup file.
-      if (!tryLoadDump(context, name + ".dump.backup", taskTracker)) {
+      if (null != tryLoadDump(context, name + ".dump.backup", taskTracker)) {
         // we don't have the old render state, so reset spp and render time
         spp = 0;
         renderTime = 0;
+        if (samples != null) {
+          samples.reset();
+        }
+        logWarning.run();
         return false;
       }
     }
@@ -2220,31 +2256,40 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * @return {@code true} if the render dump was successfully loaded
+   * @return Returns null on successful dump load, and a Runnable that will log a warning on a failed load.
    */
-  private boolean tryLoadDump(RenderContext context, String fileName, TaskTracker taskTracker) {
+  private Runnable tryLoadDump(RenderContext context, String fileName, TaskTracker taskTracker) {
     File dumpFile = context.getSceneFile(fileName);
     if (!dumpFile.isFile()) {
       if (spp != 0) {
         // The scene state says the render had some progress, so we should warn
         // that the render dump does not exist.
-        Log.warn("Render dump not found: " + fileName);
+        return ()->Log.warn("Render dump not found: " + fileName);
       }
-      return false;
+      return ()->{};
     }
 
     Log.info("Loading render dump: " + dumpFile);
+    int crop_x = this.crop_x;
+    int crop_y = this.crop_y;
+    int subareaWidth = this.subareaWidth;
+    int subareaHeight = this.subareaHeight;
     try (FileInputStream inputStream = new FileInputStream(dumpFile)) {
       RenderDump.load(inputStream, this, taskTracker);
     } catch (IOException | IllegalStateException e) {
-      // The render dump was possibly corrupt.
-      Log.warn("Failed to load the render dump", e);
-      return false;
+      // reset crop size
+      this.crop_x = crop_x;
+      this.crop_y = crop_y;
+      this.subareaWidth = subareaWidth;
+      this.subareaHeight = subareaHeight;
+
+      // The render dump was possibly corrupt, or empty
+      return ()->Log.warn("Failed to load the render dump", e);
     }
     postProcessFrame(taskTracker);
 
     Log.info("Render dump loaded: " + fileName);
-    return true;
+    return null;
   }
 
   /**
@@ -2289,14 +2334,14 @@ public class Scene implements JsonSerializable, Refreshable {
 
     occlusion += PreviewRayTracer.skyOcclusion(this, state);
 
-    alphaChannel[y * width + x] = (byte) (255 * occlusion * 0.25 + 0.5);
+    samples.setAlpha(x,y,(byte) (255 * occlusion * 0.25 + 0.5));
   }
 
   /**
    * Copies a pixel in-buffer.
    */
-  public void copyPixel(int jobId, int offset) {
-    System.arraycopy(samples, jobId * 3, samples, (jobId + offset) * 3, 3);
+  public void copyPixel(int jobId_x, int jobId_y, int offset) {
+    backBuffer.setPixel(jobId_x + offset, jobId_y, backBuffer.getPixel(jobId_x, jobId_y));
   }
 
   /**
@@ -2365,7 +2410,7 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * @return The sample buffer for this scene
    */
-  public double[] getSampleBuffer() {
+  public SampleBuffer getSampleBuffer() {
     return samples;
   }
 
@@ -2375,14 +2420,6 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public BitmapImage getBackBuffer() {
     return backBuffer;
-  }
-
-  /**
-   * Get the alpha channel of the current frame.
-   * @return Alpha channel of the current frame
-   */
-  public byte[] getAlphaChannel() {
-    return alphaChannel;
   }
 
   /**
@@ -2554,6 +2591,12 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("name", name);
     json.add("width", width);
     json.add("height", height);
+    JsonArray crop = new JsonArray(4);
+    crop.add(crop_x);
+    crop.add(crop_y);
+    crop.add(subareaWidth);
+    crop.add(subareaHeight);
+    json.add("crop", crop);
     json.add("yClipMin", yClipMin);
     json.add("yClipMax", yClipMax);
     json.add("yMin", yMin);
@@ -2821,9 +2864,25 @@ public class Scene implements JsonSerializable, Refreshable {
 
     int newWidth = json.get("width").intValue(width);
     int newHeight = json.get("height").intValue(height);
-    if (width != newWidth || height != newHeight || samples == null) {
+    JsonArray crop = json.get("crop").array();
+    int newCropX=0, newCropY=0, newCropWidth=newWidth, newCropHeight=newHeight;
+    try {
+      newCropX = crop.get(0).intValue(0);
+      newCropY = crop.get(1).intValue(0);
+      newCropWidth = crop.get(2).intValue(newWidth);
+      newCropHeight = crop.get(3).intValue(newHeight);
+    } catch (IndexOutOfBoundsException ignored) {
+      Log.info("Crop area missing or unable to read from scene.");
+    }
+    if (samples == null || width != newWidth || height != newHeight
+        || newCropX != crop_x || newCropWidth != subareaWidth
+        || newCropY != crop_y || newCropHeight != subareaHeight) {
       width = newWidth;
       height = newHeight;
+      crop_x = newCropX;
+      crop_y = newCropY;
+      subareaWidth = newCropWidth;
+      subareaHeight = newCropHeight;
       initBuffers();
     }
 
@@ -2985,6 +3044,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (mode == RenderMode.PAUSED) {
       mode = RenderMode.RENDERING;
     }
+    if (samples!=null) samples.reset();
     spp = 0;
     renderTime = 0;
     setResetReason(reason);

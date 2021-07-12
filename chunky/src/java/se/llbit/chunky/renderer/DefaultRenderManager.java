@@ -23,6 +23,7 @@ import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
 import se.llbit.chunky.renderer.scene.PathTracer;
 import se.llbit.chunky.renderer.scene.PreviewRayTracer;
+import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
@@ -372,9 +373,9 @@ public class DefaultRenderManager extends Thread implements RenderManager {
    * @return the current rendering speed in samples per second (SPS)
    */
   private int samplesPerSecond() {
-    int canvasWidth = bufferedScene.canvasWidth();
-    int canvasHeight = bufferedScene.canvasHeight();
-    long pixelsPerFrame = canvasWidth * canvasHeight;
+    int canvasWidth = bufferedScene.subareaWidth();
+    int canvasHeight = bufferedScene.subareaHeight();
+    long pixelsPerFrame = (long) canvasWidth * canvasHeight;
     double renderTime = bufferedScene.renderTime / 1000.0;
     return (int) ((bufferedScene.spp * pixelsPerFrame) / renderTime);
   }
@@ -418,7 +419,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
 
         int width = bufferedScene.width;
         int height = bufferedScene.height;
-        double[] sampleBuffer = bufferedScene.getSampleBuffer();
+        SampleBuffer sampleBuffer = bufferedScene.getSampleBuffer();
         double exposure = bufferedScene.getExposure();
 
         // Split up to 10 tasks per thread
@@ -436,7 +437,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
               int x = j % width;
               int y = j / width;
 
-              pixelFilter.processPixel(width, height, sampleBuffer, x, y, exposure, pixelbuffer);
+              pixelFilter.processPixel(sampleBuffer, x, y, exposure, pixelbuffer);
               Arrays.setAll(pixelbuffer, k -> Math.min(1, pixelbuffer[k]));
               bufferedScene.getBackBuffer().setPixel(x, y, ColorUtil.getRGB(pixelbuffer));
             }
@@ -565,7 +566,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   @Override
   public void withSampleBufferProtected(SampleBufferConsumer consumer) {
     synchronized (bufferedScene) {
-      consumer.accept(bufferedScene.getSampleBuffer(), bufferedScene.width, bufferedScene.height);
+      consumer.accept(bufferedScene.getSampleBuffer());
     }
   }
 

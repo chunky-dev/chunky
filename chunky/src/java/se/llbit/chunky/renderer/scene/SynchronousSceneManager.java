@@ -32,6 +32,7 @@ import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.function.Consumer;
 
@@ -62,7 +63,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
    * expired a reset confirm dialog will be shown before applying any further
    * non-transitory changes to the stored scene state.
    */
-  private final Scene storedScene;
+  private Scene storedScene;
 
   private final RenderContext context;
 
@@ -101,11 +102,13 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     this.onChunksLoaded = onChunksLoaded;
   }
 
-  @Override public Scene getScene() {
+  @Override
+  public Scene getScene() {
     return scene;
   }
 
-  @Override public void saveScene() throws InterruptedException {
+  @Override
+  public void saveScene() throws InterruptedException {
     try {
       synchronized (storedScene) {
         String sceneName = storedScene.name();
@@ -250,26 +253,31 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
    */
   protected void mergeDump(File dumpFile) {
     synchronized (scene) {
-      renderManager.withSampleBufferProtected((samples, width, height) -> {
-        if (width != scene.width || height != scene.height) {
-          throw new Error("Failed to merge render dump - wrong canvas size.");
-        }
+      renderManager.withSampleBufferProtected(samples -> {
+        // Attempt a merge.
         scene.mergeDump(dumpFile, taskTracker);
+// ######## <- ########
+//        scene.setResetReason(ResetReason.SCENE_LOADED);
+//        scene.notifyAll();
+//        scene.pauseRender();
+// ######## <- ########
       });
+// ######## -> ########
       scene.setResetReason(ResetReason.SCENE_LOADED);
       scene.pauseRender();
+// ######## -> ########
     }
   }
 
   /**
-   * Discard pending scene changes.
+   * Apply pending scene changes.
    */
   public void applySceneChanges() {
     // Lock order: scene -> storedScene.
     synchronized (scene) {
       synchronized (storedScene) {
-        // Setting SCENE_LOADED will force the reset.
-        scene.setResetReason(ResetReason.SCENE_LOADED);
+        // Setting SETTINGS_CHANGED_FORCE_RESET will force the reset.
+        scene.setResetReason(ResetReason.SETTINGS_CHANGED_FORCE_RESET);
 
         // Wake up the threads waiting in awaitSceneStateChange().
         scene.notifyAll();
@@ -278,7 +286,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   }
 
   /**
-   * Apply pending scene changes.
+   * Discard pending scene changes.
    */
   public void discardSceneChanges() {
     // Lock order: scene -> storedScene.

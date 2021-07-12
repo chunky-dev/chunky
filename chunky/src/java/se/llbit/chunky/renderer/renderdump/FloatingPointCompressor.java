@@ -16,13 +16,15 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
+import se.llbit.chunky.renderer.scene.SampleBuffer;
+
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.function.IntConsumer;
+import java.util.function.LongConsumer;
 
 /**
  * Implementation of the FPC algorithm
@@ -151,45 +153,40 @@ public class FloatingPointCompressor {
     }
   }
 
-  public static void compress(OutputStream output, double[] input, IntConsumer pixelProgress) throws IOException {
+  public static void compress(SampleBuffer input, OutputStream output, LongConsumer pixelProgress) throws IOException {
     try (FastBufferedOutputStream out = new FastBufferedOutputStream(output)) {
-      if (input.length % 3 != 0)
-        throw new IllegalArgumentException("Dump doesn't have a multiple of 3 values");
-
-      int pixels = input.length / 3;
-      int size = pixels - 1;
-
+      long size = input.numberOfPixels() - 1;
       EncoderDecoder rEncoder = new EncoderDecoder();
       EncoderDecoder gEncoder = new EncoderDecoder();
       EncoderDecoder bEncoder = new EncoderDecoder();
 
       for (int i = 0; i < size; i += 2) {
         int idx = 3 * i;
-        rEncoder.encodePair(input[idx], input[idx + 3], out);
-        gEncoder.encodePair(input[idx + 1], input[idx + 4], out);
-        bEncoder.encodePair(input[idx + 2], input[idx + 5], out);
+        rEncoder.encodePair(input.get(idx+0), input.get(idx+3), out);
+        gEncoder.encodePair(input.get(idx+1), input.get(idx+4), out);
+        bEncoder.encodePair(input.get(idx+2), input.get(idx+5), out);
         pixelProgress.accept(i);
       }
 
       // Add the last one and a special terminator if there is an odd number
-      if (pixels % 2 == 1) {
-        int idx = 3 * size;
-        rEncoder.encodeSingleWithOddTerminator(input[idx], out);
-        gEncoder.encodeSingleWithOddTerminator(input[idx + 1], out);
-        bEncoder.encodeSingleWithOddTerminator(input[idx + 2], out);
+      if (input.numberOfPixels() % 2 == 1) {
+        long idx = 3 * size;
+        rEncoder.encodeSingleWithOddTerminator(input.get(idx + 0), out);
+        gEncoder.encodeSingleWithOddTerminator(input.get(idx + 1), out);
+        bEncoder.encodeSingleWithOddTerminator(input.get(idx + 2), out);
         pixelProgress.accept(size);
       }
     }
   }
 
-  public static void decompress(InputStream input, int bufferLength, PixelConsumer consumer, IntConsumer pixelProgress)
+  public static void decompress(InputStream input, long bufferLength, PixelConsumer consumer, LongConsumer pixelProgress)
       throws IOException {
     try (FastBufferedInputStream in = new FastBufferedInputStream(input)) {
       if (bufferLength % 3 != 0)
         throw new IllegalArgumentException("Dump doesn't have a multiple of 3 values");
 
-      int pixels = bufferLength / 3;
-      int size = pixels - 1;
+      long pixels = bufferLength / 3;
+      long size = pixels - 1;
 
       EncoderDecoder rDecoder = new EncoderDecoder();
       EncoderDecoder gDecoder = new EncoderDecoder();
@@ -215,7 +212,7 @@ public class FloatingPointCompressor {
         double b2 = bDecoder.decodeSingle(bSecondHeader, in);
 
         consumer.consume(i, r1, g1, b1);
-        consumer.consume(i+1, r2,  g2, b2);
+        consumer.consume(i + 1, r2, g2, b2);
         pixelProgress.accept(i);
       }
 

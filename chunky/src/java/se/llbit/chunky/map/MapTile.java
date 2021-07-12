@@ -1,4 +1,5 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -154,7 +155,7 @@ public class MapTile {
     // Safety check to ensure that the image has the correct size.
     // This check fails when trying to draw static icons not matching the tile size.
     if (image.width == tileWidth || image.height == tileWidth) {
-      System.arraycopy(image.data, 0, pixels, 0, tileWidth * tileWidth);
+      pixels = image.toIntArray();
     }
   }
 }

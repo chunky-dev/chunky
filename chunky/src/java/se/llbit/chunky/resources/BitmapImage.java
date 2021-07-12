@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2016-2017 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -27,7 +27,7 @@ import org.apache.commons.math3.util.FastMath;
  * if concurrent modification of pixels needs to be done.
  */
 public class BitmapImage {
-  public final int[] data;
+  public final int[][] data;
   public final int width;
   public final int height;
 
@@ -37,7 +37,7 @@ public class BitmapImage {
   public BitmapImage(int width, int height) {
     this.width = width;
     this.height = height;
-    data = new int[width * height];
+    data = new int[height][width];
   }
 
   /**
@@ -46,44 +46,52 @@ public class BitmapImage {
   public BitmapImage(BitmapImage image) {
     this.width = image.width;
     this.height = image.height;
-    data = new int[width * height];
-    System.arraycopy(image.data, 0, data, 0, width * height);
+    data = new int[height][width];
+    for (int row = 0; row < height; row++)
+      System.arraycopy(image.data[row], 0, data[row], 0, width);
+  }
+
+  /**
+   * Create a copy of another image.
+   */
+  public BitmapImage(int[] image, int width, int height) {
+    this.width = width;
+    this.height = height;
+    data = new int[height][width];
+    setData(image);
   }
 
   /** @return the ARGB value of the pixel (x, y). */
   public int getPixel(int x, int y) {
-    return data[y * width + x];
+    return data[y][x];
   }
 
   /** Sets the ARGB value of the pixel (x, y). */
   public void setPixel(int x, int y, int argb) {
-    data[y * width + x] = argb;
+    data[y][x] = argb;
   }
 
   /**
    * Copies the source bitmap into this bitmap at the given (x0, y0) position.
    */
   public void blit(BitmapImage source, int x0, int y0) {
-    for (int y = 0; y < source.height; ++y) {
-      System.arraycopy(source.data, y * source.width, data, (y0 + y) * width + x0, source.width);
-    }
+    for (int y = 0; y < source.height; ++y)
+      System.arraycopy(source.data[y], 0, data[y0 + y], x0, source.width);
   }
 
   /**
    * Copies a region of the source bitmap into this bitmap at the given (x0, y0) position.
-   * @param x0 destination x position
-   * @param y0 destination y position
+   *
+   * @param x0  destination x position
+   * @param y0  destination y position
    * @param sx0 source x start position
    * @param sy0 source y start position
    * @param sx1 source x end position
    * @param sy1 source y end position
    */
   public void blit(BitmapImage source, int x0, int y0, int sx0, int sy0, int sx1, int sy1) {
-    for (int y = 0; y < sy1 - sy0; ++y) {
-      System.arraycopy(source.data, (sy0 + y) * source.width + sx0,
-          data, (y0 + y) * width + x0,
-          sx1 - sx0);
-    }
+    for (int y = 0; y < sy1 - sy0; ++y)
+      System.arraycopy(source.data[sy0 + y], sx0, data[y0 + y], x0, sx1 - sx0);
   }
 
   /**
@@ -92,7 +100,7 @@ public class BitmapImage {
   public BitmapImage vFlipped() {
     BitmapImage flipped = new BitmapImage(width, height);
     for (int y = 0; y < height; ++y) {
-      System.arraycopy(data, width*y, flipped.data, width*(height-y-1), width);
+      System.arraycopy(data[y], 0, flipped.data[height - y - 1], 0, width);
     }
     return flipped;
   }
@@ -128,11 +136,9 @@ public class BitmapImage {
    */
   public BitmapImage rotated() {
     BitmapImage rotated = new BitmapImage(height, width);
-    for (int y = 0; y < height; ++y) {
-      for (int x = 0; x < width; ++x) {
+    for (int y = 0; y < height; ++y)
+      for (int x = 0; x < width; ++x)
         rotated.setPixel(height - y - 1, x, getPixel(x, y));
-      }
-    }
     return rotated;
   }
 
@@ -141,11 +147,9 @@ public class BitmapImage {
    */
   public BitmapImage rotated180() {
     BitmapImage rotated = new BitmapImage(width, height);
-    for (int y = 0; y < height; ++y) {
-      for (int x = 0; x < width; ++x) {
+    for (int y = 0; y < height; ++y)
+      for (int x = 0; x < width; ++x)
         rotated.setPixel(width - x - 1, height - y - 1, getPixel(x, y));
-      }
-    }
     return rotated;
   }
 
@@ -154,16 +158,15 @@ public class BitmapImage {
    */
   public BitmapImage rotated270() {
     BitmapImage rotated = new BitmapImage(height, width);
-    for (int y = 0; y < height; ++y) {
-      for (int x = 0; x < width; ++x) {
+    for (int y = 0; y < height; ++y)
+      for (int x = 0; x < width; ++x)
         rotated.setPixel(y, width - x - 1, getPixel(x, y));
-      }
-    }
     return rotated;
   }
 
   /**
    * Puts image A above image B and returns the result.
+   *
    * @param a Image A
    * @param b Image B
    * @return a new image with a on top of b
@@ -173,5 +176,32 @@ public class BitmapImage {
     img.blit(a, 0, 0);
     img.blit(b, 0, a.height, 0, 0, b.width, b.height);
     return img;
+  }
+
+  private void setData(int[] image) {
+    // Check for size mismatch
+    if (image.length < width * height)
+      throw new IllegalArgumentException("Size not matched. Expected " + width + "*" + height + "=" + (width * height)
+          + " but got " + image.length);
+
+    for (int row = 0; row < height; row++)
+      System.arraycopy(image, width * row, data[row], 0, width);
+  }
+
+  // This should ONLY BE USED for smaller textures, and not rendering the full output
+  // (eg Scene.backBuffer), where this will fail.
+  @Deprecated
+  public int[] toIntArray() {
+    if (((long) width) * height > Integer.MAX_VALUE)
+      throw new IndexOutOfBoundsException("Bitmap too large. Cannot fit within a single array. This should only be used for small images, such as textures or MapTiles, not full renders!");
+    int[] copy = new int[width * height];
+    for (int row = 0; row < height; row++)
+      System.arraycopy(data[row], 0, copy, width * row, width);
+    return copy;
+  }
+
+  @Deprecated
+  public int[] getRow_Unsafe(int row) {
+    return data[row];
   }
 }

@@ -1,4 +1,5 @@
-/* Copyright (c) 2010-2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2010-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -52,9 +53,9 @@ public final class ImageLoader {
     for (int y = 0; y < 16; ++y) {
       for (int x = 0; x < 16; ++x) {
         if (x == 0 || x == 15 || y == 0 || y == 15 || x == y || x == 16 - y) {
-          missingImage.data[y * 16 + x] = 0xFFFF0000;
+          missingImage.setPixel(x, y, 0xFFFF0000);
         } else {
-          missingImage.data[y * 16 + x] = 0xFF000000;
+          missingImage.setPixel(x, y, 0xFF000000);
         }
       }
     }
@@ -126,10 +127,7 @@ public final class ImageLoader {
     }
     // Copy the BufferedImage data into a new bitmap image.
     DataBufferInt dataBuffer = (DataBufferInt) image.getRaster().getDataBuffer();
-    int[] data = dataBuffer.getData();
-    BitmapImage bitmap = new BitmapImage(width, height);
-    System.arraycopy(data, 0, bitmap.data, 0, width * height);
-    return bitmap;
+    return new BitmapImage(dataBuffer.getData(), width, height);
   }
 
   /**
@@ -156,7 +154,8 @@ public final class ImageLoader {
     DataBufferInt dataBuffer = (DataBufferInt) image.getRaster().getDataBuffer();
     int[] data = dataBuffer.getData();
     BitmapImage bitmap = new BitmapImage(width, height);
-    System.arraycopy(data, 0, bitmap.data, 0, width * height);
+    for (int i = 0; i<height; i++)
+      System.arraycopy(data, i*width, bitmap.data[i], 0, width);
     return bitmap;
   }
 }

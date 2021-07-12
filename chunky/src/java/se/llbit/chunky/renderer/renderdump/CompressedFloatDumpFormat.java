@@ -21,7 +21,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.function.IntConsumer;
+import java.util.function.LongConsumer;
 
 class CompressedFloatDumpFormat extends DumpFormat {
 
@@ -31,13 +31,13 @@ class CompressedFloatDumpFormat extends DumpFormat {
   }
 
   @Override
-  public void readSamples(DataInputStream inputStream, Scene scene, PixelConsumer consumer, IntConsumer pixelProgress)
+  public void readSamples(DataInputStream inputStream, Scene scene, PixelConsumer consumer, LongConsumer pixelProgress)
       throws IOException {
-    FloatingPointCompressor.decompress(inputStream, scene.getSampleBuffer().length, consumer, pixelProgress);
+    FloatingPointCompressor.decompress(inputStream, scene.getSampleBuffer().numberOfDoubles(), consumer, pixelProgress);
   }
 
   @Override
-  public void writeSamples(DataOutputStream outputStream, Scene scene, IntConsumer pixelProgress) throws IOException {
-    FloatingPointCompressor.compress(outputStream, scene.getSampleBuffer(), pixelProgress);
+  public void writeSamples(DataOutputStream outputStream, Scene scene, LongConsumer pixelProgress) throws IOException {
+    FloatingPointCompressor.compress(scene.getSampleBuffer(), outputStream, pixelProgress);
   }
 }

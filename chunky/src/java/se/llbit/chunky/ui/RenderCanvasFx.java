@@ -44,7 +44,9 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.math.Vector2;
+import se.llbit.util.Pair;
 
 import java.nio.IntBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -55,6 +57,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStatusListener {
   private static final WritablePixelFormat<IntBuffer> PIXEL_FORMAT =
       PixelFormat.getIntArgbInstance();
+
+  // This sets the maximum "Render Preview" canvas size to 4k by 4k,
+  // for sizes any larger cause a strange crash in JavaFX.
+  // Currently, this only shows the 4k by 4k top-left corner of renders
+  // which are larger than this. Future task: be able to pan around on
+  // the Render Preview canvas. (Kind-of exists, but again, loading the
+  // whole image leads to mysterious crashes.)
+  // Oh, and also, the crash happens at different minimum canvas sizes
+  // unique to each computer.
+  private static final int REDUCED_CANVAS_MAX_SIZE = 4096; // TODO: set via command line/launcher arg?
+  private boolean previewShouldSubsample = true;
 
   private final se.llbit.chunky.renderer.scene.Scene renderScene;
 
@@ -85,9 +98,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
     canvas = new Canvas();
     synchronized (scene) {
-      canvas.setWidth(scene.width);
-      canvas.setHeight(scene.height);
-      image = new WritableImage(scene.width, scene.height);
+      canvas.setWidth(scene.subareaWidth());
+      canvas.setHeight(scene.subareaHeight());
+      Pair<Integer, Integer> scaledSize = getScaledSize(scene.subareaWidth(), scene.subareaHeight(), REDUCED_CANVAS_MAX_SIZE);
+      image = new WritableImage(scaledSize.thing1, scaledSize.thing2);
     }
 
     canvasPane = new StackPane(canvas);
@@ -166,7 +180,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     });
     Menu canvasScale = new Menu("Canvas scale");
     ToggleGroup scaleGroup = new ToggleGroup();
-    for (int percent : new int[] { 25, 50, 75, 100, 150, 200, 300, 400 }) {
+    for (int percent : new int[]{25, 50, 75, 100, 150, 200, 300, 400}) {
       RadioMenuItem item = new RadioMenuItem(String.format("%d%%", percent));
       item.setToggleGroup(scaleGroup);
       item.setSelected(PersistentSettings.getCanvasScale() == percent && !fitToScreen);
@@ -357,7 +371,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     updateCanvasScale(scale);
   }
 
-  @Override public void repaint() {
+  @Override
+  public void repaint() {
     updateCanvasFit();
     if (painting.compareAndSet(false, true)) {
       forceRepaint();
@@ -367,10 +382,25 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   public void forceRepaint() {
     painting.set(true);
     renderManager.withBufferedImage(bitmap -> {
-      if (bitmap.width == (int) image.getWidth()
-          && bitmap.height == (int) image.getHeight()) {
-        image.getPixelWriter().setPixels(0, 0, bitmap.width, bitmap.height, PIXEL_FORMAT,
-            bitmap.data, 0, bitmap.width);
+      Pair<Integer, Integer> scaledSize = getScaledSize(bitmap.width, bitmap.height, REDUCED_CANVAS_MAX_SIZE);
+      int width = scaledSize.thing1;
+      int height = scaledSize.thing2;
+
+      int decimateRatio = bitmap.width / width;
+
+      if (width != Math.round((float) image.getWidth()) || height != Math.round((float) image.getHeight()))
+        setCanvasSize(width, height);
+
+      if (previewShouldSubsample) {
+        for (int row = 0; row < height; row++) {
+          image.getPixelWriter().setPixels(0, row, width, 1, PIXEL_FORMAT,
+              subsampleRow(bitmap, row * decimateRatio, decimateRatio), 0, width);
+        }
+      } else {
+        for (int row = 0; row < height; row++) {
+          image.getPixelWriter().setPixels(0, row, width, 1, PIXEL_FORMAT,
+              decimateRow(bitmap, row * decimateRatio, decimateRatio), 0, width);
+        }
       }
     });
     Platform.runLater(() -> {
@@ -384,7 +414,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     this.renderListener = renderListener;
   }
 
-  @Override public void sceneStatus(String status) {
+  @Override
+  public void sceneStatus(String status) {
     Platform.runLater(() -> {
       Point2D offset = localToScene(0, 0);
       tooltip.setText(status);
@@ -398,6 +429,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
    * Should only be called on the JavaFX application thread.
    */
   public void setCanvasSize(int width, int height) {
+    Pair<Integer, Integer> scaledSize = getScaledSize(width, height, REDUCED_CANVAS_MAX_SIZE);
+    width = scaledSize.thing1;
+    height = scaledSize.thing2;
+
     canvas.setWidth(width);
     canvas.setHeight(height);
     if (image == null || width != image.getWidth() || height != image.getHeight()) {
@@ -409,5 +444,71 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     } else {
       updateCanvasScale(canvas.getScaleX());
     }
+  }
+
+  protected Pair<Integer, Integer> getScaledSize(int w, int h, int maxSize) {
+    while (w > maxSize || h > maxSize) {
+      if (w / 2 > maxSize || h / 2 > maxSize) {
+        if (w % 3 == 0 && h % 3 == 0 && w / 3 <= maxSize && h / 3 <= maxSize) { return new Pair<>(w / 3, h / 3); }
+      }
+      w /= 2;
+      h /= 2;
+    }
+    return new Pair<>(w, h);
+  }
+
+  public boolean previewIsSubsampled() {
+    return previewShouldSubsample;
+  }
+
+  public void setPreviewShouldSubsample(boolean previewShouldSubsample) {
+    this.previewShouldSubsample = previewShouldSubsample;
+    repaint();
+  }
+
+  /**
+   * For each pixel that is getting displayed to Render Preview, take the upper-left-most pixel in its region and
+   * display just that single pixel. (by returning those upper-left-most pixels in an array)
+   */
+  protected int[] decimateRow(BitmapImage bitmap, int row, int decimateRatio) {
+    int[] ret = new int[bitmap.width / decimateRatio];
+    for (int i = 0; i < ret.length; i++) { ret[i] = bitmap.getPixel(i * decimateRatio, row); }
+    return ret;
+  }
+
+  /**
+   * For each pixel that is getting displayed to Render Preview, average all RGBA components of the pixels in its
+   * region, and display that average as a single pixel. (by returning those averages in an array)
+   */
+  protected int[] subsampleRow(BitmapImage bitmap, int row, int decimateRatio) {
+    int[] ret = new int[bitmap.width / decimateRatio];
+
+    // averaged color values
+    double a, r, g, b;
+    // this subsample's color value
+    int pixelColor;
+
+    double drsi = 1d / (decimateRatio * decimateRatio); // decimate ratio squared inverse
+    for (int i = 0; i < ret.length; i++) {
+      a = r = g = b = 0;
+      for (int y = 0; y < decimateRatio; y++) {
+        for (int x = 0; x < decimateRatio; x++) {
+          pixelColor = bitmap.getPixel(i * decimateRatio + y, row + x);
+          b += drsi * (pixelColor & 0xff);
+          pixelColor >>>= 8;
+          g += drsi * (pixelColor & 0xff);
+          pixelColor >>>= 8;
+          r += drsi * (pixelColor & 0xff);
+          pixelColor >>>= 8;
+          a += drsi * (pixelColor & 0xff);
+        }
+      }
+
+      ret[i] = ((Math.round((float) a) & 0xff) << 24)
+          | ((Math.round((float) r) & 0xff) << 16)
+          | ((Math.round((float) g) & 0xff) << 8)
+          | (Math.round((float) b) & 0xff);
+    }
+    return ret;
   }
 }

@@ -564,8 +564,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
   public void selectVisibleChunks(ChunkView cv, se.llbit.chunky.renderer.scene.Scene scene) {
     Camera camera = scene.camera();
-    int width = scene.canvasWidth();
-    int height = scene.canvasHeight();
+    int width = scene.renderWidth();
+    int height = scene.renderHeight();
 
     double halfWidth = width / (2.0 * height);
 
@@ -617,8 +617,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   public static void drawViewBounds(GraphicsContext gc, ChunkView cv,
       se.llbit.chunky.renderer.scene.Scene scene) {
     Camera camera = scene.camera();
-    int width = scene.canvasWidth();
-    int height = scene.canvasHeight();
+    int width = scene.renderWidth();
+    int height = scene.renderHeight();
 
     double halfWidth = width / (2.0 * height);
 
