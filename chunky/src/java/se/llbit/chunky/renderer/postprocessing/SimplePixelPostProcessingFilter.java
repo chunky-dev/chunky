@@ -41,7 +41,7 @@ public abstract class SimplePixelPostProcessingFilter implements PixelPostProces
           output.setPixel(x, y, ColorUtil.getRGB(pixelBuffer));
         }
 
-        task.update(width, done.incrementAndGet());
+        task.update(height, done.incrementAndGet());
       });
     }).join();
   }
