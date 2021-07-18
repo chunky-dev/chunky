@@ -28,7 +28,7 @@ import se.llbit.util.TaskTracker;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * This scene manager is used for asynchronous loading and saving of scenes.
@@ -40,13 +40,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class AsynchronousSceneManager extends Thread implements SceneManager {
 
   private final SynchronousSceneManager sceneManager;
-  private final ConcurrentLinkedQueue<Runnable> taskQueue;
+  private final LinkedBlockingQueue<Runnable> taskQueue;
 
   public AsynchronousSceneManager(RenderContext context, RenderManager renderManager) {
     super("Scene Manager");
 
     sceneManager = new SynchronousSceneManager(context, renderManager);
-    taskQueue = new ConcurrentLinkedQueue<>();
+    taskQueue = new LinkedBlockingQueue<>();
   }
 
   public SceneProvider getSceneProvider() {
@@ -76,13 +76,8 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
   @Override public void run() {
     try {
       while (!isInterrupted()) {
-        synchronized (taskQueue) {
-          while (taskQueue.isEmpty())
-            taskQueue.wait();
-        }
-        Runnable task = taskQueue.poll();
-        if (task != null)
-          task.run();
+        Runnable task = taskQueue.take();
+        task.run();
       }
     } catch (InterruptedException ignored) {
       // Interrupted.
@@ -164,9 +159,6 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
    */
   public void enqueueTask(Runnable task) {
     taskQueue.add(task);
-    synchronized (taskQueue) {
-      taskQueue.notifyAll();
-    }
   }
 
   /**

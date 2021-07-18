@@ -69,7 +69,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.Chunky;
@@ -90,7 +89,6 @@ import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.DeleteChunksJob;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
-import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.fx.ToolPane;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.fxutil.GroupedChangeListener;
@@ -690,19 +688,19 @@ public class ChunkyFxController
     start.setGraphic(new ImageView(Icon.play.fxImage()));
     start.setTooltip(new Tooltip("Start rendering."));
     start.setOnAction(e -> {
-      if (!scene.getIsLoading())
+      if (!scene.isLoading())
         asyncSceneManager.enqueueTask(() -> scene.startRender());
     });
     pause.setGraphic(new ImageView(Icon.pause.fxImage()));
     pause.setTooltip(new Tooltip("Pause the render."));
     pause.setOnAction(e -> {
-      if (!scene.getIsLoading())
+      if (!scene.isLoading())
         asyncSceneManager.enqueueTask(() -> scene.pauseRender());
     });
     reset.setGraphic(new ImageView(Icon.stop.fxImage()));
     reset.setTooltip(new Tooltip("Resets the current render. Discards render progress."));
     reset.setOnAction(e -> {
-      if (!scene.getIsLoading())
+      if (!scene.isLoading())
         asyncSceneManager.enqueueTask(() -> scene.haltRender());
     });
     sppLbl.setTooltip(new Tooltip("SPP = Samples Per Pixel, SPS = Samples Per Second"));
