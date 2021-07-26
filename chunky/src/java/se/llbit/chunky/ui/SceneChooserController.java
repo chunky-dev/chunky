@@ -180,7 +180,8 @@ public class SceneChooserController implements Initializable {
     List<File> fileList = SceneHelper.getAvailableSceneFiles(sceneDir);
     // TODO: Sort by recently modified instead of file name.
     Collections.sort(fileList, Comparator
-            .comparing((File o) -> o.toString().toLowerCase()) // ignore case on sort by file name.
+            .comparing((File o) -> -(Long)o.lastModified()) // negative of last modified -> most recent at top
+            .thenComparing((File o) -> o.toString().toLowerCase()) // Then by file name, ignoring case.
             .thenComparing(o -> o));
     for (File sceneFile : fileList) {
 
