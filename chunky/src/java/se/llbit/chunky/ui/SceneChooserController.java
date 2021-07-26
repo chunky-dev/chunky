@@ -124,7 +124,10 @@ public class SceneChooserController implements Initializable {
     });
     sizeCol.setCellValueFactory(data -> {
       SceneListItem scene = data.getValue();
-      return new ReadOnlyStringWrapper(scene.dimensions);
+      if (scene.cropping!=null)
+        return new ReadOnlyStringWrapper(scene.dimensions + scene.cropping);
+      else
+        return new ReadOnlyStringWrapper(scene.dimensions);
     });
     sppCol.setCellValueFactory(data -> {
       SceneListItem scene = data.getValue();
@@ -212,6 +215,11 @@ public class SceneChooserController implements Initializable {
      * Whether this scene description file is a backup file and the original .json is missing.
      */
     private final boolean isBackup;
+    /**
+     * Whether scene is cropped smaller than its main canvas size.
+     * Not currently used (Planned for Chunky 2.5.0; See PR #786)
+     */
+    private final String cropping;
 
     private SceneListItem(JsonObject scene, File sceneFile) {
       int width = scene.get("width").intValue(400);
@@ -228,6 +236,20 @@ public class SceneChooserController implements Initializable {
 
       this.dimensions = dimensions;
       sppCount = scene.get("spp").intValue(0);
+
+      cropping = null;
+      // Not currently used (Planned for Chunky 2.5.0; See PR #786)
+      //    JsonValue crop = scene.get("crop");
+      //    if (crop.isArray()) {
+      //      JsonArray cropArray = crop.asArray();
+      //      if (cropArray.size() >= 4) {
+      //        int w = cropArray.get(2).asInt(width);
+      //        int h = cropArray.get(3).asInt(height);
+      //        if (w != width || h != height || cropArray.get(0).asInt(0) != 0 || cropArray.get(1).asInt(0) != 0) {
+      //          cropping = " [" + w + "x" + h + "]";
+      //        } else cropping = null;
+      //      } else cropping = null;
+      //    } else cropping = null;
 
       long milliseconds = scene.get("renderTime").longValue(0);
       if (sppCount==0 || milliseconds<500) {
