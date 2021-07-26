@@ -541,8 +541,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       // use Big Decimal to round to 3 sigfigs
       String actualPercent = new java.math.BigDecimal(downscaleRatio * percent).round(new java.math.MathContext(3)).toString();
 
-      canvasScalingOptions.get(i).setText(actualPercent + "%"+(isDownscaled?" (downscaled from "+percent+"%)":""));
+      canvasScalingOptions.get(i).setText(actualPercent + "%"+(isDownscaled?" (preview downscaled from "+percent+"%)":""));
     }
-    canvasScalingOptions.get(canvasScalingOptions.size()-1).setText(fitToScreenString+(isDownscaled?" (downscaled)":""));
+    canvasScalingOptions.get(canvasScalingOptions.size()-1).setText(fitToScreenString+(isDownscaled?" (preview downscaled)":""));
   }
 }
