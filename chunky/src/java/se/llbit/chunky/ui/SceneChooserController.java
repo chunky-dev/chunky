@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -31,6 +31,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.main.SceneHelper;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.fxutil.Dialogs;
@@ -213,20 +214,37 @@ public class SceneChooserController implements Initializable {
     private final boolean isBackup;
 
     private SceneListItem(JsonObject scene, File sceneFile) {
-      sceneName = sceneFile.getName().substring(0, sceneFile.getName().length() - (
-          sceneFile.getName().endsWith(".backup") ? 7 + Scene.EXTENSION.length()
-              : Scene.EXTENSION.length()));
+      int width = scene.get("width").intValue(400);
+      int height = scene.get("height").intValue(400);
+      String dimensions = String.format("%sx%s", width, height);
+
+      isBackup = sceneFile.getName().endsWith(".backup");
+      String sceneName = sceneFile.getName();
+      int lengthWithoutExtension = sceneName.length()
+          - (Scene.EXTENSION.length() + (isBackup ? ".backup".length() : 0));
+      this.sceneName = sceneName.substring(0, lengthWithoutExtension);
       sceneDirectory = sceneFile.getParentFile();
       chunkSize = scene.get("chunkList").array().size();
-      dimensions = String.format("%sx%s", scene.get("width").intValue(400), scene.get("height").intValue(400));
-      sppCount = scene.get("spp").intValue(0);
-      isBackup = sceneFile.getName().endsWith(".backup");
 
-      long renderTime = scene.get("renderTime").longValue(0);
-      int seconds = (int) ((renderTime / 1000) % 60);
-      int minutes = (int) ((renderTime / 60000) % 60);
-      int hours = (int) (renderTime / 3600000);
-      this.renderTime = String.format("%d:%d:%d", hours, minutes, seconds);
+      this.dimensions = dimensions;
+      sppCount = scene.get("spp").intValue(0);
+
+      long milliseconds = scene.get("renderTime").longValue(0);
+      if (sppCount==0 || milliseconds<500) {
+        this.renderTime = " — ";
+      } else {
+        long seconds = FastMath.round(milliseconds / 1000d);
+        long minutes = seconds / 60;
+        long hours = minutes / 60;
+        StringBuilder sb = new StringBuilder();
+        if (hours > 0)
+          sb.append(hours).append("hr ");
+        if (minutes > 0)
+          sb.append(String.format("%02dm %02ds", minutes % 60, seconds % 60));
+        else
+          sb.append(String.format("%ds", milliseconds / 1000, milliseconds % 1000));
+        this.renderTime = sb.toString();
+      }
     }
 
     @Override
@@ -234,5 +252,4 @@ public class SceneChooserController implements Initializable {
       return String.format("Name:%s, Chunks:%d, Size:%s, Spp:%d, Time:%s, Location:%s", sceneName, chunkSize, dimensions, sppCount, renderTime, sceneDirectory.getName());
     }
   }
-
 }
