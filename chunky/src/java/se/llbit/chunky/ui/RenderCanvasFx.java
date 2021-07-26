@@ -44,11 +44,13 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.math.Vector2;
 import se.llbit.util.Pair;
 
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -69,7 +71,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   private static final int REDUCED_CANVAS_MAX_SIZE = 4096; // TODO: set via command line/launcher arg?
   private boolean previewShouldSubsample = true;
 
-  private final se.llbit.chunky.renderer.scene.Scene renderScene;
+  private final Scene renderScene;
 
   private WritableImage image;
 
@@ -87,7 +89,12 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
   private RenderStatusListener renderListener;
 
-  public RenderCanvasFx(se.llbit.chunky.renderer.scene.Scene scene, RenderManager renderManager) {
+  private ArrayList<RadioMenuItem> canvasScalingOptions;
+
+  private static final int[] scalingValues = new int[]{5, 25, 50, 75, 100, 150, 200, 300, 400};
+  private static final String fitToScreenString = "Fit to Screen";
+
+  public RenderCanvasFx(Scene scene, RenderManager renderManager) {
     this.renderScene = scene;
     this.renderManager = renderManager;
     renderManager.addSceneStatusListener(this);
@@ -180,7 +187,20 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     });
     Menu canvasScale = new Menu("Canvas scale");
     ToggleGroup scaleGroup = new ToggleGroup();
-    for (int percent : new int[]{5, 25, 50, 75, 100, 150, 200, 300, 400}) {
+
+    canvasScalingOptions = new ArrayList<>(1+scalingValues.length);
+
+    RadioMenuItem fit = new RadioMenuItem(fitToScreenString);
+    fit.setSelected(fitToScreen);
+    fit.setToggleGroup(scaleGroup);
+    fit.setOnAction(e -> {
+      fitToScreen = true;
+      PersistentSettings.setCanvasFitToScreen(true);
+      updateCanvasFit();
+    });
+    canvasScale.getItems().add(fit);
+
+    for (int percent : scalingValues) {
       RadioMenuItem item = new RadioMenuItem(String.format("%d%%", percent));
       item.setToggleGroup(scaleGroup);
       item.setSelected(PersistentSettings.getCanvasScale() == percent && !fitToScreen);
@@ -193,17 +213,11 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
         }
       });
       canvasScale.getItems().add(item);
+      canvasScalingOptions.add(item);
     }
 
-    RadioMenuItem fit = new RadioMenuItem("Fit to Screen");
-    fit.setSelected(fitToScreen);
-    fit.setToggleGroup(scaleGroup);
-    fit.setOnAction(e -> {
-      fitToScreen = true;
-      PersistentSettings.setCanvasFitToScreen(true);
-      updateCanvasFit();
-    });
-    canvasScale.getItems().add(fit);
+    canvasScalingOptions.add(fit);
+    updateScaleStrings(scene);
 
     if (fitToScreen) {
       updateCanvasFit();
@@ -251,6 +265,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
     canvasPane.setOnMouseEntered(e -> {
       updateCanvasFit();
+      updateScaleStrings(scene);
     });
 
     canvasPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
@@ -449,7 +464,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   protected Pair<Integer, Integer> getScaledSize(int w, int h, int maxSize) {
     while (w > maxSize || h > maxSize) {
       if (w / 2 > maxSize || h / 2 > maxSize) {
-        if (w % 3 == 0 && h % 3 == 0 && w / 3 <= maxSize && h / 3 <= maxSize) { return new Pair<>(w / 3, h / 3); }
+        if (w % 3 == 0 && h % 3 == 0 && w / 3 <= maxSize && h / 3 <= maxSize)
+          return new Pair<>(w / 3, h / 3);
       }
       w /= 2;
       h /= 2;
@@ -510,5 +526,23 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
           | (Math.round((float) b) & 0xff);
     }
     return ret;
+  }
+
+  private void updateScaleStrings(Scene s) {
+    int w = s.width;
+    int h = s.height;
+    // Calculate scaling and determine if isDownscaled
+    Pair<Integer, Integer> size = getScaledSize(w, h, REDUCED_CANVAS_MAX_SIZE);
+    boolean isDownscaled = w != size.thing1 || h != size.thing2;
+
+    for (int i=0; i<scalingValues.length; i++) {
+      int percent = scalingValues[i];
+      double downscaleRatio = 0.5*((double) size.thing1 / w + (double) size.thing2 / h);
+      // use Big Decimal to round to 3 sigfigs
+      String actualPercent = new java.math.BigDecimal(downscaleRatio * percent).round(new java.math.MathContext(3)).toString();
+
+      canvasScalingOptions.get(i).setText(actualPercent + "%"+(isDownscaled?" (downscaled from "+percent+"%)":""));
+    }
+    canvasScalingOptions.get(canvasScalingOptions.size()-1).setText(fitToScreenString+(isDownscaled?" (downscaled)":""));
   }
 }
