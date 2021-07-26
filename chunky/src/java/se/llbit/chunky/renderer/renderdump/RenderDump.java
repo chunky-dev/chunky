@@ -60,7 +60,7 @@ public class RenderDump {
       throws IOException, IllegalStateException {
     int magicNumberLength = DUMP_FORMAT_MAGIC_NUMBER.length;
 
-    PushbackInputStream pushbackInputStream = new PushbackInputStream(inputStream, magicNumberLength);
+    PushbackInputStream pushbackInputStream = new PushbackInputStream(new FastBufferedInputStream(inputStream), magicNumberLength);
     byte[] magicNumber = new byte[magicNumberLength];
 
     // If the file starts with the magic number, it is the new format containing a version number
@@ -108,7 +108,7 @@ public class RenderDump {
 
   public static void save(OutputStream outputStream, Scene scene, TaskTracker taskTracker) throws IOException {
     outputStream.write(DUMP_FORMAT_MAGIC_NUMBER);
-    DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+    DataOutputStream dataOutputStream = new DataOutputStream(new FastBufferedOutputStream(outputStream));
     DumpFormat format = getDumpFormatForVersion(CURRENT_DUMP_VERSION);
     dataOutputStream.writeInt(CURRENT_DUMP_VERSION);
     format.save(dataOutputStream, scene, taskTracker);
