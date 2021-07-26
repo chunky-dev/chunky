@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -177,7 +178,10 @@ public class SceneChooserController implements Initializable {
   private void populateSceneTable(File sceneDir) {
     List<SceneListItem> scenes = new ArrayList<>();
     List<File> fileList = SceneHelper.getAvailableSceneFiles(sceneDir);
-    Collections.sort(fileList);
+    // TODO: Sort by recently modified instead of file name.
+    Collections.sort(fileList, Comparator
+            .comparing((File o) -> o.toString().toLowerCase()) // ignore case on sort by file name.
+            .thenComparing(o -> o));
     for (File sceneFile : fileList) {
 
       try (JsonParser parser = new JsonParser(new FileInputStream(new File(sceneFile.getParentFile(), sceneFile.getName())))){
