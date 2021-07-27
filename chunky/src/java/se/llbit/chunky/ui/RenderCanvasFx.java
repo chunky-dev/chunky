@@ -42,8 +42,11 @@ import javafx.scene.shape.Line;
 import javafx.stage.PopupWindow;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.RenderManager;
+import se.llbit.chunky.renderer.RenderMode;
+import se.llbit.chunky.renderer.RenderStatusListener;
+import se.llbit.chunky.renderer.Repaintable;
+import se.llbit.chunky.renderer.SceneStatusListener;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
@@ -63,14 +66,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
   // This sets the maximum "Render Preview" canvas size to 4k by 4k,
   // for sizes any larger cause a strange crash in JavaFX.
-  // Currently, this only shows the 4k by 4k top-left corner of renders
-  // which are larger than this. Future task: be able to pan around on
-  // the Render Preview canvas. (Kind-of exists, but again, loading the
-  // whole image leads to mysterious crashes.)
-  // Oh, and also, the crash happens at different minimum canvas sizes
-  // unique to each computer.
   private static final int REDUCED_CANVAS_MAX_SIZE = 4096; // TODO: set via command line/launcher arg?
   private static final int MAX_OFFSCREEN = REDUCED_CANVAS_MAX_SIZE/8;
+  // Those crashes happen starting at different canvas sizes which
+  // seem to be unique to each computer.
   private boolean previewShouldSubsample = true;
   private boolean previewShouldCropNotDownscale = false;
   private int cx = 0, cy = 0;
@@ -164,8 +163,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     });
 
     canvas.setOnMouseDragged(e -> {
-      int dx = lastX - ((int) e.getX()+cx);
-      int dy = lastY - ((int) e.getY()+cy);
+      int dx = lastX - ((int) e.getX() + cx);
+      int dy = lastY - ((int) e.getY() + cy);
       lastX = (int) e.getX() + cx;
       lastY = (int) e.getY() + cy;
       scene.camera().rotateView((Math.PI / 250) * dx, -(Math.PI / 250) * dy);
@@ -192,6 +191,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       cx = FastMath.max(FastMath.min(rightBound, cx), -MAX_OFFSCREEN);
       cy = FastMath.max(FastMath.min(bottomBound, cy), -MAX_OFFSCREEN);
 
+      // If we are using one of the dimensions, dont give it a buffer, as the whole thing will always show.
+      if (effectiveWidth==scene.width) cx = 0;
+      if (effectiveHeight==scene.height) cy = 0;
+
       repaint();
     });
 
@@ -214,7 +217,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
     Menu canvasScale = new Menu("Canvas scale");
     ToggleGroup scaleGroup = new ToggleGroup();
-    canvasScalingOptions = new ArrayList<>(1+scalingValues.length);
+    canvasScalingOptions = new ArrayList<>(1 + scalingValues.length);
 
     RadioMenuItem fit = new RadioMenuItem(fitToScreenString);
     fit.setSelected(fitToScreen);
@@ -290,8 +293,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     downscaleCrop.setDisable(true);
     downscaleCrop.setOnAction(e -> {
       previewShouldCropNotDownscale = true;
-      cx = scene.width/2 - Math.min(scene.width,REDUCED_CANVAS_MAX_SIZE)/2;
-      cy = scene.height/2 - Math.min(scene.height,REDUCED_CANVAS_MAX_SIZE)/2;
+      cx = scene.width / 2 - Math.min(scene.width, REDUCED_CANVAS_MAX_SIZE) / 2;
+      cy = scene.height / 2 - Math.min(scene.height, REDUCED_CANVAS_MAX_SIZE) / 2;
       repaint();
     });
     downscaleMethod.getItems().add(downscaleCrop);
@@ -305,8 +308,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       if (event.getButton() == MouseButton.SECONDARY) {
         double invHeight = 1.0 / scene.height;
         double halfWidth = scene.width / (2.0 * scene.height);
-        target.set(-halfWidth + (event.getX()+cx) * invHeight,
-            -0.5 + (event.getY()+cy) * invHeight);
+        target.set(-halfWidth + (event.getX() + cx) * invHeight,
+            -0.5 + (event.getY() + cy) * invHeight);
         contextMenu.show(getScene().getWindow(), event.getScreenX(), event.getScreenY());
       }
     });
@@ -424,19 +427,19 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       double scaleX = canvas.getScaleX();
       double scrollX = getHvalue();
 
-      if (scrollX > scaleX/2 + 0.5) {
-        setHvalue(scaleX/2 + 0.5);
-      } else if (scrollX < -scaleX/2 + 0.5) {
-        setHvalue(-scaleX/2 + 0.5);
+      if (scrollX > scaleX / 2 + 0.5) {
+        setHvalue(scaleX / 2 + 0.5);
+      } else if (scrollX < -scaleX / 2 + 0.5) {
+        setHvalue(-scaleX / 2 + 0.5);
       }
 
       double scaleY = canvas.getScaleY();
       double scrollY = getVvalue();
 
-      if (scrollY > scaleY/2 + 0.5) {
-        setVvalue(scaleY/2 + 0.5);
-      } else if (scrollY < -scaleY/2 + 0.5) {
-        setVvalue(-scaleY/2 + 0.5);
+      if (scrollY > scaleY / 2 + 0.5) {
+        setVvalue(scaleY / 2 + 0.5);
+      } else if (scrollY < -scaleY / 2 + 0.5) {
+        setVvalue(-scaleY / 2 + 0.5);
       }
     }
   }
@@ -474,10 +477,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       if (previewShouldCropNotDownscale) {
         int width = FastMath.min(bitmap.width, REDUCED_CANVAS_MAX_SIZE);
         int height = FastMath.min(bitmap.height, REDUCED_CANVAS_MAX_SIZE);
-        setCanvasSize(width,height);
+        setCanvasSize(width, height);
         for (int row = 0; row < height; row++)
           image.getPixelWriter().setPixels(0, row, width, 1, PIXEL_FORMAT,
-              croppedRow(bitmap, cx, cy+row, width), 0, width);
+              croppedRow(bitmap, cx, cy + row, width), 0, width);
       } else {
         Pair<Integer, Integer> scaledSize = getScaledSize(bitmap.width, bitmap.height, REDUCED_CANVAS_MAX_SIZE);
         int width = scaledSize.thing1;
@@ -531,7 +534,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     width = scaledSize.thing1;
     height = scaledSize.thing2;
 
-    if (canvas.getWidth()==width && canvas.getHeight()==height)
+    if (canvas.getWidth() == width && canvas.getHeight() == height)
       return;
 
     canvas.setWidth(width);
@@ -575,8 +578,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   protected int[] croppedRow(BitmapImage bitmap, int x, int y, int width) {
     // create and null-fill array.
     int[] ret = new int[width];
-    int argbNull = se.llbit.math.ColorUtil.getArgb(0,0,0,1); //r=0,g=0,b=0,a=1, otherwise will show stuff through it.
-    for (int i=0;i<width;i++)
+    int argbNull = se.llbit.math.ColorUtil.getArgb(0, 0, 0, 1); //r=0,g=0,b=0,a=1, otherwise will show stuff through it.
+    for (int i = 0; i < width; i++)
       ret[i] = argbNull;
 
     // If entire row is OOB, return blank array
