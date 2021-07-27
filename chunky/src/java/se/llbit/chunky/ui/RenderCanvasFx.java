@@ -40,6 +40,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.stage.PopupWindow;
+import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.RenderManager;
@@ -69,7 +70,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   // Oh, and also, the crash happens at different minimum canvas sizes
   // unique to each computer.
   private static final int REDUCED_CANVAS_MAX_SIZE = 4096; // TODO: set via command line/launcher arg?
+  private static final int MAX_OFFSCREEN = REDUCED_CANVAS_MAX_SIZE/8;
   private boolean previewShouldSubsample = true;
+  private boolean previewShouldCropNotDownscale = false;
+  private int cx = 0, cy = 0;
 
   private final Scene renderScene;
 
@@ -89,7 +93,11 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
   private RenderStatusListener renderListener;
 
+  private final ContextMenu contextMenu;
   private ArrayList<RadioMenuItem> canvasScalingOptions;
+  private ArrayList<RadioMenuItem> downscalingOptions;
+  private MenuItem recenterCrop;
+  private Menu downscaleMethod;
 
   private static final int[] scalingValues = new int[]{5, 25, 50, 75, 100, 150, 200, 300, 400};
   private static final String fitToScreenString = "Fit to Screen";
@@ -151,15 +159,15 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     vGuide2.endXProperty().bind(vGuide2.startXProperty());
 
     canvas.setOnMousePressed(e -> {
-      lastX = (int) e.getX();
-      lastY = (int) e.getY();
+      lastX = (int) e.getX() + cx;
+      lastY = (int) e.getY() + cy;
     });
 
     canvas.setOnMouseDragged(e -> {
-      int dx = lastX - (int) e.getX();
-      int dy = lastY - (int) e.getY();
-      lastX = (int) e.getX();
-      lastY = (int) e.getY();
+      int dx = lastX - ((int) e.getX()+cx);
+      int dy = lastY - ((int) e.getY()+cy);
+      lastX = (int) e.getX() + cx;
+      lastY = (int) e.getY() + cy;
       scene.camera().rotateView((Math.PI / 250) * dx, -(Math.PI / 250) * dy);
     });
 
@@ -169,7 +177,24 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       tooltip.hide();
     });
 
-    ContextMenu contextMenu = new ContextMenu();
+    contextMenu = new ContextMenu();
+
+    recenterCrop = new MenuItem("Center Preview Crop Here");
+    recenterCrop.setOnAction(e -> {
+      int effectiveWidth = Math.min(scene.width, REDUCED_CANVAS_MAX_SIZE);
+      int effectiveHeight = Math.min(scene.height, REDUCED_CANVAS_MAX_SIZE);
+
+      // Update position, then clamp to be within bounds
+      cx = lastX - effectiveWidth / 2;
+      cy = lastY - effectiveHeight / 2;
+      int rightBound = scene.width + MAX_OFFSCREEN - effectiveWidth;
+      int bottomBound = scene.height + MAX_OFFSCREEN - effectiveHeight;
+      cx = FastMath.max(FastMath.min(rightBound, cx), -MAX_OFFSCREEN);
+      cy = FastMath.max(FastMath.min(bottomBound, cy), -MAX_OFFSCREEN);
+
+      repaint();
+    });
+
     MenuItem setTarget = new MenuItem("Set target");
     setTarget.setOnAction(e -> {
       scene.camera().setTarget(target.x, target.y);
@@ -177,6 +202,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
         scene.forceReset();
       }
     });
+
     CheckMenuItem showGuides = new CheckMenuItem("Show guides");
     showGuides.setSelected(false);
     showGuides.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -185,9 +211,9 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       vGuide1.setVisible(newValue);
       vGuide2.setVisible(newValue);
     });
+
     Menu canvasScale = new Menu("Canvas scale");
     ToggleGroup scaleGroup = new ToggleGroup();
-
     canvasScalingOptions = new ArrayList<>(1+scalingValues.length);
 
     RadioMenuItem fit = new RadioMenuItem(fitToScreenString);
@@ -217,7 +243,6 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     }
 
     canvasScalingOptions.add(fit);
-    updateScaleStrings(scene);
 
     if (fitToScreen) {
       updateCanvasFit();
@@ -225,14 +250,63 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       updateCanvasScale(PersistentSettings.getCanvasScale() / 100.0);
     }
 
-    contextMenu.getItems().addAll(setTarget, showGuides, canvasScale);
+    downscaleMethod = new Menu("Preview Downscale Method");
+    ToggleGroup downscaleGroup = new ToggleGroup();
+    downscalingOptions = new ArrayList<>(4);
+
+    RadioMenuItem downscaleNone = new RadioMenuItem("No downscaling or cropping");
+    downscaleNone.setSelected(true);
+    downscaleNone.setDisable(false);
+    downscaleMethod.getItems().add(downscaleNone);
+    downscalingOptions.add(downscaleNone);
+
+    RadioMenuItem downscaleDecimate = new RadioMenuItem("Downscale: one (fast, approximate)");
+    downscaleDecimate.setSelected(false);
+    downscaleDecimate.setToggleGroup(downscaleGroup);
+    downscaleDecimate.setDisable(true);
+    downscaleDecimate.setOnAction(e -> {
+      previewShouldSubsample = false;
+      previewShouldCropNotDownscale = false;
+      repaint();
+    });
+    downscaleMethod.getItems().add(downscaleDecimate);
+    downscalingOptions.add(downscaleDecimate);
+
+    RadioMenuItem downscaleSubsample = new RadioMenuItem("Downscale: subsample (slower, correct)");
+    downscaleSubsample.setSelected(false);
+    downscaleSubsample.setToggleGroup(downscaleGroup);
+    downscaleSubsample.setDisable(true);
+    downscaleSubsample.setOnAction(e -> {
+      previewShouldSubsample = true;
+      previewShouldCropNotDownscale = false;
+      repaint();
+    });
+    downscaleMethod.getItems().add(downscaleSubsample);
+    downscalingOptions.add(downscaleSubsample);
+
+    RadioMenuItem downscaleCrop = new RadioMenuItem("Crop View");
+    downscaleCrop.setSelected(false);
+    downscaleCrop.setToggleGroup(downscaleGroup);
+    downscaleCrop.setDisable(true);
+    downscaleCrop.setOnAction(e -> {
+      previewShouldCropNotDownscale = true;
+      cx = scene.width/2 - Math.min(scene.width,REDUCED_CANVAS_MAX_SIZE)/2;
+      cy = scene.height/2 - Math.min(scene.height,REDUCED_CANVAS_MAX_SIZE)/2;
+      repaint();
+    });
+    downscaleMethod.getItems().add(downscaleCrop);
+    downscalingOptions.add(downscaleCrop);
+
+    contextMenu.getItems().addAll(recenterCrop, setTarget, showGuides, canvasScale, downscaleMethod);
+
+    updateScaleStrings(scene);
 
     canvas.setOnMouseClicked(event -> {
       if (event.getButton() == MouseButton.SECONDARY) {
-        double invHeight = 1.0 / canvas.getHeight();
-        double halfWidth = canvas.getWidth() / (2.0 * canvas.getHeight());
-        target.set(-halfWidth + event.getX() * invHeight,
-            -0.5 + event.getY() * invHeight);
+        double invHeight = 1.0 / scene.height;
+        double halfWidth = scene.width / (2.0 * scene.height);
+        target.set(-halfWidth + (event.getX()+cx) * invHeight,
+            -0.5 + (event.getY()+cy) * invHeight);
         contextMenu.show(getScene().getWindow(), event.getScreenX(), event.getScreenY());
       }
     });
@@ -397,24 +471,33 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   public void forceRepaint() {
     painting.set(true);
     renderManager.withBufferedImage(bitmap -> {
-      Pair<Integer, Integer> scaledSize = getScaledSize(bitmap.width, bitmap.height, REDUCED_CANVAS_MAX_SIZE);
-      int width = scaledSize.thing1;
-      int height = scaledSize.thing2;
-
-      int decimateRatio = bitmap.width / width;
-
-      if (width != Math.round((float) image.getWidth()) || height != Math.round((float) image.getHeight()))
-        setCanvasSize(width, height);
-
-      if (previewShouldSubsample) {
-        for (int row = 0; row < height; row++) {
+      if (previewShouldCropNotDownscale) {
+        int width = FastMath.min(bitmap.width, REDUCED_CANVAS_MAX_SIZE);
+        int height = FastMath.min(bitmap.height, REDUCED_CANVAS_MAX_SIZE);
+        setCanvasSize(width,height);
+        for (int row = 0; row < height; row++)
           image.getPixelWriter().setPixels(0, row, width, 1, PIXEL_FORMAT,
-              subsampleRow(bitmap, row * decimateRatio, decimateRatio), 0, width);
-        }
+              croppedRow(bitmap, cx, cy+row, width), 0, width);
       } else {
-        for (int row = 0; row < height; row++) {
-          image.getPixelWriter().setPixels(0, row, width, 1, PIXEL_FORMAT,
-              decimateRow(bitmap, row * decimateRatio, decimateRatio), 0, width);
+        Pair<Integer, Integer> scaledSize = getScaledSize(bitmap.width, bitmap.height, REDUCED_CANVAS_MAX_SIZE);
+        int width = scaledSize.thing1;
+        int height = scaledSize.thing2;
+
+        int downscaleRatio = bitmap.width / width;
+
+        if (width != Math.round((float) image.getWidth()) || height != Math.round((float) image.getHeight()))
+          setCanvasSize(width, height);
+
+        if (previewShouldSubsample) {
+          for (int row = 0; row < height; row++) {
+            image.getPixelWriter().setPixels(0, row, width, 1, PIXEL_FORMAT,
+                subsampleRow(bitmap, row * downscaleRatio, downscaleRatio), 0, width);
+          }
+        } else {
+          for (int row = 0; row < height; row++) {
+            image.getPixelWriter().setPixels(0, row, width, 1, PIXEL_FORMAT,
+                decimateRow(bitmap, row * downscaleRatio, downscaleRatio), 0, width);
+          }
         }
       }
     });
@@ -447,6 +530,9 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     Pair<Integer, Integer> scaledSize = getScaledSize(width, height, REDUCED_CANVAS_MAX_SIZE);
     width = scaledSize.thing1;
     height = scaledSize.thing2;
+
+    if (canvas.getWidth()==width && canvas.getHeight()==height)
+      return;
 
     canvas.setWidth(width);
     canvas.setHeight(height);
@@ -483,12 +569,38 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   }
 
   /**
+   * For each pixel that is getting displayed to Render Preview, copy the pixels one for one to display a cropped
+   * region. (by returning those copied pixels in an array) Out of bounds pixels are black-filled.
+   */
+  protected int[] croppedRow(BitmapImage bitmap, int x, int y, int width) {
+    // create and null-fill array.
+    int[] ret = new int[width];
+    int argbNull = se.llbit.math.ColorUtil.getArgb(0,0,0,1); //r=0,g=0,b=0,a=1, otherwise will show stuff through it.
+    for (int i=0;i<width;i++)
+      ret[i] = argbNull;
+
+    // If entire row is OOB, return blank array
+    if (y < 0 || x <= -width || y >= bitmap.height || x >= bitmap.width)
+      return ret;
+
+    // If part of row is OOB, change variables for array-copy call to not copy from out of array.
+    int startOffset = 0;
+    if (x < 0)
+      width -= startOffset = -x;
+    if (x + width >= bitmap.width)
+      width -= (x + width - bitmap.width);
+
+    System.arraycopy(bitmap.data, (x + startOffset) + y * bitmap.width, ret, startOffset, width);
+    return ret;
+  }
+
+  /**
    * For each pixel that is getting displayed to Render Preview, take the upper-left-most pixel in its region and
    * display just that single pixel. (by returning those upper-left-most pixels in an array)
    */
-  protected int[] decimateRow(BitmapImage bitmap, int row, int decimateRatio) {
-    int[] ret = new int[bitmap.width / decimateRatio];
-    for (int i = 0; i < ret.length; i++) { ret[i] = bitmap.getPixel(i * decimateRatio, row); }
+  protected int[] decimateRow(BitmapImage bitmap, int row, int downscaleRatio) {
+    int[] ret = new int[bitmap.width / downscaleRatio];
+    for (int i = 0; i < ret.length; i++) { ret[i] = bitmap.getPixel(i * downscaleRatio, row); }
     return ret;
   }
 
@@ -496,20 +608,20 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
    * For each pixel that is getting displayed to Render Preview, average all RGBA components of the pixels in its
    * region, and display that average as a single pixel. (by returning those averages in an array)
    */
-  protected int[] subsampleRow(BitmapImage bitmap, int row, int decimateRatio) {
-    int[] ret = new int[bitmap.width / decimateRatio];
+  protected int[] subsampleRow(BitmapImage bitmap, int row, int downscaleRatio) {
+    int[] ret = new int[bitmap.width / downscaleRatio];
 
     // averaged color values
     double a, r, g, b;
     // this subsample's color value
     int pixelColor;
 
-    double drsi = 1d / (decimateRatio * decimateRatio); // decimate ratio squared inverse
+    double drsi = 1d / (downscaleRatio * downscaleRatio); // decimate ratio squared inverse
     for (int i = 0; i < ret.length; i++) {
       a = r = g = b = 0;
-      for (int y = 0; y < decimateRatio; y++) {
-        for (int x = 0; x < decimateRatio; x++) {
-          pixelColor = bitmap.getPixel(i * decimateRatio + y, row + x);
+      for (int y = 0; y < downscaleRatio; y++) {
+        for (int x = 0; x < downscaleRatio; x++) {
+          pixelColor = bitmap.getPixel(i * downscaleRatio + y, row + x);
           b += drsi * (pixelColor & 0xff);
           pixelColor >>>= 8;
           g += drsi * (pixelColor & 0xff);
@@ -535,14 +647,43 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     Pair<Integer, Integer> size = getScaledSize(w, h, REDUCED_CANVAS_MAX_SIZE);
     boolean isDownscaled = w != size.thing1 || h != size.thing2;
 
-    for (int i=0; i<scalingValues.length; i++) {
-      int percent = scalingValues[i];
-      double downscaleRatio = 0.5*((double) size.thing1 / w + (double) size.thing2 / h);
-      // use Big Decimal to round to 3 sigfigs
-      String actualPercent = new java.math.BigDecimal(downscaleRatio * percent).round(new java.math.MathContext(3)).toString();
-
-      canvasScalingOptions.get(i).setText(actualPercent + "%"+(isDownscaled?" (preview downscaled from "+percent+"%)":""));
+    if (isDownscaled) {
+      if (!contextMenu.getItems().contains(recenterCrop)) {
+        contextMenu.getItems().add(0, recenterCrop);
+        contextMenu.getItems().add(downscaleMethod);
+      }
+    } else {
+      if (contextMenu.getItems().contains(recenterCrop)) {
+        contextMenu.getItems().remove(recenterCrop);
+        contextMenu.getItems().remove(downscaleMethod);
+      }
     }
-    canvasScalingOptions.get(canvasScalingOptions.size()-1).setText(fitToScreenString+(isDownscaled?" (preview downscaled)":""));
+
+    if (previewShouldCropNotDownscale) {
+      for (int i = 0; i < scalingValues.length; i++)
+        canvasScalingOptions.get(i).setText(scalingValues[i] + "%");
+      canvasScalingOptions.get(canvasScalingOptions.size() - 1).setText(fitToScreenString + (isDownscaled ? " (preview cropped)" : ""));
+    } else {
+      for (int i = 0; i < scalingValues.length; i++) {
+        int percent = scalingValues[i];
+        double downscaleRatio = 0.5 * ((double) size.thing1 / w + (double) size.thing2 / h);
+        // use Big Decimal to round to 3 sigfigs
+        String actualPercent = new java.math.BigDecimal(downscaleRatio * percent).round(new java.math.MathContext(3)).toString();
+
+        canvasScalingOptions.get(i).setText(actualPercent + "%" + (isDownscaled ? " (preview downscaled from " + percent + "%)" : ""));
+      }
+      canvasScalingOptions.get(canvasScalingOptions.size() - 1).setText(fitToScreenString + (isDownscaled ? " (preview downscaled)" : ""));
+    }
+
+    downscalingOptions.get(0).setDisable(isDownscaled); // none
+    downscalingOptions.get(1).setDisable(!isDownscaled); // decimate
+    downscalingOptions.get(2).setDisable(!isDownscaled); // subsample
+    downscalingOptions.get(3).setDisable(!isDownscaled); // crop
+
+    downscalingOptions.get(0).setSelected(!isDownscaled);
+    downscalingOptions.get(1).setSelected(isDownscaled && !previewShouldCropNotDownscale && !previewShouldSubsample);
+    downscalingOptions.get(2).setSelected(isDownscaled && !previewShouldCropNotDownscale && previewShouldSubsample);
+    downscalingOptions.get(3).setSelected(isDownscaled && previewShouldCropNotDownscale);
+
   }
 }
