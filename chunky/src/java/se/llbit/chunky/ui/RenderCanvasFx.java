@@ -66,10 +66,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
   // This sets the maximum "Render Preview" canvas size to 4k by 4k,
   // for sizes any larger cause a strange crash in JavaFX.
-  private static final int REDUCED_CANVAS_MAX_SIZE = 4096; // TODO: set via command line/launcher arg?
-  private static final int MAX_OFFSCREEN = REDUCED_CANVAS_MAX_SIZE/8;
   // Those crashes happen starting at different canvas sizes which
   // seem to be unique to each computer.
+  private static final int REDUCED_CANVAS_MAX_SIZE = 4096; // TODO: set via command line/launcher arg?
+  private static final int MAX_OFFSCREEN = REDUCED_CANVAS_MAX_SIZE/8;
   private boolean previewShouldSubsample = true;
   private boolean previewShouldCropNotDownscale = false;
   private int cx = 0, cy = 0;
