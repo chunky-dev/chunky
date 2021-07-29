@@ -16,10 +16,10 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
-import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -60,7 +60,7 @@ public class RenderDump {
       throws IOException, IllegalStateException {
     int magicNumberLength = DUMP_FORMAT_MAGIC_NUMBER.length;
 
-    PushbackInputStream pushbackInputStream = new PushbackInputStream(new FastBufferedInputStream(inputStream), magicNumberLength);
+    PushbackInputStream pushbackInputStream = new PushbackInputStream(new BufferedInputStream(inputStream), magicNumberLength);
     byte[] magicNumber = new byte[magicNumberLength];
 
     // If the file starts with the magic number, it is the new format containing a version number
@@ -88,7 +88,7 @@ public class RenderDump {
       throws IOException, IllegalStateException {
     int magicNumberLength = DUMP_FORMAT_MAGIC_NUMBER.length;
 
-    PushbackInputStream pushbackInputStream = new PushbackInputStream(new FastBufferedInputStream(inputStream), magicNumberLength);
+    PushbackInputStream pushbackInputStream = new PushbackInputStream(new BufferedInputStream(inputStream), magicNumberLength);
     byte[] magicNumber = new byte[magicNumberLength];
 
     // If the file starts with the magic number, it is the new format containing a version number
