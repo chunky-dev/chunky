@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initializable {
@@ -111,12 +112,13 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     outputMode.setConverter(new StringConverter<PictureExportFormat>() {
       @Override
       public String toString(PictureExportFormat object) {
+        if (object == null) return "";
         return object.getName();
       }
 
       @Override
       public PictureExportFormat fromString(String string) {
-        return PictureExportFormats.getFormat(string).get();
+        return PictureExportFormats.getFormat(string).orElse(PictureExportFormats.PNG);
       }
     });
     outputMode.getSelectionModel().selectedItemProperty()
