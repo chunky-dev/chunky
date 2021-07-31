@@ -811,12 +811,12 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Test if the ray should be killed (using Russian Roulette).
+   * Test if the ray should be killed <strike>(using Russian Roulette)</strike>.
    *
    * @return {@code true} if the ray needs to die now
    */
   public final boolean kill(int depth, Random random) {
-    return depth >= rayDepth && random.nextDouble() < .5f;
+    return depth >= rayDepth;
   }
 
   /**
