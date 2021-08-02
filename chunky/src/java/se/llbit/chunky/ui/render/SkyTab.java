@@ -111,8 +111,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     simulatedSky.setConverter(new StringConverter<SimulatedSky>() {
       @Override
       public String toString(SimulatedSky object) {
-        if (object == null) return "";
-        return object.getName();
+        return object == null ? null : object.getName();
       }
 
       @Override

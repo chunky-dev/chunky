@@ -89,8 +89,7 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
     postprocessingFilter.setConverter(new StringConverter<PostProcessingFilter>() {
       @Override
       public String toString(PostProcessingFilter object) {
-        if (object == null) return "";
-        return object.getName();
+        return object == null ? null : object.getName();
       }
 
       @Override
