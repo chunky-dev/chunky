@@ -59,11 +59,11 @@
                            <VBox>
                               <children>
                                  <Label text="a_Tom" />
-                                 <Label text="TOGoS" />
                                  <Label text="Redox (alexhliu)" />
+                                 <Label text="TOGoS" />
+                                 <Label text="NotStirred" />
                                  <Label text="jackjt8" />
                                  <Label text="073TheBoss" />
-                                 <Label text="NotStirred" />
                                  <Label text="Ice Selkie (StanleyMines)" />
 
                                  <Hyperlink fx:id="ghContributors" text="Show more..." />
@@ -94,21 +94,45 @@
                            </Label>
                            <VBox>
                               <children>
-                                 <Hyperlink fx:id="markdown" text="Markdown">
-                                    <padding>
-                                       <Insets top="4.0" bottom="3.0" />
-                                    </padding>
-                                 </Hyperlink>
-                                 <Hyperlink fx:id="apacheLicense" text="Apache License 2.0">
+                                 <Hyperlink fx:id="markdown" text="Markdown" />
+                                 <Hyperlink fx:id="markdownLicense" text="BSD-style">
                                     <font>
-                                       <Font name="System Bold" size="12.0" />
+                                       <Font size="10.0" />
                                     </font>
                                     <padding>
-                                       <Insets top="4.0" bottom="4.0" />
+                                       <Insets left="20.0" />
                                     </padding>
                                  </Hyperlink>
+
                                  <Hyperlink fx:id="fastMath" text="Apache Commons Math" />
+                                 <Hyperlink fx:id="fastMathLicense" text="Apache License 2.0">
+                                    <font>
+                                       <Font size="10.0" />
+                                    </font>
+                                    <padding>
+                                       <Insets left="20.0" />
+                                    </padding>
+                                 </Hyperlink>
+
                                  <Hyperlink fx:id="fastutil" text="fastutil" />
+                                 <Hyperlink fx:id="fastutilLicense" text="Apache License 2.0">
+                                    <font>
+                                       <Font size="10.0" />
+                                    </font>
+                                    <padding>
+                                       <Insets left="20.0" />
+                                    </padding>
+                                 </Hyperlink>
+
+                                 <Hyperlink fx:id="javafx" text="JavaFX" />
+                                 <Hyperlink fx:id="javafxLicense" text="GPLv2 + ce">
+                                    <font>
+                                       <Font size="10.0" />
+                                    </font>
+                                    <padding>
+                                       <Insets left="20.0" />
+                                    </padding>
+                                 </Hyperlink>
                               </children>
                               <padding>
                                  <Insets left="10.0" />
