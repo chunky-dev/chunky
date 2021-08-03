@@ -16,11 +16,11 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
-import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
-import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -60,7 +60,7 @@ public class RenderDump {
       throws IOException, IllegalStateException {
     int magicNumberLength = DUMP_FORMAT_MAGIC_NUMBER.length;
 
-    PushbackInputStream pushbackInputStream = new PushbackInputStream(inputStream, magicNumberLength);
+    PushbackInputStream pushbackInputStream = new PushbackInputStream(new BufferedInputStream(inputStream), magicNumberLength);
     byte[] magicNumber = new byte[magicNumberLength];
 
     // If the file starts with the magic number, it is the new format containing a version number
@@ -88,7 +88,7 @@ public class RenderDump {
       throws IOException, IllegalStateException {
     int magicNumberLength = DUMP_FORMAT_MAGIC_NUMBER.length;
 
-    PushbackInputStream pushbackInputStream = new PushbackInputStream(new FastBufferedInputStream(inputStream), magicNumberLength);
+    PushbackInputStream pushbackInputStream = new PushbackInputStream(new BufferedInputStream(inputStream), magicNumberLength);
     byte[] magicNumber = new byte[magicNumberLength];
 
     // If the file starts with the magic number, it is the new format containing a version number
@@ -108,7 +108,7 @@ public class RenderDump {
 
   public static void save(OutputStream outputStream, Scene scene, TaskTracker taskTracker) throws IOException {
     outputStream.write(DUMP_FORMAT_MAGIC_NUMBER);
-    DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+    DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(outputStream));
     DumpFormat format = getDumpFormatForVersion(CURRENT_DUMP_VERSION);
     dataOutputStream.writeInt(CURRENT_DUMP_VERSION);
     format.save(dataOutputStream, scene, taskTracker);
