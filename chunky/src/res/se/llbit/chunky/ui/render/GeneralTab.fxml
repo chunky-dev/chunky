@@ -12,7 +12,9 @@
 <?import se.llbit.chunky.ui.IntegerAdjuster?>
 
 <?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.Group?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+  <Group>
     <VBox spacing="10.0">
       <children>
         <FlowPane hgap="10" vgap="10">
@@ -73,4 +75,5 @@
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
       </padding>
     </VBox>
+  </Group>
 </fx:root>

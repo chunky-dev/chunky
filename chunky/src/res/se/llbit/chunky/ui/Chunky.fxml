@@ -200,5 +200,5 @@
       <Label fx:id="etaLbl" text="ETA: N/A" />
     </right>
   </BorderPane>
-  <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0" />
+  <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" minHeight="20" prefHeight="20" progress="0.0" />
 </VBox>
