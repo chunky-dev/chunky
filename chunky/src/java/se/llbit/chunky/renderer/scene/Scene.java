@@ -1988,14 +1988,14 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Save the current frame as a PNG, TIFF, or PFM image, depending on this scene's outputMode.
+   * Save the current frame (e.g. as a PNG, TIFF, or PFM image), depending on this scene's outputMode.
    */
   public synchronized void saveFrame(File targetFile, TaskTracker taskTracker, int threadCount) {
     this.saveFrame(targetFile, getOutputMode(), taskTracker, threadCount);
   }
 
   /**
-   * Save the current frame as a PNG, TIFF, or PFM image.
+   * Save the current frame (e.g. as a PNG, TIFF, or PFM image), depending on this scene's outputMode.
    */
   public synchronized void saveFrame(File targetFile, PictureExportFormat mode, TaskTracker taskTracker, int threadCount) {
     if (mode.isTransparencySupported()) {
