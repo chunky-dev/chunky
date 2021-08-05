@@ -368,6 +368,8 @@ public class Scene implements JsonSerializable, Refreshable {
   private String renderer = DefaultRenderManager.ChunkyPathTracerID;
   private String previewRenderer = DefaultRenderManager.ChunkyPreviewID;
 
+  protected volatile boolean isLoading = false;
+
   /**
    * Creates a scene with all default settings.
    *
@@ -558,55 +560,60 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public synchronized void loadScene(RenderContext context, String sceneName, TaskTracker taskTracker)
       throws IOException {
+    isLoading = true;
     try {
-      loadDescription(context.getSceneDescriptionInputStream(sceneName));
-    } catch (FileNotFoundException e) {
-      // scene.json not found, try loading the backup file
-      Log.info("Scene description file not found, trying to load the backup file instead", e);
-      loadDescription(context.getSceneFileInputStream(sceneName + Scene.EXTENSION + ".backup"));
-    }
-
-    if (sdfVersion < SDF_VERSION) {
-      Log.warn("Old scene version detected! The scene may not have been loaded correctly.");
-    } else if (sdfVersion > SDF_VERSION) {
-      Log.warn("This scene was created with a newer version of Chunky! The scene may not have been loaded correctly.");
-    }
-
-    // Load the configured skymap file.
-    sky.loadSkymap();
-
-    if (!worldPath.isEmpty()) {
-      File worldDirectory = new File(worldPath);
-      if (World.isWorldDir(worldDirectory)) {
-        loadedWorld = World.loadWorld(worldDirectory, worldDimension, World.LoggedWarnings.NORMAL);
-      } else {
-        Log.info("Could not load world: " + worldPath);
+      try {
+        loadDescription(context.getSceneDescriptionInputStream(sceneName));
+      } catch (FileNotFoundException e) {
+        // scene.json not found, try loading the backup file
+        Log.info("Scene description file not found, trying to load the backup file instead", e);
+        loadDescription(context.getSceneFileInputStream(sceneName + Scene.EXTENSION + ".backup"));
       }
-    }
 
-    loadDump(context, taskTracker);
-
-    if (spp == 0) {
-      mode = RenderMode.PREVIEW;
-    } else if (mode == RenderMode.RENDERING) {
-      mode = RenderMode.PAUSED;
-    }
-
-    boolean emitterGridNeedChunkReload = false;
-    if (emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
-      emitterGridNeedChunkReload = !loadEmitterGrid(context, taskTracker);
-    boolean octreeLoaded = loadOctree(context, taskTracker);
-    if (emitterGridNeedChunkReload || !octreeLoaded) {
-      // Could not load stored octree or emitter grid.
-      // Load the chunks from the world.
-      if (loadedWorld == EmptyWorld.INSTANCE) {
-        Log.warn("Could not load chunks (no world found for scene)");
-      } else {
-        loadChunks(taskTracker, loadedWorld, chunks);
+      if (sdfVersion < SDF_VERSION) {
+        Log.warn("Old scene version detected! The scene may not have been loaded correctly.");
+      } else if (sdfVersion > SDF_VERSION) {
+        Log.warn("This scene was created with a newer version of Chunky! The scene may not have been loaded correctly.");
       }
-    }
 
-    notifyAll();
+      // Load the configured skymap file.
+      sky.loadSkymap();
+
+      if (!worldPath.isEmpty()) {
+        File worldDirectory = new File(worldPath);
+        if (World.isWorldDir(worldDirectory)) {
+          loadedWorld = World.loadWorld(worldDirectory, worldDimension, World.LoggedWarnings.NORMAL);
+        } else {
+          Log.info("Could not load world: " + worldPath);
+        }
+      }
+
+      loadDump(context, taskTracker);
+
+      if (spp == 0) {
+        mode = RenderMode.PREVIEW;
+      } else if (mode == RenderMode.RENDERING) {
+        mode = RenderMode.PAUSED;
+      }
+
+      boolean emitterGridNeedChunkReload = false;
+      if (emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
+        emitterGridNeedChunkReload = !loadEmitterGrid(context, taskTracker);
+      boolean octreeLoaded = loadOctree(context, taskTracker);
+      if (emitterGridNeedChunkReload || !octreeLoaded) {
+        // Could not load stored octree or emitter grid.
+        // Load the chunks from the world.
+        if (loadedWorld == EmptyWorld.INSTANCE) {
+          Log.warn("Could not load chunks (no world found for scene)");
+        } else {
+          loadChunks(taskTracker, loadedWorld, chunks);
+        }
+      }
+
+      notifyAll();
+    } finally {
+      isLoading = false;
+    }
   }
 
   /**
@@ -842,6 +849,8 @@ public class Scene implements JsonSerializable, Refreshable {
   public synchronized void loadChunks(TaskTracker taskTracker, World world, Collection<ChunkPosition> chunksToLoad) {
     if (world == null)
       return;
+
+    isLoading = true;
 
     boolean isTallWorld = world.getVersionId() >= World.VERSION_21W06A;
     if (isTallWorld) {
@@ -1416,6 +1425,8 @@ public class Scene implements JsonSerializable, Refreshable {
       buildActorBvh(task);
     }
     Log.info(String.format("Loaded %d chunks", numChunks));
+
+    isLoading = false;
   }
 
   private void buildBvh(TaskTracker.Task task) {
@@ -3310,6 +3321,10 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public String getPreviewRenderer() {
     return previewRenderer;
+  }
+
+  public boolean isLoading() {
+    return isLoading;
   }
 
   /**
