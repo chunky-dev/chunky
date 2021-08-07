@@ -16,6 +16,9 @@
  */
 package se.llbit.chunky.world;
 
+import it.unimi.dsi.fastutil.longs.Long2ReferenceMap;
+import it.unimi.dsi.fastutil.longs.Long2ReferenceOpenHashMap;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,17 +29,17 @@ import java.util.Map;
  */
 public class Heightmap {
 
-  private Map<ChunkPosition, ChunkHeightmap> map = new HashMap<>();
+  private final Long2ReferenceMap<ChunkHeightmap> map = new Long2ReferenceOpenHashMap<>();
 
   /**
    * Set height y at (x, z).
    */
   public synchronized void set(int y, int x, int z) {
-    ChunkPosition cp = ChunkPosition.get(x >> 5, z >> 5);
-    ChunkHeightmap hm = map.get(cp);
+    long key = ChunkPosition.positionToLong(x >> 5, z >> 5);
+    ChunkHeightmap hm = map.get(key);
     if (hm == null) {
       hm = new ChunkHeightmap();
-      map.put(cp, hm);
+      map.put(key, hm);
     }
     hm.set(y, x & 0x1F, z & 0x1F);
   }
@@ -45,11 +48,11 @@ public class Heightmap {
    * @return Height at (x, z)
    */
   public synchronized int get(int x, int z) {
-    ChunkPosition cp = ChunkPosition.get(x >> 5, z >> 5);
-    ChunkHeightmap hm = map.get(cp);
+    long key = ChunkPosition.positionToLong(x >> 5, z >> 5);
+    ChunkHeightmap hm = map.get(key);
     if (hm == null) {
       hm = new ChunkHeightmap();
-      map.put(cp, hm);
+      map.put(key, hm);
     }
     return hm.get(x & 0x1F, z & 0x1F);
   }

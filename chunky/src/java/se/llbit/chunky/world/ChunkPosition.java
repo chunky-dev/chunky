@@ -48,7 +48,11 @@ public class ChunkPosition {
   private static final Map<Long, ChunkPosition> positions = new ConcurrentHashMap<>();
 
   public static ChunkPosition get(int x, int z) {
-    return positions.computeIfAbsent((z & 0xFFFFFFFFL) | (x & 0xFFFFFFFFL) << 32, (position) -> new ChunkPosition(x, z));
+    return positions.computeIfAbsent(positionToLong(x, z), (position) -> new ChunkPosition(x, z));
+  }
+
+  public static long positionToLong(int x, int z) {
+    return (z & 0xFFFFFFFFL) | (x & 0xFFFFFFFFL) << 32;
   }
 
   /**
@@ -62,7 +66,7 @@ public class ChunkPosition {
    * @return The long representation of the chunk position
    */
   public long getLong() {
-    return (((long) x) << 32) | (0xFFFFFFFFL & z);
+    return positionToLong(x, z);
   }
 
   /**
