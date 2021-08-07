@@ -18,6 +18,7 @@ package se.llbit.chunky.resources;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.TexturePath;
@@ -1499,8 +1500,7 @@ public class Texture {
     float[] pixelBuffer = new float[4];
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
-        int index = width * y + x;
-        ColorUtil.getRGBAComponentsGammaCorrected(image.getPixel(index), pixelBuffer);
+        ColorUtil.getRGBAComponentsGammaCorrected(image.getPixel(x, y), pixelBuffer);
         avgColorLinear[0] += pixelBuffer[3] * pixelBuffer[0];
         avgColorLinear[1] += pixelBuffer[3] * pixelBuffer[1];
         avgColorLinear[2] += pixelBuffer[3] * pixelBuffer[2];
@@ -1560,7 +1560,7 @@ public class Texture {
     if(usesAverageColor)
       return avgColorFlat;
     float[] result = new float[4];
-    ColorUtil.getRGBAComponentsGammaCorrected(image.getPixel(width*y + x), result);
+    ColorUtil.getRGBAComponentsGammaCorrected(image.getPixel(x, y), result);
     return result;
   }
 
@@ -1652,6 +1652,7 @@ public class Texture {
     return fxImage;
   }
 
+  @PluginApi
   public BitmapImage getBitmap() {
     return image.asBitmap();
   }
