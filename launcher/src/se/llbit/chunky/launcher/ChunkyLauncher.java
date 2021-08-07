@@ -239,7 +239,7 @@ public class ChunkyLauncher {
       }
     } catch(NoClassDefFoundError e) {
       String cause = e.getMessage();
-      if(cause.contains("javafx")) {
+      if(cause != null && cause.contains("javafx")) {
         // Javafx error
         if(retryIfMissingJavafx)
           JavaFxLocator.retryWithJavafx(args);
