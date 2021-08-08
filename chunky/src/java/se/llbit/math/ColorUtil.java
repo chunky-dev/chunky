@@ -381,4 +381,20 @@ public final class ColorUtil {
     target.z = ((1 - target.w) * a * overlayColor.z + target.w * target.z) / alpha;
     target.w = alpha;
   }
+
+  /**
+   * Convert single color component from linear to non-linear (sRGB?)
+   */
+  public static byte RGBComponentFromLinear(float linearValue) {
+    float value = (float) Math.pow(linearValue, 1 / Scene.DEFAULT_GAMMA);
+    value = Math.min(1.0f, value);
+    return (byte)(value * 255);
+  }
+
+  /**
+   * Convert a single component from non-linear to linear
+   */
+  public static float RGBComponentToLinear(byte value) {
+    return toLinearLut[value & 0xFF];
+  }
 }

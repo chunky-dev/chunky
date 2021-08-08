@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -35,8 +36,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.ui.DoubleAdjuster;
-import se.llbit.json.Json;
-import se.llbit.math.BVH;
+import se.llbit.math.bvh.BVH;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Matrix3;
 import se.llbit.math.QuickMath;
@@ -47,8 +47,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.IntBuffer;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.ResourceBundle;
 
 /**
@@ -58,7 +56,7 @@ public class Poser extends Stage implements Initializable {
   private static final WritablePixelFormat<IntBuffer> PIXEL_FORMAT =
       PixelFormat.getIntArgbInstance();
   private final EntitiesTab.EntityData player;
-  private BVH bvh = new BVH(Collections.emptyList());
+  private BVH bvh = BVH.EMPTY;
   private int[] pixels;
   private int width = 300;
   private int height = 300;

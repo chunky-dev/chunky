@@ -15,11 +15,11 @@ public class Candle extends AbstractModelBlock {
   private final int candles;
   private final boolean lit;
 
-  public Candle(String name, Texture candle, int candles, boolean lit) {
+  public Candle(String name, Texture candle, Texture candleLit, int candles, boolean lit) {
     super(name, candle);
     this.candles = Math.max(1, Math.min(4, candles));
     this.lit = lit;
-    this.model = new CandleModel(candle, candles);
+    this.model = new CandleModel(lit ? candleLit : candle, candles);
   }
 
   public boolean isLit() {

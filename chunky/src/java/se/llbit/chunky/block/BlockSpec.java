@@ -62,4 +62,8 @@ public class BlockSpec {
     }
     return block;
   }
+
+  public Tag getTag() {
+    return tag;
+  }
 }

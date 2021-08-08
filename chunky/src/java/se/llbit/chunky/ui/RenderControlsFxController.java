@@ -1,4 +1,5 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -21,7 +22,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import se.llbit.chunky.renderer.RenderController;
-import se.llbit.chunky.renderer.Renderer;
+import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.render.AdvancedTab;
@@ -63,7 +64,7 @@ public class RenderControlsFxController {
   private Scene scene;
 
   private final RenderCanvasFx canvas;
-  private final Renderer renderer;
+  private final RenderManager renderManager;
 
   private Collection<RenderControlsTab> tabs = new ArrayList<>();
 
@@ -77,11 +78,11 @@ public class RenderControlsFxController {
   private final Map<RenderControlsTab, ToolTab> tabMap = new IdentityHashMap<>();
 
   public RenderControlsFxController(ChunkyFxController controller, ToolPane toolPane,
-      RenderCanvasFx canvas, Renderer renderer) {
+      RenderCanvasFx canvas, RenderManager renderManager) {
     this.controller = controller;
     this.toolPane = toolPane;
     this.canvas = canvas;
-    this.renderer = renderer;
+    this.renderManager = renderManager;
     tooltip = new Tooltip();
     tooltip.setConsumeAutoHidingEvents(false);
     tooltip.setAutoHide(true);

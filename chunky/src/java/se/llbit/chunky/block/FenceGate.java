@@ -4,7 +4,7 @@ import se.llbit.chunky.model.FenceGateModel;
 import se.llbit.chunky.resources.Texture;
 
 public class FenceGate extends AbstractModelBlock {
-
+  private final BlockFace facing;
   private final String description;
 
   public FenceGate(String name, Texture texture, String facingString, boolean inWall,
@@ -30,10 +30,17 @@ public class FenceGate extends AbstractModelBlock {
         break;
     }
     this.model = new FenceGateModel(texture, facing, inWall ? 1 : 0, open ? 1 : 0);
+    this.facing = new BlockFace[]{
+        BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST
+    }[facing];
   }
 
   @Override
   public String description() {
     return description;
+  }
+
+  public BlockFace getFacing() {
+    return this.facing;
   }
 }

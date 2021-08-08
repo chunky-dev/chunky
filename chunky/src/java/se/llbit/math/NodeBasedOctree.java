@@ -61,11 +61,6 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
     return ((NodeId)node).node.type;
   }
 
-  @Override
-  public int getData(Octree.NodeId node) {
-    return ((NodeId)node).node.getData();
-  }
-
   public NodeBasedOctree(int octreeDepth, Octree.Node node) {
     depth = octreeDepth;
     root = node;
@@ -81,7 +76,6 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
     set(new Octree.Node(type), x, y, z);
   }
 
-  @Override
   public void set(Octree.Node data, int x, int y, int z) {
     Octree.Node node = root;
     int parentLevel = depth - 1;
@@ -119,21 +113,7 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
       }
 
       if (allSame) {
-        // The parent node needs to be replaced by a DataNode if children have data
-        if(data.getData() != 0) {
-          if(i < parentLevel) {
-            // We need to find the grand parent and find which child of the grand parent
-            // the parent is to replace it
-            Octree.Node grandparent = parents[i+1];
-            int parentPosition = positions[i+1];
-            grandparent.children[parentPosition] = new Octree.DataNode(data.type, data.getData());
-          } else {
-            // The parent is the root
-            root = new Octree.DataNode(data.type, data.getData());
-          }
-        } else {
-          parent.merge(data.type);
-        }
+        parent.merge(data.type);
         cacheLevel = FastMath.max(i, cacheLevel);
       } else {
         break;
@@ -141,7 +121,6 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
     }
   }
 
-  @Override
   public Octree.Node get(int x, int y, int z) {
     while (cacheLevel < depth && ((x >>> cacheLevel) != cx ||
             (y >>> cacheLevel) != cy || (z >>> cacheLevel) != cz))
@@ -212,7 +191,6 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
   private void finalizationNode(Octree.Node node, Octree.Node parent, int childNo) {
     boolean canMerge = true;
     int mergedType = ANY_TYPE;
-    int mergedData = 0;
     for(int i = 0; i < 8; ++i) {
       Octree.Node child = node.children[i];
       if(child.type == BRANCH_NODE) {
@@ -225,25 +203,13 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
       if(canMerge) {
         if(mergedType == ANY_TYPE) {
           mergedType = child.type;
-          mergedData = child.getData();
-        } else if(!(child.type == ANY_TYPE || (child.type == mergedType && child.getData() == mergedData))) {
+        } else if(!(child.type == ANY_TYPE || child.type == mergedType)) {
           canMerge = false;
         }
       }
     }
     if(canMerge) {
-      if(mergedData == 0) {
-        // No need to use a DataNode
-        node.merge(mergedType);
-      } else {
-        // We need to replace the node by a new node in its parent
-        if(parent == null) {
-          // node is the root
-          root = new Octree.DataNode(mergedType, mergedData);
-        } else {
-          parent.children[childNo] = new Octree.DataNode(mergedType, mergedData);
-        }
-      }
+      node.merge(mergedType);
     }
   }
 

@@ -37,12 +37,12 @@ public class TexturedTriangle implements Primitive {
   public final Vector3 o = new Vector3(0, 0, 0);
   public final Vector3 n = new Vector3(0, 0, 0);
   public final AABB bounds;
-  private final double t1u;
-  private final double t1v;
-  private final double t2u;
-  private final double t2v;
-  private final double t3u;
-  private final double t3v;
+  public final double t1u;
+  public final double t1v;
+  public final double t2u;
+  public final double t2v;
+  public final double t3u;
+  public final double t3v;
   public final Material material;
   public final boolean doubleSided;
 

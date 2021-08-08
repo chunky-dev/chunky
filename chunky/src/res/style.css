@@ -54,3 +54,12 @@ Hyperlink:hover {
     -fx-text-box-border: #FF434A;
     -fx-focus-color: #FF434A;
 }
+
+.menu-item:disabled:focused {
+    -fx-background: unset;
+    -fx-background-color: transparent;
+}
+
+.menu-item:disabled:focused > .label {
+    -fx-text-fill: white;
+}

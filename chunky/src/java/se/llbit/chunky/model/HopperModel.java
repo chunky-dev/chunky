@@ -17,12 +17,7 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
-import se.llbit.math.AABB;
-import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
@@ -31,93 +26,437 @@ import se.llbit.math.Vector4;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class HopperModel {
-  private static final AABB[] boxes = new AABB[] {
-      // East.
-      new AABB(14 / 16., 1, 10 / 16., 1, 0, 1),
-      // West.
-      new AABB(0, 2 / 16., 10 / 16., 1, 0, 1),
-      // North.
-      new AABB(2 / 16., 14 / 16., 10 / 16., 1, 0, 2 / 16.),
-      // South.
-      new AABB(2 / 16., 14 / 16., 10 / 16., 1, 14 / 16., 1),
-      // Center.
-      new AABB(4 / 16., 12 / 16., 4 / 16., 10 / 16., 4 / 16., 12 / 16.),
+public class HopperModel extends QuadModel {
+  private static final Texture top = Texture.hopperTop;
+  private static final Texture side = Texture.hopperOutside;
+  private static final Texture inside = Texture.hopperInside;
+  private static final Texture[] tex = new Texture[]{
+      inside, side, side, side, side, side, top, side, side, side, side, top, side, side, side, side, top, side, side,
+      top, side, side, side, side, side, side, side, side, side, side, side, side
   };
 
-  private static final AABB[] pipe = new AABB[] {
-      // Bottom.
-      new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),
-      // Bottom.
-      new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),
-      // Facing north.
-      new AABB(6 / 16., 10 / 16., 4 / 16., 8 / 16., 0, 4 / 16.),
-      // Facing south.
-      new AABB(6 / 16., 10 / 16., 4 / 16., 8 / 16., 12 / 16., 1),
-      // Facing west.
-      new AABB(0 / 16., 4 / 16., 4 / 16., 8 / 16., 6 / 16., 10 / 16.),
-      // Facing east.
-      new AABB(12 / 16., 1, 4 / 16., 8 / 16., 6 / 16., 10 / 16.),
-      // Bottom.
-      new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),
-      // Bottom.
-      new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),
+  //region quads
+  private static final Quad[] quadsDown = new Quad[]{
+      new Quad(
+          new Vector3(0 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector3(16 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector3(0 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 1 - 16 / 16.0, 1 - 0 / 16.0)
+      ),
+      new Quad(
+          new Vector3(0 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(16 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(0 / 16.0, 10 / 16.0, 16 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 0 / 16.0)
+      ),
+      new Quad(
+          new Vector3(0 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector3(0 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector3(0 / 16.0, 10 / 16.0, 16 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 11 / 16.0, 10 / 16.0)
+      ),
+      new Quad(
+          new Vector3(16 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector3(16 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector3(16 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 11 / 16.0, 10 / 16.0)
+      ),
+      new Quad(
+          new Vector3(0 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector3(16 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector3(0 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector4(1 - 16 / 16.0, 1 - 0 / 16.0, 11 / 16.0, 10 / 16.0)
+      ),
+      new Quad(
+          new Vector3(16 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector3(0 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector3(16 / 16.0, 10 / 16.0, 16 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 11 / 16.0, 10 / 16.0)
+      ),
+      new Quad(
+          new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(2 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector4(0 / 16.0, 2 / 16.0, 1 - 16 / 16.0, 1 - 0 / 16.0)
+      ),
+      new Quad(
+          new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(0 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(2 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(2 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(2 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(2 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(0 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector4(1 - 2 / 16.0, 1 - 0 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(2 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(2 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector4(2 / 16.0, 0 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(14 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(14 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector4(14 / 16.0, 16 / 16.0, 1 - 16 / 16.0, 1 - 0 / 16.0)
+      ),
+      new Quad(
+          new Vector3(14 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(14 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(14 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(16 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(14 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(14 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector4(1 - 16 / 16.0, 1 - 14 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(14 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(16 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector4(16 / 16.0, 14 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(2 / 16.0, 16 / 16.0, 2 / 16.0),
+          new Vector3(14 / 16.0, 16 / 16.0, 2 / 16.0),
+          new Vector3(2 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector4(2 / 16.0, 14 / 16.0, 1 - 2 / 16.0, 1 - 0 / 16.0)
+      ),
+      new Quad(
+          new Vector3(2 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(14 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(2 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector4(1 - 14 / 16.0, 1 - 2 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(14 / 16.0, 16 / 16.0, 2 / 16.0),
+          new Vector3(2 / 16.0, 16 / 16.0, 2 / 16.0),
+          new Vector3(14 / 16.0, 11 / 16.0, 2 / 16.0),
+          new Vector4(14 / 16.0, 2 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(2 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(14 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(2 / 16.0, 16 / 16.0, 14 / 16.0),
+          new Vector4(2 / 16.0, 14 / 16.0, 1 - 16 / 16.0, 1 - 14 / 16.0)
+      ),
+      new Quad(
+          new Vector3(2 / 16.0, 16 / 16.0, 14 / 16.0),
+          new Vector3(14 / 16.0, 16 / 16.0, 14 / 16.0),
+          new Vector3(2 / 16.0, 11 / 16.0, 14 / 16.0),
+          new Vector4(1 - 14 / 16.0, 1 - 2 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(14 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(2 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(14 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector4(14 / 16.0, 2 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(4 / 16.0, 4 / 16.0, 4 / 16.0),
+          new Vector3(12 / 16.0, 4 / 16.0, 4 / 16.0),
+          new Vector3(4 / 16.0, 4 / 16.0, 12 / 16.0),
+          new Vector4(4 / 16.0, 12 / 16.0, 12 / 16.0, 4 / 16.0)
+      ),
+      new Quad(
+          new Vector3(4 / 16.0, 10 / 16.0, 12 / 16.0),
+          new Vector3(4 / 16.0, 10 / 16.0, 4 / 16.0),
+          new Vector3(4 / 16.0, 4 / 16.0, 12 / 16.0),
+          new Vector4(12 / 16.0, 4 / 16.0, 10 / 16.0, 4 / 16.0)
+      ),
+      new Quad(
+          new Vector3(12 / 16.0, 10 / 16.0, 4 / 16.0),
+          new Vector3(12 / 16.0, 10 / 16.0, 12 / 16.0),
+          new Vector3(12 / 16.0, 4 / 16.0, 4 / 16.0),
+          new Vector4(4 / 16.0, 12 / 16.0, 10 / 16.0, 4 / 16.0)
+      ),
+      new Quad(
+          new Vector3(4 / 16.0, 10 / 16.0, 4 / 16.0),
+          new Vector3(12 / 16.0, 10 / 16.0, 4 / 16.0),
+          new Vector3(4 / 16.0, 4 / 16.0, 4 / 16.0),
+          new Vector4(1 - 12 / 16.0, 1 - 4 / 16.0, 10 / 16.0, 4 / 16.0)
+      ),
+      new Quad(
+          new Vector3(12 / 16.0, 10 / 16.0, 12 / 16.0),
+          new Vector3(4 / 16.0, 10 / 16.0, 12 / 16.0),
+          new Vector3(12 / 16.0, 4 / 16.0, 12 / 16.0),
+          new Vector4(12 / 16.0, 4 / 16.0, 10 / 16.0, 4 / 16.0)
+      ),
+      new Quad(
+          new Vector3(6 / 16.0, 0 / 16.0, 6 / 16.0),
+          new Vector3(10 / 16.0, 0 / 16.0, 6 / 16.0),
+          new Vector3(6 / 16.0, 0 / 16.0, 10 / 16.0),
+          new Vector4(6 / 16.0, 10 / 16.0, 10 / 16.0, 6 / 16.0)
+      ),
+      new Quad(
+          new Vector3(6 / 16.0, 4 / 16.0, 10 / 16.0),
+          new Vector3(6 / 16.0, 4 / 16.0, 6 / 16.0),
+          new Vector3(6 / 16.0, 0 / 16.0, 10 / 16.0),
+          new Vector4(10 / 16.0, 6 / 16.0, 4 / 16.0, 0 / 16.0)
+      ),
+      new Quad(
+          new Vector3(10 / 16.0, 4 / 16.0, 6 / 16.0),
+          new Vector3(10 / 16.0, 4 / 16.0, 10 / 16.0),
+          new Vector3(10 / 16.0, 0 / 16.0, 6 / 16.0),
+          new Vector4(6 / 16.0, 10 / 16.0, 4 / 16.0, 0 / 16.0)
+      ),
+      new Quad(
+          new Vector3(6 / 16.0, 4 / 16.0, 6 / 16.0),
+          new Vector3(10 / 16.0, 4 / 16.0, 6 / 16.0),
+          new Vector3(6 / 16.0, 0 / 16.0, 6 / 16.0),
+          new Vector4(1 - 10 / 16.0, 1 - 6 / 16.0, 4 / 16.0, 0 / 16.0)
+      ),
+      new Quad(
+          new Vector3(10 / 16.0, 4 / 16.0, 10 / 16.0),
+          new Vector3(6 / 16.0, 4 / 16.0, 10 / 16.0),
+          new Vector3(10 / 16.0, 0 / 16.0, 10 / 16.0),
+          new Vector4(10 / 16.0, 6 / 16.0, 4 / 16.0, 0 / 16.0)
+      )
   };
 
-  private static final Quad bottom = new DoubleSidedQuad(new Vector3(2 / 16., 10 / 16., 2 / 16.),
-      new Vector3(14 / 16., 10 / 16., 2 / 16.), new Vector3(2 / 16., 10 / 16., 14 / 16.),
-      new Vector4(2 / 16., 14 / 16., 2 / 16., 14 / 16.));
+  private static final Quad[] quadsSide = new Quad[]{
+      new Quad(
+          new Vector3(0 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector3(16 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector3(0 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 1 - 16 / 16.0, 1 - 0 / 16.0)
+      ),
+      new Quad(
+          new Vector3(0 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(16 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(0 / 16.0, 10 / 16.0, 16 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 0 / 16.0)
+      ),
+      new Quad(
+          new Vector3(0 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector3(0 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector3(0 / 16.0, 10 / 16.0, 16 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 11 / 16.0, 10 / 16.0)
+      ),
+      new Quad(
+          new Vector3(16 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector3(16 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector3(16 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 11 / 16.0, 10 / 16.0)
+      ),
+      new Quad(
+          new Vector3(0 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector3(16 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector3(0 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector4(1 - 16 / 16.0, 1 - 0 / 16.0, 11 / 16.0, 10 / 16.0)
+      ),
+      new Quad(
+          new Vector3(16 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector3(0 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector3(16 / 16.0, 10 / 16.0, 16 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 11 / 16.0, 10 / 16.0)
+      ),
+      new Quad(
+          new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(2 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector4(0 / 16.0, 2 / 16.0, 1 - 16 / 16.0, 1 - 0 / 16.0)
+      ),
+      new Quad(
+          new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(0 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(2 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(2 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(2 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(2 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(0 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector4(1 - 2 / 16.0, 1 - 0 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(2 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(2 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector4(2 / 16.0, 0 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(14 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(14 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector4(14 / 16.0, 16 / 16.0, 1 - 16 / 16.0, 1 - 0 / 16.0)
+      ),
+      new Quad(
+          new Vector3(14 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(14 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(14 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(16 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(14 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(14 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector4(1 - 16 / 16.0, 1 - 14 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(14 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(16 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector4(16 / 16.0, 14 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(2 / 16.0, 16 / 16.0, 2 / 16.0),
+          new Vector3(14 / 16.0, 16 / 16.0, 2 / 16.0),
+          new Vector3(2 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector4(2 / 16.0, 14 / 16.0, 1 - 2 / 16.0, 1 - 0 / 16.0)
+      ),
+      new Quad(
+          new Vector3(2 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(14 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(2 / 16.0, 11 / 16.0, 0 / 16.0),
+          new Vector4(1 - 14 / 16.0, 1 - 2 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(14 / 16.0, 16 / 16.0, 2 / 16.0),
+          new Vector3(2 / 16.0, 16 / 16.0, 2 / 16.0),
+          new Vector3(14 / 16.0, 11 / 16.0, 2 / 16.0),
+          new Vector4(14 / 16.0, 2 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(2 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(14 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(2 / 16.0, 16 / 16.0, 14 / 16.0),
+          new Vector4(2 / 16.0, 14 / 16.0, 1 - 16 / 16.0, 1 - 14 / 16.0)
+      ),
+      new Quad(
+          new Vector3(2 / 16.0, 16 / 16.0, 14 / 16.0),
+          new Vector3(14 / 16.0, 16 / 16.0, 14 / 16.0),
+          new Vector3(2 / 16.0, 11 / 16.0, 14 / 16.0),
+          new Vector4(1 - 14 / 16.0, 1 - 2 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(14 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(2 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(14 / 16.0, 11 / 16.0, 16 / 16.0),
+          new Vector4(14 / 16.0, 2 / 16.0, 16 / 16.0, 11 / 16.0)
+      ),
+      new Quad(
+          new Vector3(4 / 16.0, 4 / 16.0, 4 / 16.0),
+          new Vector3(12 / 16.0, 4 / 16.0, 4 / 16.0),
+          new Vector3(4 / 16.0, 4 / 16.0, 12 / 16.0),
+          new Vector4(4 / 16.0, 12 / 16.0, 12 / 16.0, 4 / 16.0)
+      ),
+      new Quad(
+          new Vector3(4 / 16.0, 10 / 16.0, 12 / 16.0),
+          new Vector3(4 / 16.0, 10 / 16.0, 4 / 16.0),
+          new Vector3(4 / 16.0, 4 / 16.0, 12 / 16.0),
+          new Vector4(12 / 16.0, 4 / 16.0, 10 / 16.0, 4 / 16.0)
+      ),
+      new Quad(
+          new Vector3(12 / 16.0, 10 / 16.0, 4 / 16.0),
+          new Vector3(12 / 16.0, 10 / 16.0, 12 / 16.0),
+          new Vector3(12 / 16.0, 4 / 16.0, 4 / 16.0),
+          new Vector4(4 / 16.0, 12 / 16.0, 10 / 16.0, 4 / 16.0)
+      ),
+      new Quad(
+          new Vector3(4 / 16.0, 10 / 16.0, 4 / 16.0),
+          new Vector3(12 / 16.0, 10 / 16.0, 4 / 16.0),
+          new Vector3(4 / 16.0, 4 / 16.0, 4 / 16.0),
+          new Vector4(1 - 12 / 16.0, 1 - 4 / 16.0, 10 / 16.0, 4 / 16.0)
+      ),
+      new Quad(
+          new Vector3(12 / 16.0, 10 / 16.0, 12 / 16.0),
+          new Vector3(4 / 16.0, 10 / 16.0, 12 / 16.0),
+          new Vector3(12 / 16.0, 4 / 16.0, 12 / 16.0),
+          new Vector4(12 / 16.0, 4 / 16.0, 10 / 16.0, 4 / 16.0)
+      ),
+      new Quad(
+          new Vector3(6 / 16.0, 8 / 16.0, 4 / 16.0),
+          new Vector3(10 / 16.0, 8 / 16.0, 4 / 16.0),
+          new Vector3(6 / 16.0, 8 / 16.0, 0 / 16.0),
+          new Vector4(6 / 16.0, 10 / 16.0, 1 - 4 / 16.0, 1 - 0 / 16.0)
+      ),
+      new Quad(
+          new Vector3(6 / 16.0, 4 / 16.0, 0 / 16.0),
+          new Vector3(10 / 16.0, 4 / 16.0, 0 / 16.0),
+          new Vector3(6 / 16.0, 4 / 16.0, 4 / 16.0),
+          new Vector4(6 / 16.0, 10 / 16.0, 4 / 16.0, 0 / 16.0)
+      ),
+      new Quad(
+          new Vector3(6 / 16.0, 8 / 16.0, 4 / 16.0),
+          new Vector3(6 / 16.0, 8 / 16.0, 0 / 16.0),
+          new Vector3(6 / 16.0, 4 / 16.0, 4 / 16.0),
+          new Vector4(4 / 16.0, 0 / 16.0, 8 / 16.0, 4 / 16.0)
+      ),
+      new Quad(
+          new Vector3(10 / 16.0, 8 / 16.0, 0 / 16.0),
+          new Vector3(10 / 16.0, 8 / 16.0, 4 / 16.0),
+          new Vector3(10 / 16.0, 4 / 16.0, 0 / 16.0),
+          new Vector4(0 / 16.0, 4 / 16.0, 8 / 16.0, 4 / 16.0)
+      ),
+      new Quad(
+          new Vector3(6 / 16.0, 8 / 16.0, 0 / 16.0),
+          new Vector3(10 / 16.0, 8 / 16.0, 0 / 16.0),
+          new Vector3(6 / 16.0, 4 / 16.0, 0 / 16.0),
+          new Vector4(1 - 10 / 16.0, 1 - 6 / 16.0, 8 / 16.0, 4 / 16.0)
+      )
+  };
+  //endregion
 
-  public static boolean intersect(Ray ray) {
-    int direction = 7 & (ray.getCurrentData() >> BlockData.OFFSET);
-    return intersect(ray, direction);
+  private final Quad[] quads;
+
+  public HopperModel(String facing) {
+    switch (facing) {
+      case "down":
+        quads = quadsDown;
+        break;
+      default:
+      case "north":
+        quads = quadsSide;
+        break;
+      case "east":
+        quads = Model.rotateY(quadsSide);
+        break;
+      case "south":
+        quads = Model.rotateY(quadsSide, Math.toRadians(180));
+        break;
+      case "west":
+        quads = Model.rotateNegY(quadsSide);
+        break;
+    }
   }
 
-  public static boolean intersect(Ray ray, int direction) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (AABB box : boxes) {
-      if (box.intersect(ray)) {
-        if (ray.n.y > 0) {
-          if (box == boxes[boxes.length - 1]) {
-            Texture.hopperInside.getColor(ray);
-          } else {
-            Texture.hopperTop.getColor(ray);
-          }
-        } else {
-          Texture.hopperOutside.getColor(ray);
-        }
-        ray.color.w = 1;
-        ray.t = ray.tNext;
-        hit = true;
-      }
-    }
-    if (pipe[direction].intersect(ray)) {
-      if (ray.n.y > 0) {
-        Texture.hopperInside.getColor(ray);
-      } else {
-        Texture.hopperOutside.getColor(ray);
-      }
-      ray.color.w = 1;
-      ray.t = ray.tNext;
-      hit = true;
-    }
-    if (bottom.intersect(ray)) {
-      ray.n.set(bottom.n);
-      ray.n.scale(-QuickMath.signum(ray.d.dot(bottom.n)));
-      if (ray.n.y > 0) {
-        Texture.hopperInside.getColor(ray);
-      } else {
-        Texture.hopperOutside.getColor(ray);
-      }
-      ray.color.w = 1;
-      ray.t = ray.tNext;
-      hit = true;
-    }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return tex;
   }
 }

@@ -9,7 +9,7 @@ public class Comparator extends AbstractModelBlock {
   private final String description;
 
   public Comparator(String facingString, String modeString, boolean powered) {
-    super("repeater", Texture.redstoneRepeaterOn);
+    super("comparator", Texture.redstoneRepeaterOn);
     this.description = String.format("facing=%s, mode=%s, powered=%s",
         facingString, modeString, powered);
     int mode = modeString.equals("compare") ? 0 : 1;

@@ -1,5 +1,6 @@
 package se.llbit.chunky.block;
 
+import se.llbit.nbt.IntTag;
 import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
 
@@ -22,9 +23,15 @@ public interface BlockProvider {
     return facing(tag, "north");
   }
 
+  /**
+   * Get the integer value of the given tag (either a {@link StringTag} or an {@link IntTag}.
+   * @param tag String or int tag
+   * @param defaultValue Default value if the tag doesn't exist or the value is not an integer
+   * @return Integer value of the given tag or the default value
+   */
   static int stringToInt(Tag tag, int defaultValue) {
     if (!(tag instanceof StringTag)) {
-      return defaultValue;
+      return tag.intValue(defaultValue);
     }
     try {
       return Integer.parseInt(tag.stringValue());

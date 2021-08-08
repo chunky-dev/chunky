@@ -28,6 +28,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
@@ -133,6 +134,20 @@ public class BlockPalette {
     if(id == ANY_ID)
       return stone;
     return palette.get(id);
+  }
+
+  /**
+   * Get the block specification by its ID in this palette.
+   * @param id ID of a block in this palette
+   * @return Block specification or null if not found
+   */
+  public BlockSpec getBlockSpec(int id) {
+    for (Entry<BlockSpec, Integer> entry : blockMap.entrySet()) {
+      if (entry.getValue() == id){
+        return entry.getKey();
+      }
+    }
+    return null;
   }
 
   /**

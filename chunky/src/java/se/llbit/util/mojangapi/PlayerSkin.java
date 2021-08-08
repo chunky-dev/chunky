@@ -1,4 +1,4 @@
-/* Copyright (c) 2019 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -14,22 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer;
+package se.llbit.util.mojangapi;
 
-/**
- * Describes part of the canvas to be rendered by a render worker.
- */
-public class RenderTile {
-  public final int x0, x1, y0, y1;
+import se.llbit.chunky.renderer.scene.PlayerModel;
 
-  public RenderTile(int x0, int x1, int y0, int y1) {
-    this.x0 = x0;
-    this.x1 = x1;
-    this.y0 = y0;
-    this.y1 = y1;
+public class PlayerSkin {
+
+  private final String url;
+  private final PlayerModel model;
+
+  public PlayerSkin(String url, PlayerModel model) {
+    this.url = url;
+    this.model = model;
   }
 
-  @Override public String toString() {
-    return String.format("[Tile: [%d %d]->[%d %d]]", x0, y0, x1, y1);
+  public String getUrl() {
+    return url;
+  }
+
+  public PlayerModel getModel() {
+    return model;
   }
 }

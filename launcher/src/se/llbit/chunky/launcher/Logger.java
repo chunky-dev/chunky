@@ -32,7 +32,7 @@ public interface Logger {
   /**
    * Signals to the logger that the program has ended.
    *
-   * @param exitVal the exit value of the Chunky process.
+   * @param exitValue the exit value of the Chunky process.
    */
   void processExited(int exitValue);
 }

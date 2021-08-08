@@ -29,8 +29,7 @@ import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
 import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
-import se.llbit.util.MCDownloader;
-import se.llbit.util.NotNull;
+import se.llbit.util.mojangapi.MojangApi;
 import se.llbit.util.StringUtil;
 import se.llbit.util.TaskTracker;
 
@@ -336,7 +335,7 @@ public class CommandLineOptions {
           System.err.println("Failed to create destination directory " + resourcesDir.getAbsolutePath());
         }
         System.out.println("Downloading Minecraft " + version + "...");
-        MCDownloader.downloadMC(version, new File(resourcesDir, "minecraft.jar"));
+        MojangApi.downloadMinecraft(version, new File(resourcesDir, "minecraft.jar"));
         System.out.println("Done!");
       } catch (MalformedURLException e) {
         System.err.println("Malformed URL (" + e.getMessage() + ")");

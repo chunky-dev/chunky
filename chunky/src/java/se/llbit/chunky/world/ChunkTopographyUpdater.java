@@ -70,6 +70,13 @@ public class ChunkTopographyUpdater extends Thread {
   }
 
   /**
+   * Remove all chunks from the parse queue.
+   */
+  public synchronized void clearQueue() {
+    queue.clear();
+  }
+
+  /**
    * @return <code>true</code> if the work queue is not empty
    */
   public synchronized boolean isWorking() {

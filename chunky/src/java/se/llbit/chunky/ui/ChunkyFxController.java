@@ -76,14 +76,9 @@ import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ZipExportJob;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
-import se.llbit.chunky.renderer.CameraViewListener;
+import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
-import se.llbit.chunky.renderer.RenderController;
-import se.llbit.chunky.renderer.RenderMode;
-import se.llbit.chunky.renderer.RenderStatusListener;
-import se.llbit.chunky.renderer.Renderer;
-import se.llbit.chunky.renderer.ResetReason;
-import se.llbit.chunky.renderer.SnapshotControl;
+import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Camera;
@@ -297,7 +292,7 @@ public class ChunkyFxController
   private AsynchronousSceneManager asyncSceneManager;
   private final RenderStatusListener renderTracker;
   private se.llbit.chunky.renderer.scene.Scene scene = null;
-  private Renderer renderer;
+  private RenderManager renderManager;
   private RenderController renderController;
 
   public ChunkyFxController(Chunky chunky) {
@@ -327,7 +322,7 @@ public class ChunkyFxController
   @Override public void initialize(URL fxmlUrl, ResourceBundle resources) {
     scene = chunky.getSceneManager().getScene();
     renderController = chunky.getRenderController();
-    renderer = renderController.getRenderer();
+    renderManager = renderController.getRenderManager();
     asyncSceneManager =
         (AsynchronousSceneManager) renderController.getSceneManager();
     asyncSceneManager.setResetHandler(this);
@@ -354,21 +349,20 @@ public class ChunkyFxController
         }
       }).start();
     });
-    renderer.setSnapshotControl(SnapshotControl.DEFAULT);
-    renderer.setOnFrameCompleted((scene1, spp) -> {
-      if (SnapshotControl.DEFAULT.saveSnapshot(scene1, spp)) {
-
+    renderManager.setSnapshotControl(SnapshotControl.DEFAULT);
+    renderManager.setOnFrameCompleted((scene1, spp) -> {
+      if (renderManager.getSnapshotControl().saveSnapshot(scene1, spp)) {
         scene1.saveSnapshot(new File(renderController.getContext().getSceneDirectory(), "snapshots"), taskTracker, renderController.getContext().numRenderThreads());
       }
 
-      if (SnapshotControl.DEFAULT.saveRenderDump(scene1, spp)) {
+      if (renderManager.getSnapshotControl().saveRenderDump(scene1, spp)) {
         // Save the scene description and current render dump.
         asyncSceneManager.saveScene();
       }
     });
 
-    renderer.addRenderListener(renderTracker);
-    renderer.setRenderTask(taskTracker.backgroundTask());
+    renderManager.addRenderListener(renderTracker);
+    renderManager.setRenderTask(taskTracker.backgroundTask());
 
     saveScene.setGraphic(new ImageView(Icon.disk.fxImage()));
     saveScene.setOnAction(e -> saveSceneSafe(sceneNameField.getText()));
@@ -401,6 +395,7 @@ public class ChunkyFxController
     map = new ChunkMap(mapLoader, this, mapView, chunkSelection,
         mapCanvas, mapOverlay);
 
+    AtomicBoolean ignoreYMaxUpdate = new AtomicBoolean(false); // used to not trigger a world reload after changing the world, see #926
     mapLoader.addWorldLoadListener(
         (world, reloaded) -> {
           if (!reloaded) {
@@ -409,23 +404,6 @@ public class ChunkyFxController
           world.addChunkDeletionListener(chunkSelection);
           Optional<Vector3> playerPos = world.playerPos();
           world.addChunkUpdateListener(map);
-          world.addChunkUpdateListener(
-              new ChunkUpdateListener() {
-                private boolean warningShown = false;
-
-                @Override
-                public void chunkUpdated(ChunkPosition chunkPosition) {
-                  if (!warningShown) {
-                  String version = world.getChunk(chunkPosition).getVersion();
-                  if (version != null && !version.equals("1.13")) {
-                      warningShown = true;
-                      Log.warn(
-                          "This version of Chunky only supports worlds created with Minecraft 1.13 or later. " +
-                          "To render worlds from older Minecraft versions, please use Chunky 1.4.x or convert it to the new format using a current version of Minecraft.");
-                    }
-                  }
-                }
-              });
 
           Platform.runLater(
               () -> {
@@ -433,6 +411,7 @@ public class ChunkyFxController
                   mapView.panTo(playerPos.orElse(new Vector3(0, 0, 0)));
                 }
                 if (!reloaded) {
+                  ignoreYMaxUpdate.set(true);
                   if (mapLoader.getWorld().getVersionId() >= World.VERSION_21W06A) {
                     yMax.setRange(-64, 320);
                     yMax.set(320);
@@ -440,6 +419,7 @@ public class ChunkyFxController
                     yMax.setRange(0, 256);
                     yMax.set(256);
                   }
+                  ignoreYMaxUpdate.set(false);
                 }
                 map.redrawMap();
                 mapName.setText(world.levelName());
@@ -508,8 +488,10 @@ public class ChunkyFxController
     scale.valueProperty().addListener(new GroupedChangeListener<>(group,
         (observable, oldValue, newValue) -> mapView.setScale(newValue.intValue())));
     yMax.valueProperty().addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
-      mapView.setYMax(newValue.intValue());
-      mapLoader.reloadWorld();
+      if (!ignoreYMaxUpdate.get()) {
+        mapView.setYMax(newValue.intValue());
+        mapLoader.reloadWorld();
+      }
     }));
 
     // Add map view listener to control the individual value properties.
@@ -674,6 +656,11 @@ public class ChunkyFxController
     mapOverlay.setOnKeyReleased(map::onKeyReleased);
 
     mapLoader.loadWorld(PersistentSettings.getLastWorld());
+    if (mapLoader.getWorld().getVersionId() >= World.VERSION_21W06A) {
+      mapView.setYMax(320);
+    } else {
+      mapView.setYMax(256);
+    }
 
     menuExit.setOnAction(event -> {
       Platform.exit();
@@ -681,11 +668,11 @@ public class ChunkyFxController
     });
 
     canvas = new RenderCanvasFx(chunky.getSceneManager().getScene(),
-        chunky.getRenderController().getRenderer());
+        chunky.getRenderController().getRenderManager());
     canvas.setRenderListener(renderTracker);
     previewTab.setContent(canvas);
     sceneControls = new RenderControlsFxController(this, renderControls, canvas,
-        chunky.getRenderController().getRenderer());
+        chunky.getRenderController().getRenderManager());
     showWorldMap();
     mainTabs.getSelectionModel().selectedItemProperty().addListener(
         (observable, oldValue, newValue) -> {
@@ -773,7 +760,7 @@ public class ChunkyFxController
         e -> filters.get(e).equals(scene.outputMode))
         .findFirst().ifPresent(fileChooser::setSelectedExtensionFilter);
     fileChooser.setInitialFileName(String.format("%s-%d",
-        scene.name(), renderer.getRenderStatus().getSpp()));
+        scene.name(), renderManager.getRenderStatus().getSpp()));
     File target = fileChooser.showSaveDialog(saveFrameBtn.getScene().getWindow());
     if (target != null) {
       saveFrameDirectory = target.getParentFile();
@@ -806,7 +793,7 @@ public class ChunkyFxController
 
   @Override  public boolean allowSceneRefresh() {
     if (scene.getResetReason() == ResetReason.SCENE_LOADED
-        || renderer.getRenderStatus().getRenderTime() < SCENE_EDIT_GRACE_PERIOD) {
+        || renderManager.getRenderStatus().getRenderTime() < SCENE_EDIT_GRACE_PERIOD) {
       return true;
     } else {
       requestRenderReset();

@@ -11,6 +11,7 @@ import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.Tag;
 
 public abstract class Block extends Material {
   private final static AABB block =  new AABB(0, 1, 0, 1,0, 1);
@@ -95,5 +96,28 @@ public abstract class Block extends Material {
   public Entity toEntity(Vector3 position) {
     throw new Error("This block type can not be converted to an entity: "
         + getClass().getSimpleName());
+  }
+
+  /**
+   * If this returns true, the {@link #getNewTagWithBlockEntity(Tag, CompoundTag)} method will be
+   * invoked if a block entity is found for this block.
+   * This is used to handle legacy blocks that used to have information stored in block entities
+   * but are blocks now (e.g. colored beds).
+   */
+  public boolean isModifiedByBlockEntity() {
+    return false;
+  }
+
+  /**
+   * Given this block, its original tag and the block entity tag, create a new tag for the modified
+   * block.
+   * This is used to handle legacy blocks that used to have information stored in block entities
+   * but are blocks now (e.g. colored beds).
+   * @param blockTag Tag of this block (not to be modified)
+   * @param entityTag Block entity data
+   * @return A new tag that will be used to create a new block that will replace this block
+   */
+  public Tag getNewTagWithBlockEntity(Tag blockTag, CompoundTag entityTag) {
+    return null;
   }
 }

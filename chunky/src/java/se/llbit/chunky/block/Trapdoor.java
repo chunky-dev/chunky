@@ -11,6 +11,7 @@ public class Trapdoor extends AbstractModelBlock {
   public Trapdoor(String name, Texture texture,
       String half, String facing, boolean open) {
     super(name, texture);
+    solid = false;
     this.description = String.format("half=%s, facing=%s, open=%s",
         half, facing, open);
     int state;
