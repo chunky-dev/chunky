@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -286,12 +285,12 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Entities in the scene.
    */
-  private Collection<Entity> entities = new LinkedList<>();
+  private ArrayList<Entity> entities = new ArrayList<>();
 
   /**
    * Poseable entities in the scene.
    */
-  private Collection<Entity> actors = new LinkedList<>();
+  private ArrayList<Entity> actors = new ArrayList<>();
 
   /** Poseable entities in the scene. */
   private Map<PlayerEntity, JsonObject> profiles = new HashMap<>();
@@ -447,7 +446,7 @@ public class Scene implements JsonSerializable, Refreshable {
       worldOctree = other.worldOctree;
       waterOctree = other.waterOctree;
       entities = other.entities;
-      actors = new LinkedList<>(other.actors); // Create a copy so that entity changes can be reset.
+      actors = new ArrayList<>(other.actors); // Create a copy so that entity changes can be reset.
       profiles = other.profiles;
       bvh = other.bvh;
       actorBvh = other.actorBvh;
@@ -898,11 +897,11 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     try (TaskTracker.Task task = taskTracker.task("(2/6) Loading entities")) {
-      entities = new LinkedList<>();
+      entities = new ArrayList<>();
       if (actors.isEmpty() && PersistentSettings.getLoadPlayers()) {
         // We don't load actor entities if some already exists. Loading actor entities
         // risks resetting posed actors when reloading chunks for an existing scene.
-        actors = new LinkedList<>();
+        actors = new ArrayList<>();
         profiles = new HashMap<>();
         Collection<PlayerEntity> players = world.playerEntities();
         int done = 1;
@@ -2953,8 +2952,8 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     if (json.get("entities").isArray() || json.get("actors").isArray()) {
-      entities = new LinkedList<>();
-      actors = new LinkedList<>();
+      entities = new ArrayList<>();
+      actors = new ArrayList<>();
       // Previously poseable entities were stored in the entities array
       // rather than the actors array. In future versions only the actors
       // array should contain poseable entities.
