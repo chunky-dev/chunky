@@ -446,7 +446,9 @@ public class Scene implements JsonSerializable, Refreshable {
       worldOctree = other.worldOctree;
       waterOctree = other.waterOctree;
       entities = other.entities;
-      actors = new ArrayList<>(other.actors); // Create a copy so that entity changes can be reset.
+      actors.clear();
+      actors.addAll(other.actors); // Create a copy so that entity changes can be reset.
+      actors.trimToSize();
       profiles = other.profiles;
       bvh = other.bvh;
       actorBvh = other.actorBvh;
@@ -897,11 +899,11 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     try (TaskTracker.Task task = taskTracker.task("(2/6) Loading entities")) {
-      entities = new ArrayList<>();
+      entities.clear();
       if (actors.isEmpty() && PersistentSettings.getLoadPlayers()) {
         // We don't load actor entities if some already exists. Loading actor entities
         // risks resetting posed actors when reloading chunks for an existing scene.
-        actors = new ArrayList<>();
+        actors.clear();
         profiles = new HashMap<>();
         Collection<PlayerEntity> players = world.playerEntities();
         int done = 1;
@@ -929,6 +931,9 @@ public class Scene implements JsonSerializable, Refreshable {
           actors.add(entity);
         }
       }
+
+      entities.trimToSize();
+      actors.trimToSize();
     }
 
     Set<ChunkPosition> nonEmptyChunks = new HashSet<>();
@@ -1328,6 +1333,8 @@ public class Scene implements JsonSerializable, Refreshable {
       executor.shutdown();
     }
 
+    entities.trimToSize();
+    actors.trimToSize();
     palette.unsynchronize();
 
     grassTexture = new WorldTexture();
@@ -2721,6 +2728,7 @@ public class Scene implements JsonSerializable, Refreshable {
     } else {
       Log.warn("Failed to add player: entity already exists (" + player + ")");
     }
+    actors.trimToSize();
   }
 
   /**
@@ -2952,8 +2960,8 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     if (json.get("entities").isArray() || json.get("actors").isArray()) {
-      entities = new ArrayList<>();
-      actors = new ArrayList<>();
+      entities.clear();
+      actors.clear();
       // Previously poseable entities were stored in the entities array
       // rather than the actors array. In future versions only the actors
       // array should contain poseable entities.
@@ -2972,6 +2980,9 @@ public class Scene implements JsonSerializable, Refreshable {
         actors.add(entity);
       }
     }
+
+    actors.trimToSize();
+    entities.trimToSize();
 
     octreeImplementation = json.get("octreeImplementation").asString(PersistentSettings.getOctreeImplementation());
     bvhImplementation = json.get("bvhImplementation").asString(PersistentSettings.getBvhMethod());
