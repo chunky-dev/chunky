@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -286,12 +285,12 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Entities in the scene.
    */
-  private Collection<Entity> entities = new LinkedList<>();
+  private ArrayList<Entity> entities = new ArrayList<>();
 
   /**
    * Poseable entities in the scene.
    */
-  private Collection<Entity> actors = new LinkedList<>();
+  private ArrayList<Entity> actors = new ArrayList<>();
 
   /** Poseable entities in the scene. */
   private Map<PlayerEntity, JsonObject> profiles = new HashMap<>();
@@ -447,7 +446,9 @@ public class Scene implements JsonSerializable, Refreshable {
       worldOctree = other.worldOctree;
       waterOctree = other.waterOctree;
       entities = other.entities;
-      actors = new LinkedList<>(other.actors); // Create a copy so that entity changes can be reset.
+      actors.clear();
+      actors.addAll(other.actors); // Create a copy so that entity changes can be reset.
+      actors.trimToSize();
       profiles = other.profiles;
       bvh = other.bvh;
       actorBvh = other.actorBvh;
@@ -898,11 +899,11 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     try (TaskTracker.Task task = taskTracker.task("(2/6) Loading entities")) {
-      entities = new LinkedList<>();
+      entities.clear();
       if (actors.isEmpty() && PersistentSettings.getLoadPlayers()) {
         // We don't load actor entities if some already exists. Loading actor entities
         // risks resetting posed actors when reloading chunks for an existing scene.
-        actors = new LinkedList<>();
+        actors.clear();
         profiles = new HashMap<>();
         Collection<PlayerEntity> players = world.playerEntities();
         int done = 1;
@@ -930,6 +931,9 @@ public class Scene implements JsonSerializable, Refreshable {
           actors.add(entity);
         }
       }
+
+      entities.trimToSize();
+      actors.trimToSize();
     }
 
     Set<ChunkPosition> nonEmptyChunks = new HashSet<>();
@@ -1329,6 +1333,8 @@ public class Scene implements JsonSerializable, Refreshable {
       executor.shutdown();
     }
 
+    entities.trimToSize();
+    actors.trimToSize();
     palette.unsynchronize();
 
     grassTexture = new WorldTexture();
@@ -2722,6 +2728,7 @@ public class Scene implements JsonSerializable, Refreshable {
     } else {
       Log.warn("Failed to add player: entity already exists (" + player + ")");
     }
+    actors.trimToSize();
   }
 
   /**
@@ -2953,8 +2960,8 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     if (json.get("entities").isArray() || json.get("actors").isArray()) {
-      entities = new LinkedList<>();
-      actors = new LinkedList<>();
+      entities.clear();
+      actors.clear();
       // Previously poseable entities were stored in the entities array
       // rather than the actors array. In future versions only the actors
       // array should contain poseable entities.
@@ -2973,6 +2980,9 @@ public class Scene implements JsonSerializable, Refreshable {
         actors.add(entity);
       }
     }
+
+    actors.trimToSize();
+    entities.trimToSize();
 
     octreeImplementation = json.get("octreeImplementation").asString(PersistentSettings.getOctreeImplementation());
     bvhImplementation = json.get("bvhImplementation").asString(PersistentSettings.getBvhMethod());
