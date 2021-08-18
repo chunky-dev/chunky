@@ -271,10 +271,6 @@ public abstract class BinaryBVH implements BVH {
      * https://gamedev.stackexchange.com/a/146362
      */
     public double quickAabbIntersect(Ray ray, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax, double rx, double ry, double rz) {
-        if (ray.o.x >= xmin && ray.o.x <= xmax && ray.o.y >= ymin && ray.o.y <= ymax && ray.o.z >= zmin && ray.o.z <= zmax) {
-            return 0;
-        }
-
         double tx1 = (xmin - ray.o.x) * rx;
         double tx2 = (xmax - ray.o.x) * rx;
 
