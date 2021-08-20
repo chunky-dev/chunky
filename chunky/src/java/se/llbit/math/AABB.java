@@ -16,6 +16,8 @@
  */
 package se.llbit.math;
 
+import org.apache.commons.math3.util.FastMath;
+
 /**
  * Axis Aligned Bounding Box for collision detection and Bounding Volume Hierarchy
  * construction.
@@ -339,5 +341,12 @@ public class AABB {
   public AABB expand(AABB bb) {
     return new AABB(Math.min(xmin, bb.xmin), Math.max(xmax, bb.xmax), Math.min(ymin, bb.ymin),
         Math.max(ymax, bb.ymax), Math.min(zmin, bb.zmin), Math.max(zmax, bb.zmax));
+  }
+
+  public double getDiagonal() {
+    double dX = xmax - xmin;
+    double dY = ymax - ymin;
+    double dZ = zmax - zmin;
+    return FastMath.sqrt(dX*dX + dY*dY + dZ*dZ);
   }
 }

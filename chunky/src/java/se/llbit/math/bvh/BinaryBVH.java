@@ -41,6 +41,7 @@ public abstract class BinaryBVH implements BVH {
     /** Note: This is public for some plugins. Stability is not guaranteed. */
     public int[] packed;
     public int depth;
+    public double minDiagonal = 1;
     public Primitive[][] packedPrimitives;
 
     public static abstract class Node {
@@ -172,6 +173,7 @@ public abstract class BinaryBVH implements BVH {
             int index = dataArray.size();
             dataArray.add(0);
             packAabb(call.node.bb, dataArray);
+            minDiagonal = FastMath.min(minDiagonal, call.node.bb.getDiagonal());
 
             if (call.node instanceof Group) {
                 Group group = (Group) call.node;
@@ -237,12 +239,12 @@ public abstract class BinaryBVH implements BVH {
                 double t1 = quickAabbIntersect(ray, Float.intBitsToFloat(packed[offset+1]), Float.intBitsToFloat(packed[offset+2]),
                         Float.intBitsToFloat(packed[offset+3]), Float.intBitsToFloat(packed[offset+4]),
                         Float.intBitsToFloat(packed[offset+5]), Float.intBitsToFloat(packed[offset+6]),
-                        rx, ry, rz);
+                        rx, ry, rz, minDiagonal);
                 offset = packed[currentNode];
                 double t2 = quickAabbIntersect(ray, Float.intBitsToFloat(packed[offset+1]), Float.intBitsToFloat(packed[offset+2]),
                         Float.intBitsToFloat(packed[offset+3]), Float.intBitsToFloat(packed[offset+4]),
                         Float.intBitsToFloat(packed[offset+5]), Float.intBitsToFloat(packed[offset+6]),
-                        rx, ry, rz);
+                        rx, ry, rz, minDiagonal);
 
                 if (t1 > ray.t | t1 == -1) {
                     if (t2 > ray.t | t2 == -1) {
@@ -270,7 +272,7 @@ public abstract class BinaryBVH implements BVH {
      * Perform a fast AABB intersection with cached reciprocal direction. This is a branchless approach based on:
      * https://gamedev.stackexchange.com/a/146362
      */
-    public double quickAabbIntersect(Ray ray, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax, double rx, double ry, double rz) {
+    public double quickAabbIntersect(Ray ray, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax, double rx, double ry, double rz, double minDiag) {
         double tx1 = (xmin - ray.o.x) * rx;
         double tx2 = (xmax - ray.o.x) * rx;
 
@@ -283,7 +285,7 @@ public abstract class BinaryBVH implements BVH {
         double tmin = FastMath.max(FastMath.max(FastMath.min(tx1, tx2), FastMath.min(ty1, ty2)), FastMath.min(tz1, tz2));
         double tmax = FastMath.min(FastMath.min(FastMath.max(tx1, tx2), FastMath.max(ty1, ty2)), FastMath.max(tz1, tz2));
 
-        return (tmin <= tmax + OFFSET) & (tmin >= 0) ? tmin : -1;
+        return (tmin <= tmax) & (tmin >= -1) ? tmin : -1;
     }
 
     /**
