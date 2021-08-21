@@ -58,8 +58,9 @@ public class Lava extends MinecraftBlockTranslucent {
 
     boolean hit = false;
     if (bottom.intersect(ray)) {
-      ray.n.set(bottom.n);
-      ray.n.scale(-QuickMath.signum(ray.d.dot(bottom.n)));
+      Vector3 n = new Vector3(bottom.n);
+      n.scale(-QuickMath.signum(ray.d.dot(bottom.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       hit = true;
     }

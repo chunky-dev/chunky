@@ -119,8 +119,8 @@ public class VineModel {
           ray.color.y *= biomeColor[1];
           ray.color.z *= biomeColor[2];
           ray.t = ray.tNext;
-          Vector3 n = new Vector3(quad.n);
-          n.scale(-QuickMath.signum(ray.d.dot(quad.n)));
+          Vector3 n = new Vector3(top.n);
+          n.scale(-QuickMath.signum(ray.d.dot(top.n)));
           ray.setN(n);
           hit = true;
         }
