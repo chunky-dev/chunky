@@ -550,7 +550,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     }
   }
 
-  protected Pair<Integer, Integer> getScaledSize(int w, int h, int maxSize) {
+  public static Pair<Integer, Integer> getScaledSize(int w, int h, int maxSize) {
     while (w > maxSize || h > maxSize) {
       if (w / 2 > maxSize || h / 2 > maxSize) {
         if (w % 3 == 0 && h % 3 == 0 && w / 3 <= maxSize && h / 3 <= maxSize)
@@ -560,6 +560,9 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       h /= 2;
     }
     return new Pair<>(w, h);
+  }
+  public static int getDownscaleRatio(int w, int h, int maxSize) {
+    return w/getScaledSize(w,h,maxSize).thing1;
   }
 
   public boolean previewIsSubsampled() {
@@ -575,7 +578,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
    * For each pixel that is getting displayed to Render Preview, copy the pixels one for one to display a cropped
    * region. (by returning those copied pixels in an array) Out of bounds pixels are black-filled.
    */
-  protected int[] croppedRow(BitmapImage bitmap, int x, int y, int width) {
+  protected static int[] croppedRow(BitmapImage bitmap, int x, int y, int width) {
     // create and null-fill array.
     int[] ret = new int[width];
     int argbNull = se.llbit.math.ColorUtil.getArgb(0, 0, 0, 1); //r=0,g=0,b=0,a=1, otherwise will show stuff through it.
@@ -601,7 +604,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
    * For each pixel that is getting displayed to Render Preview, take the upper-left-most pixel in its region and
    * display just that single pixel. (by returning those upper-left-most pixels in an array)
    */
-  protected int[] decimateRow(BitmapImage bitmap, int row, int downscaleRatio) {
+  protected static int[] decimateRow(BitmapImage bitmap, int row, int downscaleRatio) {
     int[] ret = new int[bitmap.width / downscaleRatio];
     for (int i = 0; i < ret.length; i++) { ret[i] = bitmap.getPixel(i * downscaleRatio, row); }
     return ret;
@@ -611,7 +614,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
    * For each pixel that is getting displayed to Render Preview, average all RGBA components of the pixels in its
    * region, and display that average as a single pixel. (by returning those averages in an array)
    */
-  protected int[] subsampleRow(BitmapImage bitmap, int row, int downscaleRatio) {
+  protected static int[] subsampleRow(BitmapImage bitmap, int row, int downscaleRatio) {
     int[] ret = new int[bitmap.width / downscaleRatio];
 
     // averaged color values
@@ -673,9 +676,9 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
         // use Big Decimal to round to 3 sigfigs
         String actualPercent = new java.math.BigDecimal(downscaleRatio * percent).round(new java.math.MathContext(3)).toString();
 
-        canvasScalingOptions.get(i).setText(actualPercent + "%" + (isDownscaled ? " (preview downscaled from " + percent + "%)" : ""));
+        canvasScalingOptions.get(i).setText(actualPercent + "%"); // + (isDownscaled ? " (preview downscaled from " + percent + "%)" : ""));
       }
-      canvasScalingOptions.get(canvasScalingOptions.size() - 1).setText(fitToScreenString + (isDownscaled ? " (preview downscaled)" : ""));
+      canvasScalingOptions.get(canvasScalingOptions.size() - 1).setText(fitToScreenString); // + (isDownscaled ? " (preview downscaled)" : ""));
     }
 
     downscalingOptions.get(0).setDisable(isDownscaled); // none
