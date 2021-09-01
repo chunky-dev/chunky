@@ -268,6 +268,10 @@ public class World implements Comparable<World> {
     return getRegion(pos.getRegionPosition()).getChunk(pos);
   }
 
+  public Region createRegion(ChunkPosition pos) {
+    return new MCRegion(pos, this);
+  }
+
   /**
    * @param pos Region position
    * @return The region at the given position
@@ -279,7 +283,7 @@ public class World implements Comparable<World> {
       // check if the region is present in the world directory
       Region region = EmptyRegion.instance;
       if (regionExists(pos)) {
-        region = new MCRegion(pos, this);
+        region = createRegion(pos);
       }
       setRegion(pos, region);
       return region;
@@ -383,7 +387,7 @@ public class World implements Comparable<World> {
     synchronized (this) {
       Region region = regionMap.get(pos);
       if (region == null) {
-        region = new MCRegion(pos, this);
+        region = createRegion(pos);
         regionMap.put(pos, region);
       }
     }

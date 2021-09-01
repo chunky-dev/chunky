@@ -56,7 +56,7 @@ public class RegionChangeWatcher extends Thread implements ChunkViewListener {
             if (region.isEmpty()) {
               ChunkPosition pos = ChunkPosition.get(rx, rz);
               if (world.regionExists(pos)) {
-                region = new MCRegion(pos, world);
+                region = world.createRegion(pos);
               }
               world.setRegion(pos, region);
               region.parse();

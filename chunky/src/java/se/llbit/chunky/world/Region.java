@@ -1,5 +1,12 @@
 package se.llbit.chunky.world;
 
+import com.sun.istack.internal.Nullable;
+import se.llbit.nbt.Tag;
+import se.llbit.util.Mutable;
+
+import java.util.Map;
+import java.util.Set;
+
 public interface Region extends Iterable<Chunk> {
   /**
    * @return Chunk at (x, z)
@@ -33,4 +40,9 @@ public interface Region extends Iterable<Chunk> {
   boolean hasChanged();
 
   boolean chunkChangedSince(ChunkPosition chunkPos, int timestamp);
+
+  @Nullable
+  default Map<String, Tag> getChunkTags(ChunkPosition position, Set<String> request, Mutable<Integer> dataTimestamp) {
+    return null;
+  }
 }
