@@ -279,7 +279,7 @@ public class World implements Comparable<World> {
       // check if the region is present in the world directory
       Region region = EmptyRegion.instance;
       if (regionExists(pos)) {
-        region = new Region(pos, this);
+        region = new MCRegion(pos, this);
       }
       setRegion(pos, region);
       return region;
@@ -296,7 +296,7 @@ public class World implements Comparable<World> {
    * @return {@code true} if a region file exists for the given position
    */
   public boolean regionExists(ChunkPosition pos) {
-    File regionFile = new File(getRegionDirectory(), Region.getFileName(pos));
+    File regionFile = new File(getRegionDirectory(), MCRegion.getFileName(pos));
     return regionFile.exists();
   }
 
@@ -383,7 +383,7 @@ public class World implements Comparable<World> {
     synchronized (this) {
       Region region = regionMap.get(pos);
       if (region == null) {
-        region = new Region(pos, this);
+        region = new MCRegion(pos, this);
         regionMap.put(pos, region);
       }
     }
@@ -522,7 +522,7 @@ public class World implements Comparable<World> {
       throws IOException {
 
     zout.putNextEntry(new ZipEntry(regionZipFileName));
-    Region.writeRegion(regionDirectory, regionPos, new DataOutputStream(zout), chunks);
+    MCRegion.writeRegion(regionDirectory, regionPos, new DataOutputStream(zout), chunks);
     zout.closeEntry();
   }
 

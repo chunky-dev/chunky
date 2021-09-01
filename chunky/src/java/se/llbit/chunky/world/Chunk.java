@@ -16,8 +16,6 @@
  */
 package se.llbit.chunky.world;
 
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -35,12 +33,11 @@ import se.llbit.chunky.map.MapTile;
 import se.llbit.chunky.map.SurfaceLayer;
 import se.llbit.math.QuickMath;
 import se.llbit.nbt.CompoundTag;
-import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.ListTag;
-import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.SpecificTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.BitBuffer;
+import se.llbit.util.Mutable;
 import se.llbit.util.NotNull;
 
 /**
@@ -108,24 +105,12 @@ public class Chunk {
    * @param request fresh request set
    * @return loaded data, or null if something went wrong
    */
-  private Map<String, Tag> getChunkData(Set<String> request) {
-    Region region = world.getRegion(position.getRegionPosition());
-    ChunkDataSource data = region.getChunkData(position);
-    dataTimestamp = data.timestamp;
-    if (data.inputStream != null) {
-      try (DataInputStream in = data.inputStream) {
-        Map<String, Tag> result = NamedTag.quickParse(in, request);
-        for (String key : request) {
-          if (!result.containsKey(key)) {
-            result.put(key, new ErrorTag(""));
-          }
-        }
-        return result;
-      } catch (IOException e) {
-        // Ignored.
-      }
-    }
-    return null;
+  private Map<String, Tag> getChunkTags(Set<String> request) {
+    MCRegion region = (MCRegion) world.getRegion(position.getRegionPosition());
+    Mutable<Integer> timestamp = new Mutable<>(dataTimestamp);
+    Map<String, Tag> chunkTags = region.getChunkTags(this.position, request, timestamp);
+    this.dataTimestamp = timestamp.get();
+    return chunkTags;
   }
 
   /**
@@ -157,7 +142,7 @@ public class Chunk {
     request.add(Chunk.LEVEL_SECTIONS);
     request.add(Chunk.LEVEL_BIOMES);
     request.add(Chunk.LEVEL_HEIGHTMAP);
-    Map<String, Tag> data = getChunkData(request);
+    Map<String, Tag> data = getChunkTags(request);
     // TODO: improve error handling here.
     if (data == null) {
       return false;
@@ -463,7 +448,7 @@ public class Chunk {
     request.add(LEVEL_BIOMES);
     request.add(LEVEL_ENTITIES);
     request.add(LEVEL_TILEENTITIES);
-    Map<String, Tag> data = getChunkData(request);
+    Map<String, Tag> data = getChunkTags(request);
     if(reuseChunkData == null || reuseChunkData instanceof EmptyChunkData) {
       reuseChunkData = new GenericChunkData();
     } else {

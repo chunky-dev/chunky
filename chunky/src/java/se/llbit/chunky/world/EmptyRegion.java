@@ -16,12 +16,15 @@
  */
 package se.llbit.chunky.world;
 
+import java.util.Iterator;
+
 /**
  * An empty or non-existent region.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class EmptyRegion extends Region {
+public class EmptyRegion implements Region {
+  private static final ChunkPosition position = ChunkPosition.get(0,0);
 
   /**
    * Singleton instance.
@@ -32,18 +35,47 @@ public class EmptyRegion extends Region {
    * Create the empty region.
    */
   private EmptyRegion() {
-    super(ChunkPosition.get(0, 0), EmptyWorld.INSTANCE);
+
   }
 
-  @Override public Chunk getChunk(ChunkPosition pos) {
+  @Override
+  public Chunk getChunk(int x, int z) {
     return EmptyRegionChunk.INSTANCE;
   }
+
+  @Override
+  public void parse() { }
 
   @Override public boolean isEmpty() {
     return true;
   }
 
-  @Override public boolean hasChanged() {
+  @Override
+  public ChunkPosition getPosition() {
+    return position;
+  }
+
+  @Override
+  public boolean hasChanged() {
     return false;
+  }
+
+  @Override
+  public boolean chunkChangedSince(ChunkPosition chunkPos, int timestamp) {
+    return false;
+  }
+
+  @Override public Iterator<Chunk> iterator() {
+    return new Iterator<Chunk>() {
+      @Override public boolean hasNext() {
+        return false;
+      }
+
+      @Override public Chunk next() {
+        return EmptyRegionChunk.INSTANCE;
+      }
+
+      @Override public void remove() { }
+    };
   }
 }
