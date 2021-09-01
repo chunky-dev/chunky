@@ -14,7 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.world;
+package se.llbit.chunky.world.region;
+
+import se.llbit.chunky.world.Chunk;
+import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.EmptyRegionChunk;
 
 import java.util.Iterator;
 

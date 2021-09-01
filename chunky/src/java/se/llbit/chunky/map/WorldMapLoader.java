@@ -25,9 +25,9 @@ import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkTopographyUpdater;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.EmptyWorld;
-import se.llbit.chunky.world.RegionChangeWatcher;
-import se.llbit.chunky.world.RegionParser;
-import se.llbit.chunky.world.RegionQueue;
+import se.llbit.chunky.world.region.RegionChangeWatcher;
+import se.llbit.chunky.world.region.RegionParser;
+import se.llbit.chunky.world.region.RegionQueue;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 

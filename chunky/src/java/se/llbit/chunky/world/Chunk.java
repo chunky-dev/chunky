@@ -31,6 +31,8 @@ import se.llbit.chunky.map.BiomeLayer;
 import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.MapTile;
 import se.llbit.chunky.map.SurfaceLayer;
+import se.llbit.chunky.world.region.MCRegion;
+import se.llbit.chunky.world.region.Region;
 import se.llbit.math.QuickMath;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;

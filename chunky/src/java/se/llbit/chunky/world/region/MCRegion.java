@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.world;
+package se.llbit.chunky.world.region;
 
 import java.io.*;
 import java.util.Iterator;
@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
+import se.llbit.chunky.world.*;
 import se.llbit.log.Log;
 import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.NamedTag;

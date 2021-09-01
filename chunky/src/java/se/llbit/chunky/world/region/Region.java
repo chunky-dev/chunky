@@ -1,6 +1,8 @@
-package se.llbit.chunky.world;
+package se.llbit.chunky.world.region;
 
 import com.sun.istack.internal.Nullable;
+import se.llbit.chunky.world.Chunk;
+import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.nbt.Tag;
 import se.llbit.util.Mutable;
 

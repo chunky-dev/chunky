@@ -21,7 +21,7 @@ import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.Region;
+import se.llbit.chunky.world.region.Region;
 
 /**
  * A tile in the 2D world map or minimap. The tile contains either a chunk or a region.
