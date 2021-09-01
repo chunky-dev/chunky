@@ -175,7 +175,7 @@ public class Chunk {
       extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
       if (version.equals("1.13") || version.equals("1.12")) {
         BlockPalette palette = new BlockPalette();
-        loadBlockData(data, chunkData, palette);
+        loadBlockData(data, chunkData, palette, yMin, yMax);
         int[] heightmapData = extractHeightmapData(data, chunkData);
         updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
         surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, yMin, yMax);
@@ -269,13 +269,16 @@ public class Chunk {
   }
 
   private static void loadBlockData(@NotNull Map<String, Tag> data, @NotNull ChunkData chunkData,
-      BlockPalette blockPalette) {
+      BlockPalette blockPalette, int minY, int maxY) {
     Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
       for (SpecificTag section : sections.asList()) {
         Tag yTag = section.get("Y");
         int sectionY = yTag.byteValue();
         int sectionMinBlockY = sectionY << 4;
+
+        if(sectionY < minY >> 4 || sectionY-1 > (maxY >> 4)+1)
+          continue; //skip parsing sections that are outside requested bounds
 
         if (section.get("Palette").isList()) {
           ListTag palette = section.get("Palette").asList();
@@ -441,9 +444,11 @@ public class Chunk {
    *
    * @param reuseChunkData ChunkData object to be reused, if null one is created
    * @param palette Block palette
+   * @param minY The requested minimum Y to be loaded into the chunkData object. The chunk implementation does NOT have to respect it
+   * @param maxY The requested maximum Y to be loaded into the chunkData object. The chunk implementation does NOT have to respect it
    * @return Loaded chunk data, guaranteed to be reuseChunkData unless null or EmptyChunkData was passed
    */
-  public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette) {
+  public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette, int minY, int maxY) {
     Set<String> request = new HashSet<>();
     request.add(DATAVERSION);
     request.add(LEVEL_SECTIONS);
@@ -470,7 +475,7 @@ public class Chunk {
     }
 
     if (sections.isList()) {
-      loadBlockData(data, reuseChunkData, palette);
+      loadBlockData(data, reuseChunkData, palette, minY, maxY);
 
       if (entitiesTag.isList()) {
         for (SpecificTag tag : (ListTag) entitiesTag) {

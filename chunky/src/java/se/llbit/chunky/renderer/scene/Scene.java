@@ -963,7 +963,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       ExecutorService executor = Executors.newSingleThreadExecutor();
       Future<?> nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
-        world.getChunk(chunkPositions[0]).getChunkData(chunkData1, palette);
+        world.getChunk(chunkPositions[0]).getChunkData(chunkData1, palette, yMin, yMax);
       });
       for (int i = 0; i < chunkPositions.length; i++) {
         ChunkPosition cp = chunkPositions[i];
@@ -987,10 +987,10 @@ public class Scene implements JsonSerializable, Refreshable {
           }
 
           if(usingFirstChunkData) {
-            world.getChunk(chunkPositions[i]).getChunkData(chunkData1, palette);
+            world.getChunk(chunkPositions[i]).getChunkData(chunkData1, palette, yMin, yMax);
           }
           else {
-            world.getChunk(chunkPositions[i]).getChunkData(chunkData2, palette);
+            world.getChunk(chunkPositions[i]).getChunkData(chunkData2, palette, yMin, yMax);
           }
         } catch(ExecutionException e) {
           throw new RuntimeException(e.getCause());
@@ -1010,8 +1010,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
           if (i + 1 < chunkPositions.length) { //if has next request next
             final int finalI = i;
-            nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
-              world.getChunk(chunkPositions[finalI + 1]).getChunkData(nextChunkData, palette);
+            nextChunkDataTask = executor.submit(() -> { //request chunk data for the next iteration of the loop
+              world.getChunk(chunkPositions[finalI + 1]).getChunkData(nextChunkData, palette, yMin, yMax);
             });
           }
         }
