@@ -132,7 +132,7 @@ public class Chunk {
    * layer, surface and cave maps.
    * @return whether the input chunkdata was modified
    */
-  public synchronized boolean loadChunk(ChunkData chunkData, int yMax) {
+  public synchronized boolean loadChunk(ChunkData chunkData, int yMin, int yMax) {
     if (!shouldReloadChunk()) {
       return false;
     }
@@ -150,7 +150,7 @@ public class Chunk {
 
     surfaceTimestamp = dataTimestamp;
     version = chunkVersion(data);
-    loadSurface(data, chunkData, yMax);
+    loadSurface(data, chunkData, yMin, yMax);
     biomesTimestamp = dataTimestamp;
     if (surface == IconLayer.MC_1_12) {
       biomes = IconLayer.MC_1_12;
@@ -161,7 +161,7 @@ public class Chunk {
     return true;
   }
 
-  private void loadSurface(Map<String, Tag> data, ChunkData chunkData, int yMax) {
+  private void loadSurface(Map<String, Tag> data, ChunkData chunkData, int yMin, int yMax) {
     if (data == null) {
       surface = IconLayer.CORRUPT;
       return;
@@ -176,7 +176,7 @@ public class Chunk {
         loadBlockData(data, chunkData, palette);
         int[] heightmapData = extractHeightmapData(data, chunkData);
         updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
-        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, yMax);
+        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, yMin, yMax);
         queueTopography();
       }
     } else {

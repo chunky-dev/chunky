@@ -122,6 +122,7 @@ public class ChunkyFxController
   @FXML private ToggleButton netherBtn;
   @FXML private ToggleButton endBtn;
   @FXML private IntegerAdjuster scale;
+  @FXML private IntegerAdjuster yMin;
   @FXML private IntegerAdjuster yMax;
   @FXML private ToggleButton trackPlayerBtn;
   @FXML private ToggleButton trackCameraBtn;
@@ -411,9 +412,13 @@ public class ChunkyFxController
                 if (!reloaded) {
                   ignoreYMaxUpdate.set(true);
                   if (mapLoader.getWorld().getVersionId() >= World.VERSION_21W06A) {
+                    yMin.setRange(-64, 320);
+                    yMin.set(-64);
                     yMax.setRange(-64, 320);
                     yMax.set(320);
                   } else {
+                    yMin.setRange(0, 256);
+                    yMin.set(0);
                     yMax.setRange(0, 256);
                     yMax.set(256);
                   }
@@ -485,6 +490,12 @@ public class ChunkyFxController
     }));
     scale.valueProperty().addListener(new GroupedChangeListener<>(group,
         (observable, oldValue, newValue) -> mapView.setScale(newValue.intValue())));
+    yMin.valueProperty().addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
+      if (!ignoreYMaxUpdate.get()) {
+        mapView.setYMin(newValue.intValue());
+        mapLoader.reloadWorld();
+      }
+    }));
     yMax.valueProperty().addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
       if (!ignoreYMaxUpdate.get()) {
         mapView.setYMax(newValue.intValue());
@@ -655,8 +666,10 @@ public class ChunkyFxController
 
     mapLoader.loadWorld(PersistentSettings.getLastWorld());
     if (mapLoader.getWorld().getVersionId() >= World.VERSION_21W06A) {
+      mapView.setYMin(-64);
       mapView.setYMax(320);
     } else {
+      mapView.setYMin(0);
       mapView.setYMax(256);
     }
 
