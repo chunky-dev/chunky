@@ -894,7 +894,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       for (ChunkPosition region : regions) {
-        world.getRegion(region).parse();
+        world.getRegion(region).parse(yMin, yMax);
       }
     }
 

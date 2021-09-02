@@ -62,11 +62,11 @@ public class RegionChangeWatcher extends Thread implements ChunkViewListener {
                 region = world.createRegion(pos);
               }
               world.setRegion(pos, region);
-              region.parse();
+              region.parse(theView.yMin, theView.yMax);
               world.regionDiscovered(pos);
               mapLoader.regionUpdated(pos);
             } else if (region.hasChanged()) {
-              region.parse();
+              region.parse(theView.yMin, theView.yMax);
               ChunkPosition pos = region.getPosition();
               mapLoader.regionUpdated(pos);
             }

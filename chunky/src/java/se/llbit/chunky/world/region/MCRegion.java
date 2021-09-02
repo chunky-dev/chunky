@@ -113,9 +113,11 @@ public class MCRegion implements Region {
 
   /**
    * Parse the region file to discover chunks.
+   * @param minY the minimum requested Y to be loaded. This does NOT need to be respected by the implementation
+   * @param maxY the maximum requested Y to be loaded. This does NOT need to be respected by the implementation
    */
   @Override
-  public synchronized void parse() {
+  public synchronized void parse(int minY, int maxY) {
     File regionFile = new File(world.getRegionDirectory(), fileName);
     if (!regionFile.isFile()) {
       return;

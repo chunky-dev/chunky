@@ -27,8 +27,10 @@ public interface Region extends Iterable<Chunk> {
 
   /**
    * Parse the region file to discover chunks.
+   * @param minY the minimum requested Y to be loaded. This does NOT need to be respected by the implementation
+   * @param maxY the maximum requested Y to be loaded. This does NOT need to be respected by the implementation
    */
-  void parse();
+  void parse(int minY, int maxY);
 
   /**
    * @return <code>true</code> if this is an empty or non-existent region

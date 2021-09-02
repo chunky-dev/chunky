@@ -48,7 +48,7 @@ public class EmptyRegion implements Region {
   }
 
   @Override
-  public void parse() { }
+  public void parse(int yMin, int yMax) { }
 
   @Override public boolean isEmpty() {
     return true;
