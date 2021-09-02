@@ -183,7 +183,6 @@ public class MCRegion implements Region {
     return String.format("r.%d.%d.mca", pos.x, pos.z);
   }
 
-  @Override
   public Map<String, Tag> getChunkTags(ChunkPosition position, Set<String> request, Mutable<Integer> dataTimestamp) {
     ChunkDataSource data = this.getChunkData(position);
     dataTimestamp.set(data.timestamp);

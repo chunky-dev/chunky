@@ -853,16 +853,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     isLoading = true;
 
-    boolean isTallWorld = world.getVersionId() >= World.VERSION_21W06A;
-    if (isTallWorld) {
-      // snapshot 21w06a or later, don't limit yMin/yMax to allow custom height worlds
-      yMin = yClipMin;
-      yMax = yClipMax;
-    } else {
-      // treat as 0 - 256 world
-      yMin = Math.max(0, yClipMin);
-      yMax = Math.min(256, yClipMax);
-    }
+    yMin = yClipMin;
+    yMax = yClipMax;
 
     Set<ChunkPosition> loadedChunks = new HashSet<>();
     int numChunks = 0;
@@ -940,15 +932,8 @@ public class Scene implements JsonSerializable, Refreshable {
     Set<ChunkPosition> legacyChunks = new HashSet<>();
     Heightmap biomeIdMap = new Heightmap();
 
-    ChunkData chunkData1;
-    ChunkData chunkData2;
-    if (isTallWorld) { //snapshot 21w06a, treat as -64 - 320
-      chunkData1 = new GenericChunkData(); // chunk loading will switch between these two, using one asynchronously to load the data
-      chunkData2 = new GenericChunkData(); // while the other is used to add to the octree
-    } else { //Treat as 0 - 256 world
-      chunkData1 = new SimpleChunkData();
-      chunkData2 = new SimpleChunkData();
-    }
+    ChunkData chunkData1 = world.createChunkData(); // chunk loading will switch between these two, using one asynchronously to load the data
+    ChunkData chunkData2 = world.createChunkData(); // while the other is used to add to the octree
 
     try (TaskTracker.Task task = taskTracker.task("(3/6) Loading chunks")) {
       int done = 1;

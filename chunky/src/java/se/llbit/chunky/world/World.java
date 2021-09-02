@@ -17,6 +17,9 @@
 package se.llbit.chunky.world;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.GenericChunkData;
+import se.llbit.chunky.chunk.SimpleChunkData;
 import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.world.listeners.ChunkDeletionListener;
@@ -78,7 +81,7 @@ public class World implements Comparable<World> {
   /** Minimum level.dat data version of tall worlds (21w06a). */
   public static final int VERSION_21W06A = 2694;
 
-  private final Map<ChunkPosition, Region> regionMap = new HashMap<>();
+  protected final Map<ChunkPosition, Region> regionMap = new HashMap<>();
 
   private final File worldDirectory;
   private Set<PlayerEntityData> playerEntities;
@@ -152,6 +155,7 @@ public class World implements Comparable<World> {
       request.add(".Data.Player");
       request.add(".Data.LevelName");
       request.add(".Data.GameType");
+      request.add(".Data.isCubicWorld");
       Map<String, Tag> result = NamedTag.quickParse(in, request);
 
       Tag version = result.get(".Data.version");
@@ -178,8 +182,16 @@ public class World implements Comparable<World> {
 
       boolean haveSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
 
-      World world = new World(levelName, worldDirectory, dimension,
+      World world;
+      Tag isCubic = result.get(".Data.isCubicWorld");
+      if (isCubic != null && isCubic.byteValue(0) == 1) {
+        world = new CubicWorld(levelName, worldDirectory, dimension,
           playerEntities, haveSpawnPos, seed, modtime);
+      } else {
+        world = new World(levelName, worldDirectory, dimension,
+          playerEntities, haveSpawnPos, seed, modtime);
+      }
+
       world.spawnX = spawnX.intValue();
       world.spawnY = spawnY.intValue();
       world.spawnZ = spawnZ.intValue();
@@ -271,6 +283,14 @@ public class World implements Comparable<World> {
     return getRegion(pos.getRegionPosition()).getChunk(pos);
   }
 
+  public ChunkData createChunkData() {
+    if(this.getVersionId() >= World.VERSION_21W06A) {
+      return new GenericChunkData();
+    } else {
+      return new SimpleChunkData();
+    }
+  }
+
   public Region createRegion(ChunkPosition pos) {
     return new MCRegion(pos, this);
   }
@@ -313,7 +333,7 @@ public class World implements Comparable<World> {
    * @param dimension the dimension
    * @return File object pointing to the data directory
    */
-  private synchronized File getDataDirectory(int dimension) {
+  protected synchronized File getDataDirectory(int dimension) {
     return dimension == 0 ?
         worldDirectory :
         new File(worldDirectory, "DIM" + dimension);
@@ -339,7 +359,7 @@ public class World implements Comparable<World> {
    * @return File object pointing to the region file directory for
    * the given dimension
    */
-  private synchronized File getRegionDirectory(int dimension) {
+  protected synchronized File getRegionDirectory(int dimension) {
     return new File(getDataDirectory(dimension), "region");
   }
 

@@ -25,7 +25,6 @@ import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.EmptyChunkData;
-import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.map.AbstractLayer;
 import se.llbit.chunky.map.BiomeLayer;
 import se.llbit.chunky.map.IconLayer;
@@ -55,8 +54,8 @@ public class Chunk {
   public static final String LEVEL_HEIGHTMAP = ".Level.HeightMap";
   public static final String LEVEL_SECTIONS = ".Level.Sections";
   public static final String LEVEL_BIOMES = ".Level.Biomes";
-  private static final String LEVEL_ENTITIES = ".Level.Entities";
-  private static final String LEVEL_TILEENTITIES = ".Level.TileEntities";
+  public static final String LEVEL_ENTITIES = ".Level.Entities";
+  public static final String LEVEL_TILEENTITIES = ".Level.TileEntities";
 
   /** Chunk width. */
   public static final int X_MAX = 16;
@@ -68,23 +67,23 @@ public class Chunk {
   public static final int Z_MAX = 16;
 
   public static final int SECTION_Y_MAX = 16;
-  private static final int SECTION_BYTES = X_MAX * SECTION_Y_MAX * Z_MAX;
-  private static final int SECTION_HALF_NIBBLES = SECTION_BYTES / 2;
+  public static final int SECTION_BYTES = X_MAX * SECTION_Y_MAX * Z_MAX;
+  public static final int SECTION_HALF_NIBBLES = SECTION_BYTES / 2;
   private static final int CHUNK_BYTES = X_MAX * Y_MAX * Z_MAX;
 
-  private static final int DATAVERSION_20w17a = 2529;
+  public static final int DATAVERSION_20w17a = 2529;
 
-  private final ChunkPosition position;
+  protected final ChunkPosition position;
   protected volatile AbstractLayer surface = IconLayer.UNKNOWN;
   protected volatile AbstractLayer biomes = IconLayer.UNKNOWN;
 
   private final World world;
 
-  private int dataTimestamp = 0;
-  private int surfaceTimestamp = 0;
-  private int biomesTimestamp = 0;
+  protected int dataTimestamp = 0;
+  protected int surfaceTimestamp = 0;
+  protected int biomesTimestamp = 0;
 
-  private String version;
+  protected String version;
 
   public Chunk(ChunkPosition pos, World world) {
     this.world = world;
@@ -357,7 +356,7 @@ public class Chunk {
    * Load heightmap information from a chunk heightmap array
    * and insert into a quadtree.
    */
-  public static void updateHeightmap(Heightmap heightmap, ChunkPosition pos, ChunkData chunkData,
+  protected static void updateHeightmap(Heightmap heightmap, ChunkPosition pos, ChunkData chunkData,
       int[] chunkHeightmap, BlockPalette palette, int yMax) {
     for (int x = 0; x < 16; ++x) {
       for (int z = 0; z < 16; ++z) {
@@ -373,7 +372,7 @@ public class Chunk {
     }
   }
 
-  private boolean shouldReloadChunk() {
+  protected boolean shouldReloadChunk() {
     int timestamp = Integer.MAX_VALUE;
     timestamp = Math.min(timestamp, surfaceTimestamp);
     timestamp = Math.min(timestamp, biomesTimestamp);
@@ -384,7 +383,7 @@ public class Chunk {
     return region.chunkChangedSince(position, timestamp);
   }
 
-  private void queueTopography() {
+  protected void queueTopography() {
     for (int x = -1; x <= 1; ++x) {
       for (int z = -1; z <= 1; ++z) {
         ChunkPosition pos = ChunkPosition.get(position.x + x, position.z + z);
@@ -457,7 +456,7 @@ public class Chunk {
     request.add(LEVEL_TILEENTITIES);
     Map<String, Tag> data = getChunkTags(request);
     if(reuseChunkData == null || reuseChunkData instanceof EmptyChunkData) {
-      reuseChunkData = new GenericChunkData();
+      reuseChunkData = world.createChunkData();
     } else {
       reuseChunkData.clear();
     }
