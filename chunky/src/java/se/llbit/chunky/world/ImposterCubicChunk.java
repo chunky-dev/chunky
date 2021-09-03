@@ -31,10 +31,10 @@ public class ImposterCubicChunk extends Chunk {
   }
 
   private Map<Integer, Map<String, Tag>> getCubeTags(Set<String> request) {
-    Mutable<Integer> regionTimestamp = new Mutable<>(dataTimestamp);
+    Mutable<Integer> timestamp = new Mutable<>(dataTimestamp);
     ImposterCubicRegion region = (ImposterCubicRegion) world.getRegion(position.getRegionPosition());
-    Map<Integer, Map<String, Tag>> cubeTagsInColumn = region.getCubeTagsInColumn(position, request, regionTimestamp);
-    dataTimestamp = regionTimestamp.get();
+    Map<Integer, Map<String, Tag>> cubeTagsInColumn = region.getCubeTagsInColumn(position, request, timestamp);
+    dataTimestamp = timestamp.get();
     return cubeTagsInColumn;
   }
 
