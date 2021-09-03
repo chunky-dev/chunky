@@ -341,7 +341,7 @@ public class ImposterCubicRegion implements Region {
       anyUpdated[getRegionIndex(regionX, regionZ)] = true;
       try (RandomAccessFile file = new RandomAccessFile(regionFile, "r")) {
         long length = file.length();
-        if (length < 2 * SECTOR_SIZE_BYTES) {
+        if (length < SECTOR_SIZE_BYTES) {
           System.err.println("Missing header in region file!");
           return;
         }
@@ -369,7 +369,7 @@ public class ImposterCubicRegion implements Region {
           try {
             int index = ((localX) << LOC_BITS * 2) | ((localY) << LOC_BITS) | (localZ);
             long length = file.length();
-            if (length < SECTOR_SIZE_BYTES * 2) {
+            if (length < SECTOR_SIZE_BYTES) {
               System.err.println("Missing header in region file!");
             }
 
