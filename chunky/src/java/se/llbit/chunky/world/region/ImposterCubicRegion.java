@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ReferenceCollection;
 import se.llbit.chunky.world.*;
+import se.llbit.log.Log;
 import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
@@ -391,7 +392,7 @@ public class ImposterCubicRegion implements Region {
       try (RandomAccessFile file = new RandomAccessFile(regionFile, "r")) {
         long length = file.length();
         if (length < SECTOR_SIZE_BYTES) {
-          System.err.println("Missing header in region file!");
+          Log.warn("Missing header in region file!");
           return;
         }
 
@@ -406,7 +407,7 @@ public class ImposterCubicRegion implements Region {
         }
 
       } catch (IOException e) {
-        System.err.println("Failed to read region (" + fileName + "): " + e.getMessage());
+        Log.warn("Failed to read region (" + fileName + "): " + e.getMessage());
       }
     }
 
@@ -414,13 +415,15 @@ public class ImposterCubicRegion implements Region {
       Map<Integer, Map<String, Tag>> tagMapsByLocalY = new HashMap<>();
 
       try (RandomAccessFile file = new RandomAccessFile(new File(world.getRegionDirectory(), this.fileName), "r")) {
+        long length = file.length();
+        if (length < SECTOR_SIZE_BYTES) {
+          Log.warn("Missing header in region file!");
+          return tagMapsByLocalY;
+        }
+
         for (int localY = 0; localY < DIAMETER_IN_CUBES; localY++) {
           try {
             int index = ((localX) << LOC_BITS * 2) | ((localY) << LOC_BITS) | (localZ);
-            long length = file.length();
-            if (length < SECTOR_SIZE_BYTES) {
-              System.err.println("Missing header in region file!");
-            }
 
             file.seek(4L * index);
 
@@ -433,8 +436,8 @@ public class ImposterCubicRegion implements Region {
             }
 
             if (length < (long)sectorOffset * SECTOR_SIZE + Integer.BYTES) {
-              System.err.printf("Cube (%d, %d, %d) is outside of region file %s! Expected chunk data at offset %d but file length is %d%n",
-                cubicRegionToCube(regionX, localX), cubicRegionToCube(regionY, localY), cubicRegionToCube(regionZ, localZ), fileName, sectorOffset * SECTOR_SIZE_BYTES, length);
+              Log.warn(String.format("Cube (%d, %d, %d) is outside of region file %s! Expected chunk data at offset %d but file length is %d%n",
+                cubicRegionToCube(regionX, localX), cubicRegionToCube(regionY, localY), cubicRegionToCube(regionZ, localZ), fileName, sectorOffset * SECTOR_SIZE_BYTES, length));
               continue;
             }
 
@@ -442,14 +445,14 @@ public class ImposterCubicRegion implements Region {
             int dataLength = file.readInt();
 
             if (dataLength > sectorCount * SECTOR_SIZE) {
-              System.err.printf("Corrupted region file %s for local cube (%d, %d, %d). Expected data size max %d but found %d%n",
-                fileName, cubicRegionToCube(regionX, localX), cubicRegionToCube(regionY, localY), cubicRegionToCube(regionZ, localZ), sectorCount * SECTOR_SIZE, dataLength);
+              Log.warn(String.format("Corrupted region file %s for local cube (%d, %d, %d). Expected data size max %d but found %d%n",
+                fileName, cubicRegionToCube(regionX, localX), cubicRegionToCube(regionY, localY), cubicRegionToCube(regionZ, localZ), sectorCount * SECTOR_SIZE, dataLength));
               continue;
             }
 
             if (length < (long)sectorOffset * SECTOR_SIZE + Integer.BYTES + dataLength) {
-              System.err.printf("Cube (%d, %d, %d) is outside of region file %s! Expected %d bytes at offset %d but file length is %d%n",
-                cubicRegionToCube(regionX, localX), cubicRegionToCube(regionY, localY), cubicRegionToCube(regionZ, localZ), fileName, dataLength, sectorOffset * SECTOR_SIZE, length);
+              Log.warn(String.format("Cube (%d, %d, %d) is outside of region file %s! Expected %d bytes at offset %d but file length is %d%n",
+                cubicRegionToCube(regionX, localX), cubicRegionToCube(regionY, localY), cubicRegionToCube(regionZ, localZ), fileName, dataLength, sectorOffset * SECTOR_SIZE, length));
               continue;
             }
 
@@ -465,16 +468,16 @@ public class ImposterCubicRegion implements Region {
               tagMapsByLocalY.put(localY, value);
             } catch (IOException e) {
               e.printStackTrace(System.err);
-              System.err.println("Failed to read cube: " + e.getMessage());
+              Log.warn("Failed to read cube: " + e.getMessage());
               //not returning here, as other cubes may be valid within the region file, though unlikely
             }
           } catch (RuntimeException e) {
             e.printStackTrace(System.err);
-            System.err.println("Failed to read cube: " + e.getMessage());
+            Log.warn("Failed to read cube: " + e.getMessage());
           }
         }
       } catch (IOException e) {
-        System.err.println("Failed to read region (" + fileName + "): " + e.getMessage());
+        Log.warn("Failed to read region (" + fileName + "): " + e.getMessage());
       }
       return tagMapsByLocalY;
     }

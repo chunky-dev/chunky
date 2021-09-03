@@ -245,7 +245,7 @@ public class MCRegion implements Region {
       file.seek(SECTOR_SIZE + 4 * index);
       int timestamp = file.readInt();
       if (length < sectorOffset * SECTOR_SIZE + 4) {
-        System.err.printf("Chunk %s is outside of region file %s! Expected chunk data at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), sectorOffset * SECTOR_SIZE, length);
+        Log.warn(String.format("Chunk %s is outside of region file %s! Expected chunk data at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), sectorOffset * SECTOR_SIZE, length));
         return null;
       }
       file.seek(sectorOffset * SECTOR_SIZE);
@@ -253,23 +253,23 @@ public class MCRegion implements Region {
       int chunkSize = file.readInt();
 
       if (chunkSize > numSectors * SECTOR_SIZE) {
-        System.err.println("Error: chunk length does not fit in allocated sectors!");
+        Log.warn("Error: chunk length does not fit in allocated sectors!");
         return null;
       }
 
       if (length < sectorOffset * SECTOR_SIZE + 4 + chunkSize) {
-        System.err.printf("Chunk %s is outside of region file %s! Expected %d bytes at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), chunkSize, sectorOffset * SECTOR_SIZE, length);
+        Log.warn(String.format("Chunk %s is outside of region file %s! Expected %d bytes at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), chunkSize, sectorOffset * SECTOR_SIZE, length));
         return null;
       }
 
       byte type = file.readByte();
       if (type != 1 && type != 2) {
-        System.err.println("Error: unknown chunk data compression method: " + type + "!");
+        Log.warn("Error: unknown chunk data compression method: " + type + "!");
         return null;
       }
 
       if (chunkSize <= 0) {
-        System.err.println("Error: invalid chunk size: " + chunkSize);
+        Log.warn("Error: invalid chunk size: " + chunkSize);
         return null;
       }
 
@@ -282,7 +282,7 @@ public class MCRegion implements Region {
         return new ChunkDataSource(timestamp, new InflaterInputStream(in));
       }
     } catch (IOException e) {
-      System.err.println("Failed to read chunk: " + e.getMessage());
+      Log.warn("Failed to read chunk: " + e.getMessage());
       return null;
     }
   }
