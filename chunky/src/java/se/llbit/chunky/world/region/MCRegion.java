@@ -245,7 +245,7 @@ public class MCRegion implements Region {
       file.seek(SECTOR_SIZE + 4 * index);
       int timestamp = file.readInt();
       if (length < sectorOffset * SECTOR_SIZE + 4) {
-        Log.warn(String.format("Chunk %s is outside of region file %s! Expected chunk data at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), sectorOffset * SECTOR_SIZE, length));
+        Log.warnf("Chunk %s is outside of region file %s! Expected chunk data at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), sectorOffset * SECTOR_SIZE, length);
         return null;
       }
       file.seek(sectorOffset * SECTOR_SIZE);
@@ -258,7 +258,7 @@ public class MCRegion implements Region {
       }
 
       if (length < sectorOffset * SECTOR_SIZE + 4 + chunkSize) {
-        Log.warn(String.format("Chunk %s is outside of region file %s! Expected %d bytes at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), chunkSize, sectorOffset * SECTOR_SIZE, length));
+        Log.warnf("Chunk %s is outside of region file %s! Expected %d bytes at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), chunkSize, sectorOffset * SECTOR_SIZE, length);
         return null;
       }
 

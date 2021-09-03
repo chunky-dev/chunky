@@ -436,8 +436,8 @@ public class ImposterCubicRegion implements Region {
             }
 
             if (length < (long)sectorOffset * SECTOR_SIZE + Integer.BYTES) {
-              Log.warn(String.format("Cube (%d, %d, %d) is outside of region file %s! Expected chunk data at offset %d but file length is %d%n",
-                cubicRegionToCube(regionX, localX), cubicRegionToCube(regionY, localY), cubicRegionToCube(regionZ, localZ), fileName, sectorOffset * SECTOR_SIZE_BYTES, length));
+              Log.warnf("Cube (%d, %d, %d) is outside of region file %s! Expected chunk data at offset %d but file length is %d%n",
+                cubicRegionToCube(regionX, localX), cubicRegionToCube(regionY, localY), cubicRegionToCube(regionZ, localZ), fileName, sectorOffset * SECTOR_SIZE_BYTES, length);
               continue;
             }
 
@@ -445,14 +445,14 @@ public class ImposterCubicRegion implements Region {
             int dataLength = file.readInt();
 
             if (dataLength > sectorCount * SECTOR_SIZE) {
-              Log.warn(String.format("Corrupted region file %s for local cube (%d, %d, %d). Expected data size max %d but found %d%n",
-                fileName, cubicRegionToCube(regionX, localX), cubicRegionToCube(regionY, localY), cubicRegionToCube(regionZ, localZ), sectorCount * SECTOR_SIZE, dataLength));
+              Log.warnf("Corrupted region file %s for local cube (%d, %d, %d). Expected data size max %d but found %d%n",
+                fileName, cubicRegionToCube(regionX, localX), cubicRegionToCube(regionY, localY), cubicRegionToCube(regionZ, localZ), sectorCount * SECTOR_SIZE, dataLength);
               continue;
             }
 
             if (length < (long)sectorOffset * SECTOR_SIZE + Integer.BYTES + dataLength) {
-              Log.warn(String.format("Cube (%d, %d, %d) is outside of region file %s! Expected %d bytes at offset %d but file length is %d%n",
-                cubicRegionToCube(regionX, localX), cubicRegionToCube(regionY, localY), cubicRegionToCube(regionZ, localZ), fileName, dataLength, sectorOffset * SECTOR_SIZE, length));
+              Log.warnf("Cube (%d, %d, %d) is outside of region file %s! Expected %d bytes at offset %d but file length is %d%n",
+                cubicRegionToCube(regionX, localX), cubicRegionToCube(regionY, localY), cubicRegionToCube(regionZ, localZ), fileName, dataLength, sectorOffset * SECTOR_SIZE, length);
               continue;
             }
 
