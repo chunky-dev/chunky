@@ -1,7 +1,8 @@
 package se.llbit.chunky.world.region;
 
+import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ReferenceCollection;
 import se.llbit.chunky.world.*;
 import se.llbit.nbt.ErrorTag;
@@ -106,26 +107,33 @@ public class ImposterCubicRegion implements Region {
     int minRegionY = minY >> 8;
     int maxRegionY = maxY >> 8;
 
+    //Remove regions out of parse range
+    ObjectIterator<Int2ReferenceMap.Entry<CubicRegion112[]>> regionLayerIterator = internalRegions.int2ReferenceEntrySet().fastIterator();
+    while(regionLayerIterator.hasNext()) {
+      int regionY = regionLayerIterator.next().getIntKey();
+      if(regionY < minRegionY || regionY > maxRegionY) {
+        regionLayerIterator.remove();
+      }
+    }
+
+    if(!hasRegionInRangeChanged(minRegionY, maxRegionY))
+      return; //Nothing changed, we don't need to reparse
+
     //Discover regions for requested range
-    boolean anyFound = false;
-    IntOpenHashSet regionYPositions = new IntOpenHashSet();
-    for (int y = minRegionY; y <= maxRegionY; y++) {
-      CubicRegion112[] regionsForPosition = internalRegions.computeIfAbsent(y, (yPos) -> new CubicRegion112[DIAMETER_IN_CUBIC_REGIONS * DIAMETER_IN_CUBIC_REGIONS]);
+    for (int regionY = minRegionY; regionY <= maxRegionY; regionY++) {
+      CubicRegion112[] regionsForPosition = internalRegions.computeIfAbsent(regionY, (yPos) -> new CubicRegion112[DIAMETER_IN_CUBIC_REGIONS * DIAMETER_IN_CUBIC_REGIONS]);
 
       for (int localZ = 0; localZ < DIAMETER_IN_CUBIC_REGIONS; localZ++) {
         for (int localX = 0; localX < DIAMETER_IN_CUBIC_REGIONS; localX++) {
-          String fileName = String.format("%d.%d.%d.3dr", min3drPosition.x + localX, y, min3drPosition.z + localZ);
+          String fileName = String.format("%d.%d.%d.3dr", min3drPosition.x + localX, regionY, min3drPosition.z + localZ);
           File regionFile = new File(world.getRegionDirectory(), fileName);
 
           int regionIndex = localX + localZ * DIAMETER_IN_CUBIC_REGIONS;
 
           if(regionFile.isFile()) {
-            anyFound = true;
-            regionYPositions.add(y);
-
             //Create required regions
             if(regionsForPosition[regionIndex] == null) {
-              regionsForPosition[regionIndex] = new CubicRegion112(min3drPosition.x + localX, y, min3drPosition.z + localZ, fileName);
+              regionsForPosition[regionIndex] = new CubicRegion112(min3drPosition.x + localX, regionY, min3drPosition.z + localZ, fileName);
             }
           } else {
             regionsForPosition[regionIndex] = null; //region doesn't exist, ensure is null
@@ -134,55 +142,22 @@ public class ImposterCubicRegion implements Region {
       }
     }
 
-    if(!anyFound) {
-      internalRegions.clear();
-      return;
-    }
-
-    //Clear currently loaded regions that are no longer required
-    for (Integer boxedYPos : internalRegions.keySet()) {
-      int yPos = boxedYPos;
-      if(!regionYPositions.contains(yPos)) {
-        internalRegions.remove(yPos);
-      }
-    }
-
+    //Parse all regions
     for (CubicRegion112[] cubicRegions : internalRegions.values()) {
       for (CubicRegion112 cubicRegion : cubicRegions) {
         if(cubicRegion != null)
           cubicRegion.parse();
       }
     }
+    //Mark any columns that have loaded
+    BitSet columnsWithCubes = markColumnsWithCubes();
 
-    //Mark columns with cubes
-    BitSet cubeExistsInColumn = new BitSet(CHUNKS_COUNT);
-    for (CubicRegion112[] cubicRegions : internalRegions.values()) {
-      for (int regionLocalZ = 0; regionLocalZ < DIAMETER_IN_CUBIC_REGIONS; regionLocalZ++) {
-        for (int regionLocalX = 0; regionLocalX < DIAMETER_IN_CUBIC_REGIONS; regionLocalX++) {
-          CubicRegion112 cubicRegion = cubicRegions[regionLocalX + regionLocalZ * DIAMETER_IN_CUBIC_REGIONS];
-          if(cubicRegion == null)
-            continue;
-
-          for (int cubeX = 0; cubeX < CubicRegion112.DIAMETER_IN_CUBES; cubeX++) {
-            for (int cubeY = 0; cubeY < CubicRegion112.DIAMETER_IN_CUBES; cubeY++) {
-              for (int cubeZ = 0; cubeZ < CubicRegion112.DIAMETER_IN_CUBES; cubeZ++) {
-                int index = ((cubeX) << CubicRegion112.LOC_BITS*2) | ((cubeY) << CubicRegion112.LOC_BITS) | (cubeZ);
-                if(cubicRegion.presentCubes.get(index)) {
-                  int chunkIndex = (regionLocalX * CubicRegion112.DIAMETER_IN_CUBES + cubeX) + (regionLocalZ * CubicRegion112.DIAMETER_IN_CUBES + cubeZ) * DIAMETER_IN_VANILLA_CHUNKS;
-                  cubeExistsInColumn.set(chunkIndex, true);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
+    //Create marked columns
     for (int localZ = 0; localZ < DIAMETER_IN_VANILLA_CHUNKS; localZ++) {
       for (int localX = 0; localX < DIAMETER_IN_VANILLA_CHUNKS; localX++) {
         ChunkPosition pos = ChunkPosition.get(mcRegionToChunk(position.x, localX), mcRegionToChunk(position.z, localZ));
         Chunk chunk = getChunk(localX, localZ);
-        if (cubeExistsInColumn.get(localX + localZ*DIAMETER_IN_VANILLA_CHUNKS)) {
+        if (columnsWithCubes.get(localX + localZ*DIAMETER_IN_VANILLA_CHUNKS)) {
           if(chunk.isEmpty()) {
             chunk = new ImposterCubicChunk(pos, world);
             setChunk(localX, localZ, chunk);
@@ -197,6 +172,32 @@ public class ImposterCubicRegion implements Region {
     }
 
     world.regionUpdated(position);
+  }
+
+  private BitSet markColumnsWithCubes() {
+    BitSet columnsWithCubes = new BitSet(CHUNKS_COUNT);
+    for (CubicRegion112[] cubicRegions : internalRegions.values()) {
+      for (int regionLocalZ = 0; regionLocalZ < DIAMETER_IN_CUBIC_REGIONS; regionLocalZ++) {
+        for (int regionLocalX = 0; regionLocalX < DIAMETER_IN_CUBIC_REGIONS; regionLocalX++) {
+          CubicRegion112 cubicRegion = cubicRegions[regionLocalX + regionLocalZ * DIAMETER_IN_CUBIC_REGIONS];
+          if(cubicRegion == null)
+            continue;
+
+          for (int cubeX = 0; cubeX < CubicRegion112.DIAMETER_IN_CUBES; cubeX++) {
+            for (int cubeY = 0; cubeY < CubicRegion112.DIAMETER_IN_CUBES; cubeY++) {
+              for (int cubeZ = 0; cubeZ < CubicRegion112.DIAMETER_IN_CUBES; cubeZ++) {
+                int index = ((cubeX) << CubicRegion112.LOC_BITS*2) | ((cubeY) << CubicRegion112.LOC_BITS) | (cubeZ);
+                if(cubicRegion.presentCubes.get(index)) {
+                  int chunkIndex = (regionLocalX * CubicRegion112.DIAMETER_IN_CUBES + cubeX) + (regionLocalZ * CubicRegion112.DIAMETER_IN_CUBES + cubeZ) * DIAMETER_IN_VANILLA_CHUNKS;
+                  columnsWithCubes.set(chunkIndex, true);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return columnsWithCubes;
   }
 
   @Override
@@ -233,7 +234,6 @@ public class ImposterCubicRegion implements Region {
    */
   @Override
   public synchronized boolean hasChanged() {
-
     for (CubicRegion112[] regions : internalRegions.values()) {
       for (CubicRegion112 region : regions) {
         if(region != null) {
@@ -241,6 +241,40 @@ public class ImposterCubicRegion implements Region {
           long lastModified = file.lastModified();
           if (lastModified != region.regionTimestamp) {
             return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  public synchronized boolean hasRegionInRangeChanged(int minRegionY, int maxRegionY) {
+    for (int yPos = minRegionY; yPos <= maxRegionY; yPos++) {
+      CubicRegion112[] regions = internalRegions.get(yPos);
+
+      if (regions != null) { //check if any existing layers have changed
+        for (int localRegionX = 0; localRegionX < DIAMETER_IN_CUBIC_REGIONS; localRegionX++) {
+          for (int localRegionZ = 0; localRegionZ < DIAMETER_IN_CUBIC_REGIONS; localRegionZ++) {
+            CubicRegion112 region = regions[getRegionIndex(localRegionX, localRegionZ)];
+            if (region != null) { //check known region
+              File file = new File(world.getRegionDirectory(), region.fileName);
+              long lastModified = file.lastModified();
+              if (lastModified != region.regionTimestamp) {
+                return true;
+              }
+            } else { //check unknown region
+              File file = new File(world.getRegionDirectory(), String.format("%d.%d.%d.3dr", min3drPosition.x + localRegionX, yPos, min3drPosition.z + localRegionZ));
+              if(file.exists())
+                return true;
+            }
+          }
+        }
+      } else { //check if any unknown layers exist
+        for (int localRegionX = 0; localRegionX < DIAMETER_IN_CUBIC_REGIONS; localRegionX++) {
+          for (int localRegionZ = 0; localRegionZ < DIAMETER_IN_CUBIC_REGIONS; localRegionZ++) {
+            File file = new File(world.getRegionDirectory(), String.format("%d.%d.%d.3dr", min3drPosition.x + localRegionX, yPos, min3drPosition.z + localRegionZ));
+            if(file.exists())
+              return true;
           }
         }
       }
