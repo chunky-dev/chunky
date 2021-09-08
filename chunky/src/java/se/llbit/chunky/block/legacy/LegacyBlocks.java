@@ -9,12 +9,27 @@ import se.llbit.nbt.Tag;
 
 public class LegacyBlocks {
 
+  /** statically initialised array of every possible tag */
+  private static final Tag[] legacyTags = new Tag[(1 << 8) * (1 << 4)];
+
+  static {
+    for (int id = 0; id < 1 << 8; id++) { //id is 8 bits
+      for (int data = 0; data < 1 << 4; data++) { //data is 4 bits
+        legacyTags[id * (1 << 4) + data] = getTag(id, data);
+      }
+    }
+  }
+
   public static Tag getTag(int offset, byte[] blocks, byte[] blockData) {
     int id = blocks[offset] & 0xFF;
     int data = 0xFF & blockData[offset / 2];
     data >>= (offset % 2) * 4;
     data &= 0xF;
 
+    return legacyTags[id * (1 << 4) + data];
+  }
+
+  private static Tag getTag(int id, int data) {
     CompoundTag tag = new CompoundTag();
     switch (id) {
       case 0:   return nameTag(tag, "air");
