@@ -174,6 +174,7 @@ public class Chunk {
       extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
       if (version.equals("1.13") || version.equals("1.12")) {
         BlockPalette palette = new BlockPalette();
+        palette.unsynchronize(); //only this RegionParser will use this palette
         loadBlockData(data, chunkData, palette, yMin, yMax);
         int[] heightmapData = extractHeightmapData(data, chunkData);
         updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
