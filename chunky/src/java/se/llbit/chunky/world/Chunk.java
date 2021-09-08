@@ -177,7 +177,7 @@ public class Chunk {
         loadBlockData(data, chunkData, palette, yMin, yMax);
         int[] heightmapData = extractHeightmapData(data, chunkData);
         updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
-        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, yMin, yMax);
+        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, yMin, yMax, heightmapData);
         queueTopography();
       }
     } else {
