@@ -57,7 +57,7 @@ public class SurfaceLayer extends BitmapLayer {
       for (int z = 0; z < Chunk.Z_MAX; ++z) {
 
         // Find the topmost non-empty block.
-        int y = Math.min(Math.min(chunkData.maxY() - 1, yMax), heightmapData[z*16 + x]);
+        int y = Math.min(Math.min(chunkData.maxY() - 1, yMax), heightmapData[z*Chunk.X_MAX + x]);
         int minY = Math.max(chunkData.minY(), yMin);
         for (; y > minY; --y) {
           if (palette.get(chunkData.getBlockAt(x, y, z)) != Air.INSTANCE) {
