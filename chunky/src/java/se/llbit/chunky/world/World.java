@@ -20,14 +20,14 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.chunk.SimpleChunkData;
+import se.llbit.chunky.map.MapView;
+import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.world.listeners.ChunkDeletionListener;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
-import se.llbit.chunky.world.region.EmptyRegion;
-import se.llbit.chunky.world.region.MCRegion;
-import se.llbit.chunky.world.region.Region;
+import se.llbit.chunky.world.region.*;
 import se.llbit.log.Log;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.NamedTag;
@@ -293,6 +293,10 @@ public class World implements Comparable<World> {
 
   public Region createRegion(ChunkPosition pos) {
     return new MCRegion(pos, this);
+  }
+
+  public RegionChangeWatcher createRegionChangeWatcher(WorldMapLoader worldMapLoader, MapView mapView) {
+    return new MCRegionChangeWatcher(worldMapLoader, mapView);
   }
 
   /**

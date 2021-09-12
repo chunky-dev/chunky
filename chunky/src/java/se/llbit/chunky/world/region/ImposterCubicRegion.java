@@ -21,7 +21,7 @@ import java.util.zip.GZIPInputStream;
  * within the position it is assigned</p>
  */
 public class ImposterCubicRegion implements Region {
-  private static final int DIAMETER_IN_CUBIC_REGIONS = 2;
+  public static final int DIAMETER_IN_CUBIC_REGIONS = 2;
   private static final int DIAMETER_IN_VANILLA_CHUNKS = 32;
   private static final int CHUNKS_COUNT = DIAMETER_IN_VANILLA_CHUNKS*DIAMETER_IN_VANILLA_CHUNKS;
 
@@ -66,8 +66,13 @@ public class ImposterCubicRegion implements Region {
     return (regionX & 1) + (regionZ & 1) * DIAMETER_IN_CUBIC_REGIONS;
   }
 
+  /** Convert a single dimension of a block coordinate to a cube coordinate */
+  public static int blockToCube(int blockVal) {
+    return blockVal >> 4;
+  }
+
   /** Convert a single dimension of a cube coordinate to a cubic region coordinate */
-  private static int cubeToCubicRegion(int cubeVal) {
+  public static int cubeToCubicRegion(int cubeVal) {
     return cubeVal >> 4;
   }
 
@@ -90,7 +95,7 @@ public class ImposterCubicRegion implements Region {
    * All parameters are cubic region positions
    * @return the region file name for this position
    */
-  private static String get3drNameForPos(int regionX, int regionY, int regionZ) {
+  public static String get3drNameForPos(int regionX, int regionY, int regionZ) {
     return String.format("%d.%d.%d.3dr", regionX, regionY, regionZ);
   }
 

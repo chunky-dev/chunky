@@ -41,10 +41,12 @@ import java.util.function.Consumer;
  */
 public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListener {
   private final ChunkyFxController controller;
+  private final MapView mapView;
 
   private World world = EmptyWorld.INSTANCE;
 
   private final RegionQueue regionQueue = new RegionQueue();
+  private RegionChangeWatcher regionChangeWatcher = null;
 
   private final ChunkTopographyUpdater topographyUpdater = new ChunkTopographyUpdater();
 
@@ -55,8 +57,8 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
 
   public WorldMapLoader(ChunkyFxController controller, MapView mapView) {
     this.controller = controller;
+    this.mapView = mapView;
     mapView.addViewListener(this);
-    RegionChangeWatcher regionWatcher = new RegionChangeWatcher(this, mapView);
 
     // Start worker threads.
     RegionParser[] regionParsers = new RegionParser[Integer.parseInt(System.getProperty("chunky.mapLoaderThreads", String.valueOf(PersistentSettings.getNumThreads())))];
@@ -65,7 +67,6 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
       regionParsers[i].start();
     }
     topographyUpdater.start();
-    regionWatcher.start();
   }
 
   /**
@@ -81,6 +82,8 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
       newWorld.addChunkTopographyListener(this);
       synchronized (this) {
         world = newWorld;
+        updateRegionChangeWatcher(newWorld);
+
         File newWorldDir = world.getWorldDirectory();
         if (newWorldDir != null) {
           PersistentSettings.setLastWorld(newWorldDir);
@@ -144,8 +147,18 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
     newWorld.addChunkTopographyListener(this);
     synchronized (this) {
       world = newWorld;
+      updateRegionChangeWatcher(newWorld);
     }
     worldLoadListeners.forEach(listener -> listener.accept(newWorld, true));
+  }
+
+  /** Stops the current RegionChangeWatcher, and creates a new one for the specified world */
+  private void updateRegionChangeWatcher(World newWorld) {
+    if(regionChangeWatcher != null) {
+      regionChangeWatcher.interrupt();
+    }
+    regionChangeWatcher = newWorld.createRegionChangeWatcher(this, mapView);
+    regionChangeWatcher.start();
   }
 
   /**

@@ -2,10 +2,10 @@ package se.llbit.chunky.world;
 
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
+import se.llbit.chunky.map.MapView;
+import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.ui.ProgressTracker;
-import se.llbit.chunky.world.region.EmptyRegion;
-import se.llbit.chunky.world.region.ImposterCubicRegion;
-import se.llbit.chunky.world.region.Region;
+import se.llbit.chunky.world.region.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +14,9 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import static se.llbit.chunky.world.region.ImposterCubicRegion.blockToCube;
+import static se.llbit.chunky.world.region.ImposterCubicRegion.cubeToCubicRegion;
 
 public class CubicWorld extends World {
 
@@ -56,6 +59,11 @@ public class CubicWorld extends World {
     return new ImposterCubicRegion(pos, this);
   }
 
+  @Override
+  public RegionChangeWatcher createRegionChangeWatcher(WorldMapLoader worldMapLoader, MapView mapView) {
+    return new CubicRegionChangeWatcher(worldMapLoader, mapView);
+  }
+
   /**
    * @param pos Region position
    * @return The region at the given position
@@ -74,6 +82,21 @@ public class CubicWorld extends World {
     }
   }
 
+  public synchronized Region getRegionWithinRange(ChunkPosition pos, int minY, int maxY) {
+    if (regionMap.containsKey(pos)) {
+      return regionMap.get(pos);
+    } else {
+      // check if the region is present in the world directory
+      Region region = EmptyRegion.instance;
+      if (regionExistsWithinRange(pos, minY, maxY)) {
+        region = new ImposterCubicRegion(pos, this);
+      }
+      setRegion(pos, region);
+      return region;
+    }
+  }
+
+  /** no choice but to iterate over every file in the directory */
   @Override
   public boolean regionExists(ChunkPosition pos) {
     File regionDirectory = getRegionDirectory();
@@ -93,6 +116,25 @@ public class CubicWorld extends World {
     } catch (IOException e) {
       return false;
     }
+  }
+
+  public boolean regionExistsWithinRange(ChunkPosition pos, int minY, int maxY) {
+    int cubicRegionX = pos.x << 1;
+    int cubicRegionZ = pos.z << 1;
+
+    File regionDirectory = getRegionDirectory();
+    int minRegionY = cubeToCubicRegion(blockToCube(minY));
+    int maxRegionY = cubeToCubicRegion(blockToCube(maxY));
+    for (int y = minRegionY; y <= maxRegionY; y++) {
+      for (int localX = 0; localX < ImposterCubicRegion.DIAMETER_IN_CUBIC_REGIONS; localX++) {
+        for (int localZ = 0; localZ < ImposterCubicRegion.DIAMETER_IN_CUBIC_REGIONS; localZ++) {
+          File file = new File(regionDirectory, ImposterCubicRegion.get3drNameForPos(cubicRegionX + localX, y, cubicRegionZ + localZ));
+          if (file.exists())
+            return true;
+        }
+      }
+    }
+    return false;
   }
 
   /** Called when a new region has been discovered by the region parser. */
