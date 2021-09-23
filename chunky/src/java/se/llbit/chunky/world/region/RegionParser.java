@@ -62,7 +62,7 @@ public class RegionParser extends Thread {
       ChunkView map = mapView.getMapView();
       if (map.isRegionVisible(position)) {
         World world = mapLoader.getWorld();
-        Region region = world.getRegion(position);
+        Region region = world.getRegionWithinRange(position, mapView.getYMin(), mapView.getYMax());
         region.parse(mapView.getYMin(), mapView.getYMax());
         ChunkData chunkData = world.createChunkData();
         for (Chunk chunk : region) {

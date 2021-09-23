@@ -26,7 +26,7 @@ public class ImposterCubicChunk extends Chunk {
     assert world instanceof CubicWorld;
     this.world = (CubicWorld) world;
 
-    assert world.getVersionId() == 1343;
+    assert world.getVersionId() <= 1343;
     version = "1.12";
   }
 

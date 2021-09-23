@@ -73,7 +73,7 @@ public class MapTile {
         }
       }
     } else {
-      Region region = mapLoader.getWorld().getRegion(pos);
+      Region region = mapLoader.getWorld().getRegionWithinRange(pos, view.yMin, view.yMax);
       int pixelOffset = 0;
       for (int z = 0; z < 32; ++z) {
         for (int x = 0; x < 32; ++x) {

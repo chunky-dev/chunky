@@ -317,6 +317,10 @@ public class World implements Comparable<World> {
     }
   }
 
+  public Region getRegionWithinRange(ChunkPosition pos, int yMin, int yMax) {
+    return getRegion(pos);
+  }
+
   /** Set the region for the given position. */
   public synchronized void setRegion(ChunkPosition pos, Region region) {
     regionMap.put(pos, region);
