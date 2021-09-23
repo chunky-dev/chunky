@@ -34,6 +34,10 @@ public class ImposterCubicRegion implements Region {
   private final ChunkPosition mcRegionPos;
   /** The minimum cubic region position of this imposter */
   private final ChunkPosition min3drPosition;
+
+  private int minRegionY = Integer.MAX_VALUE;
+  private int maxRegionY = Integer.MIN_VALUE;
+
   private final World world;
 
   /**
@@ -137,8 +141,9 @@ public class ImposterCubicRegion implements Region {
    */
   @Override
   public synchronized void parse(int minY, int maxY) {
-    int minRegionY = minY >> 8;
-    int maxRegionY = maxY >> 8;
+    //prevent weird race condition if map view is still loading regions when loading chunks into scene
+    minRegionY = Math.min(minRegionY, minY >> 8);
+    maxRegionY = Math.max(maxRegionY, maxY >> 8);
 
     //Remove regions out of parse range
     ObjectIterator<Int2ReferenceMap.Entry<CubicRegion112[]>> regionLayerIterator = internalRegions.int2ReferenceEntrySet().fastIterator();
