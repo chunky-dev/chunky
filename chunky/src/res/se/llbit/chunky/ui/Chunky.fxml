@@ -148,11 +148,11 @@
           <Button fx:id="clearSelectionBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Clear selection"/>
           <Separator/>
           <Label text="Exports"/>
-          <Button fx:id="exportZip" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Export chunks to ZIP"/>
-          <Button fx:id="renderPng" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Export view to PNG"/>
+          <Button fx:id="exportZipBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Export chunks to ZIP"/>
+          <Button fx:id="renderPngBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Export view to PNG"/>
           <Separator/>
           <Label text="World modification - Use with caution!"/>
-          <Button fx:id="deleteChunks" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Delete selected chunks"/>
+          <Button fx:id="deleteChunksBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Delete selected chunks"/>
         </VBox>
       </Tab>
       <Tab fx:id="optionsTab" text="Options">
