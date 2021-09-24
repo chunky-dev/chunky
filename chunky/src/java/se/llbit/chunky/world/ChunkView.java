@@ -42,7 +42,7 @@ public class ChunkView {
   /**
    * A zero-size chunk view useful as a default chunk view for an uninitialized map.
    */
-  public static final ChunkView EMPTY = new ChunkView(0, 0, 0, 0, DEFAULT_BLOCK_SCALE, 0) {
+  public static final ChunkView EMPTY = new ChunkView(0, 0, 0, 0, DEFAULT_BLOCK_SCALE, 0, 0) {
     @Override public boolean isChunkVisible(int x, int z) {
       return false;
     }
@@ -90,14 +90,15 @@ public class ChunkView {
   public final int chunkScale;
 
   /** The y level for rendering a chunk in this view. */
+  public final int yMin;
   public final int yMax;
 
   /** Copies an existing chunk view. */
   public ChunkView(ChunkView other) {
-    this(other.x, other.z, other.width, other.height, other.scale, other.yMax);
+    this(other.x, other.z, other.width, other.height, other.scale, other.yMin, other.yMax);
   }
 
-  public ChunkView(double x, double z, int width, int height, int scale, int yMax) {
+  public ChunkView(double x, double z, int width, int height, int scale, int yMin, int yMax) {
     scale = clampScale(scale);
     this.scale = scale;
     if (this.scale <= 12) {
@@ -115,6 +116,7 @@ public class ChunkView {
     this.z1 = z + ch;
     this.width = width;
     this.height = height;
+    this.yMin = yMin;
     this.yMax = yMax;
     // Visible chunks (integer coordinates):
     cx0 = (int) QuickMath.floor(x0);

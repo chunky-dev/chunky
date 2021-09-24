@@ -14,19 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.world;
+package se.llbit.chunky.world.region;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
+import se.llbit.chunky.world.*;
 import se.llbit.log.Log;
+import se.llbit.nbt.ErrorTag;
+import se.llbit.nbt.NamedTag;
+import se.llbit.nbt.Tag;
+import se.llbit.util.Mutable;
 
 /**
  * Abstract region representation. Tracks loaded chunks and their timestamps.
@@ -38,7 +40,7 @@ import se.llbit.log.Log;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class Region implements Iterable<Chunk> {
+public class MCRegion implements Region {
 
   /**
    * Region X chunk width
@@ -52,6 +54,11 @@ public class Region implements Iterable<Chunk> {
 
   private static final int NUM_CHUNKS = CHUNKS_X * CHUNKS_Z;
 
+  /**
+   * Sector size in bytes.
+   */
+  private final static int SECTOR_SIZE = 4096;
+
   private final Chunk[] chunks = new Chunk[NUM_CHUNKS];
   private final ChunkPosition position;
   private final World world;
@@ -64,7 +71,7 @@ public class Region implements Iterable<Chunk> {
    *
    * @param pos   the region position
    */
-  public Region(ChunkPosition pos, World world) {
+  public MCRegion(ChunkPosition pos, World world) {
     this.world = world;
     fileName = pos.getMcaName();
     position = pos;
@@ -78,28 +85,22 @@ public class Region implements Iterable<Chunk> {
   /**
    * @return Chunk at (x, z)
    */
+  @Override
   public Chunk getChunk(int x, int z) {
     return chunks[(x & 31) + (z & 31) * 32];
   }
 
   /**
-   * @param pos Chunk position
-   * @return Chunk at given position
-   */
-  public Chunk getChunk(ChunkPosition pos) {
-    return chunks[(pos.x & 31) + (pos.z & 31) * 32];
-  }
-
-  /**
    * Set chunk at given position.
    */
-  public void setChunk(ChunkPosition pos, Chunk chunk) {
+  private void setChunk(ChunkPosition pos, Chunk chunk) {
     chunks[(pos.x & 31) + (pos.z & 31) * 32] = chunk;
   }
 
   /**
    * Delete a chunk.
    */
+  @Override
   public synchronized void deleteChunk(ChunkPosition chunkPos) {
     deleteChunkFromRegion(chunkPos);
     Chunk chunk = getChunk(chunkPos);
@@ -112,8 +113,11 @@ public class Region implements Iterable<Chunk> {
 
   /**
    * Parse the region file to discover chunks.
+   * @param minY the minimum requested block Y to be loaded. This does NOT need to be respected by the implementation
+   * @param maxY the maximum requested block Y to be loaded. This does NOT need to be respected by the implementation
    */
-  public synchronized void parse() {
+  @Override
+  public synchronized void parse(int minY, int maxY) {
     File regionFile = new File(world.getRegionDirectory(), fileName);
     if (!regionFile.isFile()) {
       return;
@@ -159,20 +163,15 @@ public class Region implements Iterable<Chunk> {
   }
 
   /**
-   * @return <code>true</code> if this is an empty or non-existent region
-   */
-  public boolean isEmpty() {
-    return false;
-  }
-
-  /**
    * @return The region position
    */
+  @Override
   public final ChunkPosition getPosition() {
     return position;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return "Region " + position.toString();
   }
 
@@ -184,10 +183,24 @@ public class Region implements Iterable<Chunk> {
     return String.format("r.%d.%d.mca", pos.x, pos.z);
   }
 
-  /**
-   * Sector size in bytes.
-   */
-  private final static int SECTOR_SIZE = 4096;
+  public Map<String, Tag> getChunkTags(ChunkPosition position, Set<String> request, Mutable<Integer> dataTimestamp) {
+    ChunkDataSource data = this.getChunkData(position);
+    dataTimestamp.set(data.timestamp);
+    if (data.inputStream != null) {
+      try (DataInputStream in = data.inputStream) {
+        Map<String, Tag> result = NamedTag.quickParse(in, request);
+        for (String key : request) {
+          if (!result.containsKey(key)) {
+            result.put(key, new ErrorTag(""));
+          }
+        }
+        return result;
+      } catch (IOException e) {
+        // Ignored.
+      }
+    }
+    return null;
+  }
 
   /**
    * Opens an input stream for the given chunk.
@@ -196,7 +209,7 @@ public class Region implements Iterable<Chunk> {
    * @return Chunk data source. The InputStream of the data source is
    * {@code null} if the chunk could not be read.
    */
-  public ChunkDataSource getChunkData(ChunkPosition chunkPos) {
+  private ChunkDataSource getChunkData(ChunkPosition chunkPos) {
     File regionDirectory = world.getRegionDirectory();
     File regionFile = new File(regionDirectory, fileName);
     ChunkDataSource data = null;
@@ -215,7 +228,7 @@ public class Region implements Iterable<Chunk> {
    *
    * @return {@code null} if the chunk could not be loaded
    */
-  public static ChunkDataSource getChunkData(File regionFile, ChunkPosition chunkPos) {
+  private static ChunkDataSource getChunkData(File regionFile, ChunkPosition chunkPos) {
     int x = chunkPos.x & 31;
     int z = chunkPos.z & 31;
     int index = x + z * 32;
@@ -232,7 +245,7 @@ public class Region implements Iterable<Chunk> {
       file.seek(SECTOR_SIZE + 4 * index);
       int timestamp = file.readInt();
       if (length < sectorOffset * SECTOR_SIZE + 4) {
-        System.err.printf("Chunk %s is outside of region file %s! Expected chunk data at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), sectorOffset * SECTOR_SIZE, length);
+        Log.warnf("Chunk %s is outside of region file %s! Expected chunk data at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), sectorOffset * SECTOR_SIZE, length);
         return null;
       }
       file.seek(sectorOffset * SECTOR_SIZE);
@@ -240,23 +253,23 @@ public class Region implements Iterable<Chunk> {
       int chunkSize = file.readInt();
 
       if (chunkSize > numSectors * SECTOR_SIZE) {
-        System.err.println("Error: chunk length does not fit in allocated sectors!");
+        Log.warn("Error: chunk length does not fit in allocated sectors!");
         return null;
       }
 
       if (length < sectorOffset * SECTOR_SIZE + 4 + chunkSize) {
-        System.err.printf("Chunk %s is outside of region file %s! Expected %d bytes at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), chunkSize, sectorOffset * SECTOR_SIZE, length);
+        Log.warnf("Chunk %s is outside of region file %s! Expected %d bytes at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), chunkSize, sectorOffset * SECTOR_SIZE, length);
         return null;
       }
 
       byte type = file.readByte();
       if (type != 1 && type != 2) {
-        System.err.println("Error: unknown chunk data compression method: " + type + "!");
+        Log.warn("Error: unknown chunk data compression method: " + type + "!");
         return null;
       }
 
       if (chunkSize <= 0) {
-        System.err.println("Error: invalid chunk size: " + chunkSize);
+        Log.warn("Error: invalid chunk size: " + chunkSize);
         return null;
       }
 
@@ -269,7 +282,7 @@ public class Region implements Iterable<Chunk> {
         return new ChunkDataSource(timestamp, new InflaterInputStream(in));
       }
     } catch (IOException e) {
-      System.err.println("Failed to read chunk: " + e.getMessage());
+      Log.warn("Failed to read chunk: " + e.getMessage());
       return null;
     }
   }
@@ -349,6 +362,7 @@ public class Region implements Iterable<Chunk> {
     }
   }
 
+  @Override
   public boolean hasChanged() {
     File regionFile = new File(world.getRegionDirectory(), fileName);
     return regionFileTime != regionFile.lastModified();
@@ -357,6 +371,7 @@ public class Region implements Iterable<Chunk> {
   /**
    * @return {@code true} if the chunk has changed since the timestamp
    */
+  @Override
   public boolean chunkChangedSince(ChunkPosition chunkPos, int timestamp) {
     return timestamp != chunkTimestamps[(chunkPos.x & 31) + (chunkPos.z & 31) * 32];
   }

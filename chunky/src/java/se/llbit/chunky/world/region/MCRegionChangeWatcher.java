@@ -14,29 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.world;
+package se.llbit.chunky.world.region;
 
 import javafx.application.Platform;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
-import se.llbit.chunky.renderer.ChunkViewListener;
+import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.ChunkView;
+import se.llbit.chunky.world.World;
 
 /**
  * Monitors filesystem for changes to region files.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class RegionChangeWatcher extends Thread implements ChunkViewListener {
-  private final WorldMapLoader mapLoader;
-  private final MapView mapView;
-  private volatile ChunkView view = ChunkView.EMPTY;
-
-  public RegionChangeWatcher(WorldMapLoader loader, MapView mapView) {
-    super("Region Refresher");
-    this.mapLoader = loader;
-    this.mapView = mapView;
-    mapView.addViewListener(this);
+public class MCRegionChangeWatcher extends RegionChangeWatcher {
+  public MCRegionChangeWatcher(WorldMapLoader loader, MapView mapView) {
+    super(loader, mapView, "Region Refresher");
   }
 
   @Override public void run() {
@@ -56,14 +51,14 @@ public class RegionChangeWatcher extends Thread implements ChunkViewListener {
             if (region.isEmpty()) {
               ChunkPosition pos = ChunkPosition.get(rx, rz);
               if (world.regionExists(pos)) {
-                region = new Region(pos, world);
+                region = world.createRegion(pos);
               }
               world.setRegion(pos, region);
-              region.parse();
+              region.parse(theView.yMin, theView.yMax);
               world.regionDiscovered(pos);
               mapLoader.regionUpdated(pos);
             } else if (region.hasChanged()) {
-              region.parse();
+              region.parse(theView.yMin, theView.yMax);
               ChunkPosition pos = region.getPosition();
               mapLoader.regionUpdated(pos);
             }
@@ -73,9 +68,5 @@ public class RegionChangeWatcher extends Thread implements ChunkViewListener {
     } catch (InterruptedException e) {
       // Interrupted.
     }
-  }
-
-  @Override public synchronized void viewUpdated(ChunkView mapView) {
-    this.view = mapView;
   }
 }

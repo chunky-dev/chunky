@@ -14,13 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.world;
+package se.llbit.chunky.world.region;
 
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.chunk.SimpleChunkData;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
+import se.llbit.chunky.world.Chunk;
+import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.ChunkView;
+import se.llbit.chunky.world.World;
 import se.llbit.log.Log;
 
 /**
@@ -58,17 +62,12 @@ public class RegionParser extends Thread {
       ChunkView map = mapView.getMapView();
       if (map.isRegionVisible(position)) {
         World world = mapLoader.getWorld();
-        Region region = world.getRegion(position);
-        region.parse();
-        ChunkData chunkData;
-        if(world.getVersionId() >= World.VERSION_21W06A) {
-          chunkData = new GenericChunkData();
-        } else {
-          chunkData = new SimpleChunkData();
-        }
+        Region region = world.getRegionWithinRange(position, mapView.getYMin(), mapView.getYMax());
+        region.parse(mapView.getYMin(), mapView.getYMax());
+        ChunkData chunkData = world.createChunkData();
         for (Chunk chunk : region) {
           if (map.shouldPreload(chunk)) {
-            if(chunk.loadChunk(chunkData, mapView.getYMax())) {
+            if(chunk.loadChunk(chunkData, mapView.getYMin(), mapView.getYMax())) {
               chunkData.clear();
             }
           }

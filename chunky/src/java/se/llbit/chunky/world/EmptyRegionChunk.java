@@ -45,7 +45,7 @@ public class EmptyRegionChunk extends Chunk {
     surface = IconLayer.CORRUPT;
   }
 
-  @Override public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette) {
+  @Override public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette, int yMin, int yMax) {
     if (reuseChunkData == null) {
       reuseChunkData = EmptyChunkData.INSTANCE;
     } else {
@@ -84,7 +84,7 @@ public class EmptyRegionChunk extends Chunk {
     // do nothing
   }
 
-  @Override public synchronized boolean loadChunk(ChunkData chunkData, int yMax) {
+  @Override public synchronized boolean loadChunk(ChunkData chunkData, int yMin, int yMax) {
     return false;
   }
 

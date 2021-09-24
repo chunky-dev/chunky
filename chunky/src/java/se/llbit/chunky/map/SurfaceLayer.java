@@ -50,7 +50,7 @@ public class SurfaceLayer extends BitmapLayer {
    * @param dim current dimension
    * @param chunkData data for the chunk
    */
-  public SurfaceLayer(int dim, ChunkData chunkData, BlockPalette palette, int yMax) {
+  public SurfaceLayer(int dim, ChunkData chunkData, BlockPalette palette, int yMin, int yMax) {
     bitmap = new int[Chunk.X_MAX * Chunk.Z_MAX];
     topo = new int[Chunk.X_MAX * Chunk.Z_MAX];
     for (int x = 0; x < Chunk.X_MAX; ++x) {
@@ -58,7 +58,7 @@ public class SurfaceLayer extends BitmapLayer {
 
         // Find the topmost non-empty block.
         int y = Math.min(chunkData.maxY() - 1, yMax);
-        int minY = chunkData.minY();
+        int minY = Math.max(chunkData.minY(), yMin);
         for (; y > minY; --y) {
           if (palette.get(chunkData.getBlockAt(x, y, z)) != Air.INSTANCE) {
             break;
