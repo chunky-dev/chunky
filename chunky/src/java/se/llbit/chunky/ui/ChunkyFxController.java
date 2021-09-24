@@ -47,6 +47,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -147,9 +148,9 @@ public class ChunkyFxController
   @FXML private Button creditsBtn;
   @FXML private DoubleTextField xPosition;
   @FXML private DoubleTextField zPosition;
-  @FXML private Button deleteChunks;
-  @FXML private Button exportZip;
-  @FXML private Button renderPng;
+  @FXML private Button deleteChunksBtn;
+  @FXML private Button exportZipBtn;
+  @FXML private Button renderPngBtn;
   @FXML private StackPane mapPane;
   @FXML private SplitPane splitPane;
   @FXML private TabPane mapTabs;
@@ -511,30 +512,36 @@ public class ChunkyFxController
           scale.set(newValue.scale);
         }));
 
-    deleteChunks.setTooltip(new Tooltip("Delete selected chunks."));
-    deleteChunks.setOnAction(e -> {
-      Alert alert = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
-      alert.setTitle("Delete Selected Chunks");
-      alert.setContentText(
-          "Do you really want to delete the selected chunks? This can not be undone.");
-      if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+    deleteChunksBtn.setTooltip(new Tooltip("Delete selected chunks."));
+    deleteChunksBtn.setGraphic(new ImageView(Icon.clear.fxImage()));
+    deleteChunksBtn.setOnAction(e -> {
+      Dialog<ButtonType> confirmationDialog = Dialogs.createSpecialApprovalConfirmation(
+        "Delete selected chunks",
+        "Confirm deleting the selected chunks",
+        "Do you really want to delete the selected chunks from the world?\nThis will remove the selected chunks from your disk and cannot be undone. Be sure to have a backup!",
+        "I do want to permanently delete the selected chunks"
+      );
+      if (confirmationDialog.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
         deleteSelectedChunks(ProgressTracker.NONE);
       }
     });
 
-    exportZip.setTooltip(new Tooltip("Export selected chunks to Zip archive."));
-    exportZip.setOnAction(e -> {
+    exportZipBtn.setTooltip(new Tooltip("Export selected chunks to Zip archive."));
+    exportZipBtn.setGraphic(new ImageView(Icon.save.fxImage()));
+    exportZipBtn.setOnAction(e -> {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Export Chunks to Zip");
       fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Zip files", "*.zip"));
       mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.levelName() + ".zip"));
-      File target = fileChooser.showSaveDialog(exportZip.getScene().getWindow());
+      File target = fileChooser.showSaveDialog(exportZipBtn.getScene().getWindow());
       if (target != null) {
         exportZip(target, ProgressTracker.NONE);
       }
     });
 
-    renderPng.setOnAction(e -> {
+    exportZipBtn.setTooltip(new Tooltip("Exports the current map view (not the selected chunks) as a PNG file."));
+    renderPngBtn.setGraphic(new ImageView(Icon.save.fxImage()));
+    renderPngBtn.setOnAction(e -> {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Export PNG");
       fileChooser
@@ -543,7 +550,7 @@ public class ChunkyFxController
       if (prevPngDir != null) {
         fileChooser.setInitialDirectory(prevPngDir.toFile());
       }
-      File target = fileChooser.showSaveDialog(exportZip.getScene().getWindow());
+      File target = fileChooser.showSaveDialog(exportZipBtn.getScene().getWindow());
       if (target != null) {
         Path path = target.toPath();
         if (!target.getName().endsWith(".png")) {
@@ -653,6 +660,7 @@ public class ChunkyFxController
 
     menuExit.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
     clearSelectionBtn.setOnAction(event -> chunkSelection.clearSelection());
+    clearSelectionBtn.setGraphic(new ImageView(Icon.clear.fxImage()));
 
     mapView.setMapSize((int) mapCanvas.getWidth(), (int) mapCanvas.getHeight());
     mapOverlay.setOnScroll(map::onScroll);
