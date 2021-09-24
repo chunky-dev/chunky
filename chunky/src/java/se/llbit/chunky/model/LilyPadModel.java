@@ -60,9 +60,7 @@ public class LilyPadModel {
         ray.color.x *= lilyPadColor[0];
         ray.color.y *= lilyPadColor[1];
         ray.color.z *= lilyPadColor[2];
-        Vector3 n = new Vector3(0, 1, 0);
-        n.scale(-QuickMath.signum(ray.d.y));
-        ray.setN(n);
+        ray.setN(0, -QuickMath.signum(ray.d.y), 0);
         ray.distance += ray.tNext;
         ray.o.scaleAdd(ray.tNext, ray.d);
         return true;

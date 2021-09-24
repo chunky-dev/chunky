@@ -77,9 +77,7 @@ public class MelonStemModel {
             ray.color.y *= stemColor[height][1];
             ray.color.z *= stemColor[height][2];
             ray.t = ray.tNext;
-            Vector3 n = new Vector3(quad.n);
-            n.scale(-QuickMath.signum(ray.d.dot(quad.n)));
-            ray.setN(n);
+            ray.orientNormal(quad.n);
             hit = true;
           }
         }
@@ -94,9 +92,7 @@ public class MelonStemModel {
             ray.color.y *= stemColor[7][1];
             ray.color.z *= stemColor[7][2];
             ray.t = ray.tNext;
-            Vector3 n = new Vector3(quad.n);
-            n.scale(-QuickMath.signum(ray.d.dot(quad.n)));
-            ray.setN(n);
+            ray.orientNormal(quad.n);
             hit = true;
           }
         }
@@ -110,9 +106,7 @@ public class MelonStemModel {
           ray.color.y *= stemColor[7][1];
           ray.color.z *= stemColor[7][2];
           ray.t = ray.tNext;
-          Vector3 n = new Vector3(quad.n);
-          n.scale(-QuickMath.signum(ray.d.dot(quad.n)));
-          ray.setN(n);
+          ray.orientNormal(quad.n);
           hit = true;
         }
       }

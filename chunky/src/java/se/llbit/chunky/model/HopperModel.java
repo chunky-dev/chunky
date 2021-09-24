@@ -103,9 +103,7 @@ public class HopperModel {
       hit = true;
     }
     if (bottom.intersect(ray)) {
-      Vector3 n = new Vector3(bottom.n);
-      n.scale(-QuickMath.signum(ray.d.dot(bottom.n)));
-      ray.setN(n);
+      ray.orientNormal(bottom.n);
       if (ray.getN().y > 0) {
         Texture.hopperInside.getColor(ray);
       } else {

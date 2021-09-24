@@ -48,9 +48,7 @@ public class CropsModel {
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
           ray.t = ray.tNext;
-          Vector3 n = new Vector3(quad.n);
-          n.scale(-QuickMath.signum(ray.d.dot(quad.n)));
-          ray.setN(n);
+          ray.orientNormal(quad.n);
           hit = true;
         }
       }

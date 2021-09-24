@@ -549,6 +549,19 @@ public class Ray {
     geomN.set(newN);
   }
 
+  /**
+   * Sets n to the given value and optionally flip it so the normal
+   * is in the opposite direction as the ray direction (dot(d, n) < 0)
+   */
+  public void orientNormal(Vector3 normal) {
+    if(d.dot(normal) > 0) {
+      n.set(-normal.x, -normal.y, -normal.z);
+    } else {
+      n.set(normal);
+    }
+    geomN.set(n);
+  }
+
   public void setShadingN(double x, double y, double z) {
     n.set(x, y, z);
   }
