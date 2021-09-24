@@ -76,7 +76,6 @@ public class CubicWorld extends World {
       if (regionExists(pos)) {
         region = createRegion(pos);
       }
-      setRegion(pos, region);
       return region;
     });
   }
@@ -88,7 +87,6 @@ public class CubicWorld extends World {
       if (regionExistsWithinRange(pos, minY, maxY)) {
         region = createRegion(pos);
       }
-      setRegion(pos, region);
       return region;
     });
   }

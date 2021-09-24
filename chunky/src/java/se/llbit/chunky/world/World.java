@@ -313,7 +313,6 @@ public class World implements Comparable<World> {
       if (regionExists(pos)) {
         region = createRegion(pos);
       }
-      setRegion(pos, region);
       return region;
     });
   }
