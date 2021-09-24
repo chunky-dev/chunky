@@ -6,6 +6,7 @@ import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.world.region.*;
+import se.llbit.log.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,31 +70,27 @@ public class CubicWorld extends World {
    * @return The region at the given position
    */
   public synchronized Region getRegion(ChunkPosition pos) {
-    if (regionMap.containsKey(pos)) {
-      return regionMap.get(pos);
-    } else {
+    return regionMap.computeIfAbsent(pos.getLong(), (p) -> {
       // check if the region is present in the world directory
       Region region = EmptyRegion.instance;
       if (regionExists(pos)) {
-        region = new ImposterCubicRegion(pos, this);
+        region = createRegion(pos);
       }
       setRegion(pos, region);
       return region;
-    }
+    });
   }
 
   public synchronized Region getRegionWithinRange(ChunkPosition pos, int minY, int maxY) {
-    if (regionMap.containsKey(pos)) {
-      return regionMap.get(pos);
-    } else {
+    return regionMap.computeIfAbsent(pos.getLong(), p -> {
       // check if the region is present in the world directory
       Region region = EmptyRegion.instance;
       if (regionExistsWithinRange(pos, minY, maxY)) {
-        region = new ImposterCubicRegion(pos, this);
+        region = createRegion(pos);
       }
       setRegion(pos, region);
       return region;
-    }
+    });
   }
 
   /** no choice but to iterate over every file in the directory */
@@ -140,20 +137,16 @@ public class CubicWorld extends World {
   /** Called when a new region has been discovered by the region parser. */
   public void regionDiscovered(ChunkPosition pos) {
     synchronized (this) {
-      Region region = regionMap.get(pos);
-      if (region == null) {
-        region = new ImposterCubicRegion(pos, this);
-        regionMap.put(pos, region);
-      }
+      regionMap.computeIfAbsent(pos.getLong(), (p) -> createRegion(pos));
     }
   }
 
   public synchronized void exportChunksToZip(File target, Collection<ChunkPosition> chunks, ProgressTracker progress)
       throws IOException {
-    throw new UnsupportedOperationException("Not implemented by cubicchunks worlds");
+    Log.warn("Not implemented by cubicchunks worlds");
   }
 
   public synchronized void exportWorldToZip(File target, ProgressTracker progress) throws IOException {
-    throw new UnsupportedOperationException("Not implemented by cubicchunks worlds");
+    Log.warn("Not implemented by cubicchunks worlds");
   }
 }

@@ -16,6 +16,8 @@
  */
 package se.llbit.chunky.world;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
@@ -80,8 +82,9 @@ public class World implements Comparable<World> {
 
   /** Minimum level.dat data version of tall worlds (21w06a). */
   public static final int VERSION_21W06A = 2694;
+  public static final int VERSION_1_12_2 = 1343;
 
-  protected final Map<ChunkPosition, Region> regionMap = new HashMap<>();
+  protected final Long2ObjectMap<Region> regionMap = new Long2ObjectOpenHashMap<>();
 
   private final File worldDirectory;
   private Set<PlayerEntityData> playerEntities;
@@ -304,9 +307,7 @@ public class World implements Comparable<World> {
    * @return The region at the given position
    */
   public synchronized Region getRegion(ChunkPosition pos) {
-    if (regionMap.containsKey(pos)) {
-      return regionMap.get(pos);
-    } else {
+    return regionMap.computeIfAbsent(pos.getLong(), p -> {
       // check if the region is present in the world directory
       Region region = EmptyRegion.instance;
       if (regionExists(pos)) {
@@ -314,7 +315,7 @@ public class World implements Comparable<World> {
       }
       setRegion(pos, region);
       return region;
-    }
+    });
   }
 
   public Region getRegionWithinRange(ChunkPosition pos, int yMin, int yMax) {
@@ -323,7 +324,7 @@ public class World implements Comparable<World> {
 
   /** Set the region for the given position. */
   public synchronized void setRegion(ChunkPosition pos, Region region) {
-    regionMap.put(pos, region);
+    regionMap.put(pos.getLong(), region);
   }
 
   /**
@@ -416,11 +417,7 @@ public class World implements Comparable<World> {
   /** Called when a new region has been discovered by the region parser. */
   public void regionDiscovered(ChunkPosition pos) {
     synchronized (this) {
-      Region region = regionMap.get(pos);
-      if (region == null) {
-        region = createRegion(pos);
-        regionMap.put(pos, region);
-      }
+      regionMap.computeIfAbsent(pos.getLong(), p -> createRegion(pos));
     }
   }
 

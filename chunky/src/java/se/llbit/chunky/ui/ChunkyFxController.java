@@ -394,7 +394,7 @@ public class ChunkyFxController
     map = new ChunkMap(mapLoader, this, mapView, chunkSelection,
         mapCanvas, mapOverlay);
 
-    AtomicBoolean ignoreYMaxUpdate = new AtomicBoolean(false); // used to not trigger a world reload after changing the world, see #926
+    AtomicBoolean ignoreYUpdate = new AtomicBoolean(false); // used to not trigger a world reload after changing the world, see #926
     mapLoader.addWorldLoadListener(
         (world, reloaded) -> {
           if (!reloaded) {
@@ -410,7 +410,7 @@ public class ChunkyFxController
                   mapView.panTo(playerPos.orElse(new Vector3(0, 0, 0)));
                 }
                 if (!reloaded) {
-                  ignoreYMaxUpdate.set(true);
+                  ignoreYUpdate.set(true);
                   if (mapLoader.getWorld().getVersionId() >= World.VERSION_21W06A) {
                     yMin.setRange(-64, 320);
                     yMin.set(-64);
@@ -422,7 +422,7 @@ public class ChunkyFxController
                     yMax.setRange(0, 256);
                     yMax.set(256);
                   }
-                  ignoreYMaxUpdate.set(false);
+                  ignoreYUpdate.set(false);
                 }
                 map.redrawMap();
                 mapName.setText(world.levelName());
@@ -491,13 +491,13 @@ public class ChunkyFxController
     scale.valueProperty().addListener(new GroupedChangeListener<>(group,
         (observable, oldValue, newValue) -> mapView.setScale(newValue.intValue())));
     yMin.valueProperty().addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
-      if (!ignoreYMaxUpdate.get()) {
+      if (!ignoreYUpdate.get()) {
         mapView.setYMin(newValue.intValue());
         mapLoader.reloadWorld();
       }
     }));
     yMax.valueProperty().addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
-      if (!ignoreYMaxUpdate.get()) {
+      if (!ignoreYUpdate.get()) {
         mapView.setYMax(newValue.intValue());
         mapLoader.reloadWorld();
       }

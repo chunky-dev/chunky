@@ -21,6 +21,7 @@ import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.EmptyRegionChunk;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * An empty or non-existent region.
@@ -76,10 +77,8 @@ public class EmptyRegion implements Region {
       }
 
       @Override public Chunk next() {
-        return EmptyRegionChunk.INSTANCE;
+        throw new NoSuchElementException();
       }
-
-      @Override public void remove() { }
     };
   }
 }

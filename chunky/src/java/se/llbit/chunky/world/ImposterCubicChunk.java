@@ -18,6 +18,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static se.llbit.chunky.world.World.VERSION_1_12_2;
+
 public class ImposterCubicChunk extends Chunk {
   private final CubicWorld world;
 
@@ -26,7 +28,7 @@ public class ImposterCubicChunk extends Chunk {
     assert world instanceof CubicWorld;
     this.world = (CubicWorld) world;
 
-    assert world.getVersionId() <= 1343;
+    assert world.getVersionId() <= VERSION_1_12_2;
     version = "1.12";
   }
 
@@ -63,6 +65,7 @@ public class ImposterCubicChunk extends Chunk {
     biomes = IconLayer.UNKNOWN;
 
     biomesTimestamp = dataTimestamp;
+    // TODO: add biomes support once we have 3d biomes support
 //    if (surface == IconLayer.MC_1_12) {
 //      biomes = IconLayer.MC_1_12;
 //    } else {
@@ -90,7 +93,6 @@ public class ImposterCubicChunk extends Chunk {
 //        extractBiomeData(cubeData.get(LEVEL_BIOMES), chunkData);
         if (version.equals("1.13") || version.equals("1.12")) {
           loadBlockDataCubic(yPos, cubeData, chunkData, palette, yMin, yMax);
-          surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, yMin, yMax);
           queueTopography();
         }
       }
@@ -98,6 +100,7 @@ public class ImposterCubicChunk extends Chunk {
 
     int[] heightmapData = extractHeightmapDataCubic(null, chunkData);
     updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
+    surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, yMin, yMax);
   }
 
   private int[] extractHeightmapDataCubic(Map<String, Tag> cubeData, ChunkData chunkData) {
@@ -173,9 +176,10 @@ public class ImposterCubicChunk extends Chunk {
       Tag biomesTag = cubeData.get(LEVEL_BIOMES);
       Tag entitiesTag = cubeData.get(LEVEL_ENTITIES);
       Tag tileEntitiesTag = cubeData.get(LEVEL_TILEENTITIES);
-      if (biomesTag.isByteArray(X_MAX * Z_MAX) || biomesTag.isIntArray(X_MAX * Z_MAX)) {
+      // TODO: add biomes support once we have 3d biomes support
+//      if (biomesTag.isByteArray(X_MAX * Z_MAX) || biomesTag.isIntArray(X_MAX * Z_MAX)) {
 //        extractBiomeData(biomesTag, reuseChunkData);
-      }
+//      }
 
       if (sections.isList()) {
         loadBlockDataCubic(yPos, cubeData, reuseChunkData, palette, minY, maxY);
