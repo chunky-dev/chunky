@@ -29,13 +29,14 @@ public class Dialogs {
   public static Dialog<ButtonType> createSpecialApprovalConfirmation(
     String title,
     String header,
-    String content
+    String content,
+    String confirmLabel
   ) {
     return new SpecialApprovalConfirmationDialog(
       title,
       header,
       content,
-      "I know what I'm doing!"
+      confirmLabel
     );
   }
 

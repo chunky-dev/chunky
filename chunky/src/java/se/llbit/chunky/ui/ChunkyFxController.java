@@ -505,9 +505,10 @@ public class ChunkyFxController
     deleteChunksBtn.setGraphic(new ImageView(Icon.clear.fxImage()));
     deleteChunksBtn.setOnAction(e -> {
       Dialog<ButtonType> confirmationDialog = Dialogs.createSpecialApprovalConfirmation(
-        "Delete Selected Chunks",
-        "This operation will modify your world - be sure to have a backup!",
-        "Do you really want to delete the selected chunks? This can not be undone."
+        "Delete selected chunks",
+        "Confirm deleting the selected chunks",
+        "Do you really want to delete the selected chunks from the world?\nThis will remove the selected chunks from your disk and cannot be undone. Be sure to have a backup!",
+        "I do want to permanently delete the selected chunks"
       );
       if (confirmationDialog.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
         deleteSelectedChunks(ProgressTracker.NONE);
