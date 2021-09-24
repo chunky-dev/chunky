@@ -47,6 +47,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -502,11 +503,12 @@ public class ChunkyFxController
 
     deleteChunks.setTooltip(new Tooltip("Delete selected chunks."));
     deleteChunks.setOnAction(e -> {
-      Alert alert = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
-      alert.setTitle("Delete Selected Chunks");
-      alert.setContentText(
-          "Do you really want to delete the selected chunks? This can not be undone.");
-      if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+      Dialog<ButtonType> confirmationDialog = Dialogs.createSpecialApprovalConfirmation(
+        "Delete Selected Chunks",
+        "This operation will modify your world - be sure to have a backup!",
+        "Do you really want to delete the selected chunks? This can not be undone."
+      );
+      if (confirmationDialog.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
         deleteSelectedChunks(ProgressTracker.NONE);
       }
     });
