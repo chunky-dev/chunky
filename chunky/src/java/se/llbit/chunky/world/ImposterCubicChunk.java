@@ -4,15 +4,14 @@ import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.EmptyChunkData;
-import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.SurfaceLayer;
 import se.llbit.chunky.world.region.ImposterCubicRegion;
-import se.llbit.math.QuickMath;
-import se.llbit.nbt.*;
-import se.llbit.util.BitBuffer;
+import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.ListTag;
+import se.llbit.nbt.SpecificTag;
+import se.llbit.nbt.Tag;
 import se.llbit.util.Mutable;
-import se.llbit.util.NotNull;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -20,6 +19,11 @@ import java.util.Set;
 
 import static se.llbit.chunky.world.World.VERSION_1_12_2;
 
+/**
+ * An implementation of a cube wrapper for pre flattening cubic chunks (1.10, 1.11, 1.12)
+ *
+ * Represents an infinitely tall column of 16x16x16 Cubes
+ */
 public class ImposterCubicChunk extends Chunk {
   private final CubicWorld world;
 
@@ -100,7 +104,7 @@ public class ImposterCubicChunk extends Chunk {
 
     int[] heightmapData = extractHeightmapDataCubic(null, chunkData);
     updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
-    surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, yMin, yMax);
+    surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, yMin, yMax, heightmapData);
   }
 
   private int[] extractHeightmapDataCubic(Map<String, Tag> cubeData, ChunkData chunkData) {
