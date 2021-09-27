@@ -20,6 +20,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector3;
 
 public class GrassModel {
   private static AABB aabb = new AABB(0, 1, 0, 1, 0, 1);
@@ -27,19 +28,20 @@ public class GrassModel {
   public static boolean intersect(Ray ray, Scene scene) {
     ray.t = Double.POSITIVE_INFINITY;
     if (aabb.intersect(ray)) {
-      if (ray.n.y == -1) {
+      Vector3 n = ray.getNormal();
+      if (n.y == -1) {
         // Bottom face.
         Texture.dirt.getColor(ray);
         ray.color.w = 1;
         ray.t = ray.tNext;
-      } else if (ray.n.y == 0 && (ray.getCurrentData() & (1 << 8)) != 0) {
+      } else if (n.y == 0 && (ray.getCurrentData() & (1 << 8)) != 0) {
         // Snowy side face.
         Texture.snowSide.getColor(ray);
         ray.color.w = 1;
         ray.t = ray.tNext;
       } else {
         float[] color;
-        if (ray.n.y > 0) {
+        if (n.y > 0) {
           color = Texture.grassTop.getColor(ray.u, ray.v);
         } else {
           color = Texture.grassSide.getColor(ray.u, ray.v);

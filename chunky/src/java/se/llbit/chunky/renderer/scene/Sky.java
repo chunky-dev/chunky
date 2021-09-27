@@ -883,7 +883,7 @@ public class Sky implements JsonSerializable {
       // Ray is entering cloud.
       if (inCloud((ray.d.x * t_offset + ox) * inv_size + offsetX,
           (ray.d.z * t_offset + oz) * inv_size + offsetZ)) {
-        ray.n.set(0, -Math.signum(ray.d.y), 0);
+        ray.setNormal(0, -Math.signum(ray.d.y), 0);
         enterCloud(ray, t_offset);
         return true;
       }
@@ -1008,7 +1008,7 @@ public class Sky implements JsonSerializable {
         // fix ray.n being set to zero (issue #643)
         return false;
       }
-      ray.n.set(nx, ny, nz);
+      ray.setNormal(nx, ny, nz);
       enterCloud(ray, t + t_offset);
       return true;
     } else {
@@ -1025,7 +1025,7 @@ public class Sky implements JsonSerializable {
         // fix ray.n being set to zero (issue #643)
         return false;
       }
-      ray.n.set(nx, ny, nz);
+      ray.setNormal(nx, ny, nz);
       exitCloud(ray, t);
     }
     return true;

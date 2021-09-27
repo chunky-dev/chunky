@@ -55,7 +55,7 @@ public class Conduit extends MinecraftBlockTranslucent {
         float[] color = texture.getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
-          ray.n.set(quad.n);
+          ray.setNormal(quad.n);
           ray.t = ray.tNext;
           hit = true;
         }

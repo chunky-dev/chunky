@@ -316,7 +316,7 @@ public class BellModel {
                 if (color[3] > Ray.EPSILON) {
                     ray.color.set(color);
                     ray.t = ray.tNext;
-                    ray.n.set(quad.n);
+                    ray.setNormal(quad.n);
                     hit = true;
                 }
             }
@@ -331,7 +331,7 @@ public class BellModel {
                     if (color[3] > Ray.EPSILON) {
                         ray.color.set(color);
                         ray.t = ray.tNext;
-                        ray.n.set(quad.n);
+                        ray.setNormal(quad.n);
                         hit = true;
                     }
                 }
@@ -345,7 +345,7 @@ public class BellModel {
                     if (color[3] > Ray.EPSILON) {
                         ray.color.set(color);
                         ray.t = ray.tNext;
-                        ray.n.set(quad.n);
+                        ray.setNormal(quad.n);
                         hit = true;
                     }
                 }
@@ -359,7 +359,7 @@ public class BellModel {
                     if (color[3] > Ray.EPSILON) {
                         ray.color.set(color);
                         ray.t = ray.tNext;
-                        ray.n.set(quad.n);
+                        ray.setNormal(quad.n);
                         hit = true;
                     }
                 }
@@ -373,7 +373,7 @@ public class BellModel {
                     if (color[3] > Ray.EPSILON) {
                         ray.color.set(color);
                         ray.t = ray.tNext;
-                        ray.n.set(quad.n);
+                        ray.setNormal(quad.n);
                         hit = true;
                     }
                 }

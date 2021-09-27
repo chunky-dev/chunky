@@ -58,8 +58,7 @@ public class Lava extends MinecraftBlockTranslucent {
 
     boolean hit = false;
     if (bottom.intersect(ray)) {
-      ray.n.set(bottom.n);
-      ray.n.scale(-QuickMath.signum(ray.d.dot(bottom.n)));
+      ray.orientNormal(bottom.n);
       ray.t = ray.tNext;
       hit = true;
     }
@@ -70,15 +69,13 @@ public class Lava extends MinecraftBlockTranslucent {
     int c3 = (0xF & (data >> CORNER_3)) % 8;
     Triangle triangle = Water.t012[c0][c1][c2];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       hit = true;
     }
     triangle = Water.t230[c2][c3][c0];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       ray.u = 1 - ray.u;
       ray.v = 1 - ray.v;
@@ -86,8 +83,7 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.westt[c0][c3];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       double y = ray.t * ray.d.y + ray.o.y;
       double z = ray.t * ray.d.z + ray.o.z;
@@ -99,8 +95,7 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.westb[c0];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       double y = ray.t * ray.d.y + ray.o.y;
       double z = ray.t * ray.d.z + ray.o.z;
@@ -112,8 +107,7 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.eastt[c1][c2];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       double y = ray.t * ray.d.y + ray.o.y;
       double z = ray.t * ray.d.z + ray.o.z;
@@ -125,8 +119,7 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.eastb[c1];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       double y = ray.t * ray.d.y + ray.o.y;
       double z = ray.t * ray.d.z + ray.o.z;
@@ -138,8 +131,7 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.southt[c0][c1];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       double x = ray.t * ray.d.x + ray.o.x;
       double y = ray.t * ray.d.y + ray.o.y;
@@ -151,8 +143,7 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.southb[c1];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       double x = ray.t * ray.d.x + ray.o.x;
       double y = ray.t * ray.d.y + ray.o.y;
@@ -164,8 +155,7 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.northt[c2][c3];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       double x = ray.t * ray.d.x + ray.o.x;
       double y = ray.t * ray.d.y + ray.o.y;
@@ -177,8 +167,7 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.northb[c2];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       double x = ray.t * ray.d.x + ray.o.x;
       double y = ray.t * ray.d.y + ray.o.y;

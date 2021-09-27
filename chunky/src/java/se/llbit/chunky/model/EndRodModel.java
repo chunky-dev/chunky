@@ -86,7 +86,7 @@ public class EndRodModel {
       if (quad.intersect(ray)) {
         Texture.endRod.getColor(ray);
         ray.t = ray.tNext;
-        ray.n.set(quad.n);
+        ray.setNormal(quad.n);
         hit = true;
       }
     }

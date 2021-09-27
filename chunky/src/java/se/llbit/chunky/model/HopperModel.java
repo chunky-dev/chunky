@@ -21,7 +21,6 @@ import se.llbit.chunky.world.BlockData;
 import se.llbit.math.AABB;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -78,7 +77,7 @@ public class HopperModel {
     ray.t = Double.POSITIVE_INFINITY;
     for (AABB box : boxes) {
       if (box.intersect(ray)) {
-        if (ray.n.y > 0) {
+        if (ray.getNormal().y > 0) {
           if (box == boxes[boxes.length - 1]) {
             Texture.hopperInside.getColor(ray);
           } else {
@@ -93,7 +92,7 @@ public class HopperModel {
       }
     }
     if (pipe[direction].intersect(ray)) {
-      if (ray.n.y > 0) {
+      if (ray.getNormal().y > 0) {
         Texture.hopperInside.getColor(ray);
       } else {
         Texture.hopperOutside.getColor(ray);
@@ -103,9 +102,8 @@ public class HopperModel {
       hit = true;
     }
     if (bottom.intersect(ray)) {
-      ray.n.set(bottom.n);
-      ray.n.scale(-QuickMath.signum(ray.d.dot(bottom.n)));
-      if (ray.n.y > 0) {
+      ray.orientNormal(bottom.n);
+      if (ray.getNormal().y > 0) {
         Texture.hopperInside.getColor(ray);
       } else {
         Texture.hopperOutside.getColor(ray);

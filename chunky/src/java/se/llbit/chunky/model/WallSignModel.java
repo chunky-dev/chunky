@@ -76,7 +76,7 @@ public class WallSignModel {
     for (Quad face : faces[ray.getBlockData() % 6]) {
       if (face.intersect(ray)) {
         Texture.oakPlanks.getColor(ray);
-        ray.n.set(face.n);
+        ray.setNormal(face.n);
         ray.t = ray.tNext;
         hit = true;
       }

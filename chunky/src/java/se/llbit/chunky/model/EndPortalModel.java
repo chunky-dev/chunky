@@ -32,8 +32,7 @@ public class EndPortalModel {
     ray.t = Double.POSITIVE_INFINITY;
     if (quad.intersect(ray)) {
       ray.color.set(0, 0, 0, 1);
-      ray.n.set(quad.n);
-      ray.n.scale(-QuickMath.signum(ray.d.dot(quad.n)));
+      ray.orientNormal(quad.n);
       ray.distance += ray.tNext;
       ray.o.scaleAdd(ray.tNext, ray.d);
       return true;

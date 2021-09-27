@@ -186,8 +186,7 @@ public class WaterModel {
         if (quad.intersect(ray)) {
           Texture.water.getAvgColorLinear(ray.color);
           ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
+          ray.orientNormal(quad.n);
           hit = true;
         }
       }
@@ -200,8 +199,7 @@ public class WaterModel {
 
     boolean hit = false;
     if (bot.intersect(ray)) {
-      ray.n.set(bot.n);
-      ray.n.scale(-QuickMath.signum(ray.d.dot(bot.n)));
+      ray.orientNormal(bot.n);
       ray.t = ray.tNext;
       hit = true;
     }
@@ -212,15 +210,13 @@ public class WaterModel {
     int c3 = (0xF & (data >> 28)) % 8;
     Triangle triangle = t012[c0][c1][c2];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       hit = true;
     }
     triangle = t230[c2][c3][c0];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       ray.u = 1 - ray.u;
       ray.v = 1 - ray.v;
@@ -228,15 +224,13 @@ public class WaterModel {
     }
     triangle = westt[c0][c3];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       hit = true;
     }
     triangle = westb[c0];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       ray.u = 1 - ray.u;
       ray.v = 1 - ray.v;
@@ -244,15 +238,13 @@ public class WaterModel {
     }
     triangle = eastt[c1][c2];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       hit = true;
     }
     triangle = eastb[c1];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       ray.u = 1 - ray.u;
       ray.v = 1 - ray.v;
@@ -260,15 +252,13 @@ public class WaterModel {
     }
     triangle = southt[c0][c1];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       hit = true;
     }
     triangle = southb[c1];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       ray.u = 1 - ray.u;
       ray.v = 1 - ray.v;
@@ -276,15 +266,13 @@ public class WaterModel {
     }
     triangle = northt[c2][c3];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       hit = true;
     }
     triangle = northb[c2];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       ray.u = 1 - ray.u;
       ray.v = 1 - ray.v;
@@ -310,15 +298,13 @@ public class WaterModel {
     int c3 = (0xF & (data >> 28)) % 8;
     Triangle triangle = t012[c0][c1][c2];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       hit = true;
     }
     triangle = t230[c2][c3][c0];
     if (triangle.intersect(ray)) {
-      ray.n.set(triangle.n);
-      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.orientNormal(triangle.n);
       ray.t = ray.tNext;
       ray.u = 1 - ray.u;
       ray.v = 1 - ray.v;
@@ -341,14 +327,15 @@ public class WaterModel {
     double z = ray.o.z / w - QuickMath.floor(ray.o.z / w);
     int u = (int) (x * normalMapW - Ray.EPSILON);
     int v = (int) ((1 - z) * normalMapW - Ray.EPSILON);
-    ray.n.set(normalMap[(u*normalMapW + v) * 2], .15f, normalMap[(u*normalMapW + v) * 2 + 1]);
+    Vector3 n = new Vector3(normalMap[(u*normalMapW + v) * 2], .15f, normalMap[(u*normalMapW + v) * 2 + 1]);
     w = (1 << 1);
     x = ray.o.x / w - QuickMath.floor(ray.o.x / w);
     z = ray.o.z / w - QuickMath.floor(ray.o.z / w);
     u = (int) (x * normalMapW - Ray.EPSILON);
     v = (int) ((1 - z) * normalMapW - Ray.EPSILON);
-    ray.n.x += normalMap[(u*normalMapW + v) * 2] / 2;
-    ray.n.z += normalMap[(u*normalMapW + v) * 2 + 1] / 2;
-    ray.n.normalize();
+    n.x += normalMap[(u*normalMapW + v) * 2] / 2;
+    n.z += normalMap[(u*normalMapW + v) * 2 + 1] / 2;
+    n.normalize();
+    ray.setShadingNormal(n.x, n.y, n.z);
   }
 }

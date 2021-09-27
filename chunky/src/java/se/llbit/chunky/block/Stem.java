@@ -54,8 +54,7 @@ public class Stem extends MinecraftBlockTranslucent {
           ray.color.y *= stemColor[age][1];
           ray.color.z *= stemColor[age][2];
           ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          ray.n.scale(-QuickMath.signum(ray.d.dot(quad.n)));
+          ray.orientNormal(quad.n);
           hit = true;
         }
       }

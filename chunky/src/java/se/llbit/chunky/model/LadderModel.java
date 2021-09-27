@@ -54,7 +54,7 @@ public class LadderModel {
       float[] color = Texture.ladder.getColor(ray.u, ray.v);
       if (color[3] > Ray.EPSILON) {
         ray.color.set(color);
-        ray.n.set(quad.n);
+        ray.setNormal(quad.n);
         ray.distance += ray.tNext;
         ray.o.scaleAdd(ray.tNext, ray.d);
         return true;

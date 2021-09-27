@@ -69,8 +69,7 @@ public class AttachedStem extends MinecraftBlockTranslucent {
           ray.color.y *= Stem.stemColor[7][1];
           ray.color.z *= Stem.stemColor[7][2];
           ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          ray.n.scale(-QuickMath.signum(ray.d.dot(quad.n)));
+          ray.orientNormal(quad.n);
           hit = true;
         }
       }
@@ -84,8 +83,7 @@ public class AttachedStem extends MinecraftBlockTranslucent {
         ray.color.y *= Stem.stemColor[7][1];
         ray.color.z *= Stem.stemColor[7][2];
         ray.t = ray.tNext;
-        ray.n.set(quad.n);
-        ray.n.scale(-QuickMath.signum(ray.d.dot(quad.n)));
+        ray.orientNormal(quad.n);
         hit = true;
       }
     }

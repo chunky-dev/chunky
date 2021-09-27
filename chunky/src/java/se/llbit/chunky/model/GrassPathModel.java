@@ -19,6 +19,7 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector3;
 
 public class GrassPathModel {
   private static AABB aabb = new AABB(0, 1, 0, 15 / 16., 0, 1);
@@ -26,9 +27,10 @@ public class GrassPathModel {
   public static boolean intersect(Ray ray) {
     ray.t = Double.POSITIVE_INFINITY;
     if (aabb.intersect(ray)) {
-      if (ray.n.y > 0) {
+      Vector3 n = ray.getNormal();
+      if (n.y > 0) {
         Texture.grassPathTop.getColor(ray);
-      } else if (ray.n.y < 0) {
+      } else if (n.y < 0) {
         Texture.dirt.getColor(ray);
       } else {
         Texture.grassPathSide.getColor(ray);

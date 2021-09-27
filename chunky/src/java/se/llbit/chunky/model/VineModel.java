@@ -99,8 +99,7 @@ public class VineModel {
             ray.color.y *= biomeColor[1];
             ray.color.z *= biomeColor[2];
             ray.t = ray.tNext;
-            ray.n.set(quad.n);
-            ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
+            ray.orientNormal(quad.n);
             hit = true;
           }
         }
@@ -118,13 +117,11 @@ public class VineModel {
           ray.color.y *= biomeColor[1];
           ray.color.z *= biomeColor[2];
           ray.t = ray.tNext;
-          ray.n.set(top.n);
-          ray.n.scale(QuickMath.signum(-ray.d.dot(top.n)));
+          ray.orientNormal(top.n);
           hit = true;
         }
       }
     }
-
     if (hit) {
       ray.distance += ray.t;
       ray.o.scaleAdd(ray.t, ray.d);

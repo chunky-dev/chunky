@@ -95,12 +95,12 @@ public class PathTracer implements RayTracer {
       Material currentMat = ray.getCurrentMaterial();
       Material prevMat = ray.getPrevMaterial();
 
-      if (!scene.stillWater && ray.n.y != 0 &&
+      if (!scene.stillWater && ray.getNormal().y != 0 &&
           ((currentMat.isWater() && prevMat == Air.INSTANCE)
               || (currentMat == Air.INSTANCE && prevMat.isWater()))) {
         WaterModel.doWaterDisplacement(ray);
         if (currentMat == Air.INSTANCE) {
-          ray.n.y = -ray.n.y;
+          ray.invertNormal();
         }
       }
 
@@ -199,13 +199,13 @@ public class PathTracer implements RayTracer {
               double directLightG = 0;
               double directLightB = 0;
 
-              boolean frontLight = reflected.d.dot(ray.n) > 0;
+              boolean frontLight = reflected.d.dot(ray.getNormal()) > 0;
 
               if (frontLight || (currentMat.subSurfaceScattering
                   && random.nextFloat() < Scene.fSubSurface)) {
 
                 if (!frontLight) {
-                  reflected.o.scaleAdd(-Ray.OFFSET, ray.n);
+                  reflected.o.scaleAdd(-Ray.OFFSET, ray.getNormal());
                 }
 
                 reflected.setCurrentMaterial(reflected.getPrevMaterial(), reflected.getPrevData());
@@ -214,7 +214,7 @@ public class PathTracer implements RayTracer {
 
                 Vector4 attenuation = state.attenuation;
                 if (attenuation.w > 0) {
-                  double mult = QuickMath.abs(reflected.d.dot(ray.n));
+                  double mult = QuickMath.abs(reflected.d.dot(ray.getNormal()));
                   directLightR = attenuation.x * attenuation.w * mult;
                   directLightG = attenuation.y * attenuation.w * mult;
                   directLightB = attenuation.z * attenuation.w * mult;
@@ -266,7 +266,7 @@ public class PathTracer implements RayTracer {
 
           // Refraction.
           float n1n2 = n1 / n2;
-          double cosTheta = -ray.n.dot(ray.d);
+          double cosTheta = -ray.getNormal().dot(ray.d);
           double radicand = 1 - n1n2 * n1n2 * (1 - cosTheta * cosTheta);
           if (doRefraction && radicand < Ray.EPSILON) {
             // Total internal reflection.
@@ -308,17 +308,27 @@ public class PathTracer implements RayTracer {
                 if (doRefraction) {
 
                   double t2 = FastMath.sqrt(radicand);
+                  Vector3 n = ray.getNormal();
                   if (cosTheta > 0) {
-                    refracted.d.x = n1n2 * ray.d.x + (n1n2 * cosTheta - t2) * ray.n.x;
-                    refracted.d.y = n1n2 * ray.d.y + (n1n2 * cosTheta - t2) * ray.n.y;
-                    refracted.d.z = n1n2 * ray.d.z + (n1n2 * cosTheta - t2) * ray.n.z;
+                    refracted.d.x = n1n2 * ray.d.x + (n1n2 * cosTheta - t2) * n.x;
+                    refracted.d.y = n1n2 * ray.d.y + (n1n2 * cosTheta - t2) * n.y;
+                    refracted.d.z = n1n2 * ray.d.z + (n1n2 * cosTheta - t2) * n.z;
                   } else {
-                    refracted.d.x = n1n2 * ray.d.x - (-n1n2 * cosTheta - t2) * ray.n.x;
-                    refracted.d.y = n1n2 * ray.d.y - (-n1n2 * cosTheta - t2) * ray.n.y;
-                    refracted.d.z = n1n2 * ray.d.z - (-n1n2 * cosTheta - t2) * ray.n.z;
+                    refracted.d.x = n1n2 * ray.d.x - (-n1n2 * cosTheta - t2) * n.x;
+                    refracted.d.y = n1n2 * ray.d.y - (-n1n2 * cosTheta - t2) * n.y;
+                    refracted.d.z = n1n2 * ray.d.z - (-n1n2 * cosTheta - t2) * n.z;
                   }
 
                   refracted.d.normalize();
+
+                  // See Ray.specularReflection for information on why this is needed
+                  // This is the same thing but for refraction instead of reflection
+                  // so this time we want the signs of the dot product to be the same
+                  if(QuickMath.signum(refracted.getGeometryNormal().dot(refracted.d)) != QuickMath.signum(refracted.getGeometryNormal().dot(ray.d))) {
+                    double factor = QuickMath.signum(refracted.getGeometryNormal().dot(ray.d)) * -Ray.EPSILON - refracted.d.dot(refracted.getGeometryNormal());
+                    refracted.d.scaleAdd(factor, refracted.getGeometryNormal());
+                    refracted.d.normalize();
+                  }
 
                   refracted.o.scaleAdd(Ray.OFFSET, refracted.d);
                 }
@@ -441,7 +451,7 @@ public class PathTracer implements RayTracer {
     emitterRay.d.sub(emitterRay.o);
     double distance = emitterRay.d.length();
     emitterRay.d.normalize();
-    double indirectEmitterCoef = emitterRay.d.dot(emitterRay.n);
+    double indirectEmitterCoef = emitterRay.d.dot(emitterRay.getNormal());
     if(indirectEmitterCoef > 0) {
       // Here We need to invert the material.
       // The fact that the dot product is > 0 guarantees that the ray is going away from the surface
