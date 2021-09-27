@@ -44,7 +44,7 @@ public class TexturedBlockModel {
     ray.t = Double.POSITIVE_INFINITY;
     if (block.intersect(ray)) {
       float[] color;
-      Vector3 n = ray.getN();
+      Vector3 n = ray.getNormal();
       if (n.z < 0) {
         color = texture[0].getColor(ray.u, ray.v);
       } else if (n.z > 0) {
@@ -81,7 +81,7 @@ public class TexturedBlockModel {
     ray.t = Double.POSITIVE_INFINITY;
     if (block.intersect(ray)) {
       float[] color;
-      Vector3 n = ray.getN();
+      Vector3 n = ray.getNormal();
       if (n.z < 0) {
         color = texture[index[0]].getColor(ray.u, ray.v);
       } else if (n.z > 0) {
@@ -153,7 +153,7 @@ public class TexturedBlockModel {
     int bx = (int) QuickMath.floor(ray.o.x);
     int by = (int) QuickMath.floor(ray.o.y);
     int bz = (int) QuickMath.floor(ray.o.z);
-    Vector3 n = ray.getN();
+    Vector3 n = ray.getNormal();
     if (n.y != 0) {
       ray.u = ray.o.x - bx;
       ray.v = ray.o.z - bz;

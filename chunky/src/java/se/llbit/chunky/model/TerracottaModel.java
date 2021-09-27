@@ -81,7 +81,7 @@ public class TerracottaModel {
       Quad face = faces[direction][i];
       if (face.intersect(ray)) {
         texture.getColor(ray);
-        ray.setN(face.n);
+        ray.setNormal(face.n);
         ray.t = ray.tNext;
         hit = true;
       }

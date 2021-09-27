@@ -49,7 +49,7 @@ public class NetherPortal extends MinecraftBlockTranslucent {
       return false;
     }
     texture.getColor(ray);
-    ray.setN(quad[axis].n);
+    ray.setNormal(quad[axis].n);
     ray.t = ray.tNext;
     ray.distance += ray.t;
     ray.o.scaleAdd(ray.t, ray.d);

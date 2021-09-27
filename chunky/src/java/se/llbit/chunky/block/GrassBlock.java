@@ -17,7 +17,7 @@ public class GrassBlock extends MinecraftBlock {
   @Override public boolean intersect(Ray ray, Scene scene) {
     ray.t = Double.POSITIVE_INFINITY;
     if (aabb.intersect(ray)) {
-      Vector3 n = ray.getN();
+      Vector3 n = ray.getNormal();
       if (n.y == -1) {
         // Bottom face.
         Texture.dirt.getColor(ray);

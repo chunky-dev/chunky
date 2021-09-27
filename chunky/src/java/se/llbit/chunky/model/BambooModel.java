@@ -168,7 +168,7 @@ public class BambooModel {
                 if (color[3] > Ray.EPSILON) {
                     ray.color.set(color);
                     ray.t = ray.tNext;
-                    ray.setN(quad.n);
+                    ray.setNormal(quad.n);
                     hit = true;
                 }
             }
@@ -182,7 +182,7 @@ public class BambooModel {
                     if (color[3] > Ray.EPSILON) {
                         ray.color.set(color);
                         ray.t = ray.tNext;
-                        ray.setN(quad.n);
+                        ray.setNormal(quad.n);
                         hit = true;
                     }
                 }
@@ -195,7 +195,7 @@ public class BambooModel {
                     if (color[3] > Ray.EPSILON) {
                         ray.color.set(color);
                         ray.t = ray.tNext;
-                        ray.setN(quad.n);
+                        ray.setNormal(quad.n);
                         hit = true;
                     }
                 }

@@ -336,6 +336,6 @@ public class WaterModel {
     n.x += normalMap[(u*normalMapW + v) * 2] / 2;
     n.z += normalMap[(u*normalMapW + v) * 2 + 1] / 2;
     n.normalize();
-    ray.setShadingN(n.x, n.y, n.z);
+    ray.setShadingNormal(n.x, n.y, n.z);
   }
 }

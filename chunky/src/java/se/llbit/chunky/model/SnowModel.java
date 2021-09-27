@@ -71,7 +71,7 @@ public class SnowModel {
     for (Quad quad : quads[layers - 1]) {
       if (quad.intersect(ray)) {
         Texture.snowBlock.getColor(ray);
-        ray.setN(quad.n);
+        ray.setNormal(quad.n);
         ray.t = ray.tNext;
         hit = true;
       }

@@ -94,7 +94,7 @@ public class SignPostModel {
       Quad side = rot[angle][i];
       if (side.intersect(ray)) {
         Texture.signPost.getColor(ray);
-        ray.setN(side.n);
+        ray.setNormal(side.n);
         ray.t = ray.tNext;
         hit = true;
       }

@@ -47,7 +47,7 @@ public class TripwireModel {
       float[] color = Texture.tripwire.getColor(ray.u, ray.v);
       if (color[3] > Ray.EPSILON) {
         ray.color.set(color);
-        ray.setN(quad.n);
+        ray.setNormal(quad.n);
         ray.distance += ray.tNext;
         ray.o.scaleAdd(ray.tNext, ray.d);
         return true;

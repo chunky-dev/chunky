@@ -88,14 +88,14 @@ public class GlassPaneModel {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     if (core.intersect(ray)) {
-      Vector3 n = ray.getN();
+      Vector3 n = ray.getNormal();
       if (n.y > 0 || n.y < 0) {
         topTexture.getColor(ray);
       } else {
         sideTexture.getColor(ray);
       }
       n.scale(-QuickMath.signum(ray.d.dot(n)));
-      ray.setN(n);
+      ray.setNormal(n);
       ray.t = ray.tNext;
       hit = true;
     }
@@ -109,7 +109,7 @@ public class GlassPaneModel {
             } else {
               topTexture.getColor(ray);
             }
-            ray.setN(quad.n);
+            ray.setNormal(quad.n);
             ray.t = ray.tNext;
             hit = true;
           }

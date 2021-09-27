@@ -208,7 +208,7 @@ public class TrapdoorModel {
         float[] color = texture.getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
-          ray.setN(face.n);
+          ray.setNormal(face.n);
           ray.t = ray.tNext;
           hit = true;
         }

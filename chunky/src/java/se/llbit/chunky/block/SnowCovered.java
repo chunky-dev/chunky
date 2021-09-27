@@ -18,7 +18,7 @@ public class SnowCovered extends MinecraftBlock {
     ray.t = Double.POSITIVE_INFINITY;
     boolean hit = block.intersect(ray, scene);
     if (hit) {
-      Vector3 n = ray.getN();
+      Vector3 n = ray.getNormal();
       if (n.y == 0) {
         Texture.snowSide.getColor(ray);
       } else if (n.y > 0) {

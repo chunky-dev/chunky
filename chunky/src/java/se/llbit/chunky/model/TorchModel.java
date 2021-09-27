@@ -126,7 +126,7 @@ public class TorchModel {
         float[] c = texture.getColor(ray.u, ray.v);
         if (c[3] > Ray.EPSILON) {
           color = c;
-          ray.setN(quad.n);
+          ray.setNormal(quad.n);
           ray.t = ray.tNext;
           hit = true;
         }

@@ -29,7 +29,7 @@ public class SaplingModel extends SpriteModel {
         float[] color = texture.getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
-          ray.setN(quad.n);
+          ray.setNormal(quad.n);
           ray.t = ray.tNext;
           hit = true;
         }

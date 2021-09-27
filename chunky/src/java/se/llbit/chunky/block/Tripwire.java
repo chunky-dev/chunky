@@ -389,7 +389,7 @@ public class Tripwire extends MinecraftBlockTranslucent {
     for (Quad quad : quads[connections]) {
       if (quad.intersect(ray)) {
         Texture.tripwire.getColor(ray);
-        ray.setN(quad.n);
+        ray.setNormal(quad.n);
         ray.t = ray.tNext;
         hit = true;
       }

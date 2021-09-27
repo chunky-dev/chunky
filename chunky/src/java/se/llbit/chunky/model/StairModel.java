@@ -165,7 +165,7 @@ public class StairModel {
   public static boolean intersect(Ray ray, Texture side, Texture top, Texture bottom) {
     boolean hit = intersect(ray, side);
     if (hit) {
-      Vector3 n = ray.getN();
+      Vector3 n = ray.getNormal();
       if (n.y > 0) {
         top.getColor(ray);
       } else if (n.y < 0) {
@@ -180,7 +180,7 @@ public class StairModel {
       int flipped, boolean isCorner, int corner, int rotation) {
     boolean hit = intersect(ray, side, flipped, isCorner, corner, rotation);
     if (hit) {
-      Vector3 n = ray.getN();
+      Vector3 n = ray.getNormal();
       if (n.y > 0) {
         top.getColor(ray);
       } else if (n.y < 0) {

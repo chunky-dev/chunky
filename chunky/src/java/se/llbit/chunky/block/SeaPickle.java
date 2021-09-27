@@ -730,7 +730,7 @@ public class SeaPickle extends MinecraftBlockTranslucent {
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
           texture.getColor(ray);
-          ray.setN(quad.n);
+          ray.setNormal(quad.n);
           ray.t = ray.tNext;
           hit = true;
         }
@@ -742,7 +742,7 @@ public class SeaPickle extends MinecraftBlockTranslucent {
           float[] color = texture.getColor(ray.u, ray.v);
           if (color[3] > Ray.EPSILON) {
             ray.color.set(color);
-            ray.setN(quad.n);
+            ray.setNormal(quad.n);
             ray.t = ray.tNext;
             hit = true;
           }

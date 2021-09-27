@@ -97,7 +97,7 @@ public class DirectionalBlockModel {
       Quad face = faces[direction][i];
       if (face.intersect(ray)) {
         textures[textureIndex[i]].getColor(ray);
-        ray.setN(face.n);
+        ray.setNormal(face.n);
         ray.t = ray.tNext;
         hit = true;
       }

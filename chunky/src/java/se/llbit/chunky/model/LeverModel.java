@@ -160,7 +160,7 @@ public class LeverModel {
     for (Quad quad : baseRotated[position][activated]) {
       if (quad.intersect(ray)) {
         Texture.cobblestone.getColor(ray);
-        ray.setN(quad.n);
+        ray.setNormal(quad.n);
         ray.t = ray.tNext;
         hit = true;
       }
@@ -169,7 +169,7 @@ public class LeverModel {
     for (Quad quad : leverRotated[position][activated]) {
       if (quad.intersect(ray)) {
         Texture.lever.getColor(ray);
-        ray.setN(quad.n);
+        ray.setNormal(quad.n);
         ray.t = ray.tNext;
         hit = true;
       }

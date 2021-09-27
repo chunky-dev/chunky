@@ -20,7 +20,6 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
@@ -159,7 +158,7 @@ public class CocoaPlantModel {
         tex[age].getColor(ray);
         ray.color.w = 1;
         ray.t = ray.tNext;
-        ray.setN(quad.n);
+        ray.setNormal(quad.n);
         hit = true;
       }
     }

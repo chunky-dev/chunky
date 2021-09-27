@@ -27,7 +27,7 @@ public class GrassPathModel {
   public static boolean intersect(Ray ray) {
     ray.t = Double.POSITIVE_INFINITY;
     if (aabb.intersect(ray)) {
-      Vector3 n = ray.getN();
+      Vector3 n = ray.getNormal();
       if (n.y > 0) {
         Texture.grassPathTop.getColor(ray);
       } else if (n.y < 0) {

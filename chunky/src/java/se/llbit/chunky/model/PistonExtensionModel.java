@@ -117,7 +117,7 @@ public class PistonExtensionModel {
       Quad side = rot[i];
       if (side.intersect(ray)) {
         texture[isSticky][i].getColor(ray);
-        ray.setN(side.n);
+        ray.setNormal(side.n);
         ray.t = ray.tNext;
         hit = true;
       }
