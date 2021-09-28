@@ -123,26 +123,6 @@
                                        <Insets left="20.0" />
                                     </padding>
                                  </Hyperlink>
-
-                                 <Hyperlink fx:id="javafx" text="JavaFX" />
-                                 <Hyperlink fx:id="javafxLicense" text="GPLv2 + ce">
-                                    <font>
-                                       <Font size="10.0" />
-                                    </font>
-                                    <padding>
-                                       <Insets left="20.0" />
-                                    </padding>
-                                 </Hyperlink>
-
-                                 <Hyperlink fx:id="openJdk" text="OpenJDK" />
-                                 <Hyperlink fx:id="openJdkLicense" text="GPLv2 + ce">
-                                    <font>
-                                       <Font size="10.0" />
-                                    </font>
-                                    <padding>
-                                       <Insets left="20.0" />
-                                    </padding>
-                                 </Hyperlink>
                               </children>
                               <padding>
                                  <Insets left="10.0" />

@@ -48,10 +48,6 @@ public class CreditsController implements Initializable {
   @FXML private Hyperlink fastMathLicense;
   @FXML private Hyperlink fastutil;
   @FXML private Hyperlink fastutilLicense;
-  @FXML private Hyperlink javafx;
-  @FXML private Hyperlink javafxLicense;
-  @FXML private Hyperlink openJdk;
-  @FXML private Hyperlink openJdkLicense;
 
   @FXML private VBox pluginBox;
   @FXML private ImageView logoImage;
@@ -118,16 +114,6 @@ public class CreditsController implements Initializable {
     fastutil.setOnAction(e -> launchAndReset(fastutil, "https://fastutil.di.unimi.it/"));
     fastutilLicense.setBorder(Border.EMPTY);
     fastutilLicense.setOnAction(e -> launchAndReset(fastutilLicense, "http://www.apache.org/licenses/LICENSE-2.0"));
-
-    javafx.setBorder(Border.EMPTY);
-    javafx.setOnAction(e -> launchAndReset(javafx, "https://openjfx.io/"));
-    javafxLicense.setBorder(Border.EMPTY);
-    javafxLicense.setOnAction(e -> launchAndReset(javafxLicense, "https://github.com/openjdk/jfx/blob/master/LICENSE"));
-
-    openJdk.setBorder(Border.EMPTY);
-    openJdk.setOnAction(e -> launchAndReset(openJdk, "https://openjdk.java.net/"));
-    openJdkLicense.setBorder(Border.EMPTY);
-    openJdkLicense.setOnAction(e -> launchAndReset(openJdkLicense, "https://openjdk.java.net/legal/gplv2+ce.html"));
 
     if (plugins.size() > 0) {
       plugins.forEach((key, item) -> pluginBox.getChildren().addAll(buildBox(item)));
