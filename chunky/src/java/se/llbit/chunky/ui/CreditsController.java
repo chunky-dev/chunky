@@ -48,8 +48,6 @@ public class CreditsController implements Initializable {
   @FXML private Hyperlink fastMathLicense;
   @FXML private Hyperlink fastutil;
   @FXML private Hyperlink fastutilLicense;
-  @FXML private Hyperlink javafx;
-  @FXML private Hyperlink javafxLicense;
 
   @FXML private VBox pluginBox;
   @FXML private ImageView logoImage;
@@ -117,22 +115,18 @@ public class CreditsController implements Initializable {
     fastutilLicense.setBorder(Border.EMPTY);
     fastutilLicense.setOnAction(e -> launchAndReset(fastutilLicense, "http://www.apache.org/licenses/LICENSE-2.0"));
 
-    javafx.setBorder(Border.EMPTY);
-    javafx.setOnAction(e -> launchAndReset(javafx, "https://openjfx.io/"));
-    javafxLicense.setBorder(Border.EMPTY);
-    javafxLicense.setOnAction(e -> launchAndReset(javafxLicense, "https://github.com/openjdk/jfx/blob/master/LICENSE"));
-
     if (plugins.size() > 0) {
       plugins.forEach((key, item) -> pluginBox.getChildren().addAll(buildBox(item)));
     } else {
-      Label label = new Label("You have no plugins installed!");
+      Label label = new Label("You have no plugins activated!");
       label.setPadding(new Insets(0, 0, 0 ,-10.0));
       pluginBox.getChildren().add(label);
-
-      Hyperlink pluginLink = new Hyperlink("Get some plugins here!");
-      pluginLink.setOnAction(e -> launchAndReset(pluginLink, "https://jackjt8.github.io/ChunkyGuide/docs/setup/plugins.html"));
-      pluginBox.getChildren().add(pluginLink);
     }
+
+    Hyperlink pluginLink = new Hyperlink("Get plugins here!");
+    pluginLink.setPadding(new Insets(0, 0, 0, -10.0));
+    pluginLink.setOnAction(e -> launchAndReset(pluginLink, "https://chunky-dev.github.io/docs/plugins/"));
+    pluginBox.getChildren().add(pluginLink);
   }
 
   public void setStage(Stage stage) {

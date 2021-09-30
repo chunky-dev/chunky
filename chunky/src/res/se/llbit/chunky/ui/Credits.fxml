@@ -58,13 +58,13 @@
                            </Label>
                            <VBox>
                               <children>
-                                 <Label text="a_Tom" />
-                                 <Label text="Redox (alexhliu)" />
+                                 <Label text="aTom3333" />
+                                 <Label text="ThatRedox" />
                                  <Label text="TOGoS" />
                                  <Label text="NotStirred" />
+                                 <Label text="IceSelkie" /> <!-- 11 commits with old email. https://discord.com/channels/541221265512464394/545374333883777037/879549715811819540 -->
                                  <Label text="jackjt8" />
-                                 <Label text="073TheBoss" />
-                                 <Label text="Ice Selkie (StanleyMines)" />
+                                 <Label text="ThisIsBrady" />
 
                                  <Hyperlink fx:id="ghContributors" text="Show more..." />
                               </children>
@@ -116,16 +116,6 @@
 
                                  <Hyperlink fx:id="fastutil" text="fastutil" />
                                  <Hyperlink fx:id="fastutilLicense" text="Apache License 2.0">
-                                    <font>
-                                       <Font size="10.0" />
-                                    </font>
-                                    <padding>
-                                       <Insets left="20.0" />
-                                    </padding>
-                                 </Hyperlink>
-
-                                 <Hyperlink fx:id="javafx" text="JavaFX" />
-                                 <Hyperlink fx:id="javafxLicense" text="GPLv2 + ce">
                                     <font>
                                        <Font size="10.0" />
                                     </font>
