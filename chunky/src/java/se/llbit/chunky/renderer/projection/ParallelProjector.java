@@ -24,11 +24,11 @@ import se.llbit.math.Vector3;
  * Casts parallel rays from different origin points on a plane
  */
 public class ParallelProjector implements Projector {
-  protected final double worldWidth;
+  protected final double worldDiagonalSize;
   protected final double fov;
 
-  public ParallelProjector(double worldWidth, double fov) {
-    this.worldWidth = worldWidth;
+  public ParallelProjector(double worldDiagonalSize, double fov) {
+    this.worldDiagonalSize = worldDiagonalSize;
     this.fov = fov;
   }
 
@@ -46,10 +46,10 @@ public class ParallelProjector implements Projector {
   }
 
   @Override public double getMaxRecommendedFoV() {
-    return worldWidth;
+    return worldDiagonalSize;
   }
 
   @Override public double getDefaultFoV() {
-    return worldWidth / 2;
+    return worldDiagonalSize / 2;
   }
 }
