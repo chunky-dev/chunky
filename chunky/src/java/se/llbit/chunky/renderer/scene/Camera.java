@@ -676,6 +676,9 @@ public class Camera implements JsonSerializable {
     if (!traceInScene.apply(ray)) {
       setDof(Double.POSITIVE_INFINITY);
     } else {
+      if(projectionMode == ProjectionMode.PARALLEL) {
+        ray.distance -= worldDiagonalSize;
+      }
       setSubjectDistance(ray.distance);
       setDof(ray.distance * ray.distance);
     }
