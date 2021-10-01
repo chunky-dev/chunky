@@ -44,6 +44,7 @@ import se.llbit.math.Vector3;
 import se.llbit.util.JsonSerializable;
 
 import java.util.Random;
+import java.util.function.Function;
 
 /**
  * Camera model for 3D rendering.
@@ -668,6 +669,16 @@ public class Camera implements JsonSerializable {
     pos.y += 1.6;
     updateTransform();
     onViewChange();
+  }
+
+  public void autoFocus(Function<Ray, Boolean> traceInScene) {
+    Ray ray = new Ray();
+    if (!traceInScene.apply(ray)) {
+      setDof(Double.POSITIVE_INFINITY);
+    } else {
+      setSubjectDistance(ray.distance);
+      setDof(ray.distance * ray.distance);
+    }
   }
 
   public void setDirectionListener(Runnable directionListener) {

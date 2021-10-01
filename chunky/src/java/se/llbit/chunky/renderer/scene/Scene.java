@@ -1707,13 +1707,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Perform auto focus.
    */
   public void autoFocus() {
-    Ray ray = new Ray();
-    if (!traceTarget(ray)) {
-      camera.setDof(Double.POSITIVE_INFINITY);
-    } else {
-      camera.setSubjectDistance(ray.distance);
-      camera.setDof(ray.distance * ray.distance);
-    }
+    camera.autoFocus(this::traceTarget);
   }
 
   /**
