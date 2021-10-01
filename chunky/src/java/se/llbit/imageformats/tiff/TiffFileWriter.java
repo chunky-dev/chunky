@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.tiff;
+package se.llbit.imageformats.tiff;
 
 import java.io.DataOutputStream;
 import java.io.File;
