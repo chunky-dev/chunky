@@ -3,7 +3,7 @@ package se.llbit.chunky.renderer.export;
 import java.io.IOException;
 import java.io.OutputStream;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.tiff.TiffFileWriter;
+import se.llbit.imageformats.tiff.TiffFileWriter;
 import se.llbit.util.TaskTracker;
 
 /**

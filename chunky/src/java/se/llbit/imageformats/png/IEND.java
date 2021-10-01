@@ -14,48 +14,51 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.png;
+package se.llbit.imageformats.png;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * A PNG chunk
+ * A PNG IEND chunk.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public abstract class PngChunk {
+public class IEND extends PngChunk {
 
   /**
-   * Write the chunk to an output stream.
-   *
-   * @param out the stream to write the chunk to.
+   * The PNG chunk type identifier
+   */
+  public static final int CHUNK_TYPE = 0x49454E44;
+  private int crc;
+
+  /**
    * @throws IOException
    */
-  public void writeChunk(DataOutputStream out) throws IOException {
-    out.writeInt(getChunkLength());
-    out.writeInt(getChunkType());
-    if (getChunkLength() > 0) {
-      writeChunkData(out);
+  public IEND() throws IOException {
+    try (
+      CrcOutputStream crcOutputStream = new CrcOutputStream();
+      DataOutputStream crcOut = new DataOutputStream(crcOutputStream)
+    ) {
+      crcOut.writeInt(CHUNK_TYPE);
+      crc = crcOutputStream.getCRC();
     }
-    out.writeInt(getChunkCRC());
   }
 
-  protected abstract void writeChunkData(DataOutputStream out) throws IOException;
+  @Override public int getChunkType() {
+    return CHUNK_TYPE;
+  }
 
-  /**
-   * @return The chunk length, in bytes
-   */
-  public abstract int getChunkLength();
+  @Override protected void writeChunkData(DataOutputStream out) throws IOException {
+  }
 
-  /**
-   * @return The chunk type identifier
-   */
-  public abstract int getChunkType();
+  @Override public int getChunkLength() {
+    return 0;
+  }
 
-  /**
-   * @return The chunk CRC
-   */
-  public abstract int getChunkCRC();
+  @Override public int getChunkCRC() {
+    return crc;
+  }
+
 
 }

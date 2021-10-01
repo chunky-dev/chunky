@@ -5,8 +5,8 @@ import java.io.OutputStream;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.png.ITXT;
-import se.llbit.png.PngFileWriter;
+import se.llbit.imageformats.png.ITXT;
+import se.llbit.imageformats.png.PngFileWriter;
 import se.llbit.util.TaskTracker;
 
 /**

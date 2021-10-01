@@ -1,6 +1,5 @@
-package se.llbit.pfm;
+package se.llbit.imageformats.pfm;
 
-import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 

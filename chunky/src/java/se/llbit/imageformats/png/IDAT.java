@@ -14,38 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.png;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.zip.CRC32;
+package se.llbit.imageformats.png;
 
 /**
- * Calculate CRC of the written data.
+ * PNG IDAT chunk constants.
  *
- * @author Jesper Öqvist (jesper@llbit.se)
+ * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class CrcOutputStream extends OutputStream {
+public interface IDAT {
 
-  CRC32 crc = new CRC32();
+  /** PNG chunk type ID. */
+  int CHUNK_TYPE = 0x49444154;
 
-  @Override public void write(int b) throws IOException {
-    crc.update(b);
-  }
-
-  @Override public void write(byte[] b, int off, int len) throws IOException {
-    crc.update(b, off, len);
-  }
-
-  @Override public void write(byte[] b) throws IOException {
-    crc.update(b);
-  }
-
-  /**
-   * @return The calculated CRC value
-   */
-  public int getCRC() {
-    return (int) crc.getValue();
-  }
-
+  /** The filter type for no filter. */
+  int FILTER_TYPE_NONE = 0;
 }
