@@ -479,7 +479,7 @@ public class CommandLineOptions {
   }
 
   private void printUsage() {
-    System.out.println("Chunky " + Version.getVersion());
+    System.out.println("Chunky " + Version.getVersion() + ", Copyright (c) 2010-2021 Jesper Oqvist and Chunky Contributors");
     System.out.println(USAGE);
     System.out.println();
   }
