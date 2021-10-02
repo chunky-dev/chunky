@@ -480,6 +480,9 @@ public class CommandLineOptions {
 
   private void printUsage() {
     System.out.println("Chunky " + Version.getVersion() + ", Copyright (c) 2010-2021 Jesper Oqvist and Chunky Contributors");
+    System.out.println("Chunky comes with ABSOLUTELY NO WARRANTY. " +
+        "This is free software, \nand you are welcome to redistribute it under certain conditions.\n" +
+        "See the GNU General Public License v3 for more details.\n");
     System.out.println(USAGE);
     System.out.println();
   }
