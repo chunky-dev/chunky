@@ -31,7 +31,7 @@ public class RenderWorkerPool {
   /**
    * Sleep interval (in ms).
    */
-  private static final int SLEEP_INTERVAL = 10;
+  private static final int MIN_SLEEP_TIME = 100;
   private static final long MAX_SLEEP_TIME = 1000;
 
   public interface Factory {
@@ -45,6 +45,7 @@ public class RenderWorkerPool {
     public final int id;
 
     private long lastSleep;
+    private long sleepTime = 0;
 
     public RenderWorker(RenderWorkerPool pool, int id, long seed) {
       super("3D Render Worker " + id);
@@ -60,29 +61,38 @@ public class RenderWorkerPool {
      * Sleep to manage CPU usage.
      */
     public void workSleep() throws InterruptedException {
-      long workTime = System.currentTimeMillis() - lastSleep;
-      if (workTime > SLEEP_INTERVAL) {
-        if (pool.cpuLoad < 100) {
-          double load = (100.0 - pool.cpuLoad) / pool.cpuLoad;
-          sleep(Math.min((long) (workTime * load), MAX_SLEEP_TIME));
+      if (pool.cpuLoad < 100) {
+        long workTime = System.currentTimeMillis() - lastSleep;
+        double load = (100.0 - pool.cpuLoad) / pool.cpuLoad;
+        double sleepTime = workTime * load;
+
+        if (sleepTime > MIN_SLEEP_TIME) {
+            Thread.sleep(Math.min((long) sleepTime, MAX_SLEEP_TIME));
+            lastSleep = System.currentTimeMillis();
         }
-        lastSleep = System.currentTimeMillis();
       }
     }
 
     /**
-     * Reset the sleep interval. Call this if the worker has spent a long time waiting.
-     * For example:
-     * <pre>
-     *    worker.workSleep()
-     *    synchronized(monitor) {
-     *      monitor.wait();
-     *    }
-     *    worker.resetSleep();
-     * </pre>
+     * Reset the sleep interval.
      */
     public void resetSleep() {
       lastSleep = System.currentTimeMillis();
+    }
+
+    /**
+     * Pause the sleep interval.
+     */
+    public void pauseSleep() {
+      sleepTime += System.currentTimeMillis() - lastSleep;
+    }
+
+    /**
+     * Resume the sleep interval.
+     */
+    public void resumeSleep() {
+      lastSleep = System.currentTimeMillis() - sleepTime;
+      sleepTime = 0;
     }
 
     @Override
@@ -118,13 +128,13 @@ public class RenderWorkerPool {
   }
 
   private void work(RenderWorker worker) throws Throwable {
+    worker.pauseSleep();
     synchronized (workQueue) {
       while (workQueue.isEmpty()) {
         workQueue.wait();
       }
     }
-
-    worker.resetSleep();
+    worker.resumeSleep();
 
     RenderJobFuture task = workQueue.poll();
     if (task == null) return;
