@@ -27,8 +27,9 @@ import javafx.scene.control.Tooltip;
  * A control for editing numeric values with a slider and text field.
  */
 public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
-  private final Slider valueSlider = new Slider();
   private static final double LOG_ARG_MIN = 0.01; // Lower limit for logarithm argument.
+
+  private final Slider valueSlider = new Slider();
   private double logScaleStart = LOG_ARG_MIN; 
   private double min = 0; // TODO: handle minimum.
   private double max = 100;
@@ -78,14 +79,17 @@ public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
    */
   public void makeLogarithmic() {
     logarithmic = true;
-    valueSlider.setMin(0); // In logarithmic case, slider value is always from 0 to 100.
+
+    // In logarithmic case, slider value is always from 0 to 100.
+    valueSlider.setMin(0);
     valueSlider.setMax(100);
+
     DoubleProperty sliderValue = new SimpleDoubleProperty();
     ChangeListener<Number> sliderListener = (observable, oldValue, newValue) -> {
       double result;
       if (maxInfinity && newValue.doubleValue() > 99.9) {
         result = Double.POSITIVE_INFINITY;
-      } else if (newValue.doubleValue() < logScaleStart) {
+      } else if (newValue.doubleValue() < 0.1) {
         result = min; // Set value to lowest number.
       } else {
         double logMin = Math.log(logScaleStart);
