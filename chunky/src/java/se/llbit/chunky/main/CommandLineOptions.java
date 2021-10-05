@@ -1,4 +1,6 @@
-/* Copyright (c) 2014 Jesper Öqvist <jesper@llbit.se>
+/*
+ * Copyright (c) 2014 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -42,6 +44,7 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -123,31 +126,59 @@ public class CommandLineOptions {
     }
   }
 
-  static class ArgumentError extends Exception {
-    public ArgumentError(String message) {
+  static class InvalidCommandLineArgumentsException extends IllegalArgumentException {
+    public InvalidCommandLineArgumentsException(String message) {
       super(message);
     }
   }
 
   static class OptionHandler {
     private final String flag;
-    private final Range numOptions;
+    private final Range optionRange;
+    private final BitSet numericOptionsFlags;
     private final Consumer<List<String>> consumer;
     private final Runnable errorHandler;
 
-    public OptionHandler(String flag, Range numOptions, Consumer<List<String>> consumer) {
+    public OptionHandler(
+      String flag,
+      Range optionRange,
+      int[] numericOptionsIndices,
+      Consumer<List<String>> consumer,
+      Runnable errorHandler
+    ) {
       this.flag = flag;
-      this.numOptions = numOptions;
-      this.consumer = consumer;
-      errorHandler = null;
-    }
-
-    public OptionHandler(String flag, Range numOptions, Consumer<List<String>> consumer,
-        Runnable errorHandler) {
-      this.flag = flag;
-      this.numOptions = numOptions;
+      this.optionRange = optionRange;
       this.consumer = consumer;
       this.errorHandler = errorHandler;
+      this.numericOptionsFlags = new BitSet(optionRange.end);
+      for(int index : numericOptionsIndices) {
+        if(index > optionRange.end) {
+          throw new IndexOutOfBoundsException("Numeric option index out of option range");
+        }
+        numericOptionsFlags.set(index);
+      }
+    }
+
+    public OptionHandler(
+      String flag,
+      Range optionRange,
+      int[] numericOptionsIndices,
+      Consumer<List<String>> consumer
+    ) {
+      this(flag, optionRange, numericOptionsIndices, consumer, null);
+    }
+
+    public OptionHandler(
+      String flag,
+      Range optionRange,
+      Consumer<List<String>> consumer,
+      Runnable errorHandler
+    ) {
+      this(flag, optionRange, new int[0], consumer, errorHandler);
+    }
+
+    public OptionHandler(String flag, Range optionRange, Consumer<List<String>> consumer) {
+      this(flag, optionRange, consumer, null);
     }
 
     /**
@@ -155,28 +186,44 @@ public class CommandLineOptions {
      *
      * @param args the arguments after the current option
      * @return the remaining arguments after removing those used by this option
-     * @throws ArgumentError
+     * @throws InvalidCommandLineArgumentsException
      */
-    List<String> handle(List<String> args) throws ArgumentError {
-      List<String> arguments = new LinkedList<>(args);  // Create local copy to avoid side effects.
+    List<String> handle(List<String> args) throws InvalidCommandLineArgumentsException {
+      LinkedList<String> arguments = new LinkedList<>(args);  // Create local copy to avoid side effects.
       List<String> optionArguments = new ArrayList<>();
-      for (int i = 0; i < numOptions.end; i += 1) {
-        if (arguments.isEmpty() || arguments.get(0).startsWith("-")) {
-          if (i >= numOptions.start) {
-            // We don't need to have the maximum number of options.
-            break;
-          }
-          if (errorHandler != null) {
-            errorHandler.run();
-            // Skip handling the rest of the command line.
-            return Collections.emptyList();
-          } else {
-            throw new ArgumentError(String.format(
-                "Missing argument for %s option. Found %d arguments, expected %d.",
-                flag, i, numOptions.start));
+      // gather all option arguments up to the next option or until we have the maximum possible amount
+      for (int i = 0; i < optionRange.end; i += 1) {
+        if(!arguments.isEmpty()) {
+          String currentArg = arguments.peek();
+          if(!currentArg.startsWith("-")) {
+            // not an option, therefore must be an argument
+            optionArguments.add(arguments.pop());
+            continue;
+          } else if(numericOptionsFlags.get(i)) {
+            // option can be numeric at this position - we'll validate, that it indeed is a number
+            try {
+              double ignored = Double.parseDouble(currentArg);
+              optionArguments.add(arguments.pop());
+              continue;
+            } catch(NumberFormatException ignored) {
+              // looks like this is the following option - error handling below
+            }
           }
         }
-        optionArguments.add(arguments.remove(0));
+        if (i >= optionRange.start) {
+          // we don't need to have the maximum number of options
+          break;
+        }
+        if (errorHandler != null) {
+          errorHandler.run();
+          // skip handling the rest of the command line
+          return Collections.emptyList();
+        } else {
+          throw new InvalidCommandLineArgumentsException(String.format(
+            "Missing argument for %s option. Found %d arguments, expected %d.",
+            flag, i, optionRange.start
+          ));
+        }
       }
       consumer.accept(new ArrayList<>(optionArguments));  // Create copy to avoid side effects.
       return arguments;
@@ -251,7 +298,7 @@ public class CommandLineOptions {
       printAvailableScenes();
     });
 
-    registerOption("-set", new Range(2, 3), arguments -> {
+    registerOption("-set", new Range(2, 3), new int[]{1}, arguments -> {
       mode = Mode.NOTHING;
       if (arguments.size() == 3) {
         options.sceneName = arguments.get(2);
@@ -406,7 +453,7 @@ public class CommandLineOptions {
       if (optionHandlers.containsKey(argument)) {
         try {
           arguments = optionHandlers.get(argument).handle(arguments);
-        } catch (ArgumentError error) {
+        } catch (InvalidCommandLineArgumentsException error) {
           System.err.println(error.getMessage());
           printUsage();
           configurationError = true;
@@ -444,6 +491,12 @@ public class CommandLineOptions {
   /** Register an option handler for a single flag. */
   private void registerOption(String flag, Range numOptions, Consumer<List<String>> consumer) {
     OptionHandler handler = new OptionHandler(flag, numOptions, consumer);
+    optionHandlers.put(flag, handler);
+  }
+
+  /** Register an option handler for a single flag with numeric options. */
+  private void registerOption(String flag, Range numOptions, int[] numericOptionsIndices, Consumer<List<String>> consumer) {
+    OptionHandler handler = new OptionHandler(flag, numOptions, numericOptionsIndices, consumer);
     optionHandlers.put(flag, handler);
   }
 
