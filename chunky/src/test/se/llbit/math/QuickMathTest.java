@@ -26,7 +26,7 @@ import org.junit.Test;
  * TODO test +-0.0 parameters
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class TestQuickMath {
+public class QuickMathTest {
 
 	/**
 	 * Test double precision minimum.

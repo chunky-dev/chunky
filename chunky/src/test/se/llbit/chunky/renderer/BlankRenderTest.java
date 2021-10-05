@@ -39,7 +39,7 @@ import static org.junit.Assert.fail;
  * The tests render using a small canvas size and with
  * only two samples per pixel.
  */
-public class TestBlankRender {
+public class BlankRenderTest {
   private static final int WIDTH = Math.max(10, Scene.MIN_CANVAS_WIDTH);
   private static final int HEIGHT = Math.max(10, Scene.MIN_CANVAS_HEIGHT);
 

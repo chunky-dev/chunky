@@ -9,7 +9,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Tests to ensure that the NBT library works.
  */
-public class TestNBT {
+public class NBTTest {
   @Test public void testEqualTags() {
     CompoundTag tag1 = new CompoundTag();
     tag1.add("Name", new StringTag("minecraft:stone"));

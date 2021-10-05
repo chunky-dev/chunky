@@ -23,7 +23,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class TestGroupedChangeListener {
+public class GroupedChangeListenerTest {
   @Test public void testRecursive() {
     BooleanProperty p1 = new SimpleBooleanProperty(false);
     BooleanProperty p2 = new SimpleBooleanProperty(false);

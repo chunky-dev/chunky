@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Test entity marshalling/unmarshalling to/from JSON.
  */
-public class TestMarshalling {
+public class MarshallingTest {
   @Test public void testPlayer() {
     PlayerEntity entity = new PlayerEntity("1234", new Vector3(100, 200, 300));
     JsonArray headPose = new JsonArray();

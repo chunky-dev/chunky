@@ -19,7 +19,7 @@ package se.llbit.chunky.renderer.scene;
 
 import org.junit.Test;
 
-public class TestScene {
+public class SceneTest {
   /**
    * Test that modifying material properties does not throw an exception.
    *

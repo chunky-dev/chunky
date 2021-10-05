@@ -24,7 +24,7 @@ import org.junit.Test;
  * Test scene name sanitizing
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class TestSceneManager {
+public class SceneManagerTest {
 	/**
 	 * Sensitive characters are replaced by underscore
 	 */

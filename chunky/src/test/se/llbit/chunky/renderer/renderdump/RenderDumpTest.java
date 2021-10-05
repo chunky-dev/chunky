@@ -34,7 +34,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class RenderDumpTests {
+public class RenderDumpTest {
   protected static final int testWidth = Scene.MIN_CANVAS_WIDTH;
   protected static final int testHeight = Scene.MIN_CANVAS_HEIGHT;
   protected static final int testSPP = 100;
@@ -95,16 +95,16 @@ public class RenderDumpTests {
   }
 
   @Test
-  public void loadClassicFormatDumpTest() throws IOException {
-    loadDumpTest("classicFormatDump");
+  public void testLoadClassicFormatDump() throws IOException {
+    testLoadDump("classicFormatDump");
   }
 
   @Test
-  public void loadCompressedFloatFormatDumpTest() throws IOException {
-    loadDumpTest("compressedFloatFormatDump");
+  public void testLoadCompressedFloatFormatDump() throws IOException {
+    testLoadDump("compressedFloatFormatDump");
   }
 
-  private void loadDumpTest(String dumpName) throws IOException {
+  private void testLoadDump(String dumpName) throws IOException {
     Scene scene = createTestScene(testWidth, testHeight, 0, 0);
     ByteArrayInputStream inputStream = new ByteArrayInputStream(getTestDump(dumpName));
     RenderDump.load(inputStream, scene, taskTracker);
@@ -114,16 +114,16 @@ public class RenderDumpTests {
   }
 
   @Test
-  public void mergeClassicFormatDumpTest() throws IOException {
-    mergeDumpTest("classicFormatDump");
+  public void testMergeClassicFormatDump() throws IOException {
+    testMergeDump("classicFormatDump");
   }
 
   @Test
-  public void mergeCompressedFloatFormatDumpTest() throws IOException {
-    mergeDumpTest("compressedFloatFormatDump");
+  public void testMergeCompressedFloatFormatDump() throws IOException {
+    testMergeDump("compressedFloatFormatDump");
   }
 
-  public void mergeDumpTest(String dumpName) throws IOException {
+  public void testMergeDump(String dumpName) throws IOException {
     int spp = 100;
     long renderTime = 123456L;
     double[] preMergeSamples = {0.5, 1.0, 2.0, 0.5, 1.0, 2.0, 2.0, 1.5, 2.5};
@@ -143,11 +143,11 @@ public class RenderDumpTests {
    * it is currently not expected to write the old format (but it would be possible)
    */
   @Test
-  public void saveCompressedFloatFormatDumpTest() throws IOException {
-    saveDumpTest("compressedFloatFormatDump");
+  public void testSaveCompressedFloatFormatDump() throws IOException {
+    testSaveDump("compressedFloatFormatDump");
   }
 
-  public void saveDumpTest(String dumpName) throws IOException {
+  public void testSaveDump(String dumpName) throws IOException {
     Scene scene = createTestScene(testWidth, testHeight, testSPP, testRenderTime);
     System.arraycopy(testSampleBuffer, 0, scene.getSampleBuffer(), 0, testSampleBuffer.length);
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
