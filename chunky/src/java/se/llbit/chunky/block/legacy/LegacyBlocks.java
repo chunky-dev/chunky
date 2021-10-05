@@ -410,7 +410,7 @@ public class LegacyBlocks {
       case 44: {
         boolean both = id == 43;
         boolean top = (data & 0x8) != 0;
-        switch (data) {
+        switch (data & 0b111) {
           default:
           case 0: return slabTag(nameTag(tag, "smooth_stone_slab"), both, top);
           case 1: return slabTag(nameTag(tag, "sandstone_slab"), both, top);
@@ -503,7 +503,7 @@ public class LegacyBlocks {
       case 126: {
         boolean both = id == 125;
         boolean top = (data & 0x8) != 0;
-        switch (data) {
+        switch (data & 0b111) {
           default:
           case 0: return slabTag(nameTag(tag, "oak_slab"), both, top);
           case 1: return slabTag(nameTag(tag, "spruce_slab"), both, top);
