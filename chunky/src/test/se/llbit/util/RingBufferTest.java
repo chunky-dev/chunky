@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
-public class TestRingBuffer {
+public class RingBufferTest {
 	@Test
 	public void testEmpty() {
 		assertTrue(new RingBuffer<Integer>(10).isEmpty());

@@ -28,7 +28,7 @@ import java.util.function.Consumer;
 /**
  * Tests for thread liveness issues in the renderer.
  */
-public class TestDeadlock {
+public class DeadlockTest {
   private static final int WIDTH = Math.max(10, Scene.MIN_CANVAS_WIDTH);
   private static final int HEIGHT = Math.max(10, Scene.MIN_CANVAS_HEIGHT);
 

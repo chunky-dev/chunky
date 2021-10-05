@@ -6,7 +6,7 @@ import se.llbit.nbt.StringTag;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestBlockPalette {
+public class BlockPaletteTest {
   // Test that the block palette reuses existing blocks with the same tag data.
   @Test public void testBlockReuse() {
     CompoundTag t1 = new CompoundTag();

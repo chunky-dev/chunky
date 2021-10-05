@@ -31,7 +31,7 @@ import static com.google.common.truth.Truth.assertThat;
 /**
  * Tests for the logging utility class.
  */
-public class TestLog {
+public class LogTest {
   @Rule public ExpectedException thrown = ExpectedException.none();
 
   private final static Receiver DO_NOTHING_RECEIVER = new Receiver() {
