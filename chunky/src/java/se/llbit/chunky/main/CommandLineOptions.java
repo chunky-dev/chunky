@@ -125,8 +125,8 @@ public class CommandLineOptions {
     }
   }
 
-  static class ArgumentError extends Exception {
-    public ArgumentError(String message) {
+  static class InvalidCommandLineArgumentsException extends IllegalArgumentException {
+    public InvalidCommandLineArgumentsException(String message) {
       super(message);
     }
   }
@@ -157,9 +157,9 @@ public class CommandLineOptions {
      *
      * @param args the arguments after the current option
      * @return the remaining arguments after removing those used by this option
-     * @throws ArgumentError
+     * @throws InvalidCommandLineArgumentsException
      */
-    List<String> handle(List<String> args) throws ArgumentError {
+    List<String> handle(List<String> args) throws InvalidCommandLineArgumentsException {
       List<String> arguments = new LinkedList<>(args);  // Create local copy to avoid side effects.
       List<String> optionArguments = new ArrayList<>();
       for (int i = 0; i < numOptions.end; i += 1) {
@@ -408,7 +408,7 @@ public class CommandLineOptions {
       if (optionHandlers.containsKey(argument)) {
         try {
           arguments = optionHandlers.get(argument).handle(arguments);
-        } catch (ArgumentError error) {
+        } catch (InvalidCommandLineArgumentsException error) {
           System.err.println(error.getMessage());
           printUsage();
           configurationError = true;

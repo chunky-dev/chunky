@@ -19,7 +19,7 @@
 package se.llbit.chunky.main;
 
 import org.junit.Test;
-import se.llbit.chunky.main.CommandLineOptions.ArgumentError;
+import se.llbit.chunky.main.CommandLineOptions.InvalidCommandLineArgumentsException;
 import se.llbit.chunky.main.CommandLineOptions.OptionHandler;
 import se.llbit.chunky.main.CommandLineOptions.Range;
 
@@ -48,83 +48,65 @@ public class OptionHandlerTest {
     assertThat(arguments).hasSize(2);
   }
 
-  @Test public void testNoArg1() throws ArgumentError {
-    OptionHandler handler = new OptionHandler("-bart", new Range(0), arguments -> {});
-    List<String> extraArgs = handler.handle(Collections.emptyList());
-    assertThat(extraArgs).isEmpty();
-  }
+  @Test public void testOptionWithNoArgument() throws InvalidCommandLineArgumentsException {
+    OptionHandler handler1 = new OptionHandler("-bart", new Range(0), arguments -> {});
+    List<String> extraArgs1 = handler1.handle(Collections.emptyList());
+    assertThat(extraArgs1).isEmpty();
 
-  @Test public void testNoArg2() throws ArgumentError {
-    OptionHandler handler = new OptionHandler("-bart", new Range(0), arguments -> {});
+    OptionHandler handler2 = new OptionHandler("-bart", new Range(0), arguments -> {});
     // Extra arguments are ignored.
-    List<String> extraArgs = handler.handle(Arrays.asList("foo", "bar", "bork", "bork", "-spork"));
-    assertThat(extraArgs).containsExactly("foo", "bar", "bork", "bork", "-spork");
+    List<String> extraArgs2 = handler2.handle(Arrays.asList("foo", "bar", "bork", "bork", "-spork"));
+    assertThat(extraArgs2).containsExactly("foo", "bar", "bork", "bork", "-spork");
   }
 
-  @Test public void testOneArg1() throws ArgumentError {
-    OptionHandler handler = new OptionHandler("-bart", new Range(1), arguments -> {});
-    List<String> extraArgs = handler.handle(Collections.singletonList("foo"));
-    assertThat(extraArgs).isEmpty();
-  }
+  @Test public void testOptionWithOneArgument() throws InvalidCommandLineArgumentsException {
+    OptionHandler handler1 = new OptionHandler("-bart", new Range(1), arguments -> {});
+    List<String> extraArgs1 = handler1.handle(Collections.singletonList("foo"));
+    assertThat(extraArgs1).isEmpty();
 
-  @Test public void testOneArg2() throws ArgumentError {
-    OptionHandler handler = new OptionHandler("-bart", new Range(1), this::expectBart);
-    List<String> extraArgs = handler.handle(Arrays.asList("bart", "foo"));
-    assertThat(extraArgs).containsExactly("foo");
-  }
-
-  /** Test an option that accepts 0 to 2 arguments. */
-  @Test public void testArgRange1() throws ArgumentError {
-    OptionHandler handler = new OptionHandler("-bart", new Range(0, 2), this::expectNone);
-    List<String> extraArgs = handler.handle(Collections.emptyList());
-    assertThat(extraArgs).isEmpty();
+    OptionHandler handler2 = new OptionHandler("-bart", new Range(1), this::expectBart);
+    List<String> extraArgs2 = handler2.handle(Arrays.asList("bart", "foo"));
+    assertThat(extraArgs2).containsExactly("foo");
   }
 
   /** Test an option that accepts 0 to 2 arguments. */
-  @Test public void testArgRange2() throws ArgumentError {
-    OptionHandler handler = new OptionHandler("-bart", new Range(0, 2), this::expectOne);
-    List<String> extraArgs = handler.handle(Collections.singletonList("foo"));
-    assertThat(extraArgs).isEmpty();
+  @Test public void testOptionArgumentRanges() throws InvalidCommandLineArgumentsException {
+    OptionHandler handler1 = new OptionHandler("-bart", new Range(0, 2), this::expectNone);
+    List<String> extraArgs1 = handler1.handle(Collections.emptyList());
+    assertThat(extraArgs1).isEmpty();
+
+    OptionHandler handler2 = new OptionHandler("-bart", new Range(0, 2), this::expectOne);
+    List<String> extraArgs2 = handler2.handle(Collections.singletonList("foo"));
+    assertThat(extraArgs2).isEmpty();
+
+    OptionHandler handler3 = new OptionHandler("-bart", new Range(0, 2), this::expectTwo);
+    List<String> extraArgs3 = handler3.handle(Arrays.asList("bart", "foo"));
+    assertThat(extraArgs3).isEmpty();
+
+    OptionHandler handler4 = new OptionHandler("-bart", new Range(0, 2), this::expectOne);
+    List<String> extraArgs4 = handler4.handle(Arrays.asList("foo", "-foo"));
+    assertThat(extraArgs4).containsExactly("-foo");
+
+    OptionHandler handler5 = new OptionHandler("-bart", new Range(0, 2), this::expectTwo);
+    List<String> extraArgs5 = handler5.handle(Arrays.asList("baz", "foo", "-foo", "bar"));
+    assertThat(extraArgs5).containsExactly("-foo", "bar");
   }
 
-  /** Test an option that accepts 0 to 2 arguments. */
-  @Test public void testArgRange3() throws ArgumentError {
-    OptionHandler handler = new OptionHandler("-bart", new Range(0, 2), this::expectTwo);
-    List<String> extraArgs = handler.handle(Arrays.asList("bart", "foo"));
-    assertThat(extraArgs).isEmpty();
-  }
-
-  /** Test an option that accepts 0 to 2 arguments. */
-  @Test public void testArgRange4() throws ArgumentError {
-    OptionHandler handler = new OptionHandler("-bart", new Range(0, 2), this::expectOne);
-    List<String> extraArgs = handler.handle(Arrays.asList("foo", "-foo"));
-    assertThat(extraArgs).containsExactly("-foo");
-  }
-
-  /** Test an option that accepts 0 to 2 arguments. */
-  @Test public void testArgRange5() throws ArgumentError {
-    OptionHandler handler = new OptionHandler("-bart", new Range(0, 2), this::expectTwo);
-    List<String> extraArgs = handler.handle(Arrays.asList("baz", "foo", "-foo", "bar"));
-    assertThat(extraArgs).containsExactly("-foo", "bar");
-  }
-
-  /** Test missing option argument. */
-  @Test(expected = ArgumentError.class)
-  public void testError01() throws ArgumentError {
+  @Test(expected = IllegalArgumentException.class)
+  public void testError_NoOptionGiven() throws InvalidCommandLineArgumentsException {
     OptionHandler handler = new OptionHandler("-bart", new Range(1), arguments -> {});
     handler.handle(Collections.emptyList());
   }
 
-  /** Test missing option argument. */
-  @Test(expected = ArgumentError.class)
-  public void testError1() throws ArgumentError {
+  @Test(expected = IllegalArgumentException.class)
+  public void testError_WrongOptionGiven() throws InvalidCommandLineArgumentsException {
     OptionHandler handler = new OptionHandler("-bart", new Range(1), arguments -> {});
     // The -bort argument is treated as a separate option.
     handler.handle(Collections.singletonList("-bort"));
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testError02() throws ArgumentError {
+  public void testError_ArgumentInsteadOfOptionGiven() throws InvalidCommandLineArgumentsException {
     OptionHandler handler = new OptionHandler("-bart", new Range(1), this::expectBart);
     handler.handle(Collections.singletonList("bort"));
   }
