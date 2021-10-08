@@ -44,6 +44,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -88,6 +89,7 @@ import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.DeleteChunksJob;
+import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
 import se.llbit.fx.ToolPane;
@@ -338,6 +340,19 @@ public class ChunkyFxController
         refreshSettings();
         guiUpdateLatch.countDown();
         getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
+        World newWorld = scene.getWorld();
+        if (newWorld != EmptyWorld.INSTANCE && !mapLoader.getWorld()
+            .getWorldDirectory().equals(newWorld.getWorldDirectory())) {
+          Alert loadWorldConfirm = Dialogs.createAlert(AlertType.CONFIRMATION);
+          loadWorldConfirm.getButtonTypes().clear();
+          loadWorldConfirm.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
+          loadWorldConfirm.setTitle("Load scene world");
+          loadWorldConfirm.setContentText(
+              "This scene shows a different world than the one that is currently loaded. Do you want to load the world of this scene?");
+          if (loadWorldConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
+            mapLoader.loadWorld(newWorld.getWorldDirectory());
+          }
+        }
       });
       new Thread(() -> {
         try {
