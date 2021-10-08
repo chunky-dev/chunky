@@ -341,8 +341,9 @@ public class ChunkyFxController
         guiUpdateLatch.countDown();
         getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
         World newWorld = scene.getWorld();
-        if (newWorld != EmptyWorld.INSTANCE && !mapLoader.getWorld()
-            .getWorldDirectory().equals(newWorld.getWorldDirectory())) {
+        if (newWorld != EmptyWorld.INSTANCE
+          && mapLoader.getWorld() != EmptyWorld.INSTANCE
+          && !mapLoader.getWorld().getWorldDirectory().equals(newWorld.getWorldDirectory())) {
           Alert loadWorldConfirm = Dialogs.createAlert(AlertType.CONFIRMATION);
           loadWorldConfirm.getButtonTypes().clear();
           loadWorldConfirm.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
