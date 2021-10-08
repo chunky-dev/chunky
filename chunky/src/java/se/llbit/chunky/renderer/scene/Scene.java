@@ -581,6 +581,7 @@ public class Scene implements JsonSerializable, Refreshable {
       // Load the configured skymap file.
       sky.loadSkymap();
 
+      loadedWorld = EmptyWorld.INSTANCE;
       if (!worldPath.isEmpty()) {
         File worldDirectory = new File(worldPath);
         if (World.isWorldDir(worldDirectory)) {
@@ -3348,5 +3349,12 @@ public class Scene implements JsonSerializable, Refreshable {
   @PluginApi
   public JsonValue getAdditionalData(String name) {
     return additionalData.get(name);
+  }
+
+  /**
+   * Get the world of this scene, or EmptyWorld.INSTANCE if it is unknown.
+   */
+  public World getWorld() {
+    return loadedWorld;
   }
 }
