@@ -280,6 +280,8 @@ public class Scene implements JsonSerializable, Refreshable {
   private Octree worldOctree;
   private Octree waterOctree;
 
+  private EntityLoadingPreferences entityLoadingPreferences = new EntityLoadingPreferences();
+
   /**
    * Entities in the scene.
    */
@@ -444,6 +446,7 @@ public class Scene implements JsonSerializable, Refreshable {
       worldOctree = other.worldOctree;
       waterOctree = other.waterOctree;
       entities = other.entities;
+      entityLoadingPreferences = other.entityLoadingPreferences;
       actors.clear();
       actors.addAll(other.actors); // Create a copy so that entity changes can be reset.
       actors.trimToSize();
@@ -1023,13 +1026,13 @@ public class Scene implements JsonSerializable, Refreshable {
 
             if (y >= yClipMin && y < yClipMax) {
               String id = tag.get("id").stringValue("");
-              if (id.equals("minecraft:painting") || id.equals("Painting")) {
+              if ((id.equals("minecraft:painting") || id.equals("Painting")) && entityLoadingPreferences.shouldLoadClass(PaintingEntity.class)) {
                 // Before 1.12 paintings had id=Painting.
                 // After 1.12 paintings had id=minecraft:painting.
                 float yaw = tag.get("Rotation").get(0).floatValue();
                 entities.add(
-                    new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
-              } else if (id.equals("minecraft:armor_stand")) {
+                        new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
+              } else if (id.equals("minecraft:armor_stand") && entityLoadingPreferences.shouldLoadClass(ArmorStand.class)) {
                 actors.add(new ArmorStand(new Vector3(x, y, z), tag));
               }
             }
@@ -1074,37 +1077,39 @@ public class Scene implements JsonSerializable, Refreshable {
                     Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
                     Entity entity = block.toEntity(position);
 
-                    if(entity instanceof Poseable && !(entity instanceof Lectern && !((Lectern) entity).hasBook())) {
-                      // don't add the actor again if it was already loaded from json
-                      if(actors.stream().noneMatch(actor -> {
-                        if(actor.getClass().equals(entity.getClass())) {
-                          Vector3 distance = new Vector3(actor.position);
-                          distance.sub(entity.position);
-                          return distance.lengthSquared() < Ray.EPSILON;
+                    if (entityLoadingPreferences.shouldLoad(entity)) {
+                      if(entity instanceof Poseable && !(entity instanceof Lectern && !((Lectern) entity).hasBook())) {
+                        // don't add the actor again if it was already loaded from json
+                        if(actors.stream().noneMatch(actor -> {
+                          if(actor.getClass().equals(entity.getClass())) {
+                            Vector3 distance = new Vector3(actor.position);
+                            distance.sub(entity.position);
+                            return distance.lengthSquared() < Ray.EPSILON;
+                          }
+                          return false;
+                        })) {
+                          actors.add(entity);
                         }
-                        return false;
-                      })) {
-                        actors.add(entity);
-                      }
-                    } else {
-                      entities.add(entity);
-                      if(emitterGrid != null) {
-                        for(Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
-                          emitterPos.x -= origin.x;
-                          emitterPos.y -= origin.y;
-                          emitterPos.z -= origin.z;
-                          emitterGrid.addEmitter(emitterPos);
-                        }
-                      }
-                    }
-
-                    if(!block.isBlockWithEntity()) {
-                      if(block.waterlogged) {
-                        block = palette.water;
-                        octNode = palette.waterId;
                       } else {
-                        block = Air.INSTANCE;
-                        octNode = palette.airId;
+                        entities.add(entity);
+                        if (emitterGrid != null) {
+                          for (Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
+                            emitterPos.x -= origin.x;
+                            emitterPos.y -= origin.y;
+                            emitterPos.z -= origin.z;
+                            emitterGrid.addEmitter(emitterPos);
+                          }
+                        }
+                      }
+
+                      if(!block.isBlockWithEntity()) {
+                        if(block.waterlogged) {
+                          block = palette.water;
+                          octNode = palette.waterId;
+                        } else {
+                          block = Air.INSTANCE;
+                          octNode = palette.airId;
+                        }
                       }
                     }
                   }
@@ -1268,26 +1273,29 @@ public class Scene implements JsonSerializable, Refreshable {
               if (blockEntity == null) {
                 continue;
               }
-              if (blockEntity instanceof Poseable) {
-                // don't add the actor again if it was already loaded from json
-                if (actors.stream().noneMatch(actor -> {
-                  if (actor.getClass().equals(blockEntity.getClass())) {
-                    Vector3 distance = new Vector3(actor.position);
-                    distance.sub(blockEntity.position);
-                    return distance.lengthSquared() < Ray.EPSILON;
+
+              if (entityLoadingPreferences.shouldLoad(blockEntity)) {
+                if (blockEntity instanceof Poseable) {
+                  // don't add the actor again if it was already loaded from json
+                  if (actors.stream().noneMatch(actor -> {
+                    if (actor.getClass().equals(blockEntity.getClass())) {
+                      Vector3 distance = new Vector3(actor.position);
+                      distance.sub(blockEntity.position);
+                      return distance.lengthSquared() < Ray.EPSILON;
+                    }
+                    return false;
+                  })) {
+                    actors.add(blockEntity);
                   }
-                  return false;
-                })) {
-                  actors.add(blockEntity);
-                }
-              } else {
-                entities.add(blockEntity);
-                if(emitterGrid != null) {
-                  for(Grid.EmitterPosition emitterPos : blockEntity.getEmitterPosition()) {
-                    emitterPos.x -= origin.x;
-                    emitterPos.y -= origin.y;
-                    emitterPos.z -= origin.z;
-                    emitterGrid.addEmitter(emitterPos);
+                } else {
+                  entities.add(blockEntity);
+                  if (emitterGrid != null) {
+                    for (Grid.EmitterPosition emitterPos : blockEntity.getEmitterPosition()) {
+                      emitterPos.x -= origin.x;
+                      emitterPos.y -= origin.y;
+                      emitterPos.z -= origin.z;
+                      emitterGrid.addEmitter(emitterPos);
+                    }
                   }
                 }
               }
@@ -2636,6 +2644,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (!actorArray.isEmpty()) {
       json.add("actors", actorArray);
     }
+    json.add("entityLoadingPreferences", entityLoadingPreferences.toJson());
     json.add("octreeImplementation", octreeImplementation);
     json.add("bvhImplementation", bvhImplementation);
     json.add("emitterSamplingStrategy", emitterSamplingStrategy.name());
@@ -2671,6 +2680,10 @@ public class Scene implements JsonSerializable, Refreshable {
     setResetReason(ResetReason.SCENE_LOADED);
     sdfVersion = json.get("sdfVersion").intValue(-1);
     name = json.get("name").stringValue("default");
+  }
+
+  public EntityLoadingPreferences getEntityLoadingPreferences() {
+    return entityLoadingPreferences;
   }
 
   public Collection<Entity> getEntities() {
@@ -2957,6 +2970,7 @@ public class Scene implements JsonSerializable, Refreshable {
         actors.add(entity);
       }
     }
+    entityLoadingPreferences.fromJson(json.get("entityLoadingPreferences"));
 
     actors.trimToSize();
     entities.trimToSize();

@@ -2,6 +2,8 @@ package se.llbit.chunky.entity;
 
 import java.util.Collection;
 import java.util.LinkedList;
+
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.material.TextureMaterial;
