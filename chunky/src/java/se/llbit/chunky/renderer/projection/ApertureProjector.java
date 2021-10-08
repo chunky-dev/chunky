@@ -18,6 +18,7 @@ package se.llbit.chunky.renderer.projection;
 
 import java.util.Random;
 
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 /**
@@ -33,8 +34,8 @@ public class ApertureProjector implements Projector {
 
   public ApertureProjector(Projector wrapped, double apertureSize, double subjectDistance) {
     this.wrapped = wrapped;
-    this.aperture = apertureSize;
-    this.subjectDistance = subjectDistance;
+    this.aperture = Math.max(apertureSize, Ray.EPSILON);
+    this.subjectDistance = Math.max(subjectDistance, Ray.EPSILON);
   }
 
   @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
