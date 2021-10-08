@@ -112,7 +112,6 @@ import se.llbit.util.mojangapi.PlayerSkin;
  * are also kept for when a snapshot should be rendered.
  */
 public class Scene implements JsonSerializable, Refreshable {
-
   public static final int DEFAULT_DUMP_FREQUENCY = 500;
   public static final String EXTENSION = ".json";
 
@@ -174,6 +173,8 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public static final PostProcessingFilter DEFAULT_POSTPROCESSING_FILTER = PostProcessingFilters
       .getPostProcessingFilterFromId("GAMMA").orElse(PostProcessingFilters.NONE);
+
+  private static boolean invalidWarn = false;
 
   protected final Sky sky = new Sky(this);
   protected final Camera camera = new Camera(this);
@@ -735,6 +736,19 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public boolean intersect(Ray ray) {
     boolean hit = false;
+
+    if (Double.isNaN(ray.d.x) || Double.isNaN(ray.d.y) || Double.isNaN(ray.d.z) ||
+        (ray.d.x == 0 && ray.d.y == 0 && ray.d.z == 0)) {
+      if (!invalidWarn) {
+        Log.warnf("Invalid ray with direction (%f, %f, %f).\n" +
+            "This is a bug! Please report it at:\n" +
+            "    https://github.com/chunky-dev/chunky/issues/",
+            ray.d.x, ray.d.y, ray.d.z);
+        invalidWarn = true;
+      }
+      ray.d.set(0, 1, 0);
+    }
+
     if (bvh.closestIntersection(ray)) {
       hit = true;
     }
