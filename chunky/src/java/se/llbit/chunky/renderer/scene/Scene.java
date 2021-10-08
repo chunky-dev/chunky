@@ -174,7 +174,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public static final PostProcessingFilter DEFAULT_POSTPROCESSING_FILTER = PostProcessingFilters
       .getPostProcessingFilterFromId("GAMMA").orElse(PostProcessingFilters.NONE);
 
-  private static boolean invalid_warn = false;
+  private static boolean invalidWarn = false;
 
   protected final Sky sky = new Sky(this);
   protected final Camera camera = new Camera(this);
@@ -735,12 +735,12 @@ public class Scene implements JsonSerializable, Refreshable {
 
     if (Double.isNaN(ray.d.x) || Double.isNaN(ray.d.y) || Double.isNaN(ray.d.z) ||
         (ray.d.x == 0 && ray.d.y == 0 && ray.d.z == 0)) {
-      if (!Scene.invalid_warn) {
+      if (!invalidWarn) {
         Log.warnf("Invalid ray with direction (%f, %f, %f).\n" +
             "This is a bug! Please report it at:\n" +
             "    https://github.com/chunky-dev/chunky/issues/",
             ray.d.x, ray.d.y, ray.d.z);
-        Scene.invalid_warn = true;
+        invalidWarn = true;
       }
       ray.d.set(0, 1, 0);
     }
