@@ -259,13 +259,14 @@ public class LegacyBlocks {
         boolTag(tag, "powered", (data&8) != 0);
         return tag;
       case 219: return facingTag(nameTag(tag, "white_shulker_box"), data);
-      case 221: return facingTag(nameTag(tag, "orange_shulker_box"), data);
-      case 222: return facingTag(nameTag(tag, "magenta_shulker_box"), data);
-      case 223: return facingTag(nameTag(tag, "light_blue_shulker_box"), data);
-      case 224: return facingTag(nameTag(tag, "yellow_shulker_box"), data);
-      case 225: return facingTag(nameTag(tag, "lime_shulker_box"), data);
-      case 226: return facingTag(nameTag(tag, "pink_shulker_box"), data);
-      case 227: return facingTag(nameTag(tag, "gray_shulker_box"), data);
+      case 220: return facingTag(nameTag(tag, "orange_shulker_box"), data);
+      case 221: return facingTag(nameTag(tag, "magenta_shulker_box"), data);
+      case 222: return facingTag(nameTag(tag, "light_blue_shulker_box"), data);
+      case 223: return facingTag(nameTag(tag, "yellow_shulker_box"), data);
+      case 224: return facingTag(nameTag(tag, "lime_shulker_box"), data);
+      case 225: return facingTag(nameTag(tag, "pink_shulker_box"), data);
+      case 226: return facingTag(nameTag(tag, "gray_shulker_box"), data);
+      case 227: return facingTag(nameTag(tag, "light_gray_shulker_box"), data);
       case 228: return facingTag(nameTag(tag, "cyan_shulker_box"), data);
       case 229: return facingTag(nameTag(tag, "purple_shulker_box"), data);
       case 230: return facingTag(nameTag(tag, "blue_shulker_box"), data);
@@ -409,7 +410,7 @@ public class LegacyBlocks {
       case 44: {
         boolean both = id == 43;
         boolean top = (data & 0x8) != 0;
-        switch (data) {
+        switch (data & 0b111) {
           default:
           case 0: return slabTag(nameTag(tag, "smooth_stone_slab"), both, top);
           case 1: return slabTag(nameTag(tag, "sandstone_slab"), both, top);
@@ -502,7 +503,7 @@ public class LegacyBlocks {
       case 126: {
         boolean both = id == 125;
         boolean top = (data & 0x8) != 0;
-        switch (data) {
+        switch (data & 0b111) {
           default:
           case 0: return slabTag(nameTag(tag, "oak_slab"), both, top);
           case 1: return slabTag(nameTag(tag, "spruce_slab"), both, top);
