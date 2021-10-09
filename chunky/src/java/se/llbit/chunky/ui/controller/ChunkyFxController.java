@@ -142,19 +142,10 @@ public class ChunkyFxController
   @FXML private Tab mapViewTab;
   @FXML private Tab chunksTab;
   @FXML private Tab optionsTab;
-  @FXML private Tab aboutTab;
   @FXML private Button editResourcePacks;
   @FXML private CheckBox singleColorBtn;
   @FXML private CheckBox disableDefaultTexturesBtn;
   @FXML private CheckBox showLauncherBtn;
-  @FXML private Hyperlink documentationLink;
-  @FXML private Hyperlink originalDocumentationLink;
-  @FXML private Hyperlink gitHubLink;
-  @FXML private Hyperlink issueTrackerLink;
-  @FXML private Hyperlink forumLink;
-  @FXML private Hyperlink discordLink;
-  @FXML private Hyperlink guideLink;
-  @FXML private Button creditsBtn;
   @FXML private DoubleTextField xPosition;
   @FXML private DoubleTextField zPosition;
   @FXML private Button deleteChunksBtn;
@@ -170,6 +161,7 @@ public class ChunkyFxController
   @FXML private MenuItem saveScene;
   @FXML private MenuItem saveSceneAs;
   @FXML private MenuItem loadScene;
+  @FXML private MenuItem creditsMenuItem;
 
   @FXML private ProgressBar progressBar;
   @FXML private Label progressLbl;
@@ -577,7 +569,7 @@ public class ChunkyFxController
       }
     });
 
-    creditsBtn.setOnAction(e -> {
+    creditsMenuItem.setOnAction(e -> {
       try {
         Credits credits = new Credits();
         credits.show();
@@ -589,13 +581,11 @@ public class ChunkyFxController
     mapViewTab.setGraphic(new ImageView(Icon.map.fxImage()));
     chunksTab.setGraphic(new ImageView(Icon.mapSelected.fxImage()));
     optionsTab.setGraphic(new ImageView(Icon.wrench.fxImage()));
-    aboutTab.setGraphic(new ImageView(Icon.question.fxImage()));
 
     Collection<Tab> javaFxTabs = new ArrayList<>();
     javaFxTabs.add(mapViewTab);
     javaFxTabs.add(chunksTab);
     javaFxTabs.add(optionsTab);
-    javaFxTabs.add(aboutTab);
     // Call the hook to let plugins add their tabs.
     javaFxTabs = chunky.getMainTabTransformer().apply(javaFxTabs);
     mapTabs.getTabs().setAll(javaFxTabs);
@@ -745,29 +735,6 @@ public class ChunkyFxController
     saveDefaultSpp.setTooltip(new Tooltip("Make the current SPP target the default."));
     saveDefaultSpp.setOnAction(e ->
         PersistentSettings.setSppTargetDefault(scene.getTargetSpp()));
-  }
-
-  public void setApplication(Application app) {
-    documentationLink.setOnAction(
-        e -> app.getHostServices().showDocument("https://lemaik.github.io/chunky"));
-
-    originalDocumentationLink.setOnAction(
-        e -> app.getHostServices().showDocument("http://chunky.llbit.se"));
-
-    issueTrackerLink.setOnAction(
-        e -> app.getHostServices().showDocument("https://github.com/llbit/chunky/issues"));
-
-    gitHubLink.setOnAction(
-        e -> app.getHostServices().showDocument("https://github.com/llbit/chunky"));
-
-    forumLink.setOnAction(
-        e -> app.getHostServices().showDocument("https://www.reddit.com/r/chunky"));
-
-    discordLink.setOnAction(
-        e -> app.getHostServices().showDocument("https://discord.com/invite/VqcHpsF"));
-
-    guideLink.setOnAction(
-        e -> app.getHostServices().showDocument("https://jackjt8.github.io/ChunkyGuide/"));
   }
 
   public void openSceneChooser() {

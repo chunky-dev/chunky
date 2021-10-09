@@ -56,7 +56,6 @@ public class ChunkyFx extends Application {
       Parent root = loader.load();
       Scene scene = new Scene(root);
       stage.setScene(scene);
-      controller.setApplication(this);
       stage.getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
       stage.setOnCloseRequest(event -> {
         PersistentSettings.setWindowPosition(new WindowPosition(stage));
