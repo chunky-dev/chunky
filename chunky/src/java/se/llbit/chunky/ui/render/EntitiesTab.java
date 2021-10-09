@@ -24,9 +24,7 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Consumer;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -39,7 +37,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.BeaconBeam;
 import se.llbit.chunky.entity.Book;
@@ -55,6 +52,7 @@ import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.IntegerTextField;
 import se.llbit.chunky.ui.RenderControlsFxController;
+import se.llbit.chunky.ui.SkinDownloadPopup;
 import se.llbit.chunky.world.material.BeaconBeamMaterial;
 import se.llbit.fx.LuxColorPicker;
 import se.llbit.json.Json;
@@ -62,6 +60,7 @@ import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Vector3;
+import se.llbit.util.mojangapi.MojangApi;
 
 public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initializable {
 
@@ -211,7 +210,24 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
             scene.rebuildActorBvh();
           }
         });
-        skinBox.getChildren().addAll(new Label("Skin:"), skinField, selectSkin);
+        Button downloadSkin = new Button("Download Skin");
+        downloadSkin.setOnAction(e -> {
+          try {
+            //Callback will only be called if a valid uuid/username is inputted
+            SkinDownloadPopup popup = new SkinDownloadPopup( s -> {
+              if(s != null) {
+                String filePath = MojangApi.downloadSkin(s.getUrl()).getAbsolutePath();
+                player.setTexture(filePath);
+                skinField.setText(filePath);
+                scene.rebuildActorBvh();
+              }
+            });
+            popup.show(controls.getScene().getWindow());
+          } catch (IOException ex) {
+            ex.printStackTrace();
+          }
+        });
+        skinBox.getChildren().addAll(new Label("Skin:"), skinField, selectSkin, downloadSkin);
 
         CheckBox showOuterLayer = new CheckBox("Show second layer");
         showOuterLayer.setSelected(player.showOuterLayer);
