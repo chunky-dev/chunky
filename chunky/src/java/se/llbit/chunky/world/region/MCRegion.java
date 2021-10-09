@@ -130,7 +130,7 @@ public class MCRegion implements Region {
     try (RandomAccessFile file = new RandomAccessFile(regionFile, "r")) {
       long length = file.length();
       if (length < 2 * SECTOR_SIZE) {
-        System.err.println("Missing header in region file!");
+        Log.warn("Missing header in region file!");
         return;
       }
 
@@ -158,7 +158,7 @@ public class MCRegion implements Region {
 
       world.regionUpdated(position);
     } catch (IOException e) {
-      System.err.println("Failed to read region: " + e.getMessage());
+      Log.warn("Failed to read region: " + e.getMessage());
     }
   }
 
