@@ -33,7 +33,7 @@ public class Credits extends Stage {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("Credits.fxml"));
     Parent root = loader.load();
     CreditsController controller = loader.getController();
-    setTitle("Chunky Credits");
+    setTitle("About Chunky");
     setScene(new Scene(root));
     this.resizableProperty().setValue(false);
     controller.setStage(this);

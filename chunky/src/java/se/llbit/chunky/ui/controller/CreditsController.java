@@ -21,6 +21,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -31,6 +32,7 @@ import javafx.scene.layout.Border;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.ui.ChunkyFx;
 import se.llbit.json.JsonObject;
@@ -43,6 +45,8 @@ import java.util.*;
 import java.util.function.Supplier;
 
 public class CreditsController implements Initializable {
+  @FXML private Label version;
+  @FXML private Hyperlink gplv3;
   @FXML private Hyperlink markdown;
   @FXML private Hyperlink markdownLicense;
   @FXML private Hyperlink fastMath;
@@ -57,6 +61,7 @@ public class CreditsController implements Initializable {
   @FXML private VBox pluginBox;
   @FXML private ImageView logoImage;
   @FXML private Hyperlink ghContributors;
+  @FXML private Button closeButton;
 
   public static final Map<String, Pair<JsonObject, Supplier<List<Node>>>> plugins = new HashMap<>();
 
@@ -101,6 +106,12 @@ public class CreditsController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     logoImage.setImage(new Image(getClass().getResourceAsStream("/se/llbit/chunky/ui/chunky.png")));
+
+    version.setText(Chunky.getMainWindowTitle());
+
+    gplv3.setOnAction(
+        e -> launchAndReset(gplv3, "https://github.com/chunky-dev/chunky/blob/master/LICENSE")
+    );
 
     ghContributors.setBorder(Border.EMPTY);
     ghContributors.setOnAction(e -> launchAndReset(ghContributors, "https://github.com/chunky-dev/chunky/graphs/contributors"));
@@ -150,6 +161,8 @@ public class CreditsController implements Initializable {
         stage.close();
       }
     });
+
+    closeButton.setOnAction(e -> stage.close());
   }
 
   private void launchAndReset(Hyperlink link, String url) {
