@@ -24,6 +24,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -157,13 +158,6 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     });
     loadSelection.setDisable(chunkSelection.size() == 0);
 
-    chunkSelection.addSelectionListener(() -> {
-      boolean noChunksSelected = chunkSelection.size() == 0;
-      clearSelection.setDisable(noChunksSelected);
-      newScene.setDisable(noChunksSelected);
-      loadSelection.setDisable(noChunksSelected);
-    });
-
     moveCameraHere.setOnAction(event -> {
       ChunkView theView = new ChunkView(view);  // Make thread-local copy.
       double scale = theView.scale;
@@ -181,8 +175,35 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       }
     });
 
-    contextMenu.getItems()
-        .addAll(newScene, loadSelection, clearSelection, moveCameraHere, selectVisible);
+    MenuItem exportZip = new MenuItem("Export chunks as zip file…");
+    exportZip.setOnAction(e -> controller.exportZip());
+    exportZip.setDisable(chunkSelection.size() == 0);
+
+    MenuItem exportPng = new MenuItem("Save map view as…");
+    exportPng.setOnAction(e -> controller.exportMapView());
+
+    MenuItem deleteChunks = new MenuItem("Delete selected chunks");
+    deleteChunks.setGraphic(new ImageView(Icon.tntSide.fxImage()));
+    deleteChunks.setOnAction(e -> controller.promptDeleteSelectedChunks());
+    deleteChunks.setDisable(chunkSelection.size() == 0);
+
+    contextMenu.getItems().addAll(
+        newScene, loadSelection, clearSelection,
+        new SeparatorMenuItem(),
+        moveCameraHere, selectVisible,
+        new SeparatorMenuItem(),
+        exportZip, exportPng,
+        new SeparatorMenuItem(),
+        deleteChunks);
+
+    chunkSelection.addSelectionListener(() -> {
+      boolean noChunksSelected = chunkSelection.size() == 0;
+      clearSelection.setDisable(noChunksSelected);
+      newScene.setDisable(noChunksSelected);
+      loadSelection.setDisable(noChunksSelected);
+      exportZip.setDisable(noChunksSelected);
+      deleteChunks.setDisable(noChunksSelected);
+    });
   }
 
   @Override public void chunkUpdated(ChunkPosition chunk) {

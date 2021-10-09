@@ -128,7 +128,6 @@ public class ChunkyFxController
   @FXML private Label mapName;
   @FXML private MenuItem menuExit;
   @FXML private ToolPane renderControls;
-  @FXML private Button clearSelectionBtn;
   @FXML private Button changeWorldBtn;
   @FXML private Button reloadWorldBtn;
   @FXML private ToggleButton overworldBtn;
@@ -140,7 +139,6 @@ public class ChunkyFxController
   @FXML private ToggleButton trackPlayerBtn;
   @FXML private ToggleButton trackCameraBtn;
   @FXML private Tab mapViewTab;
-  @FXML private Tab chunksTab;
   @FXML private Tab optionsTab;
   @FXML private Button editResourcePacks;
   @FXML private CheckBox singleColorBtn;
@@ -148,9 +146,6 @@ public class ChunkyFxController
   @FXML private CheckBox showLauncherBtn;
   @FXML private DoubleTextField xPosition;
   @FXML private DoubleTextField zPosition;
-  @FXML private Button deleteChunksBtn;
-  @FXML private Button exportZipBtn;
-  @FXML private Button renderPngBtn;
   @FXML private StackPane mapPane;
   @FXML private SplitPane splitPane;
   @FXML private TabPane mapTabs;
@@ -301,6 +296,18 @@ public class ChunkyFxController
     renderTracker = new GUIRenderListener(this);
   }
 
+  public void promptDeleteSelectedChunks() {
+    Dialog<ButtonType> confirmationDialog = Dialogs.createSpecialApprovalConfirmation(
+        "Delete selected chunks",
+        "Confirm deleting the selected chunks",
+        "Do you really want to delete the selected chunks from the world?\nThis will remove the selected chunks from your disk and cannot be undone. Be sure to have a backup!",
+        "I do want to permanently delete the selected chunks"
+    );
+    if (confirmationDialog.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+      deleteSelectedChunks(ProgressTracker.NONE);
+    }
+  }
+
   /**
    * Delete the currently selected chunks from the current world.
    */
@@ -317,6 +324,37 @@ public class ChunkyFxController
    */
   public synchronized void exportZip(File targetFile, ProgressTracker progress) {
     new ZipExportJob(mapLoader.getWorld(), chunkSelection.getSelection(), targetFile, progress).start();
+  }
+
+  public void exportZip() {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Export selected chunks to Zip file");
+    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Zip archive", "*.zip"));
+    mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.levelName() + ".zip"));
+    File target = fileChooser.showSaveDialog(stage.getScene().getWindow());
+    if (target != null) {
+      exportZip(target, ProgressTracker.NONE);
+    }
+  }
+
+  public void exportMapView() {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Export PNG");
+    fileChooser
+        .getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG image", "*.png"));
+    mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.levelName() + ".png"));
+    if (prevPngDir != null) {
+      fileChooser.setInitialDirectory(prevPngDir.toFile());
+    }
+    File target = fileChooser.showSaveDialog(stage.getScene().getWindow());
+    if (target != null) {
+      Path path = target.toPath();
+      if (!target.getName().endsWith(".png")) {
+        path = path.resolveSibling(target.getName() + ".png");
+      }
+      prevPngDir = path.getParent();
+      map.renderView(path.toFile(), ProgressTracker.NONE);
+    }
   }
 
   @Override public void initialize(URL fxmlUrl, ResourceBundle resources) {
@@ -520,55 +558,6 @@ public class ChunkyFxController
           scale.set(newValue.scale);
         }));
 
-    deleteChunksBtn.setTooltip(new Tooltip("Delete selected chunks."));
-    deleteChunksBtn.setGraphic(new ImageView(Icon.clear.fxImage()));
-    deleteChunksBtn.setOnAction(e -> {
-      Dialog<ButtonType> confirmationDialog = Dialogs.createSpecialApprovalConfirmation(
-        "Delete selected chunks",
-        "Confirm deleting the selected chunks",
-        "Do you really want to delete the selected chunks from the world?\nThis will remove the selected chunks from your disk and cannot be undone. Be sure to have a backup!",
-        "I do want to permanently delete the selected chunks"
-      );
-      if (confirmationDialog.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
-        deleteSelectedChunks(ProgressTracker.NONE);
-      }
-    });
-
-    exportZipBtn.setTooltip(new Tooltip("Export selected chunks to Zip archive."));
-    exportZipBtn.setGraphic(new ImageView(Icon.save.fxImage()));
-    exportZipBtn.setOnAction(e -> {
-      FileChooser fileChooser = new FileChooser();
-      fileChooser.setTitle("Export Chunks to Zip");
-      fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Zip files", "*.zip"));
-      mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.levelName() + ".zip"));
-      File target = fileChooser.showSaveDialog(exportZipBtn.getScene().getWindow());
-      if (target != null) {
-        exportZip(target, ProgressTracker.NONE);
-      }
-    });
-
-    exportZipBtn.setTooltip(new Tooltip("Exports the current map view (not the selected chunks) as a PNG file."));
-    renderPngBtn.setGraphic(new ImageView(Icon.save.fxImage()));
-    renderPngBtn.setOnAction(e -> {
-      FileChooser fileChooser = new FileChooser();
-      fileChooser.setTitle("Export PNG");
-      fileChooser
-          .getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG images", "*.png"));
-      mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.levelName() + ".png"));
-      if (prevPngDir != null) {
-        fileChooser.setInitialDirectory(prevPngDir.toFile());
-      }
-      File target = fileChooser.showSaveDialog(exportZipBtn.getScene().getWindow());
-      if (target != null) {
-        Path path = target.toPath();
-        if (!target.getName().endsWith(".png")) {
-          path = path.resolveSibling(target.getName() + ".png");
-        }
-        prevPngDir = path.getParent();
-        map.renderView(path.toFile(), ProgressTracker.NONE);
-      }
-    });
-
     creditsMenuItem.setOnAction(e -> {
       try {
         Credits credits = new Credits();
@@ -579,12 +568,10 @@ public class ChunkyFxController
     });
 
     mapViewTab.setGraphic(new ImageView(Icon.map.fxImage()));
-    chunksTab.setGraphic(new ImageView(Icon.mapSelected.fxImage()));
     optionsTab.setGraphic(new ImageView(Icon.wrench.fxImage()));
 
     Collection<Tab> javaFxTabs = new ArrayList<>();
     javaFxTabs.add(mapViewTab);
-    javaFxTabs.add(chunksTab);
     javaFxTabs.add(optionsTab);
     // Call the hook to let plugins add their tabs.
     javaFxTabs = chunky.getMainTabTransformer().apply(javaFxTabs);
@@ -662,8 +649,6 @@ public class ChunkyFxController
     saveScene.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
     saveSceneAs.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
     menuExit.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
-    clearSelectionBtn.setOnAction(event -> chunkSelection.clearSelection());
-    clearSelectionBtn.setGraphic(new ImageView(Icon.clear.fxImage()));
 
     mapView.setMapSize((int) mapCanvas.getWidth(), (int) mapCanvas.getHeight());
     mapOverlay.setOnScroll(map::onScroll);
