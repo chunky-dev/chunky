@@ -51,10 +51,9 @@ public class ChunkyFx extends Application {
       ChunkyFx.hostServices = this.getHostServices();
 
       FXMLLoader loader = new FXMLLoader(getClass().getResource("Chunky.fxml"));
-      ChunkyFxController controller = new ChunkyFxController(chunkyInstance);
+      ChunkyFxController controller = new ChunkyFxController(stage, chunkyInstance);
       loader.setController(controller);
       Parent root = loader.load();
-      stage.setTitle(Chunky.getMainWindowTitle());
       Scene scene = new Scene(root);
       stage.setScene(scene);
       controller.setApplication(this);

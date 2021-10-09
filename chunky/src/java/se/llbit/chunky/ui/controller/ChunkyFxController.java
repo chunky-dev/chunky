@@ -72,6 +72,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.Chunky;
@@ -120,6 +121,7 @@ import se.llbit.util.TaskTracker;
 public class ChunkyFxController
     implements Initializable, CameraViewListener, RenderResetHandler {
 
+  private final Stage stage;
   private final Chunky chunky;
   private WorldMapLoader mapLoader;
   private ChunkMap map;
@@ -308,7 +310,8 @@ public class ChunkyFxController
   private RenderManager renderManager;
   private RenderController renderController;
 
-  public ChunkyFxController(Chunky chunky) {
+  public ChunkyFxController(Stage stage, Chunky chunky) {
+    this.stage = stage;
     this.chunky = chunky;
     mapView = new MapView();
     renderTracker = new GUIRenderListener(this);
@@ -340,6 +343,7 @@ public class ChunkyFxController
         (AsynchronousSceneManager) renderController.getSceneManager();
     asyncSceneManager.setResetHandler(this);
     asyncSceneManager.setTaskTracker(taskTracker);
+    this.updateTitle();
     asyncSceneManager.setOnSceneLoaded(() -> {
       CountDownLatch guiUpdateLatch = new CountDownLatch(1);
       Platform.runLater(() -> {
@@ -887,8 +891,7 @@ public class ChunkyFxController
   }
 
   private void updateTitle() {
-    // TODO
-    // stage.setTitle(chunky.getSceneManager().getScene().name());
+    stage.setTitle(scene.name() + " - " + Chunky.getMainWindowTitle());
   }
 
   /**
