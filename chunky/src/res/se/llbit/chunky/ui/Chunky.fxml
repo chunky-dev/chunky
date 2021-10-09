@@ -28,33 +28,21 @@
 <?import se.llbit.chunky.ui.DoubleTextField?>
 <?import se.llbit.fx.ToolPane?>
 <?import javafx.scene.layout.FlowPane?>
-
-<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.control.SeparatorMenuItem?>
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+      xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
   <MenuBar>
-    <Menu mnemonicParsing="false" text="Chunky">
-      <MenuItem fx:id="menuExit" mnemonicParsing="false" text="Quit" />
+    <Menu mnemonicParsing="false" text="Scene">
+      <MenuItem fx:id="loadScene" mnemonicParsing="false" text="Load…"/>
+      <MenuItem fx:id="saveScene" mnemonicParsing="false" text="Save" />
+      <MenuItem fx:id="saveSceneAs" mnemonicParsing="false" text="Save as…" />
+      <SeparatorMenuItem/>
+      <MenuItem fx:id="menuExit" mnemonicParsing="false" text="Quit"/>
     </Menu>
   </MenuBar>
-  <HBox alignment="CENTER_LEFT" spacing="10.0">
-    <padding>
-      <Insets left="10.0" right="10.0" />
-    </padding>
-    <Label text="Scene:" />
-    <TextField fx:id="sceneNameField" />
-    <Button fx:id="saveScene" mnemonicParsing="false">
-      <tooltip>
-        <Tooltip text="Save the current scene." />
-      </tooltip>
-    </Button>
-    <Button fx:id="loadScene" mnemonicParsing="false">
-      <tooltip>
-        <Tooltip text="Load a scene, replacing the current scene." />
-      </tooltip>
-    </Button>
-    <Button fx:id="saveFrameBtn" mnemonicParsing="false" text="Save current frame" />
-    <Button fx:id="copyFrameBtn" mnemonicParsing="false" text="Copy current frame" />
-  </HBox>
-  <SplitPane fx:id="splitPane" VBox.vgrow="ALWAYS" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+  <SplitPane fx:id="splitPane"
+             VBox.vgrow="ALWAYS"
+             maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
     <VBox>
       <ToolPane fx:id="renderControls" prefWidth="350" VBox.vgrow="ALWAYS" />
       <Separator />

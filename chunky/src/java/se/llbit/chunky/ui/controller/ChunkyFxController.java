@@ -39,7 +39,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -57,8 +56,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
@@ -88,15 +86,12 @@ import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.RenderResetHandler;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.ChunkMap;
-import se.llbit.chunky.ui.dialogs.Credits;
+import se.llbit.chunky.ui.dialogs.*;
 import se.llbit.chunky.ui.DoubleTextField;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.PositiveIntegerAdjuster;
 import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.ui.RenderCanvasFx;
-import se.llbit.chunky.ui.dialogs.DialogUtils;
-import se.llbit.chunky.ui.dialogs.ResourceLoadOrderEditor;
-import se.llbit.chunky.ui.dialogs.SceneChooser;
 import se.llbit.chunky.ui.UILogReceiver;
 import se.llbit.chunky.ui.dialogs.WorldChooser;
 import se.llbit.chunky.world.ChunkPosition;
@@ -173,9 +168,9 @@ public class ChunkyFxController
   @FXML private Tab worldMapTab;
   @FXML private Tab previewTab;
 
-  @FXML private TextField sceneNameField;
-  @FXML private Button saveScene;
-  @FXML private Button loadScene;
+  @FXML private MenuItem saveScene;
+  @FXML private MenuItem saveSceneAs;
+  @FXML private MenuItem loadScene;
 
   @FXML private ProgressBar progressBar;
   @FXML private Label progressLbl;
@@ -346,7 +341,6 @@ public class ChunkyFxController
       CountDownLatch guiUpdateLatch = new CountDownLatch(1);
       Platform.runLater(() -> {
         synchronized (scene) {
-          sceneNameField.setText(scene.name());
           canvas.setCanvasSize(scene.width, scene.height);
         }
         updateTitle();
@@ -397,29 +391,20 @@ public class ChunkyFxController
     renderManager.setRenderTask(taskTracker.backgroundTask());
 
     saveScene.setGraphic(new ImageView(Icon.disk.fxImage()));
-    saveScene.setOnAction(e -> saveSceneSafe(renderController.getContext().getSceneDirectory(), sceneNameField.getText()));
+    saveScene.setOnAction(e -> asyncSceneManager.saveScene());
+
+    saveSceneAs.setOnAction((e) -> {
+      ValidatingTextInputDialog sceneNameDialog = new ValidatingTextInputDialog(scene.name(), AsynchronousSceneManager::sceneNameIsValid);
+      sceneNameDialog.setTitle("Save scene as…");
+      sceneNameDialog.setHeaderText("Enter a scene name");
+      String newName = sceneNameDialog.showAndWait().orElse("");
+      if (!newName.isEmpty()) {
+        this.saveSceneSafe(renderController.getContext().getSceneDirectory(), newName);
+      }
+    });
 
     loadScene.setGraphic(new ImageView(Icon.load.fxImage()));
     loadScene.setOnAction(e -> openSceneChooser());
-
-    sceneNameField.setText(scene.name);
-    sceneNameField.setTextFormatter(new TextFormatter<TextFormatter.Change>(change -> {
-      if (change.isReplaced()) {
-        if (change.getText().isEmpty()) {
-          // Disallow clearing the scene name.
-          change.setText(change.getControlText().substring(change.getRangeStart(),
-              change.getRangeEnd()));
-        }
-      }
-      if (change.isAdded()) {
-        if (!AsynchronousSceneManager.sceneNameIsValid(change.getText())) {
-          // Stop a change adding illegal characters to the scene name.
-          change.setText("");
-        }
-      }
-      return change;
-    }));
-    sceneNameField.setOnAction(event -> saveSceneSafe(renderController.getContext().getSceneDirectory(), sceneNameField.getText()));
 
     Log.setReceiver(new UILogReceiver(), Level.ERROR, Level.WARNING);
 
@@ -684,6 +669,9 @@ public class ChunkyFxController
     endBtn.setGraphic(new ImageView(Icon.endStone.fxImage()));
     endBtn.setOnAction(e -> mapLoader.setDimension(World.END_DIMENSION));
 
+    loadScene.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
+    saveScene.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
+    saveSceneAs.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
     menuExit.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
     clearSelectionBtn.setOnAction(event -> chunkSelection.clearSelection());
     clearSelectionBtn.setGraphic(new ImageView(Icon.clear.fxImage()));
