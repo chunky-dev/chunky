@@ -49,7 +49,7 @@ public class MojangApi {
   // the base64-encoded string might not be valid json (sometimes keys are not quoted)
   // so we use a regex to extract the skin url
   private static final Pattern SKIN_URL_FROM_OBJECT = Pattern
-  .compile("\"?SKIN\"?\\s*:\\s*\\{(.*)\"?url\"?\\s*:\\s*\"([^\"]*)\"", Pattern.DOTALL);
+  .compile("\"?SKIN\"?\\s*:\\s*\\{(.*?)\"?url\"?\\s*:\\s*\"([^\"]*)\"", Pattern.DOTALL);
 
   /**
    * Download a Minecraft Jar by version name.
