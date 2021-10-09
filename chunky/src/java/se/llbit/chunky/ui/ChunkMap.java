@@ -148,10 +148,20 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
           .loadFreshChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
     });
     newScene.setDisable(chunkSelection.size() == 0);
+
+    MenuItem loadSelection = new MenuItem("Load selected chunks");
+    loadSelection.setOnAction(event -> {
+      SceneManager sceneManager = controller.getRenderController().getSceneManager();
+      sceneManager
+          .loadChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
+    });
+    loadSelection.setDisable(chunkSelection.size() == 0);
+
     chunkSelection.addSelectionListener(() -> {
       boolean noChunksSelected = chunkSelection.size() == 0;
       clearSelection.setDisable(noChunksSelected);
       newScene.setDisable(noChunksSelected);
+      loadSelection.setDisable(noChunksSelected);
     });
 
     moveCameraHere.setOnAction(event -> {
@@ -172,7 +182,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     });
 
     contextMenu.getItems()
-        .addAll(newScene, clearSelection, moveCameraHere, selectVisible);
+        .addAll(newScene, loadSelection, clearSelection, moveCameraHere, selectVisible);
   }
 
   @Override public void chunkUpdated(ChunkPosition chunk) {
