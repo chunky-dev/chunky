@@ -218,6 +218,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
               if(s != null) {
                 String filePath = MojangApi.downloadSkin(s.getUrl()).getAbsolutePath();
                 player.setTexture(filePath);
+                playerModel.getSelectionModel().select(s.getModel());
                 skinField.setText(filePath);
                 scene.rebuildActorBvh();
               }
