@@ -91,6 +91,30 @@ public class SkullTextureTest {
         Head.getTextureUrl(validOwnerTag));
   }
 
+  @Test
+  public void testCape() { // test for #1001
+    CompoundTag capeTag = createSkullTag("Owner", Base64.getEncoder().encodeToString(
+        ("{\n"
+            + "  \"timestamp\" : 1633816089260,\n"
+            + "  \"profileId\" : \"94d67f2fd039419b8958abe6b25916b0\",\n"
+            + "  \"profileName\" : \"leMaik\",\n"
+            + "  \"textures\" : {\n"
+            + "    \"SKIN\" : {\n"
+            + "      \"url\" : \"http://textures.minecraft.net/texture/3b60a1f6d562f52aaebbf1434f1de147933a3affe0e764fa49ea057536623cd3\",\n"
+            + "      \"metadata\" : {\n"
+            + "        \"model\" : \"slim\"\n"
+            + "      }\n"
+            + "    },\n"
+            + "    \"CAPE\" : {\n"
+            + "      \"url\" : \"http://textures.minecraft.net/texture/2340c0e03dd24a11b15a8b33c2a7e9e32abb2051b2481d0ba7defd635ca7a933\"\n"
+            + "    }\n"
+            + "  }\n"
+            + "}").getBytes(StandardCharsets.UTF_8)));
+    assertEquals(
+        "http://textures.minecraft.net/texture/3b60a1f6d562f52aaebbf1434f1de147933a3affe0e764fa49ea057536623cd3",
+        Head.getTextureUrl(capeTag));
+  }
+
   private static CompoundTag createSkullTag(String rootKey, String value) {
     CompoundTag skull = new CompoundTag();
     CompoundTag ownerTag = new CompoundTag();
