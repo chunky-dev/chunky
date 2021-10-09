@@ -177,8 +177,6 @@ public class ChunkyFxController
   @FXML private Button saveScene;
   @FXML private Button loadScene;
 
-  @FXML private Button saveFrameBtn;
-  @FXML private Button copyFrameBtn;
   @FXML private ProgressBar progressBar;
   @FXML private Label progressLbl;
   @FXML private Label etaLbl;
@@ -714,7 +712,7 @@ public class ChunkyFxController
       System.exit(0);
     });
 
-    canvas = new RenderCanvasFx(chunky.getSceneManager().getScene(),
+    canvas = new RenderCanvasFx(this, chunky.getSceneManager().getScene(),
         chunky.getRenderController().getRenderManager());
     canvas.setRenderListener(renderTracker);
     previewTab.setContent(canvas);
@@ -732,8 +730,6 @@ public class ChunkyFxController
     worldMapTab.setGraphic(new ImageView(Icon.map.fxImage()));
     previewTab.setGraphic(new ImageView(Icon.sky.fxImage()));
 
-    saveFrameBtn.setOnAction(this::saveCurrentFrame);
-    copyFrameBtn.setOnAction(this::copyCurrentFrame);
     start.setGraphic(new ImageView(Icon.play.fxImage()));
     start.setTooltip(new Tooltip("Start rendering."));
     start.setOnAction(e -> {
@@ -800,7 +796,7 @@ public class ChunkyFxController
     }
   }
 
-  private void saveCurrentFrame(Event event) {
+  public void saveCurrentFrame() {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Save Current Frame");
     if (saveFrameDirectory != null && saveFrameDirectory.isDirectory()) {
@@ -817,7 +813,7 @@ public class ChunkyFxController
         .findFirst().ifPresent(fileChooser::setSelectedExtensionFilter);
     fileChooser.setInitialFileName(String.format("%s-%d",
         scene.name(), renderManager.getRenderStatus().getSpp()));
-    File target = fileChooser.showSaveDialog(saveFrameBtn.getScene().getWindow());
+    File target = fileChooser.showSaveDialog(mapCanvas.getScene().getWindow());
     if (target != null) {
       saveFrameDirectory = target.getParentFile();
       PictureExportFormat format = filters.getOrDefault(fileChooser.selectedExtensionFilterProperty().get(), PictureExportFormats.PNG);
@@ -828,7 +824,7 @@ public class ChunkyFxController
     }
   }
 
-  private void copyCurrentFrame(Event event) {
+  public void copyCurrentFrame() {
     try {
       PipedInputStream in = new PipedInputStream();
       PipedOutputStream out = new PipedOutputStream(in);

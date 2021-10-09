@@ -31,6 +31,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.PixelFormat;
@@ -51,6 +52,7 @@ import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.math.Vector2;
 
 import java.nio.IntBuffer;
@@ -63,6 +65,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   private static final WritablePixelFormat<IntBuffer> PIXEL_FORMAT =
       PixelFormat.getIntArgbInstance();
 
+  private final ChunkyFxController chunkyFxController;
   private final Scene renderScene;
 
   private WritableImage image;
@@ -82,7 +85,9 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
   private RenderStatusListener renderListener;
 
-  public RenderCanvasFx(se.llbit.chunky.renderer.scene.Scene scene, RenderManager renderManager) {
+  public RenderCanvasFx(ChunkyFxController chunkyFxController,
+      Scene scene, RenderManager renderManager) {
+    this.chunkyFxController = chunkyFxController;
     this.renderScene = scene;
     this.renderManager = renderManager;
     renderManager.addSceneStatusListener(this);
@@ -172,6 +177,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
         scene.forceReset();
       }
     });
+    contextMenu.getItems().add(setTarget);
+
     CheckMenuItem showGuides = new CheckMenuItem("Show guides");
     showGuides.setSelected(false);
     showGuides.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -180,6 +187,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       vGuide1.setVisible(newValue);
       vGuide2.setVisible(newValue);
     });
+    contextMenu.getItems().add(showGuides);
+
     Menu canvasScale = new Menu("Canvas scale");
     ToggleGroup scaleGroup = new ToggleGroup();
     for (int percent : new int[] { 25, 50, 75, 100, 150, 200, 300, 400 }) {
@@ -196,6 +205,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       });
       canvasScale.getItems().add(item);
     }
+    contextMenu.getItems().add(canvasScale);
 
     RadioMenuItem fit = new RadioMenuItem("Fit to Screen");
     fit.setSelected(fitToScreen);
@@ -213,7 +223,15 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       updateCanvasScale(PersistentSettings.getCanvasScale() / 100.0);
     }
 
-    contextMenu.getItems().addAll(setTarget, showGuides, canvasScale);
+    contextMenu.getItems().add(new SeparatorMenuItem());
+
+    MenuItem saveCurrentFrame = new MenuItem("Save image as…");
+    saveCurrentFrame.setOnAction(e -> chunkyFxController.saveCurrentFrame());
+    contextMenu.getItems().add(saveCurrentFrame);
+
+    MenuItem copyFrame = new MenuItem("Copy image to clipboard");
+    copyFrame.setOnAction(e -> chunkyFxController.copyCurrentFrame());
+    contextMenu.getItems().add(copyFrame);
 
     canvas.setOnMouseClicked(event -> {
       if (event.getButton() == MouseButton.SECONDARY) {
