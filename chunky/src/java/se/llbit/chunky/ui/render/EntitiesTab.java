@@ -210,7 +210,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
             scene.rebuildActorBvh();
           }
         });
-        Button downloadSkin = new Button("Download Skin");
+        Button downloadSkin = new Button("Download skin...");
         downloadSkin.setOnAction(e -> {
           try {
             //Callback will only be called if a valid uuid/username is inputted
