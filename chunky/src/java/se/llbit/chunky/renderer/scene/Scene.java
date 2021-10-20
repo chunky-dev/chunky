@@ -696,8 +696,7 @@ public class Scene implements JsonSerializable, Refreshable {
     state.ray.o.y -= origin.y;
     state.ray.o.z -= origin.z;
 
-    if(camera.getProjectionMode() == ProjectionMode.PARALLEL
-      && worldOctree.isInside(state.ray.o)) {
+    if(camera.getProjectionMode() == ProjectionMode.PARALLEL) {
       // When in parallel projection, push the ray origin back so the
       // ray start outside the octree to prevent ray spawning inside some blocks
       int limit = (1 << worldOctree.getDepth());
