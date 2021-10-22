@@ -48,7 +48,7 @@ public class SceneChooserController implements Initializable {
   @FXML private TableColumn<SceneListItem, Number> chunkCountCol;
   @FXML private TableColumn<SceneListItem, String> sizeCol;
   @FXML private TableColumn<SceneListItem, Number> sppCol;
-  @FXML private TableColumn<SceneListItem, String> renderTimeCol;
+  @FXML private TableColumn<SceneListItem, Number> renderTimeCol;
   @FXML private TableColumn<SceneListItem, Date> lastModifiedCol;
 
   @FXML private Button loadSceneBtn;
@@ -119,9 +119,18 @@ public class SceneChooserController implements Initializable {
       SceneListItem scene = data.getValue();
       return scene.sppCount;
     });
+
     renderTimeCol.setCellValueFactory(data -> {
       SceneListItem scene = data.getValue();
       return scene.renderTime;
+    });
+    renderTimeCol.setCellFactory(col -> new TableCell<SceneListItem, Number>() {
+      public void updateItem(Number item, boolean empty) {
+        if (item == this.getItem()) return;
+        super.updateItem(item, empty);
+        super.setGraphic(null);
+        super.setText(item == null ? null : SceneListItem.renderTimeString(item.longValue()));
+      }
     });
 
     DateFormat localeFormat = DateFormat.getDateInstance();
@@ -218,7 +227,7 @@ public class SceneChooserController implements Initializable {
     /** The spp count of the render */
     public final ReadOnlyObjectWrapper<Number> sppCount;
     /** The elapsed render time */
-    public final ReadOnlyObjectWrapper<String> renderTime;
+    public final ReadOnlyObjectWrapper<Number> renderTime;
 
     private SceneListItem(File sceneFile, Executor backgroundLoadExecutor) {
       this.sceneDirectory = sceneFile.getParentFile();
@@ -237,11 +246,28 @@ public class SceneChooserController implements Initializable {
       backgroundLoadExecutor.execute(() -> parseScene(sceneFile));
     }
 
+    public static String renderTimeString(long milliseconds) {
+      if (milliseconds < 1000) return " — ";
+
+      long seconds = FastMath.round(milliseconds / 1000d);
+      long minutes = seconds / 60;
+      long hours = minutes / 60;
+      StringBuilder sb = new StringBuilder();
+      if (hours > 0)
+        sb.append(hours).append("hr ");
+      if (minutes > 0) {
+        sb.append(String.format("%02dm %02ds", minutes % 60, seconds % 60));
+      } else {
+        sb.append(String.format("%ds", milliseconds / 1000));
+      }
+      return sb.toString();
+    }
+
     private void parseScene(File sceneFile) {
       String dimensions = null;
       Integer chunkSize = null;
       Integer sppCount = null;
-      String renderTime = null;
+      Long renderTime = null;
 
       try (JsonParser parser = new JsonParser(new FileInputStream(new File(sceneFile.getParentFile(), sceneFile.getName())))) {
         JsonObject scene = parser.parse().object();
@@ -250,7 +276,7 @@ public class SceneChooserController implements Initializable {
         int height = scene.get("height").intValue(400);
         dimensions = String.format("%sx%s", width, height);
 
-        chunkSize = scene.get("chunkyList").array().size();
+        chunkSize = scene.get("chunkList").array().size();
         sppCount = scene.get("spp").intValue(0);
 
         // Not currently used (Planned for Chunky 2.5.0; See PR #786)
@@ -266,23 +292,7 @@ public class SceneChooserController implements Initializable {
         //      } else cropping = null;
         //    } else cropping = null;
 
-        long milliseconds = scene.get("renderTime").longValue(0);
-        if (sppCount == 0 || milliseconds < 500) {
-          renderTime = " — ";
-        } else {
-          long seconds = FastMath.round(milliseconds / 1000d);
-          long minutes = seconds / 60;
-          long hours = minutes / 60;
-          StringBuilder sb = new StringBuilder();
-          if (hours > 0)
-            sb.append(hours).append("hr ");
-          if (minutes > 0) {
-            sb.append(String.format("%02dm %02ds", minutes % 60, seconds % 60));
-          } else {
-            sb.append(String.format("%ds", milliseconds / 1000));
-          }
-          renderTime = sb.toString();
-        }
+        renderTime = scene.get("renderTime").longValue(0);
       } catch (IOException | JsonParser.SyntaxError e) {
         Log.warnf("Warning: could not load scene description: %s", sceneFile.getName());
       }
@@ -300,7 +310,7 @@ public class SceneChooserController implements Initializable {
       String dimensions = this.dimensions.get() != null ? this.dimensions.get() : "-";
       String chunkSize = this.chunkSize.get() != null ? this.chunkSize.get().toString() : "-";
       String sppCount = this.sppCount.get() != null ? this.sppCount.get().toString() : "-";
-      String renderTime = this.renderTime.get() != null ? this.renderTime.get() : "-";
+      String renderTime = this.renderTime.get() != null ? renderTimeString(this.renderTime.get().longValue()) : "-";
 
       return String.format("Name:%s, Chunks:%s, Size:%s, Spp:%s, Time:%s, Location:%s",
           sceneName, chunkSize, dimensions, sppCount, renderTime, sceneDirectory.getName());
