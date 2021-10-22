@@ -18,17 +18,12 @@
 package se.llbit.chunky.ui;
 
 import javafx.beans.property.ReadOnlyIntegerWrapper;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.math3.util.FastMath;
@@ -43,31 +38,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.text.DateFormat;
+import java.util.*;
 
 public class SceneChooserController implements Initializable {
   @FXML private TableView<SceneListItem> sceneTbl;
-
   @FXML private TableColumn<SceneListItem, String> nameCol;
-
   @FXML private TableColumn<SceneListItem, Number> chunkCountCol;
-
   @FXML private TableColumn<SceneListItem, String> sizeCol;
-
   @FXML private TableColumn<SceneListItem, Number> sppCol;
-
   @FXML private TableColumn<SceneListItem, String> renderTimeCol;
+  @FXML private TableColumn<SceneListItem, Date> lastModifiedCol;
 
   @FXML private Button loadSceneBtn;
-
   @FXML private Button cancelBtn;
-
   @FXML private Button exportBtn;
-
   @FXML private Button deleteBtn;
 
   private Stage stage;
@@ -138,6 +123,21 @@ public class SceneChooserController implements Initializable {
       SceneListItem scene = data.getValue();
       return new ReadOnlyStringWrapper(scene.renderTime);
     });
+
+    DateFormat localeFormat = DateFormat.getDateInstance();
+    lastModifiedCol.setCellValueFactory(data -> {
+      SceneListItem scene = data.getValue();
+      Date lastModified = new Date(scene.sceneDirectory.lastModified());
+      return new ReadOnlyObjectWrapper<>(lastModified);
+    });
+    lastModifiedCol.setCellFactory(col -> new TableCell<SceneListItem, Date>() {
+      public void updateItem(Date item, boolean empty) {
+        if (item == this.getItem()) return;
+        super.updateItem(item, empty);
+        super.setGraphic(null);
+        super.setText(item == null ? null : localeFormat.format(item));
+      }
+    });
   }
 
   public void setStage(Stage stage) {
@@ -178,7 +178,6 @@ public class SceneChooserController implements Initializable {
   private void populateSceneTable(File sceneDir) {
     List<SceneListItem> scenes = new ArrayList<>();
     List<File> fileList = SceneHelper.getAvailableSceneFiles(sceneDir);
-    // TODO: Sort by recently modified instead of file name.
     Collections.sort(fileList, Comparator
             .comparing((File o) -> -(Long)o.lastModified()) // negative of last modified -> most recent at top
             .thenComparing((File o) -> o.toString().toLowerCase()) // Then by file name, ignoring case.
