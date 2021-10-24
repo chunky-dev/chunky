@@ -17,6 +17,7 @@
 package se.llbit.chunky.renderer.renderdump;
 
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.util.IsolatedOutputStream;
 import se.llbit.util.TaskTracker;
 
 import java.io.DataInputStream;
@@ -109,12 +110,9 @@ public class ClassicDumpFormat extends AbstractDumpFormat {
 
   @Override
   public void save(DataOutputStream outputStream, Scene scene, TaskTracker taskTracker) throws IOException {
-    GZIPOutputStream gzipStream = new GZIPOutputStream(outputStream);
-    DataOutputStream stream = new DataOutputStream(gzipStream);
-    super.save(stream, scene, taskTracker);
-    stream.flush();
-    gzipStream.finish();
-    gzipStream.flush();
+    try (DataOutputStream stream = new DataOutputStream(new GZIPOutputStream(new IsolatedOutputStream(outputStream)))) {
+      super.save(stream, scene, taskTracker);
+    }
   }
 
   @Override

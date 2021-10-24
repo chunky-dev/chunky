@@ -1,6 +1,7 @@
 package se.llbit.chunky.renderer.renderdump;
 
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.util.IsolatedOutputStream;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -54,21 +55,16 @@ public class GzipDumpFormat extends AbstractDumpFormat {
   protected void writeSamples(DataOutputStream outputStream, Scene scene,
                               IntConsumer pixelProgress)
       throws IOException {
-    GZIPOutputStream gzipStream = new GZIPOutputStream(outputStream);
-    DataOutputStream out = new DataOutputStream(gzipStream);
-
-    double[] samples = scene.getSampleBuffer();
-    int numPixels = samples.length / 3;
-    for (int pixelIndex = 0; pixelIndex < numPixels; pixelIndex++) {
-      int offset = pixelIndex * 3;
-      out.writeDouble(samples[offset + 0]);
-      out.writeDouble(samples[offset + 1]);
-      out.writeDouble(samples[offset + 2]);
-      pixelProgress.accept(pixelIndex);
+    try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(new IsolatedOutputStream(outputStream)))) {
+      double[] samples = scene.getSampleBuffer();
+      int numPixels = samples.length / 3;
+      for (int pixelIndex = 0; pixelIndex < numPixels; pixelIndex++) {
+        int offset = pixelIndex * 3;
+        out.writeDouble(samples[offset + 0]);
+        out.writeDouble(samples[offset + 1]);
+        out.writeDouble(samples[offset + 2]);
+        pixelProgress.accept(pixelIndex);
+      }
     }
-
-    out.flush();
-    gzipStream.finish();
-    gzipStream.flush();
   }
 }

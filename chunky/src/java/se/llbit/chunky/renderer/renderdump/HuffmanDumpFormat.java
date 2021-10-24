@@ -1,6 +1,7 @@
 package se.llbit.chunky.renderer.renderdump;
 
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.util.IsolatedOutputStream;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -37,8 +38,7 @@ public class HuffmanDumpFormat extends AbstractDumpFormat {
   protected void readSamples(DataInputStream inputStream, Scene scene,
                              PixelConsumer consumer, IntConsumer pixelProgress)
       throws IOException {
-    Inflater inflater = new Inflater();
-    DataInputStream in = new DataInputStream(new InflaterInputStream(inputStream, inflater));
+    DataInputStream in = new DataInputStream(new InflaterInputStream(inputStream));
 
     int numPixels = scene.getSampleBuffer().length / 3;
     for (int pixelIndex = 0; pixelIndex < numPixels; pixelIndex++) {
@@ -55,21 +55,17 @@ public class HuffmanDumpFormat extends AbstractDumpFormat {
                               IntConsumer pixelProgress)
       throws IOException {
     Deflater deflater = new Deflater(Deflater.HUFFMAN_ONLY);
-    DeflaterOutputStream deflateStream = new DeflaterOutputStream(outputStream, deflater);
-    DataOutputStream out = new DataOutputStream(deflateStream);
-
-    double[] samples = scene.getSampleBuffer();
-    int numPixels = samples.length / 3;
-    for (int pixelIndex = 0; pixelIndex < numPixels; pixelIndex++) {
-      int offset = pixelIndex * 3;
-      out.writeDouble(samples[offset + 0]);
-      out.writeDouble(samples[offset + 1]);
-      out.writeDouble(samples[offset + 2]);
-      pixelProgress.accept(pixelIndex);
+    try (DataOutputStream out = new DataOutputStream(
+        new DeflaterOutputStream(new IsolatedOutputStream(outputStream), deflater))) {
+      double[] samples = scene.getSampleBuffer();
+      int numPixels = samples.length / 3;
+      for (int pixelIndex = 0; pixelIndex < numPixels; pixelIndex++) {
+        int offset = pixelIndex * 3;
+        out.writeDouble(samples[offset + 0]);
+        out.writeDouble(samples[offset + 1]);
+        out.writeDouble(samples[offset + 2]);
+        pixelProgress.accept(pixelIndex);
+      }
     }
-
-    out.flush();
-    deflateStream.finish();
-    deflateStream.flush();
   }
 }
