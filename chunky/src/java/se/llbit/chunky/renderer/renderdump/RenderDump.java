@@ -36,7 +36,7 @@ import java.util.HashMap;
  */
 public class RenderDump {
   public static final byte[] DUMP_FORMAT_MAGIC_NUMBER = {0x44, 0x55, 0x4D, 0x50};
-  private static final DumpFormat DEFAULT_DUMP_FORMAT = FloatingPointCompressorDumpFormat.INSTANCE;
+  private static final int DEFAULT_DUMP_FORMAT = 1;  // FPC compressor
 
   private static final HashMap<Integer, DumpFormat> RENDER_DUMP_FORMATS = new HashMap<>();
 
@@ -50,14 +50,17 @@ public class RenderDump {
   }
 
   static {
-    RenderDump.addRenderDumpFormat(ClassicDumpFormat.INSTANCE);
-    RenderDump.addRenderDumpFormat(FloatingPointCompressorDumpFormat.INSTANCE);
+    RenderDump.addRenderDumpFormat(ClassicDumpFormat.INSTANCE);                 // 0
+    RenderDump.addRenderDumpFormat(FloatingPointCompressorDumpFormat.INSTANCE); // 1
+    RenderDump.addRenderDumpFormat(UncompressedDumpFormat.INSTANCE);            // 2
+    RenderDump.addRenderDumpFormat(HuffmanDumpFormat.INSTANCE);                 // 3
+    RenderDump.addRenderDumpFormat(GzipDumpFormat.INSTANCE);                    // 4
   }
 
   private static DumpFormat getDumpFormat(int version) {
     if (!RENDER_DUMP_FORMATS.containsKey(version)) {
       Log.errorf("Cannot find render dump format with version %d.", version);
-      return DEFAULT_DUMP_FORMAT;
+      return RENDER_DUMP_FORMATS.get(DEFAULT_DUMP_FORMAT);
     } else {
       return RENDER_DUMP_FORMATS.get(version);
     }
@@ -105,7 +108,7 @@ public class RenderDump {
   }
 
   public static void save(OutputStream outputStream, Scene scene, TaskTracker taskTracker) throws IOException {
-    save(outputStream, scene, taskTracker, DEFAULT_DUMP_FORMAT.getVersion());
+    save(outputStream, scene, taskTracker, DEFAULT_DUMP_FORMAT);
   }
 
   public static void save(OutputStream outputStream, Scene scene, TaskTracker taskTracker, int version) throws IOException {
@@ -116,5 +119,6 @@ public class RenderDump {
       dataOutputStream.writeInt(version);
     }
     format.save(dataOutputStream, scene, taskTracker);
+    dataOutputStream.flush();
   }
 }

@@ -109,8 +109,12 @@ public class ClassicDumpFormat extends AbstractDumpFormat {
 
   @Override
   public void save(DataOutputStream outputStream, Scene scene, TaskTracker taskTracker) throws IOException {
-    DataOutputStream stream = new DataOutputStream(new GZIPOutputStream(outputStream));
+    GZIPOutputStream gzipStream = new GZIPOutputStream(outputStream);
+    DataOutputStream stream = new DataOutputStream(gzipStream);
     super.save(stream, scene, taskTracker);
+    stream.flush();
+    gzipStream.finish();
+    gzipStream.flush();
   }
 
   @Override

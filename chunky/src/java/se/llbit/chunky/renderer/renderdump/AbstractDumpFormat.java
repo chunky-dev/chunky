@@ -52,6 +52,8 @@ abstract class AbstractDumpFormat implements DumpFormat {
                                        IntConsumer pixelProgress)
       throws IOException;
 
+  public abstract int getVersion();
+
   public abstract String getName();
 
   public abstract String getDescription();
@@ -77,8 +79,6 @@ abstract class AbstractDumpFormat implements DumpFormat {
   @Override
   public void save(DataOutputStream outputStream, Scene scene, TaskTracker taskTracker)
       throws IOException {
-    int[] done = {0};
-
     try (TaskTracker.Task task = taskTracker.task("Saving render dump", scene.width * scene.height)) {
       writeHeader(outputStream, scene);
       writeSamples(outputStream, scene, i -> task.updateInterval(i, scene.width));
