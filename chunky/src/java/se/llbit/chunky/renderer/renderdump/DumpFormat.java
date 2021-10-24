@@ -1,5 +1,6 @@
 package se.llbit.chunky.renderer.renderdump;
 
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.Registerable;
 import se.llbit.util.TaskTracker;
@@ -21,6 +22,7 @@ import java.io.IOException;
  * implemented formats. The strategy for reading/writing the samples (from the buffer in the scene) has to be
  * implemented.
  */
+@PluginApi
 public interface DumpFormat extends Registerable {
   /**
    * Get the dump version number. This should be a constant.

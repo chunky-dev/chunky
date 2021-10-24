@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.log.Log;
 import se.llbit.util.TaskTracker;
@@ -40,6 +41,7 @@ public class RenderDump {
 
   private static final HashMap<Integer, DumpFormat> RENDER_DUMP_FORMATS = new HashMap<>();
 
+  @PluginApi
   public static void addRenderDumpFormat(DumpFormat format) {
     int version = format.getVersion();
     if (!RENDER_DUMP_FORMATS.containsKey(version)) {
@@ -111,6 +113,7 @@ public class RenderDump {
     save(outputStream, scene, taskTracker, DEFAULT_DUMP_FORMAT);
   }
 
+  @PluginApi
   public static void save(OutputStream outputStream, Scene scene, TaskTracker taskTracker, int version) throws IOException {
     DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(outputStream));
     DumpFormat format = getDumpFormat(version);
