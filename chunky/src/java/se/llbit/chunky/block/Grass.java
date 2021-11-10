@@ -8,5 +8,6 @@ public class Grass extends AbstractModelBlock {
   public Grass() {
     super("grass", Texture.tallGrass);
     model = new TallGrassModel(texture);
+    solid = false;
   }
 }
