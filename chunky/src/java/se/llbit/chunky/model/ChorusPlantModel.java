@@ -17,51 +17,118 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
-import se.llbit.math.AABB;
-import se.llbit.math.Ray;
+import se.llbit.math.*;
 
-public class ChorusPlantModel {
-  private static AABB core = new AABB(4 / 16., 12 / 16., 4 / 16., 12 / 16., 4 / 16., 12 / 16.);
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
-  private static AABB[] connector = {
-      new AABB(4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0, 0, 4 / 16.),
-      new AABB(4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0, 12 / 16., 1),
-      new AABB(12 / 16., 1, 4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0),
-      new AABB(0, 4 / 16., 4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0),
-      // Above.
-      new AABB(4 / 16., 12 / 16., 12 / 16.0, 1, 4 / 16.0, 12 / 16.0),
-      // Below
-      new AABB(4 / 16., 12 / 16., 0, 4 / 16.0, 4 / 16.0, 12 / 16.0),
+// TODO: Improve rendering of chorus plants - pseudorandom plant part selection.
+public class ChorusPlantModel extends QuadModel {
+  static final Quad[] noside_n = {
+      new Quad(
+          new Vector3(12 / 16.0, 4 / 16.0, 4 / 16.0),
+          new Vector3(4 / 16.0, 4 / 16.0, 4 / 16.0),
+          new Vector3(12 / 16.0, 12 / 16.0, 4 / 16.0),
+          new Vector4(12 / 16.0, 4 / 16.0, 4 / 16.0, 12 / 16.0)),
   };
 
-  public static boolean intersect(Ray ray) {
-    int connections = ray.getCurrentData() >> BlockData.OFFSET;
-    return intersect(ray, connections);
+  static final Quad[] side_n = {
+      // cube1
+      new Quad(
+          new Vector3(4 / 16.0, 12 / 16.0, 4 / 16.0),
+          new Vector3(12 / 16.0, 12 / 16.0, 4 / 16.0),
+          new Vector3(4 / 16.0, 12 / 16.0, 0),
+          new Vector4(4 / 16.0, 12 / 16.0, 16 / 16.0, 12 / 16.0)),
+      new Quad(
+          new Vector3(4 / 16.0, 4 / 16.0, 0),
+          new Vector3(12 / 16.0, 4 / 16.0, 0),
+          new Vector3(4 / 16.0, 4 / 16.0, 4 / 16.0),
+          new Vector4(4 / 16.0, 12 / 16.0, 12 / 16.0, 16 / 16.0)),
+      new Quad(
+          new Vector3(12 / 16.0, 4 / 16.0, 4 / 16.0),
+          new Vector3(12 / 16.0, 4 / 16.0, 0),
+          new Vector3(12 / 16.0, 12 / 16.0, 4 / 16.0),
+          new Vector4(0, 4 / 16.0, 4 / 16.0, 12 / 16.0)),
+      new Quad(
+          new Vector3(4 / 16.0, 4 / 16.0, 0),
+          new Vector3(4 / 16.0, 4 / 16.0, 4 / 16.0),
+          new Vector3(4 / 16.0, 12 / 16.0, 0),
+          new Vector4(0, 4 / 16.0, 4 / 16.0, 12 / 16.0)),
+      new Quad(
+          new Vector3(12 / 16.0, 4 / 16.0, 0),
+          new Vector3(4 / 16.0, 4 / 16.0, 0),
+          new Vector3(12 / 16.0, 12 / 16.0, 0),
+          new Vector4(12 / 16.0, 4 / 16.0, 4 / 16.0, 12 / 16.0)),
+  };
+
+  static final Quad[][] noside = new Quad[6][];
+  static final Quad[][] side = new Quad[6][];
+
+  static {
+    noside[0] = noside_n;
+    noside[1] = Model.rotateY(noside[0]);
+    noside[2] = Model.rotateY(noside[1]);
+    noside[3] = Model.rotateY(noside[2]);
+    noside[4] = Model.rotateX(noside[0]);
+    noside[5] = Model.rotateNegX(noside[0]);
+    side[0] = side_n;
+    side[1] = Model.rotateY(side[0]);
+    side[2] = Model.rotateY(side[1]);
+    side[3] = Model.rotateY(side[2]);
+    side[4] = Model.rotateX(side[0]);
+    side[5] = Model.rotateNegX(side[0]);
   }
 
-  public static boolean intersect(Ray ray, int connections) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    if (core.intersect(ray)) {
-      Texture.chorusPlant.getColor(ray);
-      ray.t = ray.tNext;
-      hit = true;
+  private final Quad[] quads;
+  private final Texture[] textures;
+
+  public ChorusPlantModel(
+      boolean north, boolean south, boolean east, boolean west,
+      boolean up, boolean down) {
+    ArrayList<Quad> quads = new ArrayList<>();
+    if (north) {
+      Collections.addAll(quads, side[0]);
+    } else {
+      Collections.addAll(quads, noside[0]);
     }
-    for (int i = 0; i < 6; ++i) {
-      if ((connections & (1 << i)) != 0) {
-        if (connector[i].intersect(ray)) {
-          Texture.chorusPlant.getColor(ray);
-          ray.t = ray.tNext;
-          hit = true;
-        }
-      }
+    if (east) {
+      Collections.addAll(quads, side[1]);
+    } else {
+      Collections.addAll(quads, noside[1]);
     }
-    if (hit) {
-      ray.color.w = 1;
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
+    if (south) {
+      Collections.addAll(quads, side[2]);
+    } else {
+      Collections.addAll(quads, noside[2]);
     }
-    return hit;
+    if (west) {
+      Collections.addAll(quads, side[3]);
+    } else {
+      Collections.addAll(quads, noside[3]);
+    }
+    if (up) {
+      Collections.addAll(quads, side[4]);
+    } else {
+      Collections.addAll(quads, noside[4]);
+    }
+    if (down) {
+      Collections.addAll(quads, side[5]);
+    } else {
+      Collections.addAll(quads, noside[5]);
+    }
+    this.quads = quads.toArray(new Quad[0]);
+    this.textures = new Texture[this.quads.length];
+    Arrays.fill(this.textures, Texture.chorusPlant);
+  }
+
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

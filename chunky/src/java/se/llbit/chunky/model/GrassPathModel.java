@@ -18,26 +18,21 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
-import se.llbit.math.Ray;
 
-public class GrassPathModel {
-  private static AABB aabb = new AABB(0, 1, 0, 15 / 16., 0, 1);
+public class GrassPathModel extends AABBModel {
+  private static final AABB[] boxes = { new AABB(0, 1, 0, 15 / 16., 0, 1) };
+  private static final Texture[][] textures = { {
+      Texture.grassPathSide, Texture.grassPathSide, Texture.grassPathSide, Texture.grassPathSide,
+      Texture.grassPathTop, Texture.dirt
+  } };
 
-  public static boolean intersect(Ray ray) {
-    ray.t = Double.POSITIVE_INFINITY;
-    if (aabb.intersect(ray)) {
-      if (ray.n.y > 0) {
-        Texture.grassPathTop.getColor(ray);
-      } else if (ray.n.y < 0) {
-        Texture.dirt.getColor(ray);
-      } else {
-        Texture.grassPathSide.getColor(ray);
-      }
-      ray.color.w = 1;
-      ray.distance += ray.tNext;
-      ray.o.scaleAdd(ray.tNext, ray.d);
-      return true;
-    }
-    return false;
+  @Override
+  public AABB[] getBoxes() {
+    return boxes;
+  }
+
+  @Override
+  public Texture[][] getTextures() {
+    return textures;
   }
 }

@@ -22,7 +22,7 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class SpriteModel {
+public class SpriteModel extends QuadModel {
 
   protected static Quad[] quads =
       {new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 1), new Vector3(0, 1, 0),
@@ -48,6 +48,30 @@ public class SpriteModel {
     orientedQuads[5] = Model.rotateY(orientedQuads[3]);
   }
 
+  private final Texture[] textures;
+  private final int facing;
+
+  public SpriteModel(Texture texture, String facing) {
+    this.textures = new Texture[]{
+        texture, texture, texture, texture
+    };
+    this.facing = getOrientationIndex(facing);
+  }
+
+  public SpriteModel(Texture texture) {
+    this(texture, "up");
+  }
+
+  @Override
+  public Quad[] getQuads() {
+    return orientedQuads[facing];
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
+  }
+
   public static boolean intersect(Ray ray, Texture material) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
@@ -57,7 +81,7 @@ public class SpriteModel {
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
           ray.t = ray.tNext;
-          ray.n.set(quad.n);
+          ray.setN(quad.n);
           hit = true;
         }
       }
@@ -78,7 +102,7 @@ public class SpriteModel {
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
           ray.t = ray.tNext;
-          ray.n.set(quad.n);
+          ray.setN(quad.n);
           hit = true;
         }
       }

@@ -26,12 +26,15 @@ import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
+import java.util.Arrays;
+
 /**
  * Renders the Cocoa Plant
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class CocoaPlantModel {
+public class CocoaPlantModel extends QuadModel {
+  //region Large
   private static final Quad[] large = {
       // front
       new Quad(new Vector3(12 / 16., 3 / 16., 7 / 16.), new Vector3(4 / 16., 3 / 16., 7 / 16.),
@@ -61,6 +64,9 @@ public class CocoaPlantModel {
       new Quad(new Vector3(4 / 16., 3 / 16., 7 / 16.), new Vector3(12 / 16., 3 / 16., 7 / 16.),
           new Vector3(4 / 16., 3 / 16., 15 / 16.), new Vector4(0, 7 / 16., 9 / 16., 1)),
   };
+  //endregion
+
+  //region Medium
   private static final Quad[] medium = {
       // front
       new Quad(new Vector3(11 / 16., 5 / 16., 9 / 16.), new Vector3(5 / 16., 5 / 16., 9 / 16.),
@@ -90,6 +96,9 @@ public class CocoaPlantModel {
       new Quad(new Vector3(5 / 16., 5 / 16., 9 / 16.), new Vector3(11 / 16., 5 / 16., 9 / 16.),
           new Vector3(5 / 16., 5 / 16., 15 / 16.), new Vector4(0, 6 / 16., 10 / 16., 1)),
   };
+  //endregion
+
+  //region Small
   private static final Quad[] small = {
       // front
       new Quad(new Vector3(10 / 16., 7 / 16., 11 / 16.), new Vector3(6 / 16., 7 / 16., 11 / 16.),
@@ -120,9 +129,11 @@ public class CocoaPlantModel {
       new Quad(new Vector3(6 / 16., 7 / 16., 11 / 16.), new Vector3(10 / 16., 7 / 16., 11 / 16.),
           new Vector3(6 / 16., 7 / 16., 15 / 16.), new Vector4(0, 4 / 16., 12 / 16., 1)),
   };
-  private static final Quad stemNorth =
-      new DoubleSidedQuad(new Vector3(.5, 12 / 16., .5), new Vector3(.5, 12 / 16., 1),
-          new Vector3(.5, 1, .5), new Vector4(.5, 1, 12 / 16., 1));
+  //endregion
+
+  private static final Quad stemNorth = new DoubleSidedQuad(
+      new Vector3(.5, 12 / 16., .5), new Vector3(.5, 12 / 16., 1),
+      new Vector3(.5, 1, .5), new Vector4(.5, 1, 12 / 16., 1));
 
   private static final Quad[][][] fruit = new Quad[3][4][];
   private static final Quad[] stem = new Quad[4];
@@ -141,43 +152,26 @@ public class CocoaPlantModel {
     }
   }
 
-  private static final Texture[] tex =
-      {Texture.cocoaPlantSmall, Texture.cocoaPlantMedium, Texture.cocoaPlantLarge};
+  private static final Texture[] tex = {Texture.cocoaPlantSmall, Texture.cocoaPlantMedium, Texture.cocoaPlantLarge};
 
-  public static boolean intersect(Ray ray) {
-    int data = 0xF & (ray.getCurrentData() >> BlockData.OFFSET);
-    int age = data >> 2;
-    int direction = 3 & data;
-    return intersect(ray, direction, age);
+  private final Quad[] quads;
+  private final Texture[] textures;
+
+  public CocoaPlantModel(int facing, int age) {
+    quads = new Quad[fruit[age][facing].length+1];
+    System.arraycopy(fruit[age][facing], 0, quads, 0, quads.length-1);
+    quads[quads.length-1] = stem[facing];
+    textures = new Texture[quads.length];
+    Arrays.fill(textures, tex[age]);
   }
 
-  public static boolean intersect(Ray ray, int facing, int age) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (Quad quad : fruit[age][facing]) {
-      if (quad.intersect(ray)) {
-        tex[age].getColor(ray);
-        ray.color.w = 1;
-        ray.t = ray.tNext;
-        ray.n.set(quad.n);
-        hit = true;
-      }
-    }
-    if (stem[facing].intersect(ray)) {
-      float[] color = tex[age].getColor(ray.u, ray.v);
-      if (color[3] > Ray.EPSILON) {
-        ray.color.set(color);
-        ray.t = ray.tNext;
-        ray.n.set(stem[facing].n);
-        ray.n.scale(QuickMath.signum(-ray.d.dot(stem[facing].n)));
-        hit = true;
-      }
-    }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
   }
 
+  @Override
+  public Texture[] getTextures() {
+    return textures;
+  }
 }

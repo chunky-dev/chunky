@@ -16,9 +16,7 @@
  */
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
@@ -27,9 +25,11 @@ import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class VineModel {
+import java.util.ArrayList;
+import java.util.Arrays;
 
-  protected static final Quad[] quads = {
+public class VineModel extends QuadModel {
+  private static final Quad[] model = {
       // North
       new DoubleSidedQuad(new Vector3(0, 0, 0.8 / 16), new Vector3(1, 0, 0.8 / 16),
           new Vector3(0, 1, 0.8 / 16), new Vector4(0, 1, 0, 1)),
@@ -44,7 +44,7 @@ public class VineModel {
 
       // West
       new DoubleSidedQuad(new Vector3(0.8 / 16, 0, 1), new Vector3(0.8 / 16, 0, 0),
-          new Vector3(0.8 / 16, 1, 1), new Vector4(1, 0, 0, 1)),
+          new Vector3(0.8 / 16, 1, 1), new Vector4(1, 0, 0, 1))
   };
 
   /**
@@ -84,51 +84,40 @@ public class VineModel {
     };
   }
 
-  public static boolean intersect(Ray ray, Scene scene, int connections) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (int i = 0; i < quads.length; ++i) {
-      if ((connections & (1 << i)) != 0) {
-        Quad quad = quads[i];
-        if (quad.intersect(ray)) {
-          float[] color = Texture.vines.getColor(ray.u, ray.v);
-          if (color[3] > Ray.EPSILON) {
-            ray.color.set(color);
-            float[] biomeColor = ray.getBiomeFoliageColor(scene);
-            ray.color.x *= biomeColor[0];
-            ray.color.y *= biomeColor[1];
-            ray.color.z *= biomeColor[2];
-            ray.t = ray.tNext;
-            ray.n.set(quad.n);
-            ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
-            hit = true;
-          }
-        }
-      }
+
+  private final Quad[] quads;
+  private final Texture[] textures;
+  private final Tint[] tints;
+
+  public VineModel(int connections) {
+    ArrayList<Quad> quads = new ArrayList<>();
+    for (int i = 0; i < 5; i++) {
+      if ((connections & (1 << i)) != 0)
+        quads.add(model[i]);
+    }
+    if ((connections & (1 << 5)) != 0) {
+      quads.add(topQuads[connections & 0b1111]);
     }
 
-    if ((connections & BlockData.CONNECTED_ABOVE) != 0) {
-      Quad top = topQuads[connections & 0b1111];
-      if (top.intersect(ray)) {
-        float[] color = Texture.vines.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          float[] biomeColor = ray.getBiomeFoliageColor(scene);
-          ray.color.x *= biomeColor[0];
-          ray.color.y *= biomeColor[1];
-          ray.color.z *= biomeColor[2];
-          ray.t = ray.tNext;
-          ray.n.set(top.n);
-          ray.n.scale(QuickMath.signum(-ray.d.dot(top.n)));
-          hit = true;
-        }
-      }
-    }
+    this.quads = quads.toArray(new Quad[0]);
+    this.textures = new Texture[this.quads.length];
+    Arrays.fill(textures, Texture.vines);
+    this.tints = new Tint[this.quads.length];
+    Arrays.fill(tints, Tint.BIOME_FOLIAGE);
+  }
 
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
+  }
+
+  @Override
+  public Tint[] getTints() {
+    return tints;
   }
 }

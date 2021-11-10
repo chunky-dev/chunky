@@ -2,11 +2,10 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class BigDripleafModel {
+public class BigDripleafModel extends QuadModel {
 
   //#region big_dripleaf
   private static final Quad[] bigDripleafNorth = Model.join(
@@ -263,72 +262,52 @@ public class BigDripleafModel {
   );
   //#endregion
 
-  private static final Quad[][][] orientedVariantQuads = new Quad[3][4][];
-
   private static final Texture[] textures;
 
   static {
-    orientedVariantQuads[0] = Model.rotateYNESW(bigDripleafNorth);
-    orientedVariantQuads[1] = Model.rotateYNESW(bigDripleafPartialTiltNorth);
-    orientedVariantQuads[2] = Model.rotateYNESW(bigDripleafFullTiltNorth);
-
     Texture top = Texture.bigDripleafTop;
     Texture tip = Texture.bigDripleafTip;
     Texture side = Texture.bigDripleafSide;
     Texture stem = Texture.bigDripleafStem;
-    textures = new Texture[]{top, top, tip, tip, side, side, side, side, stem, stem, stem, stem};
+    textures = new Texture[] {top, top, tip, tip, side, side, side, side, stem, stem, stem, stem};
   }
 
-  public static boolean intersect(Ray ray, String facing, String tilt) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
+  private Quad[] quads;
 
-    Quad[] quads = orientedVariantQuads[getModelIndex(tilt)][getOrientationIndex(facing)];
-
-    for (int i = 0; i < quads.length; i++) {
-      Quad quad = quads[i];
-      if (quad.intersect(ray)) {
-        float[] color = textures[i].getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          hit = true;
-        }
-      }
-    }
-
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
-  }
-
-  private static int getOrientationIndex(String facing) {
-    switch (facing) {
-      case "east":
-        return 1;
-      case "south":
-        return 2;
-      case "west":
-        return 3;
-      case "north":
-      default:
-        return 0;
-    }
-  }
-
-  private static int getModelIndex(String tilt) {
+  public BigDripleafModel(String facing, String tilt) {
     switch (tilt) {
       case "partial":
-        return 1;
+        quads = bigDripleafPartialTiltNorth;
+        break;
       case "full":
-        return 2;
+        quads = bigDripleafFullTiltNorth;
+        break;
       case "none":
       case "unstable":
       default:
-        return 0;
+        quads = bigDripleafNorth;
     }
+
+    switch (facing) {
+      case "east":
+        quads = Model.rotateY(quads, -Math.toRadians(90));
+        break;
+      case "south":
+        quads = Model.rotateY(quads, -Math.toRadians(180));
+        break;
+      case "west":
+        quads = Model.rotateY(quads, -Math.toRadians(270));
+        break;
+    }
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
+  }
+
+  @Override
+  public Quad[] getQuads() {
+    return quads;
   }
 }

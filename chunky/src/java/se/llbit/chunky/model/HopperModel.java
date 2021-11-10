@@ -78,7 +78,7 @@ public class HopperModel {
     ray.t = Double.POSITIVE_INFINITY;
     for (AABB box : boxes) {
       if (box.intersect(ray)) {
-        if (ray.n.y > 0) {
+        if (ray.getN().y > 0) {
           if (box == boxes[boxes.length - 1]) {
             Texture.hopperInside.getColor(ray);
           } else {
@@ -93,7 +93,7 @@ public class HopperModel {
       }
     }
     if (pipe[direction].intersect(ray)) {
-      if (ray.n.y > 0) {
+      if (ray.getN().y > 0) {
         Texture.hopperInside.getColor(ray);
       } else {
         Texture.hopperOutside.getColor(ray);
@@ -103,9 +103,10 @@ public class HopperModel {
       hit = true;
     }
     if (bottom.intersect(ray)) {
-      ray.n.set(bottom.n);
-      ray.n.scale(-QuickMath.signum(ray.d.dot(bottom.n)));
-      if (ray.n.y > 0) {
+      Vector3 n = new Vector3(bottom.n);
+      n.scale(-QuickMath.signum(ray.d.dot(bottom.n)));
+      ray.setN(n);
+      if (n.y > 0) {
         Texture.hopperInside.getColor(ray);
       } else {
         Texture.hopperOutside.getColor(ray);

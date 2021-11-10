@@ -1,52 +1,43 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.model.TripwireHookModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Ray;
 
-public class TripwireHook extends MinecraftBlockTranslucent {
-    private final int facing;
-    private final boolean attached, powered;
+public class TripwireHook extends AbstractModelBlock {
 
-    public TripwireHook(String facing, boolean attached, boolean powered) {
-        super("tripwire_hook", Texture.tripwire);
-        localIntersect = true;
-        this.attached = attached;
-        this.powered = powered;
-        switch (facing) {
-            default:
-            case "north":
-                this.facing = 0;
-                break;
-            case "south":
-                this.facing = 2;
-                break;
-            case "west":
-                this.facing = 3;
-                break;
-            case "east":
-                this.facing = 1;
-                break;
-        }
+  private final String description;
+  private final BlockFace facing;
+
+  public TripwireHook(String facingString, boolean attached, boolean powered) {
+    super("tripwire_hook", Texture.tripwire);
+    this.description = String
+        .format("facing=%s,attached=%s,powered=%s", facingString, attached, powered);
+    facing = BlockFace.fromName(facingString);
+    int facingVal;
+    switch (facing) {
+      default:
+      case BlockFace.NORTH:
+        facingVal = 0;
+        break;
+      case BlockFace.SOUTH:
+        facingVal = 2;
+        break;
+      case BlockFace.WEST:
+        facingVal = 3;
+        break;
+      case BlockFace.EAST:
+        facingVal = 1;
+        break;
     }
+    this.model = new TripwireHookModel(facingVal, attached, powered);
+  }
 
-    @Override
-    public boolean intersect(Ray ray, Scene scene) {
-        return TripwireHookModel.intersect(ray, facing, attached, powered);
-    }
+  @Override
+  public String description() {
+    return description;
+  }
 
-    @Override
-    public String description() {
-        return String.format("facing=%s,attached=%s,powered=%s", facing, attached, powered);
-    }
-
-    public BlockFace getFacing() {
-        return new BlockFace[]{
-            BlockFace.NORTH,
-            BlockFace.EAST,
-            BlockFace.SOUTH,
-            BlockFace.WEST
-        }[facing];
-    }
+  public BlockFace getFacing() {
+      return facing;
+  }
 }

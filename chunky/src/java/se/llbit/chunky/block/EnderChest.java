@@ -1,48 +1,36 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.model.ChestModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Ray;
 
-public class EnderChest extends MinecraftBlock {
-  private static final Texture[] texture = {
-      Texture.enderChestFront, Texture.enderChestBack, Texture.enderChestLeft,
-      Texture.enderChestRight, Texture.enderChestTop, Texture.enderChestBottom,
-      Texture.enderChestLock, Texture.enderChestLock, Texture.enderChestLock,
-      Texture.enderChestLock, Texture.enderChestLock,
-  };
+public class EnderChest extends AbstractModelBlock {
 
-  private final int facing;
   private final String description;
 
-  public EnderChest(String facing) {
+  public EnderChest(String facingString) {
     super("ender_chest", Texture.chestFront);
-    this.description = "facing=" + facing;
-    localIntersect = true;
-    opaque = false;
-    switch (facing) {
+    this.description = "facing=" + facingString;
+    int facing;
+    switch (facingString) {
       default:
       case "north":
-        this.facing = 2;
+        facing = 2;
         break;
       case "south":
-        this.facing = 3;
+        facing = 3;
         break;
       case "west":
-        this.facing = 4;
+        facing = 4;
         break;
       case "east":
-        this.facing = 5;
+        facing = 5;
         break;
     }
+    model = new ChestModel(0, facing, false, true);
   }
 
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return ChestModel.intersect(ray, texture, 0, facing);
-  }
-
-  @Override public String description() {
+  @Override
+  public String description() {
     return description;
   }
 }

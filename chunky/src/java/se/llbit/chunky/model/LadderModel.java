@@ -19,12 +19,11 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class LadderModel {
-  protected static Quad[] quads = {
+public class LadderModel extends QuadModel {
+  private static final Quad[] model = {
       // West.
       new DoubleSidedQuad(new Vector3(0.95, 0, 0), new Vector3(0.95, 0, 1), new Vector3(0.95, 1, 0),
           new Vector4(0, 1, 0, 1)),
@@ -42,24 +41,21 @@ public class LadderModel {
           new Vector4(0, 1, 0, 1)),
   };
 
-  public static boolean intersect(Ray ray) {
-    int facing = ray.getBlockData();
-    return intersect(ray, facing);
+  private static final Texture[] textures = { Texture.ladder };
+
+  private final Quad[] quads = new Quad[1];
+
+  public LadderModel(int facing) {
+    quads[0] = model[facing % 4];
   }
 
-  public static boolean intersect(Ray ray, int facing) {
-    Quad quad = quads[facing % 4];
-    ray.t = Double.POSITIVE_INFINITY;
-    if (quad.intersect(ray)) {
-      float[] color = Texture.ladder.getColor(ray.u, ray.v);
-      if (color[3] > Ray.EPSILON) {
-        ray.color.set(color);
-        ray.n.set(quad.n);
-        ray.distance += ray.tNext;
-        ray.o.scaleAdd(ray.tNext, ray.d);
-        return true;
-      }
-    }
-    return false;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

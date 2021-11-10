@@ -22,17 +22,18 @@ import static se.llbit.chunky.model.Model.translate;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
+
+import java.util.Arrays;
 
 /**
  * A lever switch.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class LeverModel {
-  private static Quad[] base = {
+public class LeverModel extends QuadModel {
+  private static final Quad[] base = {
       // front
       new Quad(new Vector3(.75, 0, .3125), new Vector3(.25, 0, .3125),
           new Vector3(.75, .1875, .3125), new Vector4(.75, .25, 0, .1875)),
@@ -54,30 +55,30 @@ public class LeverModel {
           new Vector3(.75, .1875, .6875), new Vector4(.75, 0, .3125, .6875)),
 
       // bottom
-    /*new Quad(new Vector3d(.25, 0, .3125), new Vector3d(.75, 0, .3125),
-				new Vector3d(.25, 0, .6875), new Vector4d(.25, .75, .3125, .6875)),*/
-
+      new Quad(new Vector3(.25, 0, .3125), new Vector3(.75, 0, .3125),
+          new Vector3(.25, 0, .6875), new Vector4(.25, .75, .3125, .6875)),
   };
 
-  private static Quad[] lever =
-      {new Quad(new Vector3(.5625, 0, .4375), new Vector3(.4375, 0, .4375),
+  private static final Quad[] lever = {
+      new Quad(new Vector3(.5625, 0, .4375), new Vector3(.4375, 0, .4375),
           new Vector3(.5625, .625, .4375), new Vector4(.5625, .4375, 0, .625)),
 
-          new Quad(new Vector3(.4375, 0, .5625), new Vector3(.5625, 0, .5625),
-              new Vector3(.4375, .625, .5625), new Vector4(.4375, .5625, 0, .625)),
+      new Quad(new Vector3(.4375, 0, .5625), new Vector3(.5625, 0, .5625),
+          new Vector3(.4375, .625, .5625), new Vector4(.4375, .5625, 0, .625)),
 
-          new Quad(new Vector3(.4375, 0, .4375), new Vector3(.4375, 0, .5625),
-              new Vector3(.4375, .625, .4375), new Vector4(.4375, .5625, 0, .625)),
+      new Quad(new Vector3(.4375, 0, .4375), new Vector3(.4375, 0, .5625),
+          new Vector3(.4375, .625, .4375), new Vector4(.4375, .5625, 0, .625)),
 
-          new Quad(new Vector3(.5625, 0, .5625), new Vector3(.5625, 0, .4375),
-              new Vector3(.5625, .625, .5625), new Vector4(.5625, .4375, 0, .625)),
+      new Quad(new Vector3(.5625, 0, .5625), new Vector3(.5625, 0, .4375),
+          new Vector3(.5625, .625, .5625), new Vector4(.5625, .4375, 0, .625)),
 
-          // top
-          new Quad(new Vector3(.4375, .625, .5625), new Vector3(.5625, .625, .5625),
-              new Vector3(.4375, .625, .4375), new Vector4(.4375, .5625, .5, .625)),};
+      // top
+      new Quad(new Vector3(.4375, .625, .5625), new Vector3(.5625, .625, .5625),
+          new Vector3(.4375, .625, .4375), new Vector4(.4375, .5625, .5, .625)),
+  };
 
-  private static Quad[][][] baseRotated = new Quad[8][2][];
-  private static Quad[][][] leverRotated = new Quad[8][2][];
+  private static final Quad[][][] baseRotated = new Quad[8][2][];
+  private static final Quad[][][] leverRotated = new Quad[8][2][];
 
   static {
 
@@ -146,40 +147,28 @@ public class LeverModel {
     leverRotated[7][1] = leverCeilingNSOn;
   }
 
-  public static boolean intersect(Ray ray) {
-    int metadata = ray.getBlockData();
-    int activated = (metadata >> 3) & 1;
-    int position = (metadata & 7);
-    return intersect(ray, position, activated);
+  private static final Texture[] textures = new Texture[base.length + lever.length];
+  static {
+    Arrays.fill(textures, 0, base.length, Texture.cobblestone);
+    Arrays.fill(textures, base.length, textures.length, Texture.lever);
   }
 
-  public static boolean intersect(Ray ray, int position, int activated) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
+  private final Quad[] quads;
 
-    for (Quad quad : baseRotated[position][activated]) {
-      if (quad.intersect(ray)) {
-        Texture.cobblestone.getColor(ray);
-        ray.n.set(quad.n);
-        ray.t = ray.tNext;
-        hit = true;
-      }
-    }
+  public LeverModel(int postion, int activated) {
+    quads = Model.join(
+        baseRotated[postion][activated],
+        leverRotated[postion][activated]
+    );
+  }
 
-    for (Quad quad : leverRotated[position][activated]) {
-      if (quad.intersect(ray)) {
-        Texture.lever.getColor(ray);
-        ray.n.set(quad.n);
-        ray.t = ray.tNext;
-        hit = true;
-      }
-    }
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
 
-    if (hit) {
-      ray.color.w = 1;
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

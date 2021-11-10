@@ -50,7 +50,13 @@ public class Ray {
   /**
    * Intersection normal.
    */
-  public Vector3 n = new Vector3();
+  private Vector3 n = new Vector3();
+
+  /**
+   * Geometry normal, almost always the same as normal except when a normal map is used
+   * This stays the real normal of the geometry
+   */
+  private Vector3 geomN = new Vector3();
 
   /**
    * Distance traveled in current medium. This is updated after all intersection tests have run and
@@ -159,6 +165,7 @@ public class Ray {
     o.set(other.o);
     d.set(other.d);
     n.set(other.n);
+    geomN.set(other.geomN);
     color.set(0, 0, 0, 0);
     emittance.set(0, 0, 0);
     specular = other.specular;
@@ -242,6 +249,7 @@ public class Ray {
 
     o.scaleAdd(tNext, d);
     n.set(nx, ny, nz);
+    geomN.set(nx, ny, nz);
     distance += tNext;
   }
 
@@ -319,6 +327,13 @@ public class Ray {
     o.scaleAdd(Ray.OFFSET, d);
     currentMaterial = prevMaterial;
     specular = false;
+
+    // See specularReflection for explanation of why this is needed
+    if(QuickMath.signum(geomN.dot(d)) == QuickMath.signum(geomN.dot(ray.d))) {
+      double factor = QuickMath.signum(geomN.dot(ray.d)) * -Ray.EPSILON - d.dot(geomN);
+      d.scaleAdd(factor, geomN);
+      d.normalize();
+    }
   }
 
   /**
@@ -392,6 +407,27 @@ public class Ray {
       // roughness is zero, do a specular reflection
       d.scaleAdd(-2 * ray.d.dot(ray.n), ray.n, ray.d);
       o.scaleAdd(0.00001, ray.n);
+    }
+
+    // After reflection, the dot product between the direction and the real surface normal
+    // should have the opposite sign as the dot product between the incoming direction
+    // and the normal (because the incoming is going toward the volume enclosed
+    // by the surface and the reflected ray is going away)
+    // If this is not the case, we need to fix that
+    if(QuickMath.signum(geomN.dot(d)) == QuickMath.signum(geomN.dot(ray.d))) {
+      // The reflected ray goes is going through the geometry,
+      // we need to alter its direction so it doesn't.
+      // The way we do that is by adding the geometry normal multiplied by some factor
+      // The factor can be determined by projecting the direction on the normal,
+      // ie doing a dot product because, for every unit vector d and n,
+      // we have the relation:
+      // `(d - d.n * n) . n = 0`
+      // This tells us that if we chose `-d.n` as the factor we would have a dot product
+      // equals to 0, as we want something positive or negative,
+      // we will use the factor `-d.n +/- epsilon`
+      double factor = QuickMath.signum(geomN.dot(ray.d)) * -Ray.EPSILON - d.dot(geomN);
+      d.scaleAdd(factor, geomN);
+      d.normalize();
     }
   }
 
@@ -493,5 +529,32 @@ public class Ray {
    */
   public int getCurrentData() {
     return currentData;
+  }
+  
+  public Vector3 getN() {
+    return n;
+  }
+
+  public Vector3 getGeomN() {
+    return geomN;
+  }
+
+  public void setN(double x, double y, double z) {
+    n.set(x, y, z);
+    geomN.set(x, y, z);
+  }
+
+  public void setN(Vector3 newN) {
+    n.set(newN);
+    geomN.set(newN);
+  }
+
+  public void setShadingN(double x, double y, double z) {
+    n.set(x, y, z);
+  }
+
+  public void invertNormal() {
+    n.scale(-1);
+    geomN.scale(-1);
   }
 }

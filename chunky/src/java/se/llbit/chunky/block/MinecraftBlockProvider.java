@@ -2334,12 +2334,7 @@ public class MinecraftBlockProvider implements BlockProvider {
             Texture.loomTop,
             Texture.loomBottom);
       case "barrel":
-        return new OrientedTexturedBlock(
-            name,
-            BlockProvider.facing(tag),
-            Texture.barrelSide,
-            Texture.barrelTop,
-            Texture.barrelBottom);
+        return new Barrel(tag.get("Properties").get("facing").stringValue(), tag.get("Properties").get("open").stringValue().equals("true"));
       case "smoker":
         return smoker(tag);
       case "blast_furnace":
@@ -2976,7 +2971,7 @@ public class MinecraftBlockProvider implements BlockProvider {
   private static Block snowCovered(Tag tag, Block block) {
     String snowy = tag.get("Properties").get("snowy").stringValue("false");
     if (snowy.equals("true")) {
-      block = new SnowCovered(block);
+      block = new TexturedBlock(block.name, Texture.snowSide, Texture.snowBlock, Texture.dirt);
     }
     return block;
   }

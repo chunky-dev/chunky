@@ -750,6 +750,7 @@ public class Texture {
 
   // [1.14]
   public static final Texture barrelTop = new Texture();
+  public static final Texture barrelOpen = new Texture();
   public static final Texture barrelSide = new Texture();
   public static final Texture barrelBottom = new Texture();
   public static final Texture loomBottom = new Texture();

@@ -21,6 +21,11 @@ import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 
 public class SaplingModel extends SpriteModel {
+
+  public SaplingModel(Texture texture, String facing) {
+    super(texture, facing);
+  }
+
   public static boolean intersect(Ray ray, Texture texture) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
@@ -29,7 +34,7 @@ public class SaplingModel extends SpriteModel {
         float[] color = texture.getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
-          ray.n.set(quad.n);
+          ray.setN(quad.n);
           ray.t = ray.tNext;
           hit = true;
         }

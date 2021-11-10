@@ -122,7 +122,7 @@ public class PreviewRayTracer implements RayTracer {
       if (t > 0 && t < ray.t) {
         ray.t = t;
         Water.INSTANCE.getColor(ray);
-        ray.n.set(0, 1, 0);
+        ray.setN(0, 1, 0);
         ray.setCurrentMaterial(scene.getPalette().water);
         return true;
       }
@@ -131,7 +131,7 @@ public class PreviewRayTracer implements RayTracer {
       if (t > 0 && t < ray.t) {
         ray.t = t;
         Water.INSTANCE.getColor(ray);
-        ray.n.set(0, -1, 0);
+        ray.setN(0, -1, 0);
         ray.setCurrentMaterial(Air.INSTANCE);
         return true;
       }
@@ -191,7 +191,7 @@ public class PreviewRayTracer implements RayTracer {
         }
         // handle like a solid horizontal plane
         ray.setCurrentMaterial(MinecraftBlock.STONE);
-        ray.n.set(0, 1, 0);
+        ray.setN(0, 1, 0);
         return true;
       }
     }

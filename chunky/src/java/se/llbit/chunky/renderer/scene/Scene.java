@@ -784,7 +784,7 @@ public class Scene implements JsonSerializable, Refreshable {
     r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
     if (worldOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
       ray.t = r.distance;
-      ray.n.set(r.n);
+      ray.setN(r.getN());
       ray.color.set(r.color);
       ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
       ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
@@ -795,7 +795,7 @@ public class Scene implements JsonSerializable, Refreshable {
       r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
       if(waterOctree.exitWater(this, r, palette) && r.distance < ray.t - Ray.EPSILON) {
         ray.t = r.distance;
-        ray.n.set(r.n);
+        ray.setN(r.getN());
         ray.color.set(r.color);
         ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
         ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
@@ -808,7 +808,7 @@ public class Scene implements JsonSerializable, Refreshable {
       r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
       if (waterOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
         ray.t = r.distance;
-        ray.n.set(r.n);
+        ray.setN(r.getN());
         ray.color.set(r.color);
         ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
         ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());

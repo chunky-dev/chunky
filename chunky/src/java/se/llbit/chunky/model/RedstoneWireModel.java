@@ -20,12 +20,15 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class RedstoneWireModel {
-  private static final Quad[] quads = {
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class RedstoneWireModel extends QuadModel {
+  //region Model
+  private static final Quad[] model = {
       // 0000 no connection
       new Quad(new Vector3(11 / 16., 0, 5 / 16.), new Vector3(5 / 16., 0, 5 / 16.),
           new Vector3(11 / 16., 0, 11 / 16.), new Vector4(11 / 16., 5 / 16., 11 / 16., 5 / 16.)),
@@ -90,6 +93,7 @@ public class RedstoneWireModel {
       new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 0, 1),
           new Vector4(1, 0, 1, 0))
   };
+  //endregion
 
   private static final Quad eastSide =
       new Quad(new Vector3(1, 1, 0), new Vector3(1, 0, 0), new Vector3(1, 1, 1),
@@ -112,106 +116,60 @@ public class RedstoneWireModel {
       Texture.redstoneWireCross, Texture.redstoneWireCross, Texture.redstoneWireCross
   };
 
-  private static final float[][] wireColor = new float[16][3];
+  private static final Tint[] wireTints = new Tint[16];
 
   static {
     float[] color0 = new float[3];
     float[] color1 = new float[3];
+    float[] wireColor = new float[3];
     ColorUtil.getRGBComponents(0x4D0000, color0);
     ColorUtil.toLinear(color0);
     ColorUtil.getRGBComponents(0xFD3100, color1);
     ColorUtil.toLinear(color1);
     for (int i = 0; i < 16; ++i) {
-      wireColor[i][0] = color0[0] + (i / 15.f) * (color1[0] - color0[0]);
-      wireColor[i][1] = color0[1] + (i / 15.f) * (color1[1] - color0[1]);
-      wireColor[i][2] = color0[2] + (i / 15.f) * (color1[2] - color0[2]);
+      wireColor[0] = color0[0] + (i / 15.f) * (color1[0] - color0[0]);
+      wireColor[1] = color0[1] + (i / 15.f) * (color1[1] - color0[1]);
+      wireColor[2] = color0[2] + (i / 15.f) * (color1[2] - color0[2]);
+      wireTints[i] = new Tint(wireColor);
     }
   }
 
-  public static boolean intersect(Ray ray) {
-    int power = ray.getBlockData();
-    int data = ray.getCurrentData();
-    return intersect(ray, power, data);
-  }
+  private final Quad[] quads;
+  private final Texture[] textures;
+  private final Tint[] tints;
 
-  public static boolean intersect(Ray ray, int power, int data) {
-    boolean hit = false;
+  public RedstoneWireModel(int power, int data) {
     int connection = 0xF & (data >> BlockData.RSW_EAST_CONNECTION);
-    ray.t = Double.POSITIVE_INFINITY;
-    Quad quad = quads[connection];
-    if (quad.intersect(ray)) {
-      float[] color = tex[connection].getColor(ray.u, ray.v);
-      if (color[3] > Ray.EPSILON) {
-        ray.color.x = color[0] * wireColor[power][0];
-        ray.color.y = color[1] * wireColor[power][1];
-        ray.color.z = color[2] * wireColor[power][2];
-        ray.color.w = color[3];
-        ray.n.set(quad.n);
-        ray.t = ray.tNext;
-        hit = true;
-      }
-    }
-    if ((data & (1 << BlockData.RSW_EAST_UP)) != 0) {
-      if (eastSide.intersect(ray)) {
-        float[] color = Texture.redstoneWire.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.x = color[0] * wireColor[power][0];
-          ray.color.y = color[1] * wireColor[power][1];
-          ray.color.z = color[2] * wireColor[power][2];
-          ray.color.w = color[3];
-          ray.n.set(eastSide.n);
-          ray.t = ray.tNext;
-          hit = true;
-        }
-      }
-    }
-    if ((data & (1 << BlockData.RSW_WEST_UP)) != 0) {
-      if (westSide.intersect(ray)) {
-        float[] color = Texture.redstoneWire.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.x = color[0] * wireColor[power][0];
-          ray.color.y = color[1] * wireColor[power][1];
-          ray.color.z = color[2] * wireColor[power][2];
-          ray.color.w = color[3];
-          ray.n.set(westSide.n);
-          ray.t = ray.tNext;
-          hit = true;
-        }
-      }
-    }
-    if ((data & (1 << BlockData.RSW_NORTH_UP)) != 0) {
-      if (northSide.intersect(ray)) {
-        float[] color = Texture.redstoneWire.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.x = color[0] * wireColor[power][0];
-          ray.color.y = color[1] * wireColor[power][1];
-          ray.color.z = color[2] * wireColor[power][2];
-          ray.color.w = color[3];
-          ray.n.set(northSide.n);
-          ray.t = ray.tNext;
-          hit = true;
-        }
-      }
-    }
-    if ((data & (1 << BlockData.RSW_SOUTH_UP)) != 0) {
-      if (southSide.intersect(ray)) {
-        float[] color = Texture.redstoneWire.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.x = color[0] * wireColor[power][0];
-          ray.color.y = color[1] * wireColor[power][1];
-          ray.color.z = color[2] * wireColor[power][2];
-          ray.color.w = color[3];
-          ray.n.set(southSide.n);
-          ray.t = ray.tNext;
-          hit = true;
-        }
-      }
-    }
-    if (hit) {
-      ray.distance += ray.tNext;
-      ray.o.scaleAdd(ray.tNext, ray.d);
-      return true;
-    }
-    return false;
+    ArrayList<Quad> quads = new ArrayList<>();
+    quads.add(model[connection]);
+    if ((data & (1 << BlockData.RSW_EAST_UP)) != 0)
+      quads.add(eastSide);
+    if ((data & (1 << BlockData.RSW_WEST_UP)) != 0)
+      quads.add(westSide);
+    if ((data & (1 << BlockData.RSW_NORTH_UP)) != 0)
+      quads.add(northSide);
+    if ((data & (1 << BlockData.RSW_SOUTH_UP)) != 0)
+      quads.add(southSide);
+    this.quads = quads.toArray(new Quad[0]);
+    this.textures = new Texture[this.quads.length];
+    Arrays.fill(this.textures, Texture.redstoneWire);
+    this.textures[0] = tex[connection];
+    this.tints = new Tint[this.quads.length];
+    Arrays.fill(this.tints, wireTints[power]);
+  }
+
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
+  }
+
+  @Override
+  public Tint[] getTints() {
+    return tints;
   }
 }
