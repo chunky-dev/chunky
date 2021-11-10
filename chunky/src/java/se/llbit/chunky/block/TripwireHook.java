@@ -16,16 +16,16 @@ public class TripwireHook extends AbstractModelBlock {
     int facingVal;
     switch (facing) {
       default:
-      case BlockFace.NORTH:
+      case NORTH:
         facingVal = 0;
         break;
-      case BlockFace.SOUTH:
+      case SOUTH:
         facingVal = 2;
         break;
-      case BlockFace.WEST:
+      case WEST:
         facingVal = 3;
         break;
-      case BlockFace.EAST:
+      case EAST:
         facingVal = 1;
         break;
     }
