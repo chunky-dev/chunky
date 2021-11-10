@@ -317,7 +317,7 @@ public class ScaffoldingModel {
                 if (color[3] > Ray.EPSILON) {
                     ray.color.set(color);
                     ray.t = ray.tNext;
-                    ray.setNormal(quad.n);
+                    ray.n.set(quad.n);
                     hit = true;
                 }
             }

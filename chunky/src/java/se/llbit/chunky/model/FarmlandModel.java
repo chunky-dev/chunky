@@ -31,7 +31,7 @@ public class FarmlandModel {
   public static boolean intersect(Ray ray) {
     ray.t = Double.POSITIVE_INFINITY;
     if (block.intersect(ray)) {
-      if (ray.getNormal().y == 1) {
+      if (ray.n.y == 1) {
         tex[ray.getBlockData() % 9].getColor(ray);
       } else {
         Texture.dirt.getColor(ray);

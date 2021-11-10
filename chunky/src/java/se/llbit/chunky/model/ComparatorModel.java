@@ -149,7 +149,7 @@ public class ComparatorModel {
     for (Quad face : rot[direction]) {
       if (face.intersect(ray)) {
         blockTex[powered].getColor(ray);
-        ray.setNormal(face.n);
+        ray.n.set(face.n);
         ray.t = ray.tNext;
         hit = true;
       }
@@ -159,7 +159,7 @@ public class ComparatorModel {
         float[] color = torchTex[active].getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
-          ray.setNormal(face.n);
+          ray.n.set(face.n);
           ray.t = ray.tNext;
           hit = true;
         }
@@ -170,7 +170,7 @@ public class ComparatorModel {
         float[] color = torchTex[powered].getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
-          ray.setNormal(face.n);
+          ray.n.set(face.n);
           ray.t = ray.tNext;
           hit = true;
         }
@@ -181,7 +181,7 @@ public class ComparatorModel {
 				float[] color = torchTex[powered].getColor(ray.u, ray.v);
 				if (color[3] > Ray.EPSILON) {
 					ray.color.set(color);
-					ray.setNormal(face.n);
+					ray.n.set(face.n);
 					ray.t = ray.tNext;
 					hit = true;
 				}

@@ -93,7 +93,7 @@ public class ObserverModel {
       Quad face = faces[direction][i];
       if (face.intersect(ray)) {
         textures[textureIndex[i]].getColor(ray);
-        ray.setNormal(face.n);
+        ray.n.set(face.n);
         ray.t = ray.tNext;
         hit = true;
       }

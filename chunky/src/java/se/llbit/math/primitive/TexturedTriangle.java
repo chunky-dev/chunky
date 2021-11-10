@@ -124,7 +124,7 @@ public class TexturedTriangle implements Primitive {
         ray.color.set(color);
         ray.setCurrentMaterial(material);
         ray.t = t;
-        ray.setNormal(n);
+        ray.n.set(n);
         return true;
       }
     }

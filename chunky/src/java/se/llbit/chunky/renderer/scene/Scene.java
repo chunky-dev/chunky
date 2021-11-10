@@ -51,6 +51,8 @@ import se.llbit.chunky.block.*;
 import se.llbit.chunky.block.legacy.LegacyBlocksFinalizer;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.GenericChunkData;
+import se.llbit.chunky.chunk.SimpleChunkData;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.Lectern;
@@ -782,7 +784,7 @@ public class Scene implements JsonSerializable, Refreshable {
     r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
     if (worldOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
       ray.t = r.distance;
-      ray.setNormal(r.getNormal());
+      ray.n.set(r.n);
       ray.color.set(r.color);
       ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
       ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
@@ -793,7 +795,7 @@ public class Scene implements JsonSerializable, Refreshable {
       r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
       if(waterOctree.exitWater(this, r, palette) && r.distance < ray.t - Ray.EPSILON) {
         ray.t = r.distance;
-        ray.setNormal(r.getNormal());
+        ray.n.set(r.n);
         ray.color.set(r.color);
         ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
         ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
@@ -806,7 +808,7 @@ public class Scene implements JsonSerializable, Refreshable {
       r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
       if (waterOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
         ray.t = r.distance;
-        ray.setNormal(r.getNormal());
+        ray.n.set(r.n);
         ray.color.set(r.color);
         ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
         ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());

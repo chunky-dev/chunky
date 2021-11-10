@@ -186,7 +186,7 @@ public class TurtleEgg extends MinecraftBlockTranslucent {
       for (Quad quad : rot[hatch][i]) {
         if (quad.intersect(ray)) {
           textures[hatch].getColor(ray);
-          ray.setNormal(quad.n);
+          ray.n.set(quad.n);
           ray.t = ray.tNext;
           hit = true;
         }

@@ -195,7 +195,7 @@ public class ChestModel {
       Quad side = rot[i];
       if (side.intersect(ray)) {
         texture[i].getColor(ray);
-        ray.setNormal(side.n);
+        ray.n.set(side.n);
         ray.t = ray.tNext;
         hit = true;
       }

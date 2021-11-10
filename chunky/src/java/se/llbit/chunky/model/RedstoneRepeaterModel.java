@@ -175,7 +175,7 @@ public class RedstoneRepeaterModel {
     for (Quad face : rot[direction]) {
       if (face.intersect(ray)) {
         tex[on].getColor(ray);
-        ray.setNormal(face.n);
+        ray.n.set(face.n);
         ray.t = ray.tNext;
         hit = true;
       }
@@ -185,7 +185,7 @@ public class RedstoneRepeaterModel {
         float[] color = torchTex[0][on].getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
-          ray.setNormal(face.n);
+          ray.n.set(face.n);
           ray.t = ray.tNext;
           hit = true;
         }
@@ -196,7 +196,7 @@ public class RedstoneRepeaterModel {
         float[] color = torchTex[locked][on].getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
-          ray.setNormal(face.n);
+          ray.n.set(face.n);
           ray.t = ray.tNext;
           hit = true;
         }

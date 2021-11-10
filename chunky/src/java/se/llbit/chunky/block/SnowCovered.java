@@ -3,7 +3,6 @@ package se.llbit.chunky.block;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
 
 public class SnowCovered extends MinecraftBlock {
   private final Block block;
@@ -18,10 +17,9 @@ public class SnowCovered extends MinecraftBlock {
     ray.t = Double.POSITIVE_INFINITY;
     boolean hit = block.intersect(ray, scene);
     if (hit) {
-      Vector3 n = ray.getNormal();
-      if (n.y == 0) {
+      if (ray.n.y == 0) {
         Texture.snowSide.getColor(ray);
-      } else if (n.y > 0) {
+      } else if (ray.n.y > 0) {
         Texture.snowBlock.getColor(ray);
       }
     }

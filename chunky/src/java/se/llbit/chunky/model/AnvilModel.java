@@ -68,7 +68,7 @@ public class AnvilModel {
     ray.t = Double.POSITIVE_INFINITY;
     for (int i = 0; i < boxes[0].length; ++i) {
       if (boxes[orientation][i].intersect(ray)) {
-        if (i == 0 && ray.getNormal().y > 0) {
+        if (i == 0 && ray.n.y > 0) {
           double tmp = ray.v;
           ray.v = ray.u * orientation + tmp * (1 - orientation);
           ray.u = tmp * orientation + ray.u * (1 - orientation);

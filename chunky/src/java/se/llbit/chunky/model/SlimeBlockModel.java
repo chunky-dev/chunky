@@ -95,7 +95,7 @@ public class SlimeBlockModel {
                 float[] color = tex[i].getColor(ray.u, ray.v);
                 if (color[3] > Ray.EPSILON) {
                     ColorUtil.overlayColor(ray.color, color);
-                    ray.setNormal(quad.n);
+                    ray.n.set(quad.n);
                     ray.t = ray.tNext;
                     hit = true;
                 }
@@ -113,7 +113,7 @@ public class SlimeBlockModel {
                 float[] color = tex[i].getColor(ray.u, ray.v);
                 if (color[3] > Ray.EPSILON) {
                     ColorUtil.overlayColor(ray.color, color);
-                    ray.setNormal(quad.n);
+                    ray.n.set(quad.n);
                     ray.t = ray.tNext;
                     hit = true;
                 }

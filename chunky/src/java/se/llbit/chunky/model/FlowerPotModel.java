@@ -408,7 +408,7 @@ public class FlowerPotModel {
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
           ray.t = ray.tNext;
-          ray.setNormal(quad.n);
+          ray.n.set(quad.n);
           hit = true;
         }
       }
@@ -425,7 +425,7 @@ public class FlowerPotModel {
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
           ray.t = ray.tNext;
-          ray.setNormal(quad.n);
+          ray.n.set(quad.n);
           hit = true;
         }
       }
@@ -435,7 +435,7 @@ public class FlowerPotModel {
 
   private static boolean cactus(Ray ray) {
     if (cactus.intersect(ray)) {
-      if (ray.getNormal().y > 0) {
+      if (ray.n.y > 0) {
         Texture.cactusTop.getColor(ray);
       } else {
         Texture.cactusSide.getColor(ray);

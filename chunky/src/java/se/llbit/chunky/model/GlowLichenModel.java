@@ -47,7 +47,8 @@ public class GlowLichenModel {
           if (color[3] > Ray.EPSILON) {
             ray.color.set(color);
             ray.t = ray.tNext;
-            ray.orientNormal(quad.n);
+            ray.n.set(quad.n);
+            ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
             hit = true;
           }
         }

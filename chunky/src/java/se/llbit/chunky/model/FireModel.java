@@ -16,7 +16,9 @@
  */
 package se.llbit.chunky.model;
 
+import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.resources.AnimatedTexture;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
@@ -53,7 +55,7 @@ public class FireModel {
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
           ray.t = ray.tNext;
-          ray.setNormal(quad.n);
+          ray.n.set(quad.n);
           hit = true;
         }
       }

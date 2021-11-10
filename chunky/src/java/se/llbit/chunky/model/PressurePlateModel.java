@@ -57,7 +57,7 @@ public class PressurePlateModel {
     for (Quad quad : quads) {
       if (quad.intersect(ray)) {
         texture.getColor(ray);
-        ray.setNormal(quad.n);
+        ray.n.set(quad.n);
         ray.t = ray.tNext;
         hit = true;
       }

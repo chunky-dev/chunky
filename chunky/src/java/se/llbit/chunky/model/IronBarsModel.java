@@ -100,7 +100,8 @@ public class IronBarsModel {
         if (quad.intersect(ray)) {
           Texture.ironBars.getColor(ray);
           if (ray.color.w > 0) {
-            ray.orientNormal(quad.n);
+            ray.n.set(quad.n);
+            ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
             ray.t = ray.tNext;
             hit = true;
           }
@@ -111,7 +112,8 @@ public class IronBarsModel {
       if (quad.intersect(ray)) {
         Texture.ironBars.getColor(ray);
         if (ray.color.w > 0) {
-          ray.orientNormal(quad.n);
+          ray.n.set(quad.n);
+          ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
           ray.t = ray.tNext;
           hit = true;
         }
@@ -124,7 +126,8 @@ public class IronBarsModel {
           if (quad.intersect(ray)) {
             Texture.ironBars.getColor(ray);
             if (ray.color.w > 0) {
-              ray.orientNormal(quad.n);
+              ray.n.set(quad.n);
+              ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
               ray.t = ray.tNext;
               hit = true;
             }

@@ -50,7 +50,7 @@ public class Slab extends MinecraftBlockTranslucent {
   @Override public boolean intersect(Ray ray, Scene scene) {
     ray.t = Double.POSITIVE_INFINITY;
     if (aabb[half].intersect(ray)) {
-      if (ray.getNormal().y != 0) {
+      if (ray.n.y != 0) {
         topTexture.getColor(ray);
       } else {
         sideTexture.getColor(ray);

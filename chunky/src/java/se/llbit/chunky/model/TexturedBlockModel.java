@@ -21,7 +21,6 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
 
 /**
  * A textured block.
@@ -44,16 +43,15 @@ public class TexturedBlockModel {
     ray.t = Double.POSITIVE_INFINITY;
     if (block.intersect(ray)) {
       float[] color;
-      Vector3 n = ray.getNormal();
-      if (n.z < 0) {
+      if (ray.n.z < 0) {
         color = texture[0].getColor(ray.u, ray.v);
-      } else if (n.z > 0) {
+      } else if (ray.n.z > 0) {
         color = texture[1].getColor(ray.u, ray.v);
-      } else if (n.x > 0) {
+      } else if (ray.n.x > 0) {
         color = texture[2].getColor(ray.u, ray.v);
-      } else if (n.x < 0) {
+      } else if (ray.n.x < 0) {
         color = texture[3].getColor(ray.u, ray.v);
-      } else if (n.y > 0) {
+      } else if (ray.n.y > 0) {
         color = texture[4].getColor(1 - ray.u, 1 - ray.v);
       } else {
         color = texture[5].getColor(ray.u, ray.v);
@@ -81,16 +79,15 @@ public class TexturedBlockModel {
     ray.t = Double.POSITIVE_INFINITY;
     if (block.intersect(ray)) {
       float[] color;
-      Vector3 n = ray.getNormal();
-      if (n.z < 0) {
+      if (ray.n.z < 0) {
         color = texture[index[0]].getColor(ray.u, ray.v);
-      } else if (n.z > 0) {
+      } else if (ray.n.z > 0) {
         color = texture[index[1]].getColor(ray.u, ray.v);
-      } else if (n.x > 0) {
+      } else if (ray.n.x > 0) {
         color = texture[index[2]].getColor(ray.u, ray.v);
-      } else if (n.x < 0) {
+      } else if (ray.n.x < 0) {
         color = texture[index[3]].getColor(ray.u, ray.v);
-      } else if (n.y > 0) {
+      } else if (ray.n.y > 0) {
         color = texture[index[4]].getColor(1 - ray.u, 1 - ray.v);
       } else {
         color = texture[index[5]].getColor(ray.u, ray.v);
@@ -153,21 +150,20 @@ public class TexturedBlockModel {
     int bx = (int) QuickMath.floor(ray.o.x);
     int by = (int) QuickMath.floor(ray.o.y);
     int bz = (int) QuickMath.floor(ray.o.z);
-    Vector3 n = ray.getNormal();
-    if (n.y != 0) {
+    if (ray.n.y != 0) {
       ray.u = ray.o.x - bx;
       ray.v = ray.o.z - bz;
-    } else if (n.x != 0) {
+    } else if (ray.n.x != 0) {
       ray.u = ray.o.z - bz;
       ray.v = ray.o.y - by;
     } else {
       ray.u = ray.o.x - bx;
       ray.v = ray.o.y - by;
     }
-    if (n.x > 0 || n.z < 0) {
+    if (ray.n.x > 0 || ray.n.z < 0) {
       ray.u = 1 - ray.u;
     }
-    if (n.y > 0) {
+    if (ray.n.y > 0) {
       ray.v = 1 - ray.v;
     }
   }
