@@ -6,6 +6,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector3;
 
 /**
  * A block model that is made out of textured quads.
@@ -47,10 +48,11 @@ public abstract class QuadModel implements BlockModel {
           tint.tint(c, ray, scene);
           color = c;
           ray.t = ray.tNext;
-          ray.n.set(quad.n);
+          Vector3 n = new Vector3(quad.n);
           if (quad.doubleSided) {
-            ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
+            n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
           }
+          ray.setN(n);
           hit = true;
         }
       }

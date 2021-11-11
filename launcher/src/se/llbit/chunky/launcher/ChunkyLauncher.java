@@ -1,4 +1,5 @@
 /* Copyright (c) 2013-2016 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -58,7 +59,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ChunkyLauncher {
 
-  public static final String LAUNCHER_VERSION = "v1.12.1";
+  public static final String LAUNCHER_VERSION = "v1.12.2";
 
   /**
    * Print a launch error message to the console.
@@ -239,7 +240,7 @@ public class ChunkyLauncher {
       }
     } catch(NoClassDefFoundError e) {
       String cause = e.getMessage();
-      if(cause.contains("javafx")) {
+      if(cause != null && cause.contains("javafx")) {
         // Javafx error
         if(retryIfMissingJavafx)
           JavaFxLocator.retryWithJavafx(args);

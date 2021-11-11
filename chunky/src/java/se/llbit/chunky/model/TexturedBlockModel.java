@@ -21,6 +21,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector3;
 
 /**
  * A textured block.
@@ -74,20 +75,21 @@ public class TexturedBlockModel extends AABBModel {
     int bx = (int) QuickMath.floor(ray.o.x);
     int by = (int) QuickMath.floor(ray.o.y);
     int bz = (int) QuickMath.floor(ray.o.z);
-    if (ray.n.y != 0) {
+    Vector3 n = ray.getN();
+    if (n.y != 0) {
       ray.u = ray.o.x - bx;
       ray.v = ray.o.z - bz;
-    } else if (ray.n.x != 0) {
+    } else if (n.x != 0) {
       ray.u = ray.o.z - bz;
       ray.v = ray.o.y - by;
     } else {
       ray.u = ray.o.x - bx;
       ray.v = ray.o.y - by;
     }
-    if (ray.n.x > 0 || ray.n.z < 0) {
+    if (n.x > 0 || n.z < 0) {
       ray.u = 1 - ray.u;
     }
-    if (ray.n.y > 0) {
+    if (n.y > 0) {
       ray.v = 1 - ray.v;
     }
   }

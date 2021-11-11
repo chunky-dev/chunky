@@ -50,13 +50,11 @@ public class AnvilModel extends AABBModel {
   };
 
   private final int orientation;
-  private final int damage;
   private final Texture[][] textures;
   private final UVMapping[][] mapping;
 
   public AnvilModel(int orientation, int damage) {
     this.orientation = orientation;
-    this.damage = damage;
 
     Texture side = Texture.anvilSide;
     Texture top = topTexture[damage];

@@ -74,7 +74,7 @@ public abstract class TileBasedRenderer implements Renderer {
         manager.pool.submit(worker -> {
           WorkerState state = new WorkerState();
           state.ray = new Ray();
-          state.ray.n.set(0, 0, -1);
+          state.ray.setN(0, 0, -1);
           state.random = worker.random;
 
           IntIntMutablePair pair = new IntIntMutablePair(0, 0);

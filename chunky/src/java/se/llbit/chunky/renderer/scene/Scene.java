@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -115,7 +114,6 @@ import se.llbit.util.mojangapi.PlayerSkin;
  * are also kept for when a snapshot should be rendered.
  */
 public class Scene implements JsonSerializable, Refreshable {
-
   public static final int DEFAULT_DUMP_FREQUENCY = 500;
   public static final String EXTENSION = ".json";
 
@@ -177,6 +175,8 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public static final PostProcessingFilter DEFAULT_POSTPROCESSING_FILTER = PostProcessingFilters
       .getPostProcessingFilterFromId("GAMMA").orElse(PostProcessingFilters.NONE);
+
+  private static boolean invalidWarn = false;
 
   protected final Sky sky = new Sky(this);
   protected final Camera camera = new Camera(this);
@@ -283,15 +283,17 @@ public class Scene implements JsonSerializable, Refreshable {
   private Octree worldOctree;
   private Octree waterOctree;
 
+  private EntityLoadingPreferences entityLoadingPreferences = new EntityLoadingPreferences();
+
   /**
    * Entities in the scene.
    */
-  private Collection<Entity> entities = new LinkedList<>();
+  private ArrayList<Entity> entities = new ArrayList<>();
 
   /**
    * Poseable entities in the scene.
    */
-  private Collection<Entity> actors = new LinkedList<>();
+  private ArrayList<Entity> actors = new ArrayList<>();
 
   /** Poseable entities in the scene. */
   private Map<PlayerEntity, JsonObject> profiles = new HashMap<>();
@@ -367,6 +369,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private String renderer = DefaultRenderManager.ChunkyPathTracerID;
   private String previewRenderer = DefaultRenderManager.ChunkyPreviewID;
+
+  protected volatile boolean isLoading = false;
 
   /**
    * Creates a scene with all default settings.
@@ -445,7 +449,10 @@ public class Scene implements JsonSerializable, Refreshable {
       worldOctree = other.worldOctree;
       waterOctree = other.waterOctree;
       entities = other.entities;
-      actors = new LinkedList<>(other.actors); // Create a copy so that entity changes can be reset.
+      entityLoadingPreferences = other.entityLoadingPreferences;
+      actors.clear();
+      actors.addAll(other.actors); // Create a copy so that entity changes can be reset.
+      actors.trimToSize();
       profiles = other.profiles;
       bvh = other.bvh;
       actorBvh = other.actorBvh;
@@ -558,55 +565,61 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public synchronized void loadScene(RenderContext context, String sceneName, TaskTracker taskTracker)
       throws IOException {
+    isLoading = true;
     try {
-      loadDescription(context.getSceneDescriptionInputStream(sceneName));
-    } catch (FileNotFoundException e) {
-      // scene.json not found, try loading the backup file
-      Log.info("Scene description file not found, trying to load the backup file instead", e);
-      loadDescription(context.getSceneFileInputStream(sceneName + Scene.EXTENSION + ".backup"));
-    }
-
-    if (sdfVersion < SDF_VERSION) {
-      Log.warn("Old scene version detected! The scene may not have been loaded correctly.");
-    } else if (sdfVersion > SDF_VERSION) {
-      Log.warn("This scene was created with a newer version of Chunky! The scene may not have been loaded correctly.");
-    }
-
-    // Load the configured skymap file.
-    sky.loadSkymap();
-
-    if (!worldPath.isEmpty()) {
-      File worldDirectory = new File(worldPath);
-      if (World.isWorldDir(worldDirectory)) {
-        loadedWorld = World.loadWorld(worldDirectory, worldDimension, World.LoggedWarnings.NORMAL);
-      } else {
-        Log.info("Could not load world: " + worldPath);
+      try {
+        loadDescription(context.getSceneDescriptionInputStream(sceneName));
+      } catch (FileNotFoundException e) {
+        // scene.json not found, try loading the backup file
+        Log.info("Scene description file not found, trying to load the backup file instead", e);
+        loadDescription(context.getSceneFileInputStream(sceneName + Scene.EXTENSION + ".backup"));
       }
-    }
 
-    loadDump(context, taskTracker);
-
-    if (spp == 0) {
-      mode = RenderMode.PREVIEW;
-    } else if (mode == RenderMode.RENDERING) {
-      mode = RenderMode.PAUSED;
-    }
-
-    boolean emitterGridNeedChunkReload = false;
-    if (emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
-      emitterGridNeedChunkReload = !loadEmitterGrid(context, taskTracker);
-    boolean octreeLoaded = loadOctree(context, taskTracker);
-    if (emitterGridNeedChunkReload || !octreeLoaded) {
-      // Could not load stored octree or emitter grid.
-      // Load the chunks from the world.
-      if (loadedWorld == EmptyWorld.INSTANCE) {
-        Log.warn("Could not load chunks (no world found for scene)");
-      } else {
-        loadChunks(taskTracker, loadedWorld, chunks);
+      if (sdfVersion < SDF_VERSION) {
+        Log.warn("Old scene version detected! The scene may not have been loaded correctly.");
+      } else if (sdfVersion > SDF_VERSION) {
+        Log.warn("This scene was created with a newer version of Chunky! The scene may not have been loaded correctly.");
       }
-    }
 
-    notifyAll();
+      // Load the configured skymap file.
+      sky.loadSkymap();
+
+      loadedWorld = EmptyWorld.INSTANCE;
+      if (!worldPath.isEmpty()) {
+        File worldDirectory = new File(worldPath);
+        if (World.isWorldDir(worldDirectory)) {
+          loadedWorld = World.loadWorld(worldDirectory, worldDimension, World.LoggedWarnings.NORMAL);
+        } else {
+          Log.info("Could not load world: " + worldPath);
+        }
+      }
+
+      loadDump(context, taskTracker);
+
+      if (spp == 0) {
+        mode = RenderMode.PREVIEW;
+      } else if (mode == RenderMode.RENDERING) {
+        mode = RenderMode.PAUSED;
+      }
+
+      boolean emitterGridNeedChunkReload = false;
+      if (emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
+        emitterGridNeedChunkReload = !loadEmitterGrid(context, taskTracker);
+      boolean octreeLoaded = loadOctree(context, taskTracker);
+      if (emitterGridNeedChunkReload || !octreeLoaded) {
+        // Could not load stored octree or emitter grid.
+        // Load the chunks from the world.
+        if (loadedWorld == EmptyWorld.INSTANCE) {
+          Log.warn("Could not load chunks (no world found for scene)");
+        } else {
+          loadChunks(taskTracker, loadedWorld, chunks);
+        }
+      }
+
+      notifyAll();
+    } finally {
+      isLoading = false;
+    }
   }
 
   /**
@@ -685,8 +698,7 @@ public class Scene implements JsonSerializable, Refreshable {
     state.ray.o.y -= origin.y;
     state.ray.o.z -= origin.z;
 
-    if(camera.getProjectionMode() == ProjectionMode.PARALLEL
-      && worldOctree.isInside(state.ray.o)) {
+    if(camera.getProjectionMode() == ProjectionMode.PARALLEL) {
       // When in parallel projection, push the ray origin back so the
       // ray start outside the octree to prevent ray spawning inside some blocks
       int limit = (1 << worldOctree.getDepth());
@@ -725,6 +737,19 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public boolean intersect(Ray ray) {
     boolean hit = false;
+
+    if (Double.isNaN(ray.d.x) || Double.isNaN(ray.d.y) || Double.isNaN(ray.d.z) ||
+        (ray.d.x == 0 && ray.d.y == 0 && ray.d.z == 0)) {
+      if (!invalidWarn) {
+        Log.warnf("Invalid ray with direction (%f, %f, %f).\n" +
+            "This is a bug! Please report it at:\n" +
+            "    https://github.com/chunky-dev/chunky/issues/",
+            ray.d.x, ray.d.y, ray.d.z);
+        invalidWarn = true;
+      }
+      ray.d.set(0, 1, 0);
+    }
+
     if (bvh.closestIntersection(ray)) {
       hit = true;
     }
@@ -759,7 +784,7 @@ public class Scene implements JsonSerializable, Refreshable {
     r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
     if (worldOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
       ray.t = r.distance;
-      ray.n.set(r.n);
+      ray.setN(r.getN());
       ray.color.set(r.color);
       ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
       ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
@@ -770,7 +795,7 @@ public class Scene implements JsonSerializable, Refreshable {
       r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
       if(waterOctree.exitWater(this, r, palette) && r.distance < ray.t - Ray.EPSILON) {
         ray.t = r.distance;
-        ray.n.set(r.n);
+        ray.setN(r.getN());
         ray.color.set(r.color);
         ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
         ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
@@ -783,7 +808,7 @@ public class Scene implements JsonSerializable, Refreshable {
       r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
       if (waterOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
         ray.t = r.distance;
-        ray.n.set(r.n);
+        ray.setN(r.getN());
         ray.color.set(r.color);
         ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
         ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
@@ -811,12 +836,12 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Test if the ray should be killed (using Russian Roulette).
+   * Test if the ray should be killed <strike>(using Russian Roulette)</strike>.
    *
    * @return {@code true} if the ray needs to die now
    */
   public final boolean kill(int depth, Random random) {
-    return depth >= rayDepth && random.nextDouble() < .5f;
+    return depth >= rayDepth;
   }
 
   /**
@@ -843,16 +868,10 @@ public class Scene implements JsonSerializable, Refreshable {
     if (world == null)
       return;
 
-    boolean isTallWorld = world.getVersionId() >= World.VERSION_21W06A;
-    if (isTallWorld) {
-      // snapshot 21w06a or later, don't limit yMin/yMax to allow custom height worlds
-      yMin = yClipMin;
-      yMax = yClipMax;
-    } else {
-      // treat as 0 - 256 world
-      yMin = Math.max(0, yClipMin);
-      yMax = Math.min(256, yClipMax);
-    }
+    isLoading = true;
+
+    yMin = yClipMin;
+    yMax = yClipMax;
 
     Set<ChunkPosition> loadedChunks = new HashSet<>();
     int numChunks = 0;
@@ -884,16 +903,16 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       for (ChunkPosition region : regions) {
-        world.getRegion(region).parse();
+        world.getRegion(region).parse(yMin, yMax);
       }
     }
 
     try (TaskTracker.Task task = taskTracker.task("(2/6) Loading entities")) {
-      entities = new LinkedList<>();
+      entities.clear();
       if (actors.isEmpty() && PersistentSettings.getLoadPlayers()) {
         // We don't load actor entities if some already exists. Loading actor entities
         // risks resetting posed actors when reloading chunks for an existing scene.
-        actors = new LinkedList<>();
+        actors.clear();
         profiles = new HashMap<>();
         Collection<PlayerEntity> players = world.playerEntities();
         int done = 1;
@@ -921,21 +940,17 @@ public class Scene implements JsonSerializable, Refreshable {
           actors.add(entity);
         }
       }
+
+      entities.trimToSize();
+      actors.trimToSize();
     }
 
     Set<ChunkPosition> nonEmptyChunks = new HashSet<>();
     Set<ChunkPosition> legacyChunks = new HashSet<>();
     Heightmap biomeIdMap = new Heightmap();
 
-    ChunkData chunkData1;
-    ChunkData chunkData2;
-    if (isTallWorld) { //snapshot 21w06a, treat as -64 - 320
-      chunkData1 = new GenericChunkData(); // chunk loading will switch between these two, using one asynchronously to load the data
-      chunkData2 = new GenericChunkData(); // while the other is used to add to the octree
-    } else { //Treat as 0 - 256 world
-      chunkData1 = new SimpleChunkData();
-      chunkData2 = new SimpleChunkData();
-    }
+    ChunkData chunkData1 = world.createChunkData(); // chunk loading will switch between these two, using one asynchronously to load the data
+    ChunkData chunkData2 = world.createChunkData(); // while the other is used to add to the octree
 
     try (TaskTracker.Task task = taskTracker.task("(3/6) Loading chunks")) {
       int done = 1;
@@ -950,7 +965,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       ExecutorService executor = Executors.newSingleThreadExecutor();
       Future<?> nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
-        world.getChunk(chunkPositions[0]).getChunkData(chunkData1, palette);
+        world.getChunk(chunkPositions[0]).getChunkData(chunkData1, palette, yMin, yMax);
       });
       for (int i = 0; i < chunkPositions.length; i++) {
         ChunkPosition cp = chunkPositions[i];
@@ -974,10 +989,10 @@ public class Scene implements JsonSerializable, Refreshable {
           }
 
           if(usingFirstChunkData) {
-            world.getChunk(chunkPositions[i]).getChunkData(chunkData1, palette);
+            world.getChunk(chunkPositions[i]).getChunkData(chunkData1, palette, yMin, yMax);
           }
           else {
-            world.getChunk(chunkPositions[i]).getChunkData(chunkData2, palette);
+            world.getChunk(chunkPositions[i]).getChunkData(chunkData2, palette, yMin, yMax);
           }
         } catch(ExecutionException e) {
           throw new RuntimeException(e.getCause());
@@ -997,8 +1012,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
           if (i + 1 < chunkPositions.length) { //if has next request next
             final int finalI = i;
-            nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
-              world.getChunk(chunkPositions[finalI + 1]).getChunkData(nextChunkData, palette);
+            nextChunkDataTask = executor.submit(() -> { //request chunk data for the next iteration of the loop
+              world.getChunk(chunkPositions[finalI + 1]).getChunkData(nextChunkData, palette, yMin, yMax);
             });
           }
         }
@@ -1027,13 +1042,13 @@ public class Scene implements JsonSerializable, Refreshable {
 
             if (y >= yClipMin && y < yClipMax) {
               String id = tag.get("id").stringValue("");
-              if (id.equals("minecraft:painting") || id.equals("Painting")) {
+              if ((id.equals("minecraft:painting") || id.equals("Painting")) && entityLoadingPreferences.shouldLoadClass(PaintingEntity.class)) {
                 // Before 1.12 paintings had id=Painting.
                 // After 1.12 paintings had id=minecraft:painting.
                 float yaw = tag.get("Rotation").get(0).floatValue();
                 entities.add(
-                    new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
-              } else if (id.equals("minecraft:armor_stand")) {
+                        new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
+              } else if (id.equals("minecraft:armor_stand") && entityLoadingPreferences.shouldLoadClass(ArmorStand.class)) {
                 actors.add(new ArmorStand(new Vector3(x, y, z), tag));
               }
             }
@@ -1078,37 +1093,39 @@ public class Scene implements JsonSerializable, Refreshable {
                     Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
                     Entity entity = block.toEntity(position);
 
-                    if(entity instanceof Poseable && !(entity instanceof Lectern && !((Lectern) entity).hasBook())) {
-                      // don't add the actor again if it was already loaded from json
-                      if(actors.stream().noneMatch(actor -> {
-                        if(actor.getClass().equals(entity.getClass())) {
-                          Vector3 distance = new Vector3(actor.position);
-                          distance.sub(entity.position);
-                          return distance.lengthSquared() < Ray.EPSILON;
+                    if (entityLoadingPreferences.shouldLoad(entity)) {
+                      if(entity instanceof Poseable && !(entity instanceof Lectern && !((Lectern) entity).hasBook())) {
+                        // don't add the actor again if it was already loaded from json
+                        if(actors.stream().noneMatch(actor -> {
+                          if(actor.getClass().equals(entity.getClass())) {
+                            Vector3 distance = new Vector3(actor.position);
+                            distance.sub(entity.position);
+                            return distance.lengthSquared() < Ray.EPSILON;
+                          }
+                          return false;
+                        })) {
+                          actors.add(entity);
                         }
-                        return false;
-                      })) {
-                        actors.add(entity);
-                      }
-                    } else {
-                      entities.add(entity);
-                      if(emitterGrid != null) {
-                        for(Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
-                          emitterPos.x -= origin.x;
-                          emitterPos.y -= origin.y;
-                          emitterPos.z -= origin.z;
-                          emitterGrid.addEmitter(emitterPos);
-                        }
-                      }
-                    }
-
-                    if(!block.isBlockWithEntity()) {
-                      if(block.waterlogged) {
-                        block = palette.water;
-                        octNode = palette.waterId;
                       } else {
-                        block = Air.INSTANCE;
-                        octNode = palette.airId;
+                        entities.add(entity);
+                        if (emitterGrid != null) {
+                          for (Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
+                            emitterPos.x -= origin.x;
+                            emitterPos.y -= origin.y;
+                            emitterPos.z -= origin.z;
+                            emitterGrid.addEmitter(emitterPos);
+                          }
+                        }
+                      }
+
+                      if(!block.isBlockWithEntity()) {
+                        if(block.waterlogged) {
+                          block = palette.water;
+                          octNode = palette.waterId;
+                        } else {
+                          block = Air.INSTANCE;
+                          octNode = palette.airId;
+                        }
                       }
                     }
                   }
@@ -1272,26 +1289,29 @@ public class Scene implements JsonSerializable, Refreshable {
               if (blockEntity == null) {
                 continue;
               }
-              if (blockEntity instanceof Poseable) {
-                // don't add the actor again if it was already loaded from json
-                if (actors.stream().noneMatch(actor -> {
-                  if (actor.getClass().equals(blockEntity.getClass())) {
-                    Vector3 distance = new Vector3(actor.position);
-                    distance.sub(blockEntity.position);
-                    return distance.lengthSquared() < Ray.EPSILON;
+
+              if (entityLoadingPreferences.shouldLoad(blockEntity)) {
+                if (blockEntity instanceof Poseable) {
+                  // don't add the actor again if it was already loaded from json
+                  if (actors.stream().noneMatch(actor -> {
+                    if (actor.getClass().equals(blockEntity.getClass())) {
+                      Vector3 distance = new Vector3(actor.position);
+                      distance.sub(blockEntity.position);
+                      return distance.lengthSquared() < Ray.EPSILON;
+                    }
+                    return false;
+                  })) {
+                    actors.add(blockEntity);
                   }
-                  return false;
-                })) {
-                  actors.add(blockEntity);
-                }
-              } else {
-                entities.add(blockEntity);
-                if(emitterGrid != null) {
-                  for(Grid.EmitterPosition emitterPos : blockEntity.getEmitterPosition()) {
-                    emitterPos.x -= origin.x;
-                    emitterPos.y -= origin.y;
-                    emitterPos.z -= origin.z;
-                    emitterGrid.addEmitter(emitterPos);
+                } else {
+                  entities.add(blockEntity);
+                  if (emitterGrid != null) {
+                    for (Grid.EmitterPosition emitterPos : blockEntity.getEmitterPosition()) {
+                      emitterPos.x -= origin.x;
+                      emitterPos.y -= origin.y;
+                      emitterPos.z -= origin.z;
+                      emitterGrid.addEmitter(emitterPos);
+                    }
                   }
                 }
               }
@@ -1320,6 +1340,8 @@ public class Scene implements JsonSerializable, Refreshable {
       executor.shutdown();
     }
 
+    entities.trimToSize();
+    actors.trimToSize();
     palette.unsynchronize();
 
     grassTexture = new WorldTexture();
@@ -1394,6 +1416,10 @@ public class Scene implements JsonSerializable, Refreshable {
 
       worldOctree.endFinalization();
       waterOctree.endFinalization();
+
+      grassTexture.compact();
+      foliageTexture.compact();
+      waterTexture.compact();
     }
 
     for (Entity entity : actors) {
@@ -1416,6 +1442,8 @@ public class Scene implements JsonSerializable, Refreshable {
       buildActorBvh(task);
     }
     Log.info(String.format("Loaded %d chunks", numChunks));
+
+    isLoading = false;
   }
 
   private void buildBvh(TaskTracker.Task task) {
@@ -1703,13 +1731,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Perform auto focus.
    */
   public void autoFocus() {
-    Ray ray = new Ray();
-    if (!traceTarget(ray)) {
-      camera.setDof(Double.POSITIVE_INFINITY);
-    } else {
-      camera.setSubjectDistance(ray.distance);
-      camera.setDof(ray.distance * ray.distance);
-    }
+    camera.autoFocus(this::traceTarget);
   }
 
   /**
@@ -1988,14 +2010,14 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Save the current frame as a PNG or TIFF image, depending on this scene's outputMode.
+   * Save the current frame (e.g. as a PNG, TIFF, or PFM image), depending on this scene's outputMode.
    */
   public synchronized void saveFrame(File targetFile, TaskTracker taskTracker, int threadCount) {
     this.saveFrame(targetFile, getOutputMode(), taskTracker, threadCount);
   }
 
   /**
-   * Save the current frame as a PNG or TIFF image.
+   * Save the current frame (e.g. as a PNG, TIFF, or PFM image), depending on this scene's outputMode.
    */
   public synchronized void saveFrame(File targetFile, PictureExportFormat mode, TaskTracker taskTracker, int threadCount) {
     if (mode.isTransparencySupported()) {
@@ -2638,6 +2660,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (!actorArray.isEmpty()) {
       json.add("actors", actorArray);
     }
+    json.add("entityLoadingPreferences", entityLoadingPreferences.toJson());
     json.add("octreeImplementation", octreeImplementation);
     json.add("bvhImplementation", bvhImplementation);
     json.add("emitterSamplingStrategy", emitterSamplingStrategy.name());
@@ -2675,6 +2698,10 @@ public class Scene implements JsonSerializable, Refreshable {
     name = json.get("name").stringValue("default");
   }
 
+  public EntityLoadingPreferences getEntityLoadingPreferences() {
+    return entityLoadingPreferences;
+  }
+
   public Collection<Entity> getEntities() {
     return entities;
   }
@@ -2707,6 +2734,7 @@ public class Scene implements JsonSerializable, Refreshable {
     } else {
       Log.warn("Failed to add player: entity already exists (" + player + ")");
     }
+    actors.trimToSize();
   }
 
   /**
@@ -2938,8 +2966,8 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     if (json.get("entities").isArray() || json.get("actors").isArray()) {
-      entities = new LinkedList<>();
-      actors = new LinkedList<>();
+      entities.clear();
+      actors.clear();
       // Previously poseable entities were stored in the entities array
       // rather than the actors array. In future versions only the actors
       // array should contain poseable entities.
@@ -2958,6 +2986,10 @@ public class Scene implements JsonSerializable, Refreshable {
         actors.add(entity);
       }
     }
+    entityLoadingPreferences.fromJson(json.get("entityLoadingPreferences"));
+
+    actors.trimToSize();
+    entities.trimToSize();
 
     octreeImplementation = json.get("octreeImplementation").asString(PersistentSettings.getOctreeImplementation());
     bvhImplementation = json.get("bvhImplementation").asString(PersistentSettings.getBvhMethod());
@@ -3312,13 +3344,17 @@ public class Scene implements JsonSerializable, Refreshable {
     return previewRenderer;
   }
 
+  public boolean isLoading() {
+    return isLoading;
+  }
+
   /**
-   * Add additional data
+   * Add additional data.
    * Additional data is not used by chunky but can be used by plugins
    */
   @PluginApi
   public void setAdditionalData(String name, JsonValue value) {
-    additionalData.add(name, value);
+    additionalData.set(name, value);
   }
 
   /**
@@ -3328,5 +3364,12 @@ public class Scene implements JsonSerializable, Refreshable {
   @PluginApi
   public JsonValue getAdditionalData(String name) {
     return additionalData.get(name);
+  }
+
+  /**
+   * Get the world of this scene, or EmptyWorld.INSTANCE if it is unknown.
+   */
+  public World getWorld() {
+    return loadedWorld;
   }
 }

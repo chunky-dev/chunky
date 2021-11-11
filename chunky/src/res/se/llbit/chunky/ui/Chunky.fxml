@@ -56,7 +56,29 @@
   <SplitPane fx:id="splitPane"
              VBox.vgrow="ALWAYS"
              maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
-    <ToolPane fx:id="renderControls" prefWidth="350" />
+    <VBox>
+      <ToolPane fx:id="renderControls" prefWidth="350" VBox.vgrow="ALWAYS" />
+      <Separator/>
+      <VBox spacing="5.0">
+        <padding>
+          <Insets top="2.0" bottom="4.0" left="10.0" right="10.0" />
+        </padding>
+        <HBox alignment="CENTER_LEFT" spacing="10.0" >
+          <Label text="Render:" />
+          <ToggleButton fx:id="start" mnemonicParsing="false" text="Start">
+            <toggleGroup>
+              <ToggleGroup fx:id="renderControl" />
+            </toggleGroup>
+          </ToggleButton>
+          <ToggleButton fx:id="pause" mnemonicParsing="false" text="Pause" toggleGroup="$renderControl" />
+          <ToggleButton fx:id="reset" mnemonicParsing="false" text="Reset" toggleGroup="$renderControl" selected="true" />
+        </HBox>
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+          <IntegerAdjuster fx:id="targetSpp" />
+          <Button fx:id="saveDefaultSpp" mnemonicParsing="false" text="Set default" />
+        </HBox>
+      </VBox>
+    </VBox>
     <TabPane fx:id="mainTabs" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
       <Tab fx:id="worldMapTab" text="Map">
         <StackPane fx:id="mapPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="150.0" prefWidth="200.0">
@@ -99,7 +121,10 @@
             <IntegerAdjuster fx:id="scale" name="Scale"/>
           </VBox>
           <VBox alignment="CENTER_LEFT">
-            <IntegerAdjuster fx:id="yMax" name="Y level"/>
+            <IntegerAdjuster fx:id="yMin" name="Min Y level "/>
+          </VBox>
+          <VBox alignment="CENTER_LEFT">
+            <IntegerAdjuster fx:id="yMax" name="Max Y level"/>
           </VBox>
           <Label text="Coordinates"/>
           <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -124,9 +149,13 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
           </padding>
           <Button fx:id="clearSelectionBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Clear selection"/>
-          <Button fx:id="deleteChunks" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Delete selected chunks"/>
-          <Button fx:id="exportZip" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Export chunks to ZIP"/>
-          <Button fx:id="renderPng" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Export view to PNG"/>
+          <Separator/>
+          <Label text="Exports"/>
+          <Button fx:id="exportZipBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Export chunks to ZIP"/>
+          <Button fx:id="renderPngBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Export view to PNG"/>
+          <Separator/>
+          <Label text="World modification - Use with caution!"/>
+          <Button fx:id="deleteChunksBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Delete selected chunks"/>
         </VBox>
       </Tab>
       <Tab fx:id="optionsTab" text="Options">
@@ -172,33 +201,26 @@
       </Tab>
     </TabPane>
   </SplitPane>
-  <HBox alignment="CENTER_LEFT" spacing="10.0">
-    <Label text="Render:" />
-    <ToggleButton fx:id="start">
-      <toggleGroup>
-        <ToggleGroup fx:id="renderControl" />
-      </toggleGroup>
-    </ToggleButton>
-    <ToggleButton fx:id="pause" toggleGroup="$renderControl" />
-    <ToggleButton fx:id="reset" mnemonicParsing="false" selected="true" text="Reset" toggleGroup="$renderControl" />
-    <IntegerAdjuster fx:id="targetSpp" />
-    <Button fx:id="saveDefaultSpp" mnemonicParsing="false" text="Set default" />
-  </HBox>
-  <BorderPane>
-    <left>
-      <Label fx:id="renderTimeLbl" text="Render time: 0" />
-    </left>
-    <right>
-      <Label fx:id="sppLbl" text="0 SPP, 0 SPS" />
-    </right>
-  </BorderPane>
-  <BorderPane>
-    <left>
-      <Label fx:id="progressLbl" text="Progress" />
-    </left>
-    <right>
-      <Label fx:id="etaLbl" text="ETA: N/A" />
-    </right>
-  </BorderPane>
-  <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0" />
+  <VBox spacing="5.0">
+    <padding>
+      <Insets top="5.0" bottom="5.0" left="10.0" right="10.0" />
+    </padding>
+    <BorderPane>
+      <left>
+        <Label fx:id="renderTimeLbl" text="Render time: 0" />
+      </left>
+      <right>
+        <Label fx:id="sppLbl" text="0 SPP, 0 SPS" />
+      </right>
+    </BorderPane>
+    <BorderPane>
+      <left>
+        <Label fx:id="progressLbl" text="Progress" />
+      </left>
+      <right>
+        <Label fx:id="etaLbl" text="ETA: N/A" />
+      </right>
+    </BorderPane>
+  </VBox>
+  <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" minHeight="20" prefHeight="20" progress="0.0" />
 </VBox>

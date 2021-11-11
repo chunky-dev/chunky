@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initializable {
@@ -82,6 +83,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     outputMode.getItems().addAll(PictureExportFormats.getFormats());
+    outputMode.getSelectionModel().select(PictureExportFormats.PNG);
     cpuLoad.setName("CPU utilization");
     cpuLoad.setTooltip("CPU utilization percentage per render thread.");
     cpuLoad.setRange(1, 100);
@@ -111,12 +113,12 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     outputMode.setConverter(new StringConverter<PictureExportFormat>() {
       @Override
       public String toString(PictureExportFormat object) {
-        return object.getName();
+        return object == null ? null : object.getName();
       }
 
       @Override
       public PictureExportFormat fromString(String string) {
-        return PictureExportFormats.getFormat(string).get();
+        return PictureExportFormats.getFormat(string).orElse(PictureExportFormats.PNG);
       }
     });
     outputMode.getSelectionModel().selectedItemProperty()

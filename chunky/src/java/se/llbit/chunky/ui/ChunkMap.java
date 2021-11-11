@@ -256,11 +256,12 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       int x1 = Math.max(cp0.x, cp1.x);
       int z0 = Math.min(cp0.z, cp1.z);
       int z1 = Math.max(cp0.z, cp1.z);
-      if (ctrlModifier) {
+
+      // If ctrlModifier to deselect, then do deselect
+      // If no ctrlModifier, select chunks
+      // but if they are all already selected, then deselect.
+      if (ctrlModifier || !chunkSelection.selectChunks(mapLoader.getWorld(), x0, z0, x1, z1))
         chunkSelection.deselectChunks(x0, z0, x1, z1);
-      } else {
-        chunkSelection.selectChunks(mapLoader.getWorld(), x0, z0, x1, z1);
-      }
     }
   }
 

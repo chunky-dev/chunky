@@ -381,6 +381,42 @@ public final class PersistentSettings {
     save();
   }
 
+  public static boolean getLoadArmorStands() {
+    return settings.getBool("loadArmorStands", true);
+  }
+
+  public static void setLoadArmorStands(boolean value) {
+    settings.setBool("loadArmorStands", value);
+    save();
+  }
+
+  public static boolean getLoadBooks() {
+    return settings.getBool("loadBooks", true);
+  }
+
+  public static void setLoadBooks(boolean value) {
+    settings.setBool("loadBooks", value);
+    save();
+  }
+
+  public static boolean getLoadPaintings() {
+    return settings.getBool("loadPaintings", true);
+  }
+
+  public static void setLoadPaintings(boolean value) {
+    settings.setBool("loadPaintings", value);
+    save();
+  }
+
+  public static boolean getLoadOtherEntities() {
+    return settings.getBool("loadOtherEntities", true);
+  }
+
+  public static void setLoadOtherEntities(boolean value) {
+    settings.setBool("loadOtherEntities", value);
+    save();
+  }
+
   public static boolean drawUnknownBlocks() {
     return settings.getBool("drawUnknownBlocks", false);
   }

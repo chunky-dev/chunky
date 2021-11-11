@@ -63,7 +63,6 @@ public class PathTracingRenderer extends TileBasedRenderer {
 
     while (scene.spp < scene.getTargetSpp()) {
       int spp = scene.spp;
-      double passinv = 1.0 / sppPerPass;
       double sinv = 1.0 / (sppPerPass + spp);
 
       submitTiles(manager, (state, pixel) -> {
@@ -89,9 +88,9 @@ public class PathTracingRenderer extends TileBasedRenderer {
         }
 
         int offset = 3 * (y*width + x);
-        sampleBuffer[offset + 0] = (sampleBuffer[offset + 0] * spp + (sr * passinv)) * sinv;
-        sampleBuffer[offset + 1] = (sampleBuffer[offset + 1] * spp + (sg * passinv)) * sinv;
-        sampleBuffer[offset + 2] = (sampleBuffer[offset + 2] * spp + (sb * passinv)) * sinv;
+        sampleBuffer[offset + 0] = (sampleBuffer[offset + 0] * spp + sr) * sinv;
+        sampleBuffer[offset + 1] = (sampleBuffer[offset + 1] * spp + sg) * sinv;
+        sampleBuffer[offset + 2] = (sampleBuffer[offset + 2] * spp + sb) * sinv;
       });
 
       manager.pool.awaitEmpty();

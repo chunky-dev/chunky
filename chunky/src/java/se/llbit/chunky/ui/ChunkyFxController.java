@@ -44,9 +44,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -69,7 +71,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.Chunky;
@@ -88,9 +89,9 @@ import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.DeleteChunksJob;
+import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
-import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.fx.ToolPane;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.fxutil.GroupedChangeListener;
@@ -124,6 +125,7 @@ public class ChunkyFxController
   @FXML private ToggleButton netherBtn;
   @FXML private ToggleButton endBtn;
   @FXML private IntegerAdjuster scale;
+  @FXML private IntegerAdjuster yMin;
   @FXML private IntegerAdjuster yMax;
   @FXML private ToggleButton trackPlayerBtn;
   @FXML private ToggleButton trackCameraBtn;
@@ -148,9 +150,9 @@ public class ChunkyFxController
   @FXML private Button creditsBtn;
   @FXML private DoubleTextField xPosition;
   @FXML private DoubleTextField zPosition;
-  @FXML private Button deleteChunks;
-  @FXML private Button exportZip;
-  @FXML private Button renderPng;
+  @FXML private Button deleteChunksBtn;
+  @FXML private Button exportZipBtn;
+  @FXML private Button renderPngBtn;
   @FXML private StackPane mapPane;
   @FXML private SplitPane splitPane;
   @FXML private TabPane mapTabs;
@@ -338,6 +340,20 @@ public class ChunkyFxController
         refreshSettings();
         guiUpdateLatch.countDown();
         getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
+        World newWorld = scene.getWorld();
+        if (newWorld != EmptyWorld.INSTANCE
+          && mapLoader.getWorld() != EmptyWorld.INSTANCE
+          && !mapLoader.getWorld().getWorldDirectory().equals(newWorld.getWorldDirectory())) {
+          Alert loadWorldConfirm = Dialogs.createAlert(AlertType.CONFIRMATION);
+          loadWorldConfirm.getButtonTypes().clear();
+          loadWorldConfirm.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
+          loadWorldConfirm.setTitle("Load scene world");
+          loadWorldConfirm.setContentText(
+              "This scene shows a different world than the one that is currently loaded. Do you want to load the world of this scene?");
+          if (loadWorldConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
+            mapLoader.loadWorld(newWorld.getWorldDirectory());
+          }
+        }
       });
       new Thread(() -> {
         try {
@@ -395,7 +411,7 @@ public class ChunkyFxController
     map = new ChunkMap(mapLoader, this, mapView, chunkSelection,
         mapCanvas, mapOverlay);
 
-    AtomicBoolean ignoreYMaxUpdate = new AtomicBoolean(false); // used to not trigger a world reload after changing the world, see #926
+    AtomicBoolean ignoreYUpdate = new AtomicBoolean(false); // used to not trigger a world reload after changing the world, see #926
     mapLoader.addWorldLoadListener(
         (world, reloaded) -> {
           if (!reloaded) {
@@ -411,15 +427,19 @@ public class ChunkyFxController
                   mapView.panTo(playerPos.orElse(new Vector3(0, 0, 0)));
                 }
                 if (!reloaded) {
-                  ignoreYMaxUpdate.set(true);
+                  ignoreYUpdate.set(true);
                   if (mapLoader.getWorld().getVersionId() >= World.VERSION_21W06A) {
+                    yMin.setRange(-64, 320);
+                    yMin.set(-64);
                     yMax.setRange(-64, 320);
                     yMax.set(320);
                   } else {
+                    yMin.setRange(0, 256);
+                    yMin.set(0);
                     yMax.setRange(0, 256);
                     yMax.set(256);
                   }
-                  ignoreYMaxUpdate.set(false);
+                  ignoreYUpdate.set(false);
                 }
                 map.redrawMap();
                 mapName.setText(world.levelName());
@@ -487,8 +507,14 @@ public class ChunkyFxController
     }));
     scale.valueProperty().addListener(new GroupedChangeListener<>(group,
         (observable, oldValue, newValue) -> mapView.setScale(newValue.intValue())));
+    yMin.valueProperty().addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
+      if (!ignoreYUpdate.get()) {
+        mapView.setYMin(newValue.intValue());
+        mapLoader.reloadWorld();
+      }
+    }));
     yMax.valueProperty().addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
-      if (!ignoreYMaxUpdate.get()) {
+      if (!ignoreYUpdate.get()) {
         mapView.setYMax(newValue.intValue());
         mapLoader.reloadWorld();
       }
@@ -502,30 +528,36 @@ public class ChunkyFxController
           scale.set(newValue.scale);
         }));
 
-    deleteChunks.setTooltip(new Tooltip("Delete selected chunks."));
-    deleteChunks.setOnAction(e -> {
-      Alert alert = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
-      alert.setTitle("Delete Selected Chunks");
-      alert.setContentText(
-          "Do you really want to delete the selected chunks? This can not be undone.");
-      if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+    deleteChunksBtn.setTooltip(new Tooltip("Delete selected chunks."));
+    deleteChunksBtn.setGraphic(new ImageView(Icon.clear.fxImage()));
+    deleteChunksBtn.setOnAction(e -> {
+      Dialog<ButtonType> confirmationDialog = Dialogs.createSpecialApprovalConfirmation(
+        "Delete selected chunks",
+        "Confirm deleting the selected chunks",
+        "Do you really want to delete the selected chunks from the world?\nThis will remove the selected chunks from your disk and cannot be undone. Be sure to have a backup!",
+        "I do want to permanently delete the selected chunks"
+      );
+      if (confirmationDialog.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
         deleteSelectedChunks(ProgressTracker.NONE);
       }
     });
 
-    exportZip.setTooltip(new Tooltip("Export selected chunks to Zip archive."));
-    exportZip.setOnAction(e -> {
+    exportZipBtn.setTooltip(new Tooltip("Export selected chunks to Zip archive."));
+    exportZipBtn.setGraphic(new ImageView(Icon.save.fxImage()));
+    exportZipBtn.setOnAction(e -> {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Export Chunks to Zip");
       fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Zip files", "*.zip"));
       mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.levelName() + ".zip"));
-      File target = fileChooser.showSaveDialog(exportZip.getScene().getWindow());
+      File target = fileChooser.showSaveDialog(exportZipBtn.getScene().getWindow());
       if (target != null) {
         exportZip(target, ProgressTracker.NONE);
       }
     });
 
-    renderPng.setOnAction(e -> {
+    exportZipBtn.setTooltip(new Tooltip("Exports the current map view (not the selected chunks) as a PNG file."));
+    renderPngBtn.setGraphic(new ImageView(Icon.save.fxImage()));
+    renderPngBtn.setOnAction(e -> {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Export PNG");
       fileChooser
@@ -534,7 +566,7 @@ public class ChunkyFxController
       if (prevPngDir != null) {
         fileChooser.setInitialDirectory(prevPngDir.toFile());
       }
-      File target = fileChooser.showSaveDialog(exportZip.getScene().getWindow());
+      File target = fileChooser.showSaveDialog(exportZipBtn.getScene().getWindow());
       if (target != null) {
         Path path = target.toPath();
         if (!target.getName().endsWith(".png")) {
@@ -644,6 +676,7 @@ public class ChunkyFxController
 
     menuExit.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
     clearSelectionBtn.setOnAction(event -> chunkSelection.clearSelection());
+    clearSelectionBtn.setGraphic(new ImageView(Icon.clear.fxImage()));
 
     mapView.setMapSize((int) mapCanvas.getWidth(), (int) mapCanvas.getHeight());
     mapOverlay.setOnScroll(map::onScroll);
@@ -657,8 +690,10 @@ public class ChunkyFxController
 
     mapLoader.loadWorld(PersistentSettings.getLastWorld());
     if (mapLoader.getWorld().getVersionId() >= World.VERSION_21W06A) {
+      mapView.setYMin(-64);
       mapView.setYMax(320);
     } else {
+      mapView.setYMin(0);
       mapView.setYMax(256);
     }
 
@@ -689,13 +724,22 @@ public class ChunkyFxController
     copyFrameBtn.setOnAction(this::copyCurrentFrame);
     start.setGraphic(new ImageView(Icon.play.fxImage()));
     start.setTooltip(new Tooltip("Start rendering."));
-    start.setOnAction(e -> scene.startRender());
+    start.setOnAction(e -> {
+      if (!scene.isLoading())
+        asyncSceneManager.enqueueTask(() -> scene.startRender());
+    });
     pause.setGraphic(new ImageView(Icon.pause.fxImage()));
     pause.setTooltip(new Tooltip("Pause the render."));
-    pause.setOnAction(e -> scene.pauseRender());
+    pause.setOnAction(e -> {
+      if (!scene.isLoading())
+        asyncSceneManager.enqueueTask(() -> scene.pauseRender());
+    });
     reset.setGraphic(new ImageView(Icon.stop.fxImage()));
     reset.setTooltip(new Tooltip("Resets the current render. Discards render progress."));
-    reset.setOnAction(e -> scene.haltRender());
+    reset.setOnAction(e -> {
+      if (!scene.isLoading())
+        asyncSceneManager.enqueueTask(() -> scene.haltRender());
+    });
     sppLbl.setTooltip(new Tooltip("SPP = Samples Per Pixel, SPS = Samples Per Second"));
     targetSpp.setName("Target SPP");
     targetSpp.setTooltip("Rendering is stopped after reaching the target Samples Per Pixel (SPP).");

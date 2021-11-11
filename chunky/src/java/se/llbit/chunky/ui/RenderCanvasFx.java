@@ -19,12 +19,14 @@ package se.llbit.chunky.ui;
 
 import javafx.application.Platform;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
@@ -36,9 +38,13 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.PopupWindow;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.*;
@@ -64,6 +70,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   private final Canvas canvas;
   private final Group guideGroup;
   private final StackPane canvasPane;
+  private final Label noChunksLabel;
   private final RenderManager renderManager;
   private int lastX;
   private int lastY;
@@ -92,6 +99,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
     canvasPane = new StackPane(canvas);
     setContent(canvasPane);
+
+    noChunksLabel = new Label("No chunks selected for rendering.\nOpen a world and select and load chunks in the Map tab to get started.");
+    noChunksLabel.setTextAlignment(TextAlignment.CENTER);
+    canvasPane.getChildren().add(noChunksLabel);
 
     guideGroup = new Group();
     Line hGuide1 = new Line();
@@ -391,6 +402,9 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       tooltip.show(this,
           offset.getX() + getScene().getX() + getScene().getWindow().getX(),
           offset.getY() + getScene().getY() + getScene().getWindow().getY() + getHeight());
+      noChunksLabel.setBackground(new Background(new BackgroundFill(Paint.valueOf("#00000099"),null,null)));
+      noChunksLabel.setPadding(new Insets(20));
+      noChunksLabel.setVisible(!renderScene.haveLoadedChunks());
     });
   }
 

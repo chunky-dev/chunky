@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.renderer;
 
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
@@ -186,6 +187,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
 
     // Create a new pool. Set the seed to the current time in milliseconds.
     this.pool = context.renderPoolFactory.create(context.numRenderThreads(), System.currentTimeMillis());
+    this.setCPULoad(PersistentSettings.getCPULoad());
 
     // Initialize callbacks here since java will complain `bufferedScene` is not initialized yet.
     // (nothing important in the rest of the constructor)
@@ -374,7 +376,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   private int samplesPerSecond() {
     int canvasWidth = bufferedScene.canvasWidth();
     int canvasHeight = bufferedScene.canvasHeight();
-    long pixelsPerFrame = canvasWidth * canvasHeight;
+    long pixelsPerFrame = (long) canvasWidth * canvasHeight;
     double renderTime = bufferedScene.renderTime / 1000.0;
     return (int) ((bufferedScene.spp * pixelsPerFrame) / renderTime);
   }
