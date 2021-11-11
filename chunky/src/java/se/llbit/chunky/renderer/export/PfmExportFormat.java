@@ -3,7 +3,7 @@ package se.llbit.chunky.renderer.export;
 import java.io.IOException;
 import java.io.OutputStream;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.pfm.PfmFileWriter;
+import se.llbit.imageformats.pfm.PfmFileWriter;
 import se.llbit.util.TaskTracker;
 
 /**

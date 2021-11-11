@@ -33,8 +33,13 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.entity.ArmorStand;
+import se.llbit.chunky.entity.Book;
+import se.llbit.chunky.entity.PaintingEntity;
+import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.scene.EntityLoadingPreferences;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.ChunkyFxController;
 import se.llbit.chunky.ui.IntegerAdjuster;
@@ -75,7 +80,13 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private Button scale05;
   @FXML private Button scale15;
   @FXML private Button scale20;
+  @FXML private Button loadAllEntities;
+  @FXML private Button loadNoEntity;
   @FXML private CheckBox loadPlayers;
+  @FXML private CheckBox loadArmorStands;
+  @FXML private CheckBox loadBooks;
+  @FXML private CheckBox loadPaintings;
+  @FXML private CheckBox loadOtherEntities;
   @FXML private CheckBox biomeColors;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
@@ -112,7 +123,14 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       dumpFrequency.setDisable(true);
       saveDumps.setSelected(false);
     }
-    loadPlayers.setSelected(PersistentSettings.getLoadPlayers());
+    {
+      EntityLoadingPreferences preferences = scene.getEntityLoadingPreferences();
+      loadPlayers.setSelected(preferences.shouldLoadClass(PlayerEntity.class));
+      loadArmorStands.setSelected(preferences.shouldLoadClass(ArmorStand.class));
+      loadBooks.setSelected(preferences.shouldLoadClass(Book.class));
+      loadPaintings.setSelected(preferences.shouldLoadClass(PaintingEntity.class));
+      loadOtherEntities.setSelected(preferences.shouldLoadClass(null));
+    }
     biomeColors.setSelected(scene.biomeColorsEnabled());
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
     reloadChunks.setDisable(scene.numberOfChunks() == 0);
@@ -180,10 +198,68 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     loadPlayers.setTooltip(new Tooltip("Enable/disable player entity loading. "
         + "Takes effect on next scene creation."));
     loadPlayers.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(PlayerEntity.class, newValue);
       PersistentSettings.setLoadPlayers(newValue);
-      renderControls.showPopup(
-          "This takes effect the next time a new scene is created.", loadPlayers);
     });
+    loadPlayers.setOnAction(event -> {
+      renderControls.showPopup(
+              "This takes effect the next time a new scene is created.", loadPlayers);
+    });
+    loadArmorStands.setTooltip(new Tooltip("Enable/disable armor stand entity loading. "
+            + "Takes effect on next scene creation."));
+    loadArmorStands.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(ArmorStand.class, newValue);
+      PersistentSettings.setLoadArmorStands(newValue);
+    });
+    loadArmorStands.setOnAction(event -> {
+      renderControls.showPopup(
+              "This takes effect the next time a new scene is created.", loadArmorStands);
+    });
+    loadBooks.setTooltip(new Tooltip("Enable/disable book entity loading. "
+            + "Takes effect on next scene creation."));
+    loadBooks.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(Book.class, newValue);
+      PersistentSettings.setLoadBooks(newValue);
+    });
+    loadBooks.setOnAction(event -> {
+      renderControls.showPopup(
+              "This takes effect the next time a new scene is created.", loadBooks);
+    });
+    loadPaintings.setTooltip(new Tooltip("Enable/disable painting entity loading. "
+            + "Takes effect on next scene creation."));
+    loadPaintings.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(PaintingEntity.class, newValue);
+      PersistentSettings.setLoadPaintings(newValue);
+    });
+    loadPaintings.setOnAction(event -> {
+      renderControls.showPopup(
+              "This takes effect the next time a new scene is created.", loadPaintings);
+    });
+    loadOtherEntities.setTooltip(new Tooltip("Enable/disable other entity loading. "
+            + "Takes effect on next scene creation."));
+    loadOtherEntities.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(null, newValue);
+      PersistentSettings.setLoadOtherEntities(newValue);
+    });
+    loadOtherEntities.setOnAction(event -> {
+      renderControls.showPopup(
+              "This takes effect the next time a new scene is created.", loadOtherEntities);
+    });
+    loadAllEntities.setOnAction(event -> {
+      loadPlayers.setSelected(true);
+      loadArmorStands.setSelected(true);
+      loadBooks.setSelected(true);
+      loadPaintings.setSelected(true);
+      loadOtherEntities.setSelected(true);
+    });
+    loadNoEntity.setOnAction(event -> {
+      loadPlayers.setSelected(false);
+      loadArmorStands.setSelected(false);
+      loadBooks.setSelected(false);
+      loadPaintings.setSelected(false);
+      loadOtherEntities.setSelected(false);
+    });
+
     biomeColors.setTooltip(new Tooltip("Colors grass and tree leaves according to biome."));
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
       scene.setBiomeColorsEnabled(newValue);

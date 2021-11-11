@@ -34,7 +34,6 @@ import se.llbit.chunky.renderer.projection.ShiftProjector;
 import se.llbit.chunky.renderer.projection.SphericalApertureProjector;
 import se.llbit.chunky.renderer.projection.StereographicProjector;
 import se.llbit.chunky.world.Chunk;
-import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.json.JsonObject;
 import se.llbit.log.Log;
 import se.llbit.math.Matrix3;
@@ -45,6 +44,7 @@ import se.llbit.math.Vector3;
 import se.llbit.util.JsonSerializable;
 
 import java.util.Random;
+import java.util.function.Function;
 
 /**
  * Camera model for 3D rendering.
@@ -147,7 +147,7 @@ public class Camera implements JsonSerializable {
   /**
    * Maximum diagonal width of the world. Recalculated when world is loaded.
    */
-  private double worldWidth = 100;
+  private double worldDiagonalSize = 100;
 
   private double subjectDistance = 2;
 
@@ -177,7 +177,7 @@ public class Camera implements JsonSerializable {
     projectionMode = other.projectionMode;
     fov = other.fov;
     subjectDistance = other.subjectDistance;
-    worldWidth = other.worldWidth;
+    worldDiagonalSize = other.worldDiagonalSize;
     this.shiftX = other.shiftX;
     this.shiftY = other.shiftY;
     initProjector();
@@ -212,8 +212,12 @@ public class Camera implements JsonSerializable {
         return applyShift(applyDoF(new PinholeProjector(fov), subjectDistance));
       case PARALLEL:
         return applyShift(applyDoF(
-            new ForwardDisplacementProjector(new ParallelProjector(worldWidth, fov), -worldWidth),
-            subjectDistance + worldWidth));
+            new ForwardDisplacementProjector(
+              new ParallelProjector(worldDiagonalSize, fov),
+              -worldDiagonalSize
+            ),
+            subjectDistance + worldDiagonalSize
+        ));
       case FISHEYE:
         return applySphericalDoF(new FisheyeProjector(fov));
       case PANORAMIC_SLOT:
@@ -575,7 +579,7 @@ public class Camera implements JsonSerializable {
    * @param size World size
    */
   public void setWorldSize(double size) {
-    worldWidth = 2 * Math.sqrt(2 * size * size + Chunk.Y_MAX * Chunk.Y_MAX);
+    worldDiagonalSize = 2 * Math.sqrt(2 * size * size + Chunk.Y_MAX * Chunk.Y_MAX);
     if (projectionMode == ProjectionMode.PARALLEL) {
       initProjector();
     }
@@ -665,6 +669,19 @@ public class Camera implements JsonSerializable {
     pos.y += 1.6;
     updateTransform();
     onViewChange();
+  }
+
+  public void autoFocus(Function<Ray, Boolean> traceInScene) {
+    Ray ray = new Ray();
+    if (!traceInScene.apply(ray)) {
+      setDof(Double.POSITIVE_INFINITY);
+    } else {
+      if(projectionMode == ProjectionMode.PARALLEL) {
+        ray.distance -= worldDiagonalSize;
+      }
+      setSubjectDistance(ray.distance);
+      setDof(ray.distance * ray.distance);
+    }
   }
 
   public void setDirectionListener(Runnable directionListener) {

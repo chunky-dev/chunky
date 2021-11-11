@@ -49,7 +49,7 @@ public class MojangApi {
   // the base64-encoded string might not be valid json (sometimes keys are not quoted)
   // so we use a regex to extract the skin url
   private static final Pattern SKIN_URL_FROM_OBJECT = Pattern
-  .compile("\"?SKIN\"?\\s*:\\s*\\{(.*)\"?url\"?\\s*:\\s*\"([^\"]*)\"", Pattern.DOTALL);
+  .compile("\"?SKIN\"?\\s*:\\s*\\{(.*?)\"?url\"?\\s*:\\s*\"([^\"]*)\"", Pattern.DOTALL);
 
   /**
    * Download a Minecraft Jar by version name.
@@ -255,5 +255,61 @@ public class MojangApi {
       cache.prettyPrint(jsonOut);
     }
     return profile;
+  }
+
+  /**
+   * Get UUID of a player from their username.
+   *
+   * @param username username of player
+   * @return UUID of player if found, null otherwise
+   * @throws IOException if retrieving UUID fails
+   */
+  public static String usernameToUUID(String username) throws IOException {
+    //Lookup in cache first
+    File cacheFile = new File(PersistentSettings.cacheDirectory(), "uuidCache.json");
+    JsonObject cache;
+    if (cacheFile.exists()) {
+      try (JsonParser cacheParse = new JsonParser(new FileInputStream(cacheFile))) {
+        cache = cacheParse.parse().object();
+        if(!cache.get(username).isUnknown()) {
+          return cache.get(username).asString(null);
+        }
+      } catch (JsonParser.SyntaxError e) {
+        cache = new JsonObject();
+      }
+    } else {
+      cache = new JsonObject();
+    }
+
+    //Request uuid from Mojang
+    String url = "https://api.mojang.com/users/profiles/minecraft/" + username;
+    HttpsURLConnection conn = (HttpsURLConnection) new URL(url).openConnection();
+    int responseCode = conn.getResponseCode();
+    JsonObject response;
+    if(responseCode == 200) {
+      try (JsonParser parser = new JsonParser(conn.getInputStream())) {
+        response = parser.parse().object();
+      } catch (JsonParser.SyntaxError e) {
+        e.printStackTrace(System.err);
+        response = new JsonObject();
+      }
+    } else {
+      response = new JsonObject();
+    }
+
+    //Save in cache if there's a valid response
+    String uuid = response.get("id").asString(null);
+    if(uuid != null) {
+      cache.set(username, response.get("id"));
+      if (!PersistentSettings.cacheDirectory().isDirectory()) {
+        PersistentSettings.cacheDirectory().mkdirs();
+      }
+      try (FileOutputStream out = new FileOutputStream(cacheFile)) {
+        PrettyPrinter jsonOut = new PrettyPrinter("", new PrintStream(out));
+        cache.prettyPrint(jsonOut);
+      }
+    }
+
+    return response.get("id").asString(null);
   }
 }

@@ -1,4 +1,5 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -140,8 +141,9 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
 
   /**
    * Select chunks within rectangle.
+   * @return true if anything was changed, false if no chunks were selected.
    */
-  public synchronized void selectChunks(World world, int cx0, int cz0, int cx1, int cz1) {
+  public synchronized boolean selectChunks(World world, int cx0, int cz0, int cx1, int cz1) {
     boolean selectionChanged = false;
     for (int cx = cx0; cx <= cx1; ++cx) {
       for (int cz = cz0; cz <= cz1; ++cz) {
@@ -156,12 +158,14 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
     if (selectionChanged) {
       notifyChunkSelectionChange();
     }
+    return selectionChanged;
   }
 
   /**
    * Deselect chunks within rectangle.
+   * @return true if anything was changed, false if no chunks were deselected.
    */
-  public synchronized void deselectChunks(int cx0, int cz0, int cx1, int cz1) {
+  public synchronized boolean deselectChunks(int cx0, int cz0, int cx1, int cz1) {
     boolean selectionChanged = false;
     for (int cx = cx0; cx <= cx1; ++cx) {
       for (int cz = cz0; cz <= cz1; ++cz) {
@@ -176,6 +180,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
     if (selectionChanged) {
       notifyChunkSelectionChange();
     }
+    return selectionChanged;
   }
 
   /**

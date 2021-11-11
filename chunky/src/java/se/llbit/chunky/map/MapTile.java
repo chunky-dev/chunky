@@ -21,7 +21,7 @@ import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.Region;
+import se.llbit.chunky.world.region.Region;
 
 /**
  * A tile in the 2D world map or minimap. The tile contains either a chunk or a region.
@@ -73,7 +73,7 @@ public class MapTile {
         }
       }
     } else {
-      Region region = mapLoader.getWorld().getRegion(pos);
+      Region region = mapLoader.getWorld().getRegionWithinRange(pos, view.yMin, view.yMax);
       int pixelOffset = 0;
       for (int z = 0; z < 32; ++z) {
         for (int x = 0; x < 32; ++x) {

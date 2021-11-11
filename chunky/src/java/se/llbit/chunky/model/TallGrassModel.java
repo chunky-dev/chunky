@@ -48,7 +48,7 @@ public class TallGrassModel extends SpriteModel {
             ray.color.y *= biomeColor[1];
             ray.color.z *= biomeColor[2];
           }
-          ray.n.set(quad.n);
+          ray.setN(quad.n);
           ray.t = ray.tNext;
           hit = true;
         }
@@ -79,7 +79,7 @@ public class TallGrassModel extends SpriteModel {
           ray.color.x *= biomeColor[0];
           ray.color.y *= biomeColor[1];
           ray.color.z *= biomeColor[2];
-          ray.n.set(quad.n);
+          ray.setN(quad.n);
           ray.t = ray.tNext;
           hit = true;
         }

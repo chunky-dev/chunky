@@ -5,6 +5,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector3;
 
 /**
  * A block model that is made out of textured AABBs.
@@ -60,30 +61,31 @@ public abstract class AABBModel implements BlockModel {
     for (int i = 0; i < boxes.length; ++i) {
       if (boxes[i].intersect(ray)) {
         Tint[] tintedFacesBox = tintedFaces != null ? tintedFaces[i] : null;
-        if (ray.n.y > 0) { // top
+        Vector3 n = ray.getN();
+        if (n.y > 0) { // top
           ray.v = 1 - ray.v;
           if (intersectFace(ray, scene, textures[i][4],
               mapping != null ? mapping[i][4] : null,
               tintedFacesBox != null ? tintedFacesBox[4] : Tint.NONE)) {
             hit = true;
           }
-        } else if (ray.n.y < 0) { // bottom
+        } else if (n.y < 0) { // bottom
           hit = intersectFace(ray, scene, textures[i][5],
               mapping != null ? mapping[i][4] : null,
               tintedFacesBox != null ? tintedFacesBox[5] : Tint.NONE) || hit;
-        } else if (ray.n.z < 0) { // north
+        } else if (n.z < 0) { // north
           hit = intersectFace(ray, scene, textures[i][0],
               mapping != null ? mapping[i][4] : null,
               tintedFacesBox != null ? tintedFacesBox[0] : Tint.NONE) || hit;
-        } else if (ray.n.z > 0) { // south
+        } else if (n.z > 0) { // south
           hit = intersectFace(ray, scene, textures[i][2],
               mapping != null ? mapping[i][4] : null,
               tintedFacesBox != null ? tintedFacesBox[2] : Tint.NONE) || hit;
-        } else if (ray.n.x < 0) { // west
+        } else if (n.x < 0) { // west
           hit = intersectFace(ray, scene, textures[i][3],
               mapping != null ? mapping[i][4] : null,
               tintedFacesBox != null ? tintedFacesBox[3] : Tint.NONE) || hit;
-        } else if (ray.n.x > 0) { // east
+        } else if (n.x > 0) { // east
           hit = intersectFace(ray, scene, textures[i][1],
               mapping != null ? mapping[i][4] : null,
               tintedFacesBox != null ? tintedFacesBox[1] : Tint.NONE) || hit;

@@ -17,6 +17,7 @@
 package se.llbit.chunky.world;
 
 import se.llbit.chunky.ui.ProgressTracker;
+import se.llbit.chunky.world.region.Region;
 
 import java.util.Collection;
 

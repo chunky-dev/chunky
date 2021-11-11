@@ -16,12 +16,20 @@
  */
 package se.llbit.chunky.world;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.GenericChunkData;
+import se.llbit.chunky.chunk.SimpleChunkData;
+import se.llbit.chunky.map.MapView;
+import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.world.listeners.ChunkDeletionListener;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
+import se.llbit.chunky.world.region.*;
 import se.llbit.log.Log;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.NamedTag;
@@ -74,8 +82,9 @@ public class World implements Comparable<World> {
 
   /** Minimum level.dat data version of tall worlds (21w06a). */
   public static final int VERSION_21W06A = 2694;
+  public static final int VERSION_1_12_2 = 1343;
 
-  private final Map<ChunkPosition, Region> regionMap = new HashMap<>();
+  protected final Long2ObjectMap<Region> regionMap = new Long2ObjectOpenHashMap<>();
 
   private final File worldDirectory;
   private Set<PlayerEntityData> playerEntities;
@@ -149,6 +158,7 @@ public class World implements Comparable<World> {
       request.add(".Data.Player");
       request.add(".Data.LevelName");
       request.add(".Data.GameType");
+      request.add(".Data.isCubicWorld");
       Map<String, Tag> result = NamedTag.quickParse(in, request);
 
       Tag version = result.get(".Data.version");
@@ -175,8 +185,16 @@ public class World implements Comparable<World> {
 
       boolean haveSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
 
-      World world = new World(levelName, worldDirectory, dimension,
+      World world;
+      Tag isCubic = result.get(".Data.isCubicWorld");
+      if (isCubic != null && isCubic.byteValue(0) == 1) {
+        world = new CubicWorld(levelName, worldDirectory, dimension,
           playerEntities, haveSpawnPos, seed, modtime);
+      } else {
+        world = new World(levelName, worldDirectory, dimension,
+          playerEntities, haveSpawnPos, seed, modtime);
+      }
+
       world.spawnX = spawnX.intValue();
       world.spawnY = spawnY.intValue();
       world.spawnZ = spawnZ.intValue();
@@ -268,27 +286,44 @@ public class World implements Comparable<World> {
     return getRegion(pos.getRegionPosition()).getChunk(pos);
   }
 
+  public ChunkData createChunkData() {
+    if(this.getVersionId() >= World.VERSION_21W06A) {
+      return new GenericChunkData();
+    } else {
+      return new SimpleChunkData();
+    }
+  }
+
+  public Region createRegion(ChunkPosition pos) {
+    return new MCRegion(pos, this);
+  }
+
+  public RegionChangeWatcher createRegionChangeWatcher(WorldMapLoader worldMapLoader, MapView mapView) {
+    return new MCRegionChangeWatcher(worldMapLoader, mapView);
+  }
+
   /**
    * @param pos Region position
    * @return The region at the given position
    */
   public synchronized Region getRegion(ChunkPosition pos) {
-    if (regionMap.containsKey(pos)) {
-      return regionMap.get(pos);
-    } else {
+    return regionMap.computeIfAbsent(pos.getLong(), p -> {
       // check if the region is present in the world directory
       Region region = EmptyRegion.instance;
       if (regionExists(pos)) {
-        region = new Region(pos, this);
+        region = createRegion(pos);
       }
-      setRegion(pos, region);
       return region;
-    }
+    });
+  }
+
+  public Region getRegionWithinRange(ChunkPosition pos, int yMin, int yMax) {
+    return getRegion(pos);
   }
 
   /** Set the region for the given position. */
   public synchronized void setRegion(ChunkPosition pos, Region region) {
-    regionMap.put(pos, region);
+    regionMap.put(pos.getLong(), region);
   }
 
   /**
@@ -296,7 +331,7 @@ public class World implements Comparable<World> {
    * @return {@code true} if a region file exists for the given position
    */
   public boolean regionExists(ChunkPosition pos) {
-    File regionFile = new File(getRegionDirectory(), Region.getFileName(pos));
+    File regionFile = new File(getRegionDirectory(), MCRegion.getFileName(pos));
     return regionFile.exists();
   }
 
@@ -306,7 +341,7 @@ public class World implements Comparable<World> {
    * @param dimension the dimension
    * @return File object pointing to the data directory
    */
-  private synchronized File getDataDirectory(int dimension) {
+  protected synchronized File getDataDirectory(int dimension) {
     return dimension == 0 ?
         worldDirectory :
         new File(worldDirectory, "DIM" + dimension);
@@ -332,7 +367,7 @@ public class World implements Comparable<World> {
    * @return File object pointing to the region file directory for
    * the given dimension
    */
-  private synchronized File getRegionDirectory(int dimension) {
+  protected synchronized File getRegionDirectory(int dimension) {
     return new File(getDataDirectory(dimension), "region");
   }
 
@@ -381,11 +416,7 @@ public class World implements Comparable<World> {
   /** Called when a new region has been discovered by the region parser. */
   public void regionDiscovered(ChunkPosition pos) {
     synchronized (this) {
-      Region region = regionMap.get(pos);
-      if (region == null) {
-        region = new Region(pos, this);
-        regionMap.put(pos, region);
-      }
+      regionMap.computeIfAbsent(pos.getLong(), p -> createRegion(pos));
     }
   }
 
@@ -522,7 +553,7 @@ public class World implements Comparable<World> {
       throws IOException {
 
     zout.putNextEntry(new ZipEntry(regionZipFileName));
-    Region.writeRegion(regionDirectory, regionPos, new DataOutputStream(zout), chunks);
+    MCRegion.writeRegion(regionDirectory, regionPos, new DataOutputStream(zout), chunks);
     zout.closeEntry();
   }
 

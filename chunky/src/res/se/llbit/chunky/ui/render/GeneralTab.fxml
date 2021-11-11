@@ -1,76 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.ScrollPane?>
-<?import se.llbit.chunky.ui.IntegerAdjuster?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import se.llbit.chunky.ui.*?>
 
-<?import javafx.scene.layout.FlowPane?>
-<fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
-    <VBox spacing="10.0">
-      <children>
-        <FlowPane hgap="10" vgap="10">
-          <children>
-            <Button fx:id="openSceneDirBtn" mnemonicParsing="false" text="Open scene directory" />
-            <Button fx:id="exportSettings" mnemonicParsing="false" text="Export settings" />
-            <Button fx:id="importSettings" mnemonicParsing="false" text="Import settings" />
-            <Button fx:id="restoreDefaults" mnemonicParsing="false" text="Restore default settings" />
-          </children>
-        </FlowPane>
-        <HBox spacing="10.0">
-          <children>
-            <Button fx:id="loadSelectedChunks" mnemonicParsing="false" text="Load selected chunks" />
-            <Button fx:id="reloadChunks" mnemonicParsing="false" text="Reload chunks" />
-          </children>
-        </HBox>
-        <Separator/>
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-          <children>
-            <Label fx:id="canvasSizeLbl" text="Canvas size:" />
-            <ComboBox fx:id="canvasSize" />
-            <Button fx:id="applySize" mnemonicParsing="false" text="Apply" />
-            <Button fx:id="makeDefaultSize" mnemonicParsing="false" text="Set default" />
-          </children>
-        </HBox>
-        <HBox spacing="10.0">
-          <children>
-            <Button fx:id="scale05" mnemonicParsing="false" text="x0.5" />
-            <Button fx:id="scale15" mnemonicParsing="false" text="x1.5" />
-            <Button fx:id="scale20" mnemonicParsing="false" text="x2" />
-          </children>
-        </HBox>
-        <Separator/>
-        <CheckBox fx:id="loadPlayers" mnemonicParsing="false" text="Load players" />
-        <CheckBox fx:id="biomeColors" mnemonicParsing="false" text="Enable biome colors" />
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-          <children>
-            <CheckBox fx:id="saveDumps" mnemonicParsing="false" text="Save dump once every" />
-            <ComboBox fx:id="dumpFrequency" />
-            <Label text="frames" />
-          </children>
-        </HBox>
-        <CheckBox fx:id="saveSnapshots" mnemonicParsing="false" text="Save snapshot for each dump" />
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-          <children>
-            <IntegerAdjuster fx:id="yMin" name="Y min clip" />
-            <Button fx:id="setDefaultYMin" mnemonicParsing="false" text="Set default" />
-          </children>
-        </HBox>
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-          <children>
-            <IntegerAdjuster fx:id="yMax" name="Y max clip" />
-            <Button fx:id="setDefaultYMax" mnemonicParsing="false" text="Set default" />
-          </children>
-        </HBox>
-      </children>
-      <padding>
-        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-      </padding>
-    </VBox>
+<fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40"
+  xmlns:fx="http://javafx.com/fxml/1">
+  <VBox spacing="10.0">
+    <children>
+      <FlowPane hgap="10" vgap="10">
+        <children>
+          <Button fx:id="openSceneDirBtn" mnemonicParsing="false" text="Open scene directory"/>
+          <Button fx:id="exportSettings" mnemonicParsing="false" text="Export settings"/>
+          <Button fx:id="importSettings" mnemonicParsing="false" text="Import settings"/>
+          <Button fx:id="restoreDefaults" mnemonicParsing="false" text="Restore default settings"/>
+        </children>
+      </FlowPane>
+      <HBox spacing="10.0">
+        <children>
+          <Button fx:id="loadSelectedChunks" mnemonicParsing="false" text="Load selected chunks"/>
+          <Button fx:id="reloadChunks" mnemonicParsing="false" text="Reload chunks"/>
+        </children>
+      </HBox>
+      <Separator/>
+      <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <children>
+          <Label fx:id="canvasSizeLbl" text="Canvas size:"/>
+          <ComboBox fx:id="canvasSize"/>
+          <Button fx:id="applySize" mnemonicParsing="false" text="Apply"/>
+          <Button fx:id="makeDefaultSize" mnemonicParsing="false" text="Set default"/>
+        </children>
+      </HBox>
+      <HBox spacing="10.0">
+        <children>
+          <Button fx:id="scale05" mnemonicParsing="false" text="x0.5"/>
+          <Button fx:id="scale15" mnemonicParsing="false" text="x1.5"/>
+          <Button fx:id="scale20" mnemonicParsing="false" text="x2"/>
+        </children>
+      </HBox>
+      <Separator/>
+      <Accordion>
+        <panes>
+          <TitledPane animated="false" text="Load entities">
+            <content>
+              <VBox spacing="10.0">
+                <children>
+                  <HBox spacing="10.0">
+                    <children>
+                      <Button fx:id="loadAllEntities" mnemonicParsing="false" text="Select All"/>
+                      <Button fx:id="loadNoEntity" mnemonicParsing="false" text="Deselect All"/>
+                    </children>
+                  </HBox>
+                  <CheckBox fx:id="loadPlayers" mnemonicParsing="false" text="Players"/>
+                  <CheckBox fx:id="loadArmorStands" mnemonicParsing="false" text="Armor stands"/>
+                  <CheckBox fx:id="loadBooks" mnemonicParsing="false" text="Books"/>
+                  <CheckBox fx:id="loadPaintings" mnemonicParsing="false" text="Paintings"/>
+                  <CheckBox fx:id="loadOtherEntities" mnemonicParsing="false" text="Other"/>
+                </children>
+              </VBox>
+            </content>
+          </TitledPane>
+        </panes>
+      </Accordion>
+      <CheckBox fx:id="biomeColors" mnemonicParsing="false" text="Enable biome colors"/>
+      <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <children>
+          <CheckBox fx:id="saveDumps" mnemonicParsing="false" text="Save dump once every"/>
+          <ComboBox fx:id="dumpFrequency"/>
+          <Label text="frames"/>
+        </children>
+      </HBox>
+      <CheckBox fx:id="saveSnapshots" mnemonicParsing="false" text="Save snapshot for each dump"/>
+      <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <children>
+          <IntegerAdjuster fx:id="yMin" name="Y min clip"/>
+          <Button fx:id="setDefaultYMin" mnemonicParsing="false" text="Set default"/>
+        </children>
+      </HBox>
+      <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <children>
+          <IntegerAdjuster fx:id="yMax" name="Y max clip"/>
+          <Button fx:id="setDefaultYMax" mnemonicParsing="false" text="Set default"/>
+        </children>
+      </HBox>
+    </children>
+    <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+    </padding>
+  </VBox>
 </fx:root>

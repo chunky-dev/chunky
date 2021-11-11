@@ -24,7 +24,7 @@ import javafx.scene.image.WritablePixelFormat;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
-import se.llbit.png.PngFileWriter;
+import se.llbit.imageformats.png.PngFileWriter;
 import se.llbit.util.RingBuffer;
 import se.llbit.util.TaskTracker;
 

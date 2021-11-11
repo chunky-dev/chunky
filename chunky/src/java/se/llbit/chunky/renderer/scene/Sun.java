@@ -268,7 +268,8 @@ public class Sun implements JsonSerializable {
    * Calculate flat shading for ray.
    */
   public void flatShading(Ray ray) {
-    double shading = ray.n.x * sw.x + ray.n.y * sw.y + ray.n.z * sw.z;
+    Vector3 n = ray.getN();
+    double shading = n.x * sw.x + n.y * sw.y + n.z * sw.z;
     shading = QuickMath.max(AMBIENT, shading);
     ray.color.x *= emittance.x * shading;
     ray.color.y *= emittance.y * shading;

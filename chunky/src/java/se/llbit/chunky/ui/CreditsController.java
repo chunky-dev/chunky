@@ -43,10 +43,13 @@ import java.util.function.Supplier;
 
 public class CreditsController implements Initializable {
   @FXML private Hyperlink markdown;
-  @FXML private VBox pluginBox;
+  @FXML private Hyperlink markdownLicense;
   @FXML private Hyperlink fastMath;
+  @FXML private Hyperlink fastMathLicense;
   @FXML private Hyperlink fastutil;
-  @FXML private Hyperlink apacheLicense;
+  @FXML private Hyperlink fastutilLicense;
+
+  @FXML private VBox pluginBox;
   @FXML private ImageView logoImage;
   @FXML private Hyperlink ghContributors;
 
@@ -98,28 +101,32 @@ public class CreditsController implements Initializable {
     ghContributors.setOnAction(e -> launchAndReset(ghContributors, "https://github.com/chunky-dev/chunky/graphs/contributors"));
 
     markdown.setBorder(Border.EMPTY);
-    markdown.setOnAction(e -> launchAndReset(markdown, "https://github.com/chunky-dev/chunky/blob/master/licenses/Markdown.txt"));
-
-    apacheLicense.setBorder(Border.EMPTY);
-    apacheLicense.setOnAction(e -> launchAndReset(apacheLicense, "http://www.apache.org/licenses/LICENSE-2.0.txt"));
+    markdown.setOnAction(e -> launchAndReset(markdown, "https://daringfireball.net/projects/markdown/"));
+    markdownLicense.setBorder(Border.EMPTY);
+    markdownLicense.setOnAction(e -> launchAndReset(markdownLicense, "https://daringfireball.net/projects/markdown/license"));
 
     fastMath.setBorder(Border.EMPTY);
     fastMath.setOnAction(e -> launchAndReset(fastMath, "https://commons.apache.org/proper/commons-math/"));
+    fastMathLicense.setBorder(Border.EMPTY);
+    fastMathLicense.setOnAction(e -> launchAndReset(fastMathLicense, "http://www.apache.org/licenses/LICENSE-2.0"));
 
     fastutil.setBorder(Border.EMPTY);
     fastutil.setOnAction(e -> launchAndReset(fastutil, "https://fastutil.di.unimi.it/"));
+    fastutilLicense.setBorder(Border.EMPTY);
+    fastutilLicense.setOnAction(e -> launchAndReset(fastutilLicense, "http://www.apache.org/licenses/LICENSE-2.0"));
 
     if (plugins.size() > 0) {
       plugins.forEach((key, item) -> pluginBox.getChildren().addAll(buildBox(item)));
     } else {
-      Label label = new Label("You have no plugins installed!");
+      Label label = new Label("You have no plugins activated!");
       label.setPadding(new Insets(0, 0, 0 ,-10.0));
       pluginBox.getChildren().add(label);
-
-      Hyperlink pluginLink = new Hyperlink("Get some plugins here!");
-      pluginLink.setOnAction(e -> launchAndReset(pluginLink, "https://jackjt8.github.io/ChunkyGuide/docs/setup/plugins.html"));
-      pluginBox.getChildren().add(pluginLink);
     }
+
+    Hyperlink pluginLink = new Hyperlink("Get plugins here!");
+    pluginLink.setPadding(new Insets(0, 0, 0, -10.0));
+    pluginLink.setOnAction(e -> launchAndReset(pluginLink, "https://chunky-dev.github.io/docs/plugins/"));
+    pluginBox.getChildren().add(pluginLink);
   }
 
   public void setStage(Stage stage) {
