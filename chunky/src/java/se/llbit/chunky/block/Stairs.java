@@ -5,9 +5,8 @@ import se.llbit.chunky.resources.Texture;
 
 public class Stairs extends AbstractModelBlock {
 
-  private final int flipped, facing, corner;
-  private final boolean isCorner;
-  private final Texture side, top, bottom;
+  private final int flipped;
+  private final BlockFace facing;
   private final String description;
 
   public Stairs(String name, Texture texture, String half, String shape, String facing) {
@@ -18,46 +17,47 @@ public class Stairs extends AbstractModelBlock {
       String half, String shape, String facing) {
     super(name, side);
     this.description = String.format("half=%s, shape=%s, facing=%s", half, shape, facing);
-    this.side = side;
-    this.top = top;
-    this.bottom = bottom;
     solid = false;
     flipped = (half.equals("top")) ? 1 : 0;
-    switch (facing) {
+    this.facing = BlockFace.fromName(facing);
+    boolean isCorner = !shape.equals("straight");
+
+    int facingVal;
+    switch (this.facing) {
+      case EAST:
+        facingVal = 0;
+        break;
+      case WEST:
+        facingVal = 1;
+        break;
+      case SOUTH:
+        facingVal = 2;
+        break;
       default:
-      case "east":
-        this.facing = 0;
-        break;
-      case "west":
-        this.facing = 1;
-        break;
-      case "south":
-        this.facing = 2;
-        break;
-      case "north":
-        this.facing = 3;
-        break;
+      case NORTH:
+        facingVal = 3;
     }
-    isCorner = !shape.equals("straight");
+
+    int corner;
     switch (shape) {
       default:
       case "straight":
-        this.corner = 0;
+        corner = 0;
         break;
       case "outer_right":
         switch (facing) {
           default:
           case "east":
-            this.corner = 0;
+            corner = 0;
             break;
           case "west":
-            this.corner = 3;
+            corner = 3;
             break;
           case "south":
-            this.corner = 1;
+            corner = 1;
             break;
           case "north":
-            this.corner = 2;
+            corner = 2;
             break;
         }
         break;
@@ -65,16 +65,16 @@ public class Stairs extends AbstractModelBlock {
         switch (facing) {
           default:
           case "east":
-            this.corner = 2;
+            corner = 2;
             break;
           case "west":
-            this.corner = 1;
+            corner = 1;
             break;
           case "south":
-            this.corner = 0;
+            corner = 0;
             break;
           case "north":
-            this.corner = 3;
+            corner = 3;
             break;
         }
         break;
@@ -82,16 +82,16 @@ public class Stairs extends AbstractModelBlock {
         switch (facing) {
           default:
           case "east":
-            this.corner = 0 + 4;
+            corner = 0 + 4;
             break;
           case "west":
-            this.corner = 3 + 4;
+            corner = 3 + 4;
             break;
           case "south":
-            this.corner = 1 + 4;
+            corner = 1 + 4;
             break;
           case "north":
-            this.corner = 2 + 4;
+            corner = 2 + 4;
             break;
         }
         break;
@@ -99,22 +99,22 @@ public class Stairs extends AbstractModelBlock {
         switch (facing) {
           default:
           case "east":
-            this.corner = 2 + 4;
+            corner = 2 + 4;
             break;
           case "west":
-            this.corner = 1 + 4;
+            corner = 1 + 4;
             break;
           case "south":
-            this.corner = 0 + 4;
+            corner = 0 + 4;
             break;
           case "north":
-            this.corner = 3 + 4;
+            corner = 3 + 4;
             break;
         }
         break;
     }
 
-    this.model = new StairModel(side, top, bottom, flipped, isCorner, corner, this.facing);
+    this.model = new StairModel(side, top, bottom, flipped, isCorner, corner, facingVal);
   }
 
   @Override
@@ -127,16 +127,6 @@ public class Stairs extends AbstractModelBlock {
   }
 
   public BlockFace getFacing() {
-    switch (facing) {
-      case 0:
-        return BlockFace.EAST;
-      case 1:
-        return BlockFace.WEST;
-      case 2:
-        return BlockFace.SOUTH;
-      case 3:
-      default:
-        return BlockFace.NORTH;
-    }
+    return facing;
   }
 }

@@ -24,7 +24,7 @@ import se.llbit.math.Vector4;
 
 public class SpriteModel extends QuadModel {
 
-  protected static Quad[] quads =
+  protected static final Quad[] quads =
       {new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 1), new Vector3(0, 1, 0),
           new Vector4(0, 1, 0, 1)),
 
@@ -124,12 +124,11 @@ public class SpriteModel extends QuadModel {
         return 2;
       case "south":
         return 3;
+      default:
       case "up":
         return 4;
       case "west":
         return 5;
-      default:
-        return 4;
     }
   }
 }

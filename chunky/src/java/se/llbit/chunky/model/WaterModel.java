@@ -33,7 +33,7 @@ import se.llbit.math.Vector4;
  */
 public class WaterModel {
 
-  private static Quad[] fullBlock = {
+  private static final Quad[] fullBlock = {
       // bottom
       new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
           new Vector4(0, 1, 0, 1)),
@@ -70,7 +70,7 @@ public class WaterModel {
   /**
    * Water height levels
    */
-  static final double height[] =
+  static final double[] height =
       {14 / 16., 12.25 / 16., 10.5 / 16, 8.75 / 16, 7. / 16, 5.25 / 16, 3.5 / 16, 1.75 / 16};
 
   private static final float[] normalMap;

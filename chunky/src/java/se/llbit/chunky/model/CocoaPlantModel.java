@@ -17,11 +17,8 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;

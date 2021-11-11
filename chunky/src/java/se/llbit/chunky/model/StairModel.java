@@ -21,7 +21,7 @@ import se.llbit.math.AABB;
 
 public class StairModel extends AABBModel {
 
-  private static AABB[][][] corners = {
+  private static final AABB[][][] corners = {
       // Not flipped:
       {
           {
@@ -122,9 +122,6 @@ public class StairModel extends AABBModel {
       },
   };
 
-  private final Texture side;
-  private final Texture top;
-  private final Texture bottom;
   private final int flipped;
   private final boolean isCorner;
   private final int corner;
@@ -134,9 +131,6 @@ public class StairModel extends AABBModel {
 
   public StairModel(Texture side, Texture top, Texture bottom, int flipped, boolean isCorner,
       int corner, int facing) {
-    this.side = side;
-    this.top = top;
-    this.bottom = bottom;
     this.flipped = flipped;
     this.isCorner = isCorner;
     this.corner = corner;

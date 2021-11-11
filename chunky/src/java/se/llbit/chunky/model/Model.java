@@ -235,6 +235,6 @@ public class Model {
     for (Quad[] quads : models) {
       Collections.addAll(all, quads);
     }
-    return all.toArray(new Quad[all.size()]);
+    return all.toArray(new Quad[0]);
   }
 }

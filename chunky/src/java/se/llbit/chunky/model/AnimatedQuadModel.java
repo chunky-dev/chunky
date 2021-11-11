@@ -3,8 +3,6 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.AnimatedTexture;
-import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -64,7 +62,7 @@ public abstract class AnimatedQuadModel extends QuadModel {
           tint.tint(c, ray, scene);
           color = c;
           ray.t = ray.tNext;
-          ray.n.set(quad.n);
+          ray.setN(quad.n);
           hit = true;
         }
       }

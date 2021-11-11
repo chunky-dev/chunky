@@ -19,8 +19,6 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -91,11 +89,11 @@ public class VineModel extends QuadModel {
 
   public VineModel(int connections) {
     ArrayList<Quad> quads = new ArrayList<>();
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 4; i++) {
       if ((connections & (1 << i)) != 0)
         quads.add(model[i]);
     }
-    if ((connections & (1 << 5)) != 0) {
+    if ((connections & (1 << 4)) != 0) {
       quads.add(topQuads[connections & 0b1111]);
     }
 

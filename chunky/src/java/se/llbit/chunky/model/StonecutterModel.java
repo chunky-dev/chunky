@@ -86,6 +86,7 @@ public class StonecutterModel extends QuadModel {
 
   private static int getOrientationIndex(String facing) {
     switch (facing) {
+      default:
       case "north":
         return 0;
       case "east":
@@ -94,8 +95,6 @@ public class StonecutterModel extends QuadModel {
         return 2;
       case "west":
         return 3;
-      default:
-        return 0;
     }
   }
 

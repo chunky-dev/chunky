@@ -55,7 +55,7 @@ public class SeaPickleModel extends QuadModel {
           new Vector3(8.5 / 16.0, 8.7 / 16.0, 8 / 16.0),
           new Vector4(1 / 16.0, 3 / 16.0, 11 / 16.0, 16 / 16.0)),
           Transform.NONE.translate(0, 0, 0)
-              .rotateY(0.7853981633974483 / 1.0)
+              .rotateY(Math.PI / 4.0)
               .translate(0, 0, 0)),
       new Quad(new Quad(
           new Vector3(7.5 / 16.0, 5.2 / 16.0, 8 / 16.0),
@@ -63,7 +63,7 @@ public class SeaPickleModel extends QuadModel {
           new Vector3(7.5 / 16.0, 8.7 / 16.0, 8 / 16.0),
           new Vector4(13 / 16.0, 15 / 16.0, 11 / 16.0, 16 / 16.0)),
           Transform.NONE.translate(0, 0, 0)
-              .rotateY(0.7853981633974483 / 1.0)
+              .rotateY(Math.PI / 4.0)
               .translate(0, 0, 0)),
   };
   //endregion

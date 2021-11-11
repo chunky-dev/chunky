@@ -20,7 +20,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.*;
 
 public class SnowModel extends QuadModel {
-  protected static Quad[][] model = new Quad[8][];
+  protected static final Quad[][] model = new Quad[8][];
 
   static {
     for (int i = 0; i < 8; ++i) {

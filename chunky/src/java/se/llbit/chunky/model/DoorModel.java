@@ -24,7 +24,7 @@ import se.llbit.math.Vector4;
 import java.util.Arrays;
 
 public class DoorModel extends QuadModel {
-  protected static Quad[][] faces = {
+  protected static final Quad[][] faces = {
     {
       // front
       new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 0),

@@ -18,11 +18,9 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class RedstoneRepeaterModel extends QuadModel {
