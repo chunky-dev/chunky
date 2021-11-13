@@ -116,12 +116,12 @@ public class FlameParticles extends Entity {
     return new FlameParticles(json);
   }
 
-  @Override
-  public Grid.EmitterPosition[] getEmitterPosition() {
-    Grid.EmitterPosition[] pos = new Grid.EmitterPosition[flames.length];
-    for(int i = 0; i < flames.length; i++) {
-      pos[i] = new Grid.EmitterPosition((float)(position.x + 0.5 + flames[i].x), (float)(position.y + flames[i].y), (float)(position.z + 0.5 + flames[i].z), 1.0f/32);
-    }
-    return pos;
-  }
+//  @Override
+//  public Grid.EmitterPosition[] getEmitterPosition() {
+//    Grid.EmitterPosition[] pos = new Grid.EmitterPosition[flames.length];
+//    for(int i = 0; i < flames.length; i++) {
+//      pos[i] = new Grid.EmitterPosition((float)(position.x + 0.5 + flames[i].x), (float)(position.y + flames[i].y), (float)(position.z + 0.5 + flames[i].z), 1.0f/32);
+//    }
+//    return pos;
+//  }
 }

@@ -13,6 +13,8 @@ import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
+import java.util.Random;
+
 public abstract class Block extends Material {
   private final static AABB block =  new AABB(0, 1, 0, 1,0, 1);
 
@@ -32,6 +34,15 @@ public abstract class Block extends Material {
 
   public Block(String name, Texture texture) {
     super(name, texture);
+  }
+
+  /**
+   * Sample a random point on this block. Coordinates are normalized to be in [0, 1].
+   * @param loc  Location vector where the point is stored.
+   * @param rand Random number source.
+   */
+  public void sample(Vector3 loc, Random rand) {
+    block.sample(loc, rand);
   }
 
   /**

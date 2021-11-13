@@ -7,6 +7,8 @@ import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
+import java.util.Random;
+
 /**
  * A block model that is made out of textured AABBs.
  */
@@ -47,6 +49,13 @@ public abstract class AABBModel implements BlockModel {
   @PluginApi
   public UVMapping[][] getUVMapping() {
     return null;
+  }
+
+  @Override
+  public void sample(Vector3 loc, Random rand) {
+    // TODO Choose a random AABB based on surface area
+    AABB[] boxes = getBoxes();
+    boxes[rand.nextInt(boxes.length)].sample(loc, rand);
   }
 
   @Override

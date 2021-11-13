@@ -17,6 +17,7 @@
 package se.llbit.math;
 
 import java.util.Collection;
+import java.util.Random;
 
 import se.llbit.chunky.world.Material;
 import se.llbit.math.primitive.Primitive;
@@ -117,6 +118,32 @@ public class Quad {
     this.uv.set(uv);
     this.uv.y -= uv.x;
     this.uv.w -= uv.z;
+  }
+
+  public void sample(Vector3 loc, Random rand) {
+    // TODO Properly randomly sample a point on the quad
+    double u = rand.nextDouble();
+    double v = rand.nextDouble();
+
+    double a = xvl;
+    double b = xv.x;
+    double c = xv.y;
+    double d = xv.z;
+    double e = yvl;
+    double f = yv.x;
+    double g = yv.y;
+    double h = yv.z;
+    double o = n.x;
+    double p = this.o.x;
+    double q = n.y;
+    double l = this.o.y;
+    double m = n.z;
+    double n = this.o.z;
+
+    double recip = 1 / (a*e*(-b*g*m + b*h*q + c*f*m - c*h*o - d*f*q + d*g*o));
+    loc.x = -(a*c*e*h*l*q + a*c*e*h*m*n + a*c*e*h*o*p - a*c*m*v - a*d*d*e*g*l*q - a*d*e*g*m*n - a*d*e*g*o*p + a*d*q*v + e*g*m*u - e*h*q*u) * recip;
+    loc.y = -(-a*b*e*h*l*q - a*b*e*h*m*n - a*b*e*h*o*p + a*b*m*v + a*d*e*f*l*q + a*d*e*f*m*n + a*d*e*f*o*p - a*d*o*v - e*f*m*u + e*h*o*u) * recip;
+    loc.z = -(a*b*e*g*l*q + a*b*e*g*m*n + a*b*e*g*o*p - a*b*q*v - a*c*e*f*l*q - a*c*e*f*m*n - a*c*e*f*o*p + a*c*o*v + e*f*q*u - e*g*o*u) * recip;
   }
 
   /**

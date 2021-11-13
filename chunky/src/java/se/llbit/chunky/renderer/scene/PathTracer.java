@@ -446,7 +446,8 @@ public class PathTracer implements RayTracer {
     Ray emitterRay = new Ray();
     emitterRay.set(ray);
     // TODO Sampling a random point on the model would be better than using a random point in the middle of the cube
-    Vector3 target = new Vector3(pos.x + (random.nextDouble() - 0.5) * pos.radius, pos.y + (random.nextDouble() - 0.5) * pos.radius, pos.z  + (random.nextDouble() - 0.5) * pos.radius);
+    Vector3 target = new Vector3();
+    pos.sample(target, random);
     emitterRay.d.set(target);
     emitterRay.d.sub(emitterRay.o);
     double distance = emitterRay.d.length();

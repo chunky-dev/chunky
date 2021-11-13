@@ -16,6 +16,8 @@
  */
 package se.llbit.math;
 
+import java.util.Random;
+
 /**
  * Axis Aligned Bounding Box for collision detection and Bounding Volume Hierarchy
  * construction.
@@ -31,14 +33,40 @@ public class AABB {
   public double zmin;
   public double zmax;
 
-  public AABB(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax) {
+  public double surfaceArea;
 
+  public AABB(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax) {
     this.xmin = xmin;
     this.xmax = xmax;
     this.ymin = ymin;
     this.ymax = ymax;
     this.zmin = zmin;
     this.zmax = zmax;
+
+    double x = xmax - xmin;
+    double y = ymax - ymin;
+    double z = zmax - zmin;
+    this.surfaceArea = 2 * (y * z + x * z + x * y);
+  }
+
+  public void sample(Vector3 loc, Random rand) {
+    double[] vec = new double[3];
+    int face = rand.nextInt(6);
+    int perp = face % 3;
+
+    vec[perp] = face > 2 ? 1 : 0;
+    vec[(perp + 1) % 3] = rand.nextDouble();
+    vec[(perp + 1) % 3] = rand.nextDouble();
+
+    vec[0] *= xmax - xmin;
+    vec[1] *= ymax - ymin;
+    vec[2] *= zmax - zmin;
+
+    vec[0] += xmin;
+    vec[1] += ymin;
+    vec[2] += zmin;
+
+    loc.set(vec[0], vec[1], vec[2]);
   }
 
   /**

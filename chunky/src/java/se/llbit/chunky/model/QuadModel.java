@@ -8,6 +8,8 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
+import java.util.Random;
+
 /**
  * A block model that is made out of textured quads.
  */
@@ -27,6 +29,12 @@ public abstract class QuadModel implements BlockModel {
   @PluginApi
   public Tint[] getTints() {
     return null;
+  }
+
+  @Override
+  public void sample(Vector3 loc, Random rand) {
+    Quad[] quads = getQuads();
+    quads[rand.nextInt(quads.length)].sample(loc, rand);
   }
 
   @Override
