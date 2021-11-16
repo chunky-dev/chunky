@@ -2,13 +2,7 @@ package se.llbit.chunky.block;
 
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.AABB;
-import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
-import se.llbit.math.Triangle;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 
 import static se.llbit.chunky.block.Water.CORNER_0;
 import static se.llbit.chunky.block.Water.CORNER_1;
@@ -58,7 +52,9 @@ public class Lava extends MinecraftBlockTranslucent {
 
     boolean hit = false;
     if (bottom.intersect(ray)) {
-      ray.orientNormal(bottom.n);
+      Vector3 n = new Vector3(bottom.n);
+      n.scale(-QuickMath.signum(ray.d.dot(bottom.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       hit = true;
     }
@@ -69,13 +65,17 @@ public class Lava extends MinecraftBlockTranslucent {
     int c3 = (0xF & (data >> CORNER_3)) % 8;
     Triangle triangle = Water.t012[c0][c1][c2];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       hit = true;
     }
     triangle = Water.t230[c2][c3][c0];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       ray.u = 1 - ray.u;
       ray.v = 1 - ray.v;
@@ -83,7 +83,9 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.westt[c0][c3];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       double y = ray.t * ray.d.y + ray.o.y;
       double z = ray.t * ray.d.z + ray.o.z;
@@ -95,7 +97,9 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.westb[c0];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       double y = ray.t * ray.d.y + ray.o.y;
       double z = ray.t * ray.d.z + ray.o.z;
@@ -107,7 +111,9 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.eastt[c1][c2];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       double y = ray.t * ray.d.y + ray.o.y;
       double z = ray.t * ray.d.z + ray.o.z;
@@ -119,7 +125,9 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.eastb[c1];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       double y = ray.t * ray.d.y + ray.o.y;
       double z = ray.t * ray.d.z + ray.o.z;
@@ -131,7 +139,9 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.southt[c0][c1];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       double x = ray.t * ray.d.x + ray.o.x;
       double y = ray.t * ray.d.y + ray.o.y;
@@ -143,7 +153,9 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.southb[c1];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       double x = ray.t * ray.d.x + ray.o.x;
       double y = ray.t * ray.d.y + ray.o.y;
@@ -155,7 +167,9 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.northt[c2][c3];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       double x = ray.t * ray.d.x + ray.o.x;
       double y = ray.t * ray.d.y + ray.o.y;
@@ -167,7 +181,9 @@ public class Lava extends MinecraftBlockTranslucent {
     }
     triangle = Water.northb[c2];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       double x = ray.t * ray.d.x + ray.o.x;
       double y = ray.t * ray.d.y + ray.o.y;

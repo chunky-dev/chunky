@@ -2,11 +2,10 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class ChainModel {
+public class ChainModel extends QuadModel {
   private static final Quad[] quadsY =
       Model.rotateY(
           new Quad[] {
@@ -33,51 +32,34 @@ public class ChainModel {
           },
           Math.toRadians(45));
 
-  private static Quad[][] axis = new Quad[3][];
+  private static final Texture[] textures = {
+      Texture.chain, Texture.chain, Texture.chain, Texture.chain
+  };
 
-  static {
-    Quad[] quadsX = Model.rotateZ(quadsY);
-    Quad[] quadsZ = Model.rotateX(quadsY);
+  private final Quad[] quads;
 
-    axis[0] = quadsY;
-    axis[1] = quadsX;
-    axis[2] = quadsZ;
-  }
-
-  public static boolean intersect(Ray ray, String axisName) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-
-    int axisId;
-    switch(axisName) {
+  public ChainModel(String axisName) {
+    switch (axisName) {
       default:
       case "y":
-        axisId = 0;
+        quads = quadsY;
         break;
       case "x":
-        axisId = 1;
+        quads = Model.rotateZ(quadsY);
         break;
       case "z":
-        axisId = 2;
+        quads = Model.rotateX(quadsY);
         break;
     }
+  }
 
-    for (Quad quad : axis[axisId]) {
-      if (quad.intersect(ray)) {
-        float[] color = Texture.chain.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.setNormal(quad.n);
-          hit = true;
-        }
-      }
-    }
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
 
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

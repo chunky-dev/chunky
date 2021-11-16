@@ -2,19 +2,18 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class CakeWithCandleModel {
+import java.util.Arrays;
+
+public class CakeWithCandleModel extends QuadModel {
 
   private static final Texture bottom = Texture.cakeBottom;
   private static final Texture top = Texture.cakeTop;
   private static final Texture side = Texture.cakeSide;
-  private static final Texture[] tex = new Texture[]{
-      top, bottom, side, side, side, side,
-  };
 
+  //region Cake With Candle
   private static final Quad[] quads = Model.join(
       new Quad[]{
           new Quad(
@@ -118,29 +117,23 @@ public class CakeWithCandleModel {
               new Vector4(1 / 16.0, 0 / 16.0, 11 / 16.0, 10 / 16.0)
           )
       }, Math.toRadians(45)));
+  //endregion
 
-  public static boolean intersect(Ray ray, Texture candle) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
+  private final Texture[] textures;
 
-    for (int i = 0; i < quads.length; i++) {
-      Quad quad = quads[i];
-      Texture texture = i < tex.length ? tex[i] : candle;
-      if (quad.intersect(ray)) {
-        float[] color = texture.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.setNormal(quad.n);
-          hit = true;
-        }
-      }
-    }
+  public CakeWithCandleModel(Texture candle) {
+    textures = new Texture[quads.length];
+    Arrays.fill(textures, candle);
+    System.arraycopy(new Texture[] {top, bottom, side, side, side, side}, 0, textures, 0, 6);
+  }
 
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

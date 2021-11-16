@@ -17,16 +17,14 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.math.AABB;
-import se.llbit.math.Ray;
 
 /**
  * Anvil block.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class AnvilModel {
+public class AnvilModel extends AABBModel {
   private static final AABB[][] boxes = {
       // north-south
       {
@@ -51,40 +49,46 @@ public class AnvilModel {
       Texture.anvilTopDamaged2
   };
 
-  /**
-   * Find intersection between ray and block
-   *
-   * @return <code>true</code> if the ray intersected the block
-   */
-  public static boolean intersect(Ray ray) {
-    int data = ray.getCurrentData() >> BlockData.OFFSET;
-    int orientation = 1 & data;
-    int damage = 3 & (data >> 2);
-    return intersect(ray, orientation, damage);
+  private final int orientation;
+  private final Texture[][] textures;
+  private final UVMapping[][] mapping;
+
+  public AnvilModel(int orientation, int damage) {
+    this.orientation = orientation;
+
+    Texture side = Texture.anvilSide;
+    Texture top = topTexture[damage];
+    this.textures = new Texture[][] {
+        {side, side, side, side, top, side},
+        {side, side, side, side, side, side},
+        {side, side, side, side, side, side},
+        {side, side, side, side, side, side},
+    };
+
+    // Default mapping (all nones)
+    this.mapping = new UVMapping[4][6];
+    if (this.orientation == 1) {
+      this.mapping[0][4] = UVMapping.ROTATE_90;
+    }
   }
 
-  public static boolean intersect(Ray ray, int orientation, int damage) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (int i = 0; i < boxes[0].length; ++i) {
-      if (boxes[orientation][i].intersect(ray)) {
-        if (i == 0 && ray.getNormal().y > 0) {
-          double tmp = ray.v;
-          ray.v = ray.u * orientation + tmp * (1 - orientation);
-          ray.u = tmp * orientation + ray.u * (1 - orientation);
-          topTexture[damage].getColor(ray);
-        } else {
-          Texture.anvilSide.getColor(ray);
-        }
-        ray.t = ray.tNext;
-        hit = true;
-      }
-    }
-    if (hit) {
-      ray.color.w = 1;
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public AABB[] getBoxes() {
+    // north-south
+    if (orientation == 0)
+      return boxes[0];
+
+    // east-west
+    return boxes[1];
+  }
+
+  @Override
+  public UVMapping[][] getUVMapping() {
+    return this.mapping;
+  }
+
+  @Override
+  public Texture[][] getTextures() {
+    return this.textures;
   }
 }

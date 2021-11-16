@@ -7,12 +7,14 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
+import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
 public abstract class Block extends Material {
+  private final static AABB block =  new AABB(0, 1, 0, 1,0, 1);
 
   /**
    * Set to true if there is a local intersection model for this block. If this is set to
@@ -42,7 +44,17 @@ public abstract class Block extends Material {
    * @return True if the ray hit this block, false if not
    */
   public boolean intersect(Ray ray, Scene scene) {
-    return TexturedBlockModel.intersect(ray, texture);
+    ray.t = Double.POSITIVE_INFINITY;
+    if (block.intersect(ray)) {
+      float[] color = texture.getColor(ray.u, ray.v);
+      if (color[3] > Ray.EPSILON) {
+        ray.color.set(color);
+        ray.distance += ray.tNext;
+        ray.o.scaleAdd(ray.tNext, ray.d);
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

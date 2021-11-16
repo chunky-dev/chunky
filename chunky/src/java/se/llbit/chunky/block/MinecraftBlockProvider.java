@@ -2334,12 +2334,7 @@ public class MinecraftBlockProvider implements BlockProvider {
             Texture.loomTop,
             Texture.loomBottom);
       case "barrel":
-        return new OrientedTexturedBlock(
-            name,
-            BlockProvider.facing(tag),
-            Texture.barrelSide,
-            Texture.barrelTop,
-            Texture.barrelBottom);
+        return new Barrel(tag.get("Properties").get("facing").stringValue(), tag.get("Properties").get("open").stringValue());
       case "smoker":
         return smoker(tag);
       case "blast_furnace":
@@ -2444,12 +2439,7 @@ public class MinecraftBlockProvider implements BlockProvider {
         // as of 20w13a (1.16), the jigsaw block supports 12 orientations saved in the orientation tag
         Tag orientation = tag.get("Properties").get("orientation");
         if (orientation.isError()) {
-          return new OrientedTexturedBlock(
-              "jigsaw",
-              BlockProvider.facing(tag, "up"),
-              Texture.jigsawSide,
-              Texture.jigsawTop,
-              Texture.jigsawBottom);
+          return new JigsawBlock("jigsaw", BlockProvider.facing(tag, "up"));
         } else {
           return new JigsawBlock("jigsaw", orientation.stringValue("north_up"));
         }
@@ -2976,7 +2966,7 @@ public class MinecraftBlockProvider implements BlockProvider {
   private static Block snowCovered(Tag tag, Block block) {
     String snowy = tag.get("Properties").get("snowy").stringValue("false");
     if (snowy.equals("true")) {
-      block = new SnowCovered(block);
+      block = new TexturedBlock(block.name, Texture.snowSide, Texture.snowBlock, Texture.dirt);
     }
     return block;
   }

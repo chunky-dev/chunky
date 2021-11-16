@@ -22,7 +22,6 @@ import se.llbit.chunky.world.Material;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.math.primitive.TexturedTriangle;
 
-
 /**
  * A quad.
  *
@@ -30,10 +29,18 @@ import se.llbit.math.primitive.TexturedTriangle;
  */
 public class Quad {
 
-  protected Vector3 o = new Vector3();
-  protected Vector3 xv = new Vector3();
-  protected Vector3 yv = new Vector3();
-  protected Vector4 uv = new Vector4();
+  /** Note: This is public for some plugins. Stability is not guaranteed. */
+  public Vector3 o = new Vector3();
+  public Vector3 xv = new Vector3();
+  public Vector3 yv = new Vector3();
+  public Vector4 uv = new Vector4();
+
+  /**
+   * Is this Quad double sided? This is used instead of {@code instanceof DoubleSidedQuad} since it is ~2x faster.
+   * This is required since ray normal can only be set after an intersection is confirmed
+   * TODO: Find a better way to do this.
+   */
+  public final boolean doubleSided = false;
 
   /**
    * Normal vector

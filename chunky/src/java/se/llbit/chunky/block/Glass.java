@@ -13,6 +13,6 @@ public class Glass extends MinecraftBlock {
 
   @Override
   public boolean isSameMaterial(Material other) {
-    return other instanceof Glass && ((Glass) other).name.equals(this.name); // same name means same color
+    return other instanceof Glass && other.name.equals(this.name); // same name means same color
   }
 }

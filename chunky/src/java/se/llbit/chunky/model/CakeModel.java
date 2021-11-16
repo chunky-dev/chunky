@@ -18,18 +18,17 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class CakeModel {
-    private static Quad[][] quads = new Quad[7][];
+public class CakeModel extends QuadModel {
+    private static final Quad[][] cake = new Quad[7][];
 
     static {
-        int[] fromX = new int[]{1, 3, 5, 7, 9, 11, 13};
+        int[] fromX = new int[] {1, 3, 5, 7, 9, 11, 13};
         for (int i = 0; i < 7; i++) {
             double xMin = fromX[i] / 16.0;
-            quads[i] = new Quad[]{
+            cake[i] = new Quad[]{
                     // front
                     new Quad(new Vector3(.9375, 0, .0625), new Vector3(xMin, 0, .0625),
                             new Vector3(.9375, .5, .0625), new Vector4(.9375, xMin, 0, .5)),
@@ -57,29 +56,26 @@ public class CakeModel {
         }
     }
 
-    public static boolean intersect(Ray ray, int bites) {
-        boolean hit = false;
-        ray.t = Double.POSITIVE_INFINITY;
-        for (Quad quad : quads[bites]) {
-            if (quad.intersect(ray)) {
-                if (quad.n.y > 0)
-                    Texture.cakeTop.getColor(ray);
-                else if (quad.n.y < 0)
-                    Texture.cakeBottom.getColor(ray);
-                else if (quad.n.x >= 0 || bites == 0)
-                    Texture.cakeSide.getColor(ray);
-                else
-                    Texture.cakeInside.getColor(ray);
-                ray.setNormal(quad.n);
-                ray.t = ray.tNext;
-                hit = true;
-            }
-        }
-        if (hit) {
-            ray.color.w = 1;
-            ray.distance += ray.t;
-            ray.o.scaleAdd(ray.t, ray.d);
-        }
-        return hit;
+    private final Quad[] quads;
+    private final Texture[] textures;
+
+    public CakeModel(int bites) {
+        this.quads = cake[bites];
+
+        Texture top = Texture.cakeTop;
+        Texture side = Texture.cakeSide;
+        Texture bottom = Texture.cakeBottom;
+        Texture inside = Texture.cakeInside;
+        textures = new Texture[]{side, side, bites == 0 ? side : inside, side, top, bottom};
+    }
+
+    @Override
+    public Quad[] getQuads() {
+        return quads;
+    }
+
+    @Override
+    public Texture[] getTextures() {
+        return textures;
     }
 }

@@ -3,36 +3,27 @@ package se.llbit.chunky.block;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.FlameParticles;
 import se.llbit.chunky.model.CandleModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
-public class Candle extends MinecraftBlockTranslucent {
+public class Candle extends AbstractModelBlock {
 
   public static final Material flameMaterial = new TextureMaterial(Texture.flameParticle);
 
-  private final Texture candle;
   private final int candles;
   private final boolean lit;
 
   public Candle(String name, Texture candle, Texture candleLit, int candles, boolean lit) {
     super(name, candle);
-    this.candle = lit ? candleLit : candle;
     this.candles = Math.max(1, Math.min(4, candles));
     this.lit = lit;
-    localIntersect = true;
+    this.model = new CandleModel(lit ? candleLit : candle, candles);
   }
 
   public boolean isLit() {
     return lit;
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return CandleModel.intersect(ray, candle, candles);
   }
 
   @Override

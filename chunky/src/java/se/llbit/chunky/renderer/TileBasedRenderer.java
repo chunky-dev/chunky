@@ -19,6 +19,9 @@ package se.llbit.chunky.renderer;
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.renderer.DefaultRenderManager;
+import se.llbit.chunky.renderer.Renderer;
+import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Ray;
 
@@ -71,7 +74,7 @@ public abstract class TileBasedRenderer implements Renderer {
         manager.pool.submit(worker -> {
           WorkerState state = new WorkerState();
           state.ray = new Ray();
-          state.ray.setNormal(0, 0, -1);
+          state.ray.setN(0, 0, -1);
           state.random = worker.random;
 
           IntIntMutablePair pair = new IntIntMutablePair(0, 0);

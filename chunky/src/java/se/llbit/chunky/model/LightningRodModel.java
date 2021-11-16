@@ -2,13 +2,15 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class LightningRodModel {
+import java.util.Arrays;
 
-  private static final Quad[] quadsUp = new Quad[]{
+public class LightningRodModel extends QuadModel {
+
+  //region Model
+  private static final Quad[] lightningRod = new Quad[] {
       new Quad(
           new Vector3(6 / 16.0, 16 / 16.0, 10 / 16.0),
           new Vector3(10 / 16.0, 16 / 16.0, 10 / 16.0),
@@ -76,40 +78,31 @@ public class LightningRodModel {
           new Vector4(2 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
       )
   };
+  //endregion
 
   static final Quad[][] orientedQuads = new Quad[6][];
 
   static {
-    orientedQuads[4] = quadsUp;
-    orientedQuads[0] = Model.rotateX(Model.rotateX(quadsUp));
-    orientedQuads[2] = Model.rotateNegX(quadsUp);
+    orientedQuads[4] = lightningRod;
+    orientedQuads[0] = Model.rotateX(Model.rotateX(lightningRod));
+    orientedQuads[2] = Model.rotateNegX(lightningRod);
     orientedQuads[1] = Model.rotateY(orientedQuads[2]);
     orientedQuads[3] = Model.rotateY(orientedQuads[1]);
     orientedQuads[5] = Model.rotateY(orientedQuads[3]);
   }
 
-  public static boolean intersect(Ray ray, String facing, boolean powered) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    Texture texture = powered ? Texture.lightningRodOn : Texture.lightningRod;
+  private final static Texture[] texturesOn = new Texture[lightningRod.length];
+  static { Arrays.fill(texturesOn, Texture.lightningRodOn); }
 
-    for (Quad quad : orientedQuads[getOrientationIndex(facing)]) {
-      if (quad.intersect(ray)) {
-        float[] color = texture.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.setNormal(quad.n);
-          hit = true;
-        }
-      }
-    }
+  private final static Texture[] texturesOff = new Texture[lightningRod.length];
+  static { Arrays.fill(texturesOff, Texture.lightningRod); }
 
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  private final Quad[] quads;
+  private final Texture[] textures;
+
+  public LightningRodModel(String facing, boolean powered) {
+    this.quads = orientedQuads[getOrientationIndex(facing)];
+    this.textures = powered ? texturesOn : texturesOff;
   }
 
   private static int getOrientationIndex(String facing) {
@@ -122,12 +115,21 @@ public class LightningRodModel {
         return 2;
       case "south":
         return 3;
-      case "up":
-        return 4;
       case "west":
         return 5;
+      case "up":
       default:
         return 4;
     }
+  }
+
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

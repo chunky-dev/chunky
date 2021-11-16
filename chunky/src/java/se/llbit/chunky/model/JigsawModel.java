@@ -2,56 +2,64 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class JigsawModel {
-  private static final Quad[] quadsNorthUp =
-      new Quad[] {
-        new Quad(
-            new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
-            new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
-            new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
-            new Vector4(0 / 16.0, 16 / 16.0, 1 - 16 / 16.0, 1 - 0 / 16.0)),
-        new Quad(
-            new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
-            new Vector3(16 / 16.0, 0 / 16.0, 0 / 16.0),
-            new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
-            new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 0 / 16.0)),
-        new Quad(
-            new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
-            new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
-            new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
-            new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)),
-        new Quad(
-            new Vector3(16 / 16.0, 0 / 16.0, 0 / 16.0),
-            new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
-            new Vector3(16 / 16.0, 0 / 16.0, 16 / 16.0),
-            new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 0 / 16.0)),
-        new Quad(
-            new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
-            new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
-            new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
-            new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)),
-        new Quad(
-            new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
-            new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
-            new Vector3(16 / 16.0, 0 / 16.0, 16 / 16.0),
-            new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0))
-      };
+public class JigsawModel extends QuadModel {
+  //region Jigsaw
+  private static final Quad[] quadsNorthUp = {
+      new Quad(
+          new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 1 - 16 / 16.0, 1 - 0 / 16.0)),
+      new Quad(
+          new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
+          new Vector3(16 / 16.0, 0 / 16.0, 0 / 16.0),
+          new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 0 / 16.0)),
+      new Quad(
+          new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
+          new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)),
+      new Quad(
+          new Vector3(16 / 16.0, 0 / 16.0, 0 / 16.0),
+          new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(16 / 16.0, 0 / 16.0, 16 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 0 / 16.0)),
+      new Quad(
+          new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
+          new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)),
+      new Quad(
+          new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
+          new Vector3(16 / 16.0, 0 / 16.0, 16 / 16.0),
+          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0))
+  };
+  //endregion
 
   static final Quad[][] orientedQuads = new Quad[12][];
 
-  static Texture[] tex =
-      new Texture[] {
-        Texture.jigsawLock,
-        Texture.jigsawSide,
-        Texture.jigsawSide,
-        Texture.jigsawSide,
-        Texture.jigsawTop,
-        Texture.jigsawBottom
-      };
+  private final static Texture[] texturesLock = {
+      Texture.jigsawLock,
+      Texture.jigsawSide,
+      Texture.jigsawSide,
+      Texture.jigsawSide,
+      Texture.jigsawTop,
+      Texture.jigsawBottom
+  };
+
+  private final static Texture[] textureNoLock = {
+      Texture.jigsawSide,
+      Texture.jigsawSide,
+      Texture.jigsawSide,
+      Texture.jigsawSide,
+      Texture.jigsawTop,
+      Texture.jigsawBottom
+  };
 
   static {
     orientedQuads[1] = Model.rotateNegX(quadsNorthUp);
@@ -68,29 +76,50 @@ public class JigsawModel {
     orientedQuads[7] = Model.rotateY(orientedQuads[8]);
   }
 
-  public static boolean intersect(Ray ray, String orientation) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
+  private final Quad[] quads;
+  private final Texture[] textures;
 
-    Quad[] quads = orientedQuads[getOrientationIndex(orientation)];
-    for (int i = 0; i < quads.length; ++i) {
-      Quad quad = quads[i];
-      if (quad.intersect(ray)) {
-        float[] color = tex[i].getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.setNormal(quad.n);
-          hit = true;
-        }
-      }
+  public JigsawModel(String orientation) {
+    switch (orientation) {
+      case "up":
+        textures = textureNoLock;
+        orientation = "up_north";
+        break;
+      case "down":
+        textures = textureNoLock;
+        orientation = "down_north";
+        break;
+      case "north":
+        textures = texturesLock;
+        orientation = "north_up";
+        break;
+      case "south":
+        textures = texturesLock;
+        orientation = "south_up";
+        break;
+      case "east":
+        textures = texturesLock;
+        orientation = "east_up";
+        break;
+      case "west":
+        textures = texturesLock;
+        orientation = "west_up";
+        break;
+      default:
+        textures = texturesLock;
+        break;
     }
+    quads = orientedQuads[getOrientationIndex(orientation)];
+  }
 
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 
   private static int getOrientationIndex(String facing) {

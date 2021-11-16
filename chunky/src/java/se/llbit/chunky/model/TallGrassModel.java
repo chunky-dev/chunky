@@ -22,58 +22,17 @@ import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 
 public class TallGrassModel extends SpriteModel {
-  private static final Texture[] tex = { Texture.deadBush, Texture.tallGrass, Texture.fern };
 
-  public static boolean intersect(Ray ray, Scene scene) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (Quad quad : quads) {
-      if (quad.intersect(ray)) {
-        int kind = ray.getBlockData() % 3;
-        float[] color = tex[kind].getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          if (kind != 0) {
-            float[] biomeColor = ray.getBiomeGrassColor(scene);
-            ray.color.x *= biomeColor[0];
-            ray.color.y *= biomeColor[1];
-            ray.color.z *= biomeColor[2];
-          }
-          ray.setNormal(quad.n);
-          ray.t = ray.tNext;
-          hit = true;
-        }
-      }
-    }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  private static final Tint[] tinting = new Tint[]{
+      Tint.BIOME_GRASS, Tint.BIOME_GRASS, Tint.BIOME_GRASS, Tint.BIOME_GRASS
+  };
+
+  public TallGrassModel(Texture texture) {
+    super(texture);
   }
 
-  public static boolean intersect(Ray ray, Scene scene, Texture texture) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (Quad quad : quads) {
-      if (quad.intersect(ray)) {
-        float[] color = texture.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          float[] biomeColor = ray.getBiomeGrassColor(scene);
-          ray.color.x *= biomeColor[0];
-          ray.color.y *= biomeColor[1];
-          ray.color.z *= biomeColor[2];
-          ray.setNormal(quad.n);
-          ray.t = ray.tNext;
-          hit = true;
-        }
-      }
-    }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Tint[] getTints() {
+    return tinting;
   }
 }

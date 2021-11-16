@@ -31,7 +31,7 @@ public class TexturedTriangle implements Primitive {
 
   private static final double EPSILON = 0.000001;
 
-  /** Note: this is public for some plugins. Stability is not guaranteed. */
+  /** Note: This is public for some plugins. Stability is not guaranteed. */
   public final Vector3 e1 = new Vector3(0, 0, 0);
   public final Vector3 e2 = new Vector3(0, 0, 0);
   public final Vector3 o = new Vector3(0, 0, 0);
@@ -124,7 +124,7 @@ public class TexturedTriangle implements Primitive {
         ray.color.set(color);
         ray.setCurrentMaterial(material);
         ray.t = t;
-        ray.setNormal(n);
+        ray.setN(n);
         return true;
       }
     }

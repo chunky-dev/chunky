@@ -19,7 +19,9 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.*;
 
-public class EndPortalFrameModel {
+import java.util.Arrays;
+
+public class EndPortalFrameModel extends QuadModel {
     private static final Quad[] endPortalQuadsNorth = new Quad[]{
             new Quad(
                     new Vector3(0 / 16.0, 13 / 16.0, 16 / 16.0),
@@ -112,57 +114,45 @@ public class EndPortalFrameModel {
         orientedEyeOfEnderQuads[3] = Model.rotateY(orientedEyeOfEnderQuads[2]);
     }
 
-    public static boolean intersect(Ray ray, boolean hasEye, String facing) {
-        boolean hit = false;
-        ray.t = Double.POSITIVE_INFINITY;
+    private final Quad[] quads;
+    private final Texture[] textures;
 
-        Quad[] quads = orientedEndPortalQuads[getOrientationIndex(facing)];
-        for (int i = 0; i < quads.length; i++) {
-            Quad quad = quads[i];
-            if (quad.intersect(ray)) {
-                float[] color = tex[i].getColor(ray.u, ray.v);
-                if (color[3] > Ray.EPSILON) {
-                    ray.color.set(color);
-                    ray.t = ray.tNext;
-                    ray.setNormal(quad.n);
-                    hit = true;
-                }
-            }
+    public EndPortalFrameModel(boolean hasEye, String facingString) {
+        int orientation;
+        switch (facingString) {
+            default:
+            case "north":
+                orientation = 0;
+                break;
+            case "east":
+                orientation = 1;
+                break;
+            case "south":
+                orientation = 2;
+                break;
+            case "west":
+                orientation = 3;
+                break;
         }
 
         if (hasEye) {
-            for (Quad quad : orientedEyeOfEnderQuads[getOrientationIndex(facing)]) {
-                if (quad.intersect(ray)) {
-                    float[] color = Texture.eyeOfTheEnder.getColor(ray.u, ray.v);
-                    if (color[3] > Ray.EPSILON) {
-                        ray.color.set(color);
-                        ray.t = ray.tNext;
-                        ray.setNormal(quad.n);
-                        hit = true;
-                    }
-                }
-            }
+            quads = Model.join(orientedEndPortalQuads[orientation], orientedEyeOfEnderQuads[orientation]);
+            textures = new Texture[quads.length];
+            Arrays.fill(textures, Texture.eyeOfTheEnder);
+            System.arraycopy(tex, 0, textures, 0, tex.length);
+        } else {
+            quads = orientedEndPortalQuads[orientation];
+            textures = tex;
         }
-
-        if (hit) {
-            ray.distance += ray.t;
-            ray.o.scaleAdd(ray.t, ray.d);
-        }
-        return hit;
     }
 
-    private static int getOrientationIndex(String facing) {
-        switch (facing) {
-            case "north":
-                return 0;
-            case "east":
-                return 1;
-            case "south":
-                return 2;
-            case "west":
-                return 3;
-            default:
-                return 0;
-        }
+    @Override
+    public Quad[] getQuads() {
+        return quads;
+    }
+
+    @Override
+    public Texture[] getTextures() {
+        return textures;
     }
 }

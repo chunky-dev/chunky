@@ -2,14 +2,14 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class SmallDripleafModel {
+public class SmallDripleafModel extends QuadModel {
 
+  //region Top Model
   private static final Quad[] topQuadsNorth = Model.join(
-      new Quad[]{
+      new Quad[] {
           // top
           new Quad(
               new Vector3(8 / 16.0, 2.99 / 16.0, 15 / 16.0),
@@ -122,7 +122,7 @@ public class SmallDripleafModel {
           )
       },
       // stem
-      Model.rotateY(new Quad[]{
+      Model.rotateY(new Quad[] {
           new Quad(
               new Vector3(4.5 / 16.0, 14 / 16.0, 8 / 16.0),
               new Vector3(11.5 / 16.0, 14 / 16.0, 8 / 16.0),
@@ -136,7 +136,7 @@ public class SmallDripleafModel {
               new Vector4(12 / 16.0, 4 / 16.0, 16 / 16.0, 2 / 16.0)
           )
       }, Math.toRadians(45)),
-      Model.rotateY(new Quad[]{
+      Model.rotateY(new Quad[] {
           new Quad(
               new Vector3(4.5 / 16.0, 14 / 16.0, 8 / 16.0),
               new Vector3(11.5 / 16.0, 14 / 16.0, 8 / 16.0),
@@ -151,9 +151,11 @@ public class SmallDripleafModel {
           )
       }, Math.toRadians(-45))
   );
+  //endregion
 
+  //region Bottom Model
   private static final Quad[] bottomQuadsNorth = Model.join(
-      Model.rotateY(new Quad[]{
+      Model.rotateY(new Quad[] {
           new Quad(
               new Vector3(4.5 / 16.0, 16 / 16.0, 8 / 16.0),
               new Vector3(11.5 / 16.0, 16 / 16.0, 8 / 16.0),
@@ -166,7 +168,7 @@ public class SmallDripleafModel {
               new Vector3(11.5 / 16.0, 0 / 16.0, 8 / 16.0),
               new Vector4(14 / 16.0, 3 / 16.0, 16 / 16.0, 0 / 16.0)
           )}, Math.toRadians(45)),
-      Model.rotateY(new Quad[]{
+      Model.rotateY(new Quad[] {
           new Quad(
               new Vector3(4.5 / 16.0, 16 / 16.0, 8 / 16.0),
               new Vector3(11.5 / 16.0, 16 / 16.0, 8 / 16.0),
@@ -181,6 +183,7 @@ public class SmallDripleafModel {
           )
       }, Math.toRadians(-45))
   );
+  //endregion
 
   private static final Quad[][] orientedTopQuads = new Quad[4][];
   private static final Quad[][] orientedBottomQuads = new Quad[4][];
@@ -193,11 +196,11 @@ public class SmallDripleafModel {
     Texture side = Texture.smallDripleafSide;
     Texture stemTop = Texture.smallDripleafStemTop;
     Texture stemBottom = Texture.smallDripleafStemBottom;
-    topTextures = new Texture[]{
+    topTextures = new Texture[] {
         top, top, top, top, top, top, side, side, side, side, side, side, side, side, side, side,
         side, side, stemTop, stemTop, stemTop, stemTop
     };
-    bottomTextures = new Texture[]{stemBottom, stemBottom, stemBottom, stemBottom};
+    bottomTextures = new Texture[] {stemBottom, stemBottom, stemBottom, stemBottom};
 
     orientedTopQuads[0] = topQuadsNorth;
     orientedTopQuads[1] = Model.rotateY(orientedTopQuads[0]);
@@ -209,33 +212,14 @@ public class SmallDripleafModel {
     orientedBottomQuads[3] = Model.rotateY(orientedBottomQuads[2]);
   }
 
-  public static boolean intersect(Ray ray, String facing, String half) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
+  private final Quad[] quads;
+  private final Texture[] textures;
 
-    Quad[] quads = half.equals("upper")
-        ? orientedTopQuads[getOrientationIndex(facing)]
-        : orientedBottomQuads[getOrientationIndex(facing)];
-    Texture[] tex = half.equals("upper") ? topTextures : bottomTextures;
-
-    for (int i = 0; i < quads.length; i++) {
-      Quad quad = quads[i];
-      if (quad.intersect(ray)) {
-        float[] color = tex[i].getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.setNormal(quad.n);
-          hit = true;
-        }
-      }
-    }
-
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  public SmallDripleafModel(String facingString, String halfString) {
+    quads = halfString.equals("upper")
+        ? orientedTopQuads[getOrientationIndex(facingString)]
+        : orientedBottomQuads[getOrientationIndex(facingString)];
+    textures = halfString.equals("upper") ? topTextures : bottomTextures;
   }
 
   private static int getOrientationIndex(String facing) {
@@ -250,5 +234,15 @@ public class SmallDripleafModel {
       default:
         return 0;
     }
+  }
+
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

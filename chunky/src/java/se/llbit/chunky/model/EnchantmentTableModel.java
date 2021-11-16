@@ -18,28 +18,26 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
 
-public class EnchantmentTableModel {
-  private static AABB aabb = new AABB(0, 1, 0, .75, 0, 1);
+public class EnchantmentTableModel extends AABBModel {
+  private static final AABB[] aabbs = new AABB[]{ new AABB(0, 1, 0, .75, 0, 1) };
+  private static final Texture[][] textures;
+  static {
+    Texture top = Texture.enchantmentTableTop;
+    Texture bottom = Texture.enchantmentTableBottom;
+    Texture side = Texture.enchantmentTableSide;
+    textures = new Texture[][] {
+        {side, side, side, side, top, bottom}
+    };
+  }
 
-  public static boolean intersect(Ray ray) {
-    ray.t = Double.POSITIVE_INFINITY;
-    if (aabb.intersect(ray)) {
-      Vector3 n = ray.getNormal();
-      if (n.y > 0) {
-        Texture.enchantmentTableTop.getColor(ray);
-      } else if (n.y < 0) {
-        Texture.enchantmentTableBottom.getColor(ray);
-      } else {
-        Texture.enchantmentTableSide.getColor(ray);
-      }
-      ray.color.w = 1;
-      ray.distance += ray.tNext;
-      ray.o.scaleAdd(ray.tNext, ray.d);
-      return true;
-    }
-    return false;
+  @Override
+  public AABB[] getBoxes() {
+    return aabbs;
+  }
+
+  @Override
+  public Texture[][] getTextures() {
+    return textures;
   }
 }

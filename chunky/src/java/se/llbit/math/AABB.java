@@ -66,7 +66,7 @@ public class AABB {
         ray.tNext = t;
         ray.u = u;
         ray.v = v;
-        ray.setNormal(-1, 0, 0);
+        ray.setN(-1, 0, 0);
       }
     }
     t = (xmax - ix) / ray.d.x;
@@ -79,7 +79,7 @@ public class AABB {
         ray.tNext = t;
         ray.u = 1 - u;
         ray.v = v;
-        ray.setNormal(1, 0, 0);
+        ray.setN(1, 0, 0);
       }
     }
     t = (ymin - iy) / ray.d.y;
@@ -92,7 +92,7 @@ public class AABB {
         ray.tNext = t;
         ray.u = u;
         ray.v = v;
-        ray.setNormal(0, -1, 0);
+        ray.setN(0, -1, 0);
       }
     }
     t = (ymax - iy) / ray.d.y;
@@ -105,7 +105,7 @@ public class AABB {
         ray.tNext = t;
         ray.u = u;
         ray.v = v;
-        ray.setNormal(0, 1, 0);
+        ray.setN(0, 1, 0);
       }
     }
     t = (zmin - iz) / ray.d.z;
@@ -118,7 +118,7 @@ public class AABB {
         ray.tNext = t;
         ray.u = 1 - u;
         ray.v = v;
-        ray.setNormal(0, 0, -1);
+        ray.setN(0, 0, -1);
       }
     }
     t = (zmax - iz) / ray.d.z;
@@ -131,7 +131,7 @@ public class AABB {
         ray.tNext = t;
         ray.u = u;
         ray.v = v;
-        ray.setNormal(0, 0, 1);
+        ray.setN(0, 0, 1);
       }
     }
     return hit;

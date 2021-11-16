@@ -3,14 +3,15 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class GlowLichenModel {
+import java.util.ArrayList;
+import java.util.Arrays;
 
-  protected static final Quad[] quads = {
+public class GlowLichenModel extends QuadModel {
+
+  private static final Quad[] glowLichen = {
       // North
       new DoubleSidedQuad(new Vector3(0, 0, 0.1 / 16), new Vector3(1, 0, 0.1 / 16),
           new Vector3(0, 1, 0.1 / 16), new Vector4(0, 1, 0, 1)),
@@ -36,27 +37,27 @@ public class GlowLichenModel {
           new Vector3(0, 0.1 / 16, 1), new Vector4(0, 1, 0, 1)),
   };
 
-  public static boolean intersect(Ray ray, int connections) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (int i = 0; i < quads.length; ++i) {
-      if ((connections & (1 << i)) != 0) {
-        Quad quad = quads[i];
-        if (quad.intersect(ray)) {
-          float[] color = Texture.glowLichen.getColor(ray.u, ray.v);
-          if (color[3] > Ray.EPSILON) {
-            ray.color.set(color);
-            ray.t = ray.tNext;
-            ray.orientNormal(quad.n);
-            hit = true;
-          }
-        }
-      }
+  private final Quad[] quads;
+  private final Texture[] textures;
+
+  public GlowLichenModel(int connections) {
+    ArrayList<Quad> quads = new ArrayList<>();
+    for (int i = 0; i < glowLichen.length; i++) {
+      if ((connections & (1 << i)) != 0)
+        quads.add(glowLichen[i]);
     }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+    this.quads = quads.toArray(new Quad[0]);
+    this.textures = new Texture[this.quads.length];
+    Arrays.fill(this.textures, Texture.glowLichen);
+  }
+
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

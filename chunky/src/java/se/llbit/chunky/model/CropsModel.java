@@ -19,13 +19,13 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class CropsModel {
-  private static Quad[] quads = {
+import java.util.Arrays;
+
+public class CropsModel extends QuadModel {
+  private static final Quad[] quads = {
       new DoubleSidedQuad(new Vector3(1, 0, .25), new Vector3(0, 0, .25),
           new Vector3(1, 1, .25), new Vector4(1, 0, 0, 1)),
 
@@ -39,24 +39,20 @@ public class CropsModel {
           new Vector3(.75, 1, 1), new Vector4(1, 0, 0, 1)),
   };
 
-  public static boolean intersect(Ray ray, Texture texture) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (Quad quad : quads) {
-      if (quad.intersect(ray)) {
-        float[] color = texture.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.orientNormal(quad.n);
-          hit = true;
-        }
-      }
-    }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  private final Texture[] textures;
+
+  public CropsModel(Texture texture) {
+    textures = new Texture[quads.length];
+    Arrays.fill(textures, texture);
+  }
+
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

@@ -2,13 +2,15 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class CandleModel {
+import java.util.Arrays;
 
-  private static final Quad[][] quads = new Quad[][]{
+public class CandleModel extends QuadModel {
+
+  //region Candle Model
+  private static final Quad[][] candleModel = new Quad[][]{
       Model.join(
           new Quad[]{
               new Quad(
@@ -678,27 +680,24 @@ public class CandleModel {
           }, Math.toRadians(-45), new Vector3(9 / 16.0, 0, 6 / 16.0))
       )
   };
+  //endregion
 
-  public static boolean intersect(Ray ray, Texture candle, int candles) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
+  private final Quad[] quads;
+  private final Texture[] textures;
 
-    for (Quad quad : quads[candles - 1]) {
-      if (quad.intersect(ray)) {
-        float[] color = candle.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.setNormal(quad.n);
-          hit = true;
-        }
-      }
-    }
+  public CandleModel(Texture candle, int candles) {
+    quads = candleModel[candles-1];
+    textures = new Texture[quads.length];
+    Arrays.fill(textures, candle);
+  }
 
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

@@ -1,12 +1,9 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.model.TexturedBlockModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Ray;
 
-public class TexturedBlock extends MinecraftBlock {
-  protected final Texture[] texture;
+public class TexturedBlock extends AbstractModelBlock {
 
   public TexturedBlock(String name, Texture side, Texture topBottom) {
     this(name, side, side, side, side, topBottom, topBottom);
@@ -20,12 +17,7 @@ public class TexturedBlock extends MinecraftBlock {
       Texture north, Texture south, Texture east, Texture west,
       Texture top, Texture bottom) {
     super(name, north);
-    texture = new Texture[] { north, south, west, east, top, bottom };
-    localIntersect = true;
+    this.model = new TexturedBlockModel(north, east, south, west, top, bottom);
     opaque = true;
-  }
-
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return TexturedBlockModel.intersect(ray, texture);
   }
 }

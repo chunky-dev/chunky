@@ -19,7 +19,6 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
@@ -27,8 +26,7 @@ import se.llbit.math.Vector4;
  * This block model is used to render blocks which can face east, west, north, south, up and down.
  * For example, command blocks and observer blocks.
  */
-public class DirectionalBlockModel {
-
+public class DirectionalBlockModel extends QuadModel {
   // Facing up:
   private static final Quad[] up = new Quad[] {
       // Bottom face.
@@ -78,35 +76,41 @@ public class DirectionalBlockModel {
     faces[7] = up;
   }
 
-  // Index 0 = back, 1 = front, 2 = side.
-  private static final int[] textureIndex = {2, 2, 2, 2, 1, 0};
+  private final Quad[] quads;
+  private final Texture[] textures;
 
-  /**
-   * @param textures texture[0] is the back texture, texture[1] is the front
-   * texture, and texture[2] is the side texture.
-   */
-  public static boolean intersect(Ray ray, Texture[] textures) {
-    int direction = ray.getBlockData() & 7;
-    return intersect(ray, textures, direction);
+  public DirectionalBlockModel(String facing, Texture front, Texture back, Texture side) {
+    textures = new Texture[] {side, side, side, side, front, back};
+    switch (facing) {
+      case "up":
+        quads = faces[1];
+        break;
+      case "down":
+        quads = faces[0];
+        break;
+      default:
+      case "north":
+        quads = faces[2];
+        break;
+      case "east":
+        quads = faces[5];
+        break;
+      case "south":
+        quads = faces[3];
+        break;
+      case "west":
+        quads = faces[4];
+        break;
+    }
   }
 
-  public static boolean intersect(Ray ray, Texture[] textures, int direction) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (int i = 0; i < 6; ++i) {
-      Quad face = faces[direction][i];
-      if (face.intersect(ray)) {
-        textures[textureIndex[i]].getColor(ray);
-        ray.setNormal(face.n);
-        ray.t = ray.tNext;
-        hit = true;
-      }
-    }
-    if (hit) {
-      ray.color.w = 1;
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

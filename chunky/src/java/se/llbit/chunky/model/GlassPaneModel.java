@@ -17,18 +17,50 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
-import se.llbit.math.AABB;
-import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 
-public class GlassPaneModel {
-  private static AABB core = new AABB(7 / 16., 9 / 16., 0, 1, 7 / 16., 9 / 16.);
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.function.Consumer;
 
-  private static Quad[][] connector = {
+public class GlassPaneModel extends QuadModel {
+  //region quads
+  private static final Quad[] core = {
+      // Top
+      new Quad(
+          new Vector3(7 / 16.0, 16 / 16.0, 9 / 16.0),
+          new Vector3(9 / 16.0, 16 / 16.0, 9 / 16.0),
+          new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
+          new Vector4(7 / 16.0, 9 / 16.0, 7 / 16.0, 9 / 16.0)
+      ),
+
+      // Bottom
+      new Quad(
+          new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
+          new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
+          new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
+          new Vector4(7 / 16.0, 9 / 16.0, 7 / 16.0, 9 / 16.0)
+      ),
+
+      // North
+      new Quad(
+          new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
+          new Vector3(9 / 16.0, 16 / 16.0, 7 / 16.0),
+          new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
+          new Vector4(7 / 16.0, 9 / 16.0, 16 / 16.0, 0 / 16.0)
+      ),
+      null, // East
+      null, // South
+      null  // West
+  };
+
+  static {
+    core[3] = new Quad(core[2], Transform.NONE.rotateY());
+    core[4] = new Quad(core[3], Transform.NONE.rotateY());
+    core[5] = new Quad(core[4], Transform.NONE.rotateY());
+  }
+
+  private static final Quad[][] connector = {
       // Front side.
       {
           // Left face.
@@ -68,7 +100,7 @@ public class GlassPaneModel {
       },
   };
 
-  private static Quad[][] panes = new Quad[4][];
+  private static final Quad[][] panes = new Quad[4][];
 
   static {
     panes[0] = connector[0];
@@ -77,49 +109,53 @@ public class GlassPaneModel {
       panes[j] = Model.rotateY(connector[j - 2]);
     }
   }
+  //endregion
 
-  public static boolean intersect(Ray ray, Texture sideTexture, Texture topTexture) {
-    int metadata = 0xF & (ray.getCurrentData() >> BlockData.GLASS_PANE_OFFSET);
-    return intersect(ray, sideTexture, topTexture, metadata);
+  private final Quad[] quads;
+  private final Texture[] textures;
+
+  public GlassPaneModel(Texture top, Texture side, boolean north, boolean south, boolean east, boolean west) {
+    ArrayList<Quad> quads = new ArrayList<>();
+    ArrayList<Texture> textures = new ArrayList<>();
+
+    Consumer<Quad[]> addConnector = qs -> {
+      quads.addAll(Arrays.asList(qs));
+      textures.addAll(Arrays.asList(side, side, top, top));
+    };
+
+    // Top and bottom
+    quads.add(core[0]);
+    quads.add(core[1]);
+    textures.add(top);
+    textures.add(top);
+
+    // Cull sides
+    if (!north) quads.add(core[2]);
+    if (!east) quads.add(core[3]);
+    if (!south) quads.add(core[4]);
+    if (!west) quads.add(core[5]);
+
+    while (textures.size() < quads.size()) {
+      textures.add(side);
+    }
+
+    // Add connectors
+    if (north) addConnector.accept(panes[0]);
+    if (south) addConnector.accept(panes[1]);
+    if (east) addConnector.accept(panes[2]);
+    if (west) addConnector.accept(panes[3]);
+
+    this.quads = quads.toArray(new Quad[0]);
+    this.textures = textures.toArray(new Texture[0]);
   }
 
-  public static boolean intersect(Ray ray, Texture sideTexture, Texture topTexture,
-      int metadata) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    if (core.intersect(ray)) {
-      Vector3 n = ray.getNormal();
-      if (n.y > 0 || n.y < 0) {
-        topTexture.getColor(ray);
-      } else {
-        sideTexture.getColor(ray);
-      }
-      n.scale(-QuickMath.signum(ray.d.dot(n)));
-      ray.setNormal(n);
-      ray.t = ray.tNext;
-      hit = true;
-    }
-    for (int i = 0; i < 4; ++i) {
-      if ((metadata & (1 << i)) != 0) {
-        for (int j = 0; j < panes[i].length; ++j) {
-          Quad quad = panes[i][j];
-          if (quad.intersect(ray)) {
-            if (j < 2) {
-              sideTexture.getColor(ray);
-            } else {
-              topTexture.getColor(ray);
-            }
-            ray.setNormal(quad.n);
-            ray.t = ray.tNext;
-            hit = true;
-          }
-        }
-      }
-    }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

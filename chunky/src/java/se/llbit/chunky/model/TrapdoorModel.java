@@ -18,12 +18,14 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class TrapdoorModel {
-  private static Quad[][] faces = {
+import java.util.Arrays;
+
+public class TrapdoorModel extends QuadModel {
+  //region Model
+  private static final Quad[][] faces = {
       // low
       {
           // front
@@ -74,8 +76,8 @@ public class TrapdoorModel {
               new Vector4(1, 0, 0, 1)),
 
           // bottom
-          new Quad(new Vector3(0, 13/16., 0), new Vector3(1, 13/16., 0),
-              new Vector3(0, 13/16., 1), new Vector4(0, 1, 0, 1))
+          new Quad(new Vector3(0, 13 / 16., 0), new Vector3(1, 13 / 16., 0),
+              new Vector3(0, 13 / 16., 1), new Vector4(0, 1, 0, 1))
       },
 
       // facing north
@@ -186,38 +188,24 @@ public class TrapdoorModel {
               new Vector4(0, .1875, 0, 1))
       }
   };
+  //endregion
 
-  public static boolean intersect(Ray ray, Texture texture) {
-    int data = ray.getBlockData();
-    return intersect(ray, texture, data);
+  private final Quad[] quads;
+  private final Texture[] textures;
+
+  public TrapdoorModel(Texture texture, int state) {
+    quads = (state & 4) == 0 ? faces[state >> 3] : faces[(state & 3) + 2];
+    textures = new Texture[quads.length];
+    Arrays.fill(textures, texture);
   }
 
-  public static boolean intersect(Ray ray, Texture texture, int state) {
-    boolean hit = false;
-    Quad[] model;
-    ray.t = Double.POSITIVE_INFINITY;
-    if ((state & 4) == 0) {
-      // Not open - top or bottom?
-      model = faces[state >> 3];
-    } else {
-      // Open
-      model = faces[(state & 3) + 2];
-    }
-    for (Quad face : model) {
-      if (face.intersect(ray)) {
-        float[] color = texture.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.setNormal(face.n);
-          ray.t = ray.tNext;
-          hit = true;
-        }
-      }
-    }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

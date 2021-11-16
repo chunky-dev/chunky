@@ -1,41 +1,37 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.model.LadderModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Ray;
 
-public class Ladder extends MinecraftBlockTranslucent {
-  private final int facing;
+public class Ladder extends AbstractModelBlock {
+
   private final String description;
 
-  public Ladder(String facing) {
+  public Ladder(String facingString) {
     super("ladder", Texture.ladder);
-    this.description = "facing=" + facing;
-    localIntersect = true;
+    this.description = "facing=" + facingString;
     solid = false;
-    switch (facing) {
+    int facing;
+    switch (facingString) {
       default:
       case "north":
-        this.facing = 2;
+        facing = 2;
         break;
       case "south":
-        this.facing = 3;
+        facing = 3;
         break;
       case "west":
-        this.facing = 0;
+        facing = 0;
         break;
       case "east":
-        this.facing = 1;
+        facing = 1;
         break;
     }
+    model = new LadderModel(facing);
   }
 
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return LadderModel.intersect(ray, facing);
-  }
-
-  @Override public String description() {
+  @Override
+  public String description() {
     return description;
   }
 }

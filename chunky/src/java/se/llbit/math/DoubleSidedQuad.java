@@ -27,6 +27,7 @@ import se.llbit.math.primitive.TexturedTriangle;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class DoubleSidedQuad extends Quad {
+  public final boolean doubleSided = true;
 
   public DoubleSidedQuad(Quad other, Transform t) {
     super(other, t);

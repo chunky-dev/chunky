@@ -1,22 +1,18 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.model.GlowLichenModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
-import se.llbit.math.Ray;
 
-public class GlowLichen extends MinecraftBlockTranslucent {
+public class GlowLichen extends AbstractModelBlock {
 
   private final String description;
-  private final int connections;
 
   public GlowLichen(boolean north, boolean south, boolean east, boolean west, boolean up,
       boolean down) {
     super("glow_lichen", Texture.glowLichen);
     this.description = String.format("north=%s, south=%s, east=%s, west=%s, up=%s, down=%s",
         north, south, east, west, up, down);
-    localIntersect = true;
     solid = false;
 
     int connections = 0;
@@ -38,12 +34,7 @@ public class GlowLichen extends MinecraftBlockTranslucent {
     if (down) {
       connections |= BlockData.CONNECTED_BELOW;
     }
-    this.connections = connections;
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return GlowLichenModel.intersect(ray, connections);
+    this.model = new GlowLichenModel(connections);
   }
 
   @Override

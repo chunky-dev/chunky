@@ -18,17 +18,11 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-/**
- * Piston
- *
- * @author Jesper Öqvist <jesper@llbit.se>
- */
-public class PistonExtensionModel {
-  protected static Quad[][] extension = {
+public class PistonExtensionModel extends QuadModel {
+  private static final Quad[][] extension = {
       // down
       {},
 
@@ -94,39 +88,33 @@ public class PistonExtensionModel {
     extension[4] = Model.rotateY(extension[3]);
   }
 
-  static final Texture[][] texture =
-      {{Texture.pistonTop, Texture.pistonTop, Texture.pistonSide, Texture.pistonSide,
-          Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
-          Texture.pistonSide, Texture.pistonSide,},
+  private static final Texture[] textureNormal = {
+      Texture.pistonTop, Texture.pistonTop, Texture.pistonSide, Texture.pistonSide,
+      Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
+      Texture.pistonSide, Texture.pistonSide
+  };
 
-          {Texture.pistonTopSticky, Texture.pistonTop, Texture.pistonSide, Texture.pistonSide,
-              Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
-              Texture.pistonSide, Texture.pistonSide,},};
+  private static final Texture[] textureSticky = {
+      Texture.pistonTopSticky, Texture.pistonTop, Texture.pistonSide, Texture.pistonSide,
+      Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
+      Texture.pistonSide, Texture.pistonSide,
+  };
 
-  public static boolean intersect(Ray ray) {
-    int isSticky = ray.getBlockData() >> 3;
-    int facing = (ray.getBlockData() & 7) % 6;
-    return intersect(ray, isSticky, facing);
+  private final Quad[] quads;
+  private final Texture[] textures;
+
+  public PistonExtensionModel(boolean sticky, int facing) {
+    quads = extension[facing];
+    textures = sticky ? textureSticky : textureNormal;
   }
 
-  public static boolean intersect(Ray ray, int isSticky, int facing) {
-    boolean hit = false;
-    Quad[] rot = extension[facing];
-    ray.t = Double.POSITIVE_INFINITY;
-    for (int i = 0; i < rot.length; ++i) {
-      Quad side = rot[i];
-      if (side.intersect(ray)) {
-        texture[isSticky][i].getColor(ray);
-        ray.setNormal(side.n);
-        ray.t = ray.tNext;
-        hit = true;
-      }
-    }
-    if (hit) {
-      ray.color.w = 1;
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

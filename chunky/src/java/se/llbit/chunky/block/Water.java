@@ -83,7 +83,7 @@ public class Water extends MinecraftBlockTranslucent {
   static final Triangle[] southb = new Triangle[8];
 
   /** Water height levels. */
-  static final double height[] = {
+  static final double[] height = {
       14 / 16., 12.25 / 16., 10.5 / 16, 8.75 / 16, 7. / 16, 5.25 / 16, 3.5 / 16, 1.75 / 16
   };
 
@@ -184,7 +184,9 @@ public class Water extends MinecraftBlockTranslucent {
         if (quad.intersect(ray)) {
           texture.getAvgColorLinear(ray.color);
           ray.t = ray.tNext;
-          ray.orientNormal(quad.n);
+          Vector3 n = new Vector3(quad.n);
+          n.scale(-QuickMath.signum(ray.d.dot(quad.n)));
+          ray.setN(n);
           hit = true;
         }
       }
@@ -197,7 +199,9 @@ public class Water extends MinecraftBlockTranslucent {
 
     boolean hit = false;
     if (bottom.intersect(ray)) {
-      ray.orientNormal(bottom.n);
+      Vector3 n = new Vector3(bottom.n);
+      n.scale(-QuickMath.signum(ray.d.dot(bottom.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       hit = true;
     }
@@ -208,13 +212,17 @@ public class Water extends MinecraftBlockTranslucent {
     int c3 = (0xF & (data >> CORNER_3)) % 8;
     Triangle triangle = t012[c0][c1][c2];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       hit = true;
     }
     triangle = t230[c2][c3][c0];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       ray.u = 1 - ray.u;
       ray.v = 1 - ray.v;
@@ -222,13 +230,17 @@ public class Water extends MinecraftBlockTranslucent {
     }
     triangle = westt[c0][c3];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       hit = true;
     }
     triangle = westb[c0];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       ray.u = 1 - ray.u;
       ray.v = 1 - ray.v;
@@ -236,13 +248,17 @@ public class Water extends MinecraftBlockTranslucent {
     }
     triangle = eastt[c1][c2];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       hit = true;
     }
     triangle = eastb[c1];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       ray.u = 1 - ray.u;
       ray.v = 1 - ray.v;
@@ -250,13 +266,17 @@ public class Water extends MinecraftBlockTranslucent {
     }
     triangle = southt[c0][c1];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       hit = true;
     }
     triangle = southb[c1];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       ray.u = 1 - ray.u;
       ray.v = 1 - ray.v;
@@ -264,13 +284,17 @@ public class Water extends MinecraftBlockTranslucent {
     }
     triangle = northt[c2][c3];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       hit = true;
     }
     triangle = northb[c2];
     if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
+      Vector3 n = new Vector3(triangle.n);
+      n.scale(-QuickMath.signum(ray.d.dot(triangle.n)));
+      ray.setN(n);
       ray.t = ray.tNext;
       ray.u = 1 - ray.u;
       ray.v = 1 - ray.v;

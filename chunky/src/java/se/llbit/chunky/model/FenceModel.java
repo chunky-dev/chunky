@@ -18,12 +18,15 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
-import se.llbit.math.Ray;
 
-public class FenceModel {
-  private static AABB post = new AABB(6 / 16., 10 / 16., 0, 1, 6 / 16., 10 / 16.);
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
-  private static AABB[][] plank = {
+public class FenceModel extends AABBModel {
+  private static final AABB post = new AABB(6 / 16., 10 / 16., 0, 1, 6 / 16., 10 / 16.);
+
+  private static final AABB[][] plank = {
       // Connected north.
       {
         new AABB(7 / 16.0, 9 / 16.0, 6 / 16.0, 9 / 16.0, 0, .4),
@@ -46,35 +49,30 @@ public class FenceModel {
       },
   };
 
-  public static boolean intersect(Ray ray, Texture texture) {
-    int connections = ray.getBlockData();
-    return intersect(ray, texture, connections);
+  private final AABB[] boxes;
+  private final Texture[][] textures;
+
+  public FenceModel(Texture texture, int connections) {
+    ArrayList<AABB> boxes = new ArrayList<>();
+    boxes.add(post);
+    for (int i = 0; i < 4; i++) {
+      if ((connections & (1 << i)) != 0)
+        Collections.addAll(boxes, plank[i]);
+    }
+    this.boxes = boxes.toArray(new AABB[0]);
+    this.textures = new Texture[this.boxes.length][];
+    Texture[] tex = new Texture[6];
+    Arrays.fill(tex, texture);
+    Arrays.fill(this.textures, tex);
   }
 
-  public static boolean intersect(Ray ray, Texture texture, int connections) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    if (post.intersect(ray)) {
-      texture.getColor(ray);
-      ray.t = ray.tNext;
-      hit = true;
-    }
-    for (int i = 0; i < 4; ++i) {
-      if ((connections & (1 << i)) != 0) {
-        for (AABB aabb : plank[i]) {
-          if (aabb.intersect(ray)) {
-            texture.getColor(ray);
-            ray.t = ray.tNext;
-            hit = true;
-          }
-        }
-      }
-    }
-    if (hit) {
-      ray.color.w = 1;
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public AABB[] getBoxes() {
+    return boxes;
+  }
+
+  @Override
+  public Texture[][] getTextures() {
+    return textures;
   }
 }

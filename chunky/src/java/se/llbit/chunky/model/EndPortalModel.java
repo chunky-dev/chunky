@@ -16,27 +16,35 @@
  */
 package se.llbit.chunky.model;
 
+import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class EndPortalModel {
-  private static final Quad quad =
-      new DoubleSidedQuad(new Vector3(1, .75, 0), new Vector3(0, .75, 0), new Vector3(1, .75, 1),
-          new Vector4(1, 0, 0, 1));
+import java.util.Arrays;
 
-  public static boolean intersect(Ray ray) {
-    ray.t = Double.POSITIVE_INFINITY;
-    if (quad.intersect(ray)) {
-      ray.color.set(0, 0, 0, 1);
-      ray.orientNormal(quad.n);
-      ray.distance += ray.tNext;
-      ray.o.scaleAdd(ray.tNext, ray.d);
-      return true;
-    }
-    return false;
+public class EndPortalModel extends QuadModel {
+  private static final Quad[] quads = {
+      new DoubleSidedQuad(new Vector3(1, .75, 0), new Vector3(0, .75, 0), new Vector3(1, .75, 1),
+          new Vector4(1, 0, 0, 1))
+  };
+  private static final Texture[] textures = new Texture[1];
+
+  static {
+    BitmapImage black = new BitmapImage(16, 16);
+    Arrays.fill(black.data, 0xFF000000);
+    textures[0] = new Texture(black);
+  }
+
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

@@ -18,13 +18,14 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class ComparatorModel {
-  // The comparator base plate facing north:
-  private static Quad[] north = {
+import java.util.Arrays;
+
+public class ComparatorModel extends QuadModel {
+  // The comparator base-plate facing north:
+  private static final Quad[] north = {
       // Front face.
       new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, .125, 0),
           new Vector4(1, 0, 0, .125)),
@@ -46,7 +47,7 @@ public class ComparatorModel {
           new Vector4(1, 0, 1, 0)),
   };
 
-  private static Quad[] torchHigh = {
+  private static final Quad[] torchHigh = {
       new Quad(new Vector3(.75, 2 / 16., 7 / 16.), new Vector3(4 / 16., 2 / 16., 7 / 16.),
           new Vector3(.75, 13 / 16., 7 / 16.), new Vector4(12 / 16., 4 / 16., 5 / 16., 1)),
 
@@ -66,7 +67,7 @@ public class ComparatorModel {
   };
 
   // The lowered torch is 3 texels lower than the high version.
-  private static Quad[] torchLow = {
+  private static final Quad[] torchLow = {
       new Quad(new Vector3(.75, 2 / 16., 7 / 16.), new Vector3(4 / 16., 2 / 16., 7 / 16.),
           new Vector3(.75, 10 / 16., 7 / 16.), new Vector4(12 / 16., 4 / 16., 8 / 16., 1)),
 
@@ -85,9 +86,9 @@ public class ComparatorModel {
           new Vector4(7 / 16., 9 / 16., 8 / 16., .625))
   };
 
-  private static Quad[][][] torch1 = new Quad[2][4][];
-  private static Quad[][][] torch2 = new Quad[2][4][];
-  private static Quad[][][] torch3 = new Quad[2][4][];
+  private static final Quad[][][] torch1 = new Quad[2][4][];
+  private static final Quad[][][] torch2 = new Quad[2][4][];
+  private static final Quad[][][] torch3 = new Quad[2][4][];
 
   private static final Quad[][] rot = new Quad[4][];
 
@@ -132,66 +133,29 @@ public class ComparatorModel {
     torch3[1][3] = Model.rotateY(torch3[1][2]);
   }
 
-  /**
-   * @param powered 0 if unpowered, 1 if powered
-   * @return <code>true</code> if the block was intersected
-   */
-  public static boolean intersect(Ray ray, int powered) {
-    int data = ray.getBlockData();
-    int direction = data & 3;
-    int active = (data >> 2) & 1;
-    return intersect(ray, direction, active, powered);
+  private final Quad[] quads;
+  private final Texture[] textures;
+
+  public ComparatorModel(int direction, int active, int powered) {
+    quads = Model.join(rot[direction], torch1[active][direction],
+                       torch2[active][direction], torch3[active][direction]);
+    textures = new Texture[quads.length];
+    Arrays.fill(textures, torchTex[powered]);
+    Arrays.fill(textures, 0, rot[direction].length, blockTex[powered]);
+    Arrays.fill(textures,
+        rot[direction].length,
+        rot[direction].length + torch1[active][direction].length,
+        torchTex[active]);
   }
 
-  public static boolean intersect(Ray ray, int direction, int active, int powered) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (Quad face : rot[direction]) {
-      if (face.intersect(ray)) {
-        blockTex[powered].getColor(ray);
-        ray.setNormal(face.n);
-        ray.t = ray.tNext;
-        hit = true;
-      }
-    }
-    for (Quad face : torch1[active][direction]) {
-      if (face.intersect(ray)) {
-        float[] color = torchTex[active].getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.setNormal(face.n);
-          ray.t = ray.tNext;
-          hit = true;
-        }
-      }
-    }
-    for (Quad face : torch2[powered][direction]) {
-      if (face.intersect(ray)) {
-        float[] color = torchTex[powered].getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.setNormal(face.n);
-          ray.t = ray.tNext;
-          hit = true;
-        }
-      }
-    }
-    for (Quad face: torch3[powered][direction]) {
-			if (face.intersect(ray)) {
-				float[] color = torchTex[powered].getColor(ray.u, ray.v);
-				if (color[3] > Ray.EPSILON) {
-					ray.color.set(color);
-					ray.setNormal(face.n);
-					ray.t = ray.tNext;
-					hit = true;
-				}
-			}
-		}
-    if (hit) {
-      ray.color.w = 1;
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }

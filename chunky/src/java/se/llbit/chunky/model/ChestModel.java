@@ -18,7 +18,6 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
@@ -27,8 +26,8 @@ import se.llbit.math.Vector4;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class ChestModel {
-  // single chest facing north
+public class ChestModel extends QuadModel {
+  //region Single Chest
   protected static final Quad[] single = {
       // north
       new Quad(new Vector3(.9375, 0, .0625), new Vector3(.0625, 0, .0625),
@@ -77,8 +76,9 @@ public class ChestModel {
           new Vector3(.4375, .4375, .0625), new Vector4(.625, .375, .875, 1)),
 
   };
+  //endregion
 
-  // left part of large chest facing north
+  //region Large Chest (left)
   protected static final Quad[] left = {
       // north
       new Quad(new Vector3(1, 0, .0625), new Vector3(.0625, 0, .0625),
@@ -118,8 +118,9 @@ public class ChestModel {
       new Quad(new Vector3(.9375, .4375, 0), new Vector3(1, .4375, 0),
           new Vector3(.9375, .4375, .0625), new Vector4(.625, .5, .875, 1))
   };
+  //endregion
 
-  // right part of large chest facing north
+  //region Large Chest (right)
   protected static final Quad[] right = {
       // north
       new Quad(new Vector3(.9375, 0, .0625), new Vector3(0, 0, .0625),
@@ -159,6 +160,66 @@ public class ChestModel {
       new Quad(new Vector3(0, .4375, 0), new Vector3(.0625, .4375, 0),
           new Vector3(0, .4375, .0625), new Vector4(.5, .375, .875, 1))
   };
+  //endregion
+
+  //region Normal Chest
+  private static final Texture[][] normalChest = {
+      // Single.
+      {
+          Texture.chestFront, Texture.chestBack, Texture.chestLeft, Texture.chestRight,
+          Texture.chestTop, Texture.chestBottom, Texture.chestLock, Texture.chestLock,
+          Texture.chestLock, Texture.chestLock, Texture.chestLock,
+      },
+
+      // Left.
+      {
+          Texture.largeChestFrontLeft, Texture.largeChestBackLeft, Texture.largeChestLeft,
+          Texture.largeChestTopLeft, Texture.largeChestBottomLeft, Texture.chestLock,
+          Texture.chestLock, Texture.chestLock, Texture.chestLock,
+      },
+
+      // Right.
+      {
+          Texture.largeChestFrontRight, Texture.largeChestBackRight, Texture.largeChestRight,
+          Texture.largeChestTopRight, Texture.largeChestBottomRight, Texture.chestLock,
+          Texture.chestLock, Texture.chestLock, Texture.chestLock,
+      }
+  };
+  //endregion
+
+  //region Trapped Chest
+  private static final Texture[][] trappedChest = {
+      // Single.
+      {
+          Texture.trappedChestFront, Texture.trappedChestBack, Texture.trappedChestLeft, Texture.trappedChestRight,
+          Texture.trappedChestTop, Texture.trappedChestBottom, Texture.trappedChestLock, Texture.trappedChestLock,
+          Texture.trappedChestLock, Texture.trappedChestLock, Texture.trappedChestLock,
+      },
+
+      // Left.
+      {
+          Texture.largeTrappedChestFrontLeft, Texture.largeTrappedChestBackLeft, Texture.largeTrappedChestLeft,
+          Texture.largeTrappedChestTopLeft, Texture.largeTrappedChestBottomLeft, Texture.trappedChestLock,
+          Texture.trappedChestLock, Texture.trappedChestLock, Texture.trappedChestLock,
+      },
+
+      // Right.
+      {
+          Texture.largeTrappedChestFrontRight, Texture.largeTrappedChestBackRight, Texture.largeTrappedChestRight,
+          Texture.largeTrappedChestTopRight, Texture.largeTrappedChestBottomRight, Texture.trappedChestLock,
+          Texture.trappedChestLock, Texture.trappedChestLock, Texture.trappedChestLock,
+      }
+  };
+  //endregion
+
+  //region Ender Chest
+  private static final Texture[] enderChest = {
+      Texture.enderChestFront, Texture.enderChestBack, Texture.enderChestLeft,
+      Texture.enderChestRight, Texture.enderChestTop, Texture.enderChestBottom,
+      Texture.enderChestLock, Texture.enderChestLock, Texture.enderChestLock,
+      Texture.enderChestLock, Texture.enderChestLock,
+  };
+  //endregion
 
   protected static final Quad[][][] variants = new Quad[3][6][];
 
@@ -180,31 +241,27 @@ public class ChestModel {
     }
   }
 
-  public static boolean intersect(Ray ray, Texture[] texture) {
-    int type = ray.getCurrentData() >> 16;
-    int facing = ray.getBlockData();
-    return intersect(ray, texture, type, facing);
+  private final Quad[] quads;
+  private final Texture[] textures;
+
+  public ChestModel(int type, int facing, boolean trapped, boolean ender) {
+    if (ender) {
+      textures = enderChest;
+    } else if (trapped) {
+      textures = trappedChest[type];
+    } else {
+      textures = normalChest[type];
+    }
+    quads = variants[type][facing];
   }
 
-  public static boolean intersect(Ray ray, Texture[] texture,
-      int type, int facing) {
-    boolean hit = false;
-    Quad[] rot = variants[type % 3][facing % 6];
-    ray.t = Double.POSITIVE_INFINITY;
-    for (int i = 0; i < rot.length; ++i) {
-      Quad side = rot[i];
-      if (side.intersect(ray)) {
-        texture[i].getColor(ray);
-        ray.setNormal(side.n);
-        ray.t = ray.tNext;
-        hit = true;
-      }
-    }
-    if (hit) {
-      ray.color.w = 1;
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }
