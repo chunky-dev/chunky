@@ -61,7 +61,7 @@ public abstract class AABBModel implements BlockModel {
     for (int i = 0; i < boxes.length; ++i) {
       if (boxes[i].intersect(ray)) {
         Tint[] tintedFacesBox = tintedFaces != null ? tintedFaces[i] : null;
-        Vector3 n = ray.getN();
+        Vector3 n = ray.getNormal();
         if (n.y > 0) { // top
           ray.v = 1 - ray.v;
           if (intersectFace(ray, scene, textures[i][4],

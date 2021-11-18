@@ -530,26 +530,56 @@ public class Ray {
   public int getCurrentData() {
     return currentData;
   }
-  
-  public Vector3 getN() {
+
+  /**
+   * Get the normal of the previously hit surface.
+   */
+  public Vector3 getNormal() {
     return n;
   }
-
-  public Vector3 getGeomN() {
+  /**
+   * Get the geometric normal of the previously hit surface. When using normal maps,
+   * this is the normal of the geometry that was hit, not taking the normal map into account.
+   */
+  public Vector3 getGeometryNormal() {
     return geomN;
   }
 
-  public void setN(double x, double y, double z) {
+  /**
+   * Set the geometry normal (not taking normal mapping into account)
+   * and the shading normal (taking normal mapping into account)
+   */
+  public void setNormal(double x, double y, double z) {
     n.set(x, y, z);
     geomN.set(x, y, z);
   }
 
-  public void setN(Vector3 newN) {
+  /**
+   * Set the geometry normal (not taking normal mapping into account)
+   * and the shading normal (taking normal mapping into account)
+   */
+  public void setNormal(Vector3 newN) {
     n.set(newN);
     geomN.set(newN);
   }
 
-  public void setShadingN(double x, double y, double z) {
+  /**
+   * Sets n to the given value and optionally flip it so the normal
+   * is in the opposite direction as the ray direction (dot(d, n) < 0)
+   */
+  public void orientNormal(Vector3 normal) {
+    if(d.dot(normal) > 0) {
+      n.set(-normal.x, -normal.y, -normal.z);
+    } else {
+      n.set(normal);
+    }
+    geomN.set(n);
+  }
+
+  /**
+   * Set the shading normal (taking normal mapping into account)
+   */
+  public void setShadingNormal(double x, double y, double z) {
     n.set(x, y, z);
   }
 

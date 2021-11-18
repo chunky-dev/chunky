@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
-import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import org.apache.commons.math3.util.FastMath;
@@ -464,7 +463,7 @@ public class Octree {
       return false;
 
     ray.o.scaleAdd(tMin, ray.d);
-    ray.setN(nx, ny, nz);
+    ray.setNormal(nx, ny, nz);
     ray.distance += tMin;
     return true;
   }
@@ -609,7 +608,7 @@ public class Octree {
         nx = ny = 0;
       }
 
-      ray.setN(nx, ny, nz);
+      ray.setNormal(nx, ny, nz);
 
       distance = tNear;
     }
@@ -735,7 +734,7 @@ public class Octree {
       }
 
       ray.o.scaleAdd(tNear, ray.d);
-      ray.setN(nx, ny, nz);
+      ray.setNormal(nx, ny, nz);
       ray.distance += tNear;
     }
   }

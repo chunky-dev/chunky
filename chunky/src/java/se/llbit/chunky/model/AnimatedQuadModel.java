@@ -62,7 +62,10 @@ public abstract class AnimatedQuadModel extends QuadModel {
           tint.tint(c, ray, scene);
           color = c;
           ray.t = ray.tNext;
-          ray.setN(quad.n);
+          if (quad.doubleSided)
+            ray.orientNormal(quad.n);
+          else
+            ray.setNormal(quad.n);
           hit = true;
         }
       }
