@@ -75,7 +75,7 @@ public class TexturedBlockModel extends AABBModel {
     int bx = (int) QuickMath.floor(ray.o.x);
     int by = (int) QuickMath.floor(ray.o.y);
     int bz = (int) QuickMath.floor(ray.o.z);
-    Vector3 n = ray.getN();
+    Vector3 n = ray.getNormal();
     if (n.y != 0) {
       ray.u = ray.o.x - bx;
       ray.v = ray.o.z - bz;
