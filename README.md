@@ -15,13 +15,13 @@ Chunky is a Minecraft rendering tool that uses Path Tracing to create realistic 
 
 ## Quick start guide
 
-_Prerequisites:_ Chunky requires **Java 8**. It is recommended to have the **64-bit** version if you have a 64-bit operating system (you most likely do). If you haven't installed Java, you can [download it from here][13].
+_Prerequisites:_ Chunky requires **Java 17**. It is recommended to have the **64-bit** version if you have a 64-bit operating system (you most likely do). If you haven't installed Java, you can [download it from here, selecting Temurin 17 LTS][13]. You also need (Open) **JavaFX 17** LTS, which you can [download from here][16] and extract it; We cover valid extraction locations and manually adding the JavaFX module under the [Troubleshooting article][2].
 
 1. Download [the Chunky Launcher][12] and open it
 2. Install the latest version of Chunky by clicking on _Check for Updates_
 3. Click on _Launch Chunky_ start rendering your beautiful buildings
 
-If you have any questions, please don't hesitate to reach out via Reddit, Discord or GitHub.
+For guides and more information please checkout the [Documentation][1]. If you have any questions, please don't hesitate to reach out via [Reddit][3], [Discord][15], or GitHub.
 
 
 ## Frequently Asked Questions
@@ -53,9 +53,9 @@ If you have any questions, please don't hesitate to reach out via Reddit, Discor
 <details>
 <summary><strong>Which Minecraft versions are supported?</strong></summary>
 
-> Starting with Chunky 2.4.0, we support Minecraft 1.2 or later, including 1.17 worlds with increased height.
+> Starting with Chunky 2.4.0, we support Minecraft 1.2-1.17 worlds and Cubic Chunks for Minecraft 1.10-1.12 worlds.
 > 
-> We add new blocks shortly after a new Minecraft snapshot is released. Use the latest Chunky snapshot to render them until a new Chunky version is released.
+> We typically add new blocks shortly after a new Minecraft snapshot is released. Use the latest Chunky snapshot to render them until a new Chunky version is released.
 </details>
 
 <details>
@@ -73,7 +73,7 @@ If you have any questions, please don't hesitate to reach out via Reddit, Discor
 <details>
 <summary><strong>Can Chunky render mod blocks?</strong></summary>
 
-> No. Due to the vast number of mods, this is not feasible at the moment.
+> No. Due to the vast number of mods, this is not feasible at the moment. However support for JSON-defined block models is being worked on.
 </details>
 
 <details>
@@ -135,7 +135,7 @@ commands run with `sudo` will be affected.
 </details>
 
 More information about Chunky, including a short getting started guide and
-rendering tips are available at the [Chunky Documentation page][1]. For more insights into Chunky's development, see the [development blog][4].
+rendering tips are available at the [Chunky Documentation page][1]. For more insights into Chunky's development, keep an eye on the Discord; messages from Contributors can sometimes give you insite into what everyone is working on.
 
 
 ## Hacking on Chunky
@@ -186,18 +186,19 @@ See the file `licenses/commons-math.txt` for the copyright notices.
 See the file `licenses/Apache-2.0.txt` for the full license text.
 See the file `licenses/fast-util.txt` for the copyright notice.
 
-[1]: http://chunky.llbit.se
-[2]: http://chunky.llbit.se/troubleshooting.html
+[1]: https://chunky-dev.github.io/docs/
+[2]: https://chunky-dev.github.io/docs/faq/troubleshooting/
 [3]: http://www.reddit.com/r/chunky
-[4]: http://llbit.se
-[5]: http://chunky.llbit.se/headless.html
+
+[5]: https://chunky-dev.github.io/docs/user_interface/headless/
 [6]: https://google.github.io/styleguide/javaguide.html
 [7]: https://github.com/llbit/chunky-releasetools
 [8]: https://github.com/chunky-dev/chunky/graphs/contributors
-[9]: https://chunky.llbit.se/path_tracing.html
+[9]: https://chunky-dev.github.io/docs/rendering/
 [10]: https://github.com/leMaik/chunky-denoiser
-[11]: https://chunky.llbit.se/skymaps.html
+[11]: https://chunky-dev.github.io/docs/rendering/skymaps/
 [12]: http://chunkyupdate.lemaik.de/ChunkyLauncher.jar
-[13]: https://www.java.com/en/download/manual.jsp
+[13]: https://adoptium.net/
 [14]: https://github.com/alexhliu/ChunkyClPlugin
 [15]: https://discord.gg/VqcHpsF
+[16]: https://gluonhq.com/products/javafx/
