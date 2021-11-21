@@ -16,12 +16,9 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
-import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
-import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
+import se.llbit.chunky.renderer.scene.Scene;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.function.IntConsumer;
 
 /**
@@ -29,7 +26,130 @@ import java.util.function.IntConsumer;
  * (compression algorithm for double precision floating pointer number)
  * http://cs.txstate.edu/~burtscher/papers/tr06.pdf
  */
-public class FloatingPointCompressor {
+public class FloatingPointCompressorDumpFormat extends AbstractDumpFormat {
+  public static final FloatingPointCompressorDumpFormat INSTANCE = new FloatingPointCompressorDumpFormat();
+
+  private FloatingPointCompressorDumpFormat() {}
+
+  @Override
+  public int getVersion() {
+    return 1;
+  }
+
+  @Override
+  public String getName() {
+    return "Floating Point Compressor";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Fast FPC compressed dump format.";
+  }
+
+  @Override
+  public String getId() {
+    return "FloatingPointCompressorDumpFormat";
+  }
+
+  @Override
+  protected void readSamples(DataInputStream inputStream, Scene scene,
+                             PixelConsumer consumer, IntConsumer pixelProgress)
+      throws IOException {
+    decompress(inputStream, scene.getSampleBuffer().length, consumer, pixelProgress);
+  }
+
+  @Override
+  protected void writeSamples(DataOutputStream outputStream, Scene scene,
+                              IntConsumer pixelProgress)
+      throws IOException {
+    double[] samples = scene.getSampleBuffer();
+    assert samples.length % 3 == 0;
+
+    int pixels = samples.length / 3;
+    int size = pixels - 1;
+
+    EncoderDecoder rEncoder = new EncoderDecoder();
+    EncoderDecoder gEncoder = new EncoderDecoder();
+    EncoderDecoder bEncoder = new EncoderDecoder();
+
+    for (int i = 0; i < size; i += 2) {
+      int idx = 3 * i;
+      rEncoder.encodePair(samples[idx], samples[idx + 3], outputStream);
+      gEncoder.encodePair(samples[idx + 1], samples[idx + 4], outputStream);
+      bEncoder.encodePair(samples[idx + 2], samples[idx + 5], outputStream);
+      pixelProgress.accept(i);
+    }
+
+    // Add the last one and a special terminator if there is an odd number
+    if (pixels % 2 == 1) {
+      int idx = 3 * size;
+      rEncoder.encodeSingleWithOddTerminator(samples[idx], outputStream);
+      gEncoder.encodeSingleWithOddTerminator(samples[idx + 1], outputStream);
+      bEncoder.encodeSingleWithOddTerminator(samples[idx + 2], outputStream);
+      pixelProgress.accept(size);
+    }
+  }
+
+  private void decompress(InputStream inputStream, int bufferLength,
+                          PixelConsumer consumer, IntConsumer pixelProgress)
+      throws IOException {
+    assert bufferLength % 3 == 0;
+
+    int pixels = bufferLength / 3;
+    int size = pixels - 1;
+
+    EncoderDecoder rDecoder = new EncoderDecoder();
+    EncoderDecoder gDecoder = new EncoderDecoder();
+    EncoderDecoder bDecoder = new EncoderDecoder();
+
+    for (int i = 0; i < size; i += 2) {
+      byte rGroupedHeader = (byte) inputStream.read();
+      byte rFirstHeader = (byte) ((rGroupedHeader >>> 4) & 0x0F);
+      byte rSecondHeader = (byte) (rGroupedHeader & 0x0F);
+      double r1 = rDecoder.decodeSingle(rFirstHeader, inputStream);
+      double r2 = rDecoder.decodeSingle(rSecondHeader, inputStream);
+
+      byte gGroupedHeader = (byte) inputStream.read();
+      byte gFirstHeader = (byte) ((gGroupedHeader >>> 4) & 0x0F);
+      byte gSecondHeader = (byte) (gGroupedHeader & 0x0F);
+      double g1 = gDecoder.decodeSingle(gFirstHeader, inputStream);
+      double g2 = gDecoder.decodeSingle(gSecondHeader, inputStream);
+
+      byte bGroupedHeader = (byte) inputStream.read();
+      byte bFirstHeader = (byte) ((bGroupedHeader >>> 4) & 0x0F);
+      byte bSecondHeader = (byte) (bGroupedHeader & 0x0F);
+      double b1 = bDecoder.decodeSingle(bFirstHeader, inputStream);
+      double b2 = bDecoder.decodeSingle(bSecondHeader, inputStream);
+
+      consumer.consume(i, r1, g1, b1);
+      consumer.consume(i+1, r2,  g2, b2);
+      pixelProgress.accept(i);
+    }
+
+    // Add the last one and a special terminator if there is an odd number
+    if (pixels % 2 == 1) {
+      byte rGroupedHeader = (byte) inputStream.read();
+      byte rFirstHeader = (byte) ((rGroupedHeader >>> 4) & 0x0F);
+      byte rSecondHeader = (byte) (rGroupedHeader & 0x0F);
+      double r = rDecoder.decodeSingle(rFirstHeader, inputStream);
+      rDecoder.decodeSingle(rSecondHeader, inputStream); // discard
+
+      byte gGroupedHeader = (byte) inputStream.read();
+      byte gFirstHeader = (byte) ((gGroupedHeader >>> 4) & 0x0F);
+      byte gSecondHeader = (byte) (gGroupedHeader & 0x0F);
+      double g = gDecoder.decodeSingle(gFirstHeader, inputStream);
+      gDecoder.decodeSingle(gSecondHeader, inputStream); // discard
+
+      byte bGroupedHeader = (byte) inputStream.read();
+      byte bFirstHeader = (byte) ((bGroupedHeader >>> 4) & 0x0F);
+      byte bSecondHeader = (byte) (bGroupedHeader & 0x0F);
+      double b = bDecoder.decodeSingle(bFirstHeader, inputStream);
+      bDecoder.decodeSingle(bSecondHeader, inputStream); // discard
+
+      consumer.consume(size, r, g, b);
+      pixelProgress.accept(size);
+    }
+  }
 
   private static class EncoderDecoder {
     private static final int TABLE_SIZE = 1 << 10; // Must be a power of 2
@@ -148,100 +268,6 @@ public class FloatingPointCompressor {
       current = bits;
 
       return Double.longBitsToDouble(bits);
-    }
-  }
-
-  public static void compress(OutputStream output, double[] input, IntConsumer pixelProgress) throws IOException {
-    try (FastBufferedOutputStream out = new FastBufferedOutputStream(output)) {
-      if (input.length % 3 != 0)
-        throw new IllegalArgumentException("Dump doesn't have a multiple of 3 values");
-
-      int pixels = input.length / 3;
-      int size = pixels - 1;
-
-      EncoderDecoder rEncoder = new EncoderDecoder();
-      EncoderDecoder gEncoder = new EncoderDecoder();
-      EncoderDecoder bEncoder = new EncoderDecoder();
-
-      for (int i = 0; i < size; i += 2) {
-        int idx = 3 * i;
-        rEncoder.encodePair(input[idx], input[idx + 3], out);
-        gEncoder.encodePair(input[idx + 1], input[idx + 4], out);
-        bEncoder.encodePair(input[idx + 2], input[idx + 5], out);
-        pixelProgress.accept(i);
-      }
-
-      // Add the last one and a special terminator if there is an odd number
-      if (pixels % 2 == 1) {
-        int idx = 3 * size;
-        rEncoder.encodeSingleWithOddTerminator(input[idx], out);
-        gEncoder.encodeSingleWithOddTerminator(input[idx + 1], out);
-        bEncoder.encodeSingleWithOddTerminator(input[idx + 2], out);
-        pixelProgress.accept(size);
-      }
-    }
-  }
-
-  public static void decompress(InputStream input, int bufferLength, PixelConsumer consumer, IntConsumer pixelProgress)
-      throws IOException {
-    try (FastBufferedInputStream in = new FastBufferedInputStream(input)) {
-      if (bufferLength % 3 != 0)
-        throw new IllegalArgumentException("Dump doesn't have a multiple of 3 values");
-
-      int pixels = bufferLength / 3;
-      int size = pixels - 1;
-
-      EncoderDecoder rDecoder = new EncoderDecoder();
-      EncoderDecoder gDecoder = new EncoderDecoder();
-      EncoderDecoder bDecoder = new EncoderDecoder();
-
-      for (int i = 0; i < size; i += 2) {
-        byte rGroupedHeader = (byte) in.read();
-        byte rFirstHeader = (byte) ((rGroupedHeader >>> 4) & 0x0F);
-        byte rSecondHeader = (byte) (rGroupedHeader & 0x0F);
-        double r1 = rDecoder.decodeSingle(rFirstHeader, in);
-        double r2 = rDecoder.decodeSingle(rSecondHeader, in);
-
-        byte gGroupedHeader = (byte) in.read();
-        byte gFirstHeader = (byte) ((gGroupedHeader >>> 4) & 0x0F);
-        byte gSecondHeader = (byte) (gGroupedHeader & 0x0F);
-        double g1 = gDecoder.decodeSingle(gFirstHeader, in);
-        double g2 = gDecoder.decodeSingle(gSecondHeader, in);
-
-        byte bGroupedHeader = (byte) in.read();
-        byte bFirstHeader = (byte) ((bGroupedHeader >>> 4) & 0x0F);
-        byte bSecondHeader = (byte) (bGroupedHeader & 0x0F);
-        double b1 = bDecoder.decodeSingle(bFirstHeader, in);
-        double b2 = bDecoder.decodeSingle(bSecondHeader, in);
-
-        consumer.consume(i, r1, g1, b1);
-        consumer.consume(i+1, r2,  g2, b2);
-        pixelProgress.accept(i);
-      }
-
-      // Add the last one and a special terminator if there is an odd number
-      if (pixels % 2 == 1) {
-        byte rGroupedHeader = (byte) in.read();
-        byte rFirstHeader = (byte) ((rGroupedHeader >>> 4) & 0x0F);
-        byte rSecondHeader = (byte) (rGroupedHeader & 0x0F);
-        double r = rDecoder.decodeSingle(rFirstHeader, in);
-        rDecoder.decodeSingle(rSecondHeader, in); // discard
-
-        byte gGroupedHeader = (byte) in.read();
-        byte gFirstHeader = (byte) ((gGroupedHeader >>> 4) & 0x0F);
-        byte gSecondHeader = (byte) (gGroupedHeader & 0x0F);
-        double g = gDecoder.decodeSingle(gFirstHeader, in);
-        gDecoder.decodeSingle(gSecondHeader, in); // discard
-
-        byte bGroupedHeader = (byte) in.read();
-        byte bFirstHeader = (byte) ((bGroupedHeader >>> 4) & 0x0F);
-        byte bSecondHeader = (byte) (bGroupedHeader & 0x0F);
-        double b = bDecoder.decodeSingle(bFirstHeader, in);
-        bDecoder.decodeSingle(bSecondHeader, in); // discard
-
-        consumer.consume(size, r, g, b);
-        pixelProgress.accept(size);
-      }
     }
   }
 }
