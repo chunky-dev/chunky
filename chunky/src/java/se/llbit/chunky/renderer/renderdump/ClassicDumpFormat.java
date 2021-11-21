@@ -17,51 +17,108 @@
 package se.llbit.chunky.renderer.renderdump;
 
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.util.IsolatedOutputStream;
+import se.llbit.util.TaskTracker;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.function.IntConsumer;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
-class ClassicDumpFormat extends DumpFormat {
+/**
+ * This is the legacy dump format for <= Chunky 2.2.
+ * <p>
+ * The format is a GZIP stream containing some canvas information followed by the render dump
+ * written in column major order.
+ * <p>
+ * Note: Despite implementing {@code DumpFormat}, it does not use the Chunky render dump container format.
+ */
+public class ClassicDumpFormat extends AbstractDumpFormat {
+  public static final ClassicDumpFormat INSTANCE = new ClassicDumpFormat();
 
-  public static final DumpFormat INSTANCE = new ClassicDumpFormat();
+  private ClassicDumpFormat() {}
 
-  private ClassicDumpFormat() {
+  @Override
+  public int getVersion() {
+    return 0;
   }
 
   @Override
-  public void readSamples(DataInputStream inputStream, Scene scene, PixelConsumer consumer, IntConsumer pixelProgress)
+  public String getName() {
+    return "Classic";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Legacy dump format from Chunky <= 2.2";
+  }
+
+  @Override
+  public String getId() {
+    return "ClassicDumpFormat";
+  }
+
+  @Override
+  protected void readSamples(DataInputStream inputStream, Scene scene,
+                             PixelConsumer consumer, IntConsumer pixelProgress)
       throws IOException {
-    int pixelIndex, progress = 0;
+    int pixelIndex;
+    int done = 0;
     double r, g, b;
-    // Warning: This format writes in columns instead of rows
-    for (int x = 0; x < scene.width; ++x) {
-      for (int y = 0; y < scene.height; ++y) {
-        pixelIndex = y * scene.width + x;
+
+    // Warning: This format writes in column major order
+    for (int x = 0; x < scene.width; x++) {
+      for (int y = 0; y < scene.height; y++) {
+        pixelIndex = (y * scene.width + x);
         r = inputStream.readDouble();
         g = inputStream.readDouble();
         b = inputStream.readDouble();
         consumer.consume(pixelIndex, r, g, b);
-        pixelProgress.accept(progress++);
+        pixelProgress.accept(done++);
       }
     }
   }
 
   @Override
-  public void writeSamples(DataOutputStream outputStream, Scene scene, IntConsumer pixelProgress) throws IOException {
+  protected void writeSamples(DataOutputStream outputStream, Scene scene,
+                              IntConsumer pixelProgress)
+      throws IOException {
     double[] samples = scene.getSampleBuffer();
-    int pixelIndex, index;
-    // Warning: This format writes in columns instead of rows
+    int offset;
+    int done = 0;
+
+    // Warning: This format writes in column major order
     for (int x = 0; x < scene.width; ++x) {
       for (int y = 0; y < scene.height; ++y) {
-        pixelIndex = (y * scene.width + x);
-        index = pixelIndex * 3;
-        outputStream.writeDouble(samples[index]);
-        outputStream.writeDouble(samples[index + 1]);
-        outputStream.writeDouble(samples[index + 2]);
-        pixelProgress.accept(pixelIndex);
+        offset = (y * scene.width + x) * 3;
+        outputStream.writeDouble(samples[offset + 0]);
+        outputStream.writeDouble(samples[offset + 1]);
+        outputStream.writeDouble(samples[offset + 2]);
+        pixelProgress.accept(done++);
       }
     }
+  }
+
+  @Override
+  public void load(DataInputStream inputStream, Scene scene, TaskTracker taskTracker)
+      throws IOException, IllegalStateException {
+    DataInputStream stream = new DataInputStream(new GZIPInputStream(inputStream));
+    super.load(stream, scene, taskTracker);
+  }
+
+  @Override
+  public void save(DataOutputStream outputStream, Scene scene, TaskTracker taskTracker) throws IOException {
+    try (DataOutputStream stream = new DataOutputStream(new GZIPOutputStream(new IsolatedOutputStream(outputStream)))) {
+      super.save(stream, scene, taskTracker);
+    }
+  }
+
+  @Override
+  public void merge(DataInputStream inputStream, Scene scene, TaskTracker taskTracker)
+      throws IOException, IllegalStateException {
+    DataInputStream stream = new DataInputStream(new GZIPInputStream(inputStream));
+    super.merge(stream, scene, taskTracker);
   }
 }
