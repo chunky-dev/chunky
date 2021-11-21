@@ -135,7 +135,8 @@ commands run with `sudo` will be affected.
 </details>
 
 More information about Chunky, including a short getting started guide and
-rendering tips are available at the [Chunky Documentation page][1]. For more insights into Chunky's development, keep an eye on the Discord; messages from Contributors can sometimes give you insite into what everyone is working on.
+rendering tips are available at the [Chunky Documentation page][1]. For more insights into Chunky's development, keep an eye on the Discord; messages from contributors can sometimes give you insight into what everyone is working on.
+
 
 
 ## Hacking on Chunky
