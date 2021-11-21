@@ -6,22 +6,22 @@
 
 Chunky is a Minecraft rendering tool that uses Path Tracing to create realistic images of your Minecraft worlds.
 
-[Discord server][15] ·
-[Documentation][1] ·
-[Troubleshooting][2] ·
-[Subreddit][3]
+[Discord server][chunky-discord] ·
+[Documentation][chunky-dev] ·
+[Troubleshooting][chunky-dev-troubleshooting] ·
+[Subreddit][chunky-reddit]
 </div>
 
 
 ## Quick start guide
 
-_Prerequisites:_ Chunky requires **Java 17**. It is recommended to have the **64-bit** version if you have a 64-bit operating system (you most likely do). If you haven't installed Java, you can [download it from here, selecting Temurin 17 LTS][13]. You also need (Open) **JavaFX 17** LTS, which you can [download from here][16] and extract it; We cover valid extraction locations and manually adding the JavaFX module under the [Troubleshooting article][2].
+_Prerequisites:_ Chunky requires **Java 17**. It is recommended to have the **64-bit** version if you have a 64-bit operating system (you most likely do). If you haven't installed Java, you can [download it from here, selecting Temurin 17 LTS][JDK]. You also need (Open) **JavaFX 17** LTS, which you can [download from here][jfx] and extract it; We cover valid extraction locations and manually adding the JavaFX module under the [Troubleshooting article][chunky-dev-troubleshooting].
 
-1. Download [the Chunky Launcher][12] and open it
+1. Download [the Chunky Launcher][chunkylauncherJAR] and open it
 2. Install the latest version of Chunky by clicking on _Check for Updates_
 3. Click on _Launch Chunky_ start rendering your beautiful buildings
 
-For guides and more information please checkout the [Documentation][1]. If you have any questions, please don't hesitate to reach out via [Reddit][3], [Discord][15], or GitHub.
+For guides and more information please checkout the [Documentation][chunky-dev]. If you have any questions, please don't hesitate to reach out via [Reddit][chunky-reddit], [Discord][chunky-discord], or GitHub.
 
 
 ## Frequently Asked Questions
@@ -29,11 +29,11 @@ For guides and more information please checkout the [Documentation][1]. If you h
 <details>
 <summary><strong>Why is there noise/grain/random bright dots in the render?</strong></summary>
 
-> This is not a bug, but an unfortunate effect of [the rendering algorithm][9] used in Chunky. Torches and other small light sources cause a very random illumination and it takes a long time to render such light nicely.
+> This is not a bug, but an unfortunate effect of [the rendering algorithm][chunky-dev-rendering] used in Chunky. Torches and other small light sources cause a very random illumination and it takes a long time to render such light nicely.
 > 
 > You can disable emitters under the Lighting tab in the Render Controls dialog to remove most of the random bright dots. Note that rendering for a longer time will eventually remove the noise, though it may take a very long time.
 > 
-> Another way of removing the noise is using the [Denoiser Plugin][10]. While this can yield good results in most cases, it may distort the image in some cases.
+> Another way of removing the noise is using the [Denoiser Plugin][chunky-denoiser]. While this can yield good results in most cases, it may distort the image in some cases.
 </details>
 
 <details>
@@ -61,7 +61,7 @@ For guides and more information please checkout the [Documentation][1]. If you h
 <details>
 <summary><strong>Is GPU rendering supported?</strong></summary>
 
-> There is a work-in-progress [OpenCL plugin for Chunky][14]. If you'd like to help with this, PRs are welcome!
+> There is a work-in-progress [OpenCL plugin for Chunky][chunky-opencl]. If you'd like to help with this, PRs are welcome!
 </details>
 
 <details>
@@ -79,7 +79,7 @@ For guides and more information please checkout the [Documentation][1]. If you h
 <details>
 <summary><strong>Where can I find good skymaps?</strong></summary>
 
-> The [skymaps page][11] has some good links. Another good place is the #skymaps channel on our Discord server.
+> The [skymaps page][chunky-dev-skymaps] has some good links. Another good place is the #skymaps channel on our [Discord server][chunky-discord].
 </details>
 
 <details>
@@ -97,7 +97,7 @@ command line:
 > 
 >     java -jar chunky.jar -render SceneName
 >
-> Where SceneName is the name of the scene to render. You can read more about [headless rendering here.][5]
+> Where SceneName is the name of the scene to render. You can read more about [headless rendering here.][chunky-dev-headless]
 </details>
 
 <details>
@@ -135,7 +135,7 @@ commands run with `sudo` will be affected.
 </details>
 
 More information about Chunky, including a short getting started guide and
-rendering tips are available at the [Chunky Documentation page][1]. For more insights into Chunky's development, keep an eye on the Discord; messages from contributors can sometimes give you insight into what everyone is working on.
+rendering tips are available at the [Chunky Documentation page][chunky-dev]. For more insights into Chunky's development, keep an eye on the [Discord][chunky-discord]; messages from contributors can sometimes give you insight into what everyone is working on.
 
 
 
@@ -144,7 +144,7 @@ rendering tips are available at the [Chunky Documentation page][1]. For more ins
 To build Chunky, run the `gradlew` script in the project root directory: `./gradlew jar`
 
 This just builds the core libraries. Building an installable file takes
-a bit more work; [refer to this repository][7].
+a bit more work; [refer to this repository][chunky-releasetools].
 
 Chunky is split into four subprojects:
 
@@ -160,7 +160,7 @@ import option.
 
 ### Code Style
 
-The [Google Java style guide][6] should be followed for new code (2 spaces for
+The [Google Java style guide][Google-styleguide] should be followed for new code (2 spaces for
 indentation, no tabs). If you want to contribute code to Chunky please make
 your code look similar to the rest of the code, and refer to the style guide
 when in doubt.
@@ -168,7 +168,7 @@ when in doubt.
 
 ## Copyright & License
 
-Chunky is Copyright (c) 2010-2021, Jesper Öqvist <jesper@llbit.se> and [Chunky Contributors][8]. 
+Chunky is Copyright (c) 2010-2021, Jesper Öqvist <jesper@llbit.se> and [Chunky Contributors][chunky-contributors]. 
 
 Permission to modify and redistribute is granted under the terms of
 the GPLv3 license. See the file `LICENSE` for the full license.
@@ -187,19 +187,18 @@ See the file `licenses/commons-math.txt` for the copyright notices.
 See the file `licenses/Apache-2.0.txt` for the full license text.
 See the file `licenses/fast-util.txt` for the copyright notice.
 
-[1]: https://chunky-dev.github.io/docs/
-[2]: https://chunky-dev.github.io/docs/faq/troubleshooting/
-[3]: http://www.reddit.com/r/chunky
-
-[5]: https://chunky-dev.github.io/docs/user_interface/headless/
-[6]: https://google.github.io/styleguide/javaguide.html
-[7]: https://github.com/llbit/chunky-releasetools
-[8]: https://github.com/chunky-dev/chunky/graphs/contributors
-[9]: https://chunky-dev.github.io/docs/rendering/
-[10]: https://github.com/leMaik/chunky-denoiser
-[11]: https://chunky-dev.github.io/docs/rendering/skymaps/
-[12]: http://chunkyupdate.lemaik.de/ChunkyLauncher.jar
-[13]: https://adoptium.net/
-[14]: https://github.com/alexhliu/ChunkyClPlugin
-[15]: https://discord.gg/VqcHpsF
-[16]: https://gluonhq.com/products/javafx/
+[chunky-dev]: https://chunky-dev.github.io/docs/
+[chunky-dev-troubleshooting]: https://chunky-dev.github.io/docs/faq/troubleshooting/
+[chunky-reddit]: http://www.reddit.com/r/chunky
+[chunky-dev-headless]: https://chunky-dev.github.io/docs/user_interface/headless/
+[Google-styleguide]: https://google.github.io/styleguide/javaguide.html
+[chunky-releasetools]: https://github.com/llbit/chunky-releasetools
+[chunky-contributors]: https://github.com/chunky-dev/chunky/graphs/contributors
+[chunky-dev-rendering]: https://chunky-dev.github.io/docs/rendering/
+[chunky-denoiser]: https://github.com/leMaik/chunky-denoiser
+[chunky-dev-skymaps]: https://chunky-dev.github.io/docs/rendering/skymaps/
+[chunkylauncherJAR]: http://chunkyupdate.lemaik.de/ChunkyLauncher.jar
+[JDK]: https://adoptium.net/
+[chunky-opencl]: https://github.com/alexhliu/ChunkyClPlugin
+[chunky-discord]: https://discord.gg/VqcHpsF
+[jfx]: https://gluonhq.com/products/javafx/
