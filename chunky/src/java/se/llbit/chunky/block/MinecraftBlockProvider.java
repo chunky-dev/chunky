@@ -2344,8 +2344,8 @@ public class MinecraftBlockProvider implements BlockProvider {
             name,
             Texture.cartographyTableSide3,
             Texture.cartographyTableSide1,
-            Texture.cartographyTableSide2,
             Texture.cartographyTableSide3,
+            Texture.cartographyTableSide2,
             Texture.cartographyTableTop,
             Texture.darkOakPlanks);
       case "fletching_table":
@@ -2957,8 +2957,8 @@ public class MinecraftBlockProvider implements BlockProvider {
         name,
         north.equals("true") ? skin : Texture.mushroomPores,
         south.equals("true") ? skin : Texture.mushroomPores,
-        west.equals("true") ? skin : Texture.mushroomPores,
         east.equals("true") ? skin : Texture.mushroomPores,
+        west.equals("true") ? skin : Texture.mushroomPores,
         up.equals("true") ? skin : Texture.mushroomPores,
         down.equals("true") ? skin : Texture.mushroomPores);
   }
