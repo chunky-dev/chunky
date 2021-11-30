@@ -19,7 +19,7 @@
             <ChoiceBox fx:id="postprocessingFilter" prefWidth="150.0" />
           </children>
         </HBox>
-        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Postprocessing affects performance when Render Preview Tab is visible. Switching to the Map Tab mitigates this." wrappingWidth="276.30859375" />
+        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Postprocessing affects performance when Render Preview tab is visible. Switching to the Map tab mitigates this." wrappingWidth="276.30859375" />
       </children>
       <padding>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
