@@ -4,6 +4,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.ListTag;
@@ -52,5 +54,56 @@ public class NbtUtil {
     } else {
       tag.write(out);
     }
+  }
+
+  /**
+   * Gets the first Non-Error tag from within the tag parameter
+   *
+   * This function:
+   * Tag t = GetTagFromNames(tag, "name1", "name2", "name3");
+   *
+   * is equivalent to this example:
+   * Tag t = tag.get("name1");
+   * if(t.isError()) {
+   *   t = tag.get("name2");
+   * }
+   * if(t.isError()) {
+   *   t = tag.get("name3");
+   * }
+   *
+   * @param tag The tag to extract data from
+   * @param tagNames List of names in priority order
+   * @return First tag found
+   */
+  public static Tag getTagFromNames(@NotNull Tag tag, @NotNull String... tagNames) {
+    Tag outTag = null;
+    for (String tagName : tagNames) {
+      if(tagName.contains(".")) {
+        outTag = tag;
+        String[] split = tagName.split("\\.");
+        for (String name : split) {
+          outTag = outTag.get(name);
+        }
+      } else {
+        outTag = tag.get(tagName);
+      }
+      if (!outTag.isError()) {
+        return outTag;
+      }
+    }
+    return outTag;
+  }
+
+  /**
+   * Creates a compound tag from a map
+   */
+  public static CompoundTag tagFromMap(@NotNull Map<String, Tag> map) {
+    CompoundTag compoundTag = new CompoundTag();
+    for (Map.Entry<String, Tag> entry : map.entrySet()) {
+      String name = entry.getKey();
+      Tag tag = entry.getValue();
+      compoundTag.add(new NamedTag(name, (SpecificTag) tag));
+    }
+    return compoundTag;
   }
 }
