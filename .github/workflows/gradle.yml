@@ -32,7 +32,14 @@ jobs:
         name: Chunky Docs
         path: build/docs/
     - name: Build release jar
-      run: ./gradlew build releasejar
+      env:
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: |
+        if [[ "${GITHUB_EVENT_NAME}" != "pull_request" ]]; then
+          ./gradlew build releasejar -PnewVersion="$(git describe)"
+        else
+          ./gradlew build releasejar -PnewVersion="PR-${PR_NUMBER}_$(git describe)"
+        fi
     - name: Cleanup
       run: rm -rf build/docs build/tmp
     - name: Upload build
