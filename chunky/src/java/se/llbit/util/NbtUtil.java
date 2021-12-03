@@ -78,15 +78,7 @@ public class NbtUtil {
   public static Tag getTagFromNames(@NotNull Tag tag, @NotNull String... tagNames) {
     Tag outTag = null;
     for (String tagName : tagNames) {
-      if(tagName.contains(".")) {
-        outTag = tag;
-        String[] split = tagName.split("\\.");
-        for (String name : split) {
-          outTag = outTag.get(name);
-        }
-      } else {
-        outTag = tag.get(tagName);
-      }
+      outTag = tag.get(tagName);
       if (!outTag.isError()) {
         return outTag;
       }
