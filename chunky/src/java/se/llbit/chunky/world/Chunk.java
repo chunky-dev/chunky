@@ -286,10 +286,7 @@ public class Chunk {
         if(sectionY < minY >> 4 || sectionY-1 > (maxY >> 4)+1)
           continue; //skip parsing sections that are outside requested bounds
 
-        Tag paletteTag = getTagFromNames(section, "Palette", "block_states");
-        if(paletteTag.isCompoundTag()) {
-          paletteTag = paletteTag.get("palette");
-        }
+        Tag paletteTag = getTagFromNames(section, "Palette", "block_states.palette");
         if (paletteTag.isList()) {
           ListTag palette = paletteTag.asList();
           // Bits per block:
@@ -299,19 +296,16 @@ public class Chunk {
           }
 
           int dataSize = (4096 * bpb) / 64;
-          Tag blockData = getTagFromNames(section, "BlockStates", "block_states");
-          if(blockData.isCompoundTag()) {
-            blockData = blockData.get("data");
-          }
+          Tag blockStates = getTagFromNames(section, "Palette", "block_states.data");
 
-          if (blockData.isLongArray(dataSize)) {
+          if (blockStates.isLongArray(dataSize)) {
             // since 20w17a, block states are aligned to 64-bit boundaries, so there are 64 % bpb
             // unused bits per block state; if so, the array is longer than the expected data size
             boolean isAligned = data.get(DATAVERSION).intValue() >= DATAVERSION_20W17A;
             if (isAligned) {
               // entries are 64-bit-padded, re-calculate the bits per block
               // this is the dataSize calculation from above reverted, we know the actual data size
-              bpb = blockData.longArray().length / 64;
+              bpb = blockStates.longArray().length / 64;
             }
 
             int[] subpalette = new int[palette.size()];
@@ -320,7 +314,7 @@ public class Chunk {
               subpalette[paletteIndex] = blockPalette.put(item);
               paletteIndex += 1;
             }
-            BitBuffer buffer = new BitBuffer(blockData.longArray(), bpb, isAligned);
+            BitBuffer buffer = new BitBuffer(blockStates.longArray(), bpb, isAligned);
             for (int y = 0; y < SECTION_Y_MAX; y++) {
               int blockY = sectionMinBlockY + y;
               for (int z = 0; z < Z_MAX; z++) {
