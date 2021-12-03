@@ -55,7 +55,7 @@ public class Chunk {
   public static final String DATAVERSION = ".DataVersion";
   public static final String LEVEL_HEIGHTMAP = ".Level.HeightMap";
   public static final String LEVEL_SECTIONS = ".Level.Sections";
-  public static final String SECTIONS_POST_21W39A = ".sections";
+  public static final String LEVEL_SECTIONS_POST_21W39A = ".sections";
   public static final String LEVEL_BIOMES = ".Level.Biomes";
   public static final String LEVEL_ENTITIES = ".Level.Entities";
   public static final String LEVEL_TILEENTITIES = ".Level.TileEntities";
@@ -74,7 +74,7 @@ public class Chunk {
   public static final int SECTION_HALF_NIBBLES = SECTION_BYTES / 2;
   private static final int CHUNK_BYTES = X_MAX * Y_MAX * Z_MAX;
 
-  public static final int DATAVERSION_20w17a = 2529;
+  public static final int DATAVERSION_20W17A = 2529;
 
   protected final ChunkPosition position;
   protected volatile AbstractLayer surface = IconLayer.UNKNOWN;
@@ -144,7 +144,7 @@ public class Chunk {
     Set<String> request = new HashSet<>();
     request.add(Chunk.DATAVERSION);
     request.add(Chunk.LEVEL_SECTIONS);
-    request.add(Chunk.SECTIONS_POST_21W39A);
+    request.add(Chunk.LEVEL_SECTIONS_POST_21W39A);
     request.add(Chunk.LEVEL_BIOMES);
     request.add(Chunk.LEVEL_HEIGHTMAP);
     Map<String, Tag> dataMap = getChunkTags(request);
@@ -174,7 +174,7 @@ public class Chunk {
     }
 
     Heightmap heightmap = world.heightmap();
-    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
+    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
     if (sections.isList()) {
       extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
       if (version.equals("1.13") || version.equals("1.12")) {
@@ -259,7 +259,7 @@ public class Chunk {
 
   /** Detect Minecraft version that generated the chunk. */
   private static String chunkVersion(@NotNull Tag data) {
-    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
+    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
     if (sections.isList()) {
       for (SpecificTag section : sections.asList()) {
         if (!section.get("Palette").isList()) {
@@ -276,7 +276,7 @@ public class Chunk {
   private static void loadBlockData(@NotNull Tag data, @NotNull ChunkData chunkData,
       BlockPalette blockPalette, int minY, int maxY) {
 
-    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
+    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
     if (sections.isList()) {
       for (SpecificTag section : sections.asList()) {
         Tag yTag = section.get("Y");
@@ -307,7 +307,7 @@ public class Chunk {
           if (blockData.isLongArray(dataSize)) {
             // since 20w17a, block states are aligned to 64-bit boundaries, so there are 64 % bpb
             // unused bits per block state; if so, the array is longer than the expected data size
-            boolean isAligned = data.get(DATAVERSION).intValue() >= DATAVERSION_20w17a;
+            boolean isAligned = data.get(DATAVERSION).intValue() >= DATAVERSION_20W17A;
             if (isAligned) {
               // entries are 64-bit-padded, re-calculate the bits per block
               // this is the dataSize calculation from above reverted, we know the actual data size
@@ -465,7 +465,7 @@ public class Chunk {
     Set<String> request = new HashSet<>();
     request.add(DATAVERSION);
     request.add(LEVEL_SECTIONS);
-    request.add(SECTIONS_POST_21W39A);
+    request.add(LEVEL_SECTIONS_POST_21W39A);
     request.add(LEVEL_BIOMES);
     request.add(LEVEL_ENTITIES);
     request.add(LEVEL_TILEENTITIES);
@@ -481,7 +481,7 @@ public class Chunk {
     }
     Tag data = tagFromMap(dataMap);
     version = chunkVersion(data);
-    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
+    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
     Tag biomesTag = data.get(LEVEL_BIOMES);
     Tag entitiesTag = data.get(LEVEL_ENTITIES);
     Tag tileEntitiesTag = data.get(LEVEL_TILEENTITIES);
