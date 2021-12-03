@@ -16,20 +16,15 @@
  */
 package se.llbit.chunky.world;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import se.llbit.chunky.block.*;
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.Lava;
+import se.llbit.chunky.block.Water;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.EmptyChunkData;
-import se.llbit.chunky.map.AbstractLayer;
-import se.llbit.chunky.map.BiomeLayer;
-import se.llbit.chunky.map.IconLayer;
-import se.llbit.chunky.map.MapTile;
-import se.llbit.chunky.map.SurfaceLayer;
+import se.llbit.chunky.map.*;
 import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.chunky.world.region.Region;
 import se.llbit.math.QuickMath;
@@ -40,6 +35,13 @@ import se.llbit.nbt.Tag;
 import se.llbit.util.BitBuffer;
 import se.llbit.util.Mutable;
 import se.llbit.util.NotNull;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import static se.llbit.util.NbtUtil.getTagFromNames;
+import static se.llbit.util.NbtUtil.tagFromMap;
 
 /**
  * This class represents a loaded or not-yet-loaded chunk in the world.
@@ -53,6 +55,7 @@ public class Chunk {
   public static final String DATAVERSION = ".DataVersion";
   public static final String LEVEL_HEIGHTMAP = ".Level.HeightMap";
   public static final String LEVEL_SECTIONS = ".Level.Sections";
+  public static final String LEVEL_SECTIONS_POST_21W39A = ".sections";
   public static final String LEVEL_BIOMES = ".Level.Biomes";
   public static final String LEVEL_ENTITIES = ".Level.Entities";
   public static final String LEVEL_TILEENTITIES = ".Level.TileEntities";
@@ -71,7 +74,7 @@ public class Chunk {
   public static final int SECTION_HALF_NIBBLES = SECTION_BYTES / 2;
   private static final int CHUNK_BYTES = X_MAX * Y_MAX * Z_MAX;
 
-  public static final int DATAVERSION_20w17a = 2529;
+  public static final int DATAVERSION_20W17A = 2529;
 
   protected final ChunkPosition position;
   protected volatile AbstractLayer surface = IconLayer.UNKNOWN;
@@ -141,13 +144,15 @@ public class Chunk {
     Set<String> request = new HashSet<>();
     request.add(Chunk.DATAVERSION);
     request.add(Chunk.LEVEL_SECTIONS);
+    request.add(Chunk.LEVEL_SECTIONS_POST_21W39A);
     request.add(Chunk.LEVEL_BIOMES);
     request.add(Chunk.LEVEL_HEIGHTMAP);
-    Map<String, Tag> data = getChunkTags(request);
+    Map<String, Tag> dataMap = getChunkTags(request);
     // TODO: improve error handling here.
-    if (data == null) {
+    if (dataMap == null) {
       return false;
     }
+    Tag data = tagFromMap(dataMap);
 
     surfaceTimestamp = dataTimestamp;
     version = chunkVersion(data);
@@ -162,14 +167,14 @@ public class Chunk {
     return true;
   }
 
-  private void loadSurface(Map<String, Tag> data, ChunkData chunkData, int yMin, int yMax) {
+  private void loadSurface(@NotNull Tag data, ChunkData chunkData, int yMin, int yMax) {
     if (data == null) {
       surface = IconLayer.CORRUPT;
       return;
     }
 
     Heightmap heightmap = world.heightmap();
-    Tag sections = data.get(LEVEL_SECTIONS);
+    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
     if (sections.isList()) {
       extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
       if (version.equals("1.13") || version.equals("1.12")) {
@@ -186,7 +191,7 @@ public class Chunk {
     }
   }
 
-  private void loadBiomes(Map<String, Tag> data, ChunkData chunkData) {
+  private void loadBiomes(@NotNull Tag data, ChunkData chunkData) {
     if (data == null) {
       biomes = IconLayer.CORRUPT;
     } else {
@@ -239,7 +244,7 @@ public class Chunk {
     }
   }
 
-  private int[] extractHeightmapData(@NotNull Map<String, Tag> data, ChunkData chunkData) {
+  private int[] extractHeightmapData(@NotNull Tag data, ChunkData chunkData) {
     Tag heightmapTag = data.get(LEVEL_HEIGHTMAP);
     if (heightmapTag.isIntArray(X_MAX * Z_MAX)) {
       return heightmapTag.intArray();
@@ -253,8 +258,8 @@ public class Chunk {
   }
 
   /** Detect Minecraft version that generated the chunk. */
-  private static String chunkVersion(@NotNull Map<String, Tag> data) {
-    Tag sections = data.get(LEVEL_SECTIONS);
+  private static String chunkVersion(@NotNull Tag data) {
+    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
     if (sections.isList()) {
       for (SpecificTag section : sections.asList()) {
         if (!section.get("Palette").isList()) {
@@ -268,9 +273,10 @@ public class Chunk {
     return "?";
   }
 
-  private static void loadBlockData(@NotNull Map<String, Tag> data, @NotNull ChunkData chunkData,
+  private static void loadBlockData(@NotNull Tag data, @NotNull ChunkData chunkData,
       BlockPalette blockPalette, int minY, int maxY) {
-    Tag sections = data.get(LEVEL_SECTIONS);
+
+    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
     if (sections.isList()) {
       for (SpecificTag section : sections.asList()) {
         Tag yTag = section.get("Y");
@@ -280,8 +286,9 @@ public class Chunk {
         if(sectionY < minY >> 4 || sectionY-1 > (maxY >> 4)+1)
           continue; //skip parsing sections that are outside requested bounds
 
-        if (section.get("Palette").isList()) {
-          ListTag palette = section.get("Palette").asList();
+        Tag paletteTag = getTagFromNames(section, "Palette", "block_states\\palette");
+        if (paletteTag.isList()) {
+          ListTag palette = paletteTag.asList();
           // Bits per block:
           int bpb = 4;
           if (palette.size() > 16) {
@@ -289,12 +296,12 @@ public class Chunk {
           }
 
           int dataSize = (4096 * bpb) / 64;
-          Tag blockStates = section.get("BlockStates");
+          Tag blockStates = getTagFromNames(section, "Palette", "block_states\\data");
 
           if (blockStates.isLongArray(dataSize)) {
             // since 20w17a, block states are aligned to 64-bit boundaries, so there are 64 % bpb
             // unused bits per block state; if so, the array is longer than the expected data size
-            boolean isAligned = data.get(DATAVERSION).intValue() >= DATAVERSION_20w17a;
+            boolean isAligned = data.get(DATAVERSION).intValue() >= DATAVERSION_20W17A;
             if (isAligned) {
               // entries are 64-bit-padded, re-calculate the bits per block
               // this is the dataSize calculation from above reverted, we know the actual data size
@@ -452,21 +459,23 @@ public class Chunk {
     Set<String> request = new HashSet<>();
     request.add(DATAVERSION);
     request.add(LEVEL_SECTIONS);
+    request.add(LEVEL_SECTIONS_POST_21W39A);
     request.add(LEVEL_BIOMES);
     request.add(LEVEL_ENTITIES);
     request.add(LEVEL_TILEENTITIES);
-    Map<String, Tag> data = getChunkTags(request);
     if(reuseChunkData == null || reuseChunkData instanceof EmptyChunkData) {
       reuseChunkData = world.createChunkData();
     } else {
       reuseChunkData.clear();
     }
+    Map<String, Tag> dataMap = getChunkTags(request);
     // TODO: improve error handling here.
-    if (data == null) {
+    if (dataMap == null) {
       return reuseChunkData;
     }
+    Tag data = tagFromMap(dataMap);
     version = chunkVersion(data);
-    Tag sections = data.get(LEVEL_SECTIONS);
+    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
     Tag biomesTag = data.get(LEVEL_BIOMES);
     Tag entitiesTag = data.get(LEVEL_ENTITIES);
     Tag tileEntitiesTag = data.get(LEVEL_TILEENTITIES);
