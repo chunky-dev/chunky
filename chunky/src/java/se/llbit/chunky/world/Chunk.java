@@ -286,7 +286,7 @@ public class Chunk {
         if(sectionY < minY >> 4 || sectionY-1 > (maxY >> 4)+1)
           continue; //skip parsing sections that are outside requested bounds
 
-        Tag paletteTag = getTagFromNames(section, "Palette", "block_states.palette");
+        Tag paletteTag = getTagFromNames(section, "Palette", "block_states\\palette");
         if (paletteTag.isList()) {
           ListTag palette = paletteTag.asList();
           // Bits per block:
@@ -296,7 +296,7 @@ public class Chunk {
           }
 
           int dataSize = (4096 * bpb) / 64;
-          Tag blockStates = getTagFromNames(section, "Palette", "block_states.data");
+          Tag blockStates = getTagFromNames(section, "Palette", "block_states\\data");
 
           if (blockStates.isLongArray(dataSize)) {
             // since 20w17a, block states are aligned to 64-bit boundaries, so there are 64 % bpb

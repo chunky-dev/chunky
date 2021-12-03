@@ -57,15 +57,15 @@ public class NbtUtil {
   }
 
   /**
-   * Gets the first Non-Error tag from within the tag parameter
+   * Gets the first Non-Error tag from within the tag parameter. You can check for nested tag names by using "\" as a separator.
    *
    * This function:
-   * Tag t = GetTagFromNames(tag, "name1", "name2", "name3");
+   * Tag t = GetTagFromNames(tag, "name1", "name2\nested", "name3");
    *
    * is equivalent to this example:
    * Tag t = tag.get("name1");
    * if(t.isError()) {
-   *   t = tag.get("name2");
+   *   t = tag.get("name2").get("nested");
    * }
    * if(t.isError()) {
    *   t = tag.get("name3");
@@ -78,9 +78,9 @@ public class NbtUtil {
   public static Tag getTagFromNames(@NotNull Tag tag, @NotNull String... tagNames) {
     Tag outTag = null;
     for (String tagName : tagNames) {
-      if(tagName.contains(".")) {
+      if(tagName.contains("\\")) {
         outTag = tag;
-        String[] split = tagName.split("\\.");
+        String[] split = tagName.split("\\\\");
         for (String name : split) {
           outTag = outTag.get(name);
         }
