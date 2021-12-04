@@ -36,7 +36,7 @@ public class LauncherSettings {
   public static final ReleaseChannel DEFAULT_RELEASE_CHANNEL = new ReleaseChannel(
       "Stable", "latest.json", "Latest stable release of Chunky.");
 
-  public int launcherVersion = 1;
+  public int settingsRevision = 0;
 
   public String javaDir = "";
   public int memoryLimit = DEFAULT_MEMORY_LIMIT;
@@ -76,7 +76,7 @@ public class LauncherSettings {
       settings.load(new File(directory, LAUNCHER_SETTINGS_FILE));
     }
 
-    launcherVersion = settings.getInt("launcherVersion", 0);
+    settingsRevision = settings.getInt("settingsRevision", 0);
 
     updateSite = settings.getString("updateSite", DEFAULT_UPDATE_SITE);
     javaDir = settings.getString("javaDir", "");
@@ -130,6 +130,8 @@ public class LauncherSettings {
   }
 
   public void save() {
+    settings.setInt("settingsRevision", settingsRevision);
+
     settings.setString("updateSite", updateSite);
     settings.setString("javaDir", javaDir);
     settings.setInt("memoryLimit", memoryLimit);

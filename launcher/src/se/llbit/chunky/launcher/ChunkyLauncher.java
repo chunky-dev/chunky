@@ -60,7 +60,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ChunkyLauncher {
 
   public static final String LAUNCHER_VERSION = "v1.13.0";
-  public static final int LAUNCHER_REVISION = 1;
+  public static final int LAUNCHER_SETTINGS_REVISION = 1;
 
   /**
    * Print a launch error message to the console.
@@ -77,6 +77,10 @@ public class ChunkyLauncher {
     try {
       final LauncherSettings settings = new LauncherSettings();
       settings.load();
+
+      // Currently, there's nothing that changed from previous launcher settings revisions.
+      // In the future this can be queried to make any changes / show messages needed for a launcher version switch.
+      settings.settingsRevision = LAUNCHER_SETTINGS_REVISION;
 
       /*
        * If there are command line arguments then we assume that Chunky should run
