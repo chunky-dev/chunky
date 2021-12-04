@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 /**
  * JavaFX window for the Chunky launcher.
@@ -199,26 +200,16 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     releaseChannelReload.setOnAction(event -> {
       if (isBusy()) {
         setBusy(true);
-        LauncherInfoChecker updateThread = new LauncherInfoChecker(settings,
+        updateLauncher(
             error -> Platform.runLater(() -> {
               setBusy(false);
               launcherError("Failed to Update", error);
             }),
-            info -> {
-          if (info != null) {
-            settings.releaseChannels = info.channels;
-            int index = settings.releaseChannels.indexOf(settings.selectedChannel);
-            if (index == -1) index = 0;
-            settings.selectedChannel = settings.releaseChannels.get(index);
-            settings.save();
-          }
-
-          Platform.runLater(() -> {
-            setBusy(false);
-            updateChannelsList();
-          });
-        });
-        updateThread.start();
+            info -> Platform.runLater(() -> {
+              setBusy(false);
+              updateChannelsList();
+            })
+        );
       }
     });
 
@@ -251,23 +242,33 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
       }
     });
 
+    updateLauncher(error -> System.err.printf("Launcher Info Error: %s\n", error), info -> {});
+  }
+
+  public void updateLauncher(Consumer<String> errorCallback, Consumer<LauncherInfo> infoCallback) {
     LauncherInfoChecker updateChecker = new LauncherInfoChecker(settings,
-        error -> System.err.printf("Launcher Info Error: %s\n", error),
+        errorCallback,
         info -> {
-      if (!ChunkyLauncher.LAUNCHER_VERSION.equals(info.name) && settings.launcherTimestamp.compareTo(info.date) < 0) {
-        Platform.runLater(() -> {
-          try {
-            LauncherUpdateDialog updateDialog = new LauncherUpdateDialog(settings, info);
-            updateDialog.show();
-          } catch (IOException e) {
-            e.printStackTrace(System.err);
+          if (info != null) {
+            if (ChunkyLauncher.LAUNCHER_VERSION.compareTo(info.version) < 0) {
+              Platform.runLater(() -> {
+                try {
+                  LauncherUpdateDialog updateDialog = new LauncherUpdateDialog(settings, info);
+                  updateDialog.show();
+                } catch (IOException e) {
+                  e.printStackTrace(System.err);
+                }
+              });
+            }
+
+            settings.releaseChannels = info.channels;
+            int index = settings.releaseChannels.indexOf(settings.selectedChannel);
+            if (index == -1) index = 0;
+            settings.selectedChannel = settings.releaseChannels.get(index);
+            settings.save();
           }
+          infoCallback.accept(info);
         });
-      } else if (ChunkyLauncher.LAUNCHER_VERSION.equals(info.name) && settings.launcherTimestamp.getTime() == 0) {
-        settings.launcherTimestamp = info.date;
-        settings.save();
-      }
-    });
     updateChecker.start();
   }
 

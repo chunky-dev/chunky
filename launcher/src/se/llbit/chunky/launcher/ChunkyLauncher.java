@@ -23,6 +23,7 @@ import se.llbit.chunky.launcher.ui.ChunkyLauncherFx;
 import se.llbit.chunky.launcher.ui.DebugConsole;
 import se.llbit.chunky.launcher.ui.FirstTimeSetupDialog;
 import se.llbit.chunky.resources.SettingsDirectory;
+import se.llbit.util.SemanticVersion;
 
 import javax.swing.*;
 import java.awt.*;
@@ -59,7 +60,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ChunkyLauncher {
 
-  public static final String LAUNCHER_VERSION = "1.13.0";
+  public static final SemanticVersion LAUNCHER_VERSION = new SemanticVersion("1.13.0");
   public static final int LAUNCHER_SETTINGS_REVISION = 1;
 
   /**

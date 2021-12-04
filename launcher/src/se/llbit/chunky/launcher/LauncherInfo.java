@@ -20,6 +20,7 @@ import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
+import se.llbit.util.SemanticVersion;
 import se.llbit.util.Util;
 
 import java.io.InvalidObjectException;
@@ -29,14 +30,17 @@ import java.util.Date;
 public class LauncherInfo {
     public final String name;
     public final String timestamp;
-    public final Date date;
     public final String notes;
     public final String path;
+
+    public final Date date;
+    public final SemanticVersion version;
 
     public final ArrayList<ReleaseChannel> channels = new ArrayList<>();
 
     public LauncherInfo(JsonObject obj) {
         name = obj.get("name").stringValue("");
+        version = new SemanticVersion(name);
         timestamp = obj.get("timestamp").stringValue("");
         notes = obj.get("notes").stringValue("");
         path = obj.get("path").stringValue("ChunkyLauncher.jar");

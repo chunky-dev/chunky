@@ -29,7 +29,6 @@ import se.llbit.util.OSDetector;
 import java.io.File;
 import java.io.InvalidObjectException;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class LauncherSettings {
   private static final int DEFAULT_MEMORY_LIMIT = 1024;
@@ -42,7 +41,6 @@ public class LauncherSettings {
       "Snapshot", "snapshot.json", "Latest nightly snapshot of Chunky.");
 
   public int settingsRevision = 0;
-  public Date launcherTimestamp = new Date(0);
 
   public String javaDir = "";
   public int memoryLimit = DEFAULT_MEMORY_LIMIT;
@@ -122,8 +120,6 @@ public class LauncherSettings {
     if (settings.getBool("downloadSnapshots", false)) {
       selectSnapshot();
     }
-
-    launcherTimestamp = new Date(Long.parseLong(settings.getString("launcherTimestamp", "0")));
   }
 
   public void selectStable() {
@@ -170,8 +166,6 @@ public class LauncherSettings {
     }
     releaseChannelsObject.set("channels", releaseChannelsValue);
     settings.set("releaseChannels", releaseChannelsObject);
-
-    settings.setString("launcherTimestamp", Long.toString(launcherTimestamp.getTime()));
 
     File directory = SettingsDirectory.getSettingsDirectory();
     settings.save(directory, new File(directory, LAUNCHER_SETTINGS_FILE));
