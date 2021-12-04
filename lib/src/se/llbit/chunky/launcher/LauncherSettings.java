@@ -100,7 +100,10 @@ public class LauncherSettings {
     boolean downloadSnapshots = settings.getBool("downloadSnapshots", false);
     JsonObject releaseChannelObj = settings.get("releaseChannels").object();
     releaseChannels = new ArrayList<>();
-    releaseChannels.add(DEFAULT_RELEASE_CHANNEL);
+    // Add these channels for legacy update sites.
+    releaseChannels.add(DEFAULT_RELEASE_CHANNEL); // Stable channel
+    releaseChannels.add(new ReleaseChannel(
+        "Snapshot", "snapshot.json", "Latest nightly snapshot of Chunky.")); // Snapshot channel
     for (JsonValue obj : releaseChannelObj.get("channels").array()) {
       try {
         ReleaseChannel channel = new ReleaseChannel(obj.asObject());

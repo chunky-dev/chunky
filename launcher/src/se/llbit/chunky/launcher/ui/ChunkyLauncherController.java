@@ -201,7 +201,10 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
       if (isBusy()) {
         setBusy(true);
         ReleaseChannelChecker updateThread = new ReleaseChannelChecker(settings,
-            error -> Platform.runLater(() -> launcherError("Failed to Update", error)),
+            error -> Platform.runLater(() -> {
+              setBusy(false);
+              launcherError("Failed to Update", error);
+            }),
             () -> Platform.runLater(() -> {
               setBusy(false);
               updateChannelsList();
@@ -333,6 +336,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
   public void setBusy(boolean busy) {
     busyIndicator.setVisible(busy);
     checkForUpdate.setDisable(busy);
+    releaseChannelReload.setDisable(busy);
   }
 
   /**

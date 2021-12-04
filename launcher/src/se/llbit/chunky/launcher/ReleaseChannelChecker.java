@@ -43,7 +43,7 @@ public class ReleaseChannelChecker extends Thread {
             System.err.println("Malformed launcher info URL.");
             errorListener.accept("Malformed launcher info/update site URL: " + url);
         } catch (IOException e) {
-            System.err.println("Failed to fetch launcher info  " + e.getMessage());
+            System.err.println("Failed to fetch launcher info: " + e.getMessage());
             errorListener.accept("Failed to fetch launcher info from URL: " + url);
         } catch (SyntaxError e) {
             System.err.println("Version info JSON error: " + e.getMessage());
