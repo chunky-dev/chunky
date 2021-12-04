@@ -1,4 +1,5 @@
-/* Copyright (c) 2013-2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2013-2021 Chunky Contributors
  *
  * This file is part of Chunky.
  *
@@ -17,8 +18,6 @@
 package se.llbit.chunky.launcher.ui;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
