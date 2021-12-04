@@ -117,7 +117,7 @@ public class ChunkyLauncher {
             case "--updateAlpha":
               if(arg.equals("--updateAlpha")) {
                 System.out.println("Checking for Chunky alpha/snapshot updates..");
-                settings.selectedChannel = settings.releaseChannels.get(settings.releaseChannels.size()-1);
+                settings.selectSnapshot();
               } else {
                 System.out.println("Checking for updates..");
               }

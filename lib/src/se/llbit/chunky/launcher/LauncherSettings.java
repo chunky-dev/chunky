@@ -34,8 +34,11 @@ public class LauncherSettings {
   private static final int DEFAULT_MEMORY_LIMIT = 1024;
   public static final String LAUNCHER_SETTINGS_FILE = "chunky-launcher.json";
   public static final String DEFAULT_UPDATE_SITE = "https://chunkyupdate.lemaik.de";
-  public static final ReleaseChannel DEFAULT_RELEASE_CHANNEL = new ReleaseChannel(
+
+  private static final ReleaseChannel STABLE_RELEASE_CHANNEL = new ReleaseChannel(
       "Stable", "latest.json", "Latest stable release of Chunky.");
+  private static final ReleaseChannel SNAPSHOT_RELEASE_CHANNEL = new ReleaseChannel(
+      "Snapshot", "snapshot.json", "Latest nightly snapshot of Chunky.");
 
   public int settingsRevision = 0;
 
@@ -101,28 +104,34 @@ public class LauncherSettings {
     boolean downloadSnapshots = settings.getBool("downloadSnapshots", false);
     JsonObject releaseChannelObj = settings.get("releaseChannels").object();
     releaseChannels = new ArrayList<>();
-    // Add these channels for legacy update sites.
-    releaseChannels.add(DEFAULT_RELEASE_CHANNEL); // Stable channel
-    releaseChannels.add(new ReleaseChannel(
-        "Snapshot", "snapshot.json", "Latest nightly snapshot of Chunky.")); // Snapshot channel
+    // Add these channels to support legacy update sites.
+    releaseChannels.add(STABLE_RELEASE_CHANNEL);
+    releaseChannels.add(SNAPSHOT_RELEASE_CHANNEL);
     for (JsonValue obj : releaseChannelObj.get("channels").array()) {
       try {
         ReleaseChannel channel = new ReleaseChannel(obj.asObject());
-        int index = releaseChannels.indexOf(channel);
-        if (index == -1) {
-          releaseChannels.add(channel);
-        } else {
-          releaseChannels.set(index, channel);
-        }
+        releaseChannels.remove(channel);
+        releaseChannels.add(channel);
       } catch (InvalidObjectException e) {
         Log.info("Invalid release channel", e);
       }
     }
     int selectedChannelValue = releaseChannelObj.get("selectedChannel").intValue(0);
-    if (downloadSnapshots) {
-      selectedChannelValue = releaseChannels.size() - 1;
-    }
     selectedChannel = releaseChannels.get(selectedChannelValue);
+
+    if (downloadSnapshots) {
+      selectSnapshot();
+    }
+  }
+
+  public void selectStable() {
+    int val = releaseChannels.indexOf(STABLE_RELEASE_CHANNEL);
+    selectedChannel = releaseChannels.get(val == -1 ? 0 : val);
+  }
+
+  public void selectSnapshot() {
+    int val = releaseChannels.indexOf(SNAPSHOT_RELEASE_CHANNEL);
+    selectedChannel = releaseChannels.get(val == -1 ? releaseChannels.size() - 1 : val);
   }
 
   private String defaultJavaOptions() {
