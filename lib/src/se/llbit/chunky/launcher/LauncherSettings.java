@@ -143,6 +143,7 @@ public class LauncherSettings {
     settings.setBool("showLauncher", showLauncher);
     settings.setBool("showAdvancedSettings", showAdvancedSettings);
 
+    settings.removeSetting("downloadSnapshots");
     JsonObject releaseChannelsObject = new JsonObject();
     int selectedChannelValue = releaseChannels.indexOf(selectedChannel);
     releaseChannelsObject.set("selectedChannel", new JsonNumber(selectedChannelValue));

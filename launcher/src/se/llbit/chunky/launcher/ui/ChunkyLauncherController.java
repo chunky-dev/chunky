@@ -192,6 +192,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
           } else {
             releaseChannelBox.setTooltip(new Tooltip(newValue.notes));
             settings.selectedChannel = newValue;
+            settings.save();
           }
         });
     updateChannelsList();
