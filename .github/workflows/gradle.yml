@@ -11,11 +11,12 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
       with:
@@ -25,3 +26,24 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Upload documentation
+      uses: actions/upload-artifact@v2.2.2
+      with:
+        name: Chunky Docs
+        path: build/docs/
+    - name: Build release jar
+      env:
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: |
+        if [[ "${GITHUB_EVENT_NAME}" != "pull_request" ]]; then
+          ./gradlew build releasejar -PnewVersion="$(git describe)"
+        else
+          ./gradlew build releasejar -PnewVersion="PR-${PR_NUMBER}_$(git describe)"
+        fi
+    - name: Cleanup
+      run: rm -rf build/docs build/tmp
+    - name: Upload build
+      uses: actions/upload-artifact@v2.2.2
+      with:
+        name: Chunky Build
+        path: build/
