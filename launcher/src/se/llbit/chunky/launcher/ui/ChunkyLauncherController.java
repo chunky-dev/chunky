@@ -50,31 +50,31 @@ import java.util.ResourceBundle;
 public final class ChunkyLauncherController implements Initializable, UpdateListener {
   final LauncherSettings settings;
 
-  @FXML protected ComboBox<VersionInfo> version;
-  @FXML protected Button checkForUpdate;
-  @FXML protected ProgressIndicator busyIndicator;
-  @FXML protected TextField minecraftDirectory;
-  @FXML protected Button browseMinecraft;
-  @FXML protected IntegerAdjuster memoryLimit;
-  @FXML protected TextField updateSite;
-  @FXML protected Button resetUpdateSite;
-  @FXML protected TextField javaRuntime;
-  @FXML protected Button browseJava;
-  @FXML protected TextField javaOptions;
-  @FXML protected TextField chunkyOptions;
-  @FXML protected CheckBox enableDebugConsole;
-  @FXML protected CheckBox verboseLogging;
-  @FXML protected CheckBox closeConsoleOnExit;
-  @FXML protected TextField settingsDirectory;
-  @FXML protected Button openSettingsDirectory;
-  @FXML protected CheckBox alwaysShowLauncher;
-  @FXML protected Button launchButton;
-  @FXML protected Button cancelButton;
-  @FXML protected Label launcherVersion;
-  @FXML protected TitledPane advancedSettings;
-  @FXML protected Button pluginsButton;
-  @FXML protected ComboBox<ReleaseChannel> releaseChannelBox;
-  @FXML protected Button releaseChannelReload;
+  @FXML public ComboBox<VersionInfo> version;
+  @FXML public Button checkForUpdate;
+  @FXML public ProgressIndicator busyIndicator;
+  @FXML public TextField minecraftDirectory;
+  @FXML public Button browseMinecraft;
+  @FXML public IntegerAdjuster memoryLimit;
+  @FXML public TextField updateSite;
+  @FXML public Button resetUpdateSite;
+  @FXML public TextField javaRuntime;
+  @FXML public Button browseJava;
+  @FXML public TextField javaOptions;
+  @FXML public TextField chunkyOptions;
+  @FXML public CheckBox enableDebugConsole;
+  @FXML public CheckBox verboseLogging;
+  @FXML public CheckBox closeConsoleOnExit;
+  @FXML public TextField settingsDirectory;
+  @FXML public Button openSettingsDirectory;
+  @FXML public CheckBox alwaysShowLauncher;
+  @FXML public Button launchButton;
+  @FXML public Button cancelButton;
+  @FXML public Label launcherVersion;
+  @FXML public TitledPane advancedSettings;
+  @FXML public Button pluginsButton;
+  @FXML public ComboBox<ReleaseChannel> releaseChannelBox;
+  @FXML public Button releaseChannelReload;
 
   public ChunkyLauncherController(LauncherSettings settings) {
     this.settings = settings;
@@ -95,7 +95,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     });
     launchButton.setTooltip(new Tooltip("Launch Chunky using the current settings."));
     launchButton.setOnAction(event -> launchChunky());
-    launcherVersion.setText(ChunkyLauncher.LAUNCHER_VERSION);
+    launcherVersion.setText("v" + ChunkyLauncher.LAUNCHER_VERSION);
     advancedSettings.setExpanded(settings.showAdvancedSettings);
     advancedSettings.expandedProperty().addListener(observable -> Platform.runLater(
             () -> advancedSettings.getScene().getWindow().sizeToScene()));
@@ -199,15 +199,25 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     releaseChannelReload.setOnAction(event -> {
       if (isBusy()) {
         setBusy(true);
-        ReleaseChannelChecker updateThread = new ReleaseChannelChecker(settings,
+        LauncherInfoChecker updateThread = new LauncherInfoChecker(settings,
             error -> Platform.runLater(() -> {
               setBusy(false);
               launcherError("Failed to Update", error);
             }),
-            () -> Platform.runLater(() -> {
-              setBusy(false);
-              updateChannelsList();
-            }));
+            info -> {
+          if (info != null) {
+            settings.releaseChannels = info.channels;
+            int index = settings.releaseChannels.indexOf(settings.selectedChannel);
+            if (index == -1) index = 0;
+            settings.selectedChannel = settings.releaseChannels.get(index);
+            settings.save();
+          }
+
+          Platform.runLater(() -> {
+            setBusy(false);
+            updateChannelsList();
+          });
+        });
         updateThread.start();
       }
     });
@@ -240,6 +250,25 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
         updateThread.start();
       }
     });
+
+    LauncherInfoChecker updateChecker = new LauncherInfoChecker(settings,
+        error -> System.err.printf("Launcher Info Error: %s\n", error),
+        info -> {
+      if (!ChunkyLauncher.LAUNCHER_VERSION.equals(info.name) && settings.launcherTimestamp.compareTo(info.date) < 0) {
+        Platform.runLater(() -> {
+          try {
+            LauncherUpdateDialog updateDialog = new LauncherUpdateDialog(settings, info);
+            updateDialog.show();
+          } catch (IOException e) {
+            e.printStackTrace(System.err);
+          }
+        });
+      } else if (ChunkyLauncher.LAUNCHER_VERSION.equals(info.name) && settings.launcherTimestamp.getTime() == 0) {
+        settings.launcherTimestamp = info.date;
+        settings.save();
+      }
+    });
+    updateChecker.start();
   }
 
   /**

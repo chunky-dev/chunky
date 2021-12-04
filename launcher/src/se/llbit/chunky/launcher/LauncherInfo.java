@@ -30,15 +30,17 @@ public class LauncherInfo {
     public final String name;
     public final String timestamp;
     public final Date date;
-    public String notes = "";
+    public final String notes;
+    public final String path;
 
-    public ArrayList<ReleaseChannel> channels = new ArrayList<>();
+    public final ArrayList<ReleaseChannel> channels = new ArrayList<>();
 
     public LauncherInfo(JsonObject obj) {
         name = obj.get("name").stringValue("");
         timestamp = obj.get("timestamp").stringValue("");
-        date = Util.dateFromISO8601(timestamp);
         notes = obj.get("notes").stringValue("");
+        path = obj.get("path").stringValue("ChunkyLauncher.jar");
+        date = Util.dateFromISO8601(timestamp);
         JsonArray releaseChannels = obj.get("channels").array();
         for (JsonValue channelValue : releaseChannels) {
             try {

@@ -25,14 +25,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.function.Consumer;
 
-public class ReleaseChannelChecker extends Thread {
+public class LauncherInfoChecker extends Thread {
     private final LauncherSettings settings;
     private final Consumer<String> errorListener;
-    private final Runnable completionListener;
+    private final Consumer<LauncherInfo> completionListener;
 
-    public ReleaseChannelChecker(LauncherSettings settings,
-                                 Consumer<String> errorListener,
-                                 Runnable completionListener) {
+    public LauncherInfoChecker(LauncherSettings settings,
+                               Consumer<String> errorListener,
+                               Consumer<LauncherInfo> completionListener) {
         this.settings = settings;
         this.errorListener = errorListener;
         this.completionListener = completionListener;
@@ -43,18 +43,14 @@ public class ReleaseChannelChecker extends Thread {
         String url = settings.getResourceUrl("launcher.json");
         try {
             URL launcherJson = new URL(url);
+            LauncherInfo info = null;
             try (
                 InputStream in = launcherJson.openStream();
                 JsonParser parser = new JsonParser(in);
             ) {
-                LauncherInfo info = new LauncherInfo(parser.parse().object());
-                settings.releaseChannels = info.channels;
-                int index = settings.releaseChannels.indexOf(settings.selectedChannel);
-                if (index == -1) index = 0;
-                settings.selectedChannel = settings.releaseChannels.get(index);
+                info = new LauncherInfo(parser.parse().object());
             }
-            settings.save();
-            completionListener.run();
+            completionListener.accept(info);
         } catch (MalformedURLException e) {
             System.err.println("Malformed launcher info URL.");
             errorListener.accept("Malformed launcher info/update site URL: " + url);

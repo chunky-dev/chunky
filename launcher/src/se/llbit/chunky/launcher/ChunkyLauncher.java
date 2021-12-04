@@ -59,7 +59,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ChunkyLauncher {
 
-  public static final String LAUNCHER_VERSION = "v1.13.0";
+  public static final String LAUNCHER_VERSION = "1.13.0";
   public static final int LAUNCHER_SETTINGS_REVISION = 1;
 
   /**
@@ -105,7 +105,7 @@ public class ChunkyLauncher {
               forceLauncher = true;
               break;
             case "--version":
-              System.out.println("Chunky Launcher " + LAUNCHER_VERSION);
+              System.out.println("Chunky Launcher v" + LAUNCHER_VERSION);
               return;
             case "--verbose":
               settings.verboseLauncher = true;
