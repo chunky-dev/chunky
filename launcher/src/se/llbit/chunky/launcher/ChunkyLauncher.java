@@ -59,7 +59,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ChunkyLauncher {
 
-  public static final String LAUNCHER_VERSION = "v1.12.2";
+  public static final String LAUNCHER_VERSION = "v1.13.0";
+  public static final int LAUNCHER_REVISION = 1;
 
   /**
    * Print a launch error message to the console.
@@ -112,7 +113,7 @@ public class ChunkyLauncher {
             case "--updateAlpha":
               if(arg.equals("--updateAlpha")) {
                 System.out.println("Checking for Chunky alpha/snapshot updates..");
-                settings.downloadSnapshots = true;
+                settings.selectedChannel = settings.releaseChannels.get(settings.releaseChannels.size()-1);
               } else {
                 System.out.println("Checking for updates..");
               }
@@ -135,10 +136,6 @@ public class ChunkyLauncher {
                 @Override
                 public void noUpdateAvailable() {
                   System.out.println("No updates found.");
-                  if(!settings.downloadSnapshots) {
-                    System.out
-                            .println("Alpha/snapshot updates are disabled, enable with --updateAlpha");
-                  }
                 }
               });
               updateThread.start();

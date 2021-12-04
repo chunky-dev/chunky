@@ -18,14 +18,25 @@ package se.llbit.chunky.launcher;
 
 import se.llbit.chunky.JsonSettings;
 import se.llbit.chunky.resources.SettingsDirectory;
+import se.llbit.json.JsonArray;
+import se.llbit.json.JsonNumber;
+import se.llbit.json.JsonObject;
+import se.llbit.json.JsonValue;
+import se.llbit.log.Log;
 import se.llbit.util.OSDetector;
 
 import java.io.File;
+import java.io.InvalidObjectException;
+import java.util.ArrayList;
 
 public class LauncherSettings {
   private static final int DEFAULT_MEMORY_LIMIT = 1024;
   public static final String LAUNCHER_SETTINGS_FILE = "chunky-launcher.json";
   public static final String DEFAULT_UPDATE_SITE = "https://chunkyupdate.lemaik.de";
+  public static final ReleaseChannel DEFAULT_RELEASE_CHANNEL = new ReleaseChannel(
+      "Stable", "latest.json", "Latest stable release of Chunky.");
+
+  public int launcherVersion = 1;
 
   public String javaDir = "";
   public int memoryLimit = DEFAULT_MEMORY_LIMIT;
@@ -51,7 +62,9 @@ public class LauncherSettings {
   public boolean headless = false;
   public boolean showLauncher = true;
   public boolean showAdvancedSettings = false;
-  public boolean downloadSnapshots = false;
+
+  public ReleaseChannel selectedChannel;
+  public ArrayList<ReleaseChannel> releaseChannels;
 
   public LauncherSettings() {
     javaOptions = defaultJavaOptions();
@@ -62,6 +75,8 @@ public class LauncherSettings {
     if (directory != null) {
       settings.load(new File(directory, LAUNCHER_SETTINGS_FILE));
     }
+
+    launcherVersion = settings.getInt("launcherVersion", 0);
 
     updateSite = settings.getString("updateSite", DEFAULT_UPDATE_SITE);
     javaDir = settings.getString("javaDir", "");
@@ -81,7 +96,29 @@ public class LauncherSettings {
     version = settings.getString("version", "latest");
     showLauncher = settings.getBool("showLauncher", true);
     showAdvancedSettings = settings.getBool("showAdvancedSettings", false);
-    downloadSnapshots = settings.getBool("downloadSnapshots", false);
+
+    boolean downloadSnapshots = settings.getBool("downloadSnapshots", false);
+    JsonObject releaseChannelObj = settings.get("releaseChannels").object();
+    releaseChannels = new ArrayList<>();
+    releaseChannels.add(DEFAULT_RELEASE_CHANNEL);
+    for (JsonValue obj : releaseChannelObj.get("channels").array()) {
+      try {
+        ReleaseChannel channel = new ReleaseChannel(obj.asObject());
+        int index = releaseChannels.indexOf(channel);
+        if (index == -1) {
+          releaseChannels.add(channel);
+        } else {
+          releaseChannels.set(index, channel);
+        }
+      } catch (InvalidObjectException e) {
+        Log.info("Invalid release channel", e);
+      }
+    }
+    int selectedChannelValue = releaseChannelObj.get("selectedChannel").intValue(0);
+    if (downloadSnapshots) {
+      selectedChannelValue = releaseChannels.size() - 1;
+    }
+    selectedChannel = releaseChannels.get(selectedChannelValue);
   }
 
   private String defaultJavaOptions() {
@@ -105,7 +142,16 @@ public class LauncherSettings {
     settings.setString("version", version);
     settings.setBool("showLauncher", showLauncher);
     settings.setBool("showAdvancedSettings", showAdvancedSettings);
-    settings.setBool("downloadSnapshots", downloadSnapshots);
+
+    JsonObject releaseChannelsObject = new JsonObject();
+    int selectedChannelValue = releaseChannels.indexOf(selectedChannel);
+    releaseChannelsObject.set("selectedChannel", new JsonNumber(selectedChannelValue));
+    JsonArray releaseChannelsValue = new JsonArray(releaseChannels.size());
+    for (ReleaseChannel channel : releaseChannels) {
+      releaseChannelsValue.add(channel.toJson());
+    }
+    releaseChannelsObject.set("channels", releaseChannelsValue);
+    settings.set("releaseChannels", releaseChannelsObject);
 
     File directory = SettingsDirectory.getSettingsDirectory();
     settings.save(directory, new File(directory, LAUNCHER_SETTINGS_FILE));

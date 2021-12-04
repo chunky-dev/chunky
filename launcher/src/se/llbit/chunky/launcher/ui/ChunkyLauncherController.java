@@ -17,6 +17,8 @@
 package se.llbit.chunky.launcher.ui;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
@@ -32,16 +34,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.PopupWindow;
 import javafx.stage.WindowEvent;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.launcher.ChunkyDeployer;
-import se.llbit.chunky.launcher.ChunkyLauncher;
-import se.llbit.chunky.launcher.ConsoleLogger;
-import se.llbit.chunky.launcher.Dialogs;
-import se.llbit.chunky.launcher.JreUtil;
-import se.llbit.chunky.launcher.LaunchMode;
-import se.llbit.chunky.launcher.LauncherSettings;
-import se.llbit.chunky.launcher.UpdateChecker;
-import se.llbit.chunky.launcher.UpdateListener;
-import se.llbit.chunky.launcher.VersionInfo;
+import se.llbit.chunky.launcher.*;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.ui.IntegerAdjuster;
@@ -73,7 +66,6 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
   @FXML protected CheckBox enableDebugConsole;
   @FXML protected CheckBox verboseLogging;
   @FXML protected CheckBox closeConsoleOnExit;
-  @FXML protected CheckBox downloadSnapshots;
   @FXML protected TextField settingsDirectory;
   @FXML protected Button openSettingsDirectory;
   @FXML protected CheckBox alwaysShowLauncher;
@@ -82,6 +74,8 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
   @FXML protected Label launcherVersion;
   @FXML protected TitledPane advancedSettings;
   @FXML protected Button pluginsButton;
+  @FXML protected ComboBox<ReleaseChannel> releaseChannelBox;
+  @FXML protected Button releaseChannelReload;
 
   public ChunkyLauncherController(LauncherSettings settings) {
     this.settings = settings;
@@ -188,14 +182,33 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     verboseLogging.setSelected(settings.verboseLogging);
     closeConsoleOnExit.setTooltip(new Tooltip("Close the debug console when Chunky exits."));
     closeConsoleOnExit.setSelected(settings.closeConsoleOnExit);
-    downloadSnapshots.setSelected(settings.downloadSnapshots);
-    downloadSnapshots.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      // In contrast to the other options, we have to update the
-      // "download snapshots" setting directly so that when the
-      // user clicks "Check for Update" we will respect the check box value.
-      settings.downloadSnapshots = newValue;
-      settings.save();
+
+    releaseChannelBox.setCellFactory(new ReleaseChannel.CellFactory());
+    releaseChannelBox.setButtonCell(new ReleaseChannel.ReleaseChannelCell());
+    releaseChannelBox.getSelectionModel().selectedItemProperty().addListener(
+        (observable, oldValue, newValue) -> {
+          if (newValue == null) {
+            releaseChannelBox.setTooltip(null);
+          } else {
+            releaseChannelBox.setTooltip(new Tooltip(newValue.notes));
+            settings.selectedChannel = newValue;
+          }
+        });
+    updateChannelsList();
+
+    releaseChannelReload.setOnAction(event -> {
+      if (isBusy()) {
+        setBusy(true);
+        ReleaseChannelChecker updateThread = new ReleaseChannelChecker(settings,
+            error -> Platform.runLater(() -> launcherError("Failed to Update", error)),
+            () -> Platform.runLater(() -> {
+              setBusy(false);
+              updateChannelsList();
+            }));
+        updateThread.start();
+      }
     });
+
     openSettingsDirectory.setOnAction(event -> {
       // Running Desktop.open() on the JavaFX application thread seems to
       // lock up the application on Linux, so we create a new thread to run that.
@@ -265,6 +278,12 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     LaunchErrorDialog dialog = new LaunchErrorDialog(message);
     dialog.show();
     dialog.toFront();
+  }
+
+  private void updateChannelsList() {
+    releaseChannelBox.getItems().clear();
+    releaseChannelBox.getItems().addAll(settings.releaseChannels);
+    releaseChannelBox.getSelectionModel().select(settings.selectedChannel);
   }
 
   /** Initialize or update the version list. */
