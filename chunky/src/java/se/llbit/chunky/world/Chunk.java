@@ -296,7 +296,7 @@ public class Chunk {
           }
 
           int dataSize = (4096 * bpb) / 64;
-          Tag blockStates = getTagFromNames(section, "Palette", "block_states\\data");
+          Tag blockStates = getTagFromNames(section, "BlockStates", "block_states\\data");
 
           if (blockStates.isLongArray(dataSize)) {
             // since 20w17a, block states are aligned to 64-bit boundaries, so there are 64 % bpb
