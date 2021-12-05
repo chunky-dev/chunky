@@ -28,6 +28,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.world.World;
 import se.llbit.fx.LuxColorPicker;
@@ -51,6 +52,10 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @FXML private DoubleAdjuster waterPlaneHeight;
   @FXML private CheckBox waterPlaneOffsetEnabled;
   @FXML private CheckBox waterPlaneClip;
+  @FXML private CheckBox useProceduralWater;
+  @FXML private IntegerAdjuster proceduralWaterIterations;
+  @FXML private DoubleAdjuster proceduralWaterFrequency;
+  @FXML private DoubleAdjuster proceduralWaterAmplitude;
 
   private RenderControlsFxController renderControls;
   private RenderController controller;
@@ -91,6 +96,11 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterPlaneHeight.set(scene.getWaterPlaneHeight());
     waterPlaneOffsetEnabled.setSelected(scene.isWaterPlaneOffsetEnabled());
     waterPlaneClip.setSelected(scene.getWaterPlaneChunkClip());
+
+    useProceduralWater.setSelected(!scene.getWaterShading().useFixedTexture);
+    proceduralWaterIterations.set(scene.getWaterShading().iterations);
+    proceduralWaterFrequency.set(scene.getWaterShading().baseFrequency);
+    proceduralWaterAmplitude.set(scene.getWaterShading().baseAmplitude);
   }
 
   @Override
@@ -156,8 +166,37 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     );
 
     waterPlaneClip.selectedProperty().addListener((observable, oldValue, newValue) ->
-        scene.setWaterPlaneChunkClip(newValue)
+      scene.setWaterPlaneChunkClip(newValue)
     );
+
+    useProceduralWater.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getWaterShading().useFixedTexture = !newValue;
+      scene.refresh();
+    });
+
+    proceduralWaterIterations.setName("Iterations");
+    proceduralWaterIterations.setTooltip("The number of iterations (layers) of noise used");
+    proceduralWaterIterations.setRange(1, 10);
+    proceduralWaterIterations.onValueChange(iter -> {
+      scene.getWaterShading().iterations = iter;
+      scene.refresh();
+    });
+
+    proceduralWaterFrequency.setName("Frequency");
+    proceduralWaterFrequency.setTooltip("The frequency of the noise");
+    proceduralWaterFrequency.setRange(0, 1);
+    proceduralWaterFrequency.onValueChange(freq -> {
+      scene.getWaterShading().baseFrequency = freq;
+      scene.refresh();
+    });
+
+    proceduralWaterAmplitude.setName("Amplitude");
+    proceduralWaterAmplitude.setTooltip("The amplitude of the noise");
+    proceduralWaterAmplitude.setRange(0, 1);
+    proceduralWaterAmplitude.onValueChange(amp -> {
+      scene.getWaterShading().baseAmplitude = amp;
+      scene.refresh();
+    });
   }
 
 }

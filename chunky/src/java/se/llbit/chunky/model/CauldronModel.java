@@ -412,6 +412,7 @@ public class CauldronModel {
     Quad water = waterLevels[level];
     if (water != null && water.intersect(ray)) {
       if (!stillWater) {
+        // TODO Hook into the more generic water shading?
         WaterModel.doWaterDisplacement(ray);
       } else {
         ray.setNormal(water.n);

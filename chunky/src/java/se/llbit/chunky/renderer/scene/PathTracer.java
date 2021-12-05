@@ -98,7 +98,7 @@ public class PathTracer implements RayTracer {
       if (!scene.stillWater && ray.getNormal().y != 0 &&
           ((currentMat.isWater() && prevMat == Air.INSTANCE)
               || (currentMat == Air.INSTANCE && prevMat.isWater()))) {
-        WaterModel.doWaterDisplacement(ray);
+        scene.getWaterShading().doWaterShading(ray);
         if (currentMat == Air.INSTANCE) {
           ray.invertNormal();
         }
