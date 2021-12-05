@@ -143,9 +143,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
       settings.updateSite = newValue;
       settings.save();
     });
-    resetUpdateSite.setOnAction(event -> {
-      updateSite.setText(LauncherSettings.DEFAULT_UPDATE_SITE);
-    });
+    resetUpdateSite.setOnAction(event -> updateSite.setText(LauncherSettings.DEFAULT_UPDATE_SITE));
     resetUpdateSite.setTooltip(new Tooltip("Reset to default Chunky update site."));
 
     javaRuntime.setText(getConfiguredJre());
@@ -242,7 +240,10 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
       }
     });
 
-    updateLauncher(error -> System.err.printf("Launcher Info Error: %s\n", error), info -> {});
+    updateLauncher(
+        error -> System.err.printf("Launcher Info Error: %s\n", error),
+        info -> Platform.runLater(this::updateChannelsList)
+    );
   }
 
   public void updateLauncher(Consumer<String> errorCallback, Consumer<LauncherInfo> infoCallback) {

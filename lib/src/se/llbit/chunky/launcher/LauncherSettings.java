@@ -116,6 +116,7 @@ public class LauncherSettings {
       }
     }
     int selectedChannelValue = releaseChannelObj.get("selectedChannel").intValue(0);
+    if (selectedChannelValue < 0 || selectedChannelValue >= releaseChannels.size()) selectedChannelValue = 0;
     selectedChannel = releaseChannels.get(selectedChannelValue);
     if (settings.getBool("downloadSnapshots", false)) {
       selectSnapshot();
@@ -159,6 +160,7 @@ public class LauncherSettings {
     settings.removeSetting("downloadSnapshots");
     JsonObject releaseChannelsObject = new JsonObject();
     int selectedChannelValue = releaseChannels.indexOf(selectedChannel);
+    if (selectedChannelValue == -1) selectedChannelValue = 0;
     releaseChannelsObject.set("selectedChannel", new JsonNumber(selectedChannelValue));
     JsonArray releaseChannelsValue = new JsonArray(releaseChannels.size());
     for (ReleaseChannel channel : releaseChannels) {
