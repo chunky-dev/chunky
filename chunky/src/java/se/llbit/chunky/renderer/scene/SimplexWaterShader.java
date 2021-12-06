@@ -16,12 +16,12 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import se.llbit.chunky.model.WaterModel;
+import se.llbit.json.JsonObject;
 import se.llbit.math.Ray;
 import se.llbit.math.SimplexNoise;
 import se.llbit.math.Vector3;
 
-public class WaterShading {
+public class SimplexWaterShader implements WaterShader {
   /*
   Water shading is implemented using fractal noise based on simplex noise
   (superimposed layers of simplex noise with increasing frequency and decreasing amplitude)
@@ -35,15 +35,10 @@ public class WaterShading {
   public double baseFrequency = 0.1; /// frequency of the first iteration, doubles each iteration
   public double baseAmplitude = 0.2; /// amplitude of the first iteration, halves each iteration
   private SimplexNoise noise = new SimplexNoise();
-  public boolean useFixedTexture = false;
 
 
+  @Override
   public void doWaterShading(Ray ray) {
-    if(useFixedTexture) {
-      WaterModel.doWaterDisplacement(ray);
-      return;
-    }
-
     double frequency = baseFrequency;
     double amplitude = baseAmplitude;
 
@@ -66,10 +61,33 @@ public class WaterShading {
     ray.setShadingNormal(normal.x, normal.y, normal.z);
   }
 
-  public void set(WaterShading other) {
-    iterations = other.iterations;
-    baseFrequency = other.baseFrequency;
-    baseAmplitude = other.baseAmplitude;
-    useFixedTexture = other.useFixedTexture;
+  @Override
+  public WaterShader clone() {
+    SimplexWaterShader shader = new SimplexWaterShader();
+    shader.iterations = iterations;
+    shader.baseFrequency = baseFrequency;
+    shader.baseAmplitude = baseAmplitude;
+    return shader;
+  }
+
+  @Override
+  public void save(JsonObject json) {
+    json.add("waterShader", "SIMPLEX");
+    JsonObject params = new JsonObject();
+    params.add("iterations", iterations);
+    params.add("frequency", baseFrequency);
+    params.add("amplitude", baseAmplitude);
+    json.add("simplexWaterShader", params);
+  }
+
+  @Override
+  public void load(JsonObject json) {
+    JsonObject params = json.get("simplexWaterShader").asObject();
+    if(params == null)
+      return;
+
+    iterations = params.get("iterations").intValue(4);
+    baseFrequency = params.get("frequency").doubleValue(0.1);
+    baseAmplitude = params.get("amplitude").doubleValue(0.2);
   }
 }
