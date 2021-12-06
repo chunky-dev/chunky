@@ -48,6 +48,8 @@ public class CreditsController implements Initializable {
   @FXML private Hyperlink fastMathLicense;
   @FXML private Hyperlink fastutil;
   @FXML private Hyperlink fastutilLicense;
+  @FXML private Hyperlink simplexnoise;
+  @FXML private Hyperlink simplexnoiseLicense;
 
   @FXML private VBox pluginBox;
   @FXML private ImageView logoImage;
@@ -114,6 +116,11 @@ public class CreditsController implements Initializable {
     fastutil.setOnAction(e -> launchAndReset(fastutil, "https://fastutil.di.unimi.it/"));
     fastutilLicense.setBorder(Border.EMPTY);
     fastutilLicense.setOnAction(e -> launchAndReset(fastutilLicense, "http://www.apache.org/licenses/LICENSE-2.0"));
+
+    simplexnoise.setBorder(Border.EMPTY);
+    simplexnoise.setOnAction(e -> launchAndReset(fastutil, "https://github.com/keijiro/sketches2016/blob/master/Simplex2/SimplexNoise.java"));
+    simplexnoiseLicense.setBorder(Border.EMPTY);
+    simplexnoiseLicense.setOnAction(e -> launchAndReset(fastutilLicense, "http://unlicense.org/"));
 
     if (plugins.size() > 0) {
       plugins.forEach((key, item) -> pluginBox.getChildren().addAll(buildBox(item)));
