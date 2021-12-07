@@ -413,7 +413,7 @@ public class CauldronModel {
     Quad water = waterLevels[level];
     if (water != null && water.intersect(ray)) {
       if (!scene.stillWaterEnabled()) {
-        scene.getWaterShading().doWaterShading(ray);
+        scene.getWaterShading().doWaterShading(ray, scene.getAnimationTime());
       } else {
         ray.setNormal(water.n);
       }

@@ -44,6 +44,7 @@
           <IntegerAdjuster fx:id="proceduralWaterIterations" />
           <DoubleAdjuster fx:id="proceduralWaterFrequency" />
           <DoubleAdjuster fx:id="proceduralWaterAmplitude" />
+          <DoubleAdjuster fx:id="proceduralWaterAnimationSpeed" />
         </VBox>
       </TitledPane>
     </children>

@@ -34,153 +34,239 @@ public final class SimplexNoise
   // The derivative from the last calculation
   public float ddx;
   public float ddy;
+  public float ddz;
 
-  // 2D simplex noise
-  public final float calculate(float x, float y)
+  // 3D simplex noise
+  public final float calculate(float x, float y, float z)
   {
-    // Skewing factors for 2D simplex grid:
-    // F2 = 0.5*(sqrt(3.0)-1.0)
-    // G2 = (3.0-Math.sqrt(3.0))/6.0
-    final float F2 = 0.366025403f;
-    final float G2 = 0.211324865f;
+    // Skewing factors for 3D simplex grid:
+    // F3 = 1/3
+    // G3 = 1/6
+    final float F3 = 1.0f / 3;
+    final float G3 = 1.0f / 6;
 
-    float n0, n1, n2; // Noise contributions from the three simplex corners
-    float gx0, gy0, gx1, gy1, gx2, gy2; // Gradients at simplex corners
+    float n0, n1, n2, n3; // Noise contributions from the four simplex corners
+    float gx0, gy0, gz0; // Gradients at simplex corners
+    float gx1, gy1, gz1;
+    float gx2, gy2, gz2;
+    float gx3, gy3, gz3;
 
     // Skew the input space to determine which simplex cell we're in
-    float s = (x + y) * F2; // Hairy factor for 2D
+    float s = (x + y + z) * F3; // Very nice and simple skew factor for 3D
     float xs = x + s;
     float ys = y + s;
+    float zs = z + s;
     int i = (int)Math.floor(xs);
     int j = (int)Math.floor(ys);
+    int k = (int)Math.floor(zs);
 
-    float t = (float)(i + j) * G2;
-    float X0 = i - t; // Unskew the cell origin back to (x,y) space
+    float t = (i + j + k) * G3;
+    float X0 = i - t; // Unskew the cell origin back to (x,y,z) space
     float Y0 = j - t;
-    float x0 = x - X0; // The x,y distances from the cell origin
+    float Z0 = k - t;
+    float x0 = x - X0; // The x,y,z distances from the cell origin
     float y0 = y - Y0;
+    float z0 = z - Z0;
 
-    // For the 2D case, the simplex shape is an equilateral triangle.
+    // For the 3D case, the simplex shape is a slightly irregular tetrahedron.
     // Determine which simplex we are in.
-    int i1, j1; // Offsets for second (middle) corner of simplex in (i,j) coords
-    if (x0 > y0)
+    int i1, j1, k1; // Offsets for second corner of simplex in (i,j,k) coords
+    int i2, j2, k2; // Offsets for third corner of simplex in (i,j,k) coords
+
+    if (x0 >= y0)
     {
-      // lower triangle, XY order: (0,0)->(1,0)->(1,1)
-      i1 = 1;
-      j1 = 0;
+      if (y0 >= z0)
+      {
+        i1=1; j1=0; k1=0; i2=1; j2=1; k2=0; // X Y Z order
+      }
+      else if (x0 >= z0)
+      {
+        i1=1; j1=0; k1=0; i2=1; j2=0; k2=1; // X Z Y order
+      }
+      else
+      {
+        i1=0; j1=0; k1=1; i2=1; j2=0; k2=1; // Z X Y order
+      }
     }
-    else
+    else // x0 < y0
     {
-      // upper triangle, YX order: (0,0)->(0,1)->(1,1)
-      i1 = 0;
-      j1 = 1;
+      if (y0 < z0)
+      {
+        i1=0; j1=0; k1=1; i2=0; j2=1; k2=1; // Z Y X order
+      }
+      else if (x0 < z0)
+      {
+        i1=0; j1=1; k1=0; i2=0; j2=1; k2=1; // Y Z X order
+      }
+      else
+      {
+        i1=0; j1=1; k1=0; i2=1; j2=1; k2=0; // Y X Z order
+      }
     }
 
-    // A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
-    // a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
-    // c = (3-sqrt(3))/6
-    float x1 = x0 - i1 + G2; // Offsets for middle corner in (x,y) unskewed coords
-    float y1 = y0 - j1 + G2;
-    float x2 = x0 - 1 + 2 * G2; // Offsets for last corner in (x,y) unskewed coords
-    float y2 = y0 - 1 + 2 * G2;
+    // A step of (1,0,0) in (i,j,k) means a step of (1-c,-c,-c) in (x,y,z),
+    // a step of (0,1,0) in (i,j,k) means a step of (-c,1-c,-c) in (x,y,z), and
+    // a step of (0,0,1) in (i,j,k) means a step of (-c,-c,1-c) in (x,y,z), where
+    // c = 1/6.
+    float x1 = x0 - i1 + G3; // Offsets for second corner in (x,y,z) coords
+    float y1 = y0 - j1 + G3;
+    float z1 = z0 - k1 + G3;
+    float x2 = x0 - i2 + 2 * G3; // Offsets for third corner in (x,y,z) coords
+    float y2 = y0 - j2 + 2 * G3;
+    float z2 = z0 - k2 + 2 * G3;
+    float x3 = x0 - 1 + 3 * G3; // Offsets for last corner in (x,y,z) coords
+    float y3 = y0 - 1 + 3 * G3;
+    float z3 = z0 - 1 + 3 * G3;
 
     // Wrap the integer indices at 256, to avoid indexing perm[] out of bounds
     int ii = i & 0xff;
     int jj = j & 0xff;
+    int kk = k & 0xff;
 
-    // Calculate the contribution from the three corners
-    float t0 = 0.5f - x0 * x0 - y0 * y0;
+    // Calculate the contribution from the four corners
+    float t0 = 0.6f - x0 * x0 - y0 * y0 - z0 * z0;
     float t20, t40;
     if (t0 < 0)
-      t40 = t20 = t0 = n0 = gx0 = gy0 = 0; // No influence
+      t40 = t20 = t0 = n0 = gx0 = gy0 = gz0 = 0; // No influence
     else
     {
-      int gi = perm[ii + perm[jj]];
-      gx0 = grad2x(gi);
-      gy0 = grad2y(gi);
+      int gi = perm[ii + perm[jj + perm[kk]]];
+      gx0 = grad3x(gi);
+      gy0 = grad3y(gi);
+      gz0 = grad3z(gi);
       t20 = t0 * t0;
       t40 = t20 * t20;
-      n0 = t40 * (gx0 * x0 + gy0 * y0);
+      n0 = t40 * (gx0 * x0 + gy0 * y0 + gz0 * z0);
     }
 
-    float t1 = 0.5f - x1 * x1 - y1 * y1;
+    float t1 = 0.6f - x1 * x1 - y1 * y1 - z1 * z1;
     float t21, t41;
     if (t1 < 0)
-      t21 = t41 = t1 = n1 = gx1 = gy1 = 0; // No influence
+      t41 = t21 = t1 = n1 = gx1 = gy1 = gz1 = 0; // No influence
     else
     {
-      int gi = perm[ii + i1 + perm[jj + j1]];
-      gx1 = grad2x(gi);
-      gy1 = grad2y(gi);
+      int gi = perm[ii + i1 + perm[jj + j1 + perm[kk + k1]]];
+      gx1 = grad3x(gi);
+      gy1 = grad3y(gi);
+      gz1 = grad3z(gi);
       t21 = t1 * t1;
       t41 = t21 * t21;
-      n1 = t41 * (gx1 * x1 + gy1 * y1);
+      n1 = t41 * (gx1 * x1 + gy1 * y1 + gz1 * z1);
     }
 
-    float t2 = 0.5f - x2 * x2 - y2 * y2;
+    float t2 = 0.6f - x2 * x2 - y2 * y2 - z2 * z2;
     float t22, t42;
     if (t2 < 0)
-      t42 = t22 = t2 = n2 = gx2 = gy2 = 0; // No influence
+      t42 = t22 = t2 = n2 = gx2 = gy2 = gz2 = 0; // No influence
     else
     {
-      int gi = perm[ii + 1 + perm[jj + 1]];
-      gx2 = grad2x(gi);
-      gy2 = grad2y(gi);
+      int gi = perm[ii + i2 + perm[jj + j2 + perm[kk + k2]]];
+      gx2 = grad3x(gi);
+      gy2 = grad3y(gi);
+      gz2 = grad3z(gi);
       t22 = t2 * t2;
       t42 = t22 * t22;
-      n2 = t42 * (gx2 * x2 + gy2 * y2);
+      n2 = t42 * (gx2 * x2 + gy2 * y2 + gz2 * z2);
+    }
+
+    float t3 = 0.6f - x3 * x3 - y3 * y3 - z3 * z3;
+    float t23, t43;
+    if (t3 < 0)
+      t43 = t23 = t3 = n3 = gx3 = gy3 = gz3 = 0; // No influence
+    else
+    {
+      int gi = perm[ii + 1 + perm[jj + 1 + perm[kk + 1]]];
+      gx3 = grad3x(gi);
+      gy3 = grad3y(gi);
+      gz3 = grad3z(gi);
+      t23 = t3 * t3;
+      t43 = t23 * t23;
+      n3 = t43 * (gx3 * x3 + gy3 * y3 + gz3 * z3);
     }
 
     // Add contributions from each corner to get the final noise value.
     // The result is scaled to return values in the interval [-1, 1].
-    value = 40 * (n0 + n1 + n2);
+    value = 28 * (n0 + n1 + n2 + n3);
 
     // Compute derivative.
     // A straight, unoptimised calculation would be like:
-    //   ddx  = -8 * t20 * t0 * x0 * (gx0 * x0 + gy0 * y0) + t40 * gx0;
-    //   ddy  = -8 * t20 * t0 * y0 * (gx0 * x0 + gy0 * y0) + t40 * gy0;
-    //   ddx += -8 * t21 * t1 * x1 * (gx1 * x1 + gy1 * y1) + t41 * gx1;
-    //   ddy += -8 * t21 * t1 * y1 * (gx1 * x1 + gy1 * y1) + t41 * gy1;
-    //   ddx += -8 * t22 * t2 * x2 * (gx2 * x2 + gy2 * y2) + t42 * gx2;
-    //   ddy += -8 * t22 * t2 * y2 * (gx2 * x2 + gy2 * y2) + t42 * gy2;
-    float temp0 = t20 * t0 * (gx0 * x0 + gy0 * y0);
+    //   ddx  = -8 * t20 * t0 * x0 * dot(gx0, gy0, gz0, x0, y0, z0) + t40 * gx0;
+    //   ddy  = -8 * t20 * t0 * y0 * dot(gx0, gy0, gz0, x0, y0, z0) + t40 * gy0;
+    //   ddz  = -8 * t20 * t0 * z0 * dot(gx0, gy0, gz0, x0, y0, z0) + t40 * gz0;
+    //   ddx += -8 * t21 * t1 * x1 * dot(gx1, gy1, gz1, x1, y1, z1) + t41 * gx1;
+    //   ddy += -8 * t21 * t1 * y1 * dot(gx1, gy1, gz1, x1, y1, z1) + t41 * gy1;
+    //   ddz += -8 * t21 * t1 * z1 * dot(gx1, gy1, gz1, x1, y1, z1) + t41 * gz1;
+    //   ddx += -8 * t22 * t2 * x2 * dot(gx2, gy2, gz2, x2, y2, z2) + t42 * gx2;
+    //   ddy += -8 * t22 * t2 * y2 * dot(gx2, gy2, gz2, x2, y2, z2) + t42 * gy2;
+    //   ddz += -8 * t22 * t2 * z2 * dot(gx2, gy2, gz2, x2, y2, z2) + t42 * gz2;
+    //   ddx += -8 * t23 * t3 * x3 * dot(gx3, gy3, gz3, x3, y3, z3) + t43 * gx3;
+    //   ddy += -8 * t23 * t3 * y3 * dot(gx3, gy3, gz3, x3, y3, z3) + t43 * gy3;
+    //   ddz += -8 * t23 * t3 * z3 * dot(gx3, gy3, gz3, x3, y3, z3) + t43 * gz3;
+    float temp0 = t20 * t0 * (gx0 * x0 + gy0 * y0 + gz0 * z0);
     ddx = temp0 * x0;
     ddy = temp0 * y0;
+    ddz = temp0 * z0;
 
-    float temp1 = t21 * t1 * (gx1 * x1 + gy1 * y1);
+    float temp1 = t21 * t1 * (gx1 * x1 + gy1 * y1 + gz1 * z1);
     ddx += temp1 * x1;
     ddy += temp1 * y1;
+    ddz += temp1 * z1;
 
-    float temp2 = t22 * t2 * (gx2 * x2 + gy2 * y2);
+    float temp2 = t22 * t2 * (gx2 * x2 + gy2 * y2 + gz2 * z2);
     ddx += temp2 * x2;
     ddy += temp2 * y2;
+    ddz += temp2 * z2;
+
+    float temp3 = t23 * t3 * (gx3 * x3 + gy3 * y3 + gz3 * z3);
+    ddx += temp3 * x3;
+    ddy += temp3 * y3;
+    ddz += temp3 * z3;
+
     ddx *= -8;
     ddy *= -8;
-    ddx += t40 * gx0 + t41 * gx1 + t42 * gx2;
-    ddy += t40 * gy0 + t41 * gy1 + t42 * gy2;
-    ddx *= 40; // Scale derivative to match the noise scaling
-    ddy *= 40;
+    ddz *= -8;
+
+    ddx += t40 * gx0 + t41 * gx1 + t42 * gx2 + t43 * gx3;
+    ddy += t40 * gy0 + t41 * gy1 + t42 * gy2 + t43 * gy3;
+    ddz += t40 * gz0 + t41 * gz1 + t42 * gz2 + t43 * gz3;
+
+    ddx *= 28; // Scale derivative to match the noise scaling
+    ddy *= 28;
+    ddz *= 28;
 
     return value;
   }
 
   // Helper functions to compute gradients in 1D to 4D
   // and gradients-dot-residualvectors in 2D to 4D.
-  static float grad2x(int hash)
+  static final float grad3x(int hash)
   {
-    return grad2lut[hash & 7][0];
+    return grad3lut[hash & 15][0];
   }
 
-  static final float grad2y(int hash)
+  static final float grad3y(int hash)
   {
-    return grad2lut[hash & 7][1];
+    return grad3lut[hash & 15][1];
   }
 
-  // Gradient tables. These could be programmed the Ken Perlin way with
-  // some clever bit-twiddling, but this is more clear, and not really slower.
-  static final float [][] grad2lut =
+  static final float grad3z(int hash)
+  {
+    return grad3lut[hash & 15][2];
+  }
+
+  // Gradient directions for 3D.
+  // These vectors are based on the midpoints of the 12 edges of a cube.
+  // A larger array of random unit length vectors would also do the job,
+  // but these 12 (including 4 repeats to make the array length a power
+  // of two) work better. They are not random, they are carefully chosen
+  // to represent a small, isotropic set of directions.
+  static final float [][] grad3lut =
           {
-                  {-1, -1}, {1, 0}, {-1, 0}, {1, 1}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}
+                  { 1, 0, 1 }, { 0, 1, 1 }, {-1, 0, 1 }, // 12 cube edges
+                  { 0,-1, 1 }, { 1, 0,-1 }, { 0, 1,-1 },
+                  {-1, 0,-1 }, { 0,-1,-1 }, { 1,-1, 0 },
+                  { 1, 1, 0 }, {-1, 1, 0 }, {-1,-1, 0 },
+                  { 1, 0, 1 }, {-1, 0, 1 }, { 0, 1,-1 }, { 0,-1,-1 } // 4 repeats to make 16
           };
 
   // Permutation table. This is just a random jumble of all numbers 0-255,

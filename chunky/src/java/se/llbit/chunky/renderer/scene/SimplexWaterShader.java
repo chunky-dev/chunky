@@ -25,20 +25,21 @@ public class SimplexWaterShader implements WaterShader {
   /*
   Water shading is implemented using fractal noise based on simplex noise
   (superimposed layers of simplex noise with increasing frequency and decreasing amplitude)
-  This 2D noise function gives the height of the water for a given x and z,
+  This 3D noise function gives the height of the water for a given x, z and t,
   what we are really interested in are the partial derivatives of that function
-  as they us the slope along x and z, and the normal is simply the cross product
-  of the slop along x and the slope along z.
+  with respect to x and z as they give us the slope along x and z,
+  and the normal is simply the cross product of the slope along x and the slope along z.
    */
 
   public int iterations = 4; /// Number of iteration of the fractal noise
   public double baseFrequency = 0.1; /// frequency of the first iteration, doubles each iteration
   public double baseAmplitude = 0.2; /// amplitude of the first iteration, halves each iteration
-  private SimplexNoise noise = new SimplexNoise();
+  public double animationSpeed = 1; /// animation speed
+  private final SimplexNoise noise = new SimplexNoise();
 
 
   @Override
-  public void doWaterShading(Ray ray) {
+  public void doWaterShading(Ray ray, double animationTime) {
     double frequency = baseFrequency;
     double amplitude = baseAmplitude;
 
@@ -46,7 +47,7 @@ public class SimplexWaterShader implements WaterShader {
     double ddz = 0;
 
     for(int i = 0; i < iterations; ++i) {
-      noise.calculate((float)(ray.o.x * frequency), (float)(ray.o.z * frequency));
+      noise.calculate((float)(ray.o.x * frequency), (float)(ray.o.z * frequency), (float)(animationTime * animationSpeed));
       ddx += - amplitude * noise.ddx;
       ddz += - amplitude * noise.ddy;
 
@@ -67,6 +68,7 @@ public class SimplexWaterShader implements WaterShader {
     shader.iterations = iterations;
     shader.baseFrequency = baseFrequency;
     shader.baseAmplitude = baseAmplitude;
+    shader.animationSpeed = animationSpeed;
     return shader;
   }
 
@@ -77,6 +79,7 @@ public class SimplexWaterShader implements WaterShader {
     params.add("iterations", iterations);
     params.add("frequency", baseFrequency);
     params.add("amplitude", baseAmplitude);
+    params.add("animationSpeed", animationSpeed);
     json.add("simplexWaterShader", params);
   }
 
@@ -89,5 +92,6 @@ public class SimplexWaterShader implements WaterShader {
     iterations = params.get("iterations").intValue(4);
     baseFrequency = params.get("frequency").doubleValue(0.1);
     baseAmplitude = params.get("amplitude").doubleValue(0.2);
+    animationSpeed = params.get("animationSpeed").doubleValue(1);
   }
 }

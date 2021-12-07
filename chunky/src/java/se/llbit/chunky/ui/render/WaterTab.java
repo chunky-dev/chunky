@@ -59,6 +59,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @FXML private IntegerAdjuster proceduralWaterIterations;
   @FXML private DoubleAdjuster proceduralWaterFrequency;
   @FXML private DoubleAdjuster proceduralWaterAmplitude;
+  @FXML private DoubleAdjuster proceduralWaterAnimationSpeed;
   @FXML private TitledPane proceduralWaterDetailsPane;
 
   private RenderControlsFxController renderControls;
@@ -107,11 +108,13 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       proceduralWaterIterations.set(simplexWaterShader.iterations);
       proceduralWaterFrequency.set(simplexWaterShader.baseFrequency);
       proceduralWaterAmplitude.set(simplexWaterShader.baseAmplitude);
+      proceduralWaterAnimationSpeed.set(simplexWaterShader.animationSpeed);
     } else {
       useProceduralWater.setSelected(false);
       proceduralWaterIterations.set(4);
       proceduralWaterFrequency.set(0.1);
       proceduralWaterAmplitude.set(0.2);
+      proceduralWaterAnimationSpeed.set(1);
     }
   }
 
@@ -188,6 +191,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
         shader.iterations = proceduralWaterIterations.get();
         shader.baseFrequency = proceduralWaterFrequency.get();
         shader.baseAmplitude = proceduralWaterAmplitude.get();
+        shader.animationSpeed = proceduralWaterAnimationSpeed.get();
         scene.refresh();
       } else if(!newValue && scene.getWaterShading() instanceof SimplexWaterShader) {
         scene.setWaterShading(new LegacyWaterShader());
@@ -226,6 +230,19 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       WaterShader shader = scene.getWaterShading();
       if(shader instanceof SimplexWaterShader) {
         ((SimplexWaterShader) shader).baseAmplitude = amp;
+        scene.refresh();
+      }
+      scene.refresh();
+    });
+
+    proceduralWaterAnimationSpeed.setName("Animation speed");
+    proceduralWaterAnimationSpeed.setTooltip("Animation speed of the water. "
+            + " Only relevant when rendering animation by varying animation time.");
+    proceduralWaterAnimationSpeed.setRange(0, 10);
+    proceduralWaterAnimationSpeed.onValueChange(speed -> {
+      WaterShader shader = scene.getWaterShading();
+      if(shader instanceof SimplexWaterShader) {
+        ((SimplexWaterShader) shader).animationSpeed = speed;
         scene.refresh();
       }
       scene.refresh();

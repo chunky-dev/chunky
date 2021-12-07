@@ -22,7 +22,7 @@ import se.llbit.math.Ray;
 
 public class LegacyWaterShader implements WaterShader {
   @Override
-  public void doWaterShading(Ray ray) {
+  public void doWaterShading(Ray ray, double animationTime) {
     WaterModel.doWaterDisplacement(ray);
   }
 

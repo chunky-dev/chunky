@@ -20,7 +20,7 @@ import se.llbit.json.JsonObject;
 import se.llbit.math.Ray;
 
 public interface WaterShader {
-  void doWaterShading(Ray ray);
+  void doWaterShading(Ray ray, double animationTime);
 
   WaterShader clone();
   void save(JsonObject json);
