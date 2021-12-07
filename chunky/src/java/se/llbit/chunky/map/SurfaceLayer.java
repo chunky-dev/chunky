@@ -27,7 +27,8 @@ import se.llbit.chunky.block.Vine;
 import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
-import se.llbit.chunky.world.Biomes;
+import se.llbit.chunky.world.biome.Biome;
+import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Heightmap;
@@ -50,7 +51,7 @@ public class SurfaceLayer extends BitmapLayer {
    * @param dim current dimension
    * @param chunkData data for the chunk
    */
-  public SurfaceLayer(int dim, ChunkData chunkData, BlockPalette palette, int yMin, int yMax, int[] heightmapData) {
+  public SurfaceLayer(int dim, ChunkData chunkData, BlockPalette palette, BiomePalette biomePalette, int yMin, int yMax, int[] heightmapData) {
     bitmap = new int[Chunk.X_MAX * Chunk.Z_MAX];
     topo = new int[Chunk.X_MAX * Chunk.Z_MAX];
     for (int x = 0; x < Chunk.X_MAX; ++x) {
@@ -87,16 +88,16 @@ public class SurfaceLayer extends BitmapLayer {
           }
           float[] blockColor = new float[4];
           ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
-          int biomeId = 0xFF & chunkData.getBiomeAt(x, 0, z);
+          Biome biome = biomePalette.get(chunkData.getBiomeAt(x, 0, z) & 0xff);
 
           if (block instanceof Leaves) {
-            ColorUtil.getRGBComponents(Biomes.getFoliageColor(biomeId), blockColor);
+            ColorUtil.getRGBComponents(biome.foliageColor, blockColor);
             blockColor[3] = 1.f;// foliage colors don't include alpha
             y -= 1;
           } else if (block instanceof GrassBlock || block instanceof Grass
               || block instanceof TallGrass
               || block instanceof Vine) {
-            ColorUtil.getRGBComponents(Biomes.getGrassColor(biomeId), blockColor);
+            ColorUtil.getRGBComponents(biome.grassColor, blockColor);
             blockColor[3] = 1.f;// grass colors don't include alpha
 
             y -= 1;
@@ -121,7 +122,7 @@ public class SurfaceLayer extends BitmapLayer {
               depth += 1;
             }
 
-            ColorUtil.getRGBAComponents(Biomes.getWaterColor(biomeId), blockColor);
+            ColorUtil.getRGBAComponents(biome.waterColor, blockColor);
             blockColor[3] = QuickMath.max(.5f, 1.f - depth / 32.f);
           } else {
             if (block.opaque && y > World.SEA_LEVEL+1) {

@@ -6,6 +6,9 @@ import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.SurfaceLayer;
+import se.llbit.chunky.world.biome.ArrayBiomePalette;
+import se.llbit.chunky.world.biome.BiomePalette;
+import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.chunky.world.region.ImposterCubicRegion;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
@@ -87,6 +90,8 @@ public class ImposterCubicChunk extends Chunk {
 
     Heightmap heightmap = world.heightmap();
     BlockPalette palette = new BlockPalette();
+    BiomePalette biomePalette = new ArrayBiomePalette();
+    biomePalette.put(Biomes.biomes[0]); //We don't currently support cubic chunks biomes, and so default to ocean
 
     for (Map.Entry<Integer, Map<String, Tag>> entry : data.entrySet()) {
       Integer yPos = entry.getKey();
@@ -104,7 +109,7 @@ public class ImposterCubicChunk extends Chunk {
 
     int[] heightmapData = extractHeightmapDataCubic(null, chunkData);
     updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
-    surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, yMin, yMax, heightmapData);
+    surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
   }
 
   private int[] extractHeightmapDataCubic(Map<String, Tag> cubeData, ChunkData chunkData) {
@@ -154,7 +159,8 @@ public class ImposterCubicChunk extends Chunk {
     }
   }
 
-  public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette, int minY, int maxY) {
+  @Override
+  public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette, BiomePalette biomePalette, int minY, int maxY) {
     Set<String> request = new HashSet<>();
     request.add(DATAVERSION);
     request.add(LEVEL_SECTIONS);
@@ -184,6 +190,8 @@ public class ImposterCubicChunk extends Chunk {
 //      if (biomesTag.isByteArray(X_MAX * Z_MAX) || biomesTag.isIntArray(X_MAX * Z_MAX)) {
 //        extractBiomeData(biomesTag, reuseChunkData);
 //      }
+
+      biomePalette.put(Biomes.biomes[0]); //We don't currently support cubic chunks biomes, and so default to ocean
 
       if (sections.isList()) {
         loadBlockDataCubic(yPos, cubeData, reuseChunkData, palette, minY, maxY);
