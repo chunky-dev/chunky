@@ -322,7 +322,7 @@ public class Chunk {
           }
         }
       }
-      // TODO add support for different biomes in the same XZ coordinate (i.e. for the nether)
+      // TODO add support for different biomes in the same XZ coordinate
     } else if (biomesTag.isIntArray(X_MAX * Z_MAX)) {
       // Since Minecraft 1.13, biome IDs are stored in an int vector with 256 entries (one for each XZ position).
       int[] data = biomesTag.intArray();
