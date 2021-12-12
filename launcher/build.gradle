@@ -1,8 +1,10 @@
 dependencies {
+  implementation configurations.jsonlib
+  implementation project(':lib')
 }
 
 sourceSets.main {
-  java.srcDir 'src/java'
+  java.srcDir 'src'
   resources {
     srcDir 'src'
     include '**/*.png'

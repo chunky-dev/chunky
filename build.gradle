@@ -74,15 +74,15 @@ task versionInfo(type: JavaExec) {
   outputs.files file("build/chunky-${project.version}.jar")
   description 'Writes build/chunky-VERSION.jar, latest.json and updates chunky-core-VERSION.jar/version.json'
   classpath = project(':releasetools').sourceSets.main.runtimeClasspath
-  main = 'releasetools.ReleaseBuilder'
+  mainClass.set('releasetools.ReleaseBuilder')
   args "${project.version}", "release_notes-${project.version}.txt"
 }
 
 task releaseJar(type: Jar) {
   dependsOn 'versionInfo'
 
-  archiveName = "chunky-${project.version}.jar"
-  destinationDir = file('build')
+  archiveFileName = "chunky-${project.version}.jar"
+  destinationDirectory = file('build')
   manifest {
     attributes('Main-Class': 'se.llbit.chunky.launcher.ChunkyLauncher')
   }
@@ -97,41 +97,45 @@ task releaseJar(type: Jar) {
     from file("build/chunky-core-${project.version}.jar")
   }
 
-  from { project(':launcher').configurations.runtime.allArtifacts.files.collect { zipTree(it) } }
+  from {
+    project(':launcher').configurations.archives.allArtifacts.files.collect {
+      zipTree(it)
+    }
+  }
 }
 
-//task releaseZip(type: Zip) {
-//  dependsOn 'copyArtifacts'
-//
-//  destinationDir = buildDir
-//  archiveName = "Chunky-${project.version}.zip"
-//
-//  from(buildDir) {
-//    include "chunky-${project.version}.jar"
-//    include "ReadMe.html"
-//    include "release_notes-${project.version}.txt"
-//  }
-//  from(projectDir) {
-//    include 'license/*'
-//  }
-//  rename("release_notes-${project.version}.jar", 'chunky.jar')
-//}
+task releaseZip(type: Zip) {
+  dependsOn 'copyArtifacts'
 
-//task documentation {
-//  inputs.files 'README.md'
-//  outputs.files 'build/ReadMe.html'
-//
-//  doLast {
-//    def readme = tryCommand([ 'perl', file('tools/Markdown.pl').path, file('README.md').path ], true)
-//    file('build/ReadMe.html').write(readme)
-//  }
-//}
+  destinationDirectory = buildDir
+  archiveFileName = "Chunky-${project.version}.zip"
 
-//task copyArtifacts(type: Copy) {
-//  dependsOn subprojects.jar
-//  from subprojects.jar
-//  into buildDir
-//}
+  from(buildDir) {
+    include "chunky-${project.version}.jar"
+    include "ReadMe.html"
+    include "release_notes-${project.version}.txt"
+  }
+  from(projectDir) {
+    include 'license/*'
+  }
+  rename("release_notes-${project.version}.jar", 'chunky.jar')
+}
+
+task documentation {
+  inputs.files 'README.md'
+  outputs.files 'build/ReadMe.html'
+
+  doLast {
+    def readme = tryCommand([ 'perl', file('tools/Markdown.pl').path, file('README.md').path ], true)
+    file('build/ReadMe.html').write(readme)
+  }
+}
+
+task copyArtifacts(type: Copy) {
+  dependsOn subprojects.jar
+  from subprojects.jar
+  into buildDir
+}
 
 /** Helper function to run a command. Returns the command output if the command succeeded. */
 def tryCommand(def command, boolean failOnError = false) {
@@ -191,7 +195,7 @@ def getVersion() {
   return majorVersion + "-" + prerelease + "." + preVersion
 }
 
-//task install(dependsOn: ':chunky:install')
+task install(dependsOn: ':chunky:install')
 
 // Includes both main and library documentation:
 task docs(type: Javadoc) {
