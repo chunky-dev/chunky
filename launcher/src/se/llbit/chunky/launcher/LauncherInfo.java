@@ -16,11 +16,11 @@
  */
 package se.llbit.chunky.launcher;
 
+import com.vdurmont.semver4j.Semver;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
-import se.llbit.util.SemanticVersion;
 import se.llbit.util.Util;
 
 import java.io.InvalidObjectException;
@@ -34,13 +34,13 @@ public class LauncherInfo {
     public final String path;
 
     public final Date date;
-    public final SemanticVersion version;
+    public final Semver version;
 
     public final ArrayList<ReleaseChannel> channels = new ArrayList<>();
 
     public LauncherInfo(JsonObject obj) {
         name = obj.get("name").stringValue("");
-        version = new SemanticVersion(name);
+        version = new Semver(name);
         timestamp = obj.get("timestamp").stringValue("");
         notes = obj.get("notes").stringValue("");
         path = obj.get("path").stringValue("ChunkyLauncher.jar");

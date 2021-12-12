@@ -133,6 +133,16 @@
                                        <Insets left="20.0" />
                                     </padding>
                                  </Hyperlink>
+
+                                 <Hyperlink fx:id="semver4j" text="semver4j"/>
+                                 <Hyperlink fx:id="semver4jLicense" text="MIT License">
+                                    <font>
+                                       <Font size="10.0" />
+                                    </font>
+                                    <padding>
+                                       <Insets left="20.0" />
+                                    </padding>
+                                 </Hyperlink>
                               </children>
                               <padding>
                                  <Insets left="10.0" />

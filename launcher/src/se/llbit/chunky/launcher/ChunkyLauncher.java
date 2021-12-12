@@ -17,13 +17,13 @@
  */
 package se.llbit.chunky.launcher;
 
+import com.vdurmont.semver4j.Semver;
 import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.ui.ChunkyLauncherFx;
 import se.llbit.chunky.launcher.ui.DebugConsole;
 import se.llbit.chunky.launcher.ui.FirstTimeSetupDialog;
 import se.llbit.chunky.resources.SettingsDirectory;
-import se.llbit.util.SemanticVersion;
 
 import javax.swing.*;
 import java.awt.*;
@@ -60,7 +60,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ChunkyLauncher {
 
-  public static final SemanticVersion LAUNCHER_VERSION = new SemanticVersion("1.13.0");
+  public static final Semver LAUNCHER_VERSION = new Semver("1.13.0");
   public static final int LAUNCHER_SETTINGS_REVISION = 1;
 
   /**
