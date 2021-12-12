@@ -1,10 +1,5 @@
 project.version = getVersion()
-
 println "Building version ${project.version}"
-if (project.version =~ /\d+\.\d+(\.\d+)?-.+/) {
-  // This is a SNAPSHOT build.
-  println 'Building snapshot version.'
-}
 
 allprojects {
   repositories {
@@ -13,25 +8,41 @@ allprojects {
   }
 }
 
-apply plugin: 'idea'
+buildscript {
+  repositories {
+    maven {
+      setUrl("https://plugins.gradle.org/m2/")
+    }
+  }
+  dependencies {
+    classpath 'org.openjfx:javafx-plugin:0.0.10'
+  }
+}
 
 subprojects {
-
   apply plugin: 'java'
   apply plugin: 'jacoco'
+  apply plugin: 'org.openjfx.javafxplugin'
 
   group = 'se.llbit'
   version = rootProject.version
+
+  sourceCompatibility = '1.8'
+  targetCompatibility = '1.8'
+
+  compileJava.options.encoding = 'UTF-8'
+  compileJava.options.debug = true
+
+  javafx {
+    version = '11'
+    modules = ['javafx.base', 'javafx.controls', 'javafx.fxml']
+    configuration = 'implementation'
+  }
 
   javadoc {
     options.encoding = 'UTF-8'
     options.addStringOption('Xdoclint:none', '-quiet')
   }
-
-  sourceCompatibility = targetCompatibility = '1.8'
-
-  compileJava.options.encoding = 'UTF-8'
-  compileJava.options.debug = true
 
   configurations {
     jsonlib
@@ -41,40 +52,21 @@ subprojects {
   }
 
   dependencies {
-    compile configurations.jsonlib
     jsonlib 'se.llbit:jo-json:1.3.1'
     nbtlib 'se.llbit:jo-nbt:1.3.0'
     cplib 'se.llbit:luxcp:1.0.1'
     toolpanelib 'se.llbit:toolpane:0.1'
   }
-
-  // Code coverage with Jacoco:
-  jacocoTestReport {
-    reports {
-      xml.enabled = true
-      html.enabled = true
-    }
-  }
-
-  check.dependsOn jacocoTestReport
 }
 
 defaultTasks 'releaseJar'
 
-task tarball(type: Exec) {
-  // TODO(jesper): Prepend cmd /c on Windows?
-  commandLine "git archive --prefix=\"chunky-${project.version}\" -o build/chunky-${project.version}.tar.gz master".split(' ')
-  doFirst {
-    file('build').mkdir()
-  }
-}
-
-task release {
-  doLast {
-    tryCommand([ 'git', 'commit', '-m', "Release ${project.version}", 'chunky/src/res/se/llbit/chunky/main/Version.properties' ], true)
-    tryCommand([ 'git', 'tag', '-a', "${project.version}", '-m', "Version ${project.version}" ], true)
-  }
-}
+//task release {
+//  doLast {
+//    tryCommand([ 'git', 'commit', '-m', "Release ${project.version}", 'chunky/src/res/se/llbit/chunky/main/Version.properties' ], true)
+//    tryCommand([ 'git', 'tag', '-a', "${project.version}", '-m', "Version ${project.version}" ], true)
+//  }
+//}
 
 task versionInfo(type: JavaExec) {
   dependsOn 'copyArtifacts'
@@ -108,38 +100,38 @@ task releaseJar(type: Jar) {
   from { project(':launcher').configurations.runtime.allArtifacts.files.collect { zipTree(it) } }
 }
 
-task releaseZip(type: Zip) {
-  dependsOn 'copyArtifacts'
+//task releaseZip(type: Zip) {
+//  dependsOn 'copyArtifacts'
+//
+//  destinationDir = buildDir
+//  archiveName = "Chunky-${project.version}.zip"
+//
+//  from(buildDir) {
+//    include "chunky-${project.version}.jar"
+//    include "ReadMe.html"
+//    include "release_notes-${project.version}.txt"
+//  }
+//  from(projectDir) {
+//    include 'license/*'
+//  }
+//  rename("release_notes-${project.version}.jar", 'chunky.jar')
+//}
 
-  destinationDir = buildDir
-  archiveName = "Chunky-${project.version}.zip"
+//task documentation {
+//  inputs.files 'README.md'
+//  outputs.files 'build/ReadMe.html'
+//
+//  doLast {
+//    def readme = tryCommand([ 'perl', file('tools/Markdown.pl').path, file('README.md').path ], true)
+//    file('build/ReadMe.html').write(readme)
+//  }
+//}
 
-  from(buildDir) {
-    include "chunky-${project.version}.jar"
-    include "ReadMe.html"
-    include "release_notes-${project.version}.txt"
-  }
-  from(projectDir) {
-    include 'license/*'
-  }
-  rename("release_notes-${project.version}.jar", 'chunky.jar')
-}
-
-task documentation {
-  inputs.files 'README.md'
-  outputs.files 'build/ReadMe.html'
-
-  doLast {
-    def readme = tryCommand([ 'perl', file('tools/Markdown.pl').path, file('README.md').path ], true)
-    file('build/ReadMe.html').write(readme)
-  }
-}
-
-task copyArtifacts(type: Copy) {
-  dependsOn subprojects.jar
-  from subprojects.jar
-  into buildDir
-}
+//task copyArtifacts(type: Copy) {
+//  dependsOn subprojects.jar
+//  from subprojects.jar
+//  into buildDir
+//}
 
 /** Helper function to run a command. Returns the command output if the command succeeded. */
 def tryCommand(def command, boolean failOnError = false) {
@@ -169,30 +161,37 @@ def tryCommand(def command, boolean failOnError = false) {
 
 /** Helper function to retrieve the current version string. */
 def getVersion() {
-  if (hasProperty('newVersion')) {
-    // A new version string should be saved.
-    def date = new Date()
-    Properties version = new Properties()
-    version['version'] = newVersion
-    version.store(file('chunky/src/res/se/llbit/chunky/main/Version.properties').newWriter(), null)
-    return newVersion
-  } else {
-    def output = tryCommand(['git', 'describe'])
-    if (output) {
-      // Use Git describe output.
-      output.readLines()[0]
-    } else {
-      // Git command failed. Read the previous version string instead.
-      Properties version = new Properties()
-      version.load(new FileInputStream(file('chunky/src/res/se/llbit/chunky/main/Version.properties')))
-      version['version']
+  if (project.hasProperty('newVersion')) {
+    // Manual version override
+    return project.newVersion
+  }
+
+  // Prerelease version based on stored version and git history
+  def prerelease = "DEV"
+  if (project.hasProperty('prereleaseTag')) {
+    prerelease = project.prereleaseTag
+  }
+
+  // Get the stored major version
+  Properties versionProperties = new Properties()
+  versionProperties.load(new FileInputStream(file('chunky/src/res/se/llbit/chunky/main/Version.properties')))
+  def majorVersion = versionProperties['version']
+
+  def preVersion = "0";
+  // Attempt to get Git describe output
+  def gitDescribe = tryCommand(['git', 'describe', '--abbrev=7', '--long'])
+  if (gitDescribe) {
+    def gitMatcher = gitDescribe =~ /^.*?-(\d*)-(g.*)/
+    gitMatcher.find()
+    if (gitMatcher.groupCount() >= 2) {
+      preVersion = gitMatcher.group(1) + "." + gitMatcher.group(2)
     }
   }
+
+  return majorVersion + "-" + prerelease + "." + preVersion
 }
 
-task install(dependsOn: ':chunky:install')
-
-task uploadArchives(dependsOn: ':chunky:uploadArchives')
+//task install(dependsOn: ':chunky:install')
 
 // Includes both main and library documentation:
 task docs(type: Javadoc) {

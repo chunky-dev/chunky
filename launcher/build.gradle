@@ -1,9 +1,8 @@
 dependencies {
-  compile project(':lib')
 }
 
 sourceSets.main {
-  java.srcDir 'src'
+  java.srcDir 'src/java'
   resources {
     srcDir 'src'
     include '**/*.png'
@@ -12,7 +11,6 @@ sourceSets.main {
 }
 
 jar {
-  archiveName = 'ChunkyLauncher.jar'
   manifest.attributes 'Main-Class': 'se.llbit.chunky.launcher.ChunkyLauncher'
 
   // Include classes from the common library.

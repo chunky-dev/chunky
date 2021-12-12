@@ -1,27 +1,24 @@
 apply plugin: 'application'
-apply plugin: 'maven'
-apply plugin: 'signing'
 
 mainClassName = 'se.llbit.chunky.main.Chunky'
 archivesBaseName = 'chunky-core'
 
 dependencies {
-  compile 'it.unimi.dsi:fastutil:8.4.4'
-  compile 'org.apache.commons:commons-math3:3.2'
-  compile configurations.nbtlib
-  compile configurations.cplib
-  compile configurations.toolpanelib
-  compile project(':lib')
+  implementation 'it.unimi.dsi:fastutil:8.4.4'
+  implementation 'org.apache.commons:commons-math3:3.2'
+  implementation configurations.jsonlib
+  implementation configurations.nbtlib
+  implementation configurations.cplib
+  implementation configurations.toolpanelib
+  implementation project(':lib')
 
-  testCompile 'com.google.truth:truth:0.30'
-  testCompile 'junit:junit:4.12'
+  testImplementation 'com.google.truth:truth:0.30'
+  testImplementation 'junit:junit:4.12'
 }
 
 jar {
   // Include all dependencies in the Jar.
-  from project(':lib').configurations.archives.allArtifacts.files.collect {
-    zipTree(it)
-  }
+  from project(':lib').sourceSets.main.java.srcDirs
   from configurations.jsonlib.files.collect {
     zipTree(it)
   }
@@ -81,82 +78,13 @@ task updateVersionString {
 }
 
 task javadocJar(type: Jar) {
-  classifier = 'javadoc'
   from rootProject.docs
 }
 
 task sourcesJar(type: Jar) {
-  classifier = 'sources'
   from sourceSets.main.allSource
 }
 
 artifacts {
   archives javadocJar, sourcesJar
-}
-
-signing {
-  required { project.hasProperty('signing.keyId') }
-  sign configurations.archives
-}
-
-uploadArchives {
-  repositories.mavenDeployer {
-    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-    repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
-      if (project.hasProperty('ossrhUsername')) {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
-    }
-
-    snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
-      if (project.hasProperty('ossrhUsername')) {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
-    }
-
-    pom.project {
-      name 'Chunky'
-      packaging 'jar'
-      description 'Minecraft mapping and rendering tool'
-      url 'http://chunky.llbit.se'
-      licenses {
-        license {
-          name 'GNU General Public License Version 3 (GPLv3)'
-          url 'https://www.gnu.org/licenses/gpl-3.0.en.html'
-          distribution 'repo'
-        }
-      }
-      developers {
-        developer {
-          name 'Jesper Öqvist'
-          email 'jesper@llbit.se'
-        }
-      }
-      scm {
-        connection 'scm:git:https://github.com/llbit/chunky.git'
-        url 'https://github.com/llbit/chunky'
-      }
-    }
-  }
-}
-
-project.afterEvaluate {
-  def installers = project.tasks.install.repositories
-  def deployers = project.tasks.uploadArchives.repositories
-  installers.plus(deployers)*.pom*.whenConfigured {pom ->
-    // Exclude the dependencies that are embedded in the Jar.
-    pom.dependencies.removeAll { it.groupId == 'se.llbit' && it.artifactId == 'lib' }
-    pom.dependencies.removeAll { it.groupId == 'se.llbit' && it.artifactId == 'jo-json' }
-    pom.dependencies.removeAll { it.groupId == 'se.llbit' && it.artifactId == 'jo-nbt' }
-    pom.dependencies.removeAll { it.groupId == 'se.llbit' && it.artifactId == 'luxcp' }
-
-    // Change POM version to -SNAPSHOT for intermediate builds.
-    if (project.version =~ /\d+\.\d+(\.\d+)?-.+/) {
-      // This is a SNAPSHOT build.
-      def match = (project.version =~ /(\d+\.\d+(\.\d+)?)-.+/)
-      pom.version = "${match[0][1]}-SNAPSHOT"
-    }
-    println("POM version: ${pom.version}")
-  }
 }
