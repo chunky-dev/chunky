@@ -20,7 +20,9 @@ package se.llbit.chunky.renderer;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.RayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.RenderCanvasFx;
 import se.llbit.math.Ray;
+import se.llbit.util.Pair;
 import se.llbit.util.TaskTracker;
 
 public class PreviewRenderer extends TileBasedRenderer {
@@ -28,6 +30,8 @@ public class PreviewRenderer extends TileBasedRenderer {
   protected final String name;
   protected final String description;
   protected RayTracer tracer;
+
+  public static final int MAX_PREVIEW_SIZE = 1024;
 
   public PreviewRenderer(String id, String name, String description, RayTracer tracer) {
     this.id = id;
@@ -57,12 +61,14 @@ public class PreviewRenderer extends TileBasedRenderer {
     task.update("Preview", 2, 0, "");
 
     Scene scene = manager.bufferedScene;
-    int width = scene.width;
-    int height = scene.height;
+    Pair<Integer, Integer> scaledSize = RenderCanvasFx.getScaledSize(scene.width,scene.height,MAX_PREVIEW_SIZE);
+    int width = scaledSize.thing1;
+    int height = scaledSize.thing2;
+    int downscaleRatio = scene.width/width;
 
     Camera cam = scene.camera();
-    double halfWidth = width / (2.0 * height);
-    double invHeight = 1.0 / height;
+    double halfWidth = scene.width / (2.0 * scene.height);
+    double invHeight = 1.0 / scene.height;
 
     Ray target = new Ray();
     boolean hit = scene.traceTarget(target);
@@ -79,10 +85,13 @@ public class PreviewRenderer extends TileBasedRenderer {
         int x = pixel.firstInt();
         int y = pixel.secondInt();
 
-        int offset = 3 * (y*width + x);
+        // only render the pixels that will be used after decimate on preview.
+        if (x%downscaleRatio!=0 || y%downscaleRatio!=0) return;
+
+        int offset = 3 * (y*width*downscaleRatio + x);
 
         // Interlacing
-        if (((x + y) % 2) == sampleNum) return;
+        if (((x + y)/downscaleRatio % 2) == sampleNum) return;
 
         // Draw crosshairs
         if (x == width / 2 && (y >= height / 2 - 5 && y <= height / 2 + 5) || y == height / 2 && (
