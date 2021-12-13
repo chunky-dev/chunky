@@ -59,6 +59,7 @@ public class Chunk {
   public static final String LEVEL_BIOMES = ".Level.Biomes";
   public static final String LEVEL_ENTITIES = ".Level.Entities";
   public static final String LEVEL_TILEENTITIES = ".Level.TileEntities";
+  public static final String BLOCK_ENTITIES_POST_21W43A = ".block_entities";
 
   /** Chunk width. */
   public static final int X_MAX = 16;
@@ -463,6 +464,7 @@ public class Chunk {
     request.add(LEVEL_BIOMES);
     request.add(LEVEL_ENTITIES);
     request.add(LEVEL_TILEENTITIES);
+    request.add(BLOCK_ENTITIES_POST_21W43A);
     if(reuseChunkData == null || reuseChunkData instanceof EmptyChunkData) {
       reuseChunkData = world.createChunkData();
     } else {
@@ -478,7 +480,7 @@ public class Chunk {
     Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
     Tag biomesTag = data.get(LEVEL_BIOMES);
     Tag entitiesTag = data.get(LEVEL_ENTITIES);
-    Tag tileEntitiesTag = data.get(LEVEL_TILEENTITIES);
+    Tag tileEntitiesTag = getTagFromNames(data, LEVEL_TILEENTITIES, BLOCK_ENTITIES_POST_21W43A);
     if (biomesTag.isByteArray(X_MAX * Z_MAX) || biomesTag.isIntArray(X_MAX * Z_MAX)) {
       extractBiomeData(biomesTag, reuseChunkData);
     }
