@@ -26,8 +26,12 @@ import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.scene.LegacyWaterShader;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.SimplexWaterShader;
+import se.llbit.chunky.renderer.scene.WaterShader;
 import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.world.World;
 import se.llbit.fx.LuxColorPicker;
@@ -51,6 +55,12 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @FXML private DoubleAdjuster waterPlaneHeight;
   @FXML private CheckBox waterPlaneOffsetEnabled;
   @FXML private CheckBox waterPlaneClip;
+  @FXML private CheckBox useProceduralWater;
+  @FXML private IntegerAdjuster proceduralWaterIterations;
+  @FXML private DoubleAdjuster proceduralWaterFrequency;
+  @FXML private DoubleAdjuster proceduralWaterAmplitude;
+  @FXML private DoubleAdjuster proceduralWaterAnimationSpeed;
+  @FXML private TitledPane proceduralWaterDetailsPane;
 
   private RenderControlsFxController renderControls;
   private RenderController controller;
@@ -91,6 +101,21 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterPlaneHeight.set(scene.getWaterPlaneHeight());
     waterPlaneOffsetEnabled.setSelected(scene.isWaterPlaneOffsetEnabled());
     waterPlaneClip.setSelected(scene.getWaterPlaneChunkClip());
+
+    if(scene.getWaterShading() instanceof SimplexWaterShader) {
+      useProceduralWater.setSelected(true);
+      SimplexWaterShader simplexWaterShader = (SimplexWaterShader) scene.getWaterShading();
+      proceduralWaterIterations.set(simplexWaterShader.iterations);
+      proceduralWaterFrequency.set(simplexWaterShader.baseFrequency);
+      proceduralWaterAmplitude.set(simplexWaterShader.baseAmplitude);
+      proceduralWaterAnimationSpeed.set(simplexWaterShader.animationSpeed);
+    } else {
+      useProceduralWater.setSelected(false);
+      proceduralWaterIterations.set(4);
+      proceduralWaterFrequency.set(0.1);
+      proceduralWaterAmplitude.set(0.2);
+      proceduralWaterAnimationSpeed.set(1);
+    }
   }
 
   @Override
@@ -156,8 +181,69 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     );
 
     waterPlaneClip.selectedProperty().addListener((observable, oldValue, newValue) ->
-        scene.setWaterPlaneChunkClip(newValue)
+      scene.setWaterPlaneChunkClip(newValue)
     );
+
+    useProceduralWater.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if(newValue && scene.getWaterShading() instanceof LegacyWaterShader) {
+        SimplexWaterShader shader = new SimplexWaterShader();
+        scene.setWaterShading(shader);
+        shader.iterations = proceduralWaterIterations.get();
+        shader.baseFrequency = proceduralWaterFrequency.get();
+        shader.baseAmplitude = proceduralWaterAmplitude.get();
+        shader.animationSpeed = proceduralWaterAnimationSpeed.get();
+        scene.refresh();
+      } else if(!newValue && scene.getWaterShading() instanceof SimplexWaterShader) {
+        scene.setWaterShading(new LegacyWaterShader());
+        scene.refresh();
+      }
+    });
+    proceduralWaterDetailsPane.visibleProperty().bind(useProceduralWater.selectedProperty());
+
+    proceduralWaterIterations.setName("Iterations");
+    proceduralWaterIterations.setTooltip("The number of iterations (layers) of noise used");
+    proceduralWaterIterations.setRange(1, 10);
+    proceduralWaterIterations.onValueChange(iter -> {
+      WaterShader shader = scene.getWaterShading();
+      if(shader instanceof SimplexWaterShader) {
+        ((SimplexWaterShader) shader).iterations = iter;
+        scene.refresh();
+      }
+    });
+
+    proceduralWaterFrequency.setName("Frequency");
+    proceduralWaterFrequency.setTooltip("The frequency of the noise");
+    proceduralWaterFrequency.setRange(0, 1);
+    proceduralWaterFrequency.onValueChange(freq -> {
+      WaterShader shader = scene.getWaterShading();
+      if(shader instanceof SimplexWaterShader) {
+        ((SimplexWaterShader) shader).baseFrequency = freq;
+      }
+      scene.refresh();
+    });
+
+    proceduralWaterAmplitude.setName("Amplitude");
+    proceduralWaterAmplitude.setTooltip("The amplitude of the noise");
+    proceduralWaterAmplitude.setRange(0, 1);
+    proceduralWaterAmplitude.onValueChange(amp -> {
+      WaterShader shader = scene.getWaterShading();
+      if(shader instanceof SimplexWaterShader) {
+        ((SimplexWaterShader) shader).baseAmplitude = amp;
+      }
+      scene.refresh();
+    });
+
+    proceduralWaterAnimationSpeed.setName("Animation speed");
+    proceduralWaterAnimationSpeed.setTooltip("Animation speed of the water. "
+            + " Only relevant when rendering animation by varying animation time.");
+    proceduralWaterAnimationSpeed.setRange(0, 10);
+    proceduralWaterAnimationSpeed.onValueChange(speed -> {
+      WaterShader shader = scene.getWaterShading();
+      if(shader instanceof SimplexWaterShader) {
+        ((SimplexWaterShader) shader).animationSpeed = speed;
+      }
+      scene.refresh();
+    });
   }
 
 }

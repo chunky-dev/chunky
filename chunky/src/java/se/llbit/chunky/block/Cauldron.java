@@ -21,7 +21,7 @@ public class Cauldron extends MinecraftBlockTranslucent {
 
   @Override
   public boolean intersect(Ray ray, Scene scene) {
-    return CauldronModel.intersectWithWater(ray, scene.stillWaterEnabled(), level);
+    return CauldronModel.intersectWithWater(ray, scene, level);
   }
 
   @Override
