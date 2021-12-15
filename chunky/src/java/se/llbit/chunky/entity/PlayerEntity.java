@@ -206,7 +206,6 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           loader.load(new File(skin));
           texture = skinTexture;
         } catch (IOException | TextureFormatError e2) {
-          Log.warn("Failed to load skin", e);
           Log.warn("Failed to download skin", e2);
         }
       }
