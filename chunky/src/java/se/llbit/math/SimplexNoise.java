@@ -26,6 +26,12 @@
 
 package se.llbit.math;
 
+/**
+ * A Simplex noise generator with true analytic derivative in 3D, based on sdnoise1234.
+ *
+ * @author Stefan Gustavson
+ * @author Keijiro Takahashi
+ */
 public final class SimplexNoise
 {
   // The noise value from the last calculation

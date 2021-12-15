@@ -218,7 +218,6 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       WaterShader shader = scene.getWaterShading();
       if(shader instanceof SimplexWaterShader) {
         ((SimplexWaterShader) shader).baseFrequency = freq;
-        scene.refresh();
       }
       scene.refresh();
     });
@@ -230,7 +229,6 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       WaterShader shader = scene.getWaterShading();
       if(shader instanceof SimplexWaterShader) {
         ((SimplexWaterShader) shader).baseAmplitude = amp;
-        scene.refresh();
       }
       scene.refresh();
     });
@@ -243,7 +241,6 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       WaterShader shader = scene.getWaterShading();
       if(shader instanceof SimplexWaterShader) {
         ((SimplexWaterShader) shader).animationSpeed = speed;
-        scene.refresh();
       }
       scene.refresh();
     });

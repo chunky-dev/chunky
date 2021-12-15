@@ -118,9 +118,9 @@ public class CreditsController implements Initializable {
     fastutilLicense.setOnAction(e -> launchAndReset(fastutilLicense, "http://www.apache.org/licenses/LICENSE-2.0"));
 
     simplexnoise.setBorder(Border.EMPTY);
-    simplexnoise.setOnAction(e -> launchAndReset(fastutil, "https://github.com/keijiro/sketches2016/blob/master/Simplex2/SimplexNoise.java"));
+    simplexnoise.setOnAction(e -> launchAndReset(simplexnoise, "https://github.com/keijiro/sketches2016/blob/master/Simplex2/SimplexNoise.java"));
     simplexnoiseLicense.setBorder(Border.EMPTY);
-    simplexnoiseLicense.setOnAction(e -> launchAndReset(fastutilLicense, "http://unlicense.org/"));
+    simplexnoiseLicense.setOnAction(e -> launchAndReset(simplexnoiseLicense, "http://unlicense.org/"));
 
     if (plugins.size() > 0) {
       plugins.forEach((key, item) -> pluginBox.getChildren().addAll(buildBox(item)));
