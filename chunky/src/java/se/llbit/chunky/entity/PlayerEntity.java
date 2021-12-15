@@ -52,6 +52,8 @@ import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.JsonUtil;
+import se.llbit.util.mojangapi.MojangApi;
+import se.llbit.util.mojangapi.PlayerSkin;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -191,7 +193,21 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         loader.load(new File(skin));
         texture = skinTexture;
       } catch (IOException | TextureFormatError e) {
-        Log.warn("Failed to load skin", e);
+        Log.info("Failed to load cached skin. Trying API.", e);
+        try {
+          JsonObject profile = MojangApi.fetchProfile(uuid);
+          PlayerSkin playerSkin = MojangApi.getSkinFromProfile(profile);
+          if (playerSkin != null) {
+            String skinUrl = playerSkin.getUrl();
+            if (skinUrl != null) {
+              skin = MojangApi.downloadSkin(skinUrl).getAbsolutePath();
+              loader.load(new File(skin));
+              texture = skinTexture;
+            }
+          }
+        } catch (IOException | TextureFormatError e2) {
+          Log.warn("Failed to download skin", e2);
+        }
       }
     }
     Vector3 allPose = JsonUtil.vec3FromJsonArray(pose.get("all"));
