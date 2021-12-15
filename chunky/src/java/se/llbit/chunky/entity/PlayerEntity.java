@@ -201,10 +201,10 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
             String skinUrl = playerSkin.getUrl();
             if (skinUrl != null) {
               skin = MojangApi.downloadSkin(skinUrl).getAbsolutePath();
+              loader.load(new File(skin));
+              texture = skinTexture;
             }
           }
-          loader.load(new File(skin));
-          texture = skinTexture;
         } catch (IOException | TextureFormatError e2) {
           Log.warn("Failed to download skin", e2);
         }
