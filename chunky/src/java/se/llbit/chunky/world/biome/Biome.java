@@ -16,9 +16,7 @@
  */
 package se.llbit.chunky.world.biome;
 
-import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.math.ColorUtil;
+import static se.llbit.math.ColorUtil.getRGBAComponentsGammaCorrected;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -26,7 +24,7 @@ import se.llbit.math.ColorUtil;
 public class Biome {
   public final String resourceLocation;
   public final String name;
-  public final float temp;
+  public final float temperature;
   public final float rain;
   public final int mapColor;
 
@@ -44,30 +42,22 @@ public class Biome {
   public float[] foliageColorLinear;
   public float[] waterColorLinear;
 
-  Biome(String resourceLocation, String name, double temp, double rain, int mapColor, int grassColor, int foliageColor) {
-    this(resourceLocation, name, temp, rain, mapColor, grassColor, foliageColor, 0x3f76e4);
+  Biome(String resourceLocation, String name, double temperature, double rain, int mapColor, int grassColor, int foliageColor) {
+    this(resourceLocation, name, temperature, rain, mapColor, grassColor, foliageColor, 0x3f76e4);
   }
 
-  Biome(String resourceLocation, String name, double temp, double rain, int mapColor, int grassColor, int foliageColor, int waterColor) {
+  Biome(String resourceLocation, String name, double temperature, double rain, int mapColor, int grassColor, int foliageColor, int waterColor) {
     this.resourceLocation = resourceLocation;
     this.name = name;
-    this.temp = (float) temp;
+    this.temperature = (float) temperature;
     this.rain = (float) rain;
     this.mapColor = 0xFF000000 | mapColor;
     this.grassColor = grassColor;
     this.foliageColor = foliageColor;
     this.waterColor = waterColor;
-    this.grassColorLinear = gammaCorrectColor(grassColor);
-    this.foliageColorLinear = gammaCorrectColor(foliageColor);
-    this.waterColorLinear = gammaCorrectColor(waterColor);
-  }
 
-  protected static float[] gammaCorrectColor(int src) {
-    float[] frgb = new float[3];
-    ColorUtil.getRGBComponents(src, frgb);
-    frgb[0] = (float) FastMath.pow(frgb[0], Scene.DEFAULT_GAMMA);
-    frgb[1] = (float) FastMath.pow(frgb[1], Scene.DEFAULT_GAMMA);
-    frgb[2] = (float) FastMath.pow(frgb[2], Scene.DEFAULT_GAMMA);
-    return frgb;
+    this.grassColorLinear = getRGBAComponentsGammaCorrected(grassColor);
+    this.foliageColorLinear = getRGBAComponentsGammaCorrected(foliageColor);
+    this.waterColorLinear = getRGBAComponentsGammaCorrected(waterColor);
   }
 }

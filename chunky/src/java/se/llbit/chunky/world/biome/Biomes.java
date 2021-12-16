@@ -26,6 +26,8 @@ import se.llbit.math.QuickMath;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import static se.llbit.math.ColorUtil.getRGBAComponentsGammaCorrected;
+
 /**
  * Biome constants and utility methods.
  *
@@ -199,7 +201,7 @@ public class Biomes {
     }
 
     for (Biome biome : biomes) {
-      biome.grassColorLinear = Biome.gammaCorrectColor(biome.grassColor);
+      biome.grassColorLinear = getRGBAComponentsGammaCorrected(biome.grassColor);
     }
   }
 
@@ -215,13 +217,13 @@ public class Biomes {
     }
 
     for (Biome biome : biomes) {
-      biome.foliageColorLinear = Biome.gammaCorrectColor(biome.foliageColor);
+      biome.foliageColorLinear = getRGBAComponentsGammaCorrected(biome.foliageColor);
     }
   }
 
   private static void loadColorsFromTexture(BiConsumer<Biome, Integer> colorConsumer, BitmapImage texture) {
     for (Biome biome : biomes) {
-      double temp = QuickMath.clamp(biome.temp, 0, 1);
+      double temp = QuickMath.clamp(biome.temperature, 0, 1);
       double rain = QuickMath.clamp(biome.rain, 0, 1);
       rain *= temp;
       int color = texture.getPixel((int) ((1 - temp) * 255), (int) ((1 - rain) * 255));

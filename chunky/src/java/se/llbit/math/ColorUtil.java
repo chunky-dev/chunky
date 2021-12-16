@@ -191,6 +191,15 @@ public final class ColorUtil {
   }
 
   /**
+   * Wraps {@link ColorUtil#getRGBAComponentsGammaCorrected} creating a new float[4]
+   */
+  public static float[] getRGBAComponentsGammaCorrected(int src) {
+    float[] color = new float[4];
+    getRGBAComponentsGammaCorrected(src, color);
+    return color;
+  }
+
+  /**
    * @return Get INT RGB value corresponding to the given color
    */
   public static int getRGB(float[] frgb) {
