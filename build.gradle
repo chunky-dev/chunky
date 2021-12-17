@@ -212,3 +212,9 @@ task docs(type: Javadoc) {
     classpath = files(docProjects.collect { project(it).sourceSets.main.compileClasspath })
     destinationDir = file("${buildDir}/docs/javadoc")
 }
+
+task clean {
+    doLast {
+        delete "./build"
+    }
+}
