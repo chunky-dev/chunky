@@ -1,7 +1,7 @@
 sourceSets.main.java {
-  srcDir 'src'
+    srcDir 'src'
 }
 
 dependencies {
-  implementation configurations.jsonlib
+    implementation configurations.jsonlib
 }

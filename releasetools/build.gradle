@@ -1,12 +1,12 @@
 dependencies {
-  implementation configurations.jsonlib
-  implementation project(':lib')
+    implementation configurations.jsonlib
+    implementation project(':lib')
 }
 
 sourceSets {
-  main {
-    java {
-      srcDir 'src'
+    main {
+        java {
+            srcDir 'src'
+        }
     }
-  }
 }

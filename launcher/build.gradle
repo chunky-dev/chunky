@@ -1,25 +1,25 @@
 dependencies {
-  implementation configurations.jsonlib
-  implementation project(':lib')
+    implementation configurations.jsonlib
+    implementation project(':lib')
 }
 
 sourceSets.main {
-  java.srcDir 'src'
-  resources {
-    srcDir 'src'
-    include '**/*.png'
-    include '**/*.fxml'
-  }
+    java.srcDir 'src'
+    resources {
+        srcDir 'src'
+        include '**/*.png'
+        include '**/*.fxml'
+    }
 }
 
 jar {
-  manifest.attributes 'Main-Class': 'se.llbit.chunky.launcher.ChunkyLauncher'
+    manifest.attributes 'Main-Class': 'se.llbit.chunky.launcher.ChunkyLauncher'
 
-  // Include classes from the common library.
-  from project(':lib').configurations.archives.allArtifacts.files.collect {
-    zipTree(it)
-  }
-  from configurations.jsonlib.files.collect {
-    zipTree(it)
-  }
+    // Include classes from the common library.
+    from project(':lib').configurations.archives.allArtifacts.files.collect {
+        zipTree(it)
+    }
+    from configurations.jsonlib.files.collect {
+        zipTree(it)
+    }
 }
