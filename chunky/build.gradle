@@ -1,4 +1,5 @@
 apply plugin: 'application'
+apply plugin: 'maven-publish'
 
 mainClassName = 'se.llbit.chunky.main.Chunky'
 archivesBaseName = 'chunky-core'
@@ -88,3 +89,43 @@ task sourcesJar(type: Jar) {
 artifacts {
   archives javadocJar, sourcesJar
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "Chunky"
+                packaging = "jar"
+                description = "Minecraft mapping and rendering tool"
+                url = "http://chunky.llbit.se"
+
+                licenses {
+                    license {
+                        name = "GNU General Public License Version 3 (GPLv3)"
+                        url = "https://www.gnu.org/licenses/gpl-3.0.en.html"
+                        distribution = "repo"
+                    }
+                    developers {
+                        developer {
+                            name = "Jesper Öqvist"
+                            email = "jesper@llbit.se"
+                        }
+                    }
+                    scm {
+                        connection = "scm:git:https://github.com/chunky-dev/chunky.git"
+                        url = "https://github.com/chunky-dev/chunky"
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name 'build'
+            url layout.buildDirectory.dir('maven')
+        }
+    }
+}
+
+task install dependsOn("publish")

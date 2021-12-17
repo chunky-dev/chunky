@@ -195,7 +195,12 @@ def getVersion() {
   return majorVersion + "-" + prerelease + "." + preVersion
 }
 
-task install(dependsOn: ':chunky:install')
+task install(dependsOn: ':chunky:install') {
+    copy {
+        from file("${project(':chunky').buildDir}/maven/")
+        into file("${buildDir}/maven/")
+    }
+}
 
 // Includes both main and library documentation:
 task docs(type: Javadoc) {
