@@ -122,10 +122,8 @@ publishing {
 
     repositories {
         maven {
-            name 'build'
+            name 'Build'
             url layout.buildDirectory.dir('maven')
         }
     }
 }
-
-task install dependsOn("publish")

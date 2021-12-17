@@ -70,6 +70,7 @@ defaultTasks 'releaseJar'
 
 task versionInfo(type: JavaExec) {
   dependsOn 'copyArtifacts'
+  outputs.upToDateWhen { false }
 
   outputs.files file("build/chunky-${project.version}.jar")
   description 'Writes build/chunky-VERSION.jar, latest.json and updates chunky-core-VERSION.jar/version.json'
@@ -78,18 +79,31 @@ task versionInfo(type: JavaExec) {
   args "${project.version}", "release_notes-${project.version}.txt"
 }
 
-task releaseJar(type: Jar) {
+task release {
+  dependsOn 'buildReleaseJar', 'versionInfo'
+  outputs.upToDateWhen { false }
+
+  def destinationDirectory = file("${buildDir}/release")
+  project.delete(destinationDirectory)
+
+  doLast {
+    destinationDirectory.mkdirs()
+    file("./latest.json").renameTo("${destinationDirectory}/latest.json")
+    fileTree(buildDir).matching {
+      include "*-${project.version}.*"
+    }.each {
+      it.renameTo("${destinationDirectory}/${it.name}")
+    }
+  }
+}
+
+task buildReleaseJar(type: Jar) {
   dependsOn 'versionInfo'
 
   archiveFileName = "chunky-${project.version}.jar"
-  destinationDirectory = file('build')
+  destinationDirectory = file('build/installer')
   manifest {
     attributes('Main-Class': 'se.llbit.chunky.launcher.ChunkyLauncher')
-  }
-
-  into('') {
-    from file('latest.json')
-    rename { 'version.json' }
   }
 
   into('lib') {
@@ -102,23 +116,6 @@ task releaseJar(type: Jar) {
       zipTree(it)
     }
   }
-}
-
-task releaseZip(type: Zip) {
-  dependsOn 'copyArtifacts'
-
-  destinationDirectory = buildDir
-  archiveFileName = "Chunky-${project.version}.zip"
-
-  from(buildDir) {
-    include "chunky-${project.version}.jar"
-    include "ReadMe.html"
-    include "release_notes-${project.version}.txt"
-  }
-  from(projectDir) {
-    include 'license/*'
-  }
-  rename("release_notes-${project.version}.jar", 'chunky.jar')
 }
 
 task documentation {
@@ -195,11 +192,15 @@ def getVersion() {
   return majorVersion + "-" + prerelease + "." + preVersion
 }
 
-task install(dependsOn: ':chunky:install') {
-    copy {
-        from file("${project(':chunky').buildDir}/maven/")
-        into file("${buildDir}/maven/")
-    }
+task install(dependsOn: ':chunky:publish') {
+   doLast {
+     copy {
+       from file("${project(':chunky').buildDir}/maven/")
+       into file("${buildDir}/maven/")
+     }
+
+     project.delete(file("${project(':chunky').buildDir}/maven/"))
+   }
 }
 
 // Includes both main and library documentation:
