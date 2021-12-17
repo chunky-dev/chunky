@@ -81,12 +81,11 @@ task versionInfo(type: JavaExec) {
 
 task release {
     dependsOn 'buildReleaseJar', 'versionInfo'
-    outputs.upToDateWhen { false }
 
     def destinationDirectory = file("${buildDir}/release")
-    project.delete(destinationDirectory)
 
     doLast {
+        project.delete(destinationDirectory)
         destinationDirectory.mkdirs()
         file("./latest.json").renameTo("${destinationDirectory}/latest.json")
         fileTree(buildDir).matching {
