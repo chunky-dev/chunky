@@ -1,4 +1,5 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky Contributors
  *
  * This file is part of Chunky.
  *
@@ -32,6 +33,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Book;
@@ -64,6 +66,7 @@ import java.util.regex.Pattern;
 
 public class GeneralTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
+  private final Node wrapper;
 
   @FXML private Button openSceneDirBtn;
   @FXML private Button exportSettings;
@@ -107,6 +110,8 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     loader.setRoot(this);
     loader.setController(this);
     loader.load();
+
+    this.wrapper = new VBox(this);
   }
 
   @Override public void update(Scene scene) {
@@ -153,7 +158,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   }
 
   @Override public Node getTabContent() {
-    return this;
+    return this.wrapper;
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
