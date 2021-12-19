@@ -45,6 +45,9 @@ public class ChunkyOptions {
   /** Ignore scene loading errors when starting a headless render. */
   public boolean force = false;
 
+  /** Reload chunks with headless render */
+  public boolean reloadChunks;
+
   private ChunkyOptions() {
   }
 
