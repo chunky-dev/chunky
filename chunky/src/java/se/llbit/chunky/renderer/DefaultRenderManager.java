@@ -18,10 +18,12 @@
 package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
+import se.llbit.chunky.renderer.scene.DebugPathTracer;
 import se.llbit.chunky.renderer.scene.PathTracer;
 import se.llbit.chunky.renderer.scene.PreviewRayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -78,6 +80,13 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         "A photorealistic Path Tracing renderer.", new PathTracer()));
     addPreviewRenderer(new PreviewRenderer(ChunkyPreviewID, "Chunky Preview",
         "A simple ray marching preview renderer.", new PreviewRayTracer()));
+
+    addRenderer(new PathTracingRenderer(
+        "DebugPathTracer",
+        "Debug Path Tracer",
+        "Debug tracer",
+        new DebugPathTracer())
+    );
   }
 
   /**

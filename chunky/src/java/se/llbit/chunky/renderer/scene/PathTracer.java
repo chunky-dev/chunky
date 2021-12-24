@@ -182,7 +182,7 @@ public class PathTracer implements RayTracer {
               if(sampleOne) {
                 Grid.EmitterPosition pos = scene.getEmitterGrid().sampleEmitterPosition((int) ray.o.x, (int) ray.o.y, (int) ray.o.z, random);
                 if(pos != null) {
-                  indirectEmitterColor = sampleEmitter(scene, ray, pos,  random);
+                  indirectEmitterColor.scaleAdd(1, sampleEmitter(scene, ray, pos, random));
                 }
               } else {
                 for(Grid.EmitterPosition pos : scene.getEmitterGrid().getEmitterPositions((int) ray.o.x, (int) ray.o.y, (int) ray.o.z)) {
@@ -442,43 +442,37 @@ public class PathTracer implements RayTracer {
    * @return The contribution of the emitter
    */
   private static Vector4 sampleEmitter(Scene scene, Ray ray, Grid.EmitterPosition pos, Random random) {
-    Vector4 indirectEmitterColor = new Vector4();
+    Vector4 indirectEmitterColor = new Vector4(0, 0, 0, 1);
     Ray emitterRay = new Ray();
     emitterRay.set(ray);
-    // TODO Sampling a random point on the model would be better than using a random point in the middle of the cube
     Vector3 target = new Vector3();
+
     pos.sample(target, random);
     emitterRay.d.set(target);
     emitterRay.d.sub(emitterRay.o);
     double distance = emitterRay.d.length();
-    emitterRay.d.normalize();
-    double indirectEmitterCoef = emitterRay.d.dot(emitterRay.getNormal());
-    if(indirectEmitterCoef > 0) {
-      // Here We need to invert the material.
-      // The fact that the dot product is > 0 guarantees that the ray is going away from the surface
-      // it just met. This means the ray is going from the block just hit to the previous material (usually air or water)
-      // TODO If/when normal mapping is implemented, indirectEmitterCoef will be computed with the mapped normal
-      //      but the dot product with the original geometry normal will still need to be computed
-      //      to ensure the emitterRay isn't going through the geometry
-      Material prev = emitterRay.getPrevMaterial();
-      int prevData = emitterRay.getPrevData();
-      emitterRay.setPrevMaterial(emitterRay.getCurrentMaterial(), emitterRay.getCurrentData());
-      emitterRay.setCurrentMaterial(prev, prevData);
-      emitterRay.emittance.set(0, 0, 0);
-      emitterRay.o.scaleAdd(Ray.EPSILON, emitterRay.d);
+    emitterRay.d.scale(1 / distance);
+
+    if (emitterRay.d.dot(ray.getNormal()) > 0) {
+      emitterRay.o.scaleAdd(Ray.OFFSET, emitterRay.d);
+      emitterRay.distance += Ray.OFFSET;
       PreviewRayTracer.nextIntersection(scene, emitterRay);
-      if(emitterRay.getCurrentMaterial().emittance > Ray.EPSILON) {
-        indirectEmitterColor.set(emitterRay.color);
-        indirectEmitterColor.scale(emitterRay.getCurrentMaterial().emittance);
-        // TODO Take fog into account
-        indirectEmitterCoef *= scene.emitterIntensity;
-        // Dont know if really realistic but offer better convergence and is better artistically
-        indirectEmitterCoef /= Math.max(distance * distance, 1);
+
+      emitterRay.o.sub(target);
+      if (emitterRay.o.lengthSquared() < Ray.OFFSET) {
+        double e = -emitterRay.d.dot(emitterRay.getNormal());
+        if (e > 0) {
+          e /= Math.max(distance * distance, 1);
+          e *= pos.block.emittance;
+          e *= scene.emitterIntensity;
+
+          indirectEmitterColor.set(emitterRay.color);
+          indirectEmitterColor.scale(e);
+          indirectEmitterColor.w = 1;
+        }
       }
-    } else {
-      indirectEmitterCoef = 0;
     }
-    indirectEmitterColor.scale(indirectEmitterCoef);
+
     return indirectEmitterColor;
   }
 

@@ -52,11 +52,11 @@ public class AABB {
   public void sample(Vector3 loc, Random rand) {
     double[] vec = new double[3];
     int face = rand.nextInt(6);
-    int perp = face % 3;
+    int axis = face % 3;
 
-    vec[perp] = face > 2 ? 1 : 0;
-    vec[(perp + 1) % 3] = rand.nextDouble();
-    vec[(perp + 1) % 3] = rand.nextDouble();
+    vec[axis] = face > 2 ? 1 : 0;
+    vec[(axis + 1) % 3] = rand.nextDouble();
+    vec[(axis + 2) % 3] = rand.nextDouble();
 
     vec[0] *= xmax - xmin;
     vec[1] *= ymax - ymin;
