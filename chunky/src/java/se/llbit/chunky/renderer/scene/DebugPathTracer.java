@@ -16,22 +16,25 @@ public class DebugPathTracer implements RayTracer {
     public void trace(Scene scene, WorkerState state) {
         Ray ray = state.ray;
         Random rand = state.random;
+        Vector3 emitterContribution = new Vector3();
         ray.color.set(0, 0, 0, 1);
 
         if (PreviewRayTracer.nextIntersection(scene, ray)) {
             if (scene.getEmitterSamplingStrategy() != EmitterSamplingStrategy.NONE) {
+                Ray emitterRay = new Ray();
+//                for (Grid.EmitterPosition pos : scene.getEmitterGrid().getEmitterPositions(
+//                    (int) ray.o.x,
+//                    (int) ray.o.y,
+//                    (int) ray.o.z
+//                )) {
                 Grid.EmitterPosition pos = scene.getEmitterGrid().sampleEmitterPosition(
                     (int) ray.o.x,
                     (int) ray.o.y,
                     (int) ray.o.z,
                     rand
                 );
-                if (pos != null) {
-                    Ray emitterRay = new Ray();
+                for (Vector3 target : pos.sampleAll(rand)) {
                     emitterRay.set(ray);
-                    Vector3 target = new Vector3();
-
-                    pos.sample(target, rand);
                     emitterRay.d.set(target);
                     emitterRay.d.sub(emitterRay.o);
                     double distance = emitterRay.d.length();
@@ -42,29 +45,24 @@ public class DebugPathTracer implements RayTracer {
                         emitterRay.distance += Ray.OFFSET;
                         PreviewRayTracer.nextIntersection(scene, emitterRay);
 
-                        emitterRay.o.sub(target);
-                        if (emitterRay.o.lengthSquared() < Ray.OFFSET) {
+                        if (Math.abs(emitterRay.distance - distance) < Ray.OFFSET) {
                             double e = Math.abs(emitterRay.d.dot(emitterRay.getN()));
                             e /= Math.max(distance * distance, 1);
                             e *= pos.block.emittance;
                             e *= scene.emitterIntensity;
 
-                            ray.color.x *= emitterRay.color.x * e;
-                            ray.color.y *= emitterRay.color.y * e;
-                            ray.color.z *= emitterRay.color.z * e;
-                        } else {
-                            ray.color.set(0, 0, 0, 1);
+                            emitterContribution.x += emitterRay.color.x * e;
+                            emitterContribution.y += emitterRay.color.y * e;
+                            emitterContribution.z += emitterRay.color.z * e;
                         }
-                    } else {
-                        ray.color.set(0, 0, 0, 1);
                     }
-
-//
-//                    ray.color.x *= indirectEmitterColor.x;
-//                    ray.color.y *= indirectEmitterColor.y;
-//                    ray.color.z *= indirectEmitterColor.z;
                 }
+//                }
             }
         }
+
+        ray.color.x *= emitterContribution.x;
+        ray.color.y *= emitterContribution.y;
+        ray.color.z *= emitterContribution.z;
     }
 }

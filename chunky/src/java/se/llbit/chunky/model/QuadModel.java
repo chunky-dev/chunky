@@ -8,6 +8,8 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -35,6 +37,18 @@ public abstract class QuadModel implements BlockModel {
   public void sample(Vector3 loc, Random rand) {
     Quad[] quads = getQuads();
     quads[rand.nextInt(quads.length)].sample(loc, rand);
+  }
+
+  @Override
+  public List<Vector3> sampleAll(Random rand) {
+    Quad[] quads = getQuads();
+    Vector3[] samples = new Vector3[quads.length];
+    for (int i = 0; i < samples.length; i++) {
+      Vector3 sample = new Vector3();
+      quads[i].sample(sample, rand);
+      samples[i] = sample;
+    }
+    return Arrays.asList(samples);
   }
 
   @Override

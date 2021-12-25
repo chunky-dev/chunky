@@ -7,6 +7,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
+import java.util.List;
 import java.util.Random;
 
 @PluginApi
@@ -23,6 +24,11 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
   @Override
   public void sample(Vector3 loc, Random rand) {
     model.sample(loc, rand);
+  }
+
+  @Override
+  public List<Vector3> sampleAll(Random rand) {
+    return model.sampleAll(rand);
   }
 
   @Override

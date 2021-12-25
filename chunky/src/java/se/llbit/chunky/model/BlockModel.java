@@ -5,6 +5,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
+import java.util.List;
 import java.util.Random;
 
 @PluginApi
@@ -13,4 +14,6 @@ public interface BlockModel {
   boolean intersect(Ray ray, Scene scene);
 
   void sample(Vector3 loc, Random rand);
+
+  List<Vector3> sampleAll(Random rand);
 }

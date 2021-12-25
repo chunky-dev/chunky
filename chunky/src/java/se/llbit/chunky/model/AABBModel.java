@@ -7,6 +7,8 @@ import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -56,6 +58,16 @@ public abstract class AABBModel implements BlockModel {
     // TODO Choose a random AABB based on surface area
     AABB[] boxes = getBoxes();
     boxes[rand.nextInt(boxes.length)].sample(loc, rand);
+  }
+
+  @Override
+  public List<Vector3> sampleAll(Random rand) {
+    AABB[] boxes = getBoxes();
+    Vector3[] samples = new Vector3[boxes.length * 6];
+    for (int i = 0; i < boxes.length; i++) {
+      System.arraycopy(boxes[i].sampleAll(rand).toArray(new Vector3[0]), 0, samples, i*6, 6);
+    }
+    return Arrays.asList(samples);
   }
 
   @Override

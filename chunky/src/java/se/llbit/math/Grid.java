@@ -50,6 +50,16 @@ public class Grid {
       loc.y += y;
       loc.z += z;
     }
+
+    public List<Vector3> sampleAll(Random rand) {
+      List<Vector3> samples = block.sampleAll(rand);
+      for (Vector3 s : samples) {
+        s.x += x;
+        s.y += y;
+        s.z += z;
+      }
+      return samples;
+    }
   }
 
   private final int cellSize;

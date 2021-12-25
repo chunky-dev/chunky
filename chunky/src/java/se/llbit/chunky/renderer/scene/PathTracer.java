@@ -444,31 +444,28 @@ public class PathTracer implements RayTracer {
   private static Vector4 sampleEmitter(Scene scene, Ray ray, Grid.EmitterPosition pos, Random random) {
     Vector4 indirectEmitterColor = new Vector4(0, 0, 0, 1);
     Ray emitterRay = new Ray();
-    emitterRay.set(ray);
-    Vector3 target = new Vector3();
 
-    pos.sample(target, random);
-    emitterRay.d.set(target);
-    emitterRay.d.sub(emitterRay.o);
-    double distance = emitterRay.d.length();
-    emitterRay.d.scale(1 / distance);
+    for (Vector3 target : pos.sampleAll(random)) {
+      emitterRay.set(ray);
+      emitterRay.d.set(target);
+      emitterRay.d.sub(emitterRay.o);
 
-    if (emitterRay.d.dot(ray.getNormal()) > 0) {
-      emitterRay.o.scaleAdd(Ray.OFFSET, emitterRay.d);
-      emitterRay.distance += Ray.OFFSET;
-      PreviewRayTracer.nextIntersection(scene, emitterRay);
+      if (emitterRay.d.dot(ray.getNormal()) > 0) {
+        double distance = emitterRay.d.length();
+        emitterRay.d.scale(1 / distance);
 
-      emitterRay.o.sub(target);
-      if (emitterRay.o.lengthSquared() < Ray.OFFSET) {
-        double e = -emitterRay.d.dot(emitterRay.getNormal());
-        if (e > 0) {
+        emitterRay.o.scaleAdd(Ray.OFFSET, emitterRay.d);
+        emitterRay.distance += Ray.OFFSET;
+        PreviewRayTracer.nextIntersection(scene, emitterRay);
+        if (Math.abs(emitterRay.distance - distance) < Ray.OFFSET) {
+          double e = Math.abs(emitterRay.d.dot(emitterRay.getNormal()));
           e /= Math.max(distance * distance, 1);
           e *= pos.block.emittance;
           e *= scene.emitterIntensity;
 
-          indirectEmitterColor.set(emitterRay.color);
-          indirectEmitterColor.scale(e);
-          indirectEmitterColor.w = 1;
+          indirectEmitterColor.x += emitterRay.color.x * e;
+          indirectEmitterColor.y += emitterRay.color.y * e;
+          indirectEmitterColor.z += emitterRay.color.z * e;
         }
       }
     }

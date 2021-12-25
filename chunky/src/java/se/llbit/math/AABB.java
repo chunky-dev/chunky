@@ -16,6 +16,8 @@
  */
 package se.llbit.math;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -67,6 +69,29 @@ public class AABB {
     vec[2] += zmin;
 
     loc.set(vec[0], vec[1], vec[2]);
+  }
+
+  public List<Vector3> sampleAll(Random rand) {
+    Vector3[] samples = new Vector3[6];
+    for (int face = 0; face < 6; face++) {
+      double[] vec = new double[3];
+      int axis = face % 3;
+
+      vec[axis] = face > 2 ? 1 : 0;
+      vec[(axis + 1) % 3] = rand.nextDouble();
+      vec[(axis + 2) % 3] = rand.nextDouble();
+
+      vec[0] *= xmax - xmin;
+      vec[1] *= ymax - ymin;
+      vec[2] *= zmax - zmin;
+
+      vec[0] += xmin;
+      vec[1] += ymin;
+      vec[2] += zmin;
+
+      samples[face] = new Vector3(vec[0], vec[1], vec[2]);
+    }
+    return Arrays.asList(samples);
   }
 
   /**

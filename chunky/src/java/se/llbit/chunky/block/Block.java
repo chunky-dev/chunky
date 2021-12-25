@@ -13,6 +13,7 @@ import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
+import java.util.List;
 import java.util.Random;
 
 public abstract class Block extends Material {
@@ -43,6 +44,10 @@ public abstract class Block extends Material {
    */
   public void sample(Vector3 loc, Random rand) {
     block.sample(loc, rand);
+  }
+
+  public List<Vector3> sampleAll(Random rand) {
+    return block.sampleAll(rand);
   }
 
   /**
