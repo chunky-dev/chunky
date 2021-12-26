@@ -201,7 +201,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
         updateLauncher(
             error -> Platform.runLater(() -> {
               setBusy(false);
-              launcherError("Failed to Update", error);
+              launcherError("Failed to update the launcher", error);
             }),
             info -> Platform.runLater(() -> {
               setBusy(false);
