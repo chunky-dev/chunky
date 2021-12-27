@@ -21,6 +21,7 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
     opaque = false;
   }
 
+  @Override
   public int numFaces() {
     return model.numFaces();
   }
