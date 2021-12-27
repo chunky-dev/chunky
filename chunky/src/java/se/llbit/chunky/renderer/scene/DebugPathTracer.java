@@ -44,13 +44,13 @@ public class DebugPathTracer implements RayTracer {
                     double distance = emitterRay.d.length();
                     emitterRay.d.scale(1 / distance);
 
-                    if (emitterRay.d.dot(ray.getN()) > 0) {
+                    if (emitterRay.d.dot(ray.getNormal()) > 0) {
                         emitterRay.o.scaleAdd(Ray.OFFSET, emitterRay.d);
                         emitterRay.distance += Ray.OFFSET;
                         PreviewRayTracer.nextIntersection(scene, emitterRay);
 
                         if (Math.abs(emitterRay.distance - distance) < Ray.OFFSET) {
-                            double e = Math.abs(emitterRay.d.dot(emitterRay.getN()));
+                            double e = Math.abs(emitterRay.d.dot(emitterRay.getNormal()));
                             e /= Math.max(distance * distance, 1);
                             e *= pos.block.emittance;
                             e *= scene.emitterIntensity;
