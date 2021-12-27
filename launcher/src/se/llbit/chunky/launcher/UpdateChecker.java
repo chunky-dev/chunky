@@ -36,10 +36,12 @@ import se.llbit.json.JsonParser.SyntaxError;
 public class UpdateChecker extends Thread {
   private final LauncherSettings settings;
   private final UpdateListener listener;
+  private final String path;
 
-  public UpdateChecker(LauncherSettings settings, UpdateListener listener) {
+  public UpdateChecker(LauncherSettings settings, ReleaseChannel channel, UpdateListener listener) {
     this.settings = settings;
     this.listener = listener;
+    this.path = channel.path;
   }
 
   @Override public void run() {
@@ -56,7 +58,7 @@ public class UpdateChecker extends Thread {
   private boolean tryUpdate() {
     List<VersionInfo> candidates = new LinkedList<>();
 
-    getVersion(candidates, settings.getResourceUrl(settings.selectedChannel.path));
+    getVersion(candidates, settings.getResourceUrl(path));
 
     // Filter out corrupt versions.
     Iterator<VersionInfo> iter = candidates.iterator();

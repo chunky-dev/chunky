@@ -116,13 +116,17 @@ public class ChunkyLauncher {
               break;
             case "--update":
             case "--updateAlpha":
+              ReleaseChannel channel;
               if(arg.equals("--updateAlpha")) {
-                System.out.println("Checking for Chunky alpha/snapshot updates..");
-                settings.selectSnapshot();
+                channel = LauncherSettings.SNAPSHOT_RELEASE_CHANNEL;
               } else {
-                System.out.println("Checking for updates..");
+                channel = settings.selectedChannel;
+                if (i < args.length - 1 && settings.releaseChannels.containsKey(args[i + 1])) {
+                  channel = settings.releaseChannels.getOrDefault(args[i + 1], channel);
+                }
               }
-              UpdateChecker updateThread = new UpdateChecker(settings, new UpdateListener() {
+              System.out.println("Checking for updates on the \"" + channel.name + "\" channel...");
+              UpdateChecker updateThread = new UpdateChecker(settings, channel, new UpdateListener() {
                 @Override
                 public void updateError(String message) {
                 }

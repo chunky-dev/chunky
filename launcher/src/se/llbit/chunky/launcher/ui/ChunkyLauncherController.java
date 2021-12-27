@@ -225,7 +225,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     checkForUpdate.setOnAction(event -> {
       if (isBusy()) {
         setBusy(true);
-        UpdateChecker updateThread = new UpdateChecker(settings, this);
+        UpdateChecker updateThread = new UpdateChecker(settings, settings.selectedChannel, this);
         updateThread.start();
       }
     });
