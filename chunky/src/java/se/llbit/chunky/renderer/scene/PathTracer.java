@@ -185,13 +185,13 @@ public class PathTracer implements RayTracer {
                 case ONE_BLOCK: {
                   Grid.EmitterPosition pos = scene.getEmitterGrid().sampleEmitterPosition((int) ray.o.x, (int) ray.o.y, (int) ray.o.z, random);
                   if (pos != null) {
-                    indirectEmitterColor.scaleAdd(1, sampleEmitter(scene, ray, pos, random));
+                    indirectEmitterColor.scaleAdd(Math.PI, sampleEmitter(scene, ray, pos, random));
                   }
                   break;
                 }
                 case ALL: {
                   List<Grid.EmitterPosition> positions = scene.getEmitterGrid().getEmitterPositions((int) ray.o.x, (int) ray.o.y, (int) ray.o.z);
-                  double sampleScaler = 1.0 / positions.size();
+                  double sampleScaler = Math.PI / positions.size();
                   for (Grid.EmitterPosition pos : positions) {
                     indirectEmitterColor.scaleAdd(sampleScaler, sampleEmitter(scene, ray, pos, random));
                   }
