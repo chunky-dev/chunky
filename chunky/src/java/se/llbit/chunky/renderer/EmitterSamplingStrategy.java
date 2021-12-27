@@ -1,5 +1,5 @@
 package se.llbit.chunky.renderer;
 
 public enum EmitterSamplingStrategy {
-  NONE, ONE, ALL
+  NONE, ONE, ONE_BLOCK, ALL
 }

@@ -54,20 +54,14 @@ public abstract class AABBModel implements BlockModel {
   }
 
   @Override
-  public void sample(Vector3 loc, Random rand) {
-    // TODO Choose a random AABB based on surface area
-    AABB[] boxes = getBoxes();
-    boxes[rand.nextInt(boxes.length)].sample(loc, rand);
+  public int numFaces() {
+    return getBoxes().length * 6;
   }
 
   @Override
-  public List<Vector3> sampleAll(Random rand) {
-    AABB[] boxes = getBoxes();
-    Vector3[] samples = new Vector3[boxes.length * 6];
-    for (int i = 0; i < boxes.length; i++) {
-      System.arraycopy(boxes[i].sampleAll(rand).toArray(new Vector3[0]), 0, samples, i*6, 6);
-    }
-    return Arrays.asList(samples);
+  public void sample(int face, Vector3 loc, Random rand) {
+    int index = (face / 6) % getBoxes().length;
+    getBoxes()[index].sampleFace(face % 6, loc, rand);
   }
 
   @Override

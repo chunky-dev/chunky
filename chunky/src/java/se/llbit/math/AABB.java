@@ -16,6 +16,8 @@
  */
 package se.llbit.math;
 
+import se.llbit.chunky.renderer.CachedObjectProvider;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -51,47 +53,24 @@ public class AABB {
     this.surfaceArea = 2 * (y * z + x * z + x * y);
   }
 
-  public void sample(Vector3 loc, Random rand) {
-    double[] vec = new double[3];
-    int face = rand.nextInt(6);
+  public void sampleFace(int face, Vector3 loc, Random rand) {
+    CachedObjectProvider.Double3 v = CachedObjectProvider.getDouble3();
+    face %= 6;
     int axis = face % 3;
+    v.vec[axis] = face > 2 ? 1 : 0;
+    v.vec[(axis + 1) % 3] = rand.nextDouble();
+    v.vec[(axis + 2) % 3] = rand.nextDouble();
 
-    vec[axis] = face > 2 ? 1 : 0;
-    vec[(axis + 1) % 3] = rand.nextDouble();
-    vec[(axis + 2) % 3] = rand.nextDouble();
+    v.vec[0] *= xmax - xmin;
+    v.vec[1] *= ymax - ymin;
+    v.vec[2] *= zmax - zmin;
 
-    vec[0] *= xmax - xmin;
-    vec[1] *= ymax - ymin;
-    vec[2] *= zmax - zmin;
+    v.vec[0] += xmin;
+    v.vec[1] += ymin;
+    v.vec[2] += zmin;
 
-    vec[0] += xmin;
-    vec[1] += ymin;
-    vec[2] += zmin;
-
-    loc.set(vec[0], vec[1], vec[2]);
-  }
-
-  public List<Vector3> sampleAll(Random rand) {
-    Vector3[] samples = new Vector3[6];
-    for (int face = 0; face < 6; face++) {
-      double[] vec = new double[3];
-      int axis = face % 3;
-
-      vec[axis] = face > 2 ? 1 : 0;
-      vec[(axis + 1) % 3] = rand.nextDouble();
-      vec[(axis + 2) % 3] = rand.nextDouble();
-
-      vec[0] *= xmax - xmin;
-      vec[1] *= ymax - ymin;
-      vec[2] *= zmax - zmin;
-
-      vec[0] += xmin;
-      vec[1] += ymin;
-      vec[2] += zmin;
-
-      samples[face] = new Vector3(vec[0], vec[1], vec[2]);
-    }
-    return Arrays.asList(samples);
+    loc.set(v.vec[0], v.vec[1], v.vec[2]);
+    CachedObjectProvider.release(v);
   }
 
   /**

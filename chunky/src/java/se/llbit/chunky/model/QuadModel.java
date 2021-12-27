@@ -17,6 +17,7 @@ import java.util.Random;
  */
 @PluginApi
 public abstract class QuadModel implements BlockModel {
+  private int cachedNumFaces = -1;
 
   // Epsilons to clip ray intersections to the current block.
   protected static final double E0 = -Ray.EPSILON;
@@ -34,21 +35,13 @@ public abstract class QuadModel implements BlockModel {
   }
 
   @Override
-  public void sample(Vector3 loc, Random rand) {
-    Quad[] quads = getQuads();
-    quads[rand.nextInt(quads.length)].sample(loc, rand);
+  public int numFaces() {
+    return getQuads().length;
   }
 
   @Override
-  public List<Vector3> sampleAll(Random rand) {
-    Quad[] quads = getQuads();
-    Vector3[] samples = new Vector3[quads.length];
-    for (int i = 0; i < samples.length; i++) {
-      Vector3 sample = new Vector3();
-      quads[i].sample(sample, rand);
-      samples[i] = sample;
-    }
-    return Arrays.asList(samples);
+  public void sample(int face, Vector3 loc, Random rand) {
+    getQuads()[face % numFaces()].sample(loc, rand);
   }
 
   @Override

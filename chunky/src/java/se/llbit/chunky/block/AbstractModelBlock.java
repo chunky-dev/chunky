@@ -21,14 +21,13 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
     opaque = false;
   }
 
-  @Override
-  public void sample(Vector3 loc, Random rand) {
-    model.sample(loc, rand);
+  public int numFaces() {
+    return model.numFaces();
   }
 
   @Override
-  public List<Vector3> sampleAll(Random rand) {
-    return model.sampleAll(rand);
+  public void sample(int face, Vector3 loc, Random rand) {
+    model.sample(face, loc, rand);
   }
 
   @Override

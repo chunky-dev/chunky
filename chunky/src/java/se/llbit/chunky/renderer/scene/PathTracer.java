@@ -20,11 +20,13 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.model.WaterModel;
+import se.llbit.chunky.renderer.CachedObjectProvider;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.*;
 
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -178,15 +180,22 @@ public class PathTracer implements RayTracer {
               hit = true;
             } else if(scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
               // Sample emitter
-              boolean sampleOne = scene.emitterSamplingStrategy == EmitterSamplingStrategy.ONE;
-              if(sampleOne) {
-                Grid.EmitterPosition pos = scene.getEmitterGrid().sampleEmitterPosition((int) ray.o.x, (int) ray.o.y, (int) ray.o.z, random);
-                if(pos != null) {
-                  indirectEmitterColor.scaleAdd(1, sampleEmitter(scene, ray, pos, random));
+              switch (scene.emitterSamplingStrategy) {
+                case ONE:
+                case ONE_BLOCK: {
+                  Grid.EmitterPosition pos = scene.getEmitterGrid().sampleEmitterPosition((int) ray.o.x, (int) ray.o.y, (int) ray.o.z, random);
+                  if (pos != null) {
+                    indirectEmitterColor.scaleAdd(1, sampleEmitter(scene, ray, pos, random));
+                  }
+                  break;
                 }
-              } else {
-                for(Grid.EmitterPosition pos : scene.getEmitterGrid().getEmitterPositions((int) ray.o.x, (int) ray.o.y, (int) ray.o.z)) {
-                  indirectEmitterColor.scaleAdd(1, sampleEmitter(scene, ray, pos, random));
+                case ALL: {
+                  List<Grid.EmitterPosition> positions = scene.getEmitterGrid().getEmitterPositions((int) ray.o.x, (int) ray.o.y, (int) ray.o.z);
+                  double sampleScaler = 1.0 / positions.size();
+                  for (Grid.EmitterPosition pos : positions) {
+                    indirectEmitterColor.scaleAdd(sampleScaler, sampleEmitter(scene, ray, pos, random));
+                  }
+                  break;
                 }
               }
             }
@@ -432,6 +441,34 @@ public class PathTracer implements RayTracer {
     return hit;
   }
 
+  private static void sampleEmitterFace(Scene scene, Ray ray, Grid.EmitterPosition pos, int face, Vector4 result, double scaler, Random random) {
+    Ray emitterRay = CachedObjectProvider.getRay();
+
+    emitterRay.set(ray);
+    pos.sampleFace(face, emitterRay.d, random);
+    emitterRay.d.sub(emitterRay.o);
+
+      if (emitterRay.d.dot(ray.getNormal()) > 0) {
+        double distance = emitterRay.d.length();
+        emitterRay.d.scale(1 / distance);
+
+      emitterRay.o.scaleAdd(Ray.OFFSET, emitterRay.d);
+      emitterRay.distance += Ray.OFFSET;
+      PreviewRayTracer.nextIntersection(scene, emitterRay);
+      if (Math.abs(emitterRay.distance - distance) < Ray.OFFSET) {
+        double e = Math.abs(emitterRay.d.dot(emitterRay.getNormal()));
+        e /= Math.max(distance * distance, 1);
+        e *= pos.block.emittance;
+        e *= scene.emitterIntensity;
+        e *= scaler;
+
+        result.scaleAdd(e, emitterRay.color);
+      }
+    }
+
+    CachedObjectProvider.release(emitterRay);
+  }
+
   /**
    * Cast a shadow ray from the intersection point (given by ray) to the emitter
    * at position pos. Returns the contribution of this emitter (0 if the emitter is occluded)
@@ -442,35 +479,24 @@ public class PathTracer implements RayTracer {
    * @return The contribution of the emitter
    */
   private static Vector4 sampleEmitter(Scene scene, Ray ray, Grid.EmitterPosition pos, Random random) {
-    Vector4 indirectEmitterColor = new Vector4(0, 0, 0, 1);
-    Ray emitterRay = new Ray();
+    Vector4 result = new Vector4();
+    result.set(0, 0, 0, 1);
 
-    for (Vector3 target : pos.sampleAll(random)) {
-      emitterRay.set(ray);
-      emitterRay.d.set(target);
-      emitterRay.d.sub(emitterRay.o);
-
-      if (emitterRay.d.dot(ray.getNormal()) > 0) {
-        double distance = emitterRay.d.length();
-        emitterRay.d.scale(1 / distance);
-
-        emitterRay.o.scaleAdd(Ray.OFFSET, emitterRay.d);
-        emitterRay.distance += Ray.OFFSET;
-        PreviewRayTracer.nextIntersection(scene, emitterRay);
-        if (Math.abs(emitterRay.distance - distance) < Ray.OFFSET) {
-          double e = Math.abs(emitterRay.d.dot(emitterRay.getNormal()));
-          e /= Math.max(distance * distance, 1);
-          e *= pos.block.emittance;
-          e *= scene.emitterIntensity;
-
-          indirectEmitterColor.x += emitterRay.color.x * e;
-          indirectEmitterColor.y += emitterRay.color.y * e;
-          indirectEmitterColor.z += emitterRay.color.z * e;
+    switch (scene.getEmitterSamplingStrategy()) {
+      default:
+      case ONE:
+        sampleEmitterFace(scene, ray, pos, random.nextInt(pos.block.numFaces()), result, 1, random);
+        break;
+      case ONE_BLOCK:
+      case ALL:
+        double scaler = 1.0 / pos.block.numFaces();
+        for (int i = 0; i < pos.block.numFaces(); i++) {
+          sampleEmitterFace(scene, ray, pos, i, result, scaler, random);
         }
-      }
+        break;
     }
 
-    return indirectEmitterColor;
+    return result;
   }
 
   /**

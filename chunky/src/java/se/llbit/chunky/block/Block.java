@@ -38,16 +38,19 @@ public abstract class Block extends Material {
   }
 
   /**
+   * Get the number of faces on this block.
+   */
+  public int numFaces() {
+    return 6;
+  }
+
+  /**
    * Sample a random point on this block. Coordinates are normalized to be in [0, 1].
    * @param loc  Location vector where the point is stored.
    * @param rand Random number source.
    */
-  public void sample(Vector3 loc, Random rand) {
-    block.sample(loc, rand);
-  }
-
-  public List<Vector3> sampleAll(Random rand) {
-    return block.sampleAll(rand);
+  public void sample(int face, Vector3 loc, Random rand) {
+    block.sampleFace(face, loc, rand);
   }
 
   /**

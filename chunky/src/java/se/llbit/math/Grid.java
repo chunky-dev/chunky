@@ -45,20 +45,17 @@ public class Grid {
     }
 
     public void sample(Vector3 loc, Random rand) {
-      block.sample(loc, rand);
+      block.sample(rand.nextInt(block.numFaces()), loc, rand);
       loc.x += x;
       loc.y += y;
       loc.z += z;
     }
 
-    public List<Vector3> sampleAll(Random rand) {
-      List<Vector3> samples = block.sampleAll(rand);
-      for (Vector3 s : samples) {
-        s.x += x;
-        s.y += y;
-        s.z += z;
-      }
-      return samples;
+    public void sampleFace(int face, Vector3 loc, Random rand) {
+      block.sample(face, loc, rand);
+      loc.x += x;
+      loc.y += y;
+      loc.z += z;
     }
   }
 
