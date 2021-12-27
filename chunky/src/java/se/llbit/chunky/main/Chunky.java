@@ -169,6 +169,9 @@ public class Chunky {
           return 1;
         }
       }
+      if (options.reloadChunks) {
+        sceneManager.reloadChunks();
+      }
       sceneManager.getScene().startHeadlessRender();
 
       renderManager.start();
