@@ -43,7 +43,7 @@ public final class LauncherUpdateDialogController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     releaseInfo.setText(String.format("Version %s released on %s",
-        launcherInfo.name, launcherInfo.date));
+        launcherInfo.version.toString(), launcherInfo.date));
     if (launcherInfo.notes.isEmpty()) {
       releaseNotes.setText("No release notes available.");
     } else {

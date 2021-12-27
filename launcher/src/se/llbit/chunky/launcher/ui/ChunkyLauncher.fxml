@@ -77,7 +77,7 @@
                               <CheckBox fx:id="closeConsoleOnExit" mnemonicParsing="false" text="Close console when Chunky exits" />
                               <HBox alignment="CENTER_LEFT" spacing="10.0">
                                  <children>
-                                    <Label text="Release Channel:" />
+                                    <Label text="Release channel:" />
                                     <ComboBox fx:id="releaseChannelBox" />
                                     <Button fx:id="releaseChannelReload" mnemonicParsing="false" text="Reload" />
                                  </children>

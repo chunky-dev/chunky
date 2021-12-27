@@ -22,7 +22,6 @@ import javafx.scene.control.Tooltip;
 import javafx.util.Callback;
 import se.llbit.json.JsonObject;
 
-import java.io.InvalidObjectException;
 import java.util.Objects;
 
 public class ReleaseChannel {
@@ -46,45 +45,35 @@ public class ReleaseChannel {
         }
     }
 
+    public final String id;
     public final String name;
     public final String path;
     public final String notes;
 
-    public ReleaseChannel(String name, String path, String notes) {
+    public ReleaseChannel(String id, String name, String path, String notes) {
+        this.id = id;
         this.name = name;
         this.path = path;
         this.notes = notes;
     }
 
-    public ReleaseChannel(JsonObject obj) throws InvalidObjectException {
+    public ReleaseChannel(JsonObject obj) throws IllegalArgumentException {
+        this.id = obj.get("id").stringValue(obj.get("name").stringValue(null));
         this.name = obj.get("name").stringValue(null);
         this.path = obj.get("path").stringValue(null);
         this.notes = obj.get("notes").stringValue(null);
 
-        if (this.name == null || this.path == null || this.notes == null) {
-            throw new InvalidObjectException(String.format("One or more keys were not found:" +
-                "\n'name': %s\n'path':%s\n'notes':%s", name, path, notes));
+        if (this.id == null || this.name == null || this.path == null || this.notes == null) {
+            throw new IllegalArgumentException("Invalid release channel object");
         }
     }
 
     public JsonObject toJson() {
         JsonObject obj = new JsonObject();
+        obj.add("id", id);
         obj.add("name", name);
         obj.add("path", path);
         obj.add("notes", notes);
         return obj;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ReleaseChannel that = (ReleaseChannel) o;
-        return Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
     }
 }

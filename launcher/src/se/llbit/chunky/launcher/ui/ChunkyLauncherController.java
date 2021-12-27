@@ -22,13 +22,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.PopupWindow;
 import javafx.stage.WindowEvent;
@@ -38,7 +34,7 @@ import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.ui.IntegerAdjuster;
 
-import java.awt.Desktop;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -139,9 +135,12 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
 
     updateSite.setText(settings.updateSite);
     updateSite.setTooltip(new Tooltip("Update site URL for Chunky releases."));
-    updateSite.textProperty().addListener((observable, oldValue, newValue) -> {
-      settings.updateSite = newValue;
-      settings.save();
+    updateSite.focusedProperty().addListener((observable)->{
+        if(!updateSite.isFocused() && !updateSite.getText().equals(settings.updateSite)) {
+            settings.updateSite = updateSite.getText();
+            settings.save();
+            updateLauncher();
+        }
     });
     resetUpdateSite.setOnAction(event -> updateSite.setText(LauncherSettings.DEFAULT_UPDATE_SITE));
     resetUpdateSite.setTooltip(new Tooltip("Reset to default Chunky update site."));
@@ -198,16 +197,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     releaseChannelReload.setOnAction(event -> {
       if (isBusy()) {
         setBusy(true);
-        updateLauncher(
-            error -> Platform.runLater(() -> {
-              setBusy(false);
-              launcherError("Failed to update the launcher", error);
-            }),
-            info -> Platform.runLater(() -> {
-              setBusy(false);
-              updateChannelsList();
-            })
-        );
+        updateLauncher();
       }
     });
 
@@ -241,8 +231,21 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     });
 
     updateLauncher(
-        error -> System.err.printf("Launcher Info Error: %s\n", error),
+        error -> System.err.printf("Could not update the launcher data. %s\n", error),
         info -> Platform.runLater(this::updateChannelsList)
+    );
+  }
+
+  public void updateLauncher() {
+    updateLauncher(
+        error -> Platform.runLater(() -> {
+          setBusy(false);
+          launcherError("Failed to update the launcher", error);
+        }),
+        info -> Platform.runLater(() -> {
+          setBusy(false);
+          updateChannelsList();
+        })
     );
   }
 
@@ -262,11 +265,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
               });
             }
 
-            settings.releaseChannels = info.channels;
-            int index = settings.releaseChannels.indexOf(settings.selectedChannel);
-            if (index == -1) index = 0;
-            settings.selectedChannel = settings.releaseChannels.get(index);
-            settings.save();
+            settings.setReleaseChannels(info.channels);
           }
           infoCallback.accept(info);
         });
@@ -316,7 +315,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
 
   private void updateChannelsList() {
     releaseChannelBox.getItems().clear();
-    releaseChannelBox.getItems().addAll(settings.releaseChannels);
+    releaseChannelBox.getItems().addAll(settings.releaseChannels.values());
     releaseChannelBox.getSelectionModel().select(settings.selectedChannel);
   }
 

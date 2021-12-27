@@ -19,6 +19,7 @@ package se.llbit.chunky.launcher;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -54,6 +55,9 @@ public class LauncherInfoChecker extends Thread {
         } catch (MalformedURLException e) {
             System.err.println("Malformed launcher info URL.");
             errorListener.accept("Malformed launcher info/update site URL: " + url);
+        } catch (FileNotFoundException e) {
+            // no launcher.json found, so probably a legacy update site
+            completionListener.accept(new LauncherInfo());
         } catch (IOException e) {
             System.err.println("Failed to fetch launcher info: " + e.getMessage());
             errorListener.accept("Failed to fetch launcher info from URL: " + url);

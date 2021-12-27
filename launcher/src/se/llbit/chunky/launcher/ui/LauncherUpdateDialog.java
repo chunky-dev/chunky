@@ -33,7 +33,7 @@ public class LauncherUpdateDialog extends Stage {
     loader.setController(new LauncherUpdateDialogController(settings, info));
     Parent root = loader.load();
     setResizable(false);
-    setTitle(String.format("New Launcher Available: %s", info.name));
+    setTitle(String.format("New Launcher Available: %s", info.version.toString()));
     getIcons().add(new Image(getClass().getResourceAsStream("chunky-cfg.png")));
     initModality(Modality.APPLICATION_MODAL);
     setScene(new Scene(root));

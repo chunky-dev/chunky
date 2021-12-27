@@ -23,39 +23,39 @@ import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 import se.llbit.util.Util;
 
-import java.io.InvalidObjectException;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class LauncherInfo {
-    public final String name;
-    public final String timestamp;
     public final String notes;
     public final String path;
 
     public final Date date;
     public final Semver version;
 
-    public final ArrayList<ReleaseChannel> channels = new ArrayList<>();
+    public final Map<String, ReleaseChannel> channels = new LinkedHashMap<>();
+
+    public LauncherInfo() {
+        this.notes = "";
+        this.path = null;
+        this.date = null;
+        this.version = ChunkyLauncher.LAUNCHER_VERSION;
+        channels.put(LauncherSettings.STABLE_RELEASE_CHANNEL.id, LauncherSettings.STABLE_RELEASE_CHANNEL);
+        channels.put(LauncherSettings.SNAPSHOT_RELEASE_CHANNEL.id, LauncherSettings.SNAPSHOT_RELEASE_CHANNEL);
+    }
 
     public LauncherInfo(JsonObject obj) {
-        name = obj.get("name").stringValue("");
-        version = new Semver(name);
-        timestamp = obj.get("timestamp").stringValue("");
+        version = new Semver(obj.get("name").stringValue(""));
         notes = obj.get("notes").stringValue("");
         path = obj.get("path").stringValue("ChunkyLauncher.jar");
-        date = Util.dateFromISO8601(timestamp);
+        date = Util.dateFromISO8601(obj.get("timestamp").stringValue(""));
         JsonArray releaseChannels = obj.get("channels").array();
         for (JsonValue channelValue : releaseChannels) {
             try {
                 ReleaseChannel channel = new ReleaseChannel(channelValue.asObject());
-                int index = channels.indexOf(channel);
-                if (index == -1) {
-                    channels.add(channel);
-                } else {
-                    channels.set(index, channel);
-                }
-            } catch (InvalidObjectException e) {
+                channels.put(channel.id, channel);
+            } catch (IllegalArgumentException e) {
                 Log.info("Invalid release channel", e);
             }
         }
