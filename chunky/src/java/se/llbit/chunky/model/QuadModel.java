@@ -44,6 +44,11 @@ public abstract class QuadModel implements BlockModel {
   }
 
   @Override
+  public double faceSurfaceArea(int face) {
+    return getQuads()[face % numFaces()].surfaceArea();
+  }
+
+  @Override
   public boolean intersect(Ray ray, Scene scene) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;

@@ -60,8 +60,12 @@ public abstract class AABBModel implements BlockModel {
 
   @Override
   public void sample(int face, Vector3 loc, Random rand) {
-    int index = (face / 6) % getBoxes().length;
-    getBoxes()[index].sampleFace(face % 6, loc, rand);
+    getBoxes()[(face / 6) % getBoxes().length].sampleFace(face % 6, loc, rand);
+  }
+
+  @Override
+  public double faceSurfaceArea(int face) {
+    return getBoxes()[(face / 6) % getBoxes().length].faceSurfaceArea(face);
   }
 
   @Override

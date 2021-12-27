@@ -54,6 +54,13 @@ public abstract class Block extends Material {
   }
 
   /**
+   * Get the surface area of this face of the block.
+   */
+  public double surfaceArea(int face) {
+    return block.faceSurfaceArea(face);
+  }
+
+  /**
    * Intersect the given ray in the given scene with this block and update the Ray's color, distance
    * and origin accordingly. Note that the alpha component of the ray color must be positive if and
    * only if it hits (i.e. this method returns true) and zero otherwise.

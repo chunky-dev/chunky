@@ -73,6 +73,29 @@ public class AABB {
     CachedObjectProvider.release(v);
   }
 
+  public double faceSurfaceArea(int face) {
+    CachedObjectProvider.Double3 minC = CachedObjectProvider.getDouble3();
+    CachedObjectProvider.Double3 maxC = CachedObjectProvider.getDouble3();
+
+    minC.vec[0] = xmin;
+    minC.vec[1] = ymin;
+    minC.vec[2] = zmin;
+
+    maxC.vec[0] = xmax;
+    maxC.vec[1] = ymax;
+    maxC.vec[2] = zmax;
+
+    int a1 = (face + 1) % 3;
+    int a2 = (face + 2) % 3;
+
+    double sa = (maxC.vec[a1] - minC.vec[a1]) * (maxC.vec[a2] - minC.vec[a2]);
+
+    CachedObjectProvider.release(minC);
+    CachedObjectProvider.release(maxC);
+
+    return Math.abs(sa);
+  }
+
   /**
    * Find intersection between the given ray and this AABB.
    *

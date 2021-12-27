@@ -16,4 +16,6 @@ public interface BlockModel {
   int numFaces();
 
   void sample(int face, Vector3 loc, Random rand);
+
+  double faceSurfaceArea(int face);
 }

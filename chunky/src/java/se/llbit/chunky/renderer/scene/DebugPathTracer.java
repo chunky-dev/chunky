@@ -52,6 +52,7 @@ public class DebugPathTracer implements RayTracer {
                         if (Math.abs(emitterRay.distance - distance) < Ray.OFFSET) {
                             double e = Math.abs(emitterRay.d.dot(emitterRay.getNormal()));
                             e /= Math.max(distance * distance, 1);
+                            e *= pos.block.surfaceArea(i);
                             e *= pos.block.emittance;
                             e *= scene.emitterIntensity;
                             e *= invFaces;
@@ -66,6 +67,7 @@ public class DebugPathTracer implements RayTracer {
             }
         }
 
+        emitterContribution.scale(Math.PI);
         ray.color.x *= emitterContribution.x;
         ray.color.y *= emitterContribution.y;
         ray.color.z *= emitterContribution.z;
