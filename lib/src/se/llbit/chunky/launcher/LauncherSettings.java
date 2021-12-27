@@ -1,4 +1,5 @@
-/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2013-2021 Chunky Contributors
  *
  * This file is part of Chunky.
  *
@@ -18,14 +19,28 @@ package se.llbit.chunky.launcher;
 
 import se.llbit.chunky.JsonSettings;
 import se.llbit.chunky.resources.SettingsDirectory;
+import se.llbit.json.JsonArray;
+import se.llbit.json.JsonObject;
+import se.llbit.json.JsonString;
+import se.llbit.json.JsonValue;
+import se.llbit.log.Log;
 import se.llbit.util.OSDetector;
 
 import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class LauncherSettings {
   private static final int DEFAULT_MEMORY_LIMIT = 1024;
   public static final String LAUNCHER_SETTINGS_FILE = "chunky-launcher.json";
   public static final String DEFAULT_UPDATE_SITE = "https://chunkyupdate.lemaik.de";
+
+  static final ReleaseChannel STABLE_RELEASE_CHANNEL = new ReleaseChannel(
+      "stable", "Stable", "latest.json", "Latest stable release of Chunky.");
+  static final ReleaseChannel SNAPSHOT_RELEASE_CHANNEL = new ReleaseChannel(
+      "snapshot", "Snapshot", "snapshot.json", "Latest nightly snapshot of Chunky.");
+
+  public int settingsRevision = 0;
 
   public String javaDir = "";
   public int memoryLimit = DEFAULT_MEMORY_LIMIT;
@@ -51,7 +66,9 @@ public class LauncherSettings {
   public boolean headless = false;
   public boolean showLauncher = true;
   public boolean showAdvancedSettings = false;
-  public boolean downloadSnapshots = false;
+
+  public ReleaseChannel selectedChannel;
+  public Map<String, ReleaseChannel> releaseChannels;
 
   public LauncherSettings() {
     javaOptions = defaultJavaOptions();
@@ -62,6 +79,8 @@ public class LauncherSettings {
     if (directory != null) {
       settings.load(new File(directory, LAUNCHER_SETTINGS_FILE));
     }
+
+    settingsRevision = settings.getInt("settingsRevision", 0);
 
     updateSite = settings.getString("updateSite", DEFAULT_UPDATE_SITE);
     javaDir = settings.getString("javaDir", "");
@@ -81,7 +100,26 @@ public class LauncherSettings {
     version = settings.getString("version", "latest");
     showLauncher = settings.getBool("showLauncher", true);
     showAdvancedSettings = settings.getBool("showAdvancedSettings", false);
-    downloadSnapshots = settings.getBool("downloadSnapshots", false);
+
+    JsonObject releaseChannelObj = settings.get("releaseChannels").object();
+    releaseChannels = new LinkedHashMap<>();
+    for (JsonValue obj : releaseChannelObj.get("channels").array()) {
+      try {
+        ReleaseChannel channel = new ReleaseChannel(obj.asObject());
+        releaseChannels.put(channel.id, channel);
+      } catch (IllegalArgumentException e) {
+        Log.info("Invalid release channel", e);
+      }
+    }
+    String selectedChannelId = releaseChannelObj.get("selectedChannel").stringValue(STABLE_RELEASE_CHANNEL.id);
+    selectedChannel = releaseChannels.getOrDefault(selectedChannelId, STABLE_RELEASE_CHANNEL);
+    if (settings.getBool("downloadSnapshots", false)) {
+      selectSnapshot();
+    }
+  }
+
+  public void selectSnapshot() {
+    selectedChannel = releaseChannels.get(SNAPSHOT_RELEASE_CHANNEL.id);
   }
 
   private String defaultJavaOptions() {
@@ -93,6 +131,8 @@ public class LauncherSettings {
   }
 
   public void save() {
+    settings.setInt("settingsRevision", settingsRevision);
+
     settings.setString("updateSite", updateSite);
     settings.setString("javaDir", javaDir);
     settings.setInt("memoryLimit", memoryLimit);
@@ -105,7 +145,16 @@ public class LauncherSettings {
     settings.setString("version", version);
     settings.setBool("showLauncher", showLauncher);
     settings.setBool("showAdvancedSettings", showAdvancedSettings);
-    settings.setBool("downloadSnapshots", downloadSnapshots);
+
+    settings.removeSetting("downloadSnapshots");
+    JsonObject releaseChannelsObject = new JsonObject();
+    releaseChannelsObject.set("selectedChannel", new JsonString(selectedChannel.id));
+    JsonArray releaseChannelsValue = new JsonArray(releaseChannels.size());
+    for (ReleaseChannel channel : releaseChannels.values()) {
+      releaseChannelsValue.add(channel.toJson());
+    }
+    releaseChannelsObject.set("channels", releaseChannelsValue);
+    settings.set("releaseChannels", releaseChannelsObject);
 
     File directory = SettingsDirectory.getSettingsDirectory();
     settings.save(directory, new File(directory, LAUNCHER_SETTINGS_FILE));
@@ -117,5 +166,12 @@ public class LauncherSettings {
       updateSite += "/";
     }
     return updateSite + path;
+  }
+
+  public void setReleaseChannels(Map<String, ReleaseChannel> channels) {
+    releaseChannels.clear();
+    releaseChannels.putAll(channels);
+    selectedChannel = releaseChannels.getOrDefault(selectedChannel.id, channels.values().stream().findFirst().orElse(STABLE_RELEASE_CHANNEL));
+    save();
   }
 }

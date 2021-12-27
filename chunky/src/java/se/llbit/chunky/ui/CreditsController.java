@@ -50,6 +50,8 @@ public class CreditsController implements Initializable {
   @FXML private Hyperlink fastutilLicense;
   @FXML private Hyperlink simplexnoise;
   @FXML private Hyperlink simplexnoiseLicense;
+  @FXML private Hyperlink semver4j;
+  @FXML private Hyperlink semver4jLicense;
 
   @FXML private VBox pluginBox;
   @FXML private ImageView logoImage;
@@ -110,17 +112,22 @@ public class CreditsController implements Initializable {
     fastMath.setBorder(Border.EMPTY);
     fastMath.setOnAction(e -> launchAndReset(fastMath, "https://commons.apache.org/proper/commons-math/"));
     fastMathLicense.setBorder(Border.EMPTY);
-    fastMathLicense.setOnAction(e -> launchAndReset(fastMathLicense, "http://www.apache.org/licenses/LICENSE-2.0"));
+    fastMathLicense.setOnAction(e -> launchAndReset(fastMathLicense, "https://www.apache.org/licenses/LICENSE-2.0"));
 
     fastutil.setBorder(Border.EMPTY);
     fastutil.setOnAction(e -> launchAndReset(fastutil, "https://fastutil.di.unimi.it/"));
     fastutilLicense.setBorder(Border.EMPTY);
-    fastutilLicense.setOnAction(e -> launchAndReset(fastutilLicense, "http://www.apache.org/licenses/LICENSE-2.0"));
+    fastutilLicense.setOnAction(e -> launchAndReset(fastutilLicense, "https://www.apache.org/licenses/LICENSE-2.0"));
 
     simplexnoise.setBorder(Border.EMPTY);
     simplexnoise.setOnAction(e -> launchAndReset(simplexnoise, "https://github.com/keijiro/sketches2016/blob/master/Simplex2/SimplexNoise.java"));
     simplexnoiseLicense.setBorder(Border.EMPTY);
-    simplexnoiseLicense.setOnAction(e -> launchAndReset(simplexnoiseLicense, "http://unlicense.org/"));
+    simplexnoiseLicense.setOnAction(e -> launchAndReset(simplexnoiseLicense, "https://unlicense.org/"));
+
+    semver4j.setBorder(Border.EMPTY);
+    semver4j.setOnAction(e -> launchAndReset(semver4j, "https://github.com/vdurmont/semver4j"));
+    semver4jLicense.setBorder(Border.EMPTY);
+    semver4jLicense.setOnAction(e -> launchAndReset(semver4jLicense, "https://github.com/vdurmont/semver4j/blob/master/LICENSE.md"));
 
     if (plugins.size() > 0) {
       plugins.forEach((key, item) -> pluginBox.getChildren().addAll(buildBox(item)));

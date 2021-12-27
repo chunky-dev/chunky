@@ -1,4 +1,5 @@
-/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2013-2021 Chunky Contributors
  *
  * This file is part of Chunky.
  *
@@ -35,10 +36,12 @@ import se.llbit.json.JsonParser.SyntaxError;
 public class UpdateChecker extends Thread {
   private final LauncherSettings settings;
   private final UpdateListener listener;
+  private final String path;
 
-  public UpdateChecker(LauncherSettings settings, UpdateListener listener) {
+  public UpdateChecker(LauncherSettings settings, ReleaseChannel channel, UpdateListener listener) {
     this.settings = settings;
     this.listener = listener;
+    this.path = channel.path;
   }
 
   @Override public void run() {
@@ -55,11 +58,7 @@ public class UpdateChecker extends Thread {
   private boolean tryUpdate() {
     List<VersionInfo> candidates = new LinkedList<>();
 
-    getVersion(candidates, settings.getResourceUrl("latest.json"));
-
-    if (settings.downloadSnapshots) {
-      getVersion(candidates, settings.getResourceUrl("snapshot.json"));
-    }
+    getVersion(candidates, settings.getResourceUrl(path));
 
     // Filter out corrupt versions.
     Iterator<VersionInfo> iter = candidates.iterator();
@@ -84,14 +83,10 @@ public class UpdateChecker extends Thread {
       }
     }
 
-    // Check if more recent version than candidate is already installed.
-    List<VersionInfo> versions = ChunkyDeployer.availableVersions();
-    iter = versions.iterator();
-    while (iter.hasNext()) {
-      VersionInfo available = iter.next();
-      if (available.compareTo(latest) <= 0 && ChunkyDeployer
-          .checkVersionIntegrity(available.name)) {
-        // More recent version already installed and not corrupt.
+    // Check if version is already installed.
+    for (VersionInfo version : ChunkyDeployer.availableVersions()) {
+      if (version.name.equals(latest.name) && version.compareTo(latest) == 0 &&
+          ChunkyDeployer.checkVersionIntegrity(version.name)) {
         return false;
       }
     }

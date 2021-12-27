@@ -1,4 +1,5 @@
-/* Copyright (c) 2013-2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2013-2021 Chunky Contributors
  *
  * This file is part of Chunky.
  *
@@ -21,36 +22,25 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.PopupWindow;
 import javafx.stage.WindowEvent;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.launcher.ChunkyDeployer;
-import se.llbit.chunky.launcher.ChunkyLauncher;
-import se.llbit.chunky.launcher.ConsoleLogger;
-import se.llbit.chunky.launcher.Dialogs;
-import se.llbit.chunky.launcher.JreUtil;
-import se.llbit.chunky.launcher.LaunchMode;
-import se.llbit.chunky.launcher.LauncherSettings;
-import se.llbit.chunky.launcher.UpdateChecker;
-import se.llbit.chunky.launcher.UpdateListener;
-import se.llbit.chunky.launcher.VersionInfo;
+import se.llbit.chunky.launcher.*;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.ui.IntegerAdjuster;
+import se.llbit.fxutil.CustomizedListCellFactory;
 
-import java.awt.Desktop;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 /**
  * JavaFX window for the Chunky launcher.
@@ -58,30 +48,31 @@ import java.util.ResourceBundle;
 public final class ChunkyLauncherController implements Initializable, UpdateListener {
   final LauncherSettings settings;
 
-  @FXML protected ComboBox<VersionInfo> version;
-  @FXML protected Button checkForUpdate;
-  @FXML protected ProgressIndicator busyIndicator;
-  @FXML protected TextField minecraftDirectory;
-  @FXML protected Button browseMinecraft;
-  @FXML protected IntegerAdjuster memoryLimit;
-  @FXML protected TextField updateSite;
-  @FXML protected Button resetUpdateSite;
-  @FXML protected TextField javaRuntime;
-  @FXML protected Button browseJava;
-  @FXML protected TextField javaOptions;
-  @FXML protected TextField chunkyOptions;
-  @FXML protected CheckBox enableDebugConsole;
-  @FXML protected CheckBox verboseLogging;
-  @FXML protected CheckBox closeConsoleOnExit;
-  @FXML protected CheckBox downloadSnapshots;
-  @FXML protected TextField settingsDirectory;
-  @FXML protected Button openSettingsDirectory;
-  @FXML protected CheckBox alwaysShowLauncher;
-  @FXML protected Button launchButton;
-  @FXML protected Button cancelButton;
-  @FXML protected Label launcherVersion;
-  @FXML protected TitledPane advancedSettings;
-  @FXML protected Button pluginsButton;
+  @FXML public ComboBox<VersionInfo> version;
+  @FXML public Button checkForUpdate;
+  @FXML public ProgressIndicator busyIndicator;
+  @FXML public TextField minecraftDirectory;
+  @FXML public Button browseMinecraft;
+  @FXML public IntegerAdjuster memoryLimit;
+  @FXML public TextField updateSite;
+  @FXML public Button resetUpdateSite;
+  @FXML public TextField javaRuntime;
+  @FXML public Button browseJava;
+  @FXML public TextField javaOptions;
+  @FXML public TextField chunkyOptions;
+  @FXML public CheckBox enableDebugConsole;
+  @FXML public CheckBox verboseLogging;
+  @FXML public CheckBox closeConsoleOnExit;
+  @FXML public TextField settingsDirectory;
+  @FXML public Button openSettingsDirectory;
+  @FXML public CheckBox alwaysShowLauncher;
+  @FXML public Button launchButton;
+  @FXML public Button cancelButton;
+  @FXML public Label launcherVersion;
+  @FXML public TitledPane advancedSettings;
+  @FXML public Button pluginsButton;
+  @FXML public ComboBox<ReleaseChannel> releaseChannelBox;
+  @FXML public Button releaseChannelReload;
 
   public ChunkyLauncherController(LauncherSettings settings) {
     this.settings = settings;
@@ -102,7 +93,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     });
     launchButton.setTooltip(new Tooltip("Launch Chunky using the current settings."));
     launchButton.setOnAction(event -> launchChunky());
-    launcherVersion.setText(ChunkyLauncher.LAUNCHER_VERSION);
+    launcherVersion.setText("v" + ChunkyLauncher.LAUNCHER_VERSION);
     advancedSettings.setExpanded(settings.showAdvancedSettings);
     advancedSettings.expandedProperty().addListener(observable -> Platform.runLater(
             () -> advancedSettings.getScene().getWindow().sizeToScene()));
@@ -145,13 +136,14 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
 
     updateSite.setText(settings.updateSite);
     updateSite.setTooltip(new Tooltip("Update site URL for Chunky releases."));
-    updateSite.textProperty().addListener((observable, oldValue, newValue) -> {
-      settings.updateSite = newValue;
-      settings.save();
+    updateSite.focusedProperty().addListener((observable)->{
+        if(!updateSite.isFocused() && !updateSite.getText().equals(settings.updateSite)) {
+            settings.updateSite = updateSite.getText();
+            settings.save();
+            updateLauncher();
+        }
     });
-    resetUpdateSite.setOnAction(event -> {
-      updateSite.setText(LauncherSettings.DEFAULT_UPDATE_SITE);
-    });
+    resetUpdateSite.setOnAction(event -> updateSite.setText(LauncherSettings.DEFAULT_UPDATE_SITE));
     resetUpdateSite.setTooltip(new Tooltip("Reset to default Chunky update site."));
 
     javaRuntime.setText(getConfiguredJre());
@@ -188,14 +180,37 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     verboseLogging.setSelected(settings.verboseLogging);
     closeConsoleOnExit.setTooltip(new Tooltip("Close the debug console when Chunky exits."));
     closeConsoleOnExit.setSelected(settings.closeConsoleOnExit);
-    downloadSnapshots.setSelected(settings.downloadSnapshots);
-    downloadSnapshots.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      // In contrast to the other options, we have to update the
-      // "download snapshots" setting directly so that when the
-      // user clicks "Check for Update" we will respect the check box value.
-      settings.downloadSnapshots = newValue;
-      settings.save();
+
+    CustomizedListCellFactory.install(releaseChannelBox, new CustomizedListCellFactory.Adapter<ReleaseChannel>() {
+      @Override
+      public String getLabel(ReleaseChannel item) {
+        return item.name;
+      }
+
+      @Override
+      public Tooltip getTooltip(ReleaseChannel item) {
+        return new Tooltip(item.notes);
+      }
     });
+    releaseChannelBox.getSelectionModel().selectedItemProperty().addListener(
+        (observable, oldValue, newValue) -> {
+          if (newValue == null) {
+            releaseChannelBox.setTooltip(null);
+          } else {
+            releaseChannelBox.setTooltip(new Tooltip(newValue.notes));
+            settings.selectedChannel = newValue;
+            settings.save();
+          }
+        });
+    updateChannelsList();
+
+    releaseChannelReload.setOnAction(event -> {
+      if (isBusy()) {
+        setBusy(true);
+        updateLauncher();
+      }
+    });
+
     openSettingsDirectory.setOnAction(event -> {
       // Running Desktop.open() on the JavaFX application thread seems to
       // lock up the application on Linux, so we create a new thread to run that.
@@ -220,10 +235,51 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     checkForUpdate.setOnAction(event -> {
       if (isBusy()) {
         setBusy(true);
-        UpdateChecker updateThread = new UpdateChecker(settings, this);
+        UpdateChecker updateThread = new UpdateChecker(settings, settings.selectedChannel, this);
         updateThread.start();
       }
     });
+
+    updateLauncher(
+        error -> System.err.printf("Could not update the launcher data. %s\n", error),
+        info -> Platform.runLater(this::updateChannelsList)
+    );
+  }
+
+  public void updateLauncher() {
+    updateLauncher(
+        error -> Platform.runLater(() -> {
+          setBusy(false);
+          launcherError("Failed to update the launcher", error);
+        }),
+        info -> Platform.runLater(() -> {
+          setBusy(false);
+          updateChannelsList();
+        })
+    );
+  }
+
+  public void updateLauncher(Consumer<String> errorCallback, Consumer<LauncherInfo> infoCallback) {
+    LauncherInfoChecker updateChecker = new LauncherInfoChecker(settings,
+        errorCallback,
+        info -> {
+          if (info != null) {
+            if (info.version.isGreaterThan(ChunkyLauncher.LAUNCHER_VERSION)) {
+              Platform.runLater(() -> {
+                try {
+                  LauncherUpdateDialog updateDialog = new LauncherUpdateDialog(settings, info);
+                  updateDialog.show();
+                } catch (IOException e) {
+                  e.printStackTrace(System.err);
+                }
+              });
+            }
+
+            settings.setReleaseChannels(info.channels);
+          }
+          infoCallback.accept(info);
+        });
+    updateChecker.start();
   }
 
   /**
@@ -265,6 +321,12 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     LaunchErrorDialog dialog = new LaunchErrorDialog(message);
     dialog.show();
     dialog.toFront();
+  }
+
+  private void updateChannelsList() {
+    releaseChannelBox.getItems().clear();
+    releaseChannelBox.getItems().addAll(settings.releaseChannels.values());
+    releaseChannelBox.getSelectionModel().select(settings.selectedChannel);
   }
 
   /** Initialize or update the version list. */
@@ -313,6 +375,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
   public void setBusy(boolean busy) {
     busyIndicator.setVisible(busy);
     checkForUpdate.setDisable(busy);
+    releaseChannelReload.setDisable(busy);
   }
 
   /**

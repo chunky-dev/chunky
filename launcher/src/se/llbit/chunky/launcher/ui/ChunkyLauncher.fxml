@@ -1,20 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ProgressIndicator?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-<?import se.llbit.chunky.ui.IntegerAdjuster?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import se.llbit.chunky.ui.*?>
 
 <VBox xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
@@ -85,7 +75,13 @@
                               <CheckBox fx:id="enableDebugConsole" mnemonicParsing="false" text="Enable debug console" />
                               <CheckBox fx:id="verboseLogging" mnemonicParsing="false" text="Verbose logging" />
                               <CheckBox fx:id="closeConsoleOnExit" mnemonicParsing="false" text="Close console when Chunky exits" />
-                              <CheckBox fx:id="downloadSnapshots" mnemonicParsing="false" text="Download snapshots" />
+                              <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                 <children>
+                                    <Label text="Release channel:" />
+                                    <ComboBox fx:id="releaseChannelBox" />
+                                    <Button fx:id="releaseChannelReload" mnemonicParsing="false" text="Reload" />
+                                 </children>
+                              </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="10.0">
                                  <children>
                                     <Label text="Settings directory:" />
