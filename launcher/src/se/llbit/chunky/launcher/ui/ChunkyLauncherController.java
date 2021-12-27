@@ -33,6 +33,7 @@ import se.llbit.chunky.launcher.*;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.ui.IntegerAdjuster;
+import se.llbit.fxutil.CustomizedListCellFactory;
 
 import java.awt.*;
 import java.io.File;
@@ -180,8 +181,17 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     closeConsoleOnExit.setTooltip(new Tooltip("Close the debug console when Chunky exits."));
     closeConsoleOnExit.setSelected(settings.closeConsoleOnExit);
 
-    releaseChannelBox.setCellFactory(new ReleaseChannel.CellFactory());
-    releaseChannelBox.setButtonCell(new ReleaseChannel.ReleaseChannelCell());
+    CustomizedListCellFactory.install(releaseChannelBox, new CustomizedListCellFactory.Adapter<ReleaseChannel>() {
+      @Override
+      public String getLabel(ReleaseChannel item) {
+        return item.name;
+      }
+
+      @Override
+      public Tooltip getTooltip(ReleaseChannel item) {
+        return new Tooltip(item.notes);
+      }
+    });
     releaseChannelBox.getSelectionModel().selectedItemProperty().addListener(
         (observable, oldValue, newValue) -> {
           if (newValue == null) {

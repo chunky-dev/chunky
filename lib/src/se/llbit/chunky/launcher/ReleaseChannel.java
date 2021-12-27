@@ -16,35 +16,9 @@
  */
 package se.llbit.chunky.launcher;
 
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Tooltip;
-import javafx.util.Callback;
 import se.llbit.json.JsonObject;
 
-import java.util.Objects;
-
 public class ReleaseChannel {
-    public static final class ReleaseChannelCell extends ListCell<ReleaseChannel> {
-        @Override
-        protected void updateItem(ReleaseChannel item, boolean empty) {
-            super.updateItem(item, empty);
-            if (item == null || empty) {
-                setGraphic(null);
-            } else {
-                setText(item.name);
-                setTooltip(new Tooltip(item.notes));
-            }
-        }
-    }
-
-    public static final class CellFactory implements Callback<ListView<ReleaseChannel>, ListCell<ReleaseChannel>> {
-        @Override
-        public ListCell<ReleaseChannel> call(ListView<ReleaseChannel> param) {
-            return new ReleaseChannelCell();
-        }
-    }
-
     public final String id;
     public final String name;
     public final String path;
