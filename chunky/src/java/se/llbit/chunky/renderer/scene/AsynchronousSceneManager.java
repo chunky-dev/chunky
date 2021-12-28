@@ -20,6 +20,7 @@ package se.llbit.chunky.renderer.scene;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderManager;
+import se.llbit.chunky.renderer.SceneIOProvider;
 import se.llbit.chunky.renderer.SceneProvider;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
@@ -153,6 +154,41 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
   }
 
   /**
+   * Save the current scene.
+   * @param newName Name of the scene copy
+   */
+  public void saveSceneAs(String newName) {
+    enqueueTask(() -> {
+      try {
+        sceneManager.withSceneProtected(scene -> scene.setName(newName));
+        sceneManager.saveSceneAs(newName);
+      } catch (InterruptedException e) {
+        Log.warn("Scene saving was interrupted.");
+      }
+    });
+  }
+
+  /**
+   * Save a copy of the current scene using the given io provider.
+   * @param ioProvider IO provider to use for saving the scene
+   * @param newName Name of the scene copy
+   */
+  public void saveSceneCopy(SceneIOProvider ioProvider, String newName) {
+    enqueueTask(() -> {
+      try {
+        Scene[] copy = new Scene[1];
+        sceneManager.withSceneProtected(scene -> {
+          copy[0] = new Scene(scene);
+        });
+        copy[0].setName(newName);
+        sceneManager.saveScene(ioProvider, copy[0]);
+      } catch (InterruptedException e) {
+        Log.warn("Scene saving was interrupted.");
+      }
+    });
+  }
+
+  /**
    * Load chunks and reset camera.
    */
   @Override
@@ -188,27 +224,6 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
    */
   public void enqueueTask(Runnable task) {
     taskQueue.add(task);
-  }
-
-  /**
-   * Find a preferred scene name by attempting to avoid name collisions.
-   *
-   * @return the preferred scene name
-   */
-  public static String preferredSceneName(RenderContext context, String name) {
-    String suffix = "";
-    name = sanitizedSceneName(name);
-    int count = 0;
-    do {
-      String targetName = name + suffix;
-      if (sceneNameIsAvailable(context, targetName)) {
-        return targetName;
-      }
-      count += 1;
-      suffix = "" + count;
-    } while (count < 256);
-    // Give up.
-    return name;
   }
 
   /**
@@ -257,16 +272,6 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
       return false;
     }
     return c <= '\u007e' || c >= '\u00a0';
-  }
-
-  /**
-   * Check for scene name collision.
-   *
-   * @return <code>true</code> if the scene name does not collide with an
-   * already existing scene
-   */
-  public static boolean sceneNameIsAvailable(RenderContext context, String sceneName) {
-    return !context.getSceneDescriptionFile(sceneName).exists();
   }
 
   /**

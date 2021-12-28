@@ -19,12 +19,7 @@ package se.llbit.chunky.renderer.scene;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.plugin.PluginApi;
-import se.llbit.chunky.renderer.RenderContext;
-import se.llbit.chunky.renderer.RenderMode;
-import se.llbit.chunky.renderer.RenderStatus;
-import se.llbit.chunky.renderer.RenderManager;
-import se.llbit.chunky.renderer.ResetReason;
-import se.llbit.chunky.renderer.SceneProvider;
+import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
 import se.llbit.log.Log;
@@ -123,8 +118,8 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         }
 
         // Create backup of scene description and current render dump.
-        storedScene.backupFile(context, context.getSceneDescriptionFile(sceneName));
-        storedScene.backupFile(context, new File(sceneDirectory, sceneName + ".dump"));
+        scene.backupFile(sceneDirectory, new File(sceneDirectory, sceneName + Scene.EXTENSION));
+        scene.backupFile(sceneDirectory, new File(sceneDirectory, sceneName + ".dump"));
 
         // Copy render status over from the renderManager.
         RenderStatus status = renderManager.getRenderStatus();
@@ -141,12 +136,30 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   @PluginApi
   @Deprecated
   @Override public void saveScene() throws InterruptedException {
+    synchronized (storedScene) {
+      saveScene(context, storedScene);
+    }
+  }
+
+  public void saveSceneAs(String newName) throws InterruptedException {
+    synchronized (storedScene) {
+      synchronized (scene) {
+        storedScene.setName(newName);
+        scene.setName(newName);
+      }
+    }
+    context.setSceneDirectory(resolveSceneDirectory(newName));
+    saveScene();
+  }
+
+  public void saveScene(SceneIOProvider context, Scene scene) throws InterruptedException {
     try {
-      synchronized (storedScene) {
-        String sceneName = storedScene.name();
+        String sceneName = scene.name();
         Log.info("Saving scene " + sceneName);
-        File sceneDir = resolveSceneDirectory(sceneName);
-        context.setSceneDirectory(sceneDir);
+        File sceneDir = context.getSceneDirectory();
+        if (!sceneDir.isDirectory()) {
+          sceneDir = resolveSceneDirectory(sceneName);
+        }
         if (!sceneDir.isDirectory()) {
           boolean success = sceneDir.mkdirs();
           if (!success) {
@@ -156,16 +169,15 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         }
 
         // Create backup of scene description and current render dump.
-        storedScene.backupFile(context, context.getSceneDescriptionFile(sceneName));
-        storedScene.backupFile(context, new File(sceneDir, sceneName + ".dump"));
+        scene.backupFile(sceneDir, new File(sceneDir, sceneName + Scene.EXTENSION));
+        scene.backupFile(sceneDir, new File(sceneDir, sceneName + ".dump"));
 
-        // Copy render status over from the renderManager.
-        RenderStatus status = renderManager.getRenderStatus();
-        storedScene.renderTime = status.getRenderTime();
-        storedScene.spp = status.getSpp();
-        storedScene.saveScene(context, taskTracker);
-        Log.info("Scene saved");
-      }
+      // Copy render status over from the renderManager.
+      RenderStatus status = renderManager.getRenderStatus();
+      scene.renderTime = status.getRenderTime();
+      scene.spp = status.getSpp();
+      scene.saveScene(context, taskTracker);
+      Log.info("Scene saved");
     } catch (IOException e) {
       Log.error("Failed to save scene. Reason: " + e.getMessage(), e);
     }

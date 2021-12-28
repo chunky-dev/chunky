@@ -18,10 +18,7 @@
 package se.llbit.chunky.ui.controller;
 
 import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
@@ -33,7 +30,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
-import javafx.application.Application;
+
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -49,7 +46,6 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
@@ -81,10 +77,6 @@ import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
-import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
-import se.llbit.chunky.renderer.scene.Camera;
-import se.llbit.chunky.renderer.scene.RenderResetHandler;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.ChunkMap;
 import se.llbit.chunky.ui.dialogs.*;
 import se.llbit.chunky.ui.DoubleTextField;
@@ -94,6 +86,7 @@ import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.ui.RenderCanvasFx;
 import se.llbit.chunky.ui.UILogReceiver;
 import se.llbit.chunky.ui.dialogs.WorldChooser;
+import se.llbit.chunky.renderer.scene.*;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
@@ -155,6 +148,7 @@ public class ChunkyFxController
 
   @FXML private MenuItem saveScene;
   @FXML private MenuItem saveSceneAs;
+  @FXML private MenuItem saveSceneCopy;
   @FXML private MenuItem loadScene;
   @FXML private MenuItem creditsMenuItem;
 
@@ -426,9 +420,37 @@ public class ChunkyFxController
       ValidatingTextInputDialog sceneNameDialog = new ValidatingTextInputDialog(scene.name(), AsynchronousSceneManager::sceneNameIsValid);
       sceneNameDialog.setTitle("Save scene as…");
       sceneNameDialog.setHeaderText("Enter a scene name");
-      String newName = sceneNameDialog.showAndWait().orElse("");
-      if (!newName.isEmpty()) {
-        this.saveSceneSafe(renderController.getContext().getSceneDirectory(), newName);
+      String newName = AsynchronousSceneManager.sanitizedSceneName(sceneNameDialog.showAndWait().orElse(""));
+      if (!newName.isEmpty() && this.promptSaveScene(newName)) {
+        asyncSceneManager.saveSceneAs(newName);
+        scene.setName(newName);
+        updateTitle();
+      }
+    });
+
+    saveSceneCopy.setOnAction((e) -> {
+      ValidatingTextInputDialog sceneNameDialog = new ValidatingTextInputDialog("Copy of " + scene.name(), AsynchronousSceneManager::sceneNameIsValid);
+      sceneNameDialog.setTitle("Save a copy…");
+      sceneNameDialog.setHeaderText("Enter a scene name");
+      String newName = AsynchronousSceneManager.sanitizedSceneName(sceneNameDialog.showAndWait().orElse(""));
+      if (!newName.isEmpty() && this.promptSaveScene(newName)) {
+        File sceneDirectory = SynchronousSceneManager.resolveSceneDirectory(newName);
+        asyncSceneManager.enqueueTask(() -> {
+          asyncSceneManager.saveSceneCopy(new SceneIOProvider() {
+            @Override
+            public File getSceneDirectory() {
+              return sceneDirectory;
+            }
+
+            @Override
+            public File getSceneFile(String fileName) {
+              if (!sceneDirectory.exists()) {
+                sceneDirectory.mkdirs();
+              }
+              return new File(getSceneDirectory(), fileName);
+            }
+          }, newName);
+        });
       }
     });
 
@@ -894,22 +916,18 @@ public class ChunkyFxController
     map.cameraViewUpdated();
   }
 
-  private void saveSceneSafe(File sceneDirectory, String sceneName) {
+  private boolean promptSaveScene(String sceneName) {
     File oldFormat = new File(PersistentSettings.getSceneDirectory(), sceneName + Scene.EXTENSION);
     File newFormat = new File(PersistentSettings.getSceneDirectory(), sceneName);
-    if (!newFormat.equals(sceneDirectory)) {
-      // different path than before, we're overwriting some existing scene
-      if (oldFormat.exists() || newFormat.exists()) {
-        Alert alert = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Overwrite existing scene");
-        alert.setContentText("A scene with that name already exists. This will overwrite the existing scene, are you sure you want to continue?");
+    if (oldFormat.exists() || newFormat.exists()) {
+      Alert alert = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
+      alert.setTitle("Overwrite existing scene");
+      alert.setContentText("A scene with that name already exists. This will overwrite the existing scene, are you sure you want to continue?");
 
-        if (alert.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) return;
+      if (alert.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
+        return false;
       }
     }
-    scene.setName(sceneName);
-    renderController.getSceneProvider().withSceneProtected(scene1 -> scene1.setName(sceneName));
-    updateTitle();
-    asyncSceneManager.saveScene(newFormat);
+    return  true;
   }
 }
