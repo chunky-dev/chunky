@@ -49,8 +49,8 @@ public class UpdateChecker extends Thread {
       if (!tryUpdate()) {
         listener.noUpdateAvailable();
       }
-    } catch (Throwable e1) {
-      System.err.println("Unhandled exception: " + e1.getMessage());
+    } catch (Exception e1) {
+      e1.printStackTrace();
       listener.updateError("Can not update at this time.");
     }
   }
