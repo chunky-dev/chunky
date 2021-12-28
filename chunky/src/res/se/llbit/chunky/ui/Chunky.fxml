@@ -40,8 +40,7 @@
       <MenuItem fx:id="menuExit" mnemonicParsing="false" text="Quit" />
     </Menu>
     <Menu mnemonicParsing="false" text="Help">
-      <HyperlinkMenuItem link="http://chunky.llbit.se" text="Online Documentation" />
-      <HyperlinkMenuItem link="https://lemaik.github.io/chunky" text="Chunky 2.x Documentation" />
+      <HyperlinkMenuItem link="https://chunky-dev.github.io/docs" text="Chunky Manual" />
       <HyperlinkMenuItem link="https://jackjt8.github.io/ChunkyGuide/" text="jackjt8's Guide to Chunky" />
       <SeparatorMenuItem />
       <HyperlinkMenuItem link="https://github.com/chunky-dev/chunky" text="GitHub Repo" />
