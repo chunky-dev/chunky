@@ -39,6 +39,7 @@ import se.llbit.chunky.world.Material;
 import se.llbit.log.Log;
 import se.llbit.util.PositionalInputStream;
 import se.llbit.util.PositionalOutputStream;
+import se.llbit.util.Registerable;
 import se.llbit.util.TaskTracker;
 
 /**
@@ -111,12 +112,11 @@ public class Octree {
 
   public interface NodeId {}
 
-  public interface ImplementationFactory {
+  public interface ImplementationFactory extends Registerable {
     OctreeImplementation create(int depth);
     OctreeImplementation load(DataInputStream in) throws IOException;
     OctreeImplementation loadWithNodeCount(long nodeCount, DataInputStream in) throws IOException;
     boolean isOfType(OctreeImplementation implementation);
-    String getDescription();
   }
 
   static private Map<String, ImplementationFactory> factories = new HashMap<>();
@@ -836,8 +836,8 @@ public class Octree {
     return implementation;
   }
 
-  public static void addImplementationFactory(String name, ImplementationFactory factory) {
-    factories.put(name, factory);
+  public static void addImplementationFactory(ImplementationFactory factory) {
+    factories.put(factory.getId(), factory);
   }
 
   static {
@@ -848,5 +848,9 @@ public class Octree {
 
   public static Iterable<Map.Entry<String, ImplementationFactory>> getEntries() {
     return factories.entrySet();
+  }
+
+  public static ImplementationFactory getImplementation(String id) {
+    return factories.get(id);
   }
 }

@@ -23,6 +23,7 @@ import se.llbit.log.Log;
 import se.llbit.math.Intersectable;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
+import se.llbit.util.Registerable;
 import se.llbit.util.TaskTracker;
 
 import java.util.Collection;
@@ -45,11 +46,10 @@ public interface BVH extends Intersectable {
 
   final class Factory {
 
-    public interface BVHBuilder {
+    public interface BVHBuilder extends Registerable {
       BVH create(Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task);
 
-      String getName();
-      String getDescription();
+      default String getId() { return getName(); };
     }
 
     /**
@@ -62,7 +62,7 @@ public interface BVH extends Intersectable {
 
     public static BVHBuilder getImplementation(String id) {
       if (!implementations.containsKey(id))
-        Log.warn("Unknown BVH implementation: " + id + ". Using " + DEFAULT_IMPLEMENTATION.getName() + ".");
+        Log.warn("Unknown BVH implementation: " + id + ". Using " + DEFAULT_IMPLEMENTATION.getId() + ".");
       return implementations.getOrDefault(id, DEFAULT_IMPLEMENTATION);
     }
 
@@ -79,9 +79,9 @@ public interface BVH extends Intersectable {
      */
     @PluginApi
     public static void addBVHBuilder(BVHBuilder builder) {
-      if (implementations.containsKey(builder.getName()))
-        Log.warn("Attempted to register 2+ BVH builders with the name " + builder.getName() + " (do you have the same plugin installed twice?)");
-      implementations.put(builder.getName(), builder);
+      if (implementations.containsKey(builder.getId()))
+        Log.warn("Attempted to register 2+ BVH builders with the ID " + builder.getId() + " (do you have the same plugin installed twice?)");
+      implementations.put(builder.getId(), builder);
     }
 
     static {

@@ -27,9 +27,7 @@ import javafx.util.StringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.Chunky;
-import se.llbit.chunky.renderer.EmitterSamplingStrategy;
-import se.llbit.chunky.renderer.RenderController;
-import se.llbit.chunky.renderer.RenderManager;
+import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
@@ -38,9 +36,11 @@ import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
 import se.llbit.chunky.ui.Adjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
+import se.llbit.chunky.ui.RegisterableCellAdapter;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.ShutdownAlert;
 import se.llbit.chunky.ui.render.RenderControlsTab;
+import se.llbit.fxutil.CustomizedListCellFactory;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.log.Log;
 import se.llbit.math.Octree;
@@ -72,16 +72,16 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster transmissivityCap;
   @FXML private IntegerAdjuster cacheResolution;
   @FXML private DoubleAdjuster animationTime;
-  @FXML private ChoiceBox<PictureExportFormat> outputMode;
-  @FXML private ChoiceBox<String> octreeImplementation;
+  @FXML private ComboBox<PictureExportFormat> outputMode;
+  @FXML private ComboBox<Octree.ImplementationFactory> octreeImplementation;
   @FXML private Button octreeSwitchImplementation;
-  @FXML private ChoiceBox<String> bvhMethod;
-  @FXML private ChoiceBox<String> biomeStructureImplementation;
+  @FXML private ComboBox<BVH.Factory.BVHBuilder> bvhMethod;
+  @FXML private ComboBox<BiomeStructure.Factory> biomeStructureImplementation;
   @FXML private IntegerAdjuster gridSize;
   @FXML private CheckBox preventNormalEmitterWithSampling;
   @FXML private CheckBox hideUnknownBlocks;
-  @FXML private ChoiceBox<String> rendererSelect;
-  @FXML private ChoiceBox<String> previewSelect;
+  @FXML private ComboBox<Renderer> rendererSelect;
+  @FXML private ComboBox<Renderer> previewSelect;
   @FXML private CheckBox showLauncher;
 
   public AdvancedTab() throws IOException {
@@ -95,6 +95,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   public void initialize(URL location, ResourceBundle resources) {
     outputMode.getItems().addAll(PictureExportFormats.getFormats());
     outputMode.getSelectionModel().select(PictureExportFormats.PNG);
+    CustomizedListCellFactory.install(outputMode, PictureExportFormat::getDescription);
     cpuLoad.setName("CPU utilization");
     cpuLoad.setTooltip("CPU utilization percentage per render thread.");
     cpuLoad.setRange(1, 100);
@@ -196,77 +197,76 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       renderControls.showPopup("This change takes effect after restarting Chunky.", renderThreads);
     });
 
-    ArrayList<String> octreeNames = new ArrayList<>();
+    ArrayList<Octree.ImplementationFactory> octreeImplementations = new ArrayList<>();
     StringBuilder tooltipTextBuilder = new StringBuilder();
     for(Map.Entry<String, Octree.ImplementationFactory> entry : Octree.getEntries()) {
-      octreeNames.add(entry.getKey());
+      octreeImplementations.add(entry.getValue());
       tooltipTextBuilder.append(entry.getKey());
       tooltipTextBuilder.append(": ");
       tooltipTextBuilder.append(entry.getValue().getDescription());
       tooltipTextBuilder.append('\n');
     }
     tooltipTextBuilder.append("Requires reloading chunks to take effect.");
-    octreeImplementation.getItems().addAll(octreeNames);
+    octreeImplementation.getItems().addAll(octreeImplementations);
     octreeImplementation.getSelectionModel().selectedItemProperty()
             .addListener((observable, oldvalue, newvalue) -> {
-              PersistentSettings.setOctreeImplementation(newvalue);
-              if (!scene.getOctreeImplementation().equals(newvalue)) {
-                scene.setOctreeImplementation(newvalue);
+              PersistentSettings.setOctreeImplementation(newvalue.getId());
+              if (!scene.getOctreeImplementation().equals(getId())) {
+                scene.setOctreeImplementation(newvalue.getId());
                 scene.softRefresh();
               }
             });
+    CustomizedListCellFactory.install(octreeImplementation, RegisterableCellAdapter.INSTANCE);
     octreeImplementation.setTooltip(new Tooltip(tooltipTextBuilder.toString()));
 
     octreeSwitchImplementation.setOnAction(event -> Chunky.getCommonThreads().submit(() -> {
       TaskTracker tracker = controller.getSceneManager().getTaskTracker();
       try {
         try (TaskTracker.Task task = tracker.task("(1/2) Converting world octree", 1000)) {
-          scene.getWorldOctree().switchImplementation(octreeImplementation.getValue(), task);
+          scene.getWorldOctree().switchImplementation(octreeImplementation.getValue().getId(), task);
         }
         try (TaskTracker.Task task = tracker.task("(2/2) Converting water octree")) {
-          scene.getWaterOctree().switchImplementation(octreeImplementation.getValue(), task);
+          scene.getWaterOctree().switchImplementation(octreeImplementation.getValue().getId(), task);
         }
       } catch (IOException e) {
         Log.error("Switching octrees failed. Reload the scene.\n", e);
       }
     }));
 
-    ArrayList<String> bvhNames = new ArrayList<>();
     StringBuilder bvhMethodBuilder = new StringBuilder();
     for (BVH.Factory.BVHBuilder builder : BVH.Factory.getImplementations()) {
-      bvhNames.add(builder.getName());
       bvhMethodBuilder.append(builder.getName());
       bvhMethodBuilder.append(": ");
       bvhMethodBuilder.append(builder.getDescription());
       bvhMethodBuilder.append('\n');
     }
     bvhMethodBuilder.append("Requires reloading chunks to take effect.");
-    bvhMethod.getItems().addAll(bvhNames);
-    bvhMethod.getSelectionModel().select(PersistentSettings.getBvhMethod());
+    bvhMethod.getItems().addAll(BVH.Factory.getImplementations());
+    bvhMethod.getSelectionModel().select(BVH.Factory.getImplementation(PersistentSettings.getBvhMethod()));
     bvhMethod.getSelectionModel().selectedItemProperty()
             .addListener(((observable, oldValue, newValue) -> {
-              PersistentSettings.setBvhMethod(newValue);
-              scene.setBvhImplementation(newValue);
+              PersistentSettings.setBvhMethod(newValue.getId());
+              scene.setBvhImplementation(newValue.getId());
               scene.softRefresh();
             }));
+    CustomizedListCellFactory.install(bvhMethod, RegisterableCellAdapter.INSTANCE);
     bvhMethod.setTooltip(new Tooltip(bvhMethodBuilder.toString()));
 
-    ArrayList<String> biomeStructureIds = new ArrayList<>();
     StringBuilder biomeStructureTooltipBuilder = new StringBuilder();
     for (Registerable entry : BiomeStructure.REGISTRY.values()) {
-      biomeStructureIds.add(entry.getId());
       biomeStructureTooltipBuilder.append(entry.getName());
       biomeStructureTooltipBuilder.append(": ");
       biomeStructureTooltipBuilder.append(entry.getDescription());
       biomeStructureTooltipBuilder.append('\n');
     }
     biomeStructureTooltipBuilder.append("Requires reloading chunks to take effect.");
-    biomeStructureImplementation.getItems().addAll(biomeStructureIds);
+    biomeStructureImplementation.getItems().addAll(BiomeStructure.REGISTRY.values());
     biomeStructureImplementation.getSelectionModel().selectedItemProperty()
       .addListener((observable, oldvalue, newvalue) -> {
-        scene.setBiomeStructureImplementation(newvalue);
-        PersistentSettings.setBiomeStructureImplementation(newvalue);
+        scene.setBiomeStructureImplementation(newvalue.getId());
+        PersistentSettings.setBiomeStructureImplementation(newvalue.getId());
       });
+    CustomizedListCellFactory.install(biomeStructureImplementation, RegisterableCellAdapter.INSTANCE);
     biomeStructureImplementation.setTooltip(new Tooltip(biomeStructureTooltipBuilder.toString()));
 
     gridSize.setRange(4, 64);
@@ -306,11 +306,13 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
     rendererSelect.setTooltip(new Tooltip("The renderer to use for rendering."));
     rendererSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-        scene.setRenderer(newValue));
+        scene.setRenderer(newValue.getId()));
+    CustomizedListCellFactory.install(rendererSelect, RegisterableCellAdapter.INSTANCE);
 
     previewSelect.setTooltip(new Tooltip("The renderer to use for the preview."));
     previewSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-        scene.setPreviewRenderer(newValue));
+        scene.setPreviewRenderer(newValue.getId()));
+    CustomizedListCellFactory.install(previewSelect, RegisterableCellAdapter.INSTANCE);
 
     LauncherSettings settings = new LauncherSettings();
     settings.load();
@@ -339,15 +341,15 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());
     branchCount.set(scene.getBranchCount());
-    octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
-    bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
-    biomeStructureImplementation.getSelectionModel().select(scene.getBiomeStructureImplementation());
+    octreeImplementation.getSelectionModel().select(Octree.getImplementation(scene.getOctreeImplementation()));
+    bvhMethod.getSelectionModel().select(BVH.Factory.getImplementation(scene.getBvhImplementation()));
+    biomeStructureImplementation.getSelectionModel().select(BiomeStructure.REGISTRY.get(scene.getBiomeStructureImplementation()));
     gridSize.set(scene.getGridSize());
     preventNormalEmitterWithSampling.setSelected(scene.isPreventNormalEmitterWithSampling());
     animationTime.set(scene.getAnimationTime());
     hideUnknownBlocks.setSelected(scene.getHideUnknownBlocks());
-    rendererSelect.getSelectionModel().select(scene.getRenderer());
-    previewSelect.getSelectionModel().select(scene.getPreviewRenderer());
+    rendererSelect.getSelectionModel().select(DefaultRenderManager.renderers.get(scene.getRenderer()));
+    previewSelect.getSelectionModel().select(DefaultRenderManager.previewRenderers.get(scene.getPreviewRenderer()));
   }
 
   @Override
@@ -372,24 +374,17 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       }
     });
 
+
+    RenderManager renderManager = controller.getRenderManager();
+
     // Set the renderers
     rendererSelect.getItems().clear();
-    RenderManager renderManager = controller.getRenderManager();
-    ArrayList<String> ids = new ArrayList<>();
+    rendererSelect.getItems().addAll(renderManager.getRenderers());
+    rendererSelect.getSelectionModel().select(renderManager.getRenderers().stream().filter(r -> r.getId().equals(scene.getRenderer())).findFirst().orElse(null));
 
-    for (Registerable renderer : renderManager.getRenderers())
-      ids.add(renderer.getId());
-
-    rendererSelect.getItems().addAll(ids);
-    rendererSelect.getSelectionModel().select(scene.getRenderer());
-
-    // Set the preview renderers, reuse the `ids` ArrayList
+    // Set the preview renderers
     previewSelect.getItems().clear();
-    ids.clear();
-    for (Registerable render : renderManager.getPreviewRenderers())
-      ids.add(render.getId());
-
-    previewSelect.getItems().addAll(ids);
-    previewSelect.getSelectionModel().select(scene.getPreviewRenderer());
+    previewSelect.getItems().addAll(renderManager.getPreviewRenderers());
+    previewSelect.getSelectionModel().select(renderManager.getPreviewRenderers().stream().filter(r -> r.getId().equals(scene.getPreviewRenderer())).findFirst().orElse(null));
   }
 }

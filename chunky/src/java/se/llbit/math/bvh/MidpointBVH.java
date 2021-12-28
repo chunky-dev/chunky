@@ -52,8 +52,13 @@ public class MidpointBVH extends BinaryBVH {
             }
 
             @Override
-            public String getName() {
+            public String getId() {
                 return "MIDPOINT";
+            }
+
+            @Override
+            public String getName() {
+                return "Midpoint";
             }
 
             @Override

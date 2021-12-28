@@ -53,8 +53,13 @@ public class SahMaBVH extends BinaryBVH {
             }
 
             @Override
-            public String getName() {
+            public String getId() {
                 return "SAH_MA";
+            }
+
+            @Override
+            public String getName() {
+                return "Surface Area Heuristic with Major Axis splitting";
             }
 
             @Override
