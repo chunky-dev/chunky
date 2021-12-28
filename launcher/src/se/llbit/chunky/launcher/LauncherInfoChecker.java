@@ -65,7 +65,7 @@ public class LauncherInfoChecker extends Thread {
             System.err.println("Version info JSON error: " + e.getMessage());
             errorListener.accept("Downloaded corrupt launcher info.");
         } catch (Exception e) {
-            System.err.println("Unhandled exception: " + e.getMessage());
+            e.printStackTrace();
             errorListener.accept("Could not update release channels.");
         }
     }

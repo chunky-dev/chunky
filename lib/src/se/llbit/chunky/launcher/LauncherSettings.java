@@ -114,12 +114,8 @@ public class LauncherSettings {
     String selectedChannelId = releaseChannelObj.get("selectedChannel").stringValue(STABLE_RELEASE_CHANNEL.id);
     selectedChannel = releaseChannels.getOrDefault(selectedChannelId, STABLE_RELEASE_CHANNEL);
     if (settings.getBool("downloadSnapshots", false)) {
-      selectSnapshot();
+      selectedChannel = SNAPSHOT_RELEASE_CHANNEL;
     }
-  }
-
-  public void selectSnapshot() {
-    selectedChannel = releaseChannels.get(SNAPSHOT_RELEASE_CHANNEL.id);
   }
 
   private String defaultJavaOptions() {
