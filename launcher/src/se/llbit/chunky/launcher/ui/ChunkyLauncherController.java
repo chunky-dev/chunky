@@ -91,6 +91,15 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
         e.printStackTrace();
       }
     });
+    CustomizedListCellFactory.install(version, new CustomizedListCellFactory.Adapter<VersionInfo>() {
+      @Override
+      public String getLabel(VersionInfo item) {
+        if (item == VersionInfo.LATEST) {
+          return "latest (" + ChunkyDeployer.availableVersions().get(0).name + ")";
+        }
+        return item.name;
+      }
+    });
     launchButton.setTooltip(new Tooltip("Launch Chunky using the current settings."));
     launchButton.setOnAction(event -> launchChunky());
     launcherVersion.setText("v" + ChunkyLauncher.LAUNCHER_VERSION);
