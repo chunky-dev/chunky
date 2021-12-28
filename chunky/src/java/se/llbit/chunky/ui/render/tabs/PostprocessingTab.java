@@ -20,10 +20,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.util.StringConverter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
@@ -32,20 +33,22 @@ import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.render.RenderControlsTab;
+import se.llbit.chunky.ui.RegisterableCellAdapter;
+import se.llbit.fxutil.CustomizedListCellFactory;
 import se.llbit.util.ProgressListener;
 import se.llbit.util.TaskTracker;
+import se.llbit.util.TaskTracker.Task;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import se.llbit.util.TaskTracker.Task;
 
 public class PostprocessingTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
   private RenderControlsFxController controller;
 
   @FXML private DoubleAdjuster exposure;
-  @FXML private ChoiceBox<PostProcessingFilter> postprocessingFilter;
+  @FXML private ComboBox<PostProcessingFilter> postprocessingFilter;
 
   public PostprocessingTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("PostprocessingTab.fxml"));
@@ -84,21 +87,13 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
     postprocessingFilter.getSelectionModel().select(Scene.DEFAULT_POSTPROCESSING_FILTER);
     postprocessingFilter.getSelectionModel().selectedItemProperty().addListener(
         (observable, oldValue, newValue) -> {
-          scene.setPostprocess(newValue);
-          scene.postProcessFrame(new TaskTracker(ProgressListener.NONE));
-          controller.getCanvas().forceRepaint();
+          if (!(newValue instanceof Separator)) {
+            scene.setPostprocess(newValue);
+            scene.postProcessFrame(new TaskTracker(ProgressListener.NONE));
+            controller.getCanvas().forceRepaint();
+          }
         });
-    postprocessingFilter.setConverter(new StringConverter<PostProcessingFilter>() {
-      @Override
-      public String toString(PostProcessingFilter object) {
-        return object == null ? null : object.getName();
-      }
-
-      @Override
-      public PostProcessingFilter fromString(String string) {
-        return PostProcessingFilters.getPostProcessingFilterFromName(string).orElse(Scene.DEFAULT_POSTPROCESSING_FILTER);
-      }
-    });
+    CustomizedListCellFactory.install(postprocessingFilter, RegisterableCellAdapter.INSTANCE);
     exposure.setName("Exposure");
     exposure.setTooltip("Linear exposure of the image.");
     exposure.setRange(Scene.MIN_EXPOSURE, Scene.MAX_EXPOSURE);

@@ -16,11 +16,11 @@
  */
 package se.llbit.fxutil;
 
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Tooltip;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
 
 /**
  * A list cell factory that shows labels and tooltips.
@@ -66,7 +66,13 @@ public class CustomizedListCellFactory<A, T extends A> implements Callback<ListV
             super.updateItem(item, empty);
             if (item == null || empty || adapter == null) {
                 setGraphic(null);
+            } else if (item instanceof Separator) {
+                setDisabled(true);
+                setMouseTransparent(true);
+                setGraphic((Node) item);
+                setPadding(Insets.EMPTY);
             } else {
+                setGraphic(null);
                 setText(adapter.getLabel(item));
                 setTooltip(adapter.getTooltip(item));
             }
