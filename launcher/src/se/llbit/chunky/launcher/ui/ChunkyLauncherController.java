@@ -39,6 +39,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
@@ -95,7 +96,10 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
       @Override
       public String getLabel(VersionInfo item) {
         if (item == VersionInfo.LATEST) {
-          return "latest (" + ChunkyDeployer.availableVersions().get(0).name + ")";
+          List<VersionInfo> availableVersions = ChunkyDeployer.availableVersions();
+          if (!availableVersions.isEmpty()) {
+            return "latest (" + availableVersions.get(0).name + ")";
+          }
         }
         return item.name;
       }
