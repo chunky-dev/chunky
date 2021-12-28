@@ -172,15 +172,6 @@ public class Ray {
   }
 
   /**
-   * The block data value is a 4-bit integer value describing properties of the current block.
-   *
-   * @return current block data (sometimes called metadata).
-   */
-  public final int getBlockData() {
-    return 0xF & (currentData >> BlockData.OFFSET);
-  }
-
-  /**
    * Initialize a ray with origin and direction.
    *
    * @param o origin
