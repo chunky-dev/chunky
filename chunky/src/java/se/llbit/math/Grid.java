@@ -36,12 +36,17 @@ public class Grid {
       this.block = block;
     }
 
-    public EmitterPosition(int x, int y, int z, int block, Scene scene) {
-      this(x, y, z, scene.getPalette().get(block));
+    public static EmitterPosition create(int x, int y, int z, int block, Scene scene) {
+      try {
+        return new EmitterPosition(x, y, z, scene.getPalette().get(block));
+      } catch (ArrayIndexOutOfBoundsException e) {
+        // Mismatched block palette?
+        return create(x, y, z, scene);
+      }
     }
 
-    public EmitterPosition(int x, int y, int z, Scene scene) {
-      this(x, y, z, (Block) scene.getWorldOctree().getMaterial(x, y, z, scene.getPalette()));
+    public static EmitterPosition create(int x, int y, int z, Scene scene) {
+      return new EmitterPosition(x, y, z, (Block) scene.getWorldOctree().getMaterial(x, y, z, scene.getPalette()));
     }
 
     public void sample(Vector3 loc, Random rand) {
@@ -303,7 +308,7 @@ public class Grid {
           int x = in.readInt();
           int y = in.readInt();
           int z = in.readInt();
-          grid.emitterPositions.add(new EmitterPosition(x, y, z, scene));
+          grid.emitterPositions.add(EmitterPosition.create(x, y, z, scene));
           break;
         }
         case 2: {
@@ -311,14 +316,14 @@ public class Grid {
           float y = in.readFloat();
           float z = in.readFloat();
           in.readFloat();
-          grid.emitterPositions.add(new EmitterPosition((int) x, (int) y, (int) z, scene));
+          grid.emitterPositions.add(EmitterPosition.create((int) x, (int) y, (int) z, scene));
         }
         case 3: {
           int x = in.readInt();
           int y = in.readInt();
           int z = in.readInt();
           int block = in.readInt();
-          grid.emitterPositions.add(new EmitterPosition(x, y, z, block, scene));
+          grid.emitterPositions.add(EmitterPosition.create(x, y, z, block, scene));
         }
       }
     }
