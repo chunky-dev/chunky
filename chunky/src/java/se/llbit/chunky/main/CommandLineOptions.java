@@ -73,6 +73,8 @@ public class CommandLineOptions {
           "  -tile-width <NUM>      use the specified tile width for rendering",
           "  -spp-per-pass <NUM>    use the specified samples per pixel per pass for rendering",
           "  -target <NUM>          override target SPP to be NUM in headless mode",
+          "  -reload-chunks         reload the selected chunks before rendering the scene",
+          "  -f                     render the scene even if loading the scene fails (e.g. ignore missing octree)",
           "  -set <NAME> <VALUE>    set a global configuration option and exit",
           "  -set <NAME> <VALUE> <SCENE>",
           "                         set a configuration option for a scene and exit",
@@ -89,7 +91,7 @@ public class CommandLineOptions {
           "If the scene name is an absolute path then the scene directory will be the",
           "parent directory of the Scene Description File, otherwise the scene directory",
           "can be overridden temporarily by the -scene-dir option.", "", "Launcher options:",
-          "  --update              download the latest version of Chunky and exit",
+          "  --update [channel]    download the latest version of Chunky and exit",
           "  --setup               configure memory limit and Java options for Chunky",
           "  --nolauncher          start Chunky as normal, but without opening launcher",
           "  --launcher            forces the launcher window to be displayed",
@@ -256,6 +258,10 @@ public class CommandLineOptions {
 
     registerOption("-f", new Range(0), arguments -> {
       options.force = true;
+    });
+
+    registerOption("-reload-chunks", new Range(0), arguments -> {
+      options.reloadChunks = true;
     });
 
     registerOption("-target", new Range(1),

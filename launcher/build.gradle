@@ -1,6 +1,7 @@
 dependencies {
     implementation configurations.jsonlib
     implementation project(':lib')
+    implementation 'com.vdurmont:semver4j:3.1.0'
 }
 
 sourceSets.main {
@@ -21,5 +22,10 @@ jar {
     }
     from configurations.jsonlib.files.collect {
         zipTree(it)
+    }
+
+    // Include other dependencies
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }

@@ -17,6 +17,7 @@
 package se.llbit.chunky.launcher.ui;
 
 import javafx.application.Application;
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -38,8 +39,11 @@ public class ChunkyLauncherFx extends Application {
   private static CountDownLatch latch = new CountDownLatch(1);
   private static Consumer<Stage> callback;
   private static Stage stage;
+  private static HostServices hostServices = null;
 
   @Override public void start(Stage stage) throws Exception {
+    hostServices = getHostServices();
+
     FXMLLoader loader = new FXMLLoader(getClass().getResource("ChunkyLauncher.fxml"));
     ChunkyLauncherController controller = new ChunkyLauncherController(settings);
     loader.setController(controller);
@@ -51,6 +55,14 @@ public class ChunkyLauncherFx extends Application {
     ChunkyLauncherFx.stage = stage;
     latch.countDown();
     callback.accept(stage);
+  }
+
+  public static void launchWebpage(String url) {
+    if (hostServices == null) {
+      Platform.runLater(() -> launchWebpage(url));
+    } else {
+      hostServices.showDocument(url);
+    }
   }
 
   /**

@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.launcher;
 
+import com.vdurmont.semver4j.Semver;
 import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.ui.ChunkyLauncherFx;
@@ -59,7 +60,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ChunkyLauncher {
 
-  public static final String LAUNCHER_VERSION = "v1.12.2";
+  public static final Semver LAUNCHER_VERSION = new Semver("1.13.1");
+  public static final int LAUNCHER_SETTINGS_REVISION = 1;
 
   /**
    * Print a launch error message to the console.
@@ -76,6 +78,10 @@ public class ChunkyLauncher {
     try {
       final LauncherSettings settings = new LauncherSettings();
       settings.load();
+
+      // Currently, there's nothing that changed from previous launcher settings revisions.
+      // In the future this can be queried to make any changes / show messages needed for a launcher version switch.
+      settings.settingsRevision = LAUNCHER_SETTINGS_REVISION;
 
       /*
        * If there are command line arguments then we assume that Chunky should run
@@ -100,7 +106,7 @@ public class ChunkyLauncher {
               forceLauncher = true;
               break;
             case "--version":
-              System.out.println("Chunky Launcher " + LAUNCHER_VERSION);
+              System.out.println("Chunky Launcher v" + LAUNCHER_VERSION);
               return;
             case "--verbose":
               settings.verboseLauncher = true;
@@ -110,13 +116,17 @@ public class ChunkyLauncher {
               break;
             case "--update":
             case "--updateAlpha":
+              ReleaseChannel channel;
               if(arg.equals("--updateAlpha")) {
-                System.out.println("Checking for Chunky alpha/snapshot updates..");
-                settings.downloadSnapshots = true;
+                channel = LauncherSettings.SNAPSHOT_RELEASE_CHANNEL;
               } else {
-                System.out.println("Checking for updates..");
+                channel = settings.selectedChannel;
+                if (i < args.length - 1 && settings.releaseChannels.containsKey(args[i + 1])) {
+                  channel = settings.releaseChannels.getOrDefault(args[i + 1], channel);
+                }
               }
-              UpdateChecker updateThread = new UpdateChecker(settings, new UpdateListener() {
+              System.out.println("Checking for updates on the \"" + channel.name + "\" channel...");
+              UpdateChecker updateThread = new UpdateChecker(settings, channel, new UpdateListener() {
                 @Override
                 public void updateError(String message) {
                 }
@@ -135,10 +145,6 @@ public class ChunkyLauncher {
                 @Override
                 public void noUpdateAvailable() {
                   System.out.println("No updates found.");
-                  if(!settings.downloadSnapshots) {
-                    System.out
-                            .println("Alpha/snapshot updates are disabled, enable with --updateAlpha");
-                  }
                 }
               });
               updateThread.start();
