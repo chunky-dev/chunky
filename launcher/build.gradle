@@ -1,7 +1,13 @@
+configurations {
+    bundled
+}
+
 dependencies {
+    bundled 'com.vdurmont:semver4j:3.1.0'
+
+    implementation configurations.bundled
     implementation configurations.jsonlib
     implementation project(':lib')
-    implementation 'com.vdurmont:semver4j:3.1.0'
 }
 
 sourceSets.main {
@@ -26,6 +32,6 @@ jar {
 
     // Include other dependencies
     from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.bundled.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
