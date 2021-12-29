@@ -61,12 +61,11 @@ subprojects {
 
 defaultTasks 'release'
 
-//task releaseVersion {
-//  doLast {
-//    tryCommand([ 'git', 'commit', '-m', "Release ${project.version}", 'chunky/src/res/se/llbit/chunky/main/Version.properties' ], true)
-//    tryCommand([ 'git', 'tag', '-a', "${project.version}", '-m', "Version ${project.version}" ], true)
-//  }
-//}
+task releaseVersion {
+  doLast {
+    tryCommand([ 'git', 'tag', '-a', "${project.version}", '-m', "Version ${project.version}" ], true)
+  }
+}
 
 task versionInfo(type: JavaExec) {
     dependsOn 'copyArtifacts'
