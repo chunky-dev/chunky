@@ -123,6 +123,16 @@
                                        <Insets left="20.0" />
                                     </padding>
                                  </Hyperlink>
+
+                                 <Hyperlink fx:id="simplexnoise" text="Simplex noise" />
+                                 <Hyperlink fx:id="simplexnoiseLicense" text="Public domain / Unlicense">
+                                    <font>
+                                       <Font size="10.0" />
+                                    </font>
+                                    <padding>
+                                       <Insets left="20.0" />
+                                    </padding>
+                                 </Hyperlink>
                               </children>
                               <padding>
                                  <Insets left="10.0" />

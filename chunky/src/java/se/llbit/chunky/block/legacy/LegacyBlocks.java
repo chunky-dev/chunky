@@ -338,12 +338,30 @@ public class LegacyBlocks {
           case 1: return nameTag(tag, "red_sand");
         }
       case 17:
-        switch (data&3) {
-          default:
-          case 0: return logTag(nameTag(tag, "oak_log"), data);
-          case 1: return logTag(nameTag(tag, "spruce_log"), data);
-          case 2: return logTag(nameTag(tag, "birch_log"), data);
-          case 3: return logTag(nameTag(tag, "jungle_log"), data);
+        if ((data & 0b1100) == 0b1100) {
+          switch (data & 0b11) {
+            default:
+            case 0:
+              return nameTag(tag, "oak_wood");
+            case 1:
+              return nameTag(tag, "spruce_wood");
+            case 2:
+              return nameTag(tag, "birch_wood");
+            case 3:
+              return nameTag(tag, "jungle_wood");
+          }
+        } else {
+          switch (data & 0b11) {
+            default:
+            case 0:
+              return logTag(nameTag(tag, "oak_log"), data);
+            case 1:
+              return logTag(nameTag(tag, "spruce_log"), data);
+            case 2:
+              return logTag(nameTag(tag, "birch_log"), data);
+            case 3:
+              return logTag(nameTag(tag, "jungle_log"), data);
+          }
         }
       case 18:
         switch (data & 0b11) {
@@ -608,10 +626,22 @@ public class LegacyBlocks {
           case 1: return nameTag(tag, "dark_oak_leaves");
         }
       case 162:
-        switch (data&3) {
-          default:
-          case 0: return logTag(nameTag(tag, "acacia_log"), data);
-          case 1: return logTag(nameTag(tag, "dark_oak_log"), data);
+        if ((data & 0b1100) == 0b1100) {
+          switch (data & 0b11) {
+            default:
+            case 0:
+              return nameTag(tag, "acacia_wood");
+            case 1:
+              return nameTag(tag, "dark_oak_wood");
+          }
+        } else {
+          switch (data & 0b11) {
+            default:
+            case 0:
+              return logTag(nameTag(tag, "acacia_log"), data);
+            case 1:
+              return logTag(nameTag(tag, "dark_oak_log"), data);
+          }
         }
       case 168:
         switch (data) {

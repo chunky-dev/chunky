@@ -18,6 +18,7 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.block.Lava;
 import se.llbit.chunky.block.Water;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
@@ -392,7 +393,7 @@ public class CauldronModel {
     return hit;
   }
 
-  public static boolean intersectWithWater(Ray ray, boolean stillWater, int level) {
+  public static boolean intersectWithWater(Ray ray, Scene scene, int level) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     for (int i = 0; i < quads.length; ++i) {
@@ -411,8 +412,8 @@ public class CauldronModel {
     // TODO since this water is the same block, refraction is not taken into account – still better than no water
     Quad water = waterLevels[level];
     if (water != null && water.intersect(ray)) {
-      if (!stillWater) {
-        WaterModel.doWaterDisplacement(ray);
+      if (!scene.stillWaterEnabled()) {
+        scene.getWaterShading().doWaterShading(ray, scene.getAnimationTime());
       } else {
         ray.setNormal(water.n);
       }

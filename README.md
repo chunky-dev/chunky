@@ -196,6 +196,8 @@ See the file `licenses/commons-math.txt` for the copyright notices.
   FastUtil is covered by Apache License, version 2.0. 
 See the file `licenses/Apache-2.0.txt` for the full license text.
 See the file `licenses/fast-util.txt` for the copyright notice.
+* **Simplex noise implementation by Stefan Gustavson and Keijiro Takahashi**.
+Released in the public domain.
 
 [chunky-dev]: https://chunky-dev.github.io/docs/
 [chunky-dev-troubleshooting]: https://chunky-dev.github.io/docs/faq/troubleshooting/
