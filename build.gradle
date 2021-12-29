@@ -116,16 +116,6 @@ task buildReleaseJar(type: Jar) {
     }
 }
 
-task documentation {
-    inputs.files 'README.md'
-    outputs.files 'build/ReadMe.html'
-
-    doLast {
-        def readme = tryCommand([ 'perl', file('tools/Markdown.pl').path, file('README.md').path ], true)
-        file('build/ReadMe.html').write(readme)
-    }
-}
-
 task copyArtifacts(type: Copy) {
     dependsOn subprojects.jar
     from subprojects.jar
