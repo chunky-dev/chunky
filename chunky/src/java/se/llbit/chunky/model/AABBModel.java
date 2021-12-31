@@ -54,7 +54,7 @@ public abstract class AABBModel implements BlockModel {
   }
 
   @Override
-  public int numFaces() {
+  public int faceCount() {
     return getBoxes().length * 6;
   }
 

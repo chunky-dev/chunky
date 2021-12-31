@@ -13,7 +13,7 @@ public interface BlockModel {
 
   boolean intersect(Ray ray, Scene scene);
 
-  int numFaces();
+  int faceCount();
 
   void sample(int face, Vector3 loc, Random rand);
 

@@ -3,7 +3,6 @@ package se.llbit.math;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.log.Log;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -50,7 +49,7 @@ public class Grid {
     }
 
     public void sample(Vector3 loc, Random rand) {
-      block.sample(rand.nextInt(block.numFaces()), loc, rand);
+      block.sample(rand.nextInt(block.faceCount()), loc, rand);
       loc.x += x;
       loc.y += y;
       loc.z += z;

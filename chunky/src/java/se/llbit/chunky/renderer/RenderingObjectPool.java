@@ -6,13 +6,20 @@ import se.llbit.math.Vector3;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
-public class CachedObjectProvider {
-    public static class ObjectProvider<T> {
+/**
+ * An object pool to reduce allocation and deallocation of objects during rendering.
+ * To obtain an object, call the `get` method for that object. Once done with that object, call `release(object)`.
+ */
+public class RenderingObjectPool {
+    /**
+     * A pool for a single object type.
+     */
+    protected static class ObjectPool<T> {
         private final ArrayList<T> cachedObjects = new ArrayList<>();
         private final Supplier<T> objectFactory;
         private final int maxObjects;
 
-        protected ObjectProvider(int maxObjects, Supplier<T> objectFactory) {
+        protected ObjectPool(int maxObjects, Supplier<T> objectFactory) {
             cachedObjects.ensureCapacity(maxObjects);
             this.maxObjects = maxObjects;
             this.objectFactory = objectFactory;
@@ -33,25 +40,31 @@ public class CachedObjectProvider {
         }
     }
 
+    /**
+     * A wrapper for a double array of length 3. Accessible through `Double3.vec`.
+     */
     public static class Double3 {
         public final double[] vec = new double[3];
     }
 
-    protected final ObjectProvider<Vector3> vec3 = new ObjectProvider<>(64, Vector3::new);
-    protected final ObjectProvider<Ray> ray = new ObjectProvider<>(64, Ray::new);
+    protected final ObjectPool<Vector3> vec3 = new ObjectPool<>(64, Vector3::new);
+    protected final ObjectPool<Ray> ray = new ObjectPool<>(64, Ray::new);
 
-    protected final ObjectProvider<Double3> double3 = new ObjectProvider<>(64, Double3::new);
+    protected final ObjectPool<Double3> double3 = new ObjectPool<>(64, Double3::new);
 
-    private final static ThreadLocal<CachedObjectProvider> providerThreadLocal =
-        ThreadLocal.withInitial(CachedObjectProvider::new);
+    private final static ThreadLocal<RenderingObjectPool> providerThreadLocal =
+        ThreadLocal.withInitial(RenderingObjectPool::new);
 
-    private CachedObjectProvider() {
+    private RenderingObjectPool() {
     }
 
-    public static CachedObjectProvider get() {
+    protected static RenderingObjectPool get() {
         return providerThreadLocal.get();
     }
 
+    /**
+     * @return Vector3
+     */
     public static Vector3 getVec3() {
         return get().vec3.get();
     }
@@ -60,6 +73,9 @@ public class CachedObjectProvider {
         get().vec3.release(object);
     }
 
+    /**
+     * @return Ray
+     */
     public static Ray getRay() {
         return get().ray.get();
     }
@@ -68,6 +84,9 @@ public class CachedObjectProvider {
         get().ray.release(object);
     }
 
+    /**
+     * @return A wrapper of a double array of length 3.
+     */
     public static Double3 getDouble3() {
         return get().double3.get();
     }

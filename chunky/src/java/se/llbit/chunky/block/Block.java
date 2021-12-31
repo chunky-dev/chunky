@@ -40,7 +40,7 @@ public abstract class Block extends Material {
   /**
    * Get the number of faces on this block.
    */
-  public int numFaces() {
+  public int faceCount() {
     return 6;
   }
 

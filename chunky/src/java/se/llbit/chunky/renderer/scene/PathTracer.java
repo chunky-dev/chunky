@@ -19,8 +19,7 @@ package se.llbit.chunky.renderer.scene;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Water;
-import se.llbit.chunky.model.WaterModel;
-import se.llbit.chunky.renderer.CachedObjectProvider;
+import se.llbit.chunky.renderer.RenderingObjectPool;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
@@ -442,7 +441,7 @@ public class PathTracer implements RayTracer {
   }
 
   private static void sampleEmitterFace(Scene scene, Ray ray, Grid.EmitterPosition pos, int face, Vector4 result, double scaler, Random random) {
-    Ray emitterRay = CachedObjectProvider.getRay();
+    Ray emitterRay = RenderingObjectPool.getRay();
 
     emitterRay.set(ray);
     pos.sampleFace(face, emitterRay.d, random);
@@ -467,7 +466,7 @@ public class PathTracer implements RayTracer {
       }
     }
 
-    CachedObjectProvider.release(emitterRay);
+    RenderingObjectPool.release(emitterRay);
   }
 
   /**
@@ -486,12 +485,12 @@ public class PathTracer implements RayTracer {
     switch (scene.getEmitterSamplingStrategy()) {
       default:
       case ONE:
-        sampleEmitterFace(scene, ray, pos, random.nextInt(pos.block.numFaces()), result, 1, random);
+        sampleEmitterFace(scene, ray, pos, random.nextInt(pos.block.faceCount()), result, 1, random);
         break;
       case ONE_BLOCK:
       case ALL:
-        double scaler = 1.0 / pos.block.numFaces();
-        for (int i = 0; i < pos.block.numFaces(); i++) {
+        double scaler = 1.0 / pos.block.faceCount();
+        for (int i = 0; i < pos.block.faceCount(); i++) {
           sampleEmitterFace(scene, ray, pos, i, result, scaler, random);
         }
         break;

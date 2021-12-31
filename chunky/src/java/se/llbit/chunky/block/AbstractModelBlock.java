@@ -21,8 +21,8 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
   }
 
   @Override
-  public int numFaces() {
-    return model.numFaces();
+  public int faceCount() {
+    return model.faceCount();
   }
 
   @Override

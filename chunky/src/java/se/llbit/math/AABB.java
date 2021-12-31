@@ -16,10 +16,8 @@
  */
 package se.llbit.math;
 
-import se.llbit.chunky.renderer.CachedObjectProvider;
+import se.llbit.chunky.renderer.RenderingObjectPool;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -54,7 +52,7 @@ public class AABB {
   }
 
   public void sampleFace(int face, Vector3 loc, Random rand) {
-    CachedObjectProvider.Double3 v = CachedObjectProvider.getDouble3();
+    RenderingObjectPool.Double3 v = RenderingObjectPool.getDouble3();
     face %= 6;
     int axis = face % 3;
     v.vec[axis] = face > 2 ? 1 : 0;
@@ -70,12 +68,12 @@ public class AABB {
     v.vec[2] += zmin;
 
     loc.set(v.vec[0], v.vec[1], v.vec[2]);
-    CachedObjectProvider.release(v);
+    RenderingObjectPool.release(v);
   }
 
   public double faceSurfaceArea(int face) {
-    CachedObjectProvider.Double3 minC = CachedObjectProvider.getDouble3();
-    CachedObjectProvider.Double3 maxC = CachedObjectProvider.getDouble3();
+    RenderingObjectPool.Double3 minC = RenderingObjectPool.getDouble3();
+    RenderingObjectPool.Double3 maxC = RenderingObjectPool.getDouble3();
 
     minC.vec[0] = xmin;
     minC.vec[1] = ymin;
@@ -90,8 +88,8 @@ public class AABB {
 
     double sa = (maxC.vec[a1] - minC.vec[a1]) * (maxC.vec[a2] - minC.vec[a2]);
 
-    CachedObjectProvider.release(minC);
-    CachedObjectProvider.release(maxC);
+    RenderingObjectPool.release(minC);
+    RenderingObjectPool.release(maxC);
 
     return Math.abs(sa);
   }
