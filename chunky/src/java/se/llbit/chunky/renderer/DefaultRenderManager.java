@@ -425,8 +425,8 @@ public class DefaultRenderManager extends Thread implements RenderManager {
 
         // Split up to 10 tasks per thread
         int tasksPerThread = 10;
-        int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.getThreads() * tasksPerThread - 1);
-        ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(pool.getThreads() * tasksPerThread);
+        int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.getThreadCount() * tasksPerThread - 1);
+        ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(pool.getThreadCount() * tasksPerThread);
 
         for (int i = 0; i < bufferedScene.width * bufferedScene.height; i += pixelsPerTask) {
           int start = i;

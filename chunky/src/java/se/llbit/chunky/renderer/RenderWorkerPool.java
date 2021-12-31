@@ -133,7 +133,7 @@ public class RenderWorkerPool {
   /**
    * Get an approximation of the number workers in this pool.
    */
-  public int getThreads() {
+  public int getThreadCount() {
     return workers.size();
   }
 
