@@ -25,6 +25,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
+import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.PopupWindow;
 import javafx.stage.WindowEvent;
@@ -38,7 +39,9 @@ import se.llbit.fxutil.CustomizedListCellFactory;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -409,7 +412,10 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
 
   /** This should only be called from the JavaFX application thread. */
   public void launchChunky() {
+    if (!javaRuntime.getText().equals(settings.javaDir)) {
     settings.javaDir = javaRuntime.getText();
+      settings.skipJvmCheck = false;
+    }
     settings.debugConsole = enableDebugConsole.isSelected();
     settings.verboseLogging = verboseLogging.isSelected();
     settings.closeConsoleOnExit = closeConsoleOnExit.isSelected();
@@ -435,6 +441,36 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
       }
     };
     PersistentSettings.setMinecraftDirectory(minecraftDirectory.getText());
+
+    if (!settings.skipJvmCheck) {
+      try {
+        ArrayList<String> cmd = new ArrayList<>();
+        cmd.add(JreUtil.javaCommand(settings.javaDir));
+        cmd.add("-cp");
+        cmd.add(ManagementFactory.getRuntimeMXBean().getClassPath());
+        cmd.add(ChunkyLauncher.class.getName());
+        cmd.add("--checkJvm");
+        ProcessBuilder builder = new ProcessBuilder(cmd);
+        if (builder.start().waitFor() != 0) {
+          Alert alert = new Alert(Alert.AlertType.WARNING);
+          alert.setTitle("No 64-bit Java detected");
+          alert.setContentText("It seems like you're not using 64-bit Java. For best \n" +
+                  "performance and in order to allocate more than 3 GB of RAM to Chunky, you need a 64-bit JVM.");
+          alert.getDialogPane().getChildren().stream().filter(node -> node instanceof Label)
+                  .forEach(node -> ((Label) node).setMinHeight(Region.USE_PREF_SIZE));
+          alert.getButtonTypes().setAll(
+                  new ButtonType("Launch anyway", ButtonBar.ButtonData.YES),
+                  ButtonType.CANCEL);
+          if (alert.showAndWait().orElse(ButtonType.OK).equals(ButtonType.CANCEL)) {
+            return;
+          }
+        } else {
+          settings.skipJvmCheck = true;
+        }
+      } catch (Exception e) {
+      }
+    }
+
     if (ChunkyDeployer.launchChunky(settings, version, LaunchMode.GUI, this::launchFailure,
         loggerBuilder) == 0) {
       settings.save();

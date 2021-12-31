@@ -171,6 +171,12 @@ public class ChunkyLauncher {
                 settings.javaOptions = args[i + 1] + " " + settings.javaOptions;
               ++i;
               break;
+            case "--checkJvm":
+              boolean is64Bit = JreUtil.is64BitJvm();
+              if (!is64Bit) {
+                System.err.println("This does not appear to be a 64-bit JVM.");
+              }
+              System.exit(is64Bit ? 0 : -1);
             default:
               if(!headlessOptions.isEmpty()) {
                 headlessOptions += " ";
