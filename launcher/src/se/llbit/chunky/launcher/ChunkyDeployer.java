@@ -34,6 +34,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -486,6 +487,21 @@ public final class ChunkyDeployer {
             + version.name + ". Please select another version.");
       }
       return false;
+    }
+    return true;
+  }
+
+  public static boolean is64BitJvm(LauncherSettings settings) {
+    try {
+      ArrayList<String> cmd = new ArrayList<>();
+      cmd.add(JreUtil.javaCommand(settings.javaDir));
+      cmd.add("-cp");
+      cmd.add(ManagementFactory.getRuntimeMXBean().getClassPath());
+      cmd.add(ChunkyLauncher.class.getName());
+      cmd.add("--checkJvm");
+      ProcessBuilder builder = new ProcessBuilder(cmd);
+      return builder.start().waitFor() != 0;
+    } catch (Exception e) {
     }
     return true;
   }
