@@ -35,7 +35,7 @@ public class DeadlockTest {
   static class PointlessPool extends RenderWorkerPool {
     public PointlessPool(int threads, long seed) {
       super(1, 0);
-      Arrays.stream(workers).forEach(Thread::interrupt);
+      workers.forEach(Thread::interrupt);
     }
     @Override public RenderJobFuture submit(RenderJob task) {
       RenderJobFuture future = new RenderJobFuture(worker -> {});

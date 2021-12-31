@@ -29,6 +29,7 @@ import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
@@ -151,7 +152,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     renderThreads.clampMin();
     renderThreads.onValueChange(value -> {
       PersistentSettings.setNumRenderThreads(value);
-      renderControls.showPopup("This change takes effect after restarting Chunky.", renderThreads);
+      controller.getRenderManager().setThreadCount(value);
+      Chunky.setCommonThreadsCount(value);
     });
 
     ArrayList<String> octreeNames = new ArrayList<>();
