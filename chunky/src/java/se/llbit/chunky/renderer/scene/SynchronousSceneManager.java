@@ -110,11 +110,8 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       synchronized (storedScene) {
         String sceneName = storedScene.name();
         Log.info("Saving scene " + sceneName);
-        File sceneDir = context.getSceneDirectory();
-        if (!sceneDir.isDirectory()) {
-          sceneDir = resolveSceneDirectory(sceneName);
-          context.setSceneDirectory(sceneDir);
-        }
+        File sceneDir = resolveSceneDirectory(sceneName);
+        context.setSceneDirectory(sceneDir);
         if (!sceneDir.isDirectory()) {
           boolean success = sceneDir.mkdirs();
           if (!success) {
