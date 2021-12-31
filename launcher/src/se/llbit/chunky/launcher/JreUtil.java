@@ -64,4 +64,13 @@ public class JreUtil {
     }
   }
 
+  public static boolean is64BitJvm() {
+    for (String key : new String[]{"sun.arch.data.model", "com.ibm.vm.bitmode", "os.arch"}) {
+      String value = System.getProperty(key);
+      if (value != null && value.contains("64")) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
