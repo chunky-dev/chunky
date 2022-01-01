@@ -107,16 +107,6 @@ public abstract class Material {
     subSurfaceScattering = false;
   }
 
-  /**
-   * Retrieves the texture based on the block data.
-   *
-   * @param blockData [0,16]
-   * @return the selected texture
-   */
-  public Texture getTexture(int blockData) {
-    return texture;
-  }
-
   public void getColor(Ray ray) {
     texture.getColor(ray);
   }
