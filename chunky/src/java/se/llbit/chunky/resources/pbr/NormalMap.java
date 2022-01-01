@@ -26,9 +26,11 @@ public interface NormalMap {
     if (texture.getNormalMap() != null) {
       Vector3 n = texture.getNormalMap().getNormalAt(ray.u, ray.v);
       if (n.lengthSquared() > 0) {
-        ray.n.set(n);
-        quad.tbn.transform(ray.n);
-        ray.n.normalize();
+        Vector3 rayNormal = ray.getNormal();
+        rayNormal.set(n.x, -n.y, n.z);
+        quad.tbn.transform(rayNormal);
+        rayNormal.normalize();
+        ray.setNormal(rayNormal);
       }
     }
   }
@@ -36,10 +38,12 @@ public interface NormalMap {
   static void apply(Ray ray, Matrix3 tbn, Texture texture) {
     if (texture.getNormalMap() != null) {
       Vector3 n = texture.getNormalMap().getNormalAt(ray.u, ray.v);
-      if (n.lengthSquared() > 0) {
-        ray.n.set(n);
-        tbn.transform(ray.n);
-        ray.n.normalize();
+      if (n.lengthSquared() > 0 && n.z < 1) {
+        Vector3 rayNormal = ray.getNormal();
+        rayNormal.set(n.x, -n.y, n.z);
+        tbn.transform(rayNormal);
+        rayNormal.normalize();
+        ray.setNormal(rayNormal);
       }
     }
   }
@@ -48,7 +52,7 @@ public interface NormalMap {
     if (texture.getNormalMap() != null) {
       t.normalize();
       b.normalize();
-      apply(ray, getTbn(t, b, ray.n), texture);
+      apply(ray, getTbn(t, b, ray.getNormal()), texture);
     }
   }
 
