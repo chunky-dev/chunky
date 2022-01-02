@@ -13,8 +13,9 @@ public class FrostedIce extends MinecraftBlockTranslucent {
   private final int age;
 
   public FrostedIce(int age) {
-    super("frosted_ice", Texture.frostedIce3);
+    super("frosted_ice", texture[age & 3]);
     localIntersect = true;
+    solid = true;
     this.age = age & 3;
   }
 

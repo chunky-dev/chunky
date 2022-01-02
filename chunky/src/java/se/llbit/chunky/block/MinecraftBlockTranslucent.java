@@ -9,5 +9,6 @@ public class MinecraftBlockTranslucent extends MinecraftBlock {
   public MinecraftBlockTranslucent(String name, Texture texture) {
     super(name, texture);
     opaque = false;
+    solid = false;
   }
 }
