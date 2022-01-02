@@ -1346,7 +1346,7 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new Snow(Math.max(1,
             Math.min(8, BlockProvider.stringToInt(tag.get("Properties").get("layers"), 1))));
       case "ice":
-        return new MinecraftBlock(name, Texture.ice);
+        return new MinecraftBlockTranslucent(name, Texture.ice);
       case "snow_block":
         return new MinecraftBlock(name, Texture.snowBlock);
       case "cactus":
