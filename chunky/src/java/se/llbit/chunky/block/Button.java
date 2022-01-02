@@ -13,6 +13,7 @@ public class Button extends AbstractModelBlock {
     this.description = String.format("face=%s, facing=%s, powered=%s",
         face, facing, powered);
     this.model = new ButtonModel(face, facing, texture);
+    this.solid = false;
     // TODO handle rotation on top/bottom positions!
   }
 
