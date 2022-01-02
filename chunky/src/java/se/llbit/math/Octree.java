@@ -54,7 +54,11 @@ public class Octree {
 
   public interface OctreeImplementation {
     void set(int type, int x, int y, int z);
+    @Deprecated
     Material getMaterial(int x, int y, int z, BlockPalette palette);
+    default Block getBlock(int x, int y, int z, BlockPalette palette) {
+      return (Block) getMaterial(x, y, z, palette);
+    }
     void store(DataOutputStream output) throws IOException;
     int getDepth();
     long nodeCount();
@@ -290,11 +294,24 @@ public class Octree {
    * @param palette Block palette
    * @return Material at the given position or {@link Air#INSTANCE} if the position is outside of this octree
    */
+  @Deprecated
   public Material getMaterial(int x, int y, int z, BlockPalette palette) {
+    return getBlock(x, y, z, palette);
+  }
+
+  /**
+   * Get the block at the given position (relative to the octree origin).
+   * @param x x position
+   * @param y y position
+   * @param z z position
+   * @param palette Block palette
+   * @return Block at the given position or {@link Air#INSTANCE} if the position is outside of this octree
+   */
+  public Block getBlock(int x, int y, int z, BlockPalette palette) {
     int size = (1 << implementation.getDepth());
     if(x < 0 || y < 0 || z < 0 || x >= size || y >= size || z >= size)
       return Air.INSTANCE;
-    return implementation.getMaterial(x, y, z, palette);
+    return implementation.getBlock(x, y, z, palette);
   }
 
   /**

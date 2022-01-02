@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlockUtils;
@@ -24,18 +25,18 @@ public class LegacyFire extends UnfinalizedLegacyBlock {
     CompoundTag tag = LegacyBlocks.createTag("fire");
 
     boolean floorFire =
-        state.getY() > state.getYMin() && isTopBurnable(state.getMaterial(BlockFace.DOWN));
+        state.getY() > state.getYMin() && isTopBurnable(state.getBlock(BlockFace.DOWN));
 
     // a side is burning if the adjacent block at that side is flammable
-    LegacyBlocks.boolTag(tag, "north", !floorFire && isFlammable(state.getMaterial(BlockFace.NORTH)));
-    LegacyBlocks.boolTag(tag, "east", !floorFire && isFlammable(state.getMaterial(BlockFace.EAST)));
-    LegacyBlocks.boolTag(tag, "south", !floorFire && isFlammable(state.getMaterial(BlockFace.SOUTH)));
-    LegacyBlocks.boolTag(tag, "west", !floorFire && isFlammable(state.getMaterial(BlockFace.WEST)));
+    LegacyBlocks.boolTag(tag, "north", !floorFire && isFlammable(state.getBlock(BlockFace.NORTH)));
+    LegacyBlocks.boolTag(tag, "east", !floorFire && isFlammable(state.getBlock(BlockFace.EAST)));
+    LegacyBlocks.boolTag(tag, "south", !floorFire && isFlammable(state.getBlock(BlockFace.SOUTH)));
+    LegacyBlocks.boolTag(tag, "west", !floorFire && isFlammable(state.getBlock(BlockFace.WEST)));
 
     // the up side is visible if this burning on top of the bottom below and the block above is flammable
     LegacyBlocks
         .boolTag(tag, "up", !floorFire &&
-            state.getY() < state.getYMax() - 1 && isFlammable(state.getMaterial(BlockFace.UP)));
+            state.getY() < state.getYMax() - 1 && isFlammable(state.getBlock(BlockFace.UP)));
 
     state.replaceCurrentBlock(tag);
   }
@@ -66,7 +67,7 @@ public class LegacyFire extends UnfinalizedLegacyBlock {
         name.endsWith("_carpet");
   }
 
-  private static boolean isTopBurnable(Material material) {
+  private static boolean isTopBurnable(Block material) {
     // solid blocks like dirt and stone can burn on top but not on the side (i.e. are not flammable)
     return material.solid || isFlammable(material);
   }

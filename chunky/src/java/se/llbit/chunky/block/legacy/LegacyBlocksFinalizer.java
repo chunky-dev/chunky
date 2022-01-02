@@ -1,10 +1,9 @@
 package se.llbit.chunky.block.legacy;
 
-import se.llbit.chunky.block.FinalizationState;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.OctreeFinalizationState;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.world.ChunkPosition;
-import se.llbit.chunky.world.Material;
 import se.llbit.math.Octree;
 import se.llbit.math.Vector3i;
 
@@ -35,9 +34,9 @@ public class LegacyBlocksFinalizer {
           int x = cx + cp.x * 16 - origin.x;
           // TODO as in 1.13+ finalization we could finalize non-edge blocks during chunk loading
           finalizerState.setPosition(x, y, z);
-          Material mat = finalizerState.getMaterial();
-          if (mat instanceof UnfinalizedLegacyBlock) {
-            ((UnfinalizedLegacyBlock) mat).finalizeBlock(finalizerState);
+          Block block = finalizerState.getBlock();
+          if (block instanceof UnfinalizedLegacyBlock) {
+            ((UnfinalizedLegacyBlock) block).finalizeBlock(finalizerState);
           }
         }
       }

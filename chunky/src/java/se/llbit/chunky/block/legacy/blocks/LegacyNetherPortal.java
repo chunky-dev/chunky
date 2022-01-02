@@ -22,13 +22,13 @@ public class LegacyNetherPortal extends UnfinalizedLegacyBlock {
 
   @Override
   public void finalizeBlock(FinalizationState state) {
-    if (isNetherPortalConnector(state.getMaterial(BlockFace.NORTH))) {
+    if (isNetherPortalConnector(state.getBlock(BlockFace.NORTH))) {
       state.replaceCurrentBlock(createTag("z"));
-    } else if (isNetherPortalConnector(state.getMaterial(BlockFace.EAST))) {
+    } else if (isNetherPortalConnector(state.getBlock(BlockFace.EAST))) {
       state.replaceCurrentBlock(createTag("x"));
-    } else if (isNetherPortalConnector(state.getMaterial(BlockFace.SOUTH))) {
+    } else if (isNetherPortalConnector(state.getBlock(BlockFace.SOUTH))) {
       state.replaceCurrentBlock(createTag("z"));
-    } else if (isNetherPortalConnector(state.getMaterial(BlockFace.WEST))) {
+    } else if (isNetherPortalConnector(state.getBlock(BlockFace.WEST))) {
       state.replaceCurrentBlock(createTag("x"));
     } else {
       // not connected, just unwrap

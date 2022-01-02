@@ -20,7 +20,7 @@ public class LegacyPumpkinStem extends UnfinalizedLegacyBlock {
   public void finalizeBlock(FinalizationState state) {
     // pumpkin stem points to adjacent pumpkin or carved pumpkin (but not jack-o-lantern)
     for (BlockFace side : sides) {
-      if (state.getMaterial(side).name.endsWith("pumpkin")) {
+      if (state.getBlock(side).name.endsWith("pumpkin")) {
         state.replaceCurrentBlock(
             LegacyBlocks.stringTag(
                 LegacyBlocks.createTag("attached_pumpkin_stem"), "facing", side.getName()

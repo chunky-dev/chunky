@@ -45,12 +45,6 @@ public abstract class Material {
   public boolean opaque = false;
 
   /**
-   * The solid property controls various block behaviours like if the block connects to fences,
-   * gates, walls, etc.
-   */
-  public boolean solid = true;
-
-  /**
    * The specular coefficient controlling how shiny the block appears.
    */
   public float specular = 0;
@@ -87,8 +81,6 @@ public abstract class Material {
 
   public boolean refractive = false;
 
-  public boolean waterlogged = false;
-
   public Material(String name, Texture texture) {
     this.name = name;
     this.texture = texture;
@@ -100,7 +92,6 @@ public abstract class Material {
   public void restoreDefaults() {
     ior = DEFAULT_IOR;
     opaque = false;
-    solid = true;
     specular = 0;
     emittance = 0;
     roughness = 0;
@@ -129,10 +120,6 @@ public abstract class Material {
 
   public boolean isWater() {
     return false;
-  }
-
-  public boolean isWaterFilled() {
-    return waterlogged || isWater();
   }
 
   public boolean isSameMaterial(Material other) {

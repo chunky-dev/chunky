@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlockUtils;
@@ -16,10 +17,10 @@ public class LegacyIronBars extends UnfinalizedLegacyBlock {
 
   @Override
   public void finalizeBlock(FinalizationState state) {
-    boolean north = isIronBarConnector(state.getMaterial(0, 0, -1), BlockFace.NORTH);
-    boolean south = isIronBarConnector(state.getMaterial(0, 0, 1), BlockFace.SOUTH);
-    boolean east = isIronBarConnector(state.getMaterial(1, 0, 0), BlockFace.EAST);
-    boolean west = isIronBarConnector(state.getMaterial(-1, 0, 0), BlockFace.WEST);
+    boolean north = isIronBarConnector(state.getBlock(0, 0, -1), BlockFace.NORTH);
+    boolean south = isIronBarConnector(state.getBlock(0, 0, 1), BlockFace.SOUTH);
+    boolean east = isIronBarConnector(state.getBlock(1, 0, 0), BlockFace.EAST);
+    boolean west = isIronBarConnector(state.getBlock(-1, 0, 0), BlockFace.WEST);
 
     CompoundTag newTag = LegacyBlocks.createTag("iron_bars");
     LegacyBlocks.boolTag(newTag, "east", east);
@@ -30,7 +31,7 @@ public class LegacyIronBars extends UnfinalizedLegacyBlock {
     state.replaceCurrentBlock(newTag);
   }
 
-  private static boolean isIronBarConnector(Material block, BlockFace direction) {
+  private static boolean isIronBarConnector(Block block, BlockFace direction) {
     String name = LegacyBlockUtils.getName(block);
     if (name.equals("cobblestone_wall") || name.equals("mossy_cobblestone_wall") || name
         .endsWith("_fence") || name

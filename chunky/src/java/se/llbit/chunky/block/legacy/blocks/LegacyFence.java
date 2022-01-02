@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlockUtils;
@@ -18,10 +19,10 @@ public class LegacyFence extends UnfinalizedLegacyBlock {
   public void finalizeBlock(FinalizationState state) {
     if (id == 113) {
       // nether brick fence
-      boolean north = isNetherBrickFenceConnector(state.getMaterial(0, 0, -1), BlockFace.NORTH);
-      boolean south = isNetherBrickFenceConnector(state.getMaterial(0, 0, 1), BlockFace.SOUTH);
-      boolean east = isNetherBrickFenceConnector(state.getMaterial(1, 0, 0), BlockFace.EAST);
-      boolean west = isNetherBrickFenceConnector(state.getMaterial(-1, 0, 0), BlockFace.WEST);
+      boolean north = isNetherBrickFenceConnector(state.getBlock(0, 0, -1), BlockFace.NORTH);
+      boolean south = isNetherBrickFenceConnector(state.getBlock(0, 0, 1), BlockFace.SOUTH);
+      boolean east = isNetherBrickFenceConnector(state.getBlock(1, 0, 0), BlockFace.EAST);
+      boolean west = isNetherBrickFenceConnector(state.getBlock(-1, 0, 0), BlockFace.WEST);
 
       if (north || south || east || west) {
         state.replaceCurrentBlock(createTag(north, south, east, west));
@@ -31,10 +32,10 @@ public class LegacyFence extends UnfinalizedLegacyBlock {
       }
     } else {
       // wood fence
-      boolean north = isFenceConnector(state.getMaterial(0, 0, -1), BlockFace.NORTH);
-      boolean south = isFenceConnector(state.getMaterial(0, 0, 1), BlockFace.SOUTH);
-      boolean east = isFenceConnector(state.getMaterial(1, 0, 0), BlockFace.EAST);
-      boolean west = isFenceConnector(state.getMaterial(-1, 0, 0), BlockFace.WEST);
+      boolean north = isFenceConnector(state.getBlock(0, 0, -1), BlockFace.NORTH);
+      boolean south = isFenceConnector(state.getBlock(0, 0, 1), BlockFace.SOUTH);
+      boolean east = isFenceConnector(state.getBlock(1, 0, 0), BlockFace.EAST);
+      boolean west = isFenceConnector(state.getBlock(-1, 0, 0), BlockFace.WEST);
 
       if (north || south || east || west) {
         state.replaceCurrentBlock(createTag(north, south, east, west));
@@ -54,7 +55,7 @@ public class LegacyFence extends UnfinalizedLegacyBlock {
     return tag;
   }
 
-  private boolean isFenceConnector(Material block, BlockFace direction) {
+  private boolean isFenceConnector(Block block, BlockFace direction) {
     String name = LegacyBlockUtils.getName(block);
     if (name.equals("cobblestone_wall") || name.equals("mossy_cobblestone_wall")
         || name.equals("glass") || name.endsWith("_stained_glass")
@@ -89,7 +90,7 @@ public class LegacyFence extends UnfinalizedLegacyBlock {
     return block.solid || block.name.endsWith("_fence");
   }
 
-  private boolean isNetherBrickFenceConnector(Material block, BlockFace direction) {
+  private boolean isNetherBrickFenceConnector(Block block, BlockFace direction) {
     String name = LegacyBlockUtils.getName(block);
     if (name.equals("nether_brick_fence")) {
       return true;

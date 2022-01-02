@@ -30,6 +30,14 @@ public abstract class Block extends Material {
    */
   public boolean invisible = false;
 
+  /**
+   * The solid property controls various block behaviours like if the block connects to fences,
+   * gates, walls, etc.
+   */
+  public boolean solid = true;
+
+  public boolean waterlogged = false;
+
   public Block(String name, Texture texture) {
     super(name, texture);
   }
@@ -119,5 +127,9 @@ public abstract class Block extends Material {
    */
   public Tag getNewTagWithBlockEntity(Tag blockTag, CompoundTag entityTag) {
     return null;
+  }
+
+  public boolean isWaterFilled() {
+    return waterlogged || isWater();
   }
 }

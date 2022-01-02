@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.Stairs;
@@ -22,8 +23,8 @@ public class LegacyStairs extends UnfinalizedLegacyBlock {
     switch (rotation) {
       case 0: {
         // east
-        Material behind = state.getMaterial(1, 0, 0);
-        Material front = state.getMaterial(-1, 0, 0);
+        Block behind = state.getBlock(1, 0, 0);
+        Block front = state.getBlock(-1, 0, 0);
         if (isStairs(behind) && isTop(behind) == isTop) {
           switch (getOrientation(behind)) {
             case 2:
@@ -67,8 +68,8 @@ public class LegacyStairs extends UnfinalizedLegacyBlock {
       }
       case 1: {
         // west
-        Material behind = state.getMaterial(-1, 0, 0);
-        Material front = state.getMaterial(1, 0, 0);
+        Block behind = state.getBlock(-1, 0, 0);
+        Block front = state.getBlock(1, 0, 0);
         if (isStairs(behind) && isTop(behind) == isTop) {
           switch (getOrientation(behind)) {
             case 2:
@@ -112,8 +113,8 @@ public class LegacyStairs extends UnfinalizedLegacyBlock {
       }
       case 2: {
         // south
-        Material behind = state.getMaterial(0, 0, 1);
-        Material front = state.getMaterial(0, 0, -1);
+        Block behind = state.getBlock(0, 0, 1);
+        Block front = state.getBlock(0, 0, -1);
         if (isStairs(behind) && isTop(behind) == isTop) {
           switch (getOrientation(behind)) {
             case 0:
@@ -157,8 +158,8 @@ public class LegacyStairs extends UnfinalizedLegacyBlock {
       }
       case 3: {
         // north
-        Material behind = state.getMaterial(0, 0, -1);
-        Material front = state.getMaterial(0, 0, 1);
+        Block behind = state.getBlock(0, 0, -1);
+        Block front = state.getBlock(0, 0, 1);
         if (isStairs(behind) && isTop(behind) == isTop) {
           switch (getOrientation(behind)) {
             case 0:
@@ -259,7 +260,7 @@ public class LegacyStairs extends UnfinalizedLegacyBlock {
    * this block, false otherwise
    */
   private boolean isSameStairs(FinalizationState state, int rx, int ry, int rz) {
-    Material other = state.getMaterial(rx, ry, rz);
+    Block other = state.getBlock(rx, ry, rz);
     if (other instanceof LegacyStairs) {
       return (((LegacyStairs) other).data & 0b111) == (data & 0b111);
     } else if (other instanceof Stairs) {

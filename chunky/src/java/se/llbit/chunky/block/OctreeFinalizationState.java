@@ -1,7 +1,6 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.world.Material;
 import se.llbit.math.Octree;
 
 public class OctreeFinalizationState extends FinalizationState {
@@ -24,14 +23,14 @@ public class OctreeFinalizationState extends FinalizationState {
   }
 
   @Override
-  public Material getMaterial() {
-    return worldTree.getMaterial(x, y, z, getPalette());
+  public Block getBlock() {
+    return worldTree.getBlock(x, y, z, getPalette());
   }
 
   @Override
-  public Material getMaterial(int rx, int ry, int rz) {
+  public Block getBlock(int rx, int ry, int rz) {
     return worldTree
-        .getMaterial(x + rx, y + ry, z + rz, getPalette());
+        .getBlock(x + rx, y + ry, z + rz, getPalette());
   }
 
   @Override
