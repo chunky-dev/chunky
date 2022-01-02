@@ -424,7 +424,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
     if (selectRect || !dragging && shiftModifier) {
       selectRect = true;
-    } else {
+    } else if (!event.isSecondaryButtonDown()) { // do not drag when right-clicking
       dragging = true;
       mapView.viewDragged(dx, dy);
       onViewDragged.run();

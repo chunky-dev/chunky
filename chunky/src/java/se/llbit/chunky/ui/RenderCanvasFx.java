@@ -152,8 +152,12 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     });
 
     canvas.setOnMouseDragged(e -> {
-      float dx = lastX - (int) e.getX();
-      float dy = lastY - (int) e.getY();
+      if (e.isSecondaryButtonDown()) {
+        // do not drag when right-clicking
+        return;
+      }
+      int dx = lastX - (int) e.getX();
+      int dy = lastY - (int) e.getY();
       lastX = (int) e.getX();
       lastY = (int) e.getY();
       if (e.isShiftDown()) {
