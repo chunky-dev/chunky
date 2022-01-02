@@ -17,7 +17,6 @@ public class Button extends MinecraftBlockTranslucent {
         face, facing, powered);
     this.powered = powered;
     localIntersect = true;
-    this.solid = false;
     // TODO handle rotation on top/bottom positions!
     switch (face) {
       case "ceiling":
