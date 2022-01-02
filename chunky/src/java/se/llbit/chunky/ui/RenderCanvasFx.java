@@ -146,10 +146,14 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     });
 
     canvas.setOnMouseDragged(e -> {
-      int dx = lastX - (int) e.getX();
-      int dy = lastY - (int) e.getY();
+      float dx = lastX - (int) e.getX();
+      float dy = lastY - (int) e.getY();
       lastX = (int) e.getX();
       lastY = (int) e.getY();
+      if (e.isShiftDown()) {
+        dx *= 0.1;
+        dy *= 0.1;
+      }
       scene.camera().rotateView((Math.PI / 250) * dx, -(Math.PI / 250) * dy);
     });
 
@@ -220,7 +224,11 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       }
     });
     canvas.setOnScroll(e -> {
-      double diff = -e.getDeltaY() / e.getMultiplierY();
+      // deltaY is zero if shift is pressed because shift switches to horizontal scrolling in JavaFX
+      double diff = -(Math.abs(e.getDeltaY()) > 0 ? e.getDeltaY() / e.getMultiplierY() : e.getDeltaX() / e.getMultiplierX());
+      if (e.isShiftDown()) {
+        diff *= 0.1;
+      }
       Camera camera = scene.camera();
       double value = camera.getFov();
       double scale = camera.getMaxFoV() - camera.getMinFoV();
