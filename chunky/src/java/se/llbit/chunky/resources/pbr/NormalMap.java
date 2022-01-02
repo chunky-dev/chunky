@@ -70,11 +70,5 @@ public interface NormalMap {
     return tbn;
   }
 
-  static Matrix3 getTbn(Vector3 t, Vector3 b) {
-    Vector3 n = new Vector3();
-    n.cross(t, b);
-    return getTbn(t, b, n);
-  }
-
   Vector3 getNormalAt(double u, double v);
 }
