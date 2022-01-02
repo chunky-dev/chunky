@@ -1,5 +1,6 @@
 package se.llbit.chunky.model;
 
+import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
@@ -40,15 +41,14 @@ public abstract class AABBModel implements BlockModel {
     FLIP_V
   }
 
-  protected final static Matrix3[] tbnMatrices = new Matrix3[6];
-  static {
-    tbnMatrices[4] = NormalMap.getTbn(new Vector3(1, 0, 0), new Vector3(0, 0, -1));
-    tbnMatrices[5] = NormalMap.getTbn(new Vector3(1, 0, 0), new Vector3(0, 0, 1));
-    tbnMatrices[0] = NormalMap.getTbn(new Vector3(-1, 0, 0), new Vector3(0, 1, 0));
-    tbnMatrices[2] = NormalMap.getTbn(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
-    tbnMatrices[3] = NormalMap.getTbn(new Vector3(0, 0, 1), new Vector3(0, 1, 0));
-    tbnMatrices[1] = NormalMap.getTbn(new Vector3(0, 0, -1), new Vector3(0, 1, 0));
-  }
+  protected final static Matrix3[] tbnMatrices = {
+      NormalMap.tbnCubeNorth,
+      NormalMap.tbnCubeEast,
+      NormalMap.tbnCubeSouth,
+      NormalMap.tbnCubeWest,
+      NormalMap.tbnCubeTop,
+      NormalMap.tbnCubeBottom
+  };
 
   @PluginApi
   public abstract AABB[] getBoxes();
