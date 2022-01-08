@@ -64,8 +64,8 @@ public class RegionParser extends Thread {
         World world = mapLoader.getWorld();
         Region region = world.getRegionWithinRange(position, mapView.getYMin(), mapView.getYMax());
         region.parse(mapView.getYMin(), mapView.getYMax());
-        ChunkData chunkData = world.createChunkData();
         for (Chunk chunk : region) {
+          ChunkData chunkData = world.createChunkData(chunk);
           if (map.shouldPreload(chunk)) {
             if(chunk.loadChunk(chunkData, mapView.getYMin(), mapView.getYMax())) {
               chunkData.clear();

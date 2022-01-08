@@ -949,8 +949,9 @@ public class Scene implements JsonSerializable, Refreshable {
     Set<ChunkPosition> legacyChunks = new HashSet<>();
     Heightmap biomeIdMap = new Heightmap();
 
-    ChunkData chunkData1 = world.createChunkData(); // chunk loading will switch between these two, using one asynchronously to load the data
-    ChunkData chunkData2 = world.createChunkData(); // while the other is used to add to the octree
+    // FIXME this is very broken
+    final ChunkData[] chunkData1 = {null}; // chunk loading will switch between these two, using one asynchronously to load the data
+    final ChunkData[] chunkData2 = {null}; // while the other is used to add to the octree
 
     try (TaskTracker.Task task = taskTracker.task("(3/6) Loading chunks")) {
       int done = 1;
@@ -965,7 +966,9 @@ public class Scene implements JsonSerializable, Refreshable {
 
       ExecutorService executor = Executors.newSingleThreadExecutor();
       Future<?> nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
-        world.getChunk(chunkPositions[0]).getChunkData(chunkData1, palette, yMin, yMax);
+        Chunk chunk = world.getChunk(chunkPositions[0]);
+        chunkData1[0] = world.createChunkData(chunk);
+        chunk.getChunkData(chunkData1[0], palette, yMin, yMax);
       });
       for (int i = 0; i < chunkPositions.length; i++) {
         ChunkPosition cp = chunkPositions[i];
@@ -989,10 +992,14 @@ public class Scene implements JsonSerializable, Refreshable {
           }
 
           if(usingFirstChunkData) {
-            world.getChunk(chunkPositions[i]).getChunkData(chunkData1, palette, yMin, yMax);
+            Chunk chunk = world.getChunk(chunkPositions[i]);
+            chunkData1[0] = world.createChunkData(chunk);
+            chunk.getChunkData(chunkData1[0], palette, yMin, yMax);
           }
           else {
-            world.getChunk(chunkPositions[i]).getChunkData(chunkData2, palette, yMin, yMax);
+            Chunk chunk = world.getChunk(chunkPositions[i]);
+            chunkData2[0] = world.createChunkData(chunk);
+            chunk.getChunkData(chunkData2[0], palette, yMin, yMax);
           }
         } catch(ExecutionException e) {
           throw new RuntimeException(e.getCause());
@@ -1002,11 +1009,11 @@ public class Scene implements JsonSerializable, Refreshable {
         {
           ChunkData nextChunkData; //the chunk data to be used for the next iteration
           if (usingFirstChunkData) {
-            chunkData = chunkData1;
-            nextChunkData = chunkData2;
+            chunkData = chunkData1[0];
+            nextChunkData = chunkData2[0];
           } else {
-            chunkData = chunkData2;
-            nextChunkData = chunkData1;
+            chunkData = chunkData2[0];
+            nextChunkData = chunkData1[0];
           }
           usingFirstChunkData = !usingFirstChunkData;
 

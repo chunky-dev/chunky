@@ -74,7 +74,9 @@ public class Chunk {
   public static final int SECTION_HALF_NIBBLES = SECTION_BYTES / 2;
   private static final int CHUNK_BYTES = X_MAX * Y_MAX * Z_MAX;
 
-  public static final int DATAVERSION_20W17A = 2529;
+  public static final int DATAVERSION_20W17A = 2529; // 64-bit aligned block states
+  public static final int DATAVERSION_1_18_experimental_1 = 2825; // increased world height
+  public static final int DATAVERSION_17W47A = 1451; // the flattening
 
   protected final ChunkPosition position;
   protected volatile AbstractLayer surface = IconLayer.UNKNOWN;
@@ -86,11 +88,24 @@ public class Chunk {
   protected int surfaceTimestamp = 0;
   protected int biomesTimestamp = 0;
 
-  protected String version;
+  protected final String version;
 
   public Chunk(ChunkPosition pos, World world) {
     this.world = world;
     this.position = pos;
+
+    Set<String> request = new HashSet<>();
+    request.add(DATAVERSION);
+    Map<String, Tag> dataMap = getChunkTags(request);
+    Tag data = tagFromMap(dataMap);
+    version = chunkVersion(data);
+    System.out.println(version);
+  }
+
+  protected Chunk(ChunkPosition pos, World world, String version) {
+    this.world = world;
+    this.position = pos;
+    this.version = version;
   }
 
   public void renderSurface(MapTile tile) {
@@ -155,7 +170,6 @@ public class Chunk {
     Tag data = tagFromMap(dataMap);
 
     surfaceTimestamp = dataTimestamp;
-    version = chunkVersion(data);
     loadSurface(data, chunkData, yMin, yMax);
     biomesTimestamp = dataTimestamp;
     if (surface == IconLayer.MC_1_12) {
@@ -177,7 +191,7 @@ public class Chunk {
     Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
     if (sections.isList()) {
       extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
-      if (version.equals("1.13") || version.equals("1.12")) {
+      if (version.equals("1.18") || version.equals("1.13") || version.equals("1.12")) {
         BlockPalette palette = new BlockPalette();
         palette.unsynchronize(); //only this RegionParser will use this palette
         loadBlockData(data, chunkData, palette, yMin, yMax);
@@ -259,16 +273,15 @@ public class Chunk {
 
   /** Detect Minecraft version that generated the chunk. */
   private static String chunkVersion(@NotNull Tag data) {
-    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
-    if (sections.isList()) {
-      for (SpecificTag section : sections.asList()) {
-        if (!section.get("Palette").isList()) {
-          if (section.get("Blocks").isByteArray(SECTION_BYTES)) {
-            return "1.12";
-          }
-        }
-      }
+    int version = data.get(DATAVERSION).intValue(0);
+    if (version >= DATAVERSION_1_18_experimental_1) {
+      return "1.18";
+    }
+    if (version >= DATAVERSION_20W17A) {
       return "1.13";
+    }
+    if (version > 0) {
+      return "1.12";
     }
     return "?";
   }
@@ -464,7 +477,7 @@ public class Chunk {
     request.add(LEVEL_ENTITIES);
     request.add(LEVEL_TILEENTITIES);
     if(reuseChunkData == null || reuseChunkData instanceof EmptyChunkData) {
-      reuseChunkData = world.createChunkData();
+      reuseChunkData = world.createChunkData(this);
     } else {
       reuseChunkData.clear();
     }
@@ -474,7 +487,6 @@ public class Chunk {
       return reuseChunkData;
     }
     Tag data = tagFromMap(dataMap);
-    version = chunkVersion(data);
     Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
     Tag biomesTag = data.get(LEVEL_BIOMES);
     Tag entitiesTag = data.get(LEVEL_ENTITIES);
@@ -531,7 +543,7 @@ public class Chunk {
   }
 
   /**
-   * @return The version of this chunk (1.12, 1.13 or ?)
+   * @return The version of this chunk (1.12, 1.13, 1.18 or ?)
    */
   public String getVersion() {
     return version;

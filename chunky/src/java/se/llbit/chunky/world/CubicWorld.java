@@ -51,7 +51,7 @@ public class CubicWorld extends World {
   }
 
   @Override
-  public ChunkData createChunkData() {
+  public ChunkData createChunkData(Chunk chunk) {
     return new GenericChunkData();
   }
 

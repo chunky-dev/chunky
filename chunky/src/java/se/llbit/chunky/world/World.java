@@ -286,8 +286,9 @@ public class World implements Comparable<World> {
     return getRegion(pos.getRegionPosition()).getChunk(pos);
   }
 
-  public ChunkData createChunkData() {
-    if(this.getVersionId() >= World.VERSION_21W06A) {
+  public ChunkData createChunkData(Chunk chunk) {
+    // NOTE: some tools, e.g. WorldPainter don't set the correct world version
+    if (chunk.getVersion().equals("1.18") || this.getVersionId() >= World.VERSION_21W06A) {
       return new GenericChunkData();
     } else {
       return new SimpleChunkData();
