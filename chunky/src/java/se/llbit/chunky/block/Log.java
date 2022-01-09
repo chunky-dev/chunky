@@ -12,6 +12,7 @@ public class Log extends AbstractModelBlock {
     this.description = "axis=" + axis;
     this.model = new LogModel(axis, side, top);
     opaque = true;
+    solid = true;
   }
 
   @Override
