@@ -78,13 +78,13 @@ public class OctreeFinalizer {
   private static void processBlock(Octree worldTree, Octree waterTree, BlockPalette palette, int x,
       int cy, int z, Vector3i origin) {
     int y = cy - origin.y;
-    Block mat = worldTree.getBlock(x, y, z, palette);
-    Block wmat = waterTree.getBlock(x, y, z, palette);
+    Block block = worldTree.getBlock(x, y, z, palette);
+    Block waterBlock = waterTree.getBlock(x, y, z, palette);
 
-    if (wmat instanceof Water) {
+    if (waterBlock instanceof Water) {
       Block above = waterTree.getBlock(x, y + 1, z, palette);
       Block aboveBlock = worldTree.getBlock(x, y + 1, z, palette);
-      int level0 = 8 - ((Water) wmat).level;
+      int level0 = 8 - ((Water) waterBlock).level;
       if (!above.isWaterFilled() && !aboveBlock.solid) {
         int corner0 = level0;
         int corner1 = level0;
@@ -124,17 +124,17 @@ public class OctreeFinalizer {
         corner2 = Math.min(7, 8 - (corner2 / 4));
         corner3 = Math.min(7, 8 - (corner3 / 4));
 
-        waterTree.set(palette.getWaterId(((Water) wmat).level, (corner0 << Water.CORNER_0)
+        waterTree.set(palette.getWaterId(((Water) waterBlock).level, (corner0 << Water.CORNER_0)
             | (corner1 << Water.CORNER_1)
             | (corner2 << Water.CORNER_2)
             | (corner3 << Water.CORNER_3)), x, y, z);
       } else if (above.isWaterFilled()) {
         waterTree.set(palette.getWaterId(0, 1 << Water.FULL_BLOCK), x, y, z);
       }
-    } else if (mat instanceof Lava) {
+    } else if (block instanceof Lava) {
       Block above = worldTree.getBlock(x, y + 1, z, palette);
       if (!(above instanceof Lava)) {
-        Lava lava = (Lava) mat;
+        Lava lava = (Lava) block;
 
         int level0 = 8 - lava.level;
         int corner0 = level0;

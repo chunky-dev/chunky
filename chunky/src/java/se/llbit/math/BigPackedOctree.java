@@ -16,10 +16,10 @@
  */
 package se.llbit.math;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.plugin.PluginApi;
-import se.llbit.chunky.world.Material;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -351,7 +351,7 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
   }
 
   @Override
-  public Material getMaterial(int x, int y, int z, BlockPalette palette) {
+  public Block getBlock(int x, int y, int z, BlockPalette palette) {
     // Building the dummy node is useless here
     long nodeIndex = getNodeIndex(x, y, z);
     long value = getAt(nodeIndex);

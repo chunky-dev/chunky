@@ -55,7 +55,9 @@ public class Octree {
   public interface OctreeImplementation {
     void set(int type, int x, int y, int z);
     @Deprecated
-    Material getMaterial(int x, int y, int z, BlockPalette palette);
+    default Material getMaterial(int x, int y, int z, BlockPalette palette) {
+      return getBlock(x, y, z, palette);
+    }
     default Block getBlock(int x, int y, int z, BlockPalette palette) {
       return (Block) getMaterial(x, y, z, palette);
     }

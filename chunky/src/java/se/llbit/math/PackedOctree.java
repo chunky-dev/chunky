@@ -19,10 +19,10 @@ package se.llbit.math;
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
 import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
 import org.apache.commons.math3.util.Pair;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.plugin.PluginApi;
-import se.llbit.chunky.world.Material;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -541,12 +541,12 @@ public class PackedOctree implements Octree.OctreeImplementation {
   }
 
   /**
-   * Gets the block material type from the BlockPalette of the node which is (or contains) the block specified.
+   * Gets the block type from the BlockPalette of the node which is (or contains) the block specified.
    *
    * x, y, z are in octree coordinates, NOT world coordinates.
    */
   @Override
-  public Material getMaterial(int x, int y, int z, BlockPalette palette) {
+  public Block getBlock(int x, int y, int z, BlockPalette palette) {
     // Building the dummy node is useless here
     int nodeIndex = getNodeIndex(x, y, z);
     if(treeData[nodeIndex] > 0) {

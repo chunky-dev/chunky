@@ -67,8 +67,8 @@ public class LegacyFire extends UnfinalizedLegacyBlock {
         name.endsWith("_carpet");
   }
 
-  private static boolean isTopBurnable(Block material) {
+  private static boolean isTopBurnable(Block block) {
     // solid blocks like dirt and stone can burn on top but not on the side (i.e. are not flammable)
-    return material.solid || isFlammable(material);
+    return block.solid || isFlammable(block);
   }
 }

@@ -4,7 +4,6 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.world.Material;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -144,7 +143,7 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
   }
 
   @Override
-  public Block getMaterial(int x, int y, int z, BlockPalette palette) {
+  public Block getBlock(int x, int y, int z, BlockPalette palette) {
     Octree.Node node = get(x, y, z);
     if (node.type == BRANCH_NODE) {
       return UnknownBlock.UNKNOWN;
