@@ -500,7 +500,7 @@ public final class ChunkyDeployer {
       cmd.add(ChunkyLauncher.class.getName());
       cmd.add("--checkJvm");
       ProcessBuilder builder = new ProcessBuilder(cmd);
-      return builder.start().waitFor() != 0;
+      return builder.start().waitFor() == 0;
     } catch (Exception e) {
     }
     return true;
