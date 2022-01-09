@@ -11,7 +11,7 @@ public class Slime extends MinecraftBlockTranslucent {
         localIntersect = true;
         opaque = false;
         ior = 1.516f; // gelatin, according to https://study.com/academy/answer/what-is-the-refractive-index-of-gelatin.html
-        solid = false;
+        solid = true;
         refractive = true;
     }
 

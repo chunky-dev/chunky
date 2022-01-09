@@ -14,6 +14,7 @@ public class RepeatingCommandBlock extends AbstractModelBlock {
         conditional ? Texture.repeatingCommandBlockConditional : Texture.repeatingCommandBlockFront,
         Texture.repeatingCommandBlockBack, Texture.repeatingCommandBlockSide);
     opaque = true;
+    solid = true;
   }
 
   @Override

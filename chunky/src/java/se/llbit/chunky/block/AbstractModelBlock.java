@@ -15,6 +15,7 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
     super(name, texture);
     localIntersect = true;
     opaque = false;
+    solid = false;
   }
 
   @Override

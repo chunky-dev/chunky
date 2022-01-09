@@ -20,6 +20,7 @@ public class Dispenser extends AbstractModelBlock {
       Texture back) {
     super(name, front);
     opaque = true;
+    solid = true;
     this.model = new DispenserModel(facing, front, frontVertical, side, back);
     this.description = "facing=" + facing;
   }

@@ -19,5 +19,7 @@ public class TopBottomOrientedTexturedBlock extends AbstractModelBlock {
     public TopBottomOrientedTexturedBlock(String name, String facing, Texture front, Texture south, Texture east, Texture west, Texture top, Texture bottom) {
         super(name, front);
         this.model = new TopBottomOrientedTexturedBlockModel(facing, front, south, east, west, top, bottom);
+        solid = true;
+        opaque = true;
     }
 }

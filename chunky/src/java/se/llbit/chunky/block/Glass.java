@@ -3,11 +3,9 @@ package se.llbit.chunky.block;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 
-public class Glass extends MinecraftBlock {
+public class Glass extends MinecraftBlockTranslucent {
   public Glass(String name, Texture texture) {
     super(name, texture);
-    opaque = false;
-    solid = false;
     ior = 1.52f;
   }
 

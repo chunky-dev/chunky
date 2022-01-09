@@ -14,6 +14,7 @@ public class CommandBlock extends AbstractModelBlock {
         conditional ? Texture.commandBlockConditional : Texture.commandBlockFront,
         Texture.commandBlockBack, Texture.commandBlockSide);
     opaque = true;
+    solid = true;
   }
 
   @Override
