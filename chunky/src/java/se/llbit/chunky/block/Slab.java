@@ -11,7 +11,7 @@ public class Slab extends AbstractModelBlock {
     super(name, sideTexture);
     this.description = String.format("type=%s", type);
     this.model = new SlabModel(sideTexture, topTexture, type);
-    solid = false;
+    solid = type.equals("double");
   }
 
   public Slab(String name, Texture texture, String type) {
