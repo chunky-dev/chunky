@@ -28,7 +28,7 @@ public class Slab extends MinecraftBlockTranslucent {
     this.sideTexture = sideTexture;
     this.topTexture = topTexture;
     localIntersect = true;
-    solid = false;
+    solid = type.equals("double");
     switch (type) {
       default:
       case "top":
