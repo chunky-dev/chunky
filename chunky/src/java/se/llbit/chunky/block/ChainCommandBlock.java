@@ -8,7 +8,7 @@ public class ChainCommandBlock extends AbstractModelBlock {
   private final String description;
 
   public ChainCommandBlock(String facing, boolean conditional) {
-    super("chain_command_block", Texture.commandBlockFront);
+    super("chain_command_block", Texture.chainCommandBlockFront);
     this.description = String.format("facing=%s, conditional=%s", facing, conditional);
     this.model = new DirectionalBlockModel(facing,
         conditional ? Texture.chainCommandBlockConditional : Texture.chainCommandBlockFront,

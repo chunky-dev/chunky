@@ -11,8 +11,8 @@ public class CommandBlock extends AbstractModelBlock {
     super("command_block", Texture.commandBlockFront);
     this.description = String.format("facing=%s, conditional=%s", facing, conditional);
     this.model = new DirectionalBlockModel(facing,
-        conditional ? Texture.chainCommandBlockConditional : Texture.chainCommandBlockFront,
-        Texture.chainCommandBlockBack, Texture.chainCommandBlockSide);
+        conditional ? Texture.commandBlockConditional : Texture.commandBlockFront,
+        Texture.commandBlockBack, Texture.commandBlockSide);
     opaque = true;
   }
 
