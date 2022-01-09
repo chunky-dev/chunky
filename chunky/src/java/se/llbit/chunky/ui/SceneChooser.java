@@ -1,4 +1,5 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -33,7 +34,7 @@ public class SceneChooser extends Stage {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("SceneChooser.fxml"));
     Parent root = loader.load();
     SceneChooserController controller = loader.getController();
-    setTitle("Select 3D Scene");
+    setTitle("Load Chunky Scene");
     getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
     setScene(new Scene(root));
     controller.setController(chunkyFxController);

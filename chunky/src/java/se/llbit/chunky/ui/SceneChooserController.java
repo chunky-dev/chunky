@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -17,20 +17,15 @@
  */
 package se.llbit.chunky.ui;
 
-import javafx.beans.property.ReadOnlyIntegerWrapper;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.main.SceneHelper;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.fxutil.Dialogs;
@@ -42,35 +37,30 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.text.DateFormat;
+import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class SceneChooserController implements Initializable {
   @FXML private TableView<SceneListItem> sceneTbl;
-
   @FXML private TableColumn<SceneListItem, String> nameCol;
-
   @FXML private TableColumn<SceneListItem, Number> chunkCountCol;
-
   @FXML private TableColumn<SceneListItem, String> sizeCol;
-
   @FXML private TableColumn<SceneListItem, Number> sppCol;
-
-  @FXML private TableColumn<SceneListItem, String> renderTimeCol;
+  @FXML private TableColumn<SceneListItem, Number> renderTimeCol;
+  @FXML private TableColumn<SceneListItem, Date> lastModifiedCol;
 
   @FXML private Button loadSceneBtn;
-
   @FXML private Button cancelBtn;
-
   @FXML private Button exportBtn;
-
   @FXML private Button deleteBtn;
 
   private Stage stage;
 
   private ChunkyFxController controller;
+
+  private static final HashMap<FileTimeCache, SceneListItem> sceneListCache = new HashMap<>();
 
   @Override public void initialize(URL location, ResourceBundle resources) {
     exportBtn.setTooltip(new Tooltip("Exports the selected scene as a Zip archive."));
@@ -119,19 +109,43 @@ public class SceneChooserController implements Initializable {
     });
     chunkCountCol.setCellValueFactory(data -> {
       SceneListItem scene = data.getValue();
-      return new ReadOnlyIntegerWrapper(scene.chunkSize);
+      return scene.chunkSize;
     });
     sizeCol.setCellValueFactory(data -> {
       SceneListItem scene = data.getValue();
-      return new ReadOnlyStringWrapper(scene.dimensions);
+      return scene.dimensions;
     });
     sppCol.setCellValueFactory(data -> {
       SceneListItem scene = data.getValue();
-      return new ReadOnlyIntegerWrapper(scene.sppCount);
+      return scene.sppCount;
     });
+
     renderTimeCol.setCellValueFactory(data -> {
       SceneListItem scene = data.getValue();
-      return new ReadOnlyStringWrapper(scene.renderTime);
+      return scene.renderTime;
+    });
+    renderTimeCol.setCellFactory(col -> new TableCell<SceneListItem, Number>() {
+      public void updateItem(Number item, boolean empty) {
+        if (item == this.getItem()) return;
+        super.updateItem(item, empty);
+        super.setGraphic(null);
+        super.setText(item == null ? null : SceneListItem.renderTimeString(item.longValue()));
+      }
+    });
+
+    DateFormat localeFormat = DateFormat.getDateInstance();
+    lastModifiedCol.setCellValueFactory(data -> {
+      SceneListItem scene = data.getValue();
+      Date lastModified = new Date(scene.sceneDirectory.lastModified());
+      return new ReadOnlyObjectWrapper<>(lastModified);
+    });
+    lastModifiedCol.setCellFactory(col -> new TableCell<SceneListItem, Date>() {
+      public void updateItem(Date item, boolean empty) {
+        if (item == this.getItem()) return;
+        super.updateItem(item, empty);
+        super.setGraphic(null);
+        super.setText(item == null ? null : localeFormat.format(item));
+      }
     });
   }
 
@@ -173,17 +187,17 @@ public class SceneChooserController implements Initializable {
   private void populateSceneTable(File sceneDir) {
     List<SceneListItem> scenes = new ArrayList<>();
     List<File> fileList = SceneHelper.getAvailableSceneFiles(sceneDir);
-    Collections.sort(fileList);
+    fileList.sort(Comparator.comparing(File::length));
+    Executor loadExecutor = Executors.newSingleThreadExecutor();
     for (File sceneFile : fileList) {
-
-      try (JsonParser parser = new JsonParser(new FileInputStream(new File(sceneFile.getParentFile(), sceneFile.getName())))){
-        SceneListItem item = new SceneListItem(parser.parse().object(), sceneFile);
-        scenes.add(item);
-
-      } catch (IOException | JsonParser.SyntaxError e) {
-        Log.warnf("Warning: could not load scene description: %s", sceneFile.getName());
-      }
+      FileTimeCache file = new FileTimeCache(sceneFile);
+      scenes.add(sceneListCache.computeIfAbsent(file, f -> new SceneListItem(f.file, loadExecutor)));
     }
+
+    scenes.sort(Comparator
+        .comparing((SceneListItem scene) -> -scene.lastModified.getTime())
+        .thenComparing((SceneListItem scene) -> scene.sceneName.toLowerCase())
+    );
     sceneTbl.setItems(FXCollections.observableArrayList(scenes));
     if (!scenes.isEmpty()) {
       sceneTbl.getSelectionModel().select(0);
@@ -197,42 +211,132 @@ public class SceneChooserController implements Initializable {
   }
 
   private static class SceneListItem {
+    /** The name of the scene */
+    public final String sceneName;
+    /** The last modified time of the scene */
+    public final Date lastModified;
+    /** What folder the scene is in */
+    public final File sceneDirectory;
+    /** Whether this scene description file is a backup file and the original .json is missing. */
+    public final boolean isBackup;
 
-    private final String sceneName;
-    private final int chunkSize;
-    private final String dimensions;
-    private final int sppCount;
-    private final String renderTime;
-    /**
-     * What folder the scene is in
-     */
-    private final File sceneDirectory;
-    /**
-     * Whether this scene description file is a backup file and the original .json is missing.
-     */
-    private final boolean isBackup;
+    /** The number of chunks in the scene */
+    public final ReadOnlyObjectWrapper<Number> chunkSize;
+    /** The dimensions of the scene canvas */
+    public final ReadOnlyObjectWrapper<String> dimensions;
+    /** The spp count of the render */
+    public final ReadOnlyObjectWrapper<Number> sppCount;
+    /** The elapsed render time */
+    public final ReadOnlyObjectWrapper<Number> renderTime;
 
-    private SceneListItem(JsonObject scene, File sceneFile) {
-      sceneName = sceneFile.getName().substring(0, sceneFile.getName().length() - (
-          sceneFile.getName().endsWith(".backup") ? 7 + Scene.EXTENSION.length()
-              : Scene.EXTENSION.length()));
-      sceneDirectory = sceneFile.getParentFile();
-      chunkSize = scene.get("chunkList").array().size();
-      dimensions = String.format("%sx%s", scene.get("width").intValue(400), scene.get("height").intValue(400));
-      sppCount = scene.get("spp").intValue(0);
-      isBackup = sceneFile.getName().endsWith(".backup");
+    private SceneListItem(File sceneFile, Executor backgroundLoadExecutor) {
+      this.sceneDirectory = sceneFile.getParentFile();
+      this.lastModified = new Date(sceneFile.lastModified());
+      String sceneName = sceneFile.getName();
+      this.isBackup = sceneName.endsWith(".backup");
+      int lengthWithoutExtension = sceneName.length()
+          - (Scene.EXTENSION.length() + (isBackup ? ".backup".length() : 0));
+      this.sceneName = sceneName.substring(0, lengthWithoutExtension);
 
-      long renderTime = scene.get("renderTime").longValue(0);
-      int seconds = (int) ((renderTime / 1000) % 60);
-      int minutes = (int) ((renderTime / 60000) % 60);
-      int hours = (int) (renderTime / 3600000);
-      this.renderTime = String.format("%d:%d:%d", hours, minutes, seconds);
+      this.chunkSize = new ReadOnlyObjectWrapper<>();
+      this.dimensions = new ReadOnlyObjectWrapper<>();
+      this.sppCount = new ReadOnlyObjectWrapper<>();
+      this.renderTime = new ReadOnlyObjectWrapper<>();
+
+      backgroundLoadExecutor.execute(() -> parseScene(sceneFile));
+    }
+
+    public static String renderTimeString(long milliseconds) {
+      if (milliseconds < 1000) return " — ";
+
+      long seconds = FastMath.round(milliseconds / 1000d);
+      long minutes = seconds / 60;
+      long hours = minutes / 60;
+      StringBuilder sb = new StringBuilder();
+      if (hours > 0)
+        sb.append(hours).append("hr ");
+      if (minutes > 0) {
+        sb.append(String.format("%02dm %02ds", minutes % 60, seconds % 60));
+      } else {
+        sb.append(String.format("%ds", milliseconds / 1000));
+      }
+      return sb.toString();
+    }
+
+    private void parseScene(File sceneFile) {
+      String dimensions = null;
+      Integer chunkSize = null;
+      Integer sppCount = null;
+      Long renderTime = null;
+
+      try (JsonParser parser = new JsonParser(new FileInputStream(new File(sceneFile.getParentFile(), sceneFile.getName())))) {
+        JsonObject scene = parser.parse().object();
+
+        int width = scene.get("width").intValue(400);
+        int height = scene.get("height").intValue(400);
+        dimensions = String.format("%sx%s", width, height);
+
+        chunkSize = scene.get("chunkList").array().size();
+        sppCount = scene.get("spp").intValue(0);
+
+        // Not currently used (Planned for Chunky 2.5.0; See PR #786)
+        //    JsonValue crop = scene.get("crop");
+        //    if (crop.isArray()) {
+        //      JsonArray cropArray = crop.asArray();
+        //      if (cropArray.size() >= 4) {
+        //        int w = cropArray.get(2).asInt(width);
+        //        int h = cropArray.get(3).asInt(height);
+        //        if (w != width || h != height || cropArray.get(0).asInt(0) != 0 || cropArray.get(1).asInt(0) != 0) {
+        //          cropping = " [" + w + "x" + h + "]";
+        //        } else cropping = null;
+        //      } else cropping = null;
+        //    } else cropping = null;
+
+        renderTime = scene.get("renderTime").longValue(0);
+      } catch (IOException | JsonParser.SyntaxError e) {
+        Log.warnf("Warning: could not load scene description: %s", sceneFile.getName());
+      }
+
+      this.dimensions.setValue(dimensions);
+      this.chunkSize.setValue(chunkSize);
+      this.sppCount.setValue(sppCount);
+      this.renderTime.setValue(renderTime);
+
+//      Log.infof("Finished parsing: %s", this);
     }
 
     @Override
     public String toString() {
-      return String.format("Name:%s, Chunks:%d, Size:%s, Spp:%d, Time:%s, Location:%s", sceneName, chunkSize, dimensions, sppCount, renderTime, sceneDirectory.getName());
+      String dimensions = this.dimensions.get() != null ? this.dimensions.get() : "-";
+      String chunkSize = this.chunkSize.get() != null ? this.chunkSize.get().toString() : "-";
+      String sppCount = this.sppCount.get() != null ? this.sppCount.get().toString() : "-";
+      String renderTime = this.renderTime.get() != null ? renderTimeString(this.renderTime.get().longValue()) : "-";
+
+      return String.format("Name:%s, Chunks:%s, Size:%s, Spp:%s, Time:%s, Location:%s",
+          sceneName, chunkSize, dimensions, sppCount, renderTime, sceneDirectory.getName());
     }
   }
 
+  private static class FileTimeCache {
+    public final File file;
+    public final long lastModified;
+
+    public FileTimeCache(File file) {
+      this.file = file;
+      this.lastModified = file.lastModified();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      FileTimeCache that = (FileTimeCache) o;
+      return lastModified == that.lastModified && Objects.equals(file, that.file);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(file, lastModified);
+    }
+  }
 }
