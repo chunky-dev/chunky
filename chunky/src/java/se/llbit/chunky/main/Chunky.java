@@ -343,8 +343,9 @@ public class Chunky {
    * Note: This is done on a best-effort basis.
    */
   public static void setCommonThreadsCount(int threads) {
-    getCommonThreads();
+    ForkJoinPool t = getCommonThreads();
     commonThreads = new ForkJoinPool(threads);
+    t.shutdown();
   }
 
   public synchronized SceneManager getSceneManager() {
