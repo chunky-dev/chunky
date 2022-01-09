@@ -171,6 +171,12 @@ public class ChunkyLauncher {
                 settings.javaOptions = args[i + 1] + " " + settings.javaOptions;
               ++i;
               break;
+            case "--checkJvm":
+              boolean is64Bit = JreUtil.is64BitJvm();
+              if (!is64Bit) {
+                System.err.println("This does not appear to be a 64-bit JVM.");
+              }
+              System.exit(is64Bit ? 0 : -1);
             default:
               if(!headlessOptions.isEmpty()) {
                 headlessOptions += " ";
@@ -213,7 +219,15 @@ public class ChunkyLauncher {
         settings.chunkyOptions = headlessOptions;
         ChunkyDeployer.deploy(settings); // Install the embedded version.
         VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
-        if(ChunkyDeployer.canLaunch(version, null, false)) {
+        if (ChunkyDeployer.canLaunch(version, null, false)) {
+          if (!settings.skipJvmCheck) {
+            if (!ChunkyDeployer.is64BitJvm(settings)) {
+              System.err.println("It seems like you're not using 64-bit Java. For best " +
+                      "performance and in order to allocate more than 3 GB of RAM to Chunky, you need a 64-bit JVM.");
+            } else {
+              settings.skipJvmCheck = true;
+            }
+          }
           int exitCode = ChunkyDeployer.launchChunky(settings, version, LaunchMode.HEADLESS,
                   ChunkyLauncher::launchFailure, loggerBuilder);
           if(exitCode != 0) {
