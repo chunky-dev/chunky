@@ -133,7 +133,7 @@ public class SceneChooserController implements Initializable {
       }
     });
 
-    DateFormat localeFormat = DateFormat.getDateInstance();
+    DateFormat localeFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
     lastModifiedCol.setCellValueFactory(data -> {
       SceneListItem scene = data.getValue();
       Date lastModified = new Date(scene.sceneDirectory.lastModified());
@@ -202,6 +202,9 @@ public class SceneChooserController implements Initializable {
     if (!scenes.isEmpty()) {
       sceneTbl.getSelectionModel().select(0);
     }
+    lastModifiedCol.setSortType(TableColumn.SortType.DESCENDING);
+    sceneTbl.getSortOrder().setAll(Collections.singletonList(lastModifiedCol));
+    sceneTbl.sort();
   }
 
   public void setController(ChunkyFxController controller) {
