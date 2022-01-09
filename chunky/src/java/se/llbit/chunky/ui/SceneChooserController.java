@@ -147,8 +147,6 @@ public class SceneChooserController implements Initializable {
         super.setText(item == null ? null : localeFormat.format(item));
       }
     });
-
-    lastModifiedCol.sortTypeProperty().set(TableColumn.SortType.DESCENDING);
   }
 
   public void setStage(Stage stage) {
@@ -204,6 +202,9 @@ public class SceneChooserController implements Initializable {
     if (!scenes.isEmpty()) {
       sceneTbl.getSelectionModel().select(0);
     }
+    lastModifiedCol.setSortType(TableColumn.SortType.DESCENDING);
+    sceneTbl.getSortOrder().setAll(lastModifiedCol);
+    sceneTbl.sort();
   }
 
   public void setController(ChunkyFxController controller) {
