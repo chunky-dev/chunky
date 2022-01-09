@@ -133,7 +133,7 @@ public class SceneChooserController implements Initializable {
       }
     });
 
-    DateFormat localeFormat = DateFormat.getDateInstance();
+    DateFormat localeFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
     lastModifiedCol.setCellValueFactory(data -> {
       SceneListItem scene = data.getValue();
       Date lastModified = new Date(scene.sceneDirectory.lastModified());

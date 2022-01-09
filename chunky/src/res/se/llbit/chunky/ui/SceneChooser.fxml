@@ -26,7 +26,7 @@
 <?import javafx.scene.layout.VBox?>
 
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="790.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.llbit.chunky.ui.SceneChooserController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="818.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.llbit.chunky.ui.SceneChooserController">
     <children>
         <Label text="Select scene to load:"/>
         <TableView fx:id="sceneTbl" maxHeight="1.7976931348623157E308" prefHeight="293.0" VBox.vgrow="ALWAYS">
@@ -36,7 +36,7 @@
                 <TableColumn fx:id="sizeCol" prefWidth="150.0" text="Size"/>
                 <TableColumn fx:id="sppCol" prefWidth="100.0" text="Current SPP"/>
                 <TableColumn fx:id="renderTimeCol" prefWidth="100.0" text="Render time"/>
-                <TableColumn fx:id="lastModifiedCol" prefWidth="100.0" text="Last Modified"/>
+                <TableColumn fx:id="lastModifiedCol" prefWidth="128.0" text="Last Modified"/>
             </columns>
         </TableView>
         <HBox alignment="TOP_RIGHT" spacing="10.0">
