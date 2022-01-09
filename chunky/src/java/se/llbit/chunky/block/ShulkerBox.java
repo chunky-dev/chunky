@@ -15,6 +15,7 @@ public class ShulkerBox extends MinecraftBlock {
     this.texture = new Texture[] { bottom, top, side };
     this.description = "facing=" + facing;
     localIntersect = true;
+    solid = false;
     switch (facing) {
       default:
       case "up":

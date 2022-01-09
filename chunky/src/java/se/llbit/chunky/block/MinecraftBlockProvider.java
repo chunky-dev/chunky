@@ -1369,27 +1369,27 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "dark_oak_fence":
         return fence(tag, Texture.darkOakPlanks);
       case "pumpkin":
-        return new TexturedBlock(name, Texture.pumpkinSide, Texture.pumpkinTop);
+        return nonSolid(new TexturedBlock(name, Texture.pumpkinSide, Texture.pumpkinTop));
       case "carved_pumpkin":
-        return new TopBottomOrientedTexturedBlock(
+        return nonSolid(new TopBottomOrientedTexturedBlock(
             name,
             BlockProvider.facing(tag),
             Texture.pumpkinFront,
             Texture.pumpkinSide,
-            Texture.pumpkinTop);
+            Texture.pumpkinTop));
       case "netherrack":
         return new MinecraftBlock(name, Texture.netherrack);
       case "soul_sand":
         return new MinecraftBlock(name, Texture.soulsand);
       case "glowstone":
-        return new MinecraftBlock(name, Texture.glowstone);
+        return nonSolid(new MinecraftBlock(name, Texture.glowstone));
       case "jack_o_lantern":
-        return new TopBottomOrientedTexturedBlock(
+        return nonSolid(new TopBottomOrientedTexturedBlock(
             name,
             BlockProvider.facing(tag),
             Texture.jackolanternFront,
             Texture.pumpkinSide,
-            Texture.pumpkinTop);
+            Texture.pumpkinTop));
       case "oak_trapdoor":
         return trapdoor(tag, Texture.trapdoor);
       case "spruce_trapdoor":
@@ -1427,7 +1427,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "glass_pane":
         return glassPane(tag, Texture.glass, Texture.glassPaneTop);
       case "melon":
-        return new TexturedBlock(name, Texture.melonSide, Texture.melonTop);
+        return nonSolid(new TexturedBlock(name, Texture.melonSide, Texture.melonTop));
       case "vine":
         return vine(tag);
       case "oak_fence_gate":
@@ -1717,7 +1717,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "dark_prismarine_stairs":
         return stairs(tag, Texture.darkPrismarine);
       case "sea_lantern":
-        return new MinecraftBlock(name, Texture.seaLantern);
+        return nonSolid(new MinecraftBlock(name, Texture.seaLantern));
       case "red_sandstone":
         return new TexturedBlock(
             name, Texture.redSandstoneSide, Texture.redSandstoneTop, Texture.redSandstoneBottom);
@@ -2412,7 +2412,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "honeycomb_block":
         return new MinecraftBlock("honeycomb_block", Texture.honeycombBlock);
       case "spawner":
-        return new MinecraftBlockTranslucent(name, Texture.monsterSpawner);
+        return solid(new MinecraftBlockTranslucent(name, Texture.monsterSpawner));
       case "nether_portal": {
         String axis = tag.get("Properties").get("axis").stringValue("x");
         return new NetherPortal(axis);
@@ -3379,5 +3379,15 @@ public class MinecraftBlockProvider implements BlockProvider {
     Tag properties = tag.get("Properties");
     return new CakeWithCandle(BlockProvider.blockName(tag), candleTexture, candleTextureLit,
         properties.get("lit").stringValue("false").equals("true"));
+  }
+
+  private static Block nonSolid(Block block) {
+    block.solid = false;
+    return block;
+  }
+
+  private static Block solid(Block block) {
+    block.solid = true;
+    return block;
   }
 }
