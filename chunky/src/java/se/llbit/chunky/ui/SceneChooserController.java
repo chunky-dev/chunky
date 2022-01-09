@@ -147,6 +147,8 @@ public class SceneChooserController implements Initializable {
         super.setText(item == null ? null : localeFormat.format(item));
       }
     });
+
+    lastModifiedCol.sortTypeProperty().set(TableColumn.SortType.DESCENDING);
   }
 
   public void setStage(Stage stage) {
