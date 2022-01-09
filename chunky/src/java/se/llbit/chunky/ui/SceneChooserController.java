@@ -203,7 +203,7 @@ public class SceneChooserController implements Initializable {
       sceneTbl.getSelectionModel().select(0);
     }
     lastModifiedCol.setSortType(TableColumn.SortType.DESCENDING);
-    sceneTbl.getSortOrder().setAll(lastModifiedCol);
+    sceneTbl.getSortOrder().setAll(Collections.singletonList(lastModifiedCol));
     sceneTbl.sort();
   }
 
