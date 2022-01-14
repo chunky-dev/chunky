@@ -603,9 +603,9 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       boolean emitterGridNeedChunkReload = false;
+      boolean octreeLoaded = loadOctree(context, taskTracker);
       if (emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
         emitterGridNeedChunkReload = !loadEmitterGrid(context, taskTracker);
-      boolean octreeLoaded = loadOctree(context, taskTracker);
       if (emitterGridNeedChunkReload || !octreeLoaded) {
         // Could not load stored octree or emitter grid.
         // Load the chunks from the world.
