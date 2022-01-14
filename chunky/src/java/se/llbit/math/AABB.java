@@ -52,7 +52,7 @@ public class AABB {
   }
 
   public void sampleFace(int face, Vector3 loc, Random rand) {
-    RenderingObjectPool.Double3 v = RenderingObjectPool.getDouble3();
+    RenderingObjectPool.Double3 v = RenderingObjectPool.get(RenderingObjectPool.Double3.class);
     face %= 6;
     int axis = face % 3;
     v.vec[axis] = face > 2 ? 1 : 0;
@@ -72,8 +72,8 @@ public class AABB {
   }
 
   public double faceSurfaceArea(int face) {
-    RenderingObjectPool.Double3 minC = RenderingObjectPool.getDouble3();
-    RenderingObjectPool.Double3 maxC = RenderingObjectPool.getDouble3();
+    RenderingObjectPool.Double3 minC = RenderingObjectPool.get(RenderingObjectPool.Double3.class);
+    RenderingObjectPool.Double3 maxC = RenderingObjectPool.get(RenderingObjectPool.Double3.class);
 
     minC.vec[0] = xmin;
     minC.vec[1] = ymin;

@@ -1,9 +1,10 @@
 package se.llbit.chunky.renderer;
 
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 
-import java.util.ArrayList;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayDeque;
 import java.util.function.Supplier;
 
 /**
@@ -15,12 +16,12 @@ public class RenderingObjectPool {
      * A pool for a single object type.
      */
     protected static class ObjectPool<T> {
-        private final ArrayList<T> cachedObjects = new ArrayList<>();
+        private final ArrayDeque<T> cachedObjects;
         private final Supplier<T> objectFactory;
         private final int maxObjects;
 
         protected ObjectPool(int maxObjects, Supplier<T> objectFactory) {
-            cachedObjects.ensureCapacity(maxObjects);
+            cachedObjects = new ArrayDeque<>(maxObjects);
             this.maxObjects = maxObjects;
             this.objectFactory = objectFactory;
         }
@@ -29,14 +30,30 @@ public class RenderingObjectPool {
             if (cachedObjects.isEmpty()) {
                 return objectFactory.get();
             } else {
-                return cachedObjects.remove(cachedObjects.size()-1);
+                return cachedObjects.removeFirst();
             }
         }
 
         public void release(T object) {
             if (cachedObjects.size() < maxObjects) {
-                cachedObjects.add(object);
+                cachedObjects.addFirst(object);
             }
+        }
+    }
+
+    protected static class ThreadLocalObjectPool<T> {
+        private final ThreadLocal<ObjectPool<T>> poolThreadLocal;
+
+        public ThreadLocalObjectPool(int maxObjects, Supplier<T> objectFactory) {
+            poolThreadLocal = ThreadLocal.withInitial(() -> new ObjectPool<>(maxObjects, objectFactory));
+        }
+
+        public T get() {
+            return poolThreadLocal.get().get();
+        }
+
+        public void release(T object) {
+            poolThreadLocal.get().release(object);
         }
     }
 
@@ -47,51 +64,44 @@ public class RenderingObjectPool {
         public final double[] vec = new double[3];
     }
 
-    protected final ObjectPool<Vector3> vec3 = new ObjectPool<>(64, Vector3::new);
-    protected final ObjectPool<Ray> ray = new ObjectPool<>(64, Ray::new);
-
-    protected final ObjectPool<Double3> double3 = new ObjectPool<>(64, Double3::new);
-
-    private final static ThreadLocal<RenderingObjectPool> providerThreadLocal =
-        ThreadLocal.withInitial(RenderingObjectPool::new);
-
     private RenderingObjectPool() {
     }
 
-    protected static RenderingObjectPool get() {
-        return providerThreadLocal.get();
+    protected static final Reference2ObjectOpenHashMap<Class<?>, ThreadLocalObjectPool<?>> poolMap = new Reference2ObjectOpenHashMap<>();
+    protected static final int MAX_POOL_OBJECTS = 64;
+
+    @SuppressWarnings("unchecked")
+    public static <T> T get(Class<?> cls) {
+        ThreadLocalObjectPool<T> pool = (ThreadLocalObjectPool<T>) poolMap.getOrDefault(cls, null);
+        if (pool == null) {
+            synchronized (poolMap) {
+                pool = (ThreadLocalObjectPool<T>) poolMap.getOrDefault(cls, null);
+                if (pool == null) {
+                    try {
+                        Constructor<?> constructor = cls.getConstructor();
+                        pool = new ThreadLocalObjectPool<>(MAX_POOL_OBJECTS, () -> {
+                            try {
+                                return (T) constructor.newInstance();
+                            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                                String message = String.format("Failed to create object %s. Constructor %s.", cls, constructor);
+                                throw new RuntimeException(message, e);
+                            }
+                        });
+                        poolMap.put(cls, pool);
+                    } catch (NoSuchMethodException e) {
+                        throw new RuntimeException(String.format("Could not obtain constructor for class %s", cls), e);
+                    }
+                }
+            }
+        }
+        return pool.get();
     }
 
-    /**
-     * @return Vector3
-     */
-    public static Vector3 getVec3() {
-        return get().vec3.get();
-    }
-
-    public static void release(Vector3 object) {
-        get().vec3.release(object);
-    }
-
-    /**
-     * @return Ray
-     */
-    public static Ray getRay() {
-        return get().ray.get();
-    }
-
-    public static void release(Ray object) {
-        get().ray.release(object);
-    }
-
-    /**
-     * @return A wrapper of a double array of length 3.
-     */
-    public static Double3 getDouble3() {
-        return get().double3.get();
-    }
-
-    public static void release(Double3 object) {
-        get().double3.release(object);
+    @SuppressWarnings("unchecked")
+    public static <T> void release(T object) {
+        ThreadLocalObjectPool<T> pool = (ThreadLocalObjectPool<T>) poolMap.getOrDefault(object.getClass(), null);
+        if (pool != null) {
+            pool.release(object);
+        }
     }
 }

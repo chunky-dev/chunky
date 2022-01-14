@@ -122,7 +122,7 @@ public class Quad {
   }
 
   public double surfaceArea() {
-    Vector3 cross = RenderingObjectPool.getVec3();
+    Vector3 cross = RenderingObjectPool.get(Vector3.class);
     cross.cross(xv, yv);
     double sa = cross.length();
     RenderingObjectPool.release(cross);

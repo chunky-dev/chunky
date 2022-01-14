@@ -441,7 +441,7 @@ public class PathTracer implements RayTracer {
   }
 
   private static void sampleEmitterFace(Scene scene, Ray ray, Grid.EmitterPosition pos, int face, Vector4 result, double scaler, Random random) {
-    Ray emitterRay = RenderingObjectPool.getRay();
+    Ray emitterRay = RenderingObjectPool.get(Ray.class);
 
     emitterRay.set(ray);
     pos.sampleFace(face, emitterRay.d, random);
