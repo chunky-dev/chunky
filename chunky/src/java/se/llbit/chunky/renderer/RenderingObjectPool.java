@@ -13,6 +13,11 @@ import java.util.function.Supplier;
  */
 public class RenderingObjectPool {
     /**
+     * Maximum objects per pool.
+     */
+    protected static final int MAX_POOL_OBJECTS = 64;
+
+    /**
      * A pool for a single object type.
      */
     protected static class ObjectPool<T> {
@@ -41,6 +46,9 @@ public class RenderingObjectPool {
         }
     }
 
+    /**
+     * An ObjectPool wrapped in a ThreadLocal.
+     */
     protected static class ThreadLocalObjectPool<T> {
         private final ThreadLocal<ObjectPool<T>> poolThreadLocal;
 
@@ -66,10 +74,16 @@ public class RenderingObjectPool {
 
     private RenderingObjectPool() {
     }
-
+    
     protected static final Reference2ObjectOpenHashMap<Class<?>, ThreadLocalObjectPool<?>> poolMap = new Reference2ObjectOpenHashMap<>();
-    protected static final int MAX_POOL_OBJECTS = 64;
 
+    /**
+     * Allocate an object. The object must have a no argument constructor.
+     *
+     * @param cls Class of the object. ie {@code Vector3.class}
+     * @return An object. If there are objects left in the pool, this object will be from the pool.
+     *         Otherwise, this will be allocated using the no argument constructor.
+     */
     @SuppressWarnings("unchecked")
     public static <T> T get(Class<?> cls) {
         ThreadLocalObjectPool<T> pool = (ThreadLocalObjectPool<T>) poolMap.getOrDefault(cls, null);
@@ -97,6 +111,10 @@ public class RenderingObjectPool {
         return pool.get();
     }
 
+    /**
+     * @param object Object to return to the pool. If there is space, the object will be cached,
+     *               otherwise, it will be allowed to be garbage collected.
+     */
     @SuppressWarnings("unchecked")
     public static <T> void release(T object) {
         ThreadLocalObjectPool<T> pool = (ThreadLocalObjectPool<T>) poolMap.getOrDefault(object.getClass(), null);
