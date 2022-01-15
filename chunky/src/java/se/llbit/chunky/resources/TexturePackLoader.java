@@ -190,17 +190,17 @@ public class TexturePackLoader {
         new SimpleTexture("textures/blocks/wood", Texture.oakPlanks),
         new IndexedTexture(0x04, Texture.oakPlanks)));
     allTextures.put("stone slab side", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/block/stone_slab_side", Texture.slabSide),
-        new SimpleTexture("assets/minecraft/textures/block/stone", Texture.slabSide),
-        new SimpleTexture("assets/minecraft/textures/blocks/stone_slab_side", Texture.slabSide),
-        new SimpleTexture("textures/blocks/stoneslab_side", Texture.slabSide),
-        new IndexedTexture(0x05, Texture.slabSide)));
+        new SimpleTexture("assets/minecraft/textures/block/smooth_stone_slab_side", Texture.smoothStoneSlabSide), // MC 1.14+
+        new SimpleTexture("assets/minecraft/textures/block/stone_slab_side", Texture.smoothStoneSlabSide),
+        new SimpleTexture("assets/minecraft/textures/blocks/stone_slab_side", Texture.smoothStoneSlabSide),
+        new SimpleTexture("textures/blocks/stoneslab_side", Texture.smoothStoneSlabSide),
+        new IndexedTexture(0x05, Texture.smoothStoneSlabSide)));
     allTextures.put("stone slab top", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/block/stone_slab_top", Texture.slabTop),
-        new SimpleTexture("assets/minecraft/textures/block/stone", Texture.slabTop),
-        new SimpleTexture("assets/minecraft/textures/blocks/stone_slab_top", Texture.slabTop),
-        new SimpleTexture("textures/blocks/stoneslab_top", Texture.slabTop),
-        new IndexedTexture(0x06, Texture.slabTop)));
+        new SimpleTexture("assets/minecraft/textures/block/smooth_stone", Texture.smoothStone), // MC 1.14+
+        new SimpleTexture("assets/minecraft/textures/block/stone_slab_top", Texture.smoothStone),
+        new SimpleTexture("assets/minecraft/textures/blocks/stone_slab_top", Texture.smoothStone),
+        new SimpleTexture("textures/blocks/stoneslab_top", Texture.smoothStone),
+        new IndexedTexture(0x06, Texture.smoothStone)));
     allTextures.put("brick", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/bricks", Texture.brick),
         new SimpleTexture("assets/minecraft/textures/blocks/brick", Texture.brick),
@@ -3415,9 +3415,6 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/composter_side", Texture.composterSide);
     addSimpleTexture("assets/minecraft/textures/block/composter_compost", Texture.composterCompost);
     addSimpleTexture("assets/minecraft/textures/block/composter_ready", Texture.composterReady);
-
-    addSimpleTexture("assets/minecraft/textures/block/smooth_stone", Texture.smoothStone);
-    addSimpleTexture("assets/minecraft/textures/block/smooth_stone_slab_side", Texture.smoothStoneSlabSide);
 
     addSimpleTexture("assets/minecraft/textures/block/bamboo_stalk", Texture.bambooStalk);
     addSimpleTexture("assets/minecraft/textures/block/bamboo_small_leaves", Texture.bambooSmallLeaves);
