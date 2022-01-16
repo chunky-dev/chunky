@@ -3861,6 +3861,13 @@ public class TexturePackLoader {
   }
 
   /**
+   * Get the resource packs to be used to load textures from.
+   */
+  public static Collection<String> getTexturePacks() {
+    return Collections.unmodifiableList(Arrays.asList(texturePacks));
+  }
+
+  /**
    * Set the resource packs to be used to load textures from.
    */
   public static void setTexturePacks(@NotNull String texturePacks) {

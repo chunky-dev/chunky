@@ -23,26 +23,20 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.resources.MinecraftFinder;
+import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.world.World;
+import se.llbit.fxutil.Dialogs;
 import se.llbit.log.Log;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class WorldChooserController implements Initializable {
   @FXML private Label statusLabel;
@@ -85,7 +79,7 @@ public class WorldChooserController implements Initializable {
       TableRow<World> row = new TableRow<>();
       row.setOnMouseClicked(e -> {
         if (e.getClickCount() == 2 && !row.isEmpty()) {
-          mapLoader.loadWorld(row.getItem().getWorldDirectory());
+          this.loadWorld(row.getItem(), mapLoader);
           e.consume();
           stage.close();
         }
@@ -121,7 +115,7 @@ public class WorldChooserController implements Initializable {
       File directory = chooser.showDialog(stage);
       if (directory != null) {
         if (directory.isDirectory()) {
-          mapLoader.loadWorld(directory);
+          this.loadWorld(World.loadWorld(directory, mapLoader.getDimension(), World.LoggedWarnings.NORMAL), mapLoader);
           stage.close();
         } else {
           Log.warn("Non-directory selected.");
@@ -130,10 +124,31 @@ public class WorldChooserController implements Initializable {
     });
     loadSelectedBtn.setOnAction(e -> {
       if (!worldTbl.getSelectionModel().isEmpty()) {
-        mapLoader.loadWorld(worldTbl.getSelectionModel().getSelectedItem().getWorldDirectory());
+        this.loadWorld(worldTbl.getSelectionModel().getSelectedItem(), mapLoader);
         stage.close();
       }
     });
+  }
+
+  private void loadWorld(World world, WorldMapLoader mapLoader) {
+    world.getResourcePack().ifPresent((worldResourcePack) -> {
+      List<String> texturePacks = new ArrayList<>(TexturePackLoader.getTexturePacks());
+      if (!texturePacks.contains(worldResourcePack.getAbsolutePath())) {
+        Alert loadTexturesConfirm = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
+        loadTexturesConfirm.getButtonTypes().clear();
+        loadTexturesConfirm.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
+        loadTexturesConfirm.setTitle("Bundled resource pack");
+        loadTexturesConfirm.setContentText(
+                "The world \"" + world.levelName() + "\" contains a resource pack. Do you want to load it now?");
+        if (loadTexturesConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
+          if (!texturePacks.contains(worldResourcePack.getAbsolutePath())) {
+            texturePacks.add(0, worldResourcePack.getAbsolutePath());
+            TexturePackLoader.loadTexturePacks(texturePacks.toArray(new String[0]), true);
+          }
+        }
+      }
+    });
+    mapLoader.loadWorld(world.getWorldDirectory());
   }
 
   /**
