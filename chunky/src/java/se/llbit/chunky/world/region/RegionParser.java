@@ -26,6 +26,7 @@ import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.World;
 import se.llbit.log.Log;
+import se.llbit.util.Mutable;
 
 /**
  * Asynchronous region/chunk parser.
@@ -64,11 +65,11 @@ public class RegionParser extends Thread {
         World world = mapLoader.getWorld();
         Region region = world.getRegionWithinRange(position, mapView.getYMin(), mapView.getYMax());
         region.parse(mapView.getYMin(), mapView.getYMax());
-        ChunkData chunkData = world.createChunkData();
+        Mutable<ChunkData> chunkData = new Mutable<>(null);
         for (Chunk chunk : region) {
           if (map.shouldPreload(chunk)) {
             if(chunk.loadChunk(chunkData, mapView.getYMin(), mapView.getYMax())) {
-              chunkData.clear();
+              chunkData.get().clear();
             }
           }
         }

@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.world;
 
+import com.sun.istack.internal.Nullable;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import se.llbit.chunky.PersistentSettings;
@@ -286,10 +287,20 @@ public class World implements Comparable<World> {
     return getRegion(pos.getRegionPosition()).getChunk(pos);
   }
 
-  public ChunkData createChunkData() {
-    if(this.getVersionId() >= World.VERSION_21W06A) {
+  /**
+   * Creates a new ChunkData object, if the provided one doesn't match the chunkVersion requested
+   * if chunkData is null, a new instance is always returned
+   */
+  public ChunkData createChunkData(@Nullable ChunkData chunkData, int chunkVersion) {
+    if(chunkVersion >= World.VERSION_21W06A) {
+      if(chunkData instanceof GenericChunkData) {
+        return chunkData;
+      }
       return new GenericChunkData();
     } else {
+      if(chunkData instanceof SimpleChunkData) {
+        return chunkData;
+      }
       return new SimpleChunkData();
     }
   }

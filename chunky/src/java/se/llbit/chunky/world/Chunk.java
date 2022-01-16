@@ -140,7 +140,7 @@ public class Chunk {
    * layer, surface and cave maps.
    * @return whether the input chunkdata was modified
    */
-  public synchronized boolean loadChunk(ChunkData chunkData, int yMin, int yMax) {
+  public synchronized boolean loadChunk(@NotNull Mutable<ChunkData> chunkData, int yMin, int yMax) {
     if (!shouldReloadChunk()) {
       return false;
     }
@@ -161,7 +161,8 @@ public class Chunk {
 
     surfaceTimestamp = dataTimestamp;
     version = chunkVersion(data);
-    loadSurface(data, chunkData, yMin, yMax);
+    chunkData.set(this.world.createChunkData(chunkData.get(), data.get(DATAVERSION).intValue()));
+    loadSurface(data, chunkData.get(), yMin, yMax);
     biomesTimestamp = dataTimestamp;
 
     world.chunkUpdated(position);
@@ -541,13 +542,12 @@ public class Chunk {
   /**
    * Load the block data for this chunk.
    *
-   * @param reuseChunkData ChunkData object to be reused, if null one is created
+   * @param reuseChunkData mutable ChunkData object to be reused, if null one is created
    * @param palette Block palette
    * @param minY The requested minimum Y to be loaded into the chunkData object. The chunk implementation does NOT have to respect it
    * @param maxY The requested maximum Y to be loaded into the chunkData object. The chunk implementation does NOT have to respect it
-   * @return Loaded chunk data, guaranteed to be reuseChunkData unless null or EmptyChunkData was passed
    */
-  public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette, BiomePalette biomePalette, int minY, int maxY) {
+  public synchronized void getChunkData(@NotNull Mutable<ChunkData> reuseChunkData, BlockPalette palette, BiomePalette biomePalette, int minY, int maxY) {
     Set<String> request = new HashSet<>();
     request.add(DATAVERSION);
     request.add(LEVEL_SECTIONS);
@@ -556,42 +556,44 @@ public class Chunk {
     request.add(LEVEL_ENTITIES);
     request.add(LEVEL_TILEENTITIES);
     request.add(BLOCK_ENTITIES_POST_21W43A);
-    if(reuseChunkData == null || reuseChunkData instanceof EmptyChunkData) {
-      reuseChunkData = world.createChunkData();
-    } else {
-      reuseChunkData.clear();
-    }
     Map<String, Tag> dataMap = getChunkTags(request);
     // TODO: improve error handling here.
     if (dataMap == null) {
-      return reuseChunkData;
+      return;
     }
     Tag data = tagFromMap(dataMap);
+
+    if(reuseChunkData.get() == null || reuseChunkData.get() instanceof EmptyChunkData) {
+      reuseChunkData.set(world.createChunkData(reuseChunkData.get(), data.get(DATAVERSION).intValue()));
+    } else {
+      reuseChunkData.get().clear();
+    }
+    ChunkData chunkData = reuseChunkData.get(); //unwrap mutable, for ease of use
+
     version = chunkVersion(data);
     Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
     Tag entitiesTag = data.get(LEVEL_ENTITIES);
     Tag tileEntitiesTag = getTagFromNames(data, LEVEL_TILEENTITIES, BLOCK_ENTITIES_POST_21W43A);
 
-    loadBiomeData(data, reuseChunkData, biomePalette, minY, maxY);
+    loadBiomeData(data, chunkData, biomePalette, minY, maxY);
 
     if (sections.isList()) {
-      loadBlockData(data, reuseChunkData, palette, minY, maxY);
+      loadBlockData(data, chunkData, palette, minY, maxY);
 
       if (entitiesTag.isList()) {
         for (SpecificTag tag : (ListTag) entitiesTag) {
           if (tag.isCompoundTag())
-            reuseChunkData.addEntity((CompoundTag) tag);
+            chunkData.addEntity((CompoundTag) tag);
         }
       }
 
       if (tileEntitiesTag.isList()) {
         for (SpecificTag tag : (ListTag) tileEntitiesTag) {
           if (tag.isCompoundTag())
-            reuseChunkData.addTileEntity((CompoundTag) tag);
+            chunkData.addTileEntity((CompoundTag) tag);
         }
       }
     }
-    return reuseChunkData;
   }
 
   /**
