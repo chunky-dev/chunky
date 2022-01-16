@@ -173,7 +173,7 @@ public class World implements Comparable<World> {
       Tag spawnZ = player.get("SpawnZ");
       Tag gameType = result.get(".Data.GameType");
       Tag randomSeed = result.get(".Data.RandomSeed");
-      levelName = result.get(".Data.LevelName").stringValue(levelName);
+      levelName = result.get(".Data.LevelName").stringValue(levelName).replaceAll("§[0-9a-fklmnor]", "");
 
       long seed = randomSeed.longValue(0);
 
