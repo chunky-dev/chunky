@@ -105,7 +105,7 @@ public class ResourceLoadOrderEditor extends Stage {
       }
     });
     buttons.getChildren().addAll(up, down, addResourcePack, removeResourcePack, apply);
-    Label label = new Label("Resource packs (loaded from top to bottom):");
+    Label label = new Label("Resource packs (higher items take priority over lower items):");
     String resourcePacks = PersistentSettings.getLastTexturePack();
     for (String path : resourcePacks.split(File.pathSeparator)) {
       if (!path.isEmpty()) {
