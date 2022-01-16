@@ -22,7 +22,7 @@ import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipFile;
+import java.nio.file.Path;
 
 /**
  * Animated texture loader.
@@ -39,7 +39,8 @@ public class AnimatedTextureLoader extends TextureLoader {
     this.texture = texture;
   }
 
-  @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
+  @Override
+  protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
     BitmapImage image = ImageLoader.read(imageStream);
     if (image.height < image.width) {
       throw new TextureFormatError("Block texture should have height >= width.");
@@ -48,8 +49,9 @@ public class AnimatedTextureLoader extends TextureLoader {
     return true;
   }
 
-  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
-    return load(topLevelDir + file, texturePack);
+  @Override
+  public boolean load(Path texturePack) {
+    return load(file, texturePack);
   }
 
 }

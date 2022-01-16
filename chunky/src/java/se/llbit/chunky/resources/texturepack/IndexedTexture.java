@@ -21,7 +21,7 @@ import se.llbit.chunky.resources.Texture;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipFile;
+import java.nio.file.Path;
 
 /**
  * A texture indexed by position in Minecraft's old terrain.png.
@@ -50,12 +50,11 @@ public class IndexedTexture extends TextureLoader {
     return true;
   }
 
-  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
+  @Override public boolean load(Path texturePack) {
     return false;
   }
 
   @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
     return false;
   }
-
 }

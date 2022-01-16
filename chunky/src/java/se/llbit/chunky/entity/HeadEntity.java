@@ -153,7 +153,7 @@ public class HeadEntity extends Entity {
       try {
         File cacheFile = MojangApi.downloadSkin(skin);
         try {
-          loader.load(cacheFile);
+          loader.loadFromFile(cacheFile);
           return texture;
         } catch (IOException | TextureFormatError  e) {
           Log.warn("Failed to load skin downloaded from " + skinUrl, e);

@@ -22,7 +22,7 @@ import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipFile;
+import java.nio.file.Path;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -34,7 +34,8 @@ public class GrassColorTexture extends TextureLoader {
     this.file = file;
   }
 
-  @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
+  @Override
+  protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
     BitmapImage grassColor = ImageLoader.read(imageStream);
     if (grassColor.width != 256 || grassColor.height != 256) {
       throw new TextureFormatError("Grass color texture must be 256 by 256 pixels!");
@@ -43,8 +44,9 @@ public class GrassColorTexture extends TextureLoader {
     return true;
   }
 
-  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
-    return load(topLevelDir + file, texturePack);
+  @Override
+  public boolean load(Path texturePack) {
+    return load(file, texturePack);
   }
 }
 

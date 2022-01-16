@@ -24,8 +24,8 @@ import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.zip.ZipFile;
 
 /**
  * This works like a simple texture loader, but it colors the texture with a base color.
@@ -61,8 +61,8 @@ public class ColoredTexture extends TextureLoader {
     return true;
   }
 
-  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
-    return load(topLevelDir + textureName, texturePack);
+  @Override public boolean load(Path texturePack) {
+    return load(textureName, texturePack);
   }
 
   @Override public String toString() {

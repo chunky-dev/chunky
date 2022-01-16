@@ -24,7 +24,7 @@ import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipFile;
+import java.nio.file.Path;
 
 /**
  * Loads two textures and overlays them on top of each other.
@@ -37,21 +37,22 @@ public class LayeredTextureLoader extends TextureLoader {
   private final Texture texture;
 
   public LayeredTextureLoader(String file, Texture texture,
-      TextureLoader baseTextureLoader) {
+                              TextureLoader baseTextureLoader) {
     this.textureName = file;
     this.texture = texture;
     this.baseTexture = baseTextureLoader;
   }
 
-  @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
+  @Override
+  protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
     try {
       BitmapImage overlay = ImageLoader.read(imageStream);
       if (overlay.width != texture.getWidth() || overlay.height != texture.getHeight()) {
         throw new TextureFormatError(String.format(
-            "Overlay texture %s has wrong size. Expected %dx%d, but was %dx%d.",
-            textureName,
-            texture.getWidth(), texture.getHeight(),
-            overlay.width, overlay.height));
+                "Overlay texture %s has wrong size. Expected %dx%d, but was %dx%d.",
+                textureName,
+                texture.getWidth(), texture.getHeight(),
+                overlay.width, overlay.height));
       }
 
       BitmapImage result = new BitmapImage(texture.getBitmap());
@@ -70,12 +71,14 @@ public class LayeredTextureLoader extends TextureLoader {
     return true;
   }
 
-  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
-    return baseTexture.load(texturePack, topLevelDir)
-        && load(topLevelDir + textureName, texturePack);
+  @Override
+  public boolean load(Path texturePack) {
+    return baseTexture.load(texturePack)
+            && load(textureName, texturePack);
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return String.format("{texture: %s, overlay: %s}", baseTexture, textureName);
   }
 }

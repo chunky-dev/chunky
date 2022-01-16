@@ -16,12 +16,13 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.ZipFile;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.resources.ImageLoader;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
 
 public class SplitLargeChestTexture extends TextureLoader {
   public enum Part {
@@ -39,14 +40,14 @@ public class SplitLargeChestTexture extends TextureLoader {
   private final Texture back;
 
   public SplitLargeChestTexture(
-      String file,
-      Part part,
-      Texture top,
-      Texture bottom,
-      Texture left,
-      Texture right,
-      Texture front,
-      Texture back) {
+          String file,
+          Part part,
+          Texture top,
+          Texture bottom,
+          Texture left,
+          Texture right,
+          Texture front,
+          Texture back) {
     this.file = file;
     this.part = part;
     this.top = top;
@@ -62,7 +63,7 @@ public class SplitLargeChestTexture extends TextureLoader {
     BitmapImage spritemap = ImageLoader.read(imageStream);
     if (spritemap.width % 16 != 0 || spritemap.height % 16 != 0) {
       throw new TextureFormatError(
-          "Large chest texture file must have width and height divisible by 16!");
+              "Large chest texture file must have width and height divisible by 16!");
     }
 
     int imgW = spritemap.width;
@@ -71,43 +72,43 @@ public class SplitLargeChestTexture extends TextureLoader {
     top.setTexture(getSprite(spritemap, scale, 29, 0, 15, 14, true, true));
     bottom.setTexture(getSprite(spritemap, scale, 14, 19, 15, 14, true, true));
     front.setTexture(
-        BitmapImage.concatY(
-            getSprite(spritemap, scale, 43, 15, 15, 4, false, true),
-            getSprite(spritemap, scale, 43, 33, 15, 10, false, true)));
+            BitmapImage.concatY(
+                    getSprite(spritemap, scale, 43, 15, 15, 4, false, true),
+                    getSprite(spritemap, scale, 43, 33, 15, 10, false, true)));
     back.setTexture(
-        BitmapImage.concatY(
-            getSprite(spritemap, scale, 14, 15, 15, 4, true, true),
-            getSprite(spritemap, scale, 14, 33, 15, 10, true, true)));
+            BitmapImage.concatY(
+                    getSprite(spritemap, scale, 14, 15, 15, 4, true, true),
+                    getSprite(spritemap, scale, 14, 33, 15, 10, true, true)));
 
     if (this.part == Part.LEFT) {
       left.setTexture(
-          BitmapImage.concatY(
-              getSprite(spritemap, scale, 29, 15, 14, 4, true, true),
-              getSprite(spritemap, scale, 29, 33, 14, 10, true, true)));
+              BitmapImage.concatY(
+                      getSprite(spritemap, scale, 29, 15, 14, 4, true, true),
+                      getSprite(spritemap, scale, 29, 33, 14, 10, true, true)));
     } else {
       right.setTexture(
-          BitmapImage.concatY(
-              getSprite(spritemap, scale, 0, 15, 14, 4, false, true),
-              getSprite(spritemap, scale, 0, 33, 14, 10, false, true)));
+              BitmapImage.concatY(
+                      getSprite(spritemap, scale, 0, 15, 14, 4, false, true),
+                      getSprite(spritemap, scale, 0, 33, 14, 10, false, true)));
     }
 
     return true;
   }
 
   @Override
-  public boolean load(ZipFile texturePack, String topLevelDir) {
-    return load(topLevelDir + file, texturePack);
+  public boolean load(Path texturePack) {
+    return load(file, texturePack);
   }
 
   private static BitmapImage getSprite(
-      BitmapImage spritemap,
-      int scale,
-      int x0,
-      int y0,
-      int width,
-      int height,
-      boolean hFlip,
-      boolean vFlip) {
+          BitmapImage spritemap,
+          int scale,
+          int x0,
+          int y0,
+          int width,
+          int height,
+          boolean hFlip,
+          boolean vFlip) {
     BitmapImage img = new BitmapImage(scale * width, scale * height);
 
     img.blit(spritemap, 0, 0, x0 * scale, y0 * scale, (x0 + width) * scale, (y0 + height) * scale);

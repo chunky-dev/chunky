@@ -20,7 +20,7 @@ import se.llbit.chunky.resources.BitmapImage;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipFile;
+import java.nio.file.Path;
 
 /**
  * An alternate texture will try loading several textures,
@@ -49,9 +49,9 @@ public class AlternateTextures extends TextureLoader {
         "It is pointless to create an alternative texture loader with only one alternative.");
   }
 
-  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
+  @Override public boolean load(Path texturePack) {
     for (TextureLoader alternative : alternatives) {
-      if (alternative.load(texturePack, topLevelDir)) {
+      if (alternative.load(texturePack)) {
         return true;
       }
     }

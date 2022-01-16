@@ -22,7 +22,7 @@ import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipFile;
+import java.nio.file.Path;
 
 /**
  * Loads a set of shulker textures for rendering shulker boxes.
@@ -123,8 +123,8 @@ public class ShulkerTextureLoader extends TextureLoader {
     return image;
   }
 
-  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
-    return load(topLevelDir + entityTexture, texturePack);
+  @Override public boolean load(Path texturePack) {
+    return load(entityTexture, texturePack);
   }
 }
 

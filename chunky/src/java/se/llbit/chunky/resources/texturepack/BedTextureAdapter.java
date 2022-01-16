@@ -23,7 +23,7 @@ import se.llbit.log.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipFile;
+import java.nio.file.Path;
 
 /**
  * This texture loader is an adapter for the pre-1.12 bed textures.
@@ -78,12 +78,12 @@ public class BedTextureAdapter extends TextureLoader {
         new IndexedTexture(0x98, bedHeadEnd));
   }
 
-  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
+  @Override public boolean load(Path texturePack) {
     boolean allLoaded = true;
     int scale = 1;
     BitmapImage bitmap = new BitmapImage(64, 64);
     // All texture parts must have the same scale.
-    if (bottomLoader.load(texturePack, topLevelDir)) {
+    if (bottomLoader.load(texturePack)) {
       // Copy bottom texture to right position.
       scale = bottom.getWidth() / 16;
       if (16 * scale != bottom.getWidth()) {
@@ -97,7 +97,7 @@ public class BedTextureAdapter extends TextureLoader {
     } else {
       allLoaded = false;
     }
-    if (footEndLoader.load(texturePack, topLevelDir) && checkSize(bedFootEnd, scale)) {
+    if (footEndLoader.load(texturePack) && checkSize(bedFootEnd, scale)) {
       bitmap.blit(bedFootEnd.getBitmap().vFlipped(),
           22 * scale, 22 * scale,
           0, 3 * scale,
@@ -115,7 +115,7 @@ public class BedTextureAdapter extends TextureLoader {
     } else {
       allLoaded = false;
     }
-    if (footSideLoader.load(texturePack, topLevelDir) && checkSize(bedFootSide, scale)) {
+    if (footSideLoader.load(texturePack) && checkSize(bedFootSide, scale)) {
       bitmap.blit(bedFootSide.getBitmap().rotated().vFlipped(),
           0, 28 * scale,
           3 * scale, 0,
@@ -137,12 +137,12 @@ public class BedTextureAdapter extends TextureLoader {
     } else {
       allLoaded = false;
     }
-    if (footTopLoader.load(texturePack, topLevelDir) && checkSize(bedFootTop, scale)) {
+    if (footTopLoader.load(texturePack) && checkSize(bedFootTop, scale)) {
       bitmap.blit(bedFootTop.getBitmap().rotated180(), 6 * scale, 28 * scale);
     } else {
       allLoaded = false;
     }
-    if (headEndLoader.load(texturePack, topLevelDir) && checkSize(bedHeadEnd, scale)) {
+    if (headEndLoader.load(texturePack) && checkSize(bedHeadEnd, scale)) {
       bitmap.blit(bedHeadEnd.getBitmap().vFlipped(),
           6 * scale, 0,
           0, 3 * scale,
@@ -160,7 +160,7 @@ public class BedTextureAdapter extends TextureLoader {
     } else {
       allLoaded = false;
     }
-    if (headSideLoader.load(texturePack, topLevelDir) && checkSize(bedHeadSide, scale)) {
+    if (headSideLoader.load(texturePack) && checkSize(bedHeadSide, scale)) {
       bitmap.blit(bedHeadSide.getBitmap().rotated().vFlipped(),
           0, 6 * scale,
           3 * scale, 0,
@@ -182,7 +182,7 @@ public class BedTextureAdapter extends TextureLoader {
     } else {
       allLoaded = false;
     }
-    if (headTopLoader.load(texturePack, topLevelDir) && checkSize(bedHeadTop, scale)) {
+    if (headTopLoader.load(texturePack) && checkSize(bedHeadTop, scale)) {
       bitmap.blit(bedHeadTop.getBitmap().rotated270(), 6 * scale, 6 * scale);
     } else {
       allLoaded = false;
