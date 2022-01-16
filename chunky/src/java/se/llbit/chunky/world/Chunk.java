@@ -25,13 +25,15 @@ import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.map.*;
+import se.llbit.chunky.world.biome.ArrayBiomePalette;
+import se.llbit.chunky.world.biome.Biome;
+import se.llbit.chunky.world.biome.BiomePalette;
+import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.chunky.world.region.Region;
+import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
-import se.llbit.nbt.CompoundTag;
-import se.llbit.nbt.ListTag;
-import se.llbit.nbt.SpecificTag;
-import se.llbit.nbt.Tag;
+import se.llbit.nbt.*;
 import se.llbit.util.BitBuffer;
 import se.llbit.util.Mutable;
 import se.llbit.util.NotNull;
@@ -55,12 +57,13 @@ public class Chunk {
   public static final String DATAVERSION = ".DataVersion";
   public static final String LEVEL_HEIGHTMAP = ".Level.HeightMap";
   public static final String LEVEL_SECTIONS = ".Level.Sections";
-  public static final String LEVEL_SECTIONS_POST_21W39A = ".sections";
   public static final String LEVEL_BIOMES = ".Level.Biomes";
   public static final String LEVEL_ENTITIES = ".Level.Entities";
   public static final String LEVEL_TILEENTITIES = ".Level.TileEntities";
   public static final String BLOCK_ENTITIES_POST_21W43A = ".block_entities";
 
+  public static final String SECTIONS_POST_21W39A = ".sections";
+  public static final String BIOMES_POST_21W39A = ".biomes";
   /** Chunk width. */
   public static final int X_MAX = 16;
 
@@ -145,8 +148,9 @@ public class Chunk {
     Set<String> request = new HashSet<>();
     request.add(Chunk.DATAVERSION);
     request.add(Chunk.LEVEL_SECTIONS);
-    request.add(Chunk.LEVEL_SECTIONS_POST_21W39A);
+    request.add(Chunk.SECTIONS_POST_21W39A);
     request.add(Chunk.LEVEL_BIOMES);
+    request.add(Chunk.BIOMES_POST_21W39A);
     request.add(Chunk.LEVEL_HEIGHTMAP);
     Map<String, Tag> dataMap = getChunkTags(request);
     // TODO: improve error handling here.
@@ -159,11 +163,7 @@ public class Chunk {
     version = chunkVersion(data);
     loadSurface(data, chunkData, yMin, yMax);
     biomesTimestamp = dataTimestamp;
-    if (surface == IconLayer.MC_1_12) {
-      biomes = IconLayer.MC_1_12;
-    } else {
-      loadBiomes(data, chunkData);
-    }
+
     world.chunkUpdated(position);
     return true;
   }
@@ -175,16 +175,21 @@ public class Chunk {
     }
 
     Heightmap heightmap = world.heightmap();
-    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
+    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
     if (sections.isList()) {
-      extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
       if (version.equals("1.13") || version.equals("1.12")) {
+        BiomePalette biomePalette = new ArrayBiomePalette();
+        loadBiomeData(data, chunkData, biomePalette, yMin, yMax);
+        biomes = new BiomeLayer(chunkData, biomePalette);
+
         BlockPalette palette = new BlockPalette();
         palette.unsynchronize(); //only this RegionParser will use this palette
         loadBlockData(data, chunkData, palette, yMin, yMax);
+
         int[] heightmapData = extractHeightmapData(data, chunkData);
         updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
-        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, yMin, yMax, heightmapData);
+
+        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
         queueTopography();
       }
     } else {
@@ -192,12 +197,99 @@ public class Chunk {
     }
   }
 
-  private void loadBiomes(@NotNull Tag data, ChunkData chunkData) {
-    if (data == null) {
-      biomes = IconLayer.CORRUPT;
+  private void loadBiomeData(Tag data, ChunkData chunkData, BiomePalette biomePalette, int yMin, int yMax) {
+    Tag biomeTagsPre21w39a = data.get(LEVEL_BIOMES);
+    if(!biomeTagsPre21w39a.isError()) { // in 21w39a biome tags moved into the sections array
+      extractBiomeDataPre21w39a(biomeTagsPre21w39a, chunkData, biomePalette);
+    } else if(!data.get(SECTIONS_POST_21W39A).isError()) {
+      extractBiomeDataPost21w39a(data, chunkData, biomePalette, yMin, yMax);
     } else {
-      extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
-      biomes = new BiomeLayer(chunkData);
+      //no valid biomes found? add unknown as default
+      biomePalette.put(Biomes.unknown);
+    }
+  }
+
+  private void extractBiomeDataPost21w39a(Tag data, ChunkData chunkData, BiomePalette biomePalette, int yMin, int yMax) {
+    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
+    if (sections.isList()) {
+      for (SpecificTag section : sections.asList()) {
+        Tag yTag = section.get("Y");
+        int sectionY = yTag.byteValue();
+        int sectionMinBlockY = sectionY << 4;
+
+        if (sectionY < yMin >> 4 || sectionY - 1 > (yMax >> 4) + 1)
+          continue; //skip parsing sections that are outside requested bounds
+        Tag biomePaletteTag = getTagFromNames(section, "biomes\\palette");
+        if (biomePaletteTag.isList()) { //must be a post 21w39a section, so we load the 3d biomes
+          ListTag localBiomePalette = biomePaletteTag.asList();
+          int bitsPerBiome = 1;
+          if (localBiomePalette.size() > 2) {
+            bitsPerBiome = QuickMath.log2(QuickMath.nextPow2(localBiomePalette.size()));
+          }
+
+          Tag biomes = getTagFromNames(section, "biomes\\data");
+
+          if (biomes.isLongArray(bitsPerBiome)) {
+            int[] subpalette = new int[localBiomePalette.size()];
+            int paletteIndex = 0;
+            for (Tag item : localBiomePalette.asList()) {
+              Biome biome = Biomes.biomesByResourceLocation.get(((StringTag) item).getData());
+              if (biome == null) {
+//                Log.warnf("Missing biome %s! defaulting to first biome in the palette", ((StringTag) item).getData()); //TODO: re-enable once all 1.18 biomes are added
+                subpalette[paletteIndex] = 0; //technically unnecessary as it will default to 0, but here for clarity
+              } else {
+                subpalette[paletteIndex] = biomePalette.put(biome);
+              }
+              paletteIndex += 1;
+            }
+
+            BitBuffer buffer = new BitBuffer(biomes.longArray(), bitsPerBiome, true);
+            for (int biomeY = 0; biomeY < 4; biomeY++) {
+              int quartY = sectionMinBlockY + (biomeY << 2);
+              for (int biomeZ = 0; biomeZ < 4; biomeZ++) {
+                int quartZ = biomeZ << 2;
+                for (int biomeX = 0; biomeX < 4; biomeX++) {
+                  int quartX = biomeX << 2;
+
+                  int b0 = buffer.read();
+                  assert b0 < subpalette.length;
+                  for (int localY = 0; localY < 4; localY++) {
+                    for (int localZ = 0; localZ < 4; localZ++) {
+                      for (int localX = 0; localX < 4; localX++) {
+                        chunkData.setBiomeAt(quartX + localX, quartY + localY, quartZ + localZ, (byte) subpalette[b0]); //TODO: int biomes
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          } else {
+            if (localBiomePalette.size() == 1) {
+              // biome palette exists, but data does not, we assume that section is entirely filled with one biome
+              Biome biome = Biomes.biomesByResourceLocation.get(((StringTag) localBiomePalette.get(0)).getData());
+              int biomeId;
+              if (biome == null) {
+//                Log.warnf("Missing biome %s! defaulting to first biome in the palette", ((StringTag) localBiomePalette.get(0)).getData());
+                biomeId = 0; //technically unnecessary as it will default to 0, but here for clarity
+              } else {
+                biomeId = biomePalette.put(biome);
+              }
+              for (int y = 0; y < SECTION_Y_MAX; y++) {
+                int blockY = sectionMinBlockY + y;
+                for (int z = 0; z < Z_MAX; z++) {
+                  for (int x = 0; x < X_MAX; x++) {
+                    chunkData.setBiomeAt(x, blockY, z, (byte) biomeId); //TODO: int biomes
+                  }
+                }
+              }
+            } else {
+              // minecraft crashed while saving caused this? Should be extremely rare
+              Log.warn("Biome palette of size > 1 had no data?!");
+              assert false;
+            }
+          }
+        }
+      }
     }
   }
 
@@ -207,13 +299,13 @@ public class Chunk {
    * @param biomesTag the .Level.Biomes NBT tag to load data from.
    * @param output a byte array of length 16x16.
    */
-  private void extractBiomeData(@NotNull Tag biomesTag, ChunkData output) {
+  private void extractBiomeDataPre21w39a(@NotNull Tag biomesTag, ChunkData output, BiomePalette biomePalette) {
     if (biomesTag.isByteArray(X_MAX * Z_MAX)) {
       byte[] data = biomesTag.byteArray();
       int i = 0;
       for(int z = 0; z < Z_MAX; z++) {
         for(int x = 0; x < X_MAX; x++) {
-          output.setBiomeAt(x, 0, z, data[i]);
+          output.setBiomeAt(x, 0, z, (byte) biomePalette.put(Biomes.biomes[data[i] & 0xff])); // TODO: int biomes
           i++;
         }
       }
@@ -225,20 +317,19 @@ public class Chunk {
         for (int z = 0; z < 4; z++) {
           for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-              output.setBiomeAt((x * 4 + i), 0, z * 4 + j, (byte) data[z * 4 + x]);
+              output.setBiomeAt((x * 4 + i), 0, z * 4 + j, (byte) biomePalette.put(Biomes.biomes[data[z * 4 + x] & 0xff])); // TODO: int biomes
             }
           }
         }
       }
-      // TODO add support for different biomes in the same XZ coordinate (i.e. for the nether)
+      // TODO add support for different biomes in the same XZ coordinate
     } else if (biomesTag.isIntArray(X_MAX * Z_MAX)) {
       // Since Minecraft 1.13, biome IDs are stored in an int vector with 256 entries (one for each XZ position).
-      // TODO(llbit): do we need to use ints to store biome IDs for Minecraft 1.13+? (not yet, the highest ID is 173)
       int[] data = biomesTag.intArray();
       int i = 0;
       for(int z = 0; z < Z_MAX; z++) {
         for(int x = 0; x < X_MAX; x++) {
-          output.setBiomeAt(x, 0, z, (byte) data[i]);
+          output.setBiomeAt(x, 0, z, (byte) biomePalette.put(Biomes.biomes[data[i] & 0xff])); // TODO: int biomes
           i++;
         }
       }
@@ -260,7 +351,7 @@ public class Chunk {
 
   /** Detect Minecraft version that generated the chunk. */
   private static String chunkVersion(@NotNull Tag data) {
-    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
+    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
     if (sections.isList()) {
       for (SpecificTag section : sections.asList()) {
         if (!section.get("Palette").isList()) {
@@ -277,7 +368,7 @@ public class Chunk {
   private static void loadBlockData(@NotNull Tag data, @NotNull ChunkData chunkData,
       BlockPalette blockPalette, int minY, int maxY) {
 
-    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
+    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
     if (sections.isList()) {
       for (SpecificTag section : sections.asList()) {
         Tag yTag = section.get("Y");
@@ -287,13 +378,13 @@ public class Chunk {
         if(sectionY < minY >> 4 || sectionY-1 > (maxY >> 4)+1)
           continue; //skip parsing sections that are outside requested bounds
 
-        Tag paletteTag = getTagFromNames(section, "Palette", "block_states\\palette");
-        if (paletteTag.isList()) {
-          ListTag palette = paletteTag.asList();
+        Tag blockPaletteTag = getTagFromNames(section, "Palette", "block_states\\palette");
+        if (blockPaletteTag.isList()) {
+          ListTag localBlockPalette = blockPaletteTag.asList();
           // Bits per block:
           int bpb = 4;
-          if (palette.size() > 16) {
-            bpb = QuickMath.log2(QuickMath.nextPow2(palette.size()));
+          if (localBlockPalette.size() > 16) {
+            bpb = QuickMath.log2(QuickMath.nextPow2(localBlockPalette.size()));
           }
 
           int dataSize = (4096 * bpb) / 64;
@@ -309,9 +400,9 @@ public class Chunk {
               bpb = blockStates.longArray().length / 64;
             }
 
-            int[] subpalette = new int[palette.size()];
+            int[] subpalette = new int[localBlockPalette.size()];
             int paletteIndex = 0;
-            for (Tag item : palette.asList()) {
+            for (Tag item : localBlockPalette.asList()) {
               subpalette[paletteIndex] = blockPalette.put(item);
               paletteIndex += 1;
             }
@@ -456,11 +547,11 @@ public class Chunk {
    * @param maxY The requested maximum Y to be loaded into the chunkData object. The chunk implementation does NOT have to respect it
    * @return Loaded chunk data, guaranteed to be reuseChunkData unless null or EmptyChunkData was passed
    */
-  public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette, int minY, int maxY) {
+  public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette, BiomePalette biomePalette, int minY, int maxY) {
     Set<String> request = new HashSet<>();
     request.add(DATAVERSION);
     request.add(LEVEL_SECTIONS);
-    request.add(LEVEL_SECTIONS_POST_21W39A);
+    request.add(SECTIONS_POST_21W39A);
     request.add(LEVEL_BIOMES);
     request.add(LEVEL_ENTITIES);
     request.add(LEVEL_TILEENTITIES);
@@ -477,13 +568,11 @@ public class Chunk {
     }
     Tag data = tagFromMap(dataMap);
     version = chunkVersion(data);
-    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, LEVEL_SECTIONS_POST_21W39A);
-    Tag biomesTag = data.get(LEVEL_BIOMES);
+    Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
     Tag entitiesTag = data.get(LEVEL_ENTITIES);
     Tag tileEntitiesTag = getTagFromNames(data, LEVEL_TILEENTITIES, BLOCK_ENTITIES_POST_21W43A);
-    if (biomesTag.isByteArray(X_MAX * Z_MAX) || biomesTag.isIntArray(X_MAX * Z_MAX)) {
-      extractBiomeData(biomesTag, reuseChunkData);
-    }
+
+    loadBiomeData(data, reuseChunkData, biomePalette, minY, maxY);
 
     if (sections.isList()) {
       loadBlockData(data, reuseChunkData, palette, minY, maxY);
