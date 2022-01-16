@@ -17,7 +17,7 @@
 package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.chunky.world.Biomes;
+import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;

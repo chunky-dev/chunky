@@ -69,7 +69,10 @@ import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
-import se.llbit.chunky.world.Biomes;
+import se.llbit.chunky.world.biome.ArrayBiomePalette;
+import se.llbit.chunky.world.biome.Biome;
+import se.llbit.chunky.world.biome.BiomePalette;
+import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.EmptyWorld;
@@ -943,9 +946,11 @@ public class Scene implements JsonSerializable, Refreshable {
       actors.trimToSize();
     }
 
+    BiomePalette biomePalette = new ArrayBiomePalette();
+
     Set<ChunkPosition> nonEmptyChunks = new HashSet<>();
     Set<ChunkPosition> legacyChunks = new HashSet<>();
-    Heightmap biomeIdMap = new Heightmap();
+    Heightmap biomePaletteIdxMap = new Heightmap();
 
     ChunkData chunkData1 = world.createChunkData(); // chunk loading will switch between these two, using one asynchronously to load the data
     ChunkData chunkData2 = world.createChunkData(); // while the other is used to add to the octree
@@ -963,7 +968,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       ExecutorService executor = Executors.newSingleThreadExecutor();
       Future<?> nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
-        world.getChunk(chunkPositions[0]).getChunkData(chunkData1, palette, yMin, yMax);
+        world.getChunk(chunkPositions[0]).getChunkData(chunkData1, palette, biomePalette, yMin, yMax);
       });
       for (int i = 0; i < chunkPositions.length; i++) {
         ChunkPosition cp = chunkPositions[i];
@@ -987,10 +992,10 @@ public class Scene implements JsonSerializable, Refreshable {
           }
 
           if(usingFirstChunkData) {
-            world.getChunk(chunkPositions[i]).getChunkData(chunkData1, palette, yMin, yMax);
+            world.getChunk(chunkPositions[i]).getChunkData(chunkData1, palette, biomePalette, yMin, yMax);
           }
           else {
-            world.getChunk(chunkPositions[i]).getChunkData(chunkData2, palette, yMin, yMax);
+            world.getChunk(chunkPositions[i]).getChunkData(chunkData2, palette, biomePalette, yMin, yMax);
           }
         } catch(ExecutionException e) {
           throw new RuntimeException(e.getCause());
@@ -1011,7 +1016,7 @@ public class Scene implements JsonSerializable, Refreshable {
           if (i + 1 < chunkPositions.length) { //if has next request next
             final int finalI = i;
             nextChunkDataTask = executor.submit(() -> { //request chunk data for the next iteration of the loop
-              world.getChunk(chunkPositions[finalI + 1]).getChunkData(nextChunkData, palette, yMin, yMax);
+              world.getChunk(chunkPositions[finalI + 1]).getChunkData(nextChunkData, palette, biomePalette, yMin, yMax);
             });
           }
         }
@@ -1024,8 +1029,8 @@ public class Scene implements JsonSerializable, Refreshable {
           int wz = cz + wz0;
           for (int cx = 0; cx < 16; ++cx) {
             int wx = cx + wx0;
-            int biomeId = 0xFF & chunkData.getBiomeAt(cx, 0, cz); // TODO add vertical biomes support (1.15+)
-            biomeIdMap.set(biomeId, wx, wz);
+            int biomePaletteIdx = chunkData.getBiomeAt(cx, 0, cz) & 0xff; // TODO add vertical biomes support (1.15+)
+            biomePaletteIdxMap.set(biomePaletteIdx, wx, wz);
           }
         }
 
@@ -1371,16 +1376,16 @@ public class Scene implements JsonSerializable, Refreshable {
                 ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
                 if (nonEmptyChunks.contains(ccp)) {
                   nsum += 1;
-                  int biomeId = biomeIdMap.get(wx, wz);
-                  float[] grassColor = Biomes.getGrassColorLinear(biomeId);
+                  Biome biome = biomePalette.get(biomePaletteIdxMap.get(wx, wz));
+                  float[] grassColor = biome.grassColorLinear;
                   grassMix[0] += grassColor[0];
                   grassMix[1] += grassColor[1];
                   grassMix[2] += grassColor[2];
-                  float[] foliageColor = Biomes.getFoliageColorLinear(biomeId);
+                  float[] foliageColor = biome.foliageColorLinear;
                   foliageMix[0] += foliageColor[0];
                   foliageMix[1] += foliageColor[1];
                   foliageMix[2] += foliageColor[2];
-                  float[] waterColor = Biomes.getWaterColorLinear(biomeId);
+                  float[] waterColor = biome.waterColorLinear;
                   waterMix[0] += waterColor[0];
                   waterMix[1] += waterColor[1];
                   waterMix[2] += waterColor[2];
@@ -2428,9 +2433,8 @@ public class Scene implements JsonSerializable, Refreshable {
   public float[] getFoliageColor(int x, int z) {
     if (biomeColors) {
       return foliageTexture.get(x, z);
-    } else {
-      return Biomes.getFoliageColorLinear(0);
     }
+    return Biomes.biomes[0].foliageColorLinear;
   }
 
   /**
@@ -2441,9 +2445,8 @@ public class Scene implements JsonSerializable, Refreshable {
   public float[] getGrassColor(int x, int z) {
     if (biomeColors) {
       return grassTexture.get(x, z);
-    } else {
-      return Biomes.getGrassColorLinear(0);
     }
+    return Biomes.biomes[0].grassColorLinear;
   }
 
   /**
@@ -2457,10 +2460,8 @@ public class Scene implements JsonSerializable, Refreshable {
       if (color[0] > 0 || color[1] > 0 || color[2] > 0) {
         return color;
       }
-      return Biomes.getWaterColorLinear(0);
-    } else {
-      return Biomes.getWaterColorLinear(0);
     }
+    return Biomes.biomes[0].waterColorLinear;
   }
 
   /**
