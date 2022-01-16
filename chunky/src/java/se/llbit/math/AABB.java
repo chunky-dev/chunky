@@ -16,8 +16,6 @@
  */
 package se.llbit.math;
 
-import se.llbit.chunky.renderer.RenderingObjectPool;
-
 import java.util.Random;
 
 /**
@@ -52,44 +50,40 @@ public class AABB {
   }
 
   public void sampleFace(int face, Vector3 loc, Random rand) {
-    RenderingObjectPool.Double3 v = RenderingObjectPool.get(RenderingObjectPool.Double3.class);
+    double[] v = new double[3];
     face %= 6;
     int axis = face % 3;
-    v.vec[axis] = face > 2 ? 1 : 0;
-    v.vec[(axis + 1) % 3] = rand.nextDouble();
-    v.vec[(axis + 2) % 3] = rand.nextDouble();
+    v[axis] = face > 2 ? 1 : 0;
+    v[(axis + 1) % 3] = rand.nextDouble();
+    v[(axis + 2) % 3] = rand.nextDouble();
 
-    v.vec[0] *= xmax - xmin;
-    v.vec[1] *= ymax - ymin;
-    v.vec[2] *= zmax - zmin;
+    v[0] *= xmax - xmin;
+    v[1] *= ymax - ymin;
+    v[2] *= zmax - zmin;
 
-    v.vec[0] += xmin;
-    v.vec[1] += ymin;
-    v.vec[2] += zmin;
+    v[0] += xmin;
+    v[1] += ymin;
+    v[2] += zmin;
 
-    loc.set(v.vec[0], v.vec[1], v.vec[2]);
-    RenderingObjectPool.release(v);
+    loc.set(v[0], v[1], v[2]);
   }
 
   public double faceSurfaceArea(int face) {
-    RenderingObjectPool.Double3 minC = RenderingObjectPool.get(RenderingObjectPool.Double3.class);
-    RenderingObjectPool.Double3 maxC = RenderingObjectPool.get(RenderingObjectPool.Double3.class);
+    double[] minC = new double[3];
+    double[] maxC = new double[3];
 
-    minC.vec[0] = xmin;
-    minC.vec[1] = ymin;
-    minC.vec[2] = zmin;
+    minC[0] = xmin;
+    minC[1] = ymin;
+    minC[2] = zmin;
 
-    maxC.vec[0] = xmax;
-    maxC.vec[1] = ymax;
-    maxC.vec[2] = zmax;
+    maxC[0] = xmax;
+    maxC[1] = ymax;
+    maxC[2] = zmax;
 
     int a1 = (face + 1) % 3;
     int a2 = (face + 2) % 3;
 
-    double sa = (maxC.vec[a1] - minC.vec[a1]) * (maxC.vec[a2] - minC.vec[a2]);
-
-    RenderingObjectPool.release(minC);
-    RenderingObjectPool.release(maxC);
+    double sa = (maxC[a1] - minC[a1]) * (maxC[a2] - minC[a2]);
 
     return Math.abs(sa);
   }

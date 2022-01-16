@@ -19,7 +19,6 @@ package se.llbit.math;
 import java.util.Collection;
 import java.util.Random;
 
-import se.llbit.chunky.renderer.RenderingObjectPool;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.math.primitive.TexturedTriangle;
@@ -122,11 +121,9 @@ public class Quad {
   }
 
   public double surfaceArea() {
-    Vector3 cross = RenderingObjectPool.get(Vector3.class);
+    Vector3 cross = new Vector3();
     cross.cross(xv, yv);
-    double sa = cross.length();
-    RenderingObjectPool.release(cross);
-    return sa;
+    return cross.length();
   }
 
   public void sample(Vector3 loc, Random rand) {

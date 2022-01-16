@@ -19,7 +19,6 @@ package se.llbit.chunky.renderer.scene;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Water;
-import se.llbit.chunky.renderer.RenderingObjectPool;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
@@ -441,9 +440,8 @@ public class PathTracer implements RayTracer {
   }
 
   private static void sampleEmitterFace(Scene scene, Ray ray, Grid.EmitterPosition pos, int face, Vector4 result, double scaler, Random random) {
-    Ray emitterRay = RenderingObjectPool.get(Ray.class);
+    Ray emitterRay = new Ray(ray);
 
-    emitterRay.set(ray);
     pos.sampleFace(face, emitterRay.d, random);
     emitterRay.d.sub(emitterRay.o);
 
@@ -465,8 +463,6 @@ public class PathTracer implements RayTracer {
         result.scaleAdd(e, emitterRay.color);
       }
     }
-
-    RenderingObjectPool.release(emitterRay);
   }
 
   /**
