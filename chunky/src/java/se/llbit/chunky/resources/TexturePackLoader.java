@@ -19,30 +19,7 @@ package se.llbit.chunky.resources;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Sun;
-import se.llbit.chunky.resources.texturepack.AllTextures;
-import se.llbit.chunky.resources.texturepack.AlternateTextures;
-import se.llbit.chunky.resources.texturepack.AnimatedTextureLoader;
-import se.llbit.chunky.resources.texturepack.BedTextureAdapter;
-import se.llbit.chunky.resources.texturepack.ChestTexture;
-import se.llbit.chunky.resources.texturepack.CloudsTexture;
-import se.llbit.chunky.resources.texturepack.ConditionalTextures;
-import se.llbit.chunky.resources.texturepack.EntityTextureLoader;
-import se.llbit.chunky.resources.texturepack.FoliageColorTexture;
-import se.llbit.chunky.resources.texturepack.AsciiFontTextureLoader;
-import se.llbit.chunky.resources.texturepack.JsonFontTextureLoader;
-import se.llbit.chunky.resources.texturepack.GrassColorTexture;
-import se.llbit.chunky.resources.texturepack.IndexedTexture;
-import se.llbit.chunky.resources.texturepack.LargeChestTexture;
-import se.llbit.chunky.resources.texturepack.LayeredTextureLoader;
-import se.llbit.chunky.resources.texturepack.PaintingBackTexture;
-import se.llbit.chunky.resources.texturepack.PaintingTexture;
-import se.llbit.chunky.resources.texturepack.PaintingTextureAdapter;
-import se.llbit.chunky.resources.texturepack.PlayerTextureLoader;
-import se.llbit.chunky.resources.texturepack.SplitLargeChestTexture;
-import se.llbit.chunky.resources.texturepack.RotatedTextureLoader;
-import se.llbit.chunky.resources.texturepack.ShulkerTextureLoader;
-import se.llbit.chunky.resources.texturepack.SimpleTexture;
-import se.llbit.chunky.resources.texturepack.TextureLoader;
+import se.llbit.chunky.resources.texturepack.*;
 import se.llbit.log.Log;
 import se.llbit.resources.ImageLoader;
 import se.llbit.util.NotNull;
@@ -50,16 +27,12 @@ import se.llbit.util.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 /**
  * Utility methods to load Minecraft texture packs.
@@ -3682,13 +3655,13 @@ public class TexturePackLoader {
     allTextures.put(name, new SimpleTexture(file, texture));
   }
 
-  private static String[] texturePacks = { };
+  private static String[] texturePacks = {};
 
   private static String texturePackName(File tpFile) {
     boolean isDefault = tpFile.equals(MinecraftFinder.getMinecraftJar());
     return String.format("%s (%s)",
-        isDefault ? "default resource pack" : "resource pack",
-        tpFile.getAbsolutePath());
+            isDefault ? "default resource pack" : "resource pack",
+            tpFile.getAbsolutePath());
   }
 
   /**
@@ -3697,64 +3670,73 @@ public class TexturePackLoader {
    * a top-level directory or inside a top-level directory with the
    * same name as the Zip file.
    *
-   * @param tpFile resource pack file
+   * @param tpFile   resource pack file
    * @param textures textures to load
    * @return the keys for textures that could not be loaded
    */
   public static Set<Map.Entry<String, TextureLoader>> loadTextures(File tpFile,
-      Collection<Map.Entry<String, TextureLoader>> textures) {
+                                                                   Collection<Map.Entry<String, TextureLoader>> textures) {
     Set<Map.Entry<String, TextureLoader>> notLoaded = new HashSet<>(textures);
 
     String basename = tpFile.getName().toLowerCase();
-    if (basename.endsWith(".zip")) {
-      basename = basename.substring(0, basename.length() - 4);
-    }
 
-    try (ZipFile texturePack = new ZipFile(tpFile)) {
-      // Seach for the assets directory in the resource pack.
-      // The assets directory can be inside a top-level directory with
-      // the same name as the resource pack zip file.
+    FileSystem texturePack = null;
+    try {
+      Path root;
+      if (tpFile.isDirectory()) {
+        texturePack = FileSystems.getDefault();
+        root = tpFile.toPath();
+      } else {
+        // jar or zip file
+        texturePack = FileSystems.newFileSystem(URI.create("jar:" + tpFile.toURI()), Collections.emptyMap());
+        root = texturePack.getPath("");
+      }
+
       boolean foundAssetDirectory = false;
-      String topLevel = "";
-      Enumeration<? extends ZipEntry> entries = texturePack.entries();
-      while (entries.hasMoreElements()) {
-        String name = entries.nextElement().getName();
-        if (name.startsWith("assets/")) {
+      if (Files.exists(root.resolve("assets"))) {
+        foundAssetDirectory = true;
+      } else if (basename.endsWith(".zip")) {
+        // The assets directory can be inside a top-level directory with
+        // the same name as the resource pack zip file.
+        basename = basename.substring(0, basename.length() - 4);
+        if (Files.exists(root.resolve(basename + "/assets"))) {
+          root = root.resolve(basename);
           foundAssetDirectory = true;
-          break;
-        }
-        if (name.toLowerCase().startsWith(basename) &&
-            name.substring(basename.length()).startsWith("/assets/")) {
-          topLevel = name.substring(0, basename.length()) + "/";
-          foundAssetDirectory = true;
-          break;
         }
       }
       if (!foundAssetDirectory) {
         Log.errorf("Missing assets directory in %s", texturePackName(tpFile));
       } else {
         for (Map.Entry<String, TextureLoader> texture : textures) {
-          if (texture.getValue().load(texturePack, topLevel)) {
+          if (texture.getValue().load(root)) {
             notLoaded.remove(texture);
           }
         }
 
         // Fall back on the "terrain.png" texture atlas:
-        notLoaded = loadTerrainTextures(texturePack, notLoaded);
+        notLoaded = loadTerrainTextures(root, notLoaded);
       }
     } catch (IOException e) {
       Log.warnf("Failed to open %s: %s", texturePackName(tpFile), e.getMessage());
+    } finally {
+      if (texturePack != null) {
+        try {
+          texturePack.close();
+        } catch (UnsupportedOperationException | IOException ignore) {
+        }
+      }
     }
     return notLoaded;
   }
 
   /**
    * Load textures from some resource packs.
+   *
    * @param texturePacks The paths to texture packs to be loaded, as a path list.
-   * Texture packs are loaded in the order of the paths in this argument.
-   * Paths are separated by the system path separator.
-   * @param remember Decides if the texture packs should be saved as the
-   * last used texture pack.
+   *                     Texture packs are loaded in the order of the paths in this argument.
+   *                     Paths are separated by the system path separator.
+   * @param remember     Decides if the texture packs should be saved as the
+   *                     last used texture pack.
    */
   public static void loadTexturePacks(@NotNull String texturePacks, boolean remember) {
     String pathList = texturePacks.trim();
@@ -3769,10 +3751,11 @@ public class TexturePackLoader {
 
   /**
    * Load textures from some resource packs.
+   *
    * @param texturePacks The paths to texture packs to be loaded.
-   * Texture packs are loaded in the order of the paths in this argument.
-   * @param remember Decides if the texture packs should be saved as the
-   * last used texture pack.
+   *                     Texture packs are loaded in the order of the paths in this argument.
+   * @param remember     Decides if the texture packs should be saved as the
+   *                     last used texture pack.
    */
   public static void loadTexturePacks(@NotNull String[] texturePacks, boolean remember) {
     TextureCache.reset();
@@ -3781,7 +3764,7 @@ public class TexturePackLoader {
     for (String path : texturePacks) {
       if (!path.isEmpty()) {
         File file = new File(path);
-        if (!file.isFile()) {
+        if (!file.isFile() && !file.isDirectory()) {
           Log.error("Could not open texture pack: " + file.getAbsolutePath());
         } else {
           Log.infof("Loading %d textures from %s", toLoad.size(), file.getAbsolutePath());
@@ -3826,19 +3809,17 @@ public class TexturePackLoader {
     }
   }
 
-  private static Set<Map.Entry<String, TextureLoader>> loadTerrainTextures(ZipFile texturePack,
-      Set<Map.Entry<String, TextureLoader>> textures) {
+  private static Set<Map.Entry<String, TextureLoader>> loadTerrainTextures(Path texturePack,
+                                                                           Set<Map.Entry<String, TextureLoader>> textures) {
     Set<Map.Entry<String, TextureLoader>> notLoaded = new HashSet<>(textures);
 
-    try (InputStream in = texturePack.getInputStream(new ZipEntry("terrain.png"))) {
-      if (in != null) {
-        BitmapImage spriteMap = ImageLoader.read(in);
-        BitmapImage[] terrainTextures = getTerrainTextures(spriteMap);
+    try (InputStream in = Files.newInputStream(texturePack.resolve("terrain.png"))) {
+      BitmapImage spriteMap = ImageLoader.read(in);
+      BitmapImage[] terrainTextures = getTerrainTextures(spriteMap);
 
-        for (Map.Entry<String, TextureLoader> texture : textures) {
-          if (texture.getValue().loadFromTerrain(terrainTextures)) {
-            notLoaded.remove(texture);
-          }
+      for (Map.Entry<String, TextureLoader> texture : textures) {
+        if (texture.getValue().loadFromTerrain(terrainTextures)) {
+          notLoaded.remove(texture);
         }
       }
     } catch (IOException e) {
@@ -3857,7 +3838,7 @@ public class TexturePackLoader {
 
     if (spritemap.width != spritemap.height || spritemap.width % 16 != 0) {
       throw new IOException(
-          "Error: terrain.png file must have equal width and height, divisible by 16!");
+              "Error: terrain.png file must have equal width and height, divisible by 16!");
     }
 
     int imgW = spritemap.width;
@@ -3894,12 +3875,12 @@ public class TexturePackLoader {
   }
 
   public static Collection<Map.Entry<String, TextureLoader>> loadTextures(
-      Collection<Map.Entry<String, TextureLoader>> textures) {
+          Collection<Map.Entry<String, TextureLoader>> textures) {
     Collection<Map.Entry<String, TextureLoader>> toLoad = textures;
     for (String path : texturePacks) {
       if (!path.isEmpty()) {
         File file = new File(path);
-        if (!file.isFile()) {
+        if (!file.isFile() && !file.isDirectory()) {
           Log.error("Could not open texture pack: " + file.getAbsolutePath());
         } else {
           toLoad = loadTextures(file, toLoad);

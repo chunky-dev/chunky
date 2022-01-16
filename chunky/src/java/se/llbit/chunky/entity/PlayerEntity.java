@@ -58,6 +58,7 @@ import se.llbit.util.mojangapi.PlayerSkin;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -190,7 +191,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       PlayerTexture skinTexture = new PlayerTexture();
       PlayerTextureLoader loader = new PlayerTextureLoader(skin, skinTexture, model);
       try {
-        loader.load(new File(skin));
+        loader.loadFromFile(new File(skin));
         texture = skinTexture;
       } catch (IOException | TextureFormatError e) {
         Log.info("Failed to load cached skin. Trying API.", e);
@@ -200,8 +201,9 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           if (playerSkin != null) {
             String skinUrl = playerSkin.getUrl();
             if (skinUrl != null) {
-              skin = MojangApi.downloadSkin(skinUrl).getAbsolutePath();
-              loader.load(new File(skin));
+              File skinFile = MojangApi.downloadSkin(skinUrl);
+              skin = skinFile.getAbsolutePath();
+              loader.loadFromFile(skinFile);
               texture = skinTexture;
             }
           }

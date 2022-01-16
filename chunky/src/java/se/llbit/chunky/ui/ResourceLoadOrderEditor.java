@@ -92,12 +92,16 @@ public class ResourceLoadOrderEditor extends Stage {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Choose Resource Pack");
       fileChooser.getExtensionFilters().add(
-          new FileChooser.ExtensionFilter("Resource Packs", "*.zip", "*.jar"));
+          new FileChooser.ExtensionFilter("Resource Packs", "*.zip", "*.jar", "pack.mcmeta"));
       setInitialDirectory(fileChooser);
       File resourcePack = fileChooser.showOpenDialog(this);
       if (resourcePack != null) {
         prevDir = resourcePack.getParentFile();
-        pathList.getItems().add(resourcePack.getAbsolutePath());
+        if (resourcePack.getName().endsWith(".mcmeta")) {
+          pathList.getItems().add(prevDir.getAbsolutePath());
+        } else {
+          pathList.getItems().add(resourcePack.getAbsolutePath());
+        }
       }
     });
     buttons.getChildren().addAll(up, down, addResourcePack, removeResourcePack, apply);

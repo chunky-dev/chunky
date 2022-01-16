@@ -16,12 +16,13 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.ZipFile;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.resources.ImageLoader;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
 
 /**
  * Helper to load entity textures, i.e. creeper, zombie, skeleton etc. textures.
@@ -44,7 +45,7 @@ public class EntityTextureLoader extends TextureLoader {
 
     if (image.width != image.height && image.width != 2 * image.height) {
       throw new TextureFormatError("Entity texture should be 64x64 or 64x32 pixels, "
-          + "or a multiple of those dimensions.");
+              + "or a multiple of those dimensions.");
     }
 
     texture.setTexture(image);
@@ -52,7 +53,7 @@ public class EntityTextureLoader extends TextureLoader {
   }
 
   @Override
-  public boolean load(ZipFile texturePack, String topLevelDir) {
-    return load(topLevelDir + file, texturePack);
+  public boolean load(Path texturePack) {
+    return load(file, texturePack);
   }
 }

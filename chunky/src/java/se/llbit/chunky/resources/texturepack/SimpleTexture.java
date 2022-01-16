@@ -22,7 +22,7 @@ import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipFile;
+import java.nio.file.Path;
 
 /**
  * Non-animated texture loader.
@@ -39,7 +39,8 @@ public class SimpleTexture extends TextureLoader {
     this.texture = texture;
   }
 
-  @Override protected boolean load(InputStream imageStream) throws IOException {
+  @Override
+  protected boolean load(InputStream imageStream) throws IOException {
     BitmapImage image = ImageLoader.read(imageStream);
 
     if (image.height > image.width) {
@@ -60,11 +61,13 @@ public class SimpleTexture extends TextureLoader {
     return true;
   }
 
-  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
-    return load(topLevelDir + file, texturePack);
+  @Override
+  public boolean load(Path texturePack) {
+    return load(file, texturePack);
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return "texture:" + file;
   }
 }

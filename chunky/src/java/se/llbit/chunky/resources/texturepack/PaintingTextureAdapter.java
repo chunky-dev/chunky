@@ -17,11 +17,12 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.ZipFile;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
 
 /**
  * This texture loader is an adapter for the pre-1.14 painting textures. It splits the pre-1.14
@@ -30,10 +31,10 @@ import se.llbit.chunky.resources.Texture;
 public class PaintingTextureAdapter extends TextureLoader {
 
   @Override
-  public boolean load(ZipFile texturePack, String topLevelDir) {
+  public boolean load(Path texturePack) {
     PaintingsAtlas paintings = new PaintingsAtlas();
     if (new SimpleTexture("assets/minecraft/textures/painting/paintings_kristoffer_zetterstrand",
-        paintings).load(texturePack, topLevelDir)) {
+            paintings).load(texturePack)) {
       Texture.paintingKebab.setTexture(paintings.getPainting(0, 16, 0, 16));
       Texture.paintingAztec.setTexture(paintings.getPainting(16, 32, 0, 16));
       Texture.paintingAlban.setTexture(paintings.getPainting(32, 48, 0, 16));

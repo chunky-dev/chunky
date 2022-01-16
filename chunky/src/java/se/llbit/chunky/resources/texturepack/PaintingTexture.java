@@ -17,12 +17,13 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.ZipFile;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.resources.ImageLoader;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
 
 /**
  * Non-animated texture loader for painting textures (which are not squares).
@@ -45,8 +46,8 @@ public class PaintingTexture extends TextureLoader {
   }
 
   @Override
-  public boolean load(ZipFile texturePack, String topLevelDir) {
-    return load(topLevelDir + file, texturePack);
+  public boolean load(Path texturePack) {
+    return load(file, texturePack);
   }
 
   @Override
