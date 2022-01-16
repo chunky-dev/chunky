@@ -151,6 +151,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
       updateRegionChangeWatcher(newWorld);
     }
     worldLoadListeners.forEach(listener -> listener.accept(newWorld, true));
+    viewUpdated(mapView.getMapView()); // update visible chunks immediately
   }
 
   /** Stops the current RegionChangeWatcher, and creates a new one for the specified world */
