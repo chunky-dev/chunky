@@ -690,4 +690,21 @@ public class World implements Comparable<World> {
   public synchronized Collection<PlayerEntityData> getPlayerPositions() {
     return Collections.unmodifiableSet(playerEntities);
   }
+
+  /**
+   * Get the resource pack that is bundled with this world, i.e. the contained resourced directory or resources.zip.
+   *
+   * @return Resource pack file/directory or empty optional if this world has no bundled resource pack
+   */
+  public Optional<File> getResourcePack() {
+    File resourcePack = new File(getWorldDirectory(), "resources.zip");
+    if (resourcePack.isFile()) {
+      return Optional.of(resourcePack);
+    }
+    resourcePack = new File(getWorldDirectory(), "resources");
+    if (resourcePack.isDirectory()) {
+      return Optional.of(resourcePack);
+    }
+    return Optional.empty();
+  }
 }
