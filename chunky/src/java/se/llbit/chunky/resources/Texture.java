@@ -109,8 +109,6 @@ public class Texture {
   public static final Texture cauldronBottom = new Texture();
   public static final Texture smoothStone = new Texture();
   public static final Texture smoothStoneSlabSide = new Texture();
-  public static final Texture slabTop = new Texture("stone-slab");
-  public static final Texture slabSide = new Texture("double-stone-slab");
   public static final Texture brick = new Texture("bricks");
   public static final Texture tntTop = new Texture();
   public static final Texture tntSide = new Texture("tnt");
