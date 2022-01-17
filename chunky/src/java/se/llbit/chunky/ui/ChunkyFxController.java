@@ -140,7 +140,6 @@ public class ChunkyFxController
   @FXML private Button openSceneDirBtn;
   @FXML private Button changeSceneDirBtn;
   @FXML private Hyperlink documentationLink;
-  @FXML private Hyperlink originalDocumentationLink;
   @FXML private Hyperlink gitHubLink;
   @FXML private Hyperlink issueTrackerLink;
   @FXML private Hyperlink forumLink;
@@ -754,10 +753,7 @@ public class ChunkyFxController
 
   public void setApplication(Application app) {
     documentationLink.setOnAction(
-        e -> app.getHostServices().showDocument("https://lemaik.github.io/chunky"));
-
-    originalDocumentationLink.setOnAction(
-        e -> app.getHostServices().showDocument("http://chunky.llbit.se"));
+        e -> app.getHostServices().showDocument("https://chunky-dev.github.io/docs/"));
 
     issueTrackerLink.setOnAction(
         e -> app.getHostServices().showDocument("https://github.com/llbit/chunky/issues"));
