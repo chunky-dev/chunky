@@ -127,6 +127,24 @@ public class Biomes {
   private static final Biome warpedForest = register(new Biome("minecraft:warped_forest", "Warped Forest", 2, 0, 0x49907B, 0xBFB755, 0xAEA42A));
   private static final Biome basaltDeltas = register(new Biome("minecraft:basalt_deltas", "Basalt Deltas", 2, 0, 0x403636, 0xBFB755, 0xAEA42A));
   private static final Biome dripstoneCaves = register(new Biome("minecraft:dripstone_caves", "Dripstone Caves", 0.8, 0.4, 0x7B6254, 0x91BD59, 0x77AB2F));
+  private static final Biome snowyPlains = register(new Biome("minecraft:snowy_plains", "Snowy Plains", 0, 0.5, 0x7E7E7E, 0x80B497, 0x60A17B));
+  private static final Biome oldGrowthBirchForest = register(new Biome("minecraft:old_growth_birch_forest", "Old-Growth Birch Forest", 0.6, 0.6, 0x7E7E7E, 0x88BB67, 0x6BA941));
+  private static final Biome oldGrowthPineTaiga = register(new Biome("minecraft:old_growth_pine_taiga", "Old-Growth Pine Taiga", 0.3, 0.8, 0x7E7E7E, 0x86B87F, 0x68A55F));
+  private static final Biome oldGrowthSpruceTaiga = register(new Biome("minecraft:old_growth_spruce_taiga", "Old-Growth Spruce Taiga", 0.25, 0.8, 0x7E7E7E, 0x86B783, 0x68A464));
+  private static final Biome windsweptHills = register(new Biome("minecraft:windswept_hills", "Windswept Hills", 0.2, 0.3, 0x7E7E7E, 0x8AB689, 0x6DA36B));
+  private static final Biome windsweptGravellyHills = register(new Biome("minecraft:windswept_gravelly_hills", "Windswept Gravelly Hills", 0.2, 0.3, 0x7E7E7E, 0x8AB689, 0x6DA36B));
+  private static final Biome windsweptForest = register(new Biome("minecraft:windswept_forest", "Windswept Forest", 0.2, 0.3, 0x7E7E7E, 0x8AB689, 0x6DA36B));
+  private static final Biome windsweptSavanna = register(new Biome("minecraft:windswept_savanna", "Windswept Savanna", 2, 0, 0x7E7E7E, 0xBFB755, 0xAEA42A));
+  private static final Biome sparseJungle = register(new Biome("minecraft:sparse_jungle", "Sparse Jungle", 0.95, 0.8, 0x7E7E7E, 0x64C73F, 0x3EB80F));
+  private static final Biome woodedBadlands = register(new Biome("minecraft:wooded_badlands", "Wooded Badlands", 2, 0, 0x7E7E7E, 0xBFB755, 0xAEA42A));
+  private static final Biome meadow = register(new Biome("minecraft:meadow", "Meadow", 0.5, 0.8, 0x7E7E7E, 0x83BB6D, 0x64A948));
+  private static final Biome grove = register(new Biome("minecraft:grove", "Grove", -0.2, 0.8, 0x7E7E7E, 0x80B497, 0x60A17B));
+  private static final Biome snowySlopes = register(new Biome("minecraft:snowy_slopes", "Snowy Slopes", -0.3, 0.9, 0x7E7E7E, 0x80B497, 0x60A17B));
+  private static final Biome frozenPeaks = register(new Biome("minecraft:frozen_peaks", "Frozen Peaks", -0.7, 0.9, 0x7E7E7E, 0x80B497, 0x60A17B));
+  private static final Biome jaggedPeaks = register(new Biome("minecraft:jagged_peaks", "Jagged Peaks", -0.7, 0.9, 0x7E7E7E, 0x80B497, 0x60A17B));
+  private static final Biome stonyPeaks = register(new Biome("minecraft:stony_peaks", "Stony Peaks", 1, 0.3, 0x7E7E7E, 0x9ABE4B, 0x82AC1E));
+  private static final Biome stonyShore = register(new Biome("minecraft:stony_shore", "Stony Shore", 0.2, 0.3, 0x7E7E7E, 0x8AB689, 0x6DA36B));
+  private static final Biome lushCaves = register(new Biome("minecraft:lush_caves", "Lush Caves", 0.5, 0.5, 0x7E7E7E, 0x8EB971, 0x71A74D));
 
   private static final Biome[] SWAMP_BIOMES = { swamp, swampHills };
   private static final Biome[] BADLANDS_BIOMES = { badlands, woodedBadlandsPlateau, badlandsPlateau, erodedBadlands, modifiedWoodedBadlandsPlateau, modifiedBadlandsPlateau };
