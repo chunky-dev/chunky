@@ -2437,7 +2437,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (biomeColors) {
       return foliageTexture.get(x, z);
     }
-    return Biomes.biomes[0].foliageColorLinear;
+    return Biomes.biomesPrePalette[0].foliageColorLinear;
   }
 
   /**
@@ -2449,7 +2449,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (biomeColors) {
       return grassTexture.get(x, z);
     }
-    return Biomes.biomes[0].grassColorLinear;
+    return Biomes.biomesPrePalette[0].grassColorLinear;
   }
 
   /**
@@ -2464,7 +2464,7 @@ public class Scene implements JsonSerializable, Refreshable {
         return color;
       }
     }
-    return Biomes.biomes[0].waterColorLinear;
+    return Biomes.biomesPrePalette[0].waterColorLinear;
   }
 
   /**

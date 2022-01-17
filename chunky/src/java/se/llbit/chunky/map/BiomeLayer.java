@@ -36,7 +36,7 @@ public class BiomeLayer extends BitmapLayer {
     double[] rgb = new double[3];
     for(int x = 0; x < Chunk.X_MAX; x++) {
       for(int z = 0; z < Chunk.Z_MAX; z++) {
-        Biome biome = biomePalette.get(chunkData.getBiomeAt(x, 0, z) & 0xff);
+        Biome biome = biomePalette.get(chunkData.getBiomeAt(x, 0, z));
         biomes[Chunk.chunkXZIndex(x, z)] = biome;
         ColorUtil.getRGBComponents(biome.mapColor, rgb);
         sum[0] += rgb[0];

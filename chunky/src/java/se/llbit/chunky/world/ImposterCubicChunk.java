@@ -15,7 +15,7 @@ import se.llbit.nbt.ListTag;
 import se.llbit.nbt.SpecificTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.Mutable;
-import se.llbit.util.NotNull;
+import se.llbit.util.annotation.NotNull;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -95,7 +95,7 @@ public class ImposterCubicChunk extends Chunk {
     Heightmap heightmap = world.heightmap();
     BlockPalette palette = new BlockPalette();
     BiomePalette biomePalette = new ArrayBiomePalette();
-    biomePalette.put(Biomes.biomes[0]); //We don't currently support cubic chunks biomes, and so default to ocean
+    biomePalette.put(Biomes.biomesPrePalette[0]); //We don't currently support cubic chunks biomes, and so default to ocean
 
     for (Map.Entry<Integer, Map<String, Tag>> entry : data.entrySet()) {
       Integer yPos = entry.getKey();
@@ -196,7 +196,7 @@ public class ImposterCubicChunk extends Chunk {
 //        extractBiomeData(biomesTag, reuseChunkData);
 //      }
 
-      biomePalette.put(Biomes.biomes[0]); //We don't currently support cubic chunks biomes, and so default to ocean
+      biomePalette.put(Biomes.biomesPrePalette[0]); //We don't currently support cubic chunks biomes, and so default to ocean
 
       if (sections.isList()) {
         loadBlockDataCubic(yPos, cubeData, chunkData, palette, minY, maxY);

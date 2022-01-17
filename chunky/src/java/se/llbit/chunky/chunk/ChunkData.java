@@ -1,5 +1,6 @@
 package se.llbit.chunky.chunk;
 
+import se.llbit.chunky.chunk.biome.BiomeData;
 import se.llbit.nbt.CompoundTag;
 
 import java.util.Collection;
@@ -8,9 +9,9 @@ import java.util.Collection;
  * Interface designed to allow for any chunk data structure behind it
  *
  * Implementations expected to handle x/z values from 0-15
- * Implementations expected to handle ANY y values.
+ * Implementations expected to gracefully handle ANY y values, though it does not need to support all values
  *
- * All implementations are recommended to implement methods {@code boolean equals(Object o)} and {@code int hashCode()}
+ * If a given y coordinate is outside of supported bounds, the implementation should return 0
  */
 public interface ChunkData {
   /**
@@ -77,7 +78,7 @@ public interface ChunkData {
    * @param z Z position of the requested biome
    * @return int ID of the biome at the requested location
    */
-  byte getBiomeAt(int x, int y, int z); //TODO: int biomes for modded biome support
+  int getBiomeAt(int x, int y, int z);
 
   /**
    * @param x X position of the biome to be set
@@ -85,7 +86,7 @@ public interface ChunkData {
    * @param z Z position of the biome to be set
    * @param biome int ID of the biome to be set
    */
-  void setBiomeAt(int x, int y, int z, byte biome);
+  void setBiomeAt(int x, int y, int z, int biome);
 
   /**
    * Reset the internal data to the initial state
@@ -96,4 +97,8 @@ public interface ChunkData {
    * @return <code>true</code> if this is an empty (non-existing) chunk
    */
   boolean isEmpty();
+
+  BiomeData getBiomeData();
+
+  void setBiomeData(BiomeData biomeData);
 }

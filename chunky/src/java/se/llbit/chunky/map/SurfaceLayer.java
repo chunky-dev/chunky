@@ -88,7 +88,7 @@ public class SurfaceLayer extends BitmapLayer {
           }
           float[] blockColor = new float[4];
           ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
-          Biome biome = biomePalette.get(chunkData.getBiomeAt(x, 0, z) & 0xff);
+          Biome biome = biomePalette.get(chunkData.getBiomeAt(x, 0, z));
 
           if (block instanceof Leaves) {
             ColorUtil.getRGBComponents(biome.foliageColor, blockColor);

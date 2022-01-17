@@ -47,4 +47,9 @@ public class ArrayBiomePalette implements BiomePalette {
     assert false; //should NEVER be reached, if reached in debug, crash
     return 0;
   }
+
+  @Override
+  public int size() {
+    return palette.size();
+  }
 }
