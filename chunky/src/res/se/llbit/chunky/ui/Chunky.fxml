@@ -177,8 +177,7 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
           </padding>
           <Label text="Links:"/>
-          <Hyperlink fx:id="originalDocumentationLink" text="Online Documentation"/>
-          <Hyperlink fx:id="documentationLink" text="Chunky 2.1 Documentation"/>
+          <Hyperlink fx:id="documentationLink" text="Online Documentation"/>
           <Hyperlink fx:id="gitHubLink" text="GitHub Page"/>
           <Hyperlink fx:id="issueTrackerLink" text="Issue Tracker"/>
           <Hyperlink fx:id="forumLink" text="Discussion Forum"/>
@@ -186,7 +185,7 @@
           <Hyperlink fx:id="guideLink" text="jackjt8's Guide to Chunky" />
           <Separator />
           <Label wrapText="true" text="Chunky was created by Jesper Öqvist (jesper@llbit.se)"/>
-          <Label wrapText="true" text="Chunky is Copyright (c) 2010-2021, Jesper Öqvist and Chunky contributors." />
+          <Label wrapText="true" text="Chunky is Copyright (c) 2010-2022, Jesper Öqvist and Chunky contributors." />
           <FlowPane>
             <Label wrapText="true" text="Permission to modify and redistribute is granted under the terms of the " />
             <Hyperlink fx:id="gplv3" wrapText="true" text="GNU General Public License v3">
