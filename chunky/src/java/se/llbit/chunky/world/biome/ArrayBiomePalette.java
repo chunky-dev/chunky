@@ -24,7 +24,7 @@ public class ArrayBiomePalette implements BiomePalette {
 
   @Override
   public Biome get(int id) {
-    assert id >= 0 && id < palette.size();
+    assert id >= 0 && id < palette.size() : "id " + id + " out of bounds for palette";
 
     return this.palette.get(id);
   }

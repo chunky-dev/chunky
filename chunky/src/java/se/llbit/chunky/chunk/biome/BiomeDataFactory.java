@@ -118,7 +118,7 @@ public class BiomeDataFactory {
               if (biome == null) {
 //                Log.warnf("Missing biome %s! defaulting to first biome in the palette", ((StringTag) item).getData()); //TODO: re-enable once all 1.18 biomes are added
                 System.out.printf("Missing biome %s! defaulting to first biome in the palette\n", ((StringTag) item).getData());
-                subpalette[paletteIndex] = 0; //technically unnecessary as it will default to 0, but here for clarity
+                subpalette[paletteIndex] = biomePalette.put(Biomes.unknown);
               } else {
                 subpalette[paletteIndex] = biomePalette.put(biome);
               }
@@ -153,7 +153,7 @@ public class BiomeDataFactory {
               if (biome == null) {
 //                Log.warnf("Missing biome %s! defaulting to first biome in the palette", ((StringTag) localBiomePalette.get(0)).getData()); //TODO: re-enable once all 1.18 biomes are added
                 System.out.printf("Missing biome %s! defaulting to first biome in the palette\n", ((StringTag) localBiomePalette.get(0)).getData());
-                biomeId = 0; //technically unnecessary as it will default to 0, but here for clarity
+                biomeId = biomePalette.put(Biomes.unknown);
               } else {
                 biomeId = biomePalette.put(biome);
               }
