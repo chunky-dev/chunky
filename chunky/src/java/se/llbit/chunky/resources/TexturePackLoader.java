@@ -3689,7 +3689,7 @@ public class TexturePackLoader {
       } else {
         // jar or zip file
         texturePack = FileSystems.newFileSystem(URI.create("jar:" + tpFile.toURI()), Collections.emptyMap());
-        root = texturePack.getPath("");
+        root = texturePack.getPath("/");
       }
 
       boolean foundAssetDirectory = false;
