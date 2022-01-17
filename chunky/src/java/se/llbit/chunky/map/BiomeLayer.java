@@ -17,6 +17,7 @@
 package se.llbit.chunky.map;
 
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.biome.BiomeData;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.Chunk;
@@ -34,9 +35,10 @@ public class BiomeLayer extends BitmapLayer {
     biomes = new Biome[Chunk.X_MAX * Chunk.Z_MAX];
     double[] sum = new double[3];
     double[] rgb = new double[3];
+    BiomeData biomeData = chunkData.getBiomeData();
     for(int x = 0; x < Chunk.X_MAX; x++) {
       for(int z = 0; z < Chunk.Z_MAX; z++) {
-        Biome biome = biomePalette.get(chunkData.getBiomeAt(x, 0, z));
+        Biome biome = biomePalette.get(biomeData.getBiome(x, 0, z));
         biomes[Chunk.chunkXZIndex(x, z)] = biome;
         ColorUtil.getRGBComponents(biome.mapColor, rgb);
         sum[0] += rgb[0];

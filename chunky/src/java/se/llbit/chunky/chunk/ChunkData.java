@@ -73,22 +73,6 @@ public interface ChunkData {
   void addEntity(CompoundTag entity);
 
   /**
-   * @param x X position of the requested biome
-   * @param y Y position of the requested biome
-   * @param z Z position of the requested biome
-   * @return int ID of the biome at the requested location
-   */
-  int getBiomeAt(int x, int y, int z);
-
-  /**
-   * @param x X position of the biome to be set
-   * @param y Y position of the biome to be set
-   * @param z Z position of the biome to be set
-   * @param biome int ID of the biome to be set
-   */
-  void setBiomeAt(int x, int y, int z, int biome);
-
-  /**
    * Reset the internal data to the initial state
    */
   void clear();

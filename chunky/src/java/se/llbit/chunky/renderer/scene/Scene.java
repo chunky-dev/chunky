@@ -51,6 +51,7 @@ import se.llbit.chunky.block.*;
 import se.llbit.chunky.block.legacy.LegacyBlocksFinalizer;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.biome.BiomeData;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.Lectern;
@@ -1028,11 +1029,12 @@ public class Scene implements JsonSerializable, Refreshable {
 
         int wx0 = cp.x * 16; // Start of this chunk in world coordinates.
         int wz0 = cp.z * 16;
+        BiomeData biomeData = chunkData.getBiomeData();
         for (int cz = 0; cz < 16; ++cz) {
           int wz = cz + wz0;
           for (int cx = 0; cx < 16; ++cx) {
             int wx = cx + wx0;
-            int biomePaletteIdx = chunkData.getBiomeAt(cx, 0, cz) & 0xff; // TODO add vertical biomes support (1.15+)
+            int biomePaletteIdx = biomeData.getBiome(cx, 0, cz); // TODO add vertical biomes support (1.15+)
             biomePaletteIdxMap.set(biomePaletteIdx, wx, wz);
           }
         }

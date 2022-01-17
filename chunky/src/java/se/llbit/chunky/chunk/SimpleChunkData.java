@@ -83,14 +83,6 @@ public class SimpleChunkData implements ChunkData {
     isEmpty = false;
   }
 
-  @Override public int getBiomeAt(int x, int y, int z) {
-    return biomeData.getBiome(x, y, z);
-  }
-
-  @Override public void setBiomeAt(int x, int y, int z, int biome) {
-    biomeData.setBiomeAt(x, y, z, biome);
-  }
-
   @Override public void clear() {
     //Quickly set all values to zero. Explanation here: https://github.com/chunky-dev/chunky/pull/866#issuecomment-808490741
     System.arraycopy(emptyBlocks, 0, blocks, 0, emptyBlocks.length);

@@ -84,14 +84,6 @@ public class GenericChunkData implements ChunkData {
     entities.add(entity);
   }
 
-  @Override public int getBiomeAt(int x, int y, int z) {
-    return biomeData.getBiome(x, y, z);
-  }
-
-  @Override public void setBiomeAt(int x, int y, int z, int biome) {
-    biomeData.setBiomeAt(x, y, z, biome);
-  }
-
   @Override public void clear() {
     minSectionY = Integer.MAX_VALUE;
     maxSectionY = Integer.MIN_VALUE;

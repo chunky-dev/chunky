@@ -56,14 +56,6 @@ public class EmptyChunkData implements ChunkData {
   public void addEntity(CompoundTag entity) { }
 
   @Override
-  public int getBiomeAt(int x, int y, int z) {
-    return 0;
-  }
-
-  @Override
-  public void setBiomeAt(int x, int y, int z, int biome) { }
-
-  @Override
   public void clear() {
     throw new IllegalStateException("EmptyChunkData may not be re-used, this is a bug. Please report it!");
   }
