@@ -39,12 +39,47 @@ Click on the pencil icon at the top right of any text file (code, markdown, etc.
 
 #### Make (more significant) changes locally
 
-!!!DO STUFF!!!
+Intellij Community Edition is recommended, get it [here](https://www.jetbrains.com/toolbox-app/)
+ - You'll want to download JetBrains Toolbox, and download `Intellij IDEA Community Edition` from there
 
+##### Fork the project to your account
+Go to https://github.com/chunky-dev/chunky, click on `Fork` (usually in the top right)
 
-### Commit your update
+##### Clone the project.
+with Intellij: `File` -> `New` -> `Project from Version Control`
+- In the url put `https://github.com/GITHUB_USERNAME/chunky`
+- You can also select a location to clone to here.
 
-Commit the changes once you are happy with them.
+with Github desktop: `Clone a repository` -> select `URL`, paste `https://github.com/GITHUB_USERNAME/chunky`
+
+with CLI: `git clone git@github.com:GITHUB_USERNAME/chunky.git` or (outdated) `git clone https://github.com/GITHUB_USERNAME/chunky`
+
+##### Open the Project
+From inside Intellij (if you cloned with intellij you can likely skip this step)
+- `File` -> `Open` -> Select the first `build.gradle` file within the cloned folder
+
+You may have to wait some time while intellij indexes the project, and imports it. (The little loading bar in the bottom right) 
+
+##### Select the correct JDK version to use to build the project
+Oracle Java 8:
+- `File` -> `Project Structure` -> `Project` (should be the default)
+  - If intellij detected your install: select the `SDK` dropdown, select the oracle 8 jdk install
+  - If not: click `Edit`, then the little `+` at the top, `Add JDK` and find your oracle 8 jdk install location (select the main jdk folder).
+    - Go back to the `Project` tab, and select the newly added jdk.
+
+TODO: ADD INFO ABOUT NULLABLE AND NOTNULL ANNOTATIONS (adding them to compiler options)
+
+##### Create a new branch for your change
+In the bottom right of Intellij, there is a fork button, by default it will say `master`, select it, at the top select `New Branch`, and name it after what you're intending to fix. (ideally something very short, no more than a few words). eg: `fix_scene_tab_typo` or `fix-scene-tab-typo`  is fine.
+ - Make sure the `Checkout branch` box is checked when creating a new branch (to actually change to it once it's created)
+
+##### Make your change
+Some useful Intellij keybinds to help you navigate around:
+ - `Ctrl-n`, Find a file (class) by name
+
+##### Commit your changes
+After making your changes, select the `Commit` button (looks like a green tick) in the top right
+Select all of the changes you want to make, and add a description of what you changed.
 
 ### Pull Request
 
