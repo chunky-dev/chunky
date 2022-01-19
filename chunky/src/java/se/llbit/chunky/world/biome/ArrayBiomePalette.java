@@ -1,7 +1,7 @@
 package se.llbit.chunky.world.biome;
 
 import se.llbit.log.Log;
-import se.llbit.util.NotNull;
+import se.llbit.util.annotation.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -22,7 +22,7 @@ import se.llbit.chunky.renderer.scene.Sun;
 import se.llbit.chunky.resources.texturepack.*;
 import se.llbit.log.Log;
 import se.llbit.resources.ImageLoader;
-import se.llbit.util.NotNull;
+import se.llbit.util.annotation.NotNull;
 
 import java.io.File;
 import java.io.IOException;

@@ -105,6 +105,8 @@ import se.llbit.util.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
+
+import se.llbit.util.annotation.NotNull;
 import se.llbit.util.mojangapi.MojangApi;
 import se.llbit.util.mojangapi.PlayerSkin;
 

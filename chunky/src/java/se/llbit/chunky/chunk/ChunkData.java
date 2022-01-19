@@ -1,7 +1,6 @@
 package se.llbit.chunky.chunk;
 
 import se.llbit.nbt.CompoundTag;
-import se.llbit.util.NotNull;
 
 import java.util.Collection;
 

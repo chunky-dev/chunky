@@ -27,7 +27,7 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
 import se.llbit.resources.ImageLoader;
-import se.llbit.util.NotNull;
+import se.llbit.util.annotation.NotNull;
 
 /**
  * This class contains static fields for common textures.

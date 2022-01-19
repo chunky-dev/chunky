@@ -36,7 +36,7 @@ import se.llbit.math.QuickMath;
 import se.llbit.nbt.*;
 import se.llbit.util.BitBuffer;
 import se.llbit.util.Mutable;
-import se.llbit.util.NotNull;
+import se.llbit.util.annotation.NotNull;
 
 import java.util.HashSet;
 import java.util.Map;

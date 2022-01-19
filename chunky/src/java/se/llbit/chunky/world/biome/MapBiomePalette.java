@@ -3,7 +3,7 @@ package se.llbit.chunky.world.biome;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
-import se.llbit.util.NotNull;
+import se.llbit.util.annotation.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
