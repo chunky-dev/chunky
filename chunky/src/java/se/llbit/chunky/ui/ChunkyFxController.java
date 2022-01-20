@@ -357,8 +357,10 @@ public class ChunkyFxController
       new Thread(() -> {
         try {
           guiUpdateLatch.await();
-          showRenderPreview();
-          canvas.forceRepaint();
+          Platform.runLater(() -> {
+            showRenderPreview();
+            canvas.forceRepaint();
+          });
         } catch (InterruptedException ignored) {
           // Ignored.
         }
