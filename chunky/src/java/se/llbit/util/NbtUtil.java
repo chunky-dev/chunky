@@ -12,6 +12,7 @@ import se.llbit.nbt.ListTag;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.SpecificTag;
 import se.llbit.nbt.Tag;
+import se.llbit.util.annotation.NotNull;
 
 public class NbtUtil {
 

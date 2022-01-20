@@ -39,7 +39,7 @@ import se.llbit.math.Vector4;
 import se.llbit.resources.ImageLoader;
 import se.llbit.util.JsonSerializable;
 import se.llbit.util.JsonUtil;
-import se.llbit.util.NotNull;
+import se.llbit.util.annotation.NotNull;
 
 import java.io.File;
 import java.util.*;
