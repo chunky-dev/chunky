@@ -141,10 +141,6 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/environment/sun", Sun.texture),// MC 1.6
         new SimpleTexture("environment/sun", Sun.texture),// MC 1.5
         new SimpleTexture("terrain/sun", Sun.texture)));
-    allTextures.put("sign", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/entity/signs/oak", Texture.signPost),// MC 1.14
-        new SimpleTexture("assets/minecraft/textures/entity/sign", Texture.signPost),// MC 1.6
-        new SimpleTexture("item/sign", Texture.signPost)));
     allTextures.put("clouds", new AlternateTextures(
         new CloudsTexture("assets/minecraft/textures/environment/clouds"),
         // MC 1.6
@@ -3322,8 +3318,10 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/entity/signs/dark_oak", Texture.darkOakSignPost));
     allTextures.put("sign_jungle",
         new SimpleTexture("assets/minecraft/textures/entity/signs/jungle", Texture.jungleSignPost));
-    allTextures.put("sign_oak",
-        new SimpleTexture("assets/minecraft/textures/entity/signs/oak", Texture.oakSignPost));
+    allTextures.put("sign_oak", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/entity/signs/oak", Texture.oakSignPost),// MC 1.14
+        new SimpleTexture("assets/minecraft/textures/entity/sign", Texture.oakSignPost),// MC 1.6
+        new SimpleTexture("item/sign", Texture.oakSignPost)));
     allTextures.put("sign_spruce",
         new SimpleTexture("assets/minecraft/textures/entity/signs/spruce", Texture.spruceSignPost));
 

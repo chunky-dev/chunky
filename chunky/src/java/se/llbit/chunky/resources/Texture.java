@@ -594,7 +594,7 @@ public class Texture {
    */
   public static final Texture unknown = new Texture("unknown");
 
-  public static final Texture signPost = new Texture();
+  public static final Texture oakSignPost = new Texture();
   public static final Texture packedIce = new Texture();
   public static final Texture redSand = new Texture();
 
@@ -758,7 +758,6 @@ public class Texture {
   public static final Texture birchSignPost = new Texture();
   public static final Texture darkOakSignPost = new Texture();
   public static final Texture jungleSignPost = new Texture();
-  public static final Texture oakSignPost = new Texture();
   public static final Texture spruceSignPost = new Texture();
   public static final Texture cartographyTableSide1 = new Texture();
   public static final Texture cartographyTableSide2 = new Texture();
