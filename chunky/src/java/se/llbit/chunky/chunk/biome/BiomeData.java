@@ -17,12 +17,14 @@ public interface BiomeData {
   int SECTION_DIAMETER_IN_QUARTS = Chunk.X_MAX / QUART;
 
   /**
-   * All coordinates are chunk local block coordinates.
+   * All coordinates must be chunk local block coordinates.
+   * x & z 0 - 15
    */
   int getBiome(int chunkLocalX, int chunkLocalY, int chunkLocalZ);
 
   /**
-   * All coordinates are chunk local block coordinates.
+   * All coordinates must be chunk local block coordinates.
+   * x & z 0 - 15
    */
   void setBiomeAt(int chunkLocalX, int chunkLocalY, int chunkLocalZ, int biome);
 

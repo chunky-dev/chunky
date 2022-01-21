@@ -2,7 +2,6 @@ package se.llbit.chunky.chunk;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import se.llbit.chunky.chunk.biome.BiomeData;
-import se.llbit.chunky.chunk.biome.SimpleQuartBiomeData3d;
 import se.llbit.nbt.CompoundTag;
 
 import java.util.ArrayList;

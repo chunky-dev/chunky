@@ -47,6 +47,7 @@ public class Biomes {
 
   // The fallback foliage and grass colors of the biomes were calculated with the default resourcepack.
   // The map colors use the default biome colors by Amidst, see https://github.com/toolbox4minecraft/amidst/wiki/Biome-Color-Table.
+  // The generator script source is https://github.com/leMaik/chunky-biomegen
   private static final Biome ocean = register(new Biome("minecraft:ocean", "Ocean", 0.5, 0.5, 0x000070, 0x8EB971, 0x71A74D));
   private static final Biome plains = register(new Biome("minecraft:plains", "Plains", 0.8, 0.4, 0x8DB360, 0x91BD59, 0x77AB2F));
   private static final Biome desert = register(new Biome("minecraft:desert", "Desert", 2, 0, 0xFA9418, 0xBFB755, 0xAEA42A));
@@ -150,6 +151,9 @@ public class Biomes {
   private static final Biome[] BADLANDS_BIOMES = { badlands, woodedBadlandsPlateau, badlandsPlateau, erodedBadlands, modifiedWoodedBadlandsPlateau, modifiedBadlandsPlateau };
   private static final Biome[] DARK_FOREST_BIOMES = { darkForest, darkForestHills };
 
+  /**
+   * Pre-1.18 biomes, i.e. before the biomes palette was introduced.
+   */
   public static final Biome[] biomesPrePalette = {
       ocean, plains, desert, mountains, forest, taiga, swamp, river,
       netherWastes, theEnd, frozenOcean, frozenRiver, snowyTundra, snowyMountains, mushroomFields, mushroomFieldShore,

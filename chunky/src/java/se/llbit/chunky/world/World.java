@@ -287,8 +287,8 @@ public class World implements Comparable<World> {
   }
 
   /**
-   * Creates a new ChunkData object, if the provided one doesn't match the chunkVersion requested
-   * if chunkData is null, a new instance is always returned
+   * Returns a ChunkData instance that is compatible with the given chunk version.
+   * The provided ChunkData instance may or may not be re-used.
    */
   public ChunkData createChunkData(ChunkData chunkData, int chunkVersion) {
     if(chunkVersion >= World.VERSION_21W06A) {
