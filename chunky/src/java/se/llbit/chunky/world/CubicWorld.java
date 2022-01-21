@@ -2,6 +2,7 @@ package se.llbit.chunky.world;
 
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
+import se.llbit.chunky.chunk.biome.BiomeData2d;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.ui.ProgressTracker;
@@ -55,7 +56,9 @@ public class CubicWorld extends World {
     if (chunkData instanceof GenericChunkData) {
       return chunkData;
     }
-    return new GenericChunkData();
+    GenericChunkData genericChunkData = new GenericChunkData();
+    genericChunkData.setBiomeData(new BiomeData2d()); //TODO: CubicChunks biomes support
+    return genericChunkData;
   }
 
   @Override
