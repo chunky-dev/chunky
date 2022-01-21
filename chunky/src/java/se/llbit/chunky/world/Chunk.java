@@ -236,7 +236,7 @@ public class Chunk {
               Biome biome = Biomes.biomesByResourceLocation.get(((StringTag) item).getData());
               if (biome == null) {
 //                Log.warnf("Missing biome %s! defaulting to first biome in the palette", ((StringTag) item).getData()); //TODO: re-enable once all 1.18 biomes are added
-                subpalette[paletteIndex] = 0; //technically unnecessary as it will default to 0, but here for clarity
+                subpalette[paletteIndex] = biomePalette.put(Biomes.unknown);
               } else {
                 subpalette[paletteIndex] = biomePalette.put(biome);
               }
@@ -270,7 +270,7 @@ public class Chunk {
               int biomeId;
               if (biome == null) {
 //                Log.warnf("Missing biome %s! defaulting to first biome in the palette", ((StringTag) localBiomePalette.get(0)).getData());
-                biomeId = 0; //technically unnecessary as it will default to 0, but here for clarity
+                biomeId = biomePalette.put(Biomes.unknown);
               } else {
                 biomeId = biomePalette.put(biome);
               }
