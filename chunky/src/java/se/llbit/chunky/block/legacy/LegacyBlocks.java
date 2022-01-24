@@ -21,12 +21,16 @@ public class LegacyBlocks {
   }
 
   public static Tag getTag(int offset, byte[] blocks, byte[] blockData) {
+    return legacyTags[legacyIdx(offset, blocks, blockData)];
+  }
+
+  public static int legacyIdx(int offset, byte[] blocks, byte[] blockData) {
     int id = blocks[offset] & 0xFF;
     int data = 0xFF & blockData[offset / 2];
     data >>= (offset % 2) * 4;
     data &= 0xF;
 
-    return legacyTags[id * (1 << 4) + data];
+    return id * (1 << 4) + data;
   }
 
   private static Tag getTag(int id, int data) {

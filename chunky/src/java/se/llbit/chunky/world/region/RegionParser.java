@@ -16,16 +16,20 @@
  */
 package se.llbit.chunky.world.region;
 
+import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
-import se.llbit.chunky.chunk.GenericChunkData;
-import se.llbit.chunky.chunk.SimpleChunkData;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.World;
+import se.llbit.chunky.world.biome.ArrayBiomePalette;
+import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.log.Log;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Asynchronous region/chunk parser.
@@ -53,6 +57,11 @@ public class RegionParser extends Thread {
   }
 
   @Override public void run() {
+    //setting load factor to decrease expensive hash collisions between BlockSpec objects
+    BlockPalette blockPalette = new BlockPalette(new HashMap<>(0, 0.1f), new ArrayList<>());
+    blockPalette.unsynchronize();
+    BiomePalette biomePalette = new ArrayBiomePalette();
+
     while (!isInterrupted()) {
       ChunkPosition position = queue.poll();
       if (position == null) {
@@ -67,7 +76,7 @@ public class RegionParser extends Thread {
         ChunkData chunkData = world.createChunkData();
         for (Chunk chunk : region) {
           if (map.shouldPreload(chunk)) {
-            if(chunk.loadChunk(chunkData, mapView.getYMin(), mapView.getYMax())) {
+            if(chunk.loadChunk(blockPalette, biomePalette, chunkData, mapView.getYMin(), mapView.getYMax())) {
               chunkData.clear();
             }
           }

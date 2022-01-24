@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.NbtUtil;
@@ -38,8 +40,11 @@ public class BlockSpec {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    return (obj instanceof BlockSpec) && ((BlockSpec) obj).tag.equals(tag);
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    BlockSpec blockSpec = (BlockSpec) o;
+    return Objects.equals(tag, blockSpec.tag);
   }
 
   /**

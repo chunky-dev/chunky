@@ -52,7 +52,8 @@ public class ImposterCubicChunk extends Chunk {
    * layer, surface and cave maps.
    * @return whether the input chunkdata was modified
    */
-  public synchronized boolean loadChunk(ChunkData chunkData, int yMin, int yMax) {
+  @Override
+  public synchronized boolean loadChunk(BlockPalette blockPalette, BiomePalette biomePalette, ChunkData chunkData, int yMin, int yMax) {
     if (!shouldReloadChunk()) {
       return false;
     }
@@ -68,7 +69,7 @@ public class ImposterCubicChunk extends Chunk {
     }
 
     surfaceTimestamp = dataTimestamp;
-    loadSurfaceCubic(data, chunkData, yMin, yMax);
+    loadSurfaceCubic(blockPalette, biomePalette, data, chunkData, yMin, yMax);
     biomes = IconLayer.UNKNOWN;
 
     biomesTimestamp = dataTimestamp;
@@ -82,15 +83,13 @@ public class ImposterCubicChunk extends Chunk {
     return true;
   }
 
-  private void loadSurfaceCubic(Map<Integer, Map<String, Tag>> data, ChunkData chunkData, int yMin, int yMax) {
+  private void loadSurfaceCubic(BlockPalette blockPalette, BiomePalette biomePalette, Map<Integer, Map<String, Tag>> data, ChunkData chunkData, int yMin, int yMax) {
     if (data == null) {
       surface = IconLayer.CORRUPT;
       return;
     }
 
     Heightmap heightmap = world.heightmap();
-    BlockPalette palette = new BlockPalette();
-    BiomePalette biomePalette = new ArrayBiomePalette();
     biomePalette.put(Biomes.biomes[0]); //We don't currently support cubic chunks biomes, and so default to ocean
 
     for (Map.Entry<Integer, Map<String, Tag>> entry : data.entrySet()) {
@@ -101,15 +100,15 @@ public class ImposterCubicChunk extends Chunk {
       if (sections.isList()) {
 //        extractBiomeData(cubeData.get(LEVEL_BIOMES), chunkData);
         if (version.equals("1.13") || version.equals("1.12")) {
-          loadBlockDataCubic(yPos, cubeData, chunkData, palette, yMin, yMax);
+          loadBlockDataCubic(yPos, cubeData, chunkData, blockPalette, yMin, yMax);
           queueTopography();
         }
       }
     }
 
     int[] heightmapData = extractHeightmapDataCubic(null, chunkData);
-    updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
-    surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
+    updateHeightmap(heightmap, position, chunkData, heightmapData, blockPalette, yMax);
+    surface = new SurfaceLayer(world.currentDimension(), chunkData, blockPalette, biomePalette, yMin, yMax, heightmapData);
   }
 
   private int[] extractHeightmapDataCubic(Map<String, Tag> cubeData, ChunkData chunkData) {
@@ -145,8 +144,7 @@ public class ImposterCubicChunk extends Chunk {
                   int blockY = cubeMinBlockY + y;
                   for (int z = 0; z < CUBE_DIAMETER_IN_BLOCKS; z++) {
                     for (int x = 0; x < CUBE_DIAMETER_IN_BLOCKS; x++) {
-                      chunkData.setBlockAt(x, blockY, z, blockPalette.put(
-                        LegacyBlocks.getTag(offset, blockArray, dataArray)));
+                      chunkData.setBlockAt(x, blockY, z, LegacyBlocks.legacyIdx(offset, blockArray, dataArray));
                       offset += 1;
                     }
                   }

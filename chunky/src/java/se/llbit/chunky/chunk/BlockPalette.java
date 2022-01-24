@@ -17,12 +17,10 @@
 package se.llbit.chunky.chunk;
 
 import se.llbit.chunky.block.*;
+import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.math.Octree;
-import se.llbit.nbt.CompoundTag;
-import se.llbit.nbt.IntTag;
-import se.llbit.nbt.StringTag;
-import se.llbit.nbt.Tag;
+import se.llbit.nbt.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -67,6 +65,9 @@ public class BlockPalette {
     this.blockMap = initialMap;
     this.palette = initialList;
     this.materialProperties = getDefaultMaterialProperties();
+
+    putLegacyTags(); //must be done first as legacy blocks are index-dependant
+
     CompoundTag airTag = new CompoundTag();
     airTag.add("Name", new StringTag("minecraft:air"));
     CompoundTag stoneTag = new CompoundTag();
@@ -127,6 +128,30 @@ public class BlockPalette {
       return id;
     } finally {
       lock.unlock();
+    }
+  }
+
+  private void putLegacyTags() {
+    byte[] block = new byte[1];
+    byte[] data = new byte[1];
+    for (int i = 0; i < 256; i++) {
+      for (int j = 0; j < 16; j++) {
+        block[0] = (byte) i;
+        data[0] = (byte) j;
+        putLegacy(LegacyBlocks.getTag(0, block, data));
+      }
+    }
+  }
+
+  private void putLegacy(Tag tag) {
+    BlockSpec spec = new BlockSpec(tag);
+    blockMap.computeIfAbsent(spec, k -> palette.size());
+    try {
+      Block block = spec.toBlock();
+      applyMaterial(block);
+      palette.add(block);
+    } catch (Throwable t) {
+      palette.add(null);
     }
   }
 
