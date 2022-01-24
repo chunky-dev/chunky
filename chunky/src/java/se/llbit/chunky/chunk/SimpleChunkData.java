@@ -14,7 +14,6 @@ import static se.llbit.chunky.world.Chunk.*;
 /**
  * A simple Chunk Data implementation
  * Blocks from 0-255
- * 2d Biomes only
  */
 public class SimpleChunkData implements ChunkData {
   /** These final fields are never written to, and are instead used for quickly setting existing blocks/biomes arrays

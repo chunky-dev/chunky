@@ -14,7 +14,6 @@ import static se.llbit.chunky.world.Chunk.*;
 /**
  * A general implementation of Chunk Data
  * Supports blocks at any Y range
- * 2D biomes //TODO: use 3d Biomes
  */
 public class GenericChunkData implements ChunkData {
   private Integer minSectionY = Integer.MAX_VALUE;
