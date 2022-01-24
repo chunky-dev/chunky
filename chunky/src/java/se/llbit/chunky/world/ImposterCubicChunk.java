@@ -144,8 +144,7 @@ public class ImposterCubicChunk extends Chunk {
                   int blockY = cubeMinBlockY + y;
                   for (int z = 0; z < CUBE_DIAMETER_IN_BLOCKS; z++) {
                     for (int x = 0; x < CUBE_DIAMETER_IN_BLOCKS; x++) {
-                      chunkData.setBlockAt(x, blockY, z, blockPalette.put(
-                        LegacyBlocks.getTag(offset, blockArray, dataArray)));
+                      chunkData.setBlockAt(x, blockY, z, LegacyBlocks.legacyIdx(offset, blockArray, dataArray));
                       offset += 1;
                     }
                   }

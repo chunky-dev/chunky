@@ -437,8 +437,7 @@ public class Chunk {
               int blockY = sectionMinBlockY + y;
               for (int z = 0; z < Z_MAX; z++) {
                 for (int x = 0; x < X_MAX; x++) {
-                  chunkData.setBlockAt(x, blockY, z, blockPalette.put(
-                      LegacyBlocks.getTag(offset, blocksBytes, blockDataBytes)));
+                  chunkData.setBlockAt(x, blockY, z, LegacyBlocks.legacyIdx(offset, blocksBytes, blockDataBytes));
                   offset += 1;
                 }
               }
