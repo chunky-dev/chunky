@@ -24,7 +24,7 @@ public class ArrayBiomePalette implements BiomePalette {
 
   @Override
   public Biome get(int id) {
-    assert id >= 0 && id < palette.size();
+    assert id >= 0 && id < palette.size() : "id " + id + " out of bounds for palette";
 
     return this.palette.get(id);
   }
@@ -46,5 +46,10 @@ public class ArrayBiomePalette implements BiomePalette {
     Log.warn("Biome not present in Palette, defaulting to first biome in the palette");
     assert false; //should NEVER be reached, if reached in debug, crash
     return 0;
+  }
+
+  @Override
+  public int size() {
+    return palette.size();
   }
 }

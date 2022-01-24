@@ -51,6 +51,7 @@ import se.llbit.chunky.block.*;
 import se.llbit.chunky.block.legacy.LegacyBlocksFinalizer;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.biome.BiomeData;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.Lectern;
@@ -956,8 +957,8 @@ public class Scene implements JsonSerializable, Refreshable {
     Set<ChunkPosition> legacyChunks = new HashSet<>();
     Heightmap biomePaletteIdxMap = new Heightmap();
 
-    ChunkData chunkData1 = world.createChunkData(); // chunk loading will switch between these two, using one asynchronously to load the data
-    ChunkData chunkData2 = world.createChunkData(); // while the other is used to add to the octree
+    final Mutable<ChunkData> chunkData1 = new Mutable<>(null); // chunk loading will switch between these two, using one asynchronously to load the data
+    final Mutable<ChunkData> chunkData2 = new Mutable<>(null); // while the other is used to add to the octree
 
     try (TaskTracker.Task task = taskTracker.task("(3/6) Loading chunks")) {
       int done = 1;
@@ -997,8 +998,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
           if(usingFirstChunkData) {
             world.getChunk(chunkPositions[i]).getChunkData(chunkData1, palette, biomePalette, yMin, yMax);
-          }
-          else {
+          } else {
             world.getChunk(chunkPositions[i]).getChunkData(chunkData2, palette, biomePalette, yMin, yMax);
           }
         } catch(ExecutionException e) {
@@ -1007,12 +1007,12 @@ public class Scene implements JsonSerializable, Refreshable {
 
         ChunkData chunkData; //the chunk data to be used for THIS iteration
         {
-          ChunkData nextChunkData; //the chunk data to be used for the next iteration
+          Mutable<ChunkData> nextChunkData; //the chunk data to be used for the next iteration
           if (usingFirstChunkData) {
-            chunkData = chunkData1;
+            chunkData = chunkData1.get();
             nextChunkData = chunkData2;
           } else {
-            chunkData = chunkData2;
+            chunkData = chunkData2.get();
             nextChunkData = chunkData1;
           }
           usingFirstChunkData = !usingFirstChunkData;
@@ -1029,11 +1029,12 @@ public class Scene implements JsonSerializable, Refreshable {
 
         int wx0 = cp.x * 16; // Start of this chunk in world coordinates.
         int wz0 = cp.z * 16;
+        BiomeData biomeData = chunkData.getBiomeData();
         for (int cz = 0; cz < 16; ++cz) {
           int wz = cz + wz0;
           for (int cx = 0; cx < 16; ++cx) {
             int wx = cx + wx0;
-            int biomePaletteIdx = chunkData.getBiomeAt(cx, 0, cz) & 0xff; // TODO add vertical biomes support (1.15+)
+            int biomePaletteIdx = biomeData.getBiome(cx, 0, cz); // TODO add vertical biomes support (1.15+)
             biomePaletteIdxMap.set(biomePaletteIdx, wx, wz);
           }
         }
@@ -2438,7 +2439,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (biomeColors) {
       return foliageTexture.get(x, z);
     }
-    return Biomes.biomes[0].foliageColorLinear;
+    return Biomes.biomesPrePalette[0].foliageColorLinear;
   }
 
   /**
@@ -2450,7 +2451,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (biomeColors) {
       return grassTexture.get(x, z);
     }
-    return Biomes.biomes[0].grassColorLinear;
+    return Biomes.biomesPrePalette[0].grassColorLinear;
   }
 
   /**
@@ -2465,7 +2466,7 @@ public class Scene implements JsonSerializable, Refreshable {
         return color;
       }
     }
-    return Biomes.biomes[0].waterColorLinear;
+    return Biomes.biomesPrePalette[0].waterColorLinear;
   }
 
   /**

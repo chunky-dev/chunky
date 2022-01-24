@@ -2,6 +2,9 @@ package se.llbit.chunky.chunk;
 
 import java.util.Collection;
 import java.util.Collections;
+
+import se.llbit.chunky.chunk.biome.BiomeData;
+import se.llbit.chunky.chunk.biome.UnknownBiomeData;
 import se.llbit.nbt.CompoundTag;
 
 public class EmptyChunkData implements ChunkData {
@@ -53,14 +56,6 @@ public class EmptyChunkData implements ChunkData {
   public void addEntity(CompoundTag entity) { }
 
   @Override
-  public byte getBiomeAt(int x, int y, int z) {
-    return 0;
-  }
-
-  @Override
-  public void setBiomeAt(int x, int y, int z, byte biome) { }
-
-  @Override
   public void clear() {
     throw new IllegalStateException("EmptyChunkData may not be re-used, this is a bug. Please report it!");
   }
@@ -69,4 +64,12 @@ public class EmptyChunkData implements ChunkData {
   public boolean isEmpty() {
     return true;
   }
+
+  @Override
+  public BiomeData getBiomeData() {
+    return UnknownBiomeData.INSTANCE;
+  }
+
+  @Override
+  public void setBiomeData(BiomeData biomeData) { }
 }

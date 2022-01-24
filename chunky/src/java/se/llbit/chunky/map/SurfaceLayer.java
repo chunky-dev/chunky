@@ -27,6 +27,7 @@ import se.llbit.chunky.block.Vine;
 import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.biome.BiomeData;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.Chunk;
@@ -54,6 +55,7 @@ public class SurfaceLayer extends BitmapLayer {
   public SurfaceLayer(int dim, ChunkData chunkData, BlockPalette palette, BiomePalette biomePalette, int yMin, int yMax, int[] heightmapData) {
     bitmap = new int[Chunk.X_MAX * Chunk.Z_MAX];
     topo = new int[Chunk.X_MAX * Chunk.Z_MAX];
+    BiomeData biomeData = chunkData.getBiomeData();
     for (int x = 0; x < Chunk.X_MAX; ++x) {
       for (int z = 0; z < Chunk.Z_MAX; ++z) {
 
@@ -88,7 +90,7 @@ public class SurfaceLayer extends BitmapLayer {
           }
           float[] blockColor = new float[4];
           ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
-          Biome biome = biomePalette.get(chunkData.getBiomeAt(x, 0, z) & 0xff);
+          Biome biome = biomePalette.get(biomeData.getBiome(x, 0, z));
 
           if (block instanceof Leaves) {
             ColorUtil.getRGBComponents(biome.foliageColor, blockColor);
