@@ -4,4 +4,6 @@ public interface BiomePalette {
   Biome get(int id);
 
   int put(Biome biome);
+
+  int size();
 }

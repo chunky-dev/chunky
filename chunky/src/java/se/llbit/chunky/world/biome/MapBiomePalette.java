@@ -47,4 +47,9 @@ public class MapBiomePalette implements BiomePalette {
       return biomeMap.size();
     });
   }
+
+  @Override
+  public int size() {
+    return palette.size();
+  }
 }
