@@ -140,7 +140,7 @@ public class Chunk {
    * layer, surface and cave maps.
    * @return whether the input chunkdata was modified
    */
-  public synchronized boolean loadChunk(ChunkData chunkData, int yMin, int yMax) {
+  public synchronized boolean loadChunk(BlockPalette blockPalette, BiomePalette biomePalette, ChunkData chunkData, int yMin, int yMax) {
     if (!shouldReloadChunk()) {
       return false;
     }
@@ -161,14 +161,14 @@ public class Chunk {
 
     surfaceTimestamp = dataTimestamp;
     version = chunkVersion(data);
-    loadSurface(data, chunkData, yMin, yMax);
+    loadSurface(data, blockPalette, biomePalette, chunkData, yMin, yMax);
     biomesTimestamp = dataTimestamp;
 
     world.chunkUpdated(position);
     return true;
   }
 
-  private void loadSurface(@NotNull Tag data, ChunkData chunkData, int yMin, int yMax) {
+  private void loadSurface(@NotNull Tag data, BlockPalette blockPalette, BiomePalette biomePalette, ChunkData chunkData, int yMin, int yMax) {
     if (data == null) {
       surface = IconLayer.CORRUPT;
       return;
@@ -178,18 +178,15 @@ public class Chunk {
     Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
     if (sections.isList()) {
       if (version.equals("1.13") || version.equals("1.12")) {
-        BiomePalette biomePalette = new ArrayBiomePalette();
         loadBiomeData(data, chunkData, biomePalette, yMin, yMax);
         biomes = new BiomeLayer(chunkData, biomePalette);
 
-        BlockPalette palette = new BlockPalette();
-        palette.unsynchronize(); //only this RegionParser will use this palette
-        loadBlockData(data, chunkData, palette, yMin, yMax);
+        loadBlockData(data, chunkData, blockPalette, yMin, yMax);
 
         int[] heightmapData = extractHeightmapData(data, chunkData);
-        updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
+        updateHeightmap(heightmap, position, chunkData, heightmapData, blockPalette, yMax);
 
-        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
+        surface = new SurfaceLayer(world.currentDimension(), chunkData, blockPalette, biomePalette, yMin, yMax, heightmapData);
         queueTopography();
       }
     } else {

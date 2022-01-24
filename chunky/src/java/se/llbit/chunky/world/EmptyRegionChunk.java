@@ -85,7 +85,7 @@ public class EmptyRegionChunk extends Chunk {
     // do nothing
   }
 
-  @Override public synchronized boolean loadChunk(ChunkData chunkData, int yMin, int yMax) {
+  @Override public synchronized boolean loadChunk(BlockPalette blockPalette, BiomePalette biomePalette, ChunkData chunkData, int yMin, int yMax) {
     return false;
   }
 
