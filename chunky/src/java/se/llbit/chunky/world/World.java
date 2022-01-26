@@ -35,6 +35,7 @@ import se.llbit.math.Vector3;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.Pair;
+import se.llbit.util.annotation.Nullable;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -286,10 +287,20 @@ public class World implements Comparable<World> {
     return getRegion(pos.getRegionPosition()).getChunk(pos);
   }
 
-  public ChunkData createChunkData() {
-    if(this.getVersionId() >= World.VERSION_21W06A) {
+  /**
+   * Returns a ChunkData instance that is compatible with the given chunk version.
+   * The provided ChunkData instance may or may not be re-used.
+   */
+  public ChunkData createChunkData(@Nullable ChunkData chunkData, int chunkVersion) {
+    if(chunkVersion >= World.VERSION_21W06A) {
+      if(chunkData instanceof GenericChunkData) {
+        return chunkData;
+      }
       return new GenericChunkData();
     } else {
+      if(chunkData instanceof SimpleChunkData) {
+        return chunkData;
+      }
       return new SimpleChunkData();
     }
   }
