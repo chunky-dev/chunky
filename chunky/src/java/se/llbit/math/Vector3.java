@@ -220,6 +220,17 @@ public class Vector3 {
     z = a.z;
   }
 
+  /**
+   *
+   * @param compare
+   * @see https://www.pbr-book.org/3ed-2018/Geometry_and_Transformations/Normals#Faceforward
+   */
+  public void faceforward(Vector3 compare) {
+    if (dot(compare) < 0.f) {
+      scale(-1);
+    }
+  }
+
   @Override public String toString() {
     return String.format("(%.2f, %.2f, %.2f)", x, y, z);
   }

@@ -747,11 +747,11 @@ public class Scene implements JsonSerializable, Refreshable {
     if (Double.isNaN(ray.d.x) || Double.isNaN(ray.d.y) || Double.isNaN(ray.d.z) ||
         (ray.d.x == 0 && ray.d.y == 0 && ray.d.z == 0)) {
       if (!invalidWarn) {
-        Log.warnf("Invalid ray with direction (%f, %f, %f).\n" +
+       /* Log.warnf("Invalid ray with direction (%f, %f, %f).\n" +
             "This is a bug! Please report it at:\n" +
             "    https://github.com/chunky-dev/chunky/issues/",
             ray.d.x, ray.d.y, ray.d.z);
-        invalidWarn = true;
+        invalidWarn = true;*/
       }
       ray.d.set(0, 1, 0);
     }

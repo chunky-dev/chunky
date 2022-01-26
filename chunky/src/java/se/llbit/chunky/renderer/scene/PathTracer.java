@@ -34,13 +34,16 @@ import java.util.Random;
  */
 public class PathTracer implements RayTracer {
 
-  /** Extinction factor for fog rendering. */
+  /**
+   * Extinction factor for fog rendering.
+   */
   private static final double EXTINCTION_FACTOR = 0.04;
 
   /**
    * Path trace the ray.
    */
-  @Override public void trace(Scene scene, WorkerState state) {
+  @Override
+  public void trace(Scene scene, WorkerState state) {
     Ray ray = state.ray;
     if (scene.isInWater(ray)) {
       ray.setCurrentMaterial(Water.INSTANCE);
@@ -54,10 +57,10 @@ public class PathTracer implements RayTracer {
    * Path trace the ray in this scene.
    *
    * @param firstReflection {@code true} if the ray has not yet hit the first
-   * diffuse or specular reflection
+   *                        diffuse or specular reflection
    */
   public static boolean pathTrace(Scene scene, Ray ray, WorkerState state, int addEmitted,
-      boolean firstReflection) {
+                                  boolean firstReflection) {
 
     boolean hit = false;
     Random random = state.random;
@@ -96,8 +99,8 @@ public class PathTracer implements RayTracer {
       Material prevMat = ray.getPrevMaterial();
 
       if (!scene.stillWater && ray.getNormal().y != 0 &&
-          ((currentMat.isWater() && prevMat == Air.INSTANCE)
-              || (currentMat == Air.INSTANCE && prevMat.isWater()))) {
+              ((currentMat.isWater() && prevMat == Air.INSTANCE)
+                      || (currentMat == Air.INSTANCE && prevMat.isWater()))) {
         scene.getWaterShading().doWaterShading(ray, scene.getAnimationTime());
         if (currentMat == Air.INSTANCE) {
           ray.invertNormal();
@@ -170,22 +173,22 @@ public class PathTracer implements RayTracer {
 
               emittance = addEmitted;
               ray.emittance.x = ray.color.x * ray.color.x *
-                  currentMat.emittance * scene.emitterIntensity;
+                      currentMat.emittance * scene.emitterIntensity;
               ray.emittance.y = ray.color.y * ray.color.y *
-                  currentMat.emittance * scene.emitterIntensity;
+                      currentMat.emittance * scene.emitterIntensity;
               ray.emittance.z = ray.color.z * ray.color.z *
-                  currentMat.emittance * scene.emitterIntensity;
+                      currentMat.emittance * scene.emitterIntensity;
               hit = true;
-            } else if(scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
+            } else if (scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
               // Sample emitter
               boolean sampleOne = scene.emitterSamplingStrategy == EmitterSamplingStrategy.ONE;
-              if(sampleOne) {
+              if (sampleOne) {
                 Grid.EmitterPosition pos = scene.getEmitterGrid().sampleEmitterPosition((int) ray.o.x, (int) ray.o.y, (int) ray.o.z, random);
-                if(pos != null) {
-                  indirectEmitterColor = sampleEmitter(scene, ray, pos,  random);
+                if (pos != null) {
+                  indirectEmitterColor = sampleEmitter(scene, ray, pos, random);
                 }
               } else {
-                for(Grid.EmitterPosition pos : scene.getEmitterGrid().getEmitterPositions((int) ray.o.x, (int) ray.o.y, (int) ray.o.z)) {
+                for (Grid.EmitterPosition pos : scene.getEmitterGrid().getEmitterPositions((int) ray.o.x, (int) ray.o.y, (int) ray.o.z)) {
                   indirectEmitterColor.scaleAdd(1, sampleEmitter(scene, ray, pos, random));
                 }
               }
@@ -202,7 +205,7 @@ public class PathTracer implements RayTracer {
               boolean frontLight = reflected.d.dot(ray.getNormal()) > 0;
 
               if (frontLight || (currentMat.subSurfaceScattering
-                  && random.nextFloat() < Scene.fSubSurface)) {
+                      && random.nextFloat() < Scene.fSubSurface)) {
 
                 if (!frontLight) {
                   reflected.o.scaleAdd(-Ray.OFFSET, ray.getNormal());
@@ -226,12 +229,12 @@ public class PathTracer implements RayTracer {
               hit = pathTrace(scene, reflected, state, 0, false) || hit;
               if (hit) {
                 ray.color.x = ray.color.x * (emittance + directLightR * scene.sun.emittance.x + (
-                    reflected.color.x + reflected.emittance.x) + (indirectEmitterColor.x));
+                        reflected.color.x + reflected.emittance.x) + (indirectEmitterColor.x));
                 ray.color.y = ray.color.y * (emittance + directLightG * scene.sun.emittance.y + (
-                    reflected.color.y + reflected.emittance.y) + (indirectEmitterColor.y));
+                        reflected.color.y + reflected.emittance.y) + (indirectEmitterColor.y));
                 ray.color.z = ray.color.z * (emittance + directLightB * scene.sun.emittance.z + (
-                    reflected.color.z + reflected.emittance.z) + (indirectEmitterColor.z));
-              } else if(indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
+                        reflected.color.z + reflected.emittance.z) + (indirectEmitterColor.z));
+              } else if (indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
                 hit = true;
                 ray.color.x *= indirectEmitterColor.x;
                 ray.color.y *= indirectEmitterColor.y;
@@ -244,12 +247,12 @@ public class PathTracer implements RayTracer {
               hit = pathTrace(scene, reflected, state, 0, false) || hit;
               if (hit) {
                 ray.color.x =
-                    ray.color.x * (emittance + (reflected.color.x + reflected.emittance.x) + (indirectEmitterColor.x));
+                        ray.color.x * (emittance + (reflected.color.x + reflected.emittance.x) + (indirectEmitterColor.x));
                 ray.color.y =
-                    ray.color.y * (emittance + (reflected.color.y + reflected.emittance.y) + (indirectEmitterColor.y));
+                        ray.color.y * (emittance + (reflected.color.y + reflected.emittance.y) + (indirectEmitterColor.y));
                 ray.color.z =
-                    ray.color.z * (emittance + (reflected.color.z + reflected.emittance.z) + (indirectEmitterColor.z));
-              } else if(indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
+                        ray.color.z * (emittance + (reflected.color.z + reflected.emittance.z) + (indirectEmitterColor.z));
+              } else if (indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
                 hit = true;
                 ray.color.x *= indirectEmitterColor.x;
                 ray.color.y *= indirectEmitterColor.y;
@@ -262,13 +265,18 @@ public class PathTracer implements RayTracer {
 
           // TODO: make this decision dependent on the material properties:
           boolean doRefraction =
-              currentMat.refractive || prevMat.refractive;
+                  currentMat.refractive || prevMat.refractive;
 
           // Refraction.
+          // float n1n2 = n1 / n2;
+          double cosThetaI = ray.getNormal().dot(ray.d);
+          double frDielectric = FrDielectric(cosThetaI, n1, n2);
+
           float n1n2 = n1 / n2;
           double cosTheta = -ray.getNormal().dot(ray.d);
           double radicand = 1 - n1n2 * n1n2 * (1 - cosTheta * cosTheta);
-          if (doRefraction && radicand < Ray.EPSILON) {
+
+          if (doRefraction && frDielectric == 1) {
             // Total internal reflection.
             if (!scene.kill(ray.depth + 1, random)) {
               Ray reflected = new Ray();
@@ -283,19 +291,14 @@ public class PathTracer implements RayTracer {
             }
           } else {
             if (!scene.kill(ray.depth + 1, random)) {
-              Ray refracted = new Ray();
-              refracted.set(ray);
-
-              // Calculate angle-dependent reflectance using
-              // Fresnel equation approximation:
-              // R(cosineAngle) = R0 + (1 - R0) * (1 - cos(cosineAngle))^5
               float a = (n1n2 - 1);
               float b = (n1n2 + 1);
               double R0 = a * a / (b * b);
               double c = 1 - cosTheta;
               double Rtheta = R0 + (1 - R0) * c * c * c * c * c;
 
-              if (random.nextFloat() < Rtheta) {
+
+              if (random.nextFloat() < frDielectric) {
                 Ray reflected = new Ray();
                 reflected.specularReflection(ray, random);
                 if (pathTrace(scene, reflected, state, 1, false)) {
@@ -305,18 +308,30 @@ public class PathTracer implements RayTracer {
                   hit = true;
                 }
               } else {
-                if (doRefraction) {
+                // TODO somehow we get NaNs here... I think we need to implement Refract
+                // (https://www.pbr-book.org/3ed-2018/Reflection_Models/Specular_Reflection_and_Transmission#Refract)
 
+                Ray refracted = new Ray();
+                refracted.set(ray);
+                if (doRefraction) {
                   double t2 = FastMath.sqrt(radicand);
                   Vector3 n = ray.getNormal();
-                  if (cosTheta > 0) {
-                    refracted.d.x = n1n2 * ray.d.x + (n1n2 * cosTheta - t2) * n.x;
-                    refracted.d.y = n1n2 * ray.d.y + (n1n2 * cosTheta - t2) * n.y;
-                    refracted.d.z = n1n2 * ray.d.z + (n1n2 * cosTheta - t2) * n.z;
+                  if (cosThetaI > 0) {
+                    // entering
+                    double etaI = n1;
+                    double etaT = n2;
+                    refracted.d.set(Refract(ray.d, new Vector3(0,0,1).faceforward(ray.d), etaI / etaT));
+
+                    refracted.d.x = n1n2 * ray.d.x + (n1n2 * cosThetaI - t2) * n.x;
+                    refracted.d.y = n1n2 * ray.d.y + (n1n2 * cosThetaI - t2) * n.y;
+                    refracted.d.z = n1n2 * ray.d.z + (n1n2 * cosThetaI - t2) * n.z;
                   } else {
-                    refracted.d.x = n1n2 * ray.d.x - (-n1n2 * cosTheta - t2) * n.x;
-                    refracted.d.y = n1n2 * ray.d.y - (-n1n2 * cosTheta - t2) * n.y;
-                    refracted.d.z = n1n2 * ray.d.z - (-n1n2 * cosTheta - t2) * n.z;
+                    // exiting
+                    double etaI = n2;
+                    double etaT = n1;
+                    refracted.d.x = n1n2 * ray.d.x - (-n1n2 * cosThetaI - t2) * n.x;
+                    refracted.d.y = n1n2 * ray.d.y - (-n1n2 * cosThetaI - t2) * n.y;
+                    refracted.d.z = n1n2 * ray.d.z - (-n1n2 * cosThetaI - t2) * n.z;
                   }
 
                   refracted.d.normalize();
@@ -324,7 +339,7 @@ public class PathTracer implements RayTracer {
                   // See Ray.specularReflection for information on why this is needed
                   // This is the same thing but for refraction instead of reflection
                   // so this time we want the signs of the dot product to be the same
-                  if(QuickMath.signum(refracted.getGeometryNormal().dot(refracted.d)) != QuickMath.signum(refracted.getGeometryNormal().dot(ray.d))) {
+                  if (QuickMath.signum(refracted.getGeometryNormal().dot(refracted.d)) != QuickMath.signum(refracted.getGeometryNormal().dot(ray.d))) {
                     double factor = QuickMath.signum(refracted.getGeometryNormal().dot(ray.d)) * -Ray.EPSILON - refracted.d.dot(refracted.getGeometryNormal());
                     refracted.d.scaleAdd(factor, refracted.getGeometryNormal());
                     refracted.d.normalize();
@@ -366,7 +381,7 @@ public class PathTracer implements RayTracer {
 
       if (hit && prevMat.isWater()) {
         // Render water fog effect.
-        if(scene.waterVisibility == 0) {
+        if (scene.waterVisibility == 0) {
           ray.color.scale(0.);
         } else {
           double a = ray.distance / scene.waterVisibility;
@@ -403,7 +418,7 @@ public class PathTracer implements RayTracer {
       // so this seems like a reasonable approximation.
       Ray atmos = new Ray();
       double offset = QuickMath.clamp(airDistance * random.nextFloat(),
-          Ray.EPSILON, airDistance - Ray.EPSILON);
+              Ray.EPSILON, airDistance - Ray.EPSILON);
       atmos.o.scaleAdd(offset, od, ox);
       sun.getRandomSunDirection(atmos, random);
       atmos.setCurrentMaterial(Air.INSTANCE);
@@ -432,12 +447,58 @@ public class PathTracer implements RayTracer {
     return hit;
   }
 
+  private static double FrDielectric(double cosThetaI, double etaI, double etaT) {
+    cosThetaI = QuickMath.clamp(cosThetaI, -1, 1);
+    boolean entering = cosThetaI > 0.f;
+    if (!entering) {
+      double tmp = etaI;
+      etaI = etaT;
+      etaT = tmp;
+      cosThetaI = Math.abs(cosThetaI);
+    }
+    double sinThetaI = Math.sqrt(Math.max(0, 1 - cosThetaI * cosThetaI));
+    double sinThetaT = etaI / etaT * sinThetaI;
+    if (sinThetaT >= 1) {
+      // total internal reflection
+      return 1;
+    }
+
+    double cosThetaT = Math.sqrt(Math.max(0, 1 - sinThetaT * sinThetaT));
+
+    double Rparl = ((etaT * cosThetaI) - (etaI * cosThetaT)) / ((etaT * cosThetaI) + (etaI * cosThetaT));
+    double Rperp = ((etaI * cosThetaI) - (etaT * cosThetaT)) / ((etaI * cosThetaI) + (etaT * cosThetaT));
+    return (Rparl * Rparl + Rperp * Rperp) / 2;
+  }
+
+  /**
+   *
+   * @param wi
+   * @param n
+   * @param eta
+   * @return
+   * @see https://www.pbr-book.org/3ed-2018/Reflection_Models/Specular_Reflection_and_Transmission#Refract
+   */
+  private static Vector3 Refract(Vector3 wi, Vector3 n, Float eta) {
+  <<Compute  using Snell’s law>>
+    Float cosThetaI = Dot(n, wi);
+    Float sin2ThetaI = std::max(0.f, 1.f - cosThetaI * cosThetaI);
+    Float sin2ThetaT = eta * eta * sin2ThetaI;
+       <<Handle total internal reflection for transmission>>
+    if (sin2ThetaT >= 1) return false;
+
+    Float cosThetaT = std::sqrt(1 - sin2ThetaT);
+
+    *wt = eta * -wi + (eta * cosThetaI - cosThetaT) * Vector3f(n);
+    return true;
+  }
+
   /**
    * Cast a shadow ray from the intersection point (given by ray) to the emitter
    * at position pos. Returns the contribution of this emitter (0 if the emitter is occluded)
-   * @param scene The scene being rendered
-   * @param ray The ray that generated the intersection
-   * @param pos The position of the emitter to sample
+   *
+   * @param scene  The scene being rendered
+   * @param ray    The ray that generated the intersection
+   * @param pos    The position of the emitter to sample
    * @param random RNG
    * @return The contribution of the emitter
    */
@@ -446,13 +507,13 @@ public class PathTracer implements RayTracer {
     Ray emitterRay = new Ray();
     emitterRay.set(ray);
     // TODO Sampling a random point on the model would be better than using a random point in the middle of the cube
-    Vector3 target = new Vector3(pos.x + (random.nextDouble() - 0.5) * pos.radius, pos.y + (random.nextDouble() - 0.5) * pos.radius, pos.z  + (random.nextDouble() - 0.5) * pos.radius);
+    Vector3 target = new Vector3(pos.x + (random.nextDouble() - 0.5) * pos.radius, pos.y + (random.nextDouble() - 0.5) * pos.radius, pos.z + (random.nextDouble() - 0.5) * pos.radius);
     emitterRay.d.set(target);
     emitterRay.d.sub(emitterRay.o);
     double distance = emitterRay.d.length();
     emitterRay.d.normalize();
     double indirectEmitterCoef = emitterRay.d.dot(emitterRay.getNormal());
-    if(indirectEmitterCoef > 0) {
+    if (indirectEmitterCoef > 0) {
       // Here We need to invert the material.
       // The fact that the dot product is > 0 guarantees that the ray is going away from the surface
       // it just met. This means the ray is going from the block just hit to the previous material (usually air or water)
@@ -466,7 +527,7 @@ public class PathTracer implements RayTracer {
       emitterRay.emittance.set(0, 0, 0);
       emitterRay.o.scaleAdd(Ray.EPSILON, emitterRay.d);
       PreviewRayTracer.nextIntersection(scene, emitterRay);
-      if(emitterRay.getCurrentMaterial().emittance > Ray.EPSILON) {
+      if (emitterRay.getCurrentMaterial().emittance > Ray.EPSILON) {
         indirectEmitterColor.set(emitterRay.color);
         indirectEmitterColor.scale(emitterRay.getCurrentMaterial().emittance);
         // TODO Take fog into account
@@ -502,7 +563,7 @@ public class PathTracer implements RayTracer {
       attenuation.z *= ray.color.z * ray.color.w + mult;
       attenuation.w *= mult;
       if (ray.getPrevMaterial().isWater()) {
-        if(scene.waterVisibility == 0) {
+        if (scene.waterVisibility == 0) {
           attenuation.w = 0;
         } else {
           double a = ray.distance / scene.waterVisibility;
