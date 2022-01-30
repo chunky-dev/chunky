@@ -148,7 +148,7 @@ public class Biomes {
   private static final Biome lushCaves = register(new Biome("minecraft:lush_caves", "Lush Caves", 0.5, 0.5, 0x7E7E7E, 0x8EB971, 0x71A74D));
 
   private static final Biome[] SWAMP_BIOMES = { swamp, swampHills };
-  private static final Biome[] BADLANDS_BIOMES = { badlands, woodedBadlandsPlateau, badlandsPlateau, erodedBadlands, modifiedWoodedBadlandsPlateau, modifiedBadlandsPlateau };
+  private static final Biome[] BADLANDS_BIOMES = { badlands, woodedBadlandsPlateau, badlandsPlateau, erodedBadlands, modifiedWoodedBadlandsPlateau, modifiedBadlandsPlateau, woodedBadlands };
   private static final Biome[] DARK_FOREST_BIOMES = { darkForest, darkForestHills };
 
   /**
