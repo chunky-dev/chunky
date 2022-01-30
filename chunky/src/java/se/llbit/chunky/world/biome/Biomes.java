@@ -77,7 +77,7 @@ public class Biomes {
   private static final Biome snowyBeach = register(new Biome("minecraft:snowy_beach", "Snowy Beach", 0.05, 0.3, 0xFAF0C0, 0x83B593, 0x64A278));
   private static final Biome birchForest = register(new Biome("minecraft:birch_forest", "Birch Forest", 0.6, 0.6, 0x307444, 0x88BB67, 0x6BA941));
   private static final Biome birchForestHills = register(new Biome("minecraft:birch_forest_hills", "Birch Forest Hills", 0.6, 0.6, 0x1F5F32, 0x88BB67, 0x6BA941));
-  private static final Biome darkForest = register(new Biome("minecraft:dark_forest", "Dark Forest", 0.7, 0.8, 0x40511A, 0x79C05A, 0x59AE30));
+  private static final Biome darkForest = register(new Biome("minecraft:dark_forest", "Dark Forest", 0.7, 0.8, 0x40511A, 0x26C05A, 0x59AE30));
   private static final Biome snowyTaiga = register(new Biome("minecraft:snowy_taiga", "Snowy Taiga", -0.5, 0.4, 0x31554A, 0x80B497, 0x60A17B));
   private static final Biome snowyTaigaHills = register(new Biome("minecraft:snowy_taiga_hills", "Snowy Taiga Hills", -0.5, 0.4, 0x243F36, 0x80B497, 0x60A17B));
   private static final Biome giantTreeTaiga = register(new Biome("minecraft:giant_tree_taiga", "Giant Tree Taiga", 0.3, 0.8, 0x596651, 0x86B87F, 0x68A55F));
@@ -111,7 +111,7 @@ public class Biomes {
   private static final Biome modifiedJungleEdge = register(new Biome("minecraft:modified_jungle_edge", "Modified Jungle Edge", 0.95, 0.8, 0x8AB33F, 0x64C73F, 0x3EB80F));
   private static final Biome tallBirchForest = register(new Biome("minecraft:tall_birch_forest", "Tall Birch Forest", 0.6, 0.6, 0x589C6C, 0x88BB67, 0x6BA941));
   private static final Biome tallBirchHills = register(new Biome("minecraft:tall_birch_hills", "Tall Birch Hills", 0.6, 0.6, 0x47875A, 0x88BB67, 0x6BA941));
-  private static final Biome darkForestHills = register(new Biome("minecraft:dark_forest_hills", "Dark Forest Hills", 0.7, 0.8, 0x687942, 0x79C05A, 0x59AE30));
+  private static final Biome darkForestHills = register(new Biome("minecraft:dark_forest_hills", "Dark Forest Hills", 0.7, 0.8, 0x687942, 0x1BC05A, 0x59AE30));
   private static final Biome snowyTaigaMountains = register(new Biome("minecraft:snowy_taiga_mountains", "Snowy Taiga Mountains", -0.5, 0.4, 0x597D72, 0x80B497, 0x60A17B));
   private static final Biome giantSpruceTaiga = register(new Biome("minecraft:giant_spruce_taiga", "Giant Spruce Taiga", 0.25, 0.8, 0x818E79, 0x86B783, 0x68A464));
   private static final Biome giantSpruceTaigaHills = register(new Biome("minecraft:giant_spruce_taiga_hills", "Giant Spruce Taiga Hills", 0.25, 0.8, 0x6D7766, 0x86B783, 0x68A464));
