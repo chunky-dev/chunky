@@ -82,8 +82,8 @@ public class GenericQuartBiomeData3d implements BiomeData {
             for (Tag item : localBiomePalette.asList()) {
               Biome biome = Biomes.biomesByResourceLocation.get(((StringTag) item).getData());
               if (biome == null) {
-//                Log.warnf("Missing biome %s! defaulting to first biome in the palette", ((StringTag) item).getData()); //TODO: re-enable once all 1.18 biomes are added
-                System.out.printf("Missing biome %s! defaulting to first biome in the palette\n", ((StringTag) item).getData());
+//                Log.warnf("Unknown biome %s, will be rendered like minecraft:ocean", ((StringTag) item).getData()); //TODO: re-enable once all 1.18 biomes are added
+                System.out.printf("Unknown biome %s, will be rendered like minecraft:ocean\n", ((StringTag) item).getData());
                 subpalette[paletteIndex] = biomePalette.put(Biomes.unknown);
               } else {
                 subpalette[paletteIndex] = biomePalette.put(biome);
@@ -117,8 +117,8 @@ public class GenericQuartBiomeData3d implements BiomeData {
               Biome biome = Biomes.biomesByResourceLocation.get(((StringTag) localBiomePalette.get(0)).getData());
               int biomeId;
               if (biome == null) {
-//                Log.warnf("Missing biome %s! defaulting to first biome in the palette", ((StringTag) localBiomePalette.get(0)).getData()); //TODO: re-enable once all 1.18 biomes are added
-                System.out.printf("Missing biome %s! defaulting to first biome in the palette\n", ((StringTag) localBiomePalette.get(0)).getData());
+//                Log.warnf("Unknown biome %s, will be rendered like minecraft:ocean", ((StringTag) localBiomePalette.get(0)).getData()); //TODO: re-enable once all 1.18 biomes are added
+                System.out.printf("Unknown biome %s, will be rendered like minecraft:ocean\n", ((StringTag) localBiomePalette.get(0)).getData());
                 biomeId = biomePalette.put(Biomes.unknown);
               } else {
                 biomeId = biomePalette.put(biome);
