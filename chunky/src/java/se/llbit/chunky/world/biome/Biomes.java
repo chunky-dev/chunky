@@ -85,9 +85,9 @@ public class Biomes {
   private static final Biome woodedMountains = register(new Biome("minecraft:wooded_mountains", "Wooded Mountains", 0.2, 0.3, 0x507050, 0x8AB689, 0x6DA36B));
   private static final Biome savanna = register(new Biome("minecraft:savanna", "Savanna", 1.2, 0, 0xBDB25F, 0xBFB755, 0xAEA42A));
   private static final Biome savannaPlateau = register(new Biome("minecraft:savanna_plateau", "Savanna Plateau", 1, 0, 0xA79D64, 0xBFB755, 0xAEA42A));
-  private static final Biome badlands = register(new Biome("minecraft:badlands", "Badlands", 2, 0, 0xD94515, 0xBFB755, 0xAEA42A));
-  private static final Biome woodedBadlandsPlateau = register(new Biome("minecraft:wooded_badlands_plateau", "Wooded Badlands Plateau", 2, 0, 0xB09765, 0xBFB755, 0xAEA42A));
-  private static final Biome badlandsPlateau = register(new Biome("minecraft:badlands_plateau", "Badlands Plateau", 2, 0, 0xCA8C65, 0xBFB755, 0xAEA42A));
+  private static final Biome badlands = register(new Biome("minecraft:badlands", "Badlands", 2, 0, 0xD94515, 0x90814D, 0x9E814D));
+  private static final Biome woodedBadlandsPlateau = register(new Biome("minecraft:wooded_badlands_plateau", "Wooded Badlands Plateau", 2, 0, 0xB09765, 0x90814D, 0x9E814D));
+  private static final Biome badlandsPlateau = register(new Biome("minecraft:badlands_plateau", "Badlands Plateau", 2, 0, 0xCA8C65, 0x90814D, 0x9E814D));
   private static final Biome smallEndIslands = register(new Biome("minecraft:small_end_islands", "Small End Islands", 0.5, 0.5, 0x8080FF, 0x8EB971, 0x71A74D));
   private static final Biome endMidlands = register(new Biome("minecraft:end_midlands", "End Midlands", 0.5, 0.5, 0x8080FF, 0x8EB971, 0x71A74D));
   private static final Biome endHighlands = register(new Biome("minecraft:end_highlands", "End Highlands", 0.5, 0.5, 0x8080FF, 0x8EB971, 0x71A74D));
@@ -118,9 +118,9 @@ public class Biomes {
   private static final Biome modifiedGravellyMountains = register(new Biome("minecraft:modified_gravelly_mountains+", "Gravelly Mountains+", 0.2, 0.3, 0x789878, 0x8AB689, 0x6DA36B));
   private static final Biome shatteredSavanna = register(new Biome("minecraft:shattered_savanna", "Shattered Savanna", 1.1, 0, 0xE5DA87, 0xBFB755, 0xAEA42A));
   private static final Biome shatteredSavannaPlateau = register(new Biome("minecraft:shattered_savanna_plateau", "Shattered Savanna Plateau", 1, 0, 0xCFC58C, 0xBFB755, 0xAEA42A));
-  private static final Biome erodedBadlands = register(new Biome("minecraft:eroded_badlands", "Eroded Badlands", 2, 0, 0xFF6D3D, 0xBFB755, 0xAEA42A));
-  private static final Biome modifiedWoodedBadlandsPlateau = register(new Biome("minecraft:modified_wooded_badlands_plateau", "Modified Wooded Badlands Plateau", 2, 0, 0xD8BF8D, 0xBFB755, 0xAEA42A));
-  private static final Biome modifiedBadlandsPlateau = register(new Biome("minecraft:modified_badlands_plateau", "Modified Badlands Plateau", 2, 0, 0xF2B48D, 0xBFB755, 0xAEA42A));
+  private static final Biome erodedBadlands = register(new Biome("minecraft:eroded_badlands", "Eroded Badlands", 2, 0, 0xFF6D3D, 0x90814D, 0x9E814D));
+  private static final Biome modifiedWoodedBadlandsPlateau = register(new Biome("minecraft:modified_wooded_badlands_plateau", "Modified Wooded Badlands Plateau", 2, 0, 0xD8BF8D, 0x90814D, 0x9E814D));
+  private static final Biome modifiedBadlandsPlateau = register(new Biome("minecraft:modified_badlands_plateau", "Modified Badlands Plateau", 2, 0, 0xF2B48D, 0x90814D, 0x9E814D));
   private static final Biome bambooJungle = register(new Biome("minecraft:bamboo_jungle", "Bamboo Jungle", 0.95, 0.9, 0x768E14, 0x59C93C, 0x30BB0B));
   private static final Biome bambooJungleHills = register(new Biome("minecraft:bamboo_jungle_hills", "Bamboo Jungle Hills", 0.95, 0.9, 0x3B470A, 0x59C93C, 0x30BB0B));
   private static final Biome soulSandValley = register(new Biome("minecraft:soul_sand_valley", "Soul Sand Valley", 2, 0, 0x5E3830, 0xBFB755, 0xAEA42A));
@@ -137,7 +137,7 @@ public class Biomes {
   private static final Biome windsweptForest = register(new Biome("minecraft:windswept_forest", "Windswept Forest", 0.2, 0.3, 0x7E7E7E, 0x8AB689, 0x6DA36B));
   private static final Biome windsweptSavanna = register(new Biome("minecraft:windswept_savanna", "Windswept Savanna", 2, 0, 0x7E7E7E, 0xBFB755, 0xAEA42A));
   private static final Biome sparseJungle = register(new Biome("minecraft:sparse_jungle", "Sparse Jungle", 0.95, 0.8, 0x7E7E7E, 0x64C73F, 0x3EB80F));
-  private static final Biome woodedBadlands = register(new Biome("minecraft:wooded_badlands", "Wooded Badlands", 2, 0, 0x7E7E7E, 0xBFB755, 0xAEA42A));
+  private static final Biome woodedBadlands = register(new Biome("minecraft:wooded_badlands", "Wooded Badlands", 2, 0, 0xD94515, 0x90814D, 0x9E814D));
   private static final Biome meadow = register(new Biome("minecraft:meadow", "Meadow", 0.5, 0.8, 0x7E7E7E, 0x83BB6D, 0x64A948));
   private static final Biome grove = register(new Biome("minecraft:grove", "Grove", -0.2, 0.8, 0x7E7E7E, 0x80B497, 0x60A17B));
   private static final Biome snowySlopes = register(new Biome("minecraft:snowy_slopes", "Snowy Slopes", -0.3, 0.9, 0x7E7E7E, 0x80B497, 0x60A17B));
