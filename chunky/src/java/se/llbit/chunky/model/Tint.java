@@ -41,6 +41,7 @@ public class Tint {
     this.type = TintType.CONSTANT;
     this.tint = new float[4];
     ColorUtil.getRGBAComponents(tint, this.tint);
+    ColorUtil.toLinear(this.tint);
   }
 
   /**
