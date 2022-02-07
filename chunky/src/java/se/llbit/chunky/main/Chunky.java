@@ -139,7 +139,7 @@ public class Chunky {
       if (renderManager.getSnapshotControl().saveRenderDump(scene, spp)) {
         // Save the scene description and current render dump.
         try {
-          sceneManager.saveScene();
+          sceneManager.saveScene(getRenderContext().getSceneDirectory());
         } catch (InterruptedException e) {
           throw new Error(e);
         }
@@ -158,7 +158,7 @@ public class Chunky {
     });
 
     try {
-      sceneManager.loadScene(options.sceneName);
+      sceneManager.loadScene(options.sceneDir, options.sceneName);
       if (options.target != -1) {
         sceneManager.getScene().setTargetSpp(options.target);
       }

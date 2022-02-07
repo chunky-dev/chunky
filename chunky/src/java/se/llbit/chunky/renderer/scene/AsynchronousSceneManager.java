@@ -98,10 +98,10 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
    *
    * @param name the name of the scene to load.
    */
-  @Override public void loadScene(String name) {
+  @Override public void loadScene(File sceneDirectory, String name) {
     enqueueTask(() -> {
       try {
-        sceneManager.loadScene(name);
+        sceneManager.loadScene(sceneDirectory, name);
       } catch (IOException e) {
         Log.warn("Could not load scene.\nReason: " + e.getMessage());
       } catch (InterruptedException e) {
@@ -113,10 +113,10 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
   /**
    * Save the current scene.
    */
-  @Override public void saveScene() {
+  @Override public void saveScene(File sceneDirectory) {
     enqueueTask(() -> {
       try {
-        sceneManager.saveScene();
+        sceneManager.saveScene(sceneDirectory);
       } catch (InterruptedException e) {
         Log.warn("Scene saving was interrupted.");
       }

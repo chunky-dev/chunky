@@ -105,24 +105,23 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     return scene;
   }
 
-  @Override public void saveScene() throws InterruptedException {
+  @Override public void saveScene(File sceneDirectory) throws InterruptedException {
     try {
       synchronized (storedScene) {
         String sceneName = storedScene.name();
         Log.info("Saving scene " + sceneName);
-        File sceneDir = resolveSceneDirectory(sceneName);
-        context.setSceneDirectory(sceneDir);
-        if (!sceneDir.isDirectory()) {
-          boolean success = sceneDir.mkdirs();
+        context.setSceneDirectory(sceneDirectory);
+        if (!sceneDirectory.isDirectory()) {
+          boolean success = sceneDirectory.mkdirs();
           if (!success) {
-            Log.warn("Failed to create scene directory: " + sceneDir.getAbsolutePath());
+            Log.warn("Failed to create scene directory: " + sceneDirectory.getAbsolutePath());
             return;
           }
         }
 
         // Create backup of scene description and current render dump.
         storedScene.backupFile(context, context.getSceneDescriptionFile(sceneName));
-        storedScene.backupFile(context, new File(sceneDir, sceneName + ".dump"));
+        storedScene.backupFile(context, new File(sceneDirectory, sceneName + ".dump"));
 
         // Copy render status over from the renderManager.
         RenderStatus status = renderManager.getRenderStatus();
@@ -136,14 +135,13 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     }
   }
 
-  @Override public void loadScene(String sceneName)
+  @Override public void loadScene(File sceneDirectory, String sceneName)
       throws IOException, InterruptedException {
 
     // Do not change lock ordering here.
     // Lock order: scene -> storedScene.
     synchronized (scene) {
       try (TaskTracker.Task ignored = taskTracker.task("Loading scene", 1)) {
-        File sceneDirectory = resolveSceneDirectory(sceneName);
         if (sceneDirectory.isDirectory()) {
           context.setSceneDirectory(sceneDirectory);
         }
@@ -166,7 +164,6 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       scene.clear();
       scene.loadChunks(taskTracker, world, chunksToLoad);
       scene.resetScene(null, context.getChunky().getSceneFactory());
-      context.setSceneDirectory(resolveSceneDirectory(scene.name));
       scene.refresh();
       scene.setResetReason(ResetReason.SCENE_LOADED);
       scene.setRenderMode(RenderMode.PREVIEW);
@@ -177,7 +174,6 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   @Override public void loadChunks(World world, Collection<ChunkPosition> chunksToLoad) {
     synchronized (scene) {
       int prevChunkCount = scene.numberOfChunks();
-      context.setSceneDirectory(resolveSceneDirectory(scene.name));
       scene.loadChunks(taskTracker, world, chunksToLoad);
       if (prevChunkCount == 0) {
         scene.moveCameraToCenter();
@@ -291,36 +287,5 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         scene.clearResetFlags();
       }
     }
-  }
-
-  /**
-   * Find and resolve the directory for a given scene name. If the scene is saved in the /scenes/ folder, it will return
-   * the scenes folder.
-   *
-   * If the scene is found in a folder inside the /scenes/ directory (eg. /scenes/some_scene/) that directory will be
-   * returned.
-   *
-   * Otherwise, a new directory in the /scenes/ folder will be created for the given scene and that said directory will
-   * be returned.
-   *
-   * @param sceneName The name of the scene to resolve the directory for.
-   * @return The directory holding the given scene
-   */
-  public static File resolveSceneDirectory(String sceneName) {
-    File defaultDirectory = new File(PersistentSettings.getSceneDirectory(), sceneName);
-
-    if (!defaultDirectory.exists()) {
-
-      File descFile = new File(PersistentSettings.getSceneDirectory(), sceneName + Scene.EXTENSION);
-      if (descFile.exists()) {
-        return PersistentSettings.getSceneDirectory();
-      }
-
-      descFile = new File(PersistentSettings.getSceneDirectory() + File.separator + sceneName, sceneName + Scene.EXTENSION);
-      if (descFile.exists()) {
-        return descFile.getParentFile();
-      }
-    }
-    return defaultDirectory;
   }
 }

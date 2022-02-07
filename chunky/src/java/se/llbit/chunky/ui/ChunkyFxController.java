@@ -375,7 +375,7 @@ public class ChunkyFxController
 
       if (renderManager.getSnapshotControl().saveRenderDump(scene1, spp)) {
         // Save the scene description and current render dump.
-        asyncSceneManager.saveScene();
+        asyncSceneManager.saveScene(renderController.getContext().getSceneDirectory());
       }
     });
 
@@ -383,7 +383,7 @@ public class ChunkyFxController
     renderManager.setRenderTask(taskTracker.backgroundTask());
 
     saveScene.setGraphic(new ImageView(Icon.disk.fxImage()));
-    saveScene.setOnAction(e -> saveSceneSafe(sceneNameField.getText()));
+    saveScene.setOnAction(e -> saveSceneSafe(renderController.getContext().getSceneDirectory(), sceneNameField.getText()));
 
     loadScene.setGraphic(new ImageView(Icon.load.fxImage()));
     loadScene.setOnAction(e -> openSceneChooser());
@@ -405,7 +405,7 @@ public class ChunkyFxController
       }
       return change;
     }));
-    sceneNameField.setOnAction(event -> saveSceneSafe(sceneNameField.getText()));
+    sceneNameField.setOnAction(event -> saveSceneSafe(renderController.getContext().getSceneDirectory(), sceneNameField.getText()));
 
     Log.setReceiver(new UILogReceiver(), Level.ERROR, Level.WARNING);
 
@@ -885,9 +885,9 @@ public class ChunkyFxController
    * Loads a scene into chunky
    * @param sceneName The name of the scene. NOTE: Do not include extension.
    */
-  public void loadScene(String sceneName) {
+  public void loadScene(File sceneDirectory, String sceneName) {
     try {
-      chunky.getSceneManager().loadScene(sceneName);
+      chunky.getSceneManager().loadScene(sceneDirectory, sceneName);
     } catch (IOException | InterruptedException e) {
       Log.error("Failed to load scene", e);
     }
@@ -950,7 +950,7 @@ public class ChunkyFxController
     map.cameraViewUpdated();
   }
 
-  private void saveSceneSafe(String sceneName) {
+  private void saveSceneSafe(File sceneDirectory, String sceneName) {
     File oldFormat = new File(PersistentSettings.getSceneDirectory(), sceneName + Scene.EXTENSION);
     File newFormat = new File(PersistentSettings.getSceneDirectory(), sceneName);
     if (oldFormat.exists() || newFormat.exists()) {
@@ -963,7 +963,7 @@ public class ChunkyFxController
     scene.setName(sceneName);
     renderController.getSceneProvider().withSceneProtected(scene1 -> scene1.setName(sceneName));
     updateTitle();
-    asyncSceneManager.saveScene();
+    asyncSceneManager.saveScene(sceneDirectory);
   }
 
 }

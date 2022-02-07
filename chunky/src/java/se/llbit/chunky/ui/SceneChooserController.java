@@ -78,7 +78,7 @@ public class SceneChooserController implements Initializable {
         fileChooser.setInitialFileName(String.format("%s.zip", scene.sceneName));
         File targetFile = fileChooser.showSaveDialog(stage);
         if (targetFile != null) {
-          Scene.exportToZip(scene.sceneName, targetFile);
+          Scene.exportToZip(scene.sceneDirectory, scene.sceneName, targetFile);
         }
       }
     });
@@ -159,7 +159,7 @@ public class SceneChooserController implements Initializable {
           if (scene.sceneName.isEmpty()) {
             Log.error("Can't load scene with unknown filename.");
           } else {
-            controller.loadScene(scene.sceneName);
+            controller.loadScene(scene.sceneDirectory, scene.sceneName);
             e.consume();
             stage.close();
           }
@@ -173,7 +173,7 @@ public class SceneChooserController implements Initializable {
         if (scene.sceneName.isEmpty()) {
           Log.error("Can't load scene with unknown filename.");
         } else {
-          controller.loadScene(scene.sceneName);
+          controller.loadScene(scene.sceneDirectory, scene.sceneName);
           stage.close();
         }
       }
