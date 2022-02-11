@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
 
@@ -30,12 +31,20 @@ public interface SceneManager {
   /**
    * Save the current scene.
    */
+  @PluginApi
   void saveScene(File sceneDirectory) throws InterruptedException;
+  @PluginApi
+  @Deprecated /* Remove in 2.6 snapshots */
+  void saveScene() throws InterruptedException;
 
   /**
    * Load a saved scene.
    */
+  @PluginApi
   void loadScene(File sceneDirectory, String sceneName) throws IOException, InterruptedException;
+  @PluginApi
+  @Deprecated /* Remove in 2.6 snapshots */
+  void loadScene(String sceneName) throws IOException, InterruptedException;
 
   /**
    * Load chunks and reset camera and scene.
