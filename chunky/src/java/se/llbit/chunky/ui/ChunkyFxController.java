@@ -71,6 +71,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.Chunky;
@@ -350,6 +352,11 @@ public class ChunkyFxController
           loadWorldConfirm.setTitle("Load scene world");
           loadWorldConfirm.setContentText(
               "This scene shows a different world than the one that is currently loaded. Do you want to load the world of this scene?");
+          Window window = loadWorldConfirm.getDialogPane().getScene().getWindow();
+          if (window instanceof Stage) {
+            ((Stage) window).setAlwaysOnTop(true);
+            ((Stage) window).toFront();
+          }
           if (loadWorldConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
             mapLoader.loadWorld(newWorld.getWorldDirectory());
           }
