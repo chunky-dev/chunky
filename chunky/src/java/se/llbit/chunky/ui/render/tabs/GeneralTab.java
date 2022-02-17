@@ -45,7 +45,7 @@ import se.llbit.chunky.renderer.scene.EntityLoadingPreferences;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderCanvasFx;
-import se.llbit.chunky.ui.SilentNumberStringConverter;
+import se.llbit.chunky.ui.ValidatingNumberStringConverter;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.SettingsExport;
@@ -275,7 +275,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
       scene.setBiomeColorsEnabled(newValue);
     });
-    dumpFrequency.setConverter(new SilentNumberStringConverter());
+    dumpFrequency.setConverter(new ValidatingNumberStringConverter(true));
     dumpFrequency.getItems().addAll(50, 100, 500, 1000, 2500, 5000);
     dumpFrequency.setValue(Scene.DEFAULT_DUMP_FREQUENCY);
     dumpFrequency.setEditable(true);
