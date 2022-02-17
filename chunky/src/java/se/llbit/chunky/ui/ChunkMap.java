@@ -38,6 +38,7 @@ import se.llbit.chunky.renderer.CameraViewListener;
 import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.SceneManager;
+import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;

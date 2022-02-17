@@ -19,7 +19,7 @@ package se.llbit.chunky.map;
 import java.util.function.BiConsumer;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.ChunkViewListener;
-import se.llbit.chunky.ui.ChunkyFxController;
+import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkTopographyUpdater;

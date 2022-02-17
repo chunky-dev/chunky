@@ -50,6 +50,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Vector2;
 
 import java.nio.IntBuffer;
@@ -62,7 +63,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   private static final WritablePixelFormat<IntBuffer> PIXEL_FORMAT =
       PixelFormat.getIntArgbInstance();
 
-  private final se.llbit.chunky.renderer.scene.Scene renderScene;
+  private final Scene renderScene;
 
   private WritableImage image;
 

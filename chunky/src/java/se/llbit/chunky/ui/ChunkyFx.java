@@ -24,14 +24,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.resources.SettingsDirectory;
+import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.fxutil.WindowPosition;
-import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 
 import java.io.File;
