@@ -48,8 +48,13 @@ public class SimplexWaterShader implements WaterShader {
 
     for(int i = 0; i < iterations; ++i) {
       noise.calculate((float)(ray.o.x * frequency), (float)(ray.o.z * frequency), (float)(animationTime * animationSpeed));
-      ddx += - amplitude * noise.ddx;
-      ddz += - amplitude * noise.ddy;
+      double ddxNext = ddx - amplitude * noise.ddx;
+      double ddzNext = ddz - amplitude * noise.ddy;
+      if (Double.isNaN(ddxNext + ddzNext)) {
+        break;
+      }
+      ddx = ddxNext;
+      ddz = ddzNext;
 
       frequency *= 2;
       amplitude *= 0.5;
