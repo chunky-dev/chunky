@@ -24,7 +24,11 @@ public interface PostProcessingFilter {
    * @param exposure The exposure value
    * @param task Task
    */
-  void processFrame(int width, int height, double[] input, BitmapImage output, double exposure, TaskTracker.Task task);
+  void processFrame(
+    int width, int height,
+    ReadOnlySampleBufferWrapper input, BitmapImage output,
+    double exposure, TaskTracker.Task task
+  );
 
   /**
    * Get name of the post processing filter

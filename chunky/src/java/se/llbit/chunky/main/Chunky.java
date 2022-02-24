@@ -132,8 +132,7 @@ public class Chunky {
     renderManager.setSnapshotControl(SnapshotControl.DEFAULT);
     renderManager.setOnFrameCompleted((scene, spp) -> {
       if (renderManager.getSnapshotControl().saveSnapshot(scene, spp)) {
-        scene.saveSnapshot(new File(getRenderContext().getSceneDirectory(), "snapshots"),
-            taskTracker, getRenderContext().numRenderThreads());
+        scene.saveSnapshot(new File(getRenderContext().getSceneDirectory(), "snapshots"), taskTracker);
       }
 
       if (renderManager.getSnapshotControl().saveRenderDump(scene, spp)) {
@@ -316,7 +315,7 @@ public class Chunky {
               .format("%s-%d%s", scene.name(), scene.spp, outputMode.getExtension());
         }
         System.out.println("Image output mode: " + outputMode);
-        scene.saveFrame(new File(options.imageOutputFile), taskTracker, context.numRenderThreads());
+        scene.saveFrame(new File(options.imageOutputFile), taskTracker);
         System.out.println("Saved snapshot to " + options.imageOutputFile);
         return 0;
       }

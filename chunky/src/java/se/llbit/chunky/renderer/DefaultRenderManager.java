@@ -22,6 +22,7 @@ import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
+import se.llbit.chunky.renderer.postprocessing.ReadOnlySampleBufferWrapper;
 import se.llbit.chunky.renderer.scene.PathTracer;
 import se.llbit.chunky.renderer.scene.PreviewRayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -421,6 +422,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         int width = bufferedScene.width;
         int height = bufferedScene.height;
         double[] sampleBuffer = bufferedScene.getSampleBuffer();
+        ReadOnlySampleBufferWrapper sampleBufferWrapper = new ReadOnlySampleBufferWrapper(sampleBuffer);
         double exposure = bufferedScene.getExposure();
 
         // Split up to 10 tasks per thread
@@ -432,15 +434,15 @@ public class DefaultRenderManager extends Thread implements RenderManager {
           int start = i;
           int end = Math.min(bufferedScene.width * bufferedScene.height, i + pixelsPerTask);
           jobs.add(pool.submit(worker -> {
-            double[] pixelbuffer = new double[3];
+            double[] pixelBuffer = new double[3];
 
             for (int j = start; j < end; j++) {
               int x = j % width;
               int y = j / width;
 
-              pixelFilter.processPixel(width, height, sampleBuffer, x, y, exposure, pixelbuffer);
-              Arrays.setAll(pixelbuffer, k -> Math.min(1, pixelbuffer[k]));
-              bufferedScene.getBackBuffer().setPixel(x, y, ColorUtil.getRGB(pixelbuffer));
+              pixelFilter.processPixel(width, height, sampleBufferWrapper, x, y, exposure, pixelBuffer);
+              Arrays.setAll(pixelBuffer, k -> Math.min(1, pixelBuffer[k]));
+              bufferedScene.getBackBuffer().setPixel(x, y, ColorUtil.getRGB(pixelBuffer));
             }
           }));
         }

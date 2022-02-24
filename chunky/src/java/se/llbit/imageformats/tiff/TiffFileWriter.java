@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
+import se.llbit.chunky.renderer.postprocessing.ReadOnlySampleBufferWrapper;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.log.Log;
 import se.llbit.util.TaskTracker;
@@ -217,34 +218,44 @@ public class TiffFileWriter implements AutoCloseable {
     out.write(0);
   }
 
+  private PixelPostProcessingFilter requirePixelPostProcessingFilter(Scene scene) {
+    PostProcessingFilter filter = scene.getPostProcessingFilter();
+    if (filter instanceof PixelPostProcessingFilter) {
+      // TODO: use https://openjdk.java.net/jeps/394
+      return (PixelPostProcessingFilter) filter;
+    } else {
+      Log.warn("The selected post processing filter (" + filter.getName()
+        + ") doesn't support pixel based processing and can't be used to export TIFF files. "+
+        "The TIFF will be exported without post-processing instead.");
+      return PostProcessingFilters.NONE;
+    }
+  }
+
   /**
    * Write an image as a 32-bit per channel TIFF file.
    */
   public void write32(Scene scene, TaskTracker.Task task) throws IOException {
-    PostProcessingFilter filter = scene.getPostProcessingFilter();
-    if (!(filter instanceof PixelPostProcessingFilter)) {
-      Log.warn("The selected post processing filter (" + filter.getName()
-          + ") doesn't support pixel based processing and can't be used to export TIFF files. "+
-          "The TIFF will be exported without post-processing instead.");
-      filter = PostProcessingFilters.NONE;
-    }
+    PixelPostProcessingFilter filter = requirePixelPostProcessingFilter(scene);
 
     int width = scene.canvasWidth();
     int height = scene.canvasHeight();
     writeHeader(width, height, 4);
 
+    ReadOnlySampleBufferWrapper sampleBufferWrapper = new ReadOnlySampleBufferWrapper(scene.getSampleBuffer());
+
     for (int y = 0; y < height; ++y) {
       task.update(height, y);
       for (int x = 0; x < width; ++x) {
-        double[] pixel = new double[3];
-        ((PixelPostProcessingFilter) filter)
-            .processPixel(width, height, scene.getSampleBuffer(), x, y, scene.getExposure(), pixel);
-        out.writeFloat((float) pixel[0]);
-        out.writeFloat((float) pixel[1]);
-        out.writeFloat((float) pixel[2]);
+        double[] pixelBuffer = new double[3];
+        // TODO: refactor pixel access to remove duplicate post processing code from here
+        filter.processPixel(width, height, sampleBufferWrapper, x, y, scene.getExposure(), pixelBuffer);
+        out.writeFloat((float) pixelBuffer[0]);
+        out.writeFloat((float) pixelBuffer[1]);
+        out.writeFloat((float) pixelBuffer[2]);
       }
       task.update(height, y + 1);
     }
+
     writeFooter(width, height, 4);
   }
 
