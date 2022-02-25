@@ -199,6 +199,8 @@ YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/%22%3EY
 <a href="https://www.yourkit.com/.net/profiler/%22%3EYourKit"> .NET Profiler</a>,
 and <a href="https://www.yourkit.com/youmonitor/%22%3EYourKit"> YouMonitor</a>.
 
+---
+
 <img src="jb_square.png" width="150" title="Copyright © 2000-2022 JetBrains s.r.o. JetBrains and the JetBrains logo are registered trademarks of JetBrains s.r.o.">
 
 JetBrains supports core contributors of non-commercial open source projects by providing them with professional coding tools free of charge. <a href="https://jb.gg/OpenSourceSupport"> Find out more</a>.
