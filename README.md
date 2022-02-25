@@ -201,7 +201,7 @@ and <a href="https://www.yourkit.com/youmonitor/%22%3EYourKit"> YouMonitor</a>.
 
 ---
 
-<img src="jb_square.png" width="150" title="Copyright © 2000-2022 JetBrains s.r.o. JetBrains and the JetBrains logo are registered trademarks of JetBrains s.r.o.">
+<img src="https://github.com/JetBrains/logos/blob/master/web/jetbrains/jetbrains.svg" width="150" title="Copyright © 2000-2022 JetBrains s.r.o. JetBrains and the JetBrains logo are registered trademarks of JetBrains s.r.o.">
 
 JetBrains supports core contributors of non-commercial open source projects by providing them with professional coding tools free of charge. <a href="https://jb.gg/OpenSourceSupport"> Find out more</a>.
 
