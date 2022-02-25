@@ -3,7 +3,6 @@ package se.llbit.chunky.block;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
-import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -49,28 +48,28 @@ public class Water extends MinecraftBlockTranslucent {
 
   private static final Quad[] fullBlock = {
       // Bottom.
-      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
-          new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1), true),
       // Top.
-      new DoubleSidedQuad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 1, 1),
-          new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 1, 1),
+          new Vector4(0, 1, 0, 1), true),
       // West.
-      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1),
-          new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1), true),
       // East.
-      new DoubleSidedQuad(new Vector3(1, 0, 0), new Vector3(1, 1, 0), new Vector3(1, 0, 1),
-          new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(1, 0, 0), new Vector3(1, 1, 0), new Vector3(1, 0, 1),
+          new Vector4(0, 1, 0, 1), true),
       // North.
-      new DoubleSidedQuad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 0, 0),
-          new Vector4(0, 1, 0, 0)),
+      new Quad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 0, 0),
+          new Vector4(0, 1, 0, 0), true),
       // South.
-      new DoubleSidedQuad(new Vector3(0, 1, 1), new Vector3(1, 1, 1), new Vector3(0, 0, 1),
-          new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(0, 1, 1), new Vector3(1, 1, 1), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1), true),
   };
 
-  private static final DoubleSidedQuad bottom =
-      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
-          new Vector4(0, 1, 0, 1));
+  private static final Quad bottom =
+      new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1), true);
   static final Triangle[][][] t012 = new Triangle[8][8][8];
   static final Triangle[][][] t230 = new Triangle[8][8][8];
   static final Triangle[][] westt = new Triangle[8][8];

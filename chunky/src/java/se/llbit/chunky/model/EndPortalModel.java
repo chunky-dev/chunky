@@ -18,7 +18,6 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -27,8 +26,8 @@ import java.util.Arrays;
 
 public class EndPortalModel extends QuadModel {
   private static final Quad[] quads = {
-      new DoubleSidedQuad(new Vector3(1, .75, 0), new Vector3(0, .75, 0), new Vector3(1, .75, 1),
-          new Vector4(1, 0, 0, 1))
+      new Quad(new Vector3(1, .75, 0), new Vector3(0, .75, 0), new Vector3(1, .75, 1),
+          new Vector4(1, 0, 0, 1), true)
   };
   private static final Texture[] textures = new Texture[1];
 

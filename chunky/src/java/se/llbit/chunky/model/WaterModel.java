@@ -17,7 +17,6 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -35,27 +34,27 @@ public class WaterModel {
 
   private static final Quad[] fullBlock = {
       // bottom
-      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
-          new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1), true),
       // top
-      new DoubleSidedQuad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 1, 1),
-          new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 1, 1),
+          new Vector4(0, 1, 0, 1), true),
       // west
-      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1),
-          new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1), true),
       // east
-      new DoubleSidedQuad(new Vector3(1, 0, 0), new Vector3(1, 1, 0), new Vector3(1, 0, 1),
-          new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(1, 0, 0), new Vector3(1, 1, 0), new Vector3(1, 0, 1),
+          new Vector4(0, 1, 0, 1), true),
       // north
-      new DoubleSidedQuad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 0, 0),
-          new Vector4(0, 1, 0, 0)),
+      new Quad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 0, 0),
+          new Vector4(0, 1, 0, 0), true),
       // south
-      new DoubleSidedQuad(new Vector3(0, 1, 1), new Vector3(1, 1, 1), new Vector3(0, 0, 1),
-          new Vector4(0, 1, 0, 1)),};
+      new Quad(new Vector3(0, 1, 1), new Vector3(1, 1, 1), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1), true),};
 
-  static final DoubleSidedQuad bot =
-      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
-          new Vector4(0, 1, 0, 1));
+  static final Quad bot =
+      new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1), true);
   static final Triangle[][][] t012 = new Triangle[8][8][8];
   static final Triangle[][][] t230 = new Triangle[8][8][8];
   static final Triangle[][] westt = new Triangle[8][8];
