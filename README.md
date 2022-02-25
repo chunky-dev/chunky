@@ -192,15 +192,17 @@ Released in the public domain.
 ## Special Thanks
 
 ![YourKit](https://www.yourkit.com/images/yklogo.png)
----
+
 YourKit supports open source projects with innovative and intelligent tools
 for monitoring and profiling Java and .NET applications.
 YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/%22%3EYourKit"> Java Profiler</a>,
 <a href="https://www.yourkit.com/.net/profiler/%22%3EYourKit"> .NET Profiler</a>,
 and <a href="https://www.yourkit.com/youmonitor/%22%3EYourKit"> YouMonitor</a>.
 
-<img src="IntelliJ.jpg" width="200">
 ---
+
+<img src="IntelliJ.jpg" width="200">
+
 JetBrains supports core contributors of non-commercial open source projects by providing them with professional coding tools free of charge. JetBrains is the creator of <a href="https://www.jetbrains.com/idea/"> JRE IDE</a>, <a href="https://kotlinlang.org/"> Kotlin</a>, and much more.
 
 [chunky-dev]: https://chunky-dev.github.io/docs/
