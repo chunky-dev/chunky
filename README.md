@@ -199,7 +199,7 @@ YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/%22%3EY
 <a href="https://www.yourkit.com/.net/profiler/%22%3EYourKit"> .NET Profiler</a>,
 and <a href="https://www.yourkit.com/youmonitor/%22%3EYourKit"> YouMonitor</a>.
 
-![](IntelliJ.jpg)
+<img src="IntelliJ.jpg" width="150">
 ---
 JetBrains supports core contributors of non-commercial open source projects by providing them with professional coding tools free of charge. JetBrains is the creator of <a href="https://www.jetbrains.com/idea/"> JRE IDE</a>, <a href="https://kotlinlang.org/"> Kotlin</a>, and much more.
 
