@@ -191,16 +191,6 @@ Released in the public domain.
 
 ## Special Thanks
 
-![YourKit](https://www.yourkit.com/images/yklogo.png)
-
-YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling Java and .NET applications. YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/%22%3EYourKit"> Java Profiler</a>, <a href="https://www.yourkit.com/.net/profiler/%22%3EYourKit"> .NET Profiler</a>, and <a href="https://www.yourkit.com/youmonitor/%22%3EYourKit"> YouMonitor</a>.
-
----
-
-<img src="https://github.com/JetBrains/logos/blob/master/web/jetbrains/jetbrains.svg" width="150" title="Copyright © 2000-2022 JetBrains s.r.o. JetBrains and the JetBrains logo are registered trademarks of JetBrains s.r.o.">
-
-JetBrains supports core contributors of non-commercial open source projects by providing them with professional coding tools free of charge. <a href="https://jb.gg/OpenSourceSupport"> Find out more</a>.
-
 | ![YourKit](https://www.yourkit.com/images/yklogo.png) | <img src="https://github.com/JetBrains/logos/blob/master/web/jetbrains/jetbrains.svg" width="150" title="Copyright © 2000-2022 JetBrains s.r.o. JetBrains and the JetBrains logo are registered trademarks of JetBrains s.r.o."> |
 | --- | ----------- |
 | YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling Java and .NET applications. YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/%22%3EYourKit"> Java Profiler</a>, <a href="https://www.yourkit.com/.net/profiler/%22%3EYourKit"> .NET Profiler</a>, and <a href="https://www.yourkit.com/youmonitor/%22%3EYourKit"> YouMonitor</a>. | JetBrains supports core contributors of non-commercial open source projects by providing them with professional coding tools free of charge. <a href="https://jb.gg/OpenSourceSupport"> Find out more</a>. |
