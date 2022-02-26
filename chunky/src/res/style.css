@@ -63,3 +63,45 @@ Hyperlink:hover {
 .menu-item:disabled:focused > .label {
     -fx-text-fill: white;
 }
+
+.lock-toggle {
+    -fx-label-padding: 0em;
+}
+.lock-toggle > .box {
+    -fx-alignment: center;
+    -fx-content-display: graphic-only;
+
+    /*-fx-min-width: 1.1em;*/
+    /*-fx-pref-width: 1.1em;*/
+    /*-fx-max-width: 1.1em;*/
+    /*-fx-min-height: 2.1em;*/
+    /*-fx-pref-height: 2.1em;*/
+    /*-fx-max-height: 2.1em;*/
+    -fx-padding: 0.5em 0.1em;
+
+    -fx-background-color: none;
+    -fx-border-color: transparent;
+    -fx-border-style: solid;
+    -fx-border-radius: 0.25em;
+}
+.lock-toggle:hover > .box {
+    -fx-background-color: #282828;
+    -fx-border-color: black;
+}
+.lock-toggle:focused > .box {
+    -fx-border-style: dotted;
+    -fx-border-color: white;
+}
+.lock-toggle > .box > .mark {
+    -fx-position-shape: true;
+    -fx-scale-x: 0.45;
+
+    -fx-scale-y: 1.50;
+    -fx-background-color: #999;
+    -fx-shape: "M-2-16c-1 0-2 1-2 2l0 8c0 1 1 2 2 2l4 0c1 0 2-1 2-2l0-8c0-1-1-2-2-2zm3 2c1 0 1 1 1 1l0 6c0 1-1 1-1 1l-2 0c-1 0-1-1-1-1l0-6c0-1 1-1 1-1zM-2 4c-1 0-2 1-2 2l0 8c0 1 1 2 2 2l4 0c1 0 2-1 2-2l0-8c0-1-1-2-2-2zm3 2c1 0 1 1 1 1l0 6c0 1-1 1-1 1l-2 0c-1 0-1-1-1-1l0-6c0-1 1-1 1-1zM-1-3l2 1 0-5c0-1-1-1-1-1-1 0-1 1-1 1zM-1 2l0 5c0 1 1 1 1 1 1 0 1-1 1-1l0-4z";
+}
+.lock-toggle:selected > .box > .mark {
+    -fx-scale-y: 1.27;
+    -fx-background-color: white;
+    -fx-shape: "M-2-14c-1 0-2 1-2 2l0 8c0 1 1 2 2 2l4 0c1 0 2-1 2-2l0-8c0-1-1-2-2-2zm3 2c1 0 1 1 1 1l0 6c0 1-1 1-1 1l-2 0c-1 0-1-1-1-1l0-6c0-1 1-1 1-1zM-2 2c-1 0-2 1-2 2l0 8c0 1 1 2 2 2l4 0c1 0 2-1 2-2l0-8c0-1-1-2-2-2zm3 2c1 0 1 1 1 1l0 6c0 1-1 1-1 1l-2 0c-1 0-1-1-1-1l0-6c0-1 1-1 1-1zM-1 5c0 1 1 1 1 1 1 0 1-1 1-1l0-10c0-1-1-1-1-1-1 0-1 1-1 1z";
+}

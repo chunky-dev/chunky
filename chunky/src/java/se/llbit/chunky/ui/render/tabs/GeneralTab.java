@@ -17,7 +17,6 @@
  */
 package se.llbit.chunky.ui.render.tabs;
 
-import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -33,6 +32,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.entity.ArmorStand;
@@ -44,7 +44,7 @@ import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.EntityLoadingPreferences;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.IntegerAdjuster;
-import se.llbit.chunky.ui.RenderCanvasFx;
+import se.llbit.chunky.ui.SizeInput;
 import se.llbit.chunky.ui.ValidatingNumberStringConverter;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
@@ -63,8 +63,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class GeneralTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
@@ -76,15 +74,13 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private Button restoreDefaults;
   @FXML private Button loadSelectedChunks;
   @FXML private Button reloadChunks;
-  @FXML private ComboBox<String> canvasSize;
-  @FXML private Label canvasSizeLbl;
+  @FXML private Label canvasSizeLabel;
+  @FXML private SizeInput canvasSizeInput;
   @FXML private Button applySize;
   @FXML private Button makeDefaultSize;
+  @FXML private Pane scaleButtonArea;
   @FXML private Button setDefaultYMin;
   @FXML private Button setDefaultYMax;
-  @FXML private Button scale05;
-  @FXML private Button scale15;
-  @FXML private Button scale20;
   @FXML private Button loadAllEntities;
   @FXML private Button loadNoEntity;
   @FXML private CheckBox loadPlayers;
@@ -99,8 +95,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private IntegerAdjuster yMin;
   @FXML private IntegerAdjuster yMax;
 
-  private ChangeListener<String> canvasSizeListener =
-      (observable, oldValue, newValue) -> updateCanvasSize();
+  private final Double[] scaleButtonValues = {0.5, 1.5, 2.0};
 
   private RenderController controller;
   private WorldMapLoader mapLoader;
@@ -123,9 +118,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     }
     yMin.set(scene.getYClipMin());
     yMax.set(scene.getYClipMax());
-    canvasSize.valueProperty().removeListener(canvasSizeListener);
-    canvasSize.setValue(String.format("%dx%d", scene.width, scene.height));
-    canvasSize.valueProperty().addListener(canvasSizeListener);
+
     if (scene.shouldSaveDumps()) {
       dumpFrequency.setValue(scene.getDumpFrequency());
       dumpFrequency.setDisable(false);
@@ -300,10 +293,6 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     saveSnapshots.selectedProperty().addListener((observable1, oldValue1, newValue1) -> {
       scene.setSaveSnapshots(newValue1);
     });
-    canvasSizeLbl.setGraphic(new ImageView(Icon.scale.fxImage()));
-    canvasSize.setEditable(true);
-    canvasSize.getItems().addAll("400x400", "1024x768", "960x540", "1920x1080");
-    canvasSize.valueProperty().addListener(canvasSizeListener);
     yMax.setTooltip(
         "Blocks above this Y value are not loaded. Requires reloading chunks to take effect.");
     yMax.onValueChange(value -> {
@@ -329,60 +318,31 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     reloadChunks.setTooltip(new Tooltip("Reload all chunks in the scene."));
     reloadChunks.setGraphic(new ImageView(Icon.reload.fxImage()));
     reloadChunks.setOnAction(e -> controller.getSceneManager().reloadChunks());
-    applySize.setTooltip(new Tooltip("Set the canvas size to the value in the field."));
-    applySize.setOnAction(e -> {
-      // Make the change handler for the combo box update the canvas size.
-      canvasSize.setValue(canvasSize.getEditor().getText());
-    });
-    makeDefaultSize.setTooltip(new Tooltip("Make the current canvas size the default."));
-    makeDefaultSize.setOnAction(e -> PersistentSettings
-        .set3DCanvasSize(scene.canvasWidth(), scene.canvasHeight()));
+
     setDefaultYMin.setTooltip(new Tooltip("Make this the default lower Y clip plane."));
     setDefaultYMin.setOnAction(e -> PersistentSettings.setYClipMin(yMin.get()));
     setDefaultYMax.setTooltip(new Tooltip("Make this the default upper Y clip plane."));
     setDefaultYMax.setOnAction(e -> PersistentSettings.setYClipMax(yMax.get()));
-    scale15.setTooltip(new Tooltip("Halve canvas width and height."));
-    scale05.setOnAction(e -> {
-      int width = scene.canvasWidth() / 2;
-      int height = scene.canvasHeight() / 2;
-      setCanvasSize(width, height);
-    });
-    scale15.setTooltip(new Tooltip("Multiply canvas width and height by 1.5."));
-    scale15.setOnAction(e -> {
-      int width = (int) (scene.canvasWidth() * 1.5);
-      int height = (int) (scene.canvasHeight() * 1.5);
-      setCanvasSize(width, height);
-    });
-    scale20.setTooltip(new Tooltip("Multiply canvas width and height by 2.0."));
-    scale20.setOnAction(e -> {
-      int width = scene.canvasWidth() * 2;
-      int height = scene.canvasHeight() * 2;
-      setCanvasSize(width, height);
-    });
-  }
 
-  private void updateCanvasSize() {
-    String size = canvasSize.getValue();
-    try {
-      Pattern regex = Pattern.compile("([0-9]+)[xX.*]([0-9]+)");
-      Matcher matcher = regex.matcher(size);
-      if (matcher.matches()) {
-        int width = Integer.parseInt(matcher.group(1));
-        int height = Integer.parseInt(matcher.group(2));
-        RenderCanvasFx canvas = renderControls.getCanvas();
-        canvas.setCanvasSize(width, height);
-        scene.setCanvasSize(width, height);
-      } else {
-        Log.info("Failed to set canvas size: format must be <width>x<height>!");
-      }
-    } catch (NumberFormatException e1) {
-      Log.info("Failed to set canvas size: invalid dimensions!");
+    canvasSizeLabel.setGraphic(new ImageView(Icon.scale.fxImage()));
+    canvasSizeInput.addSizeChangeListener(this::updateCanvasSize);
+    for(Double scale : scaleButtonValues) {
+      Button scaleButton = new Button("×" + scale.toString());
+      scaleButton.setMnemonicParsing(false);
+      scaleButton.setTooltip(new Tooltip("Scale the canvas size by " + scale));
+      scaleButton.setOnAction(e -> canvasSizeInput.scaleSize(scale));
+      scaleButtonArea.getChildren().add(scaleButton);
     }
+    applySize.setTooltip(new Tooltip("Apply the new size to the render canvas."));
+    applySize.setOnAction(e -> canvasSizeInput.submitChanges());
+    makeDefaultSize.setTooltip(new Tooltip("Make the current canvas size the default."));
+    makeDefaultSize.setOnAction(e -> PersistentSettings
+      .set3DCanvasSize(scene.canvasWidth(), scene.canvasHeight()));
   }
 
-  private void setCanvasSize(int width, int height) {
-    // Updating the combo box value triggers canvas resizing.
-    canvasSize.setValue(String.format("%dx%d", width, height));
+  private void updateCanvasSize(int width, int height) {
+    renderControls.getCanvas().setCanvasSize(width, height);
+    scene.setCanvasSize(width, height);
   }
 
   @Override public void setController(RenderControlsFxController controls) {
