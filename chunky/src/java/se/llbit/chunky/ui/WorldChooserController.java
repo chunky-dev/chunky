@@ -140,6 +140,7 @@ public class WorldChooserController implements Initializable {
         loadTexturesConfirm.setTitle("Bundled resource pack");
         loadTexturesConfirm.setContentText(
                 "The world \"" + world.levelName() + "\" contains a resource pack. Do you want to load it now?");
+        Dialogs.stayOnTop(loadTexturesConfirm);
         if (loadTexturesConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
           if (!texturePacks.contains(worldResourcePack.getAbsolutePath())) {
             texturePacks.add(0, worldResourcePack.getAbsolutePath());

@@ -10,6 +10,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 public class Dialogs {
 
@@ -38,6 +40,18 @@ public class Dialogs {
       content,
       confirmLabel
     );
+  }
+
+  /**
+   * Makes the given dialog always stay on top of its parent window.
+   * @param dialog A dialog
+   */
+  public static void stayOnTop(Alert dialog) {
+    Window window = dialog.getDialogPane().getScene().getWindow();
+    if (window instanceof Stage) {
+      ((Stage) window).setAlwaysOnTop(true);
+      ((Stage) window).toFront();
+    }
   }
 
   /**
