@@ -10,19 +10,16 @@
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
 
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
-    <VBox spacing="10.0">
-      <children>
-        <DoubleAdjuster fx:id="exposure" />
-        <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
-          <children>
-            <Label text="Postprocessing filter:" />
-            <ChoiceBox fx:id="postprocessingFilter" prefWidth="150.0" />
-          </children>
-        </HBox>
-        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Postprocessing affects performance when Render Preview tab is visible. Switching to the Map tab mitigates this." wrappingWidth="276.30859375" />
-      </children>
-      <padding>
-        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-      </padding>
-    </VBox>
+  <VBox spacing="10.0">
+    <DoubleAdjuster fx:id="exposure" />
+    <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
+      <Label text="Postprocessing filter:" />
+      <ChoiceBox fx:id="postprocessingFilter" prefWidth="150.0" />
+    </HBox>
+    <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="275"
+      text="Postprocessing affects performance when Render Preview tab is visible. Switching to the Map tab mitigates this." />
+    <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
+  </VBox>
 </fx:root>

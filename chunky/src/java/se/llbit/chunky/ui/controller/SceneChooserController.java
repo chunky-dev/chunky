@@ -29,6 +29,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.SceneHelper;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.TableSortConfigSerializer;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
