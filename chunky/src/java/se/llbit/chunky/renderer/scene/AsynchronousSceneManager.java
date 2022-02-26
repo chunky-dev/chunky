@@ -111,6 +111,7 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
       }
     });
   }
+
   @PluginApi
   @Deprecated
   @Override public void loadScene(String name) {
