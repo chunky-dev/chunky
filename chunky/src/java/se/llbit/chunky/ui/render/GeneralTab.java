@@ -115,6 +115,10 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   }
 
   @Override public void update(Scene scene) {
+    if (scene.getWorld() instanceof EmptyWorld) {
+      scene.setYClipMin(yMin.get());
+      scene.setYClipMax(yMax.get());
+    }
     yMin.set(scene.getYClipMin());
     yMax.set(scene.getYClipMax());
     canvasSize.valueProperty().removeListener(canvasSizeListener);
@@ -395,10 +399,14 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   private void updateYClipSlidersRanges(World world) {
     if (world != null && world.getVersionId() >= World.VERSION_21W06A) {
       yMin.setRange(-64, 320);
+      yMin.set(-64);
       yMax.setRange(-64, 320);
+      yMax.set(320);
     } else {
       yMin.setRange(0, 256);
+      yMin.set(0);
       yMax.setRange(0, 256);
+      yMax.set(256);
     }
   }
 }
