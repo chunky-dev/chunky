@@ -26,6 +26,7 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.SceneHelper;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.fxutil.Dialogs;
@@ -202,9 +203,18 @@ public class SceneChooserController implements Initializable {
     if (!scenes.isEmpty()) {
       sceneTbl.getSelectionModel().select(0);
     }
-    lastModifiedCol.setSortType(TableColumn.SortType.DESCENDING);
+
     sceneTbl.getSortOrder().setAll(Collections.singletonList(lastModifiedCol));
+    lastModifiedCol.setSortType(TableColumn.SortType.DESCENDING);
+    try {
+      TableSortConfigSerializer.applySortConfig(sceneTbl, PersistentSettings.getTableSortConfig("scenes"));
+    } catch(Exception ignore) {
+    }
     sceneTbl.sort();
+
+    sceneTbl.setOnSort(e -> {
+      PersistentSettings.setTableSortConfig("scenes", TableSortConfigSerializer.getSortConfig(sceneTbl));
+    });
   }
 
   public void setController(ChunkyFxController controller) {

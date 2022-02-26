@@ -33,6 +33,7 @@ import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.world.World;
 import se.llbit.fxutil.Dialogs;
+import se.llbit.json.JsonArray;
 import se.llbit.log.Log;
 
 import java.io.File;
@@ -210,9 +211,20 @@ public class WorldChooserController implements Initializable {
       statusLabel.setText(prevStatus);
       disableControls(false);
 
-      modifiedCol.setSortType(TableColumn.SortType.DESCENDING);
       worldTbl.getSortOrder().setAll(Collections.singletonList(modifiedCol));
+      modifiedCol.setSortType(TableColumn.SortType.DESCENDING);
+      try {
+        JsonArray config = PersistentSettings.getTableSortConfig("worlds");
+        if (config != null) {
+          TableSortConfigSerializer.applySortConfig(worldTbl, config);
+        }
+      } catch (Exception ignore) {
+      }
       worldTbl.sort();
+
+      worldTbl.setOnSort(e -> {
+          PersistentSettings.setTableSortConfig("worlds", TableSortConfigSerializer.getSortConfig(worldTbl));
+      });
     });
 
     loadWorldsTask.setOnCancelled(event -> disableControls(false));
