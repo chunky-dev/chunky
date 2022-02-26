@@ -16,9 +16,11 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
@@ -29,11 +31,29 @@ public interface SceneManager {
   /**
    * Save the current scene.
    */
+  @PluginApi
+  void saveScene(File sceneDirectory) throws InterruptedException;
+
+  /**
+   * {@link Deprecated} removed in 2.6 snapshots.
+   * replaced by {@link SceneManager#saveScene(File)}
+   */
+  @PluginApi
+  @Deprecated
   void saveScene() throws InterruptedException;
 
   /**
    * Load a saved scene.
    */
+  @PluginApi
+  void loadScene(File sceneDirectory, String sceneName) throws IOException, InterruptedException;
+
+  /**
+   * {@link Deprecated} removed in 2.6 snapshots.
+   * replaced by {@link SceneManager#loadScene(File, String)}
+   */
+  @PluginApi
+  @Deprecated
   void loadScene(String sceneName) throws IOException, InterruptedException;
 
   /**

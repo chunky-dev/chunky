@@ -18,6 +18,7 @@
 package se.llbit.chunky.renderer.scene;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.RenderStatus;
@@ -105,6 +106,39 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     return scene;
   }
 
+  @PluginApi
+  @Override public void saveScene(File sceneDirectory) throws InterruptedException {
+    try {
+      synchronized (storedScene) {
+        String sceneName = storedScene.name();
+        Log.info("Saving scene " + sceneName);
+        context.setSceneDirectory(sceneDirectory);
+        if (!sceneDirectory.isDirectory()) {
+          boolean success = sceneDirectory.mkdirs();
+          if (!success) {
+            Log.warn("Failed to create scene directory: " + sceneDirectory.getAbsolutePath());
+            return;
+          }
+        }
+
+        // Create backup of scene description and current render dump.
+        storedScene.backupFile(context, context.getSceneDescriptionFile(sceneName));
+        storedScene.backupFile(context, new File(sceneDirectory, sceneName + ".dump"));
+
+        // Copy render status over from the renderManager.
+        RenderStatus status = renderManager.getRenderStatus();
+        storedScene.renderTime = status.getRenderTime();
+        storedScene.spp = status.getSpp();
+        storedScene.saveScene(context, taskTracker);
+        Log.info("Scene saved");
+      }
+    } catch (IOException e) {
+      Log.error("Failed to save scene. Reason: " + e.getMessage(), e);
+    }
+  }
+
+  @PluginApi
+  @Deprecated
   @Override public void saveScene() throws InterruptedException {
     try {
       synchronized (storedScene) {
@@ -136,8 +170,35 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     }
   }
 
-  @Override public void loadScene(String sceneName)
+  @PluginApi
+  @Override public void loadScene(File sceneDirectory, String sceneName)
       throws IOException, InterruptedException {
+
+    // Do not change lock ordering here.
+    // Lock order: scene -> storedScene.
+    synchronized (scene) {
+      try (TaskTracker.Task ignored = taskTracker.task("Loading scene", 1)) {
+        if (sceneDirectory.isDirectory()) {
+          context.setSceneDirectory(sceneDirectory);
+        }
+        scene.loadScene(context, sceneName, taskTracker);
+      }
+
+      // Update progress bar.
+      taskTracker.backgroundTask().update("Rendering", scene.getTargetSpp(), scene.spp);
+
+      scene.setResetReason(ResetReason.SCENE_LOADED);
+
+      // Wake up waiting threads in awaitSceneStateChange().
+      scene.notifyAll();
+    }
+    onSceneLoaded.run();
+  }
+
+  @PluginApi
+  @Deprecated
+  @Override public void loadScene(String sceneName)
+    throws IOException, InterruptedException {
 
     // Do not change lock ordering here.
     // Lock order: scene -> storedScene.
@@ -166,7 +227,6 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       scene.clear();
       scene.loadChunks(taskTracker, world, chunksToLoad);
       scene.resetScene(null, context.getChunky().getSceneFactory());
-      context.setSceneDirectory(resolveSceneDirectory(scene.name));
       scene.refresh();
       scene.setResetReason(ResetReason.SCENE_LOADED);
       scene.setRenderMode(RenderMode.PREVIEW);
@@ -177,7 +237,6 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   @Override public void loadChunks(World world, Collection<ChunkPosition> chunksToLoad) {
     synchronized (scene) {
       int prevChunkCount = scene.numberOfChunks();
-      context.setSceneDirectory(resolveSceneDirectory(scene.name));
       scene.loadChunks(taskTracker, world, chunksToLoad);
       if (prevChunkCount == 0) {
         scene.moveCameraToCenter();
@@ -306,6 +365,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
    * @param sceneName The name of the scene to resolve the directory for.
    * @return The directory holding the given scene
    */
+  @Deprecated /* Remove in 2.6 snapshots */
   public static File resolveSceneDirectory(String sceneName) {
     File defaultDirectory = new File(PersistentSettings.getSceneDirectory(), sceneName);
 

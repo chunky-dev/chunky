@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.SceneProvider;
@@ -98,6 +99,21 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
    *
    * @param name the name of the scene to load.
    */
+  @PluginApi
+  @Override public void loadScene(File sceneDirectory, String name) {
+    enqueueTask(() -> {
+      try {
+        sceneManager.loadScene(sceneDirectory, name);
+      } catch (IOException e) {
+        Log.warn("Could not load scene.\nReason: " + e.getMessage());
+      } catch (InterruptedException e) {
+        Log.warn("Scene loading was interrupted.");
+      }
+    });
+  }
+
+  @PluginApi
+  @Deprecated
   @Override public void loadScene(String name) {
     enqueueTask(() -> {
       try {
@@ -113,6 +129,19 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
   /**
    * Save the current scene.
    */
+  @PluginApi
+  @Override public void saveScene(File sceneDirectory) {
+    enqueueTask(() -> {
+      try {
+        sceneManager.saveScene(sceneDirectory);
+      } catch (InterruptedException e) {
+        Log.warn("Scene saving was interrupted.");
+      }
+    });
+  }
+
+  @PluginApi
+  @Deprecated
   @Override public void saveScene() {
     enqueueTask(() -> {
       try {
