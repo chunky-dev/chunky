@@ -96,6 +96,7 @@ public class RenderControlsFxController {
     asyncSceneManager.setOnChunksLoaded(() -> Platform.runLater(() -> {
       tabs.forEach(RenderControlsTab::onChunksLoaded);
       controller.showRenderPreview();
+      this.refreshSettings();
     }));
   }
 
