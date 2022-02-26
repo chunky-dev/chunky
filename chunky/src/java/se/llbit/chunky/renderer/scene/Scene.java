@@ -51,6 +51,7 @@ import se.llbit.chunky.block.*;
 import se.llbit.chunky.block.legacy.LegacyBlocksFinalizer;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.chunk.biome.BiomeData;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
@@ -1021,6 +1022,9 @@ public class Scene implements JsonSerializable, Refreshable {
               world.getChunk(chunkPositions[finalI + 1]).getChunkData(nextChunkData, palette, biomePalette, yMin, yMax);
             });
           }
+        }
+        if (chunkData == null) {
+          chunkData = EmptyChunkData.INSTANCE;
         }
 
         numChunks += 1;
