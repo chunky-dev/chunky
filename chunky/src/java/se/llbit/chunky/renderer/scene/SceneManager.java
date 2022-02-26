@@ -33,8 +33,13 @@ public interface SceneManager {
    */
   @PluginApi
   void saveScene(File sceneDirectory) throws InterruptedException;
+
+  /**
+   * {@link Deprecated} removed in 2.6 snapshots.
+   * replaced by {@link SceneManager#saveScene(File)}
+   */
   @PluginApi
-  @Deprecated /* Remove in 2.6 snapshots */
+  @Deprecated
   void saveScene() throws InterruptedException;
 
   /**
@@ -42,8 +47,13 @@ public interface SceneManager {
    */
   @PluginApi
   void loadScene(File sceneDirectory, String sceneName) throws IOException, InterruptedException;
+
+  /**
+   * {@link Deprecated} removed in 2.6 snapshots.
+   * replaced by {@link SceneManager#loadScene(File, String)}
+   */
   @PluginApi
-  @Deprecated /* Remove in 2.6 snapshots */
+  @Deprecated
   void loadScene(String sceneName) throws IOException, InterruptedException;
 
   /**
