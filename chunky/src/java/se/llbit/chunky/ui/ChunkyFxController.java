@@ -355,6 +355,7 @@ public class ChunkyFxController
             loadWorldConfirm.setTitle("Load scene world");
             loadWorldConfirm.setContentText(
               "This scene shows a different world than the one that is currently loaded. Do you want to load the world of this scene?");
+            Dialogs.stayOnTop(loadWorldConfirm);
             if (loadWorldConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
               mapLoader.loadWorld(newWorld.getWorldDirectory());
               getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
