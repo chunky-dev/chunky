@@ -23,6 +23,7 @@ import se.llbit.chunky.renderer.RenderConstants;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.fxutil.WindowPosition;
 import se.llbit.json.JsonArray;
+import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 
 /**
@@ -535,6 +536,29 @@ public final class PersistentSettings {
     settings.setDouble("window.width", position.getWidth());
     settings.setDouble("window.height", position.getHeight());
     settings.setBool("window.maximized", position.isMaximized());
+    save();
+  }
+
+  public static JsonArray getTableSortConfig(String table) {
+    if (!settings.get("tables").isObject()) {
+      return null;
+    }
+    JsonObject tables = settings.get("tables").asObject();
+    if (!tables.get(table).isObject()) {
+      return null;
+    }
+    return settings.get("tables").asObject().get(table).asObject().get("sort").asArray();
+  }
+
+  public static void setTableSortConfig(String table, JsonArray config) {
+    if (!settings.get("tables").isObject()) {
+      settings.set("tables", new JsonObject());
+    }
+    JsonObject tables = settings.get("tables").asObject();
+    if (!tables.get(table).isObject()) {
+      tables.set(table, new JsonObject());
+    }
+    tables.get(table).asObject().set("sort", config);
     save();
   }
 }

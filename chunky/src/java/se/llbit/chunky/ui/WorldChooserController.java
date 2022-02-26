@@ -17,6 +17,7 @@
 package se.llbit.chunky.ui;
 
 import javafx.beans.property.ReadOnlyLongWrapper;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
@@ -32,10 +33,12 @@ import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.world.World;
 import se.llbit.fxutil.Dialogs;
+import se.llbit.json.JsonArray;
 import se.llbit.log.Log;
 
 import java.io.File;
 import java.net.URL;
+import java.text.DateFormat;
 import java.util.*;
 
 public class WorldChooserController implements Initializable {
@@ -51,6 +54,8 @@ public class WorldChooserController implements Initializable {
 
   @FXML private TableColumn<World, Number> seedCol;
 
+  @FXML public TableColumn<World, Date> modifiedCol;
+
   @FXML private Button changeWorldDirBtn;
 
   @FXML private Button browseBtn;
@@ -65,6 +70,17 @@ public class WorldChooserController implements Initializable {
         data -> new ReadOnlyStringWrapper(data.getValue().getWorldDirectory().getName()));
     gameModeCol.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().gameMode()));
     seedCol.setCellValueFactory(data -> new ReadOnlyLongWrapper(data.getValue().getSeed()));
+
+    DateFormat localeFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+    modifiedCol.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue().getLastModified()));
+    modifiedCol.setCellFactory(col -> new TableCell<World, Date>() {
+      public void updateItem(Date item, boolean empty) {
+        if (item == this.getItem()) return;
+        super.updateItem(item, empty);
+        super.setGraphic(null);
+        super.setText(item == null ? null : localeFormat.format(item));
+      }
+    });
   }
 
   public void setStage(Stage stage) {
@@ -187,7 +203,6 @@ public class WorldChooserController implements Initializable {
     loadWorldsTask.setOnSucceeded((WorkerStateEvent event) -> {
       List<World> worlds = loadWorldsTask.getValue();
 
-      Collections.sort(worlds);
       worldTbl.setItems(FXCollections.observableArrayList(worlds));
       if (!worlds.isEmpty()) {
         worldTbl.getSelectionModel().select(0);
@@ -195,6 +210,21 @@ public class WorldChooserController implements Initializable {
 
       statusLabel.setText(prevStatus);
       disableControls(false);
+
+      worldTbl.getSortOrder().setAll(Collections.singletonList(modifiedCol));
+      modifiedCol.setSortType(TableColumn.SortType.DESCENDING);
+      try {
+        JsonArray config = PersistentSettings.getTableSortConfig("worlds");
+        if (config != null) {
+          TableSortConfigSerializer.applySortConfig(worldTbl, config);
+        }
+      } catch (Exception ignore) {
+      }
+      worldTbl.sort();
+
+      worldTbl.setOnSort(e -> {
+          PersistentSettings.setTableSortConfig("worlds", TableSortConfigSerializer.getSortConfig(worldTbl));
+      });
     });
 
     loadWorldsTask.setOnCancelled(event -> disableControls(false));
