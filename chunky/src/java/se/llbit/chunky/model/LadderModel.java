@@ -17,7 +17,6 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -25,20 +24,20 @@ import se.llbit.math.Vector4;
 public class LadderModel extends QuadModel {
   private static final Quad[] model = {
       // West.
-      new DoubleSidedQuad(new Vector3(0.95, 0, 0), new Vector3(0.95, 0, 1), new Vector3(0.95, 1, 0),
-          new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(0.95, 0, 0), new Vector3(0.95, 0, 1), new Vector3(0.95, 1, 0),
+          new Vector4(0, 1, 0, 1), true),
 
       // East.
-      new DoubleSidedQuad(new Vector3(0.05, 0, 1), new Vector3(0.05, 0, 0), new Vector3(0.05, 1, 1),
-          new Vector4(1, 0, 0, 1)),
+      new Quad(new Vector3(0.05, 0, 1), new Vector3(0.05, 0, 0), new Vector3(0.05, 1, 1),
+          new Vector4(1, 0, 0, 1), true),
 
       // North.
-      new DoubleSidedQuad(new Vector3(1, 0, 0.95), new Vector3(0, 0, 0.95), new Vector3(1, 1, 0.95),
-          new Vector4(1, 0, 0, 1)),
+      new Quad(new Vector3(1, 0, 0.95), new Vector3(0, 0, 0.95), new Vector3(1, 1, 0.95),
+          new Vector4(1, 0, 0, 1), true),
 
       // South.
-      new DoubleSidedQuad(new Vector3(0, 0, 0.05), new Vector3(1, 0, 0.05), new Vector3(0, 1, 0.05),
-          new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(0, 0, 0.05), new Vector3(1, 0, 0.05), new Vector3(0, 1, 0.05),
+          new Vector4(0, 1, 0, 1), true),
   };
 
   private static final Texture[] textures = { Texture.ladder };

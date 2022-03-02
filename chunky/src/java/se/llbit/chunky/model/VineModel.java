@@ -17,7 +17,6 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
@@ -29,20 +28,20 @@ import java.util.Arrays;
 public class VineModel extends QuadModel {
   private static final Quad[] model = {
       // North
-      new DoubleSidedQuad(new Vector3(0, 0, 0.8 / 16), new Vector3(1, 0, 0.8 / 16),
-          new Vector3(0, 1, 0.8 / 16), new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(0, 0, 0.8 / 16), new Vector3(1, 0, 0.8 / 16),
+          new Vector3(0, 1, 0.8 / 16), new Vector4(0, 1, 0, 1), true),
 
       // South
-      new DoubleSidedQuad(new Vector3(1, 0, 15.2 / 16), new Vector3(0, 0, 15.2 / 16),
-          new Vector3(1, 1, 15.2 / 16), new Vector4(1, 0, 0, 1)),
+      new Quad(new Vector3(1, 0, 15.2 / 16), new Vector3(0, 0, 15.2 / 16),
+          new Vector3(1, 1, 15.2 / 16), new Vector4(1, 0, 0, 1), true),
 
       // East
-      new DoubleSidedQuad(new Vector3(15.2 / 16, 0, 0), new Vector3(15.2 / 16, 0, 1),
-          new Vector3(15.2 / 16, 1, 0), new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(15.2 / 16, 0, 0), new Vector3(15.2 / 16, 0, 1),
+          new Vector3(15.2 / 16, 1, 0), new Vector4(0, 1, 0, 1), true),
 
       // West
-      new DoubleSidedQuad(new Vector3(0.8 / 16, 0, 1), new Vector3(0.8 / 16, 0, 0),
-          new Vector3(0.8 / 16, 1, 1), new Vector4(1, 0, 0, 1))
+      new Quad(new Vector3(0.8 / 16, 0, 1), new Vector3(0.8 / 16, 0, 0),
+          new Vector3(0.8 / 16, 1, 1), new Vector4(1, 0, 0, 1), true)
   };
 
   /**
@@ -53,13 +52,13 @@ public class VineModel extends QuadModel {
   protected static final Quad[] topQuads;
 
   static {
-    DoubleSidedQuad top90 =
-        new DoubleSidedQuad(new Vector3(0, 15.2 / 16, 0), new Vector3(1, 15.2 / 16, 0),
-            new Vector3(0, 15.2 / 16, 1), new Vector4(0, 1, 0, 1));
+    Quad top90 =
+        new Quad(new Vector3(0, 15.2 / 16, 0), new Vector3(1, 15.2 / 16, 0),
+            new Vector3(0, 15.2 / 16, 1), new Vector4(0, 1, 0, 1), true);
 
-    DoubleSidedQuad top = top90.transform(Transform.NONE.rotateNegY());
-    DoubleSidedQuad top180 = top90.transform(Transform.NONE.rotateY());
-    DoubleSidedQuad top270 = top180.transform(Transform.NONE.rotateY());
+    Quad top = top90.transform(Transform.NONE.rotateNegY());
+    Quad top180 = top90.transform(Transform.NONE.rotateY());
+    Quad top270 = top180.transform(Transform.NONE.rotateY());
 
     // bits of the index are other sides in order west,east,south,north
     topQuads = new Quad[]{

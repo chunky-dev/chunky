@@ -23,7 +23,6 @@ import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
 import se.llbit.chunky.resources.texturepack.TextureLoader;
 import se.llbit.log.Log;
-import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector2;
@@ -227,13 +226,8 @@ public class CubeModel {
         break;
     }
 
-    if (doubleSided) {
-      theFaces.add(new DoubleSidedQuad(new Vector3(o[0], o[1], o[2]), new Vector3(u[0], u[1], u[2]),
-          new Vector3(v[0], v[1], v[2]), uv));
-    } else {
-      theFaces.add(new Quad(new Vector3(o[0], o[1], o[2]), new Vector3(u[0], u[1], u[2]),
-          new Vector3(v[0], v[1], v[2]), uv));
-    }
+    theFaces.add(new Quad(new Vector3(o[0], o[1], o[2]), new Vector3(u[0], u[1], u[2]),
+        new Vector3(v[0], v[1], v[2]), uv, doubleSided));
   }
 
 }
