@@ -46,6 +46,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
@@ -95,7 +96,6 @@ import se.llbit.chunky.ui.dialogs.ResourceLoadOrderEditor;
 import se.llbit.chunky.ui.dialogs.SceneChooser;
 import se.llbit.chunky.ui.UILogReceiver;
 import se.llbit.chunky.ui.dialogs.WorldChooser;
-import se.llbit.chunky.ui.dialogs.ConfirmResetPopup;
 import se.llbit.chunky.ui.dialogs.SceneDirectoryPicker;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
@@ -863,23 +863,25 @@ public class ChunkyFxController
   private void requestRenderReset() {
     if (resetConfirmMutex.compareAndSet(false, true)) {
       Platform.runLater(() -> {
-        try {
-          ConfirmResetPopup popup = new ConfirmResetPopup(
-              () -> {
-                // On accept.
-                asyncSceneManager.applySceneChanges();
-                resetConfirmMutex.set(false);
-              },
-              () -> {
-                // On reject.
-                asyncSceneManager.discardSceneChanges();
-                refreshSettings();
-                resetConfirmMutex.set(false);
-              });
-          popup.show(renderControls.getScene().getWindow());
-        } catch (IOException e) {
-          Log.warn("Could not open reset confirmation dialog.", e);
+        Alert confirmReset = new Alert(
+          AlertType.CONFIRMATION,
+          "Something in the scene settings changed which requires a render reset, but the render has already made significant progress. " +
+            "\nDo you want to reset the render to apply the changes? " +
+            "\nYour current progress will be lost!",
+          new ButtonType("Reset", ButtonBar.ButtonData.YES),
+          ButtonType.CANCEL
+        );
+        confirmReset.setTitle("Reset render to apply setting changes?");
+        ButtonType resultAction = confirmReset
+          .showAndWait()
+          .orElse(ButtonType.CANCEL);
+        if (resultAction.getButtonData() == ButtonBar.ButtonData.YES) {
+          asyncSceneManager.applySceneChanges();
+        } else {
+          asyncSceneManager.discardSceneChanges();
+          refreshSettings();
         }
+        resetConfirmMutex.set(false);
       });
     }
   }
