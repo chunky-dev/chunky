@@ -17,10 +17,7 @@
 package se.llbit.chunky.ui;
 
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.layout.Region;
-import se.llbit.fxutil.Dialogs;
+import se.llbit.chunky.ui.dialogs.ChunkyErrorDialog;
 import se.llbit.log.Level;
 import se.llbit.log.Receiver;
 

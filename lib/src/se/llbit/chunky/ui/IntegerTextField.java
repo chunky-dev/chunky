@@ -7,5 +7,6 @@ public class IntegerTextField extends NumericTextField<IntegerProperty> {
 
   public IntegerTextField() {
     super(new SimpleIntegerProperty());
+    this.getConverter().setParseIntegerOnly(true);
   }
 }

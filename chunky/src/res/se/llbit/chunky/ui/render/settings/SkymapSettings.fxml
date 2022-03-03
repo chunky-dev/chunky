@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import se.llbit.chunky.ui.DoubleAdjuster?>
+
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="10.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+  <Button fx:id="loadSkymap" mnemonicParsing="false" text="Load skymap" />
+  <HBox fx:id="panoSpecific" alignment="CENTER_LEFT" spacing="10.0">
+    <Label text="Vertical resolution:" />
+    <ToggleButton fx:id="v90" mnemonicParsing="false" selected="true" text="Half (mirrored)">
+      <toggleGroup>
+        <ToggleGroup fx:id="verticalResolution" />
+      </toggleGroup>
+    </ToggleButton>
+    <ToggleButton fx:id="v180" mnemonicParsing="false" text="Full" toggleGroup="$verticalResolution" />
+  </HBox>
+  <DoubleAdjuster fx:id="skymapRotation" />
+</fx:root>

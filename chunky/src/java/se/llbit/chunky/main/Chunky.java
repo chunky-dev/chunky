@@ -37,7 +37,7 @@ import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.ChunkyFx;
-import se.llbit.chunky.ui.CreditsController;
+import se.llbit.chunky.ui.controller.CreditsController;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.chunky.world.MaterialStore;
 import se.llbit.json.JsonArray;

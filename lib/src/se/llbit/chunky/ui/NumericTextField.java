@@ -1,7 +1,7 @@
 package se.llbit.chunky.ui;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.control.TextField;
 
 /**
@@ -13,20 +13,21 @@ import javafx.scene.control.TextField;
 public class NumericTextField<T extends Property<Number>> extends TextField {
 
   private final T value;
-  private final SilentNumberStringConverter converter;
+  protected ValidatingNumberStringConverter converter = new ValidatingNumberStringConverter();
 
   public NumericTextField(T value) {
     this.value = value;
     getStyleClass().add("numeric-text-field");
-    converter = new SilentNumberStringConverter(
-        (observable, oldValue, newVaue) -> {
-          if (!newVaue) {
-            getStyleClass().add("invalid");
-          } else {
-            getStyleClass().remove("invalid");
-          }
-        });
     textProperty().bindBidirectional(value, converter);
+    validProperty().addListener(observable -> updateStyleClasses());
+  }
+
+  private void updateStyleClasses() {
+    if (isValid()) {
+      getStyleClass().remove("invalid");
+    } else {
+      getStyleClass().add("invalid");
+    }
   }
 
   /**
@@ -36,10 +37,22 @@ public class NumericTextField<T extends Property<Number>> extends TextField {
     return value;
   }
 
+  public ValidatingNumberStringConverter getConverter() {
+    return converter;
+  }
+
   /**
    * @return A property that indicates whether the value is a correct number
    */
-  public BooleanProperty validProperty() {
+  public ReadOnlyBooleanProperty validProperty() {
     return converter.validProperty();
+  }
+
+  public boolean isValid() {
+    return validProperty().get();
+  }
+
+  public void triggerRefresh() {
+    textProperty().set(converter.toString(value.getValue()));
   }
 }

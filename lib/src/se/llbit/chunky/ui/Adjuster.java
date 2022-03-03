@@ -56,7 +56,6 @@ public abstract class Adjuster<T extends Number> extends HBox {
     return name.get();
   }
 
-  // TODO: not used - should be removed?
   public StringProperty nameProperty() {
     return name;
   }
