@@ -92,6 +92,7 @@ import se.llbit.chunky.ui.DoubleTextField;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.ui.RenderCanvasFx;
+import se.llbit.chunky.ui.dialogs.DialogUtils;
 import se.llbit.chunky.ui.dialogs.ResourceLoadOrderEditor;
 import se.llbit.chunky.ui.dialogs.SceneChooser;
 import se.llbit.chunky.ui.UILogReceiver;
@@ -872,6 +873,8 @@ public class ChunkyFxController
           ButtonType.CANCEL
         );
         confirmReset.setTitle("Reset render to apply setting changes?");
+        DialogUtils.setupDialogDesign(confirmReset, mapCanvas.getScene());
+
         ButtonType resultAction = confirmReset
           .showAndWait()
           .orElse(ButtonType.CANCEL);
