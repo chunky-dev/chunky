@@ -1,7 +1,7 @@
 package se.llbit.chunky.ui;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.control.TextField;
 
 /**
@@ -44,16 +44,12 @@ public class NumericTextField<T extends Property<Number>> extends TextField {
   /**
    * @return A property that indicates whether the value is a correct number
    */
-  public BooleanProperty validProperty() {
-    return getConverter().validProperty();
+  public ReadOnlyBooleanProperty validProperty() {
+    return converter.validProperty();
   }
 
   public boolean isValid() {
     return validProperty().get();
-  }
-
-  public void setValid(boolean valid) {
-    validProperty().set(valid);
   }
 
   public void triggerRefresh() {
