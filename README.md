@@ -141,10 +141,23 @@ rendering tips are available at the [Chunky Documentation page][chunky-dev]. For
 
 ## Hacking on Chunky
 
-To build Chunky, run the `gradlew` script in the project root directory: `./gradlew jar`
+It is recommended to use [IntelliJ](https://www.jetbrains.com/idea/).
+Install the Java17 JDK ([Temurin](https://adoptium.net/) is the recomended distribution).
+Then, [clone](https://www.jetbrains.com/help/idea/set-up-a-git-repository.html#clone-repo) the Chunky
+repository and let IntelliJ index the project. Navigate to `chunky/src/java/se/llbit/chunky/main/Chunky.java` and 
+click on the green play button next to `public class Chunky {` to build and run Chunky.
 
-This just builds the core libraries. Building an installable file takes
-a bit more work; [refer to this repository][chunky-releasetools].
+To build Chunky externally, run the `gradlew` script in the project root directory. Gradle is setup with a few
+main tasks:
+* `build` - Build Chunky, documentation, and run tests.
+* `release` - Build and save files ready for a release to a Chunky update site. Outputs to `build/release`
+* `buildReleaseJar` - Build an installer JAR. Outputs to `build/installer`
+* `docs` - Build the documentation. Outputs to `build/docs`
+* `install` - Create a publishable maven repository for Chunky core. Outputs to `build/maven`
+* `clean` - Cleans the project. Removes old builds.
+
+A custom version can be specified with `-PnewVersion="<version>"`. A custom prerelease tag can be specified with
+`-PprereleaseTag="<tag>"`. The default version is in the format: `{major}.{minor}.{patch}-{tag (DEV)}.{commits since last tag}.g{git hash of commit}`
 
 Chunky is split into four subprojects:
 
@@ -175,9 +188,6 @@ the GPLv3 license. See the file `LICENSE` for the full license.
 
 Chunky uses the following 3rd party libraries:
 
-* **Markdown by John Gruber.**
-  Markdown is covered by the Modified BSD License.
-See the file `licenses/Markdown.txt` for the full license and copyright notice.
 * **Apache Commons Math library by the Apache Software Foundation.**
   The library is covered by the Apache License, version 2.0.
 See the file `licenses/Apache-2.0.txt` for the full license text.

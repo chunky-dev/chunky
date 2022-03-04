@@ -1,3 +1,7 @@
 sourceSets.main.java {
-  srcDir 'src'
+    srcDir 'src'
+}
+
+configurations {
+    implementation.extendsFrom configurations.jsonlib
 }

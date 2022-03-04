@@ -1,198 +1,198 @@
 project.version = getVersion()
-
 println "Building version ${project.version}"
-if (project.version =~ /\d+\.\d+(\.\d+)?-.+/) {
-  // This is a SNAPSHOT build.
-  println 'Building snapshot version.'
-}
 
 allprojects {
-  repositories {
-    mavenCentral()
-    mavenLocal()
-  }
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
 }
 
-apply plugin: 'idea'
+buildscript {
+    repositories {
+        maven {
+            setUrl("https://plugins.gradle.org/m2/")
+        }
+    }
+    dependencies {
+        classpath 'org.openjfx:javafx-plugin:0.0.10'
+    }
+}
 
 subprojects {
+    apply plugin: 'java'
+    apply plugin: 'jacoco'
+    apply plugin: 'org.openjfx.javafxplugin'
 
-  apply plugin: 'java'
-  apply plugin: 'jacoco'
+    group = 'se.llbit'
+    version = rootProject.version
 
-  group = 'se.llbit'
-  version = rootProject.version
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
 
-  javadoc {
-    options.encoding = 'UTF-8'
-    options.addStringOption('Xdoclint:none', '-quiet')
-  }
+    compileJava.options.encoding = 'UTF-8'
+    compileJava.options.debug = true
 
-  sourceCompatibility = targetCompatibility = '1.8'
-
-  compileJava.options.encoding = 'UTF-8'
-  compileJava.options.debug = true
-
-  configurations {
-    jsonlib
-    nbtlib
-    cplib
-    toolpanelib
-  }
-
-  dependencies {
-    compile configurations.jsonlib
-    jsonlib 'se.llbit:jo-json:1.3.1'
-    nbtlib 'se.llbit:jo-nbt:1.3.0'
-    cplib 'se.llbit:luxcp:1.0.1'
-    toolpanelib 'se.llbit:toolpane:0.1'
-  }
-
-  // Code coverage with Jacoco:
-  jacocoTestReport {
-    reports {
-      xml.enabled = true
-      html.enabled = true
+    javafx {
+        version = '11'
+        modules = ['javafx.base', 'javafx.controls', 'javafx.fxml']
+        configuration = 'implementation'
     }
-  }
 
-  check.dependsOn jacocoTestReport
+    javadoc {
+        options.encoding = 'UTF-8'
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+
+    configurations {
+        jsonlib
+        nbtlib
+        cplib
+        toolpanelib
+    }
+
+    dependencies {
+        jsonlib 'se.llbit:jo-json:1.3.1'
+        nbtlib 'se.llbit:jo-nbt:1.3.0'
+        cplib 'se.llbit:luxcp:1.0.1'
+        toolpanelib 'se.llbit:toolpane:0.1'
+    }
 }
 
-defaultTasks 'releaseJar'
+defaultTasks 'release'
 
-task tarball(type: Exec) {
-  // TODO(jesper): Prepend cmd /c on Windows?
-  commandLine "git archive --prefix=\"chunky-${project.version}\" -o build/chunky-${project.version}.tar.gz master".split(' ')
-  doFirst {
-    file('build').mkdir()
-  }
-}
-
-task release {
+task releaseVersion {
   doLast {
-    tryCommand([ 'git', 'commit', '-m', "Release ${project.version}", 'chunky/src/res/se/llbit/chunky/main/Version.properties' ], true)
     tryCommand([ 'git', 'tag', '-a', "${project.version}", '-m', "Version ${project.version}" ], true)
   }
 }
 
 task versionInfo(type: JavaExec) {
-  dependsOn 'copyArtifacts'
+    dependsOn 'copyArtifacts'
+    outputs.upToDateWhen { false }
 
-  outputs.files file("build/chunky-${project.version}.jar")
-  description 'Writes build/chunky-VERSION.jar, latest.json and updates chunky-core-VERSION.jar/version.json'
-  classpath = project(':releasetools').sourceSets.main.runtimeClasspath
-  main = 'releasetools.ReleaseBuilder'
-  args "${project.version}", "release_notes-${project.version}.txt"
+    outputs.files file("build/chunky-${project.version}.jar")
+    description 'Writes build/chunky-VERSION.jar, latest.json and updates chunky-core-VERSION.jar/version.json'
+    classpath = project(':releasetools').sourceSets.main.runtimeClasspath
+    mainClass.set('releasetools.ReleaseBuilder')
+    args "${project.version}", "release_notes-${project.version}.txt"
 }
 
-task releaseJar(type: Jar) {
-  dependsOn 'versionInfo'
+task release {
+    dependsOn 'buildReleaseJar', 'versionInfo'
 
-  archiveName = "chunky-${project.version}.jar"
-  destinationDir = file('build')
-  manifest {
-    attributes('Main-Class': 'se.llbit.chunky.launcher.ChunkyLauncher')
-  }
+    def destinationDirectory = file("${buildDir}/release")
 
-  into('') {
-    from file('latest.json')
-    rename { 'version.json' }
-  }
-
-  into('lib') {
-    from fileTree('chunky/lib').include('*.jar')
-    from file("build/chunky-core-${project.version}.jar")
-  }
-
-  from { project(':launcher').configurations.runtime.allArtifacts.files.collect { zipTree(it) } }
+    doLast {
+        project.delete(destinationDirectory)
+        destinationDirectory.mkdirs()
+        file("./latest.json").renameTo("${destinationDirectory}/latest.json")
+        fileTree(buildDir).matching {
+            include "*-${project.version}.*"
+        }.each {
+            it.renameTo("${destinationDirectory}/${it.name}")
+        }
+    }
 }
 
-task releaseZip(type: Zip) {
-  dependsOn 'copyArtifacts'
+task buildReleaseJar(type: Jar) {
+    dependsOn 'versionInfo'
 
-  destinationDir = buildDir
-  archiveName = "Chunky-${project.version}.zip"
+    archiveFileName = "chunky-${project.version}.jar"
+    destinationDirectory = file('build/installer')
+    manifest {
+        attributes('Main-Class': 'se.llbit.chunky.launcher.ChunkyLauncher')
+    }
 
-  from(buildDir) {
-    include "chunky-${project.version}.jar"
-    include "ReadMe.html"
-    include "release_notes-${project.version}.txt"
-  }
-  from(projectDir) {
-    include 'license/*'
-  }
-  rename("release_notes-${project.version}.jar", 'chunky.jar')
-}
+    into('lib') {
+        from fileTree('chunky/lib').include('*.jar')
+        from file("build/chunky-core-${project.version}.jar")
+    }
 
-task documentation {
-  inputs.files 'README.md'
-  outputs.files 'build/ReadMe.html'
+    from {
+        project(':launcher').configurations.archives.allArtifacts.files.collect {
+            zipTree(it)
+        }
+    }
 
-  doLast {
-    def readme = tryCommand([ 'perl', file('tools/Markdown.pl').path, file('README.md').path ], true)
-    file('build/ReadMe.html').write(readme)
-  }
+    from file("./latest.json")
+    rename "latest.json", "version.json"
 }
 
 task copyArtifacts(type: Copy) {
-  dependsOn subprojects.jar
-  from subprojects.jar
-  into buildDir
+    dependsOn subprojects.jar
+    from subprojects.jar
+    into buildDir
 }
 
 /** Helper function to run a command. Returns the command output if the command succeeded. */
 def tryCommand(def command, boolean failOnError = false) {
-  def out = new StringBuilder()
-  def err = new StringBuilder()
-  try {
-    def proc = command.execute()
-    proc.waitForProcessOutput(out, err)
-    if (proc.exitValue()) {
-      def msg = "failed to run '${command[0]}' (args: ${command.tail()})\n$err$out"
-      if (failOnError) {
-        throw new GradleException(msg)
-      } else {
-        print 'Warning: '
-        println msg
-      }
-      ""
-    } else {
-      if (err) println "${err}"
-      out.toString()
+    def out = new StringBuilder()
+    def err = new StringBuilder()
+    try {
+        def proc = command.execute()
+        proc.waitForProcessOutput(out, err)
+        if (proc.exitValue()) {
+            def msg = "failed to run '${command[0]}' (args: ${command.tail()})\n$err$out"
+            if (failOnError) {
+                throw new GradleException(msg)
+            } else {
+                print 'Warning: '
+                println msg
+            }
+            ""
+        } else {
+            if (err) println "${err}"
+            out.toString()
+        }
+    } catch (IOException e) {
+        println "failed to run ${command[0]} (args: ${command.tail()}): $e"
+        ""
     }
-  } catch (IOException e) {
-    println "failed to run ${command[0]} (args: ${command.tail()}): $e"
-    ""
-  }
 }
 
 /** Helper function to retrieve the current version string. */
 def getVersion() {
-  if (hasProperty('newVersion')) {
-    // A new version string should be saved.
-    def date = new Date()
-    Properties version = new Properties()
-    version['version'] = newVersion
-    version.store(file('chunky/src/res/se/llbit/chunky/main/Version.properties').newWriter(), null)
-    return newVersion
-  } else {
-    def output = tryCommand(['git', 'describe'])
-    if (output) {
-      // Use Git describe output.
-      output.readLines()[0]
-    } else {
-      // Git command failed. Read the previous version string instead.
-      Properties version = new Properties()
-      version.load(new FileInputStream(file('chunky/src/res/se/llbit/chunky/main/Version.properties')))
-      version['version']
+    if (project.hasProperty('newVersion')) {
+        // Manual version override
+        return project.newVersion
     }
-  }
+
+    // Prerelease version based on stored version and git history
+    def prerelease = "DEV"
+    if (project.hasProperty('prereleaseTag')) {
+        prerelease = project.prereleaseTag
+    }
+
+    // Get the stored major version
+    Properties versionProperties = new Properties()
+    versionProperties.load(new FileInputStream(file('chunky/src/res/se/llbit/chunky/main/Version.properties')))
+    def majorVersion = versionProperties['version']
+
+    def preVersion = "0";
+    // Attempt to get Git describe output
+    def gitDescribe = tryCommand(['git', 'describe', '--abbrev=7', '--long'])
+    if (gitDescribe) {
+        def gitMatcher = gitDescribe =~ /^.*?-(\d*)-(g.*)/
+        gitMatcher.find()
+        if (gitMatcher.groupCount() >= 2) {
+            preVersion = gitMatcher.group(1) + "." + gitMatcher.group(2)
+        }
+    }
+
+    return majorVersion + "-" + prerelease + "." + preVersion
 }
 
-task install(dependsOn: ':chunky:install')
+task install(dependsOn: ':chunky:publish') {
+    doLast {
+        copy {
+            from file("${project(':chunky').buildDir}/maven/")
+            into file("${buildDir}/maven/")
+        }
 
-task uploadArchives(dependsOn: ':chunky:uploadArchives')
+        project.delete(file("${project(':chunky').buildDir}/maven/"))
+    }
+}
 
 // Includes both main and library documentation:
 task docs(type: Javadoc) {
@@ -203,4 +203,10 @@ task docs(type: Javadoc) {
     source docProjects.collect { project(it).sourceSets.main.allJava }
     classpath = files(docProjects.collect { project(it).sourceSets.main.compileClasspath })
     destinationDir = file("${buildDir}/docs/javadoc")
+}
+
+task clean {
+    doLast {
+        delete "./build"
+    }
 }
