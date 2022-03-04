@@ -19,7 +19,9 @@ dependencies {
 
 jar {
   // Include all dependencies in the Jar.
-  from project(':lib').sourceSets.main.java.srcDirs
+  from project(':lib').configurations.archives.allArtifacts.files.collect {
+      zipTree(it)
+  }
   from configurations.jsonlib.files.collect {
     zipTree(it)
   }
