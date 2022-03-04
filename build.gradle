@@ -114,6 +114,9 @@ task buildReleaseJar(type: Jar) {
             zipTree(it)
         }
     }
+
+    from file("./latest.json")
+    rename "latest.json", "version.json"
 }
 
 task copyArtifacts(type: Copy) {
