@@ -1,12 +1,12 @@
 configurations {
     bundled
+    implementation.extendsFrom configurations.bundled
+    implementation.extendsFrom configurations.jsonlib
 }
 
 dependencies {
     bundled 'com.vdurmont:semver4j:3.1.0'
 
-    implementation configurations.bundled
-    implementation configurations.jsonlib
     implementation project(':lib')
 }
 

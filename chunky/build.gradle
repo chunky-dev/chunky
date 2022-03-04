@@ -4,13 +4,16 @@ apply plugin: 'maven-publish'
 mainClassName = 'se.llbit.chunky.main.Chunky'
 archivesBaseName = 'chunky-core'
 
+configurations {
+  implementation.extendsFrom configurations.jsonlib
+  implementation.extendsFrom configurations.nbtlib
+  implementation.extendsFrom configurations.cplib
+  implementation.extendsFrom configurations.toolpanelib
+}
+
 dependencies {
   implementation 'it.unimi.dsi:fastutil:8.4.4'
   implementation 'org.apache.commons:commons-math3:3.2'
-  implementation configurations.jsonlib
-  implementation configurations.nbtlib
-  implementation configurations.cplib
-  implementation configurations.toolpanelib
   implementation project(':lib')
 
   testImplementation 'com.google.truth:truth:0.30'

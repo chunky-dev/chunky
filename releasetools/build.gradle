@@ -1,5 +1,8 @@
+configurations {
+    implementation.extendsFrom configurations.jsonlib
+}
+
 dependencies {
-    implementation configurations.jsonlib
     implementation project(':lib')
 }
 
