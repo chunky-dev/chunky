@@ -82,6 +82,7 @@ task updateVersionString {
     def versionFile = file('src/gen-res/Version.properties')
     ant.propertyfile(file: versionFile) {
       entry(key: 'version', value: project.version)
+      entry(key: 'gitSha', value: tryCommand(['git', 'rev-parse', 'HEAD']).trim())
     }
   }
 }

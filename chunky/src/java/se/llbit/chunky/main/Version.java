@@ -43,4 +43,9 @@ public class Version {
   public static String getVersion() {
     return properties.getProperty("version", "?-snapshot");
   }
+
+  /**
+   * @return Git commit sha
+   */
+  public static String getCommit() { return properties.getProperty("gitSha", "n/a"); }
 }
