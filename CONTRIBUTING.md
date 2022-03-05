@@ -75,7 +75,7 @@ In the bottom right of IntelliJ, there is a New Branch button, by default it wil
 
 ##### Make your change
 Some useful IntelliJ keybinds to help you navigate around:
- - `Ctrl-n`, Find a file (class) by name
+ - `Ctrl + N`, Find a file (class) by name
 
 ##### Commit your changes
 After making your changes, select the `Commit` button (looks like a green tick) in the top right
