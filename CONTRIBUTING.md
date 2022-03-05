@@ -82,7 +82,7 @@ After making your changes, select the `Commit` button (looks like a green tick) 
 Select all of the changes you want to make, and add a description of what you changed.
 
 ### Testing
-Prior to making a Pull Request please test your changes. Within IntelliJ you can run chunky\src\java\se.llbit\chunky\main\Chunky.java:line64 assuming you have got IntelliJ setup correctly. Chunky's gradlew is 7.3.3.
+Prior to making a Pull Request please test your changes. Within IntelliJ you can run chunky\src\java\se.llbit\chunky\main\Chunky.java:line64 assuming you have got IntelliJ setup correctly. At the time of writing, Chunky's gradlew version is 7.4.
 
 ### Pull Request
 
