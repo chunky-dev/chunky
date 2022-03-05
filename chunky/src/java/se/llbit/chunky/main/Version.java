@@ -34,6 +34,8 @@ public class Version {
           .getResourceAsStream("se/llbit/chunky/main/Version.properties"));
     } catch (IOException e) {
       throw new Error(e);
+    } catch (NullPointerException e) {
+      // ignore, this is probably a build from within an IDE
     }
   }
 
