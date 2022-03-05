@@ -85,10 +85,12 @@ task updateVersionString {
 
 task javadocJar(type: Jar) {
   from rootProject.docs
+  archiveClassifier.set('javadoc')
 }
 
 task sourcesJar(type: Jar) {
   from sourceSets.main.allSource
+  archiveClassifier.set('sources')
 }
 
 artifacts {
@@ -122,6 +124,8 @@ publishing {
                     }
                 }
             }
+            artifact sourcesJar
+            artifact javadocJar
         }
     }
 
