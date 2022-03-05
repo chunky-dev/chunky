@@ -100,7 +100,7 @@ public class CreditsController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    logoImage.setImage(new Image(getClass().getResourceAsStream("chunky.png")));
+    logoImage.setImage(new Image(getClass().getResourceAsStream("../chunky.png")));
 
     ghContributors.setBorder(Border.EMPTY);
     ghContributors.setOnAction(e -> launchAndReset(ghContributors, "https://github.com/chunky-dev/chunky/graphs/contributors"));
