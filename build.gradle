@@ -16,6 +16,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.openjfx:javafx-plugin:0.0.10'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.42.0'
     }
 }
 
@@ -23,6 +24,9 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'jacoco'
     apply plugin: 'org.openjfx.javafxplugin'
+
+    apply plugin: 'idea'
+    apply plugin: 'com.github.ben-manes.versions'
 
     group = 'se.llbit'
     version = rootProject.version
@@ -34,7 +38,7 @@ subprojects {
     compileJava.options.debug = true
 
     javafx {
-        version = '11'
+        version = '11.0.2'
         modules = ['javafx.base', 'javafx.controls', 'javafx.fxml']
         configuration = 'implementation'
     }
@@ -57,6 +61,28 @@ subprojects {
         cplib 'se.llbit:luxcp:1.0.1'
         toolpanelib 'se.llbit:toolpane:0.1'
     }
+
+    idea {
+        module {
+            downloadJavadoc = true
+            downloadSources = true
+        }
+    }
+
+    dependencyUpdates.gradleReleaseChannel = "current"
+
+    tasks.named("dependencyUpdates") {
+        def isNonStable = { String version ->
+            def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { keyword -> version.toUpperCase().contains(keyword) }
+            def regex = /^[0-9,.v-]+(-r)?$/
+            return !stableKeyword && !(version ==~ regex)
+        }
+
+        rejectVersionIf {
+            isNonStable(it.candidate.version)
+        }
+    }
+
 }
 
 defaultTasks 'release'
