@@ -55,31 +55,34 @@ with Github desktop: `Clone a repository` -> select `URL`, paste `https://github
 with CLI: `git clone git@github.com:GITHUB_USERNAME/chunky.git` or (outdated) `git clone https://github.com/GITHUB_USERNAME/chunky`
 
 ##### Open the Project
-From inside Intellij (if you cloned with intellij you can likely skip this step)
+From inside IntelliJ (if you cloned with intelliJ you can likely skip this step)
 - `File` -> `Open` -> Select the first `build.gradle` file within the cloned folder
 
-You may have to wait some time while intellij indexes the project, and imports it. (The little loading bar in the bottom right) 
+You may have to wait some time while intelliJ indexes the project, and imports it. (The little loading bar in the bottom right) 
 
 ##### Select the correct JDK version to use to build the project
-Oracle Java 8:
+Java 17 SDK (e.g. openjdk-17-jdk on Ubuntu):
 - `File` -> `Project Structure` -> `Project` (should be the default)
-  - If intellij detected your install: select the `SDK` dropdown, select the oracle 8 jdk install
-  - If not: click `Edit`, then the little `+` at the top, `Add JDK` and find your oracle 8 jdk install location (select the main jdk folder).
+  - If intelliJ detected your install: select the `SDK` dropdown, select a Java 17 JDK install
+  - If not: click `Edit`, then the little `+` at the top, `Add JDK` and find your Java 17 JDK install location (select the main jdk folder).
     - Go back to the `Project` tab, and select the newly added jdk.
 
 TODO: ADD INFO ABOUT NULLABLE AND NOTNULL ANNOTATIONS (adding them to compiler options)
 
 ##### Create a new branch for your change
-In the bottom right of Intellij, there is a fork button, by default it will say `master`, select it, at the top select `New Branch`, and name it after what you're intending to fix. (ideally something very short, no more than a few words). eg: `fix_scene_tab_typo` or `fix-scene-tab-typo`  is fine.
+In the bottom right of IntelliJ, there is a fork button, by default it will say `master`, select it, at the top select `New Branch`, and name it after what you're intending to fix. (ideally something very short, no more than a few words). eg: `fix_scene_tab_typo` or `fix-scene-tab-typo`  is fine.
  - Make sure the `Checkout branch` box is checked when creating a new branch (to actually change to it once it's created)
 
 ##### Make your change
-Some useful Intellij keybinds to help you navigate around:
+Some useful IntelliJ keybinds to help you navigate around:
  - `Ctrl-n`, Find a file (class) by name
 
 ##### Commit your changes
 After making your changes, select the `Commit` button (looks like a green tick) in the top right
 Select all of the changes you want to make, and add a description of what you changed.
+
+### Testing
+Prior to making a Pull Request please test your changes. Within IntelliJ you can run chunky\src\java\se.llbit\chunky\main\Chunky.java:line64 assuming you have got IntelliJ setup correctly. Chunky's gradlew is 7.3.3.
 
 ### Pull Request
 
