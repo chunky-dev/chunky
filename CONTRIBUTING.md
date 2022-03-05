@@ -39,14 +39,14 @@ Click on the pencil icon at the top right of any text file (code, markdown, etc.
 
 #### Make (more significant) changes locally
 
-Intellij Community Edition is recommended, get it [here](https://www.jetbrains.com/toolbox-app/)
- - You'll want to download JetBrains Toolbox, and download `Intellij IDEA Community Edition` from there
+IntelliJ Community Edition is recommended, get it [here](https://www.jetbrains.com/toolbox-app/)
+ - You'll want to download JetBrains Toolbox, and download `IntelliJ IDEA Community Edition` from there
 
 ##### Fork the project to your account
 Go to https://github.com/chunky-dev/chunky, click on `Fork` (usually in the top right)
 
 ##### Clone the project.
-with Intellij: `File` -> `New` -> `Project from Version Control`
+with IntelliJ: `File` -> `New` -> `Project from Version Control`
 - In the url put `https://github.com/GITHUB_USERNAME/chunky`
 - You can also select a location to clone to here.
 
