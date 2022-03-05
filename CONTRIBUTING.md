@@ -96,7 +96,7 @@ Once you submit your PR, a Docs team member will review your proposal. We may as
 
 Congratulations :tada::tada: The Chunky team thanks you :sparkles:. 
 
-Once your PR is merged, your contributions will be publicly available in the next development build of Chunky and eventually a stable release!
+Once your PR is merged, your contributions will be publicly available in the next Chunky snapshot and eventually ship in a stable release.
 
 # Attribution
 
