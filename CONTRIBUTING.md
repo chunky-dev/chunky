@@ -55,15 +55,15 @@ with Github desktop: `Clone a repository` -> select `URL`, paste `https://github
 with CLI: `git clone git@github.com:GITHUB_USERNAME/chunky.git` or (outdated) `git clone https://github.com/GITHUB_USERNAME/chunky`
 
 ##### Open the Project
-From inside IntelliJ (if you cloned with intelliJ you can likely skip this step)
+From inside IntelliJ (if you cloned with IntelliJ you can likely skip this step)
 - `File` -> `Open` -> Select the first `build.gradle` file within the cloned folder
 
-You may have to wait some time while intelliJ indexes the project, and imports it. (The little loading bar in the bottom right) 
+You may have to wait some time while IntelliJ indexes the project, and imports it. (The little loading bar in the bottom right) 
 
 ##### Select the correct JDK version to use to build the project
 Java 17 SDK (e.g. openjdk-17-jdk on Ubuntu):
 - `File` -> `Project Structure` -> `Project` (should be the default)
-  - If intelliJ detected your install: select the `SDK` dropdown, select a Java 17 JDK install
+  - If IntelliJ detected your install: select the `SDK` dropdown, select a Java 17 JDK install
   - If not: click `Edit`, then the little `+` at the top, `Add JDK` and find your Java 17 JDK install location (select the main jdk folder).
     - Go back to the `Project` tab, and select the newly added jdk.
 
