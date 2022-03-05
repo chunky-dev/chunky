@@ -6,7 +6,7 @@ Read our [Code of Conduct](CODE_OF_CONDUCT.md) to keep our community approachabl
 
 In this guide you will get an overview of the contribution workflow from opening an issue, creating a PR, reviewing, and merging the PR.
 
-When contributing to this repository, please consider discussing significant changes you wish to make via an issue or the [#tech](https://discord.com/channels/541221265512464394/545374333883777037) channel on our [Discord server][chunky-discord] prior to making a change. Correcting spelling or grammar mistakes, or fixing minor bugs are not considered significant. A full rewrite, adding new features, etc. Can be considered more significant changes.
+When contributing to this repository, please consider discussing significant changes you wish to make via an issue or the [#tech](https://discord.com/channels/541221265512464394/545374333883777037) channel on our [Discord server][chunky-discord] prior to making a change. Correcting spelling or grammar mistakes, or fixing minor bugs are not considered significant. A full rewrite, adding new features, etc. can be considered more significant changes.
 
 
 ## New contributor guide
