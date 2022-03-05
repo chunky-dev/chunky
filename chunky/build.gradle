@@ -40,6 +40,9 @@ jar {
   manifest {
     attributes('Main-Class': mainClassName)
   }
+  into('se/llbit/chunky/main') {
+    from file("src/gen-res/Version.properties")
+  }
 }
 
 sourceSets {
@@ -48,8 +51,8 @@ sourceSets {
       srcDir 'src/java'
     }
     resources {
-      srcDir 'src/gen-res'
       srcDir 'src/res'
+      exclude 'se/llbit/chunky/main/Version.properties'
     }
   }
   test {
