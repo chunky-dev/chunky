@@ -38,7 +38,7 @@ subprojects {
     compileJava.options.debug = true
 
     javafx {
-        version = '11'
+        version = '11.0.2'
         modules = ['javafx.base', 'javafx.controls', 'javafx.fxml']
         configuration = 'implementation'
     }
