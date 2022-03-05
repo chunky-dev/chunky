@@ -28,7 +28,7 @@ If you spot a problem with the docs, [search if an issue already exists](https:/
 
 #### Solve an issue
 
-Scan through our [existing issues](https://github.com/chunky-dev/chunky/issues) to find one that interests you. You can narrow down the search using `labels` as filters. As a general rule, we don’t assign issues to anyone. If you find an issue to work on, you are welcome to open a PR with a fix. However we would request that you double check what PRs are open and whether or not another contributor is working on an issue already.
+Scan through our [existing issues](https://github.com/chunky-dev/chunky/issues) to find one that interests you. You can narrow down the search using `labels` as filters. If you are not sure where to start we have labelled some issues as [good first issues](https://github.com/chunky-dev/chunky/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22). As a general rule, we don’t assign issues to anyone. If you find an issue to work on, you are welcome to open a PR with a fix. However we would request that you double check what PRs are open and whether or not another contributor is working on an issue already.
 
 ### Make Changes
 
@@ -70,7 +70,7 @@ Java 17 SDK (e.g. openjdk-17-jdk on Ubuntu):
 TODO: ADD INFO ABOUT NULLABLE AND NOTNULL ANNOTATIONS (adding them to compiler options)
 
 ##### Create a new branch for your change
-In the bottom right of IntelliJ, there is a fork button, by default it will say `master`, select it, at the top select `New Branch`, and name it after what you're intending to fix. (ideally something very short, no more than a few words). eg: `fix_scene_tab_typo` or `fix-scene-tab-typo`  is fine.
+In the bottom right of IntelliJ, there is a New Branch button, by default it will say `master`, select it, at the top select `New Branch`, and name it after what you're intending to fix. (ideally something very short, no more than a few words). eg: `fix_scene_tab_typo` or `fix-scene-tab-typo`  is fine.
  - Make sure the `Checkout branch` box is checked when creating a new branch (to actually change to it once it's created)
 
 ##### Make your change
