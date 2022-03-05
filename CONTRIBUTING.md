@@ -95,6 +95,8 @@ Once you submit your PR, a team member will review your proposal. We may ask que
 - As you update your PR and apply changes, mark each conversation as [resolved](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/commenting-on-a-pull-request#resolving-conversations).
 - If you run into any merge issues, checkout this [git tutorial](https://lab.github.com/githubtraining/managing-merge-conflicts) to help you resolve merge conflicts and other issues.
 
+If you get stuck at any point along your PR journey, do not hesitate to ask for help or opinions on Discord or in the PR's discussion. We appreciate your contribution and want it to be merged as much as you do. 😉 
+
 ### Your PR is merged!
 
 Congratulations :tada::tada: The Chunky team thanks you :sparkles:. 
