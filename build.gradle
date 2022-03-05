@@ -24,6 +24,8 @@ subprojects {
     apply plugin: 'jacoco'
     apply plugin: 'org.openjfx.javafxplugin'
 
+    apply plugin: 'idea'
+
     group = 'se.llbit'
     version = rootProject.version
 
@@ -56,6 +58,13 @@ subprojects {
         nbtlib 'se.llbit:jo-nbt:1.3.0'
         cplib 'se.llbit:luxcp:1.0.1'
         toolpanelib 'se.llbit:toolpane:0.1'
+    }
+
+    idea {
+        module {
+            downloadJavadoc = true
+            downloadSources = true
+        }
     }
 }
 
