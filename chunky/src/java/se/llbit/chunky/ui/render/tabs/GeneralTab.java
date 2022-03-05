@@ -325,7 +325,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     setDefaultYMax.setOnAction(e -> PersistentSettings.setYClipMax(yMax.get()));
 
     canvasSizeLabel.setGraphic(new ImageView(Icon.scale.fxImage()));
-    canvasSizeInput.addSizeChangeListener(this::updateCanvasSize);
+    canvasSizeInput.setSizeChangeListener(this::updateCanvasSize);
     for(Double scale : scaleButtonValues) {
       Button scaleButton = new Button("×" + scale.toString());
       scaleButton.setMnemonicParsing(false);
@@ -334,7 +334,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       scaleButtonArea.getChildren().add(scaleButton);
     }
     applySize.setTooltip(new Tooltip("Apply the new size to the render canvas."));
-    applySize.setOnAction(e -> canvasSizeInput.submitChanges());
+    applySize.setOnAction(e -> canvasSizeInput.applyChanges());
     makeDefaultSize.setTooltip(new Tooltip("Make the current canvas size the default."));
     makeDefaultSize.setOnAction(e -> PersistentSettings
       .set3DCanvasSize(scene.canvasWidth(), scene.canvasHeight()));

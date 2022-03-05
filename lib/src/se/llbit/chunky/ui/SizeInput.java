@@ -21,6 +21,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.StringProperty;
@@ -44,8 +45,8 @@ import java.util.function.BiConsumer;
  */
 public class SizeInput extends GridPane {
   protected final IntegerProperty
-    currentWidthProperty = new SimpleIntegerProperty(this, "currentWidth", 400),
-    currentHeightProperty = new SimpleIntegerProperty(this, "currentHeight", 400);
+    currentWidthProperty = new SimpleIntegerProperty(this, "currentWidth"),
+    currentHeightProperty = new SimpleIntegerProperty(this, "currentHeight");
 
   protected final Label
     widthLabel = new Label("Width:"),
@@ -62,13 +63,22 @@ public class SizeInput extends GridPane {
   protected final Node aspectRatioDetailsNode;
   protected final BooleanProperty showAspectRatioDetailsProperty = new SimpleBooleanProperty(this, "showAspectRatioDetails", false);
 
-  public SizeInput() {
-    this(false);
+  public SizeInput(
+    @NamedArg("initialWidth") int initialWidth,
+    @NamedArg("initialHeight")  int initialHeight
+  ) {
+    this(initialWidth, initialHeight, false);
   }
-  public SizeInput(@NamedArg("showAspectRatioDetails") boolean showAspectRatioDetails) {
+  public SizeInput(
+    @NamedArg("initialWidth") int initialWidth,
+    @NamedArg("initialHeight")  int initialHeight,
+    @NamedArg("showAspectRatioDetails") boolean showAspectRatioDetails
+  ) {
     super();
-    queuedWidthValueProperty().set(getWidthValue());
-    queuedHeightValueProperty().set(getHeightValue());
+    currentWidthProperty.set(initialWidth);
+    currentHeightProperty.set(initialHeight);
+    queuedWidthValueProperty().set(initialWidth);
+    queuedHeightValueProperty().set(initialHeight);
     widthInput.getConverter().setParseNonNegativeOnly(true);
     heightInput.getConverter().setParseNonNegativeOnly(true);
 
@@ -121,6 +131,7 @@ public class SizeInput extends GridPane {
     IntegerProperty otherAxisValueProperty,
     Number oldValue, Number newValue
   ) {
+    // lock stops recursive updates when the other locked axis gets updated
     if (listenerLockedByUpdate.get())
       return;
     if (!textField.isValid())
@@ -159,8 +170,9 @@ public class SizeInput extends GridPane {
       listenerLockedByUpdate.set(false);
     });
 
-    widthInput.setOnAction(event -> submitChanges());
-    heightInput.setOnAction(event -> submitChanges());
+    // submit listener (typically enter)
+    widthInput.setOnAction(event -> applyChanges());
+    heightInput.setOnAction(event -> applyChanges());
 
     showAspectRatioDetailsProperty().addListener((observable, oldValue, newValue) -> {
       if(newValue != oldValue) {
@@ -208,11 +220,11 @@ public class SizeInput extends GridPane {
     return details;
   }
 
-  public IntegerProperty widthValueProperty() {
+  public ReadOnlyIntegerProperty widthValueProperty() {
     return currentWidthProperty;
   }
 
-  public IntegerProperty heightValueProperty() {
+  public ReadOnlyIntegerProperty heightValueProperty() {
     return currentHeightProperty;
   }
 
@@ -240,38 +252,63 @@ public class SizeInput extends GridPane {
     return showAspectRatioDetailsProperty;
   }
 
+  public void showAspectRatioDetails(boolean show) {
+    showAspectRatioDetailsProperty.set(show);
+  }
+
   public boolean isRatioLocked() {
     return ratioLockedProperty().get();
   }
 
+  /**
+   * @return currently set width
+   * - may not be the same as the value in the input field (see {@link #getQueuedWidthValue()})
+   */
   public int getWidthValue() {
     return widthValueProperty().get();
   }
 
+  /**
+   * @return currently set height
+   * - may not be the same as the value in the input field (see {@link #getQueuedHeightValue()})
+   */
   public int getHeightValue() {
     return heightValueProperty().get();
   }
 
+  /**
+   * @return current width from the input field
+   * - may be applied to {@link #getWidthValue()} by calling {@link #applyChanges()}
+   */
   public int getQueuedWidthValue() {
     return queuedWidthValueProperty().get();
   }
 
+  /**
+   * @return current height from the input field
+   * - may be applied to {@link #getHeightValue()} by calling {@link #applyChanges()}
+   */
   public int getQueuedHeightValue() {
     return queuedHeightValueProperty().get();
   }
 
   /**
+   * Sets and applies the size.
    * @param width > 0
    * @param height > 0
    */
   public void setSize(int width, int height) {
     if(width < 1 || height < 1)
       throw new IllegalArgumentException("Size must be positive (w,h > 0)");
-    widthValueProperty().set(width);
-    heightValueProperty().set(height);
-    submitChanges();
+    currentWidthProperty.set(width);
+    currentHeightProperty.set(height);
+    applyChanges();
   }
 
+  /**
+   * Scales both axis by scale and applies the new values as the size.
+   * @param scale scale factor
+   */
   public void scaleSize(double scale) {
     setSize(
       scaleAxis(getWidthValue(), scale),
@@ -282,19 +319,18 @@ public class SizeInput extends GridPane {
   /**
    * Submits queued changes to the size change listener.
    */
-  public void submitChanges() {
-    if(widthInput.isValid()) widthValueProperty().set(getQueuedWidthValue());
-    if(heightInput.isValid()) heightValueProperty().set(getQueuedHeightValue());
+  public void applyChanges() {
+    if(widthInput.isValid()) currentWidthProperty.set(getQueuedWidthValue());
+    if(heightInput.isValid()) currentHeightProperty.set(getQueuedHeightValue());
     sizeChangedCallback.accept(getWidthValue(), getHeightValue());
     changeQueuedProperty.set(false);
   }
 
   /**
    * Updates the current size change listener.
-   *
    * @param onChangeCallback if null remove current listener, otherwise add/replace current listener
    */
-  public void addSizeChangeListener(BiConsumer<Integer, Integer> onChangeCallback) {
+  public void setSizeChangeListener(BiConsumer<Integer, Integer> onChangeCallback) {
     sizeChangedCallback = onChangeCallback;
   }
 }

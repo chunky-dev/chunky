@@ -98,10 +98,12 @@ Hyperlink:hover {
 
     -fx-scale-y: 1.50;
     -fx-background-color: #999;
+    /* Open chains icon released under CC0 for Chunky */
     -fx-shape: "M-2-16c-1 0-2 1-2 2l0 8c0 1 1 2 2 2l4 0c1 0 2-1 2-2l0-8c0-1-1-2-2-2zm3 2c1 0 1 1 1 1l0 6c0 1-1 1-1 1l-2 0c-1 0-1-1-1-1l0-6c0-1 1-1 1-1zM-2 4c-1 0-2 1-2 2l0 8c0 1 1 2 2 2l4 0c1 0 2-1 2-2l0-8c0-1-1-2-2-2zm3 2c1 0 1 1 1 1l0 6c0 1-1 1-1 1l-2 0c-1 0-1-1-1-1l0-6c0-1 1-1 1-1zM-1-3l2 1 0-5c0-1-1-1-1-1-1 0-1 1-1 1zM-1 2l0 5c0 1 1 1 1 1 1 0 1-1 1-1l0-4z";
 }
 .lock-toggle:selected > .box > .mark {
     -fx-scale-y: 1.27;
     -fx-background-color: white;
+    /* Closed chains icon released under CC0 for Chunky */
     -fx-shape: "M-2-14c-1 0-2 1-2 2l0 8c0 1 1 2 2 2l4 0c1 0 2-1 2-2l0-8c0-1-1-2-2-2zm3 2c1 0 1 1 1 1l0 6c0 1-1 1-1 1l-2 0c-1 0-1-1-1-1l0-6c0-1 1-1 1-1zM-2 2c-1 0-2 1-2 2l0 8c0 1 1 2 2 2l4 0c1 0 2-1 2-2l0-8c0-1-1-2-2-2zm3 2c1 0 1 1 1 1l0 6c0 1-1 1-1 1l-2 0c-1 0-1-1-1-1l0-6c0-1 1-1 1-1zM-1 5c0 1 1 1 1 1 1 0 1-1 1-1l0-10c0-1-1-1-1-1-1 0-1 1-1 1z";
 }

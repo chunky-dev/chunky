@@ -24,7 +24,7 @@
         <padding>
           <Insets left="8"/>
         </padding>
-        <SizeInput fx:id="canvasSizeInput" showAspectRatioDetails="true"/>
+        <SizeInput fx:id="canvasSizeInput" initialWidth="400" initialHeight="400" showAspectRatioDetails="true"/>
         <VBox spacing="4">
           <HBox spacing="4">
             <Button fx:id="applySize" mnemonicParsing="false" text="Apply"/>
