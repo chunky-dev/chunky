@@ -203,7 +203,7 @@ public class SizeInput extends GridPane {
           () -> (int) Math.ceil((double) getWidthValue() / gdc.get()),
           gdc, widthValueProperty()
         ),
-        " : ",
+        " ∶ ",
         Bindings.createIntegerBinding(
           () -> (int) Math.ceil((double) getHeightValue() / gdc.get()),
           gdc, heightValueProperty()
