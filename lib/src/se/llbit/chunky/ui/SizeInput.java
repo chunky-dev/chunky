@@ -79,8 +79,8 @@ public class SizeInput extends GridPane {
     currentHeightProperty.set(initialHeight);
     queuedWidthValueProperty().set(initialWidth);
     queuedHeightValueProperty().set(initialHeight);
-    widthInput.getConverter().setParseNonNegativeOnly(true);
-    heightInput.getConverter().setParseNonNegativeOnly(true);
+    widthInput.getConverter().setRange(ValidatingNumberStringConverter.AllowedRange.POSITIVE);
+    heightInput.getConverter().setRange(ValidatingNumberStringConverter.AllowedRange.POSITIVE);
 
     setHgap(4);
     setVgap(4);

@@ -18,7 +18,23 @@ public class NumericTextField<T extends Property<Number>> extends TextField {
   public NumericTextField(T value) {
     this.value = value;
     getStyleClass().add("numeric-text-field");
-    textProperty().bindBidirectional(value, converter);
+
+    // this is intentional, because otherwise input which changes decimal groupings crashes the event handler
+    // e.g. backspace in these states: 1,0|00 or 1,00|0 or 1,000|
+    // cause is that backspace wants to replace parts of the text which then get changed by the number converter
+    // so that the caret is outside of text edit bounds (?)
+    // TODO: fixme
+    converter.getDecimalFormat().setGroupingUsed(false);
+
+    value.addListener(observable -> {
+      textProperty().set(converter.toString(value.getValue()));
+    });
+    textProperty().addListener(observable -> {
+      Number result = converter.fromString(textProperty().get());
+      if(result != null && isValid()) {
+        value.setValue(result);
+      }
+    });
     validProperty().addListener(observable -> updateStyleClasses());
   }
 
