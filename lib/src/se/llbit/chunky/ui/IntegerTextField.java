@@ -14,4 +14,8 @@ public class IntegerTextField extends NumericTextField<IntegerProperty> {
     getConverter().setParseIntegerOnly(true);
     triggerRefresh();
   }
+
+  public int getValue() {
+    return valueProperty().get();
+  }
 }

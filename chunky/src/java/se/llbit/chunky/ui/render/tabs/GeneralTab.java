@@ -325,7 +325,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     setDefaultYMax.setOnAction(e -> PersistentSettings.setYClipMax(yMax.get()));
 
     canvasSizeLabel.setGraphic(new ImageView(Icon.scale.fxImage()));
-    canvasSizeInput.setSizeChangeListener(this::updateCanvasSize);
+    canvasSizeInput.getSize().addListener(this::updateCanvasSize);
     for(Double scale : scaleButtonValues) {
       Button scaleButton = new Button("×" + scale.toString());
       scaleButton.setMnemonicParsing(false);

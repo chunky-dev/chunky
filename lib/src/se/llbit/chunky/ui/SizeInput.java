@@ -18,12 +18,10 @@ package se.llbit.chunky.ui;
 
 import javafx.beans.NamedArg;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -34,30 +32,28 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.SVGPath;
+import se.llbit.math.ObservableSize2D;
 import se.llbit.math.QuickMath;
+import se.llbit.math.WritableSize2D;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiConsumer;
 
 /**
  * An input UI element for integer width and integer height.
  * Supports ratio locking and queues the changes for submission via size changes listener.
  */
 public class SizeInput extends GridPane {
-  protected final IntegerProperty
-    currentWidthProperty = new SimpleIntegerProperty(this, "currentWidth"),
-    currentHeightProperty = new SimpleIntegerProperty(this, "currentHeight");
+  protected final WritableSize2D currentSize, queuedSize;
 
   protected final Label
     widthLabel = new Label("Width:"),
     heightLabel = new Label("Height:");
-  protected final IntegerTextField
-    widthInput = new IntegerTextField(),
-    heightInput = new IntegerTextField();
+  protected final IntegerTextField widthInput, heightInput;
   protected final CheckBox ratioLockCheckBox = new CheckBox();
   protected final Label unitLabel = new Label("px");
 
-  protected BiConsumer<Integer, Integer> sizeChangedCallback = null;
+  // TODO: represent this state in the UI
   protected final BooleanProperty changeQueuedProperty = new SimpleBooleanProperty(this, "changeQueued", false);
 
   protected final Node aspectRatioDetailsNode;
@@ -65,21 +61,22 @@ public class SizeInput extends GridPane {
 
   public SizeInput(
     @NamedArg("initialWidth") int initialWidth,
-    @NamedArg("initialHeight")  int initialHeight
+    @NamedArg("initialHeight") int initialHeight
   ) {
     this(initialWidth, initialHeight, false);
   }
+
   public SizeInput(
     @NamedArg("initialWidth") int initialWidth,
-    @NamedArg("initialHeight")  int initialHeight,
+    @NamedArg("initialHeight") int initialHeight,
     @NamedArg("showAspectRatioDetails") boolean showAspectRatioDetails
   ) {
     super();
-    currentWidthProperty.set(initialWidth);
-    currentHeightProperty.set(initialHeight);
-    queuedWidthValueProperty().set(initialWidth);
-    queuedHeightValueProperty().set(initialHeight);
+    currentSize = new WritableSize2D(initialWidth, initialHeight);
+    queuedSize = new WritableSize2D(initialWidth, initialHeight);
+    widthInput = new IntegerTextField(initialWidth);
     widthInput.getConverter().setRange(ValidatingNumberStringConverter.AllowedRange.POSITIVE);
+    heightInput = new IntegerTextField(initialHeight);
     heightInput.getConverter().setRange(ValidatingNumberStringConverter.AllowedRange.POSITIVE);
 
     setHgap(4);
@@ -100,6 +97,24 @@ public class SizeInput extends GridPane {
     showAspectRatioDetailsProperty.set(showAspectRatioDetails);
   }
 
+  private void updateQueuedWidth(int width) {
+    if (isRatioLocked()) {
+      double matchingHeight = (double) width * currentSize.getHeight() / currentSize.getWidth();
+      queuedSize.set(width, (int) Math.ceil(matchingHeight));
+    } else {
+      queuedSize.setWidth(width);
+    }
+  }
+
+  private void updateQueuedHeight(int height) {
+    if (isRatioLocked()) {
+      double matchingWidth = (double) height * currentSize.getWidth() / currentSize.getHeight();
+      queuedSize.set((int) Math.ceil(matchingWidth), height);
+    } else {
+      queuedSize.setHeight(height);
+    }
+  }
+
   private Node buildRatioLock() {
     ratioLockCheckBox.getStyleClass().add("lock-toggle");
 
@@ -115,59 +130,34 @@ public class SizeInput extends GridPane {
       ratioLockedProperty()
     ));
     ratioLockCheckBox.setTooltip(ratioLockTooltip);
+    SVGPath icon = new SVGPath();
+    ratioLockCheckBox.setGraphic(icon);
 
     VBox ratioLockArea = new VBox(-7, new Label("⌝ "), ratioLockCheckBox, new Label("⌟ "));
     ratioLockArea.setAlignment(Pos.CENTER);
     return ratioLockArea;
   }
 
-  AtomicBoolean listenerLockedByUpdate = new AtomicBoolean(false);
-
-  private int scaleAxis(int currentValue, double factor) {
-    return Math.max(1, (int) Math.ceil(currentValue * factor));
-  }
-  private void handleAxisUpdate(
-    IntegerTextField textField,
-    IntegerProperty otherAxisValueProperty,
-    Number oldValue, Number newValue
-  ) {
-    // lock stops recursive updates when the other locked axis gets updated
-    if (listenerLockedByUpdate.get())
-      return;
-    if (!textField.isValid())
-      return;
-
-    if (isRatioLocked()) {
-      int otherAxisScaledValue;
-      if (oldValue.intValue() > 0) {
-        double ratio = newValue.doubleValue() / oldValue.doubleValue();
-        otherAxisScaledValue = scaleAxis(otherAxisValueProperty.get(), ratio);
-      } else {
-        otherAxisScaledValue = newValue.intValue();
-      }
-      listenerLockedByUpdate.set(true);
-      otherAxisValueProperty.set(otherAxisScaledValue);
-      listenerLockedByUpdate.set(false);
-    }
-
-    changeQueuedProperty.set(true);
-  }
-
   private void initListeners() {
-    queuedWidthValueProperty().addListener((observable, oldValue, newValue) ->
-      handleAxisUpdate(widthInput, queuedHeightValueProperty(), oldValue, newValue));
-    queuedHeightValueProperty().addListener((observable, oldValue, newValue) ->
-      handleAxisUpdate(heightInput, queuedWidthValueProperty(), oldValue, newValue));
 
-    widthValueProperty().addListener(observable -> {
-      listenerLockedByUpdate.set(true);
-      queuedWidthValueProperty().set(getWidthValue());
-      listenerLockedByUpdate.set(false);
+    AtomicBoolean updateInProgress = new AtomicBoolean(false);
+    widthInput.valueProperty().addListener(observable -> {
+      if (updateInProgress.compareAndSet(false, true)) {
+        updateQueuedWidth(widthInput.getValue());
+        changeQueuedProperty.set(true);
+        updateInProgress.set(false);
+      }
     });
-    heightValueProperty().addListener(observable -> {
-      listenerLockedByUpdate.set(true);
-      queuedHeightValueProperty().set(getHeightValue());
-      listenerLockedByUpdate.set(false);
+    heightInput.valueProperty().addListener(observable -> {
+      if (updateInProgress.compareAndSet(false, true)) {
+        updateQueuedHeight(heightInput.getValue());
+        changeQueuedProperty.set(true);
+        updateInProgress.set(false);
+      }
+    });
+    queuedSize.addListener((queuedWidth, queuedHeight) -> {
+      widthInput.valueProperty().set(queuedWidth);
+      heightInput.valueProperty().set(queuedHeight);
     });
 
     // submit listener (typically enter)
@@ -175,8 +165,8 @@ public class SizeInput extends GridPane {
     heightInput.setOnAction(event -> applyChanges());
 
     showAspectRatioDetailsProperty().addListener((observable, oldValue, newValue) -> {
-      if(newValue != oldValue) {
-        if(newValue) {
+      if (newValue != oldValue) {
+        if (newValue) {
           getChildren().add(aspectRatioDetailsNode);
         } else {
           getChildren().remove(aspectRatioDetailsNode);
@@ -191,49 +181,30 @@ public class SizeInput extends GridPane {
     details.setStyle("-fx-text-fill: #999; -fx-font-style: italic;");
     details.visibleProperty().bind(showAspectRatioDetailsProperty);
 
-    IntegerProperty gdc = new SimpleIntegerProperty(QuickMath.gcd(getWidthValue(), getHeightValue()));
+    IntegerBinding gdc = Bindings.createIntegerBinding(() -> QuickMath.gcd(
+      currentSize.getWidth(),
+      currentSize.getHeight()
+    ), currentSize);
 
     details.textProperty().bind(
       Bindings.concat(
-        widthValueProperty(), unitStringProperty(),
+        currentSize.getWidthBinding(), unitStringProperty(),
         " × ",
-        heightValueProperty(), unitStringProperty(),
+        currentSize.getHeightBinding(), unitStringProperty(),
         " (",
         Bindings.createIntegerBinding(
-          () -> (int) Math.ceil((double) getWidthValue() / gdc.get()),
-          gdc, widthValueProperty()
+          () -> (int) Math.ceil((double) currentSize.getWidth() / gdc.get()),
+          gdc
         ),
         " ∶ ",
         Bindings.createIntegerBinding(
-          () -> (int) Math.ceil((double) getHeightValue() / gdc.get()),
-          gdc, heightValueProperty()
+          () -> (int) Math.ceil((double) currentSize.getHeight() / gdc.get()),
+          gdc
         ),
         ")"
       )
     );
-    changeQueuedProperty().addListener((observable, oldValue, newValue) -> {
-      // size changes were committed
-      if(!newValue) {
-        gdc.set(QuickMath.gcd(getWidthValue(), getHeightValue()));
-      }
-    });
     return details;
-  }
-
-  public ReadOnlyIntegerProperty widthValueProperty() {
-    return currentWidthProperty;
-  }
-
-  public ReadOnlyIntegerProperty heightValueProperty() {
-    return currentHeightProperty;
-  }
-
-  public IntegerProperty queuedWidthValueProperty() {
-    return widthInput.valueProperty();
-  }
-
-  public IntegerProperty queuedHeightValueProperty() {
-    return heightInput.valueProperty();
   }
 
   public BooleanProperty ratioLockedProperty() {
@@ -261,76 +232,51 @@ public class SizeInput extends GridPane {
   }
 
   /**
-   * @return currently set width
-   * - may not be the same as the value in the input field (see {@link #getQueuedWidthValue()})
+   * @return currently set size
+   * - may not be the same as the value in the input field (see {@link #getQueuedSize()})
    */
-  public int getWidthValue() {
-    return widthValueProperty().get();
+  public ObservableSize2D getSize() {
+    return currentSize;
   }
 
   /**
-   * @return currently set height
-   * - may not be the same as the value in the input field (see {@link #getQueuedHeightValue()})
+   * @return current size from the input fields
+   * - may be applied to {@link #getSize()} by calling {@link #applyChanges()}
    */
-  public int getHeightValue() {
-    return heightValueProperty().get();
-  }
-
-  /**
-   * @return current width from the input field
-   * - may be applied to {@link #getWidthValue()} by calling {@link #applyChanges()}
-   */
-  public int getQueuedWidthValue() {
-    return queuedWidthValueProperty().get();
-  }
-
-  /**
-   * @return current height from the input field
-   * - may be applied to {@link #getHeightValue()} by calling {@link #applyChanges()}
-   */
-  public int getQueuedHeightValue() {
-    return queuedHeightValueProperty().get();
+  public ObservableSize2D getQueuedSize() {
+    return queuedSize;
   }
 
   /**
    * Sets and applies the size.
-   * @param width > 0
+   *
+   * @param width  > 0
    * @param height > 0
    */
   public void setSize(int width, int height) {
-    if(width < 1 || height < 1)
+    if (width < 1 || height < 1)
       throw new IllegalArgumentException("Size must be positive (w,h > 0)");
-    currentWidthProperty.set(width);
-    currentHeightProperty.set(height);
+    queuedSize.set(width, height);
     applyChanges();
   }
 
   /**
    * Scales both axis by scale and applies the new values as the size.
+   *
    * @param scale scale factor
    */
   public void scaleSize(double scale) {
-    setSize(
-      scaleAxis(getWidthValue(), scale),
-      scaleAxis(getHeightValue(), scale)
-    );
+    queuedSize.scale(scale);
+    applyChanges();
   }
 
   /**
    * Submits queued changes to the size change listener.
    */
   public void applyChanges() {
-    if(widthInput.isValid()) currentWidthProperty.set(getQueuedWidthValue());
-    if(heightInput.isValid()) currentHeightProperty.set(getQueuedHeightValue());
-    sizeChangedCallback.accept(getWidthValue(), getHeightValue());
-    changeQueuedProperty.set(false);
-  }
-
-  /**
-   * Updates the current size change listener.
-   * @param onChangeCallback if null remove current listener, otherwise add/replace current listener
-   */
-  public void setSizeChangeListener(BiConsumer<Integer, Integer> onChangeCallback) {
-    sizeChangedCallback = onChangeCallback;
+    if (widthInput.isValid() && heightInput.isValid()) {
+      currentSize.set(queuedSize);
+      changeQueuedProperty.set(false);
+    }
   }
 }
