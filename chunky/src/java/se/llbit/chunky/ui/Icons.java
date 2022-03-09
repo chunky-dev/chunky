@@ -7,9 +7,10 @@ package se.llbit.chunky.ui;
  */
 public class Icons {
   public final static String PORTRAIT_TO_LANDSCAPE =
-    "M 0 -8 v 9 h -3 v 3 h -5 v -12 Z m -7 1 v 10 h 3 v -3 h 3 v -7 Z " + // portrait rectangle with missing edge
-    "M 8 0 v 8 h -12 v -8 Z m -11 1 v 6 h 10 v -6 Z " + // landscape rectangle
-    "M 1 -7 h 2 c 2 0 3 1 3 3 v 0.5 h 2 l -3 3 l -3 -3 h 2 v -0.5 c 0 -1 -1 -1 -1 -1 h -2 Z"; // arrow
+    "M0-8v9h-3v3h-5v-12Zm-7 1v10h3v-3h3v-7Z" + // portrait rectangle with missing edge
+    "M8 0v8h-12v-8Zm-11 1v6h10v-6Z" + // landscape rectangle
+    "M1-7h2c2 0 3 1 3 3v.5h2l-3 3-3-3h2v-.5c0-1-1-1-1-1h-2Z"; // arrow
+
   public final static String SQUARE_DIAGONALLY_CROSSED =
-    "M -6 -6 h 11 l 1 -1 l 1 1 l -1 1 v 11 h -11 l -1 1 l -1 -1 l 1 -1 Z M 4 -5 h -9 v 9 Z m 1 1 l -9 9 h 9 Z";
+    "M-6-6h11l1-1 1 1-1 1v11h-11l-1 1-1-1 1-1ZM4-5h-9v9Zm1 1-9 9h9Z";
 }
