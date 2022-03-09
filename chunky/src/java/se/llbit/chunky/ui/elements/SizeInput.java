@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.ui;
+package se.llbit.chunky.ui.elements;
 
 import javafx.beans.NamedArg;
 import javafx.beans.binding.Bindings;
@@ -34,6 +34,8 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
+import se.llbit.chunky.ui.IntegerTextField;
+import se.llbit.chunky.ui.ValidatingNumberStringConverter;
 import se.llbit.math.ObservableSize2D;
 import se.llbit.math.QuickMath;
 import se.llbit.math.WritableSize2D;
@@ -56,6 +58,7 @@ public class SizeInput extends GridPane {
 
   // TODO: represent this state in the UI
   protected final BooleanProperty changeQueuedProperty = new SimpleBooleanProperty(this, "changeQueued", false);
+  protected final AtomicBoolean updateInProgress = new AtomicBoolean(false);
 
   protected final Node aspectRatioDetailsNode;
   protected final BooleanProperty showAspectRatioDetailsProperty = new SimpleBooleanProperty(this, "showAspectRatioDetails", false);
@@ -100,25 +103,6 @@ public class SizeInput extends GridPane {
     aspectRatioDetailsNode = buildAspectRatioDetails();
     setConstraints(aspectRatioDetailsNode, 0, 2, 4, 1);
     showAspectRatioDetailsProperty.set(showAspectRatioDetails);
-  }
-
-  AtomicBoolean updateInProgress = new AtomicBoolean(false);
-  private void updateQueuedWidth(int width) {
-    if (isRatioLocked()) {
-      double matchingHeight = (double) width * currentSize.getHeight() / currentSize.getWidth();
-      queuedSize.set(width, (int) Math.ceil(matchingHeight));
-    } else {
-      queuedSize.setWidth(width);
-    }
-  }
-
-  private void updateQueuedHeight(int height) {
-    if (isRatioLocked()) {
-      double matchingWidth = (double) height * currentSize.getWidth() / currentSize.getHeight();
-      queuedSize.set((int) Math.ceil(matchingWidth), height);
-    } else {
-      queuedSize.setHeight(height);
-    }
   }
 
   private Node buildRatioLock() {
@@ -211,6 +195,24 @@ public class SizeInput extends GridPane {
       )
     );
     return details;
+  }
+
+  private void updateQueuedWidth(int width) {
+    if (isRatioLocked()) {
+      double matchingHeight = (double) width * currentSize.getHeight() / currentSize.getWidth();
+      queuedSize.set(width, (int) Math.ceil(matchingHeight));
+    } else {
+      queuedSize.setWidth(width);
+    }
+  }
+
+  private void updateQueuedHeight(int height) {
+    if (isRatioLocked()) {
+      double matchingWidth = (double) height * currentSize.getWidth() / currentSize.getHeight();
+      queuedSize.set((int) Math.ceil(matchingWidth), height);
+    } else {
+      queuedSize.setHeight(height);
+    }
   }
 
   public BooleanProperty ratioLockedProperty() {

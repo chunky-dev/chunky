@@ -47,7 +47,7 @@ import se.llbit.chunky.renderer.scene.EntityLoadingPreferences;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.Icons;
 import se.llbit.chunky.ui.IntegerAdjuster;
-import se.llbit.chunky.ui.SizeInput;
+import se.llbit.chunky.ui.elements.SizeInput;
 import se.llbit.chunky.ui.ValidatingNumberStringConverter;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
