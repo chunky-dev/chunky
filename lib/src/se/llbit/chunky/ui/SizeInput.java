@@ -102,6 +102,7 @@ public class SizeInput extends GridPane {
     showAspectRatioDetailsProperty.set(showAspectRatioDetails);
   }
 
+  AtomicBoolean updateInProgress = new AtomicBoolean(false);
   private void updateQueuedWidth(int width) {
     if (isRatioLocked()) {
       double matchingHeight = (double) width * currentSize.getHeight() / currentSize.getWidth();
@@ -144,8 +145,6 @@ public class SizeInput extends GridPane {
   }
 
   private void initListeners() {
-
-    AtomicBoolean updateInProgress = new AtomicBoolean(false);
     widthInput.valueProperty().addListener(observable -> {
       if (updateInProgress.compareAndSet(false, true)) {
         updateQueuedWidth(widthInput.getValue());
@@ -293,7 +292,9 @@ public class SizeInput extends GridPane {
    * Swaps width with height.
    */
   public void swapAxes() {
+    updateInProgress.set(true);
     queuedSize.set(currentSize.getHeight(), currentSize.getWidth());
+    updateInProgress.set(false);
     applyChanges();
   }
 
