@@ -79,6 +79,10 @@ public class SizeInput extends GridPane {
     heightInput = new IntegerTextField(initialHeight);
     heightInput.getConverter().setRange(ValidatingNumberStringConverter.AllowedRange.POSITIVE);
 
+    // width and height of max 999999 should be sufficient, right?
+    widthInput.setMaximumCharacterInputLength(6);
+    heightInput.setMaximumCharacterInputLength(6);
+
     setHgap(4);
     setVgap(4);
     add(widthLabel, 0, 0);

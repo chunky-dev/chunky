@@ -13,6 +13,9 @@ public class IntegerTextField extends NumericTextField<IntegerProperty> {
     super(new SimpleIntegerProperty(initialValue));
     getConverter().setParseIntegerOnly(true);
     triggerRefresh();
+
+    setMaximumCharacterInputLength(10); // Integer.MAX_VALUE = 2147483647
+    // warning: this setting will not prevent integer overflow!
   }
 
   public int getValue() {

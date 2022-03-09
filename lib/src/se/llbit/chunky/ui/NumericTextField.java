@@ -3,6 +3,7 @@ package se.llbit.chunky.ui;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 
 /**
  * A {@link TextField} that automatically converts the value to a number.
@@ -14,6 +15,8 @@ public class NumericTextField<T extends Property<Number>> extends TextField {
 
   private final T value;
   protected ValidatingNumberStringConverter converter = new ValidatingNumberStringConverter();
+
+  private int maximumCharacterInputLength = 54; // pretty much at the max of double precision
 
   public NumericTextField(T value) {
     this.value = value;
@@ -35,6 +38,12 @@ public class NumericTextField<T extends Property<Number>> extends TextField {
         value.setValue(result);
       }
     });
+    setTextFormatter(new TextFormatter<>(change -> {
+      if(change.getControlNewText().length() > maximumCharacterInputLength) {
+        return null;
+      }
+      return change;
+    }));
     validProperty().addListener(observable -> updateStyleClasses());
   }
 
@@ -70,5 +79,13 @@ public class NumericTextField<T extends Property<Number>> extends TextField {
 
   public void triggerRefresh() {
     textProperty().set(converter.toString(value.getValue()));
+  }
+
+  public void setMaximumCharacterInputLength(int maximumCharacterInputLength) {
+    this.maximumCharacterInputLength = maximumCharacterInputLength;
+  }
+
+  public int getMaximumCharacterInputLength() {
+    return maximumCharacterInputLength;
   }
 }
