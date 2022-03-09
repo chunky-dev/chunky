@@ -41,6 +41,7 @@ public abstract class Adjuster<T extends Number> extends HBox {
   protected Adjuster(Property<Number> value) {
     this.value = value;
     valueField = new NumericTextField<>(value);
+    valueField.triggerRefresh();
     nameLbl.textProperty().bind(Bindings.concat(name, ":"));
     setAlignment(Pos.CENTER_LEFT);
     setSpacing(10);
