@@ -43,13 +43,13 @@ public abstract class AnimatedQuadModel extends QuadModel {
     AnimatedTexture[] textures = getTextures();
     Tint[] tintedQuads = getTints();
 
-    // THe animation frame to use
+    // The animation frame to use
     int j = (int) (scene.getAnimationTime() * animationMode.framerate);
     if (animationMode.positional) {
       Vector3 position = new Vector3(ray.o);
       position.scaleAdd(Ray.OFFSET, ray.d);
 
-      j += Math.floorMod(MinecraftPRNG.rand((long) position.x, (long) position.y, (long) position.z), Integer.MAX_VALUE);
+      j += (int) MinecraftPRNG.rand((long) position.x, (long) position.y, (long) position.z);
     }
 
     float[] color = null;
