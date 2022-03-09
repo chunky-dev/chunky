@@ -38,7 +38,7 @@ public class CrcOutputStream extends OutputStream {
   }
 
   @Override public void write(byte[] b) throws IOException {
-    crc.update(b);
+    crc.update(b, 0, b.length);
   }
 
   /**

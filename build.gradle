@@ -34,8 +34,11 @@ subprojects {
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
 
-    compileJava.options.encoding = 'UTF-8'
-    compileJava.options.debug = true
+    compileJava {
+        options.release = 8
+        options.encoding = 'UTF-8'
+        options.debug = true
+    }
 
     javafx {
         version = '11.0.2'
