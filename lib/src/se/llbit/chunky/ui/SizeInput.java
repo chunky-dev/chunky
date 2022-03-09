@@ -18,6 +18,7 @@ package se.llbit.chunky.ui;
 
 import javafx.beans.NamedArg;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -89,15 +90,15 @@ public class SizeInput extends GridPane {
     add(heightLabel, 0, 1);
     add(widthInput, 1, 0);
     add(heightInput, 1, 1);
-    getColumnConstraints().add(new ColumnConstraints(USE_COMPUTED_SIZE, 60, USE_COMPUTED_SIZE));
-    getColumnConstraints().add(new ColumnConstraints(USE_COMPUTED_SIZE, 100, USE_COMPUTED_SIZE));
+    getColumnConstraints().add(new ColumnConstraints(USE_COMPUTED_SIZE, 50, USE_COMPUTED_SIZE));
+    getColumnConstraints().add(new ColumnConstraints(USE_COMPUTED_SIZE, 70, USE_COMPUTED_SIZE));
     add(buildRatioLock(), 2, 0, 1, 2);
     add(unitLabel, 3, 0, 1, 2);
 
     initListeners();
 
     aspectRatioDetailsNode = buildAspectRatioDetails();
-    setConstraints(aspectRatioDetailsNode, 1, 2, 3, 1);
+    setConstraints(aspectRatioDetailsNode, 0, 2, 4, 1);
     showAspectRatioDetailsProperty.set(showAspectRatioDetails);
   }
 
@@ -183,6 +184,8 @@ public class SizeInput extends GridPane {
     Label details = new Label();
     details.setPadding(new Insets(1, 0, 2, 3));
     details.setStyle("-fx-text-fill: #999; -fx-font-style: italic;");
+    details.setMaxWidth(Double.MAX_VALUE);
+    details.setAlignment(Pos.BASELINE_CENTER);
     details.visibleProperty().bind(showAspectRatioDetailsProperty);
 
     IntegerBinding gdc = Bindings.createIntegerBinding(() -> QuickMath.gcd(
@@ -251,6 +254,18 @@ public class SizeInput extends GridPane {
     return queuedSize;
   }
 
+  public BooleanBinding isLandscapeRatioProperty() {
+    return getSize().getWidthBinding().greaterThan(getSize().getHeightBinding());
+  }
+
+  public BooleanBinding isPortraitRatioProperty() {
+    return isLandscapeRatioProperty().not();
+  }
+
+  public BooleanBinding isSquareRatioProperty() {
+    return getSize().getWidthBinding().isEqualTo(getSize().getHeightBinding());
+  }
+
   /**
    * Sets and applies the size.
    *
@@ -271,6 +286,14 @@ public class SizeInput extends GridPane {
    */
   public void scaleSize(double scale) {
     queuedSize.scale(scale);
+    applyChanges();
+  }
+
+  /**
+   * Swaps width with height.
+   */
+  public void swapAxes() {
+    queuedSize.set(currentSize.getHeight(), currentSize.getWidth());
     applyChanges();
   }
 

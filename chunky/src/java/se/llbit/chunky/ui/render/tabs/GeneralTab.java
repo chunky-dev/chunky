@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.ui.render.tabs;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -34,6 +35,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.SVGPath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Book;
@@ -43,6 +45,7 @@ import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.EntityLoadingPreferences;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.Icons;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.SizeInput;
 import se.llbit.chunky.ui.ValidatingNumberStringConverter;
@@ -78,6 +81,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private SizeInput canvasSizeInput;
   @FXML private Button applySize;
   @FXML private Button makeDefaultSize;
+  @FXML private Button flipAxesBtn;
   @FXML private Pane scaleButtonArea;
   @FXML private Button setDefaultYMin;
   @FXML private Button setDefaultYMax;
@@ -326,6 +330,30 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
 
     canvasSizeLabel.setGraphic(new ImageView(Icon.scale.fxImage()));
     canvasSizeInput.getSize().addListener(this::updateCanvasSize);
+
+    SVGPath swapAxesIcon = new SVGPath();
+    swapAxesIcon.setContent(Icons.PORTRAIT_TO_LANDSCAPE);
+    swapAxesIcon.contentProperty().bind(
+      Bindings.when(canvasSizeInput.isSquareRatioProperty())
+        .then(Icons.SQUARE_DIAGONALLY_CROSSED)
+        .otherwise(Icons.PORTRAIT_TO_LANDSCAPE)
+    );
+    swapAxesIcon.rotateProperty().bind(
+      Bindings.when(canvasSizeInput.isPortraitRatioProperty())
+        .then(0)
+        .otherwise(-90)
+    );
+    flipAxesBtn.setGraphic(swapAxesIcon);
+    flipAxesBtn.disableProperty().bind(canvasSizeInput.isSquareRatioProperty());
+    Tooltip flipAxesTooltip = new Tooltip();
+    flipAxesTooltip.textProperty().bind(
+      Bindings.when(canvasSizeInput.isPortraitRatioProperty())
+        .then("Flip image to landscape format")
+        .otherwise("Flip image to portrait format")
+    );
+    flipAxesBtn.setTooltip(flipAxesTooltip);
+    flipAxesBtn.setOnAction(e -> canvasSizeInput.swapAxes());
+
     for(Double scale : scaleButtonValues) {
       Button scaleButton = new Button("×" + scale.toString());
       scaleButton.setMnemonicParsing(false);

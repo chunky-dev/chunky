@@ -18,22 +18,23 @@
       <Button fx:id="reloadChunks" mnemonicParsing="false" text="Reload chunks" />
     </HBox>
     <Separator />
-    <VBox spacing="4">
-      <Label fx:id="canvasSizeLabel" text="Canvas size:" style="-fx-font-weight: bold;"/>
-      <HBox alignment="CENTER_LEFT" spacing="16">
+    <HBox alignment="CENTER_LEFT" spacing="16">
+      <VBox spacing="4">
+        <Label fx:id="canvasSizeLabel" text="Canvas size:" style="-fx-font-weight: bold;"/>
         <padding>
           <Insets left="8"/>
         </padding>
         <SizeInput fx:id="canvasSizeInput" initialWidth="400" initialHeight="400" showAspectRatioDetails="true"/>
-        <VBox spacing="4">
-          <HBox spacing="4">
-            <Button fx:id="applySize" mnemonicParsing="false" text="Apply"/>
-            <Button fx:id="makeDefaultSize" mnemonicParsing="false" text="Set default"/>
-          </HBox>
-          <HBox spacing="4" fx:id="scaleButtonArea"/>
-        </VBox>
-      </HBox>
-    </VBox>
+      </VBox>
+      <VBox alignment="CENTER_LEFT" spacing="4">
+        <HBox spacing="4">
+          <Button fx:id="applySize" mnemonicParsing="false" text="Apply"/>
+          <Button fx:id="makeDefaultSize" mnemonicParsing="false" text="Set default"/>
+        </HBox>
+        <Button fx:id="flipAxesBtn" mnemonicParsing="false" text="Flip axes"/>
+        <HBox spacing="4" fx:id="scaleButtonArea"/>
+      </VBox>
+    </HBox>
     <Separator />
     <Accordion>
       <panes>

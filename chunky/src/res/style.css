@@ -35,6 +35,10 @@ Text {
     -fx-fill: #faebd7;
 }
 
+SVGPath {
+    -fx-fill: #faebd7;
+}
+
 Hyperlink {
     -fx-text-fill: orange;
     -fx-underline: false;
