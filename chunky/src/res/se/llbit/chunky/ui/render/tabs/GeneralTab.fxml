@@ -4,6 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import se.llbit.chunky.ui.*?>
+<?import se.llbit.chunky.ui.elements.*?>
 
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
@@ -18,16 +19,22 @@
       <Button fx:id="reloadChunks" mnemonicParsing="false" text="Reload chunks" />
     </HBox>
     <Separator />
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <Label fx:id="canvasSizeLbl" text="Canvas size:" />
-      <ComboBox fx:id="canvasSize" />
-      <Button fx:id="applySize" mnemonicParsing="false" text="Apply" />
-      <Button fx:id="makeDefaultSize" mnemonicParsing="false" text="Set default" />
-    </HBox>
-    <HBox spacing="10.0">
-      <Button fx:id="scale05" mnemonicParsing="false" text="x0.5" />
-      <Button fx:id="scale15" mnemonicParsing="false" text="x1.5" />
-      <Button fx:id="scale20" mnemonicParsing="false" text="x2" />
+    <HBox alignment="CENTER_LEFT" spacing="16">
+      <VBox spacing="4">
+        <Label fx:id="canvasSizeLabel" text="Canvas size:" style="-fx-font-weight: bold;"/>
+        <padding>
+          <Insets left="8"/>
+        </padding>
+        <SizeInput fx:id="canvasSizeInput" initialWidth="400" initialHeight="400" showAspectRatioDetails="true"/>
+      </VBox>
+      <VBox alignment="CENTER_LEFT" spacing="4">
+        <HBox spacing="4">
+          <Button fx:id="applySize" mnemonicParsing="false" text="Apply"/>
+          <Button fx:id="makeDefaultSize" mnemonicParsing="false" text="Set default"/>
+        </HBox>
+        <Button fx:id="flipAxesBtn" mnemonicParsing="false" text="Flip axes"/>
+        <HBox spacing="4" fx:id="scaleButtonArea"/>
+      </VBox>
     </HBox>
     <Separator />
     <Accordion>

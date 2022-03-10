@@ -19,24 +19,52 @@ public class ValidatingNumberStringConverter extends StringConverter<Number> {
 
   private final DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getNumberInstance(Locale.getDefault());
   private boolean parseNonNegativeOnly = false;
+  private boolean allowZero = true;
 
   private final int maximumFractionDigits = decimalFormat.getMaximumFractionDigits();
 
+  public enum AllowedRange {
+    FULL,
+    NON_NEGATIVE,
+    POSITIVE;
+  }
+
   public ValidatingNumberStringConverter() {
-    this(false, false);
+    this(false);
   }
 
   public ValidatingNumberStringConverter(boolean parseIntegerOnly) {
-    this(parseIntegerOnly, false);
+    this(parseIntegerOnly, AllowedRange.FULL);
   }
 
-  public ValidatingNumberStringConverter(boolean parseIntegerOnly, boolean parseNonNegativeOnly) {
+  public ValidatingNumberStringConverter(boolean parseIntegerOnly, AllowedRange range) {
     setParseIntegerOnly(parseIntegerOnly);
-    setParseNonNegativeOnly(parseNonNegativeOnly);
+    setRange(range);
+  }
+
+  public ValidatingNumberStringConverter(AllowedRange range) {
+    setRange(range);
   }
 
   public DecimalFormat getDecimalFormat() {
     return decimalFormat;
+  }
+
+  public void setRange(AllowedRange range) {
+    switch (range) {
+      case POSITIVE:
+        setAllowZero(false);
+        setParseNonNegativeOnly(true);
+        break;
+      case NON_NEGATIVE:
+        setAllowZero(true);
+        setParseNonNegativeOnly(true);
+        break;
+      case FULL:
+        setAllowZero(true);
+        setParseNonNegativeOnly(false);
+        break;
+    }
   }
 
   public void setParseIntegerOnly(boolean parseIntegerOnly) {
@@ -62,6 +90,14 @@ public class ValidatingNumberStringConverter extends StringConverter<Number> {
     return parseNonNegativeOnly;
   }
 
+  public void setAllowZero(boolean allowZero) {
+    this.allowZero = allowZero;
+  }
+
+  public boolean shouldAllowZero() {
+    return allowZero;
+  }
+
   @Override
   public Number fromString(String value) {
     if (value == null) {
@@ -82,6 +118,10 @@ public class ValidatingNumberStringConverter extends StringConverter<Number> {
     }
 
     if(parseNonNegativeOnly && number.doubleValue() < 0.0) {
+      return invalidState();
+    }
+
+    if(!allowZero && number.intValue() == 0) {
       return invalidState();
     }
 

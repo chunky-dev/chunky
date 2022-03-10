@@ -31,6 +31,7 @@ public class IntegerAdjuster extends SliderAdjuster<Integer> {
     this.valueField.triggerRefresh();
   }
 
+  @Override
   public void setRange(double min, double max) {
     super.setRange(min, max);
     this.min = (int) min;
@@ -38,7 +39,8 @@ public class IntegerAdjuster extends SliderAdjuster<Integer> {
     this.max = (int) max;
   }
 
-  @Override protected Integer clamp(Number value) {
+  @Override
+  protected Integer clamp(Number value) {
     int result = value.intValue();
     if (clampMax) {
       result = Math.min(result, max);
