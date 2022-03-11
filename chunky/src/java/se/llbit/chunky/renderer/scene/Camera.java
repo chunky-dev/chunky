@@ -35,6 +35,7 @@ import se.llbit.chunky.renderer.projection.SphericalApertureProjector;
 import se.llbit.chunky.renderer.projection.StereographicProjector;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.json.JsonObject;
+import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 import se.llbit.math.Matrix3;
 import se.llbit.math.QuickMath;
@@ -42,6 +43,7 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 import se.llbit.util.JsonSerializable;
+import se.llbit.util.annotation.Nullable;
 
 import java.util.Random;
 import java.util.function.Function;
@@ -153,6 +155,9 @@ public class Camera implements JsonSerializable {
 
   public String name = "camera 1";
 
+  @Nullable
+  private String apertureMaskFilename;
+
   /**
    * @param scene The scene that will be refreshed after the camera view changes.
    */
@@ -180,12 +185,17 @@ public class Camera implements JsonSerializable {
     worldDiagonalSize = other.worldDiagonalSize;
     this.shiftX = other.shiftX;
     this.shiftY = other.shiftY;
+    apertureMaskFilename = other.apertureMaskFilename;
     initProjector();
     updateTransform();
   }
 
   private Projector applyDoF(Projector p, double subjectDistance) {
-    return infiniteDoF() ? p : new ApertureProjector(p, subjectDistance / dof, subjectDistance);
+    if(infiniteDoF())
+      return p;
+    if(apertureMaskFilename != null)
+      return new ApertureProjector(p, subjectDistance / dof, subjectDistance, apertureMaskFilename);
+    return new ApertureProjector(p, subjectDistance / dof, subjectDistance);
   }
 
   private Projector applySphericalDoF(Projector p) {
@@ -624,6 +634,9 @@ public class Camera implements JsonSerializable {
     shift.add("y", shiftY);
     camera.add("shift", shift);
 
+    if(apertureMaskFilename != null)
+      camera.add("apertureMask", apertureMaskFilename);
+
     return camera;
   }
 
@@ -652,6 +665,8 @@ public class Camera implements JsonSerializable {
     JsonObject shift = json.get("shift").object();
     shiftX = shift.get("x").doubleValue(0);
     shiftY = shift.get("y").doubleValue(0);
+
+    apertureMaskFilename = json.get("apertureMask").stringValue(null);
 
     initProjector();
     updateTransform();
@@ -714,5 +729,16 @@ public class Camera implements JsonSerializable {
   public void copyTransients(Camera other) {
     name = other.name;
     target.set(other.target);
+  }
+
+  /**
+   * Set the filename of the aperture mask image
+   */
+  public void setAppertureMaskFilename(@Nullable String filename) {
+    if((filename != null && !filename.equals(apertureMaskFilename)) || (apertureMaskFilename != null)) {
+      apertureMaskFilename = filename;
+      initProjector();
+      onViewChange();
+    }
   }
 }

@@ -33,6 +33,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.FileChooser;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.renderer.CameraViewListener;
@@ -49,6 +50,7 @@ import se.llbit.json.JsonObject;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -76,6 +78,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   @FXML private DoubleTextField shiftX;
   @FXML private DoubleTextField shiftY;
   @FXML private Button autofocus;
+  @FXML private Button loadApertureMask;
 
   private MapView mapView;
   private CameraViewListener cameraViewListener;
@@ -248,6 +251,8 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     projectionMode.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
           scene.camera().setProjectionMode(newValue);
+          loadApertureMask.setManaged(newValue == ProjectionMode.PINHOLE);
+          scene.camera().setAppertureMaskFilename(null);
           updateFov();
         });
 
@@ -288,6 +293,17 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     };
     shiftX.addEventFilter(KeyEvent.KEY_PRESSED, shiftHandler);
     shiftY.addEventFilter(KeyEvent.KEY_PRESSED, shiftHandler);
+
+    loadApertureMask.setOnAction(e -> {
+      FileChooser fileChooser = new FileChooser();
+      fileChooser.setTitle("Choose aperture mask");
+      fileChooser.getExtensionFilters().add(
+              new FileChooser.ExtensionFilter("Aperture mask", "*.png", "*.jpg"));
+      File imageFile = fileChooser.showOpenDialog(getScene().getWindow());
+      if (imageFile != null) {
+        scene.camera().setAppertureMaskFilename(imageFile.getAbsolutePath());
+      }
+    });
   }
 
   private void generateNextCameraName() {
