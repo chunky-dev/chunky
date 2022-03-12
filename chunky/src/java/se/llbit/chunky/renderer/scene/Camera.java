@@ -18,6 +18,7 @@ package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.entity.Entity;
+import se.llbit.chunky.renderer.ApertureShape;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.projection.ApertureProjector;
 import se.llbit.chunky.renderer.projection.FisheyeProjector;
@@ -35,6 +36,7 @@ import se.llbit.chunky.renderer.projection.SphericalApertureProjector;
 import se.llbit.chunky.renderer.projection.StereographicProjector;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.json.JsonObject;
+import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 import se.llbit.math.Matrix3;
 import se.llbit.math.QuickMath;
@@ -42,6 +44,7 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 import se.llbit.util.JsonSerializable;
+import se.llbit.util.annotation.Nullable;
 
 import java.util.Random;
 import java.util.function.Function;
@@ -153,6 +156,11 @@ public class Camera implements JsonSerializable {
 
   public String name = "camera 1";
 
+  public ApertureShape apertureShape = ApertureShape.CIRCLE;
+
+  @Nullable
+  private String apertureMaskFilename;
+
   /**
    * @param scene The scene that will be refreshed after the camera view changes.
    */
@@ -180,12 +188,36 @@ public class Camera implements JsonSerializable {
     worldDiagonalSize = other.worldDiagonalSize;
     this.shiftX = other.shiftX;
     this.shiftY = other.shiftY;
+    apertureShape = other.apertureShape;
+    apertureMaskFilename = other.apertureMaskFilename;
     initProjector();
     updateTransform();
   }
 
+  private String getFilenameForBuiltinApertureShape() {
+    switch(apertureShape) {
+      case HEXAGON:
+        return getClass().getResource("hexagon-aperture.png").getPath();
+      case PENTAGON:
+        return getClass().getResource("pentagon-aperture.png").getPath();
+      case STAR:
+        return getClass().getResource("star-aperture.png").getPath();
+      case GAUSSIAN:
+        return getClass().getResource("gaussian-aperture.png").getPath();
+    }
+
+    return "";
+  }
+
   private Projector applyDoF(Projector p, double subjectDistance) {
-    return infiniteDoF() ? p : new ApertureProjector(p, subjectDistance / dof, subjectDistance);
+    if(infiniteDoF())
+      return p;
+    if(apertureShape == ApertureShape.CUSTOM)
+      return new ApertureProjector(p, subjectDistance / dof, subjectDistance, apertureMaskFilename);
+    else if(apertureShape == ApertureShape.CIRCLE)
+      return new ApertureProjector(p, subjectDistance / dof, subjectDistance);
+    else
+      return new ApertureProjector(p, subjectDistance / dof, subjectDistance, getFilenameForBuiltinApertureShape());
   }
 
   private Projector applySphericalDoF(Projector p) {
@@ -624,6 +656,10 @@ public class Camera implements JsonSerializable {
     shift.add("y", shiftY);
     camera.add("shift", shift);
 
+    camera.add("apertureShape", apertureShape.toString());
+    if(apertureMaskFilename != null)
+      camera.add("apertureMask", apertureMaskFilename);
+
     return camera;
   }
 
@@ -652,6 +688,9 @@ public class Camera implements JsonSerializable {
     JsonObject shift = json.get("shift").object();
     shiftX = shift.get("x").doubleValue(0);
     shiftY = shift.get("y").doubleValue(0);
+
+    apertureShape = ApertureShape.valueOf(json.get("apertureShape").stringValue("CIRCLE"));
+    apertureMaskFilename = json.get("apertureMask").stringValue(null);
 
     initProjector();
     updateTransform();
@@ -714,5 +753,42 @@ public class Camera implements JsonSerializable {
   public void copyTransients(Camera other) {
     name = other.name;
     target.set(other.target);
+  }
+
+  /**
+   * Set the aperture shape, except custom shape
+   * To set custom shape @see setCustomApertureShape
+   */
+  public void setApertureShape(ApertureShape newShape) {
+    if(newShape == ApertureShape.CUSTOM) {
+      // To set a custom shape, use the setCustomApertureShape functino to set the filename as well
+      throw new RuntimeException("Can't set custom aperture shape without a filename");
+    }
+
+    if(apertureShape != newShape) {
+      apertureMaskFilename = null;
+      apertureShape = newShape;
+      initProjector();
+      onViewChange();
+    }
+  }
+
+  /**
+   * Set a custom aperture shape
+   */
+  public void setCustomApertureShape(String customShapeFilename) {
+    if(apertureShape != ApertureShape.CUSTOM || !customShapeFilename.equals(apertureMaskFilename)) {
+      apertureShape = ApertureShape.CUSTOM;
+      apertureMaskFilename = customShapeFilename;
+      initProjector();
+      onViewChange();
+    }
+  }
+
+  /**
+   * Get aperture shape
+   */
+  public ApertureShape getApertureShape() {
+    return apertureShape;
   }
 }
