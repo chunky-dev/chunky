@@ -36,6 +36,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.MapView;
+import se.llbit.chunky.renderer.ApertureShape;
 import se.llbit.chunky.renderer.CameraViewListener;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.scene.Camera;
@@ -78,10 +79,12 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   @FXML private DoubleTextField shiftX;
   @FXML private DoubleTextField shiftY;
   @FXML private Button autofocus;
-  @FXML private Button loadApertureMask;
+  @FXML private ChoiceBox<ApertureShape> apertureShape;
 
   private MapView mapView;
   private CameraViewListener cameraViewListener;
+
+  private boolean preventApertureCallback = false;
 
   public CameraTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("CameraTab.fxml"));
@@ -99,6 +102,9 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     updateDof();
     updateSubjectDistance();
     updateShift();
+    preventApertureCallback = true;
+    apertureShape.setValue(scene.camera().getApertureShape());
+    preventApertureCallback = false;
   }
 
   @Override public String getTabTitle() {
@@ -251,8 +257,8 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     projectionMode.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
           scene.camera().setProjectionMode(newValue);
-          loadApertureMask.setManaged(newValue == ProjectionMode.PINHOLE);
-          scene.camera().setAppertureMaskFilename(null);
+          apertureShape.setManaged(newValue == ProjectionMode.PINHOLE);
+          scene.camera().setApertureShape(ApertureShape.CIRCLE);
           updateFov();
         });
 
@@ -294,16 +300,32 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     shiftX.addEventFilter(KeyEvent.KEY_PRESSED, shiftHandler);
     shiftY.addEventFilter(KeyEvent.KEY_PRESSED, shiftHandler);
 
-    loadApertureMask.setOnAction(e -> {
-      FileChooser fileChooser = new FileChooser();
-      fileChooser.setTitle("Choose aperture mask");
-      fileChooser.getExtensionFilters().add(
-              new FileChooser.ExtensionFilter("Aperture mask", "*.png", "*.jpg"));
-      File imageFile = fileChooser.showOpenDialog(getScene().getWindow());
-      if (imageFile != null) {
-        scene.camera().setAppertureMaskFilename(imageFile.getAbsolutePath());
-      }
-    });
+
+    apertureShape.getItems().addAll(ApertureShape.values());
+    apertureShape.getSelectionModel().select(ApertureShape.CIRCLE);
+    apertureShape.getSelectionModel().selectedItemProperty()
+            .addListener((observable, oldValue, newValue) -> {
+              if(preventApertureCallback)
+                return;
+
+              if(newValue == ApertureShape.CUSTOM) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Choose aperture mask");
+                fileChooser.getExtensionFilters().add(
+                        new FileChooser.ExtensionFilter("Aperture mask", "*.png", "*.jpg"));
+                File imageFile = fileChooser.showOpenDialog(getScene().getWindow());
+                if (imageFile != null) {
+                  scene.camera().setCustomApertureShape(imageFile.getAbsolutePath());
+                } else {
+                  // On cancel, go back to previous value
+                  preventApertureCallback = true;
+                  apertureShape.setValue(oldValue);
+                  preventApertureCallback = false;
+                }
+              } else {
+                scene.camera().setApertureShape(newValue);
+              }
+            });
   }
 
   private void generateNextCameraName() {
