@@ -278,6 +278,23 @@ public class Chunk {
                 }
               }
             }
+          } else {
+            // Single block palette
+            if (localBlockPalette.size() == 1) {
+              // Check it is not air block
+              int block = blockPalette.put(localBlockPalette.get(0));
+              if (block != blockPalette.airId) {
+                // Set the entire section
+                for (int y = 0; y < SECTION_Y_MAX; y++) {
+                  int blockY = sectionMinBlockY + y;
+                  for (int z = 0; z < Z_MAX; z++) {
+                    for(int x = 0; x < X_MAX; x++) {
+                      chunkData.setBlockAt(x, blockY, z, block);
+                    }
+                  }
+                }
+              }
+            }
           }
         } else {
           int yOffset = sectionY & 0xFF;
