@@ -116,14 +116,9 @@ public class SizeInput extends GridPane {
       // TODO: This could be solved using a skin, but CheckBoxSkins are first introduced in JavaFX 9.
       Node ratioLockCheckBoxMark = ratioLockCheckBox.lookup(".mark");
       if (ratioLockCheckBoxMark instanceof Pane) {
-        Shape checkmarkShape = ((Pane) ratioLockCheckBoxMark).getShape();
-        SVGPath lockingChainsPath;
-        if (checkmarkShape instanceof SVGPath) {
-          lockingChainsPath = (SVGPath) checkmarkShape;
-        } else {
-          lockingChainsPath = new SVGPath();
-          ((Pane) ratioLockCheckBoxMark).setShape(lockingChainsPath);
-        }
+        SVGPath lockingChainsPath = new SVGPath();
+        // Attention: The shape is shared between CheckBox instances, which is why we have to create a new one here!
+        ((Pane) ratioLockCheckBoxMark).setShape(lockingChainsPath);
         lockingChainsPath.contentProperty().bind(
           Bindings.when(ratioLockedProperty())
             .then(Icons.CHAIN_LINK_BASE + Icons.CHAIN_CONNECTION_CLOSED)
