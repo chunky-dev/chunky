@@ -154,6 +154,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         chunkyFxController.getChunkSelection().size() == 0
       );
     });
+    canvasSizeInput.setSize(scene.canvasWidth(), scene.canvasHeight());
   }
 
   @Override public String getTabTitle() {
