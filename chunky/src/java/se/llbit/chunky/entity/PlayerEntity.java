@@ -67,7 +67,7 @@ import java.util.Random;
 
 public class PlayerEntity extends Entity implements Poseable, Geared {
   private static final double STEVE_HEIGHT = 1.875; // 1.875 m is Steve's height according to https://twitter.com/Xbox/status/1451277229464379403
-  private static final double MODEL_SCALE = 2. / STEVE_HEIGHT;
+  private static final double MODEL_SCALE = STEVE_HEIGHT / 2;
   private static final String[] partNames =
       { "all", "head", "chest", "leftArm", "rightArm", "leftLeg", "rightLeg" };
   private static final String[] gearSlots =
