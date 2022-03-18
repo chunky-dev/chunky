@@ -4,6 +4,7 @@ import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.input.KeyCode;
 
 /**
  * A {@link TextField} that automatically converts the value to a number.
@@ -29,9 +30,22 @@ public class NumericTextField<T extends Property<Number>> extends TextField {
     // TODO: fixme
     converter.getDecimalFormat().setGroupingUsed(false);
 
-    value.addListener(observable -> {
-      textProperty().set(converter.toString(value.getValue()));
+    this.value.addListener((observable, oldValue, newValue) -> {
+      if (!this.focusedProperty().get()) {
+        triggerRefresh(); // Change while not focused
+      }
     });
+    this.setOnKeyPressed(event -> {
+      if (event.getCode().equals(KeyCode.ENTER)) {
+        triggerRefresh(); // Enter pressed
+      }
+    });
+    this.focusedProperty().addListener((observable, oldValue, newValue) -> {
+      if (!newValue) {
+        triggerRefresh(); // Focus lost
+      }
+    });
+
     textProperty().addListener(observable -> {
       Number result = converter.fromString(textProperty().get());
       if(result != null && isValid()) {
