@@ -46,6 +46,7 @@ public class NumericTextField<T extends Property<Number>> extends TextField {
       }
     });
 
+    triggerRefresh();
     textProperty().addListener(observable -> {
       Number result = converter.fromString(textProperty().get());
       if(result != null && isValid()) {
