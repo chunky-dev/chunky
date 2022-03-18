@@ -18,9 +18,23 @@ package se.llbit.chunky.renderer;
 
 public enum ApertureShape {
   CIRCLE,
-  HEXAGON,
-  PENTAGON,
-  STAR,
-  GAUSSIAN,
-  CUSTOM
+  HEXAGON("hexagon-aperture.png"),
+  PENTAGON("pentagon-aperture.png"),
+  STAR("star-aperture.png"),
+  GAUSSIAN("gaussian-aperture.png"),
+  CUSTOM;
+
+  private final String resourceName;
+
+  ApertureShape() {
+    resourceName = null;
+  }
+
+  ApertureShape(String resourceName) {
+    this.resourceName = resourceName;
+  }
+
+  public String getResourceName() {
+    return resourceName;
+  }
 }
