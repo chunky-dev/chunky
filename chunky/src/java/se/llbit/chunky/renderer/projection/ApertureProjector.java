@@ -17,8 +17,10 @@
 package se.llbit.chunky.renderer.projection;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 
+import se.llbit.chunky.renderer.ApertureShape;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
 import se.llbit.math.Ray;
@@ -51,6 +53,11 @@ public class ApertureProjector implements Projector {
     this.apertureMask = loadApertureMask(apertureMaskFilename);
   }
 
+  public ApertureProjector(Projector wrapped, double apertureSize, double subjectDistance, ApertureShape apertureShape) {
+    this(wrapped, apertureSize, subjectDistance);
+    this.apertureMask = loadApertureMask(apertureShape);
+  }
+
   static private BitmapImage loadApertureMask(String filename) {
     File textureFile = new File(filename);
     if (textureFile.exists()) {
@@ -64,7 +71,7 @@ public class ApertureProjector implements Projector {
         }
 
         return apertureMask;
-      } catch (Throwable e) {
+      } catch (IOException e) {
         Log.error("Failed to load aperture mask: " + filename);
         return null;
       }
@@ -72,6 +79,18 @@ public class ApertureProjector implements Projector {
       Log.errorf("Failed to load aperture mask: %s (file does not exist)", filename);
       return null;
     }
+  }
+
+  static private BitmapImage loadApertureMask(ApertureShape apertureShape) {
+    try {
+      String resourceName = apertureShape.getResourceName();
+      if (resourceName != null) {
+        return ImageLoader.read(ApertureProjector.class.getResourceAsStream(resourceName));
+      }
+    } catch (IOException e) {
+      Log.error("Failed to load built-in aperture mask: " + apertureShape);
+    }
+    return null;
   }
 
   @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {

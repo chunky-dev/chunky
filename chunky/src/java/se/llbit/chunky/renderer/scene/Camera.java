@@ -194,30 +194,15 @@ public class Camera implements JsonSerializable {
     updateTransform();
   }
 
-  private String getFilenameForBuiltinApertureShape() {
-    switch(apertureShape) {
-      case HEXAGON:
-        return getClass().getResource("hexagon-aperture.png").getPath();
-      case PENTAGON:
-        return getClass().getResource("pentagon-aperture.png").getPath();
-      case STAR:
-        return getClass().getResource("star-aperture.png").getPath();
-      case GAUSSIAN:
-        return getClass().getResource("gaussian-aperture.png").getPath();
-    }
-
-    return "";
-  }
-
   private Projector applyDoF(Projector p, double subjectDistance) {
     if(infiniteDoF())
       return p;
-    if(apertureShape == ApertureShape.CUSTOM)
+    if (apertureShape == ApertureShape.CUSTOM)
       return new ApertureProjector(p, subjectDistance / dof, subjectDistance, apertureMaskFilename);
-    else if(apertureShape == ApertureShape.CIRCLE)
+    else if (apertureShape == ApertureShape.CIRCLE)
       return new ApertureProjector(p, subjectDistance / dof, subjectDistance);
     else
-      return new ApertureProjector(p, subjectDistance / dof, subjectDistance, getFilenameForBuiltinApertureShape());
+      return new ApertureProjector(p, subjectDistance / dof, subjectDistance, apertureShape);
   }
 
   private Projector applySphericalDoF(Projector p) {
