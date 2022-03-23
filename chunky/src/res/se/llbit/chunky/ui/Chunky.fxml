@@ -24,6 +24,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import se.llbit.chunky.ui.IntegerAdjuster?>
+<?import se.llbit.chunky.ui.PositiveIntegerAdjuster?>
 <?import se.llbit.chunky.ui.DoubleTextField?>
 <?import se.llbit.fx.ToolPane?>
 <?import javafx.scene.layout.FlowPane?>
@@ -72,7 +73,7 @@
           <ToggleButton fx:id="reset" mnemonicParsing="false" text="Reset" toggleGroup="$renderControl" selected="true" />
         </HBox>
         <HBox alignment="CENTER_LEFT" spacing="10.0">
-          <IntegerAdjuster fx:id="targetSpp" />
+          <PositiveIntegerAdjuster fx:id="targetSpp" />
           <Button fx:id="saveDefaultSpp" mnemonicParsing="false" text="Set default" />
         </HBox>
       </VBox>
@@ -116,7 +117,7 @@
           </HBox>
           <Separator />
           <VBox alignment="CENTER_LEFT">
-            <IntegerAdjuster fx:id="scale" name="Scale" />
+            <PositiveIntegerAdjuster fx:id="scale" name="Scale" />
           </VBox>
           <VBox alignment="CENTER_LEFT">
             <IntegerAdjuster fx:id="yMin" name="Min Y level " />

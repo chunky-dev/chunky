@@ -90,6 +90,7 @@ import se.llbit.chunky.ui.ChunkMap;
 import se.llbit.chunky.ui.dialogs.Credits;
 import se.llbit.chunky.ui.DoubleTextField;
 import se.llbit.chunky.ui.IntegerAdjuster;
+import se.llbit.chunky.ui.PositiveIntegerAdjuster;
 import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.ui.RenderCanvasFx;
 import se.llbit.chunky.ui.dialogs.DialogUtils;
@@ -137,7 +138,7 @@ public class ChunkyFxController
   @FXML private ToggleButton overworldBtn;
   @FXML private ToggleButton netherBtn;
   @FXML private ToggleButton endBtn;
-  @FXML private IntegerAdjuster scale;
+  @FXML private PositiveIntegerAdjuster scale;
   @FXML private IntegerAdjuster yMin;
   @FXML private IntegerAdjuster yMax;
   @FXML private ToggleButton trackPlayerBtn;
@@ -184,7 +185,7 @@ public class ChunkyFxController
   @FXML private Label etaLbl;
   @FXML private Label renderTimeLbl;
   @FXML private Label sppLbl;
-  @FXML private IntegerAdjuster targetSpp;
+  @FXML private PositiveIntegerAdjuster targetSpp;
   @FXML private Button saveDefaultSpp;
 
   @FXML private ToggleButton start;
