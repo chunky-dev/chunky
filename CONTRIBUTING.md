@@ -11,12 +11,22 @@ When contributing to this repository, please consider discussing significant cha
 
 ## New contributor guide
 
-To get an overview of the project, read the [README](README.md). Here are some resources to help you get started with open source contributions:
+To get an overview of the project, read the [README](README.md).
+
+Chunky is split into four subprojects:
+
+* chunky - the core rendering and GUI project
+* lib - common code required by the other projects
+* launcher - the launcher
+* releasetools - tool used for packaging releases
+
+Here are some resources to help you get started with open source contributions:
 
 - [Finding ways to contribute to open source on GitHub](https://docs.github.com/en/get-started/exploring-projects-on-github/finding-ways-to-contribute-to-open-source-on-github)
 - [Set up Git](https://docs.github.com/en/get-started/quickstart/set-up-git)
 - [GitHub flow](https://docs.github.com/en/get-started/quickstart/github-flow)
 - [Collaborating with pull requests](https://docs.github.com/en/github/collaborating-with-pull-requests)
+
 
 ## Getting started
 
@@ -28,7 +38,7 @@ If you spot a problem with the docs, [search if an issue already exists](https:/
 
 #### Solve an issue
 
-Scan through our [existing issues](https://github.com/chunky-dev/chunky/issues) to find one that interests you. You can narrow down the search using `labels` as filters. If you are not sure where to start we have labelled some issues as [good first issues](https://github.com/chunky-dev/chunky/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22). As a general rule, we don’t assign issues to anyone. If you find an issue to work on, you are welcome to open a PR with a fix. However we would request that you double check what PRs are open and whether or not another contributor is working on an issue already.
+Scan through our [existing issues](https://github.com/chunky-dev/chunky/issues) to find one that interests you. You can narrow down the search using `labels` as filters. If you are not sure where to start we have labelled some issues as [good first issues](https://github.com/chunky-dev/chunky/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22). As a general rule, we don’t assign issues to anyone. If you find an issue to work on, you are welcome to open a PR with a fix. However, we would request that you double-check what PRs are open and whether another contributor is working on an issue already.
 
 ### Make Changes
 
@@ -50,7 +60,7 @@ with IntelliJ: `File` -> `New` -> `Project from Version Control`
 - In the url put `https://github.com/GITHUB_USERNAME/chunky`
 - You can also select a location to clone to here.
 
-with Github desktop: `Clone a repository` -> select `URL`, paste `https://github.com/GITHUB_USERNAME/chunky`
+with GitHub desktop: `Clone a repository` -> select `URL`, paste `https://github.com/GITHUB_USERNAME/chunky`
 
 with CLI: `git clone git@github.com:GITHUB_USERNAME/chunky.git` or (outdated) `git clone https://github.com/GITHUB_USERNAME/chunky`
 
@@ -74,15 +84,27 @@ In the bottom right of IntelliJ, there is a New Branch button, by default it wil
  - Make sure the `Checkout branch` box is checked when creating a new branch (to actually change to it once it's created)
 
 ##### Make your change
-Some useful IntelliJ keybinds to help you navigate around:
+Some useful IntelliJ keybindings to help you navigate around:
  - `Ctrl + N`, Find a file (class) by name
 
 ##### Commit your changes
 After making your changes, select the `Commit` button (looks like a green tick) in the top right
-Select all of the changes you want to make, and add a description of what you changed.
+Select all the changes you want to make, and add a description of what you changed.
 
 ### Testing
-Prior to making a Pull Request please test your changes. Within IntelliJ you can run chunky\src\java\se.llbit\chunky\main\Chunky.java:line64 assuming you have got IntelliJ setup correctly. At the time of writing, Chunky's gradlew version is 7.4.
+Prior to making a Pull Request please test your changes. Within IntelliJ, you can build and run Chunky by clicking on the green arrow next to `chunky\src\java\se.llbit\chunky\main\Chunky.java:line64` assuming you have got IntelliJ setup correctly. At the time of writing, Chunky's gradlew version is 7.4.
+
+To build Chunky externally, run the `gradlew` script in the project root directory. Gradle is set-up with a few main tasks:
+
+* build - Build Chunky, documentation, and run tests.
+* release - Build and save files ready for a release to a Chunky update site. Outputs to `build/release`
+* buildReleaseJar - Build an installer JAR. Outputs to `build/installer`
+* docs - Build the documentation. Outputs to `build/docs`
+* install - Create a publishable maven repository for Chunky core. Outputs to `build/maven`
+* clean - Cleans the project. Removes old builds.
+
+A custom version can be specified with `-PnewVersion="<version>"`. A custom prerelease tag can be specified with `-PprereleaseTag="<tag>"`. The default version is in the format: `{major}.{minor}.{patch}-{tag (DEV)}.{commits since last tag}.g{git hash of commit}`
+
 
 ### Pull Request
 
