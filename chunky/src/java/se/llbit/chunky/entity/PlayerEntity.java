@@ -66,6 +66,8 @@ import java.util.Map;
 import java.util.Random;
 
 public class PlayerEntity extends Entity implements Poseable, Geared {
+  private static final double STEVE_HEIGHT = 1.875; // 1.875 m is Steve's height according to https://twitter.com/Xbox/status/1451277229464379403
+  private static final double MODEL_SCALE = STEVE_HEIGHT / 2;
   private static final String[] partNames =
       { "all", "head", "chest", "leftArm", "rightArm", "leftLeg", "rightLeg" };
   private static final String[] gearSlots =
@@ -224,6 +226,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         position.y + offset.y,
         position.z + offset.z);
     Transform worldTransform = Transform.NONE
+        .scale(MODEL_SCALE)
         .scale(scale)
         .rotateX(allPose.x)
         .rotateY(allPose.y)
@@ -708,19 +711,11 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
 
   public static JsonObject parseJson(String helmetJson) {
     try (ByteArrayInputStream in = new ByteArrayInputStream(helmetJson.getBytes());
-        JsonParser parser = new JsonParser(in)) {
+         JsonParser parser = new JsonParser(in)) {
       return parser.parse().object();
     } catch (IOException | JsonParser.SyntaxError e) {
       Log.warn("Failed to parse JSON", e);
       return new JsonObject();
-    }
-  }
-
-  private Transform withScale(Transform transform) {
-    if (scale == 1.0) {
-      return transform;
-    } else {
-      return transform.scale(scale);
     }
   }
 
