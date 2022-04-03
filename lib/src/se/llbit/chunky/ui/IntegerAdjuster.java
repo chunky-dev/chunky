@@ -35,7 +35,6 @@ public class IntegerAdjuster extends SliderAdjuster<Integer> {
   public void setRange(double min, double max) {
     super.setRange(min, max);
     this.min = (int) min;
-    this.valueField.getConverter().setParseNonNegativeOnly(min >= 0.0);
     this.max = (int) max;
   }
 
@@ -50,5 +49,4 @@ public class IntegerAdjuster extends SliderAdjuster<Integer> {
     }
     return result;
   }
-
 }
