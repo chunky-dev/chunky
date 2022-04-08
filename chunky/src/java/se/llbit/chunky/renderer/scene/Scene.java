@@ -231,6 +231,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.NONE;
 
   protected boolean sunEnabled = true;
+  protected boolean fastSunSampling = true;
   /**
    * Water opacity modifier.
    */
@@ -488,6 +489,7 @@ public class Scene implements JsonSerializable, Refreshable {
     fogColor.set(other.fogColor);
     biomeColors = other.biomeColors;
     sunEnabled = other.sunEnabled;
+    fastSunSampling = other.fastSunSampling;
     emittersEnabled = other.emittersEnabled;
     emitterIntensity = other.emitterIntensity;
     emitterSamplingStrategy = other.emitterSamplingStrategy;
@@ -682,6 +684,17 @@ public class Scene implements JsonSerializable, Refreshable {
       sunEnabled = value;
       refresh();
     }
+  }
+
+  public synchronized void setFastSunSampling(boolean value) {
+    if (value != fastSunSampling) {
+      fastSunSampling = value;
+      refresh();
+    }
+  }
+
+  public boolean getFastSunSampling() {
+    return fastSunSampling;
   }
 
   /**
@@ -2897,6 +2910,7 @@ public class Scene implements JsonSerializable, Refreshable {
     emittersEnabled = json.get("emittersEnabled").boolValue(emittersEnabled);
     emitterIntensity = json.get("emitterIntensity").doubleValue(emitterIntensity);
     sunEnabled = json.get("sunEnabled").boolValue(sunEnabled);
+    fastSunSampling = json.get("fastSunSampling").boolValue(fastSunSampling);
     stillWater = json.get("stillWater").boolValue(stillWater);
     waterOpacity = json.get("waterOpacity").doubleValue(waterOpacity);
     waterVisibility = json.get("waterVisibility").doubleValue(waterVisibility);

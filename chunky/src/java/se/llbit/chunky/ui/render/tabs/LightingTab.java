@@ -54,6 +54,8 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster skyIntensity;
   @FXML private DoubleAdjuster emitterIntensity;
   @FXML private DoubleAdjuster sunIntensity;
+  @FXML private CheckBox fastSunSampling;
+  @FXML private DoubleAdjuster trueSunIntensity;
   @FXML private AngleAdjuster sunAzimuth;
   @FXML private AngleAdjuster sunAltitude;
   @FXML private CheckBox enableEmitters;
@@ -93,6 +95,17 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunIntensity.makeLogarithmic();
     sunIntensity.clampMin();
     sunIntensity.onValueChange(value -> scene.sun().setIntensity(value));
+
+    fastSunSampling.setSelected(true);
+    fastSunSampling.setTooltip(new Tooltip("Fast sun sampling. Lower noise but does not correctly model some visual effects."));
+    fastSunSampling.selectedProperty().addListener(((observable, oldValue, newValue) -> scene.setFastSunSampling(newValue)));
+
+    trueSunIntensity.setName("True Sun Intensity");
+    trueSunIntensity.setTooltip("Sun intensity used when using slow sun sampling.");
+    trueSunIntensity.setRange(1, 10000);
+    trueSunIntensity.makeLogarithmic();
+    trueSunIntensity.clampMin();
+    trueSunIntensity.onValueChange(value -> scene.sun().setTrueIntensity(value));
 
     sunAzimuth.setName("Sun azimuth");
     sunAzimuth.setTooltip("Change the angle to the sun from north.");
@@ -142,6 +155,8 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     skyIntensity.set(scene.sky().getSkyLight());
     emitterIntensity.set(scene.getEmitterIntensity());
     sunIntensity.set(scene.sun().getIntensity());
+    fastSunSampling.setSelected(scene.getFastSunSampling());
+    trueSunIntensity.set(scene.sun().getTrueIntensity());
     sunAzimuth.set(-QuickMath.radToDeg(scene.sun().getAzimuth()));
     sunAltitude.set(QuickMath.radToDeg(scene.sun().getAltitude()));
     enableEmitters.setSelected(scene.getEmittersEnabled());

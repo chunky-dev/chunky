@@ -120,6 +120,9 @@ public class Sun implements JsonSerializable {
 
   private double intensity = DEFAULT_INTENSITY;
 
+  private double trueIntensity = 1;
+  private double truePdf = 1;
+
   private double azimuth = Math.PI / 2.5;
   private double altitude = Math.PI / 3;
 
@@ -173,6 +176,8 @@ public class Sun implements JsonSerializable {
     color.set(other.color);
     drawTexture = other.drawTexture;
     intensity = other.intensity;
+    trueIntensity = other.trueIntensity;
+    truePdf = other.truePdf;
     initSun();
   }
 
@@ -310,6 +315,20 @@ public class Sun implements JsonSerializable {
    */
   public double getIntensity() {
     return intensity;
+  }
+
+  public void setTrueIntensity(double value) {
+    trueIntensity = value;
+    truePdf = 1 / value;
+    scene.refresh();
+  }
+
+  public double getTrueIntensity() {
+    return trueIntensity;
+  }
+
+  public double getTruePdf() {
+    return truePdf;
   }
 
   /**

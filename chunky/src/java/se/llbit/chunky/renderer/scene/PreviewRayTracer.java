@@ -54,7 +54,7 @@ public class PreviewRayTracer implements RayTracer {
     }
 
     if (ray.getCurrentMaterial() == Air.INSTANCE) {
-      scene.sky.getSkySpecularColor(ray);
+      scene.sky.getSkyColor(ray, true);
     } else {
       scene.sun.flatShading(ray);
     }

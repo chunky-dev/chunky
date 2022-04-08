@@ -346,9 +346,10 @@ public class Sky implements JsonSerializable {
   /**
    * Panoramic skymap color.
    */
-  public void getSkyColor(Ray ray) {
+  public void getSkyColor(Ray ray, boolean drawSun) {
     getSkyDiffuseColorInner(ray);
     ray.color.scale(skyLightModifier);
+    if (drawSun) addSunColor(ray);
     ray.color.w = 1;
   }
 
@@ -436,14 +437,6 @@ public class Sky implements JsonSerializable {
   }
 
   /**
-   * Get the specular sky color for the ray.
-   */
-  public void getSkySpecularColor(Ray ray) {
-    getSkyColor(ray);
-    addSunColor(ray);
-  }
-
-  /**
    * Add sun color contribution. This does not alpha blend the sun color
    * because the Minecraft sun texture has no alpha channel.
    */
@@ -452,10 +445,12 @@ public class Sky implements JsonSerializable {
     double g = ray.color.y;
     double b = ray.color.z;
     if (scene.sun().intersect(ray)) {
+      double mult = scene.getFastSunSampling() ? 1 : scene.sun().getTrueIntensity();
+
       // Blend sun color with current color.
-      ray.color.x = ray.color.x + r;
-      ray.color.y = ray.color.y + g;
-      ray.color.z = ray.color.z + b;
+      ray.color.x = ray.color.x * mult + r;
+      ray.color.y = ray.color.y * mult + g;
+      ray.color.z = ray.color.z * mult + b;
     }
   }
 
