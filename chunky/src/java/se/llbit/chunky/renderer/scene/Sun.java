@@ -120,8 +120,8 @@ public class Sun implements JsonSerializable {
 
   private double intensity = DEFAULT_INTENSITY;
 
-  private double trueIntensity = 1;
-  private double truePdf = 1;
+  private double trueIntensity = 100;
+  private double truePdf = 1.0 / trueIntensity;
 
   private double azimuth = Math.PI / 2.5;
   private double altitude = Math.PI / 3;

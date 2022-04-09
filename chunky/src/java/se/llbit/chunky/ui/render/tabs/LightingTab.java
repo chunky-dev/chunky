@@ -59,7 +59,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private AngleAdjuster sunAzimuth;
   @FXML private AngleAdjuster sunAltitude;
   @FXML private CheckBox enableEmitters;
-  @FXML private CheckBox enableSunlight;
+  @FXML private CheckBox enableSunSampling;
   @FXML private CheckBox drawSun;
   @FXML private LuxColorPicker sunColor;
   @FXML private ChoiceBox<EmitterSamplingStrategy> emitterSamplingStrategy;
@@ -89,19 +89,27 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     emitterIntensity.clampMin();
     emitterIntensity.onValueChange(value -> scene.setEmitterIntensity(value));
 
-    sunIntensity.setName("Sun intensity");
-    sunIntensity.setTooltip("Sunlight intensity modifier");
-    sunIntensity.setRange(Sun.MIN_INTENSITY, Sun.MAX_INTENSITY);
-    sunIntensity.makeLogarithmic();
-    sunIntensity.clampMin();
-    sunIntensity.onValueChange(value -> scene.sun().setIntensity(value));
+    drawSun.selectedProperty().addListener(
+            (observable, oldValue, newValue) -> scene.sun().setDrawTexture(newValue));
+    drawSun.setTooltip(new Tooltip("Draws the sun texture on top of the skymap."));
+
+    enableSunSampling.selectedProperty().addListener(
+            (observable, oldValue, newValue) -> scene.setDirectLight(newValue));
+    enableSunSampling.setTooltip(new Tooltip("Enable sun sampling (next event estimation)."));
 
     fastSunSampling.setSelected(true);
     fastSunSampling.setTooltip(new Tooltip("Fast sun sampling. Lower noise but does not correctly model some visual effects."));
     fastSunSampling.selectedProperty().addListener(((observable, oldValue, newValue) -> scene.setFastSunSampling(newValue)));
 
-    trueSunIntensity.setName("True Sun Intensity");
-    trueSunIntensity.setTooltip("Sun intensity used when using slow sun sampling.");
+    sunIntensity.setName("Sun intensity");
+    sunIntensity.setTooltip("Intensity of the sun on the scene.");
+    sunIntensity.setRange(Sun.MIN_INTENSITY, Sun.MAX_INTENSITY);
+    sunIntensity.makeLogarithmic();
+    sunIntensity.clampMin();
+    sunIntensity.onValueChange(value -> scene.sun().setIntensity(value));
+
+    trueSunIntensity.setName("Sun luminosity");
+    trueSunIntensity.setTooltip("Absolute brightness of the sun. Used when fast sun sampling is disabled.");
     trueSunIntensity.setRange(1, 10000);
     trueSunIntensity.makeLogarithmic();
     trueSunIntensity.clampMin();
@@ -117,11 +125,6 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
 
     enableEmitters.selectedProperty().addListener(
         (observable, oldValue, newValue) -> scene.setEmittersEnabled(newValue));
-    enableSunlight.selectedProperty().addListener(
-        (observable, oldValue, newValue) -> scene.setDirectLight(newValue));
-    drawSun.selectedProperty().addListener(
-        (observable, oldValue, newValue) -> scene.sun().setDrawTexture(newValue));
-    drawSun.setTooltip(new Tooltip("Draws the sun texture on top of the skymap."));
 
     sunColor.colorProperty().addListener(sunColorListener);
 
@@ -160,7 +163,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunAzimuth.set(-QuickMath.radToDeg(scene.sun().getAzimuth()));
     sunAltitude.set(QuickMath.radToDeg(scene.sun().getAltitude()));
     enableEmitters.setSelected(scene.getEmittersEnabled());
-    enableSunlight.setSelected(scene.getDirectLight());
+    enableSunSampling.setSelected(scene.getDirectLight());
     drawSun.setSelected(scene.sun().drawTexture());
     sunColor.colorProperty().removeListener(sunColorListener);
     sunColor.setColor(ColorUtil.toFx(scene.sun().getColor()));

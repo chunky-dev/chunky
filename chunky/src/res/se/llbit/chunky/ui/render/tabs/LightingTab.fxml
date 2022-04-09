@@ -20,10 +20,10 @@
       <Label text="Emitter Sampling Strategy:" />
       <ChoiceBox fx:id="emitterSamplingStrategy" />
     </HBox>
-    <CheckBox fx:id="enableSunlight" mnemonicParsing="false" text="Enable sunlight" />
     <CheckBox fx:id="drawSun" mnemonicParsing="false" text="Draw sun" />
+    <CheckBox fx:id="enableSunSampling" mnemonicParsing="false" text="Sun sampling" />
+    <CheckBox fx:id="fastSunSampling" mnemonicParsing="false" text="Fast sun sampling" />
     <DoubleAdjuster fx:id="sunIntensity" maxWidth="1.7976931348623157E308" />
-    <CheckBox fx:id="fastSunSampling" mnemonicParsing="false" text="Fast Sun Sampling" />
     <DoubleAdjuster fx:id="trueSunIntensity" maxWidth="Infinity" />
     <AngleAdjuster fx:id="sunAzimuth" />
     <AngleAdjuster fx:id="sunAltitude" />
