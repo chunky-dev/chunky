@@ -359,6 +359,7 @@ public class Sun implements JsonSerializable {
     sun.add("altitude", altitude);
     sun.add("azimuth", azimuth);
     sun.add("intensity", intensity);
+    sun.add("trueIntensity", trueIntensity);
     JsonObject colorObj = new JsonObject();
     colorObj.add("red", color.x);
     colorObj.add("green", color.y);
@@ -372,6 +373,7 @@ public class Sun implements JsonSerializable {
     azimuth = json.get("azimuth").doubleValue(azimuth);
     altitude = json.get("altitude").doubleValue(altitude);
     intensity = json.get("intensity").doubleValue(intensity);
+    setTrueIntensity(json.get("trueIntensity").doubleValue(trueIntensity));
 
     if (json.get("color").isObject()) {
       JsonObject colorObj = json.get("color").object();

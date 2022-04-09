@@ -2614,6 +2614,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("emittersEnabled", emittersEnabled);
     json.add("emitterIntensity", emitterIntensity);
     json.add("sunEnabled", sunEnabled);
+    json.add("fastSunSampling", fastSunSampling);
     json.add("stillWater", stillWater);
     json.add("waterOpacity", waterOpacity);
     json.add("waterVisibility", waterVisibility);
