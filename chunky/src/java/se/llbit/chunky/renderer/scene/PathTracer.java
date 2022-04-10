@@ -21,6 +21,7 @@ import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
+import se.llbit.chunky.renderer.SunSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.*;
@@ -85,7 +86,7 @@ public class PathTracer implements RayTracer {
           hit = true;
         } else {
           // Indirect sky hit - diffuse color.
-          scene.sky.getSkyColor(ray, !scene.getFastSunSampling());
+          scene.sky.getSkyColor(ray, scene.getSunSamplingStrategy() != SunSamplingStrategy.Fast);
           // Skip sky fog - likely not noticeable in diffuse reflection.
           hit = true;
         }
@@ -191,7 +192,7 @@ public class PathTracer implements RayTracer {
               }
             }
 
-            if (scene.sunEnabled) {
+            if (scene.getSunSamplingStrategy() != SunSamplingStrategy.Off) {
               reflected.set(ray);
               scene.sun.getRandomSunDirection(reflected, random);
 
@@ -509,7 +510,7 @@ public class PathTracer implements RayTracer {
           attenuation.w *= Math.exp(-a);
         }
       }
-      if (scene.getFastSunSampling() && ray.getPrevMaterial().ior != ray.getCurrentMaterial().ior) {
+      if (scene.getSunSamplingStrategy() == SunSamplingStrategy.HighQuality && ray.getPrevMaterial().ior != ray.getCurrentMaterial().ior) {
         attenuation.w = 0;
       }
     }

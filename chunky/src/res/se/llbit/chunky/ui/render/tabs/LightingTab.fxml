@@ -11,6 +11,7 @@
 <?import se.llbit.chunky.ui.elements.AngleAdjuster?>
 <?import se.llbit.fx.LuxColorPicker?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
     <DoubleAdjuster fx:id="skyIntensity" maxWidth="1.7976931348623157E308" />
@@ -21,10 +22,12 @@
       <ChoiceBox fx:id="emitterSamplingStrategy" />
     </HBox>
     <CheckBox fx:id="drawSun" mnemonicParsing="false" text="Draw sun" />
-    <CheckBox fx:id="enableSunSampling" mnemonicParsing="false" text="Sun sampling" />
-    <CheckBox fx:id="fastSunSampling" mnemonicParsing="false" text="Fast sun sampling" />
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+      <Label text="Sun Sampling Strategy:" />
+      <ComboBox fx:id="sunSamplingStrategy" />
+    </HBox>
     <DoubleAdjuster fx:id="sunIntensity" maxWidth="1.7976931348623157E308" />
-    <DoubleAdjuster fx:id="trueSunIntensity" maxWidth="Infinity" />
+    <DoubleAdjuster fx:id="sunLuminosity" maxWidth="Infinity" />
     <AngleAdjuster fx:id="sunAzimuth" />
     <AngleAdjuster fx:id="sunAltitude" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">

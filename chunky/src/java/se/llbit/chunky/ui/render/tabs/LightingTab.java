@@ -21,16 +21,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
+import se.llbit.chunky.renderer.SunSamplingStrategy;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.chunky.renderer.scene.Sun;
@@ -54,13 +50,12 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster skyIntensity;
   @FXML private DoubleAdjuster emitterIntensity;
   @FXML private DoubleAdjuster sunIntensity;
-  @FXML private CheckBox fastSunSampling;
-  @FXML private DoubleAdjuster trueSunIntensity;
+  @FXML private CheckBox drawSun;
+  @FXML private ComboBox<SunSamplingStrategy> sunSamplingStrategy;
+  @FXML private DoubleAdjuster sunLuminosity;
   @FXML private AngleAdjuster sunAzimuth;
   @FXML private AngleAdjuster sunAltitude;
   @FXML private CheckBox enableEmitters;
-  @FXML private CheckBox enableSunSampling;
-  @FXML private CheckBox drawSun;
   @FXML private LuxColorPicker sunColor;
   @FXML private ChoiceBox<EmitterSamplingStrategy> emitterSamplingStrategy;
 
@@ -89,17 +84,13 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     emitterIntensity.clampMin();
     emitterIntensity.onValueChange(value -> scene.setEmitterIntensity(value));
 
-    drawSun.selectedProperty().addListener(
-            (observable, oldValue, newValue) -> scene.sun().setDrawTexture(newValue));
+    drawSun.selectedProperty().addListener((observable, oldValue, newValue) -> scene.sun().setDrawTexture(newValue));
     drawSun.setTooltip(new Tooltip("Draws the sun texture on top of the skymap."));
 
-    enableSunSampling.selectedProperty().addListener(
-            (observable, oldValue, newValue) -> scene.setDirectLight(newValue));
-    enableSunSampling.setTooltip(new Tooltip("Enable sun sampling (next event estimation)."));
-
-    fastSunSampling.setSelected(true);
-    fastSunSampling.setTooltip(new Tooltip("Fast sun sampling. Lower noise but does not correctly model some visual effects."));
-    fastSunSampling.selectedProperty().addListener(((observable, oldValue, newValue) -> scene.setFastSunSampling(newValue)));
+    sunSamplingStrategy.getItems().addAll(SunSamplingStrategy.values());
+    sunSamplingStrategy.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldValue, newValue) -> scene.setSunSamplingStrategy(newValue));
+    sunSamplingStrategy.setTooltip(new Tooltip("Determine how the sun is sampled at each bounce."));
 
     sunIntensity.setName("Sun intensity");
     sunIntensity.setTooltip("Intensity of the sun on the scene.");
@@ -108,12 +99,12 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunIntensity.clampMin();
     sunIntensity.onValueChange(value -> scene.sun().setIntensity(value));
 
-    trueSunIntensity.setName("Sun luminosity");
-    trueSunIntensity.setTooltip("Absolute brightness of the sun. Used when fast sun sampling is disabled.");
-    trueSunIntensity.setRange(1, 10000);
-    trueSunIntensity.makeLogarithmic();
-    trueSunIntensity.clampMin();
-    trueSunIntensity.onValueChange(value -> scene.sun().setTrueIntensity(value));
+    sunLuminosity.setName("Sun luminosity");
+    sunLuminosity.setTooltip("Absolute brightness of the sun. Used when fast sun sampling is disabled.");
+    sunLuminosity.setRange(1, 10000);
+    sunLuminosity.makeLogarithmic();
+    sunLuminosity.clampMin();
+    sunLuminosity.onValueChange(value -> scene.sun().setLuminosity(value));
 
     sunAzimuth.setName("Sun azimuth");
     sunAzimuth.setTooltip("Change the angle to the sun from north.");
@@ -158,12 +149,11 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     skyIntensity.set(scene.sky().getSkyLight());
     emitterIntensity.set(scene.getEmitterIntensity());
     sunIntensity.set(scene.sun().getIntensity());
-    fastSunSampling.setSelected(scene.getFastSunSampling());
-    trueSunIntensity.set(scene.sun().getTrueIntensity());
+    sunLuminosity.set(scene.sun().getLuminosity());
     sunAzimuth.set(-QuickMath.radToDeg(scene.sun().getAzimuth()));
     sunAltitude.set(QuickMath.radToDeg(scene.sun().getAltitude()));
     enableEmitters.setSelected(scene.getEmittersEnabled());
-    enableSunSampling.setSelected(scene.getDirectLight());
+    sunSamplingStrategy.getSelectionModel().select(scene.getSunSamplingStrategy());
     drawSun.setSelected(scene.sun().drawTexture());
     sunColor.colorProperty().removeListener(sunColorListener);
     sunColor.setColor(ColorUtil.toFx(scene.sun().getColor()));

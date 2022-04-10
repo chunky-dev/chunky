@@ -120,8 +120,8 @@ public class Sun implements JsonSerializable {
 
   private double intensity = DEFAULT_INTENSITY;
 
-  private double trueIntensity = 100;
-  private double truePdf = 1.0 / trueIntensity;
+  private double luminosity = 100;
+  private double luminosityPdf = 1.0 / luminosity;
 
   private double azimuth = Math.PI / 2.5;
   private double altitude = Math.PI / 3;
@@ -176,8 +176,8 @@ public class Sun implements JsonSerializable {
     color.set(other.color);
     drawTexture = other.drawTexture;
     intensity = other.intensity;
-    trueIntensity = other.trueIntensity;
-    truePdf = other.truePdf;
+    luminosity = other.luminosity;
+    luminosityPdf = other.luminosityPdf;
     initSun();
   }
 
@@ -317,18 +317,18 @@ public class Sun implements JsonSerializable {
     return intensity;
   }
 
-  public void setTrueIntensity(double value) {
-    trueIntensity = value;
-    truePdf = 1 / value;
+  public void setLuminosity(double value) {
+    luminosity = value;
+    luminosityPdf = 1 / value;
     scene.refresh();
   }
 
-  public double getTrueIntensity() {
-    return trueIntensity;
+  public double getLuminosity() {
+    return luminosity;
   }
 
-  public double getTruePdf() {
-    return truePdf;
+  public double getLuminosityPdf() {
+    return luminosityPdf;
   }
 
   /**
@@ -359,7 +359,7 @@ public class Sun implements JsonSerializable {
     sun.add("altitude", altitude);
     sun.add("azimuth", azimuth);
     sun.add("intensity", intensity);
-    sun.add("trueIntensity", trueIntensity);
+    sun.add("luminosity", luminosity);
     JsonObject colorObj = new JsonObject();
     colorObj.add("red", color.x);
     colorObj.add("green", color.y);
@@ -373,7 +373,7 @@ public class Sun implements JsonSerializable {
     azimuth = json.get("azimuth").doubleValue(azimuth);
     altitude = json.get("altitude").doubleValue(altitude);
     intensity = json.get("intensity").doubleValue(intensity);
-    setTrueIntensity(json.get("trueIntensity").doubleValue(trueIntensity));
+    setLuminosity(json.get("luminosity").doubleValue(luminosity));
 
     if (json.get("color").isObject()) {
       JsonObject colorObj = json.get("color").object();

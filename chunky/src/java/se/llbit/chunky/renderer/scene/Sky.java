@@ -19,6 +19,7 @@ package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.Air;
+import se.llbit.chunky.renderer.SunSamplingStrategy;
 import se.llbit.chunky.resources.HDRTexture;
 import se.llbit.chunky.resources.PFMTexture;
 import se.llbit.chunky.resources.Texture;
@@ -445,7 +446,7 @@ public class Sky implements JsonSerializable {
     double g = ray.color.y;
     double b = ray.color.z;
     if (scene.sun().intersect(ray)) {
-      double mult = scene.getFastSunSampling() ? 1 : scene.sun().getTrueIntensity();
+      double mult = scene.getSunSamplingStrategy() == SunSamplingStrategy.Fast ? 1 : scene.sun().getLuminosity();
 
       // Blend sun color with current color.
       ray.color.x = ray.color.x * mult + r;
