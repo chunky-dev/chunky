@@ -1,4 +1,5 @@
 /* Copyright (c) 2013-2015 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2013-2022 Chunky Contributors
  *
  * This file is part of Chunky.
  *
