@@ -19,16 +19,27 @@ package se.llbit.chunky.renderer;
 import se.llbit.util.Registerable;
 
 public enum SunSamplingStrategy implements Registerable {
-    Off("Off", "Sun is not sampled with next event estimation."),
-    Fast("Fast", "Fast sun sampling algorithm. Lower noise but does not correctly model some visual effects."),
-    HighQuality("High Quality", "High quality sun sampling. More noise but correctly models visual effects.");
+    Off("Off", "Sun is not sampled with next event estimation.", false, true, false, true),
+    NonLuminous("Non-Luminous", "Sun is drawn on the skybox but it does not contribute to the lighting of the scene.", false, false, false, false),
+    Fast("Fast", "Fast sun sampling algorithm. Lower noise but does not correctly model some visual effects.", true, false, false, false),
+    HighQuality("High Quality", "High quality sun sampling. More noise but correctly models visual effects.", true, true, true, true);
 
     private final String friendlyName;
     private final String description;
 
-    SunSamplingStrategy(String name, String description) {
+    private final boolean sunSampling;
+    private final boolean diffuseSun;
+    private final boolean strictDirectLight;
+    private final boolean sunLuminosity;
+
+    SunSamplingStrategy(String name, String description, boolean sunSampling, boolean diffuseSun, boolean strictDirectLight, boolean sunLuminosity) {
         this.friendlyName = name;
         this.description = description;
+
+        this.sunSampling = sunSampling;
+        this.diffuseSun = diffuseSun;
+        this.strictDirectLight = strictDirectLight;
+        this.sunLuminosity = sunLuminosity;
     }
 
     @Override
@@ -44,5 +55,21 @@ public enum SunSamplingStrategy implements Registerable {
     @Override
     public String getId() {
         return this.name();
+    }
+
+    public boolean doSunSampling() {
+        return sunSampling;
+    }
+
+    public boolean isDiffuseSun() {
+        return diffuseSun;
+    }
+
+    public boolean isStrictDirectLight() {
+        return strictDirectLight;
+    }
+
+    public boolean isSunLuminosity() {
+        return sunLuminosity;
     }
 }

@@ -2898,6 +2898,22 @@ public class Scene implements JsonSerializable, Refreshable {
     emittersEnabled = json.get("emittersEnabled").boolValue(emittersEnabled);
     emitterIntensity = json.get("emitterIntensity").doubleValue(emitterIntensity);
 
+    if (json.get("sunSamplingStrategy").isUnknown()) {
+      boolean sunSampling = json.get("sunEnabled").boolValue(false);
+      boolean drawSun = json.get("sun").asObject().get("drawTexture").boolValue(false);
+      if (drawSun) {
+        if (sunSampling) {
+          sunSamplingStrategy = SunSamplingStrategy.Fast;
+        } else {
+          sunSamplingStrategy = SunSamplingStrategy.NonLuminous;
+        }
+      } else {
+        sunSamplingStrategy = SunSamplingStrategy.Fast;
+      }
+    } else {
+      sunSamplingStrategy = SunSamplingStrategy.valueOf(json.get("sunSamplingStrategy").asString(SunSamplingStrategy.Fast.getId()));
+    }
+
     if (json.get("sunEnabled").boolValue(false)) {
       sunSamplingStrategy = SunSamplingStrategy.Fast;
     } else {

@@ -446,7 +446,7 @@ public class Sky implements JsonSerializable {
     double g = ray.color.y;
     double b = ray.color.z;
     if (scene.sun().intersect(ray)) {
-      double mult = scene.getSunSamplingStrategy() == SunSamplingStrategy.Fast ? 1 : scene.sun().getLuminosity();
+      double mult = scene.getSunSamplingStrategy().isSunLuminosity() ? 1 : scene.sun().getLuminosity();
 
       // Blend sun color with current color.
       ray.color.x = ray.color.x * mult + r;
