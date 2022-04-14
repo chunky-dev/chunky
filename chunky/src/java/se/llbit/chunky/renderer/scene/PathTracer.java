@@ -193,7 +193,7 @@ public class PathTracer implements RayTracer {
               }
             }
 
-            if (scene.getSunSamplingStrategy().doSunSampling()) {
+            if (scene.sun().drawTexture() && scene.getSunSamplingStrategy().doSunSampling()) {
               reflected.set(ray);
               scene.sun.getRandomSunDirection(reflected, random);
 
@@ -216,7 +216,7 @@ public class PathTracer implements RayTracer {
 
                 Vector4 attenuation = state.attenuation;
                 if (attenuation.w > 0) {
-                  double mult = QuickMath.abs(reflected.d.dot(ray.getNormal()));
+                  double mult = QuickMath.abs(reflected.d.dot(ray.getNormal())) * (scene.getSunSamplingStrategy().isSunLuminosity() ? scene.sun().getLuminosityPdf() : 1);
                   directLightR = attenuation.x * attenuation.w * mult;
                   directLightG = attenuation.y * attenuation.w * mult;
                   directLightB = attenuation.z * attenuation.w * mult;
