@@ -53,7 +53,7 @@ For guides and more information please checkout the [Documentation][chunky-dev].
 <details>
 <summary><strong>Which Minecraft versions are supported?</strong></summary>
 
-> Starting with Chunky 2.4.0, we support Minecraft 1.2-1.17 worlds and Cubic Chunks for Minecraft 1.10-1.12 worlds.
+> Starting with Chunky 2.4.2, we support Minecraft 1.2-1.18 worlds and Cubic Chunks for Minecraft 1.10-1.12 worlds.
 > 
 > We typically add new blocks shortly after a new Minecraft snapshot is released. Use the latest Chunky snapshot to render them until a new Chunky version is released.
 </details>
@@ -181,7 +181,7 @@ when in doubt.
 
 ## Copyright & License
 
-Chunky is Copyright (c) 2010-2021, Jesper Öqvist <jesper@llbit.se> and [Chunky Contributors][chunky-contributors]. 
+Chunky is Copyright (c) 2010-2022, Jesper Öqvist <jesper@llbit.se> and [Chunky Contributors][chunky-contributors]. 
 
 Permission to modify and redistribute is granted under the terms of
 the GPLv3 license. See the file `LICENSE` for the full license.
