@@ -143,6 +143,8 @@ public class Biomes {
   private static final Biome stonyPeaks = register(new Biome("minecraft:stony_peaks", "Stony Peaks", 1, 0.3, 0x7E7E7E, 0x9ABE4B, 0x82AC1E));
   private static final Biome stonyShore = register(new Biome("minecraft:stony_shore", "Stony Shore", 0.2, 0.3, 0x7E7E7E, 0x8AB689, 0x6DA36B));
   private static final Biome lushCaves = register(new Biome("minecraft:lush_caves", "Lush Caves", 0.5, 0.5, 0x7E7E7E, 0x8EB971, 0x71A74D));
+  private static final Biome deepDark = register(new Biome("minecraft:deep_dark", "Deep Dark", 0.8, 0.4, 0x7E7E7E, 0x91BD59, 0x77AB2F));
+  private static final Biome mangroveSwamp = register(Biome.create("minecraft:mangrove_swamp", "Mangrove Swamp", 0.8, 0.9).defaultColors(0x6A7039, 0x8DB127).waterColor(0x3A7A6A).mapColor(0x07F9B2).swamp());
 
   /**
    * Pre-1.18 biomes, i.e. before the biomes palette was introduced.
