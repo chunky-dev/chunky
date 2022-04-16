@@ -94,6 +94,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private CheckBox loadPaintings;
   @FXML private CheckBox loadOtherEntities;
   @FXML private CheckBox biomeColors;
+  @FXML private CheckBox using3dBiomes;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
   @FXML private ComboBox<Number> dumpFrequency;
@@ -141,6 +142,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadOtherEntities.setSelected(preferences.shouldLoadClass(null));
     }
     biomeColors.setSelected(scene.biomeColorsEnabled());
+    using3dBiomes.setSelected(scene.isUsing3dBiomes());
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
     reloadChunks.setDisable(scene.numberOfChunks() == 0);
     loadSelectedChunks.setDisable(
@@ -277,6 +279,10 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     biomeColors.setTooltip(new Tooltip("Colors grass and tree leaves according to biome."));
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
       scene.setBiomeColorsEnabled(newValue);
+    });
+    using3dBiomes.setTooltip(new Tooltip("Attempt to load biomes as 3d (Added in 1.18+)."));
+    using3dBiomes.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.setUsing3dBiomes(newValue);
     });
     dumpFrequency.setConverter(new ValidatingNumberStringConverter(true));
     dumpFrequency.getItems().addAll(50, 100, 500, 1000, 2500, 5000);

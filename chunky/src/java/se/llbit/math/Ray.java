@@ -248,21 +248,21 @@ public class Ray {
    * @return foliage color for the current block
    */
   public float[] getBiomeFoliageColor(Scene scene) {
-    return scene.getFoliageColor((int) (o.x + d.x * OFFSET), (int) (o.z + d.z * OFFSET));
+    return scene.getFoliageColor((int) (o.x + d.x * OFFSET), (int) (o.y + d.y * OFFSET), (int) (o.z + d.z * OFFSET));
   }
 
   /**
    * @return grass color for the current block
    */
   public float[] getBiomeGrassColor(Scene scene) {
-    return scene.getGrassColor((int) (o.x + d.x * OFFSET), (int) (o.z + d.z * OFFSET));
+    return scene.getGrassColor((int) (o.x + d.x * OFFSET), (int) (o.y + d.y * OFFSET), (int) (o.z + d.z * OFFSET));
   }
 
   /**
    * @return water color for the current block
    */
   public float[] getBiomeWaterColor(Scene scene) {
-    return scene.getWaterColor((int) (o.x + d.x * OFFSET), (int) (o.z + d.z * OFFSET));
+    return scene.getWaterColor((int) (o.x + d.x * OFFSET), (int) (o.y + d.y * OFFSET), (int) (o.z + d.z * OFFSET));
   }
 
   /**

@@ -115,7 +115,7 @@ public class PreviewRayTracer implements RayTracer {
     if (scene.getWaterPlaneChunkClip()) {
       Vector3 pos = new Vector3(ray.o);
       pos.scaleAdd(t, ray.d);
-      if (scene.isChunkLoaded((int)Math.floor(pos.x), (int)Math.floor(pos.z)))
+      if (scene.isChunkLoaded((int)Math.floor(pos.x), (int)Math.floor(pos.y), (int)Math.floor(pos.z)))
         return false;
     }
     if (ray.d.y < 0) {
