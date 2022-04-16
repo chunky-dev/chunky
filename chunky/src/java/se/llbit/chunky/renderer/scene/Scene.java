@@ -249,7 +249,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /** Controls how much the fog color is blended over the sky/skymap. */
   protected double skyFogDensity = 1;
 
-  protected boolean using3dBiomes = false;
+  protected boolean use3dBiomes = false;
   protected boolean biomeColors = true;
   protected boolean transparentSky = false;
   protected boolean renderActors = true;
@@ -956,7 +956,7 @@ public class Scene implements JsonSerializable, Refreshable {
     Set<ChunkPosition> legacyChunks = new HashSet<>();
 
     Position2IntStructure biomePaletteIdxStructure;
-    if (using3dBiomes) {
+    if (use3dBiomes) {
       biomePaletteIdxStructure = new Position3d2IntPackedArray();
     } else {
       biomePaletteIdxStructure = new Position2d2IntPackedArray();
@@ -1363,7 +1363,7 @@ public class Scene implements JsonSerializable, Refreshable {
       for (ChunkPosition cp : nonEmptyChunks) {
         // Finalize grass and foliage textures.
         // 3x3 box blur.
-        if(using3dBiomes) {
+        if(use3dBiomes) {
           for (int sectionY = yMin >> 4; sectionY < (yMax - 1 >> 4) + 1; sectionY++) {
             for (int x = 0; x < 16; ++x) {
               for (int z = 0; z < 16; ++z) {
@@ -3462,14 +3462,14 @@ public class Scene implements JsonSerializable, Refreshable {
     this.waterShading = waterShading;
   }
 
-  public boolean isUsing3dBiomes() {
-    return using3dBiomes;
+  public boolean using3dBiomes() {
+    return use3dBiomes;
   }
 
-  public void setUsing3dBiomes(boolean value) {
-    using3dBiomes = value;
+  public void setUse3dBiomes(boolean value) {
+    use3dBiomes = value;
 
-    if(using3dBiomes) {
+    if(use3dBiomes) {
       grassTexture = new Position3d2ReferencePackedArrayStructure();
       foliageTexture = new Position3d2ReferencePackedArrayStructure();
       waterTexture = new Position3d2ReferencePackedArrayStructure();
