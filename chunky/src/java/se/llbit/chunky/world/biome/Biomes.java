@@ -26,7 +26,6 @@ import se.llbit.math.QuickMath;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 import static se.llbit.math.ColorUtil.getRGBAComponentsGammaCorrected;
 
@@ -36,8 +35,6 @@ import static se.llbit.math.ColorUtil.getRGBAComponentsGammaCorrected;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Biomes {
-  public static final int BIOME_MASK = 0xFF;
-
   public static final Biome unknown = new Biome("", "unknown", 0.5, 0.5, 0x7E7E7E, 0x8EB971, 0x71A74D);
 
   public static final Map<String, Biome> biomesByResourceLocation = new Object2ReferenceOpenHashMap<>();
@@ -54,7 +51,7 @@ public class Biomes {
   private static final Biome mountains = register(new Biome("minecraft:mountains", "Mountains", 0.2, 0.3, 0x606060, 0x8AB689, 0x6DA36B));
   private static final Biome forest = register(new Biome("minecraft:forest", "Forest", 0.7, 0.8, 0x056621, 0x79C05A, 0x59AE30));
   private static final Biome taiga = register(new Biome("minecraft:taiga", "Taiga", 0.25, 0.8, 0x0B6659, 0x86B783, 0x68A464));
-  private static final Biome swamp = register(new Biome("minecraft:swamp", "Swamp", 0.8, 0.9, 0x07F9B2, 0x6A7039, 0x6A7039, 0x617B64));
+  private static final Biome swamp = register(Biome.create("minecraft:swamp", "Swamp", 0.8, 0.9).defaultColors(0x6A7039, 0x6A7039).waterColor(0x617B64).mapColor(0x07F9B2).swamp());
   private static final Biome river = register(new Biome("minecraft:river", "River", 0.5, 0.5, 0x0000FF, 0x8EB971, 0x71A74D));
   private static final Biome netherWastes = register(new Biome("minecraft:nether_wastes", "Nether Wastes", 2, 0, 0xBF3B3B, 0xBFB755, 0xAEA42A));
   private static final Biome theEnd = register(new Biome("minecraft:the_end", "The End", 0.5, 0.5, 0x8080FF, 0x8EB971, 0x71A74D));
@@ -77,7 +74,7 @@ public class Biomes {
   private static final Biome snowyBeach = register(new Biome("minecraft:snowy_beach", "Snowy Beach", 0.05, 0.3, 0xFAF0C0, 0x83B593, 0x64A278));
   private static final Biome birchForest = register(new Biome("minecraft:birch_forest", "Birch Forest", 0.6, 0.6, 0x307444, 0x88BB67, 0x6BA941));
   private static final Biome birchForestHills = register(new Biome("minecraft:birch_forest_hills", "Birch Forest Hills", 0.6, 0.6, 0x1F5F32, 0x88BB67, 0x6BA941));
-  private static final Biome darkForest = register(new Biome("minecraft:dark_forest", "Dark Forest", 0.7, 0.8, 0x40511A, 0x26C05A, 0x59AE30));
+  private static final Biome darkForest = register(Biome.create("minecraft:dark_forest", "Dark Forest", 0.7, 0.8).defaultColors(0x26C05A, 0x59AE30).mapColor(0x40511A).darkForest());
   private static final Biome snowyTaiga = register(new Biome("minecraft:snowy_taiga", "Snowy Taiga", -0.5, 0.4, 0x31554A, 0x80B497, 0x60A17B));
   private static final Biome snowyTaigaHills = register(new Biome("minecraft:snowy_taiga_hills", "Snowy Taiga Hills", -0.5, 0.4, 0x243F36, 0x80B497, 0x60A17B));
   private static final Biome giantTreeTaiga = register(new Biome("minecraft:giant_tree_taiga", "Giant Tree Taiga", 0.3, 0.8, 0x596651, 0x86B87F, 0x68A55F));
@@ -85,9 +82,9 @@ public class Biomes {
   private static final Biome woodedMountains = register(new Biome("minecraft:wooded_mountains", "Wooded Mountains", 0.2, 0.3, 0x507050, 0x8AB689, 0x6DA36B));
   private static final Biome savanna = register(new Biome("minecraft:savanna", "Savanna", 1.2, 0, 0xBDB25F, 0xBFB755, 0xAEA42A));
   private static final Biome savannaPlateau = register(new Biome("minecraft:savanna_plateau", "Savanna Plateau", 1, 0, 0xA79D64, 0xBFB755, 0xAEA42A));
-  private static final Biome badlands = register(new Biome("minecraft:badlands", "Badlands", 2, 0, 0xD94515, 0x90814D, 0x9E814D));
-  private static final Biome woodedBadlandsPlateau = register(new Biome("minecraft:wooded_badlands_plateau", "Wooded Badlands Plateau", 2, 0, 0xB09765, 0x90814D, 0x9E814D));
-  private static final Biome badlandsPlateau = register(new Biome("minecraft:badlands_plateau", "Badlands Plateau", 2, 0, 0xCA8C65, 0x90814D, 0x9E814D));
+  private static final Biome badlands = register(Biome.create("minecraft:badlands", "Badlands", 2, 0).mapColor(0xD94515).badlands());
+  private static final Biome woodedBadlandsPlateau = register(Biome.create("minecraft:wooded_badlands_plateau", "Wooded Badlands Plateau", 2, 0).mapColor(0xB09765).badlands());
+  private static final Biome badlandsPlateau = register(Biome.create("minecraft:badlands_plateau", "Badlands Plateau", 2, 0).mapColor(0xCA8C65).badlands());
   private static final Biome smallEndIslands = register(new Biome("minecraft:small_end_islands", "Small End Islands", 0.5, 0.5, 0x8080FF, 0x8EB971, 0x71A74D));
   private static final Biome endMidlands = register(new Biome("minecraft:end_midlands", "End Midlands", 0.5, 0.5, 0x8080FF, 0x8EB971, 0x71A74D));
   private static final Biome endHighlands = register(new Biome("minecraft:end_highlands", "End Highlands", 0.5, 0.5, 0x8080FF, 0x8EB971, 0x71A74D));
@@ -105,22 +102,22 @@ public class Biomes {
   private static final Biome gravellyMountains = register(new Biome("minecraft:gravelly_mountains", "Gravelly Mountains", 0.2, 0.3, 0x888888, 0x8AB689, 0x6DA36B));
   private static final Biome flowerForest = register(new Biome("minecraft:flower_forest", "Flower Forest", 0.7, 0.8, 0x2D8E49, 0x79C05A, 0x59AE30));
   private static final Biome taigaMountains = register(new Biome("minecraft:taiga_mountains", "Taiga Mountains", 0.25, 0.8, 0x338E81, 0x86B783, 0x68A464));
-  private static final Biome swampHills = register(new Biome("minecraft:swamp_hills", "Swamp Hills", 0.8, 0.9, 0x2FFFDA, 0x6A7039, 0x6A7039, 0x617B64));
+  private static final Biome swampHills = register(Biome.create("minecraft:swamp_hills", "Swamp Hills", 0.8, 0.9).defaultColors(0x6A7039, 0x6A7039).waterColor(0x617B64).mapColor(0x2FFFDA).swamp());
   private static final Biome iceSpikes = register(new Biome("minecraft:ice_spikes", "Ice Spikes", 0, 0.5, 0xB4DCDC, 0x80B497, 0x60A17B));
   private static final Biome modifiedJungle = register(new Biome("minecraft:modified_jungle", "Modified Jungle", 0.95, 0.9, 0x7BA331, 0x59C93C, 0x30BB0B));
   private static final Biome modifiedJungleEdge = register(new Biome("minecraft:modified_jungle_edge", "Modified Jungle Edge", 0.95, 0.8, 0x8AB33F, 0x64C73F, 0x3EB80F));
   private static final Biome tallBirchForest = register(new Biome("minecraft:tall_birch_forest", "Tall Birch Forest", 0.6, 0.6, 0x589C6C, 0x88BB67, 0x6BA941));
   private static final Biome tallBirchHills = register(new Biome("minecraft:tall_birch_hills", "Tall Birch Hills", 0.6, 0.6, 0x47875A, 0x88BB67, 0x6BA941));
-  private static final Biome darkForestHills = register(new Biome("minecraft:dark_forest_hills", "Dark Forest Hills", 0.7, 0.8, 0x687942, 0x1BC05A, 0x59AE30));
+  private static final Biome darkForestHills = register(Biome.create("minecraft:dark_forest_hills", "Dark Forest Hills", 0.7, 0.8).defaultColors(0x1BC05A, 0x59AE30).mapColor(0x687942).darkForest());
   private static final Biome snowyTaigaMountains = register(new Biome("minecraft:snowy_taiga_mountains", "Snowy Taiga Mountains", -0.5, 0.4, 0x597D72, 0x80B497, 0x60A17B));
   private static final Biome giantSpruceTaiga = register(new Biome("minecraft:giant_spruce_taiga", "Giant Spruce Taiga", 0.25, 0.8, 0x818E79, 0x86B783, 0x68A464));
   private static final Biome giantSpruceTaigaHills = register(new Biome("minecraft:giant_spruce_taiga_hills", "Giant Spruce Taiga Hills", 0.25, 0.8, 0x6D7766, 0x86B783, 0x68A464));
   private static final Biome modifiedGravellyMountains = register(new Biome("minecraft:modified_gravelly_mountains+", "Gravelly Mountains+", 0.2, 0.3, 0x789878, 0x8AB689, 0x6DA36B));
   private static final Biome shatteredSavanna = register(new Biome("minecraft:shattered_savanna", "Shattered Savanna", 1.1, 0, 0xE5DA87, 0xBFB755, 0xAEA42A));
   private static final Biome shatteredSavannaPlateau = register(new Biome("minecraft:shattered_savanna_plateau", "Shattered Savanna Plateau", 1, 0, 0xCFC58C, 0xBFB755, 0xAEA42A));
-  private static final Biome erodedBadlands = register(new Biome("minecraft:eroded_badlands", "Eroded Badlands", 2, 0, 0xFF6D3D, 0x90814D, 0x9E814D));
-  private static final Biome modifiedWoodedBadlandsPlateau = register(new Biome("minecraft:modified_wooded_badlands_plateau", "Modified Wooded Badlands Plateau", 2, 0, 0xD8BF8D, 0x90814D, 0x9E814D));
-  private static final Biome modifiedBadlandsPlateau = register(new Biome("minecraft:modified_badlands_plateau", "Modified Badlands Plateau", 2, 0, 0xF2B48D, 0x90814D, 0x9E814D));
+  private static final Biome erodedBadlands = register(Biome.create("minecraft:eroded_badlands", "Eroded Badlands", 2, 0).mapColor(0xFF6D3D).badlands());
+  private static final Biome modifiedWoodedBadlandsPlateau = register(Biome.create("minecraft:modified_wooded_badlands_plateau", "Modified Wooded Badlands Plateau", 2, 0).mapColor(0xD8BF8D).badlands());
+  private static final Biome modifiedBadlandsPlateau = register(Biome.create("minecraft:modified_badlands_plateau", "Modified Badlands Plateau", 2, 0).mapColor(0xF2B48D).badlands());
   private static final Biome bambooJungle = register(new Biome("minecraft:bamboo_jungle", "Bamboo Jungle", 0.95, 0.9, 0x768E14, 0x59C93C, 0x30BB0B));
   private static final Biome bambooJungleHills = register(new Biome("minecraft:bamboo_jungle_hills", "Bamboo Jungle Hills", 0.95, 0.9, 0x3B470A, 0x59C93C, 0x30BB0B));
   private static final Biome soulSandValley = register(new Biome("minecraft:soul_sand_valley", "Soul Sand Valley", 2, 0, 0x5E3830, 0xBFB755, 0xAEA42A));
@@ -137,7 +134,7 @@ public class Biomes {
   private static final Biome windsweptForest = register(new Biome("minecraft:windswept_forest", "Windswept Forest", 0.2, 0.3, 0x7E7E7E, 0x8AB689, 0x6DA36B));
   private static final Biome windsweptSavanna = register(new Biome("minecraft:windswept_savanna", "Windswept Savanna", 2, 0, 0x7E7E7E, 0xBFB755, 0xAEA42A));
   private static final Biome sparseJungle = register(new Biome("minecraft:sparse_jungle", "Sparse Jungle", 0.95, 0.8, 0x7E7E7E, 0x64C73F, 0x3EB80F));
-  private static final Biome woodedBadlands = register(new Biome("minecraft:wooded_badlands", "Wooded Badlands", 2, 0, 0xD94515, 0x90814D, 0x9E814D));
+  private static final Biome woodedBadlands = register(Biome.create("minecraft:wooded_badlands", "Wooded Badlands", 2, 0).mapColor(0xD94515).badlands());
   private static final Biome meadow = register(new Biome("minecraft:meadow", "Meadow", 0.5, 0.8, 0x7E7E7E, 0x83BB6D, 0x64A948));
   private static final Biome grove = register(new Biome("minecraft:grove", "Grove", -0.2, 0.8, 0x7E7E7E, 0x80B497, 0x60A17B));
   private static final Biome snowySlopes = register(new Biome("minecraft:snowy_slopes", "Snowy Slopes", -0.3, 0.9, 0x7E7E7E, 0x80B497, 0x60A17B));
@@ -147,46 +144,42 @@ public class Biomes {
   private static final Biome stonyShore = register(new Biome("minecraft:stony_shore", "Stony Shore", 0.2, 0.3, 0x7E7E7E, 0x8AB689, 0x6DA36B));
   private static final Biome lushCaves = register(new Biome("minecraft:lush_caves", "Lush Caves", 0.5, 0.5, 0x7E7E7E, 0x8EB971, 0x71A74D));
 
-  private static final Biome[] SWAMP_BIOMES = { swamp, swampHills };
-  private static final Biome[] BADLANDS_BIOMES = { badlands, woodedBadlandsPlateau, badlandsPlateau, erodedBadlands, modifiedWoodedBadlandsPlateau, modifiedBadlandsPlateau, woodedBadlands };
-  private static final Biome[] DARK_FOREST_BIOMES = { darkForest, darkForestHills };
-
   /**
    * Pre-1.18 biomes, i.e. before the biomes palette was introduced.
    */
   public static final Biome[] biomesPrePalette = {
-      ocean, plains, desert, mountains, forest, taiga, swamp, river,
-      netherWastes, theEnd, frozenOcean, frozenRiver, snowyTundra, snowyMountains, mushroomFields, mushroomFieldShore,
-      beach, desertHills, woodedHills, taigaHills, mountainEdge, jungle, jungleHills, jungleEdge,
-      deepOcean, stoneShore, snowyBeach, birchForest, birchForestHills, darkForest, snowyTaiga, snowyTaigaHills,
-      giantTreeTaiga, giantTreeTaigaHills, woodedMountains, savanna, savannaPlateau, badlands, woodedBadlandsPlateau, badlandsPlateau,
-      smallEndIslands, endMidlands, endHighlands, endBarrens, warmOcean, lukewarmOcean, coldOcean, deepWarmOcean,
-      deepLukewarmOcean, deepColdOcean, deepFrozenOcean, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, theVoid,
-      unknown, sunflowerPlains, desertLakes, gravellyMountains, flowerForest, taigaMountains, swampHills, unknown,
-      unknown, unknown, unknown, unknown, iceSpikes, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, modifiedJungle, unknown, modifiedJungleEdge,
-      unknown, unknown, unknown, tallBirchForest, tallBirchHills, darkForestHills, snowyTaigaMountains, unknown,
-      giantSpruceTaiga, giantSpruceTaigaHills, modifiedGravellyMountains, shatteredSavanna, shatteredSavannaPlateau, erodedBadlands, modifiedWoodedBadlandsPlateau, modifiedBadlandsPlateau,
-      bambooJungle, bambooJungleHills, soulSandValley, crimsonForest, warpedForest, basaltDeltas, dripstoneCaves, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
-      unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    ocean, plains, desert, mountains, forest, taiga, swamp, river,
+    netherWastes, theEnd, frozenOcean, frozenRiver, snowyTundra, snowyMountains, mushroomFields, mushroomFieldShore,
+    beach, desertHills, woodedHills, taigaHills, mountainEdge, jungle, jungleHills, jungleEdge,
+    deepOcean, stoneShore, snowyBeach, birchForest, birchForestHills, darkForest, snowyTaiga, snowyTaigaHills,
+    giantTreeTaiga, giantTreeTaigaHills, woodedMountains, savanna, savannaPlateau, badlands, woodedBadlandsPlateau, badlandsPlateau,
+    smallEndIslands, endMidlands, endHighlands, endBarrens, warmOcean, lukewarmOcean, coldOcean, deepWarmOcean,
+    deepLukewarmOcean, deepColdOcean, deepFrozenOcean, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, theVoid,
+    unknown, sunflowerPlains, desertLakes, gravellyMountains, flowerForest, taigaMountains, swampHills, unknown,
+    unknown, unknown, unknown, unknown, iceSpikes, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, modifiedJungle, unknown, modifiedJungleEdge,
+    unknown, unknown, unknown, tallBirchForest, tallBirchHills, darkForestHills, snowyTaigaMountains, unknown,
+    giantSpruceTaiga, giantSpruceTaigaHills, modifiedGravellyMountains, shatteredSavanna, shatteredSavannaPlateau, erodedBadlands, modifiedWoodedBadlandsPlateau, modifiedBadlandsPlateau,
+    bambooJungle, bambooJungleHills, soulSandValley, crimsonForest, warpedForest, basaltDeltas, dripstoneCaves, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+    unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
   };
 
   static {
@@ -204,28 +197,29 @@ public class Biomes {
     return biome;
   }
 
+  private static Biome register(BiomeBuilder biomeBuilder) {
+    return register(biomeBuilder.build());
+  }
+
   /**
    * Loads grass colors from a grass color texture.
    */
   public static void loadGrassColors(BitmapImage texture) {
-    loadColorsFromTexture((biome, color) -> biome.grassColor = color, texture);
-    
-    // Dark forest biomes' grass color is retrieved normally, then averaged with 0x28340A to produce the final color
-    float[] color = new float[3];
-    for (Biome biome : DARK_FOREST_BIOMES) {
-      ColorUtil.getRGBComponents(biome.grassColor, color);
-      color[0] += 40 / 255.f;
-      color[1] += 52 / 255.f;
-      color[2] += 10 / 255.f;
-      biome.grassColor = ColorUtil.getRGB(color[0] / 2, color[1] / 2, color[2] / 2);
-    }
-    
-    // Badland biome's grass color is hardcoded
-    for (Biome biome : BADLANDS_BIOMES) {
-      biome.grassColor = 0x90814D;
-    }
-
     for (Biome biome : biomes) {
+      if (biome.grassColorMode == Biome.GrassColorMode.SWAMP) {
+        biome.grassColor = 0x6A7039;
+      } else if (biome.grassColorMode != Biome.GrassColorMode.FIXED_COLOR) {
+        biome.grassColor = getFoliageOrGrassColor(texture, biome);
+        if (biome.grassColorMode == Biome.GrassColorMode.DARK_FOREST) {
+          // Dark forest biomes' grass color is retrieved normally, then averaged with 0x28340A to produce the final color
+          float[] color = new float[3];
+          ColorUtil.getRGBComponents(biome.grassColor, color);
+          color[0] += 40 / 255.f;
+          color[1] += 52 / 255.f;
+          color[2] += 10 / 255.f;
+          biome.grassColor = ColorUtil.getRGB(color[0] / 2, color[1] / 2, color[2] / 2);
+        }
+      }
       biome.grassColorLinear = getRGBAComponentsGammaCorrected(biome.grassColor);
     }
   }
@@ -234,31 +228,20 @@ public class Biomes {
    * Loads foliage colors from a grass color texture.
    */
   public static void loadFoliageColors(BitmapImage texture) {
-    loadColorsFromTexture((biome, color) -> biome.foliageColor = color, texture);
-
-    // Badland biome's foliage colors are hardcoded
-    for (Biome biome : BADLANDS_BIOMES) {
-      biome.foliageColor = 0x9E814D;
-    }
-
     for (Biome biome : biomes) {
+      if (biome.foliageColorMode == Biome.FoliageColorMode.SWAMP) {
+        biome.foliageColor = 0x6A7039;
+      } else if (biome.foliageColorMode == Biome.FoliageColorMode.DEFAULT) {
+        biome.foliageColor = getFoliageOrGrassColor(texture, biome);
+      }
       biome.foliageColorLinear = getRGBAComponentsGammaCorrected(biome.foliageColor);
     }
   }
 
-  private static void loadColorsFromTexture(BiConsumer<Biome, Integer> colorConsumer, BitmapImage texture) {
-    for (Biome biome : biomes) {
-      double temp = QuickMath.clamp(biome.temperature, 0, 1);
-      double rain = QuickMath.clamp(biome.rain, 0, 1);
-      rain *= temp;
-      int color = texture.getPixel((int) ((1 - temp) * 255), (int) ((1 - rain) * 255));
-      colorConsumer.accept(biome, color);
-    }
-
-    // Swamp biome's grass and foliage colors are hardcoded
-    // (actually perlin noise with two colors in Java Edition, for we use one color as in Bedrock Edition)
-    for (Biome biome : SWAMP_BIOMES) {
-      colorConsumer.accept(biome, 0x6A7039);
-    }
+  private static int getFoliageOrGrassColor(BitmapImage texture, Biome biome) {
+    double temp = QuickMath.clamp(biome.temperature, 0, 1);
+    double rain = QuickMath.clamp(biome.rain, 0, 1);
+    rain *= temp;
+    return texture.getPixel((int) ((1 - temp) * 255), (int) ((1 - rain) * 255));
   }
 }
