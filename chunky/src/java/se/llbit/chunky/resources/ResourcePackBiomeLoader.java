@@ -3,7 +3,9 @@ package se.llbit.chunky.resources;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.stream.Stream;
 
 public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
@@ -18,11 +20,13 @@ public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
                     String namespace = String.valueOf(ns.getFileName());
 
                     Path biomes = ns.resolve("worldgen").resolve("biome");
-                    try (Stream<Path> biomeStream = Files.list(biomes)) {
-                        biomeStream.forEach(biome -> {
-                            String biomeName = String.valueOf(biome.getFileName());
-                            if (biomeName.endsWith(".json")) {
-                                biomeName = biomeName.substring(0, biomeName.length() - ".json".length());
+                    try (Stream<Path> biomeStream = Files.walk(biomes)) {
+                        biomeStream
+                                .filter(p -> Files.isRegularFile(p, LinkOption.NOFOLLOW_LINKS))
+                                .map(biomes::relativize)
+                                .forEach(biome -> {
+                            if (biome.toString().endsWith(".json")) {
+                                String biomeName = getBiomeName(biome);
                                 System.out.printf("%s:%s\n", namespace, biomeName);
                             }
                         });
@@ -36,8 +40,14 @@ public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
         return false;
     }
 
-    @Override
-    public String[] toLoad() {
-        return null;
+    private static String getBiomeName(Path biome) {
+        ArrayList<String> path = new ArrayList<>();
+        biome.iterator().forEachRemaining(p -> path.add(String.valueOf(p)));
+
+        String out = String.join("/", path);
+        if (out.toLowerCase().endsWith(".json")) {
+            out = out.substring(0, out.length() - ".json".length());
+        }
+        return out;
     }
 }
