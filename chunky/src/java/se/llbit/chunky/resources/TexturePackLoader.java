@@ -3642,6 +3642,16 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/potted_azalea_bush_plant", Texture.pottedAzaleaBushPlant);
     addSimpleTexture("assets/minecraft/textures/block/potted_flowering_azalea_bush_top", Texture.pottedFloweringAzaleaBushTop);
     addSimpleTexture("assets/minecraft/textures/block/potted_flowering_azalea_bush_side", Texture.pottedFloweringAzaleaBushSide);
+
+    // Minecraft 1.19
+    addSimpleTexture("assets/minecraft/textures/block/mud", Texture.mud);
+    addSimpleTexture("assets/minecraft/textures/block/mud_bricks", Texture.mudBricks);
+    addSimpleTexture("assets/minecraft/textures/block/packed_mud", Texture.packedMud);
+    addSimpleTexture("assets/minecraft/textures/block/muddy_mangrove_roots_side", Texture.muddyMangroveRootsSide);
+    addSimpleTexture("assets/minecraft/textures/block/muddy_mangrove_roots_top", Texture.muddyMangroveRootsTop);
+    addSimpleTexture("assets/minecraft/textures/block/reinforced_deepslate_top", Texture.reinforcedDeepslateTop);
+    addSimpleTexture("assets/minecraft/textures/block/reinforced_deepslate_side", Texture.reinforcedDeepslateSide);
+    addSimpleTexture("assets/minecraft/textures/block/reinforced_deepslate_bottom", Texture.reinforcedDeepslateBottom);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
