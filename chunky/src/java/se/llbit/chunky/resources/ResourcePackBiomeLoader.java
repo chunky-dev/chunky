@@ -1,5 +1,8 @@
 package se.llbit.chunky.resources;
 
+import se.llbit.chunky.world.biome.Biome;
+import se.llbit.chunky.world.biome.Biomes;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,7 +30,7 @@ public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
                                 .forEach(biome -> {
                             if (biome.toString().endsWith(".json")) {
                                 String biomeName = getBiomeName(biome);
-                                System.out.printf("%s:%s\n", namespace, biomeName);
+                                Biomes.register(Biome.create(namespace + ":" + biomeName, biomeName, 0, 0));
                             }
                         });
                     } catch (IOException ignored) {}

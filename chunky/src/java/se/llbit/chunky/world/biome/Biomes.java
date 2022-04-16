@@ -194,13 +194,15 @@ public class Biomes {
 
   // TODO PluginApi?
   public static Biome register(Biome biome) {
-    biomes.add(biome);
-    biomesByResourceLocation.put(biome.resourceLocation, biome);
+    if (!biomesByResourceLocation.containsKey(biome.resourceLocation)) {
+      biomes.add(biome);
+      biomesByResourceLocation.put(biome.resourceLocation, biome);
+    }
 
     return biome;
   }
 
-  private static Biome register(BiomeBuilder biomeBuilder) {
+  public static Biome register(BiomeBuilder biomeBuilder) {
     return register(biomeBuilder.build());
   }
 
