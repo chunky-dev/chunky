@@ -516,6 +516,12 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:moss_block",
       "minecraft:moss_carpet",
       "minecraft:moving_piston",
+      "minecraft:mud",
+      "minecraft:mud_bricks",
+      "minecraft:mud_brick_slab",
+      "minecraft:mud_brick_stairs",
+      "minecraft:mud_brick_wall",
+      "minecraft:muddy_mangrove_roots",
       "minecraft:mushroom_stem",
       "minecraft:mycelium",
       "minecraft:nether_brick_fence",
@@ -566,6 +572,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:orange_wool",
       "minecraft:oxeye_daisy",
       "minecraft:packed_ice",
+      "minecraft:packed_mud",
       "minecraft:peony",
       "minecraft:petrified_oak_slab",
       "minecraft:pink_banner",
@@ -2880,6 +2887,20 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.rawGoldBlock);
       case "raw_iron_block":
         return new MinecraftBlock(name, Texture.rawIronBlock);
+      case "mud":
+        return new MinecraftBlock(name, Texture.mud);
+      case "mud_bricks":
+        return new MinecraftBlock(name, Texture.mudBricks);
+      case "mud_brick_slab":
+        return slab(tag, Texture.mudBricks);
+      case "mud_brick_stairs":
+        return stairs(tag, Texture.mudBricks);
+      case "mud_brick_wall":
+        return wall(tag, Texture.mudBricks);
+      case "packed_mud":
+        return new MinecraftBlock(name, Texture.packedMud);
+      case "muddy_mangrove_roots":
+        return log(tag, Texture.muddyMangroveRootsSide, Texture.muddyMangroveRootsTop);
       case "structure_void":
       case "barrier":
         // Invisible.
