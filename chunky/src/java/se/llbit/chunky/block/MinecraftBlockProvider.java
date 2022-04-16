@@ -728,6 +728,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:red_tulip",
       "minecraft:red_wall_banner",
       "minecraft:red_wool",
+      "minecraft:reinforced_deepslate",
       "minecraft:repeater",
       "minecraft:repeating_command_block",
       "minecraft:respawn_anchor",
@@ -2901,6 +2902,9 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.packedMud);
       case "muddy_mangrove_roots":
         return log(tag, Texture.muddyMangroveRootsSide, Texture.muddyMangroveRootsTop);
+      case "reinforced_deepslate":
+        return new TexturedBlock(
+          name, Texture.reinforcedDeepslateSide, Texture.reinforcedDeepslateTop, Texture.reinforcedDeepslateBottom);
       case "structure_void":
       case "barrier":
         // Invisible.

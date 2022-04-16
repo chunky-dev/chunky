@@ -3649,6 +3649,9 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/packed_mud", Texture.packedMud);
     addSimpleTexture("assets/minecraft/textures/block/muddy_mangrove_roots_side", Texture.muddyMangroveRootsSide);
     addSimpleTexture("assets/minecraft/textures/block/muddy_mangrove_roots_top", Texture.muddyMangroveRootsTop);
+    addSimpleTexture("assets/minecraft/textures/block/reinforced_deepslate_top", Texture.reinforcedDeepslateTop);
+    addSimpleTexture("assets/minecraft/textures/block/reinforced_deepslate_side", Texture.reinforcedDeepslateSide);
+    addSimpleTexture("assets/minecraft/textures/block/reinforced_deepslate_bottom", Texture.reinforcedDeepslateBottom);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

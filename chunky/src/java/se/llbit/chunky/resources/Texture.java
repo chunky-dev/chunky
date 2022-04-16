@@ -1044,6 +1044,9 @@ public class Texture {
   public static final Texture packedMud = new Texture();
   public static final Texture muddyMangroveRootsSide = new Texture();
   public static final Texture muddyMangroveRootsTop = new Texture();
+  public static final Texture reinforcedDeepslateTop = new Texture();
+  public static final Texture reinforcedDeepslateSide = new Texture();
+  public static final Texture reinforcedDeepslateBottom = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
