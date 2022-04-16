@@ -39,14 +39,6 @@ public class Biome {
   public float[] foliageColorLinear;
   public float[] waterColorLinear;
 
-  Biome(String resourceLocation, String name, double temperature, double rain, int mapColor, int grassColor, int foliageColor) {
-    this(resourceLocation, name, temperature, rain, mapColor, grassColor, foliageColor, DEFAULT_WATER_COLOR);
-  }
-
-  Biome(String resourceLocation, String name, double temperature, double rain, int mapColor, int grassColor, int foliageColor, int waterColor) {
-    this(resourceLocation, name, temperature, rain, mapColor, grassColor, GrassColorMode.DEFAULT, foliageColor, FoliageColorMode.DEFAULT, waterColor);
-  }
-
   Biome(String resourceLocation, String name, double temperature, double rain, int mapColor, int grassColor,
         GrassColorMode grassColorMode, int foliageColor, FoliageColorMode foliageColorMode, int waterColor) {
     this.resourceLocation = resourceLocation;
