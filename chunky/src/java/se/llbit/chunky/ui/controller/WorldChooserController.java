@@ -30,6 +30,7 @@ import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.resources.MinecraftFinder;
+import se.llbit.chunky.resources.ResourcePackLoader;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.TableSortConfigSerializer;
 import se.llbit.chunky.world.World;
@@ -149,7 +150,7 @@ public class WorldChooserController implements Initializable {
 
   private void loadWorld(World world, WorldMapLoader mapLoader) {
     world.getResourcePack().ifPresent((worldResourcePack) -> {
-      List<String> texturePacks = new ArrayList<>(TexturePackLoader.getTexturePacks());
+      List<String> texturePacks = new ArrayList<>(ResourcePackLoader.getResourcePacks());
       if (!texturePacks.contains(worldResourcePack.getAbsolutePath())) {
         Alert loadTexturesConfirm = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
         loadTexturesConfirm.getButtonTypes().clear();
@@ -161,7 +162,10 @@ public class WorldChooserController implements Initializable {
         if (loadTexturesConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
           if (!texturePacks.contains(worldResourcePack.getAbsolutePath())) {
             texturePacks.add(0, worldResourcePack.getAbsolutePath());
-            TexturePackLoader.loadTexturePacks(texturePacks.toArray(new String[0]), true);
+            String[] packs = texturePacks.toArray(new String[0]);
+
+            ResourcePackLoader.loadResourcePacks(packs);
+            ResourcePackLoader.rememberResourcePacks(packs);
           }
         }
       }

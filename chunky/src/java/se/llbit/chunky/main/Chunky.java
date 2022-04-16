@@ -34,6 +34,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneFactory;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
+import se.llbit.chunky.resources.ResourcePackLoader;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.ChunkyFx;
@@ -241,7 +242,7 @@ public class Chunky {
    * This can be used by plugins to load the default Minecraft textures.
    */
   public static void loadDefaultTextures() {
-    TexturePackLoader.loadTexturePacks(new String[0], false);
+    ResourcePackLoader.loadResourcePacks(new String[0]);
   }
 
   private void loadPlugins() {

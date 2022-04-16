@@ -22,6 +22,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.ResourcePackLoader;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.json.JsonNumber;
 import se.llbit.json.JsonObject;
@@ -489,8 +490,7 @@ public class CommandLineOptions {
       if (options.texturePack == null || options.texturePack.isEmpty()) {
         options.texturePack = PersistentSettings.getLastTexturePack();
       }
-      TexturePackLoader.setTexturePacks(options.texturePack);
-      TexturePackLoader.loadTexturePacks(options.texturePack, false);
+      ResourcePackLoader.loadResourcePacks(options.texturePack);
     }
   }
 

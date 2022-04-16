@@ -40,7 +40,11 @@ import java.util.*;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class TexturePackLoader {
-  private static Map<String, TextureLoader> allTextures = new HashMap<>();
+  private static final Map<String, TextureLoader> allTextures = new HashMap<>();
+
+  static {
+    ResourcePackLoader.PACK_LOADER_FACTORIES.add(() -> new ResourcePackTextureLoader(allTextures));
+  }
 
   static {
     allTextures.put("normal chest", new ConditionalTextures(
@@ -3663,8 +3667,7 @@ public class TexturePackLoader {
     allTextures.put(name, new SimpleTexture(file, texture));
   }
 
-  private static String[] texturePacks = {};
-
+  @Deprecated // Remove in 2.6
   private static String texturePackName(File tpFile) {
     boolean isDefault = tpFile.equals(MinecraftFinder.getMinecraftJar());
     return String.format("%s (%s)",
@@ -3681,7 +3684,10 @@ public class TexturePackLoader {
    * @param tpFile   resource pack file
    * @param textures textures to load
    * @return the keys for textures that could not be loaded
+   *
+   * @deprecated Remove in 2.6.
    */
+  @Deprecated
   public static Set<Map.Entry<String, TextureLoader>> loadTextures(File tpFile,
                                                                    Collection<Map.Entry<String, TextureLoader>> textures) {
     Set<Map.Entry<String, TextureLoader>> notLoaded = new HashSet<>(textures);
@@ -3722,7 +3728,7 @@ public class TexturePackLoader {
         }
 
         // Fall back on the "terrain.png" texture atlas:
-        notLoaded = loadTerrainTextures(root, notLoaded);
+//        notLoaded = loadTerrainTextures(root, notLoaded);
       }
     } catch (IOException e) {
       Log.warnf("Failed to open %s: %s", texturePackName(tpFile), e.getMessage());
@@ -3745,16 +3751,14 @@ public class TexturePackLoader {
    *                     Paths are separated by the system path separator.
    * @param remember     Decides if the texture packs should be saved as the
    *                     last used texture pack.
+   * @deprecated See {@link ResourcePackLoader}. Remove in 2.6.
    */
+  @Deprecated
   public static void loadTexturePacks(@NotNull String texturePacks, boolean remember) {
-    String pathList = texturePacks.trim();
-    String[] packs;
-    if (!texturePacks.isEmpty()) {
-      packs = pathList.split(File.pathSeparator);
-    } else {
-      packs = new String[0];
+    ResourcePackLoader.loadResourcePacks(texturePacks);
+    if (remember) {
+      PersistentSettings.setLastTexturePack(texturePacks.trim());
     }
-    loadTexturePacks(packs, remember);
   }
 
   /**
@@ -3764,120 +3768,30 @@ public class TexturePackLoader {
    *                     Texture packs are loaded in the order of the paths in this argument.
    * @param remember     Decides if the texture packs should be saved as the
    *                     last used texture pack.
+   * @deprecated See {@link ResourcePackLoader}. Remove in 2.6.
    */
+  @Deprecated
   public static void loadTexturePacks(@NotNull String[] texturePacks, boolean remember) {
-    TextureCache.reset();
-    TexturePackLoader.texturePacks = texturePacks;
-    Set<Map.Entry<String, TextureLoader>> toLoad = allTextures.entrySet();
-    for (String path : texturePacks) {
-      if (!path.isEmpty()) {
-        File file = new File(path);
-        if (!file.isFile() && !file.isDirectory()) {
-          Log.error("Could not open texture pack: " + file.getAbsolutePath());
-        } else {
-          Log.infof("Loading %d textures from %s", toLoad.size(), file.getAbsolutePath());
-          toLoad = loadTextures(file, toLoad);
-          if (toLoad.isEmpty()) {
-            break;
-          }
-        }
-      }
-    }
-    if (!toLoad.isEmpty() && !PersistentSettings.getDisableDefaultTextures()) {
-      // If there are textures left to load we try to load the default textures.
-      File defaultResources = MinecraftFinder.getMinecraftJar();
-      if (defaultResources != null) {
-        Log.infof("Loading %d textures from %s", toLoad.size(), defaultResources.getAbsolutePath());
-        toLoad = loadTextures(defaultResources, toLoad);
-      } else {
-        Log.error("Minecraft Jar not found: falling back on placeholder textures.");
-      }
-    }
-    if (!toLoad.isEmpty()) {
-      StringBuilder message = new StringBuilder();
-      message.append("Failed to load textures:");
-      Iterator<Map.Entry<String, TextureLoader>> iterator = toLoad.iterator();
-      for (int count = 0; iterator.hasNext() && count < 10; ++count) {
-        message.append("\n\t").append(iterator.next().getKey());
-      }
-      if (toLoad.size() > 10) {
-        message.append("\n\t... and ").append(toLoad.size() - 10).append(" more");
-      }
-      Log.info(message.toString());
-    }
+    ResourcePackLoader.loadResourcePacks(texturePacks);
     if (remember) {
-      StringBuilder paths = new StringBuilder();
-      for (String path : texturePacks) {
-        if (paths.length() > 0) {
-          paths.append(File.pathSeparator);
-        }
-        paths.append(path);
-      }
-      PersistentSettings.setLastTexturePack(paths.toString());
+      ResourcePackLoader.rememberResourcePacks(texturePacks);
     }
-  }
-
-  private static Set<Map.Entry<String, TextureLoader>> loadTerrainTextures(Path texturePack,
-                                                                           Set<Map.Entry<String, TextureLoader>> textures) {
-    Set<Map.Entry<String, TextureLoader>> notLoaded = new HashSet<>(textures);
-
-    try (InputStream in = Files.newInputStream(texturePack.resolve("terrain.png"))) {
-      BitmapImage spriteMap = ImageLoader.read(in);
-      BitmapImage[] terrainTextures = getTerrainTextures(spriteMap);
-
-      for (Map.Entry<String, TextureLoader> texture : textures) {
-        if (texture.getValue().loadFromTerrain(terrainTextures)) {
-          notLoaded.remove(texture);
-        }
-      }
-    } catch (IOException e) {
-      // Failed to load terrain textures - this is handled implicitly.
-    }
-    return notLoaded;
-  }
-
-  /**
-   * Load a 16x16 spritemap.
-   *
-   * @return A bufferedImage containing the spritemap
-   * @throws IOException if the image dimensions are incorrect
-   */
-  private static BitmapImage[] getTerrainTextures(BitmapImage spritemap) throws IOException {
-
-    if (spritemap.width != spritemap.height || spritemap.width % 16 != 0) {
-      throw new IOException(
-              "Error: terrain.png file must have equal width and height, divisible by 16!");
-    }
-
-    int imgW = spritemap.width;
-    int spriteW = imgW / 16;
-    BitmapImage[] tex = new BitmapImage[256];
-
-    for (int i = 0; i < 256; ++i) {
-      tex[i] = new BitmapImage(spriteW, spriteW);
-    }
-
-    for (int y = 0; y < imgW; ++y) {
-      int sy = y / spriteW;
-      for (int x = 0; x < imgW; ++x) {
-        int sx = x / spriteW;
-        BitmapImage texture = tex[sx + sy * 16];
-        texture.setPixel(x % spriteW, y % spriteW, spritemap.getPixel(x, y));
-      }
-    }
-    return tex;
   }
 
   /**
    * Get the resource packs to be used to load textures from.
+   * @deprecated See {@link ResourcePackLoader}. Remove in 2.6.
    */
+  @Deprecated
   public static Collection<String> getTexturePacks() {
-    return Collections.unmodifiableList(Arrays.asList(texturePacks));
+    return ResourcePackLoader.getResourcePacks();
   }
 
   /**
    * Set the resource packs to be used to load textures from.
+   * @deprecated Remove in 2.6.
    */
+  @Deprecated
   public static void setTexturePacks(@NotNull String texturePacks) {
     String pathList = texturePacks.trim();
     String[] packs;
@@ -3886,13 +3800,13 @@ public class TexturePackLoader {
     } else {
       packs = new String[0];
     }
-    TexturePackLoader.texturePacks = packs;
+    ResourcePackLoader.setResourcePacks(packs);
   }
 
-  public static Collection<Map.Entry<String, TextureLoader>> loadTextures(
-          Collection<Map.Entry<String, TextureLoader>> textures) {
+  @Deprecated
+  public static Collection<Map.Entry<String, TextureLoader>> loadTextures(Collection<Map.Entry<String, TextureLoader>> textures) {
     Collection<Map.Entry<String, TextureLoader>> toLoad = textures;
-    for (String path : texturePacks) {
+    for (String path : ResourcePackLoader.getResourcePacks()) {
       if (!path.isEmpty()) {
         File file = new File(path);
         if (!file.isFile() && !file.isDirectory()) {
