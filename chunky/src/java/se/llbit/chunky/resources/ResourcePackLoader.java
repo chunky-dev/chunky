@@ -14,6 +14,11 @@ import java.util.*;
 public class ResourcePackLoader {
     public static final ArrayList<PackLoaderFactory> PACK_LOADER_FACTORIES = new ArrayList<>();
 
+    static {
+        ResourcePackLoader.PACK_LOADER_FACTORIES.add(() -> new ResourcePackTextureLoader(TexturePackLoader.ALL_TEXTURES));
+        ResourcePackLoader.PACK_LOADER_FACTORIES.add(ResourcePackBiomeLoader::new);
+    }
+
     private static String[] resourcePacks;
 
     public interface PackLoader {
