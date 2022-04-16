@@ -35,7 +35,7 @@ import static se.llbit.math.ColorUtil.getRGBAComponentsGammaCorrected;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Biomes {
-  public static final Biome unknown = new Biome("", "unknown", 0.5, 0.5, 0x7E7E7E, 0x8EB971, 0x71A74D);
+  public static final Biome unknown = Biome.create("", "unknown", 0.5, 0.5).mapColor(0x7E7E7E).grassColor(0x8EB971).foliageColor(0x71A74D).build();
 
   public static final Map<String, Biome> biomesByResourceLocation = new Object2ReferenceOpenHashMap<>();
   public static final Object2IntMap<String> biomeIDsByResourceLocation = new Object2IntOpenHashMap<>();
