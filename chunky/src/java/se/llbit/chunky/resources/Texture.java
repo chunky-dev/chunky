@@ -1047,6 +1047,13 @@ public class Texture {
   public static final Texture reinforcedDeepslateTop = new Texture();
   public static final Texture reinforcedDeepslateSide = new Texture();
   public static final Texture reinforcedDeepslateBottom = new Texture();
+  public static final Texture frogspawn = new Texture();
+  public static final Texture ochreFroglightSide = new Texture();
+  public static final Texture ochreFroglightTop = new Texture();
+  public static final Texture verdantFroglightSide = new Texture();
+  public static final Texture verdantFroglightTop = new Texture();
+  public static final Texture pearlescentFroglightSide = new Texture();
+  public static final Texture pearlescentFroglightTop = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

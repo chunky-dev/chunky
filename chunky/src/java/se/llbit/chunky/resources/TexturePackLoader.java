@@ -3652,6 +3652,13 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/reinforced_deepslate_top", Texture.reinforcedDeepslateTop);
     addSimpleTexture("assets/minecraft/textures/block/reinforced_deepslate_side", Texture.reinforcedDeepslateSide);
     addSimpleTexture("assets/minecraft/textures/block/reinforced_deepslate_bottom", Texture.reinforcedDeepslateBottom);
+    addSimpleTexture("assets/minecraft/textures/block/frogspawn", Texture.frogspawn);
+    addSimpleTexture("assets/minecraft/textures/block/ochre_froglight_side", Texture.ochreFroglightSide);
+    addSimpleTexture("assets/minecraft/textures/block/ochre_froglight_top", Texture.ochreFroglightTop);
+    addSimpleTexture("assets/minecraft/textures/block/verdant_froglight_side", Texture.verdantFroglightSide);
+    addSimpleTexture("assets/minecraft/textures/block/verdant_froglight_top", Texture.verdantFroglightTop);
+    addSimpleTexture("assets/minecraft/textures/block/pearlescent_froglight_side", Texture.pearlescentFroglightSide);
+    addSimpleTexture("assets/minecraft/textures/block/pearlescent_froglight_top", Texture.pearlescentFroglightTop);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
