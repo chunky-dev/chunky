@@ -16,20 +16,19 @@
  */
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.AABB;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
+
+import java.util.Arrays;
 
 /**
  * Flower pot block.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class FlowerPotModel {
+public class FlowerPotModel extends QuadModel {
   public enum Kind {
     NONE,
     POPPY,
@@ -62,388 +61,566 @@ public class FlowerPotModel {
     WARPED_ROOTS,
     CRIMSON_ROOTS,
     AZALEA_BUSH,
-    FLOWERING_AZALEA_BUSH
+    FLOWERING_AZALEA_BUSH,
+    MANGROVE_PROPAGULE
   }
 
-  private static final AABB[] boxes = {
-      // East.
-      new AABB(10 / 16., 11 / 16., 0, 6 / 16., 5 / 16., 11 / 16.),
-      // West.
-      new AABB(5 / 16., 6 / 16., 0, 6 / 16., 5 / 16., 11 / 16.),
-      // North.
-      new AABB(5 / 16., 11 / 16., 0, 6 / 16., 5 / 16., 6 / 16.),
-      // South.
-      new AABB(5 / 16., 11 / 16., 0, 6 / 16., 10 / 16., 11 / 16.),
-      // Center.
-      new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),
+  private static final Texture flowerpot = Texture.flowerPot;
+  private static final Texture dirt = Texture.dirt;
+  private static final Texture[] flowerPotTex = new Texture[]{
+    flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot,
+    flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot,
+    dirt, flowerpot
   };
 
-  private static final AABB cactus = new AABB(6 / 16., 10 / 16., 4 / 16., 1, 6 / 16., 10 / 16.);
-
-  private static final Quad[] flower = {
-      new Quad(new Vector3(0, 4 / 16., 0), new Vector3(1, 4 / 16., 1), new Vector3(0, 1, 0),
-          new Vector4(0, 1, 0, 12 / 16.)),
-
-      new Quad(new Vector3(1, 4 / 16., 1), new Vector3(0, 4 / 16., 0), new Vector3(1, 1, 1),
-          new Vector4(0, 1, 0, 12 / 16.)),
-
-      new Quad(new Vector3(1, 4 / 16., 0), new Vector3(0, 4 / 16., 1), new Vector3(1, 1, 0),
-          new Vector4(0, 1, 0, 12 / 16.)),
-
-      new Quad(new Vector3(0, 4 / 16., 1), new Vector3(1, 4 / 16., 0), new Vector3(0, 1, 1),
-          new Vector4(0, 1, 0, 12 / 16.)),
-  };
-
-  private static final Quad[] flowerSmall = {
-      new Quad(new Vector3(2 / 16., 4 / 16., 2 / 16.), new Vector3(14 / 16., 4 / 16., 14 / 16.),
-          new Vector3(2 / 16., 1, 2 / 16.), new Vector4(0, 1, 0, 1)),
-
-      new Quad(new Vector3(14 / 16., 4 / 16., 14 / 16.),
-          new Vector3(2 / 16., 4 / 16., 2 / 16.), new Vector3(14 / 16., 1, 14 / 16.),
-          new Vector4(0, 1, 0, 1)),
-
-      new Quad(new Vector3(14 / 16., 4 / 16., 2 / 16.),
-          new Vector3(2 / 16., 4 / 16., 14 / 16.), new Vector3(14 / 16., 1, 2 / 16.),
-          new Vector4(0, 1, 0, 1)),
-
-      new Quad(new Vector3(2 / 16., 4 / 16., 14 / 16.),
-          new Vector3(14 / 16., 4 / 16., 2 / 16.), new Vector3(2 / 16., 1, 14 / 16.),
-          new Vector4(0, 1, 0, 1)),
-  };
-
-  private static final Quad[] bamboo = {
-      new Quad(
-          new Vector3(7 / 16.0, 16 / 16.0, 9 / 16.0),
-          new Vector3(9 / 16.0, 16 / 16.0, 9 / 16.0),
-          new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
-          new Vector4(13 / 16.0, 15 / 16.0, 1 - 0 / 16.0, 1 - 2 / 16.0)),
-      new Quad(
-          new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
-          new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
-          new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
-          new Vector4(13 / 16.0, 15 / 16.0, 4 / 16.0, 6 / 16.0)),
-      new Quad(
-        new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
-        new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
-        new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
-        new Vector4(6 / 16.0, 8 / 16.0, 0 / 16.0, 16 / 16.0)),
-      new Quad(
-        new Vector3(9 / 16.0, 0 / 16.0, 9 / 16.0),
-        new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
-        new Vector3(9 / 16.0, 16 / 16.0, 9 / 16.0),
-        new Vector4(6 / 16.0, 8 / 16.0, 0 / 16.0, 16 / 16.0)),
-      new Quad(
-        new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
-        new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
-        new Vector3(9 / 16.0, 16 / 16.0, 7 / 16.0),
-        new Vector4(6 / 16.0, 8 / 16.0, 0 / 16.0, 16 / 16.0)),
-      new Quad(
-        new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
-        new Vector3(9 / 16.0, 0 / 16.0, 9 / 16.0),
-        new Vector3(7 / 16.0, 16 / 16.0, 9 / 16.0),
-        new Vector4(6 / 16.0, 8 / 16.0, 0 / 16.0, 16 / 16.0))
-  };
-
-  private static final Quad[] bambooLeaf = {
-      new Quad(
-          new Vector3(16 / 16.0, 2 / 16.0, 8 / 16.0),
-          new Vector3(0 / 16.0, 2 / 16.0, 8 / 16.0),
-          new Vector3(16 / 16.0, 18 / 16.0, 8 / 16.0),
-          new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(0 / 16.0, 2 / 16.0, 8 / 16.0),
-          new Vector3(16 / 16.0, 2 / 16.0, 8 / 16.0),
-          new Vector3(0 / 16.0, 18 / 16.0, 8 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 16 / 16.0))
-  };
-
-  private static final Quad[] azaleaBush = Model.join(new Quad[]{
-          new Quad(
-              new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
-              new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
-              new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
-              new Vector4(4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0)
-          ),
-          new Quad(
-              new Vector3(4 / 16.0, 15.9 / 16.0, 4 / 16.0),
-              new Vector3(12 / 16.0, 15.9 / 16.0, 4 / 16.0),
-              new Vector3(4 / 16.0, 15.9 / 16.0, 12 / 16.0),
-              new Vector4(4 / 16.0, 12 / 16.0, 12 / 16.0, 4 / 16.0)
-          ),
-          new Quad(
-              new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
-              new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
-              new Vector3(4 / 16.0, 8 / 16.0, 4 / 16.0),
-              new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
-          ),
-          new Quad(
-              new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
-              new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
-              new Vector3(12 / 16.0, 8 / 16.0, 4 / 16.0),
-              new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
-          ),
-          new Quad(
-              new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
-              new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
-              new Vector3(4 / 16.0, 8 / 16.0, 12 / 16.0),
-              new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
-          ),
-          new Quad(
-              new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
-              new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
-              new Vector3(12 / 16.0, 8 / 16.0, 12 / 16.0),
-              new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
-          ),
-          new Quad(
-              new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
-              new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
-              new Vector3(4 / 16.0, 8 / 16.0, 12 / 16.0),
-              new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
-          ),
-          new Quad(
-              new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
-              new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
-              new Vector3(4 / 16.0, 8 / 16.0, 4 / 16.0),
-              new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
-          ),
-          new Quad(
-              new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
-              new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
-              new Vector3(12 / 16.0, 8 / 16.0, 12 / 16.0),
-              new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
-          ),
-          new Quad(
-              new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
-              new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
-              new Vector3(12 / 16.0, 8 / 16.0, 4 / 16.0),
-              new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
-          )
-      },
-      Model.rotateY(new Quad[]{
-          new Quad(
-              new Vector3(2.6 / 16.0, 16 / 16.0, 8 / 16.0),
-              new Vector3(13.4 / 16.0, 16 / 16.0, 8 / 16.0),
-              new Vector3(2.6 / 16.0, 4 / 16.0, 8 / 16.0),
-              new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
-          ),
-          new Quad(
-              new Vector3(13.4 / 16.0, 16 / 16.0, 8 / 16.0),
-              new Vector3(2.6 / 16.0, 16 / 16.0, 8 / 16.0),
-              new Vector3(13.4 / 16.0, 4 / 16.0, 8 / 16.0),
-              new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
-          )
-      }, Math.toRadians(45)),
-      Model.rotateY(new Quad[]{
-          new Quad(
-              new Vector3(8 / 16.0, 16 / 16.0, 13.4 / 16.0),
-              new Vector3(8 / 16.0, 16 / 16.0, 2.6 / 16.0),
-              new Vector3(8 / 16.0, 4 / 16.0, 13.4 / 16.0),
-              new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
-          ),
-          new Quad(
-              new Vector3(8 / 16.0, 16 / 16.0, 2.6 / 16.0),
-              new Vector3(8 / 16.0, 16 / 16.0, 13.4 / 16.0),
-              new Vector3(8 / 16.0, 4 / 16.0, 2.6 / 16.0),
-              new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
-          )
-      }, Math.toRadians(45))
-  );
-
-  private static final Texture[] tex = {
-      Texture.flowerPot, Texture.flowerPot, Texture.flowerPot, Texture.flowerPot, Texture.dirt,
+  private static final Texture cactus_top = Texture.cactusTop;
+  private static final Texture cactus = Texture.cactusSide;
+  private static final Texture[] cactusTex = new Texture[]{
+    cactus_top, cactus, cactus, cactus, cactus
   };
 
   private static final Texture[] azaleaBushTex = {
-      Texture.pottedAzaleaBushTop, Texture.pottedAzaleaBushTop,
-      Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
-      Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
-      Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
-      Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
-      Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant,
-      Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant
+    Texture.pottedAzaleaBushTop, Texture.pottedAzaleaBushTop,
+    Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
+    Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
+    Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
+    Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
+    Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant,
+    Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant
   };
 
   private static final Texture[] floweringAzaleaBushTex = {
-      Texture.pottedFloweringAzaleaBushTop, Texture.pottedFloweringAzaleaBushTop,
-      Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
-      Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
-      Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
-      Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
-      Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant,
-      Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant
+    Texture.pottedFloweringAzaleaBushTop, Texture.pottedFloweringAzaleaBushTop,
+    Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
+    Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
+    Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
+    Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
+    Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant,
+    Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant
   };
 
-  public static boolean intersect(Ray ray, Scene scene) {
-    int flowerKind = ray.getBlockData();
-    return intersect(ray, scene, Kind.values()[flowerKind-1]);
-  }
+  //region Quads
+  private static final Quad[] flowerPot = new Quad[]{
+    new Quad(
+      new Vector3(5 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(6 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(5 / 16.0, 6 / 16.0, 5 / 16.0),
+      new Vector4(5 / 16.0, 6 / 16.0, 5 / 16.0, 11 / 16.0)
+    ),
+    new Quad(
+      new Vector3(5 / 16.0, 0 / 16.0, 5 / 16.0),
+      new Vector3(6 / 16.0, 0 / 16.0, 5 / 16.0),
+      new Vector3(5 / 16.0, 0 / 16.0, 11 / 16.0),
+      new Vector4(5 / 16.0, 6 / 16.0, 5 / 16.0, 11 / 16.0)
+    ),
+    new Quad(
+      new Vector3(5 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(5 / 16.0, 6 / 16.0, 5 / 16.0),
+      new Vector3(5 / 16.0, 0 / 16.0, 11 / 16.0),
+      new Vector4(11 / 16.0, 5 / 16.0, 6 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 6 / 16.0, 5 / 16.0),
+      new Vector3(6 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(6 / 16.0, 0 / 16.0, 5 / 16.0),
+      new Vector4(11 / 16.0, 5 / 16.0, 6 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(5 / 16.0, 6 / 16.0, 5 / 16.0),
+      new Vector3(6 / 16.0, 6 / 16.0, 5 / 16.0),
+      new Vector3(5 / 16.0, 0 / 16.0, 5 / 16.0),
+      new Vector4(11 / 16.0, 10 / 16.0, 6 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(5 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(6 / 16.0, 0 / 16.0, 11 / 16.0),
+      new Vector4(6 / 16.0, 5 / 16.0, 6 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(10 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(11 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(10 / 16.0, 6 / 16.0, 5 / 16.0),
+      new Vector4(10 / 16.0, 11 / 16.0, 5 / 16.0, 11 / 16.0)
+    ),
+    new Quad(
+      new Vector3(10 / 16.0, 0 / 16.0, 5 / 16.0),
+      new Vector3(11 / 16.0, 0 / 16.0, 5 / 16.0),
+      new Vector3(10 / 16.0, 0 / 16.0, 11 / 16.0),
+      new Vector4(10 / 16.0, 11 / 16.0, 5 / 16.0, 11 / 16.0)
+    ),
+    new Quad(
+      new Vector3(10 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(10 / 16.0, 6 / 16.0, 5 / 16.0),
+      new Vector3(10 / 16.0, 0 / 16.0, 11 / 16.0),
+      new Vector4(11 / 16.0, 5 / 16.0, 6 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(11 / 16.0, 6 / 16.0, 5 / 16.0),
+      new Vector3(11 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(11 / 16.0, 0 / 16.0, 5 / 16.0),
+      new Vector4(11 / 16.0, 5 / 16.0, 6 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(10 / 16.0, 6 / 16.0, 5 / 16.0),
+      new Vector3(11 / 16.0, 6 / 16.0, 5 / 16.0),
+      new Vector3(10 / 16.0, 0 / 16.0, 5 / 16.0),
+      new Vector4(6 / 16.0, 5 / 16.0, 6 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(11 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(10 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(11 / 16.0, 0 / 16.0, 11 / 16.0),
+      new Vector4(11 / 16.0, 10 / 16.0, 6 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 6 / 16.0, 6 / 16.0),
+      new Vector3(10 / 16.0, 6 / 16.0, 6 / 16.0),
+      new Vector3(6 / 16.0, 6 / 16.0, 5 / 16.0),
+      new Vector4(6 / 16.0, 10 / 16.0, 10 / 16.0, 11 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 0 / 16.0, 5 / 16.0),
+      new Vector3(10 / 16.0, 0 / 16.0, 5 / 16.0),
+      new Vector3(6 / 16.0, 0 / 16.0, 6 / 16.0),
+      new Vector4(6 / 16.0, 10 / 16.0, 5 / 16.0, 6 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 6 / 16.0, 5 / 16.0),
+      new Vector3(10 / 16.0, 6 / 16.0, 5 / 16.0),
+      new Vector3(6 / 16.0, 0 / 16.0, 5 / 16.0),
+      new Vector4(10 / 16.0, 6 / 16.0, 6 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(10 / 16.0, 6 / 16.0, 6 / 16.0),
+      new Vector3(6 / 16.0, 6 / 16.0, 6 / 16.0),
+      new Vector3(10 / 16.0, 0 / 16.0, 6 / 16.0),
+      new Vector4(10 / 16.0, 6 / 16.0, 6 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(10 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(6 / 16.0, 6 / 16.0, 10 / 16.0),
+      new Vector4(6 / 16.0, 10 / 16.0, 5 / 16.0, 6 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 0 / 16.0, 10 / 16.0),
+      new Vector3(10 / 16.0, 0 / 16.0, 10 / 16.0),
+      new Vector3(6 / 16.0, 0 / 16.0, 11 / 16.0),
+      new Vector4(6 / 16.0, 10 / 16.0, 10 / 16.0, 11 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 6 / 16.0, 10 / 16.0),
+      new Vector3(10 / 16.0, 6 / 16.0, 10 / 16.0),
+      new Vector3(6 / 16.0, 0 / 16.0, 10 / 16.0),
+      new Vector4(10 / 16.0, 6 / 16.0, 6 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(10 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(6 / 16.0, 6 / 16.0, 11 / 16.0),
+      new Vector3(10 / 16.0, 0 / 16.0, 11 / 16.0),
+      new Vector4(10 / 16.0, 6 / 16.0, 6 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 4 / 16.0, 10 / 16.0),
+      new Vector3(10 / 16.0, 4 / 16.0, 10 / 16.0),
+      new Vector3(6 / 16.0, 4 / 16.0, 6 / 16.0),
+      new Vector4(6 / 16.0, 10 / 16.0, 6 / 16.0, 10 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 0 / 16.0, 6 / 16.0),
+      new Vector3(10 / 16.0, 0 / 16.0, 6 / 16.0),
+      new Vector3(6 / 16.0, 0 / 16.0, 10 / 16.0),
+      new Vector4(6 / 16.0, 10 / 16.0, 0 / 16.0, 4 / 16.0)
+    )
+  };
 
-  public static boolean intersect(Ray ray, Scene scene, Kind kind) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (int i = 0; i < boxes.length; ++i) {
-      if (boxes[i].intersect(ray)) {
-        tex[i].getColor(ray);
-        ray.t = ray.tNext;
-        hit = true;
-      }
-    }
+  private static final Quad[] cactusQuads = new Quad[]{
+    new Quad(
+      new Vector3(6 / 16.0, 16 / 16.0, 10 / 16.0),
+      new Vector3(10 / 16.0, 16 / 16.0, 10 / 16.0),
+      new Vector3(6 / 16.0, 16 / 16.0, 6 / 16.0),
+      new Vector4(6 / 16.0, 10 / 16.0, 1 - 10 / 16.0, 1 - 6 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 16 / 16.0, 10 / 16.0),
+      new Vector3(6 / 16.0, 16 / 16.0, 6 / 16.0),
+      new Vector3(6 / 16.0, 5 / 16.0, 10 / 16.0),
+      new Vector4(10 / 16.0, 6 / 16.0, 16 / 16.0, 4 / 16.0)
+    ),
+    new Quad(
+      new Vector3(10 / 16.0, 16 / 16.0, 6 / 16.0),
+      new Vector3(10 / 16.0, 16 / 16.0, 10 / 16.0),
+      new Vector3(10 / 16.0, 5 / 16.0, 6 / 16.0),
+      new Vector4(10 / 16.0, 6 / 16.0, 16 / 16.0, 4 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 16 / 16.0, 6 / 16.0),
+      new Vector3(10 / 16.0, 16 / 16.0, 6 / 16.0),
+      new Vector3(6 / 16.0, 5 / 16.0, 6 / 16.0),
+      new Vector4(10 / 16.0, 6 / 16.0, 16 / 16.0, 4 / 16.0)
+    ),
+    new Quad(
+      new Vector3(10 / 16.0, 16 / 16.0, 10 / 16.0),
+      new Vector3(6 / 16.0, 16 / 16.0, 10 / 16.0),
+      new Vector3(10 / 16.0, 5 / 16.0, 10 / 16.0),
+      new Vector4(10 / 16.0, 6 / 16.0, 16 / 16.0, 4 / 16.0)
+    )
+  };
+
+  private static final Quad[] flower = {
+    new Quad(new Vector3(0, 4 / 16., 0), new Vector3(1, 4 / 16., 1), new Vector3(0, 1, 0),
+      new Vector4(0, 1, 0, 12 / 16.)),
+
+    new Quad(new Vector3(1, 4 / 16., 1), new Vector3(0, 4 / 16., 0), new Vector3(1, 1, 1),
+      new Vector4(0, 1, 0, 12 / 16.)),
+
+    new Quad(new Vector3(1, 4 / 16., 0), new Vector3(0, 4 / 16., 1), new Vector3(1, 1, 0),
+      new Vector4(0, 1, 0, 12 / 16.)),
+
+    new Quad(new Vector3(0, 4 / 16., 1), new Vector3(1, 4 / 16., 0), new Vector3(0, 1, 1),
+      new Vector4(0, 1, 0, 12 / 16.)),
+  };
+
+  private static final Quad[] flowerSmall = {
+    new Quad(new Vector3(2 / 16., 4 / 16., 2 / 16.), new Vector3(14 / 16., 4 / 16., 14 / 16.),
+      new Vector3(2 / 16., 1, 2 / 16.), new Vector4(0, 1, 0, 1)),
+
+    new Quad(new Vector3(14 / 16., 4 / 16., 14 / 16.),
+      new Vector3(2 / 16., 4 / 16., 2 / 16.), new Vector3(14 / 16., 1, 14 / 16.),
+      new Vector4(0, 1, 0, 1)),
+
+    new Quad(new Vector3(14 / 16., 4 / 16., 2 / 16.),
+      new Vector3(2 / 16., 4 / 16., 14 / 16.), new Vector3(14 / 16., 1, 2 / 16.),
+      new Vector4(0, 1, 0, 1)),
+
+    new Quad(new Vector3(2 / 16., 4 / 16., 14 / 16.),
+      new Vector3(14 / 16., 4 / 16., 2 / 16.), new Vector3(2 / 16., 1, 14 / 16.),
+      new Vector4(0, 1, 0, 1)),
+  };
+
+  private static final Quad[] bamboo = {
+    new Quad(
+      new Vector3(7 / 16.0, 16 / 16.0, 9 / 16.0),
+      new Vector3(9 / 16.0, 16 / 16.0, 9 / 16.0),
+      new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
+      new Vector4(13 / 16.0, 15 / 16.0, 1 - 0 / 16.0, 1 - 2 / 16.0)),
+    new Quad(
+      new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector4(13 / 16.0, 15 / 16.0, 4 / 16.0, 6 / 16.0)),
+    new Quad(
+      new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
+      new Vector4(6 / 16.0, 8 / 16.0, 0 / 16.0, 16 / 16.0)),
+    new Quad(
+      new Vector3(9 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector3(9 / 16.0, 16 / 16.0, 9 / 16.0),
+      new Vector4(6 / 16.0, 8 / 16.0, 0 / 16.0, 16 / 16.0)),
+    new Quad(
+      new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector3(9 / 16.0, 16 / 16.0, 7 / 16.0),
+      new Vector4(6 / 16.0, 8 / 16.0, 0 / 16.0, 16 / 16.0)),
+    new Quad(
+      new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector3(9 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector3(7 / 16.0, 16 / 16.0, 9 / 16.0),
+      new Vector4(6 / 16.0, 8 / 16.0, 0 / 16.0, 16 / 16.0))
+  };
+
+  private static final Quad[] bambooLeaf = {
+    new Quad(
+      new Vector3(16 / 16.0, 2 / 16.0, 8 / 16.0),
+      new Vector3(0 / 16.0, 2 / 16.0, 8 / 16.0),
+      new Vector3(16 / 16.0, 18 / 16.0, 8 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)),
+    new Quad(
+      new Vector3(0 / 16.0, 2 / 16.0, 8 / 16.0),
+      new Vector3(16 / 16.0, 2 / 16.0, 8 / 16.0),
+      new Vector3(0 / 16.0, 18 / 16.0, 8 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 16 / 16.0))
+  };
+
+  private static final Quad[] azaleaBush = Model.join(new Quad[]{
+      new Quad(
+        new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+        new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+        new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+        new Vector4(4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0)
+      ),
+      new Quad(
+        new Vector3(4 / 16.0, 15.9 / 16.0, 4 / 16.0),
+        new Vector3(12 / 16.0, 15.9 / 16.0, 4 / 16.0),
+        new Vector3(4 / 16.0, 15.9 / 16.0, 12 / 16.0),
+        new Vector4(4 / 16.0, 12 / 16.0, 12 / 16.0, 4 / 16.0)
+      ),
+      new Quad(
+        new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+        new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
+        new Vector3(4 / 16.0, 8 / 16.0, 4 / 16.0),
+        new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
+      ),
+      new Quad(
+        new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
+        new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+        new Vector3(12 / 16.0, 8 / 16.0, 4 / 16.0),
+        new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
+      ),
+      new Quad(
+        new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+        new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+        new Vector3(4 / 16.0, 8 / 16.0, 12 / 16.0),
+        new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
+      ),
+      new Quad(
+        new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+        new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+        new Vector3(12 / 16.0, 8 / 16.0, 12 / 16.0),
+        new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
+      ),
+      new Quad(
+        new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+        new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+        new Vector3(4 / 16.0, 8 / 16.0, 12 / 16.0),
+        new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
+      ),
+      new Quad(
+        new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+        new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+        new Vector3(4 / 16.0, 8 / 16.0, 4 / 16.0),
+        new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
+      ),
+      new Quad(
+        new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+        new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
+        new Vector3(12 / 16.0, 8 / 16.0, 12 / 16.0),
+        new Vector4(4 / 16.0, 12 / 16.0, 11 / 16.0, 3 / 16.0)
+      ),
+      new Quad(
+        new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
+        new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+        new Vector3(12 / 16.0, 8 / 16.0, 4 / 16.0),
+        new Vector4(12 / 16.0, 4 / 16.0, 11 / 16.0, 3 / 16.0)
+      )
+    },
+    Model.rotateY(new Quad[]{
+      new Quad(
+        new Vector3(2.6 / 16.0, 16 / 16.0, 8 / 16.0),
+        new Vector3(13.4 / 16.0, 16 / 16.0, 8 / 16.0),
+        new Vector3(2.6 / 16.0, 4 / 16.0, 8 / 16.0),
+        new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+      ),
+      new Quad(
+        new Vector3(13.4 / 16.0, 16 / 16.0, 8 / 16.0),
+        new Vector3(2.6 / 16.0, 16 / 16.0, 8 / 16.0),
+        new Vector3(13.4 / 16.0, 4 / 16.0, 8 / 16.0),
+        new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+      )
+    }, Math.toRadians(45)),
+    Model.rotateY(new Quad[]{
+      new Quad(
+        new Vector3(8 / 16.0, 16 / 16.0, 13.4 / 16.0),
+        new Vector3(8 / 16.0, 16 / 16.0, 2.6 / 16.0),
+        new Vector3(8 / 16.0, 4 / 16.0, 13.4 / 16.0),
+        new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+      ),
+      new Quad(
+        new Vector3(8 / 16.0, 16 / 16.0, 2.6 / 16.0),
+        new Vector3(8 / 16.0, 16 / 16.0, 13.4 / 16.0),
+        new Vector3(8 / 16.0, 4 / 16.0, 2.6 / 16.0),
+        new Vector4(16 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+      )
+    }, Math.toRadians(45))
+  );
+
+  private static final Quad[] mangrovePropagule = Model.join(
+    Model.rotateY(new Quad[]{
+      new Quad(
+        new Vector3(4.5 / 16.0, 15 / 16.0, 8 / 16.0),
+        new Vector3(11.5 / 16.0, 15 / 16.0, 8 / 16.0),
+        new Vector3(4.5 / 16.0, 9 / 16.0, 8 / 16.0),
+        new Vector4(11 / 16.0, 4 / 16.0, 15 / 16.0, 9 / 16.0), true
+      )}, Math.toRadians(-45)),
+    Model.rotateY(new Quad[]{
+      new Quad(
+        new Vector3(8 / 16.0, 15 / 16.0, 4.5 / 16.0),
+        new Vector3(8 / 16.0, 15 / 16.0, 11.5 / 16.0),
+        new Vector3(8 / 16.0, 9 / 16.0, 4.5 / 16.0),
+        new Vector4(11 / 16.0, 4 / 16.0, 15 / 16.0, 9 / 16.0), true
+      )}, Math.toRadians(-45)),
+    Model.rotateY(new Quad[]{
+      new Quad(
+        new Vector3(7 / 16.0, 9 / 16.0, 8 / 16.0),
+        new Vector3(9 / 16.0, 9 / 16.0, 8 / 16.0),
+        new Vector3(7 / 16.0, 0 / 16.0, 8 / 16.0),
+        new Vector4(9 / 16.0, 7 / 16.0, 9 / 16.0, 0 / 16.0), true
+      ),}, Math.toRadians(-45)),
+    Model.rotateY(new Quad[]{
+      new Quad(
+        new Vector3(9 / 16.0, 9 / 16.0, 8 / 16.0),
+        new Vector3(7 / 16.0, 9 / 16.0, 8 / 16.0),
+        new Vector3(9 / 16.0, 0 / 16.0, 8 / 16.0),
+        new Vector4(9 / 16.0, 7 / 16.0, 9 / 16.0, 0 / 16.0), true
+      )}, Math.toRadians(45))
+  );
+  //endregion
+
+  private final Quad[] quads;
+  private final Texture[] textures;
+  private final Tint[] tints;
+
+  public FlowerPotModel(Kind kind) {
     switch (kind) {
       case NONE:
-        break;
-      case POPPY:
-        hit |= intersect(flower, ray, Texture.poppy);
-        break;
-      case DANDELION:
-        hit |= intersect(flower, ray, Texture.dandelion);
-        break;
-      case OAK_SAPLING:
-        hit |= intersect(flowerSmall, ray, Texture.oakSapling);
-        break;
-      case SPRUCE_SAPLING:
-        hit |= intersect(flowerSmall, ray, Texture.spruceSapling);
-        break;
-      case BIRCH_SAPLING:
-        hit |= intersect(flowerSmall, ray, Texture.birchSapling);
-        break;
-      case JUNGLE_SAPLING:
-        hit |= intersect(flowerSmall, ray, Texture.jungleSapling);
-        break;
-      case ACACIA_SAPLING:
-        hit |= intersect(flowerSmall, ray, Texture.acaciaSapling);
-        break;
-      case DARK_OAK_SAPLING:
-        hit |= intersect(flowerSmall, ray, Texture.darkOakSapling);
-        break;
-      case RED_MUSHROOM:
-        hit |= intersect(flower, ray, Texture.redMushroom);
-        break;
-      case BROWN_MUSHROOM:
-        hit |= intersect(flower, ray, Texture.brownMushroom);
+        quads = flowerPot;
+        textures = flowerPotTex;
+        tints = null;
         break;
       case CACTUS:
-        hit |= cactus(ray);
-        break;
-      case DEAD_BUSH:
-        hit |= intersect(flowerSmall, ray, Texture.deadBush);
+        quads = Model.join(flowerPot, cactusQuads);
+        textures = new Texture[flowerPotTex.length + cactusTex.length];
+        tints = null;
+        System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
+        System.arraycopy(cactusTex, 0, textures, flowerPotTex.length, cactusTex.length);
         break;
       case FERN:
-        if (intersect(flowerSmall, ray, Texture.fern)) {
-          float[] biomeColor = ray.getBiomeGrassColor(scene);
-          ray.color.x *= biomeColor[0];
-          ray.color.y *= biomeColor[1];
-          ray.color.z *= biomeColor[2];
-          hit = true;
-        }
-        break;
-      case BLUE_ORCHID:
-        hit |= intersect(flowerSmall, ray, Texture.blueOrchid);
-        break;
-      case ALLIUM:
-        hit |= intersect(flowerSmall, ray, Texture.allium);
-        break;
-      case AZURE_BLUET:
-        hit |= intersect(flowerSmall, ray, Texture.azureBluet);
-        break;
-      case RED_TULIP:
-        hit |= intersect(flowerSmall, ray, Texture.redTulip);
-        break;
-      case ORANGE_TULIP:
-        hit |= intersect(flowerSmall, ray, Texture.orangeTulip);
-        break;
-      case WHITE_TULIP:
-        hit |= intersect(flowerSmall, ray, Texture.whiteTulip);
-        break;
-      case PINK_TULIP:
-        hit |= intersect(flowerSmall, ray, Texture.pinkTulip);
-        break;
-      case OXEYE_DAISY:
-        hit |= intersect(flowerSmall, ray, Texture.oxeyeDaisy);
+        quads = Model.join(flowerPot, flowerSmall);
+        textures = new Texture[flowerPotTex.length + flowerSmall.length];
+        tints = new Tint[flowerPotTex.length + flowerSmall.length];
+        System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
+        Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.fern);
+        Arrays.fill(tints, 0, flowerPotTex.length, Tint.NONE);
+        Arrays.fill(tints, flowerPotTex.length, tints.length, Tint.BIOME_GRASS);
         break;
       case BAMBOO:
-        hit |= intersect(bamboo, ray, Texture.bambooStalk);
-        hit |= intersect(bambooLeaf, ray, Texture.bambooSingleLeaf);
-        break;
-      case CORNFLOWER:
-        hit |= intersect(flowerSmall, ray, Texture.cornflower);
-        break;
-      case LILY_OF_THE_VALLEY:
-        hit |= intersect(flowerSmall, ray, Texture.lilyOfTheValley);
-        break;
-      case WITHER_ROSE:
-        hit |= intersect(flowerSmall, ray, Texture.witherRose);
-        break;
-      case WARPED_FUNGUS:
-        hit |= intersect(flowerSmall, ray, Texture.warpedFungus);
-        break;
-      case CRIMSON_FUNGUS:
-        hit |= intersect(flowerSmall, ray, Texture.crimsonFungus);
-        break;
-      case WARPED_ROOTS:
-        hit |= intersect(flowerSmall, ray, Texture.warpedRootsPot);
-        break;
-      case CRIMSON_ROOTS:
-        hit |= intersect(flowerSmall, ray, Texture.crimsonRootsPot);
+        quads = Model.join(flowerPot, bamboo, bambooLeaf);
+        textures = new Texture[flowerPotTex.length + bamboo.length + bambooLeaf.length];
+        tints = null;
+        System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
+        Arrays.fill(textures, flowerPotTex.length, flowerPotTex.length + bamboo.length, Texture.bambooStalk);
+        Arrays.fill(textures, flowerPotTex.length + bamboo.length, textures.length, Texture.bambooSingleLeaf);
         break;
       case AZALEA_BUSH:
-        hit |= intersect(azaleaBush, ray, azaleaBushTex);
-        break;
       case FLOWERING_AZALEA_BUSH:
-        hit |= intersect(azaleaBush, ray, floweringAzaleaBushTex);
+        quads = Model.join(flowerPot, azaleaBush);
+        textures = new Texture[flowerPotTex.length + azaleaBush.length];
+        tints = null;
+        System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
+        System.arraycopy(kind == Kind.AZALEA_BUSH ? azaleaBushTex : floweringAzaleaBushTex, 0, textures,
+          flowerPotTex.length, textures.length - flowerPotTex.length);
+        break;
+      case MANGROVE_PROPAGULE:
+        quads = Model.join(flowerPot, mangrovePropagule);
+        textures = new Texture[flowerPotTex.length + mangrovePropagule.length];
+        tints = null;
+        System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
+        Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.mangrovePropagule);
+        break;
+      default:
+        quads = Model.join(flowerPot, flowerSmall);
+        textures = new Texture[flowerPotTex.length + flowerSmall.length];
+        tints = null;
+        System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
+        switch (kind) {
+          case POPPY:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.poppy);
+            break;
+          case DANDELION:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.dandelion);
+            break;
+          case OAK_SAPLING:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.oakSapling);
+            break;
+          case SPRUCE_SAPLING:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.spruceSapling);
+            break;
+          case BIRCH_SAPLING:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.birchSapling);
+            break;
+          case JUNGLE_SAPLING:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.jungleSapling);
+            break;
+          case ACACIA_SAPLING:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.acaciaSapling);
+            break;
+          case DARK_OAK_SAPLING:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.darkOakSapling);
+            break;
+          case RED_MUSHROOM:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.redMushroom);
+            break;
+          case BROWN_MUSHROOM:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.brownMushroom);
+            break;
+          case DEAD_BUSH:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.deadBush);
+            break;
+          case BLUE_ORCHID:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.blueOrchid);
+            break;
+          case ALLIUM:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.allium);
+            break;
+          case AZURE_BLUET:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.azureBluet);
+            break;
+          case RED_TULIP:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.redTulip);
+            break;
+          case ORANGE_TULIP:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.orangeTulip);
+            break;
+          case WHITE_TULIP:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.whiteTulip);
+            break;
+          case PINK_TULIP:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.pinkTulip);
+            break;
+          case OXEYE_DAISY:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.oxeyeDaisy);
+            break;
+          case CORNFLOWER:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.cornflower);
+            break;
+          case LILY_OF_THE_VALLEY:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.lilyOfTheValley);
+            break;
+          case WITHER_ROSE:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.witherRose);
+            break;
+          case WARPED_FUNGUS:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.warpedFungus);
+            break;
+          case CRIMSON_FUNGUS:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.crimsonFungus);
+            break;
+          case WARPED_ROOTS:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.warpedRootsPot);
+            break;
+          case CRIMSON_ROOTS:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.crimsonRootsPot);
+            break;
+        }
         break;
     }
-    if (hit) {
-      ray.color.w = 1;
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
   }
 
-  private static boolean intersect(Quad[] quads, Ray ray, Texture texture) {
-    boolean hit = false;
-    for (Quad quad : quads) {
-      if (quad.intersect(ray)) {
-        float[] color = texture.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.setNormal(quad.n);
-          hit = true;
-        }
-      }
-    }
-    return hit;
+  @Override
+  public Quad[] getQuads() {
+    return quads;
   }
 
-  private static boolean intersect(Quad[] quads, Ray ray, Texture[] textures) {
-    boolean hit = false;
-    for (int i = 0; i < quads.length; i++) {
-      Quad quad = quads[i];
-      if (quad.intersect(ray)) {
-        float[] color = textures[i].getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.setNormal(quad.n);
-          hit = true;
-        }
-      }
-    }
-    return hit;
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 
-  private static boolean cactus(Ray ray) {
-    if (cactus.intersect(ray)) {
-      if (ray.getNormal().y > 0) {
-        Texture.cactusTop.getColor(ray);
-      } else {
-        Texture.cactusSide.getColor(ray);
-      }
-      ray.color.w = 1;
-      ray.t = ray.tNext;
-      return true;
-    }
-    return false;
+  @Override
+  public Tint[] getTints() {
+    return tints;
   }
 }
