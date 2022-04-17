@@ -1119,6 +1119,8 @@ public class Texture {
   public static final Texture sculkShriekerCanSummonInnerTop = new Texture();
   @TexturePath("assets/minecraft/textures/block/sculk_shrieker_inner_top")
   public static final Texture sculkShriekerInnerTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_vein")
+  public static final Texture sculkVein = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
