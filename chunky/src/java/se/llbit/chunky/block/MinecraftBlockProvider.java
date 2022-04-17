@@ -968,6 +968,9 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("mangrove_wood", (name, tag) -> log(tag, Texture.mangroveLog, Texture.mangroveLog));
     addBlock("stripped_mangrove_wood", (name, tag) -> log(tag, Texture.strippedMangroveLog, Texture.strippedMangroveLog));
     addBlock("mangrove_roots", (name, tag) -> new MangroveRoots());
+    addBlock("mangrove_propagule", (name, tag) -> new MangrovePropagule(
+      BlockProvider.stringToInt(tag.get("Properties").get("age"), 0),
+      tag.get("Properties").get("hanging").stringValue("false").equals("true")));
   }
 
   @Override

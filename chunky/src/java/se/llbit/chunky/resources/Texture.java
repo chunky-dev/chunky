@@ -56,8 +56,7 @@ public class Texture {
 
   public static Texture black = new SolidColorTexture(new Vector4(0, 0, 0, 1));
 
-  public static final Texture paintings = new Texture(); // 1.13 or older
-  public static final Texture paintingAlban = new Texture(); // 1.14 or newer
+  public static final Texture paintingAlban = new Texture();
   public static final Texture paintingAztec2 = new Texture();
   public static final Texture paintingAztec = new Texture();
   public static final Texture paintingBack = new Texture();
@@ -1093,6 +1092,10 @@ public class Texture {
   public static final Texture mangroveRootsSide = new Texture();
   @TexturePath("assets/minecraft/textures/block/mangrove_roots_top")
   public static final Texture mangroveRootsTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_propagule")
+  public static final Texture mangrovePropagule = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_propagule_hanging")
+  public static final Texture mangrovePropaguleHanging = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
