@@ -971,6 +971,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("mangrove_propagule", (name, tag) -> new MangrovePropagule(
       BlockProvider.stringToInt(tag.get("Properties").get("age"), 0),
       tag.get("Properties").get("hanging").stringValue("false").equals("true")));
+    addBlock("potted_mangrove_propagule", (name, tag) -> new FlowerPot(name, Kind.MANGROVE_PROPAGULE));
   }
 
   @Override
