@@ -2917,6 +2917,36 @@ public class MinecraftBlockProvider implements BlockProvider {
         return nonSolid(log(tag, Texture.verdantFroglightSide, Texture.verdantFroglightTop));
       case "pearlescent_froglight":
         return nonSolid(log(tag, Texture.pearlescentFroglightSide, Texture.pearlescentFroglightTop));
+      case "mangrove_button":
+        return button(tag, Texture.mangrovePlanks);
+      case "mangrove_door":
+        return door(tag, Texture.mangroveDoorTop, Texture.mangroveDoorBottom);
+      case "mangrove_fence":
+        return fence(tag, Texture.mangrovePlanks);
+      case "mangrove_fence_gate":
+        return fenceGate(tag, Texture.mangrovePlanks);
+      case "mangrove_leaves":
+        return new Leaves(name, Texture.mangroveLeaves);
+      case "mangrove_log":
+        return log(tag, Texture.mangroveLog, Texture.mangroveLogTop);
+      case "stripped_mangrove_log":
+        return log(tag, Texture.strippedMangroveLog, Texture.strippedMangroveLogTop);
+      case "mangrove_planks":
+        return new MinecraftBlock(name, Texture.mangrovePlanks);
+      case "mangrove_pressure_plate":
+        return new PressurePlate(name, Texture.mangrovePlanks);
+      case "mangrove_sign":
+        return sign(tag, "mangrove");
+      case "mangrove_slab":
+        return slab(tag, Texture.mangrovePlanks);
+      case "mangrove_stairs":
+        return stairs(tag, Texture.mangrovePlanks);
+      case "mangrove_trapdoor":
+        return trapdoor(tag, Texture.mangroveTrapdoor);
+      case "mangrove_wood":
+        return log(tag, Texture.mangroveLog, Texture.mangroveLog);
+      case "stripped_mangrove_wood":
+        return log(tag, Texture.strippedMangroveLog, Texture.strippedMangroveLog);
       case "structure_void":
       case "barrier":
         // Invisible.
