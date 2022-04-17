@@ -1070,6 +1070,26 @@ public class Texture {
   public static final Texture pearlescentFroglightSide = new Texture();
   @TexturePath("assets/minecraft/textures/block/pearlescent_froglight_top")
   public static final Texture pearlescentFroglightTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_planks")
+  public static final Texture mangrovePlanks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_door_top")
+  public static final Texture mangroveDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_door_bottom")
+  public static final Texture mangroveDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_leaves")
+  public static final Texture mangroveLeaves = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_log")
+  public static final Texture mangroveLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_log_top")
+  public static final Texture mangroveLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_mangrove_log")
+  public static final Texture strippedMangroveLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_mangrove_log_top")
+  public static final Texture strippedMangroveLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/mangrove")
+  public static final Texture mangroveSignPost = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_trapdoor")
+  public static final Texture mangroveTrapdoor = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
