@@ -1090,6 +1090,10 @@ public class Texture {
   public static final Texture mangroveSignPost = new Texture();
   @TexturePath("assets/minecraft/textures/block/mangrove_trapdoor")
   public static final Texture mangroveTrapdoor = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_roots_side")
+  public static final Texture mangroveRootsSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_roots_top")
+  public static final Texture mangroveRootsTop = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
