@@ -967,6 +967,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("mangrove_trapdoor", (name, tag) -> trapdoor(tag, Texture.mangroveTrapdoor));
     addBlock("mangrove_wood", (name, tag) -> log(tag, Texture.mangroveLog, Texture.mangroveLog));
     addBlock("stripped_mangrove_wood", (name, tag) -> log(tag, Texture.strippedMangroveLog, Texture.strippedMangroveLog));
+    addBlock("mangrove_roots", (name, tag) -> new MangroveRoots());
   }
 
   @Override
