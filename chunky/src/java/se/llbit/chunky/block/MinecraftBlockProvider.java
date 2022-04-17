@@ -972,6 +972,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       BlockProvider.stringToInt(tag.get("Properties").get("age"), 0),
       tag.get("Properties").get("hanging").stringValue("false").equals("true")));
     addBlock("potted_mangrove_propagule", (name, tag) -> new FlowerPot(name, Kind.MANGROVE_PROPAGULE));
+    addBlock("sculk_catalyst", (name, tag) -> new SculkCatalyst(tag.get("Properties").get("bloom").stringValue("false").equals("true")));
+    addBlock("sculk", Texture.sculk);
+    addBlock("sculk_shrieker", (name, tag) -> new SculkShrieker(tag.get("Properties").get("can_summon").stringValue("false").equals("true")));
   }
 
   @Override

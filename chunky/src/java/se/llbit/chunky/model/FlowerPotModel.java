@@ -604,8 +604,6 @@ public class FlowerPotModel extends QuadModel {
           case CRIMSON_ROOTS:
             Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.crimsonRootsPot);
             break;
-          case MANGROVE_PROPAGULE:
-            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.mangrovePropagule);
         }
         break;
     }
