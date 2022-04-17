@@ -1097,6 +1097,30 @@ public class Texture {
   public static final Texture mangrovePropagule = new Texture();
   @TexturePath("assets/minecraft/textures/block/mangrove_propagule_hanging")
   public static final Texture mangrovePropaguleHanging = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_catalyst_top")
+  public static final Texture sculkCatalystTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_catalyst_side")
+  public static final Texture sculkCatalystSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_catalyst_bottom")
+  public static final Texture sculkCatalystBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_catalyst_top_bloom")
+  public static final Texture sculkCatalystTopBloom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_catalyst_side_bloom")
+  public static final Texture sculkCatalystSideBloom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk")
+  public static final Texture sculk = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_shrieker_top")
+  public static final Texture sculkShriekerTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_shrieker_side")
+  public static final Texture sculkShriekerSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_shrieker_bottom")
+  public static final Texture sculkShriekerBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_shrieker_can_summon_inner_top")
+  public static final Texture sculkShriekerCanSummonInnerTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_shrieker_inner_top")
+  public static final Texture sculkShriekerInnerTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_vein")
+  public static final Texture sculkVein = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
