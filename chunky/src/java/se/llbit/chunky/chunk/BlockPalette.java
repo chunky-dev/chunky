@@ -564,6 +564,9 @@ public class BlockPalette {
     materialProperties.put("minecraft:pearlescent_froglight", block -> {
       block.emittance = 1.0f;
     });
+    materialProperties.put("minecraft:sculk_catalyst", block -> {
+      block.emittance = 1.0f / 15f * 6;
+    });
     return materialProperties;
   }
 
