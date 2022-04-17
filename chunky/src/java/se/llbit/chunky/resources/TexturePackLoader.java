@@ -19,30 +19,7 @@ package se.llbit.chunky.resources;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Sun;
-import se.llbit.chunky.resources.texturepack.AllTextures;
-import se.llbit.chunky.resources.texturepack.AlternateTextures;
-import se.llbit.chunky.resources.texturepack.AnimatedTextureLoader;
-import se.llbit.chunky.resources.texturepack.BedTextureAdapter;
-import se.llbit.chunky.resources.texturepack.ChestTexture;
-import se.llbit.chunky.resources.texturepack.CloudsTexture;
-import se.llbit.chunky.resources.texturepack.ConditionalTextures;
-import se.llbit.chunky.resources.texturepack.EntityTextureLoader;
-import se.llbit.chunky.resources.texturepack.FoliageColorTexture;
-import se.llbit.chunky.resources.texturepack.AsciiFontTextureLoader;
-import se.llbit.chunky.resources.texturepack.JsonFontTextureLoader;
-import se.llbit.chunky.resources.texturepack.GrassColorTexture;
-import se.llbit.chunky.resources.texturepack.IndexedTexture;
-import se.llbit.chunky.resources.texturepack.LargeChestTexture;
-import se.llbit.chunky.resources.texturepack.LayeredTextureLoader;
-import se.llbit.chunky.resources.texturepack.PaintingBackTexture;
-import se.llbit.chunky.resources.texturepack.PaintingTexture;
-import se.llbit.chunky.resources.texturepack.PaintingTextureAdapter;
-import se.llbit.chunky.resources.texturepack.PlayerTextureLoader;
-import se.llbit.chunky.resources.texturepack.SplitLargeChestTexture;
-import se.llbit.chunky.resources.texturepack.RotatedTextureLoader;
-import se.llbit.chunky.resources.texturepack.ShulkerTextureLoader;
-import se.llbit.chunky.resources.texturepack.SimpleTexture;
-import se.llbit.chunky.resources.texturepack.TextureLoader;
+import se.llbit.chunky.resources.texturepack.*;
 import se.llbit.log.Log;
 import se.llbit.resources.ImageLoader;
 import se.llbit.util.NotNull;
@@ -50,14 +27,8 @@ import se.llbit.util.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.lang.reflect.Field;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -3667,22 +3638,22 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/potted_flowering_azalea_bush_top", Texture.pottedFloweringAzaleaBushTop);
     addSimpleTexture("assets/minecraft/textures/block/potted_flowering_azalea_bush_side", Texture.pottedFloweringAzaleaBushSide);
 
-    // Minecraft 1.19
-    addSimpleTexture("assets/minecraft/textures/block/mud", Texture.mud);
-    addSimpleTexture("assets/minecraft/textures/block/mud_bricks", Texture.mudBricks);
-    addSimpleTexture("assets/minecraft/textures/block/packed_mud", Texture.packedMud);
-    addSimpleTexture("assets/minecraft/textures/block/muddy_mangrove_roots_side", Texture.muddyMangroveRootsSide);
-    addSimpleTexture("assets/minecraft/textures/block/muddy_mangrove_roots_top", Texture.muddyMangroveRootsTop);
-    addSimpleTexture("assets/minecraft/textures/block/reinforced_deepslate_top", Texture.reinforcedDeepslateTop);
-    addSimpleTexture("assets/minecraft/textures/block/reinforced_deepslate_side", Texture.reinforcedDeepslateSide);
-    addSimpleTexture("assets/minecraft/textures/block/reinforced_deepslate_bottom", Texture.reinforcedDeepslateBottom);
-    addSimpleTexture("assets/minecraft/textures/block/frogspawn", Texture.frogspawn);
-    addSimpleTexture("assets/minecraft/textures/block/ochre_froglight_side", Texture.ochreFroglightSide);
-    addSimpleTexture("assets/minecraft/textures/block/ochre_froglight_top", Texture.ochreFroglightTop);
-    addSimpleTexture("assets/minecraft/textures/block/verdant_froglight_side", Texture.verdantFroglightSide);
-    addSimpleTexture("assets/minecraft/textures/block/verdant_froglight_top", Texture.verdantFroglightTop);
-    addSimpleTexture("assets/minecraft/textures/block/pearlescent_froglight_side", Texture.pearlescentFroglightSide);
-    addSimpleTexture("assets/minecraft/textures/block/pearlescent_froglight_top", Texture.pearlescentFroglightTop);
+    for (Field field : Texture.class.getFields()) {
+      if (Texture.class.isAssignableFrom(field.getType())) {
+        addTextureLoader(field);
+      }
+    }
+  }
+
+  private static void addTextureLoader(Field textureField) {
+    TexturePath path = textureField.getAnnotation(TexturePath.class);
+    if (path != null) {
+      try {
+        addSimpleTexture(path.value(), (Texture) textureField.get(Texture.class));
+      } catch (IllegalAccessException e) {
+        throw new RuntimeException("Could not get texture field for " + path.value(), e);
+      }
+    }
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

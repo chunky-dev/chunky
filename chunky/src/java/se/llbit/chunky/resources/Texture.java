@@ -21,6 +21,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.texturepack.FontTexture;
+import se.llbit.chunky.resources.texturepack.TexturePath;
 import se.llbit.fxutil.FxImageUtil;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
@@ -1038,20 +1039,35 @@ public class Texture {
   public static final Texture pottedFloweringAzaleaBushSide = new Texture();
 
   // [1.19]
+  @TexturePath("assets/minecraft/textures/block/mud")
   public static final Texture mud = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mud_bricks")
   public static final Texture mudBricks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/packed_mud")
   public static final Texture packedMud = new Texture();
+  @TexturePath("assets/minecraft/textures/block/muddy_mangrove_roots_side")
   public static final Texture muddyMangroveRootsSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/muddy_mangrove_roots_top")
   public static final Texture muddyMangroveRootsTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/reinforced_deepslate_top")
   public static final Texture reinforcedDeepslateTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/reinforced_deepslate_side")
   public static final Texture reinforcedDeepslateSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/reinforced_deepslate_bottom")
   public static final Texture reinforcedDeepslateBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/frogspawn")
   public static final Texture frogspawn = new Texture();
+  @TexturePath("assets/minecraft/textures/block/ochre_froglight_side")
   public static final Texture ochreFroglightSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/ochre_froglight_top")
   public static final Texture ochreFroglightTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/verdant_froglight_side")
   public static final Texture verdantFroglightSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/verdant_froglight_top")
   public static final Texture verdantFroglightTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pearlescent_froglight_side")
   public static final Texture pearlescentFroglightSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pearlescent_froglight_top")
   public static final Texture pearlescentFroglightTop = new Texture();
 
   /** Banner base texture. */
