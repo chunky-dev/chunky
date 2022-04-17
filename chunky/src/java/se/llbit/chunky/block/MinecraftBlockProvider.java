@@ -333,6 +333,10 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:fletching_table",
       "minecraft:flowering_azalea",
       "minecraft:flower_pot",
+      "minecraft:frogspawn",
+      "minecraft:ochre_froglight",
+      "minecraft:verdant_froglight",
+      "minecraft:pearlescent_froglight",
       "minecraft:frosted_ice",
       "minecraft:furnace",
       "minecraft:gilded_blackstone",
@@ -2922,6 +2926,14 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "reinforced_deepslate":
         return new TexturedBlock(
           name, Texture.reinforcedDeepslateSide, Texture.reinforcedDeepslateTop, Texture.reinforcedDeepslateBottom);
+      case "frogspawn":
+        return new Frogspawn();
+      case "ochre_froglight":
+        return nonSolid(log(tag, Texture.ochreFroglightSide, Texture.ochreFroglightTop));
+      case "verdant_froglight":
+        return nonSolid(log(tag, Texture.verdantFroglightSide, Texture.verdantFroglightTop));
+      case "pearlescent_froglight":
+        return nonSolid(log(tag, Texture.pearlescentFroglightSide, Texture.pearlescentFroglightTop));
       case "structure_void":
       case "barrier":
         // Invisible.

@@ -555,6 +555,15 @@ public class BlockPalette {
         block.emittance = 1.0f / 15f * ((LightBlock) block).getLevel();
       }
     });
+    materialProperties.put("minecraft:ochre_froglight", block -> {
+      block.emittance = 1.0f;
+    });
+    materialProperties.put("minecraft:verdant_froglight", block -> {
+      block.emittance = 1.0f;
+    });
+    materialProperties.put("minecraft:pearlescent_froglight", block -> {
+      block.emittance = 1.0f;
+    });
     return materialProperties;
   }
 
