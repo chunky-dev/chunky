@@ -27,6 +27,7 @@ import se.llbit.util.annotation.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -3643,22 +3644,22 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/potted_flowering_azalea_bush_top", Texture.pottedFloweringAzaleaBushTop);
     addSimpleTexture("assets/minecraft/textures/block/potted_flowering_azalea_bush_side", Texture.pottedFloweringAzaleaBushSide);
 
-    // Minecraft 1.19
-    addSimpleTexture("assets/minecraft/textures/block/mud", Texture.mud);
-    addSimpleTexture("assets/minecraft/textures/block/mud_bricks", Texture.mudBricks);
-    addSimpleTexture("assets/minecraft/textures/block/packed_mud", Texture.packedMud);
-    addSimpleTexture("assets/minecraft/textures/block/muddy_mangrove_roots_side", Texture.muddyMangroveRootsSide);
-    addSimpleTexture("assets/minecraft/textures/block/muddy_mangrove_roots_top", Texture.muddyMangroveRootsTop);
-    addSimpleTexture("assets/minecraft/textures/block/reinforced_deepslate_top", Texture.reinforcedDeepslateTop);
-    addSimpleTexture("assets/minecraft/textures/block/reinforced_deepslate_side", Texture.reinforcedDeepslateSide);
-    addSimpleTexture("assets/minecraft/textures/block/reinforced_deepslate_bottom", Texture.reinforcedDeepslateBottom);
-    addSimpleTexture("assets/minecraft/textures/block/frogspawn", Texture.frogspawn);
-    addSimpleTexture("assets/minecraft/textures/block/ochre_froglight_side", Texture.ochreFroglightSide);
-    addSimpleTexture("assets/minecraft/textures/block/ochre_froglight_top", Texture.ochreFroglightTop);
-    addSimpleTexture("assets/minecraft/textures/block/verdant_froglight_side", Texture.verdantFroglightSide);
-    addSimpleTexture("assets/minecraft/textures/block/verdant_froglight_top", Texture.verdantFroglightTop);
-    addSimpleTexture("assets/minecraft/textures/block/pearlescent_froglight_side", Texture.pearlescentFroglightSide);
-    addSimpleTexture("assets/minecraft/textures/block/pearlescent_froglight_top", Texture.pearlescentFroglightTop);
+    for (Field field : Texture.class.getFields()) {
+      if (Texture.class.isAssignableFrom(field.getType())) {
+        addTextureLoader(field);
+      }
+    }
+  }
+
+  private static void addTextureLoader(Field textureField) {
+    TexturePath path = textureField.getAnnotation(TexturePath.class);
+    if (path != null) {
+      try {
+        addSimpleTexture(path.value(), (Texture) textureField.get(Texture.class));
+      } catch (IllegalAccessException e) {
+        throw new RuntimeException("Could not get texture field for " + path.value(), e);
+      }
+    }
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
