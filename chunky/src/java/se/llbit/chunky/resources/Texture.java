@@ -21,6 +21,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.texturepack.FontTexture;
+import se.llbit.chunky.resources.texturepack.TexturePath;
 import se.llbit.fxutil.FxImageUtil;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
@@ -55,8 +56,7 @@ public class Texture {
 
   public static Texture black = new SolidColorTexture(new Vector4(0, 0, 0, 1));
 
-  public static final Texture paintings = new Texture(); // 1.13 or older
-  public static final Texture paintingAlban = new Texture(); // 1.14 or newer
+  public static final Texture paintingAlban = new Texture();
   public static final Texture paintingAztec2 = new Texture();
   public static final Texture paintingAztec = new Texture();
   public static final Texture paintingBack = new Texture();
@@ -1039,14 +1039,88 @@ public class Texture {
   public static final Texture pottedFloweringAzaleaBushSide = new Texture();
 
   // [1.19]
+  @TexturePath("assets/minecraft/textures/block/mud")
   public static final Texture mud = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mud_bricks")
   public static final Texture mudBricks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/packed_mud")
   public static final Texture packedMud = new Texture();
+  @TexturePath("assets/minecraft/textures/block/muddy_mangrove_roots_side")
   public static final Texture muddyMangroveRootsSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/muddy_mangrove_roots_top")
   public static final Texture muddyMangroveRootsTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/reinforced_deepslate_top")
   public static final Texture reinforcedDeepslateTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/reinforced_deepslate_side")
   public static final Texture reinforcedDeepslateSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/reinforced_deepslate_bottom")
   public static final Texture reinforcedDeepslateBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/frogspawn")
+  public static final Texture frogspawn = new Texture();
+  @TexturePath("assets/minecraft/textures/block/ochre_froglight_side")
+  public static final Texture ochreFroglightSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/ochre_froglight_top")
+  public static final Texture ochreFroglightTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/verdant_froglight_side")
+  public static final Texture verdantFroglightSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/verdant_froglight_top")
+  public static final Texture verdantFroglightTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pearlescent_froglight_side")
+  public static final Texture pearlescentFroglightSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pearlescent_froglight_top")
+  public static final Texture pearlescentFroglightTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_planks")
+  public static final Texture mangrovePlanks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_door_top")
+  public static final Texture mangroveDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_door_bottom")
+  public static final Texture mangroveDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_leaves")
+  public static final Texture mangroveLeaves = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_log")
+  public static final Texture mangroveLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_log_top")
+  public static final Texture mangroveLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_mangrove_log")
+  public static final Texture strippedMangroveLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_mangrove_log_top")
+  public static final Texture strippedMangroveLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/mangrove")
+  public static final Texture mangroveSignPost = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_trapdoor")
+  public static final Texture mangroveTrapdoor = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_roots_side")
+  public static final Texture mangroveRootsSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_roots_top")
+  public static final Texture mangroveRootsTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_propagule")
+  public static final Texture mangrovePropagule = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_propagule_hanging")
+  public static final Texture mangrovePropaguleHanging = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_catalyst_top")
+  public static final Texture sculkCatalystTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_catalyst_side")
+  public static final Texture sculkCatalystSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_catalyst_bottom")
+  public static final Texture sculkCatalystBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_catalyst_top_bloom")
+  public static final Texture sculkCatalystTopBloom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_catalyst_side_bloom")
+  public static final Texture sculkCatalystSideBloom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk")
+  public static final Texture sculk = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_shrieker_top")
+  public static final Texture sculkShriekerTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_shrieker_side")
+  public static final Texture sculkShriekerSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_shrieker_bottom")
+  public static final Texture sculkShriekerBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_shrieker_can_summon_inner_top")
+  public static final Texture sculkShriekerCanSummonInnerTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_shrieker_inner_top")
+  public static final Texture sculkShriekerInnerTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_vein")
+  public static final Texture sculkVein = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
