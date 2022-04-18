@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  * into strict JSON.
  */
 public class JsonPreprocessor extends InputStream {
-  private static final Pattern COMMENT_STRIP_MATCHER = Pattern.compile("(?<json>^((\\\"([^\\\"]?(\\\\\\\")?)*\\\")?[^/\\\"]*((?!//)/)?)*)");
+  private static final Pattern COMMENT_STRIP_MATCHER = Pattern.compile("(?<json>^((\"([^\"]?(\\\\\")?)*\")?[^/\"]*((?!//)/)?)*)");
 
   /**
    * Leniently parse JSON.
