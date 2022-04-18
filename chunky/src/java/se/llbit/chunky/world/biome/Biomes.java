@@ -192,9 +192,13 @@ public class Biomes {
     }
   }
 
+  public static boolean contains(String resourceLocation) {
+    return biomesByResourceLocation.containsKey(resourceLocation);
+  }
+
   // TODO PluginApi?
   public static Biome register(Biome biome) {
-    if (!biomesByResourceLocation.containsKey(biome.resourceLocation)) {
+    if (!contains(biome.resourceLocation)) {
       biomes.add(biome);
       biomesByResourceLocation.put(biome.resourceLocation, biome);
     }
