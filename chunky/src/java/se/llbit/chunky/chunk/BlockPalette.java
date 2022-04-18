@@ -342,10 +342,10 @@ public class BlockPalette {
       block.emittance = 1.0f;
     });
     materialProperties.put("minecraft:torch", block -> {
-      block.emittance = 5.0f;
+      block.emittance = 50.0f;
     });
     materialProperties.put("minecraft:wall_torch", block -> {
-      block.emittance = 5.0f;
+      block.emittance = 50.0f;
     });
     materialProperties.put("minecraft:fire", block -> {
       block.emittance = 1.0f;
@@ -443,16 +443,16 @@ public class BlockPalette {
       block.emittance = 0.6f;
     });
     materialProperties.put("minecraft:soul_fire_torch", block -> { // MC 20w06a-20w16a
-      block.emittance = 3.5f;
+      block.emittance = 35.0f;
     });
     materialProperties.put("minecraft:soul_torch", block -> { // MC >= 20w17a
-      block.emittance = 3.5f;
+      block.emittance = 35.0f;
     });
     materialProperties.put("minecraft:soul_fire_wall_torch", block -> { // MC 20w06a-20w16a
-      block.emittance = 3.5f;
+      block.emittance = 35.0f;
     });
     materialProperties.put("minecraft:soul_wall_torch", block -> { // MC >= 20w17a
-      block.emittance = 3.5f;
+      block.emittance = 35.0f;
     });
     materialProperties.put("minecraft:soul_fire", block -> {
       block.emittance = 0.6f;
@@ -461,7 +461,7 @@ public class BlockPalette {
       block.emittance = 0.6f;
     });
     materialProperties.put("minecraft:enchanting_table", block -> {
-      block.emittance = 0.6f;
+      block.emittance = 0.5f;
     });
     materialProperties.put("minecraft:respawn_anchor", block -> {
       if (block instanceof RespawnAnchor) {
