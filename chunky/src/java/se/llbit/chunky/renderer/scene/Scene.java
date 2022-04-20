@@ -3291,8 +3291,10 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public void setPreventNormalEmitterWithSampling(boolean preventNormalEmitterWithSampling) {
-    this.preventNormalEmitterWithSampling = preventNormalEmitterWithSampling;
-    refresh();
+    if (preventNormalEmitterWithSampling != this.preventNormalEmitterWithSampling) {
+      this.preventNormalEmitterWithSampling = preventNormalEmitterWithSampling;
+      refresh();
+    }
   }
 
   public void setAnimationTime(double animationTime) {
@@ -3305,8 +3307,10 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public void setRenderer(String renderer) {
-    this.renderer = renderer;
-    refresh();
+    if (!renderer.equals(this.renderer)) {
+      this.renderer = renderer;
+      refresh();
+    }
   }
 
   public String getRenderer() {
@@ -3314,8 +3318,10 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public void setPreviewRenderer(String previewRenderer) {
-    this.previewRenderer = previewRenderer;
-    refresh();
+    if (!previewRenderer.equals(this.previewRenderer)) {
+      this.previewRenderer = previewRenderer;
+      refresh();
+    }
   }
 
   public String getPreviewRenderer() {
