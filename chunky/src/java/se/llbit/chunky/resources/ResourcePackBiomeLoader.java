@@ -74,6 +74,17 @@ public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
                       if (!(t = effects.get("water_color")).isUnknown()) {
                         builder.waterColor(t.intValue(0));
                       }
+                      if (!(t = effects.get("grass_color_modifier")).isUnknown()) {
+                        String modifier = t.asString("none").toLowerCase();
+                        switch (modifier) {
+                          case "dark_forest":
+                            builder.darkForest();
+                            break;
+                          case "swamp":
+                            builder.swamp();
+                            break;
+                        }
+                      }
 
                       Biomes.register(builder);
                     } catch (IOException | JsonParser.SyntaxError ignored) {
