@@ -989,10 +989,11 @@ public class Scene implements JsonSerializable, Refreshable {
         loadedChunks.add(cp);
 
         try {
-          nextChunkDataTask.get(50, TimeUnit.MILLISECONDS);
+          nextChunkDataTask.get(1, TimeUnit.SECONDS);
         } catch(TimeoutException | InterruptedException logged) { // If except, load the chunk synchronously
           if (logged instanceof TimeoutException) {
             Log.info("Chunk loading timed out.");
+            nextChunkDataTask.cancel(true); // cancel to prevent race conditions, see #1238
           } else {
             Log.warn("Chunky loading interrupted.", logged);
           }
