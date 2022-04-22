@@ -972,17 +972,19 @@ public class ChunkyFxController
   private void saveSceneSafe(File sceneDirectory, String sceneName) {
     File oldFormat = new File(PersistentSettings.getSceneDirectory(), sceneName + Scene.EXTENSION);
     File newFormat = new File(PersistentSettings.getSceneDirectory(), sceneName);
-    if (oldFormat.exists() || newFormat.exists()) {
-      Alert alert = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
-      alert.setTitle("Overwrite existing scene");
-      alert.setContentText("A scene with that name already exists. This will overwrite the existing scene, are you sure you want to continue?");
+    if (!newFormat.equals(sceneDirectory)) {
+      // different path than before, we're overwriting some existing scene
+      if (oldFormat.exists() || newFormat.exists()) {
+        Alert alert = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Overwrite existing scene");
+        alert.setContentText("A scene with that name already exists. This will overwrite the existing scene, are you sure you want to continue?");
 
-      if (alert.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) return;
+        if (alert.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) return;
+      }
     }
     scene.setName(sceneName);
     renderController.getSceneProvider().withSceneProtected(scene1 -> scene1.setName(sceneName));
     updateTitle();
-    asyncSceneManager.saveScene(sceneDirectory);
+    asyncSceneManager.saveScene(newFormat);
   }
-
 }
