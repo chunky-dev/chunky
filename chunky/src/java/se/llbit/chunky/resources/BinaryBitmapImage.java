@@ -33,6 +33,10 @@ public class BinaryBitmapImage {
   }
 
   public void setPixel(int x, int y, boolean value) {
+    if(x < 0 || x >= width || y < 0 || y >= height) {
+      assert false;
+      return;
+    }
     int index = y * width + x;
     int byteIndex = index / 8;
     int bitIndex = index % 8;
@@ -46,6 +50,10 @@ public class BinaryBitmapImage {
   }
 
   public boolean getPixel(int x, int y) {
+    if(x < 0 || x >= width || y < 0 || y >= height) {
+      assert false;
+      return false;
+    }
     int index = y * width + x;
     int byteIndex = index / 8;
     int bitIndex = index % 8;
