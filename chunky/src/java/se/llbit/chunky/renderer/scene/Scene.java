@@ -989,20 +989,10 @@ public class Scene implements JsonSerializable, Refreshable {
         loadedChunks.add(cp);
 
         try {
-          nextChunkDataTask.get(1, TimeUnit.SECONDS);
-        } catch(TimeoutException | InterruptedException logged) { // If except, load the chunk synchronously
-          if (logged instanceof TimeoutException) {
-            Log.info("Chunk loading timed out.");
-            nextChunkDataTask.cancel(true); // cancel to prevent race conditions, see #1238
-          } else {
-            Log.warn("Chunky loading interrupted.", logged);
-          }
-
-          if(usingFirstChunkData) {
-            world.getChunk(chunkPositions[i]).getChunkData(chunkData1, palette, biomePalette, yMin, yMax);
-          } else {
-            world.getChunk(chunkPositions[i]).getChunkData(chunkData2, palette, biomePalette, yMin, yMax);
-          }
+          nextChunkDataTask.get();
+        } catch(InterruptedException logged) { // If except, load the chunk synchronously
+          Log.warn("Chunky loading interrupted.", logged);
+          return;
         } catch(ExecutionException e) {
           throw new RuntimeException(e.getCause());
         }
