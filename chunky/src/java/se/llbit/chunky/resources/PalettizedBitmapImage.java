@@ -33,6 +33,10 @@ public class PalettizedBitmapImage {
   }
 
   public void setPixel(int x, int y, int value) {
+    if(x < 0 || x >= width || y < 0 || y >= height) {
+      assert false;
+      return;
+    }
     value &= 0xf;
     int index = y * width + x;
     int byteIndex = index / 2;
@@ -43,6 +47,10 @@ public class PalettizedBitmapImage {
   }
 
   public int getPixel(int x, int y) {
+    if(x < 0 || x >= width || y < 0 || y >= height) {
+      assert false;
+      return 0;
+    }
     int index = y * width + x;
     int byteIndex = index / 2;
     int shift = index % 2 * 4;
