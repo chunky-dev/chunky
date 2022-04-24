@@ -52,11 +52,19 @@ public class BitmapImage {
 
   /** @return the ARGB value of the pixel (x, y). */
   public int getPixel(int x, int y) {
+    if(x < 0 || x >= width || y < 0 || y >= height) {
+      assert false;
+      return 0;
+    }
     return data[y * width + x];
   }
 
   /** Sets the ARGB value of the pixel (x, y). */
   public void setPixel(int x, int y, int argb) {
+    if(x < 0 || x >= width || y < 0 || y >= height) {
+      assert false;
+      return;
+    }
     data[y * width + x] = argb;
   }
 
