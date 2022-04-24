@@ -1,7 +1,7 @@
 package se.llbit.chunky.chunk;
 
 import se.llbit.chunky.chunk.biome.BiomeData;
-import se.llbit.chunky.world.Chunk;
+import se.llbit.chunky.chunk.biome.UnknownBiomeData;
 import se.llbit.nbt.CompoundTag;
 
 import java.util.ArrayList;
@@ -16,22 +16,15 @@ import static se.llbit.chunky.world.Chunk.*;
  * Blocks from 0-255
  */
 public class SimpleChunkData implements ChunkData {
-  /** These final fields are never written to, and are instead used for quickly setting existing blocks/biomes arrays
-   to all zeros, in {@link SimpleChunkData#clear()} */
-  private static final int[] emptyBlocks = new int[X_MAX * Y_MAX * Z_MAX];
+  /** Array of zeros for quickly clearing existing blocks/biomes arrays in {@link SimpleChunkData#clear()} */
+  @SuppressWarnings("all")
+  private static final int[] EMPTY_BLOCKS = new int[X_MAX * Y_MAX * Z_MAX];
 
-  private final int[] blocks;
-  private BiomeData biomeData;
-  private final Collection<CompoundTag> tileEntities;
-  private final Collection<CompoundTag> entities;
-  private boolean isEmpty;
-
-  public SimpleChunkData() {
-    blocks = new int[X_MAX * Y_MAX * Z_MAX];
-    tileEntities = new ArrayList<>();
-    entities = new ArrayList<>();
-    isEmpty = true;
-  }
+  private final int[] blocks = new int[X_MAX * Y_MAX * Z_MAX];
+  private BiomeData biomeData = UnknownBiomeData.INSTANCE;
+  private final Collection<CompoundTag> tileEntities = new ArrayList<>();
+  private final Collection<CompoundTag> entities = new ArrayList<>();
+  private boolean isEmpty = true;
 
   @Override public int minY() {
     return 0;
@@ -83,9 +76,10 @@ public class SimpleChunkData implements ChunkData {
   }
 
   @Override public void clear() {
-    //Quickly set all values to zero. Explanation here: https://github.com/chunky-dev/chunky/pull/866#issuecomment-808490741
-    System.arraycopy(emptyBlocks, 0, blocks, 0, emptyBlocks.length);
-    this.biomeData.clear();
+    // Quickly set all values to zero. Explanation here: https://github.com/chunky-dev/chunky/pull/866#issuecomment-808490741
+    // TODO: check performance of `Arrays.fill(blocks, 0);` in newer SDKs
+    System.arraycopy(EMPTY_BLOCKS, 0, blocks, 0, EMPTY_BLOCKS.length);
+    biomeData.clear();
     tileEntities.clear();
     entities.clear();
     isEmpty = true;

@@ -2,6 +2,7 @@ package se.llbit.chunky.chunk;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import se.llbit.chunky.chunk.biome.BiomeData;
+import se.llbit.chunky.chunk.biome.UnknownBiomeData;
 import se.llbit.nbt.CompoundTag;
 
 import java.util.ArrayList;
@@ -19,16 +20,10 @@ public class GenericChunkData implements ChunkData {
   private Integer minSectionY = Integer.MAX_VALUE;
   private Integer maxSectionY = Integer.MIN_VALUE;
 
-  private final Int2ObjectOpenHashMap<SectionData> sections;
-  private BiomeData biomeData;
-  private final Collection<CompoundTag> tileEntities;
-  private final Collection<CompoundTag> entities;
-
-  public GenericChunkData() {
-    sections = new Int2ObjectOpenHashMap<>();
-    tileEntities = new ArrayList<>();
-    entities = new ArrayList<>();
-  }
+  private final Int2ObjectOpenHashMap<SectionData> sections = new Int2ObjectOpenHashMap<>();
+  private BiomeData biomeData = UnknownBiomeData.INSTANCE;
+  private final Collection<CompoundTag> tileEntities = new ArrayList<>();
+  private final Collection<CompoundTag> entities = new ArrayList<>();
 
   @Override public int minY() {
     return minSectionY << 4;
