@@ -336,10 +336,14 @@ public class BlockPalette {
       block.setPerceptualSmoothness(0.9);
     });
     materialProperties.put("minecraft:redstone_torch", block -> {
-      block.emittance = 1.0f;
+      if (block instanceof RedstoneTorch && ((RedstoneTorch) block).isLit()) {
+        block.emittance = 1.0f;
+      }
     });
     materialProperties.put("minecraft:redstone_wall_torch", block -> {
-      block.emittance = 1.0f;
+      if (block instanceof  RedstoneWallTorch && ((RedstoneWallTorch) block).isLit()) {
+        block.emittance = 1.0f;
+      }
     });
     materialProperties.put("minecraft:torch", block -> {
       block.emittance = 50.0f;

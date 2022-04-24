@@ -7,12 +7,11 @@ import se.llbit.chunky.resources.Texture;
  * A torch attached to a wall.
  */
 public class WallTorch extends AbstractModelBlock {
-
-  private final String description;
+  protected final String facing;
 
   public WallTorch(String name, Texture texture, String facing) {
     super(name, texture);
-    description = "facing=" + facing;
+    this.facing = facing;
     solid = false;
     int facingInt;
     switch (facing) {
@@ -35,6 +34,6 @@ public class WallTorch extends AbstractModelBlock {
 
   @Override
   public String description() {
-    return description;
+    return "facing=" + facing;
   }
 }

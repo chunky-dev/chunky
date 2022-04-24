@@ -1262,7 +1262,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "torch":
         return new Torch(name, Texture.torch);
       case "wall_torch":
-        return wallTorch(tag, Texture.torch);
+        return new WallTorch(name, Texture.torch, BlockProvider.facing(tag));
       case "end_rod":
         return endRod(tag);
       case "chorus_plant": {
@@ -1345,9 +1345,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "redstone_ore":
         return new MinecraftBlock(name, Texture.redstoneOre);
       case "redstone_torch":
-        return redstoneTorch(tag);
+        return new RedstoneTorch(isLit(tag));
       case "redstone_wall_torch":
-        return redstoneWallTorch(tag);
+        return new RedstoneWallTorch(BlockProvider.facing(tag), isLit(tag));
       case "stone_button":
         return button(tag, Texture.stone);
       case "snow":
@@ -2524,7 +2524,7 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new Torch(name, Texture.soulFireTorch);
       case "soul_fire_wall_torch": // 20w06a - 20w16a
       case "soul_wall_torch": // since 20w17a
-        return wallTorch(tag, Texture.soulFireTorch);
+        return new WallTorch(name, Texture.soulFireTorch, BlockProvider.facing(tag));
       case "respawn_anchor":
         return new RespawnAnchor(
             BlockProvider.stringToInt(tag.get("Properties").get("charges"), 0));
@@ -3033,21 +3033,6 @@ public class MinecraftBlockProvider implements BlockProvider {
   private static boolean isLit(Tag tag, boolean defaultValue) {
     return tag.get("Properties").get("lit").stringValue(Boolean.toString(defaultValue))
         .equals("true");
-  }
-
-  private static Block redstoneTorch(Tag tag) {
-    return new Torch(
-        "redstone_torch", isLit(tag) ? Texture.redstoneTorchOn : Texture.redstoneTorchOff);
-  }
-
-  private static Block redstoneWallTorch(Tag tag) {
-    return wallTorch(tag, isLit(tag) ? Texture.redstoneTorchOn : Texture.redstoneTorchOff);
-  }
-
-  private static Block wallTorch(Tag tag, Texture texture) {
-    String name = BlockProvider.blockName(tag);
-    String facing = BlockProvider.facing(tag);
-    return new WallTorch(name, texture, facing);
   }
 
   private static Block redstoneWire(Tag tag) {
