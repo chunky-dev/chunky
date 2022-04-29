@@ -1521,10 +1521,7 @@ public class Scene implements JsonSerializable, Refreshable {
               for (int z = 0; z < 16; ++z) {
                 int wz = cp.z * 16 + z;
 
-                Integer id = biomePaletteIdxStructure.get(wx, 0, wz);
-                if (id == null) {
-                  continue;
-                }
+                int id = biomePaletteIdxStructure.get(wx, 0, wz);
                 Biome biome = biomePalette.get(id);
 
                 grassTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.grassColorLinear);
