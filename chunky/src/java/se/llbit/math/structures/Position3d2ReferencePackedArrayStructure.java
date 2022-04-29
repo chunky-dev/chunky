@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public class Position3d2ReferencePackedArrayStructure<T> implements Position2ReferenceStructure<T> {
 
-  private final Object2ReferenceMap<XYZTriple, T[]> map = new Object2ReferenceOpenHashMap<>();
+  protected final Object2ReferenceMap<XYZTriple, T[]> map = new Object2ReferenceOpenHashMap<>();
 
   private int packedIndex(int x, int y, int z) {
     x &= 0xf;
@@ -22,18 +22,18 @@ public class Position3d2ReferencePackedArrayStructure<T> implements Position2Ref
 
   @Override
   public T get(int x, int y, int z) {
-    return this.map.get(new XYZTriple(x >> 4, y >> 4, z >> 4))[packedIndex(x, y, z)];
+    T[] ts = this.map.get(new XYZTriple(x >> 4, y >> 4, z >> 4));
+    if(ts != null) {
+      return ts[packedIndex(x, y, z)];
+    } else {
+      return null;
+    }
   }
 
-  @Override
-  public void compact() {
+  protected static class XYZTriple {
+    public final int x, y, z;
 
-  }
-
-  private static class XYZTriple {
-    private final int x, y, z;
-
-    private XYZTriple(int x, int y, int z) {
+    public XYZTriple(int x, int y, int z) {
       this.x = x;
       this.y = y;
       this.z = z;

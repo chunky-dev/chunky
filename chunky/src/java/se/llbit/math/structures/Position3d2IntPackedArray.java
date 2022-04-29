@@ -7,7 +7,10 @@ import java.util.Objects;
 
 public class Position3d2IntPackedArray implements Position2IntStructure {
 
-  private final Object2ReferenceMap<XYZTriple, int[]> structure = new Object2ReferenceOpenHashMap<>();
+  protected final Object2ReferenceMap<XYZTriple, int[]> structure = new Object2ReferenceOpenHashMap<>();
+
+  protected int lastX, lastY, lastZ;
+  protected int[] lastData = null;
 
   private int packedIndex(int x, int y, int z) {
     x &= 0xf;
@@ -18,27 +21,49 @@ public class Position3d2IntPackedArray implements Position2IntStructure {
 
   @Override
   public void set(int x, int y, int z, int data) {
-    this.structure.computeIfAbsent(new XYZTriple(x >> 4, y >> 4, z >> 4), sectionPos -> new int[16 * 16 * 16])[packedIndex(x, y, z)] = data;
+    int xSection = x >> 4;
+    int ySection = y >> 4;
+    int zSection = z >> 4;
+    int[] arr;
+    if(xSection == this.lastX && ySection == this.lastY && zSection == this.lastZ) {
+      arr = this.lastData;
+    } else {
+      arr = this.structure.computeIfAbsent(new XYZTriple(xSection, ySection, zSection), sectionPos -> new int[16 * 16 * 16]);
+      this.lastX = xSection;
+      this.lastY = ySection;
+      this.lastZ = zSection;
+      this.lastData = arr;
+    }
+    if(arr != null) {
+      arr[packedIndex(x, y, z)] = data;
+    }
   }
 
   @Override
   public int get(int x, int y, int z) {
-    int[] ints = this.structure.get(new XYZTriple(x >> 4, y >> 4, z >> 4));
-    if(ints == null) {
-      return 0;
+    int xSection = x >> 4;
+    int ySection = y >> 4;
+    int zSection = z >> 4;
+    int[] arr;
+    if(xSection == this.lastX && ySection == this.lastY && zSection == this.lastZ) {
+      arr = this.lastData;
+    } else {
+      arr = this.structure.computeIfAbsent(new XYZTriple(xSection, ySection, zSection), sectionPos -> new int[16 * 16 * 16]);
+      this.lastX = xSection;
+      this.lastY = ySection;
+      this.lastZ = zSection;
+      this.lastData = arr;
     }
-    return ints[packedIndex(x, y, z)];
+    if(arr != null) {
+      return arr[packedIndex(x, y, z)];
+    }
+    return 0;
   }
 
-  @Override
-  public void compact() {
+  protected static class XYZTriple {
+    protected final int x, y, z;
 
-  }
-
-  private static class XYZTriple {
-    private final int x, y, z;
-
-    private XYZTriple(int x, int y, int z) {
+    protected XYZTriple(int x, int y, int z) {
       this.x = x;
       this.y = y;
       this.z = z;

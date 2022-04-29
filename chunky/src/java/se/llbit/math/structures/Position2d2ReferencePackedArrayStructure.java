@@ -5,10 +5,10 @@ import it.unimi.dsi.fastutil.longs.Long2ReferenceOpenHashMap;
 
 public class Position2d2ReferencePackedArrayStructure<T> implements Position2ReferenceStructure<T> {
 
-  private final Long2ReferenceMap<T[]> map = new Long2ReferenceOpenHashMap<>();
+  protected final Long2ReferenceMap<T[]> map = new Long2ReferenceOpenHashMap<>();
 
   private long packedSectionPos(int x, int z) {
-    return (x >> 4) | ((long) (z >> 4) << 32);
+    return (z & 0xFFFFFFFFL) | (x & 0xFFFFFFFFL) << 32;
   }
 
   private int packedIndex(int x, int y, int z) {
@@ -29,14 +29,6 @@ public class Position2d2ReferencePackedArrayStructure<T> implements Position2Ref
       return null;
     }
     T t = tArray[packedIndex(x, y, z)];
-    if(t == null) {
-      int asd = 0;
-    }
     return t;
-  }
-
-  @Override
-  public void compact() {
-
   }
 }
