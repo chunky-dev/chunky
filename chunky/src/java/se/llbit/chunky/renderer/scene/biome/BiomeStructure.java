@@ -2,6 +2,7 @@ package se.llbit.chunky.renderer.scene.biome;
 
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import se.llbit.chunky.world.Chunk;
+import se.llbit.chunky.world.WorldTexture;
 import se.llbit.math.structures.Position2ReferenceStructure;
 import se.llbit.util.annotation.NotNull;
 import se.llbit.util.annotation.Nullable;
@@ -26,6 +27,16 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
 
       @Override
       public BiomeStructure load(@NotNull DataInputStream in) throws IOException {
+        /**
+         * Stored as:
+         * (int) size
+         * (int) x, y, z
+         * (long) Length of present bitset in longs
+         * (BitSet as longs) Present values bitset
+         * (int) number of values stored
+         * (float[][]) The internal data of each packed x,y,z position
+         */
+
         Trivial3dBiomeStructureImpl impl = new Trivial3dBiomeStructureImpl();
         int size = in.readInt();
         for (int i = 0; i < size; i++) {
@@ -63,6 +74,15 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
         return new Trivial2dBiomeStructureImpl();
       }
 
+      /**
+       * Stored as:
+       * (int) size
+       * (int) long packed key
+       * (long) Length of present bitset in longs
+       * (BitSet as longs) Present values bitset
+       * (int) number of values stored
+       * (float[][]) The internal data of each packed x,z position
+       */
       @Override
       public BiomeStructure load(@NotNull DataInputStream in) throws IOException {
         Trivial2dBiomeStructureImpl impl = new Trivial2dBiomeStructureImpl();
@@ -96,6 +116,8 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
   }
 
   /**
+   * This is basically a reimplementation of {@link WorldTexture#load} but instead loading into an arbitrary
+   * BiomeStructure implementation
    *
    * @param impl The implementation to load the legacy implementation into
    * @param in The serialised legacy data in an input stream
