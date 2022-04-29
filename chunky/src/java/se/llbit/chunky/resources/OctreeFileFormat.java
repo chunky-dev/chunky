@@ -26,14 +26,14 @@ import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Lava;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.world.WorldTexture;
 import se.llbit.log.Log;
 import se.llbit.math.Octree;
+import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
 
 public class OctreeFileFormat {
 
   private static final int MIN_OCTREE_VERSION = 3;
-  private static final int OCTREE_VERSION = 6;
+  private static final int OCTREE_VERSION = 7;
 
   /**
    * In octree v3-v4, the top bit of the type field in a serialized octree node is reserved for
@@ -45,9 +45,10 @@ public class OctreeFileFormat {
    * Load octrees and grass/foliage textures from a file.
    *
    * @param in   input stream for the file to load the scene from.
-   * @param impl The octree implementation to use
-   */
-  public static OctreeData load(DataInputStream in, String impl) throws IOException {
+   * @param octreeImpl The octree implementation to use
+   * @param legacyBiomeImpl The biome structure implementation to use to load any legacy WorldTextures
+   * */
+  public static OctreeData load(DataInputStream in, String octreeImpl, String legacyBiomeImpl) throws IOException {
     int version = in.readInt();
     if (version < MIN_OCTREE_VERSION || version > OCTREE_VERSION) {
       throw new IOException(String.format(
@@ -56,12 +57,28 @@ public class OctreeFileFormat {
     }
     OctreeData data = new OctreeData();
     data.palette = BlockPalette.read(in);
-    data.worldTree = Octree.load(impl, version < 5 ? convertDataNodes(data.palette, in) : in);
-    data.waterTree = Octree.load(impl, version < 5 ? convertDataNodes(data.palette, in) : in);
-    data.grassColors = WorldTexture.load(in);
-    data.foliageColors = WorldTexture.load(in);
-    if (version >= 4) {
-      data.waterColors = WorldTexture.load(in);
+    data.worldTree = Octree.load(octreeImpl, version < 5 ? convertDataNodes(data.palette, in) : in);
+    data.waterTree = Octree.load(octreeImpl, version < 5 ? convertDataNodes(data.palette, in) : in);
+
+    if(version >= 7) {
+      String biomeFormat = in.readUTF();
+      BiomeStructure.Builder builder = BiomeStructure.get(biomeFormat);
+      data.grassColors = builder.load(in);
+
+      biomeFormat = in.readUTF();
+      builder = BiomeStructure.get(biomeFormat);
+      data.foliageColors = builder.load(in);
+
+      biomeFormat = in.readUTF();
+      builder = BiomeStructure.get(biomeFormat);
+      data.waterColors = builder.load(in);
+
+    } else {
+      data.grassColors = BiomeStructure.loadLegacy(legacyBiomeImpl, in);
+      data.foliageColors = BiomeStructure.loadLegacy(legacyBiomeImpl, in);
+      if (version >= 4) {
+        data.waterColors = BiomeStructure.loadLegacy(legacyBiomeImpl, in);
+      }
     }
     data.version = version;
     return data;
@@ -123,22 +140,27 @@ public class OctreeFileFormat {
    * Save octrees and grass/foliage/water textures to a file.
    */
   public static void store(DataOutputStream out, Octree octree,
-      Octree waterTree, BlockPalette palette,
-      WorldTexture grassColors, WorldTexture foliageColors, WorldTexture waterColors)
+                           Octree waterTree, BlockPalette palette,
+                           BiomeStructure grassColors,
+                           BiomeStructure foliageColors,
+                           BiomeStructure waterColors)
       throws IOException {
     out.writeInt(OCTREE_VERSION);
     palette.write(out);
     octree.store(out);
     waterTree.store(out);
+    out.writeUTF(grassColors.biomeFormat());
     grassColors.store(out);
+    out.writeUTF(foliageColors.biomeFormat());
     foliageColors.store(out);
+    out.writeUTF(waterColors.biomeFormat());
     waterColors.store(out);
   }
 
   public static class OctreeData {
 
     public Octree worldTree, waterTree;
-    public WorldTexture grassColors, foliageColors, waterColors;
+    public BiomeStructure grassColors, foliageColors, waterColors;
     public BlockPalette palette;
     public int version;
   }

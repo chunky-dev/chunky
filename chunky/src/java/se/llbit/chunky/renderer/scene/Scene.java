@@ -69,6 +69,9 @@ import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
+import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
+import se.llbit.chunky.renderer.scene.biome.Trivial2dBiomeStructureImpl;
+import se.llbit.chunky.renderer.scene.biome.Trivial3dBiomeStructureImpl;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.biome.ArrayBiomePalette;
@@ -249,8 +252,9 @@ public class Scene implements JsonSerializable, Refreshable {
   /** Controls how much the fog color is blended over the sky/skymap. */
   protected double skyFogDensity = 1;
 
-  protected boolean use3dBiomes = false;
   protected boolean biomeColors = true;
+  protected boolean biomeBlending = true;
+  protected boolean use3dBiomes = false;
   protected boolean transparentSky = false;
   protected boolean renderActors = true;
   protected Collection<ChunkPosition> chunks = new ArrayList<>();
@@ -315,9 +319,9 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   private double animationTime = 0;
 
-  private Position2ReferenceStructure<float[]> grassTexture;
-  private Position2ReferenceStructure<float[]> foliageTexture;
-  private Position2ReferenceStructure<float[]> waterTexture;
+  private BiomeStructure grassTexture;
+  private BiomeStructure foliageTexture;
+  private BiomeStructure waterTexture;
 
   /** This is the 8-bit channel frame buffer. */
   protected BitmapImage frontBuffer;
@@ -389,9 +393,10 @@ public class Scene implements JsonSerializable, Refreshable {
     waterOctree = new Octree(octreeImplementation, 1);
     emitterGrid = null;
 
-    grassTexture = new Position2d2ReferencePackedArrayStructure<>();
-    foliageTexture = new Position2d2ReferencePackedArrayStructure<>();
-    waterTexture = new Position2d2ReferencePackedArrayStructure<>();
+    //TODO: use selected from in GUI by default
+    grassTexture = new Trivial2dBiomeStructureImpl();
+    foliageTexture = new Trivial2dBiomeStructureImpl();
+    waterTexture = new Trivial2dBiomeStructureImpl();
   }
 
   /**
@@ -1034,7 +1039,7 @@ public class Scene implements JsonSerializable, Refreshable {
             int wz = cz + wz0;
             for (int cx = 0; cx < 16; ++cx) {
               int wx = cx + wx0;
-              int biomePaletteIdx = biomeData.getBiome(cx, y, cz); // TODO add vertical biomes support (1.15+)
+              int biomePaletteIdx = biomeData.getBiome(cx, y, cz);
               biomePaletteIdxStructure.set(wx, y, wz, biomePaletteIdx);
             }
           }
@@ -1353,6 +1358,16 @@ public class Scene implements JsonSerializable, Refreshable {
     actors.trimToSize();
     palette.unsynchronize();
 
+    if(use3dBiomes) {
+      grassTexture = new Trivial3dBiomeStructureImpl();
+      foliageTexture = new Trivial3dBiomeStructureImpl();
+      waterTexture = new Trivial3dBiomeStructureImpl();
+    } else {
+      grassTexture = new Trivial2dBiomeStructureImpl();
+      foliageTexture = new Trivial2dBiomeStructureImpl();
+      waterTexture = new Trivial2dBiomeStructureImpl();
+    }
+
     try (TaskTracker.Task task = taskTracker.task("(4/6) Finalizing octree")) {
 
       worldOctree.startFinalization();
@@ -1361,112 +1376,161 @@ public class Scene implements JsonSerializable, Refreshable {
       int done = 0;
       int target = nonEmptyChunks.size();
       for (ChunkPosition cp : nonEmptyChunks) {
-        // Finalize grass and foliage textures.
-        // 3x3 box blur.
-        if(use3dBiomes) {
-          for (int sectionY = yMin >> 4; sectionY < (yMax - 1 >> 4) + 1; sectionY++) {
-            for (int x = 0; x < 16; ++x) {
-              for (int z = 0; z < 16; ++z) {
-                for (int y = 0; y < 16; y++) {
-                  int nsum = 0;
+//        TODO: make this less special cased in some way, having 2 ifs for biomeBlending and use3dBiomes is quite awful to read and maintain
 
-                  float[] grassMix = {0, 0, 0};
-                  float[] foliageMix = {0, 0, 0};
-                  float[] waterMix = {0, 0, 0};
-                  for (int sx = x - 1; sx <= x + 1; ++sx) {
-                    int wx = cp.x * 16 + sx;
-                    for (int sz = z - 1; sz <= z + 1; ++sz) {
-                      int wz = cp.z * 16 + sz;
-                      for (int sy = y - 1; sy < y + 1; sy++) {
-                        int wy = sectionY * 16 + sy;
-                        ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
-                        if (nonEmptyChunks.contains(ccp)) {
-                          nsum += 1;
-                          Integer id = biomePaletteIdxStructure.get(wx, wy, wz);
-                          if (id == null) {
-                            continue;
+//        Finalize grass and foliage textures.
+//        3x3 box blur.
+        if (biomeBlending) {
+          if (use3dBiomes) {
+            for (int sectionY = yMin >> 4; sectionY < (yMax - 1 >> 4) + 1; sectionY++) {
+              for (int x = 0; x < 16; ++x) {
+                for (int z = 0; z < 16; ++z) {
+                  for (int y = 0; y < 16; y++) {
+                    int nsum = 0;
+
+                    float[] grassMix = {0, 0, 0};
+                    float[] foliageMix = {0, 0, 0};
+                    float[] waterMix = {0, 0, 0};
+                    for (int sx = x - 1; sx <= x + 1; ++sx) {
+                      int wx = cp.x * 16 + sx;
+                      for (int sz = z - 1; sz <= z + 1; ++sz) {
+                        int wz = cp.z * 16 + sz;
+                        for (int sy = y - 1; sy < y + 1; sy++) {
+                          int wy = sectionY * 16 + sy;
+                          ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
+                          if (nonEmptyChunks.contains(ccp)) {
+                            nsum += 1;
+                            Integer id = biomePaletteIdxStructure.get(wx, wy, wz);
+                            if (id == null) {
+                              continue;
+                            }
+                            Biome biome = biomePalette.get(id);
+                            float[] grassColor = biome.grassColorLinear;
+                            grassMix[0] += grassColor[0];
+                            grassMix[1] += grassColor[1];
+                            grassMix[2] += grassColor[2];
+                            float[] foliageColor = biome.foliageColorLinear;
+                            foliageMix[0] += foliageColor[0];
+                            foliageMix[1] += foliageColor[1];
+                            foliageMix[2] += foliageColor[2];
+                            float[] waterColor = biome.waterColorLinear;
+                            waterMix[0] += waterColor[0];
+                            waterMix[1] += waterColor[1];
+                            waterMix[2] += waterColor[2];
                           }
-                          Biome biome = biomePalette.get(id);
-                          float[] grassColor = biome.grassColorLinear;
-                          grassMix[0] += grassColor[0];
-                          grassMix[1] += grassColor[1];
-                          grassMix[2] += grassColor[2];
-                          float[] foliageColor = biome.foliageColorLinear;
-                          foliageMix[0] += foliageColor[0];
-                          foliageMix[1] += foliageColor[1];
-                          foliageMix[2] += foliageColor[2];
-                          float[] waterColor = biome.waterColorLinear;
-                          waterMix[0] += waterColor[0];
-                          waterMix[1] += waterColor[1];
-                          waterMix[2] += waterColor[2];
                         }
                       }
                     }
+                    grassMix[0] /= nsum;
+                    grassMix[1] /= nsum;
+                    grassMix[2] /= nsum;
+                    grassTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, grassMix);
+
+                    foliageMix[0] /= nsum;
+                    foliageMix[1] /= nsum;
+                    foliageMix[2] /= nsum;
+                    foliageTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, foliageMix);
+
+                    waterMix[0] /= nsum;
+                    waterMix[1] /= nsum;
+                    waterMix[2] /= nsum;
+                    waterTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, waterMix);
                   }
-                  grassMix[0] /= nsum;
-                  grassMix[1] /= nsum;
-                  grassMix[2] /= nsum;
-                  grassTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, grassMix);
-
-                  foliageMix[0] /= nsum;
-                  foliageMix[1] /= nsum;
-                  foliageMix[2] /= nsum;
-                  foliageTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, foliageMix);
-
-                  waterMix[0] /= nsum;
-                  waterMix[1] /= nsum;
-                  waterMix[2] /= nsum;
-                  waterTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, waterMix);
                 }
+              }
+            }
+          } else {
+            for (int x = 0; x < 16; ++x) {
+              for (int z = 0; z < 16; ++z) {
+
+                int nsum = 0;
+                float[] grassMix = {0, 0, 0};
+                float[] foliageMix = {0, 0, 0};
+                float[] waterMix = {0, 0, 0};
+                for (int sx = x - 1; sx <= x + 1; ++sx) {
+                  int wx = cp.x * 16 + sx;
+                  for (int sz = z - 1; sz <= z + 1; ++sz) {
+                    int wz = cp.z * 16 + sz;
+
+                    ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
+                    if (nonEmptyChunks.contains(ccp)) {
+                      nsum += 1;
+                      Biome biome = biomePalette.get(biomePaletteIdxStructure.get(wx, 0, wz));
+                      float[] grassColor = biome.grassColorLinear;
+                      grassMix[0] += grassColor[0];
+                      grassMix[1] += grassColor[1];
+                      grassMix[2] += grassColor[2];
+                      float[] foliageColor = biome.foliageColorLinear;
+                      foliageMix[0] += foliageColor[0];
+                      foliageMix[1] += foliageColor[1];
+                      foliageMix[2] += foliageColor[2];
+                      float[] waterColor = biome.waterColorLinear;
+                      waterMix[0] += waterColor[0];
+                      waterMix[1] += waterColor[1];
+                      waterMix[2] += waterColor[2];
+                    }
+                  }
+                }
+                grassMix[0] /= nsum;
+                grassMix[1] /= nsum;
+                grassMix[2] /= nsum;
+                grassTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, grassMix);
+
+                foliageMix[0] /= nsum;
+                foliageMix[1] /= nsum;
+                foliageMix[2] /= nsum;
+                foliageTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, foliageMix);
+
+                waterMix[0] /= nsum;
+                waterMix[1] /= nsum;
+                waterMix[2] /= nsum;
+                waterTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, waterMix);
               }
             }
           }
         } else {
-          for (int x = 0; x < 16; ++x) {
-            for (int z = 0; z < 16; ++z) {
+          if (use3dBiomes) {
+            for (int sectionY = yMin >> 4; sectionY < (yMax - 1 >> 4) + 1; sectionY++) {
+              for (int y = 0; y < 16; y++) {
+                int wy = sectionY * 16 + y;
+                for (int x = 0; x < 16; ++x) {
+                  int wx = cp.x * Chunk.X_MAX + x;
+                  for (int z = 0; z < 16; ++z) {
+                    int wz = cp.z * Chunk.Z_MAX + z;
+                    int nsum = 0;
 
-              int nsum = 0;
-              float[] grassMix = {0, 0, 0};
-              float[] foliageMix = {0, 0, 0};
-              float[] waterMix = {0, 0, 0};
-              for (int sx = x - 1; sx <= x + 1; ++sx) {
-                int wx = cp.x * 16 + sx;
-                for (int sz = z - 1; sz <= z + 1; ++sz) {
-                  int wz = cp.z * 16 + sz;
+                    Integer id = biomePaletteIdxStructure.get(wx, wy, wz);
+                    if (id == null) {
+                      continue;
+                    }
+                    if(id != 0) {
+                      int asd = 0;
+                    }
 
-                  ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
-                  if (nonEmptyChunks.contains(ccp)) {
-                    nsum += 1;
-                    Biome biome = biomePalette.get(biomePaletteIdxStructure.get(wx, 0, wz));
-                    float[] grassColor = biome.grassColorLinear;
-                    grassMix[0] += grassColor[0];
-                    grassMix[1] += grassColor[1];
-                    grassMix[2] += grassColor[2];
-                    float[] foliageColor = biome.foliageColorLinear;
-                    foliageMix[0] += foliageColor[0];
-                    foliageMix[1] += foliageColor[1];
-                    foliageMix[2] += foliageColor[2];
-                    float[] waterColor = biome.waterColorLinear;
-                    waterMix[0] += waterColor[0];
-                    waterMix[1] += waterColor[1];
-                    waterMix[2] += waterColor[2];
+                    Biome biome = biomePalette.get(id);
+                    grassTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.grassColorLinear);
+                    foliageTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.foliageColorLinear);
+                    waterTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.waterColorLinear);
                   }
                 }
               }
-              grassMix[0] /= nsum;
-              grassMix[1] /= nsum;
-              grassMix[2] /= nsum;
-              grassTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, grassMix);
+            }
+          } else {
+            for (int x = 0; x < 16; ++x) {
+              int wx = cp.x * 16 + x;
+              for (int z = 0; z < 16; ++z) {
+                int wz = cp.z * 16 + z;
 
-              foliageMix[0] /= nsum;
-              foliageMix[1] /= nsum;
-              foliageMix[2] /= nsum;
-              foliageTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, foliageMix);
+                Integer id = biomePaletteIdxStructure.get(wx, 0, wz);
+                if (id == null) {
+                  continue;
+                }
+                Biome biome = biomePalette.get(id);
 
-              waterMix[0] /= nsum;
-              waterMix[1] /= nsum;
-              waterMix[2] /= nsum;
-              waterTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, waterMix);
+                grassTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.grassColorLinear);
+                foliageTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.foliageColorLinear);
+                waterTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.waterColorLinear);
+              }
             }
           }
         }
@@ -1645,6 +1709,21 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
+  public void setBiomeBlendingEnabled(boolean value) {
+    if (value != biomeBlending) {
+      biomeBlending = value;
+      refresh();
+    }
+  }
+
+  public void setUse3dBiomes(boolean value) {
+    if (value != use3dBiomes) {
+      use3dBiomes = value;
+
+      refresh();
+    }
+  }
+
   /**
    * Center the camera over the loaded chunks
    */
@@ -1735,6 +1814,14 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public boolean biomeColorsEnabled() {
     return biomeColors;
+  }
+
+  public boolean biomeBlendingEnabled() {
+    return biomeBlending;
+  }
+
+  public boolean using3dBiomes() {
+    return use3dBiomes;
   }
 
   /**
@@ -2199,9 +2286,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
       boolean saved = false;
       try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName))))) {
-        //TODO: READD THIS
-//        OctreeFileFormat.store(out, worldOctree, waterOctree, palette,
-//            grassTexture, foliageTexture, waterTexture);
+        OctreeFileFormat.store(out, worldOctree, waterOctree, palette,
+            grassTexture, foliageTexture, waterTexture);
         saved = true;
 
         task.update(2);
@@ -2257,23 +2343,22 @@ public class Scene implements JsonSerializable, Refreshable {
         try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(context.getSceneFileInputStream(fileName), pos -> {
           task.updateInterval((int) (pos * progressScale), 1);
         }))))) {
-          data = OctreeFileFormat.load(in, octreeImplementation);
+          data = OctreeFileFormat.load(in, octreeImplementation, "TRIVIAL_2D");
         } catch (PackedOctree.OctreeTooBigException e) {
           // Octree too big, reload file and force loading as NodeBasedOctree
           Log.warn("Octree was too big when loading dump, reloading with old (slower and bigger) implementation.");
           DataInputStream inRetry = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(context.getSceneFileInputStream(fileName), pos -> {
             task.updateInterval((int) (pos * progressScale), 1);
           }))));
-          data = OctreeFileFormat.load(inRetry, "NODE");
+          data = OctreeFileFormat.load(inRetry, "NODE", "TRIVIAL_2D");
         }
 
         worldOctree = data.worldTree;
         worldOctree.setTimestamp(fileTimestamp);
         waterOctree = data.waterTree;
-        //TODO: READD THIS
-//        grassTexture = data.grassColors;
-//        foliageTexture = data.foliageColors;
-//        waterTexture = data.waterColors;
+        grassTexture = data.grassColors;
+        foliageTexture = data.foliageColors;
+        waterTexture = data.waterColors;
         palette = data.palette;
         palette.applyMaterials();
         Log.info("Octree loaded");
@@ -3460,23 +3545,5 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void setWaterShading(WaterShader waterShading) {
     this.waterShading = waterShading;
-  }
-
-  public boolean using3dBiomes() {
-    return use3dBiomes;
-  }
-
-  public void setUse3dBiomes(boolean value) {
-    use3dBiomes = value;
-
-    if(use3dBiomes) {
-      grassTexture = new Position3d2ReferencePackedArrayStructure();
-      foliageTexture = new Position3d2ReferencePackedArrayStructure();
-      waterTexture = new Position3d2ReferencePackedArrayStructure();
-    } else {
-      grassTexture = new Position2d2ReferencePackedArrayStructure<>();
-      foliageTexture = new Position2d2ReferencePackedArrayStructure<>();
-      waterTexture = new Position2d2ReferencePackedArrayStructure<>();
-    }
   }
 }

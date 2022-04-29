@@ -22,16 +22,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -94,6 +86,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private CheckBox loadPaintings;
   @FXML private CheckBox loadOtherEntities;
   @FXML private CheckBox biomeColors;
+  @FXML private CheckBox biomeBlending;
   @FXML private CheckBox use3dBiomes;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
@@ -142,7 +135,13 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadOtherEntities.setSelected(preferences.shouldLoadClass(null));
     }
     biomeColors.setSelected(scene.biomeColorsEnabled());
+    if(!scene.biomeColorsEnabled()) {
+      biomeBlending.setDisable(true);
+      use3dBiomes.setDisable(true);
+    }
+    biomeBlending.setSelected(scene.biomeBlendingEnabled());
     use3dBiomes.setSelected(scene.using3dBiomes());
+
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
     reloadChunks.setDisable(scene.numberOfChunks() == 0);
     loadSelectedChunks.setDisable(
@@ -278,12 +277,82 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
 
     biomeColors.setTooltip(new Tooltip("Colors grass and tree leaves according to biome."));
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      boolean enabled = scene.biomeColorsEnabled();
+
       scene.setBiomeColorsEnabled(newValue);
+      biomeBlending.setDisable(!newValue);
+      use3dBiomes.setDisable(!newValue);
+
+      if(!scene.haveLoadedChunks()) {
+        return;
+      }
+      if(enabled == newValue) { // Jank to avoid not snapshotting the scene settings
+        return;
+      }
+      if(newValue) {
+        Alert warning = Dialogs.createAlert(AlertType.CONFIRMATION);
+        warning.setContentText("The selected chunks need to be reloaded in order for biome colors to update.");
+        warning.getButtonTypes().setAll(
+          ButtonType.CANCEL,
+          new ButtonType("Reload chunks", ButtonBar.ButtonData.FINISH));
+        warning.setTitle("Chunk reload required");
+        ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
+        if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
+          controller.getSceneManager().reloadChunks();
+        }
+      }
     });
+
+    biomeBlending.setTooltip(new Tooltip("Blend edges of biomes (looks better but loads slower)"));
+    biomeBlending.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      boolean enabled = scene.biomeBlendingEnabled();
+
+      scene.setBiomeBlendingEnabled(newValue);
+
+      if(!scene.haveLoadedChunks()) {
+        return;
+      }
+      if(enabled == newValue) { // Jank to avoid not snapshotting the scene settings
+        return;
+      }
+
+      Alert warning = Dialogs.createAlert(AlertType.CONFIRMATION);
+      warning.setContentText("The selected chunks need to be reloaded in order for biome blending to update.");
+      warning.getButtonTypes().setAll(
+        ButtonType.CANCEL,
+        new ButtonType("Reload chunks", ButtonBar.ButtonData.FINISH));
+      warning.setTitle("Chunk reload required");
+      ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
+      if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
+        controller.getSceneManager().reloadChunks();
+      }
+    });
+
     use3dBiomes.setTooltip(new Tooltip("Attempt to load biomes as 3d (Added in 1.18+)."));
     use3dBiomes.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      boolean enabled = scene.using3dBiomes();
+
       scene.setUse3dBiomes(newValue);
+
+      if(!scene.haveLoadedChunks()) {
+        return;
+      }
+      if(enabled == newValue) { // Jank to avoid not snapshotting the scene settings
+        return;
+      }
+
+      Alert warning = Dialogs.createAlert(AlertType.CONFIRMATION);
+      warning.setContentText("The selected chunks need to be reloaded in order for biome colors to update.");
+      warning.getButtonTypes().setAll(
+        ButtonType.CANCEL,
+        new ButtonType("Reload chunks", ButtonBar.ButtonData.FINISH));
+      warning.setTitle("Chunk reload required");
+      ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
+      if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
+        controller.getSceneManager().reloadChunks();
+      }
     });
+
     dumpFrequency.setConverter(new ValidatingNumberStringConverter(true));
     dumpFrequency.getItems().addAll(50, 100, 500, 1000, 2500, 5000);
     dumpFrequency.setValue(Scene.DEFAULT_DUMP_FREQUENCY);
