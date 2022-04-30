@@ -67,6 +67,7 @@ with CLI: `git clone git@github.com:GITHUB_USERNAME/chunky.git` or (outdated) `g
 ##### Open the Project
 From inside IntelliJ (if you cloned with IntelliJ you can likely skip this step)
 - `File` -> `Open` -> Select the first `build.gradle` file within the cloned folder
+  (You may also select the folder containing the `build.gradle` file)
 
 You may have to wait some time while IntelliJ indexes the project, and imports it. (The little loading bar in the bottom right) 
 
@@ -77,7 +78,12 @@ Java 17 SDK (e.g. openjdk-17-jdk on Ubuntu):
   - If not: click `Edit`, then the little `+` at the top, `Add JDK` and find your Java 17 JDK install location (select the main jdk folder).
     - Go back to the `Project` tab, and select the newly added jdk.
 
-TODO: ADD INFO ABOUT NULLABLE AND NOTNULL ANNOTATIONS (adding them to compiler options)
+Add `se.llbit.util.annotation.Nullable` and `se.llbit.util.annotation.NotNull` to the compiler options of Intellij for IntelliSense recommendations
+- `File` -> `Settings` -> `Build, Execution, Deployment` -> `Compiler` (select it, not the dropdown)
+  - Click `Configure annotations...`
+    - In the `Nullable` tab click the little `+` to add `Nullable (se.llbit.util.annotation)`
+    - In the `NotNull` tab click the little `+` to add `NotNull (se.llbit.util.annotation.)`
+    - Intellij must be restarted to update IntelliSense
 
 ##### Create a new branch for your change
 In the bottom right of IntelliJ, there is a New Branch button, by default it will say `master`, select it, at the top select `New Branch`, and name it after what you're intending to fix. (ideally something very short, no more than a few words). eg: `fix_scene_tab_typo` or `fix-scene-tab-typo`  is fine.
