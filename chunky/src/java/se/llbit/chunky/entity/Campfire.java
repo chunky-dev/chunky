@@ -2,6 +2,8 @@ package se.llbit.chunky.entity;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Random;
+
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
@@ -254,6 +256,24 @@ public class Campfire extends Entity {
     return new Quad(quad, Transform.NONE.rotateY(Math.toRadians(45)));
   }
 
+  private static final Quad[] fireQuads = new Quad[] {
+      quads[quads.length-4], quads[quads.length-3],
+      quads[quads.length-2], quads[quads.length-1],
+  };
+
+  private static final se.llbit.chunky.block.Campfire BLOCK_INSTANCE = new se.llbit.chunky.block.Campfire("entity_campfire", Kind.CAMPFIRE, "north", true);
+
+  public static int faceCount() {
+      return fireQuads.length;
+  }
+  public static void sample(int face, Vector3 loc, Random rand) {
+    fireQuads[face].sample(loc, rand);
+  }
+
+  public static double surfaceArea(int face) {
+    return fireQuads[face].surfaceArea();
+  }
+
   public static final Material flameMaterial = new TextureMaterial(Texture.campfireFire);
   public static final Material soulFlameMaterial = new TextureMaterial(Texture.soulCampfireFire);
 
@@ -325,14 +345,14 @@ public class Campfire extends Entity {
     }
   }
 
-//  @Override
-//  public Grid.EmitterPosition[] getEmitterPosition() {
-//    if(isLit) {
-//      Grid.EmitterPosition[] pos = new Grid.EmitterPosition[1];
-//      pos[0] = new Grid.EmitterPosition((float)(position.x + 0.5), (float)(position.y + 0.625), (float)(position.z + 0.5));
-//      return pos;
-//    }
-//    else
-//      return new Grid.EmitterPosition[0];
-//  }
+  @Override
+  public Grid.EmitterPosition[] getEmitterPosition() {
+      if (isLit) {
+          Grid.EmitterPosition[] pos = new Grid.EmitterPosition[1];
+          pos[0] = new Grid.EmitterPosition((int) position.x, (int) position.y, (int) position.z, BLOCK_INSTANCE);
+          return pos;
+      } else {
+          return new Grid.EmitterPosition[0];
+      }
+  }
 }

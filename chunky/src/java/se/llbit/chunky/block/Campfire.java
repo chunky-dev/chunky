@@ -7,6 +7,8 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
+import java.util.Random;
+
 public class Campfire extends MinecraftBlockTranslucent {
     private final se.llbit.chunky.entity.Campfire.Kind kind;
     private final String facing;
@@ -35,5 +37,20 @@ public class Campfire extends MinecraftBlockTranslucent {
     @Override
     public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
         return new se.llbit.chunky.entity.Campfire(this.kind, position, this.facing, this.isLit);
+    }
+
+    @Override
+    public int faceCount() {
+        return se.llbit.chunky.entity.Campfire.faceCount();
+    }
+
+    @Override
+    public void sample(int face, Vector3 loc, Random rand) {
+        se.llbit.chunky.entity.Campfire.sample(face, loc, rand);
+    }
+
+    @Override
+    public double surfaceArea(int face) {
+        return se.llbit.chunky.entity.Campfire.surfaceArea(face);
     }
 }
