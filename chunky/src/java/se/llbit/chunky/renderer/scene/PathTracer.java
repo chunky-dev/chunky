@@ -456,7 +456,7 @@ public class PathTracer implements RayTracer {
         double e = Math.abs(emitterRay.d.dot(emitterRay.getNormal()));
         e /= Math.max(distance * distance, 1);
         e *= pos.block.surfaceArea(face);
-        e *= pos.block.emittance;
+        e *= emitterRay.getCurrentMaterial().emittance;
         e *= scene.emitterIntensity;
         e *= scaler;
 

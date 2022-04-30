@@ -4,12 +4,14 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.log.Log;
 import se.llbit.math.*;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.util.JsonUtil;
@@ -260,9 +262,6 @@ public class Campfire extends Entity {
       quads[quads.length-4], quads[quads.length-3],
       quads[quads.length-2], quads[quads.length-1],
   };
-
-  private static final se.llbit.chunky.block.Campfire BLOCK_INSTANCE = new se.llbit.chunky.block.Campfire("entity_campfire", Kind.CAMPFIRE, "north", true);
-
   public static int faceCount() {
       return fireQuads.length;
   }
@@ -280,12 +279,14 @@ public class Campfire extends Entity {
   private final Campfire.Kind kind;
   private final String facing;
   private final boolean isLit;
+  private final Block block;
 
-  public Campfire(Campfire.Kind kind, Vector3 position, String facing, boolean lit) {
+  public Campfire(Campfire.Kind kind, Vector3 position, String facing, boolean lit, Block block) {
     super(position);
     this.kind = kind;
     this.facing = facing;
     this.isLit = lit;
+    this.block = block;
   }
 
   public Campfire(JsonObject json) {
@@ -293,6 +294,7 @@ public class Campfire extends Entity {
     this.kind = Campfire.Kind.valueOf(json.get("campfireKind").stringValue("CAMPFIRE"));
     this.facing = json.get("facing").stringValue("north");
     this.isLit = json.get("lit").boolValue(true);
+    this.block = null;
   }
 
   @Override
@@ -347,9 +349,14 @@ public class Campfire extends Entity {
 
   @Override
   public Grid.EmitterPosition[] getEmitterPosition() {
+      if (block == null) {
+          Log.warn("Attempted to build emitter grid from unassociated campfire entity.");
+          return new Grid.EmitterPosition[0];
+      }
+
       if (isLit) {
           Grid.EmitterPosition[] pos = new Grid.EmitterPosition[1];
-          pos[0] = new Grid.EmitterPosition((int) position.x, (int) position.y, (int) position.z, BLOCK_INSTANCE);
+          pos[0] = new Grid.EmitterPosition((int) position.x, (int) position.y, (int) position.z, block);
           return pos;
       } else {
           return new Grid.EmitterPosition[0];
