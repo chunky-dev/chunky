@@ -61,7 +61,7 @@ public class SceneDirectoryPicker extends Stage implements Initializable {
    * Constructor
    */
   public SceneDirectoryPicker(ChunkyOptions options) throws IOException {
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("SceneDirectoryChooser.fxml"));
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("SceneDirectoryPicker.fxml"));
     loader.setController(this);
     Parent root = loader.load();
     setTitle("Scene Directory Picker");
