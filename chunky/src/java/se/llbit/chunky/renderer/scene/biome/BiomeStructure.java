@@ -123,25 +123,21 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
    * @param in The serialised legacy data in an input stream
    * @return The newly constructed {@link BiomeStructure} of the specified implementation
    */
-  static BiomeStructure loadLegacy(String impl, DataInputStream in) {
-    BiomeStructure biomeStructure = REGISTRY.get(impl).create();
-    try {
-      int numTiles = in.readInt();
-      for (int i = 0; i < numTiles; ++i) {
-        int chunkX = in.readInt();
-        int chunkZ = in.readInt();
-        for (int localX = 0; localX < Chunk.X_MAX; localX++) {
-          for (int localZ = 0; localZ < Chunk.Z_MAX; localZ++) {
-            biomeStructure.set(chunkX * Chunk.X_MAX + localX, 0, chunkZ * Chunk.Z_MAX + localZ, new float[] {
-              in.readFloat(),
-              in.readFloat(),
-              in.readFloat()
-            });
-          }
+  static BiomeStructure loadLegacy(BiomeStructure.Builder impl, DataInputStream in) throws IOException {
+    BiomeStructure biomeStructure = impl.create();
+    int numTiles = in.readInt();
+    for (int i = 0; i < numTiles; ++i) {
+      int chunkX = in.readInt();
+      int chunkZ = in.readInt();
+      for (int localX = 0; localX < Chunk.X_MAX; localX++) {
+        for (int localZ = 0; localZ < Chunk.Z_MAX; localZ++) {
+          biomeStructure.set(chunkX * Chunk.X_MAX + localX, 0, chunkZ * Chunk.Z_MAX + localZ, new float[] {
+            in.readFloat(),
+            in.readFloat(),
+            in.readFloat()
+          });
         }
       }
-    } catch (IOException e) {
-      throw new UncheckedIOException("Could not parse legacy WorldTexture", e);
     }
     biomeStructure.compact();
     return biomeStructure;
@@ -160,7 +156,7 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
    * @return Get the specified implementation from the registry
    */
   @Nullable
-  static Builder get(@NotNull String key) {
+  static Builder get(@NotNull String key) throws NullPointerException {
     return REGISTRY.get(key);
   }
 

@@ -61,27 +61,53 @@ public class OctreeFileFormat {
     data.waterTree = Octree.load(octreeImpl, version < 5 ? convertDataNodes(data.palette, in) : in);
 
     if(version >= 7) {
-      String biomeFormat = in.readUTF();
-      BiomeStructure.Builder builder = BiomeStructure.get(biomeFormat);
-      data.grassColors = builder.load(in);
-
-      biomeFormat = in.readUTF();
-      builder = BiomeStructure.get(biomeFormat);
-      data.foliageColors = builder.load(in);
-
-      biomeFormat = in.readUTF();
-      builder = BiomeStructure.get(biomeFormat);
-      data.waterColors = builder.load(in);
-
+      data.grassColors = loadBiomeStructure(in);
+      data.foliageColors = loadBiomeStructure(in);
+      data.waterColors = loadBiomeStructure(in);
     } else {
-      data.grassColors = BiomeStructure.loadLegacy(legacyBiomeImpl, in);
-      data.foliageColors = BiomeStructure.loadLegacy(legacyBiomeImpl, in);
+      data.grassColors = loadLegacyBiomeStructure(legacyBiomeImpl, in);
+      data.foliageColors = loadLegacyBiomeStructure(legacyBiomeImpl, in);
       if (version >= 4) {
-        data.waterColors = BiomeStructure.loadLegacy(legacyBiomeImpl, in);
+        data.waterColors = loadLegacyBiomeStructure(legacyBiomeImpl, in);
       }
     }
     data.version = version;
     return data;
+  }
+
+  private static BiomeStructure loadBiomeStructure(DataInputStream in) throws IOException {
+    String biomeFormat = in.readUTF();
+    BiomeStructure.Builder builder = BiomeStructure.get(biomeFormat);
+
+    if(builder == null) {
+      throw new IOException(String.format("Failed to parse BiomeStructure: No BiomeStructure implementation with registry key %s", biomeFormat));
+    }
+
+    BiomeStructure biomeStructure;
+    try {
+      biomeStructure = builder.load(in);
+    } catch (IOException e) { //rethrow IOExceptions
+      throw e;
+    } catch (Exception e) { //rethrow other exceptions as IOException
+      throw new IOException(String.format("Failed to parse BiomeStructure (%s) from octree data", biomeFormat), e);
+    }
+    return biomeStructure;
+  }
+
+  private static BiomeStructure loadLegacyBiomeStructure(String legacyBiomeImpl, DataInputStream in) throws IOException {
+    BiomeStructure.Builder builder = BiomeStructure.get(legacyBiomeImpl);
+    if(builder == null) {
+      throw new IOException(String.format("Failed to parse legacy WorldTexture: No BiomeStructure implementation with registry key %s", legacyBiomeImpl));
+    }
+    BiomeStructure biomeStructure;
+    try {
+      biomeStructure = BiomeStructure.loadLegacy(builder, in);
+    } catch (IOException e) { //rethrow IOExceptions
+      throw e;
+    } catch (Exception e) { //rethrow other exceptions as IOException
+      throw new IOException(String.format("Failed to parse legacy WorldTexture as %s from octree data", legacyBiomeImpl), e);
+    }
+    return biomeStructure;
   }
 
   /**
