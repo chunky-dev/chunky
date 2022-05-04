@@ -78,10 +78,7 @@ public class ResourcePackLoader {
      * @return True if this is done loading
      */
     public static boolean loadResourcePack(File pack, PackLoader[] loaders) {
-        try (FileSystem resourcePack = pack.isDirectory() ?
-                FileSystems.getDefault() :
-                FileSystems.newFileSystem(URI.create("jar:" + pack.toURI()), Collections.emptyMap())
-        ) {
+        try (FileSystem resourcePack = getFileSystem(pack)) {
             Path root;
             if (pack.isDirectory()) {
                 // Raw directory
@@ -102,6 +99,16 @@ public class ResourcePackLoader {
             Log.warnf("Failed to open %s: %s", resourcePackName(pack), e.getMessage());
         }
         return false;
+    }
+
+    private static FileSystem getFileSystem(File pack) throws IOException {
+        if (pack.isDirectory()) {
+            // Raw directory
+            return FileSystems.getDefault();
+        } else {
+            // Jar or Zip file
+            return FileSystems.newFileSystem(URI.create("jar:" + pack.toURI()), Collections.emptyMap());
+        }
     }
 
     /**
