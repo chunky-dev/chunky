@@ -1,5 +1,8 @@
 package se.llbit.chunky.world.biome;
 
+import se.llbit.chunky.plugin.PluginApi;
+
+@PluginApi
 public class BiomeBuilder {
   private final String resourceLocation;
   private final String name;

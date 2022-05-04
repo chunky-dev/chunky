@@ -78,32 +78,28 @@ public class ResourcePackLoader {
      * @return True if this is done loading
      */
     public static boolean loadResourcePack(File pack, PackLoader[] loaders) {
-        FileSystem resourcePack = null;
-        try {
+        try (FileSystem resourcePack = pack.isDirectory() ?
+                FileSystems.getDefault() :
+                FileSystems.newFileSystem(URI.create("jar:" + pack.toURI()), Collections.emptyMap())
+        ) {
             Path root;
             if (pack.isDirectory()) {
                 // Raw directory
-                resourcePack = FileSystems.getDefault();
                 root = pack.toPath();
             } else {
                 // Jar or Zip file
-                resourcePack = FileSystems.newFileSystem(URI.create("jar:" + pack.toURI()), Collections.emptyMap());
                 root = resourcePack.getPath("/");
             }
 
             boolean complete = true;
             for (PackLoader loader : loaders) {
-                complete &= loader.load(root, pack.getName());
+                if (!loader.load(root, pack.getName())) {
+                    complete = false;
+                }
             }
             return complete;
         } catch (IOException e) {
             Log.warnf("Failed to open %s: %s", resourcePackName(pack), e.getMessage());
-        } finally {
-            if (resourcePack != null) {
-                try {
-                    resourcePack.close();
-                } catch (UnsupportedOperationException | IOException ignore) {}
-            }
         }
         return false;
     }

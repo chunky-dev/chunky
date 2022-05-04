@@ -19,6 +19,7 @@ package se.llbit.chunky.world.biome;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
@@ -192,11 +193,12 @@ public class Biomes {
     }
   }
 
+  @PluginApi
   public static boolean contains(String resourceLocation) {
     return biomesByResourceLocation.containsKey(resourceLocation);
   }
 
-  // TODO PluginApi?
+  @PluginApi
   public static Biome register(Biome biome) {
     if (!contains(biome.resourceLocation)) {
       biomes.add(biome);
@@ -206,6 +208,7 @@ public class Biomes {
     return biome;
   }
 
+  @PluginApi
   public static Biome register(BiomeBuilder biomeBuilder) {
     return register(biomeBuilder.build());
   }

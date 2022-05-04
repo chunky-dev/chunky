@@ -23,6 +23,7 @@ import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
+import se.llbit.log.Log;
 import se.llbit.util.JsonPreprocessor;
 
 import java.io.BufferedInputStream;
@@ -83,8 +84,11 @@ public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
                           case "swamp":
                             builder.swamp();
                             break;
+                          default:
+                            Log.warnf("Unsupported biome `grass_color_modifier`: %s", modifier);
                         }
                       }
+                      // TODO Custom fog colors
 
                       Biomes.register(builder);
                     } catch (IOException | JsonParser.SyntaxError ignored) {
