@@ -27,6 +27,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ResourcePackLoader {
     public static final ArrayList<PackLoaderFactory> PACK_LOADER_FACTORIES = new ArrayList<>();
@@ -152,14 +153,26 @@ public class ResourcePackLoader {
         }
 
         if (!complete) {
-            // TODO more detailed logging
-            Log.infof("Failed to load %d resources.",
-                    Arrays.stream(loaders)
-                            .map(PackLoader::toLoad)
-                            .filter(Objects::nonNull)
-                            .mapToInt(r -> r.length)
-                            .sum()
-            );
+            long resources = Arrays.stream(loaders)
+                .map(PackLoader::toLoad)
+                .filter(Objects::nonNull)
+                .mapToInt(r -> r.length)
+                .sum();
+
+            StringBuilder builder = new StringBuilder();
+            for (PackLoader loader : loaders) {
+                String[] toLoad = loader.toLoad();
+                if (toLoad != null && toLoad.length > 0) {
+                    String s = Arrays.stream(toLoad).limit(10).collect(Collectors.joining(","));
+                    builder.append(s);
+                    if (toLoad.length > 10) {
+                        builder.append("...");
+                    }
+                    builder.append("\n");
+                }
+            }
+
+            Log.infof("Failed to load %d resources.\n%s", resources, builder);
         }
     }
 
