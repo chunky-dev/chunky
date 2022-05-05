@@ -77,15 +77,10 @@ public class OctreeFileFormat {
 
   private static BiomeStructure loadBiomeStructure(DataInputStream in) throws IOException {
     String biomeFormat = in.readUTF();
-    BiomeStructure.Builder builder = BiomeStructure.get(biomeFormat);
-
-    if(builder == null) {
-      throw new IOException(String.format("Failed to parse BiomeStructure: No BiomeStructure implementation with registry key %s", biomeFormat));
-    }
-
+    BiomeStructure.Factory factory = BiomeStructure.get(biomeFormat);
     BiomeStructure biomeStructure;
     try {
-      biomeStructure = builder.load(in);
+      biomeStructure = factory.load(in);
     } catch (IOException e) { //rethrow IOExceptions
       throw e;
     } catch (Exception e) { //rethrow other exceptions as IOException
@@ -95,13 +90,10 @@ public class OctreeFileFormat {
   }
 
   private static BiomeStructure loadLegacyBiomeStructure(String legacyBiomeImpl, DataInputStream in) throws IOException {
-    BiomeStructure.Builder builder = BiomeStructure.get(legacyBiomeImpl);
-    if(builder == null) {
-      throw new IOException(String.format("Failed to parse legacy WorldTexture: No BiomeStructure implementation with registry key %s", legacyBiomeImpl));
-    }
+    BiomeStructure.Factory factory = BiomeStructure.get(legacyBiomeImpl);
     BiomeStructure biomeStructure;
     try {
-      biomeStructure = BiomeStructure.loadLegacy(builder, in);
+      biomeStructure = BiomeStructure.loadLegacy(factory, in);
     } catch (IOException e) { //rethrow IOExceptions
       throw e;
     } catch (Exception e) { //rethrow other exceptions as IOException

@@ -3,23 +3,23 @@ package se.llbit.chunky.renderer.scene.biome;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.WorldTexture;
+import se.llbit.log.Log;
 import se.llbit.math.structures.Position2ReferenceStructure;
 import se.llbit.util.annotation.NotNull;
-import se.llbit.util.annotation.Nullable;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.BitSet;
 import java.util.Map;
 
 public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
-  Map<String, Builder> REGISTRY = new Object2ReferenceOpenHashMap<>();
+  Map<String, Factory> REGISTRY = new Object2ReferenceOpenHashMap<>();
+  String DEFAULT_IMPLEMENTATION = "TRIVIAL_2D";
 
   static void registerDefaults() {
     //TODO: create a plugin api interface for registering implementations, and move this to that
-    BiomeStructure.register("TRIVIAL_3D", new BiomeStructure.Builder() {
+    BiomeStructure.register("TRIVIAL_3D", new Factory() {
       @Override
       public BiomeStructure create() {
         return new Trivial3dBiomeStructureImpl();
@@ -66,9 +66,14 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
         }
         return impl;
       }
+
+      @Override
+      public boolean is3d() {
+        return true;
+      }
     });
 
-    BiomeStructure.register("TRIVIAL_2D", new BiomeStructure.Builder() {
+    BiomeStructure.register("TRIVIAL_2D", new Factory() {
       @Override
       public BiomeStructure create() {
         return new Trivial2dBiomeStructureImpl();
@@ -112,6 +117,11 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
         }
         return impl;
       }
+
+      @Override
+      public boolean is3d() {
+        return false;
+      }
     });
   }
 
@@ -123,7 +133,7 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
    * @param in The serialised legacy data in an input stream
    * @return The newly constructed {@link BiomeStructure} of the specified implementation
    */
-  static BiomeStructure loadLegacy(BiomeStructure.Builder impl, DataInputStream in) throws IOException {
+  static BiomeStructure loadLegacy(Factory impl, DataInputStream in) throws IOException {
     BiomeStructure biomeStructure = impl.create();
     int numTiles = in.readInt();
     for (int i = 0; i < numTiles; ++i) {
@@ -144,20 +154,26 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
   }
 
   /**
-   * Register a new {@link BiomeStructure.Builder}
-   * @param key The key to register the builder under <b>(MUST BE UNIQUE)</b>
-   * @return Whether the supplied builder overwrote an existing one
+   * Register a new {@link Factory}
+   * @param key The key to register the factory under <b>(MUST BE UNIQUE)</b>
+   * @return Whether the supplied factory overwrote an existing one
    */
-  static boolean register(@NotNull String key, @NotNull Builder builder) {
-    return REGISTRY.put(key, builder) != null;
+  static boolean register(@NotNull String key, @NotNull Factory factory) {
+    return REGISTRY.put(key, factory) != null;
   }
 
   /**
-   * @return Get the specified implementation from the registry
+   * @return Get the specified implementation from the registry, if it doesn't exist, the default implementation is
+   * returned
    */
-  @Nullable
-  static Builder get(@NotNull String key) throws NullPointerException {
-    return REGISTRY.get(key);
+  @NotNull
+  static Factory get(@NotNull String key) throws NullPointerException {
+    Factory factory = REGISTRY.get(key);
+    if(factory == null) {
+      Log.warnf("Implementation %s does not exist, using the default: %s", key, DEFAULT_IMPLEMENTATION);
+      return REGISTRY.get(DEFAULT_IMPLEMENTATION);
+    }
+    return factory;
   }
 
   /**
@@ -176,7 +192,7 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
    */
   String biomeFormat();
 
-  interface Builder {
+  interface Factory {
     /**
      * Create an empty {@link BiomeStructure} for loading a new scene
      */
@@ -186,5 +202,10 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
      * Load a saved {@link BiomeStructure} of this implementation from a {@link DataInputStream}
      */
     BiomeStructure load(@NotNull DataInputStream in) throws IOException;
+
+    /**
+     * @return Whether the implementation created is 3d
+     */
+    boolean is3d();
   }
 }

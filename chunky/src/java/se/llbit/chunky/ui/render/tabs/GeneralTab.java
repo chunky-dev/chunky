@@ -87,7 +87,6 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private CheckBox loadOtherEntities;
   @FXML private CheckBox biomeColors;
   @FXML private CheckBox biomeBlending;
-  @FXML private CheckBox use3dBiomes;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
   @FXML private ComboBox<Number> dumpFrequency;
@@ -137,10 +136,8 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     biomeColors.setSelected(scene.biomeColorsEnabled());
     if(!scene.biomeColorsEnabled()) {
       biomeBlending.setDisable(true);
-      use3dBiomes.setDisable(true);
     }
     biomeBlending.setSelected(scene.biomeBlendingEnabled());
-    use3dBiomes.setSelected(scene.using3dBiomes());
 
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
     reloadChunks.setDisable(scene.numberOfChunks() == 0);
@@ -281,7 +278,6 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
 
       scene.setBiomeColorsEnabled(newValue);
       biomeBlending.setDisable(!newValue);
-      use3dBiomes.setDisable(!newValue);
 
       if(!scene.haveLoadedChunks()) {
         return;
@@ -318,31 +314,6 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
 
       Alert warning = Dialogs.createAlert(AlertType.CONFIRMATION);
       warning.setContentText("The selected chunks need to be reloaded in order for biome blending to update.");
-      warning.getButtonTypes().setAll(
-        ButtonType.CANCEL,
-        new ButtonType("Reload chunks", ButtonBar.ButtonData.FINISH));
-      warning.setTitle("Chunk reload required");
-      ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
-      if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
-        controller.getSceneManager().reloadChunks();
-      }
-    });
-
-    use3dBiomes.setTooltip(new Tooltip("Attempt to load biomes as 3d (Added in 1.18+)."));
-    use3dBiomes.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      boolean enabled = scene.using3dBiomes();
-
-      scene.setUse3dBiomes(newValue);
-
-      if(!scene.haveLoadedChunks()) {
-        return;
-      }
-      if(enabled == newValue) { // Jank to avoid not snapshotting the scene settings
-        return;
-      }
-
-      Alert warning = Dialogs.createAlert(AlertType.CONFIRMATION);
-      warning.setContentText("The selected chunks need to be reloaded in order for biome colors to update.");
       warning.getButtonTypes().setAll(
         ButtonType.CANCEL,
         new ButtonType("Reload chunks", ButtonBar.ButtonData.FINISH));

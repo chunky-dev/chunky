@@ -254,7 +254,6 @@ public class Scene implements JsonSerializable, Refreshable {
 
   protected boolean biomeColors = true;
   protected boolean biomeBlending = true;
-  protected boolean use3dBiomes = false;
   protected boolean transparentSky = false;
   protected boolean renderActors = true;
   protected Collection<ChunkPosition> chunks = new ArrayList<>();
@@ -367,6 +366,11 @@ public class Scene implements JsonSerializable, Refreshable {
   private String bvhImplementation = PersistentSettings.getBvhMethod();
 
   /**
+   * The BiomeStructure implementation to use
+   */
+  private String biomeStructureImplementation = PersistentSettings.getBiomeStructureImplementation();
+
+  /**
    * Additional data that is associated with a scene, this can be used by plugins
    */
   private JsonObject additionalData = new JsonObject();
@@ -392,11 +396,6 @@ public class Scene implements JsonSerializable, Refreshable {
     worldOctree = new Octree(octreeImplementation, 1);
     waterOctree = new Octree(octreeImplementation, 1);
     emitterGrid = null;
-
-    //TODO: use selected from in GUI by default
-    grassTexture = new Trivial2dBiomeStructureImpl();
-    foliageTexture = new Trivial2dBiomeStructureImpl();
-    waterTexture = new Trivial2dBiomeStructureImpl();
   }
 
   /**
@@ -886,6 +885,8 @@ public class Scene implements JsonSerializable, Refreshable {
     Set<ChunkPosition> loadedChunks = new HashSet<>();
     int numChunks = 0;
 
+    BiomeStructure.Factory biomeStructureFactory = BiomeStructure.get(this.biomeStructureImplementation);
+
     try (TaskTracker.Task task = taskTracker.task("(1/6) Loading regions")) {
       task.update(2, 1);
 
@@ -903,6 +904,11 @@ public class Scene implements JsonSerializable, Refreshable {
       palette = new BlockPalette();
       worldOctree = new Octree(octreeImplementation, requiredDepth);
       waterOctree = new Octree(octreeImplementation, requiredDepth);
+
+      grassTexture = biomeStructureFactory.create();
+      foliageTexture = biomeStructureFactory.create();
+      waterTexture = biomeStructureFactory.create();
+
       if(emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
         emitterGrid = new Grid(gridSize);
 
@@ -961,6 +967,7 @@ public class Scene implements JsonSerializable, Refreshable {
     Set<ChunkPosition> legacyChunks = new HashSet<>();
 
     Position2IntStructure biomePaletteIdxStructure;
+    boolean use3dBiomes = biomeStructureFactory.is3d();
     if (use3dBiomes) {
       biomePaletteIdxStructure = new Position3d2IntPackedArray();
     } else {
@@ -1358,16 +1365,6 @@ public class Scene implements JsonSerializable, Refreshable {
     actors.trimToSize();
     palette.unsynchronize();
 
-    if(use3dBiomes) {
-      grassTexture = new Trivial3dBiomeStructureImpl();
-      foliageTexture = new Trivial3dBiomeStructureImpl();
-      waterTexture = new Trivial3dBiomeStructureImpl();
-    } else {
-      grassTexture = new Trivial2dBiomeStructureImpl();
-      foliageTexture = new Trivial2dBiomeStructureImpl();
-      waterTexture = new Trivial2dBiomeStructureImpl();
-    }
-
     try (TaskTracker.Task task = taskTracker.task("(4/6) Finalizing octree")) {
 
       worldOctree.startFinalization();
@@ -1713,14 +1710,6 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  public void setUse3dBiomes(boolean value) {
-    if (value != use3dBiomes) {
-      use3dBiomes = value;
-
-      refresh();
-    }
-  }
-
   /**
    * Center the camera over the loaded chunks
    */
@@ -1815,10 +1804,6 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public boolean biomeBlendingEnabled() {
     return biomeBlending;
-  }
-
-  public boolean using3dBiomes() {
-    return use3dBiomes;
   }
 
   /**
@@ -3429,6 +3414,15 @@ public class Scene implements JsonSerializable, Refreshable {
   public void setBvhImplementation(String bvhImplementation) {
     this.bvhImplementation = bvhImplementation;
   }
+
+  public String getBiomeStructureImplementation() {
+    return biomeStructureImplementation;
+  }
+
+  public void setBiomeStructureImplementation(String biomeStructureImplementation) {
+    this.biomeStructureImplementation = biomeStructureImplementation;
+  }
+
 
   @PluginApi
   public Octree getWorldOctree() {
