@@ -140,10 +140,8 @@ public abstract class AABBModel implements BlockModel {
       }
     }
 
-    float[] color = texture.getColor(ray.u, ray.v);
-    if (color[3] > Ray.EPSILON) {
-      tintType.tint(color, ray, scene);
-      ray.color.set(color);
+    if (texture.applyColor(ray)) {
+      tintType.tint(ray, scene);
       return true;
     }
     return false;

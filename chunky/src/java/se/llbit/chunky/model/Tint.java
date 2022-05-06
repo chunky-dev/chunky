@@ -57,7 +57,7 @@ public class Tint {
   /**
    * Tint a color array with the tint option of this Tint object.
    */
-  public void tint(float[] color, Ray ray, Scene scene) {
+  public void tint(Ray ray, Scene scene) {
     if (type == TintType.NONE) return;
 
     float[] tintColor;
@@ -79,8 +79,8 @@ public class Tint {
         return;
     }
 
-    color[0] *= tintColor[0];
-    color[1] *= tintColor[1];
-    color[2] *= tintColor[2];
+    ray.color.x *= tintColor[0];
+    ray.color.y *= tintColor[1];
+    ray.color.z *= tintColor[2];
   }
 }

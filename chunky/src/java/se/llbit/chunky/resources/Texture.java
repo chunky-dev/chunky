@@ -1128,6 +1128,7 @@ public class Texture {
   public static final Texture armorStand = new Texture();
 
   @NotNull protected BitmapImage image;
+  @NotNull protected float[] gamaImage;
   protected int width;
   protected int height;
   protected int avgColor;
@@ -1155,6 +1156,7 @@ public class Texture {
 
   public void setTexture(BitmapImage newImage) {
     image = newImage;
+    gamaImage = new float[newImage.height*newImage.width*4];
 
     // Gamma correct the texture.
     avgColorLinear = new float[] {0, 0, 0, 0};
@@ -1167,6 +1169,7 @@ public class Texture {
       for (int x = 0; x < width; ++x) {
         int index = width * y + x;
         ColorUtil.getRGBAComponentsGammaCorrected(data[index], pixelBuffer);
+        System.arraycopy(pixelBuffer, 0, gamaImage, (y * width + x) * 4, 4);
         avgColorLinear[0] += pixelBuffer[3] * pixelBuffer[0];
         avgColorLinear[1] += pixelBuffer[3] * pixelBuffer[1];
         avgColorLinear[2] += pixelBuffer[3] * pixelBuffer[2];
@@ -1199,7 +1202,7 @@ public class Texture {
    * Get linear color values.
    */
   public void getColor(double u, double v, Vector4 c) {
-    c.set(getColor(u, v));
+    getColor((int) (u * width - Ray.EPSILON), (int) ((1 - v) * height - Ray.EPSILON), c);
   }
 
   /**
@@ -1229,8 +1232,22 @@ public class Texture {
     if(useAverageColor)
       return avgColorFlat;
     float[] result = new float[4];
-    ColorUtil.getRGBAComponentsGammaCorrected(image.data[width*y + x], result);
+    System.arraycopy(gamaImage, (width*y+x)*4,result,0,4);
     return result;
+  }
+
+  /**
+   * Get linear color values
+   *
+   * @return color
+   */
+  public void getColor(int x, int y, Vector4 c) {
+    if(useAverageColor) {
+      c.set(avgColorFlat);
+      return;
+    }
+    int i=(y*width+x)*4;
+    c.set(gamaImage[i], gamaImage[i+1], gamaImage[i+2], gamaImage[i+3]);
   }
 
   /**
@@ -1322,5 +1339,20 @@ public class Texture {
 
   public BitmapImage getBitmap() {
     return image;
+  }
+
+  public boolean applyColor(Ray ray) {
+    if(useAverageColor) {
+      ray.color.set(avgColorFlat);
+      return true;
+    }
+    int x = (int) (ray.u * width - Ray.EPSILON);
+    int y = (int) ((1 - ray.v) * height - Ray.EPSILON);
+    int i=(y*width+x)*4;
+    if (gamaImage[i+3] > Ray.EPSILON) {
+      ray.color.set(gamaImage[i], gamaImage[i + 1], gamaImage[i + 2], gamaImage[i + 3]);
+      return true;
+    }
+    return false;
   }
 }

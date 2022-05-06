@@ -38,15 +38,12 @@ public abstract class QuadModel implements BlockModel {
     Texture[] textures = getTextures();
     Tint[] tintedQuads = getTints();
 
-    float[] color = null;
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
       if (quad.intersect(ray)) {
-        float[] c = textures[i].getColor(ray.u, ray.v);
-        if (c[3] > Ray.EPSILON) {
+        if (textures[i].applyColor(ray)) {
           Tint tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
-          tint.tint(c, ray, scene);
-          color = c;
+          tint.tint(ray, scene);
           ray.t = ray.tNext;
           if (quad.doubleSided)
             ray.orientNormal(quad.n);
@@ -66,7 +63,6 @@ public abstract class QuadModel implements BlockModel {
         return false;
       }
 
-      ray.color.set(color);
       ray.distance += ray.t;
       ray.o.scaleAdd(ray.t, ray.d);
     }

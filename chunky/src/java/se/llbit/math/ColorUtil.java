@@ -191,6 +191,16 @@ public final class ColorUtil {
   }
 
   /**
+   * Get the RGBA color component gamma corrected from an ARGB int
+   */
+  public static void getRGBAComponentsGammaCorrected(int argb, Vector4 components) {
+    components.w = (argb >>> 24) / 255.0f;
+    components.x = toLinearLut[(0xFF & (argb >> 16))];
+    components.y = toLinearLut[(0xFF & (argb >> 8))];
+    components.z = toLinearLut[(0xFF & argb)];
+  }
+
+  /**
    * Wraps {@link ColorUtil#getRGBAComponentsGammaCorrected} creating a new float[4]
    */
   public static float[] getRGBAComponentsGammaCorrected(int src) {

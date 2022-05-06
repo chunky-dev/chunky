@@ -56,11 +56,9 @@ public abstract class AnimatedQuadModel extends QuadModel {
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
       if (quad.intersect(ray)) {
-        float[] c = textures[i].getColor(ray.u, ray.v, j);
-        if (c[3] > Ray.EPSILON) {
+        if (textures[i].applyColor(ray, j)) {
           Tint tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
-          tint.tint(c, ray, scene);
-          color = c;
+          tint.tint(ray, scene);
           ray.t = ray.tNext;
           if (quad.doubleSided)
             ray.orientNormal(quad.n);
