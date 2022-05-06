@@ -3,8 +3,6 @@ package se.llbit.math.structures;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 
-import java.util.Objects;
-
 public class Position3d2ReferencePackedArrayStructure<T> implements Position2ReferenceStructure<T> {
 
   protected final Object2ReferenceMap<XYZTriple, T[]> map = new Object2ReferenceOpenHashMap<>();
@@ -49,7 +47,11 @@ public class Position3d2ReferencePackedArrayStructure<T> implements Position2Ref
 
     @Override
     public int hashCode() {
-      return Objects.hash(x, y, z);
+      int hash = 7;
+      hash = 31 * hash + x;
+      hash = 31 * hash + y;
+      hash = 31 * hash + z;
+      return hash;
     }
   }
 }

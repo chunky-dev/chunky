@@ -79,7 +79,11 @@ public class Position3d2IntPackedArray implements Position2IntStructure {
 
     @Override
     public int hashCode() {
-      return Objects.hash(x, y, z);
+      int hash = 7;
+      hash = 31 * hash + x;
+      hash = 31 * hash + y;
+      hash = 31 * hash + z;
+      return hash;
     }
   }
 }

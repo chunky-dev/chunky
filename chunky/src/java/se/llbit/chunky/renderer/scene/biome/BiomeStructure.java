@@ -27,7 +27,7 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
 
       @Override
       public BiomeStructure load(@NotNull DataInputStream in) throws IOException {
-        /**
+        /*
          * Stored as:
          * (int) size
          * (int) x, y, z
