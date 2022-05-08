@@ -344,11 +344,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
   public synchronized int size() {
     int size = 0;
     for (BitSet selectedChunks : selectedChunksByRegion.values()) {
-      for (int idx = 0; idx < selectedChunks.size(); idx++) {
-        if(selectedChunks.get(idx)) {
-          size++;
-        }
-      }
+      size += selectedChunks.cardinality();
     }
     return size;
   }
