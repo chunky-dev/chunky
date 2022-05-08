@@ -36,21 +36,30 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
   private final Collection<ChunkUpdateListener> chunkUpdateListeners = new LinkedList<>();
   private final Collection<ChunkSelectionListener> selectionListeners = new LinkedList<>();
 
+  /**
+   * @return Whether the selection changed
+   */
   private boolean setChunk(ChunkPosition pos, boolean selected) {
     BitSet selectedChunksForRegion = selectedChunksByRegion.computeIfAbsent(ChunkPosition.positionToLong(pos.x >> 5, pos.z >> 5), p -> new BitSet(MCRegion.CHUNKS_X * MCRegion.CHUNKS_Z));
     int bitIndex = (pos.x & 31) + ((pos.z & 31) << 5);
     boolean previousValue = selectedChunksForRegion.get(bitIndex);
-    selectedChunksForRegion.set(bitIndex, selected);
+    if(previousValue != selected) {
+      selectedChunksForRegion.set(bitIndex, selected);
 
-    if(selectedChunksForRegion.nextSetBit(0) >= selectedChunksForRegion.length()) {
-      //all bits are 0, we don't need to track this region anymore
-      selectedChunksByRegion.remove(ChunkPosition.positionToLong(pos.x >> 5, pos.z >> 5));
+      if (selectedChunksForRegion.nextSetBit(0) >= selectedChunksForRegion.length()) {
+        //all bits are 0, we don't need to track this region anymore
+        selectedChunksByRegion.remove(ChunkPosition.positionToLong(pos.x >> 5, pos.z >> 5));
+      }
+
+      notifyChunkUpdated(pos);
+      return true;
     }
-
-    notifyChunkUpdated(pos);
-
-    return previousValue != selected; //return if changed
+    return false;
   }
+
+  /**
+   * @return Whether the selection changed
+   */
   private boolean setRegion(ChunkPosition regionPos, boolean selected) {
     long positionAsLong = regionPos.getLong();
     BitSet selectedChunksForRegion = selectedChunksByRegion.computeIfAbsent(positionAsLong, p -> new BitSet(32 * 32));
@@ -61,21 +70,23 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
       || selectedChunksForRegion.nextClearBit(0) == size;
     boolean willChange = !allBitsAreSame || selectedChunksForRegion.get(0) != selected;
 
-    selectedChunksForRegion.set(0, size, selected);
+    if(willChange) {
+      selectedChunksForRegion.set(0, size, selected);
 
-    if(selectedChunksForRegion.nextSetBit(0) >= size) {
-      //all bits are 0, we don't need to track this region anymore
-      selectedChunksByRegion.remove(positionAsLong);
-    }
-
-    //fire notifyChunkUpdated for every chunk within the region
-    for (int chunkX = regionPos.x << 5, maxChunkX = chunkX+MCRegion.CHUNKS_X; chunkX < maxChunkX; chunkX++) {
-      for (int chunkZ = regionPos.z << 5, maxChunkZ = chunkZ+MCRegion.CHUNKS_Z; chunkZ < maxChunkZ; chunkZ++) {
-        notifyChunkUpdated(ChunkPosition.get(chunkX, chunkZ));
+      if (selectedChunksForRegion.nextSetBit(0) >= size) {
+        //all bits are 0, we don't need to track this region anymore
+        selectedChunksByRegion.remove(positionAsLong);
       }
-    }
 
-    return willChange;
+      //fire notifyChunkUpdated for every chunk within the region
+      for (int chunkX = regionPos.x << 5, maxChunkX = chunkX + MCRegion.CHUNKS_X; chunkX < maxChunkX; chunkX++) {
+        for (int chunkZ = regionPos.z << 5, maxChunkZ = chunkZ + MCRegion.CHUNKS_Z; chunkZ < maxChunkZ; chunkZ++) {
+          notifyChunkUpdated(ChunkPosition.get(chunkX, chunkZ));
+        }
+      }
+      return true;
+    }
+    return false;
   }
   private boolean isChunkSelected(ChunkPosition pos) {
     BitSet selectedChunksForRegion = selectedChunksByRegion.get(ChunkPosition.positionToLong(pos.x >> 5, pos.z >> 5));
