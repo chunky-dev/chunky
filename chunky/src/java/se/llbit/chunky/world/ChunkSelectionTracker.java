@@ -198,17 +198,20 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
 
     // If selection area must contain complete regions
     if(maxChunkX - minChunkX >= MCRegion.CHUNKS_X*2 && maxChunkZ - minChunkZ >= MCRegion.CHUNKS_Z*2) {
-      int minBorderX = MCRegion.CHUNKS_X - (minChunkX & (MCRegion.CHUNKS_X-1)); // want the border from minimum region corner to minimum chunk corner, so 32 - borderSize
-      int maxBorderX = maxChunkX & (MCRegion.CHUNKS_X-1);
+      // All full regions are set first, then any chunks on the borders are set, top and bottom include corners, left and right don't
 
-      int minBorderZ = MCRegion.CHUNKS_Z - (minChunkZ & (MCRegion.CHUNKS_Z-1));
-      int maxBorderZ = maxChunkZ & (MCRegion.CHUNKS_Z-1);
+      // left, right, top, bottom are unrelated to the actual map view, and are just treating XZ as if they were XY on traditional cartesian coordinate axes
+      int leftBorder = MCRegion.CHUNKS_X - (minChunkX & (MCRegion.CHUNKS_X-1)); // want the border from minimum region corner to minimum chunk corner, so 32 - borderSize
+      int rightBorder = maxChunkX & (MCRegion.CHUNKS_X-1);
 
-      int minInnerRegionX = (minChunkX + minBorderX) >> 5;
-      int maxInnerRegionX = (maxChunkX - maxBorderX) >> 5;
+      int bottomBorder = MCRegion.CHUNKS_Z - (minChunkZ & (MCRegion.CHUNKS_Z-1));
+      int topBorder = maxChunkZ & (MCRegion.CHUNKS_Z-1);
 
-      int minInnerRegionZ = (minChunkZ + minBorderZ) >> 5;
-      int maxInnerRegionZ = (maxChunkZ - maxBorderZ) >> 5;
+      int minInnerRegionX = (minChunkX + leftBorder) >> 5;
+      int maxInnerRegionX = (maxChunkX - rightBorder) >> 5;
+
+      int minInnerRegionZ = (minChunkZ + bottomBorder) >> 5;
+      int maxInnerRegionZ = (maxChunkZ - topBorder) >> 5;
 
       // set all inner regions from the selection
       for (int regionX = minInnerRegionX; regionX < maxInnerRegionX; regionX++) {
@@ -219,7 +222,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
 
       //set top border
       for (int x = minChunkX; x < maxChunkX; x++) {
-        for (int z = maxChunkZ - maxBorderZ; z < maxChunkZ; z++) {
+        for (int z = maxChunkZ - topBorder; z < maxChunkZ; z++) {
           ChunkPosition chunkPos = ChunkPosition.get(x, z);
           if(!world.getChunk(chunkPos).isEmpty()) {
             selectionChanged |= setChunk(chunkPos, selected);
@@ -228,7 +231,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
       }
       //set bottom border
       for (int x = minChunkX; x < maxChunkX; x++) {
-        for (int z = minChunkZ; z < minChunkZ + minBorderZ; z++) {
+        for (int z = minChunkZ; z < minChunkZ + bottomBorder; z++) {
           ChunkPosition chunkPos = ChunkPosition.get(x, z);
           if(!world.getChunk(chunkPos).isEmpty()) {
             selectionChanged |= setChunk(chunkPos, selected);
@@ -236,8 +239,8 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
         }
       }
       //set left border without corners
-      for (int x = minChunkX; x < minChunkX + minBorderX; x++) {
-        for (int z = minChunkZ + minBorderZ; z < maxChunkZ - maxBorderZ; z++) {
+      for (int x = minChunkX; x < minChunkX + leftBorder; x++) {
+        for (int z = minChunkZ + bottomBorder; z < maxChunkZ - topBorder; z++) {
           ChunkPosition chunkPos = ChunkPosition.get(x, z);
           if(!world.getChunk(chunkPos).isEmpty()) {
             selectionChanged |= setChunk(chunkPos, selected);
@@ -246,8 +249,8 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
       }
 
       //set right border without corners
-      for (int x = maxChunkX - maxBorderX; x < maxChunkX; x++) {
-        for (int z = minChunkZ + minBorderZ; z < maxChunkZ - maxBorderZ; z++) {
+      for (int x = maxChunkX - rightBorder; x < maxChunkX; x++) {
+        for (int z = minChunkZ + bottomBorder; z < maxChunkZ - topBorder; z++) {
           ChunkPosition chunkPos = ChunkPosition.get(x, z);
           if(!world.getChunk(chunkPos).isEmpty()) {
             selectionChanged |= setChunk(chunkPos, selected);
