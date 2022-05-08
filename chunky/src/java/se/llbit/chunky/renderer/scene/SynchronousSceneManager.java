@@ -21,6 +21,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.RegionPosition;
 import se.llbit.chunky.world.World;
 import se.llbit.log.Log;
 import se.llbit.util.ProgressListener;
@@ -28,7 +29,8 @@ import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.BiConsumer;
@@ -233,10 +235,10 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     onSceneLoaded.run();
   }
 
-  @Override public void loadFreshChunks(World world, Collection<ChunkPosition> chunksToLoad) {
+  @Override public void loadFreshChunks(World world, Map<RegionPosition, List<ChunkPosition>> chunksToLoadByRegion) {
     synchronized (scene) {
       scene.clear();
-      scene.loadChunks(taskTracker, world, chunksToLoad);
+      scene.loadChunks(taskTracker, world, chunksToLoadByRegion);
       scene.resetScene(null, context.getChunky().getSceneFactory());
       context.setSceneDirectory(new File(context.getChunky().options.sceneDir, scene.name));
       scene.refresh();
@@ -246,10 +248,10 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     onSceneLoaded.run();
   }
 
-  @Override public void loadChunks(World world, Collection<ChunkPosition> chunksToLoad) {
+  @Override public void loadChunks(World world, Map<RegionPosition, List<ChunkPosition>> chunksToLoadByRegion) {
     synchronized (scene) {
       int prevChunkCount = scene.numberOfChunks();
-      scene.loadChunks(taskTracker, world, chunksToLoad);
+      scene.loadChunks(taskTracker, world, chunksToLoadByRegion);
       if (prevChunkCount == 0) {
         scene.moveCameraToCenter();
       }

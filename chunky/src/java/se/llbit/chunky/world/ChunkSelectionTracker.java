@@ -386,14 +386,14 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
    * @return The currently selected chunks
    */
   public synchronized Collection<ChunkPosition> getSelection() {
-    Map<ChunkPosition, List<ChunkPosition>> selectionByRegion = getSelectionByRegion();
+    Map<RegionPosition, List<ChunkPosition>> selectionByRegion = getSelectionByRegion();
     List<ChunkPosition> selectedChunks = new ArrayList<>();
     selectionByRegion.forEach((regionPosition, chunks) -> selectedChunks.addAll(chunks));
     return selectedChunks;
   }
 
-  public synchronized Map<ChunkPosition, List<ChunkPosition>> getSelectionByRegion() {
-    Map<ChunkPosition, List<ChunkPosition>> selectedChunksByRegionPosition = new Object2ReferenceOpenHashMap<>();
+  public synchronized Map<RegionPosition, List<ChunkPosition>> getSelectionByRegion() {
+    Map<RegionPosition, List<ChunkPosition>> selectedChunksByRegionPosition = new Object2ReferenceOpenHashMap<>();
     selectedChunksByRegion.forEach((regionPosition, selectedChunksBitSet) -> {
       RegionPosition regionPos = new RegionPosition(regionPosition);
       List<ChunkPosition> positions = new ArrayList<>();
@@ -405,8 +405,16 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
           }
         }
       }
-      selectedChunksByRegionPosition.put(new ChunkPosition(regionPosition), positions);
+      selectedChunksByRegionPosition.put(regionPos, positions);
     });
+    return selectedChunksByRegionPosition;
+  }
+
+  public static Map<RegionPosition, List<ChunkPosition>> selectionByRegion(Collection<ChunkPosition> chunkPositions) {
+    Map<RegionPosition, List<ChunkPosition>> selectedChunksByRegionPosition = new Object2ReferenceOpenHashMap<>();
+    chunkPositions.forEach(chunkPosition ->
+      selectedChunksByRegionPosition.computeIfAbsent(new RegionPosition(chunkPosition.x >> 5, chunkPosition.z >> 5), r -> new ArrayList<>())
+        .add(chunkPosition));
     return selectedChunksByRegionPosition;
   }
 
