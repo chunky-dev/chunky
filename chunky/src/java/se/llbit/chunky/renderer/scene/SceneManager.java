@@ -24,7 +24,8 @@ import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A scene manager can save and load scenes.
@@ -67,13 +68,13 @@ public interface SceneManager {
    * Load chunks and reset camera and scene.
    * The scene name should be set before the call to loadFreshChunks().
    */
-  void loadFreshChunks(World world, Collection<ChunkPosition> chunks);
+  void loadFreshChunks(World world, Map<ChunkPosition, List<ChunkPosition>> chunksToLoadByRegion);
 
   /**
    * Load chunks without resetting the current scene.
    * This preserves camera position, etc.
    */
-  void loadChunks(World world, Collection<ChunkPosition> chunks);
+  void loadChunks(World world, Map<ChunkPosition, List<ChunkPosition>> chunksToLoadByRegion);
 
   /**
    * Attempt to reload all loaded chunks.
