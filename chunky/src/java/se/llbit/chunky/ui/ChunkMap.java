@@ -150,7 +150,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     newScene.setOnAction(event -> {
       SceneManager sceneManager = controller.getRenderController().getSceneManager();
       sceneManager
-          .loadFreshChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
+          .loadFreshChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelectionByRegion());
     });
     newScene.setDisable(chunkSelection.isEmpty());
 
@@ -158,7 +158,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     loadSelection.setOnAction(event -> {
       SceneManager sceneManager = controller.getRenderController().getSceneManager();
       sceneManager
-          .loadChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
+          .loadChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelectionByRegion());
     });
     loadSelection.setDisable(chunkSelection.isEmpty());
 

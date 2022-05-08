@@ -29,7 +29,8 @@ import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -202,16 +203,16 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
    * Load chunks and reset camera.
    */
   @Override
-  public void loadFreshChunks(World world, Collection<ChunkPosition> chunks) {
-    enqueueTask(() -> sceneManager.loadFreshChunks(world, chunks));
+  public void loadFreshChunks(World world, Map<ChunkPosition, List<ChunkPosition>> chunksToLoadByRegion) {
+    enqueueTask(() -> sceneManager.loadFreshChunks(world, chunksToLoadByRegion));
   }
 
   /**
    * Load chunks without moving the camera.
    */
   @Override
-  public void loadChunks(World world, Collection<ChunkPosition> chunks) {
-    enqueueTask(() -> sceneManager.loadChunks(world, chunks));
+  public void loadChunks(World world, Map<ChunkPosition, List<ChunkPosition>> chunksToLoadByRegion) {
+    enqueueTask(() -> sceneManager.loadChunks(world, chunksToLoadByRegion));
   }
 
   /**
