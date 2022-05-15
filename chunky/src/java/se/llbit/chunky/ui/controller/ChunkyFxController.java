@@ -70,7 +70,6 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import se.llbit.chunky.PersistentSettings;
@@ -151,8 +150,6 @@ public class ChunkyFxController
   @FXML private CheckBox singleColorBtn;
   @FXML private CheckBox disableDefaultTexturesBtn;
   @FXML private CheckBox showLauncherBtn;
-  @FXML private Button openSceneDirBtn;
-  @FXML private Button changeSceneDirBtn;
   @FXML private Hyperlink documentationLink;
   @FXML private Hyperlink originalDocumentationLink;
   @FXML private Hyperlink gitHubLink;
@@ -591,25 +588,6 @@ public class ChunkyFxController
         }
         prevPngDir = path.getParent();
         map.renderView(path.toFile(), ProgressTracker.NONE);
-      }
-    });
-
-    openSceneDirBtn.setTooltip(
-        new Tooltip("Open the directory where Chunky stores scene descriptions and renders."));
-    openSceneDirBtn.setOnAction(e -> openDirectory(chunky.options.sceneDir));
-
-    DirectoryChooser sceneDirectoryChooser = new DirectoryChooser();
-    sceneDirectoryChooser.setTitle("Select directory for scene storage");
-    changeSceneDirBtn.setOnAction(e -> {
-      sceneDirectoryChooser.setInitialDirectory(chunky.options.sceneDir);
-      File directory = sceneDirectoryChooser.showDialog(changeSceneDirBtn.getScene().getWindow());
-      if(directory.canWrite()) {
-        PersistentSettings.setSceneDirectory(directory);
-        // TODO: It may be a good idea to not write directly to the shared scene directory.
-        // It does not matter much right now, but it might be useful in the future to have
-        // an API for getting/setting the scene directory so that custom render contexts can
-        // use a fixed scene directory.
-        chunky.options.sceneDir = directory;
       }
     });
 

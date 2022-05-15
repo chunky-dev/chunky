@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!-- Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
  -   Copyright (c) 2016-2021 Chunky contributors
  -
@@ -17,18 +18,12 @@
  -   along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  -->
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="818.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.llbit.chunky.ui.controller.SceneChooserController">
-  <Label text="Select scene to load:" />
-  <TableView fx:id="sceneTbl" maxHeight="1.7976931348623157E308" prefHeight="293.0" VBox.vgrow="ALWAYS">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="818.0" spacing="10.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.llbit.chunky.ui.controller.SceneChooserController">
+  <TableView fx:id="sceneTbl" maxHeight="1.7976931348623157E308" prefHeight="450.0" VBox.vgrow="ALWAYS">
     <columns>
       <TableColumn fx:id="nameCol" prefWidth="200.0" text="Name" />
       <TableColumn fx:id="chunkCountCol" prefWidth="100.0" text="Chunks" />
@@ -39,6 +34,9 @@
     </columns>
   </TableView>
   <HBox alignment="TOP_RIGHT" spacing="10.0">
+    <Button fx:id="changeSceneDirBtn" layoutX="469.0" layoutY="10.0" mnemonicParsing="false" text="Change scenes directory" />
+    <Button fx:id="openSceneDirBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Open scenes directory" />
+    <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
     <Button fx:id="deleteBtn" mnemonicParsing="false" text="Delete" />
     <Button fx:id="exportBtn" mnemonicParsing="false" text="Export" />
     <Button fx:id="cancelBtn" cancelButton="true" mnemonicParsing="false" text="Cancel" />
