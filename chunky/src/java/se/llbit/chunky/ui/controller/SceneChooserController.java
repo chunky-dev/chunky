@@ -23,6 +23,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.math3.util.FastMath;
@@ -53,6 +54,8 @@ public class SceneChooserController implements Initializable {
   @FXML private TableColumn<SceneListItem, Number> renderTimeCol;
   @FXML private TableColumn<SceneListItem, Date> lastModifiedCol;
 
+  @FXML private Button openSceneDirBtn;
+  @FXML private Button changeSceneDirBtn;
   @FXML private Button loadSceneBtn;
   @FXML private Button cancelBtn;
   @FXML private Button exportBtn;
@@ -101,6 +104,26 @@ public class SceneChooserController implements Initializable {
         }
       }
     });
+
+    openSceneDirBtn.setTooltip(
+      new Tooltip("Open the directory where Chunky stores scene descriptions and renders."));
+    openSceneDirBtn.setOnAction(e -> controller.openDirectory(controller.getChunky().options.sceneDir));
+
+    DirectoryChooser sceneDirectoryChooser = new DirectoryChooser();
+    sceneDirectoryChooser.setTitle("Select directory for scene storage");
+    changeSceneDirBtn.setOnAction(e -> {
+      sceneDirectoryChooser.setInitialDirectory(controller.getChunky().options.sceneDir);
+      File directory = sceneDirectoryChooser.showDialog(changeSceneDirBtn.getScene().getWindow());
+      if(directory.canWrite()) {
+        PersistentSettings.setSceneDirectory(directory);
+        // TODO: It may be a good idea to not write directly to the shared scene directory.
+        // It does not matter much right now, but it might be useful in the future to have
+        // an API for getting/setting the scene directory so that custom render contexts can
+        // use a fixed scene directory.
+        controller.getChunky().options.sceneDir = directory;
+      }
+    });
+
     nameCol.setCellValueFactory(data -> {
       SceneListItem scene = data.getValue();
       if (scene.isBackup) {
