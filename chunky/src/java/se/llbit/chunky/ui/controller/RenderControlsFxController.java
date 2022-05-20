@@ -26,17 +26,8 @@ import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.RenderCanvasFx;
-import se.llbit.chunky.ui.render.tabs.AdvancedTab;
-import se.llbit.chunky.ui.render.tabs.CameraTab;
-import se.llbit.chunky.ui.render.tabs.EntitiesTab;
-import se.llbit.chunky.ui.render.tabs.GeneralTab;
-import se.llbit.chunky.ui.render.tabs.HelpTab;
-import se.llbit.chunky.ui.render.tabs.LightingTab;
-import se.llbit.chunky.ui.render.tabs.MaterialsTab;
-import se.llbit.chunky.ui.render.tabs.PostprocessingTab;
+import se.llbit.chunky.ui.render.tabs.*;
 import se.llbit.chunky.ui.render.RenderControlsTab;
-import se.llbit.chunky.ui.render.tabs.SkyTab;
-import se.llbit.chunky.ui.render.tabs.WaterTab;
 import se.llbit.fx.ToolPane;
 import se.llbit.fx.ToolTab;
 import se.llbit.log.Log;
@@ -112,6 +103,7 @@ public class RenderControlsFxController {
       tabs.add(new EntitiesTab());
       tabs.add(new MaterialsTab());
       tabs.add(new PostprocessingTab());
+      tabs.add(new TexturesTab());
       tabs.add(new AdvancedTab());
       tabs.add(new HelpTab());
 

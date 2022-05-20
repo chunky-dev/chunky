@@ -44,7 +44,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -52,7 +51,6 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
@@ -131,10 +129,6 @@ public class ChunkyFxController
   @FXML private ToggleButton trackPlayerBtn;
   @FXML private ToggleButton trackCameraBtn;
   @FXML private Tab mapViewTab;
-  @FXML private Tab optionsTab;
-  @FXML private Button editResourcePacks;
-  @FXML private CheckBox singleColorBtn;
-  @FXML private CheckBox disableDefaultTexturesBtn;
   @FXML private DoubleTextField xPosition;
   @FXML private DoubleTextField zPosition;
   @FXML private StackPane mapPane;
@@ -604,36 +598,13 @@ public class ChunkyFxController
     });
 
     mapViewTab.setGraphic(new ImageView(Icon.map.fxImage()));
-    optionsTab.setGraphic(new ImageView(Icon.wrench.fxImage()));
 
     Collection<Tab> javaFxTabs = new ArrayList<>();
     javaFxTabs.add(mapViewTab);
-    javaFxTabs.add(optionsTab);
     // Call the hook to let plugins add their tabs.
     javaFxTabs = chunky.getMainTabTransformer().apply(javaFxTabs);
     mapTabs.getTabs().setAll(javaFxTabs);
     splitPane.setDividerPositions(0.2, 0.8);
-
-    editResourcePacks.setTooltip(
-        new Tooltip("Select resource packs Chunky uses to load textures."));
-    editResourcePacks.setGraphic(new ImageView(Icon.pencil.fxImage()));
-    editResourcePacks.setOnAction(e -> {
-      ResourceLoadOrderEditor editor = new ResourceLoadOrderEditor(() -> {
-        scene.refresh();
-        scene.rebuildBvh();
-      });
-      editor.show();
-    });
-
-    singleColorBtn.setSelected(PersistentSettings.getSingleColorTextures());
-    singleColorBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      PersistentSettings.setSingleColorTextures(newValue);
-    });
-
-    disableDefaultTexturesBtn.setSelected(PersistentSettings.getDisableDefaultTextures());
-    disableDefaultTexturesBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      PersistentSettings.setDisableDefaultTextures(newValue);
-    });
 
     trackPlayerBtn.selectedProperty().bindBidirectional(trackPlayer);
     trackCameraBtn.selectedProperty().bindBidirectional(trackCamera);
