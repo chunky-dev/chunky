@@ -54,26 +54,30 @@ public class RegionParser extends Thread {
   }
 
   @Override public void run() {
-    while (!isInterrupted()) {
-      ChunkPosition position = queue.poll();
-      if (position == null) {
-        Log.warn("Region parser shutting down abnormally.");
-        return;
-      }
-      ChunkView map = mapView.getMapView();
-      if (map.isRegionVisible(position)) {
-        World world = mapLoader.getWorld();
-        Region region = world.getRegionWithinRange(position, mapView.getYMin(), mapView.getYMax());
-        region.parse(mapView.getYMin(), mapView.getYMax());
-        Mutable<ChunkData> chunkData = new Mutable<>(null);
-        for (Chunk chunk : region) {
-          if (map.shouldPreload(chunk)) {
-            if(chunk.loadChunk(chunkData, mapView.getYMin(), mapView.getYMax())) {
-              chunkData.get().clear();
+    try {
+      while (!isInterrupted()) {
+        ChunkPosition position = queue.poll();
+        if (position == null) {
+          Log.warn("Region parser shutting down abnormally.");
+          return;
+        }
+        ChunkView map = mapView.getMapView();
+        if (map.isRegionVisible(position)) {
+          World world = mapLoader.getWorld();
+          Region region = world.getRegionWithinRange(position, mapView.getYMin(), mapView.getYMax());
+          region.parse(mapView.getYMin(), mapView.getYMax());
+          Mutable<ChunkData> chunkData = new Mutable<>(null);
+          for (Chunk chunk : region) {
+            if (map.shouldPreload(chunk)) {
+              if (chunk.loadChunk(chunkData, mapView.getYMin(), mapView.getYMax())) {
+                chunkData.get().clear();
+              }
             }
           }
         }
       }
+    } catch (Throwable t) {
+      Log.warn("Region Parser Error", t);
     }
   }
 }
