@@ -150,6 +150,7 @@ public class ChunkyFxController
   @FXML private MenuItem saveSceneAs;
   @FXML private MenuItem saveSceneCopy;
   @FXML private MenuItem loadScene;
+  @FXML private MenuItem loadSceneFile;
   @FXML private MenuItem creditsMenuItem;
 
   @FXML private ProgressBar progressBar;
@@ -457,6 +458,21 @@ public class ChunkyFxController
     loadScene.setGraphic(new ImageView(Icon.load.fxImage()));
     loadScene.setOnAction(e -> openSceneChooser());
 
+    loadSceneFile.setOnAction(e -> {
+      FileChooser fileChooser = new FileChooser();
+      fileChooser.setTitle("Load scene");
+      fileChooser
+        .getExtensionFilters().add(new FileChooser.ExtensionFilter("Chunky scene", "*.json"));
+      File sceneFile = fileChooser.showOpenDialog(stage);
+      if (sceneFile != null && sceneFile.canRead()) {
+        try {
+          chunky.getSceneManager().loadScene(sceneFile.getParentFile(), sceneFile.getName().substring(0, sceneFile.getName().length() - 5));
+        } catch (IOException | InterruptedException ex) {
+          Log.error("Failed to load scene", ex);
+        }
+      }
+    });
+
     Log.setReceiver(new UILogReceiver(), Level.ERROR, Level.WARNING);
 
     mapLoader = new WorldMapLoader(this, mapView);
@@ -668,6 +684,7 @@ public class ChunkyFxController
     endBtn.setOnAction(e -> mapLoader.setDimension(World.END_DIMENSION));
 
     loadScene.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
+    loadSceneFile.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
     saveScene.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
     saveSceneAs.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
     menuExit.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));

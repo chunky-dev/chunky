@@ -28,8 +28,9 @@
 <?import se.llbit.chunky.ui.HyperlinkMenuItem?>
 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
   <MenuBar>
-    <Menu mnemonicParsing="false" text="Scene">
+    <Menu mnemonicParsing="false" text="File">
       <MenuItem fx:id="loadScene" mnemonicParsing="false" text="Load…" />
+      <MenuItem fx:id="loadSceneFile" mnemonicParsing="false" text="Load from file…" />
       <MenuItem fx:id="saveScene" mnemonicParsing="false" text="Save" />
       <MenuItem fx:id="saveSceneAs" mnemonicParsing="false" text="Save as…" />
       <MenuItem fx:id="saveSceneCopy" mnemonicParsing="false" text="Save a copy…" />
