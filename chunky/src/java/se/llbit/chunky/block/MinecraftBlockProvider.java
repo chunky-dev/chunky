@@ -927,7 +927,14 @@ public class MinecraftBlockProvider implements BlockProvider {
 
   @Override
   public Block getBlockByTag(String namespacedName, Tag tag) {
-    String name = namespacedName.substring(10); // drop the minecraft: prefix
+    // drop the minecraft: prefix
+    String[] split = namespacedName.split(":", 2); // split into maximum 2 parts
+
+    //TODO: modded block support? non-minecraft prefix is ignored
+    if(split.length != 2 || !split[0].equals("minecraft")) {
+      return null;
+    }
+    String name = split[1];
     switch (name) {
       case "air":
       case "cave_air":
