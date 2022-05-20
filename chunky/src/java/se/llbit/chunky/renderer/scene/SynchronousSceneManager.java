@@ -80,6 +80,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
 
     scene = context.getChunky().getSceneFactory().newScene();
     scene.initBuffers();
+    context.setSceneDirectory(new File(context.getChunky().options.sceneDir, scene.name));
 
     // The stored scene is a copy of the mutable scene. They even share
     // some data structures that are only used by the renderManager.
@@ -227,6 +228,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       scene.clear();
       scene.loadChunks(taskTracker, world, chunksToLoad);
       scene.resetScene(null, context.getChunky().getSceneFactory());
+      context.setSceneDirectory(new File(context.getChunky().options.sceneDir, scene.name));
       scene.refresh();
       scene.setResetReason(ResetReason.SCENE_LOADED);
       scene.setRenderMode(RenderMode.PREVIEW);
