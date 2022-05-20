@@ -68,7 +68,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ZipExportJob;
 import se.llbit.chunky.map.MapView;
@@ -136,7 +135,6 @@ public class ChunkyFxController
   @FXML private Button editResourcePacks;
   @FXML private CheckBox singleColorBtn;
   @FXML private CheckBox disableDefaultTexturesBtn;
-  @FXML private CheckBox showLauncherBtn;
   @FXML private DoubleTextField xPosition;
   @FXML private DoubleTextField zPosition;
   @FXML private StackPane mapPane;
@@ -625,18 +623,6 @@ public class ChunkyFxController
         scene.rebuildBvh();
       });
       editor.show();
-    });
-
-    LauncherSettings settings = new LauncherSettings();
-    settings.load();
-    showLauncherBtn
-        .setTooltip(new Tooltip("Opens the Chunky launcher when starting Chunky next time."));
-    showLauncherBtn.setSelected(settings.showLauncher);
-    showLauncherBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      LauncherSettings launcherSettings = new LauncherSettings();
-      launcherSettings.load();
-      launcherSettings.showLauncher = newValue;
-      launcherSettings.save();
     });
 
     singleColorBtn.setSelected(PersistentSettings.getSingleColorTextures());

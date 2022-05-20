@@ -146,7 +146,6 @@
           <Button fx:id="editResourcePacks" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Edit resource packs" />
           <CheckBox fx:id="disableDefaultTexturesBtn" mnemonicParsing="false" text="Disable default textures (needs restart)" />
           <CheckBox fx:id="singleColorBtn" mnemonicParsing="false" text="Single color textures (needs restart)" />
-          <CheckBox fx:id="showLauncherBtn" mnemonicParsing="false" text="Show launcher when starting Chunky" />
         </VBox>
       </Tab>
     </TabPane>
