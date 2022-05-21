@@ -411,7 +411,7 @@ public class ChunkyFxController
       ValidatingTextInputDialog sceneNameDialog = new ValidatingTextInputDialog(scene.name(), AsynchronousSceneManager::sceneNameIsValid);
       sceneNameDialog.setTitle("Save scene as…");
       sceneNameDialog.setHeaderText("Enter a scene name");
-      String newName = AsynchronousSceneManager.sanitizedSceneName(sceneNameDialog.showAndWait().orElse(""));
+      String newName = AsynchronousSceneManager.sanitizedSceneName(sceneNameDialog.showAndWait().orElse(""), "");
       if (!newName.isEmpty() && this.promptSaveScene(newName)) {
         asyncSceneManager.saveSceneAs(newName);
         scene.setName(newName);
@@ -423,7 +423,7 @@ public class ChunkyFxController
       ValidatingTextInputDialog sceneNameDialog = new ValidatingTextInputDialog("Copy of " + scene.name(), AsynchronousSceneManager::sceneNameIsValid);
       sceneNameDialog.setTitle("Save a copy…");
       sceneNameDialog.setHeaderText("Enter a scene name");
-      String newName = AsynchronousSceneManager.sanitizedSceneName(sceneNameDialog.showAndWait().orElse(""));
+      String newName = AsynchronousSceneManager.sanitizedSceneName(sceneNameDialog.showAndWait().orElse(""), "");
       if (!newName.isEmpty() && this.promptSaveScene(newName)) {
         File sceneDirectory = SynchronousSceneManager.resolveSceneDirectory(newName);
         asyncSceneManager.enqueueTask(() -> {

@@ -231,7 +231,7 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
    *
    * @return sanitized scene name
    */
-  public static String sanitizedSceneName(String name) {
+  public static String sanitizedSceneName(String name, String fallbackName) {
     name = name.trim();
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < name.length(); ++i) {
@@ -244,10 +244,19 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
     }
     String stripped = sb.toString().trim();
     if (stripped.isEmpty()) {
-      return "Scene";
+      return fallbackName;
     } else {
       return stripped;
     }
+  }
+
+  /**
+   * Remove problematic characters from scene name.
+   *
+   * @return sanitized scene name
+   */
+  public static String sanitizedSceneName(String name) {
+    return sanitizedSceneName(name, "Scene");
   }
 
   /**
