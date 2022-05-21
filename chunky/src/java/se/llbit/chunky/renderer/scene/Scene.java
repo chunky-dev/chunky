@@ -550,7 +550,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * @throws IOException
    * @throws InterruptedException
    */
-  public synchronized void saveScene(RenderContext context, TaskTracker taskTracker)
+  public synchronized void saveScene(SceneIOProvider context, TaskTracker taskTracker)
       throws IOException {
     try (TaskTracker.Task task = taskTracker.task("Saving scene", 2)) {
       task.update(1);
@@ -2108,7 +2108,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  private synchronized void saveEmitterGrid(RenderContext context, TaskTracker taskTracker) {
+  private synchronized void saveEmitterGrid(SceneIOProvider context, TaskTracker taskTracker) {
     if (emitterGrid == null)
       return;
 
@@ -2125,7 +2125,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  private synchronized void saveOctree(RenderContext context, TaskTracker taskTracker) {
+  private synchronized void saveOctree(SceneIOProvider context, TaskTracker taskTracker) {
     String fileName = name + ".octree2";
     if (context.fileUnchangedSince(fileName, worldOctree.getTimestamp())) {
       Log.info("Skipping redundant Octree write");
@@ -2153,7 +2153,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  public synchronized void saveDump(RenderContext context, TaskTracker taskTracker) {
+  public synchronized void saveDump(SceneIOProvider context, TaskTracker taskTracker) {
     File dumpFile = context.getSceneFile(name + ".dump");
     Log.info("Saving render dump: " + dumpFile);
     try (FileOutputStream outputStream = new FileOutputStream(dumpFile)) {
@@ -2164,7 +2164,7 @@ public class Scene implements JsonSerializable, Refreshable {
     Log.info("Render dump saved: " + dumpFile);
   }
 
-  private synchronized boolean loadEmitterGrid(RenderContext context, TaskTracker taskTracker) {
+  private synchronized boolean loadEmitterGrid(SceneIOProvider context, TaskTracker taskTracker) {
     String filename = name + ".emittergrid";
     try (TaskTracker.Task task = taskTracker.task("Loading grid")) {
       Log.info("Load grid " + filename);
@@ -2178,7 +2178,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  private synchronized boolean loadOctree(RenderContext context, TaskTracker taskTracker) {
+  private synchronized boolean loadOctree(SceneIOProvider context, TaskTracker taskTracker) {
     String fileName = name + ".octree2";
     try (TaskTracker.Task task = taskTracker.task("(1/3) Loading octree", 2)) {
       task.update(1);
@@ -2231,7 +2231,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  public synchronized boolean loadDump(RenderContext context, TaskTracker taskTracker) {
+  public synchronized boolean loadDump(SceneIOProvider context, TaskTracker taskTracker) {
     if (!tryLoadDump(context, name + ".dump", taskTracker)) {
       // Failed to load the default render dump - try the backup file.
       if (!tryLoadDump(context, name + ".dump.backup", taskTracker)) {
@@ -2247,7 +2247,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * @return {@code true} if the render dump was successfully loaded
    */
-  private boolean tryLoadDump(RenderContext context, String fileName, TaskTracker taskTracker) {
+  private boolean tryLoadDump(SceneIOProvider context, String fileName, TaskTracker taskTracker) {
     File dumpFile = context.getSceneFile(fileName);
     if (!dumpFile.isFile()) {
       if (spp != 0) {
@@ -2747,24 +2747,16 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /** Create a backup of a scene file. */
-  public void backupFile(RenderContext context, String fileName) {
-    File renderDir = context.getSceneDirectory();
-    File file = new File(renderDir, fileName);
-    backupFile(context, file);
-  }
-
-  /** Create a backup of a scene file. */
-  public void backupFile(RenderContext context, File file) {
+  public void backupFile(File sceneDirectory, File file) {
     if (file.exists()) {
       // Try to create backup. It is not a problem if we fail this.
       String backupFileName = file.getName() + ".backup";
-      File renderDir = context.getSceneDirectory();
-      File backup = new File(renderDir, backupFileName);
+      File backup = new File(sceneDirectory, backupFileName);
       if (backup.exists()) {
         //noinspection ResultOfMethodCallIgnored
         backup.delete();
       }
-      if (!file.renameTo(new File(renderDir, backupFileName))) {
+      if (!file.renameTo(new File(sceneDirectory, backupFileName))) {
         Log.info("Could not create backup " + backupFileName);
       }
     }

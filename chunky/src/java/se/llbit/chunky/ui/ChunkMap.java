@@ -24,6 +24,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -148,11 +149,14 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
           .loadFreshChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
     });
     newScene.setDisable(chunkSelection.size() == 0);
-    chunkSelection.addSelectionListener(() -> {
-      boolean noChunksSelected = chunkSelection.size() == 0;
-      clearSelection.setDisable(noChunksSelected);
-      newScene.setDisable(noChunksSelected);
+
+    MenuItem loadSelection = new MenuItem("Load selected chunks");
+    loadSelection.setOnAction(event -> {
+      SceneManager sceneManager = controller.getRenderController().getSceneManager();
+      sceneManager
+          .loadChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
     });
+    loadSelection.setDisable(chunkSelection.size() == 0);
 
     moveCameraHere.setOnAction(event -> {
       ChunkView theView = new ChunkView(view);  // Make thread-local copy.
@@ -171,8 +175,35 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       }
     });
 
-    contextMenu.getItems()
-        .addAll(newScene, clearSelection, moveCameraHere, selectVisible);
+    MenuItem exportZip = new MenuItem("Export selected chunks…");
+    exportZip.setOnAction(e -> controller.exportZip());
+    exportZip.setDisable(chunkSelection.size() == 0);
+
+    MenuItem exportPng = new MenuItem("Save map view as…");
+    exportPng.setOnAction(e -> controller.exportMapView());
+
+    MenuItem deleteChunks = new MenuItem("Delete selected chunks");
+    deleteChunks.setGraphic(new ImageView(Icon.tntSide.fxImage()));
+    deleteChunks.setOnAction(e -> controller.promptDeleteSelectedChunks());
+    deleteChunks.setDisable(chunkSelection.size() == 0);
+
+    contextMenu.getItems().addAll(
+        newScene, loadSelection, clearSelection,
+        new SeparatorMenuItem(),
+        moveCameraHere, selectVisible,
+        new SeparatorMenuItem(),
+        exportZip, exportPng,
+        new SeparatorMenuItem(),
+        deleteChunks);
+
+    chunkSelection.addSelectionListener(() -> {
+      boolean noChunksSelected = chunkSelection.size() == 0;
+      clearSelection.setDisable(noChunksSelected);
+      newScene.setDisable(noChunksSelected);
+      loadSelection.setDisable(noChunksSelected);
+      exportZip.setDisable(noChunksSelected);
+      deleteChunks.setDisable(noChunksSelected);
+    });
   }
 
   @Override public void chunkUpdated(ChunkPosition chunk) {
@@ -393,7 +424,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
     if (selectRect || !dragging && shiftModifier) {
       selectRect = true;
-    } else {
+    } else if (!event.isSecondaryButtonDown()) { // do not drag when right-clicking
       dragging = true;
       mapView.viewDragged(dx, dy);
       onViewDragged.run();

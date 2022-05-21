@@ -43,6 +43,7 @@ import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.EntityLoadingPreferences;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.Icons;
@@ -155,6 +156,10 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       );
     });
     canvasSizeInput.setSize(scene.canvasWidth(), scene.canvasHeight());
+    openSceneDirBtn.setDisable(!controller.getContext().getSceneDirectory().exists());
+    ((AsynchronousSceneManager) controller.getSceneManager()).setOnSceneSaved(() -> {
+      openSceneDirBtn.setDisable(!controller.getContext().getSceneDirectory().exists());
+    });
   }
 
   @Override public String getTabTitle() {

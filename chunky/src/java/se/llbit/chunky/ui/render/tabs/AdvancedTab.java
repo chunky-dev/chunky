@@ -21,18 +21,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.renderer.RenderManager;
-import se.llbit.chunky.renderer.export.PictureExportFormats;
+import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
+import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
@@ -40,8 +37,8 @@ import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.ShutdownAlert;
 import se.llbit.chunky.ui.render.RenderControlsTab;
-import se.llbit.math.bvh.BVH;
 import se.llbit.math.Octree;
+import se.llbit.math.bvh.BVH;
 import se.llbit.util.Registerable;
 
 import java.io.File;
@@ -71,6 +68,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private CheckBox preventNormalEmitterWithSampling;
   @FXML private ChoiceBox<String> rendererSelect;
   @FXML private ChoiceBox<String> previewSelect;
+  @FXML private CheckBox showLauncher;
 
   public AdvancedTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("AdvancedTab.fxml"));
@@ -213,6 +211,18 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     previewSelect.setTooltip(new Tooltip("The renderer to use for the preview."));
     previewSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
         scene.setPreviewRenderer(newValue));
+
+    LauncherSettings settings = new LauncherSettings();
+    settings.load();
+    showLauncher
+        .setTooltip(new Tooltip("Opens the Chunky launcher when starting Chunky next time."));
+    showLauncher.setSelected(settings.showLauncher);
+    showLauncher.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      LauncherSettings launcherSettings = new LauncherSettings();
+      launcherSettings.load();
+      launcherSettings.showLauncher = newValue;
+      launcherSettings.save();
+    });
   }
 
   public boolean shutdownAfterCompletedRender() {
