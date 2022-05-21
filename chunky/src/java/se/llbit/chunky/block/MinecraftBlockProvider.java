@@ -997,7 +997,6 @@ public class MinecraftBlockProvider implements BlockProvider {
     // drop the minecraft: prefix
     String[] split = namespacedName.split(":", 2); // split into maximum 2 parts
 
-    //TODO: modded block support? non-minecraft prefix is ignored
     if(split.length != 2 || !split[0].equals("minecraft")) {
       return null;
     }
