@@ -54,8 +54,8 @@ public class RegionParser extends Thread {
   }
 
   @Override public void run() {
-    try {
-      while (!isInterrupted()) {
+    while (!isInterrupted()) {
+      try {
         ChunkPosition position = queue.poll();
         if (position == null) {
           Log.warn("Region parser shutting down abnormally.");
@@ -75,9 +75,9 @@ public class RegionParser extends Thread {
             }
           }
         }
+      } catch (Throwable t) {
+        Log.warn("Region Parser Error", t);
       }
-    } catch (Throwable t) {
-      Log.warn("Region Parser Error", t);
     }
   }
 }
