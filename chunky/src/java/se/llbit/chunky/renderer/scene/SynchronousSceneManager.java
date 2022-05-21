@@ -67,6 +67,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   private RenderResetHandler resetHandler = () -> true;
   private TaskTracker taskTracker = new TaskTracker(ProgressListener.NONE);
   private Runnable onSceneLoaded = () -> {};
+  private Runnable onSceneSaved = () -> {};
   private Runnable onChunksLoaded = () -> {};
 
   public SynchronousSceneManager(RenderContext context, RenderManager renderManager) {
@@ -92,6 +93,10 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
 
   public void setOnSceneLoaded(Runnable onSceneLoaded) {
     this.onSceneLoaded = onSceneLoaded;
+  }
+
+  public void setOnSceneSaved(Runnable onSceneSaved) {
+    this.onSceneSaved = onSceneSaved;
   }
 
   public void setOnChunksLoaded(Runnable onChunksLoaded) {
@@ -178,6 +183,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       scene.spp = status.getSpp();
       scene.saveScene(context, taskTracker);
       Log.info("Scene saved");
+      this.onSceneSaved.run();
     } catch (IOException e) {
       Log.error("Failed to save scene. Reason: " + e.getMessage(), e);
     }

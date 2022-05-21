@@ -67,6 +67,10 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
     sceneManager.setOnSceneLoaded(onSceneLoaded);
   }
 
+  public void setOnSceneSaved(Runnable onSceneSaved) {
+    sceneManager.setOnSceneSaved(onSceneSaved);
+  }
+
   public void setOnChunksLoaded(Runnable onChunksLoaded) {
     sceneManager.setOnChunksLoaded(onChunksLoaded);
   }
