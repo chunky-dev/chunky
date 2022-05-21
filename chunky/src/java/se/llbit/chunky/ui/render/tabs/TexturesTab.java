@@ -34,10 +34,11 @@ import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
-import se.llbit.chunky.ui.dialogs.ResourceLoadOrderEditor;
+import se.llbit.chunky.ui.dialogs.ResourcePackChooser;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.Icon;
 import se.llbit.fxutil.Dialogs;
+import se.llbit.log.Log;
 
 import java.io.IOException;
 import java.net.URL;
@@ -48,15 +49,13 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
   private Scene scene;
 
   @FXML
-  private Button editResourcePacks;
-  @FXML
   private CheckBox biomeColors;
   @FXML
   private CheckBox biomeBlending;
   @FXML
   private CheckBox singleColorBtn;
   @FXML
-  private CheckBox disableDefaultTexturesBtn;
+  private Button editResourcePacks;
 
   public TexturesTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("TexturesTab.fxml"));
@@ -70,12 +69,13 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
     editResourcePacks.setTooltip(
       new Tooltip("Select resource packs Chunky uses to load textures."));
     editResourcePacks.setGraphic(new ImageView(Icon.pencil.fxImage()));
-    editResourcePacks.setOnAction(e -> {
-      ResourceLoadOrderEditor editor = new ResourceLoadOrderEditor(() -> {
-        scene.refresh();
-        scene.rebuildBvh();
-      });
-      editor.show();
+    editResourcePacks.setOnAction(evt -> {
+      try {
+        ResourcePackChooser resourcePackChooser = new ResourcePackChooser(scene);
+        resourcePackChooser.show();
+      } catch (IOException ex) {
+        Log.error("Failed to create resource pack chooser window.", ex);
+      }
     });
 
     singleColorBtn.setSelected(PersistentSettings.getSingleColorTextures());
@@ -86,16 +86,7 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
       scene.rebuildBvh();
     });
 
-    disableDefaultTexturesBtn.setSelected(PersistentSettings.getDisableDefaultTextures());
-    disableDefaultTexturesBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      PersistentSettings.setDisableDefaultTextures(newValue);
-      TexturePackLoader.loadTexturePacks(PersistentSettings.getLastTexturePack(), true);
-      scene.refresh();
-      scene.rebuildBvh();
-    });
-
     biomeColors.setTooltip(new Tooltip("Color grass and tree leaves according to the biome."));
-    biomeColors.setTooltip(new Tooltip("Colors grass and tree leaves according to biome."));
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
       scene.setBiomeColorsEnabled(newValue);
     });
@@ -156,7 +147,7 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
 
   @Override
   public String getTabTitle() {
-    return "Resource Packs & Textures";
+    return "Textures & Resource Packs";
   }
 
   @Override
