@@ -21,28 +21,38 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.ResourceLoadOrderEditor;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.Icon;
+import se.llbit.fxutil.Dialogs;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class TexturesTab extends ScrollPane implements RenderControlsTab, Initializable {
+  private RenderController controller;
   private Scene scene;
 
   @FXML
   private Button editResourcePacks;
+  @FXML
+  private CheckBox biomeColors;
+  @FXML
+  private CheckBox biomeBlending;
   @FXML
   private CheckBox singleColorBtn;
   @FXML
@@ -83,15 +93,65 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
       scene.refresh();
       scene.rebuildBvh();
     });
+
+    biomeColors.setTooltip(new Tooltip("Color grass and tree leaves according to the biome."));
+    biomeColors.setTooltip(new Tooltip("Colors grass and tree leaves according to biome."));
+    biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.setBiomeColorsEnabled(newValue);
+    });
+    biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      boolean enabled = scene.biomeColorsEnabled();
+
+      scene.setBiomeColorsEnabled(newValue);
+      biomeBlending.setDisable(!newValue);
+
+      if(!scene.haveLoadedChunks()) {
+        return;
+      }
+      if(enabled != newValue && newValue) { // Jank to avoid not snapshotting the scene settings
+        alertIfReloadNeeded("biome colors");
+      }
+    });
+
+    biomeBlending.setTooltip(new Tooltip("Blend edges of biomes (looks better but loads slower)"));
+    biomeBlending.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      boolean enabled = scene.biomeBlendingEnabled();
+
+      scene.setBiomeBlendingEnabled(newValue);
+
+      if(enabled != newValue && newValue) { // Jank to avoid not snapshotting the scene settings
+        alertIfReloadNeeded("biome blending");
+      }
+    });
+  }
+
+  private void alertIfReloadNeeded(String changedFeature) {
+    if(!scene.haveLoadedChunks()) {
+      return;
+    }
+    Alert warning = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
+    warning.setContentText("The selected chunks need to be reloaded in order for "+changedFeature+" to update.");
+    warning.getButtonTypes().setAll(
+      ButtonType.CANCEL,
+      new ButtonType("Reload chunks", ButtonBar.ButtonData.FINISH));
+    warning.setTitle("Chunk reload required");
+    ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
+    if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
+      controller.getSceneManager().reloadChunks();
+    }
   }
 
   @Override
-  public void setController(RenderControlsFxController controller) {
-    scene = controller.getRenderController().getSceneManager().getScene();
+  public void setController(RenderControlsFxController fxController) {
+    controller = fxController.getRenderController();
+    scene = controller.getSceneManager().getScene();
   }
 
   @Override
   public void update(Scene scene) {
+    biomeColors.setSelected(scene.biomeColorsEnabled());
+    biomeBlending.setDisable(!scene.biomeColorsEnabled());
+    biomeBlending.setSelected(scene.biomeBlendingEnabled());
   }
 
   @Override

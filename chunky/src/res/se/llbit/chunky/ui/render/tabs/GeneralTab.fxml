@@ -54,8 +54,6 @@
         </TitledPane>
       </panes>
     </Accordion>
-    <CheckBox fx:id="biomeColors" mnemonicParsing="false" text="Enable biome colors" />
-    <CheckBox fx:id="biomeBlending" mnemonicParsing="false" text="Enable biome blending" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <CheckBox fx:id="saveDumps" mnemonicParsing="false" text="Save dump once every" />
       <ComboBox fx:id="dumpFrequency" />
