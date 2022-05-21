@@ -2,163 +2,150 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ProgressBar?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import se.llbit.chunky.ui.IntegerAdjuster?>
-<?import se.llbit.chunky.ui.PositiveIntegerAdjuster?>
-<?import se.llbit.chunky.ui.DoubleTextField?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import se.llbit.chunky.ui.*?>
 <?import se.llbit.fx.ToolPane?>
-<?import javafx.scene.control.SeparatorMenuItem?>
-<?import se.llbit.chunky.ui.HyperlinkMenuItem?>
-<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.65"
+      xmlns:fx="http://javafx.com/fxml/1">
   <MenuBar>
     <Menu mnemonicParsing="false" text="File">
-      <MenuItem fx:id="loadScene" mnemonicParsing="false" text="Load…" />
-      <MenuItem fx:id="loadSceneFile" mnemonicParsing="false" text="Load from file…" />
-      <MenuItem fx:id="saveScene" mnemonicParsing="false" text="Save" />
-      <MenuItem fx:id="saveSceneAs" mnemonicParsing="false" text="Save as…" />
-      <MenuItem fx:id="saveSceneCopy" mnemonicParsing="false" text="Save a copy…" />
-      <SeparatorMenuItem />
-      <MenuItem fx:id="menuExit" mnemonicParsing="false" text="Quit" />
+      <MenuItem fx:id="loadScene" mnemonicParsing="false" text="Load…"/>
+      <MenuItem fx:id="loadSceneFile" mnemonicParsing="false" text="Load from file…"/>
+      <MenuItem fx:id="saveScene" mnemonicParsing="false" text="Save"/>
+      <MenuItem fx:id="saveSceneAs" mnemonicParsing="false" text="Save as…"/>
+      <MenuItem fx:id="saveSceneCopy" mnemonicParsing="false" text="Save a copy…"/>
+      <SeparatorMenuItem/>
+      <MenuItem fx:id="menuExit" mnemonicParsing="false" text="Quit"/>
     </Menu>
     <Menu mnemonicParsing="false" text="Help">
-      <HyperlinkMenuItem link="https://chunky-dev.github.io/docs" text="Chunky Manual" />
-      <HyperlinkMenuItem link="https://jackjt8.github.io/ChunkyGuide/" text="jackjt8's Guide to Chunky" />
-      <SeparatorMenuItem />
-      <HyperlinkMenuItem link="https://github.com/chunky-dev/chunky" text="GitHub Repo" />
-      <HyperlinkMenuItem link="https://github.com/chunky-dev/chunky/issues" text="Issue Tracker" />
-      <SeparatorMenuItem />
-      <HyperlinkMenuItem link="https://www.reddit.com/r/chunky" text="Chunky Subreddit" />
-      <HyperlinkMenuItem link="https://discord.com/invite/VqcHpsF" text="Discord Server" />
-      <SeparatorMenuItem />
-      <MenuItem fx:id="creditsMenuItem" mnemonicParsing="false" text="About" />
+      <HyperlinkMenuItem link="https://chunky-dev.github.io/docs" text="Chunky Manual"/>
+      <HyperlinkMenuItem link="https://jackjt8.github.io/ChunkyGuide/" text="jackjt8's Guide to Chunky"/>
+      <SeparatorMenuItem/>
+      <HyperlinkMenuItem link="https://github.com/chunky-dev/chunky" text="GitHub Repo"/>
+      <HyperlinkMenuItem link="https://github.com/chunky-dev/chunky/issues" text="Issue Tracker"/>
+      <SeparatorMenuItem/>
+      <HyperlinkMenuItem link="https://www.reddit.com/r/chunky" text="Chunky Subreddit"/>
+      <HyperlinkMenuItem link="https://discord.com/invite/VqcHpsF" text="Discord Server"/>
+      <SeparatorMenuItem/>
+      <MenuItem fx:id="creditsMenuItem" mnemonicParsing="false" text="About"/>
     </Menu>
   </MenuBar>
-  <SplitPane fx:id="splitPane" VBox.vgrow="ALWAYS" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
-    <VBox>
-      <ToolPane fx:id="renderControls" prefWidth="350" VBox.vgrow="ALWAYS" />
-      <Separator />
+  <SplitPane fx:id="splitPane" VBox.vgrow="ALWAYS">
+    <VBox prefWidth="450" maxWidth="800">
+      <ToolPane fx:id="renderControls" prefWidth="350" VBox.vgrow="ALWAYS"/>
+      <Separator/>
       <VBox spacing="5.0">
         <padding>
-          <Insets top="2.0" bottom="4.0" left="10.0" right="10.0" />
+          <Insets top="2.0" bottom="4.0" left="10.0" right="10.0"/>
         </padding>
         <HBox alignment="CENTER_LEFT" spacing="10.0">
-          <Label text="Render:" />
+          <Label text="Render:"/>
           <ToggleButton fx:id="start" mnemonicParsing="false" text="Start">
             <toggleGroup>
-              <ToggleGroup fx:id="renderControl" />
+              <ToggleGroup fx:id="renderControl"/>
             </toggleGroup>
           </ToggleButton>
-          <ToggleButton fx:id="pause" mnemonicParsing="false" text="Pause" toggleGroup="$renderControl" />
-          <ToggleButton fx:id="reset" mnemonicParsing="false" text="Reset" toggleGroup="$renderControl" selected="true" />
+          <ToggleButton fx:id="pause" mnemonicParsing="false" text="Pause" toggleGroup="$renderControl"/>
+          <ToggleButton fx:id="reset" mnemonicParsing="false" text="Reset" toggleGroup="$renderControl"
+                        selected="true"/>
         </HBox>
         <HBox alignment="CENTER_LEFT" spacing="10.0">
-          <PositiveIntegerAdjuster fx:id="targetSpp" />
-          <Button fx:id="saveDefaultSpp" mnemonicParsing="false" text="Set default" />
+          <PositiveIntegerAdjuster fx:id="targetSpp"/>
+          <Button fx:id="saveDefaultSpp" mnemonicParsing="false" text="Set default"/>
         </HBox>
       </VBox>
     </VBox>
-    <TabPane fx:id="mainTabs" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
+    <TabPane fx:id="mainTabs" tabClosingPolicy="UNAVAILABLE">
       <Tab fx:id="worldMapTab" text="Map">
-        <StackPane fx:id="mapPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="150.0" prefWidth="200.0">
-          <Canvas fx:id="mapCanvas" height="600.0" width="695.0" />
-          <Canvas fx:id="mapOverlay" height="600.0" width="695.0" />
-        </StackPane>
-      </Tab>
-      <Tab fx:id="previewTab" text="Render Preview">
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-      </Tab>
-    </TabPane>
-    <TabPane fx:id="mapTabs" prefWidth="300" maxHeight="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
-      <Tab fx:id="mapViewTab" text="Map View">
-        <VBox maxHeight="1.7976931348623157E308" spacing="5.0">
-          <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-          </padding>
-          <HBox fillHeight="false" maxWidth="1.7976931348623157E308" spacing="10.0" VBox.vgrow="NEVER">
-            <Label text="Current World:" />
-            <Label fx:id="mapName" />
-          </HBox>
-          <HBox fillHeight="false" maxWidth="1.7976931348623157E308" spacing="10.0" VBox.vgrow="NEVER">
-            <Button fx:id="changeWorldBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Change World" HBox.hgrow="ALWAYS" />
-            <Button fx:id="reloadWorldBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Reload" HBox.hgrow="ALWAYS" />
-          </HBox>
-          <HBox prefHeight="100.0" spacing="20.0">
-            <VBox prefHeight="200.0" spacing="5.0">
-              <Label text="Dimension:" />
-              <ToggleButton fx:id="overworldBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" selected="true" text="Overworld">
+        <SplitPane>
+          <StackPane fx:id="mapPane" minWidth="50">
+            <Canvas fx:id="mapCanvas" />
+            <Canvas fx:id="mapOverlay" />
+          </StackPane>
+          <VBox maxWidth="500" minWidth="300" spacing="5.0">
+            <padding>
+              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+            </padding>
+            <HBox fillHeight="false" maxWidth="1.7976931348623157E308" spacing="10.0">
+              <Label text="Current World:"/>
+              <Label fx:id="mapName"/>
+            </HBox>
+            <HBox fillHeight="false" maxWidth="1.7976931348623157E308" spacing="10.0" VBox.vgrow="NEVER">
+              <Button fx:id="changeWorldBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                      text="Change World" HBox.hgrow="ALWAYS"/>
+              <Button fx:id="reloadWorldBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Reload"
+                      HBox.hgrow="ALWAYS"/>
+            </HBox>
+            <HBox prefHeight="100.0" spacing="20.0">
+              <VBox prefHeight="200.0" spacing="5.0">
+                <Label text="Dimension:"/>
+                <ToggleButton fx:id="overworldBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                              selected="true" text="Overworld">
+                  <toggleGroup>
+                    <ToggleGroup fx:id="dimension"/>
+                  </toggleGroup>
+                </ToggleButton>
+                <ToggleButton fx:id="netherBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                              text="Nether" toggleGroup="$dimension"/>
+                <ToggleButton fx:id="endBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="The End"
+                              toggleGroup="$dimension"/>
+              </VBox>
+            </HBox>
+            <Separator/>
+            <VBox alignment="CENTER_LEFT">
+              <PositiveIntegerAdjuster fx:id="scale" name="Scale"/>
+            </VBox>
+            <VBox alignment="CENTER_LEFT">
+              <IntegerAdjuster fx:id="yMin" name="Min Y level"/>
+            </VBox>
+            <VBox alignment="CENTER_LEFT">
+              <IntegerAdjuster fx:id="yMax" name="Max Y level"/>
+            </VBox>
+            <Label text="Coordinates"/>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+              <Label text="X="/>
+              <DoubleTextField prefWidth="80.0" fx:id="xPosition"/>
+              <Label text="Z="/>
+              <DoubleTextField fx:id="zPosition" prefWidth="80.0"/>
+            </HBox>
+            <HBox spacing="10.0">
+              <ToggleButton fx:id="trackPlayerBtn" mnemonicParsing="false" text="track player">
                 <toggleGroup>
-                  <ToggleGroup fx:id="dimension" />
+                  <ToggleGroup fx:id="tracking"/>
                 </toggleGroup>
               </ToggleButton>
-              <ToggleButton fx:id="netherBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Nether" toggleGroup="$dimension" />
-              <ToggleButton fx:id="endBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="The End" toggleGroup="$dimension" />
-            </VBox>
-          </HBox>
-          <Separator />
-          <VBox alignment="CENTER_LEFT">
-            <PositiveIntegerAdjuster fx:id="scale" name="Scale" />
+              <ToggleButton fx:id="trackCameraBtn" mnemonicParsing="false" text="track camera"
+                            toggleGroup="$tracking"/>
+            </HBox>
           </VBox>
-          <VBox alignment="CENTER_LEFT">
-            <IntegerAdjuster fx:id="yMin" name="Min Y level " />
-          </VBox>
-          <VBox alignment="CENTER_LEFT">
-            <IntegerAdjuster fx:id="yMax" name="Max Y level" />
-          </VBox>
-          <Label text="Coordinates" />
-          <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <Label text="X=" />
-            <DoubleTextField prefWidth="80.0" fx:id="xPosition" />
-            <Label text="Z=" />
-            <DoubleTextField fx:id="zPosition" prefWidth="80.0" />
-          </HBox>
-          <HBox spacing="10.0">
-            <ToggleButton fx:id="trackPlayerBtn" mnemonicParsing="false" text="track player">
-              <toggleGroup>
-                <ToggleGroup fx:id="tracking" />
-              </toggleGroup>
-            </ToggleButton>
-            <ToggleButton fx:id="trackCameraBtn" mnemonicParsing="false" text="track camera" toggleGroup="$tracking" />
-          </HBox>
-        </VBox>
+        </SplitPane>
+      </Tab>
+      <Tab fx:id="previewTab" text="Render Preview">
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
       </Tab>
     </TabPane>
   </SplitPane>
   <VBox spacing="5.0">
     <padding>
-      <Insets top="5.0" bottom="5.0" left="10.0" right="10.0" />
+      <Insets top="5.0" bottom="5.0" left="10.0" right="10.0"/>
     </padding>
     <BorderPane>
       <left>
-        <Label fx:id="renderTimeLbl" text="Render time: 0" />
+        <Label fx:id="renderTimeLbl" text="Render time: 0"/>
       </left>
       <right>
-        <Label fx:id="sppLbl" text="0 SPP, 0 SPS" />
+        <Label fx:id="sppLbl" text="0 SPP, 0 SPS"/>
       </right>
     </BorderPane>
     <BorderPane>
       <left>
-        <Label fx:id="progressLbl" text="Progress" />
+        <Label fx:id="progressLbl" text="Progress"/>
       </left>
       <right>
-        <Label fx:id="etaLbl" text="ETA: N/A" />
+        <Label fx:id="etaLbl" text="ETA: N/A"/>
       </right>
     </BorderPane>
   </VBox>
-  <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" minHeight="20" prefHeight="20" progress="0.0" />
+  <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" minHeight="20" prefHeight="20" progress="0.0"/>
 </VBox>

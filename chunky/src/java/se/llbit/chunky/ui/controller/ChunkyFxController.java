@@ -128,12 +128,10 @@ public class ChunkyFxController
   @FXML private IntegerAdjuster yMax;
   @FXML private ToggleButton trackPlayerBtn;
   @FXML private ToggleButton trackCameraBtn;
-  @FXML private Tab mapViewTab;
   @FXML private DoubleTextField xPosition;
   @FXML private DoubleTextField zPosition;
   @FXML private StackPane mapPane;
   @FXML private SplitPane splitPane;
-  @FXML private TabPane mapTabs;
   @FXML private TabPane mainTabs;
   @FXML private Tab worldMapTab;
   @FXML private Tab previewTab;
@@ -597,14 +595,10 @@ public class ChunkyFxController
       }
     });
 
-    mapViewTab.setGraphic(new ImageView(Icon.map.fxImage()));
-
-    Collection<Tab> javaFxTabs = new ArrayList<>();
-    javaFxTabs.add(mapViewTab);
+    Collection<Tab> javaFxTabs = new ArrayList<>(mainTabs.getTabs());
     // Call the hook to let plugins add their tabs.
     javaFxTabs = chunky.getMainTabTransformer().apply(javaFxTabs);
-    mapTabs.getTabs().setAll(javaFxTabs);
-    splitPane.setDividerPositions(0.2, 0.8);
+    mainTabs.getTabs().setAll(javaFxTabs);
 
     trackPlayerBtn.selectedProperty().bindBidirectional(trackPlayer);
     trackCameraBtn.selectedProperty().bindBidirectional(trackCamera);
