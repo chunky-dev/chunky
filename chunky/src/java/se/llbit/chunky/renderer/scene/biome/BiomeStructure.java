@@ -4,7 +4,10 @@ import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.WorldTexture;
 import se.llbit.log.Log;
+import se.llbit.math.structures.Position2IntStructure;
 import se.llbit.math.structures.Position2ReferenceStructure;
+import se.llbit.math.structures.Position2d2IntPackedArray;
+import se.llbit.math.structures.Position3d2IntPackedArray;
 import se.llbit.util.annotation.NotNull;
 
 import java.io.DataInputStream;
@@ -197,6 +200,18 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
      * Create an empty {@link BiomeStructure} for loading a new scene
      */
     BiomeStructure create();
+
+    /**
+     * Create an empty {@link Position2IntStructure} for the biome palette indices
+     * (used only for biome blending, does not need to be saved)
+     */
+    default Position2IntStructure createIndexStructure() {
+      if(is3d()) {
+        return new Position3d2IntPackedArray();
+      } else {
+        return new Position2d2IntPackedArray();
+      }
+    }
 
     /**
      * Load a saved {@link BiomeStructure} of this implementation from a {@link DataInputStream}

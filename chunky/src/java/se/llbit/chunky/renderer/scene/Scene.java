@@ -966,13 +966,8 @@ public class Scene implements JsonSerializable, Refreshable {
     Set<ChunkPosition> nonEmptyChunks = new HashSet<>();
     Set<ChunkPosition> legacyChunks = new HashSet<>();
 
-    Position2IntStructure biomePaletteIdxStructure;
+    Position2IntStructure biomePaletteIdxStructure = biomeStructureFactory.createIndexStructure();
     boolean use3dBiomes = biomeStructureFactory.is3d();
-    if (use3dBiomes) {
-      biomePaletteIdxStructure = new Position3d2IntPackedArray();
-    } else {
-      biomePaletteIdxStructure = new Position2d2IntPackedArray();
-    }
 
     final Mutable<ChunkData> chunkData1 = new Mutable<>(null); // chunk loading will switch between these two, using one asynchronously to load the data
     final Mutable<ChunkData> chunkData2 = new Mutable<>(null); // while the other is used to add to the octree
