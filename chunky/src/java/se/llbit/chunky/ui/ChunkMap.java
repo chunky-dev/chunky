@@ -175,7 +175,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       }
     });
 
-    MenuItem exportZip = new MenuItem("Export chunks as zip file…");
+    MenuItem exportZip = new MenuItem("Export selected chunks…");
     exportZip.setOnAction(e -> controller.exportZip());
     exportZip.setDisable(chunkSelection.size() == 0);
 
