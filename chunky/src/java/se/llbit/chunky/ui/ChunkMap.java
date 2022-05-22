@@ -48,6 +48,7 @@ import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.PlayerEntityData;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
+import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -56,6 +57,7 @@ import se.llbit.math.Vector3;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -212,6 +214,32 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       repaintRatelimited();
     } else {
       regionUpdated(chunk.getRegionPosition());
+    }
+  }
+
+  @Override public void regionChunksUpdated(ChunkPosition region) {
+    if (view.chunkScale >= 16) {
+      int minChunkX = region.x << 5;
+      int minChunkZ = region.z << 5;
+      for (int chunkX = minChunkX; chunkX < minChunkX + MCRegion.CHUNKS_X; chunkX++) {
+        for (int chunkZ = minChunkZ; chunkZ < minChunkZ + MCRegion.CHUNKS_Z; chunkZ++) {
+          mapBuffer.drawTile(mapLoader, ChunkPosition.get(chunkX, chunkZ), chunkSelection);
+        }
+      }
+      repaintRatelimited();
+    } else {
+      regionUpdated(region);
+    }
+  }
+
+  @Override public void regionChunksUpdated(ChunkPosition region, Collection<ChunkPosition> chunks) {
+    if (view.chunkScale >= 16) {
+      for (ChunkPosition chunk : chunks) {
+        mapBuffer.drawTile(mapLoader, chunk, chunkSelection);
+      }
+      repaintRatelimited();
+    } else {
+      regionUpdated(region);
     }
   }
 
