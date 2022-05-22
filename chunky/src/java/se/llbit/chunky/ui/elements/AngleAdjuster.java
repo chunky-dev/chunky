@@ -17,8 +17,8 @@
 package se.llbit.chunky.ui.elements;
 
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.event.Event;
 import javafx.geometry.Point2D;
-import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
@@ -57,6 +57,9 @@ public class AngleAdjuster extends Adjuster<Double> {
       angle = QuickMath.degToRad(angle);
       dimple.setTranslateX(Math.cos(angle) * 16);
       dimple.setTranslateY(- Math.sin(angle) * 16);
+    });
+    knob.setOnMouseReleased(e -> {
+      this.fireEvent(new Event(Adjuster.AFTER_VALUE_CHANGE));
     });
   }
 

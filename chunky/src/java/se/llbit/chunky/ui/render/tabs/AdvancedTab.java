@@ -26,17 +26,20 @@ import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
+import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.Adjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.ShutdownAlert;
 import se.llbit.chunky.ui.render.RenderControlsTab;
+import se.llbit.fxutil.Dialogs;
 import se.llbit.math.Octree;
 import se.llbit.math.bvh.BVH;
 import se.llbit.util.Registerable;
@@ -196,6 +199,20 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     gridSize.onValueChange(value -> {
       scene.setGridSize(value);
       PersistentSettings.setGridSizeDefault(value);
+    });
+    gridSize.addEventHandler(Adjuster.AFTER_VALUE_CHANGE, e -> {
+      if (scene.getEmitterSamplingStrategy() != EmitterSamplingStrategy.NONE && scene.haveLoadedChunks()) {
+        Alert warning = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
+        warning.setContentText("The selected chunks need to be reloaded to update the emitter grid size.");
+        warning.getButtonTypes().setAll(
+          ButtonType.CANCEL,
+          new ButtonType("Reload chunks", ButtonBar.ButtonData.FINISH));
+        warning.setTitle("Chunk reload required");
+        ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
+        if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
+          controller.getSceneManager().reloadChunks();
+        }
+      }
     });
 
     preventNormalEmitterWithSampling.setTooltip(new Tooltip("Prevent usual emitter contribution when emitter sampling is used"));
