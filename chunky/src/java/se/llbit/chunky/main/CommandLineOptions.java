@@ -36,6 +36,7 @@ import se.llbit.util.mojangapi.MojangApi;
 import se.llbit.util.StringUtil;
 import se.llbit.util.TaskTracker;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -320,13 +321,21 @@ public class CommandLineOptions {
           for (int j = 0; j < path.length - 1; ++j) {
             obj = obj.get(path[j]).object();
           }
-          JsonValue jsonValue;
-          try {
-            jsonValue = new JsonNumber(Integer.parseInt(value));
-          } catch (Exception e) {
-            jsonValue = new JsonString(value);
+
+          JsonValue jsonValue = null;
+          if (value.startsWith("{") || value.startsWith("[")) {
+            JsonParser parser = new JsonParser(new ByteArrayInputStream(value.getBytes()));
+            jsonValue = parser.parse();
+          } else {
+            try {
+              jsonValue =  new JsonNumber(Integer.parseInt(value));
+            } catch (Exception e) {
+              jsonValue =  new JsonString(value);
+            }
           }
+
           obj.set(path[path.length - 1], jsonValue);
+
           writeSceneJson(file, desc);
           System.out.println("Updated scene " + file.getAbsolutePath());
         } catch (SyntaxError e) {
