@@ -86,8 +86,6 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
 
     if(selectionChanged) {
       notifyRegionChunksUpdated(regionPos, changedChunks);
-//      notifyChunksUpdated(changedChunks);
-//      notifyRegionChunksUpdated(regionPos);
     }
     return selectionChanged;
   }
