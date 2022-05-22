@@ -134,9 +134,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadOtherEntities.setSelected(preferences.shouldLoadClass(null));
     }
     biomeColors.setSelected(scene.biomeColorsEnabled());
-    if(!scene.biomeColorsEnabled()) {
-      biomeBlending.setDisable(true);
-    }
+    biomeBlending.setDisable(!scene.biomeColorsEnabled());
     biomeBlending.setSelected(scene.biomeBlendingEnabled());
 
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
