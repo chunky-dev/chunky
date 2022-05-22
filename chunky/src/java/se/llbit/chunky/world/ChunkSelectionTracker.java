@@ -46,7 +46,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
     if(previousValue != selected) {
       selectedChunksForRegion.set(bitIndex, selected);
 
-      if (selectedChunksForRegion.nextSetBit(0) >= selectedChunksForRegion.length()) {
+      if (selectedChunksForRegion.nextSetBit(0) == -1) {
         //all bits are 0, we don't need to track this region anymore
         selectedChunksByRegion.remove(ChunkPosition.positionToLong(pos.x >> 5, pos.z >> 5));
       }
@@ -63,17 +63,16 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
   private boolean setRegion(ChunkPosition regionPos, boolean selected) {
     long positionAsLong = regionPos.getLong();
     BitSet selectedChunksForRegion = selectedChunksByRegion.computeIfAbsent(positionAsLong, p -> new BitSet(32 * 32));
-    int size = selectedChunksForRegion.size();
     // We know the bitset will change if all the bits are the same, and the first bit isn't equal to selected
     // or if all the bits aren't the same
-    boolean allBitsAreSame = selectedChunksForRegion.nextSetBit(0) == size
-      || selectedChunksForRegion.nextClearBit(0) == size;
-    boolean willChange = !allBitsAreSame || selectedChunksForRegion.get(0) != selected;
+    boolean allBitsAreSame = selectedChunksForRegion.nextSetBit(0) == -1
+      || selectedChunksForRegion.nextClearBit(0) == -1;
+    boolean willChange = allBitsAreSame || selectedChunksForRegion.get(0) != selected;
 
     if(willChange) {
-      selectedChunksForRegion.set(0, size, selected);
+      selectedChunksForRegion.set(0, selectedChunksForRegion.size(), selected);
 
-      if (selectedChunksForRegion.nextSetBit(0) >= size) {
+      if (selectedChunksForRegion.nextClearBit(0) == -1) {
         //all bits are 0, we don't need to track this region anymore
         selectedChunksByRegion.remove(positionAsLong);
       }
