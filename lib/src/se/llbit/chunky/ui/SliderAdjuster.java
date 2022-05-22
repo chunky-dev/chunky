@@ -20,6 +20,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.event.Event;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
 
@@ -45,6 +46,11 @@ public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
     valueSlider.valueProperty().bindBidirectional(value);
     valueSlider.setMin(0);
     valueSlider.setMax(100);
+    valueSlider.valueChangingProperty().addListener(e -> {
+      if (!valueSlider.isValueChanging()) {
+        this.fireEvent(new Event(Adjuster.AFTER_VALUE_CHANGE));
+      }
+    });
   }
 
   @Override public void setTooltip(String tooltip) {

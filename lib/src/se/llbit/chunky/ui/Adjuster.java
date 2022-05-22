@@ -16,21 +16,25 @@
  */
 package se.llbit.chunky.ui;
 
-import java.util.function.Consumer;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.event.Event;
+import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
+import java.util.function.Consumer;
+
 /**
  * A control for editing numeric values with a text field.
  */
 public abstract class Adjuster<T extends Number> extends HBox {
+  public static EventType<Event> AFTER_VALUE_CHANGE = new EventType<>("AFTER_VALUE_CHANGE");
 
   private final StringProperty name = new SimpleStringProperty("Name");
   protected final Label nameLbl = new Label();
@@ -47,6 +51,17 @@ public abstract class Adjuster<T extends Number> extends HBox {
     setSpacing(10);
     valueField.setPrefWidth(103);
     getChildren().addAll(nameLbl, valueField);
+
+    Number[] oldValue = new Number[1];
+    valueField.focusedProperty().addListener(observable -> {
+      if (valueField.isFocused()) {
+        oldValue[0] = valueField.valueProperty().getValue();
+      } else {
+        if (!valueField.valueProperty().getValue().equals(oldValue[0])) {
+          this.fireEvent(new Event(Adjuster.AFTER_VALUE_CHANGE));
+        }
+      }
+    });
   }
 
   public void setName(String name) {
