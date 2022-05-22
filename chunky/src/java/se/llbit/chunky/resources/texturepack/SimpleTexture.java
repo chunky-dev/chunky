@@ -83,46 +83,46 @@ public class SimpleTexture extends TextureLoader {
   @Override
   public boolean load(String file, Path texturePack) {
     boolean loaded = super.load(file, texturePack);
-    String specularFormat = System.getProperty("chunky.pbr.specular", "labpbr");
-    if (specularFormat.equals("oldpbr") || specularFormat.equals("labpbr")) {
-      try (InputStream in = Files.newInputStream(texturePack.resolve(file + "_s.png"))) {
-        // LabPBR uses the alpha channel for the emission map
-        // Some resource packs use the blue channel (Red=Smoothness, Green=Metalness, Blue=Emission)
-        // (In BSL, this option is called "Old PBR + Emissive")
-        if (specularFormat.equals("oldpbr")) {
-          OldPbrSpecularMap specular = new OldPbrSpecularMap(getTextureOrFirstFrame(in));
-          texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
-          texture.setReflectanceMap(specular.hasReflectance() ? specular : ReflectanceMap.EMPTY);
-          texture.setRoughnessMap(specular.hasRoughness() ? specular : RoughnessMap.EMPTY);
-          texture.setMetalnessMap(MetalnessMap.EMPTY);
-        } else if (specularFormat.equals("labpbr")) {
-          LabPbrSpecularMap specular = new LabPbrSpecularMap(getTextureOrFirstFrame(in));
-          texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
-          texture.setReflectanceMap(specular.hasReflectance() ? specular : ReflectanceMap.EMPTY);
-          texture.setRoughnessMap(specular.hasRoughness() ? specular : RoughnessMap.EMPTY);
-          texture.setMetalnessMap(specular.hasMetalness() ? specular : MetalnessMap.EMPTY);
+
+    try {
+      String specularFormat = System.getProperty("chunky.pbr.specular", "labpbr");
+      if (specularFormat.equals("oldpbr") || specularFormat.equals("labpbr")) {
+        try (InputStream in = Files.newInputStream(texturePack.resolve(file + "_s.png"))) {
+          // LabPBR uses the alpha channel for the emission map
+          // Some resource packs use the blue channel (Red=Smoothness, Green=Metalness, Blue=Emission)
+          // (In BSL, this option is called "Old PBR + Emissive")
+          if (specularFormat.equals("oldpbr")) {
+            OldPbrSpecularMap specular = new OldPbrSpecularMap(getTextureOrFirstFrame(in));
+            texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
+            texture.setReflectanceMap(specular.hasReflectance() ? specular : ReflectanceMap.EMPTY);
+            texture.setRoughnessMap(specular.hasRoughness() ? specular : RoughnessMap.EMPTY);
+            texture.setMetalnessMap(MetalnessMap.EMPTY);
+          } else if (specularFormat.equals("labpbr")) {
+            LabPbrSpecularMap specular = new LabPbrSpecularMap(getTextureOrFirstFrame(in));
+            texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
+            texture.setReflectanceMap(specular.hasReflectance() ? specular : ReflectanceMap.EMPTY);
+            texture.setRoughnessMap(specular.hasRoughness() ? specular : RoughnessMap.EMPTY);
+            texture.setMetalnessMap(specular.hasMetalness() ? specular : MetalnessMap.EMPTY);
+          }
         }
-      } catch (IOException e) {
-        // Safe to ignore
-        texture.setEmissionMap(EmissionMap.EMPTY);
-        texture.setReflectanceMap(ReflectanceMap.EMPTY);
-        texture.setRoughnessMap(RoughnessMap.EMPTY);
-        texture.setMetalnessMap(MetalnessMap.EMPTY);
       }
+    } catch (IOException e) {
+      // Safe to ignore
     }
 
-    String normalFormat = System.getProperty("chunky.pbr.normal", "");
-    if (normalFormat.equals("oldpbr") || normalFormat.equals("labpbr")) {
-      try (InputStream in = Files.newInputStream(texturePack.resolve(file + "_n.png"))) {
-        if (normalFormat.equals("oldpbr")) {
-          texture.setNormalMap(new OldPbrNormalMap(getTextureOrFirstFrame(in)));
-        } else if (normalFormat.equals("labpbr")) {
-          texture.setNormalMap(new LabPbrNormalMap(getTextureOrFirstFrame(in)));
+    try {
+      String normalFormat = System.getProperty("chunky.pbr.normal", "");
+      if (normalFormat.equals("oldpbr") || normalFormat.equals("labpbr")) {
+        try (InputStream in = Files.newInputStream(texturePack.resolve(file + "_n.png"))) {
+          if (normalFormat.equals("oldpbr")) {
+            texture.setNormalMap(new OldPbrNormalMap(getTextureOrFirstFrame(in)));
+          } else if (normalFormat.equals("labpbr")) {
+            texture.setNormalMap(new LabPbrNormalMap(getTextureOrFirstFrame(in)));
+          }
         }
-      } catch (IOException e) {
-        // Safe to ignore
-        texture.setNormalMap(null);
       }
+    } catch (IOException e) {
+      // Safe to ignore
     }
 
     return loaded;
