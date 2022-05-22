@@ -146,13 +146,13 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     loadSelectedChunks.setDisable(
       mapLoader.getWorld() instanceof EmptyWorld ||
       mapLoader.getWorld() == null ||
-      chunkyFxController.getChunkSelection().size() == 0
+      chunkyFxController.getChunkSelection().isEmpty()
     );
     chunkyFxController.getChunkSelection().addSelectionListener(() -> {
       loadSelectedChunks.setDisable(
         mapLoader.getWorld() instanceof EmptyWorld ||
         mapLoader.getWorld() == null ||
-        chunkyFxController.getChunkSelection().size() == 0
+        chunkyFxController.getChunkSelection().isEmpty()
       );
     });
     canvasSizeInput.setSize(scene.canvasWidth(), scene.canvasHeight());
@@ -323,7 +323,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     loadSelectedChunks.setOnAction(e -> {
       controller.getSceneManager()
           .loadChunks(mapLoader.getWorld(), chunkyFxController.getChunkSelection().getSelection());
-      reloadChunks.setDisable(chunkyFxController.getChunkSelection().size() == 0);
+      reloadChunks.setDisable(chunkyFxController.getChunkSelection().isEmpty());
     });
     reloadChunks.setTooltip(new Tooltip("Reload all chunks in the scene."));
     reloadChunks.setGraphic(new ImageView(Icon.reload.fxImage()));

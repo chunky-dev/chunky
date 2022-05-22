@@ -139,7 +139,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     MenuItem clearSelection = new MenuItem("Clear selection");
     clearSelection.setGraphic(new ImageView(Icon.clear.fxImage()));
     clearSelection.setOnAction(event -> chunkSelection.clearSelection());
-    clearSelection.setDisable(chunkSelection.size() == 0);
+    clearSelection.setDisable(chunkSelection.isEmpty());
 
     MenuItem newScene = new MenuItem("New scene from selection");
     newScene.setGraphic(new ImageView(Icon.sky.fxImage()));
@@ -148,7 +148,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       sceneManager
           .loadFreshChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
     });
-    newScene.setDisable(chunkSelection.size() == 0);
+    newScene.setDisable(chunkSelection.isEmpty());
 
     MenuItem loadSelection = new MenuItem("Load selected chunks");
     loadSelection.setOnAction(event -> {
@@ -156,7 +156,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       sceneManager
           .loadChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
     });
-    loadSelection.setDisable(chunkSelection.size() == 0);
+    loadSelection.setDisable(chunkSelection.isEmpty());
 
     moveCameraHere.setOnAction(event -> {
       ChunkView theView = new ChunkView(view);  // Make thread-local copy.
@@ -292,8 +292,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       // If ctrlModifier to deselect, then do deselect
       // If no ctrlModifier, select chunks
       // but if they are all already selected, then deselect.
-      if (ctrlModifier || !chunkSelection.selectChunks(mapLoader.getWorld(), x0, z0, x1, z1))
-        chunkSelection.deselectChunks(x0, z0, x1, z1);
+      if (ctrlModifier || !chunkSelection.setChunks(mapLoader.getWorld(), x0, z0, x1, z1, true)) //TODO: what the..?
+        chunkSelection.setChunks(mapLoader.getWorld(), x0, z0, x1, z1, false);
     }
   }
 
@@ -500,7 +500,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
         if (theView.scale >= 16) {
           chunkSelection.toggleChunk(mapLoader.getWorld(), cx, cz);
         } else {
-          chunkSelection.selectRegion(mapLoader.getWorld(), cx, cz);
+          chunkSelection.toggleRegion(mapLoader.getWorld(), cx, cz);
         }
       }
     } else {
