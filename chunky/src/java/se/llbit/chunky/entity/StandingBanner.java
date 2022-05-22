@@ -18,10 +18,7 @@
 package se.llbit.chunky.entity;
 
 import se.llbit.chunky.model.Model;
-import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.resources.TextureCache;
-import se.llbit.chunky.resources.TexturePackLoader;
+import se.llbit.chunky.resources.*;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
 import se.llbit.chunky.resources.texturepack.TextureLoader;
 import se.llbit.chunky.world.BlockData;
@@ -324,12 +321,13 @@ public class StandingBanner extends Entity {
       if (texture == null) {
         texture = new Texture();
         TextureCache.put(texId, texture);
-        Map<String, TextureLoader> map =
-            Collections.singletonMap(filename, new SimpleTexture(texId, texture));
-        Collection<Map.Entry<String, TextureLoader>> missing =
-            TexturePackLoader.loadTextures(map.entrySet());
-        if (!missing.isEmpty()) {
-          Log.info("Failed to load banner pattern: " + filename);
+
+        ResourcePackTextureLoader[] loaders = new ResourcePackTextureLoader[1];
+        loaders[0] = ResourcePackTextureLoader.singletonLoader(filename, new SimpleTexture(texId, texture));
+        ResourcePackLoader.loadResources(loaders);
+
+        for (String resource : loaders[0].toLoad()) {
+          Log.infof("Failed to load banner pattern: %s", resource);
           texture = Texture.bannerBase;
         }
       }

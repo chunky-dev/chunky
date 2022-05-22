@@ -22,11 +22,8 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.Head;
 import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.PlayerModel;
-import se.llbit.chunky.resources.PlayerTexture;
+import se.llbit.chunky.resources.*;
 import se.llbit.chunky.resources.PlayerTexture.ExtendedUVMap;
-import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.resources.TextureCache;
-import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.resources.texturepack.ColoredTexture;
 import se.llbit.chunky.resources.texturepack.LayeredTextureLoader;
 import se.llbit.chunky.resources.texturepack.PlayerTextureLoader;
@@ -860,12 +857,14 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       }
       if (loader != null) {
         // TODO: defer loading.
-        Map<String, TextureLoader> toLoad = Collections.singletonMap(textureId, loader);
-        Log.infof("Loading textures: %s", toLoad.keySet().toString());
-        Collection<Map.Entry<String, TextureLoader>> missing =
-            TexturePackLoader.loadTextures(toLoad.entrySet());
-        for (Map.Entry<String, TextureLoader> tex : missing) {
-          Log.warnf("Failed to load texture: %s", tex.getValue());
+        Log.infof("Loading texture: %s", textureId);
+
+        ResourcePackTextureLoader[] loaders = new ResourcePackTextureLoader[1];
+        loaders[0] = ResourcePackTextureLoader.singletonLoader(textureId, loader);
+        ResourcePackLoader.loadResources(loaders);
+
+        for (String resource : loaders[0].toLoad()) {
+          Log.warnf("Failed to load texture: %s", resource);
         }
       }
     }

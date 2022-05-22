@@ -19,6 +19,7 @@ package se.llbit.chunky.world.biome;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
@@ -41,6 +42,7 @@ public class Biomes {
   public static final Object2IntMap<String> biomeIDsByResourceLocation = new Object2IntOpenHashMap<>();
 
   public static final List<Biome> biomes = new ArrayList<>();
+  private static final List<Biome> minecraftBiomes = new ArrayList<>();
 
   // The fallback foliage and grass colors of the biomes were calculated with the default resourcepack.
   // The map colors use the default biome colors by Amidst, see https://github.com/toolbox4minecraft/amidst/wiki/Biome-Color-Table.
@@ -185,6 +187,8 @@ public class Biomes {
   };
 
   static {
+    minecraftBiomes.addAll(biomes);
+
     int i = 0;
     for (Biome biome : biomesPrePalette) {
       biomeIDsByResourceLocation.put(biome.resourceLocation, i);
@@ -192,14 +196,32 @@ public class Biomes {
     }
   }
 
-  private static Biome register(Biome biome) {
-    biomes.add(biome);
-    biomesByResourceLocation.put(biome.resourceLocation, biome);
+  public static void reset() {
+    biomesByResourceLocation.clear();
+    biomes.clear();
+
+    for (Biome biome : minecraftBiomes) {
+      register(biome);
+    }
+  }
+
+  @PluginApi
+  public static boolean contains(String resourceLocation) {
+    return biomesByResourceLocation.containsKey(resourceLocation);
+  }
+
+  @PluginApi
+  public static Biome register(Biome biome) {
+    if (!contains(biome.resourceLocation)) {
+      biomes.add(biome);
+      biomesByResourceLocation.put(biome.resourceLocation, biome);
+    }
 
     return biome;
   }
 
-  private static Biome register(BiomeBuilder biomeBuilder) {
+  @PluginApi
+  public static Biome register(BiomeBuilder biomeBuilder) {
     return register(biomeBuilder.build());
   }
 
