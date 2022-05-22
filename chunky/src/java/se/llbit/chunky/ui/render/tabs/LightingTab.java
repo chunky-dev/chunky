@@ -116,7 +116,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     emitterSamplingStrategy.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldvalue, newvalue) -> {
           scene.setEmitterSamplingStrategy(newvalue);
-          if (newvalue != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() == null) {
+          if (newvalue != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() == null && scene.haveLoadedChunks()) {
             Alert warning = Dialogs.createAlert(AlertType.CONFIRMATION);
             warning.setContentText("The selected chunks need to be reloaded in order for emitter sampling to work.");
             warning.getButtonTypes().setAll(
