@@ -186,9 +186,7 @@ public class ResourcePackLoader {
      * Load resource packs from a system path separator delimited string.
      */
     public static void loadResourcePacks(String resourcePacks) {
-        if (!resourcePacks.isEmpty()) {
-            loadResourcePacks(resourcePacks.trim().split(File.pathSeparator));
-        }
+        loadResourcePacks(resourcePacks.trim().split(File.pathSeparator));
     }
 
     /**
