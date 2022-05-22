@@ -18,6 +18,7 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.log.Log;
 
 import java.io.File;
@@ -115,8 +116,10 @@ public class ResourcePackLoader {
      * Load all resources in the default set of loaders.
      */
     public static void loadResourcePacks(String[] resourcePacks) {
-        // Save the last used set of resource packs
         TextureCache.reset();
+        Biomes.reset();
+
+        // Save the last used set of resource packs
         ResourcePackLoader.resourcePacks = resourcePacks;
 
         // Create the loaders

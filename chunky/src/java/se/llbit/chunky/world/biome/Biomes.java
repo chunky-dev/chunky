@@ -42,6 +42,7 @@ public class Biomes {
   public static final Object2IntMap<String> biomeIDsByResourceLocation = new Object2IntOpenHashMap<>();
 
   public static final List<Biome> biomes = new ArrayList<>();
+  private static final List<Biome> minecraftBiomes = new ArrayList<>();
 
   // The fallback foliage and grass colors of the biomes were calculated with the default resourcepack.
   // The map colors use the default biome colors by Amidst, see https://github.com/toolbox4minecraft/amidst/wiki/Biome-Color-Table.
@@ -186,10 +187,21 @@ public class Biomes {
   };
 
   static {
+    minecraftBiomes.addAll(biomes);
+
     int i = 0;
     for (Biome biome : biomesPrePalette) {
       biomeIDsByResourceLocation.put(biome.resourceLocation, i);
       ++i;
+    }
+  }
+
+  public static void reset() {
+    biomesByResourceLocation.clear();
+    biomes.clear();
+
+    for (Biome biome : minecraftBiomes) {
+      register(biome);
     }
   }
 
