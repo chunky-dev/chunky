@@ -48,6 +48,7 @@ import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.PlayerEntityData;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
+import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -56,6 +57,7 @@ import se.llbit.math.Vector3;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -139,7 +141,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     MenuItem clearSelection = new MenuItem("Clear selection");
     clearSelection.setGraphic(new ImageView(Icon.clear.fxImage()));
     clearSelection.setOnAction(event -> chunkSelection.clearSelection());
-    clearSelection.setDisable(chunkSelection.size() == 0);
+    clearSelection.setDisable(chunkSelection.isEmpty());
 
     MenuItem newScene = new MenuItem("New scene from selection");
     newScene.setGraphic(new ImageView(Icon.sky.fxImage()));
@@ -148,7 +150,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       sceneManager
           .loadFreshChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
     });
-    newScene.setDisable(chunkSelection.size() == 0);
+    newScene.setDisable(chunkSelection.isEmpty());
 
     MenuItem loadSelection = new MenuItem("Load selected chunks");
     loadSelection.setOnAction(event -> {
@@ -156,7 +158,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       sceneManager
           .loadChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
     });
-    loadSelection.setDisable(chunkSelection.size() == 0);
+    loadSelection.setDisable(chunkSelection.isEmpty());
 
     moveCameraHere.setOnAction(event -> {
       ChunkView theView = new ChunkView(view);  // Make thread-local copy.
@@ -212,6 +214,32 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       repaintRatelimited();
     } else {
       regionUpdated(chunk.getRegionPosition());
+    }
+  }
+
+  @Override public void regionChunksUpdated(ChunkPosition region) {
+    if (view.chunkScale >= 16) {
+      int minChunkX = region.x << 5;
+      int minChunkZ = region.z << 5;
+      for (int chunkX = minChunkX; chunkX < minChunkX + MCRegion.CHUNKS_X; chunkX++) {
+        for (int chunkZ = minChunkZ; chunkZ < minChunkZ + MCRegion.CHUNKS_Z; chunkZ++) {
+          mapBuffer.drawTile(mapLoader, ChunkPosition.get(chunkX, chunkZ), chunkSelection);
+        }
+      }
+      repaintRatelimited();
+    } else {
+      regionUpdated(region);
+    }
+  }
+
+  @Override public void regionChunksUpdated(ChunkPosition region, Collection<ChunkPosition> chunks) {
+    if (view.chunkScale >= 16) {
+      for (ChunkPosition chunk : chunks) {
+        mapBuffer.drawTile(mapLoader, chunk, chunkSelection);
+      }
+      repaintRatelimited();
+    } else {
+      regionUpdated(region);
     }
   }
 
@@ -292,8 +320,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       // If ctrlModifier to deselect, then do deselect
       // If no ctrlModifier, select chunks
       // but if they are all already selected, then deselect.
-      if (ctrlModifier || !chunkSelection.selectChunks(mapLoader.getWorld(), x0, z0, x1, z1))
-        chunkSelection.deselectChunks(x0, z0, x1, z1);
+      if (ctrlModifier || !chunkSelection.setChunks(mapLoader.getWorld(), x0, z0, x1, z1, true)) //TODO: what the..?
+        chunkSelection.setChunks(mapLoader.getWorld(), x0, z0, x1, z1, false);
     }
   }
 
@@ -500,7 +528,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
         if (theView.scale >= 16) {
           chunkSelection.toggleChunk(mapLoader.getWorld(), cx, cz);
         } else {
-          chunkSelection.selectRegion(mapLoader.getWorld(), cx, cz);
+          chunkSelection.toggleRegion(mapLoader.getWorld(), cx, cz);
         }
       }
     } else {
