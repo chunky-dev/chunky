@@ -34,6 +34,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneFactory;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
+import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
 import se.llbit.chunky.resources.ResourcePackLoader;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.resources.TexturePackLoader;
@@ -63,6 +64,9 @@ import java.util.concurrent.ForkJoinPool;
  * <p>Read more about Chunky at <a href="https://chunky.llbit.se">https://chunky.llbit.se</a>.
  */
 public class Chunky {
+  static {
+    BiomeStructure.registerDefaults();
+  }
 
   /**
    * A log receiver suitable for headless rendering.

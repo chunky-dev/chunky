@@ -33,6 +33,7 @@ import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
 import se.llbit.chunky.ui.Adjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
@@ -67,6 +68,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private ChoiceBox<PictureExportFormat> outputMode;
   @FXML private ChoiceBox<String> octreeImplementation;
   @FXML private ChoiceBox<String> bvhMethod;
+  @FXML private ChoiceBox<String> biomeStructureImplementation;
   @FXML private IntegerAdjuster gridSize;
   @FXML private CheckBox preventNormalEmitterWithSampling;
   @FXML private ChoiceBox<String> rendererSelect;
@@ -191,6 +193,24 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
             }));
     bvhMethod.setTooltip(new Tooltip(bvhMethodBuilder.toString()));
 
+    ArrayList<String> biomeStructureNames = new ArrayList<>();
+    StringBuilder biomeStructureTooltipBuilder = new StringBuilder();
+    for(Map.Entry<String, BiomeStructure.Factory> entry : BiomeStructure.REGISTRY.entrySet()) {
+      biomeStructureNames.add(entry.getKey());
+      biomeStructureTooltipBuilder.append(entry.getKey());
+      biomeStructureTooltipBuilder.append(": ");
+      biomeStructureTooltipBuilder.append("Description"); //entry.getValue().getDescription());
+      biomeStructureTooltipBuilder.append('\n');
+    }
+    biomeStructureTooltipBuilder.append("Requires reloading chunks to take effect.");
+    biomeStructureImplementation.getItems().addAll(biomeStructureNames);
+    biomeStructureImplementation.getSelectionModel().selectedItemProperty()
+      .addListener((observable, oldvalue, newvalue) -> {
+        scene.setBiomeStructureImplementation(newvalue);
+        PersistentSettings.setBiomeStructureImplementation(newvalue);
+      });
+    biomeStructureImplementation.setTooltip(new Tooltip(biomeStructureTooltipBuilder.toString()));
+
     gridSize.setRange(4, 64);
     gridSize.setName("Emitter grid size");
     gridSize.setTooltip("Size of the cells of the emitter grid. " +
@@ -255,6 +275,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     rayDepth.set(scene.getRayDepth());
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
     bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
+    biomeStructureImplementation.getSelectionModel().select(scene.getBiomeStructureImplementation());
     gridSize.set(scene.getGridSize());
     preventNormalEmitterWithSampling.setSelected(scene.isPreventNormalEmitterWithSampling());
     animationTime.set(scene.getAnimationTime());

@@ -461,6 +461,16 @@ public final class PersistentSettings {
     return settings.getString("bvhMethod", "SAH_MA");
   }
 
+  public static void setBiomeStructureImplementation(String implementation) {
+    settings.setString("biomeStructureImplementation", implementation);
+    save();
+  }
+
+  public static String getBiomeStructureImplementation() {
+    return settings.getString("biomeStructureImplementation", "TRIVIAL_2D");
+  }
+
+
   public static void setGridSizeDefault(int value) {
     settings.setInt("gridSize", value);
     save();
