@@ -58,6 +58,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
   }
 
   /**
+   * Minimum and maximum are both INCLUSIVE
    * @return Whether the selection changed
    */
   private boolean setChunksWithinRegion(ChunkPosition regionPos, int minX, int maxX, int minZ, int maxZ, boolean selected) {
@@ -66,8 +67,8 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
     Collection<ChunkPosition> changedChunks = new ArrayList<>();
     boolean selectionChanged = false;
 
-    for (int chunkX = minX; chunkX < maxX; chunkX++) {
-      for (int chunkZ = minZ; chunkZ < maxZ; chunkZ++) {
+    for (int chunkX = minX; chunkX <= maxX; chunkX++) {
+      for (int chunkZ = minZ; chunkZ <= maxZ; chunkZ++) {
         int bitIndex = (chunkX & 31) + ((chunkZ & 31) << 5);
         boolean previousValue = selectedChunksForRegion.get(bitIndex);
         if(previousValue != selected) {
@@ -242,6 +243,8 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
 
   /**
    * Select chunks within rectangle.
+   * Minimum and maximum are both INCLUSIVE
+   *
    * @return true if anything was changed, false if no chunks were selected.
    */
   public synchronized boolean setChunks(World world, int minChunkX, int minChunkZ, int maxChunkX, int maxChunkZ, boolean selected) {
