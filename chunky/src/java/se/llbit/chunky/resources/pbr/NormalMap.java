@@ -9,18 +9,17 @@ import se.llbit.math.Vector3;
 public interface NormalMap {
 
   Matrix3 tbnCubeTop =
-    getTbn(new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 0));
+    getTbn(new Vector3(1, 0, 0), new Vector3(0, 0, -1), new Vector3(0, 1, 0));
   Matrix3 tbnCubeBottom =
     getTbn(new Vector3(1, 0, 0), new Vector3(0, -1, 0), new Vector3(0, -1, 0));
   Matrix3 tbnCubeNorth =
-    getTbn(new Vector3(1, 0, 0), new Vector3(0, -1, 0), new Vector3(0, 0, -1));
+    getTbn(new Vector3(-1, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, -1));
   Matrix3 tbnCubeEast =
-    getTbn(new Vector3(0, 0, 1), new Vector3(0, -1, 0), new Vector3(1, 0, 0));
+    getTbn(new Vector3(0, 0, -1), new Vector3(0, 1, 0), new Vector3(1, 0, 0));
   Matrix3 tbnCubeSouth =
-    getTbn(new Vector3(-1, 0, 0), new Vector3(0, -1, 0), new Vector3(0, 0, 1));
+    getTbn(new Vector3(1, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1));
   Matrix3 tbnCubeWest =
-    getTbn(new Vector3(0, 0, -1), new Vector3(0, -1, 0), new Vector3(-1, 0, 0));
-
+    getTbn(new Vector3(0, 0, 1), new Vector3(0, 1, 0), new Vector3(-1, 0, 0));
 
   static void apply(Ray ray, Quad quad, Texture texture) {
     if (texture.getNormalMap() != null) {
