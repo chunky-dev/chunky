@@ -9,26 +9,41 @@ public class OldPbrNormalMap implements NormalMap {
 
   private int width;
   private int height;
-  private Vector3[] normals;
+  private float[] normals;
 
   public OldPbrNormalMap(BitmapImage normalMap) {
     width = normalMap.width;
     height = normalMap.height;
-    normals = new Vector3[width * height];
+    normals = new float[width * height * 3];
     float[] color = new float[4];
     for (int x = 0; x < normalMap.width; x++) {
       for (int y = 0; y < normalMap.height; y++) {
         ColorUtil.getRGBAComponents(normalMap.getPixel(x, y), color);
-        normals[width * y + x] =
-            new Vector3(color[0] * 2 - 1, color[1] * 2 - 1, color[2] * 2 - 1);
-        normals[width * y + x].normalize();
+        float nx = color[0] * 2 - 1;
+        float ny = color[1] * 2 - 1;
+        float nz = color[2] * 2 - 1;
+        float invLength = (float) (1 / Math.sqrt(nx * nx + ny * ny + nz * nz));
+        normals[(width * y + x) * 3] = nx * invLength;
+        normals[(width * y + x) * 3 + 1] = ny * invLength;
+        normals[(width * y + x) * 3 + 2] = nz * invLength;
       }
     }
   }
 
   @Override
-  public Vector3 getNormalAt(double u, double v) {
-    return this.normals[
-        (int) ((1 - v) * height - Ray.EPSILON) * width + (int) (u * width - Ray.EPSILON)];
+  public boolean applyNormal(Ray ray) {
+    int x = (int) (ray.u * width - Ray.EPSILON);
+    int y = (int) ((1 - ray.v) * height - Ray.EPSILON);
+    int i = (y * width + x) * 3;
+
+    float nx = normals[i];
+    float ny = normals[i + 1];
+    float nz = normals[i + 2];
+    if (Math.abs(nx) > 0 || Math.abs(ny) > 0 || Math.abs(nz) > 0) {
+      Vector3 normal = ray.getNormal();
+      normal.set(normals[i], -normals[i + 1], normals[i + 2]);
+      return true;
+    }
+    return false;
   }
 }

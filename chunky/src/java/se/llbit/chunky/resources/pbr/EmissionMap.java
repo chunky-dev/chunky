@@ -4,14 +4,14 @@ public interface EmissionMap {
 
   EmissionMap EMPTY = new EmissionMap() {
     @Override
-    public double getEmittanceAt(double u, double v) {
+    public float getEmittanceAt(double u, double v) {
       return 0;
     }
   };
 
   EmissionMap DEFAULT = new EmissionMap() {
     @Override
-    public double getEmittanceAt(double u, double v) {
+    public float getEmittanceAt(double u, double v) {
       return 1;
     }
   };
@@ -23,5 +23,5 @@ public interface EmissionMap {
    * @param v v component of the texture coordinate [0...1]
    * @return Emittance [0...1] at the given texture coordinate
    */
-  double getEmittanceAt(double u, double v);
+  float getEmittanceAt(double u, double v);
 }

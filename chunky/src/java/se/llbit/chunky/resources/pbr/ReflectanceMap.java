@@ -4,14 +4,14 @@ public interface ReflectanceMap {
 
   ReflectanceMap DEFAULT = new ReflectanceMap() {
     @Override
-    public double getReflectanceAt(double u, double v) {
+    public float getReflectanceAt(double u, double v) {
       return 1;
     }
   };
 
   ReflectanceMap EMPTY = new ReflectanceMap() {
     @Override
-    public double getReflectanceAt(double u, double v) {
+    public float getReflectanceAt(double u, double v) {
       return 0;
     }
   };
@@ -23,5 +23,5 @@ public interface ReflectanceMap {
    * @param v v component of the texture coordinate [0...1]
    * @return Reflectance [0...1] at the given texture coordinate
    */
-  double getReflectanceAt(double u, double v);
+  float getReflectanceAt(double u, double v);
 }

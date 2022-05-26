@@ -4,14 +4,14 @@ public interface RoughnessMap {
 
   RoughnessMap EMPTY = new RoughnessMap() {
     @Override
-    public double getRoughnessAt(double u, double v) {
+    public float getRoughnessAt(double u, double v) {
       return 0;
     }
   };
 
   RoughnessMap DEFAULT = new RoughnessMap() {
     @Override
-    public double getRoughnessAt(double u, double v) {
+    public float getRoughnessAt(double u, double v) {
       return 0;
     }
   };
@@ -23,5 +23,5 @@ public interface RoughnessMap {
    * @param v v component of the texture coordinate [0...1]
    * @return Roughness [0...1] at the given texture coordinate
    */
-  double getRoughnessAt(double u, double v);
+  float getRoughnessAt(double u, double v);
 }
