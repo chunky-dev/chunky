@@ -69,11 +69,11 @@ public class OldPbrSpecularMap implements EmissionMap, RoughnessMap, Reflectance
   }
 
   @Override
-  public double getEmittanceAt(double u, double v) {
+  public float getEmittanceAt(double u, double v) {
     int x = (int) (u * width - Ray.EPSILON);
     int y = (int) ((1 - v) * height - Ray.EPSILON);
     int rawValue = emissionMap[y * width + x] & 0xFF;
-    return rawValue / 255.0;
+    return rawValue / 255.0f;
   }
 
   public boolean hasEmission() {
@@ -81,7 +81,7 @@ public class OldPbrSpecularMap implements EmissionMap, RoughnessMap, Reflectance
   }
 
   @Override
-  public double getReflectanceAt(double u, double v) {
+  public float getReflectanceAt(double u, double v) {
     int x = (int) (u * width - Ray.EPSILON);
     int y = (int) ((1 - v) * height - Ray.EPSILON);
     int rawValue = reflectanceMap[y * width + x] & 0xFF;
@@ -93,11 +93,11 @@ public class OldPbrSpecularMap implements EmissionMap, RoughnessMap, Reflectance
   }
 
   @Override
-  public double getRoughnessAt(double u, double v) {
+  public float getRoughnessAt(double u, double v) {
     int x = (int) (u * width - Ray.EPSILON);
     int y = (int) ((1 - v) * height - Ray.EPSILON);
     int rawValue = roughnessMap[y * width + x] & 0xFF;
-    return rawValue / 255.0;
+    return rawValue / 255.0f;
   }
 
   public boolean hasRoughness() {

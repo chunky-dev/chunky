@@ -15,7 +15,7 @@ public class LabPbrSpecularMap implements EmissionMap, ReflectanceMap, Roughness
   private final int height;
   private byte[] emissionMap;
   private byte[] reflectanceMap;
-  private double[] roughnessMap;
+  private float[] roughnessMap;
   private boolean hasMetalness;
 
   public LabPbrSpecularMap(BitmapImage texture) {
@@ -28,7 +28,7 @@ public class LabPbrSpecularMap implements EmissionMap, ReflectanceMap, Roughness
       for (int x = 0; x < texture.width; ++x) {
         // alpha channel
         if ((emissionMap[y * texture.width + x] = (byte) (
-            texture.data[y * texture.width + x] >>> 24)) != (byte) 0x00) {
+          texture.data[y * texture.width + x] >>> 24)) != (byte) 0x00) {
           hasEmission = true;
         }
       }
@@ -58,7 +58,7 @@ public class LabPbrSpecularMap implements EmissionMap, ReflectanceMap, Roughness
       reflectanceMap = null;
     }
 
-    roughnessMap = new double[texture.width * texture.height];
+    roughnessMap = new float[texture.width * texture.height];
     boolean hasRoughness = false;
     for (int y = 0; y < texture.height; ++y) {
       for (int x = 0; x < texture.width; ++x) {
@@ -66,7 +66,7 @@ public class LabPbrSpecularMap implements EmissionMap, ReflectanceMap, Roughness
         int value = (texture.data[y * texture.width + x] >>> 16) & 0xFF;
         if (value > 0) {
           hasRoughness = true;
-          roughnessMap[y * texture.width + x] = Math.pow((255 - value) / 255.0, 2);
+          roughnessMap[y * texture.width + x] = (float) Math.pow((255 - value) / 255.0, 2);
         }
       }
     }
@@ -76,7 +76,7 @@ public class LabPbrSpecularMap implements EmissionMap, ReflectanceMap, Roughness
   }
 
   @Override
-  public double getEmittanceAt(double u, double v) {
+  public float getEmittanceAt(double u, double v) {
     if (emissionMap == null) {
       return 0;
     }
@@ -86,7 +86,7 @@ public class LabPbrSpecularMap implements EmissionMap, ReflectanceMap, Roughness
     if (rawValue == 255) {
       return 0;
     }
-    return rawValue / 254.0;
+    return rawValue / 254.0f;
   }
 
   public boolean hasEmission() {
@@ -94,7 +94,7 @@ public class LabPbrSpecularMap implements EmissionMap, ReflectanceMap, Roughness
   }
 
   @Override
-  public double getReflectanceAt(double u, double v) {
+  public float getReflectanceAt(double u, double v) {
     if (reflectanceMap == null) {
       return 0;
     }
@@ -105,7 +105,7 @@ public class LabPbrSpecularMap implements EmissionMap, ReflectanceMap, Roughness
       // values from 230 to 255 represent metals (hard-coded metals not yet supported)
       return 0;
     }
-    return rawValue / 255.0;
+    return rawValue / 255.0f;
   }
 
   public boolean hasReflectance() {
@@ -128,7 +128,7 @@ public class LabPbrSpecularMap implements EmissionMap, ReflectanceMap, Roughness
   }
 
   @Override
-  public double getRoughnessAt(double u, double v) {
+  public float getRoughnessAt(double u, double v) {
     if (roughnessMap == null) {
       return 0;
     }
