@@ -63,7 +63,8 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
    */
   private boolean setChunk(World world, ChunkPosition pos, boolean selected) {
     //Only need to check if the chunk isn't empty on selecting a chunk, as it must exist if it's already selected
-    if(selected && world.getChunk(pos) == EmptyRegionChunk.INSTANCE) {
+    Chunk chunk = world.getChunk(pos);
+    if(selected && (chunk == EmptyRegionChunk.INSTANCE || chunk == EmptyChunk.INSTANCE)) {
       return false;
     }
     return setChunk(pos, selected);
@@ -85,7 +86,8 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
         boolean previousValue = selectedChunksForRegion.get(bitIndex);
         if(previousValue != selected) {
           ChunkPosition chunkPos = ChunkPosition.get(chunkX, chunkZ);
-          if(world.getChunk(chunkPos) != EmptyRegionChunk.INSTANCE) {
+          Chunk chunk = world.getChunk(chunkPos);
+          if(chunk != EmptyRegionChunk.INSTANCE && chunk != EmptyChunk.INSTANCE) {
             selectionChanged = true;
             selectedChunksForRegion.set(bitIndex, selected);
 
