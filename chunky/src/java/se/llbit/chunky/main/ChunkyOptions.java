@@ -21,6 +21,8 @@ import se.llbit.chunky.renderer.RenderConstants;
 import se.llbit.chunky.renderer.scene.Scene;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Various options for Chunky, set via the configuration file and/or command-line flags.
@@ -34,7 +36,7 @@ public class ChunkyOptions {
   /** The output filename when doing a headless snapshot. */
   public String imageOutputFile = "";
 
-  public String texturePack = null;
+  private List<File> resourcePacks = new ArrayList<>();
   public int renderThreads = -1;
   public File worldDir = null;
   public int target = -1;
@@ -55,7 +57,6 @@ public class ChunkyOptions {
     ChunkyOptions defaults = new ChunkyOptions();
     defaults.sceneDir = PersistentSettings.getSceneDirectory();
     defaults.renderThreads = PersistentSettings.getNumThreads();
-    defaults.texturePack = PersistentSettings.getLastTexturePack();
     return defaults;
   }
 
@@ -63,10 +64,27 @@ public class ChunkyOptions {
     ChunkyOptions clone = new ChunkyOptions();
     clone.sceneDir = sceneDir;
     clone.sceneName = sceneName;
-    clone.texturePack = texturePack;
+    clone.resourcePacks = new ArrayList<>(resourcePacks);
     clone.renderThreads = renderThreads;
     clone.worldDir = worldDir;
     return clone;
+  }
+
+  public List<File> getResourcePacks() {
+    return resourcePacks;
+  }
+
+  /**
+   * Adds all resource packs given in the paths string to the load list.
+   *
+   * @param paths The path(s) to resource pack zip files to be loaded.
+   *             Resource packs are loaded in the order of the paths in this argument.
+   *             Paths are separated by the system path separator.
+   */
+  public void addResourcePacks(String paths) {
+    resourcePacks.addAll(
+      PersistentSettings.parseResourcePackPaths(paths)
+    );
   }
 
   /**

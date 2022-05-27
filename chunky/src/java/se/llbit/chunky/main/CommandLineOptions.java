@@ -68,6 +68,8 @@ public class CommandLineOptions {
   private static final String USAGE = StringUtil
       .join("\n", "Usage: mapLoader [OPTIONS] [WORLD DIRECTORY]", "Options:",
           "  -texture <FILE>        use FILE as the texture pack (must be a Zip file)",
+          "  -textures <FILES>      use FILES as the texture packs (must be Zip files), ",
+          "                         separated by system path separator, loaded in order specified in this argument",
           "  -render <SCENE>        render the specified scene (see notes)",
           "  -snapshot <SCENE> [PNG] create a snapshot of the specified scene",
           "  -scene-dir <DIR>       use the directory DIR for loading/saving scenes",
@@ -242,7 +244,9 @@ public class CommandLineOptions {
     options.sceneDir = PersistentSettings.getSceneDirectory();
 
     registerOption("-texture", new Range(1),
-        arguments -> options.texturePack = arguments.get(0));
+        arguments -> options.addResourcePacks(arguments.get(0)));
+    registerOption("-textures", new Range(1),
+      arguments -> options.addResourcePacks(arguments.get(0)));
 
     registerOption("-scene-dir", new Range(1),
         arguments -> options.sceneDir = new File(arguments.get(0)));
@@ -496,10 +500,11 @@ public class CommandLineOptions {
     }
 
     if (!configurationError && mode != Mode.NOTHING && mode != Mode.SNAPSHOT) {
-      if (options.texturePack == null || options.texturePack.isEmpty()) {
-        options.texturePack = PersistentSettings.getLastTexturePack();
+      List<File> resourcePacks = options.getResourcePacks();
+      if(resourcePacks.isEmpty()) {
+        resourcePacks.addAll(PersistentSettings.getEnabledResourcePacks());
       }
-      ResourcePackLoader.loadResourcePacks(options.texturePack);
+      ResourcePackLoader.loadResourcePacks(resourcePacks);
     }
   }
 
