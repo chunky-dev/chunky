@@ -2166,7 +2166,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "redstone_wire":
         return redstoneWire(tag);
       case "sugar_cane":
-        return new SpriteBlock(name, Texture.sugarCane);
+        return new SugarCane(); // tinted since 1.7.2 (13w36a)
       case "kelp":
         return new SpriteBlock(name, Texture.kelp);
       case "kelp_plant":
