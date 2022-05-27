@@ -81,7 +81,6 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
     singleColorBtn.setSelected(PersistentSettings.getSingleColorTextures());
     singleColorBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setSingleColorTextures(newValue);
-      TexturePackLoader.loadTexturePacks(PersistentSettings.getLastTexturePack(), true);
       scene.refresh();
       scene.rebuildBvh();
     });

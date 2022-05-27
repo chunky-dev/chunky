@@ -1132,7 +1132,7 @@ public class Texture {
   protected int height;
   protected int avgColor;
   private float[] avgColorLinear;
-  private boolean useAverageColor = false;
+  private boolean usesAverageColor = false;
   private float[] avgColorFlat;
 
   private Image fxImage = null;
@@ -1147,6 +1147,14 @@ public class Texture {
 
   public Texture(BitmapImage img) {
     setTexture(img);
+    useAverageColor(PersistentSettings.getSingleColorTextures());
+  }
+
+  public void useAverageColor(boolean enable) {
+    usesAverageColor = enable;
+  }
+  public boolean usesAverageColor() {
+    return usesAverageColor;
   }
 
   public void setTexture(Texture texture) {
@@ -1174,15 +1182,12 @@ public class Texture {
       }
     }
 
-    useAverageColor = PersistentSettings.getSingleColorTextures();
-    if (useAverageColor) {
-      avgColorFlat = new float[4];
-      if (avgColorLinear[3] > 0.001) {
-        avgColorFlat[0] = avgColorLinear[0] / avgColorLinear[3];
-        avgColorFlat[1] = avgColorLinear[1] / avgColorLinear[3];
-        avgColorFlat[2] = avgColorLinear[2] / avgColorLinear[3];
-        avgColorFlat[3] = 1;
-      }
+    avgColorFlat = new float[4];
+    if (avgColorLinear[3] > 0.001) {
+      avgColorFlat[0] = avgColorLinear[0] / avgColorLinear[3];
+      avgColorFlat[1] = avgColorLinear[1] / avgColorLinear[3];
+      avgColorFlat[2] = avgColorLinear[2] / avgColorLinear[3];
+      avgColorFlat[3] = 1;
     }
 
     avgColorLinear[0] /= width * height;
@@ -1226,7 +1231,7 @@ public class Texture {
    * @return color
    */
   public final float[] getColor(int x, int y) {
-    if(useAverageColor)
+    if(usesAverageColor)
       return avgColorFlat;
     float[] result = new float[4];
     ColorUtil.getRGBAComponentsGammaCorrected(image.data[width*y + x], result);
