@@ -203,7 +203,7 @@ public class Chunk {
     } else {
       int[] fallback = new int[X_MAX * Z_MAX];
       for (int i = 0; i < fallback.length; ++i) {
-        fallback[i] = chunkData.maxY()-1;
+        fallback[i] = chunkData.maxY();
       }
       return fallback;
     }
@@ -337,9 +337,8 @@ public class Chunk {
       int[] chunkHeightmap, BlockPalette palette, int yMax) {
     for (int x = 0; x < 16; ++x) {
       for (int z = 0; z < 16; ++z) {
-        int y = chunkHeightmap[z * 16 + x];
-        y = Math.max(1, Math.min(y - 1, yMax));
-        for (; y > 1; --y) {
+        int y = Math.max(chunkData.minY()+1, Math.min(chunkHeightmap[z * 16 + x] - 1, yMax));
+        for (; y > chunkData.minY()+1; --y) {
           Block block = palette.get(chunkData.getBlockAt(x, y, z));
           if (block != Air.INSTANCE && !block.isWater())
             break;
