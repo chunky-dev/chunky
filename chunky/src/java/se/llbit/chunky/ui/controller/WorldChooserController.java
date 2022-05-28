@@ -149,27 +149,26 @@ public class WorldChooserController implements Initializable {
   }
 
   private void loadWorld(World world, WorldMapLoader mapLoader) {
-    world.getResourcePack().ifPresent((worldResourcePack) -> {
-      List<String> texturePacks = new ArrayList<>(ResourcePackLoader.getResourcePacks());
-      if (!texturePacks.contains(worldResourcePack.getAbsolutePath())) {
-        Alert loadTexturesConfirm = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
-        loadTexturesConfirm.getButtonTypes().clear();
-        loadTexturesConfirm.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
-        loadTexturesConfirm.setTitle("Bundled resource pack");
-        loadTexturesConfirm.setContentText(
-                "The world \"" + world.levelName() + "\" contains a resource pack. Do you want to load it now?");
-        Dialogs.stayOnTop(loadTexturesConfirm);
-        if (loadTexturesConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
-          if (!texturePacks.contains(worldResourcePack.getAbsolutePath())) {
-            texturePacks.add(0, worldResourcePack.getAbsolutePath());
-            String[] packs = texturePacks.toArray(new String[0]);
+    world.getResourcePack()
+      .ifPresent(worldResourcePack -> {
+        List<File> currentlyLoadedPacks = ResourcePackLoader.getLoadedResourcePacks();
 
-            ResourcePackLoader.loadResourcePacks(packs);
-            ResourcePackLoader.rememberResourcePacks(packs);
+        if (!currentlyLoadedPacks.contains(worldResourcePack)) {
+          Alert loadTexturesConfirm = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
+          loadTexturesConfirm.getButtonTypes().clear();
+          loadTexturesConfirm.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
+          loadTexturesConfirm.setTitle("Bundled resource pack");
+          loadTexturesConfirm.setContentText(
+                  "The world \"" + world.levelName() + "\" contains a resource pack. Do you want to load it now?");
+          Dialogs.stayOnTop(loadTexturesConfirm);
+
+          if (loadTexturesConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
+            // add world resource pack with highest priority
+            currentlyLoadedPacks.add(0, worldResourcePack);
+            ResourcePackLoader.loadAndPersistResourcePacks(currentlyLoadedPacks);
           }
         }
-      }
-    });
+      });
     mapLoader.loadWorld(world.getWorldDirectory());
   }
 
