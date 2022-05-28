@@ -64,6 +64,7 @@
     <HBox spacing="10" GridPane.columnIndex="2" GridPane.rowIndex="2">
       <Button fx:id="selectAllTargetPacksBtn" mnemonicParsing="false" text="Select All" />
       <Button fx:id="deselectAllTargetPacksBtn" mnemonicParsing="false" text="Deselect All" />
+      <Button fx:id="clearAllTargetPacksBtn" mnemonicParsing="false" text="Clear All" />
     </HBox>
   </GridPane>
   <Separator />
@@ -72,6 +73,7 @@
               text="Disable default textures"/>
     <!-- TODO: is this still true? "(needs restart for consistent results)" -->
     <Pane HBox.hgrow="ALWAYS" />
+    <Button fx:id="cancelBtn" cancelButton="true" mnemonicParsing="false" text="Cancel" />
     <Button fx:id="applyAsDefaultBtn" defaultButton="true" mnemonicParsing="false" text="Apply as default" />
 <!-- TODO: have scene dependent textures -->
 <!--    <Button fx:id="applyToSceneBtn" defaultButton="true" mnemonicParsing="false" text="Apply to scene" />-->

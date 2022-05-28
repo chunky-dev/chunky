@@ -32,7 +32,7 @@ import javafx.scene.image.ImageView;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.resources.TexturePackLoader;
+import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.ResourcePackChooser;
 import se.llbit.chunky.ui.render.RenderControlsTab;
@@ -46,7 +46,7 @@ import java.util.ResourceBundle;
 
 public class TexturesTab extends ScrollPane implements RenderControlsTab, Initializable {
   private RenderController controller;
-  private Scene scene;
+  private SceneManager sceneManager;
 
   @FXML
   private CheckBox biomeColors;
@@ -71,7 +71,10 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
     editResourcePacks.setGraphic(new ImageView(Icon.pencil.fxImage()));
     editResourcePacks.setOnAction(evt -> {
       try {
-        ResourcePackChooser resourcePackChooser = new ResourcePackChooser(scene);
+        ResourcePackChooser resourcePackChooser = new ResourcePackChooser(
+          sceneManager.getScene(),
+          sceneManager.getTaskTracker()
+        );
         resourcePackChooser.show();
       } catch (IOException ex) {
         Log.error("Failed to create resource pack chooser window.", ex);
@@ -80,6 +83,7 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
 
     singleColorBtn.setSelected(PersistentSettings.getSingleColorTextures());
     singleColorBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      Scene scene = sceneManager.getScene();
       PersistentSettings.setSingleColorTextures(newValue);
       scene.refresh();
       scene.rebuildBvh();
@@ -87,9 +91,10 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
 
     biomeColors.setTooltip(new Tooltip("Color grass and tree leaves according to the biome."));
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      scene.setBiomeColorsEnabled(newValue);
+      sceneManager.getScene().setBiomeColorsEnabled(newValue);
     });
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      Scene scene = sceneManager.getScene();
       boolean enabled = scene.biomeColorsEnabled();
 
       scene.setBiomeColorsEnabled(newValue);
@@ -105,6 +110,7 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
 
     biomeBlending.setTooltip(new Tooltip("Blend edges of biomes (looks better but loads slower)"));
     biomeBlending.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      Scene scene = sceneManager.getScene();
       boolean enabled = scene.biomeBlendingEnabled();
 
       scene.setBiomeBlendingEnabled(newValue);
@@ -116,7 +122,7 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
   }
 
   private void alertIfReloadNeeded(String changedFeature) {
-    if(!scene.haveLoadedChunks()) {
+    if(!sceneManager.getScene().haveLoadedChunks()) {
       return;
     }
     Alert warning = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
@@ -134,7 +140,7 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
   @Override
   public void setController(RenderControlsFxController fxController) {
     controller = fxController.getRenderController();
-    scene = controller.getSceneManager().getScene();
+    sceneManager = controller.getSceneManager();
   }
 
   @Override

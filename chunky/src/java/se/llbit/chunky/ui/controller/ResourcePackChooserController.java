@@ -1,5 +1,4 @@
-/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
- * Copyright (c) 2016-2021 Chunky contributors
+/* Copyright (c) 2022 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -19,8 +18,12 @@ package se.llbit.chunky.ui.controller;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -40,13 +43,16 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.MinecraftFinder;
-import se.llbit.chunky.resources.TexturePackLoader;
+import se.llbit.chunky.resources.ResourcePackLoader;
+import se.llbit.chunky.ui.dialogs.ResourcePackChooser;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.log.Log;
+import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,10 +69,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 public class ResourcePackChooserController implements Initializable {
   @FXML
@@ -89,13 +93,17 @@ public class ResourcePackChooserController implements Initializable {
   private Button removeFromTargetPacksBtn;
   @FXML
   private Button moveToTargetPacksBtn;
+  @FXML
+  private Button clearAllTargetPacksBtn;
 
   @FXML
   private CheckBox disableDefaultTexturesBtn;
   @FXML
+  private Button cancelBtn;
+  private Runnable onCancel;
+  @FXML
   private Button applyAsDefaultBtn;
-
-  private Scene scene;
+  private Consumer<List<File>> onApplyAsDefault;
 
   private final static double ROW_SIZE = 48.0;
 
@@ -110,12 +118,14 @@ public class ResourcePackChooserController implements Initializable {
 
     private final ImageView icon = new ImageView();
     private final Label name = new Label();
+    private final StringProperty nameProp = new SimpleStringProperty("Loading...");
     private final Label formatVersion = new Label();
     private final Label description = new Label();
     private final GridPane root = new GridPane();
 
-    private final BooleanProperty isFirstItem = new SimpleBooleanProperty(true);
-    private final BooleanProperty isLastItem = new SimpleBooleanProperty(true);
+    private final BooleanProperty disableMoveUp = new SimpleBooleanProperty(true);
+    private final BooleanProperty disableMoveDown = new SimpleBooleanProperty(true);
+    private final BooleanProperty packDisabled = new SimpleBooleanProperty(false);
 
     public PackListItemCell(Side side, ResourcePackChooserController controller) {
       this.side = side;
@@ -143,6 +153,10 @@ public class ResourcePackChooserController implements Initializable {
       icon.setFitWidth(ROW_SIZE);
 
       name.setStyle("-fx-font-weight: bold");
+      name.textProperty().bind(Bindings.concat(
+        nameProp,
+        Bindings.createStringBinding(() -> packDisabled.get() ? " (disabled)" : "", packDisabled)
+      ));
       formatVersion.setTextAlignment(TextAlignment.RIGHT);
       formatVersion.setStyle("-fx-text-alignment: RIGHT");
 
@@ -165,6 +179,8 @@ public class ResourcePackChooserController implements Initializable {
       root.add(name, columnOffset + 1, 0);
       root.add(formatVersion, columnOffset + 2, 0);
       root.add(description, columnOffset + 1, 1, 2, 1);
+
+      disableProperty().bind(packDisabled);
     }
 
     private Node buildControls() {
@@ -172,12 +188,12 @@ public class ResourcePackChooserController implements Initializable {
       moveUpBtn.setOnAction(evt ->
         Collections.swap(controller.targetPacksList, getIndex(), getIndex() - 1)
       );
-      moveUpBtn.disableProperty().bind(isFirstItem);
+      moveUpBtn.disableProperty().bind(disableMoveUp);
       Button moveDownBtn = new Button("🡇");
       moveDownBtn.setOnAction(evt ->
         Collections.swap(controller.targetPacksList, getIndex(), getIndex() + 1)
       );
-      moveDownBtn.disableProperty().bind(isLastItem);
+      moveDownBtn.disableProperty().bind(disableMoveDown);
       return new VBox(
         moveUpBtn,
         moveDownBtn
@@ -190,17 +206,27 @@ public class ResourcePackChooserController implements Initializable {
         return;
 
       icon.setImage(item.getIcon());
+      nameProp.set(item.getName());
       if (!item.isDefaultPack()) {
         formatVersion.setText(item.getFormatVersionString());
-      }
-      name.setText(item.getName());
-      description.setText(item.getDescription());
+        description.setText(item.getDescription());
 
-      int itemCount = getListView().getItems().size();
-      isFirstItem.set(getIndex() == 0);
-      // last item is default resource pack
-      isLastItem.set(getIndex() == itemCount - 2);
-      setDisable(item.isDefaultPack());
+        packDisabled.unbind();
+        packDisabled.set(false);
+
+        // disable move up if we are the first item
+        disableMoveUp.set(getIndex() == 0);
+        // disable move down if we are the second last item (last item is default resource pack)
+        disableMoveDown.set(getIndex() == getListView().getItems().size() - 2);
+      } else {
+        formatVersion.setText("");
+        description.setText("loaded from " + item.getFile().getName());
+
+        packDisabled.bind(controller.disableDefaultTexturesBtn.selectedProperty());
+
+        disableMoveDown.set(true);
+        disableMoveUp.set(true);
+      }
     }
 
     @Override
@@ -265,47 +291,58 @@ public class ResourcePackChooserController implements Initializable {
     moveToTargetPacksBtn.setOnAction(evt ->
       movePacksToTargetList(availablePacksListView.getSelectionModel().getSelectedItems())
     );
+    targetPacksList.addListener((ListChangeListener<? super PackListItem>) prop ->
+      clearAllTargetPacksBtn.setDisable(targetPacksList.stream().allMatch(PackListItem::isDefaultPack))
+    );
+    clearAllTargetPacksBtn.setOnAction(evt ->
+      removePacksFromTargetList(targetPacksList.stream()
+        .filter(pack -> !pack.isDefaultPack())
+        .collect(Collectors.toList()))
+    );
 
     disableDefaultTexturesBtn.setSelected(PersistentSettings.getDisableDefaultTextures());
     disableDefaultTexturesBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setDisableDefaultTextures(newValue);
     });
 
-    applyAsDefaultBtn.setOnAction(evt -> {
-      // TODO
-//      targetPacksList.
-//      TexturePackLoader.loadTexturePacks(PersistentSettings.getLastTexturePack(), true);
-//      scene.refresh();
-//      scene.rebuildBvh();
-    });
+    cancelBtn.setOnAction(evt -> onCancel.run());
+    // TODO: scene independent textures
+    applyAsDefaultBtn.setOnAction(evt -> onApplyAsDefault.accept(getSelectedResourcePacks()));
   }
 
-  public void populate(Scene scene) {
-    this.scene = scene;
+  public List<File> getSelectedResourcePacks() {
+    return targetPacksList.stream()
+      .filter(pack -> !pack.isDefaultPack())
+      .map(PackListItem::getFile)
+      .collect(Collectors.toList());
+  }
+
+  public void populate(
+    Consumer<List<File>> onApplyAsDefault,
+    Runnable onCancel
+  ) {
+    this.onCancel = onCancel;
+    this.onApplyAsDefault = onApplyAsDefault;
+
+    List<File> available = ResourcePackLoader.getAvailableResourcePacks();
+    List<File> loaded = ResourcePackLoader.getLoadedResourcePacks();
+    available.removeAll(loaded);
+
+    availablePacksList.setAll(
+      available.stream()
+        .map(PackListItem::new)
+        .collect(Collectors.toList())
+    );
+
+    targetPacksList.setAll(
+      loaded.stream()
+        .map(PackListItem::new)
+        .collect(Collectors.toList())
+    );
 
     PackListItem defaultPack = PackListItem.getDefault();
     if (defaultPack != null) {
       targetPacksList.add(defaultPack);
-    }
-
-    // TODO: scene independent textures
-//    String resourcePacks = PersistentSettings.getLastTexturePack();
-//    Stream<File> knownResourcePacks = Arrays.stream(resourcePacks.split(File.pathSeparator))
-//      .filter(s -> !s.isEmpty())
-//      .map(File::new);
-
-    try (Stream<Path> directory = Files.walk(new File("D:/.minecraft/resourcepacks/").toPath(), 1)) {
-      Stream<File> knownResourcePacks = directory
-        .map(Path::toFile)
-        .filter(File::isFile);
-
-      availablePacksList.setAll(
-        knownResourcePacks
-          .map(PackListItem::new)
-          .collect(Collectors.toList())
-      );
-    } catch (IOException ex) {
-      ex.printStackTrace();
     }
   }
 
@@ -406,39 +443,50 @@ public class ResourcePackChooserController implements Initializable {
     }
 
     private void parseResourcePack(File resourcePackFile) {
-      try (ZipFile resourcePackZip = new ZipFile(resourcePackFile)) {
-        ZipEntry packMcmeta = resourcePackZip.getEntry("pack.mcmeta");
-        if (isDefaultPack) {
-          description = "loaded from " + file.getName();
-        } else if (packMcmeta != null) {
-          try (
-            InputStream inputStream = resourcePackZip.getInputStream(packMcmeta);
-            JsonParser parser = new JsonParser(inputStream)
-          ) {
-            JsonObject packInformation = parser.parse().object().get("pack").object();
-            formatVersion = packInformation.get("pack_format").intValue(1);
-            description = packInformation.get("description").stringValue("")
-              // Remove Minecraft format codes (I believe the JSON parser f***ed up the unicode
-              // and sometimes the character C2 appears in front of § - it too gets filtered out)
-              .replaceAll("\\u00c2?\\u00a7[0-9a-fklmnor]", "");
-          } catch (JsonParser.SyntaxError jpex) {
-            Log.infof("Json error in pack.mcmeta: %s", jpex.getMessage());
-            description = "[failed to load pack.mcmeta]";
+      try (FileSystem resourcePack = ResourcePackLoader.getPackFileSystem(resourcePackFile)) {
+        Path root = ResourcePackLoader.getPackRootPath(resourcePackFile, resourcePack);
+
+        Path mcMetaPath = root.resolve("pack.mcmeta");
+        if (!isDefaultPack && Files.exists(mcMetaPath)) {
+          try (InputStream inputStream = Files.newInputStream(mcMetaPath)) {
+            loadMcMeta(inputStream);
           }
         } else {
           description = "[did not find pack.mcmeta]";
         }
 
-        ZipEntry packPngEntry = resourcePackZip.getEntry("pack.png");
-        if (packPngEntry != null) {
-          try (InputStream inputStream = resourcePackZip.getInputStream(packPngEntry)) {
-            icon = new Image(inputStream);
+        Path iconPath = root.resolve("pack.png");
+        if (Files.exists(iconPath)) {
+          try (InputStream inputStream = Files.newInputStream(iconPath)) {
+            loadIcon(inputStream);
           }
         }
+      } catch (UnsupportedOperationException uoex) {
+        // default file systems do not support closing
       } catch (IOException ioex) {
-        Log.infof("Could not load resource pack metadata: %s [%s]", resourcePackFile, ioex.getMessage());
+        Log.infof("Could not load resource pack metadata: %s [%s]", resourcePackFile.getAbsolutePath(), ioex.getMessage());
       }
       Platform.runLater(() -> loading.set(false));
+    }
+
+    private void loadMcMeta(InputStream inputStream) throws IOException {
+      try (
+        JsonParser parser = new JsonParser(inputStream)
+      ) {
+        JsonObject packInformation = parser.parse().object().get("pack").object();
+        formatVersion = packInformation.get("pack_format").intValue(1);
+        description = packInformation.get("description").stringValue("")
+          // Remove Minecraft format codes (I believe the JSON parser f***ed up the unicode
+          // and sometimes the character C2 appears in front of § - it too gets filtered out)
+          .replaceAll("\\u00c2?\\u00a7[0-9a-fklmnor]", "");
+      } catch (JsonParser.SyntaxError jpex) {
+        Log.infof("Json error in pack.mcmeta: %s (%s)", file.getAbsolutePath(), jpex.getMessage());
+        description = "[failed to load pack.mcmeta]";
+      }
+    }
+
+    private void loadIcon(InputStream inputStream) {
+      icon = new Image(inputStream);
     }
 
     @Override
