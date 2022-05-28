@@ -90,6 +90,11 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   public void setTaskTracker(TaskTracker taskTracker) {
     this.taskTracker = taskTracker;
   }
+  
+  @Override
+  public TaskTracker getTaskTracker() {
+    return taskTracker;
+  }
 
   public void setOnSceneLoaded(Runnable onSceneLoaded) {
     this.onSceneLoaded = onSceneLoaded;

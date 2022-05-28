@@ -63,6 +63,11 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
     sceneManager.setTaskTracker(taskTracker);
   }
 
+  @Override
+  public TaskTracker getTaskTracker() {
+    return sceneManager.getTaskTracker();
+  }
+
   public void setOnSceneLoaded(Runnable onSceneLoaded) {
     sceneManager.setOnSceneLoaded(onSceneLoaded);
   }
