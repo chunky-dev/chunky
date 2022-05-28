@@ -1142,7 +1142,7 @@ public class Texture {
   }
 
   public Texture(String resourceName) {
-    this(ImageLoader.readNonNull("textures/" + resourceName + ".png"));
+    this(ImageLoader.readResourceNonNull("textures/" + resourceName + ".png"));
   }
 
   public Texture(BitmapImage img) {
