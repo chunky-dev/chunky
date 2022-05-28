@@ -23,7 +23,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
@@ -56,7 +55,7 @@ public class ChunkyFx extends Application {
       Parent root = loader.load();
       Scene scene = new Scene(root);
       stage.setScene(scene);
-      stage.getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
+      stage.getIcons().add(Icons.CHUNKY_ICON);
       stage.setOnCloseRequest(event -> {
         PersistentSettings.setWindowPosition(new WindowPosition(stage));
         Platform.exit();

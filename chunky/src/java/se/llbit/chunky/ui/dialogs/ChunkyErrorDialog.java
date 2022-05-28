@@ -21,19 +21,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
+import se.llbit.chunky.ui.Icons;
 import se.llbit.log.Level;
 
 import java.io.IOException;
@@ -64,7 +62,7 @@ public class ChunkyErrorDialog extends Stage implements Initializable {
     loader.setController(this);
     Parent root = loader.load();
     setTitle(getLevelName(errorType) + " Summary");
-    getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
+    getIcons().add(Icons.CHUNKY_ICON);
     setScene(new Scene(root));
     addEventFilter(KeyEvent.ANY, e -> {
       if (e.getCode() == KeyCode.ESCAPE && e.getEventType() == KeyEvent.KEY_RELEASED) {
