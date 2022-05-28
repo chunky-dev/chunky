@@ -18,7 +18,6 @@ package se.llbit.chunky.ui.controller;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.StringBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -43,16 +42,12 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.ResourcePackLoader;
-import se.llbit.chunky.ui.dialogs.ResourcePackChooser;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.log.Log;
-import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.IOException;
@@ -260,7 +255,6 @@ public class ResourcePackChooserController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    // TODO later: draggable rows
     availablePacksList = availablePacksListView.getItems();
     availablePacksListView.setItems(
       availablePacksList.sorted(Comparator.comparing(PackListItem::getName, String.CASE_INSENSITIVE_ORDER))
@@ -306,7 +300,6 @@ public class ResourcePackChooserController implements Initializable {
     });
 
     cancelBtn.setOnAction(evt -> onCancel.run());
-    // TODO: scene independent textures
     applyAsDefaultBtn.setOnAction(evt -> onApplyAsDefault.accept(getSelectedResourcePacks()));
   }
 
