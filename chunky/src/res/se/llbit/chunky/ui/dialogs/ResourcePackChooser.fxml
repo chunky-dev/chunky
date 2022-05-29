@@ -38,17 +38,17 @@
     </HBox>
 
     <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" spacing="6">
-      <Button text="🡆" fx:id="moveToTargetPacksBtn" prefWidth="26" prefHeight="26" mnemonicParsing="false">
+      <Button fx:id="moveToTargetPacksBtn" prefWidth="26" prefHeight="26" mnemonicParsing="false">
         <tooltip>
           <Tooltip text="Move all selected resource packs to the selected resource packs list" />
         </tooltip>
       </Button>
-      <Button text="🡄" fx:id="removeFromTargetPacksBtn" prefWidth="26" prefHeight="26" mnemonicParsing="false">
+      <Button fx:id="removeFromTargetPacksBtn" prefWidth="26" prefHeight="26" mnemonicParsing="false">
         <tooltip>
           <Tooltip text="Remove all selected resource packs from the selected resource packs list" />
         </tooltip>
       </Button>
-      <Button text="➕" fx:id="addNewTargetPackBtn" prefWidth="26" prefHeight="26" mnemonicParsing="false">
+      <Button fx:id="addNewTargetPackBtn" prefWidth="26" prefHeight="26" mnemonicParsing="false">
         <tooltip>
           <Tooltip text="Browse for a resource pack from outside the default resource pack folder and add it to the selected resource packs list" />
         </tooltip>

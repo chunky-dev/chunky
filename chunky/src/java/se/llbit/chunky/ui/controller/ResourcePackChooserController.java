@@ -46,6 +46,7 @@ import javafx.stage.FileChooser;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.ResourcePackLoader;
+import se.llbit.chunky.ui.Icons;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.log.Log;
@@ -182,12 +183,14 @@ public class ResourcePackChooserController implements Initializable {
     }
 
     private Node buildControls() {
-      Button moveUpBtn = new Button("🡅");
+      Button moveUpBtn = new Button();
+      Icons.buildIcon(Icons.HEAVY_ARROW_RIGHT).withSize(12).rotateCCW().setAsGraphic(moveUpBtn);
       moveUpBtn.setOnAction(evt ->
         Collections.swap(controller.targetPacksList, getIndex(), getIndex() - 1)
       );
       moveUpBtn.disableProperty().bind(disableMoveUp);
-      Button moveDownBtn = new Button("🡇");
+      Button moveDownBtn = new Button();
+      Icons.buildIcon(Icons.HEAVY_ARROW_RIGHT).withSize(12).rotateCW().setAsGraphic(moveDownBtn);
       moveDownBtn.setOnAction(evt ->
         Collections.swap(controller.targetPacksList, getIndex(), getIndex() + 1)
       );
@@ -282,6 +285,7 @@ public class ResourcePackChooserController implements Initializable {
     );
 
     ObservableList<PackListItem> selectedItems = targetPacksListView.getSelectionModel().getSelectedItems();
+    Icons.buildIcon(Icons.HEAVY_ARROW_RIGHT).withSize(12).flipX().setAsGraphic(removeFromTargetPacksBtn, true);
     removeFromTargetPacksBtn.disableProperty()
       .bind(Bindings.createBooleanBinding(
         () -> selectedItems.isEmpty()
@@ -291,11 +295,13 @@ public class ResourcePackChooserController implements Initializable {
     removeFromTargetPacksBtn.setOnAction(evt ->
       removePacksFromTargetList(targetPacksListView.getSelectionModel().getSelectedItems())
     );
+    Icons.buildIcon(Icons.HEAVY_ARROW_RIGHT).withSize(12).setAsGraphic(moveToTargetPacksBtn, true);
     moveToTargetPacksBtn.disableProperty()
       .bind(availablePacksListView.getSelectionModel().selectedItemProperty().isNull());
     moveToTargetPacksBtn.setOnAction(evt ->
       movePacksToTargetList(availablePacksListView.getSelectionModel().getSelectedItems())
     );
+    Icons.buildIcon(Icons.HEAVY_PLUS).withSize(14).setAsGraphic(addNewTargetPackBtn, true);
     addNewTargetPackBtn.setOnAction(evt -> {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Choose Resource Pack(s)");
