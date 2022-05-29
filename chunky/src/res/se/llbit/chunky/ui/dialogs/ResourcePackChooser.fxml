@@ -38,22 +38,21 @@
     </HBox>
 
     <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" spacing="6">
-        <Button text="🡄" fx:id="removeFromTargetPacksBtn" prefWidth="28" prefHeight="28" mnemonicParsing="false">
-          <tooltip>
-            <Tooltip text="Remove all selected resource packs from the selected resource packs list" />
-          </tooltip>
-        </Button>
-        <Button text="🡆" fx:id="moveToTargetPacksBtn" prefWidth="28" prefHeight="28" mnemonicParsing="false">
-          <tooltip>
-            <Tooltip text="Move all selected resource packs to the selected resource packs list" />
-          </tooltip>
-        </Button>
-<!-- TODO: add resource packs from outside the default resourcepack folder -->
-<!--        <Button text="➕" fx:id="addNewTargetPackBtn" prefWidth="28" prefHeight="28" mnemonicParsing="false">-->
-<!--          <tooltip>-->
-<!--            <Tooltip text="Browse for another resource pack and add it to the selected resource packs list" />-->
-<!--          </tooltip>-->
-<!--        </Button>-->
+      <Button text="🡆" fx:id="moveToTargetPacksBtn" prefWidth="26" prefHeight="26" mnemonicParsing="false">
+        <tooltip>
+          <Tooltip text="Move all selected resource packs to the selected resource packs list" />
+        </tooltip>
+      </Button>
+      <Button text="🡄" fx:id="removeFromTargetPacksBtn" prefWidth="26" prefHeight="26" mnemonicParsing="false">
+        <tooltip>
+          <Tooltip text="Remove all selected resource packs from the selected resource packs list" />
+        </tooltip>
+      </Button>
+      <Button text="➕" fx:id="addNewTargetPackBtn" prefWidth="26" prefHeight="26" mnemonicParsing="false">
+        <tooltip>
+          <Tooltip text="Browse for a resource pack from outside the default resource pack folder and add it to the selected resource packs list" />
+        </tooltip>
+      </Button>
     </VBox>
 
     <VBox GridPane.columnIndex="2" GridPane.rowIndex="0">

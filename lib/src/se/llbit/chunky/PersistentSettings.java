@@ -110,6 +110,8 @@ public final class PersistentSettings {
     String lastTexturePack = settings.getString("lastTexturePack", null);
     if(lastTexturePack != null) {
       setLastTexturePack(lastTexturePack);
+      // TODO: remove setting with next release
+      // settings.removeSetting("lastTexturePack");
       Log.info("migrated setting \"lastTexturePack\"");
     }
   }
@@ -223,7 +225,6 @@ public final class PersistentSettings {
     setEnabledResourcePacks(
       parseResourcePackPaths(path).toArray(new File[0])
     );
-    settings.removeSetting("lastTexturePack");
     save();
   }
 

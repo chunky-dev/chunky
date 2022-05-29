@@ -42,6 +42,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.FileChooser;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.ResourcePackLoader;
@@ -83,13 +84,15 @@ public class ResourcePackChooserController implements Initializable {
   private Button selectAllTargetPacksBtn;
   @FXML
   private Button deselectAllTargetPacksBtn;
+  @FXML
+  private Button clearAllTargetPacksBtn;
 
   @FXML
   private Button removeFromTargetPacksBtn;
   @FXML
   private Button moveToTargetPacksBtn;
   @FXML
-  private Button clearAllTargetPacksBtn;
+  private Button addNewTargetPackBtn;
 
   @FXML
   private CheckBox disableDefaultTexturesBtn;
@@ -269,6 +272,14 @@ public class ResourcePackChooserController implements Initializable {
     targetPacksListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     selectAllTargetPacksBtn.setOnAction(evt -> targetPacksListView.getSelectionModel().selectAll());
     deselectAllTargetPacksBtn.setOnAction(evt -> targetPacksListView.getSelectionModel().clearSelection());
+    targetPacksList.addListener((ListChangeListener<? super PackListItem>) prop ->
+      clearAllTargetPacksBtn.setDisable(targetPacksList.stream().allMatch(PackListItem::isDefaultPack))
+    );
+    clearAllTargetPacksBtn.setOnAction(evt ->
+      removePacksFromTargetList(targetPacksList.stream()
+        .filter(pack -> !pack.isDefaultPack())
+        .collect(Collectors.toList()))
+    );
 
     ObservableList<PackListItem> selectedItems = targetPacksListView.getSelectionModel().getSelectedItems();
     removeFromTargetPacksBtn.disableProperty()
@@ -285,14 +296,32 @@ public class ResourcePackChooserController implements Initializable {
     moveToTargetPacksBtn.setOnAction(evt ->
       movePacksToTargetList(availablePacksListView.getSelectionModel().getSelectedItems())
     );
-    targetPacksList.addListener((ListChangeListener<? super PackListItem>) prop ->
-      clearAllTargetPacksBtn.setDisable(targetPacksList.stream().allMatch(PackListItem::isDefaultPack))
-    );
-    clearAllTargetPacksBtn.setOnAction(evt ->
-      removePacksFromTargetList(targetPacksList.stream()
-        .filter(pack -> !pack.isDefaultPack())
-        .collect(Collectors.toList()))
-    );
+    addNewTargetPackBtn.setOnAction(evt -> {
+      FileChooser fileChooser = new FileChooser();
+      fileChooser.setTitle("Choose Resource Pack(s)");
+      fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+        "Resource Packs",
+        "*.zip",
+        "*.jar",
+        "pack.mcmeta"
+      ));
+      fileChooser.setInitialDirectory(MinecraftFinder.getResourcePacksDirectory());
+      List<File> resourcePack = fileChooser.showOpenMultipleDialog(addNewTargetPackBtn.getScene().getWindow());
+      if (resourcePack != null) {
+        List<PackListItem> addedResourcePacks = resourcePack.stream()
+          .map(file ->
+            availablePacksList.stream()
+              .filter(availablePack -> availablePack.getFile().equals(file))
+              .findFirst()
+              .orElseGet(() -> new PackListItem(file.getName().endsWith(".mcmeta")
+                ? file.getParentFile()
+                : file))
+          )
+          .collect(Collectors.toList());
+        availablePacksList.removeAll(addedResourcePacks);
+        targetPacksList.addAll(0, addedResourcePacks);
+      }
+    });
 
     disableDefaultTexturesBtn.setSelected(PersistentSettings.getDisableDefaultTextures());
     disableDefaultTexturesBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -457,7 +486,8 @@ public class ResourcePackChooserController implements Initializable {
       } catch (UnsupportedOperationException uoex) {
         // default file systems do not support closing
       } catch (IOException ioex) {
-        Log.infof("Could not load resource pack metadata: %s [%s]", resourcePackFile.getAbsolutePath(), ioex.getMessage());
+        Log.infof("Could not load resource pack metadata: %s [%s]", resourcePackFile.getAbsolutePath(),
+          ioex.getMessage());
       }
       Platform.runLater(() -> loading.set(false));
     }
