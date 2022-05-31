@@ -20,7 +20,7 @@ public class Trivial3dBiomeStructureImpl extends Position3d2ReferencePackedArray
       XYZTriple key = entry.getKey();
       out.writeInt(key.x);
       out.writeInt(key.y);
-      out.writeLong(key.z);
+      out.writeInt(key.z);
       Object[] value = entry.getValue();
 
       BitSet presentValues = new BitSet(value.length);
