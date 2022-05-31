@@ -70,8 +70,6 @@ import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
-import se.llbit.chunky.renderer.scene.biome.Trivial2dBiomeStructureImpl;
-import se.llbit.chunky.renderer.scene.biome.Trivial3dBiomeStructureImpl;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.biome.ArrayBiomePalette;
