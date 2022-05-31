@@ -1,11 +1,19 @@
 package se.llbit.chunky.ui;
 
+import javafx.scene.image.Image;
+
 /**
  * Icons made for Chunky and released under CC0
  *
- * Icons are provided as SVG Paths
+ * Most icons are provided as SVG paths to use with {@link javafx.scene.shape.SVGPath}.
  */
 public class Icons {
+  /**
+   * Chunky icon ("chunky-icon.png")
+   * typically used as window/dialog icon {@link javafx.stage.Stage#getIcons()}
+   */
+  public final static Image CHUNKY_ICON = new Image(Icons.class.getResourceAsStream("/chunky-icon.png"));
+
   public final static String PORTRAIT_TO_LANDSCAPE =
     "M0-8v9h-3v3h-5v-12Zm-7 1v10h3v-3h3v-7Z" + // portrait rectangle with missing edge
     "M8 0v8h-12v-8Zm-11 1v6h10v-6Z" + // landscape rectangle

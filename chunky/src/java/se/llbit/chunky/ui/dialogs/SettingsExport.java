@@ -25,12 +25,12 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import se.llbit.chunky.ui.Icons;
 import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
 
@@ -154,7 +154,7 @@ public class SettingsExport extends Stage {
     scrollPane.setContent(vBox);
     setScene(new Scene(scrollPane));
     setTitle("Settings Export");
-    getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
+    getIcons().add(Icons.CHUNKY_ICON);
     addEventFilter(KeyEvent.KEY_PRESSED, e -> {
       if (e.getCode() == KeyCode.ESCAPE) {
         e.consume();
