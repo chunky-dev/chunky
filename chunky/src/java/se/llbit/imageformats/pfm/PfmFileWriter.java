@@ -73,30 +73,29 @@ public class PfmFileWriter implements AutoCloseable {
     out.write(0x0a);
   }
 
-  private void writePixelData(Scene scene, ByteOrder byteOrder, TaskTracker.Task task) throws IOException
-  {
+  private void writePixelData(Scene scene, ByteOrder byteOrder, TaskTracker.Task task) throws IOException {
     int width = scene.canvasWidth();
     int height = scene.canvasHeight();
 
-    // one or the other will be used, depending on if postprocessing is enabled.
-    double[] pixel = new double[3];
     double[] sampleBuffer = scene.getSampleBuffer();
 
-    // write each row...
-    for (int y = height-1; y >= 0; y--) {
-      task.update(height, height-y-1);
+    // width * (r,g,b) * float size (= 4 byte)
+    ByteBuffer rowBuffer = ByteBuffer.allocate(width * 3 * 4).order(byteOrder);
+    FloatBuffer rowFloatBuffer = rowBuffer.asFloatBuffer();
 
-      // Prepare our row buffers
-      ByteBuffer buffer = ByteBuffer.allocate(width*3*4).order(byteOrder);
-      FloatBuffer floatBuffer = buffer.asFloatBuffer();
+    // write each row (bottom to top)
+    for (int y = height - 1; y >= 0; y--) {
+      rowFloatBuffer.clear();
 
       // get the row's data as floats from raw pixel data
-      // (ignore post processing because that would clip the color range and defeat the purpose of HDR)
-        for (int x = 0; x < 3*width; x++)
-          floatBuffer.put((float)sampleBuffer[y*width*3+x]);
+      // (ignores post-processing because that would clip the value range and defeat the purpose of HDR)
+      for (int x = 0; x < 3 * width; x++) {
+        rowFloatBuffer.put((float) sampleBuffer[y * width * 3 + x]);
+      }
 
       // Write buffer to stream
-      out.write(buffer.array());
+      out.write(rowBuffer.array());
+      task.update(height, height - y - 1);
     }
   }
 }
