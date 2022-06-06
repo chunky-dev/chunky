@@ -36,6 +36,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -80,15 +81,22 @@ public class JavaFxInstaller {
       updateSite = site + "/" + JAVAFX_JSON;
     }
 
+    // Fetch javafx downloads
     try {
       downloads = JavaFxDownloads.fetch(new URL(updateSite));
     } catch (JavaFxDownloads.SyntaxException | IOException e) {
       throw new InstallationException("Failed to fetch download links: " + e);
     }
 
+    // Do all the swing stuff
     showInstallDialog();
   }
 
+  /**
+   * Helper method to launch the installer.
+   * @param settings  Launcher settings. May be null.
+   * @param args      Launcher arguments.
+   */
   public static void launch(LauncherSettings settings, String[] args) {
     try {
       JavaFxInstaller instance = new JavaFxInstaller(settings);
@@ -97,13 +105,14 @@ public class JavaFxInstaller {
       try {
         synchronized (instance) {
           while (!instance.isFinished()) {
-            // Have a timeout in case the window closes but we are not notifed
+            // Have a timeout in case the window closes but we are not notified
             // for some reason
             instance.wait(10000);
           }
         }
       } catch (InterruptedException ignored) {}
 
+      // Window was closed
       if (instance.exiting) {
         return;
       }
@@ -158,21 +167,30 @@ public class JavaFxInstaller {
       showJavafxError(new InstallationException(ex.getMessage()));
     }
 
+    // Wake up listeners
     synchronized (this) {
       this.complete = true;
       this.notifyAll();
     }
   }
 
+  /**
+   * Helper method to clean up the javafx instllation directory
+   * if installation failed or was canceled.
+   */
   private void cleanupTarget() throws IOException {
-    Files.walk(target)
-      .sorted(Comparator.reverseOrder())
-      .map(Path::toFile)
-      .forEach(File::delete);
+    try (Stream<Path> walk = Files.walk(target)) {
+      walk.sorted(Comparator.reverseOrder())
+        .map(Path::toFile)
+        .forEach(f -> {
+          boolean r = f.delete();
+          assert r;
+        });
+    }
     assert !target.toFile().exists();
   }
 
-  private void showInstallDialog() throws InstallationException {
+  private void showInstallDialog() {
     Image chunkyImage = Toolkit.getDefaultToolkit().getImage(getClass().getResource(
       "/se/llbit/chunky/launcher/ui/chunky-cfg.png"));
 
@@ -221,6 +239,7 @@ public class JavaFxInstaller {
     JComboBox<String> osCombo = new JComboBox<>();
     compPanel.add(osCombo);
 
+    // Populate os's and select the best match
     Arrays.stream(downloads).forEach(os -> osCombo.addItem(os.name));
     osCombo.setSelectedIndex(0);
     for (JavaFxDownloads.Os os : downloads) {
@@ -236,6 +255,7 @@ public class JavaFxInstaller {
     JComboBox<String> archCombo = new JComboBox<>();
     compPanel.add(archCombo);
 
+    // Automatically populate arch's and select the best match when an os is selected
     osCombo.addActionListener(e -> {
       JavaFxDownloads.Os selected = downloads[osCombo.getSelectedIndex()];
 
@@ -250,6 +270,7 @@ public class JavaFxInstaller {
         }
       }
     });
+    // Force the listener to be called
     osCombo.setSelectedIndex(osCombo.getSelectedIndex());
 
     // Spacer
@@ -344,61 +365,20 @@ public class JavaFxInstaller {
   }
 
   private static void showJavafxError(InstallationException e) {
-    String[] errorMessages = new String[]{
-      "Error installing JavaFX: " + e.getMessage(),
-      "If you are using a JVM for Java 11 or later, " +
-        "JavaFX is no longer shipped alongside and must be installed separately.",
-      "If you already have JavaFX installed, you need to run Chunky with the command:",
-      "java --module-path <path/to/JavaFX/lib> --add-modules javafx.controls,javafx.fxml -jar <path/to/ChunkyLauncher.jar>"
-    };
-    String faqLink = "https://chunky.lemaik.de/java11";
-    String faqMessage = "Check out this page for more information on how to use Chunky with JavaFX";
     if(!GraphicsEnvironment.isHeadless()) {
-      JTextField faqLabel;
-      if(Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-        faqLabel = new JTextField(faqMessage);
-        Font font = faqLabel.getFont();
-        Map attributes = font.getAttributes();
-        attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-        faqLabel.setFont(font.deriveFont(attributes));
-        faqLabel.setForeground(Color.BLUE.darker());
-        faqLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        faqLabel.setEditable(false);
-        faqLabel.setBackground(null);
-        faqLabel.setBorder(null);
-        faqLabel.addMouseListener(new MouseAdapter() {
-          @Override
-          public void mouseClicked(MouseEvent e) {
-            try {
-              Desktop.getDesktop().browse(new URI(faqLink));
-            } catch(IOException | URISyntaxException ioException) {
-              ioException.printStackTrace();
-            }
-          }
-        });
-      } else {
-        faqLabel = new JTextField(String.format("%s: %s", faqMessage, faqLink));
-        faqLabel.setEditable(false);
-        faqLabel.setBackground(null);
-        faqLabel.setBorder(null);
-        faqLabel.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
-      }
-      Object[] dialogContent = {
-        Arrays.stream(errorMessages).map(msg -> {
-          JTextField field = new JTextField(msg);
-          field.setEditable(false);
-          field.setBackground(null);
-          field.setBorder(null);
-          field.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
-          return field;
-        }).toArray(),
-        faqLabel
-      };
-      JOptionPane.showMessageDialog(null, dialogContent, "Cannot find JavaFX", JOptionPane.ERROR_MESSAGE);
+      JTextField error = new JTextField("Error installing JavaFX: " + e.getMessage());
+      error.setEditable(false);
+      error.setBackground(null);
+      error.setBorder(null);
+      error.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
+
+      JLabel help = getLinkLabel();
+
+      JOptionPane.showMessageDialog(null, new Object[] {
+        error, help
+      }, "Cannot find JavaFX", JOptionPane.ERROR_MESSAGE);
     }
-    for(String message : errorMessages) {
-      System.err.println(message);
-    }
-    System.err.printf("%s: %s\n", faqMessage, faqLink);
+    System.err.println(e.getMessage());
+    System.err.println("For more information see: " + HELP_LINK);
   }
 }

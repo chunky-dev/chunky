@@ -91,6 +91,9 @@ public class JavaFxDownloads {
     return o;
   }
 
+  /**
+   * Parse a json object for the download list.
+   */
   public static Os[] parse(JsonArray objs) throws SyntaxException {
     ArrayList<Os> out = new ArrayList<>();
     for (JsonValue value : objs.elements) {
@@ -100,6 +103,9 @@ public class JavaFxDownloads {
     return out.toArray(new Os[0]);
   }
 
+  /**
+   * Parse an input stream for the download list.
+   */
   public static Os[] parse(InputStream is) throws SyntaxException, IOException {
     try (JsonParser parser = new JsonParser(is)) {
       JsonValue value = parser.parse();
@@ -110,6 +116,9 @@ public class JavaFxDownloads {
     }
   }
 
+  /**
+   * Fet the download list from a URL.
+   */
   public static Os[] fetch(URL url) throws SyntaxException, IOException {
     // Follow redirects
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
