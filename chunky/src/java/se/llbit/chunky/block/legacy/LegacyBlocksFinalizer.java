@@ -26,15 +26,14 @@ public class LegacyBlocksFinalizer {
   public static void finalizeChunk(Octree worldTree, Octree waterTree, BlockPalette palette,
       Vector3i origin, ChunkPosition cp, int yMin, int yMax) {
     OctreeFinalizationState finalizerState = new OctreeFinalizationState(worldTree, waterTree,
-        palette, yMin, yMax);
+        palette, yMin, yMax, origin);
     for (int cy = yMin; cy < yMax; ++cy) {
-      int y = cy - origin.y;
       for (int cz = 0; cz < 16; ++cz) {
-        int z = cz + cp.z * 16 - origin.z;
+        int z = cz + cp.z * 16;
         for (int cx = 0; cx < 16; ++cx) {
-          int x = cx + cp.x * 16 - origin.x;
+          int x = cx + cp.x * 16;
           // TODO as in 1.13+ finalization we could finalize non-edge blocks during chunk loading
-          finalizerState.setPosition(x, y, z);
+          finalizerState.setPosition(x, cy, z);
           Material mat = finalizerState.getMaterial();
           if (mat instanceof UnfinalizedLegacyBlock) {
             ((UnfinalizedLegacyBlock) mat).finalizeBlock(finalizerState);

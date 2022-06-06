@@ -371,34 +371,6 @@ public class Chunk {
     }
   }
 
-  public static int waterLevelAt(ChunkData chunkData, BlockPalette palette, int cx, int cy, int cz,
-                                 int baseLevel) {
-    Material corner = palette.get(chunkData.getBlockAt(cx, cy, cz));
-    if (corner.isWater()) {
-      Material above = palette.get(chunkData.getBlockAt(cx, cy+1, cz));
-      boolean isFullBlock = above.isWaterFilled();
-      return isFullBlock ? 8 : 8 - ((Water) corner).level;
-    } else if (corner.waterlogged) {
-      return 8;
-    } else if (!corner.solid) {
-      return 0;
-    }
-    return baseLevel;
-  }
-
-  public static int lavaLevelAt(ChunkData chunkData, BlockPalette palette, int cx, int cy, int cz,
-                                int baseLevel) {
-    Material corner = palette.get(chunkData.getBlockAt(cx, cy, cz));
-    if (corner instanceof Lava) {
-      Material above = palette.get(chunkData.getBlockAt(cx, cy+1, cz));
-      boolean isFullBlock = above instanceof Lava;
-      return isFullBlock ? 8 : 8 - ((Lava) corner).level;
-    } else if (!corner.solid) {
-      return 0;
-    }
-    return baseLevel;
-  }
-
   /**
    * @return <code>true</code> if this is an empty (non-existing) chunk
    */
