@@ -372,10 +372,20 @@ public class JavaFxInstaller {
       error.setBorder(null);
       error.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
 
+      JTextField setup = new JTextField(String.format(
+        "Detected computer configuration: %s %s",
+        System.getProperty("os.name"),
+        System.getProperty("os.arch")
+      ));
+      setup.setEditable(false);
+      setup.setBackground(null);
+      setup.setBorder(null);
+      setup.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
+
       JLabel help = getLinkLabel();
 
       JOptionPane.showMessageDialog(null, new Object[] {
-        error, help
+        error, setup, help
       }, "Cannot find JavaFX", JOptionPane.ERROR_MESSAGE);
     }
     System.err.println(e.getMessage());
