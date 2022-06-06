@@ -17,17 +17,15 @@
 
 package se.llbit.chunky.launcher;
 
-import se.llbit.util.OSDetector;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.font.TextAttribute;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -44,14 +42,15 @@ import java.util.zip.ZipInputStream;
 public class JavaFxInstaller {
 
   private static final String HELP_LINK = "https://chunky.lemaik.de/java11";
+  private static final String JAVAFX_JSON = "javafx.json";
 
-  private final OSDetector.OS os = OSDetector.getOS();
-  private final String arch = System.getProperty("os.arch").toLowerCase();
+  private final JavaFxDownloads.Os[] downloads;
   private final Path target;
-  private URL updateSite;
-  private URL fxDownload;
+  private String updateSite;
 
   private JFrame window = null;
+  private boolean complete = false;
+  private boolean exiting = false;
 
   private static class InstallationException extends Exception {
     public InstallationException(String message) {
@@ -69,17 +68,23 @@ public class JavaFxInstaller {
     }
 
     // Get update site
-    try {
-      if (settings == null) {
-        updateSite = new URL(LauncherSettings.DEFAULT_UPDATE_SITE);
-      } else {
-        updateSite = new URL(settings.updateSite);
-      }
-    } catch (MalformedURLException e) {
-      throw new InstallationException("Invalid update site: " + e);
+    String site;
+    if (settings == null) {
+      site = LauncherSettings.DEFAULT_UPDATE_SITE;
+    } else {
+      site = settings.updateSite;
+    }
+    if (site.endsWith("/")) {
+      updateSite = site + JAVAFX_JSON;
+    } else {
+      updateSite = site + "/" + JAVAFX_JSON;
     }
 
-    findFxDownload();
+    try {
+      downloads = JavaFxDownloads.fetch(new URL(updateSite));
+    } catch (JavaFxDownloads.SyntaxException | IOException e) {
+      throw new InstallationException("Failed to fetch download links: " + e);
+    }
 
     showInstallDialog();
   }
@@ -99,17 +104,22 @@ public class JavaFxInstaller {
         }
       } catch (InterruptedException ignored) {}
 
+      if (instance.exiting) {
+        return;
+      }
+
       // Success?
+      instance.close();
       JavaFxLocator.retryWithJavafx(args);
     } catch (InstallationException e) {
       showJavafxError(e);
     }
   }
 
-  private void downloadAndInstall() throws InstallationException {
+  private void downloadAndInstall(URL download) {
     // Zip extraction code from
     // https://mkyong.com/java/how-to-decompress-files-from-a-zip-file/
-    try (ZipInputStream zis = new ZipInputStream(fxDownload.openStream())) {
+    try (ZipInputStream zis = new ZipInputStream(download.openStream())) {
       ZipEntry entry = zis.getNextEntry();
       while (entry != null) {
         boolean isDirectory = entry.getName().endsWith("/") || entry.getName().endsWith("\\");
@@ -132,15 +142,25 @@ public class JavaFxInstaller {
         }
 
         entry = zis.getNextEntry();
+
+        if (exiting) {
+          cleanupTarget();
+          return;
+        }
       }
       zis.closeEntry();
-    } catch (IOException ex) {
+    } catch (IOException | InstallationException ex) {
       try {
         cleanupTarget();
       } catch (IOException ignored) {
         System.err.println("Could not clean up target directory.");
       }
-      throw new InstallationException(ex.getMessage());
+      showJavafxError(new InstallationException(ex.getMessage()));
+    }
+
+    synchronized (this) {
+      this.complete = true;
+      this.notifyAll();
     }
   }
 
@@ -152,21 +172,20 @@ public class JavaFxInstaller {
     assert !target.toFile().exists();
   }
 
-  private void findFxDownload() throws InstallationException {
-    try {
-      fxDownload = new URL("https://download2.gluonhq.com/openjfx/17.0.2/openjfx-17.0.2_windows-x64_bin-sdk.zip");
-    } catch (MalformedURLException e) {
-      throw new InstallationException(e.getMessage());
-    }
-  }
-
   private void showInstallDialog() throws InstallationException {
     Image chunkyImage = Toolkit.getDefaultToolkit().getImage(getClass().getResource(
       "/se/llbit/chunky/launcher/ui/chunky-cfg.png"));
 
     JFrame window = new JFrame("Install JavaFX");
-    window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     window.setIconImage(chunkyImage);
+
+    window.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(WindowEvent e) {
+        exiting = true;
+      }
+    });
 
     JPanel textPanel = new JPanel();
     textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
@@ -190,7 +209,7 @@ public class JavaFxInstaller {
     textPanel.add(new JLabel(" "));
 
     // Computer configuration
-    textPanel.add(new JLabel("Detected computer configuration:"));
+    textPanel.add(new JLabel("Computer configuration:"));
 
     JPanel compPanel = new JPanel();
     compPanel.setLayout(new GridLayout(2, 3));
@@ -198,11 +217,40 @@ public class JavaFxInstaller {
 
     compPanel.add(new JLabel("    "));
     compPanel.add(new JLabel("OS:"));
-    compPanel.add(new JLabel(String.valueOf(os)));
+
+    JComboBox<String> osCombo = new JComboBox<>();
+    compPanel.add(osCombo);
+
+    Arrays.stream(downloads).forEach(os -> osCombo.addItem(os.name));
+    osCombo.setSelectedIndex(0);
+    for (JavaFxDownloads.Os os : downloads) {
+      if (os.doesMatch(System.getProperty("os.name"))) {
+        osCombo.setSelectedItem(os.name);
+        break;
+      }
+    }
 
     compPanel.add(new JLabel("    "));
     compPanel.add(new JLabel("Arch:"));
-    compPanel.add(new JLabel(arch));
+
+    JComboBox<String> archCombo = new JComboBox<>();
+    compPanel.add(archCombo);
+
+    osCombo.addActionListener(e -> {
+      JavaFxDownloads.Os selected = downloads[osCombo.getSelectedIndex()];
+
+      archCombo.removeAllItems();
+      Arrays.stream(selected.archs).forEach(arch -> archCombo.addItem(arch.name));
+
+      archCombo.setSelectedIndex(0);
+      for (JavaFxDownloads.Arch arch : selected.archs) {
+        if (arch.doesMatch(System.getProperty("os.arch"))) {
+          archCombo.setSelectedItem(arch);
+          break;
+        }
+      }
+    });
+    osCombo.setSelectedIndex(osCombo.getSelectedIndex());
 
     // Spacer
     textPanel.add(new JLabel(" "));
@@ -220,18 +268,14 @@ public class JavaFxInstaller {
     JButton downloadButton = new JButton("Download and Install");
     textPanel.add(downloadButton);
     downloadButton.addActionListener(e -> {
-      try {
-        this.downloadAndInstall();
-        window.setVisible(false);
-        window.dispose();
-      } catch (InstallationException ex) {
-        window.setVisible(false);
-        window.dispose();
-        showJavafxError(ex);
-      }
-      synchronized (this) {
-        this.notifyAll();
-      }
+      JavaFxDownloads.Os os = downloads[osCombo.getSelectedIndex()];
+      JavaFxDownloads.Arch arch = os.archs[archCombo.getSelectedIndex()];
+      new Thread(() -> this.downloadAndInstall(arch.url)).start();
+
+      osCombo.setEnabled(false);
+      archCombo.setEnabled(false);
+      downloadButton.setEnabled(false);
+      downloadButton.setText("Downloading...");
     });
 
     // Spacer
@@ -254,7 +298,22 @@ public class JavaFxInstaller {
     if (this.window == null) {
       return false;
     }
+    if (this.complete) {
+      return true;
+    }
+    if (this.exiting) {
+      return true;
+    }
     return !this.window.isVisible();
+  }
+
+  private void close() {
+    window.setVisible(false);
+    window.dispose();
+    synchronized (this) {
+      this.complete = true;
+      this.notifyAll();
+    }
   }
 
   private static JLabel getLinkLabel() {
