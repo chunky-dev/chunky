@@ -16,18 +16,15 @@
  */
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 
-public class TallGrassModel extends SpriteModel {
+public class GrassTintedSpriteModel extends SpriteModel {
 
   private static final Tint[] tinting = new Tint[]{
-      Tint.BIOME_GRASS, Tint.BIOME_GRASS, Tint.BIOME_GRASS, Tint.BIOME_GRASS
+    Tint.BIOME_GRASS, Tint.BIOME_GRASS, Tint.BIOME_GRASS, Tint.BIOME_GRASS
   };
 
-  public TallGrassModel(Texture texture) {
+  public GrassTintedSpriteModel(Texture texture) {
     super(texture);
   }
 

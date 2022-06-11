@@ -1,5 +1,5 @@
-/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
- * Copyright (c) 2012-2021 Chunky contributors
+/* Copyright (c) 2012-2022 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2022 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -70,8 +70,6 @@ import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
-import se.llbit.chunky.renderer.scene.biome.Trivial2dBiomeStructureImpl;
-import se.llbit.chunky.renderer.scene.biome.Trivial3dBiomeStructureImpl;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.biome.ArrayBiomePalette;
@@ -226,7 +224,8 @@ public class Scene implements JsonSerializable, Refreshable {
   protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
   protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.NONE;
 
-  protected boolean sunEnabled = true;
+  protected SunSamplingStrategy sunSamplingStrategy = SunSamplingStrategy.FAST;
+
   /**
    * Water opacity modifier.
    */
@@ -489,7 +488,7 @@ public class Scene implements JsonSerializable, Refreshable {
     waterColor.set(other.waterColor);
     fogColor.set(other.fogColor);
     biomeColors = other.biomeColors;
-    sunEnabled = other.sunEnabled;
+    sunSamplingStrategy = other.sunSamplingStrategy;
     emittersEnabled = other.emittersEnabled;
     emitterIntensity = other.emitterIntensity;
     emitterSamplingStrategy = other.emitterSamplingStrategy;
@@ -660,13 +659,6 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * @return <code>true</code> if sunlight is enabled
-   */
-  public boolean getDirectLight() {
-    return sunEnabled;
-  }
-
-  /**
    * Set emitters enable flag.
    */
   public synchronized void setEmittersEnabled(boolean value) {
@@ -677,13 +669,20 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Set sunlight enable flag.
+   * Set sun sampling strategy.
    */
-  public synchronized void setDirectLight(boolean value) {
-    if (value != sunEnabled) {
-      sunEnabled = value;
+  public synchronized void setSunSamplingStrategy(SunSamplingStrategy strategy) {
+    if (strategy != this.sunSamplingStrategy) {
+      this.sunSamplingStrategy = strategy;
       refresh();
     }
+  }
+
+  /**
+   * Get sun sampling strategy.
+   */
+  public SunSamplingStrategy getSunSamplingStrategy() {
+    return this.sunSamplingStrategy;
   }
 
   /**
@@ -2720,7 +2719,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("saveSnapshots", saveSnapshots);
     json.add("emittersEnabled", emittersEnabled);
     json.add("emitterIntensity", emitterIntensity);
-    json.add("sunEnabled", sunEnabled);
+    json.add("sunSamplingStrategy", sunSamplingStrategy.getId());
     json.add("stillWater", stillWater);
     json.add("waterOpacity", waterOpacity);
     json.add("waterVisibility", waterVisibility);
@@ -3008,7 +3007,29 @@ public class Scene implements JsonSerializable, Refreshable {
     saveSnapshots = json.get("saveSnapshots").boolValue(saveSnapshots);
     emittersEnabled = json.get("emittersEnabled").boolValue(emittersEnabled);
     emitterIntensity = json.get("emitterIntensity").doubleValue(emitterIntensity);
-    sunEnabled = json.get("sunEnabled").boolValue(sunEnabled);
+
+    if (json.get("sunSamplingStrategy").isUnknown()) {
+      boolean sunSampling = json.get("sunEnabled").boolValue(false);
+      boolean drawSun = json.get("sun").asObject().get("drawTexture").boolValue(false);
+      if (drawSun) {
+        if (sunSampling) {
+          sunSamplingStrategy = SunSamplingStrategy.FAST;
+        } else {
+          sunSamplingStrategy = SunSamplingStrategy.NON_LUMINOUS;
+        }
+      } else {
+        sunSamplingStrategy = SunSamplingStrategy.FAST;
+      }
+    } else {
+      sunSamplingStrategy = SunSamplingStrategy.valueOf(json.get("sunSamplingStrategy").asString(SunSamplingStrategy.FAST.getId()));
+    }
+
+    if (json.get("sunEnabled").boolValue(false)) {
+      sunSamplingStrategy = SunSamplingStrategy.FAST;
+    } else {
+      sunSamplingStrategy = SunSamplingStrategy.valueOf(json.get("sunSamplingStrategy").asString(SunSamplingStrategy.FAST.getId()));
+    }
+
     stillWater = json.get("stillWater").boolValue(stillWater);
     waterOpacity = json.get("waterOpacity").doubleValue(waterOpacity);
     waterVisibility = json.get("waterVisibility").doubleValue(waterVisibility);

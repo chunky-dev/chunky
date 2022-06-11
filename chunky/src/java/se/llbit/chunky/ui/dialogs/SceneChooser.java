@@ -20,10 +20,10 @@ package se.llbit.chunky.ui.dialogs;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import se.llbit.chunky.ui.Icons;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.ui.controller.SceneChooserController;
 
@@ -37,7 +37,7 @@ public class SceneChooser extends Stage {
     Parent root = loader.load();
     SceneChooserController controller = loader.getController();
     setTitle("Load Chunky Scene");
-    getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
+    getIcons().add(Icons.CHUNKY_ICON);
     setScene(new Scene(root));
     controller.setController(chunkyFxController);
     controller.setStage(this);

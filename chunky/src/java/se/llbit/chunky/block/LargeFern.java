@@ -1,6 +1,6 @@
 package se.llbit.chunky.block;
 
-import se.llbit.chunky.model.TallGrassModel;
+import se.llbit.chunky.model.GrassTintedSpriteModel;
 import se.llbit.chunky.resources.Texture;
 
 public class LargeFern extends AbstractModelBlock {
@@ -11,6 +11,6 @@ public class LargeFern extends AbstractModelBlock {
             ? Texture.largeFernTop
             : Texture.largeFernBottom);
     solid = false;
-    model = new TallGrassModel(texture);
+    model = new GrassTintedSpriteModel(texture);
   }
 }
