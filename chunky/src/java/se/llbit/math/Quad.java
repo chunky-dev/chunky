@@ -16,12 +16,11 @@
  */
 package se.llbit.math;
 
-import java.util.Collection;
-
 import se.llbit.chunky.world.Material;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.math.primitive.TexturedTriangle;
 
+import java.util.Collection;
 
 /**
  * A quad.
@@ -30,10 +29,18 @@ import se.llbit.math.primitive.TexturedTriangle;
  */
 public class Quad {
 
-  protected Vector3 o = new Vector3();
-  protected Vector3 xv = new Vector3();
-  protected Vector3 yv = new Vector3();
-  protected Vector4 uv = new Vector4();
+  /**
+   * Note: This is public for some plugins. Stability is not guaranteed.
+   */
+  public Vector3 o = new Vector3();
+  public Vector3 xv = new Vector3();
+  public Vector3 yv = new Vector3();
+  public Vector4 uv = new Vector4();
+
+  /**
+   * True if this quad is double-sided.
+   */
+  public final boolean doubleSided;
 
   /**
    * Normal vector
@@ -46,6 +53,7 @@ public class Quad {
    * Create new Quad by copying another quad and applying a transform.
    */
   public Quad(Quad other, Transform t) {
+    this.doubleSided = other.doubleSided;
     o.set(other.o);
     o.x -= .5;
     o.y -= .5;
@@ -70,6 +78,7 @@ public class Quad {
    * Create transformed Quad
    */
   public Quad(Quad other, Matrix3 t) {
+    this.doubleSided = other.doubleSided;
     o.set(other.o);
     o.x -= .5;
     o.y -= .5;
@@ -91,7 +100,7 @@ public class Quad {
   }
 
   /**
-   * Create new quad
+   * Create a new single sided quad
    *
    * @param v0 Bottom left vector
    * @param v1 Top right vector
@@ -99,6 +108,21 @@ public class Quad {
    * @param uv Minimum and maximum U/V texture coordinates
    */
   public Quad(Vector3 v0, Vector3 v1, Vector3 v2, Vector4 uv) {
+    this(v0, v1, v2, uv, false);
+  }
+
+
+  /**
+   * Create new quad
+   *
+   * @param v0          Bottom left vector
+   * @param v1          Top right vector
+   * @param v2          Bottom right vector
+   * @param uv          Minimum and maximum U/V texture coordinates
+   * @param doubleSided True to make this quad double-sided
+   */
+  public Quad(Vector3 v0, Vector3 v1, Vector3 v2, Vector4 uv, boolean doubleSided) {
+    this.doubleSided = doubleSided;
     o.set(v0);
     xv.sub(v1, v0);
     xvl = 1 / xv.lengthSquared();
@@ -126,7 +150,7 @@ public class Quad {
 
     // Test that the ray is heading toward the plane of this quad.
     double denom = ray.d.dot(n);
-    if (denom < -Ray.EPSILON) {
+    if (denom < -Ray.EPSILON || (doubleSided && denom > Ray.EPSILON)) {
 
       // Test for intersection with the plane at origin.
       double t = -(ix * n.x + iy * n.y + iz * n.z + d) / denom;
@@ -162,7 +186,7 @@ public class Quad {
   }
 
   public void addTriangles(Collection<Primitive> primitives, Material material,
-      Transform transform) {
+                           Transform transform) {
     Vector3 c0 = new Vector3(o);
     Vector3 c1 = new Vector3();
     Vector3 c2 = new Vector3();
@@ -179,9 +203,9 @@ public class Quad {
     double v0 = uv.z;
     double v1 = uv.z + uv.w;
     primitives.add(new TexturedTriangle(c0, c2, c1, new Vector2(u0, v0), new Vector2(u0, v1),
-        new Vector2(u1, v0), material, false));
+      new Vector2(u1, v0), material, doubleSided));
     primitives.add(new TexturedTriangle(c1, c2, c3, new Vector2(u1, v0), new Vector2(u0, v1),
-        new Vector2(u1, v1), material, false));
+      new Vector2(u1, v1), material, doubleSided));
   }
 
   /**
