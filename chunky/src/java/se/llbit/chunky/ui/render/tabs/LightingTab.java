@@ -1,4 +1,5 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2022 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2022 Chunky Contributors
  *
  * This file is part of Chunky.
  *
@@ -21,16 +22,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
+import se.llbit.chunky.renderer.SunSamplingStrategy;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.chunky.renderer.scene.Sun;
@@ -54,11 +51,12 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster skyIntensity;
   @FXML private DoubleAdjuster emitterIntensity;
   @FXML private DoubleAdjuster sunIntensity;
+  @FXML private CheckBox drawSun;
+  @FXML private ComboBox<SunSamplingStrategy> sunSamplingStrategy;
+  @FXML private DoubleAdjuster sunLuminosity;
   @FXML private AngleAdjuster sunAzimuth;
   @FXML private AngleAdjuster sunAltitude;
   @FXML private CheckBox enableEmitters;
-  @FXML private CheckBox enableSunlight;
-  @FXML private CheckBox drawSun;
   @FXML private LuxColorPicker sunColor;
   @FXML private ChoiceBox<EmitterSamplingStrategy> emitterSamplingStrategy;
 
@@ -87,12 +85,27 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     emitterIntensity.clampMin();
     emitterIntensity.onValueChange(value -> scene.setEmitterIntensity(value));
 
+    drawSun.selectedProperty().addListener((observable, oldValue, newValue) -> scene.sun().setDrawTexture(newValue));
+    drawSun.setTooltip(new Tooltip("Draws the sun texture on top of the skymap."));
+
+    sunSamplingStrategy.getItems().addAll(SunSamplingStrategy.values());
+    sunSamplingStrategy.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldValue, newValue) -> scene.setSunSamplingStrategy(newValue));
+    sunSamplingStrategy.setTooltip(new Tooltip("Determine how the sun is sampled at each bounce."));
+
     sunIntensity.setName("Sun intensity");
-    sunIntensity.setTooltip("Sunlight intensity modifier");
+    sunIntensity.setTooltip("Intensity of the sun on the scene.");
     sunIntensity.setRange(Sun.MIN_INTENSITY, Sun.MAX_INTENSITY);
     sunIntensity.makeLogarithmic();
     sunIntensity.clampMin();
     sunIntensity.onValueChange(value -> scene.sun().setIntensity(value));
+
+    sunLuminosity.setName("Sun luminosity");
+    sunLuminosity.setTooltip("Absolute brightness of the sun. Used when fast sun sampling is disabled.");
+    sunLuminosity.setRange(1, 10000);
+    sunLuminosity.makeLogarithmic();
+    sunLuminosity.clampMin();
+    sunLuminosity.onValueChange(value -> scene.sun().setLuminosity(value));
 
     sunAzimuth.setName("Sun azimuth");
     sunAzimuth.setTooltip("Change the angle to the sun from north.");
@@ -104,11 +117,6 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
 
     enableEmitters.selectedProperty().addListener(
         (observable, oldValue, newValue) -> scene.setEmittersEnabled(newValue));
-    enableSunlight.selectedProperty().addListener(
-        (observable, oldValue, newValue) -> scene.setDirectLight(newValue));
-    drawSun.selectedProperty().addListener(
-        (observable, oldValue, newValue) -> scene.sun().setDrawTexture(newValue));
-    drawSun.setTooltip(new Tooltip("Draws the sun texture on top of the skymap."));
 
     sunColor.colorProperty().addListener(sunColorListener);
 
@@ -142,10 +150,11 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     skyIntensity.set(scene.sky().getSkyLight());
     emitterIntensity.set(scene.getEmitterIntensity());
     sunIntensity.set(scene.sun().getIntensity());
+    sunLuminosity.set(scene.sun().getLuminosity());
     sunAzimuth.set(-QuickMath.radToDeg(scene.sun().getAzimuth()));
     sunAltitude.set(QuickMath.radToDeg(scene.sun().getAltitude()));
     enableEmitters.setSelected(scene.getEmittersEnabled());
-    enableSunlight.setSelected(scene.getDirectLight());
+    sunSamplingStrategy.getSelectionModel().select(scene.getSunSamplingStrategy());
     drawSun.setSelected(scene.sun().drawTexture());
     sunColor.colorProperty().removeListener(sunColorListener);
     sunColor.setColor(ColorUtil.toFx(scene.sun().getColor()));

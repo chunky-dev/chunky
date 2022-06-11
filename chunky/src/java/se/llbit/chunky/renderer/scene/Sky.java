@@ -1,5 +1,5 @@
-/* Copyright (c) 2012 - 2021 Jesper Öqvist <jesper@llbit.se>
- * Copyright (c) 2012 - 2021 Chunky contributors
+/* Copyright (c) 2012 - 2022 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012 - 2022 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -19,6 +19,7 @@ package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.Air;
+import se.llbit.chunky.renderer.SunSamplingStrategy;
 import se.llbit.chunky.resources.HDRTexture;
 import se.llbit.chunky.resources.PFMTexture;
 import se.llbit.chunky.resources.Texture;
@@ -346,9 +347,10 @@ public class Sky implements JsonSerializable {
   /**
    * Panoramic skymap color.
    */
-  public void getSkyColor(Ray ray) {
+  public void getSkyColor(Ray ray, boolean drawSun) {
     getSkyDiffuseColorInner(ray);
     ray.color.scale(skyLightModifier);
+    if (drawSun) addSunColor(ray);
     ray.color.w = 1;
   }
 
@@ -436,14 +438,6 @@ public class Sky implements JsonSerializable {
   }
 
   /**
-   * Get the specular sky color for the ray.
-   */
-  public void getSkySpecularColor(Ray ray) {
-    getSkyColor(ray);
-    addSunColor(ray);
-  }
-
-  /**
    * Add sun color contribution. This does not alpha blend the sun color
    * because the Minecraft sun texture has no alpha channel.
    */
@@ -452,10 +446,12 @@ public class Sky implements JsonSerializable {
     double g = ray.color.y;
     double b = ray.color.z;
     if (scene.sun().intersect(ray)) {
+      double mult = scene.getSunSamplingStrategy().isSunLuminosity() ? scene.sun().getLuminosity() : 1;
+
       // Blend sun color with current color.
-      ray.color.x = ray.color.x + r;
-      ray.color.y = ray.color.y + g;
-      ray.color.z = ray.color.z + b;
+      ray.color.x = ray.color.x * mult + r;
+      ray.color.y = ray.color.y * mult + g;
+      ray.color.z = ray.color.z * mult + b;
     }
   }
 

@@ -1,4 +1,5 @@
 /* Copyright (c) 2013-2015 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2013-2022 Chunky Contributors
  *
  * This file is part of Chunky.
  *
@@ -21,6 +22,7 @@ import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
+import se.llbit.chunky.renderer.SunSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.*;
@@ -80,12 +82,12 @@ public class PathTracer implements RayTracer {
           }
         } else if (ray.specular) {
           // Indirect sky hit - specular color.
-          scene.sky.getSkySpecularColor(ray);
+          scene.sky.getSkyColor(ray, true);
           scene.addSkyFog(ray);
           hit = true;
         } else {
           // Indirect sky hit - diffuse color.
-          scene.sky.getSkyColor(ray);
+          scene.sky.getSkyColor(ray, scene.getSunSamplingStrategy().isDiffuseSun());
           // Skip sky fog - likely not noticeable in diffuse reflection.
           hit = true;
         }
@@ -191,7 +193,7 @@ public class PathTracer implements RayTracer {
               }
             }
 
-            if (scene.sunEnabled) {
+            if (scene.sun().drawTexture() && scene.getSunSamplingStrategy().doSunSampling()) {
               reflected.set(ray);
               scene.sun.getRandomSunDirection(reflected, random);
 
@@ -214,7 +216,7 @@ public class PathTracer implements RayTracer {
 
                 Vector4 attenuation = state.attenuation;
                 if (attenuation.w > 0) {
-                  double mult = QuickMath.abs(reflected.d.dot(ray.getNormal()));
+                  double mult = QuickMath.abs(reflected.d.dot(ray.getNormal())) * (scene.getSunSamplingStrategy().isSunLuminosity() ? scene.sun().getLuminosityPdf() : 1);
                   directLightR = attenuation.x * attenuation.w * mult;
                   directLightG = attenuation.y * attenuation.w * mult;
                   directLightB = attenuation.z * attenuation.w * mult;
@@ -508,6 +510,9 @@ public class PathTracer implements RayTracer {
           double a = ray.distance / scene.waterVisibility;
           attenuation.w *= Math.exp(-a);
         }
+      }
+      if (scene.getSunSamplingStrategy().isStrictDirectLight() && ray.getPrevMaterial().ior != ray.getCurrentMaterial().ior) {
+        attenuation.w = 0;
       }
     }
   }
