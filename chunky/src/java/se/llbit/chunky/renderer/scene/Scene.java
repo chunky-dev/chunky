@@ -230,7 +230,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
   protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.NONE;
 
-  protected SunSamplingStrategy sunSamplingStrategy = SunSamplingStrategy.Fast;
+  protected SunSamplingStrategy sunSamplingStrategy = SunSamplingStrategy.FAST;
 
   /**
    * Water opacity modifier.
@@ -2903,21 +2903,21 @@ public class Scene implements JsonSerializable, Refreshable {
       boolean drawSun = json.get("sun").asObject().get("drawTexture").boolValue(false);
       if (drawSun) {
         if (sunSampling) {
-          sunSamplingStrategy = SunSamplingStrategy.Fast;
+          sunSamplingStrategy = SunSamplingStrategy.FAST;
         } else {
-          sunSamplingStrategy = SunSamplingStrategy.NonLuminous;
+          sunSamplingStrategy = SunSamplingStrategy.NON_LUMINOUS;
         }
       } else {
-        sunSamplingStrategy = SunSamplingStrategy.Fast;
+        sunSamplingStrategy = SunSamplingStrategy.FAST;
       }
     } else {
-      sunSamplingStrategy = SunSamplingStrategy.valueOf(json.get("sunSamplingStrategy").asString(SunSamplingStrategy.Fast.getId()));
+      sunSamplingStrategy = SunSamplingStrategy.valueOf(json.get("sunSamplingStrategy").asString(SunSamplingStrategy.FAST.getId()));
     }
 
     if (json.get("sunEnabled").boolValue(false)) {
-      sunSamplingStrategy = SunSamplingStrategy.Fast;
+      sunSamplingStrategy = SunSamplingStrategy.FAST;
     } else {
-      sunSamplingStrategy = SunSamplingStrategy.valueOf(json.get("sunSamplingStrategy").asString(SunSamplingStrategy.Fast.getId()));
+      sunSamplingStrategy = SunSamplingStrategy.valueOf(json.get("sunSamplingStrategy").asString(SunSamplingStrategy.FAST.getId()));
     }
 
     stillWater = json.get("stillWater").boolValue(stillWater);
