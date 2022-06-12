@@ -355,6 +355,11 @@ public class Scene implements JsonSerializable, Refreshable {
   private boolean preventNormalEmitterWithSampling = PersistentSettings.getPreventNormalEmitterWithSampling();
 
   /**
+   * Hide unknown blocks. This is done at intersection time, the unknown blocks are still in the octree.
+   */
+  private boolean hideUnknownBlocks = false;
+
+  /**
    * The octree implementation to use
    */
   private String octreeImplementation = PersistentSettings.getOctreeImplementation();
@@ -509,6 +514,8 @@ public class Scene implements JsonSerializable, Refreshable {
     waterPlaneOffsetEnabled = other.waterPlaneOffsetEnabled;
     waterPlaneChunkClip = other.waterPlaneChunkClip;
     waterShading = other.waterShading.clone();
+
+    hideUnknownBlocks = other.hideUnknownBlocks;
 
     spp = other.spp;
     renderTime = other.renderTime;
@@ -2747,6 +2754,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("waterWorldHeightOffsetEnabled", waterPlaneOffsetEnabled);
     json.add("waterWorldClipEnabled", waterPlaneChunkClip);
     json.add("renderActors", renderActors);
+    json.add("hideUnknownBlocks", hideUnknownBlocks);
 
     if (!worldPath.isEmpty()) {
       // Save world info.
@@ -3074,6 +3082,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     renderActors = json.get("renderActors").boolValue(renderActors);
+    hideUnknownBlocks = json.get("hideUnknownBlocks").boolValue(hideUnknownBlocks);
     materials = json.get("materials").object().copy().toMap();
 
     // Load world info.
@@ -3552,5 +3561,13 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void setWaterShading(WaterShader waterShading) {
     this.waterShading = waterShading;
+  }
+
+  public boolean getHideUnknownBlocks() {
+    return this.hideUnknownBlocks;
+  }
+
+  public void setHideUnknownBlocks(boolean hideUnknownBlocks) {
+    this.hideUnknownBlocks = hideUnknownBlocks;
   }
 }
