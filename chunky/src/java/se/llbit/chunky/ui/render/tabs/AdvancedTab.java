@@ -285,7 +285,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     gridSize.set(scene.getGridSize());
     preventNormalEmitterWithSampling.setSelected(scene.isPreventNormalEmitterWithSampling());
     animationTime.set(scene.getAnimationTime());
-    hideUnknownBlocks.setSelected((scene.getHideUnknownBlocks()));
+    hideUnknownBlocks.setSelected(scene.getHideUnknownBlocks());
     rendererSelect.getSelectionModel().select(scene.getRenderer());
     previewSelect.getSelectionModel().select(scene.getPreviewRenderer());
   }
