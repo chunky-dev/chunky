@@ -355,6 +355,11 @@ public class Scene implements JsonSerializable, Refreshable {
   private boolean preventNormalEmitterWithSampling = PersistentSettings.getPreventNormalEmitterWithSampling();
 
   /**
+   * Hide unknown blocks. This is done at intersection time, the unknown blocks are still in the octree.
+   */
+  private boolean hideUnknownBlocks = false;
+
+  /**
    * The octree implementation to use
    */
   private String octreeImplementation = PersistentSettings.getOctreeImplementation();
@@ -368,11 +373,6 @@ public class Scene implements JsonSerializable, Refreshable {
    * The BiomeStructure implementation to use
    */
   private String biomeStructureImplementation = PersistentSettings.getBiomeStructureImplementation();
-
-  /**
-   * Hide unknown blocks. This is done at intersection time, the unknown blocks are still in the octree.
-   */
-  private boolean hideUnknownBlocks = true;
 
   /**
    * Additional data that is associated with a scene, this can be used by plugins
