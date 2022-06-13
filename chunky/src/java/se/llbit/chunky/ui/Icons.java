@@ -108,10 +108,10 @@ public class Icons {
       return this;
     }
 
-    public IconBuilder setAsGraphic(Labeled labeled) {
-      return setAsGraphic(labeled, false);
+    public IconBuilder setAsGraphicOn(Labeled labeled) {
+      return setAsGraphicOn(labeled, false);
     }
-    public IconBuilder setAsGraphic(Labeled labeled, boolean noPadding) {
+    public IconBuilder setAsGraphicOn(Labeled labeled, boolean noPadding) {
       labeled.setGraphic(svgPath);
       if(noPadding)
         labeled.setPadding(Insets.EMPTY);

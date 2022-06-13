@@ -27,7 +27,7 @@
     </columnConstraints>
 
     <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
-      <Label text="Available Resource Packs" style="-fx-font-weight: bold"/>
+      <Label text="Available Resource Packs" style="-fx-font-weight: bold" />
       <Label text="from your Minecraft installation" />
     </VBox>
     <ListView fx:id="availablePacksListView" GridPane.columnIndex="0" GridPane.rowIndex="1" />
@@ -43,21 +43,21 @@
           <Tooltip text="Remove all selected resource packs from the selected resource packs list" />
         </tooltip>
       </Button>
-      <Button fx:id="addNewTargetPackBtn" prefWidth="26" prefHeight="26" mnemonicParsing="false">
-        <tooltip>
-          <Tooltip text="Browse for a resource pack from outside the default resource pack folder and add it to the selected resource packs list" />
-        </tooltip>
-      </Button>
     </VBox>
 
     <VBox GridPane.columnIndex="2" GridPane.rowIndex="0">
-      <Label text="Selected Resource Packs" style="-fx-font-weight: bold"/>
+      <Label text="Selected Resource Packs" style="-fx-font-weight: bold" />
       <Label text="(higher items take priority over lower items)" />
     </VBox>
     <ListView fx:id="targetPacksListView" GridPane.columnIndex="2" GridPane.rowIndex="1" />
   </GridPane>
   <Separator />
   <HBox alignment="CENTER_RIGHT" spacing="10.0">
+    <Button fx:id="addNewTargetPackBtn" mnemonicParsing="false" text="Browse">
+      <tooltip>
+        <Tooltip text="Browse for a resource pack from outside the default resource pack folder and add it to the selected resource packs list" />
+      </tooltip>
+    </Button>
     <CheckBox fx:id="disableDefaultTexturesBtn" mnemonicParsing="false" text="Disable default textures"/>
     <Pane HBox.hgrow="ALWAYS" />
     <Button fx:id="cancelBtn" cancelButton="true" mnemonicParsing="false" text="Cancel" />

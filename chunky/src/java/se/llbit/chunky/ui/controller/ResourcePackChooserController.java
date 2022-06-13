@@ -200,13 +200,13 @@ public class ResourcePackChooserController implements Initializable {
 
     private Node buildControls() {
       Button moveUpBtn = new Button();
-      Icons.buildIcon(Icons.HEAVY_ARROW_RIGHT).withSize(12).rotateCCW().setAsGraphic(moveUpBtn);
+      Icons.buildIcon(Icons.HEAVY_ARROW_RIGHT).withSize(12).rotateCCW().setAsGraphicOn(moveUpBtn);
       moveUpBtn.setOnAction(evt ->
         Collections.swap(controller.targetPacksList, getIndex(), getIndex() - 1)
       );
       moveUpBtn.disableProperty().bind(disableMoveUp);
       Button moveDownBtn = new Button();
-      Icons.buildIcon(Icons.HEAVY_ARROW_RIGHT).withSize(12).rotateCW().setAsGraphic(moveDownBtn);
+      Icons.buildIcon(Icons.HEAVY_ARROW_RIGHT).withSize(12).rotateCW().setAsGraphicOn(moveDownBtn);
       moveDownBtn.setOnAction(evt ->
         Collections.swap(controller.targetPacksList, getIndex(), getIndex() + 1)
       );
@@ -331,7 +331,7 @@ public class ResourcePackChooserController implements Initializable {
     targetPacksListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
     ObservableList<PackListItem> selectedItems = targetPacksListView.getSelectionModel().getSelectedItems();
-    Icons.buildIcon(Icons.HEAVY_ARROW_RIGHT).withSize(12).flipX().setAsGraphic(removeFromTargetPacksBtn, true);
+    Icons.buildIcon(Icons.HEAVY_ARROW_RIGHT).withSize(12).flipX().setAsGraphicOn(removeFromTargetPacksBtn, true);
     removeFromTargetPacksBtn.disableProperty()
       .bind(Bindings.createBooleanBinding(
         () -> selectedItems.isEmpty()
@@ -341,40 +341,15 @@ public class ResourcePackChooserController implements Initializable {
     removeFromTargetPacksBtn.setOnAction(evt ->
       removePacksFromTargetList(targetPacksListView.getSelectionModel().getSelectedItems())
     );
-    Icons.buildIcon(Icons.HEAVY_ARROW_RIGHT).withSize(12).setAsGraphic(moveToTargetPacksBtn, true);
+    Icons.buildIcon(Icons.HEAVY_ARROW_RIGHT).withSize(12).setAsGraphicOn(moveToTargetPacksBtn, true);
     moveToTargetPacksBtn.disableProperty()
       .bind(availablePacksListView.getSelectionModel().selectedItemProperty().isNull());
     moveToTargetPacksBtn.setOnAction(evt ->
       movePacksToTargetList(availablePacksListView.getSelectionModel().getSelectedItems())
     );
-    Icons.buildIcon(Icons.HEAVY_PLUS).withSize(14).setAsGraphic(addNewTargetPackBtn, true);
-    addNewTargetPackBtn.setOnAction(evt -> {
-      FileChooser fileChooser = new FileChooser();
-      fileChooser.setTitle("Choose Resource Pack(s)");
-      fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
-        "Resource Packs",
-        "*.zip",
-        "*.jar",
-        "pack.mcmeta"
-      ));
-      fileChooser.setInitialDirectory(MinecraftFinder.getResourcePacksDirectory());
-      List<File> resourcePack = fileChooser.showOpenMultipleDialog(addNewTargetPackBtn.getScene().getWindow());
-      if (resourcePack != null) {
-        List<PackListItem> addedResourcePacks = resourcePack.stream()
-          .map(file ->
-            availablePacksList.stream()
-              .filter(availablePack -> availablePack.getFile().equals(file))
-              .findFirst()
-              .orElseGet(() -> new PackListItem(file.getName().endsWith(".mcmeta")
-                ? file.getParentFile()
-                : file))
-          )
-          .collect(Collectors.toList());
-        availablePacksList.removeAll(addedResourcePacks);
-        targetPacksList.addAll(0, addedResourcePacks);
-      }
-    });
 
+    Icons.buildIcon(Icons.HEAVY_PLUS).withSize(14).setAsGraphicOn(addNewTargetPackBtn);
+    addNewTargetPackBtn.setOnAction(evt -> browseForUnlistedPack());
     disableDefaultTexturesBtn.setSelected(PersistentSettings.getDisableDefaultTextures());
     disableDefaultTexturesBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setDisableDefaultTextures(newValue);
@@ -382,6 +357,33 @@ public class ResourcePackChooserController implements Initializable {
 
     cancelBtn.setOnAction(evt -> onCancel.run());
     applyAsDefaultBtn.setOnAction(evt -> onApplyAsDefault.accept(getSelectedResourcePacks()));
+  }
+
+  private void browseForUnlistedPack() {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Choose Resource Pack(s)");
+    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+      "Resource Packs",
+      "*.zip",
+      "*.jar",
+      "pack.mcmeta"
+    ));
+    fileChooser.setInitialDirectory(MinecraftFinder.getResourcePacksDirectory());
+    List<File> resourcePack = fileChooser.showOpenMultipleDialog(addNewTargetPackBtn.getScene().getWindow());
+    if (resourcePack != null) {
+      List<PackListItem> addedResourcePacks = resourcePack.stream()
+        .map(file ->
+          availablePacksList.stream()
+            .filter(availablePack -> availablePack.getFile().equals(file))
+            .findFirst()
+            .orElseGet(() -> new PackListItem(file.getName().endsWith(".mcmeta")
+              ? file.getParentFile()
+              : file))
+        )
+        .collect(Collectors.toList());
+      availablePacksList.removeAll(addedResourcePacks);
+      targetPacksList.addAll(0, addedResourcePacks);
+    }
   }
 
   public List<File> getSelectedResourcePacks() {
