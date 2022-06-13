@@ -22,8 +22,9 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
@@ -31,10 +32,13 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
@@ -51,6 +55,7 @@ import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.log.Log;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,20 +78,10 @@ public class ResourcePackChooserController implements Initializable {
   @FXML
   private ListView<PackListItem> availablePacksListView;
   private ObservableList<PackListItem> availablePacksList;
-  @FXML
-  private Button selectAllAvailablePacksBtn;
-  @FXML
-  private Button deselectAllAvailablePacksBtn;
 
   @FXML
   private ListView<PackListItem> targetPacksListView;
   private ObservableList<PackListItem> targetPacksList;
-  @FXML
-  private Button selectAllTargetPacksBtn;
-  @FXML
-  private Button deselectAllTargetPacksBtn;
-  @FXML
-  private Button clearAllTargetPacksBtn;
 
   @FXML
   private Button removeFromTargetPacksBtn;
@@ -109,6 +104,26 @@ public class ResourcePackChooserController implements Initializable {
   private enum Side {
     AVAILABLE,
     TARGETED
+  }
+
+  private ListView<PackListItem> getAssociatedList(Side side) {
+    switch (side) {
+      case TARGETED:
+        return targetPacksListView;
+      case AVAILABLE:
+        return availablePacksListView;
+      default:
+        throw new IllegalStateException();
+    }
+  }
+
+  private void updateListSelection(Side side, boolean deselect) {
+    ListView<PackListItem> list = getAssociatedList(side);
+    if (deselect) {
+      list.getSelectionModel().clearSelection();
+    } else {
+      list.getSelectionModel().selectAll();
+    }
   }
 
   private static class PackListItemCell extends ListCell<PackListItem> {
@@ -180,6 +195,7 @@ public class ResourcePackChooserController implements Initializable {
       root.add(description, columnOffset + 1, 1, 2, 1);
 
       disableProperty().bind(packDisabled);
+      initContextMenu();
     }
 
     private Node buildControls() {
@@ -199,6 +215,48 @@ public class ResourcePackChooserController implements Initializable {
         moveUpBtn,
         moveDownBtn
       );
+    }
+
+    private void initContextMenu() {
+      this.setContextMenu(new ContextMenu(
+        buildMenuItem("Open in system file browser",
+          evt -> {
+            if(getItem() == null)
+              return;
+            try {
+              Desktop.getDesktop().open(
+                getItem().isDefaultPack()
+                  ? getItem().file.getParentFile()
+                  : getItem().file
+              );
+            } catch (IOException ex) {
+              Log.warn("Failed to open resource pack file in system file browser.", ex);
+            }
+          },
+          menuItem -> {
+            if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+              menuItem.disableProperty().bind(itemProperty().isNull());
+            } else {
+              menuItem.setDisable(true);
+            }
+          }
+        ),
+        new SeparatorMenuItem(),
+        buildMenuItem("Select all", evt ->
+          controller.updateListSelection(side, false)),
+        buildMenuItem("Deselect all", evt ->
+          controller.updateListSelection(side, true))
+      ));
+    }
+
+    private MenuItem buildMenuItem(String label, EventHandler<ActionEvent> eventHandler) {
+      return buildMenuItem(label,eventHandler, menuItem -> {});
+    }
+    private MenuItem buildMenuItem(String label, EventHandler<ActionEvent> eventHandler, Consumer<MenuItem> init) {
+      MenuItem item = new MenuItem(label);
+      item.setOnAction(eventHandler);
+      init.accept(item);
+      return item;
     }
 
     private void updateItemData() {
@@ -267,22 +325,10 @@ public class ResourcePackChooserController implements Initializable {
     );
     availablePacksListView.setCellFactory(list -> new PackListItemCell(Side.AVAILABLE, this));
     availablePacksListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    selectAllAvailablePacksBtn.setOnAction(evt -> availablePacksListView.getSelectionModel().selectAll());
-    deselectAllAvailablePacksBtn.setOnAction(evt -> availablePacksListView.getSelectionModel().clearSelection());
 
     targetPacksList = targetPacksListView.getItems();
     targetPacksListView.setCellFactory(list -> new PackListItemCell(Side.TARGETED, this));
     targetPacksListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    selectAllTargetPacksBtn.setOnAction(evt -> targetPacksListView.getSelectionModel().selectAll());
-    deselectAllTargetPacksBtn.setOnAction(evt -> targetPacksListView.getSelectionModel().clearSelection());
-    targetPacksList.addListener((ListChangeListener<? super PackListItem>) prop ->
-      clearAllTargetPacksBtn.setDisable(targetPacksList.stream().allMatch(PackListItem::isDefaultPack))
-    );
-    clearAllTargetPacksBtn.setOnAction(evt ->
-      removePacksFromTargetList(targetPacksList.stream()
-        .filter(pack -> !pack.isDefaultPack())
-        .collect(Collectors.toList()))
-    );
 
     ObservableList<PackListItem> selectedItems = targetPacksListView.getSelectionModel().getSelectedItems();
     Icons.buildIcon(Icons.HEAVY_ARROW_RIGHT).withSize(12).flipX().setAsGraphic(removeFromTargetPacksBtn, true);

@@ -19,7 +19,6 @@
     <rowConstraints>
       <RowConstraints />
       <RowConstraints vgrow="ALWAYS" />
-      <RowConstraints />
     </rowConstraints>
     <columnConstraints>
       <ColumnConstraints hgrow="ALWAYS" />
@@ -32,10 +31,6 @@
       <Label text="from your Minecraft installation" />
     </VBox>
     <ListView fx:id="availablePacksListView" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-    <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="2">
-      <Button fx:id="selectAllAvailablePacksBtn" mnemonicParsing="false" text="Select All" />
-      <Button fx:id="deselectAllAvailablePacksBtn" mnemonicParsing="false" text="Deselect All" />
-    </HBox>
 
     <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" spacing="6">
       <Button fx:id="moveToTargetPacksBtn" prefWidth="26" prefHeight="26" mnemonicParsing="false">
@@ -60,11 +55,6 @@
       <Label text="(higher items take priority over lower items)" />
     </VBox>
     <ListView fx:id="targetPacksListView" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-    <HBox spacing="10" GridPane.columnIndex="2" GridPane.rowIndex="2">
-      <Button fx:id="selectAllTargetPacksBtn" mnemonicParsing="false" text="Select All" />
-      <Button fx:id="deselectAllTargetPacksBtn" mnemonicParsing="false" text="Deselect All" />
-      <Button fx:id="clearAllTargetPacksBtn" mnemonicParsing="false" text="Clear All" />
-    </HBox>
   </GridPane>
   <Separator />
   <HBox alignment="CENTER_RIGHT" spacing="10.0">
