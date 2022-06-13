@@ -68,11 +68,13 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ResourcePackChooserController implements Initializable {
   @FXML
@@ -114,15 +116,6 @@ public class ResourcePackChooserController implements Initializable {
         return availablePacksListView;
       default:
         throw new IllegalStateException();
-    }
-  }
-
-  private void updateListSelection(Side side, boolean deselect) {
-    ListView<PackListItem> list = getAssociatedList(side);
-    if (deselect) {
-      list.getSelectionModel().clearSelection();
-    } else {
-      list.getSelectionModel().selectAll();
     }
   }
 
@@ -304,19 +297,6 @@ public class ResourcePackChooserController implements Initializable {
     }
   }
 
-  private void removePacksFromTargetList(List<PackListItem> packs) {
-    packs = packs.stream()
-      .filter(item -> !item.isDefaultPack())
-      .collect(Collectors.toList());
-    availablePacksList.addAll(packs);
-    targetPacksList.removeAll(packs);
-  }
-
-  private void movePacksToTargetList(List<PackListItem> packs) {
-    targetPacksList.addAll(0, packs);
-    availablePacksList.removeAll(packs);
-  }
-
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     availablePacksList = availablePacksListView.getItems();
@@ -369,21 +349,30 @@ public class ResourcePackChooserController implements Initializable {
       "pack.mcmeta"
     ));
     fileChooser.setInitialDirectory(MinecraftFinder.getResourcePacksDirectory());
-    List<File> resourcePack = fileChooser.showOpenMultipleDialog(addNewTargetPackBtn.getScene().getWindow());
-    if (resourcePack != null) {
-      List<PackListItem> addedResourcePacks = resourcePack.stream()
-        .map(file ->
-          availablePacksList.stream()
-            .filter(availablePack -> availablePack.getFile().equals(file))
-            .findFirst()
-            .orElseGet(() -> new PackListItem(file.getName().endsWith(".mcmeta")
+    
+    List<File> newlyAddedFiles = fileChooser.showOpenMultipleDialog(addNewTargetPackBtn.getScene().getWindow());
+    if (newlyAddedFiles == null)
+      return;
+
+    List<PackListItem> newPacks = newlyAddedFiles.stream()
+      .map(file ->
+        // file -> pack
+        Stream.concat(availablePacksList.stream(), targetPacksList.stream())
+          .filter(availablePack -> availablePack.getFile().equals(file))
+          // use pack from available/target list, if found there
+          .findFirst()
+          // otherwise create a new pack object
+          .orElseGet(() -> new PackListItem(
+            file.getName().endsWith(".mcmeta") // directory resource pack
               ? file.getParentFile()
-              : file))
-        )
-        .collect(Collectors.toList());
-      availablePacksList.removeAll(addedResourcePacks);
-      targetPacksList.addAll(0, addedResourcePacks);
-    }
+              : file
+          ))
+      )
+      .collect(Collectors.toList());
+
+    // remove all already existing packs to guarantee them being added on top
+    targetPacksList.removeAll(newPacks);
+    movePacksToTargetList(newPacks);
   }
 
   public List<File> getSelectedResourcePacks() {
@@ -391,6 +380,28 @@ public class ResourcePackChooserController implements Initializable {
       .filter(pack -> !pack.isDefaultPack())
       .map(PackListItem::getFile)
       .collect(Collectors.toList());
+  }
+
+  private void updateListSelection(Side side, boolean deselect) {
+    ListView<PackListItem> list = getAssociatedList(side);
+    if (deselect) {
+      list.getSelectionModel().clearSelection();
+    } else {
+      list.getSelectionModel().selectAll();
+    }
+  }
+
+  private void removePacksFromTargetList(List<PackListItem> packs) {
+    packs = packs.stream()
+      .filter(item -> !item.isDefaultPack())
+      .collect(Collectors.toList());
+    availablePacksList.addAll(packs);
+    targetPacksList.removeAll(packs);
+  }
+
+  private void movePacksToTargetList(List<PackListItem> packs) {
+    targetPacksList.addAll(0, packs);
+    availablePacksList.removeAll(packs);
   }
 
   public void populate(
@@ -569,6 +580,19 @@ public class ResourcePackChooserController implements Initializable {
     @Override
     public String toString() {
       return file.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (!(o instanceof PackListItem)) return false;
+      PackListItem item = (PackListItem) o;
+      return file.equals(item.file);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(file);
     }
   }
 }
