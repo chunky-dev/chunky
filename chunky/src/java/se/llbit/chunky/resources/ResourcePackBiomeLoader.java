@@ -17,26 +17,41 @@
  */
 package se.llbit.chunky.resources;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomeBuilder;
 import se.llbit.chunky.world.biome.Biomes;
-import se.llbit.json.JsonObject;
-import se.llbit.json.JsonParser;
-import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
-import se.llbit.util.JsonPreprocessor;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
   public ResourcePackBiomeLoader() {}
+
+  protected static final Gson GSON = new GsonBuilder()
+    .disableJdkUnsafe()
+    .setLenient()
+    .create();
+
+  protected static class BiomeJson {
+    public double temperature = 0.5;
+    public double downfall = 0.5;
+    public BiomeEffects effects = new BiomeEffects();
+  }
+
+  protected static class BiomeEffects {
+    public Integer foliage_color = null;
+    public Integer grass_color = null;
+    public Integer water_color = null;
+    public String grass_color_modifier = null;
+  }
 
   @Override
   public boolean load(Path pack, String baseName) {
@@ -56,28 +71,17 @@ public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
                   String resourceLocation = namespace + ":" + biomeName;
 
                   if (!Biomes.contains(resourceLocation)) {
-                    try (InputStream f = new BufferedInputStream(Files.newInputStream(biome))) {
-                      JsonValue v = JsonPreprocessor.parse(f);
-                      JsonObject root = v.asObject();
+                    try (Reader f = Files.newBufferedReader(biome)) {
+                      BiomeJson json = GSON.fromJson(f, BiomeJson.class);
 
-                      double temperature = root.get("temperature").doubleValue(0.5);
-                      double rain = root.get("downfall").doubleValue(0.5);
-                      BiomeBuilder builder = Biome.create(resourceLocation, biomeName, temperature, rain);
-
-                      JsonObject effects = root.get("effects").asObject();
-                      JsonValue t;
-                      if (!(t = effects.get("foliage_color")).isUnknown()) {
-                        builder.foliageColor(t.intValue(0));
-                      }
-                      if (!(t = effects.get("grass_color")).isUnknown()) {
-                        builder.grassColor(t.intValue(0));
-                      }
-                      if (!(t = effects.get("water_color")).isUnknown()) {
-                        builder.waterColor(t.intValue(0));
-                      }
-                      if (!(t = effects.get("grass_color_modifier")).isUnknown()) {
-                        String modifier = t.asString("none").toLowerCase();
-                        switch (modifier) {
+                      BiomeBuilder builder = Biome.create(resourceLocation, biomeName, json.temperature, json.downfall);
+                      Optional.ofNullable(json.effects.foliage_color).ifPresent(builder::foliageColor);
+                      Optional.ofNullable(json.effects.grass_color).ifPresent(builder::grassColor);
+                      Optional.ofNullable(json.effects.water_color).ifPresent(builder::waterColor);
+                      Optional.ofNullable(json.effects.grass_color_modifier).ifPresent(modifier -> {
+                        switch (modifier.toLowerCase()) {
+                          case "none":
+                            break;
                           case "dark_forest":
                             builder.darkForest();
                             break;
@@ -85,13 +89,13 @@ public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
                             builder.swamp();
                             break;
                           default:
-                            Log.warnf("Unsupported biome `grass_color_modifier`: %s", modifier);
+                            Log.warnf("Unsupported biome `grass_modifier_color`: %s", modifier);
                         }
-                      }
+                      });
                       // TODO Custom fog colors
 
                       Biomes.register(builder);
-                    } catch (IOException | JsonParser.SyntaxError ignored) {
+                    } catch (IOException ignored) {
                     }
                   }
                 }
