@@ -196,6 +196,9 @@ See the file `licenses/commons-math.txt` for the copyright notices.
   FastUtil is covered by Apache License, version 2.0. 
 See the file `licenses/Apache-2.0.txt` for the full license text.
 See the file `licenses/fast-util.txt` for the copyright notice.
+* **Gson by Google**
+  The library is convered by the Apache License, version 2.0.
+See the file `licenses/Apache-2.0.txt` for the full license text.
 * **Simplex noise implementation by Stefan Gustavson and Keijiro Takahashi**.
 Released in the public domain.
 
