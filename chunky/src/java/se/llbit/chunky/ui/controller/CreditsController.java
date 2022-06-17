@@ -67,6 +67,10 @@ public class CreditsController implements Initializable {
   @FXML
   private Hyperlink fastutilLicense;
   @FXML
+  private Hyperlink gson;
+  @FXML
+  private Hyperlink gsonLicense;
+  @FXML
   private Hyperlink simplexnoise;
   @FXML
   private Hyperlink simplexnoiseLicense;
@@ -158,6 +162,11 @@ public class CreditsController implements Initializable {
     fastutil.setOnAction(e -> launchAndReset(fastutil, "https://fastutil.di.unimi.it/"));
     fastutilLicense.setBorder(Border.EMPTY);
     fastutilLicense.setOnAction(e -> launchAndReset(fastutilLicense, "https://www.apache.org/licenses/LICENSE-2.0"));
+
+    gson.setBorder(Border.EMPTY);
+    gson.setOnAction(e -> launchAndReset(gson, "https://github.com/google/gson"));
+    gsonLicense.setBorder(Border.EMPTY);
+    gsonLicense.setOnAction(e -> launchAndReset(gsonLicense, "https://www.apache.org/licenses/LICENSE-2.0.txt"));
 
     simplexnoise.setBorder(Border.EMPTY);
     simplexnoise.setOnAction(e -> launchAndReset(simplexnoise, "https://github.com/keijiro/sketches2016/blob/master/Simplex2/SimplexNoise.java"));

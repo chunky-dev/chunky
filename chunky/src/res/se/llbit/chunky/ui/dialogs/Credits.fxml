@@ -194,6 +194,20 @@
                       </padding>
                     </Hyperlink>
 
+                    <Hyperlink fx:id="gson" text="Gson">
+                      <padding>
+                        <Insets/>
+                      </padding>
+                    </Hyperlink>
+                    <Hyperlink fx:id="gsonLicense" text="Apache License 2.0">
+                      <font>
+                        <Font size="10.0"/>
+                      </font>
+                      <padding>
+                        <Insets left="20.0"/>
+                      </padding>
+                    </Hyperlink>
+
                      <Hyperlink fx:id="simplexnoise" text="Simplex noise">
                        <padding>
                          <Insets/>
