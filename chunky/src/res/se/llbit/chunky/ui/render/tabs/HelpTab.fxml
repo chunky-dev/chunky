@@ -22,9 +22,9 @@
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
           text="- Left-click to select or deselect a single chunk or region." />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-          text="- Hold [SHIFT] and left-click and drag to create a resizable rectangular selection of chunks." />
+          text="- Hold Shift and left-click and drag to select multiple chunks." />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-          text="- Hold [SHIFT]+[CTRL] and left-click and drag to create a resizable rectangular 'de-selection' of chunks." />
+          text="- Hold Ctrl+Shift and left-click and drag to deselect multiple chunks." />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
           text="- Use the mouse wheel to change the map scale (zoom)." />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
@@ -47,10 +47,10 @@
     <Label text="- F: Move the camera down." />
     <Label />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-          text="- Holding [SHIFT] while using the movement controls multiplies the movement of the camera by 0.1." />
+          text="- Holding Shift while using the movement controls multiplies the movement of the camera by 0.1." />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-          text="- Holding [CTRL] while using the movement controls multiplies the movement of the camera by 100." />
+          text="- Holding Ctrl while using the movement controls multiplies the movement of the camera by 100." />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-          text="- Holding [CTRL]+[SHIFT] while using the movement controls multiplies the movement of the camera by 10." />
+          text="- Holding Ctrl+Shift while using the movement controls multiplies the movement of the camera by 10." />
   </VBox>
 </fx:root>
