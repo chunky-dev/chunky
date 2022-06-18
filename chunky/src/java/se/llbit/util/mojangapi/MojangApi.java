@@ -180,7 +180,6 @@ public class MojangApi {
         for (JsonValue entry : cache) {
           if (entry.array().get(0).stringValue("").equals(key)) {
             JsonObject profile = entry.array().get(1).object();
-            System.out.println("found in cache");
             return GSON.fromJson(profile.toString(), MinecraftProfile.class);
           }
         }
