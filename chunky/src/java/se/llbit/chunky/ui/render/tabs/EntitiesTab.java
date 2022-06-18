@@ -211,7 +211,12 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         });
         Button downloadSkin = new Button("Download skin...");
         downloadSkin.setOnAction(e -> {
-          TextInputDialog playerIdentifierInput = new ValidatingTextInputDialog(playerIdentifier -> {
+          TextInputDialog playerIdentifierInput = new ValidatingTextInputDialog();
+          playerIdentifierInput.setTitle("Input player identifier");
+          playerIdentifierInput.setHeaderText("Please enter the UUID or name of the player.");
+          playerIdentifierInput.setContentText("UUID / player name:");
+          DialogUtils.setupDialogDesign(playerIdentifierInput, getScene());
+          playerIdentifierInput.showAndWait().map(playerIdentifier -> {
             try {
               // TODO: refactor this (deduplicate code, check UUID format, trim input, better error handling)
               MinecraftProfile profile = MojangApi.fetchProfile(playerIdentifier); //Search by uuid
@@ -245,11 +250,6 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
             }
             return false;
           });
-          playerIdentifierInput.setTitle("Input player identifier");
-          playerIdentifierInput.setHeaderText("Please enter the UUID or name of the player.");
-          playerIdentifierInput.setContentText("UUID / player name:");
-          DialogUtils.setupDialogDesign(playerIdentifierInput, getScene());
-          playerIdentifierInput.showAndWait();
         });
         skinBox.getChildren().addAll(new Label("Skin:"), skinField, selectSkin, downloadSkin);
 
