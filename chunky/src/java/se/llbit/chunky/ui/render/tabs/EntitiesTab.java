@@ -211,7 +211,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         });
         Button downloadSkin = new Button("Download skin...");
         downloadSkin.setOnAction(e -> {
-          TextInputDialog playerIdentifierInput = new ValidatingTextInputDialog();
+          TextInputDialog playerIdentifierInput = new ValidatingTextInputDialog(input -> input != null && !input.isEmpty());
           playerIdentifierInput.setTitle("Input player identifier");
           playerIdentifierInput.setHeaderText("Please enter the UUID or name of the player.");
           playerIdentifierInput.setContentText("UUID / player name:");
