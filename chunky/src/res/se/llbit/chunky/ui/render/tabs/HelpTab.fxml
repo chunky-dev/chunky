@@ -22,13 +22,13 @@
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
           text="- Left-click to select or deselect a single chunk or region." />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-          text="- Hold [SHIFT] and left-click and drag to create a resizable rectangular selection of chunks." />
+          text="- Hold Shift and left-click and drag to select multiple chunks." />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-          text="- Hold [SHIFT]+[CTRL] and left-click and drag to create a resizable rectangular 'de-selection' of chunks." />
+          text="- Hold Ctrl+Shift and left-click and drag to deselect multiple chunks." />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
           text="- Use the mouse wheel to change the map scale (zoom)." />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-          text="- Right-click the map to open a context menu." />
+          text="- Right-click the map to show more actions." />
     <Label />
     <Label text="Camera controls:">
       <font>
@@ -36,24 +36,21 @@
       </font>
     </Label>
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-          text="- Left-click and drag to change the view angle of the camera." />
+          text="- Left-click and drag to change the viewing angle of the camera." />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-          text="- Use the scroll wheel to change the camera FoV." />
+          text="- Use the scroll wheel to change the camera FoV (zoom)." />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-          text="- Right-click the render preview to open a context menu." />
+          text="- Right-click the render preview to show more actions." />
     <Label />
-    <Label text="- [W]: Move forward one block." />
-    <Label text="- [S]: Move backward one block." />
-    <Label text="- [A]: Strafe left one block." />
-    <Label text="- [D]: Strafe right one block." />
-    <Label text="- [R]: Move upward one block." />
-    <Label text="- [F]: Move downward one block." />
+    <Label text="- W, A, S, D: Move the camera." />
+    <Label text="- R: Move the camera up." />
+    <Label text="- F: Move the camera down." />
     <Label />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-          text="- Holding [SHIFT] while using the movement controls multiplies the movement of the camera by 0.1." />
+          text="- Holding Shift while using the movement controls multiplies the movement of the camera by 0.1." />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-          text="- Holding [CTRL] while using the movement controls multiplies the movement of the camera by 100." />
+          text="- Holding Ctrl while using the movement controls multiplies the movement of the camera by 100." />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-          text="- Holding [CTRL]+[SHIFT] while using the movement controls multiplies the movement of the camera by 10." />
+          text="- Holding Ctrl+Shift while using the movement controls multiplies the movement of the camera by 10." />
   </VBox>
 </fx:root>
