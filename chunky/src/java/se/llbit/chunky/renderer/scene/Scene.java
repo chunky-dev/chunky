@@ -17,94 +17,63 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.stream.IntStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.block.*;
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.Lava;
+import se.llbit.chunky.block.Water;
 import se.llbit.chunky.block.legacy.LegacyBlocksFinalizer;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.chunk.biome.BiomeData;
-import se.llbit.chunky.entity.ArmorStand;
-import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.entity.Lectern;
-import se.llbit.chunky.entity.PaintingEntity;
-import se.llbit.chunky.entity.PlayerEntity;
-import se.llbit.chunky.entity.Poseable;
+import se.llbit.chunky.entity.*;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.*;
-import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
-import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
+import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
+import se.llbit.chunky.world.*;
 import se.llbit.chunky.world.biome.ArrayBiomePalette;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.biome.Biomes;
-import se.llbit.chunky.world.Chunk;
-import se.llbit.chunky.world.ChunkPosition;
-import se.llbit.chunky.world.EmptyWorld;
-import se.llbit.chunky.world.ExtraMaterials;
-import se.llbit.chunky.world.Material;
-import se.llbit.chunky.world.MaterialStore;
-import se.llbit.chunky.world.World;
-import se.llbit.json.Json;
-import se.llbit.json.JsonArray;
-import se.llbit.json.JsonObject;
-import se.llbit.json.JsonParser;
-import se.llbit.json.JsonValue;
-import se.llbit.json.PrettyPrinter;
+import se.llbit.json.*;
 import se.llbit.log.Log;
 import se.llbit.math.*;
 import se.llbit.math.bvh.BVH;
-import se.llbit.math.structures.*;
+import se.llbit.math.structures.Position2IntStructure;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.*;
+import se.llbit.util.annotation.NotNull;
+import se.llbit.util.mojangapi.MinecraftProfile;
+import se.llbit.util.mojangapi.MinecraftSkin;
+import se.llbit.util.mojangapi.MojangApi;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.*;
-
-import se.llbit.util.annotation.NotNull;
-import se.llbit.util.mojangapi.MojangApi;
-import se.llbit.util.mojangapi.PlayerSkin;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.stream.IntStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Encapsulates scene and render state.
@@ -297,8 +266,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   private ArrayList<Entity> actors = new ArrayList<>();
 
-  /** Poseable entities in the scene. */
-  private Map<PlayerEntity, JsonObject> profiles = new HashMap<>();
+  private Map<PlayerEntity, MinecraftProfile> profiles = new HashMap<>();
 
   /** Material properties for this scene. */
   public Map<String, JsonValue> materials = new HashMap<>();
@@ -943,20 +911,20 @@ public class Scene implements JsonSerializable, Refreshable {
           entity.randomPose();
           task.update(target, done);
           done += 1;
-          JsonObject profile;
+          MinecraftProfile profile;
           try {
             profile = MojangApi.fetchProfile(entity.uuid);
-            PlayerSkin skin = MojangApi.getSkinFromProfile(profile);
-            if (skin != null) {
-              String skinUrl = skin.getUrl();
+            Optional<MinecraftSkin> skin = profile.getSkin();
+            if (skin.isPresent()) {
+              String skinUrl = skin.get().getSkinUrl();
               if (skinUrl != null) {
                 entity.skin = MojangApi.downloadSkin(skinUrl).getAbsolutePath();
               }
-              entity.model = skin.getModel();
+              entity.model = skin.get().getPlayerModel();
             }
           } catch (IOException e) {
             Log.error(e);
-            profile = new JsonObject();
+            profile = new MinecraftProfile();
           }
           profiles.put(entity, profile);
           actors.add(entity);
@@ -2846,12 +2814,8 @@ public class Scene implements JsonSerializable, Refreshable {
     return actors;
   }
 
-  public JsonObject getPlayerProfile(PlayerEntity entity) {
-    if (profiles.containsKey(entity)) {
-      return profiles.get(entity);
-    } else {
-      return new JsonObject();
-    }
+  public MinecraftProfile getPlayerProfile(PlayerEntity entity) {
+    return profiles.get(entity);
   }
 
   public void removeEntity(Entity player) {
@@ -2864,7 +2828,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void addPlayer(PlayerEntity player) {
     if (!actors.contains(player)) {
-      profiles.put(player, new JsonObject());
+      profiles.put(player, new MinecraftProfile());
       actors.add(player);
       rebuildActorBvh();
     } else {

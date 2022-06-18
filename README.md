@@ -196,19 +196,19 @@ the GPLv3 license. See the file `LICENSE` for the full license.
 
 Chunky uses the following 3rd party libraries:
 
-- **Apache Commons Math library by the Apache Software Foundation.**
+- **Apache Commons Math library by the Apache Software Foundation**  
   The library is covered by the Apache License, version 2.0.
   See the file `licenses/Apache-2.0.txt` for the full license text.
   See the file `licenses/commons-math.txt` for the copyright notices.
-- **FastUtil by Sebastiano Vigna**.
+- **FastUtil by Sebastiano Vigna**  
   FastUtil is covered by Apache License, version 2.0.
   See the file `licenses/Apache-2.0.txt` for the full license text.
   See the file `licenses/fast-util.txt` for the copyright notice.
-- **Gson by Google**
+- **Gson by Google**  
   The library is convered by the Apache License, version 2.0.
   See the file `licenses/Apache-2.0.txt` for the full license text.
   See the file `licenses/gson.txt` for the copyright notice.
-- **Simplex noise implementation by Stefan Gustavson and Keijiro Takahashi**.
+- **Simplex noise implementation by Stefan Gustavson and Keijiro Takahashi**  
   Released in the public domain.
 
 ## Special Thanks

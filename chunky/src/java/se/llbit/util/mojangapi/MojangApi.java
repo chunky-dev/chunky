@@ -17,29 +17,20 @@
  */
 package se.llbit.util.mojangapi;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
+import se.llbit.chunky.PersistentSettings;
+import se.llbit.json.*;
+import se.llbit.json.JsonParser.SyntaxError;
+import se.llbit.util.Util;
+
+import javax.net.ssl.HttpsURLConnection;
+import java.io.*;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Base64;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.net.ssl.HttpsURLConnection;
-import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.renderer.scene.PlayerModel;
-import se.llbit.json.JsonArray;
-import se.llbit.json.JsonObject;
-import se.llbit.json.JsonParser;
-import se.llbit.json.JsonParser.SyntaxError;
-import se.llbit.json.JsonValue;
-import se.llbit.json.PrettyPrinter;
-import se.llbit.log.Log;
-import se.llbit.util.Util;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Utility class to download Minecraft Jars and player data.
@@ -47,9 +38,11 @@ import se.llbit.util.Util;
 public class MojangApi {
 
   // the base64-encoded string might not be valid json (sometimes keys are not quoted)
-  // so we use a regex to extract the skin url
-  private static final Pattern SKIN_URL_FROM_OBJECT = Pattern
-  .compile("\"?SKIN\"?\\s*:\\s*\\{(.*?)\"?url\"?\\s*:\\s*\"([^\"]*)\"", Pattern.DOTALL);
+  // so we use lenient mode to extract the skin url
+  static final Gson GSON = new GsonBuilder()
+    .disableJdkUnsafe()
+    .setLenient()
+    .create();
 
   /**
    * Download a Minecraft Jar by version name.
@@ -60,8 +53,8 @@ public class MojangApi {
     System.out.println("destination: " + destination.getAbsolutePath());
     URL url = new URL(theUrl);
     try (
-        ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
-        FileOutputStream out = new FileOutputStream(destination)
+      ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
+      FileOutputStream out = new FileOutputStream(destination)
     ) {
       out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
     }
@@ -76,9 +69,9 @@ public class MojangApi {
    */
   private static String getVersionManifestUrl(final String version) throws IOException {
     HttpsURLConnection conn =
-        (HttpsURLConnection)
-            new URL("https://launchermeta.mojang.com/mc/game/version_manifest.json")
-                .openConnection();
+      (HttpsURLConnection)
+        new URL("https://launchermeta.mojang.com/mc/game/version_manifest.json")
+          .openConnection();
     int responseCode = conn.getResponseCode();
     if (responseCode == 200) {
       try (JsonParser parser = new JsonParser(conn.getInputStream())) {
@@ -110,14 +103,14 @@ public class MojangApi {
     if (responseCode == 200) {
       try (JsonParser parser = new JsonParser(conn.getInputStream())) {
         return parser
-            .parse()
-            .asObject()
-            .get("downloads")
-            .asObject()
-            .get("client")
-            .asObject()
-            .get("url")
-            .asString("");
+          .parse()
+          .asObject()
+          .get("downloads")
+          .asObject()
+          .get("client")
+          .asObject()
+          .get("url")
+          .asString("");
       } catch (SyntaxError e) {
         throw new IOException("Could not parse versions file", e);
       }
@@ -137,47 +130,14 @@ public class MojangApi {
       PersistentSettings.cacheDirectory().mkdirs();
     }
     File file = new File(PersistentSettings.cacheDirectory(),
-        Util.cacheEncode((url + ":skin").hashCode()));
+      Util.cacheEncode((url + ":skin").hashCode()));
     if (!file.exists()) {
       try (ReadableByteChannel inChannel = Channels.newChannel(new URL(url).openStream());
-          FileOutputStream out = new FileOutputStream(file)) {
+           FileOutputStream out = new FileOutputStream(file)) {
         out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
       }
     }
     return file;
-  }
-
-  /**
-   * Get the skin URL from the given profile. To get a profile, use {@link #fetchProfile(String)}.
-   *
-   * @param profile Player profile
-   * @return Skin (null if the player has no skin)
-   */
-  public static PlayerSkin getSkinFromProfile(JsonObject profile) {
-    JsonArray properties = profile.get("properties").asArray();
-    Optional<String> textureBase64 = properties.elements.stream()
-        .filter((p) -> p.asObject().get("name").stringValue("").equals("textures")).findFirst()
-        .map(obj -> obj.asObject().get("value").stringValue(null));
-    return textureBase64.map(MojangApi::getSkinFromEncodedTextures).orElse(null);
-  }
-
-  /**
-   * Get the skin URL from the given base64-encoded texture string. This format is used in player
-   * profiles and in entity tags of player heads.
-   *
-   * @param textureBase64 Base64-encoded texture string
-   * @return Skin information
-   */
-  public static PlayerSkin getSkinFromEncodedTextures(String textureBase64) {
-    String decoded = new String(Base64.getDecoder().decode(fixBase64Padding(textureBase64)));
-    PlayerModel model = decoded.contains("\"slim\"") ? PlayerModel.ALEX : PlayerModel.STEVE;
-    Matcher matcher = SKIN_URL_FROM_OBJECT.matcher(decoded);
-    if (matcher.find()) {
-      return new PlayerSkin(matcher.group(2), model);
-    } else {
-      Log.warn("Could not get skull texture from json: " + decoded);
-      return new PlayerSkin(null, model);
-    }
   }
 
   /**
@@ -188,7 +148,7 @@ public class MojangApi {
    * @param base64String Base64 string with or without proper padding
    * @return Base64 string with proper padding
    */
-  private static String fixBase64Padding(String base64String) {
+  static String fixBase64Padding(String base64String) {
     // the length of a base64 string must be a multiple of 4
     int missingPadding = (4 - (base64String.length() % 4)) % 4;
     if (missingPadding == 0) {
@@ -208,17 +168,20 @@ public class MojangApi {
    * @param uuid UUID of player
    * @throws IOException if downloading the profile failed
    */
-  public static JsonObject fetchProfile(String uuid) throws IOException {
+  public static MinecraftProfile fetchProfile(String uuid) throws IOException {
+    uuid = uuid.toLowerCase();
     String key = uuid + ":profile";
     File cacheFile =
-        new File(PersistentSettings.cacheDirectory(), Util.cacheEncode(key.hashCode()));
+      new File(PersistentSettings.cacheDirectory(), Util.cacheEncode(key.hashCode()));
     JsonArray cache;
     if (cacheFile.exists()) {
       try (JsonParser cacheParse = new JsonParser(new FileInputStream(cacheFile))) {
         cache = cacheParse.parse().array();
         for (JsonValue entry : cache) {
           if (entry.array().get(0).stringValue("").equals(key)) {
-            return entry.array().get(1).object();
+            JsonObject profile = entry.array().get(1).object();
+            System.out.println("found in cache");
+            return GSON.fromJson(profile.toString(), MinecraftProfile.class);
           }
         }
       } catch (JsonParser.SyntaxError e) {
@@ -231,28 +194,32 @@ public class MojangApi {
     String url = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid;
     HttpsURLConnection conn = (HttpsURLConnection) new URL(url).openConnection();
     int responseCode = conn.getResponseCode();
-    JsonObject profile;
+    MinecraftProfile profile;
     if (responseCode == 200) {
-      try (JsonParser parser = new JsonParser(conn.getInputStream())) {
-        profile = parser.parse().object();
-      } catch (JsonParser.SyntaxError e) {
+      try (InputStreamReader reader = new InputStreamReader(conn.getInputStream())) {
+        profile = GSON.fromJson(reader, MinecraftProfile.class);
+      } catch (JsonParseException e) {
         e.printStackTrace(System.err);
-        profile = new JsonObject();
+        profile = new MinecraftProfile();
       }
     } else {
-      profile = new JsonObject();
+      profile = new MinecraftProfile();
     }
 
     JsonArray newEntry = new JsonArray();
     newEntry.add(key);
-    newEntry.add(profile);
-    cache.add(newEntry);
-    if (!PersistentSettings.cacheDirectory().isDirectory()) {
-      PersistentSettings.cacheDirectory().mkdirs();
-    }
-    try (FileOutputStream out = new FileOutputStream(cacheFile)) {
-      PrettyPrinter jsonOut = new PrettyPrinter("", new PrintStream(out));
-      cache.prettyPrint(jsonOut);
+    try {
+      newEntry.add(new JsonParser(new ByteArrayInputStream(GSON.toJson(profile).getBytes(StandardCharsets.UTF_8))).parse().asObject());
+      cache.add(newEntry);
+      if (!PersistentSettings.cacheDirectory().isDirectory()) {
+        PersistentSettings.cacheDirectory().mkdirs();
+      }
+      try (FileOutputStream out = new FileOutputStream(cacheFile)) {
+        PrettyPrinter jsonOut = new PrettyPrinter("", new PrintStream(out));
+        cache.prettyPrint(jsonOut);
+      }
+    } catch (SyntaxError e) {
+      // ignore
     }
     return profile;
   }
@@ -271,7 +238,7 @@ public class MojangApi {
     if (cacheFile.exists()) {
       try (JsonParser cacheParse = new JsonParser(new FileInputStream(cacheFile))) {
         cache = cacheParse.parse().object();
-        if(!cache.get(username).isUnknown()) {
+        if (!cache.get(username).isUnknown()) {
           return cache.get(username).asString(null);
         }
       } catch (JsonParser.SyntaxError e) {
@@ -286,7 +253,7 @@ public class MojangApi {
     HttpsURLConnection conn = (HttpsURLConnection) new URL(url).openConnection();
     int responseCode = conn.getResponseCode();
     JsonObject response;
-    if(responseCode == 200) {
+    if (responseCode == 200) {
       try (JsonParser parser = new JsonParser(conn.getInputStream())) {
         response = parser.parse().object();
       } catch (JsonParser.SyntaxError e) {
@@ -299,7 +266,7 @@ public class MojangApi {
 
     //Save in cache if there's a valid response
     String uuid = response.get("id").asString(null);
-    if(uuid != null) {
+    if (uuid != null) {
       cache.set(username, response.get("id"));
       if (!PersistentSettings.cacheDirectory().isDirectory()) {
         PersistentSettings.cacheDirectory().mkdirs();

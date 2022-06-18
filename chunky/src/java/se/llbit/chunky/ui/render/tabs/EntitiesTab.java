@@ -19,11 +19,9 @@ package se.llbit.chunky.ui.render.tabs;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
+
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -47,7 +45,6 @@ import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.ui.UILogReceiver;
 import se.llbit.chunky.ui.dialogs.DialogUtils;
 import se.llbit.chunky.ui.dialogs.ValidatingTextInputDialog;
 import se.llbit.chunky.ui.elements.AngleAdjuster;
@@ -64,8 +61,9 @@ import se.llbit.json.JsonObject;
 import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Vector3;
+import se.llbit.util.mojangapi.MinecraftProfile;
+import se.llbit.util.mojangapi.MinecraftSkin;
 import se.llbit.util.mojangapi.MojangApi;
-import se.llbit.util.mojangapi.PlayerSkin;
 
 public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initializable {
 
@@ -81,8 +79,8 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       this.entity = entity;
 
       if (entity instanceof PlayerEntity) {
-        JsonObject profile = scene.getPlayerProfile((PlayerEntity) entity);
-        name = getName(profile);
+        MinecraftProfile profile = scene.getPlayerProfile((PlayerEntity) entity);
+        name = profile != null && profile.name != null ? profile.name : "Unknown";
         kind = "Player";
       } else {
         if (entity instanceof ArmorStand) {
@@ -92,10 +90,6 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         }
         name = "entity";
       }
-    }
-
-    private static String getName(JsonObject profile) {
-      return profile.get("name").stringValue("Unknown");
     }
 
     @Override
@@ -220,24 +214,23 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
           TextInputDialog playerIdentifierInput = new ValidatingTextInputDialog(playerIdentifier -> {
             try {
               // TODO: refactor this (deduplicate code, check UUID format, trim input, better error handling)
-              JsonObject profile = MojangApi.fetchProfile(playerIdentifier); //Search by uuid
-              PlayerSkin skin = MojangApi.getSkinFromProfile(profile);
-              if(skin != null) //If it found a skin, pass it back to caller
-              {
+              MinecraftProfile profile = MojangApi.fetchProfile(playerIdentifier); //Search by uuid
+              Optional<MinecraftSkin> skin = profile.getSkin();
+              if (skin.isPresent()) { // If it found a skin, pass it back to caller
                 downloadAndApplySkinForPlayer(
-                  skin,
+                  skin.get(),
                   player,
                   playerModel,
                   skinField
                 );
                 return true;
-              } else { //Otherwise, search by Username
+              } else { // Otherwise, search by Username
                 String uuid = MojangApi.usernameToUUID(playerIdentifier);
                 profile = MojangApi.fetchProfile(uuid);
-                skin = MojangApi.getSkinFromProfile(profile);
-                if(skin != null) {
+                skin = profile.getSkin();
+                if (skin.isPresent()) {
                   downloadAndApplySkinForPlayer(
-                    skin,
+                    skin.get(),
                     player,
                     playerModel,
                     skinField
@@ -398,12 +391,12 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
               }
             }
         );
-        
+
         HBox listButtons = new HBox();
         listButtons.setPadding(new Insets(10));
         listButtons.setSpacing(15);
         Button deleteButton = new Button("Delete");
-        deleteButton.setOnAction(e -> { 
+        deleteButton.setOnAction(e -> {
           Integer index = colorHeightList.getSelectionModel().getSelectedItem();
           if (index != null && index != 0) { //Prevent removal of the bottom layer
             beam.getMaterials().remove(index);
@@ -421,7 +414,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
             scene.rebuildActorBvh();
           }
         });
-        
+
         listButtons.getChildren().addAll(deleteButton, layerInput, addButton);
         propertyControls.getChildren().addAll(emittance, specular, perceptualSmoothness, ior, beamColorPicker);
         listControls.getChildren().addAll(new Label("Start Height:"), colorHeightList, listButtons);
@@ -662,15 +655,15 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
   }
 
   private void downloadAndApplySkinForPlayer(
-    PlayerSkin skin,
+    MinecraftSkin skin,
     PlayerEntity player,
     ChoiceBox<PlayerModel> playerModelSelector,
     TextField skinField
   ) throws IOException {
-    if(skin != null) {
-      String filePath = MojangApi.downloadSkin(skin.getUrl()).getAbsolutePath();
+    if (skin != null) {
+      String filePath = MojangApi.downloadSkin(skin.getSkinUrl()).getAbsolutePath();
       player.setTexture(filePath);
-      playerModelSelector.getSelectionModel().select(skin.getModel());
+      playerModelSelector.getSelectionModel().select(skin.getPlayerModel());
       skinField.setText(filePath);
       Log.info("Successfully set skin");
       scene.rebuildActorBvh();
