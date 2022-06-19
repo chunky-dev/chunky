@@ -16,10 +16,8 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import se.llbit.chunky.block.Lava;
-import se.llbit.chunky.block.Water;
+import se.llbit.chunky.block.*;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.Octree;
@@ -42,170 +40,189 @@ public class OctreeFinalizer {
    * @param cp        Position of the chunk to finalize
    */
   public static void finalizeChunk(Octree worldTree, Octree waterTree, BlockPalette palette,
-      Vector3i origin, ChunkPosition cp, int yMin, int yMax) {
+                                   Vector3i origin, ChunkPosition cp, int yMin, int yMax) {
+    OctreeFinalizationState finalizerState = new OctreeFinalizationState(worldTree, waterTree, palette, yMin, yMax, origin);
     for (int cy = yMin; cy < yMax; ++cy) {
       for (int cz = 0; cz < 16; ++cz) {
-        int z = cz + cp.z * 16 - origin.z;
+        int z = cz + cp.z * 16;
         for (int cx = 0; cx < 16; ++cx) {
-          int x = cx + cp.x * 16 - origin.x;
+          int x = cx + cp.x * 16;
           // process blocks that are at the edge of the chunk, the other should have be taken care of during the loading
           if (cy == yMin || cy == yMax - 1 || cz == 0 || cz == 15 || cx == 0 || cx == 15) {
-            hideBlocks(worldTree, palette, x, cy, z, yMin, yMax, origin);
-            processBlock(worldTree, waterTree, palette, x, cy, z, origin);
+            finalizerState.setPosition(x, cy, z);
+            hideBlocks(finalizerState);
+            processBlock(finalizerState);
           }
         }
       }
     }
   }
 
-  private static void hideBlocks(Octree worldTree, BlockPalette palette, int x,
-      int cy, int z, int yMin, int yMax, Vector3i origin) {
+  private static void hideBlocks(FinalizationState finalizationState) {
     // Set non-visible blocks to be any block, in order to merge large patches.
-    int y = cy - origin.y;
-    if (cy > yMin && cy < yMax - 1) {
-      boolean isHidden =
-          worldTree.getMaterial(x - 1, y, z, palette).opaque
-              && worldTree.getMaterial(x + 1, y, z, palette).opaque
-              && worldTree.getMaterial(x, y, z - 1, palette).opaque
-              && worldTree.getMaterial(x, y, z + 1, palette).opaque
-              && worldTree.getMaterial(x, y - 1, z, palette).opaque
-              && worldTree.getMaterial(x, y + 1, z, palette).opaque;
-      if (isHidden) {
-        worldTree.set(BlockPalette.ANY_ID, x, y, z);
-      }
+    if (finalizationState.getY() > finalizationState.getYMin() && finalizationState.getY() < finalizationState.getYMax() - 1
+      && !finalizationState.isCurrentBlockVisible()) {
+      finalizationState.replaceCurrentBlock(BlockPalette.ANY_ID);
     }
   }
 
-  private static void processBlock(Octree worldTree, Octree waterTree, BlockPalette palette, int x,
-      int cy, int z, Vector3i origin) {
-    int y = cy - origin.y;
-    Material mat = worldTree.getMaterial(x, y, z, palette);
-    Material wmat = waterTree.getMaterial(x, y, z, palette);
+  private static void processBlock(FinalizationState finalizerState) {
+    Material mat = finalizerState.getMaterial();
+    Material wmat = finalizerState.getWaterMaterial();
 
     if (wmat instanceof Water) {
-      Material above = waterTree.getMaterial(x, y + 1, z, palette);
-      Material aboveBlock = worldTree.getMaterial(x, y + 1, z, palette);
-      int level0 = 8 - ((Water) wmat).level;
-      if (!above.isWaterFilled() && !aboveBlock.solid) {
-        int corner0 = level0;
-        int corner1 = level0;
-        int corner2 = level0;
-        int corner3 = level0;
-
-        int level = waterLevelAt(worldTree, waterTree, palette, x - 1, y, z, level0);
-        corner3 += level;
-        corner0 += level;
-
-        level = waterLevelAt(worldTree, waterTree, palette, x - 1, y, z + 1, level0);
-        corner0 += level;
-
-        level = waterLevelAt(worldTree, waterTree, palette, x, y, z + 1, level0);
-        corner0 += level;
-        corner1 += level;
-
-        level = waterLevelAt(worldTree, waterTree, palette, x + 1, y, z + 1, level0);
-        corner1 += level;
-
-        level = waterLevelAt(worldTree, waterTree, palette, x + 1, y, z, level0);
-        corner1 += level;
-        corner2 += level;
-
-        level = waterLevelAt(worldTree, waterTree, palette, x + 1, y, z - 1, level0);
-        corner2 += level;
-
-        level = waterLevelAt(worldTree, waterTree, palette, x, y, z - 1, level0);
-        corner2 += level;
-        corner3 += level;
-
-        level = waterLevelAt(worldTree, waterTree, palette, x - 1, y, z - 1, level0);
-        corner3 += level;
-
-        corner0 = Math.min(7, 8 - (corner0 / 4));
-        corner1 = Math.min(7, 8 - (corner1 / 4));
-        corner2 = Math.min(7, 8 - (corner2 / 4));
-        corner3 = Math.min(7, 8 - (corner3 / 4));
-
-        waterTree.set(palette.getWaterId(((Water) wmat).level, (corner0 << Water.CORNER_0)
-            | (corner1 << Water.CORNER_1)
-            | (corner2 << Water.CORNER_2)
-            | (corner3 << Water.CORNER_3)), x, y, z);
-      } else if (above.isWaterFilled()) {
-        waterTree.set(palette.getWaterId(0, 1 << Water.FULL_BLOCK), x, y, z);
+      Material above = finalizerState.getWaterMaterial(0, 1, 0);
+      Material aboveBlock = finalizerState.getMaterial(0, 1, 0);
+      if (!above.isWaterFilled()) {
+        processWater(finalizerState);
+      } else {
+        finalizerState.replaceCurrentWaterBlock(finalizerState.getPalette().getWaterId(0, 1 << Water.FULL_BLOCK));
       }
     } else if (mat instanceof Lava) {
-      Material above = worldTree.getMaterial(x, y + 1, z, palette);
+      Material above = finalizerState.getMaterial(BlockFace.UP);
       if (!(above instanceof Lava)) {
-        Lava lava = (Lava) mat;
-
-        int level0 = 8 - lava.level;
-        int corner0 = level0;
-        int corner1 = level0;
-        int corner2 = level0;
-        int corner3 = level0;
-
-        int level = lavaLevelAt(worldTree, palette, x - 1, y, z, level0);
-        corner3 += level;
-        corner0 += level;
-
-        level = lavaLevelAt(worldTree, palette, x - 1, y, z + 1, level0);
-        corner0 += level;
-
-        level = lavaLevelAt(worldTree, palette, x, y, z + 1, level0);
-        corner0 += level;
-        corner1 += level;
-
-        level = lavaLevelAt(worldTree, palette, x + 1, y, z + 1, level0);
-        corner1 += level;
-
-        level = lavaLevelAt(worldTree, palette, x + 1, y, z, level0);
-        corner1 += level;
-        corner2 += level;
-
-        level = lavaLevelAt(worldTree, palette, x + 1, y, z - 1, level0);
-        corner2 += level;
-
-        level = lavaLevelAt(worldTree, palette, x, y, z - 1, level0);
-        corner2 += level;
-        corner3 += level;
-
-        level = lavaLevelAt(worldTree, palette, x - 1, y, z - 1, level0);
-        corner3 += level;
-
-        corner0 = Math.min(7, 8 - (corner0 / 4));
-        corner1 = Math.min(7, 8 - (corner1 / 4));
-        corner2 = Math.min(7, 8 - (corner2 / 4));
-        corner3 = Math.min(7, 8 - (corner3 / 4));
-        worldTree.set(palette.getLavaId(
-            lava.level,
-            (corner0 << Water.CORNER_0)
-                | (corner1 << Water.CORNER_1)
-                | (corner2 << Water.CORNER_2)
-                | (corner3 << Water.CORNER_3)
-        ), x, y, z);
+        processLava(finalizerState);
       }
     }
   }
 
-  private static int waterLevelAt(Octree worldTree, Octree waterTree,
-      BlockPalette palette, int x, int cy, int z, int baseLevel) {
-    Material corner = waterTree.getMaterial(x, cy, z, palette);
-    if (corner instanceof Water) {
-      Material above = waterTree.getMaterial(x, cy + 1, z, palette);
+  public static void processWater(FinalizationState finalizerState) {
+    Material wmat = finalizerState.getWaterMaterial();
+    int level0 = 8 - ((Water) wmat).level;
+
+    int corner0 = level0;
+    int corner1 = level0;
+    int corner2 = level0;
+    int corner3 = level0;
+
+    int level = waterLevelAt(finalizerState, BlockFace.WEST, level0);
+    corner3 += level;
+    corner0 += level;
+
+    level = waterLevelAt(finalizerState, BlockFace.SOUTH_WEST, level0);
+    corner0 += level;
+
+    level = waterLevelAt(finalizerState, BlockFace.SOUTH, level0);
+    corner0 += level;
+    corner1 += level;
+
+    level = waterLevelAt(finalizerState, BlockFace.SOUTH_EAST, level0);
+    corner1 += level;
+
+    level = waterLevelAt(finalizerState, BlockFace.EAST, level0);
+    corner1 += level;
+    corner2 += level;
+
+    level = waterLevelAt(finalizerState, BlockFace.NORTH_EAST, level0);
+    corner2 += level;
+
+    level = waterLevelAt(finalizerState, BlockFace.NORTH, level0);
+    corner2 += level;
+    corner3 += level;
+
+    level = waterLevelAt(finalizerState, BlockFace.NORTH_WEST, level0);
+    corner3 += level;
+
+    corner0 = Math.min(7, 8 - (corner0 / 4));
+    corner1 = Math.min(7, 8 - (corner1 / 4));
+    corner2 = Math.min(7, 8 - (corner2 / 4));
+    corner3 = Math.min(7, 8 - (corner3 / 4));
+
+    finalizerState.replaceCurrentWaterBlock(finalizerState.getPalette().getWaterId(((Water) wmat).level, (corner0 << Water.CORNER_0)
+      | (corner1 << Water.CORNER_1)
+      | (corner2 << Water.CORNER_2)
+      | (corner3 << Water.CORNER_3)));
+
+    if (finalizerState.getY() + 1 < finalizerState.getYMax()) {
+      // check if the block is submerged in water
+      boolean north = finalizerState.getWaterMaterial(0, 0, -1).isWaterFilled() && finalizerState.getWaterMaterial(0, 1, -1).isWaterFilled();
+      boolean south = finalizerState.getWaterMaterial(0, 0, 1).isWaterFilled() && finalizerState.getWaterMaterial(0, 1, 1).isWaterFilled();
+      if (north && south) {
+        finalizerState.replaceCurrentWaterBlock(finalizerState.getPalette().getWaterId(0, 1 << Water.FULL_BLOCK));
+      } else {
+        boolean east = finalizerState.getWaterMaterial(-1, 0, 0).isWaterFilled() && finalizerState.getWaterMaterial(-1, 1, 0).isWaterFilled();
+        boolean west = finalizerState.getWaterMaterial(1, 0, 0).isWaterFilled() && finalizerState.getWaterMaterial(1, 1, 0).isWaterFilled();
+        if (west && east) {
+          finalizerState.replaceCurrentWaterBlock(finalizerState.getPalette().getWaterId(0, 1 << Water.FULL_BLOCK));
+        }
+      }
+    }
+  }
+
+  public static void processLava(FinalizationState finalizerState) {
+    Lava lava = (Lava) finalizerState.getMaterial();
+
+    int level0 = 8 - lava.level;
+    int corner0 = level0;
+    int corner1 = level0;
+    int corner2 = level0;
+    int corner3 = level0;
+
+    int level = lavaLevelAt(finalizerState, BlockFace.WEST, level0);
+    corner3 += level;
+    corner0 += level;
+
+    level = lavaLevelAt(finalizerState, BlockFace.SOUTH_WEST, level0);
+    corner0 += level;
+
+    level = lavaLevelAt(finalizerState, BlockFace.SOUTH, level0);
+    corner0 += level;
+    corner1 += level;
+
+    level = lavaLevelAt(finalizerState, BlockFace.SOUTH_EAST, level0);
+    corner1 += level;
+
+    level = lavaLevelAt(finalizerState, BlockFace.EAST, level0);
+    corner1 += level;
+    corner2 += level;
+
+    level = lavaLevelAt(finalizerState, BlockFace.NORTH_EAST, level0);
+    corner2 += level;
+
+    level = lavaLevelAt(finalizerState, BlockFace.NORTH, level0);
+    corner2 += level;
+    corner3 += level;
+
+    level = lavaLevelAt(finalizerState, BlockFace.NORTH_WEST, level0);
+    corner3 += level;
+
+    corner0 = Math.min(7, 8 - (corner0 / 4));
+    corner1 = Math.min(7, 8 - (corner1 / 4));
+    corner2 = Math.min(7, 8 - (corner2 / 4));
+    corner3 = Math.min(7, 8 - (corner3 / 4));
+    finalizerState.replaceCurrentBlock(finalizerState.getPalette().getLavaId(
+      lava.level,
+      (corner0 << Water.CORNER_0)
+        | (corner1 << Water.CORNER_1)
+        | (corner2 << Water.CORNER_2)
+        | (corner3 << Water.CORNER_3)
+    ));
+  }
+
+  public static int waterLevelAt(FinalizationState finalizationState, BlockFace direction, int baseLevel) {
+    Material corner = finalizationState.getMaterial(direction);
+    if (corner.isWater()) {
+      Material above = finalizationState.getMaterial(direction.rx, 1, direction.rz);
       boolean isFullBlock = above.isWaterFilled();
-      return isFullBlock ? 8 : 8 - ((Water) corner).level;
+      return isFullBlock ? 8 : 8 - (((Water) corner).level);
     } else if (corner.waterlogged) {
       return 8;
-    } else if (!worldTree.getMaterial(x, cy, z, palette).solid) {
+    } else if (corner instanceof Air) {
+      Material cornerWater = finalizationState.getWaterMaterial(direction);
+      if (cornerWater.isWater()) {
+        Material above = finalizationState.getWaterMaterial(direction.rx, 1, direction.rz);
+        boolean isFullBlock = above.isWaterFilled();
+        return isFullBlock ? 8 : 8 - (((Water) cornerWater).level);
+      }
       return 0;
     }
     return baseLevel;
   }
 
-  private static int lavaLevelAt(Octree octree, BlockPalette palette,
-      int x, int cy, int z, int baseLevel) {
-    Material corner = octree.getMaterial(x, cy, z, palette);
+  public static int lavaLevelAt(FinalizationState finalizationState, BlockFace direction, int baseLevel) {
+    Material corner = finalizationState.getMaterial();
     if (corner instanceof Lava) {
-      Material above = octree.getMaterial(x, cy + 1, z, palette);
+      Material above = finalizationState.getMaterial(BlockFace.UP);
       boolean isFullBlock = above instanceof Lava;
       return isFullBlock ? 8 : 8 - ((Lava) corner).level;
     } else if (!corner.solid) {
@@ -214,4 +231,3 @@ public class OctreeFinalizer {
     return baseLevel;
   }
 }
-

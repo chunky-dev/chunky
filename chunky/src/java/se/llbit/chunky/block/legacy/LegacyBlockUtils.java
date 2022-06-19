@@ -48,16 +48,18 @@ public class LegacyBlockUtils {
   public static class FinalizationStateCache extends FinalizationState {
 
     private final Material[] cache;
+    private final Material[] waterCache;
     private final FinalizationState state;
 
     public FinalizationStateCache(FinalizationState state) {
-      this(state, new Material[27]);
+      this(state, new Material[27], new Material[27]);
     }
 
-    public FinalizationStateCache(FinalizationState state, Material[] cache) {
+    public FinalizationStateCache(FinalizationState state, Material[] cache, Material[] waterCache) {
       super(state.getPalette());
       this.state = state;
       this.cache = cache;
+      this.waterCache = waterCache;
     }
 
     private static int getCacheIndex(int rx, int ry, int rz) {
@@ -81,8 +83,29 @@ public class LegacyBlockUtils {
     }
 
     @Override
+    public Material getWaterMaterial() {
+      return state.getWaterMaterial();
+    }
+
+    @Override
+    public Material getWaterMaterial(int rx, int ry, int rz) {
+      int index = getCacheIndex(rx, ry, rz);
+
+      if (waterCache[index] != null) {
+        return waterCache[index];
+      }
+      waterCache[index] = state.getWaterMaterial(rx, ry, rz);
+      return waterCache[index];
+    }
+
+    @Override
     public void replaceCurrentBlock(int newBlock) {
       state.replaceCurrentBlock(newBlock);
+    }
+
+    @Override
+    public void replaceCurrentWaterBlock(int newPaletteId) {
+      state.replaceCurrentWaterBlock(newPaletteId);
     }
 
     @Override

@@ -12,27 +12,67 @@ public abstract class FinalizationState {
     this.palette = palette;
   }
 
+  /**
+   * Get the material at the current position. This may or may not return materials replaced by
+   * {@link #replaceCurrentBlock(int)} or {@link #replaceCurrentBlock(Tag)}.
+   *
+   * @return Material at the current location
+   */
   public abstract Material getMaterial();
 
+  /**
+   * Get the material at the current position. If rx = ry = rz = 0, this may or may not return materials replaced by
+   * {@link #replaceCurrentBlock(int)} or {@link #replaceCurrentBlock(Tag)}.
+   *
+   * @return Material at the current location
+   */
   public abstract Material getMaterial(int rx, int ry, int rz);
 
+  /**
+   * Get the material at given direction from the current positon. If direction is SELF, this may or may not return
+   * materials replaced by {@link #replaceCurrentBlock(int)} or {@link #replaceCurrentBlock(Tag)}.
+   *
+   * @return Material at the current location
+   */
   public Material getMaterial(BlockFace direction) {
-    switch (direction) {
-      case NORTH:
-        return getMaterial(0, 0, -1);
-      case EAST:
-        return getMaterial(1, 0, 0);
-      case SOUTH:
-        return getMaterial(0, 0, 1);
-      case WEST:
-        return getMaterial(-1, 0, 0);
-      case UP:
-        return getMaterial(0, 1, 0);
-      case DOWN:
-        return getMaterial(0, -1, 0);
-      default:
-        throw new IllegalArgumentException("Invalid direction: " + direction);
-    }
+    return getMaterial(direction.rx, direction.ry, direction.rz);
+  }
+
+  /**
+   * Check if the block at the current position is visible (ie. has any non-opaque blocks surrounding it).
+   *
+   * @return True if the block is visible, false otherwise
+   */
+  public boolean isCurrentBlockVisible() {
+    return !(getMaterial(BlockFace.NORTH).opaque && getMaterial(BlockFace.SOUTH).opaque &&
+      getMaterial(BlockFace.WEST).opaque && getMaterial(BlockFace.EAST).opaque &&
+      getMaterial(BlockFace.UP).opaque && getMaterial(BlockFace.DOWN).opaque);
+  }
+
+  /**
+   * Get the water material at the current position. This may or may not return materials replaced
+   * by {@link #replaceCurrentWaterBlock(int)}.
+   *
+   * @return Water material at the current location
+   */
+  public abstract Material getWaterMaterial();
+
+  /**
+   * Get the water material at the current position. If rx = ry = rz = 0, this may or may not return materials
+   * replaced by {@link #replaceCurrentWaterBlock(int)}.
+   *
+   * @return Water material at the current location
+   */
+  public abstract Material getWaterMaterial(int rx, int ry, int rz);
+
+  /**
+   * Get the material at given direction from the current positon. If direction is SELF, this may or may not return
+   * materials replaced by {@link #replaceCurrentWaterBlock(int)}.
+   *
+   * @return Material at the current location
+   */
+  public Material getWaterMaterial(BlockFace direction) {
+    return getWaterMaterial(direction.rx, direction.ry, direction.rz);
   }
 
   public abstract void replaceCurrentBlock(int newBlock);
@@ -40,6 +80,8 @@ public abstract class FinalizationState {
   public void replaceCurrentBlock(Tag tag) {
     replaceCurrentBlock(getPalette().put(tag));
   }
+
+  public abstract void replaceCurrentWaterBlock(int newPaletteId);
 
   public BlockPalette getPalette() {
     return palette;
