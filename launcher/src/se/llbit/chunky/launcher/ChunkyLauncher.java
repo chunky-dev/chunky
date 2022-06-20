@@ -53,7 +53,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ChunkyLauncher {
 
-  public static final Semver LAUNCHER_VERSION = new Semver("1.13.2");
+  public static final Semver LAUNCHER_VERSION = new Semver("1.13.3");
   public static final int LAUNCHER_SETTINGS_REVISION = 1;
 
   /**
