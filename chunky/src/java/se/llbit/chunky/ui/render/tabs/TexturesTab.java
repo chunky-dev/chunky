@@ -81,6 +81,7 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
       }
     });
 
+    singleColorBtn.setTooltip(new Tooltip("Set block textures to a single color which is the average of all color values of its current texture. \nRequires restart for changes to take effect."));
     singleColorBtn.setSelected(PersistentSettings.getSingleColorTextures());
     singleColorBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
       Scene scene = sceneManager.getScene();
@@ -108,7 +109,7 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
       }
     });
 
-    biomeBlending.setTooltip(new Tooltip("Blend edges of biomes (looks better but loads slower)"));
+    biomeBlending.setTooltip(new Tooltip("Blend edges of biomes (looks better but loads slower)."));
     biomeBlending.selectedProperty().addListener((observable, oldValue, newValue) -> {
       Scene scene = sceneManager.getScene();
       boolean enabled = scene.biomeBlendingEnabled();

@@ -23,6 +23,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
+import javafx.scene.control.Tooltip;
 import javafx.util.StringConverter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
@@ -72,6 +73,7 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
+    postprocessingFilter.setTooltip(new Tooltip("Set the postprocessing filter to be used on the image."));
     postprocessingFilter.getItems().add(PostProcessingFilters.NONE);
     postprocessingFilter.getItems().add(new PostprocessingSeparator());
     for (PostProcessingFilter filter : PostProcessingFilters.getFilters()) {
@@ -98,6 +100,7 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
       }
     });
     exposure.setName("Exposure");
+    exposure.setTooltip("Linear exposure of the image.");
     exposure.setRange(Scene.MIN_EXPOSURE, Scene.MAX_EXPOSURE);
     exposure.makeLogarithmic();
     exposure.clampMin();
@@ -109,7 +112,7 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
   }
 
   /**
-   * Fake post processing filter that is also a seperator for the combobox.
+   * Fake post processing filter that is also a separator for the combobox.
    */
   private static class PostprocessingSeparator extends Separator implements PostProcessingFilter {
 

@@ -221,8 +221,11 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       }
     };
     posX.addEventFilter(KeyEvent.KEY_PRESSED, positionHandler);
+    posX.setTooltip(new Tooltip("Camera X coordinate."));
     posY.addEventFilter(KeyEvent.KEY_PRESSED, positionHandler);
+    posY.setTooltip(new Tooltip("Camera Y coordinate."));
     posZ.addEventFilter(KeyEvent.KEY_PRESSED, positionHandler);
+    posZ.setTooltip(new Tooltip("Camera Z coordinate."));
 
     EventHandler<KeyEvent> directionHandler = e -> {
       if (e.getCode() == KeyCode.ENTER) {
@@ -265,6 +268,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     fov.setName("Field of view (zoom)");
     fov.setRange(0.1, 180);
     fov.clampMin();
+    fov.setTooltip("Vertical field of view of the camera.");
     fov.onValueChange(value -> scene.camera().setFoV(value));
 
     dof.setName("Depth of field");
@@ -282,7 +286,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     subjectDistance.onValueChange(value -> scene.camera().setSubjectDistance(value));
 
     autofocus.setTooltip(new Tooltip(
-        "Focuses on the object in the center of the view indicated by the crosshairs."));
+        "Focuses on the object that is the set target."));
     autofocus.setOnAction(e -> {
       scene.autoFocus();
       updateDof();
@@ -301,6 +305,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     shiftY.addEventFilter(KeyEvent.KEY_PRESSED, shiftHandler);
 
 
+    apertureShape.setTooltip(new Tooltip("Change the shape of the aperture of the virtual camera."));
     apertureShape.getItems().addAll(ApertureShape.values());
     apertureShape.getSelectionModel().select(ApertureShape.CIRCLE);
     apertureShape.getSelectionModel().selectedItemProperty()

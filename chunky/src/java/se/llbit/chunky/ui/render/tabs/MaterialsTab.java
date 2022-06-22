@@ -57,14 +57,19 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
   public MaterialsTab() {
     emittance.setName("Emittance");
     emittance.setRange(0, 100);
+    emittance.setTooltip("Intensity of the light emitted from the selected material.");
     specular.setName("Specular");
     specular.setRange(0, 1);
+    specular.setTooltip("Reflectivity of the selected material.");
     ior.setName("IoR");
     ior.setRange(0, 5);
+    ior.setTooltip("Index of Refraction of the selected material.");
     perceptualSmoothness.setName("Smoothness");
     perceptualSmoothness.setRange(0, 1);
+    perceptualSmoothness.setTooltip("Smoothness of the selected material.");
     metalness.setName("Metalness");
     metalness.setRange(0, 1);
+    metalness.setTooltip("Texture-tinted reflectivity of the selected material.");
     ObservableList<String> blockIds = FXCollections.observableArrayList();
     blockIds.addAll(MaterialStore.collections.keySet());
     blockIds.addAll(ExtraMaterials.idMap.keySet());

@@ -94,27 +94,28 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunSamplingStrategy.setTooltip(new Tooltip("Determine how the sun is sampled at each bounce."));
 
     sunIntensity.setName("Sun intensity");
-    sunIntensity.setTooltip("Intensity of the sun on the scene.");
+    sunIntensity.setTooltip("Sunlight intensity modifier.");
     sunIntensity.setRange(Sun.MIN_INTENSITY, Sun.MAX_INTENSITY);
     sunIntensity.makeLogarithmic();
     sunIntensity.clampMin();
     sunIntensity.onValueChange(value -> scene.sun().setIntensity(value));
 
     sunLuminosity.setName("Sun luminosity");
-    sunLuminosity.setTooltip("Absolute brightness of the sun. Used when fast sun sampling is disabled.");
+    sunLuminosity.setTooltip("Absolute brightness of the sun. Only used with Sun Sampling Strategy: OFF or HIGH_QUALITY.");
     sunLuminosity.setRange(1, 10000);
     sunLuminosity.makeLogarithmic();
     sunLuminosity.clampMin();
     sunLuminosity.onValueChange(value -> scene.sun().setLuminosity(value));
 
     sunAzimuth.setName("Sun azimuth");
-    sunAzimuth.setTooltip("Change the angle to the sun from north.");
+    sunAzimuth.setTooltip("The horizontal direction of the sun from a reference direction of East.");
     sunAzimuth.onValueChange(value -> scene.sun().setAzimuth(-QuickMath.degToRad(value)));
 
     sunAltitude.setName("Sun altitude");
-    sunAltitude.setTooltip("Change the angle to the sun above the horizon.");
+    sunAltitude.setTooltip("The vertical direction of the sun from a reference altitude of the horizon.");
     sunAltitude.onValueChange(value -> scene.sun().setAltitude(QuickMath.degToRad(value)));
 
+    enableEmitters.setTooltip(new Tooltip("Allow blocks to emit light based on their material settings."));
     enableEmitters.selectedProperty().addListener(
         (observable, oldValue, newValue) -> scene.setEmittersEnabled(newValue));
 

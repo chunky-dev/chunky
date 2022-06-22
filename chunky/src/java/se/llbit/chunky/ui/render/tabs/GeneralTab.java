@@ -133,7 +133,9 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     }
 
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
+    reloadChunks.setTooltip(new Tooltip("Reload the currently-loaded chunks."));
     reloadChunks.setDisable(scene.numberOfChunks() == 0);
+    loadSelectedChunks.setTooltip(new Tooltip("Load chunks selected in the map view."));
     loadSelectedChunks.setDisable(
       mapLoader.getWorld() instanceof EmptyWorld ||
       mapLoader.getWorld() == null ||
@@ -148,6 +150,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     });
     canvasSizeInput.setSize(scene.canvasWidth(), scene.canvasHeight());
     openSceneDirBtn.setDisable(!controller.getContext().getSceneDirectory().exists());
+    openSceneDirBtn.setTooltip(new Tooltip("Open the directory of the scene, if it has been saved."));
     ((AsynchronousSceneManager) controller.getSceneManager()).setOnSceneSaved(() -> {
       openSceneDirBtn.setDisable(!controller.getContext().getSceneDirectory().exists());
     });
@@ -164,11 +167,13 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @Override public void initialize(URL location, ResourceBundle resources) {
     // TODO: parentTab.setGraphic(new ImageView(Icon.wrench.fxImage()));
 
+    exportSettings.setTooltip(new Tooltip("Export settings as a JSON string."));
     exportSettings.setOnAction(event -> {
       SettingsExport dialog = new SettingsExport(scene.toJson());
       dialog.show();
     });
 
+    importSettings.setTooltip(new Tooltip("Import settings from a JSON string."));
     importSettings.setOnAction(event -> {
       TextInputDialog dialog = new TextInputDialog();
       dialog.setTitle("Settings Import");
@@ -276,6 +281,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         scene.setDumpFrequency(0);
       }
     });
+    saveDumps.setTooltip(new Tooltip("Save render progress every time a multiple of the specified number of SPP has been reached."));
     saveDumps.selectedProperty().addListener((observable, oldValue, enable) -> {
       dumpFrequency.setDisable(!enable);
       if (enable) {
