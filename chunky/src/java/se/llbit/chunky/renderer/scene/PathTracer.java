@@ -20,13 +20,13 @@ package se.llbit.chunky.renderer.scene;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Water;
-import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.SunSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.*;
 
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -180,15 +180,22 @@ public class PathTracer implements RayTracer {
               hit = true;
             } else if(scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
               // Sample emitter
-              boolean sampleOne = scene.emitterSamplingStrategy == EmitterSamplingStrategy.ONE;
-              if(sampleOne) {
-                Grid.EmitterPosition pos = scene.getEmitterGrid().sampleEmitterPosition((int) ray.o.x, (int) ray.o.y, (int) ray.o.z, random);
-                if(pos != null) {
-                  indirectEmitterColor = sampleEmitter(scene, ray, pos,  random);
+              switch (scene.emitterSamplingStrategy) {
+                case ONE:
+                case ONE_BLOCK: {
+                  Grid.EmitterPosition pos = scene.getEmitterGrid().sampleEmitterPosition((int) ray.o.x, (int) ray.o.y, (int) ray.o.z, random);
+                  if (pos != null) {
+                    indirectEmitterColor.scaleAdd(Math.PI, sampleEmitter(scene, ray, pos, random));
+                  }
+                  break;
                 }
-              } else {
-                for(Grid.EmitterPosition pos : scene.getEmitterGrid().getEmitterPositions((int) ray.o.x, (int) ray.o.y, (int) ray.o.z)) {
-                  indirectEmitterColor.scaleAdd(1, sampleEmitter(scene, ray, pos, random));
+                case ALL: {
+                  List<Grid.EmitterPosition> positions = scene.getEmitterGrid().getEmitterPositions((int) ray.o.x, (int) ray.o.y, (int) ray.o.z);
+                  double sampleScaler = Math.PI / positions.size();
+                  for (Grid.EmitterPosition pos : positions) {
+                    indirectEmitterColor.scaleAdd(sampleScaler, sampleEmitter(scene, ray, pos, random));
+                  }
+                  break;
                 }
               }
             }
@@ -434,6 +441,32 @@ public class PathTracer implements RayTracer {
     return hit;
   }
 
+  private static void sampleEmitterFace(Scene scene, Ray ray, Grid.EmitterPosition pos, int face, Vector4 result, double scaler, Random random) {
+    Ray emitterRay = new Ray(ray);
+
+    pos.sampleFace(face, emitterRay.d, random);
+    emitterRay.d.sub(emitterRay.o);
+
+      if (emitterRay.d.dot(ray.getNormal()) > 0) {
+        double distance = emitterRay.d.length();
+        emitterRay.d.scale(1 / distance);
+
+      emitterRay.o.scaleAdd(Ray.OFFSET, emitterRay.d);
+      emitterRay.distance += Ray.OFFSET;
+      PreviewRayTracer.nextIntersection(scene, emitterRay);
+      if (Math.abs(emitterRay.distance - distance) < Ray.OFFSET) {
+        double e = Math.abs(emitterRay.d.dot(emitterRay.getNormal()));
+        e /= Math.max(distance * distance, 1);
+        e *= pos.block.surfaceArea(face);
+        e *= emitterRay.getCurrentMaterial().emittance;
+        e *= scene.emitterIntensity;
+        e *= scaler;
+
+        result.scaleAdd(e, emitterRay.color);
+      }
+    }
+  }
+
   /**
    * Cast a shadow ray from the intersection point (given by ray) to the emitter
    * at position pos. Returns the contribution of this emitter (0 if the emitter is occluded)
@@ -444,43 +477,24 @@ public class PathTracer implements RayTracer {
    * @return The contribution of the emitter
    */
   private static Vector4 sampleEmitter(Scene scene, Ray ray, Grid.EmitterPosition pos, Random random) {
-    Vector4 indirectEmitterColor = new Vector4();
-    Ray emitterRay = new Ray();
-    emitterRay.set(ray);
-    // TODO Sampling a random point on the model would be better than using a random point in the middle of the cube
-    Vector3 target = new Vector3(pos.x + (random.nextDouble() - 0.5) * pos.radius, pos.y + (random.nextDouble() - 0.5) * pos.radius, pos.z  + (random.nextDouble() - 0.5) * pos.radius);
-    emitterRay.d.set(target);
-    emitterRay.d.sub(emitterRay.o);
-    double distance = emitterRay.d.length();
-    emitterRay.d.normalize();
-    double indirectEmitterCoef = emitterRay.d.dot(emitterRay.getNormal());
-    if(indirectEmitterCoef > 0) {
-      // Here We need to invert the material.
-      // The fact that the dot product is > 0 guarantees that the ray is going away from the surface
-      // it just met. This means the ray is going from the block just hit to the previous material (usually air or water)
-      // TODO If/when normal mapping is implemented, indirectEmitterCoef will be computed with the mapped normal
-      //      but the dot product with the original geometry normal will still need to be computed
-      //      to ensure the emitterRay isn't going through the geometry
-      Material prev = emitterRay.getPrevMaterial();
-      int prevData = emitterRay.getPrevData();
-      emitterRay.setPrevMaterial(emitterRay.getCurrentMaterial(), emitterRay.getCurrentData());
-      emitterRay.setCurrentMaterial(prev, prevData);
-      emitterRay.emittance.set(0, 0, 0);
-      emitterRay.o.scaleAdd(Ray.EPSILON, emitterRay.d);
-      PreviewRayTracer.nextIntersection(scene, emitterRay);
-      if(emitterRay.getCurrentMaterial().emittance > Ray.EPSILON) {
-        indirectEmitterColor.set(emitterRay.color);
-        indirectEmitterColor.scale(emitterRay.getCurrentMaterial().emittance);
-        // TODO Take fog into account
-        indirectEmitterCoef *= scene.emitterIntensity;
-        // Dont know if really realistic but offer better convergence and is better artistically
-        indirectEmitterCoef /= Math.max(distance * distance, 1);
-      }
-    } else {
-      indirectEmitterCoef = 0;
+    Vector4 result = new Vector4();
+    result.set(0, 0, 0, 1);
+
+    switch (scene.getEmitterSamplingStrategy()) {
+      default:
+      case ONE:
+        sampleEmitterFace(scene, ray, pos, random.nextInt(pos.block.faceCount()), result, 1, random);
+        break;
+      case ONE_BLOCK:
+      case ALL:
+        double scaler = 1.0 / pos.block.faceCount();
+        for (int i = 0; i < pos.block.faceCount(); i++) {
+          sampleEmitterFace(scene, ray, pos, i, result, scaler, random);
+        }
+        break;
     }
-    indirectEmitterColor.scale(indirectEmitterCoef);
-    return indirectEmitterColor;
+
+    return result;
   }
 
   /**

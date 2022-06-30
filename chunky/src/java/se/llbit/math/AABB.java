@@ -16,6 +16,8 @@
  */
 package se.llbit.math;
 
+import java.util.Random;
+
 /**
  * Axis Aligned Bounding Box for collision detection and Bounding Volume Hierarchy
  * construction.
@@ -31,14 +33,59 @@ public class AABB {
   public double zmin;
   public double zmax;
 
-  public AABB(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax) {
+  public double surfaceArea;
 
+  public AABB(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax) {
     this.xmin = xmin;
     this.xmax = xmax;
     this.ymin = ymin;
     this.ymax = ymax;
     this.zmin = zmin;
     this.zmax = zmax;
+
+    double x = xmax - xmin;
+    double y = ymax - ymin;
+    double z = zmax - zmin;
+    this.surfaceArea = 2 * (y * z + x * z + x * y);
+  }
+
+  public void sampleFace(int face, Vector3 loc, Random rand) {
+    double[] v = new double[3];
+    face %= 6;
+    int axis = face % 3;
+    v[axis] = face > 2 ? 1 : 0;
+    v[(axis + 1) % 3] = rand.nextDouble();
+    v[(axis + 2) % 3] = rand.nextDouble();
+
+    v[0] *= xmax - xmin;
+    v[1] *= ymax - ymin;
+    v[2] *= zmax - zmin;
+
+    v[0] += xmin;
+    v[1] += ymin;
+    v[2] += zmin;
+
+    loc.set(v[0], v[1], v[2]);
+  }
+
+  public double faceSurfaceArea(int face) {
+    double[] minC = new double[3];
+    double[] maxC = new double[3];
+
+    minC[0] = xmin;
+    minC[1] = ymin;
+    minC[2] = zmin;
+
+    maxC[0] = xmax;
+    maxC[1] = ymax;
+    maxC[2] = zmax;
+
+    int a1 = (face + 1) % 3;
+    int a2 = (face + 2) % 3;
+
+    double sa = (maxC[a1] - minC[a1]) * (maxC[a2] - minC[a2]);
+
+    return Math.abs(sa);
   }
 
   /**

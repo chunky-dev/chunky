@@ -4,9 +4,10 @@ import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
+
+import java.util.Random;
 
 /**
  * A block model that is made out of textured quads.
@@ -27,6 +28,21 @@ public abstract class QuadModel implements BlockModel {
   @PluginApi
   public Tint[] getTints() {
     return null;
+  }
+
+  @Override
+  public int faceCount() {
+    return getQuads().length;
+  }
+
+  @Override
+  public void sample(int face, Vector3 loc, Random rand) {
+    getQuads()[face % faceCount()].sample(loc, rand);
+  }
+
+  @Override
+  public double faceSurfaceArea(int face) {
+    return getQuads()[face % faceCount()].surfaceArea();
   }
 
   @Override
