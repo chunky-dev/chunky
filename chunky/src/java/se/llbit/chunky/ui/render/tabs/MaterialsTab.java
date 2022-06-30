@@ -69,7 +69,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     perceptualSmoothness.setTooltip("Smoothness of the selected material.");
     metalness.setName("Metalness");
     metalness.setRange(0, 1);
-    metalness.setTooltip("Texture-tinted reflectivity of the selected material.");
+    metalness.setTooltip("Metalness (texture-tinted reflectivity) of the selected material.");
     ObservableList<String> blockIds = FXCollections.observableArrayList();
     blockIds.addAll(MaterialStore.collections.keySet());
     blockIds.addAll(ExtraMaterials.idMap.keySet());
