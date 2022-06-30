@@ -132,18 +132,18 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     waterVisibility.setName("Water visibility");
-    waterVisibility.setTooltip("Distance of visibility past the surface of the water.");
+    waterVisibility.setTooltip("Distance of visibility past the water surface.");
     waterVisibility.setRange(0, 50);
     waterVisibility.clampMin();
     waterVisibility.onValueChange(value -> scene.setWaterVisibility(value));
 
     waterOpacity.setName("Water opacity");
-    waterOpacity.setTooltip("Opacity of the surface of the water.");
+    waterOpacity.setTooltip("Opacity of the water surface.");
     waterOpacity.setRange(0, 1);
     waterOpacity.clampBoth();
     waterOpacity.onValueChange(value -> scene.setWaterOpacity(value));
 
-    stillWater.setTooltip(new Tooltip("Disable the waves on the surface of the water."));
+    stillWater.setTooltip(new Tooltip("Disable the waves on the water surface."));
     stillWater.selectedProperty().addListener((observable, oldValue, newValue) ->
       scene.setStillWater(newValue)
     );
