@@ -258,6 +258,18 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
         error -> System.err.printf("Could not update the launcher data. %s\n", error),
         info -> Platform.runLater(this::updateChannelsList)
     );
+
+    UpdateChecker updateThread = new UpdateChecker(settings, settings.selectedChannel, new UpdateListener() {
+      @Override
+      public void updateAvailable(VersionInfo latest) {
+        ChunkyLauncherController.this.updateAvailable(latest);
+      }
+      @Override
+      public void updateError(String message) {}
+      @Override
+      public void noUpdateAvailable() {}
+    });
+    updateThread.start();
   }
 
   public void updateLauncher() {
