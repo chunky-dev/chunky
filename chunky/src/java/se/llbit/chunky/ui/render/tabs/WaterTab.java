@@ -143,7 +143,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterOpacity.clampBoth();
     waterOpacity.onValueChange(value -> scene.setWaterOpacity(value));
 
-    stillWater.setTooltip(new Tooltip("Disable the ripple effect of the water."));
+    stillWater.setTooltip(new Tooltip("Disable the waves on the surface of the water."));
     stillWater.selectedProperty().addListener((observable, oldValue, newValue) ->
       scene.setStillWater(newValue)
     );
@@ -155,7 +155,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
 
     waterColor.colorProperty().addListener(waterColorListener);
 
-    saveDefaults.setTooltip(new Tooltip("Store the current water settings as new defaults."));
+    saveDefaults.setTooltip(new Tooltip("Save the current water settings as new defaults."));
     saveDefaults.setOnAction(e -> {
       PersistentSettings.setStillWater(scene.stillWaterEnabled());
       PersistentSettings.setWaterOpacity(scene.getWaterOpacity());
@@ -188,7 +188,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       scene.setWaterPlaneChunkClip(newValue)
     );
 
-    useProceduralWater.setTooltip(new Tooltip("Generate customized water ripples using noise."));
+    useProceduralWater.setTooltip(new Tooltip("Generate customized water waves using noise to prevent tiling at large distances."));
     useProceduralWater.selectedProperty().addListener((observable, oldValue, newValue) -> {
       if(newValue && scene.getWaterShading() instanceof LegacyWaterShader) {
         SimplexWaterShader shader = new SimplexWaterShader();
