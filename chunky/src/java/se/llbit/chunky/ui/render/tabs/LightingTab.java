@@ -101,7 +101,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunIntensity.onValueChange(value -> scene.sun().setIntensity(value));
 
     sunLuminosity.setName("Sun luminosity");
-    sunLuminosity.setTooltip("Absolute brightness of the sun. Only used with Sun Sampling Strategy: OFF or HIGH_QUALITY.");
+    sunLuminosity.setTooltip("Absolute brightness of the sun. Only used when Sun Sampling Strategy is set to OFF or HIGH_QUALITY.");
     sunLuminosity.setRange(1, 10000);
     sunLuminosity.makeLogarithmic();
     sunLuminosity.clampMin();
