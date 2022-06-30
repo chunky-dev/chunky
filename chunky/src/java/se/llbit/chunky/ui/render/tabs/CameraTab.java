@@ -221,11 +221,11 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       }
     };
     posX.addEventFilter(KeyEvent.KEY_PRESSED, positionHandler);
-    posX.setTooltip(new Tooltip("Camera X coordinate."));
+    posX.setTooltip(new Tooltip("Camera X (East/West) coordinate."));
     posY.addEventFilter(KeyEvent.KEY_PRESSED, positionHandler);
-    posY.setTooltip(new Tooltip("Camera Y coordinate."));
+    posY.setTooltip(new Tooltip("Camera Y (Up/Down) coordinate."));
     posZ.addEventFilter(KeyEvent.KEY_PRESSED, positionHandler);
-    posZ.setTooltip(new Tooltip("Camera Z coordinate."));
+    posZ.setTooltip(new Tooltip("Camera Z (South/North) coordinate."));
 
     EventHandler<KeyEvent> directionHandler = e -> {
       if (e.getCode() == KeyCode.ENTER) {
@@ -268,7 +268,6 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     fov.setName("Field of view (zoom)");
     fov.setRange(0.1, 180);
     fov.clampMin();
-    fov.setTooltip("Vertical field of view of the camera.");
     fov.onValueChange(value -> scene.camera().setFoV(value));
 
     dof.setName("Depth of field");
