@@ -81,7 +81,7 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
       }
     });
 
-    singleColorBtn.setTooltip(new Tooltip("Set block textures to a single color which is the average of all color values of its current texture. \nRequires restart for changes to take effect."));
+    singleColorBtn.setTooltip(new Tooltip("Set block textures to a single color which is the average of all color values of its current texture."));
     singleColorBtn.setSelected(PersistentSettings.getSingleColorTextures());
     singleColorBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
       Scene scene = sceneManager.getScene();
