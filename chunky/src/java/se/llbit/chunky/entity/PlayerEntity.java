@@ -859,12 +859,11 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         // TODO: defer loading.
         Log.infof("Loading texture: %s", textureId);
 
-        ResourcePackTextureLoader[] loaders = new ResourcePackTextureLoader[1];
-        loaders[0] = ResourcePackTextureLoader.singletonLoader(textureId, loader);
-        ResourcePackLoader.loadResources(loaders);
-
-        for (String resource : loaders[0].toLoad()) {
-          Log.warnf("Failed to load texture: %s", resource);
+        if(!ResourcePackLoader.loadResources(
+          ResourcePackTextureLoader.singletonLoader(textureId, loader))
+        ) {
+          // not completed singleton load --> failure
+          Log.warnf("Failed to load texture: %s", textureId);
         }
       }
     }

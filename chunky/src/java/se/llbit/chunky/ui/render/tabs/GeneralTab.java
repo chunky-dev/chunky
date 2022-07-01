@@ -85,8 +85,6 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private CheckBox loadBooks;
   @FXML private CheckBox loadPaintings;
   @FXML private CheckBox loadOtherEntities;
-  @FXML private CheckBox biomeColors;
-  @FXML private CheckBox biomeBlending;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
   @FXML private ComboBox<Number> dumpFrequency;
@@ -133,9 +131,6 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadPaintings.setSelected(preferences.shouldLoadClass(PaintingEntity.class));
       loadOtherEntities.setSelected(preferences.shouldLoadClass(null));
     }
-    biomeColors.setSelected(scene.biomeColorsEnabled());
-    biomeBlending.setDisable(!scene.biomeColorsEnabled());
-    biomeBlending.setSelected(scene.biomeBlendingEnabled());
 
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
     reloadChunks.setDisable(scene.numberOfChunks() == 0);
@@ -268,58 +263,6 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadBooks.setSelected(false);
       loadPaintings.setSelected(false);
       loadOtherEntities.setSelected(false);
-    });
-
-    biomeColors.setTooltip(new Tooltip("Colors grass and tree leaves according to biome."));
-    biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      boolean enabled = scene.biomeColorsEnabled();
-
-      scene.setBiomeColorsEnabled(newValue);
-      biomeBlending.setDisable(!newValue);
-
-      if(!scene.haveLoadedChunks()) {
-        return;
-      }
-      if(enabled == newValue) { // Jank to avoid not snapshotting the scene settings
-        return;
-      }
-      if(newValue) {
-        Alert warning = Dialogs.createAlert(AlertType.CONFIRMATION);
-        warning.setContentText("The selected chunks need to be reloaded in order for biome colors to update.");
-        warning.getButtonTypes().setAll(
-          ButtonType.CANCEL,
-          new ButtonType("Reload chunks", ButtonBar.ButtonData.FINISH));
-        warning.setTitle("Chunk reload required");
-        ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
-        if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
-          controller.getSceneManager().reloadChunks();
-        }
-      }
-    });
-
-    biomeBlending.setTooltip(new Tooltip("Blend edges of biomes (looks better but loads slower)"));
-    biomeBlending.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      boolean enabled = scene.biomeBlendingEnabled();
-
-      scene.setBiomeBlendingEnabled(newValue);
-
-      if(!scene.haveLoadedChunks()) {
-        return;
-      }
-      if(enabled == newValue) { // Jank to avoid not snapshotting the scene settings
-        return;
-      }
-
-      Alert warning = Dialogs.createAlert(AlertType.CONFIRMATION);
-      warning.setContentText("The selected chunks need to be reloaded in order for biome blending to update.");
-      warning.getButtonTypes().setAll(
-        ButtonType.CANCEL,
-        new ButtonType("Reload chunks", ButtonBar.ButtonData.FINISH));
-      warning.setTitle("Chunk reload required");
-      ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
-      if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
-        controller.getSceneManager().reloadChunks();
-      }
     });
 
     dumpFrequency.setConverter(new ValidatingNumberStringConverter(true));

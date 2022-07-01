@@ -37,7 +37,6 @@ import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
 import se.llbit.chunky.resources.ResourcePackLoader;
 import se.llbit.chunky.resources.SettingsDirectory;
-import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.ChunkyFx;
 import se.llbit.chunky.ui.controller.CreditsController;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
@@ -211,13 +210,13 @@ public class Chunky {
     }
 
     int exitCode = 0;
-    if (cmdline.mode == CommandLineOptions.Mode.NOTHING) {
+    if (cmdline.mode == CommandLineOptions.Mode.CLI_OPERATION) {
       exitCode = cmdline.exitCode;
     } else {
       commonThreads = new ForkJoinPool(PersistentSettings.getNumThreads());
 
       Chunky chunky = new Chunky(cmdline.options);
-      chunky.headless = cmdline.mode == Mode.HEADLESS_RENDER || cmdline.mode == Mode.SNAPSHOT;
+      chunky.headless = cmdline.mode == Mode.HEADLESS_RENDER || cmdline.mode == Mode.CREATE_SNAPSHOT;
       chunky.loadPlugins();
 
       try {
@@ -225,10 +224,10 @@ public class Chunky {
           case HEADLESS_RENDER:
             exitCode = chunky.doHeadlessRender();
             break;
-          case SNAPSHOT:
+          case CREATE_SNAPSHOT:
             exitCode = chunky.doSnapshot();
             break;
-          case DEFAULT:
+          case START_GUI:
             ChunkyFx.startChunkyUI(chunky);
             break;
         }
@@ -245,8 +244,9 @@ public class Chunky {
   /**
    * This can be used by plugins to load the default Minecraft textures.
    */
+  @PluginApi
   public static void loadDefaultTextures() {
-    ResourcePackLoader.loadResourcePacks(new String[0]);
+    ResourcePackLoader.loadDefaultResourcePack();
   }
 
   private void loadPlugins() {

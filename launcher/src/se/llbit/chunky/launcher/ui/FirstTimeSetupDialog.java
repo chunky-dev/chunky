@@ -105,6 +105,7 @@ public class FirstTimeSetupDialog extends Stage {
           System.err.println(e1.getMessage());
         }
         PersistentSettings.changeSettingsDirectory(settingsDir);
+        PersistentSettings.reload();
       }
       if (!initialized) {
         Dialogs.error("Failed to Initialize",

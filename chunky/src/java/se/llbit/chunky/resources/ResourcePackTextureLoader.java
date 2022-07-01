@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,8 +86,8 @@ public class ResourcePackTextureLoader implements ResourcePackLoader.PackLoader 
     }
 
     @Override
-    public String[] toLoad() {
-        return texturesToLoad.keySet().toArray(new String[0]);
+    public Collection<String> notLoaded() {
+        return Collections.unmodifiableCollection(texturesToLoad.keySet());
     }
 
     private void loadTerrainTextures(Path root, ArrayList<String> toRemove) {

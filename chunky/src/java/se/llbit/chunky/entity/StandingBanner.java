@@ -322,13 +322,11 @@ public class StandingBanner extends Entity {
         texture = new Texture();
         TextureCache.put(texId, texture);
 
-        ResourcePackTextureLoader[] loaders = new ResourcePackTextureLoader[1];
-        loaders[0] = ResourcePackTextureLoader.singletonLoader(filename, new SimpleTexture(texId, texture));
-        ResourcePackLoader.loadResources(loaders);
-
-        for (String resource : loaders[0].toLoad()) {
-          Log.infof("Failed to load banner pattern: %s", resource);
-          texture = Texture.bannerBase;
+        if(!ResourcePackLoader.loadResources(
+          ResourcePackTextureLoader.singletonLoader(filename, new SimpleTexture(texId, texture)))
+        ) {
+          // not completed singleton load --> failure
+          Log.infof("Failed to load banner pattern: %s", texId);
         }
       }
       return texture.getBitmap();
