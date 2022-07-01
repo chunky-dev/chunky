@@ -128,7 +128,9 @@ public class ResourcePackLoader {
     TextureCache.reset();
     Biomes.reset();
 
-    loadedResourcePacks = resourcePacks;
+    loadedResourcePacks = resourcePacks.stream()
+      .distinct()
+      .collect(Collectors.toList());
 
     List<PackLoader> loaders = PACK_LOADER_FACTORIES.stream()
       .map(PackLoaderFactory::create)
