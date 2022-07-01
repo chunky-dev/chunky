@@ -115,10 +115,16 @@ public class LauncherSettings {
         Log.info("Invalid release channel", e);
       }
     }
+    releaseChannels.putIfAbsent(STABLE_RELEASE_CHANNEL.id, STABLE_RELEASE_CHANNEL);
+    releaseChannels.putIfAbsent(SNAPSHOT_RELEASE_CHANNEL.id, SNAPSHOT_RELEASE_CHANNEL);
+
     String selectedChannelId = releaseChannelObj.get("selectedChannel").stringValue(STABLE_RELEASE_CHANNEL.id);
-    selectedChannel = releaseChannels.getOrDefault(selectedChannelId, STABLE_RELEASE_CHANNEL);
+    selectedChannel = releaseChannels.getOrDefault(selectedChannelId, null);
+    if (selectedChannel == null) {
+      selectedChannel = releaseChannels.get(STABLE_RELEASE_CHANNEL.id);
+    }
     if (settings.getBool("downloadSnapshots", false)) {
-      selectedChannel = SNAPSHOT_RELEASE_CHANNEL;
+      selectedChannel = releaseChannels.get(SNAPSHOT_RELEASE_CHANNEL.id);
     }
   }
 

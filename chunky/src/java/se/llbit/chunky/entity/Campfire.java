@@ -2,12 +2,16 @@ package se.llbit.chunky.entity;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Random;
+
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.log.Log;
 import se.llbit.math.*;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.util.JsonUtil;
@@ -254,18 +258,35 @@ public class Campfire extends Entity {
     return new Quad(quad, Transform.NONE.rotateY(Math.toRadians(45)));
   }
 
+  private static final Quad[] fireQuads = new Quad[] {
+      quads[quads.length-4], quads[quads.length-3],
+      quads[quads.length-2], quads[quads.length-1],
+  };
+  public static int faceCount() {
+      return fireQuads.length;
+  }
+  public static void sample(int face, Vector3 loc, Random rand) {
+    fireQuads[face].sample(loc, rand);
+  }
+
+  public static double surfaceArea(int face) {
+    return fireQuads[face].surfaceArea();
+  }
+
   public static final Material flameMaterial = new TextureMaterial(Texture.campfireFire);
   public static final Material soulFlameMaterial = new TextureMaterial(Texture.soulCampfireFire);
 
   private final Campfire.Kind kind;
   private final String facing;
   private final boolean isLit;
+  private final Block block;
 
-  public Campfire(Campfire.Kind kind, Vector3 position, String facing, boolean lit) {
+  public Campfire(Campfire.Kind kind, Vector3 position, String facing, boolean lit, Block block) {
     super(position);
     this.kind = kind;
     this.facing = facing;
     this.isLit = lit;
+    this.block = block;
   }
 
   public Campfire(JsonObject json) {
@@ -273,6 +294,7 @@ public class Campfire extends Entity {
     this.kind = Campfire.Kind.valueOf(json.get("campfireKind").stringValue("CAMPFIRE"));
     this.facing = json.get("facing").stringValue("north");
     this.isLit = json.get("lit").boolValue(true);
+    this.block = null;
   }
 
   @Override
@@ -327,12 +349,17 @@ public class Campfire extends Entity {
 
   @Override
   public Grid.EmitterPosition[] getEmitterPosition() {
-    if(isLit) {
-      Grid.EmitterPosition[] pos = new Grid.EmitterPosition[1];
-      pos[0] = new Grid.EmitterPosition((float)(position.x + 0.5), (float)(position.y + 0.625), (float)(position.z + 0.5));
-      return pos;
-    }
-    else
-      return new Grid.EmitterPosition[0];
+      if (block == null) {
+          Log.warn("Attempted to build emitter grid from unassociated campfire entity.");
+          return new Grid.EmitterPosition[0];
+      }
+
+      if (isLit) {
+          Grid.EmitterPosition[] pos = new Grid.EmitterPosition[1];
+          pos[0] = new Grid.EmitterPosition((int) position.x, (int) position.y, (int) position.z, block);
+          return pos;
+      } else {
+          return new Grid.EmitterPosition[0];
+      }
   }
 }

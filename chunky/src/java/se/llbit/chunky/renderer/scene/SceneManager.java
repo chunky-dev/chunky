@@ -19,6 +19,7 @@ package se.llbit.chunky.renderer.scene;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
+import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +29,11 @@ import java.util.Collection;
  * A scene manager can save and load scenes.
  */
 public interface SceneManager {
+  /**
+   * Get the used task tracker or {@link se.llbit.util.TaskTracker#NONE} if tasks are not tracked.
+   */
+  TaskTracker getTaskTracker();
+
   /**
    * Save the current scene.
    */

@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2022 Jesper Öqvist <jesper@llbit.se>
  * Copyright (c) 2012-2022 Chunky contributors
  *
  * This file is part of Chunky.
@@ -17,96 +17,63 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.stream.IntStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.block.*;
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.Lava;
+import se.llbit.chunky.block.Water;
 import se.llbit.chunky.block.legacy.LegacyBlocksFinalizer;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.chunk.biome.BiomeData;
-import se.llbit.chunky.entity.ArmorStand;
-import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.entity.Lectern;
-import se.llbit.chunky.entity.PaintingEntity;
-import se.llbit.chunky.entity.PlayerEntity;
-import se.llbit.chunky.entity.Poseable;
+import se.llbit.chunky.entity.*;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.*;
-import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
-import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
+import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
-import se.llbit.chunky.renderer.scene.biome.Trivial2dBiomeStructureImpl;
-import se.llbit.chunky.renderer.scene.biome.Trivial3dBiomeStructureImpl;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
+import se.llbit.chunky.world.*;
 import se.llbit.chunky.world.biome.ArrayBiomePalette;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.biome.Biomes;
-import se.llbit.chunky.world.Chunk;
-import se.llbit.chunky.world.ChunkPosition;
-import se.llbit.chunky.world.EmptyWorld;
-import se.llbit.chunky.world.ExtraMaterials;
-import se.llbit.chunky.world.Material;
-import se.llbit.chunky.world.MaterialStore;
-import se.llbit.chunky.world.World;
-import se.llbit.json.Json;
-import se.llbit.json.JsonArray;
-import se.llbit.json.JsonObject;
-import se.llbit.json.JsonParser;
-import se.llbit.json.JsonValue;
-import se.llbit.json.PrettyPrinter;
+import se.llbit.json.*;
 import se.llbit.log.Log;
 import se.llbit.math.*;
 import se.llbit.math.bvh.BVH;
-import se.llbit.math.structures.*;
+import se.llbit.math.structures.Position2IntStructure;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.*;
+import se.llbit.util.annotation.NotNull;
+import se.llbit.util.mojangapi.MinecraftProfile;
+import se.llbit.util.mojangapi.MinecraftSkin;
+import se.llbit.util.mojangapi.MojangApi;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.*;
-
-import se.llbit.util.annotation.NotNull;
-import se.llbit.util.mojangapi.MojangApi;
-import se.llbit.util.mojangapi.PlayerSkin;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.stream.IntStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Encapsulates scene and render state.
@@ -226,7 +193,8 @@ public class Scene implements JsonSerializable, Refreshable {
   protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
   protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.NONE;
 
-  protected boolean sunEnabled = true;
+  protected SunSamplingStrategy sunSamplingStrategy = SunSamplingStrategy.FAST;
+
   /**
    * Water opacity modifier.
    */
@@ -298,8 +266,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   private ArrayList<Entity> actors = new ArrayList<>();
 
-  /** Poseable entities in the scene. */
-  private Map<PlayerEntity, JsonObject> profiles = new HashMap<>();
+  private Map<PlayerEntity, MinecraftProfile> profiles = new HashMap<>();
 
   /** Material properties for this scene. */
   public Map<String, JsonValue> materials = new HashMap<>();
@@ -354,6 +321,11 @@ public class Scene implements JsonSerializable, Refreshable {
   private int gridSize = PersistentSettings.getGridSizeDefault();
 
   private boolean preventNormalEmitterWithSampling = PersistentSettings.getPreventNormalEmitterWithSampling();
+
+  /**
+   * Hide unknown blocks. This is done at intersection time, the unknown blocks are still in the octree.
+   */
+  private boolean hideUnknownBlocks = false;
 
   /**
    * The octree implementation to use
@@ -489,7 +461,7 @@ public class Scene implements JsonSerializable, Refreshable {
     waterColor.set(other.waterColor);
     fogColor.set(other.fogColor);
     biomeColors = other.biomeColors;
-    sunEnabled = other.sunEnabled;
+    sunSamplingStrategy = other.sunSamplingStrategy;
     emittersEnabled = other.emittersEnabled;
     emitterIntensity = other.emitterIntensity;
     emitterSamplingStrategy = other.emitterSamplingStrategy;
@@ -510,6 +482,8 @@ public class Scene implements JsonSerializable, Refreshable {
     waterPlaneOffsetEnabled = other.waterPlaneOffsetEnabled;
     waterPlaneChunkClip = other.waterPlaneChunkClip;
     waterShading = other.waterShading.clone();
+
+    hideUnknownBlocks = other.hideUnknownBlocks;
 
     spp = other.spp;
     renderTime = other.renderTime;
@@ -612,9 +586,9 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       boolean emitterGridNeedChunkReload = false;
+      boolean octreeLoaded = loadOctree(context, taskTracker);
       if (emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
         emitterGridNeedChunkReload = !loadEmitterGrid(context, taskTracker);
-      boolean octreeLoaded = loadOctree(context, taskTracker);
       if (emitterGridNeedChunkReload || !octreeLoaded) {
         // Could not load stored octree or emitter grid.
         // Load the chunks from the world.
@@ -660,13 +634,6 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * @return <code>true</code> if sunlight is enabled
-   */
-  public boolean getDirectLight() {
-    return sunEnabled;
-  }
-
-  /**
    * Set emitters enable flag.
    */
   public synchronized void setEmittersEnabled(boolean value) {
@@ -677,13 +644,20 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Set sunlight enable flag.
+   * Set sun sampling strategy.
    */
-  public synchronized void setDirectLight(boolean value) {
-    if (value != sunEnabled) {
-      sunEnabled = value;
+  public synchronized void setSunSamplingStrategy(SunSamplingStrategy strategy) {
+    if (strategy != this.sunSamplingStrategy) {
+      this.sunSamplingStrategy = strategy;
       refresh();
     }
+  }
+
+  /**
+   * Get sun sampling strategy.
+   */
+  public SunSamplingStrategy getSunSamplingStrategy() {
+    return this.sunSamplingStrategy;
   }
 
   /**
@@ -937,20 +911,20 @@ public class Scene implements JsonSerializable, Refreshable {
           entity.randomPose();
           task.update(target, done);
           done += 1;
-          JsonObject profile;
+          MinecraftProfile profile;
           try {
             profile = MojangApi.fetchProfile(entity.uuid);
-            PlayerSkin skin = MojangApi.getSkinFromProfile(profile);
-            if (skin != null) {
-              String skinUrl = skin.getUrl();
+            Optional<MinecraftSkin> skin = profile.getSkin();
+            if (skin.isPresent()) {
+              String skinUrl = skin.get().getSkinUrl();
               if (skinUrl != null) {
                 entity.skin = MojangApi.downloadSkin(skinUrl).getAbsolutePath();
               }
-              entity.model = skin.getModel();
+              entity.model = skin.get().getPlayerModel();
             }
           } catch (IOException e) {
             Log.error(e);
-            profile = new JsonObject();
+            profile = new MinecraftProfile();
           }
           profiles.put(entity, profile);
           actors.add(entity);
@@ -1266,7 +1240,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   cubeWorldBlocks[cubeIndex] = octNode;
 
                   if(emitterGrid != null && block.emittance > 1e-4) {
-                    emitterGrid.addEmitter(new Grid.EmitterPosition(x + 0.5f, y - origin.y + 0.5f, z + 0.5f));
+                    emitterGrid.addEmitter(new Grid.EmitterPosition(x, y, z, block));
                   }
                 }
               }
@@ -2236,7 +2210,7 @@ public class Scene implements JsonSerializable, Refreshable {
       Log.info("Saving Grid " + filename);
 
       try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(filename)))) {
-        emitterGrid.store(out);
+        emitterGrid.store(out, this);
       } catch (IOException e) {
         Log.warn("Couldn't save Grid", e);
       }
@@ -2287,7 +2261,7 @@ public class Scene implements JsonSerializable, Refreshable {
     try (TaskTracker.Task task = taskTracker.task("Loading grid")) {
       Log.info("Load grid " + filename);
       try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(context.getSceneFileInputStream(filename))))) {
-        emitterGrid = Grid.load(in);
+        emitterGrid = Grid.load(in, this);
         return true;
       } catch (Exception e) {
         Log.info("Failed to load the grid", e);
@@ -2712,7 +2686,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("saveSnapshots", saveSnapshots);
     json.add("emittersEnabled", emittersEnabled);
     json.add("emitterIntensity", emitterIntensity);
-    json.add("sunEnabled", sunEnabled);
+    json.add("sunSamplingStrategy", sunSamplingStrategy.getId());
     json.add("stillWater", stillWater);
     json.add("waterOpacity", waterOpacity);
     json.add("waterVisibility", waterVisibility);
@@ -2740,6 +2714,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("waterWorldHeightOffsetEnabled", waterPlaneOffsetEnabled);
     json.add("waterWorldClipEnabled", waterPlaneChunkClip);
     json.add("renderActors", renderActors);
+    json.add("hideUnknownBlocks", hideUnknownBlocks);
 
     if (!worldPath.isEmpty()) {
       // Save world info.
@@ -2831,12 +2806,8 @@ public class Scene implements JsonSerializable, Refreshable {
     return actors;
   }
 
-  public JsonObject getPlayerProfile(PlayerEntity entity) {
-    if (profiles.containsKey(entity)) {
-      return profiles.get(entity);
-    } else {
-      return new JsonObject();
-    }
+  public MinecraftProfile getPlayerProfile(PlayerEntity entity) {
+    return profiles.get(entity);
   }
 
   public void removeEntity(Entity player) {
@@ -2849,7 +2820,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void addPlayer(PlayerEntity player) {
     if (!actors.contains(player)) {
-      profiles.put(player, new JsonObject());
+      profiles.put(player, new MinecraftProfile());
       actors.add(player);
       rebuildActorBvh();
     } else {
@@ -3000,7 +2971,29 @@ public class Scene implements JsonSerializable, Refreshable {
     saveSnapshots = json.get("saveSnapshots").boolValue(saveSnapshots);
     emittersEnabled = json.get("emittersEnabled").boolValue(emittersEnabled);
     emitterIntensity = json.get("emitterIntensity").doubleValue(emitterIntensity);
-    sunEnabled = json.get("sunEnabled").boolValue(sunEnabled);
+
+    if (json.get("sunSamplingStrategy").isUnknown()) {
+      boolean sunSampling = json.get("sunEnabled").boolValue(false);
+      boolean drawSun = json.get("sun").asObject().get("drawTexture").boolValue(false);
+      if (drawSun) {
+        if (sunSampling) {
+          sunSamplingStrategy = SunSamplingStrategy.FAST;
+        } else {
+          sunSamplingStrategy = SunSamplingStrategy.NON_LUMINOUS;
+        }
+      } else {
+        sunSamplingStrategy = SunSamplingStrategy.FAST;
+      }
+    } else {
+      sunSamplingStrategy = SunSamplingStrategy.valueOf(json.get("sunSamplingStrategy").asString(SunSamplingStrategy.FAST.getId()));
+    }
+
+    if (json.get("sunEnabled").boolValue(false)) {
+      sunSamplingStrategy = SunSamplingStrategy.FAST;
+    } else {
+      sunSamplingStrategy = SunSamplingStrategy.valueOf(json.get("sunSamplingStrategy").asString(SunSamplingStrategy.FAST.getId()));
+    }
+
     stillWater = json.get("stillWater").boolValue(stillWater);
     waterOpacity = json.get("waterOpacity").doubleValue(waterOpacity);
     waterVisibility = json.get("waterVisibility").doubleValue(waterVisibility);
@@ -3045,6 +3038,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     renderActors = json.get("renderActors").boolValue(renderActors);
+    hideUnknownBlocks = json.get("hideUnknownBlocks").boolValue(hideUnknownBlocks);
     materials = json.get("materials").object().copy().toMap();
 
     // Load world info.
@@ -3523,5 +3517,13 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void setWaterShading(WaterShader waterShading) {
     this.waterShading = waterShading;
+  }
+
+  public boolean getHideUnknownBlocks() {
+    return this.hideUnknownBlocks;
+  }
+
+  public void setHideUnknownBlocks(boolean hideUnknownBlocks) {
+    this.hideUnknownBlocks = hideUnknownBlocks;
   }
 }

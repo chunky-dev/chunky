@@ -469,6 +469,9 @@ public class ChunkyFxController
     map = new ChunkMap(mapLoader, this, mapView, chunkSelection,
         mapCanvas, mapOverlay);
 
+    yMin.setTooltip("Minimum Y level displayed in the map view.");
+    yMax.setTooltip("Maximum Y level displayed in the map view.");
+
     AtomicBoolean ignoreYUpdate = new AtomicBoolean(false); // used to not trigger a world reload after changing the world, see #926
     mapLoader.addWorldLoadListener(
         (world, reloaded) -> {
@@ -552,6 +555,7 @@ public class ChunkyFxController
     scale.setRange(ChunkView.BLOCK_SCALE_MIN, ChunkView.BLOCK_SCALE_MAX);
     scale.clampBoth();
     scale.set(initialView.scale);
+    scale.setTooltip("Map scale (zoom) measured in pixels per chunk.");
 
     // Add listeners to the properties to control the map view.
     GroupedChangeListener.ListenerGroup group = GroupedChangeListener.newGroup();
@@ -601,7 +605,9 @@ public class ChunkyFxController
     mainTabs.getTabs().setAll(javaFxTabs);
 
     trackPlayerBtn.selectedProperty().bindBidirectional(trackPlayer);
+    trackPlayerBtn.setTooltip(new Tooltip("Center the map view over the player."));
     trackCameraBtn.selectedProperty().bindBidirectional(trackCamera);
+    trackCameraBtn.setTooltip(new Tooltip("Center the map view over the camera."));
 
     int currentDimension = mapLoader.getDimension();
     overworldBtn.setSelected(currentDimension == World.OVERWORLD_DIMENSION);
@@ -683,7 +689,7 @@ public class ChunkyFxController
     previewTab.setGraphic(new ImageView(Icon.sky.fxImage()));
 
     start.setGraphic(new ImageView(Icon.play.fxImage()));
-    start.setTooltip(new Tooltip("Start rendering."));
+    start.setTooltip(new Tooltip("Start/resume rendering."));
     start.setOnAction(e -> {
       if (!scene.isLoading())
         asyncSceneManager.enqueueTask(() -> scene.startRender());

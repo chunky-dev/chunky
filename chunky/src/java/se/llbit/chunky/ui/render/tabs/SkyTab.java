@@ -155,6 +155,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     skyFogDensity.clampMin();
     skyFogDensity.onValueChange(value -> scene.setSkyFogDensity(value));
 
+    skyMode.setTooltip(new Tooltip("Set the type of sky to be used in the scene."));
     skyMode.getItems().addAll(Sky.SkyMode.values());
     skyMode.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
@@ -194,6 +195,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
         .setTooltip(new Tooltip("Disables sky rendering for background compositing."));
     transparentSkyEnabled.selectedProperty().addListener(
         (observable, oldValue, newValue) -> scene.setTransparentSky(newValue));
+    cloudsEnabled.setTooltip(new Tooltip("Toggle visibility of Minecraft-style clouds."));
     cloudsEnabled.selectedProperty().addListener((observable, oldValue, newValue) -> {
 
       scene.sky().setCloudsEnabled(newValue);

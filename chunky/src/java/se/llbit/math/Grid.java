@@ -1,5 +1,9 @@
 package se.llbit.math;
 
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import se.llbit.chunky.block.Block;
+import se.llbit.chunky.renderer.scene.Scene;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -8,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Grid {
-  private static final int GRID_FORMAT_VERSION = 2;
+  private static final int GRID_FORMAT_VERSION = 3;
 
   /**
    * Holds a 3D grid of blocks cube
@@ -21,21 +25,42 @@ public class Grid {
    * The maximum distance where an emitter can be found in some cases is 2*cellSize-1 blocks away.
    */
   public static class EmitterPosition {
-    public EmitterPosition(float x, float y, float z) {
+    public int x, y, z;
+    public final Block block;
+
+    public EmitterPosition(int x, int y, int z, Block block) {
       this.x = x;
       this.y = y;
       this.z = z;
-      radius = 1.0f / 8;
-    }
-    public EmitterPosition(float x, float y, float z, float radius) {
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.radius = radius;
+      this.block = block;
     }
 
-    public float x, y, z;
-    public float radius;
+    public static EmitterPosition create(int x, int y, int z, int block, Scene scene) {
+      try {
+        return new EmitterPosition(x, y, z, scene.getPalette().get(block));
+      } catch (ArrayIndexOutOfBoundsException e) {
+        // Mismatched block palette?
+        return create(x, y, z, scene);
+      }
+    }
+
+    public static EmitterPosition create(int x, int y, int z, Scene scene) {
+      return new EmitterPosition(x, y, z, (Block) scene.getWorldOctree().getMaterial(x, y, z, scene.getPalette()));
+    }
+
+    public void sample(Vector3 loc, Random rand) {
+      block.sample(rand.nextInt(block.faceCount()), loc, rand);
+      loc.x += x;
+      loc.y += y;
+      loc.z += z;
+    }
+
+    public void sampleFace(int face, Vector3 loc, Random rand) {
+      block.sample(face, loc, rand);
+      loc.x += x;
+      loc.y += y;
+      loc.z += z;
+    }
   }
 
   private final int cellSize;
@@ -67,17 +92,17 @@ public class Grid {
   public void addEmitter(EmitterPosition pos) {
     emitterPositions.add(pos);
     if(minX == -1 || pos.x < minX)
-      minX = (int) pos.x;
+      minX = pos.x;
     if(maxX == -1 || pos.x  > maxX)
-      maxX = (int) pos.x;
+      maxX = pos.x;
     if(minY == -1 || pos.y < minY)
-      minY = (int) pos.y;
+      minY = pos.y;
     if(maxY == -1 || pos.y > maxY)
-      maxY = (int) pos.y;
+      maxY = pos.y;
     if(minZ == -1 || pos.z < minZ)
-      minZ = (int) pos.z;
+      minZ = pos.z;
     if(maxZ == -1 || pos.z > maxZ)
-      maxZ = (int) pos.z;
+      maxZ = pos.z;
   }
 
   private int cellIndex(int x, int y, int z) {
@@ -201,7 +226,12 @@ public class Grid {
    * Stores the grid in the given stream
    * @param out The output stream
    */
-  public void store(DataOutputStream out) throws IOException {
+  public void store(DataOutputStream out, Scene scene) throws IOException {
+    Object2IntOpenHashMap<Block> palette = new Object2IntOpenHashMap<>();
+    for (int i = 0; i < scene.getPalette().getPalette().size(); i++) {
+      palette.put(scene.getPalette().get(i), i);
+    }
+
     out.writeInt(GRID_FORMAT_VERSION);
 
     out.writeInt(cellSize);
@@ -215,10 +245,10 @@ public class Grid {
     // Write every emitter position
     out.writeInt(emitterPositions.size());
     for(EmitterPosition pos : emitterPositions) {
-      out.writeFloat(pos.x);
-      out.writeFloat(pos.y);
-      out.writeFloat(pos.z);
-      out.writeFloat(pos.radius);
+      out.writeInt(pos.x);
+      out.writeInt(pos.y);
+      out.writeInt(pos.z);
+      out.writeInt(palette.getInt(pos.block));
     }
 
     // Write, for each cell, how many emitters are contained and their indexes in the array written earlier
@@ -237,7 +267,7 @@ public class Grid {
    * @param in The input stream to read the grid from
    * @return The grid
    */
-  public static Grid load(DataInputStream in) throws IOException {
+  public static Grid load(DataInputStream in, Scene scene) throws IOException {
     int version = in.readInt();
     if(version > GRID_FORMAT_VERSION) {
       throw new RuntimeException("Unknown grid format version, can't load the grid");
@@ -271,17 +301,29 @@ public class Grid {
     int emitterNo = in.readInt();
     grid.emitterPositions = new ArrayList<>(emitterNo);
     for(int i = 0; i < emitterNo; ++i) {
-      if(version < 2) {
-        float x = in.readInt() + 0.5f;
-        float y = in.readInt() + 0.5f;
-        float z = in.readInt() + 0.5f;
-        grid.emitterPositions.add(new EmitterPosition(x, y, z));
-      } else {
-        float x = in.readFloat();
-        float y = in.readFloat();
-        float z = in.readFloat();
-        float radius = in.readFloat();
-        grid.emitterPositions.add(new EmitterPosition(x, y, z, radius));
+      switch (version) {
+        case 0:
+        case 1: {
+          int x = in.readInt();
+          int y = in.readInt();
+          int z = in.readInt();
+          grid.emitterPositions.add(EmitterPosition.create(x, y, z, scene));
+          break;
+        }
+        case 2: {
+          float x = in.readFloat();
+          float y = in.readFloat();
+          float z = in.readFloat();
+          in.readFloat();
+          grid.emitterPositions.add(EmitterPosition.create((int) x, (int) y, (int) z, scene));
+        }
+        case 3: {
+          int x = in.readInt();
+          int y = in.readInt();
+          int z = in.readInt();
+          int block = in.readInt();
+          grid.emitterPositions.add(EmitterPosition.create(x, y, z, block, scene));
+        }
       }
     }
 

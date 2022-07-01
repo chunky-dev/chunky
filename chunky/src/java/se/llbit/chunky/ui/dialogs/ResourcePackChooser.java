@@ -17,31 +17,49 @@
  */
 package se.llbit.chunky.ui.dialogs;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-import se.llbit.chunky.map.WorldMapLoader;
-import se.llbit.chunky.ui.Icons;
-import se.llbit.chunky.ui.controller.WorldChooserController;
+import se.llbit.chunky.resources.ResourcePackLoader;
+import se.llbit.chunky.ui.controller.ResourcePackChooserController;
+import se.llbit.util.TaskTracker;
 
 import java.io.IOException;
 
 /**
- * A dialog for choosing a Minecraft world.
+ * A dialog for loading and choosing the resource packs for a scene.
  */
-public class WorldChooser extends Stage {
-  public WorldChooser(WorldMapLoader mapLoader) throws IOException {
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("WorldChooser.fxml"));
+public class ResourcePackChooser extends Stage {
+  public ResourcePackChooser(
+    se.llbit.chunky.renderer.scene.Scene scene,
+    TaskTracker taskTracker
+  ) throws IOException {
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("ResourcePackChooser.fxml"));
     Parent root = loader.load();
-    WorldChooserController controller = loader.getController();
-    setTitle("Select World");
-    getIcons().add(Icons.CHUNKY_ICON);
+    ResourcePackChooserController controller = loader.getController();
+    setTitle("Select Resource Packs");
+    getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
     setScene(new Scene(root));
-    controller.setStage(this);
-    controller.populate(mapLoader);
+
+    controller.populate(
+      resourcePacks -> {
+        close();
+        Platform.runLater(() -> {
+          try(TaskTracker.Task task = taskTracker.task("Loading textures")) {
+            ResourcePackLoader.loadAndPersistResourcePacks(resourcePacks);
+            task.update(1);
+            scene.refresh();
+            scene.rebuildBvh();
+          }
+        });
+      },
+      this::close
+    );
     addEventFilter(KeyEvent.KEY_PRESSED, e -> {
       if (e.getCode() == KeyCode.ESCAPE) {
         e.consume();

@@ -29,6 +29,7 @@
       <Label text="Output mode:" />
       <ChoiceBox fx:id="outputMode" prefWidth="150.0" />
     </HBox>
+    <CheckBox fx:id="hideUnknownBlocks" mnemonicParsing="false" text="Hide unknown blocks" />
     <Separator prefWidth="200.0" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Octree implementation:" />

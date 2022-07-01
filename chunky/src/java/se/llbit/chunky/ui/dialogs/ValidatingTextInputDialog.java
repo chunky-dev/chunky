@@ -14,11 +14,15 @@ public class ValidatingTextInputDialog extends TextInputDialog {
 
   public ValidatingTextInputDialog(String defaultValue) {
     super(defaultValue);
-    Button okButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
+    Button okButton = this.getSubmitButtion();
     okButton.addEventFilter(ActionEvent.ACTION, this::onSubmit);
     getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
       okButton.setDisable(!this.isValid.test(newValue));
     });
+  }
+
+  private Button getSubmitButtion() {
+    return (Button) getDialogPane().lookupButton(ButtonType.OK);
   }
 
   public ValidatingTextInputDialog(String defaultValue, Predicate<String> validator) {
@@ -31,12 +35,13 @@ public class ValidatingTextInputDialog extends TextInputDialog {
   }
 
   public ValidatingTextInputDialog(Predicate<String> validator) {
-    this();
+    this("");
     setValidator(validator);
   }
 
   public void setValidator(Predicate<String> validator) {
     this.isValid = validator;
+    this.getSubmitButtion().setDisable(!this.isValid.test(getEditor().getText()));
   }
 
   private void onSubmit(ActionEvent event) {

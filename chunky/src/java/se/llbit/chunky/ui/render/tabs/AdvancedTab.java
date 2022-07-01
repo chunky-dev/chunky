@@ -71,6 +71,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private ChoiceBox<String> biomeStructureImplementation;
   @FXML private IntegerAdjuster gridSize;
   @FXML private CheckBox preventNormalEmitterWithSampling;
+  @FXML private CheckBox hideUnknownBlocks;
   @FXML private ChoiceBox<String> rendererSelect;
   @FXML private ChoiceBox<String> previewSelect;
   @FXML private CheckBox showLauncher;
@@ -241,6 +242,11 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       PersistentSettings.setPreventNormalEmitterWithSampling(newvalue);
     });
 
+    hideUnknownBlocks.setTooltip(new Tooltip("Hide unknown blocks instead of rendering them as question marks."));
+    hideUnknownBlocks.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.setHideUnknownBlocks(newValue);
+    });
+
     rendererSelect.setTooltip(new Tooltip("The renderer to use for rendering."));
     rendererSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
         scene.setRenderer(newValue));
@@ -279,6 +285,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     gridSize.set(scene.getGridSize());
     preventNormalEmitterWithSampling.setSelected(scene.isPreventNormalEmitterWithSampling());
     animationTime.set(scene.getAnimationTime());
+    hideUnknownBlocks.setSelected(scene.getHideUnknownBlocks());
     rendererSelect.getSelectionModel().select(scene.getRenderer());
     previewSelect.getSelectionModel().select(scene.getPreviewRenderer());
   }

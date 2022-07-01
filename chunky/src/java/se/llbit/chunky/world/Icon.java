@@ -86,7 +86,7 @@ public class Icon extends Texture {
   public static final Icon corruptLayer = new Icon(ImageLoader.missingImage);
 
   public Icon(String resourceName) {
-    super(ImageLoader.readNonNull("icons/" + resourceName + ".png"));
+    super(ImageLoader.readResourceNonNull("icons/" + resourceName + ".png"));
   }
 
   protected Icon(BitmapImage image) {

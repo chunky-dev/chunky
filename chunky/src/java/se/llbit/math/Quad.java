@@ -17,6 +17,7 @@
 package se.llbit.math;
 
 import java.util.Collection;
+import java.util.Random;
 
 import se.llbit.chunky.world.Material;
 import se.llbit.math.primitive.Primitive;
@@ -132,6 +133,18 @@ public class Quad {
     this.uv.set(uv);
     this.uv.y -= uv.x;
     this.uv.w -= uv.z;
+  }
+
+  public double surfaceArea() {
+    Vector3 cross = new Vector3();
+    cross.cross(xv, yv);
+    return cross.length();
+  }
+
+  public void sample(Vector3 loc, Random rand) {
+    loc.set(o);
+    loc.scaleAdd(rand.nextDouble(), xv);
+    loc.scaleAdd(rand.nextDouble(), yv);
   }
 
   /**

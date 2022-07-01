@@ -70,7 +70,7 @@ public final class ImageLoader {
    *
    * @return Image for the given resource name
    */
-  public static synchronized BitmapImage readNonNull(String resourceName) {
+  public static synchronized BitmapImage readResourceNonNull(String resourceName) {
     URL url = ImageLoader.class.getResource("/" + resourceName);
     if (url == null) {
       Log.info("Could not find image: " + resourceName);

@@ -20,6 +20,7 @@ import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.resources.texturepack.FontTexture.Glyph;
 import se.llbit.json.JsonArray;
+import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonValue;
@@ -36,10 +37,10 @@ import java.nio.file.Path;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class JsonFontTextureLoader extends TextureLoader {
-  private final String fontDefinition;
+  private final String fontDefinitionPath;
 
-  public JsonFontTextureLoader(String fontDefinition) {
-    this.fontDefinition = fontDefinition;
+  public JsonFontTextureLoader(String fontDefinitionPath) {
+    this.fontDefinitionPath = fontDefinitionPath;
   }
 
   @Override
@@ -58,7 +59,7 @@ public class JsonFontTextureLoader extends TextureLoader {
     Texture.fonts.setGlyph(' ', new Glyph(new int[8], 0, 2, 8, 8, 7));
 
     JsonArray fontDefinitions;
-    try (InputStream is = Files.newInputStream(texturePack.resolve(fontDefinition))) {
+    try (InputStream is = Files.newInputStream(texturePack.resolve(fontDefinitionPath))) {
       fontDefinitions = new JsonParser(is).parse().asObject().get("providers").asArray();
     } catch (IOException | SyntaxError e) {
       // Safe to ignore - will be handled implicitly later.
@@ -66,16 +67,27 @@ public class JsonFontTextureLoader extends TextureLoader {
     }
 
     for (JsonValue fontDefinition : fontDefinitions) {
-      if (!fontDefinition.asObject().get("type").stringValue("").equals("bitmap")) {
+      JsonObject definition = fontDefinition.asObject();
+      if (!definition.get("type").stringValue("").equals("bitmap")) {
         continue;
       }
 
       BitmapImage spritemap;
-      String texture = fontDefinition.asObject().get("file").stringValue("").split(":")[1];
-      try (InputStream imageStream = Files.newInputStream(texturePack.resolve("assets/minecraft/textures/" + texture))) {
-        spritemap = ImageLoader.read(imageStream);
-      } catch (IOException e) {
-        Log.error("Could not load font texture " + texture, e);
+      String texture = definition.get("file").stringValue("").split(":")[1];
+      Path texturePath = texturePack.resolve("assets/minecraft/textures/" + texture);
+      if(Files.exists(texturePath)) {
+        try (InputStream imageStream = Files.newInputStream(texturePath)) {
+          spritemap = ImageLoader.read(imageStream);
+        } catch (IOException e) {
+          Log.error("Failed to load font texture: " + texture, e);
+          return false;
+        }
+      } else {
+        Log.warnf(
+          "Could not find font texture: %s (defined in \"%s\")",
+          texture,
+          fontDefinitionPath
+        );
         return false;
       }
 

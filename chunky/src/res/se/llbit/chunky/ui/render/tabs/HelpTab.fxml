@@ -12,21 +12,47 @@
     <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
     </padding>
-    <Label text="Camera key bindings:">
+    <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250" text="Many controls contain a short description. Hover the cursor over the control to view that description." />
+    <Label />
+    <Label text="Map controls:">
       <font>
         <Font name="System Bold" size="12.0" />
       </font>
     </Label>
-    <Label text="W move forward" />
-    <Label text="S move backward" />
-    <Label text="A strafe left" />
-    <Label text="D strafe right" />
-    <Label text="R move up" />
-    <Label text="F move down" />
+    <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
+          text="- Left-click and drag to move the map view." />
+    <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
+          text="- Left-click to select or deselect a single chunk or region." />
+    <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
+          text="- Hold Shift and left-click and drag to select multiple chunks." />
+    <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
+          text="- Hold Ctrl+Shift and left-click and drag to deselect multiple chunks." />
+    <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
+          text="- Use the mouse wheel to change the map scale (zoom)." />
+    <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
+          text="- Right-click the map to show more actions." />
+    <Label />
+    <Label text="Camera controls:">
+      <font>
+        <Font name="System Bold" size="12.0" />
+      </font>
+    </Label>
+    <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
+          text="- Left-click and drag to change the viewing angle of the camera." />
+    <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
+          text="- Use the scroll wheel to change the camera FoV (zoom)." />
+    <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
+          text="- Right-click the render preview to show more actions." />
+    <Label />
+    <Label text="- W, A, S, D: Move the camera." />
+    <Label text="- R: Move the camera up." />
+    <Label text="- F: Move the camera down." />
     <Label />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-      text="Holding SHIFT makes the basic movement keys move 0.1 of the normal speed." />
+          text="- Holding Shift while using the movement controls multiplies the movement of the camera by 0.1." />
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
-      text="Holding CTRL makes the basic movement keys move 100 of the normal speed." />
+          text="- Holding Ctrl while using the movement controls multiplies the movement of the camera by 100." />
+    <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250"
+          text="- Holding Ctrl+Shift while using the movement controls multiplies the movement of the camera by 10." />
   </VBox>
 </fx:root>

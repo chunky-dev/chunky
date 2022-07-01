@@ -1,5 +1,5 @@
-/* Copyright (c) 2012 - 2021 Jesper Öqvist <jesper@llbit.se>
- * Copyright (c) 2012 - 2021 Chunky contributors
+/* Copyright (c) 2012 - 2022 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012 - 2022 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -120,6 +120,9 @@ public class Sun implements JsonSerializable {
 
   private double intensity = DEFAULT_INTENSITY;
 
+  private double luminosity = 100;
+  private double luminosityPdf = 1.0 / luminosity;
+
   private double azimuth = Math.PI / 2.5;
   private double altitude = Math.PI / 3;
 
@@ -173,6 +176,8 @@ public class Sun implements JsonSerializable {
     color.set(other.color);
     drawTexture = other.drawTexture;
     intensity = other.intensity;
+    luminosity = other.luminosity;
+    luminosityPdf = other.luminosityPdf;
     initSun();
   }
 
@@ -312,6 +317,20 @@ public class Sun implements JsonSerializable {
     return intensity;
   }
 
+  public void setLuminosity(double value) {
+    luminosity = value;
+    luminosityPdf = 1 / value;
+    scene.refresh();
+  }
+
+  public double getLuminosity() {
+    return luminosity;
+  }
+
+  public double getLuminosityPdf() {
+    return luminosityPdf;
+  }
+
   /**
    * Point ray in random direction within sun solid angle
    */
@@ -340,6 +359,7 @@ public class Sun implements JsonSerializable {
     sun.add("altitude", altitude);
     sun.add("azimuth", azimuth);
     sun.add("intensity", intensity);
+    sun.add("luminosity", luminosity);
     JsonObject colorObj = new JsonObject();
     colorObj.add("red", color.x);
     colorObj.add("green", color.y);
@@ -353,6 +373,7 @@ public class Sun implements JsonSerializable {
     azimuth = json.get("azimuth").doubleValue(azimuth);
     altitude = json.get("altitude").doubleValue(altitude);
     intensity = json.get("intensity").doubleValue(intensity);
+    setLuminosity(json.get("luminosity").doubleValue(luminosity));
 
     if (json.get("color").isObject()) {
       JsonObject colorObj = json.get("color").object();
