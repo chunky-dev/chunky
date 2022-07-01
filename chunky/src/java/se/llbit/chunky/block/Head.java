@@ -23,12 +23,11 @@ import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.EntityTexture;
-import se.llbit.log.Log;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
-import se.llbit.util.mojangapi.MojangApi;
+import se.llbit.util.mojangapi.MinecraftSkin;
 
 public class Head extends MinecraftBlockTranslucent {
 
@@ -75,7 +74,7 @@ public class Head extends MinecraftBlockTranslucent {
     if (type == Kind.PLAYER) {
       String textureUrl = getTextureUrl(entityTag);
       return textureUrl != null ? new HeadEntity(position, textureUrl, rotation, 1)
-          : new SkullEntity(position, type, rotation, 1);
+        : new SkullEntity(position, type, rotation, 1);
     } else {
       return null;
     }
@@ -87,14 +86,9 @@ public class Head extends MinecraftBlockTranslucent {
       ownerTag = entityTag.get("SkullOwner"); // used by player heads
     }
     String textureBase64 = ownerTag.get("Properties").get("textures").get(0)
-        .get("Value").stringValue();
+      .get("Value").stringValue();
     if (!textureBase64.isEmpty()) {
-      try {
-        return MojangApi.getSkinFromEncodedTextures(textureBase64).getUrl();
-      } catch (IllegalArgumentException e) {
-        // base64 decoding error
-        Log.warn("Could not get skull texture", e);
-      }
+      return MinecraftSkin.getSkinFromEncodedTextures(textureBase64).map(MinecraftSkin::getSkinUrl).orElse(null);
     }
     return null;
   }
