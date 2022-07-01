@@ -132,28 +132,30 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     waterVisibility.setName("Water visibility");
-    waterVisibility.setTooltip("Visibility depth under water.");
+    waterVisibility.setTooltip("Distance of visibility past the water surface.");
     waterVisibility.setRange(0, 50);
     waterVisibility.clampMin();
     waterVisibility.onValueChange(value -> scene.setWaterVisibility(value));
 
     waterOpacity.setName("Water opacity");
-    waterOpacity.setTooltip("Sets how opaque the water surface appears.");
+    waterOpacity.setTooltip("Opacity of the water surface.");
     waterOpacity.setRange(0, 1);
     waterOpacity.clampBoth();
     waterOpacity.onValueChange(value -> scene.setWaterOpacity(value));
 
+    stillWater.setTooltip(new Tooltip("Disable the waves on the water surface."));
     stillWater.selectedProperty().addListener((observable, oldValue, newValue) ->
       scene.setStillWater(newValue)
     );
 
+    useCustomWaterColor.setTooltip(new Tooltip("Disable biome tinting for water, and use a custom color instead."));
     useCustomWaterColor.selectedProperty().addListener((observable, oldValue, newValue) ->
       scene.setUseCustomWaterColor(newValue)
     );
 
     waterColor.colorProperty().addListener(waterColorListener);
 
-    saveDefaults.setTooltip(new Tooltip("Store the current water settings as new defaults."));
+    saveDefaults.setTooltip(new Tooltip("Save the current water settings as new defaults."));
     saveDefaults.setOnAction(e -> {
       PersistentSettings.setStillWater(scene.stillWaterEnabled());
       PersistentSettings.setWaterOpacity(scene.getWaterOpacity());
@@ -177,6 +179,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterPlaneHeight.clampBoth();
     waterPlaneHeight.onValueChange(value -> scene.setWaterPlaneHeight(value));
 
+    waterPlaneOffsetEnabled.setTooltip(new Tooltip("Lower the water plane from block level to water level."));
     waterPlaneOffsetEnabled.selectedProperty().addListener((observable, oldValue, newValue) ->
       scene.setWaterPlaneOffsetEnabled(newValue)
     );
@@ -185,6 +188,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       scene.setWaterPlaneChunkClip(newValue)
     );
 
+    useProceduralWater.setTooltip(new Tooltip("Generate customized water waves using noise to prevent tiling at large distances."));
     useProceduralWater.selectedProperty().addListener((observable, oldValue, newValue) -> {
       if(newValue && scene.getWaterShading() instanceof LegacyWaterShader) {
         SimplexWaterShader shader = new SimplexWaterShader();
