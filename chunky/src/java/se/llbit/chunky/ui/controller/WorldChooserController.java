@@ -151,7 +151,7 @@ public class WorldChooserController implements Initializable {
   private void loadWorld(World world, WorldMapLoader mapLoader) {
     world.getResourcePack()
       .ifPresent(worldResourcePack -> {
-        List<File> currentlyLoadedPacks = ResourcePackLoader.getLoadedResourcePacks();
+        List<File> currentlyLoadedPacks = new ArrayList<>(ResourcePackLoader.getLoadedResourcePacks());
 
         if (!currentlyLoadedPacks.contains(worldResourcePack)) {
           Alert loadTexturesConfirm = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);

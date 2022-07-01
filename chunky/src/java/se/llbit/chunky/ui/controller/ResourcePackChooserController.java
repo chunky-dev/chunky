@@ -429,6 +429,8 @@ public class ResourcePackChooserController implements Initializable {
 
     PackListItem defaultPack = PackListItem.getDefault();
     if (defaultPack != null) {
+      availablePacksList.removeAll(defaultPack);
+      targetPacksList.removeAll(defaultPack);
       targetPacksList.add(defaultPack);
     }
   }
@@ -498,11 +500,9 @@ public class ResourcePackChooserController implements Initializable {
     }
 
     public String getFormatVersionString() {
-      if (formatVersion <= 0) {
-        return "?";
-      } else {
-        return "v" + formatVersion;
-      }
+      return formatVersion <= 0
+         ? ""
+         : ("v" + formatVersion);
     }
 
     public PackListItem(File resourcePackFile) {

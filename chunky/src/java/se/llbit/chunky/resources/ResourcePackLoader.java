@@ -65,21 +65,11 @@ public class ResourcePackLoader {
 
   private static List<File> loadedResourcePacks = Collections.emptyList();
 
+  /**
+   * @return loaded resource packs without default pack
+   */
   public static List<File> getLoadedResourcePacks() {
-    return new ArrayList<>(loadedResourcePacks);
-  }
-
-  public static List<File> getLoadedResourcePacks(boolean hideDefaultPack) {
-    List<File> resourcePacks = getLoadedResourcePacks();
-    if (!hideDefaultPack) {
-      File file = MinecraftFinder.getMinecraftJar();
-      if (file != null) {
-        resourcePacks.add(file);
-      } else {
-        Log.error("Minecraft Jar not found: falling back to placeholder textures.");
-      }
-    }
-    return resourcePacks;
+    return Collections.unmodifiableList(loadedResourcePacks);
   }
 
   public static List<File> getAvailableResourcePacks() {
@@ -151,10 +141,18 @@ public class ResourcePackLoader {
   }
 
   private static boolean reloadResourcePacks(List<PackLoader> loaders) {
-    return loadResourcePacks(
-      getLoadedResourcePacks(PersistentSettings.getDisableDefaultTextures()),
-      loaders
-    );
+    List<File> resourcePacks = new ArrayList<>(getLoadedResourcePacks());
+
+    if (!PersistentSettings.getDisableDefaultTextures()) {
+      File file = MinecraftFinder.getMinecraftJar();
+      if (file != null) {
+        resourcePacks.add(file);
+      } else {
+        Log.warn("Minecraft Jar not found: falling back to placeholder textures.");
+      }
+    }
+
+    return loadResourcePacks(resourcePacks, loaders);
   }
 
   private static boolean loadResourcePacks(List<File> resourcePacks, List<PackLoader> loaders) {
