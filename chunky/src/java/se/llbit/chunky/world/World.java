@@ -34,6 +34,7 @@ import se.llbit.log.Log;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
+import se.llbit.util.MinecraftText;
 import se.llbit.util.Pair;
 import se.llbit.util.annotation.Nullable;
 
@@ -167,7 +168,7 @@ public class World implements Comparable<World> {
       Tag spawnZ = player.get("SpawnZ");
       Tag gameType = result.get(".Data.GameType");
       Tag randomSeed = result.get(".Data.RandomSeed");
-      levelName = result.get(".Data.LevelName").stringValue(levelName).replaceAll("§[0-9a-fklmnor]", "");
+      levelName = MinecraftText.removeFormatChars(result.get(".Data.LevelName").stringValue(levelName));
 
       long seed = randomSeed.longValue(0);
 

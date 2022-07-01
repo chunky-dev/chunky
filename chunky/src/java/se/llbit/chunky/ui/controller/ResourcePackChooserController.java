@@ -54,6 +54,7 @@ import se.llbit.chunky.ui.Icons;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.log.Log;
+import se.llbit.util.MinecraftText;
 
 import java.awt.*;
 import java.io.File;
@@ -516,7 +517,7 @@ public class ResourcePackChooserController implements Initializable {
     private PackListItem(File resourcePackFile, String name, Executor backgroundLoadExecutor) {
       file = resourcePackFile;
       if (name == null) {
-        String filename = resourcePackFile.getName();
+        String filename = MinecraftText.removeFormatChars(resourcePackFile.getName());
         int endOfFilename = filename.lastIndexOf('.');
         this.name = (endOfFilename > 0)
           ? filename.substring(0, endOfFilename)
@@ -563,10 +564,7 @@ public class ResourcePackChooserController implements Initializable {
       ) {
         JsonObject packInformation = parser.parse().object().get("pack").object();
         formatVersion = packInformation.get("pack_format").intValue(1);
-        description = packInformation.get("description").stringValue("")
-          // Remove Minecraft format codes (I believe the JSON parser f***ed up the unicode
-          // and sometimes the character C2 appears in front of § - it too gets filtered out)
-          .replaceAll("\\u00c2?\\u00a7[0-9a-fklmnor]", "");
+        description = MinecraftText.removeFormatChars(packInformation.get("description").stringValue(""));
       } catch (JsonParser.SyntaxError jpex) {
         Log.infof("Json error in pack.mcmeta: %s (%s)", file.getAbsolutePath(), jpex.getMessage());
         description = "[failed to load pack.mcmeta]";
