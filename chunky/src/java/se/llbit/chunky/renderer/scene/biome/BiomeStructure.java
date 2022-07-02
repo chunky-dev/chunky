@@ -18,12 +18,13 @@ import java.util.Map;
 
 public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
   Map<String, Factory> REGISTRY = new Object2ReferenceOpenHashMap<>();
-  String DEFAULT_IMPLEMENTATION = "TRIVIAL_2D";
+  String DEFAULT_IMPLEMENTATION = "WORLD_TEXTURE_2D";
 
   static void registerDefaults() {
     //TODO: create a plugin api interface for registering implementations, and move this to that
     BiomeStructure.register("TRIVIAL_3D", new Trivial3dBiomeStructure());
     BiomeStructure.register("TRIVIAL_2D", new Trivial2dBiomeStructure());
+    BiomeStructure.register("WORLD_TEXTURE_2D", new WorldTexture2dBiomeStructure());
   }
 
   /**
