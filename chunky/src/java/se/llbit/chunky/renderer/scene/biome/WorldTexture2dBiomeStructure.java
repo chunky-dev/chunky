@@ -1,6 +1,9 @@
 package se.llbit.chunky.renderer.scene.biome;
 
+import it.unimi.dsi.fastutil.longs.Long2IntMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import se.llbit.chunky.world.WorldTexture;
+import se.llbit.math.structures.Position2IntStructure;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -17,6 +20,11 @@ public class WorldTexture2dBiomeStructure implements BiomeStructure.Factory {
   @Override
   public BiomeStructure load(DataInputStream in) throws IOException {
     return new Impl(WorldTexture.load(in));
+  }
+
+  @Override
+  public Position2IntStructure createIndexStructure() {
+    return new StructureImpl();
   }
 
   @Override
@@ -69,6 +77,22 @@ public class WorldTexture2dBiomeStructure implements BiomeStructure.Factory {
     @Override
     public float[] get(int x, int y, int z) {
       return texture.get(x, z);
+    }
+  }
+
+  private static class StructureImpl implements Position2IntStructure {
+    private final Long2IntMap biomeMap = new Long2IntOpenHashMap();
+
+    @Override
+    public void set(int x, int y, int z, int data) {
+      long key = ((long) x >> 4) << 32 | ((z >> 4) & 0xffffffffL);
+      biomeMap.put(key, data);
+    }
+
+    @Override
+    public int get(int x, int y, int z) {
+      long key = ((long) x >> 4) << 32 | ((z >> 4) & 0xffffffffL);
+      return biomeMap.get(key);
     }
   }
 }
