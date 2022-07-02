@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.BitSet;
 
 public class Trivial2dBiomeStructure implements BiomeStructure.Factory {
+  private static final String ID = "TRIVIAL_2D";
+
   @Override
   public BiomeStructure create() {
     return new Impl();
@@ -59,6 +61,21 @@ public class Trivial2dBiomeStructure implements BiomeStructure.Factory {
     return false;
   }
 
+  @Override
+  public String getName() {
+    return "Trivial 2d";
+  }
+
+  @Override
+  public String getDescription() {
+    return "A 2d biome format that uses a packed float array to store the biomes.";
+  }
+
+  @Override
+  public String getId() {
+    return ID;
+  }
+
   static class Impl extends Position2d2ReferencePackedArrayStructure<float[]> implements BiomeStructure {
 
     public void setCube(long packedPosition, float[][] data) {
@@ -95,7 +112,7 @@ public class Trivial2dBiomeStructure implements BiomeStructure.Factory {
 
     @Override
     public String biomeFormat() {
-      return "TRIVIAL_2D";
+      return ID;
     }
 
     @Override

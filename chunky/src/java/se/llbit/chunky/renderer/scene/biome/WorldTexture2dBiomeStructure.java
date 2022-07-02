@@ -7,6 +7,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class WorldTexture2dBiomeStructure implements BiomeStructure.Factory {
+  static final String ID = "WORLD_TEXTURE_2D";
+
   @Override
   public BiomeStructure create() {
     return new Impl(new WorldTexture());
@@ -20,6 +22,21 @@ public class WorldTexture2dBiomeStructure implements BiomeStructure.Factory {
   @Override
   public boolean is3d() {
     return false;
+  }
+
+  @Override
+  public String getName() {
+    return "World texture 2d";
+  }
+
+  @Override
+  public String getDescription() {
+    return "A 2d biome format that uses de-duplicated bitmaps per chunk.";
+  }
+
+  @Override
+  public String getId() {
+    return ID;
   }
 
   static class Impl implements BiomeStructure {
@@ -41,7 +58,7 @@ public class WorldTexture2dBiomeStructure implements BiomeStructure.Factory {
 
     @Override
     public String biomeFormat() {
-      return "WORLD_TEXTURE_2D";
+      return ID;
     }
 
     @Override

@@ -194,17 +194,17 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
             }));
     bvhMethod.setTooltip(new Tooltip(bvhMethodBuilder.toString()));
 
-    ArrayList<String> biomeStructureNames = new ArrayList<>();
+    ArrayList<String> biomeStructureIds = new ArrayList<>();
     StringBuilder biomeStructureTooltipBuilder = new StringBuilder();
-    for(Map.Entry<String, BiomeStructure.Factory> entry : BiomeStructure.REGISTRY.entrySet()) {
-      biomeStructureNames.add(entry.getKey());
-      biomeStructureTooltipBuilder.append(entry.getKey());
+    for (Registerable entry : BiomeStructure.REGISTRY.values()) {
+      biomeStructureIds.add(entry.getId());
+      biomeStructureTooltipBuilder.append(entry.getName());
       biomeStructureTooltipBuilder.append(": ");
-      biomeStructureTooltipBuilder.append("Description"); //entry.getValue().getDescription());
+      biomeStructureTooltipBuilder.append(entry.getDescription());
       biomeStructureTooltipBuilder.append('\n');
     }
     biomeStructureTooltipBuilder.append("Requires reloading chunks to take effect.");
-    biomeStructureImplementation.getItems().addAll(biomeStructureNames);
+    biomeStructureImplementation.getItems().addAll(biomeStructureIds);
     biomeStructureImplementation.getSelectionModel().selectedItemProperty()
       .addListener((observable, oldvalue, newvalue) -> {
         scene.setBiomeStructureImplementation(newvalue);

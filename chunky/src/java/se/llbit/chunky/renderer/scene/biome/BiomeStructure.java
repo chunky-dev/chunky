@@ -8,23 +8,23 @@ import se.llbit.math.structures.Position2IntStructure;
 import se.llbit.math.structures.Position2ReferenceStructure;
 import se.llbit.math.structures.Position2d2IntPackedArray;
 import se.llbit.math.structures.Position3d2IntPackedArray;
+import se.llbit.util.Registerable;
 import se.llbit.util.annotation.NotNull;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.BitSet;
 import java.util.Map;
 
 public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
   Map<String, Factory> REGISTRY = new Object2ReferenceOpenHashMap<>();
-  String DEFAULT_IMPLEMENTATION = "WORLD_TEXTURE_2D";
+  String DEFAULT_IMPLEMENTATION = WorldTexture2dBiomeStructure.ID;
 
   static void registerDefaults() {
     //TODO: create a plugin api interface for registering implementations, and move this to that
-    BiomeStructure.register("TRIVIAL_3D", new Trivial3dBiomeStructure());
-    BiomeStructure.register("TRIVIAL_2D", new Trivial2dBiomeStructure());
-    BiomeStructure.register("WORLD_TEXTURE_2D", new WorldTexture2dBiomeStructure());
+    BiomeStructure.register(new Trivial3dBiomeStructure());
+    BiomeStructure.register(new Trivial2dBiomeStructure());
+    BiomeStructure.register(new WorldTexture2dBiomeStructure());
   }
 
   /**
@@ -58,11 +58,10 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
   /**
    * Register a new {@link Factory}
    *
-   * @param key The key to register the factory under <b>(MUST BE UNIQUE)</b>
    * @return Whether the supplied factory overwrote an existing one
    */
-  static boolean register(@NotNull String key, @NotNull Factory factory) {
-    return REGISTRY.put(key, factory) != null;
+  static boolean register(@NotNull Factory factory) {
+    return REGISTRY.put(factory.getId(), factory) != null;
   }
 
   /**
@@ -95,7 +94,7 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
    */
   String biomeFormat();
 
-  interface Factory {
+  interface Factory extends Registerable {
     /**
      * Create an empty {@link BiomeStructure} for loading a new scene
      */
