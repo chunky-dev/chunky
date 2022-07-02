@@ -1535,6 +1535,8 @@ public class Scene implements JsonSerializable, Refreshable {
     }
     Log.info(String.format("Loaded %d chunks", numChunks));
 
+    palette.compact();
+
     isLoading = false;
   }
 
