@@ -505,7 +505,12 @@ public class ResourcepackBlockProvider implements BlockProvider {
     private int tintindex;
 
     public JsonModelFace(String direction, JsonObject face, Vector3 from, Vector3 to) {
-      if (face.get("texture").stringValue("").length() < 2) {
+      String texture = face.get("texture").stringValue("");
+      if (!texture.startsWith("#")) {
+        // sometimes the '#' is missing in resourcepacks
+        texture = "#" + texture;
+      }
+      if (texture.length() < 2) {
         throw new RuntimeException(face.toCompactString());
       }
       this.texture = face.get("texture").stringValue("").substring(1);
