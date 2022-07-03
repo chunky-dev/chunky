@@ -39,7 +39,8 @@ public class QuadBlock extends AbstractModelBlock  {
   }
 
   @Override
-  public boolean isBlockWithEntity() {
+  public boolean isBlockEntity() {
+    // TODO we could further optimize this by only putting the out-of-bounds quads into the BVH and rendering the rest (if any) as block
     return isEntity;
   }
 
