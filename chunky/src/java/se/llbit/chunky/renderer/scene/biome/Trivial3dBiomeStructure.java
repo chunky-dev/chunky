@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.BitSet;
 
 public class Trivial3dBiomeStructure implements BiomeStructure.Factory {
+  private static final String ID = "TRIVIAL_3D";
 
   @Override
   public BiomeStructure create() {
@@ -63,6 +64,21 @@ public class Trivial3dBiomeStructure implements BiomeStructure.Factory {
     return true;
   }
 
+  @Override
+  public String getName() {
+    return "Trivial 3d";
+  }
+
+  @Override
+  public String getDescription() {
+    return "A 3d biome format that uses a packed float array to store the biomes.";
+  }
+
+  @Override
+  public String getId() {
+    return ID;
+  }
+
   static class Impl extends Position3d2ReferencePackedArrayStructure<float[]> implements BiomeStructure {
 
     public void setCube(int x, int y, int z, float[][] data) {
@@ -102,7 +118,7 @@ public class Trivial3dBiomeStructure implements BiomeStructure.Factory {
 
     @Override
     public String biomeFormat() {
-      return "TRIVIAL_3D";
+      return ID;
     }
 
     @Override
