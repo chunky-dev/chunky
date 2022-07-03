@@ -289,6 +289,8 @@ public class PackedOctree implements Octree.OctreeImplementation {
     return (!firstIsBranch && !secondIsBranch && treeData[firstNodeIndex] == treeData[secondNodeIndex]); // compare types
   }
 
+  private int[] parents = new int[depth];
+
   /**
    * Sets a specified block within the octree to a specific palette value, subdividing and merging as needed.
    *
@@ -296,7 +298,10 @@ public class PackedOctree implements Octree.OctreeImplementation {
    */
   @Override
   public void set(int type, int x, int y, int z) {
-    int[] parents = new int[depth]; // better to put as a field to prevent allocation at each invocation?
+    if (this.parents.length < depth) {
+      this.parents = new int[depth];
+    }
+    int[] parents = this.parents;
     int nodeIndex = 0; // start at root
     int position;
 
@@ -449,7 +454,10 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
     int type = tempTree.get(0)[0];
 
-    int[] parents = new int[depth]; // better to put as a field to prevent allocation at each invocation?
+    if (this.parents.length < depth) {
+      this.parents = new int[depth];
+    }
+    int[] parents = this.parents;
     int nodeIndex = 0; // start at root
     int position;
 
