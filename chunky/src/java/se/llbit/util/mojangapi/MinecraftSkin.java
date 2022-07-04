@@ -15,11 +15,14 @@ public class MinecraftSkin {
   public MinecraftProfile.Textures textures;
 
   public String getSkinUrl() {
+    if (textures == null || textures.skin == null) {
+      return null;
+    }
     return textures.skin.url;
   }
 
   public PlayerModel getPlayerModel() {
-    if (textures.skin.metadata != null) {
+    if (textures != null && textures.skin != null && textures.skin.metadata != null) {
       if (textures.skin.metadata.model.equalsIgnoreCase("slim")) {
         return PlayerModel.ALEX;
       } else if (textures.skin.metadata.model.equalsIgnoreCase("classic")) {
