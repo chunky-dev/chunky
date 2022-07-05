@@ -471,6 +471,9 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         hat.addRightFaces(faces, Texture.pumpkinSide, new Vector4(0, 1, 0, 1));
         hat.addTopFaces(faces, Texture.pumpkinTop, new Vector4(1, 0, 1, 0));
         hat.addBottomFaces(faces, Texture.pumpkinTop, new Vector4(0, 1, 0, 1));
+      } else if (headItemId.equals("minecraft:player_head")) {
+        HeadEntity head = new HeadEntity(new Vector3(), headItem.get("skin").asString(""), 0, 1);
+        faces.addAll(head.primitives(Transform.NONE.translate(0.5, 0.5, 0.5).scale(1.2).chain(transform)));
       } else {
         addModel(faces, getHelmModel(headItem), transform);
       }
