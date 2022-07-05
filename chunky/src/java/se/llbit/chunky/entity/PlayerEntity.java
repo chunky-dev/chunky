@@ -135,6 +135,18 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         if (skinUrl != null && !skinUrl.isEmpty()) {
           item.add("skin", skinUrl);
         }
+      } else {
+        Tag skinPlayername = tag.get("tag").get("SkullOwner");
+        if (!skinPlayername.isError()) {
+          try {
+            String uuid = MojangApi.usernameToUUID(skinPlayername.stringValue());
+            MinecraftProfile profile = MojangApi.fetchProfile(uuid);
+            Optional<MinecraftSkin> skin = profile.getSkin();
+            skin.ifPresent(minecraftSkin -> item.add("skin", minecraftSkin.getSkinUrl()));
+          } catch (IOException e) {
+            Log.warn("Could not download skin", e);
+          }
+        }
       }
     }
     return item;
