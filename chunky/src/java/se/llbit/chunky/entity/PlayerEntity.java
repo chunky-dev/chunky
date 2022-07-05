@@ -144,7 +144,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
             Optional<MinecraftSkin> skin = profile.getSkin();
             skin.ifPresent(minecraftSkin -> item.add("skin", minecraftSkin.getSkinUrl()));
           } catch (IOException e) {
-            Log.warn("Could not download skin", ex);
+            Log.warn("Could not download skin", e);
           }
         }
       }
