@@ -543,7 +543,7 @@ public final class PersistentSettings {
   }
 
   public static String getBiomeStructureImplementation() {
-    return settings.getString("biomeStructureImplementation", "TRIVIAL_2D");
+    return settings.getString("biomeStructureImplementation", "WORLD_TEXTURE_2D");
   }
 
 

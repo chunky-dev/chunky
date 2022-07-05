@@ -2294,14 +2294,14 @@ public class Scene implements JsonSerializable, Refreshable {
         try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(context.getSceneFileInputStream(fileName), pos -> {
           task.updateInterval((int) (pos * progressScale), 1);
         }))))) {
-          data = OctreeFileFormat.load(in, octreeImplementation, "TRIVIAL_2D");
+          data = OctreeFileFormat.load(in, octreeImplementation, this.biomeStructureImplementation);
         } catch (PackedOctree.OctreeTooBigException e) {
           // Octree too big, reload file and force loading as NodeBasedOctree
           Log.warn("Octree was too big when loading dump, reloading with old (slower and bigger) implementation.");
           DataInputStream inRetry = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(context.getSceneFileInputStream(fileName), pos -> {
             task.updateInterval((int) (pos * progressScale), 1);
           }))));
-          data = OctreeFileFormat.load(inRetry, "NODE", "TRIVIAL_2D");
+          data = OctreeFileFormat.load(inRetry, "NODE", this.biomeStructureImplementation);
         }
 
         worldOctree = data.worldTree;
