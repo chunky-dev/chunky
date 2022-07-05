@@ -2310,6 +2310,10 @@ public class Scene implements JsonSerializable, Refreshable {
         grassTexture = data.grassColors;
         foliageTexture = data.foliageColors;
         waterTexture = data.waterColors;
+        if (waterTexture == null) {
+          // this dump is so old that it doesn't contain a water texture (Chunky 2.3.0, #691)
+          waterTexture = BiomeStructure.get(this.biomeStructureImplementation).create();
+        }
         palette = data.palette;
         palette.applyMaterials();
         Log.info("Octree loaded");
