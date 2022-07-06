@@ -32,8 +32,8 @@ public class SimplexWaterShader implements WaterShader {
    */
 
   public int iterations = 4; /// Number of iteration of the fractal noise
-  public double baseFrequency = 0.1; /// frequency of the first iteration, doubles each iteration
-  public double baseAmplitude = 0.2; /// amplitude of the first iteration, halves each iteration
+  public double baseFrequency = 0.4; /// frequency of the first iteration, doubles each iteration
+  public double baseAmplitude = 0.025; /// amplitude of the first iteration, halves each iteration
   public double animationSpeed = 1; /// animation speed
   private final SimplexNoise noise = new SimplexNoise();
 
