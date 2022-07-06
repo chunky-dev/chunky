@@ -556,7 +556,7 @@ public class ChunkyFxController
       }
     });
 
-    exportZipBtn.setTooltip(new Tooltip("Exports the current map view (not the selected chunks) as a PNG file."));
+    renderPngBtn.setTooltip(new Tooltip("Exports the current map view (not the selected chunks) as a PNG file."));
     renderPngBtn.setGraphic(new ImageView(Icon.save.fxImage()));
     renderPngBtn.setOnAction(e -> {
       FileChooser fileChooser = new FileChooser();
