@@ -1010,13 +1010,25 @@ public class Scene implements JsonSerializable, Refreshable {
         int wx0 = cp.x * 16; // Start of this chunk in world coordinates.
         int wz0 = cp.z * 16;
         BiomeData biomeData = chunkData.getBiomeData();
-        for (int y = chunkData.minY(); y < chunkData.maxY(); y++) {
+
+        if (use3dBiomes) {
+          for (int y = chunkData.minY(); y < chunkData.maxY(); y++) {
+            for (int cz = 0; cz < 16; ++cz) {
+              int wz = cz + wz0;
+              for (int cx = 0; cx < 16; ++cx) {
+                int wx = cx + wx0;
+                int biomePaletteIdx = biomeData.getBiome(cx, y, cz);
+                biomePaletteIdxStructure.set(wx, y, wz, biomePaletteIdx);
+              }
+            }
+          }
+        } else {
           for (int cz = 0; cz < 16; ++cz) {
             int wz = cz + wz0;
             for (int cx = 0; cx < 16; ++cx) {
               int wx = cx + wx0;
-              int biomePaletteIdx = biomeData.getBiome(cx, y, cz);
-              biomePaletteIdxStructure.set(wx, y, wz, biomePaletteIdx);
+              int biomePaletteIdx = biomeData.getBiome(cx, chunkData.minY(), cz); // TODO: add an option to set the biome sample height?
+              biomePaletteIdxStructure.set(wx, chunkData.minY(), wz, biomePaletteIdx);
             }
           }
         }
