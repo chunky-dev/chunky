@@ -428,6 +428,7 @@ public class Chunk {
     request.add(LEVEL_SECTIONS);
     request.add(SECTIONS_POST_21W39A);
     request.add(LEVEL_BIOMES);
+    request.add(BIOMES_POST_21W39A);
     request.add(LEVEL_ENTITIES);
     request.add(LEVEL_TILEENTITIES);
     request.add(BLOCK_ENTITIES_POST_21W43A);
