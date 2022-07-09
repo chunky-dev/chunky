@@ -274,15 +274,14 @@ public class SkullEntity extends Entity {
   }
 
   @Override public Collection<Primitive> primitives(Vector3 offset) {
-    Collection<Primitive> faces = new LinkedList<>();
     double wallHeight = 0;
     if (placement >= 2) {
       wallHeight = 4 / 16.;
     }
-    Transform transform = Transform.NONE
-        .translate(position.x + offset.x + 0.5,
-            position.y + offset.y + 4 / 16. + wallHeight,
-            position.z + offset.z + 0.5);
+    Transform transform = Transform.NONE.translate(position.x + offset.x + 0.5,
+      position.y + offset.y + 4 / 16. + wallHeight,
+      position.z + offset.z + 0.5);
+
     switch (placement) {
       case 0:
         // Unused.
@@ -290,32 +289,38 @@ public class SkullEntity extends Entity {
       case 1:
         // On floor.
         transform = Transform.NONE.rotateY(-rotation * Math.PI / 8)
-            .chain(transform);
+          .chain(transform);
         break;
       case 2:
         // Facing north.
         transform = Transform.NONE.translate(0, 0, 4 / 16.)
-            .chain(transform);
+          .chain(transform);
         break;
       case 3:
         // Facing south.
         transform = Transform.NONE.translate(0, 0, 4 / 16.)
-            .rotateY(Math.PI)
-            .chain(transform);
+          .rotateY(Math.PI)
+          .chain(transform);
         break;
       case 4:
         // Facing west.
         transform = Transform.NONE.translate(0, 0, 4 / 16.)
-            .rotateY(QuickMath.HALF_PI)
-            .chain(transform);
+          .rotateY(QuickMath.HALF_PI)
+          .chain(transform);
         break;
       case 5:
         // Facing east.
         transform = Transform.NONE.translate(0, 0, 4 / 16.)
-            .rotateY(-QuickMath.HALF_PI)
-            .chain(transform);
+          .rotateY(-QuickMath.HALF_PI)
+          .chain(transform);
         break;
     }
+
+    return primitives(transform);
+  }
+
+  public Collection<Primitive> primitives(Transform transform) {
+    Collection<Primitive> faces = new LinkedList<>();
     EntityTexture texture;
     switch (type) {
       case SKELETON:
