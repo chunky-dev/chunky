@@ -17,6 +17,7 @@
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
 <?import se.llbit.chunky.ui.DoubleTextField?>
 
+<?import javafx.scene.control.Tooltip?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
     <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
@@ -29,34 +30,68 @@
       <Button fx:id="removeCamera" mnemonicParsing="false" text="Remove" />
     </HBox>
     <TitledPane fx:id="positionOrientation" animated="false" expanded="false" text="Position &amp; Orientation">
-      <GridPane hgap="10.0" vgap="10.0">
+      <GridPane hgap="6.0" vgap="10.0">
         <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+          <ColumnConstraints hgrow="NEVER" prefWidth="70.0" />
+          <ColumnConstraints minWidth="20.0" prefWidth="90.0" />
+          <ColumnConstraints minWidth="20.0" prefWidth="90.0" />
+          <ColumnConstraints minWidth="20.0" prefWidth="90.0" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints vgrow="SOMETIMES" />
-          <RowConstraints vgrow="SOMETIMES" />
-          <RowConstraints vgrow="SOMETIMES" />
         </rowConstraints>
-        <Label text="Orientation:" GridPane.rowIndex="1" />
-        <DoubleTextField fx:id="yawField" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        <DoubleTextField fx:id="pitchField" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-        <DoubleTextField fx:id="rollField" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-        <Label text="Position:" />
-        <DoubleTextField fx:id="posX" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="1" />
-        <DoubleTextField fx:id="posY" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="2" />
-        <DoubleTextField fx:id="posZ" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="3" />
-        <Label text="Lens shift:" GridPane.rowIndex="2" />
-        <DoubleTextField fx:id="shiftX" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-        <DoubleTextField fx:id="shiftY" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+
+        <Label text="x (East/West)" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+        <Label text="y (Up/Down)" GridPane.rowIndex="0" GridPane.columnIndex="2" />
+        <Label text="z (South/North)" GridPane.rowIndex="0" GridPane.columnIndex="3" />
+
+        <Label text="Position:" GridPane.rowIndex="1" />
+        <DoubleTextField fx:id="posX" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+        <DoubleTextField fx:id="posY" GridPane.rowIndex="1" GridPane.columnIndex="2" />
+        <DoubleTextField fx:id="posZ" GridPane.rowIndex="1" GridPane.columnIndex="3" />
+
+        <Button fx:id="centerCamera" mnemonicParsing="false" text="Center camera above loaded chunks" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+        <Separator GridPane.rowIndex="3" GridPane.columnSpan="4" />
+
+        <Label text="yaw" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+        <Label text="pitch" GridPane.rowIndex="4" GridPane.columnIndex="2" />
+        <Label text="roll" GridPane.rowIndex="4" GridPane.columnIndex="3" />
+
+        <Label text="Orientation:" GridPane.rowIndex="5" />
+        <DoubleTextField fx:id="yawField" GridPane.rowIndex="5" GridPane.columnIndex="1">
+          <tooltip>
+            <Tooltip text="Rotation around the camera's downwards facing axis" />
+          </tooltip>
+        </DoubleTextField>
+        <DoubleTextField fx:id="pitchField" GridPane.rowIndex="5" GridPane.columnIndex="2">
+          <tooltip>
+            <Tooltip text="Rotation around the camera's right facing axis" />
+          </tooltip>
+        </DoubleTextField>
+        <DoubleTextField fx:id="rollField" GridPane.rowIndex="5" GridPane.columnIndex="3">
+          <tooltip>
+            <Tooltip text="Rotation around the camera's forward facing axis" />
+          </tooltip>
+        </DoubleTextField>
+
+        <Separator GridPane.rowIndex="6" GridPane.columnSpan="4" />
+        
+        <Label text="horizontal" GridPane.rowIndex="7" GridPane.columnIndex="1" />
+        <Label text="vertical" GridPane.rowIndex="7" GridPane.columnIndex="2" />
+
+        <Label text="Lens shift:" GridPane.rowIndex="8" />
+        <DoubleTextField fx:id="shiftX" GridPane.rowIndex="8" GridPane.columnIndex="1">
+          <tooltip>
+            <Tooltip text="Horizontal lens shift (relative to the image height)" />
+          </tooltip>
+        </DoubleTextField>
+        <DoubleTextField fx:id="shiftY" GridPane.rowIndex="8" GridPane.columnIndex="2">
+          <tooltip>
+            <Tooltip text="Vertical lens shift (relative to the image height)" />
+          </tooltip>
+        </DoubleTextField>
       </GridPane>
     </TitledPane>
-    <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="56.0" prefWidth="200.0" spacing="10.0">
-      <Button fx:id="centerCamera" mnemonicParsing="false" text="Center camera" />
-    </HBox>
     <Separator prefWidth="200.0" />
     <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="20.0" prefWidth="200.0" spacing="10.0">
       <Label text="Projection mode:" />
