@@ -1759,17 +1759,6 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Move the camera to the player position, if available.
-   */
-  public void moveCameraToPlayer() {
-    for (Entity entity : actors) {
-      if (entity instanceof PlayerEntity) {
-        camera.moveToPlayer((PlayerEntity) entity);
-      }
-    }
-  }
-
-  /**
    * @return <code>true</code> if still water is enabled
    */
   public boolean stillWaterEnabled() {

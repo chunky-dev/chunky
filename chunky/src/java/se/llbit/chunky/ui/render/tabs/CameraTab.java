@@ -70,7 +70,6 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   @FXML private DoubleTextField yawField;
   @FXML private DoubleTextField pitchField;
   @FXML private DoubleTextField rollField;
-  @FXML private Button cameraToPlayer;
   @FXML private Button centerCamera;
   @FXML private ChoiceBox<ProjectionMode> projectionMode;
   @FXML private DoubleAdjuster fov;
@@ -243,13 +242,6 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     rollField.setTooltip(new Tooltip("Camera roll."));
     rollField.addEventFilter(KeyEvent.KEY_PRESSED, directionHandler);
 
-    cameraToPlayer.setTooltip(new Tooltip("Move camera to the player position."));
-    cameraToPlayer.setOnAction(e -> {
-      scene.moveCameraToPlayer();
-      updateCameraPosition();
-    });
-
-    centerCamera.setTooltip(new Tooltip("Center camera above loaded chunks."));
     centerCamera.setOnAction(e -> {
       scene.moveCameraToCenter();
       updateCameraPosition();
