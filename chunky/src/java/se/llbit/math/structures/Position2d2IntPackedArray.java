@@ -7,8 +7,8 @@ public class Position2d2IntPackedArray implements Position2IntStructure {
 
   protected final Long2ReferenceMap<int[]> structure = new Long2ReferenceOpenHashMap<>();
 
-  private long packedSectionPos(int x, int z) {
-    return (z & 0xFFFFFFFFL) | (x & 0xFFFFFFFFL) << 32;
+  private long packedSectionPos(int cx, int cz) {
+    return (cz & 0xFFFFFFFFL) | (cx & 0xFFFFFFFFL) << 32;
   }
 
   private int packedIndex(int x, int y, int z) {
@@ -19,12 +19,18 @@ public class Position2d2IntPackedArray implements Position2IntStructure {
 
   @Override
   public void set(int x, int y, int z, int data) {
-    this.structure.computeIfAbsent(packedSectionPos(x, z), sectionPos -> new int[16 * 16])[packedIndex(x, y, z)] = data;
+    int cx = x >> 4;
+    int cz = z >> 4;
+    long sp = packedSectionPos(cx, cz);
+    this.structure.computeIfAbsent(sp, sectionPos -> new int[16 * 16])[packedIndex(x, y, z)] = data;
   }
 
   @Override
   public int get(int x, int y, int z) {
-    int[] ints = this.structure.get(packedSectionPos(x, z));
+    int cx = x >> 4;
+    int cz = z >> 4;
+    long sp = packedSectionPos(cx, cz);
+    int[] ints = this.structure.get(sp);
     if(ints == null) {
       return 0;
     }
