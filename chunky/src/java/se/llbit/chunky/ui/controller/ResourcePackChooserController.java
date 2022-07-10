@@ -325,7 +325,7 @@ public class ResourcePackChooserController implements Initializable {
 
     Icons.buildIcon(Icons.HEAVY_PLUS).withSize(14).setAsGraphicOn(addNewTargetPackBtn);
     addNewTargetPackBtn.setOnAction(evt -> browseForUnlistedPack());
-    disableDefaultTexturesBtn.setTooltip(new Tooltip("Disable loading of textures from Minecraft and revert to internal textures and any loaded resource packs. \nRequires restart for changes to take effect."));
+    disableDefaultTexturesBtn.setTooltip(new Tooltip("Disable loading of textures from Minecraft and revert to internal textures and any loaded resource packs.\nRequires restart for changes to take effect."));
     disableDefaultTexturesBtn.setSelected(PersistentSettings.getDisableDefaultTextures());
     disableDefaultTexturesBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setDisableDefaultTextures(newValue);
