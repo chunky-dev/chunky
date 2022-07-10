@@ -1334,7 +1334,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
         if (!chunkData.isEmpty()){
           nonEmptyChunks.add(cp);
-          if (world.getChunk(cp).getVersion().equals("1.12")) {
+          if (world.getChunk(cp).getVersion() == ChunkVersion.PRE_FLATTENING) {
             legacyChunks.add(cp);
           }
         }

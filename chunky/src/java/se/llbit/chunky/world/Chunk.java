@@ -88,7 +88,7 @@ public class Chunk {
   protected int surfaceTimestamp = 0;
   protected int biomesTimestamp = 0;
 
-  protected String version;
+  protected ChunkVersion version = ChunkVersion.UNKNOWN;
 
   public Chunk(ChunkPosition pos, World world) {
     this.world = world;
@@ -176,7 +176,7 @@ public class Chunk {
     Heightmap heightmap = world.heightmap();
     Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
     if (sections.isList()) {
-      if (version.equals("1.13") || version.equals("1.12")) {
+      if (version == ChunkVersion.PRE_FLATTENING || version == ChunkVersion.POST_FLATTENING) {
         BiomePalette biomePalette = new ArrayBiomePalette();
         BiomeDataFactory.loadBiomeData(chunkData, data, biomePalette, yMin, yMax);
         biomes = new BiomeLayer(chunkData, biomePalette);
@@ -210,19 +210,19 @@ public class Chunk {
   }
 
   /** Detect Minecraft version that generated the chunk. */
-  private static String chunkVersion(@NotNull Tag data) {
+  private static ChunkVersion chunkVersion(@NotNull Tag data) {
     Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
     if (sections.isList()) {
       for (SpecificTag section : sections.asList()) {
         if (!section.get("Palette").isList()) {
           if (section.get("Blocks").isByteArray(SECTION_BYTES)) {
-            return "1.12";
+            return ChunkVersion.PRE_FLATTENING;
           }
         }
       }
-      return "1.13";
+      return ChunkVersion.POST_FLATTENING;
     }
-    return "?";
+    return ChunkVersion.UNKNOWN;
   }
 
   private static void loadBlockData(@NotNull Tag data, @NotNull ChunkData chunkData,
@@ -499,9 +499,9 @@ public class Chunk {
   }
 
   /**
-   * @return The version of this chunk (1.12, 1.13 or ?)
+   * @return The version of this chunk.
    */
-  public String getVersion() {
+  public ChunkVersion getVersion() {
     return version;
   }
 }
