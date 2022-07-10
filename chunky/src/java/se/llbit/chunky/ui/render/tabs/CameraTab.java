@@ -242,6 +242,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     rollField.setTooltip(new Tooltip("Camera roll."));
     rollField.addEventFilter(KeyEvent.KEY_PRESSED, directionHandler);
 
+    centerCamera.setTooltip(new Tooltip("Center camera above loaded chunks."));
     centerCamera.setOnAction(e -> {
       scene.moveCameraToCenter();
       updateCameraPosition();
