@@ -55,7 +55,6 @@
       </GridPane>
     </TitledPane>
     <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="56.0" prefWidth="200.0" spacing="10.0">
-      <Button fx:id="cameraToPlayer" mnemonicParsing="false" text="Camera to player" />
       <Button fx:id="centerCamera" mnemonicParsing="false" text="Center camera" />
     </HBox>
     <Separator prefWidth="200.0" />
