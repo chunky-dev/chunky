@@ -37,7 +37,7 @@ public class ImposterCubicChunk extends Chunk {
     this.world = (CubicWorld) world;
 
     assert world.getVersionId() <= VERSION_1_12_2;
-    version = "1.12";
+    version = ChunkVersion.PRE_FLATTENING;
   }
 
   private Map<Integer, Map<String, Tag>> getCubeTags(Set<String> request) {
@@ -104,7 +104,7 @@ public class ImposterCubicChunk extends Chunk {
       Tag sections = cubeData.get(LEVEL_SECTIONS);
       if (sections.isList()) {
 //        extractBiomeData(cubeData.get(LEVEL_BIOMES), chunkData);
-        if (version.equals("1.13") || version.equals("1.12")) {
+        if (version == ChunkVersion.PRE_FLATTENING || version == ChunkVersion.POST_FLATTENING) {
           loadBlockDataCubic(yPos, cubeData, chunkData, palette, yMin, yMax);
           queueTopography();
         }
