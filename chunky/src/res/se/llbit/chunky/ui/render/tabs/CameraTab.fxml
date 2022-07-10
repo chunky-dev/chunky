@@ -18,6 +18,8 @@
 <?import se.llbit.chunky.ui.DoubleTextField?>
 
 <?import javafx.scene.control.Tooltip?>
+<?import se.llbit.chunky.ui.elements.TextFieldLabelWrapper?>
+<?import javafx.scene.control.TextField?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
     <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
@@ -41,55 +43,74 @@
           <RowConstraints vgrow="SOMETIMES" />
         </rowConstraints>
 
-        <Label text="x (East/West)" GridPane.rowIndex="0" GridPane.columnIndex="1" />
-        <Label text="y (Up/Down)" GridPane.rowIndex="0" GridPane.columnIndex="2" />
-        <Label text="z (South/North)" GridPane.rowIndex="0" GridPane.columnIndex="3" />
+        <Label text="Position:" GridPane.rowIndex="0" />
+        <TextFieldLabelWrapper labelText="x:" GridPane.rowIndex="0" GridPane.columnIndex="1">
+          <DoubleTextField fx:id="posX">
+            <tooltip>
+              <Tooltip text="Camera x (east/west) coordinate" />
+            </tooltip>
+          </DoubleTextField>
+        </TextFieldLabelWrapper>
+        <TextFieldLabelWrapper labelText="y:" GridPane.rowIndex="0" GridPane.columnIndex="2">
+          <DoubleTextField fx:id="posY">
+            <tooltip>
+              <Tooltip text="Camera y (up/down) coordinate" />
+            </tooltip>
+          </DoubleTextField>
+        </TextFieldLabelWrapper>
+        <TextFieldLabelWrapper labelText="z:" GridPane.rowIndex="0" GridPane.columnIndex="3">
+          <DoubleTextField fx:id="posZ">
+            <tooltip>
+              <Tooltip text="Camera z (south/north) coordinate" />
+            </tooltip>
+          </DoubleTextField>
+        </TextFieldLabelWrapper>
 
-        <Label text="Position:" GridPane.rowIndex="1" />
-        <DoubleTextField fx:id="posX" GridPane.rowIndex="1" GridPane.columnIndex="1" />
-        <DoubleTextField fx:id="posY" GridPane.rowIndex="1" GridPane.columnIndex="2" />
-        <DoubleTextField fx:id="posZ" GridPane.rowIndex="1" GridPane.columnIndex="3" />
+        <Button fx:id="centerCamera" mnemonicParsing="false" text="Center camera above loaded chunks"
+                GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="3" />
 
-        <Button fx:id="centerCamera" mnemonicParsing="false" text="Center camera above loaded chunks" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
-        <Separator GridPane.rowIndex="3" GridPane.columnSpan="4" />
+        <Separator GridPane.rowIndex="2" GridPane.columnSpan="4" />
 
-        <Label text="yaw" GridPane.rowIndex="4" GridPane.columnIndex="1" />
-        <Label text="pitch" GridPane.rowIndex="4" GridPane.columnIndex="2" />
-        <Label text="roll" GridPane.rowIndex="4" GridPane.columnIndex="3" />
+        <Label text="Orientation:" GridPane.rowIndex="3" />
+        <TextFieldLabelWrapper labelText="yaw:" GridPane.rowIndex="3" GridPane.columnIndex="1">
+          <DoubleTextField fx:id="yawField">
+            <tooltip>
+              <Tooltip text="Rotation around the camera's downwards facing axis" />
+            </tooltip>
+          </DoubleTextField>
+        </TextFieldLabelWrapper>
+        <TextFieldLabelWrapper labelText="pitch:" GridPane.rowIndex="3" GridPane.columnIndex="2">
+          <DoubleTextField fx:id="pitchField">
+            <tooltip>
+              <Tooltip text="Rotation around the camera's right facing axis" />
+            </tooltip>
+          </DoubleTextField>
+        </TextFieldLabelWrapper>
+        <TextFieldLabelWrapper labelText="roll:" GridPane.rowIndex="3" GridPane.columnIndex="3">
+          <DoubleTextField fx:id="rollField">
+            <tooltip>
+              <Tooltip text="Rotation around the camera's forward facing axis" />
+            </tooltip>
+          </DoubleTextField>
+        </TextFieldLabelWrapper>
 
-        <Label text="Orientation:" GridPane.rowIndex="5" />
-        <DoubleTextField fx:id="yawField" GridPane.rowIndex="5" GridPane.columnIndex="1">
-          <tooltip>
-            <Tooltip text="Rotation around the camera's downwards facing axis" />
-          </tooltip>
-        </DoubleTextField>
-        <DoubleTextField fx:id="pitchField" GridPane.rowIndex="5" GridPane.columnIndex="2">
-          <tooltip>
-            <Tooltip text="Rotation around the camera's right facing axis" />
-          </tooltip>
-        </DoubleTextField>
-        <DoubleTextField fx:id="rollField" GridPane.rowIndex="5" GridPane.columnIndex="3">
-          <tooltip>
-            <Tooltip text="Rotation around the camera's forward facing axis" />
-          </tooltip>
-        </DoubleTextField>
+        <Separator GridPane.rowIndex="4" GridPane.columnSpan="4" />
 
-        <Separator GridPane.rowIndex="6" GridPane.columnSpan="4" />
-        
-        <Label text="horizontal" GridPane.rowIndex="7" GridPane.columnIndex="1" />
-        <Label text="vertical" GridPane.rowIndex="7" GridPane.columnIndex="2" />
-
-        <Label text="Lens shift:" GridPane.rowIndex="8" />
-        <DoubleTextField fx:id="shiftX" GridPane.rowIndex="8" GridPane.columnIndex="1">
-          <tooltip>
-            <Tooltip text="Horizontal lens shift (relative to the image height)" />
-          </tooltip>
-        </DoubleTextField>
-        <DoubleTextField fx:id="shiftY" GridPane.rowIndex="8" GridPane.columnIndex="2">
-          <tooltip>
-            <Tooltip text="Vertical lens shift (relative to the image height)" />
-          </tooltip>
-        </DoubleTextField>
+        <Label text="Lens shift:" GridPane.rowIndex="5" />
+        <TextFieldLabelWrapper labelText="x:" GridPane.rowIndex="5" GridPane.columnIndex="1">
+          <DoubleTextField fx:id="shiftX">
+            <tooltip>
+              <Tooltip text="Horizontal lens shift (relative to the image height)" />
+            </tooltip>
+          </DoubleTextField>
+        </TextFieldLabelWrapper>
+        <TextFieldLabelWrapper labelText="y:" GridPane.rowIndex="5" GridPane.columnIndex="2">
+          <DoubleTextField fx:id="shiftY">
+            <tooltip>
+              <Tooltip text="Vertical lens shift (relative to the image height)" />
+            </tooltip>
+          </DoubleTextField>
+        </TextFieldLabelWrapper>
       </GridPane>
     </TitledPane>
     <Separator prefWidth="200.0" />

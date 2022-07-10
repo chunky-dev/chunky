@@ -59,6 +59,13 @@ Hyperlink:hover {
     -fx-focus-color: #FF434A;
 }
 
+.text-field-label-wrapper > .label {
+    -fx-text-fill: gray;
+}
+.text-field-label-wrapper > .text-field {
+    -fx-alignment: baseline-right;
+}
+
 .menu-item:disabled:focused {
     -fx-background: unset;
     -fx-background-color: transparent;
