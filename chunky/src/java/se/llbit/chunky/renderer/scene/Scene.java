@@ -2576,7 +2576,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Query if a position is loaded.
    */
   public boolean isChunkLoaded(int x, int y, int z) {
-    return waterTexture != null && waterTexture.get(x, y, z) == null;
+    return waterTexture != null && waterTexture.get(x, y, z) != null;
   }
 
   /**
