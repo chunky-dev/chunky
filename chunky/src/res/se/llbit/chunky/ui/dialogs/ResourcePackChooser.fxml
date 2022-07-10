@@ -58,7 +58,7 @@
         <Tooltip text="Browse for a resource pack from outside the default resource pack folder and add it to the selected resource packs list" />
       </tooltip>
     </Button>
-    <CheckBox fx:id="disableDefaultTexturesBtn" mnemonicParsing="false" text="Disable default textures"/>
+    <CheckBox fx:id="disableDefaultTexturesBtn" mnemonicParsing="false" text="Disable default textures (requires restart)"/>
     <Pane HBox.hgrow="ALWAYS" />
     <Button fx:id="cancelBtn" cancelButton="true" mnemonicParsing="false" text="Cancel" />
     <Button fx:id="applyAsDefaultBtn" defaultButton="true" mnemonicParsing="false" text="Apply as default" />

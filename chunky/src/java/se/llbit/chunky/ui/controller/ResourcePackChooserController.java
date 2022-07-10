@@ -29,16 +29,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
@@ -331,6 +325,7 @@ public class ResourcePackChooserController implements Initializable {
 
     Icons.buildIcon(Icons.HEAVY_PLUS).withSize(14).setAsGraphicOn(addNewTargetPackBtn);
     addNewTargetPackBtn.setOnAction(evt -> browseForUnlistedPack());
+    disableDefaultTexturesBtn.setTooltip(new Tooltip("Disable loading of textures from Minecraft and revert to internal textures and any loaded resource packs.\nRequires restart for changes to take effect."));
     disableDefaultTexturesBtn.setSelected(PersistentSettings.getDisableDefaultTextures());
     disableDefaultTexturesBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setDisableDefaultTextures(newValue);
