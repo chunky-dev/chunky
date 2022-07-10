@@ -2537,7 +2537,10 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public float[] getFoliageColor(int x, int y, int z) {
     if (biomeColors) {
-      return foliageTexture.get(x, y, z);
+      float[] color = foliageTexture.get(x, y, z);
+      if (color != null) {
+        return color;
+      }
     }
     return Biomes.biomesPrePalette[0].foliageColorLinear;
   }
@@ -2549,7 +2552,10 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public float[] getGrassColor(int x, int y, int z) {
     if (biomeColors) {
-      return grassTexture.get(x, y, z);
+      float[] color = grassTexture.get(x, y, z);
+      if (color != null) {
+        return color;
+      }
     }
     return Biomes.biomesPrePalette[0].grassColorLinear;
   }
@@ -2576,7 +2582,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Query if a position is loaded.
    */
   public boolean isChunkLoaded(int x, int y, int z) {
-    return waterTexture != null && waterTexture.get(x, y, z) == null;
+    return waterTexture != null && waterTexture.get(x, y, z) != null;
   }
 
   /**

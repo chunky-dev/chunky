@@ -77,7 +77,7 @@ public class WorldTexture {
     long cp = ((long) x >> 4) << 32 | ((z >> 4) & 0xffffffffL);
     ChunkTexture ct = map.get(cp);
     if (ct == null) {
-      return new float[3];
+      return null;
     }
     return ct.get(x & 0xF, z & 0xF);
   }
