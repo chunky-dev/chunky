@@ -631,7 +631,7 @@ public class ChunkyFxController
       launcherSettings.save();
     });
 
-    singleColorBtn.setTooltip(new Tooltip("Set block textures to a single color which is the average of all color values of its current texture."))
+    singleColorBtn.setTooltip(new Tooltip("Set block textures to a single color which is the average of all color values of its current texture."));
 	singleColorBtn.setSelected(PersistentSettings.getSingleColorTextures());
     singleColorBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setSingleColorTextures(newValue);
