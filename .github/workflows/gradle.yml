@@ -5,7 +5,7 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, chunky-2.4.x ]
   pull_request:
     branches: [ master ]
 
