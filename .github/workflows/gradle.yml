@@ -25,3 +25,8 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Upload build
+      uses: actions/upload-artifact@v2.2.2
+      with:
+        name: Chunky Core
+        path: build/chunky-core-*.jar
