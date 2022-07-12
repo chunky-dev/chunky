@@ -360,7 +360,6 @@ public class ChunkyFxController
         updateTitle();
         refreshSettings();
         guiUpdateLatch.countDown();
-        getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
         World newWorld = scene.getWorld();
         if (newWorld != EmptyWorld.INSTANCE
           && mapLoader.getWorld() != EmptyWorld.INSTANCE
@@ -374,6 +373,7 @@ public class ChunkyFxController
           Dialogs.stayOnTop(loadWorldConfirm);
           if (loadWorldConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
             mapLoader.loadWorld(newWorld.getWorldDirectory());
+            getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
           }
         }
       });
