@@ -23,6 +23,7 @@ import se.llbit.chunky.block.Water;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.ChunkLoadingException;
 import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.chunk.biome.BiomeDataFactory;
 import se.llbit.chunky.map.*;
@@ -30,6 +31,7 @@ import se.llbit.chunky.world.biome.ArrayBiomePalette;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.chunky.world.region.Region;
+import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
 import se.llbit.nbt.*;
 import se.llbit.util.BitBuffer;
@@ -111,7 +113,7 @@ public class Chunk {
    * @param request fresh request set
    * @return loaded data, or null if something went wrong
    */
-  private Map<String, Tag> getChunkTags(Set<String> request) {
+  private Map<String, Tag> getChunkTags(Set<String> request) throws ChunkLoadingException {
     MCRegion region = (MCRegion) world.getRegion(position.getRegionPosition());
     Mutable<Integer> timestamp = new Mutable<>(dataTimestamp);
     Map<String, Tag> chunkTags = region.getChunkTags(this.position, request, timestamp);
@@ -150,7 +152,14 @@ public class Chunk {
     request.add(Chunk.LEVEL_BIOMES);
     request.add(Chunk.BIOMES_POST_21W39A);
     request.add(Chunk.LEVEL_HEIGHTMAP);
-    Map<String, Tag> dataMap = getChunkTags(request);
+
+    Map<String, Tag> dataMap;
+    try {
+      dataMap = getChunkTags(request);
+    } catch (ChunkLoadingException e) { // we don't want to crash the map view if a chunk fails to load, so we warn the user
+      Log.warn(String.format("Failed to load chunk %s", position), e);
+      return false;
+    }
     // TODO: improve error handling here.
     if (dataMap == null) {
       return false;
@@ -421,8 +430,9 @@ public class Chunk {
    * @param palette Block palette
    * @param minY The requested minimum Y to be loaded into the chunkData object. The chunk implementation does NOT have to respect it
    * @param maxY The requested maximum Y to be loaded into the chunkData object. The chunk implementation does NOT have to respect it
+   * @throws ChunkLoadingException If there is an issue loading the chunk, and it should be aborted
    */
-  public synchronized void getChunkData(@NotNull Mutable<ChunkData> reuseChunkData, BlockPalette palette, BiomePalette biomePalette, int minY, int maxY) {
+  public synchronized void getChunkData(@NotNull Mutable<ChunkData> reuseChunkData, BlockPalette palette, BiomePalette biomePalette, int minY, int maxY) throws ChunkLoadingException {
     Set<String> request = new HashSet<>();
     request.add(DATAVERSION);
     request.add(LEVEL_SECTIONS);
@@ -435,7 +445,7 @@ public class Chunk {
     Map<String, Tag> dataMap = getChunkTags(request);
     // TODO: improve error handling here.
     if (dataMap == null) {
-      return;
+      throw new ChunkLoadingException(String.format("Got null data for chunk %s", this.position));
     }
     Tag data = tagFromMap(dataMap);
 

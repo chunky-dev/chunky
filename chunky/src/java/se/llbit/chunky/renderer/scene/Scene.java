@@ -27,6 +27,7 @@ import se.llbit.chunky.block.Water;
 import se.llbit.chunky.block.legacy.LegacyBlocksFinalizer;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.ChunkLoadingException;
 import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.chunk.biome.BiomeData;
 import se.llbit.chunky.entity.*;
@@ -943,14 +944,12 @@ public class Scene implements JsonSerializable, Refreshable {
     Position2IntStructure biomePaletteIdxStructure = biomeStructureFactory.createIndexStructure();
     boolean use3dBiomes = biomeStructureFactory.is3d();
 
-    final Mutable<ChunkData> chunkData1 = new Mutable<>(null); // chunk loading will switch between these two, using one asynchronously to load the data
-    final Mutable<ChunkData> chunkData2 = new Mutable<>(null); // while the other is used to add to the octree
+    final Mutable<ChunkData> loadingChunkData = new Mutable<>(null); // chunkData currently being used for loading from save
+    final Mutable<ChunkData> activeChunkData = new Mutable<>(null); // chunkData for loading into the octree
 
     try (TaskTracker.Task task = taskTracker.task("(3/6) Loading chunks")) {
       int done = 1;
       int target = chunksToLoad.size();
-
-      boolean usingFirstChunkData = true;
 
       ChunkPosition[] chunkPositions = chunksToLoad.toArray(new ChunkPosition[0]);
 
@@ -959,7 +958,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       ExecutorService executor = Executors.newSingleThreadExecutor();
       Future<?> nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
-        world.getChunk(chunkPositions[0]).getChunkData(chunkData1, palette, biomePalette, yMin, yMax);
+        world.getChunk(chunkPositions[0]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
       });
       for (int i = 0; i < chunkPositions.length; i++) {
         ChunkPosition cp = chunkPositions[i];
@@ -967,40 +966,40 @@ public class Scene implements JsonSerializable, Refreshable {
         task.updateEta(target, done);
         done += 1;
 
+        ChunkData chunkData;
+        try {
+          //ensure task is complete
+          nextChunkDataTask.get();
+          //swap the chunkData mutables
+          ChunkData loadedChunkData = loadingChunkData.get();
+          loadingChunkData.set(activeChunkData.get());
+          activeChunkData.set(loadedChunkData);
+          chunkData = loadedChunkData;
+        } catch(InterruptedException logged) { // If interrupted, stop loading
+          Log.warn("Chunky loading interrupted.", logged);
+          return;
+        } catch(ExecutionException e) {
+          if (e.getCause() instanceof ChunkLoadingException) {
+            Log.warn(String.format("Failed to load chunk %s", cp), e.getCause());
+            continue;
+          } else {
+            throw new RuntimeException(e.getCause());
+          }
+        } finally { // we always want to schedule the next task even if the current one throws an exception
+          if (i + 1 < chunkPositions.length) { // schedule next task if possible
+            final int finalI = i;
+            nextChunkDataTask = executor.submit(() -> { //request chunk data for the next iteration of the loop
+              world.getChunk(chunkPositions[finalI + 1]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
+            });
+          }
+        }
+
         if (loadedChunks.contains(cp)) {
           continue;
         }
 
         loadedChunks.add(cp);
 
-        try {
-          nextChunkDataTask.get();
-        } catch(InterruptedException logged) { // If except, load the chunk synchronously
-          Log.warn("Chunky loading interrupted.", logged);
-          return;
-        } catch(ExecutionException e) {
-          throw new RuntimeException(e.getCause());
-        }
-
-        ChunkData chunkData; //the chunk data to be used for THIS iteration
-        {
-          Mutable<ChunkData> nextChunkData; //the chunk data to be used for the next iteration
-          if (usingFirstChunkData) {
-            chunkData = chunkData1.get();
-            nextChunkData = chunkData2;
-          } else {
-            chunkData = chunkData2.get();
-            nextChunkData = chunkData1;
-          }
-          usingFirstChunkData = !usingFirstChunkData;
-
-          if (i + 1 < chunkPositions.length) { //if has next request next
-            final int finalI = i;
-            nextChunkDataTask = executor.submit(() -> { //request chunk data for the next iteration of the loop
-              world.getChunk(chunkPositions[finalI + 1]).getChunkData(nextChunkData, palette, biomePalette, yMin, yMax);
-            });
-          }
-        }
         if (chunkData == null) {
           chunkData = EmptyChunkData.INSTANCE;
         }
