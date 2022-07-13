@@ -113,8 +113,8 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     } else {
       useProceduralWater.setSelected(false);
       proceduralWaterIterations.set(4);
-      proceduralWaterFrequency.set(0.1);
-      proceduralWaterAmplitude.set(0.2);
+      proceduralWaterFrequency.set(0.4);
+      proceduralWaterAmplitude.set(0.025);
       proceduralWaterAnimationSpeed.set(1);
     }
   }
