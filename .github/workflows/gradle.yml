@@ -25,6 +25,15 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Build release jar
+      env:
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: |
+        if [[ "${GITHUB_EVENT_NAME}" != "pull_request" ]]; then
+          ./gradlew -PnewVersion=2.4.3-DEV.$(git rev-parse --short HEAD)
+        else
+          ./gradlew -PnewVersion=2.4.3-PR.${PR_NUMBER}.$(git rev-parse --short HEAD)
+        fi
     - name: Upload build
       uses: actions/upload-artifact@v2.2.2
       with:
