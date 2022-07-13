@@ -95,8 +95,8 @@ public class SimplexWaterShader implements WaterShader {
       return;
 
     iterations = params.get("iterations").intValue(4);
-    baseFrequency = params.get("frequency").doubleValue(0.1);
-    baseAmplitude = params.get("amplitude").doubleValue(0.2);
+    baseFrequency = params.get("frequency").doubleValue(0.4);
+    baseAmplitude = params.get("amplitude").doubleValue(0.025);
     animationSpeed = params.get("animationSpeed").doubleValue(1);
   }
 }
