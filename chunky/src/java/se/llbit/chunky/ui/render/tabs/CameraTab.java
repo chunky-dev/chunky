@@ -1,4 +1,5 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2020 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2020-2022 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -220,11 +221,8 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       }
     };
     posX.addEventFilter(KeyEvent.KEY_PRESSED, positionHandler);
-    posX.setTooltip(new Tooltip("Camera X (East/West) coordinate."));
     posY.addEventFilter(KeyEvent.KEY_PRESSED, positionHandler);
-    posY.setTooltip(new Tooltip("Camera Y (Up/Down) coordinate."));
     posZ.addEventFilter(KeyEvent.KEY_PRESSED, positionHandler);
-    posZ.setTooltip(new Tooltip("Camera Z (South/North) coordinate."));
 
     EventHandler<KeyEvent> directionHandler = e -> {
       if (e.getCode() == KeyCode.ENTER) {
@@ -235,14 +233,10 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
                 QuickMath.degToRad(rollField.valueProperty().get()));
       }
     };
-    yawField.setTooltip(new Tooltip("Camera yaw."));
     yawField.addEventFilter(KeyEvent.KEY_PRESSED, directionHandler);
-    pitchField.setTooltip(new Tooltip("Camera pitch."));
     pitchField.addEventFilter(KeyEvent.KEY_PRESSED, directionHandler);
-    rollField.setTooltip(new Tooltip("Camera roll."));
     rollField.addEventFilter(KeyEvent.KEY_PRESSED, directionHandler);
 
-    centerCamera.setTooltip(new Tooltip("Center camera above loaded chunks."));
     centerCamera.setOnAction(e -> {
       scene.moveCameraToCenter();
       updateCameraPosition();
@@ -285,9 +279,6 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       updateSubjectDistance();
     });
 
-    shiftX.setTooltip(new Tooltip("Horizontal lens shift (relative to the image height)."));
-    shiftY.setTooltip(new Tooltip("Vertical lens shift (relative to the image height)."));
-
     EventHandler<KeyEvent> shiftHandler = e -> {
       if (e.getCode() == KeyCode.ENTER) {
         scene.camera().setShift(shiftX.valueProperty().get(), shiftY.valueProperty().get());
@@ -295,7 +286,6 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     };
     shiftX.addEventFilter(KeyEvent.KEY_PRESSED, shiftHandler);
     shiftY.addEventFilter(KeyEvent.KEY_PRESSED, shiftHandler);
-
 
     apertureShape.setTooltip(new Tooltip("Change the shape of the aperture of the virtual camera."));
     apertureShape.getItems().addAll(ApertureShape.values());
