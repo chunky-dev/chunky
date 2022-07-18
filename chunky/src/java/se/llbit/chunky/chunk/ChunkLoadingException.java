@@ -1,6 +1,6 @@
 package se.llbit.chunky.chunk;
 
-public class ChunkLoadingException extends RuntimeException {
+public class ChunkLoadingException extends Exception {
   public ChunkLoadingException(String message) {
     super(message);
   }
