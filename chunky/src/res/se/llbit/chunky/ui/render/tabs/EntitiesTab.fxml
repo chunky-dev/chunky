@@ -8,6 +8,13 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import se.llbit.chunky.ui.elements.TextFieldLabelWrapper?>
+<?import javafx.scene.layout.GridPane?>
+<?import se.llbit.chunky.ui.DoubleTextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.RowConstraints?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
     <padding>
@@ -33,6 +40,40 @@
       <Button fx:id="faceTarget" mnemonicParsing="false" text="Face target" />
     </HBox>
     <Separator />
+    <GridPane fx:id="position" hgap="6.0" vgap="10.0" visible="false">
+      <columnConstraints>
+        <ColumnConstraints hgrow="NEVER" prefWidth="70.0" />
+        <ColumnConstraints minWidth="20.0" prefWidth="90.0" />
+        <ColumnConstraints minWidth="20.0" prefWidth="90.0" />
+        <ColumnConstraints minWidth="20.0" prefWidth="90.0" />
+      </columnConstraints>
+      <rowConstraints>
+        <RowConstraints vgrow="SOMETIMES" />
+      </rowConstraints>
+
+      <Label text="Position:" GridPane.rowIndex="0" />
+      <TextFieldLabelWrapper labelText="x:" GridPane.rowIndex="0" GridPane.columnIndex="1">
+        <DoubleTextField fx:id="posX">
+          <tooltip>
+            <Tooltip text="Entity x (east/west) coordinate" />
+          </tooltip>
+        </DoubleTextField>
+      </TextFieldLabelWrapper>
+      <TextFieldLabelWrapper labelText="y:" GridPane.rowIndex="0" GridPane.columnIndex="2">
+        <DoubleTextField fx:id="posY">
+          <tooltip>
+            <Tooltip text="Entity y (up/down) coordinate" />
+          </tooltip>
+        </DoubleTextField>
+      </TextFieldLabelWrapper>
+      <TextFieldLabelWrapper labelText="z:" GridPane.rowIndex="0" GridPane.columnIndex="3">
+        <DoubleTextField fx:id="posZ">
+          <tooltip>
+            <Tooltip text="Entity z (south/north) coordinate" />
+          </tooltip>
+        </DoubleTextField>
+      </TextFieldLabelWrapper>
+    </GridPane>
     <VBox fx:id="controls" spacing="10.0" VBox.vgrow="ALWAYS" />
   </VBox>
 </fx:root>

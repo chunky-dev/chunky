@@ -28,12 +28,12 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.BeaconBeam;
@@ -45,6 +45,7 @@ import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.DoubleTextField;
 import se.llbit.chunky.ui.dialogs.DialogUtils;
 import se.llbit.chunky.ui.dialogs.ValidatingTextInputDialog;
 import se.llbit.chunky.ui.elements.AngleAdjuster;
@@ -52,6 +53,7 @@ import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.IntegerTextField;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
+import se.llbit.chunky.ui.elements.TextFieldLabelWrapper;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.material.BeaconBeamMaterial;
 import se.llbit.fx.LuxColorPicker;
@@ -117,28 +119,21 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     }
   }
 
-  @FXML
-  private TableView<EntityData> entityTable;
-  @FXML
-  private TableColumn<EntityData, String> nameCol;
-  @FXML
-  private TableColumn<EntityData, String> kindCol;
-  @FXML
-  private Button delete;
-  @FXML
-  private Button add;
-  @FXML
-  private Button cameraToPlayer;
-  @FXML
-  private Button playerToCamera;
-  @FXML
-  private Button playerToTarget;
-  @FXML
-  private Button faceCamera;
-  @FXML
-  private Button faceTarget;
-  @FXML
-  private VBox controls;
+  @FXML private TableView<EntityData> entityTable;
+  @FXML private TableColumn<EntityData, String> nameCol;
+  @FXML private TableColumn<EntityData, String> kindCol;
+  @FXML private Button delete;
+  @FXML private Button add;
+  @FXML private Button cameraToPlayer;
+  @FXML private Button playerToCamera;
+  @FXML private Button playerToTarget;
+  @FXML private Button faceCamera;
+  @FXML private Button faceTarget;
+  @FXML private GridPane position;
+  @FXML private DoubleTextField posX;
+  @FXML private DoubleTextField posY;
+  @FXML private DoubleTextField posZ;
+  @FXML private VBox controls;
 
   public EntitiesTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("EntitiesTab.fxml"));
@@ -422,6 +417,32 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         controls.getChildren().add(beamColor);
       }
 
+      updatePositionFields(entity);
+      posX.valueProperty().addListener((observable, oldValue, newValue) -> {
+        withEntity(e -> {
+          Vector3 currentPosition = e.getPosition();
+          e.setPosition(new Vector3(newValue.doubleValue(), currentPosition.y, currentPosition.z));
+        });
+        scene.rebuildActorBvh();
+      });
+      posY.valueProperty().addListener((observable, oldValue, newValue) -> {
+        withEntity(e -> {
+          Vector3 currentPosition = e.getPosition();
+          e.setPosition(new Vector3(currentPosition.x, newValue.doubleValue(), currentPosition.z));
+        });
+        scene.rebuildActorBvh();
+      });
+      posZ.valueProperty().addListener((observable, oldValue, newValue) -> {
+        withEntity(e -> {
+          Vector3 currentPosition = e.getPosition();
+          e.setPosition(new Vector3(currentPosition.x, currentPosition.y, newValue.doubleValue()));
+        });
+        scene.rebuildActorBvh();
+      });
+
+      controls.getChildren().add(position);
+      position.setVisible(true);
+
       DoubleAdjuster scale = new DoubleAdjuster();
       scale.setName("Scale");
       scale.setTooltip("Modifies entity scale.");
@@ -588,6 +609,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     playerToCamera.setTooltip(new Tooltip("Move the selected player to the camera position."));
     playerToCamera.setOnAction(e -> withEntity(entity -> {
       entity.setPosition(scene.camera().getPosition());
+      updatePositionFields(entity);
       scene.rebuildActorBvh();
     }));
     playerToTarget.setTooltip(new Tooltip("Move the selected player to the current target."));
@@ -595,6 +617,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       Vector3 target = scene.getTargetPosition();
       if (target != null) {
         player.position.set(target);
+        updatePositionFields(player);
         scene.rebuildActorBvh();
       }
     }));
@@ -606,8 +629,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         scene.rebuildActorBvh();
       }
     }));
-    faceTarget
-        .setTooltip(new Tooltip("Makes the selected player look at the current view target."));
+    faceTarget.setTooltip(new Tooltip("Makes the selected player look at the current view target."));
     faceTarget.setOnAction(e -> withEntity(entity -> {
       Vector3 target = scene.getTargetPosition();
       if (target != null && entity instanceof Poseable) {
@@ -647,6 +669,12 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       }
       consumer.accept(pose);
     }
+  }
+
+  private void updatePositionFields(Entity entity) {
+    posX.valueProperty().set(entity.position.x);
+    posY.valueProperty().set(entity.position.y);
+    posZ.valueProperty().set(entity.position.z);
   }
 
   @Override
