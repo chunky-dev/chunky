@@ -1,6 +1,7 @@
 package se.llbit.chunky.entity;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -328,8 +329,8 @@ public class Campfire extends Entity {
     return json;
   }
 
-  public static Entity fromJson(JsonObject json) {
-    return new Campfire(json);
+  public static Collection<Entity> fromJson(JsonObject json) {
+    return Collections.singletonList(new Campfire(json));
   }
 
   private static int getOrientationIndex(String facing) {

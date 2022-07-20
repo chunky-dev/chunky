@@ -25,6 +25,9 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class SporeBlossom extends Block {
 
   public SporeBlossom() {
@@ -45,7 +48,7 @@ public class SporeBlossom extends Block {
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
-    return new se.llbit.chunky.entity.SporeBlossom(position);
+  public Collection<Entity> toEntity(Vector3 position) {
+    return Collections.singleton(new se.llbit.chunky.entity.SporeBlossom(position));
   }
 }

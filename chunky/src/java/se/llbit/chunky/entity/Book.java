@@ -1,6 +1,7 @@
 package se.llbit.chunky.entity;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 import se.llbit.chunky.PersistentSettings;
@@ -295,8 +296,8 @@ public class Book extends Entity implements Poseable {
     return json;
   }
 
-  public static Book fromJson(JsonObject json) {
-    return new Book(json);
+  public static Collection<Entity> fromJson(JsonObject json) {
+    return Collections.singletonList(new Book(json));
   }
 
   @Override

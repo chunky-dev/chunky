@@ -321,18 +321,18 @@ public class SceneEntities {
       // rather than the actors array. In future versions only the actors
       // array should contain poseable entities.
       for (JsonValue element : json.get("entities").array()) {
-        Entity entity = Entity.fromJson(element.object());
+        Collection<Entity> entity = Entity.fromJson(element.object());
         if (entity != null) {
           if (entity instanceof PlayerEntity) {
-            actors.add(entity);
+            actors.addAll(entity);
           } else {
-            entities.add(entity);
+            entities.addAll(entity);
           }
         }
       }
       for (JsonValue element : json.get("actors").array()) {
-        Entity entity = Entity.fromJson(element.object());
-        actors.add(entity);
+        Collection<Entity> entity = Entity.fromJson(element.object());
+        actors.addAll(entity);
       }
     }
 

@@ -30,6 +30,7 @@ import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 /**
@@ -106,10 +107,10 @@ public class CoralFanEntity extends Entity {
     return json;
   }
 
-  public static Entity fromJson(JsonObject json) {
+  public static Collection<Entity> fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
-    return new CoralFanEntity(position, json.get("coral_type").stringValue("tube"));
+    return Collections.singletonList(new CoralFanEntity(position, json.get("coral_type").stringValue("tube")));
   }
 
 

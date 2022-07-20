@@ -25,6 +25,8 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
+import java.util.Collection;
+
 public class Lectern extends MinecraftBlockTranslucent {
     private final String facing;
     private final boolean hasBook;
@@ -49,7 +51,7 @@ public class Lectern extends MinecraftBlockTranslucent {
     }
 
     @Override
-    public Entity toEntity(Vector3 position) {
-        return new se.llbit.chunky.entity.Lectern(position, this.facing, this.hasBook);
+    public Collection<Entity> toEntity(Vector3 position) {
+      return se.llbit.chunky.entity.Lectern.create(position, this.facing, this.hasBook);
     }
 }

@@ -26,6 +26,9 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class CoralFan extends MinecraftBlockTranslucent {
 
   private final String coralType;
@@ -72,7 +75,7 @@ public class CoralFan extends MinecraftBlockTranslucent {
     return true;
   }
 
-  @Override public Entity toEntity(Vector3 position) {
-    return new CoralFanEntity(position, coralType);
+  @Override public Collection<Entity> toEntity(Vector3 position) {
+    return Collections.singletonList(new CoralFanEntity(position, coralType));
   }
 }
