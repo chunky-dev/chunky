@@ -33,10 +33,7 @@ import se.llbit.nbt.Tag;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 public class SignEntity extends Entity {
 
@@ -570,7 +567,7 @@ public class SignEntity extends Entity {
   /**
    * Unmarshalls a sign entity from JSON data.
    */
-  public static Entity fromJson(JsonObject json) {
+  public static Collection<Entity> fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     JsonArray[] frontText = null;
@@ -587,7 +584,7 @@ public class SignEntity extends Entity {
     boolean glowing = json.get("glowing").boolValue(false);
     Color backDye = Color.getFromDyedSign(json.get("backDye").stringValue(null));
     boolean backGlowing = json.get("backGlowing").boolValue(false);
-    return new SignEntity(position, frontText, dye, glowing, backText, backDye, backGlowing, direction, material);
+    return Collections.singletonList(new SignEntity(position, frontText, dye, glowing, backText, backDye, backGlowing, direction, material));
   }
 
   /**

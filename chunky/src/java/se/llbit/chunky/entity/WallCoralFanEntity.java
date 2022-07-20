@@ -31,6 +31,7 @@ import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 /**
@@ -104,11 +105,11 @@ public class WallCoralFanEntity extends Entity {
     return json;
   }
 
-  public static Entity fromJson(JsonObject json) {
+  public static Collection<Entity> fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     String coralType = json.get("coral_type").stringValue("tube");
     String facing = json.get("facing").stringValue("north");
-    return new WallCoralFanEntity(position, coralType, facing);
+    return Collections.singletonList(new WallCoralFanEntity(position, coralType, facing));
   }
 }

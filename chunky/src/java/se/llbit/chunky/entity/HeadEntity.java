@@ -193,14 +193,14 @@ public class HeadEntity extends Entity {
     return json;
   }
 
-  public static Entity fromJson(JsonObject json) {
+  public static Collection<Entity> fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     //int type = json.get("type").intValue(0);
     int rotation = json.get("rotation").intValue(0);
     int placement = json.get("placement").intValue(0);
     String skin = json.get("skin").stringValue("");
-    return new HeadEntity(position, skin, rotation, placement);
+    return Collections.singletonList(new HeadEntity(position, skin, rotation, placement));
   }
 
 

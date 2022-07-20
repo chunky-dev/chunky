@@ -13,6 +13,7 @@ import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
+import java.util.Collection;
 import java.util.Random;
 
 public abstract class Block extends Material {
@@ -119,7 +120,7 @@ public abstract class Block extends Material {
     return false;
   }
 
-  public Entity toEntity(Vector3 position) {
+  public Collection<Entity> toEntity(Vector3 position) {
     throw new Error("This block type can not be converted to an entity: "
       + getClass().getSimpleName());
   }

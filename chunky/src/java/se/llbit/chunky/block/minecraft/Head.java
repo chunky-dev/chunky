@@ -34,6 +34,8 @@ import se.llbit.util.mojangapi.MinecraftSkin;
 import se.llbit.util.mojangapi.MojangApi;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 public class Head extends MinecraftBlockTranslucent {
@@ -67,8 +69,8 @@ public class Head extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
-    return new SkullEntity(position, type, rotation, 1);
+  public Collection<Entity> toEntity(Vector3 position) {
+    return Collections.singleton(new SkullEntity(position, type, rotation, 1));
   }
 
   @Override

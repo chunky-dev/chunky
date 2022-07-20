@@ -19,6 +19,7 @@ import se.llbit.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 public class ChickenEntity extends Entity implements Poseable, Variant {
 
@@ -242,8 +243,8 @@ public class ChickenEntity extends Entity implements Poseable, Variant {
     return json;
   }
 
-  public static ChickenEntity fromJson(JsonObject json) {
-    return new ChickenEntity(json);
+  public static Collection<Entity> fromJson(JsonObject json) {
+    return Collections.singleton(new ChickenEntity(json));
   }
 
   @Override

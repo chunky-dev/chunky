@@ -5,6 +5,8 @@ import se.llbit.chunky.model.minecraft.SporeBlossomModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
+import java.util.Collections;
+
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Transform;
@@ -37,7 +39,7 @@ public class SporeBlossom extends Entity {
     return json;
   }
 
-  public static Entity fromJson(JsonObject json) {
-    return new SporeBlossom(json);
+  public static Collection<Entity> fromJson(JsonObject json) {
+    return Collections.singletonList(new SporeBlossom(json));
   }
 }
