@@ -658,14 +658,19 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
   private void withPose(Entity entity, String part, Consumer<JsonArray> consumer) {
     if (entity instanceof Poseable && part != null && !part.isEmpty()) {
       Poseable poseable = (Poseable) entity;
-      JsonArray pose = poseable.getPose().get(part).array();
+      JsonObject poseObject = poseable.getPose();
+      if (poseObject == null) {
+        return;
+      }
+
+      JsonArray pose = poseObject.get(part).array();
       if (pose.size() < 3) {
         // Set default pose to [0, 0, 0].
         pose = new JsonArray(3);
         pose.add(0);
         pose.add(0);
         pose.add(0);
-        poseable.getPose().set(part, pose);
+        poseObject.set(part, pose);
       }
       consumer.accept(pose);
     }
