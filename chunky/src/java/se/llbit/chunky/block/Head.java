@@ -29,6 +29,9 @@ import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.mojangapi.MinecraftSkin;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class Head extends MinecraftBlockTranslucent {
 
   private final String description;
@@ -60,8 +63,8 @@ public class Head extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
-    return new SkullEntity(position, type, rotation, 1);
+  public Collection<Entity> toEntity(Vector3 position) {
+    return Collections.singletonList(new SkullEntity(position, type, rotation, 1));
   }
 
   @Override

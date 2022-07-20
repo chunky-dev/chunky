@@ -1093,41 +1093,43 @@ public class Scene implements JsonSerializable, Refreshable {
 
                   if(block.isEntity()) {
                     Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
-                    Entity entity = block.toEntity(position);
+                    Collection<Entity> blockEntities = block.toEntity(position);
 
-                    if (entityLoadingPreferences.shouldLoad(entity)) {
-                      if(entity instanceof Poseable && !(entity instanceof Lectern && !((Lectern) entity).hasBook())) {
-                        // don't add the actor again if it was already loaded from json
-                        if(actors.stream().noneMatch(actor -> {
-                          if(actor.getClass().equals(entity.getClass())) {
-                            Vector3 distance = new Vector3(actor.position);
-                            distance.sub(entity.position);
-                            return distance.lengthSquared() < Ray.EPSILON;
+                    for (Entity entity : blockEntities) {
+                      if (entityLoadingPreferences.shouldLoad(entity)) {
+                        if(entity instanceof Poseable) {
+                          // don't add the actor again if it was already loaded from json
+                          if(actors.stream().noneMatch(actor -> {
+                            if(actor.getClass().equals(entity.getClass())) {
+                              Vector3 distance = new Vector3(actor.position);
+                              distance.sub(entity.position);
+                              return distance.lengthSquared() < Ray.EPSILON;
+                            }
+                            return false;
+                          })) {
+                            actors.add(entity);
                           }
-                          return false;
-                        })) {
-                          actors.add(entity);
-                        }
-                      } else {
-                        entities.add(entity);
-                        if (emitterGrid != null) {
-                          for (Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
-                            emitterPos.x -= origin.x;
-                            emitterPos.y -= origin.y;
-                            emitterPos.z -= origin.z;
-                            emitterGrid.addEmitter(emitterPos);
+                        } else {
+                          entities.add(entity);
+                          if (emitterGrid != null) {
+                            for (Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
+                              emitterPos.x -= origin.x;
+                              emitterPos.y -= origin.y;
+                              emitterPos.z -= origin.z;
+                              emitterGrid.addEmitter(emitterPos);
+                            }
                           }
                         }
                       }
+                    }
 
-                      if(!block.isBlockWithEntity()) {
-                        if(block.waterlogged) {
-                          block = palette.water;
-                          octNode = palette.waterId;
-                        } else {
-                          block = Air.INSTANCE;
-                          octNode = palette.airId;
-                        }
+                    if(!block.isBlockWithEntity()) {
+                      if(block.waterlogged) {
+                        block = palette.water;
+                        octNode = palette.waterId;
+                      } else {
+                        block = Air.INSTANCE;
+                        octNode = palette.airId;
                       }
                     }
                   }
@@ -3108,18 +3110,20 @@ public class Scene implements JsonSerializable, Refreshable {
       // rather than the actors array. In future versions only the actors
       // array should contain poseable entities.
       for (JsonValue element : json.get("entities").array()) {
-        Entity entity = Entity.fromJson(element.object());
-        if (entity != null) {
-          if (entity instanceof PlayerEntity) {
-            actors.add(entity);
-          } else {
-            entities.add(entity);
+        Collection<Entity> entitiesToLoad = Entity.fromJson(element.object());
+        if (entitiesToLoad != null) {
+          for (Entity entity : entitiesToLoad) {
+            if (entity instanceof PlayerEntity) {
+              actors.add(entity);
+            } else {
+              entities.add(entity);
+            }
           }
         }
       }
       for (JsonValue element : json.get("actors").array()) {
-        Entity entity = Entity.fromJson(element.object());
-        actors.add(entity);
+        Collection<Entity> entitiesToLoad = Entity.fromJson(element.object());
+        actors.addAll(entitiesToLoad);
       }
     }
     entityLoadingPreferences.fromJson(json.get("entityLoadingPreferences"));

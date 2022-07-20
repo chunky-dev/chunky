@@ -2,10 +2,12 @@ package se.llbit.chunky.block;
 
 import se.llbit.chunky.entity.Book;
 import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.EnchantmentTableModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Vector3;
+
+import java.util.Collection;
+import java.util.Collections;
 
 public class EnchantingTable extends AbstractModelBlock {
 
@@ -27,7 +29,7 @@ public class EnchantingTable extends AbstractModelBlock {
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
+  public Collection<Entity> toEntity(Vector3 position) {
     Vector3 newPosition = new Vector3(position);
     newPosition.add(0, 0.35, 0);
     Book book = new Book(
@@ -37,6 +39,6 @@ public class EnchantingTable extends AbstractModelBlock {
         Math.toRadians(180 - 30));
     book.setPitch(Math.toRadians(80));
     book.setYaw(Math.toRadians(45));
-    return book;
+    return Collections.singletonList(book);
   }
 }

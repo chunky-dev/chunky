@@ -267,48 +267,41 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         controls.getChildren().addAll(modelBox, skinBox, layerBox);
       }
 
-      if (entity instanceof Book || entity instanceof Lectern) {
-        Book book;
-        if (entity instanceof Lectern) {
-          book = ((Lectern) entity).getBook();
-        } else {
-          book = (Book) entity;
-        }
+      if (entity instanceof Book) {
+        Book book = (Book) entity;
 
-        if (book != null) {
-          DoubleAdjuster openingAngle = new DoubleAdjuster();
-          openingAngle.setName("Opening angle");
-          openingAngle.setTooltip("Modifies the book's opening angle.");
-          openingAngle.set(Math.toDegrees(book.getOpenAngle()));
-          openingAngle.setRange(0, 180);
-          openingAngle.onValueChange(value -> {
-            book.setOpenAngle(Math.toRadians(value));
-            scene.rebuildActorBvh();
-          });
-          controls.getChildren().add(openingAngle);
+        DoubleAdjuster openingAngle = new DoubleAdjuster();
+        openingAngle.setName("Opening angle");
+        openingAngle.setTooltip("Modifies the book's opening angle.");
+        openingAngle.set(Math.toDegrees(book.getOpenAngle()));
+        openingAngle.setRange(0, 180);
+        openingAngle.onValueChange(value -> {
+          book.setOpenAngle(Math.toRadians(value));
+          scene.rebuildActorBvh();
+        });
+        controls.getChildren().add(openingAngle);
 
-          DoubleAdjuster page1Angle = new DoubleAdjuster();
-          page1Angle.setName("Page 1 angle");
-          page1Angle.setTooltip("Modifies the book's first visible page's angle.");
-          page1Angle.set(Math.toDegrees(book.getPageAngleA()));
-          page1Angle.setRange(0, 180);
-          page1Angle.onValueChange(value -> {
-            book.setPageAngleA(Math.toRadians(value));
-            scene.rebuildActorBvh();
-          });
-          controls.getChildren().add(page1Angle);
+        DoubleAdjuster page1Angle = new DoubleAdjuster();
+        page1Angle.setName("Page 1 angle");
+        page1Angle.setTooltip("Modifies the book's first visible page's angle.");
+        page1Angle.set(Math.toDegrees(book.getPageAngleA()));
+        page1Angle.setRange(0, 180);
+        page1Angle.onValueChange(value -> {
+          book.setPageAngleA(Math.toRadians(value));
+          scene.rebuildActorBvh();
+        });
+        controls.getChildren().add(page1Angle);
 
-          DoubleAdjuster page2Angle = new DoubleAdjuster();
-          page2Angle.setName("Page 2 angle");
-          page2Angle.setTooltip("Modifies the book's second visible page's angle.");
-          page2Angle.set(Math.toDegrees(book.getPageAngleB()));
-          page2Angle.setRange(0, 180);
-          page2Angle.onValueChange(value -> {
-            book.setPageAngleB(Math.toRadians(value));
-            scene.rebuildActorBvh();
-          });
-          controls.getChildren().add(page2Angle);
-        }
+        DoubleAdjuster page2Angle = new DoubleAdjuster();
+        page2Angle.setName("Page 2 angle");
+        page2Angle.setTooltip("Modifies the book's second visible page's angle.");
+        page2Angle.set(Math.toDegrees(book.getPageAngleB()));
+        page2Angle.setRange(0, 180);
+        page2Angle.onValueChange(value -> {
+          book.setPageAngleB(Math.toRadians(value));
+          scene.rebuildActorBvh();
+        });
+        controls.getChildren().add(page2Angle);
       }
       else if(entity instanceof BeaconBeam) {
         BeaconBeam beam = (BeaconBeam) entity;
