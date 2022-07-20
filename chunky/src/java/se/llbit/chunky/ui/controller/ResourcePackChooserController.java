@@ -215,7 +215,7 @@ public class ResourcePackChooserController implements Initializable {
               Desktop.getDesktop().open(
                 getItem().isDefaultPack()
                   ? getItem().file.getParentFile()
-                  : getItem().file
+                  : getItem().file.getParentFile()
               );
             } catch (IOException ex) {
               Log.warn("Failed to open resource pack file in system file browser.", ex);
