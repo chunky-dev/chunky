@@ -20,6 +20,7 @@ import se.llbit.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 public class SheepEntity extends Entity implements Poseable, Dyeable {
 
@@ -371,8 +372,8 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
     return json;
   }
 
-  public static SheepEntity fromJson(JsonObject json) {
-    return new SheepEntity(json);
+  public static Collection<Entity> fromJson(JsonObject json) {
+    return Collections.singleton(new SheepEntity(json));
   }
 
   @Override

@@ -905,8 +905,8 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       new ColoredTexture(textureName, color, texture));
   }
 
-  public static PlayerEntity fromJson(JsonObject json) {
-    return new PlayerEntity(json);
+  public static Collection<Entity> fromJson(JsonObject json) {
+    return Collections.singletonList(new PlayerEntity(json));
   }
 
   @Override

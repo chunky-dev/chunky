@@ -33,6 +33,7 @@ import se.llbit.nbt.CompoundTag;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Collections;
 
 public class WallSignEntity extends Entity {
 
@@ -154,7 +155,7 @@ public class WallSignEntity extends Entity {
   /**
    * Unmarshalls a wall sign entity from JSON data.
    */
-  public static Entity fromJson(JsonObject json) {
+  public static Collection<Entity> fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     JsonArray[] text = null;
@@ -165,6 +166,6 @@ public class WallSignEntity extends Entity {
     String material = json.get("material").stringValue("oak");
     SignEntity.Color dye = SignEntity.Color.getFromDyedSign(json.get("dye").stringValue(null));
     boolean glowing = json.get("glowing").boolValue(false);
-    return new WallSignEntity(position, text, dye, glowing, direction, material);
+    return Collections.singletonList(new WallSignEntity(position, text, dye, glowing, direction, material));
   }
 }

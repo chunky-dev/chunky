@@ -31,9 +31,10 @@ import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
 public class WallHead extends MinecraftBlockTranslucent {
-
   private final String description;
   private final int facing;
   private final SkullEntity.Kind type;
@@ -77,8 +78,8 @@ public class WallHead extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
-    return new SkullEntity(position, type, 0, facing);
+  public Collection<Entity> toEntity(Vector3 position) {
+    return Collections.singletonList(new SkullEntity(position, type, 0, facing));
   }
 
   @Override

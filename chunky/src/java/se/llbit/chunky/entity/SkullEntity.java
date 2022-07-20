@@ -33,6 +33,7 @@ import se.llbit.math.primitive.Box;
 import se.llbit.math.primitive.Primitive;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 /**
@@ -298,12 +299,12 @@ public class SkullEntity extends Entity {
     return json;
   }
 
-  public static Entity fromJson(JsonObject json) {
+  public static Collection<Entity> fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     Kind type = Kind.values()[json.get("type").intValue(0)];
     int rotation = json.get("rotation").intValue(0);
     int placement = json.get("placement").intValue(0);
-    return new SkullEntity(position, type, rotation, placement);
+    return Collections.singletonList(new SkullEntity(position, type, rotation, placement));
   }
 }

@@ -27,6 +27,7 @@ import se.llbit.math.primitive.TexturedTriangle;
 import se.llbit.util.MinecraftPRNG;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 public class LilyPadEntity extends Entity {
@@ -89,11 +90,11 @@ public class LilyPadEntity extends Entity {
   /**
    * Unmarshall a lily pad entity from JSON data.
    */
-  public static Entity fromJson(JsonObject json) {
+  public static Collection<Entity> fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     int rotation = json.get("rotation").intValue(0);
-    return new LilyPadEntity(position, rotation);
+    return Collections.singletonList(new LilyPadEntity(position, rotation));
   }
 
 }
