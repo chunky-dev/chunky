@@ -20,6 +20,7 @@ package se.llbit.chunky.ui.render.tabs;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -41,6 +42,7 @@ import se.llbit.chunky.world.MaterialStore;
 
 import java.net.URL;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.ResourceBundle;
 
 // TODO: customization of textures, base color, etc.
@@ -74,12 +76,12 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     blockIds.addAll(MaterialStore.collections.keySet());
     blockIds.addAll(ExtraMaterials.idMap.keySet());
     blockIds.addAll(MaterialStore.blockIds);
-    FilteredList<String> filteredList = new FilteredList<>(blockIds);
+    FilteredList<String> filteredList = new FilteredList<>(
+      new SortedList<>(blockIds, Comparator.naturalOrder())
+    );
     listView = new ListView<>(filteredList);
     listView.getSelectionModel().selectedItemProperty().addListener(
-        (observable, oldValue, materialName) -> {
-          updateSelectedMaterial(materialName);
-        }
+        (observable, oldValue, materialName) -> updateSelectedMaterial(materialName)
     );
     VBox settings = new VBox();
     settings.setSpacing(10);
