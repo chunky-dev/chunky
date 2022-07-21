@@ -54,6 +54,8 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileSystem;
@@ -212,11 +214,27 @@ public class ResourcePackChooserController implements Initializable {
             if(getItem() == null)
               return;
             try {
-              Desktop.getDesktop().open(
-                getItem().isDefaultPack()
-                  ? getItem().file.getParentFile()
-                  : getItem().file.getParentFile()
-              );
+              File texturePackFile = getItem().file;
+              Desktop desktop = Desktop.getDesktop();
+
+              // Attempt to open the parent folder and select
+              // Use reflection since this is a Java 9+ API
+              try {
+                Method browseOpen = desktop.getClass().getMethod("browseFileDirectory", File.class);
+                browseOpen.invoke(desktop, texturePackFile);
+                return;
+              } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                // Ignored
+              }
+
+              // Open the texture pack if it is a folder
+              if (texturePackFile.isDirectory()) {
+                desktop.open(texturePackFile);
+                return;
+              }
+
+              // Open the containing folder otherwise
+              desktop.open(texturePackFile.getParentFile());
             } catch (IOException ex) {
               Log.warn("Failed to open resource pack file in system file browser.", ex);
             }
