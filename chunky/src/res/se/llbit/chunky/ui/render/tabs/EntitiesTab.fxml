@@ -24,9 +24,9 @@
       <Button fx:id="add" mnemonicParsing="false" text="+" />
     </HBox>
     <HBox spacing="10.0">
-      <Button fx:id="cameraToPlayer" mnemonicParsing="false" text="Camera to entity" />
-      <Button fx:id="playerToCamera" mnemonicParsing="false" text="Player to camera" />
-      <Button fx:id="playerToTarget" mnemonicParsing="false" text="Entity to target" />
+      <Button fx:id="cameraToEntity" mnemonicParsing="false" text="Camera to entity" />
+      <Button fx:id="entityToCamera" mnemonicParsing="false" text="Entity to camera" />
+      <Button fx:id="entityToTarget" mnemonicParsing="false" text="Entity to target" />
     </HBox>
     <HBox spacing="10.0">
       <Button fx:id="faceCamera" mnemonicParsing="false" text="Face camera" />
