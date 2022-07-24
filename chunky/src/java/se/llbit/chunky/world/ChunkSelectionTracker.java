@@ -336,10 +336,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
    * @param chunks Chunks to select
    */
   public void setSelection(Collection<ChunkPosition> chunks) {
-    if (!selectedChunksByRegion.isEmpty()) {
-      notifyChunksUpdated(getSelection());
-      selectedChunksByRegion.clear();
-    }
+    clearSelection();
     for (ChunkPosition chunk : chunks) {
       setChunk(chunk, true);
     }

@@ -110,9 +110,8 @@ public final class PersistentSettings {
     String lastTexturePack = settings.getString("lastTexturePack", null);
     if(lastTexturePack != null) {
       setLastTexturePack(lastTexturePack);
-      // TODO: remove setting with next release
-      // settings.removeSetting("lastTexturePack");
-      Log.info("migrated setting \"lastTexturePack\"");
+      // TODO: Remove legacy setting in 2.6.0
+//      settings.removeSetting("lastTexturePack");
     }
   }
 
@@ -235,7 +234,7 @@ public final class PersistentSettings {
   public static String getLastTexturePack() {
     return getEnabledResourcePacks().stream()
       .map(File::toString)
-      .collect(Collectors.joining());
+      .collect(Collectors.joining(File.pathSeparator));
   }
 
   /**
@@ -267,6 +266,8 @@ public final class PersistentSettings {
       array.add(texturePackFile.toString());
     }
     settings.set("enabledResourcePacks", array);
+    // TODO: Remove legacy setting in 2.6.0
+    settings.setString("lastTexturePack", getLastTexturePack());
     save();
   }
 

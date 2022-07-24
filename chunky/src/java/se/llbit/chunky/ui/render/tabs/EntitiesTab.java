@@ -124,9 +124,9 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private TableColumn<EntityData, String> kindCol;
   @FXML private Button delete;
   @FXML private Button add;
-  @FXML private Button cameraToPlayer;
-  @FXML private Button playerToCamera;
-  @FXML private Button playerToTarget;
+  @FXML private Button cameraToEntity;
+  @FXML private Button entityToCamera;
+  @FXML private Button entityToTarget;
   @FXML private Button faceCamera;
   @FXML private Button faceTarget;
   @FXML private GridPane position;
@@ -604,16 +604,16 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       });
       return row;
     });*/
-    cameraToPlayer.setTooltip(new Tooltip("Move the camera to the selected player position."));
-    cameraToPlayer.setOnAction(e -> withEntity(player -> scene.camera().moveToPlayer(player)));
-    playerToCamera.setTooltip(new Tooltip("Move the selected player to the camera position."));
-    playerToCamera.setOnAction(e -> withEntity(entity -> {
+    cameraToEntity.setTooltip(new Tooltip("Move the camera to the location of the selected entity."));
+    cameraToEntity.setOnAction(e -> withEntity(player -> scene.camera().moveToPlayer(player)));
+    entityToCamera.setTooltip(new Tooltip("Move the selected entity to the location of the camera."));
+    entityToCamera.setOnAction(e -> withEntity(entity -> {
       entity.setPosition(scene.camera().getPosition());
       updatePositionFields(entity);
       scene.rebuildActorBvh();
     }));
-    playerToTarget.setTooltip(new Tooltip("Move the selected player to the current target."));
-    playerToTarget.setOnAction(e -> withEntity(player -> {
+    entityToTarget.setTooltip(new Tooltip("Move the selected entity to the current target."));
+    entityToTarget.setOnAction(e -> withEntity(player -> {
       Vector3 target = scene.getTargetPosition();
       if (target != null) {
         player.position.set(target);

@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
+import se.llbit.chunky.chunk.ChunkLoadingException;
 import se.llbit.chunky.world.*;
 import se.llbit.log.Log;
 import se.llbit.nbt.ErrorTag;
@@ -130,7 +131,7 @@ public class MCRegion implements Region {
     try (RandomAccessFile file = new RandomAccessFile(regionFile, "r")) {
       long length = file.length();
       if (length < 2 * SECTOR_SIZE) {
-        Log.warn("Missing header in region file!");
+        Log.warnf("Missing header in region file %s!", this.position);
         return;
       }
 
@@ -183,7 +184,7 @@ public class MCRegion implements Region {
     return String.format("r.%d.%d.mca", pos.x, pos.z);
   }
 
-  public Map<String, Tag> getChunkTags(ChunkPosition position, Set<String> request, Mutable<Integer> dataTimestamp) {
+  public Map<String, Tag> getChunkTags(ChunkPosition position, Set<String> request, Mutable<Integer> dataTimestamp) throws ChunkLoadingException {
     ChunkDataSource data = this.getChunkData(position);
     dataTimestamp.set(data.timestamp);
     if (data.inputStream != null) {
@@ -196,7 +197,7 @@ public class MCRegion implements Region {
         }
         return result;
       } catch (IOException e) {
-        // Ignored.
+        throw new ChunkLoadingException(String.format("Failed to read chunk %s from region file!", position), e);
       }
     }
     return null;
