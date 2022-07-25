@@ -110,6 +110,7 @@ publishing {
                 packaging = "jar"
                 description = "Minecraft mapping and rendering tool"
                 url = "http://chunky.llbit.se"
+                artifactId = archivesBaseName
 
                 licenses {
                     license {
