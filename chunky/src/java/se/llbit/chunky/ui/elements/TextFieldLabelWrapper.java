@@ -78,8 +78,9 @@ public class TextFieldLabelWrapper extends StackPane {
    */
   private void fixTextPositionOffset() {
     TextField textField = textFieldProperty.get();
-    if (!textField.isFocused())
+    if (!textField.isFocused()) {
       textField.end();
+    }
   }
 
   @Override
