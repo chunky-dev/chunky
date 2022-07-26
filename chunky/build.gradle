@@ -111,6 +111,7 @@ publishing {
                 description = "Minecraft mapping and rendering tool"
                 url = "http://chunky.llbit.se"
                 artifactId = archivesBaseName
+                version = "2.5.0-SNAPSHOT"
 
                 licenses {
                     license {
