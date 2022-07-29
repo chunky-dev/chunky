@@ -21,7 +21,7 @@ public class ValidatingNumberStringConverter extends StringConverter<Number> {
   private boolean parseNonNegativeOnly = false;
   private boolean allowZero = true;
 
-  private final int maximumFractionDigits = decimalFormat.getMaximumFractionDigits();
+  private final int maximumFractionDigits = 9;
 
   public enum AllowedRange {
     FULL,
