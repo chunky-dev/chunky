@@ -360,20 +360,24 @@ public class ChunkyFxController
         updateTitle();
         refreshSettings();
         guiUpdateLatch.countDown();
-        getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
         World newWorld = scene.getWorld();
-        if (newWorld != EmptyWorld.INSTANCE
-          && mapLoader.getWorld() != EmptyWorld.INSTANCE
-          && !mapLoader.getWorld().getWorldDirectory().equals(newWorld.getWorldDirectory())) {
-          Alert loadWorldConfirm = Dialogs.createAlert(AlertType.CONFIRMATION);
-          loadWorldConfirm.getButtonTypes().clear();
-          loadWorldConfirm.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
-          loadWorldConfirm.setTitle("Load scene world");
-          loadWorldConfirm.setContentText(
+
+        boolean isSameWorld = mapLoader.getWorld().getWorldDirectory().equals(newWorld.getWorldDirectory());
+        if (isSameWorld) {
+          getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
+        } else {
+          if (newWorld != EmptyWorld.INSTANCE && mapLoader.getWorld() != EmptyWorld.INSTANCE) {
+            Alert loadWorldConfirm = Dialogs.createAlert(AlertType.CONFIRMATION);
+            loadWorldConfirm.getButtonTypes().clear();
+            loadWorldConfirm.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
+            loadWorldConfirm.setTitle("Load scene world");
+            loadWorldConfirm.setContentText(
               "This scene shows a different world than the one that is currently loaded. Do you want to load the world of this scene?");
-          Dialogs.stayOnTop(loadWorldConfirm);
-          if (loadWorldConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
-            mapLoader.loadWorld(newWorld.getWorldDirectory());
+            Dialogs.stayOnTop(loadWorldConfirm);
+            if (loadWorldConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
+              mapLoader.loadWorld(newWorld.getWorldDirectory());
+              getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
+            }
           }
         }
       });
