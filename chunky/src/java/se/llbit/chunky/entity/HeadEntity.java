@@ -79,9 +79,9 @@ public class HeadEntity extends Entity {
       wallHeight = 4 / 16.;
     }
     Transform transform = Transform.NONE
-      .translate(position.x + offset.x,
+      .translate(position.x + offset.x + 0.5,
         position.y + offset.y + 4 / 16. + wallHeight,
-        position.z + offset.z);
+        position.z + offset.z + 0.5);
     switch (placement) {
       case 0:
         // Unused.
