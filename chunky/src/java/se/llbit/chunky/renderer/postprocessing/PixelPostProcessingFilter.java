@@ -3,7 +3,7 @@ package se.llbit.chunky.renderer.postprocessing;
 import se.llbit.chunky.plugin.PluginApi;
 
 /**
- * Post processing filter that supports processing one pixel at a time.
+ * Post-processing filter that supports processing one pixel at a time.
  */
 @PluginApi
 public interface PixelPostProcessingFilter extends PostProcessingFilter {

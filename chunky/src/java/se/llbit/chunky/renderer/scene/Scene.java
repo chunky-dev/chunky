@@ -2095,7 +2095,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Save a snapshot
    */
-  public void saveSnapshot(File directory, TaskTracker taskTracker, int threadCount) {
+  public void saveSnapshot(File directory, TaskTracker taskTracker) {
     if (directory == null) {
       Log.error("Can't save snapshot: bad output directory!");
       return;
@@ -2105,40 +2105,35 @@ public class Scene implements JsonSerializable, Refreshable {
     if (!directory.exists()) {
       directory.mkdirs();
     }
-    if (getOutputMode().isTransparencySupported()) {
-      computeAlpha(taskTracker);
-    }
-    if (!finalized) {
-      postProcessFrame(taskTracker);
-    }
-    writeImage(targetFile, getOutputMode(), taskTracker);
+    saveFrame(targetFile, taskTracker);
   }
 
   /**
-   * Save the current frame (e.g. as a PNG, TIFF, or PFM image), depending on this scene's outputMode.
+   * Saves the current frame (e.g. as a PNG, TIFF, or PFM image), depending on this scene's outputMode.
+   * Also see {@link #writeFrame(OutputStream, PictureExportFormat, TaskTracker)}
    */
-  public synchronized void saveFrame(File targetFile, TaskTracker taskTracker, int threadCount) {
-    this.saveFrame(targetFile, getOutputMode(), taskTracker, threadCount);
+  public synchronized void saveFrame(File targetFile, TaskTracker taskTracker) {
+    saveFrame(targetFile, getOutputMode(), taskTracker);
   }
 
   /**
-   * Save the current frame (e.g. as a PNG, TIFF, or PFM image), depending on this scene's outputMode.
+   * Saves the current frame into a file.
+   * Also see {@link #writeFrame(OutputStream, PictureExportFormat, TaskTracker)}
    */
-  public synchronized void saveFrame(File targetFile, PictureExportFormat mode, TaskTracker taskTracker, int threadCount) {
-    if (mode.isTransparencySupported()) {
-      computeAlpha(taskTracker);
+  public synchronized void saveFrame(File targetFile, PictureExportFormat mode, TaskTracker taskTracker) {
+    try (FileOutputStream out = new FileOutputStream(targetFile)) {
+      writeFrame(out, mode, taskTracker);
+    } catch (IOException e) {
+      Log.warn("Failed to write file: " + targetFile.getAbsolutePath(), e);
     }
-    if (!finalized) {
-      postProcessFrame(taskTracker);
-    }
-    writeImage(targetFile, mode, taskTracker);
   }
 
   /**
-   * Save the current frame into the given output stream, using the given format.
+   * Saves the current frame into the given output stream, using the given PictureExportFormat.
+   * Side effects: This will compute the alpha channel if supported by the export format
+   * and may apply post-processing if the scene has not been finalized yet.
    */
-  public synchronized void writeFrame(OutputStream out, PictureExportFormat mode, TaskTracker taskTracker, int threadCount)
-      throws IOException {
+  public synchronized void writeFrame(OutputStream out, PictureExportFormat mode, TaskTracker taskTracker) throws IOException {
     if (mode.isTransparencySupported()) {
       computeAlpha(taskTracker);
     }
@@ -2185,28 +2180,25 @@ public class Scene implements JsonSerializable, Refreshable {
    * Post-process all pixels in the current frame.
    *
    * <p>This is normally done by the render workers during rendering,
-   * but in some cases an separate post processing pass is needed.
+   * but in some cases a separate post-processing pass is needed.
    */
   public void postProcessFrame(TaskTracker.Task task) {
     PostProcessingFilter filter = postProcessingFilter;
     if(mode == RenderMode.PREVIEW) {
       filter = PreviewFilter.INSTANCE;
     }
-    filter.processFrame(width, height, samples, backBuffer, exposure, task);
+    filter.processFrame(
+      width, height,
+      samples, backBuffer,
+      exposure,
+      task
+    );
     finalized = true;
   }
 
   public void postProcessFrame(TaskTracker taskTracker) {
     try (TaskTracker.Task task = taskTracker.task("Finalizing frame")) {
       postProcessFrame(task);
-    }
-  }
-
-  private void writeImage(File targetFile, PictureExportFormat mode, TaskTracker taskTracker) {
-    try (FileOutputStream out = new FileOutputStream(targetFile)) {
-      mode.write(out, this, taskTracker);
-    } catch (IOException e) {
-      Log.warn("Failed to write file: " + targetFile.getAbsolutePath(), e);
     }
   }
 

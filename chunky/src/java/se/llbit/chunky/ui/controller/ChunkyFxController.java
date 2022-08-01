@@ -396,7 +396,7 @@ public class ChunkyFxController
     renderManager.setSnapshotControl(SnapshotControl.DEFAULT);
     renderManager.setOnFrameCompleted((scene1, spp) -> {
       if (renderManager.getSnapshotControl().saveSnapshot(scene1, spp)) {
-        scene1.saveSnapshot(new File(renderController.getContext().getSceneDirectory(), "snapshots"), taskTracker, renderController.getContext().numRenderThreads());
+        scene1.saveSnapshot(new File(renderController.getContext().getSceneDirectory(), "snapshots"), taskTracker);
       }
 
       if (renderManager.getSnapshotControl().saveRenderDump(scene1, spp)) {
@@ -743,9 +743,9 @@ public class ChunkyFxController
       fileChooser.getExtensionFilters().add(filter);
       filters.put(filter, mode);
     }
-    fileChooser.getExtensionFilters().stream().filter(
-        e -> filters.get(e).equals(scene.outputMode))
-        .findFirst().ifPresent(fileChooser::setSelectedExtensionFilter);
+    fileChooser.getExtensionFilters().stream()
+      .filter(e -> filters.get(e).equals(scene.outputMode))
+      .findFirst().ifPresent(fileChooser::setSelectedExtensionFilter);
     fileChooser.setInitialFileName(String.format("%s-%d",
         scene.name(), renderManager.getRenderStatus().getSpp()));
     File target = fileChooser.showSaveDialog(mapCanvas.getScene().getWindow());
@@ -755,7 +755,7 @@ public class ChunkyFxController
       if (!target.getName().endsWith(format.getExtension())) {
         target = new File(target.getPath() + format.getExtension());
       }
-      scene.saveFrame(target, format, taskTracker, renderController.getContext().numRenderThreads());
+      scene.saveFrame(target, format, taskTracker);
     }
   }
 
@@ -765,7 +765,7 @@ public class ChunkyFxController
       PipedOutputStream out = new PipedOutputStream(in);
       new Thread(() -> {
         try {
-          scene.writeFrame(out, PictureExportFormats.PNG, new TaskTracker(ProgressListener.NONE), renderController.getContext().numRenderThreads());
+          scene.writeFrame(out, PictureExportFormats.PNG, new TaskTracker(ProgressListener.NONE));
         } catch (IOException e) {
           Log.warn("Failed to copy image to clipboard", e);
         }
