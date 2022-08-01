@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.ui.elements;
 
+import javafx.application.Platform;
 import javafx.beans.DefaultProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -62,12 +63,24 @@ public class TextFieldLabelWrapper extends StackPane {
     if (textField == null) {
       textField = defaultTextField();
     }
+    textField.textProperty().addListener(prop -> Platform.runLater(this::fixTextPositionOffset));
     getChildren().remove(textFieldProperty.get());
 
     textFieldProperty.set(textField);
     labelNode.setLabelFor(textField);
 
     getChildren().add(0, textField);
+  }
+
+  /**
+   * scrolls to the end of the text field
+   * _best effort_ fix for 1378 - long initial text overflows the text field (cut off)
+   */
+  private void fixTextPositionOffset() {
+    TextField textField = textFieldProperty.get();
+    if (!textField.isFocused()) {
+      textField.end();
+    }
   }
 
   @Override
