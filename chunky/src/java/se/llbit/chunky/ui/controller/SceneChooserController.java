@@ -114,7 +114,7 @@ public class SceneChooserController implements Initializable {
     changeSceneDirBtn.setOnAction(e -> {
       sceneDirectoryChooser.setInitialDirectory(controller.getChunky().options.sceneDir);
       File directory = sceneDirectoryChooser.showDialog(changeSceneDirBtn.getScene().getWindow());
-      if(directory.canWrite()) {
+      if(directory != null && directory.canWrite()) {
         PersistentSettings.setSceneDirectory(directory);
         // TODO: It may be a good idea to not write directly to the shared scene directory.
         // It does not matter much right now, but it might be useful in the future to have
