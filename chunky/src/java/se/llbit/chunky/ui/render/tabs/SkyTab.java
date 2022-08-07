@@ -229,6 +229,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     colorPicker.setColor(ColorUtil.toFx(scene.sky().getColor()));
     colorPicker.colorProperty().addListener(skyColorListener);
     skyboxSettings.update(scene);
+    skymapSettings.update(scene);
   }
 
   @Override public String getTabTitle() {
