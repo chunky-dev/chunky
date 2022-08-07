@@ -233,6 +233,7 @@ public class Sky implements JsonSerializable {
 
     simulatedSkyMode = other.simulatedSkyMode;
     skyCache.set(other.skyCache);
+    skyCache.setSimulatedSkyMode(other.simulatedSkyMode);
     if (simulatedSkyMode.updateSun(scene.sun, horizonOffset)) {
       skyCache.precalculateSky();
     }
