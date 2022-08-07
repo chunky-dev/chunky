@@ -116,6 +116,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   private Runnable onViewDragged = () -> {};
   private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
+  private boolean shouldDrawPlayers = true;
+
   public ChunkMap(WorldMapLoader loader, ChunkyFxController controller,
       MapView mapView, ChunkSelectionTracker chunkSelection,
       Canvas canvas, Canvas mapOverlay) {
@@ -566,7 +568,9 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
   protected void repaint(GraphicsContext gc) {
     mapBuffer.drawBuffered(gc);
-    drawPlayers(gc);
+    if (shouldDrawPlayers) {
+      drawPlayers(gc);
+    }
     drawSpawn(gc);
     drawSelectionRect(gc);
     drawViewBounds(mapOverlay);
@@ -832,5 +836,13 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
   public void setOnViewDragged(Runnable onViewDragged) {
     this.onViewDragged = onViewDragged;
+  }
+
+  public boolean isDrawingPlayers() {
+    return this.shouldDrawPlayers;
+  }
+
+  public void setDrawingPlayers(boolean value) {
+    this.shouldDrawPlayers = value;
   }
 }

@@ -118,6 +118,11 @@
               <ToggleButton fx:id="trackCameraBtn" mnemonicParsing="false" text="track camera"
                             toggleGroup="$tracking"/>
             </HBox>
+            <Separator/>
+            <HBox spacing="10.0">
+              <Label text="Show Players"/>
+              <CheckBox fx:id="showPlayers"/>
+            </HBox>
           </VBox>
         </SplitPane>
       </Tab>

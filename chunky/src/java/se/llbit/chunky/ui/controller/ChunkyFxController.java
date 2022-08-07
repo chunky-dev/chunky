@@ -39,20 +39,8 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
@@ -124,6 +112,7 @@ public class ChunkyFxController
   @FXML private ToggleButton netherBtn;
   @FXML private ToggleButton endBtn;
   @FXML private PositiveIntegerAdjuster scale;
+  @FXML private CheckBox showPlayers;
   @FXML private IntegerAdjuster yMin;
   @FXML private IntegerAdjuster yMax;
   @FXML private ToggleButton trackPlayerBtn;
@@ -571,6 +560,10 @@ public class ChunkyFxController
       ChunkView view = mapView.getMapView();
       mapView.panTo(view.x, newValue.doubleValue() / 16);
     }));
+    showPlayers.setSelected(this.map.isDrawingPlayers());
+    showPlayers.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      this.map.setDrawingPlayers(newValue);
+    });
     scale.valueProperty().addListener(new GroupedChangeListener<>(group,
         (observable, oldValue, newValue) -> mapView.setScale(newValue.intValue())));
     yMin.valueProperty().addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
