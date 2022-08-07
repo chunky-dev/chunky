@@ -18,6 +18,7 @@
 package se.llbit.math;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -785,20 +786,25 @@ public class Octree {
 
     // This function is called as to provide a fallback when
     // an implementation isn't suitable, we assume it means
-    // that chunky is already using a lot of memory so we save the octree on disk
+    // that Chunky is already using a lot of memory, so we save the octree on disk
     // and reload it with another implementation
     long nodeCount = implementation.nodeCount();
     File tempFile = File.createTempFile("octree-conversion", ".bin");
-    try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new FileOutputStream(tempFile)))) {
-      implementation.store(out);
-    }
-    implementation = null; // Allow th gc to free memory during construction of the new octree
+    try {
+      try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(Files.newOutputStream(tempFile.toPath())))) {
+        implementation.store(out);
+      }
+      implementation = null; // Allow the GC to free memory during construction of the new octree
 
-    try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new FileInputStream(tempFile)))) {
-      implementation = factory.loadWithNodeCount(nodeCount, in);
+      try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(Files.newInputStream(tempFile.toPath())))) {
+        implementation = factory.loadWithNodeCount(nodeCount, in);
+      }
+    } finally {
+      if (!tempFile.delete()) {
+        Log.warnf("Failed to delete temporary file:\n%s", tempFile);
+        tempFile.deleteOnExit();
+      }
     }
-
-    tempFile.delete();
   }
 
   @PluginApi
