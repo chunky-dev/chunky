@@ -118,4 +118,12 @@ public abstract class Adjuster<T extends Number> extends HBox {
   public Property<Number> valueProperty() {
     return value;
   }
+
+  public void setMaximumFractionDigits(int maximumFractionDigits) {
+    this.valueField.converter.setMaximumFractionDigits(maximumFractionDigits);
+  }
+
+  public int getMaximumFractionDigits() {
+    return this.valueField.converter.getMaximumFractionDigits();
+  }
 }
