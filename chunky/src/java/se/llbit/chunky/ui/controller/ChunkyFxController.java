@@ -563,6 +563,7 @@ public class ChunkyFxController
     showPlayers.setSelected(this.map.isDrawingPlayers());
     showPlayers.selectedProperty().addListener((observable, oldValue, newValue) -> {
       this.map.setDrawingPlayers(newValue);
+      this.map.redrawMap();
     });
     scale.valueProperty().addListener(new GroupedChangeListener<>(group,
         (observable, oldValue, newValue) -> mapView.setScale(newValue.intValue())));
