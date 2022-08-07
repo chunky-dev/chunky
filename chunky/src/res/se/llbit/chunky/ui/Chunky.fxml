@@ -6,6 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import se.llbit.chunky.ui.*?>
 <?import se.llbit.fx.ToolPane?>
+<?import se.llbit.chunky.ui.elements.TextFieldLabelWrapper?>
 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.65"
       xmlns:fx="http://javafx.com/fxml/1">
   <MenuBar>
@@ -104,18 +105,28 @@
             </VBox>
             <Label text="Coordinates"/>
             <HBox alignment="CENTER_LEFT" spacing="10.0">
-              <Label text="X="/>
-              <DoubleTextField prefWidth="80.0" fx:id="xPosition"/>
-              <Label text="Z="/>
-              <DoubleTextField fx:id="zPosition" prefWidth="80.0"/>
+              <TextFieldLabelWrapper labelText="x:">
+                <DoubleTextField prefWidth="100.0" fx:id="xPosition">
+                  <tooltip>
+                    <Tooltip text="Map x (east/west) coordinate" />
+                  </tooltip>
+                </DoubleTextField>
+              </TextFieldLabelWrapper>
+              <TextFieldLabelWrapper labelText="z:">
+                <DoubleTextField prefWidth="100.0" fx:id="zPosition">
+                  <tooltip>
+                    <Tooltip text="Map z (north/south) coordinate" />
+                  </tooltip>
+                </DoubleTextField>
+              </TextFieldLabelWrapper>
             </HBox>
             <HBox spacing="10.0">
-              <ToggleButton fx:id="trackPlayerBtn" mnemonicParsing="false" text="track player">
+              <ToggleButton prefWidth="100.0" fx:id="trackPlayerBtn" mnemonicParsing="false" text="track player">
                 <toggleGroup>
                   <ToggleGroup fx:id="tracking"/>
                 </toggleGroup>
               </ToggleButton>
-              <ToggleButton fx:id="trackCameraBtn" mnemonicParsing="false" text="track camera"
+              <ToggleButton prefWidth="100.0" fx:id="trackCameraBtn" mnemonicParsing="false" text="track camera"
                             toggleGroup="$tracking"/>
             </HBox>
           </VBox>
