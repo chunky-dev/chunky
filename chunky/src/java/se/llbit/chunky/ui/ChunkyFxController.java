@@ -125,6 +125,7 @@ public class ChunkyFxController
   @FXML private ToggleButton netherBtn;
   @FXML private ToggleButton endBtn;
   @FXML private IntegerAdjuster scale;
+  @FXML private CheckBox showPlayers;
   @FXML private IntegerAdjuster yMin;
   @FXML private IntegerAdjuster yMax;
   @FXML private ToggleButton trackPlayerBtn;
@@ -510,6 +511,11 @@ public class ChunkyFxController
       ChunkView view = mapView.getMapView();
       mapView.panTo(view.x, newValue.doubleValue() / 16);
     }));
+    showPlayers.setSelected(this.map.isDrawingPlayers());
+    showPlayers.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      this.map.setDrawingPlayers(newValue);
+      this.map.redrawMap();
+    });
     scale.valueProperty().addListener(new GroupedChangeListener<>(group,
         (observable, oldValue, newValue) -> mapView.setScale(newValue.intValue())));
     yMin.valueProperty().addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
