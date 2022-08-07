@@ -168,8 +168,8 @@ public class PreviewRayTracer implements RayTracer {
         boolean insideOctree = scene.isInsideOctree(vec);
         ray.t = t;
         ray.o.set(vec);
-        double xm = ((ray.o.x) % 16.0 + 16.0) % 16.0;
-        double zm = ((ray.o.z) % 16.0 + 16.0) % 16.0;
+        double xm = ((ray.o.x) % 16.0 + 8.0) % 16.0;
+        double zm = ((ray.o.z) % 16.0 + 8.0) % 16.0;
         if (
           (xm < chunkPatternLinePosition || xm > chunkPatternLinePosition + chunkPatternLineWidth) &&
             (zm < chunkPatternLinePosition || zm > chunkPatternLinePosition + chunkPatternLineWidth)
