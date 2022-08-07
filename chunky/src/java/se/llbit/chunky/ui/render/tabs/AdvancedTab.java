@@ -26,6 +26,7 @@ import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
+import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.RenderManager;
@@ -41,9 +42,11 @@ import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.ShutdownAlert;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.fxutil.Dialogs;
+import se.llbit.log.Log;
 import se.llbit.math.Octree;
 import se.llbit.math.bvh.BVH;
 import se.llbit.util.Registerable;
+import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,6 +70,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster animationTime;
   @FXML private ChoiceBox<PictureExportFormat> outputMode;
   @FXML private ChoiceBox<String> octreeImplementation;
+  @FXML private Button octreeSwitchImplementation;
   @FXML private ChoiceBox<String> bvhMethod;
   @FXML private ChoiceBox<String> biomeStructureImplementation;
   @FXML private IntegerAdjuster gridSize;
@@ -174,6 +178,21 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
               PersistentSettings.setOctreeImplementation(newvalue);
             });
     octreeImplementation.setTooltip(new Tooltip(tooltipTextBuilder.toString()));
+
+    octreeSwitchImplementation.setOnAction(event -> Chunky.getCommonThreads().submit(() -> {
+      TaskTracker tracker = controller.getSceneManager().getTaskTracker();
+      try {
+        try (TaskTracker.Task task = tracker.task("(1/2) Converting world octree", 1000)) {
+          scene.getWorldOctree().switchImplementation(octreeImplementation.getValue(), task);
+        }
+        try (TaskTracker.Task task = tracker.task("(2/2) Converting water octree")) {
+          scene.getWaterOctree().switchImplementation(octreeImplementation.getValue(), task);
+        }
+        System.out.println("Done");
+      } catch (IOException e) {
+        Log.error("Switching octrees failed. Reload the scene.\n", e);
+      }
+    }));
 
     ArrayList<String> bvhNames = new ArrayList<>();
     StringBuilder bvhMethodBuilder = new StringBuilder();

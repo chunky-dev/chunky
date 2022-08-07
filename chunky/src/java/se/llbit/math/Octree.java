@@ -37,6 +37,9 @@ import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
 import se.llbit.log.Log;
+import se.llbit.util.PositionalInputStream;
+import se.llbit.util.PositionalOutputStream;
+import se.llbit.util.TaskTracker;
 
 /**
  * A simple voxel Octree.
@@ -770,12 +773,16 @@ public class Octree {
     implementation.setCube(cubeDepth, types, x, y, z);
   }
 
+  public void switchImplementation(String newImplementation) throws IOException {
+    switchImplementation(newImplementation, TaskTracker.Task.NONE);
+  }
+
   /**
    * Switch between any two implementation by reusing the load and store methods of
    * the octree implementations
    * @param newImplementation The new Octree implementation
    */
-  public void switchImplementation(String newImplementation) throws IOException {
+  public void switchImplementation(String newImplementation, TaskTracker.Task task) throws IOException {
     ImplementationFactory factory = getImplementationFactory(newImplementation);
     if(factory.isOfType(implementation)) {
       // Already correct implementation
@@ -783,20 +790,26 @@ public class Octree {
     }
 
     Log.infof("Changing octree implementation (%s)", newImplementation);
+    task.update(1000, 0);
 
     // This function is called as to provide a fallback when
     // an implementation isn't suitable, we assume it means
     // that Chunky is already using a lot of memory, so we save the octree on disk
     // and reload it with another implementation
     long nodeCount = implementation.nodeCount();
-    File tempFile = File.createTempFile("octree-conversion", ".bin");
+    double progressScaler = 125.0 / nodeCount;
+    File tempFile = File.createTempFile("octree-conversPaion", ".bin");
     try {
-      try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(Files.newOutputStream(tempFile.toPath())))) {
+      try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new PositionalOutputStream(Files.newOutputStream(tempFile.toPath()), position -> {
+        task.updateInterval((int) (position * progressScaler), 1);
+      })))) {
         implementation.store(out);
       }
       implementation = null; // Allow the GC to free memory during construction of the new octree
 
-      try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(Files.newInputStream(tempFile.toPath())))) {
+      try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new PositionalInputStream(Files.newInputStream(tempFile.toPath()), position -> {
+        task.updateInterval((int) (position * progressScaler) + 500, 1);
+      })))) {
         implementation = factory.loadWithNodeCount(nodeCount, in);
       }
     } finally {
