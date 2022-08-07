@@ -119,12 +119,12 @@
               <IntegerAdjuster fx:id="yMax" name="Max Y level"/>
             </VBox>
             <HBox spacing="10.0">
-              <ToggleButton fx:id="trackPlayerBtn" mnemonicParsing="false" text="track player">
+              <ToggleButton fx:id="trackPlayerBtn" mnemonicParsing="false" text="Track player">
                 <toggleGroup>
                   <ToggleGroup fx:id="tracking"/>
                 </toggleGroup>
               </ToggleButton>
-              <ToggleButton fx:id="trackCameraBtn" mnemonicParsing="false" text="track camera"
+              <ToggleButton fx:id="trackCameraBtn" mnemonicParsing="false" text="Track camera"
                             toggleGroup="$tracking"/>
             </HBox>
           </VBox>
