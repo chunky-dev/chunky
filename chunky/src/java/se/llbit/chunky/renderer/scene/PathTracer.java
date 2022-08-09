@@ -36,9 +36,6 @@ import java.util.Random;
  */
 public class PathTracer implements RayTracer {
 
-  /** Extinction factor for fog rendering. */
-  private static final double EXTINCTION_FACTOR = 0.04;
-
   /**
    * Path trace the ray.
    */
@@ -77,13 +74,13 @@ public class PathTracer implements RayTracer {
           // Direct sky hit.
           if (!scene.transparentSky()) {
             scene.sky.getSkyColorInterpolated(ray);
-            scene.addSkyFog(ray);
+            addSkyFog(scene, ray, state, ox, od);
             hit = true;
           }
         } else if (ray.specular) {
           // Indirect sky hit - specular color.
           scene.sky.getSkyColor(ray, true);
-          scene.addSkyFog(ray);
+          addSkyFog(scene, ray, state, ox, od);
           hit = true;
         } else {
           // Indirect sky hit - diffuse color.
@@ -396,8 +393,7 @@ public class PathTracer implements RayTracer {
     // This is a simplistic fog model which gives greater artistic freedom but
     // less realism. The user can select fog color and density; in a more
     // realistic model color would depend on viewing angle and sun color/position.
-    if (airDistance > 0 && scene.fogEnabled()) {
-      Sun sun = scene.sun;
+    if (airDistance > 0 && scene.fog.fogEnabled()) {
 
       // Pick point between ray origin and intersected object.
       // The chosen point is used to test if the sun is lighting the
@@ -411,34 +407,31 @@ public class PathTracer implements RayTracer {
       // However, the results are probably close enough to not be distracting,
       // so this seems like a reasonable approximation.
       Ray atmos = new Ray();
-      double offset = QuickMath.clamp(airDistance * random.nextFloat(),
-          Ray.EPSILON, airDistance - Ray.EPSILON);
+      double offset = scene.fog.sampleGroundScatterOffset(ray, ox, random);
       atmos.o.scaleAdd(offset, od, ox);
-      sun.getRandomSunDirection(atmos, random);
+      scene.sun.getRandomSunDirection(atmos, random);
       atmos.setCurrentMaterial(Air.INSTANCE);
-
-      double fogDensity = scene.getFogDensity() * EXTINCTION_FACTOR;
-      double extinction = Math.exp(-airDistance * fogDensity);
-      ray.color.scale(extinction);
 
       // Check sun visibility at random point to determine inscatter brightness.
       getDirectLightAttenuation(scene, atmos, state);
-      Vector4 attenuation = state.attenuation;
-      if (attenuation.w > Ray.EPSILON) {
-        Vector3 fogColor = scene.getFogColor();
-        double inscatter;
-        if (scene.fastFog()) {
-          inscatter = (1 - extinction);
-        } else {
-          inscatter = airDistance * fogDensity * Math.exp(-offset * fogDensity);
-        }
-        ray.color.x += attenuation.x * attenuation.w * fogColor.x * inscatter;
-        ray.color.y += attenuation.y * attenuation.w * fogColor.y * inscatter;
-        ray.color.z += attenuation.z * attenuation.w * fogColor.z * inscatter;
-      }
+      scene.fog.addGroundFog(ray, ox, airDistance, state.attenuation, offset);
     }
 
     return hit;
+  }
+
+  private static void addSkyFog(Scene scene, Ray ray, WorkerState state, Vector3 ox, Vector3 od) {
+    if (scene.fog.mode == FogMode.UNIFORM) {
+      scene.fog.addSkyFog(ray, null);
+    } else if (scene.fog.mode == FogMode.LAYERED) {
+      Ray atmos = new Ray();
+      double offset = scene.fog.sampleSkyScatterOffset(scene, ray, state.random);
+      atmos.o.scaleAdd(offset, od, ox);
+      scene.sun.getRandomSunDirection(atmos, state.random);
+      atmos.setCurrentMaterial(Air.INSTANCE);
+      getDirectLightAttenuation(scene, atmos, state);
+      scene.fog.addSkyFog(ray, state.attenuation);
+    }
   }
 
   private static void sampleEmitterFace(Scene scene, Ray ray, Grid.EmitterPosition pos, int face, Vector4 result, double scaler, Random random) {

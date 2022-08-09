@@ -153,9 +153,6 @@ public class Scene implements JsonSerializable, Refreshable {
   protected final Vector3 waterColor =
       new Vector3(PersistentSettings.getWaterColorRed(), PersistentSettings.getWaterColorGreen(),
           PersistentSettings.getWaterColorBlue());
-  protected final Vector3 fogColor =
-      new Vector3(PersistentSettings.getFogColorRed(), PersistentSettings.getFogColorGreen(),
-          PersistentSettings.getFogColorBlue());
   public int sdfVersion = -1;
   public String name = "default_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
 
@@ -210,16 +207,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean waterPlaneChunkClip = true;
   protected WaterShader waterShading = new LegacyWaterShader();
 
-  /**
-   * Enables fast fog algorithm
-   */
-  protected boolean fastFog = true;
-
-  /** Fog thickness. */
-  protected double fogDensity = DEFAULT_FOG_DENSITY;
-
-  /** Controls how much the fog color is blended over the sky/skymap. */
-  protected double skyFogDensity = 1;
+  public final Fog fog = new Fog();
 
   protected boolean biomeColors = true;
   protected boolean biomeBlending = true;
@@ -460,7 +448,7 @@ public class Scene implements JsonSerializable, Refreshable {
     waterVisibility = other.waterVisibility;
     useCustomWaterColor = other.useCustomWaterColor;
     waterColor.set(other.waterColor);
-    fogColor.set(other.fogColor);
+    fog.set(other.fog);
     biomeColors = other.biomeColors;
     sunSamplingStrategy = other.sunSamplingStrategy;
     emittersEnabled = other.emittersEnabled;
@@ -468,9 +456,6 @@ public class Scene implements JsonSerializable, Refreshable {
     emitterSamplingStrategy = other.emitterSamplingStrategy;
     preventNormalEmitterWithSampling = other.preventNormalEmitterWithSampling;
     transparentSky = other.transparentSky;
-    fogDensity = other.fogDensity;
-    skyFogDensity = other.skyFogDensity;
-    fastFog = other.fastFog;
     yClipMin = other.yClipMin;
     yClipMax = other.yClipMax;
 
@@ -2664,12 +2649,8 @@ public class Scene implements JsonSerializable, Refreshable {
     refresh();
   }
 
-  public Vector3 getFogColor() {
-    return fogColor;
-  }
-
   public void setFogColor(Vector3 color) {
-    fogColor.set(color);
+    fog.getFogColor().set(color);
     refresh();
   }
 
@@ -2719,16 +2700,9 @@ public class Scene implements JsonSerializable, Refreshable {
       json.add("waterColor", colorObj);
     }
     waterShading.save(json);
-    JsonObject fogColorObj = new JsonObject();
-    fogColorObj.add("red", fogColor.x);
-    fogColorObj.add("green", fogColor.y);
-    fogColorObj.add("blue", fogColor.z);
-    json.add("fogColor", fogColorObj);
-    json.add("fastFog", fastFog);
+    json.add("fog", fog.toJson());
     json.add("biomeColorsEnabled", biomeColors);
     json.add("transparentSky", transparentSky);
-    json.add("fogDensity", fogDensity);
-    json.add("skyFogDensity", skyFogDensity);
     json.add("waterWorldEnabled", waterPlaneEnabled);
     json.add("waterWorldHeight", waterPlaneHeight);
     json.add("waterWorldHeightOffsetEnabled", waterPlaneOffsetEnabled);
@@ -3034,15 +3008,14 @@ public class Scene implements JsonSerializable, Refreshable {
       waterShading = new LegacyWaterShader();
     }
     waterShading.load(json);
-    JsonObject fogColorObj = json.get("fogColor").object();
-    fogColor.x = fogColorObj.get("red").doubleValue(fogColor.x);
-    fogColor.y = fogColorObj.get("green").doubleValue(fogColor.y);
-    fogColor.z = fogColorObj.get("blue").doubleValue(fogColor.z);
-    fastFog = json.get("fastFog").boolValue(fastFog);
     biomeColors = json.get("biomeColorsEnabled").boolValue(biomeColors);
     transparentSky = json.get("transparentSky").boolValue(transparentSky);
-    fogDensity = json.get("fogDensity").doubleValue(fogDensity);
-    skyFogDensity = json.get("skyFogDensity").doubleValue(skyFogDensity);
+    JsonValue fogObj = json.get("fog");
+    if (fogObj.isObject()) {
+      fog.importFromJson(fogObj.asObject(), this);
+    } else {
+      fog.importFromLegacy(json);
+    }
 
     if(!json.get("waterHeight").isUnknown()) {
       // fallback for older scene versions were waterPlane was enabled by using height = 0
@@ -3212,42 +3185,24 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public void setFogDensity(double newValue) {
-    if (newValue != fogDensity) {
-      this.fogDensity = newValue;
+    if (newValue != fog.uniformDensity) {
+      fog.uniformDensity = newValue;
       refresh();
     }
-  }
-
-  public double getFogDensity() {
-    return fogDensity;
   }
 
   public void setSkyFogDensity(double newValue) {
-    if (newValue != skyFogDensity) {
-      this.skyFogDensity = newValue;
+    if (newValue != fog.skyFogDensity) {
+      fog.skyFogDensity = newValue;
       refresh();
     }
   }
 
-  public double getSkyFogDensity() {
-    return skyFogDensity;
-  }
   public void setFastFog(boolean value) {
-    if (fastFog != value) {
-      fastFog = value;
+    if (fog.fastFog != value) {
+      fog.fastFog = value;
       refresh();
     }
-  }
-
-  public boolean fastFog() {
-    return fastFog;
-  }
-
-  /**
-   * @return {@code true} if volumetric fog is enabled
-   */
-  public boolean fogEnabled() {
-    return fogDensity > 0.0;
   }
 
   public PictureExportFormat getOutputMode() {
@@ -3357,27 +3312,6 @@ public class Scene implements JsonSerializable, Refreshable {
     material.set("metalness", Json.of(value));
     materials.put(materialName, material);
     refresh(ResetReason.MATERIALS_CHANGED);
-  }
-
-  /**
-   * Renders a fog effect over the sky near the horizon.
-   */
-  public void addSkyFog(Ray ray) {
-    if (fogEnabled()) {
-      // This does not take fog density into account because the sky is
-      // most consistently treated as being infinitely far away.
-      double fog;
-      if (ray.d.y > 0) {
-        fog = 1 - ray.d.y;
-        fog *= fog;
-      } else {
-        fog = 1;
-      }
-      fog *= skyFogDensity;
-      ray.color.x = (1 - fog) * ray.color.x + fog * fogColor.x;
-      ray.color.y = (1 - fog) * ray.color.y + fog * fogColor.y;
-      ray.color.z = (1 - fog) * ray.color.z + fog * fogColor.z;
-    }
   }
 
   public int getYClipMin() {
