@@ -29,6 +29,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipError;
 
 public class ResourcePackLoader {
   public static final ArrayList<PackLoaderFactory> PACK_LOADER_FACTORIES = new ArrayList<>();
@@ -229,11 +230,17 @@ public class ResourcePackLoader {
    * FileSystem abstraction over pack files which can load files from either ZIP files or directories.
    */
   public static FileSystem getPackFileSystem(File pack) throws IOException {
-    return pack.isDirectory()
-      // for resource packs in directories
-      ? FileSystems.getDefault()
-      // for resource packs in jar or zip files
-      : FileSystems.newFileSystem(URI.create("jar:" + pack.toURI()), Collections.emptyMap());
+    try {
+      return pack.isDirectory()
+        // for resource packs in directories
+        ? FileSystems.getDefault()
+        // for resource packs in jar or zip files
+        : FileSystems.newFileSystem(URI.create("jar:" + pack.toURI()), Collections.emptyMap());
+    } catch (ZipError e) {
+      // This catch is required for Java 8. This error appears safe to catch.
+      // https://stackoverflow.com/a/51715939
+      throw new IOException(e);
+    }
   }
 
   /**

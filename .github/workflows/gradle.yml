@@ -35,11 +35,17 @@ jobs:
       env:
         PR_NUMBER: ${{ github.event.pull_request.number }}
       run: |
-        if [[ "${GITHUB_EVENT_NAME}" != "pull_request" ]]; then
-          ./gradlew buildReleaseJar
-        else
-          ./gradlew buildReleaseJar -PprereleaseTag="PR.${PR_NUMBER}"
-        fi
+        case "${GITHUB_EVENT_NAME}" in
+          "pull_request")
+            ./gradlew buildReleaseJar -PprereleaseTag="PR.${PR_NUMBER}"
+            ;;
+          "push")
+            ./gradlew buildReleaseJar -PprereleaseTag="SNAPSHOT"
+            ;;
+          *)
+            ./gradlew buildReleaseJar
+            ;;
+        esac
     - name: Upload build
       uses: actions/upload-artifact@v2.2.2
       with:

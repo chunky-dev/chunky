@@ -145,6 +145,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
 
     fogDensity.setTooltip("Fog thickness. Set to 0 to disable volumetric fog effect.");
     fogDensity.setRange(0, 1);
+    fogDensity.setMaximumFractionDigits(6);
     fogDensity.makeLogarithmic();
     fogDensity.clampMin();
     fogDensity.onValueChange(value -> scene.setFogDensity(value));
@@ -228,6 +229,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     colorPicker.setColor(ColorUtil.toFx(scene.sky().getColor()));
     colorPicker.colorProperty().addListener(skyColorListener);
     skyboxSettings.update(scene);
+    skymapSettings.update(scene);
   }
 
   @Override public String getTabTitle() {

@@ -6,6 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import se.llbit.chunky.ui.*?>
 <?import se.llbit.fx.ToolPane?>
+<?import se.llbit.chunky.ui.elements.TextFieldLabelWrapper?>
 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.65"
       xmlns:fx="http://javafx.com/fxml/1">
   <MenuBar>
@@ -63,7 +64,7 @@
             <Canvas fx:id="mapCanvas" />
             <Canvas fx:id="mapOverlay" />
           </StackPane>
-          <VBox maxWidth="500" minWidth="0" spacing="5.0">
+          <VBox maxWidth="500" minWidth="0" spacing="10.0">
             <padding>
               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
             </padding>
@@ -77,22 +78,37 @@
               <Button fx:id="reloadWorldBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Reload"
                       HBox.hgrow="ALWAYS"/>
             </HBox>
-            <HBox prefHeight="100.0" spacing="20.0">
-              <VBox prefHeight="200.0" spacing="5.0">
-                <Label text="Dimension:"/>
-                <ToggleButton fx:id="overworldBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                              selected="true" text="Overworld">
-                  <toggleGroup>
-                    <ToggleGroup fx:id="dimension"/>
-                  </toggleGroup>
-                </ToggleButton>
-                <ToggleButton fx:id="netherBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                              text="Nether" toggleGroup="$dimension"/>
-                <ToggleButton fx:id="endBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="The End"
-                              toggleGroup="$dimension"/>
-              </VBox>
+            <HBox spacing="10.0">
+              <Label text="Dimension:"/>
+              <ToggleButton fx:id="overworldBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                            selected="true" text="Overworld">
+                <toggleGroup>
+                  <ToggleGroup fx:id="dimension"/>
+                </toggleGroup>
+              </ToggleButton>
+              <ToggleButton fx:id="netherBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                            text="Nether" toggleGroup="$dimension"/>
+              <ToggleButton fx:id="endBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="The End"
+                            toggleGroup="$dimension"/>
             </HBox>
             <Separator/>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+              <Label text="Coordinates:"/>
+              <TextFieldLabelWrapper labelText="x:">
+                <DoubleTextField prefWidth="100.0" fx:id="xPosition">
+                  <tooltip>
+                    <Tooltip text="Map x (east/west) coordinate" />
+                  </tooltip>
+                </DoubleTextField>
+              </TextFieldLabelWrapper>
+              <TextFieldLabelWrapper labelText="z:">
+                <DoubleTextField prefWidth="100.0" fx:id="zPosition">
+                  <tooltip>
+                    <Tooltip text="Map z (north/south) coordinate" />
+                  </tooltip>
+                </DoubleTextField>
+              </TextFieldLabelWrapper>
+            </HBox>
             <VBox alignment="CENTER_LEFT">
               <PositiveIntegerAdjuster fx:id="scale" name="Scale"/>
             </VBox>
@@ -102,21 +118,19 @@
             <VBox alignment="CENTER_LEFT">
               <IntegerAdjuster fx:id="yMax" name="Max Y level"/>
             </VBox>
-            <Label text="Coordinates"/>
-            <HBox alignment="CENTER_LEFT" spacing="10.0">
-              <Label text="X="/>
-              <DoubleTextField prefWidth="80.0" fx:id="xPosition"/>
-              <Label text="Z="/>
-              <DoubleTextField fx:id="zPosition" prefWidth="80.0"/>
-            </HBox>
             <HBox spacing="10.0">
-              <ToggleButton fx:id="trackPlayerBtn" mnemonicParsing="false" text="track player">
+              <ToggleButton fx:id="trackPlayerBtn" mnemonicParsing="false" text="Track player">
                 <toggleGroup>
                   <ToggleGroup fx:id="tracking"/>
                 </toggleGroup>
               </ToggleButton>
-              <ToggleButton fx:id="trackCameraBtn" mnemonicParsing="false" text="track camera"
+              <ToggleButton fx:id="trackCameraBtn" mnemonicParsing="false" text="Track camera"
                             toggleGroup="$tracking"/>
+            </HBox>
+            <Separator/>
+            <HBox spacing="10.0">
+              <Label text="Show Players"/>
+              <CheckBox fx:id="showPlayers"/>
             </HBox>
           </VBox>
         </SplitPane>

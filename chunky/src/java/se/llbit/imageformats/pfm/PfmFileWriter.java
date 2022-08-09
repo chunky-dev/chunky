@@ -1,3 +1,20 @@
+/* Copyright (c) 2012-2020 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2020-2022 Chunky contributors
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package se.llbit.imageformats.pfm;
 
 import se.llbit.chunky.renderer.scene.Scene;
@@ -57,30 +74,29 @@ public class PfmFileWriter implements AutoCloseable {
     out.write(0x0a);
   }
 
-  private void writePixelData(Scene scene, ByteOrder byteOrder, TaskTracker.Task task) throws IOException
-  {
+  private void writePixelData(Scene scene, ByteOrder byteOrder, TaskTracker.Task task) throws IOException {
     int width = scene.canvasWidth();
     int height = scene.canvasHeight();
 
-    // one or the other will be used, depending on if postprocessing is enabled.
-    double[] pixel = new double[3];
     double[] sampleBuffer = scene.getSampleBuffer();
 
-    // write each row...
-    for (int y = height-1; y >= 0; y--) {
-      task.update(height, height-y-1);
+    // width * (r,g,b) * float size (= 4 byte)
+    ByteBuffer rowBuffer = ByteBuffer.allocate(width * 3 * 4).order(byteOrder);
+    FloatBuffer rowFloatBuffer = rowBuffer.asFloatBuffer();
 
-      // Prepare our row buffers
-      ByteBuffer buffer = ByteBuffer.allocate(width*3*4).order(byteOrder);
-      FloatBuffer floatBuffer = buffer.asFloatBuffer();
+    // write each row (bottom to top)
+    for (int y = height - 1; y >= 0; y--) {
+      rowFloatBuffer.clear();
 
       // get the row's data as floats from raw pixel data
-      // (ignore post processing because that would clip the color range and defeat the purpose of HDR)
-        for (int x = 0; x < 3*width; x++)
-          floatBuffer.put((float)sampleBuffer[y*width*3+x]);
+      // (ignores post-processing because that would clip the value range and defeat the purpose of HDR)
+      for (int x = 0; x < 3 * width; x++) {
+        rowFloatBuffer.put((float) sampleBuffer[y * width * 3 + x]);
+      }
 
       // Write buffer to stream
-      out.write(buffer.array());
+      out.write(rowBuffer.array());
+      task.update(height, height - y - 1);
     }
   }
 }

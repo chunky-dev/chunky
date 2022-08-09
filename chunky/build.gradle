@@ -24,7 +24,7 @@ dependencies {
 jar {
   // Include all dependencies in the Jar.
   from project(':lib').configurations.archives.allArtifacts.files.collect {
-      zipTree(it)
+    zipTree(it)
   }
   from configurations.jsonlib.files.collect {
     zipTree(it)
@@ -103,42 +103,68 @@ artifacts {
 }
 
 publishing {
-    publications {
-        maven(MavenPublication) {
-            pom {
-                name = "Chunky"
-                packaging = "jar"
-                description = "Minecraft mapping and rendering tool"
-                url = "http://chunky.llbit.se"
-                artifactId = archivesBaseName
+  publications {
+    maven(MavenPublication) {
+      from components.java
+      pom {
+        name = "Chunky"
+        packaging = "jar"
+        description = "Minecraft mapping and rendering tool"
+        url = "http://chunky.llbit.se"
+        artifactId = archivesBaseName
+        version = "2.5.0-SNAPSHOT"
 
-                licenses {
-                    license {
-                        name = "GNU General Public License Version 3 (GPLv3)"
-                        url = "https://www.gnu.org/licenses/gpl-3.0.en.html"
-                        distribution = "repo"
-                    }
-                    developers {
-                        developer {
-                            name = "Jesper Öqvist"
-                            email = "jesper@llbit.se"
-                        }
-                    }
-                    scm {
-                        connection = "scm:git:https://github.com/chunky-dev/chunky.git"
-                        url = "https://github.com/chunky-dev/chunky"
-                    }
-                }
+        licenses {
+          license {
+            name = "GNU General Public License Version 3 (GPLv3)"
+            url = "https://www.gnu.org/licenses/gpl-3.0.en.html"
+            distribution = "repo"
+          }
+          developers {
+            developer {
+              name = "Jesper Öqvist"
+              email = "jesper@llbit.se"
             }
-            artifact sourcesJar
-            artifact javadocJar
+          }
+          scm {
+            connection = "scm:git:https://github.com/chunky-dev/chunky.git"
+            url = "https://github.com/chunky-dev/chunky"
+          }
         }
+      }
+      artifact sourcesJar
+      artifact javadocJar
     }
 
-    repositories {
-        maven {
-            name 'Build'
-            url layout.buildDirectory.dir('maven')
+    // fix dependency scopes (see https://discuss.gradle.org/t/maven-publish-plugin-generated-pom-making-dependency-scope-runtime/7494/9)
+    // and filter dependencies
+    publishing.publications.all {
+      pom.withXml {
+        asNode().dependencies.'*'.findAll() {
+          it.scope.text() == 'runtime' && project.configurations.implementation.allDependencies.find { dep ->
+            dep.name == it.artifactId.text()
+          }
+        }.each() {
+          if (it.groupId.text() == "org.openjfx") {
+            // remove javafx dependencies for now (maybe make them optional in the future?)
+            it.parent().remove(it)
+            // it.appendNode('optional', 'true')
+          } else if (it.groupId.text() == "se.llbit") {
+            // se.llbit dependencies are included in chunky-core
+            it.parent().remove(it)
+          } else {
+            // everything else is a dependency as usual
+            it.scope*.value = 'compile'
+          }
         }
+      }
     }
+  }
+
+  repositories {
+    maven {
+      name 'Build'
+      url layout.buildDirectory.dir('maven')
+    }
+  }
 }

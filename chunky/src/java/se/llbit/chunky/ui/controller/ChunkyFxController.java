@@ -39,20 +39,8 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
@@ -124,6 +112,7 @@ public class ChunkyFxController
   @FXML private ToggleButton netherBtn;
   @FXML private ToggleButton endBtn;
   @FXML private PositiveIntegerAdjuster scale;
+  @FXML private CheckBox showPlayers;
   @FXML private IntegerAdjuster yMin;
   @FXML private IntegerAdjuster yMax;
   @FXML private ToggleButton trackPlayerBtn;
@@ -360,20 +349,24 @@ public class ChunkyFxController
         updateTitle();
         refreshSettings();
         guiUpdateLatch.countDown();
-        getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
         World newWorld = scene.getWorld();
-        if (newWorld != EmptyWorld.INSTANCE
-          && mapLoader.getWorld() != EmptyWorld.INSTANCE
-          && !mapLoader.getWorld().getWorldDirectory().equals(newWorld.getWorldDirectory())) {
-          Alert loadWorldConfirm = Dialogs.createAlert(AlertType.CONFIRMATION);
-          loadWorldConfirm.getButtonTypes().clear();
-          loadWorldConfirm.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
-          loadWorldConfirm.setTitle("Load scene world");
-          loadWorldConfirm.setContentText(
+
+        boolean isSameWorld = mapLoader.getWorld().getWorldDirectory().equals(newWorld.getWorldDirectory());
+        if (isSameWorld) {
+          getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
+        } else {
+          if (newWorld != EmptyWorld.INSTANCE && mapLoader.getWorld() != EmptyWorld.INSTANCE) {
+            Alert loadWorldConfirm = Dialogs.createAlert(AlertType.CONFIRMATION);
+            loadWorldConfirm.getButtonTypes().clear();
+            loadWorldConfirm.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
+            loadWorldConfirm.setTitle("Load scene world");
+            loadWorldConfirm.setContentText(
               "This scene shows a different world than the one that is currently loaded. Do you want to load the world of this scene?");
-          Dialogs.stayOnTop(loadWorldConfirm);
-          if (loadWorldConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
-            mapLoader.loadWorld(newWorld.getWorldDirectory());
+            Dialogs.stayOnTop(loadWorldConfirm);
+            if (loadWorldConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
+              mapLoader.loadWorld(newWorld.getWorldDirectory());
+              getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
+            }
           }
         }
       });
@@ -392,7 +385,7 @@ public class ChunkyFxController
     renderManager.setSnapshotControl(SnapshotControl.DEFAULT);
     renderManager.setOnFrameCompleted((scene1, spp) -> {
       if (renderManager.getSnapshotControl().saveSnapshot(scene1, spp)) {
-        scene1.saveSnapshot(new File(renderController.getContext().getSceneDirectory(), "snapshots"), taskTracker, renderController.getContext().numRenderThreads());
+        scene1.saveSnapshot(new File(renderController.getContext().getSceneDirectory(), "snapshots"), taskTracker);
       }
 
       if (renderManager.getSnapshotControl().saveRenderDump(scene1, spp)) {
@@ -567,6 +560,11 @@ public class ChunkyFxController
       ChunkView view = mapView.getMapView();
       mapView.panTo(view.x, newValue.doubleValue() / 16);
     }));
+    showPlayers.setSelected(this.map.isDrawingPlayers());
+    showPlayers.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      this.map.setDrawingPlayers(newValue);
+      this.map.redrawMap();
+    });
     scale.valueProperty().addListener(new GroupedChangeListener<>(group,
         (observable, oldValue, newValue) -> mapView.setScale(newValue.intValue())));
     yMin.valueProperty().addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
@@ -739,9 +737,9 @@ public class ChunkyFxController
       fileChooser.getExtensionFilters().add(filter);
       filters.put(filter, mode);
     }
-    fileChooser.getExtensionFilters().stream().filter(
-        e -> filters.get(e).equals(scene.outputMode))
-        .findFirst().ifPresent(fileChooser::setSelectedExtensionFilter);
+    fileChooser.getExtensionFilters().stream()
+      .filter(e -> filters.get(e).equals(scene.outputMode))
+      .findFirst().ifPresent(fileChooser::setSelectedExtensionFilter);
     fileChooser.setInitialFileName(String.format("%s-%d",
         scene.name(), renderManager.getRenderStatus().getSpp()));
     File target = fileChooser.showSaveDialog(mapCanvas.getScene().getWindow());
@@ -751,7 +749,7 @@ public class ChunkyFxController
       if (!target.getName().endsWith(format.getExtension())) {
         target = new File(target.getPath() + format.getExtension());
       }
-      scene.saveFrame(target, format, taskTracker, renderController.getContext().numRenderThreads());
+      scene.saveFrame(target, format, taskTracker);
     }
   }
 
@@ -761,7 +759,7 @@ public class ChunkyFxController
       PipedOutputStream out = new PipedOutputStream(in);
       new Thread(() -> {
         try {
-          scene.writeFrame(out, PictureExportFormats.PNG, new TaskTracker(ProgressListener.NONE), renderController.getContext().numRenderThreads());
+          scene.writeFrame(out, PictureExportFormats.PNG, new TaskTracker(ProgressListener.NONE));
         } catch (IOException e) {
           Log.warn("Failed to copy image to clipboard", e);
         }

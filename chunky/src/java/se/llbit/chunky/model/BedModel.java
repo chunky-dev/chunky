@@ -31,7 +31,7 @@ public class BedModel extends QuadModel {
           new Vector3(0, 9 / 16.0, 16 / 16.0),
           new Vector3(16 / 16.0, 9 / 16.0, 16 / 16.0),
           new Vector3(0, 9 / 16.0, 0),
-          new Vector4(6 / 64.0, 22 / 64.0, 36 / 64.0, 20 / 64.0)),
+          new Vector4(22 / 64.0, 6 / 64.0, 36 / 64.0, 20 / 64.0)),
       new Quad(
           new Vector3(0, 3 / 16.0, 0),
           new Vector3(16 / 16.0, 3 / 16.0, 0),
@@ -114,7 +114,7 @@ public class BedModel extends QuadModel {
           new Vector3(0, 9 / 16.0, 16 / 16.0),
           new Vector3(16 / 16.0, 9 / 16.0, 16 / 16.0),
           new Vector3(0, 9 / 16.0, 0),
-          new Vector4(6 / 64.0, 22 / 64.0, 58 / 64.0, 42 / 64.0)),
+          new Vector4(22 / 64.0, 6 / 64.0, 58 / 64.0, 42 / 64.0)),
       new Quad(
           new Vector3(0, 3 / 16.0, 0),
           new Vector3(16 / 16.0, 3 / 16.0, 0),
