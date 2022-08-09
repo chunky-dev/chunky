@@ -4,9 +4,11 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 <?import se.llbit.chunky.ui.*?>
 <?import se.llbit.fx.ToolPane?>
 <?import se.llbit.chunky.ui.elements.TextFieldLabelWrapper?>
+
 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.65"
       xmlns:fx="http://javafx.com/fxml/1">
   <MenuBar>
@@ -97,27 +99,18 @@
               <TextFieldLabelWrapper labelText="x:">
                 <DoubleTextField prefWidth="100.0" fx:id="xPosition">
                   <tooltip>
-                    <Tooltip text="Map x (east/west) coordinate" />
+                    <Tooltip text="Map X (east/west) coordinate" />
                   </tooltip>
                 </DoubleTextField>
               </TextFieldLabelWrapper>
               <TextFieldLabelWrapper labelText="z:">
                 <DoubleTextField prefWidth="100.0" fx:id="zPosition">
                   <tooltip>
-                    <Tooltip text="Map z (north/south) coordinate" />
+                    <Tooltip text="Map Z (south/north) coordinate" />
                   </tooltip>
                 </DoubleTextField>
               </TextFieldLabelWrapper>
             </HBox>
-            <VBox alignment="CENTER_LEFT">
-              <PositiveIntegerAdjuster fx:id="scale" name="Scale"/>
-            </VBox>
-            <VBox alignment="CENTER_LEFT">
-              <IntegerAdjuster fx:id="yMin" name="Min Y level"/>
-            </VBox>
-            <VBox alignment="CENTER_LEFT">
-              <IntegerAdjuster fx:id="yMax" name="Max Y level"/>
-            </VBox>
             <HBox spacing="10.0">
               <ToggleButton fx:id="trackPlayerBtn" mnemonicParsing="false" text="Track player">
                 <toggleGroup>
@@ -127,6 +120,21 @@
               <ToggleButton fx:id="trackCameraBtn" mnemonicParsing="false" text="Track camera"
                             toggleGroup="$tracking"/>
             </HBox>
+            <VBox alignment="CENTER_LEFT">
+              <PositiveIntegerAdjuster fx:id="scale" name="Scale"/>
+            </VBox>
+            <Separator/>
+            <Label text="Map Y clip:">
+              <font>
+                <Font name="System Bold" size="12.0" />
+              </font>
+            </Label>
+            <VBox alignment="CENTER_LEFT">
+              <IntegerAdjuster fx:id="yMin" name="Min Y level"/>
+            </VBox>
+            <VBox alignment="CENTER_LEFT">
+              <IntegerAdjuster fx:id="yMax" name="Max Y level"/>
+            </VBox>
             <Separator/>
             <HBox spacing="10.0">
               <Label text="Show Players"/>
