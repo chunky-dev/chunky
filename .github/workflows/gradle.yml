@@ -5,9 +5,9 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ master, chunky-2.4.x ]
+    branches: [ master, chunky-2.4.x, fix/chunky-2.4.x/build-tag ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, chunky-2.4.x ]
 
 jobs:
   build:
@@ -29,11 +29,17 @@ jobs:
       env:
         PR_NUMBER: ${{ github.event.pull_request.number }}
       run: |
-        if [[ "${GITHUB_EVENT_NAME}" != "pull_request" ]]; then
-          ./gradlew -PnewVersion=2.4.3-DEV.$(git rev-parse --short HEAD)
-        else
-          ./gradlew -PnewVersion=2.4.3-PR.${PR_NUMBER}.$(git rev-parse --short HEAD)
-        fi
+        case "${GITHUB_EVENT_NAME}" in
+          "pull_request")
+            ./gradlew -PnewVersion=2.4.3-PR.${PR_NUMBER}.$(git rev-parse --short HEAD)
+            ;;
+          "push")
+            ./gradlew -PnewVersion=2.4.3-SNAPSHOT.$(git rev-parse --short HEAD)
+            ;;
+          *)
+            ./gradlew -PnewVersion=2.4.3-DEV.$(git rev-parse --short HEAD)
+            ;;
+        esac
     - name: Upload build
       uses: actions/upload-artifact@v2.2.2
       with:
