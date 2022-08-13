@@ -3,6 +3,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 <?import se.llbit.chunky.ui.*?>
 <?import se.llbit.chunky.ui.elements.*?>
 
@@ -60,12 +61,18 @@
       <Label text="frames" />
     </HBox>
     <CheckBox fx:id="saveSnapshots" mnemonicParsing="false" text="Save snapshot for each dump" />
+    <Separator/>
+    <Label text="Scene Y clip:">
+      <font>
+        <Font name="System Bold" size="12.0" />
+      </font>
+    </Label>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <IntegerAdjuster fx:id="yMin" name="Y min clip" />
+      <IntegerAdjuster fx:id="yMin" name="Min Y level" />
       <Button fx:id="setDefaultYMin" mnemonicParsing="false" text="Set default" />
     </HBox>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <IntegerAdjuster fx:id="yMax" name="Y max clip" />
+      <IntegerAdjuster fx:id="yMax" name="Max Y level" />
       <Button fx:id="setDefaultYMax" mnemonicParsing="false" text="Set default" />
     </HBox>
     <padding>
