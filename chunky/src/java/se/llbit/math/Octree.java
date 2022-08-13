@@ -805,7 +805,9 @@ public class Octree {
       })))) {
         implementation.store(out);
       }
-      implementation = null; // Allow the GC to free memory during construction of the new octree
+      // Allow the GC to free memory during construction of the new octree
+      // Replace with an empty octree to prevent any NPE's
+      implementation = new PackedOctree(1);
 
       try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new PositionalInputStream(Files.newInputStream(tempFile.toPath()), position -> {
         task.updateInterval((int) (position * progressScaler) + 500, 1);
