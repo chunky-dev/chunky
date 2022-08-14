@@ -1,6 +1,7 @@
 package se.llbit.math;
 
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.world.Material;
@@ -28,9 +29,6 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
   private final Octree.Node[] parents;
   private final int[] positions;
   private final Octree.Node[] cache;
-  private int cx = 0;
-  private int cy = 0;
-  private int cz = 0;
   private int cacheLevel;
 
   private static final class NodeId implements Octree.NodeId {
@@ -122,22 +120,15 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
   }
 
   public Octree.Node get(int x, int y, int z) {
-    while (cacheLevel < depth && ((x >>> cacheLevel) != cx ||
-            (y >>> cacheLevel) != cy || (z >>> cacheLevel) != cz))
-      cacheLevel += 1;
-
-    Octree.Node node;
-    while (true) {
-      node = cache[cacheLevel];
-      if (node.type != BRANCH_NODE) {
-        break;
-      }
-      cacheLevel -= 1;
-      cx = x >>> cacheLevel;
-      cy = y >>> cacheLevel;
-      cz = z >>> cacheLevel;
-      cache[cacheLevel] =
-              cache[cacheLevel + 1].children[((cx & 1) << 2) | ((cy & 1) << 1) | (cz & 1)];
+    Octree.Node node = root;
+    int level = depth;
+    while (node != null && node.type == BRANCH_NODE) {
+      level -= 1;
+      int lx = x >>> level;
+      int ly = y >>> level;
+      int lz = z >>> level;
+      int child = ((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1);
+      node = node.children[child];
     }
     return node;
   }
@@ -145,6 +136,9 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
   @Override
   public Material getMaterial(int x, int y, int z, BlockPalette palette) {
     Octree.Node node = get(x, y, z);
+    if (node == null) {
+      return Air.INSTANCE;
+    }
     if (node.type == BRANCH_NODE) {
       return UnknownBlock.UNKNOWN;
     }
