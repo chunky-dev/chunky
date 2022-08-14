@@ -20,7 +20,6 @@ package se.llbit.util;
 
 import se.llbit.util.annotation.NotNull;
 
-import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.function.LongConsumer;
@@ -28,13 +27,14 @@ import java.util.function.LongConsumer;
 /**
  * An output stream that keeps track of it's position and calls a callback whenever a write occurs.
  */
-public class PositionalOutputStream extends FilterOutputStream {
+public class PositionalOutputStream extends OutputStream {
   private final LongConsumer update;
+  private final OutputStream out;
   private long count = 0;
 
   public PositionalOutputStream(OutputStream out, LongConsumer update) {
-    super(out);
     this.update = update;
+    this.out = out;
   }
 
   public long getPosition() {
@@ -42,22 +42,32 @@ public class PositionalOutputStream extends FilterOutputStream {
   }
 
   @Override
+  public void close() throws IOException {
+    out.close();
+  }
+
+  @Override
+  public void flush() throws IOException {
+    out.flush();
+  }
+
+  @Override
   public void write(int b) throws IOException {
-    super.write(b);
+    out.write(b);
     count++;
     update.accept(count);
   }
 
   @Override
   public void write(@NotNull byte[] b) throws IOException {
-    super.write(b);
+    out.write(b);
     count += b.length;
     update.accept(count);
   }
 
   @Override
   public void write(@NotNull byte[] b, int off, int len) throws IOException {
-    super.write(b, off, len);
+    out.write(b, off, len);
     count += len;
     update.accept(count);
   }
