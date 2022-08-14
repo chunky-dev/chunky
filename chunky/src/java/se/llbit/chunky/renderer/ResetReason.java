@@ -24,7 +24,14 @@ public enum ResetReason {
   NONE(false),
   MODE_CHANGE(false),
   MATERIALS_CHANGED(true),
+  /**
+   * Settings changed, and we do want to trigger a rerender.
+   */
   SETTINGS_CHANGED(true),
+  /**
+   * Settings changed, but we do NOT want to trigger a rerender.
+   */
+  SETTINGS_CHANGED_SOFT(true),
   SCENE_LOADED(true);
 
   /** Determines if the non-transitive scene state needs to be modified. */
