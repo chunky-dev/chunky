@@ -184,8 +184,10 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
 
   @Override
   public void endFinalization() {
-    // There is a bunch of ANY_TYPE nodes we should try to merge
-    finalizationNode(root, null, 0);
+    if (root.children != null) {
+      // There is a bunch of ANY_TYPE nodes we should try to merge
+      finalizationNode(root, null, 0);
+    }
   }
 
   private void finalizationNode(Octree.Node node, Octree.Node parent, int childNo) {
