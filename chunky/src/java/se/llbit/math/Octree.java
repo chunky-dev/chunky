@@ -790,18 +790,26 @@ public class Octree {
     }
 
     Log.infof("Changing octree implementation (%s)", newImplementation);
-    task.update(1000, 0);
 
     // This function is called as to provide a fallback when
     // an implementation isn't suitable, we assume it means
     // that Chunky is already using a lot of memory, so we save the octree on disk
     // and reload it with another implementation
     long nodeCount = implementation.nodeCount();
-    double progressScaler = 125.0 / nodeCount;
-    File tempFile = File.createTempFile("octree-conversPaion", ".bin");
+    double writeProgressScaler = 62.5 / nodeCount;
+    if (nodeCount != 0) {
+      task.update(1000, 0);
+    } else {
+      task.update(2, 1);
+    }
+
+    File tempFile = File.createTempFile("octree-conversion", ".bin");
     try {
       try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new PositionalOutputStream(Files.newOutputStream(tempFile.toPath()), position -> {
-        task.updateInterval((int) (position * progressScaler), 1);
+        if (nodeCount != 0) {
+          int progress = (int) Math.min(position * writeProgressScaler, 500);
+          task.updateInterval(progress, 1);
+        }
       })))) {
         implementation.store(out);
       }
@@ -809,8 +817,9 @@ public class Octree {
       // Replace with an empty octree to prevent any NPE's
       implementation = new PackedOctree(1);
 
+      double readProgressScaler = 500.0 / tempFile.length();
       try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new PositionalInputStream(Files.newInputStream(tempFile.toPath()), position -> {
-        task.updateInterval((int) (position * progressScaler) + 500, 1);
+        task.updateInterval(1000, (int) (position * readProgressScaler) + 500, 1);
       })))) {
         implementation = factory.loadWithNodeCount(nodeCount, in);
       }
