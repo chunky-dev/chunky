@@ -188,7 +188,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
         try (TaskTracker.Task task = tracker.task("(2/2) Converting water octree")) {
           scene.getWaterOctree().switchImplementation(octreeImplementation.getValue(), task);
         }
-        System.out.println("Done");
       } catch (IOException e) {
         Log.error("Switching octrees failed. Reload the scene.\n", e);
       }
