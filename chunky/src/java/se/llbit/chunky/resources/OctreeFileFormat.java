@@ -77,6 +77,9 @@ public class OctreeFileFormat {
 
   private static BiomeStructure loadBiomeStructure(DataInputStream in) throws IOException {
     String biomeFormat = in.readUTF();
+    if (biomeFormat.equals("NONE")) {
+      return null;
+    }
     BiomeStructure.Factory factory = BiomeStructure.get(biomeFormat);
     BiomeStructure biomeStructure;
     try {
@@ -167,12 +170,24 @@ public class OctreeFileFormat {
     palette.write(out);
     octree.store(out);
     waterTree.store(out);
-    out.writeUTF(grassColors.biomeFormat());
-    grassColors.store(out);
-    out.writeUTF(foliageColors.biomeFormat());
-    foliageColors.store(out);
-    out.writeUTF(waterColors.biomeFormat());
-    waterColors.store(out);
+    if (grassColors != null) {
+      out.writeUTF(grassColors.biomeFormat());
+      grassColors.store(out);
+    } else {
+      out.writeUTF("NONE");
+    }
+    if (foliageColors != null) {
+      out.writeUTF(foliageColors.biomeFormat());
+      foliageColors.store(out);
+    } else {
+      out.writeUTF("NONE");
+    }
+    if (waterColors != null) {
+      out.writeUTF(waterColors.biomeFormat());
+      waterColors.store(out);
+    } else {
+      out.writeUTF("NONE");
+    }
   }
 
   public static class OctreeData {
