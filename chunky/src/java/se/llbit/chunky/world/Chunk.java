@@ -176,7 +176,7 @@ public class Chunk {
     Heightmap heightmap = world.heightmap();
     Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
     if (sections.isList()) {
-      if (version.equals("1.13") || version.equals("1.12")) {
+      if ("1.13".equals(version) || "1.12".equals(version)) {
         BiomePalette biomePalette = new ArrayBiomePalette();
         BiomeDataFactory.loadBiomeData(chunkData, data, biomePalette, yMin, yMax);
         biomes = new BiomeLayer(chunkData, biomePalette);
