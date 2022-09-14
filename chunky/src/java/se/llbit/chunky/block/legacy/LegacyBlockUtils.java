@@ -1,9 +1,6 @@
 package se.llbit.chunky.block.legacy;
 
-import se.llbit.chunky.block.BlockFace;
-import se.llbit.chunky.block.FenceGate;
-import se.llbit.chunky.block.FinalizationState;
-import se.llbit.chunky.block.Stairs;
+import se.llbit.chunky.block.*;
 import se.llbit.chunky.block.legacy.blocks.LegacyFenceGate;
 import se.llbit.chunky.block.legacy.blocks.LegacyStairs;
 import se.llbit.chunky.world.Material;
@@ -47,14 +44,14 @@ public class LegacyBlockUtils {
    */
   public static class FinalizationStateCache extends FinalizationState {
 
-    private final Material[] cache;
+    private final Block[] cache;
     private final FinalizationState state;
 
     public FinalizationStateCache(FinalizationState state) {
-      this(state, new Material[27]);
+      this(state, new Block[27]);
     }
 
-    public FinalizationStateCache(FinalizationState state, Material[] cache) {
+    public FinalizationStateCache(FinalizationState state, Block[] cache) {
       super(state.getPalette());
       this.state = state;
       this.cache = cache;
@@ -65,18 +62,18 @@ public class LegacyBlockUtils {
     }
 
     @Override
-    public Material getMaterial() {
-      return state.getMaterial();
+    public Block getBlock() {
+      return state.getBlock();
     }
 
     @Override
-    public Material getMaterial(int rx, int ry, int rz) {
+    public Block getBlock(int rx, int ry, int rz) {
       int index = getCacheIndex(rx, ry, rz);
 
       if (cache[index] != null) {
         return cache[index];
       }
-      cache[index] = state.getMaterial(rx, ry, rz);
+      cache[index] = state.getBlock(rx, ry, rz);
       return cache[index];
     }
 

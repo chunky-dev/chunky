@@ -20,7 +20,7 @@ public class LegacyMelonStem extends UnfinalizedLegacyBlock {
   public void finalizeBlock(FinalizationState state) {
     // melon stem points to adjacent melon
     for (BlockFace side : sides) {
-      if (state.getMaterial(side).name.equals("minecraft:melon")) {
+      if (state.getBlock(side).name.equals("minecraft:melon")) {
         state.replaceCurrentBlock(
             LegacyBlocks.stringTag(
                 LegacyBlocks.createTag("attached_melon_stem"), "facing", side.getName()

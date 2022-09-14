@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.Snow;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
@@ -19,7 +20,7 @@ public class LegacySnowCoverableBlock extends UnfinalizedLegacyBlock {
     // (aside: Chunky 1.x only handles this correctly for grass blocks)
     if (id == 2 || (id == 3 && data == 2) || id == 110) {
       if (state.getY() < state.getYMax() - 1) {
-        Material above = state.getMaterial(0, 1, 0);
+        Block above = state.getBlock(0, 1, 0);
         if (above instanceof Snow || above.name.equals("minecraft:snow_block")) {
           state.replaceCurrentBlock(LegacyBlocks
               .boolTag(LegacyBlocks.createTag(block.name), "snowy", true));

@@ -1,11 +1,11 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.block.Door;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
-import se.llbit.chunky.world.Material;
 import se.llbit.nbt.CompoundTag;
 
 public class LegacyDoorPart extends UnfinalizedLegacyBlock {
@@ -19,7 +19,7 @@ public class LegacyDoorPart extends UnfinalizedLegacyBlock {
     if (isTopPart(data)) {
       // top part
       if (state.getY() > state.getYMin()) {
-        Material bottomPart = state.getMaterial(0, -1, 0);
+        Block bottomPart = state.getBlock(0, -1, 0);
         if (bottomPart instanceof Door) {
           // finalization is from bottom to top, so the bottom part is already finalized
           Door doorBelow = (Door) bottomPart;
@@ -31,7 +31,7 @@ public class LegacyDoorPart extends UnfinalizedLegacyBlock {
     } else {
       // bottom part
       if (state.getY() < state.getYMax() - 1) {
-        Material topPart = state.getMaterial(0, 1, 0);
+        Block topPart = state.getBlock(0, 1, 0);
         if (topPart instanceof LegacyDoorPart) {
           // finalization is from bottom to top, so the top part is not finalized yet
           LegacyDoorPart doorAbove = (LegacyDoorPart) topPart;

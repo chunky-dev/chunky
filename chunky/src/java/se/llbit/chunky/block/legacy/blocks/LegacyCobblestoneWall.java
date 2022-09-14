@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlockUtils;
@@ -16,10 +17,10 @@ public class LegacyCobblestoneWall extends UnfinalizedLegacyBlock {
 
   @Override
   public void finalizeBlock(FinalizationState state) {
-    boolean north = isStoneWallConnector(state.getMaterial(0, 0, -1), BlockFace.NORTH);
-    boolean south = isStoneWallConnector(state.getMaterial(0, 0, 1), BlockFace.SOUTH);
-    boolean east = isStoneWallConnector(state.getMaterial(1, 0, 0), BlockFace.EAST);
-    boolean west = isStoneWallConnector(state.getMaterial(-1, 0, 0), BlockFace.WEST);
+    boolean north = isStoneWallConnector(state.getBlock(0, 0, -1), BlockFace.NORTH);
+    boolean south = isStoneWallConnector(state.getBlock(0, 0, 1), BlockFace.SOUTH);
+    boolean east = isStoneWallConnector(state.getBlock(1, 0, 0), BlockFace.EAST);
+    boolean west = isStoneWallConnector(state.getBlock(-1, 0, 0), BlockFace.WEST);
     boolean up = false;
 
     if (!(north && south && !east && !west) && !(!north && !south && east && west)) {
@@ -27,14 +28,14 @@ public class LegacyCobblestoneWall extends UnfinalizedLegacyBlock {
       up = true;
     } else if (state.getY() < state.getYMax() - 1) {
       // check if connected to a block above
-      Material above = state.getMaterial(0, 1, 0);
+      Block above = state.getBlock(0, 1, 0);
       up = isStoneWallTopConnector(above);
     }
 
     state.replaceCurrentBlock(createTag(north, south, east, west, up));
   }
 
-  private static boolean isStoneWallConnector(Material block, BlockFace direction) {
+  private static boolean isStoneWallConnector(Block block, BlockFace direction) {
     String name = LegacyBlockUtils.getName(block);
     if (name.equals("cobblestone_wall") || name.equals("mossy_cobblestone_wall")) {
       return true;
@@ -71,7 +72,7 @@ public class LegacyCobblestoneWall extends UnfinalizedLegacyBlock {
     return block.solid;
   }
 
-  private static boolean isStoneWallTopConnector(Material block) {
+  private static boolean isStoneWallTopConnector(Block block) {
     String name = LegacyBlockUtils.getName(block);
     return block.solid || name.equals("water") || name.equals("lava") || name.equals("torch")
         || name.endsWith("_fence") || name.equals("chest") || name.equals("redstone_torch")

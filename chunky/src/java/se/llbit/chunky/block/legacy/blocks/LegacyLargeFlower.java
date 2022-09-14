@@ -1,10 +1,10 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlockUtils;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
-import se.llbit.chunky.world.Material;
 import se.llbit.nbt.CompoundTag;
 
 public class LegacyLargeFlower extends UnfinalizedLegacyBlock {
@@ -18,7 +18,7 @@ public class LegacyLargeFlower extends UnfinalizedLegacyBlock {
     CompoundTag newTag;
 
     if ((this.data&8) != 0) {
-      Material bottom = state.getMaterial(0, -1, 0);
+      Block bottom = state.getBlock(0, -1, 0);
 
       if (bottom instanceof LegacyLargeFlower) {
         newTag = LegacyBlocks.createTag(LegacyBlockUtils.getName(bottom));

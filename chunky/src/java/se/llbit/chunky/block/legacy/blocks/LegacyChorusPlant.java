@@ -17,12 +17,12 @@ public class LegacyChorusPlant extends UnfinalizedLegacyBlock {
   public void finalizeBlock(FinalizationState state) {
     CompoundTag newTag = LegacyBlocks.createTag(this.name);
 
-    LegacyBlocks.boolTag(newTag, "up", isConnect(state.getMaterial(0, 1, 0)));
-    LegacyBlocks.boolTag(newTag, "down", isConnectDown(state.getMaterial(0, -1, 0)));
-    LegacyBlocks.boolTag(newTag, "east", isConnect(state.getMaterial(1, 0, 0)));
-    LegacyBlocks.boolTag(newTag, "west", isConnect(state.getMaterial(-1, 0, 0)));
-    LegacyBlocks.boolTag(newTag, "north", isConnect(state.getMaterial(0, 0, -1)));
-    LegacyBlocks.boolTag(newTag, "south", isConnect(state.getMaterial(0, 0, 1)));
+    LegacyBlocks.boolTag(newTag, "up", isConnect(state.getBlock(0, 1, 0)));
+    LegacyBlocks.boolTag(newTag, "down", isConnectDown(state.getBlock(0, -1, 0)));
+    LegacyBlocks.boolTag(newTag, "east", isConnect(state.getBlock(1, 0, 0)));
+    LegacyBlocks.boolTag(newTag, "west", isConnect(state.getBlock(-1, 0, 0)));
+    LegacyBlocks.boolTag(newTag, "north", isConnect(state.getBlock(0, 0, -1)));
+    LegacyBlocks.boolTag(newTag, "south", isConnect(state.getBlock(0, 0, 1)));
 
     state.replaceCurrentBlock(newTag);
   }

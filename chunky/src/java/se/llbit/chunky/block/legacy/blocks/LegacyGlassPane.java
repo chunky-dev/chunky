@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlockUtils;
@@ -16,10 +17,10 @@ public class LegacyGlassPane extends UnfinalizedLegacyBlock {
 
   @Override
   public void finalizeBlock(FinalizationState state) {
-    boolean north = isGlassPaneConnector(state.getMaterial(0, 0, -1), BlockFace.NORTH);
-    boolean south = isGlassPaneConnector(state.getMaterial(0, 0, 1), BlockFace.SOUTH);
-    boolean east = isGlassPaneConnector(state.getMaterial(1, 0, 0), BlockFace.EAST);
-    boolean west = isGlassPaneConnector(state.getMaterial(-1, 0, 0), BlockFace.WEST);
+    boolean north = isGlassPaneConnector(state.getBlock(0, 0, -1), BlockFace.NORTH);
+    boolean south = isGlassPaneConnector(state.getBlock(0, 0, 1), BlockFace.SOUTH);
+    boolean east = isGlassPaneConnector(state.getBlock(1, 0, 0), BlockFace.EAST);
+    boolean west = isGlassPaneConnector(state.getBlock(-1, 0, 0), BlockFace.WEST);
 
     if (north || south || east || west) {
       state.replaceCurrentBlock(createTag(north, south, east, west));
@@ -29,7 +30,7 @@ public class LegacyGlassPane extends UnfinalizedLegacyBlock {
     }
   }
 
-  private static boolean isGlassPaneConnector(Material block, BlockFace direction) {
+  private static boolean isGlassPaneConnector(Block block, BlockFace direction) {
     String name = LegacyBlockUtils.getName(block);
     if (name.equals("cobblestone_wall") || name.equals("mossy_cobblestone_wall") || name
         .endsWith("_fence") || name

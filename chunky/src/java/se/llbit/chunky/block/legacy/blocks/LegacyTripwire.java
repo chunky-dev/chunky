@@ -19,10 +19,10 @@ public class LegacyTripwire extends UnfinalizedLegacyBlock {
   @Override
   public void finalizeBlock(FinalizationState state) {
     boolean attached = (data & 0b0100) != 0;
-    boolean north = isTripwireConnector(state.getMaterial(0, 0, -1), BlockFace.NORTH);
-    boolean south = isTripwireConnector(state.getMaterial(0, 0, 1), BlockFace.SOUTH);
-    boolean east = isTripwireConnector(state.getMaterial(1, 0, 0), BlockFace.EAST);
-    boolean west = isTripwireConnector(state.getMaterial(-1, 0, 0), BlockFace.WEST);
+    boolean north = isTripwireConnector(state.getBlock(0, 0, -1), BlockFace.NORTH);
+    boolean south = isTripwireConnector(state.getBlock(0, 0, 1), BlockFace.SOUTH);
+    boolean east = isTripwireConnector(state.getBlock(1, 0, 0), BlockFace.EAST);
+    boolean west = isTripwireConnector(state.getBlock(-1, 0, 0), BlockFace.WEST);
     state.replaceCurrentBlock(createTag(attached, north, south, east, west));
   }
 

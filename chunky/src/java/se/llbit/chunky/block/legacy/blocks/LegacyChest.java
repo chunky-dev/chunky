@@ -20,22 +20,22 @@ public class LegacyChest extends UnfinalizedLegacyBlock {
     String name = block.name.substring(10);
     if (data < 4) {
       // facing east or west
-      if (LegacyBlockUtils.getName(state.getMaterial(-1, 0, 0)).equals(name)) {
+      if (LegacyBlockUtils.getName(state.getBlock(-1, 0, 0)).equals(name)) {
         state.replaceCurrentBlock(
             createTag(data, data == 2 ? "right" : "left"));
         return;
-      } else if (LegacyBlockUtils.getName(state.getMaterial(1, 0, 0)).equals(name)) {
+      } else if (LegacyBlockUtils.getName(state.getBlock(1, 0, 0)).equals(name)) {
         state.replaceCurrentBlock(
             createTag(data, data == 2 ? "left" : "right"));
         return;
       }
     } else {
       // facing north or south
-      if (LegacyBlockUtils.getName(state.getMaterial(0, 0, -1)).equals(name)) {
+      if (LegacyBlockUtils.getName(state.getBlock(0, 0, -1)).equals(name)) {
         state.replaceCurrentBlock(
             createTag(data, data == 5 ? "right" : "left"));
         return;
-      } else if (LegacyBlockUtils.getName(state.getMaterial(0, 0, 1)).equals(name)) {
+      } else if (LegacyBlockUtils.getName(state.getBlock(0, 0, 1)).equals(name)) {
         state.replaceCurrentBlock(
             createTag(data, data == 5 ? "left" : "right"));
         return;

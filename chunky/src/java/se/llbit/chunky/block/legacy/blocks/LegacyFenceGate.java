@@ -20,12 +20,12 @@ public class LegacyFenceGate extends UnfinalizedLegacyBlock {
 
     if ((this.data & 3) % 2 == 0) {
       LegacyBlocks.boolTag(newTag, "in_wall",
-          state.getMaterial(-1, 0, 0).name.endsWith("cobblestone_wall") ||
-              state.getMaterial(1, 0, 0).name.endsWith("cobblestone_wall"));
+          state.getBlock(-1, 0, 0).name.endsWith("cobblestone_wall") ||
+              state.getBlock(1, 0, 0).name.endsWith("cobblestone_wall"));
     } else {
       LegacyBlocks.boolTag(newTag, "in_wall",
-          state.getMaterial(0, 0, -1).name.endsWith("cobblestone_wall") ||
-              state.getMaterial(0, 0, 1).name.endsWith("cobblestone_wall"));
+          state.getBlock(0, 0, -1).name.endsWith("cobblestone_wall") ||
+              state.getBlock(0, 0, 1).name.endsWith("cobblestone_wall"));
     }
 
     state.replaceCurrentBlock(newTag);
