@@ -42,9 +42,29 @@ public class AnimatedTexture extends Texture {
    * Get color for animation frame.
    */
   public float[] getColor(double u, double v, int frame) {
-    int i = Math.floorMod(frame, numFrames);
+    int frameFraction = Math.floorMod(frame, numFrames);
     return getColor((int) (u * width - Ray.EPSILON),
-        (int) ((1 - v) * frameHeight - Ray.EPSILON + i * frameHeight));
+      (int) ((1 - v) * frameHeight - Ray.EPSILON + frameFraction * frameHeight));
+  }
+
+  /**
+   * Get color for animation frame.
+   */
+  public boolean applyColor(Ray ray, int frame) {
+    int frameFraction = Math.floorMod(frame, numFrames);
+    int x = (int) (ray.u * width - Ray.EPSILON);
+    int y =  (int) ((1 - ray.v) * frameHeight - Ray.EPSILON + frameFraction * frameHeight);
+    int i=(y*width+x)*4;
+    if (gamaImage[i+3] > Ray.EPSILON) {
+      ray.color.set(gamaImage[i], gamaImage[i + 1], gamaImage[i + 2], gamaImage[i + 3]);
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  public boolean applyColor(Ray ray) {
+    return  applyColor(ray,0);
   }
 
   @Override public void setTexture(BitmapImage newImage) {

@@ -135,6 +135,7 @@ public class SkymapTexture extends Texture {
   /**
    * Get skymap color at (x, y).
    */
+  @Override
   public void getColor(int x, int y, Vector4 c) {
     ColorUtil.getRGBComponents(image.getPixel(x, y), c);
   }
