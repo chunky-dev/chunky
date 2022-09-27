@@ -362,7 +362,10 @@ public class ResourcePackChooserController implements Initializable {
       "*.jar",
       "pack.mcmeta"
     ));
-    fileChooser.setInitialDirectory(MinecraftFinder.getResourcePacksDirectory());
+    File dir = MinecraftFinder.getResourcePacksDirectory();
+    if(dir.isDirectory()) {
+      fileChooser.setInitialDirectory(dir);
+    }
     
     List<File> newlyAddedFiles = fileChooser.showOpenMultipleDialog(addNewTargetPackBtn.getScene().getWindow());
     if (newlyAddedFiles == null)
