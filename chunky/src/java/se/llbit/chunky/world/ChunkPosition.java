@@ -1,4 +1,5 @@
-/* Copyright (c) 2010-2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2022 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2010-2022 Chunky Contributors
  *
  * This file is part of Chunky.
  *
@@ -18,10 +19,6 @@ package se.llbit.chunky.world;
 
 /**
  * A chunk position consists of two integer coordinates x and z.
- * <p>
- * The filename of a chunk is uniquely defined by it's position.
- *
- * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class ChunkPosition {
 
@@ -37,20 +34,8 @@ public class ChunkPosition {
     this(longPositionX(position), longPositionZ(position));
   }
 
-  public static long positionToLong(int x, int z) {
-    return (z & 0xFFFFFFFFL) | (x & 0xFFFFFFFFL) << 32;
-  }
-
-  public static int longPositionX(long position) {
-    return (int) (position >>> 32);
-  }
-
-  public static int longPositionZ(long position) {
-    return (int) position;
-  }
-
   /**
-   * @return The long representation of the chunk position
+   * @return This chunk position packed into a long.
    */
   public long getLong() {
     return positionToLong(x, z);
@@ -68,6 +53,27 @@ public class ChunkPosition {
    */
   public ChunkPosition getRegionPosition() {
     return new ChunkPosition(x >> 5, z >> 5);
+  }
+
+  /**
+   * @return The packed {@code long} chunk position for the x and z
+   */
+  public static long positionToLong(int x, int z) {
+    return (z & 0xFFFFFFFFL) | (x & 0xFFFFFFFFL) << 32;
+  }
+
+  /**
+   * @return The {@code X} component of the packed long position
+   */
+  public static int longPositionX(long position) {
+    return (int) (position >>> 32);
+  }
+
+  /**
+   * @return The {@code Z} component of the packed long position
+   */
+  public static int longPositionZ(long position) {
+    return (int) position;
   }
 
   @Override
