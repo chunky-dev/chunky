@@ -228,7 +228,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       int minChunkZ = region.z << 5;
       for (int chunkX = minChunkX; chunkX < minChunkX + MCRegion.CHUNKS_X; chunkX++) {
         for (int chunkZ = minChunkZ; chunkZ < minChunkZ + MCRegion.CHUNKS_Z; chunkZ++) {
-          mapBuffer.drawTile(mapLoader, ChunkPosition.get(chunkX, chunkZ), chunkSelection);
+          mapBuffer.drawTile(mapLoader, new ChunkPosition(chunkX, chunkZ), chunkSelection);
         }
       }
       repaintRatelimited();
@@ -479,7 +479,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     // Calculate the world block position of the cursor
     int worldBlockX = cx * Chunk.X_MAX + bx;
     int worldBlockZ = cz * Chunk.Z_MAX + bz;
-    ChunkPosition cp = ChunkPosition.get(cx, cz);
+    ChunkPosition cp = new ChunkPosition(cx, cz);
     if (!mouseDown) {
       Chunk hoveredChunk = mapLoader.getWorld().getChunk(cp);
       if (!hoveredChunk.isEmpty()) {

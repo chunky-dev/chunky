@@ -109,7 +109,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
     // Enqueue visible regions and chunks to be loaded.
     for (int rx = rx0; rx <= rx1; ++rx) {
       for (int rz = rz0; rz <= rz1; ++rz) {
-        regionQueue.add(ChunkPosition.get(rx, rz));
+        regionQueue.add(new ChunkPosition(rx, rz));
       }
     }
   }
