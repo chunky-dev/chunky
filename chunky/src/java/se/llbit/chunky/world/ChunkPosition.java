@@ -16,9 +16,6 @@
  */
 package se.llbit.chunky.world;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * A chunk position consists of two integer coordinates x and z.
  * <p>
@@ -28,38 +25,20 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ChunkPosition {
 
-  public int x, z;
+  public final int x;
+  public final int z;
 
-  private ChunkPosition(int x, int z) {
+  public ChunkPosition(int x, int z) {
     this.x = x;
     this.z = z;
   }
 
-  @Override
-  public String toString() {
-    return "[" + x + ", " + z + "]";
-  }
-
-  public ChunkPosition regionPosition() {
-    return get(x >> 5, z >> 5);
-  }
-
-  //not using synchronized Long2ReferenceOpenHashMap due to using one lock. ConcurrentHashMap locks on buckets
-  private static final Map<Long, ChunkPosition> positions = new ConcurrentHashMap<>();
-
-  public static ChunkPosition get(int x, int z) {
-    return positions.computeIfAbsent(positionToLong(x, z), (position) -> new ChunkPosition(x, z));
+  public ChunkPosition(long position) {
+    this((int) (position >>> 32), (int) position);
   }
 
   public static long positionToLong(int x, int z) {
     return (z & 0xFFFFFFFFL) | (x & 0xFFFFFFFFL) << 32;
-  }
-
-  /**
-   * @return The .mca name for the region with this position
-   */
-  public String getMcaName() {
-    return String.format("r.%d.%d.mca", x, z);
   }
 
   /**
@@ -70,23 +49,61 @@ public class ChunkPosition {
   }
 
   /**
-   * @return Decoded chunk position
+   * @return The .mca name for the region with this position
    */
-  public static ChunkPosition get(long longValue) {
-    return get((int) (longValue >>> 32), (int) longValue);
+  public String getMcaName() {
+    return String.format("r.%d.%d.mca", x, z);
+  }
+
+  /**
+   * @return The region position of this chunk position
+   */
+  public ChunkPosition getRegionPosition() {
+    return get(x >> 5, z >> 5);
+  }
+
+  @Override
+  public String toString() {
+    return "[" + x + ", " + z + "]";
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof ChunkPosition) {
+      ChunkPosition other = (ChunkPosition) o;
+      return this.x == other.x && this.z == other.z;
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return 31 * x + z;
+  }
+
+  @Deprecated
+  public ChunkPosition regionPosition() {
+    return get(x >> 5, z >> 5);
   }
 
   /**
    * @return Integer representation of chunk position
    */
+  @Deprecated
   public int getInt() {
     return (x << 16) | (0xFFFF & z);
   }
 
   /**
-   * @return The region position of a this chunk position
+   * @return Decoded chunk position
    */
-  public ChunkPosition getRegionPosition() {
-    return get(x >> 5, z >> 5);
+  @Deprecated
+  public static ChunkPosition get(long longValue) {
+    return new ChunkPosition(longValue);
+  }
+
+  @Deprecated
+  public static ChunkPosition get(int x, int z) {
+    return new ChunkPosition(x, z);
   }
 }
