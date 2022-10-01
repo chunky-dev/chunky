@@ -34,11 +34,19 @@ public class ChunkPosition {
   }
 
   public ChunkPosition(long position) {
-    this((int) (position >>> 32), (int) position);
+    this(longPositionX(position), longPositionZ(position));
   }
 
   public static long positionToLong(int x, int z) {
     return (z & 0xFFFFFFFFL) | (x & 0xFFFFFFFFL) << 32;
+  }
+
+  public static int longPositionX(long position) {
+    return (int) (position >>> 32);
+  }
+
+  public static int longPositionZ(long position) {
+    return (int) position;
   }
 
   /**
@@ -59,7 +67,7 @@ public class ChunkPosition {
    * @return The region position of this chunk position
    */
   public ChunkPosition getRegionPosition() {
-    return get(x >> 5, z >> 5);
+    return new ChunkPosition(x >> 5, z >> 5);
   }
 
   @Override
@@ -81,13 +89,16 @@ public class ChunkPosition {
     return 31 * x + z;
   }
 
+  /**
+   * @deprecated Use {@link ChunkPosition#getRegionPosition()}. Remove in 2.6.
+   */
   @Deprecated
   public ChunkPosition regionPosition() {
-    return get(x >> 5, z >> 5);
+    return getRegionPosition();
   }
 
   /**
-   * @return Integer representation of chunk position
+   * @deprecated Remove in 2.6.
    */
   @Deprecated
   public int getInt() {
@@ -95,13 +106,16 @@ public class ChunkPosition {
   }
 
   /**
-   * @return Decoded chunk position
+   * @deprecated Use {@link ChunkPosition#ChunkPosition(int, int)}. Remove in 2.6.
    */
   @Deprecated
   public static ChunkPosition get(long longValue) {
     return new ChunkPosition(longValue);
   }
 
+  /**
+   * @deprecated Use {@link ChunkPosition#ChunkPosition(long)}. Remove in 2.6.
+   */
   @Deprecated
   public static ChunkPosition get(int x, int z) {
     return new ChunkPosition(x, z);

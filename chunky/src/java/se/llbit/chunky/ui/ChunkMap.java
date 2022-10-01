@@ -99,8 +99,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
    * Indicates whether or not the selection rectangle should be drawn.
    */
   protected volatile boolean selectRect = false;
-  protected volatile ChunkPosition start = ChunkPosition.get(0, 0);
-  protected volatile ChunkPosition end = ChunkPosition.get(0, 0);
+  protected volatile ChunkPosition start = new ChunkPosition(0, 0);
+  protected volatile ChunkPosition end = new ChunkPosition(0, 0);
   protected boolean ctrlModifier = false;
   protected boolean shiftModifier = false;
   protected boolean dragging = false;

@@ -371,7 +371,7 @@ public class Chunk {
   protected void queueTopography() {
     for (int x = -1; x <= 1; ++x) {
       for (int z = -1; z <= 1; ++z) {
-        ChunkPosition pos = ChunkPosition.get(position.x + x, position.z + z);
+        ChunkPosition pos = new ChunkPosition(position.x + x, position.z + z);
         Chunk chunk = world.getChunk(pos);
         if (!chunk.isEmpty()) {
           world.chunkTopographyUpdated(chunk);

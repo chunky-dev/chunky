@@ -47,9 +47,9 @@ public class MCRegionChangeWatcher extends RegionChangeWatcher {
         ChunkView theView = view;
         for (int rx = theView.prx0; rx <= theView.prx1; ++rx) {
           for (int rz = theView.prz0; rz <= theView.prz1; ++rz) {
-            Region region = world.getRegion(ChunkPosition.get(rx, rz));
+            ChunkPosition pos = new ChunkPosition(rx, rz);
+            Region region = world.getRegion(pos);
             if (region.isEmpty()) {
-              ChunkPosition pos = ChunkPosition.get(rx, rz);
               if (world.regionExists(pos)) {
                 region = world.createRegion(pos);
               }
@@ -59,8 +59,7 @@ public class MCRegionChangeWatcher extends RegionChangeWatcher {
               mapLoader.regionUpdated(pos);
             } else if (region.hasChanged()) {
               region.parse(theView.yMin, theView.yMax);
-              ChunkPosition pos = region.getPosition();
-              mapLoader.regionUpdated(pos);
+              mapLoader.regionUpdated(region.getPosition());
             }
           }
         }

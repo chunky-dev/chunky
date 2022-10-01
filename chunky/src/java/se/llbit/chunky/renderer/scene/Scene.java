@@ -1376,7 +1376,7 @@ public class Scene implements JsonSerializable, Refreshable {
                         int wz = cp.z * 16 + sz;
                         for (int sy = y - 1; sy < y + 1; sy++) {
                           int wy = sectionY * 16 + sy;
-                          ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
+                          ChunkPosition ccp = new ChunkPosition(wx >> 4, wz >> 4);
                           if (nonEmptyChunks.contains(ccp)) {
                             nsum += 1;
                             Integer id = biomePaletteIdxStructure.get(wx, wy, wz);
@@ -1431,7 +1431,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   for (int sz = z - 1; sz <= z + 1; ++sz) {
                     int wz = cp.z * 16 + sz;
 
-                    ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
+                    ChunkPosition ccp = new ChunkPosition(wx >> 4, wz >> 4);
                     if (nonEmptyChunks.contains(ccp)) {
                       nsum += 1;
                       Biome biome = biomePalette.get(biomePaletteIdxStructure.get(wx, 0, wz));
@@ -3089,7 +3089,7 @@ public class Scene implements JsonSerializable, Refreshable {
         int x = chunk.get(0).intValue(Integer.MAX_VALUE);
         int z = chunk.get(1).intValue(Integer.MAX_VALUE);
         if (x != Integer.MAX_VALUE && z != Integer.MAX_VALUE) {
-          chunks.add(ChunkPosition.get(x, z));
+          chunks.add(new ChunkPosition(x, z));
         }
       }
     }
