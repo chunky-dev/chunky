@@ -39,13 +39,16 @@ public class SceneChooser extends Stage {
     setTitle("Load Chunky Scene");
     getIcons().add(Icons.CHUNKY_ICON);
     setScene(new Scene(root));
-    controller.setController(chunkyFxController);
     controller.setStage(this);
+    controller.setController(chunkyFxController);
     addEventFilter(KeyEvent.ANY, e -> {
       if (e.getCode() == KeyCode.ESCAPE) {
         e.consume();
         close();
+        chunkyFxController.sceneChooserClosed();
       }
     });
+
+    this.setOnCloseRequest(windowEvent -> chunkyFxController.sceneChooserClosed());
   }
 }

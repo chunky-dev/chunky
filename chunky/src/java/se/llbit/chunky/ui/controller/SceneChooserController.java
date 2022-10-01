@@ -210,6 +210,9 @@ public class SceneChooserController implements Initializable {
   }
 
   private void populateSceneTable(File sceneDir) {
+    String previousTitle = this.stage.getTitle();
+    this.stage.setTitle("Loading scenes list...");
+
     List<SceneListItem> scenes = new ArrayList<>();
     List<File> fileList = SceneHelper.getAvailableSceneFiles(sceneDir);
     fileList.sort(Comparator.comparing(File::length));
@@ -235,6 +238,8 @@ public class SceneChooserController implements Initializable {
     } catch(Exception ignore) {
     }
     sceneTbl.sort();
+
+    this.stage.setTitle(previousTitle);
 
     sceneTbl.setOnSort(e -> {
       PersistentSettings.setTableSortConfig("scenes", TableSortConfigSerializer.getSortConfig(sceneTbl));

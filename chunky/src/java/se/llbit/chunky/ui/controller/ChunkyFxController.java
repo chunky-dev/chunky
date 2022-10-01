@@ -87,6 +87,7 @@ import se.llbit.log.Log;
 import se.llbit.math.Vector3;
 import se.llbit.util.ProgressListener;
 import se.llbit.util.TaskTracker;
+import se.llbit.util.annotation.Nullable;
 
 /**
  * Controller for the main Chunky window.
@@ -100,6 +101,8 @@ public class ChunkyFxController
   private ChunkMap map;
   private MapView mapView;
   protected ChunkSelectionTracker chunkSelection = new ChunkSelectionTracker();
+
+  @Nullable private SceneChooser sceneChooser;
 
   @FXML private Canvas mapCanvas;
   @FXML private Canvas mapOverlay;
@@ -718,11 +721,19 @@ public class ChunkyFxController
 
   public void openSceneChooser() {
     try {
-      SceneChooser chooser = new SceneChooser(this);
-      chooser.show();
+      if (this.sceneChooser == null) {
+        this.sceneChooser = new SceneChooser(this);
+        this.sceneChooser.show();
+      } else {
+        this.sceneChooser.toFront();
+      }
     } catch (IOException e1) {
       Log.error("Failed to create scene chooser window.", e1);
     }
+  }
+
+  public void sceneChooserClosed() {
+    this.sceneChooser = null;
   }
 
   public void saveCurrentFrame() {
