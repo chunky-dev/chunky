@@ -116,7 +116,7 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
 
       scene.setBiomeBlendingEnabled(newValue);
 
-      if(enabled != newValue && newValue) { // Jank to avoid not snapshotting the scene settings
+      if(enabled != newValue) {
         alertIfReloadNeeded("biome blending");
       }
     });

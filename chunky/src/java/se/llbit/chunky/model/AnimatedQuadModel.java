@@ -53,13 +53,13 @@ public abstract class AnimatedQuadModel extends QuadModel {
     }
 
     float[] color = null;
+    Tint tint = Tint.NONE;
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
       if (quad.intersect(ray)) {
         float[] c = textures[i].getColor(ray.u, ray.v, j);
         if (c[3] > Ray.EPSILON) {
-          Tint tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
-          tint.tint(c, ray, scene);
+          tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
           color = c;
           ray.t = ray.tNext;
           if (quad.doubleSided)
@@ -81,6 +81,7 @@ public abstract class AnimatedQuadModel extends QuadModel {
       }
 
       ray.color.set(color);
+      tint.tint(ray.color, ray, scene);
       ray.distance += ray.t;
       ray.o.scaleAdd(ray.t, ray.d);
     }
