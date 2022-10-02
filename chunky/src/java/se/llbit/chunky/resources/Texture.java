@@ -1623,7 +1623,6 @@ public class Texture {
   public float[] getColor(int x, int y) {
     if(usesAverageColor)
       return avgColorFlat;
-    }
     float[] result = new float[4];
     ColorUtil.getRGBAComponentsGammaCorrected(image.data[width * y + x], result);
     return result;
