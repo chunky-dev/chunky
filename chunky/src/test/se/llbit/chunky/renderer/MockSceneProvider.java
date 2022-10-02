@@ -18,6 +18,7 @@ package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.renderer.scene.Scene;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 class MockSceneProvider implements SceneProvider {
@@ -47,5 +48,15 @@ class MockSceneProvider implements SceneProvider {
 
   @Override public synchronized void withEditSceneProtected(Consumer<Scene> fun) {
     // Won't be edited by the scene manager.
+  }
+
+  @Override
+  public void addChangeListener(BiConsumer<ResetReason, Scene> listener) {
+    // These aren't used yet
+  }
+
+  @Override
+  public void removeChangeListener(BiConsumer<ResetReason, Scene> listener) {
+
   }
 }

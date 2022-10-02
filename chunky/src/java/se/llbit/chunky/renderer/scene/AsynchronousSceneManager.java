@@ -51,6 +51,7 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
     taskQueue = new LinkedBlockingQueue<>();
   }
 
+  @Override
   public SceneProvider getSceneProvider() {
     return sceneManager;
   }
