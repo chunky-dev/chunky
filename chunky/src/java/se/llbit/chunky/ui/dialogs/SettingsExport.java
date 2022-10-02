@@ -28,9 +28,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import se.llbit.chunky.ui.Icons;
+import se.llbit.fxutil.ColumnsBoxBuilder;
 import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
 
@@ -49,6 +52,9 @@ import java.util.Set;
  * contain the JSON string for exporting the selected settings.
  */
 public class SettingsExport extends Stage {
+  // Maximum of 15 items in a column
+  static final int MAX_COLUMN = 15;
+
   static final Set<String> excluded = new HashSet<>();
   static final Set<String> defaultIncluded = new HashSet<>();
   static final Map<String, Set<String>> groups = new LinkedHashMap<>();
@@ -83,9 +89,7 @@ public class SettingsExport extends Stage {
 
     // Exclude the grouped options to avoid duplicates.
     for (Set<String> group : groups.values()) {
-      for (String key : group) {
-        excluded.add(key);
-      }
+      excluded.addAll(group);
     }
   }
 
@@ -114,14 +118,19 @@ public class SettingsExport extends Stage {
 
     vBox.getChildren().add(new Label("Settings to export:"));
 
+    ColumnsBoxBuilder settingsBuilder = new ColumnsBoxBuilder(MAX_COLUMN, box -> {
+      box.setSpacing(10);
+      box.setPadding(new Insets(10));
+    });
+
     for (Map.Entry<String, Set<String>> group : groups.entrySet()) {
       CheckBox checkBox = new CheckBox(group.getKey());
       checkBox.setSelected(defaultIncluded.contains(group.getKey()));
       checkBox.setOnAction(event -> update());
-      vBox.getChildren().add(checkBox);
       for (String setting : group.getValue()) {
         checkMap.put(setting, checkBox);
       }
+      settingsBuilder.add(checkBox);
     }
 
     for (JsonMember setting : json.object()) {
@@ -130,21 +139,36 @@ public class SettingsExport extends Stage {
         CheckBox checkBox = new CheckBox(setting.getName());
         checkBox.setSelected(defaultIncluded.contains(setting.getName()));
         checkBox.setOnAction(event -> update());
-        vBox.getChildren().add(checkBox);
         checkMap.put(setting.getName(), checkBox);
+        settingsBuilder.add(checkBox);
       }
     }
+
+    HBox settingsBox = settingsBuilder.build();
+    vBox.getChildren().add(settingsBox);
 
     HBox exportBox = new HBox();
     exportBox.setAlignment(Pos.BASELINE_LEFT);
     exportBox.setSpacing(10);
     exportBox.getChildren().add(new Label("Settings JSON:"));
     exportBox.getChildren().add(jsonField);
+    HBox.setHgrow(jsonField, Priority.ALWAYS);
 
     vBox.getChildren().add(exportBox);
 
     HBox buttonBox = new HBox();
-    buttonBox.setAlignment(Pos.BOTTOM_RIGHT);
+    buttonBox.setAlignment(Pos.BOTTOM_CENTER);
+
+    Button selectAllButton = new Button("Select All");
+    selectAllButton.setOnAction(event ->
+      checkMap.values().forEach(checkbox -> checkbox.setSelected(true)));
+    buttonBox.getChildren().add(selectAllButton);
+
+    Label spacer = new Label(" ");
+    spacer.setMaxWidth(Double.POSITIVE_INFINITY);
+    buttonBox.getChildren().add(spacer);
+    HBox.setHgrow(spacer, Priority.ALWAYS);
+
     Button doneButton = new Button("Done");
     doneButton.setOnAction(event -> hide());
     buttonBox.getChildren().add(doneButton);
