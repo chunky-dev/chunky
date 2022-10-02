@@ -203,6 +203,10 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
         new SeparatorMenuItem(),
         deleteChunks);
 
+    controller.getChunky()
+      .getMapContextMenuTransformers()
+      .forEach(t -> t.accept(contextMenu));
+
     chunkSelection.addSelectionListener(() -> {
       boolean noChunksSelected = chunkSelection.size() == 0;
       clearSelection.setDisable(noChunksSelected);

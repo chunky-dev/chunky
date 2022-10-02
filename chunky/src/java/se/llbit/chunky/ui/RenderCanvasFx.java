@@ -237,6 +237,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     copyFrame.setOnAction(e -> chunkyFxController.copyCurrentFrame());
     contextMenu.getItems().add(copyFrame);
 
+    chunkyFxController.getChunky()
+      .getRenderContextMenuTransformers()
+      .forEach(t -> t.accept(contextMenu));
+
     canvas.setOnMouseClicked(event -> {
       if (event.getButton() == MouseButton.SECONDARY) {
         double invHeight = 1.0 / canvas.getHeight();
