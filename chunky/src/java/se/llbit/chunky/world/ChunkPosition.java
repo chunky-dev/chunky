@@ -17,7 +17,6 @@
 package se.llbit.chunky.world;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A chunk position consists of two integer coordinates x and z.
@@ -36,6 +35,19 @@ public class ChunkPosition {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ChunkPosition that = (ChunkPosition) o;
+    return x == that.x && z == that.z;
+  }
+
+  @Override
+  public int hashCode() {
+    return z * 31 + x;
+  }
+
+  @Override
   public String toString() {
     return "[" + x + ", " + z + "]";
   }
@@ -44,11 +56,8 @@ public class ChunkPosition {
     return get(x >> 5, z >> 5);
   }
 
-  //not using synchronized Long2ReferenceOpenHashMap due to using one lock. ConcurrentHashMap locks on buckets
-  private static final Map<Long, ChunkPosition> positions = new ConcurrentHashMap<>();
-
   public static ChunkPosition get(int x, int z) {
-    return positions.computeIfAbsent(positionToLong(x, z), (position) -> new ChunkPosition(x, z));
+    return new ChunkPosition(x, z);
   }
 
   public static long positionToLong(int x, int z) {

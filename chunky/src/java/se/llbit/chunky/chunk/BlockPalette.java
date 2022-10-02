@@ -16,6 +16,8 @@
  */
 package se.llbit.chunky.chunk;
 
+import it.unimi.dsi.fastutil.longs.Long2IntMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import se.llbit.chunky.block.*;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.math.Octree;
@@ -98,6 +100,19 @@ public class BlockPalette {
     };
   }
 
+  private final Long2IntMap waterIds = new Long2IntOpenHashMap();
+  private final Long2IntMap lavaIds = new Long2IntOpenHashMap();
+
+  /**
+   * This method should be called after the chunks were loaded and nothing will be changed about this palette anymore.
+   *
+   * It removes intermediate structures.
+   */
+  public void compact() {
+    waterIds.clear();
+    lavaIds.clear();
+  }
+
   /**
    * Adds a new block to the palette and returns the palette index.
    *
@@ -163,12 +178,14 @@ public class BlockPalette {
     if (level < 0 || level > 15) {
       throw new IllegalArgumentException("Invalid water level " + level);
     }
-    CompoundTag tag = new CompoundTag();
-    tag.add("Name", new StringTag("minecraft:water$chunky"));
-    tag.add("level", new IntTag(level));
-    tag.add("data", new IntTag(data));
-    BlockSpec spec = new BlockSpec(tag);
-    return put(spec);
+    long id = (level & 0xF) | ((data & 0xFFFFFFFFL) << 4);
+    return waterIds.computeIfAbsent(id, key -> {
+      CompoundTag tag = new CompoundTag();
+      tag.add("Name", new StringTag("minecraft:water$chunky"));
+      tag.add("level", new IntTag(level));
+      tag.add("data", new IntTag(data));
+      return put(new BlockSpec(tag));
+    });
   }
 
   /**
@@ -184,12 +201,14 @@ public class BlockPalette {
     if (level < 0 || level > 15) {
       throw new IllegalArgumentException("Invalid lava level " + level);
     }
-    CompoundTag tag = new CompoundTag();
-    tag.add("Name", new StringTag("minecraft:lava$chunky"));
-    tag.add("level", new IntTag(level));
-    tag.add("data", new IntTag(data));
-    BlockSpec spec = new BlockSpec(tag);
-    return put(spec);
+    long id = (level & 0xFFFFFFFFL) | (data & 0xFFFFFFFFL) << 32;
+    return lavaIds.computeIfAbsent(id, key -> {
+      CompoundTag tag = new CompoundTag();
+      tag.add("Name", new StringTag("minecraft:lava$chunky"));
+      tag.add("level", new IntTag(level));
+      tag.add("data", new IntTag(data));
+      return put(new BlockSpec(tag));
+    });
   }
 
   /**

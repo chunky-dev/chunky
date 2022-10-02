@@ -51,6 +51,7 @@ public class GenericChunkData implements ChunkData {
       return;
     SectionData sectionData = sections.computeIfAbsent(sectionY, SectionData::new);
     sectionData.blocks[chunkIndex(x & (X_MAX - 1), y & (SECTION_Y_MAX - 1), z & (Z_MAX - 1))] = block;
+    sectionData.isEmpty = false;
   }
 
   @Override public boolean isBlockOnEdge(int x, int y, int z) {
@@ -80,7 +81,9 @@ public class GenericChunkData implements ChunkData {
   @Override public void clear() {
     minSectionY = Integer.MAX_VALUE;
     maxSectionY = Integer.MIN_VALUE;
-    sections.clear();
+    for (SectionData section : sections.values()) {
+      section.clear();
+    }
     biomeData.clear();
     tileEntities.clear();
     entities.clear();
@@ -98,7 +101,7 @@ public class GenericChunkData implements ChunkData {
 
   @Override
   public boolean isEmpty() {
-    return sections.isEmpty() && entities.isEmpty() && tileEntities.isEmpty();
+    return entities.isEmpty() && tileEntities.isEmpty() && (sections.isEmpty() || sections.values().stream().allMatch(section -> section.isEmpty));
   }
 
   @Override public boolean equals(Object o) {
@@ -117,6 +120,7 @@ public class GenericChunkData implements ChunkData {
   private static class SectionData {
     public final int sectionY;
     public final int[] blocks;
+    private boolean isEmpty = true;
 
     public SectionData(int sectionY) {
       this(sectionY, new int[X_MAX * SECTION_Y_MAX * Z_MAX]);
@@ -138,6 +142,11 @@ public class GenericChunkData implements ChunkData {
       int result = Objects.hash(sectionY);
       result = 31 * result + Arrays.hashCode(blocks);
       return result;
+    }
+
+    public void clear() {
+      Arrays.fill(blocks, 0);
+      isEmpty = true;
     }
   }
 }
