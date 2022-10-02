@@ -1688,7 +1688,6 @@ public class Texture {
    * Get bilinear interpolated color value.
    */
   public void getColorInterpolated(double u, double v, Vector4 c) {
-
     double x = u * (width - 1);
     double y = (1 - v) * (height - 1);
     double weight;

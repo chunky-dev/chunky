@@ -148,13 +148,10 @@ public abstract class AABBModel implements BlockModel {
           }
         }
 
-        if (side != -1) {
-          boolean hit = intersectFace(ray, scene, textures[i][side],
-              mapping != null ? mapping[i][side] : null,
-              tintedFacesBox != null ? tintedFacesBox[side] : Tint.NONE);
-          hitTexture = hit ? textures[i][side] : hitTexture;
-          hitSide = hit ? side : hitSide;
-          ray.t = hit ? ray.tNext: ray.t;
+        if (hit) {
+          ray.t = ray.tNext;
+          hitTexture = textures[i][side];
+          hitSide = side;
         }
       }
     }
