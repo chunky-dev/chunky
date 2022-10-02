@@ -29,6 +29,9 @@ import se.llbit.util.TaskTracker;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -70,6 +73,8 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   private Runnable onSceneSaved = () -> {};
   private Runnable onChunksLoaded = () -> {};
 
+  private final Set<BiConsumer<ResetReason, Scene>> resetListeners = new CopyOnWriteArraySet<>();
+
   public SynchronousSceneManager(RenderContext context, RenderManager renderManager) {
     this.context = context;
     this.renderManager = renderManager;
@@ -110,6 +115,11 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
 
   @Override public Scene getScene() {
     return scene;
+  }
+
+  @Override
+  public SceneProvider getSceneProvider() {
+    return this;
   }
 
   @PluginApi
@@ -284,6 +294,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   }
 
   @Override public ResetReason awaitSceneStateChange() throws InterruptedException {
+    ResetReason reason;
     synchronized (scene) {
       while (true) {
         if (scene.shouldRefresh() && (scene.getForceReset() || resetHandler.allowSceneRefresh())) {
@@ -291,20 +302,27 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
             storedScene.copyState(scene);
             storedScene.mode = scene.mode;
           }
-          ResetReason reason = scene.getResetReason();
+          reason = scene.getResetReason();
           scene.clearResetFlags();
-          return reason;
+          break;
         } else if (scene.getMode() != storedScene.getMode()) {
           // Make sure the renderManager sees the updated render mode.
           // TODO: handle buffer finalization updates as state change.
           synchronized (storedScene) {
             storedScene.mode = scene.mode;
           }
-          return ResetReason.MODE_CHANGE;
+          reason = ResetReason.MODE_CHANGE;
+          break;
         }
         scene.wait();
       }
     }
+
+    for (BiConsumer<ResetReason, Scene> listener : resetListeners) {
+      listener.accept(reason, scene);
+    }
+
+    return reason;
   }
 
   @Override public boolean pollSceneStateChange() {
@@ -330,6 +348,17 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       fun.accept(scene);
     }
   }
+
+  @Override
+  public void addChangeListener(BiConsumer<ResetReason, Scene> listener) {
+    resetListeners.add(listener);
+  }
+
+  @Override
+  public void removeChangeListener(BiConsumer<ResetReason, Scene> listener) {
+    resetListeners.remove(listener);
+  }
+
   /**
    * Merge a render dump into the current render.
    *

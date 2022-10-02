@@ -24,12 +24,14 @@ import se.llbit.chunky.renderer.scene.RayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneFactory;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
+import se.llbit.util.Mutable;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
+import java.util.function.BiConsumer;
 
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
+import static com.google.common.truth.Truth.assertThat;
 
 public class PluginApiTest {
   @Test public void testSetRenderContextFactory() {
@@ -110,5 +112,63 @@ public class PluginApiTest {
     TabTransformer transformer = tabs -> Collections.emptyList();
     chunky.setMainTabTransformer(transformer);
     assertSame(transformer, chunky.getMainTabTransformer());
+  }
+
+  @Test(timeout = 10000)
+  // 10 second timeout (should only happen with a test programming error,
+  // or a very, very slow computer)
+  public void testSetSceneResetListener() throws InterruptedException {
+    Mutable<ResetReason> cbReason = new Mutable<>(null);
+    Mutable<Scene> cbScene = new Mutable<>(null);
+
+    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
+    chunky.getRenderController().getRenderManager().shutdown();
+
+    SceneProvider provider = chunky.getSceneManager().getSceneProvider();
+
+    // Create the listener
+    BiConsumer<ResetReason, Scene> listener = (resetReason, scene) -> {
+      cbReason.set(resetReason);
+      cbScene.set(scene);
+    };
+
+    provider.addChangeListener(listener);
+
+    // Enqueue a scene refresh event
+    provider.withEditSceneProtected(scene -> {
+      scene.refresh();
+      scene.setResetReason(ResetReason.SCENE_LOADED);
+      scene.setRenderMode(RenderMode.PREVIEW);
+    });
+
+    // Verify scene refresh has not been called yet
+    assertThat(cbReason.get()).isNull();
+    assertThat(cbScene.get()).isNull();
+
+    // Accept the scene refresh
+    provider.awaitSceneStateChange();
+
+    // Verify scene refresh has been called
+    assertThat(cbReason.get()).isNotNull();
+    assertThat(cbScene.get()).isNotNull();
+
+    cbReason.set(null);
+    cbScene.set(null);
+
+    provider.removeChangeListener(listener);
+
+    // Create a scene refresh event
+    provider.withEditSceneProtected(scene -> {
+      scene.refresh();
+      scene.setResetReason(ResetReason.SCENE_LOADED);
+      scene.setRenderMode(RenderMode.PREVIEW);
+    });
+
+    // Accept the scene refresh event
+    provider.awaitSceneStateChange();
+
+    // Verify listener was removed successfully
+    assertThat(cbReason.get()).isNull();
+    assertThat(cbScene.get()).isNull();
   }
 }

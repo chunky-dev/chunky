@@ -17,6 +17,7 @@
 package se.llbit.chunky.renderer.scene;
 
 import se.llbit.chunky.plugin.PluginApi;
+import se.llbit.chunky.renderer.SceneProvider;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
 import se.llbit.util.TaskTracker;
@@ -88,4 +89,9 @@ public interface SceneManager {
    * modifying the state)
    */
   Scene getScene();
+
+  /**
+   * Get the underlying scene provider.
+   */
+  SceneProvider getSceneProvider();
 }

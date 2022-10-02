@@ -17,8 +17,10 @@
  */
 package se.llbit.chunky.renderer;
 
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -50,4 +52,16 @@ public interface SceneProvider {
    * Calls the argument function on the scene while holding the scene lock.
    */
   void withEditSceneProtected(Consumer<Scene> fun);
+
+  /**
+   * Add a listener that is called when the scene state has changed.
+   */
+  @PluginApi
+  void addChangeListener(BiConsumer<ResetReason, Scene> listener);
+
+  /**
+   * Remove a listener added by {@link SceneProvider#addChangeListener(BiConsumer)}
+   */
+  @PluginApi
+  void removeChangeListener(BiConsumer<ResetReason, Scene> listener);
 }
