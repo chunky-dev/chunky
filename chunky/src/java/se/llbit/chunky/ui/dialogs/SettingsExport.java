@@ -160,8 +160,10 @@ public class SettingsExport extends Stage {
     buttonBox.setAlignment(Pos.BOTTOM_CENTER);
 
     Button selectAllButton = new Button("Select All");
-    selectAllButton.setOnAction(event ->
-      checkMap.values().forEach(checkbox -> checkbox.setSelected(true)));
+    selectAllButton.setOnAction(event -> {
+      checkMap.values().forEach(checkbox -> checkbox.setSelected(true));
+      update();
+    });
     buttonBox.getChildren().add(selectAllButton);
 
     Label spacer = new Label(" ");
