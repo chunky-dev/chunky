@@ -45,10 +45,8 @@ public class SceneChooser extends Stage {
       if (e.getCode() == KeyCode.ESCAPE) {
         e.consume();
         close();
-        chunkyFxController.sceneChooserClosed();
       }
     });
-
-    this.setOnCloseRequest(windowEvent -> chunkyFxController.sceneChooserClosed());
+    this.setOnHidden((e) -> chunkyFxController.sceneChooserClosed());
   }
 }
