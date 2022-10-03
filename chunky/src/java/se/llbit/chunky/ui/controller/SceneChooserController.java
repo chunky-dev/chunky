@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.ui.controller;
 
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -210,45 +211,53 @@ public class SceneChooserController implements Initializable {
   }
 
   private void populateSceneTable(File sceneDir) {
-    String previousTitle = this.stage.getTitle();
-    this.stage.setTitle("Loading scenes list...");
-
-    List<SceneListItem> scenes = new ArrayList<>();
-    List<File> fileList = SceneHelper.getAvailableSceneFiles(sceneDir);
-    fileList.sort(Comparator.comparing(File::length));
+    this.sceneTbl.setPlaceholder(new Label("Loading scenes…"));
     Executor loadExecutor = Executors.newSingleThreadExecutor();
-    for (File sceneFile : fileList) {
-      FileTimeCache file = new FileTimeCache(sceneFile);
-      scenes.add(sceneListCache.computeIfAbsent(file, f -> new SceneListItem(f.file, loadExecutor)));
-    }
 
-    scenes.sort(Comparator
-        .comparing((SceneListItem scene) -> -scene.lastModified.getTime())
-        .thenComparing((SceneListItem scene) -> scene.sceneName.toLowerCase())
-    );
-    sceneTbl.setItems(FXCollections.observableArrayList(scenes));
-    if (!scenes.isEmpty()) {
-      sceneTbl.getSelectionModel().select(0);
-    }
+    loadExecutor.execute(() -> {
+      List<SceneListItem> scenes = new ArrayList<>();
+      List<File> fileList = SceneHelper.getAvailableSceneFiles(sceneDir);
+      fileList.sort(Comparator.comparing(File::length));
 
-    sceneTbl.getSortOrder().setAll(Collections.singletonList(lastModifiedCol));
-    lastModifiedCol.setSortType(TableColumn.SortType.DESCENDING);
-    try {
-      TableSortConfigSerializer.applySortConfig(sceneTbl, PersistentSettings.getTableSortConfig("scenes"));
-    } catch(Exception ignore) {
-    }
-    sceneTbl.sort();
+      Platform.runLater(() -> {
+        for (File sceneFile : fileList) {
+          FileTimeCache file = new FileTimeCache(sceneFile);
+          scenes.add(sceneListCache.computeIfAbsent(file, f -> new SceneListItem(f.file, loadExecutor)));
+        }
 
-    this.stage.setTitle(previousTitle);
+        scenes.sort(Comparator
+          .comparing((SceneListItem scene) -> -scene.lastModified.getTime())
+          .thenComparing((SceneListItem scene) -> scene.sceneName.toLowerCase())
+        );
+        sceneTbl.setItems(FXCollections.observableArrayList(scenes));
+        if (!scenes.isEmpty()) {
+          sceneTbl.getSelectionModel().select(0);
+        }
 
-    sceneTbl.setOnSort(e -> {
-      PersistentSettings.setTableSortConfig("scenes", TableSortConfigSerializer.getSortConfig(sceneTbl));
+        sceneTbl.getSortOrder().setAll(Collections.singletonList(lastModifiedCol));
+        lastModifiedCol.setSortType(TableColumn.SortType.DESCENDING);
+        try {
+          TableSortConfigSerializer.applySortConfig(sceneTbl, PersistentSettings.getTableSortConfig("scenes"));
+        } catch (Exception ignore) {
+        }
+        sceneTbl.sort();
+
+        sceneTbl.setOnSort(e -> {
+          PersistentSettings.setTableSortConfig("scenes", TableSortConfigSerializer.getSortConfig(sceneTbl));
+        });
+
+        // put this in the loadExecutor so that this runs after all items have been loaded
+        loadExecutor.execute(() -> {
+          Platform.runLater(() -> {
+            this.sceneTbl.setPlaceholder(new Label("The scene directory doesn't contain any scenes."));
+          });
+        });
+      });
     });
   }
 
   public void setController(ChunkyFxController controller) {
     this.controller = controller;
-
     populateSceneTable(controller.getChunky().options.sceneDir);
   }
 
