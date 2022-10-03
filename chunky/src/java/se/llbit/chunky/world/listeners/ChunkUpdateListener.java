@@ -34,7 +34,7 @@ public interface ChunkUpdateListener {
     int minChunkZ = region.z << 5;
     for (int chunkX = minChunkX; chunkX < minChunkX + MCRegion.CHUNKS_X; chunkX++) {
       for (int chunkZ = minChunkZ; chunkZ < minChunkZ + MCRegion.CHUNKS_Z; chunkZ++) {
-        this.chunkUpdated(ChunkPosition.get(chunkX, chunkZ));
+        this.chunkUpdated(new ChunkPosition(chunkX, chunkZ));
       }
     }
   }

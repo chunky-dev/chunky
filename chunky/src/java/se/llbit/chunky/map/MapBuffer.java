@@ -111,10 +111,7 @@ public class MapBuffer {
     }
     for (int x = x0; x <= x1; ++x) {
       for (int z = z0; z <= z1; ++z) {
-        ChunkPosition pos = ChunkPosition.get(x, z);
-        if (!activeTiles.containsKey(pos)) {
-          activeTiles.put(pos, newTile(pos, newView));
-        }
+        activeTiles.computeIfAbsent(new ChunkPosition(x, z), pos -> newTile(pos, newView));
       }
     }
   }
@@ -170,7 +167,7 @@ public class MapBuffer {
     }
     for (int x = x0; x <= x1; ++x) {
       for (int z = z0; z <= z1; ++z) {
-        drawTileCached(mapLoader, ChunkPosition.get(x, z), selection);
+        drawTileCached(mapLoader, new ChunkPosition(x, z), selection);
       }
     }
   }

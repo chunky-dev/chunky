@@ -29,7 +29,7 @@ import java.util.NoSuchElementException;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class EmptyRegion implements Region {
-  private static final ChunkPosition position = ChunkPosition.get(0,0);
+  private static final ChunkPosition position = new ChunkPosition(0,0);
 
   /**
    * Singleton instance.

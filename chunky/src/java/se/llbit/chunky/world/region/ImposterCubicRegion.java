@@ -53,7 +53,7 @@ public class ImposterCubicRegion implements Region {
   public ImposterCubicRegion(ChunkPosition pos, World world) {
     this.world = world;
     mcRegionPos = pos;
-    min3drPosition = ChunkPosition.get(mcRegionToMinCubicRegion(pos.x), mcRegionToMinCubicRegion(pos.z));
+    min3drPosition = new ChunkPosition(mcRegionToMinCubicRegion(pos.x), mcRegionToMinCubicRegion(pos.z));
     for (int z = 0; z < DIAMETER_IN_VANILLA_CHUNKS; ++z) {
       for (int x = 0; x < DIAMETER_IN_VANILLA_CHUNKS; ++x) {
         chunks[x + z * 32] = EmptyChunk.INSTANCE;
@@ -172,7 +172,7 @@ public class ImposterCubicRegion implements Region {
     //Create marked any columns, delete any unmarked
     for (int localZ = 0; localZ < DIAMETER_IN_VANILLA_CHUNKS; localZ++) {
       for (int localX = 0; localX < DIAMETER_IN_VANILLA_CHUNKS; localX++) {
-        ChunkPosition pos = ChunkPosition.get(mcRegionToChunk(mcRegionPos.x, localX), mcRegionToChunk(mcRegionPos.z, localZ));
+        ChunkPosition pos = new ChunkPosition(mcRegionToChunk(mcRegionPos.x, localX), mcRegionToChunk(mcRegionPos.z, localZ));
         Chunk chunk = getChunk(localX, localZ);
         if (columnsWithCubes.get(localX + localZ*DIAMETER_IN_VANILLA_CHUNKS)) {
           if(chunk.isEmpty()) {

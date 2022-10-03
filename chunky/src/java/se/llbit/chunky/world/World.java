@@ -456,9 +456,9 @@ public class World implements Comparable<World> {
     Map<ChunkPosition, Set<ChunkPosition>> regionMap = new HashMap<>();
 
     for (ChunkPosition chunk : chunks) {
-      ChunkPosition regionPosition = chunk.regionPosition();
+      ChunkPosition regionPosition = chunk.getRegionPosition();
       Set<ChunkPosition> chunkSet = regionMap.computeIfAbsent(regionPosition, k -> new HashSet<>());
-      chunkSet.add(ChunkPosition.get(chunk.x & 31, chunk.z & 31));
+      chunkSet.add(new ChunkPosition(chunk.x & 31, chunk.z & 31));
     }
 
     int work = 0;
@@ -503,7 +503,7 @@ public class World implements Comparable<World> {
     regions.clear();
 
     WorldScanner.Operator operator = (regionDirectory, x, z) ->
-        regions.add(new Pair<>(regionDirectory, ChunkPosition.get(x, z)));
+        regions.add(new Pair<>(regionDirectory, new ChunkPosition(x, z)));
     // TODO make this more dynamic
     File overworld = getRegionDirectory(OVERWORLD_DIMENSION);
     WorldScanner.findExistingChunks(overworld, operator);

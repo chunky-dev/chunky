@@ -137,7 +137,7 @@ public class MCRegion implements Region {
 
       for (int z = 0; z < 32; ++z) {
         for (int x = 0; x < 32; ++x) {
-          ChunkPosition pos = ChunkPosition.get((position.x << 5) + x, (position.z << 5) + z);
+          ChunkPosition pos = new ChunkPosition((position.x << 5) + x, (position.z << 5) + z);
           Chunk chunk = getChunk(x, z);
           int loc = file.readInt();
           if (loc != 0) {
@@ -327,7 +327,7 @@ public class MCRegion implements Region {
       for (int i = 0; i < 32 * 32; ++i) {
         location[i] = file.readInt();
         int offset = location[i];
-        if (offset != 0 && (chunks == null || chunks.contains(ChunkPosition.get(i & 31, i >> 5)))) {
+        if (offset != 0 && (chunks == null || chunks.contains(new ChunkPosition(i & 31, i >> 5)))) {
           loc_out[i] = nextFree << 8 | offset & 0xFF;
           nextFree += offset & 0xFF;
         }

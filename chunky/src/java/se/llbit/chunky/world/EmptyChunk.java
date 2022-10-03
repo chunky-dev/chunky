@@ -42,7 +42,7 @@ public class EmptyChunk extends Chunk {
   }
 
   private EmptyChunk() {
-    super(ChunkPosition.get(0, 0), EmptyWorld.INSTANCE);
+    super(new ChunkPosition(0, 0), EmptyWorld.INSTANCE);
     surface = IconLayer.CORRUPT;
   }
 

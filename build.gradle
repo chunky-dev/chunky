@@ -38,6 +38,7 @@ subprojects {
         options.release = 8
         options.encoding = 'UTF-8'
         options.debug = true
+        options.deprecation = true
     }
 
     javafx {
