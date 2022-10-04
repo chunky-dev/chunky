@@ -8,6 +8,9 @@ import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.model.minecraft.FlowerPotModel;
+import se.llbit.chunky.model.minecraft.FlowerPotModel.Kind;
+import se.llbit.chunky.model.Tint;
+import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.nbt.ListTag;
@@ -1236,7 +1239,39 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("copper_wall_torch", (name, tag) -> new WallTorch(name, Texture.copperTorch, BlockProvider.facing(tag)));
   }
 
-  @Override
+  public static Tint[] getHardCodedTints(String blockName) {
+    switch (blockName) {
+      case "minecraft:vine":
+      case "minecraft:big_dripleaf":
+      case "minecraft:small_dripleaf":
+      case "minecraft:mangrove_leaves":
+      case "minecraft:oak_leaves":
+      case "minecraft:jungle_leaves":
+      case "minecraft:acacia_leaves":
+      case "minecraft:dark_oak_leaves":
+        return new Tint[] { Tint.BIOME_FOLIAGE };
+      case "minecraft:spruce_leaves":
+        return new Tint[] { new Tint(0x619961) };
+      case "minecraft:birch_leaves":
+        return new Tint[] { new Tint(0x80a755) };
+      case "minecraft:lily_pad":
+        return new Tint[] { new Tint(0x208030) };
+      // case "minecraft:redstone_wire":
+        // TODO return new Tint[] { Tint.REDSTONE_WIRE };
+      case "minecraft:grass_block":
+      case "minecraft:grass":
+      case "minecraft:tall_grass":
+      case "minecraft:fern":
+      case "minecraft:large_fern":
+      case "minecraft:sugar_cane":
+      case "minecraft:flower_pot":
+        return new Tint[] { Tint.BIOME_GRASS };
+      default:
+        return null;
+    }
+  }
+
+    @Override
   public Collection<String> getSupportedBlocks() {
     List<String> names = new ArrayList<>(blockList.length + blocks.size());
     names.addAll(Arrays.asList(blockList));

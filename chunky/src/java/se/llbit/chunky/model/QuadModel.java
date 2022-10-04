@@ -20,6 +20,7 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.Tint;
+import se.llbit.chunky.block.jsonmodels.TintedQuad;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
@@ -118,6 +119,7 @@ public abstract class QuadModel implements BlockModel {
 
     float[] color = null;
     Tint tint = Tint.NONE;
+    Quad hitQuad;
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
       if (quad.intersect(ray)) {
@@ -125,7 +127,11 @@ public abstract class QuadModel implements BlockModel {
         if (texture == null) continue;
         float[] c = texture.getColor(ray.u, ray.v);
         if (c[3] > Ray.EPSILON) {
-          tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
+          if (quad instanceof TintedQuad){
+            tint = ((TintedQuad) quad).tint;
+          } else {
+            tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
+          }
           color = c;
           ray.t = ray.tNext;
           if (quad.doubleSided) {

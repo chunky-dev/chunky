@@ -1,18 +1,15 @@
 package se.llbit.chunky.block.jsonmodels;
 
+import se.llbit.chunky.model.Tint;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 
 public class TintedQuad extends Quad {
 
-  private final int tintindex;
+  public final Tint tint;
 
-  public TintedQuad(Quad quad, int tintindex) {
+  public TintedQuad(Quad quad, Tint tint) {
     super(quad, Transform.NONE);
-    this.tintindex = tintindex;
-  }
-
-  public int getTintIndex() {
-    return tintindex;
+    this.tint = tint;
   }
 }
