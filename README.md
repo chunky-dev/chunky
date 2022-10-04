@@ -55,7 +55,7 @@ For guides and more information please checkout the [Documentation][chunky-dev].
 <details>
 <summary><strong>Which Minecraft versions are supported?</strong></summary>
 
-> Chunky 2.4.3 supports Minecraft 1.2-1.19.2 worlds and Cubic Chunks for Minecraft 1.10-1.12 worlds.
+> Chunky 2.4.4 supports Minecraft 1.2-1.19.2 worlds and Cubic Chunks for Minecraft 1.10-1.12 worlds.
 >
 > We typically add new blocks shortly after a new Minecraft snapshot is released. Use the latest Chunky snapshot to render them until a new Chunky version is released.
 
