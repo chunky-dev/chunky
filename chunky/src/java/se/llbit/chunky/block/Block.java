@@ -1,7 +1,7 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.model.TexturedBlockModel;
+import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
@@ -13,7 +13,6 @@ import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
-import java.util.List;
 import java.util.Random;
 
 public abstract class Block extends Material {
