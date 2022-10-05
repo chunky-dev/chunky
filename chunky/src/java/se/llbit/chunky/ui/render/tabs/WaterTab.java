@@ -169,11 +169,16 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       }
     });
 
+    waterWorldModeDetailsPane.visibleProperty().set(waterPlaneEnabled.isSelected());
+    waterWorldModeDetailsPane.expandedProperty().set(waterPlaneEnabled.isSelected());
+
     waterPlaneEnabled.setTooltip(
       new Tooltip("If enabled, an infinite ocean fills the scene. This ignores air from loaded chunks."));
-    waterPlaneEnabled.selectedProperty().addListener((observable, oldValue, newValue) ->
-      scene.setWaterPlaneEnabled(newValue)
-    );
+    waterPlaneEnabled.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.setWaterPlaneEnabled(newValue);
+      waterWorldModeDetailsPane.setVisible(newValue);
+      waterWorldModeDetailsPane.setExpanded(newValue);
+    });
 
     waterPlaneHeight.setName("Water height");
     waterPlaneHeight.setTooltip("The default ocean height is " + World.SEA_LEVEL + ".");
@@ -188,8 +193,9 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterPlaneClip.selectedProperty().addListener((observable, oldValue, newValue) ->
       scene.setWaterPlaneChunkClip(newValue)
     );
-    waterWorldModeDetailsPane.visibleProperty().bind(waterPlaneEnabled.selectedProperty());
-    waterWorldModeDetailsPane.expandedProperty().bind(waterPlaneEnabled.selectedProperty());
+
+    proceduralWaterDetailsPane.visibleProperty().set(useProceduralWater.isSelected());
+    proceduralWaterDetailsPane.expandedProperty().set(useProceduralWater.isSelected());
 
     useProceduralWater.setTooltip(new Tooltip("Generate customized water waves using noise to prevent tiling at large distances."));
     useProceduralWater.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -205,9 +211,9 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
         scene.setWaterShading(new LegacyWaterShader());
         scene.refresh();
       }
+      proceduralWaterDetailsPane.setVisible(newValue);
+      proceduralWaterDetailsPane.setExpanded(newValue);
     });
-    proceduralWaterDetailsPane.visibleProperty().bind(useProceduralWater.selectedProperty());
-    proceduralWaterDetailsPane.expandedProperty().bind(useProceduralWater.selectedProperty());
 
     proceduralWaterIterations.setName("Iterations");
     proceduralWaterIterations.setTooltip("The number of iterations (layers) of noise used");
