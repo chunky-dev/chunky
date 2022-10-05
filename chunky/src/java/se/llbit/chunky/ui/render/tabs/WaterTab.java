@@ -56,6 +56,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @FXML private DoubleAdjuster waterPlaneHeight;
   @FXML private CheckBox waterPlaneOffsetEnabled;
   @FXML private CheckBox waterPlaneClip;
+  @FXML private TitledPane waterWorldModeDetailsPane;
   @FXML private CheckBox useProceduralWater;
   @FXML private IntegerAdjuster proceduralWaterIterations;
   @FXML private DoubleAdjuster proceduralWaterFrequency;
@@ -187,6 +188,8 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterPlaneClip.selectedProperty().addListener((observable, oldValue, newValue) ->
       scene.setWaterPlaneChunkClip(newValue)
     );
+    waterWorldModeDetailsPane.visibleProperty().bind(waterPlaneEnabled.selectedProperty());
+    waterWorldModeDetailsPane.expandedProperty().bind(waterPlaneEnabled.selectedProperty());
 
     useProceduralWater.setTooltip(new Tooltip("Generate customized water waves using noise to prevent tiling at large distances."));
     useProceduralWater.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -204,6 +207,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       }
     });
     proceduralWaterDetailsPane.visibleProperty().bind(useProceduralWater.selectedProperty());
+    proceduralWaterDetailsPane.expandedProperty().bind(useProceduralWater.selectedProperty());
 
     proceduralWaterIterations.setName("Iterations");
     proceduralWaterIterations.setTooltip("The number of iterations (layers) of noise used");

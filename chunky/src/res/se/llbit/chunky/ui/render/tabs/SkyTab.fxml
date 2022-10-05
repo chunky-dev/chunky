@@ -17,7 +17,7 @@
       <Label text="Sky mode:" />
       <ChoiceBox fx:id="skyMode" prefWidth="150.0" />
     </HBox>
-    <TitledPane fx:id="detailsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Sky mode settings">
+    <TitledPane fx:id="detailsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" animated="false" text="Sky mode settings">
       <VBox.margin>
         <Insets />
       </VBox.margin>
