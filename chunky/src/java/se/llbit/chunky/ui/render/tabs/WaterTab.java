@@ -62,6 +62,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @FXML private DoubleAdjuster proceduralWaterAmplitude;
   @FXML private DoubleAdjuster proceduralWaterAnimationSpeed;
   @FXML private TitledPane proceduralWaterDetailsPane;
+  @FXML private TitledPane waterWorldModeDetailsPane;
 
   private RenderControlsFxController renderControls;
   private RenderController controller;
@@ -173,6 +174,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterPlaneEnabled.selectedProperty().addListener((observable, oldValue, newValue) ->
       scene.setWaterPlaneEnabled(newValue)
     );
+    waterWorldModeDetailsPane.visibleProperty().bind(waterPlaneEnabled.selectedProperty());
 
     waterPlaneHeight.setName("Water height");
     waterPlaneHeight.setTooltip("The default ocean height is " + World.SEA_LEVEL + ".");
