@@ -9,16 +9,49 @@
 
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
+    <Button fx:id="openSceneDirBtn" mnemonicParsing="false" text="Open scene directory" />
+    <Separator />
     <FlowPane hgap="10" vgap="10">
-      <Button fx:id="openSceneDirBtn" mnemonicParsing="false" text="Open scene directory" />
       <Button fx:id="exportSettings" mnemonicParsing="false" text="Export settings" />
       <Button fx:id="importSettings" mnemonicParsing="false" text="Import settings" />
       <Button fx:id="restoreDefaults" mnemonicParsing="false" text="Restore default settings" />
     </FlowPane>
-    <HBox spacing="10.0">
-      <Button fx:id="loadSelectedChunks" mnemonicParsing="false" text="Load selected chunks" />
-      <Button fx:id="reloadChunks" mnemonicParsing="false" text="Reload chunks" />
-    </HBox>
+    <Separator />
+    <VBox spacing="10.0">
+      <HBox spacing="10.0">
+        <Button fx:id="loadSelectedChunks" mnemonicParsing="false" text="Load selected chunks" />
+        <Button fx:id="reloadChunks" mnemonicParsing="false" text="Reload chunks" />
+      </HBox>
+      <TitledPane collapsible="false" animated="false" text="Scene Y clip">
+        <VBox spacing="10.0">
+          <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <IntegerAdjuster fx:id="yMin" name="Min Y level" />
+            <Button fx:id="setDefaultYMin" mnemonicParsing="false" text="Set default" />
+          </HBox>
+          <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <IntegerAdjuster fx:id="yMax" name="Max Y level" />
+            <Button fx:id="setDefaultYMax" mnemonicParsing="false" text="Set default" />
+          </HBox>
+        </VBox>
+      </TitledPane>
+      <Accordion>
+        <panes>
+          <TitledPane animated="false" text="Load entities">
+            <VBox spacing="10.0">
+              <HBox spacing="10.0">
+                <Button fx:id="loadAllEntities" mnemonicParsing="false" text="Select All" />
+                <Button fx:id="loadNoEntity" mnemonicParsing="false" text="Deselect All" />
+              </HBox>
+              <CheckBox fx:id="loadPlayers" mnemonicParsing="false" text="Players" />
+              <CheckBox fx:id="loadArmorStands" mnemonicParsing="false" text="Armor stands" />
+              <CheckBox fx:id="loadBooks" mnemonicParsing="false" text="Books" />
+              <CheckBox fx:id="loadPaintings" mnemonicParsing="false" text="Paintings" />
+              <CheckBox fx:id="loadOtherEntities" mnemonicParsing="false" text="Other" />
+            </VBox>
+          </TitledPane>
+        </panes>
+      </Accordion>
+    </VBox>
     <Separator />
     <HBox alignment="CENTER_LEFT" spacing="16">
       <VBox spacing="4">
@@ -38,43 +71,20 @@
       </VBox>
     </HBox>
     <Separator />
-    <Accordion>
-      <panes>
-        <TitledPane animated="false" text="Load entities">
-          <VBox spacing="10.0">
-            <HBox spacing="10.0">
-              <Button fx:id="loadAllEntities" mnemonicParsing="false" text="Select All" />
-              <Button fx:id="loadNoEntity" mnemonicParsing="false" text="Deselect All" />
-            </HBox>
-            <CheckBox fx:id="loadPlayers" mnemonicParsing="false" text="Players" />
-            <CheckBox fx:id="loadArmorStands" mnemonicParsing="false" text="Armor stands" />
-            <CheckBox fx:id="loadBooks" mnemonicParsing="false" text="Books" />
-            <CheckBox fx:id="loadPaintings" mnemonicParsing="false" text="Paintings" />
-            <CheckBox fx:id="loadOtherEntities" mnemonicParsing="false" text="Other" />
-          </VBox>
-        </TitledPane>
-      </panes>
-    </Accordion>
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <CheckBox fx:id="saveDumps" mnemonicParsing="false" text="Save dump once every" />
-      <ComboBox fx:id="dumpFrequency" />
-      <Label text="frames" />
-    </HBox>
-    <CheckBox fx:id="saveSnapshots" mnemonicParsing="false" text="Save snapshot for each dump" />
+    <VBox alignment="CENTER_LEFT" spacing="10.0">
+      <CheckBox fx:id="saveDumps" mnemonicParsing="false" text="Enable autosave" />
+      <TitledPane fx:id="dumpSettings" animated="false" text="Autosave settings">
+        <VBox spacing="10.0">
+          <HBox spacing="10.0">
+            <Label text="Autosave frequency: " />
+            <ComboBox fx:id="dumpFrequency" />
+            <Label text=" SPP" />
+          </HBox>
+          <CheckBox fx:id="saveSnapshots" mnemonicParsing="false" text="Save snapshot for each dump" />
+        </VBox>
+      </TitledPane>
+    </VBox>
     <Separator/>
-    <Label text="Scene Y clip:">
-      <font>
-        <Font name="System Bold" size="12.0" />
-      </font>
-    </Label>
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <IntegerAdjuster fx:id="yMin" name="Min Y level" />
-      <Button fx:id="setDefaultYMin" mnemonicParsing="false" text="Set default" />
-    </HBox>
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <IntegerAdjuster fx:id="yMax" name="Max Y level" />
-      <Button fx:id="setDefaultYMax" mnemonicParsing="false" text="Set default" />
-    </HBox>
     <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
     </padding>

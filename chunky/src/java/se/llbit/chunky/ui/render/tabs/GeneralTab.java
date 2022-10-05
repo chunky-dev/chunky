@@ -87,6 +87,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private CheckBox loadOtherEntities;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
+  @FXML private TitledPane dumpSettings;
   @FXML private ComboBox<Number> dumpFrequency;
   @FXML private IntegerAdjuster yMin;
   @FXML private IntegerAdjuster yMax;
@@ -292,6 +293,8 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       } else {
         scene.setDumpFrequency(0);
       }
+      dumpSettings.setVisible(enable);
+      dumpSettings.setExpanded(enable);
     });
     saveSnapshots.selectedProperty().addListener((observable1, oldValue1, newValue1) -> {
       scene.setSaveSnapshots(newValue1);
