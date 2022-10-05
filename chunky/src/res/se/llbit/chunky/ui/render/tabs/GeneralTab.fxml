@@ -80,7 +80,7 @@
             <ComboBox fx:id="dumpFrequency" />
             <Label text=" SPP" />
           </HBox>
-          <CheckBox fx:id="saveSnapshots" mnemonicParsing="false" text="Save snapshot for each dump" />
+          <CheckBox fx:id="saveSnapshots" mnemonicParsing="false" text="Save snapshot on each autosave" />
         </VBox>
       </TitledPane>
     </VBox>
