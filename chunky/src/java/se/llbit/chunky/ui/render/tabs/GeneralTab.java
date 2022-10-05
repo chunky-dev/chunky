@@ -282,6 +282,11 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         scene.setDumpFrequency(0);
       }
     });
+
+    dumpSettings.visibleProperty().set(saveDumps.isSelected());
+    dumpSettings.expandedProperty().set(saveDumps.isSelected());
+    dumpSettings.managedProperty().set(saveDumps.isSelected());
+
     saveDumps.setTooltip(new Tooltip("Save render progress every time a multiple of the specified number of SPP has been reached."));
     saveDumps.selectedProperty().addListener((observable, oldValue, enable) -> {
       dumpFrequency.setDisable(!enable);
@@ -295,25 +300,31 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       }
       dumpSettings.setVisible(enable);
       dumpSettings.setExpanded(enable);
+      dumpSettings.setManaged(enable);
     });
+
     saveSnapshots.selectedProperty().addListener((observable1, oldValue1, newValue1) -> {
       scene.setSaveSnapshots(newValue1);
     });
+
     yMax.setTooltip(
         "Blocks above this Y value are not loaded. Requires reloading chunks to take effect.");
     yMax.onValueChange(value -> {
       scene.setYClipMax(value);
       renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
     });
+
     yMin.setTooltip(
         "Blocks below this Y value are not loaded. Requires reloading chunks to take effect.");
     yMin.onValueChange(value -> {
       scene.setYClipMin(value);
       renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
     });
+
     openSceneDirBtn.setTooltip(
         new Tooltip("Open the directory where Chunky stores the scene description and renders of this scene."));
     openSceneDirBtn.setOnAction(e -> chunkyFxController.openDirectory(chunkyFxController.getRenderController().getContext().getSceneDirectory()));
+
     loadSelectedChunks
         .setTooltip(new Tooltip("Load the chunks that are currently selected in the map view"));
     loadSelectedChunks.setOnAction(e -> {
@@ -321,6 +332,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
           .loadChunks(mapLoader.getWorld(), chunkyFxController.getChunkSelection().getSelection());
       reloadChunks.setDisable(chunkyFxController.getChunkSelection().isEmpty());
     });
+
     reloadChunks.setTooltip(new Tooltip("Reload all chunks in the scene."));
     reloadChunks.setGraphic(new ImageView(Icon.reload.fxImage()));
     reloadChunks.setOnAction(e -> controller.getSceneManager().reloadChunks());
