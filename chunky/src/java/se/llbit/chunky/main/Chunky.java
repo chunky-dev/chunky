@@ -23,6 +23,7 @@ import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.MinecraftBlockProvider;
 import se.llbit.chunky.block.legacy.LegacyMinecraftBlockProvider;
 import se.llbit.chunky.main.CommandLineOptions.Mode;
+import se.llbit.chunky.plugin.ContextMenuTransformer;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.plugin.ChunkyPlugin;
 import se.llbit.chunky.plugin.TabTransformer;
@@ -53,7 +54,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 
@@ -90,6 +93,8 @@ public class Chunky {
   private RenderManagerFactory renderManagerFactory = DefaultRenderManager::new;
   private RenderControlsTabTransformer renderControlsTabTransformer = tabs -> tabs;
   private TabTransformer mainTabTransformer = tabs -> tabs;
+  private final ArrayList<ContextMenuTransformer> mapContextMenuTransformers = new ArrayList<>();
+  private final ArrayList<ContextMenuTransformer> renderContextMenuTransformers = new ArrayList<>();
   private boolean headless = false;
 
   private static ForkJoinPool commonThreads;
@@ -470,6 +475,23 @@ public class Chunky {
   @PluginApi
   public TabTransformer getMainTabTransformer() {
     return mainTabTransformer;
+  }
+
+  /**
+   * Get the mutable list of context menu transformers in the main map view.
+   */
+  @PluginApi
+  public List<ContextMenuTransformer> getMapContextMenuTransformers() {
+    return this.mapContextMenuTransformers;
+  }
+
+
+  /**
+   * Get the mutable list of context menu transformers in the main render view.
+   */
+  @PluginApi
+  public List<ContextMenuTransformer> getRenderContextMenuTransformers() {
+    return this.renderContextMenuTransformers;
   }
 
   /**
