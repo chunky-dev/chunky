@@ -137,6 +137,10 @@ public class Sun implements JsonSerializable {
 
   protected final Vector3 emittance = new Vector3(1, 1, 1);
 
+  protected final Vector3 previewEmittance = new Vector3(1, 1, 1);
+
+  protected final Vector3 previewColor = new Vector3(1, 1, 1);
+
   // final to ensure that we don't do a lot of redundant re-allocation
   private final Vector3 color = new Vector3(1, 1, 1);
 
@@ -200,6 +204,9 @@ public class Sun implements JsonSerializable {
 
     emittance.set(color);
     emittance.scale(FastMath.pow(intensity, Scene.DEFAULT_GAMMA));
+
+    previewEmittance.set(previewColor);
+    previewEmittance.scale(FastMath.pow(DEFAULT_INTENSITY, Scene.DEFAULT_GAMMA));
 
     Sky sky = ((Scene) scene).sky();
     if (sky.getSkyMode() == Sky.SkyMode.SIMULATED) {
@@ -276,9 +283,9 @@ public class Sun implements JsonSerializable {
     Vector3 n = ray.getNormal();
     double shading = n.x * sw.x + n.y * sw.y + n.z * sw.z;
     shading = QuickMath.max(AMBIENT, shading);
-    ray.color.x *= emittance.x * shading;
-    ray.color.y *= emittance.y * shading;
-    ray.color.z *= emittance.z * shading;
+    ray.color.x *= previewEmittance.x * shading;
+    ray.color.y *= previewEmittance.y * shading;
+    ray.color.z *= previewEmittance.z * shading;
   }
 
   public void setColor(Vector3 newColor) {
