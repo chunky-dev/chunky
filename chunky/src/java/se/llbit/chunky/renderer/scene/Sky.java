@@ -160,7 +160,7 @@ public class Sky implements JsonSerializable {
   private final Vector3 cloudOffset = new Vector3(0, DEFAULT_CLOUD_HEIGHT, 0);
 
   private double skyLightModifier = DEFAULT_INTENSITY;
-  private double skyApparentLightModifier = DEFAULT_INTENSITY;
+  private double apparentSkyLightModifier = DEFAULT_INTENSITY;
 
   /** Color gradient used for the GRADIENT sky mode. */
   private List<Vector4> gradient = new LinkedList<>();
@@ -234,7 +234,7 @@ public class Sky implements JsonSerializable {
     rotation = other.rotation;
     mirrored = other.mirrored;
     skyLightModifier = other.skyLightModifier;
-    skyApparentLightModifier = other.skyApparentLightModifier;
+    apparentSkyLightModifier = other.apparentSkyLightModifier;
     gradient = new ArrayList<>(other.gradient);
     color.set(other.color);
     mode = other.mode;
@@ -367,9 +367,9 @@ public class Sky implements JsonSerializable {
     ray.color.w = 1;
   }
 
-  public void getSkyApparentColor(Ray ray, boolean drawSun) {
+  public void getApparentSkyColor(Ray ray, boolean drawSun) {
     getSkyDiffuseColorInner(ray);
-    ray.color.scale(skyApparentLightModifier);
+    ray.color.scale(apparentSkyLightModifier);
     if (drawSun) addSunColor(ray);
     ray.color.w = 1;
   }
@@ -453,7 +453,7 @@ public class Sky implements JsonSerializable {
       }
     }
     addSunColor(ray);
-    ray.color.scale(skyApparentLightModifier);
+    ray.color.scale(apparentSkyLightModifier);
     ray.color.w = 1;
   }
 
@@ -572,7 +572,7 @@ public class Sky implements JsonSerializable {
     sky.add("skyYaw", rotation);
     sky.add("skyMirrored", mirrored);
     sky.add("skyLight", skyLightModifier);
-    sky.add("skyApparentLight", skyApparentLightModifier);
+    sky.add("apparentSkyLight", apparentSkyLightModifier);
     sky.add("mode", mode.name());
     sky.add("horizonOffset", horizonOffset);
     sky.add("cloudsEnabled", cloudsEnabled);
@@ -620,7 +620,7 @@ public class Sky implements JsonSerializable {
     rotation = json.get("skyYaw").doubleValue(rotation);
     mirrored = json.get("skyMirrored").boolValue(mirrored);
     skyLightModifier = json.get("skyLight").doubleValue(skyLightModifier);
-    skyApparentLightModifier = json.get("skyApparentLight").doubleValue(skyApparentLightModifier);
+    apparentSkyLightModifier = json.get("apparentSkyLight").doubleValue(apparentSkyLightModifier);
     mode = SkyMode.get(json.get("mode").stringValue(mode.name()));
     horizonOffset = json.get("horizonOffset").doubleValue(horizonOffset);
     cloudsEnabled = json.get("cloudsEnabled").boolValue(cloudsEnabled);
@@ -680,8 +680,8 @@ public class Sky implements JsonSerializable {
     scene.refresh();
   }
 
-  public void setSkyApparentLight(double newValue) {
-    skyApparentLightModifier = newValue;
+  public void setApparentSkyLight(double newValue) {
+    apparentSkyLightModifier = newValue;
     scene.refresh();
   }
 
@@ -692,8 +692,8 @@ public class Sky implements JsonSerializable {
     return skyLightModifier;
   }
 
-  public double getSkyApparentLight() {
-    return skyApparentLightModifier;
+  public double getApparentSkyLight() {
+    return apparentSkyLightModifier;
   }
 
   public void setGradient(List<Vector4> newGradient) {

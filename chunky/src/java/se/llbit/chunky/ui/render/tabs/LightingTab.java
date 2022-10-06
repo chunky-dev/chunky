@@ -49,7 +49,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   private Scene scene;
 
   @FXML private DoubleAdjuster skyIntensity;
-  @FXML private DoubleAdjuster skyApparentIntensity;
+  @FXML private DoubleAdjuster apparentSkyIntensity;
   @FXML private DoubleAdjuster emitterIntensity;
   @FXML private DoubleAdjuster sunIntensity;
   @FXML private CheckBox drawSun;
@@ -79,12 +79,12 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     skyIntensity.clampMin();
     skyIntensity.onValueChange(value -> scene.sky().setSkyLight(value));
 
-    skyApparentIntensity.setName("Apparent sky brightness");
-    skyApparentIntensity.setTooltip("Apparent sky light intensity modifier");
-    skyApparentIntensity.setRange(Sky.MIN_APPARENT_INTENSITY, Sky.MAX_APPARENT_INTENSITY);
-    skyApparentIntensity.makeLogarithmic();
-    skyApparentIntensity.clampMin();
-    skyApparentIntensity.onValueChange(value -> scene.sky().setSkyApparentLight(value));
+    apparentSkyIntensity.setName("Apparent sky brightness");
+    apparentSkyIntensity.setTooltip("Apparent sky light intensity modifier");
+    apparentSkyIntensity.setRange(Sky.MIN_APPARENT_INTENSITY, Sky.MAX_APPARENT_INTENSITY);
+    apparentSkyIntensity.makeLogarithmic();
+    apparentSkyIntensity.clampMin();
+    apparentSkyIntensity.onValueChange(value -> scene.sky().setApparentSkyLight(value));
 
     emitterIntensity.setName("Emitter intensity");
     emitterIntensity.setTooltip("Light intensity modifier for emitters");
@@ -157,7 +157,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
 
   @Override public void update(Scene scene) {
     skyIntensity.set(scene.sky().getSkyLight());
-    skyApparentIntensity.set(scene.sky().getSkyApparentLight());
+    apparentSkyIntensity.set(scene.sky().getApparentSkyLight());
     emitterIntensity.set(scene.getEmitterIntensity());
     sunIntensity.set(scene.sun().getIntensity());
     sunLuminosity.set(scene.sun().getLuminosity());
