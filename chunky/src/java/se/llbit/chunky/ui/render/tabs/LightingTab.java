@@ -49,6 +49,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   private Scene scene;
 
   @FXML private DoubleAdjuster skyIntensity;
+  @FXML private DoubleAdjuster apparentSkyIntensity;
   @FXML private DoubleAdjuster emitterIntensity;
   @FXML private DoubleAdjuster sunIntensity;
   @FXML private CheckBox drawSun;
@@ -71,12 +72,19 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
-    skyIntensity.setName("Sky light");
+    skyIntensity.setName("Sky brightness");
     skyIntensity.setTooltip("Sky light intensity modifier");
     skyIntensity.setRange(Sky.MIN_INTENSITY, Sky.MAX_INTENSITY);
     skyIntensity.makeLogarithmic();
     skyIntensity.clampMin();
     skyIntensity.onValueChange(value -> scene.sky().setSkyLight(value));
+
+    apparentSkyIntensity.setName("Apparent sky brightness");
+    apparentSkyIntensity.setTooltip("Apparent sky light intensity modifier");
+    apparentSkyIntensity.setRange(Sky.MIN_APPARENT_INTENSITY, Sky.MAX_APPARENT_INTENSITY);
+    apparentSkyIntensity.makeLogarithmic();
+    apparentSkyIntensity.clampMin();
+    apparentSkyIntensity.onValueChange(value -> scene.sky().setApparentSkyLight(value));
 
     emitterIntensity.setName("Emitter intensity");
     emitterIntensity.setTooltip("Light intensity modifier for emitters");
@@ -149,6 +157,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
 
   @Override public void update(Scene scene) {
     skyIntensity.set(scene.sky().getSkyLight());
+    apparentSkyIntensity.set(scene.sky().getApparentSkyLight());
     emitterIntensity.set(scene.getEmitterIntensity());
     sunIntensity.set(scene.sun().getIntensity());
     sunLuminosity.set(scene.sun().getLuminosity());
