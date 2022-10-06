@@ -65,7 +65,7 @@ public class Sky implements JsonSerializable {
    */
   protected static final int DEFAULT_CLOUD_HEIGHT = 128;
 
-  protected static final int DEFAULT_CLOUD_SIZE = 64;
+  protected static final int DEFAULT_CLOUD_SIZE = 12;
 
   /**
    * Maximum sky light intensity
