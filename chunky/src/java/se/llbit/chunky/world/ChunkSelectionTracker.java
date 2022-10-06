@@ -312,6 +312,38 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
   }
 
   /**
+   * Select chunks within circle.
+   *
+   * @return true if anything was changed, false if no chunks were selected.
+   */
+  public synchronized boolean setChunkRadius(World world, int centerChunkX, int centerChunkZ, float chunksRadius, boolean selected) {
+    // could be optimised to call setRegion() for regions entirely inside the circle, if necessary
+    boolean selectionChanged = false;
+
+    int minChunkX = (int) (centerChunkX - chunksRadius);
+    int minChunkZ = (int) (centerChunkZ - chunksRadius);
+
+    int maxChunkX = (int) (centerChunkX + chunksRadius);
+    int maxChunkZ = (int) (centerChunkZ + chunksRadius);
+
+    float radiusSquared = chunksRadius * chunksRadius;
+
+    for (int chunkX = minChunkX; chunkX < maxChunkX + 1; chunkX++) {
+      for (int chunkZ = minChunkZ; chunkZ < maxChunkZ + 1; chunkZ++) {
+        int chunkXOffset = chunkX - centerChunkX;
+        int chunkZOffset = chunkZ - centerChunkZ;
+        if (chunkXOffset * chunkXOffset + chunkZOffset * chunkZOffset < radiusSquared) {
+          selectionChanged |= setChunk(world, ChunkPosition.get(chunkX, chunkZ), selected);
+        }
+      }
+    }
+    if (selectionChanged) {
+      notifyChunkSelectionChange();
+    }
+    return selectionChanged;
+  }
+
+  /**
    * Deselect all chunks.
    */
   public synchronized void clearSelection() {
