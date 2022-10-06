@@ -3,7 +3,6 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 <?import se.llbit.chunky.ui.*?>
 <?import se.llbit.chunky.ui.elements.*?>
 
@@ -11,18 +10,30 @@
   <VBox spacing="10.0">
     <Button fx:id="openSceneDirBtn" mnemonicParsing="false" text="Open scene directory" />
     <Separator />
-    <FlowPane hgap="10" vgap="10">
-      <Button fx:id="exportSettings" mnemonicParsing="false" text="Export settings" />
-      <Button fx:id="importSettings" mnemonicParsing="false" text="Import settings" />
-      <Button fx:id="restoreDefaults" mnemonicParsing="false" text="Restore default settings" />
-    </FlowPane>
+    <HBox alignment="CENTER_LEFT" spacing="16">
+      <VBox spacing="4">
+        <Label fx:id="canvasSizeLabel" text="Canvas size:" style="-fx-font-weight: bold;"/>
+        <padding>
+          <Insets left="8"/>
+        </padding>
+        <SizeInput fx:id="canvasSizeInput" initialWidth="400" initialHeight="400" showAspectRatioDetails="true"/>
+      </VBox>
+      <VBox alignment="CENTER_LEFT" spacing="4">
+        <HBox spacing="4">
+          <Button fx:id="applySize" mnemonicParsing="false" text="Apply"/>
+          <Button fx:id="makeDefaultSize" mnemonicParsing="false" text="Set default"/>
+        </HBox>
+        <Button fx:id="flipAxesBtn" mnemonicParsing="false" text="Flip axes"/>
+        <HBox spacing="4" fx:id="scaleButtonArea"/>
+      </VBox>
+    </HBox>
     <Separator />
     <VBox spacing="10.0">
       <HBox spacing="10.0">
         <Button fx:id="loadSelectedChunks" mnemonicParsing="false" text="Load selected chunks" />
         <Button fx:id="reloadChunks" mnemonicParsing="false" text="Reload chunks" />
       </HBox>
-      <TitledPane collapsible="false" animated="false" text="Scene Y clip">
+      <TitledPane animated="false" text="Scene Y clip">
         <VBox spacing="10.0">
           <HBox alignment="CENTER_LEFT" spacing="10.0">
             <IntegerAdjuster fx:id="yMin" name="Min Y level" />
@@ -53,23 +64,11 @@
       </Accordion>
     </VBox>
     <Separator />
-    <HBox alignment="CENTER_LEFT" spacing="16">
-      <VBox spacing="4">
-        <Label fx:id="canvasSizeLabel" text="Canvas size:" style="-fx-font-weight: bold;"/>
-        <padding>
-          <Insets left="8"/>
-        </padding>
-        <SizeInput fx:id="canvasSizeInput" initialWidth="400" initialHeight="400" showAspectRatioDetails="true"/>
-      </VBox>
-      <VBox alignment="CENTER_LEFT" spacing="4">
-        <HBox spacing="4">
-          <Button fx:id="applySize" mnemonicParsing="false" text="Apply"/>
-          <Button fx:id="makeDefaultSize" mnemonicParsing="false" text="Set default"/>
-        </HBox>
-        <Button fx:id="flipAxesBtn" mnemonicParsing="false" text="Flip axes"/>
-        <HBox spacing="4" fx:id="scaleButtonArea"/>
-      </VBox>
-    </HBox>
+    <FlowPane hgap="10" vgap="10">
+      <Button fx:id="exportSettings" mnemonicParsing="false" text="Export settings" />
+      <Button fx:id="importSettings" mnemonicParsing="false" text="Import settings" />
+      <Button fx:id="restoreDefaults" mnemonicParsing="false" text="Restore default settings" />
+    </FlowPane>
     <Separator />
     <VBox alignment="CENTER_LEFT" spacing="10.0">
       <CheckBox fx:id="saveDumps" mnemonicParsing="false" text="Enable autosave" />
