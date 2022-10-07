@@ -296,8 +296,15 @@ public class ResourcepackBlockProvider implements BlockProvider {
     @Override
     public boolean isSatisfied(Tag properties) {
       for (Entry<String, String> property : conditions.entrySet()) {
-        if (Arrays.stream(property.getValue().split("\\|"))
-          .noneMatch(value -> properties.get(property.getKey()).stringValue("").equals(value))) {
+        String value = properties.get(property.getKey()).stringValue("");
+        boolean valueValid = false;
+        for (String allowedValue : property.getValue().split("\\|")) {
+          if (allowedValue.equals(value)) {
+            valueValid = true;
+            break;
+          }
+        }
+        if (!valueValid) {
           return false;
         }
       }
@@ -393,7 +400,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
       super(
         new OrCondition(
           when.elements.stream()
-            .map(condition -> new BlockStateCondition(when.object()))
+            .map(condition -> new BlockStateCondition(condition.object()))
             .collect(Collectors.toList())),
         model);
     }
