@@ -78,9 +78,7 @@ public class EmptyChunk extends Chunk {
     // Do nothing.
   }
 
-  @Override public synchronized boolean loadChunk(Mutable<ChunkData> chunkData, int yMin, int yMax) {
-    return false;
-  }
+  @Override public synchronized void loadChunk(Mutable<ChunkData> chunkData, int yMin, int yMax) { }
 
   @Override public String toString() {
     return "Chunk: [empty]";

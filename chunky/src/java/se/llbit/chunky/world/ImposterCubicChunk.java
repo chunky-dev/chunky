@@ -51,12 +51,11 @@ public class ImposterCubicChunk extends Chunk {
   /**
    * Parse the chunk from the region file and render the current
    * layer, surface and cave maps.
-   * @return whether the input chunkdata was modified
    */
   @Override
-  public synchronized boolean loadChunk(@NotNull Mutable<ChunkData> mutableChunkData, int yMin, int yMax) {
+  public synchronized void loadChunk(@NotNull Mutable<ChunkData> mutableChunkData, int yMin, int yMax) {
     if (!shouldReloadChunk()) {
-      return false;
+      return;
     }
 
     Set<String> request = new HashSet<>();
@@ -66,7 +65,7 @@ public class ImposterCubicChunk extends Chunk {
     Map<Integer, Map<String, Tag>> data = getCubeTags(request);
     // TODO: improve error handling here.
     if (data == null) {
-      return false;
+      return;
     }
 
     surfaceTimestamp = dataTimestamp;
@@ -83,7 +82,7 @@ public class ImposterCubicChunk extends Chunk {
 //      loadBiomes(data, chunkData);
 //    }
     world.chunkUpdated(position);
-    return true;
+    return;
   }
 
   private void loadSurfaceCubic(Map<Integer, Map<String, Tag>> data, ChunkData chunkData, int yMin, int yMax) {

@@ -378,6 +378,15 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
     return selectedChunksByRegionPosition;
   }
 
+  public static Map<ChunkPosition, List<ChunkPosition>> selectionByRegion(Collection<ChunkPosition> chunkPositions) {
+    Map<ChunkPosition, List<ChunkPosition>> selectedChunksByRegionPosition = new Object2ReferenceOpenHashMap<>();
+    chunkPositions.forEach(chunkPosition ->
+      selectedChunksByRegionPosition.computeIfAbsent(ChunkPosition.get(chunkPosition.x >> 5, chunkPosition.z >> 5), r -> new ArrayList<>())
+        .add(chunkPosition));
+    return selectedChunksByRegionPosition;
+  }
+
+
   /**
    * @return The number of selected chunks
    */

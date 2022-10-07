@@ -73,6 +73,8 @@ public class Chunk {
   /** Chunk depth. */
   public static final int Z_MAX = 16;
 
+  public static final int LOG2_DIAMETER_IN_BLOCKS = QuickMath.log2(X_MAX);
+
   public static final int SECTION_Y_MAX = 16;
   public static final int SECTION_BYTES = X_MAX * SECTION_Y_MAX * Z_MAX;
   public static final int SECTION_HALF_NIBBLES = SECTION_BYTES / 2;
@@ -138,11 +140,10 @@ public class Chunk {
   /**
    * Parse the chunk from the region file and render the current
    * layer, surface and cave maps.
-   * @return whether the input chunkdata was modified
    */
-  public synchronized boolean loadChunk(@NotNull Mutable<ChunkData> chunkData, int yMin, int yMax) {
+  public synchronized void loadChunk(@NotNull Mutable<ChunkData> chunkData, int yMin, int yMax) {
     if (!shouldReloadChunk()) {
-      return false;
+      return;
     }
 
     Set<String> request = new HashSet<>();
@@ -158,11 +159,11 @@ public class Chunk {
       dataMap = getChunkTags(request);
     } catch (ChunkLoadingException e) { // we don't want to crash the map view if a chunk fails to load, so we warn the user
       Log.warn(String.format("Failed to load chunk %s", position), e);
-      return false;
+      return;
     }
     // TODO: improve error handling here.
     if (dataMap == null) {
-      return false;
+      return;
     }
     Tag data = tagFromMap(dataMap);
 
@@ -173,7 +174,6 @@ public class Chunk {
     biomesTimestamp = dataTimestamp;
 
     world.chunkUpdated(position);
-    return true;
   }
 
   private void loadSurface(@NotNull Tag data, ChunkData chunkData, int yMin, int yMax) {
@@ -449,12 +449,8 @@ public class Chunk {
     }
     Tag data = tagFromMap(dataMap);
 
-    if(reuseChunkData.get() == null || reuseChunkData.get() instanceof EmptyChunkData) {
-      reuseChunkData.set(world.createChunkData(reuseChunkData.get(), data.get(DATAVERSION).intValue()));
-    } else {
-      reuseChunkData.get().clear();
-    }
-    ChunkData chunkData = reuseChunkData.get(); //unwrap mutable, for ease of use
+    ChunkData chunkData = world.createChunkData(reuseChunkData.get(), data.get(DATAVERSION).intValue());
+    reuseChunkData.set(chunkData);
 
     version = chunkVersion(data);
     Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);

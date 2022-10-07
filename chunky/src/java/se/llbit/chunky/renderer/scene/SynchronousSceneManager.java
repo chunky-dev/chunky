@@ -28,7 +28,8 @@ import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.BiConsumer;
@@ -256,10 +257,10 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     onSceneLoaded.run();
   }
 
-  @Override public void loadFreshChunks(World world, Collection<ChunkPosition> chunksToLoad) {
+  @Override public void loadFreshChunks(World world, Map<ChunkPosition, List<ChunkPosition>> chunksToLoadByRegion) {
     synchronized (scene) {
       scene.clear();
-      scene.loadChunks(taskTracker, world, chunksToLoad);
+      scene.loadChunks(taskTracker, world, chunksToLoadByRegion);
       scene.resetScene(null, context.getChunky().getSceneFactory());
       context.setSceneDirectory(new File(context.getChunky().options.sceneDir, scene.name));
       scene.refresh();
@@ -269,10 +270,10 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     onSceneLoaded.run();
   }
 
-  @Override public void loadChunks(World world, Collection<ChunkPosition> chunksToLoad) {
+  @Override public void loadChunks(World world, Map<ChunkPosition, List<ChunkPosition>> chunksToLoadByRegion) {
     synchronized (scene) {
       int prevChunkCount = scene.numberOfChunks();
-      scene.loadChunks(taskTracker, world, chunksToLoad);
+      scene.loadChunks(taskTracker, world, chunksToLoadByRegion);
       if (prevChunkCount == 0) {
         scene.moveCameraToCenter();
       }
