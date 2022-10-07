@@ -144,7 +144,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
                           }
                         } else if (blockStates.get("multipart").isArray()) {
                           BlockVariantMultipart multipartBlockVariant =
-                            new BlockVariantMultipart(blockName);
+                            new BlockVariantMultipart(fqBlockName);
                           for (JsonValue part : blockStates.get("multipart").array()) {
                             JsonObject blockDefinition =
                               part.object().get("apply").isArray()
