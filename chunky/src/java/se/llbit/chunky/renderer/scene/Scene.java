@@ -846,6 +846,11 @@ public class Scene implements JsonSerializable, Refreshable {
     refresh();
   }
 
+  @PluginApi
+  public synchronized void loadChunks(TaskTracker taskTracker, World world, Collection<ChunkPosition> chunksToLoadByRegion) {
+    loadChunks(taskTracker, world, ChunkSelectionTracker.selectionByRegion(chunksToLoadByRegion));
+  }
+
   /**
    * Load chunks into the octree.
    *
