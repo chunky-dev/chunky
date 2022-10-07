@@ -283,16 +283,18 @@ public class World implements Comparable<World> {
 
   /**
    * Returns a ChunkData instance that is compatible with the given chunk version.
-   * The provided ChunkData instance may or may not be re-used.
+   * The provided ChunkData instance may or may not be re-used. If reused it will be cleared
    */
   public ChunkData createChunkData(@Nullable ChunkData chunkData, int chunkVersion) {
     if(chunkVersion >= World.VERSION_21W06A) {
       if(chunkData instanceof GenericChunkData) {
+        chunkData.clear();
         return chunkData;
       }
       return new GenericChunkData();
     } else {
       if(chunkData instanceof SimpleChunkData) {
+        chunkData.clear();
         return chunkData;
       }
       return new SimpleChunkData();
