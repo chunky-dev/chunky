@@ -1054,7 +1054,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
           return true;
         }
       }
-      return true;
+      return false;
     }
 
     @Override
