@@ -54,6 +54,7 @@ import se.llbit.json.*;
 import se.llbit.log.Log;
 import se.llbit.math.*;
 import se.llbit.math.bvh.BVH;
+import se.llbit.math.collections.OffsetArray;
 import se.llbit.math.structures.Position2IntStructure;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
@@ -74,7 +75,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -882,7 +882,7 @@ public class Scene implements JsonSerializable, Refreshable {
         return;
       }
 
-      int requiredDepth = calculateOctreeOrigin(chunksToLoadByRegion, false);
+      int requiredDepth = calculateOctreeOrigin(chunksToLoadByRegion.keySet(), false);
 
       // Create new octree to fit all chunks.
       palette = new BlockPalette();
@@ -992,6 +992,24 @@ public class Scene implements JsonSerializable, Refreshable {
         }
         loadedRegions.add(regionPosition);
 
+        //There is one sub-octree per MCRegion.DIAMETER_IN_BLOCKS vertically, we store them and some data about them to be merged once this entire region has been loaded
+        OffsetArray<ObjectObjectImmutablePair<Octree, OctreeOriginOffsetDepth>> regionWorldOctrees =
+          new OffsetArray<>(((yMax - 1 + yMin) >> MCRegion.LOG2_DIAMETER_IN_BLOCKS) + 1, yMin >> MCRegion.LOG2_DIAMETER_IN_BLOCKS);
+        OffsetArray<ObjectObjectImmutablePair<Octree, OctreeOriginOffsetDepth>> regionWaterOctrees =
+          new OffsetArray<>(((yMax - 1 + yMin) >> MCRegion.LOG2_DIAMETER_IN_BLOCKS) + 1, yMin >> MCRegion.LOG2_DIAMETER_IN_BLOCKS);
+
+        for (int regionY = regionWorldOctrees.min(); regionY < regionWorldOctrees.max(); regionY++) {
+          OctreeOriginOffsetDepth subOctreeData = calculateSubOctreeDepthOffset(chunksToLoadByRegion.get(regionPosition),
+            Math.max(yMin, regionY << MCRegion.LOG2_DIAMETER_IN_BLOCKS),
+            Math.min(yMax, (regionY + 1) << MCRegion.LOG2_DIAMETER_IN_BLOCKS)
+          );
+          int depth = subOctreeData.depth;
+          assert depth <= worldOctree.getDepth();
+
+          regionWorldOctrees.set(regionY, new ObjectObjectImmutablePair<>(new Octree(octreeImplementation, depth), subOctreeData));
+          regionWaterOctrees.set(regionY, new ObjectObjectImmutablePair<>(new Octree(octreeImplementation, depth), subOctreeData));
+        }
+
         List<ObjectObjectImmutablePair<ChunkPosition, ChunkData>> chunkDataPairs;
         { // Get this data from active future, schedule next future
           try {
@@ -1018,11 +1036,24 @@ public class Scene implements JsonSerializable, Refreshable {
             chunkDataPair.first(), chunkDataPair.right(), world,
             loadedChunks, legacyChunks, nonEmptyChunks,
             use3dBiomes, biomePaletteIdxStructure,
+            regionWorldOctrees, regionWaterOctrees,
             cubeWorldBlocks, cubeWaterBlocks
           );
           if (chunkLoaded) {
             numChunks++;
           }
+        }
+
+        for (int regionY = regionWorldOctrees.min(); regionY < regionWorldOctrees.max(); regionY++) {
+          ObjectObjectImmutablePair<Octree, OctreeOriginOffsetDepth> worldOctreePair = regionWorldOctrees.get(regionY);
+          ObjectObjectImmutablePair<Octree, OctreeOriginOffsetDepth> waterOctreePair = regionWaterOctrees.get(regionY);
+
+          int x = (regionPosition.x << MCRegion.LOG2_DIAMETER_IN_BLOCKS) + worldOctreePair.second().offset.x;
+          int y = (regionY << MCRegion.LOG2_DIAMETER_IN_BLOCKS) + worldOctreePair.second().offset.y;
+          int z = (regionPosition.z << MCRegion.LOG2_DIAMETER_IN_BLOCKS) + worldOctreePair.second().offset.z;
+
+          this.worldOctree.insertSubTree(x - origin.x, y - origin.y, z - origin.z, worldOctreePair.first().getImplementation());
+          this.waterOctree.insertSubTree(x - origin.x, y - origin.y, z - origin.z, waterOctreePair.first().getImplementation());
         }
       }
       executor.shutdown();
@@ -1239,6 +1270,8 @@ public class Scene implements JsonSerializable, Refreshable {
   private boolean loadChunk(ChunkPosition cp, ChunkData chunkData, World world,
                             Collection<ChunkPosition> loadedChunks, Collection<ChunkPosition> legacyChunks, Collection<ChunkPosition> nonEmptyChunks,
                             boolean use3dBiomes, Position2IntStructure biomePaletteIdxStructure,
+                            OffsetArray<ObjectObjectImmutablePair<Octree, OctreeOriginOffsetDepth>> regionWorldOctrees,
+                            OffsetArray<ObjectObjectImmutablePair<Octree, OctreeOriginOffsetDepth>> regionWaterOctrees,
                             int[] cubeWorldBlocks, int[] cubeWaterBlocks) {
     if (loadedChunks.contains(cp)) {
       return false;
@@ -1500,8 +1533,21 @@ public class Scene implements JsonSerializable, Refreshable {
           }
         }
       }
-      worldOctree.setCube(4, cubeWorldBlocks, cp.x * 16 - origin.x, yCube * 16 - origin.y, cp.z * 16 - origin.z);
-      waterOctree.setCube(4, cubeWaterBlocks, cp.x * 16 - origin.x, yCube * 16 - origin.y, cp.z * 16 - origin.z);
+
+      ObjectObjectImmutablePair<Octree, OctreeOriginOffsetDepth> worldOctreePair = regionWorldOctrees.get(yCube >> MCRegion.LOG2_DIAMETER_IN_CHUNKS);
+      ObjectObjectImmutablePair<Octree, OctreeOriginOffsetDepth> waterOctreePair = regionWaterOctrees.get(yCube >> MCRegion.LOG2_DIAMETER_IN_CHUNKS);
+
+      // The blocks must be set within this sub-region octree, so we mask off the positions
+      int worldOctreeLocalMask = (1 << worldOctreePair.second().depth) - 1;
+      worldOctreePair.first().setCube(4, cubeWorldBlocks,
+        (cp.x * 16) & worldOctreeLocalMask,
+        (yCube * 16) & worldOctreeLocalMask,
+        (cp.z * 16) & worldOctreeLocalMask);
+      int waterOctreeLocalMask = (1 << waterOctreePair.second().depth) - 1;
+      waterOctreePair.first().setCube(4, cubeWaterBlocks,
+        (cp.x * 16) & waterOctreeLocalMask,
+        (yCube * 16) & waterOctreeLocalMask,
+        (cp.z * 16) & waterOctreeLocalMask);
     }
 
     // Block entities are also called "tile entities". These are extra bits of metadata
@@ -1525,8 +1571,14 @@ public class Scene implements JsonSerializable, Refreshable {
             int id = palette.put(newTag);
             block = palette.get(id);
             chunkData.setBlockAt(x, y, z, id);
-            worldOctree.set(id, cp.x * 16 + x - origin.x, y - origin.y, cp.z * 16 + z - origin.z);
-          }
+            ObjectObjectImmutablePair<Octree, OctreeOriginOffsetDepth> octreePair = regionWorldOctrees.get(y >> MCRegion.LOG2_DIAMETER_IN_BLOCKS);
+            // The blocks must be set within this sub-region octree, so we mask off the positions
+            int subOctreeLocalMask = (1 << octreePair.second().depth) - 1;
+            octreePair.first().set(id,
+              (cp.x * 16 + x) & subOctreeLocalMask,
+              (y) & subOctreeLocalMask,
+              (cp.z * 16 + z) & subOctreeLocalMask
+            );          }
         }
         if (block.isBlockEntity()) {
           Entity blockEntity = block.toBlockEntity(position, entityTag);
@@ -1610,47 +1662,121 @@ public class Scene implements JsonSerializable, Refreshable {
     refresh();
   }
 
-  private int calculateOctreeOrigin(Map<ChunkPosition, List<ChunkPosition>> chunksToLoadByRegion, boolean centerOctree) {
-    int xmin = Integer.MAX_VALUE;
-    int xmax = Integer.MIN_VALUE;
-    int zmin = Integer.MAX_VALUE;
-    int zmax = Integer.MIN_VALUE;
-    for (List<ChunkPosition> chunkPositions : chunksToLoadByRegion.values()) {
-      for (ChunkPosition cp : chunkPositions) {
-        if (cp.x < xmin) {
-          xmin = cp.x;
-        }
-        if (cp.x > xmax) {
-          xmax = cp.x;
-        }
-        if (cp.z < zmin) {
-          zmin = cp.z;
-        }
-        if (cp.z > zmax) {
-          zmax = cp.z;
-        }
+  private static AABBi getExtentsFromPositions(Collection<ChunkPosition> positions, int yMin, int yMax) {
+    int xMin = Integer.MAX_VALUE;
+    int xMax = Integer.MIN_VALUE;
+    int zMin = Integer.MAX_VALUE;
+    int zMax = Integer.MIN_VALUE;
+    for (ChunkPosition pos : positions) {
+      if (pos.x < xMin) {
+        xMin = pos.x;
+      }
+      if (pos.x > xMax) {
+        xMax = pos.x;
+      }
+      if (pos.z < zMin) {
+        zMin = pos.z;
+      }
+      if (pos.z > zMax) {
+        zMax = pos.z;
       }
     }
 
-    xmax += 1;
-    zmax += 1;
-    xmin *= 16;
-    xmax *= 16;
-    zmin *= 16;
-    zmax *= 16;
+    xMax += 1; //upper bounds are exclusive
+    zMax += 1;
+    xMin <<= Chunk.LOG2_DIAMETER_IN_BLOCKS;
+    xMax <<= Chunk.LOG2_DIAMETER_IN_BLOCKS;
+    zMin <<= Chunk.LOG2_DIAMETER_IN_BLOCKS;
+    zMax <<= Chunk.LOG2_DIAMETER_IN_BLOCKS;
 
-    int maxDimension = Math.max(yMax - yMin, Math.max(xmax - xmin, zmax - zmin));
+    return new AABBi(xMin, xMax, yMin, yMax, zMin, zMax);
+  }
+
+  /**
+   * Calculates the depth a sub-region octree should use given input extents
+   */
+  private static int calculateSubOctreeDepth(AABBi extents) {
+    //max coordinates are exclusive, and need to be inclusive here.
+    extents.xMax -= 1;
+    extents.yMax -= 1;
+    extents.zMax -= 1;
+
+    //check if coordinates fit within the depth, going down until they don't anymore
+    int depth = MCRegion.LOG2_DIAMETER_IN_BLOCKS;
+    for (; depth > 0; depth--) {
+      int mask = (1 << depth) - 1;
+      extents.xMin &= mask;
+      extents.yMin &= mask;
+      extents.zMin &= mask;
+      extents.xMax &= mask;
+      extents.yMax &= mask;
+      extents.zMax &= mask;
+
+      int shift = depth - 1;
+      if (extents.xMin >> shift != extents.xMax >> shift ||
+        extents.yMin >> shift != extents.yMax >> shift ||
+        extents.zMin >> shift != extents.zMax >> shift) {
+        break;
+      }
+    }
+    return depth;
+  }
+
+  private static final class OctreeOriginOffsetDepth {
+    final Vector3i offset;
+    final int depth;
+    public OctreeOriginOffsetDepth(Vector3i offset, int depth) {
+      this.offset = offset;
+      this.depth = depth;
+    }
+  }
+
+  /**
+   * Calculates the depth and offset a sub-region octree should use given the chunks to load, and the min and max Y positions
+   */
+  private static OctreeOriginOffsetDepth calculateSubOctreeDepthOffset(List<ChunkPosition> chunksToLoad, int yMin, int yMax) {
+    AABBi subSelectionExtents = getExtentsFromPositions(chunksToLoad, yMin, yMax);
+
+    int requiredDepth = calculateSubOctreeDepth(new AABBi(subSelectionExtents));
+
+    Vector3i subOctreeOffset;
+    Vector3i blockOffset;
+    assert !(requiredDepth > MCRegion.LOG2_DIAMETER_IN_BLOCKS);
+    if(requiredDepth >= MCRegion.LOG2_DIAMETER_IN_BLOCKS) {
+      // The sub-octree takes up the entire region slice, so no offset
+      subOctreeOffset = new Vector3i(0, 0, 0);
+      blockOffset = new Vector3i(0, 0, 0);
+    } else {
+      // The sub-octree doesn't take up the entire region slice, so we align it with the node it replaces in the global octree
+      subOctreeOffset = new Vector3i(
+        Math.abs(subSelectionExtents.xMin & ~((1 << requiredDepth) - 1)),
+        Math.abs(subSelectionExtents.yMin & ~((1 << requiredDepth) - 1)),
+        Math.abs(subSelectionExtents.zMin & ~((1 << requiredDepth) - 1))
+      );
+    }
+
+    return new OctreeOriginOffsetDepth(subOctreeOffset, requiredDepth);
+  }
+
+  /**
+   * Calculates the origin and depth for the global octree (modifies {@link Scene#origin})
+   */
+  private int calculateOctreeOrigin(Collection<ChunkPosition> regionPositions, boolean centerOctree) {
+    AABBi selectionExtents = getExtentsFromPositions(regionPositions, yMin, yMax);
+    selectionExtents.lShiftXZ(5); //coordinates are required in block position
+
+    int maxDimension = Math.max(selectionExtents.yMax - selectionExtents.yMin, Math.max(selectionExtents.xMax - selectionExtents.xMin, selectionExtents.zMax - selectionExtents.zMin));
     int requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
 
     if(centerOctree) {
-      int xroom = (1 << requiredDepth) - (xmax - xmin);
-      int yroom = (1 << requiredDepth) - (yMax - yMin);
-      int zroom = (1 << requiredDepth) - (zmax - zmin);
+      int xroom = (1 << requiredDepth) - (selectionExtents.xMax - selectionExtents.xMin);
+      int yroom = (1 << requiredDepth) - (selectionExtents.yMax - selectionExtents.yMin);
+      int zroom = (1 << requiredDepth) - (selectionExtents.zMax - selectionExtents.zMin);
 
-      origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
+      origin.set(selectionExtents.xMin - xroom / 2, -yroom / 2, selectionExtents.zMin - zroom / 2);
     } else {
       // Note: Math.floorDiv rather than integer division for round toward -infinity
-      origin.set(xmin, Math.floorDiv(yMin, 16) * 16, zmin);
+      origin.set(selectionExtents.xMin, Math.floorDiv(selectionExtents.yMin, 16) * 16, selectionExtents.zMin);
     }
     return requiredDepth;
   }
@@ -2345,7 +2471,7 @@ public class Scene implements JsonSerializable, Refreshable {
         palette = data.palette;
         palette.applyMaterials();
         Log.info("Octree loaded");
-        calculateOctreeOrigin(chunksToLoadByRegion, data.version < 6);
+        calculateOctreeOrigin(chunksToLoadByRegion.keySet(), data.version < 6);
         camera.setWorldSize(1 << worldOctree.getDepth());
 
         try (TaskTracker.Task bvhTask = taskTracker.task("(2/3) Building world BVH")) {

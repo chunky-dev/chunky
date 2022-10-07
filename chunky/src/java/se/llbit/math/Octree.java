@@ -103,6 +103,11 @@ public class Octree {
         }
       }
     }
+
+    default boolean supportsSubTreeInsertion() {
+      return false;
+    }
+    default void insertSubTree(int x, int y, int z, OctreeImplementation subTree) { }
   }
 
   public interface NodeId {}
@@ -767,6 +772,14 @@ public class Octree {
 
   public void setCube(int cubeDepth, int[] types, int x, int y, int z) {
     implementation.setCube(cubeDepth, types, x, y, z);
+  }
+
+  public boolean supportsSubtreeInsertion() {
+    return implementation.supportsSubTreeInsertion();
+  }
+
+  public void insertSubTree(int x, int y, int z, OctreeImplementation subTree) {
+    implementation.insertSubTree(x, y, z, subTree);
   }
 
   /**

@@ -17,11 +17,8 @@
 package se.llbit.math;
 
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
-import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
-import org.apache.commons.math3.util.Pair;
 import se.llbit.chunky.block.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.world.Material;
 
 import java.io.DataInputStream;
@@ -499,6 +496,49 @@ public class PackedOctree implements Octree.OctreeImplementation {
         break;
       }
     }
+  }
+
+  @Override
+  public void insertSubTree(int x, int y, int z, OctreeImplementation subTree) {
+    int treeDepth = subTree.getDepth();
+    assert treeDepth <= this.depth;
+    PackedOctree other = (PackedOctree) subTree;
+
+    int[] otherData = other.treeData;
+
+    int nodeIndex = 0; // start at root
+
+    // Walk down the tree until the place to insert similar to `set`
+    for(int i = this.depth - 1; i >= treeDepth; --i) {
+      if(treeData[nodeIndex] <= 0) { // It's a leaf node
+        subdivideNode(nodeIndex);
+      }
+
+      // Determine index of child (to go to next)
+      int xbit = 1 & (x >> i);
+      int ybit = 1 & (y >> i);
+      int zbit = 1 & (z >> i);
+      nodeIndex = treeData[nodeIndex] + ((xbit << 2) | (ybit << 1) | zbit);
+    }
+    freeSubTree(nodeIndex);
+
+    int value = insertSubTreeData(0, otherData);
+    treeData[nodeIndex] = value;
+  }
+
+  private int insertSubTreeData(int startIdx, int[] otherTreeData) {
+    int otherTreeDatum = otherTreeData[startIdx];
+    if(otherTreeDatum <= 0) {
+      return otherTreeDatum;
+    }
+
+    int childrenIdx = findSpace();
+    for(int i = 0; i < 8; ++i) {
+      int value = insertSubTreeData(otherTreeDatum + i, otherTreeData);
+      treeData[childrenIdx+i] = value;
+    }
+
+    return childrenIdx;
   }
 
   /**

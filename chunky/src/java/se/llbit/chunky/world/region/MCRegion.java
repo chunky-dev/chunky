@@ -26,6 +26,7 @@ import java.util.zip.InflaterInputStream;
 import se.llbit.chunky.chunk.ChunkLoadingException;
 import se.llbit.chunky.world.*;
 import se.llbit.log.Log;
+import se.llbit.math.QuickMath;
 import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
@@ -54,6 +55,12 @@ public class MCRegion implements Region {
   public static final int CHUNKS_Z = 32;
 
   private static final int NUM_CHUNKS = CHUNKS_X * CHUNKS_Z;
+
+  public static final int DIAMETER_IN_CHUNKS = 32;
+  public static final int DIAMETER_IN_BLOCKS = DIAMETER_IN_CHUNKS * Chunk.X_MAX;
+
+  public static final int LOG2_DIAMETER_IN_CHUNKS = QuickMath.log2(DIAMETER_IN_CHUNKS);
+  public static final int LOG2_DIAMETER_IN_BLOCKS = QuickMath.log2(DIAMETER_IN_BLOCKS);
 
   /**
    * Sector size in bytes.

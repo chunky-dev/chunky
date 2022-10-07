@@ -73,6 +73,8 @@ public class Chunk {
   /** Chunk depth. */
   public static final int Z_MAX = 16;
 
+  public static final int LOG2_DIAMETER_IN_BLOCKS = QuickMath.log2(X_MAX);
+
   public static final int SECTION_Y_MAX = 16;
   public static final int SECTION_BYTES = X_MAX * SECTION_Y_MAX * Z_MAX;
   public static final int SECTION_HALF_NIBBLES = SECTION_BYTES / 2;
