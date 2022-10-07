@@ -49,6 +49,7 @@ import se.llbit.chunky.world.biome.ArrayBiomePalette;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.biome.Biomes;
+import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.json.*;
 import se.llbit.log.Log;
 import se.llbit.math.*;
@@ -71,6 +72,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
@@ -956,22 +958,26 @@ public class Scene implements JsonSerializable, Refreshable {
       int[] cubeWaterBlocks = new int[16*16*16];
 
       ExecutorService executor = Executors.newSingleThreadExecutor();
-      Function<ChunkPosition, Future<List<ObjectObjectImmutablePair<ChunkPosition, ChunkData>>>> createRegionDataFuture = (regionPosition) -> {
-        return executor.submit(() -> {
-          List<ChunkPosition> chunkPositionsToLoad = chunksToLoadByRegion.get(regionPosition);
-          List<ObjectObjectImmutablePair<ChunkPosition, ChunkData>> chunkDataPairs = new ArrayList<>();
 
-          for (ChunkPosition chunkPosition : chunkPositionsToLoad) {
-            Mutable<ChunkData> reuseChunkData = new Mutable<>(null);
-            world.getChunk(chunkPosition).getChunkData(reuseChunkData, palette, biomePalette, yMin, yMax);
-            chunkDataPairs.add(new ObjectObjectImmutablePair<>(chunkPosition, reuseChunkData.get()));
-          }
-          return chunkDataPairs;
-        });
-      };
+      ChunkData[] regionParsingDataArray = new ChunkData[MCRegion.CHUNKS_X * MCRegion.CHUNKS_Z];
+      ChunkData[] chunkLoadingDataArray = new ChunkData[MCRegion.CHUNKS_X * MCRegion.CHUNKS_Z];
+
+      BiFunction<ChunkPosition, ChunkData[], Future<List<ObjectObjectImmutablePair<ChunkPosition, ChunkData>>>> createRegionDataFuture = (regionPosition, chunkDataArray) -> executor.submit(() -> {
+        List<ChunkPosition> chunkPositionsToLoad = chunksToLoadByRegion.get(regionPosition);
+        List<ObjectObjectImmutablePair<ChunkPosition, ChunkData>> chunkDataPairs = new ArrayList<>();
+
+        for (int i = 0, chunkPositionsToLoadSize = chunkPositionsToLoad.size(); i < chunkPositionsToLoadSize; i++) {
+          ChunkPosition chunkPosition = chunkPositionsToLoad.get(i);
+          Mutable<ChunkData> chunkData = new Mutable<>(chunkDataArray[i]);
+          world.getChunk(chunkPosition).getChunkData(chunkData, palette, biomePalette, yMin, yMax);
+          chunkDataArray[i] = chunkData.get();
+          chunkDataPairs.add(new ObjectObjectImmutablePair<>(chunkPosition, chunkData.get()));
+        }
+        return chunkDataPairs;
+      });
 
       //Initialise first chunk data for the for loop
-      Future<List<ObjectObjectImmutablePair<ChunkPosition, ChunkData>>> nextRegionFuture = createRegionDataFuture.apply(regionPositions[0]);
+      Future<List<ObjectObjectImmutablePair<ChunkPosition, ChunkData>>> nextRegionFuture = createRegionDataFuture.apply(regionPositions[0], regionParsingDataArray);
 
       for (int i = 0; i < regionPositions.length; i++) {
         ChunkPosition regionPosition = regionPositions[i];
@@ -985,12 +991,17 @@ public class Scene implements JsonSerializable, Refreshable {
         { // Get this data from active future, schedule next future
           try {
             chunkDataPairs = nextRegionFuture.get();
+
+            //swap the arrays
+            ChunkData[] temp = regionParsingDataArray;
+            regionParsingDataArray = chunkLoadingDataArray;
+            chunkLoadingDataArray = temp;
           } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e.getCause());
           }
 
           if (i + 1 < regionPositions.length) {
-            nextRegionFuture = createRegionDataFuture.apply(regionPositions[i + 1]);
+            nextRegionFuture = createRegionDataFuture.apply(regionPositions[i + 1], regionParsingDataArray);
           }
         }
 
