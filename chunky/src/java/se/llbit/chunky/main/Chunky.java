@@ -108,7 +108,7 @@ public class Chunky {
 
   public Chunky(ChunkyOptions options) {
     this.options = options;
-    // registerBlockProvider(new MinecraftBlockProvider());
+    registerBlockProvider(new MinecraftBlockProvider());
     // registerBlockProvider(new LegacyMinecraftBlockProvider());
     registerBlockProvider(new ResourcepackBlockProvider());
   }
