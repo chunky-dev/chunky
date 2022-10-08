@@ -215,8 +215,16 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
   @Override
   public Block getBlockByTag(String name, Tag tag) {
-    BlockVariants variants = blocks.get(name);
-    return variants != null ? variants.getBlock(tag) : null;
+    switch (name) {
+      case "minecraft:water":
+      case "minecraft:water$chunky":
+      case "minecraft:lava":
+      case "minecraft:lava$chunky":
+        return null;
+      default:
+        BlockVariants variants = blocks.get(name);
+        return variants != null ? variants.getBlock(tag) : null;
+    }
   }
 
   @Override
