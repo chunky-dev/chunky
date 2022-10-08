@@ -1256,8 +1256,8 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new Tint[] { new Tint(0x80a755) };
       case "minecraft:lily_pad":
         return new Tint[] { new Tint(0x208030) };
-      // case "minecraft:redstone_wire":
-        // TODO return new Tint[] { Tint.REDSTONE_WIRE };
+      case "minecraft:redstone_wire":
+        return new Tint[] { Tint.REDSTONE_WIRE };
       case "minecraft:grass_block":
       case "minecraft:grass":
       case "minecraft:tall_grass":
@@ -1271,7 +1271,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     }
   }
 
-    @Override
+  @Override
   public Collection<String> getSupportedBlocks() {
     List<String> names = new ArrayList<>(blockList.length + blocks.size());
     names.addAll(Arrays.asList(blockList));

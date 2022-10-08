@@ -24,6 +24,7 @@ public class Tint {
   public static final Tint BIOME_DRY_FOLIAGE = new Tint(TintType.BIOME_DRY_FOLIAGE);
   public static final Tint BIOME_GRASS = new Tint(TintType.BIOME_GRASS);
   public static final Tint BIOME_WATER = new Tint(TintType.BIOME_WATER);
+  public static final Tint REDSTONE_WIRE = new Tint(TintType.NONE);
 
   public final TintType type;
   public final float[] tint;
