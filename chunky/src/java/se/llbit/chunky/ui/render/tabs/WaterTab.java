@@ -169,9 +169,9 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       }
     });
 
-    waterWorldModeDetailsPane.visibleProperty().set(waterPlaneEnabled.isSelected());
-    waterWorldModeDetailsPane.expandedProperty().set(waterPlaneEnabled.isSelected());
-    waterWorldModeDetailsPane.managedProperty().set(waterPlaneEnabled.isSelected());
+    waterWorldModeDetailsPane.setVisible(waterPlaneEnabled.isSelected());
+    waterWorldModeDetailsPane.setExpanded(waterPlaneEnabled.isSelected());
+    waterWorldModeDetailsPane.setManaged(waterPlaneEnabled.isSelected());
 
     waterPlaneEnabled.setTooltip(
       new Tooltip("If enabled, an infinite ocean fills the scene. This ignores air from loaded chunks."));
@@ -196,9 +196,9 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       scene.setWaterPlaneChunkClip(newValue)
     );
 
-    proceduralWaterDetailsPane.visibleProperty().set(useProceduralWater.isSelected());
-    proceduralWaterDetailsPane.expandedProperty().set(useProceduralWater.isSelected());
-    proceduralWaterDetailsPane.managedProperty().set(useProceduralWater.isSelected());
+    proceduralWaterDetailsPane.setVisible(useProceduralWater.isSelected());
+    proceduralWaterDetailsPane.setExpanded(useProceduralWater.isSelected());
+    proceduralWaterDetailsPane.setManaged(useProceduralWater.isSelected());
 
     useProceduralWater.setTooltip(new Tooltip("Generate customized water waves using noise to prevent tiling at large distances."));
     useProceduralWater.selectedProperty().addListener((observable, oldValue, newValue) -> {
