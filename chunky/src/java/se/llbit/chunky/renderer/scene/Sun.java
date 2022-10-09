@@ -137,9 +137,9 @@ public class Sun implements JsonSerializable {
 
   protected final Vector3 emittance = new Vector3(1, 1, 1);
 
-  private double pE = FastMath.pow(DEFAULT_INTENSITY, Scene.DEFAULT_GAMMA);
+  private static final double pE = FastMath.pow(DEFAULT_INTENSITY, Scene.DEFAULT_GAMMA);
 
-  protected final Vector3 previewEmittance = new Vector3(pE, pE, pE);
+  protected static final Vector3 previewEmittance = new Vector3(pE, pE, pE);
 
   // final to ensure that we don't do a lot of redundant re-allocation
   private final Vector3 color = new Vector3(1, 1, 1);
