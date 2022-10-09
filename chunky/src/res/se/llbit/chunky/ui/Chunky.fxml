@@ -21,8 +21,40 @@
       <SeparatorMenuItem/>
       <MenuItem fx:id="menuExit" mnemonicParsing="false" text="Quit"/>
     </Menu>
+    <Menu mnemonicParsing="false" text="Map">
+      <MenuItem fx:id="newScene" mnemonicParsing="false" text="New scene from selection"/>
+      <MenuItem fx:id="loadSelection" mnemonicParsing="false" text="Load selected chunks"/>
+      <MenuItem fx:id="clearSelection" mnemonicParsing="false" text="Clear selection"/>
+      <SeparatorMenuItem/>
+      <MenuItem fx:id="selectVisible" mnemonicParsing="false" text="Select camera-visible chunks"/>
+      <SeparatorMenuItem/>
+      <MenuItem fx:id="exportZip" mnemonicParsing="false" text="Export selected chunks…"/>
+      <MenuItem fx:id="exportPng" mnemonicParsing="false" text="Save map view as…"/>
+      <SeparatorMenuItem/>
+      <MenuItem fx:id="deleteChunks" mnemonicParsing="false" text="Delete selected chunks"/>
+    </Menu>
+    <Menu mnemonicParsing="false" text="Render Preview">
+      <CheckMenuItem fx:id="showGuides" mnemonicParsing="false" text="Show guides"/>
+      <Menu mnemonicParsing="false" text="Canvas scale">
+        <fx:define>
+          <ToggleGroup fx:id="scaleGroup" />
+        </fx:define>
+        <RadioMenuItem fx:id="percent25" toggleGroup="$scaleGroup" mnemonicParsing="false" text="25%"/>
+        <RadioMenuItem fx:id="percent50" toggleGroup="$scaleGroup" mnemonicParsing="false" text="50%"/>
+        <RadioMenuItem fx:id="percent75" toggleGroup="$scaleGroup" mnemonicParsing="false" text="75%"/>
+        <RadioMenuItem fx:id="percent100" toggleGroup="$scaleGroup" mnemonicParsing="false" text="100%"/>
+        <RadioMenuItem fx:id="percent150" toggleGroup="$scaleGroup" mnemonicParsing="false" text="150%"/>
+        <RadioMenuItem fx:id="percent200" toggleGroup="$scaleGroup" mnemonicParsing="false" text="200%"/>
+        <RadioMenuItem fx:id="percent300" toggleGroup="$scaleGroup" mnemonicParsing="false" text="300%"/>
+        <RadioMenuItem fx:id="percent400" toggleGroup="$scaleGroup" mnemonicParsing="false" text="400%"/>
+        <RadioMenuItem fx:id="fit" toggleGroup="$scaleGroup" mnemonicParsing="false" text="Fit to screen"/>
+      </Menu>
+      <SeparatorMenuItem/>
+      <MenuItem fx:id="saveCurrentFrame" mnemonicParsing="false" text="Save image as…"/>
+      <MenuItem fx:id="copyFrame" mnemonicParsing="false" text="Copy image to clipboard"/>
+    </Menu>
     <Menu mnemonicParsing="false" text="Help">
-      <HyperlinkMenuItem link="https://chunky-dev.github.io/docs" text="Chunky Manual"/>
+      <HyperlinkMenuItem link="https://chunky-dev.github.io/docs/" text="Chunky Manual"/>
       <HyperlinkMenuItem link="https://jackjt8.github.io/ChunkyGuide/" text="jackjt8's Guide to Chunky"/>
       <SeparatorMenuItem/>
       <HyperlinkMenuItem link="https://github.com/chunky-dev/chunky" text="GitHub Repo"/>
