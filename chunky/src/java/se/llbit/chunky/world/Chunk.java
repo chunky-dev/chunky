@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.world;
 
+import it.unimi.dsi.fastutil.ints.IntIntImmutablePair;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Lava;
@@ -168,7 +169,8 @@ public class Chunk {
 
     surfaceTimestamp = dataTimestamp;
     version = chunkVersion(data);
-    chunkData.set(this.world.createChunkData(chunkData.get(), data.get(DATAVERSION).intValue()));
+    IntIntImmutablePair chunkBounds = inclusiveChunkBounds(data);
+    chunkData.set(this.world.createChunkData(chunkData.get(), chunkBounds.leftInt(), chunkBounds.rightInt()));
     loadSurface(data, chunkData.get(), yMin, yMax);
     biomesTimestamp = dataTimestamp;
 
@@ -449,8 +451,10 @@ public class Chunk {
     }
     Tag data = tagFromMap(dataMap);
 
+    IntIntImmutablePair chunkBounds = inclusiveChunkBounds(data);
+
     if(reuseChunkData.get() == null || reuseChunkData.get() instanceof EmptyChunkData) {
-      reuseChunkData.set(world.createChunkData(reuseChunkData.get(), data.get(DATAVERSION).intValue()));
+      reuseChunkData.set(world.createChunkData(reuseChunkData.get(), chunkBounds.leftInt(), chunkBounds.rightInt()));
     } else {
       reuseChunkData.get().clear();
     }
@@ -479,6 +483,28 @@ public class Chunk {
         }
       }
     }
+  }
+
+  /**
+   * @return The min and max blockY for a given section array
+   */
+  private IntIntImmutablePair inclusiveChunkBounds(Tag chunkData) {
+    Tag sections = getTagFromNames(chunkData, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
+    int minSectionY = Integer.MAX_VALUE;
+    int maxSectionY = Integer.MIN_VALUE;
+    if (sections.isList()) {
+      for (SpecificTag section : sections.asList()) {
+        byte sectionY = (byte) section.get("Y").byteValue();
+        if (sectionY < minSectionY) {
+          minSectionY = sectionY;
+        }
+        if (sectionY > maxSectionY) {
+          maxSectionY = sectionY;
+        }
+      }
+    }
+
+    return new IntIntImmutablePair(minSectionY << 4, (maxSectionY << 4) + 15);
   }
 
   /**

@@ -282,21 +282,21 @@ public class World implements Comparable<World> {
   }
 
   /**
-   * Returns a ChunkData instance that is compatible with the given chunk version.
+   * Returns a ChunkData instance that is compatible with the given chunk bounds.
    * The provided ChunkData instance may or may not be re-used.
    */
-  public ChunkData createChunkData(@Nullable ChunkData chunkData, int chunkVersion) {
-    if(chunkVersion >= World.VERSION_21W06A) {
-      if(chunkData instanceof GenericChunkData) {
-        return chunkData;
-      }
-      return new GenericChunkData();
-    } else {
-      if(chunkData instanceof SimpleChunkData) {
+  public ChunkData createChunkData(@Nullable ChunkData chunkData, int minY, int maxY) {
+    if (minY >= 0 && maxY <= 255) {
+      if (chunkData instanceof SimpleChunkData) {
         return chunkData;
       }
       return new SimpleChunkData();
     }
+
+    if (chunkData instanceof GenericChunkData) {
+      return chunkData;
+    }
+    return new GenericChunkData();
   }
 
   public Region createRegion(ChunkPosition pos) {
