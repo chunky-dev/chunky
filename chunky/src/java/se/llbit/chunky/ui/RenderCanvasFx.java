@@ -81,6 +81,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   private Vector2 target = new Vector2(0, 0);
   private Tooltip tooltip = new Tooltip();
 
+  private CheckMenuItem lockCameraAngle = new CheckMenuItem("Lock camera angle");
+
   private boolean fitToScreen = PersistentSettings.getCanvasFitToScreen();
 
   private RenderStatusListener renderListener;
@@ -152,8 +154,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     });
 
     canvas.setOnMouseDragged(e -> {
-      if (e.isSecondaryButtonDown()) {
-        // do not drag when right-clicking
+      if (e.isSecondaryButtonDown() | lockCameraAngle.isSelected()) {
+        // do not drag when right-clicking or when the camera angle is locked
         return;
       }
       double dx = lastX - (int) e.getX();
@@ -192,6 +194,9 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       vGuide2.setVisible(newValue);
     });
     contextMenu.getItems().add(showGuides);
+
+    lockCameraAngle.setSelected(false);
+    contextMenu.getItems().add(lockCameraAngle);
 
     Menu canvasScale = new Menu("Canvas scale");
     ToggleGroup scaleGroup = new ToggleGroup();
