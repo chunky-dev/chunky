@@ -42,7 +42,9 @@ public class SkyboxSettings extends VBox implements Initializable {
   @FXML private Button back;
   @FXML private Button right;
   @FXML private Button left;
-  @FXML private DoubleAdjuster skyboxRotation;
+  @FXML private DoubleAdjuster skyboxYaw;
+  @FXML private DoubleAdjuster skyboxPitch;
+  @FXML private DoubleAdjuster skyboxRoll;
 
   private File skyboxDirectory;
 
@@ -60,11 +62,21 @@ public class SkyboxSettings extends VBox implements Initializable {
     back.setOnAction(e -> selectSkyboxTexture(Sky.SKYBOX_BACK));
     right.setOnAction(e -> selectSkyboxTexture(Sky.SKYBOX_RIGHT));
     left.setOnAction(e -> selectSkyboxTexture(Sky.SKYBOX_LEFT));
-    skyboxRotation.setName("Skybox rotation");
-    skyboxRotation.setTooltip("Controls the azimuth rotational offset of the skybox.");
-    skyboxRotation.setRange(0, 360);
-    skyboxRotation
-        .onValueChange(value -> scene.sky().setRotation(QuickMath.degToRad(value)));
+    skyboxYaw.setName("Skybox yaw");
+    skyboxYaw.setTooltip("Controls the rotation of the skybox around the Y axis.");
+    skyboxYaw.setRange(0, 360);
+    skyboxYaw
+      .onValueChange(value -> scene.sky().setYaw(QuickMath.degToRad(value)));
+    skyboxPitch.setName("Skybox pitch");
+    skyboxPitch.setTooltip("Controls the rotation of the skybox around the X axis.");
+    skyboxPitch.setRange(0, 360);
+    skyboxPitch
+      .onValueChange(value -> scene.sky().setPitch(QuickMath.degToRad(value)));
+    skyboxRoll.setName("Skybox roll");
+    skyboxRoll.setTooltip("Controls the rotation of the skybox around the Z axis.");
+    skyboxRoll.setRange(0, 360);
+    skyboxRoll
+      .onValueChange(value -> scene.sky().setRoll(QuickMath.degToRad(value)));
   }
 
   private void selectSkyboxTexture(int textureIndex) {
@@ -87,6 +99,8 @@ public class SkyboxSettings extends VBox implements Initializable {
   }
 
   public void update(Scene scene) {
-    skyboxRotation.set(QuickMath.radToDeg(scene.sky().getRotation()));
+    skyboxYaw.set(QuickMath.radToDeg(scene.sky().getYaw()));
+    skyboxPitch.set(QuickMath.radToDeg(scene.sky().getPitch()));
+    skyboxRoll.set(QuickMath.radToDeg(scene.sky().getRoll()));
   }
 }
