@@ -472,6 +472,7 @@ public class Sky implements JsonSerializable {
    * Set the yaw rotation of the skymap.
    * @deprecated Use {@link #setYaw(double)} instead.
    */
+  @Deprecated
   public void setRotation(double yaw) {
     this.setYaw(yaw);
   }
@@ -480,7 +481,7 @@ public class Sky implements JsonSerializable {
    * @return The yaw rotation of the skymap
    * @deprecated Use {@link #getYaw()} instead.
    */
-  @Deprecated()
+  @Deprecated
   public double getRotation() {
     return getYaw();
   }
