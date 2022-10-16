@@ -102,7 +102,7 @@ public class HDRTexture extends AbstractHdriTexture {
         }
       }
     } catch (IOException e) {
-      Log.error("Error loading HRD image: " + e.getMessage());
+      Log.error("Error loading HDR image:", e);
       e.printStackTrace();
     }
   }

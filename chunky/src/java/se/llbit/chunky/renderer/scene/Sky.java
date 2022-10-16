@@ -790,7 +790,11 @@ public class Sky implements JsonSerializable {
           return new SkymapTexture(ImageLoader.read(textureFile));
         }
       } catch (Throwable e) {
-        Log.error("Failed to load skymap: " + fileName);
+        if (e instanceof IllegalArgumentException && e.getMessage().contains("Invalid scanline stride")) {
+          Log.errorf("Failed to load skymap: %s\nImage too big. Image must contain less than 715,827,882 pixels.", fileName);
+        } else {
+          Log.error("Failed to load skymap: " + fileName, e);
+        }
         return prevTexture;
       }
     } else {

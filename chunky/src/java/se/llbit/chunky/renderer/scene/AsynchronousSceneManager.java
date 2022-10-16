@@ -116,9 +116,9 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
       try {
         sceneManager.loadScene(sceneDirectory, name);
       } catch (IOException e) {
-        Log.warn("Could not load scene.\nReason: " + e.getMessage());
+        Log.warn("Could not load scene.\nReason:", e);
       } catch (InterruptedException e) {
-        Log.warn("Scene loading was interrupted.");
+        Log.warn("Scene loading was interrupted.", e);
       }
     });
   }
@@ -130,9 +130,9 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
       try {
         sceneManager.loadScene(name);
       } catch (IOException e) {
-        Log.warn("Could not load scene.\nReason: " + e.getMessage());
+        Log.warn("Could not load scene.", e);
       } catch (InterruptedException e) {
-        Log.warn("Scene loading was interrupted.");
+        Log.warn("Scene loading was interrupted.", e);
       }
     });
   }
@@ -146,7 +146,7 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
       try {
         sceneManager.saveScene(sceneDirectory);
       } catch (InterruptedException e) {
-        Log.warn("Scene saving was interrupted.");
+        Log.warn("Scene saving was interrupted.", e);
       }
     });
   }
@@ -158,7 +158,7 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
       try {
         sceneManager.saveScene();
       } catch (InterruptedException e) {
-        Log.warn("Scene saving was interrupted.");
+        Log.warn("Scene saving was interrupted.", e);
       }
     });
   }
@@ -173,7 +173,7 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
         sceneManager.withSceneProtected(scene -> scene.setName(newName));
         sceneManager.saveSceneAs(newName);
       } catch (InterruptedException e) {
-        Log.warn("Scene saving was interrupted.");
+        Log.warn("Scene saving was interrupted.", e);
       }
     });
   }
@@ -193,7 +193,7 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
         copy[0].setName(newName);
         sceneManager.saveScene(ioProvider, copy[0]);
       } catch (InterruptedException e) {
-        Log.warn("Scene saving was interrupted.");
+        Log.warn("Scene saving was interrupted.", e);
       }
     });
   }
