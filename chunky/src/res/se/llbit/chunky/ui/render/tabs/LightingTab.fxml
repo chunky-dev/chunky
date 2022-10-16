@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.ScrollPane?>
@@ -16,12 +17,14 @@
   <VBox spacing="10.0">
     <DoubleAdjuster fx:id="skyIntensity" maxWidth="1.7976931348623157E308" />
     <DoubleAdjuster fx:id="apparentSkyIntensity" maxWidth="1.7976931348623157E308" />
+    <Separator />
     <CheckBox fx:id="enableEmitters" mnemonicParsing="false" text="Enable emitters" />
     <DoubleAdjuster fx:id="emitterIntensity" maxWidth="1.7976931348623157E308" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Emitter Sampling Strategy:" />
       <ChoiceBox fx:id="emitterSamplingStrategy" />
     </HBox>
+    <Separator />
     <CheckBox fx:id="drawSun" mnemonicParsing="false" text="Draw sun" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Sun Sampling Strategy:" />
