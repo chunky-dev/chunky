@@ -22,8 +22,7 @@ public class QuadBlock extends AbstractModelBlock  {
   private final boolean isEntity;
   public boolean supportsOpacity = true; // some blocks only support full or zero opacity and round alpha values to 0 or 1
 
-  public QuadBlock(String name, Texture texture, Quad[] quads, Texture[] textures,
-      boolean isEntity) {
+  public QuadBlock(String name, Texture texture, Quad[] quads, Texture[] textures, boolean isEntity) {
     super(name, texture);
     localIntersect = true;
     opaque = false;
@@ -73,7 +72,7 @@ public class QuadBlock extends AbstractModelBlock  {
     };
   }
 
-  private static  class  Model extends  QuadModel{
+  private static class Model extends QuadModel{
      final Quad[] quads;
      final Texture[] textures;
 
