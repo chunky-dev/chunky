@@ -27,7 +27,7 @@
     <Button fx:id="up" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Up" />
     <Button fx:id="right" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Right" GridPane.columnIndex="1" GridPane.rowIndex="2" />
   </GridPane>
-  <DoubleAdjuster fx:id="skyboxYaw" />
   <DoubleAdjuster fx:id="skyboxPitch" />
+  <DoubleAdjuster fx:id="skyboxYaw" />
   <DoubleAdjuster fx:id="skyboxRoll" />
 </fx:root>

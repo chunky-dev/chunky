@@ -19,7 +19,7 @@
     </ToggleButton>
     <ToggleButton fx:id="v180" mnemonicParsing="false" text="Full" toggleGroup="$verticalResolution" />
   </HBox>
-  <DoubleAdjuster fx:id="skymapYaw" />
   <DoubleAdjuster fx:id="skymapPitch" />
+  <DoubleAdjuster fx:id="skymapYaw" />
   <DoubleAdjuster fx:id="skymapRoll" />
 </fx:root>
