@@ -703,7 +703,7 @@ public class Sky implements JsonSerializable {
   }
 
   private void updateTransform() {
-    rotation.rotate(pitch, -yaw, roll);
+    rotation.rotate(-pitch, -yaw, -roll);
   }
 
   /**
