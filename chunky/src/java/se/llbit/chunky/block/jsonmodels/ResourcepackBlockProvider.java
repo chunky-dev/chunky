@@ -249,8 +249,8 @@ public class ResourcepackBlockProvider implements BlockProvider {
         }
       }
       System.err.println(
-          "Could not find block model for " + tag.get("Name").stringValue() + " " + properties
-              .toString());
+        "Could not find block model for " + tag.get("Name").stringValue() + " " + properties
+          .toString());
       return UnknownBlock.UNKNOWN;
     }
   }
@@ -491,10 +491,10 @@ public class ResourcepackBlockProvider implements BlockProvider {
         // System.out.println("optimized block/cube");
         block.opaque = true;
       } else if (parentName.equals("block/tinted_cross") || parentName
-          .equals("minecraft:block/tinted_cross") || parentName.equals("block/cross") || parentName
-          .equals("minecraft:block/cross")) {
+        .equals("minecraft:block/tinted_cross") || parentName.equals("block/cross") || parentName
+        .equals("minecraft:block/cross")) {
         block.supportsOpacity = false;
-      } else if(blockDefinition.isEmpty()) {
+      } else if (blockDefinition.isEmpty()) {
         return Air.INSTANCE;
       }
       try {
@@ -505,16 +505,16 @@ public class ResourcepackBlockProvider implements BlockProvider {
           block.applyDefinition(blockDefinition, name -> this.getTexture(resourcePacks, name), ignoreParentElements);
           block.texture = block.textures.get("particle");
           if ((parentName.equals("block/cube_all") || parentName
-              .equals("minecraft:block/cube_all")) && !block.textures.get("all").hasOpacity()) {
+            .equals("minecraft:block/cube_all")) && !block.textures.get("all").hasOpacity()) {
             // System.out.println("optimized block/cube_all");
             return new MinecraftBlock(blockName, block.textures.get("all"));
           } else if (parentName.equals("block/cube") || parentName.equals("minecraft:block/cube")) {
             // System.out.println("optimized block/cube");
             block.opaque = true;
           } else if (parentName.equals("block/tinted_cross") || parentName
-              .equals("minecraft:block/tinted_cross") || parentName.equals("block/cross")
-              || parentName
-              .equals("minecraft:block/cross")) {
+            .equals("minecraft:block/tinted_cross") || parentName.equals("block/cross")
+            || parentName
+            .equals("minecraft:block/cross")) {
             block.supportsOpacity = false;
           }
         }
@@ -816,17 +816,17 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
     public QuadBlock toQuadBlock() {
       JsonModelFace[] faces = elements.stream()
-          .flatMap(element -> Arrays.stream(element.faces).filter(Objects::nonNull))
-          .toArray(JsonModelFace[]::new);
+        .flatMap(element -> Arrays.stream(element.faces).filter(Objects::nonNull))
+        .toArray(JsonModelFace[]::new);
       Texture[] textures = Arrays.stream(faces)
-          .map(f -> this.textures.get(f.texture))
-          .toArray(Texture[]::new);
+        .map(f -> this.textures.get(f.texture))
+        .toArray(Texture[]::new);
       Quad[] quads = Arrays.stream(faces)
-          .map(f -> tints != null && tints.length > 0 && f.tintindex >= 0 ? new TintedQuad(f.quad, getTint(f.tintindex)) : f.quad)
-          .toArray(Quad[]::new);
+        .map(f -> tints != null && tints.length > 0 && f.tintindex >= 0 ? new TintedQuad(f.quad, getTint(f.tintindex)) : f.quad)
+        .toArray(Quad[]::new);
 
       QuadBlock qb = new QuadBlock(name, this.textures.getOrDefault("up", Texture.unknown), quads,
-          textures, isEntity());
+        textures, isEntity());
       qb.opaque = opaque;
       return qb;
     }
@@ -1028,10 +1028,10 @@ public class ResourcepackBlockProvider implements BlockProvider {
       }
 
       QuadBlock qb = new QuadBlock(name, upTexture,
-          faces.stream().map(f -> tints != null && tints.length > 0 && f.tintindex >= 0 ? new TintedQuad(f.quad, this.getTint(f.tintindex)) : f.quad)
-              .toArray(Quad[]::new),
-          textures.toArray(
-              new Texture[0]), isEntity());
+        faces.stream().map(f -> tints != null && tints.length > 0 && f.tintindex >= 0 ? new TintedQuad(f.quad, this.getTint(f.tintindex)) : f.quad)
+          .toArray(Quad[]::new),
+        textures.toArray(
+          new Texture[0]), isEntity());
       qb.opaque = opaque;
       return qb;
     }
