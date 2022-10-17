@@ -48,6 +48,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   private RenderControlsFxController controller;
   private Scene scene;
 
+  @FXML private DoubleAdjuster skyExposure;
   @FXML private DoubleAdjuster skyIntensity;
   @FXML private DoubleAdjuster apparentSkyIntensity;
   @FXML private DoubleAdjuster emitterIntensity;
@@ -55,10 +56,12 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private CheckBox drawSun;
   @FXML private ComboBox<SunSamplingStrategy> sunSamplingStrategy;
   @FXML private DoubleAdjuster sunLuminosity;
+  @FXML private DoubleAdjuster apparentSunBrightness;
   @FXML private AngleAdjuster sunAzimuth;
   @FXML private AngleAdjuster sunAltitude;
   @FXML private CheckBox enableEmitters;
   @FXML private LuxColorPicker sunColor;
+  @FXML private CheckBox modifySunTexture;
   @FXML private ChoiceBox<EmitterSamplingStrategy> emitterSamplingStrategy;
 
   private ChangeListener<Color> sunColorListener = (observable, oldValue, newValue) ->
@@ -72,15 +75,22 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
-    skyIntensity.setName("Sky brightness");
-    skyIntensity.setTooltip("Sky light intensity modifier");
+    skyExposure.setName("Sky exposure");
+    skyExposure.setTooltip("Changes both the Sky light and the Apparent sky light");
+    skyExposure.setRange(Sky.MIN_INTENSITY, Sky.MAX_INTENSITY);
+    skyExposure.makeLogarithmic();
+    skyExposure.clampMin();
+    skyExposure.onValueChange(value -> scene.sky().setSkyExposure(value));
+
+    skyIntensity.setName("Sky brightness modifier");
+    skyIntensity.setTooltip("Modifies the intensity of the sky light");
     skyIntensity.setRange(Sky.MIN_INTENSITY, Sky.MAX_INTENSITY);
     skyIntensity.makeLogarithmic();
     skyIntensity.clampMin();
     skyIntensity.onValueChange(value -> scene.sky().setSkyLight(value));
 
-    apparentSkyIntensity.setName("Apparent sky brightness");
-    apparentSkyIntensity.setTooltip("Apparent sky light intensity modifier");
+    apparentSkyIntensity.setName("Apparent sky brightness modifier");
+    apparentSkyIntensity.setTooltip("Modifies the apparent brightness of the sky");
     apparentSkyIntensity.setRange(Sky.MIN_APPARENT_INTENSITY, Sky.MAX_APPARENT_INTENSITY);
     apparentSkyIntensity.makeLogarithmic();
     apparentSkyIntensity.clampMin();
@@ -100,6 +110,13 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunSamplingStrategy.getSelectionModel().selectedItemProperty().addListener(
             (observable, oldValue, newValue) -> scene.setSunSamplingStrategy(newValue));
     sunSamplingStrategy.setTooltip(new Tooltip("Determine how the sun is sampled at each bounce."));
+
+    apparentSunBrightness.setName("Apparent sun brightness");
+    apparentSunBrightness.setTooltip("Apparent brightness of the sun texture");
+    apparentSunBrightness.setRange(Sun.MIN_INTENSITY, Sun.MAX_INTENSITY);
+    apparentSunBrightness.makeLogarithmic();
+    apparentSunBrightness.clampMin();
+    apparentSunBrightness.onValueChange(value -> scene.sun().setApparentBrightness(value));
 
     sunIntensity.setName("Sun intensity");
     sunIntensity.setTooltip("Sunlight intensity modifier.");
@@ -129,6 +146,11 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
 
     sunColor.colorProperty().addListener(sunColorListener);
 
+    modifySunTexture.setTooltip(new Tooltip("Change whether the Sun color control modifies the color of the sun texture"));
+    modifySunTexture.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.sun().setEnableTextureModification(newValue);
+    });
+
     emitterSamplingStrategy.getItems().addAll(EmitterSamplingStrategy.values());
     emitterSamplingStrategy.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldvalue, newvalue) -> {
@@ -156,11 +178,14 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   }
 
   @Override public void update(Scene scene) {
+    skyExposure.set(scene.sky().getSkyExposure());
     skyIntensity.set(scene.sky().getSkyLight());
     apparentSkyIntensity.set(scene.sky().getApparentSkyLight());
     emitterIntensity.set(scene.getEmitterIntensity());
     sunIntensity.set(scene.sun().getIntensity());
     sunLuminosity.set(scene.sun().getLuminosity());
+    apparentSunBrightness.set(scene.sun().getApparentBrightness());
+    modifySunTexture.setSelected(scene.sun().getEnableTextureModification());
     sunAzimuth.set(-QuickMath.radToDeg(scene.sun().getAzimuth()));
     sunAltitude.set(QuickMath.radToDeg(scene.sun().getAltitude()));
     enableEmitters.setSelected(scene.getEmittersEnabled());

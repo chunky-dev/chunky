@@ -51,6 +51,10 @@ public class Sun implements JsonSerializable {
    */
   public static final double MIN_INTENSITY = 0.1;
 
+  public static final double MIN_APPARENT_BRIGHTNESS = 0.01;
+
+  public static final double MAX_APPARENT_BRIGHTNESS = 50;
+
   private static final double xZenithChroma[][] =
       {{0.00166, -0.00375, 0.00209, 0}, {-0.02903, 0.06377, -0.03203, 0.00394},
           {0.11693, -0.21196, 0.06052, 0.25886},};
@@ -123,6 +127,10 @@ public class Sun implements JsonSerializable {
   private double luminosity = 100;
   private double luminosityPdf = 1.0 / luminosity;
 
+  private double apparentBrightness = DEFAULT_INTENSITY;
+  private Vector3 apparentTextureBrightness = new Vector3(1, 1, 1);
+  private boolean enableTextureModification = false;
+
   private double azimuth = Math.PI / 2.5;
   private double altitude = Math.PI / 3;
 
@@ -177,6 +185,8 @@ public class Sun implements JsonSerializable {
     drawTexture = other.drawTexture;
     intensity = other.intensity;
     luminosity = other.luminosity;
+    apparentBrightness = other.apparentBrightness;
+    enableTextureModification = other.enableTextureModification;
     luminosityPdf = other.luminosityPdf;
     initSun();
   }
@@ -200,6 +210,13 @@ public class Sun implements JsonSerializable {
 
     emittance.set(color);
     emittance.scale(FastMath.pow(intensity, Scene.DEFAULT_GAMMA));
+
+    if (enableTextureModification) {
+      apparentTextureBrightness.set(color);
+    } else {
+      apparentTextureBrightness.set(1, 1, 1);
+    }
+    apparentTextureBrightness.scale(FastMath.pow(apparentBrightness, Scene.DEFAULT_GAMMA));
 
     Sky sky = ((Scene) scene).sky();
     if (sky.getSkyMode() == Sky.SkyMode.SIMULATED) {
@@ -259,9 +276,35 @@ public class Sun implements JsonSerializable {
       double b = Math.PI / 2 - FastMath.acos(ray.d.dot(sv)) + WIDTH;
       if (b >= 0 && b < WIDTH2) {
         texture.getColor(a / WIDTH2, b / WIDTH2, ray.color);
-        ray.color.x *= emittance.x * 10;
-        ray.color.y *= emittance.y * 10;
-        ray.color.z *= emittance.z * 10;
+        ray.color.x *= apparentTextureBrightness.x * 10;
+        ray.color.y *= apparentTextureBrightness.y * 10;
+        ray.color.z *= apparentTextureBrightness.z * 10;
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Used with <code>SSS: OFF</code> and <code>SSS: HIGH_QUALITY</code>.
+   */
+  public boolean intersectDiffuse(Ray ray) {
+    if (ray.d.dot(sw) < .5) {
+      return false;
+    }
+
+    double WIDTH = RADIUS * 4;
+    double WIDTH2 = WIDTH * 2;
+    double a;
+    a = Math.PI / 2 - FastMath.acos(ray.d.dot(su)) + WIDTH;
+    if (a >= 0 && a < WIDTH2) {
+      double b = Math.PI / 2 - FastMath.acos(ray.d.dot(sv)) + WIDTH;
+      if (b >= 0 && b < WIDTH2) {
+        texture.getColor(a / WIDTH2, b / WIDTH2, ray.color);
+        ray.color.x *= color.x * 10;
+        ray.color.y *= color.y * 10;
+        ray.color.z *= color.z * 10;
         return true;
       }
     }
@@ -331,6 +374,26 @@ public class Sun implements JsonSerializable {
     return luminosityPdf;
   }
 
+  public void setApparentBrightness(double value) {
+    apparentBrightness = value;
+    initSun();
+    scene.refresh();
+  }
+
+  public double getApparentBrightness() {
+    return apparentBrightness;
+  }
+
+  public void setEnableTextureModification(boolean value) {
+    enableTextureModification = value;
+    initSun();
+    scene.refresh();
+  }
+
+  public boolean getEnableTextureModification() {
+    return enableTextureModification;
+  }
+
   /**
    * Point ray in random direction within sun solid angle
    */
@@ -360,6 +423,8 @@ public class Sun implements JsonSerializable {
     sun.add("azimuth", azimuth);
     sun.add("intensity", intensity);
     sun.add("luminosity", luminosity);
+    sun.add("apparentBrightness", apparentBrightness);
+    sun.add("modifySunTexture", enableTextureModification);
     JsonObject colorObj = new JsonObject();
     colorObj.add("red", color.x);
     colorObj.add("green", color.y);
@@ -374,6 +439,8 @@ public class Sun implements JsonSerializable {
     altitude = json.get("altitude").doubleValue(altitude);
     intensity = json.get("intensity").doubleValue(intensity);
     setLuminosity(json.get("luminosity").doubleValue(luminosity));
+    apparentBrightness = json.get("apparentBrightness").doubleValue(apparentBrightness);
+    enableTextureModification = json.get("modifySunTexture").boolValue(enableTextureModification);
 
     if (json.get("color").isObject()) {
       JsonObject colorObj = json.get("color").object();
