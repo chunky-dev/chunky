@@ -34,13 +34,18 @@
     <DoubleAdjuster fx:id="sunIntensity" maxWidth="1.7976931348623157E308" />
     <DoubleAdjuster fx:id="sunLuminosity" maxWidth="Infinity" />
     <DoubleAdjuster fx:id="apparentSunBrightness" maxWidth="Infinity" />
-    <AngleAdjuster fx:id="sunAzimuth" />
-    <AngleAdjuster fx:id="sunAltitude" />
+    <DoubleAdjuster fx:id="sunRadius" maxWidth="-Infinity" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <Label text="Sun color:" />
+      <Label text="Sunlight color:" />
       <LuxColorPicker fx:id="sunColor" />
     </HBox>
     <CheckBox fx:id="modifySunTexture" mnemonicParsing="false" text="Modify sun texture by color" />
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+      <Label text="Apparent sun color:" />
+      <LuxColorPicker fx:id="apparentSunColor" />
+    </HBox>
+    <AngleAdjuster fx:id="sunAzimuth" />
+    <AngleAdjuster fx:id="sunAltitude" />
     <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
     </padding>
