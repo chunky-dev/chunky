@@ -76,7 +76,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
 
   @Override public void initialize(URL location, ResourceBundle resources) {
     skyExposure.setName("Sky exposure");
-    skyExposure.setTooltip("Changes both the Sky light and the Apparent sky light");
+    skyExposure.setTooltip("Changes the exposure of the sky");
     skyExposure.setRange(Sky.MIN_INTENSITY, Sky.MAX_INTENSITY);
     skyExposure.makeLogarithmic();
     skyExposure.clampMin();
