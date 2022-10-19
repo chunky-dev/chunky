@@ -51,8 +51,14 @@ public class Sun implements JsonSerializable {
    */
   public static final double MIN_INTENSITY = 0.1;
 
+  /**
+   * Minimum apparent sun brightness
+   */
   public static final double MIN_APPARENT_BRIGHTNESS = 0.01;
 
+  /**
+   * Maximum apparent sun brightness
+   */
   public static final double MAX_APPARENT_BRIGHTNESS = 50;
 
   private static final double xZenithChroma[][] =
