@@ -60,6 +60,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   @FXML private VBox skyModeSettings;
   @FXML private CheckBox transparentSkyEnabled;
   @FXML private CheckBox cloudsEnabled;
+  @FXML private TitledPane cloudDetailsPane;
   @FXML private DoubleAdjuster cloudSize;
   @FXML private DoubleAdjuster cloudX;
   @FXML private DoubleAdjuster cloudY;
@@ -130,37 +131,48 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     simulatedSky.setOnAction(simSkyListener);
     simulatedSky.setTooltip(new Tooltip(skiesTooltip(Sky.skies)));
 
-    cloudSize.setName("Cloud size");
-    cloudSize.setTooltip("Cloud size, measured in blocks per pixel of clouds.png texture");
+    cloudsEnabled.setSelected(false);
+    cloudsEnabled.setTooltip(new Tooltip("Toggles visibility of Minecraft-style clouds."));
+    cloudsEnabled.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.sky().setCloudsEnabled(newValue);
+      cloudDetailsPane.setVisible(newValue);
+      cloudDetailsPane.setExpanded(newValue);
+      cloudDetailsPane.setManaged(newValue);
+    });
+
+    cloudDetailsPane.setVisible(cloudsEnabled.isSelected());
+    cloudDetailsPane.setExpanded(cloudsEnabled.isSelected());
+    cloudDetailsPane.setManaged(cloudsEnabled.isSelected());
+
+    cloudSize.setTooltip("Changes the cloud size, measured in blocks per pixel of clouds.png texture");
     cloudSize.setRange(0.1, 128);
     cloudSize.clampMin();
     cloudSize.makeLogarithmic();
     cloudSize.onValueChange(value -> scene.sky().setCloudSize(value));
 
-    cloudX.setTooltip("Cloud X offset.");
+    cloudX.setTooltip("Changes the X-offset of the clouds.");
     cloudX.setRange(-256, 256);
     cloudX.onValueChange(value -> scene.sky().setCloudXOffset(value));
-    cloudY.setTooltip("Cloud Y offset.");
+    cloudY.setTooltip("Changes the Y-offset of the clouds.");
     cloudY.setRange(-64, 320);
     cloudY.onValueChange(value -> scene.sky().setCloudYOffset(value));
-    cloudZ.setTooltip("Cloud Z offset.");
+    cloudZ.setTooltip("Changes the Z-offset of the clouds.");
     cloudZ.setRange(-256, 256);
     cloudZ.onValueChange(value -> scene.sky().setCloudZOffset(value));
 
-    fogDensity.setTooltip("Fog thickness. Set to 0 to disable volumetric fog effect.");
+    fogDensity.setTooltip("Changes the fog thickness. Set to 0 to disable volumetric fog effect.");
     fogDensity.setRange(0, 1);
     fogDensity.setMaximumFractionDigits(6);
     fogDensity.makeLogarithmic();
     fogDensity.clampMin();
     fogDensity.onValueChange(value -> scene.setFogDensity(value));
 
-    skyFogDensity.setTooltip(
-        "How much the fog color is blended over the sky/skymap. No effect when fog is disabled.");
+    skyFogDensity.setTooltip("Changes how much the fog color is blended over the sky / skymap. Has no effect when fog is disabled.");
     skyFogDensity.setRange(0, 1);
     skyFogDensity.clampMin();
     skyFogDensity.onValueChange(value -> scene.setSkyFogDensity(value));
 
-    skyMode.setTooltip(new Tooltip("Set the type of sky to be used in the scene."));
+    skyMode.setTooltip(new Tooltip("Sets the type of sky to be used in the scene."));
     skyMode.getItems().addAll(Sky.SkyMode.values());
     skyMode.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
@@ -200,11 +212,6 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
         .setTooltip(new Tooltip("Disables sky rendering for background compositing."));
     transparentSkyEnabled.selectedProperty().addListener(
         (observable, oldValue, newValue) -> scene.setTransparentSky(newValue));
-    cloudsEnabled.setTooltip(new Tooltip("Toggle visibility of Minecraft-style clouds."));
-    cloudsEnabled.selectedProperty().addListener((observable, oldValue, newValue) -> {
-
-      scene.sky().setCloudsEnabled(newValue);
-    });
     fogColor.colorProperty().addListener(fogColorListener);
 
     colorPicker.colorProperty().addListener(skyColorListener);
