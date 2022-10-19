@@ -72,10 +72,8 @@ import se.llbit.chunky.ui.RenderCanvasFx;
 import se.llbit.chunky.ui.UILogReceiver;
 import se.llbit.chunky.ui.dialogs.WorldChooser;
 import se.llbit.chunky.renderer.scene.*;
-import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.DeleteChunksJob;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
@@ -271,29 +269,6 @@ public class ChunkyFxController
     this.chunky = chunky;
     mapView = new MapView();
     renderTracker = new GUIRenderListener(this);
-  }
-
-  public void promptDeleteSelectedChunks() {
-    Dialog<ButtonType> confirmationDialog = Dialogs.createSpecialApprovalConfirmation(
-        "Delete selected chunks",
-        "Confirm deleting the selected chunks",
-        "Do you really want to delete the selected chunks from the world?\nThis will remove the selected chunks from your disk and cannot be undone. Be sure to have a backup!",
-        "I do want to permanently delete the selected chunks"
-    );
-    if (confirmationDialog.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
-      deleteSelectedChunks(ProgressTracker.NONE);
-    }
-  }
-
-  /**
-   * Delete the currently selected chunks from the current world.
-   */
-  public void deleteSelectedChunks(ProgressTracker progress) {
-    Collection<ChunkPosition> selected = chunkSelection.getSelection();
-    if (!selected.isEmpty() && !progress.isBusy()) {
-      DeleteChunksJob job = new DeleteChunksJob(mapLoader.getWorld(), selected, progress);
-      job.start();
-    }
   }
 
   /**

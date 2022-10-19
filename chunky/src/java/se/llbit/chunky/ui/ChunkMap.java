@@ -186,22 +186,13 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     MenuItem exportPng = new MenuItem("Save map view as…");
     exportPng.setOnAction(e -> controller.exportMapView());
 
-    MenuItem deleteChunks = new MenuItem("Delete selected chunks");
-    ImageView deleteChunksIcon = new ImageView(Icon.tntSide.fxImage());
-    deleteChunksIcon.setFitHeight(16);
-    deleteChunksIcon.setPreserveRatio(true);
-    deleteChunks.setGraphic(deleteChunksIcon);
-    deleteChunks.setOnAction(e -> controller.promptDeleteSelectedChunks());
-    deleteChunks.setDisable(chunkSelection.size() == 0);
-
     contextMenu.getItems().addAll(
         newScene, loadSelection, clearSelection,
         new SeparatorMenuItem(),
         moveCameraHere, selectVisible,
         new SeparatorMenuItem(),
-        exportZip, exportPng,
-        new SeparatorMenuItem(),
-        deleteChunks);
+        exportZip, exportPng
+    );
 
     controller.getChunky()
       .getMapContextMenuTransformers()
@@ -213,7 +204,6 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       newScene.setDisable(noChunksSelected);
       loadSelection.setDisable(noChunksSelected);
       exportZip.setDisable(noChunksSelected);
-      deleteChunks.setDisable(noChunksSelected);
     });
   }
 
