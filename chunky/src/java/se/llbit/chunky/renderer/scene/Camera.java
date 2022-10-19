@@ -94,6 +94,8 @@ public class Camera implements JsonSerializable {
 
   private final Refreshable scene;
 
+  private boolean lockCamera = false;
+
   Vector3 pos = new Vector3(0, 0, 0);
 
   /**
@@ -177,6 +179,7 @@ public class Camera implements JsonSerializable {
    * @param other the camera to copy configuration from
    */
   public void set(Camera other) {
+    lockCamera = other.lockCamera;
     pos.set(other.pos);
     yaw = other.yaw;
     pitch = other.pitch;
@@ -619,6 +622,7 @@ public class Camera implements JsonSerializable {
   @Override public JsonObject toJson() {
     JsonObject camera = new JsonObject();
     camera.add("name", name);
+    camera.add("lockCamera", lockCamera);
     camera.add("position", pos.toJson());
 
     JsonObject orientation = new JsonObject();
@@ -650,6 +654,7 @@ public class Camera implements JsonSerializable {
 
   public void importFromJson(JsonObject json) {
     name = json.get("name").stringValue(name);
+    lockCamera = json.get("lockCamera").boolValue(lockCamera);
     if (json.get("position").isObject()) {
       pos.fromJson(json.get("position").object());
     }
@@ -775,5 +780,14 @@ public class Camera implements JsonSerializable {
    */
   public ApertureShape getApertureShape() {
     return apertureShape;
+  }
+
+  public void setCameraLocked(boolean value) {
+    lockCamera = value;
+    scene.refresh();
+  }
+
+  public boolean getCameraLocked() {
+    return lockCamera;
   }
 }

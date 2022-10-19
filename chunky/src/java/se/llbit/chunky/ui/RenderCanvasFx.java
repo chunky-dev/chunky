@@ -81,8 +81,6 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   private Vector2 target = new Vector2(0, 0);
   private Tooltip tooltip = new Tooltip();
 
-  private CheckMenuItem lockCameraAngle = new CheckMenuItem("Lock camera angle");
-
   private boolean fitToScreen = PersistentSettings.getCanvasFitToScreen();
 
   private RenderStatusListener renderListener;
@@ -154,7 +152,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     });
 
     canvas.setOnMouseDragged(e -> {
-      if (e.isSecondaryButtonDown() | lockCameraAngle.isSelected()) {
+      if (e.isSecondaryButtonDown() || scene.camera().getCameraLocked()) {
         // do not drag when right-clicking or when the camera angle is locked
         return;
       }
@@ -194,9 +192,6 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       vGuide2.setVisible(newValue);
     });
     contextMenu.getItems().add(showGuides);
-
-    lockCameraAngle.setSelected(false);
-    contextMenu.getItems().add(lockCameraAngle);
 
     Menu canvasScale = new Menu("Canvas scale");
     ToggleGroup scaleGroup = new ToggleGroup();
@@ -256,6 +251,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       }
     });
     canvas.setOnScroll(e -> {
+      if (scene.camera().getCameraLocked()) {
+        // do not scroll when the camera angle is locked
+        return;
+      }
       // deltaY is zero if shift is pressed because shift switches to horizontal scrolling in JavaFX
       double diff = -(Math.abs(e.getDeltaY()) > 0 ? e.getDeltaY() / e.getMultiplierY() : e.getDeltaX() / e.getMultiplierX());
       if (e.isShiftDown()) {
@@ -292,6 +291,9 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
     canvasPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
       if (!isVisible()) {
+        return;
+      }
+      if (scene.camera().getCameraLocked()) {
         return;
       }
       double modifier = 1;

@@ -23,14 +23,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TitledPane;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -64,6 +57,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   @FXML private ComboBox<String> cameras;
   @FXML private Button duplicate;
   @FXML private Button removeCamera;
+  @FXML private CheckBox lockCamera;
   @FXML private TitledPane positionOrientation;
   @FXML private DoubleTextField posX;
   @FXML private DoubleTextField posY;
@@ -102,6 +96,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     updateDof();
     updateSubjectDistance();
     updateShift();
+    updateCameraLocked();
     preventApertureCallback = true;
     apertureShape.setValue(scene.camera().getApertureShape());
     preventApertureCallback = false;
@@ -136,6 +131,10 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     shiftY.valueProperty().setValue(scene.camera().getShiftY());
   }
 
+  private void updateCameraLocked() {
+    lockCamera.selectedProperty().setValue(scene.camera().getCameraLocked());
+  }
+
   @Override public void initialize(URL location, ResourceBundle resources) {
     loadPreset.setTooltip(new Tooltip("Load a camera preset. Overwrites current camera settings."));
     for (CameraPreset preset : CameraPreset.values()) {
@@ -167,6 +166,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
           updateCameraPosition();
           updateCameraDirection();
           updateShift();
+          updateCameraLocked();
         } else {
           // Create new camera preset.
           cameras.getItems().add(newValue);
@@ -200,8 +200,29 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
         updateCameraPosition();
         updateCameraDirection();
         updateShift();
+        updateCameraLocked();
         cameras.getSelectionModel().selectedItemProperty().addListener(cameraSelectionListener);
       }
+    });
+
+    lockCamera.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.camera().setCameraLocked(newValue);
+      loadPreset.setDisable(newValue);
+      posX.setDisable(newValue);
+      posY.setDisable(newValue);
+      posZ.setDisable(newValue);
+      centerCamera.setDisable(newValue);
+      pitchField.setDisable(newValue);
+      rollField.setDisable(newValue);
+      yawField.setDisable(newValue);
+      shiftX.setDisable(newValue);
+      shiftY.setDisable(newValue);
+      projectionMode.setDisable(newValue);
+      fov.setDisable(newValue);
+      dof.setDisable(newValue);
+      subjectDistance.setDisable(newValue);
+      autofocus.setDisable(newValue);
+      apertureShape.setDisable(newValue);
     });
 
     positionOrientation.expandedProperty().addListener((observable, oldValue, newValue) -> {
