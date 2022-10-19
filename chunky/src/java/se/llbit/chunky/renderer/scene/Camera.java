@@ -1,4 +1,5 @@
 /* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2022 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -23,8 +24,9 @@ import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.projection.ApertureProjector;
 import se.llbit.chunky.renderer.projection.FisheyeProjector;
 import se.llbit.chunky.renderer.projection.ForwardDisplacementProjector;
-import se.llbit.chunky.renderer.projection.OmniDirectionalStereoProjector;
-import se.llbit.chunky.renderer.projection.OmniDirectionalStereoProjector.Eye;
+import se.llbit.chunky.renderer.projection.stereo.ODSSinglePerspectiveProjector;
+import se.llbit.chunky.renderer.projection.stereo.ODSSinglePerspectiveProjector.Eye;
+import se.llbit.chunky.renderer.projection.stereo.ODSVerticalStackedProjector;
 import se.llbit.chunky.renderer.projection.PanoramicProjector;
 import se.llbit.chunky.renderer.projection.PanoramicSlotProjector;
 import se.llbit.chunky.renderer.projection.ParallelProjector;
@@ -36,7 +38,6 @@ import se.llbit.chunky.renderer.projection.SphericalApertureProjector;
 import se.llbit.chunky.renderer.projection.StereographicProjector;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.json.JsonObject;
-import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 import se.llbit.math.Matrix3;
 import se.llbit.math.QuickMath;
@@ -244,9 +245,11 @@ public class Camera implements JsonSerializable {
       case STEREOGRAPHIC:
         return new StereographicProjector(fov);
       case ODS_LEFT:
-        return new OmniDirectionalStereoProjector(Eye.LEFT);
+        return new ODSSinglePerspectiveProjector(Eye.LEFT);
       case ODS_RIGHT:
-        return new OmniDirectionalStereoProjector(Eye.RIGHT);
+        return new ODSSinglePerspectiveProjector(Eye.RIGHT);
+      case ODS_STACKED:
+        return new ODSVerticalStackedProjector();
     }
   }
 
