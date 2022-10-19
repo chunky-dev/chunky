@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import se.llbit.chunky.chunk.ChunkLoadingException;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.world.*;
 import se.llbit.log.Log;
 import se.llbit.nbt.ErrorTag;
@@ -65,6 +66,13 @@ public class MCRegion implements Region {
   private long regionFileTime = 0;
   private final int[] chunkTimestamps = new int[NUM_CHUNKS];
 
+  private static int getMCAChunkIndex(int x, int z) {
+    return (x & 0b11111) + ((z & 0b11111) << 5);
+  }
+  private static int getMCAChunkIndex(ChunkPosition chunkPos) {
+    return getMCAChunkIndex(chunkPos.x, chunkPos.z);
+  }
+
   /**
    * Create new region
    *
@@ -76,7 +84,7 @@ public class MCRegion implements Region {
     position = pos;
     for (int z = 0; z < CHUNKS_Z; ++z) {
       for (int x = 0; x < CHUNKS_X; ++x) {
-        chunks[x + z * 32] = EmptyChunk.INSTANCE;
+        chunks[getMCAChunkIndex(x, z)] = EmptyChunk.INSTANCE;
       }
     }
   }
@@ -85,21 +93,23 @@ public class MCRegion implements Region {
    * @return Chunk at (x, z)
    */
   @Override
+  @PluginApi
   public Chunk getChunk(int x, int z) {
-    return chunks[(x & 31) + (z & 31) * 32];
+    return chunks[getMCAChunkIndex(x, z)];
   }
 
   /**
    * Set chunk at given position.
    */
   private void setChunk(ChunkPosition pos, Chunk chunk) {
-    chunks[(pos.x & 31) + (pos.z & 31) * 32] = chunk;
+    chunks[getMCAChunkIndex(pos)] = chunk;
   }
 
   /**
    * Delete a chunk.
    */
   @Override
+  @PluginApi
   public synchronized void deleteChunk(ChunkPosition chunkPos) {
     deleteChunkFromRegion(chunkPos);
     Chunk chunk = getChunk(chunkPos);
@@ -199,12 +209,6 @@ public class MCRegion implements Region {
       }
     }
     return null;
-  }
-
-  private static int getMCAChunkIndex(ChunkPosition chunkPos) {
-    int x = chunkPos.x & 0b11111;
-    int z = chunkPos.z & 0b11111;
-    return x + (z << 5);
   }
 
   /**
