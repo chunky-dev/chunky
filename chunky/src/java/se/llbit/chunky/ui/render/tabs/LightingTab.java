@@ -158,7 +158,6 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     apparentSunBrightness.onValueChange(value -> scene.sun().setApparentBrightness(value));
 
     sunRadius.setName("Sun size");
-    sunRadius.setTooltip("Changes the size of the sun.");
     sunRadius.setRange(0.01, 10);
     sunRadius.clampMin();
     sunRadius.onValueChange(value -> scene.sun().setSunRadius(value));
