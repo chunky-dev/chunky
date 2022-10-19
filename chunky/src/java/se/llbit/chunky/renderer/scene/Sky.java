@@ -1157,6 +1157,6 @@ public class Sky implements JsonSerializable {
   }
 
   public Vector3 getColor() {
-    return new Vector3(color);
+    return color;
   }
 }

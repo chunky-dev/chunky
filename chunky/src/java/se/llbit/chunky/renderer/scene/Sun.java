@@ -500,11 +500,11 @@ public class Sun implements JsonSerializable {
    * @return sun color
    */
   public Vector3 getColor() {
-    return new Vector3(color);
+    return color;
   }
 
   public Vector3 getApparentColor() {
-    return new Vector3(apparentColor);
+    return apparentColor;
   }
 
   public void setDrawTexture(boolean value) {
