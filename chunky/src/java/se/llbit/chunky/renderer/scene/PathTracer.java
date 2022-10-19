@@ -87,7 +87,7 @@ public class PathTracer implements RayTracer {
           hit = true;
         } else {
           // Indirect sky hit - diffuse color.
-          scene.sky.getSkyColor(ray, scene.getSunSamplingStrategy().isDiffuseSun());
+          scene.sky.getSkyColorDiffuseSun(ray, scene.getSunSamplingStrategy().isDiffuseSun());
           // Skip sky fog - likely not noticeable in diffuse reflection.
           hit = true;
         }
@@ -200,7 +200,7 @@ public class PathTracer implements RayTracer {
               }
             }
 
-            if (scene.sun().drawTexture() && scene.getSunSamplingStrategy().doSunSampling()) {
+            if (scene.getSunSamplingStrategy().doSunSampling()) {
               reflected.set(ray);
               scene.sun.getRandomSunDirection(reflected, random);
 
