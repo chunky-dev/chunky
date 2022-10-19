@@ -29,7 +29,7 @@ public enum ProjectionMode {
   PANORAMIC_SLOT("Panoramic (slot)"),
   ODS_LEFT("Omni‐directional Stereo (left eye)"),
   ODS_RIGHT("Omni‐directional Stereo (right eye)"),
-  ODS_SPLIT("Omni‐directional Stereo (both eyes, vertically split)");
+  ODS_STACKED("Omni‐directional Stereo (both eyes, vertically stacked)");
 
   private final String niceName;
 

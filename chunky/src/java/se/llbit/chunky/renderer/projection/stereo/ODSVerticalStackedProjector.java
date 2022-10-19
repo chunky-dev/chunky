@@ -24,7 +24,7 @@ import se.llbit.math.Vector3;
  *
  * <p>The canvas must have an aspect ratio of 1:1 for a full 360° range.
  */
-public class ODSVerticalSplitProjector extends OmniDirectionalStereoProjector {
+public class ODSVerticalStackedProjector extends OmniDirectionalStereoProjector {
   @Override
   public void apply(double x, double y, Vector3 pos, Vector3 direction) {
     if(y < 0) {

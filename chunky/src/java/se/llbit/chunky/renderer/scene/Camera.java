@@ -26,7 +26,7 @@ import se.llbit.chunky.renderer.projection.FisheyeProjector;
 import se.llbit.chunky.renderer.projection.ForwardDisplacementProjector;
 import se.llbit.chunky.renderer.projection.stereo.ODSSinglePerspectiveProjector;
 import se.llbit.chunky.renderer.projection.stereo.ODSSinglePerspectiveProjector.Eye;
-import se.llbit.chunky.renderer.projection.stereo.ODSVerticalSplitProjector;
+import se.llbit.chunky.renderer.projection.stereo.ODSVerticalStackedProjector;
 import se.llbit.chunky.renderer.projection.PanoramicProjector;
 import se.llbit.chunky.renderer.projection.PanoramicSlotProjector;
 import se.llbit.chunky.renderer.projection.ParallelProjector;
@@ -248,8 +248,8 @@ public class Camera implements JsonSerializable {
         return new ODSSinglePerspectiveProjector(Eye.LEFT);
       case ODS_RIGHT:
         return new ODSSinglePerspectiveProjector(Eye.RIGHT);
-      case ODS_SPLIT:
-        return new ODSVerticalSplitProjector();
+      case ODS_STACKED:
+        return new ODSVerticalStackedProjector();
     }
   }
 
