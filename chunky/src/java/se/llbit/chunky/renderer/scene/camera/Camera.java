@@ -30,6 +30,7 @@ import se.llbit.chunky.renderer.scene.camera.projection.ParallelProjector;
 import se.llbit.chunky.renderer.scene.camera.projection.PinholeProjector;
 import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
 import se.llbit.chunky.renderer.scene.camera.projection.Projector;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectorFactory;
 import se.llbit.chunky.renderer.scene.camera.projection.ShiftProjector;
 import se.llbit.chunky.renderer.scene.camera.projection.SphericalApertureProjector;
 import se.llbit.chunky.renderer.scene.camera.projection.StereographicProjector;
@@ -154,7 +155,7 @@ public class Camera implements JsonSerializable {
 
   public String name = "camera 1";
 
-  public ApertureShape apertureShape = ApertureShape.CIRCLE;
+  private ApertureShape apertureShape = ApertureShape.CIRCLE;
 
   @Nullable
   private String apertureMaskFilename;
@@ -192,67 +193,11 @@ public class Camera implements JsonSerializable {
     updateTransform();
   }
 
-  private Projector applyDoF(Projector p, double subjectDistance) {
-    if(infiniteDoF())
-      return p;
-    if (apertureShape == ApertureShape.CUSTOM)
-      return new ApertureProjector(p, subjectDistance / dof, subjectDistance, apertureMaskFilename);
-    else if (apertureShape == ApertureShape.CIRCLE)
-      return new ApertureProjector(p, subjectDistance / dof, subjectDistance);
-    else
-      return new ApertureProjector(p, subjectDistance / dof, subjectDistance, apertureShape);
-  }
-
-  private Projector applySphericalDoF(Projector p) {
-    return infiniteDoF() ?
-        p :
-        new SphericalApertureProjector(p, subjectDistance / dof, subjectDistance);
-  }
-
-  private Projector applyShift(Projector p) {
-    if(Math.abs(shiftX) > 0 || Math.abs(shiftY) > 0) {
-      return new ShiftProjector(p, shiftX, shiftY);
-    }
-    return p;
-  }
-
-  /**
-   * Creates projector based on the current camera settings.
-   */
-  private Projector createProjector() {
-    switch (projectionMode) {
-      default:
-        Log.errorf("Unknown projection mode: %s, using standard mode", projectionMode);
-      case PINHOLE:
-        return applyShift(applyDoF(new PinholeProjector(fov), subjectDistance));
-      case PARALLEL:
-        return applyShift(applyDoF(
-            new ForwardDisplacementProjector(
-              new ParallelProjector(worldDiagonalSize, fov),
-              -worldDiagonalSize
-            ),
-            subjectDistance + worldDiagonalSize
-        ));
-      case FISHEYE:
-        return applySphericalDoF(new FisheyeProjector(fov));
-      case PANORAMIC_SLOT:
-        return applySphericalDoF(new PanoramicSlotProjector(fov));
-      case PANORAMIC:
-        return applySphericalDoF(new PanoramicProjector(fov));
-      case STEREOGRAPHIC:
-        return new StereographicProjector(fov);
-      case ODS_LEFT:
-        return new OmniDirectionalStereoProjector(Eye.LEFT);
-      case ODS_RIGHT:
-        return new OmniDirectionalStereoProjector(Eye.RIGHT);
-    }
-  }
-
   /**
    * This (re-)initializes the camera projector.
    */
   private void initProjector() {
-    projector = createProjector();
+    projector = ProjectorFactory.create(this);
   }
 
   /**
@@ -600,6 +545,10 @@ public class Camera implements JsonSerializable {
     }
   }
 
+  public double getWorldDiagonalSize() {
+    return worldDiagonalSize;
+  }
+
   /**
    * @return Minimum FoV value, depending on projection
    */
@@ -773,5 +722,9 @@ public class Camera implements JsonSerializable {
    */
   public ApertureShape getApertureShape() {
     return apertureShape;
+  }
+
+  public String getApertureMaskFilename() {
+    return apertureMaskFilename;
   }
 }
