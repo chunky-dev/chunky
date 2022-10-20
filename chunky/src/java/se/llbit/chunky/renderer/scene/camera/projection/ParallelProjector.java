@@ -14,53 +14,42 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.projection;
+package se.llbit.chunky.renderer.scene.camera.projection;
 
 import java.util.Random;
 
-import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
 /**
- * Moves the ray origin forward (if displacement is positive) along the
- * direction vector.
+ * Casts parallel rays from different origin points on a plane
  */
-public class ForwardDisplacementProjector implements Projector {
-  protected final Projector wrapped;
-  protected final double displacementValue;
-  protected final double displacementSign;
+public class ParallelProjector implements Projector {
+  protected final double worldDiagonalSize;
+  protected final double fov;
 
-  public ForwardDisplacementProjector(Projector wrapped, double displacement) {
-    this.wrapped = wrapped;
-    this.displacementValue = QuickMath.abs(displacement);
-    this.displacementSign = QuickMath.signum(displacement);
+  public ParallelProjector(double worldDiagonalSize, double fov) {
+    this.worldDiagonalSize = worldDiagonalSize;
+    this.fov = fov;
   }
 
   @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
-    wrapped.apply(x, y, random, o, d);
-
-    d.normalize();
-    d.scale(displacementValue);
-    o.scaleAdd(displacementSign, d);
+    apply(x, y, o, d);
   }
 
   @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
-    wrapped.apply(x, y, o, d);
-
-    d.normalize();
-    d.scale(displacementValue);
-    o.scaleAdd(displacementSign, d);
+    o.set(fov * x, fov * y, 0);
+    d.set(0, 0, 1);
   }
 
   @Override public double getMinRecommendedFoV() {
-    return wrapped.getMinRecommendedFoV();
+    return 0.01;
   }
 
   @Override public double getMaxRecommendedFoV() {
-    return wrapped.getMaxRecommendedFoV();
+    return worldDiagonalSize;
   }
 
   @Override public double getDefaultFoV() {
-    return wrapped.getDefaultFoV();
+    return worldDiagonalSize / 2;
   }
 }

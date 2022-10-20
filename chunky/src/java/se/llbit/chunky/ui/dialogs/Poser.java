@@ -33,7 +33,7 @@ import javafx.scene.image.WritablePixelFormat;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.chunky.renderer.scene.camera.Camera;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.render.tabs.EntitiesTab;

@@ -14,24 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.projection;
+package se.llbit.chunky.renderer.scene.camera.projection;
 
 import java.util.Random;
 
-import se.llbit.chunky.renderer.scene.Camera;
+import org.apache.commons.math3.util.FastMath;
+
+import se.llbit.chunky.renderer.scene.camera.Camera;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
 /**
- * Stereographic projection maps points on the sphere to a plane.
- *
- * @author Jesper Öqvist <jesper@llbit.se>
+ * Behaves like a pinhole camera in the vertical direction, but like a
+ * spherical one in the horizontal direction.
  */
-public class StereographicProjector implements Projector {
+public class PanoramicSlotProjector implements Projector {
+  protected final double fov;
+  protected final double fovTan;
 
-  private final double scale;
-
-  public StereographicProjector(double fov) {
-    scale = Camera.clampedFovTan(fov);
+  public PanoramicSlotProjector(double fov) {
+    this.fov = fov;
+    this.fovTan = Camera.clampedFovTan(fov);
   }
 
   @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
@@ -39,12 +42,13 @@ public class StereographicProjector implements Projector {
   }
 
   @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
-    y *= scale;
-    x *= scale;
-    double xx_yy = x * x + y * y;
-    double r = 1 / (1 + xx_yy);
-    d.set(2 * x * r, 2 * y * r, -(-1 + xx_yy) * r);
+    double ax = QuickMath.degToRad(x * fov);
+    double dz = FastMath.cos(ax);
+    double dx = FastMath.sin(ax);
+    double dy = fovTan * y;
+
     o.set(0, 0, 0);
+    d.set(dx, dy, dz);
   }
 
   @Override public double getMinRecommendedFoV() {
@@ -52,10 +56,10 @@ public class StereographicProjector implements Projector {
   }
 
   @Override public double getMaxRecommendedFoV() {
-    return 175;
+    return 90;
   }
 
   @Override public double getDefaultFoV() {
-    return 95;
+    return 90;
   }
 }

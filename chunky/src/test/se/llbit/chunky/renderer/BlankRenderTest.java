@@ -20,7 +20,7 @@ package se.llbit.chunky.renderer;
 import org.junit.Test;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ChunkyOptions;
-import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.json.JsonObject;

@@ -14,21 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.projection;
+package se.llbit.chunky.renderer.scene.camera.projection;
 
 import java.util.Random;
 
+import org.apache.commons.math3.util.FastMath;
+
+import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
-/**
- * Casts parallel rays from different origin points on a plane
- */
-public class ParallelProjector implements Projector {
-  protected final double worldDiagonalSize;
+public class FisheyeProjector implements Projector {
   protected final double fov;
 
-  public ParallelProjector(double worldDiagonalSize, double fov) {
-    this.worldDiagonalSize = worldDiagonalSize;
+  public FisheyeProjector(double fov) {
     this.fov = fov;
   }
 
@@ -37,19 +35,32 @@ public class ParallelProjector implements Projector {
   }
 
   @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
-    o.set(fov * x, fov * y, 0);
-    d.set(0, 0, 1);
+    double ay = QuickMath.degToRad(y * fov);
+    double ax = QuickMath.degToRad(x * fov);
+    double avSquared = ay * ay + ax * ax;
+    double angleFromCenter = FastMath.sqrt(avSquared);
+    double dz = FastMath.cos(angleFromCenter);
+    double dv = FastMath.sin(angleFromCenter);
+    double dy, dx;
+    if (angleFromCenter == 0) {
+      dx = dy = 0;
+    } else {
+      dx = dv * (ax / angleFromCenter);
+      dy = dv * (ay / angleFromCenter);
+    }
+    o.set(0, 0, 0);
+    d.set(dx, dy, dz);
   }
 
   @Override public double getMinRecommendedFoV() {
-    return 0.01;
+    return 1;
   }
 
   @Override public double getMaxRecommendedFoV() {
-    return worldDiagonalSize;
+    return 180;
   }
 
   @Override public double getDefaultFoV() {
-    return worldDiagonalSize / 2;
+    return 120;
   }
 }

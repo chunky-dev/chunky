@@ -14,26 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.projection;
+package se.llbit.chunky.renderer.scene.camera.projection;
 
 import java.util.Random;
 
-import org.apache.commons.math3.util.FastMath;
-
-import se.llbit.chunky.renderer.scene.Camera;
-import se.llbit.math.QuickMath;
+import se.llbit.chunky.renderer.scene.camera.Camera;
 import se.llbit.math.Vector3;
 
 /**
- * Behaves like a pinhole camera in the vertical direction, but like a
- * spherical one in the horizontal direction.
+ * Casts rays like a pinhole camera.
+ * This is the default projection mode in Chunky.
  */
-public class PanoramicSlotProjector implements Projector {
-  protected final double fov;
+public class PinholeProjector implements Projector {
+  /** The default field of view. */
+  public static final float DEFAULT_FOV = 70;
+
   protected final double fovTan;
 
-  public PanoramicSlotProjector(double fov) {
-    this.fov = fov;
+  public PinholeProjector(double fov) {
     this.fovTan = Camera.clampedFovTan(fov);
   }
 
@@ -42,13 +40,8 @@ public class PanoramicSlotProjector implements Projector {
   }
 
   @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
-    double ax = QuickMath.degToRad(x * fov);
-    double dz = FastMath.cos(ax);
-    double dx = FastMath.sin(ax);
-    double dy = fovTan * y;
-
     o.set(0, 0, 0);
-    d.set(dx, dy, dz);
+    d.set(fovTan * x, fovTan * y, 1);
   }
 
   @Override public double getMinRecommendedFoV() {
@@ -56,10 +49,10 @@ public class PanoramicSlotProjector implements Projector {
   }
 
   @Override public double getMaxRecommendedFoV() {
-    return 90;
+    return 175;
   }
 
   @Override public double getDefaultFoV() {
-    return 90;
+    return DEFAULT_FOV;
   }
 }

@@ -14,41 +14,48 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.projection;
+package se.llbit.chunky.renderer.scene.camera.projection;
 
 import java.util.Random;
 
-import se.llbit.math.Ray;
+import se.llbit.chunky.renderer.scene.camera.Camera;
 import se.llbit.math.Vector3;
 
 /**
- * A projector for spherical depth of field.
+ * Stereographic projection maps points on the sphere to a plane.
+ *
+ * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class SphericalApertureProjector extends ApertureProjector {
-  public SphericalApertureProjector(Projector wrapped, double apertureSize,
-      double subjectDistance) {
-    super(wrapped, apertureSize, subjectDistance);
+public class StereographicProjector implements Projector {
+
+  private final double scale;
+
+  public StereographicProjector(double fov) {
+    scale = Camera.clampedFovTan(fov);
   }
 
   @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
-    wrapped.apply(x, y, random, o, d);
+    apply(x, y, o, d);
+  }
 
-    d.scale(subjectDistance);
+  @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
+    y *= scale;
+    x *= scale;
+    double xx_yy = x * x + y * y;
+    double r = 1 / (1 + xx_yy);
+    d.set(2 * x * r, 2 * y * r, -(-1 + xx_yy) * r);
+    o.set(0, 0, 0);
+  }
 
-    // find random point in aperture
-    double rx, ry;
-    while (true) {
-      rx = 2 * random.nextDouble() - 1;
-      ry = 2 * random.nextDouble() - 1;
-      double s = rx * rx + ry * ry;
-      if (s > Ray.EPSILON && s <= 1) {
-        rx *= aperture;
-        ry *= aperture;
-        break;
-      }
-    }
+  @Override public double getMinRecommendedFoV() {
+    return 1;
+  }
 
-    d.sub(rx, ry, 0);
-    o.add(rx, ry, 0);
+  @Override public double getMaxRecommendedFoV() {
+    return 175;
+  }
+
+  @Override public double getDefaultFoV() {
+    return 95;
   }
 }

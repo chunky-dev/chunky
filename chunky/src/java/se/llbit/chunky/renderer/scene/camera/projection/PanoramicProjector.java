@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.projection;
+package se.llbit.chunky.renderer.scene.camera.projection;
 
 import java.util.Random;
 
@@ -23,10 +23,14 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
-public class FisheyeProjector implements Projector {
+/**
+ * Panoramic equirectangular projector. x is mapped to yaw, y is mapped to
+ * pitch.
+ */
+public class PanoramicProjector implements Projector {
   protected final double fov;
 
-  public FisheyeProjector(double fov) {
+  public PanoramicProjector(double fov) {
     this.fov = fov;
   }
 
@@ -37,19 +41,11 @@ public class FisheyeProjector implements Projector {
   @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
     double ay = QuickMath.degToRad(y * fov);
     double ax = QuickMath.degToRad(x * fov);
-    double avSquared = ay * ay + ax * ax;
-    double angleFromCenter = FastMath.sqrt(avSquared);
-    double dz = FastMath.cos(angleFromCenter);
-    double dv = FastMath.sin(angleFromCenter);
-    double dy, dx;
-    if (angleFromCenter == 0) {
-      dx = dy = 0;
-    } else {
-      dx = dv * (ax / angleFromCenter);
-      dy = dv * (ay / angleFromCenter);
-    }
+
+    double vv = FastMath.cos(ay);
+
     o.set(0, 0, 0);
-    d.set(dx, dy, dz);
+    d.set(vv * FastMath.sin(ax), FastMath.sin(ay), vv * FastMath.cos(ax));
   }
 
   @Override public double getMinRecommendedFoV() {

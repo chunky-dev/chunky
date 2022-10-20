@@ -62,6 +62,8 @@ import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
+import se.llbit.chunky.renderer.scene.camera.Camera;
+import se.llbit.chunky.renderer.scene.camera.CameraViewListener;
 import se.llbit.chunky.ui.ChunkMap;
 import se.llbit.chunky.ui.dialogs.*;
 import se.llbit.chunky.ui.DoubleTextField;

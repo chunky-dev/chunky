@@ -14,29 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.scene;
+package se.llbit.chunky.renderer.scene.camera;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.renderer.ApertureShape;
 import se.llbit.chunky.renderer.Refreshable;
-import se.llbit.chunky.renderer.projection.ApertureProjector;
-import se.llbit.chunky.renderer.projection.FisheyeProjector;
-import se.llbit.chunky.renderer.projection.ForwardDisplacementProjector;
-import se.llbit.chunky.renderer.projection.OmniDirectionalStereoProjector;
-import se.llbit.chunky.renderer.projection.OmniDirectionalStereoProjector.Eye;
-import se.llbit.chunky.renderer.projection.PanoramicProjector;
-import se.llbit.chunky.renderer.projection.PanoramicSlotProjector;
-import se.llbit.chunky.renderer.projection.ParallelProjector;
-import se.llbit.chunky.renderer.projection.PinholeProjector;
-import se.llbit.chunky.renderer.projection.ProjectionMode;
-import se.llbit.chunky.renderer.projection.Projector;
-import se.llbit.chunky.renderer.projection.ShiftProjector;
-import se.llbit.chunky.renderer.projection.SphericalApertureProjector;
-import se.llbit.chunky.renderer.projection.StereographicProjector;
+import se.llbit.chunky.renderer.scene.camera.projection.ApertureProjector;
+import se.llbit.chunky.renderer.scene.camera.projection.FisheyeProjector;
+import se.llbit.chunky.renderer.scene.camera.projection.ForwardDisplacementProjector;
+import se.llbit.chunky.renderer.scene.camera.projection.OmniDirectionalStereoProjector;
+import se.llbit.chunky.renderer.scene.camera.projection.OmniDirectionalStereoProjector.Eye;
+import se.llbit.chunky.renderer.scene.camera.projection.PanoramicProjector;
+import se.llbit.chunky.renderer.scene.camera.projection.PanoramicSlotProjector;
+import se.llbit.chunky.renderer.scene.camera.projection.ParallelProjector;
+import se.llbit.chunky.renderer.scene.camera.projection.PinholeProjector;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
+import se.llbit.chunky.renderer.scene.camera.projection.Projector;
+import se.llbit.chunky.renderer.scene.camera.projection.ShiftProjector;
+import se.llbit.chunky.renderer.scene.camera.projection.SphericalApertureProjector;
+import se.llbit.chunky.renderer.scene.camera.projection.StereographicProjector;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.json.JsonObject;
-import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 import se.llbit.math.Matrix3;
 import se.llbit.math.QuickMath;

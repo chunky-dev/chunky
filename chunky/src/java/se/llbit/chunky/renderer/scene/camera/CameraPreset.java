@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.scene;
+package se.llbit.chunky.renderer.scene.camera;
 
 import javafx.scene.image.Image;
-import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
 import se.llbit.chunky.world.Icon;
 
 /**

@@ -14,45 +14,41 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.projection;
+package se.llbit.chunky.renderer.scene.camera.projection;
 
 import java.util.Random;
 
-import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 /**
- * Casts rays like a pinhole camera.
- * This is the default projection mode in Chunky.
+ * A projector for spherical depth of field.
  */
-public class PinholeProjector implements Projector {
-  /** The default field of view. */
-  public static final float DEFAULT_FOV = 70;
-
-  protected final double fovTan;
-
-  public PinholeProjector(double fov) {
-    this.fovTan = Camera.clampedFovTan(fov);
+public class SphericalApertureProjector extends ApertureProjector {
+  public SphericalApertureProjector(Projector wrapped, double apertureSize,
+      double subjectDistance) {
+    super(wrapped, apertureSize, subjectDistance);
   }
 
   @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
-    apply(x, y, o, d);
-  }
+    wrapped.apply(x, y, random, o, d);
 
-  @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
-    o.set(0, 0, 0);
-    d.set(fovTan * x, fovTan * y, 1);
-  }
+    d.scale(subjectDistance);
 
-  @Override public double getMinRecommendedFoV() {
-    return 1;
-  }
+    // find random point in aperture
+    double rx, ry;
+    while (true) {
+      rx = 2 * random.nextDouble() - 1;
+      ry = 2 * random.nextDouble() - 1;
+      double s = rx * rx + ry * ry;
+      if (s > Ray.EPSILON && s <= 1) {
+        rx *= aperture;
+        ry *= aperture;
+        break;
+      }
+    }
 
-  @Override public double getMaxRecommendedFoV() {
-    return 175;
-  }
-
-  @Override public double getDefaultFoV() {
-    return DEFAULT_FOV;
+    d.sub(rx, ry, 0);
+    o.add(rx, ry, 0);
   }
 }

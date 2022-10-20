@@ -14,49 +14,53 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.projection;
+package se.llbit.chunky.renderer.scene.camera.projection;
 
 import java.util.Random;
-
-import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
 /**
- * Panoramic equirectangular projector. x is mapped to yaw, y is mapped to
- * pitch.
+ * Moves the ray origin forward (if displacement is positive) along the
+ * direction vector.
  */
-public class PanoramicProjector implements Projector {
-  protected final double fov;
+public class ForwardDisplacementProjector implements Projector {
+  protected final Projector wrapped;
+  protected final double displacementValue;
+  protected final double displacementSign;
 
-  public PanoramicProjector(double fov) {
-    this.fov = fov;
+  public ForwardDisplacementProjector(Projector wrapped, double displacement) {
+    this.wrapped = wrapped;
+    this.displacementValue = QuickMath.abs(displacement);
+    this.displacementSign = QuickMath.signum(displacement);
   }
 
   @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
-    apply(x, y, o, d);
+    wrapped.apply(x, y, random, o, d);
+
+    d.normalize();
+    d.scale(displacementValue);
+    o.scaleAdd(displacementSign, d);
   }
 
   @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
-    double ay = QuickMath.degToRad(y * fov);
-    double ax = QuickMath.degToRad(x * fov);
+    wrapped.apply(x, y, o, d);
 
-    double vv = FastMath.cos(ay);
-
-    o.set(0, 0, 0);
-    d.set(vv * FastMath.sin(ax), FastMath.sin(ay), vv * FastMath.cos(ax));
+    d.normalize();
+    d.scale(displacementValue);
+    o.scaleAdd(displacementSign, d);
   }
 
   @Override public double getMinRecommendedFoV() {
-    return 1;
+    return wrapped.getMinRecommendedFoV();
   }
 
   @Override public double getMaxRecommendedFoV() {
-    return 180;
+    return wrapped.getMaxRecommendedFoV();
   }
 
   @Override public double getDefaultFoV() {
-    return 120;
+    return wrapped.getDefaultFoV();
   }
 }

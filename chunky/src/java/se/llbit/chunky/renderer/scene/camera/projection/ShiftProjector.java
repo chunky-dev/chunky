@@ -1,4 +1,4 @@
-package se.llbit.chunky.renderer.projection;
+package se.llbit.chunky.renderer.scene.camera.projection;
 
 import java.util.Random;
 import se.llbit.math.Vector3;
