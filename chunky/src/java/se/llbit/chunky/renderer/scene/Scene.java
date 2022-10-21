@@ -39,10 +39,10 @@ import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
+import se.llbit.chunky.renderer.scene.camera.MutableCamera;
 import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
-import se.llbit.chunky.renderer.scene.camera.Camera;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.*;
@@ -149,7 +149,7 @@ public class Scene implements JsonSerializable, Refreshable {
   private static boolean invalidWarn = false;
 
   protected final Sky sky = new Sky(this);
-  protected final Camera camera = new Camera(this);
+  protected final MutableCamera camera = new MutableCamera(this);
   protected final Sun sun = new Sun(this);
   protected final Vector3 waterColor =
       new Vector3(PersistentSettings.getWaterColorRed(), PersistentSettings.getWaterColorGreen(),
@@ -3170,7 +3170,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * @return The camera state object.
    */
-  public Camera camera() {
+  public MutableCamera camera() {
     return camera;
   }
 

@@ -20,7 +20,7 @@ import java.util.Random;
 
 import org.apache.commons.math3.util.FastMath;
 
-import se.llbit.chunky.renderer.scene.camera.Camera;
+import se.llbit.chunky.renderer.scene.camera.CameraUtils;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
@@ -34,7 +34,7 @@ public class PanoramicSlotProjector implements Projector {
 
   public PanoramicSlotProjector(double fov) {
     this.fov = fov;
-    this.fovTan = Camera.clampedFovTan(fov);
+    this.fovTan = CameraUtils.clampedFovTan(fov);
   }
 
   @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {

@@ -18,7 +18,7 @@ package se.llbit.chunky.renderer.scene.camera.projection;
 
 import java.util.Random;
 
-import se.llbit.chunky.renderer.scene.camera.Camera;
+import se.llbit.chunky.renderer.scene.camera.CameraUtils;
 import se.llbit.math.Vector3;
 
 /**
@@ -32,7 +32,7 @@ public class PinholeProjector implements Projector {
   protected final double fovTan;
 
   public PinholeProjector(double fov) {
-    this.fovTan = Camera.clampedFovTan(fov);
+    this.fovTan = CameraUtils.clampedFovTan(fov);
   }
 
   @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {

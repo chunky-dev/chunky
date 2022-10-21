@@ -38,7 +38,9 @@ import javafx.stage.FileChooser;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.renderer.scene.camera.ApertureShape;
+import se.llbit.chunky.renderer.scene.camera.CameraUtils;
 import se.llbit.chunky.renderer.scene.camera.CameraViewListener;
+import se.llbit.chunky.renderer.scene.camera.MutableCamera;
 import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
 import se.llbit.chunky.renderer.scene.camera.Camera;
 import se.llbit.chunky.renderer.scene.camera.CameraPreset;
@@ -142,7 +144,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       MenuItem menuItem = new MenuItem(preset.toString());
       menuItem.setGraphic(new ImageView(preset.getIcon()));
       menuItem.setOnAction(e -> {
-        Camera camera = scene.camera();
+        MutableCamera camera = scene.camera();
         preset.apply(camera);
         projectionMode.getSelectionModel().select(camera.getProjectionMode());
         updateFov();
@@ -258,14 +260,14 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     fov.onValueChange(value -> scene.camera().setFoV(value));
 
     dof.setName("Depth of field");
-    dof.setRange(Camera.MIN_DOF, Camera.MAX_DOF);
+    dof.setRange(CameraUtils.MIN_DOF, CameraUtils.MAX_DOF);
     dof.clampMin();
     dof.makeLogarithmic();
     dof.setMaxInfinity(true);
     dof.onValueChange(value -> scene.camera().setDof(value));
 
     subjectDistance.setName("Subject distance");
-    subjectDistance.setRange(Camera.MIN_SUBJECT_DISTANCE, Camera.MAX_SUBJECT_DISTANCE);
+    subjectDistance.setRange(CameraUtils.MIN_SUBJECT_DISTANCE, CameraUtils.MAX_SUBJECT_DISTANCE);
     subjectDistance.clampMax();
     subjectDistance.makeLogarithmic();
     subjectDistance.setTooltip("Distance to focal plane.");
@@ -344,7 +346,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
         cameras.getItems().add(name);
       }
     }
-    Camera camera = scene.camera();
+    MutableCamera camera = scene.camera();
     if (!cameras.getItems().contains(camera.name)) {
       cameras.getItems().add(camera.name);
     }

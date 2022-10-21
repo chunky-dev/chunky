@@ -50,8 +50,8 @@ import javafx.stage.PopupWindow;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.RenderManager;
-import se.llbit.chunky.renderer.scene.camera.Camera;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.camera.MutableCamera;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.math.Vector2;
 
@@ -256,7 +256,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       if (e.isShiftDown()) {
         diff *= 0.1;
       }
-      Camera camera = scene.camera();
+      MutableCamera camera = scene.camera();
       double value = camera.getFov();
       double scale = camera.getMaxFoV() - camera.getMinFoV();
       double offset = value / scale;

@@ -82,7 +82,7 @@ public class ProjectorFactory {
     Projector projector,
     double subjectDistance
   ) {
-    if (camera.infiniteDoF()) {
+    if (camera.isInfiniteDoF()) {
       return projector;
     }
 
@@ -112,7 +112,7 @@ public class ProjectorFactory {
     Camera camera,
     Projector projector
   ) {
-    return camera.infiniteDoF() ?
+    return camera.isInfiniteDoF() ?
       projector :
       new SphericalApertureProjector(
         projector,
