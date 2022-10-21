@@ -157,6 +157,7 @@ public class Sky implements JsonSerializable {
   private double cloudSize = DEFAULT_CLOUD_SIZE;
   private final Vector3 cloudOffset = new Vector3(0, DEFAULT_CLOUD_HEIGHT, 0);
 
+  private double skyExposure = DEFAULT_INTENSITY;
   private double skyLightModifier = DEFAULT_INTENSITY;
   private double apparentSkyLightModifier = DEFAULT_INTENSITY;
 
@@ -235,6 +236,7 @@ public class Sky implements JsonSerializable {
     roll = other.roll;
     rotation.set(other.rotation);
     mirrored = other.mirrored;
+    skyExposure = other.skyExposure;
     skyLightModifier = other.skyLightModifier;
     apparentSkyLightModifier = other.apparentSkyLightModifier;
     gradient = new ArrayList<>(other.gradient);
@@ -360,6 +362,7 @@ public class Sky implements JsonSerializable {
    */
   public void getSkyColor(Ray ray, boolean drawSun) {
     getSkyDiffuseColorInner(ray);
+    ray.color.scale(skyExposure);
     ray.color.scale(skyLightModifier);
     if (drawSun) addSunColor(ray);
     ray.color.w = 1;
@@ -367,6 +370,7 @@ public class Sky implements JsonSerializable {
 
   public void getApparentSkyColor(Ray ray, boolean drawSun) {
     getSkyDiffuseColorInner(ray);
+    ray.color.scale(skyExposure);
     ray.color.scale(apparentSkyLightModifier);
     if (drawSun) addSunColor(ray);
     ray.color.w = 1;
@@ -445,8 +449,9 @@ public class Sky implements JsonSerializable {
         getSkyDiffuseColorInner(ray);
       }
     }
-    addSunColor(ray);
+    ray.color.scale(skyExposure);
     ray.color.scale(apparentSkyLightModifier);
+    addSunColor(ray);
     ray.color.w = 1;
   }
 
@@ -459,7 +464,29 @@ public class Sky implements JsonSerializable {
     double g = ray.color.y;
     double b = ray.color.z;
     if (scene.sun().intersect(ray)) {
-      double mult = scene.getSunSamplingStrategy().isSunLuminosity() ? scene.sun().getLuminosity() : 1;
+
+      // Blend sun color with current color.
+      ray.color.x = ray.color.x + r;
+      ray.color.y = ray.color.y + g;
+      ray.color.z = ray.color.z + b;
+    }
+  }
+
+  public void getSkyColorDiffuseSun(Ray ray, boolean diffuseSun) {
+    getSkyDiffuseColorInner(ray);
+    ray.color.scale(skyExposure);
+    ray.color.scale(skyLightModifier);
+    if (diffuseSun) addSunColorDiffuseSun(ray);
+    ray.color.w = 1;
+  }
+
+  public void addSunColorDiffuseSun(Ray ray) {
+    double r = ray.color.x;
+    double g = ray.color.y;
+    double b = ray.color.z;
+
+    if (scene.sun().intersectDiffuse(ray)) {
+      double mult = scene.sun().getLuminosity();
 
       // Blend sun color with current color.
       ray.color.x = ray.color.x * mult + r;
@@ -599,6 +626,7 @@ public class Sky implements JsonSerializable {
     sky.add("skyPitch", pitch);
     sky.add("skyRoll", roll);
     sky.add("skyMirrored", mirrored);
+    sky.add("skyExposure", skyExposure);
     sky.add("skyLight", skyLightModifier);
     sky.add("apparentSkyLight", apparentSkyLightModifier);
     sky.add("mode", mode.name());
@@ -650,6 +678,7 @@ public class Sky implements JsonSerializable {
     roll = json.get("skyRoll").doubleValue(roll);
     updateTransform();
     mirrored = json.get("skyMirrored").boolValue(mirrored);
+    skyExposure = json.get("skyExposure").doubleValue(skyExposure);
     skyLightModifier = json.get("skyLight").doubleValue(skyLightModifier);
     apparentSkyLightModifier = json.get("apparentSkyLight").doubleValue(apparentSkyLightModifier);
     mode = SkyMode.get(json.get("mode").stringValue(mode.name()));
@@ -707,6 +736,11 @@ public class Sky implements JsonSerializable {
     rotation.rotate(-pitch, -yaw, -roll);
   }
 
+  public void setSkyExposure(double newValue) {
+    skyExposure = newValue;
+    scene.refresh();
+  }
+
   /**
    * Set the sky light modifier.
    */
@@ -718,6 +752,10 @@ public class Sky implements JsonSerializable {
   public void setApparentSkyLight(double newValue) {
     apparentSkyLightModifier = newValue;
     scene.refresh();
+  }
+
+  public double getSkyExposure() {
+    return skyExposure;
   }
 
   /**
@@ -1119,6 +1157,6 @@ public class Sky implements JsonSerializable {
   }
 
   public Vector3 getColor() {
-    return new Vector3(color);
+    return color;
   }
 }
