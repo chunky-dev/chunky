@@ -131,16 +131,20 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     simulatedSky.setTooltip(new Tooltip(skiesTooltip(Sky.skies)));
 
     cloudSize.setName("Cloud size");
+    cloudSize.setTooltip("Cloud size, measured in blocks per pixel of clouds.png texture");
     cloudSize.setRange(0.1, 128);
     cloudSize.clampMin();
     cloudSize.makeLogarithmic();
     cloudSize.onValueChange(value -> scene.sky().setCloudSize(value));
 
     cloudX.setTooltip("Cloud X offset.");
+    cloudX.setRange(-256, 256);
     cloudX.onValueChange(value -> scene.sky().setCloudXOffset(value));
     cloudY.setTooltip("Cloud Y offset.");
+    cloudY.setRange(-64, 320);
     cloudY.onValueChange(value -> scene.sky().setCloudYOffset(value));
     cloudZ.setTooltip("Cloud Z offset.");
+    cloudZ.setRange(-256, 256);
     cloudZ.onValueChange(value -> scene.sky().setCloudZOffset(value));
 
     fogDensity.setTooltip("Fog thickness. Set to 0 to disable volumetric fog effect.");

@@ -39,7 +39,9 @@ public class SkymapSettings extends VBox implements Initializable {
   private File lastDirectory;
 
   @FXML private Button loadSkymap;
-  @FXML private DoubleAdjuster skymapRotation;
+  @FXML private DoubleAdjuster skymapYaw;
+  @FXML private DoubleAdjuster skymapPitch;
+  @FXML private DoubleAdjuster skymapRoll;
   @FXML private ToggleButton v90;
   @FXML private HBox panoSpecific;
 
@@ -69,17 +71,29 @@ public class SkymapSettings extends VBox implements Initializable {
         scene.sky().loadSkymap(imageFile.getAbsolutePath());
       }
     });
-    skymapRotation.setName("Skymap rotation");
-    skymapRotation.setTooltip("Controls the azimuth rotational offset of the skymap.");
-    skymapRotation.setRange(0, 360);
-    skymapRotation
-        .onValueChange(value -> scene.sky().setRotation(QuickMath.degToRad(value)));
+    skymapYaw.setName("Skymap yaw");
+    skymapYaw.setTooltip("Controls the rotation of the skymap around the Y axis.");
+    skymapYaw.setRange(0, 360);
+    skymapYaw
+      .onValueChange(value -> scene.sky().setYaw(QuickMath.degToRad(value)));
+    skymapPitch.setName("Skymap pitch");
+    skymapPitch.setTooltip("Controls the rotation of the skymap around the X axis.");
+    skymapPitch.setRange(0, 360);
+    skymapPitch
+      .onValueChange(value -> scene.sky().setPitch(QuickMath.degToRad(value)));
+    skymapRoll.setName("Skymap roll");
+    skymapRoll.setTooltip("Controls the rotation of the skymap around the Z axis.");
+    skymapRoll.setRange(0, 360);
+    skymapRoll
+      .onValueChange(value -> scene.sky().setRoll(QuickMath.degToRad(value)));
     v90.selectedProperty().addListener(
         (observable, oldValue, newValue) -> scene.sky().setMirrored(newValue));
   }
 
   public void update(Scene scene) {
-    skymapRotation.set(QuickMath.radToDeg(scene.sky().getRotation()));
+    skymapYaw.set(QuickMath.radToDeg(scene.sky().getYaw()));
+    skymapPitch.set(QuickMath.radToDeg(scene.sky().getPitch()));
+    skymapRoll.set(QuickMath.radToDeg(scene.sky().getRoll()));
     v90.setSelected(scene.sky().isMirrored());
   }
 

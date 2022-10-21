@@ -1,4 +1,4 @@
-/* Copyright (c) 2016 Chunky contributors
+/* Copyright (c) 2016-2022 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -14,9 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.scene.camera.projection;
+package se.llbit.chunky.renderer.scene.camera.projection.stereo;
 
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.renderer.scene.camera.projection.PanoramicProjector;
+import se.llbit.chunky.renderer.scene.camera.projection.Projector;
 import se.llbit.math.Constants;
 import se.llbit.math.Vector3;
 
@@ -30,23 +32,16 @@ import java.util.Random;
  * viewing angle to account for the inter-pupillary distance. This allows to create panoramic
  * stereo images that are perfect for viewing on VR devices.
  *
+ * <p>The resulting image will have a complete 360° range, if and only if the canvas' aspect ratio matches the target format.
+ * See the implementing classes for details.
+ *
  * @see <a href="https://developers.google.com/vr/jump/rendering-ods-content.pdf">Rendering Omni‐directional Stereo Content</a>
  */
-public class OmniDirectionalStereoProjector implements Projector {
+public abstract class OmniDirectionalStereoProjector implements Projector {
   /**
    * The inter-pupillary distance of the viewer, in meters.
    */
-  private static final double interPupillaryDistance = 0.069;
-
-  private final double scale;
-
-  public OmniDirectionalStereoProjector(Eye eye) {
-    if (eye == Eye.LEFT) {
-      scale = -interPupillaryDistance / 2;
-    } else {
-      scale = interPupillaryDistance / 2;
-    }
-  }
+  private static final double INTERPUPILLARY_DISTANCE = 0.069;
 
   @Override
   public void apply(double x, double y, Random random, Vector3 pos, Vector3 direction) {
@@ -54,13 +49,42 @@ public class OmniDirectionalStereoProjector implements Projector {
   }
 
   @Override
-  public void apply(double x, double y, Vector3 pos, Vector3 direction) {
-    double theta = (x + 0.5) * Math.PI - Constants.HALF_PI;
-    double phi = Constants.HALF_PI - (y + 0.5) * Math.PI;
+  public abstract void apply(double x, double y, Vector3 pos, Vector3 direction);
 
-    pos.set(FastMath.cos(theta) * scale, 0, FastMath.sin(theta) * scale);
-    direction.set(FastMath.sin(theta) * FastMath.cos(phi), -FastMath.sin(phi),
-        FastMath.cos(theta) * FastMath.cos(phi));
+  /**
+   * @param x 0-1
+   * @param y 0-1
+   */
+  protected void applyLeftEye(double x, double y, Vector3 pos, Vector3 direction) {
+    apply(x, y, -INTERPUPILLARY_DISTANCE / 2, pos, direction);
+  }
+
+  /**
+   * @param x 0-1
+   * @param y 0-1
+   */
+  protected void applyRightEye(double x, double y, Vector3 pos, Vector3 direction) {
+    apply(x, y, INTERPUPILLARY_DISTANCE / 2, pos, direction);
+  }
+
+  /**
+   * @param x 0-1
+   * @param y 0-1
+   */
+  private void apply(double x, double y, double scale, Vector3 pos, Vector3 direction) {
+    double theta = x * Math.PI - Constants.HALF_PI;
+    double phi = Constants.HALF_PI - y * Math.PI;
+
+    pos.set(
+      FastMath.cos(theta) * scale,
+      0,
+      FastMath.sin(theta) * scale
+    );
+    direction.set(
+      FastMath.sin(theta) * FastMath.cos(phi),
+      -FastMath.sin(phi),
+      FastMath.cos(theta) * FastMath.cos(phi)
+    );
   }
 
   @Override
@@ -76,10 +100,5 @@ public class OmniDirectionalStereoProjector implements Projector {
   @Override
   public double getDefaultFoV() {
     return 180;
-  }
-
-  public enum Eye {
-    LEFT,
-    RIGHT
   }
 }

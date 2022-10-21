@@ -56,6 +56,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @FXML private DoubleAdjuster waterPlaneHeight;
   @FXML private CheckBox waterPlaneOffsetEnabled;
   @FXML private CheckBox waterPlaneClip;
+  @FXML private TitledPane waterWorldModeDetailsPane;
   @FXML private CheckBox useProceduralWater;
   @FXML private IntegerAdjuster proceduralWaterIterations;
   @FXML private DoubleAdjuster proceduralWaterFrequency;
@@ -168,11 +169,18 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       }
     });
 
+    waterWorldModeDetailsPane.setVisible(waterPlaneEnabled.isSelected());
+    waterWorldModeDetailsPane.setExpanded(waterPlaneEnabled.isSelected());
+    waterWorldModeDetailsPane.setManaged(waterPlaneEnabled.isSelected());
+
     waterPlaneEnabled.setTooltip(
       new Tooltip("If enabled, an infinite ocean fills the scene. This ignores air from loaded chunks."));
-    waterPlaneEnabled.selectedProperty().addListener((observable, oldValue, newValue) ->
-      scene.setWaterPlaneEnabled(newValue)
-    );
+    waterPlaneEnabled.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.setWaterPlaneEnabled(newValue);
+      waterWorldModeDetailsPane.setVisible(newValue);
+      waterWorldModeDetailsPane.setExpanded(newValue);
+      waterWorldModeDetailsPane.setManaged(newValue);
+    });
 
     waterPlaneHeight.setName("Water height");
     waterPlaneHeight.setTooltip("The default ocean height is " + World.SEA_LEVEL + ".");
@@ -188,6 +196,10 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       scene.setWaterPlaneChunkClip(newValue)
     );
 
+    proceduralWaterDetailsPane.setVisible(useProceduralWater.isSelected());
+    proceduralWaterDetailsPane.setExpanded(useProceduralWater.isSelected());
+    proceduralWaterDetailsPane.setManaged(useProceduralWater.isSelected());
+
     useProceduralWater.setTooltip(new Tooltip("Generate customized water waves using noise to prevent tiling at large distances."));
     useProceduralWater.selectedProperty().addListener((observable, oldValue, newValue) -> {
       if(newValue && scene.getWaterShading() instanceof LegacyWaterShader) {
@@ -202,8 +214,10 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
         scene.setWaterShading(new LegacyWaterShader());
         scene.refresh();
       }
+      proceduralWaterDetailsPane.setVisible(newValue);
+      proceduralWaterDetailsPane.setExpanded(newValue);
+      proceduralWaterDetailsPane.setManaged(newValue);
     });
-    proceduralWaterDetailsPane.visibleProperty().bind(useProceduralWater.selectedProperty());
 
     proceduralWaterIterations.setName("Iterations");
     proceduralWaterIterations.setTooltip("The number of iterations (layers) of noise used");

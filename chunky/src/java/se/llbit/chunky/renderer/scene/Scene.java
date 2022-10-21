@@ -1254,7 +1254,8 @@ public class Scene implements JsonSerializable, Refreshable {
                   cubeWorldBlocks[cubeIndex] = octNode;
 
                   if(emitterGrid != null && block.emittance > 1e-4) {
-                    emitterGrid.addEmitter(new Grid.EmitterPosition(x, y, z, block));
+                    // X and Z are Chunky position but Y is world position
+                    emitterGrid.addEmitter(new Grid.EmitterPosition(x, y - origin.y, z, block));
                   }
                 }
               }

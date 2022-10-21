@@ -22,7 +22,6 @@ import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.scene.camera.projection.PinholeProjector;
 import se.llbit.chunky.renderer.scene.camera.projection.ProjectionPreset;
 import se.llbit.chunky.renderer.scene.camera.projection.Projector;
-import se.llbit.chunky.renderer.scene.camera.projection.ProjectorFactory;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.json.JsonObject;
 import se.llbit.math.Matrix3;

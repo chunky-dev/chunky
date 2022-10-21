@@ -18,6 +18,7 @@ package se.llbit.chunky.renderer.scene.camera.projection;
 
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.camera.Camera;
+import se.llbit.chunky.renderer.scene.camera.projection.stereo.*;
 import se.llbit.log.Log;
 import se.llbit.util.Registerable;
 import se.llbit.util.annotation.Nullable;
@@ -102,12 +103,17 @@ public class ProjectionPreset implements Registerable, ProjectorFactory {
     new ProjectionPreset(
       "ODS_LEFT",
       "Omni‐directional Stereo (left eye)",
-      camera -> new OmniDirectionalStereoProjector(OmniDirectionalStereoProjector.Eye.LEFT)
+      camera -> new ODSSinglePerspectiveProjector(ODSSinglePerspectiveProjector.Eye.LEFT)
     ),
     new ProjectionPreset(
       "ODS_RIGHT",
       "Omni‐directional Stereo (right eye)",
-      camera -> new OmniDirectionalStereoProjector(OmniDirectionalStereoProjector.Eye.RIGHT)
+      camera -> new ODSSinglePerspectiveProjector(ODSSinglePerspectiveProjector.Eye.RIGHT)
+    ),
+    new ProjectionPreset(
+      "ODS_STACKED",
+      "Omni‐directional Stereo (both eyes, vertically stacked)",
+      camera -> new ODSVerticalStackedProjector()
     )
   );
 

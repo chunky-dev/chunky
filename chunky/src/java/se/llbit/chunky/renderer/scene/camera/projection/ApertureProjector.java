@@ -72,7 +72,7 @@ public class ApertureProjector implements Projector {
 
         return apertureMask;
       } catch (IOException e) {
-        Log.error("Failed to load aperture mask: " + filename);
+        Log.error("Failed to load aperture mask: " + filename, e);
         return null;
       }
     } else {
@@ -88,7 +88,7 @@ public class ApertureProjector implements Projector {
         return ImageLoader.read(ApertureProjector.class.getResourceAsStream(resourceName));
       }
     } catch (IOException e) {
-      Log.error("Failed to load built-in aperture mask: " + apertureShape);
+      Log.error("Failed to load built-in aperture mask: " + apertureShape, e);
     }
     return null;
   }
