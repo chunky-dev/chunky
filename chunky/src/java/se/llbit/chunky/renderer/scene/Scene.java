@@ -40,9 +40,9 @@ import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
 import se.llbit.chunky.renderer.scene.camera.MutableCamera;
-import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectionPreset;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.*;
@@ -683,7 +683,7 @@ public class Scene implements JsonSerializable, Refreshable {
     state.ray.o.y -= origin.y;
     state.ray.o.z -= origin.z;
 
-    if(camera.getProjectionMode() == ProjectionMode.PARALLEL) {
+    if(camera.getProjectionPreset() == ProjectionPreset.PARALLEL) {
       // When in parallel projection, push the ray origin back so the
       // ray start outside the octree to prevent ray spawning inside some blocks
       int limit = (1 << worldOctree.getDepth());

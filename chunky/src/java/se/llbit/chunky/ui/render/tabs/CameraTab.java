@@ -41,10 +41,10 @@ import se.llbit.chunky.renderer.scene.camera.ApertureShape;
 import se.llbit.chunky.renderer.scene.camera.CameraUtils;
 import se.llbit.chunky.renderer.scene.camera.CameraViewListener;
 import se.llbit.chunky.renderer.scene.camera.MutableCamera;
-import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
 import se.llbit.chunky.renderer.scene.camera.Camera;
 import se.llbit.chunky.renderer.scene.camera.CameraPreset;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectionPreset;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.DoubleTextField;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
@@ -74,7 +74,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   @FXML private DoubleTextField pitchField;
   @FXML private DoubleTextField rollField;
   @FXML private Button centerCamera;
-  @FXML private ChoiceBox<ProjectionMode> projectionMode;
+  @FXML private ChoiceBox<ProjectionPreset> projectionMode;
   @FXML private DoubleAdjuster fov;
   @FXML private DoubleAdjuster dof;
   @FXML private DoubleAdjuster subjectDistance;
@@ -118,7 +118,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   }
 
   private void updateProjectionMode() {
-    projectionMode.getSelectionModel().select(scene.camera().getProjectionMode());
+    projectionMode.getSelectionModel().select(scene.camera().getProjectionPreset());
   }
 
   private void updateSubjectDistance() {
@@ -146,7 +146,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       menuItem.setOnAction(e -> {
         MutableCamera camera = scene.camera();
         preset.apply(camera);
-        projectionMode.getSelectionModel().select(camera.getProjectionMode());
+        projectionMode.getSelectionModel().select(camera.getProjectionPreset());
         updateFov();
         updateCameraDirection();
       });
@@ -244,12 +244,12 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       updateCameraPosition();
     });
 
-    projectionMode.getItems().addAll(ProjectionMode.values());
-    projectionMode.getSelectionModel().select(ProjectionMode.PINHOLE);
+    projectionMode.getItems().addAll(ProjectionPreset.REGISTRY.getProjectionPresets());
+    projectionMode.getSelectionModel().select(ProjectionPreset.PINHOLE);
     projectionMode.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
-          scene.camera().setProjectionMode(newValue);
-          apertureShape.setManaged(newValue == ProjectionMode.PINHOLE);
+          scene.camera().setProjectionPreset(newValue);
+          apertureShape.setManaged(newValue == ProjectionPreset.PINHOLE);
           scene.camera().setApertureShape(ApertureShape.CIRCLE);
           updateFov();
         });

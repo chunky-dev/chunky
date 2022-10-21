@@ -1,83 +1,34 @@
+/* Copyright (c) 2022 Chunky contributors
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package se.llbit.chunky.renderer.scene.camera.projection;
 
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.camera.ApertureShape;
 import se.llbit.chunky.renderer.scene.camera.Camera;
-import se.llbit.log.Log;
 
-public class ProjectorFactory {
-  private ProjectorFactory() {
-  }
+/**
+ * Creates a projector based on the given camera settings.
+ */
+@PluginApi
+@FunctionalInterface
+public interface ProjectorFactory {
+  Projector create(Camera camera);
 
-  /**
-   * Creates projector based on the current camera settings.
-   */
-  public static Projector create(Camera camera) {
-    switch (camera.getProjectionMode()) {
-      default:
-        Log.errorf("Unknown projection mode: %s, using standard mode", camera.getProjectionMode());
-      case PINHOLE:
-        return applyShift(
-          camera,
-          applyDoF(
-            camera,
-            new PinholeProjector(
-              camera.getFov()
-            ),
-            camera.getSubjectDistance()
-          )
-        );
-      case PARALLEL:
-        return applyShift(
-          camera,
-          applyDoF(
-            camera,
-            new ForwardDisplacementProjector(
-              new ParallelProjector(
-                camera.getWorldDiagonalSize(),
-                camera.getFov()
-              ),
-              -camera.getWorldDiagonalSize()
-            ),
-            camera.getSubjectDistance() + camera.getWorldDiagonalSize()
-          )
-        );
-      case FISHEYE:
-        return applySphericalDoF(
-          camera,
-          new FisheyeProjector(
-            camera.getFov()
-          )
-        );
-      case PANORAMIC_SLOT:
-        return applySphericalDoF(
-          camera,
-          new PanoramicSlotProjector(
-            camera.getFov()
-          )
-        );
-      case PANORAMIC:
-        return applySphericalDoF(
-          camera,
-          new PanoramicProjector(
-            camera.getFov()
-          )
-        );
-      case STEREOGRAPHIC:
-        return new StereographicProjector(
-          camera.getFov()
-        );
-      case ODS_LEFT:
-        return new OmniDirectionalStereoProjector(
-          OmniDirectionalStereoProjector.Eye.LEFT
-        );
-      case ODS_RIGHT:
-        return new OmniDirectionalStereoProjector(
-          OmniDirectionalStereoProjector.Eye.RIGHT
-        );
-    }
-  }
-
-  private static Projector applyDoF(
+  static Projector applyDoF(
     Camera camera,
     Projector projector,
     double subjectDistance
@@ -108,7 +59,7 @@ public class ProjectorFactory {
       );
   }
 
-  private static Projector applySphericalDoF(
+  static Projector applySphericalDoF(
     Camera camera,
     Projector projector
   ) {
@@ -121,7 +72,7 @@ public class ProjectorFactory {
       );
   }
 
-  private static Projector applyShift(
+  static Projector applyShift(
     Camera camera,
     Projector projector
   ) {

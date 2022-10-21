@@ -19,8 +19,9 @@ package se.llbit.chunky.renderer.export;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
+
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectionPreset;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.imageformats.png.ITXT;
 import se.llbit.imageformats.png.PngFileWriter;
@@ -57,7 +58,7 @@ public class PngExportFormat implements PictureExportFormat {
       } else {
         writer.write(backBuffer.data, scene.canvasWidth(), scene.canvasHeight(), task);
       }
-      if (scene.camera().getProjectionMode() == ProjectionMode.PANORAMIC
+      if (scene.camera().getProjectionPreset() == ProjectionPreset.PANORAMIC
           && scene.camera().getFov() >= 179
           && scene.camera().getFov() <= 181) {
         writePanoramaMetaData(scene, writer);

@@ -20,7 +20,7 @@ package se.llbit.chunky.renderer.scene.camera;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.scene.camera.projection.PinholeProjector;
-import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectionPreset;
 import se.llbit.chunky.renderer.scene.camera.projection.Projector;
 import se.llbit.chunky.renderer.scene.camera.projection.ProjectorFactory;
 import se.llbit.chunky.world.Chunk;
@@ -93,7 +93,7 @@ public class MutableCamera implements Camera {
 
   private final Matrix3 tmpTransform = new Matrix3();
 
-  private ProjectionMode projectionMode = ProjectionMode.PINHOLE;
+  private ProjectionPreset projectionPreset = ProjectionPreset.PINHOLE;
   private Projector projector = new PinholeProjector(PinholeProjector.DEFAULT_FOV);
 
   private double dof = Double.POSITIVE_INFINITY;
@@ -139,7 +139,7 @@ public class MutableCamera implements Camera {
     pitch = other.getPitch();
     roll = other.getRoll();
     dof = other.getDof();
-    projectionMode = other.getProjectionMode();
+    projectionPreset = other.getProjectionPreset();
     fov = other.getFov();
     subjectDistance = other.getSubjectDistance();
     worldDiagonalSize = other.getWorldDiagonalSize();
@@ -155,7 +155,7 @@ public class MutableCamera implements Camera {
    * This (re-)initializes the camera projector.
    */
   private void initProjector() {
-    projector = ProjectorFactory.create(this);
+    projector = projectionPreset.create(this);
   }
 
   /**
@@ -194,16 +194,16 @@ public class MutableCamera implements Camera {
   /**
    * @return the projection mode
    */
-  @Override public ProjectionMode getProjectionMode() {
-    return projectionMode;
+  @Override public ProjectionPreset getProjectionPreset() {
+    return projectionPreset;
   }
 
   /**
    * Set the projection mode
    */
-  public synchronized void setProjectionMode(ProjectionMode mode) {
-    if (projectionMode != mode) {
-      projectionMode = mode;
+  public synchronized void setProjectionPreset(ProjectionPreset preset) {
+    if (projectionPreset != preset) {
+      projectionPreset = preset;
       initProjector();
       fov = projector.getDefaultFoV();
       onViewChange();
@@ -258,7 +258,7 @@ public class MutableCamera implements Camera {
    * Move camera forward
    */
   public synchronized void moveForward(double v) {
-    if (projectionMode != ProjectionMode.PARALLEL) {
+    if (projectionPreset != ProjectionPreset.PARALLEL) {
       u.set(0, 0, 1);
     } else {
       u.set(0, -1, 0);
@@ -273,7 +273,7 @@ public class MutableCamera implements Camera {
    * Move camera backward
    */
   public synchronized void moveBackward(double v) {
-    if (projectionMode != ProjectionMode.PARALLEL) {
+    if (projectionPreset != ProjectionPreset.PARALLEL) {
       u.set(0, 0, 1);
     } else {
       u.set(0, -1, 0);
@@ -498,7 +498,7 @@ public class MutableCamera implements Camera {
    */
   public void setWorldSize(double size) {
     worldDiagonalSize = 2 * Math.sqrt(2 * size * size + Chunk.Y_MAX * Chunk.Y_MAX);
-    if (projectionMode == ProjectionMode.PARALLEL) {
+    if (projectionPreset == ProjectionPreset.PARALLEL) {
       initProjector();
     }
   }
@@ -532,7 +532,7 @@ public class MutableCamera implements Camera {
     orientation.add("yaw", yaw);
     camera.add("orientation", orientation);
 
-    camera.add("projectionMode", projectionMode.name());
+    camera.add("projectionPreset", projectionPreset.getId());
     camera.add("fov", fov);
     if (dof == Double.POSITIVE_INFINITY) {
       camera.add("dof", "Infinity");
@@ -566,8 +566,14 @@ public class MutableCamera implements Camera {
 
     fov = json.get("fov").doubleValue(fov);
     subjectDistance = json.get("focalOffset").doubleValue(subjectDistance);
-    projectionMode = ProjectionMode.get(
-        json.get("projectionMode").stringValue(projectionMode.name()));
+    projectionPreset = ProjectionPreset.REGISTRY.getProjectionPreset(
+      json.get("projectionPreset").stringValue(
+        json.get("projectionMode").stringValue(
+          projectionPreset.getId()
+        )
+      ),
+      ProjectionPreset.PINHOLE
+    );
     if (json.get("infDof").boolValue(false)) {
       // The infDof setting is deprecated.
       dof = Double.POSITIVE_INFINITY;
@@ -605,7 +611,7 @@ public class MutableCamera implements Camera {
     if (!traceInScene.apply(ray)) {
       setDof(Double.POSITIVE_INFINITY);
     } else {
-      if(projectionMode == ProjectionMode.PARALLEL) {
+      if(projectionPreset == ProjectionPreset.PARALLEL) {
         ray.distance -= worldDiagonalSize;
       }
       setSubjectDistance(ray.distance);

@@ -20,9 +20,10 @@ package se.llbit.chunky.renderer;
 import org.junit.Test;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ChunkyOptions;
-import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectionPreset;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectorFactory;
 import se.llbit.json.JsonObject;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -166,7 +167,7 @@ public class BlankRenderTest {
     scene.setCanvasSize(WIDTH, HEIGHT);
     scene.setRenderMode(RenderMode.RENDERING);
     scene.sky().setSkyMode(Sky.SkyMode.SIMULATED);
-    scene.camera().setProjectionMode(ProjectionMode.PANORAMIC);
+    scene.camera().setProjectionPreset(ProjectionPreset.PANORAMIC);
     scene.camera().setFoV(100);
 
     int size = 3 * WIDTH * HEIGHT;
