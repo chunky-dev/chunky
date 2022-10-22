@@ -307,18 +307,42 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       scene.setSaveSnapshots(newValue1);
     });
 
-    yMax.setTooltip(
-        "Blocks above this Y value are not loaded. Requires reloading chunks to take effect.");
-    yMax.onValueChange(value -> {
-      scene.setYClipMax(value);
-      renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
-    });
-
     yMin.setTooltip(
         "Blocks below this Y value are not loaded. Requires reloading chunks to take effect.");
     yMin.onValueChange(value -> {
-      scene.setYClipMin(value);
-      renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
+      if (value > yMax.get()) {
+        if (!yMin.getStyleClass().contains("invalid")) {
+          yMin.getStyleClass().add("invalid");
+        }
+        if (!yMax.getStyleClass().contains("invalid")) {
+          yMax.getStyleClass().add("invalid");
+        }
+      } else {
+        yMin.getStyleClass().remove("invalid");
+        yMax.getStyleClass().remove("invalid");
+
+        scene.setYClipMin(value);
+        renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
+      }
+    });
+
+    yMax.setTooltip(
+      "Blocks above this Y value are not loaded. Requires reloading chunks to take effect.");
+    yMax.onValueChange(value -> {
+      if (yMin.get() > value) {
+        if (!yMin.getStyleClass().contains("invalid")) {
+          yMin.getStyleClass().add("invalid");
+        }
+        if (!yMax.getStyleClass().contains("invalid")) {
+          yMax.getStyleClass().add("invalid");
+        }
+      } else {
+        yMin.getStyleClass().remove("invalid");
+        yMax.getStyleClass().remove("invalid");
+
+        scene.setYClipMax(value);
+        renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
+      }
     });
 
     openSceneDirBtn.setTooltip(

@@ -576,11 +576,15 @@ public class ChunkyFxController
         (observable, oldValue, newValue) -> mapView.setScale(newValue.intValue())));
     yMin.valueProperty().addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
       if (newValue.intValue() > yMax.get()) {
-        yMin.getStyleClass().add("invalid");
-        yMax.getStyleClass().add("invalid");
+        if (!yMin.getStyleClass().contains("invalid")) {
+          yMin.getStyleClass().add("invalid");
+        }
+        if (!yMax.getStyleClass().contains("invalid")) {
+          yMax.getStyleClass().add("invalid");
+        }
       } else {
-        yMin.getStyleClass().removeAll("invalid");
-        yMax.getStyleClass().removeAll("invalid");
+        yMin.getStyleClass().remove("invalid");
+        yMax.getStyleClass().remove("invalid");
 
         if (!ignoreYUpdate.get()) {
           mapView.setYMin(newValue.intValue());
@@ -591,11 +595,15 @@ public class ChunkyFxController
     }));
     yMax.valueProperty().addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
       if (yMin.get() > newValue.intValue()) {
-        yMin.getStyleClass().add("invalid");
-        yMax.getStyleClass().add("invalid");
+        if (!yMin.getStyleClass().contains("invalid")) {
+          yMin.getStyleClass().add("invalid");
+        }
+        if (!yMax.getStyleClass().contains("invalid")) {
+          yMax.getStyleClass().add("invalid");
+        }
       } else {
-        yMin.getStyleClass().removeAll("invalid");
-        yMax.getStyleClass().removeAll("invalid");
+        yMin.getStyleClass().remove("invalid");
+        yMax.getStyleClass().remove("invalid");
 
         if (!ignoreYUpdate.get()) {
           mapView.setYMin(yMin.get());
