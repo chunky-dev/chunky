@@ -62,6 +62,8 @@ public abstract class Adjuster<T extends Number> extends HBox {
         }
       }
     });
+
+    getStyleClass().add("adjuster");
   }
 
   public void setName(String name) {
