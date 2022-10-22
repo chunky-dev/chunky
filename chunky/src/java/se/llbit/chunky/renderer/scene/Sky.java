@@ -643,7 +643,6 @@ public class Sky implements JsonSerializable {
     colorObj.add("green", color.y);
     colorObj.add("blue", color.z);
     sky.add("color", colorObj);
-    //sky.add("color", JsonUtil.vec3ToJson(color));
 
     switch (mode) {
       case SKYMAP_PANORAMIC:
