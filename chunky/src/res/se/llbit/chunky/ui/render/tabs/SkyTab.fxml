@@ -32,6 +32,10 @@
     </TitledPane>
     <CheckBox fx:id="transparentSkyEnabled" mnemonicParsing="false" text="Transparent sky" />
     <Separator />
+    <DoubleAdjuster fx:id="skyExposure" maxWidth="1.7976931348623157E308" />
+    <DoubleAdjuster fx:id="skyIntensity" maxWidth="1.7976931348623157E308" />
+    <DoubleAdjuster fx:id="apparentSkyBrightness" maxWidth="1.7976931348623157E308" />
+    <Separator />
     <CheckBox fx:id="cloudsEnabled" mnemonicParsing="false" text="Enable clouds" />
     <TitledPane fx:id="cloudDetailsPane" animated="false" text="Cloud settings">
       <VBox spacing="10.0">
@@ -46,7 +50,7 @@
     </TitledPane>
     <Separator />
     <DoubleAdjuster fx:id="fogDensity" name="Fog density" />
-    <DoubleAdjuster fx:id="skyFogDensity" name="Sky fog blending" />
+    <DoubleAdjuster fx:id="skyFogDensity" name="Sky-fog blending" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Fog color:" />
       <LuxColorPicker fx:id="fogColor" />

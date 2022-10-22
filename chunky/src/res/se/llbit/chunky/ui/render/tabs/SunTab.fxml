@@ -15,35 +15,27 @@
 
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
-    <DoubleAdjuster fx:id="skyExposure" maxWidth="1.7976931348623157E308" />
-    <DoubleAdjuster fx:id="skyIntensity" maxWidth="1.7976931348623157E308" />
-    <DoubleAdjuster fx:id="apparentSkyBrightness" maxWidth="1.7976931348623157E308" />
-    <Separator />
-    <CheckBox fx:id="enableEmitters" mnemonicParsing="false" text="Enable emitters" />
-    <DoubleAdjuster fx:id="emitterIntensity" maxWidth="1.7976931348623157E308" />
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <Label text="Emitter Sampling Strategy:" />
-      <ChoiceBox fx:id="emitterSamplingStrategy" />
-    </HBox>
-    <Separator />
-    <CheckBox fx:id="drawSun" mnemonicParsing="false" text="Draw sun" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Sun Sampling Strategy:" />
       <ComboBox fx:id="sunSamplingStrategy" />
     </HBox>
     <DoubleAdjuster fx:id="sunIntensity" maxWidth="1.7976931348623157E308" />
     <DoubleAdjuster fx:id="sunLuminosity" maxWidth="Infinity" />
-    <DoubleAdjuster fx:id="apparentSunBrightness" maxWidth="Infinity" />
     <DoubleAdjuster fx:id="sunRadius" maxWidth="Infinity" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Sunlight color:" />
-      <LuxColorPicker fx:id="sunColor" />
+      <LuxColorPicker fx:id="sunlightColor" />
     </HBox>
+    <Separator />
+    <CheckBox fx:id="drawSun" mnemonicParsing="false" text="Draw sun" />
+    <DoubleAdjuster fx:id="apparentSunBrightness" maxWidth="Infinity" />
+    <DoubleAdjuster fx:id="apparentSunRadius" maxWidth="Infinity" />
     <CheckBox fx:id="modifySunTexture" mnemonicParsing="false" text="Modify sun texture by color" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Apparent sun color:" />
       <LuxColorPicker fx:id="apparentSunColor" />
     </HBox>
+    <Separator />
     <AngleAdjuster fx:id="sunAzimuth" />
     <AngleAdjuster fx:id="sunAltitude" />
     <padding>

@@ -43,9 +43,6 @@
       <Label text="BiomeStructure implementation:" />
       <ChoiceBox fx:id="biomeStructureImplementation" prefWidth="150" />
     </HBox>
-    <IntegerAdjuster fx:id="gridSize" />
-    <CheckBox fx:id="preventNormalEmitterWithSampling" mnemonicParsing="false" text="Prevent normal emitter when using emitter sampling" />
-
     <Separator prefWidth="200.0" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Renderer:" />
