@@ -490,12 +490,16 @@ public class ChunkyFxController
                     yMin.set(-64);
                     yMax.setRange(-64, 320);
                     yMax.set(320);
+                    mapView.setYMinMax(-64, 320);
                   } else {
                     yMin.setRange(0, 256);
                     yMin.set(0);
                     yMax.setRange(0, 256);
                     yMax.set(256);
+                    mapView.setYMinMax(0, 256);
                   }
+                  yMin.getStyleClass().removeAll("invalid");
+                  yMax.getStyleClass().removeAll("invalid");
                   ignoreYUpdate.set(false);
                 }
                 map.redrawMap();
