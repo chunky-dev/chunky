@@ -325,6 +325,10 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         perceptualSmoothness.setName("Smoothness");
         perceptualSmoothness.setRange(0, 1);
 
+        DoubleAdjuster metalness = new DoubleAdjuster();
+        metalness.setName("Metalness");
+        metalness.setRange(0, 1);
+
         LuxColorPicker beamColorPicker = new LuxColorPicker();
 
         ObservableList<Integer> colorHeights = FXCollections.observableArrayList();
@@ -339,6 +343,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
               specular.set(beamMat.specular);
               ior.set(beamMat.ior);
               perceptualSmoothness.set(beamMat.getPerceptualSmoothness());
+              metalness.set(beamMat.metalness);
               beamColorPicker.setColor(ColorUtil.toFx(beamMat.getColorInt()));
 
               emittance.onValueChange(value -> {
@@ -355,6 +360,10 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
               });
               perceptualSmoothness.onValueChange(value -> {
                 beamMat.setPerceptualSmoothness(value);
+                scene.rebuildActorBvh();
+              });
+              metalness.onValueChange(value -> {
+                beamMat.metalness = value.floatValue();
                 scene.rebuildActorBvh();
               });
             }
@@ -393,7 +402,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         });
         
         listButtons.getChildren().addAll(deleteButton, layerInput, addButton);
-        propertyControls.getChildren().addAll(emittance, specular, perceptualSmoothness, ior, beamColorPicker);
+        propertyControls.getChildren().addAll(emittance, specular, perceptualSmoothness, ior, metalness, beamColorPicker);
         listControls.getChildren().addAll(new Label("Start Height:"), colorHeightList, listButtons);
         beamColor.getChildren().addAll(listControls, propertyControls);
         controls.getChildren().add(beamColor);
