@@ -193,7 +193,9 @@ public class ChunkyFxController
   static class GUIRenderListener implements RenderStatusListener {
     private final ChunkyFxController gui;
     private int spp;
-    private int sps;
+    private LinkedList<Integer> sps_queue = new LinkedList<Integer>();
+    private static final int AVERAGE_PERIOD = 150;
+    private int sps_average;
 
     public GUIRenderListener(ChunkyFxController renderControls) {
       this.gui = renderControls;
@@ -210,7 +212,24 @@ public class ChunkyFxController
     }
 
     @Override public void setSamplesPerSecond(int sps) {
-      this.sps = sps;
+      // Rolling average of SPS
+      int avg;
+      if (sps_queue.size() >= AVERAGE_PERIOD) {
+        avg = sps_average;
+        // Probably not needed, but just in case sps_queue is too long
+        for (int i = sps_queue.size(); i > AVERAGE_PERIOD; i--) {
+          sps_queue.removeLast();
+        }
+        avg -= sps_queue.removeLast() / AVERAGE_PERIOD;
+        sps_queue.addFirst(sps);
+        avg += sps / AVERAGE_PERIOD;
+      } else {
+        avg = sps_average * sps_queue.size();
+        avg += sps;
+        sps_queue.addFirst(sps);
+        avg /= sps_queue.size();
+      }
+      sps_average = avg;
       updateSppStats();
     }
 
@@ -222,7 +241,7 @@ public class ChunkyFxController
     private void updateSppStats() {
       Platform.runLater(() -> gui.sppLbl.setText(String
           .format("%s SPP, %s SPS", gui.decimalFormat.format(spp),
-              gui.decimalFormat.format(sps))));
+              gui.decimalFormat.format(sps_average))));
     }
 
     @Override public void renderStateChanged(RenderMode state) {
