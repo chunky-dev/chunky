@@ -386,6 +386,12 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     int canvasHeight = bufferedScene.canvasHeight();
     long pixelsPerFrame = (long) canvasWidth * canvasHeight;
     double renderTime = bufferedScene.renderTime / 1000.0;
+
+    // Avoid incorrect output if the average time per render pass were to exceed SPS_AVERAGE_TIME
+    // Somewhat hacky, as it will break if there is an outlier pass that's >SPS_AVERAGE_TIME, and 0 will be returned
+    if (renderTime / bufferedScene.spp >= SPS_AVERAGE_TIME)
+      return (int) ((bufferedScene.spp * pixelsPerFrame) / renderTime);
+
     if (renderTime < SPS_AVERAGE_TIME) {
       return (int) ((bufferedScene.spp * pixelsPerFrame) / renderTime);
     } else {
