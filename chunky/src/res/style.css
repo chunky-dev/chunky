@@ -53,10 +53,14 @@ Hyperlink:hover {
     -fx-underline: true;
 }
 
-.numeric-text-field.invalid {
+.numeric-text-field.invalid, .adjuster.invalid > .numeric-text-field {
     -fx-text-fill: #FF434A;
     -fx-text-box-border: #FF434A;
     -fx-focus-color: #FF434A;
+}
+
+Text.invalid {
+  -fx-fill: #FF434A;
 }
 
 .text-field-label-wrapper > .label {

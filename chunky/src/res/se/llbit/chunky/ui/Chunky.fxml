@@ -5,6 +5,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 <?import se.llbit.chunky.ui.*?>
 <?import se.llbit.fx.ToolPane?>
 <?import se.llbit.chunky.ui.elements.TextFieldLabelWrapper?>
@@ -135,6 +136,7 @@
             <VBox alignment="CENTER_LEFT">
               <IntegerAdjuster fx:id="yMax" name="Max Y level"/>
             </VBox>
+            <Text fx:id="yClipInvalid" styleClass="invalid" managed="false" visible="false">Min Y level must be smaller than Max Y level.</Text>
             <Separator/>
             <HBox spacing="10.0">
               <Label text="Show Players"/>

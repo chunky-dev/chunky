@@ -162,4 +162,11 @@ public class RenderControlsFxController {
               + node.getHeight());
     }
   }
+
+  /**
+   * Hide a popup that was previously shown with {@link #showPopup(String, Region)}.
+   */
+  public void hidePopup() {
+    tooltip.hide();
+  }
 }

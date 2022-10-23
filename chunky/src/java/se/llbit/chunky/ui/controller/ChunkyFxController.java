@@ -32,6 +32,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -50,6 +51,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -118,6 +120,7 @@ public class ChunkyFxController
   @FXML private CheckBox showPlayers;
   @FXML private IntegerAdjuster yMin;
   @FXML private IntegerAdjuster yMax;
+  @FXML private Text yClipInvalid;
   @FXML private ToggleButton trackPlayerBtn;
   @FXML private ToggleButton trackCameraBtn;
   @FXML private DoubleTextField xPosition;
@@ -490,12 +493,16 @@ public class ChunkyFxController
                     yMin.set(-64);
                     yMax.setRange(-64, 320);
                     yMax.set(320);
+                    mapView.setYMinMax(-64, 320);
                   } else {
                     yMin.setRange(0, 256);
                     yMin.set(0);
                     yMax.setRange(0, 256);
                     yMax.set(256);
+                    mapView.setYMinMax(0, 256);
                   }
+                  yMin.getStyleClass().removeAll("invalid");
+                  yMax.getStyleClass().removeAll("invalid");
                   ignoreYUpdate.set(false);
                 }
                 map.redrawMap();
@@ -571,17 +578,38 @@ public class ChunkyFxController
     scale.valueProperty().addListener(new GroupedChangeListener<>(group,
         (observable, oldValue, newValue) -> mapView.setScale(newValue.intValue())));
     yMin.valueProperty().addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
-      if (!ignoreYUpdate.get()) {
-        mapView.setYMin(newValue.intValue());
-        mapLoader.reloadWorld();
+      if (newValue.intValue() >= yMax.get()) {
+        yMin.setInvalid(true);
+        yMax.setInvalid(true);
+      } else {
+        yMin.setInvalid(false);
+        yMax.setInvalid(false);
+
+        if (!ignoreYUpdate.get()) {
+          mapView.setYMin(newValue.intValue());
+          mapView.setYMax(yMax.get());
+          mapLoader.reloadWorld();
+        }
       }
     }));
     yMax.valueProperty().addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
-      if (!ignoreYUpdate.get()) {
-        mapView.setYMax(newValue.intValue());
-        mapLoader.reloadWorld();
+      if (yMin.get() >= newValue.intValue()) {
+        yMin.setInvalid(true);
+        yMax.setInvalid(true);
+      } else {
+        yMin.setInvalid(false);
+        yMax.setInvalid(false);
+
+        if (!ignoreYUpdate.get()) {
+          mapView.setYMin(yMin.get());
+          mapView.setYMax(newValue.intValue());
+          mapLoader.reloadWorld();
+        }
       }
     }));
+
+    yClipInvalid.visibleProperty().bind(Bindings.or(yMin.invalidProperty(), yMax.invalidProperty()));
+    yClipInvalid.managedProperty().bind(yClipInvalid.visibleProperty());
 
     // Add map view listener to control the individual value properties.
     mapView.getMapViewProperty().addListener(new GroupedChangeListener<>(group,

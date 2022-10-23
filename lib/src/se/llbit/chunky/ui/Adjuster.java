@@ -17,9 +17,7 @@
 package se.llbit.chunky.ui;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.event.Event;
 import javafx.event.EventType;
@@ -41,6 +39,7 @@ public abstract class Adjuster<T extends Number> extends HBox {
   protected final NumericTextField<Property<Number>> valueField;
   protected final Property<Number> value;
   private ChangeListener<Number> listener;
+  private final BooleanProperty invalid = new SimpleBooleanProperty(false);
 
   protected Adjuster(Property<Number> value) {
     this.value = value;
@@ -60,6 +59,15 @@ public abstract class Adjuster<T extends Number> extends HBox {
         if (!valueField.valueProperty().getValue().equals(oldValue[0])) {
           this.fireEvent(new Event(Adjuster.AFTER_VALUE_CHANGE));
         }
+      }
+    });
+
+    getStyleClass().add("adjuster");
+    invalid.addListener((observable, invalidBefore, invalidNow) -> {
+      if (invalidNow) {
+        getStyleClass().add("invalid");
+      } else {
+        getStyleClass().remove("invalid");
       }
     });
   }
@@ -125,5 +133,17 @@ public abstract class Adjuster<T extends Number> extends HBox {
 
   public int getMaximumFractionDigits() {
     return this.valueField.converter.getMaximumFractionDigits();
+  }
+
+  public boolean isInvalid() {
+    return invalid.get();
+  }
+
+  public void setInvalid(boolean invalid) {
+    this.invalid.set(invalid);
+  }
+
+  public BooleanProperty invalidProperty() {
+    return invalid;
   }
 }
