@@ -28,6 +28,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
+import javafx.scene.text.Text;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Book;
@@ -91,6 +92,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private ComboBox<Number> dumpFrequency;
   @FXML private IntegerAdjuster yMin;
   @FXML private IntegerAdjuster yMax;
+  @FXML private Text yClipInvalid;
 
   private final Double[] scaleButtonValues = {0.5, 1.5, 2.0};
 
@@ -310,16 +312,13 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     yMin.setTooltip(
         "Blocks below this Y value are not loaded. Requires reloading chunks to take effect.");
     yMin.onValueChange(value -> {
-      if (value > yMax.get()) {
-        if (!yMin.getStyleClass().contains("invalid")) {
-          yMin.getStyleClass().add("invalid");
-        }
-        if (!yMax.getStyleClass().contains("invalid")) {
-          yMax.getStyleClass().add("invalid");
-        }
+      if (value >= yMax.get()) {
+        yMin.setInvalid(true);
+        yMax.setInvalid(true);
+        renderControls.hidePopup();
       } else {
-        yMin.getStyleClass().remove("invalid");
-        yMax.getStyleClass().remove("invalid");
+        yMin.setInvalid(false);
+        yMax.setInvalid(false);
 
         scene.setYClipMin(value);
         renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
@@ -329,21 +328,21 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     yMax.setTooltip(
       "Blocks above this Y value are not loaded. Requires reloading chunks to take effect.");
     yMax.onValueChange(value -> {
-      if (yMin.get() > value) {
-        if (!yMin.getStyleClass().contains("invalid")) {
-          yMin.getStyleClass().add("invalid");
-        }
-        if (!yMax.getStyleClass().contains("invalid")) {
-          yMax.getStyleClass().add("invalid");
-        }
+      if (yMin.get() >= value) {
+        yMin.setInvalid(true);
+        yMax.setInvalid(true);
+        renderControls.hidePopup();
       } else {
-        yMin.getStyleClass().remove("invalid");
-        yMax.getStyleClass().remove("invalid");
+        yMin.setInvalid(false);
+        yMax.setInvalid(false);
 
         scene.setYClipMax(value);
         renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
       }
     });
+
+    yClipInvalid.visibleProperty().bind(Bindings.or(yMin.invalidProperty(), yMax.invalidProperty()));
+    yClipInvalid.managedProperty().bind(yClipInvalid.visibleProperty());
 
     openSceneDirBtn.setTooltip(
         new Tooltip("Open the directory where Chunky stores the scene description and renders of this scene."));

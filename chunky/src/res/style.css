@@ -59,6 +59,10 @@ Hyperlink:hover {
     -fx-focus-color: #FF434A;
 }
 
+Text.invalid {
+  -fx-fill: #FF434A;
+}
+
 .text-field-label-wrapper > .label {
     -fx-text-fill: gray;
 }
