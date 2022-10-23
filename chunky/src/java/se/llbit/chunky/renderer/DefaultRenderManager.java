@@ -288,6 +288,10 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         getRenderer().sceneReset(this, reason, resetCount);
         getPreviewRenderer().sceneReset(this, reason, resetCount);
 
+        // Reset sps rolling average
+        spp_history.clear();
+        spp_history_times.clear();
+
         // Select the correct renderer
         Renderer render = mode == RenderMode.PREVIEW ? getPreviewRenderer() : getRenderer();
 
@@ -370,6 +374,10 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     }
   }
 
+  private static final int SPS_AVERAGE_TIME = 180;
+  private LinkedList<Integer> spp_history = new LinkedList<Integer>();
+  private LinkedList<Double> spp_history_times = new LinkedList<Double>();
+
   /**
    * @return the current rendering speed in samples per second (SPS)
    */
@@ -378,7 +386,11 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     int canvasHeight = bufferedScene.canvasHeight();
     long pixelsPerFrame = (long) canvasWidth * canvasHeight;
     double renderTime = bufferedScene.renderTime / 1000.0;
-    return (int) ((bufferedScene.spp * pixelsPerFrame) / renderTime);
+    if (renderTime < SPS_AVERAGE_TIME) {
+      return (int) ((bufferedScene.spp * pixelsPerFrame) / renderTime);
+    } else {
+      return (int) ((bufferedScene.spp - spp_history.get(0)) * pixelsPerFrame / SPS_AVERAGE_TIME);
+    }
   }
 
   private void updateRenderProgress() {
@@ -398,6 +410,13 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     }
 
     synchronized (this) {
+      // Update list of spp values
+      spp_history_times.addLast(renderTime);
+      spp_history.addLast(bufferedScene.spp);
+      while (spp_history_times.get(0) + SPS_AVERAGE_TIME < renderTime) {
+        spp_history_times.removeFirst();
+        spp_history.removeFirst();
+      }
       // Update render status display.
       renderStatusListeners.forEach(listener -> {
         listener.setRenderTime(bufferedScene.renderTime);
