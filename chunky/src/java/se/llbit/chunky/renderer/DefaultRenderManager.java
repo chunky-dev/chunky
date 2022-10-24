@@ -387,16 +387,14 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     long pixelsPerFrame = (long) canvasWidth * canvasHeight;
     double renderTime = bufferedScene.renderTime / 1000.0;
 
-    // Avoid incorrect output if the average time per render pass were to exceed SPS_AVERAGE_TIME
-    // Somewhat hacky, as it will break if there is an outlier pass that's >SPS_AVERAGE_TIME, and 0 will be returned
-    if (renderTime / bufferedScene.spp >= SPS_AVERAGE_TIME)
+    // Handle the first render pass
+    if (spp_history_times.size() == 1) {
       return (int) ((bufferedScene.spp * pixelsPerFrame) / renderTime);
-
-    if (renderTime < SPS_AVERAGE_TIME) {
-      return (int) ((bufferedScene.spp * pixelsPerFrame) / renderTime);
-    } else {
-      return (int) ((bufferedScene.spp - spp_history.get(0)) * pixelsPerFrame / SPS_AVERAGE_TIME);
     }
+
+    double timeDiff = renderTime - spp_history_times.getFirst();
+    int sppDiff = bufferedScene.spp - spp_history.getFirst();
+    return (int) (sppDiff * pixelsPerFrame / timeDiff);
   }
 
   private void updateRenderProgress() {
@@ -419,10 +417,12 @@ public class DefaultRenderManager extends Thread implements RenderManager {
       // Update list of spp values
       spp_history_times.addLast(renderTime);
       spp_history.addLast(bufferedScene.spp);
-      while (spp_history_times.get(0) + SPS_AVERAGE_TIME < renderTime) {
+      // These lists shouldn't contain information older than SPS_AVERAGE_TIME, but must contain at least one old value
+      while ((spp_history_times.getFirst() + SPS_AVERAGE_TIME < renderTime) && (spp_history_times.size() > 2)) {
         spp_history_times.removeFirst();
         spp_history.removeFirst();
       }
+
       // Update render status display.
       renderStatusListeners.forEach(listener -> {
         listener.setRenderTime(bufferedScene.renderTime);
