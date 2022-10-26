@@ -291,6 +291,8 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         // Reset sps rolling average
         spp_history.clear();
         spp_history_times.clear();
+        spp_history.addLast(0);
+        spp_history_times.addLast(0.0);
 
         // Select the correct renderer
         Renderer render = mode == RenderMode.PREVIEW ? getPreviewRenderer() : getRenderer();
@@ -374,7 +376,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     }
   }
 
-  private static final int SPS_AVERAGE_TIME = 180;
+  private static final int SPS_AVERAGE_TIME = 30;
   private LinkedList<Integer> spp_history = new LinkedList<Integer>();
   private LinkedList<Double> spp_history_times = new LinkedList<Double>();
 
@@ -386,11 +388,6 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     int canvasHeight = bufferedScene.canvasHeight();
     long pixelsPerFrame = (long) canvasWidth * canvasHeight;
     double renderTime = bufferedScene.renderTime / 1000.0;
-
-    // Handle the first render pass
-    if (spp_history_times.size() == 1) {
-      return (int) ((bufferedScene.spp * pixelsPerFrame) / renderTime);
-    }
 
     double timeDiff = renderTime - spp_history_times.getFirst();
     int sppDiff = bufferedScene.spp - spp_history.getFirst();
