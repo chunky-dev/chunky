@@ -181,11 +181,11 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
             case SKYBOX:
               skyModeSettings.getChildren().setAll(skyboxSettings);
               break;
-            case SKYMAP_PANORAMIC:
+            case SKYMAP_EQUIRECTANGULAR:
               skyModeSettings.getChildren().setAll(skymapSettings);
               skymapSettings.setPanoramic(true);
               break;
-            case SKYMAP_SPHERICAL:
+            case SKYMAP_ANGULAR:
               skyModeSettings.getChildren().setAll(skymapSettings);
               skymapSettings.setPanoramic(false);
               break;
