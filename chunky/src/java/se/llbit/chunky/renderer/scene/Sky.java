@@ -638,7 +638,11 @@ public class Sky implements JsonSerializable {
     // Always save gradient.
     sky.add("gradient", gradientJson(gradient));
 
-    sky.add("color", JsonUtil.vec3ToJson(color));
+    JsonObject colorObj = new JsonObject();
+    colorObj.add("red", color.x);
+    colorObj.add("green", color.y);
+    colorObj.add("blue", color.z);
+    sky.add("color", colorObj);
 
     switch (mode) {
       case SKYMAP_PANORAMIC:
@@ -696,7 +700,15 @@ public class Sky implements JsonSerializable {
       }
     }
 
-    color.set(JsonUtil.vec3FromJsonArray(json.get("color")));
+    if (json.get("color").isObject()) {
+      JsonObject colorObj = json.get("color").object();
+      color.x = colorObj.get("red").doubleValue(1);
+      color.y = colorObj.get("green").doubleValue(1);
+      color.z = colorObj.get("blue").doubleValue(1);
+    } else {
+      // Maintain backwards-compatibility with scenes saved in older Chunky versions
+      color.set(JsonUtil.vec3FromJsonArray(json.get("color")));
+    }
 
     switch (mode) {
       case SKYMAP_PANORAMIC: {
