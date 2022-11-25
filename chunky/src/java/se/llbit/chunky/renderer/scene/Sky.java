@@ -681,11 +681,11 @@ public class Sky implements JsonSerializable {
     skyExposure = json.get("skyExposure").doubleValue(skyExposure);
     skyLightModifier = json.get("skyLight").doubleValue(skyLightModifier);
     apparentSkyLightModifier = json.get("apparentSkyLight").doubleValue(apparentSkyLightModifier);
-    if (!(Objects.equals(json.get("mode").stringValue(mode.name()), "SKYMAP_PANORAMIC") || Objects.equals(json.get("mode").stringValue(mode.name()), "SKYMAP_SPHERICAL"))) {
+    if (!(json.get("mode").stringValue(mode.name()).equals("SKYMAP_PANORAMIC") || json.get("mode").stringValue(mode.name()).equals("SKYMAP_SPHERICAL"))) {
       mode = SkyMode.get(json.get("mode").stringValue(mode.name()));
-    } else if (Objects.equals(json.get("mode").stringValue(mode.name()), "SKYMAP_PANORAMIC")) {
+    } else if (json.get("mode").stringValue(mode.name()).equals("SKYMAP_PANORAMIC")) {
       mode = SkyMode.SKYMAP_EQUIRECTANGULAR;
-    } else if (Objects.equals(json.get("mode").stringValue(mode.name()), "SKYMAP_SPHERICAL")) {
+    } else if (json.get("mode").stringValue(mode.name()).equals("SKYMAP_SPHERICAL")) {
       mode = SkyMode.SKYMAP_ANGULAR;
     }
     horizonOffset = json.get("horizonOffset").doubleValue(horizonOffset);
