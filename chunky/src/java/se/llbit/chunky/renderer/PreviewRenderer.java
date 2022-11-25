@@ -57,12 +57,18 @@ public class PreviewRenderer extends TileBasedRenderer {
     task.update("Preview", 2, 0, "");
 
     Scene scene = manager.bufferedScene;
+
     int width = scene.width;
     int height = scene.height;
 
+    int fullWidth = scene.getFullWidth();
+    int fullHeight = scene.getFullHeight();
+    int cropX = scene.getCropX();
+    int cropY = scene.getCropY();
+
     Camera cam = scene.camera();
-    double halfWidth = width / (2.0 * height);
-    double invHeight = 1.0 / height;
+    double halfWidth = fullWidth / (2.0 * fullHeight);
+    double invHeight = 1.0 / fullHeight;
 
     Ray target = new Ray();
     boolean hit = scene.traceTarget(target);
@@ -85,8 +91,8 @@ public class PreviewRenderer extends TileBasedRenderer {
         if (((x + y) % 2) == sampleNum) return;
 
         // Draw crosshairs
-        if (x == width / 2 && (y >= height / 2 - 5 && y <= height / 2 + 5) || y == height / 2 && (
-            x >= width / 2 - 5 && x <= width / 2 + 5)) {
+        if (x == fullWidth / 2 && (y >= fullHeight / 2 - 5 && y <= fullHeight / 2 + 5) || y == fullHeight / 2 && (
+            x >= fullWidth / 2 - 5 && x <= fullWidth / 2 + 5)) {
           sampleBuffer[offset + 0] = 0xFF;
           sampleBuffer[offset + 1] = 0xFF;
           sampleBuffer[offset + 2] = 0xFF;
@@ -94,8 +100,8 @@ public class PreviewRenderer extends TileBasedRenderer {
         }
 
         cam.calcViewRay(state.ray, state.random,
-            -halfWidth + x * invHeight,
-            -0.5 + y * invHeight);
+            -halfWidth + (x + cropX) * invHeight,
+            -0.5 + (y + cropY) * invHeight);
         scene.rayTrace(tracer, state);
 
         // Target highlighting.
