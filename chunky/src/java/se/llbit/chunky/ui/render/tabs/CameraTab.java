@@ -327,14 +327,15 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
               }
             });
 
-    cameraFullWidth.setOnAction(actionEvent -> setCropSize());
-    cameraFullHeight.setOnAction(actionEvent -> setCropSize());
-    cameraCropX.setOnAction(actionEvent -> setCropSize());
-    cameraCropY.setOnAction(actionEvent -> setCropSize());
+    cameraFullWidth.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> setCropSize());
+    cameraFullHeight.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> setCropSize());
+    cameraCropX.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> setCropSize());
+    cameraCropY.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> setCropSize());
   }
 
   private void setCropSize() {
     scene.setCropSize(cameraFullWidth.getValue(), cameraFullHeight.getValue(), cameraCropX.getValue(), cameraCropY.getValue());
+    updateCrop();
   }
 
   private void generateNextCameraName() {

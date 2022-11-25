@@ -82,13 +82,15 @@ public class PreviewRenderer extends TileBasedRenderer {
       int sampleNum = i;
 
       submitTiles(manager, (state, pixel) -> {
-        int x = pixel.firstInt();
-        int y = pixel.secondInt();
+        int sx = pixel.firstInt();
+        int sy = pixel.secondInt();
+        int x = sx + cropX;
+        int y = sy + cropY;
 
-        int offset = 3 * (y*width + x);
+        int offset = 3 * (sy*width + sx);
 
         // Interlacing
-        if (((x + y) % 2) == sampleNum) return;
+        if (((sx + sy) % 2) == sampleNum) return;
 
         // Draw crosshairs
         if (x == fullWidth / 2 && (y >= fullHeight / 2 - 5 && y <= fullHeight / 2 + 5) || y == fullHeight / 2 && (
@@ -100,8 +102,8 @@ public class PreviewRenderer extends TileBasedRenderer {
         }
 
         cam.calcViewRay(state.ray, state.random,
-            -halfWidth + (x + cropX) * invHeight,
-            -0.5 + (y + cropY) * invHeight);
+            -halfWidth + x * invHeight,
+            -0.5 + y * invHeight);
         scene.rayTrace(tracer, state);
 
         // Target highlighting.
