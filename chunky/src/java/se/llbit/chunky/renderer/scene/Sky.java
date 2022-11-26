@@ -106,11 +106,11 @@ public class Sky implements JsonSerializable {
     /** Color gradient. */
     GRADIENT("Color Gradient"),
 
-    /** Panormaic skymap. */
-    SKYMAP_PANORAMIC("Skymap (panoramic)"),
+    /** Equirectangular skymap. */
+    SKYMAP_EQUIRECTANGULAR("Skymap (equirectangular)"),
 
-    /** Light probe skymap. */
-    SKYMAP_SPHERICAL("Skymap (spherical)"),
+    /** Light probe (angular fisheye) skymap. */
+    SKYMAP_ANGULAR("Skymap (angular)"),
 
     /** Skybox. */
     SKYBOX("Skybox"),
@@ -196,8 +196,8 @@ public class Sky implements JsonSerializable {
    */
   public void loadSkymap() {
     switch (mode) {
-      case SKYMAP_PANORAMIC:
-      case SKYMAP_SPHERICAL:
+      case SKYMAP_EQUIRECTANGULAR:
+      case SKYMAP_ANGULAR:
         if (!skymapFileName.isEmpty()) {
           loadSkymap(skymapFileName);
         }
@@ -291,7 +291,7 @@ public class Sky implements JsonSerializable {
         ray.color.set(color.x, color.y, color.z, 1);
         break;
       }
-      case SKYMAP_PANORAMIC: {
+      case SKYMAP_EQUIRECTANGULAR: {
         double x = rotation.transformX(ray.d);
         double y = rotation.transformY(ray.d);
         double z = rotation.transformZ(ray.d);
@@ -311,7 +311,7 @@ public class Sky implements JsonSerializable {
         }
         break;
       }
-      case SKYMAP_SPHERICAL: {
+      case SKYMAP_ANGULAR: {
         double x = rotation.transformX(ray.d);
         double y = rotation.transformY(ray.d);
         double z = rotation.transformZ(ray.d);
@@ -381,7 +381,7 @@ public class Sky implements JsonSerializable {
    */
   public void getSkyColorInterpolated(Ray ray) {
     switch (mode) {
-      case SKYMAP_PANORAMIC: {
+      case SKYMAP_EQUIRECTANGULAR: {
         double x = rotation.transformX(ray.d);
         double y = rotation.transformY(ray.d);
         double z = rotation.transformZ(ray.d);
@@ -400,7 +400,7 @@ public class Sky implements JsonSerializable {
         }
         break;
       }
-      case SKYMAP_SPHERICAL: {
+      case SKYMAP_ANGULAR: {
         double x = rotation.transformX(ray.d);
         double y = rotation.transformY(ray.d);
         double z = rotation.transformZ(ray.d);
@@ -566,7 +566,7 @@ public class Sky implements JsonSerializable {
   public void setSkyMode(SkyMode newMode) {
     if (this.mode != newMode) {
       this.mode = newMode;
-      if (newMode != SkyMode.SKYMAP_PANORAMIC && newMode != SkyMode.SKYMAP_SPHERICAL) {
+      if (newMode != SkyMode.SKYMAP_EQUIRECTANGULAR && newMode != SkyMode.SKYMAP_ANGULAR) {
         skymapFileName = "";
         skymap = Texture.EMPTY_TEXTURE;
       }
@@ -638,11 +638,15 @@ public class Sky implements JsonSerializable {
     // Always save gradient.
     sky.add("gradient", gradientJson(gradient));
 
-    sky.add("color", JsonUtil.vec3ToJson(color));
+    JsonObject colorObj = new JsonObject();
+    colorObj.add("red", color.x);
+    colorObj.add("green", color.y);
+    colorObj.add("blue", color.z);
+    sky.add("color", colorObj);
 
     switch (mode) {
-      case SKYMAP_PANORAMIC:
-      case SKYMAP_SPHERICAL: {
+      case SKYMAP_EQUIRECTANGULAR:
+      case SKYMAP_ANGULAR: {
         if (!skymap.isEmptyTexture()) {
           sky.add("skymap", skymapFileName);
         }
@@ -681,7 +685,13 @@ public class Sky implements JsonSerializable {
     skyExposure = json.get("skyExposure").doubleValue(skyExposure);
     skyLightModifier = json.get("skyLight").doubleValue(skyLightModifier);
     apparentSkyLightModifier = json.get("apparentSkyLight").doubleValue(apparentSkyLightModifier);
-    mode = SkyMode.get(json.get("mode").stringValue(mode.name()));
+    if (!(json.get("mode").stringValue(mode.name()).equals("SKYMAP_PANORAMIC") || json.get("mode").stringValue(mode.name()).equals("SKYMAP_SPHERICAL"))) {
+      mode = SkyMode.get(json.get("mode").stringValue(mode.name()));
+    } else if (json.get("mode").stringValue(mode.name()).equals("SKYMAP_PANORAMIC")) {
+      mode = SkyMode.SKYMAP_EQUIRECTANGULAR;
+    } else if (json.get("mode").stringValue(mode.name()).equals("SKYMAP_SPHERICAL")) {
+      mode = SkyMode.SKYMAP_ANGULAR;
+    }
     horizonOffset = json.get("horizonOffset").doubleValue(horizonOffset);
     cloudsEnabled = json.get("cloudsEnabled").boolValue(cloudsEnabled);
     cloudSize = json.get("cloudSize").doubleValue(cloudSize);
@@ -696,10 +706,19 @@ public class Sky implements JsonSerializable {
       }
     }
 
-    color.set(JsonUtil.vec3FromJsonArray(json.get("color")));
+    if (json.get("color").isObject()) {
+      JsonObject colorObj = json.get("color").object();
+      color.x = colorObj.get("red").doubleValue(1);
+      color.y = colorObj.get("green").doubleValue(1);
+      color.z = colorObj.get("blue").doubleValue(1);
+    } else {
+      // Maintain backwards-compatibility with scenes saved in older Chunky versions
+      color.set(JsonUtil.vec3FromJsonArray(json.get("color")));
+    }
 
     switch (mode) {
-      case SKYMAP_PANORAMIC: {
+      case SKYMAP_EQUIRECTANGULAR:
+      case SKYMAP_ANGULAR: {
         skymapFileName = json.get("skymap").stringValue(skymapFileName);
         if (skymapFileName.isEmpty()) {
           skymapFileName = json.get("skymapFileName").stringValue(skymapFileName);
