@@ -64,6 +64,7 @@ import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
+import se.llbit.chunky.renderer.projection.ParallelProjector;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
@@ -704,30 +705,7 @@ public class Scene implements JsonSerializable, Refreshable {
     state.ray.o.z -= origin.z;
 
     if(camera.getProjectionMode() == ProjectionMode.PARALLEL) {
-      // When in parallel projection, push the ray origin back so the
-      // ray start outside the octree to prevent ray spawning inside some blocks
-      int limit = (1 << worldOctree.getDepth());
-      Vector3 o = state.ray.o;
-      Vector3 d = state.ray.d;
-      double t = 0;
-      // simplified intersection test with the 6 planes that form the bounding box of the octree
-      if(Math.abs(d.x) > Ray.EPSILON) {
-        t = Math.min(t, -o.x / d.x);
-        t = Math.min(t, (limit - o.x) / d.x);
-      }
-      if(Math.abs(d.y) > Ray.EPSILON) {
-        t = Math.min(t, -o.y / d.y);
-        t = Math.min(t, (limit - o.y) / d.y);
-      }
-      if(Math.abs(d.z) > Ray.EPSILON) {
-        t = Math.min(t, -o.z / d.z);
-        t = Math.min(t, (limit - o.z) / d.z);
-      }
-      // set the origin to the farthest intersection point behind
-      // In theory, we only would need to set it to the closest intersection point behind
-      // but this doesn't matter because the Octree.enterOctree function
-      // will do the same amount of math for the same result no matter what the exact point is
-      o.scaleAdd(t, d);
+      ParallelProjector.fixRay(state.ray, this);
     }
 
     rayTracer.trace(this, state);
@@ -2292,38 +2270,27 @@ public class Scene implements JsonSerializable, Refreshable {
     double invHeight = 1.0 / height;
 
     // Rotated grid supersampling.
+    double[][] offsets = new double[][] {
+      { -3.0 / 8.0,  1.0 / 8.0 },
+      {  1.0 / 8.0,  3.0 / 8.0 },
+      { -1.0 / 8.0, -3.0 / 8.0 },
+      {  3.0 / 8.0, -1.0 / 8.0 },
+    };
 
-    camera
-        .calcViewRay(ray, -halfWidth + (x - 3 / 8.0) * invHeight, -.5 + (y + 1 / 8.0) * invHeight);
-    ray.o.x -= origin.x;
-    ray.o.y -= origin.y;
-    ray.o.z -= origin.z;
+    double occlusion = 0.0;
+    for (double[] offset : offsets) {
+      camera.calcViewRay(ray,
+        -halfWidth + (x + offset[0]) * invHeight,
+        -0.5 + (y + offset[1]) * invHeight);
+      ray.o.x -= origin.x;
+      ray.o.y -= origin.y;
+      ray.o.z -= origin.z;
 
-    double occlusion = PreviewRayTracer.skyOcclusion(this, state);
-
-    camera
-        .calcViewRay(ray, -halfWidth + (x + 1 / 8.0) * invHeight, -.5 + (y + 3 / 8.0) * invHeight);
-    ray.o.x -= origin.x;
-    ray.o.y -= origin.y;
-    ray.o.z -= origin.z;
-
-    occlusion += PreviewRayTracer.skyOcclusion(this, state);
-
-    camera
-        .calcViewRay(ray, -halfWidth + (x - 1 / 8.0) * invHeight, -.5 + (y - 3 / 8.0) * invHeight);
-    ray.o.x -= origin.x;
-    ray.o.y -= origin.y;
-    ray.o.z -= origin.z;
-
-    occlusion += PreviewRayTracer.skyOcclusion(this, state);
-
-    camera
-        .calcViewRay(ray, -halfWidth + (x + 3 / 8.0) * invHeight, -.5 + (y - 1 / 8.0) * invHeight);
-    ray.o.x -= origin.x;
-    ray.o.y -= origin.y;
-    ray.o.z -= origin.z;
-
-    occlusion += PreviewRayTracer.skyOcclusion(this, state);
+      if (camera.getProjectionMode() == ProjectionMode.PARALLEL) {
+        ParallelProjector.fixRay(state.ray, this);
+      }
+      occlusion += PreviewRayTracer.skyOcclusion(this, state);
+    }
 
     alphaChannel[y * width + x] = (byte) (255 * occlusion * 0.25 + 0.5);
   }
