@@ -8,6 +8,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.util.*;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,12 +30,13 @@ import se.llbit.chunky.block.MinecraftBlock;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.minecraft.UnknownBlock;
 import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.model.RedstoneWireModel;
 import se.llbit.chunky.model.Tint;
+import se.llbit.chunky.model.minecraft.RedstoneWireModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.AnimatedTexture;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
+import se.llbit.chunky.resources.ResourcePackLoader;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
@@ -65,17 +67,16 @@ public class ResourcepackBlockProvider implements BlockProvider {
                .map(
                  f -> {
                    try {
-                     return FileSystems.newFileSystem(
-                       URI.create("jar:" + f.toURI()), Collections.emptyMap());
+                     return new Pair(f, ResourcePackLoader.getPackFileSystem(f));
                    } catch (IOException e) {
                      throw new RuntimeException("Could not open resource pack " + f, e);
                    }
                  })
-               .toArray(FileSystem[]::new))) {
+               .toArray(Pair[]::new))) {
 
-      for (FileSystem resourcePack : effectiveResources.fileSystems) {
+      for (Pair<File, FileSystem> resourcePack : effectiveResources.fileSystems) {
         JsonModelLoader modelLoader = new JsonModelLoader();
-        Files.list(resourcePack.getPath("assets"))
+        Files.list(ResourcePackLoader.getPackRootPath(resourcePack.thing1, resourcePack.thing2).resolve("assets"))
           .filter(Files::isDirectory)
           .map(assetProvider -> assetProvider.resolve("blockstates"))
           .filter(Files::isDirectory)
@@ -93,6 +94,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
                       String fqBlockName = assetsName + ":" + blockName;
 
                       if (blocks.containsKey(fqBlockName)) {
+                        System.out.println("Block " + fqBlockName + " already provided");
                         // this block was already provided by a different resource pack
                         return;
                       }
@@ -199,13 +201,13 @@ public class ResourcepackBlockProvider implements BlockProvider {
                           "Could not load block "
                             + fqBlockName
                             + " from "
-                            + resourcePack.getFileStores().iterator().next().name());
+                            + resourcePack.thing2.getFileStores().iterator().next().name());
                       }
                     });
               } catch (IOException e) {
                 System.out.println(
                   "Could not read resource pack "
-                    + resourcePack.getFileStores().iterator().next().name());
+                    + resourcePack.thing2.getFileStores().iterator().next().name());
               }
             });
       }
