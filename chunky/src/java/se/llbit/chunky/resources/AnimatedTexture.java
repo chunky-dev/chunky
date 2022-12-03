@@ -28,6 +28,10 @@ public class AnimatedTexture extends Texture {
   protected int numFrames = 1;
   protected int frameHeight = 0;
 
+  public AnimatedTexture() {
+    updateNumFrames();
+  }
+
   public AnimatedTexture(String resourceName) {
     super(resourceName);
     updateNumFrames();
