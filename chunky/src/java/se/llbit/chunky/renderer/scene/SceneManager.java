@@ -36,7 +36,7 @@ public interface SceneManager {
   TaskTracker getTaskTracker();
 
   /**
-   * Save the current scene.
+   * Save the current scene to the given directory. This updates the scene context's directory.
    */
   @PluginApi
   void saveScene(File sceneDirectory) throws InterruptedException;
