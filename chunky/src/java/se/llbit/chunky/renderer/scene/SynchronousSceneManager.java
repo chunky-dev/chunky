@@ -124,41 +124,16 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
 
   @PluginApi
   @Override public void saveScene(File sceneDirectory) throws InterruptedException {
-    try {
-      synchronized (storedScene) {
-        String sceneName = storedScene.name();
-        Log.info("Saving scene " + sceneName);
-        context.setSceneDirectory(sceneDirectory);
-        if (!sceneDirectory.isDirectory()) {
-          boolean success = sceneDirectory.mkdirs();
-          if (!success) {
-            Log.warn("Failed to create scene directory: " + sceneDirectory.getAbsolutePath());
-            return;
-          }
-        }
-
-        // Create backup of scene description and current render dump.
-        scene.backupFile(sceneDirectory, new File(sceneDirectory, sceneName + Scene.EXTENSION));
-        scene.backupFile(sceneDirectory, new File(sceneDirectory, sceneName + ".dump"));
-
-        // Copy render status over from the renderManager.
-        RenderStatus status = renderManager.getRenderStatus();
-        storedScene.renderTime = status.getRenderTime();
-        storedScene.spp = status.getSpp();
-        storedScene.saveScene(context, taskTracker);
-        Log.info("Scene saved");
-      }
-    } catch (IOException e) {
-      Log.error("Failed to save scene. Reason: " + e.getMessage(), e);
+    synchronized (storedScene) {
+      context.setSceneDirectory(sceneDirectory);
+      saveScene(context, storedScene);
     }
   }
 
   @PluginApi
   @Deprecated
   @Override public void saveScene() throws InterruptedException {
-    synchronized (storedScene) {
-      saveScene(context, storedScene);
-    }
+    saveScene(context.getSceneDirectory());
   }
 
   public void saveSceneAs(String newName) throws InterruptedException {
@@ -168,29 +143,28 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         scene.setName(newName);
       }
     }
-    context.setSceneDirectory(resolveSceneDirectory(newName));
-    saveScene();
+    saveScene(resolveSceneDirectory(newName));
   }
 
   public void saveScene(SceneIOProvider context, Scene scene) throws InterruptedException {
     try {
-        String sceneName = scene.name();
-        Log.info("Saving scene " + sceneName);
-        File sceneDir = context.getSceneDirectory();
-        if (!sceneDir.isDirectory()) {
-          sceneDir = resolveSceneDirectory(sceneName);
+      String sceneName = scene.name();
+      Log.info("Saving scene " + sceneName);
+      File sceneDir = context.getSceneDirectory();
+      if (!sceneDir.isDirectory()) {
+        sceneDir = resolveSceneDirectory(sceneName);
+      }
+      if (!sceneDir.isDirectory()) {
+        boolean success = sceneDir.mkdirs();
+        if (!success) {
+          Log.warn("Failed to create scene directory: " + sceneDir.getAbsolutePath());
+          return;
         }
-        if (!sceneDir.isDirectory()) {
-          boolean success = sceneDir.mkdirs();
-          if (!success) {
-            Log.warn("Failed to create scene directory: " + sceneDir.getAbsolutePath());
-            return;
-          }
-        }
+      }
 
-        // Create backup of scene description and current render dump.
-        scene.backupFile(sceneDir, new File(sceneDir, sceneName + Scene.EXTENSION));
-        scene.backupFile(sceneDir, new File(sceneDir, sceneName + ".dump"));
+      // Create backup of scene description and current render dump.
+      scene.backupFile(sceneDir, new File(sceneDir, sceneName + Scene.EXTENSION));
+      scene.backupFile(sceneDir, new File(sceneDir, sceneName + ".dump"));
 
       // Copy render status over from the renderManager.
       RenderStatus status = renderManager.getRenderStatus();
