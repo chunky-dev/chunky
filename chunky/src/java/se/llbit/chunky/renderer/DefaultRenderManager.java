@@ -246,7 +246,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         // Wait for a scene state change (e.g. user editing the scene)
         ResetReason reason = sceneProvider.awaitSceneStateChange();
 
-        if (reason == ResetReason.SETTINGS_CHANGED_SOFT) {
+        if (!reason.shouldRerender()) {
           // Settings sync reset. No need to re-render.
           continue;
         }
