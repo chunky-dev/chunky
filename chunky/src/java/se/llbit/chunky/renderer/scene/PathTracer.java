@@ -450,13 +450,9 @@ public class PathTracer implements RayTracer {
     ray.color.x = (1 - rTrans) * ray.color.x + rTrans;
     ray.color.y = (1 - gTrans) * ray.color.y + gTrans;
     ray.color.z = (1 - bTrans) * ray.color.z + bTrans;
-    ray.emittance.set(ray.color.x, ray.color.y, ray.color.z);
     ray.color.x *= next.color.x;
     ray.color.y *= next.color.y;
     ray.color.z *= next.color.z;
-    ray.emittance.x *= next.emittance.x;
-    ray.emittance.y *= next.emittance.y;
-    ray.emittance.z *= next.emittance.z;
   }
 
   private static void sampleEmitterFace(Scene scene, Ray ray, Grid.EmitterPosition pos, int face, Vector4 result, double scaler, Random random) {
