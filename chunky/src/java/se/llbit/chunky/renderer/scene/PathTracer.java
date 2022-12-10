@@ -351,22 +351,8 @@ public class PathTracer implements RayTracer {
                 }
 
                 if (pathTrace(scene, refracted, state, 1, false)) {
-                  // Color-based transmission value
-                  double colorTrans = (ray.color.x + ray.color.y + ray.color.z)/3;
-                  // Total amount of light we want to transmit (overall transparency of texture)
-                  double shouldTrans = 1 - pDiffuse;
-                  // Amount of each color to transmit - default to overall transparency if RGB values add to 0 (e.g. regular glass)
-                  double rTrans = shouldTrans, gTrans = shouldTrans, bTrans = shouldTrans;
-                  if(colorTrans > 0) {
-                    // Amount to transmit of each color is scaled so the total transmitted amount matches the texture's transparency
-                    rTrans = ray.color.x * shouldTrans / colorTrans;
-                    gTrans = ray.color.y * shouldTrans / colorTrans;
-                    bTrans = ray.color.z * shouldTrans / colorTrans;
-                  }
-                  // Set transparent and opaque components of each color channel
-                  ray.color.x = (1 - rTrans) * ray.color.x + rTrans;
-                  ray.color.y = (1 - gTrans) * ray.color.y + gTrans;
-                  ray.color.z = (1 - bTrans) * ray.color.z + bTrans;
+                  // Calculate the color of the refracted ray
+                  translucentRayColor(ray, pDiffuse);
                   // Use emittance from refracted ray
                   ray.emittance.x = ray.color.x * refracted.emittance.x;
                   ray.emittance.y = ray.color.y * refracted.emittance.y;
@@ -388,22 +374,8 @@ public class PathTracer implements RayTracer {
           transmitted.o.scaleAdd(Ray.OFFSET, transmitted.d);
 
           if (pathTrace(scene, transmitted, state, 1, false)) {
-            // Color-based transmission value
-            double colorTrans = (ray.color.x + ray.color.y + ray.color.z)/3;
-            // Total amount of light we want to transmit (overall transparency of texture)
-            double shouldTrans = 1 - pDiffuse;
-            // Amount of each color to transmit - default to overall transparency if RGB values add to 0 (e.g. regular glass)
-            double rTrans = shouldTrans, gTrans = shouldTrans, bTrans = shouldTrans;
-            if(colorTrans > 0) {
-              // Amount to transmit of each color is scaled so the total transmitted amount matches the texture's transparency
-              rTrans = ray.color.x * shouldTrans / colorTrans;
-              gTrans = ray.color.y * shouldTrans / colorTrans;
-              bTrans = ray.color.z * shouldTrans / colorTrans;
-            }
-            // Set transparent and opaque components of each color channel
-            ray.color.x = (1 - rTrans) * ray.color.x + rTrans;
-            ray.color.y = (1 - gTrans) * ray.color.y + gTrans;
-            ray.color.z = (1 - bTrans) * ray.color.z + bTrans;
+            // Calculate the color of the transmitted ray
+            translucentRayColor(ray, pDiffuse);
             // Use emittance from transmitted ray
             ray.emittance.x = ray.color.x * transmitted.emittance.x;
             ray.emittance.y = ray.color.y * transmitted.emittance.y;
@@ -483,6 +455,25 @@ public class PathTracer implements RayTracer {
     }
 
     return hit;
+  }
+
+  private static void translucentRayColor(Ray ray, double pDiffuse) {
+    // Color-based transmission value
+    double colorTrans = (ray.color.x + ray.color.y + ray.color.z)/3;
+    // Total amount of light we want to transmit (overall transparency of texture)
+    double shouldTrans = 1 - pDiffuse;
+    // Amount of each color to transmit - default to overall transparency if RGB values add to 0 (e.g. regular glass)
+    double rTrans = shouldTrans, gTrans = shouldTrans, bTrans = shouldTrans;
+    if(colorTrans > 0) {
+      // Amount to transmit of each color is scaled so the total transmitted amount matches the texture's transparency
+      rTrans = ray.color.x * shouldTrans / colorTrans;
+      gTrans = ray.color.y * shouldTrans / colorTrans;
+      bTrans = ray.color.z * shouldTrans / colorTrans;
+    }
+    // Set transparent and opaque components of each color channel
+    ray.color.x = (1 - rTrans) * ray.color.x + rTrans;
+    ray.color.y = (1 - gTrans) * ray.color.y + gTrans;
+    ray.color.z = (1 - bTrans) * ray.color.z + bTrans;
   }
 
   private static void sampleEmitterFace(Scene scene, Ray ray, Grid.EmitterPosition pos, int face, Vector4 result, double scaler, Random random) {
