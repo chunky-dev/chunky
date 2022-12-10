@@ -351,16 +351,8 @@ public class PathTracer implements RayTracer {
                 }
 
                 if (pathTrace(scene, refracted, state, 1, false)) {
-                  // Calculate the color of the refracted ray
-                  translucentRayColor(ray, pDiffuse);
-                  // Use emittance from refracted ray
-                  ray.emittance.x = ray.color.x * refracted.emittance.x;
-                  ray.emittance.y = ray.color.y * refracted.emittance.y;
-                  ray.emittance.z = ray.color.z * refracted.emittance.z;
-                  // Scale by results from refracted ray
-                  ray.color.x *= refracted.color.x;
-                  ray.color.y *= refracted.color.y;
-                  ray.color.z *= refracted.color.z;
+                  // Calculate the color and emittance of the refracted ray
+                  translucentRayColor(ray, refracted, pDiffuse);
                   hit = true;
                 }
               }
@@ -374,16 +366,8 @@ public class PathTracer implements RayTracer {
           transmitted.o.scaleAdd(Ray.OFFSET, transmitted.d);
 
           if (pathTrace(scene, transmitted, state, 1, false)) {
-            // Calculate the color of the transmitted ray
-            translucentRayColor(ray, pDiffuse);
-            // Use emittance from transmitted ray
-            ray.emittance.x = ray.color.x * transmitted.emittance.x;
-            ray.emittance.y = ray.color.y * transmitted.emittance.y;
-            ray.emittance.z = ray.color.z * transmitted.emittance.z;
-            // Scale by results from transmitted ray
-            ray.color.x *= transmitted.color.x;
-            ray.color.y *= transmitted.color.y;
-            ray.color.z *= transmitted.color.z;
+            // Calculate the color and emittance of the transmitted ray
+            translucentRayColor(ray, transmitted, pDiffuse);
             hit = true;
           }
         }
@@ -457,11 +441,11 @@ public class PathTracer implements RayTracer {
     return hit;
   }
 
-  private static void translucentRayColor(Ray ray, double pDiffuse) {
+  private static void translucentRayColor(Ray ray, Ray next, double opacity) {
     // Color-based transmission value
     double colorTrans = (ray.color.x + ray.color.y + ray.color.z)/3;
     // Total amount of light we want to transmit (overall transparency of texture)
-    double shouldTrans = 1 - pDiffuse;
+    double shouldTrans = 1 - opacity;
     // Amount of each color to transmit - default to overall transparency if RGB values add to 0 (e.g. regular glass)
     double rTrans = shouldTrans, gTrans = shouldTrans, bTrans = shouldTrans;
     if(colorTrans > 0) {
@@ -474,6 +458,14 @@ public class PathTracer implements RayTracer {
     ray.color.x = (1 - rTrans) * ray.color.x + rTrans;
     ray.color.y = (1 - gTrans) * ray.color.y + gTrans;
     ray.color.z = (1 - bTrans) * ray.color.z + bTrans;
+    // Use emittance from next ray
+    ray.emittance.x = ray.color.x * next.emittance.x;
+    ray.emittance.y = ray.color.y * next.emittance.y;
+    ray.emittance.z = ray.color.z * next.emittance.z;
+    // Scale color based on next ray
+    ray.color.x *= next.color.x;
+    ray.color.y *= next.color.y;
+    ray.color.z *= next.color.z;
   }
 
   private static void sampleEmitterFace(Scene scene, Ray ray, Grid.EmitterPosition pos, int face, Vector4 result, double scaler, Random random) {
