@@ -360,9 +360,13 @@ public class PathTracer implements RayTracer {
                   ray.color.y = (1 - gTrans) * ray.color.y + gTrans;
                   ray.color.z = (1 - bTrans) * ray.color.z + bTrans;
                   // Scale by results from refracted ray
+                  ray.emittance.set(ray.color.x, ray.color.y, ray.color.z);
                   ray.color.x *= refracted.color.x;
                   ray.color.y *= refracted.color.y;
                   ray.color.z *= refracted.color.z;
+                  ray.emittance.x *= refracted.emittance.x;
+                  ray.emittance.y *= refracted.emittance.y;
+                  ray.emittance.z *= refracted.emittance.z;
                   hit = true;
                 }
               }
@@ -393,9 +397,13 @@ public class PathTracer implements RayTracer {
             ray.color.y = (1 - gTrans) * ray.color.y + gTrans;
             ray.color.z = (1 - bTrans) * ray.color.z + bTrans;
             // Scale by results from transmitted ray
+            ray.emittance.set(ray.color.x, ray.color.y, ray.color.z);
             ray.color.x *= transmitted.color.x;
             ray.color.y *= transmitted.color.y;
             ray.color.z *= transmitted.color.z;
+            ray.emittance.x *= transmitted.emittance.x;
+            ray.emittance.y *= transmitted.emittance.y;
+            ray.emittance.z *= transmitted.emittance.z;
             hit = true;
           }
         }
