@@ -343,9 +343,23 @@ public class PathTracer implements RayTracer {
                 }
 
                 if (pathTrace(scene, refracted, state, 1, false)) {
-                  ray.color.x = ray.color.x * pDiffuse + (1 - pDiffuse);
-                  ray.color.y = ray.color.y * pDiffuse + (1 - pDiffuse);
-                  ray.color.z = ray.color.z * pDiffuse + (1 - pDiffuse);
+                  // Color-based transmission value
+                  double colorTrans = (ray.color.x + ray.color.y + ray.color.z)/3;
+                  // Total amount of light we want to transmit (overall transparency of texture)
+                  double shouldTrans = 1 - pDiffuse;
+                  // Amount of each color to transmit - default to overall transparency if RGB values add to 0 (e.g. regular glass)
+                  double rTrans = shouldTrans, gTrans = shouldTrans, bTrans = shouldTrans;
+                  if(colorTrans > 0) {
+                    // Amount to transmit of each color is scaled so the total transmitted amount matches the texture's transparency
+                    rTrans = ray.color.x * shouldTrans / colorTrans;
+                    gTrans = ray.color.y * shouldTrans / colorTrans;
+                    bTrans = ray.color.z * shouldTrans / colorTrans;
+                  }
+                  // Set transparent and opaque components of each color channel
+                  ray.color.x = (1 - rTrans) * ray.color.x + rTrans;
+                  ray.color.y = (1 - gTrans) * ray.color.y + gTrans;
+                  ray.color.z = (1 - bTrans) * ray.color.z + bTrans;
+                  // Scale by results from refracted ray
                   ray.color.x *= refracted.color.x;
                   ray.color.y *= refracted.color.y;
                   ray.color.z *= refracted.color.z;
@@ -362,9 +376,23 @@ public class PathTracer implements RayTracer {
           transmitted.o.scaleAdd(Ray.OFFSET, transmitted.d);
 
           if (pathTrace(scene, transmitted, state, 1, false)) {
-            ray.color.x = ray.color.x * pDiffuse + (1 - pDiffuse);
-            ray.color.y = ray.color.y * pDiffuse + (1 - pDiffuse);
-            ray.color.z = ray.color.z * pDiffuse + (1 - pDiffuse);
+            // Color-based transmission value
+            double colorTrans = (ray.color.x + ray.color.y + ray.color.z)/3;
+            // Total amount of light we want to transmit (overall transparency of texture)
+            double shouldTrans = 1 - pDiffuse;
+            // Amount of each color to transmit - default to overall transparency if RGB values add to 0 (e.g. regular glass)
+            double rTrans = shouldTrans, gTrans = shouldTrans, bTrans = shouldTrans;
+            if(colorTrans > 0) {
+              // Amount to transmit of each color is scaled so the total transmitted amount matches the texture's transparency
+              rTrans = ray.color.x * shouldTrans / colorTrans;
+              gTrans = ray.color.y * shouldTrans / colorTrans;
+              bTrans = ray.color.z * shouldTrans / colorTrans;
+            }
+            // Set transparent and opaque components of each color channel
+            ray.color.x = (1 - rTrans) * ray.color.x + rTrans;
+            ray.color.y = (1 - gTrans) * ray.color.y + gTrans;
+            ray.color.z = (1 - bTrans) * ray.color.z + bTrans;
+            // Scale by results from transmitted ray
             ray.color.x *= transmitted.color.x;
             ray.color.y *= transmitted.color.y;
             ray.color.z *= transmitted.color.z;
