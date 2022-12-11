@@ -140,6 +140,10 @@ public class PathTracer implements RayTracer {
           reflected.specularReflection(ray, random);
 
           if (pathTrace(scene, reflected, state, 1, false)) {
+            ray.emittance.x = ray.color.x * reflected.emittance.x;
+            ray.emittance.y = ray.color.y * reflected.emittance.y;
+            ray.emittance.z = ray.color.z * reflected.emittance.z;
+
             if (doMetal) {
               // use the albedo color as specular color
               ray.color.x *= reflected.color.x;
@@ -308,6 +312,10 @@ public class PathTracer implements RayTracer {
                 Ray reflected = new Ray();
                 reflected.specularReflection(ray, random);
                 if (pathTrace(scene, reflected, state, 1, false)) {
+                  ray.emittance.x = ray.color.x * reflected.emittance.x;
+                  ray.emittance.y = ray.color.x * reflected.emittance.y;
+                  ray.emittance.z = ray.color.x * reflected.emittance.z;
+
                   ray.color.x = reflected.color.x;
                   ray.color.y = reflected.color.y;
                   ray.color.z = reflected.color.z;
@@ -346,6 +354,11 @@ public class PathTracer implements RayTracer {
                   ray.color.x = ray.color.x * pDiffuse + (1 - pDiffuse);
                   ray.color.y = ray.color.y * pDiffuse + (1 - pDiffuse);
                   ray.color.z = ray.color.z * pDiffuse + (1 - pDiffuse);
+
+                  ray.emittance.x = ray.color.x * refracted.emittance.x;
+                  ray.emittance.y = ray.color.x * refracted.emittance.y;
+                  ray.emittance.z = ray.color.x * refracted.emittance.z;
+
                   ray.color.x *= refracted.color.x;
                   ray.color.y *= refracted.color.y;
                   ray.color.z *= refracted.color.z;
@@ -365,6 +378,11 @@ public class PathTracer implements RayTracer {
             ray.color.x = ray.color.x * pDiffuse + (1 - pDiffuse);
             ray.color.y = ray.color.y * pDiffuse + (1 - pDiffuse);
             ray.color.z = ray.color.z * pDiffuse + (1 - pDiffuse);
+
+            ray.emittance.x = ray.color.x * transmitted.emittance.x;
+            ray.emittance.y = ray.color.x * transmitted.emittance.y;
+            ray.emittance.z = ray.color.x * transmitted.emittance.z;
+
             ray.color.x *= transmitted.color.x;
             ray.color.y *= transmitted.color.y;
             ray.color.z *= transmitted.color.z;
