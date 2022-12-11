@@ -454,6 +454,25 @@ public class PathTracer implements RayTracer {
       gTrans = ray.color.y * shouldTrans / colorTrans;
       bTrans = ray.color.z * shouldTrans / colorTrans;
     }
+    if (rTrans > 1) {
+      // Give excess transmission from red to green and blue
+      double gTransNew = reassignTransmissivity(rTrans, gTrans, bTrans, shouldTrans);
+      bTrans = reassignTransmissivity(rTrans, bTrans, gTrans, shouldTrans);
+      gTrans = gTransNew;
+      rTrans = 1;
+    } else if (gTrans > 1) {
+      // Give excess transmission from green to red and blue
+      double rTransNew = reassignTransmissivity(gTrans, rTrans, bTrans, shouldTrans);
+      bTrans = reassignTransmissivity(gTrans, bTrans, rTrans, shouldTrans);
+      rTrans = rTransNew;
+      gTrans = 1;
+    } else if (bTrans > 1) {
+      // Give excess transmission from blue to green and red
+      double gTransNew = reassignTransmissivity(bTrans, gTrans, rTrans, shouldTrans);
+      rTrans = reassignTransmissivity(bTrans, rTrans, gTrans, shouldTrans);
+      gTrans = gTransNew;
+      bTrans = 1;
+    }
     // Set transparent and opaque components of each color channel
     ray.color.x = (1 - rTrans) * ray.color.x + rTrans;
     ray.color.y = (1 - gTrans) * ray.color.y + gTrans;
@@ -466,6 +485,12 @@ public class PathTracer implements RayTracer {
     ray.color.x *= next.color.x;
     ray.color.y *= next.color.y;
     ray.color.z *= next.color.z;
+  }
+
+  private static double reassignTransmissivity(double from, double to, double other, double trans) {
+    // Formula here derived algebraically from this system:
+    // (1 - to_new)/(1 - other_new) = (from - to)/(from - other), (1 + to_new + other_new)/3 = trans
+    return (other - to + (3*trans - 1)*(to - from))/(other + to - 2*from);
   }
 
   private static void sampleEmitterFace(Scene scene, Ray ray, Grid.EmitterPosition pos, int face, Vector4 result, double scaler, Random random) {
