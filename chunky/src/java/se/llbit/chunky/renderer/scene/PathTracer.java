@@ -313,8 +313,8 @@ public class PathTracer implements RayTracer {
                 reflected.specularReflection(ray, random);
                 if (pathTrace(scene, reflected, state, 1, false)) {
                   ray.emittance.x = ray.color.x * reflected.emittance.x;
-                  ray.emittance.y = ray.color.x * reflected.emittance.y;
-                  ray.emittance.z = ray.color.x * reflected.emittance.z;
+                  ray.emittance.y = ray.color.y * reflected.emittance.y;
+                  ray.emittance.z = ray.color.z * reflected.emittance.z;
 
                   ray.color.x = reflected.color.x;
                   ray.color.y = reflected.color.y;
@@ -356,8 +356,8 @@ public class PathTracer implements RayTracer {
                   ray.color.z = ray.color.z * pDiffuse + (1 - pDiffuse);
 
                   ray.emittance.x = ray.color.x * refracted.emittance.x;
-                  ray.emittance.y = ray.color.x * refracted.emittance.y;
-                  ray.emittance.z = ray.color.x * refracted.emittance.z;
+                  ray.emittance.y = ray.color.y * refracted.emittance.y;
+                  ray.emittance.z = ray.color.z * refracted.emittance.z;
 
                   ray.color.x *= refracted.color.x;
                   ray.color.y *= refracted.color.y;
@@ -380,8 +380,8 @@ public class PathTracer implements RayTracer {
             ray.color.z = ray.color.z * pDiffuse + (1 - pDiffuse);
 
             ray.emittance.x = ray.color.x * transmitted.emittance.x;
-            ray.emittance.y = ray.color.x * transmitted.emittance.y;
-            ray.emittance.z = ray.color.x * transmitted.emittance.z;
+            ray.emittance.y = ray.color.y * transmitted.emittance.y;
+            ray.emittance.z = ray.color.z * transmitted.emittance.z;
 
             ray.color.x *= transmitted.color.x;
             ray.color.y *= transmitted.color.y;
