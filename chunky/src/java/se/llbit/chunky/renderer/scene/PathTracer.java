@@ -108,7 +108,7 @@ public class PathTracer implements RayTracer {
 
       float pSpecular = currentMat.specular;
 
-      double pDiffuse = ray.color.w;
+      double pDiffuse = 1 - Math.sqrt(1 - ray.color.w);
 
       float n1 = prevMat.ior;
       float n2 = currentMat.ior;
