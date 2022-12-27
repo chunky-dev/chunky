@@ -118,7 +118,7 @@ public class EmittersTab extends ScrollPane implements RenderControlsTab, Initia
     });
     gridSize.setDisable(true);
 
-    preventNormalEmitterWithSampling.setTooltip(new Tooltip("Prevent usual emitter contribution when emitter sampling is used"));
+    preventNormalEmitterWithSampling.setTooltip(new Tooltip("Prevent usual emitter contribution when emitter sampling is used."));
     preventNormalEmitterWithSampling.selectedProperty().addListener((observable, oldvalue, newvalue) -> {
       scene.setPreventNormalEmitterWithSampling(newvalue);
       PersistentSettings.setPreventNormalEmitterWithSampling(newvalue);

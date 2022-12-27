@@ -436,7 +436,7 @@ public class Sun implements JsonSerializable {
   }
 
   public double getApparentSunRadius() {
-    return radius / .03;
+    return apparentRadius / .03;
   }
 
   /**
