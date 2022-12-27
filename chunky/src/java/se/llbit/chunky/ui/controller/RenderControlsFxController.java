@@ -96,9 +96,10 @@ public class RenderControlsFxController {
     try {
       // Create the default tabs:
       tabs.add(new GeneralTab());
-      tabs.add(new LightingTab());
+      tabs.add(new SunTab());
       tabs.add(new SkyTab());
       tabs.add(new WaterTab());
+      tabs.add(new EmittersTab());
       tabs.add(new CameraTab());
       tabs.add(new EntitiesTab());
       tabs.add(new MaterialsTab());

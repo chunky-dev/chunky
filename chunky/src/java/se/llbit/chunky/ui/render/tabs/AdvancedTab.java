@@ -26,7 +26,6 @@ import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
-import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
@@ -40,7 +39,6 @@ import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.ShutdownAlert;
 import se.llbit.chunky.ui.render.RenderControlsTab;
-import se.llbit.fxutil.Dialogs;
 import se.llbit.math.Octree;
 import se.llbit.math.bvh.BVH;
 import se.llbit.util.Registerable;
@@ -69,8 +67,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private ChoiceBox<String> octreeImplementation;
   @FXML private ChoiceBox<String> bvhMethod;
   @FXML private ChoiceBox<String> biomeStructureImplementation;
-  @FXML private IntegerAdjuster gridSize;
-  @FXML private CheckBox preventNormalEmitterWithSampling;
   @FXML private CheckBox hideUnknownBlocks;
   @FXML private ChoiceBox<String> rendererSelect;
   @FXML private ChoiceBox<String> previewSelect;
@@ -169,9 +165,9 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     tooltipTextBuilder.append("Requires reloading chunks to take effect.");
     octreeImplementation.getItems().addAll(octreeNames);
     octreeImplementation.getSelectionModel().selectedItemProperty()
-            .addListener((observable, oldvalue, newvalue) -> {
-              scene.setOctreeImplementation(newvalue);
-              PersistentSettings.setOctreeImplementation(newvalue);
+            .addListener((observable, oldValue, newValue) -> {
+              scene.setOctreeImplementation(newValue);
+              PersistentSettings.setOctreeImplementation(newValue);
             });
     octreeImplementation.setTooltip(new Tooltip(tooltipTextBuilder.toString()));
 
@@ -206,41 +202,11 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     biomeStructureTooltipBuilder.append("Requires reloading chunks to take effect.");
     biomeStructureImplementation.getItems().addAll(biomeStructureIds);
     biomeStructureImplementation.getSelectionModel().selectedItemProperty()
-      .addListener((observable, oldvalue, newvalue) -> {
-        scene.setBiomeStructureImplementation(newvalue);
-        PersistentSettings.setBiomeStructureImplementation(newvalue);
+      .addListener((observable, oldValue, newValue) -> {
+        scene.setBiomeStructureImplementation(newValue);
+        PersistentSettings.setBiomeStructureImplementation(newValue);
       });
     biomeStructureImplementation.setTooltip(new Tooltip(biomeStructureTooltipBuilder.toString()));
-
-    gridSize.setRange(4, 64);
-    gridSize.setName("Emitter grid size");
-    gridSize.setTooltip("Size of the cells of the emitter grid. " +
-            "The bigger, the more emitter will be sampled. " +
-            "Need the chunks to be reloaded to apply");
-    gridSize.onValueChange(value -> {
-      scene.setGridSize(value);
-      PersistentSettings.setGridSizeDefault(value);
-    });
-    gridSize.addEventHandler(Adjuster.AFTER_VALUE_CHANGE, e -> {
-      if (scene.getEmitterSamplingStrategy() != EmitterSamplingStrategy.NONE && scene.haveLoadedChunks()) {
-        Alert warning = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
-        warning.setContentText("The selected chunks need to be reloaded to update the emitter grid size.");
-        warning.getButtonTypes().setAll(
-          ButtonType.CANCEL,
-          new ButtonType("Reload chunks", ButtonBar.ButtonData.FINISH));
-        warning.setTitle("Chunk reload required");
-        ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
-        if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
-          controller.getSceneManager().reloadChunks();
-        }
-      }
-    });
-
-    preventNormalEmitterWithSampling.setTooltip(new Tooltip("Prevent usual emitter contribution when emitter sampling is used"));
-    preventNormalEmitterWithSampling.selectedProperty().addListener((observable, oldvalue, newvalue) -> {
-      scene.setPreventNormalEmitterWithSampling(newvalue);
-      PersistentSettings.setPreventNormalEmitterWithSampling(newvalue);
-    });
 
     hideUnknownBlocks.setTooltip(new Tooltip("Hide unknown blocks instead of rendering them as question marks."));
     hideUnknownBlocks.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -282,8 +248,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
     bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
     biomeStructureImplementation.getSelectionModel().select(scene.getBiomeStructureImplementation());
-    gridSize.set(scene.getGridSize());
-    preventNormalEmitterWithSampling.setSelected(scene.isPreventNormalEmitterWithSampling());
     animationTime.set(scene.getAnimationTime());
     hideUnknownBlocks.setSelected(scene.getHideUnknownBlocks());
     rendererSelect.getSelectionModel().select(scene.getRenderer());

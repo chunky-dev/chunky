@@ -1,5 +1,5 @@
 /* Copyright (c) 2016 - 2021 Jesper Öqvist <jesper@llbit.se>
- * Copyright (c) 2016 - 2021 Chunky contributors
+ * Copyright (c) 2016 - 2022 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -59,7 +59,11 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   @FXML private TitledPane detailsPane;
   @FXML private VBox skyModeSettings;
   @FXML private CheckBox transparentSkyEnabled;
+  @FXML private DoubleAdjuster skyExposure;
+  @FXML private DoubleAdjuster skyIntensity;
+  @FXML private DoubleAdjuster apparentSkyBrightness;
   @FXML private CheckBox cloudsEnabled;
+  @FXML private TitledPane cloudDetailsPane;
   @FXML private DoubleAdjuster cloudSize;
   @FXML private DoubleAdjuster cloudX;
   @FXML private DoubleAdjuster cloudY;
@@ -130,41 +134,83 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     simulatedSky.setOnAction(simSkyListener);
     simulatedSky.setTooltip(new Tooltip(skiesTooltip(Sky.skies)));
 
-    cloudSize.setName("Cloud size");
-    cloudSize.setTooltip("Cloud size, measured in blocks per pixel of clouds.png texture");
+    skyExposure.setName("Sky exposure");
+    skyExposure.setTooltip("Changes the exposure of the sky.");
+    skyExposure.setRange(Sky.MIN_INTENSITY, Sky.MAX_INTENSITY);
+    skyExposure.makeLogarithmic();
+    skyExposure.clampMin();
+    skyExposure.onValueChange(value -> scene.sky().setSkyExposure(value));
+
+    skyIntensity.setName("Sky light intensity modifier");
+    skyIntensity.setTooltip("Modifies the intensity of the light emitted by the sky.");
+    skyIntensity.setRange(Sky.MIN_INTENSITY, Sky.MAX_INTENSITY);
+    skyIntensity.makeLogarithmic();
+    skyIntensity.clampMin();
+    skyIntensity.onValueChange(value -> scene.sky().setSkyLight(value));
+
+    apparentSkyBrightness.setName("Apparent sky brightness modifier");
+    apparentSkyBrightness.setTooltip("Modifies the apparent brightness of the sky.");
+    apparentSkyBrightness.setRange(Sky.MIN_APPARENT_INTENSITY, Sky.MAX_APPARENT_INTENSITY);
+    apparentSkyBrightness.makeLogarithmic();
+    apparentSkyBrightness.clampMin();
+    apparentSkyBrightness.onValueChange(value -> scene.sky().setApparentSkyLight(value));
+
+    cloudsEnabled.setSelected(false);
+    cloudsEnabled.setTooltip(new Tooltip("Toggles visibility of Minecraft-style clouds."));
+    cloudsEnabled.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.sky().setCloudsEnabled(newValue);
+      cloudDetailsPane.setVisible(newValue);
+      cloudDetailsPane.setExpanded(newValue);
+      cloudDetailsPane.setManaged(newValue);
+    });
+
+    cloudDetailsPane.setVisible(cloudsEnabled.isSelected());
+    cloudDetailsPane.setExpanded(cloudsEnabled.isSelected());
+    cloudDetailsPane.setManaged(cloudsEnabled.isSelected());
+
+    cloudSize.setTooltip("Changes the cloud size, measured in blocks per pixel of clouds.png texture");
     cloudSize.setRange(0.1, 128);
     cloudSize.clampMin();
     cloudSize.makeLogarithmic();
     cloudSize.onValueChange(value -> scene.sky().setCloudSize(value));
 
-    cloudX.setTooltip("Cloud X offset.");
+    cloudX.setTooltip("Changes the X-offset of the clouds.");
     cloudX.setRange(-256, 256);
     cloudX.onValueChange(value -> scene.sky().setCloudXOffset(value));
-    cloudY.setTooltip("Cloud Y offset.");
+    cloudY.setTooltip("Changes the height of the clouds.");
     cloudY.setRange(-64, 320);
     cloudY.onValueChange(value -> scene.sky().setCloudYOffset(value));
-    cloudZ.setTooltip("Cloud Z offset.");
+    cloudZ.setTooltip("Changes the Z-offset of the clouds.");
     cloudZ.setRange(-256, 256);
     cloudZ.onValueChange(value -> scene.sky().setCloudZOffset(value));
 
-    fogDensity.setTooltip("Fog thickness. Set to 0 to disable volumetric fog effect.");
+    fogDensity.setTooltip("Changes the fog thickness. Set to 0 to disable volumetric fog effect.");
     fogDensity.setRange(0, 1);
     fogDensity.setMaximumFractionDigits(6);
     fogDensity.makeLogarithmic();
     fogDensity.clampMin();
-    fogDensity.onValueChange(value -> scene.setFogDensity(value));
+    fogDensity.onValueChange(value -> {
+      scene.setFogDensity(value);
+    });
+    fogDensity.valueProperty().addListener((observable, oldValue, newValue) -> {
+      skyFogDensity.setDisable(newValue.doubleValue() == 0);
+      fogColor.setDisable(newValue.doubleValue() == 0);
+    });
 
-    skyFogDensity.setTooltip(
-        "How much the fog color is blended over the sky/skymap. No effect when fog is disabled.");
+    skyFogDensity.setTooltip("Changes how much the fog color is blended over the sky. Has no effect when fog is disabled.");
     skyFogDensity.setRange(0, 1);
     skyFogDensity.clampMin();
     skyFogDensity.onValueChange(value -> scene.setSkyFogDensity(value));
+    skyFogDensity.setDisable(true);
 
-    skyMode.setTooltip(new Tooltip("Set the type of sky to be used in the scene."));
+    skyMode.setTooltip(new Tooltip("Sets the type of sky to be used in the scene."));
     skyMode.getItems().addAll(Sky.SkyMode.values());
     skyMode.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
           scene.sky().setSkyMode(newValue);
+          skyExposure.setDisable(newValue.equals(Sky.SkyMode.BLACK));
+          skyIntensity.setDisable(newValue.equals(Sky.SkyMode.BLACK));
+          apparentSkyBrightness.setDisable(newValue.equals(Sky.SkyMode.BLACK));
           switch (newValue) {
             case SIMULATED:
               skyModeSettings.getChildren().setAll(simulatedSettings);
@@ -200,12 +246,8 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
         .setTooltip(new Tooltip("Disables sky rendering for background compositing."));
     transparentSkyEnabled.selectedProperty().addListener(
         (observable, oldValue, newValue) -> scene.setTransparentSky(newValue));
-    cloudsEnabled.setTooltip(new Tooltip("Toggle visibility of Minecraft-style clouds."));
-    cloudsEnabled.selectedProperty().addListener((observable, oldValue, newValue) -> {
-
-      scene.sky().setCloudsEnabled(newValue);
-    });
     fogColor.colorProperty().addListener(fogColorListener);
+    fogColor.setDisable(true);
 
     colorPicker.colorProperty().addListener(skyColorListener);
   }
@@ -215,6 +257,9 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     simulatedSky.setOnAction(null);
     simulatedSky.getSelectionModel().select(scene.sky().getSimulatedSky());
     simulatedSky.setOnAction(simSkyListener);
+    skyExposure.set(scene.sky().getSkyExposure());
+    skyIntensity.set(scene.sky().getSkyLight());
+    apparentSkyBrightness.set(scene.sky().getApparentSkyLight());
     cloudsEnabled.setSelected(scene.sky().cloudsEnabled());
     transparentSkyEnabled.setSelected(scene.transparentSky());
     cloudSize.set(scene.sky().cloudSize());

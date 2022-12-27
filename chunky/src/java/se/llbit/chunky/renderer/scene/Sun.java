@@ -126,6 +126,10 @@ public class Sun implements JsonSerializable {
   public double radiusCos = FastMath.cos(radius);
   public double radiusSin = FastMath.sin(radius);
 
+  public double apparentRadius = .03;
+  public double apparentRadiusCos = FastMath.cos(apparentRadius);
+  public double apparentRadiusSin = FastMath.sin(apparentRadius);
+
   private static final double AMBIENT = .3;
 
   private double intensity = DEFAULT_INTENSITY;
@@ -200,6 +204,7 @@ public class Sun implements JsonSerializable {
     luminosity = other.luminosity;
     apparentBrightness = other.apparentBrightness;
     radius = other.radius;
+    apparentRadius = other.apparentRadius;
     enableTextureModification = other.enableTextureModification;
     luminosityPdf = other.luminosityPdf;
     initSun();
@@ -282,7 +287,7 @@ public class Sun implements JsonSerializable {
       return false;
     }
 
-    double width = radius * 4;
+    double width = apparentRadius * 4;
     double width2 = width * 2;
     double a;
     a = Math.PI / 2 - FastMath.acos(ray.d.dot(su)) + width;
@@ -426,6 +431,18 @@ public class Sun implements JsonSerializable {
     return radius / .03;
   }
 
+  public void setApparentSunRadius(double value) {
+    apparentRadius = value * .03;
+    apparentRadiusCos = FastMath.cos(apparentRadius);
+    apparentRadiusSin = FastMath.sin(apparentRadius);
+    initSun();
+    scene.refresh();
+  }
+
+  public double getApparentSunRadius() {
+    return apparentRadius / .03;
+  }
+
   /**
    * Point ray in random direction within sun solid angle
    */
@@ -457,6 +474,7 @@ public class Sun implements JsonSerializable {
     sun.add("luminosity", luminosity);
     sun.add("apparentBrightness", apparentBrightness);
     sun.add("radius", radius);
+    sun.add("apparentRadius", apparentRadius);
     sun.add("modifySunTexture", enableTextureModification);
     JsonObject colorObj = new JsonObject();
     colorObj.add("red", color.x);
@@ -479,6 +497,7 @@ public class Sun implements JsonSerializable {
     setLuminosity(json.get("luminosity").doubleValue(luminosity));
     apparentBrightness = json.get("apparentBrightness").doubleValue(apparentBrightness);
     radius = json.get("radius").doubleValue(radius);
+    apparentRadius = json.get("apparentRadius").doubleValue(apparentRadius);
     enableTextureModification = json.get("modifySunTexture").boolValue(enableTextureModification);
 
     if (json.get("color").isObject()) {
