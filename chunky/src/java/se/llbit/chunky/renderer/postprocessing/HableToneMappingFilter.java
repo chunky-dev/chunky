@@ -1,8 +1,13 @@
 package se.llbit.chunky.renderer.postprocessing;
 
+import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.renderer.scene.Scene;
+
 /**
  * Implementation of Hable tone mapping
+ *
  * @link http://filmicworlds.com/blog/filmic-tonemapping-operators/
+ * @link https://www.gdcvault.com/play/1012351/Uncharted-2-HDR
  */
 public class HableToneMappingFilter extends SimplePixelPostProcessingFilter {
   private static final float hA = 0.15f;
@@ -16,12 +21,11 @@ public class HableToneMappingFilter extends SimplePixelPostProcessingFilter {
   
   @Override
   public void processPixel(double[] pixel) {
-    // This adjusts the exposure by a factor of 16 so that the resulting exposure approximately matches the other
-    // post-processing methods. Without this, the image would be very dark.
-    for(int i = 0; i < 3; ++i) {
-      pixel[i] *= 16;
+    for (int i = 0; i < 3; ++i) {
+      pixel[i] *= 2; // exposure bias
       pixel[i] = ((pixel[i] * (hA * pixel[i] + hC * hB) + hD * hE) / (pixel[i] * (hA * pixel[i] + hB) + hD * hF)) - hE / hF;
       pixel[i] *= whiteScale;
+      pixel[i] = FastMath.pow(pixel[i], 1 / Scene.DEFAULT_GAMMA);
     }
   }
 
