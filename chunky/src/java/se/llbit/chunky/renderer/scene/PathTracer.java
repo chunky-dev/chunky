@@ -454,7 +454,6 @@ public class PathTracer implements RayTracer {
       gTrans = ray.color.y * shouldTrans / colorTrans;
       bTrans = ray.color.z * shouldTrans / colorTrans;
     }
-    // TODO: Make this controllable from 1 to 3 via a slider
     double transmissivityCap = scene.transmissivityCap;
     // Determine the color with the highest transmissivity
     double maxTrans = Math.max(rTrans, Math.max(gTrans, bTrans));
@@ -479,18 +478,26 @@ public class PathTracer implements RayTracer {
         bTrans = transmissivityCap;
       }
     }
-    // Set transparent and opaque components of each color channel
-    ray.color.x = (1 - rTrans) * ray.color.x + rTrans;
-    ray.color.y = (1 - gTrans) * ray.color.y + gTrans;
-    ray.color.z = (1 - bTrans) * ray.color.z + bTrans;
-    // Use emittance from next ray
-    ray.emittance.x = ray.color.x * next.emittance.x;
-    ray.emittance.y = ray.color.y * next.emittance.y;
-    ray.emittance.z = ray.color.z * next.emittance.z;
+    // Don't need to check for energy gain if transmissivity cap is 1
+    if(transmissivityCap > 1) {
+      double currentEnergy = rTrans * next.color.x + gTrans * next.color.y + bTrans * next.color.z;
+      double nextEnergy = next.color.x + next.color.y + next.color.z;
+      double energyRatio = currentEnergy / nextEnergy;
+      // Normalize if there is net energy gain across all channels (more likely for higher transmissivityCap combined with high-saturation light source)
+      if(energyRatio > 1) {
+        rTrans /= energyRatio;
+        gTrans /= energyRatio;
+        bTrans /= energyRatio;
+      }
+    }
     // Scale color based on next ray
-    ray.color.x *= next.color.x;
-    ray.color.y *= next.color.y;
-    ray.color.z *= next.color.z;
+    ray.color.x = rTrans * next.color.x;
+    ray.color.y = gTrans * next.color.y;
+    ray.color.z = bTrans * next.color.z;
+    // Use emittance from next ray
+    ray.emittance.x = rTrans * next.emittance.x;
+    ray.emittance.y = gTrans * next.emittance.y;
+    ray.emittance.z = bTrans * next.emittance.z;
   }
 
   private static double reassignTransmissivity(double from, double to, double other, double trans, double cap) {
