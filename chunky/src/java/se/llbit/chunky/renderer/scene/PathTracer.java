@@ -352,7 +352,7 @@ public class PathTracer implements RayTracer {
 
                 if (pathTrace(scene, refracted, state, 1, false)) {
                   // Calculate the color and emittance of the refracted ray
-                  translucentRayColor(ray, refracted, pDiffuse);
+                  translucentRayColor(scene, ray, refracted, pDiffuse);
                   hit = true;
                 }
               }
@@ -367,7 +367,7 @@ public class PathTracer implements RayTracer {
 
           if (pathTrace(scene, transmitted, state, 1, false)) {
             // Calculate the color and emittance of the transmitted ray
-            translucentRayColor(ray, transmitted, pDiffuse);
+            translucentRayColor(scene, ray, transmitted, pDiffuse);
             hit = true;
           }
         }
@@ -441,7 +441,7 @@ public class PathTracer implements RayTracer {
     return hit;
   }
 
-  private static void translucentRayColor(Ray ray, Ray next, double opacity) {
+  private static void translucentRayColor(Scene scene, Ray ray, Ray next, double opacity) {
     // Color-based transmission value
     double colorTrans = (ray.color.x + ray.color.y + ray.color.z)/3;
     // Total amount of light we want to transmit (overall transparency of texture)
@@ -455,28 +455,28 @@ public class PathTracer implements RayTracer {
       bTrans = ray.color.z * shouldTrans / colorTrans;
     }
     // TODO: Make this controllable from 1 to 3 via a slider
-    final double TRANSMISSIVITY_CAP = 1;
+    double transmissivityCap = scene.transmissivityCap;
     // Determine the color with the highest transmissivity
     double maxTrans = Math.max(rTrans, Math.max(gTrans, bTrans));
-    if(maxTrans > TRANSMISSIVITY_CAP) {
+    if(maxTrans > transmissivityCap) {
       if (maxTrans == rTrans) {
         // Give excess transmission from red to green and blue
-        double gTransNew = reassignTransmissivity(rTrans, gTrans, bTrans, shouldTrans, TRANSMISSIVITY_CAP);
-        bTrans = reassignTransmissivity(rTrans, bTrans, gTrans, shouldTrans, TRANSMISSIVITY_CAP);
+        double gTransNew = reassignTransmissivity(rTrans, gTrans, bTrans, shouldTrans, transmissivityCap);
+        bTrans = reassignTransmissivity(rTrans, bTrans, gTrans, shouldTrans, transmissivityCap);
         gTrans = gTransNew;
-        rTrans = TRANSMISSIVITY_CAP;
+        rTrans = transmissivityCap;
       } else if (maxTrans == gTrans) {
         // Give excess transmission from green to red and blue
-        double rTransNew = reassignTransmissivity(gTrans, rTrans, bTrans, shouldTrans, TRANSMISSIVITY_CAP);
-        bTrans = reassignTransmissivity(gTrans, bTrans, rTrans, shouldTrans, TRANSMISSIVITY_CAP);
+        double rTransNew = reassignTransmissivity(gTrans, rTrans, bTrans, shouldTrans, transmissivityCap);
+        bTrans = reassignTransmissivity(gTrans, bTrans, rTrans, shouldTrans, transmissivityCap);
         rTrans = rTransNew;
-        gTrans = TRANSMISSIVITY_CAP;
+        gTrans = transmissivityCap;
       } else if (maxTrans == bTrans) {
         // Give excess transmission from blue to green and red
-        double gTransNew = reassignTransmissivity(bTrans, gTrans, rTrans, shouldTrans, TRANSMISSIVITY_CAP);
-        rTrans = reassignTransmissivity(bTrans, rTrans, gTrans, shouldTrans, TRANSMISSIVITY_CAP);
+        double gTransNew = reassignTransmissivity(bTrans, gTrans, rTrans, shouldTrans, transmissivityCap);
+        rTrans = reassignTransmissivity(bTrans, rTrans, gTrans, shouldTrans, transmissivityCap);
         gTrans = gTransNew;
-        bTrans = TRANSMISSIVITY_CAP;
+        bTrans = transmissivityCap;
       }
     }
     // Set transparent and opaque components of each color channel
