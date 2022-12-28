@@ -2,6 +2,8 @@ package se.llbit.chunky.renderer.postprocessing;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.json.JsonObject;
+import se.llbit.util.Configurable;
 
 /**
  * Implementation of Hable (i.e. Uncharted 2) tone mapping
@@ -9,7 +11,7 @@ import se.llbit.chunky.renderer.scene.Scene;
  * @link http://filmicworlds.com/blog/filmic-tonemapping-operators/
  * @link https://www.gdcvault.com/play/1012351/Uncharted-2-HDR
  */
-public class HableToneMappingFilter extends SimplePixelPostProcessingFilter {
+public class HableToneMappingFilter extends SimplePixelPostProcessingFilter implements Configurable {
   public enum Preset {
     /**
      * Parameters from <a href="http://filmicworlds.com/blog/filmic-tonemapping-operators/">John Hable's blog post</a>
@@ -148,5 +150,29 @@ public class HableToneMappingFilter extends SimplePixelPostProcessingFilter {
   @Override
   public String getId() {
     return "TONEMAP3";
+  }
+
+  @Override
+  public void loadConfiguration(JsonObject json) {
+    reset();
+    hA = json.get("shoulderStrength").floatValue(hA);
+    hB = json.get("linearStrength").floatValue(hB);
+    hC = json.get("linearAngle").floatValue(hC);
+    hD = json.get("toeStrength").floatValue(hD);
+    hE = json.get("toeNumerator").floatValue(hE);
+    hF = json.get("toeDenominator").floatValue(hF);
+    hW = json.get("linearWhitePointValue").floatValue(hW);
+    recalculateWhiteScale();
+  }
+
+  @Override
+  public void storeConfiguration(JsonObject json) {
+    json.add("shoulderStrength", hA);
+    json.add("linearStrength", hB);
+    json.add("linearAngle", hC);
+    json.add("toeStrength", hD);
+    json.add("toeNumerator", hE);
+    json.add("toeDenominator", hF);
+    json.add("linearWhitePointValue", hW);
   }
 }

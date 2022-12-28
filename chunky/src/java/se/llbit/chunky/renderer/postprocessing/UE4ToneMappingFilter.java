@@ -2,7 +2,9 @@ package se.llbit.chunky.renderer.postprocessing;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.json.JsonObject;
 import se.llbit.math.QuickMath;
+import se.llbit.util.Configurable;
 
 /**
  * Implementation of the Unreal Engine 4 Filmic Tone Mapper.
@@ -10,7 +12,7 @@ import se.llbit.math.QuickMath;
  * @link https://docs.unrealengine.com/4.26/en-US/RenderingAndGraphics/PostProcessEffects/ColorGrading/
  * @link https://www.desmos.com/calculator/h8rbdpawxj?lang=de
  */
-public class UE4ToneMappingFilter extends SimplePixelPostProcessingFilter {
+public class UE4ToneMappingFilter extends SimplePixelPostProcessingFilter implements Configurable {
   public enum Preset {
     /**
      * ACES curve parameters
@@ -148,5 +150,27 @@ public class UE4ToneMappingFilter extends SimplePixelPostProcessingFilter {
   @Override
   public String getId() {
     return "UE4_FILMIC";
+  }
+
+  @Override
+  public void loadConfiguration(JsonObject json) {
+    reset();
+    saturation = json.get("saturation").floatValue(saturation);
+    slope = json.get("slope").floatValue(slope);
+    toe = json.get("toe").floatValue(toe);
+    shoulder = json.get("shoulder").floatValue(shoulder);
+    blackClip = json.get("blackClip").floatValue(blackClip);
+    whiteClip = json.get("whiteClip").floatValue(whiteClip);
+    recalculateConstants();
+  }
+
+  @Override
+  public void storeConfiguration(JsonObject json) {
+    json.add("saturation", saturation);
+    json.add("slope", slope);
+    json.add("toe", toe);
+    json.add("shoulder", shoulder);
+    json.add("blackClip", blackClip);
+    json.add("whiteClip", whiteClip);
   }
 }
