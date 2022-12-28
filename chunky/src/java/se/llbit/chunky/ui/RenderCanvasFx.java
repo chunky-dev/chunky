@@ -72,7 +72,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
   private final AtomicBoolean painting = new AtomicBoolean(false);
   private final Canvas canvas;
-  private final Group guideGroup;
+  private final Group guideGroup = new Group();
   private final StackPane canvasPane;
   private final Label noChunksLabel;
   private final RenderManager renderManager;
@@ -80,6 +80,22 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   private int lastY;
   private Vector2 target = new Vector2(0, 0);
   private Tooltip tooltip = new Tooltip();
+
+  private CheckMenuItem showGuides = new CheckMenuItem("Show guides");
+  private Line hGuide1 = new Line();
+  private Line hGuide2 = new Line();
+  private Line vGuide1 = new Line();
+  private Line vGuide2 = new Line();
+
+  private RadioMenuItem percent25 = new RadioMenuItem(String.format("%d%%", 25));
+  private RadioMenuItem percent50 = new RadioMenuItem(String.format("%d%%", 50));
+  private RadioMenuItem percent75 = new RadioMenuItem(String.format("%d%%", 75));
+  private RadioMenuItem percent100 = new RadioMenuItem(String.format("%d%%", 100));
+  private RadioMenuItem percent150 = new RadioMenuItem(String.format("%d%%", 150));
+  private RadioMenuItem percent200 = new RadioMenuItem(String.format("%d%%", 200));
+  private RadioMenuItem percent300 = new RadioMenuItem(String.format("%d%%", 300));
+  private RadioMenuItem percent400 = new RadioMenuItem(String.format("%d%%", 400));
+  private RadioMenuItem fit = new RadioMenuItem("Fit to screen");
 
   private boolean fitToScreen = PersistentSettings.getCanvasFitToScreen();
 
@@ -110,11 +126,6 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     noChunksLabel.setTextAlignment(TextAlignment.CENTER);
     canvasPane.getChildren().add(noChunksLabel);
 
-    guideGroup = new Group();
-    Line hGuide1 = new Line();
-    Line hGuide2 = new Line();
-    Line vGuide1 = new Line();
-    Line vGuide2 = new Line();
     guideGroup.getChildren().addAll(hGuide1, hGuide2, vGuide1, vGuide2);
     canvasPane.getChildren().add(guideGroup);
 
@@ -183,43 +194,83 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     });
     contextMenu.getItems().add(setTarget);
 
-    CheckMenuItem showGuides = new CheckMenuItem("Show guides");
     showGuides.setSelected(false);
     showGuides.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      hGuide1.setVisible(newValue);
-      hGuide2.setVisible(newValue);
-      vGuide1.setVisible(newValue);
-      vGuide2.setVisible(newValue);
+      changeShowGuides(newValue);
+      chunkyFxController.syncShowGuides(newValue);
     });
     contextMenu.getItems().add(showGuides);
 
     Menu canvasScale = new Menu("Canvas scale");
     ToggleGroup scaleGroup = new ToggleGroup();
-    for (int percent : new int[] { 25, 50, 75, 100, 150, 200, 300, 400 }) {
-      RadioMenuItem item = new RadioMenuItem(String.format("%d%%", percent));
-      item.setToggleGroup(scaleGroup);
-      item.setSelected(PersistentSettings.getCanvasScale() == percent && !fitToScreen);
-      item.setOnAction(e -> {
-        updateCanvasScale(percent / 100.0);
-        PersistentSettings.setCanvasScale(percent);
-        if (fitToScreen) {
-          fitToScreen = false;
-          PersistentSettings.setCanvasFitToScreen(false);
-        }
-      });
-      canvasScale.getItems().add(item);
-    }
-    contextMenu.getItems().add(canvasScale);
-
-    RadioMenuItem fit = new RadioMenuItem("Fit to Screen");
-    fit.setSelected(fitToScreen);
+    percent25.setToggleGroup(scaleGroup);
+    percent50.setToggleGroup(scaleGroup);
+    percent75.setToggleGroup(scaleGroup);
+    percent100.setToggleGroup(scaleGroup);
+    percent150.setToggleGroup(scaleGroup);
+    percent200.setToggleGroup(scaleGroup);
+    percent300.setToggleGroup(scaleGroup);
+    percent400.setToggleGroup(scaleGroup);
     fit.setToggleGroup(scaleGroup);
-    fit.setOnAction(e -> {
-      fitToScreen = true;
-      PersistentSettings.setCanvasFitToScreen(true);
-      updateCanvasFit();
+
+    percent25.setSelected(PersistentSettings.getCanvasScale() == 25 && !fitToScreen);
+    percent50.setSelected(PersistentSettings.getCanvasScale() == 50 && !fitToScreen);
+    percent75.setSelected(PersistentSettings.getCanvasScale() == 75 && !fitToScreen);
+    percent100.setSelected(PersistentSettings.getCanvasScale() == 100 && !fitToScreen);
+    percent150.setSelected(PersistentSettings.getCanvasScale() == 150 && !fitToScreen);
+    percent200.setSelected(PersistentSettings.getCanvasScale() == 200 && !fitToScreen);
+    percent300.setSelected(PersistentSettings.getCanvasScale() == 300 && !fitToScreen);
+    percent400.setSelected(PersistentSettings.getCanvasScale() == 400 && !fitToScreen);
+    fit.setSelected(fitToScreen);
+
+    percent25.setOnAction(e -> {
+      changeCanvasScale(25);
+      chunkyFxController.syncCanvasScale(25);
     });
+    percent50.setOnAction(e -> {
+      changeCanvasScale(50);
+      chunkyFxController.syncCanvasScale(50);
+    });
+    percent75.setOnAction(e -> {
+      changeCanvasScale(75);
+      chunkyFxController.syncCanvasScale(75);
+    });
+    percent100.setOnAction(e -> {
+      changeCanvasScale(100);
+      chunkyFxController.syncCanvasScale(100);
+    });
+    percent150.setOnAction(e -> {
+      changeCanvasScale(150);
+      chunkyFxController.syncCanvasScale(150);
+    });
+    percent200.setOnAction(e -> {
+      changeCanvasScale(200);
+      chunkyFxController.syncCanvasScale(200);
+    });
+    percent300.setOnAction(e -> {
+      changeCanvasScale(300);
+      chunkyFxController.syncCanvasScale(300);
+    });
+    percent400.setOnAction(e -> {
+      changeCanvasScale(400);
+      chunkyFxController.syncCanvasScale(400);
+    });
+    fit.setOnAction(e -> {
+      changeFitToScreen();
+      chunkyFxController.syncFitToScreen();
+    });
+
+    canvasScale.getItems().add(percent25);
+    canvasScale.getItems().add(percent50);
+    canvasScale.getItems().add(percent75);
+    canvasScale.getItems().add(percent100);
+    canvasScale.getItems().add(percent150);
+    canvasScale.getItems().add(percent200);
+    canvasScale.getItems().add(percent300);
+    canvasScale.getItems().add(percent400);
     canvasScale.getItems().add(fit);
+
+    contextMenu.getItems().add(canvasScale);
 
     if (fitToScreen) {
       updateCanvasFit();
@@ -346,6 +397,56 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
           break;
       }
     });
+  }
+
+  public void changeShowGuides(boolean value) {
+    hGuide1.setVisible(value);
+    hGuide2.setVisible(value);
+    vGuide1.setVisible(value);
+    vGuide2.setVisible(value);
+  }
+
+  public void syncShowGuides(boolean value) {
+    showGuides.setSelected(value);
+  }
+
+  public void changeCanvasScale(int percent) {
+    updateCanvasScale(percent / 100.0);
+    PersistentSettings.setCanvasScale(percent);
+    if (fitToScreen) {
+      fitToScreen = false;
+      PersistentSettings.setCanvasFitToScreen(false);
+    }
+  }
+
+  public void syncCanvasScale(int percent) {
+    if (percent == 25) {
+      percent25.setSelected(true);
+    } else if (percent == 50) {
+      percent50.setSelected(true);
+    } else if (percent == 75) {
+      percent75.setSelected(true);
+    } else if (percent == 100) {
+      percent100.setSelected(true);
+    } else if (percent == 150) {
+      percent150.setSelected(true);
+    } else if (percent == 200) {
+      percent200.setSelected(true);
+    } else if (percent == 300) {
+      percent300.setSelected(true);
+    } else if (percent == 400) {
+      percent400.setSelected(true);
+    }
+  }
+
+  public void changeFitToScreen() {
+    fitToScreen = true;
+    PersistentSettings.setCanvasFitToScreen(true);
+    updateCanvasFit();
+  }
+
+  public void syncFitToScreen() {
+    fit.setSelected(true);
   }
 
   private void updateCanvasPane() {

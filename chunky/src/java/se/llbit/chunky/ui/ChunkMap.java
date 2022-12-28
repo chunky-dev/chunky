@@ -172,11 +172,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
     selectVisible.setGraphic(new ImageView(Icon.eye.fxImage()));
     selectVisible.setOnAction(event -> {
-      ChunkView chunkView = new ChunkView(view);  // Make thread-local copy.
-      if (controller.getChunky().sceneInitialized()) {
-        controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
-            scene -> selectVisibleChunks(chunkView, scene));
-      }
+      selectCameraVisibleChunks();
     });
 
     MenuItem exportZip = new MenuItem("Export selected chunks…");
@@ -214,6 +210,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       loadSelection.setDisable(noChunksSelected);
       exportZip.setDisable(noChunksSelected);
       deleteChunks.setDisable(noChunksSelected);
+
+      controller.disableMapMenuItems(noChunksSelected);
     });
   }
 
@@ -423,6 +421,14 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
   public int getHeight() {
     return mapView.getMapView().height;
+  }
+
+  public void selectCameraVisibleChunks() {
+    ChunkView chunkView = new ChunkView(view);  // Make thread-local copy.
+    if (controller.getChunky().sceneInitialized()) {
+      controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
+        scene -> selectVisibleChunks(chunkView, scene));
+    }
   }
 
   public void onKeyPressed(KeyEvent keyEvent) {

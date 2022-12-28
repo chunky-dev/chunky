@@ -136,6 +136,29 @@ public class ChunkyFxController
   @FXML private MenuItem saveSceneCopy;
   @FXML private MenuItem loadScene;
   @FXML private MenuItem loadSceneFile;
+
+  @FXML private MenuItem newScene;
+  @FXML private MenuItem loadSelection;
+  @FXML private MenuItem clearSelection;
+  @FXML private MenuItem selectVisible;
+  @FXML private MenuItem exportZip;
+  @FXML private MenuItem exportPng;
+  @FXML private MenuItem deleteChunks;
+
+  @FXML private CheckMenuItem showGuides;
+  @FXML private Menu canvasScale;
+  @FXML private RadioMenuItem percent25;
+  @FXML private RadioMenuItem percent50;
+  @FXML private RadioMenuItem percent75;
+  @FXML private RadioMenuItem percent100;
+  @FXML private RadioMenuItem percent150;
+  @FXML private RadioMenuItem percent200;
+  @FXML private RadioMenuItem percent300;
+  @FXML private RadioMenuItem percent400;
+  @FXML private RadioMenuItem fit;
+  @FXML private MenuItem saveCurrentFrame;
+  @FXML private MenuItem copyFrame;
+
   @FXML private MenuItem creditsMenuItem;
 
   @FXML private ProgressBar progressBar;
@@ -149,6 +172,8 @@ public class ChunkyFxController
   @FXML private ToggleButton start;
   @FXML private ToggleButton pause;
   @FXML private ToggleButton reset;
+
+  private boolean fitToScreen = PersistentSettings.getCanvasFitToScreen();
 
   RenderControlsFxController sceneControls;
 
@@ -462,6 +487,98 @@ public class ChunkyFxController
       }
     });
 
+    newScene.setGraphic(new ImageView(Icon.sky.fxImage()));
+    newScene.setOnAction(event -> {
+      SceneManager sceneManager = getRenderController().getSceneManager();
+      sceneManager
+        .loadFreshChunks(mapLoader.getWorld(), getChunkSelection().getSelection());
+    });
+    newScene.setDisable(chunkSelection.isEmpty());
+
+    loadSelection.setOnAction(event -> {
+      SceneManager sceneManager = getRenderController().getSceneManager();
+      sceneManager
+        .loadChunks(mapLoader.getWorld(), getChunkSelection().getSelection());
+    });
+    loadSelection.setDisable(chunkSelection.isEmpty());
+
+    clearSelection.setGraphic(new ImageView(Icon.clear.fxImage()));
+    clearSelection.setOnAction(event -> chunkSelection.clearSelection());
+    clearSelection.setDisable(chunkSelection.isEmpty());
+
+    selectVisible.setGraphic(new ImageView(Icon.eye.fxImage()));
+    selectVisible.setOnAction(event -> map.selectCameraVisibleChunks());
+
+    exportZip.setOnAction(e -> exportZip());
+    exportZip.setDisable(chunkSelection.size() == 0);
+
+    exportPng.setOnAction(e -> exportMapView());
+
+    ImageView deleteChunksIcon = new ImageView(Icon.tntSide.fxImage());
+    deleteChunksIcon.setFitHeight(16);
+    deleteChunksIcon.setPreserveRatio(true);
+    deleteChunks.setGraphic(deleteChunksIcon);
+    deleteChunks.setOnAction(e -> promptDeleteSelectedChunks());
+    deleteChunks.setDisable(chunkSelection.size() == 0);
+
+    showGuides.setSelected(false);
+    showGuides.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      canvas.changeShowGuides(newValue);
+      canvas.syncShowGuides(newValue);
+    });
+
+    percent25.setSelected(PersistentSettings.getCanvasScale() == 25 && !fitToScreen);
+    percent50.setSelected(PersistentSettings.getCanvasScale() == 50 && !fitToScreen);
+    percent75.setSelected(PersistentSettings.getCanvasScale() == 75 && !fitToScreen);
+    percent100.setSelected(PersistentSettings.getCanvasScale() == 100 && !fitToScreen);
+    percent150.setSelected(PersistentSettings.getCanvasScale() == 150 && !fitToScreen);
+    percent200.setSelected(PersistentSettings.getCanvasScale() == 200 && !fitToScreen);
+    percent300.setSelected(PersistentSettings.getCanvasScale() == 300 && !fitToScreen);
+    percent400.setSelected(PersistentSettings.getCanvasScale() == 400 && !fitToScreen);
+    fit.setSelected(fitToScreen);
+
+    percent25.setOnAction(e -> {
+      canvas.changeCanvasScale(25);
+      canvas.syncCanvasScale(25);
+    });
+    percent50.setOnAction(e -> {
+      canvas.changeCanvasScale(50);
+      canvas.syncCanvasScale(50);
+    });
+    percent75.setOnAction(e -> {
+      canvas.changeCanvasScale(75);
+      canvas.syncCanvasScale(75);
+    });
+    percent100.setOnAction(e -> {
+      canvas.changeCanvasScale(100);
+      canvas.syncCanvasScale(100);
+    });
+    percent150.setOnAction(e -> {
+      canvas.changeCanvasScale(150);
+      canvas.syncCanvasScale(150);
+    });
+    percent200.setOnAction(e -> {
+      canvas.changeCanvasScale(200);
+
+      canvas.syncCanvasScale(200);
+    });
+    percent300.setOnAction(e -> {
+      canvas.changeCanvasScale(300);
+      canvas.syncCanvasScale(300);
+    });
+    percent400.setOnAction(e -> {
+      canvas.changeCanvasScale(400);
+      canvas.syncCanvasScale(400);
+    });
+    fit.setOnAction(e -> {
+      canvas.changeFitToScreen();
+      canvas.syncFitToScreen();
+    });
+
+    saveCurrentFrame.setOnAction(e -> saveCurrentFrame());
+
+    copyFrame.setOnAction(e -> copyCurrentFrame());
+
     Log.setReceiver(new UILogReceiver(), Level.ERROR, Level.WARNING);
 
     mapLoader = new WorldMapLoader(this, mapView);
@@ -745,6 +862,42 @@ public class ChunkyFxController
     saveDefaultSpp.setTooltip(new Tooltip("Make the current SPP target the default."));
     saveDefaultSpp.setOnAction(e ->
         PersistentSettings.setSppTargetDefault(scene.getTargetSpp()));
+  }
+
+  public void disableMapMenuItems(boolean value) {
+    newScene.setDisable(value);
+    loadSelection.setDisable(value);
+    clearSelection.setDisable(value);
+    exportZip.setDisable(value);
+    deleteChunks.setDisable(value);
+  }
+
+  public void syncShowGuides(boolean value) {
+    showGuides.setSelected(value);
+  }
+
+  public void syncCanvasScale(int percent) {
+    if (percent == 25) {
+      percent25.setSelected(true);
+    } else if (percent == 50) {
+      percent50.setSelected(true);
+    } else if (percent == 75) {
+      percent75.setSelected(true);
+    } else if (percent == 100) {
+      percent100.setSelected(true);
+    } else if (percent == 150) {
+      percent150.setSelected(true);
+    } else if (percent == 200) {
+      percent200.setSelected(true);
+    } else if (percent == 300) {
+      percent300.setSelected(true);
+    } else if (percent == 400) {
+      percent400.setSelected(true);
+    }
+  }
+
+  public void syncFitToScreen() {
+    fit.setSelected(true);
   }
 
   public void openSceneChooser() {
