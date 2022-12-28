@@ -13,7 +13,7 @@
     <Separator />
     <HBox alignment="CENTER_LEFT" spacing="16">
       <VBox spacing="4">
-        <Label fx:id="canvasSizeLabel" text="Canvas size:" style="-fx-font-weight: bold;"/>
+        <Label fx:id="canvasSizeLabel" text="Canvas size:" styleClass="group-label"/>
         <padding>
           <Insets left="8"/>
         </padding>
