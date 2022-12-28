@@ -18,6 +18,7 @@ public abstract class PostProcessingFilters {
     addPostProcessingFilter(new Tonemap1Filter());
     addPostProcessingFilter(new ACESFilmicFilter());
     addPostProcessingFilter(new HableToneMappingFilter());
+    addPostProcessingFilter(new UE4ToneMappingFilter());
   }
 
   public static Optional<PostProcessingFilter> getPostProcessingFilterFromId(String id) {
