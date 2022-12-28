@@ -47,7 +47,6 @@ import java.util.ResourceBundle;
 public class MaterialsTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
 
-  private final DoubleAdjuster transmissivityCap = new DoubleAdjuster();
   private final DoubleAdjuster emittance = new DoubleAdjuster();
   private final DoubleAdjuster specular = new DoubleAdjuster();
   private final DoubleAdjuster ior = new DoubleAdjuster();
@@ -56,12 +55,6 @@ public class MaterialsTab extends ScrollPane implements RenderControlsTab, Initi
   private final ListView<String> listView;
 
   public MaterialsTab() {
-    transmissivityCap.setName("Transmissivity cap");
-    transmissivityCap.setRange(Scene.MIN_TRANSMISSIVITY_CAP, Scene.MAX_TRANSMISSIVITY_CAP);
-    transmissivityCap.clampBoth();
-    transmissivityCap.setTooltip("Maximum amplification of one color channel as a ray passes through a translucent block (stained glass, ice, etc.).\nA value of 1 prevents amplification entirely; higher values result in more vibrant colors.");
-    transmissivityCap.onValueChange(value -> scene.setTransmissivityCap(value));
-
     emittance.setName("Emittance");
     emittance.setRange(0, 100);
     emittance.setTooltip("Intensity of the light emitted from the selected material.");
@@ -81,12 +74,6 @@ public class MaterialsTab extends ScrollPane implements RenderControlsTab, Initi
     metalness.setName("Metalness");
     metalness.setRange(0, 1);
     metalness.setTooltip("Metalness (texture-tinted reflectivity) of the selected material.");
-
-    Label globalMaterialPropertiesLabel = new Label("Global Material Properties");
-    globalMaterialPropertiesLabel.getStyleClass().add("group-label");
-
-    VBox globalMaterialPropertiesBox = new VBox(10.0);
-    globalMaterialPropertiesBox.getChildren().addAll(globalMaterialPropertiesLabel, transmissivityCap);
 
     ObservableList<String> blockIds = FXCollections.observableArrayList();
     blockIds.addAll(MaterialStore.collections.keySet());
@@ -128,11 +115,8 @@ public class MaterialsTab extends ScrollPane implements RenderControlsTab, Initi
     HBox materialPropertiesBox = new HBox(15.0);
     materialPropertiesBox.getChildren().addAll(listPane, settings);
 
-    VBox mainBox = new VBox(10.0);
-    mainBox.getChildren().addAll(globalMaterialPropertiesBox, new Separator(), materialPropertiesBox);
-
     setPadding(new Insets(10));
-    setContent(mainBox);
+    setContent(materialPropertiesBox);
   }
 
   private void updateSelectedMaterial(String materialName) {
@@ -195,7 +179,6 @@ public class MaterialsTab extends ScrollPane implements RenderControlsTab, Initi
   @Override public void update(Scene scene) {
     String material = listView.getSelectionModel().getSelectedItem();
     updateSelectedMaterial(material);
-    transmissivityCap.set(scene.getTransmissivityCap());
   }
 
   @Override public String getTabTitle() {

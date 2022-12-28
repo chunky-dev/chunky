@@ -133,7 +133,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Default transmissivity cap.
    */
-  public static final double DEFAULT_TRANSMISSIVITY_CAP = 1.5;
+  public static final double DEFAULT_TRANSMISSIVITY_CAP = 1;
 
   /**
    * Minimum transmissivity cap.
