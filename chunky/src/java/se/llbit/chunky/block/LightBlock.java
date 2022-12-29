@@ -41,7 +41,6 @@ public class LightBlock extends AbstractModelBlock {
             || ray.depth >= scene.getRayDepth() - 1 || ray.specular)) {
       return false;
     }
-    ray.color.set(1, 1, 1, 1);
     return this.model.intersect(ray, scene);
   }
 
