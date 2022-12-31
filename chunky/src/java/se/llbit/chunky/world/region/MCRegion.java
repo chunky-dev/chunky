@@ -253,7 +253,8 @@ public class MCRegion implements Region {
     long index = getMCAChunkIndex(chunkPos);
 
     long length = file.length();
-    if (length < SECTOR_SIZE << 1) {
+    // header is 2 sectors long: location table + timestamp table
+    if (length < 2 * SECTOR_SIZE) {
       throw new ChunkReadException(chunkPos, "Missing header in region file");
     }
 
