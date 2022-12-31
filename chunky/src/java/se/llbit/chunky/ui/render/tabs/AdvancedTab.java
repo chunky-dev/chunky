@@ -111,9 +111,10 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
       List<File> dumps = fileChooser.showOpenMultipleDialog(getScene().getWindow());
       if (dumps != null) {
+        // TODO: remove cast.
+        AsynchronousSceneManager sceneManager = ((AsynchronousSceneManager) controller.getSceneManager());
         for (File dump : dumps) {
-          // TODO: remove cast.
-          ((AsynchronousSceneManager) controller.getSceneManager()).mergeRenderDump(dump);
+          sceneManager.mergeRenderDump(dump);
         }
       }
     });
