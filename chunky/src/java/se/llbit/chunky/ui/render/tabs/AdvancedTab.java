@@ -49,6 +49,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -104,13 +105,16 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
             .setTooltip(new Tooltip("Merge an existing render dump with the current render."));
     mergeRenderDump.setOnAction(e -> {
       FileChooser fileChooser = new FileChooser();
-      fileChooser.setTitle("Merge Render Dump");
+      fileChooser.setTitle("Merge Render Dumps");
       fileChooser
               .getExtensionFilters().add(new FileChooser.ExtensionFilter("Render dumps", "*.dump"));
-      File dump = fileChooser.showOpenDialog(getScene().getWindow());
-      if(dump != null) {
-        // TODO: remove cast.
-        ((AsynchronousSceneManager) controller.getSceneManager()).mergeRenderDump(dump);
+
+      List<File> dumps = fileChooser.showOpenMultipleDialog(getScene().getWindow());
+      if (dumps != null) {
+        for (File dump : dumps) {
+          // TODO: remove cast.
+          ((AsynchronousSceneManager) controller.getSceneManager()).mergeRenderDump(dump);
+        }
       }
     });
     outputMode.setConverter(new StringConverter<PictureExportFormat>() {
