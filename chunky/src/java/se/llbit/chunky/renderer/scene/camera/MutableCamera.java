@@ -117,6 +117,8 @@ public class MutableCamera implements Camera {
   @Nullable
   private String apertureMaskFilename;
 
+  private boolean lockCamera = false;
+
   /**
    * @param scene The scene that will be refreshed after the camera view changes.
    */
@@ -146,6 +148,7 @@ public class MutableCamera implements Camera {
     this.shiftY = other.getShiftY();
     apertureShape = other.getApertureShape();
     apertureMaskFilename = other.getApertureMaskFilename();
+    lockCamera = other.getCameraLocked();
     initProjector();
     updateTransform();
   }
@@ -549,11 +552,14 @@ public class MutableCamera implements Camera {
     if(apertureMaskFilename != null)
       camera.add("apertureMask", apertureMaskFilename);
 
+    camera.add("lockCamera", lockCamera);
+
     return camera;
   }
 
   public void importFromJson(JsonObject json) {
     name = json.get("name").stringValue(name);
+    lockCamera = json.get("lockCamera").boolValue(lockCamera);
     if (json.get("position").isObject()) {
       position.fromJson(json.get("position").object());
     }
@@ -689,5 +695,14 @@ public class MutableCamera implements Camera {
 
   @Override public String getApertureMaskFilename() {
     return apertureMaskFilename;
+  }
+
+  public void setCameraLocked(boolean value) {
+    lockCamera = value;
+    scene.refresh();
+  }
+
+  public boolean getCameraLocked() {
+    return lockCamera;
   }
 }

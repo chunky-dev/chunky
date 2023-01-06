@@ -48,7 +48,6 @@ public class ValidatingTextInputDialog extends TextInputDialog {
     String currentInput = getEditor().getText();
     if (!isValid.test(currentInput)) {
       event.consume();
-      System.out.println("invalid");
       // show invalid
     }
   }

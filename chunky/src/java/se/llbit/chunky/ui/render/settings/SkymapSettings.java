@@ -54,6 +54,7 @@ public class SkymapSettings extends VBox implements Initializable {
 
   public void setPanoramic(boolean pano) {
     panoSpecific.setVisible(pano);
+    panoSpecific.setManaged(pano);
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {

@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
@@ -19,7 +20,7 @@
 
 <?import javafx.scene.control.Tooltip?>
 <?import se.llbit.chunky.ui.elements.TextFieldLabelWrapper?>
-<?import javafx.scene.control.TextField?>
+
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
     <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
@@ -31,6 +32,7 @@
       <Button fx:id="duplicate" mnemonicParsing="false" text="Clone" />
       <Button fx:id="removeCamera" mnemonicParsing="false" text="Remove" />
     </HBox>
+    <CheckBox fx:id="lockCamera" mnemonicParsing="false" text="Lock selected camera" />
     <TitledPane fx:id="positionOrientation" animated="false" expanded="false" text="Position &amp; Orientation">
       <GridPane hgap="6.0" vgap="10.0">
         <columnConstraints>

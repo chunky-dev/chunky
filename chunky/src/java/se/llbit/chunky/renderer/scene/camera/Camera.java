@@ -63,4 +63,6 @@ public interface Camera extends JsonSerializable {
 
   ApertureShape getApertureShape();
   String getApertureMaskFilename();
+
+  boolean getCameraLocked();
 }

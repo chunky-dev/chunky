@@ -3,6 +3,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
 <?import se.llbit.chunky.ui.*?>
 <?import se.llbit.chunky.ui.elements.*?>
 
@@ -43,6 +44,7 @@
             <IntegerAdjuster fx:id="yMax" name="Max Y level" />
             <Button fx:id="setDefaultYMax" mnemonicParsing="false" text="Set default" />
           </HBox>
+          <Text fx:id="yClipInvalid" styleClass="invalid" managed="false" visible="false">Min Y level must be smaller than Max Y level.</Text>
         </VBox>
       </TitledPane>
       <Accordion>

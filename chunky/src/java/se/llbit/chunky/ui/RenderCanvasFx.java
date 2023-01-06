@@ -152,8 +152,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     });
 
     canvas.setOnMouseDragged(e -> {
-      if (e.isSecondaryButtonDown()) {
-        // do not drag when right-clicking
+      if (e.isSecondaryButtonDown() || scene.camera().getCameraLocked()) {
+        // do not drag when right-clicking or when the camera angle is locked
         return;
       }
       double dx = lastX - (int) e.getX();
@@ -251,6 +251,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       }
     });
     canvas.setOnScroll(e -> {
+      if (scene.camera().getCameraLocked()) {
+        // do not scroll when the camera angle is locked
+        return;
+      }
       // deltaY is zero if shift is pressed because shift switches to horizontal scrolling in JavaFX
       double diff = -(Math.abs(e.getDeltaY()) > 0 ? e.getDeltaY() / e.getMultiplierY() : e.getDeltaX() / e.getMultiplierX());
       if (e.isShiftDown()) {
@@ -287,6 +291,9 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
     canvasPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
       if (!isVisible()) {
+        return;
+      }
+      if (scene.camera().getCameraLocked()) {
         return;
       }
       double modifier = 1;
