@@ -387,7 +387,7 @@ public class JavaFxInstaller {
       setup.setBorder(null);
       setup.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
 
-      JLabel help = getLinkLabel("Click here for more information", "For more information, see", JAVAFX_LINK);
+      JLabel help = getLinkLabel("Click here for more information", "For more information, see", HELP_LINK);
 
       JOptionPane.showMessageDialog(null, new Object[] {
         error, setup, help
