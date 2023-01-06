@@ -277,7 +277,7 @@ public class JavaFxInstaller {
     textPanel.add(new JLabel(" "));
 
     // JavaFX Licensing
-    JLabel licenseText = new JLabel("JavaFX is licensed under GPLv2+LE.");
+    JLabel licenseText = new JLabel("JavaFX is licensed under GPLv2+CE.");
     licenseText.setFont(new Font(licenseText.getFont().getFontName(), Font.PLAIN, 12));
     textPanel.add(licenseText);
     textPanel.add(getLinkLabel());
