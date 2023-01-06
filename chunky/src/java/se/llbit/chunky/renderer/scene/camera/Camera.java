@@ -16,7 +16,7 @@
  */
 package se.llbit.chunky.renderer.scene.camera;
 
-import se.llbit.chunky.renderer.scene.camera.projection.ProjectionPreset;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.util.JsonSerializable;
@@ -58,7 +58,7 @@ public interface Camera extends JsonSerializable {
   boolean isInfiniteDoF();
   double getSubjectDistance();
 
-  ProjectionPreset getProjectionPreset();
+  ProjectionMode getProjectionMode();
   double getWorldDiagonalSize();
 
   ApertureShape getApertureShape();

@@ -43,7 +43,7 @@ import se.llbit.chunky.renderer.scene.camera.MutableCamera;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
 import se.llbit.chunky.renderer.scene.camera.projection.ParallelProjector;
-import se.llbit.chunky.renderer.scene.camera.projection.ProjectionPreset;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.*;
@@ -684,7 +684,7 @@ public class Scene implements JsonSerializable, Refreshable {
     state.ray.o.y -= origin.y;
     state.ray.o.z -= origin.z;
 
-    if(camera.getProjectionPreset() == ProjectionPreset.PARALLEL) {
+    if(camera.getProjectionMode() == ProjectionMode.PARALLEL) {
       ParallelProjector.fixRay(state.ray, this);
     }
 
@@ -2375,7 +2375,7 @@ public class Scene implements JsonSerializable, Refreshable {
       ray.o.y -= origin.y;
       ray.o.z -= origin.z;
 
-      if (camera.getProjectionPreset() == ProjectionPreset.PARALLEL) {
+      if (camera.getProjectionMode() == ProjectionMode.PARALLEL) {
         ParallelProjector.fixRay(state.ray, this);
       }
       occlusion += PreviewRayTracer.skyOcclusion(this, state);

@@ -17,7 +17,7 @@
 package se.llbit.chunky.renderer.scene.camera;
 
 import javafx.scene.image.Image;
-import se.llbit.chunky.renderer.scene.camera.projection.ProjectionPreset;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
 import se.llbit.chunky.world.Icon;
 
 /**
@@ -29,35 +29,35 @@ public enum CameraPreset {
   ISO_NORTH_WEST("Isometric North-West", Icon.isoNW.fxImage(), -Math.PI / 4, -Math.PI / 4) {
     @Override public void apply(MutableCamera camera) {
       camera.setView(yaw, pitch, 0);
-      camera.setProjectionPreset(ProjectionPreset.PARALLEL);
+      camera.setProjectionPreset(ProjectionMode.PARALLEL);
       camera.setShift(0, 0);
     }
   },
   ISO_NORTH_EAST("Isometric North-East", Icon.isoNE.fxImage(), -3 * Math.PI / 4, -Math.PI / 4) {
     @Override public void apply(MutableCamera camera) {
       camera.setView(yaw, pitch, 0);
-      camera.setProjectionPreset(ProjectionPreset.PARALLEL);
+      camera.setProjectionPreset(ProjectionMode.PARALLEL);
       camera.setShift(0, 0);
     }
   },
   ISO_SOUTH_EAST("Isometric South-East", Icon.isoSE.fxImage(), -5 * Math.PI / 4, -Math.PI / 4) {
     @Override public void apply(MutableCamera camera) {
       camera.setView(yaw, pitch, 0);
-      camera.setProjectionPreset(ProjectionPreset.PARALLEL);
+      camera.setProjectionPreset(ProjectionMode.PARALLEL);
       camera.setShift(0, 0);
     }
   },
   ISO_SOUTH_WEST("Isometric South-West", Icon.isoSW.fxImage(), -7 * Math.PI / 4, -Math.PI / 4) {
     @Override public void apply(MutableCamera camera) {
       camera.setView(yaw, pitch, 0);
-      camera.setProjectionPreset(ProjectionPreset.PARALLEL);
+      camera.setProjectionPreset(ProjectionMode.PARALLEL);
       camera.setShift(0, 0);
     }
   },
   SKYBOX_RIGHT("Skybox Right", Icon.skyboxRight.fxImage(), Math.PI, -Math.PI / 2) {
     @Override public void apply(MutableCamera camera) {
       camera.setView(yaw, pitch, 0);
-      camera.setProjectionPreset(ProjectionPreset.PINHOLE);
+      camera.setProjectionPreset(ProjectionMode.PINHOLE);
       camera.setFoV(90);
       camera.setShift(0, 0);
     }
@@ -65,7 +65,7 @@ public enum CameraPreset {
   SKYBOX_LEFT("Skybox Left", Icon.skyboxLeft.fxImage(), 0, -Math.PI / 2) {
     @Override public void apply(MutableCamera camera) {
       camera.setView(yaw, pitch, 0);
-      camera.setProjectionPreset(ProjectionPreset.PINHOLE);
+      camera.setProjectionPreset(ProjectionMode.PINHOLE);
       camera.setFoV(90);
       camera.setShift(0, 0);
     }
@@ -73,7 +73,7 @@ public enum CameraPreset {
   SKYBOX_UP("Skybox Up", Icon.skyboxUp.fxImage(), -Math.PI / 2, Math.PI) {
     @Override public void apply(MutableCamera camera) {
       camera.setView(yaw, pitch, 0);
-      camera.setProjectionPreset(ProjectionPreset.PINHOLE);
+      camera.setProjectionPreset(ProjectionMode.PINHOLE);
       camera.setFoV(90);
       camera.setShift(0, 0);
     }
@@ -81,7 +81,7 @@ public enum CameraPreset {
   SKYBOX_DOWN("Skybox Down", Icon.skyboxDown.fxImage(), -Math.PI / 2, 0) {
     @Override public void apply(MutableCamera camera) {
       camera.setView(yaw, pitch, 0);
-      camera.setProjectionPreset(ProjectionPreset.PINHOLE);
+      camera.setProjectionPreset(ProjectionMode.PINHOLE);
       camera.setFoV(90);
       camera.setShift(0, 0);
     }
@@ -89,7 +89,7 @@ public enum CameraPreset {
   SKYBOX_FRONT("Skybox Front (North)", Icon.skyboxFront.fxImage(), -Math.PI / 2, -Math.PI / 2) {
     @Override public void apply(MutableCamera camera) {
       camera.setView(yaw, pitch, 0);
-      camera.setProjectionPreset(ProjectionPreset.PINHOLE);
+      camera.setProjectionPreset(ProjectionMode.PINHOLE);
       camera.setFoV(90);
       camera.setShift(0, 0);
     }
@@ -97,7 +97,7 @@ public enum CameraPreset {
   SKYBOX_BACK("Skybox Back", Icon.skyboxBack.fxImage(), Math.PI / 2, -Math.PI / 2) {
     @Override public void apply(MutableCamera camera) {
       camera.setView(yaw, pitch, 0);
-      camera.setProjectionPreset(ProjectionPreset.PINHOLE);
+      camera.setProjectionPreset(ProjectionMode.PINHOLE);
       camera.setFoV(90);
       camera.setShift(0, 0);
     }

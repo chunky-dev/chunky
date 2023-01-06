@@ -30,12 +30,12 @@ import java.util.Map;
 import static se.llbit.chunky.renderer.scene.camera.projection.ProjectorFactory.*;
 
 /**
- * A ProjectionPreset is a {@link Registerable} {@link ProjectorFactory}.
+ * A ProjectionMode is a {@link Registerable} {@link ProjectorFactory}.
  *
  * <p>All registered presets can be found in the {@link Registry}.
  */
-public class ProjectionPreset implements Registerable, ProjectorFactory {
-  public static final ProjectionPreset PINHOLE = new ProjectionPreset(
+public class ProjectionMode implements Registerable, ProjectorFactory {
+  public static final ProjectionMode PINHOLE = new ProjectionMode(
     "PINHOLE",
     "Standard",
     camera -> applyShift(
@@ -47,7 +47,7 @@ public class ProjectionPreset implements Registerable, ProjectorFactory {
       )
     )
   );
-  public static final ProjectionPreset PARALLEL = new ProjectionPreset(
+  public static final ProjectionMode PARALLEL = new ProjectionMode(
     "PARALLEL",
     "Parallel",
     camera -> applyShift(
@@ -65,7 +65,7 @@ public class ProjectionPreset implements Registerable, ProjectorFactory {
       )
     )
   );
-  public static final ProjectionPreset PANORAMIC = new ProjectionPreset(
+  public static final ProjectionMode PANORAMIC = new ProjectionMode(
     "PANORAMIC",
     "Panoramic (equirectangular)",
     camera -> applySphericalDoF(
@@ -78,7 +78,7 @@ public class ProjectionPreset implements Registerable, ProjectorFactory {
   public static final Registry REGISTRY = new Registry(
     PINHOLE,
     PARALLEL,
-    new ProjectionPreset(
+    new ProjectionMode(
       "FISHEYE",
       "Fisheye",
       camera -> applySphericalDoF(
@@ -86,13 +86,13 @@ public class ProjectionPreset implements Registerable, ProjectorFactory {
         new FisheyeProjector(camera.getFov())
       )
     ),
-    new ProjectionPreset(
+    new ProjectionMode(
       "STEREOGRAPHIC",
       "Stereographic",
       camera -> new StereographicProjector(camera.getFov())
     ),
     PANORAMIC,
-    new ProjectionPreset(
+    new ProjectionMode(
       "PANORAMIC_SLOT",
       "Panoramic (slot)",
       camera -> applySphericalDoF(
@@ -100,17 +100,17 @@ public class ProjectionPreset implements Registerable, ProjectorFactory {
         new PanoramicSlotProjector(camera.getFov())
       )
     ),
-    new ProjectionPreset(
+    new ProjectionMode(
       "ODS_LEFT",
       "Omni‐directional Stereo (left eye)",
       camera -> new ODSSinglePerspectiveProjector(ODSSinglePerspectiveProjector.Eye.LEFT)
     ),
-    new ProjectionPreset(
+    new ProjectionMode(
       "ODS_RIGHT",
       "Omni‐directional Stereo (right eye)",
       camera -> new ODSSinglePerspectiveProjector(ODSSinglePerspectiveProjector.Eye.RIGHT)
     ),
-    new ProjectionPreset(
+    new ProjectionMode(
       "ODS_STACKED",
       "Omni‐directional Stereo (both eyes, vertically stacked)",
       camera -> new ODSVerticalStackedProjector()
@@ -118,17 +118,17 @@ public class ProjectionPreset implements Registerable, ProjectorFactory {
   );
 
   public static class Registry {
-    private Registry(ProjectionPreset... presets) {
-      for (ProjectionPreset preset : presets) {
+    private Registry(ProjectionMode... presets) {
+      for (ProjectionMode preset : presets) {
         addProjectionPreset(preset);
       }
     }
 
     @PluginApi
-    private final Map<String, ProjectionPreset> projectionPresets = new LinkedHashMap<>();
+    private final Map<String, ProjectionMode> projectionPresets = new LinkedHashMap<>();
 
     @PluginApi
-    public void addProjectionPreset(ProjectionPreset preset) {
+    public void addProjectionPreset(ProjectionMode preset) {
       projectionPresets.put(preset.getId(), preset);
     }
 
@@ -137,8 +137,8 @@ public class ProjectionPreset implements Registerable, ProjectorFactory {
      */
     @PluginApi
     @Nullable
-    public ProjectionPreset getProjectionPreset(String id, ProjectionPreset fallback) {
-      ProjectionPreset preset = projectionPresets.get(id);
+    public ProjectionMode getProjectionPreset(String id, ProjectionMode fallback) {
+      ProjectionMode preset = projectionPresets.get(id);
       if (preset != null)
         return preset;
 
@@ -147,7 +147,7 @@ public class ProjectionPreset implements Registerable, ProjectorFactory {
     }
 
     @PluginApi
-    public Collection<ProjectionPreset> getProjectionPresets() {
+    public Collection<ProjectionMode> getProjectionPresets() {
       return projectionPresets.values();
     }
   }
@@ -156,7 +156,7 @@ public class ProjectionPreset implements Registerable, ProjectorFactory {
   private final String name;
   private final ProjectorFactory factory;
 
-  ProjectionPreset(String id, String name, ProjectorFactory factory) {
+  ProjectionMode(String id, String name, ProjectorFactory factory) {
     this.ID = id;
     this.name = name;
     this.factory = factory;

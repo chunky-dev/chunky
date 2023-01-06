@@ -37,7 +37,7 @@ import se.llbit.chunky.renderer.scene.camera.MutableCamera;
 import se.llbit.chunky.renderer.scene.camera.Camera;
 import se.llbit.chunky.renderer.scene.camera.CameraPreset;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.renderer.scene.camera.projection.ProjectionPreset;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.DoubleTextField;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
@@ -68,7 +68,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   @FXML private DoubleTextField pitchField;
   @FXML private DoubleTextField rollField;
   @FXML private Button centerCamera;
-  @FXML private ChoiceBox<ProjectionPreset> projectionMode;
+  @FXML private ChoiceBox<ProjectionMode> projectionMode;
   @FXML private DoubleAdjuster fov;
   @FXML private DoubleAdjuster dof;
   @FXML private DoubleAdjuster subjectDistance;
@@ -113,7 +113,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   }
 
   private void updateProjectionMode() {
-    projectionMode.getSelectionModel().select(scene.camera().getProjectionPreset());
+    projectionMode.getSelectionModel().select(scene.camera().getProjectionMode());
   }
 
   private void updateSubjectDistance() {
@@ -145,7 +145,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       menuItem.setOnAction(e -> {
         MutableCamera camera = scene.camera();
         preset.apply(camera);
-        projectionMode.getSelectionModel().select(camera.getProjectionPreset());
+        projectionMode.getSelectionModel().select(camera.getProjectionMode());
         updateFov();
         updateCameraDirection();
       });
@@ -265,12 +265,12 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       updateCameraPosition();
     });
 
-    projectionMode.getItems().addAll(ProjectionPreset.REGISTRY.getProjectionPresets());
-    projectionMode.getSelectionModel().select(ProjectionPreset.PINHOLE);
+    projectionMode.getItems().addAll(ProjectionMode.REGISTRY.getProjectionPresets());
+    projectionMode.getSelectionModel().select(ProjectionMode.PINHOLE);
     projectionMode.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
           scene.camera().setProjectionPreset(newValue);
-          apertureShape.setManaged(newValue == ProjectionPreset.PINHOLE);
+          apertureShape.setManaged(newValue == ProjectionMode.PINHOLE);
           scene.camera().setApertureShape(ApertureShape.CIRCLE);
           updateFov();
         });
