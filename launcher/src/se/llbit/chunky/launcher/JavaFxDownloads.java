@@ -53,7 +53,7 @@ public class JavaFxDownloads {
       ArrayList<Arch> archs = new ArrayList<>();
       JsonValue archsVal = obj.get("archs");
       if (!archsVal.isArray()) throw new SyntaxException("OS object field archs must be array.");
-      for (JsonValue arch: archsVal.asArray().elements) {
+      for (JsonValue arch : archsVal.asArray().elements) {
         if (!arch.isObject()) throw new SyntaxException("OS object field archs must be array of architecture objects");
         archs.add(new Arch(arch.asObject()));
       }
@@ -68,13 +68,15 @@ public class JavaFxDownloads {
   public static class Arch {
     public final String name;
     public final URL url;
+    public final String sha256;
     private final Pattern regex;
 
     Arch(JsonObject obj) throws SyntaxException {
       name = getChecked(obj, "name");
-      this.regex = Pattern.compile(getChecked(obj, "regex"));
+      regex = Pattern.compile(getChecked(obj, "regex"));
+      sha256 = getChecked(obj, "sha256");
       try {
-        this.url = new URL(getChecked(obj, "url"));
+        url = new URL(getChecked(obj, "url"));
       } catch (MalformedURLException e) {
         throw new SyntaxException("Architecture object has invalid URL");
       }

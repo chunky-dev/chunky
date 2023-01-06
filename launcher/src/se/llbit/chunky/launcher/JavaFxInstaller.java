@@ -24,7 +24,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.font.TextAttribute;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,6 +35,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
@@ -40,15 +45,16 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static se.llbit.util.Util.byteArrayToHexString;
+
 public class JavaFxInstaller {
 
-  private static final String HELP_LINK = "https://chunky.lemaik.de/java11";
+  private static final String HELP_LINK = "https://chunky-dev.github.io/docs/getting_started/installing_chunky/#setup";
   private static final String JAVAFX_LINK = "https://gluonhq.com/products/javafx/";
   private static final String JAVAFX_JSON = "javafx.json";
 
   private final JavaFxDownloads.Os[] downloads;
   private final Path target;
-  private String updateSite;
 
   private JFrame window = null;
   private boolean complete = false;
@@ -76,6 +82,7 @@ public class JavaFxInstaller {
     } else {
       site = settings.updateSite;
     }
+    String updateSite;
     if (site.endsWith("/")) {
       updateSite = site + JAVAFX_JSON;
     } else {
@@ -95,8 +102,9 @@ public class JavaFxInstaller {
 
   /**
    * Helper method to launch the installer.
-   * @param settings  Launcher settings. May be null.
-   * @param args      Launcher arguments.
+   *
+   * @param settings Launcher settings. May be null.
+   * @param args     Launcher arguments.
    */
   public static void launch(LauncherSettings settings, String[] args) {
     try {
@@ -111,7 +119,8 @@ public class JavaFxInstaller {
             instance.wait(10000);
           }
         }
-      } catch (InterruptedException ignored) {}
+      } catch (InterruptedException ignored) {
+      }
 
       // Window was closed
       if (instance.exiting) {
@@ -126,46 +135,62 @@ public class JavaFxInstaller {
     }
   }
 
-  private void downloadAndInstall(URL download) {
-    // Zip extraction code from
-    // https://mkyong.com/java/how-to-decompress-files-from-a-zip-file/
-    try (ZipInputStream zis = new ZipInputStream(download.openStream())) {
-      ZipEntry entry = zis.getNextEntry();
-      while (entry != null) {
-        boolean isDirectory = entry.getName().endsWith("/") || entry.getName().endsWith("\\");
+  private void downloadAndInstall(URL download, String sha256) {
+    try {
+      File tempFile = File.createTempFile("chunky-javafx", ".zip");
+      tempFile.deleteOnExit();
 
-        // Protect against zip slip
-        Path newPath = target.resolve(entry.getName());
-        Path normalizedPath = newPath.normalize();
-        if (!normalizedPath.startsWith(target)) {
-          cleanupTarget();
-          throw new InstallationException("Bad zip entry: " + entry.getName());
+      try (DigestInputStream is = new DigestInputStream(download.openStream(), MessageDigest.getInstance("SHA-256"))) {
+        Files.copy(is, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        String hash = byteArrayToHexString(is.getMessageDigest().digest());
+
+        if (!hash.equalsIgnoreCase(sha256)) {
+          throw new InstallationException("The JavaFX download could not be verified.");
         }
 
-        if (isDirectory) {
-          Files.createDirectories(newPath);
-        } else {
-          if (newPath.getParent() != null) {
-            Files.createDirectories(newPath.getParent());
+        // Zip extraction code from
+        // https://mkyong.com/java/how-to-decompress-files-from-a-zip-file/
+        try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(tempFile)))) {
+          ZipEntry entry = zis.getNextEntry();
+          while (entry != null) {
+            boolean isDirectory = entry.getName().endsWith("/") || entry.getName().endsWith("\\");
+
+            // Protect against zip slip
+            Path newPath = target.resolve(entry.getName());
+            Path normalizedPath = newPath.normalize();
+            if (!normalizedPath.startsWith(target)) {
+              cleanupTarget();
+              throw new InstallationException("Bad zip entry: " + entry.getName());
+            }
+
+            if (isDirectory) {
+              Files.createDirectories(newPath);
+            } else {
+              if (newPath.getParent() != null) {
+                Files.createDirectories(newPath.getParent());
+              }
+              Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            entry = zis.getNextEntry();
+
+            if (exiting) {
+              cleanupTarget();
+              return;
+            }
           }
-          Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
+          zis.closeEntry();
         }
-
-        entry = zis.getNextEntry();
-
-        if (exiting) {
-          cleanupTarget();
-          return;
-        }
+      } finally {
+        tempFile.delete();
       }
-      zis.closeEntry();
-    } catch (IOException | InstallationException ex) {
+    } catch (IOException | InstallationException | NoSuchAlgorithmException ex) {
       try {
         cleanupTarget();
       } catch (IOException ignored) {
         System.err.println("Could not clean up target directory.");
       }
-      showJavafxError(new InstallationException(ex.getMessage()));
+      showJavafxError(ex instanceof InstallationException ? (InstallationException) ex : new InstallationException(ex.getMessage()));
     }
 
     // Wake up listeners
@@ -296,7 +321,7 @@ public class JavaFxInstaller {
     downloadButton.addActionListener(e -> {
       JavaFxDownloads.Os os = downloads[osCombo.getSelectedIndex()];
       JavaFxDownloads.Arch arch = os.archs[archCombo.getSelectedIndex()];
-      new Thread(() -> this.downloadAndInstall(arch.url)).start();
+      new Thread(() -> this.downloadAndInstall(arch.url, arch.sha256)).start();
 
       osCombo.setEnabled(false);
       archCombo.setEnabled(false);
@@ -357,7 +382,7 @@ public class JavaFxInstaller {
         public void mouseClicked(MouseEvent e) {
           try {
             Desktop.getDesktop().browse(new URI(url));
-          } catch(IOException | URISyntaxException ex) {
+          } catch (IOException | URISyntaxException ex) {
             throw new RuntimeException(ex);
           }
         }
@@ -370,7 +395,7 @@ public class JavaFxInstaller {
   }
 
   private static void showJavafxError(InstallationException e) {
-    if(!GraphicsEnvironment.isHeadless()) {
+    if (!GraphicsEnvironment.isHeadless()) {
       JTextField error = new JTextField("Error installing JavaFX: " + e.getMessage());
       error.setEditable(false);
       error.setBackground(null);
@@ -389,7 +414,7 @@ public class JavaFxInstaller {
 
       JLabel help = getLinkLabel("Click here for more information", "For more information, see", HELP_LINK);
 
-      JOptionPane.showMessageDialog(null, new Object[] {
+      JOptionPane.showMessageDialog(null, new Object[]{
         error, setup, help
       }, "Cannot find JavaFX", JOptionPane.ERROR_MESSAGE);
     }
