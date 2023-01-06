@@ -43,6 +43,7 @@ import java.util.zip.ZipInputStream;
 public class JavaFxInstaller {
 
   private static final String HELP_LINK = "https://chunky.lemaik.de/java11";
+  private static final String JAVAFX_LINK = "https://gluonhq.com/products/javafx/";
   private static final String JAVAFX_JSON = "javafx.json";
 
   private final JavaFxDownloads.Os[] downloads;
@@ -279,8 +280,12 @@ public class JavaFxInstaller {
     // JavaFX Licensing
     JLabel licenseText = new JLabel("JavaFX is licensed under GPLv2+CE.");
     licenseText.setFont(new Font(licenseText.getFont().getFontName(), Font.PLAIN, 12));
-    textPanel.add(licenseText);
-    textPanel.add(getLinkLabel());
+    textPanel.add(getLinkLabel("JavaFX is licensed under GPLv2+CE.", "JavaFX is licensed under GPLv2+CE", JAVAFX_LINK));
+
+    // Spacer
+    textPanel.add(new JLabel(" "));
+
+    textPanel.add(getLinkLabel("Click here for more information.", "For more information see", HELP_LINK));
 
     // Spacer
     textPanel.add(new JLabel(" "));
@@ -337,10 +342,10 @@ public class JavaFxInstaller {
     }
   }
 
-  private static JLabel getLinkLabel() {
+  private static JLabel getLinkLabel(String linkText, String altText, String url) {
     JLabel faqLabel;
-    if(Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-      faqLabel = new JLabel("Click here for more information.");
+    if (Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+      faqLabel = new JLabel(linkText);
       Font font = faqLabel.getFont();
       Map attributes = font.getAttributes();
       attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
@@ -351,14 +356,14 @@ public class JavaFxInstaller {
         @Override
         public void mouseClicked(MouseEvent e) {
           try {
-            Desktop.getDesktop().browse(new URI(HELP_LINK));
+            Desktop.getDesktop().browse(new URI(url));
           } catch(IOException | URISyntaxException ex) {
             throw new RuntimeException(ex);
           }
         }
       });
     } else {
-      faqLabel = new JLabel(String.format("For more information see: %s", HELP_LINK));
+      faqLabel = new JLabel(String.format("%s: %s", altText, url));
       faqLabel.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
     }
     return faqLabel;
@@ -382,7 +387,7 @@ public class JavaFxInstaller {
       setup.setBorder(null);
       setup.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
 
-      JLabel help = getLinkLabel();
+      JLabel help = getLinkLabel("Click here for more information", "For more information, see", JAVAFX_LINK);
 
       JOptionPane.showMessageDialog(null, new Object[] {
         error, setup, help
