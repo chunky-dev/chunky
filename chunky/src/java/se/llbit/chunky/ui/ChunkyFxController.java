@@ -339,13 +339,16 @@ public class ChunkyFxController
         updateTitle();
         refreshSettings();
         guiUpdateLatch.countDown();
-        World newWorld = scene.getWorld();
 
-        boolean isSameWorld = mapLoader.getWorld().getWorldDirectory().equals(newWorld.getWorldDirectory());
+        World newWorld = scene.getWorld();
+        World currentWorld = mapLoader.getWorld();
+        boolean isSameWorld = currentWorld != EmptyWorld.INSTANCE &&
+          currentWorld.getWorldDirectory().equals(newWorld.getWorldDirectory());
+
         if (isSameWorld) {
           getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
         } else {
-          if (newWorld != EmptyWorld.INSTANCE && mapLoader.getWorld() != EmptyWorld.INSTANCE) {
+          if (newWorld != EmptyWorld.INSTANCE && currentWorld != EmptyWorld.INSTANCE) {
             Alert loadWorldConfirm = Dialogs.createAlert(AlertType.CONFIRMATION);
             loadWorldConfirm.getButtonTypes().clear();
             loadWorldConfirm.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
