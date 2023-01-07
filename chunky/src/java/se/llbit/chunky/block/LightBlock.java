@@ -1,18 +1,23 @@
 package se.llbit.chunky.block;
 
+import se.llbit.chunky.model.LightBlockModel;
 import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector4;
 
-public class LightBlock extends MinecraftBlockTranslucent {
+public class LightBlock extends AbstractModelBlock {
 
   private final int level;
 
+  private final Vector4 color = new Vector4(1, 1, 1, 1);
+
   public LightBlock(String name, int level) {
-    super(name, Texture.EMPTY_TEXTURE);
+    super(name, Texture.light);
     this.level = level;
+    this.model = new LightBlockModel(color);
     localIntersect = true;
     solid = false;
   }
@@ -31,8 +36,7 @@ public class LightBlock extends MinecraftBlockTranslucent {
             || ray.depth >= scene.getRayDepth() - 1 || ray.specular)) {
       return false;
     }
-    ray.color.set(1, 1, 1, 1);
-    return true;
+    return this.model.intersect(ray, scene);
   }
 
   @Override

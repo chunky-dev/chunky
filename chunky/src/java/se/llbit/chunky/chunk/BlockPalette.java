@@ -552,7 +552,7 @@ public class BlockPalette {
     });
     materialProperties.put("minecraft:light", block -> {
       if (block instanceof LightBlock) {
-        block.emittance = 1.0f / 15f * ((LightBlock) block).getLevel();
+        block.emittance = 1.0f / 15f * 4 * ((LightBlock) block).getLevel();
       }
     });
     materialProperties.put("minecraft:ochre_froglight", block -> {
