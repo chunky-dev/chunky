@@ -38,7 +38,6 @@ import se.llbit.chunky.renderer.scene.CameraPreset;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.DoubleTextField;
-import se.llbit.chunky.ui.IntegerTextField;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.json.JsonMember;
@@ -75,10 +74,6 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   @FXML private DoubleTextField shiftY;
   @FXML private Button autofocus;
   @FXML private ChoiceBox<ApertureShape> apertureShape;
-  @FXML private IntegerTextField cameraFullWidth;
-  @FXML private IntegerTextField cameraFullHeight;
-  @FXML private IntegerTextField cameraCropX;
-  @FXML private IntegerTextField cameraCropY;
 
   private MapView mapView;
   private CameraViewListener cameraViewListener;
@@ -102,7 +97,6 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     updateSubjectDistance();
     updateShift();
     updateCameraLocked();
-    updateCrop();
     preventApertureCallback = true;
     apertureShape.setValue(scene.camera().getApertureShape());
     preventApertureCallback = false;
@@ -139,13 +133,6 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
 
   private void updateCameraLocked() {
     lockCamera.selectedProperty().setValue(scene.camera().getCameraLocked());
-  }
-
-  private void updateCrop() {
-    cameraFullWidth.valueProperty().set(scene.fullWidth);
-    cameraFullHeight.valueProperty().set(scene.fullHeight);
-    cameraCropX.valueProperty().set(scene.cropX);
-    cameraCropY.valueProperty().set(scene.cropY);
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
@@ -347,16 +334,6 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
                 scene.camera().setApertureShape(newValue);
               }
             });
-
-    cameraFullWidth.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> setCropSize());
-    cameraFullHeight.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> setCropSize());
-    cameraCropX.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> setCropSize());
-    cameraCropY.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> setCropSize());
-  }
-
-  private void setCropSize() {
-    scene.setCropSize(cameraFullWidth.getValue(), cameraFullHeight.getValue(), cameraCropX.getValue(), cameraCropY.getValue());
-    updateCrop();
   }
 
   private void generateNextCameraName() {

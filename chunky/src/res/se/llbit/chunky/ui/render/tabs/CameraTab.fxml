@@ -20,9 +20,7 @@
 
 <?import javafx.scene.control.Tooltip?>
 <?import se.llbit.chunky.ui.elements.TextFieldLabelWrapper?>
-<?import javafx.scene.control.TextField?>
-<?import se.llbit.chunky.ui.IntegerTextField?>
-<?import se.llbit.chunky.ui.elements.SizeInput?>
+
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
     <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
@@ -130,43 +128,6 @@
       <Label text="Aperture shape:" />
       <ChoiceBox fx:id="apertureShape" prefWidth="150.0" />
     </HBox>
-    <Separator prefWidth="200.0" />
-
-    <Label text="Canvas Crop:" />
-    <GridPane vgap="4.0" hgap="4.0" prefWidth="200.0">
-      <padding>
-        <Insets right="10.0" />
-      </padding>
-
-      <Label text="Width:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-      <IntegerTextField fx:id="cameraFullWidth" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="70.0">
-        <tooltip>
-          <Tooltip text="Full camera width. 0 to disable." />
-        </tooltip>
-      </IntegerTextField>
-
-      <Label text="Crop X Offset" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-      <IntegerTextField fx:id="cameraCropX" GridPane.columnIndex="3" GridPane.rowIndex="0" prefWidth="70.0">
-        <tooltip>
-          <Tooltip text="Crop X offset." />
-        </tooltip>
-      </IntegerTextField>
-
-      <Label text="Height:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-      <IntegerTextField fx:id="cameraFullHeight" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="70.0">
-        <tooltip>
-          <Tooltip text="Full, uncropped camera height. 0 to disable." />
-        </tooltip>
-      </IntegerTextField>
-
-      <Label text="Crop Y Offset" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-      <IntegerTextField fx:id="cameraCropY" GridPane.columnIndex="3" GridPane.rowIndex="1" prefWidth="70.0">
-        <tooltip>
-          <Tooltip text="Crop Y offset." />
-        </tooltip>
-      </IntegerTextField>
-    </GridPane>
-
     <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
     </padding>
