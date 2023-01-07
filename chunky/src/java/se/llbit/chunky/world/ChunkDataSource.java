@@ -18,24 +18,59 @@ package se.llbit.chunky.world;
 
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 
-import java.io.DataInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.InflaterInputStream;
 
 /**
- * Container representing a chunk data source with a timestamp and an input stream.
+ * Container representing a handle to a singular chunk's data with its last modified timestamp.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ChunkDataSource {
   public final int timestamp;
-  public final DataInputStream inputStream;
+  private final byte[] data;
+  private final CompressionScheme compressionScheme;
 
-  public ChunkDataSource(int timestamp, InputStream in) {
+  public ChunkDataSource(int timestamp) {
+    this(timestamp, new byte[0], null);
+  }
+  public ChunkDataSource(int timestamp, byte[] data, CompressionScheme compressionScheme) {
     this.timestamp = timestamp;
-    if (in != null) {
-      this.inputStream = new DataInputStream(new FastBufferedInputStream(in));
-    } else {
-      this.inputStream = null;
+    this.data = data;
+    this.compressionScheme = compressionScheme;
+  }
+
+  public boolean hasData() {
+    return data != null && data.length > 0;
+  }
+
+  public InputStream getInputStream() throws IOException {
+    return new FastBufferedInputStream(
+      compressionScheme.wrapInputStream(
+        new ByteArrayInputStream(data)
+      )
+    );
+  }
+
+  public enum CompressionScheme {
+    GZIP(GZIPInputStream::new),
+    ZLIB(InflaterInputStream::new);
+
+    private final WrapStream wrapper;
+    CompressionScheme(WrapStream wrapper) {
+      this.wrapper = wrapper;
+    }
+
+    @FunctionalInterface
+    interface WrapStream {
+      InputStream wrap(InputStream in) throws IOException;
+    }
+
+    public InputStream wrapInputStream(InputStream in) throws IOException {
+      return wrapper.wrap(in);
     }
   }
 }
