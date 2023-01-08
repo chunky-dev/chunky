@@ -28,6 +28,23 @@
         <HBox spacing="4" fx:id="scaleButtonArea"/>
       </VBox>
     </HBox>
+
+    <CheckBox fx:id="renderRegions" mnemonicParsing="false" text="Render region" />
+    <GridPane fx:id="renderRegionsArea" vgap="4.0" hgap="4.0" prefWidth="200.0">
+      <padding>
+        <Insets right="10.0" />
+      </padding>
+
+      <Label text="Width:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+      <IntegerTextField fx:id="cameraCropWidth" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="70.0" />
+      <Label text="Height:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+      <IntegerTextField fx:id="cameraCropHeight" GridPane.columnIndex="3" GridPane.rowIndex="0" prefWidth="70.0" />
+
+      <Label text="X Offset:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+      <IntegerTextField fx:id="cameraCropX" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="70.0" />
+      <Label text="Y Offset:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+      <IntegerTextField fx:id="cameraCropY" GridPane.columnIndex="3" GridPane.rowIndex="1" prefWidth="70.0" />
+    </GridPane>
     <Separator />
     <VBox spacing="10.0">
       <HBox spacing="10.0">

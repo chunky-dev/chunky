@@ -2089,20 +2089,43 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  public synchronized void setCropSize(int fullWidth, int fullHeight, int cropX, int cropY) {
-    if (fullWidth != 0 || fullHeight != 0) {
+  public synchronized void setCanvasCropSize(int canvasWidth, int canvasHeight, int fullWidth, int fullHeight, int cropX, int cropY) {
+    canvasWidth = Math.max(MIN_CANVAS_WIDTH, canvasWidth);
+    canvasHeight = Math.max(MIN_CANVAS_HEIGHT, canvasHeight);
+    if (fullWidth == 0 || fullHeight == 0) {
+      // Crop disabled
+      fullWidth = 0;
+      fullHeight = 0;
+      cropX = 0;
+      cropY = 0;
+    } else {
+      // Crop enabled
       fullWidth = Math.max(canvasWidth(), fullWidth);
       fullHeight = Math.max(canvasHeight(), fullHeight);
       cropX = QuickMath.clamp(cropX, 0, fullWidth-canvasWidth());
       cropY = QuickMath.clamp(cropY, 0, fullHeight-canvasHeight());
     }
+    boolean changed = false;
     if (fullWidth != this.fullWidth || fullHeight != this.fullHeight || cropX != this.cropX || cropY != this.cropY) {
+      changed = true;
       this.fullWidth = fullWidth;
       this.fullHeight = fullHeight;
       this.cropX = cropX;
       this.cropY = cropY;
+    }
+    if (canvasWidth != this.width || canvasHeight != this.height) {
+      changed = true;
+      this.width = canvasWidth;
+      this.height = canvasHeight;
+      initBuffers();
+    }
+    if (changed) {
       refresh();
     }
+  }
+
+  public boolean isCanvasCropped() {
+    return fullWidth != 0 && fullHeight != 0;
   }
 
   /**
@@ -2120,31 +2143,31 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public int getFullWidth() {
-    if (fullWidth == 0 && fullHeight == 0) {
-      return width;
+    if (isCanvasCropped()) {
+      return fullWidth;
     }
-    return fullWidth;
+    return width;
   }
 
   public int getFullHeight() {
-    if (fullWidth == 0 && fullHeight == 0) {
-      return height;
+    if (isCanvasCropped()) {
+      return fullHeight;
     }
-    return fullHeight;
+    return height;
   }
 
   public int getCropX() {
-    if (fullWidth == 0 && fullHeight == 0) {
-      return 0;
+    if (isCanvasCropped()) {
+      return cropX;
     }
-    return cropX;
+    return 0;
   }
 
   public int getCropY() {
-    if (fullWidth == 0 && fullHeight == 0) {
-      return 0;
+    if (isCanvasCropped()) {
+      return cropY;
     }
-    return cropY;
+    return 0;
   }
 
   /**
