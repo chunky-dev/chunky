@@ -1027,8 +1027,9 @@ public class Scene implements JsonSerializable, Refreshable {
                 // Before 1.12 paintings had id=Painting.
                 // After 1.12 paintings had id=minecraft:painting.
                 float yaw = tag.get("Rotation").get(0).floatValue();
-                entities.add(
-                        new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
+
+                Tag paintingVariant = NbtUtil.getTagFromNames(tag, "Motive", "variant");
+                entities.add(new PaintingEntity(new Vector3(x, y, z), paintingVariant.stringValue(), yaw));
               } else if (id.equals("minecraft:armor_stand") && entityLoadingPreferences.shouldLoadClass(ArmorStand.class)) {
                 actors.add(new ArmorStand(new Vector3(x, y, z), tag));
               }
