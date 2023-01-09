@@ -158,9 +158,10 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     apparentSunBrightness.onValueChange(value -> scene.sun().setApparentBrightness(value));
 
     sunRadius.setName("Sun size");
-    sunRadius.setRange(0.01, 10);
+    sunRadius.setTooltip("Sun radius in degrees.");
+    sunRadius.setRange(0.01, 20);
     sunRadius.clampMin();
-    sunRadius.onValueChange(value -> scene.sun().setSunRadius(value));
+    sunRadius.onValueChange(value -> scene.sun().setSunRadius(Math.toRadians(value)));
 
     sunColor.colorProperty().addListener(sunColorListener);
 
@@ -196,7 +197,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunIntensity.set(scene.sun().getIntensity());
     sunLuminosity.set(scene.sun().getLuminosity());
     apparentSunBrightness.set(scene.sun().getApparentBrightness());
-    sunRadius.set(scene.sun().getSunRadius());
+    sunRadius.set(Math.toDegrees(scene.sun().getSunRadius()));
     modifySunTexture.setSelected(scene.sun().getEnableTextureModification());
     sunAzimuth.set(-QuickMath.radToDeg(scene.sun().getAzimuth()));
     sunAltitude.set(QuickMath.radToDeg(scene.sun().getAltitude()));
