@@ -447,57 +447,50 @@ public class PathTracer implements RayTracer {
     // Total amount of light we want to transmit (overall transparency of texture)
     double shouldTrans = 1 - opacity;
     // Amount of each color to transmit - default to overall transparency if RGB values add to 0 (e.g. regular glass)
-    double rTrans = shouldTrans, gTrans = shouldTrans, bTrans = shouldTrans;
+    Vector3 rgbTrans = new Vector3(shouldTrans, shouldTrans, shouldTrans);
     if(colorTrans > 0) {
       // Amount to transmit of each color is scaled so the total transmitted amount matches the texture's transparency
-      rTrans = ray.color.x * shouldTrans / colorTrans;
-      gTrans = ray.color.y * shouldTrans / colorTrans;
-      bTrans = ray.color.z * shouldTrans / colorTrans;
+      rgbTrans.set(ray.color.toVec3());
+      rgbTrans.scale(shouldTrans / colorTrans);
     }
     double transmissivityCap = scene.transmissivityCap;
     // Determine the color with the highest transmissivity
-    double maxTrans = Math.max(rTrans, Math.max(gTrans, bTrans));
+    double maxTrans = Math.max(rgbTrans.x, Math.max(rgbTrans.y, rgbTrans.z));
     if(maxTrans > transmissivityCap) {
-      if (maxTrans == rTrans) {
+      if (maxTrans == rgbTrans.x) {
         // Give excess transmission from red to green and blue
-        double gTransNew = reassignTransmissivity(rTrans, gTrans, bTrans, shouldTrans, transmissivityCap);
-        bTrans = reassignTransmissivity(rTrans, bTrans, gTrans, shouldTrans, transmissivityCap);
-        gTrans = gTransNew;
-        rTrans = transmissivityCap;
-      } else if (maxTrans == gTrans) {
+        double gTransNew = reassignTransmissivity(rgbTrans.x, rgbTrans.y, rgbTrans.z, shouldTrans, transmissivityCap);
+        rgbTrans.z = reassignTransmissivity(rgbTrans.x, rgbTrans.z, rgbTrans.y, shouldTrans, transmissivityCap);
+        rgbTrans.y = gTransNew;
+        rgbTrans.x = transmissivityCap;
+      } else if (maxTrans == rgbTrans.y) {
         // Give excess transmission from green to red and blue
-        double rTransNew = reassignTransmissivity(gTrans, rTrans, bTrans, shouldTrans, transmissivityCap);
-        bTrans = reassignTransmissivity(gTrans, bTrans, rTrans, shouldTrans, transmissivityCap);
-        rTrans = rTransNew;
-        gTrans = transmissivityCap;
-      } else if (maxTrans == bTrans) {
+        double rTransNew = reassignTransmissivity(rgbTrans.y, rgbTrans.x, rgbTrans.z, shouldTrans, transmissivityCap);
+        rgbTrans.z = reassignTransmissivity(rgbTrans.y, rgbTrans.z, rgbTrans.x, shouldTrans, transmissivityCap);
+        rgbTrans.x = rTransNew;
+        rgbTrans.y = transmissivityCap;
+      } else if (maxTrans == rgbTrans.z) {
         // Give excess transmission from blue to green and red
-        double gTransNew = reassignTransmissivity(bTrans, gTrans, rTrans, shouldTrans, transmissivityCap);
-        rTrans = reassignTransmissivity(bTrans, rTrans, gTrans, shouldTrans, transmissivityCap);
-        gTrans = gTransNew;
-        bTrans = transmissivityCap;
+        double gTransNew = reassignTransmissivity(rgbTrans.z, rgbTrans.y, rgbTrans.x, shouldTrans, transmissivityCap);
+        rgbTrans.x = reassignTransmissivity(rgbTrans.z, rgbTrans.x, rgbTrans.y, shouldTrans, transmissivityCap);
+        rgbTrans.y = gTransNew;
+        rgbTrans.z = transmissivityCap;
       }
     }
     // Don't need to check for energy gain if transmissivity cap is 1
     if(transmissivityCap > 1) {
-      double currentEnergy = rTrans * next.color.x + gTrans * next.color.y + bTrans * next.color.z;
+      double currentEnergy = rgbTrans.x * next.color.x + rgbTrans.y * next.color.y + rgbTrans.z * next.color.z;
       double nextEnergy = next.color.x + next.color.y + next.color.z;
-      double energyRatio = currentEnergy / nextEnergy;
+      double energyRatio = nextEnergy / currentEnergy;
       // Normalize if there is net energy gain across all channels (more likely for higher transmissivityCap combined with high-saturation light source)
-      if(energyRatio > 1) {
-        rTrans /= energyRatio;
-        gTrans /= energyRatio;
-        bTrans /= energyRatio;
+      if(energyRatio < 1) {
+        rgbTrans.scale(energyRatio);
       }
     }
     // Scale color based on next ray
-    ray.color.x = rTrans * next.color.x;
-    ray.color.y = gTrans * next.color.y;
-    ray.color.z = bTrans * next.color.z;
+    ray.color.multiplyEntrywise(new Vector4(rgbTrans, 1), next.color);
     // Use emittance from next ray
-    ray.emittance.x = rTrans * next.emittance.x;
-    ray.emittance.y = gTrans * next.emittance.y;
-    ray.emittance.z = bTrans * next.emittance.z;
+    ray.emittance.multiplyEntrywise(rgbTrans, next.emittance);
   }
 
   private static double reassignTransmissivity(double from, double to, double other, double trans, double cap) {
