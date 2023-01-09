@@ -25,17 +25,10 @@ import se.llbit.chunky.launcher.ui.DebugConsole;
 import se.llbit.chunky.launcher.ui.FirstTimeSetupDialog;
 import se.llbit.chunky.resources.SettingsDirectory;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.font.TextAttribute;
 import java.io.*;
 import java.net.*;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Arrays;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -53,7 +46,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ChunkyLauncher {
 
-  public static final Semver LAUNCHER_VERSION = new Semver("1.13.3");
+  public static final Semver LAUNCHER_VERSION = new Semver("1.14.0");
   public static final int LAUNCHER_SETTINGS_REVISION = 1;
 
   /**
@@ -68,8 +61,8 @@ public class ChunkyLauncher {
   public static void main(String[] args) throws FileNotFoundException {
     boolean retryIfMissingJavafx = true;
 
+    final LauncherSettings settings = new LauncherSettings();
     try {
-      final LauncherSettings settings = new LauncherSettings();
       settings.load();
 
       // Currently, there's nothing that changed from previous launcher settings revisions.
@@ -257,7 +250,7 @@ public class ChunkyLauncher {
         // Javafx error
         if (retryIfMissingJavafx)
           JavaFxLocator.retryWithJavafx(args);
-        showJavafxError();
+        JavaFxInstaller.launch(settings, args);
       }
       e.printStackTrace(System.err);
     }
@@ -386,64 +379,5 @@ public class ChunkyLauncher {
     } else {
       return String.format("%.1f %s", fSize, unit);
     }
-  }
-
-  private static void showJavafxError() {
-    String[] errorMessages = new String[]{
-      "Error: Java cannot find JavaFX.",
-      "If you are using a JVM for Java 11 or later, " +
-        "JavaFX is no longer shipped alongside and must be installed separately.",
-      "If you already have JavaFX installed, you need to run Chunky with the command:",
-      "java --module-path <path/to/JavaFX/lib> --add-modules javafx.controls,javafx.fxml -jar <path/to/ChunkyLauncher.jar>"
-    };
-    String faqLink = "https://chunky.lemaik.de/java11";
-    String faqMessage = "Check out this page for more information on how to use Chunky with JavaFX";
-    if (!GraphicsEnvironment.isHeadless()) {
-      JTextField faqLabel;
-      if (Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-        faqLabel = new JTextField(faqMessage);
-        Font font = faqLabel.getFont();
-        Map attributes = font.getAttributes();
-        attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-        faqLabel.setFont(font.deriveFont(attributes));
-        faqLabel.setForeground(Color.BLUE.darker());
-        faqLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        faqLabel.setEditable(false);
-        faqLabel.setBackground(null);
-        faqLabel.setBorder(null);
-        faqLabel.addMouseListener(new MouseAdapter() {
-          @Override
-          public void mouseClicked(MouseEvent e) {
-            try {
-              Desktop.getDesktop().browse(new URI(faqLink));
-            } catch (IOException | URISyntaxException ioException) {
-              ioException.printStackTrace();
-            }
-          }
-        });
-      } else {
-        faqLabel = new JTextField(String.format("%s: %s", faqMessage, faqLink));
-        faqLabel.setEditable(false);
-        faqLabel.setBackground(null);
-        faqLabel.setBorder(null);
-        faqLabel.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
-      }
-      Object[] dialogContent = {
-        Arrays.stream(errorMessages).map(msg -> {
-          JTextField field = new JTextField(msg);
-          field.setEditable(false);
-          field.setBackground(null);
-          field.setBorder(null);
-          field.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
-          return field;
-        }).toArray(),
-        faqLabel
-      };
-      JOptionPane.showMessageDialog(null, dialogContent, "Cannot find JavaFX", JOptionPane.ERROR_MESSAGE);
-    }
-    for (String message : errorMessages) {
-      System.err.println(message);
-    }
-    System.err.printf("%s: %s\n", faqMessage, faqLink);
   }
 }

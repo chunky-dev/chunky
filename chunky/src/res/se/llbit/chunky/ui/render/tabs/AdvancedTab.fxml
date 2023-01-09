@@ -19,7 +19,7 @@
     <Separator prefWidth="200.0" />
     <IntegerAdjuster fx:id="rayDepth" />
     <Separator layoutX="20.0" layoutY="90.0" prefWidth="200.0" />
-    <Button fx:id="mergeRenderDump" mnemonicParsing="false" text="Merge render dump" />
+    <Button fx:id="mergeRenderDump" mnemonicParsing="false" text="Merge render dumps" />
     <Separator prefWidth="200.0" />
     <CheckBox fx:id="shutdown" mnemonicParsing="false" text="Shutdown computer when render completes" />
     <CheckBox fx:id="fastFog" mnemonicParsing="false" text="Fast fog" />
