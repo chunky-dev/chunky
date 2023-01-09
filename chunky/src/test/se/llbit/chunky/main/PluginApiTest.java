@@ -27,6 +27,7 @@ import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.util.Mutable;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.function.BiConsumer;
 
@@ -122,7 +123,9 @@ public class PluginApiTest {
     Mutable<Scene> cbScene = new Mutable<>(null);
 
     Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
-    chunky.getRenderController().getRenderManager().shutdown();
+    DefaultRenderManager rm = (DefaultRenderManager) chunky.getRenderController().getRenderManager();
+    rm.shutdown();
+    rm.join();
 
     SceneProvider provider = chunky.getSceneManager().getSceneProvider();
 

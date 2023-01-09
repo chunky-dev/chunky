@@ -1,5 +1,6 @@
 package se.llbit.chunky.world.region;
 
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 
@@ -7,14 +8,17 @@ public interface Region extends Iterable<Chunk> {
   /**
    * @return Chunk at (x, z)
    */
+  @PluginApi
   Chunk getChunk(int x, int z);
+  @PluginApi
   default Chunk getChunk(ChunkPosition pos) {
-    return getChunk(pos.x & 31, pos.z & 31);
+    return getChunk(pos.x & 0b11111, pos.z & 0b11111);
   }
 
   /**
    * Delete a chunk.
    */
+  @PluginApi
   default void deleteChunk(ChunkPosition chunkPos) {
     throw new UnsupportedOperationException("Not implemented by region implementation");
   }

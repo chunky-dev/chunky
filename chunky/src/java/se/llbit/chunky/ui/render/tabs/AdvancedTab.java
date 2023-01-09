@@ -49,6 +49,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -63,6 +64,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private Button mergeRenderDump;
   @FXML private CheckBox shutdown;
   @FXML private CheckBox fastFog;
+  @FXML private DoubleAdjuster transmissivityCap;
   @FXML private IntegerAdjuster cacheResolution;
   @FXML private DoubleAdjuster animationTime;
   @FXML private ChoiceBox<PictureExportFormat> outputMode;
@@ -104,13 +106,17 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
             .setTooltip(new Tooltip("Merge an existing render dump with the current render."));
     mergeRenderDump.setOnAction(e -> {
       FileChooser fileChooser = new FileChooser();
-      fileChooser.setTitle("Merge Render Dump");
+      fileChooser.setTitle("Merge Render Dumps");
       fileChooser
               .getExtensionFilters().add(new FileChooser.ExtensionFilter("Render dumps", "*.dump"));
-      File dump = fileChooser.showOpenDialog(getScene().getWindow());
-      if(dump != null) {
+
+      List<File> dumps = fileChooser.showOpenMultipleDialog(getScene().getWindow());
+      if (dumps != null) {
         // TODO: remove cast.
-        ((AsynchronousSceneManager) controller.getSceneManager()).mergeRenderDump(dump);
+        AsynchronousSceneManager sceneManager = ((AsynchronousSceneManager) controller.getSceneManager());
+        for (File dump : dumps) {
+          sceneManager.mergeRenderDump(dump);
+        }
       }
     });
     outputMode.setConverter(new StringConverter<PictureExportFormat>() {
@@ -132,6 +138,11 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     fastFog.setTooltip(new Tooltip("Enable faster fog rendering algorithm."));
     fastFog.selectedProperty()
             .addListener((observable, oldValue, newValue) -> scene.setFastFog(newValue));
+    transmissivityCap.setName("Transmissivity cap");
+    transmissivityCap.setRange(Scene.MIN_TRANSMISSIVITY_CAP, Scene.MAX_TRANSMISSIVITY_CAP);
+    transmissivityCap.clampBoth();
+    transmissivityCap.setTooltip("Maximum amplification of one color channel as a ray passes through a translucent block (stained glass, ice, etc.).\nA value of 1 prevents amplification entirely; higher values result in more vibrant colors.");
+    transmissivityCap.onValueChange(value -> scene.setTransmissivityCap(value));
     cacheResolution.setName("Sky cache resolution");
     cacheResolution.setTooltip("Resolution of the sky cache. Lower values will use less memory and improve performance but can cause sky artifacts.");
     cacheResolution.setRange(1, 4096);
@@ -276,6 +287,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   public void update(Scene scene) {
     outputMode.getSelectionModel().select(scene.getOutputMode());
     fastFog.setSelected(scene.fastFog());
+    transmissivityCap.set(scene.getTransmissivityCap());
     renderThreads.set(PersistentSettings.getNumThreads());
     cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());

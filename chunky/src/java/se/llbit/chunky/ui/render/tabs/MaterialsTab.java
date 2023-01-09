@@ -25,9 +25,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import se.llbit.chunky.block.*;
@@ -46,7 +44,7 @@ import java.util.Comparator;
 import java.util.ResourceBundle;
 
 // TODO: customization of textures, base color, etc.
-public class MaterialsTab extends HBox implements RenderControlsTab, Initializable {
+public class MaterialsTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
 
   private final DoubleAdjuster emittance = new DoubleAdjuster();
@@ -60,22 +58,28 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     emittance.setName("Emittance");
     emittance.setRange(0, 100);
     emittance.setTooltip("Intensity of the light emitted from the selected material.");
+
     specular.setName("Specular");
     specular.setRange(0, 1);
     specular.setTooltip("Reflectivity of the selected material.");
+
     ior.setName("IoR");
     ior.setRange(0, 5);
     ior.setTooltip("Index of Refraction of the selected material.");
+
     perceptualSmoothness.setName("Smoothness");
     perceptualSmoothness.setRange(0, 1);
     perceptualSmoothness.setTooltip("Smoothness of the selected material.");
+
     metalness.setName("Metalness");
     metalness.setRange(0, 1);
     metalness.setTooltip("Metalness (texture-tinted reflectivity) of the selected material.");
+
     ObservableList<String> blockIds = FXCollections.observableArrayList();
     blockIds.addAll(MaterialStore.collections.keySet());
     blockIds.addAll(ExtraMaterials.idMap.keySet());
     blockIds.addAll(MaterialStore.blockIds);
+
     FilteredList<String> filteredList = new FilteredList<>(
       new SortedList<>(blockIds, Comparator.naturalOrder())
     );
@@ -83,14 +87,15 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     listView.getSelectionModel().selectedItemProperty().addListener(
         (observable, oldValue, materialName) -> updateSelectedMaterial(materialName)
     );
-    VBox settings = new VBox();
-    settings.setSpacing(10);
+
+    Label materialPropertiesLabel = new Label("Material Properties");
+    materialPropertiesLabel.getStyleClass().add("group-label");
+    VBox settings = new VBox(10.0);
     settings.getChildren().addAll(
-        new Label("Material Properties"),
+        materialPropertiesLabel,
         emittance, specular, perceptualSmoothness, ior, metalness,
         new Label("(set to zero to disable)"));
-    setPadding(new Insets(10));
-    setSpacing(15);
+
     TextField filterField = new TextField();
     filterField.textProperty().addListener((observable, oldValue, newValue) -> {
       if (newValue.trim().isEmpty()) {
@@ -99,14 +104,19 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
         filteredList.setPredicate(name -> name.contains(newValue));
       }
     });
-    HBox filterBox = new HBox();
+
+    HBox filterBox = new HBox(10.0);
     filterBox.setAlignment(Pos.BASELINE_LEFT);
-    filterBox.setSpacing(10);
     filterBox.getChildren().addAll(new Label("Filter:"), filterField);
-    VBox listPane = new VBox();
-    listPane.setSpacing(10);
+
+    VBox listPane = new VBox(10.0);
     listPane.getChildren().addAll(filterBox, listView);
-    getChildren().addAll(listPane, settings);
+
+    HBox materialPropertiesBox = new HBox(15.0);
+    materialPropertiesBox.getChildren().addAll(listPane, settings);
+
+    setPadding(new Insets(10));
+    setContent(materialPropertiesBox);
   }
 
   private void updateSelectedMaterial(String materialName) {
