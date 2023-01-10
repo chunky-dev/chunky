@@ -19,6 +19,7 @@ package se.llbit.chunky.ui;
 
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -43,6 +44,8 @@ import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
+import se.llbit.chunky.ui.dialogs.SelectChunksInRadiusDialog;
+import se.llbit.chunky.ui.elements.TextFieldLabelWrapper;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
@@ -85,8 +88,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   protected final ContextMenu contextMenu = new ContextMenu();
   protected final MenuItem moveCameraHere;
   protected final MenuItem selectVisible;
-  protected final Dialog<DoubleAdjuster> selectionRadiusDialog;
-  protected float chunkSelectionRadius = 10;
+  protected SelectChunksInRadiusDialog selectionRadiusDialog;
   public Tooltip tooltip = new Tooltip();
   public int lastX;
   public int lastY;
@@ -151,7 +153,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     clearSelection.setOnAction(event -> chunkSelection.clearSelection());
     clearSelection.setDisable(chunkSelection.isEmpty());
 
-    this.selectionRadiusDialog = createRadiusDialog();
+    this.selectionRadiusDialog = new SelectChunksInRadiusDialog();
     MenuItem selectChunksInRadius = createSelectChunksInRadiusMenuItem(mapView, chunkSelection);
 
     MenuItem newScene = new MenuItem("New scene from selection");
@@ -847,49 +849,31 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   }
 
   private MenuItem createSelectChunksInRadiusMenuItem(MapView mapView, ChunkSelectionTracker chunkSelection) {
-    Image image = Icon.wrench.fxImage();
-    ImageView graphic = new ImageView(image);
-    graphic.resize(5, 5);
-    Button selectChunksInRadiusSettings = new Button("", graphic);
-    selectChunksInRadiusSettings.setBorder(Border.EMPTY);
-    selectChunksInRadiusSettings.setMaxSize(5, 5);
-    selectChunksInRadiusSettings.setOnAction(event -> {
-      selectionRadiusDialog.show();
-
+    MenuItem selectChunksInRadius = new MenuItem("Select chunks in radius");
+    selectChunksInRadius.setOnAction(event -> {
       // not using lastX and lastY as they are the position within this display, and so when positioning a window in a system
       // with multiple displays they would set the position relative to the PRIMARY display... very annoying
       Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
-      selectionRadiusDialog.setX(mouseLocation.x - 200); // some offsetting to center the popup on the mouse (may not work as well on higher resolutions than 1920x1080)
-      selectionRadiusDialog.setY(mouseLocation.y - 75);
-      event.consume(); // consume the event so the parent MenuItem doesn't also receive it
-    });
+      this.selectionRadiusDialog.setX(mouseLocation.x - 200); // some offsetting to center the popup on the mouse (may not work as well on higher resolutions than 1920x1080)
+      this.selectionRadiusDialog.setY(mouseLocation.y - 75);
 
-    MenuItem selectChunksInRadius = new MenuItem("Select chunks in radius", selectChunksInRadiusSettings);
-    selectChunksInRadius.setOnAction(event -> {
       ChunkView theView = mapView.getMapView();
       int cx = (int) QuickMath.floor(theView.x + (clickX - getWidth() / 2f) / theView.scale);
       int cz = (int) QuickMath.floor(theView.z + (clickY - getHeight() / 2f) / theView.scale);
-      chunkSelection.setChunkRadius(mapLoader.getWorld(), cx, cz, this.chunkSelectionRadius, true);
-    });
+
+      this.selectionRadiusDialog.setSelectionPos(cx, cz);
+
+      if (selectionRadiusDialog.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+        chunkSelection.setChunkRadius(
+          mapLoader.getWorld(),
+          this.selectionRadiusDialog.getSelectionX(),
+          this.selectionRadiusDialog.getSelectionZ(),
+          this.selectionRadiusDialog.getRadius(),
+          true
+        );
+      }
+   });
     return selectChunksInRadius;
-  }
-
-  private Dialog<DoubleAdjuster> createRadiusDialog() {
-    Dialog<DoubleAdjuster> radiusDialog = new Dialog<>();
-    radiusDialog.setTitle("Adjust chunk selection radius");
-    DialogPane dialogPane = radiusDialog.getDialogPane();
-    GridPane gridPane = new GridPane();
-    DoubleAdjuster chunkRadiusAdjuster = new DoubleAdjuster();
-    chunkRadiusAdjuster.setName("Radius (Chunks)");
-    chunkRadiusAdjuster.setRange(0, 100);
-    chunkRadiusAdjuster.clampMin();
-    chunkRadiusAdjuster.set(this.chunkSelectionRadius); // set default
-    chunkRadiusAdjuster.onValueChange(value -> this.chunkSelectionRadius = value.floatValue());
-
-    gridPane.add(chunkRadiusAdjuster, 0, 0);
-    dialogPane.setContent(gridPane);
-    dialogPane.getButtonTypes().addAll(ButtonType.OK);
-    return radiusDialog;
   }
 
   public void setOnViewDragged(Runnable onViewDragged) {
