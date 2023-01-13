@@ -387,7 +387,7 @@ public class BlockPalette {
       block.specular = 0.04f;
     });
     materialProperties.put("minecraft:sea_lantern", block -> {
-      block.emittance = 0.5f;
+      block.emittance = 1.0f;
     });
     materialProperties.put("minecraft:magma", block -> {
       block.emittance = 0.6f;
