@@ -131,6 +131,10 @@ public class MCRegion implements Region {
     regionFileTime = modtime;
     try (RandomAccessFile file = new RandomAccessFile(regionFile, "r")) {
       long length = file.length();
+      if (length == 0) {
+        return; // vanilla will occasionally save empty region files, we shouldn't warn the user about these.
+      }
+
       if (length < 2 * SECTOR_SIZE) {
         Log.warn("Missing header in region file!");
         return;
@@ -262,6 +266,11 @@ public class MCRegion implements Region {
     int index = x + z * 32;
     try (RandomAccessFile file = new RandomAccessFile(regionFile, "r")) {
       long length = file.length();
+
+      if (length == 0) {
+        return null; // vanilla will occasionally save empty region files, we shouldn't warn the user about these.
+      }
+
       if (length < 2 * SECTOR_SIZE) {
         Log.warn("Missing header in region file!");
         return null;
@@ -270,6 +279,12 @@ public class MCRegion implements Region {
       int loc = file.readInt();
       int numSectors = loc & 0xFF;
       int sectorOffset = loc >> 8;
+
+      if (sectorOffset == 0 || numSectors == 0) {
+        // chunk not generated yet
+        return null;
+      }
+
       file.seek(SECTOR_SIZE + 4 * index);
       int timestamp = file.readInt();
       if (length < sectorOffset * SECTOR_SIZE + 4) {
