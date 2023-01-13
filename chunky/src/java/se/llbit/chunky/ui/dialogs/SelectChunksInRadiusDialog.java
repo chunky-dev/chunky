@@ -16,7 +16,7 @@ public class SelectChunksInRadiusDialog extends Dialog<ButtonType> {
   protected IntegerTextField selectionZ;
 
   public SelectChunksInRadiusDialog() {
-    this.setTitle("Adjust chunk selection radius");
+    this.setTitle("Select chunks in radius");
 
     this.selectionX = new IntegerTextField();
     this.selectionZ = new IntegerTextField();
