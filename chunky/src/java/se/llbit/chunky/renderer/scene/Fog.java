@@ -59,17 +59,19 @@ public final class Fog {
 
   public void addSkyFog(Ray ray, Vector4 scatterLight) {
     if (mode == FogMode.UNIFORM) {
-      double fog;
-      if (ray.d.y > 0) {
-        fog = 1 - ray.d.y;
-        fog *= fog;
-      } else {
-        fog = 1;
+      if (uniformDensity > 0.0) {
+        double fog;
+        if (ray.d.y > 0) {
+          fog = 1 - ray.d.y;
+          fog *= fog;
+        } else {
+          fog = 1;
+        }
+        fog *= skyFogDensity;
+        ray.color.x = (1 - fog) * ray.color.x + fog * fogColor.x;
+        ray.color.y = (1 - fog) * ray.color.y + fog * fogColor.y;
+        ray.color.z = (1 - fog) * ray.color.z + fog * fogColor.z;
       }
-      fog *= skyFogDensity;
-      ray.color.x = (1 - fog) * ray.color.x + fog * fogColor.x;
-      ray.color.y = (1 - fog) * ray.color.y + fog * fogColor.y;
-      ray.color.z = (1 - fog) * ray.color.z + fog * fogColor.z;
     } else if (mode == FogMode.LAYERED) {
       double dy = ray.d.y;
       double y1 = ray.o.y;
