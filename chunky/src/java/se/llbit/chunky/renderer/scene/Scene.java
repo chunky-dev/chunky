@@ -170,6 +170,11 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public int height;
 
+  public int fullWidth = 0;
+  public int fullHeight = 0;
+  public int cropX = 0;
+  public int cropY = 0;
+
   public PostProcessingFilter postProcessingFilter = DEFAULT_POSTPROCESSING_FILTER;
   public PictureExportFormat outputMode = PictureExportFormats.PNG;
   public long renderTime;
@@ -502,6 +507,11 @@ public class Scene implements JsonSerializable, Refreshable {
       alphaChannel = other.alphaChannel;
       samples = other.samples;
     }
+
+    fullWidth = other.fullWidth;
+    fullHeight = other.fullHeight;
+    cropX = other.cropX;
+    cropY = other.cropY;
 
     octreeImplementation = other.octreeImplementation;
     bvhImplementation = other.bvhImplementation;
@@ -2058,6 +2068,45 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
+  public synchronized void setCanvasCropSize(int canvasWidth, int canvasHeight, int fullWidth, int fullHeight, int cropX, int cropY) {
+    canvasWidth = Math.max(MIN_CANVAS_WIDTH, canvasWidth);
+    canvasHeight = Math.max(MIN_CANVAS_HEIGHT, canvasHeight);
+    if (fullWidth == 0 || fullHeight == 0) {
+      // Crop disabled
+      fullWidth = 0;
+      fullHeight = 0;
+      cropX = 0;
+      cropY = 0;
+    } else {
+      // Crop enabled
+      fullWidth = Math.max(canvasWidth(), fullWidth);
+      fullHeight = Math.max(canvasHeight(), fullHeight);
+      cropX = QuickMath.clamp(cropX, 0, fullWidth-canvasWidth());
+      cropY = QuickMath.clamp(cropY, 0, fullHeight-canvasHeight());
+    }
+    boolean changed = false;
+    if (fullWidth != this.fullWidth || fullHeight != this.fullHeight || cropX != this.cropX || cropY != this.cropY) {
+      changed = true;
+      this.fullWidth = fullWidth;
+      this.fullHeight = fullHeight;
+      this.cropX = cropX;
+      this.cropY = cropY;
+    }
+    if (canvasWidth != this.width || canvasHeight != this.height) {
+      changed = true;
+      this.width = canvasWidth;
+      this.height = canvasHeight;
+      initBuffers();
+    }
+    if (changed) {
+      refresh();
+    }
+  }
+
+  public boolean isCanvasCropped() {
+    return fullWidth != 0 && fullHeight != 0;
+  }
+
   /**
    * @return Canvas width
    */
@@ -2070,6 +2119,34 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public int canvasHeight() {
     return height;
+  }
+
+  public int getFullWidth() {
+    if (isCanvasCropped()) {
+      return fullWidth;
+    }
+    return width;
+  }
+
+  public int getFullHeight() {
+    if (isCanvasCropped()) {
+      return fullHeight;
+    }
+    return height;
+  }
+
+  public int getCropX() {
+    if (isCanvasCropped()) {
+      return cropX;
+    }
+    return 0;
+  }
+
+  public int getCropY() {
+    if (isCanvasCropped()) {
+      return cropY;
+    }
+    return 0;
   }
 
   /**
@@ -2651,6 +2728,10 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("name", name);
     json.add("width", width);
     json.add("height", height);
+    json.add("fullWidth", fullWidth);
+    json.add("fullHeight", fullHeight);
+    json.add("cropX", cropX);
+    json.add("cropY", cropY);
     json.add("yClipMin", yClipMin);
     json.add("yClipMax", yClipMax);
     json.add("yMin", yMin);
@@ -2919,6 +3000,11 @@ public class Scene implements JsonSerializable, Refreshable {
       height = newHeight;
       initBuffers();
     }
+
+    fullWidth = json.get("fullWidth").intValue(fullWidth);
+    fullHeight = json.get("fullHeight").intValue(fullHeight);
+    cropX = json.get("cropX").intValue(cropX);
+    cropY = json.get("cropY").intValue(cropY);
 
     yClipMin = json.get("yClipMin").asInt(yClipMin);
     yClipMax = json.get("yClipMax").asInt(yClipMax);
