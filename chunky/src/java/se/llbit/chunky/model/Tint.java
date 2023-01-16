@@ -4,6 +4,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector4;
 
 public class Tint {
   public enum TintType {
@@ -56,33 +57,45 @@ public class Tint {
     System.arraycopy(tint, 0, this.tint, 0, 3);
   }
 
+  private float[] getTintColor(Ray ray, Scene scene) {
+    switch (type) {
+      case NONE:
+        return null;
+      case CONSTANT:
+        return this.tint;
+      case BIOME_FOLIAGE:
+        return ray.getBiomeFoliageColor(scene);
+      case BIOME_GRASS:
+        return ray.getBiomeGrassColor(scene);
+      case BIOME_WATER:
+        return ray.getBiomeWaterColor(scene);
+      default:
+        Log.warn("Unsupported tint type " + type);
+        return null;
+    }
+  }
+
   /**
    * Tint a color array with the tint option of this Tint object.
    */
   public void tint(float[] color, Ray ray, Scene scene) {
-    if (type == TintType.NONE) return;
-
-    float[] tintColor;
-    switch (type) {
-      case CONSTANT:
-        tintColor = this.tint;
-        break;
-      case BIOME_FOLIAGE:
-        tintColor = ray.getBiomeFoliageColor(scene);
-        break;
-      case BIOME_GRASS:
-        tintColor = ray.getBiomeGrassColor(scene);
-        break;
-      case BIOME_WATER:
-        tintColor = ray.getBiomeWaterColor(scene);
-        break;
-      default:
-        Log.warn("Unsupported tint type " + type);
-        return;
+    float[] tintColor = this.getTintColor(ray, scene);
+    if (tintColor != null) {
+      color[0] *= tintColor[0];
+      color[1] *= tintColor[1];
+      color[2] *= tintColor[2];
     }
+  }
 
-    color[0] *= tintColor[0];
-    color[1] *= tintColor[1];
-    color[2] *= tintColor[2];
+  /**
+   * Tint a color vector with the tint option of this Tint object.
+   */
+  public void tint(Vector4 color, Ray ray, Scene scene) {
+    float[] tintColor = this.getTintColor(ray, scene);
+    if (tintColor != null) {
+      color.x *= tintColor[0];
+      color.y *= tintColor[1];
+      color.z *= tintColor[2];
+    }
   }
 }
