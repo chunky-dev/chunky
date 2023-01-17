@@ -12,12 +12,11 @@
 <?import se.llbit.chunky.ui.IntegerAdjuster?>
 
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
+<?import se.llbit.chunky.ui.builder.javafx.FxBuildableUi?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
-    <IntegerAdjuster fx:id="renderThreads" />
-    <IntegerAdjuster fx:id="cpuLoad" />
-    <Separator prefWidth="200.0" />
-    <IntegerAdjuster fx:id="rayDepth" />
+    <FxBuildableUi fx:id="chunkyUi" spacing="10.0" />
+
     <Separator layoutX="20.0" layoutY="90.0" prefWidth="200.0" />
     <Button fx:id="mergeRenderDump" mnemonicParsing="false" text="Merge render dumps" />
     <Separator prefWidth="200.0" />

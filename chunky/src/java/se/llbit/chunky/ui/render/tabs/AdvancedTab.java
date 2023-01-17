@@ -37,6 +37,7 @@ import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
 import se.llbit.chunky.ui.Adjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
+import se.llbit.chunky.ui.builder.javafx.FxBuildableUi;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.ShutdownAlert;
 import se.llbit.chunky.ui.render.RenderControlsTab;
@@ -57,10 +58,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   private RenderControlsFxController renderControls;
   private RenderController controller;
   private Scene scene;
+  @FXML private FxBuildableUi chunkyUi;
 
-  @FXML private IntegerAdjuster renderThreads;
-  @FXML private IntegerAdjuster cpuLoad;
-  @FXML private IntegerAdjuster rayDepth;
   @FXML private Button mergeRenderDump;
   @FXML private CheckBox shutdown;
   @FXML private CheckBox fastFog;
@@ -88,19 +87,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   public void initialize(URL location, ResourceBundle resources) {
     outputMode.getItems().addAll(PictureExportFormats.getFormats());
     outputMode.getSelectionModel().select(PictureExportFormats.PNG);
-    cpuLoad.setName("CPU utilization");
-    cpuLoad.setTooltip("CPU utilization percentage per render thread.");
-    cpuLoad.setRange(1, 100);
-    cpuLoad.clampBoth();
-    cpuLoad.onValueChange(value -> {
-      PersistentSettings.setCPULoad(value);
-      controller.getRenderManager().setCPULoad(value);
-    });
-    rayDepth.setName("Ray depth");
-    rayDepth.setTooltip("Sets the minimum recursive ray depth.");
-    rayDepth.setRange(1, 25);
-    rayDepth.clampMin();
-    rayDepth.onValueChange(value -> scene.setRayDepth(value));
     mergeRenderDump
             .setTooltip(new Tooltip("Merge an existing render dump with the current render."));
     mergeRenderDump.setOnAction(e -> {
@@ -152,14 +138,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     animationTime.set(0);
     animationTime.onValueChange(value -> {
       scene.setAnimationTime(value);
-    });
-    renderThreads.setName("Render threads");
-    renderThreads.setTooltip("Number of rendering threads.");
-    renderThreads.setRange(1, 20);
-    renderThreads.clampMin();
-    renderThreads.onValueChange(value -> {
-      PersistentSettings.setNumRenderThreads(value);
-      renderControls.showPopup("This change takes effect after restarting Chunky.", renderThreads);
     });
 
     ArrayList<String> octreeNames = new ArrayList<>();
@@ -271,6 +249,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       launcherSettings.showLauncher = newValue;
       launcherSettings.save();
     });
+
+
   }
 
   public boolean shutdownAfterCompletedRender() {
@@ -279,11 +259,39 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
   @Override
   public void update(Scene scene) {
+    chunkyUi.build(builder -> {
+      builder.integerAdjuster()
+        .setName("Render threads")
+        .setTooltip("Number of rendering threads.")
+        .setRange(1, 20)
+        .setClamp(true, false)
+        .set(PersistentSettings.getNumThreads())
+        .addCallback(PersistentSettings::setNumRenderThreads);
+
+      builder.integerAdjuster()
+        .setName("CPU utilization")
+        .setTooltip("CPU utilization percentage per render thread")
+        .setRange(1, 100)
+        .setClamp(true, true)
+        .set(PersistentSettings.getCPULoad())
+        .addCallback(value -> {
+          PersistentSettings.setCPULoad(value);
+          controller.getRenderManager().setCPULoad(value);
+        });
+
+      builder.separator();
+
+      builder.integerAdjuster()
+        .setName("Ray depth")
+        .setTooltip("Sets the minimum recursive ray depth")
+        .setRange(1, 25)
+        .setClamp(true, false)
+        .set(scene.getRayDepth())
+        .addCallback(scene::setRayDepth);
+    });
+
     outputMode.getSelectionModel().select(scene.getOutputMode());
     fastFog.setSelected(scene.fog.fastFog());
-    renderThreads.set(PersistentSettings.getNumThreads());
-    cpuLoad.set(PersistentSettings.getCPULoad());
-    rayDepth.set(scene.getRayDepth());
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
     bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
     biomeStructureImplementation.getSelectionModel().select(scene.getBiomeStructureImplementation());
