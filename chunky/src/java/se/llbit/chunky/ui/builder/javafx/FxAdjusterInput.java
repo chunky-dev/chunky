@@ -19,6 +19,7 @@
 package se.llbit.chunky.ui.builder.javafx;
 
 import javafx.beans.value.ChangeListener;
+import se.llbit.chunky.ui.Adjuster;
 import se.llbit.chunky.ui.SliderAdjuster;
 import se.llbit.chunky.ui.builder.AdjusterInput;
 
@@ -26,107 +27,100 @@ import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class FxAdjusterInput<T extends Number> implements AdjusterInput<T> {
-  public final SliderAdjuster<T> adjuster;
-  protected final ArrayList<Consumer<T>> callbacks = new ArrayList<>();
+public class FxAdjusterInput<T extends Number> extends FxInput<T, SliderAdjuster<T>, AdjusterInput<T>> implements AdjusterInput<T> {
+  protected final ArrayList<Consumer<T>> afterChangeHandlers = new ArrayList<>();
   protected final ChangeListener<Number> listener;
 
   public FxAdjusterInput(SliderAdjuster<T> adjuster, Function<Number, T> converter) {
-    this.listener = (observable, oldValue, newValue) -> callback(converter.apply(newValue));
-    this.adjuster = adjuster;
-    this.adjuster.valueProperty().addListener(this.listener);
-  }
-
-  protected void callback(T value) {
-    for (Consumer<T> cb : callbacks) {
-      cb.accept(value);
-    }
+    super(adjuster);
+    listener = (observable, oldValue, newValue) -> callCallbacks(converter.apply(newValue));
+    input.valueProperty().addListener(listener);
+    input.addEventHandler(Adjuster.AFTER_VALUE_CHANGE, e -> {
+      T value = get();
+      for (Consumer<T> handler : afterChangeHandlers) {
+        handler.accept(value);
+      }
+    });
   }
 
   @Override
   public AdjusterInput<T> set(Number value) {
-    adjuster.valueProperty().removeListener(listener);
-    adjuster.set(value);
-    adjuster.valueProperty().addListener(listener);
+    input.valueProperty().removeListener(listener);
+    input.set(value);
+    input.valueProperty().addListener(listener);
     return this;
   }
 
   @Override
   public T get() {
-    return adjuster.get();
+    return input.get();
   }
 
   @Override
   public AdjusterInput<T> setName(String name) {
-    adjuster.setName(name);
+    input.setName(name);
     return this;
   }
 
   @Override
   public AdjusterInput<T> setTooltip(String tooltip) {
-    adjuster.setTooltip(tooltip);
+    input.setTooltip(tooltip);
     return this;
   }
 
   @Override
   public AdjusterInput<T> setRange(double min, double max) {
-    adjuster.setRange(min, max);
+    input.setRange(min, max);
     return this;
   }
 
   @Override
   public AdjusterInput<T> setRange(double min, double max, double logScaleStart) {
-    adjuster.setRange(min, max, logScaleStart);
+    input.setRange(min, max, logScaleStart);
     return this;
   }
 
   @Override
   public double getMin() {
-    return adjuster.getMin();
+    return input.getMin();
   }
 
   @Override
   public double getMax() {
-    return adjuster.getMax();
+    return input.getMax();
   }
 
   @Override
   public AdjusterInput<T> setClamp(boolean min, boolean max) {
-    adjuster.setClamp(min, max);
+    input.setClamp(min, max);
     return this;
   }
 
   @Override
   public AdjusterInput<T> setLogarithmic(boolean logarithmic) {
-    if (adjuster.isLogarithmic() && !logarithmic) {
+    if (input.isLogarithmic() && !logarithmic) {
       throw new UnsupportedOperationException("Cannot make slider not logarithmic.");
-    } else if (!adjuster.isLogarithmic() && logarithmic) {
-      adjuster.makeLogarithmic();
+    } else if (!input.isLogarithmic() && logarithmic) {
+      input.makeLogarithmic();
     }
     return this;
   }
 
   @Override
   public AdjusterInput<T> setMaxInfinity(boolean maxInfinity) {
-    adjuster.setMaxInfinity(maxInfinity);
+    input.setMaxInfinity(maxInfinity);
     return this;
   }
 
   @Override
-  public AdjusterInput<T> callCallbacks() {
-    this.callback(this.get());
+  public AdjusterInput<T> addAfterChangeHandler(Consumer<T> handler) {
+    afterChangeHandlers.add(handler);
     return this;
   }
 
   @Override
-  public AdjusterInput<T> addCallback(Consumer<T> callback) {
-    callbacks.add(callback);
-    return this;
-  }
-
-  @Override
-  public AdjusterInput<T> removeCallback(Consumer<T> callback) {
-    callbacks.remove(callback);
+  public AdjusterInput<T> removeAfterChangeHandler(Consumer<T> handler) {
+    afterChangeHandlers.remove(handler);
     return this;
   }
 }

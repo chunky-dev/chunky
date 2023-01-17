@@ -19,18 +19,8 @@
 package se.llbit.chunky.ui.builder;
 
 import java.util.function.Consumer;
-import java.util.function.IntConsumer;
 
-public interface AdjusterInput<T extends Number> {
-  /**
-   * Set the value of the adjuster without calling any callbacks.
-   */
-  AdjusterInput<T> set(Number value);
-  T get();
-
-  AdjusterInput<T> setName(String name);
-  AdjusterInput<T> setTooltip(String tooltip);
-
+public interface AdjusterInput<T extends Number> extends UiInput<T, AdjusterInput<T>> {
   AdjusterInput<T> setRange(double min, double max);
   AdjusterInput<T> setRange(double min, double max, double logScaleStart);
   double getMin();
@@ -40,8 +30,6 @@ public interface AdjusterInput<T extends Number> {
   AdjusterInput<T> setLogarithmic(boolean logarithmic);
   AdjusterInput<T> setMaxInfinity(boolean maxInfinity);
 
-  AdjusterInput<T> callCallbacks();
-  AdjusterInput<T> addCallback(Consumer<T> callback);
-  AdjusterInput<T> removeCallback(Consumer<T> callback);
-
+  AdjusterInput<T> addAfterChangeHandler(Consumer<T> handler);
+  AdjusterInput<T> removeAfterChangeHandler(Consumer<T> handler);
 }

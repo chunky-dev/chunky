@@ -20,23 +20,17 @@ package se.llbit.chunky.ui.builder;
 
 import java.util.function.Consumer;
 
-public interface UiBuilder {
+public interface UiInput<T, Self extends UiInput<T, Self>> {
   /**
-   * Add a node to this builder. Return {@code false} if the node could not be added. This is implementation
-   * specific and should be type checked.
+   * Set the value of the adjuster without calling any callbacks.
    */
-  default boolean addNode(Object node) {
-    return false;
-  }
+  Self set(T value);
+  T get();
 
-  default void addNodeOrElse(Object node, Consumer<UiBuilder> orElse) {
-    if (!addNode(node)) {
-      orElse.accept(this);
-    }
-  }
+  Self setName(String name);
+  Self setTooltip(String tooltip);
 
-  void separator();
-  AdjusterInput<Integer> integerAdjuster();
-  AdjusterInput<Double> doubleAdjuster();
-  CheckboxInput checkbox();
+  Self callCallbacks();
+  Self addCallback(Consumer<T> callback);
+  Self removeCallback(Consumer<T> callback);
 }

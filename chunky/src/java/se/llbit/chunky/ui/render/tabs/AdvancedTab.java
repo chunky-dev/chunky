@@ -22,6 +22,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import se.llbit.chunky.PersistentSettings;
@@ -42,6 +43,7 @@ import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.ShutdownAlert;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.fxutil.Dialogs;
+import se.llbit.log.Log;
 import se.llbit.math.Octree;
 import se.llbit.math.bvh.BVH;
 import se.llbit.util.Registerable;
@@ -58,23 +60,25 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   private RenderControlsFxController renderControls;
   private RenderController controller;
   private Scene scene;
+  private LauncherSettings launcherSettings;
+  private volatile boolean shutdownAfterCompletedRender;
+
   @FXML private FxBuildableUi chunkyUi;
 
-  @FXML private Button mergeRenderDump;
-  @FXML private CheckBox shutdown;
-  @FXML private CheckBox fastFog;
-  @FXML private IntegerAdjuster cacheResolution;
-  @FXML private DoubleAdjuster animationTime;
+  @FXML private HBox outputModeBox;
   @FXML private ChoiceBox<PictureExportFormat> outputMode;
+  @FXML private HBox octreeImplementationBox;
   @FXML private ChoiceBox<String> octreeImplementation;
+  @FXML private HBox bvhMethodBox;
   @FXML private ChoiceBox<String> bvhMethod;
+  @FXML private HBox biomeStructureImplementationBox;
   @FXML private ChoiceBox<String> biomeStructureImplementation;
-  @FXML private IntegerAdjuster gridSize;
-  @FXML private CheckBox preventNormalEmitterWithSampling;
-  @FXML private CheckBox hideUnknownBlocks;
+  @FXML private HBox rendererSelectBox;
   @FXML private ChoiceBox<String> rendererSelect;
+  @FXML private HBox previewSelectBox;
   @FXML private ChoiceBox<String> previewSelect;
-  @FXML private CheckBox showLauncher;
+
+  private Button mergeRenderDump;
 
   public AdvancedTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("AdvancedTab.fxml"));
@@ -85,10 +89,11 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    outputMode.getItems().addAll(PictureExportFormats.getFormats());
-    outputMode.getSelectionModel().select(PictureExportFormats.PNG);
-    mergeRenderDump
-            .setTooltip(new Tooltip("Merge an existing render dump with the current render."));
+    launcherSettings = new LauncherSettings();
+    launcherSettings.load();
+
+    mergeRenderDump = new Button("Merge render dumps");
+    mergeRenderDump.setTooltip(new Tooltip("Merge an existing render dump with the current render."));
     mergeRenderDump.setOnAction(e -> {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Merge Render Dumps");
@@ -104,6 +109,9 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
         }
       }
     });
+
+    outputMode.getItems().addAll(PictureExportFormats.getFormats());
+    outputMode.getSelectionModel().select(PictureExportFormats.PNG);
     outputMode.setConverter(new StringConverter<PictureExportFormat>() {
       @Override
       public String toString(PictureExportFormat object) {
@@ -117,28 +125,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     });
     outputMode.getSelectionModel().selectedItemProperty()
             .addListener((observable, oldValue, newValue) -> scene.setOutputMode(newValue));
-    if(!ShutdownAlert.canShutdown()) {
-      shutdown.setDisable(true);
-    }
-    fastFog.setTooltip(new Tooltip("Enable faster fog rendering algorithm."));
-    fastFog.selectedProperty()
-            .addListener((observable, oldValue, newValue) -> scene.setFastFog(newValue));
-    cacheResolution.setName("Sky cache resolution");
-    cacheResolution.setTooltip("Resolution of the sky cache. Lower values will use less memory and improve performance but can cause sky artifacts.");
-    cacheResolution.setRange(1, 4096);
-    cacheResolution.clampMin();
-    cacheResolution.set(128);
-    cacheResolution.onValueChange(value -> {
-      scene.sky().setSkyCacheResolution(value);
-    });
-    animationTime.setName("Current animation time");
-    animationTime.setTooltip("Current animation time in seconds, used for animated textures.");
-    animationTime.setRange(0, 60);
-    animationTime.clampMin();
-    animationTime.set(0);
-    animationTime.onValueChange(value -> {
-      scene.setAnimationTime(value);
-    });
 
     ArrayList<String> octreeNames = new ArrayList<>();
     StringBuilder tooltipTextBuilder = new StringBuilder();
@@ -195,41 +181,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       });
     biomeStructureImplementation.setTooltip(new Tooltip(biomeStructureTooltipBuilder.toString()));
 
-    gridSize.setRange(4, 64);
-    gridSize.setName("Emitter grid size");
-    gridSize.setTooltip("Size of the cells of the emitter grid. " +
-            "The bigger, the more emitter will be sampled. " +
-            "Need the chunks to be reloaded to apply");
-    gridSize.onValueChange(value -> {
-      scene.setGridSize(value);
-      PersistentSettings.setGridSizeDefault(value);
-    });
-    gridSize.addEventHandler(Adjuster.AFTER_VALUE_CHANGE, e -> {
-      if (scene.getEmitterSamplingStrategy() != EmitterSamplingStrategy.NONE && scene.haveLoadedChunks()) {
-        Alert warning = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
-        warning.setContentText("The selected chunks need to be reloaded to update the emitter grid size.");
-        warning.getButtonTypes().setAll(
-          ButtonType.CANCEL,
-          new ButtonType("Reload chunks", ButtonBar.ButtonData.FINISH));
-        warning.setTitle("Chunk reload required");
-        ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
-        if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
-          controller.getSceneManager().reloadChunks();
-        }
-      }
-    });
-
-    preventNormalEmitterWithSampling.setTooltip(new Tooltip("Prevent usual emitter contribution when emitter sampling is used"));
-    preventNormalEmitterWithSampling.selectedProperty().addListener((observable, oldvalue, newvalue) -> {
-      scene.setPreventNormalEmitterWithSampling(newvalue);
-      PersistentSettings.setPreventNormalEmitterWithSampling(newvalue);
-    });
-
-    hideUnknownBlocks.setTooltip(new Tooltip("Hide unknown blocks instead of rendering them as question marks."));
-    hideUnknownBlocks.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      scene.setHideUnknownBlocks(newValue);
-    });
-
     rendererSelect.setTooltip(new Tooltip("The renderer to use for rendering."));
     rendererSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
         scene.setRenderer(newValue));
@@ -237,24 +188,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     previewSelect.setTooltip(new Tooltip("The renderer to use for the preview."));
     previewSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
         scene.setPreviewRenderer(newValue));
-
-    LauncherSettings settings = new LauncherSettings();
-    settings.load();
-    showLauncher
-        .setTooltip(new Tooltip("Opens the Chunky launcher when starting Chunky next time."));
-    showLauncher.setSelected(settings.showLauncher);
-    showLauncher.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      LauncherSettings launcherSettings = new LauncherSettings();
-      launcherSettings.load();
-      launcherSettings.showLauncher = newValue;
-      launcherSettings.save();
-    });
-
-
-  }
-
-  public boolean shutdownAfterCompletedRender() {
-    return shutdown.isSelected();
   }
 
   @Override
@@ -274,10 +207,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
         .setRange(1, 100)
         .setClamp(true, true)
         .set(PersistentSettings.getCPULoad())
-        .addCallback(value -> {
-          PersistentSettings.setCPULoad(value);
-          controller.getRenderManager().setCPULoad(value);
-        });
+        .addCallback(v -> controller.getRenderManager().setCPULoad(v))
+        .addCallback(PersistentSettings::setCPULoad);
 
       builder.separator();
 
@@ -288,17 +219,105 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
         .setClamp(true, false)
         .set(scene.getRayDepth())
         .addCallback(scene::setRayDepth);
+
+      builder.separator();
+
+      builder.addNodeOrElse(mergeRenderDump, b -> Log.error("Failed to build `AdvancedTab.mergeRenderDump`"));
+
+      builder.separator();
+
+      builder.checkbox()
+        .setName("Shutdown computer when render completes")
+        .set(false)
+        .setDisable(!ShutdownAlert.canShutdown())
+        .addCallback(v -> shutdownAfterCompletedRender = v);
+
+      builder.checkbox()
+        .setName("Fast fog")
+        .setTooltip("Enable faster fog rendering algorithm.")
+        .set(scene.fog.fastFog())
+        .addCallback(scene::setFastFog);
+
+      builder.integerAdjuster()
+        .setName("Sky cache resolution")
+        .setTooltip("Resolution of the sky cache. Lower values will use less memory and improve performance but can cause sky artifacts.")
+        .setRange(1, 4096)
+        .setClamp(true, false)
+        .set(128)
+        .addCallback(value -> scene.sky().setSkyCacheResolution(value));
+
+      builder.doubleAdjuster()
+        .setName("Current animation time")
+        .setTooltip("Current animation time in seconds, used for animated textures.")
+        .setRange(0, 60)
+        .setClamp(true, false)
+        .set(scene.getAnimationTime())
+        .addCallback(scene::setAnimationTime);
+
+      builder.addNodeOrElse(outputModeBox, b -> Log.error("Failed to build `AdvancedTab.outputMode`"));
+
+      builder.checkbox()
+        .setName("Hide unknown blocks")
+        .setTooltip("Hide unknown blocks instead of rendering them as question marks.")
+        .set(scene.getHideUnknownBlocks())
+        .addCallback(scene::setHideUnknownBlocks);
+
+      builder.separator();
+
+      builder.addNodeOrElse(octreeImplementationBox, b -> Log.error("Failed to build `AdvancedTab.octreeImplementation"));
+      builder.addNodeOrElse(bvhMethodBox, b -> Log.error("Failed to build `AdvancedTab.bvhMethod`"));
+      builder.addNodeOrElse(biomeStructureImplementationBox, b -> Log.error("Failed to build `AdvancedTab.biomeStructureImplementation"));
+
+      builder.integerAdjuster()
+        .setName("Emitter grid size")
+        .setTooltip("Size of the cells of the emitter grid. The bigger, the more emitter will be sampled. Need the chunks to be reloaded to apply")
+        .set(scene.getGridSize())
+        .addCallback(scene::setGridSize)
+        .addCallback(PersistentSettings::setGridSizeDefault)
+        .addAfterChangeHandler(value -> {
+          if (scene.getEmitterSamplingStrategy() != EmitterSamplingStrategy.NONE && scene.haveLoadedChunks()) {
+            Alert warning = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
+            warning.setContentText("The selected chunks need to be reloaded to update the emitter grid size.");
+            warning.getButtonTypes().setAll(
+              ButtonType.CANCEL,
+              new ButtonType("Reload chunks", ButtonBar.ButtonData.FINISH));
+            warning.setTitle("Chunk reload required");
+            ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
+            if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
+              controller.getSceneManager().reloadChunks();
+            }
+          }
+        });
+
+      builder.checkbox()
+        .setName("Prevent normal emitter when using emitter sampling")
+        .setTooltip("Prevent usual emitter contribution when emitter sampling is used")
+        .set(scene.isPreventNormalEmitterWithSampling())
+        .addCallback(scene::setPreventNormalEmitterWithSampling)
+        .addCallback(PersistentSettings::setPreventNormalEmitterWithSampling);
+
+      builder.separator();
+
+      builder.addNodeOrElse(rendererSelectBox, b -> Log.error("Failed to build `AdvancedTab.rendererSelect`"));
+      builder.addNodeOrElse(previewSelectBox, b -> Log.error("Failed to build `AdvancedTab.previewSelect`"));
+
+      builder.separator();
+
+      builder.checkbox()
+        .setName("Show launcher when starting Chunky")
+        .setTooltip("Opens the Chunky launcher when starting Chunky next time.")
+        .set(launcherSettings.showLauncher)
+        .addCallback(value -> {
+          launcherSettings.load();
+          launcherSettings.showLauncher = value;
+          launcherSettings.save();
+        });
     });
 
     outputMode.getSelectionModel().select(scene.getOutputMode());
-    fastFog.setSelected(scene.fog.fastFog());
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
     bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
     biomeStructureImplementation.getSelectionModel().select(scene.getBiomeStructureImplementation());
-    gridSize.set(scene.getGridSize());
-    preventNormalEmitterWithSampling.setSelected(scene.isPreventNormalEmitterWithSampling());
-    animationTime.set(scene.getAnimationTime());
-    hideUnknownBlocks.setSelected(scene.getHideUnknownBlocks());
     rendererSelect.getSelectionModel().select(scene.getRenderer());
     previewSelect.getSelectionModel().select(scene.getPreviewRenderer());
   }
@@ -319,7 +338,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     this.controller = controls.getRenderController();
     scene = controller.getSceneManager().getScene();
     controller.getRenderManager().setOnRenderCompleted((time, sps) -> {
-      if(shutdownAfterCompletedRender()) {
+      if(shutdownAfterCompletedRender) {
         // TODO: rewrite the shutdown alert in JavaFX.
         new ShutdownAlert(null);
       }
