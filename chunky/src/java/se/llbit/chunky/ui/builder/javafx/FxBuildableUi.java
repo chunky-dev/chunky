@@ -19,15 +19,13 @@
 package se.llbit.chunky.ui.builder.javafx;
 
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
-import se.llbit.chunky.ui.builder.AdjusterInput;
-import se.llbit.chunky.ui.builder.CheckboxInput;
-import se.llbit.chunky.ui.builder.Configurable;
-import se.llbit.chunky.ui.builder.UiBuilder;
+import se.llbit.chunky.ui.builder.*;
 
 import java.util.ArrayList;
 
@@ -76,6 +74,13 @@ public class FxBuildableUi extends VBox {
       CheckBox checkbox = new CheckBox();
       nodes.add(checkbox);
       return new FxCheckboxInput(checkbox);
+    }
+
+    @Override
+    public UiButton button() {
+      Button button = new Button();
+      nodes.add(button);
+      return new FxButton(button);
     }
   }
 }

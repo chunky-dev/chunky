@@ -92,24 +92,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     launcherSettings = new LauncherSettings();
     launcherSettings.load();
 
-    mergeRenderDump = new Button("Merge render dumps");
-    mergeRenderDump.setTooltip(new Tooltip("Merge an existing render dump with the current render."));
-    mergeRenderDump.setOnAction(e -> {
-      FileChooser fileChooser = new FileChooser();
-      fileChooser.setTitle("Merge Render Dumps");
-      fileChooser
-              .getExtensionFilters().add(new FileChooser.ExtensionFilter("Render dumps", "*.dump"));
-
-      List<File> dumps = fileChooser.showOpenMultipleDialog(getScene().getWindow());
-      if (dumps != null) {
-        // TODO: remove cast.
-        AsynchronousSceneManager sceneManager = ((AsynchronousSceneManager) controller.getSceneManager());
-        for (File dump : dumps) {
-          sceneManager.mergeRenderDump(dump);
-        }
-      }
-    });
-
     outputMode.getItems().addAll(PictureExportFormats.getFormats());
     outputMode.getSelectionModel().select(PictureExportFormats.PNG);
     outputMode.setConverter(new StringConverter<PictureExportFormat>() {
@@ -222,7 +204,24 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
       builder.separator();
 
-      builder.addNodeOrElse(mergeRenderDump, b -> Log.error("Failed to build `AdvancedTab.mergeRenderDump`"));
+      builder.button()
+        .setText("Merge render dumps")
+        .setTooltip("Merge an existing render dump with the current render.")
+        .addCallback(b -> {
+          FileChooser fileChooser = new FileChooser();
+          fileChooser.setTitle("Merge Render Dumps");
+          fileChooser
+            .getExtensionFilters().add(new FileChooser.ExtensionFilter("Render dumps", "*.dump"));
+
+          List<File> dumps = fileChooser.showOpenMultipleDialog(getScene().getWindow());
+          if (dumps != null) {
+            // TODO: remove cast.
+            AsynchronousSceneManager sceneManager = ((AsynchronousSceneManager) controller.getSceneManager());
+            for (File dump : dumps) {
+              sceneManager.mergeRenderDump(dump);
+            }
+          }
+        });
 
       builder.separator();
 
