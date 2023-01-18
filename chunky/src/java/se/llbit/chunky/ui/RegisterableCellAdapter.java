@@ -16,31 +16,24 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.llbit.chunky.ui.builder;
+package se.llbit.chunky.ui;
 
+import javafx.scene.control.Tooltip;
+import se.llbit.fxutil.CustomizedListCellFactory;
 import se.llbit.util.Registerable;
 
-import java.util.function.Consumer;
-
-public interface UiBuilder {
-  /**
-   * Add a node to this builder. Return {@code false} if the node could not be added. This is implementation
-   * specific and should be type checked.
-   */
-  default boolean addNode(Object node) {
-    return false;
+public class RegisterableCellAdapter implements CustomizedListCellFactory.Adapter<Registerable> {
+  @Override
+  public String getLabel(Registerable item) {
+    return item.getName();
   }
 
-  default void addNodeOrElse(Object node, Consumer<UiBuilder> orElse) {
-    if (!addNode(node)) {
-      orElse.accept(this);
+  @Override
+  public Tooltip getTooltip(Registerable item) {
+    String description = item.getDescription();
+    if (description != null && !description.isEmpty()) {
+      return new Tooltip(item.getDescription());
     }
+    return null;
   }
-
-  void separator();
-  AdjusterInput<Integer> integerAdjuster();
-  AdjusterInput<Double> doubleAdjuster();
-  CheckboxInput checkbox();
-  UiButton button();
-  <T extends Registerable> ChoiceBoxInput<T> choiceBoxInput();
 }

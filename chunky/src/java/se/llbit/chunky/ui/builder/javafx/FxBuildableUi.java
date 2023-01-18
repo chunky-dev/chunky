@@ -26,6 +26,7 @@ import javafx.scene.layout.VBox;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.builder.*;
+import se.llbit.util.Registerable;
 
 import java.util.ArrayList;
 
@@ -81,6 +82,13 @@ public class FxBuildableUi extends VBox {
       Button button = new Button();
       nodes.add(button);
       return new FxButton(button);
+    }
+
+    @Override
+    public <T extends Registerable> ChoiceBoxInput<T> choiceBoxInput() {
+      FxChoiceBoxInput<T> choiceBoxInput = new FxChoiceBoxInput<>();
+      nodes.add(choiceBoxInput.input);
+      return choiceBoxInput;
     }
   }
 }

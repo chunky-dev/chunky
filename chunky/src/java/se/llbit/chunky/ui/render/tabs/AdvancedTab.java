@@ -51,10 +51,7 @@ import se.llbit.util.Registerable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initializable {
   private RenderControlsFxController renderControls;
@@ -73,10 +70,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private ChoiceBox<String> bvhMethod;
   @FXML private HBox biomeStructureImplementationBox;
   @FXML private ChoiceBox<String> biomeStructureImplementation;
-  @FXML private HBox rendererSelectBox;
-  @FXML private ChoiceBox<String> rendererSelect;
-  @FXML private HBox previewSelectBox;
-  @FXML private ChoiceBox<String> previewSelect;
 
   private Button mergeRenderDump;
 
@@ -162,14 +155,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
         PersistentSettings.setBiomeStructureImplementation(newvalue);
       });
     biomeStructureImplementation.setTooltip(new Tooltip(biomeStructureTooltipBuilder.toString()));
-
-    rendererSelect.setTooltip(new Tooltip("The renderer to use for rendering."));
-    rendererSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-        scene.setRenderer(newValue));
-
-    previewSelect.setTooltip(new Tooltip("The renderer to use for the preview."));
-    previewSelect.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-        scene.setPreviewRenderer(newValue));
   }
 
   @Override
@@ -297,8 +282,19 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
       builder.separator();
 
-      builder.addNodeOrElse(rendererSelectBox, b -> Log.error("Failed to build `AdvancedTab.rendererSelect`"));
-      builder.addNodeOrElse(previewSelectBox, b -> Log.error("Failed to build `AdvancedTab.previewSelect`"));
+      builder.choiceBoxInput()
+        .setName("Renderer:")
+        .setTooltip("The renderer to use for rendering.")
+        .addItems(controller.getRenderManager().getRenderers())
+        .set(scene.getRenderer())
+        .addCallback(r -> scene.setRenderer(r.getId()));
+
+      builder.choiceBoxInput()
+        .setName("Preview Renderer:")
+        .setTooltip("The renderer to use for the preview.")
+        .addItems(controller.getRenderManager().getPreviewRenderers())
+        .set(scene.getPreviewRenderer())
+        .addCallback(r -> scene.setPreviewRenderer(r.getId()));
 
       builder.separator();
 
@@ -317,8 +313,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
     bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
     biomeStructureImplementation.getSelectionModel().select(scene.getBiomeStructureImplementation());
-    rendererSelect.getSelectionModel().select(scene.getRenderer());
-    previewSelect.getSelectionModel().select(scene.getPreviewRenderer());
   }
 
   @Override
@@ -342,25 +336,5 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
         new ShutdownAlert(null);
       }
     });
-
-    // Set the renderers
-    rendererSelect.getItems().clear();
-    RenderManager renderManager = controller.getRenderManager();
-    ArrayList<String> ids = new ArrayList<>();
-
-    for (Registerable renderer : renderManager.getRenderers())
-      ids.add(renderer.getId());
-
-    rendererSelect.getItems().addAll(ids);
-    rendererSelect.getSelectionModel().select(scene.getRenderer());
-
-    // Set the preview renderers, reuse the `ids` ArrayList
-    previewSelect.getItems().clear();
-    ids.clear();
-    for (Registerable render : renderManager.getPreviewRenderers())
-      ids.add(render.getId());
-
-    previewSelect.getItems().addAll(ids);
-    previewSelect.getSelectionModel().select(scene.getPreviewRenderer());
   }
 }

@@ -20,27 +20,14 @@ package se.llbit.chunky.ui.builder;
 
 import se.llbit.util.Registerable;
 
-import java.util.function.Consumer;
+import java.util.Collection;
+import java.util.Collections;
 
-public interface UiBuilder {
-  /**
-   * Add a node to this builder. Return {@code false} if the node could not be added. This is implementation
-   * specific and should be type checked.
-   */
-  default boolean addNode(Object node) {
-    return false;
+public interface ChoiceBoxInput<T extends Registerable> extends UiInput<T, ChoiceBoxInput<T>> {
+  ChoiceBoxInput<T> set(String id);
+  ChoiceBoxInput<T> addItems(Collection<? extends T> items);
+  default ChoiceBoxInput<T> addItem(T item) {
+    return addItems(Collections.singletonList(item));
   }
-
-  default void addNodeOrElse(Object node, Consumer<UiBuilder> orElse) {
-    if (!addNode(node)) {
-      orElse.accept(this);
-    }
-  }
-
-  void separator();
-  AdjusterInput<Integer> integerAdjuster();
-  AdjusterInput<Double> doubleAdjuster();
-  CheckboxInput checkbox();
-  UiButton button();
-  <T extends Registerable> ChoiceBoxInput<T> choiceBoxInput();
+  ChoiceBoxInput<T> clear();
 }
