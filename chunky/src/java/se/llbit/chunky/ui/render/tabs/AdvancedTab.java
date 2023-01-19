@@ -38,6 +38,7 @@ import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
 import se.llbit.chunky.ui.Adjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
+import se.llbit.chunky.ui.builder.ChoiceBoxInput;
 import se.llbit.chunky.ui.builder.javafx.FxBuildableUi;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.ShutdownAlert;
@@ -62,8 +63,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
   @FXML private FxBuildableUi chunkyUi;
 
-  @FXML private HBox outputModeBox;
-  @FXML private ChoiceBox<PictureExportFormat> outputMode;
   @FXML private HBox octreeImplementationBox;
   @FXML private ChoiceBox<String> octreeImplementation;
   @FXML private HBox bvhMethodBox;
@@ -84,22 +83,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   public void initialize(URL location, ResourceBundle resources) {
     launcherSettings = new LauncherSettings();
     launcherSettings.load();
-
-    outputMode.getItems().addAll(PictureExportFormats.getFormats());
-    outputMode.getSelectionModel().select(PictureExportFormats.PNG);
-    outputMode.setConverter(new StringConverter<PictureExportFormat>() {
-      @Override
-      public String toString(PictureExportFormat object) {
-        return object == null ? null : object.getName();
-      }
-
-      @Override
-      public PictureExportFormat fromString(String string) {
-        return PictureExportFormats.getFormat(string).orElse(PictureExportFormats.PNG);
-      }
-    });
-    outputMode.getSelectionModel().selectedItemProperty()
-            .addListener((observable, oldValue, newValue) -> scene.setOutputMode(newValue));
 
     ArrayList<String> octreeNames = new ArrayList<>();
     StringBuilder tooltipTextBuilder = new StringBuilder();
@@ -238,7 +221,14 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
         .set(scene.getAnimationTime())
         .addCallback(scene::setAnimationTime);
 
-      builder.addNodeOrElse(outputModeBox, b -> Log.error("Failed to build `AdvancedTab.outputMode`"));
+      builder.<PictureExportFormat>choiceBoxInput()
+        .setName("Output mode:")
+        .setTooltip(null)  // TODO
+        .addItems(PictureExportFormats.getFormats())
+        .set(PictureExportFormats.PNG)
+        .setStringConverter(PictureExportFormat::getName)
+        .setTooltipConverter(PictureExportFormat::getDescription)
+        .addCallback(scene::setOutputMode);
 
       builder.checkbox()
         .setName("Hide unknown blocks")
@@ -282,18 +272,18 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
       builder.separator();
 
-      builder.choiceBoxInput()
+      builder.registerableChoiceBoxInput()
         .setName("Renderer:")
         .setTooltip("The renderer to use for rendering.")
         .addItems(controller.getRenderManager().getRenderers())
-        .set(scene.getRenderer())
+        .select(x -> Objects.equals(x.getId(), scene.getRenderer()))
         .addCallback(r -> scene.setRenderer(r.getId()));
 
-      builder.choiceBoxInput()
+      builder.registerableChoiceBoxInput()
         .setName("Preview Renderer:")
         .setTooltip("The renderer to use for the preview.")
         .addItems(controller.getRenderManager().getPreviewRenderers())
-        .set(scene.getPreviewRenderer())
+        .select(x -> Objects.equals(x.getId(), scene.getPreviewRenderer()))
         .addCallback(r -> scene.setPreviewRenderer(r.getId()));
 
       builder.separator();
@@ -309,7 +299,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
         });
     });
 
-    outputMode.getSelectionModel().select(scene.getOutputMode());
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
     bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
     biomeStructureImplementation.getSelectionModel().select(scene.getBiomeStructureImplementation());

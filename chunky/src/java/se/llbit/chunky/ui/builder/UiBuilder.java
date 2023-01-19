@@ -42,5 +42,11 @@ public interface UiBuilder {
   AdjusterInput<Double> doubleAdjuster();
   CheckboxInput checkbox();
   UiButton button();
-  <T extends Registerable> ChoiceBoxInput<T> choiceBoxInput();
+  <T> ChoiceBoxInput<T> choiceBoxInput();
+  default <T extends Registerable> ChoiceBoxInput<T> registerableChoiceBoxInput() {
+    ChoiceBoxInput<T> input = choiceBoxInput();
+    input.setStringConverter(Registerable::getName);
+    input.setTooltipConverter(Registerable::getDescription);
+    return input;
+  }
 }

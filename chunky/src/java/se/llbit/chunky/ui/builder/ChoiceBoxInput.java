@@ -18,16 +18,21 @@
 
 package se.llbit.chunky.ui.builder;
 
-import se.llbit.util.Registerable;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
-public interface ChoiceBoxInput<T extends Registerable> extends UiInput<T, ChoiceBoxInput<T>> {
-  ChoiceBoxInput<T> set(String id);
+public interface ChoiceBoxInput<T> extends UiInput<T, ChoiceBoxInput<T>> {
   ChoiceBoxInput<T> addItems(Collection<? extends T> items);
-  default ChoiceBoxInput<T> addItem(T item) {
-    return addItems(Collections.singletonList(item));
+  default ChoiceBoxInput<T> addItems(T... items) {
+    return addItems(Arrays.asList(items));
   }
-  ChoiceBoxInput<T> clear();
+  ChoiceBoxInput<T> select(Predicate<T> predicate);
+  ChoiceBoxInput<T> setStringConverter(Function<T, String> toString);
+  /**
+   * Set the tooltip converter. Return {@code null} for no tooltip.
+   */
+  ChoiceBoxInput<T> setTooltipConverter(Function<T, String> toTooltip);
 }

@@ -19,24 +19,26 @@
 package se.llbit.chunky.ui.builder.javafx;
 
 import javafx.beans.value.ChangeListener;
+import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
-import se.llbit.chunky.ui.RegisterableCellAdapter;
 import se.llbit.chunky.ui.builder.ChoiceBoxInput;
 import se.llbit.fxutil.CustomizedListCellFactory;
-import se.llbit.util.Registerable;
 
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
-public class FxChoiceBoxInput<T extends Registerable> extends FxInput<T, HBox, ChoiceBoxInput<T>> implements ChoiceBoxInput<T> {
+public class FxChoiceBoxInput<T> extends FxInput<T, HBox, ChoiceBoxInput<T>> implements ChoiceBoxInput<T> {
   protected final Label label;
   protected final ComboBox<T> comboBox;
   protected final ChangeListener<T> listener;
+
+  protected Function<T, String> toString = Objects::toString;
+  protected Function<T, String> toTooltip = x -> null;
 
   public FxChoiceBoxInput() {
     super(new HBox());
@@ -44,11 +46,30 @@ public class FxChoiceBoxInput<T extends Registerable> extends FxInput<T, HBox, C
     comboBox = new ComboBox<>();
 
     input.setSpacing(10);
+    input.setAlignment(Pos.CENTER_LEFT);
     input.getChildren().addAll(label, comboBox);
+    comboBox.setPrefWidth(150);
 
     listener = (observable, oldValue, newValue) -> callCallbacks(newValue);
     comboBox.getSelectionModel().selectedItemProperty().addListener(listener);
-    CustomizedListCellFactory.install(comboBox, new RegisterableCellAdapter());
+    CustomizedListCellFactory.install(comboBox, buildAdapter());
+  }
+
+  private CustomizedListCellFactory.Adapter<T> buildAdapter() {
+    return new CustomizedListCellFactory.Adapter<T>() {
+      @Override
+      public String getLabel(T item) {
+        if (item == null) return null;
+        return toString.apply(item);
+      }
+      @Override
+      public Tooltip getTooltip(T item) {
+        if (item == null) return null;
+        String tooltip = toTooltip.apply(item);
+        if (tooltip == null || tooltip.isEmpty()) return null;
+        return new Tooltip(tooltip);
+      }
+    };
   }
 
   @Override
@@ -58,14 +79,29 @@ public class FxChoiceBoxInput<T extends Registerable> extends FxInput<T, HBox, C
   }
 
   @Override
-  public ChoiceBoxInput<T> addItem(T item) {
-    comboBox.getItems().add(item);
+  @SafeVarargs
+  public final ChoiceBoxInput<T> addItems(T... items) {
+    comboBox.getItems().addAll(items);
     return this;
   }
 
   @Override
-  public ChoiceBoxInput<T> clear() {
-    comboBox.getItems().clear();
+  public ChoiceBoxInput<T> select(Predicate<T> predicate) {
+    comboBox.getItems().stream().filter(predicate).findFirst().ifPresent(this::set);
+    return this;
+  }
+
+  @Override
+  public ChoiceBoxInput<T> setStringConverter(Function<T, String> toString) {
+    this.toString = toString;
+    CustomizedListCellFactory.install(comboBox, buildAdapter());
+    return this;
+  }
+
+  @Override
+  public ChoiceBoxInput<T> setTooltipConverter(Function<T, String> toTooltip) {
+    this.toTooltip = toTooltip;
+    CustomizedListCellFactory.install(comboBox, buildAdapter());
     return this;
   }
 
@@ -74,12 +110,6 @@ public class FxChoiceBoxInput<T extends Registerable> extends FxInput<T, HBox, C
     comboBox.getSelectionModel().selectedItemProperty().removeListener(listener);
     comboBox.getSelectionModel().select(value);
     comboBox.getSelectionModel().selectedItemProperty().addListener(listener);
-    return this;
-  }
-
-  @Override
-  public ChoiceBoxInput<T> set(String id) {
-    comboBox.getItems().stream().filter(i -> Objects.equals(id, i.getId())).findFirst().ifPresent(this::set);
     return this;
   }
 
@@ -98,17 +128,5 @@ public class FxChoiceBoxInput<T extends Registerable> extends FxInput<T, HBox, C
   public ChoiceBoxInput<T> setTooltip(String tooltip) {
     Tooltip.install(input, new Tooltip(tooltip));
     return this;
-  }
-
-  protected static class ChoiceSeparator extends Separator implements Registerable {
-    @Override
-    public String getName() {
-      return "";
-    }
-
-    @Override
-    public String getDescription() {
-      return null;
-    }
   }
 }

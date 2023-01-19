@@ -9,11 +9,6 @@
 
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <FxBuildableUi fx:id="chunkyUi" spacing="10.0">
-    <HBox fx:id="outputModeBox" alignment="CENTER_LEFT" spacing="10.0">
-      <Label text="Output mode:" />
-      <ChoiceBox fx:id="outputMode" prefWidth="150.0" />
-    </HBox>
-
     <HBox fx:id="octreeImplementationBox" alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Octree implementation:" />
       <ChoiceBox fx:id="octreeImplementation" prefWidth="150.0" />
