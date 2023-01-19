@@ -1,29 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.ScrollPane?>
 <?import se.llbit.chunky.ui.builder.javafx.FxBuildableUi?>
 
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <FxBuildableUi fx:id="chunkyUi" spacing="10.0">
-    <HBox fx:id="octreeImplementationBox" alignment="CENTER_LEFT" spacing="10.0">
-      <Label text="Octree implementation:" />
-      <ChoiceBox fx:id="octreeImplementation" prefWidth="150.0" />
-    </HBox>
-
-    <HBox fx:id="bvhMethodBox" alignment="CENTER_LEFT" spacing="10.0">
-      <Label text="BVH build method:" />
-      <ChoiceBox fx:id="bvhMethod" prefWidth="150" />
-    </HBox>
-
-    <HBox fx:id="biomeStructureImplementationBox" alignment="CENTER_LEFT" spacing="10.0">
-      <Label text="BiomeStructure implementation:" />
-      <ChoiceBox fx:id="biomeStructureImplementation" prefWidth="150" />
-    </HBox>
-
     <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
     </padding>

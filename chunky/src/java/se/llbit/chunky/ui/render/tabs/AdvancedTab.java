@@ -63,13 +63,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
   @FXML private FxBuildableUi chunkyUi;
 
-  @FXML private HBox octreeImplementationBox;
-  @FXML private ChoiceBox<String> octreeImplementation;
-  @FXML private HBox bvhMethodBox;
-  @FXML private ChoiceBox<String> bvhMethod;
-  @FXML private HBox biomeStructureImplementationBox;
-  @FXML private ChoiceBox<String> biomeStructureImplementation;
-
   private Button mergeRenderDump;
 
   public AdvancedTab() throws IOException {
@@ -83,61 +76,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   public void initialize(URL location, ResourceBundle resources) {
     launcherSettings = new LauncherSettings();
     launcherSettings.load();
-
-    ArrayList<String> octreeNames = new ArrayList<>();
-    StringBuilder tooltipTextBuilder = new StringBuilder();
-    for(Map.Entry<String, Octree.ImplementationFactory> entry : Octree.getEntries()) {
-      octreeNames.add(entry.getKey());
-      tooltipTextBuilder.append(entry.getKey());
-      tooltipTextBuilder.append(": ");
-      tooltipTextBuilder.append(entry.getValue().getDescription());
-      tooltipTextBuilder.append('\n');
-    }
-    tooltipTextBuilder.append("Requires reloading chunks to take effect.");
-    octreeImplementation.getItems().addAll(octreeNames);
-    octreeImplementation.getSelectionModel().selectedItemProperty()
-            .addListener((observable, oldvalue, newvalue) -> {
-              scene.setOctreeImplementation(newvalue);
-              PersistentSettings.setOctreeImplementation(newvalue);
-            });
-    octreeImplementation.setTooltip(new Tooltip(tooltipTextBuilder.toString()));
-
-    ArrayList<String> bvhNames = new ArrayList<>();
-    StringBuilder bvhMethodBuilder = new StringBuilder();
-    for (BVH.Factory.BVHBuilder builder : BVH.Factory.getImplementations()) {
-      bvhNames.add(builder.getName());
-      bvhMethodBuilder.append(builder.getName());
-      bvhMethodBuilder.append(": ");
-      bvhMethodBuilder.append(builder.getDescription());
-      bvhMethodBuilder.append('\n');
-    }
-    bvhMethodBuilder.append("Requires reloading chunks to take effect.");
-    bvhMethod.getItems().addAll(bvhNames);
-    bvhMethod.getSelectionModel().select(PersistentSettings.getBvhMethod());
-    bvhMethod.getSelectionModel().selectedItemProperty()
-            .addListener(((observable, oldValue, newValue) -> {
-              PersistentSettings.setBvhMethod(newValue);
-              scene.setBvhImplementation(newValue);
-            }));
-    bvhMethod.setTooltip(new Tooltip(bvhMethodBuilder.toString()));
-
-    ArrayList<String> biomeStructureIds = new ArrayList<>();
-    StringBuilder biomeStructureTooltipBuilder = new StringBuilder();
-    for (Registerable entry : BiomeStructure.REGISTRY.values()) {
-      biomeStructureIds.add(entry.getId());
-      biomeStructureTooltipBuilder.append(entry.getName());
-      biomeStructureTooltipBuilder.append(": ");
-      biomeStructureTooltipBuilder.append(entry.getDescription());
-      biomeStructureTooltipBuilder.append('\n');
-    }
-    biomeStructureTooltipBuilder.append("Requires reloading chunks to take effect.");
-    biomeStructureImplementation.getItems().addAll(biomeStructureIds);
-    biomeStructureImplementation.getSelectionModel().selectedItemProperty()
-      .addListener((observable, oldvalue, newvalue) -> {
-        scene.setBiomeStructureImplementation(newvalue);
-        PersistentSettings.setBiomeStructureImplementation(newvalue);
-      });
-    biomeStructureImplementation.setTooltip(new Tooltip(biomeStructureTooltipBuilder.toString()));
   }
 
   @Override
@@ -238,9 +176,36 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
       builder.separator();
 
-      builder.addNodeOrElse(octreeImplementationBox, b -> Log.error("Failed to build `AdvancedTab.octreeImplementation"));
-      builder.addNodeOrElse(bvhMethodBox, b -> Log.error("Failed to build `AdvancedTab.bvhMethod`"));
-      builder.addNodeOrElse(biomeStructureImplementationBox, b -> Log.error("Failed to build `AdvancedTab.biomeStructureImplementation"));
+      builder.<Map.Entry<String, Octree.ImplementationFactory>>choiceBoxInput()
+        .setName("Octree implementation:")
+        .setTooltip(null)  // TODO
+        .addItems(Octree.getEntries())
+        .select(impl -> Objects.equals(impl.getKey(), PersistentSettings.getOctreeImplementation()))
+        .setStringConverter(Map.Entry::getKey)
+        .setTooltipConverter(impl -> impl.getValue().getDescription())
+        .addCallback(impl -> {
+          scene.setOctreeImplementation(impl.getKey());
+          PersistentSettings.setOctreeImplementation(impl.getKey());
+        });
+
+      builder.<BVH.Factory.BVHBuilder>choiceBoxInput()
+        .setName("BVH build method:")
+        .setTooltip("Set the BVH build method. Requires reloading chunks to take effect.")
+        .addItems(BVH.Factory.getImplementations())
+        .select(impl -> Objects.equals(impl.getName(), scene.getBvhImplementation()))
+        .setStringConverter(BVH.Factory.BVHBuilder::getName)
+        .setTooltipConverter(BVH.Factory.BVHBuilder::getDescription)
+        .addCallback(impl -> {
+          PersistentSettings.setBvhMethod(impl.getName());
+          scene.setBvhImplementation(impl.getName());
+        });
+
+      builder.registerableChoiceBoxInput()
+        .setName("BiomeStructure implementation:")
+        .setTooltip("Set the BiomeStructure implementation. Requires reloading chunks to take effect.")
+        .addItems(BiomeStructure.REGISTRY.values())
+        .select(impl -> Objects.equals(impl.getId(), scene.getBiomeStructureImplementation()))
+        .addCallback(impl -> scene.setBiomeStructureImplementation(impl.getId()));
 
       builder.integerAdjuster()
         .setName("Emitter grid size")
@@ -276,15 +241,15 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
         .setName("Renderer:")
         .setTooltip("The renderer to use for rendering.")
         .addItems(controller.getRenderManager().getRenderers())
-        .select(x -> Objects.equals(x.getId(), scene.getRenderer()))
-        .addCallback(r -> scene.setRenderer(r.getId()));
+        .select(impl -> Objects.equals(impl.getId(), scene.getRenderer()))
+        .addCallback(impl -> scene.setRenderer(impl.getId()));
 
       builder.registerableChoiceBoxInput()
         .setName("Preview Renderer:")
         .setTooltip("The renderer to use for the preview.")
         .addItems(controller.getRenderManager().getPreviewRenderers())
-        .select(x -> Objects.equals(x.getId(), scene.getPreviewRenderer()))
-        .addCallback(r -> scene.setPreviewRenderer(r.getId()));
+        .select(impl -> Objects.equals(impl.getId(), scene.getPreviewRenderer()))
+        .addCallback(impl -> scene.setPreviewRenderer(impl.getId()));
 
       builder.separator();
 
@@ -298,10 +263,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
           launcherSettings.save();
         });
     });
-
-    octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
-    bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
-    biomeStructureImplementation.getSelectionModel().select(scene.getBiomeStructureImplementation());
   }
 
   @Override

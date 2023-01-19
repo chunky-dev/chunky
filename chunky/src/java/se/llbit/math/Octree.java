@@ -20,6 +20,7 @@ package se.llbit.math;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
@@ -816,7 +817,7 @@ public class Octree {
     BigPackedOctree.initImplementation();
   }
 
-  public static Iterable<Map.Entry<String, ImplementationFactory>> getEntries() {
+  public static Set<Map.Entry<String, ImplementationFactory>> getEntries() {
     return factories.entrySet();
   }
 }
