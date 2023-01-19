@@ -18,7 +18,9 @@
 
 package se.llbit.chunky.ui.render;
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
+import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.builder.Configurable;
 import se.llbit.chunky.ui.builder.UiBuilder;
@@ -26,7 +28,8 @@ import se.llbit.chunky.ui.builder.javafx.FxBuildableUi;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 
 public abstract class AbstractRenderControlsTab implements RenderControlsTab, Configurable {
-  protected RenderControlsFxController controller;
+  protected RenderControlsFxController fxController;
+  protected RenderController controller;
   protected Scene scene;
 
   protected final FxBuildableUi ui;
@@ -35,6 +38,8 @@ public abstract class AbstractRenderControlsTab implements RenderControlsTab, Co
   public AbstractRenderControlsTab(String tabTitle) {
     this.tabTitle = tabTitle;
     this.ui = new FxBuildableUi();
+    this.ui.setSpacing(10);
+    this.ui.setPadding(new Insets(10));
   }
 
   @Override
@@ -61,7 +66,10 @@ public abstract class AbstractRenderControlsTab implements RenderControlsTab, Co
   }
 
   @Override
-  public void setController(RenderControlsFxController controller) {
-    this.controller = controller;
+  public void setController(RenderControlsFxController fxController) {
+    this.fxController = fxController;
+    this.controller = fxController.getRenderController();
+    this.scene = controller.getSceneManager().getScene();
+    update();
   }
 }
