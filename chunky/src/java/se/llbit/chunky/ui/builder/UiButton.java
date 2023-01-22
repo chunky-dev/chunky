@@ -18,11 +18,14 @@
 
 package se.llbit.chunky.ui.builder;
 
+import se.llbit.chunky.world.Icon;
+
 import java.util.function.Consumer;
 
 public interface UiButton {
   UiButton setText(String text);
   UiButton setTooltip(String tooltip);
+  UiButton setGraphic(Icon icon);
 
   UiButton callCallbacks();
   UiButton addCallback(Consumer<UiButton> callback);

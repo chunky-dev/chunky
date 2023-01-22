@@ -20,7 +20,9 @@ package se.llbit.chunky.ui.builder.javafx;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
 import se.llbit.chunky.ui.builder.UiButton;
+import se.llbit.chunky.world.Icon;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
@@ -43,6 +45,12 @@ public class FxButton implements UiButton {
   @Override
   public UiButton setTooltip(String tooltip) {
     button.setTooltip(new Tooltip(tooltip));
+    return this;
+  }
+
+  @Override
+  public UiButton setGraphic(Icon icon) {
+    button.setGraphic(new ImageView(icon.fxImage()));
     return this;
   }
 
