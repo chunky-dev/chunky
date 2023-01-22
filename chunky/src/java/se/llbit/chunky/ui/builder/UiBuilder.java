@@ -49,4 +49,6 @@ public interface UiBuilder {
     input.setTooltipConverter(Registerable::getDescription);
     return input;
   }
+  UiLabel label();
+  UiText text();
 }

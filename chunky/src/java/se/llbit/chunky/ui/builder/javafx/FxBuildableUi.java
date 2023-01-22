@@ -21,8 +21,10 @@ package se.llbit.chunky.ui.builder.javafx;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.builder.*;
@@ -88,6 +90,23 @@ public class FxBuildableUi extends VBox {
       FxChoiceBoxInput<T> choiceBoxInput = new FxChoiceBoxInput<>();
       nodes.add(choiceBoxInput.input);
       return choiceBoxInput;
+    }
+
+    @Override
+    public UiLabel label() {
+      Label label = new Label();
+      label.setWrapText(true);
+      label.setMaxWidth(350);
+      nodes.add(label);
+      return new FxLabel(label);
+    }
+
+    @Override
+    public UiText text() {
+      Text text = new Text();
+      text.setWrappingWidth(350);
+      nodes.add(text);
+      return new FxText(text);
     }
   }
 }
