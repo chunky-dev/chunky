@@ -221,10 +221,10 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     cloudX.set(scene.sky().cloudXOffset());
     cloudY.set(scene.sky().cloudYOffset());
     cloudZ.set(scene.sky().cloudZOffset());
-    fogDensity.set(scene.getFogDensity());
-    skyFogDensity.set(scene.getSkyFogDensity());
+    fogDensity.set(scene.fog.getUniformDensity());
+    skyFogDensity.set(scene.fog.getSkyFogDensity());
     fogColor.colorProperty().removeListener(fogColorListener);
-    fogColor.setColor(ColorUtil.toFx(scene.getFogColor()));
+    fogColor.setColor(ColorUtil.toFx(scene.fog.getFogColor()));
     fogColor.colorProperty().addListener(fogColorListener);
     horizonOffset.set(scene.sky().getHorizonOffset());
     simulatedSky.setValue(scene.sky().getSimulatedSky());

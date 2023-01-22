@@ -29,6 +29,8 @@ import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.Mutable;
+import se.llbit.util.annotation.NotNull;
+import se.llbit.util.annotation.Nullable;
 
 /**
  * Abstract region representation. Tracks loaded chunks and their timestamps.
@@ -138,6 +140,10 @@ public class MCRegion implements Region {
     regionFileTime = modtime;
     try (RandomAccessFile file = new RandomAccessFile(regionFile, "r")) {
       long length = file.length();
+      if (length == 0) {
+        return; // vanilla will occasionally save empty region files, we shouldn't warn the user about these.
+      }
+
       if (length < 2 * SECTOR_SIZE) {
         Log.warnf("Missing header in region file %s!", this.position);
         return;
@@ -192,9 +198,21 @@ public class MCRegion implements Region {
     return String.format("r.%d.%d.mca", pos.x, pos.z);
   }
 
+  @Nullable
   public Map<String, Tag> getChunkTags(ChunkPosition position, Set<String> request, Mutable<Integer> dataTimestamp) throws ChunkLoadingException {
     ChunkDataSource data = this.getChunkData(position);
     dataTimestamp.set(data.timestamp);
+    return parseNbtFromChunkDataSource(position, request, data);
+  }
+
+  @Nullable
+  public Map<String, Tag> getEntityTags(ChunkPosition position, Set<String> request) throws ChunkLoadingException {
+    ChunkDataSource data = this.getEntityData(position);
+    return parseNbtFromChunkDataSource(position, request, data);
+  }
+
+  @Nullable
+  private static Map<String, Tag> parseNbtFromChunkDataSource(ChunkPosition position, Set<String> request, ChunkDataSource data) throws ChunkLoadingException {
     if (data.hasData()) {
       try (DataInputStream in = new DataInputStream(data.getInputStream())) {
         Map<String, Tag> result = NamedTag.quickParse(in, request);
@@ -218,8 +236,22 @@ public class MCRegion implements Region {
    * @return Chunk data source. The InputStream of the data source is
    * {@code null} if the chunk could not be read.
    */
+  @NotNull
   private ChunkDataSource getChunkData(ChunkPosition chunkPos) {
     File regionDirectory = world.getRegionDirectory();
+    ChunkDataSource data = getChunkDataSource(chunkPos, regionDirectory);
+    chunkTimestamps[getMCAChunkIndex(chunkPos)] = data.timestamp;
+    return data;
+  }
+  @NotNull
+  private ChunkDataSource getEntityData(ChunkPosition chunkPos) {
+    File regionDirectory = world.getRegionDirectory();
+    regionDirectory = new File(regionDirectory.getParentFile(), "entities");
+    return getChunkDataSource(chunkPos, regionDirectory);
+  }
+
+  @NotNull
+  private ChunkDataSource getChunkDataSource(ChunkPosition chunkPos, File regionDirectory) {
     File regionFile = new File(regionDirectory, fileName);
     ChunkDataSource data = null;
     if (regionFile.exists()) {
@@ -239,7 +271,6 @@ public class MCRegion implements Region {
     if (data == null) {
       data = new ChunkDataSource((int) System.currentTimeMillis());
     }
-    chunkTimestamps[getMCAChunkIndex(chunkPos)] = data.timestamp;
     return data;
   }
 
@@ -253,6 +284,11 @@ public class MCRegion implements Region {
     long index = getMCAChunkIndex(chunkPos);
 
     long length = file.length();
+
+    if (length == 0) {
+      return null; // vanilla will occasionally save empty region files, we shouldn't warn the user about these.
+    }
+
     // header is 2 sectors long: location table + timestamp table
     if (length < 2 * SECTOR_SIZE) {
       throw new ChunkReadException(chunkPos, "Missing header in region file");
@@ -263,7 +299,7 @@ public class MCRegion implements Region {
     int locationEntry = file.readInt();
     int sectorCount = locationEntry & 0xFF;
     int sectorOffset = locationEntry >> 8;
-    if (sectorOffset == 0 && sectorCount == 0) {
+    if (sectorOffset == 0 || sectorCount == 0) {
       // chunk not generated yet
       return null;
     }

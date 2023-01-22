@@ -90,6 +90,9 @@ public class SizeInput extends GridPane {
     widthInput.setMaximumCharacterInputLength(6);
     heightInput.setMaximumCharacterInputLength(6);
 
+    // Prevent units from becoming ellipsis
+    unitLabel.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
+
     setHgap(4);
     setVgap(4);
     add(widthLabel, 0, 0);

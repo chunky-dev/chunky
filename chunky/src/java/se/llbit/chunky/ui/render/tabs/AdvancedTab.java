@@ -286,7 +286,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @Override
   public void update(Scene scene) {
     outputMode.getSelectionModel().select(scene.getOutputMode());
-    fastFog.setSelected(scene.fastFog());
+    fastFog.setSelected(scene.fog.fastFog());
     transmissivityCap.set(scene.getTransmissivityCap());
     renderThreads.set(PersistentSettings.getNumThreads());
     cpuLoad.set(PersistentSettings.getCPULoad());
