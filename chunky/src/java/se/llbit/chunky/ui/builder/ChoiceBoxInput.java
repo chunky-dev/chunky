@@ -24,6 +24,10 @@ import java.util.Collection;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * An item that implements {@link se.llbit.fxutil.ListSeparator} will be rendered as a separator if supported,
+ * otherwise it will be ignored.
+ */
 public interface ChoiceBoxInput<T> extends UiInput<T, ChoiceBoxInput<T>> {
   ChoiceBoxInput<T> addItems(Collection<? extends T> items);
   default ChoiceBoxInput<T> addItems(T... items) {

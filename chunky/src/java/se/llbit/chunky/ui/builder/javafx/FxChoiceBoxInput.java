@@ -26,6 +26,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import se.llbit.chunky.ui.builder.ChoiceBoxInput;
 import se.llbit.fxutil.CustomizedListCellFactory;
+import se.llbit.fxutil.ListSeparator;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -87,7 +88,10 @@ public class FxChoiceBoxInput<T> extends FxInput<T, HBox, ChoiceBoxInput<T>> imp
 
   @Override
   public ChoiceBoxInput<T> select(Predicate<T> predicate) {
-    comboBox.getItems().stream().filter(predicate).findFirst().ifPresent(this::set);
+    comboBox.getItems().stream()
+      .filter(item -> !(item instanceof ListSeparator))
+      .filter(predicate)
+      .findFirst().ifPresent(this::set);
     return this;
   }
 

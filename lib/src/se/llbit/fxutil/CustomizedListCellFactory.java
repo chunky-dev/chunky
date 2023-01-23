@@ -16,10 +16,8 @@
  */
 package se.llbit.fxutil;
 
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Tooltip;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
 import javafx.util.Callback;
 
 /**
@@ -52,6 +50,7 @@ public class CustomizedListCellFactory<A, T extends A> implements Callback<ListV
 
     public static class Cell<A, T extends A> extends ListCell<T> {
         private final Adapter<A> adapter;
+        private final Separator separator = new Separator();
 
         public Cell(Adapter<A> adapter) {
             this.adapter = adapter;
@@ -66,7 +65,16 @@ public class CustomizedListCellFactory<A, T extends A> implements Callback<ListV
             super.updateItem(item, empty);
             if (item == null || empty || adapter == null) {
                 setGraphic(null);
+                setPrefHeight(-1);
+            } else if (item instanceof ListSeparator) {
+                setGraphic(separator);
+                setPrefHeight(0);
+                setDisable(true);
+                setMouseTransparent(true);
+                setPadding(Insets.EMPTY);
             } else {
+                setGraphic(null);
+                setPrefHeight(-1);
                 setText(adapter.getLabel(item));
                 setTooltip(adapter.getTooltip(item));
             }
