@@ -18,6 +18,7 @@
 
 package se.llbit.chunky.ui.builder.javafx;
 
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
@@ -27,13 +28,18 @@ import se.llbit.chunky.world.Icon;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
-public class FxButton implements UiButton {
+public class FxButton implements UiButton, FxElement {
   public final Button button;
   protected final ArrayList<Consumer<UiButton>> callbacks = new ArrayList<>();
 
-  public FxButton(Button button) {
-    this.button = button;
+  public FxButton() {
+    this.button = new Button();
     this.button.setOnAction(e -> callCallbacks());
+  }
+
+  @Override
+  public Node getNode() {
+    return button;
   }
 
   @Override

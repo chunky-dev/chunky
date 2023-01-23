@@ -44,11 +44,10 @@ public class FxAdjusterInput<T extends Number> extends FxInput<T, SliderAdjuster
   }
 
   @Override
-  public AdjusterInput<T> set(Number value) {
+  protected void doSet(Number value) {
     input.valueProperty().removeListener(listener);
     input.set(value);
     input.valueProperty().addListener(listener);
-    return this;
   }
 
   @Override

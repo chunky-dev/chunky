@@ -22,7 +22,6 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.SceneManager;
-import se.llbit.chunky.ui.builder.CheckboxInput;
 import se.llbit.chunky.ui.builder.UiBuilder;
 import se.llbit.chunky.ui.dialogs.ResourcePackChooser;
 import se.llbit.chunky.ui.render.AbstractRenderControlsTab;
@@ -40,10 +39,7 @@ public class TexturesTab extends AbstractRenderControlsTab {
 
   @Override
   public void build(UiBuilder builder) {
-    CheckboxInput biomeColors = builder.checkbox();
-    CheckboxInput biomeBlending = builder.checkbox();
-
-    biomeColors
+    builder.checkbox()
       .setName("Enable biome colors")
       .setTooltip("Color grass and tree leaves according to the biome.")
       .set(scene.biomeColorsEnabled())
@@ -51,8 +47,6 @@ public class TexturesTab extends AbstractRenderControlsTab {
       .addCallback(value -> {
         boolean enabled = scene.biomeColorsEnabled();
         scene.setBiomeColorsEnabled(enabled);
-        biomeBlending.setDisable(!value);
-
         if (!scene.haveLoadedChunks()) {
           return;
         }
@@ -61,11 +55,11 @@ public class TexturesTab extends AbstractRenderControlsTab {
         }
       });
 
-    biomeBlending
+    builder.checkbox()
       .setName("Enable biome blending")
       .setTooltip("Blend edges of biomes (looks better but loads slower).")
       .set(scene.biomeBlendingEnabled())
-      .setDisable(!scene.biomeColorsEnabled())
+      .setDisable(() -> !scene.biomeColorsEnabled())
       .addCallback(value -> {
         boolean enabled = scene.biomeBlendingEnabled();
         scene.setBiomeBlendingEnabled(value);

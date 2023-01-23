@@ -16,11 +16,11 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.llbit.chunky.ui.builder;
+package se.llbit.chunky.ui.builder.javafx;
 
-import java.util.function.BooleanSupplier;
+import javafx.scene.Node;
 
-public interface CheckboxInput extends UiInput<Boolean, CheckboxInput> {
-  CheckboxInput setDisable(boolean value);
-  CheckboxInput setDisable(BooleanSupplier valueSupplier);
+public interface FxElement {
+  Node getNode();
+  default void refresh() {};
 }

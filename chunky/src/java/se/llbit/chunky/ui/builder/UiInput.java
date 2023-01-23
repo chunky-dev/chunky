@@ -19,12 +19,14 @@
 package se.llbit.chunky.ui.builder;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public interface UiInput<T, Self extends UiInput<T, Self>> {
   /**
    * Set the value of the adjuster without calling any callbacks.
    */
   Self set(T value);
+  Self set(Supplier<T> valueSupplier);
   T get();
 
   Self setName(String name);
@@ -33,4 +35,6 @@ public interface UiInput<T, Self extends UiInput<T, Self>> {
   Self callCallbacks();
   Self addCallback(Consumer<T> callback);
   Self removeCallback(Consumer<T> callback);
+
+  void refresh();
 }

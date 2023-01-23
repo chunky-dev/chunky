@@ -106,11 +106,10 @@ public class FxChoiceBoxInput<T> extends FxInput<T, HBox, ChoiceBoxInput<T>> imp
   }
 
   @Override
-  public ChoiceBoxInput<T> set(T value) {
+  protected void doSet(T value) {
     comboBox.getSelectionModel().selectedItemProperty().removeListener(listener);
     comboBox.getSelectionModel().select(value);
     comboBox.getSelectionModel().selectedItemProperty().addListener(listener);
-    return this;
   }
 
   @Override

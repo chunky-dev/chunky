@@ -19,8 +19,6 @@
 package se.llbit.chunky.ui.builder.javafx;
 
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
@@ -30,21 +28,30 @@ import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.builder.*;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class FxBuildableUi extends VBox {
+  protected ArrayList<FxElement> elements = new ArrayList<>();
+
   public void build(Configurable configurable) {
     Builder builder = new Builder();
     configurable.build(builder);
-    this.getChildren().setAll(builder.nodes);
+    elements = builder.elements;
+    this.getChildren().setAll(elements.stream().map(FxElement::getNode).collect(Collectors.toList()));
+  }
+
+  public void refresh() {
+    elements.forEach(FxElement::refresh);
   }
 
   public static class Builder implements UiBuilder {
-    protected final ArrayList<Node> nodes = new ArrayList<>();
+    protected final ArrayList<FxElement> elements = new ArrayList<>();
 
     @Override
     public boolean addNode(Object node) {
       if (node instanceof Node) {
-        nodes.add((Node) node);
+        Node n = (Node) node;
+        elements.add(() -> n);
         return true;
       }
       return false;
@@ -54,41 +61,41 @@ public class FxBuildableUi extends VBox {
     public void separator() {
       Separator separator = new Separator();
       separator.setPrefWidth(200);
-      nodes.add(separator);
+      elements.add(() -> separator);
     }
 
     @Override
     public AdjusterInput<Integer> integerAdjuster() {
-      IntegerAdjuster adjuster = new IntegerAdjuster();
-      nodes.add(adjuster);
-      return new FxAdjusterInput<>(adjuster, Number::intValue);
+      FxAdjusterInput<Integer> adjuster = new FxAdjusterInput<>(new IntegerAdjuster(), Number::intValue);
+      elements.add(adjuster);
+      return adjuster;
     }
 
     @Override
     public AdjusterInput<Double> doubleAdjuster() {
-      DoubleAdjuster adjuster = new DoubleAdjuster();
-      nodes.add(adjuster);
-      return new FxAdjusterInput<>(adjuster, Number::doubleValue);
+      FxAdjusterInput<Double> adjuster = new FxAdjusterInput<>(new DoubleAdjuster(), Number::doubleValue);
+      elements.add(adjuster);
+      return adjuster;
     }
 
     @Override
     public CheckboxInput checkbox() {
-      CheckBox checkbox = new CheckBox();
-      nodes.add(checkbox);
-      return new FxCheckboxInput(checkbox);
+      FxCheckboxInput checkbox = new FxCheckboxInput();
+      elements.add(checkbox);
+      return checkbox;
     }
 
     @Override
     public UiButton button() {
-      Button button = new Button();
-      nodes.add(button);
-      return new FxButton(button);
+      FxButton button = new FxButton();
+      elements.add(button);
+      return button;
     }
 
     @Override
     public <T> ChoiceBoxInput<T> choiceBoxInput() {
       FxChoiceBoxInput<T> choiceBoxInput = new FxChoiceBoxInput<>();
-      nodes.add(choiceBoxInput.input);
+      elements.add(choiceBoxInput);
       return choiceBoxInput;
     }
 
@@ -97,7 +104,7 @@ public class FxBuildableUi extends VBox {
       Label label = new Label();
       label.setWrapText(true);
       label.setMaxWidth(350);
-      nodes.add(label);
+      elements.add(() -> label);
       return new FxLabel(label);
     }
 
@@ -105,7 +112,7 @@ public class FxBuildableUi extends VBox {
     public UiText text() {
       Text text = new Text();
       text.setWrappingWidth(350);
-      nodes.add(text);
+      elements.add(() -> text);
       return new FxText(text);
     }
   }

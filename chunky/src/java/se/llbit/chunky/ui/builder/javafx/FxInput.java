@@ -23,24 +23,54 @@ import se.llbit.chunky.ui.builder.UiInput;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-public abstract class FxInput<T, N extends Node, Self extends UiInput<T, Self>> implements UiInput<T, Self> {
+public abstract class FxInput<T, N extends Node, Self extends UiInput<T, Self>> implements UiInput<T, Self>, FxElement {
   public final N input;
   protected final ArrayList<Consumer<T>> callbacks = new ArrayList<>();
+  protected Supplier<T> valueSupplier = null;
 
   protected FxInput(N input) {
     this.input = input;
+  }
+
+  @Override
+  public Node getNode() {
+    return input;
+  }
+
+  @SuppressWarnings("unchecked")
+  private Self self() {
+    return (Self) this;
+  }
+
+  protected abstract void doSet(T value);
+
+  @Override
+  public Self set(T value) {
+    this.valueSupplier = null;
+    doSet(value);
+    return self();
+  }
+
+  @Override
+  public Self set(Supplier<T> valueSupplier) {
+    this.valueSupplier = valueSupplier;
+    doSet(valueSupplier.get());
+    return self();
+  }
+
+  @Override
+  public void refresh() {
+    if (valueSupplier != null) {
+      doSet(valueSupplier.get());
+    }
   }
 
   protected void callCallbacks(T value) {
     for (Consumer<T> cb : callbacks) {
       cb.accept(value);
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  private Self self() {
-    return (Self) this;
   }
 
   @Override

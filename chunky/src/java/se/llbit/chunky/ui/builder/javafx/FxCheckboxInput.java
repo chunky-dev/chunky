@@ -23,21 +23,23 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Tooltip;
 import se.llbit.chunky.ui.builder.CheckboxInput;
 
+import java.util.function.BooleanSupplier;
+
 public class FxCheckboxInput extends FxInput<Boolean, CheckBox, CheckboxInput> implements CheckboxInput {
   protected final ChangeListener<Boolean> listener;
+  protected BooleanSupplier disableSupplier = null;
 
-  public FxCheckboxInput(CheckBox checkbox) {
-    super(checkbox);
+  public FxCheckboxInput() {
+    super(new CheckBox());
     listener = (observable, oldValue, newValue) -> callCallbacks(newValue);
     input.selectedProperty().addListener(listener);
   }
 
   @Override
-  public CheckboxInput set(Boolean value) {
+  protected void doSet(Boolean value) {
     input.selectedProperty().removeListener(listener);
     input.setSelected(value);
     input.selectedProperty().addListener(listener);
-    return this;
   }
 
   @Override
@@ -59,7 +61,23 @@ public class FxCheckboxInput extends FxInput<Boolean, CheckBox, CheckboxInput> i
 
   @Override
   public CheckboxInput setDisable(boolean value) {
+    disableSupplier = null;
     input.setDisable(value);
     return this;
+  }
+
+  @Override
+  public CheckboxInput setDisable(BooleanSupplier valueSupplier) {
+    disableSupplier = valueSupplier;
+    input.setDisable(valueSupplier.getAsBoolean());
+    return this;
+  }
+
+  @Override
+  public void refresh() {
+    super.refresh();
+    if (disableSupplier != null) {
+      input.setDisable(disableSupplier.getAsBoolean());
+    }
   }
 }

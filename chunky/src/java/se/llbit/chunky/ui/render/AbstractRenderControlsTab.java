@@ -21,11 +21,14 @@ package se.llbit.chunky.ui.render;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.builder.Configurable;
 import se.llbit.chunky.ui.builder.UiBuilder;
 import se.llbit.chunky.ui.builder.javafx.FxBuildableUi;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
+
+import java.util.function.BiConsumer;
 
 public abstract class AbstractRenderControlsTab implements RenderControlsTab, Configurable {
   protected RenderControlsFxController fxController;
@@ -34,12 +37,17 @@ public abstract class AbstractRenderControlsTab implements RenderControlsTab, Co
 
   protected final FxBuildableUi ui;
   protected final String tabTitle;
+  protected final BiConsumer<ResetReason, Scene> sceneListener = (r, s) -> refresh();
 
   public AbstractRenderControlsTab(String tabTitle) {
     this.tabTitle = tabTitle;
     this.ui = new FxBuildableUi();
     this.ui.setSpacing(10);
     this.ui.setPadding(new Insets(10));
+  }
+
+  public void refresh() {
+    this.ui.refresh();
   }
 
   @Override
@@ -70,6 +78,10 @@ public abstract class AbstractRenderControlsTab implements RenderControlsTab, Co
     this.fxController = fxController;
     this.controller = fxController.getRenderController();
     this.scene = controller.getSceneManager().getScene();
+
+    this.controller.getSceneManager().getSceneProvider().removeChangeListener(sceneListener);
+    this.controller.getSceneManager().getSceneProvider().addChangeListener(sceneListener);
+
     update();
   }
 }
