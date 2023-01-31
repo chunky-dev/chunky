@@ -57,6 +57,7 @@ public class Chunk {
   public static final String LEVEL_SECTIONS = ".Level.Sections";
   public static final String LEVEL_BIOMES = ".Level.Biomes";
   public static final String LEVEL_ENTITIES = ".Level.Entities";
+  public static final String ENTITIES_POST_20W45A = ".Entities";
   public static final String LEVEL_TILEENTITIES = ".Level.TileEntities";
   public static final String BLOCK_ENTITIES_POST_21W43A = ".block_entities";
 
@@ -77,6 +78,7 @@ public class Chunk {
   private static final int CHUNK_BYTES = X_MAX * Y_MAX * Z_MAX;
 
   public static final int DATAVERSION_20W17A = 2529;
+  public static final int DATAVERSION_20W45A = 2681; // entities moved into separate region files
 
   protected final ChunkPosition position;
   protected volatile AbstractLayer surface = IconLayer.UNKNOWN;
@@ -117,6 +119,15 @@ public class Chunk {
     Map<String, Tag> chunkTags = region.getChunkTags(this.position, request, timestamp);
     this.dataTimestamp = timestamp.get();
     return chunkTags;
+  }
+
+  /**
+   * @param request fresh request set
+   * @return loaded data, or null if something went wrong
+   */
+  private Map<String, Tag> getEntityTags(Set<String> request) {
+    MCRegion region = (MCRegion) world.getRegion(position.getRegionPosition());
+    return region.getEntityTags(this.position, request);
   }
 
   /**
@@ -439,8 +450,9 @@ public class Chunk {
     }
     Tag data = tagFromMap(dataMap);
 
+    int dataVersion = data.get(DATAVERSION).intValue();
     if(reuseChunkData.get() == null || reuseChunkData.get() instanceof EmptyChunkData) {
-      reuseChunkData.set(world.createChunkData(reuseChunkData.get(), data.get(DATAVERSION).intValue()));
+      reuseChunkData.set(world.createChunkData(reuseChunkData.get(), dataVersion));
     } else {
       reuseChunkData.get().clear();
     }
@@ -466,6 +478,23 @@ public class Chunk {
         for (SpecificTag tag : (ListTag) tileEntitiesTag) {
           if (tag.isCompoundTag())
             chunkData.addTileEntity((CompoundTag) tag);
+        }
+      }
+    }
+
+    // post 20w45A entities
+    if (dataVersion >= DATAVERSION_20W45A) {
+      Set<String> entitiesRequest = new HashSet<>();
+      entitiesRequest.add(ENTITIES_POST_20W45A);
+
+      Map<String, Tag> entitiesMap = getEntityTags(entitiesRequest);
+      if (entitiesMap != null) {
+        entitiesTag = entitiesMap.get(".Entities");
+        if (entitiesTag.isList()) {
+          for (SpecificTag tag : (ListTag) entitiesTag) {
+            if (tag.isCompoundTag())
+              chunkData.addEntity((CompoundTag) tag);
+          }
         }
       }
     }
