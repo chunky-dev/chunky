@@ -962,6 +962,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("mangrove_planks", Texture.mangrovePlanks);
     addBlock("mangrove_pressure_plate", (name, tag) -> new PressurePlate(name, Texture.mangrovePlanks));
     addBlock("mangrove_sign", (name, tag) -> sign(tag, "mangrove"));
+    addBlock("mangrove_wall_sign", (name, tag) -> wallSign(tag, "mangrove"));
     addBlock("mangrove_slab", (name, tag) -> slab(tag, Texture.mangrovePlanks));
     addBlock("mangrove_stairs", (name, tag) -> stairs(tag, Texture.mangrovePlanks));
     addBlock("mangrove_trapdoor", (name, tag) -> trapdoor(tag, Texture.mangroveTrapdoor));
