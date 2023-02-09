@@ -27,6 +27,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TitledPane;
@@ -34,6 +35,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
+import se.llbit.chunky.renderer.scene.FogMode;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SimulatedSky;
 import se.llbit.chunky.renderer.scene.Sky;
@@ -41,6 +43,7 @@ import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.elements.GradientEditor;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.render.RenderControlsTab;
+import se.llbit.chunky.ui.render.settings.UniformFogSettings;
 import se.llbit.chunky.ui.render.settings.SkyboxSettings;
 import se.llbit.chunky.ui.render.settings.SkymapSettings;
 import se.llbit.fx.LuxColorPicker;
@@ -64,9 +67,9 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   @FXML private DoubleAdjuster cloudX;
   @FXML private DoubleAdjuster cloudY;
   @FXML private DoubleAdjuster cloudZ;
-  @FXML private DoubleAdjuster fogDensity;
-  @FXML private DoubleAdjuster skyFogDensity;
-  @FXML private LuxColorPicker fogColor;
+  @FXML private ComboBox<FogMode> fogMode;
+  @FXML private TitledPane fogDetailsPane;
+  @FXML private VBox fogDetailsBox;
   private final VBox simulatedSettings = new VBox();
   private DoubleAdjuster horizonOffset = new DoubleAdjuster();
   private ChoiceBox<SimulatedSky> simulatedSky = new ChoiceBox<>();
@@ -75,8 +78,8 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   private final VBox colorEditor = new VBox(colorPicker);
   private final SkyboxSettings skyboxSettings = new SkyboxSettings();
   private final SkymapSettings skymapSettings = new SkymapSettings();
-  private ChangeListener<? super javafx.scene.paint.Color> fogColorListener =
-      (observable, oldValue, newValue) -> scene.setFogColor(ColorUtil.fromFx(newValue));
+  private final UniformFogSettings uniformFogSettings = new UniformFogSettings();
+
   private ChangeListener<? super javafx.scene.paint.Color> skyColorListener =
       (observable, oldValue, newValue) -> scene.sky().setColor(ColorUtil.fromFx(newValue));
   private EventHandler<ActionEvent> simSkyListener = event -> {
@@ -95,6 +98,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     scene = controller.getRenderController().getSceneManager().getScene();
     skyboxSettings.setRenderController(controller.getRenderController());
     skymapSettings.setRenderController(controller.getRenderController());
+    uniformFogSettings.setRenderController(controller.getRenderController());
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
@@ -147,18 +151,25 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     cloudZ.setRange(-256, 256);
     cloudZ.onValueChange(value -> scene.sky().setCloudZOffset(value));
 
-    fogDensity.setTooltip("Fog thickness. Set to 0 to disable volumetric fog effect.");
-    fogDensity.setRange(0, 1);
-    fogDensity.setMaximumFractionDigits(6);
-    fogDensity.makeLogarithmic();
-    fogDensity.clampMin();
-    fogDensity.onValueChange(value -> scene.setFogDensity(value));
-
-    skyFogDensity.setTooltip(
-        "How much the fog color is blended over the sky/skymap. No effect when fog is disabled.");
-    skyFogDensity.setRange(0, 1);
-    skyFogDensity.clampMin();
-    skyFogDensity.onValueChange(value -> scene.setSkyFogDensity(value));
+    fogMode.getItems().addAll(FogMode.values());
+    fogMode.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+      scene.setFogMode(newValue);
+      switch (newValue) {
+        case NONE: {
+          fogDetailsBox.getChildren().setAll(new Label("Selected mode has no settings."));
+          break;
+        }
+        case UNIFORM: {
+          fogDetailsBox.getChildren().setAll(uniformFogSettings);
+          break;
+        }
+        case LAYERED: {
+          fogDetailsBox.getChildren().setAll(new Label("Selected mode does not yet have a GUI."));
+          break;
+        }
+      }
+      fogDetailsPane.setExpanded(true);
+    });
 
     skyMode.setTooltip(new Tooltip("Set the type of sky to be used in the scene."));
     skyMode.getItems().addAll(Sky.SkyMode.values());
@@ -193,9 +204,8 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
               skyModeSettings.getChildren().setAll(new Label("" + newValue));
               break;
           }
+          detailsPane.setExpanded(true);
         });
-    skyMode.getSelectionModel().selectedItemProperty()
-        .addListener((observable, oldValue, newValue) -> detailsPane.setExpanded(true));
     transparentSkyEnabled
         .setTooltip(new Tooltip("Disables sky rendering for background compositing."));
     transparentSkyEnabled.selectedProperty().addListener(
@@ -205,8 +215,6 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
 
       scene.sky().setCloudsEnabled(newValue);
     });
-    fogColor.colorProperty().addListener(fogColorListener);
-
     colorPicker.colorProperty().addListener(skyColorListener);
   }
 
@@ -221,11 +229,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     cloudX.set(scene.sky().cloudXOffset());
     cloudY.set(scene.sky().cloudYOffset());
     cloudZ.set(scene.sky().cloudZOffset());
-    fogDensity.set(scene.fog.getUniformDensity());
-    skyFogDensity.set(scene.fog.getSkyFogDensity());
-    fogColor.colorProperty().removeListener(fogColorListener);
-    fogColor.setColor(ColorUtil.toFx(scene.fog.getFogColor()));
-    fogColor.colorProperty().addListener(fogColorListener);
+    fogMode.getSelectionModel().select(scene.fog.getFogMode());
     horizonOffset.set(scene.sky().getHorizonOffset());
     simulatedSky.setValue(scene.sky().getSimulatedSky());
     gradientEditor.setGradient(scene.sky().getGradient());
@@ -234,6 +238,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     colorPicker.colorProperty().addListener(skyColorListener);
     skyboxSettings.update(scene);
     skymapSettings.update(scene);
+    uniformFogSettings.update(scene);
   }
 
   @Override public String getTabTitle() {

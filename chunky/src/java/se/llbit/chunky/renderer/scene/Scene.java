@@ -3252,6 +3252,13 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
+  public void setFogMode(FogMode mode) {
+    if (fog.mode != mode) {
+      fog.mode = mode;
+      refresh();
+    }
+  }
+
   public PictureExportFormat getOutputMode() {
     return outputMode;
   }
