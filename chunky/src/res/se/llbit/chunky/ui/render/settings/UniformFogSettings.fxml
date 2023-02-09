@@ -14,5 +14,5 @@
     <Label text="Fog color:" />
     <LuxColorPicker fx:id="fogColor" />
   </HBox>
-  <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="350" text="Hint: Set fog density &gt; 0.1 for thick fog, and &lt; 0.1 for haze effect. Set fog density to 0.0 to disable fog." />
+  <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="350" text="Hint: Set fog density &gt; 0.1 for thick fog, and &lt; 0.1 for haze effect." />
 </fx:root>
