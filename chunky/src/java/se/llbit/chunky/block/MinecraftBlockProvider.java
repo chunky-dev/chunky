@@ -983,6 +983,24 @@ public class MinecraftBlockProvider implements BlockProvider {
       tag.get("Properties").get("west").stringValue("false").equals("true"),
       tag.get("Properties").get("up").stringValue("false").equals("true"),
       tag.get("Properties").get("down").stringValue("false").equals("true")));
+
+    //1.20
+    addBlock("cherry_button", (name, tag) -> button(tag, Texture.cherryPlanks));
+    addBlock("cherry_door", (name, tag) -> door(tag, Texture.cherryDoorTop, Texture.cherryDoorBottom));
+    addBlock("cherry_fence", (name, tag) -> fence(tag, Texture.cherryPlanks));
+    addBlock("cherry_fence_gate", (name, tag) -> fenceGate(tag, Texture.cherryPlanks));
+    addBlock("cherry_leaves", (name, tag) -> new Leaves(name, Texture.cherryLeaves));
+    addBlock("cherry_log", (name, tag) -> log(tag, Texture.cherryLog, Texture.cherryLogTop));
+    addBlock("stripped_cherry_log", (name, tag) ->  log(tag, Texture.strippedCherryLog, Texture.strippedCherryLogTop));
+    addBlock("cherry_planks", Texture.cherryPlanks);
+    addBlock("cherry_pressure_plate", (name, tag) -> new PressurePlate(name, Texture.cherryPlanks));
+    addBlock("cherry_sign", (name, tag) -> sign(tag, "cherry"));
+    addBlock("cherry_wall_sign", (name, tag) -> wallSign(tag, "cherry"));
+    addBlock("cherry_slab", (name, tag) -> slab(tag, Texture.cherryPlanks));
+    addBlock("cherry_stairs", (name, tag) -> stairs(tag, Texture.cherryPlanks));
+    addBlock("cherry_trapdoor", (name, tag) -> trapdoor(tag, Texture.cherryTrapdoor));
+    addBlock("cherry_wood", (name, tag) -> log(tag, Texture.cherryLog, Texture.cherryLog));
+    addBlock("stripped_cherry_wood", (name, tag) -> log(tag, Texture.strippedCherryLog, Texture.strippedCherryLog));
   }
 
   @Override

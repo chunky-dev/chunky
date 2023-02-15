@@ -1122,6 +1122,28 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/sculk_vein")
   public static final Texture sculkVein = new Texture();
 
+  //1.20
+  @TexturePath("assets/minecraft/textures/block/cherry_planks")
+  public static final Texture cherryPlanks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_door_top")
+  public static final Texture cherryDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_door_bottom")
+  public static final Texture cherryDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_leaves")
+  public static final Texture cherryLeaves = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_log")
+  public static final Texture cherryLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_log_top")
+  public static final Texture cherryLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_cherry_log")
+  public static final Texture strippedCherryLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_cherry_log_top")
+  public static final Texture strippedCherryLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/cherry")
+  public static final Texture cherrySignPost = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_trapdoor")
+  public static final Texture cherryTrapdoor = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 
