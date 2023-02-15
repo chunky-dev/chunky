@@ -985,6 +985,23 @@ public class MinecraftBlockProvider implements BlockProvider {
       tag.get("Properties").get("down").stringValue("false").equals("true")));
 
     //1.20
+    addBlock("bamboo_button", (name, tag) -> button(tag, Texture.bambooPlanks));
+    addBlock("bamboo_door", (name, tag) -> door(tag, Texture.bambooDoorTop, Texture.bambooDoorBottom));
+    addBlock("bamboo_fence", (name, tag) -> fence(tag, Texture.bambooPlanks));
+    addBlock("bamboo_fence_gate", (name, tag) -> fenceGate(tag, Texture.bambooPlanks));
+    addBlock("bamboo_block", (name, tag) -> log(tag, Texture.bambooBlock, Texture.bambooBlockTop));
+    addBlock("stripped_bamboo_block", (name, tag) ->  log(tag, Texture.strippedBambooBlock, Texture.strippedBambooBlockTop));
+    addBlock("bamboo_planks", Texture.bambooPlanks);
+    addBlock("bamboo_mosaic", Texture.bambooMosaic);
+    addBlock("bamboo_pressure_plate", (name, tag) -> new PressurePlate(name, Texture.bambooPlanks));
+    addBlock("bamboo_sign", (name, tag) -> sign(tag, "bamboo"));
+    addBlock("bamboo_wall_sign", (name, tag) -> wallSign(tag, "bamboo"));
+    addBlock("bamboo_slab", (name, tag) -> slab(tag, Texture.bambooPlanks));
+    addBlock("bamboo_stairs", (name, tag) -> stairs(tag, Texture.bambooPlanks));
+    addBlock("bamboo_mosaic_slab", (name, tag) -> slab(tag, Texture.bambooMosaic));
+    addBlock("bamboo_mosaic_stairs", (name, tag) -> stairs(tag, Texture.bambooMosaic));
+    addBlock("bamboo_trapdoor", (name, tag) -> trapdoor(tag, Texture.bambooTrapdoor));
+
     addBlock("cherry_button", (name, tag) -> button(tag, Texture.cherryPlanks));
     addBlock("cherry_door", (name, tag) -> door(tag, Texture.cherryDoorTop, Texture.cherryDoorBottom));
     addBlock("cherry_fence", (name, tag) -> fence(tag, Texture.cherryPlanks));

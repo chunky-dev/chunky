@@ -1123,6 +1123,27 @@ public class Texture {
   public static final Texture sculkVein = new Texture();
 
   //1.20
+  @TexturePath("assets/minecraft/textures/block/bamboo_planks")
+  public static final Texture bambooPlanks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_mosaic")
+  public static final Texture bambooMosaic = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_door_top")
+  public static final Texture bambooDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_door_bottom")
+  public static final Texture bambooDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_block")
+  public static final Texture bambooBlock = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_block_top")
+  public static final Texture bambooBlockTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_bamboo_block")
+  public static final Texture strippedBambooBlock = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_bamboo_block_top")
+  public static final Texture strippedBambooBlockTop = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/bamboo")
+  public static final Texture bambooSignPost = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_trapdoor")
+  public static final Texture bambooTrapdoor = new Texture();
+
   @TexturePath("assets/minecraft/textures/block/cherry_planks")
   public static final Texture cherryPlanks = new Texture();
   @TexturePath("assets/minecraft/textures/block/cherry_door_top")
