@@ -1018,6 +1018,11 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("cherry_trapdoor", (name, tag) -> trapdoor(tag, Texture.cherryTrapdoor));
     addBlock("cherry_wood", (name, tag) -> log(tag, Texture.cherryLog, Texture.cherryLog));
     addBlock("stripped_cherry_wood", (name, tag) -> log(tag, Texture.strippedCherryLog, Texture.strippedCherryLog));
+    addBlock("cherry_sapling", (name, tag) -> new SpriteBlock(name, Texture.cherrySapling));
+    addBlock("potted_cherry_sapling", (name, tag) -> new FlowerPot(name, Kind.CHERRY_SAPLING));
+    addBlock("torchflower", (name, tag) -> new SpriteBlock(name, Texture.torchflower));
+    addBlock("torchflower_crop", (name, tag) -> new TorchflowerCrop(BlockProvider.stringToInt(tag.get("Properties").get("age"), 2)));
+    addBlock("potted_torchflower", (name, tag) -> new FlowerPot(name, Kind.TORCHFLOWER));
   }
 
   @Override
@@ -2328,9 +2333,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "potted_warped_roots":
         return new FlowerPot(name, FlowerPotModel.Kind.WARPED_ROOTS);
       case "potted_azalea_bush":
-        return new FlowerPot(name, Kind.AZALEA_BUSH);
+        return new FlowerPot(name, FlowerPotModel.Kind.AZALEA_BUSH);
       case "potted_flowering_azalea_bush":
-        return new FlowerPot(name, Kind.FLOWERING_AZALEA_BUSH);
+        return new FlowerPot(name, FlowerPotModel.Kind.FLOWERING_AZALEA_BUSH);
       case "carrots":
         return new Carrots(BlockProvider.stringToInt(tag.get("Properties").get("age"), 7));
       case "potatoes":

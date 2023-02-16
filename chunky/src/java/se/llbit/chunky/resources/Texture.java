@@ -1164,6 +1164,17 @@ public class Texture {
   public static final Texture cherrySignPost = new Texture();
   @TexturePath("assets/minecraft/textures/block/cherry_trapdoor")
   public static final Texture cherryTrapdoor = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_sapling")
+  public static final Texture cherrySapling = new Texture();
+  @TexturePath("assets/minecraft/textures/block/torchflower")
+  public static final Texture torchflower = new Texture();
+  @TexturePath("assets/minecraft/textures/block/torchflower_crop_stage0")
+  public static final Texture torchflowerCropStage0 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/torchflower_crop_stage1")
+  public static final Texture torchflowerCropStage1 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/torchflower_crop_stage2")
+  public static final Texture torchflowerCropStage2 = new Texture();
+
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
