@@ -2,7 +2,6 @@ package se.llbit.chunky.block;
 
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.model.FlowerPotModel;
@@ -1006,7 +1005,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("cherry_door", (name, tag) -> door(tag, Texture.cherryDoorTop, Texture.cherryDoorBottom));
     addBlock("cherry_fence", (name, tag) -> fence(tag, Texture.cherryPlanks));
     addBlock("cherry_fence_gate", (name, tag) -> fenceGate(tag, Texture.cherryPlanks));
-    addBlock("cherry_leaves", (name, tag) -> new Leaves(name, Texture.cherryLeaves));
+    addBlock("cherry_leaves", (name, tag) -> new UntintedLeaves(name, Texture.cherryLeaves));
     addBlock("cherry_log", (name, tag) -> log(tag, Texture.cherryLog, Texture.cherryLogTop));
     addBlock("stripped_cherry_log", (name, tag) ->  log(tag, Texture.strippedCherryLog, Texture.strippedCherryLogTop));
     addBlock("cherry_planks", Texture.cherryPlanks);
@@ -2897,9 +2896,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "flowering_azalea":
         return new Azalea(name, Texture.floweringAzaleaTop, Texture.floweringAzaleaSide);
       case "azalea_leaves":
-        return new AzaleaLeaves(name, Texture.azaleaLeaves);
+        return new UntintedLeaves(name, Texture.azaleaLeaves);
       case "flowering_azalea_leaves":
-        return new AzaleaLeaves(name, Texture.floweringAzaleaLeaves);
+        return new UntintedLeaves(name, Texture.floweringAzaleaLeaves);
       case "moss_block":
         return new MinecraftBlock(name, Texture.mossBlock);
       case "moss_carpet":
