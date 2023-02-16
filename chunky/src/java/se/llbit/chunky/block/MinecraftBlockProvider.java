@@ -1019,11 +1019,12 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("stripped_cherry_wood", (name, tag) -> log(tag, Texture.strippedCherryLog, Texture.strippedCherryLog));
     addBlock("cherry_sapling", (name, tag) -> new SpriteBlock(name, Texture.cherrySapling));
     addBlock("potted_cherry_sapling", (name, tag) -> new FlowerPot(name, Kind.CHERRY_SAPLING));
+
     addBlock("torchflower", (name, tag) -> new SpriteBlock(name, Texture.torchflower));
     addBlock("torchflower_crop", (name, tag) -> new TorchflowerCrop(BlockProvider.stringToInt(tag.get("Properties").get("age"), 2)));
     addBlock("potted_torchflower", (name, tag) -> new FlowerPot(name, Kind.TORCHFLOWER));
-
     addBlock("suspicious_sand", (name, tag) -> suspiciousSand(tag));
+    addBlock("chiseled_bookshelf", (name, tag) -> new ChiseledBookshelf(tag.get("Properties").get("facing").stringValue("north")));
   }
 
   @Override
