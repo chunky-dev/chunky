@@ -1022,6 +1022,8 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("torchflower", (name, tag) -> new SpriteBlock(name, Texture.torchflower));
     addBlock("torchflower_crop", (name, tag) -> new TorchflowerCrop(BlockProvider.stringToInt(tag.get("Properties").get("age"), 2)));
     addBlock("potted_torchflower", (name, tag) -> new FlowerPot(name, Kind.TORCHFLOWER));
+
+    addBlock("suspicious_sand", (name, tag) -> suspiciousSand(tag));
   }
 
   @Override
@@ -3460,6 +3462,21 @@ public class MinecraftBlockProvider implements BlockProvider {
     Tag properties = tag.get("Properties");
     return new CakeWithCandle(BlockProvider.blockName(tag), candleTexture, candleTextureLit,
         properties.get("lit").stringValue("false").equals("true"));
+  }
+
+  private static Block suspiciousSand(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String dusted = properties.get("dusted").stringValue("0");
+    switch(dusted) {
+      case "1":
+        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage1);
+      case "2":
+        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage2);
+      case "3":
+        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage3);
+      default:
+        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage0);
+    }
   }
 
   private static Block nonSolid(Block block) {
