@@ -1181,6 +1181,14 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_top")
   public static final Texture chiseledBookshelfTop = new Texture();
 
+  @TexturePath("assets/minecraft/textures/block/suspicious_sand_0")
+  public static final Texture suspiciousSandStage0 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/suspicious_sand_1")
+  public static final Texture suspiciousSandStage1 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/suspicious_sand_2")
+  public static final Texture suspiciousSandStage2 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/suspicious_sand_3")
+  public static final Texture suspiciousSandStage3 = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
