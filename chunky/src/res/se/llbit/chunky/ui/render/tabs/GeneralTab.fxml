@@ -76,6 +76,7 @@
               <CheckBox fx:id="loadArmorStands" mnemonicParsing="false" text="Armor stands" />
               <CheckBox fx:id="loadBooks" mnemonicParsing="false" text="Books" />
               <CheckBox fx:id="loadPaintings" mnemonicParsing="false" text="Paintings" />
+              <CheckBox fx:id="loadBeaconBeams" mnemonicParsing="false" text="Beacon beams" />
               <CheckBox fx:id="loadOtherEntities" mnemonicParsing="false" text="Other" />
             </VBox>
           </TitledPane>

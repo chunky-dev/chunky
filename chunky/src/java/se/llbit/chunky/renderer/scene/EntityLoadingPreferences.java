@@ -19,6 +19,7 @@ public class EntityLoadingPreferences {
         loadingPreferences.put(ArmorStand.class, PersistentSettings.getLoadArmorStands());
         loadingPreferences.put(Book.class, PersistentSettings.getLoadBooks());
         loadingPreferences.put(PaintingEntity.class, PersistentSettings.getLoadPaintings());
+        loadingPreferences.put(BeaconBeam.class, PersistentSettings.getLoadBeaconBeams());
         loadOtherEntities = PersistentSettings.getLoadOtherEntities();
     }
 
