@@ -1176,10 +1176,23 @@ public class Texture {
   public static final Texture torchflowerCropStage2 = new Texture();
   @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_empty")
   public static final Texture chiseledBookshelfEmpty = new Texture();
+  @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_occupied")
+  public static final Texture chiseledBookshelfOccupied = new Texture();
   @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_side")
   public static final Texture chiseledBookshelfSide = new Texture();
   @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_top")
   public static final Texture chiseledBookshelfTop = new Texture();
+
+  public static final Texture[] chiseledBookshelfCombinations = new OverlaidTexture[64];
+  static {
+    for(int i = 0; i < chiseledBookshelfCombinations.length; i++) {
+      int j = i; // it complains if I don't do this
+      chiseledBookshelfCombinations[i] = new OverlaidTexture(Texture.chiseledBookshelfEmpty, Texture.chiseledBookshelfOccupied, (x, y) ->
+        ((j & 1) != 0 && x < 1f/3 && y < 1f/2) || ((j & 2) != 0 && x >= 1f/3 && x < 2f/3 && y < 1f/2) || ((j & 4) != 0 && x >= 2f/3 && y < 1f/2)
+        || ((j & 8) != 0 && x < 1f/3 && y >= 1f/2) || ((j & 16) != 0 && x >= 1f/3 && x < 2f/3 && y >= 1f/2) || ((j & 32) != 0 && x >= 2f/3 && y >= 1f/2)
+      );
+    }
+  }
 
   @TexturePath("assets/minecraft/textures/block/suspicious_sand_0")
   public static final Texture suspiciousSandStage0 = new Texture();
@@ -1298,7 +1311,7 @@ public class Texture {
    *
    * @return color
    */
-  public final float[] getColor(int x, int y) {
+  public float[] getColor(int x, int y) {
     if(usesAverageColor)
       return avgColorFlat;
     float[] result = new float[4];
@@ -1364,6 +1377,12 @@ public class Texture {
    */
   public float[] getAvgColorLinear() {
     return avgColorLinear;
+  }
+  /**
+   * @return The average flat color of this texture
+   */
+  public float[] getAvgColorFlat() {
+    return avgColorFlat;
   }
 
   public int getWidth() {
