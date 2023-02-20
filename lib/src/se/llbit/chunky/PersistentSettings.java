@@ -408,6 +408,15 @@ public final class PersistentSettings {
     save();
   }
 
+  public static boolean getLoadBeaconBeams() {
+    return settings.getBool("loadBeaconBeams", true);
+  }
+
+  public static void setLoadBeaconBeams(boolean value) {
+    settings.setBool("loadBeaconBeams", value);
+    save();
+  }
+
   public static boolean getLoadOtherEntities() {
     return settings.getBool("loadOtherEntities", true);
   }
