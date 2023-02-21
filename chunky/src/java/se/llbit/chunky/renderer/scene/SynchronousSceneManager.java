@@ -44,22 +44,24 @@ import java.util.function.Consumer;
  */
 public class SynchronousSceneManager implements SceneProvider, SceneManager {
   /**
-   * This stores all pending scene state changes. When the scene edit
-   * grace period has expired any changes to this scene state are not
-   * copied directly to the stored scene state.
+   * This stores all pending scene state changes. Until the scene edit
+   * grace period has expired any changes to this scene state are also
+   * applied to the stored scene state {@link #storedScene}. After that,
+   * a reset confirm dialog will be shown before applying any further
+   * non-transitory changes.
    *
-   * Multiple threads can try to read/write the mutable scene concurrently,
+   * <p>Multiple threads can try to read/write the mutable scene concurrently,
    * so multiple accesses are serialized by the intrinsic lock of the Scene
    * class.
    *
-   * NB: lock ordering for scene and storedScene is always scene->storedScene!
+   * <p><strong>NB: lock ordering for scene and storedScene is always scene->storedScene!
    */
   private final Scene scene;
 
   /**
    * Stores the current scene configuration. When the scene edit grace period has
    * expired a reset confirm dialog will be shown before applying any further
-   * non-transitory changes to the stored scene state.
+   * non-transitory changes from the pending scene state changes in {@link #scene}.
    */
   private final Scene storedScene;
 
@@ -352,7 +354,8 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   }
 
   /**
-   * Discard pending scene changes.
+   * Apply pending scene changes from {@link #scene} to {@link #storedScene}.
+   * <p>The changes will be loading with the scene reset {@link ResetReason#SCENE_LOADED}.
    */
   public void applySceneChanges() {
     // Lock order: scene -> storedScene.
@@ -368,7 +371,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   }
 
   /**
-   * Apply pending scene changes.
+   * Discard pending scene changes in {@link #scene} and revert the state to {@link #storedScene}.
    */
   public void discardSceneChanges() {
     // Lock order: scene -> storedScene.
