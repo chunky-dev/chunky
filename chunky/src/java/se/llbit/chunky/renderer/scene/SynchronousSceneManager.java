@@ -54,7 +54,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
    * so multiple accesses are serialized by the intrinsic lock of the Scene
    * class.
    *
-   * <p><strong>NB: lock ordering for scene and storedScene is always scene->storedScene!
+   * <p><strong>Important: lock ordering for scene and storedScene is always scene->storedScene!
    */
   private final Scene scene;
 
