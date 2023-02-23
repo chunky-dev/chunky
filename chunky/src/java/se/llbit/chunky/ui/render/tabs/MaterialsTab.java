@@ -95,7 +95,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     settings.setSpacing(10);
     settings.getChildren().addAll(
         new Label("Material Properties"),
-        emittance, apparentBrightness, perceptualSmoothness, ior, metalness,
+        emittance, apparentBrightness, specular, perceptualSmoothness, ior, metalness,
         new Label("(set to zero to disable)"));
     setPadding(new Insets(10));
     setSpacing(15);
