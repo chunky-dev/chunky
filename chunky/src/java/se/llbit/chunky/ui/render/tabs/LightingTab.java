@@ -52,6 +52,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster skyIntensity;
   @FXML private DoubleAdjuster apparentSkyBrightness;
   @FXML private DoubleAdjuster emitterIntensity;
+  @FXML private DoubleAdjuster apparentEmitterBrightness;
   @FXML private DoubleAdjuster sunIntensity;
   @FXML private CheckBox drawSun;
   @FXML private ComboBox<SunSamplingStrategy> sunSamplingStrategy;
@@ -109,6 +110,13 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     emitterIntensity.makeLogarithmic();
     emitterIntensity.clampMin();
     emitterIntensity.onValueChange(value -> scene.setEmitterIntensity(value));
+
+    apparentEmitterBrightness.setName("Apparent emitter brightness");
+    apparentEmitterBrightness.setTooltip("Modifies the apparent brightness of emitters.");
+    apparentEmitterBrightness.setRange(Scene.MIN_APPARENT_EMITTER_BRIGHTNESS, Scene.MAX_APPARENT_EMITTER_BRIGHTNESS);
+    apparentEmitterBrightness.makeLogarithmic();
+    apparentEmitterBrightness.clampMin();
+    apparentEmitterBrightness.onValueChange(value -> scene.setApparentEmitterBrightness(value));
 
     emitterSamplingStrategy.getItems().addAll(EmitterSamplingStrategy.values());
     emitterSamplingStrategy.getSelectionModel().selectedItemProperty()
@@ -194,6 +202,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     skyIntensity.set(scene.sky().getSkyLight());
     apparentSkyBrightness.set(scene.sky().getApparentSkyLight());
     emitterIntensity.set(scene.getEmitterIntensity());
+    apparentEmitterBrightness.set(scene.getApparentEmitterBrightness());
     sunIntensity.set(scene.sun().getIntensity());
     sunLuminosity.set(scene.sun().getLuminosity());
     apparentSunBrightness.set(scene.sun().getApparentBrightness());

@@ -131,6 +131,21 @@ public class Scene implements JsonSerializable, Refreshable {
   public static final double MAX_EMITTER_INTENSITY = 1000;
 
   /**
+   * Default apparent emitter brightness.
+   */
+  public static final double DEFAULT_APPARENT_EMITTER_BRIGHTNESS = 1;
+
+  /**
+   * Minimum apparent emitter brightness.
+   */
+  public static final double MIN_APPARENT_EMITTER_BRIGHTNESS = 0;
+
+  /**
+   * Maximum apparent emitter brightness.
+   */
+  public static final double MAX_APPARENT_EMITTER_BRIGHTNESS = 1000;
+
+  /**
    * Default exposure.
    */
   public static final double DEFAULT_EXPOSURE = 1.0;
@@ -195,6 +210,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean saveSnapshots = false;
   protected boolean emittersEnabled = DEFAULT_EMITTERS_ENABLED;
   protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
+  protected double apparentEmitterBrightness = DEFAULT_APPARENT_EMITTER_BRIGHTNESS;
   protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.NONE;
 
   protected SunSamplingStrategy sunSamplingStrategy = SunSamplingStrategy.FAST;
@@ -459,6 +475,7 @@ public class Scene implements JsonSerializable, Refreshable {
     sunSamplingStrategy = other.sunSamplingStrategy;
     emittersEnabled = other.emittersEnabled;
     emitterIntensity = other.emitterIntensity;
+    apparentEmitterBrightness = other.apparentEmitterBrightness;
     emitterSamplingStrategy = other.emitterSamplingStrategy;
     preventNormalEmitterWithSampling = other.preventNormalEmitterWithSampling;
     transparentSky = other.transparentSky;
@@ -1883,6 +1900,21 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
+   * @return The current apparent emitter brightness
+   */
+  public double getApparentEmitterBrightness() {
+    return apparentEmitterBrightness;
+  }
+
+  /**
+   * Set the apparent emitter brightness.
+   */
+  public void setApparentEmitterBrightness(double value) {
+    apparentEmitterBrightness = value;
+    refresh();
+  }
+
+  /**
    * Set the transparent sky option.
    */
   public void setTransparentSky(boolean value) {
@@ -2729,6 +2761,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("saveSnapshots", saveSnapshots);
     json.add("emittersEnabled", emittersEnabled);
     json.add("emitterIntensity", emitterIntensity);
+    json.add("apparentEmitterBrightness", apparentEmitterBrightness);
     json.add("sunSamplingStrategy", sunSamplingStrategy.getId());
     json.add("stillWater", stillWater);
     json.add("waterOpacity", waterOpacity);
@@ -3012,6 +3045,7 @@ public class Scene implements JsonSerializable, Refreshable {
     saveSnapshots = json.get("saveSnapshots").boolValue(saveSnapshots);
     emittersEnabled = json.get("emittersEnabled").boolValue(emittersEnabled);
     emitterIntensity = json.get("emitterIntensity").doubleValue(emitterIntensity);
+    apparentEmitterBrightness = json.get("apparentEmitterBrightness").doubleValue(apparentEmitterBrightness);
 
     if (json.get("sunSamplingStrategy").isUnknown()) {
       boolean sunSampling = json.get("sunEnabled").boolValue(false);
@@ -3317,6 +3351,16 @@ public class Scene implements JsonSerializable, Refreshable {
   public void setEmittance(String materialName, float value) {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("emittance", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the apparent brightness property for the given material.
+   */
+  public void setApparentBrightness(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("apparentBrightness", Json.of(value));
     materials.put(materialName, material);
     refresh(ResetReason.MATERIALS_CHANGED);
   }

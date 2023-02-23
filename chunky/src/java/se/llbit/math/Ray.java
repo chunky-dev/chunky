@@ -75,6 +75,11 @@ public class Ray {
   public Vector3 emittance = new Vector3();
 
   /**
+   * Apparent brightness of previously intersected surface.
+   */
+  public Vector3 apparentBrightness = new Vector3();
+
+  /**
    * Previous material.
    */
   private Material prevMaterial = Air.INSTANCE;
@@ -151,6 +156,7 @@ public class Ray {
     depth = 0;
     color.set(0, 0, 0, 0);
     emittance.set(0, 0, 0);
+    apparentBrightness.set(0, 0, 0);
     specular = true;
   }
 
@@ -168,6 +174,7 @@ public class Ray {
     geomN.set(other.geomN);
     color.set(0, 0, 0, 0);
     emittance.set(0, 0, 0);
+    apparentBrightness.set(0, 0, 0);
     specular = other.specular;
   }
 
