@@ -52,6 +52,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster skyIntensity;
   @FXML private DoubleAdjuster apparentSkyBrightness;
   @FXML private DoubleAdjuster emitterIntensity;
+  @FXML private DoubleAdjuster emitterLightIntensity;
   @FXML private DoubleAdjuster apparentEmitterBrightness;
   @FXML private DoubleAdjuster sunIntensity;
   @FXML private CheckBox drawSun;
@@ -105,11 +106,18 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
       (observable, oldValue, newValue) -> scene.setEmittersEnabled(newValue));
 
     emitterIntensity.setName("Emitter intensity");
-    emitterIntensity.setTooltip("Modifies the intensity of emitter light.");
+    emitterIntensity.setTooltip("Changes the brightness of emitters.");
     emitterIntensity.setRange(Scene.MIN_EMITTER_INTENSITY, Scene.MAX_EMITTER_INTENSITY);
     emitterIntensity.makeLogarithmic();
     emitterIntensity.clampMin();
     emitterIntensity.onValueChange(value -> scene.setEmitterIntensity(value));
+
+    emitterLightIntensity.setName("Emitter light intensity");
+    emitterLightIntensity.setTooltip("Modifies the intensity of emitter light.");
+    emitterLightIntensity.setRange(Scene.MIN_EMITTER_LIGHT_INTENSITY, Scene.MAX_EMITTER_LIGHT_INTENSITY);
+    emitterLightIntensity.makeLogarithmic();
+    emitterLightIntensity.clampMin();
+    emitterLightIntensity.onValueChange(value -> scene.setEmitterLightIntensity(value));
 
     apparentEmitterBrightness.setName("Apparent emitter brightness");
     apparentEmitterBrightness.setTooltip("Modifies the apparent brightness of emitters.");
@@ -202,6 +210,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     skyIntensity.set(scene.sky().getSkyLight());
     apparentSkyBrightness.set(scene.sky().getApparentSkyLight());
     emitterIntensity.set(scene.getEmitterIntensity());
+    emitterLightIntensity.set(scene.getEmitterLightIntensity());
     apparentEmitterBrightness.set(scene.getApparentEmitterBrightness());
     sunIntensity.set(scene.sun().getIntensity());
     sunLuminosity.set(scene.sun().getLuminosity());
