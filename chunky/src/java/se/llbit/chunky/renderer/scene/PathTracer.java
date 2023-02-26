@@ -160,8 +160,6 @@ public class PathTracer implements RayTracer {
         if (random.nextFloat() < pDiffuse) {
           // Diffuse reflection.
 
-          //firstReflection = false;
-
           if (!scene.kill(ray.depth + 1, random)) {
             Ray reflected = new Ray();
 
