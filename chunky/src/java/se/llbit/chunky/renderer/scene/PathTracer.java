@@ -160,6 +160,9 @@ public class PathTracer implements RayTracer {
         if (random.nextFloat() < pDiffuse) {
           // Diffuse reflection.
 
+          boolean wasFirstReflection = firstReflection;
+          firstReflection = false;
+
           if (!scene.kill(ray.depth + 1, random)) {
             Ray reflected = new Ray();
 
@@ -167,7 +170,7 @@ public class PathTracer implements RayTracer {
 
             if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance > Ray.EPSILON) {
 
-              if (firstReflection) {
+              if (wasFirstReflection) {
                 ray.apparentBrightness.x = ray.color.x * ray.color.x * currentMat.apparentBrightness * scene.apparentEmitterBrightness * scene.emitterIntensity;
                 ray.apparentBrightness.y = ray.color.y * ray.color.y * currentMat.apparentBrightness * scene.apparentEmitterBrightness * scene.emitterIntensity;
                 ray.apparentBrightness.z = ray.color.z * ray.color.z * currentMat.apparentBrightness * scene.apparentEmitterBrightness * scene.emitterIntensity;
