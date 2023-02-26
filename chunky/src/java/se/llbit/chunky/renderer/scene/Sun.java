@@ -414,16 +414,22 @@ public class Sun implements JsonSerializable {
     return enableTextureModification;
   }
 
+  /**
+   * @param value Sun radius in radians.
+   */
   public void setSunRadius(double value) {
-    radius = value * .03;
+    radius = value;
     radiusCos = FastMath.cos(radius);
     radiusSin = FastMath.sin(radius);
     initSun();
     scene.refresh();
   }
 
+  /**
+   * @return Sun radius in radians.
+   */
   public double getSunRadius() {
-    return radius / .03;
+    return radius;
   }
 
   /**

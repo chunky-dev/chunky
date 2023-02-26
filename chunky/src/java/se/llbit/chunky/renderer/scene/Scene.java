@@ -169,9 +169,6 @@ public class Scene implements JsonSerializable, Refreshable {
   protected final Vector3 waterColor =
       new Vector3(PersistentSettings.getWaterColorRed(), PersistentSettings.getWaterColorGreen(),
           PersistentSettings.getWaterColorBlue());
-  protected final Vector3 fogColor =
-      new Vector3(PersistentSettings.getFogColorRed(), PersistentSettings.getFogColorGreen(),
-          PersistentSettings.getFogColorBlue());
   public int sdfVersion = -1;
   public String name = "default_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
 
@@ -184,6 +181,11 @@ public class Scene implements JsonSerializable, Refreshable {
    * Canvas height.
    */
   public int height;
+
+  public int fullWidth = 0;
+  public int fullHeight = 0;
+  public int cropX = 0;
+  public int cropY = 0;
 
   public PostProcessingFilter postProcessingFilter = DEFAULT_POSTPROCESSING_FILTER;
   public PictureExportFormat outputMode = PictureExportFormats.PNG;
@@ -227,16 +229,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean waterPlaneChunkClip = true;
   protected WaterShader waterShading = new LegacyWaterShader();
 
-  /**
-   * Enables fast fog algorithm
-   */
-  protected boolean fastFog = true;
-
-  /** Fog thickness. */
-  protected double fogDensity = DEFAULT_FOG_DENSITY;
-
-  /** Controls how much the fog color is blended over the sky/skymap. */
-  protected double skyFogDensity = 1;
+  public final Fog fog = new Fog();
 
   protected boolean biomeColors = true;
   protected boolean biomeBlending = true;
@@ -477,7 +470,7 @@ public class Scene implements JsonSerializable, Refreshable {
     waterVisibility = other.waterVisibility;
     useCustomWaterColor = other.useCustomWaterColor;
     waterColor.set(other.waterColor);
-    fogColor.set(other.fogColor);
+    fog.set(other.fog);
     biomeColors = other.biomeColors;
     sunSamplingStrategy = other.sunSamplingStrategy;
     emittersEnabled = other.emittersEnabled;
@@ -486,9 +479,6 @@ public class Scene implements JsonSerializable, Refreshable {
     preventNormalEmitterWithSampling = other.preventNormalEmitterWithSampling;
     transmissivityCap = other.transmissivityCap;
     transparentSky = other.transparentSky;
-    fogDensity = other.fogDensity;
-    skyFogDensity = other.skyFogDensity;
-    fastFog = other.fastFog;
     yClipMin = other.yClipMin;
     yClipMax = other.yClipMax;
 
@@ -519,6 +509,11 @@ public class Scene implements JsonSerializable, Refreshable {
       alphaChannel = other.alphaChannel;
       samples = other.samples;
     }
+
+    fullWidth = other.fullWidth;
+    fullHeight = other.fullHeight;
+    cropX = other.cropX;
+    cropY = other.cropY;
 
     octreeImplementation = other.octreeImplementation;
     bvhImplementation = other.bvhImplementation;
@@ -1044,8 +1039,9 @@ public class Scene implements JsonSerializable, Refreshable {
                 // Before 1.12 paintings had id=Painting.
                 // After 1.12 paintings had id=minecraft:painting.
                 float yaw = tag.get("Rotation").get(0).floatValue();
-                entities.add(
-                        new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
+
+                Tag paintingVariant = NbtUtil.getTagFromNames(tag, "Motive", "variant");
+                entities.add(new PaintingEntity(new Vector3(x, y, z), paintingVariant.stringValue(), yaw));
               } else if (id.equals("minecraft:armor_stand") && entityLoadingPreferences.shouldLoadClass(ArmorStand.class)) {
                 actors.add(new ArmorStand(new Vector3(x, y, z), tag));
               }
@@ -2074,6 +2070,45 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
+  public synchronized void setCanvasCropSize(int canvasWidth, int canvasHeight, int fullWidth, int fullHeight, int cropX, int cropY) {
+    canvasWidth = Math.max(MIN_CANVAS_WIDTH, canvasWidth);
+    canvasHeight = Math.max(MIN_CANVAS_HEIGHT, canvasHeight);
+    if (fullWidth == 0 || fullHeight == 0) {
+      // Crop disabled
+      fullWidth = 0;
+      fullHeight = 0;
+      cropX = 0;
+      cropY = 0;
+    } else {
+      // Crop enabled
+      fullWidth = Math.max(canvasWidth(), fullWidth);
+      fullHeight = Math.max(canvasHeight(), fullHeight);
+      cropX = QuickMath.clamp(cropX, 0, fullWidth-canvasWidth());
+      cropY = QuickMath.clamp(cropY, 0, fullHeight-canvasHeight());
+    }
+    boolean changed = false;
+    if (fullWidth != this.fullWidth || fullHeight != this.fullHeight || cropX != this.cropX || cropY != this.cropY) {
+      changed = true;
+      this.fullWidth = fullWidth;
+      this.fullHeight = fullHeight;
+      this.cropX = cropX;
+      this.cropY = cropY;
+    }
+    if (canvasWidth != this.width || canvasHeight != this.height) {
+      changed = true;
+      this.width = canvasWidth;
+      this.height = canvasHeight;
+      initBuffers();
+    }
+    if (changed) {
+      refresh();
+    }
+  }
+
+  public boolean isCanvasCropped() {
+    return fullWidth != 0 && fullHeight != 0;
+  }
+
   /**
    * @return Canvas width
    */
@@ -2086,6 +2121,34 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public int canvasHeight() {
     return height;
+  }
+
+  public int getFullWidth() {
+    if (isCanvasCropped()) {
+      return fullWidth;
+    }
+    return width;
+  }
+
+  public int getFullHeight() {
+    if (isCanvasCropped()) {
+      return fullHeight;
+    }
+    return height;
+  }
+
+  public int getCropX() {
+    if (isCanvasCropped()) {
+      return cropX;
+    }
+    return 0;
+  }
+
+  public int getCropY() {
+    if (isCanvasCropped()) {
+      return cropY;
+    }
+    return 0;
   }
 
   /**
@@ -2641,12 +2704,8 @@ public class Scene implements JsonSerializable, Refreshable {
     refresh();
   }
 
-  public Vector3 getFogColor() {
-    return fogColor;
-  }
-
   public void setFogColor(Vector3 color) {
-    fogColor.set(color);
+    fog.getFogColor().set(color);
     refresh();
   }
 
@@ -2667,6 +2726,10 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("name", name);
     json.add("width", width);
     json.add("height", height);
+    json.add("fullWidth", fullWidth);
+    json.add("fullHeight", fullHeight);
+    json.add("cropX", cropX);
+    json.add("cropY", cropY);
     json.add("yClipMin", yClipMin);
     json.add("yClipMax", yClipMax);
     json.add("yMin", yMin);
@@ -2697,16 +2760,9 @@ public class Scene implements JsonSerializable, Refreshable {
       json.add("waterColor", colorObj);
     }
     waterShading.save(json);
-    JsonObject fogColorObj = new JsonObject();
-    fogColorObj.add("red", fogColor.x);
-    fogColorObj.add("green", fogColor.y);
-    fogColorObj.add("blue", fogColor.z);
-    json.add("fogColor", fogColorObj);
-    json.add("fastFog", fastFog);
+    json.add("fog", fog.toJson());
     json.add("biomeColorsEnabled", biomeColors);
     json.add("transparentSky", transparentSky);
-    json.add("fogDensity", fogDensity);
-    json.add("skyFogDensity", skyFogDensity);
     json.add("waterWorldEnabled", waterPlaneEnabled);
     json.add("waterWorldHeight", waterPlaneHeight);
     json.add("waterWorldHeightOffsetEnabled", waterPlaneOffsetEnabled);
@@ -2937,6 +2993,11 @@ public class Scene implements JsonSerializable, Refreshable {
       initBuffers();
     }
 
+    fullWidth = json.get("fullWidth").intValue(fullWidth);
+    fullHeight = json.get("fullHeight").intValue(fullHeight);
+    cropX = json.get("cropX").intValue(cropX);
+    cropY = json.get("cropY").intValue(cropY);
+
     yClipMin = json.get("yClipMin").asInt(yClipMin);
     yClipMax = json.get("yClipMax").asInt(yClipMax);
     yMin = json.get("yMin").asInt(Math.max(yClipMin, yMin));
@@ -3013,15 +3074,14 @@ public class Scene implements JsonSerializable, Refreshable {
       waterShading = new LegacyWaterShader();
     }
     waterShading.load(json);
-    JsonObject fogColorObj = json.get("fogColor").object();
-    fogColor.x = fogColorObj.get("red").doubleValue(fogColor.x);
-    fogColor.y = fogColorObj.get("green").doubleValue(fogColor.y);
-    fogColor.z = fogColorObj.get("blue").doubleValue(fogColor.z);
-    fastFog = json.get("fastFog").boolValue(fastFog);
     biomeColors = json.get("biomeColorsEnabled").boolValue(biomeColors);
     transparentSky = json.get("transparentSky").boolValue(transparentSky);
-    fogDensity = json.get("fogDensity").doubleValue(fogDensity);
-    skyFogDensity = json.get("skyFogDensity").doubleValue(skyFogDensity);
+    JsonValue fogObj = json.get("fog");
+    if (fogObj.isObject()) {
+      fog.importFromJson(fogObj.asObject(), this);
+    } else {
+      fog.importFromLegacy(json);
+    }
 
     if(!json.get("waterHeight").isUnknown()) {
       // fallback for older scene versions were waterPlane was enabled by using height = 0
@@ -3191,42 +3251,24 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public void setFogDensity(double newValue) {
-    if (newValue != fogDensity) {
-      this.fogDensity = newValue;
+    if (newValue != fog.uniformDensity) {
+      fog.uniformDensity = newValue;
       refresh();
     }
-  }
-
-  public double getFogDensity() {
-    return fogDensity;
   }
 
   public void setSkyFogDensity(double newValue) {
-    if (newValue != skyFogDensity) {
-      this.skyFogDensity = newValue;
+    if (newValue != fog.skyFogDensity) {
+      fog.skyFogDensity = newValue;
       refresh();
     }
   }
 
-  public double getSkyFogDensity() {
-    return skyFogDensity;
-  }
   public void setFastFog(boolean value) {
-    if (fastFog != value) {
-      fastFog = value;
+    if (fog.fastFog != value) {
+      fog.fastFog = value;
       refresh();
     }
-  }
-
-  public boolean fastFog() {
-    return fastFog;
-  }
-
-  /**
-   * @return {@code true} if volumetric fog is enabled
-   */
-  public boolean fogEnabled() {
-    return fogDensity > 0.0;
   }
 
   public PictureExportFormat getOutputMode() {
@@ -3336,27 +3378,6 @@ public class Scene implements JsonSerializable, Refreshable {
     material.set("metalness", Json.of(value));
     materials.put(materialName, material);
     refresh(ResetReason.MATERIALS_CHANGED);
-  }
-
-  /**
-   * Renders a fog effect over the sky near the horizon.
-   */
-  public void addSkyFog(Ray ray) {
-    if (fogEnabled()) {
-      // This does not take fog density into account because the sky is
-      // most consistently treated as being infinitely far away.
-      double fog;
-      if (ray.d.y > 0) {
-        fog = 1 - ray.d.y;
-        fog *= fog;
-      } else {
-        fog = 1;
-      }
-      fog *= skyFogDensity;
-      ray.color.x = (1 - fog) * ray.color.x + fog * fogColor.x;
-      ray.color.y = (1 - fog) * ray.color.y + fog * fogColor.y;
-      ray.color.z = (1 - fog) * ray.color.z + fog * fogColor.z;
-    }
   }
 
   public int getYClipMin() {

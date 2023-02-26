@@ -112,6 +112,10 @@ public class QuickMath {
     return value < min ? min : value > max ? max : value;
   }
 
+  public static int clamp(int value, int min, int max) {
+    return Math.max(Math.min(value, max), min);
+  }
+
   /**
    * Maximum of a and b.
    * <p>NB: not NaN-correct. Do not use if either a or b can be NaN.

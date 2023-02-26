@@ -36,9 +36,6 @@ import java.util.Random;
  */
 public class PathTracer implements RayTracer {
 
-  /** Extinction factor for fog rendering. */
-  private static final double EXTINCTION_FACTOR = 0.04;
-
   /**
    * Path trace the ray.
    */
@@ -77,13 +74,13 @@ public class PathTracer implements RayTracer {
           // Direct sky hit.
           if (!scene.transparentSky()) {
             scene.sky.getSkyColorInterpolated(ray);
-            scene.addSkyFog(ray);
+            addSkyFog(scene, ray, state, ox, od);
             hit = true;
           }
         } else if (ray.specular) {
           // Indirect sky hit - specular color.
           scene.sky.getSkyColor(ray, true);
-          scene.addSkyFog(ray);
+          addSkyFog(scene, ray, state, ox, od);
           hit = true;
         } else {
           // Indirect sky hit - diffuse color.
@@ -396,8 +393,7 @@ public class PathTracer implements RayTracer {
     // This is a simplistic fog model which gives greater artistic freedom but
     // less realism. The user can select fog color and density; in a more
     // realistic model color would depend on viewing angle and sun color/position.
-    if (airDistance > 0 && scene.fogEnabled()) {
-      Sun sun = scene.sun;
+    if (airDistance > 0 && scene.fog.fogEnabled()) {
 
       // Pick point between ray origin and intersected object.
       // The chosen point is used to test if the sun is lighting the
@@ -411,31 +407,14 @@ public class PathTracer implements RayTracer {
       // However, the results are probably close enough to not be distracting,
       // so this seems like a reasonable approximation.
       Ray atmos = new Ray();
-      double offset = QuickMath.clamp(airDistance * random.nextFloat(),
-          Ray.EPSILON, airDistance - Ray.EPSILON);
+      double offset = scene.fog.sampleGroundScatterOffset(ray, ox, random);
       atmos.o.scaleAdd(offset, od, ox);
-      sun.getRandomSunDirection(atmos, random);
+      scene.sun.getRandomSunDirection(atmos, random);
       atmos.setCurrentMaterial(Air.INSTANCE);
-
-      double fogDensity = scene.getFogDensity() * EXTINCTION_FACTOR;
-      double extinction = Math.exp(-airDistance * fogDensity);
-      ray.color.scale(extinction);
 
       // Check sun visibility at random point to determine inscatter brightness.
       getDirectLightAttenuation(scene, atmos, state);
-      Vector4 attenuation = state.attenuation;
-      if (attenuation.w > Ray.EPSILON) {
-        Vector3 fogColor = scene.getFogColor();
-        double inscatter;
-        if (scene.fastFog()) {
-          inscatter = (1 - extinction);
-        } else {
-          inscatter = airDistance * fogDensity * Math.exp(-offset * fogDensity);
-        }
-        ray.color.x += attenuation.x * attenuation.w * fogColor.x * inscatter;
-        ray.color.y += attenuation.y * attenuation.w * fogColor.y * inscatter;
-        ray.color.z += attenuation.z * attenuation.w * fogColor.z * inscatter;
-      }
+      scene.fog.addGroundFog(ray, ox, airDistance, state.attenuation, offset);
     }
 
     return hit;
@@ -447,56 +426,70 @@ public class PathTracer implements RayTracer {
     // Total amount of light we want to transmit (overall transparency of texture)
     double shouldTrans = 1 - opacity;
     // Amount of each color to transmit - default to overall transparency if RGB values add to 0 (e.g. regular glass)
-    double rTrans = shouldTrans, gTrans = shouldTrans, bTrans = shouldTrans;
+    Vector3 rgbTrans = new Vector3(shouldTrans, shouldTrans, shouldTrans);
     if(colorTrans > 0) {
       // Amount to transmit of each color is scaled so the total transmitted amount matches the texture's transparency
-      rTrans = ray.color.x * shouldTrans / colorTrans;
-      gTrans = ray.color.y * shouldTrans / colorTrans;
-      bTrans = ray.color.z * shouldTrans / colorTrans;
+      rgbTrans.set(ray.color.toVec3());
+      rgbTrans.scale(shouldTrans / colorTrans);
     }
-    // TODO: Make this controllable from 1 to 3 via a slider
     double transmissivityCap = scene.transmissivityCap;
     // Determine the color with the highest transmissivity
-    double maxTrans = Math.max(rTrans, Math.max(gTrans, bTrans));
+    double maxTrans = Math.max(rgbTrans.x, Math.max(rgbTrans.y, rgbTrans.z));
     if(maxTrans > transmissivityCap) {
-      if (maxTrans == rTrans) {
+      if (maxTrans == rgbTrans.x) {
         // Give excess transmission from red to green and blue
-        double gTransNew = reassignTransmissivity(rTrans, gTrans, bTrans, shouldTrans, transmissivityCap);
-        bTrans = reassignTransmissivity(rTrans, bTrans, gTrans, shouldTrans, transmissivityCap);
-        gTrans = gTransNew;
-        rTrans = transmissivityCap;
-      } else if (maxTrans == gTrans) {
+        double gTransNew = reassignTransmissivity(rgbTrans.x, rgbTrans.y, rgbTrans.z, shouldTrans, transmissivityCap);
+        rgbTrans.z = reassignTransmissivity(rgbTrans.x, rgbTrans.z, rgbTrans.y, shouldTrans, transmissivityCap);
+        rgbTrans.y = gTransNew;
+        rgbTrans.x = transmissivityCap;
+      } else if (maxTrans == rgbTrans.y) {
         // Give excess transmission from green to red and blue
-        double rTransNew = reassignTransmissivity(gTrans, rTrans, bTrans, shouldTrans, transmissivityCap);
-        bTrans = reassignTransmissivity(gTrans, bTrans, rTrans, shouldTrans, transmissivityCap);
-        rTrans = rTransNew;
-        gTrans = transmissivityCap;
-      } else if (maxTrans == bTrans) {
+        double rTransNew = reassignTransmissivity(rgbTrans.y, rgbTrans.x, rgbTrans.z, shouldTrans, transmissivityCap);
+        rgbTrans.z = reassignTransmissivity(rgbTrans.y, rgbTrans.z, rgbTrans.x, shouldTrans, transmissivityCap);
+        rgbTrans.x = rTransNew;
+        rgbTrans.y = transmissivityCap;
+      } else if (maxTrans == rgbTrans.z) {
         // Give excess transmission from blue to green and red
-        double gTransNew = reassignTransmissivity(bTrans, gTrans, rTrans, shouldTrans, transmissivityCap);
-        rTrans = reassignTransmissivity(bTrans, rTrans, gTrans, shouldTrans, transmissivityCap);
-        gTrans = gTransNew;
-        bTrans = transmissivityCap;
+        double gTransNew = reassignTransmissivity(rgbTrans.z, rgbTrans.y, rgbTrans.x, shouldTrans, transmissivityCap);
+        rgbTrans.x = reassignTransmissivity(rgbTrans.z, rgbTrans.x, rgbTrans.y, shouldTrans, transmissivityCap);
+        rgbTrans.y = gTransNew;
+        rgbTrans.z = transmissivityCap;
       }
     }
-    // Set transparent and opaque components of each color channel
-    ray.color.x = (1 - rTrans) * ray.color.x + rTrans;
-    ray.color.y = (1 - gTrans) * ray.color.y + gTrans;
-    ray.color.z = (1 - bTrans) * ray.color.z + bTrans;
-    // Use emittance from next ray
-    ray.emittance.x = ray.color.x * next.emittance.x;
-    ray.emittance.y = ray.color.y * next.emittance.y;
-    ray.emittance.z = ray.color.z * next.emittance.z;
+    // Don't need to check for energy gain if transmissivity cap is 1
+    if(transmissivityCap > 1) {
+      double currentEnergy = rgbTrans.x * next.color.x + rgbTrans.y * next.color.y + rgbTrans.z * next.color.z;
+      double nextEnergy = next.color.x + next.color.y + next.color.z;
+      double energyRatio = nextEnergy / currentEnergy;
+      // Normalize if there is net energy gain across all channels (more likely for higher transmissivityCap combined with high-saturation light source)
+      if(energyRatio < 1) {
+        rgbTrans.scale(energyRatio);
+      }
+    }
     // Scale color based on next ray
-    ray.color.x *= next.color.x;
-    ray.color.y *= next.color.y;
-    ray.color.z *= next.color.z;
+    ray.color.multiplyEntrywise(new Vector4(rgbTrans, 1), next.color);
+    // Use emittance from next ray
+    ray.emittance.multiplyEntrywise(rgbTrans, next.emittance);
   }
 
   private static double reassignTransmissivity(double from, double to, double other, double trans, double cap) {
     // Formula here derived algebraically from this system:
     // (cap - to_new)/(cap - other_new) = (from - to)/(from - other), (cap + to_new + other_new)/3 = trans
     return (cap*(other - 2*to + from) + (3*trans)*(to - from))/(other + to - 2*from);
+  }
+
+  private static void addSkyFog(Scene scene, Ray ray, WorkerState state, Vector3 ox, Vector3 od) {
+    if (scene.fog.mode == FogMode.UNIFORM) {
+      scene.fog.addSkyFog(ray, null);
+    } else if (scene.fog.mode == FogMode.LAYERED) {
+      Ray atmos = new Ray();
+      double offset = scene.fog.sampleSkyScatterOffset(scene, ray, state.random);
+      atmos.o.scaleAdd(offset, od, ox);
+      scene.sun.getRandomSunDirection(atmos, state.random);
+      atmos.setCurrentMaterial(Air.INSTANCE);
+      getDirectLightAttenuation(scene, atmos, state);
+      scene.fog.addSkyFog(ray, state.attenuation);
+    }
   }
 
   private static void sampleEmitterFace(Scene scene, Ray ray, Grid.EmitterPosition pos, int face, Vector4 result, double scaler, Random random) {
