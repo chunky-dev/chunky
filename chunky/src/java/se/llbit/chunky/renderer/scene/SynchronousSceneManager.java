@@ -139,10 +139,11 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   }
 
   public void saveSceneAs(String newName) throws InterruptedException {
-    synchronized (storedScene) {
-      synchronized (scene) {
-        storedScene.setName(newName);
+    // Lock order: scene -> storedScene.
+    synchronized (scene) {
+      synchronized (storedScene) {
         scene.setName(newName);
+        storedScene.setName(newName);
       }
     }
     saveScene(resolveSceneDirectory(newName));
