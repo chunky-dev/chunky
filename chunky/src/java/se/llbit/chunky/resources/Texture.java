@@ -1203,6 +1203,19 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/suspicious_sand_3")
   public static final Texture suspiciousSandStage3 = new Texture();
 
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/decorated_pot_base")
+  public static final Texture decoratedPotBase = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/decorated_pot_side")
+  public static final Texture decoratedPotSide = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/pottery_pattern_archer")
+  public static final Texture decoratedPotPatternArcher = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/pottery_pattern_arms_up")
+  public static final Texture decoratedPotPatternArmsUp = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/pottery_pattern_prize")
+  public static final Texture decoratedPotPatternPrize = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/pottery_pattern_skull")
+  public static final Texture decoratedPotPatternSkull = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 

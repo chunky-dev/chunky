@@ -10,6 +10,7 @@ import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
+import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
 
 public class MinecraftBlockProvider implements BlockProvider {
@@ -1032,6 +1033,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       tag.get("Properties").get("slot_3_occupied").stringValue("false").equals("true"),
       tag.get("Properties").get("slot_4_occupied").stringValue("false").equals("true"),
       tag.get("Properties").get("slot_5_occupied").stringValue("false").equals("true")));
+    addBlock("decorated_pot", (name, tag) -> decoratedPot(tag));
   }
 
   @Override
@@ -3485,6 +3487,23 @@ public class MinecraftBlockProvider implements BlockProvider {
       default:
         return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage0);
     }
+  }
+
+  private static Block decoratedPot(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String facing = BlockProvider.facing(tag);
+    boolean waterlogged = properties.get("waterlogged").stringValue("").equals("true");
+    String[] shards = new String[4];
+    ListTag shardTags = properties.get("blockEntity#shards").asList();
+    for(int i = 0; i < shardTags.size() && i < 4; i++) {
+      String shard = shardTags.get(i).stringValue();
+      if(!shard.equals("minecraft:brick")) shards[i] = shard;
+    }
+    return new DecoratedPot(
+      facing,
+      waterlogged,
+      shards
+    );
   }
 
   private static Block nonSolid(Block block) {
