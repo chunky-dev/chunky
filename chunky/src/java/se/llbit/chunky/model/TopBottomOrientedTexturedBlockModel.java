@@ -31,7 +31,7 @@ public class TopBottomOrientedTexturedBlockModel extends QuadModel {
     this(facing, FULL_BLOCK_QUADS, new Texture[]{north, south, west, east, top, bottom});
   }
 
-  private Quad[] rotateToFacing(String facing, Quad[] quads) {
+  public static Quad[] rotateToFacing(String facing, Quad[] quads) {
     switch (facing) {
       case "north":
         return quads;

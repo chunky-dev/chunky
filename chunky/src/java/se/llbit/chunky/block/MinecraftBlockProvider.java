@@ -1026,7 +1026,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("potted_torchflower", (name, tag) -> new FlowerPot(name, Kind.TORCHFLOWER));
     addBlock("suspicious_sand", (name, tag) -> suspiciousSand(tag));
     addBlock("chiseled_bookshelf", (name, tag) -> new ChiseledBookshelf(
-      tag.get("Properties").get("facing").stringValue("north"),
+      BlockProvider.facing(tag),
       tag.get("Properties").get("slot_0_occupied").stringValue("false").equals("true"),
       tag.get("Properties").get("slot_1_occupied").stringValue("false").equals("true"),
       tag.get("Properties").get("slot_2_occupied").stringValue("false").equals("true"),

@@ -2779,16 +2779,18 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("chunkList", chunkList);
 
     JsonArray entityArray = new JsonArray();
-    for (Entity entity : entities) {
-      entityArray.add(entity.toJson());
-    }
+    entities.stream()
+      .map(Entity::toJson)
+      .filter(Objects::nonNull)
+      .forEach(entityArray::add);
     if (!entityArray.isEmpty()) {
       json.add("entities", entityArray);
     }
     JsonArray actorArray = new JsonArray();
-    for (Entity entity : actors) {
-      actorArray.add(entity.toJson());
-    }
+    actors.stream()
+      .map(Entity::toJson)
+      .filter(Objects::nonNull)
+      .forEach(actorArray::add);
     if (!actorArray.isEmpty()) {
       json.add("actors", actorArray);
     }
