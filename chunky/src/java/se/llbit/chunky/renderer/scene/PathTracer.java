@@ -63,6 +63,7 @@ public class PathTracer implements RayTracer {
     Vector3 ox = new Vector3(ray.o);
     Vector3 od = new Vector3(ray.d);
     double airDistance = 0;
+    final int branchCount = 10;
 
     while (true) {
 
@@ -133,7 +134,7 @@ public class PathTracer implements RayTracer {
         // Branched path tracing on the first bounce
         // TODO: make sure "hit" does what it is supposed to
         if (!scene.kill(ray.depth + 1, random)) {
-          hit = doSpecularReflection(ray, firstReflection ? 5 : 1, doMetal, scene, state, random);
+          hit = doSpecularReflection(ray, firstReflection ? branchCount : 1, doMetal, scene, state, random);
         }
         firstReflection = false;
 
@@ -143,7 +144,7 @@ public class PathTracer implements RayTracer {
           // Diffuse reflection.
 
           if (!scene.kill(ray.depth + 1, random)) {
-            hit = doDiffuseReflection(ray, firstReflection ? 5 : 1, currentMat, addEmitted, scene, state, random);
+            hit = doDiffuseReflection(ray, firstReflection ? branchCount : 1, currentMat, addEmitted, scene, state, random);
           }
           firstReflection = false;
         } else if (n1 != n2) {
@@ -155,11 +156,11 @@ public class PathTracer implements RayTracer {
             float n1n2 = n1 / n2;
             double cosTheta = -ray.getNormal().dot(ray.d);
             double radicand = 1 - n1n2 * n1n2 * (1 - cosTheta * cosTheta);
-            hit = doRefraction(ray, firstReflection ? 5 : 1, n1n2, cosTheta, radicand, pDiffuse, doRefraction, scene, state, random);
+            hit = doRefraction(ray, firstReflection ? branchCount : 1, n1n2, cosTheta, radicand, pDiffuse, doRefraction, scene, state, random);
           }
         } else {
           if(!scene.kill(ray.depth + 1, random)) {
-            hit = doTransmission(ray, firstReflection ? 5 : 1, pDiffuse, scene, state);
+            hit = doTransmission(ray, firstReflection ? branchCount : 1, pDiffuse, scene, state);
           }
         }
       }
