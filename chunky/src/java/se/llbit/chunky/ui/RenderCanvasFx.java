@@ -247,6 +247,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
         double halfWidth = canvas.getWidth() / (2.0 * canvas.getHeight());
         target.set(-halfWidth + event.getX() * invHeight,
             -0.5 + event.getY() * invHeight);
+        contextMenu.setUserData(new Vector2(event.getX(), event.getY()));
         contextMenu.show(getScene().getWindow(), event.getScreenX(), event.getScreenY());
       }
     });
