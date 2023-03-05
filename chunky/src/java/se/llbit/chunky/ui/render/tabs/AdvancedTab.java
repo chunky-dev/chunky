@@ -61,6 +61,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private IntegerAdjuster renderThreads;
   @FXML private IntegerAdjuster cpuLoad;
   @FXML private IntegerAdjuster rayDepth;
+  @FXML private IntegerAdjuster branchCount;
   @FXML private Button mergeRenderDump;
   @FXML private CheckBox shutdown;
   @FXML private CheckBox fastFog;
@@ -101,6 +102,16 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     rayDepth.setRange(1, 25);
     rayDepth.clampMin();
     rayDepth.onValueChange(value -> scene.setRayDepth(value));
+
+    branchCount.setName("Branch count");
+    branchCount.setTooltip("Sets the number of rays cast after the first intersection.");
+    branchCount.setRange(Scene.MIN_BRANCH_COUNT, Scene.MAX_BRANCH_COUNT);
+    branchCount.clampMin();
+    branchCount.onValueChange(value -> {
+      scene.setBranchCount(value);
+      PersistentSettings.setBranchCountDefault(value);
+    });
+
     mergeRenderDump
             .setTooltip(new Tooltip("Merge an existing render dump with the current render."));
     mergeRenderDump.setOnAction(e -> {
@@ -284,6 +295,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     renderThreads.set(PersistentSettings.getNumThreads());
     cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());
+    branchCount.set(scene.getBranchCount());
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
     bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
     biomeStructureImplementation.getSelectionModel().select(scene.getBiomeStructureImplementation());

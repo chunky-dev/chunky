@@ -64,6 +64,7 @@ public final class PersistentSettings {
   public static final double DEFAULT_FOG_BLUE = 1;
 
   public static final int DEFAULT_RAY_DEPTH = 5;
+  public static final int DEFAULT_BRANCH_COUNT = 5;
   public static final int DEFAULT_SPP_TARGET = 1000;
 
   public static final int DEFAULT_DIMENSION = 0;
@@ -283,10 +284,6 @@ public final class PersistentSettings {
     save();
   }
 
-  public static int getSppTargetDefault() {
-    return settings.getInt("sppTargetDefault", DEFAULT_SPP_TARGET);
-  }
-
   /**
    * @return the default configured ray depth
    */
@@ -311,8 +308,21 @@ public final class PersistentSettings {
     return settings.containsKey(key);
   }
 
+  public static int getSppTargetDefault() {
+    return settings.getInt("sppTargetDefault", DEFAULT_SPP_TARGET);
+  }
+
   public static void setSppTargetDefault(int targetSPP) {
     settings.setInt("sppTargetDefault", targetSPP);
+    save();
+  }
+
+  public static int getBranchCountDefault() {
+    return settings.getInt("branchCountDefault", DEFAULT_BRANCH_COUNT);
+  }
+
+  public static void setBranchCountDefault(int targetSPP) {
+    settings.setInt("branchCountDefault", targetSPP);
     save();
   }
 
