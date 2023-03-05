@@ -479,7 +479,7 @@ public class Chunky {
 
   /**
    * Get the mutable list of context menu transformers in the main map view.
-   * The map X and Y coordinates are supplied as a `Vector2` in ContextMenu.getUserData()
+   * The map view X and Y coordinates are supplied as a `Vector2` in the context menu's `mapviewPosition` property.
    */
   @PluginApi
   public List<ContextMenuTransformer> getMapContextMenuTransformers() {
@@ -489,7 +489,7 @@ public class Chunky {
 
   /**
    * Get the mutable list of context menu transformers in the main render view.
-   * The canvas X and Y coordinates are supplied as a `Vector2` in ContextMenu.getUserData()
+   * The canvas X and Y coordinates are supplied as a `Vector2` in the context menu's `canvasPosition` property.
    */
   @PluginApi
   public List<ContextMenuTransformer> getRenderContextMenuTransformers() {
