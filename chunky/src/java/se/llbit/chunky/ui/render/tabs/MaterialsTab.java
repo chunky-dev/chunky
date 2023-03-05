@@ -50,7 +50,6 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
   private Scene scene;
 
   private final DoubleAdjuster emittance = new DoubleAdjuster();
-  private final DoubleAdjuster apparentBrightness = new DoubleAdjuster();
   private final DoubleAdjuster specular = new DoubleAdjuster();
   private final DoubleAdjuster ior = new DoubleAdjuster();
   private final DoubleAdjuster perceptualSmoothness = new DoubleAdjuster();
@@ -61,15 +60,9 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     emittance.setName("Emittance");
     emittance.setRange(0, 100);
     emittance.setTooltip("Intensity of the light emitted from the selected material.");
-    emittance.clampMin();
-    apparentBrightness.setName("Apparent Brightness");
-    apparentBrightness.setRange(0, 100);
-    apparentBrightness.setTooltip("Apparent brightness of the texture of the selected material.");
-    apparentBrightness.clampMin();
     specular.setName("Specular");
     specular.setRange(0, 1);
     specular.setTooltip("Reflectivity of the selected material.");
-    specular.clampBoth();
     ior.setName("IoR");
     ior.setRange(0, 5);
     ior.setTooltip("Index of Refraction of the selected material.");
@@ -79,7 +72,6 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     metalness.setName("Metalness");
     metalness.setRange(0, 1);
     metalness.setTooltip("Metalness (texture-tinted reflectivity) of the selected material.");
-    metalness.clampBoth();
     ObservableList<String> blockIds = FXCollections.observableArrayList();
     blockIds.addAll(MaterialStore.collections.keySet());
     blockIds.addAll(ExtraMaterials.idMap.keySet());
@@ -89,14 +81,14 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     );
     listView = new ListView<>(filteredList);
     listView.getSelectionModel().selectedItemProperty().addListener(
-        (observable, oldValue, materialName) -> updateSelectedMaterial(materialName)
+      (observable, oldValue, materialName) -> updateSelectedMaterial(materialName)
     );
     VBox settings = new VBox();
     settings.setSpacing(10);
     settings.getChildren().addAll(
-        new Label("Material Properties"),
-        emittance, apparentBrightness, specular, perceptualSmoothness, ior, metalness,
-        new Label("(set to zero to disable)"));
+      new Label("Material Properties"),
+      emittance, specular, perceptualSmoothness, ior, metalness,
+      new Label("(set to zero to disable)"));
     setPadding(new Insets(10));
     setSpacing(15);
     TextField filterField = new TextField();
@@ -121,7 +113,6 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     boolean materialExists = false;
     if (MaterialStore.collections.containsKey(materialName)) {
       double emAcc = 0;
-      double apparentBrightnessAcc = 0;
       double specAcc = 0;
       double iorAcc = 0;
       double perceptualSmoothnessAcc = 0;
@@ -129,14 +120,12 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       Collection<Block> blocks = MaterialStore.collections.get(materialName);
       for (Block block : blocks) {
         emAcc += block.emittance;
-        apparentBrightnessAcc += block.apparentBrightness;
         specAcc += block.specular;
         iorAcc += block.ior;
         perceptualSmoothnessAcc += block.getPerceptualSmoothness();
         metalnessAcc += block.metalness;
       }
       emittance.set(emAcc / blocks.size());
-      apparentBrightness.set(apparentBrightnessAcc / blocks.size());
       specular.set(specAcc / blocks.size());
       ior.set(iorAcc / blocks.size());
       perceptualSmoothness.set(perceptualSmoothnessAcc / blocks.size());
@@ -146,7 +135,6 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       Material material = ExtraMaterials.idMap.get(materialName);
       if (material != null) {
         emittance.set(material.emittance);
-        apparentBrightness.set(material.apparentBrightness);
         specular.set(material.specular);
         ior.set(material.ior);
         perceptualSmoothness.set(material.getPerceptualSmoothness());
@@ -157,7 +145,6 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       Block block = new MinecraftBlock(materialName.substring(10), Texture.air);
       scene.getPalette().applyMaterial(block);
       emittance.set(block.emittance);
-      apparentBrightness.set(block.apparentBrightness);
       specular.set(block.specular);
       ior.set(block.ior);
       perceptualSmoothness.set(block.getPerceptualSmoothness());
@@ -166,14 +153,12 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     }
     if (materialExists) {
       emittance.onValueChange(value -> scene.setEmittance(materialName, value.floatValue()));
-      apparentBrightness.onValueChange(value -> scene.setApparentBrightness(materialName, value.floatValue()));
       specular.onValueChange(value -> scene.setSpecular(materialName, value.floatValue()));
       ior.onValueChange(value -> scene.setIor(materialName, value.floatValue()));
       perceptualSmoothness.onValueChange(value -> scene.setPerceptualSmoothness(materialName, value.floatValue()));
       metalness.onValueChange(value -> scene.setMetalness(materialName, value.floatValue()));
     } else {
       emittance.onValueChange(value -> {});
-      apparentBrightness.onValueChange(value -> {});
       specular.onValueChange(value -> {});
       ior.onValueChange(value -> {});
       perceptualSmoothness.onValueChange(value -> {});

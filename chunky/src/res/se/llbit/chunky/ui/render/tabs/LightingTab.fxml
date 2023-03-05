@@ -21,8 +21,6 @@
     <Separator />
     <CheckBox fx:id="enableEmitters" mnemonicParsing="false" text="Enable emitters" />
     <DoubleAdjuster fx:id="emitterIntensity" maxWidth="1.7976931348623157E308" />
-    <DoubleAdjuster fx:id="emitterLightIntensity" maxWidth="1.7976931348623157E308" />
-    <DoubleAdjuster fx:id="apparentEmitterBrightness" maxWidth="1.7976931348623157E308" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Emitter Sampling Strategy:" />
       <ChoiceBox fx:id="emitterSamplingStrategy" />

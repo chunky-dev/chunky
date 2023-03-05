@@ -61,11 +61,6 @@ public abstract class Material {
   public float emittance = 0;
 
   /**
-   * The apparent brightness of the material.
-   */
-  public float apparentBrightness = 1;
-
-  /**
    * The (linear) roughness controlling how rough a shiny block appears. A value of 0 makes the
    * surface perfectly specular, a value of 1 makes it diffuse.
    */
@@ -108,7 +103,6 @@ public abstract class Material {
     solid = true;
     specular = 0;
     emittance = 0;
-    apparentBrightness = 1;
     roughness = 0;
     subSurfaceScattering = false;
   }
@@ -129,7 +123,6 @@ public abstract class Material {
     ior = json.get("ior").floatValue(ior);
     specular = json.get("specular").floatValue(specular);
     emittance = json.get("emittance").floatValue(emittance);
-    apparentBrightness = json.get("apparentBrightness").floatValue(apparentBrightness);
     roughness = json.get("roughness").floatValue(roughness);
     metalness = json.get("metalness").floatValue(metalness);
   }
