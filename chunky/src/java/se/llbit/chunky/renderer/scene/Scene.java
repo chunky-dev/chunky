@@ -1898,8 +1898,12 @@ public class Scene implements JsonSerializable, Refreshable {
   ) {
     boolean changedBuffers = canvasConfig.setSize(canvasWidth, canvasHeight);
     boolean cropChanged = canvasConfig.setCropSize(fullWidth, fullHeight, cropX, cropY);
-    if(changedBuffers) initBuffers();
-    if(changedBuffers || cropChanged) refresh();
+    if(changedBuffers) { 
+      initBuffers();
+    }
+    if(changedBuffers || cropChanged) {
+      refresh();
+    }
   }
 
   /**
