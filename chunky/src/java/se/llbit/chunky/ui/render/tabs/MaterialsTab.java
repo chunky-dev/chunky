@@ -81,14 +81,14 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     );
     listView = new ListView<>(filteredList);
     listView.getSelectionModel().selectedItemProperty().addListener(
-      (observable, oldValue, materialName) -> updateSelectedMaterial(materialName)
+        (observable, oldValue, materialName) -> updateSelectedMaterial(materialName)
     );
     VBox settings = new VBox();
     settings.setSpacing(10);
     settings.getChildren().addAll(
-      new Label("Material Properties"),
-      emittance, specular, perceptualSmoothness, ior, metalness,
-      new Label("(set to zero to disable)"));
+        new Label("Material Properties"),
+        emittance, specular, perceptualSmoothness, ior, metalness,
+        new Label("(set to zero to disable)"));
     setPadding(new Insets(10));
     setSpacing(15);
     TextField filterField = new TextField();
