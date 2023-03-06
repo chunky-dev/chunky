@@ -30,9 +30,9 @@ public class SceneManagerTest {
 	 */
 	@Test
 	public void testSceneNameSanitizing_1() {
-		assertEquals("ab_cd", AsynchronousSceneManager.sanitizedSceneName("ab/cd"));
-		assertEquals("x___cd", AsynchronousSceneManager.sanitizedSceneName("x<>|cd"));
-		assertEquals("______#42", AsynchronousSceneManager.sanitizedSceneName(":*?\\\"/#42"));
+		assertEquals("ab_cd", SceneUtils.sanitizedSceneName("ab/cd"));
+		assertEquals("x___cd", SceneUtils.sanitizedSceneName("x<>|cd"));
+		assertEquals("______#42", SceneUtils.sanitizedSceneName(":*?\\\"/#42"));
 	}
 
 	/**
@@ -40,8 +40,8 @@ public class SceneManagerTest {
 	 */
 	@Test
 	public void testSceneNameSanitizing_2() {
-		assertEquals("foo bar", AsynchronousSceneManager.sanitizedSceneName(" foo bar   "));
-		assertEquals("foo bar", AsynchronousSceneManager.sanitizedSceneName(" \nfoo bar\t "));
+		assertEquals("foo bar", SceneUtils.sanitizedSceneName(" foo bar   "));
+		assertEquals("foo bar", SceneUtils.sanitizedSceneName(" \nfoo bar\t "));
 	}
 
 	/**
@@ -49,9 +49,9 @@ public class SceneManagerTest {
 	 */
 	@Test
 	public void testSceneNameSanitizing_3() {
-		assertEquals("xyzabc", AsynchronousSceneManager.sanitizedSceneName("xyz\u007fabc"));
-		assertEquals("12", AsynchronousSceneManager.sanitizedSceneName("1\u009f2"));
-		assertEquals("AZ", AsynchronousSceneManager.sanitizedSceneName("A\u0000\u0001\u001fZ"));
+		assertEquals("xyzabc", SceneUtils.sanitizedSceneName("xyz\u007fabc"));
+		assertEquals("12", SceneUtils.sanitizedSceneName("1\u009f2"));
+		assertEquals("AZ", SceneUtils.sanitizedSceneName("A\u0000\u0001\u001fZ"));
 	}
 
 	/**
@@ -59,12 +59,12 @@ public class SceneManagerTest {
 	 */
 	@Test
 	public void testSceneNameSanitizing_4() {
-		assertEquals("Scene", AsynchronousSceneManager.sanitizedSceneName(""));
-		assertEquals("Scene", AsynchronousSceneManager.sanitizedSceneName("   "));
-		assertEquals("Scene", AsynchronousSceneManager.sanitizedSceneName("\t\n\b\r"));
-		assertEquals("Scene", AsynchronousSceneManager.sanitizedSceneName("\u0080"));
+		assertEquals("Scene", SceneUtils.sanitizedSceneName(""));
+		assertEquals("Scene", SceneUtils.sanitizedSceneName("   "));
+		assertEquals("Scene", SceneUtils.sanitizedSceneName("\t\n\b\r"));
+		assertEquals("Scene", SceneUtils.sanitizedSceneName("\u0080"));
 
 		// test that whitespace is stripped after removing control chars
-		assertEquals("Scene", AsynchronousSceneManager.sanitizedSceneName("\u0085 \u0085"));
+		assertEquals("Scene", SceneUtils.sanitizedSceneName("\u0085 \u0085"));
 	}
 }
