@@ -145,6 +145,9 @@ public class PathTracer implements RayTracer {
       }
       ray.color.set(cumulativeColor);
       ray.emittance.set(cumulativeEmittance);
+      ray.color.scale(1d/count);
+      // ray.emittance.scale(1d/count);
+      // don't need to scale emittance because it doesn't affect the first ray
 
       if (hit && prevMat.isWater()) {
         // Render water fog effect.
