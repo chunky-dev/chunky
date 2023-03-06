@@ -519,8 +519,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
         theView.z + (overlayPosition.y - getHeight() / 2f) / theView.scale
       );
 
-      contextMenu.getProperties().put("overlayPosition", overlayPosition);
-      contextMenu.getProperties().put("chunkPosition", chunkPosition);
+      contextMenu.getProperties().put("overlayPosition", overlayPosition); // plugin api
+      contextMenu.getProperties().put("chunkPosition", chunkPosition); // plugin api
       contextMenu.show(mapOverlay, event.getScreenX(), event.getScreenY());
     } else {
       if (contextMenu.isShowing()) {
