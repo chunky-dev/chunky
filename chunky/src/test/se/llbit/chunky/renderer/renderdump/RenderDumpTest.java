@@ -18,6 +18,7 @@ package se.llbit.chunky.renderer.renderdump;
 
 import org.junit.Before;
 import org.junit.Test;
+import se.llbit.chunky.renderer.scene.CanvasConfig;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.ProgressListener;
 import se.llbit.util.TaskTracker;
@@ -35,8 +36,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class RenderDumpTest {
-  protected static final int testWidth = Scene.MIN_CANVAS_WIDTH;
-  protected static final int testHeight = Scene.MIN_CANVAS_HEIGHT;
+  protected static final int testWidth = CanvasConfig.MIN_CANVAS_WIDTH;
+  protected static final int testHeight = CanvasConfig.MIN_CANVAS_HEIGHT;
   protected static final int testSPP = 100;
   protected static final long testRenderTime = 654321L;
 

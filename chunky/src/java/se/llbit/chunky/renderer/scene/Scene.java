@@ -88,12 +88,6 @@ public class Scene implements JsonSerializable, Refreshable {
 
   protected static final double fSubSurface = 0.3;
 
-  /** Minimum canvas width. */
-  public static final int MIN_CANVAS_WIDTH = 20;
-
-  /** Minimum canvas height. */
-  public static final int MIN_CANVAS_HEIGHT = 20;
-
   /**
    * Minimum exposure.
    */
@@ -153,20 +147,10 @@ public class Scene implements JsonSerializable, Refreshable {
   public int sdfVersion = -1;
   public String name = "default_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
 
-  /**
-   * Canvas width.
-   */
-  public int width;
-
-  /**
-   * Canvas height.
-   */
-  public int height;
-
-  public int fullWidth = 0;
-  public int fullHeight = 0;
-  public int cropX = 0;
-  public int cropY = 0;
+  public CanvasConfig canvasConfig = new CanvasConfig(
+    PersistentSettings.get3DCanvasWidth(),
+    PersistentSettings.get3DCanvasHeight()
+  );
 
   public PostProcessingFilter postProcessingFilter = DEFAULT_POSTPROCESSING_FILTER;
   public PictureExportFormat outputMode = PictureExportFormats.PNG;
@@ -330,8 +314,6 @@ public class Scene implements JsonSerializable, Refreshable {
    * fromJson(), or importFromJson(), or by calling initBuffers().
    */
   public Scene() {
-    width = PersistentSettings.get3DCanvasWidth();
-    height = PersistentSettings.get3DCanvasHeight();
     sppTarget = PersistentSettings.getSppTargetDefault();
 
     palette = new BlockPalette();
@@ -370,10 +352,10 @@ public class Scene implements JsonSerializable, Refreshable {
    * scene and after scene canvas size changes.
    */
   public synchronized void initBuffers() {
-    frontBuffer = new BitmapImage(width, height);
-    backBuffer = new BitmapImage(width, height);
-    alphaChannel = new byte[width * height];
-    samples = new double[width * height * 3];
+    frontBuffer = new BitmapImage(canvasConfig.width, canvasConfig.height);
+    backBuffer = new BitmapImage(canvasConfig.width, canvasConfig.height);
+    alphaChannel = new byte[canvasConfig.getPixelCount()];
+    samples = new double[canvasConfig.getPixelCount() * 3];
   }
 
   /**
@@ -453,19 +435,13 @@ public class Scene implements JsonSerializable, Refreshable {
 
     finalized = false;
 
+    canvasConfig.copyState(other.canvasConfig);
     if (samples != other.samples) {
-      width = other.width;
-      height = other.height;
       backBuffer = other.backBuffer;
       frontBuffer = other.frontBuffer;
       alphaChannel = other.alphaChannel;
       samples = other.samples;
     }
-
-    fullWidth = other.fullWidth;
-    fullHeight = other.fullHeight;
-    cropX = other.cropX;
-    cropY = other.cropY;
 
     octreeImplementation = other.octreeImplementation;
 
@@ -1909,95 +1885,21 @@ public class Scene implements JsonSerializable, Refreshable {
    * new canvas size is not identical to the current canvas size.
    */
   public synchronized void setCanvasSize(int canvasWidth, int canvasHeight) {
-    int newWidth = Math.max(MIN_CANVAS_WIDTH, canvasWidth);
-    int newHeight = Math.max(MIN_CANVAS_HEIGHT, canvasHeight);
-    if (newWidth != width || newHeight != height) {
-      width = newWidth;
-      height = newHeight;
+    if (canvasConfig.setSize(canvasWidth, canvasHeight)) {
       initBuffers();
       refresh();
     }
   }
 
-  public synchronized void setCanvasCropSize(int canvasWidth, int canvasHeight, int fullWidth, int fullHeight, int cropX, int cropY) {
-    canvasWidth = Math.max(MIN_CANVAS_WIDTH, canvasWidth);
-    canvasHeight = Math.max(MIN_CANVAS_HEIGHT, canvasHeight);
-    if (fullWidth == 0 || fullHeight == 0) {
-      // Crop disabled
-      fullWidth = 0;
-      fullHeight = 0;
-      cropX = 0;
-      cropY = 0;
-    } else {
-      // Crop enabled
-      fullWidth = Math.max(canvasWidth(), fullWidth);
-      fullHeight = Math.max(canvasHeight(), fullHeight);
-      cropX = QuickMath.clamp(cropX, 0, fullWidth-canvasWidth());
-      cropY = QuickMath.clamp(cropY, 0, fullHeight-canvasHeight());
-    }
-    boolean changed = false;
-    if (fullWidth != this.fullWidth || fullHeight != this.fullHeight || cropX != this.cropX || cropY != this.cropY) {
-      changed = true;
-      this.fullWidth = fullWidth;
-      this.fullHeight = fullHeight;
-      this.cropX = cropX;
-      this.cropY = cropY;
-    }
-    if (canvasWidth != this.width || canvasHeight != this.height) {
-      changed = true;
-      this.width = canvasWidth;
-      this.height = canvasHeight;
-      initBuffers();
-    }
-    if (changed) {
-      refresh();
-    }
-  }
-
-  public boolean isCanvasCropped() {
-    return fullWidth != 0 && fullHeight != 0;
-  }
-
-  /**
-   * @return Canvas width
-   */
-  public int canvasWidth() {
-    return width;
-  }
-
-  /**
-   * @return Canvas height
-   */
-  public int canvasHeight() {
-    return height;
-  }
-
-  public int getFullWidth() {
-    if (isCanvasCropped()) {
-      return fullWidth;
-    }
-    return width;
-  }
-
-  public int getFullHeight() {
-    if (isCanvasCropped()) {
-      return fullHeight;
-    }
-    return height;
-  }
-
-  public int getCropX() {
-    if (isCanvasCropped()) {
-      return cropX;
-    }
-    return 0;
-  }
-
-  public int getCropY() {
-    if (isCanvasCropped()) {
-      return cropY;
-    }
-    return 0;
+  public synchronized void setCanvasCropSize(
+    int canvasWidth, int canvasHeight,
+    int fullWidth, int fullHeight,
+    int cropX, int cropY
+  ) {
+    boolean changedBuffers = canvasConfig.setSize(canvasWidth, canvasHeight);
+    boolean cropChanged = canvasConfig.setCropSize(fullWidth, fullHeight, cropX, cropY);
+    if(changedBuffers) initBuffers();
+    if(changedBuffers || cropChanged) refresh();
   }
 
   /**
@@ -2063,15 +1965,15 @@ public class Scene implements JsonSerializable, Refreshable {
           AtomicInteger done = new AtomicInteger(0);
 
           Chunky.getCommonThreads().submit(() -> {
-            IntStream.range(0, width).parallel().forEach(x -> {
+            IntStream.range(0, canvasConfig.width).parallel().forEach(x -> {
               WorkerState state = new WorkerState();
               state.ray = new Ray();
 
-              for (int y = 0; y < height; y++) {
+              for (int y = 0; y < canvasConfig.height; y++) {
                 computeAlpha(x, y, state);
               }
 
-              task.update(width, done.incrementAndGet());
+              task.update(canvasConfig.width, done.incrementAndGet());
             });
           }).get();
 
@@ -2096,7 +1998,7 @@ public class Scene implements JsonSerializable, Refreshable {
       filter = PreviewFilter.INSTANCE;
     }
     filter.processFrame(
-      width, height,
+      canvasConfig.width, canvasConfig.height,
       samples, backBuffer,
       exposure,
       task
@@ -2283,8 +2185,8 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void computeAlpha(int x, int y, WorkerState state) {
     Ray ray = state.ray;
-    double halfWidth = width / (2.0 * height);
-    double invHeight = 1.0 / height;
+    double halfWidth = canvasConfig.width / (2.0 * canvasConfig.height);
+    double invHeight = 1.0 / canvasConfig.height;
 
     // Rotated grid supersampling.
     double[][] offsets = new double[][] {
@@ -2309,7 +2211,7 @@ public class Scene implements JsonSerializable, Refreshable {
       occlusion += PreviewRayTracer.skyOcclusion(this, state);
     }
 
-    alphaChannel[y * width + x] = (byte) (255 * occlusion * 0.25 + 0.5);
+    alphaChannel[y * canvasConfig.width + x] = (byte) (255 * occlusion * 0.25 + 0.5);
   }
 
   /**
@@ -2573,12 +2475,7 @@ public class Scene implements JsonSerializable, Refreshable {
     JsonObject json = new JsonObject();
     json.add("sdfVersion", SDF_VERSION);
     json.add("name", name);
-    json.add("width", width);
-    json.add("height", height);
-    json.add("fullWidth", fullWidth);
-    json.add("fullHeight", fullHeight);
-    json.add("cropX", cropX);
-    json.add("cropY", cropY);
+    canvasConfig.writeJsonData(json);
     json.add("yClipMin", yClipMin);
     json.add("yClipMax", yClipMax);
     json.add("yMin", yMin);
@@ -2807,18 +2704,9 @@ public class Scene implements JsonSerializable, Refreshable {
     // TODO: check if we actually need to reset the scene based on changed settings.
     refresh();
 
-    int newWidth = json.get("width").intValue(width);
-    int newHeight = json.get("height").intValue(height);
-    if (width != newWidth || height != newHeight || samples == null) {
-      width = newWidth;
-      height = newHeight;
+    if(canvasConfig.importJsonData(json) || samples == null) {
       initBuffers();
     }
-
-    fullWidth = json.get("fullWidth").intValue(fullWidth);
-    fullHeight = json.get("fullHeight").intValue(fullHeight);
-    cropX = json.get("cropX").intValue(cropX);
-    cropY = json.get("cropY").intValue(cropY);
 
     yClipMin = json.get("yClipMin").asInt(yClipMin);
     yClipMax = json.get("yClipMax").asInt(yClipMax);

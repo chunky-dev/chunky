@@ -173,18 +173,18 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     cameraCropX.valueProperty().removeListener(canvasCropListener);
     cameraCropY.valueProperty().removeListener(canvasCropListener);
 
-    cameraCropWidth.valueProperty().set(scene.width);
-    cameraCropHeight.valueProperty().set(scene.height);
-    cameraCropX.valueProperty().set(scene.cropX);
-    cameraCropY.valueProperty().set(scene.cropY);
+    cameraCropWidth.valueProperty().set(scene.canvasConfig.getWidth());
+    cameraCropHeight.valueProperty().set(scene.canvasConfig.getHeight());
+    cameraCropX.valueProperty().set(scene.canvasConfig.getSavedCropX());
+    cameraCropY.valueProperty().set(scene.canvasConfig.getSavedCropY());
 
     cameraCropWidth.valueProperty().addListener(canvasCropListener);
     cameraCropHeight.valueProperty().addListener(canvasCropListener);
     cameraCropX.valueProperty().addListener(canvasCropListener);
     cameraCropY.valueProperty().addListener(canvasCropListener);
 
-    renderRegions.setSelected(scene.isCanvasCropped());
-    canvasSizeInput.setSize(scene.getFullWidth(), scene.getFullHeight());
+    renderRegions.setSelected(scene.canvasConfig.isCanvasCropped());
+    canvasSizeInput.setSize(scene.canvasConfig.getCropWidth(), scene.canvasConfig.getCropHeight());
   }
 
   @Override public String getTabTitle() {
@@ -439,15 +439,15 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     applySize.setOnAction(e -> canvasSizeInput.applyChanges());
     makeDefaultSize.setTooltip(new Tooltip("Make the current canvas size the default."));
     makeDefaultSize.setOnAction(e -> PersistentSettings
-      .set3DCanvasSize(scene.canvasWidth(), scene.canvasHeight()));
+      .set3DCanvasSize(scene.canvasConfig.getWidth(), scene.canvasConfig.getHeight()));
 
     renderRegionsArea.visibleProperty().bind(renderRegions.selectedProperty());
     renderRegionsArea.managedProperty().bind(renderRegionsArea.visibleProperty());
     renderRegions.selectedProperty().addListener((observable, oldValue, newValue) -> {
       if (newValue) {
         if (cameraCropWidth.getValue() == 0 || cameraCropHeight.getValue() == 0) {
-          cameraCropWidth.valueProperty().set(scene.getFullWidth());
-          cameraCropHeight.valueProperty().set(scene.getFullHeight());
+          cameraCropWidth.valueProperty().set(scene.canvasConfig.getCropWidth());
+          cameraCropHeight.valueProperty().set(scene.canvasConfig.getCropHeight());
           cameraCropX.valueProperty().set(0);
           cameraCropY.valueProperty().set(0);
         }
@@ -473,16 +473,16 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     }
     if (renderRegions.isSelected()) {
       scene.setCanvasCropSize(cameraCropWidth.getValue(), cameraCropHeight.getValue(), width, height, cameraCropX.getValue(), cameraCropY.getValue());
-      if (cameraCropX.getValue() != scene.cropX) {
-        cameraCropX.valueProperty().set(scene.getCropX());
+      if (cameraCropX.getValue() != scene.canvasConfig.getSavedCropX()) {
+        cameraCropX.valueProperty().set(scene.canvasConfig.getCropX());
       }
-      if (cameraCropY.getValue() != scene.cropY) {
-        cameraCropY.valueProperty().set(scene.getCropY());
+      if (cameraCropY.getValue() != scene.canvasConfig.getSavedCropY()) {
+        cameraCropY.valueProperty().set(scene.canvasConfig.getCropY());
       }
     } else {
       scene.setCanvasCropSize(width, height, 0, 0, 0, 0);
     }
-    renderControls.getCanvas().setCanvasSize(scene.width, scene.height);
+    renderControls.getCanvas().setCanvasSize(scene.canvasConfig.getWidth(), scene.canvasConfig.getHeight());
   }
 
   private void updateCanvasCrop() {

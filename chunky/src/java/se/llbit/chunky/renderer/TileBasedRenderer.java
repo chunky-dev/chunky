@@ -87,10 +87,10 @@ public abstract class TileBasedRenderer implements Renderer {
   }
 
   private void initTiles(DefaultRenderManager manager) {
-    Scene bufferedScene = manager.bufferedScene;
-    int width = bufferedScene.width;
-    int height = bufferedScene.height;
+    Scene scene = manager.bufferedScene;
     int tileWidth = manager.context.tileWidth();
+    int width = scene.canvasConfig.getWidth();
+    int height = scene.canvasConfig.getHeight();
 
     if (prevWidth != width || prevHeight != height) {
       prevWidth = width;

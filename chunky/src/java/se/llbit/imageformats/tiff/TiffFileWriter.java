@@ -237,8 +237,8 @@ public class TiffFileWriter implements AutoCloseable {
   public void write32(Scene scene, TaskTracker.Task task) throws IOException {
     PixelPostProcessingFilter filter = requirePixelPostProcessingFilter(scene);
 
-    int width = scene.canvasWidth();
-    int height = scene.canvasHeight();
+    int width = scene.canvasConfig.getWidth();
+    int height = scene.canvasConfig.getHeight();
     writeHeader(width, height, 4);
 
     double[] sampleBuffer = scene.getSampleBuffer();
