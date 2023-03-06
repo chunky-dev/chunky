@@ -480,8 +480,8 @@ public class Chunky {
   /**
    * Get the mutable list of context menu transformers in the main map view. The following are supplied as context menu properties:
    * <ul>
-   *   <li> overlayPosition - The screen overlay coordinates. The origin is in the top left of the map view. The unit is in pixels. </li>
-   *   <li> chunkPosition - The chunk coordinates. The unit is in chunks. Multiply by 16 to get the block coordinates. </li>
+   *   <li> `overlayPosition`: Vector2 - The screen overlay coordinates. The origin is in the top left of the map view. The unit is in pixels. </li>
+   *   <li> `chunkPosition`: Vector2 - The chunk coordinates. The unit is in chunks. Multiply by 16 to get the block coordinates. </li>
    * </ul>
    */
   @PluginApi
@@ -493,7 +493,7 @@ public class Chunky {
   /**
    * Get the mutable list of context menu transformers in the main render view. The following are supplied as context menu properties:
    * <ul>
-   *   <li> canvasPosition - The canvas coordinates which correspond to the coordinates of the render buffer. The origin is in the top left corner. </li>
+   *   <li> `canvasPosition`: Vector2 - The canvas coordinates which correspond to the coordinates of the render buffer. The origin is in the top left corner. </li>
    * </ul>
    */
   @PluginApi
