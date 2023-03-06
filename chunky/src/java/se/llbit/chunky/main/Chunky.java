@@ -478,8 +478,11 @@ public class Chunky {
   }
 
   /**
-   * Get the mutable list of context menu transformers in the main map view.
-   * The map view X and Y coordinates are supplied as a `Vector2` in the context menu's `mapviewPosition` property.
+   * Get the mutable list of context menu transformers in the main map view. The following are supplied as context menu properties:
+   * <ul>
+   *   <li> overlayPosition - The screen overlay coordinates. The origin is in the top left of the map view. The unit is in pixels. </li>
+   *   <li> chunkPosition - The chunk coordinates. The unit is in chunks. Multiply by 16 to get the block coordinates. </li>
+   * </ul>
    */
   @PluginApi
   public List<ContextMenuTransformer> getMapContextMenuTransformers() {
@@ -488,8 +491,10 @@ public class Chunky {
 
 
   /**
-   * Get the mutable list of context menu transformers in the main render view.
-   * The canvas X and Y coordinates are supplied as a `Vector2` in the context menu's `canvasPosition` property.
+   * Get the mutable list of context menu transformers in the main render view. The following are supplied as context menu properties:
+   * <ul>
+   *   <li> canvasPosition - The canvas coordinates which correspond to the coordinates of the render buffer. The origin is in the top left corner. </li>
+   * </ul>
    */
   @PluginApi
   public List<ContextMenuTransformer> getRenderContextMenuTransformers() {

@@ -511,7 +511,16 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     if (event.getButton() == MouseButton.SECONDARY) {
       clickX = lastX;
       clickY = lastY;
-      contextMenu.getProperties().put("mapviewPosition", new Vector2(event.getX(), event.getY()));
+
+      ChunkView theView = mapView.getMapView();
+      Vector2 overlayPosition = new Vector2(event.getX(), event.getY());
+      Vector2 chunkPosition = new Vector2(
+        theView.x + (overlayPosition.x - getWidth() / 2f) / theView.scale,
+        theView.z + (overlayPosition.y - getHeight() / 2f) / theView.scale
+      );
+
+      contextMenu.getProperties().put("overlayPosition", overlayPosition);
+      contextMenu.getProperties().put("chunkPosition", chunkPosition);
       contextMenu.show(mapOverlay, event.getScreenX(), event.getScreenY());
     } else {
       if (contextMenu.isShowing()) {
