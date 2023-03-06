@@ -294,13 +294,16 @@ public class CommandLineOptions {
         arguments -> options.target = Math.max(1, Integer.parseInt(arguments.get(0))));
 
     registerOption("-threads", new Range(1),
-        arguments -> options.renderThreads = Math.max(1, Integer.parseInt(arguments.get(0))));
+        arguments -> options.changeRenderConfig(config ->
+          config.setRenderThreadCount(Math.max(1, Integer.parseInt(arguments.get(0))))));
 
     registerOption("-tile-width", new Range(1),
-        arguments -> options.tileWidth = Math.max(1, Integer.parseInt(arguments.get(0))));
+        arguments -> options.changeRenderConfig(config ->
+          config.setTileWidth(Math.max(1, Integer.parseInt(arguments.get(0))))));
 
     registerOption("-spp-per-pass", new Range(1),
-        arguments -> options.sppPerPass = Math.max(1, Integer.parseInt(arguments.get(0))));
+        arguments -> options.changeRenderConfig(config ->
+          config.setSppPerPass(Math.max(1, Integer.parseInt(arguments.get(0))))));
 
     registerOption("-version", new Range(0), arguments -> {
       mode = Mode.CLI_OPERATION;

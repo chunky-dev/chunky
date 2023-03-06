@@ -24,13 +24,12 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import se.llbit.chunky.renderer.RenderConstants;
+import se.llbit.chunky.renderer.RenderOptions;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.fxutil.WindowPosition;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.log.Log;
 
 /**
  * Utility class for managing global Chunky settings.
@@ -147,17 +146,24 @@ public final class PersistentSettings {
   /**
    * @return Default number of render threads
    */
-  public static int getNumThreads() {
-    return settings.getInt("numThreads", RenderConstants.NUM_RENDER_THREADS_DEFAULT);
+  public static int getRenderThreadCount() {
+    return settings.getInt("numThreads", RenderOptions.NUM_RENDER_THREADS_DEFAULT);
+  }
+
+  /**
+   * @return Default number of map loading threads
+   */
+  public static int getMapLoadingThreadCount() {
+    return getRenderThreadCount(); // TODO
   }
 
   /**
    * Set default number of render threads.
    */
-  public static void setNumRenderThreads(int numThreads) {
-    numThreads = Math.max(RenderConstants.NUM_RENDER_THREADS_MIN, numThreads);
-    numThreads = Math.min(RenderConstants.NUM_RENDER_THREADS_MAX, numThreads);
-    settings.setInt("numThreads", numThreads);
+  public static void setRenderThreadCount(int renderThreadCount) {
+    renderThreadCount = Math.max(RenderOptions.RENDER_THREADS_COUNT_MIN, renderThreadCount);
+    renderThreadCount = Math.min(RenderOptions.RENDER_THREAD_COUNT_MAX, renderThreadCount);
+    settings.setInt("numThreads", renderThreadCount);
     save();
   }
 
@@ -183,7 +189,7 @@ public final class PersistentSettings {
    * @return CPU load setting
    */
   public static int getCPULoad() {
-    return settings.getInt("cpuLoad", RenderConstants.CPU_LOAD_DEFAULT);
+    return settings.getInt("cpuLoad", RenderOptions.TARGET_CPU_LOAD_PERCENTAGE);
   }
 
   /**

@@ -64,11 +64,8 @@ public class RenderContext implements SceneIOProvider {
         return sceneDirectory;
     }
 
-    /**
-     * @return The preferred number of rendering threads.
-     */
-    public int numRenderThreads() {
-        return config.renderThreads;
+    public RenderOptions getRenderOptions() {
+      return config.getRenderOptions();
     }
 
     /**
@@ -83,19 +80,5 @@ public class RenderContext implements SceneIOProvider {
             sceneDirectory.mkdirs();
         }
         return new File(sceneDirectory, fileName);
-    }
-
-    /**
-     * @return The tile width.
-     */
-    public int tileWidth() {
-        return config.tileWidth;
-    }
-
-    /**
-     * @return The samples per pixel per pass
-     */
-    public int sppPerPass() {
-        return config.sppPerPass;
     }
 }

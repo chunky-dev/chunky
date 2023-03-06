@@ -17,12 +17,14 @@
 package se.llbit.chunky.main;
 
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.renderer.RenderConstants;
+import se.llbit.chunky.renderer.RenderOptions;
+import se.llbit.chunky.renderer.ModifiableRenderOptions;
 import se.llbit.chunky.renderer.scene.Scene;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Various options for Chunky, set via the configuration file and/or command-line flags.
@@ -37,12 +39,10 @@ public class ChunkyOptions {
   public String imageOutputFile = "";
 
   private List<File> resourcePacks = new ArrayList<>();
-  public int renderThreads = -1;
   public File worldDir = null;
   public int target = -1;
 
-  public int tileWidth = RenderConstants.TILE_WIDTH_DEFAULT;
-  public int sppPerPass = RenderConstants.SPP_PER_PASS_DEFAULT;
+  protected ModifiableRenderOptions renderOptions = new ModifiableRenderOptions();
 
   /** Ignore scene loading errors when starting a headless render. */
   public boolean force = false;
@@ -56,7 +56,7 @@ public class ChunkyOptions {
   public static ChunkyOptions getDefaults() {
     ChunkyOptions defaults = new ChunkyOptions();
     defaults.sceneDir = PersistentSettings.getSceneDirectory();
-    defaults.renderThreads = PersistentSettings.getNumThreads();
+    defaults.renderOptions.setRenderThreadCount(PersistentSettings.getRenderThreadCount());
     return defaults;
   }
 
@@ -65,9 +65,17 @@ public class ChunkyOptions {
     clone.sceneDir = sceneDir;
     clone.sceneName = sceneName;
     clone.resourcePacks = new ArrayList<>(resourcePacks);
-    clone.renderThreads = renderThreads;
+    clone.renderOptions.copyState(renderOptions);
     clone.worldDir = worldDir;
     return clone;
+  }
+
+  public RenderOptions getRenderOptions() {
+    return renderOptions;
+  }
+
+  public synchronized void changeRenderConfig(Consumer<ModifiableRenderOptions> callback) {
+    callback.accept(renderOptions);
   }
 
   public List<File> getResourcePacks() {

@@ -16,12 +16,23 @@
  */
 package se.llbit.chunky.renderer;
 
-public interface RenderConstants {
+/**
+ * The render options contain some values for tweaking the global render performance.
+ * <p><i>Which of these options a specific Renderer/RayTracer supports is not defined.
+ */
+public interface RenderOptions {
 
   /**
    * Default samples per pixel per pass
    */
   int SPP_PER_PASS_DEFAULT = 1;
+
+  int getSppPerPass();
+
+  /**
+   * Default CPU load
+   */
+  int TARGET_CPU_LOAD_PERCENTAGE = 100;
 
   /**
    * Default number of worker threads.
@@ -30,22 +41,24 @@ public interface RenderConstants {
   int NUM_RENDER_THREADS_DEFAULT = Runtime.getRuntime().availableProcessors();
 
   /**
-   * Default CPU load
-   */
-  int CPU_LOAD_DEFAULT = 100;
-
-  /**
    * Minimum number of worker threads
    */
-  int NUM_RENDER_THREADS_MIN = 1;
+  int RENDER_THREADS_COUNT_MIN = 1;
 
   /**
    * Maximum number of worker threads
    */
-  int NUM_RENDER_THREADS_MAX = 10000;
+  int RENDER_THREAD_COUNT_MAX = 10000;
+
+  /**
+   * -1 will use all available processors
+   */
+  int getRenderThreadCount();
 
   /**
    * Default tile width
    */
   int TILE_WIDTH_DEFAULT = 8;
+
+  int getTileWidth();
 }
