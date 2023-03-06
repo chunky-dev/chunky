@@ -25,6 +25,7 @@ import se.llbit.math.Ray;
 import java.util.ArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 /**
  * A tile based renderer. Simply call {@code submitTiles} to submit a frame's worth of tiles to the work queue.
@@ -57,6 +58,9 @@ public abstract class TileBasedRenderer implements Renderer {
     postRender = callback;
   }
 
+  protected Supplier<WorkerState> workerStateFactory = WorkerState::new;
+  protected Supplier<Ray> rayFactory = Ray::new;
+
   /**
    * Create and submit tiles to the rendering pool.
    * Await for these tiles to finish rendering with {@code manager.pool.awaitEmpty()}.
@@ -69,8 +73,8 @@ public abstract class TileBasedRenderer implements Renderer {
 
     cachedTiles.forEach(tile ->
         manager.pool.submit(worker -> {
-          WorkerState state = new WorkerState();
-          state.ray = new Ray();
+          WorkerState state = workerStateFactory.get();
+          state.ray = rayFactory.get();
           state.ray.setNormal(0, 0, -1);
           state.random = worker.random;
 
