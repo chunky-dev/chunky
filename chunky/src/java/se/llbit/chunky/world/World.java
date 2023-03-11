@@ -340,12 +340,16 @@ public class World implements Comparable<World> {
     return regionFile.exists();
   }
 
-  /**
-   * Get the data directory for the given dimension.
-   *
-   * @param dimension the dimension
-   * @return File object pointing to the data directory
-   */
+  public boolean regionExistsWithinRange(ChunkPosition pos, int minY, int maxY) {
+    return this.regionExists(pos);
+  }
+
+    /**
+     * Get the data directory for the given dimension.
+     *
+     * @param dimension the dimension
+     * @return File object pointing to the data directory
+     */
   protected synchronized File getDataDirectory(int dimension) {
     return dimension == 0 ?
         worldDirectory :

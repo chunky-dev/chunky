@@ -119,6 +119,7 @@ public class CubicWorld extends World {
     }
   }
 
+  @Override
   public boolean regionExistsWithinRange(ChunkPosition pos, int minY, int maxY) {
     int cubicRegionX = pos.x << 1;
     int cubicRegionZ = pos.z << 1;

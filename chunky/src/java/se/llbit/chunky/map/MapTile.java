@@ -70,7 +70,7 @@ public class MapTile {
         }
       }
     } else {
-      boolean isValid = mapLoader.getWorld().regionExists(pos);
+      boolean isValid = mapLoader.getWorld().regionExistsWithinRange(pos, view.yMin, view.yMax);
       Region region = mapLoader.getWorld().getRegionWithinRange(pos, view.yMin, view.yMax);
       int pixelOffset = 0;
       for (int z = 0; z < 32; ++z) {
