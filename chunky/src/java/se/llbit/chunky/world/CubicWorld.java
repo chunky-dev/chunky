@@ -119,13 +119,14 @@ public class CubicWorld extends World {
     }
   }
 
+  @Override
   public boolean regionExistsWithinRange(ChunkPosition pos, int minY, int maxY) {
     int cubicRegionX = pos.x << 1;
     int cubicRegionZ = pos.z << 1;
 
     File regionDirectory = getRegionDirectory();
     int minRegionY = cubeToCubicRegion(blockToCube(minY));
-    int maxRegionY = cubeToCubicRegion(blockToCube(maxY));
+    int maxRegionY = cubeToCubicRegion(blockToCube(maxY - 1));
     for (int y = minRegionY; y <= maxRegionY; y++) {
       for (int localX = 0; localX < ImposterCubicRegion.DIAMETER_IN_CUBIC_REGIONS; localX++) {
         for (int localZ = 0; localZ < ImposterCubicRegion.DIAMETER_IN_CUBIC_REGIONS; localZ++) {
