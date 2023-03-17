@@ -165,17 +165,20 @@ public class PathTracer implements RayTracer {
           if (!scene.kill(ray.depth + 1, random)) {
             Ray reflected = new Ray();
 
+            double apparentBrightness = 0;
+
             Vector4 indirectEmitterColor = new Vector4(0, 0, 0, 0);
 
-            double apparentBrightnessFactor = currentMat.apparentBrightness * scene.apparentEmitterBrightness;
-
             if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance > Ray.EPSILON) {
-              ray.emittance.x = ray.color.x * scene.emitterIntensity;
-              ray.emittance.y = ray.color.y * scene.emitterIntensity;
-              ray.emittance.z = ray.color.z * scene.emitterIntensity;
 
+              apparentBrightness = addEmitted * currentMat.apparentBrightness * scene.apparentEmitterBrightness * scene.emitterIntensity;
+              ray.emittance.x = ray.color.x * ray.color.x *
+                  currentMat.emittance * scene.emitterLightIntensity * scene.emitterIntensity;
+              ray.emittance.y = ray.color.y * ray.color.y *
+                  currentMat.emittance * scene.emitterLightIntensity * scene.emitterIntensity;
+              ray.emittance.z = ray.color.z * ray.color.z *
+                  currentMat.emittance * scene.emitterLightIntensity * scene.emitterIntensity;
               hit = true;
-
             } else if(scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
               // Sample emitter
               switch (scene.emitterSamplingStrategy) {
@@ -232,12 +235,12 @@ public class PathTracer implements RayTracer {
               reflected.diffuseReflection(ray, random);
               hit = pathTrace(scene, reflected, state, 0, false) || hit;
               if (hit) {
-                ray.color.x = (addEmitted * ray.emittance.x * apparentBrightnessFactor) + ray.color.x * (directLightR * scene.sun.emittance.x + (
-                    reflected.color.x + reflected.emittance.x + scene.emitterLightIntensity * reflected.emittance.x) + (indirectEmitterColor.x));
-                ray.color.y = (addEmitted * ray.emittance.y * apparentBrightnessFactor) + ray.color.y * (directLightG * scene.sun.emittance.y + (
-                    reflected.color.y + reflected.emittance.y + scene.emitterLightIntensity * reflected.emittance.y) + (indirectEmitterColor.y));
-                ray.color.z = (addEmitted * ray.emittance.z * apparentBrightnessFactor) + ray.color.z * (directLightB * scene.sun.emittance.z + (
-                    reflected.color.z + reflected.emittance.z + scene.emitterLightIntensity * reflected.emittance.z) + (indirectEmitterColor.z));
+                ray.color.x = ray.color.x * (apparentBrightness + directLightR * scene.sun.emittance.x + (
+                    reflected.color.x + reflected.emittance.x) + (indirectEmitterColor.x));
+                ray.color.y = ray.color.y * (apparentBrightness + directLightG * scene.sun.emittance.y + (
+                    reflected.color.y + reflected.emittance.y) + (indirectEmitterColor.y));
+                ray.color.z = ray.color.z * (apparentBrightness + directLightB * scene.sun.emittance.z + (
+                    reflected.color.z + reflected.emittance.z) + (indirectEmitterColor.z));
               } else if(indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
                 hit = true;
                 ray.color.x *= indirectEmitterColor.x;
@@ -251,11 +254,11 @@ public class PathTracer implements RayTracer {
               hit = pathTrace(scene, reflected, state, 0, false) || hit;
               if (hit) {
                 ray.color.x =
-                  (addEmitted * ray.emittance.x * apparentBrightnessFactor) + ray.color.x * ((reflected.color.x + reflected.emittance.x * scene.emitterLightIntensity * reflected.emittance.x) + (indirectEmitterColor.x));
+                    ray.color.x * (apparentBrightness + (reflected.color.x + reflected.emittance.x) + (indirectEmitterColor.x));
                 ray.color.y =
-                  (addEmitted * ray.emittance.y * apparentBrightnessFactor) + ray.color.y * ((reflected.color.y + reflected.emittance.y * scene.emitterLightIntensity * reflected.emittance.y) + (indirectEmitterColor.y));
+                    ray.color.y * (apparentBrightness + (reflected.color.y + reflected.emittance.y) + (indirectEmitterColor.y));
                 ray.color.z =
-                  (addEmitted * ray.emittance.z * apparentBrightnessFactor) + ray.color.z * ((reflected.color.z + reflected.emittance.z * scene.emitterLightIntensity * reflected.emittance.z) + (indirectEmitterColor.z));
+                    ray.color.z * (apparentBrightness + (reflected.color.z + reflected.emittance.z) + (indirectEmitterColor.z));
               } else if(indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
                 hit = true;
                 ray.color.x *= indirectEmitterColor.x;
