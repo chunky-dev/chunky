@@ -25,105 +25,65 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Tooltip;
 import javafx.util.StringConverter;
+import se.llbit.chunky.renderer.postprocessing.NoneFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.builder.UiBuilder;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
+import se.llbit.chunky.ui.render.AbstractRenderControlsTab;
 import se.llbit.chunky.ui.render.RenderControlsTab;
+import se.llbit.fxutil.ListSeparator;
 import se.llbit.util.ProgressListener;
 import se.llbit.util.TaskTracker;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+
 import se.llbit.util.TaskTracker.Task;
 
-public class PostprocessingTab extends ScrollPane implements RenderControlsTab, Initializable {
-  private Scene scene;
-  private RenderControlsFxController controller;
-
-  @FXML private DoubleAdjuster exposure;
-  @FXML private ChoiceBox<PostProcessingFilter> postprocessingFilter;
-
-  public PostprocessingTab() throws IOException {
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("PostprocessingTab.fxml"));
-    loader.setRoot(this);
-    loader.setController(this);
-    loader.load();
+public class PostprocessingTab extends AbstractRenderControlsTab {
+  public PostprocessingTab() {
+    super("Postprocessing");
   }
 
-  @Override public void setController(RenderControlsFxController controller) {
-    this.controller = controller;
-    scene = controller.getRenderController().getSceneManager().getScene();
+  @Override
+  public void build(UiBuilder builder) {
+    builder.doubleAdjuster()
+      .setName("Exposure")
+      .setTooltip("Linear exposure of the image.")
+      .setRange(Scene.MIN_EXPOSURE, Scene.MAX_EXPOSURE)
+      .set(scene.getExposure())
+      .setLogarithmic(true)
+      .setClamp(true, false)
+      .addCallback(value -> {
+        scene.setExposure(value);
+        scene.postProcessFrame(TaskTracker.NONE);
+        fxController.getCanvas().forceRepaint();
+      });
+
+    builder.<PostProcessingFilter>choiceBoxInput()
+      .setName("Postprocessing filter:")
+      .setTooltip("Set the postprocessing filter to be used on the image.")
+      .addItems(PostProcessingFilters.NONE)
+      .addItems(new PostprocessingSeparator())
+      .addItems(PostProcessingFilters.getFilters().stream().filter(f -> f != PostProcessingFilters.NONE).collect(Collectors.toList()))
+      .set(scene.getPostProcessingFilter())
+      .setStringConverter(PostProcessingFilter::getName)
+      .setTooltipConverter(PostProcessingFilter::getDescription)
+      .addCallback(value -> {
+        scene.setPostprocess(value);
+        scene.postProcessFrame(TaskTracker.NONE);
+        fxController.getCanvas().forceRepaint();
+      });
+
+    builder.text().setText("Postprocessing affects performance when Render Preview tab is visible. Switching to the Map tab mitigates this.");
   }
 
-  @Override public void update(Scene scene) {
-    postprocessingFilter.getSelectionModel().select(scene.getPostProcessingFilter());
-    exposure.set(scene.getExposure());
-  }
-
-  @Override public String getTabTitle() {
-    return "Postprocessing";
-  }
-
-  @Override public Node getTabContent() {
-    return this;
-  }
-
-  @Override public void initialize(URL location, ResourceBundle resources) {
-    postprocessingFilter.setTooltip(new Tooltip("Set the postprocessing filter to be used on the image."));
-    postprocessingFilter.getItems().add(PostProcessingFilters.NONE);
-    postprocessingFilter.getItems().add(new PostprocessingSeparator());
-    for (PostProcessingFilter filter : PostProcessingFilters.getFilters()) {
-      if (filter != PostProcessingFilters.NONE) {
-        postprocessingFilter.getItems().add(filter);
-      }
-    }
-    postprocessingFilter.getSelectionModel().select(Scene.DEFAULT_POSTPROCESSING_FILTER);
-    postprocessingFilter.getSelectionModel().selectedItemProperty().addListener(
-        (observable, oldValue, newValue) -> {
-          scene.setPostprocess(newValue);
-          scene.postProcessFrame(new TaskTracker(ProgressListener.NONE));
-          controller.getCanvas().forceRepaint();
-        });
-    postprocessingFilter.setConverter(new StringConverter<PostProcessingFilter>() {
-      @Override
-      public String toString(PostProcessingFilter object) {
-        return object == null ? null : object.getName();
-      }
-
-      @Override
-      public PostProcessingFilter fromString(String string) {
-        return PostProcessingFilters.getPostProcessingFilterFromName(string).orElse(Scene.DEFAULT_POSTPROCESSING_FILTER);
-      }
-    });
-    exposure.setName("Exposure");
-    exposure.setTooltip("Linear exposure of the image.");
-    exposure.setRange(Scene.MIN_EXPOSURE, Scene.MAX_EXPOSURE);
-    exposure.makeLogarithmic();
-    exposure.clampMin();
-    exposure.onValueChange(value -> {
-      scene.setExposure(value);
-      scene.postProcessFrame(new TaskTracker(ProgressListener.NONE));
-      controller.getCanvas().forceRepaint();
-    });
-  }
-
-  /**
-   * Fake post processing filter that is also a separator for the combobox.
-   */
-  private static class PostprocessingSeparator extends Separator implements PostProcessingFilter {
-
-    @Override
-    public void processFrame(int width, int height, double[] input, BitmapImage output,
-        double exposure, Task task) {
-    }
-
-    @Override
-    public String getName() {
-      return "";
-    }
+  private static class PostprocessingSeparator extends NoneFilter implements ListSeparator {
   }
 }

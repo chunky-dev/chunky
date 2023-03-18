@@ -129,6 +129,10 @@ public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
     valueSlider.valueProperty().bindBidirectional(sliderValue);
   }
 
+  public boolean isLogarithmic() {
+    return this.logarithmic;
+  }
+
   /**
    * When set to true the value is set to infinity when the slider is at the maximum position.
    */
@@ -147,5 +151,10 @@ public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
 
   public void clampMin() {
     clampMin = true;
+  }
+
+  public void setClamp(boolean min, boolean max) {
+    clampMin = min;
+    clampMax = max;
   }
 }
