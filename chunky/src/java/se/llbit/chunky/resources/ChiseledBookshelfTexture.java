@@ -23,20 +23,18 @@ public class ChiseledBookshelfTexture extends Texture {
     this.book6 = book6;
   }
   private boolean bookPresentAt(int x, int y) {
-    double u = (double)x/empty.image.width;
-    double v = (double)y/empty.image.height;
-    if(v < 0.5) {
-      if(u < 1./3) {
+    if(y * 2 < empty.image.height) {
+      if(x * 3 < empty.image.width) {
         return book1;
-      } else if(u < 2./3) {
+      } else if(x * 3 / 2 < empty.image.width) {
         return book2;
       } else {
         return book3;
       }
     } else {
-      if(u < 1./3) {
+      if(x * 3 < empty.image.width) {
         return book4;
-      } else if(u < 2./3) {
+      } else if(x * 3 / 2 < empty.image.width) {
         return book5;
       } else {
         return book6;
