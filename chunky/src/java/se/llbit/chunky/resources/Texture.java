@@ -1183,14 +1183,11 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_top")
   public static final Texture chiseledBookshelfTop = new Texture();
 
-  public static final Texture[] chiseledBookshelfCombinations = new OverlaidTexture[64];
+  public static final Texture[] chiseledBookshelfCombinations = new ChiseledBookshelfTexture[64];
   static {
     for(int i = 0; i < chiseledBookshelfCombinations.length; i++) {
-      int j = i; // it complains if I don't do this
-      chiseledBookshelfCombinations[i] = new OverlaidTexture(Texture.chiseledBookshelfEmpty, Texture.chiseledBookshelfOccupied, (x, y) ->
-        ((j & 1) != 0 && x < 1f/3 && y < 1f/2) || ((j & 2) != 0 && x >= 1f/3 && x < 2f/3 && y < 1f/2) || ((j & 4) != 0 && x >= 2f/3 && y < 1f/2)
-        || ((j & 8) != 0 && x < 1f/3 && y >= 1f/2) || ((j & 16) != 0 && x >= 1f/3 && x < 2f/3 && y >= 1f/2) || ((j & 32) != 0 && x >= 2f/3 && y >= 1f/2)
-      );
+      chiseledBookshelfCombinations[i] = new ChiseledBookshelfTexture(Texture.chiseledBookshelfEmpty, Texture.chiseledBookshelfOccupied,
+        i % 2 == 1, (i >> 1) % 2 == 1, (i >> 2) % 2 == 1, (i >> 3) % 2 == 1, (i >> 4) % 2 == 1, (i >> 5) % 2 == 1);
     }
   }
 
