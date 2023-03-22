@@ -105,21 +105,21 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     enableEmitters.selectedProperty().addListener(
       (observable, oldValue, newValue) -> scene.setEmittersEnabled(newValue));
 
-    emitterIntensity.setName("Emitter intensity");
+    emitterIntensity.setName("Emitter brightness");
     emitterIntensity.setTooltip("Changes the brightness of emitters.");
     emitterIntensity.setRange(Scene.MIN_EMITTER_INTENSITY, Scene.MAX_EMITTER_INTENSITY);
     emitterIntensity.makeLogarithmic();
     emitterIntensity.clampMin();
     emitterIntensity.onValueChange(value -> scene.setEmitterIntensity(value));
 
-    emitterLightIntensity.setName("Emitter light intensity");
-    emitterLightIntensity.setTooltip("Modifies the intensity of emitter light.");
+    emitterLightIntensity.setName("Emitter light intensity modifier");
+    emitterLightIntensity.setTooltip("Modifies the intensity of the light emitted by emitters.");
     emitterLightIntensity.setRange(Scene.MIN_EMITTER_LIGHT_INTENSITY, Scene.MAX_EMITTER_LIGHT_INTENSITY);
     emitterLightIntensity.makeLogarithmic();
     emitterLightIntensity.clampMin();
     emitterLightIntensity.onValueChange(value -> scene.setEmitterLightIntensity(value));
 
-    apparentEmitterBrightness.setName("Apparent emitter brightness");
+    apparentEmitterBrightness.setName("Apparent emitter brightness modifier");
     apparentEmitterBrightness.setTooltip("Modifies the apparent brightness of emitters.");
     apparentEmitterBrightness.setRange(Scene.MIN_APPARENT_EMITTER_BRIGHTNESS, Scene.MAX_APPARENT_EMITTER_BRIGHTNESS);
     apparentEmitterBrightness.makeLogarithmic();
