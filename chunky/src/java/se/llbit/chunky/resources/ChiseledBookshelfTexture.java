@@ -9,35 +9,35 @@ public class ChiseledBookshelfTexture extends Texture {
   // The texture when all six books are present
   private Texture full;
 
-  // book1 is top left, book3 is top right, book6 is bottom right
-  private boolean book1, book2, book3, book4, book5, book6;
+  // slot0 is top left, slot2 is top right, slot5 is bottom right
+  private boolean slot0, slot1, slot2, slot3, slot4, slot5;
 
-  public ChiseledBookshelfTexture(Texture empty, Texture full, boolean book1, boolean book2, boolean book3, boolean book4, boolean book5, boolean book6) {
+  public ChiseledBookshelfTexture(Texture empty, Texture full, boolean slot0, boolean slot1, boolean slot2, boolean slot3, boolean slot4, boolean slot5) {
     this.empty = empty;
     this.full = full;
-    this.book1 = book1;
-    this.book2 = book2;
-    this.book3 = book3;
-    this.book4 = book4;
-    this.book5 = book5;
-    this.book6 = book6;
+    this.slot0 = slot0;
+    this.slot1 = slot1;
+    this.slot2 = slot2;
+    this.slot3 = slot3;
+    this.slot4 = slot4;
+    this.slot5 = slot5;
   }
   private boolean bookPresentAt(int x, int y) {
     if(y * 2 < empty.image.height) {
       if(x * 3 < empty.image.width) {
-        return book1;
+        return slot0;
       } else if(x * 3 / 2 < empty.image.width) {
-        return book2;
+        return slot1;
       } else {
-        return book3;
+        return slot2;
       }
     } else {
       if(x * 3 < empty.image.width) {
-        return book4;
+        return slot3;
       } else if(x * 3 / 2 < empty.image.width) {
-        return book5;
+        return slot4;
       } else {
-        return book6;
+        return slot5;
       }
     }
   }
