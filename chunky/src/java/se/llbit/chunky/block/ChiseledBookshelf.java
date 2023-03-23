@@ -2,7 +2,7 @@ package se.llbit.chunky.block;
 
 import se.llbit.chunky.resources.Texture;
 
-public class ChiseledBookshelf extends TopBottomOrientedTexturedBlock {
+public class ChiseledBookshelf extends FixedTopBottomRotatableTexturedBlock {
 
   private final String description;
 
