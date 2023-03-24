@@ -92,34 +92,33 @@ public abstract class AABBModel implements BlockModel {
           }
         } else if (n.y < 0) { // bottom
           if (intersectFace(ray, scene, textures[i][5],
-            mapping != null ? mapping[i][4] : null)) {
+            mapping != null ? mapping[i][5] : null)) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[5] : Tint.NONE;
           }
-          ;
         } else if (n.z < 0) { // north
           if (intersectFace(ray, scene, textures[i][0],
-            mapping != null ? mapping[i][4] : null
+            mapping != null ? mapping[i][0] : null
           )) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[0] : Tint.NONE;
           }
         } else if (n.z > 0) { // south
           if (intersectFace(ray, scene, textures[i][2],
-            mapping != null ? mapping[i][4] : null
+            mapping != null ? mapping[i][2] : null
           )) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[2] : Tint.NONE;
           }
         } else if (n.x < 0) { // west
           if (intersectFace(ray, scene, textures[i][3],
-            mapping != null ? mapping[i][4] : null)) {
+            mapping != null ? mapping[i][3] : null)) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[3] : Tint.NONE;
           }
         } else if (n.x > 0) { // east
           if (intersectFace(ray, scene, textures[i][1],
-            mapping != null ? mapping[i][4] : null)) {
+            mapping != null ? mapping[i][1] : null)) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[1] : Tint.NONE;
           }
