@@ -218,6 +218,8 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         try (JsonParser parser = new JsonParser(new ByteArrayInputStream(text.getBytes()))) {
           JsonObject json = parser.parse().object();
           scene.importFromJson(json);
+          renderControls.getCanvas().setCanvasSize(scene.width, scene.height);
+          renderControls.refreshSettings();
         } catch (IOException e) {
           Log.warn("Failed to import scene settings.");
         } catch (JsonParser.SyntaxError syntaxError) {
