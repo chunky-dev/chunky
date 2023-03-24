@@ -96,7 +96,6 @@ public abstract class AABBModel implements BlockModel {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[5] : Tint.NONE;
           }
-          ;
         } else if (n.z < 0) { // north
           if (intersectFace(ray, scene, textures[i][0],
             mapping != null ? mapping[i][0] : null
