@@ -34,6 +34,7 @@
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Octree implementation:" />
       <ChoiceBox fx:id="octreeImplementation" prefWidth="150.0" />
+      <Button fx:id="octreeSwitchImplementation" text="Switch Current Scene" />
     </HBox>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="BVH build method:" />
