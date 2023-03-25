@@ -68,7 +68,10 @@ public abstract class TextureLoader {
   public boolean load(File file) throws IOException, TextureFormatError {
     try (FileInputStream in = new FileInputStream(file)) {
       return load(in);
+    } catch (NullPointerException e) {
+      // Safe to ignore - will be handled implicitly later.
     }
+    return false;
   }
 
   /**
@@ -85,7 +88,7 @@ public abstract class TextureLoader {
       }
     } catch (TextureFormatError e) {
       Log.info(e.getMessage());
-    } catch (IOException e) {
+    } catch (IOException | NullPointerException e) {
       // Safe to ignore - will be handled implicitly later.
     }
     return false;
