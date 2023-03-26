@@ -1204,14 +1204,46 @@ public class Texture {
   public static final Texture decoratedPotBase = new Texture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/decorated_pot_side")
   public static final Texture decoratedPotSide = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/decorated_pot/pottery_pattern_archer")
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/angler_pottery_pattern")
+  public static final Texture decoratedPotPatternAngler = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/archer_pottery_pattern")
   public static final Texture decoratedPotPatternArcher = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/decorated_pot/pottery_pattern_arms_up")
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/arms_up_pottery_pattern")
   public static final Texture decoratedPotPatternArmsUp = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/decorated_pot/pottery_pattern_prize")
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/blade_pottery_pattern")
+  public static final Texture decoratedPotPatternBlade = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/brewer_pottery_pattern")
+  public static final Texture decoratedPotPatternBrewer = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/burn_pottery_pattern")
+  public static final Texture decoratedPotPatternBurn = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/danger_pottery_pattern")
+  public static final Texture decoratedPotPatternDanger = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/explorer_pottery_pattern")
+  public static final Texture decoratedPotPatternExplorer = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/friend_pottery_pattern")
+  public static final Texture decoratedPotPatternFriend = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/heartbreak_pottery_pattern")
+  public static final Texture decoratedPotPatternHeartbreak = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/heart_pottery_pattern")
+  public static final Texture decoratedPotPatternHeart = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/howl_pottery_pattern")
+  public static final Texture decoratedPotPatternHowl = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/miner_pottery_pattern")
+  public static final Texture decoratedPotPatternMiner = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/mourner_pottery_pattern")
+  public static final Texture decoratedPotPatternMourner = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/plenty_pottery_pattern")
+  public static final Texture decoratedPotPatternPlenty = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/prize_pottery_pattern")
   public static final Texture decoratedPotPatternPrize = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/decorated_pot/pottery_pattern_skull")
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/sheaf_pottery_pattern")
+  public static final Texture decoratedPotPatternSheaf = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/shelter_pottery_pattern")
+  public static final Texture decoratedPotPatternShelter = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/skull_pottery_pattern")
   public static final Texture decoratedPotPatternSkull = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/snort_pottery_pattern")
+  public static final Texture decoratedPotPatternSnort = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

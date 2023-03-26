@@ -142,17 +142,51 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
   }
 
   private static Texture getTextureForShard(String shard) {
-    if(shard == null)
+    if(shard == null) {
       return Texture.decoratedPotSide;
+    }
+
     switch(shard) {
-      case "minecraft:pottery_shard_skull":
-        return Texture.decoratedPotPatternSkull;
-      case "minecraft:pottery_shard_prize":
-        return Texture.decoratedPotPatternPrize;
-      case "minecraft:pottery_shard_archer":
+      case "minecraft:angler_pottery_shard":
+        return Texture.decoratedPotPatternAngler;
+      case "minecraft:archer_pottery_shard":
         return Texture.decoratedPotPatternArcher;
-      case "minecraft:pottery_shard_arms_up":
+      case "minecraft:arms_up_pottery_shard":
         return Texture.decoratedPotPatternArmsUp;
+      case "minecraft:blade_pottery_shard":
+        return Texture.decoratedPotPatternBlade;
+      case "minecraft:brewer_pottery_shard":
+        return Texture.decoratedPotPatternBrewer;
+      case "minecraft:burn_pottery_shard":
+        return Texture.decoratedPotPatternBurn;
+      case "minecraft:danger_pottery_shard":
+        return Texture.decoratedPotPatternDanger;
+      case "minecraft:explorer_pottery_shard":
+        return Texture.decoratedPotPatternExplorer;
+      case "minecraft:friend_pottery_shard":
+        return Texture.decoratedPotPatternFriend;
+      case "minecraft:heartbreak_pottery_shard":
+        return Texture.decoratedPotPatternHeartbreak;
+      case "minecraft:heart_pottery_shard":
+        return Texture.decoratedPotPatternHeart;
+      case "minecraft:howl_pottery_shard":
+        return Texture.decoratedPotPatternHowl;
+      case "minecraft:miner_pottery_shard":
+        return Texture.decoratedPotPatternMiner;
+      case "minecraft:moutner_pottery_shard":
+        return Texture.decoratedPotPatternMourner;
+      case "minecraft:plenty_pottery_shard":
+        return Texture.decoratedPotPatternPlenty;
+      case "minecraft:prize_pottery_shard":
+        return Texture.decoratedPotPatternPrize;
+      case "minecraft:sheaf_pottery_shard":
+        return Texture.decoratedPotPatternSheaf;
+      case "minecraft:shelter_pottery_shard":
+        return Texture.decoratedPotPatternShelter;
+      case "minecraft:skull_pottery_shard":
+        return Texture.decoratedPotPatternSkull;
+      case "minecraft:snort_pottery_shard":
+        return Texture.decoratedPotPatternSnort;
       default:
         Log.warn("Unknown pottery shard: " + shard);
         return Texture.decoratedPotSide;
