@@ -1008,7 +1008,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("cherry_fence_gate", (name, tag) -> fenceGate(tag, Texture.cherryPlanks));
     addBlock("cherry_leaves", (name, tag) -> new UntintedLeaves(name, Texture.cherryLeaves));
     addBlock("cherry_log", (name, tag) -> log(tag, Texture.cherryLog, Texture.cherryLogTop));
-    addBlock("stripped_cherry_log", (name, tag) ->  log(tag, Texture.strippedCherryLog, Texture.strippedCherryLogTop));
+    addBlock("stripped_cherry_log", (name, tag) -> log(tag, Texture.strippedCherryLog, Texture.strippedCherryLogTop));
     addBlock("cherry_planks", Texture.cherryPlanks);
     addBlock("cherry_pressure_plate", (name, tag) -> new PressurePlate(name, Texture.cherryPlanks));
     addBlock("cherry_sign", (name, tag) -> sign(tag, "cherry"));
@@ -1020,7 +1020,6 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("stripped_cherry_wood", (name, tag) -> log(tag, Texture.strippedCherryLog, Texture.strippedCherryLog));
     addBlock("cherry_sapling", (name, tag) -> new SpriteBlock(name, Texture.cherrySapling));
     addBlock("potted_cherry_sapling", (name, tag) -> new FlowerPot(name, Kind.CHERRY_SAPLING));
-
     addBlock("torchflower", (name, tag) -> new SpriteBlock(name, Texture.torchflower));
     addBlock("torchflower_crop", (name, tag) -> new TorchflowerCrop(BlockProvider.stringToInt(tag.get("Properties").get("age"), 2)));
     addBlock("potted_torchflower", (name, tag) -> new FlowerPot(name, Kind.TORCHFLOWER));
@@ -1035,6 +1034,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       tag.get("Properties").get("slot_4_occupied").stringValue("false").equals("true"),
       tag.get("Properties").get("slot_5_occupied").stringValue("false").equals("true")));
     addBlock("decorated_pot", (name, tag) -> decoratedPot(tag));
+    addBlock("sniffer_egg", (name, tag) -> new SnifferEgg(name, BlockProvider.stringToInt(tag.get("Properties").get("age"), 0)));
   }
 
   @Override

@@ -1254,6 +1254,13 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/snort_pottery_pattern")
   public static final Texture decoratedPotPatternSnort = new Texture();
 
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked")
+  public static final Texture snifferEggNotCracked = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked")
+  public static final Texture snifferEggSlightlyCracked = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked")
+  public static final Texture snifferEggVeryCracked = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 
