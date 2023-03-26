@@ -168,10 +168,11 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
           updateShift();
           updateCameraLocked();
         } else {
-          // Create new camera preset.
-          cameras.getItems().add(newValue);
-          scene.saveCameraPreset(oldValue);
+          // Rename preset.
+          scene.deleteCameraPreset(oldValue);
+          scene.saveCameraPreset(newValue);
           scene.camera().name = newValue;
+          updateCameraList();
         }
       }
     };
@@ -348,6 +349,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
         }
       }
       if (unique) {
+        cameras.getItems().add(newName);
         cameras.setValue(newName);
         break;
       } else {
