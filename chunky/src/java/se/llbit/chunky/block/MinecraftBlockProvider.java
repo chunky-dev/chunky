@@ -1025,6 +1025,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("torchflower_crop", (name, tag) -> new TorchflowerCrop(BlockProvider.stringToInt(tag.get("Properties").get("age"), 2)));
     addBlock("potted_torchflower", (name, tag) -> new FlowerPot(name, Kind.TORCHFLOWER));
     addBlock("suspicious_sand", (name, tag) -> suspiciousSand(tag));
+    addBlock("suspicious_gravel", (name, tag) -> suspiciousGravel(tag));
     addBlock("chiseled_bookshelf", (name, tag) -> new ChiseledBookshelf(
       BlockProvider.facing(tag),
       tag.get("Properties").get("slot_0_occupied").stringValue("false").equals("true"),
@@ -3486,6 +3487,21 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage3);
       default:
         return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage0);
+    }
+  }
+
+  private static Block suspiciousGravel(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String dusted = properties.get("dusted").stringValue("0");
+    switch(dusted) {
+      case "1":
+        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage1);
+      case "2":
+        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage2);
+      case "3":
+        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage3);
+      default:
+        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage0);
     }
   }
 

@@ -1200,6 +1200,15 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/suspicious_sand_3")
   public static final Texture suspiciousSandStage3 = new Texture();
 
+  @TexturePath("assets/minecraft/textures/block/suspicious_gravel_0")
+  public static final Texture suspiciousGravelStage0 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/suspicious_gravel_1")
+  public static final Texture suspiciousGravelStage1 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/suspicious_gravel_2")
+  public static final Texture suspiciousGravelStage2 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/suspicious_gravel_3")
+  public static final Texture suspiciousGravelStage3 = new Texture();
+
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/decorated_pot_base")
   public static final Texture decoratedPotBase = new Texture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/decorated_pot_side")
