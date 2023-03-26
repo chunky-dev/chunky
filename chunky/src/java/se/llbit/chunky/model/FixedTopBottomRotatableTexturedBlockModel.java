@@ -5,9 +5,10 @@ import se.llbit.math.Quad;
 
 /**
  * A quad-based BlockModel which can be rotated horizontally (around y-axis) using a given facing.
+ * Unlike TopBottomOrientedTexturedBlockModel, this ONLY rotates the sides - the top and bottom are not rotated.
  * Defaults to a full block, but can be customized by providing own quads.
  */
-public class TopBottomOrientedTexturedBlockModel extends QuadModel {
+public class FixedTopBottomRotatableTexturedBlockModel extends QuadModel {
 
   protected final Quad[] quads;
   protected final Texture[] textures;
@@ -17,7 +18,7 @@ public class TopBottomOrientedTexturedBlockModel extends QuadModel {
    * @param quads structured like: [north, south, west, east, top, bottom]
    * @param textures structured like: [north, south, west, east, top, bottom]
    */
-  public TopBottomOrientedTexturedBlockModel(
+  public FixedTopBottomRotatableTexturedBlockModel(
     String facing,
     Quad[] quads,
     Texture[] textures
@@ -26,24 +27,37 @@ public class TopBottomOrientedTexturedBlockModel extends QuadModel {
     this.textures = textures;
   }
 
-  public TopBottomOrientedTexturedBlockModel(String facing,
-    Texture north, Texture east, Texture south, Texture west, Texture top, Texture bottom) {
+  public FixedTopBottomRotatableTexturedBlockModel(String facing,
+                                                   Texture north, Texture east, Texture south, Texture west, Texture top, Texture bottom) {
     this(facing, FULL_BLOCK_QUADS, new Texture[]{north, south, west, east, top, bottom});
   }
 
   public static Quad[] rotateToFacing(String facing, Quad[] quads) {
+    // if either top or bottom is missing, ignore
+    Quad top = quads.length > 4 ? quads[4] : null;
+    Quad bottom = quads.length > 5 ? quads[5] : null;
     switch (facing) {
       case "north":
-        return quads;
+        break;
       case "south":
-        return Model.rotateY(Model.rotateY(quads));
+        quads = Model.rotateY(Model.rotateY(quads));
+        break;
       case "east":
-        return Model.rotateY(quads, -Math.toRadians(90));
+        quads = Model.rotateY(quads, -Math.toRadians(90));
+        break;
       case "west":
-        return Model.rotateNegY(quads);
+        quads = Model.rotateNegY(quads);
+        break;
       default:
         throw new IllegalArgumentException("Invalid facing: " + facing);
     }
+    if(top != null) {
+      quads[4] = top;
+    }
+    if(bottom != null) {
+      quads[5] = bottom;
+    }
+    return quads;
   }
 
   @Override
