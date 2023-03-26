@@ -2,6 +2,7 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.entity.SporeBlossom;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.log.Log;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -153,7 +154,8 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
       case "minecraft:pottery_shard_arms_up":
         return Texture.decoratedPotPatternArmsUp;
       default:
-        throw new IllegalArgumentException("Unknown pottery shard: " + shard);
+        Log.warn("Unknown pottery shard: " + shard);
+        return Texture.decoratedPotSide;
     }
   }
 
