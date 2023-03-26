@@ -62,7 +62,9 @@ public class FlowerPotModel extends QuadModel {
     CRIMSON_ROOTS,
     AZALEA_BUSH,
     FLOWERING_AZALEA_BUSH,
-    MANGROVE_PROPAGULE
+    MANGROVE_PROPAGULE,
+    TORCHFLOWER,
+    CHERRY_SAPLING
   }
 
   private static final Texture flowerpot = Texture.flowerPot;
@@ -603,6 +605,12 @@ public class FlowerPotModel extends QuadModel {
             break;
           case CRIMSON_ROOTS:
             Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.crimsonRootsPot);
+            break;
+          case CHERRY_SAPLING:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.cherrySapling);
+            break;
+          case TORCHFLOWER:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.torchflower);
             break;
         }
         break;

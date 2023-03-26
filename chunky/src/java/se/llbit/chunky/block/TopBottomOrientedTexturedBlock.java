@@ -5,6 +5,7 @@ import se.llbit.chunky.resources.Texture;
 /**
  * A textured block that can have one of four orientations but have a fixed top and bottom that rotates, too.
  * E.g. furnaces, pumpkins, looms.
+ * If the top and bottom should NOT rotate with the rest of the block, use FixedTopBottomRotatableTexturedBlock.
  */
 public class TopBottomOrientedTexturedBlock extends OrientedTexturedBlock {
     private static final int[][] uvRotationMap = {
