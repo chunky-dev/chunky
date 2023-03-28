@@ -1208,7 +1208,7 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new TexturedBlock(
             name, Texture.sandstoneCut, Texture.sandstoneTop, Texture.sandstoneBottom);
       case "note_block":
-        return new MinecraftBlock(name, Texture.jukeboxSide);
+        return new MinecraftBlock(name, Texture.noteBlock);
       case "powered_rail":
         return poweredRail(tag);
       case "detector_rail": {
