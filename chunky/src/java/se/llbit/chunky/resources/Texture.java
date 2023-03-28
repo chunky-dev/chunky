@@ -176,6 +176,7 @@ public class Texture {
   public static final Texture sugarCane = new Texture("sugar-canes");
   public static final Texture jukeboxSide = new Texture();
   public static final Texture jukeboxTop = new Texture();
+  public static final Texture noteBlock = new Texture();
   public static final Texture torch = new Texture("torch");
   public static final Texture oakDoorTop = new Texture();
   public static final Texture oakDoorBottom = new Texture();

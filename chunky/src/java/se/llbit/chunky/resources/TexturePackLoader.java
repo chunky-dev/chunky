@@ -511,11 +511,18 @@ public class TexturePackLoader {
         new SimpleTexture("textures/blocks/reeds", Texture.sugarCane),
         new IndexedTexture(0x49, Texture.sugarCane)));
     allTextures.put("note_block", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/block/note_block", Texture.jukeboxSide),
-        new SimpleTexture("assets/minecraft/textures/blocks/note_block", Texture.jukeboxSide),
-        new SimpleTexture("assets/minecraft/textures/blocks/noteblock", Texture.jukeboxSide),
-        new SimpleTexture("textures/blocks/musicBlock", Texture.jukeboxSide),
-        new IndexedTexture(0x4A, Texture.jukeboxSide)));
+      new SimpleTexture("assets/minecraft/textures/block/note_block", Texture.noteBlock),
+      new SimpleTexture("assets/minecraft/textures/blocks/note_block", Texture.noteBlock),
+      new SimpleTexture("assets/minecraft/textures/blocks/noteblock", Texture.noteBlock),
+      new SimpleTexture("textures/blocks/musicBlock", Texture.noteBlock),
+      new IndexedTexture(0x4A, Texture.noteBlock)));
+    allTextures.put("jukebox_side", new AlternateTextures(
+      new SimpleTexture("assets/minecraft/textures/block/jukebox_side", Texture.jukeboxSide),
+      new SimpleTexture("assets/minecraft/textures/block/note_block", Texture.jukeboxSide),
+      new SimpleTexture("assets/minecraft/textures/blocks/note_block", Texture.jukeboxSide),
+      new SimpleTexture("assets/minecraft/textures/blocks/noteblock", Texture.jukeboxSide),
+      new SimpleTexture("textures/blocks/musicBlock", Texture.jukeboxSide),
+      new IndexedTexture(0x4A, Texture.jukeboxSide)));
     allTextures.put("jukebox_top", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/jukebox_top", Texture.jukeboxTop),
         new SimpleTexture("assets/minecraft/textures/blocks/jukebox_top", Texture.jukeboxTop),
