@@ -16,20 +16,20 @@
  */
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.log.Log;
 import se.llbit.math.AABB;
-import se.llbit.math.Ray;
 import se.llbit.util.annotation.NotNull;
 import se.llbit.util.annotation.Nullable;
 
 /**
- * A textured block.
- *
- * @author Jesper Öqvist <jesper@llbit.se>
+ * A textured block. This can either be statically textured or be oriented.
  */
 public class TexturedBlockModel extends AABBModel {
+  /**
+   * A block orientation. Orientations with the {@code SIDE_} prefix do not rotate
+   * the top and bottom faces of the block.
+   */
   public enum Orientation {
     NORTH, SOUTH, EAST, WEST,
     SIDE_NORTH, SIDE_SOUTH, SIDE_EAST, SIDE_WEST,
@@ -51,10 +51,10 @@ public class TexturedBlockModel extends AABBModel {
     }
   }
 
-  protected static final AABB box = new AABB(0, 1, 0, 1, 0, 1);
-  protected final Texture[] textures;
-  protected final UVMapping[] mappings;
-  protected final Tint[] tints;
+  protected static final AABB[] boxes = { new AABB(0, 1, 0, 1, 0, 1) };
+  protected final Texture[][] textures;
+  protected final UVMapping[][] mappings;
+  protected final Tint[][] tints;
 
   public TexturedBlockModel(Texture north, Texture east, Texture south, Texture west, Texture top, Texture bottom) {
     this(new Texture[] { north, east, south, west, top, bottom }, null, null);
@@ -70,14 +70,9 @@ public class TexturedBlockModel extends AABBModel {
   }
 
   public TexturedBlockModel(@NotNull Texture[] textures, @Nullable UVMapping[] mappings, @Nullable Tint[] tints) {
-    this.textures = textures;
-    this.textures2 = new Texture[][] { textures };
-
-    this.mappings = mappings;
-    this.mappings2 = mappings == null ? null : new UVMapping[][] { mappings };
-
-    this.tints = tints;
-    this.tints2 = tints == null ? null : new Tint[][] { tints };
+    this.textures = new Texture[][] { textures };
+    this.mappings = mappings == null ? null : new UVMapping[][] { mappings };
+    this.tints = tints == null ? null : new Tint[][] { tints };
   }
 
   private static Texture[] mapTextures(Orientation orientation, Texture north, Texture east, Texture south,
@@ -121,34 +116,22 @@ public class TexturedBlockModel extends AABBModel {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    // TODO: Optimize
-    return super.intersect(ray, scene);
-  }
-
-  // This stuff is just to adhere to the interface.
-  private static final AABB[] boxes = { box };
-  private final Texture[][] textures2;
-  private final UVMapping[][] mappings2;
-  private final Tint[][] tints2;
-
-  @Override
   public final AABB[] getBoxes() {
     return boxes;
   }
 
   @Override
   public final Texture[][] getTextures() {
-    return textures2;
+    return textures;
   }
 
   @Override
   public final UVMapping[][] getUVMapping() {
-    return mappings2;
+    return mappings;
   }
 
   @Override
   public final Tint[][] getTints() {
-    return tints2;
+    return tints;
   }
 }
