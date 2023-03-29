@@ -1,6 +1,5 @@
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.entity.SporeBlossom;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.log.Log;
 import se.llbit.math.Quad;
@@ -18,7 +17,7 @@ import se.llbit.util.JsonUtil;
 import java.util.Collection;
 import java.util.LinkedList;
 
-public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
+public class DecoratedPotModel extends OrientedQuadModel {
 
   private static final Vector4 BASE_UV_MAP = new Vector4(0 / 32., 14 / 32., 8 / 32., 22 / 32.);
   private static final Vector4 SIDE_UV_MAP = new Vector4(1 / 16., 15 / 16., 0., 1.);
@@ -103,7 +102,7 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
       Collection<Primitive> primitives = new LinkedList<>();
       Transform transform = Transform.NONE
         .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
-      for (Quad quad : rotateToFacing(facing, QUADS)) {
+      for (Quad quad : rotateToFacing(TexturedBlockModel.Orientation.fromFacing(facing, false), QUADS)) {
         quad.addTriangles(primitives, material, transform);
       }
       return primitives;
@@ -127,7 +126,7 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
   }
 
   public DecoratedPotModel(String facing, String[] shards) {
-    super(facing, DEFAULT_QUADS, new Texture[]{
+    super(TexturedBlockModel.Orientation.fromFacing(facing, false), DEFAULT_QUADS, new Texture[]{
       // shards[0] top crafting slot -> north
       getTextureForShard(shards[0]),
       // shards[3] bottom crafting slot -> south
@@ -138,7 +137,7 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
       getTextureForShard(shards[2]),
       Texture.decoratedPotBase, // top
       Texture.decoratedPotBase  // bottom
-    });
+    }, null);
   }
 
   private static Texture getTextureForShard(String shard) {

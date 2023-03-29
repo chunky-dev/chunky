@@ -31,8 +31,8 @@ public class TexturedBlockModel extends AABBModel {
    * the top and bottom faces of the block.
    */
   public enum Orientation {
-    NORTH, SOUTH, EAST, WEST,
-    SIDE_NORTH, SIDE_SOUTH, SIDE_EAST, SIDE_WEST,
+    NORTH(false, null), SOUTH(false, null), EAST(false, null), WEST(false, null),
+    SIDE_NORTH(true, NORTH), SIDE_SOUTH(true, SOUTH), SIDE_EAST(true, EAST), SIDE_WEST(true, WEST),
 
     ;
     public static Orientation fromFacing(String facing, boolean side) {
@@ -48,6 +48,18 @@ public class TexturedBlockModel extends AABBModel {
         default:
           throw new IllegalArgumentException("Invalid facing: " + facing);
       }
+    }
+
+    /** Only rotate the side faces */
+    public final boolean side;
+    private final Orientation reduced;
+    Orientation(boolean side, @Nullable Orientation reduced) {
+      this.side = side;
+      this.reduced = reduced;
+    }
+
+    public Orientation reduce() {
+      return reduced == null ? this : reduced;
     }
   }
 
@@ -77,25 +89,24 @@ public class TexturedBlockModel extends AABBModel {
 
   private static Texture[] mapTextures(Orientation orientation, Texture north, Texture east, Texture south,
                                        Texture west, Texture top, Texture bottom) {
-    switch (orientation) {
+    switch (orientation.reduce()) {
       default:
         Log.warn("Unknown orientation: " + orientation);
       case NORTH:
-      case SIDE_NORTH:
         return new Texture[] { north, east, south, west, top, bottom };
       case SOUTH:
-      case SIDE_SOUTH:
         return new Texture[] { south, west, north, east, top, bottom };
       case EAST:
-      case SIDE_EAST:
         return new Texture[] { west, north, east, south, top, bottom };
       case WEST:
-      case SIDE_WEST:
         return new Texture[] { east, south, west, north, top, bottom };
     }
   }
 
   private static UVMapping[] mapUV(Orientation orientation) {
+    if (orientation.side) {
+      return null;
+    }
     switch (orientation) {
       default:
         Log.warn("Unknown orientation: " + orientation);
@@ -107,11 +118,6 @@ public class TexturedBlockModel extends AABBModel {
         return new UVMapping[] {null, null, null, null, UVMapping.ROTATE_90, UVMapping.ROTATE_90};
       case WEST:
         return new UVMapping[] {null, null, null, null, UVMapping.ROTATE_270, UVMapping.ROTATE_270};
-      case SIDE_EAST:
-      case SIDE_SOUTH:
-      case SIDE_NORTH:
-      case SIDE_WEST:
-        return null;
     }
   }
 
