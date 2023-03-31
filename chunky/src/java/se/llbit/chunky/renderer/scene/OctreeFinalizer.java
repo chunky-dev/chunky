@@ -16,10 +16,9 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import se.llbit.chunky.block.Lava;
-import se.llbit.chunky.block.Water;
+import se.llbit.chunky.block.block.Lava;
+import se.llbit.chunky.block.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.Octree;

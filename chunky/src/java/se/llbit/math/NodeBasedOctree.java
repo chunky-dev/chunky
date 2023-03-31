@@ -1,8 +1,8 @@
 package se.llbit.math;
 
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.block.Air;
-import se.llbit.chunky.block.UnknownBlock;
+import se.llbit.chunky.block.block.Air;
+import se.llbit.chunky.block.block.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.world.Material;
 

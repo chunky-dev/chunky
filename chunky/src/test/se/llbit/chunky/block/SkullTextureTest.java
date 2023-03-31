@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
 import org.junit.Test;
+import se.llbit.chunky.block.block.Head;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;

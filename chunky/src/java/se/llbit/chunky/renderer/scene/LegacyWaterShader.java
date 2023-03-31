@@ -16,7 +16,7 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import se.llbit.chunky.model.WaterModel;
+import se.llbit.chunky.model.model.WaterModel;
 import se.llbit.json.JsonObject;
 import se.llbit.math.Ray;
 

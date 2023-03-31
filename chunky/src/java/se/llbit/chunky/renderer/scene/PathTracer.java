@@ -18,10 +18,9 @@
 package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.block.Air;
-import se.llbit.chunky.block.Water;
+import se.llbit.chunky.block.block.Air;
+import se.llbit.chunky.block.block.Water;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
-import se.llbit.chunky.renderer.SunSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.*;

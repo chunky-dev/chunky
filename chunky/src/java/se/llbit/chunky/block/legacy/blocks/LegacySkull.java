@@ -1,6 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
-import static se.llbit.chunky.block.Head.getTextureUrl;
+import static se.llbit.chunky.block.block.Head.getTextureUrl;
 
 import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.entity.Entity;

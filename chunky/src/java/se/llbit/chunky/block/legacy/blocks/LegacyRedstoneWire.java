@@ -1,7 +1,7 @@
 package se.llbit.chunky.block.legacy.blocks;
 
 import se.llbit.chunky.block.FinalizationState;
-import se.llbit.chunky.block.Repeater;
+import se.llbit.chunky.block.block.Repeater;
 import se.llbit.chunky.block.legacy.LegacyBlockUtils;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;

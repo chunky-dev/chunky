@@ -16,9 +16,8 @@
  */
 package se.llbit.math;
 
-import se.llbit.chunky.block.UnknownBlock;
+import se.llbit.chunky.block.block.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.world.Material;
 
 import java.io.DataInputStream;

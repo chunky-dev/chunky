@@ -18,7 +18,7 @@
  */
 package se.llbit.chunky.entity;
 
-import se.llbit.chunky.block.Head;
+import se.llbit.chunky.block.block.Head;
 import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.*;

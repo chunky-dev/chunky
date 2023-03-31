@@ -18,8 +18,7 @@
 package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.block.Air;
-import se.llbit.chunky.renderer.SunSamplingStrategy;
+import se.llbit.chunky.block.block.Air;
 import se.llbit.chunky.resources.HDRTexture;
 import se.llbit.chunky.resources.PFMTexture;
 import se.llbit.chunky.resources.Texture;

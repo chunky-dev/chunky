@@ -6,7 +6,7 @@ import java.util.Random;
 import java.util.stream.StreamSupport;
 
 import se.llbit.chunky.block.Block;
-import se.llbit.chunky.block.Candle;
+import se.llbit.chunky.block.block.Candle;
 import se.llbit.chunky.model.Model;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;

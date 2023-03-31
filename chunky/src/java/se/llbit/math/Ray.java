@@ -17,11 +17,10 @@
 package se.llbit.math;
 
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.block.Air;
-import se.llbit.chunky.block.Lava;
-import se.llbit.chunky.block.Water;
+import se.llbit.chunky.block.block.Air;
+import se.llbit.chunky.block.block.Lava;
+import se.llbit.chunky.block.block.Water;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Material;
 
 import java.util.Random;
