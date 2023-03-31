@@ -1254,12 +1254,42 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/snort_pottery_pattern")
   public static final Texture decoratedPotPatternSnort = new Texture();
 
-  @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked")
-  public static final Texture snifferEggNotCracked = new Texture();
-  @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked")
-  public static final Texture snifferEggSlightlyCracked = new Texture();
-  @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked")
-  public static final Texture snifferEggVeryCracked = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_bottom")
+  public static final Texture snifferEggNotCrackedBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_east")
+  public static final Texture snifferEggNotCrackedEast = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_north")
+  public static final Texture snifferEggNotCrackedNorth = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_south")
+  public static final Texture snifferEggNotCrackedSouth = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_top")
+  public static final Texture snifferEggNotCrackedTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_west")
+  public static final Texture snifferEggNotCrackedWest = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_bottom")
+  public static final Texture snifferEggSlightlyCrackedBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_east")
+  public static final Texture snifferEggSlightlyCrackedEast = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_north")
+  public static final Texture snifferEggSlightlyCrackedNorth = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_south")
+  public static final Texture snifferEggSlightlyCrackedSouth = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_top")
+  public static final Texture snifferEggSlightlyCrackedTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_west")
+  public static final Texture snifferEggSlightlyCrackedWest = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_bottom")
+  public static final Texture snifferEggVeryCrackedBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_east")
+  public static final Texture snifferEggVeryCrackedEast = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_north")
+  public static final Texture snifferEggVeryCrackedNorth = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_south")
+  public static final Texture snifferEggVeryCrackedSouth = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_top")
+  public static final Texture snifferEggVeryCrackedTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_west")
+  public static final Texture snifferEggVeryCrackedWest = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

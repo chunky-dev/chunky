@@ -8,9 +8,9 @@ public class SnifferEgg extends AbstractModelBlock {
   private final String description;
 
   public SnifferEgg(String name, int age) {
-    super(name, getTexture(age));
+    super(name, getTopTexture(age));
     this.description = "age=" + age;
-    this.model = new SnifferEggModel(this.texture);
+    this.model = new SnifferEggModel(age);
   }
 
   @Override
@@ -18,15 +18,15 @@ public class SnifferEgg extends AbstractModelBlock {
     return description;
   }
 
-  private static Texture getTexture(int age) {
+  private static Texture getTopTexture(int age) {
     switch (age) {
       case 1:
-        return Texture.snifferEggSlightlyCracked;
+        return Texture.snifferEggSlightlyCrackedTop;
       case 2:
-        return Texture.snifferEggVeryCracked;
+        return Texture.snifferEggVeryCrackedTop;
       default:
       case 0:
-        return Texture.snifferEggNotCracked;
+        return Texture.snifferEggNotCrackedTop;
     }
   }
 }
