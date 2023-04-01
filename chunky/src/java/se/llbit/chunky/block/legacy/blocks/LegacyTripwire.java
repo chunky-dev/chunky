@@ -2,8 +2,8 @@ package se.llbit.chunky.block.legacy.blocks;
 
 import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.block.FinalizationState;
-import se.llbit.chunky.block.block.Tripwire;
-import se.llbit.chunky.block.block.TripwireHook;
+import se.llbit.chunky.block.minecraft.Tripwire;
+import se.llbit.chunky.block.minecraft.TripwireHook;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
 import se.llbit.chunky.world.Material;

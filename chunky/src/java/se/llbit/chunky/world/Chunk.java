@@ -16,10 +16,10 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.chunky.block.block.Air;
+import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.Block;
-import se.llbit.chunky.block.block.Lava;
-import se.llbit.chunky.block.block.Water;
+import se.llbit.chunky.block.minecraft.Lava;
+import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;

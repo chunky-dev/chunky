@@ -17,9 +17,9 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import se.llbit.chunky.block.block.Air;
+import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.MinecraftBlock;
-import se.llbit.chunky.block.block.Water;
+import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;

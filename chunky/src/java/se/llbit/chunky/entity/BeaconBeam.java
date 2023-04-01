@@ -1,7 +1,7 @@
 package se.llbit.chunky.entity;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import se.llbit.chunky.block.block.Beacon;
+import se.llbit.chunky.block.minecraft.Beacon;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.world.Material;

@@ -17,13 +17,13 @@
 package se.llbit.chunky.map;
 
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.block.block.Air;
+import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.Block;
-import se.llbit.chunky.block.block.Grass;
-import se.llbit.chunky.block.block.GrassBlock;
-import se.llbit.chunky.block.block.Leaves;
-import se.llbit.chunky.block.block.TallGrass;
-import se.llbit.chunky.block.block.Vine;
+import se.llbit.chunky.block.minecraft.Grass;
+import se.llbit.chunky.block.minecraft.GrassBlock;
+import se.llbit.chunky.block.minecraft.Leaves;
+import se.llbit.chunky.block.minecraft.TallGrass;
+import se.llbit.chunky.block.minecraft.Vine;
 import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;

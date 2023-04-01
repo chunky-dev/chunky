@@ -19,7 +19,7 @@ package se.llbit.chunky.world;
 import java.util.HashMap;
 import java.util.Map;
 
-import se.llbit.chunky.block.block.Candle;
+import se.llbit.chunky.block.minecraft.Candle;
 import se.llbit.chunky.entity.Campfire;
 import se.llbit.chunky.world.material.CloudMaterial;
 

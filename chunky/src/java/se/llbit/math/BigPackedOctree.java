@@ -16,7 +16,7 @@
  */
 package se.llbit.math;
 
-import se.llbit.chunky.block.block.UnknownBlock;
+import se.llbit.chunky.block.minecraft.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.world.Material;
 
