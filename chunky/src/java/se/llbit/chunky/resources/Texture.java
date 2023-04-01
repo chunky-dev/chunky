@@ -1172,8 +1172,6 @@ public class Texture {
   public static final Texture torchflowerCropStage0 = new Texture();
   @TexturePath("assets/minecraft/textures/block/torchflower_crop_stage1")
   public static final Texture torchflowerCropStage1 = new Texture();
-  @TexturePath("assets/minecraft/textures/block/torchflower_crop_stage2")
-  public static final Texture torchflowerCropStage2 = new Texture();
   @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_empty")
   public static final Texture chiseledBookshelfEmpty = new Texture();
   @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_occupied")
