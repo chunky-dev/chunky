@@ -1288,6 +1288,10 @@ public class Texture {
   public static final Texture snifferEggVeryCrackedTop = new Texture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_west")
   public static final Texture snifferEggVeryCrackedWest = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pink_petals")
+  public static final Texture pinkPetals = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pink_petals_stem")
+  public static final Texture pinkPetalsStem = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
