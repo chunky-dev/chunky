@@ -7,8 +7,6 @@ import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -81,44 +79,45 @@ public abstract class AABBModel implements BlockModel {
     for (int i = 0; i < boxes.length; ++i) {
       if (boxes[i].intersect(ray)) {
         Tint[] tintedFacesBox = tintedFaces != null ? tintedFaces[i] : null;
+        UVMapping[] mappingBox = mapping != null ? mapping[i] : null;
         Vector3 n = ray.getNormal();
         if (n.y > 0) { // top
           ray.v = 1 - ray.v;
-          if (intersectFace(ray, scene, textures[i][4],
-            mapping != null ? mapping[i][4] : null
+          if (intersectFace(ray, textures[i][4],
+            mappingBox != null ? mappingBox[4] : null
           )) {
             tint = tintedFacesBox != null ? tintedFacesBox[4] : Tint.NONE;
             hit = true;
           }
         } else if (n.y < 0) { // bottom
-          if (intersectFace(ray, scene, textures[i][5],
-            mapping != null ? mapping[i][5] : null)) {
+          if (intersectFace(ray, textures[i][5],
+            mappingBox != null ? mappingBox[5] : null)) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[5] : Tint.NONE;
           }
         } else if (n.z < 0) { // north
-          if (intersectFace(ray, scene, textures[i][0],
-            mapping != null ? mapping[i][0] : null
+          if (intersectFace(ray, textures[i][0],
+            mappingBox != null ? mappingBox[0] : null
           )) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[0] : Tint.NONE;
           }
         } else if (n.z > 0) { // south
-          if (intersectFace(ray, scene, textures[i][2],
-            mapping != null ? mapping[i][2] : null
+          if (intersectFace(ray, textures[i][2],
+            mappingBox != null ? mappingBox[2] : null
           )) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[2] : Tint.NONE;
           }
         } else if (n.x < 0) { // west
-          if (intersectFace(ray, scene, textures[i][3],
-            mapping != null ? mapping[i][3] : null)) {
+          if (intersectFace(ray, textures[i][3],
+            mappingBox != null ? mappingBox[3] : null)) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[3] : Tint.NONE;
           }
         } else if (n.x > 0) { // east
-          if (intersectFace(ray, scene, textures[i][1],
-            mapping != null ? mapping[i][1] : null)) {
+          if (intersectFace(ray, textures[i][1],
+            mappingBox != null ? mappingBox[1] : null)) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[1] : Tint.NONE;
           }
@@ -140,7 +139,7 @@ public abstract class AABBModel implements BlockModel {
     return hit;
   }
 
-  private boolean intersectFace(Ray ray, Scene scene, Texture texture, UVMapping mapping) {
+  private boolean intersectFace(Ray ray, Texture texture, UVMapping mapping) {
     // This is the method that handles intersecting faces of all AABB-based models.
     // Do normal mapping, parallax occlusion mapping, specular maps and all the good stuff here!
 

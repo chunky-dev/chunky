@@ -560,7 +560,7 @@ public class Octree {
         // Origin and distance of ray need to be updated
         ray.o.scaleAdd(distance, ray.d);
         ray.distance += distance;
-        TexturedBlockModel.getIntersectionColor(ray);
+        getIntersectionColor(ray);
         if (currentBlock.opaque) {
           ray.color.w = 1;
         }
@@ -670,7 +670,7 @@ public class Octree {
           }
           return true;
         } else if (currentBlock != Air.INSTANCE) {
-          TexturedBlockModel.getIntersectionColor(ray);
+          getIntersectionColor(ray);
           if (currentBlock.opaque) {
             ray.color.w = 1;
           }
@@ -828,6 +828,51 @@ public class Octree {
         Log.warnf("Failed to delete temporary file:\n%s", tempFile);
         tempFile.deleteOnExit();
       }
+    }
+  }
+
+  /**
+   * Find the color of the object at the intersection point.
+   *
+   * @param ray ray to test
+   */
+  public static void getIntersectionColor(Ray ray) {
+    if (ray.getCurrentMaterial() == Air.INSTANCE) {
+      ray.color.x = 1;
+      ray.color.y = 1;
+      ray.color.z = 1;
+      ray.color.w = 0;
+      return;
+    }
+    getTextureCoordinates(ray);
+    ray.getCurrentMaterial().getColor(ray);
+  }
+
+  /**
+   * Calculate the UV coordinates for the ray on the intersected block.
+   *
+   * @param ray ray to test
+   */
+  private static void getTextureCoordinates(Ray ray) {
+    int bx = (int) QuickMath.floor(ray.o.x);
+    int by = (int) QuickMath.floor(ray.o.y);
+    int bz = (int) QuickMath.floor(ray.o.z);
+    Vector3 n = ray.getNormal();
+    if (n.y != 0) {
+      ray.u = ray.o.x - bx;
+      ray.v = ray.o.z - bz;
+    } else if (n.x != 0) {
+      ray.u = ray.o.z - bz;
+      ray.v = ray.o.y - by;
+    } else {
+      ray.u = ray.o.x - bx;
+      ray.v = ray.o.y - by;
+    }
+    if (n.x > 0 || n.z < 0) {
+      ray.u = 1 - ray.u;
+    }
+    if (n.y > 0) {
+      ray.v = 1 - ray.v;
     }
   }
 

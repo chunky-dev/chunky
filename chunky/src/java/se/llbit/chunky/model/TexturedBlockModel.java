@@ -16,81 +16,128 @@
  */
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.block.Air;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.log.Log;
 import se.llbit.math.AABB;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
+import se.llbit.util.annotation.NotNull;
+import se.llbit.util.annotation.Nullable;
 
 /**
- * A textured block.
- *
- * @author Jesper Öqvist <jesper@llbit.se>
+ * A textured block. This can either be statically textured or be oriented.
  */
 public class TexturedBlockModel extends AABBModel {
-  private static final AABB[] boxes = { new AABB(0, 1, 0, 1, 0, 1) };
+  /**
+   * A block orientation. Orientations with the {@code SIDE_} prefix do not rotate
+   * the top and bottom faces of the block.
+   */
+  public enum Orientation {
+    NORTH(false, null), SOUTH(false, null), EAST(false, null), WEST(false, null),
+    SIDE_NORTH(true, NORTH), SIDE_SOUTH(true, SOUTH), SIDE_EAST(true, EAST), SIDE_WEST(true, WEST),
 
-  private final Texture[][] textures;
+    ;
+    public static Orientation fromFacing(String facing, boolean side) {
+      switch (facing) {
+        case "north":
+          return side ? SIDE_NORTH : NORTH;
+        case "south":
+          return side ? SIDE_SOUTH : SOUTH;
+        case "east":
+          return side ? SIDE_EAST : EAST;
+        case "west":
+          return side ? SIDE_WEST : WEST;
+        default:
+          throw new IllegalArgumentException("Invalid facing: " + facing);
+      }
+    }
+
+    /** Only rotate the side faces */
+    public final boolean side;
+    private final Orientation reduced;
+    Orientation(boolean side, @Nullable Orientation reduced) {
+      this.side = side;
+      this.reduced = reduced;
+    }
+
+    public Orientation reduce() {
+      return reduced == null ? this : reduced;
+    }
+  }
+
+  protected static final AABB[] boxes = { new AABB(0, 1, 0, 1, 0, 1) };
+  protected final Texture[][] textures;
+  protected final UVMapping[][] mappings;
+  protected final Tint[][] tints;
 
   public TexturedBlockModel(Texture north, Texture east, Texture south, Texture west, Texture top, Texture bottom) {
-    this.textures = new Texture[][] {{
-      north, east, south, west, top, bottom
-    }};
+    this(new Texture[] { north, east, south, west, top, bottom }, null, null);
+  }
+
+  public TexturedBlockModel(Orientation orientation, Texture north, Texture east, Texture south, Texture west,
+                            Texture top, Texture bottom, @Nullable Tint[] tints) {
+    this(
+      mapTextures(orientation, north, east, south, west, top, bottom),
+      mapUV(orientation),
+      tints
+    );
+  }
+
+  public TexturedBlockModel(@NotNull Texture[] textures, @Nullable UVMapping[] mappings, @Nullable Tint[] tints) {
+    this.textures = new Texture[][] { textures };
+    this.mappings = mappings == null ? null : new UVMapping[][] { mappings };
+    this.tints = tints == null ? null : new Tint[][] { tints };
+  }
+
+  private static Texture[] mapTextures(Orientation orientation, Texture north, Texture east, Texture south,
+                                       Texture west, Texture top, Texture bottom) {
+    switch (orientation.reduce()) {
+      default:
+        Log.warn("Unknown orientation: " + orientation);
+      case NORTH:
+        return new Texture[] { north, east, south, west, top, bottom };
+      case SOUTH:
+        return new Texture[] { south, west, north, east, top, bottom };
+      case EAST:
+        return new Texture[] { west, north, east, south, top, bottom };
+      case WEST:
+        return new Texture[] { east, south, west, north, top, bottom };
+    }
+  }
+
+  private static UVMapping[] mapUV(Orientation orientation) {
+    if (orientation.side) {
+      return null;
+    }
+    switch (orientation) {
+      default:
+        Log.warn("Unknown orientation: " + orientation);
+      case NORTH:
+        return null;
+      case SOUTH:
+        return new UVMapping[] {null, null, null, null, UVMapping.ROTATE_180, UVMapping.ROTATE_180};
+      case EAST:
+        return new UVMapping[] {null, null, null, null, UVMapping.ROTATE_90, UVMapping.ROTATE_90};
+      case WEST:
+        return new UVMapping[] {null, null, null, null, UVMapping.ROTATE_270, UVMapping.ROTATE_270};
+    }
   }
 
   @Override
-  public AABB[] getBoxes() {
+  public final AABB[] getBoxes() {
     return boxes;
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public final Texture[][] getTextures() {
     return textures;
   }
 
-  /**
-   * Find the color of the object at the intersection point.
-   *
-   * @param ray ray to test
-   */
-  public static void getIntersectionColor(Ray ray) {
-    if (ray.getCurrentMaterial() == Air.INSTANCE) {
-      ray.color.x = 1;
-      ray.color.y = 1;
-      ray.color.z = 1;
-      ray.color.w = 0;
-      return;
-    }
-    getTextureCoordinates(ray);
-    ray.getCurrentMaterial().getColor(ray);
+  @Override
+  public final UVMapping[][] getUVMapping() {
+    return mappings;
   }
 
-  /**
-   * Calculate the UV coordinates for the ray on the intersected block.
-   *
-   * @param ray ray to test
-   */
-  private static void getTextureCoordinates(Ray ray) {
-    int bx = (int) QuickMath.floor(ray.o.x);
-    int by = (int) QuickMath.floor(ray.o.y);
-    int bz = (int) QuickMath.floor(ray.o.z);
-    Vector3 n = ray.getNormal();
-    if (n.y != 0) {
-      ray.u = ray.o.x - bx;
-      ray.v = ray.o.z - bz;
-    } else if (n.x != 0) {
-      ray.u = ray.o.z - bz;
-      ray.v = ray.o.y - by;
-    } else {
-      ray.u = ray.o.x - bx;
-      ray.v = ray.o.y - by;
-    }
-    if (n.x > 0 || n.z < 0) {
-      ray.u = 1 - ray.u;
-    }
-    if (n.y > 0) {
-      ray.v = 1 - ray.v;
-    }
+  @Override
+  public final Tint[][] getTints() {
+    return tints;
   }
 }

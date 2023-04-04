@@ -15,44 +15,6 @@ import java.util.Random;
  */
 @PluginApi
 public abstract class QuadModel implements BlockModel {
-
-  public static final Quad FULL_BLOCK_NORTH_SIDE = new Quad(
-    new Vector3(1, 0, 0),
-    new Vector3(0, 0, 0),
-    new Vector3(1, 1, 0),
-    new Vector4(0, 1, 0, 1));
-  public static final Quad FULL_BLOCK_SOUTH_SIDE = new Quad(
-    new Vector3(0, 0, 1),
-    new Vector3(1, 0, 1),
-    new Vector3(0, 1, 1),
-    new Vector4(0, 1, 0, 1));
-  public static final Quad FULL_BLOCK_WEST_SIDE = new Quad(
-    new Vector3(0, 0, 0),
-    new Vector3(0, 0, 1),
-    new Vector3(0, 1, 0),
-    new Vector4(0, 1, 0, 1));
-  public static final Quad FULL_BLOCK_EAST_SIDE = new Quad(
-    new Vector3(1, 0, 1),
-    new Vector3(1, 0, 0),
-    new Vector3(1, 1, 1),
-    new Vector4(0, 1, 0, 1));
-  public static final Quad FULL_BLOCK_TOP_SIDE = new Quad(
-    new Vector3(1, 1, 0),
-    new Vector3(0, 1, 0),
-    new Vector3(1, 1, 1),
-    new Vector4(1, 0, 1, 0));
-  public static final Quad FULL_BLOCK_BOTTOM_SIDE = new Quad(
-    new Vector3(0, 0, 0),
-    new Vector3(1, 0, 0),
-    new Vector3(0, 0, 1),
-    new Vector4(0, 1, 0, 1));
-
-  public static final Quad[] FULL_BLOCK_QUADS = {
-    FULL_BLOCK_NORTH_SIDE, FULL_BLOCK_SOUTH_SIDE,
-    FULL_BLOCK_WEST_SIDE, FULL_BLOCK_EAST_SIDE,
-    FULL_BLOCK_TOP_SIDE, FULL_BLOCK_BOTTOM_SIDE
-  };
-
   // Epsilons to clip ray intersections to the current block.
   protected static final double E0 = -Ray.EPSILON;
   protected static final double E1 = 1 + Ray.EPSILON;

@@ -1,6 +1,6 @@
 package se.llbit.chunky.block;
 
-import se.llbit.chunky.model.TopBottomOrientedTexturedBlockModel;
+import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.resources.Texture;
 
 /**
@@ -19,7 +19,8 @@ public class TopBottomOrientedTexturedBlock extends AbstractModelBlock {
 
     public TopBottomOrientedTexturedBlock(String name, String facing, Texture front, Texture south, Texture east, Texture west, Texture top, Texture bottom) {
         super(name, front);
-        this.model = new TopBottomOrientedTexturedBlockModel(facing, front, south, east, west, top, bottom);
+        this.model = new TexturedBlockModel(TexturedBlockModel.Orientation.fromFacing(facing, false),
+          front, east, south, west, top, bottom, null);
         solid = true;
         opaque = true;
     }
