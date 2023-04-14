@@ -281,33 +281,18 @@ public class Sun implements JsonSerializable {
    * @return <code>true</code> if the ray intersects the sun model
    */
   public boolean intersect(Ray ray) {
-    if (!drawTexture || ray.d.dot(sw) < .5) {
-      return false;
-    }
-
-    double width = radius * 4;
-    double width2 = width * 2;
-    double a;
-    a = Math.PI / 2 - FastMath.acos(ray.d.dot(su)) + width;
-    if (a >= 0 && a < width2) {
-      double b = Math.PI / 2 - FastMath.acos(ray.d.dot(sv)) + width;
-      if (b >= 0 && b < width2) {
-        texture.getColor(a / width2, b / width2, ray.color);
-        ray.color.x *= apparentTextureBrightness.x * 10;
-        ray.color.y *= apparentTextureBrightness.y * 10;
-        ray.color.z *= apparentTextureBrightness.z * 10;
-        return true;
-      }
-    }
-
-    return false;
+    return doIntersect(ray, apparentTextureBrightness);
   }
 
   /**
    * Used with <code>SSS: OFF</code> and <code>SSS: HIGH_QUALITY</code>.
    */
   public boolean intersectDiffuse(Ray ray) {
-    if (ray.d.dot(sw) < .5) {
+    return doIntersect(ray, color);
+  }
+
+  private boolean doIntersect(Ray ray, Vector3 color) {
+    if (!drawTexture || ray.d.dot(sw) < .5) {
       return false;
     }
 
