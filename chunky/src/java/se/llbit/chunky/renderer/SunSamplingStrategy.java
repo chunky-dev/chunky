@@ -20,7 +20,6 @@ import se.llbit.util.Registerable;
 
 public enum SunSamplingStrategy implements Registerable {
     OFF("Off", "Sun is not sampled with next event estimation.", false, true, false, true),
-    NON_LUMINOUS("Non-Luminous", "Sun is drawn on the skybox but it does not contribute to the lighting of the scene.", false, false, false, false),
     FAST("Fast", "Fast sun sampling algorithm. Lower noise but does not correctly model some visual effects.", true, false, false, false),
     HIGH_QUALITY("High Quality", "High quality sun sampling. More noise but correctly models visual effects such as caustics.", true, true, true, true);
 

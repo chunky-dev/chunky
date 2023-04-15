@@ -23,6 +23,7 @@
     <Separator prefWidth="200.0" />
     <CheckBox fx:id="shutdown" mnemonicParsing="false" text="Shutdown computer when render completes" />
     <CheckBox fx:id="fastFog" mnemonicParsing="false" text="Fast fog" />
+    <CheckBox fx:id="enableSkymapInterpolation" mnemonicParsing="false" text="Enable skymap interpolation" />
     <IntegerAdjuster fx:id="cacheResolution" />
     <DoubleAdjuster fx:id="animationTime" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">

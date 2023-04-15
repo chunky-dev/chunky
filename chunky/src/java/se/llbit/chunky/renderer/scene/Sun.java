@@ -160,6 +160,8 @@ public class Sun implements JsonSerializable {
 
   private final Vector3 apparentColor = new Vector3(1, 1, 1);
 
+  private boolean enableSunlight = true;
+
   private boolean drawTexture = true;
 
   private double chroma(double turb, double turb2, double sunTheta, double[][] matrix) {
@@ -195,6 +197,7 @@ public class Sun implements JsonSerializable {
     altitude = other.altitude;
     color.set(other.color);
     apparentColor.set(other.apparentColor);
+    enableSunlight = other.enableSunlight;
     drawTexture = other.drawTexture;
     intensity = other.intensity;
     luminosity = other.luminosity;
@@ -281,18 +284,18 @@ public class Sun implements JsonSerializable {
    * @return <code>true</code> if the ray intersects the sun model
    */
   public boolean intersect(Ray ray) {
-    return doIntersect(ray, apparentTextureBrightness);
+    return doIntersect(ray, apparentTextureBrightness, false);
   }
 
   /**
    * Used with <code>SSS: OFF</code> and <code>SSS: HIGH_QUALITY</code>.
    */
   public boolean intersectDiffuse(Ray ray) {
-    return doIntersect(ray, color);
+    return doIntersect(ray, color, true);
   }
 
-  private boolean doIntersect(Ray ray, Vector3 color) {
-    if (!drawTexture || ray.d.dot(sw) < .5) {
+  private boolean doIntersect(Ray ray, Vector3 color, boolean isDiffuse) {
+    if ((isDiffuse && !enableSunlight) || (!isDiffuse && !drawTexture) || ray.d.dot(sw) < .5) {
       return false;
     }
 
@@ -460,6 +463,7 @@ public class Sun implements JsonSerializable {
     apparentColorObj.add("green", apparentColor.y);
     apparentColorObj.add("blue", apparentColor.z);
     sun.add("apparentColor", apparentColorObj);
+    sun.add("enableSunlight", enableSunlight);
     sun.add("drawTexture", drawTexture);
     return sun;
   }
@@ -487,6 +491,10 @@ public class Sun implements JsonSerializable {
       apparentColor.z = apparentColorObj.get("blue").doubleValue(1);
     }
 
+    if (!json.get("enableSunlight").isUnknown()) {
+      enableSunlight = json.get("enableSunlight").boolValue(enableSunlight);
+    }
+
     drawTexture = json.get("drawTexture").boolValue(drawTexture);
 
     initSun();
@@ -501,6 +509,17 @@ public class Sun implements JsonSerializable {
 
   public Vector3 getApparentColor() {
     return apparentColor;
+  }
+
+  public void setEnableSunlight(boolean value) {
+    if (value != enableSunlight) {
+      enableSunlight = value;
+      scene.refresh();
+    }
+  }
+
+  public boolean sunlightEnabled() {
+    return enableSunlight;
   }
 
   public void setDrawTexture(boolean value) {

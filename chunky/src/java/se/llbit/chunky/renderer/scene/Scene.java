@@ -3016,15 +3016,7 @@ public class Scene implements JsonSerializable, Refreshable {
     emitterIntensity = json.get("emitterIntensity").doubleValue(emitterIntensity);
 
     if (json.get("sunSamplingStrategy").isUnknown()) {
-      boolean sunSampling = json.get("sunEnabled").boolValue(false);
-      boolean drawSun = json.get("sun").asObject().get("drawTexture").boolValue(false);
-      if (drawSun) {
-        if (sunSampling) {
-          sunSamplingStrategy = SunSamplingStrategy.FAST;
-        } else {
-          sunSamplingStrategy = SunSamplingStrategy.NON_LUMINOUS;
-        }
-      } else {
+      if (json.get("sunEnabled").boolValue(false)) {
         sunSamplingStrategy = SunSamplingStrategy.FAST;
       }
     } else {
@@ -3033,6 +3025,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
     if (json.get("sunEnabled").boolValue(false)) {
       sunSamplingStrategy = SunSamplingStrategy.FAST;
+      sun.setEnableSunlight(true);
     } else {
       sunSamplingStrategy = SunSamplingStrategy.valueOf(json.get("sunSamplingStrategy").asString(SunSamplingStrategy.FAST.getId()));
     }
