@@ -47,11 +47,6 @@ public interface RenderManager {
   Collection<? extends Registerable> getPreviewRenderers();
 
   /**
-   * Instructs the renderer to change its CPU load.
-   */
-  void setCPULoad(int loadPercent);
-
-  /**
    * Set a listener for render completion.
    *
    * @param listener a listener which is passed the total rendering

@@ -179,23 +179,6 @@ public final class PersistentSettings {
     return settings.getInt("yClipMin", 0);
   }
 
-  /**
-   * @return CPU load setting
-   */
-  public static int getCPULoad() {
-    return settings.getInt("cpuLoad", RenderConstants.CPU_LOAD_DEFAULT);
-  }
-
-  /**
-   * Change the default CPU load.
-   */
-  public static void setCPULoad(int cpuLoad) {
-    cpuLoad = Math.max(1, cpuLoad);
-    cpuLoad = Math.min(100, cpuLoad);
-    settings.setInt("cpuLoad", cpuLoad);
-    save();
-  }
-
   public static void setLastWorld(File worldDirectory) {
     settings.setString("lastWorld", worldDirectory.getAbsolutePath());
     save();

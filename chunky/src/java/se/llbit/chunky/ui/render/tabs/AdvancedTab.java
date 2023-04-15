@@ -62,7 +62,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   private Scene scene;
 
   @FXML private IntegerAdjuster renderThreads;
-  @FXML private IntegerAdjuster cpuLoad;
   @FXML private IntegerAdjuster rayDepth;
   @FXML private Button mergeRenderDump;
   @FXML private CheckBox shutdown;
@@ -92,14 +91,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   public void initialize(URL location, ResourceBundle resources) {
     outputMode.getItems().addAll(PictureExportFormats.getFormats());
     outputMode.getSelectionModel().select(PictureExportFormats.PNG);
-    cpuLoad.setName("CPU utilization");
-    cpuLoad.setTooltip("CPU utilization percentage per render thread.");
-    cpuLoad.setRange(1, 100);
-    cpuLoad.clampBoth();
-    cpuLoad.onValueChange(value -> {
-      PersistentSettings.setCPULoad(value);
-      controller.getRenderManager().setCPULoad(value);
-    });
     rayDepth.setName("Ray depth");
     rayDepth.setTooltip("Sets the minimum recursive ray depth.");
     rayDepth.setRange(1, 25);
@@ -302,7 +293,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     outputMode.getSelectionModel().select(scene.getOutputMode());
     fastFog.setSelected(scene.fog.fastFog());
     renderThreads.set(PersistentSettings.getNumThreads());
-    cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
     bvhMethod.getSelectionModel().select(scene.getBvhImplementation());

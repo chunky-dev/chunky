@@ -30,11 +30,6 @@ public interface RenderConstants {
   int NUM_RENDER_THREADS_DEFAULT = Runtime.getRuntime().availableProcessors();
 
   /**
-   * Default CPU load
-   */
-  int CPU_LOAD_DEFAULT = 100;
-
-  /**
    * Minimum number of worker threads
    */
   int NUM_RENDER_THREADS_MIN = 1;

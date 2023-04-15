@@ -15,7 +15,6 @@
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
     <IntegerAdjuster fx:id="renderThreads" />
-    <IntegerAdjuster fx:id="cpuLoad" />
     <Separator prefWidth="200.0" />
     <IntegerAdjuster fx:id="rayDepth" />
     <Separator layoutX="20.0" layoutY="90.0" prefWidth="200.0" />

@@ -27,13 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Performs rendering work.
  */
 public class RenderWorkerPool {
-
-  /**
-   * Sleep interval (in ms).
-   */
-  private static final int MIN_SLEEP_TIME = 100;
-  private static final long MAX_SLEEP_TIME = 1000;
-
   public interface Factory {
     RenderWorkerPool create(int threads, long seed);
   }
@@ -44,55 +37,12 @@ public class RenderWorkerPool {
     public final Random random;
     public final int id;
 
-    private long lastSleep;
-    private long sleepTime = 0;
-
     public RenderWorker(RenderWorkerPool pool, int id, long seed) {
       super("3D Render Worker " + id);
 
       this.pool = pool;
       this.id = id;
       this.random = new Random(seed);
-
-      lastSleep = System.currentTimeMillis();
-    }
-
-    /**
-     * Sleep to manage CPU usage.
-     */
-    public void workSleep() throws InterruptedException {
-      if (pool.cpuLoad < 100) {
-        long workTime = System.currentTimeMillis() - lastSleep;
-        double load = (100.0 - pool.cpuLoad) / pool.cpuLoad;
-        double sleepTime = workTime * load;
-
-        if (sleepTime > MIN_SLEEP_TIME) {
-            Thread.sleep(Math.min((long) sleepTime, MAX_SLEEP_TIME));
-            lastSleep = System.currentTimeMillis();
-        }
-      }
-    }
-
-    /**
-     * Reset the sleep interval.
-     */
-    public void resetSleep() {
-      lastSleep = System.currentTimeMillis();
-    }
-
-    /**
-     * Pause the sleep interval.
-     */
-    public void pauseSleep() {
-      sleepTime += System.currentTimeMillis() - lastSleep;
-    }
-
-    /**
-     * Resume the sleep interval.
-     */
-    public void resumeSleep() {
-      lastSleep = System.currentTimeMillis() - sleepTime;
-      sleepTime = 0;
     }
 
     @Override
@@ -108,8 +58,6 @@ public class RenderWorkerPool {
   }
 
   public final int threads;
-
-  private volatile int cpuLoad = 100;
 
   private final ConcurrentLinkedQueue<RenderJobFuture> workQueue = new ConcurrentLinkedQueue<>();
   private final AtomicInteger progress = new AtomicInteger(0);
@@ -128,20 +76,16 @@ public class RenderWorkerPool {
   }
 
   private void work(RenderWorker worker) throws Throwable {
-    worker.pauseSleep();
     synchronized (workQueue) {
       while (workQueue.isEmpty()) {
         workQueue.wait();
       }
     }
-    worker.resumeSleep();
 
     RenderJobFuture task = workQueue.poll();
     if (task == null) return;
     task.task.accept(worker);
     task.finished();
-
-    worker.workSleep();
 
     progress.incrementAndGet();
     synchronized (progress) { progress.notifyAll(); }
@@ -153,15 +97,6 @@ public class RenderWorkerPool {
     synchronized (workQueue) { workQueue.notifyAll(); }
     localProgress.incrementAndGet();
     return future;
-  }
-
-  /**
-   * Set the cpu load. The pools will attempt (not guaranteed) to limit cpu usage to this value.
-   * @param cpuLoad percentage of cpu usage, will be clamped to [1..100]
-   */
-  public void setCpuLoad(int cpuLoad) {
-    // Clamp to 1-100
-    this.cpuLoad = Math.max(Math.min(cpuLoad, 100), 1);
   }
 
   /**

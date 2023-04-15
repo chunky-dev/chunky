@@ -17,7 +17,6 @@
  */
 package se.llbit.chunky.renderer;
 
-import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
@@ -106,13 +105,10 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   /**
    * This is the render worker pool {@code Renderer}s should use.
    *
-   * {@code Renderer}s should submit small work-units to this pool. CPU usage is limited automatically, but if
-   * each work-unit can take a long time, they should call {@code RenderWorkerPool.RenderWorker.workSleep()}
-   * periodically to manage CPU usage.
+   * {@code Renderer}s should submit small work-units to this pool.
    */
   public final RenderWorkerPool pool;
 
-  protected int cpuLoad = 100;
 
   /**
    * The render canvas. This is redrawn on every frame (if applicable).
@@ -187,7 +183,6 @@ public class DefaultRenderManager extends Thread implements RenderManager {
 
     // Create a new pool. Set the seed to the current time in milliseconds.
     this.pool = context.renderPoolFactory.create(context.numRenderThreads(), System.currentTimeMillis());
-    this.setCPULoad(PersistentSettings.getCPULoad());
 
     // Initialize callbacks here since java will complain `bufferedScene` is not initialized yet.
     // (nothing important in the rest of the constructor)
@@ -300,11 +295,8 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         if (mode == RenderMode.PREVIEW) {
           // Bail early if the preview is not visible
           if (finalizeAllFrames) {
-            // Preview with no CPU limit
-            pool.setCpuLoad(100);
             render.setPostRender(previewCallback);
             render.render(this);
-            pool.setCpuLoad(cpuLoad);
           }
         } else {
           // Bail early if render is already done
@@ -537,17 +529,6 @@ public class DefaultRenderManager extends Thread implements RenderManager {
 
   public TaskTracker.Task getRenderTask() {
     return renderTask;
-  }
-
-  /**
-   * Set CPU load percentage.
-   *
-   * @param value new load percentage.
-   */
-  @Override
-  public void setCPULoad(int value) {
-    this.cpuLoad = value;
-    pool.setCpuLoad(value);
   }
 
   @Override
