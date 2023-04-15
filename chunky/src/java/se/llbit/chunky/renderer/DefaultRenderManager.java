@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.renderer;
 
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
@@ -109,6 +110,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
    */
   public final RenderWorkerPool pool;
 
+  protected int renderThreads = RenderConstants.NUM_RENDER_THREADS_DEFAULT;
 
   /**
    * The render canvas. This is redrawn on every frame (if applicable).
@@ -183,6 +185,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
 
     // Create a new pool. Set the seed to the current time in milliseconds.
     this.pool = context.renderPoolFactory.create(context.numRenderThreads(), System.currentTimeMillis());
+    this.setRenderThreads(PersistentSettings.getNumThreads());
 
     // Initialize callbacks here since java will complain `bufferedScene` is not initialized yet.
     // (nothing important in the rest of the constructor)
@@ -529,6 +532,12 @@ public class DefaultRenderManager extends Thread implements RenderManager {
 
   public TaskTracker.Task getRenderTask() {
     return renderTask;
+  }
+
+  @Override
+  public void setRenderThreads(int value) {
+    this.renderThreads = value;
+    pool.setRenderThreads(value);
   }
 
   @Override

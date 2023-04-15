@@ -57,16 +57,17 @@ public class RenderWorkerPool {
     }
   }
 
-  public final int threads;
+  public volatile int threads;
 
   private final ConcurrentLinkedQueue<RenderJobFuture> workQueue = new ConcurrentLinkedQueue<>();
   private final AtomicInteger progress = new AtomicInteger(0);
   private final AtomicInteger localProgress = new AtomicInteger(0);
 
-  protected final RenderWorker[] workers;
-
+  protected RenderWorker[] workers;
+  private final long workerSeed;
   public RenderWorkerPool(int threads, long seed) {
     this.threads = threads;
+    this.workerSeed = seed;
 
     workers = new RenderWorker[threads];
     for (int i = 0; i < threads; i++) {
@@ -76,6 +77,10 @@ public class RenderWorkerPool {
   }
 
   private void work(RenderWorker worker) throws Throwable {
+    while (worker.id >= this.threads) {
+      Thread.sleep(1000);
+    }
+
     synchronized (workQueue) {
       while (workQueue.isEmpty()) {
         workQueue.wait();
@@ -110,7 +115,33 @@ public class RenderWorkerPool {
     }
   }
 
-  public void interrupt() {
+  /**
+   * Synchronized (internally) along with {@link RenderWorkerPool#interrupt()} to
+   * prevent an unlikely race with it
+   */
+  public void setRenderThreads(int renderThreads) {
+    this.threads = Math.max(Math.min(renderThreads, RenderConstants.NUM_RENDER_THREADS_MAX), RenderConstants.NUM_RENDER_THREADS_MIN);
+
+    if (this.threads > this.workers.length) {
+      // threads is bigger than our worker array, so we recreate it
+      synchronized (this) {
+        RenderWorker[] existingWorkers = this.workers;
+        this.workers = new RenderWorker[this.threads];
+
+        System.arraycopy(existingWorkers, 0, this.workers, 0, existingWorkers.length);
+        for (int i = existingWorkers.length; i < this.threads; i++) {
+          this.workers[i] = new RenderWorker(this, i, this.workerSeed + i);
+          this.workers[i].start();
+        }
+      }
+    }
+  }
+
+  /**
+   * Synchronized along with {@link RenderWorkerPool#setRenderThreads(int)} to
+   * prevent an unlikely race with it
+   */
+  public synchronized void interrupt() {
     for (RenderWorker worker : workers) {
       worker.interrupt();
     }

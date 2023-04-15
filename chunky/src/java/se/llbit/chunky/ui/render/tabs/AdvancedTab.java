@@ -28,6 +28,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
+import se.llbit.chunky.renderer.RenderConstants;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
@@ -150,11 +151,11 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     });
     renderThreads.setName("Render threads");
     renderThreads.setTooltip("Number of rendering threads.");
-    renderThreads.setRange(1, 20);
+    renderThreads.setRange(1, 2 * RenderConstants.NUM_RENDER_THREADS_DEFAULT);
     renderThreads.clampMin();
     renderThreads.onValueChange(value -> {
       PersistentSettings.setNumRenderThreads(value);
-      renderControls.showPopup("This change takes effect after restarting Chunky.", renderThreads);
+      controller.getRenderManager().setRenderThreads(value);
     });
 
     ArrayList<String> octreeNames = new ArrayList<>();
