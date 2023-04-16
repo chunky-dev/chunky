@@ -2,6 +2,7 @@ package se.llbit.chunky.world;
 
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
+import se.llbit.chunky.chunk.biome.BiomeData2d;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.ui.ProgressTracker;
@@ -51,8 +52,13 @@ public class CubicWorld extends World {
   }
 
   @Override
-  public ChunkData createChunkData() {
-    return new GenericChunkData();
+  public ChunkData createChunkData(ChunkData chunkData, int chunkVersion) {
+    if (chunkData instanceof GenericChunkData) {
+      return chunkData;
+    }
+    GenericChunkData genericChunkData = new GenericChunkData();
+    genericChunkData.setBiomeData(new BiomeData2d()); //TODO: CubicChunks biomes support
+    return genericChunkData;
   }
 
   @Override
@@ -113,13 +119,14 @@ public class CubicWorld extends World {
     }
   }
 
+  @Override
   public boolean regionExistsWithinRange(ChunkPosition pos, int minY, int maxY) {
     int cubicRegionX = pos.x << 1;
     int cubicRegionZ = pos.z << 1;
 
     File regionDirectory = getRegionDirectory();
     int minRegionY = cubeToCubicRegion(blockToCube(minY));
-    int maxRegionY = cubeToCubicRegion(blockToCube(maxY));
+    int maxRegionY = cubeToCubicRegion(blockToCube(maxY - 1));
     for (int y = minRegionY; y <= maxRegionY; y++) {
       for (int localX = 0; localX < ImposterCubicRegion.DIAMETER_IN_CUBIC_REGIONS; localX++) {
         for (int localZ = 0; localZ < ImposterCubicRegion.DIAMETER_IN_CUBIC_REGIONS; localZ++) {

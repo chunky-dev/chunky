@@ -17,11 +17,11 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
       with:
-        java-version: 1.8
-        java-package: jdk+fx
+        distribution: 'temurin'
+        java-version: '17'
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
@@ -35,15 +35,24 @@ jobs:
       env:
         PR_NUMBER: ${{ github.event.pull_request.number }}
       run: |
-        if [[ "${GITHUB_EVENT_NAME}" != "pull_request" ]]; then
-          ./gradlew build releasejar -PnewVersion="$(git describe)"
-        else
-          ./gradlew build releasejar -PnewVersion="PR-${PR_NUMBER}_$(git describe)"
-        fi
-    - name: Cleanup
-      run: rm -rf build/docs build/tmp
+        case "${GITHUB_EVENT_NAME}" in
+          "pull_request")
+            ./gradlew buildReleaseJar -PprereleaseTag="PR.${PR_NUMBER}"
+            ;;
+          "push")
+            ./gradlew buildReleaseJar -PprereleaseTag="SNAPSHOT"
+            ;;
+          *)
+            ./gradlew buildReleaseJar
+            ;;
+        esac
     - name: Upload build
       uses: actions/upload-artifact@v2.2.2
       with:
         name: Chunky Build
-        path: build/
+        path: build/installer
+    - name: Upload build
+      uses: actions/upload-artifact@v2.2.2
+      with:
+        name: Chunky Core
+        path: build/chunky-core-*.jar

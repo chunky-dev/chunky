@@ -18,7 +18,7 @@ package se.llbit.chunky.resources.texturepack;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipFile;
+import java.nio.file.Path;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.resources.ImageLoader;
@@ -152,7 +152,7 @@ public class ChestTexture extends TextureLoader {
   }
 
   @Override
-  public boolean load(ZipFile texturePack, String topLevelDir) {
-    return load(topLevelDir + file, texturePack);
+  public boolean load(Path texturePack) {
+    return load(file, texturePack);
   }
 }

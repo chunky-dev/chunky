@@ -17,7 +17,6 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -101,13 +100,15 @@ public class BrewingStandModel extends QuadModel {
           new Vector3(2 / 16.0, 2 / 16.0, 7 / 16.0),
           new Vector3(8 / 16.0, 2 / 16.0, 7 / 16.0),
           new Vector3(2 / 16.0, 2 / 16.0, 1 / 16.0),
-          new Vector4(2 / 16.0, 8 / 16.0, 9 / 16.0, 15 / 16.0)
+          new Vector4(1 / 16.0, 7 / 16.0, 9 / 16.0, 15 / 16.0)
+          // new Vector4(2 / 16.0, 8 / 16.0, 9 / 16.0, 15 / 16.0) // <22w17a
       ),
       new Quad(
           new Vector3(2 / 16.0, 0 / 16.0, 1 / 16.0),
           new Vector3(8 / 16.0, 0 / 16.0, 1 / 16.0),
           new Vector3(2 / 16.0, 0 / 16.0, 7 / 16.0),
-          new Vector4(2 / 16.0, 8 / 16.0, 9 / 16.0, 15 / 16.0)
+          new Vector4(1 / 16.0, 7 / 16.0, 9 / 16.0, 15 / 16.0)
+          // new Vector4(2 / 16.0, 8 / 16.0, 9 / 16.0, 15 / 16.0) // <22w17a
       ),
       new Quad(
           new Vector3(2 / 16.0, 2 / 16.0, 7 / 16.0),
@@ -125,25 +126,29 @@ public class BrewingStandModel extends QuadModel {
           new Vector3(2 / 16.0, 2 / 16.0, 1 / 16.0),
           new Vector3(8 / 16.0, 2 / 16.0, 1 / 16.0),
           new Vector3(2 / 16.0, 0 / 16.0, 1 / 16.0),
-          new Vector4(8 / 16.0, 2 / 16.0, 2 / 16.0, 0 / 16.0)
+          new Vector4(7 / 16.0, 1 / 16.0, 2 / 16.0, 0 / 16.0)
+          // new Vector4(8 / 16.0, 2 / 16.0, 2 / 16.0, 0 / 16.0) // <22w17a
       ),
       new Quad(
           new Vector3(8 / 16.0, 2 / 16.0, 7 / 16.0),
           new Vector3(2 / 16.0, 2 / 16.0, 7 / 16.0),
           new Vector3(8 / 16.0, 0 / 16.0, 7 / 16.0),
-          new Vector4(8 / 16.0, 2 / 16.0, 2 / 16.0, 0 / 16.0)
+          new Vector4(7 / 16.0, 1 / 16.0, 2 / 16.0, 0 / 16.0)
+          // new Vector4(8 / 16.0, 2 / 16.0, 2 / 16.0, 0 / 16.0) // <22w17a
       ),
       new Quad(
           new Vector3(2 / 16.0, 2 / 16.0, 15 / 16.0),
           new Vector3(8 / 16.0, 2 / 16.0, 15 / 16.0),
           new Vector3(2 / 16.0, 2 / 16.0, 9 / 16.0),
-          new Vector4(2 / 16.0, 8 / 16.0, 1 / 16.0, 7 / 16.0)
+          new Vector4(1 / 16.0, 7 / 16.0, 1 / 16.0, 7 / 16.0)
+          // new Vector4(2 / 16.0, 8 / 16.0, 1 / 16.0, 7 / 16.0) // <22w17a
       ),
       new Quad(
           new Vector3(2 / 16.0, 0 / 16.0, 9 / 16.0),
           new Vector3(8 / 16.0, 0 / 16.0, 9 / 16.0),
           new Vector3(2 / 16.0, 0 / 16.0, 15 / 16.0),
-          new Vector4(2 / 16.0, 8 / 16.0, 1 / 16.0, 7 / 16.0)
+          new Vector4(1 / 16.0, 7 / 16.0, 1 / 16.0, 7 / 16.0)
+          // new Vector4(2 / 16.0, 8 / 16.0, 1 / 16.0, 7 / 16.0) // <22w17a
       ),
       new Quad(
           new Vector3(2 / 16.0, 2 / 16.0, 15 / 16.0),
@@ -161,42 +166,44 @@ public class BrewingStandModel extends QuadModel {
           new Vector3(2 / 16.0, 2 / 16.0, 9 / 16.0),
           new Vector3(8 / 16.0, 2 / 16.0, 9 / 16.0),
           new Vector3(2 / 16.0, 0 / 16.0, 9 / 16.0),
-          new Vector4(8 / 16.0, 2 / 16.0, 2 / 16.0, 0 / 16.0)
+          new Vector4(7 / 16.0, 1 / 16.0, 2 / 16.0, 0 / 16.0)
+          // new Vector4(8 / 16.0, 2 / 16.0, 2 / 16.0, 0 / 16.0) // <22w17a
       ),
       new Quad(
           new Vector3(8 / 16.0, 2 / 16.0, 15 / 16.0),
           new Vector3(2 / 16.0, 2 / 16.0, 15 / 16.0),
           new Vector3(8 / 16.0, 0 / 16.0, 15 / 16.0),
-          new Vector4(8 / 16.0, 2 / 16.0, 2 / 16.0, 0 / 16.0)
+          new Vector4(7 / 16.0, 1 / 16.0, 2 / 16.0, 0 / 16.0)
+          // new Vector4(8 / 16.0, 2 / 16.0, 2 / 16.0, 0 / 16.0) // <22w17a
       ),
   };
 
-  private static final DoubleSidedQuad[] noBottleQuads = {
+  private static final Quad[] noBottleQuads = {
       // east
-      new DoubleSidedQuad(new Vector3(9 / 16., 0, .5), new Vector3(1, 0, .5),
-          new Vector3(.5, 1, .5), new Vector4(9 / 16., 1, 0, 1)),
+      new Quad(new Vector3(9 / 16., 0, .5), new Vector3(1, 0, .5),
+          new Vector3(.5, 1, .5), new Vector4(9 / 16., 1, 0, 1), true),
 
       // southwest 210
-      new DoubleSidedQuad(new Vector3(.46, 0, 9 / 16.), new Vector3(.25, 0, .933),
-          new Vector3(.46, 1, 9 / 16.), new Vector4(9 / 16., 1, 0, 1)),
+      new Quad(new Vector3(.46, 0, 9 / 16.), new Vector3(.25, 0, .933),
+          new Vector3(.46, 1, 9 / 16.), new Vector4(9 / 16., 1, 0, 1), true),
 
       // northwest 330
-      new DoubleSidedQuad(new Vector3(.46, 0, 7 / 16.), new Vector3(.25, 0, .067),
-          new Vector3(.46, 1, 7 / 16.), new Vector4(9 / 16., 1, 0, 1)),
+      new Quad(new Vector3(.46, 0, 7 / 16.), new Vector3(.25, 0, .067),
+          new Vector3(.46, 1, 7 / 16.), new Vector4(9 / 16., 1, 0, 1), true),
   };
 
-  private static final DoubleSidedQuad[] bottleQuads = {
+  private static final Quad[] bottleQuads = {
       // east
-      new DoubleSidedQuad(new Vector3(9 / 16., 0, .5), new Vector3(1, 0, .5),
-          new Vector3(.50, 1, 8 / 16.), new Vector4(7 / 16., 0, 0, 1)),
+      new Quad(new Vector3(9 / 16., 0, .5), new Vector3(1, 0, .5),
+          new Vector3(.50, 1, 8 / 16.), new Vector4(7 / 16., 0, 0, 1), true),
 
       // southwest 210
-      new DoubleSidedQuad(new Vector3(.46, 0, 9 / 16.), new Vector3(.25, 0, .933),
-          new Vector3(.46, 1, 9 / 16.), new Vector4(7 / 16., 0., 0, 1)),
+      new Quad(new Vector3(.46, 0, 9 / 16.), new Vector3(.25, 0, .933),
+          new Vector3(.46, 1, 9 / 16.), new Vector4(7 / 16., 0., 0, 1), true),
 
       // northwest 330
-      new DoubleSidedQuad(new Vector3(.46, 0, 7 / 16.), new Vector3(.25, 0, .067),
-          new Vector3(.46, 1, 7 / 16.), new Vector4(7 / 16., 0, 0, 1)),
+      new Quad(new Vector3(.46, 0, 7 / 16.), new Vector3(.25, 0, .067),
+          new Vector3(.46, 1, 7 / 16.), new Vector4(7 / 16., 0, 0, 1), true),
   };
   //endregion
 

@@ -21,13 +21,14 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.texturepack.FontTexture;
+import se.llbit.chunky.resources.texturepack.TexturePath;
 import se.llbit.fxutil.FxImageUtil;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
 import se.llbit.resources.ImageLoader;
-import se.llbit.util.NotNull;
+import se.llbit.util.annotation.NotNull;
 
 /**
  * This class contains static fields for common textures.
@@ -55,8 +56,7 @@ public class Texture {
 
   public static Texture black = new SolidColorTexture(new Vector4(0, 0, 0, 1));
 
-  public static final Texture paintings = new Texture(); // 1.13 or older
-  public static final Texture paintingAlban = new Texture(); // 1.14 or newer
+  public static final Texture paintingAlban = new Texture();
   public static final Texture paintingAztec2 = new Texture();
   public static final Texture paintingAztec = new Texture();
   public static final Texture paintingBack = new Texture();
@@ -109,8 +109,6 @@ public class Texture {
   public static final Texture cauldronBottom = new Texture();
   public static final Texture smoothStone = new Texture();
   public static final Texture smoothStoneSlabSide = new Texture();
-  public static final Texture slabTop = new Texture("stone-slab");
-  public static final Texture slabSide = new Texture("double-stone-slab");
   public static final Texture brick = new Texture("bricks");
   public static final Texture tntTop = new Texture();
   public static final Texture tntSide = new Texture("tnt");
@@ -178,6 +176,7 @@ public class Texture {
   public static final Texture sugarCane = new Texture("sugar-canes");
   public static final Texture jukeboxSide = new Texture();
   public static final Texture jukeboxTop = new Texture();
+  public static final Texture noteBlock = new Texture();
   public static final Texture torch = new Texture("torch");
   public static final Texture oakDoorTop = new Texture();
   public static final Texture oakDoorBottom = new Texture();
@@ -596,7 +595,7 @@ public class Texture {
    */
   public static final Texture unknown = new Texture("unknown");
 
-  public static final Texture signPost = new Texture();
+  public static final Texture oakSignPost = new Texture();
   public static final Texture packedIce = new Texture();
   public static final Texture redSand = new Texture();
 
@@ -761,7 +760,6 @@ public class Texture {
   public static final Texture birchSignPost = new Texture();
   public static final Texture darkOakSignPost = new Texture();
   public static final Texture jungleSignPost = new Texture();
-  public static final Texture oakSignPost = new Texture();
   public static final Texture spruceSignPost = new Texture();
   public static final Texture cartographyTableSide1 = new Texture();
   public static final Texture cartographyTableSide2 = new Texture();
@@ -896,8 +894,8 @@ public class Texture {
   public static final Texture crimsonTrapdoor = new Texture();
   public static final Texture warpedTrapdoor = new Texture();
   public static final Texture soulFire = new Texture();
-  public static final AnimatedTexture soulFireLayer0 = new AnimatedTexture("soul_fire");
-  public static final AnimatedTexture soulFireLayer1 = new AnimatedTexture("soul_fire");
+  public static final AnimatedTexture soulFireLayer0 = new AnimatedTexture();
+  public static final AnimatedTexture soulFireLayer1 = new AnimatedTexture();
   public static final Texture lodestoneSide = new Texture();
   public static final Texture lodestoneTop = new Texture();
   public static final Texture blackstone = new Texture();
@@ -1041,6 +1039,181 @@ public class Texture {
   public static final Texture pottedFloweringAzaleaBushTop = new Texture();
   public static final Texture pottedFloweringAzaleaBushSide = new Texture();
 
+  // [1.19]
+  @TexturePath("assets/minecraft/textures/block/mud")
+  public static final Texture mud = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mud_bricks")
+  public static final Texture mudBricks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/packed_mud")
+  public static final Texture packedMud = new Texture();
+  @TexturePath("assets/minecraft/textures/block/muddy_mangrove_roots_side")
+  public static final Texture muddyMangroveRootsSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/muddy_mangrove_roots_top")
+  public static final Texture muddyMangroveRootsTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/reinforced_deepslate_top")
+  public static final Texture reinforcedDeepslateTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/reinforced_deepslate_side")
+  public static final Texture reinforcedDeepslateSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/reinforced_deepslate_bottom")
+  public static final Texture reinforcedDeepslateBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/frogspawn")
+  public static final Texture frogspawn = new Texture();
+  @TexturePath("assets/minecraft/textures/block/ochre_froglight_side")
+  public static final Texture ochreFroglightSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/ochre_froglight_top")
+  public static final Texture ochreFroglightTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/verdant_froglight_side")
+  public static final Texture verdantFroglightSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/verdant_froglight_top")
+  public static final Texture verdantFroglightTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pearlescent_froglight_side")
+  public static final Texture pearlescentFroglightSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pearlescent_froglight_top")
+  public static final Texture pearlescentFroglightTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_planks")
+  public static final Texture mangrovePlanks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_door_top")
+  public static final Texture mangroveDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_door_bottom")
+  public static final Texture mangroveDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_leaves")
+  public static final Texture mangroveLeaves = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_log")
+  public static final Texture mangroveLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_log_top")
+  public static final Texture mangroveLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_mangrove_log")
+  public static final Texture strippedMangroveLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_mangrove_log_top")
+  public static final Texture strippedMangroveLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/mangrove")
+  public static final Texture mangroveSignPost = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_trapdoor")
+  public static final Texture mangroveTrapdoor = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_roots_side")
+  public static final Texture mangroveRootsSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_roots_top")
+  public static final Texture mangroveRootsTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_propagule")
+  public static final Texture mangrovePropagule = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_propagule_hanging")
+  public static final Texture mangrovePropaguleHanging = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_catalyst_top")
+  public static final Texture sculkCatalystTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_catalyst_side")
+  public static final Texture sculkCatalystSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_catalyst_bottom")
+  public static final Texture sculkCatalystBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_catalyst_top_bloom")
+  public static final Texture sculkCatalystTopBloom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_catalyst_side_bloom")
+  public static final Texture sculkCatalystSideBloom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk")
+  public static final Texture sculk = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_shrieker_top")
+  public static final Texture sculkShriekerTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_shrieker_side")
+  public static final Texture sculkShriekerSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_shrieker_bottom")
+  public static final Texture sculkShriekerBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_shrieker_can_summon_inner_top")
+  public static final Texture sculkShriekerCanSummonInnerTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_shrieker_inner_top")
+  public static final Texture sculkShriekerInnerTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sculk_vein")
+  public static final Texture sculkVein = new Texture();
+
+  //1.20
+  @TexturePath("assets/minecraft/textures/block/bamboo_planks")
+  public static final Texture bambooPlanks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_mosaic")
+  public static final Texture bambooMosaic = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_door_top")
+  public static final Texture bambooDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_door_bottom")
+  public static final Texture bambooDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_block")
+  public static final Texture bambooBlock = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_block_top")
+  public static final Texture bambooBlockTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_bamboo_block")
+  public static final Texture strippedBambooBlock = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_bamboo_block_top")
+  public static final Texture strippedBambooBlockTop = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/bamboo")
+  public static final Texture bambooSignPost = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_trapdoor")
+  public static final Texture bambooTrapdoor = new Texture();
+
+  @TexturePath("assets/minecraft/textures/block/cherry_planks")
+  public static final Texture cherryPlanks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_door_top")
+  public static final Texture cherryDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_door_bottom")
+  public static final Texture cherryDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_leaves")
+  public static final Texture cherryLeaves = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_log")
+  public static final Texture cherryLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_log_top")
+  public static final Texture cherryLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_cherry_log")
+  public static final Texture strippedCherryLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_cherry_log_top")
+  public static final Texture strippedCherryLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/cherry")
+  public static final Texture cherrySignPost = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_trapdoor")
+  public static final Texture cherryTrapdoor = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_sapling")
+  public static final Texture cherrySapling = new Texture();
+  @TexturePath("assets/minecraft/textures/block/torchflower")
+  public static final Texture torchflower = new Texture();
+  @TexturePath("assets/minecraft/textures/block/torchflower_crop_stage0")
+  public static final Texture torchflowerCropStage0 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/torchflower_crop_stage1")
+  public static final Texture torchflowerCropStage1 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/torchflower_crop_stage2")
+  public static final Texture torchflowerCropStage2 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_empty")
+  public static final Texture chiseledBookshelfEmpty = new Texture();
+  @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_occupied")
+  public static final Texture chiseledBookshelfOccupied = new Texture();
+  @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_side")
+  public static final Texture chiseledBookshelfSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_top")
+  public static final Texture chiseledBookshelfTop = new Texture();
+
+  public static final Texture[] chiseledBookshelfCombinations = new ChiseledBookshelfTexture[64];
+  static {
+    for(int i = 0; i < chiseledBookshelfCombinations.length; i++) {
+      chiseledBookshelfCombinations[i] = new ChiseledBookshelfTexture(Texture.chiseledBookshelfEmpty, Texture.chiseledBookshelfOccupied,
+        i % 2 == 1, (i >> 1) % 2 == 1, (i >> 2) % 2 == 1, (i >> 3) % 2 == 1, (i >> 4) % 2 == 1, (i >> 5) % 2 == 1);
+    }
+  }
+
+  @TexturePath("assets/minecraft/textures/block/suspicious_sand_0")
+  public static final Texture suspiciousSandStage0 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/suspicious_sand_1")
+  public static final Texture suspiciousSandStage1 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/suspicious_sand_2")
+  public static final Texture suspiciousSandStage2 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/suspicious_sand_3")
+  public static final Texture suspiciousSandStage3 = new Texture();
+
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/decorated_pot_base")
+  public static final Texture decoratedPotBase = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/decorated_pot_side")
+  public static final Texture decoratedPotSide = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/pottery_pattern_archer")
+  public static final Texture decoratedPotPatternArcher = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/pottery_pattern_arms_up")
+  public static final Texture decoratedPotPatternArmsUp = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/pottery_pattern_prize")
+  public static final Texture decoratedPotPatternPrize = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/pottery_pattern_skull")
+  public static final Texture decoratedPotPatternSkull = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 
@@ -1051,7 +1224,7 @@ public class Texture {
   protected int height;
   protected int avgColor;
   private float[] avgColorLinear;
-  private boolean useAverageColor = false;
+  private boolean usesAverageColor = false;
   private float[] avgColorFlat;
 
   private Image fxImage = null;
@@ -1061,11 +1234,19 @@ public class Texture {
   }
 
   public Texture(String resourceName) {
-    this(ImageLoader.readNonNull("textures/" + resourceName + ".png"));
+    this(ImageLoader.readResourceNonNull("textures/" + resourceName + ".png"));
   }
 
   public Texture(BitmapImage img) {
     setTexture(img);
+    useAverageColor(PersistentSettings.getSingleColorTextures());
+  }
+
+  public void useAverageColor(boolean enable) {
+    usesAverageColor = enable;
+  }
+  public boolean usesAverageColor() {
+    return usesAverageColor;
   }
 
   public void setTexture(Texture texture) {
@@ -1093,15 +1274,12 @@ public class Texture {
       }
     }
 
-    useAverageColor = PersistentSettings.getSingleColorTextures();
-    if (useAverageColor) {
-      avgColorFlat = new float[4];
-      if (avgColorLinear[3] > 0.001) {
-        avgColorFlat[0] = avgColorLinear[0] / avgColorLinear[3];
-        avgColorFlat[1] = avgColorLinear[1] / avgColorLinear[3];
-        avgColorFlat[2] = avgColorLinear[2] / avgColorLinear[3];
-        avgColorFlat[3] = 1;
-      }
+    avgColorFlat = new float[4];
+    if (avgColorLinear[3] > 0.001) {
+      avgColorFlat[0] = avgColorLinear[0] / avgColorLinear[3];
+      avgColorFlat[1] = avgColorLinear[1] / avgColorLinear[3];
+      avgColorFlat[2] = avgColorLinear[2] / avgColorLinear[3];
+      avgColorFlat[3] = 1;
     }
 
     avgColorLinear[0] /= width * height;
@@ -1144,8 +1322,8 @@ public class Texture {
    *
    * @return color
    */
-  public final float[] getColor(int x, int y) {
-    if(useAverageColor)
+  public float[] getColor(int x, int y) {
+    if(usesAverageColor)
       return avgColorFlat;
     float[] result = new float[4];
     ColorUtil.getRGBAComponentsGammaCorrected(image.data[width*y + x], result);
@@ -1210,6 +1388,12 @@ public class Texture {
    */
   public float[] getAvgColorLinear() {
     return avgColorLinear;
+  }
+  /**
+   * @return The average flat color of this texture
+   */
+  public float[] getAvgColorFlat() {
+    return avgColorFlat;
   }
 
   public int getWidth() {

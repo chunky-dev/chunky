@@ -26,9 +26,9 @@ public class CubicRegionChangeWatcher extends RegionChangeWatcher {
         ChunkView theView = view;
         for (int rx = theView.prx0; rx <= theView.prx1; ++rx) {
           for (int rz = theView.prz0; rz <= theView.prz1; ++rz) {
-            Region region = world.getRegionWithinRange(ChunkPosition.get(rx, rz), theView.yMin, theView.yMax);
+            Region region = world.getRegionWithinRange(new ChunkPosition(rx, rz), theView.yMin, theView.yMax);
             if (region.isEmpty()) {
-              ChunkPosition pos = ChunkPosition.get(rx, rz);
+              ChunkPosition pos = new ChunkPosition(rx, rz);
               if (world.regionExistsWithinRange(pos, theView.yMin, theView.yMax)) {
                 region = world.createRegion(pos);
               }

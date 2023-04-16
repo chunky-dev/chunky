@@ -18,12 +18,8 @@
 package se.llbit.chunky.renderer.scene;
 
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.renderer.RenderContext;
-import se.llbit.chunky.renderer.RenderMode;
-import se.llbit.chunky.renderer.RenderStatus;
-import se.llbit.chunky.renderer.RenderManager;
-import se.llbit.chunky.renderer.ResetReason;
-import se.llbit.chunky.renderer.SceneProvider;
+import se.llbit.chunky.plugin.PluginApi;
+import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
 import se.llbit.log.Log;
@@ -33,6 +29,9 @@ import se.llbit.util.TaskTracker;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -45,22 +44,24 @@ import java.util.function.Consumer;
  */
 public class SynchronousSceneManager implements SceneProvider, SceneManager {
   /**
-   * This stores all pending scene state changes. When the scene edit
-   * grace period has expired any changes to this scene state are not
-   * copied directly to the stored scene state.
+   * This stores all pending scene state changes. Until the scene edit
+   * grace period has expired any changes to this scene state are also
+   * applied to the stored scene state {@link #storedScene}. After that,
+   * a reset confirm dialog will be shown before applying any further
+   * non-transitory changes.
    *
-   * Multiple threads can try to read/write the mutable scene concurrently,
+   * <p>Multiple threads can try to read/write the mutable scene concurrently,
    * so multiple accesses are serialized by the intrinsic lock of the Scene
    * class.
    *
-   * NB: lock ordering for scene and storedScene is always scene->storedScene!
+   * <p><strong>Important: lock ordering for scene and storedScene is always scene->storedScene!
    */
   private final Scene scene;
 
   /**
    * Stores the current scene configuration. When the scene edit grace period has
    * expired a reset confirm dialog will be shown before applying any further
-   * non-transitory changes to the stored scene state.
+   * non-transitory changes from the pending scene state changes in {@link #scene}.
    */
   private final Scene storedScene;
 
@@ -71,7 +72,10 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   private RenderResetHandler resetHandler = () -> true;
   private TaskTracker taskTracker = new TaskTracker(ProgressListener.NONE);
   private Runnable onSceneLoaded = () -> {};
+  private Runnable onSceneSaved = () -> {};
   private Runnable onChunksLoaded = () -> {};
+
+  private final Set<BiConsumer<ResetReason, Scene>> resetListeners = new CopyOnWriteArraySet<>();
 
   public SynchronousSceneManager(RenderContext context, RenderManager renderManager) {
     this.context = context;
@@ -79,6 +83,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
 
     scene = context.getChunky().getSceneFactory().newScene();
     scene.initBuffers();
+    context.setSceneDirectory(new File(context.getChunky().options.sceneDir, scene.name));
 
     // The stored scene is a copy of the mutable scene. They even share
     // some data structures that are only used by the renderManager.
@@ -92,9 +97,18 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   public void setTaskTracker(TaskTracker taskTracker) {
     this.taskTracker = taskTracker;
   }
+  
+  @Override
+  public TaskTracker getTaskTracker() {
+    return taskTracker;
+  }
 
   public void setOnSceneLoaded(Runnable onSceneLoaded) {
     this.onSceneLoaded = onSceneLoaded;
+  }
+
+  public void setOnSceneSaved(Runnable onSceneSaved) {
+    this.onSceneSaved = onSceneSaved;
   }
 
   public void setOnChunksLoaded(Runnable onChunksLoaded) {
@@ -105,39 +119,97 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     return scene;
   }
 
+  @Override
+  public SceneProvider getSceneProvider() {
+    return this;
+  }
+
+  @PluginApi
+  @Override public void saveScene(File sceneDirectory) throws InterruptedException {
+    synchronized (storedScene) {
+      context.setSceneDirectory(sceneDirectory);
+      saveScene(context, storedScene);
+    }
+  }
+
+  @PluginApi
+  @Deprecated
   @Override public void saveScene() throws InterruptedException {
-    try {
+    saveScene(context.getSceneDirectory());
+  }
+
+  public void saveSceneAs(String newName) throws InterruptedException {
+    // Lock order: scene -> storedScene.
+    synchronized (scene) {
       synchronized (storedScene) {
-        String sceneName = storedScene.name();
-        Log.info("Saving scene " + sceneName);
-        File sceneDir = resolveSceneDirectory(sceneName);
-        context.setSceneDirectory(sceneDir);
-        if (!sceneDir.isDirectory()) {
-          boolean success = sceneDir.mkdirs();
-          if (!success) {
-            Log.warn("Failed to create scene directory: " + sceneDir.getAbsolutePath());
-            return;
-          }
-        }
-
-        // Create backup of scene description and current render dump.
-        storedScene.backupFile(context, context.getSceneDescriptionFile(sceneName));
-        storedScene.backupFile(context, new File(sceneDir, sceneName + ".dump"));
-
-        // Copy render status over from the renderManager.
-        RenderStatus status = renderManager.getRenderStatus();
-        storedScene.renderTime = status.getRenderTime();
-        storedScene.spp = status.getSpp();
-        storedScene.saveScene(context, taskTracker);
-        Log.info("Scene saved");
+        scene.setName(newName);
+        storedScene.setName(newName);
       }
+    }
+    saveScene(resolveSceneDirectory(newName));
+  }
+
+  public void saveScene(SceneIOProvider context, Scene scene) throws InterruptedException {
+    try {
+      String sceneName = scene.name();
+      Log.info("Saving scene " + sceneName);
+      File sceneDir = context.getSceneDirectory();
+      if (!sceneDir.isDirectory()) {
+        sceneDir = resolveSceneDirectory(sceneName);
+      }
+      if (!sceneDir.isDirectory()) {
+        boolean success = sceneDir.mkdirs();
+        if (!success) {
+          Log.warn("Failed to create scene directory: " + sceneDir.getAbsolutePath());
+          return;
+        }
+      }
+
+      // Create backup of scene description and current render dump.
+      scene.backupFile(sceneDir, new File(sceneDir, sceneName + Scene.EXTENSION));
+      scene.backupFile(sceneDir, new File(sceneDir, sceneName + ".dump"));
+
+      // Copy render status over from the renderManager.
+      RenderStatus status = renderManager.getRenderStatus();
+      scene.renderTime = status.getRenderTime();
+      scene.spp = status.getSpp();
+      scene.saveScene(context, taskTracker);
+      Log.info("Scene saved");
+      this.onSceneSaved.run();
     } catch (IOException e) {
       Log.error("Failed to save scene. Reason: " + e.getMessage(), e);
     }
   }
 
-  @Override public void loadScene(String sceneName)
+  @PluginApi
+  @Override public void loadScene(File sceneDirectory, String sceneName)
       throws IOException, InterruptedException {
+
+    // Do not change lock ordering here.
+    // Lock order: scene -> storedScene.
+    synchronized (scene) {
+      try (TaskTracker.Task ignored = taskTracker.task("Loading scene", 1)) {
+        if (sceneDirectory.isDirectory()) {
+          context.setSceneDirectory(sceneDirectory);
+        }
+        scene.loadScene(context, sceneName, taskTracker);
+      }
+
+      // Update progress bar.
+      taskTracker.backgroundTask().update("Rendering", scene.getTargetSpp(), scene.spp);
+
+      scene.setResetReason(ResetReason.SCENE_LOADED);
+
+      // Wake up waiting threads in awaitSceneStateChange().
+      scene.notifyAll();
+    }
+    onSceneLoaded.run();
+  }
+
+  @PluginApi
+  @Deprecated
+  @Override public void loadScene(String sceneName)
+    throws IOException, InterruptedException {
 
     // Do not change lock ordering here.
     // Lock order: scene -> storedScene.
@@ -166,7 +238,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       scene.clear();
       scene.loadChunks(taskTracker, world, chunksToLoad);
       scene.resetScene(null, context.getChunky().getSceneFactory());
-      context.setSceneDirectory(resolveSceneDirectory(scene.name));
+      context.setSceneDirectory(new File(context.getChunky().options.sceneDir, scene.name));
       scene.refresh();
       scene.setResetReason(ResetReason.SCENE_LOADED);
       scene.setRenderMode(RenderMode.PREVIEW);
@@ -177,7 +249,6 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   @Override public void loadChunks(World world, Collection<ChunkPosition> chunksToLoad) {
     synchronized (scene) {
       int prevChunkCount = scene.numberOfChunks();
-      context.setSceneDirectory(resolveSceneDirectory(scene.name));
       scene.loadChunks(taskTracker, world, chunksToLoad);
       if (prevChunkCount == 0) {
         scene.moveCameraToCenter();
@@ -200,6 +271,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   }
 
   @Override public ResetReason awaitSceneStateChange() throws InterruptedException {
+    ResetReason reason;
     synchronized (scene) {
       while (true) {
         if (scene.shouldRefresh() && (scene.getForceReset() || resetHandler.allowSceneRefresh())) {
@@ -207,20 +279,27 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
             storedScene.copyState(scene);
             storedScene.mode = scene.mode;
           }
-          ResetReason reason = scene.getResetReason();
+          reason = scene.getResetReason();
           scene.clearResetFlags();
-          return reason;
+          break;
         } else if (scene.getMode() != storedScene.getMode()) {
           // Make sure the renderManager sees the updated render mode.
           // TODO: handle buffer finalization updates as state change.
           synchronized (storedScene) {
             storedScene.mode = scene.mode;
           }
-          return ResetReason.MODE_CHANGE;
+          reason = ResetReason.MODE_CHANGE;
+          break;
         }
         scene.wait();
       }
     }
+
+    for (BiConsumer<ResetReason, Scene> listener : resetListeners) {
+      listener.accept(reason, scene);
+    }
+
+    return reason;
   }
 
   @Override public boolean pollSceneStateChange() {
@@ -246,6 +325,17 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       fun.accept(scene);
     }
   }
+
+  @Override
+  public void addChangeListener(BiConsumer<ResetReason, Scene> listener) {
+    resetListeners.add(listener);
+  }
+
+  @Override
+  public void removeChangeListener(BiConsumer<ResetReason, Scene> listener) {
+    resetListeners.remove(listener);
+  }
+
   /**
    * Merge a render dump into the current render.
    *
@@ -265,7 +355,8 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   }
 
   /**
-   * Discard pending scene changes.
+   * Apply pending scene changes from {@link #scene} to {@link #storedScene}.
+   * <p>The changes will be loading with the scene reset {@link ResetReason#SCENE_LOADED}.
    */
   public void applySceneChanges() {
     // Lock order: scene -> storedScene.
@@ -281,7 +372,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   }
 
   /**
-   * Apply pending scene changes.
+   * Discard pending scene changes in {@link #scene} and revert the state to {@link #storedScene}.
    */
   public void discardSceneChanges() {
     // Lock order: scene -> storedScene.
@@ -306,6 +397,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
    * @param sceneName The name of the scene to resolve the directory for.
    * @return The directory holding the given scene
    */
+  @Deprecated /* Remove in 2.6 snapshots */
   public static File resolveSceneDirectory(String sceneName) {
     File defaultDirectory = new File(PersistentSettings.getSceneDirectory(), sceneName);
 

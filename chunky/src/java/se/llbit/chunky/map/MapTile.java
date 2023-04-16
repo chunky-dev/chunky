@@ -17,10 +17,7 @@
 package se.llbit.chunky.map;
 
 import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.chunky.world.Chunk;
-import se.llbit.chunky.world.ChunkPosition;
-import se.llbit.chunky.world.ChunkSelectionTracker;
-import se.llbit.chunky.world.ChunkView;
+import se.llbit.chunky.world.*;
 import se.llbit.chunky.world.region.Region;
 
 /**
@@ -67,19 +64,20 @@ public class MapTile {
     if (scale >= 16) {
       Chunk chunk = mapLoader.getWorld().getChunk(pos);
       renderChunk(chunk);
-      if (selection.isSelected(pos)) {
+      if (!(chunk instanceof EmptyChunk) && selection.isSelected(pos)) {
         for (int i = 0; i < tileWidth * tileWidth; ++i) {
           pixels[i] = selectionTint(pixels[i]);
         }
       }
     } else {
+      boolean isValid = mapLoader.getWorld().regionExistsWithinRange(pos, view.yMin, view.yMax);
       Region region = mapLoader.getWorld().getRegionWithinRange(pos, view.yMin, view.yMax);
       int pixelOffset = 0;
       for (int z = 0; z < 32; ++z) {
         for (int x = 0; x < 32; ++x) {
           Chunk chunk = region.getChunk(x, z);
           pixels[pixelOffset] = chunk.biomeColor();
-          if (selection.isSelected(chunk.getPosition())) {
+          if (isValid && !(chunk instanceof EmptyChunk) && selection.isSelected(chunk.getPosition())) {
             pixels[pixelOffset] = selectionTint(pixels[pixelOffset]);
           }
           pixelOffset += 1;

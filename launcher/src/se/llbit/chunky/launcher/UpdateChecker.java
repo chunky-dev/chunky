@@ -19,6 +19,7 @@ package se.llbit.chunky.launcher;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
@@ -44,7 +45,8 @@ public class UpdateChecker extends Thread {
     this.path = channel.path;
   }
 
-  @Override public void run() {
+  @Override
+  public void run() {
     try {
       if (!tryUpdate()) {
         listener.noUpdateAvailable();
@@ -86,7 +88,7 @@ public class UpdateChecker extends Thread {
     // Check if version is already installed.
     for (VersionInfo version : ChunkyDeployer.availableVersions()) {
       if (version.name.equals(latest.name) && version.compareTo(latest) == 0 &&
-          ChunkyDeployer.checkVersionIntegrity(version.name)) {
+        ChunkyDeployer.checkVersionIntegrity(version.name)) {
         return false;
       }
     }
@@ -99,6 +101,14 @@ public class UpdateChecker extends Thread {
   private void getVersion(List<VersionInfo> candidates, String url) {
     try {
       URL latestJson = new URL(url);
+      HttpURLConnection conn = (HttpURLConnection) latestJson.openConnection();
+      int responseCode = conn.getResponseCode();
+      if (responseCode == HttpURLConnection.HTTP_MOVED_PERM ||
+        responseCode == HttpURLConnection.HTTP_MOVED_TEMP ||
+        responseCode == HttpURLConnection.HTTP_SEE_OTHER) {
+        getVersion(candidates, conn.getHeaderField("Location"));
+        return;
+      }
       try (
         InputStream in = latestJson.openStream();
         JsonParser parser = new JsonParser(in)

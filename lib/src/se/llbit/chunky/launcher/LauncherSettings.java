@@ -69,6 +69,7 @@ public class LauncherSettings {
 
   public ReleaseChannel selectedChannel;
   public Map<String, ReleaseChannel> releaseChannels;
+  public boolean skipJvmCheck = false;
 
   public LauncherSettings() {
     javaOptions = defaultJavaOptions();
@@ -86,9 +87,11 @@ public class LauncherSettings {
     javaDir = settings.getString("javaDir", "");
     if (javaDir.isEmpty()) {
       javaDir = settings.getString("javaExecutable", "");
+      skipJvmCheck = false;
     }
     if (javaDir.isEmpty()) {
       javaDir = System.getProperty("java.home");
+      skipJvmCheck = false;
     }
     memoryLimit = settings.getInt("memoryLimit", DEFAULT_MEMORY_LIMIT);
     debugConsole = settings.getBool("showConsole", false);
@@ -100,6 +103,7 @@ public class LauncherSettings {
     version = settings.getString("version", "latest");
     showLauncher = settings.getBool("showLauncher", true);
     showAdvancedSettings = settings.getBool("showAdvancedSettings", false);
+    skipJvmCheck = settings.getBool("skipJvmCheck", false);
 
     JsonObject releaseChannelObj = settings.get("releaseChannels").object();
     releaseChannels = new LinkedHashMap<>();
@@ -111,10 +115,16 @@ public class LauncherSettings {
         Log.info("Invalid release channel", e);
       }
     }
+    releaseChannels.putIfAbsent(STABLE_RELEASE_CHANNEL.id, STABLE_RELEASE_CHANNEL);
+    releaseChannels.putIfAbsent(SNAPSHOT_RELEASE_CHANNEL.id, SNAPSHOT_RELEASE_CHANNEL);
+
     String selectedChannelId = releaseChannelObj.get("selectedChannel").stringValue(STABLE_RELEASE_CHANNEL.id);
-    selectedChannel = releaseChannels.getOrDefault(selectedChannelId, STABLE_RELEASE_CHANNEL);
+    selectedChannel = releaseChannels.getOrDefault(selectedChannelId, null);
+    if (selectedChannel == null) {
+      selectedChannel = releaseChannels.get(STABLE_RELEASE_CHANNEL.id);
+    }
     if (settings.getBool("downloadSnapshots", false)) {
-      selectedChannel = SNAPSHOT_RELEASE_CHANNEL;
+      selectedChannel = releaseChannels.get(SNAPSHOT_RELEASE_CHANNEL.id);
     }
   }
 
@@ -141,6 +151,7 @@ public class LauncherSettings {
     settings.setString("version", version);
     settings.setBool("showLauncher", showLauncher);
     settings.setBool("showAdvancedSettings", showAdvancedSettings);
+    settings.setBool("skipJvmCheck", skipJvmCheck);
 
     settings.removeSetting("downloadSnapshots");
     JsonObject releaseChannelsObject = new JsonObject();

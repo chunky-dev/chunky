@@ -77,7 +77,6 @@ public class JsonModel {
     Path stairs = fileSystem.getPath("/assets/minecraft/models/", model + ".json");
     try (InputStream in = Files.newInputStream(stairs);
         JsonParser parser = new JsonParser(in)) {
-      System.out.println("loading model: " + model);
       JsonObject json = parser.parse().object();
       // Check for parent.
       String parent = json.get("parent").asString("");

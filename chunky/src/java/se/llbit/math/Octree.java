@@ -18,6 +18,7 @@
 package se.llbit.math;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +37,9 @@ import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
 import se.llbit.log.Log;
+import se.llbit.util.PositionalInputStream;
+import se.llbit.util.PositionalOutputStream;
+import se.llbit.util.TaskTracker;
 
 /**
  * A simple voxel Octree.
@@ -769,12 +773,16 @@ public class Octree {
     implementation.setCube(cubeDepth, types, x, y, z);
   }
 
+  public void switchImplementation(String newImplementation) throws IOException {
+    switchImplementation(newImplementation, TaskTracker.Task.NONE);
+  }
+
   /**
    * Switch between any two implementation by reusing the load and store methods of
    * the octree implementations
    * @param newImplementation The new Octree implementation
    */
-  public void switchImplementation(String newImplementation) throws IOException {
+  public void switchImplementation(String newImplementation, TaskTracker.Task task) throws IOException {
     ImplementationFactory factory = getImplementationFactory(newImplementation);
     if(factory.isOfType(implementation)) {
       // Already correct implementation
@@ -785,20 +793,42 @@ public class Octree {
 
     // This function is called as to provide a fallback when
     // an implementation isn't suitable, we assume it means
-    // that chunky is already using a lot of memory so we save the octree on disk
+    // that Chunky is already using a lot of memory, so we save the octree on disk
     // and reload it with another implementation
     long nodeCount = implementation.nodeCount();
+    double writeProgressScaler = 62.5 / nodeCount;
+    if (nodeCount != 0) {
+      task.update(1000, 0);
+    } else {
+      task.update(2, 1);
+    }
+
     File tempFile = File.createTempFile("octree-conversion", ".bin");
-    try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new FileOutputStream(tempFile)))) {
-      implementation.store(out);
-    }
-    implementation = null; // Allow th gc to free memory during construction of the new octree
+    try {
+      try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new PositionalOutputStream(Files.newOutputStream(tempFile.toPath()), position -> {
+        if (nodeCount != 0) {
+          int progress = (int) Math.min(position * writeProgressScaler, 500);
+          task.updateInterval(progress, 1);
+        }
+      })))) {
+        implementation.store(out);
+      }
+      // Allow the GC to free memory during construction of the new octree
+      // Replace with an empty octree to prevent any NPE's
+      implementation = new PackedOctree(1);
 
-    try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new FileInputStream(tempFile)))) {
-      implementation = factory.loadWithNodeCount(nodeCount, in);
+      double readProgressScaler = 500.0 / tempFile.length();
+      try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new PositionalInputStream(Files.newInputStream(tempFile.toPath()), position -> {
+        task.updateInterval(1000, (int) (position * readProgressScaler) + 500, 1);
+      })))) {
+        implementation = factory.loadWithNodeCount(nodeCount, in);
+      }
+    } finally {
+      if (!tempFile.delete()) {
+        Log.warnf("Failed to delete temporary file:\n%s", tempFile);
+        tempFile.deleteOnExit();
+      }
     }
-
-    tempFile.delete();
   }
 
   @PluginApi

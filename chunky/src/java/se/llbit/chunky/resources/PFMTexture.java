@@ -84,7 +84,7 @@ public class PFMTexture extends AbstractHdriTexture {
         }
       }
     } catch (IOException e) {
-      Log.error("Error loading PFM image: " + e.getMessage());
+      Log.error("Error loading PFM image:", e);
       e.printStackTrace();
     }
   }

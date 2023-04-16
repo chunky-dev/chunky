@@ -34,6 +34,8 @@ public class Version {
           .getResourceAsStream("se/llbit/chunky/main/Version.properties"));
     } catch (IOException e) {
       throw new Error(e);
+    } catch (NullPointerException e) {
+      // ignore, this is probably a build from within an IDE
     }
   }
 
@@ -43,4 +45,9 @@ public class Version {
   public static String getVersion() {
     return properties.getProperty("version", "?-snapshot");
   }
+
+  /**
+   * @return Git commit sha
+   */
+  public static String getCommit() { return properties.getProperty("gitSha", "n/a"); }
 }

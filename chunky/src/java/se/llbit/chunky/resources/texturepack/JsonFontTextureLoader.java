@@ -16,27 +16,31 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.resources.texturepack.FontTexture.Glyph;
 import se.llbit.json.JsonArray;
+import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 import se.llbit.resources.ImageLoader;
 
-/** @author Jesper Öqvist <jesper@llbit.se> */
-public class JsonFontTextureLoader extends TextureLoader {
-  private final String fontDefinition;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-  public JsonFontTextureLoader(String fontDefinition) {
-    this.fontDefinition = fontDefinition;
+/**
+ * @author Jesper Öqvist <jesper@llbit.se>
+ */
+public class JsonFontTextureLoader extends TextureLoader {
+  private final String fontDefinitionPath;
+
+  public JsonFontTextureLoader(String fontDefinitionPath) {
+    this.fontDefinitionPath = fontDefinitionPath;
   }
 
   @Override
@@ -45,20 +49,17 @@ public class JsonFontTextureLoader extends TextureLoader {
   }
 
   @Override
-  public boolean load(File file) throws IOException, TextureFormatError {
+  public boolean loadFromFile(File file) {
     return false;
   }
 
   @Override
-  public boolean load(ZipFile texturePack, String topLevelDir) {
+  public boolean load(Path texturePack) {
     Texture.fonts.clear();
     Texture.fonts.setGlyph(' ', new Glyph(new int[8], 0, 2, 8, 8, 7));
 
     JsonArray fontDefinitions;
-    try (InputStream is = texturePack.getInputStream(new ZipEntry(topLevelDir + fontDefinition))) {
-      if (is == null) {
-        return false;
-      }
+    try (InputStream is = Files.newInputStream(texturePack.resolve(fontDefinitionPath))) {
       fontDefinitions = new JsonParser(is).parse().asObject().get("providers").asArray();
     } catch (IOException | SyntaxError e) {
       // Safe to ignore - will be handled implicitly later.
@@ -66,32 +67,37 @@ public class JsonFontTextureLoader extends TextureLoader {
     }
 
     for (JsonValue fontDefinition : fontDefinitions) {
-      if (!fontDefinition.asObject().get("type").stringValue("").equals("bitmap")) {
+      JsonObject definition = fontDefinition.asObject();
+      if (!definition.get("type").stringValue("").equals("bitmap")) {
         continue;
       }
 
       BitmapImage spritemap;
-      String texture = fontDefinition.asObject().get("file").stringValue("").split(":")[1];
-      try (InputStream imageStream =
-          texturePack.getInputStream(
-              new ZipEntry(topLevelDir + "assets/minecraft/textures/" + texture))) {
-        if (imageStream == null) {
-          Log.error("Could not load font texture " + texture);
+      String texture = definition.get("file").stringValue("").split(":")[1];
+      Path texturePath = texturePack.resolve("assets/minecraft/textures/" + texture);
+      if(Files.exists(texturePath)) {
+        try (InputStream imageStream = Files.newInputStream(texturePath)) {
+          spritemap = ImageLoader.read(imageStream);
+        } catch (IOException e) {
+          Log.error("Failed to load font texture: " + texture, e);
           return false;
         }
-        spritemap = ImageLoader.read(imageStream);
-      } catch (IOException e) {
-        Log.error("Could not load font texture " + texture, e);
+      } else {
+        Log.warnf(
+          "Could not find font texture: %s (defined in \"%s\")",
+          texture,
+          fontDefinitionPath
+        );
         return false;
       }
 
       int width = spritemap.width / 16;
       int height = fontDefinition.asObject().get("height").asInt(8);
       int ascent =
-          fontDefinition
-              .asObject()
-              .get("ascent")
-              .asInt(7); // distance (from top) of the letter base
+              fontDefinition
+                      .asObject()
+                      .get("ascent")
+                      .asInt(7); // distance (from top) of the letter base
 
       int x, y = 0;
       for (JsonValue charactersLine : fontDefinition.asObject().get("chars").asArray()) {
@@ -110,7 +116,7 @@ public class JsonFontTextureLoader extends TextureLoader {
   }
 
   @Override
-  protected boolean load(String file, ZipFile texturePack) {
+  protected boolean load(String file, Path texturePack) {
     return super.load(file, texturePack);
   }
 }

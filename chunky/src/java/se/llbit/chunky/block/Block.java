@@ -13,6 +13,9 @@ import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
+import java.util.List;
+import java.util.Random;
+
 public abstract class Block extends Material {
   private final static AABB block =  new AABB(0, 1, 0, 1,0, 1);
 
@@ -32,6 +35,29 @@ public abstract class Block extends Material {
 
   public Block(String name, Texture texture) {
     super(name, texture);
+  }
+
+  /**
+   * Get the number of faces on this block.
+   */
+  public int faceCount() {
+    return 6;
+  }
+
+  /**
+   * Sample a random point on this block. Coordinates are normalized to be in [0, 1].
+   * @param loc  Location vector where the point is stored.
+   * @param rand Random number source.
+   */
+  public void sample(int face, Vector3 loc, Random rand) {
+    block.sampleFace(face, loc, rand);
+  }
+
+  /**
+   * Get the surface area of this face of the block.
+   */
+  public double surfaceArea(int face) {
+    return block.faceSurfaceArea(face);
   }
 
   /**

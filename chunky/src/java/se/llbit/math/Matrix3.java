@@ -84,11 +84,57 @@ public class Matrix3 {
   }
 
   /**
+   * Set the matrix to be a rotation matrix for rotation
+   * around the X, Y and Z axis.
+   */
+  public final void rotate(double pitch, double yaw, double roll) {
+    double cosa = FastMath.cos(roll);
+    double sina = FastMath.sin(roll);
+    double cosb = FastMath.cos(yaw);
+    double sinb = FastMath.sin(yaw);
+    double cosc = FastMath.cos(pitch);
+    double sinc = FastMath.sin(pitch);
+    m11 = cosa * cosb;
+    m12 = cosa * sinb * sinc - sina * cosc;
+    m13 = cosa * sinb * cosc + sina * sinc;
+    m21 = sina * cosb;
+    m22 = sina * sinb * sinc + cosa * cosc;
+    m23 = sina * sinb * cosc - cosa * sinc;
+    m31 = -sinb;
+    m32 = cosb * sinc;
+    m33 = cosb * cosc;
+  }
+
+  /**
    * Transform a vector using this matrix.
    */
   public void transform(Vector3 o) {
     o.set(m11 * o.x + m12 * o.y + m13 * o.z, m21 * o.x + m22 * o.y + m23 * o.z,
         m31 * o.x + m32 * o.y + m33 * o.z);
+  }
+
+  /**
+   * Transform the vector using this matrix.
+   * @return X component of the transformed vector
+   */
+  public double transformX(Vector3 o) {
+    return m11 * o.x + m12 * o.y + m13 * o.z;
+  }
+
+  /**
+   * Transform the vector using this matrix.
+   * @return Y component of the transformed vector
+   */
+  public double transformY(Vector3 o) {
+    return m21 * o.x + m22 * o.y + m23 * o.z;
+  }
+
+  /**
+   * Transform the vector using this matrix.
+   * @return Z component of the transformed vector
+   */
+  public double transformZ(Vector3 o) {
+    return m31 * o.x + m32 * o.y + m33 * o.z;
   }
 
   /**

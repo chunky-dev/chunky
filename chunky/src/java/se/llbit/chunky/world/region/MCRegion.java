@@ -20,15 +20,17 @@ import java.io.*;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.InflaterInputStream;
 
+import se.llbit.chunky.chunk.ChunkLoadingException;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.world.*;
 import se.llbit.log.Log;
 import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.Mutable;
+import se.llbit.util.annotation.NotNull;
+import se.llbit.util.annotation.Nullable;
 
 /**
  * Abstract region representation. Tracks loaded chunks and their timestamps.
@@ -66,10 +68,17 @@ public class MCRegion implements Region {
   private long regionFileTime = 0;
   private final int[] chunkTimestamps = new int[NUM_CHUNKS];
 
+  private static int getMCAChunkIndex(int x, int z) {
+    return (x & 0b11111) + ((z & 0b11111) << 5);
+  }
+  private static int getMCAChunkIndex(ChunkPosition chunkPos) {
+    return getMCAChunkIndex(chunkPos.x, chunkPos.z);
+  }
+
   /**
    * Create new region
    *
-   * @param pos   the region position
+   * @param pos the region position
    */
   public MCRegion(ChunkPosition pos, World world) {
     this.world = world;
@@ -77,7 +86,7 @@ public class MCRegion implements Region {
     position = pos;
     for (int z = 0; z < CHUNKS_Z; ++z) {
       for (int x = 0; x < CHUNKS_X; ++x) {
-        chunks[x + z * 32] = EmptyChunk.INSTANCE;
+        chunks[getMCAChunkIndex(x, z)] = EmptyChunk.INSTANCE;
       }
     }
   }
@@ -86,21 +95,23 @@ public class MCRegion implements Region {
    * @return Chunk at (x, z)
    */
   @Override
+  @PluginApi
   public Chunk getChunk(int x, int z) {
-    return chunks[(x & 31) + (z & 31) * 32];
+    return chunks[getMCAChunkIndex(x, z)];
   }
 
   /**
    * Set chunk at given position.
    */
   private void setChunk(ChunkPosition pos, Chunk chunk) {
-    chunks[(pos.x & 31) + (pos.z & 31) * 32] = chunk;
+    chunks[getMCAChunkIndex(pos)] = chunk;
   }
 
   /**
    * Delete a chunk.
    */
   @Override
+  @PluginApi
   public synchronized void deleteChunk(ChunkPosition chunkPos) {
     deleteChunkFromRegion(chunkPos);
     Chunk chunk = getChunk(chunkPos);
@@ -129,14 +140,18 @@ public class MCRegion implements Region {
     regionFileTime = modtime;
     try (RandomAccessFile file = new RandomAccessFile(regionFile, "r")) {
       long length = file.length();
+      if (length == 0) {
+        return; // vanilla will occasionally save empty region files, we shouldn't warn the user about these.
+      }
+
       if (length < 2 * SECTOR_SIZE) {
-        Log.warn("Missing header in region file!");
+        Log.warnf("Missing header in region file %s!", this.position);
         return;
       }
 
       for (int z = 0; z < 32; ++z) {
         for (int x = 0; x < 32; ++x) {
-          ChunkPosition pos = ChunkPosition.get((position.x << 5) + x, (position.z << 5) + z);
+          ChunkPosition pos = new ChunkPosition((position.x << 5) + x, (position.z << 5) + z);
           Chunk chunk = getChunk(x, z);
           int loc = file.readInt();
           if (loc != 0) {
@@ -183,11 +198,23 @@ public class MCRegion implements Region {
     return String.format("r.%d.%d.mca", pos.x, pos.z);
   }
 
-  public Map<String, Tag> getChunkTags(ChunkPosition position, Set<String> request, Mutable<Integer> dataTimestamp) {
+  @Nullable
+  public Map<String, Tag> getChunkTags(ChunkPosition position, Set<String> request, Mutable<Integer> dataTimestamp) throws ChunkLoadingException {
     ChunkDataSource data = this.getChunkData(position);
     dataTimestamp.set(data.timestamp);
-    if (data.inputStream != null) {
-      try (DataInputStream in = data.inputStream) {
+    return parseNbtFromChunkDataSource(position, request, data);
+  }
+
+  @Nullable
+  public Map<String, Tag> getEntityTags(ChunkPosition position, Set<String> request) throws ChunkLoadingException {
+    ChunkDataSource data = this.getEntityData(position);
+    return parseNbtFromChunkDataSource(position, request, data);
+  }
+
+  @Nullable
+  private static Map<String, Tag> parseNbtFromChunkDataSource(ChunkPosition position, Set<String> request, ChunkDataSource data) throws ChunkLoadingException {
+    if (data.hasData()) {
+      try (DataInputStream in = new DataInputStream(data.getInputStream())) {
         Map<String, Tag> result = NamedTag.quickParse(in, request);
         for (String key : request) {
           if (!result.containsKey(key)) {
@@ -196,7 +223,7 @@ public class MCRegion implements Region {
         }
         return result;
       } catch (IOException e) {
-        // Ignored.
+        throw new ChunkLoadingException(String.format("Failed to read chunk %s from region file!", position), e);
       }
     }
     return null;
@@ -209,81 +236,126 @@ public class MCRegion implements Region {
    * @return Chunk data source. The InputStream of the data source is
    * {@code null} if the chunk could not be read.
    */
+  @NotNull
   private ChunkDataSource getChunkData(ChunkPosition chunkPos) {
     File regionDirectory = world.getRegionDirectory();
+    ChunkDataSource data = getChunkDataSource(chunkPos, regionDirectory);
+    chunkTimestamps[getMCAChunkIndex(chunkPos)] = data.timestamp;
+    return data;
+  }
+  @NotNull
+  private ChunkDataSource getEntityData(ChunkPosition chunkPos) {
+    File regionDirectory = world.getRegionDirectory();
+    regionDirectory = new File(regionDirectory.getParentFile(), "entities");
+    return getChunkDataSource(chunkPos, regionDirectory);
+  }
+
+  @NotNull
+  private ChunkDataSource getChunkDataSource(ChunkPosition chunkPos, File regionDirectory) {
     File regionFile = new File(regionDirectory, fileName);
     ChunkDataSource data = null;
     if (regionFile.exists()) {
-      data = getChunkData(regionFile, chunkPos);
+      // TODO: reuse RandomAccessFile instances when loading world map
+      try (RandomAccessFile raf = new RandomAccessFile(regionFile, "r")) {
+        data = readChunkData(raf, chunkPos);
+      } catch (IOException ex) {
+        Log.warn(
+          String.format(
+            "Failed to read chunk %s in region %s",
+            chunkPos,
+            regionFile.getName()
+          ), ex
+        );
+      }
     }
     if (data == null) {
-      data = new ChunkDataSource((int) System.currentTimeMillis(), null);
+      data = new ChunkDataSource((int) System.currentTimeMillis());
     }
-    chunkTimestamps[(chunkPos.x & 31) + (chunkPos.z & 31) * 32] = data.timestamp;
     return data;
   }
 
   /**
    * Read chunk data from region file.
+   * <a href="https://wiki.vg/Region_Files#Structure">Format documentation</a>
    *
    * @return {@code null} if the chunk could not be loaded
    */
-  private static ChunkDataSource getChunkData(File regionFile, ChunkPosition chunkPos) {
-    int x = chunkPos.x & 31;
-    int z = chunkPos.z & 31;
-    int index = x + z * 32;
-    try (RandomAccessFile file = new RandomAccessFile(regionFile, "r")) {
-      long length = file.length();
-      if (length < 2 * SECTOR_SIZE) {
-        Log.warn("Missing header in region file!");
-        return null;
-      }
-      file.seek(4 * index);
-      int loc = file.readInt();
-      int numSectors = loc & 0xFF;
-      int sectorOffset = loc >> 8;
-      file.seek(SECTOR_SIZE + 4 * index);
-      int timestamp = file.readInt();
-      if (length < sectorOffset * SECTOR_SIZE + 4) {
-        Log.warnf("Chunk %s is outside of region file %s! Expected chunk data at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), sectorOffset * SECTOR_SIZE, length);
-        return null;
-      }
-      file.seek(sectorOffset * SECTOR_SIZE);
+  private static ChunkDataSource readChunkData(RandomAccessFile file, ChunkPosition chunkPos) throws IOException {
+    long index = getMCAChunkIndex(chunkPos);
 
-      int chunkSize = file.readInt();
+    long length = file.length();
 
-      if (chunkSize > numSectors * SECTOR_SIZE) {
-        Log.warn("Error: chunk length does not fit in allocated sectors!");
-        return null;
-      }
+    if (length == 0) {
+      return null; // vanilla will occasionally save empty region files, we shouldn't warn the user about these.
+    }
 
-      if (length < sectorOffset * SECTOR_SIZE + 4 + chunkSize) {
-        Log.warnf("Chunk %s is outside of region file %s! Expected %d bytes at offset %d but file length is %d.%n", chunkPos, regionFile.getName(), chunkSize, sectorOffset * SECTOR_SIZE, length);
-        return null;
-      }
+    // header is 2 sectors long: location table + timestamp table
+    if (length < 2 * SECTOR_SIZE) {
+      throw new ChunkReadException(chunkPos, "Missing header in region file");
+    }
 
-      byte type = file.readByte();
-      if (type != 1 && type != 2) {
-        Log.warn("Error: unknown chunk data compression method: " + type + "!");
-        return null;
-      }
-
-      if (chunkSize <= 0) {
-        Log.warn("Error: invalid chunk size: " + chunkSize);
-        return null;
-      }
-
-      byte[] buf = new byte[chunkSize - 1];
-      file.read(buf);
-      ByteArrayInputStream in = new ByteArrayInputStream(buf);
-      if (type == 1) {
-        return new ChunkDataSource(timestamp, new GZIPInputStream(in));
-      } else {
-        return new ChunkDataSource(timestamp, new InflaterInputStream(in));
-      }
-    } catch (IOException e) {
-      Log.warn("Failed to read chunk: " + e.getMessage());
+    // query location table for chunk location in file
+    file.seek(index << 2);
+    int locationEntry = file.readInt();
+    int sectorCount = locationEntry & 0xFF;
+    int sectorOffset = locationEntry >> 8;
+    if (sectorOffset == 0 || sectorCount == 0) {
+      // chunk not generated yet
       return null;
+    }
+
+    // query timestamp table (chunk last modified time)
+    file.seek(SECTOR_SIZE + (index << 2));
+    int lastModifiedTimestamp = file.readInt();
+
+    long fileOffset = (long) sectorOffset * SECTOR_SIZE;
+    if (fileOffset + 4 >= length) {
+      throw new ChunkReadException(chunkPos, String.format(
+        "Chunk is outside of region file. Expected chunk data at offset %d but file length is %d.",
+        sectorOffset * SECTOR_SIZE, length
+      ));
+    }
+    file.seek(fileOffset);
+
+    int chunkSize = file.readInt();
+
+    if (chunkSize > sectorCount * SECTOR_SIZE) {
+      throw new ChunkReadException(chunkPos, "Chunk length does not fit in allocated sectors");
+    }
+
+    if (length < fileOffset + 4 + chunkSize) {
+      throw new ChunkReadException(chunkPos, String.format(
+        "Chunk is outside of region file. Expected %d bytes at offset %d but file length is %d.",
+        chunkSize, sectorOffset * SECTOR_SIZE, length
+      ));
+    }
+
+    if (chunkSize <= 0) {
+      throw new ChunkReadException(chunkPos, String.format(
+        "Invalid chunk size: %d",
+        chunkSize
+      ));
+    }
+
+    ChunkDataSource.CompressionScheme compressionScheme = readCompressionScheme(file, chunkPos);
+
+    byte[] buf = new byte[chunkSize - 1];
+    file.read(buf);
+    return new ChunkDataSource(lastModifiedTimestamp, buf, compressionScheme);
+  }
+
+  private static ChunkDataSource.CompressionScheme readCompressionScheme(RandomAccessFile file, ChunkPosition chunkPos) throws IOException {
+    byte compressionType = file.readByte();
+    switch (compressionType) {
+      case 1:
+        return ChunkDataSource.CompressionScheme.GZIP;
+      case 2:
+        return ChunkDataSource.CompressionScheme.ZLIB;
+      default:
+        throw new ChunkReadException(chunkPos, String.format(
+          "Unknown chunk data compression method: %d",
+          compressionType
+        ));
     }
   }
 
@@ -316,7 +388,7 @@ public class MCRegion implements Region {
    * @throws IOException
    */
   public static synchronized void writeRegion(File regionDirectory, ChunkPosition regionPos,
-      DataOutputStream out, Set<ChunkPosition> chunks) throws IOException {
+    DataOutputStream out, Set<ChunkPosition> chunks) throws IOException {
     String fileName = regionPos.getMcaName();
     File regionFile = new File(regionDirectory, fileName);
     try (RandomAccessFile file = new RandomAccessFile(regionFile, "r")) {
@@ -326,7 +398,7 @@ public class MCRegion implements Region {
       for (int i = 0; i < 32 * 32; ++i) {
         location[i] = file.readInt();
         int offset = location[i];
-        if (offset != 0 && (chunks == null || chunks.contains(ChunkPosition.get(i & 31, i >> 5)))) {
+        if (offset != 0 && (chunks == null || chunks.contains(new ChunkPosition(i & 31, i >> 5)))) {
           loc_out[i] = nextFree << 8 | offset & 0xFF;
           nextFree += offset & 0xFF;
         }

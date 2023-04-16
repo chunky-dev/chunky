@@ -23,6 +23,7 @@ import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.MinecraftBlockProvider;
 import se.llbit.chunky.block.legacy.LegacyMinecraftBlockProvider;
 import se.llbit.chunky.main.CommandLineOptions.Mode;
+import se.llbit.chunky.plugin.ContextMenuTransformer;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.plugin.ChunkyPlugin;
 import se.llbit.chunky.plugin.TabTransformer;
@@ -34,10 +35,11 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneFactory;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
+import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
+import se.llbit.chunky.resources.ResourcePackLoader;
 import se.llbit.chunky.resources.SettingsDirectory;
-import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.ChunkyFx;
-import se.llbit.chunky.ui.CreditsController;
+import se.llbit.chunky.ui.controller.CreditsController;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.chunky.world.MaterialStore;
 import se.llbit.json.JsonArray;
@@ -52,7 +54,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 
@@ -62,6 +66,9 @@ import java.util.concurrent.ForkJoinPool;
  * <p>Read more about Chunky at <a href="https://chunky.llbit.se">https://chunky.llbit.se</a>.
  */
 public class Chunky {
+  static {
+    BiomeStructure.registerDefaults();
+  }
 
   /**
    * A log receiver suitable for headless rendering.
@@ -86,6 +93,8 @@ public class Chunky {
   private RenderManagerFactory renderManagerFactory = DefaultRenderManager::new;
   private RenderControlsTabTransformer renderControlsTabTransformer = tabs -> tabs;
   private TabTransformer mainTabTransformer = tabs -> tabs;
+  private final ArrayList<ContextMenuTransformer> mapContextMenuTransformers = new ArrayList<>();
+  private final ArrayList<ContextMenuTransformer> renderContextMenuTransformers = new ArrayList<>();
   private boolean headless = false;
 
   private static ForkJoinPool commonThreads;
@@ -132,14 +141,13 @@ public class Chunky {
     renderManager.setSnapshotControl(SnapshotControl.DEFAULT);
     renderManager.setOnFrameCompleted((scene, spp) -> {
       if (renderManager.getSnapshotControl().saveSnapshot(scene, spp)) {
-        scene.saveSnapshot(new File(getRenderContext().getSceneDirectory(), "snapshots"),
-            taskTracker, getRenderContext().numRenderThreads());
+        scene.saveSnapshot(new File(getRenderContext().getSceneDirectory(), "snapshots"), taskTracker);
       }
 
       if (renderManager.getSnapshotControl().saveRenderDump(scene, spp)) {
         // Save the scene description and current render dump.
         try {
-          sceneManager.saveScene();
+          sceneManager.saveScene(getRenderContext().getSceneDirectory());
         } catch (InterruptedException e) {
           throw new Error(e);
         }
@@ -158,7 +166,7 @@ public class Chunky {
     });
 
     try {
-      sceneManager.loadScene(options.sceneName);
+      sceneManager.loadScene(options.sceneDir, options.sceneName);
       if (options.target != -1) {
         sceneManager.getScene().setTargetSpp(options.target);
       }
@@ -206,13 +214,13 @@ public class Chunky {
     }
 
     int exitCode = 0;
-    if (cmdline.mode == CommandLineOptions.Mode.NOTHING) {
+    if (cmdline.mode == CommandLineOptions.Mode.CLI_OPERATION) {
       exitCode = cmdline.exitCode;
     } else {
       commonThreads = new ForkJoinPool(PersistentSettings.getNumThreads());
 
       Chunky chunky = new Chunky(cmdline.options);
-      chunky.headless = cmdline.mode == Mode.HEADLESS_RENDER || cmdline.mode == Mode.SNAPSHOT;
+      chunky.headless = cmdline.mode == Mode.HEADLESS_RENDER || cmdline.mode == Mode.CREATE_SNAPSHOT;
       chunky.loadPlugins();
 
       try {
@@ -220,10 +228,10 @@ public class Chunky {
           case HEADLESS_RENDER:
             exitCode = chunky.doHeadlessRender();
             break;
-          case SNAPSHOT:
+          case CREATE_SNAPSHOT:
             exitCode = chunky.doSnapshot();
             break;
-          case DEFAULT:
+          case START_GUI:
             ChunkyFx.startChunkyUI(chunky);
             break;
         }
@@ -240,8 +248,9 @@ public class Chunky {
   /**
    * This can be used by plugins to load the default Minecraft textures.
    */
+  @PluginApi
   public static void loadDefaultTextures() {
-    TexturePackLoader.loadTexturePacks(new String[0], false);
+    ResourcePackLoader.loadDefaultResourcePack();
   }
 
   private void loadPlugins() {
@@ -316,7 +325,7 @@ public class Chunky {
               .format("%s-%d%s", scene.name(), scene.spp, outputMode.getExtension());
         }
         System.out.println("Image output mode: " + outputMode);
-        scene.saveFrame(new File(options.imageOutputFile), taskTracker, context.numRenderThreads());
+        scene.saveFrame(new File(options.imageOutputFile), taskTracker);
         System.out.println("Saved snapshot to " + options.imageOutputFile);
         return 0;
       }
@@ -477,6 +486,30 @@ public class Chunky {
   @PluginApi
   public TabTransformer getMainTabTransformer() {
     return mainTabTransformer;
+  }
+
+  /**
+   * Get the mutable list of context menu transformers in the main map view. The following are supplied as context menu properties:
+   * <ul>
+   *   <li> `overlayPosition`: Vector2 - The screen overlay coordinates. The origin is in the top left of the map view. The unit is in pixels. </li>
+   *   <li> `chunkPosition`: Vector2 - The chunk coordinates. The unit is in chunks. Multiply by 16 to get the block coordinates. </li>
+   * </ul>
+   */
+  @PluginApi
+  public List<ContextMenuTransformer> getMapContextMenuTransformers() {
+    return this.mapContextMenuTransformers;
+  }
+
+
+  /**
+   * Get the mutable list of context menu transformers in the main render view. The following are supplied as context menu properties:
+   * <ul>
+   *   <li> `canvasPosition`: Vector2 - The canvas coordinates which correspond to the coordinates of the render buffer. The origin is in the top left corner. </li>
+   * </ul>
+   */
+  @PluginApi
+  public List<ContextMenuTransformer> getRenderContextMenuTransformers() {
+    return this.renderContextMenuTransformers;
   }
 
   /**

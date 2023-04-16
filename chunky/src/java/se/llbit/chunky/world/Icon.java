@@ -47,9 +47,9 @@ public class Icon extends Texture {
   public static final Icon skyboxFront = new Icon("skybox-front");
   public static final Icon skyboxBack = new Icon("skybox-back");
   public static final Icon isoNE = new Icon("iso-ne");
-  public static final Icon isoWN = new Icon("iso-wn");
+  public static final Icon isoNW = new Icon("iso-nw");
+  public static final Icon isoSE = new Icon("iso-se");
   public static final Icon isoSW = new Icon("iso-sw");
-  public static final Icon isoES = new Icon("iso-es");
   public static final Icon wrench = new Icon("wrench");
   public static final Icon pencil = new Icon("pencil");
   public static final Icon MC_1_13 = new Icon("1_13");
@@ -86,7 +86,7 @@ public class Icon extends Texture {
   public static final Icon corruptLayer = new Icon(ImageLoader.missingImage);
 
   public Icon(String resourceName) {
-    super(ImageLoader.readNonNull("icons/" + resourceName + ".png"));
+    super(ImageLoader.readResourceNonNull("icons/" + resourceName + ".png"));
   }
 
   protected Icon(BitmapImage image) {

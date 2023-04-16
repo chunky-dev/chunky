@@ -1,4 +1,5 @@
 /* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2022 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -18,12 +19,14 @@ package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.entity.Entity;
+import se.llbit.chunky.renderer.ApertureShape;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.projection.ApertureProjector;
 import se.llbit.chunky.renderer.projection.FisheyeProjector;
 import se.llbit.chunky.renderer.projection.ForwardDisplacementProjector;
-import se.llbit.chunky.renderer.projection.OmniDirectionalStereoProjector;
-import se.llbit.chunky.renderer.projection.OmniDirectionalStereoProjector.Eye;
+import se.llbit.chunky.renderer.projection.stereo.ODSSinglePerspectiveProjector;
+import se.llbit.chunky.renderer.projection.stereo.ODSSinglePerspectiveProjector.Eye;
+import se.llbit.chunky.renderer.projection.stereo.ODSVerticalStackedProjector;
 import se.llbit.chunky.renderer.projection.PanoramicProjector;
 import se.llbit.chunky.renderer.projection.PanoramicSlotProjector;
 import se.llbit.chunky.renderer.projection.ParallelProjector;
@@ -42,6 +45,7 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 import se.llbit.util.JsonSerializable;
+import se.llbit.util.annotation.Nullable;
 
 import java.util.Random;
 import java.util.function.Function;
@@ -90,6 +94,8 @@ public class Camera implements JsonSerializable {
   public static final double MAX_SUBJECT_DISTANCE = 1000;
 
   private final Refreshable scene;
+
+  private boolean lockCamera = false;
 
   Vector3 pos = new Vector3(0, 0, 0);
 
@@ -153,6 +159,11 @@ public class Camera implements JsonSerializable {
 
   public String name = "camera 1";
 
+  public ApertureShape apertureShape = ApertureShape.CIRCLE;
+
+  @Nullable
+  private String apertureMaskFilename;
+
   /**
    * @param scene The scene that will be refreshed after the camera view changes.
    */
@@ -169,6 +180,7 @@ public class Camera implements JsonSerializable {
    * @param other the camera to copy configuration from
    */
   public void set(Camera other) {
+    lockCamera = other.lockCamera;
     pos.set(other.pos);
     yaw = other.yaw;
     pitch = other.pitch;
@@ -180,12 +192,21 @@ public class Camera implements JsonSerializable {
     worldDiagonalSize = other.worldDiagonalSize;
     this.shiftX = other.shiftX;
     this.shiftY = other.shiftY;
+    apertureShape = other.apertureShape;
+    apertureMaskFilename = other.apertureMaskFilename;
     initProjector();
     updateTransform();
   }
 
   private Projector applyDoF(Projector p, double subjectDistance) {
-    return infiniteDoF() ? p : new ApertureProjector(p, subjectDistance / dof, subjectDistance);
+    if(infiniteDoF())
+      return p;
+    if (apertureShape == ApertureShape.CUSTOM)
+      return new ApertureProjector(p, subjectDistance / dof, subjectDistance, apertureMaskFilename);
+    else if (apertureShape == ApertureShape.CIRCLE)
+      return new ApertureProjector(p, subjectDistance / dof, subjectDistance);
+    else
+      return new ApertureProjector(p, subjectDistance / dof, subjectDistance, apertureShape);
   }
 
   private Projector applySphericalDoF(Projector p) {
@@ -227,9 +248,11 @@ public class Camera implements JsonSerializable {
       case STEREOGRAPHIC:
         return new StereographicProjector(fov);
       case ODS_LEFT:
-        return new OmniDirectionalStereoProjector(Eye.LEFT);
+        return new ODSSinglePerspectiveProjector(Eye.LEFT);
       case ODS_RIGHT:
-        return new OmniDirectionalStereoProjector(Eye.RIGHT);
+        return new ODSSinglePerspectiveProjector(Eye.RIGHT);
+      case ODS_STACKED:
+        return new ODSVerticalStackedProjector();
     }
   }
 
@@ -602,6 +625,7 @@ public class Camera implements JsonSerializable {
   @Override public JsonObject toJson() {
     JsonObject camera = new JsonObject();
     camera.add("name", name);
+    camera.add("lockCamera", lockCamera);
     camera.add("position", pos.toJson());
 
     JsonObject orientation = new JsonObject();
@@ -624,11 +648,16 @@ public class Camera implements JsonSerializable {
     shift.add("y", shiftY);
     camera.add("shift", shift);
 
+    camera.add("apertureShape", apertureShape.toString());
+    if(apertureMaskFilename != null)
+      camera.add("apertureMask", apertureMaskFilename);
+
     return camera;
   }
 
   public void importFromJson(JsonObject json) {
     name = json.get("name").stringValue(name);
+    lockCamera = json.get("lockCamera").boolValue(lockCamera);
     if (json.get("position").isObject()) {
       pos.fromJson(json.get("position").object());
     }
@@ -652,6 +681,9 @@ public class Camera implements JsonSerializable {
     JsonObject shift = json.get("shift").object();
     shiftX = shift.get("x").doubleValue(0);
     shiftY = shift.get("y").doubleValue(0);
+
+    apertureShape = ApertureShape.valueOf(json.get("apertureShape").stringValue("CIRCLE"));
+    apertureMaskFilename = json.get("apertureMask").stringValue(null);
 
     initProjector();
     updateTransform();
@@ -714,5 +746,51 @@ public class Camera implements JsonSerializable {
   public void copyTransients(Camera other) {
     name = other.name;
     target.set(other.target);
+  }
+
+  /**
+   * Set the aperture shape, except custom shape
+   * To set custom shape @see setCustomApertureShape
+   */
+  public void setApertureShape(ApertureShape newShape) {
+    if(newShape == ApertureShape.CUSTOM) {
+      // To set a custom shape, use the setCustomApertureShape functino to set the filename as well
+      throw new RuntimeException("Can't set custom aperture shape without a filename");
+    }
+
+    if(apertureShape != newShape) {
+      apertureMaskFilename = null;
+      apertureShape = newShape;
+      initProjector();
+      onViewChange();
+    }
+  }
+
+  /**
+   * Set a custom aperture shape
+   */
+  public void setCustomApertureShape(String customShapeFilename) {
+    if(apertureShape != ApertureShape.CUSTOM || !customShapeFilename.equals(apertureMaskFilename)) {
+      apertureShape = ApertureShape.CUSTOM;
+      apertureMaskFilename = customShapeFilename;
+      initProjector();
+      onViewChange();
+    }
+  }
+
+  /**
+   * Get aperture shape
+   */
+  public ApertureShape getApertureShape() {
+    return apertureShape;
+  }
+
+  public void setCameraLocked(boolean value) {
+    lockCamera = value;
+    scene.refresh();
+  }
+
+  public boolean getCameraLocked() {
+    return lockCamera;
   }
 }

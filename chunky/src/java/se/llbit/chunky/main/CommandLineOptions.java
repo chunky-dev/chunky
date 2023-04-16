@@ -22,7 +22,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.resources.TexturePackLoader;
+import se.llbit.chunky.resources.ResourcePackLoader;
 import se.llbit.json.JsonNumber;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
@@ -35,6 +35,7 @@ import se.llbit.util.mojangapi.MojangApi;
 import se.llbit.util.StringUtil;
 import se.llbit.util.TaskTracker;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -54,10 +55,31 @@ import java.util.function.Consumer;
 
 public class CommandLineOptions {
   enum Mode {
-    DEFAULT,
-    NOTHING,
-    HEADLESS_RENDER,
-    SNAPSHOT,
+    /**
+     * Starts the Chunky GUI.
+     */
+    START_GUI(true),
+    /**
+     * Outputs direct CLI operation feedback.
+     * Used by help, version, list / set config operations
+     */
+    CLI_OPERATION(false),
+    /**
+     * Starts a headless render of a scene with CLI feedback.
+     * Terminates once the target SSP count is reached.
+     */
+    HEADLESS_RENDER(true),
+    /**
+     * Generates and saves a snapshot of a scene based on the scene's dump file.
+     */
+    CREATE_SNAPSHOT(false),
+    ;
+
+    Mode(boolean requiresTextures) {
+      this.requiresTextures = requiresTextures;
+    }
+
+    final boolean requiresTextures;
   }
 
   /**
@@ -66,6 +88,8 @@ public class CommandLineOptions {
   private static final String USAGE = StringUtil
       .join("\n", "Usage: mapLoader [OPTIONS] [WORLD DIRECTORY]", "Options:",
           "  -texture <FILE>        use FILE as the texture pack (must be a Zip file)",
+          "  -textures <FILES>      use FILES as the texture packs (must be Zip files), ",
+          "                         separated by system path separator, loaded in order specified in this argument",
           "  -render <SCENE>        render the specified scene (see notes)",
           "  -snapshot <SCENE> [PNG] create a snapshot of the specified scene",
           "  -scene-dir <DIR>       use the directory DIR for loading/saving scenes",
@@ -104,7 +128,7 @@ public class CommandLineOptions {
    */
   protected boolean configurationError = false;
 
-  protected Mode mode = Mode.DEFAULT;
+  protected Mode mode = Mode.START_GUI;
 
   /**
    * Exit code to exit the application with if mode is DEFAULT
@@ -240,7 +264,9 @@ public class CommandLineOptions {
     options.sceneDir = PersistentSettings.getSceneDirectory();
 
     registerOption("-texture", new Range(1),
-        arguments -> options.texturePack = arguments.get(0));
+        arguments -> options.addResourcePacks(arguments.get(0)));
+    registerOption("-textures", new Range(1),
+      arguments -> options.addResourcePacks(arguments.get(0)));
 
     registerOption("-scene-dir", new Range(1),
         arguments -> options.sceneDir = new File(arguments.get(0)));
@@ -277,18 +303,18 @@ public class CommandLineOptions {
         arguments -> options.sppPerPass = Math.max(1, Integer.parseInt(arguments.get(0))));
 
     registerOption("-version", new Range(0), arguments -> {
-      mode = Mode.NOTHING;
+      mode = Mode.CLI_OPERATION;
       System.out.println("Chunky " + Version.getVersion());
     });
 
     registerOption(new String[] {"-help", "-h", "-?", "--help"}, new Range(0), arguments -> {
-      mode = Mode.NOTHING;
+      mode = Mode.CLI_OPERATION;
       printUsage();
       System.out.println("The default scene directory is " + PersistentSettings.getSceneDirectory());
     });
 
     registerOption("-snapshot", new Range(1, 2), arguments -> {
-      mode = Mode.SNAPSHOT;
+      mode = Mode.CREATE_SNAPSHOT;
       options.sceneName = arguments.get(0);
       if (arguments.size() == 2) {
         options.imageOutputFile = arguments.get(1);
@@ -300,12 +326,12 @@ public class CommandLineOptions {
     });
 
     registerOption("-list-scenes", new Range(0), arguments -> {
-      mode = Mode.NOTHING;
+      mode = Mode.CLI_OPERATION;
       printAvailableScenes();
     });
 
     registerOption("-set", new Range(2, 3), new int[]{1}, arguments -> {
-      mode = Mode.NOTHING;
+      mode = Mode.CLI_OPERATION;
       if (arguments.size() == 3) {
         options.sceneName = arguments.get(2);
         try {
@@ -319,13 +345,21 @@ public class CommandLineOptions {
           for (int j = 0; j < path.length - 1; ++j) {
             obj = obj.get(path[j]).object();
           }
-          JsonValue jsonValue;
-          try {
-            jsonValue = new JsonNumber(Integer.parseInt(value));
-          } catch (Exception e) {
-            jsonValue = new JsonString(value);
+
+          JsonValue jsonValue = null;
+          if (value.startsWith("{") || value.startsWith("[")) {
+            JsonParser parser = new JsonParser(new ByteArrayInputStream(value.getBytes()));
+            jsonValue = parser.parse();
+          } else {
+            try {
+              jsonValue =  new JsonNumber(Integer.parseInt(value));
+            } catch (Exception e) {
+              jsonValue =  new JsonString(value);
+            }
           }
+
           obj.set(path[path.length - 1], jsonValue);
+
           writeSceneJson(file, desc);
           System.out.println("Updated scene " + file.getAbsolutePath());
         } catch (SyntaxError e) {
@@ -347,7 +381,7 @@ public class CommandLineOptions {
     });
 
     registerOption("-reset", new Range(1, 2), arguments -> {
-      mode = Mode.NOTHING;
+      mode = Mode.CLI_OPERATION;
       if (arguments.size() == 2) {
         options.sceneName = arguments.get(1);
         try {
@@ -376,7 +410,7 @@ public class CommandLineOptions {
     });
 
     registerOption("-download-mc", new Range(1), arguments -> {
-      mode = Mode.NOTHING;
+      mode = Mode.CLI_OPERATION;
       String version = arguments.get(0);
       try {
         File resourcesDir = new File(PersistentSettings.settingsDirectory(), "resources");
@@ -403,7 +437,7 @@ public class CommandLineOptions {
     });
 
     registerOption("-merge-dump", new Range(2), arguments -> {
-      mode = Mode.NOTHING;
+      mode = Mode.CLI_OPERATION;
       options.sceneName = arguments.get(0);
       String dumpPath = arguments.get(1);
       File dumpfile = new File(dumpPath);
@@ -448,12 +482,12 @@ public class CommandLineOptions {
       }
     });
 
-    // When mode is set to Mode.NOTHING, then an option handler has performed
+    // When mode is set to Mode.CLI_OPERATION, then an option handler has performed
     // something and we should quit.
     // If configurationError is set to true then an option handler encountered an
     // error and we should quit.
     List<String> arguments = new LinkedList<>(Arrays.asList(args));
-    while (!arguments.isEmpty() && !configurationError && mode != Mode.NOTHING) {
+    while (!arguments.isEmpty() && !configurationError && mode != Mode.CLI_OPERATION) {
       // Remove first argument.
       String argument = arguments.remove(0);
       if (optionHandlers.containsKey(argument)) {
@@ -485,12 +519,13 @@ public class CommandLineOptions {
       }
     }
 
-    if (!configurationError && mode != Mode.NOTHING && mode != Mode.SNAPSHOT) {
-      if (options.texturePack == null || options.texturePack.isEmpty()) {
-        options.texturePack = PersistentSettings.getLastTexturePack();
+    if (!configurationError && mode.requiresTextures) {
+      List<File> resourcePacks = options.getResourcePacks();
+      if(resourcePacks.isEmpty()) {
+        ResourcePackLoader.loadPersistedResourcePacks();
+      } else {
+        ResourcePackLoader.loadResourcePacks(resourcePacks);
       }
-      TexturePackLoader.setTexturePacks(options.texturePack);
-      TexturePackLoader.loadTexturePacks(options.texturePack, false);
     }
   }
 

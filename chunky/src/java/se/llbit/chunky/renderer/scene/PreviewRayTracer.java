@@ -1,5 +1,5 @@
-/* Copyright (c) 2013-2021 Jesper Öqvist <jesper@llbit.se>
- * Copyright (c) 2013-2021 Chunky contributors
+/* Copyright (c) 2013-2022 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2013-2022 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -54,7 +54,7 @@ public class PreviewRayTracer implements RayTracer {
     }
 
     if (ray.getCurrentMaterial() == Air.INSTANCE) {
-      scene.sky.getSkySpecularColor(ray);
+      scene.sky.getApparentSkyColor(ray, true);
     } else {
       scene.sun.flatShading(ray);
     }
@@ -115,7 +115,7 @@ public class PreviewRayTracer implements RayTracer {
     if (scene.getWaterPlaneChunkClip()) {
       Vector3 pos = new Vector3(ray.o);
       pos.scaleAdd(t, ray.d);
-      if (scene.isChunkLoaded((int)Math.floor(pos.x), (int)Math.floor(pos.z)))
+      if (scene.isChunkLoaded((int)Math.floor(pos.x), (int)Math.floor(pos.y), (int)Math.floor(pos.z)))
         return false;
     }
     if (ray.d.y < 0) {
@@ -168,8 +168,8 @@ public class PreviewRayTracer implements RayTracer {
         boolean insideOctree = scene.isInsideOctree(vec);
         ray.t = t;
         ray.o.set(vec);
-        double xm = ((ray.o.x) % 16.0 + 16.0) % 16.0;
-        double zm = ((ray.o.z) % 16.0 + 16.0) % 16.0;
+        double xm = ((ray.o.x) % 16.0 + 8.0) % 16.0;
+        double zm = ((ray.o.z) % 16.0 + 8.0) % 16.0;
         if (
           (xm < chunkPatternLinePosition || xm > chunkPatternLinePosition + chunkPatternLineWidth) &&
             (zm < chunkPatternLinePosition || zm > chunkPatternLinePosition + chunkPatternLineWidth)

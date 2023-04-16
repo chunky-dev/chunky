@@ -1,15 +1,18 @@
 package se.llbit.chunky.block;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
 import org.junit.Test;
+import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
+import se.llbit.util.mojangapi.MinecraftSkin;
 
 public class SkullTextureTest {
 
@@ -113,6 +116,19 @@ public class SkullTextureTest {
     assertEquals(
         "http://textures.minecraft.net/texture/3b60a1f6d562f52aaebbf1434f1de147933a3affe0e764fa49ea057536623cd3",
         Head.getTextureUrl(capeTag));
+  }
+
+  @Test
+  public void testNoSkins() { // test for #1331
+    MinecraftSkin skin = MinecraftSkin.getSkinFromEncodedTextures(Base64.getEncoder().encodeToString(
+      ("{\n"
+        + "  \"timestamp\" : 1633816089260,\n"
+        + "  \"profileId\" : \"94d67f2fd039419b8958abe6b25916b0\",\n"
+        + "  \"profileName\" : \"leMaik\",\n"
+        + "  \"textures\" : {}\n"
+        + "}").getBytes(StandardCharsets.UTF_8))).get();
+    assertNull(skin.getSkinUrl());
+    assertEquals(PlayerModel.STEVE, skin.getPlayerModel());
   }
 
   private static CompoundTag createSkullTag(String rootKey, String value) {

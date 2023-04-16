@@ -61,6 +61,7 @@ public class BeaconBeamMaterial extends Material {
         json.add("specular", this.specular);
         json.add("emittance", this.emittance);
         json.add("roughness", this.roughness);
+        json.add("metalness", this.metalness);
         json.add("color", this.color);
     }
 }

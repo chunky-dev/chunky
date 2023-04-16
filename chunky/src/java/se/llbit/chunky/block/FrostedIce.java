@@ -11,6 +11,7 @@ public class FrostedIce extends MinecraftBlockTranslucent {
 
   public FrostedIce(int age) {
     super("frosted_ice", texture[age & 3]);
+    solid = true;
     this.age = age & 3;
   }
 

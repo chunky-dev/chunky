@@ -112,6 +112,10 @@ public class QuickMath {
     return value < min ? min : value > max ? max : value;
   }
 
+  public static int clamp(int value, int min, int max) {
+    return Math.max(Math.min(value, max), min);
+  }
+
   /**
    * Maximum of a and b.
    * <p>NB: not NaN-correct. Do not use if either a or b can be NaN.
@@ -158,5 +162,17 @@ public class QuickMath {
    */
   public static double abs(double x) {
     return (x < 0.0) ? -x : x;
+  }
+
+  /**
+   * Greatest Common Divisor of both inputs
+   */
+  public static int gcd(int a, int b) {
+    while (b != 0) {
+      int t = a;
+      a = b;
+      b = t % b;
+    }
+    return a;
   }
 }

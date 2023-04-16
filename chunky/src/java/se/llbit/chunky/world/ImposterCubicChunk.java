@@ -6,12 +6,16 @@ import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.SurfaceLayer;
+import se.llbit.chunky.world.biome.ArrayBiomePalette;
+import se.llbit.chunky.world.biome.BiomePalette;
+import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.chunky.world.region.ImposterCubicRegion;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.SpecificTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.Mutable;
+import se.llbit.util.annotation.NotNull;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -33,7 +37,7 @@ public class ImposterCubicChunk extends Chunk {
     this.world = (CubicWorld) world;
 
     assert world.getVersionId() <= VERSION_1_12_2;
-    version = "1.12";
+    version = ChunkVersion.PRE_FLATTENING;
   }
 
   private Map<Integer, Map<String, Tag>> getCubeTags(Set<String> request) {
@@ -49,7 +53,8 @@ public class ImposterCubicChunk extends Chunk {
    * layer, surface and cave maps.
    * @return whether the input chunkdata was modified
    */
-  public synchronized boolean loadChunk(ChunkData chunkData, int yMin, int yMax) {
+  @Override
+  public synchronized boolean loadChunk(@NotNull Mutable<ChunkData> mutableChunkData, int yMin, int yMax) {
     if (!shouldReloadChunk()) {
       return false;
     }
@@ -65,6 +70,8 @@ public class ImposterCubicChunk extends Chunk {
     }
 
     surfaceTimestamp = dataTimestamp;
+    mutableChunkData.set(this.world.createChunkData(mutableChunkData.get(), 0)); //chunk version ignored for cubic worlds
+    ChunkData chunkData = mutableChunkData.get();
     loadSurfaceCubic(data, chunkData, yMin, yMax);
     biomes = IconLayer.UNKNOWN;
 
@@ -87,6 +94,8 @@ public class ImposterCubicChunk extends Chunk {
 
     Heightmap heightmap = world.heightmap();
     BlockPalette palette = new BlockPalette();
+    BiomePalette biomePalette = new ArrayBiomePalette();
+    biomePalette.put(Biomes.biomesPrePalette[0]); //We don't currently support cubic chunks biomes, and so default to ocean
 
     for (Map.Entry<Integer, Map<String, Tag>> entry : data.entrySet()) {
       Integer yPos = entry.getKey();
@@ -95,7 +104,7 @@ public class ImposterCubicChunk extends Chunk {
       Tag sections = cubeData.get(LEVEL_SECTIONS);
       if (sections.isList()) {
 //        extractBiomeData(cubeData.get(LEVEL_BIOMES), chunkData);
-        if (version.equals("1.13") || version.equals("1.12")) {
+        if (version == ChunkVersion.PRE_FLATTENING || version == ChunkVersion.POST_FLATTENING) {
           loadBlockDataCubic(yPos, cubeData, chunkData, palette, yMin, yMax);
           queueTopography();
         }
@@ -104,7 +113,7 @@ public class ImposterCubicChunk extends Chunk {
 
     int[] heightmapData = extractHeightmapDataCubic(null, chunkData);
     updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
-    surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, yMin, yMax, heightmapData);
+    surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
   }
 
   private int[] extractHeightmapDataCubic(Map<String, Tag> cubeData, ChunkData chunkData) {
@@ -154,7 +163,8 @@ public class ImposterCubicChunk extends Chunk {
     }
   }
 
-  public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette, int minY, int maxY) {
+  @Override
+  public synchronized void getChunkData(@NotNull Mutable<ChunkData> reuseChunkData, BlockPalette palette, BiomePalette biomePalette, int minY, int maxY) {
     Set<String> request = new HashSet<>();
     request.add(DATAVERSION);
     request.add(LEVEL_SECTIONS);
@@ -162,16 +172,17 @@ public class ImposterCubicChunk extends Chunk {
     request.add(LEVEL_ENTITIES);
     request.add(LEVEL_TILEENTITIES);
     Map<Integer, Map<String, Tag>> data = getCubeTags(request);
-    if(reuseChunkData == null || reuseChunkData instanceof EmptyChunkData) {
-      reuseChunkData = world.createChunkData();
+    if(reuseChunkData.get() == null || reuseChunkData.get() instanceof EmptyChunkData) {
+      reuseChunkData.set(world.createChunkData(reuseChunkData.get(), 0));
     } else {
-      reuseChunkData.clear();
+      reuseChunkData.get().clear();
     }
     // TODO: improve error handling here.
     if (data == null) {
-      return reuseChunkData;
+      return;
     }
 
+    ChunkData chunkData = reuseChunkData.get();
     for (Map.Entry<Integer, Map<String, Tag>> entry : data.entrySet()) {
       Integer yPos = entry.getKey();
       Map<String, Tag> cubeData = entry.getValue();
@@ -185,24 +196,25 @@ public class ImposterCubicChunk extends Chunk {
 //        extractBiomeData(biomesTag, reuseChunkData);
 //      }
 
+      biomePalette.put(Biomes.biomesPrePalette[0]); //We don't currently support cubic chunks biomes, and so default to ocean
+
       if (sections.isList()) {
-        loadBlockDataCubic(yPos, cubeData, reuseChunkData, palette, minY, maxY);
+        loadBlockDataCubic(yPos, cubeData, chunkData, palette, minY, maxY);
       }
 
       if (entitiesTag.isList()) {
         for (SpecificTag tag : (ListTag) entitiesTag) {
           if (tag.isCompoundTag())
-            reuseChunkData.addEntity((CompoundTag) tag);
+            chunkData.addEntity((CompoundTag) tag);
         }
       }
 
       if (tileEntitiesTag.isList()) {
         for (SpecificTag tag : (ListTag) tileEntitiesTag) {
           if (tag.isCompoundTag())
-            reuseChunkData.addTileEntity((CompoundTag) tag);
+            chunkData.addTileEntity((CompoundTag) tag);
         }
       }
     }
-    return reuseChunkData;
   }
 }

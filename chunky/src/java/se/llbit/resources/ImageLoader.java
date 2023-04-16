@@ -18,17 +18,17 @@ package se.llbit.resources;
 
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.io.ByteArrayOutputStream;
+import java.awt.image.ImageObserver;
+import java.io.*;
+
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
+import se.llbit.util.Mutable;
 
 import javax.imageio.ImageIO;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -70,7 +70,7 @@ public final class ImageLoader {
    *
    * @return Image for the given resource name
    */
-  public static synchronized BitmapImage readNonNull(String resourceName) {
+  public static synchronized BitmapImage readResourceNonNull(String resourceName) {
     URL url = ImageLoader.class.getResource("/" + resourceName);
     if (url == null) {
       Log.info("Could not find image: " + resourceName);
@@ -97,10 +97,16 @@ public final class ImageLoader {
       while ((nRead = in.read(data, 0, data.length)) != -1) {
         buffer.write(data, 0, nRead);
       }
-      Image img = Toolkit.getDefaultToolkit().createImage(buffer.toByteArray());
-      return fromAwtImage(img);
-    }
 
+      byte[] imgData = buffer.toByteArray();
+      try {
+        Image img = Toolkit.getDefaultToolkit().createImage(imgData);
+        return fromAwtImage(img);
+      } catch (Exception e) {
+        Log.info("Failed to load image with AWT. Trying with ImageIO.");
+        return fromBufferedImage(ImageIO.read(new ByteArrayInputStream(imgData)));
+      }
+    }
     return fromBufferedImage(ImageIO.read(in));
   }
 
@@ -141,8 +147,18 @@ public final class ImageLoader {
       // until it is drawn
       BufferedImage tmp = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
       Graphics g = tmp.getGraphics();
-      while (!g.drawImage(newImage, 0, 0, null)) {}
+      Mutable<Boolean> stop = new Mutable<>(false);
+      ImageObserver observer = (img, infoflags, x, y, width, height) -> {
+        boolean fail = (infoflags &
+            (ImageObserver.ERROR | ImageObserver.ABORT)) != 0;
+        stop.set(fail);
+        return !fail;
+      };
+      while (!stop.get() && !g.drawImage(newImage, 0, 0, observer)) {}
       g.dispose();
+      if (stop.get()) {
+        throw new IllegalArgumentException("Invalid image.");
+      }
     }
 
     int width = newImage.getWidth(null);

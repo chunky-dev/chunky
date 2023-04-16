@@ -19,17 +19,22 @@ package se.llbit.chunky.ui;
 
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.ContextMenu;
+import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.GridPane;
 import javafx.stage.PopupWindow;
 import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.MapView;
@@ -38,6 +43,9 @@ import se.llbit.chunky.renderer.CameraViewListener;
 import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.SceneManager;
+import se.llbit.chunky.ui.controller.ChunkyFxController;
+import se.llbit.chunky.ui.dialogs.SelectChunksInRadiusDialog;
+import se.llbit.chunky.ui.elements.TextFieldLabelWrapper;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
@@ -46,14 +54,17 @@ import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.PlayerEntityData;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
+import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -77,6 +88,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   protected final ContextMenu contextMenu = new ContextMenu();
   protected final MenuItem moveCameraHere;
   protected final MenuItem selectVisible;
+  protected SelectChunksInRadiusDialog selectionRadiusDialog;
   public Tooltip tooltip = new Tooltip();
   public int lastX;
   public int lastY;
@@ -95,8 +107,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
    * Indicates whether or not the selection rectangle should be drawn.
    */
   protected volatile boolean selectRect = false;
-  protected volatile ChunkPosition start = ChunkPosition.get(0, 0);
-  protected volatile ChunkPosition end = ChunkPosition.get(0, 0);
+  protected volatile ChunkPosition start = new ChunkPosition(0, 0);
+  protected volatile ChunkPosition end = new ChunkPosition(0, 0);
   protected boolean ctrlModifier = false;
   protected boolean shiftModifier = false;
   protected boolean dragging = false;
@@ -111,6 +123,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   private volatile long lastRedraw = 0;
   private Runnable onViewDragged = () -> {};
   private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
+  private boolean shouldDrawPlayers = true;
 
   public ChunkMap(WorldMapLoader loader, ChunkyFxController controller,
       MapView mapView, ChunkSelectionTracker chunkSelection,
@@ -137,7 +151,10 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     MenuItem clearSelection = new MenuItem("Clear selection");
     clearSelection.setGraphic(new ImageView(Icon.clear.fxImage()));
     clearSelection.setOnAction(event -> chunkSelection.clearSelection());
-    clearSelection.setDisable(chunkSelection.size() == 0);
+    clearSelection.setDisable(chunkSelection.isEmpty());
+
+    this.selectionRadiusDialog = new SelectChunksInRadiusDialog();
+    MenuItem selectChunksInRadius = createSelectChunksInRadiusMenuItem(mapView, chunkSelection);
 
     MenuItem newScene = new MenuItem("New scene from selection");
     newScene.setGraphic(new ImageView(Icon.sky.fxImage()));
@@ -146,12 +163,15 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       sceneManager
           .loadFreshChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
     });
-    newScene.setDisable(chunkSelection.size() == 0);
-    chunkSelection.addSelectionListener(() -> {
-      boolean noChunksSelected = chunkSelection.size() == 0;
-      clearSelection.setDisable(noChunksSelected);
-      newScene.setDisable(noChunksSelected);
+    newScene.setDisable(chunkSelection.isEmpty());
+
+    MenuItem loadSelection = new MenuItem("Load selected chunks");
+    loadSelection.setOnAction(event -> {
+      SceneManager sceneManager = controller.getRenderController().getSceneManager();
+      sceneManager
+          .loadChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
     });
+    loadSelection.setDisable(chunkSelection.isEmpty());
 
     moveCameraHere.setOnAction(event -> {
       ChunkView theView = new ChunkView(view);  // Make thread-local copy.
@@ -170,8 +190,32 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       }
     });
 
-    contextMenu.getItems()
-        .addAll(newScene, clearSelection, moveCameraHere, selectVisible);
+    MenuItem exportZip = new MenuItem("Export selected chunks…");
+    exportZip.setOnAction(e -> controller.exportZip());
+    exportZip.setDisable(chunkSelection.size() == 0);
+
+    MenuItem exportPng = new MenuItem("Save map view as…");
+    exportPng.setOnAction(e -> controller.exportMapView());
+
+    contextMenu.getItems().addAll(
+        newScene, loadSelection, clearSelection, selectChunksInRadius,
+        new SeparatorMenuItem(),
+        moveCameraHere, selectVisible,
+        new SeparatorMenuItem(),
+        exportZip, exportPng
+    );
+
+    controller.getChunky()
+      .getMapContextMenuTransformers()
+      .forEach(t -> t.accept(contextMenu));
+
+    chunkSelection.addSelectionListener(() -> {
+      boolean noChunksSelected = chunkSelection.size() == 0;
+      clearSelection.setDisable(noChunksSelected);
+      newScene.setDisable(noChunksSelected);
+      loadSelection.setDisable(noChunksSelected);
+      exportZip.setDisable(noChunksSelected);
+    });
   }
 
   @Override public void chunkUpdated(ChunkPosition chunk) {
@@ -180,6 +224,32 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       repaintRatelimited();
     } else {
       regionUpdated(chunk.getRegionPosition());
+    }
+  }
+
+  @Override public void regionChunksUpdated(ChunkPosition region) {
+    if (view.chunkScale >= 16) {
+      int minChunkX = region.x << 5;
+      int minChunkZ = region.z << 5;
+      for (int chunkX = minChunkX; chunkX < minChunkX + MCRegion.CHUNKS_X; chunkX++) {
+        for (int chunkZ = minChunkZ; chunkZ < minChunkZ + MCRegion.CHUNKS_Z; chunkZ++) {
+          mapBuffer.drawTile(mapLoader, new ChunkPosition(chunkX, chunkZ), chunkSelection);
+        }
+      }
+      repaintRatelimited();
+    } else {
+      regionUpdated(region);
+    }
+  }
+
+  @Override public void regionChunksUpdated(ChunkPosition region, Collection<ChunkPosition> chunks) {
+    if (view.chunkScale >= 16) {
+      for (ChunkPosition chunk : chunks) {
+        mapBuffer.drawTile(mapLoader, chunk, chunkSelection);
+      }
+      repaintRatelimited();
+    } else {
+      regionUpdated(region);
     }
   }
 
@@ -260,8 +330,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       // If ctrlModifier to deselect, then do deselect
       // If no ctrlModifier, select chunks
       // but if they are all already selected, then deselect.
-      if (ctrlModifier || !chunkSelection.selectChunks(mapLoader.getWorld(), x0, z0, x1, z1))
-        chunkSelection.deselectChunks(x0, z0, x1, z1);
+      if (ctrlModifier || !chunkSelection.setChunks(mapLoader.getWorld(), x0, z0, x1, z1, true)) //TODO: what the..?
+        chunkSelection.setChunks(mapLoader.getWorld(), x0, z0, x1, z1, false);
     }
   }
 
@@ -392,7 +462,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
     if (selectRect || !dragging && shiftModifier) {
       selectRect = true;
-    } else {
+    } else if (!event.isSecondaryButtonDown()) { // do not drag when right-clicking
       dragging = true;
       mapView.viewDragged(dx, dy);
       onViewDragged.run();
@@ -414,7 +484,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     // Calculate the world block position of the cursor
     int worldBlockX = cx * Chunk.X_MAX + bx;
     int worldBlockZ = cz * Chunk.Z_MAX + bz;
-    ChunkPosition cp = ChunkPosition.get(cx, cz);
+    ChunkPosition cp = new ChunkPosition(cx, cz);
     if (!mouseDown) {
       Chunk hoveredChunk = mapLoader.getWorld().getChunk(cp);
       if (!hoveredChunk.isEmpty()) {
@@ -441,6 +511,16 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     if (event.getButton() == MouseButton.SECONDARY) {
       clickX = lastX;
       clickY = lastY;
+
+      ChunkView theView = mapView.getMapView();
+      Vector2 overlayPosition = new Vector2(event.getX(), event.getY());
+      Vector2 chunkPosition = new Vector2(
+        theView.x + (overlayPosition.x - getWidth() / 2f) / theView.scale,
+        theView.z + (overlayPosition.y - getHeight() / 2f) / theView.scale
+      );
+
+      contextMenu.getProperties().put("overlayPosition", overlayPosition); // plugin api
+      contextMenu.getProperties().put("chunkPosition", chunkPosition); // plugin api
       contextMenu.show(mapOverlay, event.getScreenX(), event.getScreenY());
     } else {
       if (contextMenu.isShowing()) {
@@ -468,7 +548,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
         if (theView.scale >= 16) {
           chunkSelection.toggleChunk(mapLoader.getWorld(), cx, cz);
         } else {
-          chunkSelection.selectRegion(mapLoader.getWorld(), cx, cz);
+          chunkSelection.toggleRegion(mapLoader.getWorld(), cx, cz);
         }
       }
     } else {
@@ -506,7 +586,9 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
   protected void repaint(GraphicsContext gc) {
     mapBuffer.drawBuffered(gc);
-    drawPlayers(gc);
+    if (shouldDrawPlayers) {
+      drawPlayers(gc);
+    }
     drawSpawn(gc);
     drawSelectionRect(gc);
     drawViewBounds(mapOverlay);
@@ -770,7 +852,43 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     gc.strokeLine(x1, y1, x2, y2);
   }
 
+  private MenuItem createSelectChunksInRadiusMenuItem(MapView mapView, ChunkSelectionTracker chunkSelection) {
+    MenuItem selectChunksInRadius = new MenuItem("Select chunks in radius");
+    selectChunksInRadius.setOnAction(event -> {
+      // not using lastX and lastY as they are the position within this display, and so when positioning a window in a system
+      // with multiple displays they would set the position relative to the PRIMARY display... very annoying
+      Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+      this.selectionRadiusDialog.setX(mouseLocation.x - 200); // some offsetting to center the popup on the mouse (may not work as well on higher resolutions than 1920x1080)
+      this.selectionRadiusDialog.setY(mouseLocation.y - 75);
+
+      ChunkView theView = mapView.getMapView();
+      int cx = (int) QuickMath.floor(theView.x + (clickX - getWidth() / 2f) / theView.scale);
+      int cz = (int) QuickMath.floor(theView.z + (clickY - getHeight() / 2f) / theView.scale);
+
+      this.selectionRadiusDialog.setSelectionPos(cx, cz);
+
+      if (selectionRadiusDialog.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+        chunkSelection.setChunkRadius(
+          mapLoader.getWorld(),
+          this.selectionRadiusDialog.getSelectionX(),
+          this.selectionRadiusDialog.getSelectionZ(),
+          this.selectionRadiusDialog.getRadius(),
+          true
+        );
+      }
+   });
+    return selectChunksInRadius;
+  }
+
   public void setOnViewDragged(Runnable onViewDragged) {
     this.onViewDragged = onViewDragged;
+  }
+
+  public boolean isDrawingPlayers() {
+    return this.shouldDrawPlayers;
+  }
+
+  public void setDrawingPlayers(boolean value) {
+    this.shouldDrawPlayers = value;
   }
 }

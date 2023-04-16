@@ -17,6 +17,7 @@
 package se.llbit.math;
 
 import java.util.Collection;
+import java.util.Random;
 
 import se.llbit.chunky.world.Material;
 import se.llbit.math.primitive.Primitive;
@@ -36,11 +37,9 @@ public class Quad {
   public Vector4 uv = new Vector4();
 
   /**
-   * Is this Quad double sided? This is used instead of {@code instanceof DoubleSidedQuad} since it is ~2x faster.
-   * This is required since ray normal can only be set after an intersection is confirmed
-   * TODO: Find a better way to do this.
+   * True if this quad is double-sided.
    */
-  public final boolean doubleSided = false;
+  public final boolean doubleSided;
 
   /**
    * Normal vector
@@ -53,6 +52,7 @@ public class Quad {
    * Create new Quad by copying another quad and applying a transform.
    */
   public Quad(Quad other, Transform t) {
+    this.doubleSided = other.doubleSided;
     o.set(other.o);
     o.x -= .5;
     o.y -= .5;
@@ -77,6 +77,7 @@ public class Quad {
    * Create transformed Quad
    */
   public Quad(Quad other, Matrix3 t) {
+    this.doubleSided = other.doubleSided;
     o.set(other.o);
     o.x -= .5;
     o.y -= .5;
@@ -98,14 +99,29 @@ public class Quad {
   }
 
   /**
+   * Create a new single sided quad
+   *
+   * @param v0 Bottom left vector
+   * @param v1 Top right vector
+   * @param v2 Bottom right vector
+   * @param uv Minimum and maximum U/V texture coordinates (x0,y0 bottom left)
+   */
+  public Quad(Vector3 v0, Vector3 v1, Vector3 v2, Vector4 uv) {
+    this(v0, v1, v2, uv, false);
+  }
+
+
+  /**
    * Create new quad
    *
    * @param v0 Bottom left vector
    * @param v1 Top right vector
    * @param v2 Bottom right vector
-   * @param uv Minimum and maximum U/V texture coordinates
+   * @param uv Minimum and maximum U/V texture coordinates (x0,y0 bottom left)
+   * @param doubleSided True to make this quad double-sided
    */
-  public Quad(Vector3 v0, Vector3 v1, Vector3 v2, Vector4 uv) {
+  public Quad(Vector3 v0, Vector3 v1, Vector3 v2, Vector4 uv, boolean doubleSided) {
+    this.doubleSided = doubleSided;
     o.set(v0);
     xv.sub(v1, v0);
     xvl = 1 / xv.lengthSquared();
@@ -117,6 +133,18 @@ public class Quad {
     this.uv.set(uv);
     this.uv.y -= uv.x;
     this.uv.w -= uv.z;
+  }
+
+  public double surfaceArea() {
+    Vector3 cross = new Vector3();
+    cross.cross(xv, yv);
+    return cross.length();
+  }
+
+  public void sample(Vector3 loc, Random rand) {
+    loc.set(o);
+    loc.scaleAdd(rand.nextDouble(), xv);
+    loc.scaleAdd(rand.nextDouble(), yv);
   }
 
   /**
@@ -133,7 +161,7 @@ public class Quad {
 
     // Test that the ray is heading toward the plane of this quad.
     double denom = ray.d.dot(n);
-    if (denom < -Ray.EPSILON) {
+    if (denom < -Ray.EPSILON || (doubleSided && denom > Ray.EPSILON)) {
 
       // Test for intersection with the plane at origin.
       double t = -(ix * n.x + iy * n.y + iz * n.z + d) / denom;
@@ -186,9 +214,9 @@ public class Quad {
     double v0 = uv.z;
     double v1 = uv.z + uv.w;
     primitives.add(new TexturedTriangle(c0, c2, c1, new Vector2(u0, v0), new Vector2(u0, v1),
-        new Vector2(u1, v0), material, false));
+        new Vector2(u1, v0), material, doubleSided));
     primitives.add(new TexturedTriangle(c1, c2, c3, new Vector2(u1, v0), new Vector2(u0, v1),
-        new Vector2(u1, v1), material, false));
+        new Vector2(u1, v1), material, doubleSided));
   }
 
   /**

@@ -22,7 +22,7 @@ import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipFile;
+import java.nio.file.Path;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -49,8 +49,8 @@ public class CloudsTexture extends TextureLoader {
     return true;
   }
 
-  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
-    return load(topLevelDir + file, texturePack);
+  @Override public boolean load(Path texturePack) {
+    return load(file, texturePack);
   }
 }
 

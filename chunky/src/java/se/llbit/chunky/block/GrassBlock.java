@@ -9,5 +9,6 @@ public class GrassBlock extends AbstractModelBlock {
     super("grass_block", Texture.grassTop);
     model = new GrassBlockModel();
     opaque = true;
+    solid = true;
   }
 }

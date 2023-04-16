@@ -23,8 +23,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * This class loads textures from a Minecraft resource pack.
@@ -48,14 +48,10 @@ public abstract class TextureLoader {
   /**
    * Attempt to load a texture from a texture pack.
    *
-   * @param texturePack Reference to the texture pack zip file
-   * @param topLevelDir The top-level directory of the resource pack, with
-   * trailing slash. The assets directory should be inside the top-level directory.
-   * This can be empty, if the assets directory is a top-level directory of the
-   * Zip file.
+   * @param texturePack Reference to the texture pack file or directory
    * @return <code>true</code> if the texture was successfully loaded
    */
-  public abstract boolean load(ZipFile texturePack, String topLevelDir);
+  public abstract boolean load(Path texturePack);
 
   /**
    * Attempt to load a texture from a PNG image file.
@@ -65,27 +61,28 @@ public abstract class TextureLoader {
    * @throws TextureFormatError
    * @throws IOException
    */
-  public boolean load(File file) throws IOException, TextureFormatError {
-    try (FileInputStream in = new FileInputStream(file)) {
+  public boolean loadFromFile(File file) throws IOException, TextureFormatError {
+    try (InputStream in = new FileInputStream(file)) {
       return load(in);
+    } catch (NullPointerException e) {
+      // Safe to ignore - will be handled implicitly later.
     }
+    return false;
   }
 
   /**
    * Attempt to load a texture from a texture pack.
    *
    * @param file        Path of texture in texture pack
-   * @param texturePack Reference to the texture pack zip file
+   * @param texturePack Reference to the texture pack file or directory
    * @return <code>true</code> if the texture was successfully loaded
    */
-  protected boolean load(String file, ZipFile texturePack) {
-    try (InputStream in = texturePack.getInputStream(new ZipEntry(file + ".png"))) {
-      if (in != null) {
-        return load(in);
-      }
+  protected boolean load(String file, Path texturePack) {
+    try (InputStream in = Files.newInputStream(texturePack.resolve(file + ".png"))) {
+      return load(in);
     } catch (TextureFormatError e) {
       Log.info(e.getMessage());
-    } catch (IOException e) {
+    } catch (IOException | NullPointerException e) {
       // Safe to ignore - will be handled implicitly later.
     }
     return false;

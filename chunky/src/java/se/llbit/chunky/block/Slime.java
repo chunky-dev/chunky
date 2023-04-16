@@ -7,11 +7,11 @@ import se.llbit.math.Ray;
 
 public class Slime extends MinecraftBlockTranslucent {
     public Slime() {
-        super("slime", Texture.slime);
+        super("slime_block", Texture.slime);
         localIntersect = true;
         opaque = false;
         ior = 1.516f; // gelatin, according to https://study.com/academy/answer/what-is-the-refractive-index-of-gelatin.html
-        solid = false;
+        solid = true;
         refractive = true;
     }
 

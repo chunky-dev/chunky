@@ -32,8 +32,8 @@ public class SimplexWaterShader implements WaterShader {
    */
 
   public int iterations = 4; /// Number of iteration of the fractal noise
-  public double baseFrequency = 0.1; /// frequency of the first iteration, doubles each iteration
-  public double baseAmplitude = 0.2; /// amplitude of the first iteration, halves each iteration
+  public double baseFrequency = 0.4; /// frequency of the first iteration, doubles each iteration
+  public double baseAmplitude = 0.025; /// amplitude of the first iteration, halves each iteration
   public double animationSpeed = 1; /// animation speed
   private final SimplexNoise noise = new SimplexNoise();
 
@@ -48,8 +48,13 @@ public class SimplexWaterShader implements WaterShader {
 
     for(int i = 0; i < iterations; ++i) {
       noise.calculate((float)(ray.o.x * frequency), (float)(ray.o.z * frequency), (float)(animationTime * animationSpeed));
-      ddx += - amplitude * noise.ddx;
-      ddz += - amplitude * noise.ddy;
+      double ddxNext = ddx - amplitude * noise.ddx;
+      double ddzNext = ddz - amplitude * noise.ddy;
+      if (Double.isNaN(ddxNext + ddzNext)) {
+        break;
+      }
+      ddx = ddxNext;
+      ddz = ddzNext;
 
       frequency *= 2;
       amplitude *= 0.5;
@@ -90,8 +95,8 @@ public class SimplexWaterShader implements WaterShader {
       return;
 
     iterations = params.get("iterations").intValue(4);
-    baseFrequency = params.get("frequency").doubleValue(0.1);
-    baseAmplitude = params.get("amplitude").doubleValue(0.2);
+    baseFrequency = params.get("frequency").doubleValue(0.4);
+    baseAmplitude = params.get("amplitude").doubleValue(0.025);
     animationSpeed = params.get("animationSpeed").doubleValue(1);
   }
 }

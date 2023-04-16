@@ -17,9 +17,8 @@
 package se.llbit.chunky.ui.render;
 
 import javafx.scene.Node;
-import javafx.scene.control.Tab;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.ui.RenderControlsFxController;
+import se.llbit.chunky.ui.controller.RenderControlsFxController;
 
 /**
  * Tabs in the Render Controls dialog implement this interface.

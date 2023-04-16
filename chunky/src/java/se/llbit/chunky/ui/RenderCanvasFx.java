@@ -31,6 +31,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.PixelFormat;
@@ -50,6 +51,8 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.math.Vector2;
 
 import java.nio.IntBuffer;
@@ -62,7 +65,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   private static final WritablePixelFormat<IntBuffer> PIXEL_FORMAT =
       PixelFormat.getIntArgbInstance();
 
-  private final se.llbit.chunky.renderer.scene.Scene renderScene;
+  private final ChunkyFxController chunkyFxController;
+  private final Scene renderScene;
 
   private WritableImage image;
 
@@ -81,7 +85,9 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
   private RenderStatusListener renderListener;
 
-  public RenderCanvasFx(se.llbit.chunky.renderer.scene.Scene scene, RenderManager renderManager) {
+  public RenderCanvasFx(ChunkyFxController chunkyFxController,
+      Scene scene, RenderManager renderManager) {
+    this.chunkyFxController = chunkyFxController;
     this.renderScene = scene;
     this.renderManager = renderManager;
     renderManager.addSceneStatusListener(this);
@@ -146,10 +152,18 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     });
 
     canvas.setOnMouseDragged(e -> {
-      int dx = lastX - (int) e.getX();
-      int dy = lastY - (int) e.getY();
+      if (e.isSecondaryButtonDown() || scene.camera().getCameraLocked()) {
+        // do not drag when right-clicking or when the camera angle is locked
+        return;
+      }
+      double dx = lastX - (int) e.getX();
+      double dy = lastY - (int) e.getY();
       lastX = (int) e.getX();
       lastY = (int) e.getY();
+      if (e.isShiftDown()) {
+        dx *= 0.1;
+        dy *= 0.1;
+      }
       scene.camera().rotateView((Math.PI / 250) * dx, -(Math.PI / 250) * dy);
     });
 
@@ -167,6 +181,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
         scene.forceReset();
       }
     });
+    contextMenu.getItems().add(setTarget);
+
     CheckMenuItem showGuides = new CheckMenuItem("Show guides");
     showGuides.setSelected(false);
     showGuides.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -175,6 +191,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       vGuide1.setVisible(newValue);
       vGuide2.setVisible(newValue);
     });
+    contextMenu.getItems().add(showGuides);
+
     Menu canvasScale = new Menu("Canvas scale");
     ToggleGroup scaleGroup = new ToggleGroup();
     for (int percent : new int[] { 25, 50, 75, 100, 150, 200, 300, 400 }) {
@@ -191,6 +209,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       });
       canvasScale.getItems().add(item);
     }
+    contextMenu.getItems().add(canvasScale);
 
     RadioMenuItem fit = new RadioMenuItem("Fit to Screen");
     fit.setSelected(fitToScreen);
@@ -208,7 +227,19 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       updateCanvasScale(PersistentSettings.getCanvasScale() / 100.0);
     }
 
-    contextMenu.getItems().addAll(setTarget, showGuides, canvasScale);
+    contextMenu.getItems().add(new SeparatorMenuItem());
+
+    MenuItem saveCurrentFrame = new MenuItem("Save image as…");
+    saveCurrentFrame.setOnAction(e -> chunkyFxController.saveCurrentFrame());
+    contextMenu.getItems().add(saveCurrentFrame);
+
+    MenuItem copyFrame = new MenuItem("Copy image to clipboard");
+    copyFrame.setOnAction(e -> chunkyFxController.copyCurrentFrame());
+    contextMenu.getItems().add(copyFrame);
+
+    chunkyFxController.getChunky()
+      .getRenderContextMenuTransformers()
+      .forEach(t -> t.accept(contextMenu));
 
     canvas.setOnMouseClicked(event -> {
       if (event.getButton() == MouseButton.SECONDARY) {
@@ -216,11 +247,20 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
         double halfWidth = canvas.getWidth() / (2.0 * canvas.getHeight());
         target.set(-halfWidth + event.getX() * invHeight,
             -0.5 + event.getY() * invHeight);
+        contextMenu.getProperties().put("canvasPosition", new Vector2(event.getX(), event.getY())); // plugin api
         contextMenu.show(getScene().getWindow(), event.getScreenX(), event.getScreenY());
       }
     });
     canvas.setOnScroll(e -> {
-      double diff = -e.getDeltaY() / e.getMultiplierY();
+      if (scene.camera().getCameraLocked()) {
+        // do not scroll when the camera angle is locked
+        return;
+      }
+      // deltaY is zero if shift is pressed because shift switches to horizontal scrolling in JavaFX
+      double diff = -(Math.abs(e.getDeltaY()) > 0 ? e.getDeltaY() / e.getMultiplierY() : e.getDeltaX() / e.getMultiplierX());
+      if (e.isShiftDown()) {
+        diff *= 0.1;
+      }
       Camera camera = scene.camera();
       double value = camera.getFov();
       double scale = camera.getMaxFoV() - camera.getMinFoV();
@@ -252,6 +292,9 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
     canvasPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
       if (!isVisible()) {
+        return;
+      }
+      if (scene.camera().getCameraLocked()) {
         return;
       }
       double modifier = 1;

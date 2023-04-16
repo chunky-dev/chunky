@@ -21,7 +21,7 @@ import se.llbit.chunky.resources.Texture;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipFile;
+import java.nio.file.Path;
 
 /**
  * Loads a single texture and rotates it 90 degrees clockwise and
@@ -38,8 +38,9 @@ public class RotatedTextureLoader extends TextureLoader {
     loader = new SimpleTexture(file, texture);
   }
 
-  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
-    if (!loader.load(texturePack, topLevelDir)) {
+  @Override
+  public boolean load(Path texturePack) {
+    if (!loader.load(texturePack)) {
       return false;
     }
 
@@ -48,8 +49,8 @@ public class RotatedTextureLoader extends TextureLoader {
     return true;
   }
 
-  @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
+  @Override
+  protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
     throw new TextureFormatError("Call simple texture sub-loader instead.");
   }
-
 }

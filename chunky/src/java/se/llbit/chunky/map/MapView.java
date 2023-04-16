@@ -159,4 +159,14 @@ public class MapView {
     }
   }
 
+  /**
+   * Change the maximum and maxmimum y layer that is shown.
+   */
+  public void setYMinMax(int yMin, int yMax) {
+    ChunkView mapView = map.get();
+    if (yMin != mapView.yMin || yMax != mapView.yMax) {
+      map.set(new ChunkView(mapView.x, mapView.z, mapView.width, mapView.height, mapView.scale, yMin, yMax));
+      notifyViewUpdated();
+    }
+  }
 }

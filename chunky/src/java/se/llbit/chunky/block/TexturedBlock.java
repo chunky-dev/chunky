@@ -19,5 +19,6 @@ public class TexturedBlock extends AbstractModelBlock {
     super(name, north);
     this.model = new TexturedBlockModel(north, east, south, west, top, bottom);
     opaque = true;
+    solid = true;
   }
 }

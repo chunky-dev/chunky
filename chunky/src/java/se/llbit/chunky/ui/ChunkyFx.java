@@ -23,15 +23,13 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.resources.SettingsDirectory;
+import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.fxutil.WindowPosition;
-import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 
 import java.io.File;
@@ -52,14 +50,12 @@ public class ChunkyFx extends Application {
       ChunkyFx.hostServices = this.getHostServices();
 
       FXMLLoader loader = new FXMLLoader(getClass().getResource("Chunky.fxml"));
-      ChunkyFxController controller = new ChunkyFxController(chunkyInstance);
+      ChunkyFxController controller = new ChunkyFxController(stage, chunkyInstance);
       loader.setController(controller);
       Parent root = loader.load();
-      stage.setTitle(Chunky.getMainWindowTitle());
       Scene scene = new Scene(root);
       stage.setScene(scene);
-      controller.setApplication(this);
-      stage.getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
+      stage.getIcons().add(Icons.CHUNKY_ICON);
       stage.setOnCloseRequest(event -> {
         PersistentSettings.setWindowPosition(new WindowPosition(stage));
         Platform.exit();

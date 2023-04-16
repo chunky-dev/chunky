@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.text.Text?>
+<?import se.llbit.chunky.ui.DoubleAdjuster?>
+<?import se.llbit.fx.LuxColorPicker?>
+
+<fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+  <VBox spacing="10.0">
+    <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
+      <Label text="Sky mode:" />
+      <ChoiceBox fx:id="skyMode" prefWidth="150.0" />
+    </HBox>
+    <TitledPane fx:id="detailsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" animated="false" text="Sky mode settings">
+      <VBox.margin>
+        <Insets />
+      </VBox.margin>
+      <VBox fx:id="skyModeSettings">
+        <padding>
+          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </padding>
+        <Label text="Selected mode has no settings." />
+      </VBox>
+    </TitledPane>
+    <CheckBox fx:id="transparentSkyEnabled" mnemonicParsing="false" text="Transparent sky" />
+    <Separator />
+    <CheckBox fx:id="cloudsEnabled" mnemonicParsing="false" text="Enable clouds" />
+    <DoubleAdjuster fx:id="cloudSize" />
+    <DoubleAdjuster fx:id="cloudX" name="Cloud X" />
+    <DoubleAdjuster fx:id="cloudY" name="Cloud Y" />
+    <DoubleAdjuster fx:id="cloudZ" name="Cloud Z" />
+    <Separator />
+    <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
+      <Label text="Fog mode:" />
+      <ComboBox fx:id="fogMode" prefWidth="150.0" />
+    </HBox>
+    <TitledPane fx:id="fogDetailsPane" animated="false" text="Fog settings">
+      <VBox.margin>
+        <Insets />
+      </VBox.margin>
+      <VBox fx:id="fogDetailsBox" spacing="10.0">
+        <padding>
+          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </padding>
+        <Label text="Selected mode has no settings." />
+      </VBox>
+    </TitledPane>
+    <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
+  </VBox>
+</fx:root>

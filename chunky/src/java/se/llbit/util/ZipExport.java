@@ -20,7 +20,6 @@ import se.llbit.log.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
@@ -48,7 +47,7 @@ public class ZipExport {
       for (String extension : extensions) {
         File file = new File(sceneDir, sceneName + extension);
         if (file.exists()) {
-          addToZipFile(zos, sceneDir, sceneName, file);
+          addToZipFile(zos, sceneName, file);
         }
       }
     } catch (IOException e) {
@@ -56,8 +55,7 @@ public class ZipExport {
     }
   }
 
-  private static void addToZipFile(ZipOutputStream zos, File sceneDir, String prefix,
-      File file) throws IOException {
+  private static void addToZipFile(ZipOutputStream zos, String prefix, File file) throws IOException {
     try (FileInputStream fis = new FileInputStream(file)) {
       ZipEntry zipEntry = new ZipEntry(prefix + "/" + file.getName());
       zos.putNextEntry(zipEntry);

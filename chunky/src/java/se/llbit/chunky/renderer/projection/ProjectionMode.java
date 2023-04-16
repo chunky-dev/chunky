@@ -1,4 +1,5 @@
 /* Copyright (c) 2014 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2022 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -27,7 +28,8 @@ public enum ProjectionMode {
   PANORAMIC("Panoramic (equirectangular)"),
   PANORAMIC_SLOT("Panoramic (slot)"),
   ODS_LEFT("Omni‐directional Stereo (left eye)"),
-  ODS_RIGHT("Omni‐directional Stereo (right eye)");
+  ODS_RIGHT("Omni‐directional Stereo (right eye)"),
+  ODS_STACKED("Omni‐directional Stereo (both eyes, vertically stacked)");
 
   private final String niceName;
 

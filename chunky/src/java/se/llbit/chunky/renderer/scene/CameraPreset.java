@@ -26,7 +26,7 @@ import se.llbit.chunky.world.Icon;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public enum CameraPreset {
-  ISO_WEST_NORTH("Isometric West-North", Icon.isoWN.fxImage(), -Math.PI / 4, -Math.PI / 4) {
+  ISO_NORTH_WEST("Isometric North-West", Icon.isoNW.fxImage(), -Math.PI / 4, -Math.PI / 4) {
     @Override public void apply(Camera camera) {
       camera.setView(yaw, pitch, 0);
       camera.setProjectionMode(ProjectionMode.PARALLEL);
@@ -40,7 +40,7 @@ public enum CameraPreset {
       camera.setShift(0, 0);
     }
   },
-  ISO_EAST_SOUTH("Isometric East-South", Icon.isoES.fxImage(), -5 * Math.PI / 4, -Math.PI / 4) {
+  ISO_SOUTH_EAST("Isometric South-East", Icon.isoSE.fxImage(), -5 * Math.PI / 4, -Math.PI / 4) {
     @Override public void apply(Camera camera) {
       camera.setView(yaw, pitch, 0);
       camera.setProjectionMode(ProjectionMode.PARALLEL);

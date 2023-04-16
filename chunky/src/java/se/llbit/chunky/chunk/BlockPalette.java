@@ -1,4 +1,4 @@
-/* Copyright (c) 2019-2021 Chunky contributors
+/* Copyright (c) 2019-2022 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -236,7 +236,7 @@ public class BlockPalette {
     materialProperties.put(
         "minecraft:water",
         block -> {
-          block.specular = 0.12f;
+          block.specular = 0.255f;
           block.ior = 1.333f;
           block.refractive = true;
         });
@@ -336,7 +336,14 @@ public class BlockPalette {
       block.setPerceptualSmoothness(0.9);
     });
     materialProperties.put("minecraft:redstone_torch", block -> {
-      block.emittance = 1.0f;
+      if (block instanceof RedstoneTorch && ((RedstoneTorch) block).isLit()) {
+        block.emittance = 1.0f;
+      }
+    });
+    materialProperties.put("minecraft:redstone_wall_torch", block -> {
+      if (block instanceof  RedstoneWallTorch && ((RedstoneWallTorch) block).isLit()) {
+        block.emittance = 1.0f;
+      }
     });
     materialProperties.put("minecraft:torch", block -> {
       block.emittance = 50.0f;
@@ -380,7 +387,7 @@ public class BlockPalette {
       block.specular = 0.04f;
     });
     materialProperties.put("minecraft:sea_lantern", block -> {
-      block.emittance = 0.5f;
+      block.emittance = 1.0f;
     });
     materialProperties.put("minecraft:magma", block -> {
       block.emittance = 0.6f;
@@ -456,6 +463,9 @@ public class BlockPalette {
     });
     materialProperties.put("minecraft:crying_obsidian", block -> {
       block.emittance = 0.6f;
+    });
+    materialProperties.put("minecraft:enchanting_table", block -> {
+      block.emittance = 0.5f;
     });
     materialProperties.put("minecraft:respawn_anchor", block -> {
       if (block instanceof RespawnAnchor) {
@@ -552,8 +562,20 @@ public class BlockPalette {
     });
     materialProperties.put("minecraft:light", block -> {
       if (block instanceof LightBlock) {
-        block.emittance = 1.0f / 15f * ((LightBlock) block).getLevel();
+        block.emittance = 1.0f / 15f * 4 * ((LightBlock) block).getLevel();
       }
+    });
+    materialProperties.put("minecraft:ochre_froglight", block -> {
+      block.emittance = 1.0f;
+    });
+    materialProperties.put("minecraft:verdant_froglight", block -> {
+      block.emittance = 1.0f;
+    });
+    materialProperties.put("minecraft:pearlescent_froglight", block -> {
+      block.emittance = 1.0f;
+    });
+    materialProperties.put("minecraft:sculk_catalyst", block -> {
+      block.emittance = 1.0f / 15f * 6;
     });
     return materialProperties;
   }

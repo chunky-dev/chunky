@@ -208,7 +208,7 @@ public final class UpdateDialogController implements Initializable {
       try {
         File versionFile = new File(controller.versionsDir, version.name + ".json");
         version.writeTo(versionFile);
-        controller.downloadSucceeded();
+        controller.downloadSucceeded(version);
       } catch (IOException e) {
         controller.updateFailed("Failed to update version info. Please try again later.");
       }
@@ -240,7 +240,7 @@ public final class UpdateDialogController implements Initializable {
    * Also shows the "Download completed!" label, and sets the
    * progress bar to max progress and sets the progress color to green.
    */
-  private void downloadSucceeded() {
+  private void downloadSucceeded(VersionInfo version) {
     Platform.runLater(() -> {
       progress.setProgress(1.0);
       progress.setStyle("-fx-accent: green;");
@@ -253,7 +253,7 @@ public final class UpdateDialogController implements Initializable {
         launcher.launchChunky();
       });
       launcher.updateVersionList();
-      launcher.selectLatestVersion();
+      launcher.version.getSelectionModel().select(version);
       busyIndicator.setVisible(false);
     });
   }

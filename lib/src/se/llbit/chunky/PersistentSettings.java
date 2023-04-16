@@ -18,12 +18,19 @@
 package se.llbit.chunky;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import se.llbit.chunky.renderer.RenderConstants;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.fxutil.WindowPosition;
 import se.llbit.json.JsonArray;
+import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.log.Log;
 
 /**
  * Utility class for managing global Chunky settings.
@@ -85,6 +92,31 @@ public final class PersistentSettings {
       directory = SettingsDirectory.getHomeDirectory();
     }
     changeSettingsDirectory(directory);
+    load();
+  }
+
+  public static void changeSettingsDirectory(File directory) {
+    settingsDir = directory;
+    settingsFile = new File(settingsDir, SETTINGS_FILE);
+    cacheDir = new File(settingsDir, "cache");
+  }
+
+  private static void load() {
+    settings.load(settingsFile);
+    migrateOldSettings();
+  }
+
+  private static void migrateOldSettings() {
+    String lastTexturePack = settings.getString("lastTexturePack", null);
+    if(lastTexturePack != null) {
+      setLastTexturePack(lastTexturePack);
+      // TODO: Remove legacy setting in 2.6.0
+//      settings.removeSetting("lastTexturePack");
+    }
+  }
+
+  public static void reload() {
+    load();
   }
 
   public static void save() {
@@ -184,8 +216,66 @@ public final class PersistentSettings {
     return settings.getString("skinDirectory", "");
   }
 
+  /**
+   * please use {@link PersistentSettings#setEnabledResourcePacks(File...)}
+   */
+  @Deprecated
+  public static void setLastTexturePack(String path) {
+    setEnabledResourcePacks(
+      parseResourcePackPaths(path).toArray(new File[0])
+    );
+    save();
+  }
+
+  /**
+   * please use {@link PersistentSettings#getEnabledResourcePacks()}
+   */
+  @Deprecated
   public static String getLastTexturePack() {
-    return settings.getString("lastTexturePack", "");
+    return getEnabledResourcePacks().stream()
+      .map(File::toString)
+      .collect(Collectors.joining(File.pathSeparator));
+  }
+
+  /**
+   * helper method for parsing resource pack file configurations
+   * @param paths paths separated by {@link File#pathSeparator}
+   * @return list of files of all paths which could be converted to files,
+   *         can contain non-existing or invalid resource packs
+   */
+  public static List<File> parseResourcePackPaths(String paths) {
+    return parseResourcePackPaths(Arrays.stream(paths.split(File.pathSeparator)));
+  }
+
+  /**
+   * helper method for converting a list of possible resource pack paths to a list of files
+   * @return list of files of all paths which could be converted to files,
+   *         can contain non-existing or invalid resource packs
+   */
+  public static List<File> parseResourcePackPaths(Stream<String> paths) {
+    return paths
+      .map(String::trim)
+      .map(pathString -> pathString.isEmpty() ? null : new File(pathString))
+      .filter(Objects::nonNull)
+      .collect(Collectors.toList());
+  }
+
+  public static void setEnabledResourcePacks(File... enabledTexturePacks) {
+    JsonArray array = new JsonArray(enabledTexturePacks.length);
+    for(File texturePackFile : enabledTexturePacks) {
+      array.add(texturePackFile.toString());
+    }
+    settings.set("enabledResourcePacks", array);
+    // TODO: Remove legacy setting in 2.6.0
+    settings.setString("lastTexturePack", getLastTexturePack());
+    save();
+  }
+
+  public static List<File> getEnabledResourcePacks() {
+    return parseResourcePackPaths(
+      settings.get("enabledResourcePacks").array().elements.stream()
+        .map(jsonValue -> jsonValue.stringValue(""))
+    );
   }
 
   public static void setRayDepth(int rayDepth) {
@@ -229,11 +319,6 @@ public final class PersistentSettings {
   public static void set3DCanvasSize(int width, int height) {
     settings.setInt("3dcanvas.width", width);
     settings.setInt("3dcanvas.height", height);
-    save();
-  }
-
-  public static void setLastTexturePack(String path) {
-    settings.setString("lastTexturePack", path);
     save();
   }
 
@@ -408,6 +493,15 @@ public final class PersistentSettings {
     save();
   }
 
+  public static boolean getLoadBeaconBeams() {
+    return settings.getBool("loadBeaconBeams", true);
+  }
+
+  public static void setLoadBeaconBeams(boolean value) {
+    settings.setBool("loadBeaconBeams", value);
+    save();
+  }
+
   public static boolean getLoadOtherEntities() {
     return settings.getBool("loadOtherEntities", true);
   }
@@ -435,13 +529,6 @@ public final class PersistentSettings {
     save();
   }
 
-  public static void changeSettingsDirectory(File directory) {
-    settingsDir = directory;
-    settingsFile = new File(settingsDir, SETTINGS_FILE);
-    cacheDir = new File(settingsDir, "cache");
-    settings.load(settingsFile);
-  }
-
   public static void setOctreeImplementation(String implementation) {
     settings.setString("octreeImplementation", implementation);
     save();
@@ -459,6 +546,16 @@ public final class PersistentSettings {
   public static String getBvhMethod() {
     return settings.getString("bvhMethod", "SAH_MA");
   }
+
+  public static void setBiomeStructureImplementation(String implementation) {
+    settings.setString("biomeStructureImplementation", implementation);
+    save();
+  }
+
+  public static String getBiomeStructureImplementation() {
+    return settings.getString("biomeStructureImplementation", "WORLD_TEXTURE_2D");
+  }
+
 
   public static void setGridSizeDefault(int value) {
     settings.setInt("gridSize", value);
@@ -535,6 +632,29 @@ public final class PersistentSettings {
     settings.setDouble("window.width", position.getWidth());
     settings.setDouble("window.height", position.getHeight());
     settings.setBool("window.maximized", position.isMaximized());
+    save();
+  }
+
+  public static JsonArray getTableSortConfig(String table) {
+    if (!settings.get("tables").isObject()) {
+      return null;
+    }
+    JsonObject tables = settings.get("tables").asObject();
+    if (!tables.get(table).isObject()) {
+      return null;
+    }
+    return settings.get("tables").asObject().get(table).asObject().get("sort").asArray();
+  }
+
+  public static void setTableSortConfig(String table, JsonArray config) {
+    if (!settings.get("tables").isObject()) {
+      settings.set("tables", new JsonObject());
+    }
+    JsonObject tables = settings.get("tables").asObject();
+    if (!tables.get(table).isObject()) {
+      tables.set(table, new JsonObject());
+    }
+    tables.get(table).asObject().set("sort", config);
     save();
   }
 }

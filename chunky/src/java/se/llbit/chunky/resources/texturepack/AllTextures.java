@@ -1,9 +1,10 @@
 package se.llbit.chunky.resources.texturepack;
 
+import se.llbit.chunky.resources.BitmapImage;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipFile;
-import se.llbit.chunky.resources.BitmapImage;
+import java.nio.file.Path;
 
 /**
  * This texture will try to load several textures and fail if at least one of them could not be
@@ -21,16 +22,18 @@ public class AllTextures extends TextureLoader {
     this.textures = textures;
   }
 
-  /** Don't use this. */
+  /**
+   * Don't use this.
+   */
   public AllTextures(TextureLoader ignored) {
     throw new Error("It is pointless to create an all texture loader with only one texture.");
   }
 
   @Override
-  public boolean load(ZipFile texturePack, String topLevelDir) {
+  public boolean load(Path texturePack) {
     int loaded = 0;
     for (TextureLoader alternative : textures) {
-      if (alternative.load(texturePack, topLevelDir)) {
+      if (alternative.load(texturePack)) {
         loaded++;
       }
     }

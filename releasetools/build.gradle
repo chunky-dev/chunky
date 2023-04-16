@@ -1,11 +1,15 @@
+configurations {
+    implementation.extendsFrom configurations.jsonlib
+}
+
 dependencies {
-  compile project(':lib')
+    implementation project(':lib')
 }
 
 sourceSets {
-  main {
-    java {
-      srcDir 'src'
+    main {
+        java {
+            srcDir 'src'
+        }
     }
-  }
 }

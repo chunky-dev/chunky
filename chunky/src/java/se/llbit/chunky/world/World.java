@@ -34,7 +34,9 @@ import se.llbit.log.Log;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
+import se.llbit.util.MinecraftText;
 import se.llbit.util.Pair;
+import se.llbit.util.annotation.Nullable;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -44,14 +46,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -173,7 +168,7 @@ public class World implements Comparable<World> {
       Tag spawnZ = player.get("SpawnZ");
       Tag gameType = result.get(".Data.GameType");
       Tag randomSeed = result.get(".Data.RandomSeed");
-      levelName = result.get(".Data.LevelName").stringValue(levelName);
+      levelName = MinecraftText.removeFormatChars(result.get(".Data.LevelName").stringValue(levelName));
 
       long seed = randomSeed.longValue(0);
 
@@ -286,10 +281,20 @@ public class World implements Comparable<World> {
     return getRegion(pos.getRegionPosition()).getChunk(pos);
   }
 
-  public ChunkData createChunkData() {
-    if(this.getVersionId() >= World.VERSION_21W06A) {
+  /**
+   * Returns a ChunkData instance that is compatible with the given chunk version.
+   * The provided ChunkData instance may or may not be re-used.
+   */
+  public ChunkData createChunkData(@Nullable ChunkData chunkData, int chunkVersion) {
+    if(chunkVersion >= World.VERSION_21W06A) {
+      if(chunkData instanceof GenericChunkData) {
+        return chunkData;
+      }
       return new GenericChunkData();
     } else {
+      if(chunkData instanceof SimpleChunkData) {
+        return chunkData;
+      }
       return new SimpleChunkData();
     }
   }
@@ -333,6 +338,16 @@ public class World implements Comparable<World> {
   public boolean regionExists(ChunkPosition pos) {
     File regionFile = new File(getRegionDirectory(), MCRegion.getFileName(pos));
     return regionFile.exists();
+  }
+
+  /**
+   * @param pos Position of the region to load
+   * @param minY Minimum block Y (inclusive)
+   * @param maxY Maximum block Y (exclusive)
+   * @return Whether the region exists
+   */
+  public boolean regionExistsWithinRange(ChunkPosition pos, int minY, int maxY) {
+    return this.regionExists(pos);
   }
 
   /**
@@ -451,9 +466,9 @@ public class World implements Comparable<World> {
     Map<ChunkPosition, Set<ChunkPosition>> regionMap = new HashMap<>();
 
     for (ChunkPosition chunk : chunks) {
-      ChunkPosition regionPosition = chunk.regionPosition();
+      ChunkPosition regionPosition = chunk.getRegionPosition();
       Set<ChunkPosition> chunkSet = regionMap.computeIfAbsent(regionPosition, k -> new HashSet<>());
-      chunkSet.add(ChunkPosition.get(chunk.x & 31, chunk.z & 31));
+      chunkSet.add(new ChunkPosition(chunk.x & 31, chunk.z & 31));
     }
 
     int work = 0;
@@ -498,7 +513,7 @@ public class World implements Comparable<World> {
     regions.clear();
 
     WorldScanner.Operator operator = (regionDirectory, x, z) ->
-        regions.add(new Pair<>(regionDirectory, ChunkPosition.get(x, z)));
+        regions.add(new Pair<>(regionDirectory, new ChunkPosition(x, z)));
     // TODO make this more dynamic
     File overworld = getRegionDirectory(OVERWORLD_DIMENSION);
     WorldScanner.findExistingChunks(overworld, operator);
@@ -673,6 +688,10 @@ public class World implements Comparable<World> {
     return seed;
   }
 
+  public Date getLastModified() {
+    return new Date(this.worldDirectory.lastModified());
+  }
+
   /**
    * Load entities from world the file.
    * This is usually the single player entity in a local save.
@@ -689,5 +708,22 @@ public class World implements Comparable<World> {
 
   public synchronized Collection<PlayerEntityData> getPlayerPositions() {
     return Collections.unmodifiableSet(playerEntities);
+  }
+
+  /**
+   * Get the resource pack that is bundled with this world, i.e. the contained resourced directory or resources.zip.
+   *
+   * @return Resource pack file/directory or empty optional if this world has no bundled resource pack
+   */
+  public Optional<File> getResourcePack() {
+    File resourcePack = new File(getWorldDirectory(), "resources.zip");
+    if (resourcePack.isFile()) {
+      return Optional.of(resourcePack);
+    }
+    resourcePack = new File(getWorldDirectory(), "resources");
+    if (resourcePack.isDirectory()) {
+      return Optional.of(resourcePack);
+    }
+    return Optional.empty();
   }
 }

@@ -17,8 +17,10 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderManager;
+import se.llbit.chunky.renderer.SceneIOProvider;
 import se.llbit.chunky.renderer.SceneProvider;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
@@ -49,6 +51,7 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
     taskQueue = new LinkedBlockingQueue<>();
   }
 
+  @Override
   public SceneProvider getSceneProvider() {
     return sceneManager;
   }
@@ -61,8 +64,17 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
     sceneManager.setTaskTracker(taskTracker);
   }
 
+  @Override
+  public TaskTracker getTaskTracker() {
+    return sceneManager.getTaskTracker();
+  }
+
   public void setOnSceneLoaded(Runnable onSceneLoaded) {
     sceneManager.setOnSceneLoaded(onSceneLoaded);
+  }
+
+  public void setOnSceneSaved(Runnable onSceneSaved) {
+    sceneManager.setOnSceneSaved(onSceneSaved);
   }
 
   public void setOnChunksLoaded(Runnable onChunksLoaded) {
@@ -98,14 +110,29 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
    *
    * @param name the name of the scene to load.
    */
+  @PluginApi
+  @Override public void loadScene(File sceneDirectory, String name) {
+    enqueueTask(() -> {
+      try {
+        sceneManager.loadScene(sceneDirectory, name);
+      } catch (IOException e) {
+        Log.warn("Could not load scene.\nReason:", e);
+      } catch (InterruptedException e) {
+        Log.warn("Scene loading was interrupted.", e);
+      }
+    });
+  }
+
+  @PluginApi
+  @Deprecated
   @Override public void loadScene(String name) {
     enqueueTask(() -> {
       try {
         sceneManager.loadScene(name);
       } catch (IOException e) {
-        Log.warn("Could not load scene.\nReason: " + e.getMessage());
+        Log.warn("Could not load scene.", e);
       } catch (InterruptedException e) {
-        Log.warn("Scene loading was interrupted.");
+        Log.warn("Scene loading was interrupted.", e);
       }
     });
   }
@@ -113,12 +140,60 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
   /**
    * Save the current scene.
    */
+  @PluginApi
+  @Override public void saveScene(File sceneDirectory) {
+    enqueueTask(() -> {
+      try {
+        sceneManager.saveScene(sceneDirectory);
+      } catch (InterruptedException e) {
+        Log.warn("Scene saving was interrupted.", e);
+      }
+    });
+  }
+
+  @PluginApi
+  @Deprecated
   @Override public void saveScene() {
     enqueueTask(() -> {
       try {
         sceneManager.saveScene();
       } catch (InterruptedException e) {
-        Log.warn("Scene saving was interrupted.");
+        Log.warn("Scene saving was interrupted.", e);
+      }
+    });
+  }
+
+  /**
+   * Save the current scene.
+   * @param newName Name of the scene copy
+   */
+  public void saveSceneAs(String newName) {
+    enqueueTask(() -> {
+      try {
+        sceneManager.withSceneProtected(scene -> scene.setName(newName));
+        sceneManager.saveSceneAs(newName);
+      } catch (InterruptedException e) {
+        Log.warn("Scene saving was interrupted.", e);
+      }
+    });
+  }
+
+  /**
+   * Save a copy of the current scene using the given io provider.
+   * @param ioProvider IO provider to use for saving the scene
+   * @param newName Name of the scene copy
+   */
+  public void saveSceneCopy(SceneIOProvider ioProvider, String newName) {
+    enqueueTask(() -> {
+      try {
+        Scene[] copy = new Scene[1];
+        sceneManager.withSceneProtected(scene -> {
+          copy[0] = new Scene(scene);
+        });
+        copy[0].setName(newName);
+        sceneManager.saveScene(ioProvider, copy[0]);
+      } catch (InterruptedException e) {
+        Log.warn("Scene saving was interrupted.", e);
       }
     });
   }
@@ -162,32 +237,11 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
   }
 
   /**
-   * Find a preferred scene name by attempting to avoid name collisions.
-   *
-   * @return the preferred scene name
-   */
-  public static String preferredSceneName(RenderContext context, String name) {
-    String suffix = "";
-    name = sanitizedSceneName(name);
-    int count = 0;
-    do {
-      String targetName = name + suffix;
-      if (sceneNameIsAvailable(context, targetName)) {
-        return targetName;
-      }
-      count += 1;
-      suffix = "" + count;
-    } while (count < 256);
-    // Give up.
-    return name;
-  }
-
-  /**
    * Remove problematic characters from scene name.
    *
    * @return sanitized scene name
    */
-  public static String sanitizedSceneName(String name) {
+  public static String sanitizedSceneName(String name, String fallbackName) {
     name = name.trim();
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < name.length(); ++i) {
@@ -200,10 +254,19 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
     }
     String stripped = sb.toString().trim();
     if (stripped.isEmpty()) {
-      return "Scene";
+      return fallbackName;
     } else {
       return stripped;
     }
+  }
+
+  /**
+   * Remove problematic characters from scene name.
+   *
+   * @return sanitized scene name
+   */
+  public static String sanitizedSceneName(String name) {
+    return sanitizedSceneName(name, "Scene");
   }
 
   /**
@@ -228,16 +291,6 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
       return false;
     }
     return c <= '\u007e' || c >= '\u00a0';
-  }
-
-  /**
-   * Check for scene name collision.
-   *
-   * @return <code>true</code> if the scene name does not collide with an
-   * already existing scene
-   */
-  public static boolean sceneNameIsAvailable(RenderContext context, String sceneName) {
-    return !context.getSceneDescriptionFile(sceneName).exists();
   }
 
   /**

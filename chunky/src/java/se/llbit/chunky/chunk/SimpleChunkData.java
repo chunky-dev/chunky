@@ -1,6 +1,7 @@
 package se.llbit.chunky.chunk;
 
-import se.llbit.chunky.world.Chunk;
+import se.llbit.chunky.chunk.biome.BiomeData;
+import se.llbit.chunky.chunk.biome.UnknownBiomeData;
 import se.llbit.nbt.CompoundTag;
 
 import java.util.ArrayList;
@@ -13,27 +14,17 @@ import static se.llbit.chunky.world.Chunk.*;
 /**
  * A simple Chunk Data implementation
  * Blocks from 0-255
- * 2d Biomes only
  */
 public class SimpleChunkData implements ChunkData {
-  /** These final fields are never written to, and are instead used for quickly setting existing blocks/biomes arrays
-   to all zeros, in {@link SimpleChunkData#clear()} */
-  private static final int[] emptyBlocks = new int[X_MAX * Y_MAX * Z_MAX];
-  private static final byte[] emptyBiomes = new byte[X_MAX * Z_MAX];
+  /** Array of zeros for quickly clearing existing blocks/biomes arrays in {@link SimpleChunkData#clear()} */
+  @SuppressWarnings("all")
+  private static final int[] EMPTY_BLOCKS = new int[X_MAX * Y_MAX * Z_MAX];
 
-  private final int[] blocks;
-  private final byte[] biomes;
-  private final Collection<CompoundTag> tileEntities;
-  private final Collection<CompoundTag> entities;
-  private boolean isEmpty;
-
-  public SimpleChunkData() {
-    blocks = new int[X_MAX * Y_MAX * Z_MAX];
-    biomes = new byte[X_MAX * Z_MAX];
-    tileEntities = new ArrayList<>();
-    entities = new ArrayList<>();
-    isEmpty = true;
-  }
+  private final int[] blocks = new int[X_MAX * Y_MAX * Z_MAX];
+  private BiomeData biomeData = UnknownBiomeData.INSTANCE;
+  private final Collection<CompoundTag> tileEntities = new ArrayList<>();
+  private final Collection<CompoundTag> entities = new ArrayList<>();
+  private boolean isEmpty = true;
 
   @Override public int minY() {
     return 0;
@@ -84,39 +75,42 @@ public class SimpleChunkData implements ChunkData {
     isEmpty = false;
   }
 
-  @Override public byte getBiomeAt(int x, int y, int z) {
-    return biomes[chunkXZIndex(x, z)];
-  }
-
-  @Override public void setBiomeAt(int x, int y, int z, byte biome) {
-    biomes[chunkXZIndex(x, z)] = biome;
-  }
-
   @Override public void clear() {
-    //Quickly set all values to zero. Explanation here: https://github.com/chunky-dev/chunky/pull/866#issuecomment-808490741
-    System.arraycopy(emptyBlocks, 0, blocks, 0, emptyBlocks.length);
-    System.arraycopy(emptyBiomes, 0, biomes, 0, emptyBiomes.length);
+    // Quickly set all values to zero. Explanation here: https://github.com/chunky-dev/chunky/pull/866#issuecomment-808490741
+    // TODO: check performance of `Arrays.fill(blocks, 0);` in newer SDKs
+    System.arraycopy(EMPTY_BLOCKS, 0, blocks, 0, EMPTY_BLOCKS.length);
+    biomeData.clear();
     tileEntities.clear();
     entities.clear();
     isEmpty = true;
+  }
+
+  @Override
+  public BiomeData getBiomeData() {
+    return biomeData;
+  }
+
+  @Override
+  public void setBiomeData(BiomeData biomeData) {
+    this.biomeData = biomeData;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return isEmpty;
   }
 
   @Override public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     SimpleChunkData that = (SimpleChunkData) o;
-    return Arrays.equals(blocks, that.blocks) && Arrays.equals(biomes, that.biomes) && Objects.equals(tileEntities, that.tileEntities) && Objects.equals(entities, that.entities);
+    return Arrays.equals(blocks, that.blocks) && Objects.equals(biomeData, that.biomeData) && Objects.equals(tileEntities, that.tileEntities) && Objects.equals(entities, that.entities);
   }
 
   @Override public int hashCode() {
     int result = Objects.hash(tileEntities, entities);
     result = 31 * result + Arrays.hashCode(blocks);
-    result = 31 * result + Arrays.hashCode(biomes);
+    result = 31 * result + biomeData.hashCode();
     return result;
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return isEmpty;
   }
 }

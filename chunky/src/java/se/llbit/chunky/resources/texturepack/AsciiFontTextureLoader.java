@@ -1,22 +1,25 @@
 package se.llbit.chunky.resources.texturepack;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.ZipFile;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.resources.texturepack.FontTexture.Glyph;
 import se.llbit.resources.ImageLoader;
 
-/** @author Jesper Öqvist <jesper@llbit.se> */
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+
+/**
+ * @author Jesper Öqvist <jesper@llbit.se>
+ */
 public class AsciiFontTextureLoader extends TextureLoader {
   private final String[] ASCII_MAP =
-      new String[] {
-        "ÀÁÂÈÊËÍÓÔÕÚßãõğİ", "ıŒœŞşŴŵžȇ", " !\"#$%&\\'()*+,-./", "0123456789:;<=>?",
-        "@ABCDEFGHIJKLMNO", "PQRSTUVWXYZ[\\\\]^_", "`abcdefghijklmno", "pqrstuvwxyz{|}~",
-        "ÇüéâäàåçêëèïîìÄÅ", "ÉæÆôöòûùÿÖÜø£Ø×ƒ", "áíóúñÑªº¿®¬½¼¡«»", "░▒▓│┤╡╢╖╕╣║╗╝╜╛┐",
-        "└┴┬├─┼╞╟╚╔╩╦╠═╬╧", "╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀", "αβΓπΣσμτΦΘΩδ∞∅∈∩", "≡±≥≤⌠⌡÷≈°∙·√ⁿ²■"
-      };
+          new String[]{
+                  "ÀÁÂÈÊËÍÓÔÕÚßãõğİ", "ıŒœŞşŴŵžȇ", " !\"#$%&\\'()*+,-./", "0123456789:;<=>?",
+                  "@ABCDEFGHIJKLMNO", "PQRSTUVWXYZ[\\\\]^_", "`abcdefghijklmno", "pqrstuvwxyz{|}~",
+                  "ÇüéâäàåçêëèïîìÄÅ", "ÉæÆôöòûùÿÖÜø£Ø×ƒ", "áíóúñÑªº¿®¬½¼¡«»", "░▒▓│┤╡╢╖╕╣║╗╝╜╛┐",
+                  "└┴┬├─┼╞╟╚╔╩╦╠═╬╧", "╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀", "αβΓπΣσμτΦΘΩδ∞∅∈∩", "≡±≥≤⌠⌡÷≈°∙·√ⁿ²■"
+          };
 
   private final String file;
 
@@ -35,12 +38,12 @@ public class AsciiFontTextureLoader extends TextureLoader {
   }
 
   @Override
-  public boolean load(ZipFile texturePack, String topLevelDir) {
-    return load(topLevelDir + file, texturePack);
+  public boolean load(Path texturePack) {
+    return load(file, texturePack);
   }
 
   private static void loadGlyphs(
-      BitmapImage spritemap, String[] map, int width, int height, int ascent) {
+          BitmapImage spritemap, String[] map, int width, int height, int ascent) {
     for (int y = 0; y < map.length; y++) {
       String line = map[y];
       for (int x = 0; x < line.length(); x++) {

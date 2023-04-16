@@ -16,36 +16,60 @@
  */
 package se.llbit.chunky.ui;
 
-import java.util.function.Consumer;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
+import javafx.event.Event;
+import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
+import java.util.function.Consumer;
+
 /**
  * A control for editing numeric values with a text field.
  */
 public abstract class Adjuster<T extends Number> extends HBox {
+  public static EventType<Event> AFTER_VALUE_CHANGE = new EventType<>("AFTER_VALUE_CHANGE");
 
   private final StringProperty name = new SimpleStringProperty("Name");
   protected final Label nameLbl = new Label();
   protected final NumericTextField<Property<Number>> valueField;
   protected final Property<Number> value;
   private ChangeListener<Number> listener;
+  private final BooleanProperty invalid = new SimpleBooleanProperty(false);
 
   protected Adjuster(Property<Number> value) {
     this.value = value;
     valueField = new NumericTextField<>(value);
+    valueField.triggerRefresh();
     nameLbl.textProperty().bind(Bindings.concat(name, ":"));
     setAlignment(Pos.CENTER_LEFT);
     setSpacing(10);
     valueField.setPrefWidth(103);
     getChildren().addAll(nameLbl, valueField);
+
+    Number[] oldValue = new Number[1];
+    valueField.focusedProperty().addListener(observable -> {
+      if (valueField.isFocused()) {
+        oldValue[0] = valueField.valueProperty().getValue();
+      } else {
+        if (!valueField.valueProperty().getValue().equals(oldValue[0])) {
+          this.fireEvent(new Event(Adjuster.AFTER_VALUE_CHANGE));
+        }
+      }
+    });
+
+    getStyleClass().add("adjuster");
+    invalid.addListener((observable, invalidBefore, invalidNow) -> {
+      if (invalidNow) {
+        getStyleClass().add("invalid");
+      } else {
+        getStyleClass().remove("invalid");
+      }
+    });
   }
 
   public void setName(String name) {
@@ -56,7 +80,6 @@ public abstract class Adjuster<T extends Number> extends HBox {
     return name.get();
   }
 
-  // TODO: not used - should be removed?
   public StringProperty nameProperty() {
     return name;
   }
@@ -102,5 +125,25 @@ public abstract class Adjuster<T extends Number> extends HBox {
 
   public Property<Number> valueProperty() {
     return value;
+  }
+
+  public void setMaximumFractionDigits(int maximumFractionDigits) {
+    this.valueField.converter.setMaximumFractionDigits(maximumFractionDigits);
+  }
+
+  public int getMaximumFractionDigits() {
+    return this.valueField.converter.getMaximumFractionDigits();
+  }
+
+  public boolean isInvalid() {
+    return invalid.get();
+  }
+
+  public void setInvalid(boolean invalid) {
+    this.invalid.set(invalid);
+  }
+
+  public BooleanProperty invalidProperty() {
+    return invalid;
   }
 }

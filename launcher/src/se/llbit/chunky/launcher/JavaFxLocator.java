@@ -51,6 +51,7 @@ public class JavaFxLocator {
     Path userHomePath = getJavaFXPathBySystemProperty("user.home");
     if(userHomePath != null) {
       addJavaFXPathIfValid(userHomePath.resolve(".chunky"), true);
+      addJavaFXPathIfValid(userHomePath.resolve(".chunky").resolve("javafx"), true);
     }
 
     // java home

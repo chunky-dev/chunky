@@ -8,7 +8,7 @@ import java.util.List;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.NbtUtil;
-import se.llbit.util.NotNull;
+import se.llbit.util.annotation.NotNull;
 
 public class BlockSpec {
 

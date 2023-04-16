@@ -19,7 +19,7 @@ package se.llbit.chunky.map;
 import java.util.function.BiConsumer;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.ChunkViewListener;
-import se.llbit.chunky.ui.ChunkyFxController;
+import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkTopographyUpdater;
@@ -109,7 +109,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
     // Enqueue visible regions and chunks to be loaded.
     for (int rx = rx0; rx <= rx1; ++rx) {
       for (int rz = rz0; rz <= rz1; ++rz) {
-        regionQueue.add(ChunkPosition.get(rx, rz));
+        regionQueue.add(new ChunkPosition(rx, rz));
       }
     }
   }
@@ -151,6 +151,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
       updateRegionChangeWatcher(newWorld);
     }
     worldLoadListeners.forEach(listener -> listener.accept(newWorld, true));
+    viewUpdated(mapView.getMapView()); // update visible chunks immediately
   }
 
   /** Stops the current RegionChangeWatcher, and creates a new one for the specified world */
