@@ -130,12 +130,16 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
       });
     emitterSamplingStrategy.setTooltip(new Tooltip("Determine how emitters are sampled at each bounce."));
 
-    enableSunlight.selectedProperty().addListener((observable, oldValue, newValue) -> scene.sun().setEnableSunlight(newValue));
+    enableSunlight.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.sun().setEnableSunlight(newValue);
+      sunSamplingStrategy.setDisable(!newValue);
+    });
     enableSunlight.setTooltip(new Tooltip("Changes whether the sun emits light."));
 
     drawSun.selectedProperty().addListener((observable, oldValue, newValue) -> scene.sun().setDrawTexture(newValue));
     drawSun.setTooltip(new Tooltip("Draws the sun texture on top of the skymap."));
 
+    sunSamplingStrategy.setDisable(!enableSunlight.isSelected());
     sunSamplingStrategy.getItems().addAll(SunSamplingStrategy.values());
     sunSamplingStrategy.getSelectionModel().selectedItemProperty().addListener(
             (observable, oldValue, newValue) -> scene.setSunSamplingStrategy(newValue));
