@@ -262,7 +262,7 @@ public class Sky implements JsonSerializable {
   /**
    * Calculate sky color for the ray, based on sky mode.
    */
-  public void getSkyDiffuseColorInner(Ray ray) {
+  private void getSkyDiffuseColorInner(Ray ray) {
     switch (mode) {
       case SOLID_COLOR: {
         ray.color.set(color.x, color.y, color.z, 1);
@@ -386,7 +386,7 @@ public class Sky implements JsonSerializable {
   /**
    * Bilinear interpolated panoramic skymap color.
    */
-  public void getSkyColorInterpolated(Ray ray) {
+  private void getSkyColorInterpolated(Ray ray) {
     switch (mode) {
       case SKYMAP_EQUIRECTANGULAR: {
         double x = rotation.transformX(ray.d);
