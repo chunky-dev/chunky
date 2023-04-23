@@ -3510,16 +3510,16 @@ public class MinecraftBlockProvider implements BlockProvider {
     Tag properties = tag.get("Properties");
     String facing = BlockProvider.facing(tag);
     boolean waterlogged = properties.get("waterlogged").stringValue("").equals("true");
-    String[] shards = new String[4];
-    ListTag shardTags = properties.get("blockEntity#shards").asList();
-    for(int i = 0; i < shardTags.size() && i < 4; i++) {
-      String shard = shardTags.get(i).stringValue();
-      if(!shard.equals("minecraft:brick")) shards[i] = shard;
+    String[] sherds = new String[4];
+    ListTag sherdTags = properties.get("blockEntity#sherds").asList();
+    for(int i = 0; i < sherdTags.size() && i < 4; i++) {
+      String sherd = sherdTags.get(i).stringValue();
+      if(!sherd.equals("minecraft:brick")) sherds[i] = sherd;
     }
     return new DecoratedPot(
       facing,
       waterlogged,
-      shards
+      sherds
     );
   }
 
