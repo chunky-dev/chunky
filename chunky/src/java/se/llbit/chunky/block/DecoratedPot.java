@@ -17,16 +17,16 @@ public class DecoratedPot extends AbstractModelBlock {
   private final String facing;
   private final String description;
 
-  public DecoratedPot(String facing, boolean waterlogged, String[] shards) {
+  public DecoratedPot(String facing, boolean waterlogged, String[] sherds) {
     super("decorated_pot", Texture.decoratedPotSide);
     this.waterlogged = waterlogged;
     this.facing = facing;
     description = "waterlogged=" + waterlogged
       + ", facing=" + facing
-      + ", shards=" + Arrays.stream(shards)
-      .map(shard -> shard == null ? "minecraft:brick" : shard)
+      + ", sherds=" + Arrays.stream(sherds)
+      .map(sherd -> sherd == null ? "minecraft:brick" : sherd)
       .collect(Collectors.joining(", ", "[", "]"));
-    model = new DecoratedPotModel(facing, shards);
+    model = new DecoratedPotModel(facing, sherds);
   }
 
   @Override
@@ -60,7 +60,7 @@ public class DecoratedPot extends AbstractModelBlock {
     newBlockTag.add("Properties", properties); // because set is not implemented
     blockTag.get("Properties").asCompound().iterator().forEachRemaining(properties::add);
 
-    properties.add("blockEntity#shards", entityTag.get("shards").asList());
+    properties.add("blockEntity#sherds", entityTag.get("sherds").asList());
     properties.add("chunky#debugCoordinates", new StringTag(
       entityTag.get("x").intValue() + " " + entityTag.get("z").intValue()
     ));

@@ -126,35 +126,69 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
     }
   }
 
-  public DecoratedPotModel(String facing, String[] shards) {
+  public DecoratedPotModel(String facing, String[] sherds) {
     super(facing, DEFAULT_QUADS, new Texture[]{
-      // shards[0] top crafting slot -> north
-      getTextureForShard(shards[0]),
-      // shards[3] bottom crafting slot -> south
-      getTextureForShard(shards[3]),
-      // shards[1] left crafting slot -> west
-      getTextureForShard(shards[1]),
-      // shards[2] right crafting slot -> east
-      getTextureForShard(shards[2]),
+      // sherds[0] top crafting slot -> north
+      getTextureForsherd(sherds[0]),
+      // sherds[3] bottom crafting slot -> south
+      getTextureForsherd(sherds[3]),
+      // sherds[1] left crafting slot -> west
+      getTextureForsherd(sherds[1]),
+      // sherds[2] right crafting slot -> east
+      getTextureForsherd(sherds[2]),
       Texture.decoratedPotBase, // top
       Texture.decoratedPotBase  // bottom
     });
   }
 
-  private static Texture getTextureForShard(String shard) {
-    if(shard == null)
+  private static Texture getTextureForsherd(String sherd) {
+    if(sherd == null) {
       return Texture.decoratedPotSide;
-    switch(shard) {
-      case "minecraft:pottery_shard_skull":
-        return Texture.decoratedPotPatternSkull;
-      case "minecraft:pottery_shard_prize":
-        return Texture.decoratedPotPatternPrize;
-      case "minecraft:pottery_shard_archer":
+    }
+
+    switch(sherd) {
+      case "minecraft:angler_pottery_sherd":
+        return Texture.decoratedPotPatternAngler;
+      case "minecraft:archer_pottery_sherd":
         return Texture.decoratedPotPatternArcher;
-      case "minecraft:pottery_shard_arms_up":
+      case "minecraft:arms_up_pottery_sherd":
         return Texture.decoratedPotPatternArmsUp;
+      case "minecraft:blade_pottery_sherd":
+        return Texture.decoratedPotPatternBlade;
+      case "minecraft:brewer_pottery_sherd":
+        return Texture.decoratedPotPatternBrewer;
+      case "minecraft:burn_pottery_sherd":
+        return Texture.decoratedPotPatternBurn;
+      case "minecraft:danger_pottery_sherd":
+        return Texture.decoratedPotPatternDanger;
+      case "minecraft:explorer_pottery_sherd":
+        return Texture.decoratedPotPatternExplorer;
+      case "minecraft:friend_pottery_sherd":
+        return Texture.decoratedPotPatternFriend;
+      case "minecraft:heartbreak_pottery_sherd":
+        return Texture.decoratedPotPatternHeartbreak;
+      case "minecraft:heart_pottery_sherd":
+        return Texture.decoratedPotPatternHeart;
+      case "minecraft:howl_pottery_sherd":
+        return Texture.decoratedPotPatternHowl;
+      case "minecraft:miner_pottery_sherd":
+        return Texture.decoratedPotPatternMiner;
+      case "minecraft:moutner_pottery_sherd":
+        return Texture.decoratedPotPatternMourner;
+      case "minecraft:plenty_pottery_sherd":
+        return Texture.decoratedPotPatternPlenty;
+      case "minecraft:prize_pottery_sherd":
+        return Texture.decoratedPotPatternPrize;
+      case "minecraft:sheaf_pottery_sherd":
+        return Texture.decoratedPotPatternSheaf;
+      case "minecraft:shelter_pottery_sherd":
+        return Texture.decoratedPotPatternShelter;
+      case "minecraft:skull_pottery_sherd":
+        return Texture.decoratedPotPatternSkull;
+      case "minecraft:snort_pottery_sherd":
+        return Texture.decoratedPotPatternSnort;
       default:
-        Log.warn("Unknown pottery shard: " + shard);
+        Log.warn("Unknown pottery sherd: " + sherd);
         return Texture.decoratedPotSide;
     }
   }
