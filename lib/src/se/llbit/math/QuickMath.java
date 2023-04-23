@@ -113,6 +113,13 @@ public class QuickMath {
   }
 
   /**
+   * Gives value clamped to {@code [min, max]}.
+   */
+  public static int clamp(int value, int min, int max) {
+    return value < min ? min : value > max ? max : value;
+  }
+
+  /**
    * Maximum of a and b.
    * <p>NB: not NaN-correct. Do not use if either a or b can be NaN.
    */

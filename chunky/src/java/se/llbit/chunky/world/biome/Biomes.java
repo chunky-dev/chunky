@@ -145,6 +145,7 @@ public class Biomes {
   private static final Biome lushCaves = register(Biome.create("minecraft:lush_caves", "Lush Caves", 0.5, 0.5).mapColor(0x7E7E7E).defaultColors(0x8EB971, 0x71A74D));
   private static final Biome deepDark = register(Biome.create("minecraft:deep_dark", "Deep Dark", 0.8, 0.4).mapColor(0x7E7E7E).defaultColors(0x91BD59, 0x77AB2F));
   private static final Biome mangroveSwamp = register(Biome.create("minecraft:mangrove_swamp", "Mangrove Swamp", 0.8, 0.9).defaultColors(0x6A7039, 0x8DB127).waterColor(0x3A7A6A).mapColor(0x07F9B2).swamp());
+  private static final Biome cherryGrove = register(Biome.create("minecraft:cherry_grove", "Cherry Grove", 0.5, 0.8).mapColor(0xFCCBE7).defaultColors(0x91BD59, 0x77AB2F));
 
   /**
    * Pre-1.18 biomes, i.e. before the biomes palette was introduced.

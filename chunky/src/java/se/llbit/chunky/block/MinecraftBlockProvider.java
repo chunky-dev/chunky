@@ -1008,7 +1008,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("cherry_fence_gate", (name, tag) -> fenceGate(tag, Texture.cherryPlanks));
     addBlock("cherry_leaves", (name, tag) -> new UntintedLeaves(name, Texture.cherryLeaves));
     addBlock("cherry_log", (name, tag) -> log(tag, Texture.cherryLog, Texture.cherryLogTop));
-    addBlock("stripped_cherry_log", (name, tag) ->  log(tag, Texture.strippedCherryLog, Texture.strippedCherryLogTop));
+    addBlock("stripped_cherry_log", (name, tag) -> log(tag, Texture.strippedCherryLog, Texture.strippedCherryLogTop));
     addBlock("cherry_planks", Texture.cherryPlanks);
     addBlock("cherry_pressure_plate", (name, tag) -> new PressurePlate(name, Texture.cherryPlanks));
     addBlock("cherry_sign", (name, tag) -> sign(tag, "cherry"));
@@ -1020,11 +1020,11 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("stripped_cherry_wood", (name, tag) -> log(tag, Texture.strippedCherryLog, Texture.strippedCherryLog));
     addBlock("cherry_sapling", (name, tag) -> new SpriteBlock(name, Texture.cherrySapling));
     addBlock("potted_cherry_sapling", (name, tag) -> new FlowerPot(name, Kind.CHERRY_SAPLING));
-
     addBlock("torchflower", (name, tag) -> new SpriteBlock(name, Texture.torchflower));
     addBlock("torchflower_crop", (name, tag) -> new TorchflowerCrop(BlockProvider.stringToInt(tag.get("Properties").get("age"), 2)));
     addBlock("potted_torchflower", (name, tag) -> new FlowerPot(name, Kind.TORCHFLOWER));
     addBlock("suspicious_sand", (name, tag) -> suspiciousSand(tag));
+    addBlock("suspicious_gravel", (name, tag) -> suspiciousGravel(tag));
     addBlock("chiseled_bookshelf", (name, tag) -> new ChiseledBookshelf(
       BlockProvider.facing(tag),
       tag.get("Properties").get("slot_0_occupied").stringValue("false").equals("true"),
@@ -1034,6 +1034,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       tag.get("Properties").get("slot_4_occupied").stringValue("false").equals("true"),
       tag.get("Properties").get("slot_5_occupied").stringValue("false").equals("true")));
     addBlock("decorated_pot", (name, tag) -> decoratedPot(tag));
+    addBlock("sniffer_egg", (name, tag) -> new SnifferEgg(name, BlockProvider.stringToInt(tag.get("Properties").get("age"), 0)));
+    addBlock("pink_petals", (name, tag) -> new PinkPetals(name, BlockProvider.stringToInt(tag.get("Properties").get("flower_amount"), 1), BlockProvider.facing(tag)));
   }
 
   @Override
@@ -3510,20 +3512,35 @@ public class MinecraftBlockProvider implements BlockProvider {
     }
   }
 
+  private static Block suspiciousGravel(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String dusted = properties.get("dusted").stringValue("0");
+    switch(dusted) {
+      case "1":
+        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage1);
+      case "2":
+        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage2);
+      case "3":
+        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage3);
+      default:
+        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage0);
+    }
+  }
+
   private static Block decoratedPot(Tag tag) {
     Tag properties = tag.get("Properties");
     String facing = BlockProvider.facing(tag);
     boolean waterlogged = properties.get("waterlogged").stringValue("").equals("true");
-    String[] shards = new String[4];
-    ListTag shardTags = properties.get("blockEntity#shards").asList();
-    for(int i = 0; i < shardTags.size() && i < 4; i++) {
-      String shard = shardTags.get(i).stringValue();
-      if(!shard.equals("minecraft:brick")) shards[i] = shard;
+    String[] sherds = new String[4];
+    ListTag sherdTags = properties.get("blockEntity#sherds").asList();
+    for(int i = 0; i < sherdTags.size() && i < 4; i++) {
+      String sherd = sherdTags.get(i).stringValue();
+      if(!sherd.equals("minecraft:brick")) sherds[i] = sherd;
     }
     return new DecoratedPot(
       facing,
       waterlogged,
-      shards
+      sherds
     );
   }
 
