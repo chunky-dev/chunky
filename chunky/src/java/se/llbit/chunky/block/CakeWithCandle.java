@@ -6,6 +6,8 @@ import se.llbit.chunky.model.CakeWithCandleModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Vector3;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
 
 public class CakeWithCandle extends AbstractModelBlock {
@@ -42,8 +44,8 @@ public class CakeWithCandle extends AbstractModelBlock {
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
-    return new FlameParticles(position, entity);
+  public Collection<Entity> toEntity(Vector3 position) {
+    return Collections.singletonList(new FlameParticles(position, entity));
   }
 
   @Override

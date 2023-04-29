@@ -18,6 +18,7 @@
 package se.llbit.chunky.entity;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 import se.llbit.chunky.model.Model;
@@ -131,12 +132,12 @@ public class WallSignEntity extends Entity {
   /**
    * Unmarshalls a wall sign entity from JSON data.
    */
-  public static Entity fromJson(JsonObject json) {
+  public static Collection<Entity> fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     JsonArray[] text = SignEntity.textFromJson(json.get("text"));
     int direction = json.get("direction").intValue(0);
     String material = json.get("material").stringValue("oak");
-    return new WallSignEntity(position, text, direction, material);
+    return Collections.singletonList(new WallSignEntity(position, text, direction, material));
   }
 }

@@ -1,6 +1,7 @@
 package se.llbit.chunky.entity;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.stream.StreamSupport;
@@ -119,8 +120,8 @@ public class FlameParticles extends Entity {
     return json;
   }
 
-  public static Entity fromJson(JsonObject json) {
-    return new FlameParticles(json);
+  public static Collection<Entity> fromJson(JsonObject json) {
+    return Collections.singletonList(new FlameParticles(json));
   }
 
   @Override

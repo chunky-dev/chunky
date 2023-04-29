@@ -18,10 +18,8 @@
  */
 package se.llbit.chunky.entity;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
+
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
@@ -182,11 +180,11 @@ public class PaintingEntity extends Entity {
    *
    * @return deserialized entity, or {@code null} if it was not a valid entity
    */
-  public static Entity fromJson(JsonObject json) {
+  public static Collection<Entity> fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     String art = json.get("art").stringValue("");
     double angle = json.get("angle").doubleValue(0.0);
-    return new PaintingEntity(position, art, angle);
+    return Collections.singletonList(new PaintingEntity(position, art, angle));
   }
 }

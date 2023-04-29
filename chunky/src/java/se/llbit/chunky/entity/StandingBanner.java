@@ -342,11 +342,11 @@ public class StandingBanner extends Entity {
     return json;
   }
 
-  public static Entity fromJson(JsonObject json) {
+  public static Collection<Entity> fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     int rotation = json.get("rotation").intValue(0);
-    return new StandingBanner(position, rotation, json.get("design").object());
+    return Collections.singletonList(new StandingBanner(position, rotation, json.get("design").object()));
   }
 
 

@@ -34,6 +34,7 @@ import se.llbit.nbt.Tag;
 import se.llbit.util.JsonUtil;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 public class ArmorStand extends Entity implements Poseable, Geared {
@@ -586,8 +587,8 @@ public class ArmorStand extends Entity implements Poseable, Geared {
    *
    * @return deserialized entity, or {@code null} if it was not a valid entity
    */
-  public static Entity fromJson(JsonObject json) {
-    return new ArmorStand(json);
+  public static Collection<Entity> fromJson(JsonObject json) {
+    return Collections.singletonList(new ArmorStand(json));
   }
 
   @Override public String[] partNames() {

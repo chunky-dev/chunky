@@ -1,6 +1,8 @@
 package se.llbit.chunky.entity;
 
 import java.util.Collection;
+import java.util.Collections;
+
 import se.llbit.chunky.model.SporeBlossomModel;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
@@ -32,7 +34,7 @@ public class SporeBlossom extends Entity {
     return json;
   }
 
-  public static Entity fromJson(JsonObject json) {
-    return new SporeBlossom(json);
+  public static Collection<Entity> fromJson(JsonObject json) {
+    return Collections.singletonList(new SporeBlossom(json));
   }
 }

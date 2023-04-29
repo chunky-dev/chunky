@@ -9,6 +9,9 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class LilyPad extends MinecraftBlockTranslucent {
   public LilyPad() {
     super("lily_pad", Texture.lilyPad);
@@ -25,7 +28,7 @@ public class LilyPad extends MinecraftBlockTranslucent {
     return true;
   }
 
-  @Override public Entity toEntity(Vector3 position) {
-    return new LilyPadEntity(position);
+  @Override public Collection<Entity> toEntity(Vector3 position) {
+    return Collections.singletonList(new LilyPadEntity(position));
   }
 }
