@@ -1036,6 +1036,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("decorated_pot", (name, tag) -> decoratedPot(tag));
     addBlock("sniffer_egg", (name, tag) -> new SnifferEgg(name, BlockProvider.stringToInt(tag.get("Properties").get("hatch"), 0)));
     addBlock("pink_petals", (name, tag) -> new PinkPetals(name, BlockProvider.stringToInt(tag.get("Properties").get("flower_amount"), 1), BlockProvider.facing(tag)));
+    addBlock("pitcher_plant", (name, tag) -> new PitcherPlant(name, tag.get("Properties").get("half").stringValue("lower")));
   }
 
   @Override
