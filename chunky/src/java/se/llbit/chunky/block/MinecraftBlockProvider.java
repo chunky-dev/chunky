@@ -1034,7 +1034,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       tag.get("Properties").get("slot_4_occupied").stringValue("false").equals("true"),
       tag.get("Properties").get("slot_5_occupied").stringValue("false").equals("true")));
     addBlock("decorated_pot", (name, tag) -> decoratedPot(tag));
-    addBlock("sniffer_egg", (name, tag) -> new SnifferEgg(name, BlockProvider.stringToInt(tag.get("Properties").get("age"), 0)));
+    addBlock("sniffer_egg", (name, tag) -> new SnifferEgg(name, BlockProvider.stringToInt(tag.get("Properties").get("hatch"), 0)));
     addBlock("pink_petals", (name, tag) -> new PinkPetals(name, BlockProvider.stringToInt(tag.get("Properties").get("flower_amount"), 1), BlockProvider.facing(tag)));
   }
 
