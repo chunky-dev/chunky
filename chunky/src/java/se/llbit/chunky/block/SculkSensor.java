@@ -16,7 +16,7 @@ public class SculkSensor extends MinecraftBlockTranslucent {
   }
 
   public boolean isActive() {
-    return phase.equals("active");
+    return phase.equals("active") || phase.equals("cooldown");
   }
 
   @Override
