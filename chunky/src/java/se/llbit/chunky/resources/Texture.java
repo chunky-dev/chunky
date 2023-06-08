@@ -1292,6 +1292,18 @@ public class Texture {
   public static final Texture pinkPetals = new Texture();
   @TexturePath("assets/minecraft/textures/block/pink_petals_stem")
   public static final Texture pinkPetalsStem = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pitcher_crop_bottom_stage_1")
+  public static final Texture pitcherCropBottomStage1 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pitcher_crop_bottom_stage_2")
+  public static final Texture pitcherCropBottomStage2 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pitcher_crop_bottom_stage_3")
+  public static final Texture pitcherCropBottomStage3 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pitcher_crop_bottom_stage_4")
+  public static final Texture pitcherCropBottomStage4 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pitcher_crop_top_stage_3")
+  public static final Texture pitcherCropTopStage3 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pitcher_crop_top_stage_4")
+  public static final Texture pitcherCropTopStage4 = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
