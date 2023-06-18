@@ -169,7 +169,7 @@ public class SignEntity extends Entity {
   private final String material;
 
   public SignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
-    this(position, getTextLines(entityTag), blockData & 0xF, material);
+    this(position, getFrontTextLines(entityTag), blockData & 0xF, material);
   }
 
   public SignEntity(Vector3 position, JsonArray[] text, int direction, String material) {
@@ -183,15 +183,25 @@ public class SignEntity extends Entity {
   }
 
   /**
-   * Extracts the text lines from a sign entity tag.
+   * Extracts the front text lines from a sign entity tag.
    *
    * @return array of text lines.
    */
-  protected static JsonArray[] getTextLines(CompoundTag entityTag) {
-    return new JsonArray[] {
+  protected static JsonArray[] getFrontTextLines(CompoundTag entityTag) {
+    if (!entityTag.get("front_text").isError()) {
+      // 1.20+ sign
+      Tag lines = entityTag.get("front_text").get("messages");
+      return new JsonArray[]{
+        extractText(lines.get(0)), extractText(lines.get(1)),
+        extractText(lines.get(2)), extractText(lines.get(3)),
+      };
+    } else {
+      // < 1.20 sign
+      return new JsonArray[]{
         extractText(entityTag.get("Text1")), extractText(entityTag.get("Text2")),
         extractText(entityTag.get("Text3")), extractText(entityTag.get("Text4")),
-    };
+      };
+    }
   }
 
   /**

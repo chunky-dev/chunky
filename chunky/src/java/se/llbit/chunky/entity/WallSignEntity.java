@@ -92,7 +92,7 @@ public class WallSignEntity extends Entity {
   private final String material;
 
   public WallSignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
-    this(position, SignEntity.getTextLines(entityTag), blockData % 6, material);
+    this(position, SignEntity.getFrontTextLines(entityTag), blockData % 6, material);
   }
 
   public WallSignEntity(Vector3 position, JsonArray[] text, int direction, String material) {
