@@ -26,15 +26,13 @@ import se.llbit.math.Vector4;
 
 public class SignTexture extends Texture {
 
-  private static final double ww, hh, u0, v0;
+  private static final double hh, v0;
+  private final double ww, u0;
 
   static {
     // Set up texture coordinates.
-    u0 = 2 / 64.;
-    double u1 = 26 / 64.;
     v0 = 18 / 32.;
     double v1 = 30 / 32.;
-    ww = u1 - u0;
     hh = v1 - v0;
   }
 
@@ -50,7 +48,7 @@ public class SignTexture extends Texture {
     return false;
   }
 
-  public SignTexture(JsonArray[] text, Texture signTexture) {
+  public SignTexture(JsonArray[] text, Texture signTexture, boolean isBackSide) {
     this.signTexture = signTexture;
     int ymargin = 1;
     int lineHeight = 10;
@@ -110,6 +108,16 @@ public class SignTexture extends Texture {
         }
         ystart += lineHeight;
       }
+    }
+
+    if (isBackSide) {
+      u0 = 26 / 64.;
+      double u1 = 50 / 64.;
+      ww = u1 - u0;
+    }else {
+      u0 = 2 / 64.;
+      double u1 = 26 / 64.;
+      ww = u1 - u0;
     }
   }
 

@@ -100,7 +100,7 @@ public class WallSignEntity extends Entity {
     Texture signTexture = SignEntity.textureFromMaterial(material);
     this.orientation = direction;
     this.text = text;
-    this.frontTexture = new SignTexture(text, signTexture);
+    this.frontTexture = new SignTexture(text, signTexture, false);
     this.texture = signTexture;
     this.material = material;
   }
