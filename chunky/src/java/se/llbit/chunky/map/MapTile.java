@@ -64,7 +64,7 @@ public class MapTile {
     if (scale >= 16) {
       Chunk chunk = mapLoader.getWorld().currentDimension().getChunk(pos);
       renderChunk(chunk);
-      if (!(chunk instanceof EmptyChunk) && selection.isSelected(pos)) {
+      if (!(chunk instanceof EmptyRegionChunk) && selection.isSelected(pos)) {
         for (int i = 0; i < tileWidth * tileWidth; ++i) {
           pixels[i] = selectionTint(pixels[i]);
         }
@@ -76,8 +76,11 @@ public class MapTile {
       for (int z = 0; z < 32; ++z) {
         for (int x = 0; x < 32; ++x) {
           Chunk chunk = region.getChunk(x, z);
+          //Calculate the chunk position as empty chunks are (0, 0)
+          ChunkPosition pos = region.getPosition().chunkPositionFromRegion(x, z);
+
           pixels[pixelOffset] = chunk.biomeColor();
-          if (isValid && !(chunk instanceof EmptyChunk) && selection.isSelected(chunk.getPosition())) {
+          if (isValid && !(chunk instanceof EmptyRegionChunk) && selection.isSelected(pos)) {
             pixels[pixelOffset] = selectionTint(pixels[pixelOffset]);
           }
           pixelOffset += 1;
