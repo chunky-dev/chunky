@@ -2797,16 +2797,18 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("chunkList", chunkList);
 
     JsonArray entityArray = new JsonArray();
-    for (Entity entity : entities) {
-      entityArray.add(entity.toJson());
-    }
+    entities.stream()
+      .map(Entity::toJson)
+      .filter(Objects::nonNull)
+      .forEach(entityArray::add);
     if (!entityArray.isEmpty()) {
       json.add("entities", entityArray);
     }
     JsonArray actorArray = new JsonArray();
-    for (Entity entity : actors) {
-      actorArray.add(entity.toJson());
-    }
+    actors.stream()
+      .map(Entity::toJson)
+      .filter(Objects::nonNull)
+      .forEach(actorArray::add);
     if (!actorArray.isEmpty()) {
       json.add("actors", actorArray);
     }
@@ -3185,16 +3187,27 @@ public class Scene implements JsonSerializable, Refreshable {
    * Called when the scene description has been altered in a way that
    * forces the rendering to restart.
    */
-  @Override public synchronized void refresh() {
+  @Override
+  public synchronized void refresh() {
     refresh(ResetReason.SETTINGS_CHANGED);
+  }
+
+  /**
+   * Called when the scene description has been altered in a way that
+   * should be saved to disk.
+   */
+  public synchronized void softRefresh() {
+    refresh(ResetReason.SETTINGS_CHANGED_SOFT);
   }
 
   private synchronized void refresh(ResetReason reason) {
     if (mode == RenderMode.PAUSED) {
       mode = RenderMode.RENDERING;
     }
-    spp = 0;
-    renderTime = 0;
+    if (reason != ResetReason.NONE) {
+      spp = 0;
+      renderTime = 0;
+    }
     setResetReason(reason);
     notifyAll();
   }

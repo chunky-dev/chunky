@@ -51,8 +51,8 @@ public class MinecraftSkin {
    * @return Skin information
    */
   public static Optional<MinecraftSkin> getSkinFromEncodedTextures(String textureBase64) {
-    String decoded = new String(Base64.getDecoder().decode(MojangApi.fixBase64Padding(textureBase64)));
     try {
+      String decoded = new String(Base64.getDecoder().decode(MojangApi.fixBase64Padding(textureBase64)));
       try {
         return Optional.of(MojangApi.GSON.fromJson(decoded, MinecraftSkin.class));
       } catch (JsonParseException e) {

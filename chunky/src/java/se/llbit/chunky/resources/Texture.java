@@ -176,6 +176,7 @@ public class Texture {
   public static final Texture sugarCane = new Texture("sugar-canes");
   public static final Texture jukeboxSide = new Texture();
   public static final Texture jukeboxTop = new Texture();
+  public static final Texture noteBlock = new Texture();
   public static final Texture torch = new Texture("torch");
   public static final Texture oakDoorTop = new Texture();
   public static final Texture oakDoorBottom = new Texture();
@@ -1122,6 +1123,177 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/sculk_vein")
   public static final Texture sculkVein = new Texture();
 
+  //1.20
+  @TexturePath("assets/minecraft/textures/block/bamboo_planks")
+  public static final Texture bambooPlanks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_mosaic")
+  public static final Texture bambooMosaic = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_door_top")
+  public static final Texture bambooDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_door_bottom")
+  public static final Texture bambooDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_block")
+  public static final Texture bambooBlock = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_block_top")
+  public static final Texture bambooBlockTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_bamboo_block")
+  public static final Texture strippedBambooBlock = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_bamboo_block_top")
+  public static final Texture strippedBambooBlockTop = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/bamboo")
+  public static final Texture bambooSignPost = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_trapdoor")
+  public static final Texture bambooTrapdoor = new Texture();
+
+  @TexturePath("assets/minecraft/textures/block/cherry_planks")
+  public static final Texture cherryPlanks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_door_top")
+  public static final Texture cherryDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_door_bottom")
+  public static final Texture cherryDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_leaves")
+  public static final Texture cherryLeaves = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_log")
+  public static final Texture cherryLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_log_top")
+  public static final Texture cherryLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_cherry_log")
+  public static final Texture strippedCherryLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_cherry_log_top")
+  public static final Texture strippedCherryLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/cherry")
+  public static final Texture cherrySignPost = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_trapdoor")
+  public static final Texture cherryTrapdoor = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_sapling")
+  public static final Texture cherrySapling = new Texture();
+  @TexturePath("assets/minecraft/textures/block/torchflower")
+  public static final Texture torchflower = new Texture();
+  @TexturePath("assets/minecraft/textures/block/torchflower_crop_stage0")
+  public static final Texture torchflowerCropStage0 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/torchflower_crop_stage1")
+  public static final Texture torchflowerCropStage1 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_empty")
+  public static final Texture chiseledBookshelfEmpty = new Texture();
+  @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_occupied")
+  public static final Texture chiseledBookshelfOccupied = new Texture();
+  @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_side")
+  public static final Texture chiseledBookshelfSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_top")
+  public static final Texture chiseledBookshelfTop = new Texture();
+
+  public static final Texture[] chiseledBookshelfCombinations = new ChiseledBookshelfTexture[64];
+  static {
+    for(int i = 0; i < chiseledBookshelfCombinations.length; i++) {
+      chiseledBookshelfCombinations[i] = new ChiseledBookshelfTexture(Texture.chiseledBookshelfEmpty, Texture.chiseledBookshelfOccupied,
+        i % 2 == 1, (i >> 1) % 2 == 1, (i >> 2) % 2 == 1, (i >> 3) % 2 == 1, (i >> 4) % 2 == 1, (i >> 5) % 2 == 1);
+    }
+  }
+
+  @TexturePath("assets/minecraft/textures/block/suspicious_sand_0")
+  public static final Texture suspiciousSandStage0 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/suspicious_sand_1")
+  public static final Texture suspiciousSandStage1 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/suspicious_sand_2")
+  public static final Texture suspiciousSandStage2 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/suspicious_sand_3")
+  public static final Texture suspiciousSandStage3 = new Texture();
+
+  @TexturePath("assets/minecraft/textures/block/suspicious_gravel_0")
+  public static final Texture suspiciousGravelStage0 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/suspicious_gravel_1")
+  public static final Texture suspiciousGravelStage1 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/suspicious_gravel_2")
+  public static final Texture suspiciousGravelStage2 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/suspicious_gravel_3")
+  public static final Texture suspiciousGravelStage3 = new Texture();
+
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/decorated_pot_base")
+  public static final Texture decoratedPotBase = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/decorated_pot_side")
+  public static final Texture decoratedPotSide = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/angler_pottery_pattern")
+  public static final Texture decoratedPotPatternAngler = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/archer_pottery_pattern")
+  public static final Texture decoratedPotPatternArcher = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/arms_up_pottery_pattern")
+  public static final Texture decoratedPotPatternArmsUp = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/blade_pottery_pattern")
+  public static final Texture decoratedPotPatternBlade = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/brewer_pottery_pattern")
+  public static final Texture decoratedPotPatternBrewer = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/burn_pottery_pattern")
+  public static final Texture decoratedPotPatternBurn = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/danger_pottery_pattern")
+  public static final Texture decoratedPotPatternDanger = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/explorer_pottery_pattern")
+  public static final Texture decoratedPotPatternExplorer = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/friend_pottery_pattern")
+  public static final Texture decoratedPotPatternFriend = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/heartbreak_pottery_pattern")
+  public static final Texture decoratedPotPatternHeartbreak = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/heart_pottery_pattern")
+  public static final Texture decoratedPotPatternHeart = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/howl_pottery_pattern")
+  public static final Texture decoratedPotPatternHowl = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/miner_pottery_pattern")
+  public static final Texture decoratedPotPatternMiner = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/mourner_pottery_pattern")
+  public static final Texture decoratedPotPatternMourner = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/plenty_pottery_pattern")
+  public static final Texture decoratedPotPatternPlenty = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/prize_pottery_pattern")
+  public static final Texture decoratedPotPatternPrize = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/sheaf_pottery_pattern")
+  public static final Texture decoratedPotPatternSheaf = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/shelter_pottery_pattern")
+  public static final Texture decoratedPotPatternShelter = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/skull_pottery_pattern")
+  public static final Texture decoratedPotPatternSkull = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/snort_pottery_pattern")
+  public static final Texture decoratedPotPatternSnort = new Texture();
+
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_bottom")
+  public static final Texture snifferEggNotCrackedBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_east")
+  public static final Texture snifferEggNotCrackedEast = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_north")
+  public static final Texture snifferEggNotCrackedNorth = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_south")
+  public static final Texture snifferEggNotCrackedSouth = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_top")
+  public static final Texture snifferEggNotCrackedTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_west")
+  public static final Texture snifferEggNotCrackedWest = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_bottom")
+  public static final Texture snifferEggSlightlyCrackedBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_east")
+  public static final Texture snifferEggSlightlyCrackedEast = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_north")
+  public static final Texture snifferEggSlightlyCrackedNorth = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_south")
+  public static final Texture snifferEggSlightlyCrackedSouth = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_top")
+  public static final Texture snifferEggSlightlyCrackedTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_west")
+  public static final Texture snifferEggSlightlyCrackedWest = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_bottom")
+  public static final Texture snifferEggVeryCrackedBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_east")
+  public static final Texture snifferEggVeryCrackedEast = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_north")
+  public static final Texture snifferEggVeryCrackedNorth = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_south")
+  public static final Texture snifferEggVeryCrackedSouth = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_top")
+  public static final Texture snifferEggVeryCrackedTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_west")
+  public static final Texture snifferEggVeryCrackedWest = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pink_petals")
+  public static final Texture pinkPetals = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pink_petals_stem")
+  public static final Texture pinkPetalsStem = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 
@@ -1230,7 +1402,7 @@ public class Texture {
    *
    * @return color
    */
-  public final float[] getColor(int x, int y) {
+  public float[] getColor(int x, int y) {
     if(usesAverageColor)
       return avgColorFlat;
     float[] result = new float[4];
@@ -1296,6 +1468,12 @@ public class Texture {
    */
   public float[] getAvgColorLinear() {
     return avgColorLinear;
+  }
+  /**
+   * @return The average flat color of this texture
+   */
+  public float[] getAvgColorFlat() {
+    return avgColorFlat;
   }
 
   public int getWidth() {

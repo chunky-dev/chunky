@@ -21,6 +21,7 @@ import java.util.Collection;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.model.DecoratedPotModel;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Grid;
@@ -107,6 +108,8 @@ abstract public class Entity {
         return BeaconBeam.fromJson(json);
       case "sporeBlossom":
         return SporeBlossom.fromJson(json);
+      case "decoratedPotSpout":
+        return DecoratedPotModel.DecoratedPotSpoutEntity.fromJson(json);
     }
     return null;
   }

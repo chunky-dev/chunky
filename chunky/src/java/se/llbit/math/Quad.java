@@ -104,7 +104,7 @@ public class Quad {
    * @param v0 Bottom left vector
    * @param v1 Top right vector
    * @param v2 Bottom right vector
-   * @param uv Minimum and maximum U/V texture coordinates
+   * @param uv Minimum and maximum U/V texture coordinates (x0,y0 bottom left)
    */
   public Quad(Vector3 v0, Vector3 v1, Vector3 v2, Vector4 uv) {
     this(v0, v1, v2, uv, false);
@@ -117,7 +117,7 @@ public class Quad {
    * @param v0 Bottom left vector
    * @param v1 Top right vector
    * @param v2 Bottom right vector
-   * @param uv Minimum and maximum U/V texture coordinates
+   * @param uv Minimum and maximum U/V texture coordinates (x0,y0 bottom left)
    * @param doubleSided True to make this quad double-sided
    */
   public Quad(Vector3 v0, Vector3 v1, Vector3 v2, Vector4 uv, boolean doubleSided) {
