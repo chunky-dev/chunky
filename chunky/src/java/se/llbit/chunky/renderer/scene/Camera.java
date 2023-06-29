@@ -422,7 +422,8 @@ public class Camera implements JsonSerializable {
    * Rotate the camera
    */
   public synchronized void rotateView(double yaw, double pitch) {
-    double fovRad = QuickMath.degToRad(fov / 2);
+    double fovRad = (this.projectionMode == ProjectionMode.PARALLEL) ? 0.5 : QuickMath.degToRad(fov / 2);
+
     this.yaw += yaw * fovRad;
     this.pitch += pitch * fovRad;
 
