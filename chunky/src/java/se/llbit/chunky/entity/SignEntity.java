@@ -20,7 +20,6 @@ package se.llbit.chunky.entity;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -100,12 +99,11 @@ public class SignEntity extends Entity {
     }
   }
 
-
   // Facing south.
   protected static Quad[] sides = {
     // Front face.
     new Quad(new Vector3(0, 9 / 16., 9 / 16.), new Vector3(1, 9 / 16., 9 / 16.),
-      new Vector3(0, 17 / 16., 9 / 16.), new Vector4(0, 1, 0, 1)),
+      new Vector3(0, 17 / 16., 9 / 16.), new Vector4(2 / 64., 26 / 64., 18 / 32., 30 / 32.)),
 
     // Back face.
     new Quad(new Vector3(1, 9 / 16., 7 / 16.), new Vector3(0, 9 / 16., 7 / 16.),
@@ -152,6 +150,7 @@ public class SignEntity extends Entity {
 
   };
 
+  private static Quad[] frontFaceWithText = new Quad[16];
   private static Quad[] backFaceWithText = new Quad[16];
 
   private static final Quad[][] rot = new Quad[16][];
@@ -163,14 +162,20 @@ public class SignEntity extends Entity {
       rot[i] = Model.rotateY(sides, -i * Math.PI / 8);
     }
 
+    frontFaceWithText[0] = new Quad(new Vector3(0, 9 / 16., 9 / 16.), new Vector3(1, 9 / 16., 9 / 16.),
+      new Vector3(0, 17 / 16., 9 / 16.), new Vector4(0, 1, 0, 1));
+    for (int i = 1; i < 16; ++i) {
+      frontFaceWithText[i] = frontFaceWithText[0].transform(Transform.NONE.rotateY(-i * Math.PI / 8));
+    }
+
     backFaceWithText[0] = new Quad(new Vector3(1, 9 / 16., 7 / 16.), new Vector3(0, 9 / 16., 7 / 16.),
-        new Vector3(1, 17 / 16., 7 / 16.), new Vector4(0, 1, 0, 1));
+      new Vector3(1, 17 / 16., 7 / 16.), new Vector4(0, 1, 0, 1));
     for (int i = 1; i < 16; ++i) {
       backFaceWithText[i] = backFaceWithText[0].transform(Transform.NONE.rotateY(-i * Math.PI / 8));
     }
   }
 
-  private final JsonArray[] text;
+  private final JsonArray[] frontText;
   private final JsonArray[] backText;
   private final int angle;
   private final SignTexture frontTexture;
@@ -182,13 +187,13 @@ public class SignEntity extends Entity {
     this(position, getFrontTextLines(entityTag), getBackTextLines(entityTag), blockData & 0xF, material);
   }
 
-  public SignEntity(Vector3 position, JsonArray[] text, JsonArray[] backText, int direction, String material) {
+  public SignEntity(Vector3 position, JsonArray[] frontText, JsonArray[] backText, int direction, String material) {
     super(position);
     Texture signTexture = SignEntity.textureFromMaterial(material);
-    this.text = text;
+    this.frontText = frontText;
     this.backText = backText;
     this.angle = direction;
-    this.frontTexture = new SignTexture(text, signTexture, false);
+    this.frontTexture = frontText != null ? new SignTexture(frontText, signTexture, false) : null;
     this.backTexture = backText != null ? new SignTexture(backText, signTexture, true) : null;
     this.texture = signTexture;
     this.material = material;
@@ -203,16 +208,24 @@ public class SignEntity extends Entity {
     if (!entityTag.get("front_text").isError()) {
       // 1.20+ sign
       Tag lines = entityTag.get("front_text").get("messages");
-      return new JsonArray[]{
+      JsonArray[] extractedText = new JsonArray[]{
         extractText(lines.get(0)), extractText(lines.get(1)),
         extractText(lines.get(2)), extractText(lines.get(3)),
       };
+      if (isEmpty(extractedText)) {
+        return null;
+      }
+      return extractedText;
     } else {
       // < 1.20 sign
-      return new JsonArray[]{
+      JsonArray[] extractedText = new JsonArray[]{
         extractText(entityTag.get("Text1")), extractText(entityTag.get("Text2")),
         extractText(entityTag.get("Text3")), extractText(entityTag.get("Text4")),
       };
+      if (isEmpty(extractedText)) {
+        return null;
+      }
+      return extractedText;
     }
   }
 
@@ -229,10 +242,14 @@ public class SignEntity extends Entity {
 
     // 1.20+ sign
     Tag lines = entityTag.get("back_text").get("messages");
-    return new JsonArray[]{
+    JsonArray[] extractedText = new JsonArray[]{
       extractText(lines.get(0)), extractText(lines.get(1)),
       extractText(lines.get(2)), extractText(lines.get(3)),
     };
+    if (isEmpty(extractedText)) {
+      return null;
+    }
+    return extractedText;
   }
 
   /**
@@ -274,6 +291,23 @@ public class SignEntity extends Entity {
   }
 
   /**
+   * Check if the given lines are empty or only whitespace.
+   *
+   * @param lines Lines extracted by {{@link #extractText(Tag)}}
+   * @return True if the lines are empty or only whitespace, false otherwise
+   */
+  private static boolean isEmpty(JsonArray[] lines) {
+    for (JsonArray line : lines) {
+      for (JsonValue text : line) {
+        if (!text.object().get("text").stringValue("").trim().isEmpty()) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
    * Add a text entry to a JSON text array.
    */
   private static void addText(JsonArray array, String text) {
@@ -306,8 +340,9 @@ public class SignEntity extends Entity {
     for (int i = 0; i < sides.length; ++i) {
       Quad quad = rot[angle][i];
       Texture tex = texture;
-      if (i == 0) {
+      if (i == 0 && frontTexture != null) {
         tex = frontTexture;
+        quad = frontFaceWithText[angle];
       } else if (i == 1 && backTexture != null) {
         tex = backTexture;
         quad = backFaceWithText[angle];
@@ -322,7 +357,9 @@ public class SignEntity extends Entity {
     JsonObject json = new JsonObject();
     json.add("kind", "sign");
     json.add("position", position.toJson());
-    json.add("text", textToJson(text));
+    if (frontText != null) {
+      json.add("text", textToJson(frontText));
+    }
     if (backText != null) {
       json.add("backText", textToJson(backText));
     }
@@ -337,14 +374,17 @@ public class SignEntity extends Entity {
   public static Entity fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
-    JsonArray[] text = textFromJson(json.get("text"));
+    JsonArray[] frontText = null;
+    if (json.get("text").isArray()) {
+      frontText = textFromJson(json.get("text"));
+    }
     JsonArray[] backText = null;
     if (json.get("backText").isArray()) {
       backText = textFromJson(json.get("backText"));
     }
     int direction = json.get("direction").intValue(0);
     String material = json.get("material").stringValue("oak");
-    return new SignEntity(position, text, backText, direction, material);
+    return new SignEntity(position, frontText, backText, direction, material);
   }
 
   /**

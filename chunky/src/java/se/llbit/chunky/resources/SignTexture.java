@@ -42,8 +42,9 @@ public class SignTexture extends Texture {
 
   static private boolean hasVisibleCharacter(JsonArray line) {
     for(JsonValue textItem : line) {
-      if(!textItem.object().get("text").stringValue("").trim().isEmpty())
+      if(!textItem.object().get("text").stringValue("").trim().isEmpty()) {
         return true;
+      }
     }
     return false;
   }
