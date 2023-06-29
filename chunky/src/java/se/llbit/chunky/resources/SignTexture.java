@@ -112,10 +112,10 @@ public class SignTexture extends Texture {
     }
 
     if (isBackSide) {
-      u0 = 26 / 64.;
-      double u1 = 50 / 64.;
+      u0 = 28 / 64.;
+      double u1 = 52 / 64.;
       ww = u1 - u0;
-    }else {
+    } else {
       u0 = 2 / 64.;
       double u1 = 26 / 64.;
       ww = u1 - u0;

@@ -46,7 +46,7 @@ public class WallSignEntity extends Entity {
     {
       // North (front) face.
       new Quad(new Vector3(1, 4.5 / 16, .875 + offset), new Vector3(0, 4.5 / 16, .875 + offset),
-        new Vector3(1, 12.5 / 16, .875 + offset), new Vector4(0, 1, 0, 1)),
+        new Vector3(1, 12.5 / 16, .875 + offset), new Vector4(2 / 64., 26 / 64., 18 / 32., 30 / 32.)),
 
       // South (back) face.
       new Quad(new Vector3(0, 4.5 / 16, 1 - offset), new Vector3(1, 4.5 / 16, 1 - offset),
