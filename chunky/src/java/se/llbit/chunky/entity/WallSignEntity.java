@@ -46,7 +46,7 @@ public class WallSignEntity extends Entity {
     {
       // North (front) face.
       new Quad(new Vector3(1, 4.5 / 16, .875 + offset), new Vector3(0, 4.5 / 16, .875 + offset),
-        new Vector3(1, 12.5 / 16, .875 + offset), new Vector4(0, 1, 0, 1)),
+        new Vector3(1, 12.5 / 16, .875 + offset), new Vector4(2 / 64., 26 / 64., 18 / 32., 30 / 32.)),
 
       // South (back) face.
       new Quad(new Vector3(0, 4.5 / 16, 1 - offset), new Vector3(1, 4.5 / 16, 1 - offset),
@@ -79,10 +79,18 @@ public class WallSignEntity extends Entity {
     // Facing east.
     {},};
 
+  private static Quad[] frontFaceWithText = new Quad[6];
+
   static {
     faces[5] = Model.rotateY(faces[2]);
     faces[3] = Model.rotateY(faces[5]);
     faces[4] = Model.rotateY(faces[3]);
+
+    frontFaceWithText[2] = new Quad(new Vector3(1, 4.5 / 16, .875 + offset), new Vector3(0, 4.5 / 16, .875 + offset),
+      new Vector3(1, 12.5 / 16, .875 + offset), new Vector4(0, 1, 0, 1));
+    frontFaceWithText[5] = frontFaceWithText[2].transform(Transform.NONE.rotateY());
+    frontFaceWithText[3] = frontFaceWithText[5].transform(Transform.NONE.rotateY());
+    frontFaceWithText[4] = frontFaceWithText[3].transform(Transform.NONE.rotateY());
   }
 
   private final JsonArray[] text;
@@ -92,7 +100,7 @@ public class WallSignEntity extends Entity {
   private final String material;
 
   public WallSignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
-    this(position, SignEntity.getTextLines(entityTag), blockData % 6, material);
+    this(position, SignEntity.getFrontTextLines(entityTag), blockData % 6, material);
   }
 
   public WallSignEntity(Vector3 position, JsonArray[] text, int direction, String material) {
@@ -100,7 +108,7 @@ public class WallSignEntity extends Entity {
     Texture signTexture = SignEntity.textureFromMaterial(material);
     this.orientation = direction;
     this.text = text;
-    this.frontTexture = new SignTexture(text, signTexture);
+    this.frontTexture = text != null ? new SignTexture(text, signTexture, false) : null;
     this.texture = signTexture;
     this.material = material;
   }
@@ -113,8 +121,12 @@ public class WallSignEntity extends Entity {
     Quad[] quads = faces[orientation];
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
-      Material material = new TextureMaterial(i == 0 ? frontTexture : texture);
-      quad.addTriangles(primitives, material, transform);
+      Texture tex = texture;
+      if (i == 0 && frontTexture != null) {
+        tex = frontTexture;
+        quad = frontFaceWithText[orientation];
+      }
+      quad.addTriangles(primitives, new TextureMaterial(tex), transform);
     }
     return primitives;
   }
@@ -124,7 +136,9 @@ public class WallSignEntity extends Entity {
     JsonObject json = new JsonObject();
     json.add("kind", "wallsign");
     json.add("position", position.toJson());
-    json.add("text", SignEntity.textToJson(text));
+    if (text != null) {
+      json.add("text", SignEntity.textToJson(text));
+    }
     json.add("direction", orientation);
     json.add("material", material);
     return json;
@@ -136,7 +150,10 @@ public class WallSignEntity extends Entity {
   public static Entity fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
-    JsonArray[] text = SignEntity.textFromJson(json.get("text"));
+    JsonArray[] text = null;
+    if (json.get("text").isArray()) {
+      text = SignEntity.textFromJson(json.get("text"));
+    }
     int direction = json.get("direction").intValue(0);
     String material = json.get("material").stringValue("oak");
     return new WallSignEntity(position, text, direction, material);
