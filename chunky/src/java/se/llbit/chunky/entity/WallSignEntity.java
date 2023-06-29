@@ -42,42 +42,42 @@ public class WallSignEntity extends Entity {
 
   private static Quad[][] faces = {{}, {},
 
-      // Facing north
-      {
-          // North (front) face.
-          new Quad(new Vector3(1, .2, .875 + offset), new Vector3(0, .2, .875 + offset),
-              new Vector3(1, .8, .875 + offset), new Vector4(0, 1, 0, 1)),
+    // Facing north
+    {
+      // North (front) face.
+      new Quad(new Vector3(1, 4.5 / 16, .875 + offset), new Vector3(0, 4.5 / 16, .875 + offset),
+        new Vector3(1, 12.5 / 16, .875 + offset), new Vector4(0, 1, 0, 1)),
 
-          // South (back) face.
-          new Quad(new Vector3(0, .2, 1 - offset), new Vector3(1, .2, 1 - offset),
-              new Vector3(0, .8, 1 - offset),
-              new Vector4(28 / 64., 52 / 64., 18 / 32., 30 / 32.)),
+      // South (back) face.
+      new Quad(new Vector3(0, 4.5 / 16, 1 - offset), new Vector3(1, 4.5 / 16, 1 - offset),
+        new Vector3(0, 12.5 / 16, 1 - offset),
+        new Vector4(28 / 64., 52 / 64., 18 / 32., 30 / 32.)),
 
-          // West (left) face.
-          new Quad(new Vector3(0, .2, .875 + offset), new Vector3(0, .2, 1 - offset),
-              new Vector3(0, .8, .875 + offset),
-              new Vector4(26 / 64., 28 / 64., 18 / 32., 30 / 32.)),
+      // West (left) face.
+      new Quad(new Vector3(0, 4.5 / 16, .875 + offset), new Vector3(0, 4.5 / 16, 1 - offset),
+        new Vector3(0, 12.5 / 16, .875 + offset),
+        new Vector4(26 / 64., 28 / 64., 18 / 32., 30 / 32.)),
 
-          // East (right) face.
-          new Quad(new Vector3(1, .2, 1 - offset), new Vector3(1, .2, .875 + offset),
-              new Vector3(1, .8, 1 - offset), new Vector4(0, 2 / 64., 18 / 32., 30 / 32.)),
+      // East (right) face.
+      new Quad(new Vector3(1, 4.5 / 16, 1 - offset), new Vector3(1, 4.5 / 16, .875 + offset),
+        new Vector3(1, 12.5 / 16, 1 - offset), new Vector4(0, 2 / 64., 18 / 32., 30 / 32.)),
 
-          // Top face.
-          new Quad(new Vector3(1, .8, .875 + offset), new Vector3(0, .8, .875 + offset),
-              new Vector3(1, .8, 1 - offset), new Vector4(2 / 64., 26 / 64., 30 / 32., 1)),
+      // Top face.
+      new Quad(new Vector3(1, 12.5 / 16, .875 + offset), new Vector3(0, 12.5 / 16, .875 + offset),
+        new Vector3(1, 12.5 / 16, 1 - offset), new Vector4(2 / 64., 26 / 64., 30 / 32., 1)),
 
-          // Bottom face
-          new Quad(new Vector3(0, .2, .875 + offset), new Vector3(1, .2, .875 + offset),
-              new Vector3(0, .2, 1 - offset), new Vector4(50 / 64., 26 / 64., 30 / 32., 1)),},
+      // Bottom face
+      new Quad(new Vector3(0, 4.5 / 16, .875 + offset), new Vector3(1, 4.5 / 16, .875 + offset),
+        new Vector3(0, 4.5 / 16, 1 - offset), new Vector4(50 / 64., 26 / 64., 30 / 32., 1)),},
 
-      // Facing south.
-      {},
+    // Facing south.
+    {},
 
-      // Facing west.
-      {},
+    // Facing west.
+    {},
 
-      // Facing east.
-      {},};
+    // Facing east.
+    {},};
 
   static {
     faces[5] = Model.rotateY(faces[2]);
@@ -105,10 +105,11 @@ public class WallSignEntity extends Entity {
     this.material = material;
   }
 
-  @Override public Collection<Primitive> primitives(Vector3 offset) {
+  @Override
+  public Collection<Primitive> primitives(Vector3 offset) {
     Collection<Primitive> primitives = new LinkedList<>();
     Transform transform = Transform.NONE
-        .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
+      .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     Quad[] quads = faces[orientation];
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
@@ -118,7 +119,8 @@ public class WallSignEntity extends Entity {
     return primitives;
   }
 
-  @Override public JsonValue toJson() {
+  @Override
+  public JsonValue toJson() {
     JsonObject json = new JsonObject();
     json.add("kind", "wallsign");
     json.add("position", position.toJson());
