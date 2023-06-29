@@ -180,8 +180,10 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     octreeImplementation.getSelectionModel().selectedItemProperty()
             .addListener((observable, oldvalue, newvalue) -> {
               PersistentSettings.setOctreeImplementation(newvalue);
-              scene.setOctreeImplementation(newvalue);
-              scene.softRefresh();
+              if (!scene.getOctreeImplementation().equals(newvalue)) {
+                scene.setOctreeImplementation(newvalue);
+                scene.softRefresh();
+              }
             });
     octreeImplementation.setTooltip(new Tooltip(tooltipTextBuilder.toString()));
 
