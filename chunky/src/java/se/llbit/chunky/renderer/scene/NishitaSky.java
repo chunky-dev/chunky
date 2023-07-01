@@ -84,10 +84,10 @@ public class NishitaSky implements SimulatedSky {
   }
 
   @Override
-  public Vector3 calcIncidentLight(Ray ray) {
+  public Vector3 calcIncidentLight(Vector3 d) {
     // Render from just above the surface of "earth"
-    Vector3 origin = new Vector3(0, ray.o.y + EARTH_RADIUS + 1, 0);
-    Vector3 direction = ray.d;
+    Vector3 origin = new Vector3(0, EARTH_RADIUS + 1, 0);
+    Vector3 direction = d;
     direction.y += horizonOffset;
     direction.normalize();
 

@@ -168,14 +168,11 @@ public class SkyCache {
    * Calculate the sky color for a pixel on the cache.
    */
   private Vector3 getSkyColorAt(int x, int y) {
-    Ray ray = new Ray();
-
     double theta = ((double) x / skyResolution) * 2 * PI;
     double phi = ((double) y / skyResolution) * PI - PI / 2;
     double r = FastMath.cos(phi);
-    ray.d.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
 
-    Vector3 color = simSky.calcIncidentLight(ray);
+    Vector3 color = simSky.calcIncidentLight(new Vector3(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r));
     ColorUtil.RGBtoHSL(color, color.x, color.y, color.z);
     return color;
   }

@@ -125,12 +125,12 @@ public class PreethamSky implements SimulatedSky {
   }
 
   @Override
-  public Vector3 calcIncidentLight(Ray ray) {
-    double cosTheta = ray.d.y;
+  public Vector3 calcIncidentLight(Vector3 d) {
+    double cosTheta = d.y;
     cosTheta += horizonOffset;
     if (cosTheta < 0)
       cosTheta = 0;
-    double cosGamma = ray.d.dot(sw);
+    double cosGamma = d.dot(sw);
     double gamma = FastMath.acos(cosGamma);
     double cos2Gamma = cosGamma * cosGamma;
     double x = zenith_x * perezF(cosTheta, gamma, cos2Gamma, A.x, B.x, C.x, D.x, E.x) * f0_x;
