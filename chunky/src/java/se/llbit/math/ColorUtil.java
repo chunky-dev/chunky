@@ -291,22 +291,22 @@ public final class ColorUtil {
     return color;
   }
 
-  public static void RGBfromHSL(Vector3 rgb, double hue, double saturation, double lightness) {
+  public static void RGBfromHSL(Vector4 rgb, double hue, double saturation, double lightness) {
     double c = Math.min(1, (1 - Math.abs(2 * lightness - 1)) * saturation);
     double h = hue * 6;
     double x = c * (1 - Math.abs(h % 2 - 1));
     if (h < 1) {
-      rgb.set(c, x, 0);
+      rgb.set(c, x, 0, 1);
     } else if (h < 2) {
-      rgb.set(x, c, 0);
+      rgb.set(x, c, 0, 1);
     } else if (h < 3) {
-      rgb.set(0, c, x);
+      rgb.set(0, c, x, 1);
     } else if (h < 4) {
-      rgb.set(0, x, c);
+      rgb.set(0, x, c, 1);
     } else if (h < 5) {
-      rgb.set(x, 0, c);
+      rgb.set(x, 0, c, 1);
     } else {
-      rgb.set(c, 0, x);
+      rgb.set(c, 0, x, 1);
     }
     double m = Math.max(0, lightness - 0.5 * c);
     rgb.x += m;
