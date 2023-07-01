@@ -678,7 +678,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * @param ray ray to test against scene
    * @return <code>true</code> if an intersection was found
    */
-  public boolean intersect(Ray ray) {
+  public boolean intersect(Ray ray, WorkerState state) {
     boolean hit = false;
 
     if (Double.isNaN(ray.d.x) || Double.isNaN(ray.d.y) || Double.isNaN(ray.d.z) ||
@@ -696,7 +696,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (entities.intersect(ray)) {
       hit = true;
     }
-    if (worldIntersection(ray)) {
+    if (worldIntersection(ray, state)) {
       hit = true;
     }
     if (hit) {
@@ -714,11 +714,11 @@ public class Scene implements JsonSerializable, Refreshable {
    * @param ray   the ray
    * @return {@code true} if the ray intersects a voxel
    */
-  private boolean worldIntersection(Ray ray) {
-    Ray start = new Ray(ray);
+  private boolean worldIntersection(Ray ray, WorkerState state) {
+    Ray start = state.newRay(ray);
     start.setCurrentMaterial(ray.getPrevMaterial(), ray.getPrevData());
     boolean hit = false;
-    Ray r = new Ray(start);
+    Ray r = state.newRay(start);
     r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
     if (worldOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
       ray.t = r.distance;
@@ -729,7 +729,7 @@ public class Scene implements JsonSerializable, Refreshable {
       hit = true;
     }
     if (start.getCurrentMaterial().isWater()) {
-      r = new Ray(start);
+      r.set(start);
       r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
       if(waterOctree.exitWater(this, r, palette) && r.distance < ray.t - Ray.EPSILON) {
         ray.t = r.distance;
@@ -742,7 +742,7 @@ public class Scene implements JsonSerializable, Refreshable {
         ray.setPrevMaterial(Water.INSTANCE, 1 << Water.FULL_BLOCK);
       }
     } else {
-      r = new Ray(start);
+      r.set(start);
       r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
       if (waterOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
         ray.t = r.distance;
@@ -753,6 +753,8 @@ public class Scene implements JsonSerializable, Refreshable {
         hit = true;
       }
     }
+    state.returnRay(start);
+    state.returnRay(r);
     return hit;
   }
 
@@ -1669,7 +1671,7 @@ public class Scene implements JsonSerializable, Refreshable {
     ray.o.x -= origin.x;
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
-    while (PreviewRayTracer.nextIntersection(this, ray)) {
+    while (PreviewRayTracer.nextIntersection(this, ray, state)) {
       if (ray.getCurrentMaterial() != Air.INSTANCE) {
         return true;
       }
