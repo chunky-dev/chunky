@@ -1012,7 +1012,9 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("cherry_planks", Texture.cherryPlanks);
     addBlock("cherry_pressure_plate", (name, tag) -> new PressurePlate(name, Texture.cherryPlanks));
     addBlock("cherry_sign", (name, tag) -> sign(tag, "cherry"));
+    addBlock("cherry_hanging_sign", (name, tag) -> hangingSign(tag, "cherry"));
     addBlock("cherry_wall_sign", (name, tag) -> wallSign(tag, "cherry"));
+    addBlock("cherry_wall_hanging_sign", (name, tag) -> hangingSign(tag, "cherry"));
     addBlock("cherry_slab", (name, tag) -> slab(tag, Texture.cherryPlanks));
     addBlock("cherry_stairs", (name, tag) -> stairs(tag, Texture.cherryPlanks));
     addBlock("cherry_trapdoor", (name, tag) -> trapdoor(tag, Texture.cherryTrapdoor));
@@ -3257,6 +3259,13 @@ public class MinecraftBlockProvider implements BlockProvider {
     String name = BlockProvider.blockName(tag);
     int rotation = BlockProvider.stringToInt(tag.get("Properties").get("rotation"), 0);
     return new Sign(name, material, rotation);
+  }
+
+  private static Block hangingSign(Tag tag, String material) {
+    String name = BlockProvider.blockName(tag);
+    int rotation = BlockProvider.stringToInt(tag.get("Properties").get("rotation"), 0);
+    boolean attached = tag.get("Properties").get("attached").stringValue("false").equals("true");
+    return new HangingSign(name, material, rotation, attached);
   }
 
   private static Block banner(Tag tag, Texture texture, int color) {
