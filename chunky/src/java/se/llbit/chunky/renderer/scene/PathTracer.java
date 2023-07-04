@@ -171,7 +171,7 @@ public class PathTracer implements RayTracer {
 
             if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance > Ray.EPSILON) {
 
-              apparentBrightness = addEmitted * currentMat.apparentBrightness * scene.apparentEmitterBrightness * scene.emitterIntensity;
+              apparentBrightness = addEmitted * currentMat.emittance * currentMat.apparentBrightnessModifier * scene.apparentEmitterBrightness * scene.emitterIntensity;
               ray.emittance.x = ray.color.x * ray.color.x *
                   currentMat.emittance * scene.emitterLightIntensity * scene.emitterIntensity;
               ray.emittance.y = ray.color.y * ray.color.y *

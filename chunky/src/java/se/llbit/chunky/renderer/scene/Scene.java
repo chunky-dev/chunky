@@ -3400,7 +3400,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void setApparentBrightness(String materialName, float value) {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
-    material.set("apparentBrightness", Json.of(value));
+    material.set("apparentBrightnessModifier", Json.of(value));
     materials.put(materialName, material);
     refresh(ResetReason.MATERIALS_CHANGED);
   }
