@@ -19,25 +19,21 @@
 package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
-import se.llbit.chunky.model.minecraft.SculkSensorModel;
+import se.llbit.chunky.model.minecraft.PitcherPlantBottomModel;
+import se.llbit.chunky.model.minecraft.PitcherPlantTopModel;
 import se.llbit.chunky.resources.Texture;
 
-public class SculkSensor extends AbstractModelBlock {
+public class PitcherPlant extends AbstractModelBlock {
+  private final String description;
 
-  private final String phase;
-
-  public SculkSensor(String phase) {
-    super("sculk_sensor", Texture.sculkSensorTop);
-    this.phase = phase;
-    this.model = new SculkSensorModel(isActive());
-  }
-
-  public boolean isActive() {
-    return phase.equals("active") || phase.equals("cooldown");
+  public PitcherPlant(String name, String half) {
+    super(name, Texture.pinkPetals);
+    this.description = String.format("half=%s", half);
+    this.model = half.equals("upper") ? new PitcherPlantTopModel() : new PitcherPlantBottomModel();
   }
 
   @Override
   public String description() {
-    return "sculk_sensor_phase=" + phase;
+    return this.description;
   }
 }

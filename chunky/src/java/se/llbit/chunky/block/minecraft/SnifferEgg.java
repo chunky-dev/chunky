@@ -19,25 +19,33 @@
 package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
-import se.llbit.chunky.model.minecraft.SculkSensorModel;
+import se.llbit.chunky.model.minecraft.SnifferEggModel;
 import se.llbit.chunky.resources.Texture;
 
-public class SculkSensor extends AbstractModelBlock {
+public class SnifferEgg extends AbstractModelBlock {
 
-  private final String phase;
+  private final String description;
 
-  public SculkSensor(String phase) {
-    super("sculk_sensor", Texture.sculkSensorTop);
-    this.phase = phase;
-    this.model = new SculkSensorModel(isActive());
-  }
-
-  public boolean isActive() {
-    return phase.equals("active") || phase.equals("cooldown");
+  public SnifferEgg(String name, int hatch) {
+    super(name, getTopTexture(hatch));
+    this.description = "hatch=" + hatch;
+    this.model = new SnifferEggModel(hatch);
   }
 
   @Override
   public String description() {
-    return "sculk_sensor_phase=" + phase;
+    return description;
+  }
+
+  private static Texture getTopTexture(int hatch) {
+    switch (hatch) {
+      case 1:
+        return Texture.snifferEggSlightlyCrackedTop;
+      case 2:
+        return Texture.snifferEggVeryCrackedTop;
+      default:
+      case 0:
+        return Texture.snifferEggNotCrackedTop;
+    }
   }
 }
