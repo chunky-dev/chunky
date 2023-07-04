@@ -62,7 +62,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     emittance.setRange(0, 100);
     emittance.setTooltip("Intensity of the light emitted from the selected material.");
     emittance.clampMin();
-    apparentBrightnessModifier.setName("Brightness Modifier");
+    apparentBrightnessModifier.setName("Apparent brightness modifier");
     apparentBrightnessModifier.setRange(0, 100);
     apparentBrightnessModifier.setTooltip("Controls the ratio between the selected material's apparent texture brightness and its actual light output.");
     apparentBrightnessModifier.clampMin();
