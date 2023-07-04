@@ -20,7 +20,6 @@ package se.llbit.chunky.entity;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -100,57 +99,59 @@ public class SignEntity extends Entity {
     }
   }
 
-
   // Facing south.
   protected static Quad[] sides = {
-      // Front face.
-      new Quad(new Vector3(0, 9 / 16., 9 / 16.), new Vector3(1, 9 / 16., 9 / 16.),
-          new Vector3(0, 17 / 16., 9 / 16.), new Vector4(0, 1, 0, 1)),
+    // Front face.
+    new Quad(new Vector3(0, 9 / 16., 9 / 16.), new Vector3(1, 9 / 16., 9 / 16.),
+      new Vector3(0, 17 / 16., 9 / 16.), new Vector4(2 / 64., 26 / 64., 18 / 32., 30 / 32.)),
 
-      // Back face.
-      new Quad(new Vector3(1, 9 / 16., 7 / 16.), new Vector3(0, 9 / 16., 7 / 16.),
-          new Vector3(1, 17 / 16., 7 / 16.), new Vector4(28 / 64., 52 / 64., 18 / 32., 30 / 32.)),
+    // Back face.
+    new Quad(new Vector3(1, 9 / 16., 7 / 16.), new Vector3(0, 9 / 16., 7 / 16.),
+      new Vector3(1, 17 / 16., 7 / 16.), new Vector4(28 / 64., 52 / 64., 18 / 32., 30 / 32.)),
 
-      // Left face.
-      new Quad(new Vector3(0, 9 / 16., 7 / 16.), new Vector3(0, 9 / 16., 9 / 16.),
-          new Vector3(0, 17 / 16., 7 / 16.), new Vector4(0, 2 / 64., 18 / 32., 30 / 32.)),
+    // Left face.
+    new Quad(new Vector3(0, 9 / 16., 7 / 16.), new Vector3(0, 9 / 16., 9 / 16.),
+      new Vector3(0, 17 / 16., 7 / 16.), new Vector4(0, 2 / 64., 18 / 32., 30 / 32.)),
 
-      // Right face.
-      new Quad(new Vector3(1, 9 / 16., 9 / 16.), new Vector3(1, 9 / 16., 7 / 16.),
-          new Vector3(1, 17 / 16., 9 / 16.), new Vector4(26 / 64., 28 / 64., 18 / 32., 30 / 32.)),
+    // Right face.
+    new Quad(new Vector3(1, 9 / 16., 9 / 16.), new Vector3(1, 9 / 16., 7 / 16.),
+      new Vector3(1, 17 / 16., 9 / 16.), new Vector4(26 / 64., 28 / 64., 18 / 32., 30 / 32.)),
 
-      // Top face.
-      new Quad(new Vector3(1, 17 / 16., 7 / 16.), new Vector3(0, 17 / 16., 7 / 16.),
-          new Vector3(1, 17 / 16., 9 / 16.), new Vector4(2 / 64., 26 / 64., 1, 30 / 32.)),
+    // Top face.
+    new Quad(new Vector3(1, 17 / 16., 7 / 16.), new Vector3(0, 17 / 16., 7 / 16.),
+      new Vector3(1, 17 / 16., 9 / 16.), new Vector4(2 / 64., 26 / 64., 1, 30 / 32.)),
 
-      // Bottom face.
-      new Quad(new Vector3(0, 9 / 16., 7 / 16.), new Vector3(1, 9 / 16., 7 / 16.),
-          new Vector3(0, 9 / 16., 9 / 16.), new Vector4(26 / 64., 50 / 64., 1, 30 / 32.)),
+    // Bottom face.
+    new Quad(new Vector3(0, 9 / 16., 7 / 16.), new Vector3(1, 9 / 16., 7 / 16.),
+      new Vector3(0, 9 / 16., 9 / 16.), new Vector4(26 / 64., 50 / 64., 1, 30 / 32.)),
 
-      // Post front.
-      new Quad(new Vector3(7 / 16., 0, 9 / 16.), new Vector3(9 / 16., 0, 9 / 16.),
-          new Vector3(7 / 16., 9 / 16., 9 / 16.),
-          new Vector4(2 / 64., 4 / 64., 2 / 32., 16 / 32.)),
+    // Post front.
+    new Quad(new Vector3(7 / 16., 0, 9 / 16.), new Vector3(9 / 16., 0, 9 / 16.),
+      new Vector3(7 / 16., 9 / 16., 9 / 16.),
+      new Vector4(2 / 64., 4 / 64., 2 / 32., 16 / 32.)),
 
-      // Post back.
-      new Quad(new Vector3(9 / 16., 0, 7 / 16.), new Vector3(7 / 16., 0, 7 / 16.),
-          new Vector3(9 / 16., 9 / 16., 7 / 16.),
-          new Vector4(4 / 64., 6 / 64., 2 / 32., 16 / 32.)),
+    // Post back.
+    new Quad(new Vector3(9 / 16., 0, 7 / 16.), new Vector3(7 / 16., 0, 7 / 16.),
+      new Vector3(9 / 16., 9 / 16., 7 / 16.),
+      new Vector4(4 / 64., 6 / 64., 2 / 32., 16 / 32.)),
 
-      // Post left.
-      new Quad(new Vector3(7 / 16., 0, 7 / 16.), new Vector3(7 / 16., 0, 9 / 16.),
-          new Vector3(7 / 16., 9 / 16., 7 / 16.), new Vector4(0, 2 / 64., 2 / 32., 16 / 32.)),
+    // Post left.
+    new Quad(new Vector3(7 / 16., 0, 7 / 16.), new Vector3(7 / 16., 0, 9 / 16.),
+      new Vector3(7 / 16., 9 / 16., 7 / 16.), new Vector4(0, 2 / 64., 2 / 32., 16 / 32.)),
 
-      // Post right.
-      new Quad(new Vector3(9 / 16., 0, 9 / 16.), new Vector3(9 / 16., 0, 7 / 16.),
-          new Vector3(9 / 16., 9 / 16., 9 / 16.),
-          new Vector4(6 / 64., 8 / 64., 2 / 32., 16 / 32.)),
+    // Post right.
+    new Quad(new Vector3(9 / 16., 0, 9 / 16.), new Vector3(9 / 16., 0, 7 / 16.),
+      new Vector3(9 / 16., 9 / 16., 9 / 16.),
+      new Vector4(6 / 64., 8 / 64., 2 / 32., 16 / 32.)),
 
-      // Post bottom.
-      new Quad(new Vector3(7 / 16., 0, 7 / 16.), new Vector3(9 / 16., 0, 7 / 16.),
-          new Vector3(7 / 16., 0, 9 / 16.), new Vector4(4 / 64., 6 / 64., 16 / 32., 18 / 32.)),
+    // Post bottom.
+    new Quad(new Vector3(7 / 16., 0, 7 / 16.), new Vector3(9 / 16., 0, 7 / 16.),
+      new Vector3(7 / 16., 0, 9 / 16.), new Vector4(4 / 64., 6 / 64., 16 / 32., 18 / 32.)),
 
   };
+
+  private static Quad[] frontFaceWithText = new Quad[16];
+  private static Quad[] backFaceWithText = new Quad[16];
 
   private static final Quad[][] rot = new Quad[16][];
 
@@ -160,38 +161,95 @@ public class SignEntity extends Entity {
     for (int i = 1; i < 16; ++i) {
       rot[i] = Model.rotateY(sides, -i * Math.PI / 8);
     }
+
+    frontFaceWithText[0] = new Quad(new Vector3(0, 9 / 16., 9 / 16.), new Vector3(1, 9 / 16., 9 / 16.),
+      new Vector3(0, 17 / 16., 9 / 16.), new Vector4(0, 1, 0, 1));
+    for (int i = 1; i < 16; ++i) {
+      frontFaceWithText[i] = frontFaceWithText[0].transform(Transform.NONE.rotateY(-i * Math.PI / 8));
+    }
+
+    backFaceWithText[0] = new Quad(new Vector3(1, 9 / 16., 7 / 16.), new Vector3(0, 9 / 16., 7 / 16.),
+      new Vector3(1, 17 / 16., 7 / 16.), new Vector4(0, 1, 0, 1));
+    for (int i = 1; i < 16; ++i) {
+      backFaceWithText[i] = backFaceWithText[0].transform(Transform.NONE.rotateY(-i * Math.PI / 8));
+    }
   }
 
-  private final JsonArray[] text;
+  private final JsonArray[] frontText;
+  private final JsonArray[] backText;
   private final int angle;
   private final SignTexture frontTexture;
+  private final SignTexture backTexture;
   private final Texture texture;
   private final String material;
 
   public SignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
-    this(position, getTextLines(entityTag), blockData & 0xF, material);
+    this(position, getFrontTextLines(entityTag), getBackTextLines(entityTag), blockData & 0xF, material);
   }
 
-  public SignEntity(Vector3 position, JsonArray[] text, int direction, String material) {
+  public SignEntity(Vector3 position, JsonArray[] frontText, JsonArray[] backText, int direction, String material) {
     super(position);
     Texture signTexture = SignEntity.textureFromMaterial(material);
-    this.text = text;
+    this.frontText = frontText;
+    this.backText = backText;
     this.angle = direction;
-    this.frontTexture = new SignTexture(text, signTexture);
+    this.frontTexture = frontText != null ? new SignTexture(frontText, signTexture, false) : null;
+    this.backTexture = backText != null ? new SignTexture(backText, signTexture, true) : null;
     this.texture = signTexture;
     this.material = material;
   }
 
   /**
-   * Extracts the text lines from a sign entity tag.
+   * Extracts the front text lines from a sign entity tag.
    *
    * @return array of text lines.
    */
-  protected static JsonArray[] getTextLines(CompoundTag entityTag) {
-    return new JsonArray[] {
+  protected static JsonArray[] getFrontTextLines(CompoundTag entityTag) {
+    if (!entityTag.get("front_text").isError()) {
+      // 1.20+ sign
+      Tag lines = entityTag.get("front_text").get("messages");
+      JsonArray[] extractedText = new JsonArray[]{
+        extractText(lines.get(0)), extractText(lines.get(1)),
+        extractText(lines.get(2)), extractText(lines.get(3)),
+      };
+      if (isEmpty(extractedText)) {
+        return null;
+      }
+      return extractedText;
+    } else {
+      // < 1.20 sign
+      JsonArray[] extractedText = new JsonArray[]{
         extractText(entityTag.get("Text1")), extractText(entityTag.get("Text2")),
         extractText(entityTag.get("Text3")), extractText(entityTag.get("Text4")),
+      };
+      if (isEmpty(extractedText)) {
+        return null;
+      }
+      return extractedText;
+    }
+  }
+
+  /**
+   * Extracts the front text lines from a sign entity tag.
+   *
+   * @return array of text lines.
+   */
+  protected static JsonArray[] getBackTextLines(CompoundTag entityTag) {
+    if (entityTag.get("back_text").isError()) {
+      // < 1.20 sign
+      return null;
+    }
+
+    // 1.20+ sign
+    Tag lines = entityTag.get("back_text").get("messages");
+    JsonArray[] extractedText = new JsonArray[]{
+      extractText(lines.get(0)), extractText(lines.get(1)),
+      extractText(lines.get(2)), extractText(lines.get(3)),
     };
+    if (isEmpty(extractedText)) {
+      return null;
+    }
+    return extractedText;
   }
 
   /**
@@ -212,7 +270,7 @@ public class SignEntity extends Entity {
             if (extra.isObject()) {
               JsonObject extraObject = extra.object();
               addText(array, extraObject.get("text").stringValue(""),
-                  extraObject.get("color").stringValue(""));
+                extraObject.get("color").stringValue(""));
             } else {
               addText(array, extra.stringValue(""));
             }
@@ -230,6 +288,23 @@ public class SignEntity extends Entity {
       addText(array, data);
     }
     return array;
+  }
+
+  /**
+   * Check if the given lines are empty or only whitespace.
+   *
+   * @param lines Lines extracted by {{@link #extractText(Tag)}}
+   * @return True if the lines are empty or only whitespace, false otherwise
+   */
+  private static boolean isEmpty(JsonArray[] lines) {
+    for (JsonArray line : lines) {
+      for (JsonValue text : line) {
+        if (!text.object().get("text").stringValue("").trim().isEmpty()) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   /**
@@ -257,23 +332,37 @@ public class SignEntity extends Entity {
     }
   }
 
-  @Override public Collection<Primitive> primitives(Vector3 offset) {
+  @Override
+  public Collection<Primitive> primitives(Vector3 offset) {
     Collection<Primitive> primitives = new LinkedList<>();
     Transform transform = Transform.NONE
-        .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
+      .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     for (int i = 0; i < sides.length; ++i) {
       Quad quad = rot[angle][i];
-      Material material = new TextureMaterial(i == 0 ? frontTexture : texture);
-      quad.addTriangles(primitives, material, transform);
+      Texture tex = texture;
+      if (i == 0 && frontTexture != null) {
+        tex = frontTexture;
+        quad = frontFaceWithText[angle];
+      } else if (i == 1 && backTexture != null) {
+        tex = backTexture;
+        quad = backFaceWithText[angle];
+      }
+      quad.addTriangles(primitives, new TextureMaterial(tex), transform);
     }
     return primitives;
   }
 
-  @Override public JsonValue toJson() {
+  @Override
+  public JsonValue toJson() {
     JsonObject json = new JsonObject();
     json.add("kind", "sign");
     json.add("position", position.toJson());
-    json.add("text", textToJson(text));
+    if (frontText != null) {
+      json.add("text", textToJson(frontText));
+    }
+    if (backText != null) {
+      json.add("backText", textToJson(backText));
+    }
     json.add("direction", angle);
     json.add("material", material);
     return json;
@@ -285,10 +374,17 @@ public class SignEntity extends Entity {
   public static Entity fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
-    JsonArray[] text = textFromJson(json.get("text"));
+    JsonArray[] frontText = null;
+    if (json.get("text").isArray()) {
+      frontText = textFromJson(json.get("text"));
+    }
+    JsonArray[] backText = null;
+    if (json.get("backText").isArray()) {
+      backText = textFromJson(json.get("backText"));
+    }
     int direction = json.get("direction").intValue(0);
     String material = json.get("material").stringValue("oak");
-    return new SignEntity(position, text, direction, material);
+    return new SignEntity(position, frontText, backText, direction, material);
   }
 
   /**

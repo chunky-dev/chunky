@@ -206,6 +206,9 @@ public class Sun implements JsonSerializable {
   }
 
   private void initSun() {
+    radiusCos = FastMath.cos(radius);
+    radiusSin = FastMath.sin(radius);
+
     double theta = azimuth;
     double phi = altitude;
 
@@ -419,8 +422,6 @@ public class Sun implements JsonSerializable {
    */
   public void setSunRadius(double value) {
     radius = value;
-    radiusCos = FastMath.cos(radius);
-    radiusSin = FastMath.sin(radius);
     initSun();
     scene.refresh();
   }
