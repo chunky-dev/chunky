@@ -20,7 +20,7 @@ import java.util.LinkedList;
 public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
 
   private static final Vector4 TOP_UV_MAP = new Vector4(14 / 32., 28 / 32., 19 / 32., 5 / 32.);
-  private static final Vector4 BOTTOM_UV_MAP = new Vector4(6.5 / 16, 6.5 / 16, 5.5 / 16, 5.5 / 16);
+  private static final Vector4 BOTTOM_UV_MAP = new Vector4(0 / 32., 14 / 32., 5 / 32., 19 / 32.);
   private static final Vector4 SIDE_UV_MAP = new Vector4(1 / 16., 15 / 16., 0., 1.);
 
   private static final Quad NORTH_SIDE = new Quad(
@@ -165,7 +165,7 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
       // sherds[2] right crafting slot -> east
       getTextureForsherd(sherds[2]),
       Texture.decoratedPotBase, // top
-      Texture.decoratedPotSide  // bottom
+      Texture.decoratedPotBase  // bottom
     });
   }
 
