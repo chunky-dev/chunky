@@ -100,6 +100,8 @@ public class Quad {
 
   /**
    * Create a new single sided quad
+   * <br>
+   * For some visualizations, see this PR: <a href="https://github.com/chunky-dev/chunky/pull/1603">#1603</a>
    *
    * @param v0 Bottom left vector
    * @param v1 Bottom right vector
@@ -113,6 +115,8 @@ public class Quad {
 
   /**
    * Create new quad
+   * <br>
+   * For some visualizations, see this PR: <a href="https://github.com/chunky-dev/chunky/pull/1603">#1603</a>
    *
    * @param v0 Bottom left vector
    * @param v1 Bottom right vector
