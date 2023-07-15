@@ -269,6 +269,8 @@ public class Ray {
    * Set this ray to a random diffuse reflection of the input ray.
    */
   public final void diffuseReflection(Ray ray, Random random) {
+    boolean SUN_SAMPLING_TEST = true;
+
     set(ray);
 
     // get random point on unit disk
@@ -276,6 +278,10 @@ public class Ray {
     double x2 = random.nextDouble();
     double r = FastMath.sqrt(x1);
     double theta = 2 * Math.PI * x2;
+
+    if(SUN_SAMPLING_TEST) {
+
+    }
 
     // project to point on hemisphere in tangent space
     double tx = r * FastMath.cos(theta);
@@ -314,6 +320,11 @@ public class Ray {
     d.x = ux * tx + vx * ty + n.x * tz;
     d.y = uy * tx + vy * ty + n.y * tz;
     d.z = uz * tx + vz * ty + n.z * tz;
+//    if(random.nextFloat() < 0.5) {
+//      d.x = -0.5;
+//      d.y = 0.7071;
+//      d.z = 0.5;
+//    }
 
     o.scaleAdd(Ray.OFFSET, d);
     currentMaterial = prevMaterial;
