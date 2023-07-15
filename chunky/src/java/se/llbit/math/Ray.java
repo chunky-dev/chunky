@@ -279,14 +279,31 @@ public class Ray {
     double r = FastMath.sqrt(x1);
     double theta = 2 * Math.PI * x2;
 
-    if(SUN_SAMPLING_TEST) {
-
-    }
-
     // project to point on hemisphere in tangent space
     double tx = r * FastMath.cos(theta);
     double ty = r * FastMath.sin(theta);
     double tz = FastMath.sqrt(1 - x1);
+
+    if(SUN_SAMPLING_TEST) {
+      double DESIRED_DX = -0.5;
+      double DESIRED_DY = FastMath.sqrt(0.5);
+      double DESIRED_DZ = 0.5;
+      double desired_tx, desired_ty, desired_tz;
+      if(QuickMath.abs(n.x) > .1) {
+        desired_tx = DESIRED_DX*n.z*(n.y*n.y - n.x*n.x - n.z*n.z) + DESIRED_DZ*n.x*(n.x*n.x - n.y*n.y + n.z*n.z);
+        desired_ty = DESIRED_DX*n.x*n.y - DESIRED_DY*(n.x*n.x + n.z*n.z) + DESIRED_DZ*(n.y*n.z);
+        desired_tz = -DESIRED_DX*n.x + DESIRED_DY*n.y - DESIRED_DZ*n.z;
+        double sqrtxz = FastMath.sqrt(n.x*n.x+n.z*n.z);
+        desired_tx /= sqrtxz;
+        desired_ty /= sqrtxz;
+        if(desired_tz > 0) {
+          tx = desired_tx;
+          ty = desired_ty;
+          tz = desired_tz;
+        }
+      }
+
+    }
 
     // transform from tangent space to world space
     double xx, xy, xz;
