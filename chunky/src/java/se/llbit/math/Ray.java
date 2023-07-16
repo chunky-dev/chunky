@@ -289,20 +289,25 @@ public class Ray {
       double DESIRED_DZ = 0.5;
       double DESIRED_DY = FastMath.sqrt(1 - DESIRED_DX*DESIRED_DX - DESIRED_DZ*DESIRED_DZ);
       double desired_tx, desired_ty, desired_tz;
+      desired_tz = DESIRED_DX*n.x + DESIRED_DY*n.y + DESIRED_DZ*n.z;
       if(QuickMath.abs(n.x) > .1) {
         desired_tx = DESIRED_DX*n.z - DESIRED_DZ*n.x;
-        desired_ty = DESIRED_DX*n.x*n.y - DESIRED_DY*(n.x*n.x + n.z*n.z) + DESIRED_DZ*(n.y*n.z);
-        desired_tz = DESIRED_DX*n.x + DESIRED_DY*n.y + DESIRED_DZ*n.z;
+        desired_ty = DESIRED_DX*n.x*n.y - DESIRED_DY*(n.x*n.x + n.z*n.z) + DESIRED_DZ*n.y*n.z;
         double sqrtxz = FastMath.sqrt(n.x*n.x+n.z*n.z);
         desired_tx /= sqrtxz;
         desired_ty /= sqrtxz;
-        if(desired_tz > 0) {
-          tx = desired_tx;
-          ty = desired_ty;
-          tz = desired_tz;
-        }
+      } else {
+        desired_tx = DESIRED_DZ*n.y - DESIRED_DY*n.z;
+        desired_ty = DESIRED_DY*n.x*n.y - DESIRED_DX*(n.y*n.y + n.z*n.z) + DESIRED_DZ*n.x*n.z;
+        double sqrtyz = FastMath.sqrt(n.y*n.y+n.z*n.z);
+        desired_tx /= sqrtyz;
+        desired_ty /= sqrtyz;
       }
-
+      if(desired_tz > 0) {
+        tx = desired_tx;
+        ty = desired_ty;
+        tz = desired_tz;
+      }
     }
 
     // transform from tangent space to world space
