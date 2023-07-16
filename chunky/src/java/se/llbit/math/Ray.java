@@ -285,14 +285,14 @@ public class Ray {
     double tz = FastMath.sqrt(1 - x1);
 
     if(SUN_SAMPLING_TEST) {
-      double DESIRED_DX = -0.5;
-      double DESIRED_DY = FastMath.sqrt(0.5);
+      double DESIRED_DX = 0.5;
       double DESIRED_DZ = 0.5;
+      double DESIRED_DY = FastMath.sqrt(1 - DESIRED_DX*DESIRED_DX - DESIRED_DZ*DESIRED_DZ);
       double desired_tx, desired_ty, desired_tz;
       if(QuickMath.abs(n.x) > .1) {
-        desired_tx = DESIRED_DX*n.z*(n.y*n.y - n.x*n.x - n.z*n.z) + DESIRED_DZ*n.x*(n.x*n.x - n.y*n.y + n.z*n.z);
+        desired_tx = DESIRED_DX*n.z - DESIRED_DZ*n.x;
         desired_ty = DESIRED_DX*n.x*n.y - DESIRED_DY*(n.x*n.x + n.z*n.z) + DESIRED_DZ*(n.y*n.z);
-        desired_tz = -DESIRED_DX*n.x + DESIRED_DY*n.y - DESIRED_DZ*n.z;
+        desired_tz = DESIRED_DX*n.x + DESIRED_DY*n.y + DESIRED_DZ*n.z;
         double sqrtxz = FastMath.sqrt(n.x*n.x+n.z*n.z);
         desired_tx /= sqrtxz;
         desired_ty /= sqrtxz;
@@ -337,11 +337,6 @@ public class Ray {
     d.x = ux * tx + vx * ty + n.x * tz;
     d.y = uy * tx + vy * ty + n.y * tz;
     d.z = uz * tx + vz * ty + n.z * tz;
-//    if(random.nextFloat() < 0.5) {
-//      d.x = -0.5;
-//      d.y = 0.7071;
-//      d.z = 0.5;
-//    }
 
     o.scaleAdd(Ray.OFFSET, d);
     currentMaterial = prevMaterial;
