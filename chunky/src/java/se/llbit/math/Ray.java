@@ -270,10 +270,6 @@ public class Ray {
    */
   public final void diffuseReflection(Ray ray, Random random, Scene scene) {
 
-    double DEFAULT_CIRCLE_RADIUS = scene.sun().getSunRadius() * scene.sun().getDiffuseSampleRadius();
-    double MIN_CIRCLE_RADIUS = DEFAULT_CIRCLE_RADIUS / 10;
-    double SUN_SAMPLE_CHANCE = scene.sun().getDiffuseSampleChance();
-
     set(ray);
 
     // get random point on unit disk
@@ -285,54 +281,73 @@ public class Ray {
     // project to point on hemisphere in tangent space
     double tx = r * FastMath.cos(theta);
     double ty = r * FastMath.sin(theta);
+    double tz; // to be initialized later, after potentially changing tx and ty
 
+    // diffuse sun sampling (importance sampling)
     if(scene.getSunSamplingStrategy().isDiffuseSampling()) {
-      double sun_az = scene.sun().getAzimuth();
-      double sun_alt = scene.sun().getAltitude();
-      double desired_dx = FastMath.cos(sun_az)*FastMath.cos(sun_alt);
-      double desired_dz = FastMath.sin(sun_az)*FastMath.cos(sun_alt);
-      double desired_dy = FastMath.sin(sun_alt);
-      double desired_tx, desired_ty, desired_tz;
-      desired_tz = desired_dx*n.x + desired_dy*n.y + desired_dz*n.z;
-      if(desired_tz > 0) {
+
+      // constants
+      final double DEFAULT_CIRCLE_RADIUS = scene.sun().getSunRadius() * scene.sun().getDiffuseSampleRadius();
+      final double MIN_CIRCLE_RADIUS = DEFAULT_CIRCLE_RADIUS / 10;
+      final double SUN_SAMPLE_CHANCE = scene.sun().getDiffuseSampleChance();
+
+      final double sun_az = scene.sun().getAzimuth();
+      final double sun_alt = scene.sun().getAltitude();
+      final double sun_dx = FastMath.cos(sun_az)*FastMath.cos(sun_alt);
+      final double sun_dz = FastMath.sin(sun_az)*FastMath.cos(sun_alt);
+      final double sun_dy = FastMath.sin(sun_alt);
+
+      // determine the sun direction in tangent space
+      // since we know the sun's direction in world space easily, we must reverse the algebra done later in this method
+      // (I calculated the inverse matrix by hand and it was not fun)
+      double sun_tx, sun_ty, sun_tz;
+      sun_tz = sun_dx*n.x + sun_dy*n.y + sun_dz*n.z;
+      if(sun_tz > 0) { // if sun_tz is negative, that means that the sun is behind the current surface, so skip sampling
         if(QuickMath.abs(n.x) > .1) {
-          desired_tx = desired_dx * n.z - desired_dz * n.x;
-          desired_ty = desired_dx * n.x * n.y - desired_dy * (n.x * n.x + n.z * n.z) + desired_dz * n.y * n.z;
+          sun_tx = sun_dx * n.z - sun_dz * n.x;
+          sun_ty = sun_dx * n.x * n.y - sun_dy * (n.x * n.x + n.z * n.z) + sun_dz * n.y * n.z;
           double sqrtxz = FastMath.hypot(n.x, n.z);
-          desired_tx /= sqrtxz;
-          desired_ty /= sqrtxz;
+          sun_tx /= sqrtxz;
+          sun_ty /= sqrtxz;
         } else {
-          desired_tx = desired_dz * n.y - desired_dy * n.z;
-          desired_ty = desired_dy * n.x * n.y - desired_dx * (n.y * n.y + n.z * n.z) + desired_dz * n.x * n.z;
+          sun_tx = sun_dz * n.y - sun_dy * n.z;
+          sun_ty = sun_dy * n.x * n.y - sun_dx * (n.y * n.y + n.z * n.z) + sun_dz * n.x * n.z;
           double sqrtzy = FastMath.hypot(n.z, n.y);
-          desired_tx /= sqrtzy;
-          desired_ty /= sqrtzy;
+          sun_tx /= sqrtzy;
+          sun_ty /= sqrtzy;
         }
-        double circle_radius = FastMath.min(DEFAULT_CIRCLE_RADIUS, 1 - FastMath.hypot(desired_tx, desired_ty) - Ray.EPSILON);
+        // radius of the circle being sampled, but must not go outside the unit circle
+        double circle_radius = FastMath.min(DEFAULT_CIRCLE_RADIUS, 1 - FastMath.hypot(sun_tx, sun_ty) - Ray.EPSILON);
+        // if the circle radius is reduced, also reduce the sample chance
         double sample_chance = SUN_SAMPLE_CHANCE * circle_radius * circle_radius / (DEFAULT_CIRCLE_RADIUS * DEFAULT_CIRCLE_RADIUS);
         if(circle_radius >= MIN_CIRCLE_RADIUS) {
           if(random.nextDouble() < sample_chance) {
-            tx = desired_tx + tx * circle_radius;
-            ty = desired_ty + ty * circle_radius;
+            // sun sampling
+            tx = sun_tx + tx * circle_radius;
+            ty = sun_ty + ty * circle_radius;
+            // diminish the contribution of the ray based on the circle area and the sample chance
             ray.color.scale(circle_radius * circle_radius / sample_chance);
           } else {
-            while(FastMath.hypot(tx - desired_tx, ty - desired_ty) < circle_radius) {
-              tx -= desired_tx;
-              ty -= desired_ty;
-              // Avoid very unlikely infinite loop
+            // non-sun sampling
+            // now, rather than guaranteeing that the ray is cast within a circle, instead guarantee that it does not
+            while(FastMath.hypot(tx - sun_tx, ty - sun_ty) < circle_radius) {
+              tx -= sun_tx;
+              ty -= sun_ty;
+              // avoid very unlikely infinite loop
               if(tx == 0 && ty == 0) {
                 break;
               }
               tx /= circle_radius;
               ty /= circle_radius;
             }
+            // correct for the fact that we are now undersampling everything but the sun
             ray.color.scale((1 - circle_radius * circle_radius) / (1 - sample_chance));
           }
         }
       }
     }
 
-    double tz = FastMath.sqrt(1 - tx*tx - ty*ty);
+    tz = FastMath.sqrt(1 - tx*tx - ty*ty);
 
     // transform from tangent space to world space
     double xx, xy, xz;
