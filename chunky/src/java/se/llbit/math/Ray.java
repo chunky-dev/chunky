@@ -268,8 +268,13 @@ public class Ray {
   /**
    * Set this ray to a random diffuse reflection of the input ray.
    */
-  public final void diffuseReflection(Ray ray, Random random) {
+  public final void diffuseReflection(Ray ray, Random random, Scene scene) {
+
+    //TODO: Make these configurable
     boolean SUN_SAMPLING_TEST = true;
+    double DEFAULT_CIRCLE_RADIUS = scene.sun().getSunRadius() * 1.2;
+    double MIN_CIRCLE_RADIUS = DEFAULT_CIRCLE_RADIUS / 10;
+    double SUN_SAMPLE_CHANCE = 0.25;
 
     set(ray);
 
@@ -282,33 +287,54 @@ public class Ray {
     // project to point on hemisphere in tangent space
     double tx = r * FastMath.cos(theta);
     double ty = r * FastMath.sin(theta);
-    double tz = FastMath.sqrt(1 - x1);
 
     if(SUN_SAMPLING_TEST) {
-      double DESIRED_DX = 0.5;
-      double DESIRED_DZ = 0.5;
-      double DESIRED_DY = FastMath.sqrt(1 - DESIRED_DX*DESIRED_DX - DESIRED_DZ*DESIRED_DZ);
+      double sun_az = scene.sun().getAzimuth();
+      double sun_alt = scene.sun().getAltitude();
+      double desired_dx = FastMath.cos(sun_az)*FastMath.cos(sun_alt);
+      double desired_dz = FastMath.sin(sun_az)*FastMath.cos(sun_alt);
+      double desired_dy = FastMath.sin(sun_alt);
       double desired_tx, desired_ty, desired_tz;
-      desired_tz = DESIRED_DX*n.x + DESIRED_DY*n.y + DESIRED_DZ*n.z;
-      if(QuickMath.abs(n.x) > .1) {
-        desired_tx = DESIRED_DX*n.z - DESIRED_DZ*n.x;
-        desired_ty = DESIRED_DX*n.x*n.y - DESIRED_DY*(n.x*n.x + n.z*n.z) + DESIRED_DZ*n.y*n.z;
-        double sqrtxz = FastMath.sqrt(n.x*n.x+n.z*n.z);
-        desired_tx /= sqrtxz;
-        desired_ty /= sqrtxz;
-      } else {
-        desired_tx = DESIRED_DZ*n.y - DESIRED_DY*n.z;
-        desired_ty = DESIRED_DY*n.x*n.y - DESIRED_DX*(n.y*n.y + n.z*n.z) + DESIRED_DZ*n.x*n.z;
-        double sqrtyz = FastMath.sqrt(n.y*n.y+n.z*n.z);
-        desired_tx /= sqrtyz;
-        desired_ty /= sqrtyz;
-      }
+      desired_tz = desired_dx*n.x + desired_dy*n.y + desired_dz*n.z;
       if(desired_tz > 0) {
-        tx = desired_tx;
-        ty = desired_ty;
-        tz = desired_tz;
+        if(QuickMath.abs(n.x) > .1) {
+          desired_tx = desired_dx * n.z - desired_dz * n.x;
+          desired_ty = desired_dx * n.x * n.y - desired_dy * (n.x * n.x + n.z * n.z) + desired_dz * n.y * n.z;
+          double sqrtxz = FastMath.hypot(n.x, n.z);
+          desired_tx /= sqrtxz;
+          desired_ty /= sqrtxz;
+        } else {
+          desired_tx = desired_dz * n.y - desired_dy * n.z;
+          desired_ty = desired_dy * n.x * n.y - desired_dx * (n.y * n.y + n.z * n.z) + desired_dz * n.x * n.z;
+          double sqrtzy = FastMath.hypot(n.z, n.y);
+          desired_tx /= sqrtzy;
+          desired_ty /= sqrtzy;
+        }
+        double circle_radius = FastMath.min(DEFAULT_CIRCLE_RADIUS, 1 - FastMath.hypot(desired_tx, desired_ty) - Ray.EPSILON);
+        double sample_chance = SUN_SAMPLE_CHANCE * circle_radius * circle_radius / (DEFAULT_CIRCLE_RADIUS * DEFAULT_CIRCLE_RADIUS);
+        if(circle_radius >= MIN_CIRCLE_RADIUS) {
+          if(random.nextDouble() < sample_chance) {
+            tx = desired_tx + tx * circle_radius;
+            ty = desired_ty + ty * circle_radius;
+            ray.color.scale(circle_radius * circle_radius / sample_chance);
+          } else {
+            while(FastMath.hypot(tx - desired_tx, ty - desired_ty) < circle_radius) {
+              tx -= desired_tx;
+              ty -= desired_ty;
+              // Avoid very unlikely infinite loop
+              if(tx == 0 && ty == 0) {
+                break;
+              }
+              tx /= circle_radius;
+              ty /= circle_radius;
+            }
+            ray.color.scale((1 - circle_radius * circle_radius) / (1 - sample_chance));
+          }
+        }
       }
     }
+
+    double tz = FastMath.sqrt(1 - tx*tx - ty*ty);
 
     // transform from tangent space to world space
     double xx, xy, xz;

@@ -232,7 +232,7 @@ public class PathTracer implements RayTracer {
                 }
               }
 
-              reflected.diffuseReflection(ray, random);
+              reflected.diffuseReflection(ray, random, scene);
               hit = pathTrace(scene, reflected, state, 0, false) || hit;
               if (hit) {
                 ray.color.x = ray.color.x * (emittance + directLightR * scene.sun.emittance.x + (
@@ -249,7 +249,7 @@ public class PathTracer implements RayTracer {
               }
 
             } else {
-              reflected.diffuseReflection(ray, random);
+              reflected.diffuseReflection(ray, random, scene);
 
               hit = pathTrace(scene, reflected, state, 0, false) || hit;
               if (hit) {
