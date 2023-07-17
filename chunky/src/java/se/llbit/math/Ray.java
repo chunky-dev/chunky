@@ -271,10 +271,9 @@ public class Ray {
   public final void diffuseReflection(Ray ray, Random random, Scene scene) {
 
     //TODO: Make these configurable
-    boolean SUN_SAMPLING_TEST = true;
     double DEFAULT_CIRCLE_RADIUS = scene.sun().getSunRadius() * 1.2;
     double MIN_CIRCLE_RADIUS = DEFAULT_CIRCLE_RADIUS / 10;
-    double SUN_SAMPLE_CHANCE = 0.25;
+    double SUN_SAMPLE_CHANCE = 0.1;
 
     set(ray);
 
@@ -288,7 +287,7 @@ public class Ray {
     double tx = r * FastMath.cos(theta);
     double ty = r * FastMath.sin(theta);
 
-    if(SUN_SAMPLING_TEST) {
+    if(scene.getSunSamplingStrategy().isDiffuseSampling()) {
       double sun_az = scene.sun().getAzimuth();
       double sun_alt = scene.sun().getAltitude();
       double desired_dx = FastMath.cos(sun_az)*FastMath.cos(sun_alt);
