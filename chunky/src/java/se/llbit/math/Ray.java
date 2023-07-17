@@ -270,10 +270,9 @@ public class Ray {
    */
   public final void diffuseReflection(Ray ray, Random random, Scene scene) {
 
-    //TODO: Make these configurable
-    double DEFAULT_CIRCLE_RADIUS = scene.sun().getSunRadius() * 1.2;
+    double DEFAULT_CIRCLE_RADIUS = scene.sun().getSunRadius() * scene.sun().getDiffuseSampleRadius();
     double MIN_CIRCLE_RADIUS = DEFAULT_CIRCLE_RADIUS / 10;
-    double SUN_SAMPLE_CHANCE = 0.1;
+    double SUN_SAMPLE_CHANCE = scene.sun().getDiffuseSampleChance();
 
     set(ray);
 
