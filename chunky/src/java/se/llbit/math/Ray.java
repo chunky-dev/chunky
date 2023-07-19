@@ -312,8 +312,9 @@ public class Ray {
       sun_ty /= sqrt;
       double circle_radius = scene.sun().getSunRadius() * scene.sun().getDiffuseSampleRadius();
       double sample_chance = scene.sun().getDiffuseSampleChance();
+      double sun_alt_relative = FastMath.asin(sun_tz);
       // check if there is any chance of the sun being visible
-      if(FastMath.hypot(sun_tx, sun_ty) - circle_radius < 1) {
+      if(sun_alt_relative + circle_radius > Ray.EPSILON) {
         // if the sun is not at too shallow of an angle, then sample a circular region
         if(FastMath.hypot(sun_tx, sun_ty) + circle_radius + Ray.EPSILON < 1) {
           if (random.nextDouble() < sample_chance) {
@@ -341,7 +342,6 @@ public class Ray {
         } else {
           // the sun is at a shallow angle, so instead we're using a "rectangular-ish segment"
           // it is important that we sample from a shape which we can easily calculate the area of
-          double sun_alt_relative = FastMath.asin(sun_tz);
           double minr = FastMath.cos(sun_alt_relative + circle_radius);
           double maxr = FastMath.cos(FastMath.max(sun_alt_relative - circle_radius, 0));
           double sun_theta = FastMath.atan2(sun_ty, sun_tx);
