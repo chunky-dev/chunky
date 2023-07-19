@@ -298,6 +298,7 @@ public class Ray {
       // since we know the sun's direction in world space easily, we must reverse the algebra done later in this method
       // (I calculated the inverse matrix by hand and it was not fun)
       double sun_tx, sun_ty, sqrt;
+      double sun_tz = sun_dx*n.x + sun_dy*n.y + sun_dz*n.z;
       if(QuickMath.abs(n.x) > .1) {
         sun_tx = sun_dx * n.z - sun_dz * n.x;
         sun_ty = sun_dx * n.x * n.y - sun_dy * (n.x * n.x + n.z * n.z) + sun_dz * n.y * n.z;
@@ -340,14 +341,16 @@ public class Ray {
         } else {
           // the sun is at a shallow angle, so instead we're using a "rectangular-ish segment"
           // it is important that we sample from a shape which we can easily calculate the area of
-          double minr = FastMath.hypot(sun_tx, sun_ty) - circle_radius;
+          double sun_alt_relative = FastMath.asin(sun_tz);
+          double minr = FastMath.cos(sun_alt_relative + circle_radius);
+          double maxr = FastMath.cos(FastMath.max(sun_alt_relative - circle_radius, 0));
           double sun_theta = FastMath.atan2(sun_ty, sun_tx);
-          double segment_area_proportion = ((1 - minr * minr) * circle_radius) / Math.PI;
+          double segment_area_proportion = ((maxr * maxr - minr * minr) * circle_radius) / Math.PI;
           sample_chance *= segment_area_proportion / (circle_radius * circle_radius);
           sample_chance = FastMath.min(sample_chance, Sun.MAX_DIFFUSE_SAMPLE_CHANCE);
           if(random.nextDouble() < sample_chance) {
             // sun sampling
-            r = FastMath.sqrt(1 - (1 - minr * minr) * x1);
+            r = FastMath.sqrt(minr * minr * x1 + maxr * maxr * (1 - x1));
             theta = sun_theta + (2 * x2 - 1) * circle_radius;
             tx = r * FastMath.cos(theta);
             ty = r * FastMath.sin(theta);
