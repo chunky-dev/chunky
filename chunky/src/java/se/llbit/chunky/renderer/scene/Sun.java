@@ -576,9 +576,15 @@ public class Sun implements JsonSerializable {
 
   public double getDiffuseSampleChance() { return diffuseSampleChance; }
 
-  public void setDiffuseSampleChance(double d) { diffuseSampleChance = d; }
+  public void setDiffuseSampleChance(double d) {
+    diffuseSampleChance = d;
+    scene.refresh();
+  }
 
   public double getDiffuseSampleRadius() { return diffuseSampleRadius; }
 
-  public void setDiffuseSampleRadius(double d) { diffuseSampleRadius = d; }
+  public void setDiffuseSampleRadius(double d) {
+    diffuseSampleRadius = d;
+    scene.refresh();
+  }
 }
