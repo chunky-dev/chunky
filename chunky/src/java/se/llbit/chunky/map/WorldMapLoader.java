@@ -177,6 +177,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
       // switching and it would probably be much better to just create a fresh
       // world instance to load.
       loadWorld(world.getWorldDirectory());
+      viewUpdated(mapView.getMapView()); // update visible chunks immediately
     }
   }
 

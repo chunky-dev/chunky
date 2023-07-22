@@ -521,16 +521,18 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     World world = mapLoader.getWorld();
     double blockScale = mapView.scale / 16.;
     for (PlayerEntityData player : world.getPlayerPositions()) {
-      int px = (int) QuickMath.floor(player.x * blockScale);
-      int py = (int) QuickMath.floor(player.y);
-      int pz = (int) QuickMath.floor(player.z * blockScale);
-      int ppx = px - (int) QuickMath.floor(mapView.x0 * mapView.scale);
-      int ppy = pz - (int) QuickMath.floor(mapView.z0 * mapView.scale);
-      int pw = (int) QuickMath.max(16, QuickMath.min(32, blockScale * 4));
-      ppx = Math.min(mapView.width - pw, Math.max(0, ppx - pw / 2));
-      ppy = Math.min(mapView.height - pw, Math.max(0, ppy - pw / 2));
+      if (player.dimension == world.currentDimension()) {
+        int px = (int) QuickMath.floor(player.x * blockScale);
+        int py = (int) QuickMath.floor(player.y);
+        int pz = (int) QuickMath.floor(player.z * blockScale);
+        int ppx = px - (int) QuickMath.floor(mapView.x0 * mapView.scale);
+        int ppy = pz - (int) QuickMath.floor(mapView.z0 * mapView.scale);
+        int pw = (int) QuickMath.max(16, QuickMath.min(32, blockScale * 4));
+        ppx = Math.min(mapView.width - pw, Math.max(0, ppx - pw / 2));
+        ppy = Math.min(mapView.height - pw, Math.max(0, ppy - pw / 2));
 
-      gc.drawImage(Icon.player.fxImage(), ppx, ppy, pw, pw);
+        gc.drawImage(Icon.player.fxImage(), ppx, ppy, pw, pw);
+      }
     }
   }
 
