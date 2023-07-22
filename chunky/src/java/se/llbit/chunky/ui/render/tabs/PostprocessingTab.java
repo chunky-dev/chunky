@@ -30,6 +30,7 @@ import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.DoubleTextField;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.util.ProgressListener;
@@ -46,6 +47,21 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
 
   @FXML private DoubleAdjuster exposure;
   @FXML private ChoiceBox<PostProcessingFilter> postprocessingFilter;
+
+  @FXML private DoubleTextField hableShoulderStrength;
+  @FXML private DoubleTextField hableLinearStrength;
+  @FXML private DoubleTextField hableLinearAngle;
+  @FXML private DoubleTextField hableToeStrength;
+  @FXML private DoubleTextField hableToeNumerator;
+  @FXML private DoubleTextField hableToeDenominator;
+  @FXML private DoubleTextField hableLinearWhitePointValue;
+
+  @FXML private DoubleTextField ue4Saturation;
+  @FXML private DoubleTextField ue4Slope;
+  @FXML private DoubleTextField ue4Toe;
+  @FXML private DoubleTextField ue4Shoulder;
+  @FXML private DoubleTextField ue4BlackClip;
+  @FXML private DoubleTextField ue4WhiteClip;
 
   public PostprocessingTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("PostprocessingTab.fxml"));
