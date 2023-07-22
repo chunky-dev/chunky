@@ -250,10 +250,10 @@ public class Scene implements JsonSerializable, Refreshable {
   public Map<String, JsonValue> materials = new HashMap<>();
 
   /** Lower Y clip plane. */
-  public int yClipMin = PersistentSettings.getYClipMin();
+  public int yClipMin = 0;
 
   /** Upper Y clip plane. */
-  public int yClipMax = PersistentSettings.getYClipMax();
+  public int yClipMax = 256;
 
   /**
    * Current time in seconds. Adjusts animated blocks like fire.

@@ -55,11 +55,9 @@
         <VBox spacing="10.0">
           <HBox alignment="CENTER_LEFT" spacing="10.0">
             <IntegerAdjuster fx:id="yMin" name="Min Y level" />
-            <Button fx:id="setDefaultYMin" mnemonicParsing="false" text="Set default" />
           </HBox>
           <HBox alignment="CENTER_LEFT" spacing="10.0">
             <IntegerAdjuster fx:id="yMax" name="Max Y level" />
-            <Button fx:id="setDefaultYMax" mnemonicParsing="false" text="Set default" />
           </HBox>
           <Text fx:id="yClipInvalid" styleClass="invalid" managed="false" visible="false">Min Y level must be smaller than Max Y level.</Text>
         </VBox>
