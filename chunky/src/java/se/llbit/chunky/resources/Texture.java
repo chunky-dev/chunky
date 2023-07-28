@@ -1305,6 +1305,12 @@ public class Texture {
   public static final Texture pitcherCropTopStage3 = new Texture();
   @TexturePath("assets/minecraft/textures/block/pitcher_crop_top_stage_4")
   public static final Texture pitcherCropTopStage4 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pitcher_crop_top")
+  public static final Texture pitcherCropTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pitcher_crop_side")
+  public static final Texture pitcherCropSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pitcher_crop_bottom")
+  public static final Texture pitcherCropBottom = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
