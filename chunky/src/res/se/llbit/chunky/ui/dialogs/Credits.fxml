@@ -31,7 +31,7 @@
                     <Font name="System Bold" size="14.0"/>
                   </font>
                 </Label>
-                <Label text="Copyright (c) 2010-2022, Jesper Öqvist and Chunky contributors." wrapText="true">
+                <Label text="Copyright (c) 2010-2023, Jesper Öqvist and Chunky contributors." wrapText="true">
                   <padding>
                     <Insets top="10.0"/>
                   </padding>
