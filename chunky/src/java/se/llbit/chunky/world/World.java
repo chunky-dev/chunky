@@ -16,37 +16,19 @@
  */
 package se.llbit.chunky.world;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.chunk.ChunkData;
-import se.llbit.chunky.chunk.GenericChunkData;
-import se.llbit.chunky.chunk.SimpleChunkData;
-import se.llbit.chunky.map.MapView;
-import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.ui.ProgressTracker;
-import se.llbit.chunky.entity.PlayerEntity;
-import se.llbit.chunky.world.listeners.ChunkDeletionListener;
-import se.llbit.chunky.world.listeners.ChunkTopographyListener;
-import se.llbit.chunky.world.listeners.ChunkUpdateListener;
-import se.llbit.chunky.world.region.*;
+import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.log.Log;
-import se.llbit.math.Vector3;
+import se.llbit.math.Vector3i;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.MinecraftText;
 import se.llbit.util.Pair;
-import se.llbit.util.annotation.Nullable;
+import se.llbit.util.annotation.NotNull;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -79,30 +61,16 @@ public class World implements Comparable<World> {
   public static final int VERSION_21W06A = 2694;
   public static final int VERSION_1_12_2 = 1343;
 
-  protected final Long2ObjectMap<Region> regionMap = new Long2ObjectOpenHashMap<>();
-
   private final File worldDirectory;
-  private Set<PlayerEntityData> playerEntities;
-  private final boolean haveSpawnPos;
-  private int playerDimension = 0;
-  private final int dimension;
 
-  private final Heightmap heightmap = new Heightmap();
+  protected Dimension currentDimension;
+  protected int currentDimensionId;
 
   private final String levelName;
-
-  private final Collection<ChunkDeletionListener> chunkDeletionListeners = new LinkedList<>();
-  private final Collection<ChunkTopographyListener> chunkTopographyListeners = new LinkedList<>();
-  private final Collection<ChunkUpdateListener> chunkUpdateListeners = new LinkedList<>();
-  private int spawnX;
-  private int spawnY;
-  private int spawnZ;
-
   private int gameMode = 0;
+  private final long seed;
 
   private int versionId;
-
-  private final long seed;
 
   /** Timestamp for level.dat when player data was last loaded. */
   private long timestamp;
@@ -110,18 +78,12 @@ public class World implements Comparable<World> {
   /**
    * @param levelName name of the world (not the world directory).
    * @param worldDirectory Minecraft world directory.
-   * @param dimension the dimension to load.
-   * @param haveSpawnPos
    * @param seed
    * @param timestamp
    */
-  protected World(String levelName, File worldDirectory, int dimension,
-      Set<PlayerEntityData> playerEntities, boolean haveSpawnPos, long seed, long timestamp) {
+  protected World(String levelName, File worldDirectory, long seed, long timestamp) {
     this.levelName = levelName;
     this.worldDirectory = worldDirectory;
-    this.dimension = dimension;
-    this.playerEntities = playerEntities;
-    this.haveSpawnPos = haveSpawnPos;
     this.seed = seed;
     this.timestamp = timestamp;
   }
@@ -136,7 +98,7 @@ public class World implements Comparable<World> {
    *
    * @return {@code true} if the world data was loaded
    */
-  public static World loadWorld(File worldDirectory, int dimension, LoggedWarnings warnings) {
+  public static World loadWorld(File worldDirectory, int dimensionId, LoggedWarnings warnings) {
     if (worldDirectory == null) {
       return EmptyWorld.INSTANCE;
     }
@@ -172,30 +134,35 @@ public class World implements Comparable<World> {
 
       long seed = randomSeed.longValue(0);
 
-      Set<PlayerEntityData> playerEntities = new HashSet<>();
-      if (!player.isError()) {
-        playerEntities.add(new PlayerEntityData(player));
-      }
-      loadAdditionalPlayers(worldDirectory, playerEntities);
-
-      boolean haveSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
+      Set<PlayerEntityData> playerEntities = getPlayerEntityData(worldDirectory, dimensionId, player);
 
       World world;
-      Tag isCubic = result.get(".Data.isCubicWorld");
-      if (isCubic != null && isCubic.byteValue(0) == 1) {
-        world = new CubicWorld(levelName, worldDirectory, dimension,
-          playerEntities, haveSpawnPos, seed, modtime);
-      } else {
-        world = new World(levelName, worldDirectory, dimension,
-          playerEntities, haveSpawnPos, seed, modtime);
+//      Tag isCubic = result.get(".Data.isCubicWorld");
+//      if (isCubic != null && isCubic.byteValue(0) == 1) {
+//        world = new CubicWorld(levelName, worldDirectory, dimensionId,
+//          playerEntities, haveSpawnPos, seed, modtime);
+//      } else {
+        world = new World(levelName, worldDirectory, seed, modtime);
+//      }
+      world.gameMode = gameType.intValue(0);
+      world.versionId = versionId.intValue();
+
+      Dimension dimension = new Dimension(
+        world,
+        "?",
+        dimensionId,
+        dimensionId == 0 ? worldDirectory : new File(worldDirectory, "DIM" + dimensionId),
+        playerEntities,
+        modtime
+      );
+
+      boolean haveSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
+      if (haveSpawnPos) {
+        dimension.spawnPos(new Vector3i(spawnX.intValue(0), spawnY.intValue(0), spawnZ.intValue(0)));
       }
 
-      world.spawnX = spawnX.intValue();
-      world.spawnY = spawnY.intValue();
-      world.spawnZ = spawnZ.intValue();
-      world.gameMode = gameType.intValue(0);
-      world.playerDimension = player.get("Dimension").intValue();
-      world.versionId = versionId.intValue();
+      world.currentDimension = dimension;
+
       return world;
     } catch (FileNotFoundException e) {
       if (warnings == LoggedWarnings.NORMAL) {
@@ -209,11 +176,23 @@ public class World implements Comparable<World> {
     return EmptyWorld.INSTANCE;
   }
 
+  @NotNull
+  private static Set<PlayerEntityData> getPlayerEntityData(File worldDirectory, int dimensionId, Tag player) {
+    Set<PlayerEntityData> playerEntities = new HashSet<>();
+    if (!player.isError()) {
+      playerEntities.add(new PlayerEntityData(player));
+    }
+    loadAdditionalPlayers(worldDirectory, playerEntities);
+    // Filter for the players only within the requested dimension
+    playerEntities = playerEntities.stream().filter(playerData -> playerData.dimension == dimensionId).collect(Collectors.toSet());
+    return playerEntities;
+  }
+
   /**
-   * Reload player data.
+   * Reload player data for the current dimension. This method is not in Dimension because players are per-world, not per-dimension
    * @return {@code true} if player data was reloaded.
    */
-  public synchronized boolean reloadPlayerData() {
+  synchronized boolean reloadPlayerData() {
     if (worldDirectory == null) {
       return false;
     }
@@ -224,33 +203,21 @@ public class World implements Comparable<World> {
     }
     Log.infof("world %s: timestamp updated: reading player data", levelName);
     timestamp = lastModified;
-    World temp = loadWorld(worldDirectory, dimension, LoggedWarnings.SILENT);
-    if (temp != EmptyWorld.INSTANCE) {
-      // Copy over new player data.
-      playerEntities = temp.playerEntities;
+
+    try (FileInputStream fin = new FileInputStream(worldFile);
+         InputStream gzin = new GZIPInputStream(fin);
+         DataInputStream in = new DataInputStream(gzin)) {
+      Set<String> request = new HashSet<>();
+      request.add(".Data.Player");
+      Map<String, Tag> result = NamedTag.quickParse(in, request);
+      Tag player = result.get(".Data.Player");
+
+      currentDimension.setPlayerEntities(getPlayerEntityData(worldDirectory, currentDimensionId, player));
+    } catch (IOException e) {
+      Log.infof("Could not read the level.dat file for world %s while trying to reload player data!", levelName);
+      return false;
     }
     return true;
-  }
-
-/** Add a chunk deletion listener. */
-  public void addChunkDeletionListener(ChunkDeletionListener listener) {
-    synchronized (chunkDeletionListeners) {
-      chunkDeletionListeners.add(listener);
-    }
-  }
-
-  /** Add a region discovery listener. */
-  public void addChunkUpdateListener(ChunkUpdateListener listener) {
-    synchronized (chunkUpdateListeners) {
-      chunkUpdateListeners.add(listener);
-    }
-  }
-
-  private void fireChunkDeleted(ChunkPosition chunk) {
-    synchronized (chunkDeletionListeners) {
-      for (ChunkDeletionListener listener : chunkDeletionListeners)
-        listener.chunkDeleted(chunk);
-    }
   }
 
   private static void loadAdditionalPlayers(File worldDirectory, Set<PlayerEntityData> playerEntities) {
@@ -275,183 +242,45 @@ public class World implements Comparable<World> {
   }
 
   /**
-   * @return The chunk at the given position
+   * @return The current dimension
    */
-  public synchronized Chunk getChunk(ChunkPosition pos) {
-    return getRegion(pos.getRegionPosition()).getChunk(pos);
-  }
-
-  /**
-   * Returns a ChunkData instance that is compatible with the given chunk version.
-   * The provided ChunkData instance may or may not be re-used.
-   */
-  public ChunkData createChunkData(@Nullable ChunkData chunkData, int chunkVersion) {
-    if(chunkVersion >= World.VERSION_21W06A) {
-      if(chunkData instanceof GenericChunkData) {
-        return chunkData;
-      }
-      return new GenericChunkData();
-    } else {
-      if(chunkData instanceof SimpleChunkData) {
-        return chunkData;
-      }
-      return new SimpleChunkData();
-    }
-  }
-
-  public Region createRegion(ChunkPosition pos) {
-    return new MCRegion(pos, this);
-  }
-
-  public RegionChangeWatcher createRegionChangeWatcher(WorldMapLoader worldMapLoader, MapView mapView) {
-    return new MCRegionChangeWatcher(worldMapLoader, mapView);
-  }
-
-  /**
-   * @param pos Region position
-   * @return The region at the given position
-   */
-  public synchronized Region getRegion(ChunkPosition pos) {
-    return regionMap.computeIfAbsent(pos.getLong(), p -> {
-      // check if the region is present in the world directory
-      Region region = EmptyRegion.instance;
-      if (regionExists(pos)) {
-        region = createRegion(pos);
-      }
-      return region;
-    });
-  }
-
-  public Region getRegionWithinRange(ChunkPosition pos, int yMin, int yMax) {
-    return getRegion(pos);
-  }
-
-  /** Set the region for the given position. */
-  public synchronized void setRegion(ChunkPosition pos, Region region) {
-    regionMap.put(pos.getLong(), region);
-  }
-
-  /**
-   * @param pos region position
-   * @return {@code true} if a region file exists for the given position
-   */
-  public boolean regionExists(ChunkPosition pos) {
-    File regionFile = new File(getRegionDirectory(), MCRegion.getFileName(pos));
-    return regionFile.exists();
-  }
-
-  /**
-   * @param pos Position of the region to load
-   * @param minY Minimum block Y (inclusive)
-   * @param maxY Maximum block Y (exclusive)
-   * @return Whether the region exists
-   */
-  public boolean regionExistsWithinRange(ChunkPosition pos, int minY, int maxY) {
-    return this.regionExists(pos);
-  }
-
-  /**
-   * Get the data directory for the given dimension.
-   *
-   * @param dimension the dimension
-   * @return File object pointing to the data directory
-   */
-  protected synchronized File getDataDirectory(int dimension) {
-    return dimension == 0 ?
-        worldDirectory :
-        new File(worldDirectory, "DIM" + dimension);
-  }
-
-  /**
-   * Get the data directory for the current dimension
-   *
-   * @return File object pointing to the data directory
-   */
-  public synchronized File getDataDirectory() {
-    return getDataDirectory(dimension);
-  }
-
-  /**
-   * @return File object pointing to the region file directory
-   */
-  public synchronized File getRegionDirectory() {
-    return new File(getDataDirectory(), "region");
-  }
-
-  /**
-   * @return File object pointing to the region file directory for
-   * the given dimension
-   */
-  protected synchronized File getRegionDirectory(int dimension) {
-    return new File(getDataDirectory(dimension), "region");
-  }
-
-  /**
-   * Get the current player position as an optional vector.
-   *
-   * <p>The result is empty if this is not a single player world.
-   */
-  public synchronized Optional<Vector3> playerPos() {
-    if (!playerEntities.isEmpty() && playerDimension == dimension) {
-      PlayerEntityData pos = playerEntities.iterator().next();
-      return Optional.of(new Vector3(pos.x, pos.y, pos.z));
-    } else {
-      return Optional.empty();
-    }
-  }
-
-  /**
-   * @return <code>true</code> if there is spawn position information
-   */
-  public synchronized boolean haveSpawnPos() {
-    return haveSpawnPos && playerDimension == 0;
+  public synchronized Dimension currentDimension() {
+    return this.currentDimension;
   }
 
   /**
    * @return The current dimension
    */
-  public synchronized int currentDimension() {
-    return dimension;
+  public synchronized int currentDimensionId() {
+    return this.currentDimensionId;
   }
 
-  /**
-   * @return The chunk heightmap
-   */
-  public Heightmap heightmap() {
-    return heightmap;
-  }
 
   /**
-   * @return The world director
+   * @return The world directory
    */
   public File getWorldDirectory() {
     return worldDirectory;
   }
 
-  /** Called when a new region has been discovered by the region parser. */
-  public void regionDiscovered(ChunkPosition pos) {
-    synchronized (this) {
-      regionMap.computeIfAbsent(pos.getLong(), p -> createRegion(pos));
-    }
+  /**
+   * @deprecated Use {@link World#currentDimension()} -> {@link Dimension#getDimensionDirectory()} ()}. Removed once there are no more usages
+   */
+  @Deprecated
+  protected synchronized File getDataDirectory(int dimension) {
+    return dimension == 0 ?
+      worldDirectory :
+      new File(worldDirectory, "DIM" + dimension);
   }
 
-  /** Notify region update listeners. */
-  private void fireChunkUpdated(ChunkPosition chunk) {
-    synchronized (chunkUpdateListeners) {
-      for (ChunkUpdateListener listener : chunkUpdateListeners) {
-        listener.chunkUpdated(chunk);
-      }
-    }
+  /**
+    @deprecated Use {@link World#currentDimension()} -> {@link Dimension#getRegionDirectory()}. Removed once there are no more usages
+   */
+  @Deprecated
+  protected synchronized File getRegionDirectory(int dimension) {
+    return new File(getDataDirectory(dimension), "region");
   }
 
-  /** Notify region update listeners. */
-  private void fireRegionUpdated(ChunkPosition region) {
-    synchronized (chunkUpdateListeners) {
-      for (ChunkUpdateListener listener : chunkUpdateListeners) {
-        listener.regionUpdated(region);
-      }
-    }
-  }
 
   /**
    * Export the given chunks to a Zip archive.
@@ -461,7 +290,7 @@ public class World implements Comparable<World> {
    * @throws IOException
    */
   public synchronized void exportChunksToZip(File target, Collection<ChunkPosition> chunks,
-      ProgressTracker progress) throws IOException {
+                                             ProgressTracker progress) throws IOException {
 
     Map<ChunkPosition, Set<ChunkPosition>> regionMap = new HashMap<>();
 
@@ -475,7 +304,8 @@ public class World implements Comparable<World> {
     progress.setJobSize(regionMap.size() + 1);
 
     String regionDirectory =
-        dimension == 0 ? worldDirectory.getName() : worldDirectory.getName() + "/DIM" + dimension;
+      currentDimensionId == 0 ? currentDimension().getDimensionDirectory().getName() :
+        currentDimension().getDimensionDirectory().getName() + "/DIM" + currentDimensionId;
     regionDirectory += "/region";
 
     try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(target))) {
@@ -489,8 +319,8 @@ public class World implements Comparable<World> {
 
         ChunkPosition region = entry.getKey();
 
-        appendRegionToZip(zout, getRegionDirectory(dimension), region,
-            regionDirectory + "/" + region.getMcaName(), entry.getValue());
+        appendRegionToZip(zout, currentDimension.getRegionDirectory(), region,
+          regionDirectory + "/" + region.getMcaName(), entry.getValue());
 
         progress.setProgress(++work);
       }
@@ -510,7 +340,6 @@ public class World implements Comparable<World> {
     System.out.println("exporting all dimensions to " + target.getName());
 
     final Collection<Pair<File, ChunkPosition>> regions = new LinkedList<>();
-    regions.clear();
 
     WorldScanner.Operator operator = (regionDirectory, x, z) ->
         regions.add(new Pair<>(regionDirectory, new ChunkPosition(x, z)));
@@ -581,62 +410,6 @@ public class World implements Comparable<World> {
     return levelName;
   }
 
-  /** Called when a chunk has been updated. */
-  public void chunkUpdated(ChunkPosition chunk) {
-    fireChunkUpdated(chunk);
-  }
-
-  /** Called when a chunk has been updated. */
-  public void regionUpdated(ChunkPosition region) {
-    fireRegionUpdated(region);
-  }
-
-  /** Add a chunk discovery listener */
-  public void addChunkTopographyListener(ChunkTopographyListener listener) {
-    synchronized (chunkTopographyListeners) {
-      chunkTopographyListeners.add(listener);
-    }
-  }
-
-  /** Remove a chunk discovery listener */
-  public void removeChunkTopographyListener(ChunkTopographyListener listener) {
-    synchronized (chunkTopographyListeners) {
-      chunkTopographyListeners.remove(listener);
-    }
-  }
-
-  /**
-   * Notifies listeners that the height gradient of a chunk may have changed.
-   *
-   * @param chunk The chunk
-   */
-  public void chunkTopographyUpdated(Chunk chunk) {
-    for (ChunkTopographyListener listener : chunkTopographyListeners) {
-      listener.chunksTopographyUpdated(chunk);
-    }
-  }
-
-  /**
-   * @return The spawn Z position
-   */
-  public double spawnPosZ() {
-    return spawnZ;
-  }
-
-  /**
-   * @return The spawn Y position
-   */
-  public double spawnPosY() {
-    return spawnY;
-  }
-
-  /**
-   * @return The spawn X position
-   */
-  public double spawnPosX() {
-    return spawnX;
-  }
-
   public int getVersionId() {
     return versionId;
   }
@@ -651,16 +424,6 @@ public class World implements Comparable<World> {
       return levelDat.exists() && levelDat.isFile();
     }
     return false;
-  }
-
-  /**
-   * Called when chunks have been deleted from this world.
-   * Triggers the chunk deletion listeners.
-   *
-   * @param pos Position of deleted chunk
-   */
-  public void chunkDeleted(ChunkPosition pos) {
-    fireChunkDeleted(pos);
   }
 
   /**
@@ -690,24 +453,6 @@ public class World implements Comparable<World> {
 
   public Date getLastModified() {
     return new Date(this.worldDirectory.lastModified());
-  }
-
-  /**
-   * Load entities from world the file.
-   * This is usually the single player entity in a local save.
-   */
-  public synchronized Collection<PlayerEntity> playerEntities() {
-    Collection<PlayerEntity> list = new LinkedList<>();
-    if (PersistentSettings.getLoadPlayers()) {
-      for (PlayerEntityData data : playerEntities) {
-        list.add(new PlayerEntity(data));
-      }
-    }
-    return list;
-  }
-
-  public synchronized Collection<PlayerEntityData> getPlayerPositions() {
-    return Collections.unmodifiableSet(playerEntities);
   }
 
   /**

@@ -86,7 +86,7 @@ public class Chunk {
   protected volatile AbstractLayer surface = IconLayer.UNKNOWN;
   protected volatile AbstractLayer biomes = IconLayer.UNKNOWN;
 
-  private final World world;
+  private final Dimension dimension;
 
   protected int dataTimestamp = 0;
   protected int surfaceTimestamp = 0;
@@ -94,8 +94,8 @@ public class Chunk {
 
   protected ChunkVersion version = ChunkVersion.UNKNOWN;
 
-  public Chunk(ChunkPosition pos, World world) {
-    this.world = world;
+  public Chunk(ChunkPosition pos, Dimension dimension) {
+    this.dimension = dimension;
     this.position = pos;
   }
 
@@ -116,7 +116,7 @@ public class Chunk {
    * @return loaded data, or null if something went wrong
    */
   private Map<String, Tag> getChunkTags(Set<String> request) throws ChunkLoadingException {
-    MCRegion region = (MCRegion) world.getRegion(position.getRegionPosition());
+    MCRegion region = (MCRegion) dimension.getRegion(position.getRegionPosition());
     Mutable<Integer> timestamp = new Mutable<>(dataTimestamp);
     Map<String, Tag> chunkTags = region.getChunkTags(this.position, request, timestamp);
     this.dataTimestamp = timestamp.get();
@@ -128,7 +128,7 @@ public class Chunk {
    * @return loaded data, or null if something went wrong
    */
   private Map<String, Tag> getEntityTags(Set<String> request) throws ChunkLoadingException {
-    MCRegion region = (MCRegion) world.getRegion(position.getRegionPosition());
+    MCRegion region = (MCRegion) dimension.getRegion(position.getRegionPosition());
     return region.getEntityTags(this.position, request);
   }
 
@@ -179,11 +179,11 @@ public class Chunk {
 
     surfaceTimestamp = dataTimestamp;
     version = chunkVersion(data);
-    chunkData.set(this.world.createChunkData(chunkData.get(), data.get(DATAVERSION).intValue()));
+    chunkData.set(this.dimension.createChunkData(chunkData.get(), data.get(DATAVERSION).intValue()));
     loadSurface(data, chunkData.get(), yMin, yMax);
     biomesTimestamp = dataTimestamp;
 
-    world.chunkUpdated(position);
+    dimension.chunkUpdated(position);
     return true;
   }
 
@@ -193,7 +193,7 @@ public class Chunk {
       return;
     }
 
-    Heightmap heightmap = world.heightmap();
+    Heightmap heightmap = dimension.heightmap();
     Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
     if (sections.isList()) {
       if (version == ChunkVersion.PRE_FLATTENING || version == ChunkVersion.POST_FLATTENING) {
@@ -208,7 +208,7 @@ public class Chunk {
         int[] heightmapData = extractHeightmapData(data, chunkData);
         updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
 
-        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
+        surface = new SurfaceLayer(dimension.dimensionId(), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
         queueTopography();
       }
     } else {
@@ -375,7 +375,7 @@ public class Chunk {
     if (timestamp == 0) {
       return true;
     }
-    Region region = world.getRegion(position.getRegionPosition());
+    Region region = dimension.getRegion(position.getRegionPosition());
     return region.chunkChangedSince(position, timestamp);
   }
 
@@ -383,9 +383,9 @@ public class Chunk {
     for (int x = -1; x <= 1; ++x) {
       for (int z = -1; z <= 1; ++z) {
         ChunkPosition pos = new ChunkPosition(position.x + x, position.z + z);
-        Chunk chunk = world.getChunk(pos);
+        Chunk chunk = dimension.getChunk(pos);
         if (!chunk.isEmpty()) {
-          world.chunkTopographyUpdated(chunk);
+          dimension.chunkTopographyUpdated(chunk);
         }
       }
     }
@@ -430,8 +430,8 @@ public class Chunk {
    * Render the topography of this chunk.
    */
   public synchronized void renderTopography() {
-    surface.renderTopography(position, world.heightmap());
-    world.chunkUpdated(position);
+    surface.renderTopography(position, dimension.heightmap());
+    dimension.chunkUpdated(position);
   }
 
   /**
@@ -462,7 +462,7 @@ public class Chunk {
 
     int dataVersion = data.get(DATAVERSION).intValue();
     if(reuseChunkData.get() == null || reuseChunkData.get() instanceof EmptyChunkData) {
-      reuseChunkData.set(world.createChunkData(reuseChunkData.get(), dataVersion));
+      reuseChunkData.set(dimension.createChunkData(reuseChunkData.get(), dataVersion));
     } else {
       reuseChunkData.get().clear();
     }

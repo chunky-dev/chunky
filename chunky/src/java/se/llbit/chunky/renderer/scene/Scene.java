@@ -798,12 +798,14 @@ public class Scene implements JsonSerializable, Refreshable {
 
     BiomeStructure.Factory biomeStructureFactory = BiomeStructure.get(this.biomeStructureImplementation);
 
+    Dimension dimension = world.currentDimension();
+
     try (TaskTracker.Task task = taskTracker.task("(1/6) Loading regions")) {
       task.update(2, 1);
 
       loadedWorld = world;
       worldPath = loadedWorld.getWorldDirectory().getAbsolutePath();
-      worldDimension = world.currentDimension();
+      worldDimension = world.currentDimensionId();
 
       if (chunksToLoad.isEmpty()) {
         return;
@@ -830,12 +832,12 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       for (ChunkPosition region : regions) {
-        world.getRegion(region).parse(yMin, yMax);
+        dimension.getRegion(region).parse(yMin, yMax);
       }
     }
 
     try (TaskTracker.Task task = taskTracker.task("(2/6) Loading entities")) {
-     entities.loadPlayers(task, world);
+     entities.loadPlayers(task, dimension);
     }
 
     BiomePalette biomePalette = new ArrayBiomePalette();
@@ -860,7 +862,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       ExecutorService executor = Executors.newSingleThreadExecutor();
       Future<?> nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
-        world.getChunk(chunkPositions[0]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
+        dimension.getChunk(chunkPositions[0]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
         return null; // runnable can't throw non-RuntimeExceptions, so we use a callable instead and have to return something
       });
       for (int i = 0; i < chunkPositions.length; i++) {
@@ -892,7 +894,7 @@ public class Scene implements JsonSerializable, Refreshable {
           if (i + 1 < chunkPositions.length) { // schedule next task if possible
             final int finalI = i;
             nextChunkDataTask = executor.submit(() -> { //request chunk data for the next iteration of the loop
-              world.getChunk(chunkPositions[finalI + 1]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
+              dimension.getChunk(chunkPositions[finalI + 1]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
               return null; // runnable can't throw non-RuntimeExceptions, so we use a callable instead and have to return something
             });
           }
@@ -1185,7 +1187,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
         if (!chunkData.isEmpty()){
           nonEmptyChunks.add(cp);
-          if (world.getChunk(cp).getVersion() == ChunkVersion.PRE_FLATTENING) {
+          if (dimension.getChunk(cp).getVersion() == ChunkVersion.PRE_FLATTENING) {
             legacyChunks.add(cp);
           }
         }

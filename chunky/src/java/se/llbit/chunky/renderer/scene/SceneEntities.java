@@ -7,7 +7,7 @@ import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
-import se.llbit.chunky.world.World;
+import se.llbit.chunky.world.Dimension;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
@@ -99,14 +99,14 @@ public class SceneEntities {
     return hit;
   }
 
-  public void loadPlayers(TaskTracker.Task task, World world) {
+  public void loadPlayers(TaskTracker.Task task, Dimension dimension) {
     entities.clear();
     if (actors.isEmpty() && PersistentSettings.getLoadPlayers()) {
       // We don't load actor entities if some already exists. Loading actor entities
       // risks resetting posed actors when reloading chunks for an existing scene.
       actors.clear();
       profiles = new HashMap<>();
-      Collection<PlayerEntity> players = world.playerEntities();
+      Collection<PlayerEntity> players = dimension.playerEntities();
       int done = 1;
       int target = players.size();
       for (PlayerEntity entity : players) {

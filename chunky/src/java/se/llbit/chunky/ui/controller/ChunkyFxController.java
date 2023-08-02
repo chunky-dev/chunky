@@ -455,9 +455,9 @@ public class ChunkyFxController
           if (!reloaded) {
             chunkSelection.clearSelection();
           }
-          world.addChunkDeletionListener(chunkSelection);
-          Optional<Vector3> playerPos = world.playerPos();
-          world.addChunkUpdateListener(map);
+          world.currentDimension().addChunkDeletionListener(chunkSelection);
+          Optional<Vector3> playerPos = world.currentDimension().playerPos();
+          world.currentDimension().addChunkUpdateListener(map);
 
           Platform.runLater(
               () -> {
@@ -498,7 +498,7 @@ public class ChunkyFxController
       boolean track = trackPlayer.get();
       PersistentSettings.setFollowPlayer(track);
       if (track) {
-        mapLoader.withWorld(world -> world.playerPos().ifPresent(mapView::panTo));
+        mapLoader.withWorld(world -> world.currentDimension().playerPos().ifPresent(mapView::panTo));
       }
     });
 
