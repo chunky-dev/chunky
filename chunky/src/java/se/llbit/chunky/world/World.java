@@ -93,6 +93,11 @@ public class World implements Comparable<World> {
     SILENT
   }
 
+  public void loadDimension(int dimensionId) {
+    currentDimension = loadDimension(this, this.worldDirectory, dimensionId, -1, Collections.emptySet());
+    currentDimension.reloadPlayerData();
+  }
+
   /**
    * Parse player location and level name.
    *
@@ -140,13 +145,7 @@ public class World implements Comparable<World> {
       world.gameMode = gameType.intValue(0);
       world.versionId = versionId.intValue();
 
-      Dimension dimension;
-      File dimensionDirectory = dimensionId == 0 ? worldDirectory : new File(worldDirectory, "DIM" + dimensionId);
-      if (new File(dimensionDirectory, "region3d").exists()) {
-        dimension = new CubicDimension(world, "?", dimensionId, dimensionDirectory, playerEntities, modtime);
-      } else {
-        dimension = new Dimension(world, "?", dimensionId, dimensionDirectory, playerEntities, modtime);
-      }
+      Dimension dimension = loadDimension(world, worldDirectory, dimensionId, modtime, playerEntities);
 
       boolean haveSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
       if (haveSpawnPos) {
@@ -166,6 +165,18 @@ public class World implements Comparable<World> {
       }
     }
     return EmptyWorld.INSTANCE;
+  }
+
+  @NotNull
+  private static Dimension loadDimension(World world, File worldDirectory, int dimensionId, long modtime, Set<PlayerEntityData> playerEntities) {
+    Dimension dimension;
+    File dimensionDirectory = dimensionId == 0 ? worldDirectory : new File(worldDirectory, "DIM" + dimensionId);
+    if (new File(dimensionDirectory, "region3d").exists()) {
+      dimension = new CubicDimension(world, dimensionId, dimensionDirectory, playerEntities, modtime);
+    } else {
+      dimension = new Dimension(world, dimensionId, dimensionDirectory, playerEntities, modtime);
+    }
+    return dimension;
   }
 
   @NotNull
