@@ -38,7 +38,7 @@ public class ImposterCubicRegion implements Region {
   private int minRegionY = Integer.MAX_VALUE;
   private int maxRegionY = Integer.MIN_VALUE;
 
-  private final World world;
+  private final CubicDimension dimension;
 
   /**
    * Cubes don't have a timestamp, the hacky solution is to average the region timestamps.
@@ -50,8 +50,8 @@ public class ImposterCubicRegion implements Region {
    * One flag per region column */
   private final boolean[] anyUpdated = new boolean[DIAMETER_IN_CUBIC_REGIONS*DIAMETER_IN_CUBIC_REGIONS];
 
-  public ImposterCubicRegion(ChunkPosition pos, World world) {
-    this.world = world;
+  public ImposterCubicRegion(ChunkPosition pos, CubicDimension dimension) {
+    this.dimension = dimension;
     mcRegionPos = pos;
     min3drPosition = new ChunkPosition(mcRegionToMinCubicRegion(pos.x), mcRegionToMinCubicRegion(pos.z));
     for (int z = 0; z < DIAMETER_IN_VANILLA_CHUNKS; ++z) {
@@ -176,19 +176,19 @@ public class ImposterCubicRegion implements Region {
         Chunk chunk = getChunk(localX, localZ);
         if (columnsWithCubes.get(localX + localZ*DIAMETER_IN_VANILLA_CHUNKS)) {
           if(chunk.isEmpty()) {
-            chunk = new ImposterCubicChunk(pos, world);
+            chunk = new ImposterCubicChunk(pos, dimension);
             setChunk(localX, localZ, chunk);
           }
         } else {
           if (!chunk.isEmpty()) {
-            world.chunkDeleted(pos);
+            dimension.chunkDeleted(pos);
             setChunk(localX, localZ, EmptyChunk.INSTANCE);
           }
         }
       }
     }
 
-    world.regionUpdated(mcRegionPos);
+    dimension.regionUpdated(mcRegionPos);
   }
 
   /**
@@ -203,7 +203,7 @@ public class ImposterCubicRegion implements Region {
       for (int localZ = 0; localZ < DIAMETER_IN_CUBIC_REGIONS; localZ++) {
         for (int localX = 0; localX < DIAMETER_IN_CUBIC_REGIONS; localX++) {
           String fileName = get3drNameForPos(min3drPosition.x + localX, regionY, min3drPosition.z + localZ);
-          File regionFile = new File(world.getRegionDirectory(), fileName);
+          File regionFile = new File(dimension.getRegionDirectory(), fileName);
 
           int regionIndex = localX + localZ * DIAMETER_IN_CUBIC_REGIONS;
 
@@ -292,7 +292,7 @@ public class ImposterCubicRegion implements Region {
     for (CubicRegion112[] regions : internalRegions.values()) {
       for (CubicRegion112 region : regions) {
         if(region != null) {
-          File file = new File(world.getRegionDirectory(), region.fileName);
+          File file = new File(dimension.getRegionDirectory(), region.fileName);
           long lastModified = file.lastModified();
           if (lastModified != region.regionTimestamp) {
             return true;
@@ -317,13 +317,13 @@ public class ImposterCubicRegion implements Region {
           for (int localRegionZ = 0; localRegionZ < DIAMETER_IN_CUBIC_REGIONS; localRegionZ++) {
             CubicRegion112 region = regions[getRegionIndex(localRegionX, localRegionZ)];
             if (region != null) { //check known region
-              File file = new File(world.getRegionDirectory(), region.fileName);
+              File file = new File(dimension.getRegionDirectory(), region.fileName);
               long lastModified = file.lastModified();
               if (lastModified != region.regionTimestamp) {
                 return true;
               }
             } else { //check unknown region
-              File file = new File(world.getRegionDirectory(), get3drNameForPos(min3drPosition.x + localRegionX, yPos, min3drPosition.z + localRegionZ));
+              File file = new File(dimension.getRegionDirectory(), get3drNameForPos(min3drPosition.x + localRegionX, yPos, min3drPosition.z + localRegionZ));
               if(file.exists())
                 return true;
             }
@@ -332,7 +332,7 @@ public class ImposterCubicRegion implements Region {
       } else { //check if any unknown layers exist
         for (int localRegionX = 0; localRegionX < DIAMETER_IN_CUBIC_REGIONS; localRegionX++) {
           for (int localRegionZ = 0; localRegionZ < DIAMETER_IN_CUBIC_REGIONS; localRegionZ++) {
-            File file = new File(world.getRegionDirectory(), get3drNameForPos(min3drPosition.x + localRegionX, yPos, min3drPosition.z + localRegionZ));
+            File file = new File(dimension.getRegionDirectory(), get3drNameForPos(min3drPosition.x + localRegionX, yPos, min3drPosition.z + localRegionZ));
             if(file.exists())
               return true;
           }
@@ -392,7 +392,7 @@ public class ImposterCubicRegion implements Region {
     }
 
     public void parse() {
-      File regionFile = new File(world.getRegionDirectory(), fileName);
+      File regionFile = new File(dimension.getRegionDirectory(), fileName);
       long modtime = regionFile.lastModified();
       if (regionTimestamp == modtime) {
         return;
@@ -424,7 +424,7 @@ public class ImposterCubicRegion implements Region {
     public Map<Integer, Map<String, Tag>> getCubeTagsInColumn(int localX, int localZ, Set<String> request) {
       Map<Integer, Map<String, Tag>> tagMapsByLocalY = new HashMap<>();
 
-      try (RandomAccessFile file = new RandomAccessFile(new File(world.getRegionDirectory(), this.fileName), "r")) {
+      try (RandomAccessFile file = new RandomAccessFile(new File(dimension.getRegionDirectory(), this.fileName), "r")) {
         long length = file.length();
         if (length < SECTOR_SIZE_BYTES) {
           Log.warn("Missing header in region file!");

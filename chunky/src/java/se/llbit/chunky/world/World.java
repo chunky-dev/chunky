@@ -136,25 +136,17 @@ public class World implements Comparable<World> {
 
       Set<PlayerEntityData> playerEntities = getPlayerEntityData(worldDirectory, dimensionId, player);
 
-      World world;
-//      Tag isCubic = result.get(".Data.isCubicWorld");
-//      if (isCubic != null && isCubic.byteValue(0) == 1) {
-//        world = new CubicWorld(levelName, worldDirectory, dimensionId,
-//          playerEntities, haveSpawnPos, seed, modtime);
-//      } else {
-        world = new World(levelName, worldDirectory, seed, modtime);
-//      }
+      World world = new World(levelName, worldDirectory, seed, modtime);
       world.gameMode = gameType.intValue(0);
       world.versionId = versionId.intValue();
 
-      Dimension dimension = new Dimension(
-        world,
-        "?",
-        dimensionId,
-        dimensionId == 0 ? worldDirectory : new File(worldDirectory, "DIM" + dimensionId),
-        playerEntities,
-        modtime
-      );
+      Dimension dimension;
+      File dimensionDirectory = dimensionId == 0 ? worldDirectory : new File(worldDirectory, "DIM" + dimensionId);
+      if (new File(dimensionDirectory, "region3d").exists()) {
+        dimension = new CubicDimension(world, "?", dimensionId, dimensionDirectory, playerEntities, modtime);
+      } else {
+        dimension = new Dimension(world, "?", dimensionId, dimensionDirectory, playerEntities, modtime);
+      }
 
       boolean haveSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
       if (haveSpawnPos) {

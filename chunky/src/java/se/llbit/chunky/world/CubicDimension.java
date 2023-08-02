@@ -3,52 +3,36 @@ package se.llbit.chunky.world;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.chunk.biome.BiomeData2d;
-import se.llbit.chunky.map.MapView;
-import se.llbit.chunky.map.WorldMapLoader;
-import se.llbit.chunky.ui.ProgressTracker;
-import se.llbit.chunky.world.region.*;
-import se.llbit.log.Log;
+import se.llbit.chunky.world.region.EmptyRegion;
+import se.llbit.chunky.world.region.ImposterCubicRegion;
+import se.llbit.chunky.world.region.Region;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import static se.llbit.chunky.world.region.ImposterCubicRegion.blockToCube;
 import static se.llbit.chunky.world.region.ImposterCubicRegion.cubeToCubicRegion;
 
-public class CubicWorld extends World {
+public class CubicDimension extends Dimension {
 
   /**
-   * @param levelName      name of the world (not the world directory).
-   * @param worldDirectory Minecraft world directory.
-   * @param dimension      the dimension to load.
-   * @param playerEntities
-   * @param haveSpawnPos
-   * @param seed
+   * @param dimensionDirectory Minecraft world directory.
    * @param timestamp
    */
-  protected CubicWorld(String levelName, File worldDirectory, int dimension, Set<PlayerEntityData> playerEntities,
-      boolean haveSpawnPos, long seed, long timestamp) {
-    super(levelName, worldDirectory, dimension, playerEntities, haveSpawnPos, seed, timestamp);
+  protected CubicDimension(World world, int dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, long timestamp) {
+    super(world, dimensionId, dimensionDirectory, playerEntities, timestamp);
   }
 
   /**
    * @return File object pointing to the region file directory
    */
+  @Override
   public synchronized File getRegionDirectory() {
-    return new File(getDataDirectory(), "region3d");
-  }
-
-  /**
-   * @return File object pointing to the region file directory for
-   * the given dimension
-   */
-  protected synchronized File getRegionDirectory(int dimension) {
-    return new File(getDataDirectory(dimension), "region3d");
+    return new File(dimensionDirectory, "region3d");
   }
 
   @Override
@@ -64,26 +48,6 @@ public class CubicWorld extends World {
   @Override
   public Region createRegion(ChunkPosition pos) {
     return new ImposterCubicRegion(pos, this);
-  }
-
-  @Override
-  public RegionChangeWatcher createRegionChangeWatcher(WorldMapLoader worldMapLoader, MapView mapView) {
-    return new CubicRegionChangeWatcher(worldMapLoader, mapView);
-  }
-
-  /**
-   * @param pos Region position
-   * @return The region at the given position
-   */
-  public synchronized Region getRegion(ChunkPosition pos) {
-    return regionMap.computeIfAbsent(pos.getLong(), (p) -> {
-      // check if the region is present in the world directory
-      Region region = EmptyRegion.instance;
-      if (regionExists(pos)) {
-        region = createRegion(pos);
-      }
-      return region;
-    });
   }
 
   public synchronized Region getRegionWithinRange(ChunkPosition pos, int minY, int maxY) {
@@ -144,14 +108,5 @@ public class CubicWorld extends World {
     synchronized (this) {
       regionMap.computeIfAbsent(pos.getLong(), (p) -> createRegion(pos));
     }
-  }
-
-  public synchronized void exportChunksToZip(File target, Collection<ChunkPosition> chunks, ProgressTracker progress)
-      throws IOException {
-    Log.warn("Not implemented by cubicchunks worlds");
-  }
-
-  public synchronized void exportWorldToZip(File target, ProgressTracker progress) throws IOException {
-    Log.warn("Not implemented by cubicchunks worlds");
   }
 }

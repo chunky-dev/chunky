@@ -48,9 +48,9 @@ public class MCRegionChangeWatcher extends RegionChangeWatcher {
         for (int rx = theView.prx0; rx <= theView.prx1; ++rx) {
           for (int rz = theView.prz0; rz <= theView.prz1; ++rz) {
             ChunkPosition pos = new ChunkPosition(rx, rz);
-            Region region = dimension.getRegion(pos);
+            Region region = dimension.getRegionWithinRange(pos, theView.yMin, theView.yMax);
             if (region.isEmpty()) {
-              if (dimension.regionExists(pos)) {
+              if (dimension.regionExistsWithinRange(pos, theView.yMin, theView.yMax)) {
                 region = dimension.createRegion(pos);
               }
               dimension.setRegion(pos, region);

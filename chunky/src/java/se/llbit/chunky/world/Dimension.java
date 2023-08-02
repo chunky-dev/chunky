@@ -28,7 +28,7 @@ public class Dimension {
 
   protected final Long2ObjectMap<Region> regionMap = new Long2ObjectOpenHashMap<>();
 
-  private final File dimensionDirectory;
+  protected final File dimensionDirectory;
   private Set<PlayerEntityData> playerEntities;
 
   private final Heightmap heightmap = new Heightmap();
