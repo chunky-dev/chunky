@@ -170,6 +170,8 @@ public class Sky implements JsonSerializable {
   /** Current sky rendering mode. */
   private SkyMode mode = SkyMode.DEFAULT;
 
+  private boolean enableSkymapInterpolation = true;
+
   /** Simulated skies. */
   public final static List<SimulatedSky> skies = new ArrayList<>();
 
@@ -254,12 +256,13 @@ public class Sky implements JsonSerializable {
     if (simulatedSkyMode.updateSun(scene.sun, horizonOffset)) {
       skyCache.precalculateSky();
     }
+    enableSkymapInterpolation = other.enableSkymapInterpolation;
   }
 
   /**
    * Calculate sky color for the ray, based on sky mode.
    */
-  public void getSkyDiffuseColorInner(Ray ray) {
+  private void getSkyDiffuseColorInner(Ray ray) {
     switch (mode) {
       case SOLID_COLOR: {
         ray.color.set(color.x, color.y, color.z, 1);
@@ -360,26 +363,30 @@ public class Sky implements JsonSerializable {
   /**
    * Panoramic skymap color.
    */
-  public void getSkyColor(Ray ray, boolean drawSun) {
-    getSkyDiffuseColorInner(ray);
-    ray.color.scale(skyExposure);
-    ray.color.scale(skyLightModifier);
-    if (drawSun) addSunColor(ray);
-    ray.color.w = 1;
-  }
+  public void getSkyColor(Ray ray, boolean isApparentColor, boolean isDiffuseSun) {
+    if (enableSkymapInterpolation) {
+      getSkyColorInterpolated(ray);
+    } else {
+      getSkyDiffuseColorInner(ray);
+    }
 
-  public void getApparentSkyColor(Ray ray, boolean drawSun) {
-    getSkyDiffuseColorInner(ray);
     ray.color.scale(skyExposure);
-    ray.color.scale(apparentSkyLightModifier);
-    if (drawSun) addSunColor(ray);
+    if (isApparentColor) {
+      ray.color.scale(apparentSkyLightModifier);
+      addSunColor(ray, false);
+    } else {
+      ray.color.scale(skyLightModifier);
+      if (isDiffuseSun) {
+        addSunColor(ray, true);
+      }
+    }
     ray.color.w = 1;
   }
 
   /**
    * Bilinear interpolated panoramic skymap color.
    */
-  public void getSkyColorInterpolated(Ray ray) {
+  private void getSkyColorInterpolated(Ray ray) {
     switch (mode) {
       case SKYMAP_EQUIRECTANGULAR: {
         double x = rotation.transformX(ray.d);
@@ -449,9 +456,6 @@ public class Sky implements JsonSerializable {
         getSkyDiffuseColorInner(ray);
       }
     }
-    ray.color.scale(skyExposure);
-    ray.color.scale(apparentSkyLightModifier);
-    addSunColor(ray);
     ray.color.w = 1;
   }
 
@@ -459,39 +463,27 @@ public class Sky implements JsonSerializable {
    * Add sun color contribution. This does not alpha blend the sun color
    * because the Minecraft sun texture has no alpha channel.
    */
-  private void addSunColor(Ray ray) {
+  private void addSunColor(Ray ray, boolean isDiffuseSun) {
     double r = ray.color.x;
     double g = ray.color.y;
     double b = ray.color.z;
-    if (scene.sun().intersect(ray)) {
+    if (isDiffuseSun) {
+      if (scene.sun().intersectDiffuse(ray)) {
+        double mult = scene.sun().getLuminosity();
 
-      // Blend sun color with current color.
-      ray.color.x = ray.color.x + r;
-      ray.color.y = ray.color.y + g;
-      ray.color.z = ray.color.z + b;
-    }
-  }
+        // Blend sun color with current color.
+        ray.color.x = ray.color.x * mult + r;
+        ray.color.y = ray.color.y * mult + g;
+        ray.color.z = ray.color.z * mult + b;
+      }
+    } else {
+      if (scene.sun().intersect(ray)) {
 
-  public void getSkyColorDiffuseSun(Ray ray, boolean diffuseSun) {
-    getSkyDiffuseColorInner(ray);
-    ray.color.scale(skyExposure);
-    ray.color.scale(skyLightModifier);
-    if (diffuseSun) addSunColorDiffuseSun(ray);
-    ray.color.w = 1;
-  }
-
-  public void addSunColorDiffuseSun(Ray ray) {
-    double r = ray.color.x;
-    double g = ray.color.y;
-    double b = ray.color.z;
-
-    if (scene.sun().intersectDiffuse(ray)) {
-      double mult = scene.sun().getLuminosity();
-
-      // Blend sun color with current color.
-      ray.color.x = ray.color.x * mult + r;
-      ray.color.y = ray.color.y * mult + g;
-      ray.color.z = ray.color.z * mult + b;
+        // Blend sun color with current color.
+        ray.color.x = ray.color.x + r;
+        ray.color.y = ray.color.y + g;
+        ray.color.z = ray.color.z + b;
+      }
     }
   }
 
@@ -673,6 +665,7 @@ public class Sky implements JsonSerializable {
         break;
       }
     }
+    sky.add("enableSkymapInterpolation", enableSkymapInterpolation);
     return sky;
   }
 
@@ -749,6 +742,7 @@ public class Sky implements JsonSerializable {
       default:
         break;
     }
+    enableSkymapInterpolation = json.get("enableSkymapInterpolation").boolValue(enableSkymapInterpolation);
   }
 
   private void updateTransform() {
@@ -1177,5 +1171,14 @@ public class Sky implements JsonSerializable {
 
   public Vector3 getColor() {
     return color;
+  }
+
+  public void setEnableSkymapInterpolation(boolean value) {
+    enableSkymapInterpolation = value;
+    scene.refresh();
+  }
+
+  public boolean getEnableSkymapInterpolation() {
+    return enableSkymapInterpolation;
   }
 }

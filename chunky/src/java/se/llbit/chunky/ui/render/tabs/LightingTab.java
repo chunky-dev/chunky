@@ -54,6 +54,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster emitterIntensity;
   @FXML private DoubleAdjuster sunIntensity;
   @FXML private CheckBox drawSun;
+  @FXML private CheckBox enableSunlight;
   @FXML private ComboBox<SunSamplingStrategy> sunSamplingStrategy;
   @FXML private DoubleAdjuster sunLuminosity;
   @FXML private DoubleAdjuster apparentSunBrightness;
@@ -129,9 +130,16 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
       });
     emitterSamplingStrategy.setTooltip(new Tooltip("Determine how emitters are sampled at each bounce."));
 
+    enableSunlight.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.sun().setEnableSunlight(newValue);
+      sunSamplingStrategy.setDisable(!newValue);
+    });
+    enableSunlight.setTooltip(new Tooltip("Changes whether the sun emits light."));
+
     drawSun.selectedProperty().addListener((observable, oldValue, newValue) -> scene.sun().setDrawTexture(newValue));
     drawSun.setTooltip(new Tooltip("Draws the sun texture on top of the skymap."));
 
+    sunSamplingStrategy.setDisable(!enableSunlight.isSelected());
     sunSamplingStrategy.getItems().addAll(SunSamplingStrategy.values());
     sunSamplingStrategy.getSelectionModel().selectedItemProperty().addListener(
             (observable, oldValue, newValue) -> scene.setSunSamplingStrategy(newValue));
@@ -203,6 +211,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunAltitude.set(QuickMath.radToDeg(scene.sun().getAltitude()));
     enableEmitters.setSelected(scene.getEmittersEnabled());
     sunSamplingStrategy.getSelectionModel().select(scene.getSunSamplingStrategy());
+    enableSunlight.setSelected(scene.sun().sunlightEnabled());
     drawSun.setSelected(scene.sun().drawTexture());
     sunColor.colorProperty().removeListener(sunColorListener);
     sunColor.setColor(ColorUtil.toFx(scene.sun().getColor()));

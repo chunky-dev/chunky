@@ -67,6 +67,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private Button mergeRenderDump;
   @FXML private CheckBox shutdown;
   @FXML private CheckBox fastFog;
+  @FXML private CheckBox enableSkymapInterpolation;
   @FXML private IntegerAdjuster cacheResolution;
   @FXML private DoubleAdjuster animationTime;
   @FXML private ChoiceBox<PictureExportFormat> outputMode;
@@ -141,6 +142,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     fastFog.setTooltip(new Tooltip("Enable faster fog rendering algorithm."));
     fastFog.selectedProperty()
             .addListener((observable, oldValue, newValue) -> scene.setFastFog(newValue));
+    enableSkymapInterpolation.setTooltip(new Tooltip("Enable interpolation of the skymap / skybox texture, if a skymap / skybox is being used."));
+    enableSkymapInterpolation.selectedProperty().addListener((observable, oldValue, newValue) -> scene.sky().setEnableSkymapInterpolation(newValue));
     cacheResolution.setName("Sky cache resolution");
     cacheResolution.setTooltip("Resolution of the sky cache. Lower values will use less memory and improve performance but can cause sky artifacts.");
     cacheResolution.setRange(1, 4096);
@@ -303,6 +306,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   public void update(Scene scene) {
     outputMode.getSelectionModel().select(scene.getOutputMode());
     fastFog.setSelected(scene.fog.fastFog());
+    enableSkymapInterpolation.setSelected(scene.sky().getEnableSkymapInterpolation());
     renderThreads.set(PersistentSettings.getNumThreads());
     cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());

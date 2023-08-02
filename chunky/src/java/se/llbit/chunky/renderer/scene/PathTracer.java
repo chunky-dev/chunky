@@ -73,18 +73,18 @@ public class PathTracer implements RayTracer {
         } else if (ray.depth == 0) {
           // Direct sky hit.
           if (!scene.transparentSky()) {
-            scene.sky.getSkyColorInterpolated(ray);
+            scene.sky.getSkyColor(ray, true, false);
             addSkyFog(scene, ray, state, ox, od);
             hit = true;
           }
         } else if (ray.specular) {
           // Indirect sky hit - specular color.
-          scene.sky.getSkyColor(ray, true);
+          scene.sky.getSkyColor(ray, true, false);
           addSkyFog(scene, ray, state, ox, od);
           hit = true;
         } else {
           // Indirect sky hit - diffuse color.
-          scene.sky.getSkyColorDiffuseSun(ray, scene.getSunSamplingStrategy().isDiffuseSun());
+          scene.sky.getSkyColor(ray, false, scene.getSunSamplingStrategy().isDiffuseSun());
           // Skip sky fog - likely not noticeable in diffuse reflection.
           hit = true;
         }
@@ -201,7 +201,7 @@ public class PathTracer implements RayTracer {
               }
             }
 
-            if (scene.getSunSamplingStrategy().doSunSampling()) {
+            if (scene.getSunSamplingStrategy().doSunSampling() && scene.sun.sunlightEnabled()) {
               reflected.set(ray);
               scene.sun.getRandomSunDirection(reflected, random);
 

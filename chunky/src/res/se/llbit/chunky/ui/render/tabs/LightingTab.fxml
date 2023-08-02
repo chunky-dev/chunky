@@ -26,6 +26,7 @@
       <ChoiceBox fx:id="emitterSamplingStrategy" />
     </HBox>
     <Separator />
+    <CheckBox fx:id="enableSunlight" mnemonicParsing="false" text="Enable sunlight" />
     <CheckBox fx:id="drawSun" mnemonicParsing="false" text="Draw sun" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Sun Sampling Strategy:" />
