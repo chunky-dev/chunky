@@ -6,21 +6,23 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class PitcherCropTopModel extends QuadModel {
-  private static final Texture pitcher_top = Texture.pitcherCropTop;
-  private static final Texture pitcher_side = Texture.pitcherCropSide;
-  private static final Texture pitcher_bottom = Texture.pitcherCropBottom;
-  private static final Texture stage_2 = Texture.pitcherCropBottomStage2;
+  private static final Texture top = Texture.pitcherCropTop;
+  private static final Texture side = Texture.pitcherCropSide;
+  private static final Texture bottom = Texture.pitcherCropBottom;
+  private static final Texture bottomStage2 = Texture.pitcherCropBottomStage2;
+  private static final Texture topStage3 = Texture.pitcherCropTopStage3;
+  private static final Texture topStage4 = Texture.pitcherCropTopStage4;
 
   private static final Texture[][] textures = new Texture[][]{
     null, null,
     new Texture[]{
-      stage_2, stage_2, stage_2, stage_2, pitcher_top, pitcher_bottom, pitcher_side, pitcher_side, pitcher_side, pitcher_side
+      bottomStage2, bottomStage2, bottomStage2, bottomStage2, top, bottom, side, side, side, side
     },
     new Texture[]{
-      Texture.pitcherCropTopStage3, Texture.pitcherCropTopStage3, Texture.pitcherCropTopStage3, Texture.pitcherCropTopStage3
+      topStage3, topStage3, topStage3, topStage3
     },
     new Texture[]{
-      Texture.pitcherCropTopStage4, Texture.pitcherCropTopStage4, Texture.pitcherCropTopStage4, Texture.pitcherCropTopStage4
+      topStage4, topStage4, topStage4, topStage4
     }
   };
 
