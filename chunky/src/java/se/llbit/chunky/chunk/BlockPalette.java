@@ -547,6 +547,11 @@ public class BlockPalette {
         block.emittance = 1.0f / 15f;
       }
     });
+    materialProperties.put("minecraft:calibrated_sculk_sensor", block -> {
+      if (block instanceof CalibratedSculkSensor && ((CalibratedSculkSensor) block).isActive()) {
+        block.emittance = 1.0f / 15f;
+      }
+    });
     materialProperties.put("minecraft:glow_lichen", block -> {
       block.emittance = 1.0f / 15f * 7;
     });

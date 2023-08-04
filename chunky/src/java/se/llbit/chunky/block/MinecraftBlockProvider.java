@@ -1037,6 +1037,17 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("sniffer_egg", (name, tag) -> new SnifferEgg(name, BlockProvider.stringToInt(tag.get("Properties").get("hatch"), 0)));
     addBlock("pink_petals", (name, tag) -> new PinkPetals(name, BlockProvider.stringToInt(tag.get("Properties").get("flower_amount"), 1), BlockProvider.facing(tag)));
     addBlock("pitcher_plant", (name, tag) -> new PitcherPlant(name, tag.get("Properties").get("half").stringValue("lower")));
+    addBlock("pitcher_crop", (name, tag) -> {
+      int age = BlockProvider.stringToInt(tag.get("Properties").get("age"), 0);
+      String half = tag.get("Properties").get("half").stringValue("lower");
+      if (half.equals("upper") && age < 2) {
+        return Air.INSTANCE;
+      }
+      return new PitcherCrop(age, half);
+    });
+    addBlock("calibrated_sculk_sensor", (name, tag) -> new CalibratedSculkSensor(
+      tag.get("Properties").get("sculk_sensor_phase").stringValue("cooldown"),
+      tag.get("Properties").get("facing").stringValue("north")));
   }
 
   @Override
