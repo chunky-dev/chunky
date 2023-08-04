@@ -54,6 +54,5 @@ public class ExtraMaterials {
     CalibratedSculkSensorAmethyst.activeMaterial.emittance = 1.0f / 15;
 
     CalibratedSculkSensorAmethyst.inactiveMaterial.restoreDefaults();
-    CalibratedSculkSensorAmethyst.inactiveMaterial.emittance = 1.0f / 15;
   }
 }
