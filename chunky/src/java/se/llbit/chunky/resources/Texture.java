@@ -1311,6 +1311,12 @@ public class Texture {
   public static final Texture pitcherCropSide = new Texture();
   @TexturePath("assets/minecraft/textures/block/pitcher_crop_bottom")
   public static final Texture pitcherCropBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/calibrated_sculk_sensor_amethyst")
+  public static final Texture calibratedSculkSensorAmethyst = new Texture();
+  @TexturePath("assets/minecraft/textures/block/calibrated_sculk_sensor_top")
+  public static final Texture calibratedSculkSensorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/calibrated_sculk_sensor_input_side")
+  public static final Texture calibratedSculkSensorInputSide = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

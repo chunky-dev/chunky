@@ -1045,6 +1045,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       }
       return new PitcherCrop(age, half);
     });
+    addBlock("calibrated_sculk_sensor", (name, tag) -> new CalibratedSculkSensor(
+      tag.get("Properties").get("sculk_sensor_phase").stringValue("cooldown"),
+      tag.get("Properties").get("facing").stringValue("north")));
   }
 
   @Override

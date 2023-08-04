@@ -4,7 +4,6 @@ import se.llbit.chunky.model.SculkSensorModel;
 import se.llbit.chunky.resources.Texture;
 
 public class SculkSensor extends AbstractModelBlock {
-
   private final String phase;
 
   public SculkSensor(String phase) {
