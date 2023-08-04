@@ -6,7 +6,6 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class SculkSensor extends MinecraftBlockTranslucent {
-
   private final String phase;
 
   public SculkSensor(String phase) {
