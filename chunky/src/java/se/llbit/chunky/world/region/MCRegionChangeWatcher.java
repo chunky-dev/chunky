@@ -41,7 +41,7 @@ public class MCRegionChangeWatcher extends RegionChangeWatcher {
         Dimension dimension = mapLoader.getWorld().currentDimension();
         if (dimension.reloadPlayerData()) {
           if (PersistentSettings.getFollowPlayer()) {
-            Platform.runLater(() -> dimension.playerPos().ifPresent(mapView::panTo));
+            Platform.runLater(() -> dimension.getPlayerPos().ifPresent(mapView::panTo));
           }
         }
         ChunkView theView = view;

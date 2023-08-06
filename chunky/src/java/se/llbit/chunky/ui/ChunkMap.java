@@ -617,7 +617,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     ChunkView mapView = new ChunkView(view);  // Make thread-local copy.
     World world = mapLoader.getWorld();
     double blockScale = mapView.scale / 16.;
-    world.currentDimension().spawnPos().ifPresent(spawnPos -> {
+    world.currentDimension().getSpawnPosition().ifPresent(spawnPos -> {
       int px = (int) QuickMath.floor(spawnPos.x * blockScale);
       int py = (int) QuickMath.floor(spawnPos.y);
       int pz = (int) QuickMath.floor(spawnPos.z * blockScale);

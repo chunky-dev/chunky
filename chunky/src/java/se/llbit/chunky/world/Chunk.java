@@ -193,7 +193,7 @@ public class Chunk {
       return;
     }
 
-    Heightmap heightmap = dimension.heightmap();
+    Heightmap heightmap = dimension.getHeightmap();
     Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
     if (sections.isList()) {
       if (version == ChunkVersion.PRE_FLATTENING || version == ChunkVersion.POST_FLATTENING) {
@@ -208,7 +208,7 @@ public class Chunk {
         int[] heightmapData = extractHeightmapData(data, chunkData);
         updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
 
-        surface = new SurfaceLayer(dimension.dimensionId(), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
+        surface = new SurfaceLayer(dimension.getDimensionId(), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
         queueTopography();
       }
     } else {
@@ -430,7 +430,7 @@ public class Chunk {
    * Render the topography of this chunk.
    */
   public synchronized void renderTopography() {
-    surface.renderTopography(position, dimension.heightmap());
+    surface.renderTopography(position, dimension.getHeightmap());
     dimension.chunkUpdated(position);
   }
 

@@ -89,7 +89,7 @@ public class ImposterCubicChunk extends Chunk {
       return;
     }
 
-    Heightmap heightmap = dimension.heightmap();
+    Heightmap heightmap = dimension.getHeightmap();
     BlockPalette palette = new BlockPalette();
     BiomePalette biomePalette = new ArrayBiomePalette();
     biomePalette.put(Biomes.biomesPrePalette[0]); //We don't currently support cubic chunks biomes, and so default to ocean
@@ -110,7 +110,7 @@ public class ImposterCubicChunk extends Chunk {
 
     int[] heightmapData = extractHeightmapDataCubic(null, chunkData);
     updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
-    surface = new SurfaceLayer(dimension.dimensionId(), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
+    surface = new SurfaceLayer(dimension.getDimensionId(), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
   }
 
   private int[] extractHeightmapDataCubic(Map<String, Tag> cubeData, ChunkData chunkData) {

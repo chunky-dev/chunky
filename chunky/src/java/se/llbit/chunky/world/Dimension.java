@@ -56,7 +56,7 @@ public class Dimension {
     this.timestamp = timestamp;
   }
 
-  public int dimensionId() {
+  public int getDimensionId() {
     return dimensionId;
   }
 
@@ -186,7 +186,7 @@ public class Dimension {
    *
    * <p>The result is empty if this is not a single player world.
    */
-  public synchronized Optional<Vector3> playerPos() {
+  public synchronized Optional<Vector3> getPlayerPos() {
     if (!playerEntities.isEmpty()) {
       PlayerEntityData pos = playerEntities.iterator().next();
       return Optional.of(new Vector3(pos.x, pos.y, pos.z));
@@ -198,7 +198,7 @@ public class Dimension {
   /**
    * @return The chunk heightmap
    */
-  public Heightmap heightmap() {
+  public Heightmap getHeightmap() {
     return heightmap;
   }
 
@@ -266,11 +266,11 @@ public class Dimension {
     }
   }
 
-  public Optional<Vector3i> spawnPos() {
+  public Optional<Vector3i> getSpawnPosition() {
     return Optional.ofNullable(this.spawnPos);
   }
 
-  public void spawnPos(@Nullable Vector3i spawnPos) {
+  public void setSpawnPos(@Nullable Vector3i spawnPos) {
     this.spawnPos = spawnPos;
   }
 
@@ -292,7 +292,7 @@ public class Dimension {
    * Load entities from world the file.
    * This is usually the single player entity in a local save.
    */
-  public synchronized Collection<PlayerEntity> playerEntities() {
+  public synchronized Collection<PlayerEntity> getPlayerEntities() {
     Collection<PlayerEntity> list = new LinkedList<>();
     if (PersistentSettings.getLoadPlayers()) {
       for (PlayerEntityData data : playerEntities) {

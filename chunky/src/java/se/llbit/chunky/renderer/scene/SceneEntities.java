@@ -106,7 +106,7 @@ public class SceneEntities {
       // risks resetting posed actors when reloading chunks for an existing scene.
       actors.clear();
       profiles = new HashMap<>();
-      Collection<PlayerEntity> players = dimension.playerEntities();
+      Collection<PlayerEntity> players = dimension.getPlayerEntities();
       int done = 1;
       int target = players.size();
       for (PlayerEntity entity : players) {

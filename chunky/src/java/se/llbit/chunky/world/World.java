@@ -149,7 +149,7 @@ public class World implements Comparable<World> {
 
       boolean haveSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
       if (haveSpawnPos) {
-        dimension.spawnPos(new Vector3i(spawnX.intValue(0), spawnY.intValue(0), spawnZ.intValue(0)));
+        dimension.setSpawnPos(new Vector3i(spawnX.intValue(0), spawnY.intValue(0), spawnZ.intValue(0)));
       }
 
       world.currentDimension = dimension;
