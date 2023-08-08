@@ -38,12 +38,12 @@ public interface RenderOptions {
    * Default number of worker threads.
    * Is set to the number of available CPU cores.
    */
-  int NUM_RENDER_THREADS_DEFAULT = Runtime.getRuntime().availableProcessors();
+  int RENDER_THREAD_COUNT_DEFAULT = Runtime.getRuntime().availableProcessors();
 
   /**
    * Minimum number of worker threads
    */
-  int RENDER_THREADS_COUNT_MIN = 1;
+  int RENDER_THREAD_COUNT_MIN = 1;
 
   /**
    * Maximum number of worker threads

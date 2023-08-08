@@ -20,7 +20,9 @@ package se.llbit.chunky.main;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
+import se.llbit.chunky.renderer.ModifiableRenderOptions;
 import se.llbit.chunky.renderer.RenderContext;
+import se.llbit.chunky.renderer.RenderOptions;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.ResourcePackLoader;
 import se.llbit.json.JsonNumber;
@@ -251,7 +253,7 @@ public class CommandLineOptions {
           ));
         }
       }
-      consumer.accept(new ArrayList<>(optionArguments));  // Create copy to avoid side effects.
+      consumer.accept(Collections.unmodifiableList(optionArguments));
       return arguments;
     }
   }
@@ -293,17 +295,16 @@ public class CommandLineOptions {
     registerOption("-target", new Range(1),
         arguments -> options.target = Math.max(1, Integer.parseInt(arguments.get(0))));
 
+    ModifiableRenderOptions renderOptions = (ModifiableRenderOptions) options.getRenderOptions();
+
     registerOption("-threads", new Range(1),
-        arguments -> options.changeRenderConfig(config ->
-          config.setRenderThreadCount(Math.max(1, Integer.parseInt(arguments.get(0))))));
+        arguments -> renderOptions.setRenderThreadCount(Math.max(1, Integer.parseInt(arguments.get(0)))));
 
     registerOption("-tile-width", new Range(1),
-        arguments -> options.changeRenderConfig(config ->
-          config.setTileWidth(Math.max(1, Integer.parseInt(arguments.get(0))))));
+        arguments -> renderOptions.setTileWidth(Math.max(1, Integer.parseInt(arguments.get(0)))));
 
     registerOption("-spp-per-pass", new Range(1),
-        arguments -> options.changeRenderConfig(config ->
-          config.setSppPerPass(Math.max(1, Integer.parseInt(arguments.get(0))))));
+        arguments -> renderOptions.setSppPerPass(Math.max(1, Integer.parseInt(arguments.get(0)))));
 
     registerOption("-version", new Range(0), arguments -> {
       mode = Mode.CLI_OPERATION;

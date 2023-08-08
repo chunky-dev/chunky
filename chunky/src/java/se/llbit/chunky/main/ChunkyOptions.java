@@ -70,12 +70,17 @@ public class ChunkyOptions {
     return clone;
   }
 
+  /**
+   * Returns the current state of the render options to by the renderer.
+   * It is not specified whether it is a copy or a view of the current options and
+   * does not guarantee to update on change.
+   * <p>Cast it to {@link ModifiableRenderOptions}, if you have to edit it.
+   * Edits are only safe on startup and might not propagate while a render is in progress.
+   *
+   * @return Options to use to start the render system.
+   */
   public RenderOptions getRenderOptions() {
     return renderOptions;
-  }
-
-  public synchronized void changeRenderConfig(Consumer<ModifiableRenderOptions> callback) {
-    callback.accept(renderOptions);
   }
 
   public List<File> getResourcePacks() {

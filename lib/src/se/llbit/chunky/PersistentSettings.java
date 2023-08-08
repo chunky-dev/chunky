@@ -147,7 +147,7 @@ public final class PersistentSettings {
    * @return Default number of render threads
    */
   public static int getRenderThreadCount() {
-    return settings.getInt("numThreads", RenderOptions.NUM_RENDER_THREADS_DEFAULT);
+    return settings.getInt("numThreads", RenderOptions.RENDER_THREAD_COUNT_DEFAULT);
   }
 
   /**
@@ -161,7 +161,7 @@ public final class PersistentSettings {
    * Set default number of render threads.
    */
   public static void setRenderThreadCount(int renderThreadCount) {
-    renderThreadCount = Math.max(RenderOptions.RENDER_THREADS_COUNT_MIN, renderThreadCount);
+    renderThreadCount = Math.max(RenderOptions.RENDER_THREAD_COUNT_MIN, renderThreadCount);
     renderThreadCount = Math.min(RenderOptions.RENDER_THREAD_COUNT_MAX, renderThreadCount);
     settings.setInt("numThreads", renderThreadCount);
     save();
