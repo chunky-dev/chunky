@@ -147,10 +147,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public int sdfVersion = -1;
   public String name = "default_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
 
-  public CanvasConfig canvasConfig = new CanvasConfig(
-    PersistentSettings.get3DCanvasWidth(),
-    PersistentSettings.get3DCanvasHeight()
-  );
+  public CanvasConfig canvasConfig = new CanvasConfig();
 
   public PostProcessingFilter postProcessingFilter = DEFAULT_POSTPROCESSING_FILTER;
   public PictureExportFormat outputMode = PictureExportFormats.PNG;
@@ -352,8 +349,8 @@ public class Scene implements JsonSerializable, Refreshable {
    * scene and after scene canvas size changes.
    */
   public synchronized void initBuffers() {
-    frontBuffer = new BitmapImage(canvasConfig.width, canvasConfig.height);
-    backBuffer = new BitmapImage(canvasConfig.width, canvasConfig.height);
+    frontBuffer = new BitmapImage(canvasConfig.getWidth(), canvasConfig.getHeight());
+    backBuffer = new BitmapImage(canvasConfig.getWidth(), canvasConfig.getHeight());
     alphaChannel = new byte[canvasConfig.getPixelCount()];
     samples = new double[canvasConfig.getPixelCount() * 3];
   }
@@ -1907,6 +1904,54 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
+   * @deprecated use {@link CanvasConfig}
+   */
+  @Deprecated
+  public int canvasWidth() {
+    return canvasConfig.getWidth();
+  }
+
+  /**
+   * @deprecated use {@link CanvasConfig}
+   */
+  @Deprecated
+  public int canvasHeight() {
+    return canvasConfig.getHeight();
+  }
+
+  /**
+   * @deprecated use {@link CanvasConfig}
+   */
+  @Deprecated
+  public int getFullWidth() {
+    return canvasConfig.getCropWidth();
+  }
+
+  /**
+   * @deprecated use {@link CanvasConfig}
+   */
+  @Deprecated
+  public int getFullHeight() {
+    return canvasConfig.getCropHeight();
+  }
+
+  /**
+   * @deprecated use {@link CanvasConfig}
+   */
+  @Deprecated
+  public int getCropX() {
+    return canvasConfig.getCropX();
+  }
+
+  /**
+   * @deprecated use {@link CanvasConfig}
+   */
+  @Deprecated
+  public int getCropY() {
+    return canvasConfig.getCropY();
+  }
+
+  /**
    * Save a snapshot
    */
   public void saveSnapshot(File directory, TaskTracker taskTracker) {
@@ -1969,15 +2014,15 @@ public class Scene implements JsonSerializable, Refreshable {
           AtomicInteger done = new AtomicInteger(0);
 
           Chunky.getCommonThreads().submit(() -> {
-            IntStream.range(0, canvasConfig.width).parallel().forEach(x -> {
+            IntStream.range(0, canvasConfig.getWidth()).parallel().forEach(x -> {
               WorkerState state = new WorkerState();
               state.ray = new Ray();
 
-              for (int y = 0; y < canvasConfig.height; y++) {
+              for (int y = 0; y < canvasConfig.getHeight(); y++) {
                 computeAlpha(x, y, state);
               }
 
-              task.update(canvasConfig.width, done.incrementAndGet());
+              task.update(canvasConfig.getWidth(), done.incrementAndGet());
             });
           }).get();
 
@@ -2002,7 +2047,7 @@ public class Scene implements JsonSerializable, Refreshable {
       filter = PreviewFilter.INSTANCE;
     }
     filter.processFrame(
-      canvasConfig.width, canvasConfig.height,
+      canvasConfig.getWidth(), canvasConfig.getHeight(),
       samples, backBuffer,
       exposure,
       task
@@ -2189,8 +2234,8 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void computeAlpha(int x, int y, WorkerState state) {
     Ray ray = state.ray;
-    double halfWidth = canvasConfig.width / (2.0 * canvasConfig.height);
-    double invHeight = 1.0 / canvasConfig.height;
+    double halfWidth = canvasConfig.getWidth() / (2.0 * canvasConfig.getHeight());
+    double invHeight = 1.0 / canvasConfig.getHeight();
 
     // Rotated grid supersampling.
     double[][] offsets = new double[][] {
@@ -2215,7 +2260,7 @@ public class Scene implements JsonSerializable, Refreshable {
       occlusion += PreviewRayTracer.skyOcclusion(this, state);
     }
 
-    alphaChannel[y * canvasConfig.width + x] = (byte) (255 * occlusion * 0.25 + 0.5);
+    alphaChannel[y * canvasConfig.getWidth() + x] = (byte) (255 * occlusion * 0.25 + 0.5);
   }
 
   /**

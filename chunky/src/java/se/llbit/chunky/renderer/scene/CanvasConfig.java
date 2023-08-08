@@ -1,5 +1,6 @@
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.json.JsonObject;
 import se.llbit.math.QuickMath;
 
@@ -14,15 +15,21 @@ public class CanvasConfig {
    */
   public static final int MIN_CANVAS_HEIGHT = 20;
 
-  protected int width;
-  protected int height;
+  private int width;
+  private int height;
 
-  protected int cropWidth = 0;
-  protected int cropHeight = 0;
+  private int cropWidth = 0;
+  private int cropHeight = 0;
 
-  protected int cropX = 0;
-  protected int cropY = 0;
+  private int cropX = 0;
+  private int cropY = 0;
 
+  public CanvasConfig() {
+    this(
+      PersistentSettings.get3DCanvasWidth(),
+      PersistentSettings.get3DCanvasHeight()
+    );
+  }
   public CanvasConfig(int width, int height) {
     this.width = width;
     this.height = height;
@@ -56,7 +63,7 @@ public class CanvasConfig {
   }
 
   /**
-   * @return fullWidth if the canvas is cropped, otherwise width
+   * @return cropWidth if the canvas is cropped, otherwise width
    */
   public int getCropWidth() {
     if (isCanvasCropped()) {
@@ -70,7 +77,7 @@ public class CanvasConfig {
   }
 
   /**
-   * @return fullHeight if the canvas is cropped, otherwise height
+   * @return cropHeight if the canvas is cropped, otherwise height
    */
   public int getCropHeight() {
     if (isCanvasCropped()) {
@@ -163,8 +170,11 @@ public class CanvasConfig {
   public void writeJsonData(JsonObject json) {
     json.add("width", width);
     json.add("height", height);
+
+    // TODO: rename
     json.add("fullWidth", cropWidth);
     json.add("fullHeight", cropHeight);
+
     json.add("cropX", cropX);
     json.add("cropY", cropY);
   }
@@ -176,8 +186,10 @@ public class CanvasConfig {
     int newWidth = json.get("width").intValue(width);
     int newHeight = json.get("height").intValue(height);
 
+    // TODO: rename
     cropWidth = json.get("fullWidth").intValue(cropWidth);
     cropHeight = json.get("fullHeight").intValue(cropHeight);
+
     cropX = json.get("cropX").intValue(cropX);
     cropY = json.get("cropY").intValue(cropY);
 
