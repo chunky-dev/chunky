@@ -213,7 +213,7 @@
                          <Insets/>
                        </padding>
                      </Hyperlink>
-                     <Hyperlink fx:id="simplexnoiseLicense" text="Public domain / Unlicense">
+                     <Hyperlink fx:id="simplexnoiseLicense" text="Public domain / CC0">
                         <font>
                            <Font size="10.0" />
                         </font>

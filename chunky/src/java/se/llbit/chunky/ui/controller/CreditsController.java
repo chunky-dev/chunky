@@ -171,7 +171,7 @@ public class CreditsController implements Initializable {
     simplexnoise.setBorder(Border.EMPTY);
     simplexnoise.setOnAction(e -> launchAndReset(simplexnoise, "https://github.com/keijiro/sketches2016/blob/master/Simplex2/SimplexNoise.java"));
     simplexnoiseLicense.setBorder(Border.EMPTY);
-    simplexnoiseLicense.setOnAction(e -> launchAndReset(simplexnoiseLicense, "https://unlicense.org/"));
+    simplexnoiseLicense.setOnAction(e -> launchAndReset(simplexnoiseLicense, "https://creativecommons.org/publicdomain/zero/1.0/"));
 
     semver4j.setBorder(Border.EMPTY);
     semver4j.setOnAction(e -> launchAndReset(semver4j, "https://github.com/vdurmont/semver4j"));
