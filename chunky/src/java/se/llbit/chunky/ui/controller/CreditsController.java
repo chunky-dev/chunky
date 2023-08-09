@@ -186,7 +186,7 @@ public class CreditsController implements Initializable {
     }
 
     pluginLink
-        .setOnAction(e -> launchAndReset(pluginLink, "https://chunky-dev.github.io/docs/plugins/"));
+        .setOnAction(e -> launchAndReset(pluginLink, "https://chunky-dev.github.io/docs/plugins/plugin_list/"));
   }
 
   public void setStage(Stage stage) {
