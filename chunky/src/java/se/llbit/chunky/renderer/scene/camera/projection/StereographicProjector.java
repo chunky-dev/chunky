@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.projection;
+package se.llbit.chunky.renderer.scene.camera.projection;
 
 import java.util.Random;
 
-import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.chunky.renderer.scene.camera.CameraUtils;
 import se.llbit.math.Vector3;
 
 /**
@@ -31,7 +31,7 @@ public class StereographicProjector implements Projector {
   private final double scale;
 
   public StereographicProjector(double fov) {
-    scale = Camera.clampedFovTan(fov);
+    scale = CameraUtils.clampedFovTan(fov);
   }
 
   @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {

@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.projection;
+package se.llbit.chunky.renderer.scene.camera.projection;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
-import se.llbit.chunky.renderer.ApertureShape;
+import se.llbit.chunky.renderer.scene.camera.ApertureShape;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
 import se.llbit.math.Ray;

@@ -64,6 +64,8 @@ import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
+import se.llbit.chunky.renderer.scene.camera.CameraViewListener;
+import se.llbit.chunky.renderer.scene.camera.MutableCamera;
 import se.llbit.chunky.ui.ChunkMap;
 import se.llbit.chunky.ui.dialogs.*;
 import se.llbit.chunky.ui.DoubleTextField;
@@ -855,7 +857,7 @@ public class ChunkyFxController
 
   public void moveCameraTo(double x, double z) {
     chunky.getRenderController().getSceneProvider().withEditSceneProtected(scene -> {
-      Camera camera = scene.camera();
+      MutableCamera camera = scene.camera();
       Vector3 pos = new Vector3(x, camera.getPosition().y, z);
       camera.setPosition(pos);
     });

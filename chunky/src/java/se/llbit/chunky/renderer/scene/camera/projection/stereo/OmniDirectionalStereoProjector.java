@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.projection.stereo;
+package se.llbit.chunky.renderer.scene.camera.projection.stereo;
 
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.renderer.projection.PanoramicProjector;
-import se.llbit.chunky.renderer.projection.Projector;
+import se.llbit.chunky.renderer.scene.camera.projection.PanoramicProjector;
+import se.llbit.chunky.renderer.scene.camera.projection.Projector;
 import se.llbit.math.Constants;
 import se.llbit.math.Vector3;
 

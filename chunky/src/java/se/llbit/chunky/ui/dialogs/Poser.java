@@ -33,8 +33,8 @@ import javafx.scene.image.WritablePixelFormat;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.PlayerModel;
+import se.llbit.chunky.renderer.scene.camera.CameraUtils;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.render.tabs.EntitiesTab;
 import se.llbit.math.bvh.BVH;
@@ -192,7 +192,7 @@ public class Poser extends Stage implements Initializable {
     GraphicsContext gc = preview.getGraphicsContext2D();
     Ray ray = new Ray();
     double aspect = width / (double) height;
-    double fovTan = Camera.clampedFovTan(70);
+    double fovTan = CameraUtils.clampedFovTan(70);
     camPos.set(0, 1, -2);
     for (int y = 0; y < height; ++y) {
       double rayy = fovTan * (.5 - ((double) y) / height);

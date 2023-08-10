@@ -19,8 +19,9 @@ package se.llbit.chunky.renderer.export;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import se.llbit.chunky.renderer.projection.ProjectionMode;
+
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.imageformats.png.ITXT;
 import se.llbit.imageformats.png.PngFileWriter;

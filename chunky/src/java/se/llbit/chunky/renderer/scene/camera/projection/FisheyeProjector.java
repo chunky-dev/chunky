@@ -14,53 +14,53 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.projection;
+package se.llbit.chunky.renderer.scene.camera.projection;
 
 import java.util.Random;
+
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
-/**
- * Moves the ray origin forward (if displacement is positive) along the
- * direction vector.
- */
-public class ForwardDisplacementProjector implements Projector {
-  protected final Projector wrapped;
-  protected final double displacementValue;
-  protected final double displacementSign;
+public class FisheyeProjector implements Projector {
+  protected final double fov;
 
-  public ForwardDisplacementProjector(Projector wrapped, double displacement) {
-    this.wrapped = wrapped;
-    this.displacementValue = QuickMath.abs(displacement);
-    this.displacementSign = QuickMath.signum(displacement);
+  public FisheyeProjector(double fov) {
+    this.fov = fov;
   }
 
   @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
-    wrapped.apply(x, y, random, o, d);
-
-    d.normalize();
-    d.scale(displacementValue);
-    o.scaleAdd(displacementSign, d);
+    apply(x, y, o, d);
   }
 
   @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
-    wrapped.apply(x, y, o, d);
-
-    d.normalize();
-    d.scale(displacementValue);
-    o.scaleAdd(displacementSign, d);
+    double ay = QuickMath.degToRad(y * fov);
+    double ax = QuickMath.degToRad(x * fov);
+    double avSquared = ay * ay + ax * ax;
+    double angleFromCenter = FastMath.sqrt(avSquared);
+    double dz = FastMath.cos(angleFromCenter);
+    double dv = FastMath.sin(angleFromCenter);
+    double dy, dx;
+    if (angleFromCenter == 0) {
+      dx = dy = 0;
+    } else {
+      dx = dv * (ax / angleFromCenter);
+      dy = dv * (ay / angleFromCenter);
+    }
+    o.set(0, 0, 0);
+    d.set(dx, dy, dz);
   }
 
   @Override public double getMinRecommendedFoV() {
-    return wrapped.getMinRecommendedFoV();
+    return 1;
   }
 
   @Override public double getMaxRecommendedFoV() {
-    return wrapped.getMaxRecommendedFoV();
+    return 180;
   }
 
   @Override public double getDefaultFoV() {
-    return wrapped.getDefaultFoV();
+    return 120;
   }
 }

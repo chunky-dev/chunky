@@ -15,36 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.scene;
+package se.llbit.chunky.renderer.scene.camera;
 
-import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.renderer.ApertureShape;
 import se.llbit.chunky.renderer.Refreshable;
-import se.llbit.chunky.renderer.projection.ApertureProjector;
-import se.llbit.chunky.renderer.projection.FisheyeProjector;
-import se.llbit.chunky.renderer.projection.ForwardDisplacementProjector;
-import se.llbit.chunky.renderer.projection.stereo.ODSSinglePerspectiveProjector;
-import se.llbit.chunky.renderer.projection.stereo.ODSSinglePerspectiveProjector.Eye;
-import se.llbit.chunky.renderer.projection.stereo.ODSVerticalStackedProjector;
-import se.llbit.chunky.renderer.projection.PanoramicProjector;
-import se.llbit.chunky.renderer.projection.PanoramicSlotProjector;
-import se.llbit.chunky.renderer.projection.ParallelProjector;
-import se.llbit.chunky.renderer.projection.PinholeProjector;
-import se.llbit.chunky.renderer.projection.ProjectionMode;
-import se.llbit.chunky.renderer.projection.Projector;
-import se.llbit.chunky.renderer.projection.ShiftProjector;
-import se.llbit.chunky.renderer.projection.SphericalApertureProjector;
-import se.llbit.chunky.renderer.projection.StereographicProjector;
+import se.llbit.chunky.renderer.scene.camera.projection.PinholeProjector;
+import se.llbit.chunky.renderer.scene.camera.projection.ProjectionMode;
+import se.llbit.chunky.renderer.scene.camera.projection.Projector;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.json.JsonObject;
-import se.llbit.log.Log;
 import se.llbit.math.Matrix3;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
-import se.llbit.util.JsonSerializable;
 import se.llbit.util.annotation.Nullable;
 
 import java.util.Random;
@@ -58,46 +42,15 @@ import java.util.function.Function;
  * @author Jesper Öqvist <jesper@llbit.se>
  * @author TOGoS (projection code)
  */
-public class Camera implements JsonSerializable {
+public class MutableCamera implements Camera {
 
   private Runnable directionListener = () -> {};
   private Runnable positionListener = () -> {};
   private Runnable projectionListener = () -> {};
 
-  /**
-   * @param fov Field of view, in degrees. Maximum 180.
-   * @return {@code tan(fov/2)}
-   */
-  public static double clampedFovTan(double fov) {
-    double clampedFoV = Math.max(0, Math.min(180, fov));
-    return 2 * FastMath.tan(QuickMath.degToRad(clampedFoV / 2));
-  }
-
-  /**
-   * Minimum Depth of Field (DoF).
-   */
-  public static final double MIN_DOF = .05;
-
-  /**
-   * Maximum Depth of Field (DoF).
-   */
-  public static final double MAX_DOF = 5000;
-
-  /**
-   * Minimum recommended subject distance.
-   */
-  public static final double MIN_SUBJECT_DISTANCE = 0.01;
-
-  /**
-   * Maximum recommended subject distance.
-   */
-  public static final double MAX_SUBJECT_DISTANCE = 1000;
-
   private final Refreshable scene;
 
-  private boolean lockCamera = false;
-
-  Vector3 pos = new Vector3(0, 0, 0);
+  private Vector3 position = new Vector3(0, 0, 0);
 
   /**
    * Scratch vector used for temporary storage.
@@ -159,15 +112,17 @@ public class Camera implements JsonSerializable {
 
   public String name = "camera 1";
 
-  public ApertureShape apertureShape = ApertureShape.CIRCLE;
+  private ApertureShape apertureShape = ApertureShape.CIRCLE;
 
   @Nullable
   private String apertureMaskFilename;
 
+  private boolean lockCamera = false;
+
   /**
    * @param scene The scene that will be refreshed after the camera view changes.
    */
-  public Camera(Refreshable scene) {
+  public MutableCamera(Refreshable scene) {
     this.scene = scene;
     transform.setIdentity();
     initProjector();
@@ -180,94 +135,36 @@ public class Camera implements JsonSerializable {
    * @param other the camera to copy configuration from
    */
   public void set(Camera other) {
-    lockCamera = other.lockCamera;
-    pos.set(other.pos);
-    yaw = other.yaw;
-    pitch = other.pitch;
-    roll = other.roll;
-    dof = other.dof;
-    projectionMode = other.projectionMode;
-    fov = other.fov;
-    subjectDistance = other.subjectDistance;
-    worldDiagonalSize = other.worldDiagonalSize;
-    this.shiftX = other.shiftX;
-    this.shiftY = other.shiftY;
-    apertureShape = other.apertureShape;
-    apertureMaskFilename = other.apertureMaskFilename;
+    position.set(other.getPosition());
+    yaw = other.getYaw();
+    pitch = other.getPitch();
+    roll = other.getRoll();
+    dof = other.getDof();
+    projectionMode = other.getProjectionMode();
+    fov = other.getFov();
+    subjectDistance = other.getSubjectDistance();
+    worldDiagonalSize = other.getWorldDiagonalSize();
+    this.shiftX = other.getShiftX();
+    this.shiftY = other.getShiftY();
+    apertureShape = other.getApertureShape();
+    apertureMaskFilename = other.getApertureMaskFilename();
+    lockCamera = other.getCameraLocked();
     initProjector();
     updateTransform();
-  }
-
-  private Projector applyDoF(Projector p, double subjectDistance) {
-    if(infiniteDoF())
-      return p;
-    if (apertureShape == ApertureShape.CUSTOM)
-      return new ApertureProjector(p, subjectDistance / dof, subjectDistance, apertureMaskFilename);
-    else if (apertureShape == ApertureShape.CIRCLE)
-      return new ApertureProjector(p, subjectDistance / dof, subjectDistance);
-    else
-      return new ApertureProjector(p, subjectDistance / dof, subjectDistance, apertureShape);
-  }
-
-  private Projector applySphericalDoF(Projector p) {
-    return infiniteDoF() ?
-        p :
-        new SphericalApertureProjector(p, subjectDistance / dof, subjectDistance);
-  }
-
-  private Projector applyShift(Projector p) {
-    if(Math.abs(shiftX) > 0 || Math.abs(shiftY) > 0) {
-      return new ShiftProjector(p, shiftX, shiftY);
-    }
-    return p;
-  }
-
-  /**
-   * Creates projector based on the current camera settings.
-   */
-  private Projector createProjector() {
-    switch (projectionMode) {
-      default:
-        Log.errorf("Unknown projection mode: %s, using standard mode", projectionMode);
-      case PINHOLE:
-        return applyShift(applyDoF(new PinholeProjector(fov), subjectDistance));
-      case PARALLEL:
-        return applyShift(applyDoF(
-            new ForwardDisplacementProjector(
-              new ParallelProjector(worldDiagonalSize, fov),
-              -worldDiagonalSize
-            ),
-            subjectDistance + worldDiagonalSize
-        ));
-      case FISHEYE:
-        return applySphericalDoF(new FisheyeProjector(fov));
-      case PANORAMIC_SLOT:
-        return applySphericalDoF(new PanoramicSlotProjector(fov));
-      case PANORAMIC:
-        return applySphericalDoF(new PanoramicProjector(fov));
-      case STEREOGRAPHIC:
-        return new StereographicProjector(fov);
-      case ODS_LEFT:
-        return new ODSSinglePerspectiveProjector(Eye.LEFT);
-      case ODS_RIGHT:
-        return new ODSSinglePerspectiveProjector(Eye.RIGHT);
-      case ODS_STACKED:
-        return new ODSVerticalStackedProjector();
-    }
   }
 
   /**
    * This (re-)initializes the camera projector.
    */
   private void initProjector() {
-    projector = createProjector();
+    projector = projectionMode.create(this);
   }
 
   /**
    * Set the camera position.
    */
   public void setPosition(Vector3 v) {
-    pos.set(v);
+    position.set(v);
     onViewChange();
     positionListener.run();
   }
@@ -285,30 +182,30 @@ public class Camera implements JsonSerializable {
   /**
    * @return Current Depth of Field
    */
-  public double getDof() {
+  @Override public double getDof() {
     return dof;
   }
 
   /**
    * @return <code>true</code> if infinite DoF is active
    */
-  public boolean infiniteDoF() {
+  @Override public boolean isInfiniteDoF() {
     return dof == Double.POSITIVE_INFINITY;
   }
 
   /**
    * @return the projection mode
    */
-  public ProjectionMode getProjectionMode() {
+  @Override public ProjectionMode getProjectionMode() {
     return projectionMode;
   }
 
   /**
    * Set the projection mode
    */
-  public synchronized void setProjectionMode(ProjectionMode mode) {
-    if (projectionMode != mode) {
-      projectionMode = mode;
+  public synchronized void setProjectionPreset(ProjectionMode preset) {
+    if (projectionMode != preset) {
+      projectionMode = preset;
       initProjector();
       fov = projector.getDefaultFoV();
       onViewChange();
@@ -340,7 +237,7 @@ public class Camera implements JsonSerializable {
   /**
    * @return Current field of view
    */
-  public double getFov() {
+  @Override public double getFov() {
     return fov;
   }
 
@@ -355,7 +252,7 @@ public class Camera implements JsonSerializable {
   /**
    * @return Current subject distance
    */
-  public double getSubjectDistance() {
+  @Override public double getSubjectDistance() {
     return subjectDistance;
   }
 
@@ -369,7 +266,7 @@ public class Camera implements JsonSerializable {
       u.set(0, -1, 0);
     }
     transform.transform(u);
-    pos.scaleAdd(v, u);
+    position.scaleAdd(v, u);
     onViewChange();
     positionListener.run();
   }
@@ -384,7 +281,7 @@ public class Camera implements JsonSerializable {
       u.set(0, -1, 0);
     }
     transform.transform(u);
-    pos.scaleAdd(-v, u);
+    position.scaleAdd(-v, u);
     onViewChange();
     positionListener.run();
   }
@@ -394,7 +291,7 @@ public class Camera implements JsonSerializable {
    */
   public synchronized void moveUp(double v) {
     u.set(0, 1, 0);
-    pos.scaleAdd(v, u);
+    position.scaleAdd(v, u);
     onViewChange();
     positionListener.run();
   }
@@ -404,7 +301,7 @@ public class Camera implements JsonSerializable {
    */
   public synchronized void moveDown(double v) {
     u.set(0, 1, 0);
-    pos.scaleAdd(-v, u);
+    position.scaleAdd(-v, u);
     onViewChange();
     positionListener.run();
   }
@@ -415,7 +312,7 @@ public class Camera implements JsonSerializable {
   public synchronized void strafeLeft(double v) {
     u.set(1, 0, 0);
     transform.transform(u);
-    pos.scaleAdd(-v, u);
+    position.scaleAdd(-v, u);
     onViewChange();
     positionListener.run();
   }
@@ -426,7 +323,7 @@ public class Camera implements JsonSerializable {
   public synchronized void strafeRight(double v) {
     u.set(1, 0, 0);
     transform.transform(u);
-    pos.scaleAdd(v, u);
+    position.scaleAdd(v, u);
     onViewChange();
     positionListener.run();
   }
@@ -508,7 +405,7 @@ public class Camera implements JsonSerializable {
    * @param x      normalized image coordinate [-0.5, 0.5]
    * @param y      normalized image coordinate [-0.5, 0.5]
    */
-  public void calcViewRay(Ray ray, Random random, double x, double y) {
+  @Override public void calcViewRay(Ray ray, Random random, double x, double y) {
     // Reset the ray properties - current material etc.
     ray.setDefault();
 
@@ -519,7 +416,7 @@ public class Camera implements JsonSerializable {
     // From camera space to world space.
     transform.transform(ray.d);
     transform.transform(ray.o);
-    ray.o.add(pos);
+    ray.o.add(position);
   }
 
   /**
@@ -530,7 +427,7 @@ public class Camera implements JsonSerializable {
    * @param x   normalized image coordinate [-0.5, 0.5]
    * @param y   normalized image coordinate [-0.5, 0.5]
    */
-  public void calcViewRay(Ray ray, double x, double y) {
+  @Override public void calcViewRay(Ray ray, double x, double y) {
     // Reset the ray properties - current material etc.
     ray.setDefault();
 
@@ -541,7 +438,7 @@ public class Camera implements JsonSerializable {
     // From camera space to world space.
     transform.transform(ray.d);
     transform.transform(ray.o);
-    ray.o.add(pos);
+    ray.o.add(position);
   }
 
   /**
@@ -557,42 +454,42 @@ public class Camera implements JsonSerializable {
   /**
    * @return Current position
    */
-  public Vector3 getPosition() {
-    return pos;
+  @Override public Vector3 getPosition() {
+    return position;
   }
 
   /**
    * @return The current yaw angle
    */
-  public double getYaw() {
+  @Override public double getYaw() {
     return yaw;
   }
 
   /**
    * @return The current pitch angle
    */
-  public double getPitch() {
+  @Override public double getPitch() {
     return pitch;
   }
 
   /**
    * @return The current roll angle
    */
-  public double getRoll() {
+  @Override public double getRoll() {
     return roll;
   }
 
   /**
    * @return The current camera shift in x direction
    */
-  public double getShiftX() {
+  @Override public double getShiftX() {
     return shiftX;
   }
 
   /**
    * @return The current camera shift in y direction
    */
-  public double getShiftY() {
+  @Override public double getShiftY() {
     return shiftY;
   }
 
@@ -607,6 +504,10 @@ public class Camera implements JsonSerializable {
     if (projectionMode == ProjectionMode.PARALLEL) {
       initProjector();
     }
+  }
+
+  @Override public double getWorldDiagonalSize() {
+    return worldDiagonalSize;
   }
 
   /**
@@ -626,8 +527,7 @@ public class Camera implements JsonSerializable {
   @Override public JsonObject toJson() {
     JsonObject camera = new JsonObject();
     camera.add("name", name);
-    camera.add("lockCamera", lockCamera);
-    camera.add("position", pos.toJson());
+    camera.add("position", position.toJson());
 
     JsonObject orientation = new JsonObject();
     orientation.add("roll", roll);
@@ -635,7 +535,7 @@ public class Camera implements JsonSerializable {
     orientation.add("yaw", yaw);
     camera.add("orientation", orientation);
 
-    camera.add("projectionMode", projectionMode.name());
+    camera.add("projectionPreset", projectionMode.getId());
     camera.add("fov", fov);
     if (dof == Double.POSITIVE_INFINITY) {
       camera.add("dof", "Infinity");
@@ -653,6 +553,8 @@ public class Camera implements JsonSerializable {
     if(apertureMaskFilename != null)
       camera.add("apertureMask", apertureMaskFilename);
 
+    camera.add("lockCamera", lockCamera);
+
     return camera;
   }
 
@@ -660,7 +562,7 @@ public class Camera implements JsonSerializable {
     name = json.get("name").stringValue(name);
     lockCamera = json.get("lockCamera").boolValue(lockCamera);
     if (json.get("position").isObject()) {
-      pos.fromJson(json.get("position").object());
+      position.fromJson(json.get("position").object());
     }
 
     JsonObject orientation = json.get("orientation").object();
@@ -670,8 +572,14 @@ public class Camera implements JsonSerializable {
 
     fov = json.get("fov").doubleValue(fov);
     subjectDistance = json.get("focalOffset").doubleValue(subjectDistance);
-    projectionMode = ProjectionMode.get(
-        json.get("projectionMode").stringValue(projectionMode.name()));
+    projectionMode = ProjectionMode.REGISTRY.getProjectionPreset(
+      json.get("projectionPreset").stringValue(
+        json.get("projectionMode").stringValue(
+          projectionMode.getId()
+        )
+      ),
+      ProjectionMode.PINHOLE
+    );
     if (json.get("infDof").boolValue(false)) {
       // The infDof setting is deprecated.
       dof = Double.POSITIVE_INFINITY;
@@ -698,8 +606,8 @@ public class Camera implements JsonSerializable {
     //pitch = QuickMath.degToRad(player.pitch - 90);
     //yaw = QuickMath.degToRad(-player.rotation + 90);
     roll = 0;
-    pos.set(player.getPosition());
-    pos.y += 1.6;
+    position.set(player.getPosition());
+    position.y += 1.6;
     updateTransform();
     onViewChange();
   }
@@ -744,7 +652,7 @@ public class Camera implements JsonSerializable {
   /**
    * Copy transient state from another camera.
    */
-  public void copyTransients(Camera other) {
+  public void copyTransients(MutableCamera other) {
     name = other.name;
     target.set(other.target);
   }
@@ -782,8 +690,12 @@ public class Camera implements JsonSerializable {
   /**
    * Get aperture shape
    */
-  public ApertureShape getApertureShape() {
+  @Override public ApertureShape getApertureShape() {
     return apertureShape;
+  }
+
+  @Override public String getApertureMaskFilename() {
+    return apertureMaskFilename;
   }
 
   public void setCameraLocked(boolean value) {

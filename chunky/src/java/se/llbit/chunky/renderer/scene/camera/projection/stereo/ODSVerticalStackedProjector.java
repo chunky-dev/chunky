@@ -1,4 +1,4 @@
-/* Copyright (c) 2016-2022 Chunky contributors
+/* Copyright (c) 2022 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -14,36 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.projection.stereo;
+package se.llbit.chunky.renderer.scene.camera.projection.stereo;
 
 import se.llbit.math.Vector3;
 
 /**
- * An Omni-Directional Stereo projector implementation which projects only one of both eyes' perspectives.
+ * An Omni-Directional Stereo projector implementation which aligns both eye's perspectives vertically stacked.
+ * The left eye will be in the upper image half, the right eye in the lower half.
  *
- * <p>The canvas must have an aspect ratio of 2:1 for a full 360° range.
+ * <p>The canvas must have an aspect ratio of 1:1 for a full 360° range.
  */
-public class ODSSinglePerspectiveProjector extends OmniDirectionalStereoProjector {
-  private final Eye eye;
-
-  public ODSSinglePerspectiveProjector(Eye eye) {
-    this.eye = eye;
-  }
-
+public class ODSVerticalStackedProjector extends OmniDirectionalStereoProjector {
   @Override
   public void apply(double x, double y, Vector3 pos, Vector3 direction) {
-    switch (eye) {
-      case LEFT:
-        applyLeftEye(x + 0.5, y + 0.5, pos, direction);
-        break;
-      case RIGHT:
-        applyRightEye(x + 0.5, y + 0.5, pos, direction);
-        break;
+    if(y < 0) {
+      // -0.5 - 0.0
+      applyLeftEye(x*2 + 1, y*2 + 1, pos, direction);
+    } else {
+      // 0.0 - 0.5
+      applyRightEye(x*2 + 1, y*2, pos, direction);
     }
-  }
-
-  public enum Eye {
-    LEFT,
-    RIGHT
   }
 }

@@ -17,7 +17,7 @@
 
 package se.llbit.chunky.renderer;
 
-import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.chunky.renderer.scene.camera.Camera;
 import se.llbit.chunky.renderer.scene.RayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Ray;
