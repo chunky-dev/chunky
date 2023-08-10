@@ -387,7 +387,7 @@ public class BlockPalette {
       block.specular = 0.04f;
     });
     materialProperties.put("minecraft:sea_lantern", block -> {
-      block.emittance = 0.5f;
+      block.emittance = 1.0f;
     });
     materialProperties.put("minecraft:magma", block -> {
       block.emittance = 0.6f;
@@ -547,6 +547,11 @@ public class BlockPalette {
         block.emittance = 1.0f / 15f;
       }
     });
+    materialProperties.put("minecraft:calibrated_sculk_sensor", block -> {
+      if (block instanceof CalibratedSculkSensor && ((CalibratedSculkSensor) block).isActive()) {
+        block.emittance = 1.0f / 15f;
+      }
+    });
     materialProperties.put("minecraft:glow_lichen", block -> {
       block.emittance = 1.0f / 15f * 7;
     });
@@ -562,7 +567,7 @@ public class BlockPalette {
     });
     materialProperties.put("minecraft:light", block -> {
       if (block instanceof LightBlock) {
-        block.emittance = 1.0f / 15f * ((LightBlock) block).getLevel();
+        block.emittance = 1.0f / 15f * 4 * ((LightBlock) block).getLevel();
       }
     });
     materialProperties.put("minecraft:ochre_froglight", block -> {

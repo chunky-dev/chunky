@@ -19,18 +19,22 @@ package se.llbit.chunky.ui;
 
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.ContextMenu;
+import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.GridPane;
 import javafx.stage.PopupWindow;
 import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.MapView;
@@ -40,6 +44,8 @@ import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.renderer.scene.camera.Camera;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
+import se.llbit.chunky.ui.dialogs.SelectChunksInRadiusDialog;
+import se.llbit.chunky.ui.elements.TextFieldLabelWrapper;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
@@ -55,6 +61,7 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -81,6 +88,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   protected final ContextMenu contextMenu = new ContextMenu();
   protected final MenuItem moveCameraHere;
   protected final MenuItem selectVisible;
+  protected SelectChunksInRadiusDialog selectionRadiusDialog;
   public Tooltip tooltip = new Tooltip();
   public int lastX;
   public int lastY;
@@ -145,6 +153,9 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     clearSelection.setOnAction(event -> chunkSelection.clearSelection());
     clearSelection.setDisable(chunkSelection.isEmpty());
 
+    this.selectionRadiusDialog = new SelectChunksInRadiusDialog();
+    MenuItem selectChunksInRadius = createSelectChunksInRadiusMenuItem(mapView, chunkSelection);
+
     MenuItem newScene = new MenuItem("New scene from selection");
     newScene.setGraphic(new ImageView(Icon.sky.fxImage()));
     newScene.setOnAction(event -> {
@@ -186,22 +197,13 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     MenuItem exportPng = new MenuItem("Save map view as…");
     exportPng.setOnAction(e -> controller.exportMapView());
 
-    MenuItem deleteChunks = new MenuItem("Delete selected chunks");
-    ImageView deleteChunksIcon = new ImageView(Icon.tntSide.fxImage());
-    deleteChunksIcon.setFitHeight(16);
-    deleteChunksIcon.setPreserveRatio(true);
-    deleteChunks.setGraphic(deleteChunksIcon);
-    deleteChunks.setOnAction(e -> controller.promptDeleteSelectedChunks());
-    deleteChunks.setDisable(chunkSelection.size() == 0);
-
     contextMenu.getItems().addAll(
-        newScene, loadSelection, clearSelection,
+        newScene, loadSelection, clearSelection, selectChunksInRadius,
         new SeparatorMenuItem(),
         moveCameraHere, selectVisible,
         new SeparatorMenuItem(),
-        exportZip, exportPng,
-        new SeparatorMenuItem(),
-        deleteChunks);
+        exportZip, exportPng
+    );
 
     controller.getChunky()
       .getMapContextMenuTransformers()
@@ -213,7 +215,6 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       newScene.setDisable(noChunksSelected);
       loadSelection.setDisable(noChunksSelected);
       exportZip.setDisable(noChunksSelected);
-      deleteChunks.setDisable(noChunksSelected);
     });
   }
 
@@ -510,6 +511,16 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     if (event.getButton() == MouseButton.SECONDARY) {
       clickX = lastX;
       clickY = lastY;
+
+      ChunkView theView = mapView.getMapView();
+      Vector2 overlayPosition = new Vector2(event.getX(), event.getY());
+      Vector2 chunkPosition = new Vector2(
+        theView.x + (overlayPosition.x - getWidth() / 2f) / theView.scale,
+        theView.z + (overlayPosition.y - getHeight() / 2f) / theView.scale
+      );
+
+      contextMenu.getProperties().put("overlayPosition", overlayPosition); // plugin api
+      contextMenu.getProperties().put("chunkPosition", chunkPosition); // plugin api
       contextMenu.show(mapOverlay, event.getScreenX(), event.getScreenY());
     } else {
       if (contextMenu.isShowing()) {
@@ -588,16 +599,18 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     World world = mapLoader.getWorld();
     double blockScale = mapView.scale / 16.;
     for (PlayerEntityData player : world.getPlayerPositions()) {
-      int px = (int) QuickMath.floor(player.x * blockScale);
-      int py = (int) QuickMath.floor(player.y);
-      int pz = (int) QuickMath.floor(player.z * blockScale);
-      int ppx = px - (int) QuickMath.floor(mapView.x0 * mapView.scale);
-      int ppy = pz - (int) QuickMath.floor(mapView.z0 * mapView.scale);
-      int pw = (int) QuickMath.max(16, QuickMath.min(32, blockScale * 4));
-      ppx = Math.min(mapView.width - pw, Math.max(0, ppx - pw / 2));
-      ppy = Math.min(mapView.height - pw, Math.max(0, ppy - pw / 2));
+      if (player.dimension == world.currentDimension()) {
+        int px = (int) QuickMath.floor(player.x * blockScale);
+        int py = (int) QuickMath.floor(player.y);
+        int pz = (int) QuickMath.floor(player.z * blockScale);
+        int ppx = px - (int) QuickMath.floor(mapView.x0 * mapView.scale);
+        int ppy = pz - (int) QuickMath.floor(mapView.z0 * mapView.scale);
+        int pw = (int) QuickMath.max(16, QuickMath.min(32, blockScale * 4));
+        ppx = Math.min(mapView.width - pw, Math.max(0, ppx - pw / 2));
+        ppy = Math.min(mapView.height - pw, Math.max(0, ppy - pw / 2));
 
-      gc.drawImage(Icon.player.fxImage(), ppx, ppy, pw, pw);
+        gc.drawImage(Icon.player.fxImage(), ppx, ppy, pw, pw);
+      }
     }
   }
 
@@ -839,6 +852,34 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     int x2 = (int) v2.x;
     int y2 = (int) v2.y;
     gc.strokeLine(x1, y1, x2, y2);
+  }
+
+  private MenuItem createSelectChunksInRadiusMenuItem(MapView mapView, ChunkSelectionTracker chunkSelection) {
+    MenuItem selectChunksInRadius = new MenuItem("Select chunks in radius");
+    selectChunksInRadius.setOnAction(event -> {
+      // not using lastX and lastY as they are the position within this display, and so when positioning a window in a system
+      // with multiple displays they would set the position relative to the PRIMARY display... very annoying
+      Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+      this.selectionRadiusDialog.setX(mouseLocation.x - 200); // some offsetting to center the popup on the mouse (may not work as well on higher resolutions than 1920x1080)
+      this.selectionRadiusDialog.setY(mouseLocation.y - 75);
+
+      ChunkView theView = mapView.getMapView();
+      int cx = (int) QuickMath.floor(theView.x + (clickX - getWidth() / 2f) / theView.scale);
+      int cz = (int) QuickMath.floor(theView.z + (clickY - getHeight() / 2f) / theView.scale);
+
+      this.selectionRadiusDialog.setSelectionPos(cx, cz);
+
+      if (selectionRadiusDialog.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+        chunkSelection.setChunkRadius(
+          mapLoader.getWorld(),
+          this.selectionRadiusDialog.getSelectionX(),
+          this.selectionRadiusDialog.getSelectionZ(),
+          this.selectionRadiusDialog.getRadius(),
+          true
+        );
+      }
+   });
+    return selectChunksInRadius;
   }
 
   public void setOnViewDragged(Runnable onViewDragged) {

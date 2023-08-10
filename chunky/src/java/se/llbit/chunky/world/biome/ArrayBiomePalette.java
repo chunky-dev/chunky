@@ -24,8 +24,10 @@ public class ArrayBiomePalette implements BiomePalette {
 
   @Override
   public Biome get(int id) {
-    assert id >= 0 && id < palette.size() : "id " + id + " out of bounds for palette";
-
+    if (id < 0 || id >= palette.size()) {
+      // this should not happen but is very common with WorldPainter generated worlds
+      return Biomes.biomesPrePalette[1];
+    }
     return this.palette.get(id);
   }
 
@@ -34,12 +36,12 @@ public class ArrayBiomePalette implements BiomePalette {
     assert biome != null;
 
     for (int i = 0, len = this.palette.size(); i <= len; i++) {
-      if(i == palette.size()) { //biome must not be in palette, so add it
+      if (i == palette.size()) { //biome must not be in palette, so add it
         this.palette.add(biome);
         return i;
       }
 
-      if(this.palette.get(i) == biome) { //found biome in palette, return it
+      if (this.palette.get(i) == biome) { //found biome in palette, return it
         return i;
       }
     }

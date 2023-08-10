@@ -51,13 +51,19 @@ public class PathTracingRenderer extends TileBasedRenderer {
   @Override
   public void render(DefaultRenderManager manager) throws InterruptedException {
     Scene scene = manager.bufferedScene;
+
     int width = scene.width;
     int height = scene.height;
 
+    int fullWidth = scene.getFullWidth();
+    int fullHeight = scene.getFullHeight();
+    int cropX = scene.getCropX();
+    int cropY = scene.getCropY();
+
     int sppPerPass = manager.context.sppPerPass();
     Camera cam = scene.camera();
-    double halfWidth = width / (2.0 * height);
-    double invHeight = 1.0 / height;
+    double halfWidth = fullWidth / (2.0 * fullHeight);
+    double invHeight = 1.0 / fullHeight;
 
     double[] sampleBuffer = scene.getSampleBuffer();
 
@@ -78,8 +84,8 @@ public class PathTracingRenderer extends TileBasedRenderer {
           double oy = state.random.nextDouble();
 
           cam.calcViewRay(state.ray, state.random,
-              -halfWidth + (x + ox) * invHeight,
-              -0.5 + (y + oy) * invHeight);
+              -halfWidth + (x + ox + cropX) * invHeight,
+              -0.5 + (y + oy + cropY) * invHeight);
           scene.rayTrace(tracer, state);
 
           sr += state.ray.color.x;

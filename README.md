@@ -189,7 +189,7 @@ when in doubt.
 
 ## Copyright & License
 
-Chunky is Copyright (c) 2010-2022, Jesper Öqvist <jesper@llbit.se> and [Chunky Contributors][chunky-contributors].
+Chunky is Copyright (c) 2010-2023, Jesper Öqvist <jesper@llbit.se> and [Chunky Contributors][chunky-contributors].
 
 Permission to modify and redistribute is granted under the terms of
 the GPLv3 license. See the file `LICENSE` for the full license.

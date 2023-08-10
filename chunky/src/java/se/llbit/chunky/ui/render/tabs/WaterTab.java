@@ -184,7 +184,6 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
 
     waterPlaneHeight.setName("Water height");
     waterPlaneHeight.setTooltip("The default ocean height is " + World.SEA_LEVEL + ".");
-    waterPlaneHeight.clampBoth();
     waterPlaneHeight.onValueChange(value -> scene.setWaterPlaneHeight(value));
 
     waterPlaneOffsetEnabled.setTooltip(new Tooltip("Lower the water plane from block level to water level."));

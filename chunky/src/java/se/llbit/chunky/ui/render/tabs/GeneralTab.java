@@ -18,6 +18,7 @@
 package se.llbit.chunky.ui.render.tabs;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -33,6 +34,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Book;
 import se.llbit.chunky.entity.PaintingEntity;
+import se.llbit.chunky.entity.BeaconBeam;
 import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.RenderController;
@@ -41,6 +43,7 @@ import se.llbit.chunky.renderer.scene.EntityLoadingPreferences;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.Icons;
 import se.llbit.chunky.ui.IntegerAdjuster;
+import se.llbit.chunky.ui.IntegerTextField;
 import se.llbit.chunky.ui.elements.SizeInput;
 import se.llbit.chunky.ui.ValidatingNumberStringConverter;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
@@ -54,6 +57,7 @@ import se.llbit.fxutil.Dialogs;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.log.Log;
+import se.llbit.math.ObservableSize2D;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -77,14 +81,19 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private Button makeDefaultSize;
   @FXML private Button flipAxesBtn;
   @FXML private Pane scaleButtonArea;
-  @FXML private Button setDefaultYMin;
-  @FXML private Button setDefaultYMax;
+  @FXML private CheckBox renderRegions;
+  @FXML private Pane renderRegionsArea;
+  @FXML private IntegerTextField cameraCropWidth;
+  @FXML private IntegerTextField cameraCropHeight;
+  @FXML private IntegerTextField cameraCropX;
+  @FXML private IntegerTextField cameraCropY;
   @FXML private Button loadAllEntities;
   @FXML private Button loadNoEntity;
   @FXML private CheckBox loadPlayers;
   @FXML private CheckBox loadArmorStands;
   @FXML private CheckBox loadBooks;
   @FXML private CheckBox loadPaintings;
+  @FXML private CheckBox loadBeaconBeams;
   @FXML private CheckBox loadOtherEntities;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
@@ -100,6 +109,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   private WorldMapLoader mapLoader;
   private RenderControlsFxController renderControls;
   private ChunkyFxController chunkyFxController;
+  private ChangeListener<? super Number> canvasCropListener = (observable, oldValue, newValue) -> updateCanvasCrop();
 
   public GeneralTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("GeneralTab.fxml"));
@@ -132,6 +142,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadArmorStands.setSelected(preferences.shouldLoadClass(ArmorStand.class));
       loadBooks.setSelected(preferences.shouldLoadClass(Book.class));
       loadPaintings.setSelected(preferences.shouldLoadClass(PaintingEntity.class));
+      loadBeaconBeams.setSelected(preferences.shouldLoadClass(BeaconBeam.class));
       loadOtherEntities.setSelected(preferences.shouldLoadClass(null));
     }
 
@@ -151,12 +162,29 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         chunkyFxController.getChunkSelection().isEmpty()
       );
     });
-    canvasSizeInput.setSize(scene.canvasWidth(), scene.canvasHeight());
     openSceneDirBtn.setDisable(!controller.getContext().getSceneDirectory().exists());
     openSceneDirBtn.setTooltip(new Tooltip("Open the directory of the scene, if it has been saved."));
     ((AsynchronousSceneManager) controller.getSceneManager()).setOnSceneSaved(() -> {
       openSceneDirBtn.setDisable(!controller.getContext().getSceneDirectory().exists());
     });
+
+    cameraCropWidth.valueProperty().removeListener(canvasCropListener);
+    cameraCropHeight.valueProperty().removeListener(canvasCropListener);
+    cameraCropX.valueProperty().removeListener(canvasCropListener);
+    cameraCropY.valueProperty().removeListener(canvasCropListener);
+
+    cameraCropWidth.valueProperty().set(scene.width);
+    cameraCropHeight.valueProperty().set(scene.height);
+    cameraCropX.valueProperty().set(scene.cropX);
+    cameraCropY.valueProperty().set(scene.cropY);
+
+    cameraCropWidth.valueProperty().addListener(canvasCropListener);
+    cameraCropHeight.valueProperty().addListener(canvasCropListener);
+    cameraCropX.valueProperty().addListener(canvasCropListener);
+    cameraCropY.valueProperty().addListener(canvasCropListener);
+
+    renderRegions.setSelected(scene.isCanvasCropped());
+    canvasSizeInput.setSize(scene.getFullWidth(), scene.getFullHeight());
   }
 
   @Override public String getTabTitle() {
@@ -188,6 +216,8 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         try (JsonParser parser = new JsonParser(new ByteArrayInputStream(text.getBytes()))) {
           JsonObject json = parser.parse().object();
           scene.importFromJson(json);
+          renderControls.getCanvas().setCanvasSize(scene.width, scene.height);
+          renderControls.refreshSettings();
         } catch (IOException e) {
           Log.warn("Failed to import scene settings.");
         } catch (JsonParser.SyntaxError syntaxError) {
@@ -248,6 +278,16 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       renderControls.showPopup(
               "This takes effect the next time a new scene is created.", loadPaintings);
     });
+    loadBeaconBeams.setTooltip(new Tooltip("Enable/disable beacon beam entity loading. "
+      + "Takes effect on next scene creation."));
+    loadBeaconBeams.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(BeaconBeam.class, newValue);
+      PersistentSettings.setLoadBeaconBeams(newValue);
+    });
+    loadBeaconBeams.setOnAction(event -> {
+      renderControls.showPopup(
+        "This takes effect the next time a new scene is created.", loadBeaconBeams);
+    });
     loadOtherEntities.setTooltip(new Tooltip("Enable/disable other entity loading. "
             + "Takes effect on next scene creation."));
     loadOtherEntities.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -263,6 +303,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadArmorStands.setSelected(true);
       loadBooks.setSelected(true);
       loadPaintings.setSelected(true);
+      loadBeaconBeams.setSelected(true);
       loadOtherEntities.setSelected(true);
     });
     loadNoEntity.setOnAction(event -> {
@@ -270,6 +311,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadArmorStands.setSelected(false);
       loadBooks.setSelected(false);
       loadPaintings.setSelected(false);
+      loadBeaconBeams.setSelected(false);
       loadOtherEntities.setSelected(false);
     });
 
@@ -360,11 +402,6 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     reloadChunks.setGraphic(new ImageView(Icon.reload.fxImage()));
     reloadChunks.setOnAction(e -> controller.getSceneManager().reloadChunks());
 
-    setDefaultYMin.setTooltip(new Tooltip("Make this the default lower Y clip plane."));
-    setDefaultYMin.setOnAction(e -> PersistentSettings.setYClipMin(yMin.get()));
-    setDefaultYMax.setTooltip(new Tooltip("Make this the default upper Y clip plane."));
-    setDefaultYMax.setOnAction(e -> PersistentSettings.setYClipMax(yMax.get()));
-
     canvasSizeLabel.setGraphic(new ImageView(Icon.scale.fxImage()));
     canvasSizeInput.getSize().addListener(this::updateCanvasSize);
 
@@ -403,11 +440,54 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     makeDefaultSize.setTooltip(new Tooltip("Make the current canvas size the default."));
     makeDefaultSize.setOnAction(e -> PersistentSettings
       .set3DCanvasSize(scene.canvasWidth(), scene.canvasHeight()));
+
+    renderRegionsArea.visibleProperty().bind(renderRegions.selectedProperty());
+    renderRegionsArea.managedProperty().bind(renderRegionsArea.visibleProperty());
+    renderRegions.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (newValue) {
+        if (cameraCropWidth.getValue() == 0 || cameraCropHeight.getValue() == 0) {
+          cameraCropWidth.valueProperty().set(scene.getFullWidth());
+          cameraCropHeight.valueProperty().set(scene.getFullHeight());
+          cameraCropX.valueProperty().set(0);
+          cameraCropY.valueProperty().set(0);
+        }
+      } else {
+        cameraCropWidth.valueProperty().set(0);
+        cameraCropHeight.valueProperty().set(0);
+        cameraCropX.valueProperty().set(0);
+        cameraCropY.valueProperty().set(0);
+      }
+    });
+    cameraCropWidth.valueProperty().addListener(canvasCropListener);
+    cameraCropHeight.valueProperty().addListener(canvasCropListener);
+    cameraCropX.valueProperty().addListener(canvasCropListener);
+    cameraCropY.valueProperty().addListener(canvasCropListener);
   }
 
   private void updateCanvasSize(int width, int height) {
-    renderControls.getCanvas().setCanvasSize(width, height);
-    scene.setCanvasSize(width, height);
+    if (cameraCropWidth.getValue() > width) {
+      cameraCropWidth.valueProperty().set(width);
+    }
+    if (cameraCropHeight.getValue() > height) {
+      cameraCropHeight.valueProperty().set(height);
+    }
+    if (renderRegions.isSelected()) {
+      scene.setCanvasCropSize(cameraCropWidth.getValue(), cameraCropHeight.getValue(), width, height, cameraCropX.getValue(), cameraCropY.getValue());
+      if (cameraCropX.getValue() != scene.cropX) {
+        cameraCropX.valueProperty().set(scene.getCropX());
+      }
+      if (cameraCropY.getValue() != scene.cropY) {
+        cameraCropY.valueProperty().set(scene.getCropY());
+      }
+    } else {
+      scene.setCanvasCropSize(width, height, 0, 0, 0, 0);
+    }
+    renderControls.getCanvas().setCanvasSize(scene.width, scene.height);
+  }
+
+  private void updateCanvasCrop() {
+    ObservableSize2D size = canvasSizeInput.getSize();
+    updateCanvasSize(size.getWidth(), size.getHeight());
   }
 
   @Override public void setController(RenderControlsFxController controls) {

@@ -206,6 +206,9 @@ public class Sun implements JsonSerializable {
   }
 
   private void initSun() {
+    radiusCos = FastMath.cos(radius);
+    radiusSin = FastMath.sin(radius);
+
     double theta = azimuth;
     double phi = altitude;
 
@@ -414,16 +417,20 @@ public class Sun implements JsonSerializable {
     return enableTextureModification;
   }
 
+  /**
+   * @param value Sun radius in radians.
+   */
   public void setSunRadius(double value) {
-    radius = value * .03;
-    radiusCos = FastMath.cos(radius);
-    radiusSin = FastMath.sin(radius);
+    radius = value;
     initSun();
     scene.refresh();
   }
 
+  /**
+   * @return Sun radius in radians.
+   */
   public double getSunRadius() {
-    return radius / .03;
+    return radius;
   }
 
   /**
