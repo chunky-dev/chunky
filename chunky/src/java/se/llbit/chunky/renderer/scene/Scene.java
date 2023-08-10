@@ -127,6 +127,21 @@ public class Scene implements JsonSerializable, Refreshable {
   public static final double MAX_EMITTER_INTENSITY = 1000;
 
   /**
+   * Default transmissivity cap.
+   */
+  public static final double DEFAULT_TRANSMISSIVITY_CAP = 1;
+
+  /**
+   * Minimum transmissivity cap.
+   */
+  public static final double MIN_TRANSMISSIVITY_CAP = 1;
+
+  /**
+   * Maximum transmissivity cap.
+   */
+  public static final double MAX_TRANSMISSIVITY_CAP = 3;
+
+  /**
    * Default exposure.
    */
   public static final double DEFAULT_EXPOSURE = 1.0;
@@ -192,6 +207,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean emittersEnabled = DEFAULT_EMITTERS_ENABLED;
   protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
   protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.NONE;
+  protected double transmissivityCap = DEFAULT_TRANSMISSIVITY_CAP;
 
   protected SunSamplingStrategy sunSamplingStrategy = SunSamplingStrategy.FAST;
 
@@ -430,6 +446,7 @@ public class Scene implements JsonSerializable, Refreshable {
     emitterIntensity = other.emitterIntensity;
     emitterSamplingStrategy = other.emitterSamplingStrategy;
     preventNormalEmitterWithSampling = other.preventNormalEmitterWithSampling;
+    transmissivityCap = other.transmissivityCap;
     transparentSky = other.transparentSky;
     yClipMin = other.yClipMin;
     yClipMax = other.yClipMax;
@@ -798,12 +815,14 @@ public class Scene implements JsonSerializable, Refreshable {
 
     BiomeStructure.Factory biomeStructureFactory = BiomeStructure.get(this.biomeStructureImplementation);
 
+    Dimension dimension = world.currentDimension();
+
     try (TaskTracker.Task task = taskTracker.task("(1/6) Loading regions")) {
       task.update(2, 1);
 
       loadedWorld = world;
       worldPath = loadedWorld.getWorldDirectory().getAbsolutePath();
-      worldDimension = world.currentDimension();
+      worldDimension = world.currentDimensionId();
 
       if (chunksToLoad.isEmpty()) {
         return;
@@ -830,12 +849,12 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       for (ChunkPosition region : regions) {
-        world.getRegion(region).parse(yMin, yMax);
+        dimension.getRegion(region).parse(yMin, yMax);
       }
     }
 
     try (TaskTracker.Task task = taskTracker.task("(2/6) Loading entities")) {
-     entities.loadPlayers(task, world);
+     entities.loadPlayers(task, dimension);
     }
 
     BiomePalette biomePalette = new ArrayBiomePalette();
@@ -860,7 +879,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       ExecutorService executor = Executors.newSingleThreadExecutor();
       Future<?> nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
-        world.getChunk(chunkPositions[0]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
+        dimension.getChunk(chunkPositions[0]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
         return null; // runnable can't throw non-RuntimeExceptions, so we use a callable instead and have to return something
       });
       for (int i = 0; i < chunkPositions.length; i++) {
@@ -892,7 +911,7 @@ public class Scene implements JsonSerializable, Refreshable {
           if (i + 1 < chunkPositions.length) { // schedule next task if possible
             final int finalI = i;
             nextChunkDataTask = executor.submit(() -> { //request chunk data for the next iteration of the loop
-              world.getChunk(chunkPositions[finalI + 1]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
+              dimension.getChunk(chunkPositions[finalI + 1]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
               return null; // runnable can't throw non-RuntimeExceptions, so we use a callable instead and have to return something
             });
           }
@@ -1185,7 +1204,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
         if (!chunkData.isEmpty()){
           nonEmptyChunks.add(cp);
-          if (world.getChunk(cp).getVersion() == ChunkVersion.PRE_FLATTENING) {
+          if (dimension.getChunk(cp).getVersion() == ChunkVersion.PRE_FLATTENING) {
             legacyChunks.add(cp);
           }
         }
@@ -2595,6 +2614,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("saveSnapshots", saveSnapshots);
     json.add("emittersEnabled", emittersEnabled);
     json.add("emitterIntensity", emitterIntensity);
+    json.add("transmissivityCap", transmissivityCap);
     json.add("sunSamplingStrategy", sunSamplingStrategy.getId());
     json.add("stillWater", stillWater);
     json.add("waterOpacity", waterOpacity);
@@ -2852,6 +2872,7 @@ public class Scene implements JsonSerializable, Refreshable {
     saveSnapshots = json.get("saveSnapshots").boolValue(saveSnapshots);
     emittersEnabled = json.get("emittersEnabled").boolValue(emittersEnabled);
     emitterIntensity = json.get("emitterIntensity").doubleValue(emitterIntensity);
+    transmissivityCap = json.get("transmissivityCap").doubleValue(transmissivityCap);
 
     if (json.get("sunSamplingStrategy").isUnknown()) {
       boolean sunSampling = json.get("sunEnabled").boolValue(false);
@@ -3358,5 +3379,14 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void setHideUnknownBlocks(boolean hideUnknownBlocks) {
     this.hideUnknownBlocks = hideUnknownBlocks;
+  }
+
+  public double getTransmissivityCap() {
+    return transmissivityCap;
+  }
+
+  public void setTransmissivityCap(double value) {
+    transmissivityCap = value;
+    refresh();
   }
 }

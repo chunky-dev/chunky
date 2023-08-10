@@ -105,7 +105,7 @@ public class PathTracer implements RayTracer {
 
       float pSpecular = currentMat.specular;
 
-      double pDiffuse = ray.color.w;
+      double pDiffuse = 1 - Math.sqrt(1 - ray.color.w);
 
       float n1 = prevMat.ior;
       float n2 = currentMat.ior;
@@ -348,17 +348,8 @@ public class PathTracer implements RayTracer {
                 }
 
                 if (pathTrace(scene, refracted, state, 1, false)) {
-                  ray.color.x = ray.color.x * pDiffuse + (1 - pDiffuse);
-                  ray.color.y = ray.color.y * pDiffuse + (1 - pDiffuse);
-                  ray.color.z = ray.color.z * pDiffuse + (1 - pDiffuse);
-
-                  ray.emittance.x = ray.color.x * refracted.emittance.x;
-                  ray.emittance.y = ray.color.y * refracted.emittance.y;
-                  ray.emittance.z = ray.color.z * refracted.emittance.z;
-
-                  ray.color.x *= refracted.color.x;
-                  ray.color.y *= refracted.color.y;
-                  ray.color.z *= refracted.color.z;
+                  // Calculate the color and emittance of the refracted ray
+                  translucentRayColor(scene, ray, refracted, pDiffuse);
                   hit = true;
                 }
               }
@@ -372,17 +363,8 @@ public class PathTracer implements RayTracer {
           transmitted.o.scaleAdd(Ray.OFFSET, transmitted.d);
 
           if (pathTrace(scene, transmitted, state, 1, false)) {
-            ray.color.x = ray.color.x * pDiffuse + (1 - pDiffuse);
-            ray.color.y = ray.color.y * pDiffuse + (1 - pDiffuse);
-            ray.color.z = ray.color.z * pDiffuse + (1 - pDiffuse);
-
-            ray.emittance.x = ray.color.x * transmitted.emittance.x;
-            ray.emittance.y = ray.color.y * transmitted.emittance.y;
-            ray.emittance.z = ray.color.z * transmitted.emittance.z;
-
-            ray.color.x *= transmitted.color.x;
-            ray.color.y *= transmitted.color.y;
-            ray.color.z *= transmitted.color.z;
+            // Calculate the color and emittance of the transmitted ray
+            translucentRayColor(scene, ray, transmitted, pDiffuse);
             hit = true;
           }
         }
@@ -436,6 +418,64 @@ public class PathTracer implements RayTracer {
     }
 
     return hit;
+  }
+
+  private static void translucentRayColor(Scene scene, Ray ray, Ray next, double opacity) {
+    // Color-based transmission value
+    double colorTrans = (ray.color.x + ray.color.y + ray.color.z)/3;
+    // Total amount of light we want to transmit (overall transparency of texture)
+    double shouldTrans = 1 - opacity;
+    // Amount of each color to transmit - default to overall transparency if RGB values add to 0 (e.g. regular glass)
+    Vector3 rgbTrans = new Vector3(shouldTrans, shouldTrans, shouldTrans);
+    if(colorTrans > 0) {
+      // Amount to transmit of each color is scaled so the total transmitted amount matches the texture's transparency
+      rgbTrans.set(ray.color.toVec3());
+      rgbTrans.scale(shouldTrans / colorTrans);
+    }
+    double transmissivityCap = scene.transmissivityCap;
+    // Determine the color with the highest transmissivity
+    double maxTrans = Math.max(rgbTrans.x, Math.max(rgbTrans.y, rgbTrans.z));
+    if(maxTrans > transmissivityCap) {
+      if (maxTrans == rgbTrans.x) {
+        // Give excess transmission from red to green and blue
+        double gTransNew = reassignTransmissivity(rgbTrans.x, rgbTrans.y, rgbTrans.z, shouldTrans, transmissivityCap);
+        rgbTrans.z = reassignTransmissivity(rgbTrans.x, rgbTrans.z, rgbTrans.y, shouldTrans, transmissivityCap);
+        rgbTrans.y = gTransNew;
+        rgbTrans.x = transmissivityCap;
+      } else if (maxTrans == rgbTrans.y) {
+        // Give excess transmission from green to red and blue
+        double rTransNew = reassignTransmissivity(rgbTrans.y, rgbTrans.x, rgbTrans.z, shouldTrans, transmissivityCap);
+        rgbTrans.z = reassignTransmissivity(rgbTrans.y, rgbTrans.z, rgbTrans.x, shouldTrans, transmissivityCap);
+        rgbTrans.x = rTransNew;
+        rgbTrans.y = transmissivityCap;
+      } else if (maxTrans == rgbTrans.z) {
+        // Give excess transmission from blue to green and red
+        double gTransNew = reassignTransmissivity(rgbTrans.z, rgbTrans.y, rgbTrans.x, shouldTrans, transmissivityCap);
+        rgbTrans.x = reassignTransmissivity(rgbTrans.z, rgbTrans.x, rgbTrans.y, shouldTrans, transmissivityCap);
+        rgbTrans.y = gTransNew;
+        rgbTrans.z = transmissivityCap;
+      }
+    }
+    // Don't need to check for energy gain if transmissivity cap is 1
+    if(transmissivityCap > 1) {
+      double currentEnergy = rgbTrans.x * next.color.x + rgbTrans.y * next.color.y + rgbTrans.z * next.color.z;
+      double nextEnergy = next.color.x + next.color.y + next.color.z;
+      double energyRatio = nextEnergy / currentEnergy;
+      // Normalize if there is net energy gain across all channels (more likely for higher transmissivityCap combined with high-saturation light source)
+      if(energyRatio < 1) {
+        rgbTrans.scale(energyRatio);
+      }
+    }
+    // Scale color based on next ray
+    ray.color.multiplyEntrywise(new Vector4(rgbTrans, 1), next.color);
+    // Use emittance from next ray
+    ray.emittance.multiplyEntrywise(rgbTrans, next.emittance);
+  }
+
+  private static double reassignTransmissivity(double from, double to, double other, double trans, double cap) {
+    // Formula here derived algebraically from this system:
+    // (cap - to_new)/(cap - other_new) = (from - to)/(from - other), (cap + to_new + other_new)/3 = trans
+    return (cap*(other - 2*to + from) + (3*trans)*(to - from))/(other + to - 2*from);
   }
 
   private static void addSkyFog(Scene scene, Ray ray, WorkerState state, Vector3 ox, Vector3 od) {
