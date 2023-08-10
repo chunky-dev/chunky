@@ -56,7 +56,9 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
     mapView.addViewListener(this);
 
     // Start worker threads.
-    RegionParser[] regionParsers = new RegionParser[Integer.parseInt(System.getProperty("chunky.mapLoaderThreads", String.valueOf(PersistentSettings.getNumThreads())))];
+    RegionParser[] regionParsers = new RegionParser[Integer.parseInt(
+      System.getProperty("chunky.mapLoaderThreads", String.valueOf(PersistentSettings.getMapLoadingThreadCount()))
+    )];
     for (int i = 0; i < regionParsers.length; ++i) {
       regionParsers[i] = new RegionParser(this, regionQueue, mapView);
       regionParsers[i].start();

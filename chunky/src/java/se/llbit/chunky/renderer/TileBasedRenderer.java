@@ -25,6 +25,7 @@ import se.llbit.math.Ray;
 import java.util.ArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 /**
  * A tile based renderer. Simply call {@code submitTiles} to submit a frame's worth of tiles to the work queue.
@@ -57,6 +58,9 @@ public abstract class TileBasedRenderer implements Renderer {
     postRender = callback;
   }
 
+  protected Supplier<WorkerState> workerStateFactory = WorkerState::new;
+  protected Supplier<Ray> rayFactory = Ray::new;
+
   /**
    * Create and submit tiles to the rendering pool.
    * Await for these tiles to finish rendering with {@code manager.pool.awaitEmpty()}.
@@ -65,12 +69,12 @@ public abstract class TileBasedRenderer implements Renderer {
    *                 The second argument is the current pixel (x, y).
    */
   protected void submitTiles(DefaultRenderManager manager, BiConsumer<WorkerState, IntIntPair> perPixel) {
-    initTiles(manager);
+    initTiles(manager.bufferedScene, manager.context.getRenderOptions());
 
     cachedTiles.forEach(tile ->
         manager.pool.submit(worker -> {
-          WorkerState state = new WorkerState();
-          state.ray = new Ray();
+          WorkerState state = workerStateFactory.get();
+          state.ray = rayFactory.get();
           state.ray.setNormal(0, 0, -1);
           state.random = worker.random;
 
@@ -86,11 +90,10 @@ public abstract class TileBasedRenderer implements Renderer {
     );
   }
 
-  private void initTiles(DefaultRenderManager manager) {
-    Scene bufferedScene = manager.bufferedScene;
-    int width = bufferedScene.width;
-    int height = bufferedScene.height;
-    int tileWidth = manager.context.tileWidth();
+  private void initTiles(Scene scene, RenderOptions renderOptions) {
+    int width = scene.width;
+    int height = scene.height;
+    int tileWidth = renderOptions.getTileWidth();
 
     if (prevWidth != width || prevHeight != height) {
       prevWidth = width;
@@ -99,8 +102,10 @@ public abstract class TileBasedRenderer implements Renderer {
 
       for (int i = 0; i < width; i += tileWidth) {
         for (int j = 0; j < height; j += tileWidth) {
-          cachedTiles.add(new RenderTile(i, FastMath.min(i + tileWidth, width),
-              j, FastMath.min(j + tileWidth, height)));
+          cachedTiles.add(new RenderTile(
+            i, FastMath.min(i + tileWidth, width),
+            j, FastMath.min(j + tileWidth, height)
+          ));
         }
       }
     }

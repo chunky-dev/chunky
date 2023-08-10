@@ -168,7 +168,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     renderThreads.setRange(1, 20);
     renderThreads.clampMin();
     renderThreads.onValueChange(value -> {
-      PersistentSettings.setNumRenderThreads(value);
+      PersistentSettings.setRenderThreadCount(value);
       renderControls.showPopup("This change takes effect after restarting Chunky.", renderThreads);
     });
 
@@ -309,8 +309,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   public void update(Scene scene) {
     outputMode.getSelectionModel().select(scene.getOutputMode());
     fastFog.setSelected(scene.fog.fastFog());
+    renderThreads.set(PersistentSettings.getRenderThreadCount());
     transmissivityCap.set(scene.getTransmissivityCap());
-    renderThreads.set(PersistentSettings.getNumThreads());
     cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());

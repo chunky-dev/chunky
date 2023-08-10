@@ -60,7 +60,7 @@ public class PathTracingRenderer extends TileBasedRenderer {
     int cropX = scene.getCropX();
     int cropY = scene.getCropY();
 
-    int sppPerPass = manager.context.sppPerPass();
+    int sppPerPass = manager.context.getRenderOptions().getSppPerPass();
     Camera cam = scene.camera();
     double halfWidth = fullWidth / (2.0 * fullHeight);
     double invHeight = 1.0 / fullHeight;

@@ -70,7 +70,7 @@ public class BlankRenderTest {
     // A single worker thread is used, with fixed PRNG seed.
     // This makes the path tracing results deterministic.
     ChunkyOptions options = ChunkyOptions.getDefaults();
-    options.renderThreads = 1;
+    ((ModifiableRenderOptions) options.getRenderOptions()).setRenderThreadCount(1);
     Chunky chunky = new Chunky(options);
     RenderContext context = new RenderContext(chunky);
     context.renderPoolFactory = (threads, seed) -> new RenderWorkerPool(threads, 0);

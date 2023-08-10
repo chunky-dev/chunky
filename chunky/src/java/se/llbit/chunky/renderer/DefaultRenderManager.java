@@ -186,7 +186,9 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     this.bufferedScene = context.getChunky().getSceneFactory().newScene();
 
     // Create a new pool. Set the seed to the current time in milliseconds.
-    this.pool = context.renderPoolFactory.create(context.numRenderThreads(), System.currentTimeMillis());
+    this.pool = context.renderPoolFactory.create(
+      context.getRenderOptions().getRenderThreadCount(), System.currentTimeMillis()
+    );
     this.setCPULoad(PersistentSettings.getCPULoad());
 
     // Initialize callbacks here since java will complain `bufferedScene` is not initialized yet.
@@ -294,7 +296,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         getPreviewRenderer().sceneReset(this, reason, resetCount);
 
         // Select the correct renderer
-        Renderer render = mode == RenderMode.PREVIEW ? getPreviewRenderer() : getRenderer();
+        Renderer renderer = mode == RenderMode.PREVIEW ? getPreviewRenderer() : getRenderer();
 
         frameStart = System.currentTimeMillis();
         if (mode == RenderMode.PREVIEW) {
@@ -302,8 +304,8 @@ public class DefaultRenderManager extends Thread implements RenderManager {
           if (finalizeAllFrames) {
             // Preview with no CPU limit
             pool.setCpuLoad(100);
-            render.setPostRender(previewCallback);
-            render.render(this);
+            renderer.setPostRender(previewCallback);
+            startRender(renderer);
             pool.setCpuLoad(cpuLoad);
           }
         } else {
@@ -314,8 +316,8 @@ public class DefaultRenderManager extends Thread implements RenderManager {
               updateRenderState(scene);
             });
           } else if (mode != RenderMode.PAUSED) {
-            render.setPostRender(renderCallback);
-            render.render(this);
+            renderer.setPostRender(renderCallback);
+            startRender(renderer);
           }
         }
 
@@ -326,6 +328,10 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     } catch (Throwable e) {
       Log.error("Unchecked exception in render manager.", e);
     }
+  }
+
+  protected void startRender(Renderer renderer) throws InterruptedException {
+    renderer.render(this);
   }
 
   /**
