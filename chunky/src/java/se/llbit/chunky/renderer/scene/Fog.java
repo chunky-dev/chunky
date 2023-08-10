@@ -13,7 +13,7 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public final class Fog {
-  protected FogMode mode = FogMode.UNIFORM;
+  protected FogMode mode = FogMode.NONE;
   protected boolean fastFog = true;
   protected double uniformDensity = Scene.DEFAULT_FOG_DENSITY;
   protected double skyFogDensity = 1;
@@ -38,6 +38,10 @@ public final class Fog {
 
   public double getSkyFogDensity() {
     return skyFogDensity;
+  }
+
+  public FogMode getFogMode() {
+    return mode;
   }
 
   public boolean fastFog() {

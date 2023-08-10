@@ -341,6 +341,16 @@ public class World implements Comparable<World> {
   }
 
   /**
+   * @param pos Position of the region to load
+   * @param minY Minimum block Y (inclusive)
+   * @param maxY Maximum block Y (exclusive)
+   * @return Whether the region exists
+   */
+  public boolean regionExistsWithinRange(ChunkPosition pos, int minY, int maxY) {
+    return this.regionExists(pos);
+  }
+
+  /**
    * Get the data directory for the given dimension.
    *
    * @param dimension the dimension

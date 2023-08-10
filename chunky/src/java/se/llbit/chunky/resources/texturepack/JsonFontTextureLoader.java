@@ -37,10 +37,10 @@ import java.nio.file.Path;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class JsonFontTextureLoader extends TextureLoader {
-  private final String fontDefinitionPath;
+  private final String rootFontDefinitionPath;
 
   public JsonFontTextureLoader(String fontDefinitionPath) {
-    this.fontDefinitionPath = fontDefinitionPath;
+    this.rootFontDefinitionPath = fontDefinitionPath;
   }
 
   @Override
@@ -58,57 +58,63 @@ public class JsonFontTextureLoader extends TextureLoader {
     Texture.fonts.clear();
     Texture.fonts.setGlyph(' ', new Glyph(new int[8], 0, 2, 8, 8, 7));
 
+    return loadFontDefinitions(texturePack, rootFontDefinitionPath);
+  }
+
+  private boolean loadFontDefinitions(Path texturePack, String fontDefinitionPath) {
     JsonArray fontDefinitions;
     try (InputStream is = Files.newInputStream(texturePack.resolve(fontDefinitionPath))) {
       fontDefinitions = new JsonParser(is).parse().asObject().get("providers").asArray();
     } catch (IOException | SyntaxError e) {
       // Safe to ignore - will be handled implicitly later.
+      Log.error("Failed to load font definition: " + fontDefinitionPath, e);
       return false;
     }
 
     for (JsonValue fontDefinition : fontDefinitions) {
       JsonObject definition = fontDefinition.asObject();
-      if (!definition.get("type").stringValue("").equals("bitmap")) {
-        continue;
-      }
-
-      BitmapImage spritemap;
-      String texture = definition.get("file").stringValue("").split(":")[1];
-      Path texturePath = texturePack.resolve("assets/minecraft/textures/" + texture);
-      if(Files.exists(texturePath)) {
-        try (InputStream imageStream = Files.newInputStream(texturePath)) {
-          spritemap = ImageLoader.read(imageStream);
-        } catch (IOException e) {
-          Log.error("Failed to load font texture: " + texture, e);
-          return false;
-        }
-      } else {
-        Log.warnf(
-          "Could not find font texture: %s (defined in \"%s\")",
-          texture,
-          fontDefinitionPath
-        );
-        return false;
-      }
-
-      int width = spritemap.width / 16;
-      int height = fontDefinition.asObject().get("height").asInt(8);
-      int ascent =
-              fontDefinition
-                      .asObject()
-                      .get("ascent")
-                      .asInt(7); // distance (from top) of the letter base
-
-      int x, y = 0;
-      for (JsonValue charactersLine : fontDefinition.asObject().get("chars").asArray()) {
-        x = 0;
-        for (int codePoint : charactersLine.stringValue("").codePoints().toArray()) {
-          if (!Texture.fonts.containsGlyph(codePoint)) {
-            Texture.fonts.loadGlyph(spritemap, x, y, codePoint, width, height, ascent);
+      if (definition.get("type").stringValue("").equals("bitmap")) {
+        BitmapImage spritemap;
+        String texture = definition.get("file").stringValue("").split(":")[1];
+        Path texturePath = texturePack.resolve("assets/minecraft/textures/" + texture);
+        if (Files.exists(texturePath)) {
+          try (InputStream imageStream = Files.newInputStream(texturePath)) {
+            spritemap = ImageLoader.read(imageStream);
+          } catch (IOException e) {
+            Log.error("Failed to load font texture: " + texture, e);
+            continue;
           }
-          x++;
+        } else {
+          Log.warnf(
+            "Could not find font texture: %s (defined in \"%s\")",
+            texture,
+            fontDefinitionPath
+          );
+          continue;
         }
-        y++;
+
+        int width = spritemap.width / 16;
+        int height = fontDefinition.asObject().get("height").asInt(8);
+        int ascent =
+          fontDefinition
+            .asObject()
+            .get("ascent")
+            .asInt(7); // distance (from top) of the letter base
+
+        int x, y = 0;
+        for (JsonValue charactersLine : fontDefinition.asObject().get("chars").asArray()) {
+          x = 0;
+          for (int codePoint : charactersLine.stringValue("").codePoints().toArray()) {
+            if (!Texture.fonts.containsGlyph(codePoint)) {
+              Texture.fonts.loadGlyph(spritemap, x, y, codePoint, width, height, ascent);
+            }
+            x++;
+          }
+          y++;
+        }
+      } else if (definition.get("type").stringValue("").equals("reference")) {
+        String fontInclude = definition.get("id").stringValue("").split(":")[1];
+        loadFontDefinitions(texturePack, "assets/minecraft/font/" + fontInclude + ".json");
       }
     }
 

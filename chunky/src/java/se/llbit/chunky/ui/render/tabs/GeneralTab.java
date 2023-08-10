@@ -34,6 +34,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Book;
 import se.llbit.chunky.entity.PaintingEntity;
+import se.llbit.chunky.entity.BeaconBeam;
 import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.RenderController;
@@ -86,14 +87,13 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private IntegerTextField cameraCropHeight;
   @FXML private IntegerTextField cameraCropX;
   @FXML private IntegerTextField cameraCropY;
-  @FXML private Button setDefaultYMin;
-  @FXML private Button setDefaultYMax;
   @FXML private Button loadAllEntities;
   @FXML private Button loadNoEntity;
   @FXML private CheckBox loadPlayers;
   @FXML private CheckBox loadArmorStands;
   @FXML private CheckBox loadBooks;
   @FXML private CheckBox loadPaintings;
+  @FXML private CheckBox loadBeaconBeams;
   @FXML private CheckBox loadOtherEntities;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
@@ -142,6 +142,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadArmorStands.setSelected(preferences.shouldLoadClass(ArmorStand.class));
       loadBooks.setSelected(preferences.shouldLoadClass(Book.class));
       loadPaintings.setSelected(preferences.shouldLoadClass(PaintingEntity.class));
+      loadBeaconBeams.setSelected(preferences.shouldLoadClass(BeaconBeam.class));
       loadOtherEntities.setSelected(preferences.shouldLoadClass(null));
     }
 
@@ -215,6 +216,8 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         try (JsonParser parser = new JsonParser(new ByteArrayInputStream(text.getBytes()))) {
           JsonObject json = parser.parse().object();
           scene.importFromJson(json);
+          renderControls.getCanvas().setCanvasSize(scene.width, scene.height);
+          renderControls.refreshSettings();
         } catch (IOException e) {
           Log.warn("Failed to import scene settings.");
         } catch (JsonParser.SyntaxError syntaxError) {
@@ -275,6 +278,16 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       renderControls.showPopup(
               "This takes effect the next time a new scene is created.", loadPaintings);
     });
+    loadBeaconBeams.setTooltip(new Tooltip("Enable/disable beacon beam entity loading. "
+      + "Takes effect on next scene creation."));
+    loadBeaconBeams.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(BeaconBeam.class, newValue);
+      PersistentSettings.setLoadBeaconBeams(newValue);
+    });
+    loadBeaconBeams.setOnAction(event -> {
+      renderControls.showPopup(
+        "This takes effect the next time a new scene is created.", loadBeaconBeams);
+    });
     loadOtherEntities.setTooltip(new Tooltip("Enable/disable other entity loading. "
             + "Takes effect on next scene creation."));
     loadOtherEntities.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -290,6 +303,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadArmorStands.setSelected(true);
       loadBooks.setSelected(true);
       loadPaintings.setSelected(true);
+      loadBeaconBeams.setSelected(true);
       loadOtherEntities.setSelected(true);
     });
     loadNoEntity.setOnAction(event -> {
@@ -297,6 +311,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadArmorStands.setSelected(false);
       loadBooks.setSelected(false);
       loadPaintings.setSelected(false);
+      loadBeaconBeams.setSelected(false);
       loadOtherEntities.setSelected(false);
     });
 
@@ -386,11 +401,6 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     reloadChunks.setTooltip(new Tooltip("Reload all chunks in the scene."));
     reloadChunks.setGraphic(new ImageView(Icon.reload.fxImage()));
     reloadChunks.setOnAction(e -> controller.getSceneManager().reloadChunks());
-
-    setDefaultYMin.setTooltip(new Tooltip("Make this the default lower Y clip plane."));
-    setDefaultYMin.setOnAction(e -> PersistentSettings.setYClipMin(yMin.get()));
-    setDefaultYMax.setTooltip(new Tooltip("Make this the default upper Y clip plane."));
-    setDefaultYMax.setOnAction(e -> PersistentSettings.setYClipMax(yMax.get()));
 
     canvasSizeLabel.setGraphic(new ImageView(Icon.scale.fxImage()));
     canvasSizeInput.getSize().addListener(this::updateCanvasSize);
