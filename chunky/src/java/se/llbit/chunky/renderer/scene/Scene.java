@@ -207,6 +207,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean emittersEnabled = DEFAULT_EMITTERS_ENABLED;
   protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
   protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.NONE;
+  protected boolean fancierTranslucency = true;
   protected double transmissivityCap = DEFAULT_TRANSMISSIVITY_CAP;
 
   protected SunSamplingStrategy sunSamplingStrategy = SunSamplingStrategy.FAST;
@@ -446,6 +447,7 @@ public class Scene implements JsonSerializable, Refreshable {
     emitterIntensity = other.emitterIntensity;
     emitterSamplingStrategy = other.emitterSamplingStrategy;
     preventNormalEmitterWithSampling = other.preventNormalEmitterWithSampling;
+    fancierTranslucency = other.fancierTranslucency;
     transmissivityCap = other.transmissivityCap;
     transparentSky = other.transparentSky;
     yClipMin = other.yClipMin;
@@ -2614,6 +2616,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("saveSnapshots", saveSnapshots);
     json.add("emittersEnabled", emittersEnabled);
     json.add("emitterIntensity", emitterIntensity);
+    json.add("fancierTranslucency", fancierTranslucency);
     json.add("transmissivityCap", transmissivityCap);
     json.add("sunSamplingStrategy", sunSamplingStrategy.getId());
     json.add("stillWater", stillWater);
@@ -2872,6 +2875,7 @@ public class Scene implements JsonSerializable, Refreshable {
     saveSnapshots = json.get("saveSnapshots").boolValue(saveSnapshots);
     emittersEnabled = json.get("emittersEnabled").boolValue(emittersEnabled);
     emitterIntensity = json.get("emitterIntensity").doubleValue(emitterIntensity);
+    fancierTranslucency = json.get("fancierTranslucency").boolValue(fancierTranslucency);
     transmissivityCap = json.get("transmissivityCap").doubleValue(transmissivityCap);
 
     if (json.get("sunSamplingStrategy").isUnknown()) {
@@ -3379,6 +3383,14 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void setHideUnknownBlocks(boolean hideUnknownBlocks) {
     this.hideUnknownBlocks = hideUnknownBlocks;
+  }
+  public boolean getFancierTranslucency() {
+    return fancierTranslucency;
+  }
+
+  public void setFancierTranslucency(boolean value) {
+    fancierTranslucency = value;
+    refresh();
   }
 
   public double getTransmissivityCap() {

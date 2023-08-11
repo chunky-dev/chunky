@@ -67,6 +67,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private Button mergeRenderDump;
   @FXML private CheckBox shutdown;
   @FXML private CheckBox fastFog;
+  @FXML private CheckBox fancierTranslucency;
   @FXML private DoubleAdjuster transmissivityCap;
   @FXML private IntegerAdjuster cacheResolution;
   @FXML private DoubleAdjuster animationTime;
@@ -142,6 +143,13 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     fastFog.setTooltip(new Tooltip("Enable faster fog rendering algorithm."));
     fastFog.selectedProperty()
             .addListener((observable, oldValue, newValue) -> scene.setFastFog(newValue));
+    fancierTranslucency.setTooltip(new Tooltip("Enable more sophisticated algorithm for computing color changes through translucent materials."));
+    fancierTranslucency.selectedProperty()
+      .addListener((observable, oldValue, newValue) -> {
+        scene.setFancierTranslucency(newValue);
+        transmissivityCap.setVisible(newValue);
+        transmissivityCap.setManaged(newValue);
+      });
     transmissivityCap.setName("Transmissivity cap");
     transmissivityCap.setRange(Scene.MIN_TRANSMISSIVITY_CAP, Scene.MAX_TRANSMISSIVITY_CAP);
     transmissivityCap.clampBoth();
@@ -309,6 +317,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   public void update(Scene scene) {
     outputMode.getSelectionModel().select(scene.getOutputMode());
     fastFog.setSelected(scene.fog.fastFog());
+    fancierTranslucency.setSelected(scene.getFancierTranslucency());
     transmissivityCap.set(scene.getTransmissivityCap());
     renderThreads.set(PersistentSettings.getNumThreads());
     cpuLoad.set(PersistentSettings.getCPULoad());
