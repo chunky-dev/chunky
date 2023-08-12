@@ -152,16 +152,6 @@ public class Scene implements JsonSerializable, Refreshable {
   public static final double DEFAULT_FOG_DENSITY = 0.0;
 
   /**
-   * Minimum branch count.
-   */
-  public static final int MIN_BRANCH_COUNT = 1;
-
-  /**
-   * Maximum branch count.
-   */
-  public static final int MAX_BRANCH_COUNT = 50;
-
-  /**
    * Default post processing filter.
    */
   public static final PostProcessingFilter DEFAULT_POSTPROCESSING_FILTER = PostProcessingFilters

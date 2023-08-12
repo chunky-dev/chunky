@@ -110,7 +110,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
     branchCount.setName("Branch count");
     branchCount.setTooltip("Sets the number of rays cast after the first intersection.");
-    branchCount.setRange(Scene.MIN_BRANCH_COUNT, Scene.MAX_BRANCH_COUNT);
+    branchCount.setRange(1, 50);
     branchCount.clampMin();
     branchCount.onValueChange(value -> {
       scene.setBranchCount(value);
