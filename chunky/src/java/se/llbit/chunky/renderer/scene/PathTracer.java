@@ -129,6 +129,13 @@ public class PathTracer implements RayTracer {
       Vector3 cumulativeEmittance = new Vector3(0, 0, 0);
       Ray next = new Ray();
       float pMetal = currentMat.metalness;
+      // Reusing first rays - a simplified form of "branched path tracing" (what Blender used to call it before they implemented something fancier)
+      // The initial rays cast into the scene are very similar between each sample, since they are almost entirely a function of the pixel coordinates
+      // Because of that, casting those initial rays on every sample is redundant and can be skipped
+      // If the ray depth is high, this doesn't help much (just a few percent), but in some outdoor/low depth scenes, this can improve performance by >40%
+      // The main caveat is that antialiasing is achieved by varying the starting rays at the subpixel level (see PathTracingRenderer.java)
+      // Therefore, it's still necessary to have a decent amount (20 is ok, 50 is better) of distinct starting rays for each pixel
+      // scene.branchCount is the number of times we use the same first ray before casting a new one
       int count = firstReflection ? scene.getBranchCount() : 1;
       for (int i = 0; i < count; i++) {
         boolean doMetal = pMetal > Ray.EPSILON && random.nextFloat() < pMetal;
