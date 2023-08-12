@@ -89,6 +89,16 @@ public class Vector4 {
   }
 
   /**
+   * Add a to this vector.
+   */
+  public final void add(Vector4 a) {
+    x += a.x;
+    y += a.y;
+    z += a.z;
+    w += a.w;
+  }
+
+  /**
    * Scale and add argument the vector.
    */
   public void scaleAdd(double s, Vector4 v) {
@@ -118,4 +128,5 @@ public class Vector4 {
   @Override public String toString() {
     return String.format("(%.2f, %.2f, %.2f, %.2f)", x, y, z, w);
   }
+
 }
