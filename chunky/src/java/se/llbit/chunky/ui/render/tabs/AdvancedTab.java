@@ -26,6 +26,7 @@ import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
+import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.RenderManager;
@@ -41,9 +42,11 @@ import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.ShutdownAlert;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.fxutil.Dialogs;
+import se.llbit.log.Log;
 import se.llbit.math.Octree;
 import se.llbit.math.bvh.BVH;
 import se.llbit.util.Registerable;
+import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,10 +68,12 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private Button mergeRenderDump;
   @FXML private CheckBox shutdown;
   @FXML private CheckBox fastFog;
+  @FXML private DoubleAdjuster transmissivityCap;
   @FXML private IntegerAdjuster cacheResolution;
   @FXML private DoubleAdjuster animationTime;
   @FXML private ChoiceBox<PictureExportFormat> outputMode;
   @FXML private ChoiceBox<String> octreeImplementation;
+  @FXML private Button octreeSwitchImplementation;
   @FXML private ChoiceBox<String> bvhMethod;
   @FXML private ChoiceBox<String> biomeStructureImplementation;
   @FXML private IntegerAdjuster gridSize;
@@ -148,6 +153,11 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     fastFog.setTooltip(new Tooltip("Enable faster fog rendering algorithm."));
     fastFog.selectedProperty()
             .addListener((observable, oldValue, newValue) -> scene.setFastFog(newValue));
+    transmissivityCap.setName("Transmissivity cap");
+    transmissivityCap.setRange(Scene.MIN_TRANSMISSIVITY_CAP, Scene.MAX_TRANSMISSIVITY_CAP);
+    transmissivityCap.clampBoth();
+    transmissivityCap.setTooltip("Maximum amplification of one color channel as a ray passes through a translucent block (stained glass, ice, etc.).\nA value of 1 prevents amplification entirely; higher values result in more vibrant colors.");
+    transmissivityCap.onValueChange(value -> scene.setTransmissivityCap(value));
     cacheResolution.setName("Sky cache resolution");
     cacheResolution.setTooltip("Resolution of the sky cache. Lower values will use less memory and improve performance but can cause sky artifacts.");
     cacheResolution.setRange(1, 4096);
@@ -186,10 +196,27 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     octreeImplementation.getItems().addAll(octreeNames);
     octreeImplementation.getSelectionModel().selectedItemProperty()
             .addListener((observable, oldvalue, newvalue) -> {
-              scene.setOctreeImplementation(newvalue);
               PersistentSettings.setOctreeImplementation(newvalue);
+              if (!scene.getOctreeImplementation().equals(newvalue)) {
+                scene.setOctreeImplementation(newvalue);
+                scene.softRefresh();
+              }
             });
     octreeImplementation.setTooltip(new Tooltip(tooltipTextBuilder.toString()));
+
+    octreeSwitchImplementation.setOnAction(event -> Chunky.getCommonThreads().submit(() -> {
+      TaskTracker tracker = controller.getSceneManager().getTaskTracker();
+      try {
+        try (TaskTracker.Task task = tracker.task("(1/2) Converting world octree", 1000)) {
+          scene.getWorldOctree().switchImplementation(octreeImplementation.getValue(), task);
+        }
+        try (TaskTracker.Task task = tracker.task("(2/2) Converting water octree")) {
+          scene.getWaterOctree().switchImplementation(octreeImplementation.getValue(), task);
+        }
+      } catch (IOException e) {
+        Log.error("Switching octrees failed. Reload the scene.\n", e);
+      }
+    }));
 
     ArrayList<String> bvhNames = new ArrayList<>();
     StringBuilder bvhMethodBuilder = new StringBuilder();
@@ -207,6 +234,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
             .addListener(((observable, oldValue, newValue) -> {
               PersistentSettings.setBvhMethod(newValue);
               scene.setBvhImplementation(newValue);
+              scene.softRefresh();
             }));
     bvhMethod.setTooltip(new Tooltip(bvhMethodBuilder.toString()));
 
@@ -292,6 +320,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   public void update(Scene scene) {
     outputMode.getSelectionModel().select(scene.getOutputMode());
     fastFog.setSelected(scene.fog.fastFog());
+    transmissivityCap.set(scene.getTransmissivityCap());
     renderThreads.set(PersistentSettings.getNumThreads());
     cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());

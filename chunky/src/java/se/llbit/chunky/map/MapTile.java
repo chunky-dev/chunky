@@ -62,7 +62,7 @@ public class MapTile {
   public void draw(MapBuffer buffer, WorldMapLoader mapLoader, ChunkView view,
       ChunkSelectionTracker selection) {
     if (scale >= 16) {
-      Chunk chunk = mapLoader.getWorld().getChunk(pos);
+      Chunk chunk = mapLoader.getWorld().currentDimension().getChunk(pos);
       renderChunk(chunk);
       if (!(chunk instanceof EmptyChunk) && selection.isSelected(pos)) {
         for (int i = 0; i < tileWidth * tileWidth; ++i) {
@@ -70,8 +70,8 @@ public class MapTile {
         }
       }
     } else {
-      boolean isValid = mapLoader.getWorld().regionExists(pos);
-      Region region = mapLoader.getWorld().getRegionWithinRange(pos, view.yMin, view.yMax);
+      boolean isValid = mapLoader.getWorld().currentDimension().regionExistsWithinRange(pos, view.yMin, view.yMax);
+      Region region = mapLoader.getWorld().currentDimension().getRegionWithinRange(pos, view.yMin, view.yMax);
       int pixelOffset = 0;
       for (int z = 0; z < 32; ++z) {
         for (int x = 0; x < 32; ++x) {

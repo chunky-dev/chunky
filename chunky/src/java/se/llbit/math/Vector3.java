@@ -112,6 +112,15 @@ public class Vector3 {
   }
 
   /**
+   * Set this vector equal to the entrywise product of a and b.
+   */
+  public final void multiplyEntrywise(Vector3 a, Vector3 b) {
+    x = a.x * b.x;
+    y = a.y * b.y;
+    z = a.z * b.z;
+  }
+
+  /**
    * Normalize this vector (scale the vector to unit length)
    */
   public final void normalize() {

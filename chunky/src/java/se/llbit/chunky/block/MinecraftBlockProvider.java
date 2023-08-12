@@ -2,7 +2,6 @@ package se.llbit.chunky.block;
 
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.model.FlowerPotModel;
@@ -11,6 +10,7 @@ import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
+import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
 
 public class MinecraftBlockProvider implements BlockProvider {
@@ -983,6 +983,71 @@ public class MinecraftBlockProvider implements BlockProvider {
       tag.get("Properties").get("west").stringValue("false").equals("true"),
       tag.get("Properties").get("up").stringValue("false").equals("true"),
       tag.get("Properties").get("down").stringValue("false").equals("true")));
+
+    //1.20
+    addBlock("bamboo_button", (name, tag) -> button(tag, Texture.bambooPlanks));
+    addBlock("bamboo_door", (name, tag) -> door(tag, Texture.bambooDoorTop, Texture.bambooDoorBottom));
+    addBlock("bamboo_fence", (name, tag) -> fence(tag, Texture.bambooPlanks));
+    addBlock("bamboo_fence_gate", (name, tag) -> fenceGate(tag, Texture.bambooPlanks));
+    addBlock("bamboo_block", (name, tag) -> log(tag, Texture.bambooBlock, Texture.bambooBlockTop));
+    addBlock("stripped_bamboo_block", (name, tag) ->  log(tag, Texture.strippedBambooBlock, Texture.strippedBambooBlockTop));
+    addBlock("bamboo_planks", Texture.bambooPlanks);
+    addBlock("bamboo_mosaic", Texture.bambooMosaic);
+    addBlock("bamboo_pressure_plate", (name, tag) -> new PressurePlate(name, Texture.bambooPlanks));
+    addBlock("bamboo_sign", (name, tag) -> sign(tag, "bamboo"));
+    addBlock("bamboo_wall_sign", (name, tag) -> wallSign(tag, "bamboo"));
+    addBlock("bamboo_slab", (name, tag) -> slab(tag, Texture.bambooPlanks));
+    addBlock("bamboo_stairs", (name, tag) -> stairs(tag, Texture.bambooPlanks));
+    addBlock("bamboo_mosaic_slab", (name, tag) -> slab(tag, Texture.bambooMosaic));
+    addBlock("bamboo_mosaic_stairs", (name, tag) -> stairs(tag, Texture.bambooMosaic));
+    addBlock("bamboo_trapdoor", (name, tag) -> trapdoor(tag, Texture.bambooTrapdoor));
+
+    addBlock("cherry_button", (name, tag) -> button(tag, Texture.cherryPlanks));
+    addBlock("cherry_door", (name, tag) -> door(tag, Texture.cherryDoorTop, Texture.cherryDoorBottom));
+    addBlock("cherry_fence", (name, tag) -> fence(tag, Texture.cherryPlanks));
+    addBlock("cherry_fence_gate", (name, tag) -> fenceGate(tag, Texture.cherryPlanks));
+    addBlock("cherry_leaves", (name, tag) -> new UntintedLeaves(name, Texture.cherryLeaves));
+    addBlock("cherry_log", (name, tag) -> log(tag, Texture.cherryLog, Texture.cherryLogTop));
+    addBlock("stripped_cherry_log", (name, tag) -> log(tag, Texture.strippedCherryLog, Texture.strippedCherryLogTop));
+    addBlock("cherry_planks", Texture.cherryPlanks);
+    addBlock("cherry_pressure_plate", (name, tag) -> new PressurePlate(name, Texture.cherryPlanks));
+    addBlock("cherry_sign", (name, tag) -> sign(tag, "cherry"));
+    addBlock("cherry_wall_sign", (name, tag) -> wallSign(tag, "cherry"));
+    addBlock("cherry_slab", (name, tag) -> slab(tag, Texture.cherryPlanks));
+    addBlock("cherry_stairs", (name, tag) -> stairs(tag, Texture.cherryPlanks));
+    addBlock("cherry_trapdoor", (name, tag) -> trapdoor(tag, Texture.cherryTrapdoor));
+    addBlock("cherry_wood", (name, tag) -> log(tag, Texture.cherryLog, Texture.cherryLog));
+    addBlock("stripped_cherry_wood", (name, tag) -> log(tag, Texture.strippedCherryLog, Texture.strippedCherryLog));
+    addBlock("cherry_sapling", (name, tag) -> new SpriteBlock(name, Texture.cherrySapling));
+    addBlock("potted_cherry_sapling", (name, tag) -> new FlowerPot(name, Kind.CHERRY_SAPLING));
+    addBlock("torchflower", (name, tag) -> new SpriteBlock(name, Texture.torchflower));
+    addBlock("torchflower_crop", (name, tag) -> new TorchflowerCrop(BlockProvider.stringToInt(tag.get("Properties").get("age"), 2)));
+    addBlock("potted_torchflower", (name, tag) -> new FlowerPot(name, Kind.TORCHFLOWER));
+    addBlock("suspicious_sand", (name, tag) -> suspiciousSand(tag));
+    addBlock("suspicious_gravel", (name, tag) -> suspiciousGravel(tag));
+    addBlock("chiseled_bookshelf", (name, tag) -> new ChiseledBookshelf(
+      BlockProvider.facing(tag),
+      tag.get("Properties").get("slot_0_occupied").stringValue("false").equals("true"),
+      tag.get("Properties").get("slot_1_occupied").stringValue("false").equals("true"),
+      tag.get("Properties").get("slot_2_occupied").stringValue("false").equals("true"),
+      tag.get("Properties").get("slot_3_occupied").stringValue("false").equals("true"),
+      tag.get("Properties").get("slot_4_occupied").stringValue("false").equals("true"),
+      tag.get("Properties").get("slot_5_occupied").stringValue("false").equals("true")));
+    addBlock("decorated_pot", (name, tag) -> decoratedPot(tag));
+    addBlock("sniffer_egg", (name, tag) -> new SnifferEgg(name, BlockProvider.stringToInt(tag.get("Properties").get("hatch"), 0)));
+    addBlock("pink_petals", (name, tag) -> new PinkPetals(name, BlockProvider.stringToInt(tag.get("Properties").get("flower_amount"), 1), BlockProvider.facing(tag)));
+    addBlock("pitcher_plant", (name, tag) -> new PitcherPlant(name, tag.get("Properties").get("half").stringValue("lower")));
+    addBlock("pitcher_crop", (name, tag) -> {
+      int age = BlockProvider.stringToInt(tag.get("Properties").get("age"), 0);
+      String half = tag.get("Properties").get("half").stringValue("lower");
+      if (half.equals("upper") && age < 2) {
+        return Air.INSTANCE;
+      }
+      return new PitcherCrop(age, half);
+    });
+    addBlock("calibrated_sculk_sensor", (name, tag) -> new CalibratedSculkSensor(
+      tag.get("Properties").get("sculk_sensor_phase").stringValue("cooldown"),
+      tag.get("Properties").get("facing").stringValue("north")));
   }
 
   @Override
@@ -1157,7 +1222,7 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new TexturedBlock(
             name, Texture.sandstoneCut, Texture.sandstoneTop, Texture.sandstoneBottom);
       case "note_block":
-        return new MinecraftBlock(name, Texture.jukeboxSide);
+        return new MinecraftBlock(name, Texture.noteBlock);
       case "powered_rail":
         return poweredRail(tag);
       case "detector_rail": {
@@ -2293,9 +2358,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "potted_warped_roots":
         return new FlowerPot(name, FlowerPotModel.Kind.WARPED_ROOTS);
       case "potted_azalea_bush":
-        return new FlowerPot(name, Kind.AZALEA_BUSH);
+        return new FlowerPot(name, FlowerPotModel.Kind.AZALEA_BUSH);
       case "potted_flowering_azalea_bush":
-        return new FlowerPot(name, Kind.FLOWERING_AZALEA_BUSH);
+        return new FlowerPot(name, FlowerPotModel.Kind.FLOWERING_AZALEA_BUSH);
       case "carrots":
         return new Carrots(BlockProvider.stringToInt(tag.get("Properties").get("age"), 7));
       case "potatoes":
@@ -2857,9 +2922,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "flowering_azalea":
         return new Azalea(name, Texture.floweringAzaleaTop, Texture.floweringAzaleaSide);
       case "azalea_leaves":
-        return new AzaleaLeaves(name, Texture.azaleaLeaves);
+        return new UntintedLeaves(name, Texture.azaleaLeaves);
       case "flowering_azalea_leaves":
-        return new AzaleaLeaves(name, Texture.floweringAzaleaLeaves);
+        return new UntintedLeaves(name, Texture.floweringAzaleaLeaves);
       case "moss_block":
         return new MinecraftBlock(name, Texture.mossBlock);
       case "moss_carpet":
@@ -3421,6 +3486,53 @@ public class MinecraftBlockProvider implements BlockProvider {
     Tag properties = tag.get("Properties");
     return new CakeWithCandle(BlockProvider.blockName(tag), candleTexture, candleTextureLit,
         properties.get("lit").stringValue("false").equals("true"));
+  }
+
+  private static Block suspiciousSand(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String dusted = properties.get("dusted").stringValue("0");
+    switch(dusted) {
+      case "1":
+        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage1);
+      case "2":
+        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage2);
+      case "3":
+        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage3);
+      default:
+        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage0);
+    }
+  }
+
+  private static Block suspiciousGravel(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String dusted = properties.get("dusted").stringValue("0");
+    switch(dusted) {
+      case "1":
+        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage1);
+      case "2":
+        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage2);
+      case "3":
+        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage3);
+      default:
+        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage0);
+    }
+  }
+
+  private static Block decoratedPot(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String facing = BlockProvider.facing(tag);
+    boolean waterlogged = properties.get("waterlogged").stringValue("").equals("true");
+    String[] sherds = new String[4];
+    ListTag sherdTags = properties.get("blockEntity#sherds").asList();
+    for(int i = 0; i < sherdTags.size() && i < 4; i++) {
+      String sherd = sherdTags.get(i).stringValue();
+      if(!sherd.equals("minecraft:brick")) sherds[i] = sherd;
+    }
+    return new DecoratedPot(
+      facing,
+      waterlogged,
+      sherds
+    );
   }
 
   private static Block nonSolid(Block block) {

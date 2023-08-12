@@ -162,24 +162,6 @@ public final class PersistentSettings {
     save();
   }
 
-  public static void setYClipMax(int value) {
-    settings.setInt("yClipMax", value);
-    save();
-  }
-
-  public static int getYClipMax() {
-    return settings.getInt("yClipMax", 256);
-  }
-
-  public static void setYClipMin(int value) {
-    settings.setInt("yClipMin", value);
-    save();
-  }
-
-  public static int getYClipMin() {
-    return settings.getInt("yClipMin", 0);
-  }
-
   /**
    * @return CPU load setting
    */

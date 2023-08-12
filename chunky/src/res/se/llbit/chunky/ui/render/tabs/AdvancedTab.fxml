@@ -24,6 +24,7 @@
     <Separator prefWidth="200.0" />
     <CheckBox fx:id="shutdown" mnemonicParsing="false" text="Shutdown computer when render completes" />
     <CheckBox fx:id="fastFog" mnemonicParsing="false" text="Fast fog" />
+    <DoubleAdjuster fx:id="transmissivityCap" />
     <IntegerAdjuster fx:id="cacheResolution" />
     <DoubleAdjuster fx:id="animationTime" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -35,6 +36,7 @@
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Octree implementation:" />
       <ChoiceBox fx:id="octreeImplementation" prefWidth="150.0" />
+      <Button fx:id="octreeSwitchImplementation" text="Switch Current Scene" />
     </HBox>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="BVH build method:" />

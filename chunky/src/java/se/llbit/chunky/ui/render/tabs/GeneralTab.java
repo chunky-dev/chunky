@@ -87,8 +87,6 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private IntegerTextField cameraCropHeight;
   @FXML private IntegerTextField cameraCropX;
   @FXML private IntegerTextField cameraCropY;
-  @FXML private Button setDefaultYMin;
-  @FXML private Button setDefaultYMax;
   @FXML private Button loadAllEntities;
   @FXML private Button loadNoEntity;
   @FXML private CheckBox loadPlayers;
@@ -218,6 +216,8 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         try (JsonParser parser = new JsonParser(new ByteArrayInputStream(text.getBytes()))) {
           JsonObject json = parser.parse().object();
           scene.importFromJson(json);
+          renderControls.getCanvas().setCanvasSize(scene.width, scene.height);
+          renderControls.refreshSettings();
         } catch (IOException e) {
           Log.warn("Failed to import scene settings.");
         } catch (JsonParser.SyntaxError syntaxError) {
@@ -401,11 +401,6 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     reloadChunks.setTooltip(new Tooltip("Reload all chunks in the scene."));
     reloadChunks.setGraphic(new ImageView(Icon.reload.fxImage()));
     reloadChunks.setOnAction(e -> controller.getSceneManager().reloadChunks());
-
-    setDefaultYMin.setTooltip(new Tooltip("Make this the default lower Y clip plane."));
-    setDefaultYMin.setOnAction(e -> PersistentSettings.setYClipMin(yMin.get()));
-    setDefaultYMax.setTooltip(new Tooltip("Make this the default upper Y clip plane."));
-    setDefaultYMax.setOnAction(e -> PersistentSettings.setYClipMax(yMax.get()));
 
     canvasSizeLabel.setGraphic(new ImageView(Icon.scale.fxImage()));
     canvasSizeInput.getSize().addListener(this::updateCanvasSize);

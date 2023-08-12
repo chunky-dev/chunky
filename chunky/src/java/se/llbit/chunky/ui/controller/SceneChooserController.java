@@ -122,6 +122,7 @@ public class SceneChooserController implements Initializable {
         // an API for getting/setting the scene directory so that custom render contexts can
         // use a fixed scene directory.
         controller.getChunky().options.sceneDir = directory;
+        populateSceneTable(controller.getChunky().options.sceneDir);
       }
     });
 
