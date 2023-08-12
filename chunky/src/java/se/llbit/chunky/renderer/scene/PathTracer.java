@@ -21,7 +21,6 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
-import se.llbit.chunky.renderer.SunSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.*;
@@ -401,9 +400,8 @@ public class PathTracer implements RayTracer {
 
         if (pathTrace(scene, next, state, 1, false)) {
           // Calculate the color and emittance of the refracted ray
-          translucentRayColor(scene, ray, next, pDiffuse);
+          translucentRayColor(scene, ray, next, cumulativeColor, pDiffuse);
           cumulativeEmittance.add(ray.emittance);
-          cumulativeColor.add(ray.color);
           hit = true;
         }
       }
@@ -418,15 +416,14 @@ public class PathTracer implements RayTracer {
 
     if (pathTrace(scene, next, state, 1, false)) {
       // Calculate the color and emittance of the refracted ray
-      translucentRayColor(scene, ray, next, pDiffuse);
+      translucentRayColor(scene, ray, next, cumulativeColor, pDiffuse);
       cumulativeEmittance.add(ray.emittance);
-      cumulativeColor.add(ray.color);
       hit = true;
     }
     return hit;
   }
 
-  private static void translucentRayColor(Scene scene, Ray ray, Ray next, double opacity) {
+  private static void translucentRayColor(Scene scene, Ray ray, Ray next, Vector4 cumulativeColor, double opacity) {
     // Color-based transmission value
     double colorTrans = (ray.color.x + ray.color.y + ray.color.z)/3;
     // Total amount of light we want to transmit (overall transparency of texture)
@@ -473,7 +470,9 @@ public class PathTracer implements RayTracer {
       }
     }
     // Scale color based on next ray
-    ray.color.multiplyEntrywise(new Vector4(rgbTrans, 1), next.color);
+    Vector4 outputColor = new Vector4(0, 0, 0, 0);
+    outputColor.multiplyEntrywise(new Vector4(rgbTrans, 1), next.color);
+    cumulativeColor.add(outputColor);
     // Use emittance from next ray
     ray.emittance.multiplyEntrywise(rgbTrans, next.emittance);
   }
