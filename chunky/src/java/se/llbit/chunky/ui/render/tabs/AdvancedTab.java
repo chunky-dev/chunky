@@ -165,7 +165,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     });
     renderThreads.setName("Render threads");
     renderThreads.setTooltip("Number of rendering threads.");
-    renderThreads.setRange(1, 20);
+    renderThreads.setRange(1, Runtime.getRuntime().availableProcessors());
     renderThreads.clampMin();
     renderThreads.onValueChange(value -> {
       PersistentSettings.setNumRenderThreads(value);
