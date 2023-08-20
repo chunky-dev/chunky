@@ -18,6 +18,7 @@
     <IntegerAdjuster fx:id="cpuLoad" />
     <Separator prefWidth="200.0" />
     <IntegerAdjuster fx:id="rayDepth" />
+    <IntegerAdjuster fx:id="branchCount" />
     <Separator layoutX="20.0" layoutY="90.0" prefWidth="200.0" />
     <Button fx:id="mergeRenderDump" mnemonicParsing="false" text="Merge render dumps" />
     <Separator prefWidth="200.0" />
