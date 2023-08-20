@@ -196,6 +196,10 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   protected int sppTarget = PersistentSettings.getSppTargetDefault();
   /**
+   * Branch count for the scene.
+   */
+  protected int branchCount = PersistentSettings.getBranchCountDefault();
+  /**
    * Recursive ray depth limit (not including Russian Roulette).
    */
   protected int rayDepth = PersistentSettings.getRayDepthDefault();
@@ -350,6 +354,7 @@ public class Scene implements JsonSerializable, Refreshable {
     width = PersistentSettings.get3DCanvasWidth();
     height = PersistentSettings.get3DCanvasHeight();
     sppTarget = PersistentSettings.getSppTargetDefault();
+    branchCount = PersistentSettings.getBranchCountDefault();
 
     palette = new BlockPalette();
     worldOctree = new Octree(octreeImplementation, 1);
@@ -549,7 +554,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       // Load the configured skymap file.
-      sky.loadSkymap();
+      sky.reloadSkymap(context.getSceneDirectory());
 
       loadedWorld = EmptyWorld.INSTANCE;
       if (!worldPath.isEmpty()) {
@@ -772,15 +777,6 @@ public class Scene implements JsonSerializable, Refreshable {
       }
       ray.color.w = waterOpacity;
     }
-  }
-
-  /**
-   * Test if the ray should be killed <strike>(using Russian Roulette)</strike>.
-   *
-   * @return {@code true} if the ray needs to die now
-   */
-  public final boolean kill(int depth, Random random) {
-    return depth >= rayDepth;
   }
 
   /**
@@ -1900,6 +1896,7 @@ public class Scene implements JsonSerializable, Refreshable {
     dumpFrequency = other.dumpFrequency;
     saveSnapshots = other.saveSnapshots;
     sppTarget = other.sppTarget;
+    branchCount = other.branchCount;
     rayDepth = other.rayDepth;
     mode = other.mode;
     outputMode = other.outputMode;
@@ -1922,6 +1919,20 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void setTargetSpp(int value) {
     sppTarget = value;
+  }
+
+  /**
+   * @return The branch count
+   */
+  public int getBranchCount() {
+    return branchCount;
+  }
+
+  /**
+   * @param value Branch count value
+   */
+  public void setBranchCount(int value) {
+    branchCount = value;
   }
 
   /**
@@ -2610,6 +2621,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("renderTime", renderTime);
     json.add("spp", spp);
     json.add("sppTarget", sppTarget);
+    json.add("branchCount", branchCount);
     json.add("rayDepth", rayDepth);
     json.add("pathTrace", mode != RenderMode.PREVIEW);
     json.add("dumpFrequency", dumpFrequency);
@@ -2862,6 +2874,7 @@ public class Scene implements JsonSerializable, Refreshable {
       .getFormat(json.get("outputMode").stringValue(outputMode.getName()))
       .orElse(PictureExportFormats.PNG);
     sppTarget = json.get("sppTarget").intValue(sppTarget);
+    branchCount = json.get("branchCount").intValue(branchCount);
     rayDepth = json.get("rayDepth").intValue(rayDepth);
     if (!json.get("pathTrace").isUnknown()) {
       boolean pathTrace = json.get("pathTrace").boolValue(false);
