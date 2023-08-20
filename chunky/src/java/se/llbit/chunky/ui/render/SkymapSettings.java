@@ -66,7 +66,7 @@ public class SkymapSettings extends VBox implements Initializable {
       File imageFile = fileChooser.showOpenDialog(getScene().getWindow());
       if (imageFile != null) {
         lastDirectory = imageFile.getParentFile();
-        scene.sky().loadSkymap(imageFile.getAbsolutePath());
+        scene.sky().loadSkymap(imageFile.getAbsolutePath(), null);
       }
     });
     skymapRotation.setName("Skymap rotation");

@@ -40,8 +40,10 @@ import se.llbit.resources.ImageLoader;
 import se.llbit.util.JsonSerializable;
 import se.llbit.util.JsonUtil;
 import se.llbit.util.NotNull;
+import se.llbit.util.annotation.Nullable;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -182,18 +184,18 @@ public class Sky implements JsonSerializable {
   /**
    * Load the configured skymap file
    */
-  public void loadSkymap() {
+  public void reloadSkymap(@Nullable File sceneDirectory) {
     switch (mode) {
       case SKYMAP_PANORAMIC:
       case SKYMAP_SPHERICAL:
         if (!skymapFileName.isEmpty()) {
-          loadSkymap(skymapFileName);
+          loadSkymap(skymapFileName, sceneDirectory);
         }
         break;
       case SKYBOX:
         for (int i = 0; i < 6; ++i) {
           if (!skyboxFileName[i].isEmpty()) {
-            loadSkyboxTexture(skyboxFileName[i], i);
+            loadSkyboxTexture(skyboxFileName[i], i, sceneDirectory);
           }
         }
       default:
@@ -204,9 +206,9 @@ public class Sky implements JsonSerializable {
   /**
    * Load a panoramic skymap texture.
    */
-  public void loadSkymap(String fileName) {
+  public void loadSkymap(String fileName, @Nullable File sceneDirectory) {
     skymapFileName = fileName;
-    skymap = loadSkyTexture(fileName, skymap);
+    skymap = loadSkyTexture(fileName, skymap, sceneDirectory);
     scene.refresh();
   }
 
@@ -742,17 +744,20 @@ public class Sky implements JsonSerializable {
     gradient.add(new Vector4(0x75 / 255., 0xAA / 255., 0xFF / 255., 1));
   }
 
-  public void loadSkyboxTexture(String fileName, int index) {
+  public void loadSkyboxTexture(String fileName, int index, @Nullable File sceneDirectory) {
     if (index < 0 || index >= 6) {
       throw new IllegalArgumentException();
     }
     skyboxFileName[index] = fileName;
-    skybox[index] = loadSkyTexture(fileName, skybox[index]);
+    skybox[index] = loadSkyTexture(fileName, skybox[index], sceneDirectory);
     scene.refresh();
   }
 
-  private Texture loadSkyTexture(String fileName, Texture prevTexture) {
-    File textureFile = new File(fileName);
+  private Texture loadSkyTexture(String fileName, Texture prevTexture, @Nullable File sceneDirectory) {
+    String resolvedFilename = sceneDirectory == null
+      ? fileName
+      : Paths.get(sceneDirectory.getAbsolutePath(), fileName).toAbsolutePath().toString();
+    File textureFile = new File(resolvedFilename);
     if (textureFile.exists()) {
       try {
         Log.info("Loading skymap: " + fileName);

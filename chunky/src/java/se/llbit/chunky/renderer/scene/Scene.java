@@ -588,7 +588,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       // Load the configured skymap file.
-      sky.loadSkymap();
+      sky.reloadSkymap(context.getSceneDirectory());
 
       loadedWorld = EmptyWorld.INSTANCE;
       if (!worldPath.isEmpty()) {
