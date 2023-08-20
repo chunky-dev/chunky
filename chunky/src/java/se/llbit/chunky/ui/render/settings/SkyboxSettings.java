@@ -90,7 +90,7 @@ public class SkyboxSettings extends VBox implements Initializable {
     File imageFile = fileChooser.showOpenDialog(getScene().getWindow());
     if (imageFile != null) {
       skyboxDirectory = imageFile.getParentFile();
-      scene.sky().loadSkyboxTexture(imageFile.getAbsolutePath(), textureIndex);
+      scene.sky().loadSkyboxTexture(imageFile.getAbsolutePath(), textureIndex, null);
     }
   }
 
