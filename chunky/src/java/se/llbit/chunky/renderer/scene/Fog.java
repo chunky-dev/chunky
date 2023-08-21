@@ -11,8 +11,10 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
+import se.llbit.util.JsonSerializable;
 
-public final class Fog {
+public final class Fog implements JsonSerializable {
+  private final Scene scene;
   protected FogMode mode = FogMode.NONE;
   protected boolean fastFog = true;
   protected double uniformDensity = Scene.DEFAULT_FOG_DENSITY;
@@ -23,6 +25,10 @@ public final class Fog {
   private static final double EXTINCTION_FACTOR = 0.04;
   public static final double FOG_LIMIT = 30000;
   public static final Vector4 SKY_SCATTER = new Vector4(1, 1, 1, 1);
+
+  public Fog(Scene scene) {
+    this.scene = scene;
+  }
 
   public boolean fogEnabled() {
     return mode != FogMode.NONE;
@@ -46,6 +52,47 @@ public final class Fog {
 
   public boolean fastFog() {
     return fastFog;
+  }
+
+  public FogLayer[] getFogLayers() {
+    return layers;
+  }
+
+  public void addLayer() {
+    int length = layers.length;
+    layers = Arrays.copyOf(layers, layers.length + 1);
+    layers[length] = new FogLayer(scene);
+    scene.refresh();
+  }
+
+  public void removeLayer(int index) {
+    FogLayer[] layers2 = new FogLayer[layers.length - 1];
+    int currentIndex = 0;
+    int newIndex = 0;
+    for (FogLayer layer : layers) {
+      if (!(currentIndex == index)) {
+        layers2[newIndex] = layer;
+        newIndex++;
+      }
+      currentIndex++;
+    }
+    layers = Arrays.copyOf(layers2, layers2.length);
+    scene.refresh();
+  }
+
+  public void setY(int index, double value) {
+    layers[index].setY(value);
+    scene.refresh();
+  }
+
+  public void setBreadth(int index, double value) {
+    layers[index].setBreadth(value);
+    scene.refresh();
+  }
+
+  public void setDensity(int index, double value) {
+    layers[index].setDensity(value);
+    scene.refresh();
   }
 
   private static double clampDy(double dy) {
@@ -163,7 +210,7 @@ public final class Fog {
     return (offsetY - y1) / clampDy(dy);
   }
 
-  public JsonObject toJson() {
+  @Override public JsonObject toJson() {
     JsonObject fogObj = new JsonObject();
     fogObj.add("mode", mode.name());
     fogObj.add("uniformDensity", uniformDensity);

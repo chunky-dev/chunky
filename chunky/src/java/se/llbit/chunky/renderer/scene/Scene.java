@@ -225,7 +225,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean waterPlaneChunkClip = true;
   protected WaterShader waterShading = new LegacyWaterShader();
 
-  public final Fog fog = new Fog();
+  public final Fog fog = new Fog(this);
 
   protected boolean biomeColors = true;
   protected boolean biomeBlending = true;
