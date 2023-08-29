@@ -116,6 +116,8 @@ abstract public class Entity {
         return CalibratedSculkSensorAmethyst.fromJson(json);
       case "hangingSign":
         return HangingSignEntity.fromJson(json);
+      case "wallHangingSign":
+        return WallHangingSignEntity.fromJson(json);
     }
     return null;
   }

@@ -1,5 +1,6 @@
 package se.llbit.chunky.entity;
 
+import se.llbit.chunky.block.WallHangingSign;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;
 import se.llbit.chunky.resources.Texture;
@@ -17,59 +18,8 @@ import se.llbit.nbt.CompoundTag;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
-public class HangingSignEntity extends Entity {
-  private static final Quad[] quadsAttached = new Quad[]{
-    new Quad(
-      new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
-      new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
-      new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
-      new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
-    ),
-    new Quad(
-      new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
-      new Vector3(7 / 16.0, 0 / 16.0, -1 / 16.0),
-      new Vector3(-7 / 16.0, 0 / 16.0, 1 / 16.0),
-      new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
-    ),
-    new Quad(
-      new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
-      new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
-      new Vector3(-7 / 16.0, 0 / 16.0, 1 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-    ),
-    new Quad(
-      new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
-      new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
-      new Vector3(7 / 16.0, 0 / 16.0, -1 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-    ),
-    new Quad(
-      new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
-      new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
-      new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-    ),
-    new Quad(
-      new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
-      new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
-      new Vector3(7 / 16.0, 0 / 16.0, 1 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-    ),
-    new Quad(
-      new Vector3(-6 / 16.0, 16 / 16.0, 0 / 16.0),
-      new Vector3(6 / 16.0, 16 / 16.0, 0 / 16.0),
-      new Vector3(-6 / 16.0, 10 / 16.0, 0 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-    ),
-    new Quad(
-      new Vector3(6 / 16.0, 16 / 16.0, 0 / 16.0),
-      new Vector3(-6 / 16.0, 16 / 16.0, 0 / 16.0),
-      new Vector3(6 / 16.0, 10 / 16.0, 0 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-    )
-  };
-
-  private static final Quad[] quadsNotAttached = Model.join(
+public class WallHangingSignEntity extends Entity {
+  private static final Quad[] quads = Model.join(
     new Quad[]{
       new Quad(
         new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
@@ -108,18 +58,56 @@ public class HangingSignEntity extends Entity {
         new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
       )
     },
+    new Quad[]{
+      new Quad(
+        new Vector3(-8 / 16.0, 16 / 16.0, 2 / 16.0),
+        new Vector3(8 / 16.0, 16 / 16.0, 2 / 16.0),
+        new Vector3(-8 / 16.0, 16 / 16.0, -2 / 16.0),
+        new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+        new Vector3(-8 / 16.0, 14 / 16.0, -2 / 16.0),
+        new Vector3(8 / 16.0, 14 / 16.0, -2 / 16.0),
+        new Vector3(-8 / 16.0, 14 / 16.0, 2 / 16.0),
+        new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
+      ),
+      new Quad(
+        new Vector3(-8 / 16.0, 16 / 16.0, 2 / 16.0),
+        new Vector3(-8 / 16.0, 16 / 16.0, -2 / 16.0),
+        new Vector3(-8 / 16.0, 14 / 16.0, 2 / 16.0),
+        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+      ),
+      new Quad(
+        new Vector3(8 / 16.0, 16 / 16.0, -2 / 16.0),
+        new Vector3(8 / 16.0, 16 / 16.0, 2 / 16.0),
+        new Vector3(8 / 16.0, 14 / 16.0, -2 / 16.0),
+        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+      ),
+      new Quad(
+        new Vector3(-8 / 16.0, 16 / 16.0, -2 / 16.0),
+        new Vector3(8 / 16.0, 16 / 16.0, -2 / 16.0),
+        new Vector3(-8 / 16.0, 14 / 16.0, -2 / 16.0),
+        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+      ),
+      new Quad(
+        new Vector3(8 / 16.0, 16 / 16.0, 2 / 16.0),
+        new Vector3(-8 / 16.0, 16 / 16.0, 2 / 16.0),
+        new Vector3(8 / 16.0, 14 / 16.0, 2 / 16.0),
+        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+      )
+    },
     Model.transform(
       new Quad[]{
         new Quad(
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(-1.5 / 16.0, 4 / 16.0, 0 / 16.0),
           new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
         ),
         new Quad(
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(1.5 / 16.0, 4 / 16.0, 0 / 16.0),
           new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
         )
       },
@@ -127,20 +115,20 @@ public class HangingSignEntity extends Entity {
         .translate(0.5, 0.5, 0.5)
         .rotateY(Math.toRadians(-45))
         .translate(-0.5, -0.5, -0.5)
-        .translate(-5 / 16.0, 0 / 16.0, 0 / 16.0)
+        .translate(-5 / 16.0, 6 / 16.0, 0 / 16.0)
     ),
     Model.transform(
       new Quad[]{
         new Quad(
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(-1.5 / 16.0, 4 / 16.0, 0 / 16.0),
           new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
         ),
         new Quad(
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(1.5 / 16.0, 4 / 16.0, 0 / 16.0),
           new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
         )
       },
@@ -148,20 +136,20 @@ public class HangingSignEntity extends Entity {
         .translate(0.5, 0.5, 0.5)
         .rotateY(Math.toRadians(45))
         .translate(-0.5, -0.5, -0.5)
-        .translate(-5 / 16.0, 0 / 16.0, 0 / 16.0)
+        .translate(-5 / 16.0, 6 / 16.0, 0 / 16.0)
     ),
     Model.transform(
       new Quad[]{
         new Quad(
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(-1.5 / 16.0, 4 / 16.0, 0 / 16.0),
           new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
         ),
         new Quad(
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(1.5 / 16.0, 4 / 16.0, 0 / 16.0),
           new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
         )
       },
@@ -169,20 +157,20 @@ public class HangingSignEntity extends Entity {
         .translate(0.5, 0.5, 0.5)
         .rotateY(Math.toRadians(-45))
         .translate(-0.5, -0.5, -0.5)
-        .translate(5 / 16.0, 0 / 16.0, 0 / 16.0)
+        .translate(5 / 16.0, 6 / 16.0, 0 / 16.0)
     ),
     Model.transform(
       new Quad[]{
         new Quad(
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(-1.5 / 16.0, 4 / 16.0, 0 / 16.0),
           new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
         ),
         new Quad(
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
+          new Vector3(1.5 / 16.0, 4 / 16.0, 0 / 16.0),
           new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
         )
       },
@@ -190,43 +178,36 @@ public class HangingSignEntity extends Entity {
         .translate(0.5, 0.5, 0.5)
         .rotateY(Math.toRadians(45))
         .translate(-0.5, -0.5, -0.5)
-        .translate(5 / 16.0, 0 / 16.0, 0 / 16.0)
+        .translate(5 / 16.0, 6 / 16.0, 0 / 16.0)
     )
   );
-
-  private static Quad[][] rotatedQuadsAttached = new Quad[16][];
-  private static Quad[][] rotatedQuadsNotAttached = new Quad[16][];
+  private static Quad[][] rotatedQuads = new Quad[4][];
 
   static {
-    rotatedQuadsAttached[0] = Model.translate(quadsAttached, 0.5, 0, 0.5);
-    rotatedQuadsNotAttached[0] = Model.translate(quadsNotAttached, 0.5, 0, 0.5);
-
-    for (int i = 1; i < 16; ++i) {
-      rotatedQuadsAttached[i] = Model.rotateY(rotatedQuadsAttached[0], -i * Math.PI / 8);
-      rotatedQuadsNotAttached[i] = Model.rotateY(rotatedQuadsNotAttached[0], -i * Math.PI / 8);
-    }
+    rotatedQuads[0] = Model.translate(quads, 0.5, 0, 0.5);
+    rotatedQuads[1] = Model.rotateY(rotatedQuads[0]);
+    rotatedQuads[2] = Model.rotateY(rotatedQuads[1]);
+    rotatedQuads[3] = Model.rotateY(rotatedQuads[2]);
   }
 
   private final JsonArray[] frontText;
   private final JsonArray[] backText;
-  private final int angle;
-  private final boolean attached;
+  private final WallHangingSign.Facing orientation;
   private final SignTexture frontTexture;
   private final SignTexture backTexture;
   private final Texture texture;
   private final String material;
 
-  public HangingSignEntity(Vector3 position, CompoundTag entityTag, int rotation, boolean attached, String material) {
-    this(position, SignEntity.getFrontTextLines(entityTag), SignEntity.getBackTextLines(entityTag), rotation, attached, material);
+  public WallHangingSignEntity(Vector3 position, CompoundTag entityTag, WallHangingSign.Facing direction, String material) {
+    this(position, SignEntity.getFrontTextLines(entityTag), SignEntity.getBackTextLines(entityTag), direction, material);
   }
 
-  public HangingSignEntity(Vector3 position, JsonArray[] frontText, JsonArray[] backText, int rotation, boolean attached, String material) {
+  public WallHangingSignEntity(Vector3 position, JsonArray[] frontText, JsonArray[] backText, WallHangingSign.Facing direction, String material) {
     super(position);
     Texture signTexture = SignEntity.textureFromMaterial(material);
     this.frontText = frontText;
     this.backText = backText;
-    this.angle = rotation;
-    this.attached = attached;
+    this.orientation = direction;
     this.frontTexture = frontText != null ? new SignTexture(frontText, signTexture, false) : null;
     this.backTexture = backText != null ? new SignTexture(backText, signTexture, true) : null;
     this.texture = signTexture;
@@ -236,9 +217,20 @@ public class HangingSignEntity extends Entity {
   @Override
   public Collection<Primitive> primitives(Vector3 offset) {
     LinkedHashSet<Primitive> set = new LinkedHashSet<>();
-    Quad[] quads = attached ? rotatedQuadsAttached[angle] : rotatedQuadsNotAttached[angle];
+    Quad[] quads = rotatedQuads[0];
+    switch (orientation) {
+      case EAST:
+        quads = rotatedQuads[1];
+        break;
+      case SOUTH:
+        quads = rotatedQuads[2];
+        break;
+      case WEST:
+        quads = rotatedQuads[3];
+        break;
+    }
     for (Quad quad : quads) {
-      quad.addTriangles(set, new TextureMaterial(Texture.redWool),
+      quad.addTriangles(set, new TextureMaterial(Texture.lightBlueWool),
         Transform.NONE.translate(position.x + offset.x, position.y + offset.y, position.z + offset.z));
     }
     return set;
@@ -247,7 +239,7 @@ public class HangingSignEntity extends Entity {
   @Override
   public JsonValue toJson() {
     JsonObject json = new JsonObject();
-    json.add("kind", "hangingSign");
+    json.add("kind", "wallHangingSign");
     json.add("position", position.toJson());
     if (frontText != null) {
       json.add("text", SignEntity.textToJson(frontText));
@@ -255,8 +247,7 @@ public class HangingSignEntity extends Entity {
     if (backText != null) {
       json.add("backText", SignEntity.textToJson(backText));
     }
-    json.add("direction", angle);
-    json.add("attached", attached);
+    json.add("direction", orientation.toString());
     json.add("material", material);
     return json;
   }
@@ -275,10 +266,8 @@ public class HangingSignEntity extends Entity {
     if (json.get("backText").isArray()) {
       backText = SignEntity.textFromJson(json.get("backText"));
     }
-    int direction = json.get("direction").intValue(0);
-    boolean attached = json.get("attached").boolValue(false);
+    WallHangingSign.Facing direction = WallHangingSign.Facing.fromString(json.get("direction").stringValue("north"));
     String material = json.get("material").stringValue("oak");
-    return new HangingSignEntity(position, frontText, backText, direction, attached, material);
+    return new WallHangingSignEntity(position, frontText, backText, direction, material);
   }
 }
-
