@@ -21,94 +21,107 @@ import java.util.LinkedHashSet;
 public class WallHangingSignEntity extends Entity {
   private static final Quad[] quads = Model.join(
     new Quad[]{
+      // sign top
       new Quad(
         new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
-        new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
+        new Vector4(2 / 64., 16 / 64., 1 - 12 / 32., 1 - 14 / 32.)
       ),
+      // sign bottom
       new Quad(
         new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
         new Vector3(7 / 16.0, 0 / 16.0, -1 / 16.0),
         new Vector3(-7 / 16.0, 0 / 16.0, 1 / 16.0),
-        new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
+        new Vector4(16 / 64., 30 / 64., 1 - 12 / 32., 1 - 14 / 32.)
       ),
+      // sign left
       new Quad(
         new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
         new Vector3(-7 / 16.0, 0 / 16.0, 1 / 16.0),
-        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+        new Vector4(0 / 64., 2 / 64.0, 1 - 14 / 32., 1 - 24 / 32.)
       ),
+      // sign right
       new Quad(
         new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
         new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(7 / 16.0, 0 / 16.0, -1 / 16.0),
-        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+        new Vector4(16 / 64., 18 / 64.0, 1 - 14 / 32., 1 - 24 / 32.)
       ),
+      // sign front
       new Quad(
         new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
         new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
         new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
-        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+        new Vector4(2 / 64., 16 / 64., 1 - 14 / 32., 1 - 24 / 32.)
       ),
+      // sign back
       new Quad(
         new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(7 / 16.0, 0 / 16.0, 1 / 16.0),
-        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+        new Vector4(18 / 64., 32 / 64., 1 - 14 / 32., 1 - 24 / 32.)
       )
     },
     new Quad[]{
+      // bar top
       new Quad(
         new Vector3(-8 / 16.0, 16 / 16.0, 2 / 16.0),
         new Vector3(8 / 16.0, 16 / 16.0, 2 / 16.0),
         new Vector3(-8 / 16.0, 16 / 16.0, -2 / 16.0),
-        new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
+        new Vector4(4 / 64., 20 / 64., 1 - 0 / 32., 1 - 4 / 32.)
       ),
+      // bar bottom
       new Quad(
         new Vector3(-8 / 16.0, 14 / 16.0, -2 / 16.0),
         new Vector3(8 / 16.0, 14 / 16.0, -2 / 16.0),
         new Vector3(-8 / 16.0, 14 / 16.0, 2 / 16.0),
-        new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
+        new Vector4(20 / 64., 36 / 64., 1 - 0 / 32., 1 - 4 / 32.)
       ),
+      // bar left
       new Quad(
         new Vector3(-8 / 16.0, 16 / 16.0, 2 / 16.0),
         new Vector3(-8 / 16.0, 16 / 16.0, -2 / 16.0),
         new Vector3(-8 / 16.0, 14 / 16.0, 2 / 16.0),
-        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+        new Vector4(0 / 64., 4 / 64., 1 - 4 / 32., 1 - 6 / 32.)
       ),
+      // bar right
       new Quad(
         new Vector3(8 / 16.0, 16 / 16.0, -2 / 16.0),
         new Vector3(8 / 16.0, 16 / 16.0, 2 / 16.0),
         new Vector3(8 / 16.0, 14 / 16.0, -2 / 16.0),
-        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+        new Vector4(20 / 64., 24 / 64., 1 - 4 / 32., 1 - 6 / 32.)
       ),
+      // bar front
       new Quad(
         new Vector3(-8 / 16.0, 16 / 16.0, -2 / 16.0),
         new Vector3(8 / 16.0, 16 / 16.0, -2 / 16.0),
         new Vector3(-8 / 16.0, 14 / 16.0, -2 / 16.0),
-        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+        new Vector4(4 / 64., 20 / 64., 1 - 4 / 32., 1 - 6 / 32.)
       ),
+      // bar back
       new Quad(
         new Vector3(8 / 16.0, 16 / 16.0, 2 / 16.0),
         new Vector3(-8 / 16.0, 16 / 16.0, 2 / 16.0),
         new Vector3(8 / 16.0, 14 / 16.0, 2 / 16.0),
-        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+        new Vector4(24 / 64., 40 / 64., 1 - 4 / 32., 1 - 6 / 32.)
       )
     },
+    // chains
     Model.transform(
       new Quad[]{
         new Quad(
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(6 / 64., 9 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         ),
         new Quad(
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(6 / 64., 9 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         )
       },
       Transform.NONE
@@ -123,13 +136,13 @@ public class WallHangingSignEntity extends Entity {
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(0 / 64., 3 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         ),
         new Quad(
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(0 / 64., 3 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         )
       },
       Transform.NONE
@@ -144,13 +157,13 @@ public class WallHangingSignEntity extends Entity {
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(6 / 64., 9 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         ),
         new Quad(
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(6 / 64., 9 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         )
       },
       Transform.NONE
@@ -165,13 +178,13 @@ public class WallHangingSignEntity extends Entity {
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(0 / 64., 3 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         ),
         new Quad(
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(0 / 64., 3 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         )
       },
       Transform.NONE
@@ -204,7 +217,7 @@ public class WallHangingSignEntity extends Entity {
 
   public WallHangingSignEntity(Vector3 position, JsonArray[] frontText, JsonArray[] backText, WallHangingSign.Facing direction, String material) {
     super(position);
-    Texture signTexture = SignEntity.textureFromMaterial(material);
+    Texture signTexture = HangingSignEntity.textureFromMaterial(material);
     this.frontText = frontText;
     this.backText = backText;
     this.orientation = direction;
@@ -230,7 +243,7 @@ public class WallHangingSignEntity extends Entity {
         break;
     }
     for (Quad quad : quads) {
-      quad.addTriangles(set, new TextureMaterial(Texture.lightBlueWool),
+      quad.addTriangles(set, new TextureMaterial(texture),
         Transform.NONE.translate(position.x + offset.x, position.y + offset.y, position.z + offset.z));
     }
     return set;

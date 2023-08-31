@@ -19,108 +19,123 @@ import java.util.LinkedHashSet;
 
 public class HangingSignEntity extends Entity {
   private static final Quad[] quadsAttached = new Quad[]{
+    // top
     new Quad(
       new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
       new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
       new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
-      new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
+      new Vector4(2 / 64., 16 / 64., 1 - 12 / 32., 1 - 14 / 32.)
     ),
+    // bottom
     new Quad(
       new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
       new Vector3(7 / 16.0, 0 / 16.0, -1 / 16.0),
       new Vector3(-7 / 16.0, 0 / 16.0, 1 / 16.0),
-      new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
+      new Vector4(16 / 64., 30 / 64., 1 - 12 / 32., 1 - 14 / 32.)
     ),
+    // left
     new Quad(
       new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
       new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
       new Vector3(-7 / 16.0, 0 / 16.0, 1 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+      new Vector4(0 / 64., 2 / 64.0, 1 - 14 / 32., 1 - 24 / 32.)
     ),
+    // right
     new Quad(
       new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
       new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
       new Vector3(7 / 16.0, 0 / 16.0, -1 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+      new Vector4(16 / 64., 18 / 64.0, 1 - 14 / 32., 1 - 24 / 32.)
     ),
+    // front
     new Quad(
       new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
       new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
       new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+      new Vector4(2 / 64., 16 / 64., 1 - 14 / 32., 1 - 24 / 32.)
     ),
+    // back
     new Quad(
       new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
       new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
       new Vector3(7 / 16.0, 0 / 16.0, 1 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+      new Vector4(18 / 64., 32 / 64., 1 - 14 / 32., 1 - 24 / 32.)
     ),
+    // chains front
     new Quad(
       new Vector3(-6 / 16.0, 16 / 16.0, 0 / 16.0),
       new Vector3(6 / 16.0, 16 / 16.0, 0 / 16.0),
       new Vector3(-6 / 16.0, 10 / 16.0, 0 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+      new Vector4(13 / 64., 27 / 64., 1 - 6 / 32., 1 - 12 / 32.)
     ),
+    // chains back
     new Quad(
       new Vector3(6 / 16.0, 16 / 16.0, 0 / 16.0),
       new Vector3(-6 / 16.0, 16 / 16.0, 0 / 16.0),
       new Vector3(6 / 16.0, 10 / 16.0, 0 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+      new Vector4(13 / 64., 27 / 64., 1 - 6 / 32., 1 - 12 / 32.)
     )
   };
 
   private static final Quad[] quadsNotAttached = Model.join(
     new Quad[]{
+      // top
       new Quad(
         new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
-        new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
+        new Vector4(2 / 64., 16 / 64., 1 - 12 / 32., 1 - 14 / 32.)
       ),
+      // bottom
       new Quad(
         new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
         new Vector3(7 / 16.0, 0 / 16.0, -1 / 16.0),
         new Vector3(-7 / 16.0, 0 / 16.0, 1 / 16.0),
-        new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
+        new Vector4(16 / 64., 30 / 64., 1 - 12 / 32., 1 - 14 / 32.)
       ),
+      // left
       new Quad(
         new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
         new Vector3(-7 / 16.0, 0 / 16.0, 1 / 16.0),
-        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+        new Vector4(0 / 64., 2 / 64.0, 1 - 14 / 32., 1 - 24 / 32.)
       ),
+      // right
       new Quad(
         new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
         new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(7 / 16.0, 0 / 16.0, -1 / 16.0),
-        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+        new Vector4(16 / 64., 18 / 64.0, 1 - 14 / 32., 1 - 24 / 32.)
       ),
+      // front
       new Quad(
         new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
         new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
         new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
-        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+        new Vector4(2 / 64., 16 / 64., 1 - 14 / 32., 1 - 24 / 32.)
       ),
+      // back
       new Quad(
         new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(7 / 16.0, 0 / 16.0, 1 / 16.0),
-        new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-      )
+        new Vector4(18 / 64., 32 / 64., 1 - 14 / 32., 1 - 24 / 32.)
+      ),
     },
+    // chains
     Model.transform(
       new Quad[]{
         new Quad(
           new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(6 / 64., 9 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         ),
         new Quad(
           new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(6 / 64., 9 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         )
       },
       Transform.NONE
@@ -135,13 +150,13 @@ public class HangingSignEntity extends Entity {
           new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(0 / 64., 3 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         ),
         new Quad(
           new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(0 / 64., 3 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         )
       },
       Transform.NONE
@@ -156,13 +171,13 @@ public class HangingSignEntity extends Entity {
           new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(6 / 64., 9 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         ),
         new Quad(
           new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(6 / 64., 9 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         )
       },
       Transform.NONE
@@ -177,13 +192,13 @@ public class HangingSignEntity extends Entity {
           new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(0 / 64., 3 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         ),
         new Quad(
           new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
           new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(0 / 64., 3 / 64., 1 - 6 / 32., 1 - 12 / 32.)
         )
       },
       Transform.NONE
@@ -222,7 +237,7 @@ public class HangingSignEntity extends Entity {
 
   public HangingSignEntity(Vector3 position, JsonArray[] frontText, JsonArray[] backText, int rotation, boolean attached, String material) {
     super(position);
-    Texture signTexture = SignEntity.textureFromMaterial(material);
+    Texture signTexture = HangingSignEntity.textureFromMaterial(material);
     this.frontText = frontText;
     this.backText = backText;
     this.angle = rotation;
@@ -238,7 +253,7 @@ public class HangingSignEntity extends Entity {
     LinkedHashSet<Primitive> set = new LinkedHashSet<>();
     Quad[] quads = attached ? rotatedQuadsAttached[angle] : rotatedQuadsNotAttached[angle];
     for (Quad quad : quads) {
-      quad.addTriangles(set, new TextureMaterial(Texture.redWool),
+      quad.addTriangles(set, new TextureMaterial(texture),
         Transform.NONE.translate(position.x + offset.x, position.y + offset.y, position.z + offset.z));
     }
     return set;
@@ -279,6 +294,35 @@ public class HangingSignEntity extends Entity {
     boolean attached = json.get("attached").boolValue(false);
     String material = json.get("material").stringValue("oak");
     return new HangingSignEntity(position, frontText, backText, direction, attached, material);
+  }
+
+  public static Texture textureFromMaterial(String material) {
+    switch (material) {
+      case "oak":
+        return Texture.oakHangingSign;
+      case "spruce":
+        return Texture.spruceHangingSign;
+      case "birch":
+        return Texture.birchHangingSign;
+      case "jungle":
+        return Texture.jungleHangingSign;
+      case "acacia":
+        return Texture.acaciaHangingSign;
+      case "dark_oak":
+        return Texture.darkOakHangingSign;
+      case "crimson":
+        return Texture.crimsonHangingSign;
+      case "warped":
+        return Texture.warpedHangingSign;
+      case "mangrove":
+        return Texture.mangroveHangingSign;
+      case "bamboo":
+        return Texture.bambooHangingSign;
+      case "cherry":
+        return Texture.cherryHangingSign;
+      default:
+        throw new IllegalArgumentException("Unknown hanging sign material: " + material);
+    }
   }
 }
 

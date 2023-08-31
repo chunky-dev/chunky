@@ -1,7 +1,7 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.entity.SignEntity;
+import se.llbit.chunky.entity.HangingSignEntity;
 import se.llbit.chunky.entity.WallHangingSignEntity;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Ray;
@@ -13,7 +13,7 @@ public class WallHangingSign extends MinecraftBlockTranslucent {
   private final Facing facing;
 
   public WallHangingSign(String name, String material, String facing) {
-    super(name, SignEntity.textureFromMaterial(material));
+    super(name, HangingSignEntity.textureFromMaterial(material));
     this.material = material;
     this.facing = Facing.fromString(facing);
     invisible = true;

@@ -1012,9 +1012,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("cherry_planks", Texture.cherryPlanks);
     addBlock("cherry_pressure_plate", (name, tag) -> new PressurePlate(name, Texture.cherryPlanks));
     addBlock("cherry_sign", (name, tag) -> sign(tag, "cherry"));
-    addBlock("cherry_hanging_sign", (name, tag) -> hangingSign(tag, "cherry"));
     addBlock("cherry_wall_sign", (name, tag) -> wallSign(tag, "cherry"));
-    addBlock("cherry_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "cherry"));
     addBlock("cherry_slab", (name, tag) -> slab(tag, Texture.cherryPlanks));
     addBlock("cherry_stairs", (name, tag) -> stairs(tag, Texture.cherryPlanks));
     addBlock("cherry_trapdoor", (name, tag) -> trapdoor(tag, Texture.cherryTrapdoor));
@@ -1050,6 +1048,28 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("calibrated_sculk_sensor", (name, tag) -> new CalibratedSculkSensor(
       tag.get("Properties").get("sculk_sensor_phase").stringValue("cooldown"),
       tag.get("Properties").get("facing").stringValue("north")));
+    addBlock("oak_hanging_sign", (name, tag) -> hangingSign(tag, "oak"));
+    addBlock("oak_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "oak"));
+    addBlock("spruce_hanging_sign", (name, tag) -> hangingSign(tag, "spruce"));
+    addBlock("spruce_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "spruce"));
+    addBlock("birch_hanging_sign", (name, tag) -> hangingSign(tag, "birch"));
+    addBlock("birch_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "birch"));
+    addBlock("jungle_hanging_sign", (name, tag) -> hangingSign(tag, "jungle"));
+    addBlock("jungle_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "jungle"));
+    addBlock("acacia_hanging_sign", (name, tag) -> hangingSign(tag, "acacia"));
+    addBlock("acacia_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "acacia"));
+    addBlock("dark_oak_hanging_sign", (name, tag) -> hangingSign(tag, "dark_oak"));
+    addBlock("dark_oak_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "dark_oak"));
+    addBlock("crimson_hanging_sign", (name, tag) -> hangingSign(tag, "crimson"));
+    addBlock("crimson_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "crimson"));
+    addBlock("warped_hanging_sign", (name, tag) -> hangingSign(tag, "warped"));
+    addBlock("warped_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "warped"));
+    addBlock("mangrove_hanging_sign", (name, tag) -> hangingSign(tag, "mangrove"));
+    addBlock("mangrove_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "mangrove"));
+    addBlock("bamboo_hanging_sign", (name, tag) -> hangingSign(tag, "bamboo"));
+    addBlock("bamboo_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "bamboo"));
+    addBlock("cherry_hanging_sign", (name, tag) -> hangingSign(tag, "cherry"));
+    addBlock("cherry_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "cherry"));
   }
 
   @Override

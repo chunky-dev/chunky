@@ -2,7 +2,6 @@ package se.llbit.chunky.block;
 
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.HangingSignEntity;
-import se.llbit.chunky.entity.SignEntity;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -14,7 +13,7 @@ public class HangingSign extends MinecraftBlockTranslucent {
   private final boolean attached;
 
   public HangingSign(String name, String material, int rotation, boolean attached) {
-    super(name, SignEntity.textureFromMaterial(material));
+    super(name, HangingSignEntity.textureFromMaterial(material));
     this.material = material;
     this.rotation = rotation;
     this.attached = attached;
