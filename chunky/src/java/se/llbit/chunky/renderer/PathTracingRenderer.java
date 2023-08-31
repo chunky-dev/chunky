@@ -71,7 +71,7 @@ public class PathTracingRenderer extends TileBasedRenderer {
 
     while (scene.spp < scene.getTargetSpp()) {
       int spp = scene.spp;
-      int branchCount = (tracer instanceof PathTracer) ? scene.getBranchCount() : 1;
+      int branchCount = (tracer instanceof PathTracer) ? scene.getBranchCount(true) : 1;
       double sinv = 1.0 / (sppPerPass * branchCount + spp);
 
       submitTiles(manager, (state, pixel) -> {

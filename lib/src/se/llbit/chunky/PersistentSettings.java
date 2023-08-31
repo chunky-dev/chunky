@@ -64,7 +64,7 @@ public final class PersistentSettings {
   public static final double DEFAULT_FOG_BLUE = 1;
 
   public static final int DEFAULT_RAY_DEPTH = 5;
-  public static final int DEFAULT_BRANCH_COUNT = 5;
+  public static final int DEFAULT_BRANCH_COUNT = 10;
   public static final int DEFAULT_SPP_TARGET = 1000;
 
   public static final int DEFAULT_DIMENSION = 0;
