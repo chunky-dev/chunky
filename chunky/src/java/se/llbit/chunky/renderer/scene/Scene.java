@@ -1920,11 +1920,19 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * @param modified Whether to alter the branch count based on current spp
-   * @return The branch count
+   * @return The "nominal" value of the branch count.
    */
-  public int getBranchCount(boolean modified) {
-    if(modified && spp < branchCount) {
+  public int getBranchCount() {
+      return branchCount;
+  }
+
+  /**
+   * Usually the same as getBranchCount, but reduces branch count to 1 for first few SPP.
+   *
+   * @return The current "true" branch count
+   */
+  public int getCurrentBranchCount() {
+    if(spp < branchCount) {
       if(spp <= Math.sqrt(branchCount)) { // This is arbitrary, but should be a good compromise in most cases
         return 1;
       } else {

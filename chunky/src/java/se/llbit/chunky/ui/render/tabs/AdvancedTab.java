@@ -326,7 +326,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     renderThreads.set(PersistentSettings.getNumThreads());
     cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());
-    branchCount.set(scene.getBranchCount(false));
+    branchCount.set(scene.getBranchCount());
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
     bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
     biomeStructureImplementation.getSelectionModel().select(scene.getBiomeStructureImplementation());

@@ -135,7 +135,7 @@ public class PathTracer implements RayTracer {
       // The main caveat is that antialiasing is achieved by varying the starting rays at the subpixel level (see PathTracingRenderer.java)
       // Therefore, it's still necessary to have a decent amount (20 is ok, 50 is better) of distinct starting rays for each pixel
       // scene.branchCount is the number of times we use the same first ray before casting a new one
-      int count = firstReflection ? scene.getBranchCount(true) : 1;
+      int count = firstReflection ? scene.getCurrentBranchCount() : 1;
       for (int i = 0; i < count; i++) {
         boolean doMetal = pMetal > Ray.EPSILON && random.nextFloat() < pMetal;
         if (doMetal || (pSpecular > Ray.EPSILON && random.nextFloat() < pSpecular)) {
