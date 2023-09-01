@@ -228,7 +228,9 @@ public class PathTracer implements RayTracer {
 
     if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance > Ray.EPSILON) {
 
-      emittance = new Vector3(ray.color.x, ray.color.y, ray.color.z);
+      // Quadratic emittance mapping, so a pixel that's 50% darker will emit only 25% as much light
+      // This is arbitrary but gives pretty good results in most cases.
+      emittance = new Vector3(ray.color.x * ray.color.x, ray.color.y * ray.color.y, ray.color.z * ray.color.z);
       emittance.scale(currentMat.emittance * scene.emitterIntensity);
 
       hit = true;
@@ -288,9 +290,9 @@ public class PathTracer implements RayTracer {
       next.diffuseReflection(ray, random);
       hit = pathTrace(scene, next, state, false) || hit;
       if (hit) {
-        cumulativeColor.x += ray.color.x * (emittance.x + directLightR * scene.sun.emittance.x + next.color.x + (indirectEmitterColor.x));
-        cumulativeColor.y += ray.color.y * (emittance.y + directLightG * scene.sun.emittance.y + next.color.y + (indirectEmitterColor.y));
-        cumulativeColor.z += ray.color.z * (emittance.z + directLightB * scene.sun.emittance.z + next.color.z + (indirectEmitterColor.z));
+        cumulativeColor.x += emittance.x + ray.color.x * (directLightR * scene.sun.emittance.x + next.color.x + indirectEmitterColor.x);
+        cumulativeColor.y += emittance.y + ray.color.y * (directLightG * scene.sun.emittance.y + next.color.y + indirectEmitterColor.y);
+        cumulativeColor.z += emittance.z + ray.color.z * (directLightB * scene.sun.emittance.z + next.color.z + indirectEmitterColor.z);
       } else if (indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
         hit = true;
         cumulativeColor.x += ray.color.x * indirectEmitterColor.x;
@@ -303,9 +305,9 @@ public class PathTracer implements RayTracer {
 
       hit = pathTrace(scene, next, state, false) || hit;
       if (hit) {
-        cumulativeColor.x += ray.color.x * (emittance.x + next.color.x + (indirectEmitterColor.x));
-        cumulativeColor.y += ray.color.y * (emittance.y + next.color.y + (indirectEmitterColor.y));
-        cumulativeColor.z += ray.color.z * (emittance.z + next.color.z + (indirectEmitterColor.z));
+        cumulativeColor.x += emittance.x + ray.color.x * (next.color.x + indirectEmitterColor.x);
+        cumulativeColor.y += emittance.y + ray.color.y * (next.color.y + indirectEmitterColor.y);
+        cumulativeColor.z += emittance.z + ray.color.z * (next.color.z + indirectEmitterColor.z);
       } else if (indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
         hit = true;
         cumulativeColor.x += ray.color.x * indirectEmitterColor.x;
