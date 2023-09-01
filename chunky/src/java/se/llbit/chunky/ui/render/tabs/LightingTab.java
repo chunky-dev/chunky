@@ -52,6 +52,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster skyIntensity;
   @FXML private DoubleAdjuster apparentSkyBrightness;
   @FXML private DoubleAdjuster emitterIntensity;
+  @FXML private DoubleAdjuster emitterMappingExponent;
   @FXML private DoubleAdjuster sunIntensity;
   @FXML private CheckBox drawSun;
   @FXML private ComboBox<SunSamplingStrategy> sunSamplingStrategy;
@@ -109,6 +110,12 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     emitterIntensity.makeLogarithmic();
     emitterIntensity.clampMin();
     emitterIntensity.onValueChange(value -> scene.setEmitterIntensity(value));
+
+    emitterMappingExponent.setName("Emitter mapping exponent");
+    emitterMappingExponent.setTooltip("Determines how much light is emitted from darker or lighter pixels.\nHigher values will result in darker pixels emitting less light.");
+    emitterMappingExponent.setRange(Scene.MIN_EMITTER_MAPPING_EXPONENT, Scene.MAX_EMITTER_MAPPING_EXPONENT);
+    emitterMappingExponent.clampMin();
+    emitterMappingExponent.onValueChange(value -> scene.setEmitterMappingExponent(value));
 
     emitterSamplingStrategy.getItems().addAll(EmitterSamplingStrategy.values());
     emitterSamplingStrategy.getSelectionModel().selectedItemProperty()
@@ -194,6 +201,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     skyIntensity.set(scene.sky().getSkyLight());
     apparentSkyBrightness.set(scene.sky().getApparentSkyLight());
     emitterIntensity.set(scene.getEmitterIntensity());
+    emitterMappingExponent.set(scene.getEmitterMappingExponent());
     sunIntensity.set(scene.sun().getIntensity());
     sunLuminosity.set(scene.sun().getLuminosity());
     apparentSunBrightness.set(scene.sun().getApparentBrightness());
