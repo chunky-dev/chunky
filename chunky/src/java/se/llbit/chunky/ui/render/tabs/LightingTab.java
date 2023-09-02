@@ -26,6 +26,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.paint.Color;
+import se.llbit.chunky.renderer.EmitterMappingType;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.SunSamplingStrategy;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -52,6 +53,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster skyIntensity;
   @FXML private DoubleAdjuster apparentSkyBrightness;
   @FXML private DoubleAdjuster emitterIntensity;
+  @FXML private ComboBox<EmitterMappingType> emitterMappingType;
   @FXML private DoubleAdjuster emitterMappingExponent;
   @FXML private DoubleAdjuster sunIntensity;
   @FXML private CheckBox drawSun;
@@ -110,6 +112,11 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     emitterIntensity.makeLogarithmic();
     emitterIntensity.clampMin();
     emitterIntensity.onValueChange(value -> scene.setEmitterIntensity(value));
+
+    emitterMappingType.getItems().addAll(EmitterMappingType.values());
+    emitterMappingType.getSelectionModel().selectedItemProperty().addListener(
+      (observable, oldValue, newValue) -> scene.setEmitterMappingType(newValue));
+    emitterMappingType.setTooltip(new Tooltip("Determines how per-pixel light emission is computed."));
 
     emitterMappingExponent.setName("Emitter mapping exponent");
     emitterMappingExponent.setTooltip("Determines how much light is emitted from darker or lighter pixels.\nHigher values will result in darker pixels emitting less light.");
@@ -202,6 +209,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     apparentSkyBrightness.set(scene.sky().getApparentSkyLight());
     emitterIntensity.set(scene.getEmitterIntensity());
     emitterMappingExponent.set(scene.getEmitterMappingExponent());
+    emitterMappingType.getSelectionModel().select(scene.getEmitterMappingType());
     sunIntensity.set(scene.sun().getIntensity());
     sunLuminosity.set(scene.sun().getLuminosity());
     apparentSunBrightness.set(scene.sun().getApparentBrightness());

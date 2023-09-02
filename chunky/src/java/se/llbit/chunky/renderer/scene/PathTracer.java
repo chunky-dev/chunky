@@ -228,9 +228,17 @@ public class PathTracer implements RayTracer {
 
     if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance > Ray.EPSILON) {
 
-      // Exponential emittance mapping
+      // Emittance mapping
       double exp = scene.getEmitterMappingExponent();
-      emittance = new Vector3(FastMath.pow(ray.color.x, exp), FastMath.pow(ray.color.y, exp), FastMath.pow(ray.color.z, exp));
+      switch(scene.getEmitterMappingType()) {
+        case BRIGHTEST_CHANNEL:
+          double val = FastMath.pow(Math.max(ray.color.x, Math.max(ray.color.y, ray.color.z)), exp);
+          emittance = new Vector3(ray.color.x * val, ray.color.y * val, ray.color.z * val);
+          break;
+        case INDEPENDENT_CHANNELS:
+          emittance = new Vector3(FastMath.pow(ray.color.x, exp), FastMath.pow(ray.color.y, exp), FastMath.pow(ray.color.z, exp));
+          break;
+      }
       emittance.scale(currentMat.emittance * scene.emitterIntensity);
 
       hit = true;
