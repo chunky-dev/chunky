@@ -21,7 +21,6 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
-import se.llbit.chunky.renderer.SunSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.*;
@@ -56,7 +55,7 @@ public class PathTracer implements RayTracer {
    * diffuse or specular reflection
    */
   public static boolean pathTrace(Scene scene, Ray ray, WorkerState state, int addEmitted,
-      boolean firstReflection) {
+                                  boolean firstReflection) {
 
     boolean hit = false;
     Random random = state.random;
@@ -105,7 +104,7 @@ public class PathTracer implements RayTracer {
 
       float pSpecular = currentMat.specular;
 
-      double pDiffuse = ray.color.w;
+      double pDiffuse = 1 - Math.sqrt(1 - ray.color.w);
 
       float n1 = prevMat.ior;
       float n2 = currentMat.ior;
@@ -123,270 +122,34 @@ public class PathTracer implements RayTracer {
         // TODO: material color may change here.
         continue;
       }
-
+      if(ray.depth + 1 >= scene.rayDepth) {
+        break;
+      }
+      Vector4 cumulativeColor = new Vector4(0, 0, 0, 0);
+      Ray next = new Ray();
       float pMetal = currentMat.metalness;
-      boolean doMetal = pMetal > Ray.EPSILON && random.nextFloat() < pMetal;
-
-      if (doMetal || (pSpecular > Ray.EPSILON && random.nextFloat() < pSpecular)) {
-        // Specular reflection (metals only do specular reflection).
-
-        firstReflection = false;
-
-        if (!scene.kill(ray.depth + 1, random)) {
-          Ray reflected = new Ray();
-          reflected.specularReflection(ray, random);
-
-          if (pathTrace(scene, reflected, state, 1, false)) {
-            ray.emittance.x = ray.color.x * reflected.emittance.x;
-            ray.emittance.y = ray.color.y * reflected.emittance.y;
-            ray.emittance.z = ray.color.z * reflected.emittance.z;
-
-            if (doMetal) {
-              // use the albedo color as specular color
-              ray.color.x *= reflected.color.x;
-              ray.color.y *= reflected.color.y;
-              ray.color.z *= reflected.color.z;
-            } else {
-              ray.color.x = reflected.color.x;
-              ray.color.y = reflected.color.y;
-              ray.color.z = reflected.color.z;
-            }
-            hit = true;
-          }
-        }
-
-      } else {
-
-        if (random.nextFloat() < pDiffuse) {
-          // Diffuse reflection.
-
-          firstReflection = false;
-
-          if (!scene.kill(ray.depth + 1, random)) {
-            Ray reflected = new Ray();
-
-            float emittance = 0;
-
-            Vector4 indirectEmitterColor = new Vector4(0, 0, 0, 0);
-
-            if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance > Ray.EPSILON) {
-
-              emittance = addEmitted;
-              ray.emittance.x = ray.color.x * ray.color.x *
-                  currentMat.emittance * scene.emitterIntensity;
-              ray.emittance.y = ray.color.y * ray.color.y *
-                  currentMat.emittance * scene.emitterIntensity;
-              ray.emittance.z = ray.color.z * ray.color.z *
-                  currentMat.emittance * scene.emitterIntensity;
-              hit = true;
-            } else if(scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
-              // Sample emitter
-              switch (scene.emitterSamplingStrategy) {
-                case ONE:
-                case ONE_BLOCK: {
-                  Grid.EmitterPosition pos = scene.getEmitterGrid().sampleEmitterPosition((int) ray.o.x, (int) ray.o.y, (int) ray.o.z, random);
-                  if (pos != null) {
-                    indirectEmitterColor.scaleAdd(Math.PI, sampleEmitter(scene, ray, pos, random));
-                  }
-                  break;
-                }
-                case ALL: {
-                  List<Grid.EmitterPosition> positions = scene.getEmitterGrid().getEmitterPositions((int) ray.o.x, (int) ray.o.y, (int) ray.o.z);
-                  double sampleScaler = Math.PI / positions.size();
-                  for (Grid.EmitterPosition pos : positions) {
-                    indirectEmitterColor.scaleAdd(sampleScaler, sampleEmitter(scene, ray, pos, random));
-                  }
-                  break;
-                }
-              }
-            }
-
-            if (scene.getSunSamplingStrategy().doSunSampling()) {
-              reflected.set(ray);
-              scene.sun.getRandomSunDirection(reflected, random);
-
-              double directLightR = 0;
-              double directLightG = 0;
-              double directLightB = 0;
-
-              boolean frontLight = reflected.d.dot(ray.getNormal()) > 0;
-
-              if (frontLight || (currentMat.subSurfaceScattering
-                  && random.nextFloat() < Scene.fSubSurface)) {
-
-                if (!frontLight) {
-                  reflected.o.scaleAdd(-Ray.OFFSET, ray.getNormal());
-                }
-
-                reflected.setCurrentMaterial(reflected.getPrevMaterial(), reflected.getPrevData());
-
-                getDirectLightAttenuation(scene, reflected, state);
-
-                Vector4 attenuation = state.attenuation;
-                if (attenuation.w > 0) {
-                  double mult = QuickMath.abs(reflected.d.dot(ray.getNormal())) * (scene.getSunSamplingStrategy().isSunLuminosity() ? scene.sun().getLuminosityPdf() : 1);
-                  directLightR = attenuation.x * attenuation.w * mult;
-                  directLightG = attenuation.y * attenuation.w * mult;
-                  directLightB = attenuation.z * attenuation.w * mult;
-                  hit = true;
-                }
-              }
-
-              reflected.diffuseReflection(ray, random, scene);
-              hit = pathTrace(scene, reflected, state, 0, false) || hit;
-              if (hit) {
-                ray.color.x = ray.color.x * (emittance + directLightR * scene.sun.emittance.x + (
-                    reflected.color.x + reflected.emittance.x) + (indirectEmitterColor.x));
-                ray.color.y = ray.color.y * (emittance + directLightG * scene.sun.emittance.y + (
-                    reflected.color.y + reflected.emittance.y) + (indirectEmitterColor.y));
-                ray.color.z = ray.color.z * (emittance + directLightB * scene.sun.emittance.z + (
-                    reflected.color.z + reflected.emittance.z) + (indirectEmitterColor.z));
-              } else if(indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
-                hit = true;
-                ray.color.x *= indirectEmitterColor.x;
-                ray.color.y *= indirectEmitterColor.y;
-                ray.color.z *= indirectEmitterColor.z;
-              }
-
-            } else {
-              reflected.diffuseReflection(ray, random, scene);
-
-              hit = pathTrace(scene, reflected, state, 0, false) || hit;
-              if (hit) {
-                ray.color.x =
-                    ray.color.x * (emittance + (reflected.color.x + reflected.emittance.x) + (indirectEmitterColor.x));
-                ray.color.y =
-                    ray.color.y * (emittance + (reflected.color.y + reflected.emittance.y) + (indirectEmitterColor.y));
-                ray.color.z =
-                    ray.color.z * (emittance + (reflected.color.z + reflected.emittance.z) + (indirectEmitterColor.z));
-              } else if(indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
-                hit = true;
-                ray.color.x *= indirectEmitterColor.x;
-                ray.color.y *= indirectEmitterColor.y;
-                ray.color.z *= indirectEmitterColor.z;
-              }
-            }
-          }
+      // Reusing first rays - a simplified form of "branched path tracing" (what Blender used to call it before they implemented something fancier)
+      // The initial rays cast into the scene are very similar between each sample, since they are almost entirely a function of the pixel coordinates
+      // Because of that, casting those initial rays on every sample is redundant and can be skipped
+      // If the ray depth is high, this doesn't help much (just a few percent), but in some outdoor/low depth scenes, this can improve performance by >40%
+      // The main caveat is that antialiasing is achieved by varying the starting rays at the subpixel level (see PathTracingRenderer.java)
+      // Therefore, it's still necessary to have a decent amount (20 is ok, 50 is better) of distinct starting rays for each pixel
+      // scene.branchCount is the number of times we use the same first ray before casting a new one
+      int count = firstReflection ? scene.getCurrentBranchCount() : 1;
+      for (int i = 0; i < count; i++) {
+        boolean doMetal = pMetal > Ray.EPSILON && random.nextFloat() < pMetal;
+        if (doMetal || (pSpecular > Ray.EPSILON && random.nextFloat() < pSpecular)) {
+          hit |= doSpecularReflection(ray, next, cumulativeColor, doMetal, random, state, scene);
+        } else if(random.nextFloat() < pDiffuse) {
+          hit |= doDiffuseReflection(ray, next, currentMat, cumulativeColor, addEmitted, random, state, scene);
         } else if (n1 != n2) {
-          // Refraction.
-
-          // TODO: make this decision dependent on the material properties:
-          boolean doRefraction =
-              currentMat.refractive || prevMat.refractive;
-
-          // Refraction.
-          float n1n2 = n1 / n2;
-          double cosTheta = -ray.getNormal().dot(ray.d);
-          double radicand = 1 - n1n2 * n1n2 * (1 - cosTheta * cosTheta);
-          if (doRefraction && radicand < Ray.EPSILON) {
-            // Total internal reflection.
-            if (!scene.kill(ray.depth + 1, random)) {
-              Ray reflected = new Ray();
-              reflected.specularReflection(ray, random);
-              if (pathTrace(scene, reflected, state, 1, false)) {
-
-                ray.color.x = reflected.color.x;
-                ray.color.y = reflected.color.y;
-                ray.color.z = reflected.color.z;
-                hit = true;
-              }
-            }
-          } else {
-            if (!scene.kill(ray.depth + 1, random)) {
-              Ray refracted = new Ray();
-              refracted.set(ray);
-
-              // Calculate angle-dependent reflectance using
-              // Fresnel equation approximation:
-              // R(cosineAngle) = R0 + (1 - R0) * (1 - cos(cosineAngle))^5
-              float a = (n1n2 - 1);
-              float b = (n1n2 + 1);
-              double R0 = a * a / (b * b);
-              double c = 1 - cosTheta;
-              double Rtheta = R0 + (1 - R0) * c * c * c * c * c;
-
-              if (random.nextFloat() < Rtheta) {
-                Ray reflected = new Ray();
-                reflected.specularReflection(ray, random);
-                if (pathTrace(scene, reflected, state, 1, false)) {
-                  ray.emittance.x = ray.color.x * reflected.emittance.x;
-                  ray.emittance.y = ray.color.y * reflected.emittance.y;
-                  ray.emittance.z = ray.color.z * reflected.emittance.z;
-
-                  ray.color.x = reflected.color.x;
-                  ray.color.y = reflected.color.y;
-                  ray.color.z = reflected.color.z;
-                  hit = true;
-                }
-              } else {
-                if (doRefraction) {
-
-                  double t2 = FastMath.sqrt(radicand);
-                  Vector3 n = ray.getNormal();
-                  if (cosTheta > 0) {
-                    refracted.d.x = n1n2 * ray.d.x + (n1n2 * cosTheta - t2) * n.x;
-                    refracted.d.y = n1n2 * ray.d.y + (n1n2 * cosTheta - t2) * n.y;
-                    refracted.d.z = n1n2 * ray.d.z + (n1n2 * cosTheta - t2) * n.z;
-                  } else {
-                    refracted.d.x = n1n2 * ray.d.x - (-n1n2 * cosTheta - t2) * n.x;
-                    refracted.d.y = n1n2 * ray.d.y - (-n1n2 * cosTheta - t2) * n.y;
-                    refracted.d.z = n1n2 * ray.d.z - (-n1n2 * cosTheta - t2) * n.z;
-                  }
-
-                  refracted.d.normalize();
-
-                  // See Ray.specularReflection for information on why this is needed
-                  // This is the same thing but for refraction instead of reflection
-                  // so this time we want the signs of the dot product to be the same
-                  if(QuickMath.signum(refracted.getGeometryNormal().dot(refracted.d)) != QuickMath.signum(refracted.getGeometryNormal().dot(ray.d))) {
-                    double factor = QuickMath.signum(refracted.getGeometryNormal().dot(ray.d)) * -Ray.EPSILON - refracted.d.dot(refracted.getGeometryNormal());
-                    refracted.d.scaleAdd(factor, refracted.getGeometryNormal());
-                    refracted.d.normalize();
-                  }
-
-                  refracted.o.scaleAdd(Ray.OFFSET, refracted.d);
-                }
-
-                if (pathTrace(scene, refracted, state, 1, false)) {
-                  ray.color.x = ray.color.x * pDiffuse + (1 - pDiffuse);
-                  ray.color.y = ray.color.y * pDiffuse + (1 - pDiffuse);
-                  ray.color.z = ray.color.z * pDiffuse + (1 - pDiffuse);
-
-                  ray.emittance.x = ray.color.x * refracted.emittance.x;
-                  ray.emittance.y = ray.color.y * refracted.emittance.y;
-                  ray.emittance.z = ray.color.z * refracted.emittance.z;
-
-                  ray.color.x *= refracted.color.x;
-                  ray.color.y *= refracted.color.y;
-                  ray.color.z *= refracted.color.z;
-                  hit = true;
-                }
-              }
-            }
-          }
-
+          hit |= doRefraction(ray, next, currentMat, prevMat, cumulativeColor, n1, n2, pDiffuse, random, state, scene);
         } else {
-
-          Ray transmitted = new Ray();
-          transmitted.set(ray);
-          transmitted.o.scaleAdd(Ray.OFFSET, transmitted.d);
-
-          if (pathTrace(scene, transmitted, state, 1, false)) {
-            ray.color.x = ray.color.x * pDiffuse + (1 - pDiffuse);
-            ray.color.y = ray.color.y * pDiffuse + (1 - pDiffuse);
-            ray.color.z = ray.color.z * pDiffuse + (1 - pDiffuse);
-
-            ray.emittance.x = ray.color.x * transmitted.emittance.x;
-            ray.emittance.y = ray.color.y * transmitted.emittance.y;
-            ray.emittance.z = ray.color.z * transmitted.emittance.z;
-
-            ray.color.x *= transmitted.color.x;
-            ray.color.y *= transmitted.color.y;
-            ray.color.z *= transmitted.color.z;
-            hit = true;
-          }
+          hit |= doTransmission(ray, next, cumulativeColor, pDiffuse, state, scene);
         }
       }
+      ray.color.set(cumulativeColor);
+      ray.color.scale(1d/count);
 
       if (hit && prevMat.isWater()) {
         // Render water fog effect.
@@ -438,6 +201,289 @@ public class PathTracer implements RayTracer {
     return hit;
   }
 
+  private static boolean doSpecularReflection(Ray ray, Ray next, Vector4 cumulativeColor, boolean doMetal, Random random, WorkerState state, Scene scene) {
+    boolean hit = false;
+    next.specularReflection(ray, random);
+    if (pathTrace(scene, next, state, 1, false)) {
+      ray.emittance.x = ray.color.x * next.emittance.x;
+      ray.emittance.y = ray.color.y * next.emittance.y;
+      ray.emittance.z = ray.color.z * next.emittance.z;
+
+      if (doMetal) {
+        // use the albedo color as specular color
+        cumulativeColor.x += ray.color.x * next.color.x;
+        cumulativeColor.y += ray.color.y * next.color.y;
+        cumulativeColor.z += ray.color.z * next.color.z;
+      } else {
+        cumulativeColor.x += next.color.x;
+        cumulativeColor.y += next.color.y;
+        cumulativeColor.z += next.color.z;
+      }
+      hit = true;
+    }
+    return hit;
+  }
+
+  private static boolean doDiffuseReflection(Ray ray, Ray next, Material currentMat, Vector4 cumulativeColor, int addEmitted, Random random, WorkerState state, Scene scene) {
+    boolean hit = false;
+    float emittance = 0;
+    Vector4 indirectEmitterColor = new Vector4(0, 0, 0, 0);
+
+    if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance > Ray.EPSILON) {
+
+      emittance = addEmitted;
+      ray.emittance.x = ray.color.x * ray.color.x *
+        currentMat.emittance * scene.emitterIntensity;
+      ray.emittance.y = ray.color.y * ray.color.y *
+        currentMat.emittance * scene.emitterIntensity;
+      ray.emittance.z = ray.color.z * ray.color.z *
+        currentMat.emittance * scene.emitterIntensity;
+
+      hit = true;
+    } else if (scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
+      // Sample emitter
+      switch (scene.emitterSamplingStrategy) {
+        case ONE:
+        case ONE_BLOCK: {
+          Grid.EmitterPosition pos = scene.getEmitterGrid().sampleEmitterPosition((int) ray.o.x, (int) ray.o.y, (int) ray.o.z, random);
+          if (pos != null) {
+            indirectEmitterColor.scaleAdd(Math.PI, sampleEmitter(scene, ray, pos, random));
+          }
+          break;
+        }
+        case ALL: {
+          List<Grid.EmitterPosition> positions = scene.getEmitterGrid().getEmitterPositions((int) ray.o.x, (int) ray.o.y, (int) ray.o.z);
+          double sampleScaler = Math.PI / positions.size();
+          for (Grid.EmitterPosition pos : positions) {
+            indirectEmitterColor.scaleAdd(sampleScaler, sampleEmitter(scene, ray, pos, random));
+          }
+          break;
+        }
+      }
+    }
+
+    if (scene.getSunSamplingStrategy().doSunSampling()) {
+      next.set(ray);
+      scene.sun.getRandomSunDirection(next, random);
+
+      double directLightR = 0;
+      double directLightG = 0;
+      double directLightB = 0;
+
+      boolean frontLight = next.d.dot(ray.getNormal()) > 0;
+
+      if (frontLight || (currentMat.subSurfaceScattering
+        && random.nextFloat() < Scene.fSubSurface)) {
+
+        if (!frontLight) {
+          next.o.scaleAdd(-Ray.OFFSET, ray.getNormal());
+        }
+
+        next.setCurrentMaterial(next.getPrevMaterial(), next.getPrevData());
+
+        getDirectLightAttenuation(scene, next, state);
+
+        Vector4 attenuation = state.attenuation;
+        if (attenuation.w > 0) {
+          double mult = QuickMath.abs(next.d.dot(ray.getNormal())) * (scene.getSunSamplingStrategy().isSunLuminosity() ? scene.sun().getLuminosityPdf() : 1);
+          directLightR = attenuation.x * attenuation.w * mult;
+          directLightG = attenuation.y * attenuation.w * mult;
+          directLightB = attenuation.z * attenuation.w * mult;
+          hit = true;
+        }
+      }
+
+      next.diffuseReflection(ray, random, scene);
+      hit = pathTrace(scene, next, state, 0, false) || hit;
+      if (hit) {
+        cumulativeColor.x += ray.color.x * (emittance + directLightR * scene.sun.emittance.x + (
+          next.color.x + next.emittance.x) + (indirectEmitterColor.x));
+        cumulativeColor.y += ray.color.y * (emittance + directLightG * scene.sun.emittance.y + (
+          next.color.y + next.emittance.y) + (indirectEmitterColor.y));
+        cumulativeColor.z += ray.color.z * (emittance + directLightB * scene.sun.emittance.z + (
+          next.color.z + next.emittance.z) + (indirectEmitterColor.z));
+      } else if (indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
+        hit = true;
+        cumulativeColor.x += ray.color.x * indirectEmitterColor.x;
+        cumulativeColor.y += ray.color.y * indirectEmitterColor.y;
+        cumulativeColor.z += ray.color.z * indirectEmitterColor.z;
+      }
+
+    } else {
+      next.diffuseReflection(ray, random, scene);
+
+      hit = pathTrace(scene, next, state, 0, false) || hit;
+      if (hit) {
+        cumulativeColor.x += ray.color.x * (emittance + (next.color.x + next.emittance.x) + (indirectEmitterColor.x));
+        cumulativeColor.y += ray.color.y * (emittance + (next.color.y + next.emittance.y) + (indirectEmitterColor.y));
+        cumulativeColor.z += ray.color.z * (emittance + (next.color.z + next.emittance.z) + (indirectEmitterColor.z));
+      } else if (indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
+        hit = true;
+        cumulativeColor.x += ray.color.x * indirectEmitterColor.x;
+        cumulativeColor.y += ray.color.y * indirectEmitterColor.y;
+        cumulativeColor.z += ray.color.z * indirectEmitterColor.z;
+      }
+    }
+    return hit;
+  }
+
+  private static boolean doRefraction(Ray ray, Ray next, Material currentMat, Material prevMat, Vector4 cumulativeColor, float n1, float n2, double pDiffuse, Random random, WorkerState state, Scene scene) {
+    boolean hit = false;
+    // TODO: make this decision dependent on the material properties:
+    boolean doRefraction = currentMat.refractive || prevMat.refractive;
+
+    float n1n2 = n1 / n2;
+    double cosTheta = -ray.getNormal().dot(ray.d);
+    double radicand = 1 - n1n2 * n1n2 * (1 - cosTheta * cosTheta);
+    if (doRefraction && radicand < Ray.EPSILON) {
+      // Total internal reflection.
+      next.specularReflection(ray, random);
+      if (pathTrace(scene, next, state, 1, false)) {
+        ray.emittance.x = ray.color.x * next.emittance.x;
+        ray.emittance.y = ray.color.y * next.emittance.y;
+        ray.emittance.z = ray.color.z * next.emittance.z;
+
+        cumulativeColor.x += next.color.x;
+        cumulativeColor.y += next.color.y;
+        cumulativeColor.z += next.color.z;
+        hit = true;
+      }
+    } else {
+      next.set(ray);
+
+      // Calculate angle-dependent reflectance using
+      // Fresnel equation approximation:
+      // R(cosineAngle) = R0 + (1 - R0) * (1 - cos(cosineAngle))^5
+      float a = (n1n2 - 1);
+      float b = (n1n2 + 1);
+      double R0 = a * a / (b * b);
+      double c = 1 - cosTheta;
+      double Rtheta = R0 + (1 - R0) * c * c * c * c * c;
+
+      if (random.nextFloat() < Rtheta) {
+        next.specularReflection(ray, random);
+        if (pathTrace(scene, next, state, 1, false)) {
+          ray.emittance.x = ray.color.x * next.emittance.x;
+          ray.emittance.y = ray.color.y * next.emittance.y;
+          ray.emittance.z = ray.color.z * next.emittance.z;
+
+          cumulativeColor.x += next.color.x;
+          cumulativeColor.y += next.color.y;
+          cumulativeColor.z += next.color.z;
+          hit = true;
+        }
+      } else {
+        if (doRefraction) {
+
+          double t2 = FastMath.sqrt(radicand);
+          Vector3 n = ray.getNormal();
+          if (cosTheta > 0) {
+            next.d.x = n1n2 * ray.d.x + (n1n2 * cosTheta - t2) * n.x;
+            next.d.y = n1n2 * ray.d.y + (n1n2 * cosTheta - t2) * n.y;
+            next.d.z = n1n2 * ray.d.z + (n1n2 * cosTheta - t2) * n.z;
+          } else {
+            next.d.x = n1n2 * ray.d.x - (-n1n2 * cosTheta - t2) * n.x;
+            next.d.y = n1n2 * ray.d.y - (-n1n2 * cosTheta - t2) * n.y;
+            next.d.z = n1n2 * ray.d.z - (-n1n2 * cosTheta - t2) * n.z;
+          }
+
+          next.d.normalize();
+
+          // See Ray.specularReflection for information on why this is needed
+          // This is the same thing but for refraction instead of reflection
+          // so this time we want the signs of the dot product to be the same
+          if (QuickMath.signum(next.getGeometryNormal().dot(next.d)) != QuickMath.signum(next.getGeometryNormal().dot(ray.d))) {
+            double factor = QuickMath.signum(next.getGeometryNormal().dot(ray.d)) * -Ray.EPSILON - next.d.dot(next.getGeometryNormal());
+            next.d.scaleAdd(factor, next.getGeometryNormal());
+            next.d.normalize();
+          }
+
+          next.o.scaleAdd(Ray.OFFSET, next.d);
+        }
+
+        if (pathTrace(scene, next, state, 1, false)) {
+          // Calculate the color and emittance of the refracted ray
+          translucentRayColor(scene, ray, next, cumulativeColor, pDiffuse);
+          hit = true;
+        }
+      }
+    }
+    return hit;
+  }
+
+  private static boolean doTransmission(Ray ray, Ray next, Vector4 cumulativeColor, double pDiffuse, WorkerState state, Scene scene) {
+    boolean hit = false;
+    next.set(ray);
+    next.o.scaleAdd(Ray.OFFSET, next.d);
+
+    if (pathTrace(scene, next, state, 1, false)) {
+      // Calculate the color and emittance of the refracted ray
+      translucentRayColor(scene, ray, next, cumulativeColor, pDiffuse);
+      hit = true;
+    }
+    return hit;
+  }
+
+  private static void translucentRayColor(Scene scene, Ray ray, Ray next, Vector4 cumulativeColor, double opacity) {
+    // Color-based transmission value
+    double colorTrans = (ray.color.x + ray.color.y + ray.color.z)/3;
+    // Total amount of light we want to transmit (overall transparency of texture)
+    double shouldTrans = 1 - opacity;
+    // Amount of each color to transmit - default to overall transparency if RGB values add to 0 (e.g. regular glass)
+    Vector3 rgbTrans = new Vector3(shouldTrans, shouldTrans, shouldTrans);
+    if(colorTrans > 0) {
+      // Amount to transmit of each color is scaled so the total transmitted amount matches the texture's transparency
+      rgbTrans.set(ray.color.toVec3());
+      rgbTrans.scale(shouldTrans / colorTrans);
+    }
+    double transmissivityCap = scene.transmissivityCap;
+    // Determine the color with the highest transmissivity
+    double maxTrans = Math.max(rgbTrans.x, Math.max(rgbTrans.y, rgbTrans.z));
+    if(maxTrans > transmissivityCap) {
+      if (maxTrans == rgbTrans.x) {
+        // Give excess transmission from red to green and blue
+        double gTransNew = reassignTransmissivity(rgbTrans.x, rgbTrans.y, rgbTrans.z, shouldTrans, transmissivityCap);
+        rgbTrans.z = reassignTransmissivity(rgbTrans.x, rgbTrans.z, rgbTrans.y, shouldTrans, transmissivityCap);
+        rgbTrans.y = gTransNew;
+        rgbTrans.x = transmissivityCap;
+      } else if (maxTrans == rgbTrans.y) {
+        // Give excess transmission from green to red and blue
+        double rTransNew = reassignTransmissivity(rgbTrans.y, rgbTrans.x, rgbTrans.z, shouldTrans, transmissivityCap);
+        rgbTrans.z = reassignTransmissivity(rgbTrans.y, rgbTrans.z, rgbTrans.x, shouldTrans, transmissivityCap);
+        rgbTrans.x = rTransNew;
+        rgbTrans.y = transmissivityCap;
+      } else if (maxTrans == rgbTrans.z) {
+        // Give excess transmission from blue to green and red
+        double gTransNew = reassignTransmissivity(rgbTrans.z, rgbTrans.y, rgbTrans.x, shouldTrans, transmissivityCap);
+        rgbTrans.x = reassignTransmissivity(rgbTrans.z, rgbTrans.x, rgbTrans.y, shouldTrans, transmissivityCap);
+        rgbTrans.y = gTransNew;
+        rgbTrans.z = transmissivityCap;
+      }
+    }
+    // Don't need to check for energy gain if transmissivity cap is 1
+    if(transmissivityCap > 1) {
+      double currentEnergy = rgbTrans.x * next.color.x + rgbTrans.y * next.color.y + rgbTrans.z * next.color.z;
+      double nextEnergy = next.color.x + next.color.y + next.color.z;
+      double energyRatio = nextEnergy / currentEnergy;
+      // Normalize if there is net energy gain across all channels (more likely for higher transmissivityCap combined with high-saturation light source)
+      if(energyRatio < 1) {
+        rgbTrans.scale(energyRatio);
+      }
+    }
+    // Scale color based on next ray
+    Vector4 outputColor = new Vector4(0, 0, 0, 0);
+    outputColor.multiplyEntrywise(new Vector4(rgbTrans, 1), next.color);
+    cumulativeColor.add(outputColor);
+    // Use emittance from next ray
+    ray.emittance.multiplyEntrywise(rgbTrans, next.emittance);
+  }
+
+  private static double reassignTransmissivity(double from, double to, double other, double trans, double cap) {
+    // Formula here derived algebraically from this system:
+    // (cap - to_new)/(cap - other_new) = (from - to)/(from - other), (cap + to_new + other_new)/3 = trans
+    return (cap*(other - 2*to + from) + (3*trans)*(to - from))/(other + to - 2*from);
+  }
+
   private static void addSkyFog(Scene scene, Ray ray, WorkerState state, Vector3 ox, Vector3 od) {
     if (scene.fog.mode == FogMode.UNIFORM) {
       scene.fog.addSkyFog(ray, null);
@@ -458,9 +504,9 @@ public class PathTracer implements RayTracer {
     pos.sampleFace(face, emitterRay.d, random);
     emitterRay.d.sub(emitterRay.o);
 
-      if (emitterRay.d.dot(ray.getNormal()) > 0) {
-        double distance = emitterRay.d.length();
-        emitterRay.d.scale(1 / distance);
+    if (emitterRay.d.dot(ray.getNormal()) > 0) {
+      double distance = emitterRay.d.length();
+      emitterRay.d.scale(1 / distance);
 
       emitterRay.o.scaleAdd(Ray.OFFSET, emitterRay.d);
       emitterRay.distance += Ray.OFFSET;

@@ -64,6 +64,7 @@ public final class PersistentSettings {
   public static final double DEFAULT_FOG_BLUE = 1;
 
   public static final int DEFAULT_RAY_DEPTH = 5;
+  public static final int DEFAULT_BRANCH_COUNT = 10;
   public static final int DEFAULT_SPP_TARGET = 1000;
 
   public static final int DEFAULT_DIMENSION = 0;
@@ -159,24 +160,6 @@ public final class PersistentSettings {
     numThreads = Math.min(RenderConstants.NUM_RENDER_THREADS_MAX, numThreads);
     settings.setInt("numThreads", numThreads);
     save();
-  }
-
-  public static void setYClipMax(int value) {
-    settings.setInt("yClipMax", value);
-    save();
-  }
-
-  public static int getYClipMax() {
-    return settings.getInt("yClipMax", 256);
-  }
-
-  public static void setYClipMin(int value) {
-    settings.setInt("yClipMin", value);
-    save();
-  }
-
-  public static int getYClipMin() {
-    return settings.getInt("yClipMin", 0);
   }
 
   /**
@@ -283,10 +266,6 @@ public final class PersistentSettings {
     save();
   }
 
-  public static int getSppTargetDefault() {
-    return settings.getInt("sppTargetDefault", DEFAULT_SPP_TARGET);
-  }
-
   /**
    * @return the default configured ray depth
    */
@@ -311,8 +290,21 @@ public final class PersistentSettings {
     return settings.containsKey(key);
   }
 
+  public static int getSppTargetDefault() {
+    return settings.getInt("sppTargetDefault", DEFAULT_SPP_TARGET);
+  }
+
   public static void setSppTargetDefault(int targetSPP) {
     settings.setInt("sppTargetDefault", targetSPP);
+    save();
+  }
+
+  public static int getBranchCountDefault() {
+    return settings.getInt("branchCountDefault", DEFAULT_BRANCH_COUNT);
+  }
+
+  public static void setBranchCountDefault(int targetSPP) {
+    settings.setInt("branchCountDefault", targetSPP);
     save();
   }
 

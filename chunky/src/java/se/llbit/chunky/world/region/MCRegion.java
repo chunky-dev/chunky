@@ -63,7 +63,7 @@ public class MCRegion implements Region {
 
   private final Chunk[] chunks = new Chunk[NUM_CHUNKS];
   private final ChunkPosition position;
-  private final World world;
+  private final Dimension dimension;
   private final String fileName;
   private long regionFileTime = 0;
   private final int[] chunkTimestamps = new int[NUM_CHUNKS];
@@ -80,8 +80,8 @@ public class MCRegion implements Region {
    *
    * @param pos the region position
    */
-  public MCRegion(ChunkPosition pos, World world) {
-    this.world = world;
+  public MCRegion(ChunkPosition pos, Dimension dimension) {
+    this.dimension = dimension;
     fileName = pos.getMcaName();
     position = pos;
     for (int z = 0; z < CHUNKS_Z; ++z) {
@@ -118,7 +118,7 @@ public class MCRegion implements Region {
     if (!chunk.isEmpty()) {
       chunk.reset();
       setChunk(chunkPos, EmptyChunk.INSTANCE);
-      world.chunkDeleted(chunkPos);
+      dimension.chunkDeleted(chunkPos);
     }
   }
 
@@ -129,7 +129,7 @@ public class MCRegion implements Region {
    */
   @Override
   public synchronized void parse(int minY, int maxY) {
-    File regionFile = new File(world.getRegionDirectory(), fileName);
+    File regionFile = new File(dimension.getRegionDirectory(), fileName);
     if (!regionFile.isFile()) {
       return;
     }
@@ -156,12 +156,12 @@ public class MCRegion implements Region {
           int loc = file.readInt();
           if (loc != 0) {
             if (chunk.isEmpty()) {
-              chunk = new Chunk(pos, world);
+              chunk = new Chunk(pos, dimension);
               setChunk(pos, chunk);
             }
           } else {
             if (!chunk.isEmpty()) {
-              world.chunkDeleted(pos);
+              dimension.chunkDeleted(pos);
             }
           }
         }
@@ -171,7 +171,7 @@ public class MCRegion implements Region {
         chunkTimestamps[i] = file.readInt();
       }
 
-      world.regionUpdated(position);
+      dimension.regionUpdated(position);
     } catch (IOException e) {
       Log.warn("Failed to read region: " + e.getMessage());
     }
@@ -238,14 +238,14 @@ public class MCRegion implements Region {
    */
   @NotNull
   private ChunkDataSource getChunkData(ChunkPosition chunkPos) {
-    File regionDirectory = world.getRegionDirectory();
+    File regionDirectory = dimension.getRegionDirectory();
     ChunkDataSource data = getChunkDataSource(chunkPos, regionDirectory);
     chunkTimestamps[getMCAChunkIndex(chunkPos)] = data.timestamp;
     return data;
   }
   @NotNull
   private ChunkDataSource getEntityData(ChunkPosition chunkPos) {
-    File regionDirectory = world.getRegionDirectory();
+    File regionDirectory = dimension.getRegionDirectory();
     regionDirectory = new File(regionDirectory.getParentFile(), "entities");
     return getChunkDataSource(chunkPos, regionDirectory);
   }
@@ -364,7 +364,7 @@ public class MCRegion implements Region {
    */
   public void deleteChunkFromRegion(ChunkPosition chunkPos) {
     // Just write zero in the entry for the chunk in the location table.
-    File regionDirectory = world.getRegionDirectory();
+    File regionDirectory = dimension.getRegionDirectory();
     int x = chunkPos.x & 31;
     int z = chunkPos.z & 31;
     File regionFile = new File(regionDirectory, fileName);
@@ -436,7 +436,7 @@ public class MCRegion implements Region {
 
   @Override
   public boolean hasChanged() {
-    File regionFile = new File(world.getRegionDirectory(), fileName);
+    File regionFile = new File(dimension.getRegionDirectory(), fileName);
     return regionFileTime != regionFile.lastModified();
   }
 
