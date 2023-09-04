@@ -310,6 +310,8 @@ public class PathTracer implements RayTracer {
       }
 
     } else {
+      // If diffuse sun sampling is performed, then ray.color will be altered, but it should be the same on each iteration of ray branching
+      Vector4 rayColor = new Vector4(ray.color);
       next.diffuseReflection(ray, random, scene);
 
       hit = pathTrace(scene, next, state, 0, false) || hit;
@@ -323,6 +325,7 @@ public class PathTracer implements RayTracer {
         cumulativeColor.y += ray.color.y * indirectEmitterColor.y;
         cumulativeColor.z += ray.color.z * indirectEmitterColor.z;
       }
+      ray.color.set(rayColor);
     }
     return hit;
   }
