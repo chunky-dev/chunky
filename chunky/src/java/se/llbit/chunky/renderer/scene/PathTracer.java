@@ -228,20 +228,9 @@ public class PathTracer implements RayTracer {
 
     if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance > Ray.EPSILON) {
 
-      // Emittance mapping
-      double exp = scene.getEmitterMappingExponent();
-      switch(scene.getEmitterMappingType()) {
-        case BRIGHTEST_CHANNEL:
-          double val = FastMath.pow(Math.max(ray.color.x, Math.max(ray.color.y, ray.color.z)), exp);
-          emittance = new Vector3(ray.color.x * val, ray.color.y * val, ray.color.z * val);
-          break;
-        case INDEPENDENT_CHANNELS:
-          emittance = new Vector3(FastMath.pow(ray.color.x, exp), FastMath.pow(ray.color.y, exp), FastMath.pow(ray.color.z, exp));
-          break;
-      }
-      emittance.scale(currentMat.emittance * scene.emitterIntensity);
-
+      doEmittanceMapping(emittance, ray.color, scene, currentMat.emittance);
       hit = true;
+
     } else if (scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
       // Sample emitter
       switch (scene.emitterSamplingStrategy) {
@@ -476,6 +465,20 @@ public class PathTracer implements RayTracer {
     cumulativeColor.add(outputColor);
   }
 
+  private static void doEmittanceMapping(Vector3 emittance, Vector4 color, Scene scene, double materialEmittance) {
+    double exp = scene.getEmitterMappingExponent();
+    switch(scene.getEmitterMappingType()) {
+      case BRIGHTEST_CHANNEL:
+        double val = FastMath.pow(Math.max(color.x, Math.max(color.y, color.z)), exp);
+        emittance.set(color.x * val, color.y * val, color.z * val);
+        break;
+      case INDEPENDENT_CHANNELS:
+        emittance.set(FastMath.pow(color.x, exp), FastMath.pow(color.y, exp), FastMath.pow(color.z, exp));
+        break;
+    }
+    emittance.scale(materialEmittance * scene.emitterIntensity);
+  }
+
   private static double reassignTransmissivity(double from, double to, double other, double trans, double cap) {
     // Formula here derived algebraically from this system:
     // (cap - to_new)/(cap - other_new) = (from - to)/(from - other), (cap + to_new + other_new)/3 = trans
@@ -514,10 +517,11 @@ public class PathTracer implements RayTracer {
         e /= Math.max(distance * distance, 1);
         e *= pos.block.surfaceArea(face);
         e *= emitterRay.getCurrentMaterial().emittance;
-        e *= scene.emitterIntensity;
         e *= scaler;
+        Vector3 emittance = new Vector3();
+        doEmittanceMapping(emittance, emitterRay.color, scene, e);
 
-        result.scaleAdd(e, emitterRay.color);
+        result.add(new Vector4(emittance, 0));
       }
     }
   }
