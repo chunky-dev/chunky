@@ -23,6 +23,7 @@ import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.Dimension;
+import se.llbit.chunky.world.RegionPosition;
 
 /**
  * Monitors filesystem for changes to region files.
@@ -47,7 +48,7 @@ public class MCRegionChangeWatcher extends RegionChangeWatcher {
         ChunkView theView = view;
         for (int rx = theView.prx0; rx <= theView.prx1; ++rx) {
           for (int rz = theView.prz0; rz <= theView.prz1; ++rz) {
-            ChunkPosition pos = new ChunkPosition(rx, rz);
+            RegionPosition pos = new RegionPosition(rx, rz);
             Region region = dimension.getRegionWithinRange(pos, theView.yMin, theView.yMax);
             if (region.isEmpty()) {
               if (dimension.regionExistsWithinRange(pos, theView.yMin, theView.yMax)) {

@@ -46,11 +46,11 @@ public class CubicDimension extends Dimension {
   }
 
   @Override
-  public Region createRegion(ChunkPosition pos) {
+  public Region createRegion(RegionPosition pos) {
     return new ImposterCubicRegion(pos, this);
   }
 
-  public synchronized Region getRegionWithinRange(ChunkPosition pos, int minY, int maxY) {
+  public synchronized Region getRegionWithinRange(RegionPosition pos, int minY, int maxY) {
     return regionMap.computeIfAbsent(pos.getLong(), p -> {
       // check if the region is present in the world directory
       Region region = EmptyRegion.instance;
@@ -63,7 +63,7 @@ public class CubicDimension extends Dimension {
 
   /** no choice but to iterate over every file in the directory */
   @Override
-  public boolean regionExists(ChunkPosition pos) {
+  public boolean regionExists(RegionPosition pos) {
     File regionDirectory = getRegionDirectory();
     try {
       Stream<Path> list = Files.list(regionDirectory.toPath());
@@ -84,7 +84,7 @@ public class CubicDimension extends Dimension {
   }
 
   @Override
-  public boolean regionExistsWithinRange(ChunkPosition pos, int minY, int maxY) {
+  public boolean regionExistsWithinRange(RegionPosition pos, int minY, int maxY) {
     int cubicRegionX = pos.x << 1;
     int cubicRegionZ = pos.z << 1;
 
@@ -104,7 +104,7 @@ public class CubicDimension extends Dimension {
   }
 
   /** Called when a new region has been discovered by the region parser. */
-  public void regionDiscovered(ChunkPosition pos) {
+  public void regionDiscovered(RegionPosition pos) {
     synchronized (this) {
       regionMap.computeIfAbsent(pos.getLong(), (p) -> createRegion(pos));
     }

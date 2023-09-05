@@ -43,13 +43,22 @@ public class ChunkPosition {
 
   /**
    * @return The .mca name for the region with this position
+   *
+   * @deprecated Use {@link RegionPosition#getMcaName()}. Remove in 2.6
    */
+  @Deprecated
   public String getMcaName() {
     return String.format("r.%d.%d.mca", x, z);
   }
 
+  public RegionPosition asRegionPosition() {
+    return new RegionPosition(x >> 5, z >> 5);
+  }
+
   /**
    * @return The region position of this chunk position
+   *
+   * @deprecated Use {@link ChunkPosition#asRegionPosition()}. Remove in 2.6
    */
   public ChunkPosition getRegionPosition() {
     return new ChunkPosition(x >> 5, z >> 5);
@@ -100,7 +109,7 @@ public class ChunkPosition {
   }
 
   /**
-   * @deprecated Use {@link ChunkPosition#getRegionPosition()}. Remove in 2.6.
+   * @deprecated Use {@link ChunkPosition#asRegionPosition()}. Remove in 2.6.
    */
   @Deprecated
   public ChunkPosition regionPosition() {

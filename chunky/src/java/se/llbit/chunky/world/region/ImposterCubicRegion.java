@@ -31,7 +31,7 @@ public class ImposterCubicRegion implements Region {
 
   private final Chunk[] chunks = new Chunk[CHUNKS_COUNT];
   /** The MC region position of this imposter */
-  private final ChunkPosition mcRegionPos;
+  private final RegionPosition mcRegionPos;
   /** The minimum cubic region position of this imposter */
   private final ChunkPosition min3drPosition;
 
@@ -50,7 +50,7 @@ public class ImposterCubicRegion implements Region {
    * One flag per region column */
   private final boolean[] anyUpdated = new boolean[DIAMETER_IN_CUBIC_REGIONS*DIAMETER_IN_CUBIC_REGIONS];
 
-  public ImposterCubicRegion(ChunkPosition pos, CubicDimension dimension) {
+  public ImposterCubicRegion(RegionPosition pos, CubicDimension dimension) {
     this.dimension = dimension;
     mcRegionPos = pos;
     min3drPosition = new ChunkPosition(mcRegionToMinCubicRegion(pos.x), mcRegionToMinCubicRegion(pos.z));
@@ -251,7 +251,7 @@ public class ImposterCubicRegion implements Region {
   }
 
   @Override
-  public ChunkPosition getPosition() {
+  public RegionPosition getPosition() {
     return mcRegionPos;
   }
 
