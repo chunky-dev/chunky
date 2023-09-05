@@ -17,6 +17,7 @@
 package se.llbit.chunky.world.region;
 
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.RegionPosition;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -30,10 +31,10 @@ import java.util.Set;
  */
 public class RegionQueue {
 
-  private final Queue<ChunkPosition> queue = new LinkedList<>();
-  private final Set<ChunkPosition> set = new HashSet<>();
+  private final Queue<RegionPosition> queue = new LinkedList<>();
+  private final Set<RegionPosition> set = new HashSet<>();
 
-  public synchronized ChunkPosition poll() {
+  public synchronized RegionPosition poll() {
     try {
       while (queue.isEmpty()) {
         wait();
@@ -41,12 +42,12 @@ public class RegionQueue {
     } catch (InterruptedException e) {
       return null;
     }
-    ChunkPosition position = queue.poll();
+    RegionPosition position = queue.poll();
     set.remove(position);
     return position;
   }
 
-  public synchronized boolean add(ChunkPosition position) {
+  public synchronized boolean add(RegionPosition position) {
     if (!set.contains(position)) {
       queue.add(position);
       set.add(position);
