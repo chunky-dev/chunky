@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.renderer.EmitterMappingType;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonString;
@@ -59,6 +60,16 @@ public abstract class Material {
    * The amount of light the material emits.
    */
   public float emittance = 0;
+
+  /**
+   * Offset to apply to the global emitter mapping exponent (the resulting value will be constrained to be >= 0).
+   */
+  public float emitterMappingOffset = 0;
+
+  /**
+   * Overrides the global emitter mapping type unless set to NONE.
+   */
+  public EmitterMappingType emitterMappingType = EmitterMappingType.NONE;
 
   /**
    * The (linear) roughness controlling how rough a shiny block appears. A value of 0 makes the
@@ -123,6 +134,8 @@ public abstract class Material {
     ior = json.get("ior").floatValue(ior);
     specular = json.get("specular").floatValue(specular);
     emittance = json.get("emittance").floatValue(emittance);
+    emitterMappingOffset = json.get("emitterMappingOffset").floatValue(emitterMappingOffset);
+    emitterMappingType = EmitterMappingType.valueOf(json.get("emitterMappingType").asString(emitterMappingType.toString()));
     roughness = json.get("roughness").floatValue(roughness);
     metalness = json.get("metalness").floatValue(metalness);
   }

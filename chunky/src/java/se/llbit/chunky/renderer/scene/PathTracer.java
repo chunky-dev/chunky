@@ -20,6 +20,7 @@ package se.llbit.chunky.renderer.scene;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.minecraft.Water;
+import se.llbit.chunky.renderer.EmitterMappingType;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
@@ -228,7 +229,7 @@ public class PathTracer implements RayTracer {
 
     if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance > Ray.EPSILON) {
 
-      doEmittanceMapping(emittance, ray.color, scene, currentMat.emittance);
+      doEmittanceMapping(emittance, ray.color, scene, currentMat);
       hit = true;
 
     } else if (scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
@@ -465,9 +466,10 @@ public class PathTracer implements RayTracer {
     cumulativeColor.add(outputColor);
   }
 
-  private static void doEmittanceMapping(Vector3 emittance, Vector4 color, Scene scene, double materialEmittance) {
-    double exp = scene.getEmitterMappingExponent();
-    switch(scene.getEmitterMappingType()) {
+  private static void doEmittanceMapping(Vector3 emittance, Vector4 color, Scene scene, Material material) {
+    double exp = Math.max(scene.getEmitterMappingExponent() + material.emitterMappingOffset, 0);
+    EmitterMappingType mt = material.emitterMappingType == EmitterMappingType.NONE ? scene.getEmitterMappingType() : material.emitterMappingType;
+    switch(mt) {
       case BRIGHTEST_CHANNEL:
         double val = FastMath.pow(Math.max(color.x, Math.max(color.y, color.z)), exp);
         emittance.set(color.x * val, color.y * val, color.z * val);
@@ -476,7 +478,7 @@ public class PathTracer implements RayTracer {
         emittance.set(FastMath.pow(color.x, exp), FastMath.pow(color.y, exp), FastMath.pow(color.z, exp));
         break;
     }
-    emittance.scale(materialEmittance * scene.emitterIntensity);
+    emittance.scale(material.emittance * scene.emitterIntensity);
   }
 
   private static double reassignTransmissivity(double from, double to, double other, double trans, double cap) {
@@ -516,10 +518,10 @@ public class PathTracer implements RayTracer {
         double e = Math.abs(emitterRay.d.dot(emitterRay.getNormal()));
         e /= Math.max(distance * distance, 1);
         e *= pos.block.surfaceArea(face);
-        e *= emitterRay.getCurrentMaterial().emittance;
         e *= scaler;
         Vector3 emittance = new Vector3();
-        doEmittanceMapping(emittance, emitterRay.color, scene, e);
+        doEmittanceMapping(emittance, emitterRay.color, scene, emitterRay.getCurrentMaterial());
+        emittance.scale(e);
 
         result.add(new Vector4(emittance, 0));
       }

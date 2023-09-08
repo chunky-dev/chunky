@@ -114,6 +114,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     emitterIntensity.onValueChange(value -> scene.setEmitterIntensity(value));
 
     emitterMappingType.getItems().addAll(EmitterMappingType.values());
+    emitterMappingType.getItems().remove(EmitterMappingType.NONE);
     emitterMappingType.getSelectionModel().selectedItemProperty().addListener(
       (observable, oldValue, newValue) -> scene.setEmitterMappingType(newValue));
     emitterMappingType.setTooltip(new Tooltip("Determines how per-pixel light emission is computed."));

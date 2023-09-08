@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.ui.render.tabs;
 
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -25,12 +26,11 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import se.llbit.chunky.block.*;
+import se.llbit.chunky.renderer.EmitterMappingType;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.ui.DoubleAdjuster;
@@ -50,6 +50,9 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
   private Scene scene;
 
   private final DoubleAdjuster emittance = new DoubleAdjuster();
+  private final DoubleAdjuster emitterMappingOffset = new DoubleAdjuster();
+  private final ComboBox<EmitterMappingType> emitterMappingType = new ComboBox<>();
+  private javafx.beans.value.ChangeListener<? super EmitterMappingType> emtListener = null;
   private final DoubleAdjuster specular = new DoubleAdjuster();
   private final DoubleAdjuster ior = new DoubleAdjuster();
   private final DoubleAdjuster perceptualSmoothness = new DoubleAdjuster();
@@ -60,6 +63,11 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     emittance.setName("Emittance");
     emittance.setRange(0, 100);
     emittance.setTooltip("Intensity of the light emitted from the selected material.");
+    emitterMappingOffset.setName("Emitter mapping offset");
+    emitterMappingOffset.setRange(-5, 5);
+    emitterMappingOffset.setTooltip("Offset applied to the global emitter mapping exponent.");
+    emitterMappingType.getItems().addAll(EmitterMappingType.values());
+    emitterMappingType.setTooltip(new Tooltip("Overrides the global setting for emitter mapping type."));
     specular.setName("Specular");
     specular.setRange(0, 1);
     specular.setTooltip("Reflectivity of the selected material.");
@@ -83,11 +91,15 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     listView.getSelectionModel().selectedItemProperty().addListener(
         (observable, oldValue, materialName) -> updateSelectedMaterial(materialName)
     );
+    HBox emt = new HBox();
+    emt.setSpacing(10);
+    emt.setAlignment(Pos.CENTER_LEFT);
+    emt.getChildren().addAll(new Label("Emitter mapping type:"), emitterMappingType);
     VBox settings = new VBox();
     settings.setSpacing(10);
     settings.getChildren().addAll(
         new Label("Material Properties"),
-        emittance, specular, perceptualSmoothness, ior, metalness,
+        emittance, emitterMappingOffset, emt, specular, perceptualSmoothness, ior, metalness,
         new Label("(set to zero to disable)"));
     setPadding(new Insets(10));
     setSpacing(15);
@@ -111,8 +123,13 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
 
   private void updateSelectedMaterial(String materialName) {
     boolean materialExists = false;
+    if(emtListener != null) {
+      emitterMappingType.getSelectionModel().selectedItemProperty().removeListener(emtListener);
+      emtListener = null;
+    }
     if (MaterialStore.collections.containsKey(materialName)) {
       double emAcc = 0;
+      double emoAcc = 0;
       double specAcc = 0;
       double iorAcc = 0;
       double perceptualSmoothnessAcc = 0;
@@ -120,12 +137,15 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       Collection<Block> blocks = MaterialStore.collections.get(materialName);
       for (Block block : blocks) {
         emAcc += block.emittance;
+        emoAcc += block.emitterMappingOffset;
         specAcc += block.specular;
         iorAcc += block.ior;
         perceptualSmoothnessAcc += block.getPerceptualSmoothness();
         metalnessAcc += block.metalness;
       }
       emittance.set(emAcc / blocks.size());
+      emitterMappingOffset.set(emoAcc / blocks.size());
+      emitterMappingType.getSelectionModel().select(EmitterMappingType.NONE);
       specular.set(specAcc / blocks.size());
       ior.set(iorAcc / blocks.size());
       perceptualSmoothness.set(perceptualSmoothnessAcc / blocks.size());
@@ -135,6 +155,8 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       Material material = ExtraMaterials.idMap.get(materialName);
       if (material != null) {
         emittance.set(material.emittance);
+        emitterMappingOffset.set(material.emitterMappingOffset);
+        emitterMappingType.getSelectionModel().select(material.emitterMappingType);
         specular.set(material.specular);
         ior.set(material.ior);
         perceptualSmoothness.set(material.getPerceptualSmoothness());
@@ -145,6 +167,8 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       Block block = new MinecraftBlock(materialName.substring(10), Texture.air);
       scene.getPalette().applyMaterial(block);
       emittance.set(block.emittance);
+      emitterMappingOffset.set(block.emitterMappingOffset);
+      emitterMappingType.getSelectionModel().select(block.emitterMappingType);
       specular.set(block.specular);
       ior.set(block.ior);
       perceptualSmoothness.set(block.getPerceptualSmoothness());
@@ -153,12 +177,16 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     }
     if (materialExists) {
       emittance.onValueChange(value -> scene.setEmittance(materialName, value.floatValue()));
+      emitterMappingOffset.onValueChange(value -> scene.setEmitterMappingOffset(materialName, value.floatValue()));
+      emtListener = (observable, oldValue, newValue) -> scene.setEmitterMappingTypeOverride(materialName, newValue);
+      emitterMappingType.getSelectionModel().selectedItemProperty().addListener(emtListener);
       specular.onValueChange(value -> scene.setSpecular(materialName, value.floatValue()));
       ior.onValueChange(value -> scene.setIor(materialName, value.floatValue()));
       perceptualSmoothness.onValueChange(value -> scene.setPerceptualSmoothness(materialName, value.floatValue()));
       metalness.onValueChange(value -> scene.setMetalness(materialName, value.floatValue()));
     } else {
       emittance.onValueChange(value -> {});
+      emitterMappingOffset.onValueChange(value -> {});
       specular.onValueChange(value -> {});
       ior.onValueChange(value -> {});
       perceptualSmoothness.onValueChange(value -> {});

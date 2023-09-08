@@ -118,7 +118,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Default exponent for emitter mapping.
    */
-  public static final double DEFAULT_EMITTER_MAPPING_EXPONENT = 2;
+  public static final double DEFAULT_EMITTER_MAPPING_EXPONENT = 1.5;
 
   /**
    * Default method for emitter mapping.
@@ -3278,6 +3278,27 @@ public class Scene implements JsonSerializable, Refreshable {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("emittance", Json.of(value));
     materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the emittance property for the given material.
+   */
+  public void setEmitterMappingOffset(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("emitterMappingOffset", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the emittance property for the given material.
+   */
+  public void setEmitterMappingTypeOverride(String materialName, EmitterMappingType value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("emitterMappingType", Json.of(value.toString()));
+    materials.put(materialName, material);
+    System.out.println(materialName + ", " + value);
     refresh(ResetReason.MATERIALS_CHANGED);
   }
 
