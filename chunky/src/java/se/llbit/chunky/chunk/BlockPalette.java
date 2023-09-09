@@ -340,26 +340,25 @@ public class BlockPalette {
       block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.9);
     });
-    materialProperties.put("minecraft:redstone_torch", block -> {
+    Consumer<Block> redstoneTorchConfig = block -> {
+      block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+      block.addRefColorGammaCorrected(255, 255, 210, 0.35f);
+      block.addRefColorGammaCorrected(255, 185, 0, 0.25f);
+      block.addRefColorGammaCorrected(221, 0, 0, 0.3f);
       if (block instanceof RedstoneTorch && ((RedstoneTorch) block).isLit()) {
         block.setLightLevel(7);
-        block.emitterMappingOffset = 0.5f;
       }
-    });
-    materialProperties.put("minecraft:redstone_wall_torch", block -> {
-      if (block instanceof  RedstoneWallTorch && ((RedstoneWallTorch) block).isLit()) {
-        block.setLightLevel(7);
-        block.emitterMappingOffset = 0.5f;
-      }
-    });
-    materialProperties.put("minecraft:torch", block -> {
+    };
+    materialProperties.put("minecraft:redstone_torch", redstoneTorchConfig);
+    materialProperties.put("minecraft:redstone_wall_torch", redstoneTorchConfig);
+    Consumer<Block> torchConfig = block -> {
+      block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+      block.addRefColorGammaCorrected(255, 255, 210, 0.35f);
+      block.addRefColorGammaCorrected(255, 185, 0, 0.25f);
       block.setLightLevel(14);
-      block.emitterMappingOffset = 0.5f;
-    });
-    materialProperties.put("minecraft:wall_torch", block -> {
-      block.setLightLevel(14);
-      block.emitterMappingOffset = 0.5f;
-    });
+    };
+    materialProperties.put("minecraft:torch", torchConfig);
+    materialProperties.put("minecraft:wall_torch", torchConfig);
     materialProperties.put("minecraft:fire", block -> {
       block.setLightLevel(15);
       block.emitterMappingOffset = -0.5f;
@@ -453,36 +452,37 @@ public class BlockPalette {
       }
     });
     materialProperties.put("minecraft:lantern", block -> {
+      block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+      block.addRefColorGammaCorrected(254, 254, 179, 0.25f);
+      block.addRefColorGammaCorrected(253, 158, 76, 0.45f);
+      block.addRefColorGammaCorrected(134, 73, 42, 0.05f);
       block.setLightLevel(15);
-      block.emitterMappingOffset = 1.0f;
     });
     materialProperties.put("minecraft:shroomlight", block -> {
       block.setLightLevel(15);
     });
     materialProperties.put("minecraft:soul_fire_lantern", block -> { // MC 20w06a-20w16a
+      block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+      block.addRefColorGammaCorrected(220, 252, 255, 0.5f);
+      block.addRefColorGammaCorrected(76, 198, 202, 0.3f);
       block.setLightLevel(10);
-      block.emitterMappingOffset = 1.0f;
     });
     materialProperties.put("minecraft:soul_lantern", block -> { // MC >= 20w17a
+      block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+      block.addRefColorGammaCorrected(220, 252, 255, 0.5f);
+      block.addRefColorGammaCorrected(76, 198, 202, 0.3f);
       block.setLightLevel(10);
-      block.emitterMappingOffset = 1.0f;
     });
-    materialProperties.put("minecraft:soul_fire_torch", block -> { // MC 20w06a-20w16a
+    Consumer<Block> soulTorchConfig = block -> {
+      block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+      block.addRefColorGammaCorrected(199, 252, 254, 0.45f);
+      block.addRefColorGammaCorrected(35, 204, 209, 0.25f);
       block.setLightLevel(10);
-      block.emitterMappingOffset = 0.5f;
-    });
-    materialProperties.put("minecraft:soul_torch", block -> { // MC >= 20w17a
-      block.setLightLevel(10);
-      block.emitterMappingOffset = 0.5f;
-    });
-    materialProperties.put("minecraft:soul_fire_wall_torch", block -> { // MC 20w06a-20w16a
-      block.setLightLevel(10);
-      block.emitterMappingOffset = 0.5f;
-    });
-    materialProperties.put("minecraft:soul_wall_torch", block -> { // MC >= 20w17a
-      block.setLightLevel(10);
-      block.emitterMappingOffset = 0.5f;
-    });
+    };
+    materialProperties.put("minecraft:soul_fire_torch", soulTorchConfig); // MC 20w06a-20w16a
+    materialProperties.put("minecraft:soul_torch", soulTorchConfig); // MC >= 20w17a
+    materialProperties.put("minecraft:soul_fire_wall_torch", soulTorchConfig); // MC 20w06a-20w16a
+    materialProperties.put("minecraft:soul_wall_torch", soulTorchConfig); // MC >= 20w17a
     materialProperties.put("minecraft:soul_fire", block -> {
       block.setLightLevel(10);
       block.emitterMappingOffset = -0.5f;
