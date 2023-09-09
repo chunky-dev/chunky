@@ -25,7 +25,6 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
 
 public class SignTexture extends Texture {
-  private static final int FONT_PIXELS_PER_PIXEL = 4;
   private final double hh, ww, u0, v0;
   private final Texture signTexture;
   private final PalettizedBitmapImage textColor;
@@ -40,12 +39,10 @@ public class SignTexture extends Texture {
     return false;
   }
 
-  public SignTexture(JsonArray[] text, Texture signTexture, int signWidth, int signHeight, double x0, double y0, double x1, double y1) {
+  public SignTexture(JsonArray[] text, Texture signTexture, int signWidth, int signHeight, double x0, double y0, double x1, double y1, double fontSize, int ymargin, int lineHeight) {
     this.signTexture = signTexture;
-    int ymargin = 1;
-    int lineHeight = 10;
-    int width = signWidth * FONT_PIXELS_PER_PIXEL;
-    int height = signHeight * FONT_PIXELS_PER_PIXEL;
+    int width = (int) Math.ceil(signWidth * fontSize);
+    int height = (int) Math.ceil(signHeight * fontSize);
     int ystart = ymargin;
     boolean allEmpty = true;
     for (JsonArray line : text) {

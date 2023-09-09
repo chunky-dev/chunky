@@ -246,8 +246,8 @@ public class WallHangingSignEntity extends Entity {
     this.frontText = frontText;
     this.backText = backText;
     this.orientation = direction;
-    this.frontTexture = frontText != null ? new SignTexture(frontText, signTexture, 14, 10, 2 / 64., 1 - 24 / 32., 16 / 64., 1 - 14 / 32.) : null;
-    this.backTexture = backText != null ? new SignTexture(backText, signTexture, 14, 10, 18 / 64., 1 - 24 / 32., 32 / 64., 1 - 14 / 32.) : null;
+    this.frontTexture = frontText != null ? new SignTexture(frontText, signTexture, 14, 10, 2 / 64., 1 - 24 / 32., 16 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
+    this.backTexture = backText != null ? new SignTexture(backText, signTexture, 14, 10, 18 / 64., 1 - 24 / 32., 32 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
     this.texture = signTexture;
     this.material = material;
   }
