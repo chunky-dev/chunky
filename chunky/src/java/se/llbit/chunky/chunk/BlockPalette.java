@@ -430,35 +430,35 @@ public class BlockPalette {
     materialProperties.put("minecraft:furnace", block -> {
       if(block instanceof Furnace && ((Furnace)block).isLit()) {
         block.setLightLevel(13);
-        block.emitterMappingOffset = 0.5f;
+        block.emitterMappingOffset = 2.0f;
       }
     });
     materialProperties.put("minecraft:smoker", block -> {
       if(block instanceof Smoker && ((Smoker)block).isLit()) {
         block.setLightLevel(13);
-        block.emitterMappingOffset = 0.5f;
+        block.emitterMappingOffset = 2.0f;
       }
     });
     materialProperties.put("minecraft:blast_furnace", block -> {
       if(block instanceof BlastFurnace && ((BlastFurnace)block).isLit()) {
         block.setLightLevel(13);
-        block.emitterMappingOffset = 0.5f;
+        block.emitterMappingOffset = 2.0f;
       }
     });
     materialProperties.put("minecraft:lantern", block -> {
       block.setLightLevel(15);
-      block.emitterMappingOffset = 0.5f;
+      block.emitterMappingOffset = 1.0f;
     });
     materialProperties.put("minecraft:shroomlight", block -> {
       block.setLightLevel(15);
     });
     materialProperties.put("minecraft:soul_fire_lantern", block -> { // MC 20w06a-20w16a
       block.setLightLevel(10);
-      block.emitterMappingOffset = 0.5f;
+      block.emitterMappingOffset = 1.0f;
     });
     materialProperties.put("minecraft:soul_lantern", block -> { // MC >= 20w17a
       block.setLightLevel(10);
-      block.emitterMappingOffset = 0.5f;
+      block.emitterMappingOffset = 1.0f;
     });
     materialProperties.put("minecraft:soul_fire_torch", block -> { // MC 20w06a-20w16a
       block.setLightLevel(10);
