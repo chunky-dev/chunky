@@ -68,9 +68,9 @@ public class LayeredFogSettings extends VBox implements Initializable {
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
-    layers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-      updateControls();
-    });
+    layers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+      updateControls()
+    );
 
     addLayer.setOnAction(e -> {
       scene.fog.addLayer();
@@ -79,7 +79,7 @@ public class LayeredFogSettings extends VBox implements Initializable {
     });
 
     removeLayer.setOnAction(e -> {
-      if (scene.fog.getFogLayers().length > 0) {
+      if (scene.fog.getFogLayers().size() > 0) {
         scene.fog.removeLayer(layers.getSelectionModel().getSelectedIndex());
         update(scene);
       }
@@ -119,7 +119,7 @@ public class LayeredFogSettings extends VBox implements Initializable {
   private boolean updateLayersList() {
     layers.getSelectionModel().clearSelection();
     layers.getItems().clear();
-    int numLayers = scene.fog.getFogLayers().length;
+    int numLayers = scene.fog.getFogLayers().size();
     boolean emptyLayers = !(numLayers > 0);
     if (!emptyLayers) {
       for (int i = 0; i < numLayers; i++) {
@@ -132,9 +132,9 @@ public class LayeredFogSettings extends VBox implements Initializable {
   private void updateControls() {
     if (!layers.getSelectionModel().isEmpty()) {
       int index = layers.getSelectionModel().getSelectedIndex();
-      layerY.set(scene.fog.getFogLayers()[index].y);
-      layerBreadth.set(scene.fog.getFogLayers()[index].breadth);
-      layerDensity.set(scene.fog.getFogLayers()[index].density);
+      layerY.set(scene.fog.getFogLayers().get(index).y);
+      layerBreadth.set(scene.fog.getFogLayers().get(index).breadth);
+      layerDensity.set(scene.fog.getFogLayers().get(index).density);
       enableControls();
     }
   }

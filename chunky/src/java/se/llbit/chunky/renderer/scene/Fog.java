@@ -1,7 +1,8 @@
 package se.llbit.chunky.renderer.scene;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.json.JsonArray;
@@ -19,7 +20,7 @@ public final class Fog implements JsonSerializable {
   protected boolean fastFog = true;
   protected double uniformDensity = Scene.DEFAULT_FOG_DENSITY;
   protected double skyFogDensity = 1;
-  protected FogLayer[] layers = new FogLayer[0];
+  protected ArrayList<FogLayer> layers = new ArrayList<>(0);
   protected Vector3 fogColor = new Vector3(PersistentSettings.getFogColorRed(), PersistentSettings.getFogColorGreen(), PersistentSettings.getFogColorBlue());
 
   private static final double EXTINCTION_FACTOR = 0.04;
@@ -54,44 +55,32 @@ public final class Fog implements JsonSerializable {
     return fastFog;
   }
 
-  public FogLayer[] getFogLayers() {
+  public ArrayList<FogLayer> getFogLayers() {
     return layers;
   }
 
   public void addLayer() {
-    int length = layers.length;
-    layers = Arrays.copyOf(layers, layers.length + 1);
-    layers[length] = new FogLayer(scene);
+    layers.add(new FogLayer(scene));
     scene.refresh();
   }
 
   public void removeLayer(int index) {
-    FogLayer[] layers2 = new FogLayer[layers.length - 1];
-    int currentIndex = 0;
-    int newIndex = 0;
-    for (FogLayer layer : layers) {
-      if (!(currentIndex == index)) {
-        layers2[newIndex] = layer;
-        newIndex++;
-      }
-      currentIndex++;
-    }
-    layers = Arrays.copyOf(layers2, layers2.length);
+    layers.remove(index);
     scene.refresh();
   }
 
   public void setY(int index, double value) {
-    layers[index].setY(value);
+    layers.get(index).setY(value);
     scene.refresh();
   }
 
   public void setBreadth(int index, double value) {
-    layers[index].setBreadth(value);
+    layers.get(index).setBreadth(value);
     scene.refresh();
   }
 
   public void setDensity(int index, double value) {
-    layers[index].setDensity(value);
+    layers.get(index).setDensity(value);
     scene.refresh();
   }
 
@@ -196,11 +185,11 @@ public final class Fog implements JsonSerializable {
   }
 
   private double sampleLayeredScatterOffset(Random random, double y1, double y2, double dy) {
-    if (layers.length == 0) {
+    if (layers.size() == 0) {
       return Ray.EPSILON;
     }
     // This works only for one fog layer yet.
-    FogLayer layer = layers[0];
+    FogLayer layer = layers.get(0);
     // Logistic distribution CDF.
     double y1v = 1 / (1 + Math.exp((layer.yWithOrigin - y1) * layer.breadthInv));
     double y2v = 1 / (1 + Math.exp((layer.yWithOrigin - y2) * layer.breadthInv));
@@ -241,7 +230,7 @@ public final class Fog implements JsonSerializable {
         o.get("y").doubleValue(0),
         o.get("breadth").doubleValue(0),
         o.get("density").doubleValue(0),
-        scene)).toArray(FogLayer[]::new);
+        scene)).collect(Collectors.toCollection(ArrayList<FogLayer>::new));
     JsonObject colorObj = json.get("color").object();
     fogColor.x = colorObj.get("red").doubleValue(fogColor.x);
     fogColor.y = colorObj.get("green").doubleValue(fogColor.y);
@@ -253,7 +242,7 @@ public final class Fog implements JsonSerializable {
     mode = json.get("fogEnabled").boolValue(mode != FogMode.NONE) ? FogMode.NONE : FogMode.UNIFORM;
     uniformDensity = json.get("fogDensity").doubleValue(uniformDensity);
     skyFogDensity = json.get("skyFogDensity").doubleValue(skyFogDensity);
-    layers = new FogLayer[0];
+    layers = new ArrayList<>(0);
     JsonObject colorObj = json.get("fogColor").object();
     fogColor.x = colorObj.get("red").doubleValue(fogColor.x);
     fogColor.y = colorObj.get("green").doubleValue(fogColor.y);
@@ -265,7 +254,7 @@ public final class Fog implements JsonSerializable {
     mode = other.mode;
     uniformDensity = other.uniformDensity;
     skyFogDensity = other.skyFogDensity;
-    layers = Arrays.stream(other.layers).map(FogLayer::clone).toArray(FogLayer[]::new);
+    layers = new ArrayList<>(other.layers);
     fogColor.set(other.fogColor);
   }
 }
