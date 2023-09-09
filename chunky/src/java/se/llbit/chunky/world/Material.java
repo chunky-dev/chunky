@@ -159,4 +159,12 @@ public abstract class Material {
   public void setPerceptualSmoothness(double perceptualSmoothness) {
     roughness = (float) Math.pow(1 - perceptualSmoothness, 2);
   }
+
+  /**
+   * Set the emittance based on a Minecraft light level
+   * @param level The light level from 0 to 15
+   */
+  public void setLightLevel(float level) {
+    emittance = level / 15;
+  }
 }

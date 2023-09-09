@@ -42,16 +42,19 @@ public class ExtraMaterials {
     CloudMaterial.INSTANCE.restoreDefaults();
 
     Candle.flameMaterial.restoreDefaults();
-    Candle.flameMaterial.emittance = 1.0f;
+    Candle.flameMaterial.setLightLevel(12);
+    Candle.flameMaterial.emitterMappingOffset = -0.5f;
 
     Campfire.flameMaterial.restoreDefaults();
-    Campfire.flameMaterial.emittance = 1.0f;
+    Campfire.flameMaterial.setLightLevel(15);
+    Campfire.flameMaterial.emitterMappingOffset = -0.5f;
 
     Campfire.soulFlameMaterial.restoreDefaults();
-    Campfire.soulFlameMaterial.emittance = 0.6f;
+    Campfire.soulFlameMaterial.setLightLevel(10);
+    Campfire.soulFlameMaterial.emitterMappingOffset = -0.5f;
 
     CalibratedSculkSensorAmethyst.activeMaterial.restoreDefaults();
-    CalibratedSculkSensorAmethyst.activeMaterial.emittance = 1.0f / 15;
+    CalibratedSculkSensorAmethyst.activeMaterial.setLightLevel(1);
 
     CalibratedSculkSensorAmethyst.inactiveMaterial.restoreDefaults();
   }
