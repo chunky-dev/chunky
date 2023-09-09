@@ -193,8 +193,8 @@ public class SignEntity extends Entity {
     this.frontText = frontText;
     this.backText = backText;
     this.angle = direction;
-    this.frontTexture = frontText != null ? new SignTexture(frontText, signTexture, false) : null;
-    this.backTexture = backText != null ? new SignTexture(backText, signTexture, true) : null;
+    this.frontTexture = frontText != null ? new SignTexture(frontText, signTexture, 24, 12, 2 / 64., 18 / 32., 26 / 64., 30 / 32.) : null;
+    this.backTexture = backText != null ? new SignTexture(backText, signTexture, 24, 12, 28 / 64., 18 / 32., 52 / 64., 30 / 32.) : null;
     this.texture = signTexture;
     this.material = material;
   }

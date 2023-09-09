@@ -15,7 +15,7 @@ import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.LinkedList;
 
 public class HangingSignEntity extends Entity {
   private static final Quad[] quadsAttached = new Quad[]{
@@ -52,14 +52,14 @@ public class HangingSignEntity extends Entity {
       new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
       new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
       new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
-      new Vector4(2 / 64., 16 / 64., 1 - 14 / 32., 1 - 24 / 32.)
+      new Vector4(16 / 64., 2 / 64., 1 - 14 / 32., 1 - 24 / 32.)
     ),
     // back
     new Quad(
       new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
       new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
       new Vector3(7 / 16.0, 0 / 16.0, 1 / 16.0),
-      new Vector4(18 / 64., 32 / 64., 1 - 14 / 32., 1 - 24 / 32.)
+      new Vector4(32 / 64., 18 / 64., 1 - 14 / 32., 1 - 24 / 32.)
     ),
     // chains front
     new Quad(
@@ -112,14 +112,14 @@ public class HangingSignEntity extends Entity {
         new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
         new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
         new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
-        new Vector4(2 / 64., 16 / 64., 1 - 14 / 32., 1 - 24 / 32.)
+        new Vector4(16 / 64., 2 / 64., 1 - 14 / 32., 1 - 24 / 32.)
       ),
       // back
       new Quad(
         new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(7 / 16.0, 0 / 16.0, 1 / 16.0),
-        new Vector4(18 / 64., 32 / 64., 1 - 14 / 32., 1 - 24 / 32.)
+        new Vector4(32 / 64., 18 / 64., 1 - 14 / 32., 1 - 24 / 32.)
       ),
     },
     // chains
@@ -212,13 +212,38 @@ public class HangingSignEntity extends Entity {
   private static Quad[][] rotatedQuadsAttached = new Quad[16][];
   private static Quad[][] rotatedQuadsNotAttached = new Quad[16][];
 
+  private static Quad[] frontFaceWithText = new Quad[16];
+  private static Quad[] backFaceWithText = new Quad[16];
+
   static {
     rotatedQuadsAttached[0] = Model.translate(quadsAttached, 0.5, 0, 0.5);
     rotatedQuadsNotAttached[0] = Model.translate(quadsNotAttached, 0.5, 0, 0.5);
 
     for (int i = 1; i < 16; ++i) {
-      rotatedQuadsAttached[i] = Model.rotateY(rotatedQuadsAttached[0], -i * Math.PI / 8);
-      rotatedQuadsNotAttached[i] = Model.rotateY(rotatedQuadsNotAttached[0], -i * Math.PI / 8);
+      rotatedQuadsAttached[i] = Model.rotateY(rotatedQuadsAttached[0], Math.PI - i * Math.PI / 8);
+      rotatedQuadsNotAttached[i] = Model.rotateY(rotatedQuadsNotAttached[0], Math.PI - i * Math.PI / 8);
+    }
+
+    frontFaceWithText[0] = new Quad(
+      new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
+      new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
+      new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
+      new Vector4(1, 0, 1, 0)
+    );
+    frontFaceWithText[0] = frontFaceWithText[0].transform(Transform.NONE.translate(0.5, 0, 0.5));
+    for (int i = 1; i < 16; ++i) {
+      frontFaceWithText[i] = frontFaceWithText[0].transform(Transform.NONE.rotateY(Math.PI - i * Math.PI / 8));
+    }
+
+    backFaceWithText[0] = new Quad(
+      new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
+      new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 1 / 16.0),
+      new Vector4(1, 0, 1, 0)
+    );
+    backFaceWithText[0] = backFaceWithText[0].transform(Transform.NONE.translate(0.5, 0, 0.5));
+    for (int i = 1; i < 16; ++i) {
+      backFaceWithText[i] = backFaceWithText[0].transform(Transform.NONE.rotateY(Math.PI - i * Math.PI / 8));
     }
   }
 
@@ -242,21 +267,30 @@ public class HangingSignEntity extends Entity {
     this.backText = backText;
     this.angle = rotation;
     this.attached = attached;
-    this.frontTexture = frontText != null ? new SignTexture(frontText, signTexture, false) : null;
-    this.backTexture = backText != null ? new SignTexture(backText, signTexture, true) : null;
+    this.frontTexture = frontText != null ? new SignTexture(frontText, signTexture, 14, 10, 2 / 64., 1 - 24 / 32., 16 / 64., 1 - 14 / 32.) : null;
+    this.backTexture = backText != null ? new SignTexture(backText, signTexture, 14, 10, 18 / 64., 1 - 24 / 32., 32 / 64., 1 - 14 / 32.) : null;
     this.texture = signTexture;
     this.material = material;
   }
 
   @Override
   public Collection<Primitive> primitives(Vector3 offset) {
-    LinkedHashSet<Primitive> set = new LinkedHashSet<>();
+    Collection<Primitive> primitives = new LinkedList<>();
+    Transform transform = Transform.NONE.translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     Quad[] quads = attached ? rotatedQuadsAttached[angle] : rotatedQuadsNotAttached[angle];
-    for (Quad quad : quads) {
-      quad.addTriangles(set, new TextureMaterial(texture),
-        Transform.NONE.translate(position.x + offset.x, position.y + offset.y, position.z + offset.z));
+    for (int i = 0; i < quads.length; ++i) {
+      Quad quad = quads[i];
+      Texture tex = texture;
+      if (i == 4 && frontTexture != null) {
+        tex = frontTexture;
+        quad = frontFaceWithText[angle];
+      } else if (i == 5 && backTexture != null) {
+        tex = backTexture;
+        quad = backFaceWithText[angle];
+      }
+      quad.addTriangles(primitives, new TextureMaterial(tex), transform);
     }
-    return set;
+    return primitives;
   }
 
   @Override

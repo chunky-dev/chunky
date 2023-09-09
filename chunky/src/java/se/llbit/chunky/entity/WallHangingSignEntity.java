@@ -54,14 +54,14 @@ public class WallHangingSignEntity extends Entity {
         new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
         new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
         new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
-        new Vector4(2 / 64., 16 / 64., 1 - 14 / 32., 1 - 24 / 32.)
+        new Vector4(16 / 64., 2 / 64., 1 - 14 / 32., 1 - 24 / 32.)
       ),
       // sign back
       new Quad(
         new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
         new Vector3(7 / 16.0, 0 / 16.0, 1 / 16.0),
-        new Vector4(18 / 64., 32 / 64., 1 - 14 / 32., 1 - 24 / 32.)
+        new Vector4(32 / 64., 18 / 64., 1 - 14 / 32., 1 - 24 / 32.)
       )
     },
     new Quad[]{
@@ -196,11 +196,36 @@ public class WallHangingSignEntity extends Entity {
   );
   private static Quad[][] rotatedQuads = new Quad[4][];
 
+  private static Quad[] frontFaceWithText = new Quad[4];
+  private static Quad[] backFaceWithText = new Quad[4];
+
   static {
     rotatedQuads[0] = Model.translate(quads, 0.5, 0, 0.5);
     rotatedQuads[1] = Model.rotateY(rotatedQuads[0]);
     rotatedQuads[2] = Model.rotateY(rotatedQuads[1]);
     rotatedQuads[3] = Model.rotateY(rotatedQuads[2]);
+
+    frontFaceWithText[0] = new Quad(
+      new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
+      new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
+      new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
+      new Vector4(1, 0, 1, 0)
+    );
+    frontFaceWithText[0] = frontFaceWithText[0].transform(Transform.NONE.translate(0.5, 0, 0.5));
+    frontFaceWithText[1] = frontFaceWithText[0].transform(Transform.NONE.rotateY());
+    frontFaceWithText[2] = frontFaceWithText[1].transform(Transform.NONE.rotateY());
+    frontFaceWithText[3] = frontFaceWithText[2].transform(Transform.NONE.rotateY());
+
+    backFaceWithText[0] = new Quad(
+      new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
+      new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 1 / 16.0),
+      new Vector4(1, 0, 1, 0)
+    );
+    backFaceWithText[0] = backFaceWithText[0].transform(Transform.NONE.translate(0.5, 0, 0.5));
+    backFaceWithText[1] = backFaceWithText[0].transform(Transform.NONE.rotateY());
+    backFaceWithText[2] = backFaceWithText[1].transform(Transform.NONE.rotateY());
+    backFaceWithText[3] = backFaceWithText[2].transform(Transform.NONE.rotateY());
   }
 
   private final JsonArray[] frontText;
@@ -221,8 +246,8 @@ public class WallHangingSignEntity extends Entity {
     this.frontText = frontText;
     this.backText = backText;
     this.orientation = direction;
-    this.frontTexture = frontText != null ? new SignTexture(frontText, signTexture, false) : null;
-    this.backTexture = backText != null ? new SignTexture(backText, signTexture, true) : null;
+    this.frontTexture = frontText != null ? new SignTexture(frontText, signTexture, 14, 10, 2 / 64., 1 - 24 / 32., 16 / 64., 1 - 14 / 32.) : null;
+    this.backTexture = backText != null ? new SignTexture(backText, signTexture, 14, 10, 18 / 64., 1 - 24 / 32., 32 / 64., 1 - 14 / 32.) : null;
     this.texture = signTexture;
     this.material = material;
   }
@@ -230,20 +255,18 @@ public class WallHangingSignEntity extends Entity {
   @Override
   public Collection<Primitive> primitives(Vector3 offset) {
     LinkedHashSet<Primitive> set = new LinkedHashSet<>();
-    Quad[] quads = rotatedQuads[0];
-    switch (orientation) {
-      case EAST:
-        quads = rotatedQuads[1];
-        break;
-      case SOUTH:
-        quads = rotatedQuads[2];
-        break;
-      case WEST:
-        quads = rotatedQuads[3];
-        break;
-    }
-    for (Quad quad : quads) {
-      quad.addTriangles(set, new TextureMaterial(texture),
+    Quad[] quads = rotatedQuads[orientation.ordinal()];
+    for (int i = 0; i < quads.length; ++i) {
+      Quad quad = quads[i];
+      Texture tex = texture;
+      if (i == 4 && frontTexture != null) {
+        tex = frontTexture;
+        quad = frontFaceWithText[orientation.ordinal()];
+      } else if (i == 5 && backTexture != null) {
+        tex = backTexture;
+        quad = backFaceWithText[orientation.ordinal()];
+      }
+      quad.addTriangles(set, new TextureMaterial(tex),
         Transform.NONE.translate(position.x + offset.x, position.y + offset.y, position.z + offset.z));
     }
     return set;
