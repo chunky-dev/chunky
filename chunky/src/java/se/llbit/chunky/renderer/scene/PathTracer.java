@@ -469,9 +469,18 @@ public class PathTracer implements RayTracer {
   private static void doEmittanceMapping(Vector3 emittance, Vector4 color, Scene scene, Material material) {
     double exp = Math.max(scene.getEmitterMappingExponent() + material.emitterMappingOffset, 0);
     EmitterMappingType mt = material.emitterMappingType == EmitterMappingType.NONE ? scene.getEmitterMappingType() : material.emitterMappingType;
+    double val;
     switch(mt) {
       case BRIGHTEST_CHANNEL:
-        double val = FastMath.pow(Math.max(color.x, Math.max(color.y, color.z)), exp);
+        val = FastMath.pow(Math.max(color.x, Math.max(color.y, color.z)), exp);
+        emittance.set(color.x * val, color.y * val, color.z * val);
+        break;
+      case REFERENCE_COLORS:
+        boolean emit = false;
+        for(Vector4 refcolor : material.emitterMappingReferenceColor) {
+          emit = emit || (Math.max(Math.abs(color.x - refcolor.x), Math.max(Math.abs(color.y - refcolor.y), Math.abs(color.z - refcolor.z))) <= refcolor.w);
+        }
+        val = emit ? FastMath.pow(Math.max(color.x, Math.max(color.y, color.z)), exp) : 0;
         emittance.set(color.x * val, color.y * val, color.z * val);
         break;
       case INDEPENDENT_CHANNELS:

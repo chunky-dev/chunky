@@ -17,11 +17,15 @@
 package se.llbit.chunky.world;
 
 import se.llbit.chunky.renderer.EmitterMappingType;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector4;
+
+import java.util.ArrayList;
 
 public abstract class Material {
 
@@ -72,6 +76,12 @@ public abstract class Material {
   public EmitterMappingType emitterMappingType = EmitterMappingType.NONE;
 
   /**
+   * (x, y, z): The color to use for the REFERENCE_COLORS emitter mapping type.
+   * w: The range surrounding the specified color to apply full brightness.
+   */
+  public ArrayList<Vector4> emitterMappingReferenceColor = new ArrayList<>();
+
+  /**
    * The (linear) roughness controlling how rough a shiny block appears. A value of 0 makes the
    * surface perfectly specular, a value of 1 makes it diffuse.
    */
@@ -114,6 +124,9 @@ public abstract class Material {
     solid = true;
     specular = 0;
     emittance = 0;
+    emitterMappingOffset = 0;
+    emitterMappingType = EmitterMappingType.NONE;
+    emitterMappingReferenceColor = new ArrayList<>();
     roughness = 0;
     subSurfaceScattering = false;
   }
@@ -166,5 +179,9 @@ public abstract class Material {
    */
   public void setLightLevel(float level) {
     emittance = level / 15;
+  }
+
+  public void addRefColorGammaCorrected(float r, float g, float b, float delta) {
+    emitterMappingReferenceColor.add(new Vector4(Math.pow(r/255, Scene.DEFAULT_GAMMA), Math.pow(g/255, Scene.DEFAULT_GAMMA), Math.pow(b/255, Scene.DEFAULT_GAMMA), delta));
   }
 }

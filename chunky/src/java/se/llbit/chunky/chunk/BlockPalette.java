@@ -20,7 +20,10 @@ import se.llbit.chunky.block.*;
 import se.llbit.chunky.block.minecraft.*;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.renderer.EmitterMappingType;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Octree;
+import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.IntTag;
 import se.llbit.nbt.StringTag;
@@ -428,21 +431,25 @@ public class BlockPalette {
       }
     });
     materialProperties.put("minecraft:furnace", block -> {
+      block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+      block.addRefColorGammaCorrected(255, 255, 215, 0.38f);
+      block.addRefColorGammaCorrected(230, 171, 16, 0.38f);
       if(block instanceof Furnace && ((Furnace)block).isLit()) {
         block.setLightLevel(13);
-        block.emitterMappingOffset = 2.0f;
       }
     });
     materialProperties.put("minecraft:smoker", block -> {
+      block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+      block.addRefColorGammaCorrected(228, 169, 17, 0.32f);
       if(block instanceof Smoker && ((Smoker)block).isLit()) {
         block.setLightLevel(13);
-        block.emitterMappingOffset = 2.0f;
       }
     });
     materialProperties.put("minecraft:blast_furnace", block -> {
+      block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+      block.addRefColorGammaCorrected(224, 128, 46, 0.25f);
       if(block instanceof BlastFurnace && ((BlastFurnace)block).isLit()) {
         block.setLightLevel(13);
-        block.emitterMappingOffset = 2.0f;
       }
     });
     materialProperties.put("minecraft:lantern", block -> {
