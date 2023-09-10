@@ -25,6 +25,7 @@ import se.llbit.util.annotation.Nullable;
 
 public class SignTexture extends Texture {
   private final double hh, ww, u0, v0;
+  private final Color dyeColor;
   private final Texture signTexture;
   @Nullable
   private final PalettizedBitmapImage textColor;
@@ -40,7 +41,8 @@ public class SignTexture extends Texture {
     return false;
   }
 
-  public SignTexture(JsonArray[] text, Texture signTexture, int signWidth, int signHeight, double x0, double y0, double x1, double y1, double fontSize, int ymargin, int lineHeight) {
+  public SignTexture(JsonArray[] text, Color dyeColor, Texture signTexture, int signWidth, int signHeight, double x0, double y0, double x1, double y1, double fontSize, int ymargin, int lineHeight) {
+    this.dyeColor = dyeColor;
     this.signTexture = signTexture;
     int width = (int) Math.ceil(signWidth * fontSize);
     int height = (int) Math.ceil(signHeight * fontSize);
@@ -74,7 +76,8 @@ public class SignTexture extends Texture {
         int xstart = (int) Math.ceil((width - lineWidth) / 2.0);
         for (JsonValue textItem : line) {
           String textLine = textItem.object().get("text").stringValue("");
-          Color color = Color.get(textItem.object().get("color").intValue(0));
+          int textItemColor = textItem.object().get("color").intValue(-1);
+          Color color = textItemColor >= 0 ? Color.get(textItemColor) : dyeColor;
 
           for (int c : textLine.codePoints().toArray()) {
             Glyph glyph = Texture.fonts.getGlyph(c);
@@ -85,8 +88,12 @@ public class SignTexture extends Texture {
                 int x = xstart;
                 for (int px = glyph.xmin; px <= glyph.xmax; ++px) {
                   if ((glyph.lines[py] & (1 << px)) != 0) {
-                    textColor.setPixel(x, y, color.id);
-                    textMask.setPixel(x, y, true);
+                    if (textItemColor >= 0) {
+                      textColor.setPixel(x, y, color.id);
+                      textMask.setPixel(x, y, true);
+                    } else {
+                      textColor.setPixel(x, y, 1);
+                    }
                   }
                   x += 1;
                 }
@@ -108,12 +115,17 @@ public class SignTexture extends Texture {
 
   @Override
   public float[] getColor(double u, double v) {
+    int x = (int) (u * textColor.width - Ray.EPSILON);
     if (textColor != null) {
-      int x = (int) (u * textColor.width - Ray.EPSILON);
       int y = (int) ((1 - v) * textColor.height - Ray.EPSILON);
       if (textMask != null && textMask.getPixel(x, y)) {
         Color characterColor = Color.get(textColor.getPixel(x, y));
         return characterColor.linearColor;
+      } else if (textColor.getPixel(x, y) == 1) {
+        // we use this for the dye color to not require more memory (color palette only has 16 colors, the dye color is a 17th color)
+        return dyeColor.linearColor;
+      } else {
+        return signTexture.getColor(u * ww + u0, v * hh + v0);
       }
     }
     return signTexture.getColor(u * ww + u0, v * hh + v0);

@@ -233,21 +233,25 @@ public class WallHangingSignEntity extends Entity {
   private final WallHangingSign.Facing orientation;
   private final SignTexture frontTexture;
   private final SignTexture backTexture;
+  private final SignEntity.Color frontDye;
+  private final SignEntity.Color backDye;
   private final Texture texture;
   private final String material;
 
   public WallHangingSignEntity(Vector3 position, CompoundTag entityTag, WallHangingSign.Facing direction, String material) {
-    this(position, SignEntity.getFrontTextLines(entityTag), SignEntity.getBackTextLines(entityTag), direction, material);
+    this(position, SignEntity.getFrontTextLines(entityTag), SignEntity.getFrontDyeColor(entityTag), SignEntity.getBackTextLines(entityTag), SignEntity.getBackDyeColor(entityTag), direction, material);
   }
 
-  public WallHangingSignEntity(Vector3 position, JsonArray[] frontText, JsonArray[] backText, WallHangingSign.Facing direction, String material) {
+  public WallHangingSignEntity(Vector3 position, JsonArray[] frontText, SignEntity.Color frontDye, JsonArray[] backText, SignEntity.Color backDye, WallHangingSign.Facing direction, String material) {
     super(position);
     Texture signTexture = HangingSignEntity.textureFromMaterial(material);
     this.frontText = frontText;
     this.backText = backText;
+    this.frontDye = frontDye;
+    this.backDye = backDye;
     this.orientation = direction;
-    this.frontTexture = frontText != null ? new SignTexture(frontText, signTexture, 14, 10, 2 / 64., 1 - 24 / 32., 16 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
-    this.backTexture = backText != null ? new SignTexture(backText, signTexture, 14, 10, 18 / 64., 1 - 24 / 32., 32 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
+    this.frontTexture = frontText != null ? new SignTexture(frontText, frontDye, signTexture, 14, 10, 2 / 64., 1 - 24 / 32., 16 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
+    this.backTexture = backText != null ? new SignTexture(backText, backDye, signTexture, 14, 10, 18 / 64., 1 - 24 / 32., 32 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
     this.texture = signTexture;
     this.material = material;
   }
@@ -279,9 +283,11 @@ public class WallHangingSignEntity extends Entity {
     json.add("position", position.toJson());
     if (frontText != null) {
       json.add("text", SignEntity.textToJson(frontText));
+      json.add("dye", frontDye.name().replace("DYE_", "").toLowerCase());
     }
     if (backText != null) {
       json.add("backText", SignEntity.textToJson(backText));
+      json.add("backDye", backDye.name().replace("DYE_", "").toLowerCase());
     }
     json.add("direction", orientation.toString());
     json.add("material", material);
@@ -304,6 +310,8 @@ public class WallHangingSignEntity extends Entity {
     }
     WallHangingSign.Facing direction = WallHangingSign.Facing.fromString(json.get("direction").stringValue("north"));
     String material = json.get("material").stringValue("oak");
-    return new WallHangingSignEntity(position, frontText, backText, direction, material);
+    SignEntity.Color dye = SignEntity.Color.getFromDyedSign(json.get("dye").stringValue("black"));
+    SignEntity.Color backDye = SignEntity.Color.getFromDyedSign(json.get("backDye").stringValue("black"));
+    return new WallHangingSignEntity(position, frontText, dye, backText, backDye, direction, material);
   }
 }

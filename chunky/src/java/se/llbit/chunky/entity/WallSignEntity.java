@@ -17,13 +17,9 @@
  */
 package se.llbit.chunky.entity;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -34,6 +30,9 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
+
+import java.util.Collection;
+import java.util.LinkedList;
 
 public class WallSignEntity extends Entity {
 
@@ -94,21 +93,23 @@ public class WallSignEntity extends Entity {
   }
 
   private final JsonArray[] text;
+  private final SignEntity.Color dye;
   private final int orientation;
   private final SignTexture frontTexture;
   private final Texture texture;
   private final String material;
 
   public WallSignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
-    this(position, SignEntity.getFrontTextLines(entityTag), blockData % 6, material);
+    this(position, SignEntity.getFrontTextLines(entityTag), SignEntity.getFrontDyeColor(entityTag), blockData % 6, material);
   }
 
-  public WallSignEntity(Vector3 position, JsonArray[] text, int direction, String material) {
+  public WallSignEntity(Vector3 position, JsonArray[] text, SignEntity.Color dye, int direction, String material) {
     super(position);
     Texture signTexture = SignEntity.textureFromMaterial(material);
     this.orientation = direction;
     this.text = text;
-    this.frontTexture = text != null ? new SignTexture(text, signTexture, 24, 12, 2 / 64., 18 / 32., 26 / 64., 30 / 32., 4, 1, 10) : null;
+    this.dye = dye;
+    this.frontTexture = text != null ? new SignTexture(text, dye, signTexture, 24, 12, 2 / 64., 18 / 32., 26 / 64., 30 / 32., 4, 1, 10) : null;
     this.texture = signTexture;
     this.material = material;
   }
@@ -138,6 +139,7 @@ public class WallSignEntity extends Entity {
     json.add("position", position.toJson());
     if (text != null) {
       json.add("text", SignEntity.textToJson(text));
+      json.add("dye", dye.name().replace("DYE_", "").toLowerCase());
     }
     json.add("direction", orientation);
     json.add("material", material);
@@ -156,6 +158,7 @@ public class WallSignEntity extends Entity {
     }
     int direction = json.get("direction").intValue(0);
     String material = json.get("material").stringValue("oak");
-    return new WallSignEntity(position, text, direction, material);
+    SignEntity.Color dye = SignEntity.Color.getFromDyedSign(json.get("dye").stringValue("balck"));
+    return new WallSignEntity(position, text, dye, direction, material);
   }
 }
