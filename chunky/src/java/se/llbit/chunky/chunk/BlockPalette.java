@@ -403,6 +403,8 @@ public class BlockPalette {
       block.setLightLevel(3);
     });
     materialProperties.put("minecraft:end_rod", block -> {
+      block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+      block.addRefColorGammaCorrected(248, 236, 219, 0.3f);
       block.setLightLevel(14);
     });
     materialProperties.put("minecraft:kelp", block -> {
@@ -577,17 +579,16 @@ public class BlockPalette {
     materialProperties.put("minecraft:glow_lichen", block -> {
       block.setLightLevel(7);
     });
-    materialProperties.put("minecraft:cave_vines_plant", block -> {
+    Consumer<Block> caveVinesConfig = block -> {
+      block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+      block.addRefColorGammaCorrected(241, 189, 85, 0.3f);
+      block.addRefColorGammaCorrected(164, 100, 34, 0.05f);
       if (block instanceof CaveVines && ((CaveVines) block).hasBerries()) {
         block.setLightLevel(14);
       }
-    });
-    materialProperties.put("minecraft:cave_vines", block -> {
-      if (block instanceof CaveVines && ((CaveVines) block).hasBerries()) {
-        block.setLightLevel(14);
-        block.emitterMappingOffset = 0.5f;
-      }
-    });
+    };
+    materialProperties.put("minecraft:cave_vines_plant", caveVinesConfig);
+    materialProperties.put("minecraft:cave_vines", caveVinesConfig);
     materialProperties.put("minecraft:light", block -> {
       if (block instanceof LightBlock) {
         block.setLightLevel(4 * ((LightBlock) block).getLevel());
