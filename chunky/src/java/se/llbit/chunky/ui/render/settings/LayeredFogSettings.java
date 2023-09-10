@@ -89,17 +89,17 @@ public class LayeredFogSettings extends VBox implements Initializable {
       disableControls();
     }
 
-    layerY.setTooltip("Y-coordinate of selected fog layer");
+    layerY.setTooltip("Y-coordinate of the selected fog layer");
     layerY.setRange(-64, 320);
     layerY.onValueChange(value -> scene.fog.setY(layers.getSelectionModel().getSelectedIndex(), value));
     layerY.setName("Layer altitude");
 
-    layerBreadth.setTooltip("Thickness of the selected fog layer");
+    layerBreadth.setTooltip("Vertical spread of the selected fog layer");
     layerBreadth.setRange(0.1, 100);
     layerBreadth.makeLogarithmic();
     layerBreadth.clampMin();
     layerBreadth.onValueChange(value -> scene.fog.setBreadth(layers.getSelectionModel().getSelectedIndex(), value));
-    layerBreadth.setName("Layer breadth");
+    layerBreadth.setName("Layer thickness");
 
     layerDensity.setTooltip("Density of the selected fog layer");
     layerDensity.setRange(0, 1);
