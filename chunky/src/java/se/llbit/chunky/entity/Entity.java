@@ -114,6 +114,10 @@ abstract public class Entity {
         return DecoratedPotModel.DecoratedPotSpoutEntity.fromJson(json);
       case "calibratedSculkSensorAmethyst":
         return CalibratedSculkSensorAmethyst.fromJson(json);
+      case "hangingSign":
+        return HangingSignEntity.fromJson(json);
+      case "wallHangingSign":
+        return WallHangingSignEntity.fromJson(json);
     }
     return null;
   }
