@@ -57,6 +57,8 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
   private final DoubleAdjuster ior = new DoubleAdjuster();
   private final DoubleAdjuster perceptualSmoothness = new DoubleAdjuster();
   private final DoubleAdjuster metalness = new DoubleAdjuster();
+  private final CheckBox advanced = new CheckBox();
+  private final VBox advancedSettings = new VBox();
   private final ListView<String> listView;
 
   public MaterialsTab() {
@@ -80,6 +82,20 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     metalness.setName("Metalness");
     metalness.setRange(0, 1);
     metalness.setTooltip("Metalness (texture-tinted reflectivity) of the selected material.");
+    advanced.setText("Advanced settings");
+    advanced.setTooltip(new Tooltip("Show advanced settings"));
+    advanced.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        advancedSettings.setVisible(newValue);
+        advancedSettings.setManaged(newValue);
+      });
+    HBox emt = new HBox();
+    emt.setSpacing(10);
+    emt.setAlignment(Pos.CENTER_LEFT);
+    emt.getChildren().addAll(new Label("Emitter mapping type:"), emitterMappingType);
+    advancedSettings.setSpacing(10);
+    advancedSettings.getChildren().addAll(emitterMappingOffset, emt);
+    advancedSettings.setVisible(false);
+    advancedSettings.setManaged(false);
     ObservableList<String> blockIds = FXCollections.observableArrayList();
     blockIds.addAll(MaterialStore.collections.keySet());
     blockIds.addAll(ExtraMaterials.idMap.keySet());
@@ -91,16 +107,14 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     listView.getSelectionModel().selectedItemProperty().addListener(
         (observable, oldValue, materialName) -> updateSelectedMaterial(materialName)
     );
-    HBox emt = new HBox();
-    emt.setSpacing(10);
-    emt.setAlignment(Pos.CENTER_LEFT);
-    emt.getChildren().addAll(new Label("Emitter mapping type:"), emitterMappingType);
     VBox settings = new VBox();
     settings.setSpacing(10);
     settings.getChildren().addAll(
         new Label("Material Properties"),
-        emittance, emitterMappingOffset, emt, specular, perceptualSmoothness, ior, metalness,
-        new Label("(set to zero to disable)"));
+        emittance, specular, perceptualSmoothness, ior, metalness,
+        new Label("(set to zero to disable)"),
+        advanced, advancedSettings
+      );
     setPadding(new Insets(10));
     setSpacing(15);
     TextField filterField = new TextField();
@@ -176,7 +190,9 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       materialExists = true;
     }
     if (materialExists) {
-      emittance.onValueChange(value -> scene.setEmittance(materialName, value.floatValue()));
+      emittance.onValueChange(value -> {
+        scene.setEmittance(materialName, value.floatValue());
+      });
       emitterMappingOffset.onValueChange(value -> scene.setEmitterMappingOffset(materialName, value.floatValue()));
       emtListener = (observable, oldValue, newValue) -> scene.setEmitterMappingTypeOverride(materialName, newValue);
       emitterMappingType.getSelectionModel().selectedItemProperty().addListener(emtListener);
