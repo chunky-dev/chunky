@@ -19,6 +19,7 @@ package se.llbit.chunky.world;
 import se.llbit.chunky.renderer.EmitterMappingType;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
@@ -79,7 +80,7 @@ public abstract class Material {
    * (x, y, z): The color to use for the REFERENCE_COLORS emitter mapping type.
    * w: The range surrounding the specified color to apply full brightness.
    */
-  public ArrayList<Vector4> emitterMappingReferenceColor = new ArrayList<>();
+  public ArrayList<Vector4> emitterMappingReferenceColors = new ArrayList<>();
 
   /**
    * The (linear) roughness controlling how rough a shiny block appears. A value of 0 makes the
@@ -126,7 +127,7 @@ public abstract class Material {
     emittance = 0;
     emitterMappingOffset = 0;
     emitterMappingType = EmitterMappingType.NONE;
-    emitterMappingReferenceColor = new ArrayList<>();
+    emitterMappingReferenceColors = new ArrayList<>();
     roughness = 0;
     subSurfaceScattering = false;
   }
@@ -146,11 +147,24 @@ public abstract class Material {
   public void loadMaterialProperties(JsonObject json) {
     ior = json.get("ior").floatValue(ior);
     specular = json.get("specular").floatValue(specular);
+    roughness = json.get("roughness").floatValue(roughness);
+    metalness = json.get("metalness").floatValue(metalness);
     emittance = json.get("emittance").floatValue(emittance);
     emitterMappingOffset = json.get("emitterMappingOffset").floatValue(emitterMappingOffset);
     emitterMappingType = EmitterMappingType.valueOf(json.get("emitterMappingType").asString(emitterMappingType.toString()));
-    roughness = json.get("roughness").floatValue(roughness);
-    metalness = json.get("metalness").floatValue(metalness);
+    JsonArray referenceColors = json.get("emitterMappingReferenceColors").array();
+    // Overwrite existing reference colors, but only if any are specified
+    if(referenceColors.size() > 0) {
+      emitterMappingReferenceColors = new ArrayList<>();
+    }
+    for(JsonValue refColorJson : referenceColors.elements) {
+      Vector4 refColor = new Vector4();
+      refColor.x = refColorJson.object().get("red").floatValue(0);
+      refColor.y = refColorJson.object().get("green").floatValue(0);
+      refColor.z = refColorJson.object().get("blue").floatValue(0);
+      refColor.w = refColorJson.object().get("range").floatValue(0);
+      emitterMappingReferenceColors.add(refColor);
+    }
   }
 
   public boolean isWater() {
@@ -182,6 +196,6 @@ public abstract class Material {
   }
 
   public void addRefColorGammaCorrected(float r, float g, float b, float delta) {
-    emitterMappingReferenceColor.add(new Vector4(Math.pow(r/255, Scene.DEFAULT_GAMMA), Math.pow(g/255, Scene.DEFAULT_GAMMA), Math.pow(b/255, Scene.DEFAULT_GAMMA), delta));
+    emitterMappingReferenceColors.add(new Vector4(Math.pow(r/255, Scene.DEFAULT_GAMMA), Math.pow(g/255, Scene.DEFAULT_GAMMA), Math.pow(b/255, Scene.DEFAULT_GAMMA), delta));
   }
 }

@@ -477,7 +477,7 @@ public class PathTracer implements RayTracer {
         break;
       case REFERENCE_COLORS:
         boolean emit = false;
-        for(Vector4 refcolor : material.emitterMappingReferenceColor) {
+        for(Vector4 refcolor : material.emitterMappingReferenceColors) {
           emit = emit || (Math.max(Math.abs(color.x - refcolor.x), Math.max(Math.abs(color.y - refcolor.y), Math.abs(color.z - refcolor.z))) <= refcolor.w);
         }
         val = emit ? FastMath.pow(Math.max(color.x, Math.max(color.y, color.z)), exp) : 0;
