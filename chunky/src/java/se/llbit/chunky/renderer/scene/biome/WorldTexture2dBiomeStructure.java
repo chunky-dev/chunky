@@ -52,7 +52,7 @@ public class WorldTexture2dBiomeStructure implements BiomeStructure.Factory {
     }
 
     @Override
-    public void compact() {
+    public void endFinalization() {
       texture.compact();
     }
 

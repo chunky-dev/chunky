@@ -84,10 +84,14 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
   void store(DataOutputStream out) throws IOException;
 
   /**
-   * This method is called to tell the implementation to shrink its size. (Node-tree optimisation, etc.)
-   * Called when throughout insertion of new biomes, and on completion
+   * This method is called to tell the implementation to shrink its size. Called when throughout insertion of new biomes.
    */
-  void compact();
+  default void compact() {}
+
+  /**
+   * This method is called to tell the implementation to finalize. Called on completion of loading.
+   */
+  default void endFinalization() {}
 
   /**
    * @return The registry key this biome format uses. Must be unique
