@@ -59,7 +59,7 @@ public class WeakInterner<T> implements Interner<T> {
   protected final ReferenceQueue<T> queue = new ReferenceQueue<>();
 
   @Override
-  public T intern(T sample) {
+  public T maybeIntern(T sample) {
     compact();
 
     HashedWeakReference<T> ref = new HashedWeakReference<>(sample, queue);
@@ -75,7 +75,7 @@ public class WeakInterner<T> implements Interner<T> {
       // Existing object is dead or doesn't exist
       // Enqueue our new ref
       pool.put(ref, ref);
-      return sample;
+      return null;
     }
   }
 

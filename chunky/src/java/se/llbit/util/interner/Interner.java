@@ -23,7 +23,19 @@ package se.llbit.util.interner;
  */
 public interface Interner<T> {
   /**
+   * Intern the given object, returning an existing object if one exists. Returns `null` if no such object exists.
+   * This is intended for use in cases where the caller needs to know whether the object was interned or not.
+   */
+  T maybeIntern(T sample);
+
+  /**
    * Intern the given object, returning an existing object if one exists.
    */
-  T intern(T sample);
+  default T intern(T sample) {
+    T interned = maybeIntern(sample);
+    if (interned != null) {
+      return interned;
+    }
+    return sample;
+  }
 }

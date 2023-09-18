@@ -28,7 +28,7 @@ import java.util.Arrays;
 
 public class ChunkTexture  {
   protected final byte[] data = new byte[Chunk.X_MAX * Chunk.Z_MAX * 3];
-  protected boolean writeable = true;
+  protected transient boolean writeable = true;
 
   /**
    * Create new texture

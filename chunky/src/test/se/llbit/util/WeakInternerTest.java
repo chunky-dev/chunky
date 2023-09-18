@@ -19,9 +19,9 @@
 package se.llbit.util;
 
 import org.junit.Assume;
-import org.junit.Ignore;
 import org.junit.Test;
 import se.llbit.util.interner.Interner;
+import se.llbit.util.interner.StrongInterner;
 import se.llbit.util.interner.WeakInterner;
 
 import java.lang.ref.WeakReference;
@@ -29,7 +29,6 @@ import java.util.Objects;
 import java.util.Random;
 
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 
 public class WeakInternerTest {
   private static class TestInternable {
@@ -54,9 +53,17 @@ public class WeakInternerTest {
   }
 
   @Test
-  public void testSmoke() {
+  public void testWeakInternerSmokeIntern() {
+    smokeIntern(new WeakInterner<>());
+  }
+
+  @Test
+  public void testStrongInternerSmokeIntern() {
+    smokeIntern(new StrongInterner<>());
+  }
+
+  private void smokeIntern(Interner<TestInternable> interner) {
     Random rand = new Random(0);
-    Interner<Object> interner = new WeakInterner<>();
 
     TestInternable test11 = new TestInternable(rand.nextLong());
     TestInternable test12 = new TestInternable(rand.nextLong());
@@ -74,6 +81,37 @@ public class WeakInternerTest {
     assertSame(interner.intern(test21), test11);
     assertSame(interner.intern(test22), test12);
     assertSame(interner.intern(test23), test13);
+  }
+
+  @Test
+  public void testWeakInternerSmokeMaybeIntern() {
+    smokeMaybeIntern(new WeakInterner<>());
+  }
+
+  @Test
+  public void testStrongInternerSmokeMaybeIntern() {
+    smokeMaybeIntern(new StrongInterner<>());
+  }
+
+  private void smokeMaybeIntern(Interner<TestInternable> interner) {
+    Random rand = new Random(0);
+
+    TestInternable test11 = new TestInternable(rand.nextLong());
+    TestInternable test12 = new TestInternable(rand.nextLong());
+    TestInternable test13 = new TestInternable(rand.nextLong());
+    TestInternable test21 = new TestInternable(test11.value);
+    TestInternable test22 = new TestInternable(test12.value);
+    TestInternable test23 = new TestInternable(test13.value);
+
+    // Test that we get `null` when we maybeIntern the object.
+    assertSame(interner.maybeIntern(test11), null);
+    assertSame(interner.maybeIntern(test12), null);
+    assertSame(interner.maybeIntern(test13), null);
+
+    // Test that we get back the interned object when interning the copy
+    assertSame(interner.maybeIntern(test21), test11);
+    assertSame(interner.maybeIntern(test22), test12);
+    assertSame(interner.maybeIntern(test23), test13);
   }
 
   @Test

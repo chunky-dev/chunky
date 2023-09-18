@@ -27,6 +27,16 @@ public class StrongInterner<T> implements Interner<T> {
   protected final HashMap<T, T> pool = new HashMap<>();
 
   @Override
+  public T maybeIntern(T sample) {
+    T interned = pool.get(sample);
+    if (interned != null) {
+      return interned;
+    }
+    pool.put(sample, sample);
+    return null;
+  }
+
+  @Override
   public T intern(T sample) {
     return pool.computeIfAbsent(sample, k -> k);
   }
