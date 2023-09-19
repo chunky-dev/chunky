@@ -76,15 +76,7 @@ public class WorldTexture2dBiomeStructure implements BiomeStructure.Factory {
       for (int i = 0; i < numTiles; i++) {
         int x = in.readInt();
         int z = in.readInt();
-        ChunkTexture tile = ChunkTexture.load(in);
-
-        ChunkTexture interned = interner.maybeIntern(tile);
-        if (interned != null) {
-          interned.makeReadOnly();
-          tile = interned;
-        }
-
-        tile = interner.intern(tile);
+        ChunkTexture tile = ChunkTexture.load(in).intern(interner);
         texture.map.put(chunkPos(x, z), tile);
       }
 
@@ -108,13 +100,7 @@ public class WorldTexture2dBiomeStructure implements BiomeStructure.Factory {
     public void endFinalization() {
       Interner<ChunkTexture> interner = new StrongInterner<>();
       for (Long2ObjectMap.Entry<ChunkTexture> entry : map.long2ObjectEntrySet()) {
-        ChunkTexture interned = interner.maybeIntern(entry.getValue());
-
-        // We did de-duplicate, mark the texture as shared and replace the value
-        if (interned != null) {
-          interned.makeReadOnly();
-          entry.setValue(interned);
-        }
+        entry.setValue(entry.getValue().intern(interner));
       }
     }
 

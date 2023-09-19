@@ -2,6 +2,7 @@ package se.llbit.chunky.renderer.scene.biome;
 
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import se.llbit.chunky.renderer.scene.biome.worldtexture.WorldTexture2dBiomeStructure;
+import se.llbit.chunky.renderer.scene.biome.worldtexture.WorldTexture3dBiomeStructure;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.log.Log;
 import se.llbit.math.structures.Position2IntStructure;
@@ -25,6 +26,7 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
     BiomeStructure.register(new Trivial3dBiomeStructure());
     BiomeStructure.register(new Trivial2dBiomeStructure());
     BiomeStructure.register(new WorldTexture2dBiomeStructure());
+    BiomeStructure.register(new WorldTexture3dBiomeStructure.Factory());
   }
 
   /**

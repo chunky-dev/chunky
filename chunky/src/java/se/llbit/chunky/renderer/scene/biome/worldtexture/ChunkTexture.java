@@ -20,6 +20,7 @@ package se.llbit.chunky.renderer.scene.biome.worldtexture;
 
 import se.llbit.chunky.world.Chunk;
 import se.llbit.math.ColorUtil;
+import se.llbit.util.interner.Interner;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -72,6 +73,14 @@ public class ChunkTexture  {
    */
   public void makeReadOnly() {
     writeable = false;
+  }
+
+  /**
+   * Intern this chunk texture.
+   */
+  public ChunkTexture intern(Interner<ChunkTexture> interner) {
+    this.makeReadOnly();
+    return interner.intern(this);
   }
 
   /**
