@@ -26,6 +26,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+/**
+ * A 3D chunk texture. This stores a column of {@link ChunkTexture}'s, each corresponding to a different
+ * y-level in a chunk.
+ */
 public class ChunkTexture3d {
   protected final Int2ObjectOpenHashMap<ChunkTexture> data = new Int2ObjectOpenHashMap<>();
   protected transient boolean writeable = true;
@@ -48,12 +52,12 @@ public class ChunkTexture3d {
   /**
    * Load a chunk texture from an input stream.
    */
-  public static ChunkTexture3d load(DataInputStream in, Interner<ChunkTexture> interner) throws IOException {
+  public static ChunkTexture3d load(DataInputStream in) throws IOException {
     ChunkTexture3d tex = new ChunkTexture3d();
     int count = in.readInt();
     for (int i = 0; i < count; i++) {
       int y = in.readInt();
-      ChunkTexture ct = ChunkTexture.load(in).intern(interner);
+      ChunkTexture ct = ChunkTexture.load(in);
       tex.data.put(y, ct);
     }
     return tex;
@@ -80,9 +84,16 @@ public class ChunkTexture3d {
   /**
    * Intern this chunk texture.
    */
-  public ChunkTexture3d intern(Interner<ChunkTexture3d> interner) {
+  public ChunkTexture3d intern(Interner<ChunkTexture> interner2d, Interner<ChunkTexture3d> interner3d) {
     this.makeReadOnly();
-    return interner.intern(this);
+
+    ChunkTexture3d interned = interner3d.intern(this);
+    if (interned == this) {
+      // This dosen't actually modify the visible data of this CT so it's safe to do despite being interned already
+      this.compact(interner2d);
+    }
+
+    return interned;
   }
 
   /**

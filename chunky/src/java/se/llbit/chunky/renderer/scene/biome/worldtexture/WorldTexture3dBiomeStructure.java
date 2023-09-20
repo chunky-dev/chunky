@@ -18,8 +18,11 @@
 
 package se.llbit.chunky.renderer.scene.biome.worldtexture;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
 import se.llbit.util.annotation.NotNull;
 import se.llbit.util.interner.Interner;
@@ -33,23 +36,43 @@ import java.io.IOException;
 public class WorldTexture3dBiomeStructure implements BiomeStructure {
   public static final String ID = "WORLD_TEXTURE_3D";
 
+  /**
+   * Map from chunk position to chunk texture.
+   */
   private final Long2ObjectOpenHashMap<ChunkTexture3d> map = new Long2ObjectOpenHashMap<>();
+
+  /**
+   * List of live, un-interned chunk textures.
+   */
+  private LongOpenHashSet live = null;
+  private Interner<ChunkTexture> interner2d = null;
+  private Interner<ChunkTexture3d> interner3d = null;
+
+  protected WorldTexture3dBiomeStructure(boolean doIntern) {
+    if (doIntern) {
+      live = new LongOpenHashSet();
+      interner2d = new StrongInterner<>();
+      interner3d = new StrongInterner<>();
+    }
+  }
 
   private static long chunkPos(int x, int z) {
     return (((long) x) << 32) | ((long) z);
   }
 
   public static WorldTexture3dBiomeStructure load(DataInputStream in) throws IOException {
-    WorldTexture3dBiomeStructure texture = new WorldTexture3dBiomeStructure();
-    Interner<ChunkTexture3d> ct3dInterner = new StrongInterner<>();
-    Interner<ChunkTexture> ct2dInterner = new StrongInterner<>();
+    // Set doIntern to false since we can do it better
+    WorldTexture3dBiomeStructure texture = new WorldTexture3dBiomeStructure(false);
+
+    Interner<ChunkTexture> interner2d = new StrongInterner<>();
+    Interner<ChunkTexture3d> interner3d = new StrongInterner<>();
 
     int numTiles = in.readInt();
     for (int i = 0; i < numTiles; i++) {
       int x = in.readInt();
       int z = in.readInt();
 
-      ChunkTexture3d column = ChunkTexture3d.load(in, ct2dInterner);
+      ChunkTexture3d column = ChunkTexture3d.load(in).intern(interner2d, interner3d);
       texture.map.put(chunkPos(x, z), column);
     }
 
@@ -72,20 +95,27 @@ public class WorldTexture3dBiomeStructure implements BiomeStructure {
   }
 
   @Override
+  public void compact() {
+    if (live == null || interner2d == null || interner3d == null) {
+      return;
+    }
+
+    for (long cp : live) {
+      map.computeIfPresent(cp, (k, v) -> v.intern(interner2d, interner3d));
+    }
+    live.clear();
+  }
+
+  @Override
   public void endFinalization() {
-    Interner<ChunkTexture3d> interner3D = new StrongInterner<>();
-    Interner<ChunkTexture> interner2D = new StrongInterner<>();
     for (Long2ObjectMap.Entry<ChunkTexture3d> entry : map.long2ObjectEntrySet()) {
       ChunkTexture3d value = entry.getValue();
-      value.makeReadOnly();
-
-      ChunkTexture3d interned = interner3D.maybeIntern(value);
-      if (interned != null) {
-        entry.setValue(interned);
-      } else {
-        value.compact(interner2D);
-      }
+      entry.setValue(value.intern(interner2d, interner3d));
     }
+
+    live = null;
+    interner2d = null;
+    interner3d = null;
   }
 
   @Override
@@ -107,6 +137,10 @@ public class WorldTexture3dBiomeStructure implements BiomeStructure {
     if (newTex != texture) {
       map.put(cp, newTex);
     }
+
+    if (live != null) {
+      live.add(cp);
+    }
   }
 
   @Override
@@ -122,7 +156,7 @@ public class WorldTexture3dBiomeStructure implements BiomeStructure {
 
     @Override
     public BiomeStructure create() {
-      return new WorldTexture3dBiomeStructure();
+      return new WorldTexture3dBiomeStructure(true);
     }
 
     @Override

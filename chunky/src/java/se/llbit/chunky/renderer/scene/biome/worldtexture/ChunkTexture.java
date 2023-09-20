@@ -27,6 +27,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+/**
+ * A 2D chunk texture. This stores a pixel for each block in a chunk, with 8 bits per channel.
+ */
 public class ChunkTexture  {
   protected final byte[] data = new byte[Chunk.X_MAX * Chunk.Z_MAX * 3];
   protected transient boolean writeable = true;
