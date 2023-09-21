@@ -94,22 +94,24 @@ public class WallSignEntity extends Entity {
 
   private final JsonArray[] text;
   private final SignEntity.Color dye;
+  private final boolean glowing;
   private final int orientation;
   private final SignTexture frontTexture;
   private final Texture texture;
   private final String material;
 
   public WallSignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
-    this(position, SignEntity.getFrontTextLines(entityTag), SignEntity.getFrontDyeColor(entityTag), blockData % 6, material);
+    this(position, SignEntity.getFrontTextLines(entityTag), SignEntity.getFrontDyeColor(entityTag), SignEntity.getFrontGlowing(entityTag), blockData % 6, material);
   }
 
-  public WallSignEntity(Vector3 position, JsonArray[] text, SignEntity.Color dye, int direction, String material) {
+  public WallSignEntity(Vector3 position, JsonArray[] text, SignEntity.Color dye, boolean isGlowing, int direction, String material) {
     super(position);
     Texture signTexture = SignEntity.textureFromMaterial(material);
     this.orientation = direction;
     this.text = text;
     this.dye = dye;
-    this.frontTexture = text != null ? new SignTexture(text, dye, false, signTexture, 24, 12, 2 / 64., 18 / 32., 26 / 64., 30 / 32., 4, 1, 10) : null;
+    this.glowing = isGlowing;
+    this.frontTexture = text != null ? new SignTexture(text, dye, isGlowing, signTexture, 24, 12, 2 / 64., 18 / 32., 26 / 64., 30 / 32., 4, 1, 10) : null;
     this.texture = signTexture;
     this.material = material;
   }
@@ -142,6 +144,7 @@ public class WallSignEntity extends Entity {
       if (dye != null) {
         json.add("dye", dye.name().replace("DYE_", "").toLowerCase());
       }
+      json.add("glowing", glowing);
     }
     json.add("direction", orientation);
     json.add("material", material);
@@ -161,6 +164,7 @@ public class WallSignEntity extends Entity {
     int direction = json.get("direction").intValue(0);
     String material = json.get("material").stringValue("oak");
     SignEntity.Color dye = SignEntity.Color.getFromDyedSign(json.get("dye").stringValue(null));
-    return new WallSignEntity(position, text, dye, direction, material);
+    boolean glowing = json.get("glowing").boolValue(false);
+    return new WallSignEntity(position, text, dye, glowing, direction, material);
   }
 }

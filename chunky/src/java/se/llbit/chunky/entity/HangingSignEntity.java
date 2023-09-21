@@ -254,25 +254,29 @@ public class HangingSignEntity extends Entity {
   private final SignTexture frontTexture;
   private final SignTexture backTexture;
   private final SignEntity.Color frontDye;
+  private final boolean frontGlowing;
   private final SignEntity.Color backDye;
+  private final boolean backGlowing;
   private final Texture texture;
   private final String material;
 
   public HangingSignEntity(Vector3 position, CompoundTag entityTag, int rotation, boolean attached, String material) {
-    this(position, SignEntity.getFrontTextLines(entityTag), SignEntity.getFrontDyeColor(entityTag), SignEntity.getBackTextLines(entityTag), SignEntity.getBackDyeColor(entityTag), rotation, attached, material);
+    this(position, SignEntity.getFrontTextLines(entityTag), SignEntity.getFrontDyeColor(entityTag), SignEntity.getFrontGlowing(entityTag), SignEntity.getBackTextLines(entityTag), SignEntity.getBackDyeColor(entityTag), SignEntity.getBackGlowing(entityTag), rotation, attached, material);
   }
 
-  public HangingSignEntity(Vector3 position, JsonArray[] frontText, SignEntity.Color frontDye, JsonArray[] backText, SignEntity.Color backDye, int rotation, boolean attached, String material) {
+  public HangingSignEntity(Vector3 position, JsonArray[] frontText, SignEntity.Color frontDye, boolean frontGlowing, JsonArray[] backText, SignEntity.Color backDye, boolean backGlowing, int rotation, boolean attached, String material) {
     super(position);
     Texture signTexture = HangingSignEntity.textureFromMaterial(material);
     this.frontText = frontText;
     this.backText = backText;
     this.frontDye = frontDye;
+    this.frontGlowing = frontGlowing;
     this.backDye = backDye;
+    this.backGlowing = backGlowing;
     this.angle = rotation;
     this.attached = attached;
-    this.frontTexture = frontText != null ? new SignTexture(frontText, frontDye, false, signTexture, 14, 10, 2 / 64., 1 - 24 / 32., 16 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
-    this.backTexture = backText != null ? new SignTexture(backText, backDye, false, signTexture, 14, 10, 18 / 64., 1 - 24 / 32., 32 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
+    this.frontTexture = frontText != null ? new SignTexture(frontText, frontDye, frontGlowing, signTexture, 14, 10, 2 / 64., 1 - 24 / 32., 16 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
+    this.backTexture = backText != null ? new SignTexture(backText, backDye, backGlowing, signTexture, 14, 10, 18 / 64., 1 - 24 / 32., 32 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
     this.texture = signTexture;
     this.material = material;
   }
@@ -307,12 +311,14 @@ public class HangingSignEntity extends Entity {
       if (frontDye != null) {
         json.add("dye", frontDye.name().replace("DYE_", "").toLowerCase());
       }
+      json.add("glowing", frontGlowing);
     }
     if (backText != null) {
       json.add("backText", SignEntity.textToJson(backText));
       if (backDye != null) {
         json.add("backDye", backDye.name().replace("DYE_", "").toLowerCase());
       }
+      json.add("backGlowing", backGlowing);
     }
     json.add("direction", angle);
     json.add("attached", attached);
@@ -338,8 +344,10 @@ public class HangingSignEntity extends Entity {
     boolean attached = json.get("attached").boolValue(false);
     String material = json.get("material").stringValue("oak");
     SignEntity.Color dye = SignEntity.Color.getFromDyedSign(json.get("dye").stringValue(null));
+    boolean glowing = json.get("glowing").boolValue(false);
     SignEntity.Color backDye = SignEntity.Color.getFromDyedSign(json.get("backDye").stringValue(null));
-    return new HangingSignEntity(position, frontText, dye, backText, backDye, direction, attached, material);
+    boolean backGlowing = json.get("backGlowing").boolValue(false);
+    return new HangingSignEntity(position, frontText, dye, glowing, backText, backDye, backGlowing, direction, attached, material);
   }
 
   public static Texture textureFromMaterial(String material) {

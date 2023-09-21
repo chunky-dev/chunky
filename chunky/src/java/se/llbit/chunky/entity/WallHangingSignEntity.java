@@ -235,23 +235,27 @@ public class WallHangingSignEntity extends Entity {
   private final SignTexture backTexture;
   private final SignEntity.Color frontDye;
   private final SignEntity.Color backDye;
+  private final boolean frontGlowing;
+  private final boolean backGlowing;
   private final Texture texture;
   private final String material;
 
   public WallHangingSignEntity(Vector3 position, CompoundTag entityTag, WallHangingSign.Facing direction, String material) {
-    this(position, SignEntity.getFrontTextLines(entityTag), SignEntity.getFrontDyeColor(entityTag), SignEntity.getBackTextLines(entityTag), SignEntity.getBackDyeColor(entityTag), direction, material);
+    this(position, SignEntity.getFrontTextLines(entityTag), SignEntity.getFrontDyeColor(entityTag), SignEntity.getFrontGlowing(entityTag), SignEntity.getBackTextLines(entityTag), SignEntity.getBackDyeColor(entityTag), SignEntity.getBackGlowing(entityTag), direction, material);
   }
 
-  public WallHangingSignEntity(Vector3 position, JsonArray[] frontText, SignEntity.Color frontDye, JsonArray[] backText, SignEntity.Color backDye, WallHangingSign.Facing direction, String material) {
+  public WallHangingSignEntity(Vector3 position, JsonArray[] frontText, SignEntity.Color frontDye, boolean frontGlowing, JsonArray[] backText, SignEntity.Color backDye, boolean backGlowing, WallHangingSign.Facing direction, String material) {
     super(position);
     Texture signTexture = HangingSignEntity.textureFromMaterial(material);
     this.frontText = frontText;
     this.backText = backText;
     this.frontDye = frontDye;
     this.backDye = backDye;
+    this.frontGlowing = frontGlowing;
+    this.backGlowing = backGlowing;
     this.orientation = direction;
-    this.frontTexture = frontText != null ? new SignTexture(frontText, frontDye, false, signTexture, 14, 10, 2 / 64., 1 - 24 / 32., 16 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
-    this.backTexture = backText != null ? new SignTexture(backText, backDye, false, signTexture, 14, 10, 18 / 64., 1 - 24 / 32., 32 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
+    this.frontTexture = frontText != null ? new SignTexture(frontText, frontDye, frontGlowing, signTexture, 14, 10, 2 / 64., 1 - 24 / 32., 16 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
+    this.backTexture = backText != null ? new SignTexture(backText, backDye, backGlowing, signTexture, 14, 10, 18 / 64., 1 - 24 / 32., 32 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
     this.texture = signTexture;
     this.material = material;
   }
@@ -286,12 +290,14 @@ public class WallHangingSignEntity extends Entity {
       if (frontDye != null) {
         json.add("dye", frontDye.name().replace("DYE_", "").toLowerCase());
       }
+      json.add("glowing", frontGlowing);
     }
     if (backText != null) {
       json.add("backText", SignEntity.textToJson(backText));
       if (backDye != null) {
         json.add("backDye", backDye.name().replace("DYE_", "").toLowerCase());
       }
+      json.add("backGlowing", backGlowing);
     }
     json.add("direction", orientation.toString());
     json.add("material", material);
@@ -315,7 +321,9 @@ public class WallHangingSignEntity extends Entity {
     WallHangingSign.Facing direction = WallHangingSign.Facing.fromString(json.get("direction").stringValue("north"));
     String material = json.get("material").stringValue("oak");
     SignEntity.Color dye = SignEntity.Color.getFromDyedSign(json.get("dye").stringValue(null));
+    boolean glowing = json.get("glowing").boolValue(false);
     SignEntity.Color backDye = SignEntity.Color.getFromDyedSign(json.get("backDye").stringValue(null));
-    return new WallHangingSignEntity(position, frontText, dye, backText, backDye, direction, material);
+    boolean backGlowing = json.get("backGlowing").boolValue(false);
+    return new WallHangingSignEntity(position, frontText, dye, glowing, backText, backDye, backGlowing, direction, material);
   }
 }
