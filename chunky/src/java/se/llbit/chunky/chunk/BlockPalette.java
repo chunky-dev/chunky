@@ -351,6 +351,16 @@ public class BlockPalette {
     };
     materialProperties.put("minecraft:redstone_torch", redstoneTorchConfig);
     materialProperties.put("minecraft:redstone_wall_torch", redstoneTorchConfig);
+    materialProperties.put("minecraft:redstone_ore", block -> {
+      block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+      block.addRefColorGammaCorrected(254, 118, 118, 0.2f);
+      block.addRefColorGammaCorrected(210, 3, 3, 0.2f);
+    });
+    materialProperties.put("minecraft:deepslate_redstone_ore", block -> {
+      block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+      block.addRefColorGammaCorrected(254, 118, 118, 0.2f);
+      block.addRefColorGammaCorrected(210, 3, 3, 0.35f);
+    });
     Consumer<Block> torchConfig = block -> {
       block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
       block.addRefColorGammaCorrected(255, 255, 210, 0.35f);
