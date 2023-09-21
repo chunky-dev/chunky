@@ -352,13 +352,13 @@ public class SignEntity extends Entity {
         JsonValue value = parser.parse();
         if (value.isObject()) {
           JsonObject obj = value.object();
-          addText(array, obj.get("text").stringValue(""));
+          addText(array, obj.get("text").stringValue(""), obj.get("color").stringValue(""));
           JsonArray extraArray = obj.get("extra").array();
           for (JsonValue extra : extraArray) {
             if (extra.isObject()) {
               JsonObject extraObject = extra.object();
               addText(array, extraObject.get("text").stringValue(""),
-                extraObject.get("color").stringValue(""));
+                extraObject.get("color").stringValue(obj.get("color").stringValue("")));
             } else {
               addText(array, extra.stringValue(""));
             }
