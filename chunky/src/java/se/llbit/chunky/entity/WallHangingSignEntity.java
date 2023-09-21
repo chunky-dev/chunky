@@ -250,8 +250,8 @@ public class WallHangingSignEntity extends Entity {
     this.frontDye = frontDye;
     this.backDye = backDye;
     this.orientation = direction;
-    this.frontTexture = frontText != null ? new SignTexture(frontText, frontDye, signTexture, 14, 10, 2 / 64., 1 - 24 / 32., 16 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
-    this.backTexture = backText != null ? new SignTexture(backText, backDye, signTexture, 14, 10, 18 / 64., 1 - 24 / 32., 32 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
+    this.frontTexture = frontText != null ? new SignTexture(frontText, frontDye, false, signTexture, 14, 10, 2 / 64., 1 - 24 / 32., 16 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
+    this.backTexture = backText != null ? new SignTexture(backText, backDye, false, signTexture, 14, 10, 18 / 64., 1 - 24 / 32., 32 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
     this.texture = signTexture;
     this.material = material;
   }
@@ -283,11 +283,15 @@ public class WallHangingSignEntity extends Entity {
     json.add("position", position.toJson());
     if (frontText != null) {
       json.add("text", SignEntity.textToJson(frontText));
-      json.add("dye", frontDye.name().replace("DYE_", "").toLowerCase());
+      if (frontDye != null) {
+        json.add("dye", frontDye.name().replace("DYE_", "").toLowerCase());
+      }
     }
     if (backText != null) {
       json.add("backText", SignEntity.textToJson(backText));
-      json.add("backDye", backDye.name().replace("DYE_", "").toLowerCase());
+      if (backDye != null) {
+        json.add("backDye", backDye.name().replace("DYE_", "").toLowerCase());
+      }
     }
     json.add("direction", orientation.toString());
     json.add("material", material);
@@ -310,8 +314,8 @@ public class WallHangingSignEntity extends Entity {
     }
     WallHangingSign.Facing direction = WallHangingSign.Facing.fromString(json.get("direction").stringValue("north"));
     String material = json.get("material").stringValue("oak");
-    SignEntity.Color dye = SignEntity.Color.getFromDyedSign(json.get("dye").stringValue("black"));
-    SignEntity.Color backDye = SignEntity.Color.getFromDyedSign(json.get("backDye").stringValue("black"));
+    SignEntity.Color dye = SignEntity.Color.getFromDyedSign(json.get("dye").stringValue(null));
+    SignEntity.Color backDye = SignEntity.Color.getFromDyedSign(json.get("backDye").stringValue(null));
     return new WallHangingSignEntity(position, frontText, dye, backText, backDye, direction, material);
   }
 }

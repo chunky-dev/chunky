@@ -24,8 +24,20 @@ import se.llbit.math.Ray;
 import se.llbit.util.annotation.Nullable;
 
 public class SignTexture extends Texture {
+  /**
+   * We use this for the glow dye color to not require more memory (color palette only has 16 colors, the dye color is a 17th color).
+   * If the text mask is false but the color is set to this value, we use the glow dye color (the bright one).
+   */
+  private static final int GLOW_DYE_COLOR = 1;
+  /**
+   * We use this for the glow dye outline color to not require more memory (color palette only has 16 colors, the glow dye color is an 18th color).
+   * If the text mask is false but the color is set to this value, we use the dye color (the darker one).
+   */
+  private static final int GLOW_DYE_OUTLINE_COLOR = 2;
+
   private final double hh, ww, u0, v0;
   private final Color dyeColor;
+  private final boolean isGlowing;
   private final Texture signTexture;
   @Nullable
   private final PalettizedBitmapImage textColor;
@@ -41,9 +53,10 @@ public class SignTexture extends Texture {
     return false;
   }
 
-  public SignTexture(JsonArray[] text, Color dyeColor, Texture signTexture, int signWidth, int signHeight, double x0, double y0, double x1, double y1, double fontSize, int ymargin, int lineHeight) {
+  public SignTexture(JsonArray[] text, Color dyeColor, boolean isGlowing, Texture signTexture, int signWidth, int signHeight, double x0, double y0, double x1, double y1, double fontSize, int ymargin, int lineHeight) {
     this.dyeColor = dyeColor;
     this.signTexture = signTexture;
+    this.isGlowing = isGlowing;
     int width = (int) Math.ceil(signWidth * fontSize);
     int height = (int) Math.ceil(signHeight * fontSize);
     int ystart = ymargin;
@@ -91,7 +104,7 @@ public class SignTexture extends Texture {
                     if (textItemColor >= 0) {
                       textColor.setPixel(x, y, color.id);
                       textMask.setPixel(x, y, true);
-                    } else {
+                    } else if (dyeColor != null) {
                       textColor.setPixel(x, y, 1);
                     }
                   }
@@ -105,6 +118,28 @@ public class SignTexture extends Texture {
         }
         ystart += lineHeight;
       }
+
+      if (isGlowing) {
+        // add the text outline (textmask=0, textcolor=GLOW_DYE_OUTLINE_COLOR)
+        for (int y = 0; y < textColor.height; y++) {
+          for (int x = 0; x < textColor.width; x++) {
+            if (textMask.getPixel(x, y) || textColor.getPixel(x, y) == GLOW_DYE_COLOR) {
+              continue;
+            }
+            for (int dy = -1; dy <= 1; dy++) {
+              for (int dx = -1; dx <= 1; dx++) {
+                if (dy == 0 && dx == 0) {
+                  continue;
+                }
+                if (x + dx >= 0 && x + dx < textColor.width && y + dy >= 0 && y + dy < textColor.height
+                  && (textMask.getPixel(x + dx, y + dy) || textColor.getPixel(x + dx, y + dy) == GLOW_DYE_COLOR)) {
+                  textColor.setPixel(x, y, GLOW_DYE_OUTLINE_COLOR);
+                }
+              }
+            }
+          }
+        }
+      }
     }
 
     ww = x1 - x0;
@@ -115,17 +150,20 @@ public class SignTexture extends Texture {
 
   @Override
   public float[] getColor(double u, double v) {
-    int x = (int) (u * textColor.width - Ray.EPSILON);
     if (textColor != null) {
+      int x = (int) (u * textColor.width - Ray.EPSILON);
       int y = (int) ((1 - v) * textColor.height - Ray.EPSILON);
       if (textMask != null && textMask.getPixel(x, y)) {
         Color characterColor = Color.get(textColor.getPixel(x, y));
         return characterColor.linearColor;
-      } else if (textColor.getPixel(x, y) == 1) {
-        // we use this for the dye color to not require more memory (color palette only has 16 colors, the dye color is a 17th color)
-        return dyeColor.linearColor;
-      } else {
-        return signTexture.getColor(u * ww + u0, v * hh + v0);
+      } else if (textColor.getPixel(x, y) == GLOW_DYE_COLOR) {
+        if (this.isGlowing) {
+          return dyeColor.getGlowingDyeColor().linearColor;
+        } else {
+          return dyeColor.linearColor;
+        }
+      } else if (textColor.getPixel(x, y) == GLOW_DYE_OUTLINE_COLOR) {
+        return dyeColor.getGlowingOutlineColor().linearColor;
       }
     }
     return signTexture.getColor(u * ww + u0, v * hh + v0);

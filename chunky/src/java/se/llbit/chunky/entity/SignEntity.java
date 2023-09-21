@@ -42,39 +42,56 @@ public class SignEntity extends Entity {
 
   public enum Color {
     // text colors
-    BLACK(0, 0xFF000000),
-    DARK_BLUE(1, 0xFF0000AA),
-    DARK_GREEN(2, 0xFF00AA00),
-    DARK_AQUA(3, 0xFF00AAAA),
-    DARK_RED(4, 0xFFAA0000),
-    DARK_PURPLE(5, 0xFFAA00AA),
-    GOLD(6, 0xFFFFAA00),
-    GRAY(7, 0xFFAAAAAA),
-    DARK_GRAY(8, 0xFF555555),
-    BLUE(9, 0xFF5555FF),
-    GREEN(10, 0xFF55FF55),
-    AQUA(11, 0xFF55FFFF),
-    RED(12, 0xFFFF5555),
-    LIGHT_PURPLE(13, 0xFFFF55FF),
-    YELLOW(14, 0xFFFFFF55),
-    WHITE(15, 0xFFFFFFFF),
+    BLACK(0, 0xFF000000, 1),
+    DARK_BLUE(1, 0xFF0000AA, 1),
+    DARK_GREEN(2, 0xFF00AA00, 1),
+    DARK_AQUA(3, 0xFF00AAAA, 1),
+    DARK_RED(4, 0xFFAA0000, 1),
+    DARK_PURPLE(5, 0xFFAA00AA, 1),
+    GOLD(6, 0xFFFFAA00, 1),
+    GRAY(7, 0xFFAAAAAA, 1),
+    DARK_GRAY(8, 0xFF555555, 1),
+    BLUE(9, 0xFF5555FF, 1),
+    GREEN(10, 0xFF55FF55, 1),
+    AQUA(11, 0xFF55FFFF, 1),
+    RED(12, 0xFFFF5555, 1),
+    LIGHT_PURPLE(13, 0xFFFF55FF, 1),
+    YELLOW(14, 0xFFFFFF55, 1),
+    WHITE(15, 0xFFFFFFFF, 1),
 
     // dyed sign text colors
-    DYE_WHITE(0xFF656565),
-    DYE_ORANGE(0xFF65280C),
-    DYE_MAGENTA(0xFF650065),
-    DYE_LIGHT_BLUE(0xFF3C4B51),
-    DYE_YELLOW(0xFF656500),
-    DYE_LIME(0xFF4B6500),
-    DYE_PINK(0xFF652947),
-    DYE_GRAY(0xFF323232),
-    DYE_LIGHT_GRAY(0xFF535353),
-    DYE_CYAN(0xFF006565),
-    DYE_PURPLE(0xFF3F0C5F),
-    DYE_BLUE(0xFF000065),
-    DYE_BROWN(0xFF361B07),
-    DYE_GREEN(0xFF006500),
-    DYE_RED(0xFF650000);
+    DYE_WHITE(0xFFFFFFFF, 0.4f),
+    DYE_ORANGE(0xFFFF681F, 0.4f),
+    DYE_MAGENTA(0xFFFF00FF, 0.4f),
+    DYE_LIGHT_BLUE(0xFF9AC0CD, 0.4f),
+    DYE_YELLOW(0xFFFFFF00, 0.4f),
+    DYE_LIME(0xFFBFFF00, 0.4f),
+    DYE_PINK(0xFFFF69B4, 0.4f),
+    DYE_GRAY(0xFF808080, 0.4f),
+    DYE_LIGHT_GRAY(0xFFD3D3D3, 0.4f),
+    DYE_CYAN(0xFF00FFFF, 0.4f),
+    DYE_PURPLE(0xFFA020F0, 0.4f),
+    DYE_BLUE(0xFF0000FF, 0.4f),
+    DYE_BROWN(0xFF8B4513, 0.4f),
+    DYE_GREEN(0xFF00FF00, 0.4f),
+    DYE_RED(0xFFFF0000, 0.4f),
+
+    // dyed sign text colors (glowing sign)
+    DYE_GLOWING_WHITE(0xFFFFFFFF),
+    DYE_GLOWING_ORANGE(0xFFFF681F),
+    DYE_GLOWING_MAGENTA(0xFFFF00FF),
+    DYE_GLOWING_LIGHT_BLUE(0xFF9AC0CD),
+    DYE_GLOWING_YELLOW(0xFFFFFF00),
+    DYE_GLOWING_LIME(0xFFBFFF00),
+    DYE_GLOWING_PINK(0xFFFF69B4),
+    DYE_GLOWING_GRAY(0xFF808080),
+    DYE_GLOWING_LIGHT_GRAY(0xFFD3D3D3),
+    DYE_GLOWING_CYAN(0xFF00FFFF),
+    DYE_GLOWING_PURPLE(0xFFA020F0),
+    DYE_GLOWING_BLUE(0xFF0000FF),
+    DYE_GLOWING_BROWN(0xFF8B4513),
+    DYE_GLOWING_GREEN(0xFF00FF00),
+    DYE_GLOWING_RED(0xFFFF0000);
 
     public final int id;
     public final int rgbColor;
@@ -136,12 +153,25 @@ public class SignEntity extends Entity {
     }
 
     Color(int color) {
-      this(-1, color);
+      this(-1, color, 1);
     }
 
-    Color(int id, int color) {
+    Color(int color, float multiplier) {
+      this(-1, color, multiplier);
+    }
+
+    Color(int id, int color, float multiplier) {
       this.id = id;
-      this.rgbColor = color;
+      if (multiplier != 1) {
+        float[] rgb = new float[3];
+        ColorUtil.getRGBComponents(color, rgb);
+        rgb[0] *= multiplier;
+        rgb[1] *= multiplier;
+        rgb[2] *= multiplier;
+        this.rgbColor = ColorUtil.getRGB(rgb);
+      } else {
+        this.rgbColor = color;
+      }
       this.linearColor = new float[4];
       ColorUtil.getRGBAComponentsGammaCorrected(rgbColor, linearColor);
     }
@@ -156,6 +186,51 @@ public class SignEntity extends Entity {
 
     public static Color getFromDyedSign(String color) {
       return dyedTextColorMap.getOrDefault(color, Color.BLACK);
+    }
+
+    public Color getGlowingDyeColor() {
+      switch (this) {
+        case DYE_WHITE:
+          return DYE_GLOWING_WHITE;
+        case DYE_ORANGE:
+          return DYE_GLOWING_ORANGE;
+        case DYE_MAGENTA:
+          return DYE_GLOWING_MAGENTA;
+        case DYE_LIGHT_BLUE:
+          return DYE_GLOWING_LIGHT_BLUE;
+        case DYE_YELLOW:
+          return DYE_GLOWING_YELLOW;
+        case DYE_LIME:
+          return DYE_GLOWING_LIME;
+        case DYE_PINK:
+          return DYE_GLOWING_PINK;
+        case DYE_GRAY:
+          return DYE_GLOWING_GRAY;
+        case DYE_LIGHT_GRAY:
+          return DYE_GLOWING_LIGHT_GRAY;
+        case DYE_CYAN:
+          return DYE_GLOWING_CYAN;
+        case DYE_PURPLE:
+          return DYE_GLOWING_PURPLE;
+        case DYE_BLUE:
+          return DYE_GLOWING_BLUE;
+        case DYE_BROWN:
+          return DYE_GLOWING_BROWN;
+        case DYE_GREEN:
+          return DYE_GLOWING_GREEN;
+        case DYE_RED:
+          return DYE_GLOWING_RED;
+        case BLACK:
+        default:
+          return BLACK;
+      }
+    }
+
+    public Color getGlowingOutlineColor() {
+      if (this == BLACK) {
+        return WHITE;
+      }
+      return this;
     }
   }
 
@@ -242,23 +317,27 @@ public class SignEntity extends Entity {
   private final SignTexture backTexture;
   private final Color frontDye;
   private final Color backDye;
+  private final boolean frontGlowing;
+  private final boolean backGlowing;
   private final Texture texture;
   private final String material;
 
   public SignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
-    this(position, getFrontTextLines(entityTag), getFrontDyeColor(entityTag), getBackTextLines(entityTag), getFrontDyeColor(entityTag), blockData & 0xF, material);
+    this(position, getFrontTextLines(entityTag), getFrontDyeColor(entityTag), getFrontGlowing(entityTag), getBackTextLines(entityTag), getBackDyeColor(entityTag), getBackGlowing(entityTag), blockData & 0xF, material);
   }
 
-  public SignEntity(Vector3 position, JsonArray[] frontText, Color frontDye, JsonArray[] backText, Color backDye, int direction, String material) {
+  public SignEntity(Vector3 position, JsonArray[] frontText, Color frontDye, boolean frontGlowing, JsonArray[] backText, Color backDye, boolean backGlowing, int direction, String material) {
     super(position);
     Texture signTexture = SignEntity.textureFromMaterial(material);
     this.frontText = frontText;
     this.backText = backText;
     this.frontDye = frontDye;
     this.backDye = backDye;
+    this.frontGlowing = frontGlowing;
+    this.backGlowing = backGlowing;
     this.angle = direction;
-    this.frontTexture = frontText != null ? new SignTexture(frontText, frontDye, signTexture, 24, 12, 2 / 64., 18 / 32., 26 / 64., 30 / 32., 4, 1, 10) : null;
-    this.backTexture = backText != null ? new SignTexture(backText, backDye, signTexture, 24, 12, 28 / 64., 18 / 32., 52 / 64., 30 / 32., 4, 1, 10) : null;
+    this.frontTexture = frontText != null ? new SignTexture(frontText, frontDye, frontGlowing, signTexture, 24, 12, 2 / 64., 18 / 32., 26 / 64., 30 / 32., 4, 1, 10) : null;
+    this.backTexture = backText != null ? new SignTexture(backText, backDye, backGlowing, signTexture, 24, 12, 28 / 64., 18 / 32., 52 / 64., 30 / 32., 4, 1, 10) : null;
     this.texture = signTexture;
     this.material = material;
   }
@@ -306,6 +385,18 @@ public class SignEntity extends Entity {
   }
 
   /**
+   * Extracts the front glowing boolean from a sign entity tag.
+   */
+  protected static boolean getFrontGlowing(CompoundTag entityTag) {
+    if (!entityTag.get("front_text").isError()) {
+      return entityTag.get("front_text").get("has_glowing_text").boolValue(false);
+    } else {
+      // < 1.20 sign
+      return entityTag.get("GlowingText").boolValue(false);
+    }
+  }
+
+  /**
    * Extracts the front text lines from a sign entity tag.
    *
    * @return array of text lines.
@@ -332,11 +423,23 @@ public class SignEntity extends Entity {
    * Extracts the back dye color from a sign entity tag.
    */
   protected static Color getBackDyeColor(CompoundTag entityTag) {
-    if (!entityTag.get("front_text").isError()) {
-      return Color.getFromDyedSign(entityTag.get("front_text").get("color").stringValue("black"));
+    if (!entityTag.get("back_text").isError()) {
+      return Color.getFromDyedSign(entityTag.get("back_text").get("color").stringValue("black"));
     } else {
       // < 1.20 sign
       return Color.BLACK;
+    }
+  }
+
+  /**
+   * Extracts the back glowing boolean from a sign entity tag.
+   */
+  protected static boolean getBackGlowing(CompoundTag entityTag) {
+    if (!entityTag.get("back_text").isError()) {
+      return entityTag.get("back_text").get("has_glowing_text").boolValue(false);
+    } else {
+      // < 1.20 sign
+      return false;
     }
   }
 
@@ -447,11 +550,17 @@ public class SignEntity extends Entity {
     json.add("position", position.toJson());
     if (frontText != null) {
       json.add("text", textToJson(frontText));
-      json.add("dye", frontDye.name().replace("DYE_", "").toLowerCase());
+      if (frontDye != null) {
+        json.add("dye", frontDye.name().replace("DYE_", "").toLowerCase());
+      }
+      json.add("glowing", frontGlowing);
     }
     if (backText != null) {
       json.add("backText", textToJson(backText));
-      json.add("backDye", backDye.name().replace("DYE_", "").toLowerCase());
+      if (backDye != null) {
+        json.add("backDye", backDye.name().replace("DYE_", "").toLowerCase());
+      }
+      json.add("backGlowing", backGlowing);
     }
     json.add("direction", angle);
     json.add("material", material);
@@ -474,9 +583,11 @@ public class SignEntity extends Entity {
     }
     int direction = json.get("direction").intValue(0);
     String material = json.get("material").stringValue("oak");
-    Color dye = Color.getFromDyedSign(json.get("dye").stringValue("black"));
-    Color backDye = Color.getFromDyedSign(json.get("backDye").stringValue("black"));
-    return new SignEntity(position, frontText, dye, backText, backDye, direction, material);
+    Color dye = Color.getFromDyedSign(json.get("dye").stringValue(null));
+    boolean glowing = json.get("glowing").boolValue(false);
+    Color backDye = Color.getFromDyedSign(json.get("backDye").stringValue(null));
+    boolean backGlowing = json.get("backGlowing").boolValue(false);
+    return new SignEntity(position, frontText, dye, glowing, backText, backDye, backGlowing, direction, material);
   }
 
   /**

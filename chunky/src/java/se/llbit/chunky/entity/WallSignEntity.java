@@ -109,7 +109,7 @@ public class WallSignEntity extends Entity {
     this.orientation = direction;
     this.text = text;
     this.dye = dye;
-    this.frontTexture = text != null ? new SignTexture(text, dye, signTexture, 24, 12, 2 / 64., 18 / 32., 26 / 64., 30 / 32., 4, 1, 10) : null;
+    this.frontTexture = text != null ? new SignTexture(text, dye, false, signTexture, 24, 12, 2 / 64., 18 / 32., 26 / 64., 30 / 32., 4, 1, 10) : null;
     this.texture = signTexture;
     this.material = material;
   }
@@ -139,7 +139,9 @@ public class WallSignEntity extends Entity {
     json.add("position", position.toJson());
     if (text != null) {
       json.add("text", SignEntity.textToJson(text));
-      json.add("dye", dye.name().replace("DYE_", "").toLowerCase());
+      if (dye != null) {
+        json.add("dye", dye.name().replace("DYE_", "").toLowerCase());
+      }
     }
     json.add("direction", orientation);
     json.add("material", material);
@@ -158,7 +160,7 @@ public class WallSignEntity extends Entity {
     }
     int direction = json.get("direction").intValue(0);
     String material = json.get("material").stringValue("oak");
-    SignEntity.Color dye = SignEntity.Color.getFromDyedSign(json.get("dye").stringValue("balck"));
+    SignEntity.Color dye = SignEntity.Color.getFromDyedSign(json.get("dye").stringValue(null));
     return new WallSignEntity(position, text, dye, direction, material);
   }
 }
