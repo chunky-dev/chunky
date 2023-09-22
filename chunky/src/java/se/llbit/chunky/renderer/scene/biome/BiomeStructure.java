@@ -25,7 +25,7 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
     //TODO: create a plugin api interface for registering implementations, and move this to that
     BiomeStructure.register(new Trivial3dBiomeStructure());
     BiomeStructure.register(new Trivial2dBiomeStructure());
-    BiomeStructure.register(new WorldTexture2dBiomeStructure());
+    BiomeStructure.register(new WorldTexture2dBiomeStructure.Factory());
     BiomeStructure.register(new WorldTexture3dBiomeStructure.Factory());
   }
 

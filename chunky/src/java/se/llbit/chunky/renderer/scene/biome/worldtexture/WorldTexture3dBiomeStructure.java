@@ -18,16 +18,13 @@
 
 package se.llbit.chunky.renderer.scene.biome.worldtexture;
 
-import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
 import se.llbit.util.annotation.NotNull;
 import se.llbit.util.interner.Interner;
 import se.llbit.util.interner.StrongInterner;
-import se.llbit.util.interner.WeakInterner;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -41,9 +38,6 @@ public class WorldTexture3dBiomeStructure implements BiomeStructure {
    */
   private final Long2ObjectOpenHashMap<ChunkTexture3d> map = new Long2ObjectOpenHashMap<>();
 
-  /**
-   * List of live, un-interned chunk textures.
-   */
   private LongOpenHashSet live = null;
   private Interner<ChunkTexture> interner2d = null;
   private Interner<ChunkTexture3d> interner3d = null;
