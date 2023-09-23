@@ -21,10 +21,7 @@ import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.chunk.SimpleChunkData;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
-import se.llbit.chunky.world.Chunk;
-import se.llbit.chunky.world.ChunkPosition;
-import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.World;
+import se.llbit.chunky.world.*;
 import se.llbit.log.Log;
 import se.llbit.util.Mutable;
 
@@ -63,8 +60,8 @@ public class RegionParser extends Thread {
         }
         ChunkView map = mapView.getMapView();
         if (map.isRegionVisible(position)) {
-          World world = mapLoader.getWorld();
-          Region region = world.getRegionWithinRange(position, mapView.getYMin(), mapView.getYMax());
+          Dimension dimension = mapLoader.getWorld().currentDimension();
+          Region region = dimension.getRegionWithinRange(position, mapView.getYMin(), mapView.getYMax());
           region.parse(mapView.getYMin(), mapView.getYMax());
           Mutable<ChunkData> chunkData = new Mutable<>(null);
           for (Chunk chunk : region) {

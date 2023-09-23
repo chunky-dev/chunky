@@ -127,6 +127,21 @@ public class Scene implements JsonSerializable, Refreshable {
   public static final double MAX_EMITTER_INTENSITY = 1000;
 
   /**
+   * Default transmissivity cap.
+   */
+  public static final double DEFAULT_TRANSMISSIVITY_CAP = 1;
+
+  /**
+   * Minimum transmissivity cap.
+   */
+  public static final double MIN_TRANSMISSIVITY_CAP = 1;
+
+  /**
+   * Maximum transmissivity cap.
+   */
+  public static final double MAX_TRANSMISSIVITY_CAP = 3;
+
+  /**
    * Default exposure.
    */
   public static final double DEFAULT_EXPOSURE = 1.0;
@@ -181,6 +196,10 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   protected int sppTarget = PersistentSettings.getSppTargetDefault();
   /**
+   * Branch count for the scene.
+   */
+  protected int branchCount = PersistentSettings.getBranchCountDefault();
+  /**
    * Recursive ray depth limit (not including Russian Roulette).
    */
   protected int rayDepth = PersistentSettings.getRayDepthDefault();
@@ -192,6 +211,8 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean emittersEnabled = DEFAULT_EMITTERS_ENABLED;
   protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
   protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.NONE;
+  protected boolean fancierTranslucency = true;
+  protected double transmissivityCap = DEFAULT_TRANSMISSIVITY_CAP;
 
   protected SunSamplingStrategy sunSamplingStrategy = SunSamplingStrategy.FAST;
 
@@ -250,10 +271,10 @@ public class Scene implements JsonSerializable, Refreshable {
   public Map<String, JsonValue> materials = new HashMap<>();
 
   /** Lower Y clip plane. */
-  public int yClipMin = PersistentSettings.getYClipMin();
+  public int yClipMin = 0;
 
   /** Upper Y clip plane. */
-  public int yClipMax = PersistentSettings.getYClipMax();
+  public int yClipMax = 256;
 
   /**
    * Current time in seconds. Adjusts animated blocks like fire.
@@ -333,6 +354,7 @@ public class Scene implements JsonSerializable, Refreshable {
     width = PersistentSettings.get3DCanvasWidth();
     height = PersistentSettings.get3DCanvasHeight();
     sppTarget = PersistentSettings.getSppTargetDefault();
+    branchCount = PersistentSettings.getBranchCountDefault();
 
     palette = new BlockPalette();
     worldOctree = new Octree(octreeImplementation, 1);
@@ -430,6 +452,8 @@ public class Scene implements JsonSerializable, Refreshable {
     emitterIntensity = other.emitterIntensity;
     emitterSamplingStrategy = other.emitterSamplingStrategy;
     preventNormalEmitterWithSampling = other.preventNormalEmitterWithSampling;
+    fancierTranslucency = other.fancierTranslucency;
+    transmissivityCap = other.transmissivityCap;
     transparentSky = other.transparentSky;
     yClipMin = other.yClipMin;
     yClipMax = other.yClipMax;
@@ -530,7 +554,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       // Load the configured skymap file.
-      sky.loadSkymap();
+      sky.reloadSkymap(context.getSceneDirectory());
 
       loadedWorld = EmptyWorld.INSTANCE;
       if (!worldPath.isEmpty()) {
@@ -756,15 +780,6 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Test if the ray should be killed <strike>(using Russian Roulette)</strike>.
-   *
-   * @return {@code true} if the ray needs to die now
-   */
-  public final boolean kill(int depth, Random random) {
-    return depth >= rayDepth;
-  }
-
-  /**
    * Reload all loaded chunks.
    */
   public synchronized void reloadChunks(TaskTracker taskTracker) {
@@ -798,12 +813,14 @@ public class Scene implements JsonSerializable, Refreshable {
 
     BiomeStructure.Factory biomeStructureFactory = BiomeStructure.get(this.biomeStructureImplementation);
 
+    Dimension dimension = world.currentDimension();
+
     try (TaskTracker.Task task = taskTracker.task("(1/6) Loading regions")) {
       task.update(2, 1);
 
       loadedWorld = world;
       worldPath = loadedWorld.getWorldDirectory().getAbsolutePath();
-      worldDimension = world.currentDimension();
+      worldDimension = world.currentDimensionId();
 
       if (chunksToLoad.isEmpty()) {
         return;
@@ -830,12 +847,12 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       for (ChunkPosition region : regions) {
-        world.getRegion(region).parse(yMin, yMax);
+        dimension.getRegion(region).parse(yMin, yMax);
       }
     }
 
     try (TaskTracker.Task task = taskTracker.task("(2/6) Loading entities")) {
-     entities.loadPlayers(task, world);
+     entities.loadPlayers(task, dimension);
     }
 
     BiomePalette biomePalette = new ArrayBiomePalette();
@@ -860,7 +877,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       ExecutorService executor = Executors.newSingleThreadExecutor();
       Future<?> nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
-        world.getChunk(chunkPositions[0]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
+        dimension.getChunk(chunkPositions[0]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
         return null; // runnable can't throw non-RuntimeExceptions, so we use a callable instead and have to return something
       });
       for (int i = 0; i < chunkPositions.length; i++) {
@@ -892,7 +909,7 @@ public class Scene implements JsonSerializable, Refreshable {
           if (i + 1 < chunkPositions.length) { // schedule next task if possible
             final int finalI = i;
             nextChunkDataTask = executor.submit(() -> { //request chunk data for the next iteration of the loop
-              world.getChunk(chunkPositions[finalI + 1]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
+              dimension.getChunk(chunkPositions[finalI + 1]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
               return null; // runnable can't throw non-RuntimeExceptions, so we use a callable instead and have to return something
             });
           }
@@ -1185,7 +1202,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
         if (!chunkData.isEmpty()){
           nonEmptyChunks.add(cp);
-          if (world.getChunk(cp).getVersion() == ChunkVersion.PRE_FLATTENING) {
+          if (dimension.getChunk(cp).getVersion() == ChunkVersion.PRE_FLATTENING) {
             legacyChunks.add(cp);
           }
         }
@@ -1879,6 +1896,7 @@ public class Scene implements JsonSerializable, Refreshable {
     dumpFrequency = other.dumpFrequency;
     saveSnapshots = other.saveSnapshots;
     sppTarget = other.sppTarget;
+    branchCount = other.branchCount;
     rayDepth = other.rayDepth;
     mode = other.mode;
     outputMode = other.outputMode;
@@ -1901,6 +1919,37 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void setTargetSpp(int value) {
     sppTarget = value;
+  }
+
+  /**
+   * @return The "nominal" value of the branch count.
+   */
+  public int getBranchCount() {
+      return branchCount;
+  }
+
+  /**
+   * Usually the same as getBranchCount, but reduces branch count to 1 for first few SPP.
+   *
+   * @return The current "true" branch count
+   */
+  public int getCurrentBranchCount() {
+    if(spp < branchCount) {
+      if(spp <= Math.sqrt(branchCount)) { // This is arbitrary, but should be a good compromise in most cases
+        return 1;
+      } else {
+        return branchCount - spp;
+      }
+    } else {
+      return branchCount;
+    }
+  }
+
+  /**
+   * @param value Branch count value
+   */
+  public void setBranchCount(int value) {
+    branchCount = value;
   }
 
   /**
@@ -2589,12 +2638,15 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("renderTime", renderTime);
     json.add("spp", spp);
     json.add("sppTarget", sppTarget);
+    json.add("branchCount", branchCount);
     json.add("rayDepth", rayDepth);
     json.add("pathTrace", mode != RenderMode.PREVIEW);
     json.add("dumpFrequency", dumpFrequency);
     json.add("saveSnapshots", saveSnapshots);
     json.add("emittersEnabled", emittersEnabled);
     json.add("emitterIntensity", emitterIntensity);
+    json.add("fancierTranslucency", fancierTranslucency);
+    json.add("transmissivityCap", transmissivityCap);
     json.add("sunSamplingStrategy", sunSamplingStrategy.getId());
     json.add("stillWater", stillWater);
     json.add("waterOpacity", waterOpacity);
@@ -2839,6 +2891,7 @@ public class Scene implements JsonSerializable, Refreshable {
       .getFormat(json.get("outputMode").stringValue(outputMode.getName()))
       .orElse(PictureExportFormats.PNG);
     sppTarget = json.get("sppTarget").intValue(sppTarget);
+    branchCount = json.get("branchCount").intValue(branchCount);
     rayDepth = json.get("rayDepth").intValue(rayDepth);
     if (!json.get("pathTrace").isUnknown()) {
       boolean pathTrace = json.get("pathTrace").boolValue(false);
@@ -2852,6 +2905,8 @@ public class Scene implements JsonSerializable, Refreshable {
     saveSnapshots = json.get("saveSnapshots").boolValue(saveSnapshots);
     emittersEnabled = json.get("emittersEnabled").boolValue(emittersEnabled);
     emitterIntensity = json.get("emitterIntensity").doubleValue(emitterIntensity);
+    fancierTranslucency = json.get("fancierTranslucency").boolValue(fancierTranslucency);
+    transmissivityCap = json.get("transmissivityCap").doubleValue(transmissivityCap);
 
     if (json.get("sunSamplingStrategy").isUnknown()) {
       boolean sunSampling = json.get("sunEnabled").boolValue(false);
@@ -3358,5 +3413,22 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void setHideUnknownBlocks(boolean hideUnknownBlocks) {
     this.hideUnknownBlocks = hideUnknownBlocks;
+  }
+  public boolean getFancierTranslucency() {
+    return fancierTranslucency;
+  }
+
+  public void setFancierTranslucency(boolean value) {
+    fancierTranslucency = value;
+    refresh();
+  }
+
+  public double getTransmissivityCap() {
+    return transmissivityCap;
+  }
+
+  public void setTransmissivityCap(double value) {
+    transmissivityCap = value;
+    refresh();
   }
 }

@@ -36,6 +36,7 @@ import java.util.Random;
 @PluginApi
 public abstract class QuadModel implements BlockModel {
 
+  // For some visualizations, see this PR: https://github.com/chunky-dev/chunky/pull/1603
   public static final Quad FULL_BLOCK_NORTH_SIDE = new Quad(
     new Vector3(1, 0, 0),
     new Vector3(0, 0, 0),

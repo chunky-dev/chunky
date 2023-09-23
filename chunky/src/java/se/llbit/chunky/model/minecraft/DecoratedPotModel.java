@@ -38,7 +38,8 @@ import java.util.LinkedList;
 
 public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
 
-  private static final Vector4 BASE_UV_MAP = new Vector4(0 / 32., 14 / 32., 8 / 32., 22 / 32.);
+  private static final Vector4 TOP_UV_MAP = new Vector4(14 / 32., 28 / 32., 19 / 32., 5 / 32.);
+  private static final Vector4 BOTTOM_UV_MAP = new Vector4(0 / 32., 14 / 32., 5 / 32., 19 / 32.);
   private static final Vector4 SIDE_UV_MAP = new Vector4(1 / 16., 15 / 16., 0., 1.);
 
   private static final Quad NORTH_SIDE = new Quad(
@@ -65,12 +66,12 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
     new Vector3(1 / 16., 1, 15 / 16.),
     new Vector3(15 / 16., 1, 15 / 16.),
     new Vector3(1 / 16., 1, 1 / 16.),
-    BASE_UV_MAP);
+    TOP_UV_MAP);
   private static final Quad BOTTOM_SIDE = new Quad(
     new Vector3(1 / 16., 0, 1 / 16.),
     new Vector3(15 / 16., 0, 1 / 16.),
     new Vector3(1 / 16., 0, 15 / 16.),
-    BASE_UV_MAP);
+    BOTTOM_UV_MAP);
 
   private static final Quad[] DEFAULT_QUADS = {
     NORTH_SIDE, SOUTH_SIDE,
@@ -81,31 +82,59 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
   public static class DecoratedPotSpoutEntity extends Entity {
 
     private static final Quad[] QUADS = {
+      // top section
+      new Quad( // north
+        new Vector3(12 / 16., 17 / 16., 4 / 16.),
+        new Vector3(4 / 16., 17 / 16., 4 / 16.),
+        new Vector3(12 / 16., 20 / 16., 4 / 16.),
+        new Vector4(24 / 32., 32 / 32., 21 / 32., 24 / 32.)),
+      new Quad( // south
+        new Vector3(4 / 16., 17 / 16., 12 / 16.),
+        new Vector3(12 / 16., 17 / 16., 12 / 16.),
+        new Vector3(4 / 16., 20 / 16., 12 / 16.),
+        new Vector4(8 / 32., 16 / 32., 21 / 32., 24 / 32.)),
+      new Quad( // west
+        new Vector3(4 / 16., 17 / 16., 4 / 16.),
+        new Vector3(4 / 16., 17 / 16., 12 / 16.),
+        new Vector3(4 / 16., 20 / 16., 4 / 16.),
+        new Vector4(0 / 32., 8 / 32., 21 / 32., 24 / 32.)),
+      new Quad( // east
+        new Vector3(12 / 16., 17 / 16., 12 / 16.),
+        new Vector3(12 / 16., 17 / 16., 4 / 16.),
+        new Vector3(12 / 16., 20 / 16., 12 / 16.),
+        new Vector4(16 / 32., 24 / 32., 21 / 32., 24 / 32.)),
+      new Quad( // top
+        new Vector3(4 / 16., 20 / 16., 12 / 16.),
+        new Vector3(12 / 16., 20 / 16., 12 / 16.),
+        new Vector3(4 / 16., 20 / 16., 4 / 16.),
+        new Vector4(8 / 32., 16 / 32., 24 / 32., 32 / 32.)),
+      new Quad( // bottom
+        new Vector3(4 / 16., 17 / 16., 4 / 16.),
+        new Vector3(12 / 16., 17 / 16., 4 / 16.),
+        new Vector3(4 / 16., 17 / 16., 12 / 16.),
+        new Vector4(16 / 32., 24 / 32., 32 / 32., 24 / 32.)),
+
+      // throat
       new Quad( // north
         new Vector3(11 / 16., 1, 5 / 16.),
         new Vector3(5 / 16., 1, 5 / 16.),
-        new Vector3(11 / 16., 20 / 16., 5 / 16.),
-        new Vector4(18 / 32., 24 / 32., 22 / 32., 26 / 32.)),
+        new Vector3(11 / 16., 17 / 16., 5 / 16.),
+        new Vector4(18 / 32., 24 / 32., 20 / 32., 21 / 32.)),
       new Quad( // south
         new Vector3(5 / 16., 1, 11 / 16.),
         new Vector3(11 / 16., 1, 11 / 16.),
-        new Vector3(5 / 16., 20 / 16., 11 / 16.),
-        new Vector4(6 / 32., 12 / 32., 22 / 32., 26 / 32.)),
+        new Vector3(5 / 16., 17 / 16., 11 / 16.),
+        new Vector4(6 / 32., 12 / 32., 20 / 32., 21 / 32.)),
       new Quad( // west
         new Vector3(5 / 16., 1, 5 / 16.),
         new Vector3(5 / 16., 1, 11 / 16.),
-        new Vector3(5 / 16., 20 / 16., 5 / 16.),
-        new Vector4(0 / 32., 6 / 32., 22 / 32., 26 / 32.)),
+        new Vector3(5 / 16., 17 / 16., 5 / 16.),
+        new Vector4(0 / 32., 6 / 32., 20 / 32., 21 / 32.)),
       new Quad( // east
         new Vector3(11 / 16., 1, 11 / 16.),
         new Vector3(11 / 16., 1, 5 / 16.),
-        new Vector3(11 / 16., 20 / 16., 11 / 16.),
-        new Vector4(12 / 32., 18 / 32., 22 / 32., 26 / 32.)),
-      new Quad( // top
-        new Vector3(5 / 16., 20 / 16., 11 / 16.),
-        new Vector3(11 / 16., 20 / 16., 11 / 16.),
-        new Vector3(5 / 16., 20 / 16., 5 / 16.),
-        new Vector4(6 / 32., 12 / 32., 26 / 32., 32 / 32.)),
+        new Vector3(11 / 16., 17 / 16., 11 / 16.),
+        new Vector4(12 / 32., 18 / 32., 20 / 32., 21 / 32.)),
     };
 
     private final Material material = new TextureMaterial(Texture.decoratedPotBase);

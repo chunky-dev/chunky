@@ -100,10 +100,12 @@ public class Quad {
 
   /**
    * Create a new single sided quad
+   * <br>
+   * For some visualizations, see this PR: <a href="https://github.com/chunky-dev/chunky/pull/1603">#1603</a>
    *
    * @param v0 Bottom left vector
-   * @param v1 Top right vector
-   * @param v2 Bottom right vector
+   * @param v1 Bottom right vector
+   * @param v2 Top left vector
    * @param uv Minimum and maximum U/V texture coordinates (x0,y0 bottom left)
    */
   public Quad(Vector3 v0, Vector3 v1, Vector3 v2, Vector4 uv) {
@@ -113,10 +115,12 @@ public class Quad {
 
   /**
    * Create new quad
+   * <br>
+   * For some visualizations, see this PR: <a href="https://github.com/chunky-dev/chunky/pull/1603">#1603</a>
    *
    * @param v0 Bottom left vector
-   * @param v1 Top right vector
-   * @param v2 Bottom right vector
+   * @param v1 Bottom right vector
+   * @param v2 Top left vector
    * @param uv Minimum and maximum U/V texture coordinates (x0,y0 bottom left)
    * @param doubleSided True to make this quad double-sided
    */
@@ -196,8 +200,7 @@ public class Quad {
     return new Quad(this, transform);
   }
 
-  public void addTriangles(Collection<Primitive> primitives, Material material,
-      Transform transform) {
+  public void addTriangles(Collection<Primitive> primitives, Material material, Transform transform) {
     Vector3 c0 = new Vector3(o);
     Vector3 c1 = new Vector3();
     Vector3 c2 = new Vector3();

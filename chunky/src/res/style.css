@@ -31,6 +31,12 @@ Label {
     -fx-text-fill: #faebd7;
 }
 
+Label.group-label {
+    -fx-text-fill: #faebd7;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
 Text {
     -fx-fill: #faebd7;
 }

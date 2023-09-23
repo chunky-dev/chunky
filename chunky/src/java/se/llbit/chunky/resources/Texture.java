@@ -1305,6 +1305,40 @@ public class Texture {
   public static final Texture pitcherCropTopStage3 = new Texture();
   @TexturePath("assets/minecraft/textures/block/pitcher_crop_top_stage_4")
   public static final Texture pitcherCropTopStage4 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pitcher_crop_top")
+  public static final Texture pitcherCropTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pitcher_crop_side")
+  public static final Texture pitcherCropSide = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pitcher_crop_bottom")
+  public static final Texture pitcherCropBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/calibrated_sculk_sensor_amethyst")
+  public static final Texture calibratedSculkSensorAmethyst = new Texture();
+  @TexturePath("assets/minecraft/textures/block/calibrated_sculk_sensor_top")
+  public static final Texture calibratedSculkSensorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/calibrated_sculk_sensor_input_side")
+  public static final Texture calibratedSculkSensorInputSide = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/oak")
+  public static final Texture oakHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/spruce")
+  public static final Texture spruceHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/birch")
+  public static final Texture birchHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/jungle")
+  public static final Texture jungleHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/acacia")
+  public static final Texture acaciaHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/dark_oak")
+  public static final Texture darkOakHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/crimson")
+  public static final Texture crimsonHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/warped")
+  public static final Texture warpedHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/mangrove")
+  public static final Texture mangroveHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/bamboo")
+  public static final Texture bambooHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/cherry")
+  public static final Texture cherryHangingSign = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

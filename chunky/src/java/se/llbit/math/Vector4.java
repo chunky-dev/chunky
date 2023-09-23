@@ -39,6 +39,8 @@ public class Vector4 {
     this(v.x, v.y, v.z, v.w);
   }
 
+  public Vector4(Vector3 v, double w) { this(v.x, v.y, v.z, w); }
+
   public Vector4(double i, double j, double k, double l) {
     x = i;
     y = j;
@@ -87,6 +89,16 @@ public class Vector4 {
   }
 
   /**
+   * Add a to this vector.
+   */
+  public final void add(Vector4 a) {
+    x += a.x;
+    y += a.y;
+    z += a.z;
+    w += a.w;
+  }
+
+  /**
    * Scale and add argument the vector.
    */
   public void scaleAdd(double s, Vector4 v) {
@@ -96,7 +108,25 @@ public class Vector4 {
     w += s * v.w;
   }
 
+  /**
+   * Set this vector equal to the entrywise product of a and b.
+   */
+  public final void multiplyEntrywise(Vector4 a, Vector4 b) {
+    x = a.x * b.x;
+    y = a.y * b.y;
+    z = a.z * b.z;
+    w = a.w * b.w;
+  }
+
+  /**
+   * Return a Vector3 by removing the 4th entry.
+   */
+  public final Vector3 toVec3() {
+    return new Vector3(x, y, z);
+  }
+
   @Override public String toString() {
     return String.format("(%.2f, %.2f, %.2f, %.2f)", x, y, z, w);
   }
+
 }

@@ -22,7 +22,7 @@ import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.World;
+import se.llbit.chunky.world.Dimension;
 
 /**
  * Monitors filesystem for changes to region files.
@@ -38,24 +38,24 @@ public class MCRegionChangeWatcher extends RegionChangeWatcher {
     try {
       while (!isInterrupted()) {
         sleep(3000);
-        World world = mapLoader.getWorld();
-        if (world.reloadPlayerData()) {
+        Dimension dimension = mapLoader.getWorld().currentDimension();
+        if (dimension.reloadPlayerData()) {
           if (PersistentSettings.getFollowPlayer()) {
-            Platform.runLater(() -> world.playerPos().ifPresent(mapView::panTo));
+            Platform.runLater(() -> dimension.getPlayerPos().ifPresent(mapView::panTo));
           }
         }
         ChunkView theView = view;
         for (int rx = theView.prx0; rx <= theView.prx1; ++rx) {
           for (int rz = theView.prz0; rz <= theView.prz1; ++rz) {
             ChunkPosition pos = new ChunkPosition(rx, rz);
-            Region region = world.getRegion(pos);
+            Region region = dimension.getRegionWithinRange(pos, theView.yMin, theView.yMax);
             if (region.isEmpty()) {
-              if (world.regionExists(pos)) {
-                region = world.createRegion(pos);
+              if (dimension.regionExistsWithinRange(pos, theView.yMin, theView.yMax)) {
+                region = dimension.createRegion(pos);
               }
-              world.setRegion(pos, region);
+              dimension.setRegion(pos, region);
               region.parse(theView.yMin, theView.yMax);
-              world.regionDiscovered(pos);
+              dimension.regionDiscovered(pos);
               mapLoader.regionUpdated(pos);
             } else if (region.hasChanged()) {
               region.parse(theView.yMin, theView.yMax);
