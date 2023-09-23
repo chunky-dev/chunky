@@ -1,6 +1,6 @@
 package se.llbit.chunky.entity;
 
-import se.llbit.chunky.block.WallHangingSign;
+import se.llbit.chunky.block.minecraft.WallHangingSign;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;
 import se.llbit.chunky.resources.Texture;
