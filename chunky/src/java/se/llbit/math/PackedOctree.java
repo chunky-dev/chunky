@@ -17,11 +17,8 @@
 package se.llbit.math;
 
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
-import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
-import org.apache.commons.math3.util.Pair;
-import se.llbit.chunky.block.UnknownBlock;
+import se.llbit.chunky.block.minecraft.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.world.Material;
 
 import java.io.DataInputStream;
