@@ -873,7 +873,7 @@ public class Sky implements JsonSerializable {
   private Texture loadSkyTexture(String fileName, Texture prevTexture, @Nullable File sceneDirectory) {
     String resolvedFilename = sceneDirectory == null
       ? fileName
-      : Paths.get(sceneDirectory.getAbsolutePath(), fileName).toAbsolutePath().toString();
+      : Paths.get(sceneDirectory.getAbsolutePath()).resolve(fileName).toAbsolutePath().toString();
     File textureFile = new File(resolvedFilename);
     if (textureFile.exists()) {
       try {
