@@ -1,10 +1,17 @@
 package se.llbit.chunky.renderer.scene;
 
 public final class FogLayer {
+  public static final double DEFAULT_Y = 62;
+  public static final double DEFAULT_BREADTH = 5;
+  public static final double DEFAULT_DENSITY = 1;
   public double yMin, y, yWithOrigin, breadth, breadthInv, density;
 
   public FogLayer(double y, double breadth, double density, Scene scene) {
     this(y, breadth, density, scene.yMin);
+  }
+
+  public FogLayer(Scene scene) {
+    this(DEFAULT_Y, DEFAULT_BREADTH, DEFAULT_DENSITY, scene.yMin);
   }
 
   private FogLayer(double y, double breadth, double density, double yMin) {
