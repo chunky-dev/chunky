@@ -23,4 +23,5 @@
     <LuxColorPicker fx:id="fogColor" />
   </HBox>
   <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="350" text="Hint: Set fog density &gt; 0.1 for thick fog, and &lt; 0.1 for haze effect." />
+  <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="350" text="Note: The 'Fog Color' control affects the color of all fog layers." />
 </fx:root>
