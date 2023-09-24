@@ -935,7 +935,11 @@ public class Scene implements JsonSerializable, Refreshable {
 
         if (use3dBiomes) {
           biomeBlendingHelper.put(cp, chunkBiomeHelper);
-          for (int y = chunkData.minY(); y < chunkData.maxY(); y++) {
+          // We need to load biome data for the full height of the chunk
+          // and not only limited to the sections where there are blocks
+          // because it is possible that a neighboring chunks has blocks
+          // that will observe the biome color (via biome blending)
+          for (int y = yMin; y < yMax; y++) {
             for (int cz = 0; cz < 16; ++cz) {
               int wz = cz + wz0;
               for (int cx = 0; cx < 16; ++cx) {
@@ -1233,7 +1237,7 @@ public class Scene implements JsonSerializable, Refreshable {
       int done = 0;
       int target = nonEmptyChunks.size();
 
-      final int blurRadius = 1;
+      final int blurRadius = 5;
 
       for (ChunkPosition cp : nonEmptyChunks) {
 //        TODO: make this less special cased in some way, having 2 ifs for biomeBlending and use3dBiomes is quite awful to read and maintain
@@ -1299,6 +1303,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   grassTexture,
                   foliageTexture,
                   waterTexture);
+                nextY = transition - blurRadius;
               }
 
               // Do a 3D blur to fill the next 2*blurRadius layers
