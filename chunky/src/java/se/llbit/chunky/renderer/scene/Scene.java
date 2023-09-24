@@ -228,7 +228,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected double waterPlaneHeight = World.SEA_LEVEL;
   protected boolean waterPlaneOffsetEnabled = true;
   protected boolean waterPlaneChunkClip = true;
-  protected WaterShader waterShading = new LegacyWaterShader();
+  protected WaterShader waterShading = new SimplexWaterShader();
 
   public final Fog fog = new Fog(this);
 
@@ -2940,14 +2940,14 @@ public class Scene implements JsonSerializable, Refreshable {
       waterColor.y = colorObj.get("green").doubleValue(waterColor.y);
       waterColor.z = colorObj.get("blue").doubleValue(waterColor.z);
     }
-    String waterShader = json.get("waterShader").stringValue("LEGACY");
+    String waterShader = json.get("waterShader").stringValue("SIMPLEX");
     if(waterShader.equals("LEGACY"))
       waterShading = new LegacyWaterShader();
     else if(waterShader.equals("SIMPLEX"))
       waterShading = new SimplexWaterShader();
     else {
-      Log.infof("Unknown water shader %s, using LEGACY", waterShader);
-      waterShading = new LegacyWaterShader();
+      Log.infof("Unknown water shader %s, using SIMPLEX", waterShader);
+      waterShading = new SimplexWaterShader();
     }
     waterShading.load(json);
     biomeColors = json.get("biomeColorsEnabled").boolValue(biomeColors);
