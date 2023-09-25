@@ -20,14 +20,15 @@ import se.llbit.chunky.entity.SignEntity.Color;
 import se.llbit.chunky.resources.texturepack.FontTexture.Glyph;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
-import se.llbit.math.ColorUtil;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector4;
+import se.llbit.util.annotation.Nullable;
 
 public class SignTexture extends Texture {
   private final double hh, ww, u0, v0;
   private final Texture signTexture;
+  @Nullable
   private final PalettizedBitmapImage textColor;
+  @Nullable
   private final BinaryBitmapImage textMask;
 
   static private boolean hasVisibleCharacter(JsonArray line) {
@@ -107,13 +108,14 @@ public class SignTexture extends Texture {
 
   @Override
   public float[] getColor(double u, double v) {
-    int x = (int) (u * textColor.width - Ray.EPSILON);
-    int y = (int) ((1 - v) * textColor.height - Ray.EPSILON);
-    if (textMask != null && textMask.getPixel(x, y)) {
-      Color characterColor = Color.get(textColor.getPixel(x, y));
-      return characterColor.linearColor;
-    } else {
-      return signTexture.getColor(u * ww + u0, v * hh + v0);
+    if (textColor != null) {
+      int x = (int) (u * textColor.width - Ray.EPSILON);
+      int y = (int) ((1 - v) * textColor.height - Ray.EPSILON);
+      if (textMask != null && textMask.getPixel(x, y)) {
+        Color characterColor = Color.get(textColor.getPixel(x, y));
+        return characterColor.linearColor;
+      }
     }
+    return signTexture.getColor(u * ww + u0, v * hh + v0);
   }
 }
