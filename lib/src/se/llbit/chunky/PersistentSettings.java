@@ -356,13 +356,18 @@ public final class PersistentSettings {
     save();
   }
 
-  public static void setStillWater(boolean value) {
-    settings.setBool("stillWater", value);
+  public static boolean getStillWater() {
+    return settings.getBool("stillWater", false);
+  }
+
+  public static void setWaterShadingStrategy(String waterShadingStrategy) {
+    settings.setString("waterShadingStrategy", waterShadingStrategy);
     save();
   }
 
-  public static boolean getStillWater() {
-    return settings.getBool("stillWater", false);
+  public static String getWaterShadingStrategy() {
+    String defaultValue = getStillWater() ? "STILL" : "SIMPLEX";
+    return settings.getString("waterShadingStrategy", defaultValue);
   }
 
   public static void setWaterOpacity(double value) {
