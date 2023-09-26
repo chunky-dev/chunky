@@ -39,7 +39,7 @@ public class ChunkBiomeBlendingHelper {
 
   public int[] combineAndTrimTransitions(ChunkBiomeBlendingHelper[] neighboringChunks, int blurRadius) {
     // merge sorted arrays and deduplication
-    // Simple implementation for, new probably enough even later
+    // Simple implementation for now, probably enough even later
     IntSortedSet set = new IntRBTreeSet();
     if(transitions != null) {
       for(int y : transitions) {

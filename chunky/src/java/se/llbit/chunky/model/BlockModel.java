@@ -18,4 +18,6 @@ public interface BlockModel {
   void sample(int face, Vector3 loc, Random rand);
 
   double faceSurfaceArea(int face);
+
+  boolean useBiomeTint();
 }

@@ -945,7 +945,7 @@ public class Scene implements JsonSerializable, Refreshable {
               for (int cx = 0; cx < 16; ++cx) {
                 int wx = cx + wx0;
                 int biomePaletteIdx = biomeData.getBiome(cx, y, cz);
-                if(y != chunkData.minY()) {
+                if(y != yMin) {
                   int biomeUnder = biomeData.getBiome(cx, y-1, cz);
                   if(biomeUnder != biomePaletteIdx)
                     chunkBiomeHelper.addTransition(y);
@@ -1001,9 +1001,8 @@ public class Scene implements JsonSerializable, Refreshable {
                   int octNode = currentBlock;
                   Block block = palette.get(currentBlock);
 
-                  // TODO Implement isUsingBiome() and uncomment if
-                  //if(block.isUsingBiome())
-                  chunkBiomeHelper.makeBiomeRelevant(y);
+                  if(block.useBiomeTint())
+                    chunkBiomeHelper.makeBiomeRelevant(y);
 
                   if(block.isEntity()) {
                     Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
@@ -1260,7 +1259,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
             int[] combinedBiomeTransitions = chunkBiomeHelper.combineAndTrimTransitions(neighboringChunks, blurRadius);
 
-            System.out.printf("Chunk %d, %d :", cp.x, cp.z);
+            System.out.printf("Chunk %d, %d (from %d to %d) :", cp.x, cp.z, chunkBiomeHelper.getyMinBiomeRelevant(), chunkBiomeHelper.getyMaxBiomeRelevant());
             for(int t : combinedBiomeTransitions)
               System.out.printf("%d, ", t);
             System.out.print("\n");

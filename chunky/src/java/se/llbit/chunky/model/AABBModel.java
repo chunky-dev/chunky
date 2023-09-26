@@ -9,6 +9,7 @@ import se.llbit.math.Vector3;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -180,5 +181,17 @@ public abstract class AABBModel implements BlockModel {
       return true;
     }
     return false;
+  }
+
+  @Override
+  public boolean useBiomeTint() {
+    Tint[][] tints = getTints();
+    if(tints == null)
+      return false;
+
+    return Arrays.stream(tints)
+      .filter(Objects::nonNull)
+      .flatMap(Arrays::stream)
+      .anyMatch(Tint::isBiomeTint);
   }
 }

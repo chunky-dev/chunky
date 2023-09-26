@@ -83,4 +83,9 @@ public class LegacyFlowerPot extends UnfinalizedLegacyBlock {
 
     return tag; // keep empty
   }
+
+  @Override
+  public boolean useBiomeTint() {
+    return true; // (in reality it is only used for fern)
+  }
 }
