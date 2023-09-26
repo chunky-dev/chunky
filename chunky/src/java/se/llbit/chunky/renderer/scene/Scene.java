@@ -228,6 +228,11 @@ public class Scene implements JsonSerializable, Refreshable {
   protected double waterPlaneHeight = World.SEA_LEVEL;
   protected boolean waterPlaneOffsetEnabled = true;
   protected boolean waterPlaneChunkClip = true;
+
+  protected boolean groundPlaneEnabled = false;
+  protected double groundPlaneHeight = 0;
+  protected boolean groundPlaneChunkClip = true;
+
   protected WaterShader waterShading = new SimplexWaterShader();
 
   public final Fog fog = new Fog(this);
@@ -466,6 +471,11 @@ public class Scene implements JsonSerializable, Refreshable {
     waterPlaneHeight = other.waterPlaneHeight;
     waterPlaneOffsetEnabled = other.waterPlaneOffsetEnabled;
     waterPlaneChunkClip = other.waterPlaneChunkClip;
+
+    groundPlaneEnabled = other.groundPlaneEnabled;
+    groundPlaneHeight = other.groundPlaneHeight;
+    groundPlaneChunkClip = other.groundPlaneChunkClip;
+
     waterShading = other.waterShading.clone();
 
     hideUnknownBlocks = other.hideUnknownBlocks;
@@ -1859,6 +1869,39 @@ public class Scene implements JsonSerializable, Refreshable {
     return waterPlaneChunkClip;
   }
 
+  public void setGroundPlaneEnabled(boolean enabled) {
+    if (enabled != groundPlaneEnabled) {
+      groundPlaneEnabled = enabled;
+      refresh();
+    }
+  }
+
+  public boolean isGroundPlaneEnabled() {
+    return groundPlaneEnabled;
+  }
+
+  public void setGroundPlaneHeight(double height) {
+    if (height != groundPlaneHeight) {
+      groundPlaneHeight = height;
+      refresh();
+    }
+  }
+
+  public double getGroundPlaneHeight() {
+    return groundPlaneHeight;
+  }
+
+  public void setGroundPlaneChunkClip(boolean enabled) {
+    if (enabled != groundPlaneChunkClip) {
+      groundPlaneChunkClip = enabled;
+      refresh();
+    }
+  }
+
+  public boolean getGroundPlaneChunkClip() {
+    return groundPlaneChunkClip;
+  }
+
   /**
    * @return the dumpFrequency
    */
@@ -2663,10 +2706,16 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("fog", fog.toJson());
     json.add("biomeColorsEnabled", biomeColors);
     json.add("transparentSky", transparentSky);
+
     json.add("waterWorldEnabled", waterPlaneEnabled);
     json.add("waterWorldHeight", waterPlaneHeight);
     json.add("waterWorldHeightOffsetEnabled", waterPlaneOffsetEnabled);
     json.add("waterWorldClipEnabled", waterPlaneChunkClip);
+
+    json.add("groundPlaneEnabled", groundPlaneEnabled);
+    json.add("groundPlaneHeight", groundPlaneHeight);
+    json.add("groundPlaneClipEnabled", groundPlaneChunkClip);
+
     json.add("hideUnknownBlocks", hideUnknownBlocks);
 
     if (!worldPath.isEmpty()) {
@@ -2971,6 +3020,10 @@ public class Scene implements JsonSerializable, Refreshable {
         .boolValue(waterPlaneOffsetEnabled);
       waterPlaneChunkClip = json.get("waterWorldClipEnabled").boolValue(waterPlaneChunkClip);
     }
+
+    groundPlaneEnabled = json.get("groundPlaneEnabled").boolValue(groundPlaneEnabled);
+    groundPlaneHeight = json.get("groundPlaneHeight").doubleValue(groundPlaneHeight);
+    groundPlaneChunkClip = json.get("groundPlaneClipEnabled").boolValue(groundPlaneChunkClip);
 
     hideUnknownBlocks = json.get("hideUnknownBlocks").boolValue(hideUnknownBlocks);
     materials = json.get("materials").object().copy().toMap();

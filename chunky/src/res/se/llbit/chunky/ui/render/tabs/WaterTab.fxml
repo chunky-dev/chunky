@@ -23,6 +23,7 @@
     </HBox>
     <Button fx:id="saveDefaults" mnemonicParsing="false" text="Save as defaults" />
     <Separator prefWidth="200.0" />
+
     <CheckBox fx:id="waterPlaneEnabled" mnemonicParsing="false" text="Water world mode" />
     <TitledPane fx:id="waterWorldModeDetailsPane" animated="false" text="Water world mode settings">
       <VBox spacing="10.0">
@@ -34,6 +35,19 @@
         <CheckBox fx:id="waterPlaneClip" mnemonicParsing="false" text="Hide the water plane in loaded chunks" />
       </VBox>
     </TitledPane>
+
+    <CheckBox fx:id="groundPlaneEnabled" mnemonicParsing="false" text="Ground plane" />
+    <TitledPane fx:id="groundPlaneDetailsPane" animated="false" text="Ground plane settings">
+      <VBox spacing="10.0">
+        <padding>
+          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </padding>
+
+        <DoubleAdjuster fx:id="groundPlaneHeight" />
+        <CheckBox fx:id="groundPlaneClip" mnemonicParsing="false" text="Hide the ground plane in loaded chunks" />
+      </VBox>
+    </TitledPane>
+
     <CheckBox fx:id="useProceduralWater" mnemonicParsing="false" text="Procedural water" />
     <TitledPane fx:id="proceduralWaterDetailsPane" animated="false" text="Procedural water settings">
       <VBox spacing="10.0">

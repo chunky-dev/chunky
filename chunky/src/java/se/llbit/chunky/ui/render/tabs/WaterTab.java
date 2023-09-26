@@ -52,11 +52,18 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @FXML private CheckBox useCustomWaterColor;
   @FXML private LuxColorPicker waterColor;
   @FXML private Button saveDefaults;
+
   @FXML private CheckBox waterPlaneEnabled;
   @FXML private DoubleAdjuster waterPlaneHeight;
   @FXML private CheckBox waterPlaneOffsetEnabled;
   @FXML private CheckBox waterPlaneClip;
   @FXML private TitledPane waterWorldModeDetailsPane;
+
+  @FXML private CheckBox groundPlaneEnabled;
+  @FXML private DoubleAdjuster groundPlaneHeight;
+  @FXML private CheckBox groundPlaneClip;
+  @FXML private TitledPane groundPlaneDetailsPane;
+
   @FXML private CheckBox useProceduralWater;
   @FXML private IntegerAdjuster proceduralWaterIterations;
   @FXML private DoubleAdjuster proceduralWaterFrequency;
@@ -103,6 +110,11 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterPlaneHeight.set(scene.getWaterPlaneHeight());
     waterPlaneOffsetEnabled.setSelected(scene.isWaterPlaneOffsetEnabled());
     waterPlaneClip.setSelected(scene.getWaterPlaneChunkClip());
+
+    groundPlaneEnabled.setSelected(scene.isGroundPlaneEnabled());
+    groundPlaneHeight.setRange(scene.yClipMin, scene.yClipMax);
+    groundPlaneHeight.set(scene.getGroundPlaneHeight());
+    groundPlaneClip.setSelected(scene.getGroundPlaneChunkClip());
 
     if(scene.getWaterShading() instanceof SimplexWaterShader) {
       useProceduralWater.setSelected(true);
@@ -193,6 +205,26 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
 
     waterPlaneClip.selectedProperty().addListener((observable, oldValue, newValue) ->
       scene.setWaterPlaneChunkClip(newValue)
+    );
+
+    groundPlaneDetailsPane.setVisible(groundPlaneEnabled.isSelected());
+    groundPlaneDetailsPane.setExpanded(groundPlaneEnabled.isSelected());
+    groundPlaneDetailsPane.setManaged(groundPlaneEnabled.isSelected());
+
+    groundPlaneEnabled.setTooltip(new Tooltip("If enabled, an infinite ground fills the scene."));
+    groundPlaneEnabled.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.setGroundPlaneEnabled(newValue);
+      groundPlaneDetailsPane.setVisible(newValue);
+      groundPlaneDetailsPane.setExpanded(newValue);
+      groundPlaneDetailsPane.setManaged(newValue);
+    });
+
+    groundPlaneHeight.setName("Ground height");
+    groundPlaneHeight.setTooltip("The default ground height is at y=0.");
+    groundPlaneHeight.onValueChange(value -> scene.setGroundPlaneHeight(value));
+
+    groundPlaneClip.selectedProperty().addListener((observable, oldValue, newValue) ->
+      scene.setGroundPlaneChunkClip(newValue)
     );
 
     proceduralWaterDetailsPane.setVisible(useProceduralWater.isSelected());

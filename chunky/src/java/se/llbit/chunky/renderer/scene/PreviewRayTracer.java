@@ -95,7 +95,9 @@ public class PreviewRayTracer implements RayTracer {
     if (scene.isWaterPlaneEnabled()) {
       hit = waterPlaneIntersection(scene, ray) || hit;
     }
-    hit |= groundPlaneIntersection(scene, ray);
+    if (scene.isGroundPlaneEnabled()) {
+      hit |= groundPlaneIntersection(scene, ray);
+    }
     if (scene.intersect(ray)) {
       // Octree tracer handles updating distance.
       return true;
@@ -141,8 +143,8 @@ public class PreviewRayTracer implements RayTracer {
   }
 
   private static boolean groundPlaneIntersection(Scene scene, Ray ray) {
-    double t = (scene.getYClipMin() - ray.o.y - scene.origin.y) / ray.d.y;
-    if (scene.getWaterPlaneChunkClip()) {
+    double t = (scene.getGroundPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
+    if (scene.getGroundPlaneChunkClip()) {
       Vector3 pos = new Vector3(ray.o);
       pos.scaleAdd(t, ray.d);
       if (scene.isChunkLoaded((int)Math.floor(pos.x), (int)Math.floor(pos.y), (int)Math.floor(pos.z)))
