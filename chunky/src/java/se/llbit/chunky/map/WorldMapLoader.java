@@ -80,7 +80,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
         updateRegionChangeWatcher(newWorld.currentDimension());
 
         File newWorldDir = world.getWorldDirectory();
-        if (newWorldDir != null) {
+        if (newWorldDir != null && !newWorldDir.equals(PersistentSettings.getLastWorld())) {
           PersistentSettings.setLastWorld(newWorldDir);
         }
       }

@@ -109,10 +109,12 @@ public final class PersistentSettings {
 
   private static void migrateOldSettings() {
     String lastTexturePack = settings.getString("lastTexturePack", null);
-    if(lastTexturePack != null) {
-      setLastTexturePack(lastTexturePack);
+    if (lastTexturePack != null) {
+      setEnabledResourcePacks(
+        parseResourcePackPaths(lastTexturePack).toArray(new File[0]), false
+      );
       // TODO: Remove legacy setting in 2.6.0
-//      settings.removeSetting("lastTexturePack");
+      // settings.removeSetting("lastTexturePack");
     }
   }
 
@@ -207,7 +209,6 @@ public final class PersistentSettings {
     setEnabledResourcePacks(
       parseResourcePackPaths(path).toArray(new File[0])
     );
-    save();
   }
 
   /**
@@ -244,14 +245,20 @@ public final class PersistentSettings {
   }
 
   public static void setEnabledResourcePacks(File... enabledTexturePacks) {
+    setEnabledResourcePacks(enabledTexturePacks, true);
+  }
+
+  private static void setEnabledResourcePacks(File[] enabledTexturePacks, boolean save) {
     JsonArray array = new JsonArray(enabledTexturePacks.length);
-    for(File texturePackFile : enabledTexturePacks) {
+    for (File texturePackFile : enabledTexturePacks) {
       array.add(texturePackFile.toString());
     }
     settings.set("enabledResourcePacks", array);
     // TODO: Remove legacy setting in 2.6.0
     settings.setString("lastTexturePack", getLastTexturePack());
-    save();
+    if (save) {
+      PersistentSettings.save();
+    }
   }
 
   public static List<File> getEnabledResourcePacks() {
