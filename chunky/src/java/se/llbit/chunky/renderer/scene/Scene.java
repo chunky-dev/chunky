@@ -1312,6 +1312,8 @@ public class Scene implements JsonSerializable, Refreshable {
               // we will fill the layers y in [7, 12] while working on the first
               // transition and on [13, 14] when working on the second. But the
               // blur will use the correct biome even during the first transition
+              // (that being said, it would probably be more efficient to do only
+              // one call of 3D blur for multiple transition, TODO)
               int maxLayerWorkedOn = Math.min(transition + blurRadius, chunkBiomeHelper.getyMaxBiomeRelevant());
               BiomeBlendingUtility.chunk3DBlur(
                 cp,
