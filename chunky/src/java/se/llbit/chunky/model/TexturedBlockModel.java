@@ -16,7 +16,7 @@
  */
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.QuickMath;

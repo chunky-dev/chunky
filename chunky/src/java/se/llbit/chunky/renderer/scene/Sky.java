@@ -18,7 +18,7 @@
 package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.resources.HDRTexture;
 import se.llbit.chunky.resources.PFMTexture;
 import se.llbit.chunky.resources.Texture;
@@ -873,7 +873,7 @@ public class Sky implements JsonSerializable {
   private Texture loadSkyTexture(String fileName, Texture prevTexture, @Nullable File sceneDirectory) {
     String resolvedFilename = sceneDirectory == null
       ? fileName
-      : Paths.get(sceneDirectory.getAbsolutePath(), fileName).toAbsolutePath().toString();
+      : Paths.get(sceneDirectory.getAbsolutePath()).resolve(fileName).toAbsolutePath().toString();
     File textureFile = new File(resolvedFilename);
     if (textureFile.exists()) {
       try {

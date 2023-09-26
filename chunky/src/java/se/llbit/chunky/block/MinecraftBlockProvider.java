@@ -3,9 +3,12 @@ package se.llbit.chunky.block;
 import java.util.*;
 import java.util.function.BiFunction;
 
+import se.llbit.chunky.block.minecraft.*;
+import se.llbit.chunky.block.minecraft.Comparator;
+import se.llbit.chunky.block.minecraft.Observer;
 import se.llbit.chunky.entity.SkullEntity;
-import se.llbit.chunky.model.FlowerPotModel;
-import se.llbit.chunky.model.FlowerPotModel.Kind;
+import se.llbit.chunky.model.minecraft.FlowerPotModel;
+import se.llbit.chunky.model.minecraft.FlowerPotModel.Kind;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
