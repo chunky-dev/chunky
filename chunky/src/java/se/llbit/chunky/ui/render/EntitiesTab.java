@@ -510,6 +510,11 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         });
         gearField.setText(geared.getGear(slot).get("id").stringValue(""));
         slotBox.getChildren().addAll(new Label(slot + ":"), gearField);
+        // Hide these fields to avoid user confusion because they do not actually work.
+        if (slot.equals("leftHand") || slot.equals("rightHand")) {
+          slotBox.setVisible(false);
+          slotBox.setManaged(false);
+        }
         controls.getChildren().add(slotBox);
       }
     }
