@@ -95,6 +95,7 @@ public class PreviewRayTracer implements RayTracer {
     if (scene.isWaterPlaneEnabled()) {
       hit = waterPlaneIntersection(scene, ray) || hit;
     }
+    hit |= groundPlaneIntersection(scene, ray);
     if (scene.intersect(ray)) {
       // Octree tracer handles updating distance.
       return true;
@@ -135,6 +136,30 @@ public class PreviewRayTracer implements RayTracer {
         ray.setCurrentMaterial(Air.INSTANCE);
         return true;
       }
+    }
+    return false;
+  }
+
+  private static boolean groundPlaneIntersection(Scene scene, Ray ray) {
+    double t = (scene.getYClipMin() - ray.o.y - scene.origin.y) / ray.d.y;
+    if (scene.getWaterPlaneChunkClip()) {
+      Vector3 pos = new Vector3(ray.o);
+      pos.scaleAdd(t, ray.d);
+      if (scene.isChunkLoaded((int)Math.floor(pos.x), (int)Math.floor(pos.y), (int)Math.floor(pos.z)))
+        return false;
+    }
+    if (ray.d.y < 0 && t > 0 && t < ray.t) {
+      double px = ray.o.x + t * ray.d.x;
+      double pz = ray.o.z + t * ray.d.z;
+
+      ray.u = px - Math.floor(px);
+      ray.v = pz - Math.floor(pz);
+
+      ray.t = t;
+      scene.getPalette().stone.getColor(ray);
+      ray.setNormal(0, 1, 0);
+      ray.setCurrentMaterial(scene.getPalette().stone);
+      return true;
     }
     return false;
   }
