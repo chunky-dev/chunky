@@ -20,6 +20,7 @@ import se.llbit.chunky.block.minecraft.Candle;
 import se.llbit.chunky.entity.CalibratedSculkSensorAmethyst;
 import se.llbit.chunky.entity.Campfire;
 import se.llbit.chunky.world.material.CloudMaterial;
+import se.llbit.chunky.world.material.ParticleFogMaterial;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +32,7 @@ public class ExtraMaterials {
 
   static {
     idMap.put("cloud", CloudMaterial.INSTANCE);
+    idMap.put("particle_fog", ParticleFogMaterial.INSTANCE);
     idMap.put("candle_flame", Candle.flameMaterial);
     idMap.put("campfire_flame", Campfire.flameMaterial);
     idMap.put("soul_campfire_flame", Campfire.soulFlameMaterial);
@@ -40,6 +42,7 @@ public class ExtraMaterials {
 
   public static void loadDefaultMaterialProperties() {
     CloudMaterial.INSTANCE.restoreDefaults();
+    ParticleFogMaterial.INSTANCE.restoreDefaults();
 
     Candle.flameMaterial.restoreDefaults();
     Candle.flameMaterial.emittance = 1.0f;

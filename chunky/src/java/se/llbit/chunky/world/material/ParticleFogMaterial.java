@@ -19,10 +19,10 @@ package se.llbit.chunky.world.material;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 
-public class FogMaterial extends Material {
-  public static final FogMaterial INSTANCE = new FogMaterial();
+public class ParticleFogMaterial extends Material {
+  public static final ParticleFogMaterial INSTANCE = new ParticleFogMaterial();
 
-  private FogMaterial() {
-    super("fog", Texture.air);
+  private ParticleFogMaterial() {
+    super("particle_fog", Texture.air);
   }
 }

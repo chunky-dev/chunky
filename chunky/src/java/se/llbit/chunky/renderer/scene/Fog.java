@@ -5,8 +5,9 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.world.material.FogMaterial;
+import se.llbit.chunky.world.material.ParticleFogMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
@@ -100,9 +101,10 @@ public final class Fog implements JsonSerializable {
   }
 
   public boolean intersect(Ray ray) {
+    Random random = ThreadLocalRandom.current();
     // Amount of fog the ray should pass through before being scattered
     // Sampled from an exponential distribution
-    double fogPenetrated = -Math.log(1 - ThreadLocalRandom.current().nextDouble());
+    double fogPenetrated = -Math.log(1 - random.nextDouble());
     double scaleHeight = 20;
     double expHeightDiff = fogPenetrated * ray.d.y / (scaleHeight * uniformDensity);
     double expYfHs = Math.exp(-(ray.o.y + scene.origin.y) / scaleHeight) - expHeightDiff;
@@ -117,9 +119,24 @@ public final class Fog implements JsonSerializable {
       return false;
     }
     ray.t = dist;
-    ray.setNormal(ray.d);
-    ray.invertNormal();
-    ray.setCurrentMaterial(FogMaterial.INSTANCE);
+    // pick a random normal vector based on a spherical particle
+    Vector3 a1 = new Vector3();
+    a1.cross(ray.d, new Vector3(0, 1, 0));
+    a1.normalize();
+    Vector3 a2 = new Vector3();
+    a2.cross(ray.d, a1);
+    // get random point on unit disk
+    double x1 = random.nextDouble();
+    double x2 = random.nextDouble();
+    double r = FastMath.sqrt(x1);
+    double theta = 2 * Math.PI * x2;
+    double t1 = r * FastMath.cos(theta);
+    double t2 = r * FastMath.sin(theta);
+    a1.scale(t1);
+    a1.scaleAdd(t2, a2);
+    a1.scaleAdd(-Math.sqrt(1 - a1.lengthSquared()), ray.d);
+    ray.setNormal(a1);
+    ray.setCurrentMaterial(ParticleFogMaterial.INSTANCE);
     ray.color.set(fogColor.x, fogColor.y, fogColor.z, 1);
     return true;
   }
