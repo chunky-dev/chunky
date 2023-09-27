@@ -1287,7 +1287,8 @@ public class Scene implements JsonSerializable, Refreshable {
             // that's probably ok.
             int nextY = chunkBiomeHelper.getyMinBiomeRelevant();
 
-            for(int transition : combinedBiomeTransitions) {
+            for(int i = 0; i < combinedBiomeTransitions.length; ++i) {
+              int transition = combinedBiomeTransitions[i];
               if(nextY < transition - blurRadius) {
                 // Do a 2d blur to fill up to the height affected by the transition
                 BiomeBlendingUtility.chunk2DBlur(
@@ -1306,19 +1307,21 @@ public class Scene implements JsonSerializable, Refreshable {
               }
 
               // Do a 3D blur to fill the next 2*blurRadius layers
-              // Works even if the next transition is close by
-              // For example if transition at y=10 and y=12 with blur radius of 3
-              // we will fill the layers y in [7, 12] while working on the first
-              // transition and on [13, 14] when working on the second. But the
-              // blur will use the correct biome even during the first transition
-              // (that being said, it would probably be more efficient to do only
-              // one call of 3D blur for multiple transition, TODO)
-              int maxLayerWorkedOn = Math.min(transition + blurRadius, chunkBiomeHelper.getyMaxBiomeRelevant());
+              // or more if the next transition is close by, in which case
+              // both transition (or even more) are handled by a bigger 3D blur
+              int maxYWorkedOn = transition + blurRadius;
+              while(i < combinedBiomeTransitions.length - 1 && maxYWorkedOn >= combinedBiomeTransitions[i+1] - blurRadius)
+              {
+                // Extends the 3D blur to enclose the next transition as well
+                maxYWorkedOn = combinedBiomeTransitions[i+1] + blurRadius;
+                ++i;
+              }
+              int maxYWorkedOnClamped = Math.min(maxYWorkedOn, chunkBiomeHelper.getyMaxBiomeRelevant());
               BiomeBlendingUtility.chunk3DBlur(
                 cp,
                 blurRadius,
                 nextY,
-                maxLayerWorkedOn + 1,
+                maxYWorkedOnClamped + 1,
                 origin,
                 biomePaletteIdxStructure,
                 biomePalette,
@@ -1326,7 +1329,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 grassTexture,
                 foliageTexture,
                 waterTexture);
-              nextY = maxLayerWorkedOn + 1;
+              nextY = maxYWorkedOnClamped + 1;
             }
 
             // Last 2D blur that extent up to the top
