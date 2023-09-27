@@ -240,7 +240,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public final Fog fog = new Fog(this);
 
   protected boolean biomeColors = true;
-  protected boolean biomeBlending = true;
+  protected int biomeBlendingRadius = 2;
   protected boolean transparentSky = false;
   protected Collection<ChunkPosition> chunks = new ArrayList<>();
   protected JsonObject cameraPresets = new JsonObject();
@@ -1236,14 +1236,12 @@ public class Scene implements JsonSerializable, Refreshable {
       int done = 0;
       int target = nonEmptyChunks.size();
 
-      final int blurRadius = 5;
-
       for (ChunkPosition cp : nonEmptyChunks) {
 //        TODO: make this less special cased in some way, having 2 ifs for biomeBlending and use3dBiomes is quite awful to read and maintain
 
 //        Finalize grass and foliage textures.
 //        3x3 box blur.
-        if (biomeBlending) {
+        if (biomeBlendingRadius > 0) {
           if (use3dBiomes) {
             ChunkBiomeBlendingHelper chunkBiomeHelper = biomeBlendingHelper.get(cp);
             ChunkBiomeBlendingHelper[] neighboringChunks = new ChunkBiomeBlendingHelper[] {
@@ -1257,7 +1255,7 @@ public class Scene implements JsonSerializable, Refreshable {
               biomeBlendingHelper.get(new ChunkPosition(cp.x + 1, cp.z + 1))
             };
 
-            int[] combinedBiomeTransitions = chunkBiomeHelper.combineAndTrimTransitions(neighboringChunks, blurRadius);
+            int[] combinedBiomeTransitions = chunkBiomeHelper.combineAndTrimTransitions(neighboringChunks, biomeBlendingRadius);
 
             System.out.printf("Chunk %d, %d (from %d to %d) :", cp.x, cp.z, chunkBiomeHelper.getyMinBiomeRelevant(), chunkBiomeHelper.getyMaxBiomeRelevant());
             for(int t : combinedBiomeTransitions)
@@ -1277,9 +1275,9 @@ public class Scene implements JsonSerializable, Refreshable {
             // Then we can compute the 2D blur at y=22 and use those colors for up to y=47
             // And so on, 3D blur for y in [48, 51] and 2D blur for y in [52,200]
 
-            // As such, in spirit every transition make us compute an additional 16*16*(2*blurRadius) 3D blur
-            // and a 16*16 2D blur (that can be combined in a 16*16*(2*blurRadius+1) 3D blur)
-            // (ignoring cases where transition are close to one another which are hendled by the code)
+            // As such, in spirit every transition make us compute an additional 16*16*(2*biomeBlendingRadius) 3D blur
+            // and a 16*16 2D blur (that can be combined in a 16*16*(2*biomeBlendingRadius+1) 3D blur)
+            // (ignoring cases where transition are close to one another which are handled by the code)
 
             // Note that having a single (x, y) column that effectively has a biome transition
             // in the chunk are a neighboring chunk causes us to compute the 3D blur for the whole 16*16
@@ -1289,13 +1287,13 @@ public class Scene implements JsonSerializable, Refreshable {
 
             for(int i = 0; i < combinedBiomeTransitions.length; ++i) {
               int transition = combinedBiomeTransitions[i];
-              if(nextY < transition - blurRadius) {
+              if(nextY < transition - biomeBlendingRadius) {
                 // Do a 2d blur to fill up to the height affected by the transition
                 BiomeBlendingUtility.chunk2DBlur(
                   cp,
-                  blurRadius,
+                  biomeBlendingRadius,
                   nextY,
-                  transition - blurRadius,
+                  transition - biomeBlendingRadius,
                   origin,
                   biomePaletteIdxStructure,
                   biomePalette,
@@ -1303,23 +1301,23 @@ public class Scene implements JsonSerializable, Refreshable {
                   grassTexture,
                   foliageTexture,
                   waterTexture);
-                nextY = transition - blurRadius;
+                nextY = transition - biomeBlendingRadius;
               }
 
-              // Do a 3D blur to fill the next 2*blurRadius layers
+              // Do a 3D blur to fill the next 2*biomeBlendingRadius layers
               // or more if the next transition is close by, in which case
               // both transition (or even more) are handled by a bigger 3D blur
-              int maxYWorkedOn = transition + blurRadius;
-              while(i < combinedBiomeTransitions.length - 1 && maxYWorkedOn >= combinedBiomeTransitions[i+1] - blurRadius)
+              int maxYWorkedOn = transition + biomeBlendingRadius;
+              while(i < combinedBiomeTransitions.length - 1 && maxYWorkedOn >= combinedBiomeTransitions[i+1] - biomeBlendingRadius)
               {
                 // Extends the 3D blur to enclose the next transition as well
-                maxYWorkedOn = combinedBiomeTransitions[i+1] + blurRadius;
+                maxYWorkedOn = combinedBiomeTransitions[i+1] + biomeBlendingRadius;
                 ++i;
               }
               int maxYWorkedOnClamped = Math.min(maxYWorkedOn, chunkBiomeHelper.getyMaxBiomeRelevant());
               BiomeBlendingUtility.chunk3DBlur(
                 cp,
-                blurRadius,
+                biomeBlendingRadius,
                 nextY,
                 maxYWorkedOnClamped + 1,
                 origin,
@@ -1336,7 +1334,7 @@ public class Scene implements JsonSerializable, Refreshable {
             if(nextY <= chunkBiomeHelper.getyMaxBiomeRelevant()) {
               BiomeBlendingUtility.chunk2DBlur(
                 cp,
-                blurRadius,
+                biomeBlendingRadius,
                 nextY,
                 chunkBiomeHelper.getyMaxBiomeRelevant() + 1,
                 origin,
@@ -1348,7 +1346,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 waterTexture);
             }
           } else {
-            BiomeBlendingUtility.chunk2DBlur(cp, blurRadius, 0, 1, origin, biomePaletteIdxStructure, biomePalette, nonEmptyChunks, grassTexture, foliageTexture, waterTexture);
+            BiomeBlendingUtility.chunk2DBlur(cp, biomeBlendingRadius, 0, 1, origin, biomePaletteIdxStructure, biomePalette, nonEmptyChunks, grassTexture, foliageTexture, waterTexture);
           }
         } else {
           if (use3dBiomes) {
@@ -1557,9 +1555,9 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  public void setBiomeBlendingEnabled(boolean value) {
-    if (value != biomeBlending) {
-      biomeBlending = value;
+  public void setBiomeBlendingRadius(int value) {
+    if (value != biomeBlendingRadius) {
+      biomeBlendingRadius = value;
       refresh();
     }
   }
@@ -1638,8 +1636,8 @@ public class Scene implements JsonSerializable, Refreshable {
     return biomeColors;
   }
 
-  public boolean biomeBlendingEnabled() {
-    return biomeBlending;
+  public int biomeBlendingRadius() {
+    return biomeBlendingRadius;
   }
 
   /**
