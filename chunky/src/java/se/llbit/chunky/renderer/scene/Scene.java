@@ -1682,7 +1682,7 @@ public class Scene implements JsonSerializable, Refreshable {
     ray.o.x -= origin.x;
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
-    while (PreviewRayTracer.nextIntersection(this, ray)) {
+    while (PreviewRayTracer.nextIntersection(this, ray, false)) {
       if (ray.getCurrentMaterial() != Air.INSTANCE) {
         return true;
       }

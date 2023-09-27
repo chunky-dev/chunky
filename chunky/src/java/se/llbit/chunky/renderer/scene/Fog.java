@@ -2,9 +2,11 @@ package se.llbit.chunky.renderer.scene;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.world.material.FogMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
@@ -97,7 +99,33 @@ public final class Fog implements JsonSerializable {
     return dy;
   }
 
+  public boolean intersect(Ray ray) {
+    // Amount of fog the ray should pass through before being scattered
+    // Sampled from an exponential distribution
+    double fogPenetrated = -Math.log(1 - ThreadLocalRandom.current().nextDouble());
+    double scaleHeight = 20;
+    double expHeightDiff = fogPenetrated * ray.d.y / (scaleHeight * uniformDensity);
+    double expYfHs = Math.exp(-(ray.o.y + scene.origin.y) / scaleHeight) - expHeightDiff;
+    if(expYfHs <= 0) {
+      // The ray does not encounter enough fog to be scattered - no intersection.
+      return false;
+    }
+    double yf = -Math.log(expYfHs) * scaleHeight;
+    double dist = (yf - (ray.o.y + scene.origin.y)) / ray.d.y;
+    if(dist >= ray.t) {
+      // The ray would have encountered enough fog to be scattered, but something is in the way.
+      return false;
+    }
+    ray.t = dist;
+    ray.setNormal(ray.d);
+    ray.invertNormal();
+    ray.setCurrentMaterial(FogMaterial.INSTANCE);
+    ray.color.set(fogColor.x, fogColor.y, fogColor.z, 1);
+    return true;
+  }
+
   public void addSkyFog(Ray ray, Vector4 scatterLight) {
+    /*
     if (mode == FogMode.UNIFORM) {
       if (uniformDensity > 0.0) {
         double fog;
@@ -118,6 +146,7 @@ public final class Fog implements JsonSerializable {
       double y2 = y1 + dy * FOG_LIMIT;
       addLayeredFog(ray.color, dy, y1, y2, scatterLight);
     }
+    */
   }
 
   public void addGroundFog(Ray ray, Vector3 ox, double airDistance, Vector4 scatterLight, double scatterOffset) {

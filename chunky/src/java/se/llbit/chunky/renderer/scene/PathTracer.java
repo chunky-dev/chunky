@@ -65,7 +65,7 @@ public class PathTracer implements RayTracer {
 
     while (true) {
 
-      if (!PreviewRayTracer.nextIntersection(scene, ray)) {
+      if (!PreviewRayTracer.nextIntersection(scene, ray, true)) {
         if (ray.getPrevMaterial().isWater()) {
           ray.color.set(0, 0, 0, 1);
           hit = true;
@@ -170,7 +170,7 @@ public class PathTracer implements RayTracer {
         airDistance = ray.distance;
       }
     }
-
+/*
     // This is a simplistic fog model which gives greater artistic freedom but
     // less realism. The user can select fog color and density; in a more
     // realistic model color would depend on viewing angle and sun color/position.
@@ -197,7 +197,7 @@ public class PathTracer implements RayTracer {
       getDirectLightAttenuation(scene, atmos, state);
       scene.fog.addGroundFog(ray, ox, airDistance, state.attenuation, offset);
     }
-
+*/
     return hit;
   }
 
@@ -520,7 +520,7 @@ public class PathTracer implements RayTracer {
 
       emitterRay.o.scaleAdd(Ray.OFFSET, emitterRay.d);
       emitterRay.distance += Ray.OFFSET;
-      PreviewRayTracer.nextIntersection(scene, emitterRay);
+      PreviewRayTracer.nextIntersection(scene, emitterRay, true);
       if (Math.abs(emitterRay.distance - distance) < Ray.OFFSET) {
         double e = Math.abs(emitterRay.d.dot(emitterRay.getNormal()));
         e /= Math.max(distance * distance, 1);
@@ -576,7 +576,7 @@ public class PathTracer implements RayTracer {
     attenuation.w = 1;
     while (attenuation.w > 0) {
       ray.o.scaleAdd(Ray.OFFSET, ray.d);
-      if (!PreviewRayTracer.nextIntersection(scene, ray)) {
+      if (!PreviewRayTracer.nextIntersection(scene, ray, true)) {
         break;
       }
       double mult = 1 - ray.color.w;

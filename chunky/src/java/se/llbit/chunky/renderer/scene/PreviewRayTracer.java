@@ -25,6 +25,8 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
+import java.util.Random;
+
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
@@ -41,7 +43,7 @@ public class PreviewRayTracer implements RayTracer {
       ray.setCurrentMaterial(Air.INSTANCE);
     }
     while (true) {
-      if (!nextIntersection(scene, ray)) {
+      if (!nextIntersection(scene, ray, false)) {
         if (mapIntersection(scene, ray)) {
           break;
         }
@@ -85,7 +87,7 @@ public class PreviewRayTracer implements RayTracer {
    * Find next ray intersection.
    * @return Next intersection
    */
-  public static boolean nextIntersection(Scene scene, Ray ray) {
+  public static boolean nextIntersection(Scene scene, Ray ray, boolean particleFog) {
     ray.setPrevMaterial(ray.getCurrentMaterial(), ray.getCurrentData());
     ray.t = Double.POSITIVE_INFINITY;
     boolean hit = false;
@@ -94,6 +96,9 @@ public class PreviewRayTracer implements RayTracer {
     }
     if (scene.isWaterPlaneEnabled()) {
       hit = waterPlaneIntersection(scene, ray) || hit;
+    }
+    if (particleFog) {
+      hit = scene.fog.intersect(ray) || hit;
     }
     if (scene.intersect(ray)) {
       // Octree tracer handles updating distance.
@@ -108,6 +113,10 @@ public class PreviewRayTracer implements RayTracer {
       ray.setCurrentMaterial(Air.INSTANCE);
       return false;
     }
+  }
+
+  public static boolean nextIntersection(Scene scene, Ray ray) {
+    return nextIntersection(scene, ray, false);
   }
 
   private static boolean waterPlaneIntersection(Scene scene, Ray ray) {
