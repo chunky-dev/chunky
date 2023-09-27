@@ -865,8 +865,6 @@ public class Scene implements JsonSerializable, Refreshable {
     final Mutable<ChunkData> loadingChunkData = new Mutable<>(null); // chunkData currently being used for loading from save
     final Mutable<ChunkData> activeChunkData = new Mutable<>(null); // chunkData for loading into the octree
 
-    long start = System.nanoTime();
-
     try (TaskTracker.Task task = taskTracker.task("(3/6) Loading chunks")) {
       int done = 1;
       int target = chunksToLoad.size();
@@ -1257,11 +1255,6 @@ public class Scene implements JsonSerializable, Refreshable {
 
             int[] combinedBiomeTransitions = chunkBiomeHelper.combineAndTrimTransitions(neighboringChunks, biomeBlendingRadius);
 
-            System.out.printf("Chunk %d, %d (from %d to %d) :", cp.x, cp.z, chunkBiomeHelper.getyMinBiomeRelevant(), chunkBiomeHelper.getyMaxBiomeRelevant());
-            for(int t : combinedBiomeTransitions)
-              System.out.printf("%d, ", t);
-            System.out.print("\n");
-
             // When doing 3D blur we use the list of (vertical) biome transition
             // in the chunk or in neighboring ones
             // If there is no transition, a 2D blur is enough, otherwise we only
@@ -1400,10 +1393,6 @@ public class Scene implements JsonSerializable, Refreshable {
       foliageTexture.compact();
       waterTexture.compact();
     }
-
-    long end = System.nanoTime();
-
-    System.out.printf("Loading time: %fms\n", (end - start) / 1000000.0);
 
     entities.loadDataFromOctree(worldOctree, palette, origin);
 
