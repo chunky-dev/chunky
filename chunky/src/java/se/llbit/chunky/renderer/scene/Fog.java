@@ -11,10 +11,7 @@ import se.llbit.chunky.world.material.ParticleFogMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 import se.llbit.util.JsonSerializable;
 
 public final class Fog implements JsonSerializable {
@@ -35,7 +32,8 @@ public final class Fog implements JsonSerializable {
     this.scene = scene;
     //addVolume(new ExponentialFogVolume(new Vector3(1, 0, 0), 0.001, 20, 100));
     //addVolume(new ExponentialFogVolume(new Vector3(0, 0, 1), 0.0001, -20, 100));
-    addVolume(new LayerFogVolume(new Vector3(0.5, 0.5, 1), 0.004, 20, 200));
+    //addVolume(new LayerFogVolume(new Vector3(0.5, 0.5, 1), 0.004, 20, 200));
+    addVolume(new CuboidFogVolume(new Vector3(1, 0, 1), 0.01, new AABB(-650, -550, 150, 250, 450, 550)));
   }
 
   public boolean fogEnabled() {
