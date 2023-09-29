@@ -24,6 +24,7 @@ public final class Fog implements JsonSerializable {
   protected double uniformDensity = Scene.DEFAULT_FOG_DENSITY;
   protected double skyFogDensity = 1;
   protected ArrayList<FogLayer> layers = new ArrayList<>(0);
+  protected ArrayList<FogVolume> volumes = new ArrayList<>(0);
   protected Vector3 fogColor = new Vector3(PersistentSettings.getFogColorRed(), PersistentSettings.getFogColorGreen(), PersistentSettings.getFogColorBlue());
 
   private static final double EXTINCTION_FACTOR = 0.04;
@@ -32,6 +33,9 @@ public final class Fog implements JsonSerializable {
 
   public Fog(Scene scene) {
     this.scene = scene;
+    //addVolume(new ExponentialFogVolume(new Vector3(1, 0, 0), 0.001, 20, 100));
+    //addVolume(new ExponentialFogVolume(new Vector3(0, 0, 1), 0.0001, -20, 100));
+    addVolume(new LayerFogVolume(new Vector3(0.5, 0.5, 1), 0.004, 20, 200));
   }
 
   public boolean fogEnabled() {
@@ -61,6 +65,9 @@ public final class Fog implements JsonSerializable {
   public ArrayList<FogLayer> getFogLayers() {
     return layers;
   }
+  public ArrayList<FogVolume> getFogVolumes() {
+    return volumes;
+  }
 
   public void addLayer() {
     layers.add(new FogLayer(scene));
@@ -69,6 +76,16 @@ public final class Fog implements JsonSerializable {
 
   public void removeLayer(int index) {
     layers.remove(index);
+    scene.refresh();
+  }
+
+  public void addVolume(FogVolume v) {
+    volumes.add(v);
+    scene.refresh();
+  }
+
+  public void removeVolume(int index) {
+    volumes.remove(index);
     scene.refresh();
   }
 
@@ -98,47 +115,6 @@ public final class Fog implements JsonSerializable {
       return -epsilon;
     }
     return dy;
-  }
-
-  public boolean intersect(Ray ray) {
-    Random random = ThreadLocalRandom.current();
-    // Amount of fog the ray should pass through before being scattered
-    // Sampled from an exponential distribution
-    double fogPenetrated = -Math.log(1 - random.nextDouble());
-    double scaleHeight = 20;
-    double expHeightDiff = fogPenetrated * ray.d.y / (scaleHeight * uniformDensity);
-    double expYfHs = Math.exp(-(ray.o.y + scene.origin.y) / scaleHeight) - expHeightDiff;
-    if(expYfHs <= 0) {
-      // The ray does not encounter enough fog to be scattered - no intersection.
-      return false;
-    }
-    double yf = -Math.log(expYfHs) * scaleHeight;
-    double dist = (yf - (ray.o.y + scene.origin.y)) / ray.d.y;
-    if(dist >= ray.t) {
-      // The ray would have encountered enough fog to be scattered, but something is in the way.
-      return false;
-    }
-    ray.t = dist;
-    // pick a random normal vector based on a spherical particle
-    Vector3 a1 = new Vector3();
-    a1.cross(ray.d, new Vector3(0, 1, 0));
-    a1.normalize();
-    Vector3 a2 = new Vector3();
-    a2.cross(ray.d, a1);
-    // get random point on unit disk
-    double x1 = random.nextDouble();
-    double x2 = random.nextDouble();
-    double r = FastMath.sqrt(x1);
-    double theta = 2 * Math.PI * x2;
-    double t1 = r * FastMath.cos(theta);
-    double t2 = r * FastMath.sin(theta);
-    a1.scale(t1);
-    a1.scaleAdd(t2, a2);
-    a1.scaleAdd(-Math.sqrt(1 - a1.lengthSquared()), ray.d);
-    ray.setNormal(a1);
-    ray.setCurrentMaterial(ParticleFogMaterial.INSTANCE);
-    ray.color.set(fogColor.x, fogColor.y, fogColor.z, 1);
-    return true;
   }
 
   public void addSkyFog(Ray ray, Vector4 scatterLight) {
@@ -301,6 +277,7 @@ public final class Fog implements JsonSerializable {
     uniformDensity = other.uniformDensity;
     skyFogDensity = other.skyFogDensity;
     layers = new ArrayList<>(other.layers);
+    volumes = new ArrayList<>(other.volumes);
     fogColor.set(other.fogColor);
   }
 }

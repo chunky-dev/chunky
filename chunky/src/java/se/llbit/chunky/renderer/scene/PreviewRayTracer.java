@@ -43,7 +43,7 @@ public class PreviewRayTracer implements RayTracer {
       ray.setCurrentMaterial(Air.INSTANCE);
     }
     while (true) {
-      if (!nextIntersection(scene, ray, false)) {
+      if (!nextIntersection(scene, ray)) {
         if (mapIntersection(scene, ray)) {
           break;
         }
@@ -85,9 +85,11 @@ public class PreviewRayTracer implements RayTracer {
 
   /**
    * Find next ray intersection.
+   * @param particleFog Whether to process particle fog
+   * @param random Used for particle fog, can be null if particleFog is false
    * @return Next intersection
    */
-  public static boolean nextIntersection(Scene scene, Ray ray, boolean particleFog) {
+  public static boolean nextIntersection(Scene scene, Ray ray, boolean particleFog, Random random) {
     ray.setPrevMaterial(ray.getCurrentMaterial(), ray.getCurrentData());
     ray.t = Double.POSITIVE_INFINITY;
     boolean hit = false;
@@ -98,7 +100,9 @@ public class PreviewRayTracer implements RayTracer {
       hit = waterPlaneIntersection(scene, ray) || hit;
     }
     if (particleFog) {
-      hit = scene.fog.intersect(ray) || hit;
+      for(FogVolume v : scene.fog.getFogVolumes()) {
+        hit = v.intersect(ray, scene, random) || hit;
+      }
     }
     if (scene.intersect(ray)) {
       // Octree tracer handles updating distance.
@@ -116,7 +120,7 @@ public class PreviewRayTracer implements RayTracer {
   }
 
   public static boolean nextIntersection(Scene scene, Ray ray) {
-    return nextIntersection(scene, ray, false);
+    return nextIntersection(scene, ray, false, null);
   }
 
   private static boolean waterPlaneIntersection(Scene scene, Ray ray) {
