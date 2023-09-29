@@ -5,16 +5,11 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.world.material.ParticleFogMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 import se.llbit.util.JsonSerializable;
 
 public final class Fog implements JsonSerializable {
@@ -33,9 +28,6 @@ public final class Fog implements JsonSerializable {
 
   public Fog(Scene scene) {
     this.scene = scene;
-    //addVolume(new ExponentialFogVolume(new Vector3(1, 0, 0), 0.001, 20, 100));
-    //addVolume(new ExponentialFogVolume(new Vector3(0, 0, 1), 0.0001, -20, 100));
-    addVolume(new LayerFogVolume(new Vector3(0.5, 0.5, 1), 0.004, 20, 200));
   }
 
   public boolean fogEnabled() {
