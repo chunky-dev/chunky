@@ -258,22 +258,6 @@ public class AABB {
   }
 
   /**
-   * Test for intersection while exiting the bounding box.
-   * @param ray Ray to test for intersection.
-   * @return False if the ray does not start inside the box.
-   */
-  public boolean intersectFromInside(Ray ray) {
-    if(!inside(ray.o)) {
-      return false;
-    }
-    double tx = ((ray.d.x >= 0 ? xmax : xmin) - ray.o.x) / ray.d.x;
-    double ty = ((ray.d.y >= 0 ? ymax : ymin) - ray.o.y) / ray.d.y;
-    double tz = ((ray.d.z >= 0 ? zmax : zmin) - ray.o.z) / ray.d.z;
-    ray.tNext = Math.min(tx, Math.min(ty, tz));
-    return true;
-  }
-
-  /**
    * Test if point is inside the bounding box.
    *
    * @return true if p is inside this BB.
@@ -349,7 +333,12 @@ public class AABB {
       }
     }
 
-    return tNear < tFar + Ray.EPSILON && tFar > 0;
+    if (tNear < tFar + Ray.EPSILON && tFar > 0) {
+      ray.tNext = tNear;
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**

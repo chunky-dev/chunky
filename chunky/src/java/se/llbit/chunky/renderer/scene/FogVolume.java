@@ -28,4 +28,12 @@ public abstract class FogVolume {
     a1.scaleAdd(-Math.sqrt(1 - a1.lengthSquared()), ray.d);
     ray.setNormal(a1);
   }
+
+  public void setDensity(double value) {
+    this.density = value;
+  }
+
+  public void setColor(Vector3 value) {
+    this.color = new Vector3(value);
+  }
 }

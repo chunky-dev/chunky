@@ -8,58 +8,61 @@ import se.llbit.math.Vector3;
 import java.util.Random;
 
 public class CuboidFogVolume extends FogVolume {
-  public AABB bounds;
-  public CuboidFogVolume(Vector3 color, double density, AABB bounds) {
-    this.color = color;
-    this.density = density;
-    this.bounds = bounds;
-  }
+
+  private AABB aabb;
 
   @Override
-  public void setRandomNormal(Ray ray, Random random) {
-    super.setRandomNormal(ray, random);
-  }
-
   public boolean intersect(Ray ray, Scene scene, Random random) {
-    // Amount of fog the ray should pass through before being scattered
-    // Sampled from an exponential distribution
+    double distance;
     double fogPenetrated = -Math.log(1 - random.nextDouble());
     double fogDistance = fogPenetrated / density;
-    AABB boundsTranslated = bounds.getTranslated(-scene.origin.x, -scene.origin.y, -scene.origin.z);
-    double dist;
-    if(boundsTranslated.inside(ray.o)) {
-      boundsTranslated.intersectFromInside(ray);
-      if(fogDistance > ray.tNext) {
-        // The ray makes it out of the box without hitting fog
-        return false;
+    AABB aabbTranslated = aabb.getTranslated(-scene.origin.x, -scene.origin.y, -scene.origin.z);
+    if (!aabbTranslated.inside(ray.o)) {
+      Ray test = new Ray(ray);
+      if (aabbTranslated.hitTest(test)) {
+        distance = test.tNext;
+        distance += fogDistance;
       } else {
-        dist = fogDistance;
+        return false;
       }
     } else {
-      // Outside the box
-      if(!boundsTranslated.quickIntersect(ray)) {
-        // The ray misses the box
-        return false;
-      }
-      Ray throughBox = new Ray(ray);
-      throughBox.o.scaleAdd(ray.tNext + Ray.OFFSET, ray.d);
-      boundsTranslated.intersectFromInside(throughBox);
-      if(fogDistance > throughBox.tNext) {
-        // The ray makes it through the box without hitting fog
-        return false;
-      } else {
-        dist = ray.tNext + fogDistance;
-      }
+      distance = fogDistance;
     }
-    if(dist >= ray.t) {
-      // The ray would have encountered enough fog to be scattered, but something is in the way.
+
+    if (distance > ray.t) {
       return false;
     }
-    ray.t = dist;
-    // pick a random normal vector based on a spherical particle
-    setRandomNormal(ray, random);
-    ray.setCurrentMaterial(ParticleFogMaterial.INSTANCE);
-    ray.color.set(color.x, color.y, color.z, 1);
-    return true;
+
+    Vector3 o = new Vector3(ray.o);
+    o.scaleAdd(distance, ray.d);
+    if (aabbTranslated.inside(o)) {
+      ray.t = distance;
+      setRandomNormal(ray, random);
+      ray.setCurrentMaterial(ParticleFogMaterial.INSTANCE);
+      ray.color.set(color.x, color.y, color.z, 1);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public void setBounds(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax) {
+    this.aabb = new AABB(xmin, xmax, ymin, ymax, zmin, zmax);
+  }
+
+  public void setBounds(AABB aabb) {
+    this.aabb = aabb;
+  }
+
+  public CuboidFogVolume(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax, Vector3 color, double density) {
+    this.aabb = new AABB(xmin, xmax, ymin, ymax, zmin, zmax);
+    this.color = color;
+    this.density = density;
+  }
+
+  public CuboidFogVolume(AABB aabb, Vector3 color, double density) {
+    this.aabb = aabb;
+    this.color = color;
+    this.density = density;
   }
 }
