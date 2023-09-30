@@ -7,8 +7,8 @@ import se.llbit.math.Vector3;
 import java.util.Random;
 
 public class LayerFogVolume extends FogVolume {
-  public double layerHeight;
-  public double yOffset;
+  private double layerHeight;
+  private double yOffset;
   public LayerFogVolume(Vector3 color, double density, double layerHeight, double yOffset) {
     this.color = color;
     this.density = density;
@@ -34,8 +34,23 @@ public class LayerFogVolume extends FogVolume {
     ray.t = dist;
     // pick a random normal vector based on a spherical particle
     setRandomNormal(ray, random);
-    ray.setCurrentMaterial(ParticleFogMaterial.INSTANCE);
-    ray.color.set(color.x, color.y, color.z, 1);
+    setRayMaterialAndColor(ray);
     return true;
+  }
+
+  public void setLayerHeight(double l) {
+    layerHeight = l;
+  }
+
+  public double getLayerHeight() {
+    return layerHeight;
+  }
+
+  public void setYOffset(double y) {
+    yOffset = y;
+  }
+
+  public double getYOffset() {
+    return yOffset;
   }
 }

@@ -28,6 +28,11 @@ public final class Fog implements JsonSerializable {
 
   public Fog(Scene scene) {
     this.scene = scene;
+    addVolume(new ExponentialFogVolume(new Vector3(0.5, 0.6, 1), 0.01, 50, 64));
+    addVolume(new CuboidFogVolume(new Vector3(1, 1, 1), 0.1, -625, -525, 125, 225, 450, 550));
+    SphericalFogVolume sfv = new SphericalFogVolume(new Vector3(0.7, 0, 1), 0.02, new Vector3(-700, 175, 500), 50);
+    sfv.getMaterial().emittance = 1;
+    addVolume(sfv);
   }
 
   public boolean fogEnabled() {

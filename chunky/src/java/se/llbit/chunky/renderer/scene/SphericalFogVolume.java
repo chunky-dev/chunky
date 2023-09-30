@@ -41,8 +41,7 @@ public class SphericalFogVolume extends FogVolume {
     if (distance <= radius) {
       ray.t = distance;
       setRandomNormal(ray, random);
-      ray.setCurrentMaterial(ParticleFogMaterial.INSTANCE);
-      ray.color.set(color.x, color.y, color.z, 1);
+      setRayMaterialAndColor(ray);
       return true;
     } else {
       return false;
@@ -65,7 +64,7 @@ public class SphericalFogVolume extends FogVolume {
     this.radius = value;
   }
 
-  public SphericalFogVolume(Vector3 center, double radius, Vector3 color, double density) {
+  public SphericalFogVolume(Vector3 color, double density, Vector3 center, double radius) {
     this.center = center;
     this.radius = radius;
     this.color = color;

@@ -1,15 +1,20 @@
 package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.world.Material;
+import se.llbit.chunky.world.material.ParticleFogMaterial;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 import java.util.Random;
 
 public abstract class FogVolume {
-  public Vector3 color;
-  public double density;
+  protected Vector3 color;
+  protected double density;
+  protected Material material = new ParticleFogMaterial();
+
   public abstract boolean intersect(Ray ray, Scene scene, Random random);
+
   public void setRandomNormal(Ray ray, Random random) {
     Vector3 a1 = new Vector3();
     a1.cross(ray.d, new Vector3(0, 1, 0));
@@ -29,11 +34,28 @@ public abstract class FogVolume {
     ray.setNormal(a1);
   }
 
+  public void setRayMaterialAndColor(Ray ray) {
+    ray.setCurrentMaterial(material);
+    ray.color.set(color.x, color.y, color.z, 1);
+  }
+
+  public Material getMaterial() {
+    return material;
+  }
+
   public void setDensity(double value) {
     this.density = value;
   }
 
+  public double getDensity() {
+    return density;
+  }
+
   public void setColor(Vector3 value) {
     this.color = new Vector3(value);
+  }
+
+  public Vector3 getColor() {
+    return color;
   }
 }

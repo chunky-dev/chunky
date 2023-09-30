@@ -38,8 +38,7 @@ public class CuboidFogVolume extends FogVolume {
     if (aabbTranslated.inside(o)) {
       ray.t = distance;
       setRandomNormal(ray, random);
-      ray.setCurrentMaterial(ParticleFogMaterial.INSTANCE);
-      ray.color.set(color.x, color.y, color.z, 1);
+      setRayMaterialAndColor(ray);
       return true;
     } else {
       return false;
@@ -54,13 +53,13 @@ public class CuboidFogVolume extends FogVolume {
     this.aabb = aabb;
   }
 
-  public CuboidFogVolume(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax, Vector3 color, double density) {
+  public CuboidFogVolume(Vector3 color, double density, double xmin, double xmax, double ymin, double ymax, double zmin, double zmax) {
     this.aabb = new AABB(xmin, xmax, ymin, ymax, zmin, zmax);
     this.color = color;
     this.density = density;
   }
 
-  public CuboidFogVolume(AABB aabb, Vector3 color, double density) {
+  public CuboidFogVolume(Vector3 color, double density, AABB aabb) {
     this.aabb = aabb;
     this.color = color;
     this.density = density;

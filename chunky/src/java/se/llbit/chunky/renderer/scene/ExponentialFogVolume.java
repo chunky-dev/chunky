@@ -1,14 +1,13 @@
 package se.llbit.chunky.renderer.scene;
 
-import se.llbit.chunky.world.material.ParticleFogMaterial;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 import java.util.Random;
 
 public class ExponentialFogVolume extends FogVolume {
-  public double scaleHeight;
-  public double yOffset;
+  private double scaleHeight;
+  private double yOffset;
   public ExponentialFogVolume(Vector3 color, double density, double scaleHeight, double yOffset) {
     this.color = color;
     this.density = density;
@@ -34,8 +33,23 @@ public class ExponentialFogVolume extends FogVolume {
     ray.t = dist;
     // pick a random normal vector based on a spherical particle
     setRandomNormal(ray, random);
-    ray.setCurrentMaterial(ParticleFogMaterial.INSTANCE);
-    ray.color.set(color.x, color.y, color.z, 1);
+    setRayMaterialAndColor(ray);
     return true;
+  }
+
+  public void setScaleHeight(double s) {
+    scaleHeight = s;
+  }
+
+  public double getScaleHeight() {
+    return scaleHeight;
+  }
+
+  public void setYOffset(double y) {
+    yOffset = y;
+  }
+
+  public double getYOffset() {
+    return yOffset;
   }
 }
