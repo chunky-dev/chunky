@@ -217,7 +217,8 @@ public class Chunky {
     if (cmdline.mode == CommandLineOptions.Mode.CLI_OPERATION) {
       exitCode = cmdline.exitCode;
     } else {
-      commonThreads = new ForkJoinPool(PersistentSettings.getNumThreads());
+      // Initialize the common thread pool.
+      getCommonThreads();
 
       Chunky chunky = new Chunky(cmdline.options);
       chunky.headless = cmdline.mode == Mode.HEADLESS_RENDER || cmdline.mode == Mode.CREATE_SNAPSHOT;
@@ -341,7 +342,7 @@ public class Chunky {
    */
   public static ForkJoinPool getCommonThreads() {
     if (commonThreads == null) {
-      commonThreads = new ForkJoinPool(PersistentSettings.getNumThreads());
+      commonThreads = new ForkJoinPool(Math.max(PersistentSettings.getNumThreads(), 2));
     }
     return commonThreads;
   }
