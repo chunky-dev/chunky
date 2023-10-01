@@ -99,6 +99,12 @@ public class TaskTracker {
       tracker.updateProgress(taskName, target, done, eta);
     }
 
+    /** Change the task name. */
+    public void update(String task) {
+      this.taskName = task;
+      update();
+    }
+
     /** Set the current progress. */
     public void update(int done) {
       this.done = done;
