@@ -18,6 +18,8 @@
  */
 package se.llbit.util;
 
+import se.llbit.log.Log;
+
 /**
  * A task tracker is used to update a progress listener with current task progress.
  * The task tracker has a stack of tasks. When a new task is created the previous
@@ -89,6 +91,8 @@ public class TaskTracker {
     @Override public void close() {
       tracker.currentTask = previous;
       previous.update();
+      Log.infof("Task %s: %d in %.3f seconds", taskName, done,
+        (System.currentTimeMillis() - startTime) / 1000.0);
     }
 
     protected void update() {
