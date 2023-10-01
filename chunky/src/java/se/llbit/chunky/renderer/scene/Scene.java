@@ -2242,7 +2242,7 @@ public class Scene implements JsonSerializable, Refreshable {
       try {
         long fileTimestamp = context.fileTimestamp(fileName);
         OctreeFileFormat.OctreeData data;
-        Consumer<String> stepConsumer = step -> task.update("(1/3) Loading octree: " + step);
+        Consumer<String> stepConsumer = step -> task.update("(1/3) Loading octree (" + step + ")");
 
         try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(context.getSceneFileInputStream(fileName), pos -> {
           task.updateInterval((int) (pos * progressScale), 1);
