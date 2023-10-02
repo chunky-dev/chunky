@@ -1339,6 +1339,8 @@ public class Texture {
   public static final Texture bambooHangingSign = new Texture();
   @TexturePath("assets/minecraft/textures/entity/signs/hanging/cherry")
   public static final Texture cherryHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/piglin/piglin")
+  public static final Texture piglin = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
