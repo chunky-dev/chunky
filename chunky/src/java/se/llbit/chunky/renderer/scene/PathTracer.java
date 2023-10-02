@@ -84,7 +84,7 @@ public class PathTracer implements RayTracer {
         } else {
           // Indirect sky hit - diffuse color.
           scene.sky.getSkyColorDiffuseSun(ray, scene.getSunSamplingStrategy().isDiffuseSun());
-          // Skip sky fog - likely not noticeable in diffuse reflection.
+          addSkyFog(scene, ray, state, ox, od);
           hit = true;
         }
         break;
@@ -170,7 +170,7 @@ public class PathTracer implements RayTracer {
         airDistance = ray.distance;
       }
     }
-/*
+
     // This is a simplistic fog model which gives greater artistic freedom but
     // less realism. The user can select fog color and density; in a more
     // realistic model color would depend on viewing angle and sun color/position.
@@ -197,7 +197,7 @@ public class PathTracer implements RayTracer {
       getDirectLightAttenuation(scene, atmos, state);
       scene.fog.addGroundFog(ray, ox, airDistance, state.attenuation, offset);
     }
-*/
+
     return hit;
   }
 

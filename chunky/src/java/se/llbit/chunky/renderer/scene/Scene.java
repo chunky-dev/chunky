@@ -149,7 +149,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Default fog density.
    */
-  public static final double DEFAULT_FOG_DENSITY = 0.0;
+  public static final double DEFAULT_FOG_DENSITY = 0.05;
 
   /**
    * Default post processing filter.
@@ -343,6 +343,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
   protected volatile boolean isLoading = false;
 
+  private boolean previewParticleFog = PersistentSettings.getPreviewParticleFog();
+
   /**
    * Creates a scene with all default settings.
    *
@@ -454,6 +456,7 @@ public class Scene implements JsonSerializable, Refreshable {
     preventNormalEmitterWithSampling = other.preventNormalEmitterWithSampling;
     fancierTranslucency = other.fancierTranslucency;
     transmissivityCap = other.transmissivityCap;
+    previewParticleFog = other.previewParticleFog;
     transparentSky = other.transparentSky;
     yClipMin = other.yClipMin;
     yClipMax = other.yClipMax;
@@ -3429,6 +3432,16 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void setTransmissivityCap(double value) {
     transmissivityCap = value;
+    refresh();
+  }
+
+  public boolean getPreviewParticleFog() {
+    return this.previewParticleFog;
+  }
+
+  public void setPreviewParticleFog(boolean value) {
+    this.previewParticleFog = value;
+    PersistentSettings.setPreviewParticleFog(value);
     refresh();
   }
 }

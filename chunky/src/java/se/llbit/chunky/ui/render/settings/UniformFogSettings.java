@@ -51,7 +51,7 @@ public class UniformFogSettings extends VBox implements Initializable {
 
   @Override public void initialize(URL location, ResourceBundle resources) {
     fogDensity.setTooltip("Fog thickness. Set to 0 to disable volumetric fog effect.");
-    fogDensity.setRange(0, 1);
+    fogDensity.setRange(0.000001, 1);
     fogDensity.setMaximumFractionDigits(6);
     fogDensity.makeLogarithmic();
     fogDensity.clampMin();

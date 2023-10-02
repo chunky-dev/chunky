@@ -43,7 +43,7 @@ public class PreviewRayTracer implements RayTracer {
       ray.setCurrentMaterial(Air.INSTANCE);
     }
     while (true) {
-      if (!nextIntersection(scene, ray)) {
+      if (!nextIntersection(scene, ray, scene.getPreviewParticleFog(), state.random)) {
         if (mapIntersection(scene, ray)) {
           break;
         }
