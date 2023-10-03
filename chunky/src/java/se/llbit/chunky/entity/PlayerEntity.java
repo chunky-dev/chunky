@@ -677,7 +677,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     JsonObject json = parseJson(helmJson);
     switch (id) {
       case "minecraft:skull":
-        // Reference: https://minecraft.gamepedia.com/Mob_head#Data_values
+        // Reference: https://minecraft.wiki/w/Mob_head#Data_values
         int type = item.get("type").asInt(3);
         switch (type) {
           case 0:
@@ -757,7 +757,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       TextureLoader loader = null;
       switch (id.substring("minecraft:".length())) {
         case "skull": {
-          // Reference: https://minecraft.gamepedia.com/Mob_head#Data_values
+          // Reference: https://minecraft.wiki/w/Mob_head#Data_values
           int type = item.get("type").asInt(3);
           switch (type) {
             case 0:
