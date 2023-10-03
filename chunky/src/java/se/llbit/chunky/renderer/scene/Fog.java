@@ -2,7 +2,6 @@ package se.llbit.chunky.renderer.scene;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import se.llbit.chunky.PersistentSettings;
@@ -28,11 +27,6 @@ public final class Fog implements JsonSerializable {
 
   public Fog(Scene scene) {
     this.scene = scene;
-    addVolume(new ExponentialFogVolume(new Vector3(0.5, 0.6, 1), 0.01, 50, 64));
-    addVolume(new CuboidFogVolume(new Vector3(1, 1, 1), 0.1, -625, -525, 125, 225, 450, 550));
-    SphericalFogVolume sfv = new SphericalFogVolume(new Vector3(0.7, 0, 1), 0.02, new Vector3(-700, 175, 500), 50);
-    sfv.getMaterial().emittance = 1;
-    addVolume(sfv);
   }
 
   public boolean fogEnabled() {
@@ -76,9 +70,27 @@ public final class Fog implements JsonSerializable {
     scene.refresh();
   }
 
-  public void addVolume(FogVolume v) {
-    volumes.add(v);
+  private FogVolume getVolumeFromType(FogVolumeType fogVolumeType) {
+    switch (fogVolumeType) {
+      case LAYER:
+        return new LayerFogVolume(fogColor, uniformDensity);
+      case SPHERE:
+        return new SphericalFogVolume(fogColor, uniformDensity);
+      case CUBOID:
+        return new CuboidFogVolume(fogColor, uniformDensity);
+      case EXPONENTIAL:
+      default:
+        return new ExponentialFogVolume(fogColor, uniformDensity);
+    }
+  }
+
+  public void addVolume(FogVolumeType fogVolumeType) {
+    addVolume(getVolumeFromType(fogVolumeType));
     scene.refresh();
+  }
+
+  public void addVolume(FogVolume fogVolume) {
+    volumes.add(fogVolume);
   }
 
   public void removeVolume(int index) {
@@ -115,7 +127,7 @@ public final class Fog implements JsonSerializable {
   }
 
   public void addSkyFog(Ray ray, Vector4 scatterLight) {
-    /*
+
     if (mode == FogMode.UNIFORM) {
       if (uniformDensity > 0.0) {
         double fog;
@@ -136,7 +148,7 @@ public final class Fog implements JsonSerializable {
       double y2 = y1 + dy * FOG_LIMIT;
       addLayeredFog(ray.color, dy, y1, y2, scatterLight);
     }
-    */
+
   }
 
   public void addGroundFog(Ray ray, Vector3 ox, double airDistance, Vector4 scatterLight, double scatterOffset) {
@@ -232,6 +244,11 @@ public final class Fog implements JsonSerializable {
       jsonLayers.add(jsonLayer);
     }
     fogObj.add("layers", jsonLayers);
+    JsonArray jsonVolumes = new JsonArray();
+    for (FogVolume volume : volumes) {
+      jsonVolumes.add(volume.toJson());
+    }
+    fogObj.add("volumes", jsonVolumes);
     JsonObject colorObj = new JsonObject();
     colorObj.add("red", fogColor.x);
     colorObj.add("green", fogColor.y);
@@ -250,6 +267,15 @@ public final class Fog implements JsonSerializable {
         o.get("breadth").doubleValue(0),
         o.get("density").doubleValue(0),
         scene)).collect(Collectors.toCollection(ArrayList<FogLayer>::new));
+    JsonArray jsonVolumes = json.get("volumes").array();
+    volumes.clear();
+    for (JsonValue jsonVolume : jsonVolumes) {
+      JsonObject jsonVolumeObject = jsonVolume.asObject();
+      FogVolumeType fogVolumeType = FogVolumeType.valueOf(jsonVolumeObject.get("type").asString(""));
+      FogVolume fogVolume = getVolumeFromType(fogVolumeType);
+      fogVolume.importFromJson(jsonVolumeObject);
+      addVolume(fogVolume);
+    }
     JsonObject colorObj = json.get("color").object();
     fogColor.x = colorObj.get("red").doubleValue(fogColor.x);
     fogColor.y = colorObj.get("green").doubleValue(fogColor.y);
@@ -261,7 +287,8 @@ public final class Fog implements JsonSerializable {
     mode = json.get("fogEnabled").boolValue(mode != FogMode.NONE) ? FogMode.NONE : FogMode.UNIFORM;
     uniformDensity = json.get("fogDensity").doubleValue(uniformDensity);
     skyFogDensity = json.get("skyFogDensity").doubleValue(skyFogDensity);
-    layers = new ArrayList<>(0);
+    layers.clear();
+    volumes.clear();
     JsonObject colorObj = json.get("fogColor").object();
     fogColor.x = colorObj.get("red").doubleValue(fogColor.x);
     fogColor.y = colorObj.get("green").doubleValue(fogColor.y);

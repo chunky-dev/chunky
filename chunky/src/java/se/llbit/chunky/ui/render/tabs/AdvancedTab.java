@@ -69,6 +69,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private CheckBox shutdown;
   @FXML private CheckBox fastFog;
   @FXML private CheckBox fancierTranslucency;
+  @FXML private CheckBox previewParticleFog;
   @FXML private DoubleAdjuster transmissivityCap;
   @FXML private IntegerAdjuster cacheResolution;
   @FXML private DoubleAdjuster animationTime;
@@ -163,6 +164,12 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
         transmissivityCap.setVisible(newValue);
         transmissivityCap.setManaged(newValue);
       });
+
+    previewParticleFog.setTooltip(new Tooltip("Render particle fog in the render preview."));
+    previewParticleFog.selectedProperty().addListener((observer, oldValue, newValue) ->
+      scene.setPreviewParticleFog(newValue)
+    );
+
     boolean tcapVisible = scene != null && scene.getFancierTranslucency();
     transmissivityCap.setVisible(tcapVisible);
     transmissivityCap.setManaged(tcapVisible);
@@ -334,6 +341,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     outputMode.getSelectionModel().select(scene.getOutputMode());
     fastFog.setSelected(scene.fog.fastFog());
     fancierTranslucency.setSelected(scene.getFancierTranslucency());
+    previewParticleFog.setSelected(scene.getPreviewParticleFog());
     transmissivityCap.set(scene.getTransmissivityCap());
     renderThreads.set(PersistentSettings.getNumThreads());
     cpuLoad.set(PersistentSettings.getCPULoad());

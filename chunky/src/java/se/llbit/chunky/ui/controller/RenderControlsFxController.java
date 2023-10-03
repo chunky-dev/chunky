@@ -98,6 +98,7 @@ public class RenderControlsFxController {
       tabs.add(new GeneralTab());
       tabs.add(new LightingTab());
       tabs.add(new SkyTab());
+      tabs.add(new FogTab());
       tabs.add(new WaterTab());
       tabs.add(new CameraTab());
       tabs.add(new EntitiesTab());
