@@ -342,6 +342,7 @@ public class Chunky {
    */
   public static ForkJoinPool getCommonThreads() {
     if (commonThreads == null) {
+      // use at least two threads to prevent deadlocks in some java versions (see #1631)
       commonThreads = new ForkJoinPool(Math.max(PersistentSettings.getNumThreads(), 2));
     }
     return commonThreads;
