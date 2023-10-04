@@ -41,61 +41,196 @@ import java.util.Map;
 public class SignEntity extends Entity {
 
   public enum Color {
-    BLACK(0, 0xFF000000),
-    DARK_BLUE(1, 0xFF0000AA),
-    DARK_GREEN(2, 0xFF00AA00),
-    DARK_AQUA(3, 0xFF00AAAA),
-    DARK_RED(4, 0xFFAA0000),
-    DARK_PURPLE(5, 0xFFAA00AA),
-    GOLD(6, 0xFFFFAA00),
-    GRAY(7, 0xFFAAAAAA),
-    DARK_GRAY(8, 0xFF555555),
-    BLUE(9, 0xFF5555FF),
-    GREEN(10, 0xFF55FF55),
-    AQUA(11, 0xFF55FFFF),
-    RED(12, 0xFFFF5555),
-    LIGHT_PURPLE(13, 0xFFFF55FF),
-    YELLOW(14, 0xFFFFFF55),
-    WHITE(15, 0xFFFFFFFF);
+    // text colors
+    BLACK(0, 0xFF000000, 1),
+    DARK_BLUE(1, 0xFF0000AA, 1),
+    DARK_GREEN(2, 0xFF00AA00, 1),
+    DARK_AQUA(3, 0xFF00AAAA, 1),
+    DARK_RED(4, 0xFFAA0000, 1),
+    DARK_PURPLE(5, 0xFFAA00AA, 1),
+    GOLD(6, 0xFFFFAA00, 1),
+    GRAY(7, 0xFFAAAAAA, 1),
+    DARK_GRAY(8, 0xFF555555, 1),
+    BLUE(9, 0xFF5555FF, 1),
+    GREEN(10, 0xFF55FF55, 1),
+    AQUA(11, 0xFF55FFFF, 1),
+    RED(12, 0xFFFF5555, 1),
+    LIGHT_PURPLE(13, 0xFFFF55FF, 1),
+    YELLOW(14, 0xFFFFFF55, 1),
+    WHITE(15, 0xFFFFFFFF, 1),
+
+    // dyed sign text colors
+    DYE_WHITE(0xFFFFFFFF, 0.4f),
+    DYE_ORANGE(0xFFFF681F, 0.4f),
+    DYE_MAGENTA(0xFFFF00FF, 0.4f),
+    DYE_LIGHT_BLUE(0xFF9AC0CD, 0.4f),
+    DYE_YELLOW(0xFFFFFF00, 0.4f),
+    DYE_LIME(0xFFBFFF00, 0.4f),
+    DYE_PINK(0xFFFF69B4, 0.4f),
+    DYE_GRAY(0xFF808080, 0.4f),
+    DYE_LIGHT_GRAY(0xFFD3D3D3, 0.4f),
+    DYE_CYAN(0xFF00FFFF, 0.4f),
+    DYE_PURPLE(0xFFA020F0, 0.4f),
+    DYE_BLUE(0xFF0000FF, 0.4f),
+    DYE_BROWN(0xFF8B4513, 0.4f),
+    DYE_GREEN(0xFF00FF00, 0.4f),
+    DYE_RED(0xFFFF0000, 0.4f),
+
+    // dyed sign text colors (glowing sign)
+    DYE_GLOWING_WHITE(0xFFFFFFFF),
+    DYE_GLOWING_ORANGE(0xFFFF681F),
+    DYE_GLOWING_MAGENTA(0xFFFF00FF),
+    DYE_GLOWING_LIGHT_BLUE(0xFF9AC0CD),
+    DYE_GLOWING_YELLOW(0xFFFFFF00),
+    DYE_GLOWING_LIME(0xFFBFFF00),
+    DYE_GLOWING_PINK(0xFFFF69B4),
+    DYE_GLOWING_GRAY(0xFF808080),
+    DYE_GLOWING_LIGHT_GRAY(0xFFD3D3D3),
+    DYE_GLOWING_CYAN(0xFF00FFFF),
+    DYE_GLOWING_PURPLE(0xFFA020F0),
+    DYE_GLOWING_BLUE(0xFF0000FF),
+    DYE_GLOWING_BROWN(0xFF8B4513),
+    DYE_GLOWING_GREEN(0xFF00FF00),
+    DYE_GLOWING_RED(0xFFFF0000);
 
     public final int id;
     public final int rgbColor;
     public final float[] linearColor;
 
-    private static final Map<String, Color> map = new HashMap<>();
+    private static final Map<String, Color> textColorMap = new HashMap<>();
+    private static final Color[] textColorByIdMap = new Color[]{
+      BLACK,
+      DARK_BLUE,
+      DARK_GREEN,
+      DARK_AQUA,
+      DARK_RED,
+      DARK_PURPLE,
+      GOLD,
+      GRAY,
+      DARK_GRAY,
+      BLUE,
+      GREEN,
+      AQUA,
+      RED,
+      LIGHT_PURPLE,
+      YELLOW,
+      WHITE,
+    };
+    private static final Map<String, Color> dyedTextColorMap = new HashMap<>();
 
     static {
-      map.put("dark_blue", DARK_BLUE);
-      map.put("dark_green", DARK_GREEN);
-      map.put("dark_aqua", DARK_AQUA);
-      map.put("dark_red", DARK_RED);
-      map.put("dark_purple", DARK_PURPLE);
-      map.put("gold", GOLD);
-      map.put("gray", GRAY);
-      map.put("dark_gray", DARK_GRAY);
-      map.put("blue", BLUE);
-      map.put("green", GREEN);
-      map.put("aqua", AQUA);
-      map.put("red", RED);
-      map.put("light_purple", LIGHT_PURPLE);
-      map.put("yellow", YELLOW);
-      map.put("white", WHITE);
+      textColorMap.put("dark_blue", DARK_BLUE);
+      textColorMap.put("dark_green", DARK_GREEN);
+      textColorMap.put("dark_aqua", DARK_AQUA);
+      textColorMap.put("dark_red", DARK_RED);
+      textColorMap.put("dark_purple", DARK_PURPLE);
+      textColorMap.put("gold", GOLD);
+      textColorMap.put("gray", GRAY);
+      textColorMap.put("dark_gray", DARK_GRAY);
+      textColorMap.put("blue", BLUE);
+      textColorMap.put("green", GREEN);
+      textColorMap.put("aqua", AQUA);
+      textColorMap.put("red", RED);
+      textColorMap.put("light_purple", LIGHT_PURPLE);
+      textColorMap.put("yellow", YELLOW);
+      textColorMap.put("white", WHITE);
 
+      dyedTextColorMap.put("white", Color.DYE_WHITE);
+      dyedTextColorMap.put("orange", Color.DYE_ORANGE);
+      dyedTextColorMap.put("magenta", Color.DYE_MAGENTA);
+      dyedTextColorMap.put("light_blue", Color.DYE_LIGHT_BLUE);
+      dyedTextColorMap.put("yellow", Color.DYE_YELLOW);
+      dyedTextColorMap.put("lime", Color.DYE_LIME);
+      dyedTextColorMap.put("pink", Color.DYE_PINK);
+      dyedTextColorMap.put("gray", Color.DYE_GRAY);
+      dyedTextColorMap.put("light_gray", Color.DYE_LIGHT_GRAY);
+      dyedTextColorMap.put("cyan", Color.DYE_CYAN);
+      dyedTextColorMap.put("purple", Color.DYE_PURPLE);
+      dyedTextColorMap.put("blue", Color.DYE_BLUE);
+      dyedTextColorMap.put("brown", Color.DYE_BROWN);
+      dyedTextColorMap.put("green", Color.DYE_GREEN);
+      dyedTextColorMap.put("red", Color.DYE_RED);
     }
 
-    Color(int id, int color) {
+    Color(int color) {
+      this(-1, color, 1);
+    }
+
+    Color(int color, float multiplier) {
+      this(-1, color, multiplier);
+    }
+
+    Color(int id, int color, float multiplier) {
       this.id = id;
-      this.rgbColor = color;
+      if (multiplier != 1) {
+        float[] rgb = new float[3];
+        ColorUtil.getRGBComponents(color, rgb);
+        rgb[0] *= multiplier;
+        rgb[1] *= multiplier;
+        rgb[2] *= multiplier;
+        this.rgbColor = ColorUtil.getRGB(rgb);
+      } else {
+        this.rgbColor = color;
+      }
       this.linearColor = new float[4];
       ColorUtil.getRGBAComponentsGammaCorrected(rgbColor, linearColor);
     }
 
     public static Color get(String color) {
-      return map.getOrDefault(color, Color.BLACK);
+      return textColorMap.getOrDefault(color, Color.BLACK);
     }
 
     public static Color get(int id) {
-      return values()[id & 0xF];
+      return textColorByIdMap[id & 0xF];
+    }
+
+    public static Color getFromDyedSign(String color) {
+      return dyedTextColorMap.getOrDefault(color, Color.BLACK);
+    }
+
+    public Color getGlowingDyeColor() {
+      switch (this) {
+        case DYE_WHITE:
+          return DYE_GLOWING_WHITE;
+        case DYE_ORANGE:
+          return DYE_GLOWING_ORANGE;
+        case DYE_MAGENTA:
+          return DYE_GLOWING_MAGENTA;
+        case DYE_LIGHT_BLUE:
+          return DYE_GLOWING_LIGHT_BLUE;
+        case DYE_YELLOW:
+          return DYE_GLOWING_YELLOW;
+        case DYE_LIME:
+          return DYE_GLOWING_LIME;
+        case DYE_PINK:
+          return DYE_GLOWING_PINK;
+        case DYE_GRAY:
+          return DYE_GLOWING_GRAY;
+        case DYE_LIGHT_GRAY:
+          return DYE_GLOWING_LIGHT_GRAY;
+        case DYE_CYAN:
+          return DYE_GLOWING_CYAN;
+        case DYE_PURPLE:
+          return DYE_GLOWING_PURPLE;
+        case DYE_BLUE:
+          return DYE_GLOWING_BLUE;
+        case DYE_BROWN:
+          return DYE_GLOWING_BROWN;
+        case DYE_GREEN:
+          return DYE_GLOWING_GREEN;
+        case DYE_RED:
+          return DYE_GLOWING_RED;
+        case BLACK:
+        default:
+          return BLACK;
+      }
+    }
+
+    public Color getGlowingOutlineColor() {
+      if (this == BLACK) {
+        return WHITE;
+      }
+      return this;
     }
   }
 
@@ -180,21 +315,29 @@ public class SignEntity extends Entity {
   private final int angle;
   private final SignTexture frontTexture;
   private final SignTexture backTexture;
+  private final Color frontDye;
+  private final Color backDye;
+  private final boolean frontGlowing;
+  private final boolean backGlowing;
   private final Texture texture;
   private final String material;
 
   public SignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
-    this(position, getFrontTextLines(entityTag), getBackTextLines(entityTag), blockData & 0xF, material);
+    this(position, getFrontTextLines(entityTag), getFrontDyeColor(entityTag), getFrontGlowing(entityTag), getBackTextLines(entityTag), getBackDyeColor(entityTag), getBackGlowing(entityTag), blockData & 0xF, material);
   }
 
-  public SignEntity(Vector3 position, JsonArray[] frontText, JsonArray[] backText, int direction, String material) {
+  public SignEntity(Vector3 position, JsonArray[] frontText, Color frontDye, boolean frontGlowing, JsonArray[] backText, Color backDye, boolean backGlowing, int direction, String material) {
     super(position);
     Texture signTexture = SignEntity.textureFromMaterial(material);
     this.frontText = frontText;
     this.backText = backText;
+    this.frontDye = frontDye;
+    this.backDye = backDye;
+    this.frontGlowing = frontGlowing;
+    this.backGlowing = backGlowing;
     this.angle = direction;
-    this.frontTexture = frontText != null ? new SignTexture(frontText, signTexture, 24, 12, 2 / 64., 18 / 32., 26 / 64., 30 / 32., 4, 1, 10) : null;
-    this.backTexture = backText != null ? new SignTexture(backText, signTexture, 24, 12, 28 / 64., 18 / 32., 52 / 64., 30 / 32., 4, 1, 10) : null;
+    this.frontTexture = frontText != null ? new SignTexture(frontText, frontDye, frontGlowing, signTexture, 24, 12, 2 / 64., 18 / 32., 26 / 64., 30 / 32., 4, 1, 10) : null;
+    this.backTexture = backText != null ? new SignTexture(backText, backDye, backGlowing, signTexture, 24, 12, 28 / 64., 18 / 32., 52 / 64., 30 / 32., 4, 1, 10) : null;
     this.texture = signTexture;
     this.material = material;
   }
@@ -230,6 +373,30 @@ public class SignEntity extends Entity {
   }
 
   /**
+   * Extracts the front dye color from a sign entity tag.
+   */
+  protected static Color getFrontDyeColor(CompoundTag entityTag) {
+    if (!entityTag.get("front_text").isError()) {
+      return Color.getFromDyedSign(entityTag.get("front_text").get("color").stringValue("black"));
+    } else {
+      // < 1.20 sign
+      return Color.getFromDyedSign(entityTag.get("Color").stringValue("black"));
+    }
+  }
+
+  /**
+   * Extracts the front glowing boolean from a sign entity tag.
+   */
+  protected static boolean getFrontGlowing(CompoundTag entityTag) {
+    if (!entityTag.get("front_text").isError()) {
+      return entityTag.get("front_text").get("has_glowing_text").boolValue(false);
+    } else {
+      // < 1.20 sign
+      return entityTag.get("GlowingText").boolValue(false);
+    }
+  }
+
+  /**
    * Extracts the front text lines from a sign entity tag.
    *
    * @return array of text lines.
@@ -253,6 +420,30 @@ public class SignEntity extends Entity {
   }
 
   /**
+   * Extracts the back dye color from a sign entity tag.
+   */
+  protected static Color getBackDyeColor(CompoundTag entityTag) {
+    if (!entityTag.get("back_text").isError()) {
+      return Color.getFromDyedSign(entityTag.get("back_text").get("color").stringValue("black"));
+    } else {
+      // < 1.20 sign
+      return Color.BLACK;
+    }
+  }
+
+  /**
+   * Extracts the back glowing boolean from a sign entity tag.
+   */
+  protected static boolean getBackGlowing(CompoundTag entityTag) {
+    if (!entityTag.get("back_text").isError()) {
+      return entityTag.get("back_text").get("has_glowing_text").boolValue(false);
+    } else {
+      // < 1.20 sign
+      return false;
+    }
+  }
+
+  /**
    * Extract text from entity tag.
    */
   private static JsonArray extractText(Tag tag) {
@@ -264,13 +455,13 @@ public class SignEntity extends Entity {
         JsonValue value = parser.parse();
         if (value.isObject()) {
           JsonObject obj = value.object();
-          addText(array, obj.get("text").stringValue(""));
+          addText(array, obj.get("text").stringValue(""), obj.get("color").stringValue(""));
           JsonArray extraArray = obj.get("extra").array();
           for (JsonValue extra : extraArray) {
             if (extra.isObject()) {
               JsonObject extraObject = extra.object();
               addText(array, extraObject.get("text").stringValue(""),
-                extraObject.get("color").stringValue(""));
+                extraObject.get("color").stringValue(obj.get("color").stringValue("")));
             } else {
               addText(array, extra.stringValue(""));
             }
@@ -359,9 +550,17 @@ public class SignEntity extends Entity {
     json.add("position", position.toJson());
     if (frontText != null) {
       json.add("text", textToJson(frontText));
+      if (frontDye != null) {
+        json.add("dye", frontDye.name().replace("DYE_", "").toLowerCase());
+      }
+      json.add("glowing", frontGlowing);
     }
     if (backText != null) {
       json.add("backText", textToJson(backText));
+      if (backDye != null) {
+        json.add("backDye", backDye.name().replace("DYE_", "").toLowerCase());
+      }
+      json.add("backGlowing", backGlowing);
     }
     json.add("direction", angle);
     json.add("material", material);
@@ -384,7 +583,11 @@ public class SignEntity extends Entity {
     }
     int direction = json.get("direction").intValue(0);
     String material = json.get("material").stringValue("oak");
-    return new SignEntity(position, frontText, backText, direction, material);
+    Color dye = Color.getFromDyedSign(json.get("dye").stringValue(null));
+    boolean glowing = json.get("glowing").boolValue(false);
+    Color backDye = Color.getFromDyedSign(json.get("backDye").stringValue(null));
+    boolean backGlowing = json.get("backGlowing").boolValue(false);
+    return new SignEntity(position, frontText, dye, glowing, backText, backDye, backGlowing, direction, material);
   }
 
   /**
