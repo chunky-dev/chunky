@@ -59,10 +59,10 @@ public class UVMapHelper {
   }
 
   public static class Side {
-    private final double x0;
-    private final double x1;
-    private final double y0;
-    private final double y1;
+    private double x0;
+    private double x1;
+    private double y0;
+    private double y1;
 
     protected Side(double x0, double x1, double y0, double y1) {
       this.x0 = x0;
@@ -72,11 +72,17 @@ public class UVMapHelper {
     }
 
     public Side flipX() {
-      return new Side(x1, x0, y0, y1);
+      double tmp = x0;
+      x0 = x1;
+      x1 = tmp;
+      return this;
     }
 
     public Side flipY() {
-      return new Side(x0, x1, y1, y0);
+      double tmp = y0;
+      y0 = y1;
+      y1 = tmp;
+      return this;
     }
 
     /**
