@@ -22,6 +22,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.function.Consumer;
+
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.minecraft.Lava;
 import se.llbit.chunky.block.minecraft.Water;
@@ -47,8 +49,9 @@ public class OctreeFileFormat {
    * @param in   input stream for the file to load the scene from.
    * @param octreeImpl The octree implementation to use
    * @param legacyBiomeImpl The biome structure implementation to use to load any legacy WorldTextures
-   * */
-  public static OctreeData load(DataInputStream in, String octreeImpl, String legacyBiomeImpl) throws IOException {
+   * @param stepConsumer A consumer that will be called with a string describing the current loading step
+   */
+  public static OctreeData load(DataInputStream in, String octreeImpl, String legacyBiomeImpl, Consumer<String> stepConsumer) throws IOException {
     int version = in.readInt();
     if (version < MIN_OCTREE_VERSION || version > OCTREE_VERSION) {
       throw new IOException(String.format(
@@ -56,18 +59,27 @@ public class OctreeFileFormat {
           MIN_OCTREE_VERSION, OCTREE_VERSION, version));
     }
     OctreeData data = new OctreeData();
+    stepConsumer.accept("block palette");
     data.palette = BlockPalette.read(in);
+    stepConsumer.accept("world octree");
     data.worldTree = Octree.load(octreeImpl, version < 5 ? convertDataNodes(data.palette, in) : in);
+    stepConsumer.accept("water octree");
     data.waterTree = Octree.load(octreeImpl, version < 5 ? convertDataNodes(data.palette, in) : in);
 
     if(version >= 7) {
+      stepConsumer.accept("grass tints");
       data.grassColors = loadBiomeStructure(in);
+      stepConsumer.accept("foliage tints");
       data.foliageColors = loadBiomeStructure(in);
+      stepConsumer.accept("water tints");
       data.waterColors = loadBiomeStructure(in);
     } else {
+      stepConsumer.accept("grass tints");
       data.grassColors = loadLegacyBiomeStructure(legacyBiomeImpl, in);
+      stepConsumer.accept("foliage tints");
       data.foliageColors = loadLegacyBiomeStructure(legacyBiomeImpl, in);
       if (version >= 4) {
+        stepConsumer.accept("water tints");
         data.waterColors = loadLegacyBiomeStructure(legacyBiomeImpl, in);
       }
     }
