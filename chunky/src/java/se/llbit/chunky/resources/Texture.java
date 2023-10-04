@@ -1316,6 +1316,8 @@ public class Texture {
   public static final Texture calibratedSculkSensorTop = new Texture();
   @TexturePath("assets/minecraft/textures/block/calibrated_sculk_sensor_input_side")
   public static final Texture calibratedSculkSensorInputSide = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/piglin/piglin")
+  public static final Texture piglin = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

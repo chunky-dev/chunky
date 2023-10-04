@@ -13,6 +13,9 @@ import se.llbit.chunky.world.BlockData;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
 
+import java.util.*;
+import java.util.function.BiFunction;
+
 public class MinecraftBlockProvider implements BlockProvider {
 
   private static final String[] blockList = new String[]{
@@ -2388,9 +2391,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "dragon_egg":
         return new DragonEgg();
       case "dragon_head":
-        return skull(tag, Texture.steve, SkullEntity.Kind.DRAGON);
+        return skull(tag, Texture.dragon, SkullEntity.Kind.DRAGON);
       case "dragon_wall_head":
-        return wallSkull(tag, Texture.steve, SkullEntity.Kind.DRAGON);
+        return wallSkull(tag, Texture.dragon, SkullEntity.Kind.DRAGON);
       case "white_banner":
         return banner(tag, Texture.whiteWool, BlockData.COLOR_WHITE);
       case "orange_banner":
@@ -3018,6 +3021,10 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.rawGoldBlock);
       case "raw_iron_block":
         return new MinecraftBlock(name, Texture.rawIronBlock);
+      case "piglin_head":
+        return skull(tag, Texture.piglin, SkullEntity.Kind.PIGLIN);
+      case "piglin_wall_head":
+        return wallSkull(tag, Texture.piglin, SkullEntity.Kind.PIGLIN);
       default:
         BiFunction<String, Tag, Block> factory = blocks.get(namespacedName);
         if (factory != null) {
@@ -3444,13 +3451,13 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new Wall(name, texture, north, south, east, west, up.equals("true"));
   }
 
-  private Block skull(Tag tag, EntityTexture texture, SkullEntity.Kind type) {
+  private Block skull(Tag tag, Texture texture, SkullEntity.Kind type) {
     String name = BlockProvider.blockName(tag);
     int rotation = BlockProvider.stringToInt(tag.get("Properties").get("rotation"), 0);
     return new Head(name, texture, type, rotation);
   }
 
-  private Block wallSkull(Tag tag, EntityTexture texture, SkullEntity.Kind type) {
+  private Block wallSkull(Tag tag, Texture texture, SkullEntity.Kind type) {
     String name = BlockProvider.blockName(tag);
     String facing = BlockProvider.facing(tag);
     return new WallHead(name, texture, type, facing);

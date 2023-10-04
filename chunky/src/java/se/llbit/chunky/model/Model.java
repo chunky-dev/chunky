@@ -227,6 +227,18 @@ public class Model {
   }
 
   /**
+   * @param src source quads
+   * @return Quads rotated about the Z axis by some angle
+   */
+  public static Quad[] transform(Quad[] src, Transform transform) {
+    Quad[] rot = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i].transform(transform);
+    }
+    return rot;
+  }
+
+  /**
    * @param models source quads
    * @return All quads merged into a single array
    */

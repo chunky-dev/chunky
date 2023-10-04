@@ -5,7 +5,7 @@ import se.llbit.chunky.entity.HeadEntity;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.resources.EntityTexture;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
@@ -16,7 +16,7 @@ public class WallHead extends MinecraftBlockTranslucent {
   private final int facing;
   private final SkullEntity.Kind type;
 
-  public WallHead(String name, EntityTexture texture, SkullEntity.Kind type, String facing) {
+  public WallHead(String name, Texture texture, SkullEntity.Kind type, String facing) {
     super(name, texture);
     localIntersect = true;
     invisible = true;
