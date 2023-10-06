@@ -484,7 +484,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         faces.addAll(head.primitives(Transform.NONE.scale(1.2).translate(0.5, 0.5, 0.5).chain(transform)));
       } else if (headItemId.equals("minecraft:piglin_head")) {
         SkullEntity skull = new SkullEntity(new Vector3(), Kind.PIGLIN, 0, 1);
-        faces.addAll(skull.piglinHeadPrimitives(Transform.NONE.scale(1.1).translate(0.5, 0.5, 0.5).chain(transform)));
+        faces.addAll(skull.piglinHeadPrimitives(Transform.NONE.scale(1.2).translate(0.5, 0.5, 0.5).chain(transform)));
       } else {
         addModel(faces, getHelmModel(headItem), transform);
       }
