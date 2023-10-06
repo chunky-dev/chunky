@@ -605,8 +605,9 @@ public class SkullEntity extends Entity {
   }
 
   public Collection<Primitive> piglinHeadPrimitives(Transform transform) {
-    transform = Transform.NONE.chain(transform)
-      .translate(0, -4 / 16., 0);
+    transform = Transform.NONE
+      .translate(0, -4 / 16., 0)
+      .chain(transform);
     Collection<Primitive> faces = new LinkedList<>();
     Material material = new TextureMaterial(Texture.piglin);
     for (Quad quad : piglinHead) {
