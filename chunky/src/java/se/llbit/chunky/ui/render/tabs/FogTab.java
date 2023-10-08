@@ -144,17 +144,6 @@ public class FogTab extends ScrollPane implements RenderControlsTab, Initializab
       int index = fogVolumeTable.getSelectionModel().getSelectedIndex();
       FogVolume fogVolume = scene.fog.getFogVolumes().get(index);
 
-      DoubleAdjuster density = new DoubleAdjuster();
-      density.setName("Fog density");
-      density.setTooltip("Fog thickness");
-      density.setMaximumFractionDigits(6);
-      density.setRange(0.000001, 1);
-      density.clampMin();
-      density.set(fogVolume.getDensity());
-      density.onValueChange(value -> {
-        fogVolume.setDensity(value);
-        scene.refresh();
-      });
 
       HBox fogColorPickerBox = new HBox();
       fogColorPickerBox.setSpacing(10);
@@ -168,6 +157,31 @@ public class FogTab extends ScrollPane implements RenderControlsTab, Initializab
         });
       fogColorPickerBox.getChildren().addAll(label, luxColorPicker);
 
+      DoubleAdjuster density = new DoubleAdjuster();
+      density.setName("Fog density");
+      density.setTooltip("Fog thickness");
+      density.setMaximumFractionDigits(6);
+      density.setRange(0.000001, 1);
+      density.clampMin();
+      density.set(fogVolume.getDensity());
+      density.onValueChange(value -> {
+        fogVolume.setDensity(value);
+        scene.refresh();
+      });
+
+      DoubleAdjuster anisotropy = new DoubleAdjuster();
+      anisotropy.setName("Anisotropy");
+      anisotropy.setTooltip("Changes the direction light is more likely to be scattered.\n" +
+        "Positive values increase the chance light scatters into its original direction of travel.\n" +
+        "Negative values increase the chance light scatters away from its original direction of travel");
+      anisotropy.set(fogVolume.getAnisotropy());
+      anisotropy.setRange(-1, 1);
+      anisotropy.clampBoth();
+      anisotropy.onValueChange(value -> {
+        fogVolume.setAnisotropy(value.floatValue());
+        scene.refresh();
+      });
+
       DoubleAdjuster emittance = new DoubleAdjuster();
       emittance.setName("Emittance");
       emittance.setRange(0, 100);
@@ -178,55 +192,13 @@ public class FogTab extends ScrollPane implements RenderControlsTab, Initializab
         scene.refresh();
       });
 
-      DoubleAdjuster specular = new DoubleAdjuster();
-      specular.setName("Specular");
-      specular.setRange(0, 1);
-      specular.clampBoth();
-      specular.set(fogVolume.getSpecular());
-      specular.onValueChange(value -> {
-        fogVolume.setSpecular(value.floatValue());
-        scene.refresh();
-      });
-
-      DoubleAdjuster smoothness = new DoubleAdjuster();
-      smoothness.setName("Smoothness");
-      smoothness.setRange(0, 1);
-      smoothness.clampBoth();
-      smoothness.set(fogVolume.getSmoothness());
-      smoothness.onValueChange(value -> {
-        fogVolume.setSmoothness(value.floatValue());
-        scene.refresh();
-      });
-
-      DoubleAdjuster ior = new DoubleAdjuster();
-      ior.setName("IoR");
-      ior.setRange(0, 5);
-      ior.set(fogVolume.getIor());
-      ior.onValueChange(value -> {
-        fogVolume.setIor(value.floatValue());
-        scene.refresh();
-      });
-
-      DoubleAdjuster metalness = new DoubleAdjuster();
-      metalness.setName("Metalness");
-      metalness.setRange(0, 1);
-      metalness.clampBoth();
-      metalness.set(fogVolume.getMetalness());
-      metalness.onValueChange(value -> {
-        fogVolume.setMetalness(value.floatValue());
-        scene.refresh();
-      });
-
       Separator separator = new Separator();
 
       volumeSpecificControls.getChildren().addAll(
-        density,
         fogColorPickerBox,
+        density,
+        anisotropy,
         emittance,
-        specular,
-        smoothness,
-        ior,
-        metalness,
         separator
       );
 

@@ -347,10 +347,10 @@ public class BlockPalette {
       }
     });
     materialProperties.put("minecraft:torch", block -> {
-      block.emittance = 50.0f;
+      block.emittance = 1.0f;
     });
     materialProperties.put("minecraft:wall_torch", block -> {
-      block.emittance = 50.0f;
+      block.emittance = 1.0f;
     });
     materialProperties.put("minecraft:fire", block -> {
       block.emittance = 1.0f;
@@ -448,16 +448,16 @@ public class BlockPalette {
       block.emittance = 0.6f;
     });
     materialProperties.put("minecraft:soul_fire_torch", block -> { // MC 20w06a-20w16a
-      block.emittance = 35.0f;
+      block.emittance = 0.6f;
     });
     materialProperties.put("minecraft:soul_torch", block -> { // MC >= 20w17a
-      block.emittance = 35.0f;
+      block.emittance = 0.6f;
     });
     materialProperties.put("minecraft:soul_fire_wall_torch", block -> { // MC 20w06a-20w16a
-      block.emittance = 35.0f;
+      block.emittance = 0.6f;
     });
     materialProperties.put("minecraft:soul_wall_torch", block -> { // MC >= 20w17a
-      block.emittance = 35.0f;
+      block.emittance = 0.6f;
     });
     materialProperties.put("minecraft:soul_fire", block -> {
       block.emittance = 0.6f;
@@ -523,16 +523,24 @@ public class BlockPalette {
       }
     });
     materialProperties.put("minecraft:small_amethyst_bud", block -> {
-      block.emittance = 1.0f / 15f;
+      if (block instanceof AmethystCluster && ((AmethystCluster) block).isLit()) {
+        block.emittance = 1.0f / 15f;
+      }
     });
     materialProperties.put("minecraft:medium_amethyst_bud", block -> {
-      block.emittance = 1.0f / 15f * 2;
+      if (block instanceof AmethystCluster && ((AmethystCluster) block).isLit()) {
+        block.emittance = 1.0f / 15f * 2;
+      }
     });
     materialProperties.put("minecraft:large_amethyst_bud", block -> {
-      block.emittance = 1.0f / 15f * 4;
+      if (block instanceof AmethystCluster && ((AmethystCluster) block).isLit()) {
+        block.emittance = 1.0f / 15f * 4;
+      }
     });
     materialProperties.put("minecraft:amethyst_cluster", block -> {
-      block.emittance = 1.0f / 15f * 5;
+      if (block instanceof AmethystCluster && ((AmethystCluster) block).isLit()) {
+        block.emittance = 1.0f / 15f * 5;
+      }
     });
     materialProperties.put("minecraft:tinted_glass", glassConfig);
     materialProperties.put("minecraft:sculk_sensor", block -> {

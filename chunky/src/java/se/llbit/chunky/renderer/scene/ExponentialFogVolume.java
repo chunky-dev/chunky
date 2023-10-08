@@ -42,9 +42,12 @@ public class ExponentialFogVolume extends FogVolume {
       return false;
     }
     ray.t = dist;
-    // pick a random normal vector based on a spherical particle
+    // pick a random normal vector based on a spherical particle.
+    // This is done only to prevent fog from looking ugly in the render preview and
+    // should have no effect on the path-traced render.
     setRandomNormal(ray, random);
     setRayMaterialAndColor(ray);
+    ray.specular = false;
     return true;
   }
 

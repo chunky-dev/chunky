@@ -70,11 +70,6 @@ public class Ray {
   public Vector4 color = new Vector4();
 
   /**
-   * Emittance of previously intersected surface.
-   */
-  public Vector3 emittance = new Vector3();
-
-  /**
    * Previous material.
    */
   private Material prevMaterial = Air.INSTANCE;
@@ -150,7 +145,6 @@ public class Ray {
     currentMaterial = Air.INSTANCE;
     depth = 0;
     color.set(0, 0, 0, 0);
-    emittance.set(0, 0, 0);
     specular = true;
   }
 
@@ -167,7 +161,6 @@ public class Ray {
     n.set(other.n);
     geomN.set(other.geomN);
     color.set(0, 0, 0, 0);
-    emittance.set(0, 0, 0);
     specular = other.specular;
   }
 

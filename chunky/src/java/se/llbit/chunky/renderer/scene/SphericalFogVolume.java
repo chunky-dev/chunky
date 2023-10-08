@@ -39,8 +39,12 @@ public class SphericalFogVolume extends FogVolume {
     o.scaleAdd(distance, ray.d);
     if (sphereTranslated.isInside(o)) {
       ray.t = distance;
+      // pick a random normal vector based on a spherical particle.
+      // This is done only to prevent fog from looking ugly in the render preview and
+      // should have no effect on the path-traced render.
       setRandomNormal(ray, random);
       setRayMaterialAndColor(ray);
+      ray.specular = false;
       return true;
     } else {
       return false;

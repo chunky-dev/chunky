@@ -54,36 +54,12 @@ public abstract class FogVolume implements JsonSerializable {
     this.material.emittance = value;
   }
 
-  public double getSpecular() {
-    return this.material.specular;
+  public double getAnisotropy() {
+    return this.material.anisotropy;
   }
 
-  public void setSpecular(float value) {
-    this.material.specular = value;
-  }
-
-  public double getSmoothness() {
-    return this.material.getPerceptualSmoothness();
-  }
-
-  public void setSmoothness(double value) {
-    this.material.setPerceptualSmoothness(value);
-  }
-
-  public double getIor() {
-    return this.material.ior;
-  }
-
-  public void setIor(float value) {
-    this.material.ior = value;
-  }
-
-  public double getMetalness() {
-    return this.material.metalness;
-  }
-
-  public void setMetalness(float value) {
-    this.material.metalness = value;
+  public void setAnisotropy(float value) {
+    this.material.anisotropy = value;
   }
 
   public void setDensity(double value) {
@@ -95,7 +71,7 @@ public abstract class FogVolume implements JsonSerializable {
   }
 
   public void setColor(Vector3 value) {
-    this.color = new Vector3(value);
+    this.color.set(value);
   }
 
   public Vector3 getColor() {
@@ -125,10 +101,7 @@ public abstract class FogVolume implements JsonSerializable {
   protected JsonObject materialPropertiesToJson() {
     JsonObject materialProperties = new JsonObject();
     materialProperties.add("emittance", material.emittance);
-    materialProperties.add("specular", material.specular);
-    materialProperties.add("roughness", material.roughness);
-    materialProperties.add("ior", material.ior);
-    materialProperties.add("metalness", material.metalness);
+    materialProperties.add("anisotropy", material.anisotropy);
     return materialProperties;
   }
 
@@ -147,9 +120,6 @@ public abstract class FogVolume implements JsonSerializable {
 
   protected void importMaterialProperties(JsonObject json) {
     material.emittance = json.get("emittance").floatValue(material.emittance);
-    material.specular = json.get("specular").floatValue(material.specular);
-    material.roughness = json.get("roughness").floatValue(material.roughness);
-    material.ior = json.get("ior").floatValue(material.ior);
-    material.metalness = json.get("metalness").floatValue(material.metalness);
+    material.anisotropy = json.get("anisotropy").floatValue(material.anisotropy);
   }
 }

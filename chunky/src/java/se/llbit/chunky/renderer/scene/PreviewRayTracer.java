@@ -101,7 +101,7 @@ public class PreviewRayTracer implements RayTracer {
     }
     if (particleFog) {
       for(FogVolume v : scene.fog.getFogVolumes()) {
-        hit = v.intersect(ray, scene, random) || hit;
+        hit |= v.intersect(ray, scene, random);
       }
     }
     if (scene.intersect(ray)) {
