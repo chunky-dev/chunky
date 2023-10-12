@@ -73,7 +73,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     metalness.setName("Metalness");
     metalness.setRange(0, 1);
     metalness.setTooltip("Metalness (texture-tinted reflectivity) of the selected material.");
-    anisotropy.setName("Volume scatter anisotropy");
+    anisotropy.setName("Anisotropy");
     anisotropy.setRange(-1, 1);
     anisotropy.clampBoth();
     ObservableList<String> blockIds = FXCollections.observableArrayList();
@@ -92,7 +92,8 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     settings.getChildren().addAll(
         new Label("Material Properties"),
         emittance, specular, perceptualSmoothness, ior, metalness, anisotropy,
-        new Label("(set to zero to disable)"));
+        new Label("(set to zero to disable)\n" +
+          "'Anisotropy' is effective only on the 'volume_cloud' material."));
     setPadding(new Insets(10));
     setSpacing(15);
     TextField filterField = new TextField();

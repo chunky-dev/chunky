@@ -144,7 +144,6 @@ public class FogTab extends ScrollPane implements RenderControlsTab, Initializab
       int index = fogVolumeTable.getSelectionModel().getSelectedIndex();
       FogVolume fogVolume = scene.fog.getFogVolumes().get(index);
 
-
       HBox fogColorPickerBox = new HBox();
       fogColorPickerBox.setSpacing(10);
       Label label = new Label("Fog color:");
@@ -305,6 +304,28 @@ public class FogTab extends ScrollPane implements RenderControlsTab, Initializab
           yText.setLabelText("y:");
           zText.setLabelText("z:");
 
+          Button toCamera = new Button();
+          toCamera.setText("To camera");
+          toCamera.setOnAction(event -> {
+            Vector3 cameraPosition = new Vector3(scene.camera().getPosition());
+            posX.valueProperty().setValue(cameraPosition.x);
+            posY.valueProperty().setValue(cameraPosition.y);
+            posZ.valueProperty().setValue(cameraPosition.z);
+            scene.refresh();
+          });
+
+          Button toTarget = new Button();
+          toTarget.setText("To target");
+          toTarget.setOnAction(event -> {
+            Vector3 targetPosition = scene.getTargetPosition();
+            if (targetPosition != null) {
+              posX.valueProperty().setValue(targetPosition.x);
+              posY.valueProperty().setValue(targetPosition.y);
+              posZ.valueProperty().setValue(targetPosition.z);
+              scene.refresh();
+            }
+          });
+
           GridPane gridPane = new GridPane();
           gridPane.setHgap(6);
           gridPane.getColumnConstraints().addAll(
@@ -314,6 +335,10 @@ public class FogTab extends ScrollPane implements RenderControlsTab, Initializab
             posFieldConstraints
           );
           gridPane.addRow(0, new Label("Center:"), xText, yText, zText);
+
+          HBox hBox = new HBox();
+          hBox.setSpacing(10);
+          hBox.getChildren().addAll(toCamera, toTarget);
 
           DoubleAdjuster radius = new DoubleAdjuster();
           radius.setName("Radius");
@@ -326,7 +351,7 @@ public class FogTab extends ScrollPane implements RenderControlsTab, Initializab
             scene.refresh();
           });
 
-          volumeSpecificControls.getChildren().addAll(gridPane, radius);
+          volumeSpecificControls.getChildren().addAll(gridPane, hBox, radius);
           break;
         }
         case CUBOID: {
@@ -448,19 +473,79 @@ public class FogTab extends ScrollPane implements RenderControlsTab, Initializab
           y2Text.setLabelText("y:");
           z2Text.setLabelText("z:");
 
-          GridPane gridPane = new GridPane();
-          gridPane.setHgap(6);
-          gridPane.setVgap(10);
-          gridPane.getColumnConstraints().addAll(
+          Button pos1ToCamera = new Button();
+          pos1ToCamera.setText("To camera");
+          pos1ToCamera.setOnAction(event -> {
+            Vector3 cameraPosition = new Vector3(scene.camera().getPosition());
+            x1.valueProperty().setValue(cameraPosition.x);
+            y1.valueProperty().setValue(cameraPosition.y);
+            z1.valueProperty().setValue(cameraPosition.z);
+            scene.refresh();
+          });
+
+          Button pos1ToTarget = new Button();
+          pos1ToTarget.setText("To target");
+          pos1ToTarget.setOnAction(event -> {
+            Vector3 targetPosition = scene.getTargetPosition();
+            if (targetPosition != null) {
+              x1.valueProperty().setValue(targetPosition.x);
+              y1.valueProperty().setValue(targetPosition.y);
+              z1.valueProperty().setValue(targetPosition.z);
+              scene.refresh();
+            }
+          });
+
+          Button pos2ToCamera = new Button();
+          pos2ToCamera.setText("To camera");
+          pos2ToCamera.setOnAction(event -> {
+            Vector3 cameraPosition = new Vector3(scene.camera().getPosition());
+            x2.valueProperty().setValue(cameraPosition.x);
+            y2.valueProperty().setValue(cameraPosition.y);
+            z2.valueProperty().setValue(cameraPosition.z);
+            scene.refresh();
+          });
+
+          Button pos2ToTarget = new Button();
+          pos2ToTarget.setText("To target");
+          pos2ToTarget.setOnAction(event -> {
+            Vector3 targetPosition = scene.getTargetPosition();
+            if (targetPosition != null) {
+              x2.valueProperty().setValue(targetPosition.x);
+              y2.valueProperty().setValue(targetPosition.y);
+              z2.valueProperty().setValue(targetPosition.z);
+              scene.refresh();
+            }
+          });
+
+          GridPane gridPane1 = new GridPane();
+          gridPane1.setHgap(6);
+          gridPane1.getColumnConstraints().addAll(
             labelConstraints,
             posFieldConstraints,
             posFieldConstraints,
             posFieldConstraints
           );
-          gridPane.addRow(0, new Label("Corner 1:"), x1Text, y1Text, z1Text);
-          gridPane.addRow(1, new Label("Corner 2:"), x2Text, y2Text, z2Text);
+          gridPane1.addRow(0, new Label("Corner 1:"), x1Text, y1Text, z1Text);
 
-          volumeSpecificControls.getChildren().addAll(gridPane);
+          HBox hBox1 = new HBox();
+          hBox1.setSpacing(10);
+          hBox1.getChildren().addAll(pos1ToCamera, pos1ToTarget);
+
+          GridPane gridPane2 = new GridPane();
+          gridPane2.setHgap(6);
+          gridPane2.getColumnConstraints().addAll(
+            labelConstraints,
+            posFieldConstraints,
+            posFieldConstraints,
+            posFieldConstraints
+          );
+          gridPane2.addRow(1, new Label("Corner 2:"), x2Text, y2Text, z2Text);
+
+          HBox hBox2 = new HBox();
+          hBox2.setSpacing(10);
+          hBox2.getChildren().addAll(pos2ToCamera, pos2ToTarget);
+
+          volumeSpecificControls.getChildren().addAll(gridPane1, hBox1, gridPane2, hBox2);
           break;
         }
       }
