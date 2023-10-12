@@ -307,7 +307,7 @@ public class FogTab extends ScrollPane implements RenderControlsTab, Initializab
           Button toCamera = new Button();
           toCamera.setText("To camera");
           toCamera.setOnAction(event -> {
-            Vector3 cameraPosition = new Vector3(scene.camera().getPosition());
+            Vector3 cameraPosition = scene.camera().getPosition();
             posX.valueProperty().setValue(cameraPosition.x);
             posY.valueProperty().setValue(cameraPosition.y);
             posZ.valueProperty().setValue(cameraPosition.z);
@@ -476,7 +476,7 @@ public class FogTab extends ScrollPane implements RenderControlsTab, Initializab
           Button pos1ToCamera = new Button();
           pos1ToCamera.setText("To camera");
           pos1ToCamera.setOnAction(event -> {
-            Vector3 cameraPosition = new Vector3(scene.camera().getPosition());
+            Vector3 cameraPosition = scene.camera().getPosition();
             x1.valueProperty().setValue(cameraPosition.x);
             y1.valueProperty().setValue(cameraPosition.y);
             z1.valueProperty().setValue(cameraPosition.z);
@@ -498,7 +498,7 @@ public class FogTab extends ScrollPane implements RenderControlsTab, Initializab
           Button pos2ToCamera = new Button();
           pos2ToCamera.setText("To camera");
           pos2ToCamera.setOnAction(event -> {
-            Vector3 cameraPosition = new Vector3(scene.camera().getPosition());
+            Vector3 cameraPosition = scene.camera().getPosition();
             x2.valueProperty().setValue(cameraPosition.x);
             y2.valueProperty().setValue(cameraPosition.y);
             z2.valueProperty().setValue(cameraPosition.z);
