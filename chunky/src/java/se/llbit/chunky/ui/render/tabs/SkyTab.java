@@ -60,10 +60,16 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   @FXML private VBox skyModeSettings;
   @FXML private CheckBox transparentSkyEnabled;
   @FXML private CheckBox cloudsEnabled;
-  @FXML private DoubleAdjuster cloudSize;
-  @FXML private DoubleAdjuster cloudX;
-  @FXML private DoubleAdjuster cloudY;
-  @FXML private DoubleAdjuster cloudZ;
+  @FXML private TitledPane cloudDetailsPane;
+  @FXML private DoubleAdjuster cloudSizeX;
+  @FXML private DoubleAdjuster cloudSizeY;
+  @FXML private DoubleAdjuster cloudSizeZ;
+  @FXML private DoubleAdjuster cloudOffsetX;
+  @FXML private DoubleAdjuster cloudOffsetY;
+  @FXML private DoubleAdjuster cloudOffsetZ;
+  @FXML private LuxColorPicker cloudColor;
+  @FXML private CheckBox enableVolumetricClouds;
+  @FXML private DoubleAdjuster cloudDensity;
   private final VBox simulatedSettings = new VBox();
   private DoubleAdjuster horizonOffset = new DoubleAdjuster();
   private ChoiceBox<SimulatedSky> simulatedSky = new ChoiceBox<>();
@@ -75,6 +81,9 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
 
   private ChangeListener<? super javafx.scene.paint.Color> skyColorListener =
       (observable, oldValue, newValue) -> scene.sky().setColor(ColorUtil.fromFx(newValue));
+
+  private ChangeListener<? super javafx.scene.paint.Color> cloudColorListener =
+    (observable, oldValue, newValue) -> scene.sky().setCloudColor(ColorUtil.fromFx(newValue));
   private EventHandler<ActionEvent> simSkyListener = event -> {
     int selected = simulatedSky.getSelectionModel().getSelectedIndex();
     scene.sky().setSimulatedSkyMode(selected);
@@ -126,22 +135,68 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     simulatedSky.setOnAction(simSkyListener);
     simulatedSky.setTooltip(new Tooltip(skiesTooltip(Sky.skies)));
 
-    cloudSize.setName("Cloud size");
-    cloudSize.setTooltip("Cloud size, measured in blocks per pixel of clouds.png texture");
-    cloudSize.setRange(0.1, 128);
-    cloudSize.clampMin();
-    cloudSize.makeLogarithmic();
-    cloudSize.onValueChange(value -> scene.sky().setCloudSize(value));
+    cloudsEnabled.setTooltip(new Tooltip("Toggle visibility of Minecraft-style clouds."));
+    cloudsEnabled.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.sky().setCloudsEnabled(newValue);
+      cloudDetailsPane.setVisible(newValue);
+      cloudDetailsPane.setExpanded(newValue);
+      cloudDetailsPane.setManaged(newValue);
+    });
 
-    cloudX.setTooltip("Cloud X offset.");
-    cloudX.setRange(-256, 256);
-    cloudX.onValueChange(value -> scene.sky().setCloudXOffset(value));
-    cloudY.setTooltip("Cloud Y offset.");
-    cloudY.setRange(-64, 320);
-    cloudY.onValueChange(value -> scene.sky().setCloudYOffset(value));
-    cloudZ.setTooltip("Cloud Z offset.");
-    cloudZ.setRange(-256, 256);
-    cloudZ.onValueChange(value -> scene.sky().setCloudZOffset(value));
+    cloudDetailsPane.setVisible(false);
+    cloudDetailsPane.setExpanded(false);
+    cloudDetailsPane.setManaged(false);
+
+    cloudSizeX.setName("Cloud X scale");
+    cloudSizeX.setTooltip("Scale of the X-dimension of the clouds, measured in blocks per pixel of clouds.png texture");
+    cloudSizeX.setRange(0.01, 128);
+    cloudSizeX.clampMin();
+    cloudSizeX.makeLogarithmic();
+    cloudSizeX.onValueChange(value -> scene.sky().setCloudSizeX(value));
+
+    cloudSizeY.setName("Cloud Y scale");
+    cloudSizeY.setTooltip("Scale of the Y-dimension of the clouds, measured in blocks per pixel of clouds.png texture");
+    cloudSizeY.setRange(0.01, 128);
+    cloudSizeY.clampMin();
+    cloudSizeY.makeLogarithmic();
+    cloudSizeY.onValueChange(value -> scene.sky().setCloudSizeY(value));
+
+    cloudSizeZ.setName("Cloud Z scale");
+    cloudSizeZ.setTooltip("Scale of the Z-dimension of the clouds, measured in blocks per pixel of clouds.png texture");
+    cloudSizeZ.setRange(0.01, 128);
+    cloudSizeZ.clampMin();
+    cloudSizeZ.makeLogarithmic();
+    cloudSizeZ.onValueChange(value -> scene.sky().setCloudSizeZ(value));
+
+    cloudOffsetX.setName("Cloud X offset");
+    cloudOffsetX.setTooltip("Changes the X-offset of the clouds.");
+    cloudOffsetX.setRange(-256, 256);
+    cloudOffsetX.onValueChange(value -> scene.sky().setCloudXOffset(value));
+
+    cloudOffsetY.setName("Cloud Y offset");
+    cloudOffsetY.setTooltip("Changes the altitude of the clouds.");
+    cloudOffsetY.setRange(-64, 320);
+    cloudOffsetY.onValueChange(value -> scene.sky().setCloudYOffset(value));
+
+    cloudOffsetZ.setName("Cloud Z offset");
+    cloudOffsetZ.setTooltip("Changes the Z-offset of the clouds.");
+    cloudOffsetZ.setRange(-256, 256);
+    cloudOffsetZ.onValueChange(value -> scene.sky().setCloudZOffset(value));
+
+    cloudColor.colorProperty().addListener(cloudColorListener);
+
+    enableVolumetricClouds.setTooltip(new Tooltip("Use a volume scatter for the cloud material."));
+    enableVolumetricClouds.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.sky().setVolumetricClouds(newValue);
+      cloudDensity.setDisable(!newValue);
+    });
+
+    cloudDensity.setName("Volumetric cloud density");
+    cloudDensity.setRange(0.000001, 1);
+    cloudDensity.clampMin();
+    cloudDensity.setMaximumFractionDigits(6);
+    cloudDensity.onValueChange(value -> scene.sky().setCloudDensity(value));
+    cloudDensity.setDisable(true);
 
     skyMode.setTooltip(new Tooltip("Set the type of sky to be used in the scene."));
     skyMode.getItems().addAll(Sky.SkyMode.values());
@@ -182,11 +237,6 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
         .setTooltip(new Tooltip("Disables sky rendering for background compositing."));
     transparentSkyEnabled.selectedProperty().addListener(
         (observable, oldValue, newValue) -> scene.setTransparentSky(newValue));
-    cloudsEnabled.setTooltip(new Tooltip("Toggle visibility of Minecraft-style clouds."));
-    cloudsEnabled.selectedProperty().addListener((observable, oldValue, newValue) -> {
-
-      scene.sky().setCloudsEnabled(newValue);
-    });
     colorPicker.colorProperty().addListener(skyColorListener);
   }
 
@@ -197,10 +247,17 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     simulatedSky.setOnAction(simSkyListener);
     cloudsEnabled.setSelected(scene.sky().cloudsEnabled());
     transparentSkyEnabled.setSelected(scene.transparentSky());
-    cloudSize.set(scene.sky().cloudSize());
-    cloudX.set(scene.sky().cloudXOffset());
-    cloudY.set(scene.sky().cloudYOffset());
-    cloudZ.set(scene.sky().cloudZOffset());
+    cloudSizeX.set(scene.sky().getCloudSizeX());
+    cloudSizeY.set(scene.sky().getCloudSizeY());
+    cloudSizeZ.set(scene.sky().getCloudSizeZ());
+    cloudOffsetX.set(scene.sky().cloudXOffset());
+    cloudOffsetY.set(scene.sky().cloudYOffset());
+    cloudOffsetZ.set(scene.sky().cloudZOffset());
+    cloudColor.colorProperty().removeListener(cloudColorListener);
+    cloudColor.setColor(ColorUtil.toFx(scene.sky().getCloudColor()));
+    cloudColor.colorProperty().addListener(cloudColorListener);
+    enableVolumetricClouds.setSelected(scene.sky().getVolumetricClouds());
+    cloudDensity.set(scene.sky().getCloudDensity());
     horizonOffset.set(scene.sky().getHorizonOffset());
     simulatedSky.setValue(scene.sky().getSimulatedSky());
     gradientEditor.setGradient(scene.sky().getGradient());

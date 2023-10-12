@@ -25,6 +25,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Clouds;
 import se.llbit.chunky.world.SkymapTexture;
 import se.llbit.chunky.world.material.CloudMaterial;
+import se.llbit.chunky.world.material.VolumeCloudMaterial;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -34,6 +35,7 @@ import se.llbit.math.*;
 import se.llbit.resources.ImageLoader;
 import se.llbit.util.JsonSerializable;
 import se.llbit.util.JsonUtil;
+import se.llbit.util.Pair;
 import se.llbit.util.annotation.NotNull;
 import se.llbit.util.annotation.Nullable;
 
@@ -62,6 +64,8 @@ public class Sky implements JsonSerializable {
   protected static final int DEFAULT_CLOUD_HEIGHT = 128;
 
   protected static final int DEFAULT_CLOUD_SIZE = 12;
+
+  private static final double DEFAULT_CLOUD_DENSITY = 0.2;
 
   /**
    * Minimum sky light intensity
@@ -155,7 +159,10 @@ public class Sky implements JsonSerializable {
 
   private boolean mirrored = true;
   private boolean cloudsEnabled = false;
-  private double cloudSize = DEFAULT_CLOUD_SIZE;
+  private boolean volumetricClouds = false;
+  private double cloudDensity = DEFAULT_CLOUD_DENSITY;
+  private final Vector3 cloudColor = new Vector3(1, 1, 1);
+  private final Vector3 cloudSize = new Vector3(DEFAULT_CLOUD_SIZE, 4, DEFAULT_CLOUD_SIZE);
   private final Vector3 cloudOffset = new Vector3(0, DEFAULT_CLOUD_HEIGHT, 0);
 
   private double skyExposure = DEFAULT_INTENSITY;
@@ -229,7 +236,10 @@ public class Sky implements JsonSerializable {
   public void set(Sky other) {
     cloudsEnabled = other.cloudsEnabled;
     cloudOffset.set(other.cloudOffset);
-    cloudSize = other.cloudSize;
+    cloudSize.set(other.cloudSize);
+    cloudColor.set(other.cloudColor);
+    volumetricClouds = other.volumetricClouds;
+    cloudDensity = other.cloudDensity;
     skymapFileName = other.skymapFileName;
     skymap = other.skymap;
     yaw = other.yaw;
@@ -633,7 +643,7 @@ public class Sky implements JsonSerializable {
     sky.add("mode", mode.name());
     sky.add("horizonOffset", horizonOffset);
     sky.add("cloudsEnabled", cloudsEnabled);
-    sky.add("cloudSize", cloudSize);
+    sky.add("cloudSize", cloudSize.toJson());
     sky.add("cloudOffset", cloudOffset.toJson());
 
     // Always save gradient.
@@ -695,7 +705,12 @@ public class Sky implements JsonSerializable {
     }
     horizonOffset = json.get("horizonOffset").doubleValue(horizonOffset);
     cloudsEnabled = json.get("cloudsEnabled").boolValue(cloudsEnabled);
-    cloudSize = json.get("cloudSize").doubleValue(cloudSize);
+    if (json.get("cloudSize").isObject()) {
+      cloudSize.fromJson(json.get("cloudSize").object());
+    } else {
+      double xzSize = json.get("cloudSize").doubleValue(DEFAULT_CLOUD_SIZE);
+      cloudSize.set(xzSize, 5, xzSize);
+    }
     if (json.get("cloudOffset").isObject()) {
       cloudOffset.fromJson(json.get("cloudOffset").object());
     }
@@ -911,17 +926,43 @@ public class Sky implements JsonSerializable {
     return horizonOffset;
   }
 
-  public void setCloudSize(double newValue) {
-    if (newValue != cloudSize) {
-      cloudSize = newValue;
+  public void setCloudSizeX(double newValue) {
+    if (newValue != cloudSize.x) {
+      cloudSize.x = newValue;
       if (cloudsEnabled) {
         scene.refresh();
       }
     }
   }
 
-  public double cloudSize() {
-    return cloudSize;
+  public double getCloudSizeX() {
+    return cloudSize.x;
+  }
+
+  public void setCloudSizeY(double newValue) {
+    if (newValue != cloudSize.y) {
+      cloudSize.y = newValue;
+      if (cloudsEnabled) {
+        scene.refresh();
+      }
+    }
+  }
+
+  public double getCloudSizeY() {
+    return cloudSize.y;
+  }
+
+  public void setCloudSizeZ(double newValue) {
+    if (newValue != cloudSize.z) {
+      cloudSize.z = newValue;
+      if (cloudsEnabled) {
+        scene.refresh();
+      }
+    }
+  }
+
+  public double getCloudSizeZ() {
+    return cloudSize.z;
   }
 
   public void setCloudXOffset(double newValue) {
@@ -987,15 +1028,162 @@ public class Sky implements JsonSerializable {
     return cloudsEnabled;
   }
 
-  public boolean cloudIntersection(Scene scene, Ray ray) {
+  public Vector3 getCloudColor() {
+    return new Vector3(cloudColor);
+  }
+
+  public void setCloudColor(Vector3 color) {
+    cloudColor.set(color);
+    scene.refresh();
+  }
+
+  public boolean getVolumetricClouds() {
+    return volumetricClouds;
+  }
+
+  public void setVolumetricClouds(boolean value) {
+    volumetricClouds = value;
+    scene.refresh();
+  }
+
+  public double getCloudDensity() {
+    return cloudDensity;
+  }
+
+  public void setCloudDensity(double value) {
+    cloudDensity = value;
+    scene.refresh();
+  }
+
+  private Pair<Double, Double> getCloudDistance(Scene scene, Ray ray) {
+    Pair<Boolean, Boolean> cloudIntersectionTest = cloudIntersection(scene, ray);
+    boolean hitCloud = cloudIntersectionTest.thing1;
+    boolean insideCloud = cloudIntersectionTest.thing2;
+    if (!hitCloud) {
+      return new Pair<>(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+    } else {
+      if (!volumetricClouds) {
+        double t = ray.t;
+        double tExit;
+        if (insideCloud) {
+          tExit = 1d;
+        } else {
+          tExit = 0d;
+        }
+        return new Pair<>(t, tExit);
+      } else {
+        if (insideCloud) {
+          double t;
+          double tExit;
+          t = 0;
+          tExit = ray.t;
+          return new Pair<>(t, tExit);
+        } else {
+          double t = ray.t;
+          double tExit;
+          double depth = 0;
+          while (true) {
+            if (depth >= 1000) {
+              return new Pair<>(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+            }
+            Ray nextIntersection = new Ray(ray);
+            nextIntersection.t = Double.POSITIVE_INFINITY;
+            nextIntersection.o.scaleAdd(t + Ray.OFFSET, ray.d);
+            Pair<Boolean, Boolean> testSecondIntersection = cloudIntersection(scene, nextIntersection);
+            if (!testSecondIntersection.thing1) {
+              return new Pair<>(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+            } else {
+              if (testSecondIntersection.thing2) {
+                tExit = t + Ray.OFFSET + nextIntersection.t;
+                break;
+              } else {
+                t += Ray.OFFSET + nextIntersection.t;
+                depth++;
+              }
+            }
+          }
+          return new Pair<>(t, tExit);
+        }
+      }
+    }
+  }
+
+  public boolean cloudIntersection(Scene scene, Ray ray, Random random) {
+    if (random == null) {
+      return false;
+    }
+    Ray test = new Ray(ray);
+    test.t = ray.t;
+    Pair<Double, Double> cloudDistance = getCloudDistance(scene, test);
+    double firstIntersection = cloudDistance.thing1;
+    if (firstIntersection == Double.POSITIVE_INFINITY) {
+      return false;
+    }
+    double secondIntersection = cloudDistance.thing2;
+    double t;
+    if (volumetricClouds) {
+      double testFirstIntersection = firstIntersection;
+      double testSecondIntersection = secondIntersection;
+      Vector3 normal = new Vector3(test.getNormal());
+      int depth = 0;
+      while (true) {
+        if (depth >= 1000) {
+          return false;
+        }
+        double fogPenetrated = -FastMath.log(1 - random.nextDouble());
+        double fogDistance = fogPenetrated / cloudDensity;
+        if (testFirstIntersection + fogDistance < testSecondIntersection) {
+          t = testFirstIntersection + fogDistance;
+          ray.setNormal(normal);
+          ray.setCurrentMaterial(VolumeCloudMaterial.INSTANCE);
+          ray.specular = false;
+          break;
+        } else {
+          Ray test2 = new Ray(ray);
+          test2.t = Double.POSITIVE_INFINITY;
+          test2.o.scaleAdd(testSecondIntersection + Ray.OFFSET, ray.d);
+          Pair<Double, Double> testCloudDistance = getCloudDistance(scene, test2);
+          if (testCloudDistance.thing1 == Double.POSITIVE_INFINITY) {
+            return false;
+          }
+          testFirstIntersection += (testSecondIntersection - testFirstIntersection) + Ray.OFFSET + testCloudDistance.thing1;
+          testSecondIntersection += Ray.OFFSET + testCloudDistance.thing2;
+          normal.set(test2.getNormal());
+          depth++;
+        }
+      }
+    } else {
+      t = firstIntersection;
+      ray.setNormal(test.getNormal());
+      if (secondIntersection == 1) {
+        ray.setCurrentMaterial(Air.INSTANCE);
+      } else {
+        ray.setCurrentMaterial(CloudMaterial.INSTANCE);
+      }
+    }
+    ray.t = t;
+    ray.color.set(cloudColor.x, cloudColor.y, cloudColor.z, 1);
+    return true;
+  }
+
+  /**
+   * Test for a cloud intersection. If the ray intersects a cloud,
+   * the distance to the intersection is stored in <code>ray.t</code>.
+   * @return {@link se.llbit.util.Pair} of Booleans.
+   * @param ray Ray with which to test for cloud intersection.
+   * <code>pair.thing1</code>: <code>true</code> if the ray intersected a cloud.
+   * <code>pair.thing2</code>: <code>true</code> if the ray origin is inside a cloud.
+   */
+  private Pair<Boolean, Boolean> cloudIntersection(Scene scene, Ray ray) {
     double ox = ray.o.x + scene.origin.x;
     double oy = ray.o.y + scene.origin.y;
     double oz = ray.o.z + scene.origin.z;
     double offsetX = cloudOffset.x;
     double offsetY = cloudOffset.y;
     double offsetZ = cloudOffset.z;
-    double inv_size = 1 / cloudSize;
-    double cloudTop = offsetY + 5;
+    double invSizeX = 1 / cloudSize.x;
+    double invSizeZ = 1 / cloudSize.z;
+    double cloudTop = offsetY + cloudSize.y;
     int target = 1;
     double t_offset = 0;
     if (oy < offsetY || oy > cloudTop) {
@@ -1005,16 +1193,16 @@ public class Sky implements JsonSerializable {
         t_offset = (cloudTop - oy) / ray.d.y;
       }
       if (t_offset < 0) {
-        return false;
+        return new Pair<>(false, false);
       }
       // Ray is entering cloud.
-      if (inCloud((ray.d.x * t_offset + ox) * inv_size + offsetX,
-          (ray.d.z * t_offset + oz) * inv_size + offsetZ)) {
+      if (inCloud((ray.d.x * t_offset + ox) * invSizeX + offsetX,
+          (ray.d.z * t_offset + oz) * invSizeZ + offsetZ)) {
         ray.setNormal(0, -Math.signum(ray.d.y), 0);
-        enterCloud(ray, t_offset);
-        return true;
+        ray.t = t_offset;
+        return new Pair<>(true, false);
       }
-    } else if (inCloud(ox * inv_size + offsetX, oz * inv_size + offsetZ)) {
+    } else if (inCloud(ox * invSizeX + offsetX, oz * invSizeZ + offsetZ)) {
       target = 0;
     }
     double tExit;
@@ -1026,16 +1214,16 @@ public class Sky implements JsonSerializable {
     if (ray.t < tExit) {
       tExit = ray.t;
     }
-    double x0 = (ox + ray.d.x * t_offset) * inv_size + offsetX;
-    double z0 = (oz + ray.d.z * t_offset) * inv_size + offsetZ;
+    double x0 = (ox + ray.d.x * t_offset) * invSizeX + offsetX;
+    double z0 = (oz + ray.d.z * t_offset) * invSizeZ + offsetZ;
     double xp = x0;
     double zp = z0;
     int ix = (int) Math.floor(xp);
     int iz = (int) Math.floor(zp);
     int xmod = (int) Math.signum(ray.d.x), zmod = (int) Math.signum(ray.d.z);
     int xo = (1 + xmod) / 2, zo = (1 + zmod) / 2;
-    double dx = Math.abs(ray.d.x) * inv_size;
-    double dz = Math.abs(ray.d.z) * inv_size;
+    double dx = Math.abs(ray.d.x) * invSizeX;
+    double dz = Math.abs(ray.d.z) * invSizeZ;
     double t = 0;
     int i = 0;
     int nx = 0, nz = 0;
@@ -1129,15 +1317,15 @@ public class Sky implements JsonSerializable {
     int ny = 0;
     if (target == 1) {
       if (t > tExit) {
-        return false;
+        return new Pair<>(false, false);
       }
       if (nx == 0 && ny == 0 && nz == 0) {
         // fix ray.n being set to zero (issue #643)
-        return false;
+        return new Pair<>(false, false);
       }
       ray.setNormal(nx, ny, nz);
-      enterCloud(ray, t + t_offset);
-      return true;
+      ray.t = t + t_offset;
+      return new Pair<>(true, false);
     } else {
       if (t > tExit) {
         nx = 0;
@@ -1150,24 +1338,12 @@ public class Sky implements JsonSerializable {
       }
       if (nx == 0 && ny == 0 && nz == 0) {
         // fix ray.n being set to zero (issue #643)
-        return false;
+        return new Pair<>(false, false);
       }
       ray.setNormal(nx, ny, nz);
-      exitCloud(ray, t);
+      ray.t = t;
+      return new Pair<>(true, true);
     }
-    return true;
-  }
-
-  private static void enterCloud(Ray ray, double t) {
-    ray.t = t;
-    ray.color.set(CloudMaterial.color);
-    ray.setCurrentMaterial(CloudMaterial.INSTANCE);
-  }
-
-  private static void exitCloud(Ray ray, double t) {
-    ray.t = t;
-    ray.color.set(CloudMaterial.color);
-    ray.setCurrentMaterial(Air.INSTANCE);
   }
 
   private static boolean inCloud(double x, double z) {

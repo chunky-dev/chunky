@@ -54,6 +54,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
   private final DoubleAdjuster ior = new DoubleAdjuster();
   private final DoubleAdjuster perceptualSmoothness = new DoubleAdjuster();
   private final DoubleAdjuster metalness = new DoubleAdjuster();
+  private final DoubleAdjuster anisotropy = new DoubleAdjuster();
   private final ListView<String> listView;
 
   public MaterialsTab() {
@@ -72,6 +73,9 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     metalness.setName("Metalness");
     metalness.setRange(0, 1);
     metalness.setTooltip("Metalness (texture-tinted reflectivity) of the selected material.");
+    anisotropy.setName("Volume scatter anisotropy");
+    anisotropy.setRange(-1, 1);
+    anisotropy.clampBoth();
     ObservableList<String> blockIds = FXCollections.observableArrayList();
     blockIds.addAll(MaterialStore.collections.keySet());
     blockIds.addAll(ExtraMaterials.idMap.keySet());
@@ -87,7 +91,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     settings.setSpacing(10);
     settings.getChildren().addAll(
         new Label("Material Properties"),
-        emittance, specular, perceptualSmoothness, ior, metalness,
+        emittance, specular, perceptualSmoothness, ior, metalness, anisotropy,
         new Label("(set to zero to disable)"));
     setPadding(new Insets(10));
     setSpacing(15);
@@ -117,6 +121,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       double iorAcc = 0;
       double perceptualSmoothnessAcc = 0;
       double metalnessAcc = 0;
+      double anisotropyAcc = 0;
       Collection<Block> blocks = MaterialStore.collections.get(materialName);
       for (Block block : blocks) {
         emAcc += block.emittance;
@@ -124,12 +129,14 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
         iorAcc += block.ior;
         perceptualSmoothnessAcc += block.getPerceptualSmoothness();
         metalnessAcc += block.metalness;
+        anisotropyAcc += block.anisotropy;
       }
       emittance.set(emAcc / blocks.size());
       specular.set(specAcc / blocks.size());
       ior.set(iorAcc / blocks.size());
       perceptualSmoothness.set(perceptualSmoothnessAcc / blocks.size());
       metalness.set(metalnessAcc / blocks.size());
+      anisotropy.set(anisotropyAcc / blocks.size());
       materialExists = true;
     } else if (ExtraMaterials.idMap.containsKey(materialName)) {
       Material material = ExtraMaterials.idMap.get(materialName);
@@ -139,6 +146,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
         ior.set(material.ior);
         perceptualSmoothness.set(material.getPerceptualSmoothness());
         metalness.set(material.metalness);
+        anisotropy.set(material.anisotropy);
         materialExists = true;
       }
     } else if (MaterialStore.blockIds.contains(materialName)) {
@@ -149,6 +157,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       ior.set(block.ior);
       perceptualSmoothness.set(block.getPerceptualSmoothness());
       metalness.set(block.metalness);
+      anisotropy.set(block.anisotropy);
       materialExists = true;
     }
     if (materialExists) {
@@ -157,12 +166,14 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       ior.onValueChange(value -> scene.setIor(materialName, value.floatValue()));
       perceptualSmoothness.onValueChange(value -> scene.setPerceptualSmoothness(materialName, value.floatValue()));
       metalness.onValueChange(value -> scene.setMetalness(materialName, value.floatValue()));
+      anisotropy.onValueChange(value -> scene.setAnisotropy(materialName, value.floatValue()));
     } else {
       emittance.onValueChange(value -> {});
       specular.onValueChange(value -> {});
       ior.onValueChange(value -> {});
       perceptualSmoothness.onValueChange(value -> {});
       metalness.onValueChange(value -> {});
+      anisotropy.onValueChange(value -> {});
     }
   }
 

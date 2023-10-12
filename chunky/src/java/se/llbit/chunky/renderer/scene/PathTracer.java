@@ -23,6 +23,7 @@ import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
+import se.llbit.chunky.world.VolumeMaterial;
 import se.llbit.chunky.world.material.ParticleFogMaterial;
 import se.llbit.math.*;
 
@@ -140,7 +141,7 @@ public class PathTracer implements RayTracer {
       for (int i = 0; i < count; i++) {
         boolean doMetal = pMetal > Ray.EPSILON && random.nextFloat() < pMetal;
 
-        if (currentMat instanceof ParticleFogMaterial) {
+        if (currentMat instanceof VolumeMaterial) {
           hit |= doParticleFogReflection(ray, next, currentMat, cumulativeColor, random, state, scene);
         } else if (doMetal || (pSpecular > Ray.EPSILON && random.nextFloat() < pSpecular)) {
           hit |= doSpecularReflection(ray, next, cumulativeColor, doMetal, random, state, scene);

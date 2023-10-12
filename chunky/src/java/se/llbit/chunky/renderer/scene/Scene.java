@@ -3251,6 +3251,13 @@ public class Scene implements JsonSerializable, Refreshable {
     refresh(ResetReason.MATERIALS_CHANGED);
   }
 
+  public void setAnisotropy(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("anisotropy", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
   public int getYClipMin() {
     return yClipMin;
   }
