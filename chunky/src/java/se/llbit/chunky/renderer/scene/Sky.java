@@ -1124,7 +1124,6 @@ public class Sky implements JsonSerializable {
     if (volumetricClouds) {
       double testFirstIntersection = firstIntersection;
       double testSecondIntersection = secondIntersection;
-      Vector3 normal = new Vector3(test.getNormal());
       int depth = 0;
       while (true) {
         if (depth >= 1000) {
@@ -1134,7 +1133,25 @@ public class Sky implements JsonSerializable {
         double fogDistance = fogPenetrated / cloudDensity;
         if (testFirstIntersection + fogDistance < testSecondIntersection) {
           t = testFirstIntersection + fogDistance;
-          ray.setNormal(normal);
+
+          // Set a random normal
+          Vector3 a1 = new Vector3();
+          a1.cross(ray.d, new Vector3(0, 1, 0));
+          a1.normalize();
+          Vector3 a2 = new Vector3();
+          a2.cross(ray.d, a1);
+          // get random point on unit disk
+          double x1 = random.nextDouble();
+          double x2 = random.nextDouble();
+          double r = FastMath.sqrt(x1);
+          double theta = 2 * Math.PI * x2;
+          double t1 = r * FastMath.cos(theta);
+          double t2 = r * FastMath.sin(theta);
+          a1.scale(t1);
+          a1.scaleAdd(t2, a2);
+          a1.scaleAdd(-Math.sqrt(1 - a1.lengthSquared()), ray.d);
+          ray.setNormal(a1);
+
           ray.setCurrentMaterial(VolumeCloudMaterial.INSTANCE);
           ray.specular = false;
           break;
@@ -1148,7 +1165,6 @@ public class Sky implements JsonSerializable {
           }
           testFirstIntersection += (testSecondIntersection - testFirstIntersection) + Ray.OFFSET + testCloudDistance.thing1;
           testSecondIntersection += Ray.OFFSET + testCloudDistance.thing2;
-          normal.set(test2.getNormal());
           depth++;
         }
       }
