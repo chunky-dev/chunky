@@ -24,7 +24,6 @@ import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.VolumeMaterial;
-import se.llbit.chunky.world.material.ParticleFogMaterial;
 import se.llbit.math.*;
 
 import java.util.List;
