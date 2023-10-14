@@ -12,6 +12,7 @@
 
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.CheckBox?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
     <Label text="Fast fog settings" />
@@ -32,6 +33,7 @@
     </TitledPane>
     <Separator />
     <Label text="Particle fog settings" />
+    <CheckBox fx:id="previewParticleFog" mnemonicParsing="false" text="Preview particle fog" />
     <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
       <Button fx:id="addVolume" mnemonicParsing="false" text="Add volume" />
       <Button fx:id="removeVolume" mnemonicParsing="false" text="Remove volume" />

@@ -25,7 +25,6 @@
     <CheckBox fx:id="shutdown" mnemonicParsing="false" text="Shutdown computer when render completes" />
     <CheckBox fx:id="fastFog" mnemonicParsing="false" text="Fast fog" />
     <CheckBox fx:id="fancierTranslucency" mnemonicParsing="false" text="Fancier translucency" />
-    <CheckBox fx:id="previewParticleFog" mnemonicParsing="false" text="Preview particle fog" />
     <DoubleAdjuster fx:id="transmissivityCap" />
     <IntegerAdjuster fx:id="cacheResolution" />
     <DoubleAdjuster fx:id="animationTime" />
