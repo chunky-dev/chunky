@@ -66,7 +66,7 @@ public class PathTracer implements RayTracer {
 
     while (true) {
 
-      if (!PreviewRayTracer.nextIntersection(scene, ray, true, random)) {
+      if (!PreviewRayTracer.nextIntersection(scene, ray, random, IntersectionConfig.defaultIntersect(scene, false))) {
         if (ray.getPrevMaterial().isWater()) {
           ray.color.set(0, 0, 0, 1);
           hit = true;
@@ -579,7 +579,7 @@ public class PathTracer implements RayTracer {
 
       emitterRay.o.scaleAdd(Ray.OFFSET, emitterRay.d);
       emitterRay.distance += Ray.OFFSET;
-      PreviewRayTracer.nextIntersection(scene, emitterRay, true, random);
+      PreviewRayTracer.nextIntersection(scene, emitterRay, random, IntersectionConfig.defaultIntersect(scene, false));
       if (Math.abs(emitterRay.distance - distance) < Ray.OFFSET) {
         double e = Math.abs(emitterRay.d.dot(emitterRay.getNormal()));
         e /= Math.max(distance * distance, 1);
@@ -635,7 +635,7 @@ public class PathTracer implements RayTracer {
     attenuation.w = 1;
     while (attenuation.w > 0) {
       ray.o.scaleAdd(Ray.OFFSET, ray.d);
-      if (!PreviewRayTracer.nextIntersection(scene, ray, true, state.random)) {
+      if (!PreviewRayTracer.nextIntersection(scene, ray, state.random, IntersectionConfig.defaultIntersect(scene, false))) {
         break;
       }
       double mult = 1 - ray.color.w;

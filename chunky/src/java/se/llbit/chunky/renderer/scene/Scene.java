@@ -1685,7 +1685,9 @@ public class Scene implements JsonSerializable, Refreshable {
     ray.o.x -= origin.x;
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
-    while (PreviewRayTracer.nextIntersection(this, ray)) {
+    while (PreviewRayTracer.nextIntersection(this, ray, null,
+      new IntersectionConfig((sky.cloudsEnabled() && !sky.getVolumetricClouds()),
+        false, waterPlaneEnabled, true))) {
       if (ray.getCurrentMaterial() != Air.INSTANCE) {
         return true;
       }
