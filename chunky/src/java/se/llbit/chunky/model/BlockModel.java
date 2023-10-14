@@ -19,5 +19,5 @@ public interface BlockModel {
 
   double faceSurfaceArea(int face);
 
-  boolean useBiomeTint();
+  boolean isBiomeDependant();
 }

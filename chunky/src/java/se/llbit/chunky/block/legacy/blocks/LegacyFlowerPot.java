@@ -85,7 +85,7 @@ public class LegacyFlowerPot extends UnfinalizedLegacyBlock {
   }
 
   @Override
-  public boolean useBiomeTint() {
+  public boolean isBiomeDependant() {
     return true; // (in reality it is only used for fern)
   }
 }

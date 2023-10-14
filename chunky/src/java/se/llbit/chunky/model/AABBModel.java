@@ -184,7 +184,7 @@ public abstract class AABBModel implements BlockModel {
   }
 
   @Override
-  public boolean useBiomeTint() {
+  public boolean isBiomeDependant() {
     Tint[][] tints = getTints();
     if(tints == null)
       return false;

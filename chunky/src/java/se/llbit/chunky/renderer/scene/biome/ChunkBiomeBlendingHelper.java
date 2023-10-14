@@ -65,4 +65,9 @@ public class ChunkBiomeBlendingHelper {
   public int getyMaxBiomeRelevant() {
     return yMaxBiomeRelevant;
   }
+
+  public boolean isBiomeUsed() {
+    // Has makeBiomeRelevant been called at least once
+    return yMaxBiomeRelevant >= yMinBiomeRelevant;
+  }
 }

@@ -1,8 +1,6 @@
 package se.llbit.chunky.block;
 
-import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.model.BlockModel;
-import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
@@ -49,7 +47,7 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
   }
 
   @Override
-  public boolean useBiomeTint() {
-    return super.useBiomeTint() || model.useBiomeTint();
+  public boolean isBiomeDependant() {
+    return super.isBiomeDependant() || model.isBiomeDependant();
   }
 }

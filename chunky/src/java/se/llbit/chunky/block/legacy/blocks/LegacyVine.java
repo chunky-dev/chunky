@@ -29,7 +29,7 @@ public class LegacyVine extends UnfinalizedLegacyBlock {
   }
 
   @Override
-  public boolean useBiomeTint() {
+  public boolean isBiomeDependant() {
     return true;
   }
 }

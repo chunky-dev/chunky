@@ -150,7 +150,7 @@ public abstract class Block extends Material {
   /**
    * Does this block use biome tint for its rendering
    */
-  public boolean useBiomeTint() {
+  public boolean isBiomeDependant() {
     return isWaterFilled();
   }
 }
