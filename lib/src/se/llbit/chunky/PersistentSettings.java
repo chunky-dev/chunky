@@ -663,6 +663,6 @@ public final class PersistentSettings {
   }
 
   public static boolean getPreviewParticleFog() {
-    return settings.getBool("previewParticleFog", false);
+    return settings.getBool("previewParticleFog", true);
   }
 }
