@@ -645,6 +645,13 @@ public class Sky implements JsonSerializable {
     sky.add("cloudsEnabled", cloudsEnabled);
     sky.add("cloudSize", cloudSize.toJson());
     sky.add("cloudOffset", cloudOffset.toJson());
+    JsonObject cloudColorObj = new JsonObject();
+    cloudColorObj.add("red", cloudColor.x);
+    cloudColorObj.add("green", cloudColor.y);
+    cloudColorObj.add("blue", cloudColor.z);
+    sky.add("cloudColor", cloudColorObj);
+    sky.add("volumetricClouds", volumetricClouds);
+    sky.add("cloudDensity", cloudDensity);
 
     // Always save gradient.
     sky.add("gradient", gradientJson(gradient));
@@ -714,6 +721,16 @@ public class Sky implements JsonSerializable {
     if (json.get("cloudOffset").isObject()) {
       cloudOffset.fromJson(json.get("cloudOffset").object());
     }
+    if (json.get("cloudColor").isObject()) {
+      JsonObject colorObj = json.get("cloudColor").object();
+      cloudColor.x = colorObj.get("red").doubleValue(cloudColor.x);
+      cloudColor.y = colorObj.get("green").doubleValue(cloudColor.y);
+      cloudColor.z = colorObj.get("blue").doubleValue(cloudColor.z);
+    } else {
+      cloudColor.set(1, 1, 1);
+    }
+    volumetricClouds = json.get("volumetricClouds").boolValue(false);
+    cloudDensity = json.get("cloudDensity").doubleValue(cloudDensity);
 
     if (json.get("gradient").isArray()) {
       List<Vector4> theGradient = gradientFromJson(json.get("gradient").array());
@@ -724,9 +741,9 @@ public class Sky implements JsonSerializable {
 
     if (json.get("color").isObject()) {
       JsonObject colorObj = json.get("color").object();
-      color.x = colorObj.get("red").doubleValue(1);
-      color.y = colorObj.get("green").doubleValue(1);
-      color.z = colorObj.get("blue").doubleValue(1);
+      color.x = colorObj.get("red").doubleValue(color.x);
+      color.y = colorObj.get("green").doubleValue(color.y);
+      color.z = colorObj.get("blue").doubleValue(color.z);
     } else {
       // Maintain backwards-compatibility with scenes saved in older Chunky versions
       color.set(JsonUtil.vec3FromJsonArray(json.get("color")));
@@ -1109,7 +1126,7 @@ public class Sky implements JsonSerializable {
   }
 
   public boolean cloudIntersection(Scene scene, Ray ray, Random random) {
-    if (random == null) {
+    if (random == null && volumetricClouds) {
       return false;
     }
     Ray test = new Ray(ray);
@@ -1133,6 +1150,10 @@ public class Sky implements JsonSerializable {
         double fogDistance = fogPenetrated / cloudDensity;
         if (testFirstIntersection + fogDistance < testSecondIntersection) {
           t = testFirstIntersection + fogDistance;
+
+          if (t >= ray.t) {
+            return false;
+          }
 
           // Set a random normal
           Vector3 a1 = new Vector3();
@@ -1170,6 +1191,9 @@ public class Sky implements JsonSerializable {
       }
     } else {
       t = firstIntersection;
+      if (t >= ray.t) {
+        return false;
+      }
       ray.setNormal(test.getNormal());
       if (secondIntersection == 1) {
         ray.setCurrentMaterial(Air.INSTANCE);
