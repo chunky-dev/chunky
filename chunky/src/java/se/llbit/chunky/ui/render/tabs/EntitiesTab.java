@@ -63,6 +63,7 @@ import se.llbit.json.JsonObject;
 import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Vector3;
+import se.llbit.nbt.CompoundTag;
 import se.llbit.util.mojangapi.MinecraftProfile;
 import se.llbit.util.mojangapi.MinecraftSkin;
 import se.llbit.util.mojangapi.MojangApi;
@@ -134,6 +135,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleTextField posY;
   @FXML private DoubleTextField posZ;
   @FXML private VBox controls;
+  @FXML private ComboBox<String> entityType;
 
   public EntitiesTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("EntitiesTab.fxml"));
@@ -566,36 +568,63 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    add.setTooltip(new Tooltip("Add a player at the target position."));
+    entityType.getItems().addAll("Player", "Armor stand", "Lectern", "Book", "Beacon beam");
+    entityType.setValue("Player");
+    add.setTooltip(new Tooltip("Add an entity at the target position."));
     add.setOnAction(e -> {
-      Collection<Entity> entities = scene.getActors();
-      Set<String> ids = new HashSet<>();
-      for (Entity entity : entities) {
-        if (entity instanceof PlayerEntity) {
-          ids.add(((PlayerEntity) entity).uuid);
-        }
-      }
-      // Pick a new UUID for the new entity.
-      long id = System.currentTimeMillis();
-      while (ids.contains(String.format("%016X%016X", 0, id))) {
-        id += 1;
-      }
       Vector3 position = scene.getTargetPosition();
       if (position == null) {
         position = new Vector3(scene.camera().getPosition());
       }
-      PlayerEntity player = new PlayerEntity(String.format("%016X%016X", 0, id), position);
-      withEntity(selected -> {
-        if (selected instanceof PlayerEntity) {
-          player.skin = ((PlayerEntity) selected).skin;
-          player.model = ((PlayerEntity) selected).model;
+
+      Entity added = null;
+      switch (entityType.getValue()) {
+        case "Player": {
+          Collection<Entity> entities = scene.getActors();
+          Set<String> ids = new HashSet<>();
+          for (Entity entity : entities) {
+            if (entity instanceof PlayerEntity) {
+              ids.add(((PlayerEntity) entity).uuid);
+            }
+          }
+          // Pick a new UUID for the new entity.
+          long id = System.currentTimeMillis();
+          while (ids.contains(String.format("%016X%016X", 0, id))) {
+            id += 1;
+          }
+          PlayerEntity player = new PlayerEntity(String.format("%016X%016X", 0, id), position);
+          withEntity(selected -> {
+            if (selected instanceof PlayerEntity) {
+              player.skin = ((PlayerEntity) selected).skin;
+              player.model = ((PlayerEntity) selected).model;
+            }
+          });
+          player.randomPoseAndLook();
+          scene.addPlayer(player);
+          added = player;
+          break;
         }
-      });
-      player.randomPoseAndLook();
-      scene.addPlayer(player);
-      EntityData data = new EntityData(player, scene);
-      entityTable.getItems().add(data);
-      entityTable.getSelectionModel().select(data);
+        case "Armor stand":
+          added = new ArmorStand(position, new CompoundTag());
+          scene.addActor(added);
+          break;
+        case "Lectern":
+          added = new Lectern(position, "north", true);
+          scene.addActor(added);
+          break;
+        case "Book":
+          added = new Book(position, Math.PI - Math.PI / 16, Math.toRadians(30), Math.toRadians(180 - 30));
+          scene.addActor(added);
+          break;
+        case "Beacon beam":
+          scene.addActor(added = new BeaconBeam(position));
+          break;
+      }
+      if (added != null) {
+        EntityData data = new EntityData(added, scene);
+        entityTable.getItems().add(data);
+        entityTable.getSelectionModel().select(data);
+      }
     });
     delete.setTooltip(new Tooltip("Delete the selected entity."));
     delete.setOnAction(e -> withEntity(entity -> {

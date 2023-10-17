@@ -2103,7 +2103,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Compute the alpha channel.
    */
-  private void computeAlpha(TaskTracker taskTracker) {
+  public void computeAlpha(TaskTracker taskTracker) {
     if (transparentSky) {
       if (!this.getOutputMode().isTransparencySupported()) {
         Log.warn("Can not use transparent sky with " + this.getOutputMode().getName() +  " output mode. Use PNG instead.");
@@ -2748,6 +2748,11 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public MinecraftProfile getPlayerProfile(PlayerEntity player) {
     return entities.getAssociatedProfile(player);
+  }
+
+  public void addActor(Entity entity) {
+    entities.addActor(entity);
+    rebuildActorBvh();
   }
 
   public void removeEntity(Entity entity) {
