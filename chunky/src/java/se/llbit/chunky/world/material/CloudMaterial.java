@@ -20,9 +20,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 
 public class CloudMaterial extends Material {
-  public static final CloudMaterial INSTANCE = new CloudMaterial();
-
-  private CloudMaterial() {
+  public CloudMaterial() {
     super("cloud", Texture.air);
   }
 }

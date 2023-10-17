@@ -14,6 +14,6 @@ public class IntersectionConfig {
   }
 
   public static IntersectionConfig defaultIntersect(Scene scene, boolean isRenderPreview) {
-    return new IntersectionConfig(scene.sky().cloudsEnabled(), !isRenderPreview || scene.getPreviewParticleFog(), scene.isWaterPlaneEnabled(), true);
+    return new IntersectionConfig(true, !isRenderPreview || scene.getPreviewParticleFog(), scene.isWaterPlaneEnabled(), true);
   }
 }

@@ -24,6 +24,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.JsonObject;
+import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -500,16 +501,8 @@ public class Sun implements JsonSerializable {
     sun.add("apparentBrightness", apparentBrightness);
     sun.add("radius", radius);
     sun.add("modifySunTexture", enableTextureModification);
-    JsonObject colorObj = new JsonObject();
-    colorObj.add("red", color.x);
-    colorObj.add("green", color.y);
-    colorObj.add("blue", color.z);
-    sun.add("color", colorObj);
-    JsonObject apparentColorObj = new JsonObject();
-    apparentColorObj.add("red", apparentColor.x);
-    apparentColorObj.add("green", apparentColor.y);
-    apparentColorObj.add("blue", apparentColor.z);
-    sun.add("apparentColor", apparentColorObj);
+    sun.add("color", ColorUtil.rgbToJson(color));
+    sun.add("apparentColor", ColorUtil.rgbToJson(apparentColor));
     JsonObject diffuseSamplingObj = new JsonObject();
     diffuseSamplingObj.add("chance", diffuseSampleChance);
     diffuseSamplingObj.add("radius", diffuseSampleRadius);
@@ -528,17 +521,11 @@ public class Sun implements JsonSerializable {
     enableTextureModification = json.get("modifySunTexture").boolValue(enableTextureModification);
 
     if (json.get("color").isObject()) {
-      JsonObject colorObj = json.get("color").object();
-      color.x = colorObj.get("red").doubleValue(1);
-      color.y = colorObj.get("green").doubleValue(1);
-      color.z = colorObj.get("blue").doubleValue(1);
+      color.set(ColorUtil.jsonToRGB(json.get("color").asObject()));
     }
 
     if (json.get("apparentColor").isObject()) {
-      JsonObject apparentColorObj = json.get("apparentColor").object();
-      apparentColor.x = apparentColorObj.get("red").doubleValue(1);
-      apparentColor.y = apparentColorObj.get("green").doubleValue(1);
-      apparentColor.z = apparentColorObj.get("blue").doubleValue(1);
+      apparentColor.set(ColorUtil.jsonToRGB(json.get("apparentColor").asObject()));
     }
 
     if(json.get("diffuseSampling").isObject()) {

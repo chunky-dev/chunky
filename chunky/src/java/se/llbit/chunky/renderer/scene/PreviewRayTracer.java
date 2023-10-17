@@ -119,7 +119,7 @@ public class PreviewRayTracer implements RayTracer {
   }
 
   public static boolean nextIntersection(Scene scene, Ray ray) {
-    return nextIntersection(scene, ray, null, new IntersectionConfig((scene.sky.cloudsEnabled() && !scene.sky.getVolumetricClouds()), false, scene.waterPlaneEnabled, true));
+    return nextIntersection(scene, ray, null, new IntersectionConfig(true, false, scene.waterPlaneEnabled, true));
   }
 
   private static boolean cloudIntersection(Scene scene, Ray ray, Random random) {
@@ -127,14 +127,7 @@ public class PreviewRayTracer implements RayTracer {
   }
 
   private static boolean fogIntersection(Scene scene, Ray ray, Random random) {
-    if (random == null) {
-      return false;
-    }
-    boolean hit = false;
-    for(FogVolume v : scene.fog.getFogVolumes()) {
-      hit |= v.intersect(ray, scene, random);
-    }
-    return hit;
+    return scene.fog.particleFogIntersection(scene, ray, random);
   }
 
   private static boolean waterPlaneIntersection(Scene scene, Ray ray) {

@@ -12,6 +12,8 @@
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
 <?import se.llbit.fx.LuxColorPicker?>
 
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Button?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
     <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
@@ -31,7 +33,11 @@
     </TitledPane>
     <CheckBox fx:id="transparentSkyEnabled" mnemonicParsing="false" text="Transparent sky" />
     <Separator />
-    <CheckBox fx:id="cloudsEnabled" mnemonicParsing="false" text="Enable clouds" />
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+      <ComboBox fx:id="cloudLayers" prefWidth="150.0" />
+      <Button fx:id="addCloudLayer" mnemonicParsing="false" />
+      <Button fx:id="removeCloudLayer" mnemonicParsing="false" />
+    </HBox>
     <TitledPane fx:id="cloudDetailsPane" animated="false" text="Cloud settings">
       <VBox spacing="10.0">
         <padding>
@@ -49,6 +55,14 @@
         </HBox>
         <CheckBox fx:id="enableVolumetricClouds" mnemonicParsing="false" text="Volumetric clouds"/>
         <DoubleAdjuster fx:id="cloudDensity" />
+        <Separator />
+        <Label text="Material properties" />
+        <DoubleAdjuster fx:id="emittance" />
+        <DoubleAdjuster fx:id="specular" />
+        <DoubleAdjuster fx:id="smoothness" />
+        <DoubleAdjuster fx:id="ior" />
+        <DoubleAdjuster fx:id="metalness" />
+        <DoubleAdjuster fx:id="anisotropy" />
       </VBox>
     </TitledPane>
     <padding>

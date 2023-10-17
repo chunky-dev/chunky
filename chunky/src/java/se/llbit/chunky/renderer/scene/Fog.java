@@ -230,6 +230,17 @@ public final class Fog implements JsonSerializable {
     return (offsetY - y1) / clampDy(dy);
   }
 
+  public boolean particleFogIntersection(Scene scene, Ray ray, Random random) {
+    if (random == null) {
+      return false;
+    }
+    boolean hit = false;
+    for (FogVolume v : volumes) {
+      hit |= v.intersect(scene, ray, random);
+    }
+    return hit;
+  }
+
   @Override public JsonObject toJson() {
     JsonObject fogObj = new JsonObject();
     fogObj.add("mode", mode.name());
@@ -249,11 +260,7 @@ public final class Fog implements JsonSerializable {
       jsonVolumes.add(volume.toJson());
     }
     fogObj.add("volumes", jsonVolumes);
-    JsonObject colorObj = new JsonObject();
-    colorObj.add("red", fogColor.x);
-    colorObj.add("green", fogColor.y);
-    colorObj.add("blue", fogColor.z);
-    fogObj.add("color", colorObj);
+    fogObj.add("color", ColorUtil.rgbToJson(fogColor));
     fogObj.add("fastFog", fastFog);
     return fogObj;
   }
@@ -276,10 +283,7 @@ public final class Fog implements JsonSerializable {
       fogVolume.importFromJson(jsonVolumeObject);
       addVolume(fogVolume);
     }
-    JsonObject colorObj = json.get("color").object();
-    fogColor.x = colorObj.get("red").doubleValue(fogColor.x);
-    fogColor.y = colorObj.get("green").doubleValue(fogColor.y);
-    fogColor.z = colorObj.get("blue").doubleValue(fogColor.z);
+    fogColor.set(ColorUtil.jsonToRGB(json.get("color").object()));
     fastFog = json.get("fastFog").boolValue(fastFog);
   }
 
@@ -289,10 +293,7 @@ public final class Fog implements JsonSerializable {
     skyFogDensity = json.get("skyFogDensity").doubleValue(skyFogDensity);
     layers.clear();
     volumes.clear();
-    JsonObject colorObj = json.get("fogColor").object();
-    fogColor.x = colorObj.get("red").doubleValue(fogColor.x);
-    fogColor.y = colorObj.get("green").doubleValue(fogColor.y);
-    fogColor.z = colorObj.get("blue").doubleValue(fogColor.z);
+    fogColor.set(ColorUtil.jsonToRGB(json.get("fogColor").asObject()));
     fastFog = json.get("fastFog").boolValue(fastFog);
   }
 

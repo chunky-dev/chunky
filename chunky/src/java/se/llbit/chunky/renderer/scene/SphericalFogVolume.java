@@ -15,7 +15,7 @@ public class SphericalFogVolume extends FogVolume {
   private Sphere sphere;
 
   @Override
-  public boolean intersect(Ray ray, Scene scene, Random random) {
+  public boolean intersect(Scene scene, Ray ray, Random random) {
     double distance;
     double fogPenetrated = -Math.log(1 - random.nextDouble());
     double fogDistance = fogPenetrated / density;

@@ -1,9 +1,10 @@
 package se.llbit.chunky.renderer.scene;
 
-import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.world.Material;
+import se.llbit.chunky.world.VolumeMaterial;
 import se.llbit.chunky.world.material.ParticleFogMaterial;
 import se.llbit.json.JsonObject;
+import se.llbit.math.ColorUtil;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.util.JsonSerializable;
@@ -14,27 +15,12 @@ public abstract class FogVolume implements JsonSerializable {
   protected FogVolumeType type;
   protected Vector3 color;
   protected double density;
-  protected Material material = new ParticleFogMaterial();
+  protected VolumeMaterial material = new ParticleFogMaterial();
 
-  public abstract boolean intersect(Ray ray, Scene scene, Random random);
+  public abstract boolean intersect(Scene scene, Ray ray, Random random);
 
   public void setRandomNormal(Ray ray, Random random) {
-    Vector3 a1 = new Vector3();
-    a1.cross(ray.d, new Vector3(0, 1, 0));
-    a1.normalize();
-    Vector3 a2 = new Vector3();
-    a2.cross(ray.d, a1);
-    // get random point on unit disk
-    double x1 = random.nextDouble();
-    double x2 = random.nextDouble();
-    double r = FastMath.sqrt(x1);
-    double theta = 2 * Math.PI * x2;
-    double t1 = r * FastMath.cos(theta);
-    double t2 = r * FastMath.sin(theta);
-    a1.scale(t1);
-    a1.scaleAdd(t2, a2);
-    a1.scaleAdd(-Math.sqrt(1 - a1.lengthSquared()), ray.d);
-    ray.setNormal(a1);
+    material.setRandomSphericalNormal(ray, random);
   }
 
   public void setRayMaterialAndColor(Ray ray) {
@@ -88,11 +74,7 @@ public abstract class FogVolume implements JsonSerializable {
   public JsonObject toJson() {
     JsonObject properties = volumeSpecificPropertiesToJson();
     properties.add("type", type.name());
-    JsonObject colorObj = new JsonObject();
-    colorObj.add("red", color.x);
-    colorObj.add("green", color.y);
-    colorObj.add("blue", color.z);
-    properties.add("color", colorObj);
+    properties.add("color", ColorUtil.rgbToJson(color));
     properties.add("density", density);
     properties.add("materialProperties", materialPropertiesToJson());
     return properties;
@@ -108,10 +90,7 @@ public abstract class FogVolume implements JsonSerializable {
   protected abstract void importVolumeSpecificProperties(JsonObject jsonObject);
 
   public void importFromJson(JsonObject json) {
-    JsonObject colorObj = json.get("color").object();
-    color.x = colorObj.get("red").doubleValue(color.x);
-    color.y = colorObj.get("green").doubleValue(color.y);
-    color.z = colorObj.get("blue").doubleValue(color.z);
+    color.set(ColorUtil.jsonToRGB(json.get("color").asObject()));
     density = json.get("density").doubleValue(Scene.DEFAULT_FOG_DENSITY);
     JsonObject materialProperties = json.get("materialProperties").object();
     importMaterialProperties(materialProperties);

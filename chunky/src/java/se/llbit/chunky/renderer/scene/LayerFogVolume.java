@@ -24,7 +24,7 @@ public class LayerFogVolume extends FogVolume {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene, Random random) {
+  public boolean intersect(Scene scene, Ray ray, Random random) {
     // Amount of fog the ray should pass through before being scattered
     // Sampled from an exponential distribution
     double fogPenetrated = -Math.log(1 - random.nextDouble());

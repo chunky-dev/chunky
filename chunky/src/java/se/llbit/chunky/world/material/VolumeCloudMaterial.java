@@ -20,9 +20,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.VolumeMaterial;
 
 public class VolumeCloudMaterial extends VolumeMaterial {
-  public static final VolumeCloudMaterial INSTANCE = new VolumeCloudMaterial();
-
-  private VolumeCloudMaterial() {
+  public VolumeCloudMaterial() {
     super("volume_cloud", Texture.air);
   }
 }
