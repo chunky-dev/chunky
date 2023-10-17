@@ -2103,7 +2103,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Compute the alpha channel.
    */
-  public void computeAlpha(TaskTracker taskTracker) {
+  private void computeAlpha(TaskTracker taskTracker) {
     if (transparentSky) {
       if (!this.getOutputMode().isTransparencySupported()) {
         Log.warn("Can not use transparent sky with " + this.getOutputMode().getName() +  " output mode. Use PNG instead.");

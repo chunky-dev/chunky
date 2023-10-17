@@ -28,7 +28,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -53,7 +52,6 @@ import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.IntegerTextField;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
-import se.llbit.chunky.ui.elements.TextFieldLabelWrapper;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.material.BeaconBeamMaterial;
 import se.llbit.fx.LuxColorPicker;
@@ -69,8 +67,37 @@ import se.llbit.util.mojangapi.MinecraftSkin;
 import se.llbit.util.mojangapi.MojangApi;
 
 public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initializable {
+  private static final Map<String, EntitiesTab.EntityType<?>> entityTypes = new HashMap<>();
+
+  static {
+    entityTypes.put("Player", (position, scene) -> {
+      Collection<Entity> entities = scene.getActors();
+      Set<String> ids = new HashSet<>();
+      for (Entity entity : entities) {
+        if (entity instanceof PlayerEntity) {
+          ids.add(((PlayerEntity) entity).uuid);
+        }
+      }
+      // Pick a new UUID for the new entity.
+      long id = System.currentTimeMillis();
+      while (ids.contains(String.format("%016X%016X", 0, id))) {
+        id += 1;
+      }
+      PlayerEntity player = new PlayerEntity(String.format("%016X%016X", 0, id), position);
+      player.randomPoseAndLook();
+      return player;
+    });
+    entityTypes.put("Armor stand", (position, scene) -> new ArmorStand(position, new CompoundTag()));
+    entityTypes.put("Lectern", (position, scene) -> new Lectern(position, "north", true));
+    entityTypes.put("Book", (position, scene) -> new Book(position, Math.PI - Math.PI / 16, Math.toRadians(30), Math.toRadians(180 - 30)));
+    entityTypes.put("Beacon beam", (position, scene) -> new BeaconBeam(position));
+  }
 
   private Scene scene;
+
+  public interface EntityType<T extends Entity> {
+    T createInstance(Vector3 position, Scene scene);
+  }
 
   public static class EntityData {
 
@@ -568,7 +595,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    entityType.getItems().addAll("Player", "Armor stand", "Lectern", "Book", "Beacon beam");
+    entityType.getItems().addAll(entityTypes.keySet());
     entityType.setValue("Player");
     add.setTooltip(new Tooltip("Add an entity at the target position."));
     add.setOnAction(e -> {
@@ -577,54 +604,22 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         position = new Vector3(scene.camera().getPosition());
       }
 
-      Entity added = null;
-      switch (entityType.getValue()) {
-        case "Player": {
-          Collection<Entity> entities = scene.getActors();
-          Set<String> ids = new HashSet<>();
-          for (Entity entity : entities) {
-            if (entity instanceof PlayerEntity) {
-              ids.add(((PlayerEntity) entity).uuid);
-            }
+      Entity entity = entityTypes.get(entityType.getValue()).createInstance(position, scene);
+      if (entity instanceof PlayerEntity) {
+        PlayerEntity player = (PlayerEntity) entity;
+        withEntity(selected -> {
+          if (selected instanceof PlayerEntity) {
+            player.skin = ((PlayerEntity) selected).skin;
+            player.model = ((PlayerEntity) selected).model;
           }
-          // Pick a new UUID for the new entity.
-          long id = System.currentTimeMillis();
-          while (ids.contains(String.format("%016X%016X", 0, id))) {
-            id += 1;
-          }
-          PlayerEntity player = new PlayerEntity(String.format("%016X%016X", 0, id), position);
-          withEntity(selected -> {
-            if (selected instanceof PlayerEntity) {
-              player.skin = ((PlayerEntity) selected).skin;
-              player.model = ((PlayerEntity) selected).model;
-            }
-          });
-          player.randomPoseAndLook();
-          scene.addPlayer(player);
-          added = player;
-          break;
-        }
-        case "Armor stand":
-          added = new ArmorStand(position, new CompoundTag());
-          scene.addActor(added);
-          break;
-        case "Lectern":
-          added = new Lectern(position, "north", true);
-          scene.addActor(added);
-          break;
-        case "Book":
-          added = new Book(position, Math.PI - Math.PI / 16, Math.toRadians(30), Math.toRadians(180 - 30));
-          scene.addActor(added);
-          break;
-        case "Beacon beam":
-          scene.addActor(added = new BeaconBeam(position));
-          break;
+        });
+        scene.addPlayer(player);
+      } else {
+        scene.addActor(entity);
       }
-      if (added != null) {
-        EntityData data = new EntityData(added, scene);
-        entityTable.getItems().add(data);
-        entityTable.getSelectionModel().select(data);
-      }
+      EntityData data = new EntityData(entity, scene);
+      entityTable.getItems().add(data);
+      entityTable.getSelectionModel().select(data);
     });
     delete.setTooltip(new Tooltip("Delete the selected entity."));
     delete.setOnAction(e -> withEntity(entity -> {
