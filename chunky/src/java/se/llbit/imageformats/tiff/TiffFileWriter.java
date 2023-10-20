@@ -17,11 +17,20 @@
  */
 package se.llbit.imageformats.tiff;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+
+import se.llbit.chunky.main.Version;
 import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
@@ -30,192 +39,303 @@ import se.llbit.log.Log;
 import se.llbit.util.TaskTracker;
 
 /**
- * TIFF image output. This supports 32-bit floating point channel output.
- *
- * <p>Non-32bit output has been removed sine it was unused.
- *
- * @author Jesper Öqvist <jesper@llbit.se>
+ * Basic writer for the TIFF image format.
+ * <p>Supports (only) 32-bit floating point channel output.
+ * See the <a href="https://download.osgeo.org/libtiff/doc/TIFF6.pdf">format specification</a> for details.
  */
 public class TiffFileWriter implements AutoCloseable {
 
-  private static final int ASCII = 2;
-  private static final int SHORT = 3;
-  private static final int LONG = 4;
-  private static final int RATIONAL = 5;
-
   private final DataOutputStream out;
 
-  public TiffFileWriter(OutputStream out) throws IOException {
-    this.out = new DataOutputStream(out);
-    out.write(0x4D);
-    out.write(0x4D);
-    out.write(0x00);
-    out.write(0x2A);
+  public TiffFileWriter(OutputStream outputStream) throws IOException {
+    out = new DataOutputStream(outputStream);
+    // "MM\0*"
+    // - MM -> magic bytes
+    // - \0* -> magic number 42 for big-endian byte order
+    out.writeInt(0x4D4D002A);
   }
 
-  /**
-   * @throws IOException
-   */
-  public TiffFileWriter(File file) throws IOException {
-    this(new FileOutputStream(file));
-  }
-
-  /**
-   * @throws IOException
-   */
   @Override
   public void close() throws IOException {
     out.close();
   }
 
-  private void writeHeader(int width, int height, int bytesPerSample) throws IOException {
-    out.writeInt(ifdOffset(width, height, bytesPerSample));
+  static class IFDWriter {
+    /**
+     * Tag structure (12 bytes):
+     * - 2 bytes: tag ID
+     * - 2 bytes: field type
+     * - 4 bytes: value count, not byte count!
+     * - 4 bytes: value if it fits otherwise address in file
+     */
+    List<ByteBuffer> tagEntries = new ArrayList<>();
+    List<Long> unfinalizedTags = new ArrayList<>();
+    ByteArrayOutputStream tagDataBuffer = new ByteArrayOutputStream(128);
+
+    enum TagFieldType {
+      ASCII(2, 1),
+      SHORT(3, 2),
+      LONG(4, 4),
+      RATIONAL(5, 8);
+      final short id;
+      final int byteSize;
+
+      TagFieldType(int id, int byteSize) {
+        this.id = (short) id;
+        this.byteSize = byteSize;
+      }
+    }
+
+    /**
+     * Writes a string as 7-bit ASCII code, 0-terminated
+     */
+    public void addAsciiTagEntry(short tagID, String data) throws IOException {
+      byte[] bytes = data.getBytes(StandardCharsets.US_ASCII);
+      // append 0-terminator
+      bytes = Arrays.copyOf(bytes, bytes.length+1);
+      addTagEntry(tagID, TagFieldType.ASCII, bytes.length, bytes);
+    }
+
+    /**
+     * Writes single 16-bit unsigned(!) integer
+     */
+    public void addShortTagEntry(short tagID, short data) throws IOException {
+      ByteBuffer buf = ByteBuffer.allocate(12);
+      buf.putShort(tagID);
+      buf.putShort(TagFieldType.SHORT.id);
+      buf.putInt(1);
+      buf.putShort(data);
+      buf.putShort((short) 0);
+      tagEntries.add(buf);
+    }
+
+    /**
+     * Writes multiple 16-bit unsigned(!) integer
+     */
+    public void addShortTagEntry(short tagID, short[] data) throws IOException {
+      ByteBuffer buf = ByteBuffer.allocate(data.length*2);
+      buf.asShortBuffer().put(data);
+      addTagEntry(tagID, TagFieldType.SHORT, data.length, buf.array());
+    }
+
+    /**
+     * Writes single 32-bit unsigned(!) integer
+     */
+    public void addLongTagEntry(short tagID, int data) throws IOException {
+      ByteBuffer buf = ByteBuffer.allocate(12);
+      buf.putShort(tagID);
+      buf.putShort(TagFieldType.LONG.id);
+      buf.putInt(1);
+      buf.putInt(data);
+      tagEntries.add(buf);
+    }
+
+    /**
+     * Writes multiple 32-bit unsigned(!) integer
+     */
+    private void addLongTagEntry(short tagID, int[] data) throws IOException {
+      ByteBuffer buf = ByteBuffer.allocate(data.length*4);
+      buf.asIntBuffer().put(data);
+      addTagEntry(tagID, TagFieldType.LONG, data.length, buf.array());
+    }
+
+    /**
+     * Writes a fraction using an
+     * - 32-bit unsigned(!) integer numerator
+     * - 32-bit unsigned(!) integer denominator
+     * @param numeratorDenominatorPairs interleaved array of fraction numerator and denominator [n,d,n,d,...]
+     */
+    private void addRationalTagEntry(short tagID, int[] numeratorDenominatorPairs) throws IOException {
+      ByteBuffer buf = ByteBuffer.allocate(numeratorDenominatorPairs.length*4);
+      buf.asIntBuffer().put(numeratorDenominatorPairs);
+      addTagEntry(tagID, TagFieldType.RATIONAL, numeratorDenominatorPairs.length, buf.array());
+    }
+
+    private void addTagEntry(short tagID, TagFieldType fieldType, int valueCount, byte[] data) throws IOException {
+      ByteBuffer buf = ByteBuffer.allocate(12);
+      buf.putShort(tagID);
+      buf.putShort(fieldType.id);
+      buf.putInt(valueCount);
+      if(valueCount * fieldType.byteSize <= 4) {
+        // store in tag
+        buf.put(data);
+        // pad tag
+        while(buf.position() < 12) {
+          buf.put((byte) 0);
+        }
+      } else {
+        // finalize later
+        buf.putInt(0);
+        int tagIndex = tagEntries.size();
+        int bufferOffset = tagDataBuffer.size();
+        unfinalizedTags.add((long) tagIndex << 32 | bufferOffset);
+        tagDataBuffer.write(data);
+      }
+      tagEntries.add(buf);
+    }
+
+    /**
+     * IFD structure:
+     * - 2 bytes: tag count
+     * - x * 12 bytes: tags
+     * - 4 bytes: next IFD address
+     */
+    void write(DataOutputStream out, int expectedAddress, boolean lastIFD) throws IOException {
+      assert(expectedAddress >= out.size());
+      int padding = expectedAddress - out.size();
+      out.write(new byte[padding]);
+
+      // write tag count
+      out.writeShort(tagEntries.size());
+
+      // address for buffered data
+      int addressAfterIFD = out.size() + tagEntries.size() * 12 + 4;
+      // finalize tag addresses
+      for(long unfinalizedTag : unfinalizedTags) {
+        int unfinalizedTagIndex = (int) (unfinalizedTag >> 32);
+        int bufferOffset = (int) unfinalizedTag;
+        ByteBuffer tagEntry = tagEntries.get(unfinalizedTagIndex);
+        tagEntry.putInt(8, addressAfterIFD + bufferOffset);
+      }
+      // sort tag entries by tagID
+      tagEntries.sort(
+        Comparator.comparingInt((ByteBuffer tagEntry) -> (int) tagEntry.getShort(0))
+      );
+
+      // write tags
+      for(ByteBuffer tagEntry : tagEntries) {
+        out.write(tagEntry.array());
+      }
+      // write pointer to next IFD
+      if(!lastIFD) {
+        int nextIFDAddress = addressAfterIFD + tagDataBuffer.size();
+        if ((nextIFDAddress & 0b1) != 0) {
+          // align to 16-bit address
+          nextIFDAddress++;
+        }
+        out.writeInt(nextIFDAddress);
+      } else {
+        // zero-pointer represents last IFD
+        out.writeInt(0);
+      }
+      out.flush();
+
+      // write buffered data
+      out.write(tagDataBuffer.toByteArray());
+      out.flush();
+    }
+
+    /** width / columns / pixels per scanline */
+    static final short TAG_IMAGE_WIDTH = 0x0100;
+    /** height / rows / length / scanline count */
+    static final short TAG_IMAGE_HEIGHT = 0x0101;
+    static final short TAG_BITS_PER_SAMPLE = 0x0102;
+    static final short TAG_SAMPLE_FORMAT = 0x0153;
+
+    /** defines details of subfile using 32 flag bits */
+    static final short TAG_NEW_SUBFILE_TYPE = 0x00FE;
+
+    static final short TAG_COMPRESSION_TYPE = 0x0103;
+    static final short TAG_PHOTOMETRIC_INTERPRETATION = 0x0106;
+    static final short TAG_PLANAR_CONFIGURATION = 0x011C;
+
+    /** number of rows in each strip (except possibly the last strip) */
+    static final short TAG_ROWS_PER_STRIP = 0x0116;
+    /** for each strip, the byte offset of that strip */
+    static final short TAG_STRIP_OFFSETS = 0x0111;
+    /** for each strip, the number of bytes in that strip after any compression */
+    static final short TAG_STRIP_BYTE_COUNTS = 0x0117;
+    static final short TAG_ORIENTATION = 0x0112;
+    static final short TAG_SAMPLES_PER_PIXEL = 0x0115;
+
+    static final short TAG_X_RESOLUTION = 0x011A;
+    static final short TAG_Y_RESOLUTION = 0x011B;
+    static final short TAG_RESOLUTION_UNIT = 0x0128;
+
+    static final short TAG_SOFTWARE = 0x0131;
+    static final short TAG_DATETIME = 0x0132;
   }
 
-  private void writeFooter(int width, int height, int bytesPerSample) throws IOException {
-    int ifdOffset = ifdOffset(width, height, bytesPerSample);
-    int numEntries = 15;
+  private static final int BYTES_PER_SAMPLE = 4;
+  private static final DateTimeFormatter DATETIME_FORMAT = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
 
-    // Number of IFD entries.
-    out.writeShort(numEntries);
+  /**
+   * Export sample buffer as Baseline TIFF RGB image / TIFF Class R image
+   * with 32 bits per color component.
+   */
+  public void export(Scene scene, TaskTracker.Task task) throws IOException {
+    int width = scene.canvasWidth();
+    int height = scene.canvasHeight();
 
-    // 1: Width.
-    out.writeShort(0x0100);
-    out.writeShort(SHORT);
-    out.writeInt(1);
-    out.writeShort(width);
-    out.writeShort(0);
+    int pixelDataOffset = out.size() + 4; // header + ifd address
+    int pixelDataByteCount = width * height * 3 * BYTES_PER_SAMPLE;
+    int ifdOffset = pixelDataOffset + pixelDataByteCount;
+    out.writeInt(ifdOffset);
 
-    // 2: Height.
-    out.writeShort(0x0101);
-    out.writeShort(SHORT);
-    out.writeInt(1);
-    out.writeShort(height);
-    out.writeShort(0);
+    writePixelData(width, height, scene, task);
 
-    // 3: Bits per sample.
-    out.writeShort(0x0102);
-    out.writeShort(SHORT);
-    out.writeInt(3);
-    int offsetBps = ifdOffset + 2 + 12 * numEntries + 2;
-    out.writeInt(offsetBps);
+    IFDWriter idf = new IFDWriter();
+    // RGB full color
+    idf.addShortTagEntry(IFDWriter.TAG_PHOTOMETRIC_INTERPRETATION, (short) 2);
+    // Store pixel components contiguously [RGBRGBRGB...]
+    idf.addShortTagEntry(IFDWriter.TAG_PLANAR_CONFIGURATION, (short) 1);
+    // Number of components per pixel (R, G, B)
+    idf.addShortTagEntry(IFDWriter.TAG_SAMPLES_PER_PIXEL, (short) 3);
 
-    // 4: Compression type.
-    out.writeShort(0x0103);
-    out.writeShort(SHORT);
-    out.writeInt(1);
-    out.writeShort(1);
-    out.writeShort(0);
+    assert(width <= Short.MAX_VALUE);
+    idf.addShortTagEntry(IFDWriter.TAG_IMAGE_WIDTH, (short) width);
+    assert(height <= Short.MAX_VALUE);
+    idf.addShortTagEntry(IFDWriter.TAG_IMAGE_HEIGHT, (short) height);
+    short bitsPerSample = (short) (8 * BYTES_PER_SAMPLE);
+    idf.addShortTagEntry(IFDWriter.TAG_BITS_PER_SAMPLE, new short[]{ bitsPerSample, bitsPerSample, bitsPerSample });
+    // Interpret each component as IEEE754 float32
+    idf.addShortTagEntry(IFDWriter.TAG_SAMPLE_FORMAT, new short[]{ 3, 3, 3 });
 
-    // 5: PhotometricInterpretation
-    out.writeShort(0x0106);
-    out.writeShort(SHORT);
-    out.writeInt(1);
-    out.writeShort(2);
-    out.writeShort(0);
+    // No compression, but pack data into bytes as tightly as possible, leaving no unused
+    // bits (except at the end of a row). The component values are stored as an array of
+    // type BYTE. Each scan line (row) is padded to the next BYTE boundary.
+    idf.addShortTagEntry(IFDWriter.TAG_COMPRESSION_TYPE, (short) 1);
 
-    // 7: StripOffsets
-    out.writeShort(0x0111);
-    out.writeShort(LONG);
-    out.writeInt(1);
-    out.writeInt(8);
+    // "Compressed or uncompressed image data can be stored almost anywhere in a
+    // TIFF file. TIFF also supports breaking an image into separate strips for increased
+    // editing flexibility and efficient I/O buffering."
+    // We will use exactly 1 strip, therefore the relevant tags have only 1 entry.
+    // All rows in 1 strip
+    idf.addLongTagEntry(IFDWriter.TAG_ROWS_PER_STRIP, height);
+    // Absolute strip address
+    idf.addLongTagEntry(IFDWriter.TAG_STRIP_OFFSETS, pixelDataOffset);
+    // Strip length
+    idf.addLongTagEntry(IFDWriter.TAG_STRIP_BYTE_COUNTS, pixelDataByteCount);
+    // The 0th row represents the visual top of the image, and the 0th column represents the visual left-hand side.
+    idf.addShortTagEntry(IFDWriter.TAG_ORIENTATION, (short) 1);
 
-    // 6: Orientation
-    out.writeShort(0x0112);
-    out.writeShort(SHORT);
-    out.writeInt(1);
-    out.writeShort(1); // First row is at the top of the image.
-    out.writeShort(0);
+    // Image does not have a physical size
+    idf.addShortTagEntry(IFDWriter.TAG_RESOLUTION_UNIT, (short) 1); // not an absolute unit
+    idf.addRationalTagEntry(IFDWriter.TAG_X_RESOLUTION, new int[]{ 1, 1 });
+    idf.addRationalTagEntry(IFDWriter.TAG_Y_RESOLUTION, new int[]{ 1, 1 });
 
-    // 8: SamplesPerPixel
-    out.writeShort(0x0115);
-    out.writeShort(SHORT);
-    out.writeInt(1);
-    out.writeShort(3);
-    out.writeShort(0);
+    idf.addAsciiTagEntry(IFDWriter.TAG_SOFTWARE, "Chunky " + Version.getVersion());
+    idf.addAsciiTagEntry(IFDWriter.TAG_DATETIME, DATETIME_FORMAT.format(LocalDateTime.now()));
 
-    // 9: RowsPerStrip
-    out.writeShort(0x0116);
-    out.writeShort(LONG);
-    out.writeInt(1);
-    out.writeInt(height);
+    idf.write(out, ifdOffset, true);
+  }
 
-    // 10: StripByteCounts
-    out.writeShort(0x0117);
-    out.writeShort(LONG);
-    out.writeInt(1);
-    int offsetSbc = ifdOffset + 2 + 12 * numEntries + 2 + 2 * 3;
-    out.writeInt(offsetSbc);
-
-    // 11: XResolution
-    out.writeShort(0x011A);
-    out.writeShort(RATIONAL);
-    out.writeInt(1);
-    int offsetXres = ifdOffset + 2 + 12 * numEntries + 2 + 2 * 3 + 4;
-    out.writeInt(offsetXres);
-
-    // 12: YResolution
-    out.writeShort(0x011B);
-    out.writeShort(RATIONAL);
-    out.writeInt(1);
-    int offsetYres = ifdOffset + 2 + 12 * numEntries + 2 + 2 * 3 + 4 + 8;
-    out.writeInt(offsetYres);
-
-    // 13: ResolutionUnit
-    out.writeShort(0x0128);
-    out.writeShort(SHORT);
-    out.writeInt(1);
-    out.writeShort(1);
-    out.writeShort(0);
-
-    // 14: SampleFormat
-    out.writeShort(0x0153);
-    out.writeShort(SHORT);
-    out.writeInt(3);
-    int offsetSampleFormat = ifdOffset + 2 + 12 * numEntries + 2 + 2 * 3 + 4 + 8 + 8;
-    out.writeInt(offsetSampleFormat);
-
-    // 15: Software
-    out.writeShort(0x0131);
-    out.writeShort(ASCII);
-    out.writeInt("Chunky".length() + 1);
-    int offsetSoftware = ifdOffset + 2 + 12 * numEntries + 2 + 2 * 3 + 4 + 8 + 8 + 2 * 3;
-    out.writeInt(offsetSoftware);
-
-    // End of IFD.
-    out.writeShort(0);
-
-    // Bits per sample, values.
-    out.writeShort(8 * bytesPerSample);
-    out.writeShort(8 * bytesPerSample);
-    out.writeShort(8 * bytesPerSample);
-
-    // Strip byte count.
-    out.writeInt(width * height * 3 * bytesPerSample);
-
-    // X resolution.
-    out.writeInt(0);
-    out.writeInt(1);
-
-    // Y resolution.
-    out.writeInt(0);
-    out.writeInt(1);
-
-    // Sample formats.
-    if (bytesPerSample == 1) {
-      out.writeShort(1);
-      out.writeShort(1);
-      out.writeShort(1);
-    } else {
-      out.writeShort(3);
-      out.writeShort(3);
-      out.writeShort(3);
+  private void writePixelData(int width, int height, Scene scene, TaskTracker.Task task) throws IOException {
+    PixelPostProcessingFilter filter = requirePixelPostProcessingFilter(scene);
+    double[] sampleBuffer = scene.getSampleBuffer();
+    double[] pixelBuffer = new double[3];
+    for (int y = 0; y < height; ++y) {
+      task.update(height, y);
+      for (int x = 0; x < width; ++x) {
+        // TODO: refactor pixel access to remove duplicate post processing code from here
+        filter.processPixel(width, height, sampleBuffer, x, y, scene.getExposure(), pixelBuffer);
+        out.writeFloat((float) pixelBuffer[0]);
+        out.writeFloat((float) pixelBuffer[1]);
+        out.writeFloat((float) pixelBuffer[2]);
+      }
     }
-
-    for (byte b : "Chunky".getBytes()) {
-      out.write(b);
-    }
-    out.write(0);
+    out.flush();
+    task.update(height, height);
   }
 
   private PixelPostProcessingFilter requirePixelPostProcessingFilter(Scene scene) {
@@ -225,41 +345,9 @@ public class TiffFileWriter implements AutoCloseable {
       return (PixelPostProcessingFilter) filter;
     } else {
       Log.warn("The selected post processing filter (" + filter.getName()
-        + ") doesn't support pixel based processing and can't be used to export TIFF files. "+
+        + ") doesn't support pixel based processing and can't be used to export TIFF files. " +
         "The TIFF will be exported without post-processing instead.");
       return PostProcessingFilters.NONE;
     }
-  }
-
-  /**
-   * Write an image as a 32-bit per channel TIFF file.
-   */
-  public void write32(Scene scene, TaskTracker.Task task) throws IOException {
-    PixelPostProcessingFilter filter = requirePixelPostProcessingFilter(scene);
-
-    int width = scene.canvasWidth();
-    int height = scene.canvasHeight();
-    writeHeader(width, height, 4);
-
-    double[] sampleBuffer = scene.getSampleBuffer();
-
-    for (int y = 0; y < height; ++y) {
-      task.update(height, y);
-      for (int x = 0; x < width; ++x) {
-        double[] pixelBuffer = new double[3];
-        // TODO: refactor pixel access to remove duplicate post processing code from here
-        filter.processPixel(width, height, sampleBuffer, x, y, scene.getExposure(), pixelBuffer);
-        out.writeFloat((float) pixelBuffer[0]);
-        out.writeFloat((float) pixelBuffer[1]);
-        out.writeFloat((float) pixelBuffer[2]);
-      }
-      task.update(height, y + 1);
-    }
-
-    writeFooter(width, height, 4);
-  }
-
-  private int ifdOffset(int width, int height, int bytesPerSample) {
-    return 8 + width * height * 3 * bytesPerSample; // Offset to first IFD from file start.
   }
 }
