@@ -7,7 +7,7 @@ import se.llbit.imageformats.tiff.TiffFileWriter;
 import se.llbit.util.TaskTracker;
 
 /**
- * TIFF with 32-bit color channels.
+ * TIFF with 32-bit floating point RGB channels.
  */
 public class Tiff32ExportFormat implements PictureExportFormat {
 
@@ -35,7 +35,7 @@ public class Tiff32ExportFormat implements PictureExportFormat {
   public void write(OutputStream out, Scene scene, TaskTracker taskTracker) throws IOException {
     try (TaskTracker.Task task = taskTracker.task("Writing TIFF");
         TiffFileWriter writer = new TiffFileWriter(out)) {
-      writer.write32(scene, task);
+      writer.export(scene, task);
     }
   }
 }
