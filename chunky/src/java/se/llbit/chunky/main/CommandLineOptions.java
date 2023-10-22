@@ -21,6 +21,7 @@ package se.llbit.chunky.main;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
 import se.llbit.chunky.renderer.RenderContext;
+import se.llbit.chunky.renderer.SceneIOProvider;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.ResourcePackLoader;
 import se.llbit.json.JsonNumber;
@@ -558,7 +559,7 @@ public class CommandLineOptions {
 
   private void printAvailableScenes() {
     System.err.println("Scene directory: " + options.sceneDir.getAbsolutePath());
-    List<File> fileList = SceneHelper.getAvailableSceneFiles(options.sceneDir);
+    List<File> fileList = SceneIOProvider.getAvailableSceneFiles(options.sceneDir);
     Collections.sort(fileList);
     if (!fileList.isEmpty()) {
       System.err.println("Available scenes:");

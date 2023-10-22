@@ -515,18 +515,18 @@ public class Scene implements JsonSerializable, Refreshable {
    * @throws IOException
    * @throws InterruptedException
    */
-  public synchronized void saveScene(SceneIOProvider context, TaskTracker taskTracker)
+  public synchronized void saveScene(SceneIOProvider ioContext, TaskTracker taskTracker)
       throws IOException {
     try (TaskTracker.Task task = taskTracker.task("Saving scene", 2)) {
       task.update(1);
 
-      try (BufferedOutputStream out = new BufferedOutputStream(context.getSceneDescriptionOutputStream(name))) {
+      try (BufferedOutputStream out = new BufferedOutputStream(ioContext.getSceneDescriptionOutputStream(name))) {
         saveDescription(out);
       }
 
-      saveOctree(context, taskTracker);
-      saveDump(context, taskTracker);
-      saveEmitterGrid(context, taskTracker);
+      saveOctree(ioContext, taskTracker);
+      saveDump(ioContext, taskTracker);
+      saveEmitterGrid(ioContext, taskTracker);
     }
   }
 
@@ -2159,7 +2159,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  private synchronized void saveEmitterGrid(SceneIOProvider context, TaskTracker taskTracker) {
+  private synchronized void saveEmitterGrid(SceneIOProvider ioContext, TaskTracker taskTracker) {
     if (emitterGrid == null)
       return;
 
@@ -2168,7 +2168,7 @@ public class Scene implements JsonSerializable, Refreshable {
     try (TaskTracker.Task task = taskTracker.task("Saving Grid")) {
       Log.info("Saving Grid " + filename);
 
-      try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(filename)))) {
+      try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(ioContext.getSceneFileOutputStream(filename)))) {
         emitterGrid.store(out, this);
       } catch (IOException e) {
         Log.warn("Couldn't save Grid", e);
@@ -2176,9 +2176,9 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  private synchronized void saveOctree(SceneIOProvider context, TaskTracker taskTracker) {
+  private synchronized void saveOctree(SceneIOProvider ioContext, TaskTracker taskTracker) {
     String fileName = name + ".octree2";
-    if (context.fileUnchangedSince(fileName, worldOctree.getTimestamp())) {
+    if (ioContext.fileUnchangedSince(fileName, worldOctree.getTimestamp())) {
       Log.info("Skipping redundant Octree write");
       return;
     }
@@ -2187,7 +2187,7 @@ public class Scene implements JsonSerializable, Refreshable {
       Log.info("Saving octree " + fileName);
 
       boolean saved = false;
-      try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName))))) {
+      try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new GZIPOutputStream(ioContext.getSceneFileOutputStream(fileName))))) {
         OctreeFileFormat.store(out, worldOctree, waterOctree, palette,
             grassTexture, foliageTexture, waterTexture);
         saved = true;
@@ -2199,13 +2199,13 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       if (saved) {
-        worldOctree.setTimestamp(context.fileTimestamp(fileName));
+        worldOctree.setTimestamp(ioContext.fileTimestamp(fileName));
       }
     }
   }
 
-  public synchronized void saveDump(SceneIOProvider context, TaskTracker taskTracker) {
-    File dumpFile = context.getSceneFile(name + ".dump");
+  public synchronized void saveDump(SceneIOProvider ioContext, TaskTracker taskTracker) {
+    File dumpFile = ioContext.getSceneFile(name + ".dump");
     Log.info("Saving render dump: " + dumpFile);
     try (FileOutputStream outputStream = new FileOutputStream(dumpFile)) {
       RenderDump.save(outputStream, this, taskTracker);
@@ -2215,11 +2215,11 @@ public class Scene implements JsonSerializable, Refreshable {
     Log.info("Render dump saved: " + dumpFile);
   }
 
-  private synchronized boolean loadEmitterGrid(SceneIOProvider context, TaskTracker taskTracker) {
+  private synchronized boolean loadEmitterGrid(SceneIOProvider ioContext, TaskTracker taskTracker) {
     String filename = name + ".emittergrid";
     try (TaskTracker.Task task = taskTracker.task("Loading grid")) {
       Log.info("Load grid " + filename);
-      try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(context.getSceneFileInputStream(filename))))) {
+      try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(ioContext.getSceneFileInputStream(filename))))) {
         emitterGrid = Grid.load(in, this);
         return true;
       } catch (Exception e) {
@@ -2229,29 +2229,29 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  private synchronized boolean loadOctree(SceneIOProvider context, TaskTracker taskTracker) {
+  private synchronized boolean loadOctree(SceneIOProvider ioContext, TaskTracker taskTracker) {
     String fileName = name + ".octree2";
     try (TaskTracker.Task task = taskTracker.task("(1/3) Loading octree", 2)) {
       task.update(1);
       Log.info("Loading octree " + fileName);
 
-      long length = context.getSceneFile(fileName).length();
+      long length = ioContext.getSceneFile(fileName).length();
       double progressScale = 1000.0 / length;
       task.update(1000, 0);
 
       try {
-        long fileTimestamp = context.fileTimestamp(fileName);
+        long fileTimestamp = ioContext.fileTimestamp(fileName);
         OctreeFileFormat.OctreeData data;
         Consumer<String> stepConsumer = step -> task.update("(1/3) Loading octree (" + step + ")");
 
-        try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(context.getSceneFileInputStream(fileName), pos -> {
+        try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(ioContext.getSceneFileInputStream(fileName), pos -> {
           task.updateInterval((int) (pos * progressScale), 1);
         }))))) {
           data = OctreeFileFormat.load(in, octreeImplementation, this.biomeStructureImplementation, stepConsumer);
         } catch (PackedOctree.OctreeTooBigException e) {
           // Octree too big, reload file and force loading as NodeBasedOctree
           Log.warn("Octree was too big when loading dump, reloading with old (slower and bigger) implementation.");
-          DataInputStream inRetry = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(context.getSceneFileInputStream(fileName), pos -> {
+          DataInputStream inRetry = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(ioContext.getSceneFileInputStream(fileName), pos -> {
             task.updateInterval((int) (pos * progressScale), 1);
           }))));
           data = OctreeFileFormat.load(inRetry, "NODE", this.biomeStructureImplementation, stepConsumer);
@@ -2288,10 +2288,10 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  public synchronized boolean loadDump(SceneIOProvider context, TaskTracker taskTracker) {
-    if (!tryLoadDump(context, name + ".dump", taskTracker)) {
+  public synchronized boolean loadDump(SceneIOProvider ioContext, TaskTracker taskTracker) {
+    if (!tryLoadDump(ioContext, name + ".dump", taskTracker)) {
       // Failed to load the default render dump - try the backup file.
-      if (!tryLoadDump(context, name + ".dump.backup", taskTracker)) {
+      if (!tryLoadDump(ioContext, name + ".dump.backup", taskTracker)) {
         // we don't have the old render state, so reset spp and render time
         spp = 0;
         renderTime = 0;
@@ -2304,8 +2304,8 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * @return {@code true} if the render dump was successfully loaded
    */
-  private boolean tryLoadDump(SceneIOProvider context, String fileName, TaskTracker taskTracker) {
-    File dumpFile = context.getSceneFile(fileName);
+  private boolean tryLoadDump(SceneIOProvider ioContext, String fileName, TaskTracker taskTracker) {
+    File dumpFile = ioContext.getSceneFile(fileName);
     if (!dumpFile.isFile()) {
       if (spp != 0) {
         // The scene state says the render had some progress, so we should warn

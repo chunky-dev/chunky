@@ -29,7 +29,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.main.SceneHelper;
+import se.llbit.chunky.renderer.SceneIOProvider;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.TableSortConfigSerializer;
 import se.llbit.fxutil.Dialogs;
@@ -217,7 +217,7 @@ public class SceneChooserController implements Initializable {
 
     loadExecutor.execute(() -> {
       List<SceneListItem> scenes = new ArrayList<>();
-      List<File> fileList = SceneHelper.getAvailableSceneFiles(sceneDir);
+      List<File> fileList = SceneIOProvider.getAvailableSceneFiles(sceneDir);
       fileList.sort(Comparator.comparing(File::length));
 
       Platform.runLater(() -> {
