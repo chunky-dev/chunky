@@ -537,6 +537,9 @@ public class Scene implements JsonSerializable, Refreshable {
       // Load the configured skymap file.
       sky.reloadSkymap(context);
 
+      // Load the configured custom texture
+      sun.loadCustomTextures(context);
+
       loadedWorld = EmptyWorld.INSTANCE;
       if (!worldPath.isEmpty()) {
         File worldDirectory = new File(worldPath);

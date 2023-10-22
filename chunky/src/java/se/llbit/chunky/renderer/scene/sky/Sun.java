@@ -22,6 +22,7 @@ import java.util.Random;
 import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.renderer.Refreshable;
+import se.llbit.chunky.renderer.SceneIOProvider;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.JsonObject;
@@ -116,11 +117,6 @@ public class Sun implements JsonSerializable {
   private static Vector3 D = new Vector3();
   private static Vector3 E = new Vector3();
 
-  /**
-   * Sun texture
-   */
-  public static Texture texture = new Texture();
-
   static {
     A.x = mdx[0][0] * turb + mdx[0][1];
     B.x = mdx[1][0] * turb + mdx[1][1];
@@ -149,6 +145,8 @@ public class Sun implements JsonSerializable {
   private double f0_y;
 
   private final Refreshable scene;
+
+  private CelestialBodyType type = new CelestialBodyType.Sun();
 
   /**
    * Sun radius
@@ -236,6 +234,7 @@ public class Sun implements JsonSerializable {
     radius = other.radius;
     enableTextureModification = other.enableTextureModification;
     luminosityPdf = other.luminosityPdf;
+    type = other.type;
     importanceSampleRadius = other.importanceSampleRadius;
     importanceSampleChance = other.importanceSampleChance;
     initSun();
@@ -328,7 +327,7 @@ public class Sun implements JsonSerializable {
     if (a >= 0 && a < width2) {
       double b = Math.PI / 2 - FastMath.acos(ray.d.dot(sv)) + width;
       if (b >= 0 && b < width2) {
-        texture.getColor(a / width2, b / width2, ray.color);
+        type.getTexture().getColor(a / width2, b / width2, ray.color);
         ray.color.x *= apparentTextureBrightness.x * 10;
         ray.color.y *= apparentTextureBrightness.y * 10;
         ray.color.z *= apparentTextureBrightness.z * 10;
@@ -354,7 +353,7 @@ public class Sun implements JsonSerializable {
     if (a >= 0 && a < width2) {
       double b = Math.PI / 2 - FastMath.acos(ray.d.dot(sv)) + width;
       if (b >= 0 && b < width2) {
-        texture.getColor(a / width2, b / width2, ray.color);
+        type.getTexture().getColor(a / width2, b / width2, ray.color);
         ray.color.x *= color.x * 10;
         ray.color.y *= color.y * 10;
         ray.color.z *= color.z * 10;
@@ -516,6 +515,7 @@ public class Sun implements JsonSerializable {
     importanceSamplingObj.add("radius", importanceSampleRadius);
     sun.add("importanceSampling", importanceSamplingObj);
     sun.add("drawTexture", drawTexture);
+    type.appendToConfig(sun);
     return sun;
   }
 
@@ -550,7 +550,13 @@ public class Sun implements JsonSerializable {
 
     drawTexture = json.get("drawTexture").boolValue(drawTexture);
 
+    type = CelestialBodyType.newFromJson(json);
+
     initSun();
+  }
+
+  public void loadCustomTextures(SceneIOProvider ioContext) {
+    type.loadCustomTextures(ioContext);
   }
 
   /**
@@ -577,6 +583,14 @@ public class Sun implements JsonSerializable {
 
   public boolean drawTexture() {
     return drawTexture;
+  }
+
+  public CelestialBodyType getType() {
+    return type;
+  }
+
+  public void setType(CelestialBodyType type) {
+    this.type = type;
   }
 
   public double getImportanceSampleChance() { return importanceSampleChance; }
