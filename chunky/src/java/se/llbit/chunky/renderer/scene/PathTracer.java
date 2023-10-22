@@ -141,7 +141,7 @@ public class PathTracer implements RayTracer {
         boolean doMetal = pMetal > Ray.EPSILON && random.nextFloat() < pMetal;
 
         if (currentMat instanceof VolumeMaterial) {
-          hit |= doParticleFogReflection(ray, next, currentMat, cumulativeColor, random, state, scene);
+          hit |= doParticleFogReflection(ray, next, (VolumeMaterial) currentMat, cumulativeColor, random, state, scene);
         } else if (doMetal || (pSpecular > Ray.EPSILON && random.nextFloat() < pSpecular)) {
           hit |= doSpecularReflection(ray, next, cumulativeColor, doMetal, random, state, scene);
         } else if(random.nextFloat() < pDiffuse) {
@@ -205,7 +205,7 @@ public class PathTracer implements RayTracer {
     return hit;
   }
 
-  private static boolean doParticleFogReflection(Ray ray, Ray next, Material currentMat, Vector4 cumulativeColor, Random random, WorkerState state, Scene scene) {
+  private static boolean doParticleFogReflection(Ray ray, Ray next, VolumeMaterial currentMat, Vector4 cumulativeColor, Random random, WorkerState state, Scene scene) {
     boolean hit = false;
     Vector3 emittance = new Vector3();
     next.set(ray);
@@ -234,7 +234,7 @@ public class PathTracer implements RayTracer {
 
       Vector4 attenuation = state.attenuation;
       if (attenuation.w > 0) {
-        double mult = phaseHG(cosTheta, ray.getCurrentMaterial().anisotropy) * (scene.getSunSamplingStrategy().isSunLuminosity() ? scene.sun().getLuminosityPdf() : 1);
+        double mult = phaseHG(cosTheta, currentMat.anisotropy) * (scene.getSunSamplingStrategy().isSunLuminosity() ? scene.sun().getLuminosityPdf() : 1);
         directLightR = attenuation.x * attenuation.w * mult;
         directLightG = attenuation.y * attenuation.w * mult;
         directLightB = attenuation.z * attenuation.w * mult;
@@ -245,7 +245,7 @@ public class PathTracer implements RayTracer {
       Vector3 outboundDirection = new Vector3();
       double x1 = random.nextDouble();
       double x2 = random.nextDouble();
-      henyeyGreensteinSampleP(ray.getCurrentMaterial().anisotropy, inboundDirection, outboundDirection, x1, x2);
+      henyeyGreensteinSampleP(currentMat.anisotropy, inboundDirection, outboundDirection, x1, x2);
       next.d.set(outboundDirection);
       next.d.normalize();
 
@@ -261,7 +261,7 @@ public class PathTracer implements RayTracer {
       Vector3 outboundDirection = new Vector3();
       double x1 = random.nextDouble();
       double x2 = random.nextDouble();
-      henyeyGreensteinSampleP(ray.getCurrentMaterial().anisotropy, inboundDirection, outboundDirection, x1, x2);
+      henyeyGreensteinSampleP(currentMat.anisotropy, inboundDirection, outboundDirection, x1, x2);
       next.d.set(outboundDirection);
       next.d.normalize();
 

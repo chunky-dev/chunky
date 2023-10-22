@@ -8,6 +8,8 @@ import se.llbit.math.Vector3;
 import java.util.Random;
 
 public class VolumeMaterial extends Material {
+  public float anisotropy = 0;
+
   public VolumeMaterial(String name, Texture texture) {
     super(name, texture);
   }

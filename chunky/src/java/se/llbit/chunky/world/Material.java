@@ -75,8 +75,6 @@ public abstract class Material {
    */
   public float metalness = 0;
 
-  public float anisotropy = 0;
-
   /**
    * Subsurface scattering property.
    */
@@ -106,7 +104,6 @@ public abstract class Material {
     specular = 0;
     emittance = 0;
     roughness = 0;
-    anisotropy = 0;
     subSurfaceScattering = false;
   }
 
@@ -128,7 +125,6 @@ public abstract class Material {
     emittance = json.get("emittance").floatValue(emittance);
     roughness = json.get("roughness").floatValue(roughness);
     metalness = json.get("metalness").floatValue(metalness);
-    anisotropy = json.get("anisotropy").floatValue(anisotropy);
   }
 
   public boolean isWater() {

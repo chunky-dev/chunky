@@ -536,7 +536,7 @@ public class CloudLayer implements JsonSerializable {
   }
 
   private void importVolumeMaterial(JsonObject json) {
-    volumeMaterial.emittance = json.get("emittance").floatValue(material.emittance);
-    volumeMaterial.anisotropy = json.get("anisotropy").floatValue(material.anisotropy);
+    volumeMaterial.emittance = json.get("emittance").floatValue(volumeMaterial.emittance);
+    volumeMaterial.anisotropy = json.get("anisotropy").floatValue(volumeMaterial.anisotropy);
   }
 }
