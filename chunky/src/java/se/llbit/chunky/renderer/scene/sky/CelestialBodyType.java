@@ -150,7 +150,7 @@ public abstract class CelestialBodyType implements Registerable {
         (phase.textureAtlasPosX+1) * textureSize,
         (phase.textureAtlasPosY+1) * textureSize
       );
-      texture.setTexture(phaseTexture);
+      texture.setTexture(phaseTexture.rotated270());
     }
   }
 
