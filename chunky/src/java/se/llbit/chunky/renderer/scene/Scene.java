@@ -43,6 +43,8 @@ import se.llbit.chunky.renderer.projection.ParallelProjector;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
+import se.llbit.chunky.renderer.scene.sky.Sky;
+import se.llbit.chunky.renderer.scene.sky.Sun;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.*;
@@ -554,7 +556,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       // Load the configured skymap file.
-      sky.reloadSkymap(context.getSceneDirectory());
+      sky.reloadSkymap(context);
 
       loadedWorld = EmptyWorld.INSTANCE;
       if (!worldPath.isEmpty()) {

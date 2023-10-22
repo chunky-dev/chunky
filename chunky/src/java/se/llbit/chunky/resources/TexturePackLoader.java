@@ -17,7 +17,7 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.renderer.scene.PlayerModel;
-import se.llbit.chunky.renderer.scene.Sun;
+import se.llbit.chunky.renderer.scene.sky.Sun;
 import se.llbit.chunky.resources.texturepack.*;
 
 import java.lang.reflect.Field;
