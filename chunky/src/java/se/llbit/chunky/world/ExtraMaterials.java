@@ -20,6 +20,7 @@ import se.llbit.chunky.block.minecraft.Candle;
 import se.llbit.chunky.entity.CalibratedSculkSensorAmethyst;
 import se.llbit.chunky.entity.Campfire;
 import se.llbit.chunky.world.material.CloudMaterial;
+import se.llbit.chunky.world.material.VolumeCloudMaterial;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +32,7 @@ public class ExtraMaterials {
 
   static {
     idMap.put("cloud", CloudMaterial.INSTANCE);
+    idMap.put("volume_cloud", VolumeCloudMaterial.INSTANCE);
     idMap.put("candle_flame", Candle.flameMaterial);
     idMap.put("campfire_flame", Campfire.flameMaterial);
     idMap.put("soul_campfire_flame", Campfire.soulFlameMaterial);

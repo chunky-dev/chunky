@@ -94,14 +94,14 @@ public class PreviewRayTracer implements RayTracer {
     ray.t = Double.POSITIVE_INFINITY;
     boolean hit = false;
     if (scene.sky().cloudsEnabled()) {
-      hit = scene.sky().cloudIntersection(scene, ray);
+      hit = scene.sky().cloudIntersection(scene, ray, random);
     }
     if (scene.isWaterPlaneEnabled()) {
       hit = waterPlaneIntersection(scene, ray) || hit;
     }
     if (particleFog) {
       for(FogVolume v : scene.fog.getFogVolumes()) {
-        hit = v.intersect(ray, scene, random) || hit;
+        hit |= v.intersect(ray, scene, random);
       }
     }
     if (scene.intersect(ray)) {
