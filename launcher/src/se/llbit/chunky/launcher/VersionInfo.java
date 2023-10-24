@@ -62,6 +62,7 @@ public class VersionInfo implements Comparable<VersionInfo> {
   }
 
   public static class Library {
+    private static final boolean DISABLE_CHECKSUM_CHECK = Boolean.parseBoolean(System.getProperty("chunky.dangerouslyDisableLibraryVerification", "false"));
     public final String name;
     public final String md5;
     public final String sha256;
@@ -89,22 +90,24 @@ public class VersionInfo implements Comparable<VersionInfo> {
     }
 
     public LibraryStatus testIntegrity(File libDir) {
-      if (name.isEmpty() || (md5.isEmpty() && sha256.isEmpty())) {
+      if (name.isEmpty() || (!DISABLE_CHECKSUM_CHECK && md5.isEmpty() && sha256.isEmpty())) {
         return LibraryStatus.INCOMPLETE_INFO;
       }
       File library = new File(libDir, name);
       if (!library.isFile()) {
         return LibraryStatus.MISSING;
       }
-      if (!sha256.isEmpty()) {
-        String libSha256 = Util.sha256sum(library);
-        if (!libSha256.equalsIgnoreCase(sha256)) {
-          return LibraryStatus.CHECKSUM_MISMATCH;
-        }
-      } else {
-        String libMD5 = Util.md5sum(library);
-        if (!libMD5.equalsIgnoreCase(md5)) {
-          return LibraryStatus.CHECKSUM_MISMATCH;
+      if (!DISABLE_CHECKSUM_CHECK) {
+        if (!sha256.isEmpty()) {
+          String libSha256 = Util.sha256sum(library);
+          if (!libSha256.equalsIgnoreCase(sha256)) {
+            return LibraryStatus.CHECKSUM_MISMATCH;
+          }
+        } else {
+          String libMD5 = Util.md5sum(library);
+          if (!libMD5.equalsIgnoreCase(md5)) {
+            return LibraryStatus.CHECKSUM_MISMATCH;
+          }
         }
       }
       return LibraryStatus.PASSED;
