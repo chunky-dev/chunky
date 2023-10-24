@@ -42,7 +42,7 @@ public class VersionInfo implements Comparable<VersionInfo> {
 
   public enum LibraryStatus {
     PASSED("Installed"),
-    MD5_MISMATCH("To be downloaded (checksum mismatch)"),
+    CHECKSUM_MISMATCH("To be downloaded (checksum mismatch)"),
     INCOMPLETE_INFO("Incomplete library information"),
     MISSING("To be downloaded (file missing)"),
     MALFORMED_URL("Download failed (malformed URL)"),
@@ -64,12 +64,14 @@ public class VersionInfo implements Comparable<VersionInfo> {
   public static class Library {
     public final String name;
     public final String md5;
+    public final String sha256;
     public final String url;
     public final int size;
 
-    public Library(String name, String md5, int size) {
+    public Library(String name, String md5, String sha256, int size) {
       this.name = name;
       this.md5 = md5;
+      this.sha256 = sha256;
       this.url = "";
       this.size = size;
     }
@@ -77,6 +79,7 @@ public class VersionInfo implements Comparable<VersionInfo> {
     public Library(JsonObject obj) {
       name = obj.get("name").stringValue("");
       md5 = obj.get("md5").stringValue("");
+      sha256 = obj.get("sha256").stringValue("");
       url = obj.get("url").stringValue("");
       size = obj.get("size").intValue(1);
     }
@@ -86,16 +89,23 @@ public class VersionInfo implements Comparable<VersionInfo> {
     }
 
     public LibraryStatus testIntegrity(File libDir) {
-      if (name.isEmpty() || md5.isEmpty()) {
+      if (name.isEmpty() || (md5.isEmpty() && sha256.isEmpty())) {
         return LibraryStatus.INCOMPLETE_INFO;
       }
       File library = new File(libDir, name);
       if (!library.isFile()) {
         return LibraryStatus.MISSING;
       }
-      String libMD5 = Util.md5sum(library);
-      if (!libMD5.equalsIgnoreCase(md5)) {
-        return LibraryStatus.MD5_MISMATCH;
+      if (!sha256.isEmpty()) {
+        String libSha256 = Util.sha256sum(library);
+        if (!libSha256.equalsIgnoreCase(sha256)) {
+          return LibraryStatus.CHECKSUM_MISMATCH;
+        }
+      } else {
+        String libMD5 = Util.md5sum(library);
+        if (!libMD5.equalsIgnoreCase(md5)) {
+          return LibraryStatus.CHECKSUM_MISMATCH;
+        }
       }
       return LibraryStatus.PASSED;
     }
@@ -104,6 +114,7 @@ public class VersionInfo implements Comparable<VersionInfo> {
       JsonObject obj = new JsonObject();
       obj.add("name", name);
       obj.add("md5", md5);
+      obj.add("sha256", sha256);
       obj.add("url", url);
       obj.add("size", size);
       return obj;

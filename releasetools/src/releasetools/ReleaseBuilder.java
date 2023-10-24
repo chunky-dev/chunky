@@ -161,6 +161,7 @@ public class ReleaseBuilder {
     JsonObject library = new JsonObject();
     library.add("name", lib.getName());
     library.add("md5", Util.md5sum(lib));
+    library.add("sha256", Util.sha256sum(lib));
     library.add("size", (int) Math.min(Integer.MAX_VALUE, lib.length()));
     return library;
   }
