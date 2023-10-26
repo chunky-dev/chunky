@@ -19,6 +19,7 @@ package se.llbit.chunky.chunk;
 import se.llbit.chunky.block.*;
 import se.llbit.chunky.block.minecraft.*;
 import se.llbit.chunky.plugin.PluginApi;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Octree;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.IntTag;
@@ -480,42 +481,46 @@ public class BlockPalette {
       block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.75);
     };
-    Consumer<Block> lightlyWeatheredCopperConfig = block -> {
+    Consumer<Block> exposedCopperConfig = block -> {
       block.metalness = 0.66f;
       block.setPerceptualSmoothness(0.75);
     };
-    Consumer<Block> semiWeatheredCopperConfig = block -> {
+    Consumer<Block> weatheredCopperConfig = block -> {
       block.metalness = 0.66f;
       block.setPerceptualSmoothness(0.75);
     };
-    materialProperties.put("minecraft:copper_block", copperConfig);
     materialProperties.put("minecraft:raw_copper_block", block -> {
       block.metalness = 0.66f;
       block.setPerceptualSmoothness(0.5);
     });
-    materialProperties.put("minecraft:exposed_copper", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:weathered_copper", semiWeatheredCopperConfig);
-    materialProperties.put("minecraft:cut_copper", copperConfig);
-    materialProperties.put("minecraft:exposed_cut_copper", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:weathered_cut_copper", semiWeatheredCopperConfig);
-    materialProperties.put("minecraft:cut_copper_stairs", copperConfig);
-    materialProperties.put("minecraft:exposed_cut_copper_stairs", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:weathered_cut_copper_stairs", semiWeatheredCopperConfig);
-    materialProperties.put("minecraft:cut_copper_slab", copperConfig);
-    materialProperties.put("minecraft:exposed_cut_copper_slab", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:weathered_cut_copper_slab", semiWeatheredCopperConfig);
-    materialProperties.put("minecraft:waxed_copper_block", copperConfig);
-    materialProperties.put("minecraft:waxed_exposed_copper", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:waxed_weathered_copper", semiWeatheredCopperConfig);
-    materialProperties.put("minecraft:waxed_cut_copper", copperConfig);
-    materialProperties.put("minecraft:waxed_exposed_cut_copper", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:waxed_weathered_cut_copper", semiWeatheredCopperConfig);
-    materialProperties.put("minecraft:waxed_cut_copper_stairs", copperConfig);
-    materialProperties.put("minecraft:waxed_exposed_cut_copper_stairs", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:waxed_weathered_cut_copper_stairs", semiWeatheredCopperConfig);
-    materialProperties.put("minecraft:waxed_cut_copper_slab", copperConfig);
-    materialProperties.put("minecraft:waxed_exposed_cut_copper_slab", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:waxed_weathered_cut_copper_slab", semiWeatheredCopperConfig);
+    for(String s : new String[]{"minecraft:", "minecraft:waxed_"}) {
+      materialProperties.put(s + "copper_block", copperConfig);
+      materialProperties.put(s + "cut_copper", copperConfig);
+      materialProperties.put(s + "cut_copper_stairs", copperConfig);
+      materialProperties.put(s + "cut_copper_slab", copperConfig);
+      materialProperties.put(s + "chiseled_copper", copperConfig);
+      materialProperties.put(s + "copper_grate", copperConfig);
+      materialProperties.put(s + "copper_door", copperConfig);
+      materialProperties.put(s + "copper_trapdoor", copperConfig);
+      
+      materialProperties.put(s + "exposed_copper", exposedCopperConfig);
+      materialProperties.put(s + "exposed_cut_copper", exposedCopperConfig);
+      materialProperties.put(s + "exposed_cut_copper_stairs", exposedCopperConfig);
+      materialProperties.put(s + "exposed_cut_copper_slab", exposedCopperConfig);
+      materialProperties.put(s + "exposed_chiseled_copper", exposedCopperConfig);
+      materialProperties.put(s + "exposed_copper_grate", exposedCopperConfig);
+      materialProperties.put(s + "exposed_copper_door", exposedCopperConfig);
+      materialProperties.put(s + "exposed_copper_trapdoor", exposedCopperConfig);
+
+      materialProperties.put(s + "weathered_copper", weatheredCopperConfig);
+      materialProperties.put(s + "weathered_cut_copper", weatheredCopperConfig);
+      materialProperties.put(s + "weathered_cut_copper_stairs", weatheredCopperConfig);
+      materialProperties.put(s + "weathered_cut_copper_slab", weatheredCopperConfig);
+      materialProperties.put(s + "weathered_chiseled_copper", weatheredCopperConfig);
+      materialProperties.put(s + "weathered_copper_grate", weatheredCopperConfig);
+      materialProperties.put(s + "weathered_copper_door", weatheredCopperConfig);
+      materialProperties.put(s + "weathered_copper_trapdoor", weatheredCopperConfig);
+    }
     materialProperties.put("minecraft:lightning_rod", block -> {
       // apply copper attributes only to non-powered lightning rods
       if (block instanceof LightningRod && !((LightningRod) block).isPowered()) {
@@ -575,6 +580,28 @@ public class BlockPalette {
     materialProperties.put("minecraft:sculk_catalyst", block -> {
       block.emittance = 1.0f / 15f * 6;
     });
+    for(String s : new String[]{"minecraft:", "minecraft:waxed_"}) {
+      materialProperties.put(s + "copper_bulb", block -> {
+        if(block instanceof CopperBulb && ((CopperBulb) block).isLit) {
+          block.emittance = 1.0f;
+        }
+      });
+      materialProperties.put(s + "exposed_copper_bulb", block -> {
+        if(block instanceof CopperBulb && ((CopperBulb) block).isLit) {
+          block.emittance = 12 / 15f;
+        }
+      });
+      materialProperties.put(s + "weathered_copper_bulb", block -> {
+        if(block instanceof CopperBulb && ((CopperBulb) block).isLit) {
+          block.emittance = 8 / 15f;
+        }
+      });
+      materialProperties.put(s + "oxidized_copper_bulb", block -> {
+        if(block instanceof CopperBulb && ((CopperBulb) block).isLit) {
+          block.emittance = 4 / 15f;
+        }
+      });
+    }
     return materialProperties;
   }
 

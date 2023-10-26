@@ -169,6 +169,18 @@ public class Model {
 
   /**
    * @param src source quads
+   * @return Quads rotated about the negative Z axis
+   */
+  public static Quad[] rotateNegZ(Quad[] src) {
+    Quad[] rot = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i].transform(Transform.NONE.rotateNegZ());
+    }
+    return rot;
+  }
+
+  /**
+   * @param src source quads
    * @return Quads rotated about the Z axis by some angle
    */
   public static Quad[] rotateZ(Quad[] src, double angle) {
