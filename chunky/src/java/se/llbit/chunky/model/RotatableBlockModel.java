@@ -27,7 +27,6 @@ import se.llbit.math.Vector4;
  * For example, command blocks and observer blocks.
  */
 public class RotatableBlockModel extends QuadModel {
-  // Facing up:
   private Quad[] quads = new Quad[] {
     FULL_BLOCK_NORTH_SIDE,
     FULL_BLOCK_EAST_SIDE,
@@ -71,7 +70,6 @@ public class RotatableBlockModel extends QuadModel {
     }
     switch(r) {
       case 1:
-        System.out.println("ry1");
         quads = Model.rotateY(quads);
         break;
       case 2:

@@ -1421,9 +1421,6 @@ public class Texture {
   public static final Texture oxidizedCopperDoorBottom = new Texture();
   @TexturePath("assets/minecraft/textures/block/oxidized_copper_trapdoor")
   public static final Texture oxidizedCopperTrapdoor = new Texture();
-  //      Texture.crafterNorth, Texture.crafterNorthCrafting, Texture.crafterEast, Texture.crafterEastCrafting, Texture.crafterEastTriggered,
-  //      Texture.crafterSouth, Texture.crafterSouthTriggered, Texture.crafterWest, Texture.crafterWestCrafting, Texture.crafterWestTriggered,
-  //      Texture.crafterTop, Texture.crafterTopCrafting, Texture.crafterTopTriggered, Texture.crafterBottom));
   @TexturePath("assets/minecraft/textures/block/crafter_north")
   public static final Texture crafterNorth = new Texture();
   @TexturePath("assets/minecraft/textures/block/crafter_north_crafting")

@@ -22,16 +22,23 @@ import se.llbit.chunky.block.MinecraftBlock;
 import se.llbit.chunky.resources.Texture;
 
 public class CopperBulb extends MinecraftBlock {
-  public final boolean isLit;
-  public final boolean isPowered;
+  private final boolean lit;
+  private final boolean powered;
 
   public CopperBulb(String name, boolean lit, boolean powered, Texture lp, Texture lnp, Texture nlp, Texture nlnp) {
     super(name, lit ? (powered ? lp : lnp) : (powered ? nlp : nlnp));
-    this.isLit = lit;
-    this.isPowered = powered;
+    this.lit = lit;
+    this.powered = powered;
+  }
+  public boolean isLit() {
+    return lit;
+  }
+
+  public boolean isPowered() {
+    return powered;
   }
 
   @Override public String description() {
-    return "lit=" + isLit + ", powered=" + isPowered;
+    return "lit=" + lit + ", powered=" + powered;
   }
 }

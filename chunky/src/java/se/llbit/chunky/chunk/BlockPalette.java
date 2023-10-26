@@ -381,7 +381,7 @@ public class BlockPalette {
       block.ior = 1.52f;
     });
     materialProperties.put("minecraft:redstone_lamp", block -> {
-      if (block instanceof RedstoneLamp && ((RedstoneLamp) block).isLit) {
+      if (block instanceof RedstoneLamp && ((RedstoneLamp) block).isLit()) {
         block.emittance = 1.0f;
       }
     });
@@ -582,22 +582,22 @@ public class BlockPalette {
     });
     for(String s : new String[]{"minecraft:", "minecraft:waxed_"}) {
       materialProperties.put(s + "copper_bulb", block -> {
-        if(block instanceof CopperBulb && ((CopperBulb) block).isLit) {
+        if(block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
           block.emittance = 1.0f;
         }
       });
       materialProperties.put(s + "exposed_copper_bulb", block -> {
-        if(block instanceof CopperBulb && ((CopperBulb) block).isLit) {
+        if(block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
           block.emittance = 12 / 15f;
         }
       });
       materialProperties.put(s + "weathered_copper_bulb", block -> {
-        if(block instanceof CopperBulb && ((CopperBulb) block).isLit) {
+        if(block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
           block.emittance = 8 / 15f;
         }
       });
       materialProperties.put(s + "oxidized_copper_bulb", block -> {
-        if(block instanceof CopperBulb && ((CopperBulb) block).isLit) {
+        if(block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
           block.emittance = 4 / 15f;
         }
       });
