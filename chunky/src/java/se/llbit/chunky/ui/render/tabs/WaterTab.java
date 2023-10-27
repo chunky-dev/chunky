@@ -144,7 +144,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
         scene.setWaterShadingStrategy(newValue);
         switch (newValue) {
           case STILL:
-          case LEGACY:
+          case TILED_NORMALMAP:
             proceduralWaterDetailsPane.setVisible(false);
             proceduralWaterDetailsPane.setExpanded(false);
             proceduralWaterDetailsPane.setManaged(false);

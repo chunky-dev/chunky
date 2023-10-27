@@ -2921,7 +2921,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (!json.get("waterShader").isUnknown()) {
       String waterShader = json.get("waterShader").stringValue("SIMPLEX");
       if(waterShader.equals("LEGACY"))
-        waterShadingStrategy = WaterShadingStrategy.LEGACY;
+        waterShadingStrategy = WaterShadingStrategy.TILED_NORMALMAP;
       else if(waterShader.equals("SIMPLEX"))
         waterShadingStrategy = WaterShadingStrategy.SIMPLEX;
       else {
@@ -2929,7 +2929,7 @@ public class Scene implements JsonSerializable, Refreshable {
         waterShadingStrategy = WaterShadingStrategy.SIMPLEX;
       }
     } else {
-      waterShadingStrategy = WaterShadingStrategy.LEGACY;
+      waterShadingStrategy = WaterShadingStrategy.TILED_NORMALMAP;
     }
     if (!json.get("stillWater").isUnknown()) {
       if (json.get("stillWater").boolValue(false)) {
@@ -3412,7 +3412,7 @@ public class Scene implements JsonSerializable, Refreshable {
     switch (waterShadingStrategy) {
       case STILL:
         return stillWaterShader;
-      case LEGACY:
+      case TILED_NORMALMAP:
         return legacyWaterShader;
       default:
         return simplexWaterShader;

@@ -20,7 +20,7 @@ import se.llbit.util.Registerable;
 
 public enum WaterShadingStrategy implements Registerable {
     SIMPLEX("Simplex", "Uses configurable noise to shade the water, which prevents tiling at great distances."),
-    LEGACY("Legacy", "Uses a tiled normal map to shade the water"),
+    TILED_NORMALMAP("Tiled normal map", "Uses a built-in tiled normal map to shade the water"),
     STILL("Still", "Renders the water surface as flat.");
 
     private final String displayName;
