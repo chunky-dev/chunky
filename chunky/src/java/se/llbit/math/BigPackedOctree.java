@@ -459,7 +459,7 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
   }
 
   static public void initImplementation() {
-    Octree.addImplementationFactory("BIGPACKED", new Octree.ImplementationFactory() {
+    Octree.addImplementationFactory(new Octree.ImplementationFactory() {
       @Override
       public Octree.OctreeImplementation create(int depth) {
         return new BigPackedOctree(depth);
@@ -478,6 +478,16 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
       @Override
       public boolean isOfType(Octree.OctreeImplementation implementation) {
         return implementation instanceof BigPackedOctree;
+      }
+
+      @Override
+      public String getId() {
+        return "BIGPACKED";
+      }
+
+      @Override
+      public String getName() {
+        return "Big Packed";
       }
 
       @Override

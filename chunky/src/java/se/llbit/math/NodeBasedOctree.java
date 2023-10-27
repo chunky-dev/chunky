@@ -210,7 +210,7 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
   }
 
   static public void initImplementation() {
-    Octree.addImplementationFactory("NODE", new Octree.ImplementationFactory() {
+    Octree.addImplementationFactory(new Octree.ImplementationFactory() {
       @Override
       public Octree.OctreeImplementation create(int depth) {
         return new NodeBasedOctree(depth, new Octree.Node(0));
@@ -229,6 +229,16 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
       @Override
       public boolean isOfType(Octree.OctreeImplementation implementation) {
         return implementation instanceof NodeBasedOctree;
+      }
+
+      @Override
+      public String getId() {
+        return "NODE";
+      }
+
+      @Override
+      public String getName() {
+        return "Node";
       }
 
       @Override

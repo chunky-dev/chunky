@@ -714,7 +714,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
    * Add PackedOctree to OctreeImplementationFactory so Packed can be created and loaded via by name.
    */
   static public void initImplementation() {
-    Octree.addImplementationFactory("PACKED", new Octree.ImplementationFactory() {
+    Octree.addImplementationFactory(new Octree.ImplementationFactory() {
       @Override
       public Octree.OctreeImplementation create(int depth) {
         return new PackedOctree(depth);
@@ -733,6 +733,16 @@ public class PackedOctree implements Octree.OctreeImplementation {
       @Override
       public boolean isOfType(Octree.OctreeImplementation implementation) {
         return implementation instanceof PackedOctree;
+      }
+
+      @Override
+      public String getId() {
+        return "PACKED";
+      }
+
+      @Override
+      public String getName() {
+        return "Packed";
       }
 
       @Override

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -14,7 +14,7 @@
     <DoubleAdjuster fx:id="exposure" />
     <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
       <Label text="Postprocessing filter:" />
-      <ChoiceBox fx:id="postprocessingFilter" prefWidth="150.0" />
+      <ComboBox fx:id="postprocessingFilter" prefWidth="150.0" />
     </HBox>
     <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="275"
       text="Postprocessing affects performance when Render Preview tab is visible. Switching to the Map tab mitigates this." />

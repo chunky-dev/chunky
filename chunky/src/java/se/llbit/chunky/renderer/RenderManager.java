@@ -39,12 +39,12 @@ public interface RenderManager {
   /**
    * Get all available {@code Renderer}s.
    */
-  Collection<? extends Registerable> getRenderers();
+  Collection<Renderer> getRenderers();
 
   /**
    * Get all available preview {@code Renderer}s.
    */
-  Collection<? extends Registerable> getPreviewRenderers();
+  Collection<Renderer> getPreviewRenderers();
 
   /**
    * Instructs the renderer to change its CPU load.

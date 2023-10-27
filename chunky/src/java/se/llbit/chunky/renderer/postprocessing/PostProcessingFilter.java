@@ -2,6 +2,7 @@ package se.llbit.chunky.renderer.postprocessing;
 
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.util.Registerable;
 import se.llbit.util.TaskTracker;
 
 /**
@@ -14,7 +15,7 @@ import se.llbit.util.TaskTracker;
  * PixelPostProcessingFilter} instead.
  */
 @PluginApi
-public interface PostProcessingFilter {
+public interface PostProcessingFilter extends Registerable {
   /**
    * Post process the entire frame
    * @param width The width of the image
@@ -30,12 +31,14 @@ public interface PostProcessingFilter {
    * Get name of the post processing filter
    * @return The name of the post processing filter
    */
+  @Override
   String getName();
 
   /**
    * Get description of the post processing filter
    * @return The description of the post processing filter
    */
+  @Override
   default String getDescription() {
     return null;
   }
@@ -44,5 +47,6 @@ public interface PostProcessingFilter {
    * Get id of the post processing filter
    * @return The id of the post processing filter
    */
+  @Override
   String getId();
 }

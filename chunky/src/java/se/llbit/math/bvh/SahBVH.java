@@ -52,8 +52,13 @@ public class SahBVH extends BinaryBVH {
             }
 
             @Override
-            public String getName() {
+            public String getId() {
                 return "SAH";
+            }
+
+            @Override
+            public String getName() {
+                return "Surface Area Heuristic";
             }
 
             @Override

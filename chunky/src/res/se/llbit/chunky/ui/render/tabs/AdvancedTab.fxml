@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.HBox?>
@@ -12,6 +11,7 @@
 <?import se.llbit.chunky.ui.IntegerAdjuster?>
 
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
+<?import javafx.scene.control.ComboBox?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
     <IntegerAdjuster fx:id="renderThreads" />
@@ -30,22 +30,22 @@
     <DoubleAdjuster fx:id="animationTime" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Output mode:" />
-      <ChoiceBox fx:id="outputMode" prefWidth="150.0" />
+      <ComboBox fx:id="outputMode" prefWidth="150.0" />
     </HBox>
     <CheckBox fx:id="hideUnknownBlocks" mnemonicParsing="false" text="Hide unknown blocks" />
     <Separator prefWidth="200.0" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Octree implementation:" />
-      <ChoiceBox fx:id="octreeImplementation" prefWidth="150.0" />
+      <ComboBox fx:id="octreeImplementation" prefWidth="150.0" />
       <Button fx:id="octreeSwitchImplementation" text="Switch Current Scene" />
     </HBox>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="BVH build method:" />
-      <ChoiceBox fx:id="bvhMethod" prefWidth="150" />
+      <ComboBox fx:id="bvhMethod" prefWidth="150" />
     </HBox>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="BiomeStructure implementation:" />
-      <ChoiceBox fx:id="biomeStructureImplementation" prefWidth="150" />
+      <ComboBox fx:id="biomeStructureImplementation" prefWidth="150" />
     </HBox>
     <IntegerAdjuster fx:id="gridSize" />
     <CheckBox fx:id="preventNormalEmitterWithSampling" mnemonicParsing="false" text="Prevent normal emitter when using emitter sampling" />
@@ -53,11 +53,11 @@
     <Separator prefWidth="200.0" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Renderer:" />
-      <ChoiceBox fx:id="rendererSelect" prefWidth="150.0" />
+      <ComboBox fx:id="rendererSelect" prefWidth="150.0" />
     </HBox>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <Label text="Preview Renderer:" />
-      <ChoiceBox fx:id="previewSelect" prefWidth="150.0" />
+      <ComboBox fx:id="previewSelect" prefWidth="150.0" />
     </HBox>
 
     <Separator prefWidth="200.0" />
