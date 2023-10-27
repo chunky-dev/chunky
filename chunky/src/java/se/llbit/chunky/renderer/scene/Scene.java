@@ -2750,6 +2750,11 @@ public class Scene implements JsonSerializable, Refreshable {
     return entities.getAssociatedProfile(player);
   }
 
+  public void addActor(Entity entity) {
+    entities.addActor(entity);
+    rebuildActorBvh();
+  }
+
   public void removeEntity(Entity entity) {
     entities.removeEntity(entity);
     rebuildActorBvh();
