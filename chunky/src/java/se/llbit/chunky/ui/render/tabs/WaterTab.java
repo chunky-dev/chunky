@@ -156,7 +156,11 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
             break;
         }
       });
-    waterShader.setTooltip(new Tooltip("Change how the water is shaded."));
+    StringBuilder waterShaderOptions = new StringBuilder("\n\n");
+    for (WaterShadingStrategy strategy : WaterShadingStrategy.values()) {
+      waterShaderOptions.append(strategy.getId()).append(": ").append(strategy.getDescription()).append("\n");
+    }
+    waterShader.setTooltip(new Tooltip("Change how the water surface is rendered." + waterShaderOptions));
 
     useCustomWaterColor.setTooltip(new Tooltip("Disable biome tinting for water, and use a custom color instead."));
     useCustomWaterColor.selectedProperty().addListener((observable, oldValue, newValue) ->
