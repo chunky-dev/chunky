@@ -528,20 +528,18 @@ public class SignEntity extends Entity {
     Collection<Primitive> primitives = new LinkedList<>();
     Transform transform = Transform.NONE
       .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
+    Quad[] quads = rot[angle];
     // Front and back textures are unique so it is useless to use the cache for them
     // it will just take space in the cache for nothing
     // The other texture is shared so retrieving the material from the cache is a gain
     TextureMaterial otherMaterial = TextureMaterial.getForTexture(texture);
     for (int i = 0; i < sides.length; ++i) {
-      Quad quad = rot[angle][i];
       if (i == 0 && frontTexture != null) {
-        quad = frontFaceWithText[angle];
-        quad.addTriangles(primitives, new TextureMaterial(frontTexture), transform);
+        frontFaceWithText[angle].addTriangles(primitives, new TextureMaterial(frontTexture), transform);
       } else if (i == 1 && backTexture != null) {
-        quad = backFaceWithText[angle];
-        quad.addTriangles(primitives, new TextureMaterial(backTexture), transform);
+        backFaceWithText[angle].addTriangles(primitives, new TextureMaterial(backTexture), transform);
       } else {
-        quad.addTriangles(primitives, otherMaterial, transform);
+        quads[i].addTriangles(primitives, otherMaterial, transform);
       }
     }
     return primitives;

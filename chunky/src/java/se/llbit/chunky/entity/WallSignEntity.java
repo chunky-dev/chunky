@@ -127,12 +127,10 @@ public class WallSignEntity extends Entity {
     // The other texture is shared so retrieving the material from the cache is a gain
     TextureMaterial otherMaterial = TextureMaterial.getForTexture(texture);
     for (int i = 0; i < quads.length; ++i) {
-      Quad quad = quads[i];
       if (i == 0 && frontTexture != null) {
-        quad = frontFaceWithText[orientation];
-        quad.addTriangles(primitives, new TextureMaterial(frontTexture), transform);
+        frontFaceWithText[orientation].addTriangles(primitives, new TextureMaterial(frontTexture), transform);
       } else {
-        quad.addTriangles(primitives, otherMaterial, transform);
+        quads[i].addTriangles(primitives, otherMaterial, transform);
       }
     }
     return primitives;
