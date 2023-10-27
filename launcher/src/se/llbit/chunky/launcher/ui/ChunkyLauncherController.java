@@ -315,7 +315,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
         .getOperatingSystemMXBean()).getTotalPhysicalMemorySize() / 1024 / 1024);
     } catch (Exception e) {
       // fallback for JDKs that don't have com.sun.management.OperatingSystemMXBean
-      return 1 << 14;
+      return 1 << 14; // 16 GiB
     }
   }
 
