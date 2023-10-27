@@ -40,6 +40,8 @@ public class LauncherSettings {
   static final ReleaseChannel SNAPSHOT_RELEASE_CHANNEL = new ReleaseChannel(
       "snapshot", "Snapshot", "snapshot.json", "Latest nightly snapshot of Chunky.");
 
+  public static boolean disableLibraryValidation = false;
+
   public int settingsRevision = 0;
 
   public String javaDir = "";
