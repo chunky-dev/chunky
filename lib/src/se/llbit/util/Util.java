@@ -60,7 +60,7 @@ public class Util {
   }
 
   /**
-   * @return the MD5 hash sum of the given file, in hexadecimal format.
+   * @return the SHA256 hash sum of the given file, in hexadecimal format.
    * Returns an error message if there was an error computing the checksum.
    */
   public static String sha256sum(File library) {
