@@ -221,14 +221,18 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   protected double waterOpacity = PersistentSettings.getWaterOpacity();
   protected double waterVisibility = PersistentSettings.getWaterVisibility();
-  protected boolean stillWater = PersistentSettings.getStillWater();
+  protected WaterShadingStrategy waterShadingStrategy = WaterShadingStrategy.valueOf(PersistentSettings.getWaterShadingStrategy());
+  private final StillWaterShader stillWaterShader = new StillWaterShader();
+  private final LegacyWaterShader legacyWaterShader = new LegacyWaterShader();
+  private final SimplexWaterShader simplexWaterShader = new SimplexWaterShader();
+
+  private WaterShader currentWaterShader = getWaterShader(waterShadingStrategy);
   protected boolean useCustomWaterColor = PersistentSettings.getUseCustomWaterColor();
 
   protected boolean waterPlaneEnabled = false;
   protected double waterPlaneHeight = World.SEA_LEVEL;
   protected boolean waterPlaneOffsetEnabled = true;
   protected boolean waterPlaneChunkClip = true;
-  protected WaterShader waterShading = new SimplexWaterShader();
 
   public final Fog fog = new Fog(this);
 
@@ -440,7 +444,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     exposure = other.exposure;
 
-    stillWater = other.stillWater;
+    waterShadingStrategy = other.waterShadingStrategy;
+    currentWaterShader = other.currentWaterShader.clone();
     waterOpacity = other.waterOpacity;
     waterVisibility = other.waterVisibility;
     useCustomWaterColor = other.useCustomWaterColor;
@@ -466,7 +471,6 @@ public class Scene implements JsonSerializable, Refreshable {
     waterPlaneHeight = other.waterPlaneHeight;
     waterPlaneOffsetEnabled = other.waterPlaneOffsetEnabled;
     waterPlaneChunkClip = other.waterPlaneChunkClip;
-    waterShading = other.waterShading.clone();
 
     hideUnknownBlocks = other.hideUnknownBlocks;
 
@@ -610,16 +614,6 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public double getExposure() {
     return exposure;
-  }
-
-  /**
-   * Set still water mode.
-   */
-  public void setStillWater(boolean value) {
-    if (value != stillWater) {
-      stillWater = value;
-      refresh();
-    }
   }
 
   /**
@@ -1615,13 +1609,6 @@ public class Scene implements JsonSerializable, Refreshable {
       forceReset = true;
       refresh();
     }
-  }
-
-  /**
-   * @return <code>true</code> if still water is enabled
-   */
-  public boolean stillWaterEnabled() {
-    return stillWater;
   }
 
   /**
@@ -2650,7 +2637,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("fancierTranslucency", fancierTranslucency);
     json.add("transmissivityCap", transmissivityCap);
     json.add("sunSamplingStrategy", sunSamplingStrategy.getId());
-    json.add("stillWater", stillWater);
+    json.add("waterShadingStrategy", waterShadingStrategy.getId());
     json.add("waterOpacity", waterOpacity);
     json.add("waterVisibility", waterVisibility);
     json.add("useCustomWaterColor", useCustomWaterColor);
@@ -2661,7 +2648,7 @@ public class Scene implements JsonSerializable, Refreshable {
       colorObj.add("blue", waterColor.z);
       json.add("waterColor", colorObj);
     }
-    waterShading.save(json);
+    currentWaterShader.save(json);
     json.add("fog", fog.toJson());
     json.add("biomeColorsEnabled", biomeColors);
     json.add("transparentSky", transparentSky);
@@ -2937,7 +2924,28 @@ public class Scene implements JsonSerializable, Refreshable {
       sunSamplingStrategy = SunSamplingStrategy.valueOf(json.get("sunSamplingStrategy").asString(SunSamplingStrategy.FAST.getId()));
     }
 
-    stillWater = json.get("stillWater").boolValue(stillWater);
+    waterShadingStrategy = WaterShadingStrategy.valueOf(json.get("waterShadingStrategy").asString(WaterShadingStrategy.SIMPLEX.getId()));
+    if (!json.get("waterShader").isUnknown()) {
+      String waterShader = json.get("waterShader").stringValue("SIMPLEX");
+      if(waterShader.equals("LEGACY"))
+        waterShadingStrategy = WaterShadingStrategy.TILED_NORMALMAP;
+      else if(waterShader.equals("SIMPLEX"))
+        waterShadingStrategy = WaterShadingStrategy.SIMPLEX;
+      else {
+        Log.infof("Unknown water shader %s, using SIMPLEX", waterShader);
+        waterShadingStrategy = WaterShadingStrategy.SIMPLEX;
+      }
+    } else {
+      waterShadingStrategy = WaterShadingStrategy.TILED_NORMALMAP;
+    }
+    if (!json.get("stillWater").isUnknown()) {
+      if (json.get("stillWater").boolValue(false)) {
+        waterShadingStrategy = WaterShadingStrategy.STILL;
+      }
+    }
+    setCurrentWaterShader(waterShadingStrategy);
+    currentWaterShader.load(json);
+
     waterOpacity = json.get("waterOpacity").doubleValue(waterOpacity);
     waterVisibility = json.get("waterVisibility").doubleValue(waterVisibility);
     useCustomWaterColor = json.get("useCustomWaterColor").boolValue(useCustomWaterColor);
@@ -2947,16 +2955,6 @@ public class Scene implements JsonSerializable, Refreshable {
       waterColor.y = colorObj.get("green").doubleValue(waterColor.y);
       waterColor.z = colorObj.get("blue").doubleValue(waterColor.z);
     }
-    String waterShader = json.get("waterShader").stringValue("SIMPLEX");
-    if(waterShader.equals("LEGACY"))
-      waterShading = new LegacyWaterShader();
-    else if(waterShader.equals("SIMPLEX"))
-      waterShading = new SimplexWaterShader();
-    else {
-      Log.infof("Unknown water shader %s, using SIMPLEX", waterShader);
-      waterShading = new SimplexWaterShader();
-    }
-    waterShading.load(json);
     biomeColors = json.get("biomeColorsEnabled").boolValue(biomeColors);
     transparentSky = json.get("transparentSky").boolValue(transparentSky);
     JsonValue fogObj = json.get("fog");
@@ -3400,18 +3398,32 @@ public class Scene implements JsonSerializable, Refreshable {
     return loadedWorld;
   }
 
-  /**
-   * Get the water shader
-   */
-  public WaterShader getWaterShading() {
-    return waterShading;
+  public WaterShadingStrategy getWaterShadingStrategy() {
+    return waterShadingStrategy;
   }
 
-  /**
-   * Set the Water shader
-   */
-  public void setWaterShading(WaterShader waterShading) {
-    this.waterShading = waterShading;
+  public void setWaterShadingStrategy(WaterShadingStrategy waterShadingStrategy) {
+    this.waterShadingStrategy = waterShadingStrategy;
+    setCurrentWaterShader(waterShadingStrategy);
+    refresh();
+  }
+
+  public WaterShader getCurrentWaterShader() {
+    return currentWaterShader;
+  }
+  private void setCurrentWaterShader(WaterShadingStrategy waterShadingStrategy) {
+    currentWaterShader = getWaterShader(waterShadingStrategy);
+  }
+
+  private WaterShader getWaterShader(WaterShadingStrategy waterShadingStrategy) {
+    switch (waterShadingStrategy) {
+      case STILL:
+        return stillWaterShader;
+      case TILED_NORMALMAP:
+        return legacyWaterShader;
+      default:
+        return simplexWaterShader;
+    }
   }
 
   public boolean getHideUnknownBlocks() {

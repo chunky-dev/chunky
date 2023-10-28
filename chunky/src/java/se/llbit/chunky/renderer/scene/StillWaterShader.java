@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2021 Chunky contributors
+/* Copyright (c) 2012-2023 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -20,15 +20,14 @@ import se.llbit.chunky.model.minecraft.WaterModel;
 import se.llbit.json.JsonObject;
 import se.llbit.math.Ray;
 
-public class LegacyWaterShader implements WaterShader {
+public class StillWaterShader implements WaterShader {
   @Override
   public void doWaterShading(Ray ray, double animationTime) {
-    WaterModel.doWaterDisplacement(ray);
   }
 
   @Override
   public WaterShader clone() {
-    return new LegacyWaterShader();
+    return new StillWaterShader();
   }
 
   @Override
