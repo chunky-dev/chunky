@@ -20,8 +20,6 @@ package se.llbit.chunky.renderer.scene;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.renderer.ApertureShape;
-import se.llbit.chunky.renderer.Refreshable;
-import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.projection.ApertureProjector;
 import se.llbit.chunky.renderer.projection.FisheyeProjector;
 import se.llbit.chunky.renderer.projection.ForwardDisplacementProjector;
@@ -789,10 +787,7 @@ public class Camera implements JsonSerializable {
 
   public void setCameraLocked(boolean value) {
     lockCamera = value;
-    if (scene.mode == RenderMode.PREVIEW) {
-      // don't interrupt the render if we are currently rendering
-      scene.refresh();
-    }
+    scene.softRefresh();
   }
 
   public boolean getCameraLocked() {
