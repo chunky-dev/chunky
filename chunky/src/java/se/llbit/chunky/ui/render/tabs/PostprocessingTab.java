@@ -39,11 +39,11 @@ import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.util.ProgressListener;
 import se.llbit.util.TaskTracker;
+import se.llbit.util.TaskTracker.Task;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import se.llbit.util.TaskTracker.Task;
 
 public class PostprocessingTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
@@ -185,21 +185,21 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
       if (e.getCode() == KeyCode.ENTER) {
         if (scene.postProcessingFilter instanceof HableToneMappingFilter) {
           HableToneMappingFilter filter = (HableToneMappingFilter) scene.postProcessingFilter;
-          filter.setShoulderStrength((float) hableShoulderStrength.valueProperty().get());
-          filter.setLinearStrength((float) hableLinearStrength.valueProperty().get());
-          filter.setLinearAngle((float) hableLinearAngle.valueProperty().get());
-          filter.setToeStrength((float) hableToeStrength.valueProperty().get());
-          filter.setToeNumerator((float) hableToeNumerator.valueProperty().get());
-          filter.setToeDenominator((float) hableToeDenominator.valueProperty().get());
-          filter.setLinearWhitePointValue((float) hableLinearWhitePointValue.valueProperty().get());
+          filter.setShoulderStrength(hableShoulderStrength.valueProperty().floatValue());
+          filter.setLinearStrength(hableLinearStrength.valueProperty().floatValue());
+          filter.setLinearAngle(hableLinearAngle.valueProperty().floatValue());
+          filter.setToeStrength(hableToeStrength.valueProperty().floatValue());
+          filter.setToeNumerator(hableToeNumerator.valueProperty().floatValue());
+          filter.setToeDenominator(hableToeDenominator.valueProperty().floatValue());
+          filter.setLinearWhitePointValue(hableLinearWhitePointValue.valueProperty().floatValue());
         } else if (scene.postProcessingFilter instanceof UE4ToneMappingFilter) {
           UE4ToneMappingFilter filter = (UE4ToneMappingFilter) scene.postProcessingFilter;
-          filter.setSaturation((float) ue4Saturation.valueProperty().get());
-          filter.setSlope((float) ue4Slope.valueProperty().get());
-          filter.setToe((float) ue4Toe.valueProperty().get());
-          filter.setShoulder((float) ue4Shoulder.valueProperty().get());
-          filter.setBlackClip((float) ue4BlackClip.valueProperty().get());
-          filter.setWhiteClip((float) ue4WhiteClip.valueProperty().get());
+          filter.setSaturation(ue4Saturation.valueProperty().floatValue());
+          filter.setSlope(ue4Slope.valueProperty().floatValue());
+          filter.setToe(ue4Toe.valueProperty().floatValue());
+          filter.setShoulder(ue4Shoulder.valueProperty().floatValue());
+          filter.setBlackClip(ue4BlackClip.valueProperty().floatValue());
+          filter.setWhiteClip(ue4WhiteClip.valueProperty().floatValue());
         }
         applyChangedSettings(true);
       }
