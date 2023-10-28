@@ -16,17 +16,21 @@
  */
 package se.llbit.chunky.ui.render.tabs;
 
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
+import se.llbit.chunky.renderer.RenderMode;
+import se.llbit.chunky.renderer.postprocessing.HableToneMappingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
+import se.llbit.chunky.renderer.postprocessing.UE4ToneMappingFilter;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.ui.DoubleAdjuster;
@@ -48,6 +52,7 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
   @FXML private DoubleAdjuster exposure;
   @FXML private ChoiceBox<PostProcessingFilter> postprocessingFilter;
 
+  @FXML private VBox hableCurveSettings;
   @FXML private DoubleTextField hableShoulderStrength;
   @FXML private DoubleTextField hableLinearStrength;
   @FXML private DoubleTextField hableLinearAngle;
@@ -55,13 +60,18 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
   @FXML private DoubleTextField hableToeNumerator;
   @FXML private DoubleTextField hableToeDenominator;
   @FXML private DoubleTextField hableLinearWhitePointValue;
+  @FXML private Button gdcPreset;
+  @FXML private Button fwPreset;
 
+  @FXML private VBox ue4CurveSettings;
   @FXML private DoubleTextField ue4Saturation;
   @FXML private DoubleTextField ue4Slope;
   @FXML private DoubleTextField ue4Toe;
   @FXML private DoubleTextField ue4Shoulder;
   @FXML private DoubleTextField ue4BlackClip;
   @FXML private DoubleTextField ue4WhiteClip;
+  @FXML private Button acesPreset;
+  @FXML private Button ue4LegacyPreset;
 
   public PostprocessingTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("PostprocessingTab.fxml"));
@@ -77,7 +87,28 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
 
   @Override public void update(Scene scene) {
     postprocessingFilter.getSelectionModel().select(scene.getPostProcessingFilter());
+    hableCurveSettings.setVisible(scene.getPostProcessingFilter() instanceof HableToneMappingFilter);
+    ue4CurveSettings.setVisible(scene.getPostProcessingFilter() instanceof UE4ToneMappingFilter);
     exposure.set(scene.getExposure());
+
+    if (scene.getPostProcessingFilter() instanceof HableToneMappingFilter) {
+      HableToneMappingFilter filter = (HableToneMappingFilter) scene.getPostProcessingFilter();
+      hableShoulderStrength.valueProperty().set(filter.getShoulderStrength());
+      hableLinearStrength.valueProperty().set(filter.getLinearStrength());
+      hableLinearAngle.valueProperty().set(filter.getLinearAngle());
+      hableToeStrength.valueProperty().set(filter.getToeStrength());
+      hableToeNumerator.valueProperty().set(filter.getToeNumerator());
+      hableToeDenominator.valueProperty().set(filter.getToeDenominator());
+      hableLinearWhitePointValue.valueProperty().set(filter.getLinearWhitePointValue());
+    } else if (scene.getPostProcessingFilter() instanceof UE4ToneMappingFilter) {
+      UE4ToneMappingFilter filter = (UE4ToneMappingFilter) scene.getPostProcessingFilter();
+      ue4Saturation.valueProperty().set(filter.getSaturation());
+      ue4Slope.valueProperty().set(filter.getSlope());
+      ue4Toe.valueProperty().set(filter.getToe());
+      ue4Shoulder.valueProperty().set(filter.getShoulder());
+      ue4BlackClip.valueProperty().set(filter.getBlackClip());
+      ue4WhiteClip.valueProperty().set(filter.getWhiteClip());
+    }
   }
 
   @Override public String getTabTitle() {
@@ -101,8 +132,7 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
     postprocessingFilter.getSelectionModel().selectedItemProperty().addListener(
         (observable, oldValue, newValue) -> {
           scene.setPostprocess(newValue);
-          scene.postProcessFrame(new TaskTracker(ProgressListener.NONE));
-          controller.getCanvas().forceRepaint();
+          applyChangedSettings(false);
         });
     postprocessingFilter.setConverter(new StringConverter<PostProcessingFilter>() {
       @Override
@@ -122,9 +152,81 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
     exposure.clampMin();
     exposure.onValueChange(value -> {
       scene.setExposure(value);
-      scene.postProcessFrame(new TaskTracker(ProgressListener.NONE));
-      controller.getCanvas().forceRepaint();
+      applyChangedSettings(false);
     });
+    hableCurveSettings.managedProperty().bind(hableCurveSettings.visibleProperty());
+    gdcPreset.setOnAction((e) -> {
+      if (scene.postProcessingFilter instanceof HableToneMappingFilter) {
+        ((HableToneMappingFilter) scene.postProcessingFilter).applyPreset(HableToneMappingFilter.Preset.GDC);
+        applyChangedSettings(true);
+      }
+    });
+    fwPreset.setOnAction((e) -> {
+      if (scene.postProcessingFilter instanceof HableToneMappingFilter) {
+        ((HableToneMappingFilter) scene.postProcessingFilter).applyPreset(HableToneMappingFilter.Preset.FILMIC_WORLDS);
+        applyChangedSettings(true);
+      }
+    });
+    ue4CurveSettings.managedProperty().bind(ue4CurveSettings.visibleProperty());
+    acesPreset.setOnAction((e) -> {
+      if (scene.postProcessingFilter instanceof UE4ToneMappingFilter) {
+        ((UE4ToneMappingFilter) scene.postProcessingFilter).applyPreset(UE4ToneMappingFilter.Preset.ACES);
+        applyChangedSettings(true);
+      }
+    });
+    ue4LegacyPreset.setOnAction((e) -> {
+      if (scene.postProcessingFilter instanceof UE4ToneMappingFilter) {
+        ((UE4ToneMappingFilter) scene.postProcessingFilter).applyPreset(UE4ToneMappingFilter.Preset.LEGACY_UE4);
+        applyChangedSettings(true);
+      }
+    });
+
+    EventHandler<KeyEvent> postprocessingSettingsHandler = e -> {
+      if (e.getCode() == KeyCode.ENTER) {
+        if (scene.postProcessingFilter instanceof HableToneMappingFilter) {
+          HableToneMappingFilter filter = (HableToneMappingFilter) scene.postProcessingFilter;
+          filter.setShoulderStrength((float) hableShoulderStrength.valueProperty().get());
+          filter.setLinearStrength((float) hableLinearStrength.valueProperty().get());
+          filter.setLinearAngle((float) hableLinearAngle.valueProperty().get());
+          filter.setToeStrength((float) hableToeStrength.valueProperty().get());
+          filter.setToeNumerator((float) hableToeNumerator.valueProperty().get());
+          filter.setToeDenominator((float) hableToeDenominator.valueProperty().get());
+          filter.setLinearWhitePointValue((float) hableLinearWhitePointValue.valueProperty().get());
+        } else if (scene.postProcessingFilter instanceof UE4ToneMappingFilter) {
+          UE4ToneMappingFilter filter = (UE4ToneMappingFilter) scene.postProcessingFilter;
+          filter.setSaturation((float) ue4Saturation.valueProperty().get());
+          filter.setSlope((float) ue4Slope.valueProperty().get());
+          filter.setToe((float) ue4Toe.valueProperty().get());
+          filter.setShoulder((float) ue4Shoulder.valueProperty().get());
+          filter.setBlackClip((float) ue4BlackClip.valueProperty().get());
+          filter.setWhiteClip((float) ue4WhiteClip.valueProperty().get());
+        }
+        applyChangedSettings(true);
+      }
+    };
+    hableShoulderStrength.addEventFilter(KeyEvent.KEY_PRESSED, postprocessingSettingsHandler);
+    hableLinearStrength.addEventFilter(KeyEvent.KEY_PRESSED, postprocessingSettingsHandler);
+    hableLinearAngle.addEventFilter(KeyEvent.KEY_PRESSED, postprocessingSettingsHandler);
+    hableToeStrength.addEventFilter(KeyEvent.KEY_PRESSED, postprocessingSettingsHandler);
+    hableToeNumerator.addEventFilter(KeyEvent.KEY_PRESSED, postprocessingSettingsHandler);
+    hableToeDenominator.addEventFilter(KeyEvent.KEY_PRESSED, postprocessingSettingsHandler);
+    hableLinearWhitePointValue.addEventFilter(KeyEvent.KEY_PRESSED, postprocessingSettingsHandler);
+    ue4Saturation.addEventFilter(KeyEvent.KEY_PRESSED, postprocessingSettingsHandler);
+    ue4Slope.addEventFilter(KeyEvent.KEY_PRESSED, postprocessingSettingsHandler);
+    ue4Toe.addEventFilter(KeyEvent.KEY_PRESSED, postprocessingSettingsHandler);
+    ue4Shoulder.addEventFilter(KeyEvent.KEY_PRESSED, postprocessingSettingsHandler);
+    ue4BlackClip.addEventFilter(KeyEvent.KEY_PRESSED, postprocessingSettingsHandler);
+    ue4WhiteClip.addEventFilter(KeyEvent.KEY_PRESSED, postprocessingSettingsHandler);
+  }
+
+  private void applyChangedSettings(boolean refreshScene) {
+    if (refreshScene && scene.getMode() == RenderMode.PREVIEW) {
+      // Don't interrupt the render if we are currently rendering.
+      scene.refresh();
+    }
+    update(scene);
+    scene.postProcessFrame(new TaskTracker(ProgressListener.NONE));
+    controller.getCanvas().forceRepaint();
   }
 
   /**

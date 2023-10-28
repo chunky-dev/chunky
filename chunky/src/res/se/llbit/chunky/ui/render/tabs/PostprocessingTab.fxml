@@ -14,8 +14,7 @@
       <Label text="Postprocessing filter:" />
       <ChoiceBox fx:id="postprocessingFilter" prefWidth="150.0" />
     </HBox>
-    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Hable tone mapping curve parameters:" wrappingWidth="275" />
-    <VBox prefWidth="250.0" spacing="5.0">
+    <VBox prefWidth="250.0" spacing="5.0" fx:id="hableCurveSettings">
       <TextFieldLabelWrapper labelText="Shoulder strength:">
         <DoubleTextField fx:id="hableShoulderStrength" />
       </TextFieldLabelWrapper>
@@ -39,15 +38,15 @@
       </TextFieldLabelWrapper>
       <HBox alignment="TOP_RIGHT" prefWidth="200.0" spacing="5.0">
         <children>
-          <Button mnemonicParsing="false" text="GDC preset" />
-          <Button mnemonicParsing="false" text="FW preset" />
+          <Button mnemonicParsing="false" text="FW preset" fx:id="fwPreset" />
+          <Button mnemonicParsing="false" text="GDC preset" fx:id="gdcPreset" />
         </children>
       </HBox>
       <VBox.margin>
         <Insets left="20.0" />
       </VBox.margin>
     </VBox>
-    <VBox prefWidth="250.0" spacing="5.0">
+    <VBox prefWidth="250.0" spacing="5.0" fx:id="ue4CurveSettings" >
       <TextFieldLabelWrapper labelText="Saturation:">
         <DoubleTextField fx:id="ue4Saturation" />
       </TextFieldLabelWrapper>
@@ -68,8 +67,8 @@
       </TextFieldLabelWrapper>
       <HBox alignment="TOP_RIGHT" prefWidth="200.0" spacing="5.0">
         <children>
-          <Button mnemonicParsing="false" text="ACES preset" />
-          <Button mnemonicParsing="false" text="UE4 Legacy preset" />
+          <Button mnemonicParsing="false" text="ACES preset" fx:id="acesPreset" />
+          <Button mnemonicParsing="false" text="UE4 Legacy preset" fx:id="ue4LegacyPreset" />
         </children>
       </HBox>
       <VBox.margin>
