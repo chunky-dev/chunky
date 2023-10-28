@@ -1731,6 +1731,9 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public synchronized void setPostprocess(PostProcessingFilter p) {
     postProcessingFilter = p;
+    if (postProcessingFilter instanceof Configurable) {
+      ((Configurable) postProcessingFilter).reset();
+    }
     if (mode == RenderMode.PREVIEW) {
       // Don't interrupt the render if we are currently rendering.
       refresh();
@@ -2623,6 +2626,11 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("yMax", yMax);
     json.add("exposure", exposure);
     json.add("postprocess", postProcessingFilter.getId());
+    if (postProcessingFilter instanceof Configurable) {
+      JsonObject postprocessJson = new JsonObject();
+      ((Configurable) postProcessingFilter).storeConfiguration(postprocessJson);
+      json.add("postprocessSettings", postprocessJson);
+    }
     json.add("outputMode", outputMode.getName());
     json.add("renderTime", renderTime);
     json.add("spp", spp);
@@ -2873,14 +2881,17 @@ public class Scene implements JsonSerializable, Refreshable {
 
     exposure = json.get("exposure").doubleValue(exposure);
     postProcessingFilter = PostProcessingFilters
-            .getPostProcessingFilterFromId(json.get("postprocess").stringValue(postProcessingFilter.getId()))
-            .orElseGet(() -> {
-              if (json.get("postprocess").stringValue(null) != null) {
-                Log.warn("The post processing filter " + json +
-                        " is unknown. Maybe you're missing a plugin that was used to create this scene?");
-              }
-              return DEFAULT_POSTPROCESSING_FILTER;
-            });
+      .getPostProcessingFilterFromId(json.get("postprocess").stringValue(postProcessingFilter.getId()))
+      .orElseGet(() -> {
+        if (json.get("postprocess").stringValue(null) != null) {
+          Log.warn("The post processing filter " + json +
+            " is unknown. Maybe you're missing a plugin that was used to create this scene?");
+        }
+        return DEFAULT_POSTPROCESSING_FILTER;
+      });
+    if (postProcessingFilter instanceof Configurable) {
+      ((Configurable) postProcessingFilter).loadConfiguration(json.get("postprocessSettings").asObject());
+    }
     outputMode = PictureExportFormats
       .getFormat(json.get("outputMode").stringValue(outputMode.getName()))
       .orElse(PictureExportFormats.PNG);
