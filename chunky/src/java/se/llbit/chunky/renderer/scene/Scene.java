@@ -1572,7 +1572,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * restarted
    */
   public boolean shouldRefresh() {
-    return resetReason != ResetReason.NONE;
+    return resetReason.shouldRerender();
   }
 
   /**
@@ -3068,7 +3068,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (mode == RenderMode.PAUSED) {
       mode = RenderMode.RENDERING;
     }
-    if (reason != ResetReason.NONE) {
+    if (reason.shouldRerender()) {
       spp = 0;
       renderTime = 0;
     }

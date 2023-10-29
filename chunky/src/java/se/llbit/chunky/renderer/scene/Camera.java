@@ -20,7 +20,6 @@ package se.llbit.chunky.renderer.scene;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.renderer.ApertureShape;
-import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.projection.ApertureProjector;
 import se.llbit.chunky.renderer.projection.FisheyeProjector;
 import se.llbit.chunky.renderer.projection.ForwardDisplacementProjector;
@@ -93,7 +92,7 @@ public class Camera implements JsonSerializable {
    */
   public static final double MAX_SUBJECT_DISTANCE = 1000;
 
-  private final Refreshable scene;
+  private final Scene scene;
 
   private boolean lockCamera = false;
 
@@ -167,7 +166,7 @@ public class Camera implements JsonSerializable {
   /**
    * @param scene The scene that will be refreshed after the camera view changes.
    */
-  public Camera(Refreshable scene) {
+  public Camera(Scene scene) {
     this.scene = scene;
     transform.setIdentity();
     initProjector();
@@ -788,7 +787,7 @@ public class Camera implements JsonSerializable {
 
   public void setCameraLocked(boolean value) {
     lockCamera = value;
-    scene.refresh();
+    scene.softRefresh();
   }
 
   public boolean getCameraLocked() {
