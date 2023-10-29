@@ -25,6 +25,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
@@ -35,7 +36,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
-import se.llbit.chunky.renderer.scene.FogMode;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SimulatedSky;
 import se.llbit.chunky.renderer.scene.Sky;
@@ -43,8 +43,6 @@ import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.elements.GradientEditor;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.render.RenderControlsTab;
-import se.llbit.chunky.ui.render.settings.LayeredFogSettings;
-import se.llbit.chunky.ui.render.settings.UniformFogSettings;
 import se.llbit.chunky.ui.render.settings.SkyboxSettings;
 import se.llbit.chunky.ui.render.settings.SkymapSettings;
 import se.llbit.fx.LuxColorPicker;
@@ -63,14 +61,25 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   @FXML private TitledPane detailsPane;
   @FXML private VBox skyModeSettings;
   @FXML private CheckBox transparentSkyEnabled;
-  @FXML private CheckBox cloudsEnabled;
-  @FXML private DoubleAdjuster cloudSize;
-  @FXML private DoubleAdjuster cloudX;
-  @FXML private DoubleAdjuster cloudY;
-  @FXML private DoubleAdjuster cloudZ;
-  @FXML private ComboBox<FogMode> fogMode;
-  @FXML private TitledPane fogDetailsPane;
-  @FXML private VBox fogDetailsBox;
+  @FXML private ComboBox<String> cloudLayers;
+  @FXML private Button addCloudLayer;
+  @FXML private Button removeCloudLayer;
+  @FXML private TitledPane cloudDetailsPane;
+  @FXML private DoubleAdjuster cloudSizeX;
+  @FXML private DoubleAdjuster cloudSizeY;
+  @FXML private DoubleAdjuster cloudSizeZ;
+  @FXML private DoubleAdjuster cloudOffsetX;
+  @FXML private DoubleAdjuster cloudOffsetY;
+  @FXML private DoubleAdjuster cloudOffsetZ;
+  @FXML private LuxColorPicker cloudColor;
+  @FXML private CheckBox enableVolumetricClouds;
+  @FXML private DoubleAdjuster cloudDensity;
+  @FXML private DoubleAdjuster emittance;
+  @FXML private DoubleAdjuster specular;
+  @FXML private DoubleAdjuster smoothness;
+  @FXML private DoubleAdjuster ior;
+  @FXML private DoubleAdjuster metalness;
+  @FXML private DoubleAdjuster anisotropy;
   private final VBox simulatedSettings = new VBox();
   private DoubleAdjuster horizonOffset = new DoubleAdjuster();
   private ChoiceBox<SimulatedSky> simulatedSky = new ChoiceBox<>();
@@ -79,11 +88,15 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   private final VBox colorEditor = new VBox(colorPicker);
   private final SkyboxSettings skyboxSettings = new SkyboxSettings();
   private final SkymapSettings skymapSettings = new SkymapSettings();
-  private final UniformFogSettings uniformFogSettings = new UniformFogSettings();
-  private final LayeredFogSettings layeredFogSettings = new LayeredFogSettings();
 
   private ChangeListener<? super javafx.scene.paint.Color> skyColorListener =
       (observable, oldValue, newValue) -> scene.sky().setColor(ColorUtil.fromFx(newValue));
+
+  private ChangeListener<? super javafx.scene.paint.Color> cloudColorListener =
+    (observable, oldValue, newValue) -> {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      scene.sky().setCloudLayerColor(index, ColorUtil.fromFx(newValue));
+    };
   private EventHandler<ActionEvent> simSkyListener = event -> {
     int selected = simulatedSky.getSelectionModel().getSelectedIndex();
     scene.sky().setSimulatedSkyMode(selected);
@@ -100,8 +113,6 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     scene = controller.getRenderController().getSceneManager().getScene();
     skyboxSettings.setRenderController(controller.getRenderController());
     skymapSettings.setRenderController(controller.getRenderController());
-    uniformFogSettings.setRenderController(controller.getRenderController());
-    layeredFogSettings.setRenderController(controller.getRenderController());
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
@@ -137,41 +148,150 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     simulatedSky.setOnAction(simSkyListener);
     simulatedSky.setTooltip(new Tooltip(skiesTooltip(Sky.skies)));
 
-    cloudSize.setName("Cloud size");
-    cloudSize.setTooltip("Cloud size, measured in blocks per pixel of clouds.png texture");
-    cloudSize.setRange(0.1, 128);
-    cloudSize.clampMin();
-    cloudSize.makeLogarithmic();
-    cloudSize.onValueChange(value -> scene.sky().setCloudSize(value));
+    cloudLayers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+      updateControls()
+    );
 
-    cloudX.setTooltip("Cloud X offset.");
-    cloudX.setRange(-256, 256);
-    cloudX.onValueChange(value -> scene.sky().setCloudXOffset(value));
-    cloudY.setTooltip("Cloud Y offset.");
-    cloudY.setRange(-64, 320);
-    cloudY.onValueChange(value -> scene.sky().setCloudYOffset(value));
-    cloudZ.setTooltip("Cloud Z offset.");
-    cloudZ.setRange(-256, 256);
-    cloudZ.onValueChange(value -> scene.sky().setCloudZOffset(value));
+    addCloudLayer.setText("Add cloud layer");
+    addCloudLayer.setOnAction(event -> {
+      scene.sky().addCloudLayer();
+      disableControls();
+      if (updateLayersList()) {
+        updateControls();
+      }
+      cloudLayers.getSelectionModel().selectLast();
+    });
 
-    fogMode.getItems().addAll(FogMode.values());
-    fogMode.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-      scene.setFogMode(newValue);
-      switch (newValue) {
-        case NONE: {
-          fogDetailsBox.getChildren().setAll(new Label("Selected mode has no settings."));
-          break;
-        }
-        case UNIFORM: {
-          fogDetailsBox.getChildren().setAll(uniformFogSettings);
-          break;
-        }
-        case LAYERED: {
-          fogDetailsBox.getChildren().setAll(layeredFogSettings);
-          break;
+    removeCloudLayer.setText("Remove cloud layer");
+    removeCloudLayer.setOnAction(event -> {
+      if (scene.sky().getNumCloudLayers() > 0) {
+        scene.sky().removeCloudLayer(cloudLayers.getSelectionModel().getSelectedIndex());
+        disableControls();
+        if (updateLayersList()) {
+          updateControls();
         }
       }
-      fogDetailsPane.setExpanded(true);
+    });
+
+    cloudSizeX.setName("Cloud X scale");
+    cloudSizeX.setTooltip("Scale of the X-dimension of the clouds, measured in blocks per pixel of clouds.png texture");
+    cloudSizeX.setRange(0.01, 128);
+    cloudSizeX.clampMin();
+    cloudSizeX.makeLogarithmic();
+    cloudSizeX.onValueChange(value -> {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      scene.sky().setCloudLayerSizeX(index, value);
+    });
+
+    cloudSizeY.setName("Cloud Y scale");
+    cloudSizeY.setTooltip("Scale of the Y-dimension of the clouds, measured in blocks per pixel of clouds.png texture");
+    cloudSizeY.setRange(0.01, 128);
+    cloudSizeY.clampMin();
+    cloudSizeY.makeLogarithmic();
+    cloudSizeY.onValueChange(value -> {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      scene.sky().setCloudLayerSizeY(index, value);
+    });
+
+    cloudSizeZ.setName("Cloud Z scale");
+    cloudSizeZ.setTooltip("Scale of the Z-dimension of the clouds, measured in blocks per pixel of clouds.png texture");
+    cloudSizeZ.setRange(0.01, 128);
+    cloudSizeZ.clampMin();
+    cloudSizeZ.makeLogarithmic();
+    cloudSizeZ.onValueChange(value -> {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      scene.sky().setCloudLayerSizeZ(index, value);
+    });
+
+    cloudOffsetX.setName("Cloud X offset");
+    cloudOffsetX.setTooltip("Changes the X-offset of the clouds.");
+    cloudOffsetX.setRange(-256, 256);
+    cloudOffsetX.onValueChange(value -> {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      scene.sky().setCloudLayerXOffset(index, value);
+    });
+
+    cloudOffsetY.setName("Cloud Y offset");
+    cloudOffsetY.setTooltip("Changes the altitude of the clouds.");
+    cloudOffsetY.setRange(-64, 320);
+    cloudOffsetY.onValueChange(value -> {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      scene.sky().setCloudLayerYOffset(index, value);
+    });
+
+    cloudOffsetZ.setName("Cloud Z offset");
+    cloudOffsetZ.setTooltip("Changes the Z-offset of the clouds.");
+    cloudOffsetZ.setRange(-256, 256);
+    cloudOffsetZ.onValueChange(value -> {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      scene.sky().setCloudLayerZOffset(index, value);
+    });
+
+    cloudColor.colorProperty().addListener(cloudColorListener);
+
+    enableVolumetricClouds.setTooltip(new Tooltip("Use a volume scatter for the cloud material."));
+    enableVolumetricClouds.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      scene.sky().setCloudLayerVolumetricClouds(index, newValue);
+      disableControls();
+      enableControls(newValue);
+    });
+
+    cloudDensity.setName("Volumetric cloud density");
+    cloudDensity.setRange(0.000001, 1);
+    cloudDensity.clampMin();
+    cloudDensity.setMaximumFractionDigits(6);
+    cloudDensity.onValueChange(value -> {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      scene.sky().setCloudLayerDensity(index, value);
+    });
+
+    emittance.setName("Emittance");
+    emittance.setRange(0, 100);
+    emittance.clampMin();
+    emittance.onValueChange(value -> {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      scene.sky().setCloudLayerEmittance(index, value.floatValue());
+    });
+
+    specular.setName("Specular");
+    specular.setRange(0, 1);
+    specular.clampBoth();
+    specular.onValueChange(value -> {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      scene.sky().setCloudLayerSpecular(index, value.floatValue());
+    });
+
+    smoothness.setName("Smoothness");
+    smoothness.setRange(0, 1);
+    smoothness.clampBoth();
+    smoothness.onValueChange(value -> {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      scene.sky().setCloudLayerSmoothness(index, value.floatValue());
+    });
+
+    ior.setName("IoR");
+    ior.setRange(0, 5);
+    ior.clampMin();
+    ior.onValueChange(value -> {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      scene.sky().setCloudLayerIor(index, value.floatValue());
+    });
+
+    metalness.setName("Metalness");
+    metalness.setRange(0, 1);
+    metalness.clampBoth();
+    metalness.onValueChange(value -> {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      scene.sky().setCloudLayerMetalness(index, value.floatValue());
+    });
+
+    anisotropy.setName("Anisotropy");
+    anisotropy.setRange(-1, 1);
+    anisotropy.clampBoth();
+    anisotropy.onValueChange(value -> {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      scene.sky().setCloudLayerAnisotropy(index, value.floatValue());
     });
 
     skyMode.setTooltip(new Tooltip("Set the type of sky to be used in the scene."));
@@ -213,12 +333,84 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
         .setTooltip(new Tooltip("Disables sky rendering for background compositing."));
     transparentSkyEnabled.selectedProperty().addListener(
         (observable, oldValue, newValue) -> scene.setTransparentSky(newValue));
-    cloudsEnabled.setTooltip(new Tooltip("Toggle visibility of Minecraft-style clouds."));
-    cloudsEnabled.selectedProperty().addListener((observable, oldValue, newValue) -> {
-
-      scene.sky().setCloudsEnabled(newValue);
-    });
     colorPicker.colorProperty().addListener(skyColorListener);
+  }
+
+  private void disableControls() {
+    cloudSizeX.setDisable(true);
+    cloudSizeY.setDisable(true);
+    cloudSizeZ.setDisable(true);
+    cloudOffsetX.setDisable(true);
+    cloudOffsetY.setDisable(true);
+    cloudOffsetZ.setDisable(true);
+    cloudColor.setDisable(true);
+    enableVolumetricClouds.setDisable(true);
+    cloudDensity.setDisable(true);
+    emittance.setDisable(true);
+    specular.setDisable(true);
+    smoothness.setDisable(true);
+    ior.setDisable(true);
+    metalness.setDisable(true);
+    anisotropy.setDisable(true);
+  }
+
+  private void enableControls(boolean volumetricClouds) {
+    cloudSizeX.setDisable(false);
+    cloudSizeY.setDisable(false);
+    cloudSizeZ.setDisable(false);
+    cloudOffsetX.setDisable(false);
+    cloudOffsetY.setDisable(false);
+    cloudOffsetZ.setDisable(false);
+    cloudColor.setDisable(false);
+    enableVolumetricClouds.setDisable(false);
+    emittance.setDisable(false);
+    if (!volumetricClouds) {
+      specular.setDisable(false);
+      smoothness.setDisable(false);
+      ior.setDisable(false);
+      metalness.setDisable(false);
+    } else {
+      cloudDensity.setDisable(false);
+      anisotropy.setDisable(false);
+    }
+  }
+
+  private boolean updateLayersList() {
+    cloudLayers.getSelectionModel().clearSelection();
+    cloudLayers.getItems().clear();
+    int numLayers = scene.sky().getNumCloudLayers();
+    boolean emptyLayers = !(numLayers > 0);
+    if (!emptyLayers) {
+      for (int i = 0; i < numLayers; i++) {
+        cloudLayers.getItems().add(String.format("Layer %d", i + 1));
+      }
+    }
+    return emptyLayers;
+  }
+
+  private void updateControls() {
+    if (!cloudLayers.getSelectionModel().isEmpty()) {
+      int index = cloudLayers.getSelectionModel().getSelectedIndex();
+      cloudSizeX.set(scene.sky().getCloudLayerSizeX(index));
+      cloudSizeY.set(scene.sky().getCloudLayerSizeY(index));
+      cloudSizeZ.set(scene.sky().getCloudLayerSizeZ(index));
+      cloudOffsetX.set(scene.sky().getCloudLayerXOffset(index));
+      cloudOffsetY.set(scene.sky().getCloudLayerYOffset(index));
+      cloudOffsetZ.set(scene.sky().getCloudLayerZOffset(index));
+      cloudColor.colorProperty().removeListener(cloudColorListener);
+      cloudColor.setColor(ColorUtil.toFx(scene.sky().getCloudLayerColor(index)));
+      cloudColor.colorProperty().addListener(cloudColorListener);
+      boolean volumetricClouds = scene.sky().getCloudLayerVolumetricClouds(index);
+      enableVolumetricClouds.setSelected(volumetricClouds);
+      cloudDensity.set(scene.sky().getCloudLayerDensity(index));
+      emittance.set(scene.sky().getCloudLayerEmittance(index));
+      specular.set(scene.sky().getCloudLayerSpecular(index));
+      smoothness.set(scene.sky().getCloudLayerSmoothness(index));
+      ior.set(scene.sky().getCloudLayerIor(index));
+      metalness.set(scene.sky().getCloudLayerMetalness(index));
+      anisotropy.set(scene.sky().getCloudLayerAnisotropy(index));
+      enableControls(volumetricClouds);
+    }
   }
 
   @Override public void update(Scene scene) {
@@ -226,13 +418,11 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     simulatedSky.setOnAction(null);
     simulatedSky.getSelectionModel().select(scene.sky().getSimulatedSky());
     simulatedSky.setOnAction(simSkyListener);
-    cloudsEnabled.setSelected(scene.sky().cloudsEnabled());
+    disableControls();
+    if (updateLayersList()) {
+      updateControls();
+    }
     transparentSkyEnabled.setSelected(scene.transparentSky());
-    cloudSize.set(scene.sky().cloudSize());
-    cloudX.set(scene.sky().cloudXOffset());
-    cloudY.set(scene.sky().cloudYOffset());
-    cloudZ.set(scene.sky().cloudZOffset());
-    fogMode.getSelectionModel().select(scene.fog.getFogMode());
     horizonOffset.set(scene.sky().getHorizonOffset());
     simulatedSky.setValue(scene.sky().getSimulatedSky());
     gradientEditor.setGradient(scene.sky().getGradient());
@@ -241,12 +431,10 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     colorPicker.colorProperty().addListener(skyColorListener);
     skyboxSettings.update(scene);
     skymapSettings.update(scene);
-    uniformFogSettings.update(scene);
-    layeredFogSettings.update(scene);
   }
 
   @Override public String getTabTitle() {
-    return "Sky & Fog";
+    return "Sky";
   }
 
   @Override public Node getTabContent() {

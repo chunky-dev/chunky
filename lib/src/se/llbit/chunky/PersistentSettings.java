@@ -661,4 +661,13 @@ public final class PersistentSettings {
     tables.get(table).asObject().set("sort", config);
     save();
   }
+
+  public static void setPreviewParticleFog(boolean value) {
+    settings.setBool("previewParticleFog", value);
+    save();
+  }
+
+  public static boolean getPreviewParticleFog() {
+    return settings.getBool("previewParticleFog", true);
+  }
 }

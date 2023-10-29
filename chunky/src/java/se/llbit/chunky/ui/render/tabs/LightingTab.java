@@ -55,6 +55,9 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster sunIntensity;
   @FXML private CheckBox drawSun;
   @FXML private ComboBox<SunSamplingStrategy> sunSamplingStrategy;
+  @FXML private TitledPane diffuseSamplingDetailsPane;
+  @FXML private DoubleAdjuster diffuseSampleChance;
+  @FXML private DoubleAdjuster diffuseSampleRadius;
   @FXML private DoubleAdjuster sunLuminosity;
   @FXML private DoubleAdjuster apparentSunBrightness;
   @FXML private DoubleAdjuster sunRadius;
@@ -134,8 +137,32 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
 
     sunSamplingStrategy.getItems().addAll(SunSamplingStrategy.values());
     sunSamplingStrategy.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, newValue) -> scene.setSunSamplingStrategy(newValue));
+            (observable, oldValue, newValue) -> {
+              scene.setSunSamplingStrategy(newValue);
+
+              boolean visible = scene != null && scene.getSunSamplingStrategy().isDiffuseSampling();
+              diffuseSamplingDetailsPane.setVisible(visible);
+              diffuseSamplingDetailsPane.setExpanded(visible);
+              diffuseSamplingDetailsPane.setManaged(visible);
+            });
     sunSamplingStrategy.setTooltip(new Tooltip("Determines how the sun is sampled at each bounce."));
+
+    boolean visible = scene != null && scene.getSunSamplingStrategy().isDiffuseSampling();
+    diffuseSamplingDetailsPane.setVisible(visible);
+    diffuseSamplingDetailsPane.setExpanded(visible);
+    diffuseSamplingDetailsPane.setManaged(visible);
+
+    diffuseSampleChance.setName("Diffuse sample chance");
+    diffuseSampleChance.setTooltip("Probability of sampling the sun on each diffuse bounce");
+    diffuseSampleChance.setRange(Sun.MIN_DIFFUSE_SAMPLE_CHANCE, Sun.MAX_DIFFUSE_SAMPLE_CHANCE);
+    diffuseSampleChance.clampBoth();
+    diffuseSampleChance.onValueChange(value -> scene.sun().setDiffuseSampleChance(value));
+
+    diffuseSampleRadius.setName("Diffuse sample radius");
+    diffuseSampleRadius.setTooltip("Radius of possible sun sampling bounces (relative to the sun's radius)");
+    diffuseSampleRadius.setRange(Sun.MIN_DIFFUSE_SAMPLE_RADIUS, Sun.MAX_DIFFUSE_SAMPLE_RADIUS);
+    diffuseSampleRadius.clampMin();
+    diffuseSampleRadius.onValueChange(value -> scene.sun().setDiffuseSampleRadius(value));
 
     sunIntensity.setName("Sunlight intensity");
     sunIntensity.setTooltip("Changes the intensity of sunlight. Only used when Sun Sampling Strategy is set to FAST or HIGH_QUALITY.");
@@ -203,6 +230,8 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunAltitude.set(QuickMath.radToDeg(scene.sun().getAltitude()));
     enableEmitters.setSelected(scene.getEmittersEnabled());
     sunSamplingStrategy.getSelectionModel().select(scene.getSunSamplingStrategy());
+    diffuseSampleChance.set(scene.sun().getDiffuseSampleChance());
+    diffuseSampleRadius.set(scene.sun().getDiffuseSampleRadius());
     drawSun.setSelected(scene.sun().drawTexture());
     sunColor.colorProperty().removeListener(sunColorListener);
     sunColor.setColor(ColorUtil.toFx(scene.sun().getColor()));

@@ -163,6 +163,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
         transmissivityCap.setVisible(newValue);
         transmissivityCap.setManaged(newValue);
       });
+
     boolean tcapVisible = scene != null && scene.getFancierTranslucency();
     transmissivityCap.setVisible(tcapVisible);
     transmissivityCap.setManaged(tcapVisible);

@@ -24,6 +24,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.JsonObject;
+import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -60,6 +61,36 @@ public class Sun implements JsonSerializable {
    * Maximum apparent sun brightness
    */
   public static final double MAX_APPARENT_BRIGHTNESS = 50;
+
+  /**
+   * Default probability for diffuse sun sampling
+   */
+  public static final double DEFAULT_DIFFUSE_SAMPLE_CHANCE = 0.1;
+
+  /**
+   * Minimum probability for diffuse sun sampling
+   */
+  public static final double MIN_DIFFUSE_SAMPLE_CHANCE = 0.001;
+
+  /**
+   * Maximum probability for diffuse sun sampling
+   */
+  public static final double MAX_DIFFUSE_SAMPLE_CHANCE = 0.9;
+
+  /**
+   * Default radius (relative to sun) for diffuse sun sampling
+   */
+  public static final double DEFAULT_DIFFUSE_SAMPLE_RADIUS = 1.2;
+
+  /**
+   * Minimum radius (relative to sun) for diffuse sun sampling
+   */
+  public static final double MIN_DIFFUSE_SAMPLE_RADIUS = 0.1;
+
+  /**
+   * Maximum radius (relative to sun) for diffuse sun sampling
+   */
+  public static final double MAX_DIFFUSE_SAMPLE_RADIUS = 5;
 
   private static final double xZenithChroma[][] =
       {{0.00166, -0.00375, 0.00209, 0}, {-0.02903, 0.06377, -0.03203, 0.00394},
@@ -137,6 +168,9 @@ public class Sun implements JsonSerializable {
   private Vector3 apparentTextureBrightness = new Vector3(1, 1, 1);
   private boolean enableTextureModification = false;
 
+  private double diffuseSampleChance = DEFAULT_DIFFUSE_SAMPLE_CHANCE;
+  private double diffuseSampleRadius = DEFAULT_DIFFUSE_SAMPLE_RADIUS;
+
   private double azimuth = Math.PI / 2.5;
   private double altitude = Math.PI / 3;
 
@@ -202,6 +236,8 @@ public class Sun implements JsonSerializable {
     radius = other.radius;
     enableTextureModification = other.enableTextureModification;
     luminosityPdf = other.luminosityPdf;
+    diffuseSampleRadius = other.diffuseSampleRadius;
+    diffuseSampleChance = other.diffuseSampleChance;
     initSun();
   }
 
@@ -465,16 +501,12 @@ public class Sun implements JsonSerializable {
     sun.add("apparentBrightness", apparentBrightness);
     sun.add("radius", radius);
     sun.add("modifySunTexture", enableTextureModification);
-    JsonObject colorObj = new JsonObject();
-    colorObj.add("red", color.x);
-    colorObj.add("green", color.y);
-    colorObj.add("blue", color.z);
-    sun.add("color", colorObj);
-    JsonObject apparentColorObj = new JsonObject();
-    apparentColorObj.add("red", apparentColor.x);
-    apparentColorObj.add("green", apparentColor.y);
-    apparentColorObj.add("blue", apparentColor.z);
-    sun.add("apparentColor", apparentColorObj);
+    sun.add("color", ColorUtil.rgbToJson(color));
+    sun.add("apparentColor", ColorUtil.rgbToJson(apparentColor));
+    JsonObject diffuseSamplingObj = new JsonObject();
+    diffuseSamplingObj.add("chance", diffuseSampleChance);
+    diffuseSamplingObj.add("radius", diffuseSampleRadius);
+    sun.add("diffuseSampling", diffuseSamplingObj);
     sun.add("drawTexture", drawTexture);
     return sun;
   }
@@ -489,17 +521,17 @@ public class Sun implements JsonSerializable {
     enableTextureModification = json.get("modifySunTexture").boolValue(enableTextureModification);
 
     if (json.get("color").isObject()) {
-      JsonObject colorObj = json.get("color").object();
-      color.x = colorObj.get("red").doubleValue(1);
-      color.y = colorObj.get("green").doubleValue(1);
-      color.z = colorObj.get("blue").doubleValue(1);
+      color.set(ColorUtil.jsonToRGB(json.get("color").asObject()));
     }
 
     if (json.get("apparentColor").isObject()) {
-      JsonObject apparentColorObj = json.get("apparentColor").object();
-      apparentColor.x = apparentColorObj.get("red").doubleValue(1);
-      apparentColor.y = apparentColorObj.get("green").doubleValue(1);
-      apparentColor.z = apparentColorObj.get("blue").doubleValue(1);
+      apparentColor.set(ColorUtil.jsonToRGB(json.get("apparentColor").asObject()));
+    }
+
+    if(json.get("diffuseSampling").isObject()) {
+      JsonObject diffuseSamplingObj = json.get("diffuseSampling").object();
+      diffuseSampleChance = diffuseSamplingObj.get("chance").doubleValue(DEFAULT_DIFFUSE_SAMPLE_CHANCE);
+      diffuseSampleRadius = diffuseSamplingObj.get("radius").doubleValue(DEFAULT_DIFFUSE_SAMPLE_RADIUS);
     }
 
     drawTexture = json.get("drawTexture").boolValue(drawTexture);
@@ -527,5 +559,19 @@ public class Sun implements JsonSerializable {
 
   public boolean drawTexture() {
     return drawTexture;
+  }
+
+  public double getDiffuseSampleChance() { return diffuseSampleChance; }
+
+  public void setDiffuseSampleChance(double d) {
+    diffuseSampleChance = d;
+    scene.refresh();
+  }
+
+  public double getDiffuseSampleRadius() { return diffuseSampleRadius; }
+
+  public void setDiffuseSampleRadius(double d) {
+    diffuseSampleRadius = d;
+    scene.refresh();
   }
 }

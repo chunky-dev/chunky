@@ -17,10 +17,10 @@
 package se.llbit.chunky.world.material;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.Material;
+import se.llbit.chunky.world.VolumeMaterial;
 
-public class CloudMaterial extends Material {
-  public CloudMaterial() {
-    super("cloud", Texture.air);
+public class VolumeCloudMaterial extends VolumeMaterial {
+  public VolumeCloudMaterial() {
+    super("volume_cloud", Texture.air);
   }
 }

@@ -23,6 +23,7 @@ import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
+import se.llbit.chunky.world.VolumeMaterial;
 import se.llbit.math.*;
 
 import java.util.List;
@@ -45,7 +46,7 @@ public class PathTracer implements RayTracer {
     } else {
       ray.setCurrentMaterial(Air.INSTANCE);
     }
-    pathTrace(scene, ray, state, 1, true);
+    pathTrace(scene, ray, state, true);
   }
 
   /**
@@ -54,7 +55,7 @@ public class PathTracer implements RayTracer {
    * @param firstReflection {@code true} if the ray has not yet hit the first
    * diffuse or specular reflection
    */
-  public static boolean pathTrace(Scene scene, Ray ray, WorkerState state, int addEmitted,
+  public static boolean pathTrace(Scene scene, Ray ray, WorkerState state,
                                   boolean firstReflection) {
 
     boolean hit = false;
@@ -65,7 +66,7 @@ public class PathTracer implements RayTracer {
 
     while (true) {
 
-      if (!PreviewRayTracer.nextIntersection(scene, ray)) {
+      if (!PreviewRayTracer.nextIntersection(scene, ray, random, IntersectionConfig.defaultIntersect(scene, false))) {
         if (ray.getPrevMaterial().isWater()) {
           ray.color.set(0, 0, 0, 1);
           hit = true;
@@ -84,7 +85,7 @@ public class PathTracer implements RayTracer {
         } else {
           // Indirect sky hit - diffuse color.
           scene.sky.getSkyColorDiffuseSun(ray, scene.getSunSamplingStrategy().isDiffuseSun());
-          // Skip sky fog - likely not noticeable in diffuse reflection.
+          addSkyFog(scene, ray, state, ox, od);
           hit = true;
         }
         break;
@@ -138,10 +139,13 @@ public class PathTracer implements RayTracer {
       int count = firstReflection ? scene.getCurrentBranchCount() : 1;
       for (int i = 0; i < count; i++) {
         boolean doMetal = pMetal > Ray.EPSILON && random.nextFloat() < pMetal;
-        if (doMetal || (pSpecular > Ray.EPSILON && random.nextFloat() < pSpecular)) {
+
+        if (currentMat instanceof VolumeMaterial) {
+          hit |= doParticleFogReflection(ray, next, (VolumeMaterial) currentMat, cumulativeColor, random, state, scene);
+        } else if (doMetal || (pSpecular > Ray.EPSILON && random.nextFloat() < pSpecular)) {
           hit |= doSpecularReflection(ray, next, cumulativeColor, doMetal, random, state, scene);
         } else if(random.nextFloat() < pDiffuse) {
-          hit |= doDiffuseReflection(ray, next, currentMat, cumulativeColor, addEmitted, random, state, scene);
+          hit |= doDiffuseReflection(ray, next, currentMat, cumulativeColor, random, state, scene);
         } else if (n1 != n2) {
           hit |= doRefraction(ray, next, currentMat, prevMat, cumulativeColor, n1, n2, pDiffuse, random, state, scene);
         } else {
@@ -201,13 +205,82 @@ public class PathTracer implements RayTracer {
     return hit;
   }
 
+  private static boolean doParticleFogReflection(Ray ray, Ray next, VolumeMaterial currentMat, Vector4 cumulativeColor, Random random, WorkerState state, Scene scene) {
+    boolean hit = false;
+    Vector3 emittance = new Vector3();
+    next.set(ray);
+    Vector3 inboundDirection = new Vector3(ray.d);
+    inboundDirection.scale(-1);
+
+    if (scene.emittersEnabled && currentMat.emittance > Ray.EPSILON) {
+      // Quadratic emittance mapping, so a pixel that's 50% darker will emit only 25% as much light
+      // This is arbitrary but gives pretty good results in most cases.
+      emittance = new Vector3(ray.color.x * ray.color.x, ray.color.y * ray.color.y, ray.color.z * ray.color.z);
+      emittance.scale(currentMat.emittance * scene.emitterIntensity);
+      hit = true;
+    }
+
+    if (scene.getSunSamplingStrategy().doSunSampling()) {
+      scene.sun.getRandomSunDirection(next, random);
+      double cosTheta = inboundDirection.dot(next.d);
+
+      double directLightR = 0;
+      double directLightG = 0;
+      double directLightB = 0;
+
+      next.setCurrentMaterial(next.getPrevMaterial(), next.getPrevData());
+
+      getDirectLightAttenuation(scene, next, state);
+
+      Vector4 attenuation = state.attenuation;
+      if (attenuation.w > 0) {
+        double mult = phaseHG(cosTheta, currentMat.anisotropy) * (scene.getSunSamplingStrategy().isSunLuminosity() ? scene.sun().getLuminosityPdf() : 1);
+        directLightR = attenuation.x * attenuation.w * mult;
+        directLightG = attenuation.y * attenuation.w * mult;
+        directLightB = attenuation.z * attenuation.w * mult;
+        hit = true;
+      }
+
+      next.set(ray);
+      Vector3 outboundDirection = new Vector3();
+      double x1 = random.nextDouble();
+      double x2 = random.nextDouble();
+      henyeyGreensteinSampleP(currentMat.anisotropy, inboundDirection, outboundDirection, x1, x2);
+      next.d.set(outboundDirection);
+      next.d.normalize();
+
+      hit |= pathTrace(scene, next, state, false);
+      if (hit) {
+        cumulativeColor.x += emittance.x + ray.color.x * (directLightR * scene.sun.emittance.x + next.color.x);
+        cumulativeColor.y += emittance.y + ray.color.y * (directLightG * scene.sun.emittance.y + next.color.y);
+        cumulativeColor.z += emittance.z + ray.color.z * (directLightB * scene.sun.emittance.z + next.color.z);
+      }
+    } else {
+      Vector4 rayColor = new Vector4(ray.color);
+
+      Vector3 outboundDirection = new Vector3();
+      double x1 = random.nextDouble();
+      double x2 = random.nextDouble();
+      henyeyGreensteinSampleP(currentMat.anisotropy, inboundDirection, outboundDirection, x1, x2);
+      next.d.set(outboundDirection);
+      next.d.normalize();
+
+      hit |= pathTrace(scene, next, state, false);
+      if (hit) {
+        cumulativeColor.x += emittance.x + ray.color.x * (next.color.x);
+        cumulativeColor.y += emittance.y + ray.color.y * (next.color.y);
+        cumulativeColor.z += emittance.z + ray.color.z * (next.color.z);
+      }
+      ray.color.set(rayColor);
+
+    }
+    return hit;
+  }
+
   private static boolean doSpecularReflection(Ray ray, Ray next, Vector4 cumulativeColor, boolean doMetal, Random random, WorkerState state, Scene scene) {
     boolean hit = false;
     next.specularReflection(ray, random);
-    if (pathTrace(scene, next, state, 1, false)) {
-      ray.emittance.x = ray.color.x * next.emittance.x;
-      ray.emittance.y = ray.color.y * next.emittance.y;
-      ray.emittance.z = ray.color.z * next.emittance.z;
+    if (pathTrace(scene, next, state, false)) {
 
       if (doMetal) {
         // use the albedo color as specular color
@@ -224,20 +297,17 @@ public class PathTracer implements RayTracer {
     return hit;
   }
 
-  private static boolean doDiffuseReflection(Ray ray, Ray next, Material currentMat, Vector4 cumulativeColor, int addEmitted, Random random, WorkerState state, Scene scene) {
+  private static boolean doDiffuseReflection(Ray ray, Ray next, Material currentMat, Vector4 cumulativeColor, Random random, WorkerState state, Scene scene) {
     boolean hit = false;
-    float emittance = 0;
+    Vector3 emittance = new Vector3();
     Vector4 indirectEmitterColor = new Vector4(0, 0, 0, 0);
 
     if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance > Ray.EPSILON) {
 
-      emittance = addEmitted;
-      ray.emittance.x = ray.color.x * ray.color.x *
-        currentMat.emittance * scene.emitterIntensity;
-      ray.emittance.y = ray.color.y * ray.color.y *
-        currentMat.emittance * scene.emitterIntensity;
-      ray.emittance.z = ray.color.z * ray.color.z *
-        currentMat.emittance * scene.emitterIntensity;
+      // Quadratic emittance mapping, so a pixel that's 50% darker will emit only 25% as much light
+      // This is arbitrary but gives pretty good results in most cases.
+      emittance = new Vector3(ray.color.x * ray.color.x, ray.color.y * ray.color.y, ray.color.z * ray.color.z);
+      emittance.scale(currentMat.emittance * scene.emitterIntensity);
 
       hit = true;
     } else if (scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
@@ -293,15 +363,12 @@ public class PathTracer implements RayTracer {
         }
       }
 
-      next.diffuseReflection(ray, random);
-      hit = pathTrace(scene, next, state, 0, false) || hit;
+      next.diffuseReflection(ray, random, scene);
+      hit = pathTrace(scene, next, state, false) || hit;
       if (hit) {
-        cumulativeColor.x += ray.color.x * (emittance + directLightR * scene.sun.emittance.x + (
-          next.color.x + next.emittance.x) + (indirectEmitterColor.x));
-        cumulativeColor.y += ray.color.y * (emittance + directLightG * scene.sun.emittance.y + (
-          next.color.y + next.emittance.y) + (indirectEmitterColor.y));
-        cumulativeColor.z += ray.color.z * (emittance + directLightB * scene.sun.emittance.z + (
-          next.color.z + next.emittance.z) + (indirectEmitterColor.z));
+        cumulativeColor.x += emittance.x + ray.color.x * (directLightR * scene.sun.emittance.x + next.color.x + indirectEmitterColor.x);
+        cumulativeColor.y += emittance.y + ray.color.y * (directLightG * scene.sun.emittance.y + next.color.y + indirectEmitterColor.y);
+        cumulativeColor.z += emittance.z + ray.color.z * (directLightB * scene.sun.emittance.z + next.color.z + indirectEmitterColor.z);
       } else if (indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
         hit = true;
         cumulativeColor.x += ray.color.x * indirectEmitterColor.x;
@@ -310,19 +377,22 @@ public class PathTracer implements RayTracer {
       }
 
     } else {
-      next.diffuseReflection(ray, random);
+      // If diffuse sun sampling is performed, then ray.color will be altered, but it should be the same on each iteration of ray branching
+      Vector4 rayColor = new Vector4(ray.color);
+      next.diffuseReflection(ray, random, scene);
 
-      hit = pathTrace(scene, next, state, 0, false) || hit;
+      hit = pathTrace(scene, next, state, false) || hit;
       if (hit) {
-        cumulativeColor.x += ray.color.x * (emittance + (next.color.x + next.emittance.x) + (indirectEmitterColor.x));
-        cumulativeColor.y += ray.color.y * (emittance + (next.color.y + next.emittance.y) + (indirectEmitterColor.y));
-        cumulativeColor.z += ray.color.z * (emittance + (next.color.z + next.emittance.z) + (indirectEmitterColor.z));
+        cumulativeColor.x += emittance.x + ray.color.x * (next.color.x + indirectEmitterColor.x);
+        cumulativeColor.y += emittance.y + ray.color.y * (next.color.y + indirectEmitterColor.y);
+        cumulativeColor.z += emittance.z + ray.color.z * (next.color.z + indirectEmitterColor.z);
       } else if (indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
         hit = true;
         cumulativeColor.x += ray.color.x * indirectEmitterColor.x;
         cumulativeColor.y += ray.color.y * indirectEmitterColor.y;
         cumulativeColor.z += ray.color.z * indirectEmitterColor.z;
       }
+      ray.color.set(rayColor);
     }
     return hit;
   }
@@ -338,10 +408,7 @@ public class PathTracer implements RayTracer {
     if (doRefraction && radicand < Ray.EPSILON) {
       // Total internal reflection.
       next.specularReflection(ray, random);
-      if (pathTrace(scene, next, state, 1, false)) {
-        ray.emittance.x = ray.color.x * next.emittance.x;
-        ray.emittance.y = ray.color.y * next.emittance.y;
-        ray.emittance.z = ray.color.z * next.emittance.z;
+      if (pathTrace(scene, next, state, false)) {
 
         cumulativeColor.x += next.color.x;
         cumulativeColor.y += next.color.y;
@@ -362,10 +429,7 @@ public class PathTracer implements RayTracer {
 
       if (random.nextFloat() < Rtheta) {
         next.specularReflection(ray, random);
-        if (pathTrace(scene, next, state, 1, false)) {
-          ray.emittance.x = ray.color.x * next.emittance.x;
-          ray.emittance.y = ray.color.y * next.emittance.y;
-          ray.emittance.z = ray.color.z * next.emittance.z;
+        if (pathTrace(scene, next, state, false)) {
 
           cumulativeColor.x += next.color.x;
           cumulativeColor.y += next.color.y;
@@ -401,7 +465,7 @@ public class PathTracer implements RayTracer {
           next.o.scaleAdd(Ray.OFFSET, next.d);
         }
 
-        if (pathTrace(scene, next, state, 1, false)) {
+        if (pathTrace(scene, next, state, false)) {
           // Calculate the color and emittance of the refracted ray
           translucentRayColor(scene, ray, next, cumulativeColor, pDiffuse);
           hit = true;
@@ -416,7 +480,7 @@ public class PathTracer implements RayTracer {
     next.set(ray);
     next.o.scaleAdd(Ray.OFFSET, next.d);
 
-    if (pathTrace(scene, next, state, 1, false)) {
+    if (pathTrace(scene, next, state, false)) {
       // Calculate the color and emittance of the refracted ray
       translucentRayColor(scene, ray, next, cumulativeColor, pDiffuse);
       hit = true;
@@ -481,8 +545,6 @@ public class PathTracer implements RayTracer {
     Vector4 outputColor = new Vector4(0, 0, 0, 0);
     outputColor.multiplyEntrywise(new Vector4(rgbTrans, 1), next.color);
     cumulativeColor.add(outputColor);
-    // Use emittance from next ray
-    ray.emittance.multiplyEntrywise(rgbTrans, next.emittance);
   }
 
   private static double reassignTransmissivity(double from, double to, double other, double trans, double cap) {
@@ -517,7 +579,7 @@ public class PathTracer implements RayTracer {
 
       emitterRay.o.scaleAdd(Ray.OFFSET, emitterRay.d);
       emitterRay.distance += Ray.OFFSET;
-      PreviewRayTracer.nextIntersection(scene, emitterRay);
+      PreviewRayTracer.nextIntersection(scene, emitterRay, random, IntersectionConfig.defaultIntersect(scene, false));
       if (Math.abs(emitterRay.distance - distance) < Ray.OFFSET) {
         double e = Math.abs(emitterRay.d.dot(emitterRay.getNormal()));
         e /= Math.max(distance * distance, 1);
@@ -573,7 +635,7 @@ public class PathTracer implements RayTracer {
     attenuation.w = 1;
     while (attenuation.w > 0) {
       ray.o.scaleAdd(Ray.OFFSET, ray.d);
-      if (!PreviewRayTracer.nextIntersection(scene, ray)) {
+      if (!PreviewRayTracer.nextIntersection(scene, ray, state.random, IntersectionConfig.defaultIntersect(scene, false))) {
         break;
       }
       double mult = 1 - ray.color.w;
@@ -593,6 +655,68 @@ public class PathTracer implements RayTracer {
         attenuation.w = 0;
       }
     }
+  }
+
+  private static final double INV_4_PI = 1 / (4 * FastMath.PI);
+
+  /**
+   * Code adapted from <a href="https://github.com/mmp/pbrt-v3/blob/b47ed0d334cde4c475def0044c974b7db173ff99/src/core/medium.h#L69">pbrt</a>
+   */
+  private static double phaseHG(double cosTheta, double g) {
+    double denominator = 1 + g * g + 2 * g * cosTheta;
+    return INV_4_PI * (1 - g * g) / (denominator * FastMath.sqrt(denominator));
+  }
+
+  /**
+   * Code adapted from <a href="https://github.com/mmp/pbrt-v3/blob/b47ed0d334cde4c475def0044c974b7db173ff99/src/core/medium.cpp#L193">pbrt</a>
+   */
+  private static double henyeyGreensteinSampleP(double g, Vector3 wo, Vector3 wi, double x1, double x2) {
+    double cosTheta;
+    if (FastMath.abs(g) < 1e-3) {
+      cosTheta = 1 - 2 * x1;
+    } else {
+      double sqrTerm = (1 - g * g) / (1 + g - 2 * g * x1);
+      cosTheta = -(1 + g * g - sqrTerm * sqrTerm) / (2 * g);
+    }
+
+    double sinTheta = FastMath.sqrt(FastMath.max(0d, 1 - cosTheta * cosTheta));
+    double phi = 2 * FastMath.PI * x2;
+    Vector3 v1 = new Vector3();
+    Vector3 v2 = new Vector3();
+    coordinateSystem(wo, v1, v2);
+    wi.set(sphericalDirection(sinTheta, cosTheta, phi, v1, v2, wo));
+    return phaseHG(cosTheta, g);
+  }
+
+  /**
+   * Code adapted from <a href="https://github.com/mmp/pbrt-v3/blob/b47ed0d334cde4c475def0044c974b7db173ff99/src/core/geometry.h#L1020">pbrt</a>
+   */
+  private static void coordinateSystem(Vector3 v1, Vector3 v2, Vector3 v3) {
+    Vector3 x;
+    if (FastMath.abs(v1.x) > FastMath.abs(v1.y)) {
+      x = new Vector3(-v1.z, 0, v1.x);
+      x.scale(1 / FastMath.sqrt(v1.x * v1.x + v1.z * v1.z));
+    } else {
+      x = new Vector3(0, v1.z, -v1.y);
+      x.scale(FastMath.sqrt(v1.y * v1.y + v1.z * v1.z));
+    }
+    v2.set(x);
+    v3.cross(v1, v2);
+  }
+
+  /**
+   * Code adapted from <a href="https://github.com/mmp/pbrt-v3/blob/b47ed0d334cde4c475def0044c974b7db173ff99/src/core/geometry.h#L1465C25-L1465C25">pbrt</a>
+   */
+  private static Vector3 sphericalDirection(double sinTheta, double cosTheta, double phi, Vector3 x, Vector3 y, Vector3 z) {
+    Vector3 x1 = new Vector3(x);
+    Vector3 y1 = new Vector3(y);
+    Vector3 z1 = new Vector3(z);
+    x1.scale(sinTheta * FastMath.cos(phi));
+    y1.scale(sinTheta * FastMath.sin(phi));
+    z1.scale(cosTheta);
+    x1.add(y1);
+    x1.add(z1);
+    return x1;
   }
 
 }

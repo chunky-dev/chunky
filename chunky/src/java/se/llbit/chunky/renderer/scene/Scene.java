@@ -149,7 +149,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Default fog density.
    */
-  public static final double DEFAULT_FOG_DENSITY = 0.0;
+  public static final double DEFAULT_FOG_DENSITY = 0.05;
 
   /**
    * Default post processing filter.
@@ -347,6 +347,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
   protected volatile boolean isLoading = false;
 
+  private boolean previewParticleFog = PersistentSettings.getPreviewParticleFog();
+
   /**
    * Creates a scene with all default settings.
    *
@@ -459,6 +461,7 @@ public class Scene implements JsonSerializable, Refreshable {
     preventNormalEmitterWithSampling = other.preventNormalEmitterWithSampling;
     fancierTranslucency = other.fancierTranslucency;
     transmissivityCap = other.transmissivityCap;
+    previewParticleFog = other.previewParticleFog;
     transparentSky = other.transparentSky;
     yClipMin = other.yClipMin;
     yClipMax = other.yClipMax;
@@ -1669,7 +1672,9 @@ public class Scene implements JsonSerializable, Refreshable {
     ray.o.x -= origin.x;
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
-    while (PreviewRayTracer.nextIntersection(this, ray)) {
+    while (PreviewRayTracer.nextIntersection(this, ray, null,
+      new IntersectionConfig(true,
+        false, waterPlaneEnabled, true))) {
       if (ray.getCurrentMaterial() != Air.INSTANCE) {
         return true;
       }
@@ -2650,11 +2655,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("waterVisibility", waterVisibility);
     json.add("useCustomWaterColor", useCustomWaterColor);
     if (useCustomWaterColor) {
-      JsonObject colorObj = new JsonObject();
-      colorObj.add("red", waterColor.x);
-      colorObj.add("green", waterColor.y);
-      colorObj.add("blue", waterColor.z);
-      json.add("waterColor", colorObj);
+      json.add("waterColor", ColorUtil.rgbToJson(waterColor));
     }
     currentWaterShader.save(json);
     json.add("fog", fog.toJson());
@@ -2961,10 +2962,7 @@ public class Scene implements JsonSerializable, Refreshable {
     waterVisibility = json.get("waterVisibility").doubleValue(waterVisibility);
     useCustomWaterColor = json.get("useCustomWaterColor").boolValue(useCustomWaterColor);
     if (useCustomWaterColor) {
-      JsonObject colorObj = json.get("waterColor").object();
-      waterColor.x = colorObj.get("red").doubleValue(waterColor.x);
-      waterColor.y = colorObj.get("green").doubleValue(waterColor.y);
-      waterColor.z = colorObj.get("blue").doubleValue(waterColor.z);
+      waterColor.set(ColorUtil.jsonToRGB(json.get("waterColor").asObject()));
     }
     biomeColors = json.get("biomeColorsEnabled").boolValue(biomeColors);
     transparentSky = json.get("transparentSky").boolValue(transparentSky);
@@ -3264,6 +3262,13 @@ public class Scene implements JsonSerializable, Refreshable {
     refresh(ResetReason.MATERIALS_CHANGED);
   }
 
+  public void setAnisotropy(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("anisotropy", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
   public int getYClipMin() {
     return yClipMin;
   }
@@ -3459,6 +3464,16 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void setTransmissivityCap(double value) {
     transmissivityCap = value;
+    refresh();
+  }
+
+  public boolean getPreviewParticleFog() {
+    return this.previewParticleFog;
+  }
+
+  public void setPreviewParticleFog(boolean value) {
+    this.previewParticleFog = value;
+    PersistentSettings.setPreviewParticleFog(value);
     refresh();
   }
 }

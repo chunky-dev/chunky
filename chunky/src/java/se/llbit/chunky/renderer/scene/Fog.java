@@ -8,10 +8,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 import se.llbit.util.JsonSerializable;
 
 public final class Fog implements JsonSerializable {
@@ -21,6 +18,7 @@ public final class Fog implements JsonSerializable {
   protected double uniformDensity = Scene.DEFAULT_FOG_DENSITY;
   protected double skyFogDensity = 1;
   protected ArrayList<FogLayer> layers = new ArrayList<>(0);
+  protected ArrayList<FogVolume> volumes = new ArrayList<>(0);
   protected Vector3 fogColor = new Vector3(PersistentSettings.getFogColorRed(), PersistentSettings.getFogColorGreen(), PersistentSettings.getFogColorBlue());
 
   private static final double EXTINCTION_FACTOR = 0.04;
@@ -58,6 +56,9 @@ public final class Fog implements JsonSerializable {
   public ArrayList<FogLayer> getFogLayers() {
     return layers;
   }
+  public ArrayList<FogVolume> getFogVolumes() {
+    return volumes;
+  }
 
   public void addLayer() {
     layers.add(new FogLayer(scene));
@@ -66,6 +67,34 @@ public final class Fog implements JsonSerializable {
 
   public void removeLayer(int index) {
     layers.remove(index);
+    scene.refresh();
+  }
+
+  private FogVolume getVolumeFromType(FogVolumeType fogVolumeType) {
+    switch (fogVolumeType) {
+      case LAYER:
+        return new LayerFogVolume(fogColor, uniformDensity);
+      case SPHERE:
+        return new SphericalFogVolume(fogColor, uniformDensity);
+      case CUBOID:
+        return new CuboidFogVolume(fogColor, uniformDensity);
+      case EXPONENTIAL:
+      default:
+        return new ExponentialFogVolume(fogColor, uniformDensity);
+    }
+  }
+
+  public void addVolume(FogVolumeType fogVolumeType) {
+    addVolume(getVolumeFromType(fogVolumeType));
+    scene.refresh();
+  }
+
+  public void addVolume(FogVolume fogVolume) {
+    volumes.add(fogVolume);
+  }
+
+  public void removeVolume(int index) {
+    volumes.remove(index);
     scene.refresh();
   }
 
@@ -98,6 +127,7 @@ public final class Fog implements JsonSerializable {
   }
 
   public void addSkyFog(Ray ray, Vector4 scatterLight) {
+
     if (mode == FogMode.UNIFORM) {
       if (uniformDensity > 0.0) {
         double fog;
@@ -118,6 +148,7 @@ public final class Fog implements JsonSerializable {
       double y2 = y1 + dy * FOG_LIMIT;
       addLayeredFog(ray.color, dy, y1, y2, scatterLight);
     }
+
   }
 
   public void addGroundFog(Ray ray, Vector3 ox, double airDistance, Vector4 scatterLight, double scatterOffset) {
@@ -199,6 +230,17 @@ public final class Fog implements JsonSerializable {
     return (offsetY - y1) / clampDy(dy);
   }
 
+  public boolean particleFogIntersection(Scene scene, Ray ray, Random random) {
+    if (random == null) {
+      return false;
+    }
+    boolean hit = false;
+    for (FogVolume v : volumes) {
+      hit |= v.intersect(scene, ray, random);
+    }
+    return hit;
+  }
+
   @Override public JsonObject toJson() {
     JsonObject fogObj = new JsonObject();
     fogObj.add("mode", mode.name());
@@ -213,11 +255,12 @@ public final class Fog implements JsonSerializable {
       jsonLayers.add(jsonLayer);
     }
     fogObj.add("layers", jsonLayers);
-    JsonObject colorObj = new JsonObject();
-    colorObj.add("red", fogColor.x);
-    colorObj.add("green", fogColor.y);
-    colorObj.add("blue", fogColor.z);
-    fogObj.add("color", colorObj);
+    JsonArray jsonVolumes = new JsonArray();
+    for (FogVolume volume : volumes) {
+      jsonVolumes.add(volume.toJson());
+    }
+    fogObj.add("volumes", jsonVolumes);
+    fogObj.add("color", ColorUtil.rgbToJson(fogColor));
     fogObj.add("fastFog", fastFog);
     return fogObj;
   }
@@ -231,10 +274,16 @@ public final class Fog implements JsonSerializable {
         o.get("breadth").doubleValue(0),
         o.get("density").doubleValue(0),
         scene)).collect(Collectors.toCollection(ArrayList<FogLayer>::new));
-    JsonObject colorObj = json.get("color").object();
-    fogColor.x = colorObj.get("red").doubleValue(fogColor.x);
-    fogColor.y = colorObj.get("green").doubleValue(fogColor.y);
-    fogColor.z = colorObj.get("blue").doubleValue(fogColor.z);
+    JsonArray jsonVolumes = json.get("volumes").array();
+    volumes.clear();
+    for (JsonValue jsonVolume : jsonVolumes) {
+      JsonObject jsonVolumeObject = jsonVolume.asObject();
+      FogVolumeType fogVolumeType = FogVolumeType.valueOf(jsonVolumeObject.get("type").asString(""));
+      FogVolume fogVolume = getVolumeFromType(fogVolumeType);
+      fogVolume.importFromJson(jsonVolumeObject);
+      addVolume(fogVolume);
+    }
+    fogColor.set(ColorUtil.jsonToRGB(json.get("color").object()));
     fastFog = json.get("fastFog").boolValue(fastFog);
   }
 
@@ -242,11 +291,9 @@ public final class Fog implements JsonSerializable {
     mode = json.get("fogEnabled").boolValue(mode != FogMode.NONE) ? FogMode.NONE : FogMode.UNIFORM;
     uniformDensity = json.get("fogDensity").doubleValue(uniformDensity);
     skyFogDensity = json.get("skyFogDensity").doubleValue(skyFogDensity);
-    layers = new ArrayList<>(0);
-    JsonObject colorObj = json.get("fogColor").object();
-    fogColor.x = colorObj.get("red").doubleValue(fogColor.x);
-    fogColor.y = colorObj.get("green").doubleValue(fogColor.y);
-    fogColor.z = colorObj.get("blue").doubleValue(fogColor.z);
+    layers.clear();
+    volumes.clear();
+    fogColor.set(ColorUtil.jsonToRGB(json.get("fogColor").asObject()));
     fastFog = json.get("fastFog").boolValue(fastFog);
   }
 
@@ -255,6 +302,7 @@ public final class Fog implements JsonSerializable {
     uniformDensity = other.uniformDensity;
     skyFogDensity = other.skyFogDensity;
     layers = new ArrayList<>(other.layers);
+    volumes = new ArrayList<>(other.volumes);
     fogColor.set(other.fogColor);
   }
 }

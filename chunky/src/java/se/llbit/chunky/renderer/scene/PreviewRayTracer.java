@@ -25,6 +25,8 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
+import java.util.Random;
+
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
@@ -41,7 +43,7 @@ public class PreviewRayTracer implements RayTracer {
       ray.setCurrentMaterial(Air.INSTANCE);
     }
     while (true) {
-      if (!nextIntersection(scene, ray)) {
+      if (!nextIntersection(scene, ray, state.random, IntersectionConfig.defaultIntersect(scene, true))) {
         if (mapIntersection(scene, ray)) {
           break;
         }
@@ -68,7 +70,7 @@ public class PreviewRayTracer implements RayTracer {
     Ray ray = state.ray;
     double occlusion = 1.0;
     while (true) {
-      if (!nextIntersection(scene, ray)) {
+      if (!nextIntersection(scene, ray, state.random, IntersectionConfig.defaultIntersect(scene, false))) {
         break;
       } else {
         occlusion *= (1 - ray.color.w);
@@ -83,21 +85,27 @@ public class PreviewRayTracer implements RayTracer {
 
   /**
    * Find next ray intersection.
+   * @param random Used for particle fog, can be null if particleFog is false
    * @return Next intersection
    */
-  public static boolean nextIntersection(Scene scene, Ray ray) {
+  public static boolean nextIntersection(Scene scene, Ray ray, Random random, IntersectionConfig config) {
     ray.setPrevMaterial(ray.getCurrentMaterial(), ray.getCurrentData());
     ray.t = Double.POSITIVE_INFINITY;
     boolean hit = false;
-    if (scene.sky().cloudsEnabled()) {
-      hit = scene.sky().cloudIntersection(scene, ray);
+    if (config.cloudIntersect) {
+      hit |= cloudIntersection(scene, ray, random);
     }
-    if (scene.isWaterPlaneEnabled()) {
-      hit = waterPlaneIntersection(scene, ray) || hit;
+    if (config.waterPlaneIntersect) {
+      hit |= waterPlaneIntersection(scene, ray);
     }
-    if (scene.intersect(ray)) {
+    if (config.fogIntersect) {
+      hit |= fogIntersection(scene, ray, random);
+    }
+    if (config.sceneIntersect) {
       // Octree tracer handles updating distance.
-      return true;
+      if (sceneIntersection(scene, ray)) {
+        return true;
+      }
     }
     if (hit) {
       ray.distance += ray.t;
@@ -108,6 +116,18 @@ public class PreviewRayTracer implements RayTracer {
       ray.setCurrentMaterial(Air.INSTANCE);
       return false;
     }
+  }
+
+  public static boolean nextIntersection(Scene scene, Ray ray) {
+    return nextIntersection(scene, ray, null, new IntersectionConfig(true, false, scene.waterPlaneEnabled, true));
+  }
+
+  private static boolean cloudIntersection(Scene scene, Ray ray, Random random) {
+    return scene.sky.cloudIntersection(scene, ray, random);
+  }
+
+  private static boolean fogIntersection(Scene scene, Ray ray, Random random) {
+    return scene.fog.particleFogIntersection(scene, ray, random);
   }
 
   private static boolean waterPlaneIntersection(Scene scene, Ray ray) {
@@ -137,6 +157,10 @@ public class PreviewRayTracer implements RayTracer {
       }
     }
     return false;
+  }
+
+  private static boolean sceneIntersection(Scene scene, Ray ray) {
+    return scene.intersect(ray);
   }
 
   // Chunk pattern config

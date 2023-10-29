@@ -25,6 +25,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Clouds;
 import se.llbit.chunky.world.SkymapTexture;
 import se.llbit.chunky.world.material.CloudMaterial;
+import se.llbit.chunky.world.material.VolumeCloudMaterial;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -34,6 +35,7 @@ import se.llbit.math.*;
 import se.llbit.resources.ImageLoader;
 import se.llbit.util.JsonSerializable;
 import se.llbit.util.JsonUtil;
+import se.llbit.util.Pair;
 import se.llbit.util.annotation.NotNull;
 import se.llbit.util.annotation.Nullable;
 
@@ -55,13 +57,6 @@ public class Sky implements JsonSerializable {
    * Default sky light intensity
    */
   public static final double DEFAULT_INTENSITY = 1;
-
-  /**
-   * Default cloud y-position
-   */
-  protected static final int DEFAULT_CLOUD_HEIGHT = 128;
-
-  protected static final int DEFAULT_CLOUD_SIZE = 12;
 
   /**
    * Minimum sky light intensity
@@ -154,9 +149,8 @@ public class Sky implements JsonSerializable {
   private double yaw = 0, pitch = 0, roll = 0;
 
   private boolean mirrored = true;
-  private boolean cloudsEnabled = false;
-  private double cloudSize = DEFAULT_CLOUD_SIZE;
-  private final Vector3 cloudOffset = new Vector3(0, DEFAULT_CLOUD_HEIGHT, 0);
+
+  private ArrayList<CloudLayer> cloudLayers = new ArrayList<>(0);
 
   private double skyExposure = DEFAULT_INTENSITY;
   private double skyLightModifier = DEFAULT_INTENSITY;
@@ -227,9 +221,7 @@ public class Sky implements JsonSerializable {
    * Set the sky equal to other sky.
    */
   public void set(Sky other) {
-    cloudsEnabled = other.cloudsEnabled;
-    cloudOffset.set(other.cloudOffset);
-    cloudSize = other.cloudSize;
+    cloudLayers = new ArrayList<>(other.cloudLayers);
     skymapFileName = other.skymapFileName;
     skymap = other.skymap;
     yaw = other.yaw;
@@ -632,18 +624,16 @@ public class Sky implements JsonSerializable {
     sky.add("apparentSkyLight", apparentSkyLightModifier);
     sky.add("mode", mode.name());
     sky.add("horizonOffset", horizonOffset);
-    sky.add("cloudsEnabled", cloudsEnabled);
-    sky.add("cloudSize", cloudSize);
-    sky.add("cloudOffset", cloudOffset.toJson());
+    JsonArray cloudLayersJson = new JsonArray();
+    for (CloudLayer layer : cloudLayers) {
+      cloudLayersJson.add(layer.toJson());
+    }
+    sky.add("cloudLayers", cloudLayersJson);
 
     // Always save gradient.
     sky.add("gradient", gradientJson(gradient));
 
-    JsonObject colorObj = new JsonObject();
-    colorObj.add("red", color.x);
-    colorObj.add("green", color.y);
-    colorObj.add("blue", color.z);
-    sky.add("color", colorObj);
+    sky.add("color", ColorUtil.rgbToJson(color));
 
     switch (mode) {
       case SKYMAP_EQUIRECTANGULAR:
@@ -694,10 +684,30 @@ public class Sky implements JsonSerializable {
       mode = SkyMode.SKYMAP_ANGULAR;
     }
     horizonOffset = json.get("horizonOffset").doubleValue(horizonOffset);
-    cloudsEnabled = json.get("cloudsEnabled").boolValue(cloudsEnabled);
-    cloudSize = json.get("cloudSize").doubleValue(cloudSize);
-    if (json.get("cloudOffset").isObject()) {
-      cloudOffset.fromJson(json.get("cloudOffset").object());
+
+    if (json.get("cloudLayers").isUnknown()) {
+      boolean cloudsEnabled = json.get("cloudsEnabled").boolValue(false);
+      if (cloudsEnabled) {
+        double cloudSize = json.get("cloudSize").doubleValue(12);
+        Vector3 cloudOffset = JsonUtil.vec3FromJsonObject(json.get("cloudOffset").asObject());
+        CloudLayer cloudLayer = new CloudLayer();
+        cloudLayer.setCloudSizeX(cloudSize);
+        cloudLayer.setCloudSizeY(5);
+        cloudLayer.setCloudSizeZ(cloudSize);
+        cloudLayer.setCloudXOffset(cloudOffset.x);
+        cloudLayer.setCloudYOffset(cloudOffset.y);
+        cloudLayer.setCloudZOffset(cloudOffset.z);
+        cloudLayers.add(cloudLayer);
+      }
+    } else {
+      JsonArray jsonCloudLayers = json.get("cloudLayers").asArray();
+      cloudLayers.clear();
+      for (JsonValue layer : jsonCloudLayers) {
+        JsonObject layerObject = layer.asObject();
+        CloudLayer cloudLayer = new CloudLayer();
+        cloudLayer.importFromJson(layerObject);
+        cloudLayers.add(cloudLayer);
+      }
     }
 
     if (json.get("gradient").isArray()) {
@@ -708,10 +718,7 @@ public class Sky implements JsonSerializable {
     }
 
     if (json.get("color").isObject()) {
-      JsonObject colorObj = json.get("color").object();
-      color.x = colorObj.get("red").doubleValue(1);
-      color.y = colorObj.get("green").doubleValue(1);
-      color.z = colorObj.get("blue").doubleValue(1);
+      color.set(ColorUtil.jsonToRGB(json.get("color").asObject()));
     } else {
       // Maintain backwards-compatibility with scenes saved in older Chunky versions
       color.set(JsonUtil.vec3FromJsonArray(json.get("color")));
@@ -911,269 +918,6 @@ public class Sky implements JsonSerializable {
     return horizonOffset;
   }
 
-  public void setCloudSize(double newValue) {
-    if (newValue != cloudSize) {
-      cloudSize = newValue;
-      if (cloudsEnabled) {
-        scene.refresh();
-      }
-    }
-  }
-
-  public double cloudSize() {
-    return cloudSize;
-  }
-
-  public void setCloudXOffset(double newValue) {
-    if (newValue != cloudOffset.x) {
-      cloudOffset.x = newValue;
-      if (cloudsEnabled) {
-        scene.refresh();
-      }
-    }
-  }
-
-  /**
-   * Change the cloud height
-   */
-  public void setCloudYOffset(double newValue) {
-    if (newValue != cloudOffset.y) {
-      cloudOffset.y = newValue;
-      if (cloudsEnabled) {
-        scene.refresh();
-      }
-    }
-  }
-
-  public void setCloudZOffset(double newValue) {
-    if (newValue != cloudOffset.z) {
-      cloudOffset.z = newValue;
-      if (cloudsEnabled) {
-        scene.refresh();
-      }
-    }
-  }
-
-  public double cloudXOffset() {
-    return cloudOffset.x;
-  }
-
-  /**
-   * @return The current cloud height
-   */
-  public double cloudYOffset() {
-    return cloudOffset.y;
-  }
-
-  public double cloudZOffset() {
-    return cloudOffset.z;
-  }
-
-
-  /**
-   * Enable/disable clouds rendering.
-   */
-  public void setCloudsEnabled(boolean newValue) {
-    if (newValue != cloudsEnabled) {
-      cloudsEnabled = newValue;
-      scene.refresh();
-    }
-  }
-
-  /**
-   * @return <code>true</code> if cloud rendering is enabled
-   */
-  public boolean cloudsEnabled() {
-    return cloudsEnabled;
-  }
-
-  public boolean cloudIntersection(Scene scene, Ray ray) {
-    double ox = ray.o.x + scene.origin.x;
-    double oy = ray.o.y + scene.origin.y;
-    double oz = ray.o.z + scene.origin.z;
-    double offsetX = cloudOffset.x;
-    double offsetY = cloudOffset.y;
-    double offsetZ = cloudOffset.z;
-    double inv_size = 1 / cloudSize;
-    double cloudTop = offsetY + 5;
-    int target = 1;
-    double t_offset = 0;
-    if (oy < offsetY || oy > cloudTop) {
-      if (ray.d.y > 0) {
-        t_offset = (offsetY - oy) / ray.d.y;
-      } else {
-        t_offset = (cloudTop - oy) / ray.d.y;
-      }
-      if (t_offset < 0) {
-        return false;
-      }
-      // Ray is entering cloud.
-      if (inCloud((ray.d.x * t_offset + ox) * inv_size + offsetX,
-          (ray.d.z * t_offset + oz) * inv_size + offsetZ)) {
-        ray.setNormal(0, -Math.signum(ray.d.y), 0);
-        enterCloud(ray, t_offset);
-        return true;
-      }
-    } else if (inCloud(ox * inv_size + offsetX, oz * inv_size + offsetZ)) {
-      target = 0;
-    }
-    double tExit;
-    if (ray.d.y > 0) {
-      tExit = (cloudTop - oy) / ray.d.y - t_offset;
-    } else {
-      tExit = (offsetY - oy) / ray.d.y - t_offset;
-    }
-    if (ray.t < tExit) {
-      tExit = ray.t;
-    }
-    double x0 = (ox + ray.d.x * t_offset) * inv_size + offsetX;
-    double z0 = (oz + ray.d.z * t_offset) * inv_size + offsetZ;
-    double xp = x0;
-    double zp = z0;
-    int ix = (int) Math.floor(xp);
-    int iz = (int) Math.floor(zp);
-    int xmod = (int) Math.signum(ray.d.x), zmod = (int) Math.signum(ray.d.z);
-    int xo = (1 + xmod) / 2, zo = (1 + zmod) / 2;
-    double dx = Math.abs(ray.d.x) * inv_size;
-    double dz = Math.abs(ray.d.z) * inv_size;
-    double t = 0;
-    int i = 0;
-    int nx = 0, nz = 0;
-    if (dx > dz) {
-      double m = dz / dx;
-      double xrem = xmod * (ix + xo - xp);
-      double zlimit = xrem * m;
-      while (t < tExit) {
-        double zrem = zmod * (iz + zo - zp);
-        if (zrem < zlimit) {
-          iz += zmod;
-          if (Clouds.getCloud(ix, iz) == target) {
-            t = i / dx + zrem / dz;
-            nx = 0;
-            nz = -zmod;
-            break;
-          }
-          ix += xmod;
-          if (Clouds.getCloud(ix, iz) == target) {
-            t = (i + xrem) / dx;
-            nx = -xmod;
-            nz = 0;
-            break;
-          }
-        } else {
-          ix += xmod;
-          if (Clouds.getCloud(ix, iz) == target) {
-            t = (i + xrem) / dx;
-            nx = -xmod;
-            nz = 0;
-            break;
-          }
-          if (zrem <= m) {
-            iz += zmod;
-            if (Clouds.getCloud(ix, iz) == target) {
-              t = i / dx + zrem / dz;
-              nx = 0;
-              nz = -zmod;
-              break;
-            }
-          }
-        }
-        t = i / dx;
-        i += 1;
-        zp = z0 + zmod * i * m;
-      }
-    } else {
-      double m = dx / dz;
-      double zrem = zmod * (iz + zo - zp);
-      double xlimit = zrem * m;
-      while (t < tExit) {
-        double xrem = xmod * (ix + xo - xp);
-        if (xrem < xlimit) {
-          ix += xmod;
-          if (Clouds.getCloud(ix, iz) == target) {
-            t = i / dz + xrem / dx;
-            nx = -xmod;
-            nz = 0;
-            break;
-          }
-          iz += zmod;
-          if (Clouds.getCloud(ix, iz) == target) {
-            t = (i + zrem) / dz;
-            nx = 0;
-            nz = -zmod;
-            break;
-          }
-        } else {
-          iz += zmod;
-          if (Clouds.getCloud(ix, iz) == target) {
-            t = (i + zrem) / dz;
-            nx = 0;
-            nz = -zmod;
-            break;
-          }
-          if (xrem <= m) {
-            ix += xmod;
-            if (Clouds.getCloud(ix, iz) == target) {
-              t = i / dz + xrem / dx;
-              nx = -xmod;
-              nz = 0;
-              break;
-            }
-          }
-        }
-        t = i / dz;
-        i += 1;
-        xp = x0 + xmod * i * m;
-      }
-    }
-    int ny = 0;
-    if (target == 1) {
-      if (t > tExit) {
-        return false;
-      }
-      if (nx == 0 && ny == 0 && nz == 0) {
-        // fix ray.n being set to zero (issue #643)
-        return false;
-      }
-      ray.setNormal(nx, ny, nz);
-      enterCloud(ray, t + t_offset);
-      return true;
-    } else {
-      if (t > tExit) {
-        nx = 0;
-        ny = (int) Math.signum(ray.d.y);
-        nz = 0;
-        t = tExit;
-      } else {
-        nx = -nx;
-        nz = -nz;
-      }
-      if (nx == 0 && ny == 0 && nz == 0) {
-        // fix ray.n being set to zero (issue #643)
-        return false;
-      }
-      ray.setNormal(nx, ny, nz);
-      exitCloud(ray, t);
-    }
-    return true;
-  }
-
-  private static void enterCloud(Ray ray, double t) {
-    ray.t = t;
-    ray.color.set(CloudMaterial.color);
-    ray.setCurrentMaterial(CloudMaterial.INSTANCE);
-  }
-
-  private static void exitCloud(Ray ray, double t) {
-    ray.t = t;
-    ray.color.set(CloudMaterial.color);
-    ray.setCurrentMaterial(Air.INSTANCE);
-  }
-
-  private static boolean inCloud(double x, double z) {
-    return Clouds.getCloud((int) Math.floor(x), (int) Math.floor(z)) == 1;
-  }
-
   public void setColor(Vector3 color) {
     this.color.set(color);
     scene.refresh();
@@ -1181,5 +925,176 @@ public class Sky implements JsonSerializable {
 
   public Vector3 getColor() {
     return color;
+  }
+
+  public Vector3 getCloudLayerColor(int index) {
+    return cloudLayers.get(index).getCloudColor();
+  }
+
+  public void setCloudLayerColor(int index, Vector3 color) {
+    cloudLayers.get(index).setCloudColor(color);
+    scene.refresh();
+  }
+
+
+  public boolean getCloudLayerVolumetricClouds(int index) {
+    return cloudLayers.get(index).getVolumetricClouds();
+  }
+
+  public void setCloudLayerVolumetricClouds(int index, boolean value) {
+    cloudLayers.get(index).setVolumetricClouds(value);
+    scene.refresh();
+  }
+
+
+  public double getCloudLayerDensity(int index) {
+    return cloudLayers.get(index).getCloudDensity();
+  }
+
+  public void setCloudLayerDensity(int index, double value) {
+    cloudLayers.get(index).setCloudDensity(value);
+    scene.refresh();
+  }
+
+
+  public double getCloudLayerSizeX(int index) {
+    return cloudLayers.get(index).getCloudSizeX();
+  }
+
+  public void setCloudLayerSizeX(int index, double newValue) {
+    cloudLayers.get(index).setCloudSizeX(newValue);
+    scene.refresh();
+  }
+
+
+  public double getCloudLayerSizeY(int index) {
+    return cloudLayers.get(index).getCloudSizeY();
+  }
+
+  public void setCloudLayerSizeY(int index, double newValue) {
+    cloudLayers.get(index).setCloudSizeY(newValue);
+    scene.refresh();
+  }
+
+
+  public double getCloudLayerSizeZ(int index) {
+    return cloudLayers.get(index).getCloudSizeZ();
+  }
+
+  public void setCloudLayerSizeZ(int index, double newValue) {
+    cloudLayers.get(index).setCloudSizeZ(newValue);
+    scene.refresh();
+  }
+
+
+  public double getCloudLayerXOffset(int index) {
+    return cloudLayers.get(index).getCloudXOffset();
+  }
+
+  public void setCloudLayerXOffset(int index, double newValue) {
+    cloudLayers.get(index).setCloudXOffset(newValue);
+    scene.refresh();
+  }
+
+
+  /**
+   * @return The current cloud height
+   */
+  public double getCloudLayerYOffset(int index) {
+    return cloudLayers.get(index).getCloudYOffset();
+  }
+
+  /**
+   * Change the cloud height
+   */
+  public void setCloudLayerYOffset(int index, double newValue) {
+    cloudLayers.get(index).setCloudYOffset(newValue);
+    scene.refresh();
+  }
+
+
+  public double getCloudLayerZOffset(int index) {
+    return cloudLayers.get(index).getCloudZOffset();
+  }
+
+  public void setCloudLayerZOffset(int index, double newValue) {
+    cloudLayers.get(index).setCloudZOffset(newValue);
+    scene.refresh();
+  }
+
+  public float getCloudLayerEmittance(int index) {
+    return cloudLayers.get(index).getEmittance();
+  }
+
+  public void setCloudLayerEmittance(int index, float value) {
+    cloudLayers.get(index).setEmittance(value);
+    scene.refresh();
+  }
+
+  public float getCloudLayerSpecular(int index) {
+    return cloudLayers.get(index).getSpecular();
+  }
+
+  public void setCloudLayerSpecular(int index, float value) {
+    cloudLayers.get(index).setSpecular(value);
+    scene.refresh();
+  }
+
+  public float getCloudLayerSmoothness(int index) {
+    return cloudLayers.get(index).getSmoothness();
+  }
+
+  public void setCloudLayerSmoothness(int index, float value) {
+    cloudLayers.get(index).setSmoothness(value);
+    scene.refresh();
+  }
+
+  public float getCloudLayerIor(int index) {
+    return cloudLayers.get(index).getIor();
+  }
+
+  public void setCloudLayerIor(int index, float value) {
+    cloudLayers.get(index).setIor(value);
+    scene.refresh();
+  }
+
+  public float getCloudLayerMetalness(int index) {
+    return cloudLayers.get(index).getMetalness();
+  }
+
+  public void setCloudLayerMetalness(int index, float value) {
+    cloudLayers.get(index).setMetalness(value);
+    scene.refresh();
+  }
+
+  public float getCloudLayerAnisotropy(int index) {
+    return cloudLayers.get(index).getAnisotropy();
+  }
+
+  public void setCloudLayerAnisotropy(int index, float value) {
+    cloudLayers.get(index).setAnisotropy(value);
+    scene.refresh();
+  }
+
+  public void addCloudLayer() {
+    cloudLayers.add(new CloudLayer());
+    scene.refresh();
+  }
+
+  public void removeCloudLayer(int index) {
+    cloudLayers.remove(index);
+    scene.refresh();
+  }
+
+  public int getNumCloudLayers() {
+    return cloudLayers.size();
+  }
+
+  public boolean cloudIntersection(Scene scene, Ray ray, Random random) {
+    boolean hit = false;
+    for (CloudLayer layer : cloudLayers) {
+      hit |= layer.intersect(scene, ray, random);
+    }
+    return hit;
   }
 }
