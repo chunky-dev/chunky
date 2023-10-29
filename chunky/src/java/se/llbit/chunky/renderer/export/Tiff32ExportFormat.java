@@ -17,9 +17,11 @@
  */
 package se.llbit.chunky.renderer.export;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.imageformats.tiff.CompressionType;
 import se.llbit.imageformats.tiff.TiffFileWriter;
 import se.llbit.util.TaskTracker;
 
@@ -50,8 +52,12 @@ public class Tiff32ExportFormat implements PictureExportFormat {
 
   @Override
   public void write(OutputStream out, Scene scene, TaskTracker taskTracker) throws IOException {
+    assert(out instanceof FileOutputStream);
     try (TaskTracker.Task task = taskTracker.task("Writing TIFF");
-        TiffFileWriter writer = new TiffFileWriter(out)) {
+        TiffFileWriter writer = new TiffFileWriter(
+          ((FileOutputStream) out).getChannel(),
+          CompressionType.DEFLATE
+        )) {
       writer.export(scene, task);
     }
   }
