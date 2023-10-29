@@ -58,6 +58,8 @@ import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.*;
 import se.llbit.util.annotation.NotNull;
+import se.llbit.util.io.PositionalInputStream;
+import se.llbit.util.io.ZipExport;
 import se.llbit.util.mojangapi.MinecraftProfile;
 
 import java.io.*;
