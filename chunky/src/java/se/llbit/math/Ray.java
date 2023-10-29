@@ -16,14 +16,13 @@
  */
 package se.llbit.math;
 
+import java.util.Random;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.minecraft.Lava;
 import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
-
-import java.util.Random;
 
 /**
  * The ray representation used for ray tracing.
@@ -69,7 +68,27 @@ public class Ray {
   public Vector4 color = new Vector4();
 
   /**
-   * Emittance of previously intersected surface.
+   * The emittance of the previously intersected surface.
+   */
+  public double emittanceValue = 0;
+
+  /**
+   * The reflectance of the previously intersected surface.
+   */
+  public double reflectanceValue = 0;
+
+  /**
+   * The smoothness of the previously intersected surface.
+   */
+  public double roughnessValue = 0;
+
+  /**
+   * The metalness of the previously intersected surface.
+   */
+  public float metalnessValue = 0;
+
+  /**
+   * Emittance of previously intersected surface (used for emitter sampling).
    */
   public Vector3 emittance = new Vector3();
 
@@ -150,6 +169,10 @@ public class Ray {
     depth = 0;
     color.set(0, 0, 0, 0);
     emittance.set(0, 0, 0);
+    emittanceValue = 0;
+    reflectanceValue = 0;
+    roughnessValue = 0;
+    metalnessValue = 0;
     specular = true;
   }
 
@@ -167,6 +190,10 @@ public class Ray {
     geomN.set(other.geomN);
     color.set(0, 0, 0, 0);
     emittance.set(0, 0, 0);
+    emittanceValue = 0;
+    reflectanceValue = 0;
+    roughnessValue = 0;
+    metalnessValue = 0;
     specular = other.specular;
   }
 
@@ -333,7 +360,8 @@ public class Ray {
     set(ray);
     currentMaterial = prevMaterial;
 
-    double roughness = ray.getCurrentMaterial().roughness;
+    double roughness = ray.roughnessValue * ray.getCurrentMaterial().roughness;
+
     if (roughness > Ray.EPSILON) {
       // For rough specular reflections, we interpolate linearly between the diffuse ray direction and the specular direction,
       // which is inspired by https://blog.demofox.org/2020/06/06/casual-shadertoy-path-tracing-2-image-improvement-and-glossy-reflections/

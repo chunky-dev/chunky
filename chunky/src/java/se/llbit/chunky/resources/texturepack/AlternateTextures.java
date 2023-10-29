@@ -71,4 +71,10 @@ public class AlternateTextures extends TextureLoader {
     throw new UnsupportedOperationException("Call load(ZipFile) instead!");
   }
 
+  @Override
+  public void reset() {
+    for (TextureLoader alternative :alternatives) {
+      alternative.reset();
+    }
+  }
 }

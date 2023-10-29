@@ -18,10 +18,20 @@ package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.pbr.EmissionMap;
+import se.llbit.chunky.resources.pbr.LabPbrNormalMap;
+import se.llbit.chunky.resources.pbr.LabPbrSpecularMap;
+import se.llbit.chunky.resources.pbr.MetalnessMap;
+import se.llbit.chunky.resources.pbr.NormalMap;
+import se.llbit.chunky.resources.pbr.OldPbrNormalMap;
+import se.llbit.chunky.resources.pbr.OldPbrSpecularMap;
+import se.llbit.chunky.resources.pbr.ReflectanceMap;
+import se.llbit.chunky.resources.pbr.RoughnessMap;
 import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -41,6 +51,11 @@ public class SimpleTexture extends TextureLoader {
 
   @Override
   protected boolean load(InputStream imageStream) throws IOException {
+    texture.setTexture(getTextureOrFirstFrame(imageStream));
+    return true;
+  }
+
+  private static BitmapImage getTextureOrFirstFrame(InputStream imageStream) throws IOException {
     BitmapImage image = ImageLoader.read(imageStream);
 
     if (image.height > image.width) {
@@ -54,11 +69,10 @@ public class SimpleTexture extends TextureLoader {
           frame0.setPixel(x, y, image.getPixel(x, y));
         }
       }
-      texture.setTexture(frame0);
+      return frame0;
     } else {
-      texture.setTexture(image);
+      return image;
     }
-    return true;
   }
 
   @Override
@@ -67,7 +81,60 @@ public class SimpleTexture extends TextureLoader {
   }
 
   @Override
+  public boolean load(String file, Path texturePack) {
+    boolean loaded = super.load(file, texturePack);
+
+    try {
+      String specularFormat = System.getProperty("chunky.pbr.specular", "labpbr");
+      if (specularFormat.equals("oldpbr") || specularFormat.equals("labpbr")) {
+        try (InputStream in = Files.newInputStream(texturePack.resolve(file + "_s.png"))) {
+          // LabPBR uses the alpha channel for the emission map
+          // Some resource packs use the blue channel (Red=Smoothness, Green=Metalness, Blue=Emission)
+          // (In BSL, this option is called "Old PBR + Emissive")
+          if (specularFormat.equals("oldpbr")) {
+            OldPbrSpecularMap specular = new OldPbrSpecularMap(getTextureOrFirstFrame(in));
+            texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
+            texture.setReflectanceMap(specular.hasReflectance() ? specular : ReflectanceMap.EMPTY);
+            texture.setRoughnessMap(specular.hasRoughness() ? specular : RoughnessMap.EMPTY);
+            texture.setMetalnessMap(MetalnessMap.EMPTY);
+          } else if (specularFormat.equals("labpbr")) {
+            LabPbrSpecularMap specular = new LabPbrSpecularMap(getTextureOrFirstFrame(in));
+            texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
+            texture.setReflectanceMap(specular.hasReflectance() ? specular : ReflectanceMap.EMPTY);
+            texture.setRoughnessMap(specular.hasRoughness() ? specular : RoughnessMap.EMPTY);
+            texture.setMetalnessMap(specular.hasMetalness() ? specular : MetalnessMap.EMPTY);
+          }
+        }
+      }
+    } catch (IOException e) {
+      // Safe to ignore
+    }
+
+    try {
+      String normalFormat = System.getProperty("chunky.pbr.normal", "");
+      if (normalFormat.equals("oldpbr") || normalFormat.equals("labpbr")) {
+        try (InputStream in = Files.newInputStream(texturePack.resolve(file + "_n.png"))) {
+          if (normalFormat.equals("oldpbr")) {
+            texture.setNormalMap(new OldPbrNormalMap(getTextureOrFirstFrame(in)));
+          } else if (normalFormat.equals("labpbr")) {
+            texture.setNormalMap(new LabPbrNormalMap(getTextureOrFirstFrame(in)));
+          }
+        }
+      }
+    } catch (IOException e) {
+      // Safe to ignore
+    }
+
+    return loaded;
+  }
+
+  @Override
   public String toString() {
     return "texture:" + file;
+  }
+
+  @Override
+  public void reset() {
+    texture.reset();
   }
 }

@@ -56,4 +56,9 @@ public class PlayerTextureLoader extends TextureLoader {
   public boolean load(Path texturePack) {
     return load(file, texturePack);
   }
+
+  @Override
+  public void reset() {
+    texture.reset();
+  }
 }

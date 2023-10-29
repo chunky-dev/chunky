@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
+import java.util.Objects;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.resources.ImageLoader;
@@ -125,6 +126,13 @@ public class ShulkerTextureLoader extends TextureLoader {
 
   @Override public boolean load(Path texturePack) {
     return load(entityTexture, texturePack);
+  }
+
+  @Override
+  public void reset() {
+    texture.side.reset();
+    texture.top.reset();
+    texture.bottom.reset();
   }
 }
 

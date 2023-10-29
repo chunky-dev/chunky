@@ -58,10 +58,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -494,6 +491,7 @@ public class ResourcePackChooserController implements Initializable {
 
     private Image icon = MISSING_PACK_PNG;
     private String description = "loading …";
+    private boolean isPbrPack = false;
     private int formatVersion = 0;
 
     public File getFile() {
@@ -514,6 +512,10 @@ public class ResourcePackChooserController implements Initializable {
 
     public String getDescription() {
       return description;
+    }
+
+    public boolean isPbrPack() {
+      return isPbrPack;
     }
 
     public String getFormatVersionString() {
@@ -564,6 +566,16 @@ public class ResourcePackChooserController implements Initializable {
           try (InputStream inputStream = Files.newInputStream(iconPath)) {
             loadIcon(inputStream);
           }
+        }
+
+        try {
+          isPbrPack = Files.walk(root.resolve("assets/minecraft/textures/block"))
+            .anyMatch(path -> {
+              String filename = path.getFileName().toString();
+              return filename.endsWith("_n.png") || filename.endsWith("_s.png");
+            });
+        } catch (IOException e) {
+          isPbrPack = false;
         }
       } catch (UnsupportedOperationException uoex) {
         // default file systems do not support closing
