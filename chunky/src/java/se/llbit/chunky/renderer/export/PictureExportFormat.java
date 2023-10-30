@@ -54,10 +54,10 @@ public interface PictureExportFormat {
   /**
    * Note: It depends on the scene settings if the alpha buffer will be available on export.
    *
-   * @return the required format for the alpha buffer or DISABLED if alpha is not supported.
+   * @return the required format for the alpha buffer or {@link AlphaBuffer.Type#UNSUPPORTED} if alpha is not supported.
    */
   default AlphaBuffer.Type transparencyType() {
-    return AlphaBuffer.Type.DISABLED;
+    return AlphaBuffer.Type.UNSUPPORTED;
   }
 
   /**

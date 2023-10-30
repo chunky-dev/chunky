@@ -2081,7 +2081,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public synchronized void writeFrame(OutputStream out, PictureExportFormat mode, TaskTracker taskTracker) throws IOException {
     if (transparentSky) {
-      if (mode.transparencyType() == AlphaBuffer.Type.DISABLED) {
+      if (mode.transparencyType() == AlphaBuffer.Type.UNSUPPORTED) {
         Log.warn("You selected \"transparent sky\", but the selected picture format \"" + mode.getName() + "\" does not support alpha layers.\nUse a different format like PNG instead.");
         }
       alphaBuffer.computeAlpha(this, mode.transparencyType(), taskTracker);

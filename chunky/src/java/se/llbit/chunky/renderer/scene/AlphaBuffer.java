@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
 public class AlphaBuffer {
 
   public enum Type {
-    DISABLED(0,
+    UNSUPPORTED(0,
       (buffer, index, alphaValue) -> {
       }
     ),
@@ -47,7 +47,7 @@ public class AlphaBuffer {
     }
   }
 
-  private Type type = Type.DISABLED;
+  private Type type = Type.UNSUPPORTED;
   private ByteBuffer buffer = null;
 
   public Type getType() {
@@ -59,7 +59,7 @@ public class AlphaBuffer {
   }
 
   public void reset() {
-    type = Type.DISABLED;
+    type = Type.UNSUPPORTED;
     buffer = null;
   }
 
@@ -67,7 +67,7 @@ public class AlphaBuffer {
    * Compute the alpha channel.
    */
   void computeAlpha(Scene scene, Type type, TaskTracker taskTracker) {
-    if(type == Type.DISABLED) return;
+    if(type == Type.UNSUPPORTED) return;
     if(this.type == type && buffer != null) return;
 
     try (TaskTracker.Task task = taskTracker.task("Computing alpha channel")) {
