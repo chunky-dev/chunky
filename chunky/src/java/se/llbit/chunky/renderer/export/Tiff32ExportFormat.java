@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
+import se.llbit.chunky.renderer.scene.AlphaBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.imageformats.tiff.CompressionType;
 import se.llbit.imageformats.tiff.TiffFileWriter;
@@ -53,7 +54,7 @@ public class Tiff32ExportFormat implements PictureExportFormat {
   }
 
   @Override
-  public boolean isTransparencySupported() {
+  public boolean wantsPostprocessing() {
     return false;
   }
 

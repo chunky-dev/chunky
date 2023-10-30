@@ -18,6 +18,8 @@ package se.llbit.chunky.renderer.export;
 
 import java.io.IOException;
 import java.io.OutputStream;
+
+import se.llbit.chunky.renderer.scene.AlphaBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
@@ -50,12 +52,20 @@ public interface PictureExportFormat {
   String getExtension();
 
   /**
-   * Check if this format supports transparency (used for transparent sky).
+   * Note: It depends on the scene settings if the alpha buffer will be available on export.
    *
-   * @return True if this format supports transparency, false otherwise
+   * @return the required format for the alpha buffer or DISABLED if alpha is not supported.
    */
-  default boolean isTransparencySupported() {
-    return false;
+  default AlphaBuffer.Type transparencyType() {
+    return AlphaBuffer.Type.DISABLED;
+  }
+
+  /**
+   * @return true, if the export formats wants preprocessed buffer data<br>
+   *         false, if the export format uses the unprocessed sampling data
+   */
+  default boolean wantsPostprocessing() {
+    return true;
   }
 
   /**

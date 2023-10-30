@@ -755,7 +755,7 @@ public class ChunkyFxController
       filters.put(filter, mode);
     }
     fileChooser.getExtensionFilters().stream()
-      .filter(e -> filters.get(e).equals(scene.outputMode))
+      .filter(e -> filters.get(e).equals(scene.getPictureExportFormat()))
       .findFirst().ifPresent(fileChooser::setSelectedExtensionFilter);
     fileChooser.setInitialFileName(String.format("%s-%d",
         scene.name(), renderManager.getRenderStatus().getSpp()));

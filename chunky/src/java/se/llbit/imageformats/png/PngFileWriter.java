@@ -20,10 +20,13 @@ package se.llbit.imageformats.png;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+
+import se.llbit.chunky.renderer.scene.AlphaBuffer;
 import se.llbit.util.TaskTracker;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.zip.Deflater;
 
 /**
@@ -98,7 +101,7 @@ public class PngFileWriter implements AutoCloseable {
   /**
    * Write the image to a PNG file.
    */
-  public void write(int[] data, byte[] alpha, int width, int height,
+  public void write(int[] data, ByteBuffer alpha, int width, int height,
       TaskTracker.Task task) throws IOException {
     writeChunk(new IHDR(width, height, IHDR.COLOR_TYPE_RGBA));
     IDATWriter idat = new IDATWriter();
@@ -111,7 +114,7 @@ public class PngFileWriter implements AutoCloseable {
         idat.write((rgb >> 16) & 0xFF);
         idat.write((rgb >> 8) & 0xFF);
         idat.write(rgb & 0xFF);
-        idat.write(alpha[i]);
+        idat.write(alpha.get(i));
         i += 1;
       }
       task.update(height, y + 1);
