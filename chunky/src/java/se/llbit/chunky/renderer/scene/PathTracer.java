@@ -256,22 +256,41 @@ public class PathTracer implements RayTracer {
         cumulativeColor.z += emittance.z + ray.color.z * (directLightB * scene.sun.emittance.z + next.color.z);
       }
     } else {
-      Vector4 rayColor = new Vector4(ray.color);
-
-      Vector3 outboundDirection = new Vector3();
-      double x1 = random.nextDouble();
-      double x2 = random.nextDouble();
-      henyeyGreensteinSampleP(currentMat.anisotropy, inboundDirection, outboundDirection, x1, x2);
-      next.d.set(outboundDirection);
-      next.d.normalize();
-
-      hit |= pathTrace(scene, next, state, false);
-      if (hit) {
-        cumulativeColor.x += emittance.x + ray.color.x * (next.color.x);
-        cumulativeColor.y += emittance.y + ray.color.y * (next.color.y);
-        cumulativeColor.z += emittance.z + ray.color.z * (next.color.z);
+      double sun_az = scene.sun().getAzimuth();
+      double sun_alt = scene.sun().getAltitude();
+      Vector3 sun_dir = new Vector3(FastMath.cos(sun_az)*FastMath.cos(sun_alt), FastMath.sin(sun_az)*FastMath.cos(sun_alt), FastMath.sin(sun_alt));
+      double circle_radius = scene.sun().getSunRadius() * scene.sun().getDiffuseSampleRadius();
+      double sample_chance = scene.sun().getDiffuseSampleChance();
+      if(Math.abs(currentMat.anisotropy) > 0.99 || !scene.getSunSamplingStrategy().isDiffuseSampling()) {
+        sample_chance = 0;
       }
-      ray.color.set(rayColor);
+      if(random.nextDouble() < sample_chance) {
+        Vector3 outboundDirection = new Vector3();
+        double x1 = random.nextDouble();
+        double x2 = random.nextDouble();
+
+      } else {
+        Vector4 rayColor = new Vector4(ray.color);
+        while(true) {
+          Vector3 outboundDirection = new Vector3();
+          double x1 = random.nextDouble();
+          double x2 = random.nextDouble();
+          henyeyGreensteinSampleP(currentMat.anisotropy, inboundDirection, outboundDirection, x1, x2);
+          next.d.set(outboundDirection);
+          next.d.normalize();
+          if(next.d.dot(sun_dir) > FastMath.cos(circle_radius)) {
+            continue;
+          }
+          hit |= pathTrace(scene, next, state, false);
+          if (hit) {
+            cumulativeColor.x += (emittance.x + ray.color.x * (next.color.x)) / (1 - sample_chance);
+            cumulativeColor.y += (emittance.y + ray.color.y * (next.color.y)) / (1 - sample_chance);
+            cumulativeColor.z += (emittance.z + ray.color.z * (next.color.z)) / (1 - sample_chance);
+          }
+          break;
+        }
+        ray.color.set(rayColor);
+      }
 
     }
     return hit;
