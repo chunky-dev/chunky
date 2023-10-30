@@ -54,6 +54,11 @@ public class Tiff32ExportFormat implements PictureExportFormat {
   }
 
   @Override
+  public AlphaBuffer.Type transparencyType() {
+    return AlphaBuffer.Type.FP32;
+  }
+
+  @Override
   public boolean wantsPostprocessing() {
     return false;
   }
