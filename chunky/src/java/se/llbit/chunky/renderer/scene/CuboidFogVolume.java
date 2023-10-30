@@ -18,7 +18,7 @@ public class CuboidFogVolume extends FogVolume {
   private AABB aabb;
 
   @Override
-  public boolean intersect(Ray ray, Scene scene, Random random) {
+  public boolean intersect(Scene scene, Ray ray, Random random) {
     double distance;
     double fogPenetrated = -FastMath.log(1 - random.nextDouble());
     double fogDistance = fogPenetrated / density;

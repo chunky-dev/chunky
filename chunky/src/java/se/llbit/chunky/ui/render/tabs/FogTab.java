@@ -56,6 +56,7 @@ public class FogTab extends ScrollPane implements RenderControlsTab, Initializab
   @FXML private ComboBox<FogMode> fogMode;
   @FXML private TitledPane fogDetailsPane;
   @FXML private VBox fogDetailsBox;
+  @FXML private CheckBox previewParticleFog;
   @FXML private TableView<FogVolumeData> fogVolumeTable;
   @FXML private TableColumn<FogVolumeData, String> typeCol;
   @FXML private Button addVolume;
@@ -80,6 +81,10 @@ public class FogTab extends ScrollPane implements RenderControlsTab, Initializab
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
+    previewParticleFog.setTooltip(new Tooltip("Render particle fog in the render preview."));
+    previewParticleFog.selectedProperty().addListener((observer, oldValue, newValue) ->
+      scene.setPreviewParticleFog(newValue)
+    );
     fogMode.getItems().addAll(FogMode.values());
     fogMode.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
       scene.setFogMode(newValue);
@@ -126,6 +131,7 @@ public class FogTab extends ScrollPane implements RenderControlsTab, Initializab
     fogMode.getSelectionModel().select(scene.fog.getFogMode());
     uniformFogSettings.update(scene);
     layeredFogSettings.update(scene);
+    previewParticleFog.setSelected(scene.getPreviewParticleFog());
     rebuildList();
   }
 

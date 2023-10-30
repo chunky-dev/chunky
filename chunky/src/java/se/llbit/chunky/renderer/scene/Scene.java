@@ -1685,7 +1685,9 @@ public class Scene implements JsonSerializable, Refreshable {
     ray.o.x -= origin.x;
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
-    while (PreviewRayTracer.nextIntersection(this, ray)) {
+    while (PreviewRayTracer.nextIntersection(this, ray, null,
+      new IntersectionConfig(true,
+        false, waterPlaneEnabled, true))) {
       if (ray.getCurrentMaterial() != Air.INSTANCE) {
         return true;
       }
@@ -2656,11 +2658,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("waterVisibility", waterVisibility);
     json.add("useCustomWaterColor", useCustomWaterColor);
     if (useCustomWaterColor) {
-      JsonObject colorObj = new JsonObject();
-      colorObj.add("red", waterColor.x);
-      colorObj.add("green", waterColor.y);
-      colorObj.add("blue", waterColor.z);
-      json.add("waterColor", colorObj);
+      json.add("waterColor", ColorUtil.rgbToJson(waterColor));
     }
     waterShading.save(json);
     json.add("fog", fog.toJson());
@@ -2938,10 +2936,7 @@ public class Scene implements JsonSerializable, Refreshable {
     waterVisibility = json.get("waterVisibility").doubleValue(waterVisibility);
     useCustomWaterColor = json.get("useCustomWaterColor").boolValue(useCustomWaterColor);
     if (useCustomWaterColor) {
-      JsonObject colorObj = json.get("waterColor").object();
-      waterColor.x = colorObj.get("red").doubleValue(waterColor.x);
-      waterColor.y = colorObj.get("green").doubleValue(waterColor.y);
-      waterColor.z = colorObj.get("blue").doubleValue(waterColor.z);
+      waterColor.set(ColorUtil.jsonToRGB(json.get("waterColor").asObject()));
     }
     String waterShader = json.get("waterShader").stringValue("SIMPLEX");
     if(waterShader.equals("LEGACY"))
