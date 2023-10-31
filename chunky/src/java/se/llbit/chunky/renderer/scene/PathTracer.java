@@ -258,7 +258,7 @@ public class PathTracer implements RayTracer {
     } else {
       double sun_az = scene.sun().getAzimuth();
       double sun_alt = scene.sun().getAltitude();
-      Vector3 sun_dir = new Vector3(FastMath.cos(sun_az)*FastMath.cos(sun_alt), FastMath.sin(sun_az)*FastMath.cos(sun_alt), FastMath.sin(sun_alt));
+      Vector3 sun_dir = new Vector3(FastMath.cos(sun_az)*FastMath.cos(sun_alt), FastMath.sin(sun_alt), FastMath.sin(sun_az)*FastMath.cos(sun_alt));
       double circle_radius = scene.sun().getSunRadius() * scene.sun().getDiffuseSampleRadius();
       double sample_chance = scene.sun().getDiffuseSampleChance();
       double sample_area = (1 - FastMath.cos(circle_radius))*2*Math.PI;
@@ -302,7 +302,6 @@ public class PathTracer implements RayTracer {
           }
         }
       } else {
-        Vector4 rayColor = new Vector4(ray.color);
         Vector3 outboundDirection = new Vector3();
         double x1 = random.nextDouble();
         double x2 = random.nextDouble();
@@ -315,7 +314,6 @@ public class PathTracer implements RayTracer {
           cumulativeColor.y += emittance.y + ray.color.y * (next.color.y);
           cumulativeColor.z += emittance.z + ray.color.z * (next.color.z);
         }
-        ray.color.set(rayColor);
       }
     }
     return hit;
