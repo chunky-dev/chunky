@@ -24,7 +24,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.SceneIOProvider;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.renderer.scene.sky.celestialbodies.CelestialBodyType;
 import se.llbit.json.JsonObject;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -146,7 +146,7 @@ public class Sun implements JsonSerializable {
 
   private final Refreshable scene;
 
-  private CelestialBodyType type = new CelestialBodyType.Sun();
+  private CelestialBodyType type = CelestialBodyType.DEFAULT;
 
   /**
    * Sun radius
