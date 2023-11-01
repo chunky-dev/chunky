@@ -33,7 +33,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import se.llbit.chunky.renderer.scene.Sky;
+import se.llbit.chunky.renderer.scene.sky.Sky;
 import se.llbit.chunky.ui.render.tabs.SkyTab;
 import se.llbit.fx.LuxColorPicker;
 import se.llbit.json.JsonParser;

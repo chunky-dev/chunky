@@ -15,10 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.scene;
+package se.llbit.chunky.renderer.scene.sky;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.minecraft.Air;
+import se.llbit.chunky.renderer.SceneIOProvider;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.HDRTexture;
 import se.llbit.chunky.resources.PFMTexture;
 import se.llbit.chunky.resources.Texture;
@@ -143,11 +145,11 @@ public class Sky implements JsonSerializable {
   }
 
   @NotNull private Texture skymap = Texture.EMPTY_TEXTURE;
-  private final Texture skybox[] =
+  private final Texture[] skybox =
       {Texture.EMPTY_TEXTURE, Texture.EMPTY_TEXTURE, Texture.EMPTY_TEXTURE, Texture.EMPTY_TEXTURE,
           Texture.EMPTY_TEXTURE, Texture.EMPTY_TEXTURE};
   private String skymapFileName = "";
-  private final String skyboxFileName[] = {"", "", "", "", "", ""};
+  private final String[] skyboxFileName = {"", "", "", "", "", ""};
   private final Scene scene;
 
   private Matrix3 rotation = new Matrix3();
@@ -195,18 +197,18 @@ public class Sky implements JsonSerializable {
   /**
    * Load the configured skymap file
    */
-  public void reloadSkymap(@Nullable File sceneDirectory) {
+  public void reloadSkymap(SceneIOProvider ioContext) {
     switch (mode) {
       case SKYMAP_EQUIRECTANGULAR:
       case SKYMAP_ANGULAR:
         if (!skymapFileName.isEmpty()) {
-          loadSkymap(skymapFileName, sceneDirectory);
+          loadSkymap(ioContext, skymapFileName);
         }
         break;
       case SKYBOX:
         for (int i = 0; i < 6; ++i) {
           if (!skyboxFileName[i].isEmpty()) {
-            loadSkyboxTexture(skyboxFileName[i], i, sceneDirectory);
+            loadSkyboxTexture(ioContext, skyboxFileName[i], i);
           }
         }
       default:
@@ -217,9 +219,9 @@ public class Sky implements JsonSerializable {
   /**
    * Load a panoramic skymap texture.
    */
-  public void loadSkymap(String fileName, @Nullable File sceneDirectory) {
+  public void loadSkymap(SceneIOProvider ioContext, String fileName) {
     skymapFileName = fileName;
-    skymap = loadSkyTexture(fileName, skymap, sceneDirectory);
+    skymap = loadSkyTexture(ioContext, fileName, skymap);
     scene.refresh();
   }
 
@@ -252,7 +254,7 @@ public class Sky implements JsonSerializable {
     simulatedSkyMode = other.simulatedSkyMode;
     skyCache.set(other.skyCache);
     skyCache.setSimulatedSkyMode(other.simulatedSkyMode);
-    if (simulatedSkyMode.updateSun(scene.sun, horizonOffset)) {
+    if (simulatedSkyMode.updateSun(scene.sun(), horizonOffset)) {
       skyCache.precalculateSky();
     }
   }
@@ -593,7 +595,7 @@ public class Sky implements JsonSerializable {
    */
   public void setSimulatedSkyMode(int mode) {
     this.simulatedSkyMode = skies.get(mode);
-    this.simulatedSkyMode.updateSun(scene.sun, horizonOffset);
+    this.simulatedSkyMode.updateSun(scene.sun(), horizonOffset);
     skyCache.setSimulatedSkyMode(this.simulatedSkyMode);
     scene.refresh();
   }
@@ -861,40 +863,33 @@ public class Sky implements JsonSerializable {
     gradient.add(new Vector4(0x75 / 255., 0xAA / 255., 0xFF / 255., 1));
   }
 
-  public void loadSkyboxTexture(String fileName, int index, @Nullable File sceneDirectory) {
+  public void loadSkyboxTexture(SceneIOProvider ioContext, String fileName, int index) {
     if (index < 0 || index >= 6) {
       throw new IllegalArgumentException();
     }
     skyboxFileName[index] = fileName;
-    skybox[index] = loadSkyTexture(fileName, skybox[index], sceneDirectory);
+    skybox[index] = loadSkyTexture(ioContext, fileName, skybox[index]);
     scene.refresh();
   }
 
-  private Texture loadSkyTexture(String fileName, Texture prevTexture, @Nullable File sceneDirectory) {
-    String resolvedFilename = sceneDirectory == null
-      ? fileName
-      : Paths.get(sceneDirectory.getAbsolutePath()).resolve(fileName).toAbsolutePath().toString();
-    File textureFile = new File(resolvedFilename);
-    if (textureFile.exists()) {
-      try {
-        Log.info("Loading skymap: " + fileName);
-        if (fileName.toLowerCase().endsWith(".pfm")) {
-          return new PFMTexture(textureFile);
-        } else if (fileName.toLowerCase().endsWith(".hdr")) {
-          return new HDRTexture(textureFile);
-        } else {
-          return new SkymapTexture(ImageLoader.read(textureFile));
-        }
-      } catch (Throwable e) {
-        if (e instanceof IllegalArgumentException && e.getMessage().contains("Invalid scanline stride")) {
-          Log.errorf("Failed to load skymap: %s\nImage too big. Image must contain less than 715,827,882 pixels.", fileName);
-        } else {
-          Log.error("Failed to load skymap: " + fileName, e);
-        }
+  private Texture loadSkyTexture(SceneIOProvider ioContext, String fileName, Texture prevTexture) {
+    try {
+      File textureFile = ioContext.resolveLinkedFile(fileName);
+      Log.info("Loading skymap: " + fileName);
+      if (fileName.toLowerCase().endsWith(".pfm")) {
+        return new PFMTexture(textureFile);
+      } else if (fileName.toLowerCase().endsWith(".hdr")) {
+        return new HDRTexture(textureFile);
+      } else {
+        return new SkymapTexture(ImageLoader.read(textureFile));
+      }
+    } catch (Throwable e) {
+      if (e instanceof IllegalArgumentException && e.getMessage().contains("Invalid scanline stride")) {
+        Log.errorf("Failed to load skymap: %s\nImage too big. Image must contain less than 715,827,882 pixels.", fileName);
+      } else {
+        Log.error("Failed to load skymap: " + fileName, e);
         return prevTexture;
       }
-    } else {
-      Log.errorf("Failed to load skymap: %s (file does not exist)", fileName);
       return prevTexture;
     }
   }
@@ -988,9 +983,9 @@ public class Sky implements JsonSerializable {
   }
 
   public boolean cloudIntersection(Scene scene, Ray ray) {
-    double ox = ray.o.x + scene.origin.x;
-    double oy = ray.o.y + scene.origin.y;
-    double oz = ray.o.z + scene.origin.z;
+    double ox = ray.o.x + scene.getOrigin().x;
+    double oy = ray.o.y + scene.getOrigin().y;
+    double oz = ray.o.z + scene.getOrigin().z;
     double offsetX = cloudOffset.x;
     double offsetY = cloudOffset.y;
     double offsetZ = cloudOffset.z;

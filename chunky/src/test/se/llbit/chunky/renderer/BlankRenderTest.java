@@ -22,7 +22,7 @@ import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ChunkyOptions;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.renderer.scene.Sky;
+import se.llbit.chunky.renderer.scene.sky.Sky;
 import se.llbit.json.JsonObject;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;

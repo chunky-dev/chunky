@@ -23,8 +23,9 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.SceneIOProvider;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.renderer.scene.Sky;
+import se.llbit.chunky.renderer.scene.sky.Sky;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.math.QuickMath;
 
@@ -35,6 +36,7 @@ import java.util.ResourceBundle;
 
 public class SkyboxSettings extends VBox implements Initializable {
   private Scene scene;
+  private SceneIOProvider ioContext;
 
   @FXML private Button up;
   @FXML private Button down;
@@ -90,12 +92,13 @@ public class SkyboxSettings extends VBox implements Initializable {
     File imageFile = fileChooser.showOpenDialog(getScene().getWindow());
     if (imageFile != null) {
       skyboxDirectory = imageFile.getParentFile();
-      scene.sky().loadSkyboxTexture(imageFile.getAbsolutePath(), textureIndex, null);
+      scene.sky().loadSkyboxTexture(ioContext, imageFile.getAbsolutePath(), textureIndex);
     }
   }
 
   public void setRenderController(RenderController controller) {
     scene = controller.getSceneManager().getScene();
+    ioContext = controller.getContext();
   }
 
   public void update(Scene scene) {
