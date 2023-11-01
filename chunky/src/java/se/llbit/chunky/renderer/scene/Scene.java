@@ -2374,6 +2374,20 @@ public class Scene implements JsonSerializable, Refreshable {
     return backBuffer;
   }
 
+  /**
+   * @return returns a view of the alpha channel as uint8 array
+   * @deprecated Replaced by {@link #getAlphaBuffer()}
+   */
+  @Deprecated(forRemoval = true)
+  public byte[] getAlphaChannel() {
+    if(alphaBuffer.getType() != AlphaBuffer.Type.UINT8) {
+      throw new UnsupportedOperationException(
+        "Export Format uses out-of-date API, please update the plugin for \""+ pictureExportFormat.getName() +"\""
+      );
+    }
+    return alphaBuffer.getBuffer().array();
+  }
+
   public AlphaBuffer getAlphaBuffer() {
     return alphaBuffer;
   }

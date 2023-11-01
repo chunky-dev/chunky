@@ -52,12 +52,21 @@ public interface PictureExportFormat {
   String getExtension();
 
   /**
+   * @return true, if this export format supports exporting the alpha channel
+   * @deprecated Replaced by {@link #transparencyType()} and usage of {@link AlphaBuffer}
+   */
+  @Deprecated(forRemoval = true)
+  default boolean isTransparencySupported() {
+    return false;
+  }
+
+  /**
    * Note: It depends on the scene settings if the alpha buffer will be available on export.
    *
    * @return the required format for the alpha buffer or {@link AlphaBuffer.Type#UNSUPPORTED} if alpha is not supported.
    */
   default AlphaBuffer.Type transparencyType() {
-    return AlphaBuffer.Type.UNSUPPORTED;
+    return isTransparencySupported() ? AlphaBuffer.Type.UINT8 : AlphaBuffer.Type.UNSUPPORTED;
   }
 
   /**
