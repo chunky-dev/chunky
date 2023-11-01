@@ -40,6 +40,7 @@ public class TiffFileWriter implements AutoCloseable {
 
   private final FinalizableBFCOutputStream out;
   private final CompressionType compressionType;
+  private FinalizableBFCOutputStream.UnfinalizedData.Int nextIFDOffset;
 
   public TiffFileWriter(
     FileChannel fileChannel,
@@ -51,10 +52,15 @@ public class TiffFileWriter implements AutoCloseable {
     // - MM -> magic bytes
     // - \0* -> magic number 42 for big-endian byte order
     out.writeInt(0x4D4D002A);
+    nextIFDOffset = out.writeUnfinalizedInt();
   }
 
   public TiffFileWriter(FileOutputStream outputStream) throws IOException {
     this(outputStream.getChannel(), CompressionType.NONE);
+  }
+
+  public void doFinalization() throws IOException {
+    out.doFinalization();
   }
 
   @Override
@@ -65,11 +71,12 @@ public class TiffFileWriter implements AutoCloseable {
   /**
    * Export sample buffer as Baseline TIFF RGB image / TIFF Class R image
    * with 32 bits per color component.
+   *
+   * <p>Note: This method does not close the output stream, and can be called multiple times for multiple layers.
+   *       Use {@link #doFinalization()} to complete the export.
    */
   public void export(Scene scene, TaskTracker.Task task) throws IOException {
-    FinalizableBFCOutputStream.UnfinalizedData.Int ifdOffset = out.writeUnfinalizedInt();
-
-    writePrimaryIDF(ifdOffset, scene, task);
+    nextIFDOffset = writePrimaryIDF(nextIFDOffset, scene, task);
   }
 
   private static final DateTimeFormatter DATETIME_FORMAT = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");

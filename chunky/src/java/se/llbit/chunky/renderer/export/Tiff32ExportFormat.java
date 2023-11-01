@@ -19,7 +19,14 @@ package se.llbit.chunky.renderer.export;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.imageformats.tiff.CompressionType;
 import se.llbit.imageformats.tiff.TiffFileWriter;
@@ -52,13 +59,37 @@ public class Tiff32ExportFormat implements PictureExportFormat {
 
   @Override
   public void write(OutputStream out, Scene scene, TaskTracker taskTracker) throws IOException {
-    assert(out instanceof FileOutputStream);
-    try (TaskTracker.Task task = taskTracker.task("Writing TIFF");
-        TiffFileWriter writer = new TiffFileWriter(
-          ((FileOutputStream) out).getChannel(),
-          CompressionType.DEFLATE
+    try (TaskTracker.Task task = taskTracker.task("Writing TIFF")) {
+      if (out instanceof FileOutputStream) {
+        write(((FileOutputStream) out).getChannel(), scene, task);
+      } else {
+        // fallback for the case, that the output stream was not created on a file
+        Path tempFile = Files.createTempFile(scene.name + "-", getExtension());
+        try (FileChannel fileChannel = FileChannel.open(tempFile, StandardOpenOption.DELETE_ON_CLOSE,
+          StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
+          StandardOpenOption.READ, StandardOpenOption.WRITE
         )) {
-      writer.export(scene, task);
+          write(fileChannel, scene, task);
+          // rewind channel
+          fileChannel.position(0);
+          try (InputStream inputStream = Channels.newInputStream(fileChannel)) {
+            // copy temp file to output
+            inputStream.transferTo(out);
+          }
+        }
+      }
     }
+  }
+
+  /**
+   * Note: does not (!) close the file channel after writing
+   */
+  private void write(FileChannel fileChannel, Scene scene, TaskTracker.Task task) throws IOException {
+    TiffFileWriter writer = new TiffFileWriter(
+      fileChannel,
+      CompressionType.DEFLATE
+    );
+    writer.export(scene, task);
+    writer.doFinalization();
   }
 }

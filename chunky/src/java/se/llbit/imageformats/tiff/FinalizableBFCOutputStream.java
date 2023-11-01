@@ -29,11 +29,22 @@ class FinalizableBFCOutputStream extends BufferedFileChannelOutputStream {
     return ud;
   }
 
-  @Override
-  public void close() throws IOException {
+  /**
+   * writes remaining unfinalized data
+   */
+  public void doFinalization() throws IOException {
     for(UnfinalizedData<?> data : finalizationQueue) {
       data.write(this);
     }
+    finalizationQueue.clear();
+  }
+
+  /**
+   * does finalization, then closes the output stream
+   */
+  @Override
+  public void close() throws IOException {
+    doFinalization();
     super.close();
   }
 
