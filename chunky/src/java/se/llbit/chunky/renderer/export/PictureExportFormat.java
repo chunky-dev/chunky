@@ -53,7 +53,7 @@ public interface PictureExportFormat {
 
   /**
    * @return true, if this export format supports exporting the alpha channel
-   * @deprecated Replaced by {@link #transparencyType()} and usage of {@link AlphaBuffer}
+   * @deprecated Replaced by {@link #getTransparencyType()} and usage of {@link AlphaBuffer}
    */
   @Deprecated(forRemoval = true)
   default boolean isTransparencySupported() {
@@ -65,7 +65,7 @@ public interface PictureExportFormat {
    *
    * @return the required format for the alpha buffer or {@link AlphaBuffer.Type#UNSUPPORTED} if alpha is not supported.
    */
-  default AlphaBuffer.Type transparencyType() {
+  default AlphaBuffer.Type getTransparencyType() {
     return isTransparencySupported() ? AlphaBuffer.Type.UINT8 : AlphaBuffer.Type.UNSUPPORTED;
   }
 

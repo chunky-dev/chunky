@@ -43,7 +43,7 @@ public class PngExportFormat implements PictureExportFormat {
   }
 
   @Override
-  public AlphaBuffer.Type transparencyType() {
+  public AlphaBuffer.Type getTransparencyType() {
     return AlphaBuffer.Type.UINT8;
   }
 
@@ -53,7 +53,7 @@ public class PngExportFormat implements PictureExportFormat {
         PngFileWriter writer = new PngFileWriter(out)) {
       BitmapImage backBuffer = scene.getBackBuffer();
       AlphaBuffer alpha = scene.getAlphaBuffer();
-      if (alpha.getType() == transparencyType()) {
+      if (alpha.getType() == getTransparencyType()) {
         writer.write(backBuffer.data, alpha.getBuffer(), scene.canvasWidth(), scene.canvasHeight(), task);
       } else {
         writer.write(backBuffer.data, scene.canvasWidth(), scene.canvasHeight(), task);
