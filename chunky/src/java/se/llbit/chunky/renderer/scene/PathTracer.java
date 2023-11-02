@@ -140,7 +140,7 @@ public class PathTracer implements RayTracer {
       for (int i = 0; i < count; i++) {
         boolean doMetal = pMetal > Ray.EPSILON && random.nextFloat() < pMetal;
         if (doMetal || (pSpecular > Ray.EPSILON && random.nextFloat() < pSpecular)) {
-          hit |= doSpecularReflection(ray, next, cumulativeColor, doMetal, random, state, scene);
+          hit |= doSpecularReflection(ray, next, currentMat, cumulativeColor, doMetal, random, state, scene);
         } else if(random.nextFloat() < pDiffuse) {
           hit |= doDiffuseReflection(ray, next, currentMat, cumulativeColor, random, state, scene);
         } else if (n1 != n2) {
@@ -202,20 +202,23 @@ public class PathTracer implements RayTracer {
     return hit;
   }
 
-  private static boolean doSpecularReflection(Ray ray, Ray next, Vector4 cumulativeColor, boolean doMetal, Random random, WorkerState state, Scene scene) {
+  private static boolean doSpecularReflection(Ray ray, Ray next, Material currentMat, Vector4 cumulativeColor, boolean doMetal, Random random, WorkerState state, Scene scene) {
     boolean hit = false;
+    Vector3 emittance = new Vector3();
+    if(scene.emittersEnabled && currentMat.emittance > Ray.EPSILON) {
+      doEmittanceMapping(emittance, ray.color, scene, currentMat);
+    }
     next.specularReflection(ray, random);
     if (pathTrace(scene, next, state, false)) {
-
       if (doMetal) {
         // use the albedo color as specular color
-        cumulativeColor.x += ray.color.x * next.color.x;
-        cumulativeColor.y += ray.color.y * next.color.y;
-        cumulativeColor.z += ray.color.z * next.color.z;
+        cumulativeColor.x += emittance.x + ray.color.x * next.color.x;
+        cumulativeColor.y += emittance.y + ray.color.y * next.color.y;
+        cumulativeColor.z += emittance.z + ray.color.z * next.color.z;
       } else {
-        cumulativeColor.x += next.color.x;
-        cumulativeColor.y += next.color.y;
-        cumulativeColor.z += next.color.z;
+        cumulativeColor.x += emittance.x + next.color.x;
+        cumulativeColor.y += emittance.y + next.color.y;
+        cumulativeColor.z += emittance.z + next.color.z;
       }
       hit = true;
     }

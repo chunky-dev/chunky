@@ -619,25 +619,49 @@ public class BlockPalette {
     materialProperties.put("minecraft:sculk_catalyst", block -> {
       block.setLightLevel(6);
     });
+    Consumer<Block> copperBulbRedLight = block -> {
+      block.addRefColorGammaCorrected(217, 35, 35, 0.05f);
+      block.addRefColorGammaCorrected(176, 23, 23, 0.05f);
+      block.addRefColorGammaCorrected(138, 24, 24, 0.05f);
+    };
     for(String s : new String[]{"minecraft:", "minecraft:waxed_"}) {
       materialProperties.put(s + "copper_bulb", block -> {
-        if(block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
-          block.emittance = 1.0f;
+        block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+        block.addRefColorGammaCorrected(255, 235, 186, 0.25f);
+        block.addRefColorGammaCorrected(251, 184, 96, 0.25f);
+        copperBulbRedLight.accept(block);
+        copperConfig.accept(block);
+        if(block instanceof CopperBulb && (((CopperBulb) block).isLit() || ((CopperBulb) block).isPowered())) {
+          block.setLightLevel(15);
         }
       });
       materialProperties.put(s + "exposed_copper_bulb", block -> {
+        block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+        block.addRefColorGammaCorrected(247, 204, 136, 0.25f);
+        block.addRefColorGammaCorrected(238, 155, 50, 0.2f);
+        copperBulbRedLight.accept(block);
+        exposedCopperConfig.accept(block);
         if(block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
-          block.emittance = 12 / 15f;
+          block.setLightLevel(12);
         }
       });
       materialProperties.put(s + "weathered_copper_bulb", block -> {
+        block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+        block.addRefColorGammaCorrected(234, 184, 91, 0.25f);
+        block.addRefColorGammaCorrected(224, 151, 53, 0.25f);
+        copperBulbRedLight.accept(block);
+        weatheredCopperConfig.accept(block);
         if(block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
-          block.emittance = 8 / 15f;
+          block.setLightLevel(8);
         }
       });
       materialProperties.put(s + "oxidized_copper_bulb", block -> {
+        block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
+        block.addRefColorGammaCorrected(212, 153, 67, 0.25f);
+        block.addRefColorGammaCorrected(191, 113, 65, 0.25f);
+        copperBulbRedLight.accept(block);
         if(block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
-          block.emittance = 4 / 15f;
+          block.setLightLevel(4);
         }
       });
     }
