@@ -17,8 +17,10 @@
  */
 package se.llbit.imageformats.tiff;
 
+import java.io.DataOutput;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.FloatBuffer;
 import java.nio.channels.FileChannel;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,6 +29,7 @@ import se.llbit.chunky.main.Version;
 import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
+import se.llbit.chunky.renderer.scene.AlphaBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.log.Log;
 import se.llbit.util.TaskTracker;
@@ -82,6 +85,7 @@ public class TiffFileWriter implements AutoCloseable {
   private static final DateTimeFormatter DATETIME_FORMAT = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
 
   private static final int BYTES_PER_SAMPLE = 4;
+
   private FinalizableBFCOutputStream.UnfinalizedData.Int writePrimaryIDF(
     FinalizableBFCOutputStream.UnfinalizedData.Int ifdOffset,
     Scene scene,
@@ -92,33 +96,59 @@ public class TiffFileWriter implements AutoCloseable {
 
     BasicIFD idf = new BasicIFD(width, height, compressionType);
 
-    // Number of components per pixel (R, G, B)
-    idf.addTag(IFDTag.TAG_SAMPLES_PER_PIXEL, (short) 3);
-    short bitsPerSample = (short) (8 * BYTES_PER_SAMPLE);
-    idf.addMultiTag(IFDTag.TAG_BITS_PER_SAMPLE, new short[]{ bitsPerSample, bitsPerSample, bitsPerSample });
-    // Interpret each component as IEEE754 float32
-    idf.addMultiTag(IFDTag.TAG_SAMPLE_FORMAT, new short[]{ 3, 3, 3 });
+    boolean embedAlpha = scene.getAlphaBuffer().getType() == AlphaBuffer.Type.FP32;
+    if (embedAlpha) {
+      // Number of components per pixel (R, G, B, A)
+      idf.addTag(IFDTag.TAG_SAMPLES_PER_PIXEL, (short) 4);
+      short bitsPerSample = (short) (8 * BYTES_PER_SAMPLE);
+      idf.addMultiTag(IFDTag.TAG_BITS_PER_SAMPLE, new short[]{bitsPerSample, bitsPerSample, bitsPerSample, bitsPerSample});
+      // Interpret each component as IEEE754 float32
+      idf.addMultiTag(IFDTag.TAG_SAMPLE_FORMAT, new short[]{3, 3, 3, 3});
+      // Extra sample component as unassociated alpha (non-premultiplied)
+      idf.addTag(IFDTag.TAG_EXTRA_SAMPLES, (short) 1);
+    } else {
+      // Number of components per pixel (R, G, B)
+      idf.addTag(IFDTag.TAG_SAMPLES_PER_PIXEL, (short) 3);
+      short bitsPerSample = (short) (8 * BYTES_PER_SAMPLE);
+      idf.addMultiTag(IFDTag.TAG_BITS_PER_SAMPLE, new short[]{bitsPerSample, bitsPerSample, bitsPerSample});
+      // Interpret each component as IEEE754 float32
+      idf.addMultiTag(IFDTag.TAG_SAMPLE_FORMAT, new short[]{3, 3, 3});
+    }
 
     idf.addTag(IFDTag.TAG_SOFTWARE, "Chunky " + Version.getVersion());
     idf.addTag(IFDTag.TAG_DATETIME, DATETIME_FORMAT.format(LocalDateTime.now()));
 
     return idf.write(out, ifdOffset, (out) -> {
-        PixelPostProcessingFilter filter = requirePixelPostProcessingFilter(scene);
-        double[] sampleBuffer = scene.getSampleBuffer();
-        double[] pixelBuffer = new double[3];
-        for (int y = 0; y < height; ++y) {
-          task.update(height, y);
-          for (int x = 0; x < width; ++x) {
-            // TODO: refactor pixel access to remove duplicate post processing code from here
-            filter.processPixel(width, height, sampleBuffer, x, y, scene.getExposure(), pixelBuffer);
-            out.writeFloat((float) pixelBuffer[0]);
-            out.writeFloat((float) pixelBuffer[1]);
-            out.writeFloat((float) pixelBuffer[2]);
-          }
-        }
-        task.update(height, height);
+      PixelPostProcessingFilter filter = requirePixelPostProcessingFilter(scene);
+      double[] sampleBuffer = scene.getSampleBuffer();
+      AlphaBuffer alpha = scene.getAlphaBuffer();
+      FloatBuffer buffer = null;
+      if(embedAlpha) {
+        assert alpha.getType() == AlphaBuffer.Type.FP32;
+        buffer = alpha.getBuffer().asFloatBuffer();
       }
-    );
+      double[] pixelBuffer = new double[embedAlpha ? 4 : 3];
+      for (int y = 0; y < height; ++y) {
+        task.update(height, y);
+        for (int x = 0; x < width; ++x) {
+          // TODO: refactor pixel access to remove duplicate post processing code from here
+          filter.processPixel(width, height, sampleBuffer, x, y, scene.getExposure(), pixelBuffer);
+          if(embedAlpha) {
+            pixelBuffer[3] = buffer.get(y * width + x);
+          }
+          writePixel(out, pixelBuffer);
+        }
+      }
+      task.update(height, height);
+    });
+  }
+
+  void writePixel(DataOutput out, double[] pixelBuffer) throws IOException {
+    out.writeFloat((float) pixelBuffer[0]);
+    out.writeFloat((float) pixelBuffer[1]);
+    out.writeFloat((float) pixelBuffer[2]);
+    if(pixelBuffer.length > 3)
+      out.writeFloat((float) pixelBuffer[3]);
   }
 
   private PixelPostProcessingFilter requirePixelPostProcessingFilter(Scene scene) {

@@ -45,6 +45,7 @@ public abstract class IFDTag<SingleType, ArrayType> {
   static final ShortTag TAG_IMAGE_HEIGHT = new ShortTag(0x0101);
   static final ShortTag TAG_BITS_PER_SAMPLE = new ShortTag(0x0102);
   static final ShortTag TAG_SAMPLE_FORMAT = new ShortTag(0x0153);
+  static final ShortTag TAG_EXTRA_SAMPLES = new ShortTag(0x0152);
 
   /**
    * defines details of subfile using 32 flag bits

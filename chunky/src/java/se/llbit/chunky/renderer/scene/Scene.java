@@ -31,7 +31,6 @@ import se.llbit.chunky.chunk.ChunkLoadingException;
 import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.chunk.biome.BiomeData;
 import se.llbit.chunky.entity.*;
-import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
@@ -69,9 +68,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -186,7 +183,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public int cropY = 0;
 
   public PostProcessingFilter postProcessingFilter = DEFAULT_POSTPROCESSING_FILTER;
-  public PictureExportFormat outputMode = PictureExportFormats.PNG;
+  private PictureExportFormat pictureExportFormat = PictureExportFormats.PNG;
   public long renderTime;
   /**
    * Current SPP for the scene.
@@ -310,7 +307,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   protected double[] samples;
 
-  private byte[] alphaChannel;
+  private AlphaBuffer alphaBuffer = new AlphaBuffer();
 
   private boolean finalized = false;
 
@@ -400,7 +397,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public synchronized void initBuffers() {
     frontBuffer = new BitmapImage(width, height);
     backBuffer = new BitmapImage(width, height);
-    alphaChannel = new byte[width * height];
+    alphaBuffer.reset();
     samples = new double[width * height * 3];
   }
 
@@ -488,9 +485,10 @@ public class Scene implements JsonSerializable, Refreshable {
       height = other.height;
       backBuffer = other.backBuffer;
       frontBuffer = other.frontBuffer;
-      alphaChannel = other.alphaChannel;
       samples = other.samples;
     }
+    // TODO: could we copy it without resetting if the export format and camera perspective didn't change?
+    alphaBuffer.reset();
 
     fullWidth = other.fullWidth;
     fullHeight = other.fullHeight;
@@ -1891,7 +1889,7 @@ public class Scene implements JsonSerializable, Refreshable {
     branchCount = other.branchCount;
     rayDepth = other.rayDepth;
     mode = other.mode;
-    outputMode = other.outputMode;
+    pictureExportFormat = other.pictureExportFormat;
     cameraPresets = other.cameraPresets;
     camera.copyTransients(other.camera);
     finalizeBuffer = other.finalizeBuffer;
@@ -2049,7 +2047,7 @@ public class Scene implements JsonSerializable, Refreshable {
       Log.error("Can't save snapshot: bad output directory!");
       return;
     }
-    String fileName = String.format("%s-%d%s", name, spp, getOutputMode().getExtension());
+    String fileName = String.format("%s-%d%s", name, spp, pictureExportFormat.getExtension());
     File targetFile = new File(directory, fileName);
     if (!directory.exists()) {
       directory.mkdirs();
@@ -2062,7 +2060,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Also see {@link #writeFrame(OutputStream, PictureExportFormat, TaskTracker)}
    */
   public synchronized void saveFrame(File targetFile, TaskTracker taskTracker) {
-    saveFrame(targetFile, getOutputMode(), taskTracker);
+    saveFrame(targetFile, pictureExportFormat, taskTracker);
   }
 
   /**
@@ -2083,46 +2081,16 @@ public class Scene implements JsonSerializable, Refreshable {
    * and may apply post-processing if the scene has not been finalized yet.
    */
   public synchronized void writeFrame(OutputStream out, PictureExportFormat mode, TaskTracker taskTracker) throws IOException {
-    if (mode.isTransparencySupported()) {
-      computeAlpha(taskTracker);
-    }
-    if (!finalized) {
+    if (transparentSky) {
+      if (mode.getTransparencyType() == AlphaBuffer.Type.UNSUPPORTED) {
+        Log.warn("You selected \"transparent sky\", but the selected picture format \"" + mode.getName() + "\" does not support alpha layers.\nUse a different format like PNG instead.");
+        }
+      alphaBuffer.computeAlpha(this, mode.getTransparencyType(), taskTracker);
+      }
+    if (mode.wantsPostprocessing() && !finalized) {
       postProcessFrame(taskTracker);
     }
     mode.write(out, this, taskTracker);
-  }
-
-  /**
-   * Compute the alpha channel.
-   */
-  private void computeAlpha(TaskTracker taskTracker) {
-    if (transparentSky) {
-      if (!this.getOutputMode().isTransparencySupported()) {
-        Log.warn("Can not use transparent sky with " + this.getOutputMode().getName() +  " output mode. Use PNG instead.");
-      } else {
-        try (TaskTracker.Task task = taskTracker.task("Computing alpha channel")) {
-          AtomicInteger done = new AtomicInteger(0);
-
-          Chunky.getCommonThreads().submit(() -> {
-            IntStream.range(0, width).parallel().forEach(x -> {
-              WorkerState state = new WorkerState();
-              state.ray = new Ray();
-
-              for (int y = 0; y < height; y++) {
-                computeAlpha(x, y, state);
-              }
-
-              task.update(width, done.incrementAndGet());
-            });
-          }).get();
-
-        } catch (InterruptedException e) {
-          Log.warn("Failed to compute alpha channel", e);
-        } catch (ExecutionException e) {
-          Log.error("Failed to compute alpha channel", e);
-        }
-      }
-    }
   }
 
   /**
@@ -2322,40 +2290,6 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Compute the alpha channel based on sky visibility.
-   */
-  public void computeAlpha(int x, int y, WorkerState state) {
-    Ray ray = state.ray;
-    double halfWidth = width / (2.0 * height);
-    double invHeight = 1.0 / height;
-
-    // Rotated grid supersampling.
-    double[][] offsets = new double[][] {
-      { -3.0 / 8.0,  1.0 / 8.0 },
-      {  1.0 / 8.0,  3.0 / 8.0 },
-      { -1.0 / 8.0, -3.0 / 8.0 },
-      {  3.0 / 8.0, -1.0 / 8.0 },
-    };
-
-    double occlusion = 0.0;
-    for (double[] offset : offsets) {
-      camera.calcViewRay(ray,
-        -halfWidth + (x + offset[0]) * invHeight,
-        -0.5 + (y + offset[1]) * invHeight);
-      ray.o.x -= origin.x;
-      ray.o.y -= origin.y;
-      ray.o.z -= origin.z;
-
-      if (camera.getProjectionMode() == ProjectionMode.PARALLEL) {
-        ParallelProjector.fixRay(state.ray, this);
-      }
-      occlusion += PreviewRayTracer.skyOcclusion(this, state);
-    }
-
-    alphaChannel[y * width + x] = (byte) (255 * occlusion * 0.25 + 0.5);
-  }
-
-  /**
    * Copies a pixel in-buffer.
    */
   public void copyPixel(int jobId, int offset) {
@@ -2434,6 +2368,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
   /**
    * Get the back buffer of the current frame (in ARGB format).
+   *
    * @return Back buffer
    */
   public BitmapImage getBackBuffer() {
@@ -2441,11 +2376,21 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Get the alpha channel of the current frame.
-   * @return Alpha channel of the current frame
+   * @return returns a view of the alpha channel as uint8 array
+   * @deprecated Replaced by {@link #getAlphaBuffer()}
    */
+  @Deprecated(forRemoval = true)
   public byte[] getAlphaChannel() {
-    return alphaChannel;
+    if(alphaBuffer.getType() != AlphaBuffer.Type.UINT8) {
+      throw new UnsupportedOperationException(
+        "Export Format uses out-of-date API, please update the plugin for \""+ pictureExportFormat.getName() +"\""
+      );
+    }
+    return alphaBuffer.getBuffer().array();
+  }
+
+  public AlphaBuffer getAlphaBuffer() {
+    return alphaBuffer;
   }
 
   /**
@@ -2633,7 +2578,7 @@ public class Scene implements JsonSerializable, Refreshable {
       ((Configurable) postProcessingFilter).storeConfiguration(postprocessJson);
       json.add("postprocessSettings", postprocessJson);
     }
-    json.add("outputMode", outputMode.getName());
+    json.add("outputMode", pictureExportFormat.getName());
     json.add("renderTime", renderTime);
     json.add("spp", spp);
     json.add("sppTarget", sppTarget);
@@ -2894,8 +2839,8 @@ public class Scene implements JsonSerializable, Refreshable {
     if (postProcessingFilter instanceof Configurable) {
       ((Configurable) postProcessingFilter).loadConfiguration(json.get("postprocessSettings").asObject());
     }
-    outputMode = PictureExportFormats
-      .getFormat(json.get("outputMode").stringValue(outputMode.getName()))
+    pictureExportFormat = PictureExportFormats
+      .getFormat(json.get("outputMode").stringValue(pictureExportFormat.getName()))
       .orElse(PictureExportFormats.PNG);
     sppTarget = json.get("sppTarget").intValue(sppTarget);
     branchCount = json.get("branchCount").intValue(branchCount);
@@ -3157,12 +3102,12 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  public PictureExportFormat getOutputMode() {
-    return outputMode;
+  public PictureExportFormat getPictureExportFormat() {
+    return pictureExportFormat;
   }
 
-  public void setOutputMode(PictureExportFormat mode) {
-    outputMode = mode;
+  public void setPictureExportFormat(PictureExportFormat mode) {
+    pictureExportFormat = mode;
   }
 
   public int numberOfChunks() {
