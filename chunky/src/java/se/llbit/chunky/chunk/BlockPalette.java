@@ -622,6 +622,7 @@ public class BlockPalette {
     Consumer<Block> copperBulbRedLight = block -> {
       block.addRefColorGammaCorrected(217, 35, 35, 0.05f);
       block.addRefColorGammaCorrected(176, 23, 23, 0.05f);
+      block.addRefColorGammaCorrected(163, 24, 24, 0.05f);
       block.addRefColorGammaCorrected(138, 24, 24, 0.05f);
     };
     for(String s : new String[]{"minecraft:", "minecraft:waxed_"}) {
@@ -637,11 +638,11 @@ public class BlockPalette {
       });
       materialProperties.put(s + "exposed_copper_bulb", block -> {
         block.emitterMappingType = EmitterMappingType.REFERENCE_COLORS;
-        block.addRefColorGammaCorrected(247, 204, 136, 0.25f);
-        block.addRefColorGammaCorrected(238, 155, 50, 0.2f);
+        block.addRefColorGammaCorrected(253, 202, 138, 0.25f);
+        block.addRefColorGammaCorrected(223, 139, 41, 0.2f);
         copperBulbRedLight.accept(block);
         exposedCopperConfig.accept(block);
-        if(block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
+        if(block instanceof CopperBulb && (((CopperBulb) block).isLit() || ((CopperBulb) block).isPowered())) {
           block.setLightLevel(12);
         }
       });
@@ -651,7 +652,7 @@ public class BlockPalette {
         block.addRefColorGammaCorrected(224, 151, 53, 0.25f);
         copperBulbRedLight.accept(block);
         weatheredCopperConfig.accept(block);
-        if(block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
+        if(block instanceof CopperBulb && (((CopperBulb) block).isLit() || ((CopperBulb) block).isPowered())) {
           block.setLightLevel(8);
         }
       });
@@ -660,7 +661,7 @@ public class BlockPalette {
         block.addRefColorGammaCorrected(212, 153, 67, 0.25f);
         block.addRefColorGammaCorrected(191, 113, 65, 0.25f);
         copperBulbRedLight.accept(block);
-        if(block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
+        if(block instanceof CopperBulb && (((CopperBulb) block).isLit() || ((CopperBulb) block).isPowered())) {
           block.setLightLevel(4);
         }
       });
