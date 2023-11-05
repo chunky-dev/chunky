@@ -1372,7 +1372,7 @@ public class Scene implements JsonSerializable, Refreshable {
         }
         task.updateEta(target, done);
         done += 1;
-        OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
+        OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, loadedChunks, origin, cp, yMin, yMax);
         if (legacyChunks.contains(cp)) {
           LegacyBlocksFinalizer
               .finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
