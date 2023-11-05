@@ -265,8 +265,8 @@ public class PathTracer implements RayTracer {
       double directLightB = 0;
 
       boolean frontLight = next.d.dot(ray.getNormal()) > 0;
-
-      if (frontLight || (currentMat.subSurfaceScattering
+      //check if normal faces the sun direction, if so do sampling
+      if (frontLight || (false
         && random.nextFloat() < Scene.fSubSurface)) {
 
         if (!frontLight) {
@@ -359,31 +359,7 @@ public class PathTracer implements RayTracer {
         }
       } else {
         if (doRefraction) {
-
-          double t2 = FastMath.sqrt(radicand);
-          Vector3 n = ray.getNormal();
-          if (cosTheta > 0) {
-            next.d.x = n1n2 * ray.d.x + (n1n2 * cosTheta - t2) * n.x;
-            next.d.y = n1n2 * ray.d.y + (n1n2 * cosTheta - t2) * n.y;
-            next.d.z = n1n2 * ray.d.z + (n1n2 * cosTheta - t2) * n.z;
-          } else {
-            next.d.x = n1n2 * ray.d.x - (-n1n2 * cosTheta - t2) * n.x;
-            next.d.y = n1n2 * ray.d.y - (-n1n2 * cosTheta - t2) * n.y;
-            next.d.z = n1n2 * ray.d.z - (-n1n2 * cosTheta - t2) * n.z;
-          }
-
-          next.d.normalize();
-
-          // See Ray.specularReflection for information on why this is needed
-          // This is the same thing but for refraction instead of reflection
-          // so this time we want the signs of the dot product to be the same
-          if (QuickMath.signum(next.getGeometryNormal().dot(next.d)) != QuickMath.signum(next.getGeometryNormal().dot(ray.d))) {
-            double factor = QuickMath.signum(next.getGeometryNormal().dot(ray.d)) * -Ray.EPSILON - next.d.dot(next.getGeometryNormal());
-            next.d.scaleAdd(factor, next.getGeometryNormal());
-            next.d.normalize();
-          }
-
-          next.o.scaleAdd(Ray.OFFSET, next.d);
+          next.specularRefraction(ray, random, radicand, n1n2, cosTheta);
         }
 
         if (pathTrace(scene, next, state, false)) {
