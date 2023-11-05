@@ -53,6 +53,8 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
   private final DoubleAdjuster specular = new DoubleAdjuster();
   private final DoubleAdjuster ior = new DoubleAdjuster();
   private final DoubleAdjuster perceptualSmoothness = new DoubleAdjuster();
+
+  private final DoubleAdjuster perceptualTransmissionSmoothness = new DoubleAdjuster();
   private final DoubleAdjuster metalness = new DoubleAdjuster();
   private final ListView<String> listView;
 
@@ -69,6 +71,9 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     perceptualSmoothness.setName("Smoothness");
     perceptualSmoothness.setRange(0, 1);
     perceptualSmoothness.setTooltip("Smoothness of the selected material.");
+    perceptualTransmissionSmoothness.setName("Transmission Smoothness");
+    perceptualTransmissionSmoothness.setRange(0, 1);
+    perceptualTransmissionSmoothness.setTooltip("Smoothness of refraction though material");
     metalness.setName("Metalness");
     metalness.setRange(0, 1);
     metalness.setTooltip("Metalness (texture-tinted reflectivity) of the selected material.");
@@ -87,7 +92,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     settings.setSpacing(10);
     settings.getChildren().addAll(
         new Label("Material Properties"),
-        emittance, specular, perceptualSmoothness, ior, metalness,
+        emittance, specular, perceptualSmoothness, ior,perceptualTransmissionSmoothness, metalness,
         new Label("(set to zero to disable)"));
     setPadding(new Insets(10));
     setSpacing(15);
@@ -116,6 +121,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       double specAcc = 0;
       double iorAcc = 0;
       double perceptualSmoothnessAcc = 0;
+      double perceptualTransmissionSmoothnessAcc = 0;
       double metalnessAcc = 0;
       Collection<Block> blocks = MaterialStore.collections.get(materialName);
       for (Block block : blocks) {
@@ -123,12 +129,14 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
         specAcc += block.specular;
         iorAcc += block.ior;
         perceptualSmoothnessAcc += block.getPerceptualSmoothness();
+        perceptualTransmissionSmoothnessAcc += block.getPerceptualTransmissionSmoothness();
         metalnessAcc += block.metalness;
       }
       emittance.set(emAcc / blocks.size());
       specular.set(specAcc / blocks.size());
       ior.set(iorAcc / blocks.size());
       perceptualSmoothness.set(perceptualSmoothnessAcc / blocks.size());
+      perceptualTransmissionSmoothness.set(perceptualTransmissionSmoothnessAcc / blocks.size());
       metalness.set(metalnessAcc / blocks.size());
       materialExists = true;
     } else if (ExtraMaterials.idMap.containsKey(materialName)) {
@@ -138,6 +146,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
         specular.set(material.specular);
         ior.set(material.ior);
         perceptualSmoothness.set(material.getPerceptualSmoothness());
+        perceptualTransmissionSmoothness.set(material.getPerceptualTransmissionSmoothness());
         metalness.set(material.metalness);
         materialExists = true;
       }
@@ -148,6 +157,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       specular.set(block.specular);
       ior.set(block.ior);
       perceptualSmoothness.set(block.getPerceptualSmoothness());
+      perceptualTransmissionSmoothness.set(block.getPerceptualTransmissionSmoothness());
       metalness.set(block.metalness);
       materialExists = true;
     }
@@ -156,12 +166,15 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       specular.onValueChange(value -> scene.setSpecular(materialName, value.floatValue()));
       ior.onValueChange(value -> scene.setIor(materialName, value.floatValue()));
       perceptualSmoothness.onValueChange(value -> scene.setPerceptualSmoothness(materialName, value.floatValue()));
+      perceptualTransmissionSmoothness.onValueChange(value -> scene.setPerceptualTransmissionSmoothness(materialName,
+        value.floatValue()));
       metalness.onValueChange(value -> scene.setMetalness(materialName, value.floatValue()));
     } else {
       emittance.onValueChange(value -> {});
       specular.onValueChange(value -> {});
       ior.onValueChange(value -> {});
       perceptualSmoothness.onValueChange(value -> {});
+      perceptualTransmissionSmoothness.onValueChange(value -> {});
       metalness.onValueChange(value -> {});
     }
   }

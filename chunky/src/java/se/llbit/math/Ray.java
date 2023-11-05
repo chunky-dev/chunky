@@ -262,7 +262,119 @@ public class Ray {
    */
   public final void diffuseReflection(Ray ray, Random random) {
     set(ray);
+    // get random point on hemisphere
+    this.randomHemisphereDir(random);
 
+    o.scaleAdd(Ray.OFFSET, d);
+    currentMaterial = prevMaterial;
+    specular = false;
+
+    // See specularReflection for explanation of why this is needed
+    if(QuickMath.signum(geomN.dot(d)) == QuickMath.signum(geomN.dot(ray.d))) {
+      double factor = QuickMath.signum(geomN.dot(ray.d)) * -Ray.EPSILON - d.dot(geomN);
+      d.scaleAdd(factor, geomN);
+      d.normalize();
+    }
+  }
+
+  /**
+   * Set this ray to the specular reflection of the input ray.
+   */
+  public final void specularReflection(Ray ray, Random random) {
+    set(ray);
+    currentMaterial = prevMaterial;
+
+    double roughness = ray.getCurrentMaterial().roughness;
+    if (roughness > Ray.EPSILON) {
+      // For rough specular reflections, we interpolate linearly between the diffuse ray direction and the specular direction,
+      // which is inspired by https://blog.demofox.org/2020/06/06/casual-shadertoy-path-tracing-2-image-improvement-and-glossy-reflections/
+      // This gives good-looking results, although a microfacet-based model would be more physically correct.
+
+      // 1. get specular reflection direction
+      Vector3 specularDirection = new Vector3(d);
+      specularDirection.scaleAdd(-2 * ray.d.dot(ray.n), ray.n, ray.d);
+
+      // 2. get diffuse reflection direction (stored in this.d)
+      // get random point on hemisphere
+      this.randomHemisphereDir(random);
+
+      // 3. scale d to be roughness * dDiffuse + (1 - roughness) * dSpecular
+      d.scale(roughness);
+      d.scaleAdd(1 - roughness, specularDirection);
+      d.normalize();
+      o.scaleAdd(0.00001, d);
+    } else {
+      // roughness is zero, do a specular reflection
+      d.scaleAdd(-2 * ray.d.dot(ray.n), ray.n, ray.d);
+      o.scaleAdd(0.00001, ray.n);
+    }
+
+    // After reflection, the dot product between the direction and the real surface normal
+    // should have the opposite sign as the dot product between the incoming direction
+    // and the normal (because the incoming is going toward the volume enclosed
+    // by the surface and the reflected ray is going away)
+    // If this is not the case, we need to fix that
+    if(QuickMath.signum(geomN.dot(d)) == QuickMath.signum(geomN.dot(ray.d))) {
+      // The reflected ray goes is going through the geometry,
+      // we need to alter its direction so it doesn't.
+      // The way we do that is by adding the geometry normal multiplied by some factor
+      // The factor can be determined by projecting the direction on the normal,
+      // ie doing a dot product because, for every unit vector d and n,
+      // we have the relation:
+      // `(d - d.n * n) . n = 0`
+      // This tells us that if we chose `-d.n` as the factor we would have a dot product
+      // equals to 0, as we want something positive or negative,
+      // we will use the factor `-d.n +/- epsilon`
+      double factor = QuickMath.signum(geomN.dot(ray.d)) * -Ray.EPSILON - d.dot(geomN);
+      d.scaleAdd(factor, geomN);
+      d.normalize();
+    }
+  }
+
+  public final void specularRefraction (Ray ray, Random random, double radicand, float n1n2, double cosTheta) {
+    set(ray);
+    double roughness = ray.getCurrentMaterial().transmissionRoughness;
+    this.randomHemisphereDir(random);
+    d.scale(-1.0); //invert for lower hemisphere
+    double t2 = FastMath.sqrt(radicand);
+    Vector3 n = ray.getNormal();
+    Vector3 refractionDirection = new Vector3();
+    if (cosTheta > 0) {
+      refractionDirection.x = n1n2 * ray.d.x + (n1n2 * cosTheta - t2) * n.x;
+      refractionDirection.y = n1n2 * ray.d.y + (n1n2 * cosTheta - t2) * n.y;
+      refractionDirection.z = n1n2 * ray.d.z + (n1n2 * cosTheta - t2) * n.z;
+    } else {
+      refractionDirection.x = n1n2 * ray.d.x - (-n1n2 * cosTheta - t2) * n.x;
+      refractionDirection.y = n1n2 * ray.d.y - (-n1n2 * cosTheta - t2) * n.y;
+      refractionDirection.z = n1n2 * ray.d.z - (-n1n2 * cosTheta - t2) * n.z;
+    }
+
+    refractionDirection.normalize();
+
+    // 3. scale d to be roughness * dDiffuse + (1 - roughness) * dSpecular
+    d.scale(roughness);
+    d.scaleAdd(1 - roughness, refractionDirection);
+    d.normalize();
+    o.scaleAdd(Ray.OFFSET, d);
+
+    // See Ray.specularReflection for information on why this is needed
+    // This is the same thing but for refraction instead of reflection
+    // so this time we want the signs of the dot product to be the same
+    if (QuickMath.signum(geomN.dot(d)) != QuickMath.signum(geomN.dot(ray.d))) {
+      double factor = QuickMath.signum(geomN.dot(ray.d)) * -Ray.EPSILON - d.dot(geomN);
+      d.scaleAdd(factor,geomN);
+      d.normalize();
+    }
+
+
+  }
+
+  /**
+   * Random direction sampled from the upper hemisphere
+   * stored in this.d
+   * @param random random number source
+   */
+  public final void randomHemisphereDir(Random random) {
     // get random point on unit disk
     double x1 = random.nextDouble();
     double x2 = random.nextDouble();
@@ -306,161 +418,6 @@ public class Ray {
     d.x = ux * tx + vx * ty + n.x * tz;
     d.y = uy * tx + vy * ty + n.y * tz;
     d.z = uz * tx + vz * ty + n.z * tz;
-
-    o.scaleAdd(Ray.OFFSET, d);
-    currentMaterial = prevMaterial;
-    specular = false;
-
-    // See specularReflection for explanation of why this is needed
-    if(QuickMath.signum(geomN.dot(d)) == QuickMath.signum(geomN.dot(ray.d))) {
-      double factor = QuickMath.signum(geomN.dot(ray.d)) * -Ray.EPSILON - d.dot(geomN);
-      d.scaleAdd(factor, geomN);
-      d.normalize();
-    }
-  }
-
-  /**
-   * Set this ray to the specular reflection of the input ray.
-   */
-  public final void specularReflection(Ray ray, Random random) {
-    set(ray);
-    currentMaterial = prevMaterial;
-
-    double roughness = ray.getCurrentMaterial().roughness;
-    if (roughness > Ray.EPSILON) {
-      // For rough specular reflections, we interpolate linearly between the diffuse ray direction and the specular direction,
-      // which is inspired by https://blog.demofox.org/2020/06/06/casual-shadertoy-path-tracing-2-image-improvement-and-glossy-reflections/
-      // This gives good-looking results, although a microfacet-based model would be more physically correct.
-
-      // 1. get specular reflection direction
-      Vector3 specularDirection = new Vector3(d);
-      specularDirection.scaleAdd(-2 * ray.d.dot(ray.n), ray.n, ray.d);
-
-      // 2. get diffuse reflection direction (stored in this.d)
-      // get random point on unit disk
-      double x1 = random.nextDouble();
-      double x2 = random.nextDouble();
-      double r = FastMath.sqrt(x1);
-      double theta = 2 * Math.PI * x2;
-
-      // project to point on hemisphere in tangent space
-      double tx = r * FastMath.cos(theta);
-      double ty = r * FastMath.sin(theta);
-      double tz = FastMath.sqrt(1 - x1);
-
-      // transform from tangent space to world space
-      double xx, xy, xz;
-      double ux, uy, uz;
-      double vx, vy, vz;
-
-      if (QuickMath.abs(n.x) > .1) {
-        xx = 0;
-        xy = 1;
-        xz = 0;
-      } else {
-        xx = 1;
-        xy = 0;
-        xz = 0;
-      }
-
-      ux = xy * n.z - xz * n.y;
-      uy = xz * n.x - xx * n.z;
-      uz = xx * n.y - xy * n.x;
-
-      r = 1 / FastMath.sqrt(ux * ux + uy * uy + uz * uz);
-
-      ux *= r;
-      uy *= r;
-      uz *= r;
-
-      vx = uy * n.z - uz * n.y;
-      vy = uz * n.x - ux * n.z;
-      vz = ux * n.y - uy * n.x;
-
-      d.x = ux * tx + vx * ty + n.x * tz;
-      d.y = uy * tx + vy * ty + n.y * tz;
-      d.z = uz * tx + vz * ty + n.z * tz;
-
-      // 3. scale d to be roughness * dDiffuse + (1 - roughness) * dSpecular
-      d.scale(roughness);
-      d.scaleAdd(1 - roughness, specularDirection);
-      d.normalize();
-      o.scaleAdd(0.00001, d);
-    } else {
-      // roughness is zero, do a specular reflection
-      d.scaleAdd(-2 * ray.d.dot(ray.n), ray.n, ray.d);
-      o.scaleAdd(0.00001, ray.n);
-    }
-
-    // After reflection, the dot product between the direction and the real surface normal
-    // should have the opposite sign as the dot product between the incoming direction
-    // and the normal (because the incoming is going toward the volume enclosed
-    // by the surface and the reflected ray is going away)
-    // If this is not the case, we need to fix that
-    if(QuickMath.signum(geomN.dot(d)) == QuickMath.signum(geomN.dot(ray.d))) {
-      // The reflected ray goes is going through the geometry,
-      // we need to alter its direction so it doesn't.
-      // The way we do that is by adding the geometry normal multiplied by some factor
-      // The factor can be determined by projecting the direction on the normal,
-      // ie doing a dot product because, for every unit vector d and n,
-      // we have the relation:
-      // `(d - d.n * n) . n = 0`
-      // This tells us that if we chose `-d.n` as the factor we would have a dot product
-      // equals to 0, as we want something positive or negative,
-      // we will use the factor `-d.n +/- epsilon`
-      double factor = QuickMath.signum(geomN.dot(ray.d)) * -Ray.EPSILON - d.dot(geomN);
-      d.scaleAdd(factor, geomN);
-      d.normalize();
-    }
-  }
-
-  /**
-   * Scatter ray normal
-   *
-   * @param random random number source
-   */
-  public final void scatterNormal(Random random) {
-    // get random point on unit disk
-    double x1 = random.nextDouble();
-    double x2 = random.nextDouble();
-    double r = FastMath.sqrt(x1);
-    double theta = 2 * Math.PI * x2;
-
-    // project to point on hemisphere in tangent space
-    double tx = r * FastMath.cos(theta);
-    double ty = r * FastMath.sin(theta);
-    double tz = FastMath.sqrt(1 - x1);
-
-    // transform from tangent space to world space
-    double xx, xy, xz;
-    double ux, uy, uz;
-    double vx, vy, vz;
-
-    if (QuickMath.abs(n.x) > .1) {
-      xx = 0;
-      xy = 1;
-      xz = 0;
-    } else {
-      xx = 1;
-      xy = 0;
-      xz = 0;
-    }
-
-    ux = xy * n.z - xz * n.y;
-    uy = xz * n.x - xx * n.z;
-    uz = xx * n.y - xy * n.x;
-
-    r = 1 / FastMath.sqrt(ux * ux + uy * uy + uz * uz);
-
-    ux *= r;
-    uy *= r;
-    uz *= r;
-
-    vx = uy * n.z - uz * n.y;
-    vy = uz * n.x - ux * n.z;
-    vz = ux * n.y - uy * n.x;
-
-    n.set(ux * tx + vx * ty + n.x * tz, uy * tx + vy * ty + n.y * tz, uz * tx + vz * ty + n.z * tz);
   }
 
   public void setPrevMaterial(Material mat, int data) {

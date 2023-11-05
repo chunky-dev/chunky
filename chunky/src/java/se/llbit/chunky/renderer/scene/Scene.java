@@ -3257,6 +3257,16 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
+   * Modifies the transmission roughness property for the given material.
+   */
+  public void setPerceptualTransmissionSmoothness(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("transmissionRoughness", Json.of(Math.pow(1 - value, 2)));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
    * Modifies the metalness property for the given material.
    */
   public void setMetalness(String materialName, float value) {
