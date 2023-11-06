@@ -256,23 +256,65 @@ public class PathTracer implements RayTracer {
         cumulativeColor.z += emittance.z + ray.color.z * (directLightB * scene.sun.emittance.z + next.color.z);
       }
     } else {
-      Vector4 rayColor = new Vector4(ray.color);
-
-      Vector3 outboundDirection = new Vector3();
-      double x1 = random.nextDouble();
-      double x2 = random.nextDouble();
-      henyeyGreensteinSampleP(currentMat.anisotropy, inboundDirection, outboundDirection, x1, x2);
-      next.d.set(outboundDirection);
-      next.d.normalize();
-
-      hit |= pathTrace(scene, next, state, false);
-      if (hit) {
-        cumulativeColor.x += emittance.x + ray.color.x * (next.color.x);
-        cumulativeColor.y += emittance.y + ray.color.y * (next.color.y);
-        cumulativeColor.z += emittance.z + ray.color.z * (next.color.z);
+      double sun_az = scene.sun().getAzimuth();
+      double sun_alt = scene.sun().getAltitude();
+      Vector3 sun_dir = new Vector3(FastMath.cos(sun_az)*FastMath.cos(sun_alt), FastMath.sin(sun_alt), FastMath.sin(sun_az)*FastMath.cos(sun_alt));
+      double circle_radius = scene.sun().getSunRadius() * scene.sun().getDiffuseSampleRadius();
+      double sample_chance = scene.sun().getDiffuseSampleChance();
+      double sample_area = (1 - FastMath.cos(circle_radius))*2*Math.PI;
+      if(Math.abs(currentMat.anisotropy) < 0.99 && scene.getSunSamplingStrategy().isDiffuseSampling()) {
+        if(random.nextDouble() < sample_chance) {
+          // Generate random sun direction assuming sun is directly overhead
+          double ay = random.nextDouble(FastMath.cos(circle_radius), 1);
+          double phi = random.nextDouble(2*Math.PI);
+          double ax = FastMath.sqrt(1 - ay * ay)*FastMath.sin(phi);
+          double az = FastMath.sqrt(1 - ay * ay)*FastMath.cos(phi);
+          // Transform to actual sun position
+          double bx = ax * FastMath.sin(sun_alt) + ay * FastMath.cos(sun_alt);
+          double by = -ax * FastMath.cos(sun_alt) + ay * FastMath.sin(sun_alt);
+          double cx = bx * FastMath.cos(sun_az) - az * FastMath.sin(sun_az);
+          double cz = bx * FastMath.sin(sun_az) + az * FastMath.cos(sun_az);
+          next.d.set(cx, by, cz);
+          double pdf = phaseHG(inboundDirection.dot(next.d), currentMat.anisotropy);
+          hit |= pathTrace(scene, next, state, false);
+          if (hit) {
+            cumulativeColor.x += (emittance.x + ray.color.x * (next.color.x)) * pdf * sample_area / sample_chance;
+            cumulativeColor.y += (emittance.y + ray.color.y * (next.color.y)) * pdf * sample_area / sample_chance;
+            cumulativeColor.z += (emittance.z + ray.color.z * (next.color.z)) * pdf * sample_area / sample_chance;
+          }
+        } else {
+          while(true) {
+            double z = random.nextDouble(-1, 1);
+            double rho = FastMath.sqrt(1 - z * z);
+            double phi = random.nextDouble(2*Math.PI);
+            next.d.set(rho*FastMath.cos(phi), rho*FastMath.sin(phi), z);
+            if(next.d.dot(sun_dir) > FastMath.cos(circle_radius)) {
+              continue;
+            }
+            double pdf = phaseHG(inboundDirection.dot(next.d), currentMat.anisotropy);
+            hit |= pathTrace(scene, next, state, false);
+            if (hit) {
+              cumulativeColor.x += (emittance.x + ray.color.x * (next.color.x)) * pdf * (4*Math.PI - sample_area) / (1 - sample_chance);
+              cumulativeColor.y += (emittance.y + ray.color.y * (next.color.y)) * pdf * (4*Math.PI - sample_area) / (1 - sample_chance);
+              cumulativeColor.z += (emittance.z + ray.color.z * (next.color.z)) * pdf * (4*Math.PI - sample_area) / (1 - sample_chance);
+            }
+            break;
+          }
+        }
+      } else {
+        Vector3 outboundDirection = new Vector3();
+        double x1 = random.nextDouble();
+        double x2 = random.nextDouble();
+        henyeyGreensteinSampleP(currentMat.anisotropy, inboundDirection, outboundDirection, x1, x2);
+        next.d.set(outboundDirection);
+        next.d.normalize();
+        hit |= pathTrace(scene, next, state, false);
+        if (hit) {
+          cumulativeColor.x += emittance.x + ray.color.x * (next.color.x);
+          cumulativeColor.y += emittance.y + ray.color.y * (next.color.y);
+          cumulativeColor.z += emittance.z + ray.color.z * (next.color.z);
+        }
       }
-      ray.color.set(rayColor);
-
     }
     return hit;
   }
