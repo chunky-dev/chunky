@@ -1,23 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Text?>
-<?import javafx.scene.control.ScrollPane?>
-<?import se.llbit.chunky.ui.DoubleAdjuster?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import se.llbit.chunky.ui.*?>
+<?import se.llbit.chunky.ui.elements.*?>
 
-<fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
     <DoubleAdjuster fx:id="exposure" />
     <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
       <Label text="Postprocessing filter:" />
       <ChoiceBox fx:id="postprocessingFilter" prefWidth="150.0" />
     </HBox>
-    <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="275"
-      text="Postprocessing affects performance when Render Preview tab is visible. Switching to the Map tab mitigates this." />
+    <VBox prefWidth="250.0" spacing="5.0" fx:id="hableCurveSettings">
+      <TextFieldLabelWrapper labelText="Shoulder strength:">
+        <DoubleTextField fx:id="hableShoulderStrength" />
+      </TextFieldLabelWrapper>
+      <TextFieldLabelWrapper labelText="Linear strength:">
+        <DoubleTextField fx:id="hableLinearStrength" />
+      </TextFieldLabelWrapper>
+      <TextFieldLabelWrapper labelText="Linear angle:">
+        <DoubleTextField fx:id="hableLinearAngle" />
+      </TextFieldLabelWrapper>
+      <TextFieldLabelWrapper labelText="Toe strength:">
+        <DoubleTextField fx:id="hableToeStrength" />
+      </TextFieldLabelWrapper>
+      <TextFieldLabelWrapper labelText="Toe numerator:">
+        <DoubleTextField fx:id="hableToeNumerator" />
+      </TextFieldLabelWrapper>
+      <TextFieldLabelWrapper labelText="Toe denominator:">
+        <DoubleTextField fx:id="hableToeDenominator" />
+      </TextFieldLabelWrapper>
+      <TextFieldLabelWrapper labelText="Linear white point value:">
+        <DoubleTextField fx:id="hableLinearWhitePointValue" />
+      </TextFieldLabelWrapper>
+      <HBox alignment="TOP_RIGHT" prefWidth="200.0" spacing="5.0">
+        <children>
+          <Button mnemonicParsing="false" text="FW preset" fx:id="fwPreset" />
+          <Button mnemonicParsing="false" text="GDC preset" fx:id="gdcPreset" />
+        </children>
+      </HBox>
+      <VBox.margin>
+        <Insets left="20.0" />
+      </VBox.margin>
+    </VBox>
+    <VBox prefWidth="250.0" spacing="5.0" fx:id="ue4CurveSettings" >
+      <TextFieldLabelWrapper labelText="Saturation:">
+        <DoubleTextField fx:id="ue4Saturation" />
+      </TextFieldLabelWrapper>
+      <TextFieldLabelWrapper labelText="Slope:">
+        <DoubleTextField fx:id="ue4Slope" />
+      </TextFieldLabelWrapper>
+      <TextFieldLabelWrapper labelText="Toe:">
+        <DoubleTextField fx:id="ue4Toe" />
+      </TextFieldLabelWrapper>
+      <TextFieldLabelWrapper labelText="Shoulder:">
+        <DoubleTextField fx:id="ue4Shoulder" />
+      </TextFieldLabelWrapper>
+      <TextFieldLabelWrapper labelText="Black clip:">
+        <DoubleTextField fx:id="ue4BlackClip" />
+      </TextFieldLabelWrapper>
+      <TextFieldLabelWrapper labelText="White clip:">
+        <DoubleTextField fx:id="ue4WhiteClip" />
+      </TextFieldLabelWrapper>
+      <HBox alignment="TOP_RIGHT" prefWidth="200.0" spacing="5.0">
+        <children>
+          <Button mnemonicParsing="false" text="ACES preset" fx:id="acesPreset" />
+          <Button mnemonicParsing="false" text="UE4 Legacy preset" fx:id="ue4LegacyPreset" />
+        </children>
+      </HBox>
+      <VBox.margin>
+        <Insets left="20.0" />
+      </VBox.margin>
+    </VBox>
+    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Postprocessing affects performance when Render Preview tab is visible. Switching to the Map tab mitigates this." wrappingWidth="275" />
     <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
     </padding>

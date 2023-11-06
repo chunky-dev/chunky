@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.block.minecraft.Lava;
 import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.StillWaterShader;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
@@ -413,8 +414,8 @@ public class CauldronModel {
     // TODO since this water is the same block, refraction is not taken into account – still better than no water
     Quad water = waterLevels[level];
     if (water != null && water.intersect(ray)) {
-      if (!scene.stillWaterEnabled()) {
-        scene.getWaterShading().doWaterShading(ray, scene.getAnimationTime());
+      if (!(scene.getCurrentWaterShader() instanceof StillWaterShader)) {
+        scene.getCurrentWaterShader().doWaterShading(ray, scene.getAnimationTime());
       } else {
         ray.setNormal(water.n);
       }

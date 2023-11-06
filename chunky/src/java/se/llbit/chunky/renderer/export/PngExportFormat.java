@@ -20,6 +20,7 @@ package se.llbit.chunky.renderer.export;
 import java.io.IOException;
 import java.io.OutputStream;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.scene.AlphaBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.imageformats.png.ITXT;
@@ -42,8 +43,8 @@ public class PngExportFormat implements PictureExportFormat {
   }
 
   @Override
-  public boolean isTransparencySupported() {
-    return true;
+  public AlphaBuffer.Type getTransparencyType() {
+    return AlphaBuffer.Type.UINT8;
   }
 
   @Override
@@ -51,9 +52,9 @@ public class PngExportFormat implements PictureExportFormat {
     try (TaskTracker.Task task = taskTracker.task("Writing PNG");
         PngFileWriter writer = new PngFileWriter(out)) {
       BitmapImage backBuffer = scene.getBackBuffer();
-      if (scene.transparentSky()) {
-        writer.write(backBuffer.data, scene.getAlphaChannel(), scene.canvasWidth(),
-            scene.canvasHeight(), task);
+      AlphaBuffer alpha = scene.getAlphaBuffer();
+      if (alpha.getType() == getTransparencyType()) {
+        writer.write(backBuffer.data, alpha.getBuffer(), scene.canvasWidth(), scene.canvasHeight(), task);
       } else {
         writer.write(backBuffer.data, scene.canvasWidth(), scene.canvasHeight(), task);
       }

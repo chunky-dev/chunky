@@ -3658,8 +3658,7 @@ public class TexturePackLoader {
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
-    String[] path = file.split("/");
-    addSimpleTexture(path[path.length - 1], file, texture);
+    addSimpleTexture(file, file, texture);
   }
 
   private static void addSimpleTexture(String name, String file, Texture texture) {

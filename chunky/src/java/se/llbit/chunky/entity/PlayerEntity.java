@@ -23,12 +23,7 @@ import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.*;
 import se.llbit.chunky.resources.PlayerTexture.ExtendedUVMap;
-import se.llbit.chunky.resources.texturepack.ColoredTexture;
-import se.llbit.chunky.resources.texturepack.LayeredTextureLoader;
-import se.llbit.chunky.resources.texturepack.PlayerTextureLoader;
-import se.llbit.chunky.resources.texturepack.SimpleTexture;
-import se.llbit.chunky.resources.texturepack.TextureFormatError;
-import se.llbit.chunky.resources.texturepack.TextureLoader;
+import se.llbit.chunky.resources.texturepack.*;
 import se.llbit.chunky.world.PlayerEntityData;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.chunky.world.model.CubeModel;
@@ -38,11 +33,7 @@ import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
-import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Transform;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 import se.llbit.math.primitive.Box;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
@@ -491,6 +482,9 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       } else if (headItemId.equals("minecraft:player_head")) {
         HeadEntity head = new HeadEntity(new Vector3(), headItem.get("skin").asString(""), 0, 1);
         faces.addAll(head.primitives(Transform.NONE.scale(1.2).translate(0.5, 0.5, 0.5).chain(transform)));
+      } else if (headItemId.equals("minecraft:piglin_head")) {
+        SkullEntity skull = new SkullEntity(new Vector3(), Kind.PIGLIN, 0, 1);
+        faces.addAll(skull.piglinHeadPrimitives(Transform.NONE.scale(1.2).translate(0.5, 0.5, 0.5).chain(transform)));
       } else {
         addModel(faces, getHelmModel(headItem), transform);
       }
@@ -677,7 +671,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     JsonObject json = parseJson(helmJson);
     switch (id) {
       case "minecraft:skull":
-        // Reference: https://minecraft.gamepedia.com/Mob_head#Data_values
+        // Reference: https://minecraft.wiki/w/Mob_head#Data_values
         int type = item.get("type").asInt(3);
         switch (type) {
           case 0:
@@ -757,7 +751,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       TextureLoader loader = null;
       switch (id.substring("minecraft:".length())) {
         case "skull": {
-          // Reference: https://minecraft.gamepedia.com/Mob_head#Data_values
+          // Reference: https://minecraft.wiki/w/Mob_head#Data_values
           int type = item.get("type").asInt(3);
           switch (type) {
             case 0:
@@ -874,7 +868,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         // TODO: defer loading.
         Log.infof("Loading texture: %s", textureId);
 
-        if(!ResourcePackLoader.loadResources(
+        if (!ResourcePackLoader.loadResources(
           ResourcePackTextureLoader.singletonLoader(textureId, loader))
         ) {
           // not completed singleton load --> failure

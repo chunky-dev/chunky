@@ -1,20 +1,20 @@
 package se.llbit.chunky.block;
 
-import java.util.*;
-import java.util.function.BiFunction;
-
-import se.llbit.chunky.block.minecraft.*;
 import se.llbit.chunky.block.minecraft.Comparator;
 import se.llbit.chunky.block.minecraft.Observer;
+import se.llbit.chunky.block.minecraft.Tripwire;
+import se.llbit.chunky.block.minecraft.*;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.model.minecraft.FlowerPotModel;
 import se.llbit.chunky.model.minecraft.FlowerPotModel.Kind;
-import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
+
+import java.util.*;
+import java.util.function.BiFunction;
 
 public class MinecraftBlockProvider implements BlockProvider {
 
@@ -1004,7 +1004,6 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("bamboo_mosaic_slab", (name, tag) -> slab(tag, Texture.bambooMosaic));
     addBlock("bamboo_mosaic_stairs", (name, tag) -> stairs(tag, Texture.bambooMosaic));
     addBlock("bamboo_trapdoor", (name, tag) -> trapdoor(tag, Texture.bambooTrapdoor));
-
     addBlock("cherry_button", (name, tag) -> button(tag, Texture.cherryPlanks));
     addBlock("cherry_door", (name, tag) -> door(tag, Texture.cherryDoorTop, Texture.cherryDoorBottom));
     addBlock("cherry_fence", (name, tag) -> fence(tag, Texture.cherryPlanks));
@@ -1073,6 +1072,51 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("bamboo_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "bamboo"));
     addBlock("cherry_hanging_sign", (name, tag) -> hangingSign(tag, "cherry"));
     addBlock("cherry_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "cherry"));
+
+    //1.21
+    addBlock("tuff_slab", (name, tag) -> slab(tag, Texture.tuff));
+    addBlock("tuff_stairs", (name, tag) -> stairs(tag, Texture.tuff));
+    addBlock("tuff_wall", (name, tag) -> wall(tag, Texture.tuff));
+    addBlock("polished_tuff", Texture.polishedTuff);
+    addBlock("polished_tuff_slab", (name, tag) -> slab(tag, Texture.polishedTuff));
+    addBlock("polished_tuff_stairs", (name, tag) -> stairs(tag, Texture.polishedTuff));
+    addBlock("polished_tuff_wall", (name, tag) -> wall(tag, Texture.polishedTuff));
+    addBlock("tuff_bricks", Texture.tuffBricks);
+    addBlock("tuff_brick_slab", (name, tag) -> slab(tag, Texture.tuffBricks));
+    addBlock("tuff_brick_stairs", (name, tag) -> stairs(tag, Texture.tuffBricks));
+    addBlock("tuff_brick_wall", (name, tag) -> wall(tag, Texture.tuffBricks));
+    addBlock("chiseled_tuff", Texture.chiseledTuff);
+    addBlock("chiseled_tuff_bricks", Texture.chiseledTuffBricks);
+    for(String s : new String[]{"", "waxed_"}) {
+      addBlock(s + "chiseled_copper", Texture.chiseledCopper);
+      addBlock(s + "copper_grate", (name, tag) -> new SolidNonOpaqueBlock(name, Texture.copperGrate));
+      addBlock(s + "copper_bulb", (name, tag) -> new CopperBulb(name, tag.get("Properties").get("lit").stringValue().equals("true"), tag.get("Properties").get("powered").stringValue().equals("true"),
+        Texture.copperBulbLitPowered, Texture.copperBulbLit, Texture.copperBulbPowered, Texture.copperBulb));
+      addBlock(s + "copper_door", (name, tag) -> door(tag, Texture.copperDoorTop, Texture.copperDoorBottom));
+      addBlock(s + "copper_trapdoor", (name, tag) -> trapdoor(tag, Texture.copperTrapdoor));
+      addBlock(s + "exposed_chiseled_copper", Texture.exposedChiseledCopper);
+      addBlock(s + "exposed_copper_grate", (name, tag) -> new SolidNonOpaqueBlock(name, Texture.exposedCopperGrate));
+      addBlock(s + "exposed_copper_bulb", (name, tag) -> new CopperBulb(name, tag.get("Properties").get("lit").stringValue().equals("true"), tag.get("Properties").get("powered").stringValue().equals("true"),
+        Texture.exposedCopperBulbLitPowered, Texture.exposedCopperBulbLit, Texture.exposedCopperBulbPowered, Texture.exposedCopperBulb));
+      addBlock(s + "exposed_copper_door", (name, tag) -> door(tag, Texture.exposedCopperDoorTop, Texture.exposedCopperDoorBottom));
+      addBlock(s + "exposed_copper_trapdoor", (name, tag) -> trapdoor(tag, Texture.exposedCopperTrapdoor));
+      addBlock(s + "weathered_chiseled_copper", Texture.weatheredChiseledCopper);
+      addBlock(s + "weathered_copper_grate", (name, tag) -> new SolidNonOpaqueBlock(name, Texture.weatheredCopperGrate));
+      addBlock(s + "weathered_copper_bulb", (name, tag) -> new CopperBulb(name, tag.get("Properties").get("lit").stringValue().equals("true"), tag.get("Properties").get("powered").stringValue().equals("true"),
+        Texture.weatheredCopperBulbLitPowered, Texture.weatheredCopperBulbLit, Texture.weatheredCopperBulbPowered, Texture.weatheredCopperBulb));
+      addBlock(s + "weathered_copper_door", (name, tag) -> door(tag, Texture.weatheredCopperDoorTop, Texture.weatheredCopperDoorBottom));
+      addBlock(s + "weathered_copper_trapdoor", (name, tag) -> trapdoor(tag, Texture.weatheredCopperTrapdoor));
+      addBlock(s + "oxidized_chiseled_copper", Texture.oxidizedChiseledCopper);
+      addBlock(s + "oxidized_copper_grate", (name, tag) -> new SolidNonOpaqueBlock(name, Texture.oxidizedCopperGrate));
+      addBlock(s + "oxidized_copper_bulb", (name, tag) -> new CopperBulb(name, tag.get("Properties").get("lit").stringValue().equals("true"), tag.get("Properties").get("powered").stringValue().equals("true"),
+        Texture.oxidizedCopperBulbLitPowered, Texture.oxidizedCopperBulbLit, Texture.oxidizedCopperBulbPowered, Texture.oxidizedCopperBulb));
+      addBlock(s + "oxidized_copper_door", (name, tag) -> door(tag, Texture.oxidizedCopperDoorTop, Texture.oxidizedCopperDoorBottom));
+      addBlock(s + "oxidized_copper_trapdoor", (name, tag) -> trapdoor(tag, Texture.oxidizedCopperTrapdoor));
+    }
+    addBlock("crafter", (name, tag) -> new Crafter(name, tag.get("Properties").get("orientation").stringValue(), tag.get("Properties").get("crafting").stringValue().equals("true"), tag.get("Properties").get("triggered").stringValue().equals("true"),
+      Texture.crafterNorth, Texture.crafterNorthCrafting, Texture.crafterEast, Texture.crafterEastCrafting, Texture.crafterEastTriggered,
+      Texture.crafterSouth, Texture.crafterSouthTriggered, Texture.crafterWest, Texture.crafterWestCrafting, Texture.crafterWestTriggered,
+      Texture.crafterTop, Texture.crafterTopCrafting, Texture.crafterTopTriggered, Texture.crafterBottom));
   }
 
   @Override
@@ -2413,9 +2457,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "dragon_egg":
         return new DragonEgg();
       case "dragon_head":
-        return skull(tag, Texture.steve, SkullEntity.Kind.DRAGON);
+        return skull(tag, Texture.dragon, SkullEntity.Kind.DRAGON);
       case "dragon_wall_head":
-        return wallSkull(tag, Texture.steve, SkullEntity.Kind.DRAGON);
+        return wallSkull(tag, Texture.dragon, SkullEntity.Kind.DRAGON);
       case "white_banner":
         return banner(tag, Texture.whiteWool, BlockData.COLOR_WHITE);
       case "orange_banner":
@@ -3033,6 +3077,10 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.rawGoldBlock);
       case "raw_iron_block":
         return new MinecraftBlock(name, Texture.rawIronBlock);
+      case "piglin_head":
+        return skull(tag, Texture.piglin, SkullEntity.Kind.PIGLIN);
+      case "piglin_wall_head":
+        return wallSkull(tag, Texture.piglin, SkullEntity.Kind.PIGLIN);
       default:
         BiFunction<String, Tag, Block> factory = blocks.get(namespacedName);
         if (factory != null) {
@@ -3455,13 +3503,13 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new Wall(name, texture, north, south, east, west, up.equals("true"));
   }
 
-  private Block skull(Tag tag, EntityTexture texture, SkullEntity.Kind type) {
+  private Block skull(Tag tag, Texture texture, SkullEntity.Kind type) {
     String name = BlockProvider.blockName(tag);
     int rotation = BlockProvider.stringToInt(tag.get("Properties").get("rotation"), 0);
     return new Head(name, texture, type, rotation);
   }
 
-  private Block wallSkull(Tag tag, EntityTexture texture, SkullEntity.Kind type) {
+  private Block wallSkull(Tag tag, Texture texture, SkullEntity.Kind type) {
     String name = BlockProvider.blockName(tag);
     String facing = BlockProvider.facing(tag);
     return new WallHead(name, texture, type, facing);

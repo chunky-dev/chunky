@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.util;
+package se.llbit.util.io;
 
 import se.llbit.log.Log;
 

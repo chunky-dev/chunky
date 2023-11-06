@@ -17,7 +17,7 @@
 package se.llbit.chunky.renderer.renderdump;
 
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.util.IsolatedOutputStream;
+import se.llbit.util.io.IsolatedOutputStream;
 import se.llbit.util.TaskTracker;
 
 import java.io.DataInputStream;
