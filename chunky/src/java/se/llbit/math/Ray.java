@@ -353,7 +353,7 @@ public class Ray {
           } else {
             // non-sun sampling
             // basically, if we are going to sample the sun segment, reset the rng until we don't
-            while(r > minr || FastMath.abs(theta - sun_theta) < circle_radius) {
+            while(r > minr && r < maxr && angleDistance(theta, sun_theta) < circle_radius) {
               x1 = random.nextDouble();
               x2 = random.nextDouble();
               r = FastMath.sqrt(x1);
@@ -413,6 +413,10 @@ public class Ray {
       d.scaleAdd(factor, geomN);
       d.normalize();
     }
+  }
+  private double angleDistance(double a1, double a2) {
+    double diff = Math.abs(a1 - a2) % (2*Math.PI);
+    return diff > Math.PI ? 2*Math.PI - diff : diff;
   }
 
   /**
