@@ -276,8 +276,9 @@ public class Ray {
     double ty = r * FastMath.sin(theta);
     double tz; // to be initialized later, after potentially changing tx and ty
 
-    // diffuse sun sampling (importance sampling)
-    if(scene.getSunSamplingStrategy().isDiffuseSampling()) {
+    // importance sampling, see PR #1604
+    // https://github.com/chunky-dev/chunky/pull/1604/
+    if(scene.getSunSamplingStrategy().isImportanceSampling()) {
 
       // constants
       final double sun_az = scene.sun().getAzimuth();

@@ -140,14 +140,14 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
             (observable, oldValue, newValue) -> {
               scene.setSunSamplingStrategy(newValue);
 
-              boolean visible = scene != null && scene.getSunSamplingStrategy().isDiffuseSampling();
+              boolean visible = scene != null && scene.getSunSamplingStrategy().isImportanceSampling();
               diffuseSamplingDetailsPane.setVisible(visible);
               diffuseSamplingDetailsPane.setExpanded(visible);
               diffuseSamplingDetailsPane.setManaged(visible);
             });
     sunSamplingStrategy.setTooltip(new Tooltip("Determines how the sun is sampled at each bounce."));
 
-    boolean visible = scene != null && scene.getSunSamplingStrategy().isDiffuseSampling();
+    boolean visible = scene != null && scene.getSunSamplingStrategy().isImportanceSampling();
     diffuseSamplingDetailsPane.setVisible(visible);
     diffuseSamplingDetailsPane.setExpanded(visible);
     diffuseSamplingDetailsPane.setManaged(visible);
