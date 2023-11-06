@@ -1317,6 +1317,138 @@ public class Texture {
   public static final Texture calibratedSculkSensorTop = new Texture();
   @TexturePath("assets/minecraft/textures/block/calibrated_sculk_sensor_input_side")
   public static final Texture calibratedSculkSensorInputSide = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/oak")
+  public static final Texture oakHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/spruce")
+  public static final Texture spruceHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/birch")
+  public static final Texture birchHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/jungle")
+  public static final Texture jungleHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/acacia")
+  public static final Texture acaciaHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/dark_oak")
+  public static final Texture darkOakHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/crimson")
+  public static final Texture crimsonHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/warped")
+  public static final Texture warpedHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/mangrove")
+  public static final Texture mangroveHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/bamboo")
+  public static final Texture bambooHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/cherry")
+  public static final Texture cherryHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/piglin/piglin")
+  public static final Texture piglin = new Texture();
+  @TexturePath("assets/minecraft/textures/block/polished_tuff")
+  public static final Texture polishedTuff = new Texture();
+  @TexturePath("assets/minecraft/textures/block/tuff_bricks")
+  public static final Texture tuffBricks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/chiseled_tuff")
+  public static final Texture chiseledTuff = new Texture();
+  @TexturePath("assets/minecraft/textures/block/chiseled_tuff_bricks")
+  public static final Texture chiseledTuffBricks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/chiseled_copper")
+  public static final Texture chiseledCopper = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_grate")
+  public static final Texture copperGrate = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_bulb")
+  public static final Texture copperBulb = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_bulb_lit")
+  public static final Texture copperBulbLit = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_bulb_powered")
+  public static final Texture copperBulbPowered = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_bulb_lit_powered")
+  public static final Texture copperBulbLitPowered = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_door_top")
+  public static final Texture copperDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_door_bottom")
+  public static final Texture copperDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_trapdoor")
+  public static final Texture copperTrapdoor = new Texture();
+  @TexturePath("assets/minecraft/textures/block/exposed_chiseled_copper")
+  public static final Texture exposedChiseledCopper = new Texture();
+  @TexturePath("assets/minecraft/textures/block/exposed_copper_grate")
+  public static final Texture exposedCopperGrate = new Texture();
+  @TexturePath("assets/minecraft/textures/block/exposed_copper_bulb")
+  public static final Texture exposedCopperBulb = new Texture();
+  @TexturePath("assets/minecraft/textures/block/exposed_copper_bulb_lit")
+  public static final Texture exposedCopperBulbLit = new Texture();
+  @TexturePath("assets/minecraft/textures/block/exposed_copper_bulb_powered")
+  public static final Texture exposedCopperBulbPowered = new Texture();
+  @TexturePath("assets/minecraft/textures/block/exposed_copper_bulb_lit_powered")
+  public static final Texture exposedCopperBulbLitPowered = new Texture();
+  @TexturePath("assets/minecraft/textures/block/exposed_copper_door_top")
+  public static final Texture exposedCopperDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/exposed_copper_door_bottom")
+  public static final Texture exposedCopperDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/exposed_copper_trapdoor")
+  public static final Texture exposedCopperTrapdoor = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_chiseled_copper")
+  public static final Texture weatheredChiseledCopper = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_copper_grate")
+  public static final Texture weatheredCopperGrate = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_copper_bulb")
+  public static final Texture weatheredCopperBulb = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_copper_bulb_lit")
+  public static final Texture weatheredCopperBulbLit = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_copper_bulb_powered")
+  public static final Texture weatheredCopperBulbPowered = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_copper_bulb_lit_powered")
+  public static final Texture weatheredCopperBulbLitPowered = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_copper_door_top")
+  public static final Texture weatheredCopperDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_copper_door_bottom")
+  public static final Texture weatheredCopperDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_copper_trapdoor")
+  public static final Texture weatheredCopperTrapdoor = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_chiseled_copper")
+  public static final Texture oxidizedChiseledCopper = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_copper_grate")
+  public static final Texture oxidizedCopperGrate = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_copper_bulb")
+  public static final Texture oxidizedCopperBulb = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_copper_bulb_lit")
+  public static final Texture oxidizedCopperBulbLit = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_copper_bulb_powered")
+  public static final Texture oxidizedCopperBulbPowered = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_copper_bulb_lit_powered")
+  public static final Texture oxidizedCopperBulbLitPowered = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_copper_door_top")
+  public static final Texture oxidizedCopperDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_copper_door_bottom")
+  public static final Texture oxidizedCopperDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_copper_trapdoor")
+  public static final Texture oxidizedCopperTrapdoor = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crafter_north")
+  public static final Texture crafterNorth = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crafter_north_crafting")
+  public static final Texture crafterNorthCrafting = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crafter_east")
+  public static final Texture crafterEast = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crafter_east_crafting")
+  public static final Texture crafterEastCrafting = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crafter_east_triggered")
+  public static final Texture crafterEastTriggered = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crafter_south")
+  public static final Texture crafterSouth = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crafter_south_triggered")
+  public static final Texture crafterSouthTriggered = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crafter_west")
+  public static final Texture crafterWest = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crafter_west_crafting")
+  public static final Texture crafterWestCrafting = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crafter_west_triggered")
+  public static final Texture crafterWestTriggered = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crafter_top")
+  public static final Texture crafterTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crafter_top_crafting")
+  public static final Texture crafterTopCrafting = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crafter_top_triggered")
+  public static final Texture crafterTopTriggered = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crafter_bottom")
+  public static final Texture crafterBottom = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

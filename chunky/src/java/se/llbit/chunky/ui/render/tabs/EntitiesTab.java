@@ -28,7 +28,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -53,7 +52,6 @@ import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.IntegerTextField;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
-import se.llbit.chunky.ui.elements.TextFieldLabelWrapper;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.material.BeaconBeamMaterial;
 import se.llbit.fx.LuxColorPicker;
@@ -63,13 +61,43 @@ import se.llbit.json.JsonObject;
 import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Vector3;
+import se.llbit.nbt.CompoundTag;
 import se.llbit.util.mojangapi.MinecraftProfile;
 import se.llbit.util.mojangapi.MinecraftSkin;
 import se.llbit.util.mojangapi.MojangApi;
 
 public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initializable {
+  private static final Map<String, EntitiesTab.EntityType<?>> entityTypes = new HashMap<>();
+
+  static {
+    entityTypes.put("Player", (position, scene) -> {
+      Collection<Entity> entities = scene.getActors();
+      Set<String> ids = new HashSet<>();
+      for (Entity entity : entities) {
+        if (entity instanceof PlayerEntity) {
+          ids.add(((PlayerEntity) entity).uuid);
+        }
+      }
+      // Pick a new UUID for the new entity.
+      long id = System.currentTimeMillis();
+      while (ids.contains(String.format("%016X%016X", 0, id))) {
+        id += 1;
+      }
+      PlayerEntity player = new PlayerEntity(String.format("%016X%016X", 0, id), position);
+      player.randomPoseAndLook();
+      return player;
+    });
+    entityTypes.put("Armor stand", (position, scene) -> new ArmorStand(position, new CompoundTag()));
+    entityTypes.put("Lectern", (position, scene) -> new Lectern(position, "north", true));
+    entityTypes.put("Book", (position, scene) -> new Book(position, Math.PI - Math.PI / 16, Math.toRadians(30), Math.toRadians(180 - 30)));
+    entityTypes.put("Beacon beam", (position, scene) -> new BeaconBeam(position));
+  }
 
   private Scene scene;
+
+  public interface EntityType<T extends Entity> {
+    T createInstance(Vector3 position, Scene scene);
+  }
 
   public static class EntityData {
 
@@ -134,6 +162,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleTextField posY;
   @FXML private DoubleTextField posZ;
   @FXML private VBox controls;
+  @FXML private ComboBox<String> entityType;
 
   public EntitiesTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("EntitiesTab.fxml"));
@@ -554,6 +583,11 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         });
         gearField.setText(geared.getGear(slot).get("id").stringValue(""));
         slotBox.getChildren().addAll(new Label(slot + ":"), gearField);
+        // Hide these fields to avoid user confusion because they do not actually work.
+        if (slot.equals("leftHand") || slot.equals("rightHand")) {
+          slotBox.setVisible(false);
+          slotBox.setManaged(false);
+        }
         controls.getChildren().add(slotBox);
       }
     }
@@ -561,34 +595,29 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    add.setTooltip(new Tooltip("Add a player at the target position."));
+    entityType.getItems().addAll(entityTypes.keySet());
+    entityType.setValue("Player");
+    add.setTooltip(new Tooltip("Add an entity at the target position."));
     add.setOnAction(e -> {
-      Collection<Entity> entities = scene.getActors();
-      Set<String> ids = new HashSet<>();
-      for (Entity entity : entities) {
-        if (entity instanceof PlayerEntity) {
-          ids.add(((PlayerEntity) entity).uuid);
-        }
-      }
-      // Pick a new UUID for the new entity.
-      long id = System.currentTimeMillis();
-      while (ids.contains(String.format("%016X%016X", 0, id))) {
-        id += 1;
-      }
       Vector3 position = scene.getTargetPosition();
       if (position == null) {
         position = new Vector3(scene.camera().getPosition());
       }
-      PlayerEntity player = new PlayerEntity(String.format("%016X%016X", 0, id), position);
-      withEntity(selected -> {
-        if (selected instanceof PlayerEntity) {
-          player.skin = ((PlayerEntity) selected).skin;
-          player.model = ((PlayerEntity) selected).model;
-        }
-      });
-      player.randomPoseAndLook();
-      scene.addPlayer(player);
-      EntityData data = new EntityData(player, scene);
+
+      Entity entity = entityTypes.get(entityType.getValue()).createInstance(position, scene);
+      if (entity instanceof PlayerEntity) {
+        PlayerEntity player = (PlayerEntity) entity;
+        withEntity(selected -> {
+          if (selected instanceof PlayerEntity) {
+            player.skin = ((PlayerEntity) selected).skin;
+            player.model = ((PlayerEntity) selected).model;
+          }
+        });
+        scene.addPlayer(player);
+      } else {
+        scene.addActor(entity);
+      }
+      EntityData data = new EntityData(entity, scene);
       entityTable.getItems().add(data);
       entityTable.getSelectionModel().select(data);
     });

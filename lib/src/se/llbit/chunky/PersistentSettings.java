@@ -64,6 +64,7 @@ public final class PersistentSettings {
   public static final double DEFAULT_FOG_BLUE = 1;
 
   public static final int DEFAULT_RAY_DEPTH = 5;
+  public static final int DEFAULT_BRANCH_COUNT = 10;
   public static final int DEFAULT_SPP_TARGET = 1000;
 
   public static final int DEFAULT_DIMENSION = 0;
@@ -108,10 +109,12 @@ public final class PersistentSettings {
 
   private static void migrateOldSettings() {
     String lastTexturePack = settings.getString("lastTexturePack", null);
-    if(lastTexturePack != null) {
-      setLastTexturePack(lastTexturePack);
+    if (lastTexturePack != null) {
+      setEnabledResourcePacks(
+        parseResourcePackPaths(lastTexturePack).toArray(new File[0]), false
+      );
       // TODO: Remove legacy setting in 2.6.0
-//      settings.removeSetting("lastTexturePack");
+      // settings.removeSetting("lastTexturePack");
     }
   }
 
@@ -206,7 +209,6 @@ public final class PersistentSettings {
     setEnabledResourcePacks(
       parseResourcePackPaths(path).toArray(new File[0])
     );
-    save();
   }
 
   /**
@@ -243,14 +245,20 @@ public final class PersistentSettings {
   }
 
   public static void setEnabledResourcePacks(File... enabledTexturePacks) {
+    setEnabledResourcePacks(enabledTexturePacks, true);
+  }
+
+  private static void setEnabledResourcePacks(File[] enabledTexturePacks, boolean save) {
     JsonArray array = new JsonArray(enabledTexturePacks.length);
-    for(File texturePackFile : enabledTexturePacks) {
+    for (File texturePackFile : enabledTexturePacks) {
       array.add(texturePackFile.toString());
     }
     settings.set("enabledResourcePacks", array);
     // TODO: Remove legacy setting in 2.6.0
     settings.setString("lastTexturePack", getLastTexturePack());
-    save();
+    if (save) {
+      PersistentSettings.save();
+    }
   }
 
   public static List<File> getEnabledResourcePacks() {
@@ -263,10 +271,6 @@ public final class PersistentSettings {
   public static void setRayDepth(int rayDepth) {
     settings.setInt("rayDepth", rayDepth);
     save();
-  }
-
-  public static int getSppTargetDefault() {
-    return settings.getInt("sppTargetDefault", DEFAULT_SPP_TARGET);
   }
 
   /**
@@ -293,8 +297,21 @@ public final class PersistentSettings {
     return settings.containsKey(key);
   }
 
+  public static int getSppTargetDefault() {
+    return settings.getInt("sppTargetDefault", DEFAULT_SPP_TARGET);
+  }
+
   public static void setSppTargetDefault(int targetSPP) {
     settings.setInt("sppTargetDefault", targetSPP);
+    save();
+  }
+
+  public static int getBranchCountDefault() {
+    return settings.getInt("branchCountDefault", DEFAULT_BRANCH_COUNT);
+  }
+
+  public static void setBranchCountDefault(int targetSPP) {
+    settings.setInt("branchCountDefault", targetSPP);
     save();
   }
 
@@ -346,13 +363,18 @@ public final class PersistentSettings {
     save();
   }
 
-  public static void setStillWater(boolean value) {
-    settings.setBool("stillWater", value);
+  public static boolean getStillWater() {
+    return settings.getBool("stillWater", false);
+  }
+
+  public static void setWaterShadingStrategy(String waterShadingStrategy) {
+    settings.setString("waterShadingStrategy", waterShadingStrategy);
     save();
   }
 
-  public static boolean getStillWater() {
-    return settings.getBool("stillWater", false);
+  public static String getWaterShadingStrategy() {
+    String defaultValue = getStillWater() ? "STILL" : "SIMPLEX";
+    return settings.getString("waterShadingStrategy", defaultValue);
   }
 
   public static void setWaterOpacity(double value) {

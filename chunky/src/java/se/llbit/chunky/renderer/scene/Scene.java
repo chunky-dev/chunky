@@ -20,10 +20,10 @@ package se.llbit.chunky.renderer.scene;
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.Block;
-import se.llbit.chunky.block.Lava;
-import se.llbit.chunky.block.Water;
+import se.llbit.chunky.block.minecraft.Lava;
+import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.block.legacy.LegacyBlocksFinalizer;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
@@ -31,7 +31,6 @@ import se.llbit.chunky.chunk.ChunkLoadingException;
 import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.chunk.biome.BiomeData;
 import se.llbit.chunky.entity.*;
-import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
@@ -58,6 +57,8 @@ import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.*;
 import se.llbit.util.annotation.NotNull;
+import se.llbit.util.io.PositionalInputStream;
+import se.llbit.util.io.ZipExport;
 import se.llbit.util.mojangapi.MinecraftProfile;
 
 import java.io.*;
@@ -67,9 +68,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -121,6 +120,21 @@ public class Scene implements JsonSerializable, Refreshable {
   public static final double MAX_EMITTER_INTENSITY = 1000;
 
   /**
+   * Default transmissivity cap.
+   */
+  public static final double DEFAULT_TRANSMISSIVITY_CAP = 1;
+
+  /**
+   * Minimum transmissivity cap.
+   */
+  public static final double MIN_TRANSMISSIVITY_CAP = 1;
+
+  /**
+   * Maximum transmissivity cap.
+   */
+  public static final double MAX_TRANSMISSIVITY_CAP = 3;
+
+  /**
    * Default exposure.
    */
   public static final double DEFAULT_EXPOSURE = 1.0;
@@ -150,7 +164,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public CanvasConfig canvasConfig = new CanvasConfig();
 
   public PostProcessingFilter postProcessingFilter = DEFAULT_POSTPROCESSING_FILTER;
-  public PictureExportFormat outputMode = PictureExportFormats.PNG;
+  private PictureExportFormat pictureExportFormat = PictureExportFormats.PNG;
   public long renderTime;
   /**
    * Current SPP for the scene.
@@ -161,6 +175,10 @@ public class Scene implements JsonSerializable, Refreshable {
    * Target SPP for the scene.
    */
   protected int sppTarget = PersistentSettings.getSppTargetDefault();
+  /**
+   * Branch count for the scene.
+   */
+  protected int branchCount = PersistentSettings.getBranchCountDefault();
   /**
    * Recursive ray depth limit (not including Russian Roulette).
    */
@@ -173,6 +191,8 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean emittersEnabled = DEFAULT_EMITTERS_ENABLED;
   protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
   protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.NONE;
+  protected boolean fancierTranslucency = true;
+  protected double transmissivityCap = DEFAULT_TRANSMISSIVITY_CAP;
 
   protected SunSamplingStrategy sunSamplingStrategy = SunSamplingStrategy.FAST;
 
@@ -181,16 +201,20 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   protected double waterOpacity = PersistentSettings.getWaterOpacity();
   protected double waterVisibility = PersistentSettings.getWaterVisibility();
-  protected boolean stillWater = PersistentSettings.getStillWater();
+  protected WaterShadingStrategy waterShadingStrategy = WaterShadingStrategy.valueOf(PersistentSettings.getWaterShadingStrategy());
+  private final StillWaterShader stillWaterShader = new StillWaterShader();
+  private final LegacyWaterShader legacyWaterShader = new LegacyWaterShader();
+  private final SimplexWaterShader simplexWaterShader = new SimplexWaterShader();
+
+  private WaterShader currentWaterShader = getWaterShader(waterShadingStrategy);
   protected boolean useCustomWaterColor = PersistentSettings.getUseCustomWaterColor();
 
   protected boolean waterPlaneEnabled = false;
   protected double waterPlaneHeight = World.SEA_LEVEL;
   protected boolean waterPlaneOffsetEnabled = true;
   protected boolean waterPlaneChunkClip = true;
-  protected WaterShader waterShading = new LegacyWaterShader();
 
-  public final Fog fog = new Fog();
+  public final Fog fog = new Fog(this);
 
   protected boolean biomeColors = true;
   protected boolean biomeBlending = true;
@@ -264,7 +288,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   protected double[] samples;
 
-  private byte[] alphaChannel;
+  private AlphaBuffer alphaBuffer = new AlphaBuffer();
 
   private boolean finalized = false;
 
@@ -312,6 +336,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public Scene() {
     sppTarget = PersistentSettings.getSppTargetDefault();
+    branchCount = PersistentSettings.getBranchCountDefault();
 
     palette = new BlockPalette();
     worldOctree = new Octree(octreeImplementation, 1);
@@ -351,7 +376,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public synchronized void initBuffers() {
     frontBuffer = new BitmapImage(canvasConfig.getWidth(), canvasConfig.getHeight());
     backBuffer = new BitmapImage(canvasConfig.getWidth(), canvasConfig.getHeight());
-    alphaChannel = new byte[canvasConfig.getPixelCount()];
+    alphaBuffer.reset();
     samples = new double[canvasConfig.getPixelCount() * 3];
   }
 
@@ -397,7 +422,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     exposure = other.exposure;
 
-    stillWater = other.stillWater;
+    waterShadingStrategy = other.waterShadingStrategy;
+    currentWaterShader = other.currentWaterShader.clone();
     waterOpacity = other.waterOpacity;
     waterVisibility = other.waterVisibility;
     useCustomWaterColor = other.useCustomWaterColor;
@@ -409,6 +435,8 @@ public class Scene implements JsonSerializable, Refreshable {
     emitterIntensity = other.emitterIntensity;
     emitterSamplingStrategy = other.emitterSamplingStrategy;
     preventNormalEmitterWithSampling = other.preventNormalEmitterWithSampling;
+    fancierTranslucency = other.fancierTranslucency;
+    transmissivityCap = other.transmissivityCap;
     transparentSky = other.transparentSky;
     yClipMin = other.yClipMin;
     yClipMax = other.yClipMax;
@@ -421,7 +449,6 @@ public class Scene implements JsonSerializable, Refreshable {
     waterPlaneHeight = other.waterPlaneHeight;
     waterPlaneOffsetEnabled = other.waterPlaneOffsetEnabled;
     waterPlaneChunkClip = other.waterPlaneChunkClip;
-    waterShading = other.waterShading.clone();
 
     hideUnknownBlocks = other.hideUnknownBlocks;
 
@@ -436,9 +463,10 @@ public class Scene implements JsonSerializable, Refreshable {
     if (samples != other.samples) {
       backBuffer = other.backBuffer;
       frontBuffer = other.frontBuffer;
-      alphaChannel = other.alphaChannel;
       samples = other.samples;
     }
+    // TODO: could we copy it without resetting if the export format and camera perspective didn't change?
+    alphaBuffer.reset();
 
     octreeImplementation = other.octreeImplementation;
 
@@ -503,7 +531,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       // Load the configured skymap file.
-      sky.loadSkymap();
+      sky.reloadSkymap(context.getSceneDirectory());
 
       loadedWorld = EmptyWorld.INSTANCE;
       if (!worldPath.isEmpty()) {
@@ -559,16 +587,6 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public double getExposure() {
     return exposure;
-  }
-
-  /**
-   * Set still water mode.
-   */
-  public void setStillWater(boolean value) {
-    if (value != stillWater) {
-      stillWater = value;
-      refresh();
-    }
   }
 
   /**
@@ -729,15 +747,6 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Test if the ray should be killed <strike>(using Russian Roulette)</strike>.
-   *
-   * @return {@code true} if the ray needs to die now
-   */
-  public final boolean kill(int depth, Random random) {
-    return depth >= rayDepth;
-  }
-
-  /**
    * Reload all loaded chunks.
    */
   public synchronized void reloadChunks(TaskTracker taskTracker) {
@@ -771,12 +780,14 @@ public class Scene implements JsonSerializable, Refreshable {
 
     BiomeStructure.Factory biomeStructureFactory = BiomeStructure.get(this.biomeStructureImplementation);
 
+    Dimension dimension = world.currentDimension();
+
     try (TaskTracker.Task task = taskTracker.task("(1/6) Loading regions")) {
       task.update(2, 1);
 
       loadedWorld = world;
       worldPath = loadedWorld.getWorldDirectory().getAbsolutePath();
-      worldDimension = world.currentDimension();
+      worldDimension = world.currentDimensionId();
 
       if (chunksToLoad.isEmpty()) {
         return;
@@ -803,12 +814,12 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       for (ChunkPosition region : regions) {
-        world.getRegion(region).parse(yMin, yMax);
+        dimension.getRegion(region).parse(yMin, yMax);
       }
     }
 
     try (TaskTracker.Task task = taskTracker.task("(2/6) Loading entities")) {
-     entities.loadPlayers(task, world);
+     entities.loadPlayers(task, dimension);
     }
 
     BiomePalette biomePalette = new ArrayBiomePalette();
@@ -833,7 +844,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       ExecutorService executor = Executors.newSingleThreadExecutor();
       Future<?> nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
-        world.getChunk(chunkPositions[0]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
+        dimension.getChunk(chunkPositions[0]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
         return null; // runnable can't throw non-RuntimeExceptions, so we use a callable instead and have to return something
       });
       for (int i = 0; i < chunkPositions.length; i++) {
@@ -865,7 +876,7 @@ public class Scene implements JsonSerializable, Refreshable {
           if (i + 1 < chunkPositions.length) { // schedule next task if possible
             final int finalI = i;
             nextChunkDataTask = executor.submit(() -> { //request chunk data for the next iteration of the loop
-              world.getChunk(chunkPositions[finalI + 1]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
+              dimension.getChunk(chunkPositions[finalI + 1]).getChunkData(loadingChunkData, palette, biomePalette, yMin, yMax);
               return null; // runnable can't throw non-RuntimeExceptions, so we use a callable instead and have to return something
             });
           }
@@ -1158,7 +1169,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
         if (!chunkData.isEmpty()){
           nonEmptyChunks.add(cp);
-          if (world.getChunk(cp).getVersion() == ChunkVersion.PRE_FLATTENING) {
+          if (dimension.getChunk(cp).getVersion() == ChunkVersion.PRE_FLATTENING) {
             legacyChunks.add(cp);
           }
         }
@@ -1534,7 +1545,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * restarted
    */
   public boolean shouldRefresh() {
-    return resetReason != ResetReason.NONE;
+    return resetReason.shouldRerender();
   }
 
   /**
@@ -1571,13 +1582,6 @@ public class Scene implements JsonSerializable, Refreshable {
       forceReset = true;
       refresh();
     }
-  }
-
-  /**
-   * @return <code>true</code> if still water is enabled
-   */
-  public boolean stillWaterEnabled() {
-    return stillWater;
   }
 
   /**
@@ -1700,6 +1704,9 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public synchronized void setPostprocess(PostProcessingFilter p) {
     postProcessingFilter = p;
+    if (postProcessingFilter instanceof Configurable) {
+      ((Configurable) postProcessingFilter).reset();
+    }
     if (mode == RenderMode.PREVIEW) {
       // Don't interrupt the render if we are currently rendering.
       refresh();
@@ -1852,9 +1859,10 @@ public class Scene implements JsonSerializable, Refreshable {
     dumpFrequency = other.dumpFrequency;
     saveSnapshots = other.saveSnapshots;
     sppTarget = other.sppTarget;
+    branchCount = other.branchCount;
     rayDepth = other.rayDepth;
     mode = other.mode;
-    outputMode = other.outputMode;
+    pictureExportFormat = other.pictureExportFormat;
     cameraPresets = other.cameraPresets;
     camera.copyTransients(other.camera);
     finalizeBuffer = other.finalizeBuffer;
@@ -1874,6 +1882,37 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void setTargetSpp(int value) {
     sppTarget = value;
+  }
+
+  /**
+   * @return The "nominal" value of the branch count.
+   */
+  public int getBranchCount() {
+      return branchCount;
+  }
+
+  /**
+   * Usually the same as getBranchCount, but reduces branch count to 1 for first few SPP.
+   *
+   * @return The current "true" branch count
+   */
+  public int getCurrentBranchCount() {
+    if(spp < branchCount) {
+      if(spp <= Math.sqrt(branchCount)) { // This is arbitrary, but should be a good compromise in most cases
+        return 1;
+      } else {
+        return branchCount - spp;
+      }
+    } else {
+      return branchCount;
+    }
+  }
+
+  /**
+   * @param value Branch count value
+   */
+  public void setBranchCount(int value) {
+    branchCount = value;
   }
 
   /**
@@ -1959,7 +1998,7 @@ public class Scene implements JsonSerializable, Refreshable {
       Log.error("Can't save snapshot: bad output directory!");
       return;
     }
-    String fileName = String.format("%s-%d%s", name, spp, getOutputMode().getExtension());
+    String fileName = String.format("%s-%d%s", name, spp, pictureExportFormat.getExtension());
     File targetFile = new File(directory, fileName);
     if (!directory.exists()) {
       directory.mkdirs();
@@ -1972,7 +2011,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Also see {@link #writeFrame(OutputStream, PictureExportFormat, TaskTracker)}
    */
   public synchronized void saveFrame(File targetFile, TaskTracker taskTracker) {
-    saveFrame(targetFile, getOutputMode(), taskTracker);
+    saveFrame(targetFile, pictureExportFormat, taskTracker);
   }
 
   /**
@@ -1993,46 +2032,16 @@ public class Scene implements JsonSerializable, Refreshable {
    * and may apply post-processing if the scene has not been finalized yet.
    */
   public synchronized void writeFrame(OutputStream out, PictureExportFormat mode, TaskTracker taskTracker) throws IOException {
-    if (mode.isTransparencySupported()) {
-      computeAlpha(taskTracker);
-    }
-    if (!finalized) {
+    if (transparentSky) {
+      if (mode.getTransparencyType() == AlphaBuffer.Type.UNSUPPORTED) {
+        Log.warn("You selected \"transparent sky\", but the selected picture format \"" + mode.getName() + "\" does not support alpha layers.\nUse a different format like PNG instead.");
+        }
+      alphaBuffer.computeAlpha(this, mode.getTransparencyType(), taskTracker);
+      }
+    if (mode.wantsPostprocessing() && !finalized) {
       postProcessFrame(taskTracker);
     }
     mode.write(out, this, taskTracker);
-  }
-
-  /**
-   * Compute the alpha channel.
-   */
-  private void computeAlpha(TaskTracker taskTracker) {
-    if (transparentSky) {
-      if (!this.getOutputMode().isTransparencySupported()) {
-        Log.warn("Can not use transparent sky with " + this.getOutputMode().getName() +  " output mode. Use PNG instead.");
-      } else {
-        try (TaskTracker.Task task = taskTracker.task("Computing alpha channel")) {
-          AtomicInteger done = new AtomicInteger(0);
-
-          Chunky.getCommonThreads().submit(() -> {
-            IntStream.range(0, canvasConfig.getWidth()).parallel().forEach(x -> {
-              WorkerState state = new WorkerState();
-              state.ray = new Ray();
-
-              for (int y = 0; y < canvasConfig.getHeight(); y++) {
-                computeAlpha(x, y, state);
-              }
-
-              task.update(canvasConfig.getWidth(), done.incrementAndGet());
-            });
-          }).get();
-
-        } catch (InterruptedException e) {
-          Log.warn("Failed to compute alpha channel", e);
-        } catch (ExecutionException e) {
-          Log.error("Failed to compute alpha channel", e);
-        }
-      }
-    }
   }
 
   /**
@@ -2144,17 +2153,19 @@ public class Scene implements JsonSerializable, Refreshable {
       try {
         long fileTimestamp = context.fileTimestamp(fileName);
         OctreeFileFormat.OctreeData data;
+        Consumer<String> stepConsumer = step -> task.update("(1/3) Loading octree (" + step + ")");
+
         try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(context.getSceneFileInputStream(fileName), pos -> {
           task.updateInterval((int) (pos * progressScale), 1);
         }))))) {
-          data = OctreeFileFormat.load(in, octreeImplementation, this.biomeStructureImplementation);
+          data = OctreeFileFormat.load(in, octreeImplementation, this.biomeStructureImplementation, stepConsumer);
         } catch (PackedOctree.OctreeTooBigException e) {
           // Octree too big, reload file and force loading as NodeBasedOctree
           Log.warn("Octree was too big when loading dump, reloading with old (slower and bigger) implementation.");
           DataInputStream inRetry = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(context.getSceneFileInputStream(fileName), pos -> {
             task.updateInterval((int) (pos * progressScale), 1);
           }))));
-          data = OctreeFileFormat.load(inRetry, "NODE", this.biomeStructureImplementation);
+          data = OctreeFileFormat.load(inRetry, "NODE", this.biomeStructureImplementation, stepConsumer);
         }
 
         worldOctree = data.worldTree;
@@ -2227,40 +2238,6 @@ public class Scene implements JsonSerializable, Refreshable {
 
     Log.info("Render dump loaded: " + fileName);
     return true;
-  }
-
-  /**
-   * Compute the alpha channel based on sky visibility.
-   */
-  public void computeAlpha(int x, int y, WorkerState state) {
-    Ray ray = state.ray;
-    double halfWidth = canvasConfig.getWidth() / (2.0 * canvasConfig.getHeight());
-    double invHeight = 1.0 / canvasConfig.getHeight();
-
-    // Rotated grid supersampling.
-    double[][] offsets = new double[][] {
-      { -3.0 / 8.0,  1.0 / 8.0 },
-      {  1.0 / 8.0,  3.0 / 8.0 },
-      { -1.0 / 8.0, -3.0 / 8.0 },
-      {  3.0 / 8.0, -1.0 / 8.0 },
-    };
-
-    double occlusion = 0.0;
-    for (double[] offset : offsets) {
-      camera.calcViewRay(ray,
-        -halfWidth + (x + offset[0]) * invHeight,
-        -0.5 + (y + offset[1]) * invHeight);
-      ray.o.x -= origin.x;
-      ray.o.y -= origin.y;
-      ray.o.z -= origin.z;
-
-      if (camera.getProjectionMode() == ProjectionMode.PARALLEL) {
-        ParallelProjector.fixRay(state.ray, this);
-      }
-      occlusion += PreviewRayTracer.skyOcclusion(this, state);
-    }
-
-    alphaChannel[y * canvasConfig.getWidth() + x] = (byte) (255 * occlusion * 0.25 + 0.5);
   }
 
   /**
@@ -2342,6 +2319,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
   /**
    * Get the back buffer of the current frame (in ARGB format).
+   *
    * @return Back buffer
    */
   public BitmapImage getBackBuffer() {
@@ -2349,11 +2327,21 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Get the alpha channel of the current frame.
-   * @return Alpha channel of the current frame
+   * @return returns a view of the alpha channel as uint8 array
+   * @deprecated Replaced by {@link #getAlphaBuffer()}
    */
+  @Deprecated(forRemoval = true)
   public byte[] getAlphaChannel() {
-    return alphaChannel;
+    if(alphaBuffer.getType() != AlphaBuffer.Type.UINT8) {
+      throw new UnsupportedOperationException(
+        "Export Format uses out-of-date API, please update the plugin for \""+ pictureExportFormat.getName() +"\""
+      );
+    }
+    return alphaBuffer.getBuffer().array();
+  }
+
+  public AlphaBuffer getAlphaBuffer() {
+    return alphaBuffer;
   }
 
   /**
@@ -2531,18 +2519,26 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("yMax", yMax);
     json.add("exposure", exposure);
     json.add("postprocess", postProcessingFilter.getId());
-    json.add("outputMode", outputMode.getName());
+    if (postProcessingFilter instanceof Configurable) {
+      JsonObject postprocessJson = new JsonObject();
+      ((Configurable) postProcessingFilter).storeConfiguration(postprocessJson);
+      json.add("postprocessSettings", postprocessJson);
+    }
+    json.add("outputMode", pictureExportFormat.getName());
     json.add("renderTime", renderTime);
     json.add("spp", spp);
     json.add("sppTarget", sppTarget);
+    json.add("branchCount", branchCount);
     json.add("rayDepth", rayDepth);
     json.add("pathTrace", mode != RenderMode.PREVIEW);
     json.add("dumpFrequency", dumpFrequency);
     json.add("saveSnapshots", saveSnapshots);
     json.add("emittersEnabled", emittersEnabled);
     json.add("emitterIntensity", emitterIntensity);
+    json.add("fancierTranslucency", fancierTranslucency);
+    json.add("transmissivityCap", transmissivityCap);
     json.add("sunSamplingStrategy", sunSamplingStrategy.getId());
-    json.add("stillWater", stillWater);
+    json.add("waterShadingStrategy", waterShadingStrategy.getId());
     json.add("waterOpacity", waterOpacity);
     json.add("waterVisibility", waterVisibility);
     json.add("useCustomWaterColor", useCustomWaterColor);
@@ -2553,7 +2549,7 @@ public class Scene implements JsonSerializable, Refreshable {
       colorObj.add("blue", waterColor.z);
       json.add("waterColor", colorObj);
     }
-    waterShading.save(json);
+    currentWaterShader.save(json);
     json.add("fog", fog.toJson());
     json.add("biomeColorsEnabled", biomeColors);
     json.add("transparentSky", transparentSky);
@@ -2640,6 +2636,11 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public MinecraftProfile getPlayerProfile(PlayerEntity player) {
     return entities.getAssociatedProfile(player);
+  }
+
+  public void addActor(Entity entity) {
+    entities.addActor(entity);
+    rebuildActorBvh();
   }
 
   public void removeEntity(Entity entity) {
@@ -2764,18 +2765,22 @@ public class Scene implements JsonSerializable, Refreshable {
 
     exposure = json.get("exposure").doubleValue(exposure);
     postProcessingFilter = PostProcessingFilters
-            .getPostProcessingFilterFromId(json.get("postprocess").stringValue(postProcessingFilter.getId()))
-            .orElseGet(() -> {
-              if (json.get("postprocess").stringValue(null) != null) {
-                Log.warn("The post processing filter " + json +
-                        " is unknown. Maybe you're missing a plugin that was used to create this scene?");
-              }
-              return DEFAULT_POSTPROCESSING_FILTER;
-            });
-    outputMode = PictureExportFormats
-      .getFormat(json.get("outputMode").stringValue(outputMode.getName()))
+      .getPostProcessingFilterFromId(json.get("postprocess").stringValue(postProcessingFilter.getId()))
+      .orElseGet(() -> {
+        if (json.get("postprocess").stringValue(null) != null) {
+          Log.warn("The post processing filter " + json +
+            " is unknown. Maybe you're missing a plugin that was used to create this scene?");
+        }
+        return DEFAULT_POSTPROCESSING_FILTER;
+      });
+    if (postProcessingFilter instanceof Configurable) {
+      ((Configurable) postProcessingFilter).loadConfiguration(json.get("postprocessSettings").asObject());
+    }
+    pictureExportFormat = PictureExportFormats
+      .getFormat(json.get("outputMode").stringValue(pictureExportFormat.getName()))
       .orElse(PictureExportFormats.PNG);
     sppTarget = json.get("sppTarget").intValue(sppTarget);
+    branchCount = json.get("branchCount").intValue(branchCount);
     rayDepth = json.get("rayDepth").intValue(rayDepth);
     if (!json.get("pathTrace").isUnknown()) {
       boolean pathTrace = json.get("pathTrace").boolValue(false);
@@ -2789,6 +2794,8 @@ public class Scene implements JsonSerializable, Refreshable {
     saveSnapshots = json.get("saveSnapshots").boolValue(saveSnapshots);
     emittersEnabled = json.get("emittersEnabled").boolValue(emittersEnabled);
     emitterIntensity = json.get("emitterIntensity").doubleValue(emitterIntensity);
+    fancierTranslucency = json.get("fancierTranslucency").boolValue(fancierTranslucency);
+    transmissivityCap = json.get("transmissivityCap").doubleValue(transmissivityCap);
 
     if (json.get("sunSamplingStrategy").isUnknown()) {
       boolean sunSampling = json.get("sunEnabled").boolValue(false);
@@ -2812,7 +2819,28 @@ public class Scene implements JsonSerializable, Refreshable {
       sunSamplingStrategy = SunSamplingStrategy.valueOf(json.get("sunSamplingStrategy").asString(SunSamplingStrategy.FAST.getId()));
     }
 
-    stillWater = json.get("stillWater").boolValue(stillWater);
+    waterShadingStrategy = WaterShadingStrategy.valueOf(json.get("waterShadingStrategy").asString(WaterShadingStrategy.SIMPLEX.getId()));
+    if (!json.get("waterShader").isUnknown()) {
+      String waterShader = json.get("waterShader").stringValue("SIMPLEX");
+      if(waterShader.equals("LEGACY"))
+        waterShadingStrategy = WaterShadingStrategy.TILED_NORMALMAP;
+      else if(waterShader.equals("SIMPLEX"))
+        waterShadingStrategy = WaterShadingStrategy.SIMPLEX;
+      else {
+        Log.infof("Unknown water shader %s, using SIMPLEX", waterShader);
+        waterShadingStrategy = WaterShadingStrategy.SIMPLEX;
+      }
+    } else {
+      waterShadingStrategy = WaterShadingStrategy.TILED_NORMALMAP;
+    }
+    if (!json.get("stillWater").isUnknown()) {
+      if (json.get("stillWater").boolValue(false)) {
+        waterShadingStrategy = WaterShadingStrategy.STILL;
+      }
+    }
+    setCurrentWaterShader(waterShadingStrategy);
+    currentWaterShader.load(json);
+
     waterOpacity = json.get("waterOpacity").doubleValue(waterOpacity);
     waterVisibility = json.get("waterVisibility").doubleValue(waterVisibility);
     useCustomWaterColor = json.get("useCustomWaterColor").boolValue(useCustomWaterColor);
@@ -2822,16 +2850,6 @@ public class Scene implements JsonSerializable, Refreshable {
       waterColor.y = colorObj.get("green").doubleValue(waterColor.y);
       waterColor.z = colorObj.get("blue").doubleValue(waterColor.z);
     }
-    String waterShader = json.get("waterShader").stringValue("LEGACY");
-    if(waterShader.equals("LEGACY"))
-      waterShading = new LegacyWaterShader();
-    else if(waterShader.equals("SIMPLEX"))
-      waterShading = new SimplexWaterShader();
-    else {
-      Log.infof("Unknown water shader %s, using LEGACY", waterShader);
-      waterShading = new LegacyWaterShader();
-    }
-    waterShading.load(json);
     biomeColors = json.get("biomeColorsEnabled").boolValue(biomeColors);
     transparentSky = json.get("transparentSky").boolValue(transparentSky);
     JsonValue fogObj = json.get("fog");
@@ -2934,7 +2952,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (mode == RenderMode.PAUSED) {
       mode = RenderMode.RENDERING;
     }
-    if (reason != ResetReason.NONE) {
+    if (reason.shouldRerender()) {
       spp = 0;
       renderTime = 0;
     }
@@ -3021,12 +3039,12 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  public PictureExportFormat getOutputMode() {
-    return outputMode;
+  public PictureExportFormat getPictureExportFormat() {
+    return pictureExportFormat;
   }
 
-  public void setOutputMode(PictureExportFormat mode) {
-    outputMode = mode;
+  public void setPictureExportFormat(PictureExportFormat mode) {
+    pictureExportFormat = mode;
   }
 
   public int numberOfChunks() {
@@ -3275,18 +3293,32 @@ public class Scene implements JsonSerializable, Refreshable {
     return loadedWorld;
   }
 
-  /**
-   * Get the water shader
-   */
-  public WaterShader getWaterShading() {
-    return waterShading;
+  public WaterShadingStrategy getWaterShadingStrategy() {
+    return waterShadingStrategy;
   }
 
-  /**
-   * Set the Water shader
-   */
-  public void setWaterShading(WaterShader waterShading) {
-    this.waterShading = waterShading;
+  public void setWaterShadingStrategy(WaterShadingStrategy waterShadingStrategy) {
+    this.waterShadingStrategy = waterShadingStrategy;
+    setCurrentWaterShader(waterShadingStrategy);
+    refresh();
+  }
+
+  public WaterShader getCurrentWaterShader() {
+    return currentWaterShader;
+  }
+  private void setCurrentWaterShader(WaterShadingStrategy waterShadingStrategy) {
+    currentWaterShader = getWaterShader(waterShadingStrategy);
+  }
+
+  private WaterShader getWaterShader(WaterShadingStrategy waterShadingStrategy) {
+    switch (waterShadingStrategy) {
+      case STILL:
+        return stillWaterShader;
+      case TILED_NORMALMAP:
+        return legacyWaterShader;
+      default:
+        return simplexWaterShader;
+    }
   }
 
   public boolean getHideUnknownBlocks() {
@@ -3295,5 +3327,22 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void setHideUnknownBlocks(boolean hideUnknownBlocks) {
     this.hideUnknownBlocks = hideUnknownBlocks;
+  }
+  public boolean getFancierTranslucency() {
+    return fancierTranslucency;
+  }
+
+  public void setFancierTranslucency(boolean value) {
+    fancierTranslucency = value;
+    refresh();
+  }
+
+  public double getTransmissivityCap() {
+    return transmissivityCap;
+  }
+
+  public void setTransmissivityCap(double value) {
+    transmissivityCap = value;
+    refresh();
   }
 }

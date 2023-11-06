@@ -26,10 +26,8 @@ import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderController;
-import se.llbit.chunky.renderer.scene.LegacyWaterShader;
-import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.renderer.scene.SimplexWaterShader;
-import se.llbit.chunky.renderer.scene.WaterShader;
+import se.llbit.chunky.renderer.WaterShadingStrategy;
+import se.llbit.chunky.renderer.scene.*;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
@@ -46,7 +44,7 @@ import java.util.ResourceBundle;
 public class WaterTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
 
-  @FXML private CheckBox stillWater;
+  @FXML private ChoiceBox<WaterShadingStrategy> waterShader;
   @FXML private DoubleAdjuster waterVisibility;
   @FXML private DoubleAdjuster waterOpacity;
   @FXML private CheckBox useCustomWaterColor;
@@ -57,7 +55,6 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @FXML private CheckBox waterPlaneOffsetEnabled;
   @FXML private CheckBox waterPlaneClip;
   @FXML private TitledPane waterWorldModeDetailsPane;
-  @FXML private CheckBox useProceduralWater;
   @FXML private IntegerAdjuster proceduralWaterIterations;
   @FXML private DoubleAdjuster proceduralWaterFrequency;
   @FXML private DoubleAdjuster proceduralWaterAmplitude;
@@ -89,7 +86,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @Override
   public void update(Scene scene) {
     useCustomWaterColor.setSelected(scene.getUseCustomWaterColor());
-    stillWater.setSelected(scene.stillWaterEnabled());
+    waterShader.getSelectionModel().select(scene.getWaterShadingStrategy());
     waterVisibility.set(scene.getWaterVisibility());
     waterOpacity.set(scene.getWaterOpacity());
 
@@ -104,15 +101,13 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterPlaneOffsetEnabled.setSelected(scene.isWaterPlaneOffsetEnabled());
     waterPlaneClip.setSelected(scene.getWaterPlaneChunkClip());
 
-    if(scene.getWaterShading() instanceof SimplexWaterShader) {
-      useProceduralWater.setSelected(true);
-      SimplexWaterShader simplexWaterShader = (SimplexWaterShader) scene.getWaterShading();
+    if(scene.getCurrentWaterShader() instanceof SimplexWaterShader) {
+      SimplexWaterShader simplexWaterShader = (SimplexWaterShader) scene.getCurrentWaterShader();
       proceduralWaterIterations.set(simplexWaterShader.iterations);
       proceduralWaterFrequency.set(simplexWaterShader.baseFrequency);
       proceduralWaterAmplitude.set(simplexWaterShader.baseAmplitude);
       proceduralWaterAnimationSpeed.set(simplexWaterShader.animationSpeed);
     } else {
-      useProceduralWater.setSelected(false);
       proceduralWaterIterations.set(4);
       proceduralWaterFrequency.set(0.4);
       proceduralWaterAmplitude.set(0.025);
@@ -144,10 +139,28 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterOpacity.clampBoth();
     waterOpacity.onValueChange(value -> scene.setWaterOpacity(value));
 
-    stillWater.setTooltip(new Tooltip("Disable the waves on the water surface."));
-    stillWater.selectedProperty().addListener((observable, oldValue, newValue) ->
-      scene.setStillWater(newValue)
-    );
+    waterShader.getItems().addAll(WaterShadingStrategy.values());
+    waterShader.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        scene.setWaterShadingStrategy(newValue);
+        switch (newValue) {
+          case STILL:
+          case TILED_NORMALMAP:
+            proceduralWaterDetailsPane.setVisible(false);
+            proceduralWaterDetailsPane.setExpanded(false);
+            proceduralWaterDetailsPane.setManaged(false);
+            break;
+          case SIMPLEX:
+            proceduralWaterDetailsPane.setVisible(true);
+            proceduralWaterDetailsPane.setExpanded(true);
+            proceduralWaterDetailsPane.setManaged(true);
+            break;
+        }
+      });
+    StringBuilder waterShaderOptions = new StringBuilder("\n\n");
+    for (WaterShadingStrategy strategy : WaterShadingStrategy.values()) {
+      waterShaderOptions.append(strategy.getId()).append(": ").append(strategy.getDescription()).append("\n");
+    }
+    waterShader.setTooltip(new Tooltip("Change how the water surface is rendered." + waterShaderOptions));
 
     useCustomWaterColor.setTooltip(new Tooltip("Disable biome tinting for water, and use a custom color instead."));
     useCustomWaterColor.selectedProperty().addListener((observable, oldValue, newValue) ->
@@ -158,7 +171,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
 
     saveDefaults.setTooltip(new Tooltip("Save the current water settings as new defaults."));
     saveDefaults.setOnAction(e -> {
-      PersistentSettings.setStillWater(scene.stillWaterEnabled());
+      PersistentSettings.setWaterShadingStrategy(scene.getWaterShadingStrategy().getId());
       PersistentSettings.setWaterOpacity(scene.getWaterOpacity());
       PersistentSettings.setWaterVisibility(scene.getWaterVisibility());
       boolean useCustomWaterColor = scene.getUseCustomWaterColor();
@@ -195,34 +208,11 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       scene.setWaterPlaneChunkClip(newValue)
     );
 
-    proceduralWaterDetailsPane.setVisible(useProceduralWater.isSelected());
-    proceduralWaterDetailsPane.setExpanded(useProceduralWater.isSelected());
-    proceduralWaterDetailsPane.setManaged(useProceduralWater.isSelected());
-
-    useProceduralWater.setTooltip(new Tooltip("Generate customized water waves using noise to prevent tiling at large distances."));
-    useProceduralWater.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      if(newValue && scene.getWaterShading() instanceof LegacyWaterShader) {
-        SimplexWaterShader shader = new SimplexWaterShader();
-        scene.setWaterShading(shader);
-        shader.iterations = proceduralWaterIterations.get();
-        shader.baseFrequency = proceduralWaterFrequency.get();
-        shader.baseAmplitude = proceduralWaterAmplitude.get();
-        shader.animationSpeed = proceduralWaterAnimationSpeed.get();
-        scene.refresh();
-      } else if(!newValue && scene.getWaterShading() instanceof SimplexWaterShader) {
-        scene.setWaterShading(new LegacyWaterShader());
-        scene.refresh();
-      }
-      proceduralWaterDetailsPane.setVisible(newValue);
-      proceduralWaterDetailsPane.setExpanded(newValue);
-      proceduralWaterDetailsPane.setManaged(newValue);
-    });
-
     proceduralWaterIterations.setName("Iterations");
     proceduralWaterIterations.setTooltip("The number of iterations (layers) of noise used");
     proceduralWaterIterations.setRange(1, 10);
     proceduralWaterIterations.onValueChange(iter -> {
-      WaterShader shader = scene.getWaterShading();
+      WaterShader shader = scene.getCurrentWaterShader();
       if(shader instanceof SimplexWaterShader) {
         ((SimplexWaterShader) shader).iterations = iter;
         scene.refresh();
@@ -233,7 +223,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     proceduralWaterFrequency.setTooltip("The frequency of the noise");
     proceduralWaterFrequency.setRange(0, 1);
     proceduralWaterFrequency.onValueChange(freq -> {
-      WaterShader shader = scene.getWaterShading();
+      WaterShader shader = scene.getCurrentWaterShader();
       if(shader instanceof SimplexWaterShader) {
         ((SimplexWaterShader) shader).baseFrequency = freq;
       }
@@ -244,7 +234,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     proceduralWaterAmplitude.setTooltip("The amplitude of the noise");
     proceduralWaterAmplitude.setRange(0, 1);
     proceduralWaterAmplitude.onValueChange(amp -> {
-      WaterShader shader = scene.getWaterShading();
+      WaterShader shader = scene.getCurrentWaterShader();
       if(shader instanceof SimplexWaterShader) {
         ((SimplexWaterShader) shader).baseAmplitude = amp;
       }
@@ -256,7 +246,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
             + " Only relevant when rendering animation by varying animation time.");
     proceduralWaterAnimationSpeed.setRange(0, 10);
     proceduralWaterAnimationSpeed.onValueChange(speed -> {
-      WaterShader shader = scene.getWaterShading();
+      WaterShader shader = scene.getCurrentWaterShader();
       if(shader instanceof SimplexWaterShader) {
         ((SimplexWaterShader) shader).animationSpeed = speed;
       }

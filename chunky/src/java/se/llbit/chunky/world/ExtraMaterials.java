@@ -16,7 +16,7 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.chunky.block.Candle;
+import se.llbit.chunky.block.minecraft.Candle;
 import se.llbit.chunky.entity.CalibratedSculkSensorAmethyst;
 import se.llbit.chunky.entity.Campfire;
 import se.llbit.chunky.world.material.CloudMaterial;

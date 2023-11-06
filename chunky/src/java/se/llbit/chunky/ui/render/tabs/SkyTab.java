@@ -43,6 +43,7 @@ import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.elements.GradientEditor;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.render.RenderControlsTab;
+import se.llbit.chunky.ui.render.settings.LayeredFogSettings;
 import se.llbit.chunky.ui.render.settings.UniformFogSettings;
 import se.llbit.chunky.ui.render.settings.SkyboxSettings;
 import se.llbit.chunky.ui.render.settings.SkymapSettings;
@@ -79,6 +80,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   private final SkyboxSettings skyboxSettings = new SkyboxSettings();
   private final SkymapSettings skymapSettings = new SkymapSettings();
   private final UniformFogSettings uniformFogSettings = new UniformFogSettings();
+  private final LayeredFogSettings layeredFogSettings = new LayeredFogSettings();
 
   private ChangeListener<? super javafx.scene.paint.Color> skyColorListener =
       (observable, oldValue, newValue) -> scene.sky().setColor(ColorUtil.fromFx(newValue));
@@ -99,6 +101,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     skyboxSettings.setRenderController(controller.getRenderController());
     skymapSettings.setRenderController(controller.getRenderController());
     uniformFogSettings.setRenderController(controller.getRenderController());
+    layeredFogSettings.setRenderController(controller.getRenderController());
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
@@ -164,7 +167,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
           break;
         }
         case LAYERED: {
-          fogDetailsBox.getChildren().setAll(new Label("Selected mode does not yet have a GUI."));
+          fogDetailsBox.getChildren().setAll(layeredFogSettings);
           break;
         }
       }
@@ -239,6 +242,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     skyboxSettings.update(scene);
     skymapSettings.update(scene);
     uniformFogSettings.update(scene);
+    layeredFogSettings.update(scene);
   }
 
   @Override public String getTabTitle() {

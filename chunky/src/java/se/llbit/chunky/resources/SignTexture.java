@@ -20,84 +20,93 @@ import se.llbit.chunky.entity.SignEntity.Color;
 import se.llbit.chunky.resources.texturepack.FontTexture.Glyph;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
-import se.llbit.math.ColorUtil;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector4;
+import se.llbit.util.annotation.Nullable;
 
 public class SignTexture extends Texture {
+  /**
+   * We use this for the glow dye color to not require more memory (color palette only has 16 colors, the dye color is a 17th color).
+   * If the text mask is false but the color is set to this value, we use the glow dye color (the bright one).
+   */
+  private static final int GLOW_DYE_COLOR = 1;
+  /**
+   * We use this for the glow dye outline color to not require more memory (color palette only has 16 colors, the glow dye color is an 18th color).
+   * If the text mask is false but the color is set to this value, we use the dye color (the darker one).
+   */
+  private static final int GLOW_DYE_OUTLINE_COLOR = 2;
 
-  private static final double hh, v0;
-  private final double ww, u0;
-
-  static {
-    // Set up texture coordinates.
-    v0 = 18 / 32.;
-    double v1 = 30 / 32.;
-    hh = v1 - v0;
-  }
-
+  private final double hh, ww, u0, v0;
+  private final Color dyeColor;
+  private final boolean isGlowing;
   private final Texture signTexture;
+  @Nullable
   private final PalettizedBitmapImage textColor;
+  @Nullable
   private final BinaryBitmapImage textMask;
 
   static private boolean hasVisibleCharacter(JsonArray line) {
-    for(JsonValue textItem : line) {
-      if(!textItem.object().get("text").stringValue("").trim().isEmpty()) {
+    for (JsonValue textItem : line) {
+      if (!textItem.object().get("text").stringValue("").trim().isEmpty()) {
         return true;
       }
     }
     return false;
   }
 
-  public SignTexture(JsonArray[] text, Texture signTexture, boolean isBackSide) {
+  public SignTexture(JsonArray[] text, Color dyeColor, boolean isGlowing, Texture signTexture, int signWidth, int signHeight, double x0, double y0, double x1, double y1, double fontSize, int ymargin, int lineHeight) {
+    this.dyeColor = dyeColor;
     this.signTexture = signTexture;
-    int ymargin = 1;
-    int lineHeight = 10;
-    int width = 96;
-    int height = 48;
+    this.isGlowing = isGlowing;
+    int width = (int) Math.ceil(signWidth * fontSize);
+    int height = (int) Math.ceil(signHeight * fontSize);
     int ystart = ymargin;
     boolean allEmpty = true;
-    for(JsonArray line : text) {
-      if(hasVisibleCharacter(line)) {
+    for (JsonArray line : text) {
+      if (hasVisibleCharacter(line)) {
         allEmpty = false;
         break;
       }
     }
-    if(allEmpty) {
+    if (allEmpty) {
       textColor = null;
       textMask = null;
     } else {
       textColor = new PalettizedBitmapImage(width, height);
       textMask = new BinaryBitmapImage(width, height);
-      for(JsonArray line : text) {
-        if(line.isEmpty()) {
+      for (JsonArray line : text) {
+        if (line.isEmpty()) {
           ystart += lineHeight;
           continue;
         }
         int lineWidth = 0;
-        for(JsonValue textItem : line) {
+        for (JsonValue textItem : line) {
           String textLine = textItem.object().get("text").stringValue("");
-          for(int c : textLine.codePoints().toArray()) {
+          for (int c : textLine.codePoints().toArray()) {
             Glyph glyph = Texture.fonts.getGlyph(c);
             lineWidth += glyph != null ? glyph.width : 0;
           }
         }
         int xstart = (int) Math.ceil((width - lineWidth) / 2.0);
-        for(JsonValue textItem : line) {
+        for (JsonValue textItem : line) {
           String textLine = textItem.object().get("text").stringValue("");
-          Color color = Color.get(textItem.object().get("color").intValue(0));
+          int textItemColor = textItem.object().get("color").intValue(-1);
+          Color color = textItemColor >= 0 ? Color.get(textItemColor) : dyeColor;
 
-          for(int c : textLine.codePoints().toArray()) {
+          for (int c : textLine.codePoints().toArray()) {
             Glyph glyph = Texture.fonts.getGlyph(c);
-            if(glyph != null) {
+            if (glyph != null) {
               int y = ystart - glyph.ascent + lineHeight;
 
-              for(int py = 0; py < glyph.height; ++py) {
+              for (int py = 0; py < glyph.height; ++py) {
                 int x = xstart;
-                for(int px = glyph.xmin; px <= glyph.xmax; ++px) {
-                  if((glyph.lines[py] & (1 << px)) != 0) {
-                    textColor.setPixel(x, y, color.id);
-                    textMask.setPixel(x, y, true);
+                for (int px = glyph.xmin; px <= glyph.xmax; ++px) {
+                  if ((glyph.lines[py] & (1 << px)) != 0) {
+                    if (textItemColor >= 0) {
+                      textColor.setPixel(x, y, color.id);
+                      textMask.setPixel(x, y, true);
+                    } else if (dyeColor != null) {
+                      textColor.setPixel(x, y, 1);
+                    }
                   }
                   x += 1;
                 }
@@ -109,28 +118,54 @@ public class SignTexture extends Texture {
         }
         ystart += lineHeight;
       }
+
+      if (isGlowing) {
+        // add the text outline (textmask=0, textcolor=GLOW_DYE_OUTLINE_COLOR)
+        for (int y = 0; y < textColor.height; y++) {
+          for (int x = 0; x < textColor.width; x++) {
+            if (textMask.getPixel(x, y) || textColor.getPixel(x, y) == GLOW_DYE_COLOR) {
+              continue;
+            }
+            for (int dy = -1; dy <= 1; dy++) {
+              for (int dx = -1; dx <= 1; dx++) {
+                if (dy == 0 && dx == 0) {
+                  continue;
+                }
+                if (x + dx >= 0 && x + dx < textColor.width && y + dy >= 0 && y + dy < textColor.height
+                  && (textMask.getPixel(x + dx, y + dy) || textColor.getPixel(x + dx, y + dy) == GLOW_DYE_COLOR)) {
+                  textColor.setPixel(x, y, GLOW_DYE_OUTLINE_COLOR);
+                }
+              }
+            }
+          }
+        }
+      }
     }
 
-    if (isBackSide) {
-      u0 = 28 / 64.;
-      double u1 = 52 / 64.;
-      ww = u1 - u0;
-    } else {
-      u0 = 2 / 64.;
-      double u1 = 26 / 64.;
-      ww = u1 - u0;
-    }
+    ww = x1 - x0;
+    hh = y1 - y0;
+    u0 = x0;
+    v0 = y0;
   }
 
   @Override
   public float[] getColor(double u, double v) {
-    int x = (int)(u * 96 - Ray.EPSILON);
-    int y = (int) ((1 - v) * 48 - Ray.EPSILON);
-    if(textMask != null && textMask.getPixel(x, y)) {
-      Color characterColor = Color.get(textColor.getPixel(x, y));
-      return characterColor.linearColor;
-    } else {
-      return signTexture.getColor(u * ww + u0, v * hh + v0);
+    if (textColor != null) {
+      int x = (int) (u * textColor.width - Ray.EPSILON);
+      int y = (int) ((1 - v) * textColor.height - Ray.EPSILON);
+      if (textMask != null && textMask.getPixel(x, y)) {
+        Color characterColor = Color.get(textColor.getPixel(x, y));
+        return characterColor.linearColor;
+      } else if (textColor.getPixel(x, y) == GLOW_DYE_COLOR) {
+        if (this.isGlowing) {
+          return dyeColor.getGlowingDyeColor().linearColor;
+        } else {
+          return dyeColor.linearColor;
+        }
+      } else if (textColor.getPixel(x, y) == GLOW_DYE_OUTLINE_COLOR) {
+        return dyeColor.getGlowingOutlineColor().linearColor;
+      }
     }
+    return signTexture.getColor(u * ww + u0, v * hh + v0);
   }
 }

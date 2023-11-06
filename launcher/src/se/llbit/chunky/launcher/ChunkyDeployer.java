@@ -98,7 +98,7 @@ public final class ChunkyDeployer {
           case INCOMPLETE_INFO:
             System.err.println("Missing library name or checksum");
             return false;
-          case MD5_MISMATCH:
+          case CHECKSUM_MISMATCH:
             System.err.println("Library MD5 checksum mismatch");
             return false;
           case MISSING:
@@ -473,7 +473,7 @@ public final class ChunkyDeployer {
       // Version not available!
       System.err.println("Found no installed Chunky version.");
       if (reportErrors) {
-        launcher.launcherError("No Chunky Available",
+        launcher.launcherError("No Chunky version available",
             "There is no local Chunky version installed. Please try updating.");
       }
       return false;
@@ -482,9 +482,9 @@ public final class ChunkyDeployer {
       // TODO: add a way to fix this (delete corrupt version and then update)!
       System.err.println("Version integrity check failed for version " + version.name);
       if (reportErrors) {
-        launcher.launcherError("Chunky Version is Corrupt",
+        launcher.launcherError("Chunky version is corrupt",
             "Version integrity check failed for version "
-            + version.name + ". Please select another version.");
+            + version.name + ". Please select another version or check for updates to repair it.");
       }
       return false;
     }

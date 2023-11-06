@@ -1,6 +1,6 @@
 package se.llbit.chunky.entity;
 
-import se.llbit.chunky.block.CalibratedSculkSensor;
+import se.llbit.chunky.block.minecraft.CalibratedSculkSensor;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;

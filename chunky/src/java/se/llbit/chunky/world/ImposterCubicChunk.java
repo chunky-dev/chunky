@@ -21,28 +21,25 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static se.llbit.chunky.world.World.VERSION_1_12_2;
-
 /**
  * An implementation of a cube wrapper for pre flattening cubic chunks (1.10, 1.11, 1.12)
  *
  * Represents an infinitely tall column of 16x16x16 Cubes
  */
 public class ImposterCubicChunk extends Chunk {
-  private final CubicWorld world;
+  private final CubicDimension dimension;
 
-  public ImposterCubicChunk(ChunkPosition pos, World world) {
-    super(pos, world);
-    assert world instanceof CubicWorld;
-    this.world = (CubicWorld) world;
+  public ImposterCubicChunk(ChunkPosition pos, Dimension dimension) {
+    super(pos, dimension);
+    assert dimension instanceof CubicDimension;
+    this.dimension = (CubicDimension) dimension;
 
-    assert world.getVersionId() <= VERSION_1_12_2;
     version = ChunkVersion.PRE_FLATTENING;
   }
 
   private Map<Integer, Map<String, Tag>> getCubeTags(Set<String> request) {
     Mutable<Integer> timestamp = new Mutable<>(dataTimestamp);
-    ImposterCubicRegion region = (ImposterCubicRegion) world.getRegion(position.getRegionPosition());
+    ImposterCubicRegion region = (ImposterCubicRegion) dimension.getRegion(position.getRegionPosition());
     Map<Integer, Map<String, Tag>> cubeTagsInColumn = region.getCubeTagsInColumn(position, request, timestamp);
     dataTimestamp = timestamp.get();
     return cubeTagsInColumn;
@@ -70,7 +67,7 @@ public class ImposterCubicChunk extends Chunk {
     }
 
     surfaceTimestamp = dataTimestamp;
-    mutableChunkData.set(this.world.createChunkData(mutableChunkData.get(), 0)); //chunk version ignored for cubic worlds
+    mutableChunkData.set(this.dimension.createChunkData(mutableChunkData.get(), 0)); //chunk version ignored for cubic worlds
     ChunkData chunkData = mutableChunkData.get();
     loadSurfaceCubic(data, chunkData, yMin, yMax);
     biomes = IconLayer.UNKNOWN;
@@ -82,7 +79,7 @@ public class ImposterCubicChunk extends Chunk {
 //    } else {
 //      loadBiomes(data, chunkData);
 //    }
-    world.chunkUpdated(position);
+    dimension.chunkUpdated(position);
     return true;
   }
 
@@ -92,7 +89,7 @@ public class ImposterCubicChunk extends Chunk {
       return;
     }
 
-    Heightmap heightmap = world.heightmap();
+    Heightmap heightmap = dimension.getHeightmap();
     BlockPalette palette = new BlockPalette();
     BiomePalette biomePalette = new ArrayBiomePalette();
     biomePalette.put(Biomes.biomesPrePalette[0]); //We don't currently support cubic chunks biomes, and so default to ocean
@@ -113,7 +110,7 @@ public class ImposterCubicChunk extends Chunk {
 
     int[] heightmapData = extractHeightmapDataCubic(null, chunkData);
     updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
-    surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
+    surface = new SurfaceLayer(dimension.getDimensionId(), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
   }
 
   private int[] extractHeightmapDataCubic(Map<String, Tag> cubeData, ChunkData chunkData) {
@@ -173,7 +170,7 @@ public class ImposterCubicChunk extends Chunk {
     request.add(LEVEL_TILEENTITIES);
     Map<Integer, Map<String, Tag>> data = getCubeTags(request);
     if(reuseChunkData.get() == null || reuseChunkData.get() instanceof EmptyChunkData) {
-      reuseChunkData.set(world.createChunkData(reuseChunkData.get(), 0));
+      reuseChunkData.set(dimension.createChunkData(reuseChunkData.get(), 0));
     } else {
       reuseChunkData.get().clear();
     }

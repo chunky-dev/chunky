@@ -1,7 +1,7 @@
 package se.llbit.chunky.entity;
 
 import java.util.Collection;
-import se.llbit.chunky.model.SporeBlossomModel;
+import se.llbit.chunky.model.minecraft.SporeBlossomModel;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Transform;

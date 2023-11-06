@@ -17,11 +17,10 @@
 package se.llbit.math;
 
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.block.Air;
-import se.llbit.chunky.block.Lava;
-import se.llbit.chunky.block.Water;
+import se.llbit.chunky.block.minecraft.Air;
+import se.llbit.chunky.block.minecraft.Lava;
+import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Material;
 
 import java.util.Random;
@@ -68,11 +67,6 @@ public class Ray {
    * Accumulated color value.
    */
   public Vector4 color = new Vector4();
-
-  /**
-   * Emittance of previously intersected surface.
-   */
-  public Vector3 emittance = new Vector3();
 
   /**
    * Previous material.
@@ -150,7 +144,6 @@ public class Ray {
     currentMaterial = Air.INSTANCE;
     depth = 0;
     color.set(0, 0, 0, 0);
-    emittance.set(0, 0, 0);
     specular = true;
   }
 
@@ -167,7 +160,6 @@ public class Ray {
     n.set(other.n);
     geomN.set(other.geomN);
     color.set(0, 0, 0, 0);
-    emittance.set(0, 0, 0);
     specular = other.specular;
   }
 

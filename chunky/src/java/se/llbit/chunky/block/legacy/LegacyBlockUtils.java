@@ -1,9 +1,9 @@
 package se.llbit.chunky.block.legacy;
 
 import se.llbit.chunky.block.BlockFace;
-import se.llbit.chunky.block.FenceGate;
+import se.llbit.chunky.block.minecraft.FenceGate;
 import se.llbit.chunky.block.FinalizationState;
-import se.llbit.chunky.block.Stairs;
+import se.llbit.chunky.block.minecraft.Stairs;
 import se.llbit.chunky.block.legacy.blocks.LegacyFenceGate;
 import se.llbit.chunky.block.legacy.blocks.LegacyStairs;
 import se.llbit.chunky.world.Material;
