@@ -282,7 +282,8 @@ public class Ray {
 
       // constants
       final double sun_az = scene.sun().getAzimuth();
-      final double sun_alt = scene.sun().getAltitude();
+      final double sun_alt_fake = scene.sun().getAltitude();
+      final double sun_alt = Math.abs(sun_alt_fake) > Math.PI / 2 ? Math.signum(sun_alt_fake) * Math.PI - sun_alt_fake : sun_alt_fake;
       final double sun_dx = FastMath.cos(sun_az)*FastMath.cos(sun_alt);
       final double sun_dz = FastMath.sin(sun_az)*FastMath.cos(sun_alt);
       final double sun_dy = FastMath.sin(sun_alt);
@@ -303,8 +304,8 @@ public class Ray {
       }
       sun_tx /= sqrt;
       sun_ty /= sqrt;
-      double circle_radius = scene.sun().getSunRadius() * scene.sun().getDiffuseSampleRadius();
-      double sample_chance = scene.sun().getDiffuseSampleChance();
+      double circle_radius = scene.sun().getSunRadius() * scene.sun().getImportanceSampleRadius();
+      double sample_chance = scene.sun().getImportanceSampleChance();
       double sun_alt_relative = FastMath.asin(sun_tz);
       // check if there is any chance of the sun being visible
       if(sun_alt_relative + circle_radius > Ray.EPSILON) {
@@ -340,7 +341,7 @@ public class Ray {
           double sun_theta = FastMath.atan2(sun_ty, sun_tx);
           double segment_area_proportion = ((maxr * maxr - minr * minr) * circle_radius) / Math.PI;
           sample_chance *= segment_area_proportion / (circle_radius * circle_radius);
-          sample_chance = FastMath.min(sample_chance, Sun.MAX_DIFFUSE_SAMPLE_CHANCE);
+          sample_chance = FastMath.min(sample_chance, Sun.MAX_IMPORTANCE_SAMPLE_CHANCE);
           if(random.nextDouble() < sample_chance) {
             // sun sampling
             r = FastMath.sqrt(minr * minr * x1 + maxr * maxr * (1 - x1));
