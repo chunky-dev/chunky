@@ -3,8 +3,9 @@ package se.llbit.chunky.renderer.scene;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.json.JsonObject;
 import se.llbit.math.QuickMath;
+import se.llbit.util.Configurable;
 
-public class CanvasConfig {
+public class CanvasConfig implements Configurable {
   /**
    * Minimum canvas width.
    */
@@ -33,6 +34,14 @@ public class CanvasConfig {
   public CanvasConfig(int width, int height) {
     this.width = width;
     this.height = height;
+  }
+
+  @Override
+  public void reset() {
+    cropWidth = 0;
+    cropHeight = 0;
+    cropX = 0;
+    cropY = 0;
   }
 
   public void copyState(CanvasConfig other) {
@@ -167,7 +176,8 @@ public class CanvasConfig {
     return width * height;
   }
 
-  public void writeJsonData(JsonObject json) {
+  @Override
+  public void storeConfiguration(JsonObject json) {
     json.add("width", width);
     json.add("height", height);
 
@@ -179,12 +189,10 @@ public class CanvasConfig {
     json.add("cropY", cropY);
   }
 
-  /**
-   * @return true if buffers have to be reinitialized
-   */
-  public boolean importJsonData(JsonObject json) {
-    int newWidth = json.get("width").intValue(width);
-    int newHeight = json.get("height").intValue(height);
+  @Override
+  public void loadConfiguration(JsonObject json) {
+    width = json.get("width").intValue(width);
+    height = json.get("height").intValue(height);
 
     // TODO: rename
     cropWidth = json.get("fullWidth").intValue(cropWidth);
@@ -192,12 +200,5 @@ public class CanvasConfig {
 
     cropX = json.get("cropX").intValue(cropX);
     cropY = json.get("cropY").intValue(cropY);
-
-    if (width != newWidth || height != newHeight) {
-      width = newWidth;
-      height = newHeight;
-      return true;
-    }
-    return false;
   }
 }

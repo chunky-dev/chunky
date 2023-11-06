@@ -1945,7 +1945,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * @deprecated use {@link CanvasConfig}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   public int canvasWidth() {
     return canvasConfig.getWidth();
   }
@@ -1953,7 +1953,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * @deprecated use {@link CanvasConfig}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   public int canvasHeight() {
     return canvasConfig.getHeight();
   }
@@ -1961,7 +1961,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * @deprecated use {@link CanvasConfig}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   public int getFullWidth() {
     return canvasConfig.getCropWidth();
   }
@@ -1969,7 +1969,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * @deprecated use {@link CanvasConfig}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   public int getFullHeight() {
     return canvasConfig.getCropHeight();
   }
@@ -1977,7 +1977,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * @deprecated use {@link CanvasConfig}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   public int getCropX() {
     return canvasConfig.getCropX();
   }
@@ -1985,7 +1985,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * @deprecated use {@link CanvasConfig}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   public int getCropY() {
     return canvasConfig.getCropY();
   }
@@ -2243,6 +2243,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Copies a pixel in-buffer.
    */
+  @Deprecated(forRemoval = true)
   public void copyPixel(int jobId, int offset) {
     System.arraycopy(samples, jobId * 3, samples, (jobId + offset) * 3, 3);
   }
@@ -2512,7 +2513,7 @@ public class Scene implements JsonSerializable, Refreshable {
     JsonObject json = new JsonObject();
     json.add("sdfVersion", SDF_VERSION);
     json.add("name", name);
-    canvasConfig.writeJsonData(json);
+    canvasConfig.storeConfiguration(json);
     json.add("yClipMin", yClipMin);
     json.add("yClipMax", yClipMax);
     json.add("yMin", yMin);
@@ -2754,7 +2755,10 @@ public class Scene implements JsonSerializable, Refreshable {
     // TODO: check if we actually need to reset the scene based on changed settings.
     refresh();
 
-    if(canvasConfig.importJsonData(json) || samples == null) {
+    int oldWidth = canvasConfig.getWidth();
+    int oldHeight = canvasConfig.getHeight();
+    canvasConfig.loadConfiguration(json);
+    if(oldWidth != canvasConfig.getWidth() || oldHeight != canvasConfig.getHeight() || samples == null) {
       initBuffers();
     }
 
