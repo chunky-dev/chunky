@@ -258,9 +258,9 @@ public class Ray {
   }
 
   /**
-   * Set this ray to a random diffuse reflection of the input ray.
+   * Set this ray to a random diffuse reflection or transmission of the input ray.
    */
-  public final void diffuseReflection(Ray ray, Random random) {
+  public final void diffuseLobes(Ray ray, Random random, boolean transmitBack) {
     set(ray);
     // get random point on hemisphere
     this.randomHemisphereDir(random);
@@ -270,7 +270,7 @@ public class Ray {
     specular = false;
 
     // See specularReflection for explanation of why this is needed
-    if(QuickMath.signum(geomN.dot(d)) == QuickMath.signum(geomN.dot(ray.d))) {
+    if(QuickMath.signum(geomN.dot(d)) == QuickMath.signum(geomN.dot(ray.d))^transmitBack) {
       double factor = QuickMath.signum(geomN.dot(ray.d)) * -Ray.EPSILON - d.dot(geomN);
       d.scaleAdd(factor, geomN);
       d.normalize();

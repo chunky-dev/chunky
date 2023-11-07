@@ -17,7 +17,6 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
@@ -297,7 +296,7 @@ public class PathTracer implements RayTracer {
         }
       }
 
-      next.diffuseReflection(ray, random);
+      next.diffuseLobes(ray, random, transmitBack);
       hit = pathTrace(scene, next, state, false) || hit;
       if (hit) {
         cumulativeColor.x += emittance.x + ray.color.x * (directLightR * scene.sun.emittance.x + next.color.x + indirectEmitterColor.x);
@@ -311,7 +310,7 @@ public class PathTracer implements RayTracer {
       }
 
     } else {
-      next.diffuseReflection(ray, random);
+      next.diffuseLobes(ray, random, transmitBack);
 
       hit = pathTrace(scene, next, state, false) || hit;
       if (hit) {
@@ -324,6 +323,10 @@ public class PathTracer implements RayTracer {
         cumulativeColor.y += ray.color.y * indirectEmitterColor.y;
         cumulativeColor.z += ray.color.z * indirectEmitterColor.z;
       }
+    }
+    //fix the normal if inverted for use in other things
+    if (transmitBack) {
+      ray.invertNormal();
     }
     return hit;
   }
