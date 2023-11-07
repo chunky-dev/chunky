@@ -104,7 +104,8 @@ public class PathTracer implements RayTracer {
 
       float pSpecular = currentMat.specular;
 
-      double pDiffuse = scene.fancierTranslucency ? 1 - Math.sqrt(1 - ray.color.w) : ray.color.w;
+      double pDiffuse = scene.fancierTranslucency ? 1 - Math.pow(1 - ray.color.w, Math.max(ray.color.x, Math.max(ray.color.y, ray.color.z))) : ray.color.w;
+      double pAbsorb = scene.fancierTranslucency ? 1 - (1 - ray.color.w)/(1 - pDiffuse + Ray.EPSILON) : ray.color.w;
 
       float n1 = prevMat.ior;
       float n2 = currentMat.ior;
@@ -143,9 +144,9 @@ public class PathTracer implements RayTracer {
         } else if(random.nextFloat() < pDiffuse) {
           hit |= doDiffuseReflection(ray, next, currentMat, cumulativeColor, random, state, scene);
         } else if (n1 != n2) {
-          hit |= doRefraction(ray, next, currentMat, prevMat, cumulativeColor, n1, n2, pDiffuse, random, state, scene);
+          hit |= doRefraction(ray, next, currentMat, prevMat, cumulativeColor, n1, n2, pAbsorb, random, state, scene);
         } else {
-          hit |= doTransmission(ray, next, cumulativeColor, pDiffuse, state, scene);
+          hit |= doTransmission(ray, next, cumulativeColor, pAbsorb, state, scene);
         }
       }
       ray.color.set(cumulativeColor);
@@ -318,7 +319,7 @@ public class PathTracer implements RayTracer {
     return hit;
   }
 
-  private static boolean doRefraction(Ray ray, Ray next, Material currentMat, Material prevMat, Vector4 cumulativeColor, float n1, float n2, double pDiffuse, Random random, WorkerState state, Scene scene) {
+  private static boolean doRefraction(Ray ray, Ray next, Material currentMat, Material prevMat, Vector4 cumulativeColor, float n1, float n2, double pAbsorb, Random random, WorkerState state, Scene scene) {
     boolean hit = false;
     // TODO: make this decision dependent on the material properties:
     boolean doRefraction = currentMat.refractive || prevMat.refractive;
@@ -388,7 +389,7 @@ public class PathTracer implements RayTracer {
 
         if (pathTrace(scene, next, state, false)) {
           // Calculate the color and emittance of the refracted ray
-          translucentRayColor(scene, ray, next, cumulativeColor, pDiffuse);
+          translucentRayColor(scene, ray, next, cumulativeColor, pAbsorb);
           hit = true;
         }
       }
@@ -396,26 +397,26 @@ public class PathTracer implements RayTracer {
     return hit;
   }
 
-  private static boolean doTransmission(Ray ray, Ray next, Vector4 cumulativeColor, double pDiffuse, WorkerState state, Scene scene) {
+  private static boolean doTransmission(Ray ray, Ray next, Vector4 cumulativeColor, double pAbsorb, WorkerState state, Scene scene) {
     boolean hit = false;
     next.set(ray);
     next.o.scaleAdd(Ray.OFFSET, next.d);
 
     if (pathTrace(scene, next, state, false)) {
       // Calculate the color and emittance of the refracted ray
-      translucentRayColor(scene, ray, next, cumulativeColor, pDiffuse);
+      translucentRayColor(scene, ray, next, cumulativeColor, pAbsorb);
       hit = true;
     }
     return hit;
   }
 
-  private static void translucentRayColor(Scene scene, Ray ray, Ray next, Vector4 cumulativeColor, double opacity) {
+  private static void translucentRayColor(Scene scene, Ray ray, Ray next, Vector4 cumulativeColor, double absorption) {
     Vector3 rgbTrans;
     if(scene.fancierTranslucency) {
       // Color-based transmission value
       double colorTrans = (ray.color.x + ray.color.y + ray.color.z) / 3;
       // Total amount of light we want to transmit (overall transparency of texture)
-      double shouldTrans = 1 - opacity;
+      double shouldTrans = 1 - absorption;
       // Amount of each color to transmit - default to overall transparency if RGB values add to 0 (e.g. regular glass)
       rgbTrans = new Vector3(shouldTrans, shouldTrans, shouldTrans);
       if (colorTrans > 0) {
@@ -459,8 +460,8 @@ public class PathTracer implements RayTracer {
       }
     } else {
       // Old method (see https://github.com/chunky-dev/chunky/pull/1513)
-      rgbTrans = new Vector3(1 - opacity, 1 - opacity, 1 - opacity);
-      rgbTrans.scaleAdd(opacity, ray.color.toVec3());
+      rgbTrans = new Vector3(1 - absorption, 1 - absorption, 1 - absorption);
+      rgbTrans.scaleAdd(absorption, ray.color.toVec3());
     }
     // Scale color based on next ray
     Vector4 outputColor = new Vector4(0, 0, 0, 0);
