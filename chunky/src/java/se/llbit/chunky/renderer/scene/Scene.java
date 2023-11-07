@@ -3276,6 +3276,16 @@ public class Scene implements JsonSerializable, Refreshable {
     refresh(ResetReason.MATERIALS_CHANGED);
   }
 
+  /**
+   * Modifies the additional transmission through diffuse  property for the given material.
+   */
+  public void setAdditionalTransmission(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("additionalTransmission", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
   public int getYClipMin() {
     return yClipMin;
   }

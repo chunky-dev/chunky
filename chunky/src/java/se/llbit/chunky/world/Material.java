@@ -134,7 +134,8 @@ public abstract class Material {
     emittance = json.get("emittance").floatValue(emittance);
     roughness = json.get("roughness").floatValue(roughness);
     metalness = json.get("metalness").floatValue(metalness);
-    transmissionRoughness = json.get("transmissionRoughness").floatValue(metalness);
+    transmissionRoughness = json.get("transmissionRoughness").floatValue(transmissionRoughness);
+    additionalTransmission  = json.get("additionalTransmission").floatValue(additionalTransmission);
   }
 
   public boolean isWater() {
