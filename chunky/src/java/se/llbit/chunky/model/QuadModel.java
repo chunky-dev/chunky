@@ -23,6 +23,7 @@ import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.Material;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -114,6 +115,7 @@ public abstract class QuadModel implements BlockModel {
     Quad[] quads = getQuads();
     Texture[] textures = getTextures();
     Tint[] tintedQuads = getTints();
+    Material mat = ray.getCurrentMaterial();
 
     float[] color = null;
     Tint tint = Tint.NONE;
@@ -121,11 +123,11 @@ public abstract class QuadModel implements BlockModel {
       Quad quad = quads[i];
       if (quad.intersect(ray)) {
         float[] c = textures[i].getColor(ray.u, ray.v);
-        if (c[3] > Ray.EPSILON) {
+        if (c[3] > Ray.EPSILON || mat.refractive) {
           tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
           color = c;
           ray.t = ray.tNext;
-          if (quad.doubleSided)
+          if (quad.doubleSided || mat.refractive)
             ray.orientNormal(quad.n);
           else
             ray.setNormal(quad.n);
