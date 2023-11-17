@@ -23,6 +23,7 @@ import se.llbit.chunky.entity.BeaconBeam;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.model.minecraft.BeaconModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.Point3;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
@@ -46,7 +47,7 @@ public class Beacon extends AbstractModelBlock {
   }
 
   @Override
-  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  public Entity toBlockEntity(Point3 position, CompoundTag entityTag) {
     if (entityTag.get("Levels").intValue(0) > 0) {
       return new BeaconBeam(position);
     }

@@ -25,7 +25,10 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.Json;
 import se.llbit.json.JsonObject;
+import se.llbit.math.IntersectionRecord;
+import se.llbit.math.Point3;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
@@ -55,7 +58,7 @@ public class WallBanner extends MinecraftBlockTranslucent {
     this.color = color;
   }
 
-  @Override public boolean intersect(Ray ray, Scene scene) {
+  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     return false;
   }
 
@@ -63,7 +66,7 @@ public class WallBanner extends MinecraftBlockTranslucent {
     return true;
   }
 
-  @Override public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  @Override public Entity toBlockEntity(Point3 position, CompoundTag entityTag) {
     JsonObject design = StandingBanner.parseDesign(entityTag);
     design.set("base", Json.of(color)); // Base color is not included in the entity tag in Minecraft 1.13+.
     return new se.llbit.chunky.entity.WallBanner(position, facing, design);

@@ -223,7 +223,7 @@ public final class ColorUtil {
    * Transform from xyY colorspace to XYZ colorspace.
    */
   public static void xyYtoXYZ(Vector3 in, Vector3 out) {
-    if (in.y <= Ray.EPSILON) {
+    if (in.y <= Constants.EPSILON) {
       out.set(0, 0, 0);
       return;
     }
@@ -282,7 +282,7 @@ public final class ColorUtil {
       hue = (((r - g) / delta) + 4) / 6.0;
     }
 
-    hsl.set(hue, delta < Ray.EPSILON ? 0 : delta / (1 - FastMath.abs(2*lightness - 1)), lightness);
+    hsl.set(hue, delta < Constants.EPSILON ? 0 : delta / (1 - FastMath.abs(2*lightness - 1)), lightness);
   }
 
   public static Vector3 RGBtoHSL(double r, double g, double b) {

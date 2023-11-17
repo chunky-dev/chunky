@@ -22,7 +22,9 @@ import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.model.minecraft.HoneyBlockModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 
 public class Honey extends MinecraftBlockTranslucent {
     public Honey() {
@@ -35,7 +37,7 @@ public class Honey extends MinecraftBlockTranslucent {
     }
 
     @Override
-    public boolean intersect(Ray ray, Scene scene) {
-        return HoneyBlockModel.intersect(ray);
+    public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+        return HoneyBlockModel.intersect(ray, intersectionRecord);
     }
 }

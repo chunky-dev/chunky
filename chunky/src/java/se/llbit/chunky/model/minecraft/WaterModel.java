@@ -17,13 +17,19 @@
  */
 package se.llbit.chunky.model.minecraft;
 
+import se.llbit.chunky.block.minecraft.Water;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.StillWaterShader;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Triangle;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
+import se.llbit.util.VectorUtil;
 
 /**
  * A water block. The height of the top water block is slightly
@@ -53,7 +59,7 @@ public class WaterModel {
       new Quad(new Vector3(0, 1, 1), new Vector3(1, 1, 1), new Vector3(0, 0, 1),
           new Vector4(0, 1, 0, 1), true),};
 
-  static final Quad bot =
+  static final Quad bottom =
       new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
           new Vector4(0, 1, 0, 1), true);
   static final Triangle[][][] t012 = new Triangle[8][8][8];
@@ -173,34 +179,31 @@ public class WaterModel {
     }
   }
 
-  public static boolean intersect(Ray ray) {
-    ray.t = Double.POSITIVE_INFINITY;
+  public static boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+    IntersectionRecord intersectionTest = new IntersectionRecord();
 
-    int data = ray.getCurrentData();
+    int data = intersectionRecord.material instanceof Water ? ((Water) intersectionRecord.material).data : 0;
     int isFull = (data >> FULL_BLOCK) & 1;
     //int level = data >> 8;
 
     if (isFull != 0) {
       boolean hit = false;
       for (Quad quad : fullBlock) {
-        if (quad.intersect(ray)) {
-          Texture.water.getAvgColorLinear(ray.color);
-          ray.t = ray.tNext;
-          ray.orientNormal(quad.n);
+        if (quad.intersect(ray, intersectionTest)) {
+          Texture.water.getAvgColorLinear(intersectionRecord.color);
+          intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, quad.n));
           hit = true;
         }
       }
       if (hit) {
-        ray.distance += ray.t;
-        ray.o.scaleAdd(ray.t, ray.d);
+        intersectionRecord.distance += intersectionTest.distance;
       }
       return hit;
     }
 
     boolean hit = false;
-    if (bot.intersect(ray)) {
-      ray.orientNormal(bot.n);
-      ray.t = ray.tNext;
+    if (bottom.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, bottom.n));
       hit = true;
     }
 
@@ -209,87 +212,79 @@ public class WaterModel {
     int c2 = (0xF & (data >> 24)) % 8;
     int c3 = (0xF & (data >> 28)) % 8;
     Triangle triangle = t012[c0][c1][c2];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
       hit = true;
     }
     triangle = t230[c2][c3][c0];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
-      ray.u = 1 - ray.u;
-      ray.v = 1 - ray.v;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionTest.uv.x = 1 - intersectionTest.uv.x;
+      intersectionTest.uv.y = 1 - intersectionTest.uv.y;
       hit = true;
     }
     triangle = westt[c0][c3];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
       hit = true;
     }
     triangle = westb[c0];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
-      ray.u = 1 - ray.u;
-      ray.v = 1 - ray.v;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionTest.uv.x = 1 - intersectionTest.uv.x;
+      intersectionTest.uv.y = 1 - intersectionTest.uv.y;
       hit = true;
     }
     triangle = eastt[c1][c2];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
       hit = true;
     }
     triangle = eastb[c1];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
-      ray.u = 1 - ray.u;
-      ray.v = 1 - ray.v;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionTest.uv.x = 1 - intersectionTest.uv.x;
+      intersectionTest.uv.y = 1 - intersectionTest.uv.y;
       hit = true;
     }
     triangle = southt[c0][c1];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
       hit = true;
     }
     triangle = southb[c1];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
-      ray.u = 1 - ray.u;
-      ray.v = 1 - ray.v;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionTest.uv.x = 1 - intersectionTest.uv.x;
+      intersectionTest.uv.y = 1 - intersectionTest.uv.y;
       hit = true;
     }
     triangle = northt[c2][c3];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
       hit = true;
     }
     triangle = northb[c2];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
-      ray.u = 1 - ray.u;
-      ray.v = 1 - ray.v;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionTest.uv.x = 1 - intersectionTest.uv.x;
+      intersectionTest.uv.y = 1 - intersectionTest.uv.y;
       hit = true;
     }
     if (hit) {
-      Texture.water.getAvgColorLinear(ray.color);
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
+      if (!(scene.getCurrentWaterShader() instanceof StillWaterShader) && intersectionRecord.shadeN.y != 0) {
+        scene.getCurrentWaterShader().doWaterShading(ray, intersectionRecord, scene.getAnimationTime());
+      }
+      Texture.water.getAvgColorLinear(intersectionRecord.color);
+      intersectionRecord.distance += intersectionTest.distance;
     }
     return hit;
   }
 
-  public static boolean intersectTop(Ray ray) {
-    ray.t = Double.POSITIVE_INFINITY;
+  public static boolean intersectTop(Ray2 ray, IntersectionRecord intersectionRecord) {
+    IntersectionRecord intersectionTest = new IntersectionRecord();
 
-    int data = ray.getCurrentData();
+    int data = intersectionRecord.material instanceof Water ? ((Water) intersectionRecord.material).data : 0;
 
     boolean hit = false;
     int c0 = (0xF & (data >> 16)) % 8;
@@ -297,23 +292,20 @@ public class WaterModel {
     int c2 = (0xF & (data >> 24)) % 8;
     int c3 = (0xF & (data >> 28)) % 8;
     Triangle triangle = t012[c0][c1][c2];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
       hit = true;
     }
     triangle = t230[c2][c3][c0];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
-      ray.u = 1 - ray.u;
-      ray.v = 1 - ray.v;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionTest.uv.x = 1 - intersectionTest.uv.x;
+      intersectionTest.uv.y = 1 - intersectionTest.uv.y;
       hit = true;
     }
     if (hit) {
-      Texture.water.getAvgColorLinear(ray.color);
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
+      Texture.water.getAvgColorLinear(intersectionRecord.color);
+      intersectionRecord.distance += intersectionTest.distance;
     }
     return hit;
   }
@@ -321,21 +313,21 @@ public class WaterModel {
   /**
    * Displace the normal using the water displacement map.
    */
-  public static void doWaterDisplacement(Ray ray) {
+  public static void doWaterDisplacement(Ray2 ray, IntersectionRecord intersectionRecord) {
     int w = (1 << 4);
     double x = ray.o.x / w - QuickMath.floor(ray.o.x / w);
     double z = ray.o.z / w - QuickMath.floor(ray.o.z / w);
-    int u = (int) (x * normalMapW - Ray.EPSILON);
-    int v = (int) ((1 - z) * normalMapW - Ray.EPSILON);
+    int u = (int) (x * normalMapW - Constants.EPSILON);
+    int v = (int) ((1 - z) * normalMapW - Constants.EPSILON);
     Vector3 n = new Vector3(normalMap[(u*normalMapW + v) * 2], .15f, normalMap[(u*normalMapW + v) * 2 + 1]);
     w = (1 << 1);
     x = ray.o.x / w - QuickMath.floor(ray.o.x / w);
     z = ray.o.z / w - QuickMath.floor(ray.o.z / w);
-    u = (int) (x * normalMapW - Ray.EPSILON);
-    v = (int) ((1 - z) * normalMapW - Ray.EPSILON);
+    u = (int) (x * normalMapW - Constants.EPSILON);
+    v = (int) ((1 - z) * normalMapW - Constants.EPSILON);
     n.x += normalMap[(u*normalMapW + v) * 2] / 2;
     n.z += normalMap[(u*normalMapW + v) * 2 + 1] / 2;
     n.normalize();
-    ray.setShadingNormal(n.x, n.y, n.z);
+    intersectionRecord.shadeN.set(n.x, n.y, n.z);
   }
 }

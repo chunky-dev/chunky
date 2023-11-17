@@ -42,6 +42,7 @@ import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
+import se.llbit.math.Point3;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
@@ -236,7 +237,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     EventHandler<KeyEvent> positionHandler = e -> {
       if (e.getCode() == KeyCode.ENTER) {
         scene.camera()
-            .setPosition(new Vector3(
+            .setPosition(new Point3(
                 posX.valueProperty().get(),
                 posY.valueProperty().get(),
                 posZ.valueProperty().get()));
@@ -378,7 +379,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
 
   private void updateCameraPosition() {
     Camera camera = scene.camera();
-    Vector3 pos = camera.getPosition();
+    Point3 pos = camera.getPosition();
     if (positionOrientation.isExpanded()) {
       posX.valueProperty().set(pos.x);
       posY.valueProperty().set(pos.y);

@@ -53,27 +53,27 @@ public class FlameParticles extends Entity {
   private final double scale;
   private final Block block;
 
-  public FlameParticles(Vector3 position, double scale, Block block, Vector3[] flames) {
+  public FlameParticles(Point3 position, double scale, Block block, Vector3[] flames) {
     super(position);
     this.flames = flames;
     this.scale = scale;
     this.block = block;
   }
 
-  public FlameParticles(Vector3 position, Block block, Vector3[] flames) {
+  public FlameParticles(Point3 position, Block block, Vector3[] flames) {
     this(position, 1, block, flames);
   }
 
   public FlameParticles(Block block, Vector3[] flames) {
-    this(new Vector3(0, 0, 0), 1, block, flames);
+    this(new Point3(0, 0, 0), 1, block, flames);
   }
 
-  public FlameParticles(Vector3 position, FlameParticles other) {
+  public FlameParticles(Point3 position, FlameParticles other) {
     this(position, other.scale, other.block, other.flames);
   }
 
   public FlameParticles(JsonObject json) {
-    super(JsonUtil.vec3FromJsonObject(json.get("position")));
+    super(JsonUtil.point3FromJsonObject(json.get("position")));
     this.block = null;
     this.scale = json.get("scale").asDouble(1.0);
     if (json.get("particles").isArray()) {
@@ -81,7 +81,7 @@ public class FlameParticles extends Entity {
           .map(JsonUtil::vec3FromJsonObject)
           .toArray(Vector3[]::new);
     } else {
-      this.flames = new Vector3[]{position};
+      this.flames = new Vector3[]{position.asVector()};
     }
   }
 
@@ -97,7 +97,7 @@ public class FlameParticles extends Entity {
                 .translate(0.5, 1 / 16.0, 0.5)
                 .translate(flameOffset)
                 .translate(offset)
-                .translate(position));
+                .translate(position.asVector()));
       }
     }
     return faces;

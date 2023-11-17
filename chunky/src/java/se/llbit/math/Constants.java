@@ -17,6 +17,10 @@
 package se.llbit.math;
 
 public class Constants {
+  public static final double EPSILON = 5e-8;
+  public static final double OFFSET = 1e-6;
+
+  public static final double INV_4_PI = 1 / (4 * Math.PI);
   public static final double HALF_PI = Math.PI / 2;
   // TODO INV_TAU
   public static final double TAU = Math.PI * 2;

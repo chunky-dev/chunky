@@ -253,7 +253,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Octree origin.
    */
-  protected Vector3i origin = new Vector3i();
+  protected Point3i origin = new Point3i();
 
   /**
    * Actual upper y bound (might be lower than yClipMax).
@@ -678,7 +678,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * @param ray ray to test against scene
    * @return <code>true</code> if an intersection was found
    */
-  public boolean intersect(Ray ray) {
+  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
     boolean hit = false;
 
     if (Double.isNaN(ray.d.x) || Double.isNaN(ray.d.y) || Double.isNaN(ray.d.z) ||
@@ -693,19 +693,52 @@ public class Scene implements JsonSerializable, Refreshable {
       ray.d.set(0, 1, 0);
     }
 
-    if (entities.intersect(ray)) {
+    if (worldIntersection(ray, intersectionRecord)) {
       hit = true;
     }
-    if (worldIntersection(ray)) {
+    if (entities.intersect(ray, intersectionRecord)) {
       hit = true;
     }
     if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-      updateOpacity(ray);
+      /*ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);*/
+      updateOpacity(ray, intersectionRecord);
       return true;
     }
     return false;
+  }
+
+  private boolean worldIntersection(Ray2 ray, IntersectionRecord intersectionRecord) {
+    boolean hit = false;
+    IntersectionRecord intersectionTest = new IntersectionRecord();
+    if (worldOctree.enterBlock(this, ray, intersectionTest, palette)
+        && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
+      intersectionRecord.distance = intersectionTest.distance;
+      intersectionRecord.setNormal(intersectionTest.shadeN);
+      intersectionRecord.color.set(intersectionTest.color);
+      intersectionRecord.material = intersectionTest.material;
+      hit = true;
+    }
+    intersectionTest = new IntersectionRecord();
+    if (ray.getCurrentMedium().isWater()) {
+      if (waterOctree.exitWater(this, ray, intersectionTest, palette)) {
+        intersectionRecord.distance = intersectionTest.distance;
+        intersectionRecord.setNormal(intersectionTest.shadeN);
+        intersectionRecord.color.set(intersectionTest.color);
+        intersectionRecord.material = intersectionTest.material;
+        hit = true;
+      }
+    } else {
+      if (waterOctree.enterBlock(this, ray, intersectionTest, palette)
+          && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
+        intersectionRecord.distance = intersectionTest.distance;
+        intersectionRecord.setNormal(intersectionTest.shadeN);
+        intersectionRecord.color.set(intersectionTest.color);
+        intersectionRecord.material = intersectionTest.material;
+        hit = true;
+      }
+    }
+    return hit;
   }
 
   /**
@@ -714,7 +747,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * @param ray   the ray
    * @return {@code true} if the ray intersects a voxel
    */
-  private boolean worldIntersection(Ray ray) {
+  /*private boolean worldIntersection(Ray ray) {
     Ray start = new Ray(ray);
     start.setCurrentMaterial(ray.getPrevMaterial(), ray.getPrevData());
     boolean hit = false;
@@ -754,22 +787,22 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
     return hit;
-  }
+  }*/
 
-  public void updateOpacity(Ray ray) {
-    if (ray.getCurrentMaterial().isWater() || (ray.getCurrentMaterial() == Air.INSTANCE
-        && ray.getPrevMaterial().isWater())) {
+  public void updateOpacity(Ray2 ray, IntersectionRecord intersectionRecord) {
+    if (intersectionRecord.material.isWater() || (!intersectionRecord.material.isWater()
+        && ray.getCurrentMedium().isWater())) {
       if (useCustomWaterColor) {
-        ray.color.x = waterColor.x;
-        ray.color.y = waterColor.y;
-        ray.color.z = waterColor.z;
+        intersectionRecord.color.x *= waterColor.x;
+        intersectionRecord.color.y *= waterColor.y;
+        intersectionRecord.color.z *= waterColor.z;
       } else {
-        float[] waterColor = ray.getBiomeWaterColor(this);
-        ray.color.x *= waterColor[0];
-        ray.color.y *= waterColor[1];
-        ray.color.z *= waterColor[2];
+        float[] waterColor = getWaterColor((int) (ray.o.x + ray.d.x * Constants.OFFSET), (int) (ray.o.y + ray.d.y * Constants.OFFSET), (int) (ray.o.z + ray.d.z * Constants.OFFSET));
+        intersectionRecord.color.x *= waterColor[0];
+        intersectionRecord.color.y *= waterColor[1];
+        intersectionRecord.color.z *= waterColor[2];
       }
-      ray.color.w = waterOpacity;
+      intersectionRecord.color.w = waterOpacity;
     }
   }
 
@@ -984,7 +1017,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   Block block = palette.get(currentBlock);
 
                   if(block.isEntity()) {
-                    Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
+                    Point3 position = new Point3(cx + cp.x * 16, y, cz + cp.z * 16);
                     Entity entity = block.toEntity(position);
 
                     if (entities.shouldLoad(entity)) {
@@ -1159,7 +1192,7 @@ public class Scene implements JsonSerializable, Refreshable {
             }
             Block block = palette.get(chunkData.getBlockAt(x, y, z));
             // Metadata is the old block data (to be replaced in future Minecraft versions?).
-            Vector3 position = new Vector3(x + wx0, y, z + wz0);
+            Point3 position = new Point3(x + wx0, y, z + wz0);
             if (block.isModifiedByBlockEntity()) {
               Tag newTag = block.getNewTagWithBlockEntity(palette.getBlockSpec(chunkData.getBlockAt(x, y, z)).getTag(), entityTag);
               if (newTag != null) {
@@ -1336,14 +1369,10 @@ public class Scene implements JsonSerializable, Refreshable {
                   int wx = cp.x * Chunk.X_MAX + x;
                   for (int z = 0; z < 16; ++z) {
                     int wz = cp.z * Chunk.Z_MAX + z;
-                    int nsum = 0;
 
                     Integer id = biomePaletteIdxStructure.get(wx, wy, wz);
                     if (id == null) {
                       continue;
-                    }
-                    if(id != 0) {
-                      int asd = 0;
                     }
 
                     Biome biome = biomePalette.get(id);
@@ -1485,9 +1514,9 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * @return The calculated camera position
    */
-  public Vector3 calcCenterCamera() {
+  public Point3 calcCenterCamera() {
     if (chunks.isEmpty()) {
-      return new Vector3(0, 128, 0);
+      return new Point3(0, 128, 0);
     }
 
     int xmin = Integer.MAX_VALUE;
@@ -1521,10 +1550,10 @@ public class Scene implements JsonSerializable, Refreshable {
       Material block = worldOctree.getMaterial(xcenter - origin.x, y - origin.y, zcenter - origin.z,
           palette);
       if (!(block instanceof Air)) {
-        return new Vector3(xcenter, y + 5, zcenter);
+        return new Point3(xcenter, y + 5, zcenter);
       }
     }
-    return new Vector3(xcenter, 128, zcenter);
+    return new Point3(xcenter, 128, zcenter);
   }
 
   /**
@@ -1657,22 +1686,25 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * @return {@code true} if the ray hit something
    */
-  public boolean traceTarget(Ray ray) {
+  public boolean traceTarget(Ray2 ray, IntersectionRecord intersectionRecord) {
     WorkerState state = new WorkerState();
     state.ray = ray;
     if (isInWater(ray)) {
-      ray.setCurrentMaterial(Water.INSTANCE);
+      ray.setCurrentMedium(Water.INSTANCE);
     } else {
-      ray.setCurrentMaterial(Air.INSTANCE);
+      ray.setCurrentMedium(Air.INSTANCE);
     }
     camera.getTargetDirection(ray);
     ray.o.x -= origin.x;
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
-    while (PreviewRayTracer.nextIntersection(this, ray)) {
-      if (ray.getCurrentMaterial() != Air.INSTANCE) {
+    while (intersect(ray, intersectionRecord)) {
+      if (intersectionRecord.material != Air.INSTANCE) {
         return true;
       }
+      ray.o.add(ray.d.x * (intersectionRecord.distance + Constants.OFFSET),
+                ray.d.x * (intersectionRecord.distance + Constants.OFFSET),
+                ray.d.x * (intersectionRecord.distance + Constants.OFFSET));
     }
     return false;
   }
@@ -1689,12 +1721,13 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * @return {@code null} if the camera is not aiming at some intersectable object
    */
-  public Vector3 getTargetPosition() {
-    Ray ray = new Ray();
-    if (!traceTarget(ray)) {
+  public Point3 getTargetPosition() {
+    Ray2 ray = new Ray2();
+    IntersectionRecord intersectionRecord = new IntersectionRecord();
+    if (!traceTarget(ray, intersectionRecord)) {
       return null;
     } else {
-      Vector3 target = new Vector3(ray.o);
+      Point3 target = new Point3(ray.o);
       target.add(origin.x, origin.y, origin.z);
       return target;
     }
@@ -1703,7 +1736,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * @return World origin in the Octree
    */
-  public Vector3i getOrigin() {
+  public Point3i getOrigin() {
     return origin;
   }
 
@@ -2305,10 +2338,11 @@ public class Scene implements JsonSerializable, Refreshable {
         return "No chunks loaded!";
       } else {
         StringBuilder buf = new StringBuilder();
-        Ray ray = new Ray();
-        if (traceTarget(ray) && ray.getCurrentMaterial() instanceof Block) {
-          Block block = (Block) ray.getCurrentMaterial();
-          buf.append(String.format("target: %.2f m\n", ray.distance));
+        Ray2 ray = new Ray2();
+        IntersectionRecord intersectionRecord = new IntersectionRecord();
+        if (traceTarget(ray, intersectionRecord) && intersectionRecord.material instanceof Block) {
+          Block block = (Block) intersectionRecord.material;
+          buf.append(String.format("target: %.2f m\n", intersectionRecord.distance));
           buf.append(block.name);
           String description = block.description();
           if (!description.isEmpty()) {
@@ -2316,7 +2350,7 @@ public class Scene implements JsonSerializable, Refreshable {
           }
           buf.append("\n");
         }
-        Vector3 pos = camera.getPosition();
+        Point3 pos = camera.getPosition();
         buf.append(String.format("pos: (%.1f, %.1f, %.1f)\n", pos.x, pos.y, pos.z));
 
         buf.append("facing: ");
@@ -2485,7 +2519,18 @@ public class Scene implements JsonSerializable, Refreshable {
     return saveSnapshots;
   }
 
-  public boolean isInWater(Ray ray) {
+  public Material getWorldMaterial(Point3 point) {
+    int x = (int) QuickMath.floor(point.x);
+    int y = (int) QuickMath.floor(point.y);
+    int z = (int) QuickMath.floor(point.z);
+    Material material = waterOctree.getMaterial(x, y, z, palette);
+    if (!material.isWater()) {
+      material = worldOctree.getMaterial(x, y, z, palette);
+    }
+    return material;
+  }
+
+  public boolean isInWater(Ray2 ray) {
     if (isWaterPlaneEnabled() && ray.o.y + origin.y < getEffectiveWaterPlaneHeight()) {
       if (getWaterPlaneChunkClip()) {
         if (!isChunkLoaded((int)Math.floor(ray.o.x), (int)Math.floor(ray.o.y), (int)Math.floor(ray.o.z))) {
@@ -2506,8 +2551,8 @@ public class Scene implements JsonSerializable, Refreshable {
     return false;
   }
 
-  public boolean isInsideOctree(Vector3 vec) {
-    return worldOctree.isInside(vec);
+  public boolean isInsideOctree(Point3 point) {
+    return worldOctree.isInside(point);
   }
 
   public double getWaterOpacity() {

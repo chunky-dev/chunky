@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.resources;
 
+import se.llbit.math.Constants;
 import se.llbit.math.Ray;
 
 /**
@@ -47,8 +48,8 @@ public class AnimatedTexture extends Texture {
    */
   public float[] getColor(double u, double v, int frame) {
     int i = Math.floorMod(frame, numFrames);
-    return getColor((int) (u * width - Ray.EPSILON),
-        (int) ((1 - v) * frameHeight - Ray.EPSILON + i * frameHeight));
+    return getColor((int) (u * width - Constants.EPSILON),
+        (int) ((1 - v) * frameHeight - Constants.EPSILON + i * frameHeight));
   }
 
   @Override public void setTexture(BitmapImage newImage) {

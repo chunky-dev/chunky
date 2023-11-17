@@ -20,15 +20,17 @@ package se.llbit.math.bvh;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntStack;
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.primitive.Primitive;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Stack;
 
-import static se.llbit.math.Ray.OFFSET;
+import static se.llbit.math.Constants.OFFSET;
 
 /**
  * An abstract class for BinaryBVHs. This provides helper methods for packing a node based BVH into a more compact
@@ -212,7 +214,7 @@ public abstract class BinaryBVH implements BVH {
      * @return {@code true} if there exists any intersection
      */
     @Override
-    public boolean closestIntersection(Ray ray) {
+    public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord) {
         boolean hit = false;
         int currentNode = 0;
         IntStack nodesToVisit = new IntArrayList(depth/2);
@@ -226,7 +228,7 @@ public abstract class BinaryBVH implements BVH {
                 // Is leaf
                 int primIndex = -packed[currentNode];
                 for (Primitive primitive : packedPrimitives[primIndex]) {
-                    hit = primitive.intersect(ray) | hit;
+                    hit = primitive.intersect(ray, intersectionRecord) | hit;
                 }
 
                 if (nodesToVisit.isEmpty()) break;
@@ -244,14 +246,14 @@ public abstract class BinaryBVH implements BVH {
                         Float.intBitsToFloat(packed[offset+5]), Float.intBitsToFloat(packed[offset+6]),
                         rx, ry, rz);
 
-                if (t1 > ray.t | t1 == -1) {
-                    if (t2 > ray.t | t2 == -1) {
+                if (t1 > intersectionRecord.distance | t1 == -1) {
+                    if (t2 > intersectionRecord.distance | t2 == -1) {
                         if (nodesToVisit.isEmpty()) break;
                         currentNode = nodesToVisit.popInt();
                     } else {
                         currentNode = packed[currentNode];
                     }
-                } else if (t2 > ray.t | t2 == -1) {
+                } else if (t2 > intersectionRecord.distance | t2 == -1) {
                     currentNode += 7;
                 } else if (t1 < t2) {
                     nodesToVisit.push(packed[currentNode]);
@@ -270,7 +272,7 @@ public abstract class BinaryBVH implements BVH {
      * Perform a fast AABB intersection with cached reciprocal direction. This is a branchless approach based on:
      * https://gamedev.stackexchange.com/a/146362
      */
-    public double quickAabbIntersect(Ray ray, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax, double rx, double ry, double rz) {
+    public double quickAabbIntersect(Ray2 ray, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax, double rx, double ry, double rz) {
         double tx1 = (xmin - ray.o.x) * rx;
         double tx2 = (xmax - ray.o.x) * rx;
 

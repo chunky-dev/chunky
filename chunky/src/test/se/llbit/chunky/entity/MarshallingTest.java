@@ -21,6 +21,7 @@ import org.junit.Test;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
+import se.llbit.math.Point3;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
@@ -31,7 +32,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class MarshallingTest {
   @Test public void testPlayer() {
-    PlayerEntity entity = new PlayerEntity("1234", new Vector3(100, 200, 300));
+    PlayerEntity entity = new PlayerEntity("1234", new Point3(100, 200, 300));
     JsonArray headPose = new JsonArray();
     headPose.add(Json.of(33));
     headPose.add(Json.of(66));
@@ -48,7 +49,7 @@ public class MarshallingTest {
   }
 
   @Test public void testArmorStand() {
-    ArmorStand entity = new ArmorStand(new Vector3(100, 200, 300), new CompoundTag());
+    ArmorStand entity = new ArmorStand(new Point3(100, 200, 300), new CompoundTag());
     JsonArray headPose = new JsonArray();
     headPose.add(Json.of(33));
     headPose.add(Json.of(66));

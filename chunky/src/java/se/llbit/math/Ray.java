@@ -32,10 +32,6 @@ import java.util.Random;
  */
 public class Ray {
 
-  public static final double EPSILON = 0.00000005;
-
-  public static final double OFFSET = 0.000001;
-
   /**
    * Ray direction.
    */
@@ -189,13 +185,13 @@ public class Ray {
     int nz = 0;
     double tNext = Double.POSITIVE_INFINITY;
     double t = (bx - o.x) / d.x;
-    if (t > Ray.EPSILON) {
+    if (t > Constants.EPSILON) {
       tNext = t;
       nx = 1;
       ny = nz = 0;
     } else {
       t = ((bx + 1) - o.x) / d.x;
-      if (t < tNext && t > Ray.EPSILON) {
+      if (t < tNext && t > Constants.EPSILON) {
         tNext = t;
         nx = -1;
         ny = nz = 0;
@@ -203,13 +199,13 @@ public class Ray {
     }
 
     t = (by - o.y) / d.y;
-    if (t < tNext && t > Ray.EPSILON) {
+    if (t < tNext && t > Constants.EPSILON) {
       tNext = t;
       ny = 1;
       nx = nz = 0;
     } else {
       t = ((by + 1) - o.y) / d.y;
-      if (t < tNext && t > Ray.EPSILON) {
+      if (t < tNext && t > Constants.EPSILON) {
         tNext = t;
         ny = -1;
         nx = nz = 0;
@@ -217,13 +213,13 @@ public class Ray {
     }
 
     t = (bz - o.z) / d.z;
-    if (t < tNext && t > Ray.EPSILON) {
+    if (t < tNext && t > Constants.EPSILON) {
       tNext = t;
       nz = 1;
       nx = ny = 0;
     } else {
       t = ((bz + 1) - o.z) / d.z;
-      if (t < tNext && t > Ray.EPSILON) {
+      if (t < tNext && t > Constants.EPSILON) {
         tNext = t;
         nz = -1;
         nx = ny = 0;
@@ -234,27 +230,6 @@ public class Ray {
     n.set(nx, ny, nz);
     geomN.set(nx, ny, nz);
     distance += tNext;
-  }
-
-  /**
-   * @return foliage color for the current block
-   */
-  public float[] getBiomeFoliageColor(Scene scene) {
-    return scene.getFoliageColor((int) (o.x + d.x * OFFSET), (int) (o.y + d.y * OFFSET), (int) (o.z + d.z * OFFSET));
-  }
-
-  /**
-   * @return grass color for the current block
-   */
-  public float[] getBiomeGrassColor(Scene scene) {
-    return scene.getGrassColor((int) (o.x + d.x * OFFSET), (int) (o.y + d.y * OFFSET), (int) (o.z + d.z * OFFSET));
-  }
-
-  /**
-   * @return water color for the current block
-   */
-  public float[] getBiomeWaterColor(Scene scene) {
-    return scene.getWaterColor((int) (o.x + d.x * OFFSET), (int) (o.y + d.y * OFFSET), (int) (o.z + d.z * OFFSET));
   }
 
   /**
@@ -307,13 +282,13 @@ public class Ray {
     d.y = uy * tx + vy * ty + n.y * tz;
     d.z = uz * tx + vz * ty + n.z * tz;
 
-    o.scaleAdd(Ray.OFFSET, d);
+    o.scaleAdd(Constants.OFFSET, d);
     currentMaterial = prevMaterial;
     specular = false;
 
     // See specularReflection for explanation of why this is needed
     if(QuickMath.signum(geomN.dot(d)) == QuickMath.signum(geomN.dot(ray.d))) {
-      double factor = QuickMath.signum(geomN.dot(ray.d)) * -Ray.EPSILON - d.dot(geomN);
+      double factor = QuickMath.signum(geomN.dot(ray.d)) * -Constants.EPSILON - d.dot(geomN);
       d.scaleAdd(factor, geomN);
       d.normalize();
     }
@@ -327,7 +302,7 @@ public class Ray {
     currentMaterial = prevMaterial;
 
     double roughness = ray.getCurrentMaterial().roughness;
-    if (roughness > Ray.EPSILON) {
+    if (roughness > Constants.EPSILON) {
       // For rough specular reflections, we interpolate linearly between the diffuse ray direction and the specular direction,
       // which is inspired by https://blog.demofox.org/2020/06/06/casual-shadertoy-path-tracing-2-image-improvement-and-glossy-reflections/
       // This gives good-looking results, although a microfacet-based model would be more physically correct.
@@ -408,7 +383,7 @@ public class Ray {
       // This tells us that if we chose `-d.n` as the factor we would have a dot product
       // equals to 0, as we want something positive or negative,
       // we will use the factor `-d.n +/- epsilon`
-      double factor = QuickMath.signum(geomN.dot(ray.d)) * -Ray.EPSILON - d.dot(geomN);
+      double factor = QuickMath.signum(geomN.dot(ray.d)) * -Constants.EPSILON - d.dot(geomN);
       d.scaleAdd(factor, geomN);
       d.normalize();
     }

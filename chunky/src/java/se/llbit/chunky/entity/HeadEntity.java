@@ -33,6 +33,7 @@ import se.llbit.chunky.resources.texturepack.TextureFormatError;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
+import se.llbit.math.Point3;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
@@ -65,7 +66,7 @@ public class HeadEntity extends Entity {
    */
   private final String skin;
 
-  public HeadEntity(Vector3 position, String skin, int rotation, int placement) {
+  public HeadEntity(Point3 position, String skin, int rotation, int placement) {
     super(position);
     this.skin = skin;
     this.rotation = rotation;
@@ -194,7 +195,7 @@ public class HeadEntity extends Entity {
   }
 
   public static Entity fromJson(JsonObject json) {
-    Vector3 position = new Vector3();
+    Point3 position = new Point3();
     position.fromJson(json.get("position").object());
     //int type = json.get("type").intValue(0);
     int rotation = json.get("rotation").intValue(0);

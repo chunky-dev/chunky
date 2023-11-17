@@ -24,8 +24,10 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.JsonObject;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.util.JsonSerializable;
 
@@ -151,9 +153,11 @@ public class Sun implements JsonSerializable {
 
   protected final Vector3 emittance = new Vector3(1, 1, 1);
 
-  private static final double pE = FastMath.pow(DEFAULT_INTENSITY, Scene.DEFAULT_GAMMA);
-
-  protected static final Vector3 previewEmittance = new Vector3(pE, pE, pE);
+  protected static final Vector3 previewEmittance = new Vector3(
+    DEFAULT_INTENSITY,
+    DEFAULT_INTENSITY,
+    DEFAULT_INTENSITY
+  );
 
   // final to ensure that we don't do a lot of redundant re-allocation
   private final Vector3 color = new Vector3(1, 1, 1);
@@ -226,7 +230,7 @@ public class Sun implements JsonSerializable {
     su.cross(sv, sw);
 
     emittance.set(color);
-    emittance.scale(FastMath.pow(intensity, Scene.DEFAULT_GAMMA));
+    emittance.scale(intensity);
 
     if (enableTextureModification) {
       apparentTextureBrightness.set(apparentColor);
@@ -280,8 +284,8 @@ public class Sun implements JsonSerializable {
    *
    * @return <code>true</code> if the ray intersects the sun model
    */
-  public boolean intersect(Ray ray) {
-    if (!drawTexture || ray.d.dot(sw) < .5) {
+  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
+    if (!drawTexture || ray.d.dot(sw) < radiusCos) {
       return false;
     }
 
@@ -292,36 +296,8 @@ public class Sun implements JsonSerializable {
     if (a >= 0 && a < width2) {
       double b = Math.PI / 2 - FastMath.acos(ray.d.dot(sv)) + width;
       if (b >= 0 && b < width2) {
-        texture.getColor(a / width2, b / width2, ray.color);
-        ray.color.x *= apparentTextureBrightness.x * 10;
-        ray.color.y *= apparentTextureBrightness.y * 10;
-        ray.color.z *= apparentTextureBrightness.z * 10;
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Used with <code>SSS: OFF</code> and <code>SSS: HIGH_QUALITY</code>.
-   */
-  public boolean intersectDiffuse(Ray ray) {
-    if (ray.d.dot(sw) < .5) {
-      return false;
-    }
-
-    double width = radius * 4;
-    double width2 = width * 2;
-    double a;
-    a = Math.PI / 2 - FastMath.acos(ray.d.dot(su)) + width;
-    if (a >= 0 && a < width2) {
-      double b = Math.PI / 2 - FastMath.acos(ray.d.dot(sv)) + width;
-      if (b >= 0 && b < width2) {
-        texture.getColor(a / width2, b / width2, ray.color);
-        ray.color.x *= color.x * 10;
-        ray.color.y *= color.y * 10;
-        ray.color.z *= color.z * 10;
+        texture.getColor(a / width2, b / width2, intersectionRecord.color);
+        intersectionRecord.color.set(color.x, color.y, color.z, 1);
         return true;
       }
     }
@@ -332,13 +308,13 @@ public class Sun implements JsonSerializable {
   /**
    * Calculate flat shading for ray.
    */
-  public void flatShading(Ray ray) {
-    Vector3 n = ray.getNormal();
+  public void flatShading(IntersectionRecord intersectionRecord) {
+    Vector3 n = intersectionRecord.shadeN;
     double shading = n.x * sw.x + n.y * sw.y + n.z * sw.z;
     shading = QuickMath.max(AMBIENT, shading);
-    ray.color.x *= previewEmittance.x * shading;
-    ray.color.y *= previewEmittance.y * shading;
-    ray.color.z *= previewEmittance.z * shading;
+    intersectionRecord.color.x *= previewEmittance.x * shading;
+    intersectionRecord.color.y *= previewEmittance.y * shading;
+    intersectionRecord.color.z *= previewEmittance.z * shading;
   }
 
   public void setColor(Vector3 newColor) {

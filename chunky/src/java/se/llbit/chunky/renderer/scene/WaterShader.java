@@ -17,10 +17,12 @@
 package se.llbit.chunky.renderer.scene;
 
 import se.llbit.json.JsonObject;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 
 public interface WaterShader {
-  void doWaterShading(Ray ray, double animationTime);
+  void doWaterShading(Ray2 ray, IntersectionRecord intersectionRecord, double animationTime);
 
   WaterShader clone();
   void save(JsonObject json);

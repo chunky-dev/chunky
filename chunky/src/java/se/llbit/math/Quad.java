@@ -156,20 +156,20 @@ public class Quad {
    *
    * @return <code>true</code> if the ray intersects this quad
    */
-  public boolean intersect(Ray ray) {
+  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
     double u, v;
 
-    double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
-    double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
-    double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
+    double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Constants.OFFSET);
+    double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Constants.OFFSET);
+    double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Constants.OFFSET);
 
     // Test that the ray is heading toward the plane of this quad.
     double denom = ray.d.dot(n);
-    if (denom < -Ray.EPSILON || (doubleSided && denom > Ray.EPSILON)) {
+    if (denom < -Constants.EPSILON || (doubleSided && denom > Constants.EPSILON)) {
 
       // Test for intersection with the plane at origin.
       double t = -(ix * n.x + iy * n.y + iz * n.z + d) / denom;
-      if (t > -Ray.EPSILON && t < ray.t) {
+      if (t > -Constants.EPSILON && t < intersectionRecord.distance) {
 
         // Plane intersection confirmed.
         // Translate to get hit point relative to the quad origin.
@@ -181,9 +181,9 @@ public class Quad {
         v = ix * yv.x + iy * yv.y + iz * yv.z;
         v *= yvl;
         if (u >= 0 && u <= 1 && v >= 0 && v <= 1) {
-          ray.u = uv.x + u * uv.y;
-          ray.v = uv.z + v * uv.w;
-          ray.tNext = t;
+          intersectionRecord.uv.x = uv.x + u * uv.y;
+          intersectionRecord.uv.y = uv.z + v * uv.w;
+          intersectionRecord.distance = t;
           return true;
         }
       }

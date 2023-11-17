@@ -17,7 +17,9 @@
 package se.llbit.chunky.renderer.scene;
 
 import se.llbit.json.JsonObject;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.SimplexNoise;
 import se.llbit.math.Vector3;
 
@@ -39,7 +41,7 @@ public class SimplexWaterShader implements WaterShader {
 
 
   @Override
-  public void doWaterShading(Ray ray, double animationTime) {
+  public void doWaterShading(Ray2 ray, IntersectionRecord intersectionRecord, double animationTime) {
     double frequency = baseFrequency;
     double amplitude = baseAmplitude;
 
@@ -64,7 +66,7 @@ public class SimplexWaterShader implements WaterShader {
     Vector3 normal = new Vector3();
     normal.cross(zslope, xslope);
     normal.normalize();
-    ray.setShadingNormal(normal.x, normal.y, normal.z);
+    intersectionRecord.shadeN.set(normal.x, normal.y, normal.z);
   }
 
   @Override

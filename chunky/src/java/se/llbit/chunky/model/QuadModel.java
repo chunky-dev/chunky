@@ -23,10 +23,14 @@ import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
+import se.llbit.util.VectorUtil;
 
 import java.util.Random;
 
@@ -75,8 +79,8 @@ public abstract class QuadModel implements BlockModel {
   };
 
   // Epsilons to clip ray intersections to the current block.
-  protected static final double E0 = -Ray.EPSILON;
-  protected static final double E1 = 1 + Ray.EPSILON;
+  protected static final double E0 = -Constants.EPSILON;
+  protected static final double E1 = 1 + Constants.EPSILON;
 
   @PluginApi
   public abstract Quad[] getQuads();
@@ -105,9 +109,9 @@ public abstract class QuadModel implements BlockModel {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
+  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
+    IntersectionRecord intersectionTest = new IntersectionRecord();
 
     Quad[] quads = getQuads();
     Texture[] textures = getTextures();
@@ -117,34 +121,36 @@ public abstract class QuadModel implements BlockModel {
     Tint tint = Tint.NONE;
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
-      if (quad.intersect(ray)) {
-        float[] c = textures[i].getColor(ray.u, ray.v);
-        if (c[3] > Ray.EPSILON) {
+      if (quad.intersect(ray, intersectionTest)) {
+        float[] c = textures[i].getColor(intersectionTest.uv.x, intersectionTest.uv.y);
+        if (c[3] > Constants.EPSILON) {
           tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
           color = c;
-          ray.t = ray.tNext;
-          if (quad.doubleSided)
-            ray.orientNormal(quad.n);
-          else
-            ray.setNormal(quad.n);
+          if (quad.doubleSided) {
+            intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, quad.n));
+          } else {
+            intersectionRecord.setNormal(quad.n);
+          }
           hit = true;
         }
       }
     }
 
     if (hit) {
-      double px = ray.o.x - Math.floor(ray.o.x + ray.d.x * Ray.OFFSET) + ray.d.x * ray.tNext;
-      double py = ray.o.y - Math.floor(ray.o.y + ray.d.y * Ray.OFFSET) + ray.d.y * ray.tNext;
-      double pz = ray.o.z - Math.floor(ray.o.z + ray.d.z * Ray.OFFSET) + ray.d.z * ray.tNext;
+      double px = ray.o.x - Math.floor(ray.o.x + ray.d.x * Constants.OFFSET) + ray.d.x * intersectionTest.distance;
+      double py = ray.o.y - Math.floor(ray.o.y + ray.d.y * Constants.OFFSET) + ray.d.y * intersectionTest.distance;
+      double pz = ray.o.z - Math.floor(ray.o.z + ray.d.z * Constants.OFFSET) + ray.d.z * intersectionTest.distance;
       if (px < E0 || px > E1 || py < E0 || py > E1 || pz < E0 || pz > E1) {
         // TODO this check is only really needed for wall torches
         return false;
       }
 
-      ray.color.set(color);
-      tint.tint(ray.color, ray, scene);
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
+      intersectionRecord.color.set(color);
+      tint.tint(intersectionRecord.color, ray, scene);
+      intersectionRecord.distance += intersectionTest.distance;
+      /*ray.o.scaleAdd(ray.t, ray.d);
+      int x;
+       */
     }
     return hit;
   }

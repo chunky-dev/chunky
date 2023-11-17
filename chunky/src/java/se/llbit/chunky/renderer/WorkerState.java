@@ -16,7 +16,7 @@
  */
 package se.llbit.chunky.renderer;
 
-import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector4;
 
 import java.util.Random;
@@ -25,7 +25,8 @@ import java.util.Random;
  * State for a render worker.
  */
 public class WorkerState {
-  public Ray ray;
+  public Ray2 ray = new Ray2();
+  public Vector4 color = new Vector4();
   public Vector4 attenuation = new Vector4();
   public Random random;
 }

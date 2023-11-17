@@ -24,7 +24,10 @@ import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector4;
 
 public class LightBlock extends AbstractModelBlock {
@@ -51,16 +54,15 @@ public class LightBlock extends AbstractModelBlock {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
+  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     if (scene.getMode() == RenderMode.PREVIEW) {
-      return previewBlockModel.intersect(ray, scene);
+      return previewBlockModel.intersect(ray, intersectionRecord, scene);
     }
     if (scene.getMode() != RenderMode.PREVIEW &&
-        (!scene.getEmittersEnabled() || emittance < Ray.EPSILON
-            || ray.depth >= scene.getRayDepth() - 1 || ray.specular)) {
+        (!scene.getEmittersEnabled() || emittance < Constants.EPSILON)) {
       return false;
     }
-    return this.model.intersect(ray, scene);
+    return this.model.intersect(ray, intersectionRecord, scene);
   }
 
   @Override

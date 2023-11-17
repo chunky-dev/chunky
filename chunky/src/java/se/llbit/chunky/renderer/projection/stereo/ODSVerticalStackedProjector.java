@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer.projection.stereo;
 
+import se.llbit.math.Point3;
 import se.llbit.math.Vector3;
 
 /**
@@ -26,7 +27,7 @@ import se.llbit.math.Vector3;
  */
 public class ODSVerticalStackedProjector extends OmniDirectionalStereoProjector {
   @Override
-  public void apply(double x, double y, Vector3 pos, Vector3 direction) {
+  public void apply(double x, double y, Point3 pos, Vector3 direction) {
     if(y < 0) {
       // -0.5 - 0.0
       applyLeftEye(x*2 + 1, y*2 + 1, pos, direction);

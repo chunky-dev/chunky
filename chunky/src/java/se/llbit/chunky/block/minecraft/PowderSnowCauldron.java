@@ -21,7 +21,9 @@ package se.llbit.chunky.block.minecraft;
 import se.llbit.chunky.model.minecraft.CauldronModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 
 public class PowderSnowCauldron extends Cauldron {
 
@@ -30,7 +32,7 @@ public class PowderSnowCauldron extends Cauldron {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return CauldronModel.intersect(ray, getLevel(), Texture.powderSnow);
+  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+    return CauldronModel.intersect(ray, intersectionRecord, getLevel(), Texture.powderSnow);
   }
 }

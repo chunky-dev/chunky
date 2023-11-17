@@ -8,6 +8,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.math.Constants;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -126,7 +127,7 @@ public final class Fog implements JsonSerializable {
       double fogDensity = uniformDensity * EXTINCTION_FACTOR;
       double extinction = Math.exp(-airDistance * fogDensity);
       color.scale(extinction);
-      if (scatterLight.w > Ray.EPSILON) {
+      if (scatterLight.w > Constants.EPSILON) {
         double inscatter = scatterLight.w;
         if (fastFog) {
           inscatter *= (1 - extinction);
@@ -151,7 +152,7 @@ public final class Fog implements JsonSerializable {
     }
     double extinction = Math.exp(total / clampDy(dy));
     color.scale(extinction);
-    if (scatterLight.w > Ray.EPSILON) {
+    if (scatterLight.w > Constants.EPSILON) {
       double inscatter = (1 - extinction) * scatterLight.w;
       color.x += inscatter * scatterLight.x * fogColor.x;
       color.y += inscatter * scatterLight.y * fogColor.y;
@@ -162,7 +163,7 @@ public final class Fog implements JsonSerializable {
   public double sampleGroundScatterOffset(Ray ray, Vector3 ox, Random random) {
     double airDistance = ray.distance;
     if (mode == FogMode.UNIFORM) {
-      return QuickMath.clamp(airDistance * random.nextFloat(), Ray.EPSILON, airDistance - Ray.EPSILON);
+      return QuickMath.clamp(airDistance * random.nextFloat(), Constants.EPSILON, airDistance - Constants.EPSILON);
     } else if (mode == FogMode.LAYERED) {
       double dy = ray.d.y;
       double y1 = ox.y;
@@ -186,7 +187,7 @@ public final class Fog implements JsonSerializable {
 
   private double sampleLayeredScatterOffset(Random random, double y1, double y2, double dy) {
     if (layers.size() == 0) {
-      return Ray.EPSILON;
+      return Constants.EPSILON;
     }
     // This works only for one fog layer yet.
     FogLayer layer = layers.get(0);

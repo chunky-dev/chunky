@@ -28,6 +28,7 @@ import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.math.Point3;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Transform;
@@ -142,7 +143,7 @@ public class PaintingEntity extends Entity {
   private final double angle;
   private final String art;
 
-  public PaintingEntity(Vector3 position, String art, double angle) {
+  public PaintingEntity(Point3 position, String art, double angle) {
     super(position);
     this.art = art;
     this.angle = angle;
@@ -183,7 +184,7 @@ public class PaintingEntity extends Entity {
    * @return deserialized entity, or {@code null} if it was not a valid entity
    */
   public static Entity fromJson(JsonObject json) {
-    Vector3 position = new Vector3();
+    Point3 position = new Point3();
     position.fromJson(json.get("position").object());
     String art = json.get("art").stringValue("");
     double angle = json.get("angle").doubleValue(0.0);

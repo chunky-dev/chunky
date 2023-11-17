@@ -4,7 +4,10 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.json.JsonObject;
 import se.llbit.math.ColorUtil;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 
 public class BeaconBeamMaterial extends Material {
 
@@ -29,19 +32,19 @@ public class BeaconBeamMaterial extends Material {
     }
 
     @Override
-    public void getColor(Ray ray) {
-        super.getColor(ray);
-        if (ray.color.w > Ray.EPSILON) {
-            ray.color.x *= beamColor[0];
-            ray.color.y *= beamColor[1];
-            ray.color.z *= beamColor[2];
+    public void getColor(IntersectionRecord intersectionRecord) {
+        super.getColor(intersectionRecord);
+        if (intersectionRecord.color.w > Constants.EPSILON) {
+            intersectionRecord.color.x *= beamColor[0];
+            intersectionRecord.color.y *= beamColor[1];
+            intersectionRecord.color.z *= beamColor[2];
         }
     }
 
     @Override
     public float[] getColor(double u, double v) {
         float[] color = super.getColor(u, v);
-        if (color[3] > Ray.EPSILON) {
+        if (color[3] > Constants.EPSILON) {
             color = color.clone();
             color[0] *= beamColor[0];
             color[1] *= beamColor[1];

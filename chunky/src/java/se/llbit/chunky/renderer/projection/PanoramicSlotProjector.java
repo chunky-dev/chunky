@@ -21,6 +21,7 @@ import java.util.Random;
 import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.math.Point3;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
@@ -37,11 +38,11 @@ public class PanoramicSlotProjector implements Projector {
     this.fovTan = Camera.clampedFovTan(fov);
   }
 
-  @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
+  @Override public void apply(double x, double y, Random random, Point3 o, Vector3 d) {
     apply(x, y, o, d);
   }
 
-  @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
+  @Override public void apply(double x, double y, Point3 o, Vector3 d) {
     double ax = QuickMath.degToRad(x * fov);
     double dz = FastMath.cos(ax);
     double dx = FastMath.sin(ax);

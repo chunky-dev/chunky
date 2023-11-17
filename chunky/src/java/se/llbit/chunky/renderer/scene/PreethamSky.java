@@ -17,6 +17,7 @@
 package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.math.Constants;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -136,7 +137,7 @@ public class PreethamSky implements SimulatedSky {
     double x = zenith_x * perezF(cosTheta, gamma, cos2Gamma, A.x, B.x, C.x, D.x, E.x) * f0_x;
     double y = zenith_y * perezF(cosTheta, gamma, cos2Gamma, A.y, B.y, C.y, D.y, E.y) * f0_y;
     double z = zenith_Y * perezF(cosTheta, gamma, cos2Gamma, A.z, B.z, C.z, D.z, E.z) * f0_Y;
-    if (y <= Ray.EPSILON) {
+    if (y <= Constants.EPSILON) {
       return new Vector3(0, 0, 0);
     } else {
       double f = (z / y);

@@ -22,6 +22,8 @@ import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
@@ -128,8 +130,8 @@ public class SkymapTexture extends Texture {
   }
 
   @Override public void getColor(double u, double v, Vector4 c) {
-    ColorUtil.getRGBComponents(image.getPixel((int) (u * width - Ray.EPSILON),
-        (int) ((1 - v) * height - Ray.EPSILON)), c);
+    ColorUtil.getRGBComponents(image.getPixel((int) (u * width - Constants.EPSILON),
+        (int) ((1 - v) * height - Constants.EPSILON)), c);
   }
 
   /**
@@ -139,7 +141,7 @@ public class SkymapTexture extends Texture {
     ColorUtil.getRGBComponents(image.getPixel(x, y), c);
   }
 
-  @Override public void getColor(Ray ray) {
+  @Override public void getColor(IntersectionRecord intersectionRecord) {
     throw new UnsupportedOperationException();
   }
 

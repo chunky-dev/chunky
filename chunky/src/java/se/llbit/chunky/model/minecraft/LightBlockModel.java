@@ -22,7 +22,9 @@ import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector4;
 
 public class LightBlockModel extends AABBModel {
@@ -47,14 +49,12 @@ public class LightBlockModel extends AABBModel {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
+  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     boolean hit = false;
     AABB[] boxes = getBoxes();
-    ray.t = Double.POSITIVE_INFINITY;
-    if (boxes[0].intersect(ray)) {
-      ray.color.set(color);
+    if (boxes[0].intersect(ray, intersectionRecord)) {
+      intersectionRecord.color.set(color);
       hit = true;
-      ray.t = ray.tNext;
     }
     return hit;
   }

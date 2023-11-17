@@ -25,6 +25,8 @@ import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Grid;
 import se.llbit.math.Octree;
+import se.llbit.math.Point3;
+import se.llbit.math.Point3i;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
 import se.llbit.math.primitive.Primitive;
@@ -38,10 +40,10 @@ import java.util.Collection;
  */
 abstract public class Entity {
 
-  public final Vector3 position;
+  public final Point3 position;
 
-  protected Entity(Vector3 position) {
-    this.position = new Vector3(position);
+  protected Entity(Point3 position) {
+    this.position = new Point3(position);
   }
 
   abstract public Collection<Primitive> primitives(Vector3 offset);
@@ -57,7 +59,7 @@ abstract public class Entity {
    * @param palette The scene's block palate
    * @param origin  The Octree's origin
    */
-  public void loadDataFromOctree(Octree octree, BlockPalette palette, Vector3i origin) {
+  public void loadDataFromOctree(Octree octree, BlockPalette palette, Point3i origin) {
   }
 
   /**
@@ -124,11 +126,11 @@ abstract public class Entity {
     return null;
   }
 
-  public Vector3 getPosition() {
+  public Point3 getPosition() {
     return position;
   }
 
-  public void setPosition(Vector3 position) {
+  public void setPosition(Point3 position) {
     this.position.set(position);
   }
 }

@@ -35,6 +35,7 @@ import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.model.minecraft.WaterModel;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.StillWaterShader;
 import se.llbit.chunky.world.Material;
 import se.llbit.log.Log;
 import se.llbit.util.io.PositionalInputStream;
@@ -327,7 +328,7 @@ public class Octree {
    * @param o vector
    * @return {@code true} if the vector is inside the octree
    */
-  public boolean isInside(Vector3 o) {
+  public boolean isInside(Point3 o) {
     int depth = implementation.getDepth();
 
     int x = (int) QuickMath.floor(o.x);
@@ -346,7 +347,7 @@ public class Octree {
    * @param ray Ray that will be moved to the boundary of the octree. The origin, distance and normals will be modified.
    * @return {@code false} if the ray doesn't intersect the octree.
    */
-  private boolean enterOctree(Ray ray) {
+  private boolean enterOctree(Ray2 ray, IntersectionRecord intersectionRecord) {
     double nx = 0, ny = 0, nz = 0;
     double octree_size = 1 << getDepth();
 
@@ -466,9 +467,9 @@ public class Octree {
     if (tMin < 0)
       return false;
 
-    ray.o.scaleAdd(tMin, ray.d);
-    ray.setNormal(nx, ny, nz);
-    ray.distance += tMin;
+    ray.o.add(ray.d.x * tMin, ray.d.y * tMin, ray.d.z * tMin);
+    intersectionRecord.setNormal(nx, ny, nz);
+    intersectionRecord.distance = tMin;
     return true;
   }
 
@@ -477,8 +478,8 @@ public class Octree {
    *
    * @return {@code false} if the ray did not hit the geometry
    */
-  public boolean enterBlock(Scene scene, Ray ray, BlockPalette palette) {
-    if (!isInside(ray.o) && !enterOctree(ray))
+  public boolean enterBlock(Scene scene, Ray2 ray, IntersectionRecord intersectionRecord, BlockPalette palette) {
+    if (!isInside(ray.o) && !enterOctree(ray, intersectionRecord))
       return false;
 
     int depth = implementation.getDepth();
@@ -503,9 +504,9 @@ public class Octree {
     while (true) {
       // Add small offset past the intersection to avoid
       // recursion to the same octree node!
-      int x = (int) Math.floor(ray.o.x + ray.d.x * (distance + Ray.OFFSET));
-      int y = (int) Math.floor(ray.o.y + ray.d.y * (distance + Ray.OFFSET));
-      int z = (int) Math.floor(ray.o.z + ray.d.z * (distance + Ray.OFFSET));
+      int x = (int) Math.floor(ray.o.x + ray.d.x * (distance + Constants.OFFSET));
+      int y = (int) Math.floor(ray.o.y + ray.d.y * (distance + Constants.OFFSET));
+      int z = (int) Math.floor(ray.o.z + ray.d.z * (distance + Constants.OFFSET));
 
       int lx = x >>> depth;
       int ly = y >>> depth;
@@ -524,10 +525,11 @@ public class Octree {
 
       // Test intersection
       Block currentBlock = palette.get(type);
-      Material prevBlock = ray.getCurrentMaterial();
+      Material prevBlock = ray.getCurrentMedium();
 
-      ray.setPrevMaterial(prevBlock, ray.getCurrentData());
-      ray.setCurrentMaterial(currentBlock);
+      /*ray.setPrevMaterial(prevBlock, ray.getCurrentData());
+      ray.setCurrentMaterial(currentBlock);*/
+      intersectionRecord.material = currentBlock;
 
       if (currentBlock.localIntersect) {
         // Other functions expect the ray origin to be in the block they test so here time
@@ -535,34 +537,34 @@ public class Octree {
         // Updating the origin also means that new offsetX/offsetY/offsetZ must be computed
         // but that is done a after the intersection test only if necessary
         // and not if we are leaving the function anyway
-        ray.o.scaleAdd(distance, ray.d);
-        ray.distance += distance;
+        ray.o.add(ray.d.x * distance, ray.d.y * distance, ray.d.z * distance);
+        intersectionRecord.distance += distance;
         distance = 0;
-        if (currentBlock.intersect(ray, scene)) {
+        if (currentBlock.intersect(ray, intersectionRecord, scene)) {
           if (prevBlock != currentBlock)
             return true;
 
-          ray.o.scaleAdd(Ray.OFFSET, ray.d);
+          ray.o.add(ray.d.x * Constants.OFFSET, ray.d.y * Constants.OFFSET, ray.d.z * Constants.OFFSET);
           offsetX = -ray.o.x * invDx;
           offsetY = -ray.o.y * invDy;
           offsetZ = -ray.o.z * invDz;
           continue;
         } else {
           // Exit ray from this local block.
-          ray.setCurrentMaterial(Air.INSTANCE); // Current material is air.
-          ray.exitBlock(x, y, z);
+          //ray.setCurrentMedium(Air.INSTANCE); // Current material is air.
+          exitBlock(ray, intersectionRecord, x, y, z);
           offsetX = -ray.o.x * invDx;
           offsetY = -ray.o.y * invDy;
           offsetZ = -ray.o.z * invDz;
           continue;
         }
-      } else if (!currentBlock.isSameMaterial(prevBlock) && currentBlock != Air.INSTANCE) {
+      } else if (!currentBlock.isSameMaterial(prevBlock)) {
         // Origin and distance of ray need to be updated
-        ray.o.scaleAdd(distance, ray.d);
-        ray.distance += distance;
-        TexturedBlockModel.getIntersectionColor(ray);
+        // ray.o.scaleAdd(distance, ray.d);
+        intersectionRecord.distance += distance;
+        TexturedBlockModel.getIntersectionColor(ray, intersectionRecord);
         if (currentBlock.opaque) {
-          ray.color.w = 1;
+          intersectionRecord.color.w = 1;
         }
         return true;
       }
@@ -576,43 +578,43 @@ public class Octree {
       // The computation involves a multiplication and an addition so we could use a fma (need java 9+)
       // but according to measurement, performance are identical
       double t = (lx << level) * invDx + offsetX;
-      if (t > distance + Ray.EPSILON) {
+      if (t > distance + Constants.EPSILON) {
         tNear = t;
         nx = 1;
       }
       t = ((lx + 1) << level) * invDx + offsetX;
-      if (t < tNear && t > distance + Ray.EPSILON) {
+      if (t < tNear && t > distance + Constants.EPSILON) {
         tNear = t;
         nx = -1;
       }
 
       t = (ly << level) * invDy + offsetY;
-      if (t < tNear && t > distance + Ray.EPSILON) {
+      if (t < tNear && t > distance + Constants.EPSILON) {
         tNear = t;
         ny = 1;
         nx = 0;
       }
       t = ((ly + 1) << level) * invDy + offsetY;
-      if (t < tNear && t > distance + Ray.EPSILON) {
+      if (t < tNear && t > distance + Constants.EPSILON) {
         tNear = t;
         ny = -1;
         nx = 0;
       }
 
       t = (lz << level) * invDz + offsetZ;
-      if (t < tNear && t > distance + Ray.EPSILON) {
+      if (t < tNear && t > distance + Constants.EPSILON) {
         tNear = t;
         nz = 1;
         nx = ny = 0;
       }
       t = ((lz + 1) << level) * invDz + offsetZ;
-      if (t < tNear && t > distance + Ray.EPSILON) {
+      if (t < tNear && t > distance + Constants.EPSILON) {
         tNear = t;
         nz = -1;
         nx = ny = 0;
       }
 
-      ray.setNormal(nx, ny, nz);
+      intersectionRecord.setNormal(nx, ny, nz);
 
       distance = tNear;
     }
@@ -623,8 +625,8 @@ public class Octree {
    *
    * @return {@code false} if the ray doesn't hit anything
    */
-  public boolean exitWater(Scene scene, Ray ray, BlockPalette palette) {
-    if (!isInside(ray.o) && !enterOctree(ray))
+  public boolean exitWater(Scene scene, Ray2 ray, IntersectionRecord intersectionRecord, BlockPalette palette) {
+    if (!isInside(ray.o) && !enterOctree(ray, intersectionRecord))
       return false;
 
     int depth = getDepth();
@@ -636,9 +638,9 @@ public class Octree {
     while (true) {
       // Add small offset past the intersection to avoid
       // recursion to the same octree node!
-      int x = (int) QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
-      int y = (int) QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
-      int z = (int) QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
+      int x = (int) QuickMath.floor(ray.o.x + ray.d.x * Constants.OFFSET);
+      int y = (int) QuickMath.floor(ray.o.y + ray.d.y * Constants.OFFSET);
+      int z = (int) QuickMath.floor(ray.o.z + ray.d.z * Constants.OFFSET);
 
       int lx = x >>> depth;
       int ly = y >>> depth;
@@ -658,34 +660,27 @@ public class Octree {
 
       // Test intersection
       Block currentBlock = palette.get(type);
-      Material prevBlock = ray.getCurrentMaterial();
+      Material prevBlock = ray.getCurrentMedium();
 
-      ray.setPrevMaterial(prevBlock, ray.getCurrentData());
-      ray.setCurrentMaterial(currentBlock);
+      /*ray.setPrevMaterial(prevBlock, ray.getCurrentData());
+      ray.setCurrentMaterial(currentBlock);*/
+      intersectionRecord.material = currentBlock;
 
       if (!currentBlock.isWater()) {
-        if (currentBlock.localIntersect) {
-          if (!currentBlock.intersect(ray, scene)) {
-            ray.setCurrentMaterial(Air.INSTANCE);
-          }
-          return true;
-        } else if (currentBlock != Air.INSTANCE) {
-          TexturedBlockModel.getIntersectionColor(ray);
-          if (currentBlock.opaque) {
-            ray.color.w = 1;
-          }
-          return true;
-        } else {
-          return true;
-        }
+        return true;
       }
 
       if (!(currentBlock instanceof Water && ((Water) currentBlock).isFullBlock())) {
-        if (WaterModel.intersectTop(ray)) {
-          ray.setCurrentMaterial(Air.INSTANCE);
+        if (WaterModel.intersectTop(ray, intersectionRecord)) {
+          intersectionRecord.material = Air.INSTANCE;
+          if (!(scene.getCurrentWaterShader() instanceof StillWaterShader) && intersectionRecord.shadeN.y != 0) {
+            scene.getCurrentWaterShader().doWaterShading(ray, intersectionRecord, scene.getAnimationTime());
+          }
+          intersectionRecord.shadeN.scale(-1);
+          intersectionRecord.n.scale(-1);
           return true;
         } else {
-          ray.exitBlock(x, y, z);
+          exitBlock(ray, intersectionRecord, x, y, z);
           continue;
         }
       }
@@ -696,13 +691,13 @@ public class Octree {
 
       // Testing all six sides of the current leaf node and advancing to the closest intersection
       double t = ((lx << level) - ray.o.x) / ray.d.x;
-      if (t > Ray.EPSILON) {
+      if (t > Constants.EPSILON) {
         tNear = t;
         nx = 1;
         ny = nz = 0;
       } else {
         t = (((lx + 1) << level) - ray.o.x) / ray.d.x;
-        if (t < tNear && t > Ray.EPSILON) {
+        if (t < tNear && t > Constants.EPSILON) {
           tNear = t;
           nx = -1;
           ny = nz = 0;
@@ -710,13 +705,13 @@ public class Octree {
       }
 
       t = ((ly << level) - ray.o.y) / ray.d.y;
-      if (t < tNear && t > Ray.EPSILON) {
+      if (t < tNear && t > Constants.EPSILON) {
         tNear = t;
         ny = 1;
         nx = nz = 0;
       } else {
         t = (((ly + 1) << level) - ray.o.y) / ray.d.y;
-        if (t < tNear && t > Ray.EPSILON) {
+        if (t < tNear && t > Constants.EPSILON) {
           tNear = t;
           ny = -1;
           nx = nz = 0;
@@ -724,23 +719,83 @@ public class Octree {
       }
 
       t = ((lz << level) - ray.o.z) / ray.d.z;
-      if (t < tNear && t > Ray.EPSILON) {
+      if (t < tNear && t > Constants.EPSILON) {
         tNear = t;
         nz = 1;
         nx = ny = 0;
       } else {
         t = (((lz + 1) << level) - ray.o.z) / ray.d.z;
-        if (t < tNear && t > Ray.EPSILON) {
+        if (t < tNear && t > Constants.EPSILON) {
           tNear = t;
           nz = -1;
           nx = ny = 0;
         }
       }
 
-      ray.o.scaleAdd(tNear, ray.d);
-      ray.setNormal(nx, ny, nz);
-      ray.distance += tNear;
+      ray.o.add(ray.d.x * tNear, ray.d.y * tNear, ray.d.z * tNear);
+      intersectionRecord.setNormal(nx, ny, nz);
+      intersectionRecord.distance += tNear;
     }
+  }
+
+  /**
+   * Find the exit point from the given block for this ray. This marches the ray forward - i.e.
+   * updates ray origin directly.
+   *
+   * @param bx block x coordinate
+   * @param by block y coordinate
+   * @param bz block z coordinate
+   */
+  public void exitBlock(Ray2 ray, IntersectionRecord intersectionRecord, int bx, int by, int bz) {
+    int nx = 0;
+    int ny = 0;
+    int nz = 0;
+    double tNext = Double.POSITIVE_INFINITY;
+    double t = (bx - ray.o.x) / ray.d.x;
+    if (t > Constants.EPSILON) {
+      tNext = t;
+      nx = 1;
+      ny = nz = 0;
+    } else {
+      t = ((bx + 1) - ray.o.x) / ray.d.x;
+      if (t < tNext && t > Constants.EPSILON) {
+        tNext = t;
+        nx = -1;
+        ny = nz = 0;
+      }
+    }
+
+    t = (by - ray.o.y) / ray.d.y;
+    if (t < tNext && t > Constants.EPSILON) {
+      tNext = t;
+      ny = 1;
+      nx = nz = 0;
+    } else {
+      t = ((by + 1) - ray.o.y) / ray.d.y;
+      if (t < tNext && t > Constants.EPSILON) {
+        tNext = t;
+        ny = -1;
+        nx = nz = 0;
+      }
+    }
+
+    t = (bz - ray.o.z) / ray.d.z;
+    if (t < tNext && t > Constants.EPSILON) {
+      tNext = t;
+      nz = 1;
+      nx = ny = 0;
+    } else {
+      t = ((bz + 1) - ray.o.z) / ray.d.z;
+      if (t < tNext && t > Constants.EPSILON) {
+        tNext = t;
+        nz = -1;
+        nx = ny = 0;
+      }
+    }
+
+    ray.o.add(ray.d.x * tNext, ray.d.y * tNext, ray.d.z * tNext);
+    intersectionRecord.setNormal(nx, ny, nz);
+    intersectionRecord.distance += tNext;
   }
 
   /**

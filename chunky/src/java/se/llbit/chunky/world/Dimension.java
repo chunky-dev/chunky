@@ -13,6 +13,7 @@ import se.llbit.chunky.world.listeners.ChunkDeletionListener;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.chunky.world.region.*;
+import se.llbit.math.Point3;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
 import se.llbit.util.annotation.Nullable;
@@ -186,10 +187,10 @@ public class Dimension {
    *
    * <p>The result is empty if this is not a single player world.
    */
-  public synchronized Optional<Vector3> getPlayerPos() {
+  public synchronized Optional<Point3> getPlayerPos() {
     if (!playerEntities.isEmpty()) {
       PlayerEntityData pos = playerEntities.iterator().next();
-      return Optional.of(new Vector3(pos.x, pos.y, pos.z));
+      return Optional.of(new Point3(pos.x, pos.y, pos.z));
     } else {
       return Optional.empty();
     }

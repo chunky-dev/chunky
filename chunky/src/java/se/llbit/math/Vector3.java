@@ -25,9 +25,7 @@ import se.llbit.json.JsonObject;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class Vector3 {
-
-  public double x, y, z;
+public class Vector3 extends Tuple3 {
 
   /**
    * Creates a new vector (0, 0, 0).
@@ -82,7 +80,7 @@ public class Vector3 {
   /**
    * Set this vector equal to a-b.
    */
-  public final void sub(Vector3 a, Vector3 b) {
+  public final void sub(Tuple3 a, Tuple3 b) {
     x = a.x - b.x;
     y = a.y - b.y;
     z = a.z - b.z;
@@ -133,7 +131,7 @@ public class Vector3 {
   /**
    * Set this vector equal to s*d + o.
    */
-  public final void scaleAdd(double s, Vector3 d, Vector3 o) {
+  public final void scaleAdd(double s, Vector3 d, Tuple3 o) {
     x = s * d.x + o.x;
     y = s * d.y + o.y;
     z = s * d.z + o.z;

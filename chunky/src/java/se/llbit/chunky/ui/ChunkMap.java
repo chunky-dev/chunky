@@ -652,9 +652,9 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
     double halfWidth = width / (2.0 * height);
 
-    Vector3 o = new Vector3(camera.getPosition());
+    Point3 o = new Point3(camera.getPosition());
 
-    Ray ray = new Ray();
+    Ray2 ray = new Ray2();
     Vector3[] corners = new Vector3[4];
 
     camera.calcViewRay(ray, -halfWidth, -0.5);
@@ -685,7 +685,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       for (int z = cv.pz0; z <= cv.pz1; ++z) {
         // Chunk top center position:
         Vector3 pos = new Vector3((x + 0.5) * 16, 63, (z + 0.5) * 16);
-        pos.sub(o);
+        pos.sub(o.asVector());
         if (norm[0].dot(pos) > CHUNK_SELECT_RADIUS && norm[1].dot(pos) > CHUNK_SELECT_RADIUS
             && norm[2].dot(pos) > CHUNK_SELECT_RADIUS && norm[3].dot(pos) > CHUNK_SELECT_RADIUS) {
           chunkSelection.selectChunk(currentDimension, x, z);
@@ -705,7 +705,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
     double halfWidth = width / (2.0 * height);
 
-    Ray ray = new Ray();
+    Ray2 ray = new Ray2();
 
     Vector3[] direction = new Vector3[4];
     Vector2[] bounds = new Vector2[4];
@@ -779,7 +779,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
     // Draw the camera facing direction indicator.
     camera.calcViewRay(ray, 0, 0);
-    Vector3 o = new Vector3(ray.o);
+    Point3 o = new Point3(ray.o);
     o.x /= 16;
     o.z /= 16;
     o.scaleAdd(1, ray.d);
@@ -796,7 +796,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
    *
    * <p>The result is given in chunk coordinates.
    */
-  private static Vector2 findMapPos(Ray ray, ChunkView cv) {
+  private static Vector2 findMapPos(Ray2 ray, ChunkView cv) {
     if (ray.d.y < 0 && ray.o.y > 63 || ray.d.y > 0 && ray.o.y < 63) {
       // Ray intersects ground.
       double d = (63 - ray.o.y) / ray.d.y;

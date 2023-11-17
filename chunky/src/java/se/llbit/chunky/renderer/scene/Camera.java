@@ -38,15 +38,19 @@ import se.llbit.chunky.renderer.projection.StereographicProjector;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.json.JsonObject;
 import se.llbit.log.Log;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Matrix3;
+import se.llbit.math.Point3;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 import se.llbit.util.JsonSerializable;
 import se.llbit.util.annotation.Nullable;
 
 import java.util.Random;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 /**
@@ -96,7 +100,7 @@ public class Camera implements JsonSerializable {
 
   private boolean lockCamera = false;
 
-  Vector3 pos = new Vector3(0, 0, 0);
+  Point3 pos = new Point3(0, 0, 0);
 
   /**
    * Scratch vector used for temporary storage.
@@ -265,8 +269,8 @@ public class Camera implements JsonSerializable {
   /**
    * Set the camera position.
    */
-  public void setPosition(Vector3 v) {
-    pos.set(v);
+  public void setPosition(Point3 p) {
+    pos.set(p);
     onViewChange();
     positionListener.run();
   }
@@ -368,7 +372,8 @@ public class Camera implements JsonSerializable {
       u.set(0, -1, 0);
     }
     transform.transform(u);
-    pos.scaleAdd(v, u);
+    u.scale(v);
+    pos.add(u);
     onViewChange();
     positionListener.run();
   }
@@ -383,7 +388,8 @@ public class Camera implements JsonSerializable {
       u.set(0, -1, 0);
     }
     transform.transform(u);
-    pos.scaleAdd(-v, u);
+    u.scale(-v);
+    pos.add(u);
     onViewChange();
     positionListener.run();
   }
@@ -393,7 +399,8 @@ public class Camera implements JsonSerializable {
    */
   public synchronized void moveUp(double v) {
     u.set(0, 1, 0);
-    pos.scaleAdd(v, u);
+    u.scale(v);
+    pos.add(u);
     onViewChange();
     positionListener.run();
   }
@@ -403,7 +410,8 @@ public class Camera implements JsonSerializable {
    */
   public synchronized void moveDown(double v) {
     u.set(0, 1, 0);
-    pos.scaleAdd(-v, u);
+    u.scale(-v);
+    pos.add(u);
     onViewChange();
     positionListener.run();
   }
@@ -414,7 +422,8 @@ public class Camera implements JsonSerializable {
   public synchronized void strafeLeft(double v) {
     u.set(1, 0, 0);
     transform.transform(u);
-    pos.scaleAdd(-v, u);
+    u.scale(-v);
+    pos.add(u);
     onViewChange();
     positionListener.run();
   }
@@ -425,7 +434,8 @@ public class Camera implements JsonSerializable {
   public synchronized void strafeRight(double v) {
     u.set(1, 0, 0);
     transform.transform(u);
-    pos.scaleAdd(v, u);
+    u.scale(v);
+    pos.add(u);
     onViewChange();
     positionListener.run();
   }
@@ -507,10 +517,7 @@ public class Camera implements JsonSerializable {
    * @param x      normalized image coordinate [-0.5, 0.5]
    * @param y      normalized image coordinate [-0.5, 0.5]
    */
-  public void calcViewRay(Ray ray, Random random, double x, double y) {
-    // Reset the ray properties - current material etc.
-    ray.setDefault();
-
+  public void calcViewRay(Ray2 ray, Random random, double x, double y) {
     projector.apply(x, y, random, ray.o, ray.d);
 
     ray.d.normalize();
@@ -529,10 +536,7 @@ public class Camera implements JsonSerializable {
    * @param x   normalized image coordinate [-0.5, 0.5]
    * @param y   normalized image coordinate [-0.5, 0.5]
    */
-  public void calcViewRay(Ray ray, double x, double y) {
-    // Reset the ray properties - current material etc.
-    ray.setDefault();
-
+  public void calcViewRay(Ray2 ray, double x, double y) {
     projector.apply(x, y, ray.o, ray.d);
 
     ray.d.normalize();
@@ -556,7 +560,7 @@ public class Camera implements JsonSerializable {
   /**
    * @return Current position
    */
-  public Vector3 getPosition() {
+  public Point3 getPosition() {
     return pos;
   }
 
@@ -703,16 +707,17 @@ public class Camera implements JsonSerializable {
     onViewChange();
   }
 
-  public void autoFocus(Function<Ray, Boolean> traceInScene) {
-    Ray ray = new Ray();
-    if (!traceInScene.apply(ray)) {
+  public void autoFocus(BiPredicate<Ray2, IntersectionRecord> traceInScene) {
+    Ray2 ray = new Ray2();
+    IntersectionRecord intersectionRecord = new IntersectionRecord();
+    if (!traceInScene.test(ray, intersectionRecord)) {
       setDof(Double.POSITIVE_INFINITY);
     } else {
       if(projectionMode == ProjectionMode.PARALLEL) {
-        ray.distance -= worldDiagonalSize;
+        intersectionRecord.distance -= worldDiagonalSize;
       }
-      setSubjectDistance(ray.distance);
-      setDof(ray.distance * ray.distance);
+      setSubjectDistance(intersectionRecord.distance);
+      setDof(intersectionRecord.distance * intersectionRecord.distance);
     }
   }
 
@@ -731,7 +736,7 @@ public class Camera implements JsonSerializable {
   /**
    * Update the argument ray to point toward the current target.
    */
-  public void getTargetDirection(Ray ray) {
+  public void getTargetDirection(Ray2 ray) {
     calcViewRay(ray, target.x, target.y);
   }
 

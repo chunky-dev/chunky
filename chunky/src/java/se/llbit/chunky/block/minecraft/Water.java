@@ -20,13 +20,17 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.StillWaterShader;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Triangle;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
+import se.llbit.util.VectorUtil;
 
 public class Water extends MinecraftBlockTranslucent {
 
@@ -189,33 +193,30 @@ public class Water extends MinecraftBlockTranslucent {
     }
   }
 
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    ray.t = Double.POSITIVE_INFINITY;
+  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+    IntersectionRecord intersectionTest = new IntersectionRecord();
 
-    int data = ray.getCurrentData();
+    int data = intersectionRecord.material instanceof Water ? ((Water) intersectionRecord.material).data : 0;
     int isFull = (data >> FULL_BLOCK) & 1;
 
     if (isFull != 0) {
       boolean hit = false;
       for (Quad quad : fullBlock) {
-        if (quad.intersect(ray)) {
-          texture.getAvgColorLinear(ray.color);
-          ray.t = ray.tNext;
-          ray.orientNormal(quad.n);
+        if (quad.intersect(ray, intersectionTest)) {
+          texture.getAvgColorLinear(intersectionRecord.color);
+          intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, quad.n));
           hit = true;
         }
       }
       if (hit) {
-        ray.distance += ray.t;
-        ray.o.scaleAdd(ray.t, ray.d);
+        intersectionRecord.distance += intersectionTest.distance;
       }
       return hit;
     }
 
     boolean hit = false;
-    if (bottom.intersect(ray)) {
-      ray.orientNormal(bottom.n);
-      ray.t = ray.tNext;
+    if (bottom.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, bottom.n));
       hit = true;
     }
 
@@ -224,79 +225,71 @@ public class Water extends MinecraftBlockTranslucent {
     int c2 = (0xF & (data >> CORNER_2)) % 8;
     int c3 = (0xF & (data >> CORNER_3)) % 8;
     Triangle triangle = t012[c0][c1][c2];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
       hit = true;
     }
     triangle = t230[c2][c3][c0];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
-      ray.u = 1 - ray.u;
-      ray.v = 1 - ray.v;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionTest.uv.x = 1 - intersectionTest.uv.x;
+      intersectionTest.uv.y = 1 - intersectionTest.uv.y;
       hit = true;
     }
     triangle = westt[c0][c3];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
       hit = true;
     }
     triangle = westb[c0];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
-      ray.u = 1 - ray.u;
-      ray.v = 1 - ray.v;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionTest.uv.x = 1 - intersectionTest.uv.x;
+      intersectionTest.uv.y = 1 - intersectionTest.uv.y;
       hit = true;
     }
     triangle = eastt[c1][c2];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
       hit = true;
     }
     triangle = eastb[c1];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
-      ray.u = 1 - ray.u;
-      ray.v = 1 - ray.v;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionTest.uv.x = 1 - intersectionTest.uv.x;
+      intersectionTest.uv.y = 1 - intersectionTest.uv.y;
       hit = true;
     }
     triangle = southt[c0][c1];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
       hit = true;
     }
     triangle = southb[c1];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
-      ray.u = 1 - ray.u;
-      ray.v = 1 - ray.v;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionTest.uv.x = 1 - intersectionTest.uv.x;
+      intersectionTest.uv.y = 1 - intersectionTest.uv.y;
       hit = true;
     }
     triangle = northt[c2][c3];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
       hit = true;
     }
     triangle = northb[c2];
-    if (triangle.intersect(ray)) {
-      ray.orientNormal(triangle.n);
-      ray.t = ray.tNext;
-      ray.u = 1 - ray.u;
-      ray.v = 1 - ray.v;
+    if (triangle.intersect(ray, intersectionTest)) {
+      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionTest.uv.x = 1 - intersectionTest.uv.x;
+      intersectionTest.uv.y = 1 - intersectionTest.uv.y;
       hit = true;
     }
     if (hit) {
-      texture.getAvgColorLinear(ray.color);
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
+      if (!(scene.getCurrentWaterShader() instanceof StillWaterShader) && intersectionRecord.shadeN.y != 0) {
+        scene.getCurrentWaterShader().doWaterShading(ray, intersectionRecord, scene.getAnimationTime());
+      }
+      texture.getAvgColorLinear(intersectionRecord.color);
+      intersectionRecord.distance += intersectionTest.distance;
     }
     return hit;
   }

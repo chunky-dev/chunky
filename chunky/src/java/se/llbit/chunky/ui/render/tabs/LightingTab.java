@@ -48,9 +48,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   private RenderControlsFxController controller;
   private Scene scene;
 
-  @FXML private DoubleAdjuster skyExposure;
-  @FXML private DoubleAdjuster skyIntensity;
-  @FXML private DoubleAdjuster apparentSkyBrightness;
+  @FXML private DoubleAdjuster skyEmittance;
   @FXML private DoubleAdjuster emitterIntensity;
   @FXML private DoubleAdjuster sunIntensity;
   @FXML private CheckBox drawSun;
@@ -78,26 +76,12 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
-    skyExposure.setName("Sky exposure");
-    skyExposure.setTooltip("Changes the exposure of the sky.");
-    skyExposure.setRange(Sky.MIN_INTENSITY, Sky.MAX_INTENSITY);
-    skyExposure.makeLogarithmic();
-    skyExposure.clampMin();
-    skyExposure.onValueChange(value -> scene.sky().setSkyExposure(value));
-
-    skyIntensity.setName("Sky light intensity modifier");
-    skyIntensity.setTooltip("Modifies the intensity of the light emitted by the sky.");
-    skyIntensity.setRange(Sky.MIN_INTENSITY, Sky.MAX_INTENSITY);
-    skyIntensity.makeLogarithmic();
-    skyIntensity.clampMin();
-    skyIntensity.onValueChange(value -> scene.sky().setSkyLight(value));
-
-    apparentSkyBrightness.setName("Apparent sky brightness modifier");
-    apparentSkyBrightness.setTooltip("Modifies the apparent brightness of the sky.");
-    apparentSkyBrightness.setRange(Sky.MIN_APPARENT_INTENSITY, Sky.MAX_APPARENT_INTENSITY);
-    apparentSkyBrightness.makeLogarithmic();
-    apparentSkyBrightness.clampMin();
-    apparentSkyBrightness.onValueChange(value -> scene.sky().setApparentSkyLight(value));
+    skyEmittance.setName("Sky exposure");
+    skyEmittance.setTooltip("Changes the exposure of the sky.");
+    skyEmittance.setRange(Sky.MIN_INTENSITY, Sky.MAX_INTENSITY);
+    skyEmittance.makeLogarithmic();
+    skyEmittance.clampMin();
+    skyEmittance.onValueChange(value -> scene.sky().setSkyEmittance(value));
 
     enableEmitters.setTooltip(new Tooltip("Allow blocks to emit light based on their material settings."));
     enableEmitters.selectedProperty().addListener(
@@ -190,9 +174,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   }
 
   @Override public void update(Scene scene) {
-    skyExposure.set(scene.sky().getSkyExposure());
-    skyIntensity.set(scene.sky().getSkyLight());
-    apparentSkyBrightness.set(scene.sky().getApparentSkyLight());
+    skyEmittance.set(scene.sky().getSkyEmittance());
     emitterIntensity.set(scene.getEmitterIntensity());
     sunIntensity.set(scene.sun().getIntensity());
     sunLuminosity.set(scene.sun().getLuminosity());

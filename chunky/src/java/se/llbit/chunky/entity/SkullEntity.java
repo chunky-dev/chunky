@@ -501,7 +501,7 @@ public class SkullEntity extends Entity {
    */
   private final int placement;
 
-  public SkullEntity(Vector3 position, Kind type, int rotation, int placement) {
+  public SkullEntity(Point3 position, Kind type, int rotation, int placement) {
     super(position);
     this.type = type;
     this.rotation = rotation;
@@ -628,7 +628,7 @@ public class SkullEntity extends Entity {
   }
 
   public static Entity fromJson(JsonObject json) {
-    Vector3 position = new Vector3();
+    Point3 position = new Point3();
     position.fromJson(json.get("position").object());
     Kind type = Kind.values()[json.get("type").intValue(0)];
     int rotation = json.get("rotation").intValue(0);

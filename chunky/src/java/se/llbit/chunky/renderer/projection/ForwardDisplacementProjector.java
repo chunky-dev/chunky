@@ -18,6 +18,7 @@ package se.llbit.chunky.renderer.projection;
 
 import java.util.Random;
 
+import se.llbit.math.Point3;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
@@ -36,20 +37,20 @@ public class ForwardDisplacementProjector implements Projector {
     this.displacementSign = QuickMath.signum(displacement);
   }
 
-  @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
+  @Override public void apply(double x, double y, Random random, Point3 o, Vector3 d) {
     wrapped.apply(x, y, random, o, d);
 
     d.normalize();
     d.scale(displacementValue);
-    o.scaleAdd(displacementSign, d);
+    o.add(d.x * displacementSign, d.y * displacementSign, d.z * displacementSign);
   }
 
-  @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
+  @Override public void apply(double x, double y, Point3 o, Vector3 d) {
     wrapped.apply(x, y, o, d);
 
     d.normalize();
     d.scale(displacementValue);
-    o.scaleAdd(displacementSign, d);
+    o.add(d.x * displacementSign, d.y * displacementSign, d.z * displacementSign);
   }
 
   @Override public double getMinRecommendedFoV() {

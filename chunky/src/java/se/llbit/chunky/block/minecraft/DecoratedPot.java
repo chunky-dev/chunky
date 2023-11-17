@@ -22,6 +22,7 @@ import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.DecoratedPotModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.entity.Entity;
+import se.llbit.math.Point3;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.StringTag;
@@ -64,7 +65,7 @@ public class DecoratedPot extends AbstractModelBlock {
   }
 
   @Override
-  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  public Entity toBlockEntity(Point3 position, CompoundTag entityTag) {
     return new DecoratedPotModel.DecoratedPotSpoutEntity(position, facing);
   }
 

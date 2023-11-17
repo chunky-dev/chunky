@@ -6,6 +6,7 @@ import se.llbit.chunky.renderer.projection.ParallelProjector;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.log.Log;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.util.TaskTracker;
 
 import java.nio.ByteBuffer;
@@ -78,7 +79,6 @@ public class AlphaBuffer {
       Chunky.getCommonThreads().submit(() -> {
         IntStream.range(0, scene.width).parallel().forEach(x -> {
           WorkerState state = new WorkerState();
-          state.ray = new Ray();
 
           for (int y = 0; y < scene.height; y++) {
             computeAlpha(scene, x, y, state);
@@ -96,7 +96,7 @@ public class AlphaBuffer {
    * Compute the alpha channel based on sky visibility.
    */
   public void computeAlpha(Scene scene, int x, int y, WorkerState state) {
-    Ray ray = state.ray;
+    Ray2 ray = state.ray;
     double halfWidth = scene.width / (2.0 * scene.height);
     double invHeight = 1.0 / scene.height;
 

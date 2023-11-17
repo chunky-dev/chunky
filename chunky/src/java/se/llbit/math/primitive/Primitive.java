@@ -16,8 +16,9 @@
  */
 package se.llbit.math.primitive;
 
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.AABB;
-import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 
 /**
  * An intersectable primitive piece of geometry
@@ -31,7 +32,7 @@ public interface Primitive {
    *
    * @return {@code true} if there was an intersection
    */
-  boolean intersect(Ray ray);
+  boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord);
 
   /**
    * @return axis-aligned bounding box for the primitive

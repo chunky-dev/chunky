@@ -22,8 +22,11 @@ import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.StillWaterShader;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
@@ -361,51 +364,47 @@ public class CauldronModel {
           side, side
       };
 
-  public static boolean intersect(Ray ray, int level, Texture contentTexture) {
+  public static boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, int level, Texture contentTexture) {
     boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
+    IntersectionRecord intersectionTest = new IntersectionRecord();
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
-      if (quad.intersect(ray)) {
-        float[] color = tex[i].getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.setNormal(quad.n);
+      if (quad.intersect(ray, intersectionTest)) {
+        float[] color = tex[i].getColor(intersectionTest.uv.x, intersectionTest.uv.y);
+        if (color[3] > Constants.EPSILON) {
+          intersectionRecord.color.set(color);
+          intersectionRecord.setNormal(quad.n);
           hit = true;
         }
       }
     }
 
     Quad water = waterLevels[level];
-    if (water != null && water.intersect(ray)) {
-      float[] color = contentTexture.getColor(ray.u, ray.v);
-      if (color[3] > Ray.EPSILON) {
-        ray.color.set(color);
-        ray.t = ray.tNext;
-        ray.setNormal(water.n);
+    if (water != null && water.intersect(ray, intersectionTest)) {
+      float[] color = contentTexture.getColor(intersectionTest.uv.x, intersectionTest.uv.y);
+      if (color[3] > Constants.EPSILON) {
+        intersectionRecord.color.set(color);
+        intersectionRecord.setNormal(water.n);
         hit = true;
       }
     }
 
     if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
+      intersectionRecord.distance += intersectionTest.distance;
     }
     return hit;
   }
 
-  public static boolean intersectWithWater(Ray ray, Scene scene, int level) {
+  public static boolean intersectWithWater(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, int level) {
     boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
+    IntersectionRecord intersectionTest = new IntersectionRecord();
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
-      if (quad.intersect(ray)) {
-        float[] color = tex[i].getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.setNormal(quad.n);
+      if (quad.intersect(ray, intersectionTest)) {
+        float[] color = tex[i].getColor(intersectionTest.uv.x, intersectionTest.uv.y);
+        if (color[3] > Constants.EPSILON) {
+          intersectionRecord.color.set(color);
+          intersectionRecord.setNormal(quad.n);
           hit = true;
         }
       }
@@ -413,58 +412,57 @@ public class CauldronModel {
 
     // TODO since this water is the same block, refraction is not taken into account – still better than no water
     Quad water = waterLevels[level];
-    if (water != null && water.intersect(ray)) {
+    if (water != null && water.intersect(ray, intersectionTest)) {
       if (!(scene.getCurrentWaterShader() instanceof StillWaterShader)) {
-        scene.getCurrentWaterShader().doWaterShading(ray, scene.getAnimationTime());
+        scene.getCurrentWaterShader().doWaterShading(ray, intersectionRecord, scene.getAnimationTime());
       } else {
-        ray.setNormal(water.n);
+        intersectionRecord.setNormal(water.n);
       }
-      ray.setPrevMaterial(ray.getCurrentMaterial(), ray.getCurrentData());
-      ray.setCurrentMaterial(Water.INSTANCE);
-      ray.t = ray.tNext;
+      intersectionRecord.material = Water.INSTANCE;
     }
 
     if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
+      intersectionRecord.distance += intersectionRecord.distance;
+      /*ray.o.scaleAdd(ray.t, ray.d);
+      int x;
+       */
     }
     return hit;
   }
 
-  public static boolean intersectWithLava(Ray ray) {
+  public static boolean intersectWithLava(Ray2 ray, IntersectionRecord intersectionRecord) {
     boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
+    IntersectionRecord intersectionTest = new IntersectionRecord();
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
-      if (quad.intersect(ray)) {
-        float[] color = tex[i].getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.setNormal(quad.n);
+      if (quad.intersect(ray, intersectionTest)) {
+        float[] color = tex[i].getColor(intersectionTest.uv.x, intersectionTest.uv.y);
+        if (color[3] > Constants.EPSILON) {
+          intersectionRecord.color.set(color);
+          intersectionRecord.setNormal(quad.n);
           hit = true;
         }
       }
     }
 
     Quad lava = waterLevels[3];
-    if (lava.intersect(ray)) {
-      float[] color = Texture.lava.getColor(ray.u, ray.v);
-      if (color[3] > Ray.EPSILON) {
-        ray.color.set(color);
-        ray.t = ray.tNext;
-        ray.setNormal(lava.n);
+    if (lava.intersect(ray, intersectionTest)) {
+      float[] color = Texture.lava.getColor(intersectionTest.uv.x, intersectionTest.uv.y);
+      if (color[3] > Constants.EPSILON) {
+        intersectionRecord.color.set(color);
+        intersectionRecord.setNormal(lava.n);
         hit = true;
 
         // set the current material to lava so that only the lava is emissive and not the cauldron
-        ray.setPrevMaterial(ray.getCurrentMaterial(), ray.getCurrentData());
-        ray.setCurrentMaterial(new Lava(7));
+        intersectionRecord.material = new Lava(7);
       }
     }
 
     if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
+      intersectionRecord.distance += intersectionTest.distance;
+      /*ray.o.scaleAdd(ray.t, ray.d);
+      int x;
+       */
     }
     return hit;
   }

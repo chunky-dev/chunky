@@ -6,6 +6,7 @@ import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.Octree;
+import se.llbit.math.Point3i;
 import se.llbit.math.Vector3i;
 
 /**
@@ -24,7 +25,7 @@ public class LegacyBlocksFinalizer {
    * @param yMax      Max y level to finalize (exclusive)
    */
   public static void finalizeChunk(Octree worldTree, Octree waterTree, BlockPalette palette,
-      Vector3i origin, ChunkPosition cp, int yMin, int yMax) {
+                                   Point3i origin, ChunkPosition cp, int yMin, int yMax) {
     OctreeFinalizationState finalizerState = new OctreeFinalizationState(worldTree, waterTree,
         palette, yMin, yMax);
     for (int cy = yMin; cy < yMax; ++cy) {

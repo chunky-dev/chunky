@@ -26,5 +26,5 @@ public interface Intersectable {
    *
    * @return {@code true} if there exists any intersection
    */
-  boolean closestIntersection(Ray ray);
+  boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord);
 }

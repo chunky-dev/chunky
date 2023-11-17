@@ -54,7 +54,7 @@ public class Sky implements JsonSerializable {
   /**
    * Default sky light intensity
    */
-  public static final double DEFAULT_INTENSITY = 1;
+  public static final double DEFAULT_EMITTANCE = 1;
 
   /**
    * Default cloud y-position
@@ -158,18 +158,18 @@ public class Sky implements JsonSerializable {
   private double cloudSize = DEFAULT_CLOUD_SIZE;
   private final Vector3 cloudOffset = new Vector3(0, DEFAULT_CLOUD_HEIGHT, 0);
 
-  private double skyExposure = DEFAULT_INTENSITY;
-  private double skyLightModifier = DEFAULT_INTENSITY;
-  private double apparentSkyLightModifier = DEFAULT_INTENSITY;
+  private double skyEmittance = DEFAULT_EMITTANCE;
 
   /** Color gradient used for the GRADIENT sky mode. */
   private List<Vector4> gradient = new LinkedList<>();
 
   /** Color used for the SOLID_COLOR sky mode. */
-  private Vector3 color = new Vector3(0, 0, 0);
+  private final Vector3 color = new Vector3(0, 0, 0);
 
   /** Current sky rendering mode. */
   private SkyMode mode = SkyMode.DEFAULT;
+
+  private boolean textureInterpolation = true;
 
   /** Simulated skies. */
   public final static List<SimulatedSky> skies = new ArrayList<>();
@@ -237,9 +237,7 @@ public class Sky implements JsonSerializable {
     roll = other.roll;
     rotation.set(other.rotation);
     mirrored = other.mirrored;
-    skyExposure = other.skyExposure;
-    skyLightModifier = other.skyLightModifier;
-    apparentSkyLightModifier = other.apparentSkyLightModifier;
+    skyEmittance = other.skyEmittance;
     gradient = new ArrayList<>(other.gradient);
     color.set(other.color);
     mode = other.mode;
@@ -255,15 +253,16 @@ public class Sky implements JsonSerializable {
     if (simulatedSkyMode.updateSun(scene.sun, horizonOffset)) {
       skyCache.precalculateSky();
     }
+    textureInterpolation = other.textureInterpolation;
   }
 
   /**
    * Calculate sky color for the ray, based on sky mode.
    */
-  public void getSkyDiffuseColorInner(Ray ray) {
+  public void getSkyColorInner(Ray2 ray, IntersectionRecord intersectionRecord) {
     switch (mode) {
       case SOLID_COLOR: {
-        ray.color.set(color.x, color.y, color.z, 1);
+        intersectionRecord.color.set(color.x, color.y, color.z, 1);
         break;
       }
       case GRADIENT: {
@@ -283,13 +282,13 @@ public class Sky implements JsonSerializable {
           xx = 0.5 * (Math.sin(Math.PI * xx - Constants.HALF_PI) + 1);
           double a = 1 - xx;
           double b = xx;
-          ray.color.set(a * c0.x + b * c1.x, a * c0.y + b * c1.y, a * c0.z + b * c1.z, 1);
+          intersectionRecord.color.set(a * c0.x + b * c1.x, a * c0.y + b * c1.y, a * c0.z + b * c1.z, 1);
         }
         break;
       }
       case SIMULATED: {
         Vector3 color = skyCache.calcIncidentLight(ray);
-        ray.color.set(color.x, color.y, color.z, 1);
+        intersectionRecord.color.set(color.x, color.y, color.z, 1);
         break;
       }
       case SKYMAP_EQUIRECTANGULAR: {
@@ -303,12 +302,12 @@ public class Sky implements JsonSerializable {
             theta = (theta % 1 + 1) % 1;
           }
           double phi = Math.abs(Math.asin(y)) / Constants.HALF_PI;
-          skymap.getColor(theta, phi, ray.color);
+          skymap.getColor(theta, phi, intersectionRecord.color);
         } else {
           double theta = FastMath.atan2(z, x) / Constants.TAU;
           theta = (theta % 1 + 1) % 1;
           double phi = (Math.asin(y) + Constants.HALF_PI) / Math.PI;
-          skymap.getColor(theta, phi, ray.color);
+          getSkymapColor(skymap, theta, phi, intersectionRecord.color);
         }
         break;
       }
@@ -317,10 +316,10 @@ public class Sky implements JsonSerializable {
         double y = rotation.transformY(ray.d);
         double z = rotation.transformZ(ray.d);
         double len = Math.sqrt(x * x + y * y);
-        double theta = (len < Ray.EPSILON) ? 0 : Math.acos(-z) / (Constants.TAU * len);
+        double theta = (len < Constants.EPSILON) ? 0 : Math.acos(-z) / (Constants.TAU * len);
         double u = theta * x + .5;
         double v = .5 + theta * y;
-        skymap.getColor(u, v, ray.color);
+        getSkymapColor(skymap, u, v, intersectionRecord.color);
         break;
       }
       case SKYBOX: {
@@ -332,167 +331,66 @@ public class Sky implements JsonSerializable {
         double zabs = QuickMath.abs(z);
         if (y > xabs && y > zabs) {
           double alpha = 1 / yabs;
-          skybox[SKYBOX_UP].getColor((1 + x * alpha) / 2.0, (1 + z * alpha) / 2.0, ray.color);
+          getSkymapColor(skybox[SKYBOX_UP], (1 + x * alpha) / 2.0, (1 + z * alpha) / 2.0, intersectionRecord.color);
         } else if (-z > xabs && -z > yabs) {
           double alpha = 1 / zabs;
-          skybox[SKYBOX_FRONT].getColor((1 + x * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
+          getSkymapColor(skybox[SKYBOX_FRONT], (1 + x * alpha) / 2.0, (1 + y * alpha) / 2.0, intersectionRecord.color);
         } else if (z > xabs && z > yabs) {
           double alpha = 1 / zabs;
-          skybox[SKYBOX_BACK].getColor((1 - x * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
+          getSkymapColor(skybox[SKYBOX_BACK], (1 - x * alpha) / 2.0, (1 + y * alpha) / 2.0, intersectionRecord.color);
         } else if (-x > zabs && -x > yabs) {
           double alpha = 1 / xabs;
-          skybox[SKYBOX_LEFT].getColor((1 - z * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
+          getSkymapColor(skybox[SKYBOX_LEFT], (1 - z * alpha) / 2.0, (1 + y * alpha) / 2.0, intersectionRecord.color);
         } else if (x > zabs && x > yabs) {
           double alpha = 1 / xabs;
-          skybox[SKYBOX_RIGHT].getColor((1 + z * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
+          getSkymapColor(skybox[SKYBOX_RIGHT], (1 + z * alpha) / 2.0, (1 + y * alpha) / 2.0, intersectionRecord.color);
         } else if (-y > xabs && -y > zabs) {
           double alpha = 1 / yabs;
-          skybox[SKYBOX_DOWN].getColor((1 + x * alpha) / 2.0, (1 - z * alpha) / 2.0, ray.color);
+          getSkymapColor(skybox[SKYBOX_DOWN], (1 + x * alpha) / 2.0, (1 - z * alpha) / 2.0, intersectionRecord.color);
         }
         break;
       }
       case BLACK: {
-        ray.color.set(0, 0, 0, 1);
+        intersectionRecord.color.set(0, 0, 0, 1);
         break;
       }
     }
+  }
+
+  private void getSkymapColor(Texture texture, double u, double v, Vector4 color) {
+    if (textureInterpolation) {
+      texture.getColorInterpolated(u, v, color);
+    } else {
+      texture.getColor(u, v, color);
+    }
+  }
+
+  public Vector3 getSolidColor() {
+    return color;
   }
 
   /**
    * Panoramic skymap color.
    */
-  public void getSkyColor(Ray ray, boolean drawSun) {
-    getSkyDiffuseColorInner(ray);
-    ray.color.scale(skyExposure);
-    ray.color.scale(skyLightModifier);
-    if (drawSun) addSunColor(ray);
-    ray.color.w = 1;
-  }
-
-  public void getApparentSkyColor(Ray ray, boolean drawSun) {
-    getSkyDiffuseColorInner(ray);
-    ray.color.scale(skyExposure);
-    ray.color.scale(apparentSkyLightModifier);
-    if (drawSun) addSunColor(ray);
-    ray.color.w = 1;
-  }
-
-  /**
-   * Bilinear interpolated panoramic skymap color.
-   */
-  public void getSkyColorInterpolated(Ray ray) {
-    switch (mode) {
-      case SKYMAP_EQUIRECTANGULAR: {
-        double x = rotation.transformX(ray.d);
-        double y = rotation.transformY(ray.d);
-        double z = rotation.transformZ(ray.d);
-        if (mirrored) {
-          double theta = FastMath.atan2(z, x) / Constants.TAU;
-          theta = (theta % 1 + 1) % 1;
-          double phi = Math.abs(Math.asin(y)) / Constants.HALF_PI;
-          skymap.getColorInterpolated(theta, phi, ray.color);
-        } else {
-          double theta = FastMath.atan2(z, x) / Constants.TAU;
-          if (theta > 1 || theta < 0) {
-            theta = (theta % 1 + 1) % 1;
-          }
-          double phi = (Math.asin(y) + Constants.HALF_PI) / Math.PI;
-          skymap.getColorInterpolated(theta, phi, ray.color);
-        }
-        break;
-      }
-      case SKYMAP_ANGULAR: {
-        double x = rotation.transformX(ray.d);
-        double y = rotation.transformY(ray.d);
-        double z = rotation.transformZ(ray.d);
-        double len = Math.sqrt(x * x + y * y);
-        double theta = (len < Ray.EPSILON) ? 0 : Math.acos(-z) / (Constants.TAU * len);
-        double u = theta * x + .5;
-        double v = .5 + theta * y;
-        skymap.getColorInterpolated(u, v, ray.color);
-        break;
-      }
-      case SKYBOX: {
-        double x = rotation.transformX(ray.d);
-        double y = rotation.transformY(ray.d);
-        double z = rotation.transformZ(ray.d);
-        double xabs = QuickMath.abs(x);
-        double yabs = QuickMath.abs(y);
-        double zabs = QuickMath.abs(z);
-        if (y > xabs && y > zabs) {
-          double alpha = 1 / yabs;
-          skybox[SKYBOX_UP]
-              .getColorInterpolated((1 + x * alpha) / 2.0, (1 + z * alpha) / 2.0, ray.color);
-        } else if (-z > xabs && -z > yabs) {
-          double alpha = 1 / zabs;
-          skybox[SKYBOX_FRONT]
-              .getColorInterpolated((1 + x * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
-        } else if (z > xabs && z > yabs) {
-          double alpha = 1 / zabs;
-          skybox[SKYBOX_BACK]
-              .getColorInterpolated((1 - x * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
-        } else if (-x > zabs && -x > yabs) {
-          double alpha = 1 / xabs;
-          skybox[SKYBOX_LEFT]
-              .getColorInterpolated((1 - z * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
-        } else if (x > zabs && x > yabs) {
-          double alpha = 1 / xabs;
-          skybox[SKYBOX_RIGHT]
-              .getColorInterpolated((1 + z * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
-        } else if (-y > xabs && -y > zabs) {
-          double alpha = 1 / yabs;
-          skybox[SKYBOX_DOWN]
-              .getColorInterpolated((1 + x * alpha) / 2.0, (1 - z * alpha) / 2.0, ray.color);
-        }
-        break;
-      }
-      default: {
-        getSkyDiffuseColorInner(ray);
-      }
-    }
-    ray.color.scale(skyExposure);
-    ray.color.scale(apparentSkyLightModifier);
-    addSunColor(ray);
-    ray.color.w = 1;
+  public void getSkyColor(Ray2 ray, IntersectionRecord intersectionRecord) {
+    getSkyColorInner(ray, intersectionRecord);
+    intersectionRecord.color.scale(skyEmittance);
+    addSunColor(ray, intersectionRecord);
+    intersectionRecord.color.w = 1;
   }
 
   /**
    * Add sun color contribution. This does not alpha blend the sun color
    * because the Minecraft sun texture has no alpha channel.
    */
-  private void addSunColor(Ray ray) {
-    double r = ray.color.x;
-    double g = ray.color.y;
-    double b = ray.color.z;
-    if (scene.sun().intersect(ray)) {
+  private void addSunColor(Ray2 ray, IntersectionRecord intersectionRecord) {
+    Vector4 skyColor = new Vector4(intersectionRecord.color);
+    if (scene.sun().intersect(ray, intersectionRecord)) {
+      double mult = scene.sun.getLuminosity();
 
       // Blend sun color with current color.
-      ray.color.x = ray.color.x + r;
-      ray.color.y = ray.color.y + g;
-      ray.color.z = ray.color.z + b;
-    }
-  }
-
-  public void getSkyColorDiffuseSun(Ray ray, boolean diffuseSun) {
-    getSkyDiffuseColorInner(ray);
-    ray.color.scale(skyExposure);
-    ray.color.scale(skyLightModifier);
-    if (diffuseSun) addSunColorDiffuseSun(ray);
-    ray.color.w = 1;
-  }
-
-  public void addSunColorDiffuseSun(Ray ray) {
-    double r = ray.color.x;
-    double g = ray.color.y;
-    double b = ray.color.z;
-
-    if (scene.sun().intersectDiffuse(ray)) {
-      double mult = scene.sun().getLuminosity();
-
-      // Blend sun color with current color.
-      ray.color.x = ray.color.x * mult + r;
-      ray.color.y = ray.color.y * mult + g;
-      ray.color.z = ray.color.z * mult + b;
+      intersectionRecord.color.scale(mult);
+      intersectionRecord.color.add(skyColor);
     }
   }
 
@@ -627,9 +525,7 @@ public class Sky implements JsonSerializable {
     sky.add("skyPitch", pitch);
     sky.add("skyRoll", roll);
     sky.add("skyMirrored", mirrored);
-    sky.add("skyExposure", skyExposure);
-    sky.add("skyLight", skyLightModifier);
-    sky.add("apparentSkyLight", apparentSkyLightModifier);
+    sky.add("skyEmittance", skyEmittance);
     sky.add("mode", mode.name());
     sky.add("horizonOffset", horizonOffset);
     sky.add("cloudsEnabled", cloudsEnabled);
@@ -683,9 +579,7 @@ public class Sky implements JsonSerializable {
     roll = json.get("skyRoll").doubleValue(roll);
     updateTransform();
     mirrored = json.get("skyMirrored").boolValue(mirrored);
-    skyExposure = json.get("skyExposure").doubleValue(skyExposure);
-    skyLightModifier = json.get("skyLight").doubleValue(skyLightModifier);
-    apparentSkyLightModifier = json.get("apparentSkyLight").doubleValue(apparentSkyLightModifier);
+    skyEmittance = json.get("skyExposure").doubleValue(skyEmittance);
     if (!(json.get("mode").stringValue(mode.name()).equals("SKYMAP_PANORAMIC") || json.get("mode").stringValue(mode.name()).equals("SKYMAP_SPHERICAL"))) {
       mode = SkyMode.get(json.get("mode").stringValue(mode.name()));
     } else if (json.get("mode").stringValue(mode.name()).equals("SKYMAP_PANORAMIC")) {
@@ -756,37 +650,13 @@ public class Sky implements JsonSerializable {
     rotation.rotate(-pitch, -yaw, -roll);
   }
 
-  public void setSkyExposure(double newValue) {
-    skyExposure = newValue;
+  public void setSkyEmittance(double newValue) {
+    skyEmittance = newValue;
     scene.refresh();
   }
 
-  /**
-   * Set the sky light modifier.
-   */
-  public void setSkyLight(double newValue) {
-    skyLightModifier = newValue;
-    scene.refresh();
-  }
-
-  public void setApparentSkyLight(double newValue) {
-    apparentSkyLightModifier = newValue;
-    scene.refresh();
-  }
-
-  public double getSkyExposure() {
-    return skyExposure;
-  }
-
-  /**
-   * @return Current sky light modifier
-   */
-  public double getSkyLight() {
-    return skyLightModifier;
-  }
-
-  public double getApparentSkyLight() {
-    return apparentSkyLightModifier;
+  public double getSkyEmittance() {
+    return skyEmittance;
   }
 
   public void setGradient(List<Vector4> newGradient) {

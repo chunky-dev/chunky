@@ -23,6 +23,7 @@ import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.FlameParticles;
 import se.llbit.chunky.model.minecraft.CakeWithCandleModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.Point3;
 import se.llbit.math.Vector3;
 
 import java.util.Random;
@@ -61,7 +62,7 @@ public class CakeWithCandle extends AbstractModelBlock {
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
+  public Entity toEntity(Point3 position) {
     return new FlameParticles(position, entity);
   }
 

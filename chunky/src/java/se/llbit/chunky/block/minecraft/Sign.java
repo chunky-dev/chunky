@@ -22,7 +22,10 @@ import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.SignEntity;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.math.IntersectionRecord;
+import se.llbit.math.Point3;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
@@ -39,7 +42,7 @@ public class Sign extends MinecraftBlockTranslucent {
     this.material = material;
   }
 
-  @Override public boolean intersect(Ray ray, Scene scene) {
+  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     return false;
   }
 
@@ -47,7 +50,7 @@ public class Sign extends MinecraftBlockTranslucent {
     return true;
   }
 
-  @Override public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  @Override public Entity toBlockEntity(Point3 position, CompoundTag entityTag) {
     return new SignEntity(position, entityTag, rotation, material);
   }
 }

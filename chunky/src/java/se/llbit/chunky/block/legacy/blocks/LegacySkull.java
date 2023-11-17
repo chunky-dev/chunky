@@ -9,7 +9,10 @@ import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.IntersectionRecord;
+import se.llbit.math.Point3;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
@@ -36,7 +39,7 @@ public class LegacySkull extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  public Entity toBlockEntity(Point3 position, CompoundTag entityTag) {
     Kind kind = getSkullKind(entityTag.get("SkullType").byteValue(0));
     int rotation = entityTag.get("Rot").byteValue(0);
     if (kind == Kind.PLAYER) {
@@ -49,7 +52,7 @@ public class LegacySkull extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
+  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     return false;
   }
 

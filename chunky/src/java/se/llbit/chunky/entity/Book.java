@@ -10,6 +10,8 @@ import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.Json;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.math.Constants;
+import se.llbit.math.Point3;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Transform;
@@ -183,7 +185,7 @@ public class Book extends Entity implements Poseable {
   private final JsonObject pose;
   private double scale = 1;
 
-  public Book(Vector3 position, double openAngle, double pageAngleA, double pageAngleB) {
+  public Book(Point3 position, double openAngle, double pageAngleA, double pageAngleB) {
     super(position);
     this.openAngle = openAngle;
     this.pageAngleA = Math.max(openAngle, pageAngleA);
@@ -193,7 +195,7 @@ public class Book extends Entity implements Poseable {
   }
 
   public Book(JsonObject json) {
-    super(JsonUtil.vec3FromJsonObject(json.get("position")));
+    super(JsonUtil.point3FromJsonObject(json.get("position")));
     this.openAngle = json.get("openAngle").doubleValue(0);
     this.pageAngleA = json.get("pageAngleA").doubleValue(0);
     this.pageAngleB = json.get("pageAngleB").doubleValue(0);
@@ -234,7 +236,7 @@ public class Book extends Entity implements Poseable {
     double pagesDistance = (1 - Math.sin(Math.PI / 2 - pageAngle)) / 16.0;
 
     for (int i = 0; i < leftPages.length; i++) {
-      if (i == 5 && openAngle < Ray.EPSILON) {
+      if (i == 5 && openAngle < Constants.EPSILON) {
         continue; // the cover would overlay the pages if the book is closed
       }
       if (i == 4 && (pageAngleA >= (Math.PI + openAngle) / 2
@@ -247,7 +249,7 @@ public class Book extends Entity implements Poseable {
     }
 
     for (int i = 0; i < rightPages.length; i++) {
-      if (i == 5 && openAngle < Ray.EPSILON) {
+      if (i == 5 && openAngle < Constants.EPSILON) {
         continue; // the cover would overlay the pages if the book is closed
       }
       if (i == 4 && (pageAngleA <= (Math.PI - openAngle) / 2

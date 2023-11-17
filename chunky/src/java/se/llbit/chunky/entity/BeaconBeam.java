@@ -12,6 +12,8 @@ import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Octree;
+import se.llbit.math.Point3;
+import se.llbit.math.Point3i;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
@@ -60,14 +62,14 @@ public class BeaconBeam extends Entity implements Poseable {
   private int height = 256;
   private final Int2ObjectOpenHashMap<BeaconBeamMaterial> materials = new Int2ObjectOpenHashMap<>();
 
-  public BeaconBeam(Vector3 position) {
+  public BeaconBeam(Point3 position) {
     super(position);
     this.pose = new JsonObject();
     pose.add("all", JsonUtil.vec3ToJson(new Vector3(0, 0, 0)));
   }
 
   public BeaconBeam(JsonObject json) {
-    super(JsonUtil.vec3FromJsonObject(json.get("position")));
+    super(JsonUtil.point3FromJsonObject(json.get("position")));
     this.scale = json.get("scale").asDouble(1);
     this.height = json.get("height").asInt(256);
     this.pose = json.get("pose").object();
@@ -81,14 +83,14 @@ public class BeaconBeam extends Entity implements Poseable {
   }
 
   @Override
-  public void loadDataFromOctree(Octree octree, BlockPalette palette, Vector3i origin) {
+  public void loadDataFromOctree(Octree octree, BlockPalette palette, Point3i origin) {
     int firstColor = BeaconBeamMaterial.DEFAULT_COLOR;
     boolean foundFirst = false;
     this.materials.put(0, new BeaconBeamMaterial(BeaconBeamMaterial.DEFAULT_COLOR));
 
     //Start i at 1 so the first beacon block is not checked. This would cause the base beam color to always be white.
     //Stop iterating if the we get outside octree.
-    for (int i = 1; i < height && octree.isInside(new Vector3((position.x - origin.x), (position.y + i - origin.y), (position.z - origin.z))); i++) {
+    for (int i = 1; i < height && octree.isInside(new Point3((position.x - origin.x), (position.y + i - origin.y), (position.z - origin.z))); i++) {
       Material blockMaterial = octree.getMaterial((int)(position.x - origin.x), (int)(position.y + i - origin.y), (int)(position.z - origin.z), palette);
       int color = getColorFromBlock((Block)blockMaterial);
       if(color != -1) {

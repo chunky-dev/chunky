@@ -21,6 +21,7 @@ import se.llbit.chunky.model.Model;
 import se.llbit.chunky.world.Material;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.math.Point3;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
@@ -113,13 +114,13 @@ public class WallBanner extends Entity {
   private final int rotation;
   private final JsonObject design;
 
-  public WallBanner(Vector3 position, int rotation, JsonObject design) {
+  public WallBanner(Point3 position, int rotation, JsonObject design) {
     super(position);
     this.rotation = rotation;
     this.design = design;
   }
 
-  public WallBanner(Vector3 position, int rotation, CompoundTag entityTag) {
+  public WallBanner(Point3 position, int rotation, CompoundTag entityTag) {
     this(position, rotation, StandingBanner.parseDesign(entityTag));
   }
 
@@ -144,7 +145,7 @@ public class WallBanner extends Entity {
   }
 
   public static Entity fromJson(JsonObject json) {
-    Vector3 position = new Vector3();
+    Point3 position = new Point3();
     position.fromJson(json.get("position").object());
     int rotation = json.get("rotation").intValue(0);
     return new WallBanner(position, rotation, json.get("design").object());

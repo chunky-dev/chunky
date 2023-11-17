@@ -26,6 +26,7 @@ import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 
 /**
@@ -128,7 +129,7 @@ public class SkyCache {
    * @param ray Ray to calculate the incident light for
    * @return Incident light color (RGB)
    */
-  public Vector3 calcIncidentLight(Ray ray) {
+  public Vector3 calcIncidentLight(Ray2 ray) {
     double theta = FastMath.atan2(ray.d.z, ray.d.x);
     theta /= PI * 2;
     theta = ((theta % 1) + 1) % 1;

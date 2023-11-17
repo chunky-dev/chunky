@@ -16,11 +16,19 @@
  */
 package se.llbit.chunky.world;
 
+import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
+import se.llbit.math.Vector3;
+
+import java.util.Random;
 
 public abstract class Material {
 
@@ -107,8 +115,8 @@ public abstract class Material {
     subSurfaceScattering = false;
   }
 
-  public void getColor(Ray ray) {
-    texture.getColor(ray);
+  public void getColor(IntersectionRecord intersectionRecord) {
+    texture.getColor(intersectionRecord);
   }
 
   public float[] getColor(double u, double v) {
@@ -145,5 +153,103 @@ public abstract class Material {
 
   public void setPerceptualSmoothness(double perceptualSmoothness) {
     roughness = (float) Math.pow(1 - perceptualSmoothness, 2);
+  }
+
+  public boolean setOutboundDir(Ray2 ray, IntersectionRecord intersectionRecord, Random random) {
+    Material currentMat = intersectionRecord.material;
+    Material prevMat = ray.getCurrentMedium();
+
+    double pDiffuse = intersectionRecord.color.w;
+
+    float pSpecular = currentMat.specular;
+    float pMetal = currentMat.metalness;
+    float roughness = currentMat.roughness;
+    float n1 = prevMat.ior;
+    float n2 = currentMat.ior;
+
+    if (pDiffuse + pSpecular < Constants.EPSILON && n1 != n2) {
+      ray.o.add(ray.d.x * Constants.OFFSET, ray.d.y * Constants.OFFSET, ray.d.z * Constants.OFFSET);
+      return true;
+    }
+
+    if (pMetal > Constants.EPSILON && random.nextFloat() < pMetal) {
+      ray.d.set(specularReflection(ray, intersectionRecord, random));
+    } else if (pSpecular > Constants.EPSILON && random.nextFloat() < pSpecular) {
+      ray.d.set(specularReflection(ray, intersectionRecord, random));
+      intersectionRecord.color.set(1, 1, 1, 1);
+    } else {
+      ray.d.set(diffuseReflection(intersectionRecord, random));
+    }
+    return false;
+  }
+
+  private Vector3 randomHemisphereDir(Vector3 normal, Random random) {
+    double x1 = random.nextDouble();
+    double x2 = random.nextDouble();
+    double r = FastMath.sqrt(x1);
+    double theta = 2 * FastMath.PI * x2;
+
+    double tx = r * FastMath.cos(theta);
+    double ty = r * FastMath.sin(theta);
+    double tz = FastMath.sqrt(1 - x1);
+
+    // Transform from tangent space to world space
+    double xx, xy, xz;
+    double ux, uy, uz;
+    double vx, vy, vz;
+
+    if (QuickMath.abs(normal.x) > 0.1) {
+      xx = 0;
+      xy = 1;
+    } else {
+      xx = 1;
+      xy = 0;
+    }
+    xz = 0;
+
+    ux = xy * normal.z - xz * normal.y;
+    uy = xz * normal.x - xx * normal.z;
+    uz = xx * normal.y - xy * normal.x;
+
+    r = 1 / FastMath.sqrt(ux*ux + uy*uy + uz*uz);
+
+    ux *= r;
+    uy *= r;
+    uz *= r;
+
+    vx = uy * normal.z - uz * normal.y;
+    vy = uz * normal.x - ux * normal.z;
+    vz = ux * normal.y - uy * normal.x;
+
+    return new Vector3(
+      ux * tx + vx * ty + normal.x * tz,
+      uy * tx + vy * ty + normal.y * tz,
+      uz * tx + vz * ty + normal.z * tz
+    );
+  }
+
+  private Vector3 diffuseReflection(IntersectionRecord intersectionRecord, Random random) {
+    return randomHemisphereDir(intersectionRecord.shadeN, random);
+  }
+
+  private Vector3 specularReflection(Ray2 ray, IntersectionRecord intersectionRecord, Random random) {
+    Vector3 direction = new Vector3(ray.d);
+    Vector3 normal = new Vector3(intersectionRecord.shadeN);
+    normal.scale(-2 * direction.dot(normal));
+    direction.add(normal);
+
+    if (intersectionRecord.material.roughness > Constants.EPSILON) {
+      Vector3 randomHemisphereDir = randomHemisphereDir(intersectionRecord.shadeN, random);
+      randomHemisphereDir.scale(intersectionRecord.material.roughness);
+      direction.scale(1 - intersectionRecord.material.roughness);
+      direction.add(randomHemisphereDir);
+    }
+
+    if (QuickMath.signum(intersectionRecord.n.dot(direction)) == QuickMath.signum(intersectionRecord.n.dot(ray.d))) {
+      double factor = QuickMath.signum(intersectionRecord.n.dot(ray.d)) * -Constants.EPSILON - ray.d.dot(direction);
+      direction.scaleAdd(factor, intersectionRecord.n);
+    }
+    direction.normalize();
+    return direction;
   }
 }

@@ -63,7 +63,7 @@ public class CalibratedSculkSensorAmethyst extends Entity {
   public static final Material activeMaterial = new TextureMaterial(Texture.calibratedSculkSensorAmethyst);
   public static final Material inactiveMaterial = new TextureMaterial(Texture.calibratedSculkSensorAmethyst);
 
-  public CalibratedSculkSensorAmethyst(Vector3 position, String facing, boolean active, CalibratedSculkSensor block) {
+  public CalibratedSculkSensorAmethyst(Point3 position, String facing, boolean active, CalibratedSculkSensor block) {
     super(position);
     this.facing = facing;
     this.active = active;
@@ -71,7 +71,7 @@ public class CalibratedSculkSensorAmethyst extends Entity {
   }
 
   public CalibratedSculkSensorAmethyst(JsonObject json) {
-    super(JsonUtil.vec3FromJsonObject(json.get("position")));
+    super(JsonUtil.point3FromJsonObject(json.get("position")));
     this.facing = json.get("facing").stringValue("north");
     this.active = json.get("active").boolValue(true);
     this.block = null;

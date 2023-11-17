@@ -22,7 +22,10 @@ import se.llbit.chunky.block.Block;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.IntersectionRecord;
+import se.llbit.math.Point3;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 
 public class SporeBlossom extends Block {
@@ -35,7 +38,7 @@ public class SporeBlossom extends Block {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
+  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     return false;
   }
 
@@ -45,7 +48,7 @@ public class SporeBlossom extends Block {
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
+  public Entity toEntity(Point3 position) {
     return new se.llbit.chunky.entity.SporeBlossom(position);
   }
 }

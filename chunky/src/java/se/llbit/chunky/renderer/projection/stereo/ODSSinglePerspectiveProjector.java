@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer.projection.stereo;
 
+import se.llbit.math.Point3;
 import se.llbit.math.Vector3;
 
 /**
@@ -31,7 +32,7 @@ public class ODSSinglePerspectiveProjector extends OmniDirectionalStereoProjecto
   }
 
   @Override
-  public void apply(double x, double y, Vector3 pos, Vector3 direction) {
+  public void apply(double x, double y, Point3 pos, Vector3 direction) {
     switch (eye) {
       case LEFT:
         applyLeftEye(x + 0.5, y + 0.5, pos, direction);

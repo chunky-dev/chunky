@@ -20,6 +20,7 @@ import java.util.Random;
 
 import org.apache.commons.math3.util.FastMath;
 
+import se.llbit.math.Point3;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
@@ -34,11 +35,11 @@ public class PanoramicProjector implements Projector {
     this.fov = fov;
   }
 
-  @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
+  @Override public void apply(double x, double y, Random random, Point3 o, Vector3 d) {
     apply(x, y, o, d);
   }
 
-  @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
+  @Override public void apply(double x, double y, Point3 o, Vector3 d) {
     double ay = QuickMath.degToRad(y * fov);
     double ax = QuickMath.degToRad(x * fov);
 

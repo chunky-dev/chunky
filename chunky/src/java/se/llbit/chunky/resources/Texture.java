@@ -24,8 +24,11 @@ import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.TexturePath;
 import se.llbit.fxutil.FxImageUtil;
 import se.llbit.math.ColorUtil;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector4;
 import se.llbit.resources.ImageLoader;
 import se.llbit.util.annotation.NotNull;
@@ -1538,10 +1541,10 @@ public class Texture {
   /**
    * Get linear color values.
    *
-   * @param ray ray to store color value in.
+   * @param intersectionRecord IntersectionRecord to store color value in.
    */
-  public void getColor(Ray ray) {
-    getColor(ray.u, ray.v, ray.color);
+  public void getColor(IntersectionRecord intersectionRecord) {
+    getColor(intersectionRecord.uv.x, intersectionRecord.uv.y, intersectionRecord.color);
   }
 
   /**
@@ -1550,7 +1553,7 @@ public class Texture {
    * @return color
    */
   public float[] getColor(double u, double v) {
-    return getColor((int) (u * width - Ray.EPSILON), (int) ((1 - v) * height - Ray.EPSILON));
+    return getColor((int) (u * width - Constants.EPSILON), (int) ((1 - v) * height - Constants.EPSILON));
   }
 
   /**

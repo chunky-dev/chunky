@@ -18,11 +18,12 @@ package se.llbit.math.primitive;
 
 import java.util.Collection;
 
+import se.llbit.math.IntersectionRecord;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.math.AABB;
-import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
@@ -145,7 +146,7 @@ public class Box implements Primitive {
             new Vector2(uv.y, uv.z), material));
   }
 
-  @Override public boolean intersect(Ray ray) {
+  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
     // TODO Auto-generated method stub
     return false;
   }

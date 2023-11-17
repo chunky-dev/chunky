@@ -8,7 +8,11 @@ import se.llbit.chunky.world.Material;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
 import se.llbit.math.AABB;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
+import se.llbit.math.Point3;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
@@ -69,14 +73,13 @@ public abstract class Block extends Material {
    * @param scene Scene
    * @return True if the ray hit this block, false if not
    */
-  public boolean intersect(Ray ray, Scene scene) {
-    ray.t = Double.POSITIVE_INFINITY;
-    if (block.intersect(ray)) {
-      float[] color = texture.getColor(ray.u, ray.v);
-      if (color[3] > Ray.EPSILON) {
-        ray.color.set(color);
-        ray.distance += ray.tNext;
-        ray.o.scaleAdd(ray.tNext, ray.d);
+  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+    if (block.intersect(ray, intersectionRecord)) {
+      float[] color = texture.getColor(intersectionRecord.uv.x, intersectionRecord.uv.y);
+      if (color[3] > Constants.EPSILON) {
+        intersectionRecord.color.set(color);
+        /*ray.distance += ray.tNext;
+        ray.o.scaleAdd(ray.tNext, ray.d);*/
         return true;
       }
     }
@@ -101,7 +104,7 @@ public abstract class Block extends Material {
     return false;
   }
 
-  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  public Entity toBlockEntity(Point3 position, CompoundTag entityTag) {
     throw new Error("This block type can not be converted to a block entity: "
         + getClass().getSimpleName());
   }
@@ -119,7 +122,7 @@ public abstract class Block extends Material {
     return false;
   }
 
-  public Entity toEntity(Vector3 position) {
+  public Entity toEntity(Point3 position) {
     throw new Error("This block type can not be converted to an entity: "
         + getClass().getSimpleName());
   }

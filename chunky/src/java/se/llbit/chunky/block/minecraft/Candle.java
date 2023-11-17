@@ -25,6 +25,7 @@ import se.llbit.chunky.model.minecraft.CandleModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
+import se.llbit.math.Point3;
 import se.llbit.math.Vector3;
 
 import java.util.Random;
@@ -89,7 +90,7 @@ public class Candle extends AbstractModelBlock {
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
+  public Entity toEntity(Point3 position) {
     if (entity != null) {
       return new FlameParticles(position, entity);
     } else {

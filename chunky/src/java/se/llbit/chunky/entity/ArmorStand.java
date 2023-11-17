@@ -23,6 +23,7 @@ import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.math.Point3;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Transform;
@@ -377,7 +378,7 @@ public class ArmorStand extends Entity implements Poseable, Geared {
   private final boolean noBasePlate;
 
   public ArmorStand(JsonObject json) {
-    super(JsonUtil.vec3FromJsonObject(json.get("position")));
+    super(JsonUtil.point3FromJsonObject(json.get("position")));
     this.scale = json.get("scale").asDouble(1.0);
     this.headScale = json.get("headScale").asDouble(1.0);
     this.showArms = json.get("showArms").asBoolean(false);
@@ -387,7 +388,7 @@ public class ArmorStand extends Entity implements Poseable, Geared {
     this.noBasePlate = json.get("noBasePlate").asBoolean(false);
   }
 
-  public ArmorStand(Vector3 position, Tag tag) {
+  public ArmorStand(Point3 position, Tag tag) {
     super(position);
     gear = new JsonObject();
     Tag handItems = tag.get("HandItems");

@@ -7,6 +7,7 @@ import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.math.Point3;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
@@ -260,11 +261,11 @@ public class HangingSignEntity extends Entity {
   private final Texture texture;
   private final String material;
 
-  public HangingSignEntity(Vector3 position, CompoundTag entityTag, int rotation, boolean attached, String material) {
+  public HangingSignEntity(Point3 position, CompoundTag entityTag, int rotation, boolean attached, String material) {
     this(position, SignEntity.getFrontTextLines(entityTag), SignEntity.getFrontDyeColor(entityTag), SignEntity.getFrontGlowing(entityTag), SignEntity.getBackTextLines(entityTag), SignEntity.getBackDyeColor(entityTag), SignEntity.getBackGlowing(entityTag), rotation, attached, material);
   }
 
-  public HangingSignEntity(Vector3 position, JsonArray[] frontText, SignEntity.Color frontDye, boolean frontGlowing, JsonArray[] backText, SignEntity.Color backDye, boolean backGlowing, int rotation, boolean attached, String material) {
+  public HangingSignEntity(Point3 position, JsonArray[] frontText, SignEntity.Color frontDye, boolean frontGlowing, JsonArray[] backText, SignEntity.Color backDye, boolean backGlowing, int rotation, boolean attached, String material) {
     super(position);
     Texture signTexture = HangingSignEntity.textureFromMaterial(material);
     this.frontText = frontText;
@@ -330,7 +331,7 @@ public class HangingSignEntity extends Entity {
    * Unmarshalls a sign entity from JSON data.
    */
   public static Entity fromJson(JsonObject json) {
-    Vector3 position = new Vector3();
+    Point3 position = new Point3();
     position.fromJson(json.get("position").object());
     JsonArray[] frontText = null;
     if (json.get("text").isArray()) {

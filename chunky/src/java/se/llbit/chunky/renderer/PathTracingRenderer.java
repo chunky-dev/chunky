@@ -91,13 +91,13 @@ public class PathTracingRenderer extends TileBasedRenderer {
               -0.5 + (y + oy + cropY) * invHeight);
           scene.rayTrace(tracer, state);
 
-          sr += state.ray.color.x * branchCount;
-          sg += state.ray.color.y * branchCount;
-          sb += state.ray.color.z * branchCount;
+          sr += state.color.x * branchCount;
+          sg += state.color.y * branchCount;
+          sb += state.color.z * branchCount;
         }
 
         int offset = 3 * (y*width + x);
-        sampleBuffer[offset + 0] = (sampleBuffer[offset + 0] * spp + sr) * sinv;
+        sampleBuffer[offset]     = (sampleBuffer[offset]     * spp + sr) * sinv;
         sampleBuffer[offset + 1] = (sampleBuffer[offset + 1] * spp + sg) * sinv;
         sampleBuffer[offset + 2] = (sampleBuffer[offset + 2] * spp + sb) * sinv;
       });

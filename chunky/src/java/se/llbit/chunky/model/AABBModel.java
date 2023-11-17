@@ -4,7 +4,10 @@ import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 
 import java.util.Arrays;
@@ -69,7 +72,7 @@ public abstract class AABBModel implements BlockModel {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
+  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     AABB[] boxes = getBoxes();
     Texture[][] textures = getTextures();
     UVMapping[][] mapping = getUVMapping();
@@ -77,70 +80,66 @@ public abstract class AABBModel implements BlockModel {
 
     boolean hit = false;
     Tint tint = Tint.NONE;
-    ray.t = Double.POSITIVE_INFINITY;
     for (int i = 0; i < boxes.length; ++i) {
-      if (boxes[i].intersect(ray)) {
+      if (boxes[i].intersect(ray, intersectionRecord)) {
         Tint[] tintedFacesBox = tintedFaces != null ? tintedFaces[i] : null;
-        Vector3 n = ray.getNormal();
+        Vector3 n = intersectionRecord.n;
         if (n.y > 0) { // top
-          ray.v = 1 - ray.v;
-          if (intersectFace(ray, scene, textures[i][4],
+          intersectionRecord.uv.x = 1 - intersectionRecord.uv.x;
+          if (intersectFace(intersectionRecord, scene, textures[i][4],
             mapping != null ? mapping[i][4] : null
           )) {
             tint = tintedFacesBox != null ? tintedFacesBox[4] : Tint.NONE;
             hit = true;
           }
         } else if (n.y < 0) { // bottom
-          if (intersectFace(ray, scene, textures[i][5],
+          if (intersectFace(intersectionRecord, scene, textures[i][5],
             mapping != null ? mapping[i][5] : null)) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[5] : Tint.NONE;
           }
         } else if (n.z < 0) { // north
-          if (intersectFace(ray, scene, textures[i][0],
+          if (intersectFace(intersectionRecord, scene, textures[i][0],
             mapping != null ? mapping[i][0] : null
           )) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[0] : Tint.NONE;
           }
         } else if (n.z > 0) { // south
-          if (intersectFace(ray, scene, textures[i][2],
+          if (intersectFace(intersectionRecord, scene, textures[i][2],
             mapping != null ? mapping[i][2] : null
           )) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[2] : Tint.NONE;
           }
         } else if (n.x < 0) { // west
-          if (intersectFace(ray, scene, textures[i][3],
+          if (intersectFace(intersectionRecord, scene, textures[i][3],
             mapping != null ? mapping[i][3] : null)) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[3] : Tint.NONE;
           }
         } else if (n.x > 0) { // east
-          if (intersectFace(ray, scene, textures[i][1],
+          if (intersectFace(intersectionRecord, scene, textures[i][1],
             mapping != null ? mapping[i][1] : null)) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[1] : Tint.NONE;
           }
         }
-        if (hit) {
-          ray.t = ray.tNext;
-        }
       }
     }
     if (hit) {
-      if (ray.getCurrentMaterial().opaque) {
-        ray.color.w = 1;
+      if (intersectionRecord.material.opaque) {
+        intersectionRecord.color.w = 1;
       }
 
-      tint.tint(ray.color, ray, scene);
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
+      tint.tint(intersectionRecord.color, ray, scene);
+      /*ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);*/
     }
     return hit;
   }
 
-  private boolean intersectFace(Ray ray, Scene scene, Texture texture, UVMapping mapping) {
+  private boolean intersectFace(IntersectionRecord intersectionRecord, Scene scene, Texture texture, UVMapping mapping) {
     // This is the method that handles intersecting faces of all AABB-based models.
     // Do normal mapping, parallax occlusion mapping, specular maps and all the good stuff here!
 
@@ -152,31 +151,31 @@ public abstract class AABBModel implements BlockModel {
     if (mapping != null) {
       switch (mapping) {
         case ROTATE_90:
-          tmp = ray.u;
-          ray.u = 1 - ray.v;
-          ray.v = tmp;
+          tmp = intersectionRecord.uv.x;
+          intersectionRecord.uv.x = 1 - intersectionRecord.uv.y;
+          intersectionRecord.uv.y = tmp;
           break;
         case ROTATE_180:
-          ray.u = 1 - ray.u;
-          ray.v = 1 - ray.v;
+          intersectionRecord.uv.x = 1 - intersectionRecord.uv.x;
+          intersectionRecord.uv.y = 1 - intersectionRecord.uv.y;
           break;
         case ROTATE_270:
-          tmp = ray.v;
-          ray.v = 1 - ray.u;
-          ray.u = tmp;
+          tmp = intersectionRecord.uv.y;
+          intersectionRecord.uv.y = 1 - intersectionRecord.uv.x;
+          intersectionRecord.uv.x = tmp;
           break;
         case FLIP_U:
-          ray.u = 1 - ray.u;
+          intersectionRecord.uv.x = 1 - intersectionRecord.uv.x;
           break;
         case FLIP_V:
-          ray.v = 1 - ray.v;
+          intersectionRecord.uv.y = 1 - intersectionRecord.uv.y;
           break;
       }
     }
 
-    float[] color = texture.getColor(ray.u, ray.v);
-    if (color[3] > Ray.EPSILON) {
-      ray.color.set(color);
+    float[] color = texture.getColor(intersectionRecord.uv.x, intersectionRecord.uv.y);
+    if (color[3] > Constants.EPSILON) {
+      intersectionRecord.color.set(color);
       return true;
     }
     return false;

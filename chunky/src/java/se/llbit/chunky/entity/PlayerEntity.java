@@ -68,16 +68,16 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   public String skin = "";
   public boolean showOuterLayer = true;
 
-  public PlayerEntity(String uuid, Vector3 position) {
+  public PlayerEntity(String uuid, Point3 position) {
     this(uuid, position, 0, 0, new JsonObject());
   }
 
   public PlayerEntity(PlayerEntityData data) {
-    this(data.uuid, new Vector3(data.x, data.y, data.z), data.rotation, data.pitch,
+    this(data.uuid, new Point3(data.x, data.y, data.z), data.rotation, data.pitch,
       buildGear(data));
   }
 
-  protected PlayerEntity(String uuid, Vector3 position, double rotationDegrees, double pitchDegrees,
+  protected PlayerEntity(String uuid, Point3 position, double rotationDegrees, double pitchDegrees,
                          JsonObject gear) {
     super(position);
     this.uuid = uuid;
@@ -96,7 +96,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
 
 
   public PlayerEntity(JsonObject settings) {
-    super(JsonUtil.vec3FromJsonObject(settings.get("position")));
+    super(JsonUtil.point3FromJsonObject(settings.get("position")));
     this.model = PlayerModel.get(settings.get("model").stringValue("STEVE"));
     this.uuid = settings.get("uuid").stringValue("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
     this.skin = settings.get("skin").stringValue("");
@@ -460,7 +460,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         .chain(worldTransform);
       String headItemId = headItem.get("id").asString("");
       if (headItemId.equals("minecraft:dragon_head")) {
-        SkullEntity skull = new SkullEntity(new Vector3(), Kind.DRAGON, 0, 1);
+        SkullEntity skull = new SkullEntity(new Point3(), Kind.DRAGON, 0, 1);
         faces.addAll(skull.dragonHeadPrimitives(Transform.NONE.translate(0.5, 0.5, 0.5).scale(1.2).chain(transform)));
       } else if (headItemId.equals("minecraft:carved_pumpkin")) {
         Box hat = new Box(-4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16.);
@@ -480,10 +480,10 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         hat.addTopFaces(faces, Texture.pumpkinTop, new Vector4(1, 0, 1, 0));
         hat.addBottomFaces(faces, Texture.pumpkinTop, new Vector4(0, 1, 0, 1));
       } else if (headItemId.equals("minecraft:player_head")) {
-        HeadEntity head = new HeadEntity(new Vector3(), headItem.get("skin").asString(""), 0, 1);
+        HeadEntity head = new HeadEntity(new Point3(), headItem.get("skin").asString(""), 0, 1);
         faces.addAll(head.primitives(Transform.NONE.scale(1.2).translate(0.5, 0.5, 0.5).chain(transform)));
       } else if (headItemId.equals("minecraft:piglin_head")) {
-        SkullEntity skull = new SkullEntity(new Vector3(), Kind.PIGLIN, 0, 1);
+        SkullEntity skull = new SkullEntity(new Point3(), Kind.PIGLIN, 0, 1);
         faces.addAll(skull.piglinHeadPrimitives(Transform.NONE.scale(1.2).translate(0.5, 0.5, 0.5).chain(transform)));
       } else {
         addModel(faces, getHelmModel(headItem), transform);

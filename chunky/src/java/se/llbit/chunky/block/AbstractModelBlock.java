@@ -4,7 +4,9 @@ import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 
 import java.util.Random;
@@ -42,7 +44,7 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return model.intersect(ray, scene);
+  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+    return model.intersect(ray, intersectionRecord, scene);
   }
 }

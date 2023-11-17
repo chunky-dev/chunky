@@ -16,8 +16,12 @@
  */
 package se.llbit.math.primitive;
 
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.AABB;
+import se.llbit.math.Point3;
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 
 /**
@@ -110,15 +114,15 @@ public class MutableAABB implements Primitive {
       }
     }
 
-    return tNear < tFar + Ray.EPSILON && tFar > 0;
+    return tNear < tFar + Constants.EPSILON && tFar > 0;
   }
 
-  @Override public boolean intersect(Ray ray) {
+  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
     double t1, t2;
     double tNear = Double.NEGATIVE_INFINITY;
     double tFar = Double.POSITIVE_INFINITY;
     Vector3 d = ray.d;
-    Vector3 o = ray.o;
+    Point3 o = ray.o;
 
     if (d.x != 0) {
       double rx = 1 / d.x;
@@ -173,8 +177,8 @@ public class MutableAABB implements Primitive {
       }
     }
 
-    if (tNear < tFar + Ray.EPSILON && tNear >= 0 && tNear < ray.t) {
-      ray.tNext = tNear;
+    if (tNear < tFar + Constants.EPSILON && tNear >= 0 && tNear < intersectionRecord.distance) {
+      intersectionRecord.distance = tNear;
       return true;
     } else {
       return false;

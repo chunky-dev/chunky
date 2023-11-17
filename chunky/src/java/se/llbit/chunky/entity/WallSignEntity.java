@@ -24,6 +24,7 @@ import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.math.Point3;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
@@ -100,11 +101,11 @@ public class WallSignEntity extends Entity {
   private final Texture texture;
   private final String material;
 
-  public WallSignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
+  public WallSignEntity(Point3 position, CompoundTag entityTag, int blockData, String material) {
     this(position, SignEntity.getFrontTextLines(entityTag), SignEntity.getFrontDyeColor(entityTag), SignEntity.getFrontGlowing(entityTag), blockData % 6, material);
   }
 
-  public WallSignEntity(Vector3 position, JsonArray[] text, SignEntity.Color dye, boolean isGlowing, int direction, String material) {
+  public WallSignEntity(Point3 position, JsonArray[] text, SignEntity.Color dye, boolean isGlowing, int direction, String material) {
     super(position);
     Texture signTexture = SignEntity.textureFromMaterial(material);
     this.orientation = direction;
@@ -155,7 +156,7 @@ public class WallSignEntity extends Entity {
    * Unmarshalls a wall sign entity from JSON data.
    */
   public static Entity fromJson(JsonObject json) {
-    Vector3 position = new Vector3();
+    Point3 position = new Point3();
     position.fromJson(json.get("position").object());
     JsonArray[] text = null;
     if (json.get("text").isArray()) {

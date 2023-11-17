@@ -103,45 +103,42 @@ public class SlimeBlockModel {
             Texture.slime, Texture.slime, Texture.slime, Texture.slime, Texture.slime, Texture.slime
     };
 
-    public static boolean intersect(Ray ray) {
-        ray.t = Double.POSITIVE_INFINITY;
+    public static boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
+        IntersectionRecord intersectionTest = new IntersectionRecord();
         boolean hit = false;
-        Vector4 oldColor = new Vector4(ray.color);
+        Vector4 oldColor = new Vector4(intersectionRecord.color);
         for (int i = 0; i < 6; ++i) {
             Quad quad = quads[i];
-            if (quad.intersect(ray)) {
-                float[] color = tex[i].getColor(ray.u, ray.v);
-                if (color[3] > Ray.EPSILON) {
-                    ColorUtil.overlayColor(ray.color, color);
-                    ray.setNormal(quad.n);
-                    ray.t = ray.tNext;
+            if (quad.intersect(ray, intersectionTest)) {
+                float[] color = tex[i].getColor(intersectionTest.uv.x, intersectionTest.uv.y);
+                if (color[3] > Constants.EPSILON) {
+                    ColorUtil.overlayColor(intersectionRecord.color, color);
+                    intersectionRecord.setNormal(quad.n);
                     hit = true;
                 }
             }
         }
         boolean innerHit = hit;
-        Vector4 innerColor = hit ? new Vector4(ray.color) : null;
+        Vector4 innerColor = hit ? new Vector4(intersectionRecord.color) : null;
 
-        ray.color.set(oldColor);
+        intersectionRecord.color.set(oldColor);
         hit = false;
 
         for (int i = 6; i < quads.length; ++i) {
             Quad quad = quads[i];
-            if (quad.intersect(ray)) {
-                float[] color = tex[i].getColor(ray.u, ray.v);
-                if (color[3] > Ray.EPSILON) {
-                    ColorUtil.overlayColor(ray.color, color);
-                    ray.setNormal(quad.n);
-                    ray.t = ray.tNext;
+            if (quad.intersect(ray, intersectionTest)) {
+                float[] color = tex[i].getColor(intersectionTest.uv.x, intersectionTest.uv.y);
+                if (color[3] > Constants.EPSILON) {
+                    ColorUtil.overlayColor(intersectionRecord.color, color);
+                    intersectionRecord.setNormal(quad.n);
                     hit = true;
                 }
             }
         }
         if (hit) {
-            ray.distance += ray.t;
-            ray.o.scaleAdd(ray.t, ray.d);
+            intersectionRecord.distance += intersectionTest.distance;
             if (innerHit) {
-                ColorUtil.overlayColor(ray.color, innerColor);
+                ColorUtil.overlayColor(intersectionRecord.color, innerColor);
             }
         }
         return hit;
