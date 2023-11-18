@@ -20,7 +20,6 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.projection.PanoramicProjector;
 import se.llbit.chunky.renderer.projection.Projector;
 import se.llbit.math.Constants;
-import se.llbit.math.Point3;
 import se.llbit.math.Vector3;
 
 import java.util.Random;
@@ -45,18 +44,18 @@ public abstract class OmniDirectionalStereoProjector implements Projector {
   private static final double INTERPUPILLARY_DISTANCE = 0.069;
 
   @Override
-  public void apply(double x, double y, Random random, Point3 pos, Vector3 direction) {
+  public void apply(double x, double y, Random random, Vector3 pos, Vector3 direction) {
     apply(x, y, pos, direction);
   }
 
   @Override
-  public abstract void apply(double x, double y, Point3 pos, Vector3 direction);
+  public abstract void apply(double x, double y, Vector3 pos, Vector3 direction);
 
   /**
    * @param x 0-1
    * @param y 0-1
    */
-  protected void applyLeftEye(double x, double y, Point3 pos, Vector3 direction) {
+  protected void applyLeftEye(double x, double y, Vector3 pos, Vector3 direction) {
     apply(x, y, -INTERPUPILLARY_DISTANCE / 2, pos, direction);
   }
 
@@ -64,7 +63,7 @@ public abstract class OmniDirectionalStereoProjector implements Projector {
    * @param x 0-1
    * @param y 0-1
    */
-  protected void applyRightEye(double x, double y, Point3 pos, Vector3 direction) {
+  protected void applyRightEye(double x, double y, Vector3 pos, Vector3 direction) {
     apply(x, y, INTERPUPILLARY_DISTANCE / 2, pos, direction);
   }
 
@@ -72,7 +71,7 @@ public abstract class OmniDirectionalStereoProjector implements Projector {
    * @param x 0-1
    * @param y 0-1
    */
-  private void apply(double x, double y, double scale, Point3 pos, Vector3 direction) {
+  private void apply(double x, double y, double scale, Vector3 pos, Vector3 direction) {
     double theta = x * Math.PI - Constants.HALF_PI;
     double phi = Constants.HALF_PI - y * Math.PI;
 

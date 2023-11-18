@@ -23,7 +23,6 @@ import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.Point3;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Transform;
@@ -64,7 +63,7 @@ public class WallCoralFanEntity extends Entity {
   private final String coralType;
   private final String facing;
 
-  public WallCoralFanEntity(Point3 position, String coralType, String facing) {
+  public WallCoralFanEntity(Vector3 position, String coralType, String facing) {
     super(position);
     this.coralType = coralType;
     this.facing = facing;
@@ -106,7 +105,7 @@ public class WallCoralFanEntity extends Entity {
   }
 
   public static Entity fromJson(JsonObject json) {
-    Point3 position = new Point3();
+    Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     String coralType = json.get("coral_type").stringValue("tube");
     String facing = json.get("facing").stringValue("north");

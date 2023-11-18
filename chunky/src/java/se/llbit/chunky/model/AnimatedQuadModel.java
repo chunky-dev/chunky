@@ -5,7 +5,6 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.AnimatedTexture;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Point3;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
@@ -51,8 +50,8 @@ public abstract class AnimatedQuadModel extends QuadModel {
     // The animation frame to use
     int j = (int) (scene.getAnimationTime() * animationMode.framerate);
     if (animationMode.positional) {
-      Point3 position = new Point3(ray.o);
-      position.add(ray.d.x * Constants.OFFSET, ray.d.y * Constants.OFFSET, ray.d.z * Constants.OFFSET);
+      Vector3 position = new Vector3(ray.o);
+      position.scaleAdd(Constants.OFFSET, ray.d);
 
       j += (int) MinecraftPRNG.rand((long) position.x, (long) position.y, (long) position.z);
     }

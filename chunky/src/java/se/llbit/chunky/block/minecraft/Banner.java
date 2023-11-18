@@ -26,7 +26,6 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.json.Json;
 import se.llbit.json.JsonObject;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Point3;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
@@ -55,7 +54,7 @@ public class Banner extends MinecraftBlockTranslucent {
     return true;
   }
 
-  @Override public Entity toBlockEntity(Point3 position, CompoundTag entityTag) {
+  @Override public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
     JsonObject design = StandingBanner.parseDesign(entityTag);
     design.set("base", Json.of(color)); // Base color is not included in the entity tag in Minecraft 1.13+.
     return new StandingBanner(position, rotation, design);

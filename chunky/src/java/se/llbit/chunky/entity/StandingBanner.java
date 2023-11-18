@@ -20,7 +20,6 @@ package se.llbit.chunky.entity;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.*;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
-import se.llbit.chunky.resources.texturepack.TextureLoader;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
@@ -29,7 +28,6 @@ import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
-import se.llbit.math.Point3;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
@@ -40,9 +38,7 @@ import se.llbit.nbt.ListTag;
 import se.llbit.nbt.SpecificTag;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Map;
 
 /**
  * A mob head (skull) entity.
@@ -153,13 +149,13 @@ public class StandingBanner extends Entity {
   private final int rotation;
   private final JsonObject design;
 
-  public StandingBanner(Point3 position, int rotation, JsonObject design) {
+  public StandingBanner(Vector3 position, int rotation, JsonObject design) {
     super(position);
     this.rotation = rotation;
     this.design = design;
   }
 
-  public StandingBanner(Point3 position, int rotation, CompoundTag entityTag) {
+  public StandingBanner(Vector3 position, int rotation, CompoundTag entityTag) {
     this(position, rotation, parseDesign(entityTag));
   }
 
@@ -344,7 +340,7 @@ public class StandingBanner extends Entity {
   }
 
   public static Entity fromJson(JsonObject json) {
-    Point3 position = new Point3();
+    Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     int rotation = json.get("rotation").intValue(0);
     return new StandingBanner(position, rotation, json.get("design").object());

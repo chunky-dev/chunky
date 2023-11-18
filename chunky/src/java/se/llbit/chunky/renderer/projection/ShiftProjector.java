@@ -2,7 +2,6 @@ package se.llbit.chunky.renderer.projection;
 
 import java.util.Random;
 
-import se.llbit.math.Point3;
 import se.llbit.math.Vector3;
 
 public class ShiftProjector implements Projector {
@@ -17,12 +16,12 @@ public class ShiftProjector implements Projector {
   }
 
   @Override
-  public void apply(double x, double y, Random random, Point3 pos, Vector3 direction) {
+  public void apply(double x, double y, Random random, Vector3 pos, Vector3 direction) {
     wrapped.apply(x + shiftX, y - shiftY, random, pos, direction);
   }
 
   @Override
-  public void apply(double x, double y, Point3 pos, Vector3 direction) {
+  public void apply(double x, double y, Vector3 pos, Vector3 direction) {
     wrapped.apply(x + shiftX, y - shiftY, pos, direction);
   }
 

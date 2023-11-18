@@ -18,7 +18,6 @@ package se.llbit.chunky.renderer.projection;
 
 import java.util.Random;
 
-import se.llbit.math.Point3;
 import se.llbit.math.Vector3;
 
 /**
@@ -33,7 +32,7 @@ public interface Projector {
    * @param direction will be populated with camera-relative ray direction
    *                  (not necessarily normalized)
    */
-  void apply(double x, double y, Random random, Point3 pos, Vector3 direction);
+  void apply(double x, double y, Random random, Vector3 pos, Vector3 direction);
 
   /**
    * @param x         pixel X coordinate, where 0 = center and +-0.5 = edges
@@ -42,7 +41,7 @@ public interface Projector {
    * @param direction will be populated with camera-relative ray direction
    *                  (not necessarily normalized)
    */
-  void apply(double x, double y, Point3 pos, Vector3 direction);
+  void apply(double x, double y, Vector3 pos, Vector3 direction);
 
   double getMinRecommendedFoV();
 

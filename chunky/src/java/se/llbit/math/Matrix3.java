@@ -106,14 +106,6 @@ public class Matrix3 {
   }
 
   /**
-   * Transform a point using this matrix.
-   */
-  public void transform(Point3 o) {
-    o.set(m11 * o.x + m12 * o.y + m13 * o.z, m21 * o.x + m22 * o.y + m23 * o.z,
-        m31 * o.x + m32 * o.y + m33 * o.z);
-  }
-
-  /**
    * Transform a vector using this matrix.
    */
   public void transform(Vector3 o) {

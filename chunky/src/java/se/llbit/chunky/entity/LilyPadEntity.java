@@ -20,7 +20,6 @@ import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.LilyPadMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.Point3;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 import se.llbit.math.primitive.Primitive;
@@ -34,12 +33,12 @@ public class LilyPadEntity extends Entity {
   private static final Material lilyMaterial = new LilyPadMaterial();
   private final int rotation;
 
-  public LilyPadEntity(Point3 position) {
+  public LilyPadEntity(Vector3 position) {
     this(position, 3 & (int) (MinecraftPRNG.rand(
         (long) position.x, (long) position.y, (long) position.z) >> 16));
   }
 
-  public LilyPadEntity(Point3 position, int rotation) {
+  public LilyPadEntity(Vector3 position, int rotation) {
     super(position);
     this.rotation = rotation;
   }
@@ -91,7 +90,7 @@ public class LilyPadEntity extends Entity {
    * Unmarshall a lily pad entity from JSON data.
    */
   public static Entity fromJson(JsonObject json) {
-    Point3 position = new Point3();
+    Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     int rotation = json.get("rotation").intValue(0);
     return new LilyPadEntity(position, rotation);

@@ -60,7 +60,6 @@ import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
-import se.llbit.math.Point3;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.util.mojangapi.MinecraftProfile;
@@ -97,7 +96,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
   private Scene scene;
 
   public interface EntityType<T extends Entity> {
-    T createInstance(Point3 position, Scene scene);
+    T createInstance(Vector3 position, Scene scene);
   }
 
   public static class EntityData {
@@ -459,22 +458,22 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       updatePositionFields(entity);
       posX.valueProperty().addListener((observable, oldValue, newValue) -> {
         withEntity(e -> {
-          Point3 currentPosition = e.getPosition();
-          e.setPosition(new Point3(newValue.doubleValue(), currentPosition.y, currentPosition.z));
+          Vector3 currentPosition = e.getPosition();
+          e.setPosition(new Vector3(newValue.doubleValue(), currentPosition.y, currentPosition.z));
         });
         scene.rebuildActorBvh();
       });
       posY.valueProperty().addListener((observable, oldValue, newValue) -> {
         withEntity(e -> {
-          Point3 currentPosition = e.getPosition();
-          e.setPosition(new Point3(currentPosition.x, newValue.doubleValue(), currentPosition.z));
+          Vector3 currentPosition = e.getPosition();
+          e.setPosition(new Vector3(currentPosition.x, newValue.doubleValue(), currentPosition.z));
         });
         scene.rebuildActorBvh();
       });
       posZ.valueProperty().addListener((observable, oldValue, newValue) -> {
         withEntity(e -> {
-          Point3 currentPosition = e.getPosition();
-          e.setPosition(new Point3(currentPosition.x, currentPosition.y, newValue.doubleValue()));
+          Vector3 currentPosition = e.getPosition();
+          e.setPosition(new Vector3(currentPosition.x, currentPosition.y, newValue.doubleValue()));
         });
         scene.rebuildActorBvh();
       });
@@ -600,9 +599,9 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     entityType.setValue("Player");
     add.setTooltip(new Tooltip("Add an entity at the target position."));
     add.setOnAction(e -> {
-      Point3 position = scene.getTargetPosition();
+      Vector3 position = scene.getTargetPosition();
       if (position == null) {
-        position = new Point3(scene.camera().getPosition());
+        position = new Vector3(scene.camera().getPosition());
       }
 
       Entity entity = entityTypes.get(entityType.getValue()).createInstance(position, scene);
@@ -653,7 +652,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     }));
     entityToTarget.setTooltip(new Tooltip("Move the selected entity to the current target."));
     entityToTarget.setOnAction(e -> withEntity(player -> {
-      Point3 target = scene.getTargetPosition();
+      Vector3 target = scene.getTargetPosition();
       if (target != null) {
         player.position.set(target);
         updatePositionFields(player);
@@ -670,7 +669,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     }));
     faceTarget.setTooltip(new Tooltip("Makes the selected player look at the current view target."));
     faceTarget.setOnAction(e -> withEntity(entity -> {
-      Point3 target = scene.getTargetPosition();
+      Vector3 target = scene.getTargetPosition();
       if (target != null && entity instanceof Poseable) {
         Poseable player = (Poseable) entity;
         player.lookAt(target);

@@ -7,7 +7,6 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.Point3;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
@@ -148,7 +147,7 @@ public class Lectern extends Entity implements Poseable {
   private final String facing;
   private final Book book;
 
-  public Lectern(Point3 position, String facing, boolean hasBook) {
+  public Lectern(Vector3 position, String facing, boolean hasBook) {
     super(position);
     this.facing = facing;
     if (hasBook) {
@@ -159,7 +158,7 @@ public class Lectern extends Entity implements Poseable {
   }
 
   public Lectern(JsonObject json) {
-    super(JsonUtil.point3FromJsonObject(json.get("position")));
+    super(JsonUtil.vec3FromJsonObject(json.get("position")));
     this.facing = json.get("facing").stringValue("north");
     if (json.get("book").isObject()) {
       this.book = Book.fromJson(json.get("book").object());
@@ -246,8 +245,8 @@ public class Lectern extends Entity implements Poseable {
     }
   }
 
-  private static Book createBookEntity(Point3 position, String facing) {
-    Point3 bookPosition = new Point3(position);
+  private static Book createBookEntity(Vector3 position, String facing) {
+    Vector3 bookPosition = new Vector3(position);
     bookPosition.add(0, 8.5 / 16.0, 0);
 
     switch (facing) {

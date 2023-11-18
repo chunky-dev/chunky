@@ -40,7 +40,6 @@ import se.llbit.json.JsonObject;
 import se.llbit.log.Log;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Matrix3;
-import se.llbit.math.Point3;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
@@ -51,7 +50,6 @@ import se.llbit.util.annotation.Nullable;
 
 import java.util.Random;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
 
 /**
  * Camera model for 3D rendering.
@@ -100,7 +98,7 @@ public class Camera implements JsonSerializable {
 
   private boolean lockCamera = false;
 
-  Point3 pos = new Point3(0, 0, 0);
+  Vector3 pos = new Vector3(0, 0, 0);
 
   /**
    * Scratch vector used for temporary storage.
@@ -269,7 +267,7 @@ public class Camera implements JsonSerializable {
   /**
    * Set the camera position.
    */
-  public void setPosition(Point3 p) {
+  public void setPosition(Vector3 p) {
     pos.set(p);
     onViewChange();
     positionListener.run();
@@ -560,7 +558,7 @@ public class Camera implements JsonSerializable {
   /**
    * @return Current position
    */
-  public Point3 getPosition() {
+  public Vector3 getPosition() {
     return pos;
   }
 

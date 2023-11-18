@@ -3,7 +3,6 @@ package se.llbit.chunky.entity;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.material.TextureMaterial;
@@ -11,7 +10,6 @@ import se.llbit.json.Json;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Constants;
-import se.llbit.math.Point3;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Transform;
@@ -185,7 +183,7 @@ public class Book extends Entity implements Poseable {
   private final JsonObject pose;
   private double scale = 1;
 
-  public Book(Point3 position, double openAngle, double pageAngleA, double pageAngleB) {
+  public Book(Vector3 position, double openAngle, double pageAngleA, double pageAngleB) {
     super(position);
     this.openAngle = openAngle;
     this.pageAngleA = Math.max(openAngle, pageAngleA);
@@ -195,7 +193,7 @@ public class Book extends Entity implements Poseable {
   }
 
   public Book(JsonObject json) {
-    super(JsonUtil.point3FromJsonObject(json.get("position")));
+    super(JsonUtil.vec3FromJsonObject(json.get("position")));
     this.openAngle = json.get("openAngle").doubleValue(0);
     this.pageAngleA = json.get("pageAngleA").doubleValue(0);
     this.pageAngleB = json.get("pageAngleB").doubleValue(0);

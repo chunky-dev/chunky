@@ -84,7 +84,6 @@ import se.llbit.fxutil.Dialogs;
 import se.llbit.fxutil.GroupedChangeListener;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
-import se.llbit.math.Point3;
 import se.llbit.math.Vector3;
 import se.llbit.util.ProgressListener;
 import se.llbit.util.TaskTracker;
@@ -457,13 +456,13 @@ public class ChunkyFxController
             chunkSelection.clearSelection();
           }
           world.currentDimension().addChunkDeletionListener(chunkSelection);
-          Optional<Point3> playerPos = world.currentDimension().getPlayerPos();
+          Optional<Vector3> playerPos = world.currentDimension().getPlayerPos();
           world.currentDimension().addChunkUpdateListener(map);
 
           Platform.runLater(
               () -> {
                 if (!reloaded || trackPlayer.getValue()) {
-                  mapView.panTo(playerPos.orElse(new Point3(0, 0, 0)));
+                  mapView.panTo(playerPos.orElse(new Vector3(0, 0, 0)));
                 }
                 if (!reloaded) {
                   ignoreYUpdate.set(true);
@@ -857,7 +856,7 @@ public class ChunkyFxController
   public void moveCameraTo(double x, double z) {
     chunky.getRenderController().getSceneProvider().withEditSceneProtected(scene -> {
       Camera camera = scene.camera();
-      Point3 pos = new Point3(x, camera.getPosition().y, z);
+      Vector3 pos = new Vector3(x, camera.getPosition().y, z);
       camera.setPosition(pos);
     });
   }

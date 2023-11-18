@@ -21,7 +21,6 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.TopBottomOrientedTexturedBlockModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.log.Log;
-import se.llbit.math.Point3;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -141,7 +140,7 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
     private final Material material = new TextureMaterial(Texture.decoratedPotBase);
     private final String facing;
 
-    public DecoratedPotSpoutEntity(Point3 position, String facing) {
+    public DecoratedPotSpoutEntity(Vector3 position, String facing) {
       super(position);
       this.facing = facing;
     }
@@ -159,7 +158,7 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
 
     public static Entity fromJson(JsonObject json) {
       return new DecoratedPotSpoutEntity(
-        JsonUtil.point3FromJsonObject(json.get("position")),
+        JsonUtil.vec3FromJsonObject(json.get("position")),
         json.get("facing").stringValue("north")
       );
     }

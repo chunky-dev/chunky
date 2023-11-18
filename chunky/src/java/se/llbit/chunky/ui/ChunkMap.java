@@ -19,22 +19,16 @@ package se.llbit.chunky.ui;
 
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.MenuItem;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.GridPane;
 import javafx.stage.PopupWindow;
 import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.MapView;
@@ -45,7 +39,6 @@ import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.ui.dialogs.SelectChunksInRadiusDialog;
-import se.llbit.chunky.ui.elements.TextFieldLabelWrapper;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
@@ -63,7 +56,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -652,7 +644,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
     double halfWidth = width / (2.0 * height);
 
-    Point3 o = new Point3(camera.getPosition());
+    Vector3 o = new Vector3(camera.getPosition());
 
     Ray2 ray = new Ray2();
     Vector3[] corners = new Vector3[4];
@@ -685,7 +677,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       for (int z = cv.pz0; z <= cv.pz1; ++z) {
         // Chunk top center position:
         Vector3 pos = new Vector3((x + 0.5) * 16, 63, (z + 0.5) * 16);
-        pos.sub(o.asVector());
+        pos.sub(o);
         if (norm[0].dot(pos) > CHUNK_SELECT_RADIUS && norm[1].dot(pos) > CHUNK_SELECT_RADIUS
             && norm[2].dot(pos) > CHUNK_SELECT_RADIUS && norm[3].dot(pos) > CHUNK_SELECT_RADIUS) {
           chunkSelection.selectChunk(currentDimension, x, z);
@@ -779,7 +771,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
     // Draw the camera facing direction indicator.
     camera.calcViewRay(ray, 0, 0);
-    Point3 o = new Point3(ray.o);
+    Vector3 o = new Vector3(ray.o);
     o.x /= 16;
     o.z /= 16;
     o.scaleAdd(1, ray.d);

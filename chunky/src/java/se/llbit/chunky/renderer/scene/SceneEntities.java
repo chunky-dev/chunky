@@ -15,8 +15,6 @@ import se.llbit.log.Log;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Octree;
-import se.llbit.math.Point3;
-import se.llbit.math.Point3i;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
@@ -158,13 +156,13 @@ public class SceneEntities {
 
             Tag paintingVariant = NbtUtil.getTagFromNames(tag, "Motive", "variant");
             addEntity(new PaintingEntity(
-              new Point3(x, y, z),
+              new Vector3(x, y, z),
               paintingVariant.stringValue(),
               yaw
             ));
           } else if (id.equals("minecraft:armor_stand") && entityLoadingPreferences.shouldLoadClass(ArmorStand.class)) {
             addActor(new ArmorStand(
-              new Point3(x, y, z),
+              new Vector3(x, y, z),
               tag
             ));
           }
@@ -185,8 +183,9 @@ public class SceneEntities {
     // don't add the actor again if it was already loaded from json
     if(actors.stream().noneMatch(actor -> {
       if(actor.getClass().equals(entity.getClass())) {
-        double distance = actor.position.vSub(entity.position).lengthSquared();
-        return distance < Constants.EPSILON;
+        Vector3 distance = new Vector3(actor.position);
+        distance.sub(entity.position);
+        return distance.lengthSquared() < Constants.EPSILON;
       }
       return false;
     })) {
@@ -238,7 +237,7 @@ public class SceneEntities {
   public void loadDataFromOctree(
     Octree worldOctree,
     BlockPalette palette,
-    Point3i origin
+    Vector3i origin
   ) {
     for (Entity entity : actors) {
       entity.loadDataFromOctree(worldOctree, palette, origin);
@@ -248,12 +247,12 @@ public class SceneEntities {
     }
   }
 
-  public void buildBvh(TaskTracker.Task task, Point3i origin) {
+  public void buildBvh(TaskTracker.Task task, Vector3i origin) {
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
     bvh = BVH.Factory.create(bvhImplementation, entities, worldOffset, task);
   }
 
-  public void buildActorBvh(TaskTracker.Task task, Point3i origin) {
+  public void buildActorBvh(TaskTracker.Task task, Vector3i origin) {
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
     actorBvh = BVH.Factory.create(bvhImplementation, actors, worldOffset, task);
   }

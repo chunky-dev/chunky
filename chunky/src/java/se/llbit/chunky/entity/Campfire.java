@@ -281,7 +281,7 @@ public class Campfire extends Entity {
   private final boolean isLit;
   private final Block block;
 
-  public Campfire(Campfire.Kind kind, Point3 position, String facing, boolean lit, Block block) {
+  public Campfire(Campfire.Kind kind, Vector3 position, String facing, boolean lit, Block block) {
     super(position);
     this.kind = kind;
     this.facing = facing;
@@ -290,7 +290,7 @@ public class Campfire extends Entity {
   }
 
   public Campfire(JsonObject json) {
-    super(JsonUtil.point3FromJsonObject(json.get("position")));
+    super(JsonUtil.vec3FromJsonObject(json.get("position")));
     this.kind = Campfire.Kind.valueOf(json.get("campfireKind").stringValue("CAMPFIRE"));
     this.facing = json.get("facing").stringValue("north");
     this.isLit = json.get("lit").boolValue(true);

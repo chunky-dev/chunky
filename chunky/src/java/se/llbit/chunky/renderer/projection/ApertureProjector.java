@@ -24,7 +24,6 @@ import se.llbit.chunky.renderer.ApertureShape;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
 import se.llbit.math.Constants;
-import se.llbit.math.Point3;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.resources.ImageLoader;
@@ -95,7 +94,7 @@ public class ApertureProjector implements Projector {
     return null;
   }
 
-  @Override public void apply(double x, double y, Random random, Point3 o, Vector3 d) {
+  @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
     wrapped.apply(x, y, random, o, d);
 
     d.scale(subjectDistance / d.z);
@@ -146,7 +145,7 @@ public class ApertureProjector implements Projector {
     o.add(rx, ry, 0);
   }
 
-  @Override public void apply(double x, double y, Point3 pos, Vector3 direction) {
+  @Override public void apply(double x, double y, Vector3 pos, Vector3 direction) {
     wrapped.apply(x, y, pos, direction);
   }
 

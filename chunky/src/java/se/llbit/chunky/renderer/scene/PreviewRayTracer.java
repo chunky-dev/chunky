@@ -23,7 +23,6 @@ import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Point3;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
@@ -167,7 +166,7 @@ public class PreviewRayTracer implements RayTracer {
     if (ray.d.y < 0) { // ray going below horizon
       double t = (scene.yMin - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < intersectionRecord.distance) {
-        Point3 point = new Point3(ray.o);
+        Vector3 point = new Vector3(ray.o);
         point.scaleAdd(t + Constants.OFFSET, ray.d);
         // must be submerged if water plane is enabled otherwise ray already had collided with water
         boolean isSubmerged = scene.isWaterPlaneEnabled();

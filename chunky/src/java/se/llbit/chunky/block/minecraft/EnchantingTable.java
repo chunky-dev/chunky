@@ -23,7 +23,6 @@ import se.llbit.chunky.entity.Book;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.model.minecraft.EnchantmentTableModel;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Point3;
 import se.llbit.math.Vector3;
 
 public class EnchantingTable extends AbstractModelBlock {
@@ -46,8 +45,8 @@ public class EnchantingTable extends AbstractModelBlock {
   }
 
   @Override
-  public Entity toEntity(Point3 position) {
-    Point3 newPosition = new Point3(position);
+  public Entity toEntity(Vector3 position) {
+    Vector3 newPosition = new Vector3(position);
     newPosition.add(0, 0.35, 0);
     Book book = new Book(
         newPosition,

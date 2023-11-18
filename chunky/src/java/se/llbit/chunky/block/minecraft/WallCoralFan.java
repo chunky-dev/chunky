@@ -23,7 +23,6 @@ import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.WallCoralFanEntity;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Point3;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
@@ -50,7 +49,7 @@ public class WallCoralFan extends MinecraftBlockTranslucent {
     return true;
   }
 
-  @Override public Entity toEntity(Point3 position) {
+  @Override public Entity toEntity(Vector3 position) {
     return new WallCoralFanEntity(position, coralType, facing);
   }
 }

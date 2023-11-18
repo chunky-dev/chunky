@@ -23,7 +23,6 @@ import se.llbit.chunky.entity.CalibratedSculkSensorAmethyst;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.model.minecraft.CalibratedSculkSensorModel;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Point3;
 import se.llbit.math.Vector3;
 
 public class CalibratedSculkSensor extends AbstractModelBlock {
@@ -57,7 +56,7 @@ public class CalibratedSculkSensor extends AbstractModelBlock {
   }
 
   @Override
-  public Entity toEntity(Point3 position) {
+  public Entity toEntity(Vector3 position) {
     return new CalibratedSculkSensorAmethyst(position, this.facing, isActive(), this);
   }
 }

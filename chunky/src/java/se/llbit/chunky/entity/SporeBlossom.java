@@ -4,7 +4,6 @@ import java.util.Collection;
 import se.llbit.chunky.model.minecraft.SporeBlossomModel;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.Point3;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.primitive.Primitive;
@@ -12,17 +11,17 @@ import se.llbit.util.JsonUtil;
 
 public class SporeBlossom extends Entity {
 
-  public SporeBlossom(Point3 position) {
+  public SporeBlossom(Vector3 position) {
     super(position);
   }
 
   public SporeBlossom(JsonObject json) {
-    super(JsonUtil.point3FromJsonObject(json.get("position")));
+    super(JsonUtil.vec3FromJsonObject(json.get("position")));
   }
 
   @Override
   public Collection<Primitive> primitives(Vector3 offset) {
-    return SporeBlossomModel.primitives(Transform.NONE.translate(position.asVector()).translate(offset));
+    return SporeBlossomModel.primitives(Transform.NONE.translate(position).translate(offset));
   }
 
   @Override

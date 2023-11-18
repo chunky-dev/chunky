@@ -24,7 +24,6 @@ import se.llbit.chunky.entity.LilyPadEntity;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Point3;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
@@ -45,7 +44,7 @@ public class LilyPad extends MinecraftBlockTranslucent {
     return true;
   }
 
-  @Override public Entity toEntity(Point3 position) {
+  @Override public Entity toEntity(Vector3 position) {
     return new LilyPadEntity(position);
   }
 }

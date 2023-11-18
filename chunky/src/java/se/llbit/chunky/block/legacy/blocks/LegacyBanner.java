@@ -9,7 +9,6 @@ import se.llbit.chunky.world.BlockData;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Point3;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
@@ -59,7 +58,7 @@ public class LegacyBanner extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public Entity toBlockEntity(Point3 position, CompoundTag entityTag) {
+  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
     return new StandingBanner(position, rotation, parseDesign(entityTag));
   }
 

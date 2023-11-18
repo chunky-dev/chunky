@@ -19,7 +19,6 @@ package se.llbit.math.primitive;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.AABB;
-import se.llbit.math.Point3;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
@@ -122,7 +121,7 @@ public class MutableAABB implements Primitive {
     double tNear = Double.NEGATIVE_INFINITY;
     double tFar = Double.POSITIVE_INFINITY;
     Vector3 d = ray.d;
-    Point3 o = ray.o;
+    Vector3 o = ray.o;
 
     if (d.x != 0) {
       double rx = 1 / d.x;

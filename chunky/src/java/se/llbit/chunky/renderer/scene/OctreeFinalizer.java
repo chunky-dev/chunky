@@ -22,7 +22,6 @@ import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.Octree;
-import se.llbit.math.Point3i;
 import se.llbit.math.Vector3i;
 
 /**
@@ -42,7 +41,7 @@ public class OctreeFinalizer {
    * @param cp        Position of the chunk to finalize
    */
   public static void finalizeChunk(Octree worldTree, Octree waterTree, BlockPalette palette,
-                                   Point3i origin, ChunkPosition cp, int yMin, int yMax) {
+                                   Vector3i origin, ChunkPosition cp, int yMin, int yMax) {
     for (int cy = yMin; cy < yMax; ++cy) {
       for (int cz = 0; cz < 16; ++cz) {
         int z = cz + cp.z * 16 - origin.z;
@@ -59,7 +58,7 @@ public class OctreeFinalizer {
   }
 
   private static void hideBlocks(Octree worldTree, BlockPalette palette, int x,
-      int cy, int z, int yMin, int yMax, Point3i origin) {
+      int cy, int z, int yMin, int yMax, Vector3i origin) {
     // Set non-visible blocks to be any block, in order to merge large patches.
     int y = cy - origin.y;
     if (cy > yMin && cy < yMax - 1) {
@@ -77,7 +76,7 @@ public class OctreeFinalizer {
   }
 
   private static void processBlock(Octree worldTree, Octree waterTree, BlockPalette palette, int x,
-      int cy, int z, Point3i origin) {
+      int cy, int z, Vector3i origin) {
     int y = cy - origin.y;
     Material mat = worldTree.getMaterial(x, y, z, palette);
     Material wmat = waterTree.getMaterial(x, y, z, palette);

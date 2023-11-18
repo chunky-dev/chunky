@@ -253,7 +253,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Octree origin.
    */
-  protected Point3i origin = new Point3i();
+  protected Vector3i origin = new Vector3i();
 
   /**
    * Actual upper y bound (might be lower than yClipMax).
@@ -1017,7 +1017,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   Block block = palette.get(currentBlock);
 
                   if(block.isEntity()) {
-                    Point3 position = new Point3(cx + cp.x * 16, y, cz + cp.z * 16);
+                    Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
                     Entity entity = block.toEntity(position);
 
                     if (entities.shouldLoad(entity)) {
@@ -1192,7 +1192,7 @@ public class Scene implements JsonSerializable, Refreshable {
             }
             Block block = palette.get(chunkData.getBlockAt(x, y, z));
             // Metadata is the old block data (to be replaced in future Minecraft versions?).
-            Point3 position = new Point3(x + wx0, y, z + wz0);
+            Vector3 position = new Vector3(x + wx0, y, z + wz0);
             if (block.isModifiedByBlockEntity()) {
               Tag newTag = block.getNewTagWithBlockEntity(palette.getBlockSpec(chunkData.getBlockAt(x, y, z)).getTag(), entityTag);
               if (newTag != null) {
@@ -1514,9 +1514,9 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * @return The calculated camera position
    */
-  public Point3 calcCenterCamera() {
+  public Vector3 calcCenterCamera() {
     if (chunks.isEmpty()) {
-      return new Point3(0, 128, 0);
+      return new Vector3(0, 128, 0);
     }
 
     int xmin = Integer.MAX_VALUE;
@@ -1550,10 +1550,10 @@ public class Scene implements JsonSerializable, Refreshable {
       Material block = worldOctree.getMaterial(xcenter - origin.x, y - origin.y, zcenter - origin.z,
           palette);
       if (!(block instanceof Air)) {
-        return new Point3(xcenter, y + 5, zcenter);
+        return new Vector3(xcenter, y + 5, zcenter);
       }
     }
-    return new Point3(xcenter, 128, zcenter);
+    return new Vector3(xcenter, 128, zcenter);
   }
 
   /**
@@ -1721,13 +1721,13 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * @return {@code null} if the camera is not aiming at some intersectable object
    */
-  public Point3 getTargetPosition() {
+  public Vector3 getTargetPosition() {
     Ray2 ray = new Ray2();
     IntersectionRecord intersectionRecord = new IntersectionRecord();
     if (!traceTarget(ray, intersectionRecord)) {
       return null;
     } else {
-      Point3 target = new Point3(ray.o);
+      Vector3 target = new Vector3(ray.o);
       target.add(origin.x, origin.y, origin.z);
       return target;
     }
@@ -1736,7 +1736,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * @return World origin in the Octree
    */
-  public Point3i getOrigin() {
+  public Vector3i getOrigin() {
     return origin;
   }
 
@@ -2350,7 +2350,7 @@ public class Scene implements JsonSerializable, Refreshable {
           }
           buf.append("\n");
         }
-        Point3 pos = camera.getPosition();
+        Vector3 pos = camera.getPosition();
         buf.append(String.format("pos: (%.1f, %.1f, %.1f)\n", pos.x, pos.y, pos.z));
 
         buf.append("facing: ");
@@ -2519,7 +2519,7 @@ public class Scene implements JsonSerializable, Refreshable {
     return saveSnapshots;
   }
 
-  public Material getWorldMaterial(Point3 point) {
+  public Material getWorldMaterial(Vector3 point) {
     int x = (int) QuickMath.floor(point.x);
     int y = (int) QuickMath.floor(point.y);
     int z = (int) QuickMath.floor(point.z);
@@ -2551,7 +2551,7 @@ public class Scene implements JsonSerializable, Refreshable {
     return false;
   }
 
-  public boolean isInsideOctree(Point3 point) {
+  public boolean isInsideOctree(Vector3 point) {
     return worldOctree.isInside(point);
   }
 

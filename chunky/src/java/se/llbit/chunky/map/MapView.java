@@ -20,7 +20,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.world.ChunkView;
-import se.llbit.math.Point3;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 
@@ -66,7 +65,7 @@ public class MapView {
   }
 
   /** Set the map view by block coordinates. */
-  public void panTo(Point3 pos) {
+  public void panTo(Vector3 pos) {
     // Convert from block coordinates to chunk coordinates.
     panTo(pos.x / 16, pos.z / 16);
   }

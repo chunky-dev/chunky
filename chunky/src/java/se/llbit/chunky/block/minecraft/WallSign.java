@@ -24,7 +24,6 @@ import se.llbit.chunky.entity.SignEntity;
 import se.llbit.chunky.entity.WallSignEntity;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Point3;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
@@ -65,7 +64,7 @@ public class WallSign extends MinecraftBlockTranslucent {
     return true;
   }
 
-  @Override public Entity toBlockEntity(Point3 position, CompoundTag entityTag) {
+  @Override public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
     return new WallSignEntity(position, entityTag, facing, material);
   }
 }

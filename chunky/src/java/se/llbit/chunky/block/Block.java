@@ -1,7 +1,6 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
@@ -10,14 +9,12 @@ import se.llbit.json.JsonValue;
 import se.llbit.math.AABB;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Point3;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
-import java.util.List;
 import java.util.Random;
 
 public abstract class Block extends Material {
@@ -26,7 +23,7 @@ public abstract class Block extends Material {
   /**
    * Set to true if there is a local intersection model for this block. If this is set to
    * <code>false</code> (default), this block is assumed to be an opaque cube block and {@link
-   * #intersect(Ray, Scene)} will never be called.
+   * #intersect(Ray2, IntersectionRecord, Scene)} will never be called.
    */
   public boolean localIntersect = false;
 
@@ -104,7 +101,7 @@ public abstract class Block extends Material {
     return false;
   }
 
-  public Entity toBlockEntity(Point3 position, CompoundTag entityTag) {
+  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
     throw new Error("This block type can not be converted to a block entity: "
         + getClass().getSimpleName());
   }
@@ -122,7 +119,7 @@ public abstract class Block extends Material {
     return false;
   }
 
-  public Entity toEntity(Point3 position) {
+  public Entity toEntity(Vector3 position) {
     throw new Error("This block type can not be converted to an entity: "
         + getClass().getSimpleName());
   }

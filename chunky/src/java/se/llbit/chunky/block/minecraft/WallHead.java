@@ -26,7 +26,6 @@ import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Point3;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
@@ -77,7 +76,7 @@ public class WallHead extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public Entity toEntity(Point3 position) {
+  public Entity toEntity(Vector3 position) {
     return new SkullEntity(position, type, 0, facing);
   }
 
@@ -87,7 +86,7 @@ public class WallHead extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public Entity toBlockEntity(Point3 position, CompoundTag entityTag) {
+  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
     if (type == Kind.PLAYER) {
       String textureUrl = Head.getTextureUrl(entityTag);
       return textureUrl != null ? new HeadEntity(position, textureUrl, 0, facing)

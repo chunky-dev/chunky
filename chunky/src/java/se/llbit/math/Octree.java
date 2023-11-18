@@ -328,7 +328,7 @@ public class Octree {
    * @param o vector
    * @return {@code true} if the vector is inside the octree
    */
-  public boolean isInside(Point3 o) {
+  public boolean isInside(Vector3 o) {
     int depth = implementation.getDepth();
 
     int x = (int) QuickMath.floor(o.x);

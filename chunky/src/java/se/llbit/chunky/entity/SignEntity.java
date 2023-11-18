@@ -322,11 +322,11 @@ public class SignEntity extends Entity {
   private final Texture texture;
   private final String material;
 
-  public SignEntity(Point3 position, CompoundTag entityTag, int blockData, String material) {
+  public SignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
     this(position, getFrontTextLines(entityTag), getFrontDyeColor(entityTag), getFrontGlowing(entityTag), getBackTextLines(entityTag), getBackDyeColor(entityTag), getBackGlowing(entityTag), blockData & 0xF, material);
   }
 
-  public SignEntity(Point3 position, JsonArray[] frontText, Color frontDye, boolean frontGlowing, JsonArray[] backText, Color backDye, boolean backGlowing, int direction, String material) {
+  public SignEntity(Vector3 position, JsonArray[] frontText, Color frontDye, boolean frontGlowing, JsonArray[] backText, Color backDye, boolean backGlowing, int direction, String material) {
     super(position);
     Texture signTexture = SignEntity.textureFromMaterial(material);
     this.frontText = frontText;
@@ -571,7 +571,7 @@ public class SignEntity extends Entity {
    * Unmarshalls a sign entity from JSON data.
    */
   public static Entity fromJson(JsonObject json) {
-    Point3 position = new Point3();
+    Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     JsonArray[] frontText = null;
     if (json.get("text").isArray()) {

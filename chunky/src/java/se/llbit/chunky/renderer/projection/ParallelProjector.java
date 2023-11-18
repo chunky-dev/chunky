@@ -20,7 +20,6 @@ import java.util.Random;
 
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Constants;
-import se.llbit.math.Point3;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
@@ -37,11 +36,11 @@ public class ParallelProjector implements Projector {
     this.fov = fov;
   }
 
-  @Override public void apply(double x, double y, Random random, Point3 o, Vector3 d) {
+  @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
     apply(x, y, o, d);
   }
 
-  @Override public void apply(double x, double y, Point3 o, Vector3 d) {
+  @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
     o.set(fov * x, fov * y, 0);
     d.set(0, 0, 1);
   }
@@ -62,7 +61,7 @@ public class ParallelProjector implements Projector {
     // When in parallel projection, push the ray origin back so the
     // ray start outside the octree to prevent ray spawning inside some blocks
     int limit = (1 << scene.getWorldOctree().getDepth());
-    Point3 o = ray.o;
+    Vector3 o = ray.o;
     Vector3 d = ray.d;
     double t = 0;
     // simplified intersection test with the 6 planes that form the bounding box of the octree

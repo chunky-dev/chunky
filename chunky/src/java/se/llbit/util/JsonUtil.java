@@ -21,7 +21,6 @@ import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.Point3;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.Tag;
@@ -40,30 +39,6 @@ public final class JsonUtil {
       json.add(QuickMath.degToRad(val.floatValue()));
     }
     return json;
-  }
-
-  public static Point3 point3FromJsonArray(JsonValue json) {
-    JsonArray array = json.array();
-    double x = array.size() >= 1 ? array.get(0).asDouble(0) : 0;
-    double y = array.size() >= 2 ? array.get(1).asDouble(0) : 0;
-    double z = array.size() >= 3 ? array.get(2).asDouble(0) : 0;
-    return new Point3(x, y, z);
-  }
-
-  public static Point3 point3FromJsonObject(JsonValue json) {
-    JsonObject obj = json.object();
-    double x = obj.get("x").asDouble(0);
-    double y = obj.get("y").asDouble(0);
-    double z = obj.get("z").asDouble(0);
-    return new Point3(x, y, z);
-  }
-
-  public static JsonValue vec3ToJson(Point3 point) {
-    JsonArray array = new JsonArray();
-    array.add(Json.of(point.x));
-    array.add(Json.of(point.y));
-    array.add(Json.of(point.z));
-    return array;
   }
 
   public static Vector3 vec3FromJsonArray(JsonValue json) {
