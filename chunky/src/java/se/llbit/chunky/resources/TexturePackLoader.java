@@ -334,6 +334,7 @@ public class TexturePackLoader {
         new SimpleTexture("textures/blocks/grass_side_overlay", Texture.grassSide),
         new IndexedTexture(0x26, Texture.grassSide)));
     allTextures.put("tallgrass", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/block/short_grass", Texture.tallGrass), // since 1.20.3-pre2
         new SimpleTexture("assets/minecraft/textures/block/grass", Texture.tallGrass),
         new SimpleTexture("assets/minecraft/textures/blocks/grass", Texture.tallGrass),
         new SimpleTexture("assets/minecraft/textures/blocks/tallgrass", Texture.tallGrass),

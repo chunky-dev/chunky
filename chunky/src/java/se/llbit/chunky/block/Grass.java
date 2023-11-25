@@ -7,7 +7,7 @@ import se.llbit.math.Ray;
 
 public class Grass extends MinecraftBlockTranslucent {
   public Grass() {
-    super("grass", Texture.tallGrass);
+    super("short_grass", Texture.tallGrass);
     localIntersect = true;
     solid = false;
   }
