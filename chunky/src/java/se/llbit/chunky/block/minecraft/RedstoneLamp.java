@@ -22,14 +22,18 @@ import se.llbit.chunky.block.MinecraftBlock;
 import se.llbit.chunky.resources.Texture;
 
 public class RedstoneLamp extends MinecraftBlock {
-  public final boolean isLit;
+  private final boolean lit;
 
   public RedstoneLamp(boolean lit) {
     super("redstone_lamp", lit ? Texture.redstoneLampOn : Texture.redstoneLampOff);
-    this.isLit = lit;
+    this.lit = lit;
+  }
+
+  public boolean isLit() {
+    return lit;
   }
 
   @Override public String description() {
-    return "lit=" + isLit;
+    return "lit=" + lit;
   }
 }

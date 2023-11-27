@@ -33,7 +33,6 @@ public class LegacyWaterShader implements WaterShader {
 
   @Override
   public void save(JsonObject json) {
-    json.add("waterShader", "LEGACY");
   }
 
   @Override

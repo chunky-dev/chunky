@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2023 Chunky contributors
+/* Copyright (c) 2012-2023 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -15,18 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
+package se.llbit.chunky.renderer.scene;
 
-package se.llbit.chunky.block.minecraft;
+import se.llbit.chunky.model.minecraft.WaterModel;
+import se.llbit.json.JsonObject;
+import se.llbit.math.Ray;
 
-import se.llbit.chunky.block.AbstractModelBlock;
-import se.llbit.chunky.model.GrassTintedSpriteModel;
-import se.llbit.chunky.resources.Texture;
+public class StillWaterShader implements WaterShader {
+  @Override
+  public void doWaterShading(Ray ray, double animationTime) {
+  }
 
-public class Grass extends AbstractModelBlock {
+  @Override
+  public WaterShader clone() {
+    return new StillWaterShader();
+  }
 
-  public Grass() {
-    super("short_grass", Texture.tallGrass);
-    solid = false;
-    model = new GrassTintedSpriteModel(texture);
+  @Override
+  public void save(JsonObject json) {
+  }
+
+  @Override
+  public void load(JsonObject json) {
   }
 }

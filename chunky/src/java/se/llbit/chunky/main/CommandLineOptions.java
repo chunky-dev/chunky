@@ -122,7 +122,9 @@ public class CommandLineOptions {
           "  --launcher            forces the launcher window to be displayed",
           "  --version             print the launcher version and exit",
           "  --verbose             verbose logging in the launcher",
-          "  --console             show the GUI console in headless mode");
+          "  --console             show the GUI console in headless mode",
+          "  --dangerouslyDisableLibraryValidation",
+          "                        disable library checksum validation (not recommended)");
 
   /**
    * True if any command line option provided was invalid.

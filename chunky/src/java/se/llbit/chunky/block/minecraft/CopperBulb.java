@@ -18,15 +18,27 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.block.AbstractModelBlock;
-import se.llbit.chunky.model.GrassTintedSpriteModel;
+import se.llbit.chunky.block.MinecraftBlock;
 import se.llbit.chunky.resources.Texture;
 
-public class Grass extends AbstractModelBlock {
+public class CopperBulb extends MinecraftBlock {
+  private final boolean lit;
+  private final boolean powered;
 
-  public Grass() {
-    super("short_grass", Texture.tallGrass);
-    solid = false;
-    model = new GrassTintedSpriteModel(texture);
+  public CopperBulb(String name, boolean lit, boolean powered, Texture lp, Texture lnp, Texture nlp, Texture nlnp) {
+    super(name, lit ? (powered ? lp : lnp) : (powered ? nlp : nlnp));
+    this.lit = lit;
+    this.powered = powered;
+  }
+  public boolean isLit() {
+    return lit;
+  }
+
+  public boolean isPowered() {
+    return powered;
+  }
+
+  @Override public String description() {
+    return "lit=" + lit + ", powered=" + powered;
   }
 }
