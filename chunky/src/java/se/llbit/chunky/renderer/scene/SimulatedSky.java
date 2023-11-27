@@ -31,7 +31,7 @@ public interface SimulatedSky {
   /**
    * Calculate the sky color for a given ray.
    */
-  Vector3 calcIncidentLight(Ray ray);
+  Vector3 calcIncidentLight(Vector3 d);
 
   /**
    * Get the friendly name.

@@ -288,8 +288,7 @@ public class Sky implements JsonSerializable {
         break;
       }
       case SIMULATED: {
-        Vector3 color = skyCache.calcIncidentLight(ray);
-        ray.color.set(color.x, color.y, color.z, 1);
+        skyCache.calcIncidentLight(ray);
         break;
       }
       case SKYMAP_EQUIRECTANGULAR: {

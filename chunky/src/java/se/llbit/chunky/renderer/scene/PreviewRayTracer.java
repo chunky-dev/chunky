@@ -41,7 +41,7 @@ public class PreviewRayTracer implements RayTracer {
       ray.setCurrentMaterial(Air.INSTANCE);
     }
     while (true) {
-      if (!nextIntersection(scene, ray)) {
+      if (!nextIntersection(scene, ray, state)) {
         if (mapIntersection(scene, ray)) {
           break;
         }
@@ -68,7 +68,7 @@ public class PreviewRayTracer implements RayTracer {
     Ray ray = state.ray;
     double occlusion = 1.0;
     while (true) {
-      if (!nextIntersection(scene, ray)) {
+      if (!nextIntersection(scene, ray, state)) {
         break;
       } else {
         occlusion *= (1 - ray.color.w);
@@ -85,7 +85,7 @@ public class PreviewRayTracer implements RayTracer {
    * Find next ray intersection.
    * @return true if intersected, false if no intersection has been found
    */
-  public static boolean nextIntersection(Scene scene, Ray ray) {
+  public static boolean nextIntersection(Scene scene, Ray ray, WorkerState state) {
     ray.setPrevMaterial(ray.getCurrentMaterial(), ray.getCurrentData());
     ray.t = Double.POSITIVE_INFINITY;
     boolean hit = false;
@@ -95,7 +95,7 @@ public class PreviewRayTracer implements RayTracer {
     if (scene.isWaterPlaneEnabled()) {
       hit = waterPlaneIntersection(scene, ray) || hit;
     }
-    if (scene.intersect(ray)) {
+    if (scene.intersect(ray, state)) {
       // Octree tracer handles updating distance.
       return true;
     }

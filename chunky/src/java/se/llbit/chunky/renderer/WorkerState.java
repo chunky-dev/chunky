@@ -19,6 +19,8 @@ package se.llbit.chunky.renderer;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -28,4 +30,33 @@ public class WorkerState {
   public Ray ray;
   public Vector4 attenuation = new Vector4();
   public Random random;
+  private List<Ray> pool = new LinkedList<>();
+
+  public WorkerState() {
+    for (int i = 0; i < 10; i++) {
+      pool.add(new Ray());
+    }
+  }
+
+  public Ray newRay() {
+    if (pool.isEmpty()) {
+      return new Ray();
+    }
+    Ray ray = pool.remove(0);
+    ray.setDefault();
+    return ray;
+  }
+
+  public void returnRay(Ray ray) {
+    pool.add(ray);
+  }
+
+  public Ray newRay(Ray original) {
+    if (pool.isEmpty()) {
+      return new Ray(original);
+    }
+    Ray ray = pool.remove(0);
+    ray.set(original);
+    return ray;
+  }
 }

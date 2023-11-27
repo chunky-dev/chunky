@@ -20,13 +20,11 @@ import static java.lang.Math.PI;
 
 import java.util.concurrent.ExecutionException;
 import java.util.stream.IntStream;
+
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.log.Log;
-import se.llbit.math.ColorUtil;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
+import se.llbit.math.*;
 
 /**
  * A sky cache. Precalculates sky colors and them uses cached values with bilinear interpolation.
@@ -128,15 +126,14 @@ public class SkyCache {
    * @param ray Ray to calculate the incident light for
    * @return Incident light color (RGB)
    */
-  public Vector3 calcIncidentLight(Ray ray) {
+  public void calcIncidentLight(Ray ray) {
     double theta = FastMath.atan2(ray.d.z, ray.d.x);
     theta /= PI * 2;
     theta = ((theta % 1) + 1) % 1;
     double phi = (FastMath.asin(QuickMath.clamp(ray.d.y, -1, 1)) + PI / 2) / PI;
 
-    Vector3 color = getColorInterpolated(theta, phi);
-    ColorUtil.RGBfromHSL(color, color.x, color.y, color.z);
-    return color;
+    getColorInterpolated(theta, phi, ray.color);
+    ColorUtil.RGBfromHSL(ray.color, ray.color.x, ray.color.y, ray.color.z);
   }
 
   // Linear interpolation between 2 points in 1 dimension
@@ -147,35 +144,38 @@ public class SkyCache {
   /**
    * Calculate the bilinearly interpolated value from the cache.
    */
-  private Vector3 getColorInterpolated(double normX, double normY) {
+  private void getColorInterpolated(double normX, double normY, Vector4 out) {
     double x = normX * skyResolution;
     double y = normY * skyResolution;
     int floorX = (int) QuickMath.clamp(x, 0, skyResolution - 1);
     int floorY = (int) QuickMath.clamp(y, 0, skyResolution - 1);
 
-    double[] color = new double[3];
     for (int i = 0; i < 3; i++) {
       double y0 = interp1D(x, floorX, floorX + 1, skyTexture[floorX][floorY][i],
-          skyTexture[floorX + 1][floorY][i]);
+        skyTexture[floorX + 1][floorY][i]);
       double y1 = interp1D(x, floorX, floorX + 1, skyTexture[floorX][floorY + 1][i],
-          skyTexture[floorX + 1][floorY + 1][i]);
-      color[i] = interp1D(y, floorY, floorY + 1, y0, y1);
+        skyTexture[floorX + 1][floorY + 1][i]);
+      double c = interp1D(y, floorY, floorY + 1, y0, y1);
+      if (i == 0) {
+        out.x = c;
+      } else if (i == 1) {
+        out.y = c;
+      } else if (i == 2) {
+        out.z = c;
+      }
+      out.w = 1;
     }
-    return new Vector3(color[0], color[1], color[2]);
   }
 
   /**
    * Calculate the sky color for a pixel on the cache.
    */
   private Vector3 getSkyColorAt(int x, int y) {
-    Ray ray = new Ray();
-
     double theta = ((double) x / skyResolution) * 2 * PI;
     double phi = ((double) y / skyResolution) * PI - PI / 2;
     double r = FastMath.cos(phi);
-    ray.d.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
 
-    Vector3 color = simSky.calcIncidentLight(ray);
+    Vector3 color = simSky.calcIncidentLight(new Vector3(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r));
     ColorUtil.RGBtoHSL(color, color.x, color.y, color.z);
     return color;
   }

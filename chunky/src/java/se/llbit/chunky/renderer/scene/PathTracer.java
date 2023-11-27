@@ -65,7 +65,7 @@ public class PathTracer implements RayTracer {
 
     while (true) {
 
-      if (!PreviewRayTracer.nextIntersection(scene, ray)) {
+      if (!PreviewRayTracer.nextIntersection(scene, ray, state)) {
         if (ray.getPrevMaterial().isWater()) {
           ray.color.set(0, 0, 0, 1);
           hit = true;
@@ -126,7 +126,7 @@ public class PathTracer implements RayTracer {
         break;
       }
       Vector4 cumulativeColor = new Vector4(0, 0, 0, 0);
-      Ray next = new Ray();
+      Ray next = state.newRay();
       float pMetal = currentMat.metalness;
       // Reusing first rays - a simplified form of "branched path tracing" (what Blender used to call it before they implemented something fancier)
       // The initial rays cast into the scene are very similar between each sample, since they are almost entirely a function of the pixel coordinates
@@ -187,7 +187,7 @@ public class PathTracer implements RayTracer {
       // travelled through glass or other materials between air gaps.
       // However, the results are probably close enough to not be distracting,
       // so this seems like a reasonable approximation.
-      Ray atmos = new Ray();
+      Ray atmos = state.newRay();
       double offset = scene.fog.sampleGroundScatterOffset(ray, ox, random);
       atmos.o.scaleAdd(offset, od, ox);
       scene.sun.getRandomSunDirection(atmos, random);
@@ -196,6 +196,7 @@ public class PathTracer implements RayTracer {
       // Check sun visibility at random point to determine inscatter brightness.
       getDirectLightAttenuation(scene, atmos, state);
       scene.fog.addGroundFog(ray, ox, airDistance, state.attenuation, offset);
+      state.returnRay(atmos);
     }
 
     return hit;
@@ -478,20 +479,21 @@ public class PathTracer implements RayTracer {
     if (scene.fog.mode == FogMode.UNIFORM) {
       scene.fog.addSkyFog(ray, null);
     } else if (scene.fog.mode == FogMode.LAYERED) {
-      Ray atmos = new Ray();
+      Ray atmos = state.newRay();
       double offset = scene.fog.sampleSkyScatterOffset(scene, ray, state.random);
       atmos.o.scaleAdd(offset, od, ox);
       scene.sun.getRandomSunDirection(atmos, state.random);
       atmos.setCurrentMaterial(Air.INSTANCE);
       getDirectLightAttenuation(scene, atmos, state);
       scene.fog.addSkyFog(ray, state.attenuation);
+      state.returnRay(atmos);
     }
   }
 
-  private static void sampleEmitterFace(Scene scene, Ray ray, Grid.EmitterPosition pos, int face, Vector4 result, double scaler, Random random) {
-    Ray emitterRay = new Ray(ray);
+  private static void sampleEmitterFace(Scene scene, Ray ray, Grid.EmitterPosition pos, int face, Vector4 result, double scaler, WorkerState state) {
+    Ray emitterRay = state.newRay(ray);
 
-    pos.sampleFace(face, emitterRay.d, random);
+    pos.sampleFace(face, emitterRay.d, state.random);
     emitterRay.d.sub(emitterRay.o);
 
     if (emitterRay.d.dot(ray.getNormal()) > 0) {
@@ -500,7 +502,7 @@ public class PathTracer implements RayTracer {
 
       emitterRay.o.scaleAdd(Ray.OFFSET, emitterRay.d);
       emitterRay.distance += Ray.OFFSET;
-      PreviewRayTracer.nextIntersection(scene, emitterRay);
+      PreviewRayTracer.nextIntersection(scene, emitterRay, state);
       if (Math.abs(emitterRay.distance - distance) < Ray.OFFSET) {
         double e = Math.abs(emitterRay.d.dot(emitterRay.getNormal()));
         e /= Math.max(distance * distance, 1);
@@ -512,6 +514,8 @@ public class PathTracer implements RayTracer {
         result.scaleAdd(e, emitterRay.color);
       }
     }
+
+    state.returnRay(emitterRay);
   }
 
   /**
@@ -523,20 +527,20 @@ public class PathTracer implements RayTracer {
    * @param random RNG
    * @return The contribution of the emitter
    */
-  private static Vector4 sampleEmitter(Scene scene, Ray ray, Grid.EmitterPosition pos, Random random) {
+  private static Vector4 sampleEmitter(Scene scene, Ray ray, Grid.EmitterPosition pos, WorkerState state) {
     Vector4 result = new Vector4();
     result.set(0, 0, 0, 1);
 
     switch (scene.getEmitterSamplingStrategy()) {
       default:
       case ONE:
-        sampleEmitterFace(scene, ray, pos, random.nextInt(pos.block.faceCount()), result, 1, random);
+        sampleEmitterFace(scene, ray, pos, state.random.nextInt(pos.block.faceCount()), result, 1, state);
         break;
       case ONE_BLOCK:
       case ALL:
         double scaler = 1.0 / pos.block.faceCount();
         for (int i = 0; i < pos.block.faceCount(); i++) {
-          sampleEmitterFace(scene, ray, pos, i, result, scaler, random);
+          sampleEmitterFace(scene, ray, pos, i, result, scaler, state);
         }
         break;
     }
@@ -556,7 +560,7 @@ public class PathTracer implements RayTracer {
     attenuation.w = 1;
     while (attenuation.w > 0) {
       ray.o.scaleAdd(Ray.OFFSET, ray.d);
-      if (!PreviewRayTracer.nextIntersection(scene, ray)) {
+      if (!PreviewRayTracer.nextIntersection(scene, ray, state)) {
         break;
       }
       double mult = 1 - ray.color.w;
