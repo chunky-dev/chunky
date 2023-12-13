@@ -266,7 +266,9 @@ public class Ray {
     this.randomHemisphereDir(random);
 
     o.scaleAdd(Ray.OFFSET, d);
-    currentMaterial = prevMaterial;
+    //if a block is solid while transmiting then we want to keep the old material as it penetrates
+    // might be able to remove the solid check but test correctness and performance
+    if (!transmitBack | !currentMaterial.solid) currentMaterial = prevMaterial;
     specular = false;
 
     // See specularReflection for explanation of why this is needed
