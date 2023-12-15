@@ -15,13 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.scene;
+package se.llbit.chunky.renderer.scene.sky;
 
 import java.util.Random;
 
 import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.renderer.Refreshable;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.JsonObject;
 import se.llbit.math.QuickMath;
@@ -149,7 +150,7 @@ public class Sun implements JsonSerializable {
    */
   private final Vector3 sw = new Vector3();
 
-  protected final Vector3 emittance = new Vector3(1, 1, 1);
+  private final Vector3 emittance = new Vector3(1, 1, 1);
 
   private static final double pE = FastMath.pow(DEFAULT_INTENSITY, Scene.DEFAULT_GAMMA);
 
@@ -512,6 +513,10 @@ public class Sun implements JsonSerializable {
    */
   public Vector3 getColor() {
     return color;
+  }
+
+  public Vector3 getEmittance() {
+    return emittance;
   }
 
   public Vector3 getApparentColor() {

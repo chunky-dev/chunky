@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.scene;
+package se.llbit.chunky.renderer.scene.sky;
 
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;

@@ -291,9 +291,10 @@ public class PathTracer implements RayTracer {
       next.diffuseReflection(ray, random);
       hit = pathTrace(scene, next, state, false) || hit;
       if (hit) {
-        cumulativeColor.x += emittance.x + ray.color.x * (directLightR * scene.sun.emittance.x + next.color.x + indirectEmitterColor.x);
-        cumulativeColor.y += emittance.y + ray.color.y * (directLightG * scene.sun.emittance.y + next.color.y + indirectEmitterColor.y);
-        cumulativeColor.z += emittance.z + ray.color.z * (directLightB * scene.sun.emittance.z + next.color.z + indirectEmitterColor.z);
+        Vector3 sunEmittance = scene.sun().getEmittance();
+        cumulativeColor.x += emittance.x + ray.color.x * (directLightR * sunEmittance.x + next.color.x + indirectEmitterColor.x);
+        cumulativeColor.y += emittance.y + ray.color.y * (directLightG * sunEmittance.y + next.color.y + indirectEmitterColor.y);
+        cumulativeColor.z += emittance.z + ray.color.z * (directLightB * sunEmittance.z + next.color.z + indirectEmitterColor.z);
       } else if (indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
         hit = true;
         cumulativeColor.x += ray.color.x * indirectEmitterColor.x;
