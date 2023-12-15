@@ -10,7 +10,7 @@
   <VBox spacing="10.0">
     <CheckBox fx:id="biomeColors" mnemonicParsing="false" text="Enable biome colors" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <IntegerAdjuster fx:id="biomeBlendingRadiusInput" name="Biome Blending Radius" />
+      <IntegerAdjuster fx:id="biomeBlendingRadiusInput" name="Biome blending radius" />
     </HBox>
     <CheckBox fx:id="singleColorBtn" mnemonicParsing="false" text="Single color textures"/>
     <Button fx:id="editResourcePacks" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
