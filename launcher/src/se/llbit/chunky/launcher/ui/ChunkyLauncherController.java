@@ -448,6 +448,12 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
 
     // Resolve specific version.
     VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
+    if (version == VersionInfo.NONE) {
+      setBusy(true);
+      UpdateChecker updateThread = new UpdateChecker(settings, settings.selectedChannel, this);
+      updateThread.start();
+      return;
+    }
     if (!ChunkyDeployer.canLaunch(version, this, true)) {
       return;
     }
