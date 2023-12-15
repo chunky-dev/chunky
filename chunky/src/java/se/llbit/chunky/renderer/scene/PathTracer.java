@@ -125,6 +125,7 @@ public class PathTracer implements RayTracer {
       if(ray.depth + 1 >= scene.rayDepth) {
         break;
       }
+      ray.depth += 1;
       Vector4 cumulativeColor = new Vector4(0, 0, 0, 0);
       Ray next = new Ray();
       float pMetal = currentMat.metalness;
