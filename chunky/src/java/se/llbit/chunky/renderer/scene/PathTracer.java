@@ -698,7 +698,7 @@ public class PathTracer implements RayTracer {
       x.scale(1 / FastMath.sqrt(v1.x * v1.x + v1.z * v1.z));
     } else {
       x = new Vector3(0, v1.z, -v1.y);
-      x.scale(FastMath.sqrt(v1.y * v1.y + v1.z * v1.z));
+      x.scale(1 / FastMath.sqrt(v1.y * v1.y + v1.z * v1.z));
     }
     v2.set(x);
     v3.cross(v1, v2);
