@@ -99,10 +99,13 @@ public class SceneChooserController implements Initializable {
         alert.setTitle("Delete Scene");
         alert.setContentText(String.format("Are you sure you want to delete the scene %s? "
             + "All files for the scene, except snapshot images, will be deleted.", scene.sceneName));
-        if (alert.showAndWait().get() == ButtonType.OK) {
-          Scene.delete(scene.sceneName, scene.sceneDirectory);
-          sceneTbl.getItems().remove(sceneTbl.getSelectionModel().getSelectedItem());
-        }
+        alert.showAndWait()
+          .ifPresent(result ->
+              if (result == ButtonType.OK) {
+                Scene.delete(scene.sceneName, scene.sceneDirectory);
+                sceneTbl.getItems().remove(sceneTbl.getSelectionModel().getSelectedItem());
+              }
+          );
       }
     });
 
