@@ -121,7 +121,7 @@ public class BiomeBlendingUtility {
     SummedAreaTable table = new SummedAreaTable(blurRadius);
     for(int x = -blurRadius; x < 16 + blurRadius; ++x) {
       for(int z = -blurRadius; z < 16 + blurRadius; ++z) {
-        ChunkPosition ccp = new ChunkPosition((cp.x * 16 + x) / 16, (cp.z * 16 + z) / 16);
+        ChunkPosition ccp = new ChunkPosition(Math.floorDiv(cp.x * 16 + x, 16), Math.floorDiv(cp.z * 16 + z, 16));
         if (nonEmptyChunks.contains(ccp)) {
           int biomeId = biomeIdx.get(cp.x * 16 + x, samplingY, cp.z * 16 + z);
           if(biomeId != -1) {
@@ -298,7 +298,7 @@ public class BiomeBlendingUtility {
     for(int y = minY - blurRadius; y < maxY + blurRadius; ++y) {
       for(int x = -blurRadius; x < 16 + blurRadius; ++x) {
         for(int z = -blurRadius; z < 16 + blurRadius; ++z) {
-          ChunkPosition ccp = new ChunkPosition((cp.x * 16 + x) / 16, (cp.z * 16 + z) / 16);
+          ChunkPosition ccp = new ChunkPosition(Math.floorDiv(cp.x * 16 + x, 16), Math.floorDiv(cp.z * 16 + z, 16));
           if (nonEmptyChunks.contains(ccp)) {
             int biomeId = biomeIdx.get(cp.x * 16 + x, y, cp.z * 16 + z);
             if(biomeId != -1) {
