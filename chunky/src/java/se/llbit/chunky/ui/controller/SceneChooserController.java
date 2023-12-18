@@ -100,12 +100,12 @@ public class SceneChooserController implements Initializable {
         alert.setContentText(String.format("Are you sure you want to delete the scene %s? "
             + "All files for the scene, except snapshot images, will be deleted.", scene.sceneName));
         alert.showAndWait()
-          .ifPresent(result ->
+          .ifPresent(result -> {
               if (result == ButtonType.OK) {
                 Scene.delete(scene.sceneName, scene.sceneDirectory);
                 sceneTbl.getItems().remove(sceneTbl.getSelectionModel().getSelectedItem());
               }
-          );
+          });
       }
     });
 
