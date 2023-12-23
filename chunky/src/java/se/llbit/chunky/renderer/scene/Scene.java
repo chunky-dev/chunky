@@ -1385,14 +1385,18 @@ public class Scene implements JsonSerializable, Refreshable {
         }
         task.updateEta(target, done);
         done += 1;
+
+        grassTexture.compact();
+        foliageTexture.compact();
+        waterTexture.compact();
       }
 
       worldOctree.endFinalization();
       waterOctree.endFinalization();
 
-      grassTexture.compact();
-      foliageTexture.compact();
-      waterTexture.compact();
+      grassTexture.endFinalization();
+      foliageTexture.endFinalization();
+      waterTexture.endFinalization();
     }
 
     entities.loadDataFromOctree(worldOctree, palette, origin);

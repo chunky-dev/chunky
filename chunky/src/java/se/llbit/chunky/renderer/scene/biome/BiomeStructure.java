@@ -1,8 +1,9 @@
 package se.llbit.chunky.renderer.scene.biome;
 
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import se.llbit.chunky.renderer.scene.biome.worldtexture.WorldTexture2dBiomeStructure;
+import se.llbit.chunky.renderer.scene.biome.worldtexture.WorldTexture3dBiomeStructure;
 import se.llbit.chunky.world.Chunk;
-import se.llbit.chunky.world.WorldTexture;
 import se.llbit.log.Log;
 import se.llbit.math.structures.Position2IntStructure;
 import se.llbit.math.structures.Position2ReferenceStructure;
@@ -24,13 +25,11 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
     //TODO: create a plugin api interface for registering implementations, and move this to that
     BiomeStructure.register(new Trivial3dBiomeStructure());
     BiomeStructure.register(new Trivial2dBiomeStructure());
-    BiomeStructure.register(new WorldTexture2dBiomeStructure());
+    BiomeStructure.register(new WorldTexture2dBiomeStructure.Factory());
+    BiomeStructure.register(new WorldTexture3dBiomeStructure.Factory());
   }
 
   /**
-   * This is basically a reimplementation of {@link WorldTexture#load} but instead loading into an arbitrary
-   * BiomeStructure implementation
-   *
    * @param impl The implementation to load the legacy implementation into
    * @param in   The serialised legacy data in an input stream
    * @return The newly constructed {@link BiomeStructure} of the specified implementation
@@ -84,10 +83,14 @@ public interface BiomeStructure extends Position2ReferenceStructure<float[]> {
   void store(DataOutputStream out) throws IOException;
 
   /**
-   * This method is called to tell the implementation to shrink its size. (Node-tree optimisation, etc.)
-   * Called when throughout insertion of new biomes, and on completion
+   * This method is called to tell the implementation to shrink its size. Called when throughout insertion of new biomes.
    */
-  void compact();
+  default void compact() {}
+
+  /**
+   * This method is called to tell the implementation to finalize. Called on completion of loading.
+   */
+  default void endFinalization() {}
 
   /**
    * @return The registry key this biome format uses. Must be unique
