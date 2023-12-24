@@ -28,6 +28,8 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -147,5 +149,15 @@ public abstract class QuadModel implements BlockModel {
       ray.o.scaleAdd(ray.t, ray.d);
     }
     return hit;
+  }
+
+  @Override
+  public boolean isBiomeDependant() {
+    Tint[] tints = getTints();
+    if(tints == null)
+      return false;
+
+    return Arrays.stream(tints)
+      .anyMatch(Tint::isBiomeTint);
   }
 }

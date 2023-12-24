@@ -114,9 +114,5 @@ public class Trivial2dBiomeStructure implements BiomeStructure.Factory {
     public String biomeFormat() {
       return ID;
     }
-
-    @Override
-    public void compact() {
-    }
   }
 }
