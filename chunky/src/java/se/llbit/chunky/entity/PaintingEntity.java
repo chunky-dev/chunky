@@ -18,22 +18,18 @@
  */
 package se.llbit.chunky.entity;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Transform;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 import se.llbit.math.primitive.Primitive;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class PaintingEntity extends Entity {
 
@@ -50,32 +46,31 @@ public class PaintingEntity extends Entity {
 
       double offset = -1 / 16.;
       double off = 0;
-      int pw = w * 16;
-      int ph = h * 16;
+
       quads = new Quad[]{
-          // north (front)
-          new Quad(new Vector3(w, 0, offset), new Vector3(0, 0, offset),
-              new Vector3(w, h, offset), new Vector4(0, 1, 0, 1)),
+        // north (front)
+        new Quad(new Vector3(w, 0, offset), new Vector3(0, 0, offset),
+          new Vector3(w, h, offset), new Vector4(0, 1, 0, 1)),
 
-          // south (back)
-          new Quad(new Vector3(0, 0, off), new Vector3(w, 0, off), new Vector3(0, h, off),
-              new Vector4(0, w / 4., 1, 1 - h / 4.)),
+        // south (back)
+        new Quad(new Vector3(0, 0, off), new Vector3(w, 0, off), new Vector3(0, h, off),
+          new Vector4(0, w / 4., 1, 1 - h / 4.)),
 
-          // west (left)
-          new Quad(new Vector3(0, 0, offset), new Vector3(0, 0, off), new Vector3(0, h, offset),
-              new Vector4(0, 1 / 64., 1 - h / 4., 1)),
+        // west (left)
+        new Quad(new Vector3(0, 0, offset), new Vector3(0, 0, off), new Vector3(0, h, offset),
+          new Vector4(0, 1 / 64., 1 - h / 4., 1)),
 
-          // east (right)
-          new Quad(new Vector3(w, 0, off), new Vector3(w, 0, offset), new Vector3(w, h, off),
-              new Vector4(0, 1 / 64., 1 - h / 4., 1)),
+        // east (right)
+        new Quad(new Vector3(w, 0, off), new Vector3(w, 0, offset), new Vector3(w, h, off),
+          new Vector4(0, 1 / 64., 1 - h / 4., 1)),
 
-          // top
-          new Quad(new Vector3(w, h, offset), new Vector3(0, h, offset), new Vector3(w, h, off),
-              new Vector4(0, w / 4., 1 - 1 / 64., 1)),
+        // top
+        new Quad(new Vector3(w, h, offset), new Vector3(0, h, offset), new Vector3(w, h, off),
+          new Vector4(0, w / 4., 1 - 1 / 64., 1)),
 
-          // bottom
-          new Quad(new Vector3(0, 0, offset), new Vector3(w, 0, offset), new Vector3(0, 0, off),
-              new Vector4(0, w / 4., 1, 1 - 1 / 64.)),};
+        // bottom
+        new Quad(new Vector3(0, 0, offset), new Vector3(w, 0, offset), new Vector3(0, 0, off),
+          new Vector4(0, w / 4., 1, 1 - 1 / 64.)),};
       material = new TextureMaterial(painting);
     }
   }
@@ -155,9 +150,9 @@ public class PaintingEntity extends Entity {
     if (painting == null) {
       return primitives;
     }
-    double rot = QuickMath.degToRad(180 - angle);
+    double rot = QuickMath.degToRad(180 - getAngleFromPosition(position));
     Transform transform = Transform.NONE.translate(painting.ox, painting.oy, 0.5 / 16).rotateY(rot)
-        .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
+      .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     Quad[] quads = painting.quads;
     quads[0].addTriangles(primitives, painting.material, transform); // front face
     for (int i = 1; i < quads.length; i++) { // other faces
@@ -165,6 +160,29 @@ public class PaintingEntity extends Entity {
       quad.addTriangles(primitives, BACK_MATERIAL, transform);
     }
     return primitives;
+  }
+
+  /**
+   * Get the painting angle from its position.
+   * This isn't needed for 1.17+ worlds, but it doesn't hurt to do this.
+   *
+   * @param position Painting position
+   * @return Rotation angle of the painting
+   * @see <a href="https://github.com/chunky-dev/chunky/issues/1553">#1553</a>
+   */
+  private static int getAngleFromPosition(Vector3 position) {
+    double x = (position.x - Math.floor(position.x));
+    double z = (position.z - Math.floor(position.z));
+    if (x > 0 && x < 0.5) {
+      return 270;
+    }
+    if (z > 0 && z < 0.5) {
+      return 0;
+    }
+    if (z > 0.5) {
+      return 180;
+    }
+    return 90;
   }
 
   @Override
