@@ -119,8 +119,8 @@ public class ChunkyLauncher {
 
     options.addOption(Option.builder()
       .longOpt("javaOptions")
+      .hasArg(true)
       .argName("options")
-      .optionalArg(false)
       .desc("Add a Java option when launching Chunky")
       .build()
     );
