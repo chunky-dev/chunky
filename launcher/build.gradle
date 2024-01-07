@@ -9,9 +9,13 @@ configurations {
 }
 
 dependencies {
-    bundled 'org.apache.maven:maven-artifact:3.9.9'
+  bundled 'org.apache.maven:maven-artifact:3.9.9'
+  bundled 'commons-cli:commons-cli:1.6.0'
 
-    implementation project(':lib')
+  implementation project(':lib')
+
+  testImplementation 'com.google.truth:truth:1.1.3'
+  testImplementation 'junit:junit:4.13.2'
 }
 
 java {
@@ -21,13 +25,22 @@ java {
   }
 }
 
-sourceSets.main {
-    java.srcDir 'src'
-    resources {
-        srcDir 'src'
-        include '**/*.png'
-        include '**/*.fxml'
+sourceSets {
+  main {
+    java {
+      srcDir 'src'
     }
+    resources {
+      srcDir 'src'
+      include '**/*.png'
+      include '**/*.fxml'
+    }
+  }
+  test {
+    java {
+      srcDir 'test'
+    }
+  }
 }
 
 jar {
