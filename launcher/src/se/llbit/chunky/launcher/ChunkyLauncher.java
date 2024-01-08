@@ -63,11 +63,6 @@ public class ChunkyLauncher {
     );
 
     options.addOption(Option.builder()
-      .longOpt("nolauncher")
-      .build()
-    );
-
-    options.addOption(Option.builder()
       .longOpt("launcher")
       .desc("Forces the launcher GUI to be shown")
       .build()
@@ -91,19 +86,12 @@ public class ChunkyLauncher {
       .build()
     );
 
-    options.addOptionGroup(new OptionGroup()
-      .addOption(Option.builder()
-        .longOpt("update")
-        .argName("release channel")
-        .optionalArg(true)
-        .desc("Update Chunky to the latest release")
-        .build()
-      )
-      .addOption(Option.builder()
-        .longOpt("updateAlpha")
-        .desc("Update Chunky to the latest snapshot release. Equivalent to `--update snapshot`. (legacy)")
-        .build()
-      )
+    options.addOption(Option.builder()
+      .longOpt("update")
+      .argName("release channel")
+      .optionalArg(true)
+      .desc("Update Chunky to the latest release")
+      .build()
     );
 
     options.addOption(Option.builder()
@@ -113,15 +101,15 @@ public class ChunkyLauncher {
     );
 
     options.addOption(Option.builder()
-      .longOpt("noRetryJavafx")
-      .build()
-    );
-
-    options.addOption(Option.builder()
       .longOpt("javaOptions")
       .hasArg(true)
       .argName("options")
       .desc("Add a Java option when launching Chunky")
+      .build()
+    );
+
+    options.addOption(Option.builder()
+      .longOpt("noRetryJavafx")
       .build()
     );
 
@@ -143,7 +131,7 @@ public class ChunkyLauncher {
   public static CommandLine parseCli(String[] args) throws ParseException {
     Options options = cliOptions();
     return new DefaultParser()
-      .parse(options, args, true);
+      .parse(options, args);
   }
 
   public static void main(String[] args) throws FileNotFoundException {
@@ -179,10 +167,6 @@ public class ChunkyLauncher {
           return;
         }
 
-        if (cmd.hasOption("nolauncher")) {
-          mode = LaunchMode.GUI;
-        }
-
         if (cmd.hasOption("launcher")) {
           forceLauncher = true;
         }
@@ -200,17 +184,12 @@ public class ChunkyLauncher {
           settings.forceGuiConsole = true;
         }
 
-        if (cmd.hasOption("update") || cmd.hasOption("updateAlpha")) {
-          ReleaseChannel channel;
-          if (cmd.hasOption("updateAlpha")) {
-            channel = LauncherSettings.SNAPSHOT_RELEASE_CHANNEL;
-          } else {
-            channel = settings.selectedChannel;
+        if (cmd.hasOption("update")) {
+          ReleaseChannel channel = settings.selectedChannel;
 
-            String selected = cmd.getOptionValue("update");
-            if (selected != null) {
-              channel = settings.releaseChannels.getOrDefault(selected, channel);
-            }
+          String selected = cmd.getOptionValue("update");
+          if (selected != null) {
+            channel = settings.releaseChannels.getOrDefault(selected, channel);
           }
 
           headlessUpdateChunky(settings, channel);
