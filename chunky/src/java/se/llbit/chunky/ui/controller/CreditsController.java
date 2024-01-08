@@ -40,6 +40,7 @@ import javafx.scene.layout.Border;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import se.llbit.chunky.HelpCopyright;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.ui.ChunkyFx;
@@ -49,9 +50,10 @@ import se.llbit.log.Log;
 import se.llbit.util.Pair;
 
 public class CreditsController implements Initializable {
-
   @FXML
   private Label version;
+  @FXML
+  public Label copyrightLine;
   @FXML
   private Hyperlink gplv3;
   @FXML
@@ -82,6 +84,10 @@ public class CreditsController implements Initializable {
   private Hyperlink lz4Java;
   @FXML
   private Hyperlink lz4JavaLicense;
+  @FXML
+  private Hyperlink apacheCli;
+  @FXML
+  private Hyperlink apacheCliLicense;
   @FXML
   private VBox pluginBox;
   @FXML
@@ -140,6 +146,8 @@ public class CreditsController implements Initializable {
 
     version.setText(Chunky.getMainWindowTitle());
 
+    copyrightLine.setText(HelpCopyright.COPYRIGHT_LINE);
+
     gplv3.setOnAction(
         e -> launchAndReset(gplv3, "https://github.com/chunky-dev/chunky/blob/master/LICENSE")
     );
@@ -188,6 +196,11 @@ public class CreditsController implements Initializable {
     lz4Java.setOnAction(e -> launchAndReset(lz4Java, "https://github.com/lz4/lz4-java"));
     lz4JavaLicense.setBorder(Border.EMPTY);
     lz4JavaLicense.setOnAction(e -> launchAndReset(lz4JavaLicense, "https://github.com/lz4/lz4-java/blob/master/LICENSE.txt"));
+
+    apacheCli.setBorder(Border.EMPTY);
+    apacheCli.setOnAction(e -> launchAndReset(apacheCli, "https://commons.apache.org/proper/commons-cli/"));
+    apacheCliLicense.setBorder(Border.EMPTY);
+    apacheCliLicense.setOnAction(e -> launchAndReset(apacheCliLicense, "http://www.apache.org/licenses/LICENSE-2.0"));
 
     if (!plugins.isEmpty()) {
       plugins.forEach((key, item) -> pluginBox.getChildren().addAll(buildBox(item)));

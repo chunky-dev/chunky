@@ -79,16 +79,6 @@ public class ChunkyLauncherCliParseTest {
     assertThat(cmd.getOptions().length).isEqualTo(1);
     assertThat(cmd.hasOption("update")).isTrue();
 
-    // Check --noRetryJavafx
-    cmd = ChunkyLauncher.parseCli(new String[] { "--noRetryJavafx" });
-    assertThat(cmd.getOptions().length).isEqualTo(1);
-    assertThat(cmd.hasOption("noRetryJavafx")).isTrue();
-
-    // Check --checkJvm
-    cmd = ChunkyLauncher.parseCli(new String[] { "--checkJvm" });
-    assertThat(cmd.getOptions().length).isEqualTo(1);
-    assertThat(cmd.hasOption("checkJvm")).isTrue();
-
     // Check --dangerouslyDisableLibraryValidation
     cmd = ChunkyLauncher.parseCli(new String[] { "--dangerouslyDisableLibraryValidation" });
     assertThat(cmd.getOptions().length).isEqualTo(1);
@@ -99,5 +89,15 @@ public class ChunkyLauncherCliParseTest {
     assertThat(cmd.getOptions().length).isEqualTo(1);
     assertThat(cmd.hasOption("javaOptions")).isTrue();
     assertThat(cmd.getOptionValue("javaOptions")).isEqualTo("test");
+
+    // Check --noRetryJavafx
+    cmd = ChunkyLauncher.parseCli(new String[] { "--noRetryJavafx" });
+    assertThat(cmd.getOptions().length).isEqualTo(1);
+    assertThat(cmd.hasOption("noRetryJavafx")).isTrue();
+
+    // Check --checkJvm
+    cmd = ChunkyLauncher.parseCli(new String[] { "--checkJvm" });
+    assertThat(cmd.getOptions().length).isEqualTo(1);
+    assertThat(cmd.hasOption("checkJvm")).isTrue();
   }
 }

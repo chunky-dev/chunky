@@ -22,6 +22,7 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.commons.cli.*;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.cli.CliUtil;
 import se.llbit.chunky.launcher.ui.ChunkyLauncherFx;
 import se.llbit.chunky.launcher.ui.DebugConsole;
 import se.llbit.chunky.launcher.ui.FirstTimeSetupDialog;
@@ -52,7 +53,7 @@ public class ChunkyLauncher {
 
   public static final int LAUNCHER_SETTINGS_REVISION = 1;
 
-  public static Options cliOptions() {
+  public static Options cliOptionsPublic() {
     Options options = new Options();
 
     options.addOption(Option.builder()
@@ -109,17 +110,6 @@ public class ChunkyLauncher {
     );
 
     options.addOption(Option.builder()
-      .longOpt("noRetryJavafx")
-      .build()
-    );
-
-    options.addOption(Option.builder()
-      .longOpt("checkJvm")
-      .desc("Check if JVM version is 64-bit")
-      .build()
-    );
-
-    options.addOption(Option.builder()
       .longOpt("dangerouslyDisableLibraryValidation")
       .desc("Disable library validation. This can be dangerous!")
       .build()
@@ -128,8 +118,24 @@ public class ChunkyLauncher {
     return options;
   }
 
+  public static Options cliOptionsFull() {
+    Options options = cliOptionsPublic();
+
+    options.addOption(Option.builder()
+      .longOpt("noRetryJavafx")
+      .build()
+    );
+
+    options.addOption(Option.builder()
+      .longOpt("checkJvm")
+      .build()
+    );
+
+    return options;
+  }
+
   public static CommandLine parseCli(String[] args) throws ParseException {
-    Options options = cliOptions();
+    Options options = cliOptionsFull();
     return new DefaultParser()
       .parse(options, args);
   }
@@ -162,8 +168,15 @@ public class ChunkyLauncher {
         CommandLine cmd = parseCli(args);
 
         if (cmd.hasOption("help")) {
-          new HelpFormatter()
-            .printHelp("java -jar ChunkyLauncher.jar", cliOptions());
+          String header = CliUtil.makeHelpHeader("Chunky Launcher", LAUNCHER_VERSION.toString(), "");
+          String footer = "\n" +
+            "Command line options after -- are passed to Chunky.\n" +
+            "For Chunky's command line help, run:\n" +
+            "  java -jar ChunkyLauncher.jar -- --help";
+
+          HelpFormatter help = new HelpFormatter();
+          help.setWidth(CliUtil.CLI_WIDTH);
+          help.printHelp("java -jar ChunkyLauncher.jar", header, cliOptionsPublic(), footer);
           return;
         }
 
@@ -204,9 +217,10 @@ public class ChunkyLauncher {
 
         if (cmd.hasOption("noRetryJavafx")) {
           retryIfMissingJavafx = false;
-          // if this is the only option, with "--javaOptions" "<param>" we want the launcher
-          if (args.length == 3)
-            forceLauncher = true;
+          // If this is the only option, with "--javaOptions" "<param>" we want to launch as if there were no arguments
+          if (args.length == 3) {
+            mode = LaunchMode.GUI;
+          }
         }
 
         if (cmd.hasOption("javaOptions")) {
