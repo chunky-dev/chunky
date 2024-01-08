@@ -49,11 +49,6 @@ public class ChunkyLauncherCliParseTest {
     assertThat(cmd.getOptions().length).isEqualTo(1);
     assertThat(cmd.hasOption("help")).isTrue();
 
-    // Check --nolauncher
-    cmd = ChunkyLauncher.parseCli(new String[] { "--nolauncher" });
-    assertThat(cmd.getOptions().length).isEqualTo(1);
-    assertThat(cmd.hasOption("nolauncher")).isTrue();
-
     // Check --launcher
     cmd = ChunkyLauncher.parseCli(new String[] { "--launcher" });
     assertThat(cmd.getOptions().length).isEqualTo(1);
@@ -79,6 +74,11 @@ public class ChunkyLauncherCliParseTest {
     assertThat(cmd.getOptions().length).isEqualTo(1);
     assertThat(cmd.hasOption("setup")).isTrue();
 
+    // Check --update
+    cmd = ChunkyLauncher.parseCli(new String[] { "--update" });
+    assertThat(cmd.getOptions().length).isEqualTo(1);
+    assertThat(cmd.hasOption("update")).isTrue();
+
     // Check --noRetryJavafx
     cmd = ChunkyLauncher.parseCli(new String[] { "--noRetryJavafx" });
     assertThat(cmd.getOptions().length).isEqualTo(1);
@@ -93,24 +93,11 @@ public class ChunkyLauncherCliParseTest {
     cmd = ChunkyLauncher.parseCli(new String[] { "--dangerouslyDisableLibraryValidation" });
     assertThat(cmd.getOptions().length).isEqualTo(1);
     assertThat(cmd.hasOption("dangerouslyDisableLibraryValidation")).isTrue();
-  }
 
-  @Test
-  public void testUpdateGroup() throws ParseException {
-    CommandLine cmd;
-
-    // Check --update
-    cmd = ChunkyLauncher.parseCli(new String[] { "--update" });
+    // Check --javaOptions
+    cmd = ChunkyLauncher.parseCli(new String[] { "--javaOptions", "test" });
     assertThat(cmd.getOptions().length).isEqualTo(1);
-    assertThat(cmd.hasOption("update")).isTrue();
-
-    // Check --updateAlpha
-    cmd = ChunkyLauncher.parseCli(new String[] { "--updateAlpha" });
-    assertThat(cmd.getOptions().length).isEqualTo(1);
-    assertThat(cmd.hasOption("updateAlpha")).isTrue();
-
-    // Check both --update and --updateAlpha is invalid
-    assertThrows(ParseException.class, () ->
-      ChunkyLauncher.parseCli(new String[] { "--update", "--updateAlpha" }));
+    assertThat(cmd.hasOption("javaOptions")).isTrue();
+    assertThat(cmd.getOptionValue("javaOptions")).isEqualTo("test");
   }
 }
