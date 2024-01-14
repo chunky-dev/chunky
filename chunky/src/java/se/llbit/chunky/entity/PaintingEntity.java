@@ -143,6 +143,26 @@ public class PaintingEntity extends Entity {
     this.angle = angle;
   }
 
+  public PaintingEntity(Vector3 position, String art, int facing) {
+    super(position);
+    this.art = art;
+    switch (facing) {
+      case 1:
+        this.angle = 90;
+        break;
+      case 2:
+        this.angle = 180;
+        break;
+      case 3:
+        this.angle = 270;
+        break;
+      case 0:
+      default:
+        this.angle = 0;
+        break;
+    }
+  }
+
   @Override
   public Collection<Primitive> primitives(Vector3 offset) {
     Collection<Primitive> primitives = new LinkedList<>();
@@ -150,7 +170,7 @@ public class PaintingEntity extends Entity {
     if (painting == null) {
       return primitives;
     }
-    double rot = QuickMath.degToRad(180 - getAngleFromPosition(position));
+    double rot = QuickMath.degToRad(180 - angle);
     Transform transform = Transform.NONE.translate(painting.ox, painting.oy, 0.5 / 16).rotateY(rot)
       .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     Quad[] quads = painting.quads;
@@ -160,29 +180,6 @@ public class PaintingEntity extends Entity {
       quad.addTriangles(primitives, BACK_MATERIAL, transform);
     }
     return primitives;
-  }
-
-  /**
-   * Get the painting angle from its position.
-   * This isn't needed for 1.17+ worlds, but it doesn't hurt to do this.
-   *
-   * @param position Painting position
-   * @return Rotation angle of the painting
-   * @see <a href="https://github.com/chunky-dev/chunky/issues/1553">#1553</a>
-   */
-  private static int getAngleFromPosition(Vector3 position) {
-    double x = (position.x - Math.floor(position.x));
-    double z = (position.z - Math.floor(position.z));
-    if (x > 0 && x < 0.5) {
-      return 270;
-    }
-    if (z > 0 && z < 0.5) {
-      return 0;
-    }
-    if (z > 0.5) {
-      return 180;
-    }
-    return 90;
   }
 
   @Override
