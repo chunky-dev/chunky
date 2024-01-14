@@ -1030,15 +1030,23 @@ public class Scene implements JsonSerializable, Refreshable {
 
             if (y >= yClipMin && y < yClipMax) {
               String id = tag.get("id").stringValue("");
+              // Before 1.12 paintings had id=Painting.
+              // After 1.12 paintings had id=minecraft:painting.
               if ((id.equals("minecraft:painting") || id.equals("Painting")) && entityLoadingPreferences.shouldLoadClass(PaintingEntity.class)) {
-                // Before 1.12 paintings had id=Painting.
-                // After 1.12 paintings had id=minecraft:painting.
-                float yaw = tag.get("Rotation").get(0).floatValue();
-
                 Tag paintingVariant = NbtUtil.getTagFromNames(tag, "Motive", "variant");
-                entities.add(new PaintingEntity(new Vector3(x, y, z), paintingVariant.stringValue(), yaw));
+                int facing = (tag.get("facing").isError())
+                  ? tag.get("Facing").byteValue(0) // pre 1.17
+                  : tag.get("facing").byteValue(0); // 1.17+
+                entities.add(new PaintingEntity(
+                  new Vector3(x, y, z),
+                  paintingVariant.stringValue(),
+                  facing
+                ));
               } else if (id.equals("minecraft:armor_stand") && entityLoadingPreferences.shouldLoadClass(ArmorStand.class)) {
-                actors.add(new ArmorStand(new Vector3(x, y, z), tag));
+                actors.add(new ArmorStand(
+                  new Vector3(x, y, z),
+                  tag
+                ));
               }
             }
           }
