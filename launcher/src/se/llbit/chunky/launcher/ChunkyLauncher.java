@@ -431,44 +431,40 @@ public class ChunkyLauncher {
     {
       String updateReleaseChannels = in.nextLine().trim();
       if (!updateReleaseChannels.contains("n")) {
-        LauncherInfoChecker checker = new LauncherInfoChecker(
-          settings,
-          error -> {
-            System.err.println("Failed to fetch launcher info!");
-            System.err.println(error);
-          },
-          info -> {
-            if (info != null) {
-              if (info.version.compareTo(ChunkyLauncher.LAUNCHER_VERSION) > 0) {
-                System.out.printf("Launcher update found! Version %s released on %s: %s\n",
-                  info.version, info.date, settings.getResourceUrl(info.path));
-                if (info.notes.isEmpty()) {
-                  System.out.println("No release notes available.");
-                } else {
-                  System.out.println(info.notes);
-                }
-                System.out.println();
-              }
-
-              settings.setReleaseChannels(info.channels);
-            }
-          }
-        );
-        checker.start();
-        try {
-          checker.join();
-        } catch (InterruptedException e) {
-          System.err.println("Interrupted!");
-        }
+        reloadReleaseChannels(settings);
       }
     }
+  }
 
-    System.out.println("Available channels:");
-    System.out.println(String.join(", ", settings.releaseChannels.keySet()));
-    System.out.printf("Release channel [%s]: ", settings.selectedChannel.id);
-    {
-      String releaseChannel = in.nextLine().trim();
-      settings.selectedChannel = settings.releaseChannels.getOrDefault(releaseChannel, settings.selectedChannel);
+  private static void reloadReleaseChannels(LauncherSettings settings) {
+    LauncherInfoChecker checker = new LauncherInfoChecker(
+      settings,
+      error -> {
+        System.err.println("Failed to fetch launcher info!");
+        System.err.println(error);
+      },
+      info -> {
+        if (info != null) {
+          if (info.version.compareTo(ChunkyLauncher.LAUNCHER_VERSION) > 0) {
+            System.out.printf("Launcher update found! Version %s released on %s: %s\n",
+              info.version, info.date, settings.getResourceUrl(info.path));
+            if (info.notes.isEmpty()) {
+              System.out.println("No release notes available.");
+            } else {
+              System.out.println(info.notes);
+            }
+            System.out.println();
+          }
+
+          settings.setReleaseChannels(info.channels);
+        }
+      }
+    );
+    checker.start();
+    try {
+      checker.join();
+    } catch (InterruptedException e) {
+      System.err.println("Interrupted!");
     }
   }
 
