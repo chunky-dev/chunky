@@ -427,7 +427,15 @@ public class ChunkyLauncher {
       }
     }
 
-    System.out.print("Reload release channels [Y/n]: ");
+    System.out.printf("Update site [%s]: ", settings.updateSite);
+    {
+      String updateSite = in.nextLine().trim();
+      if (!updateSite.isEmpty()) {
+        settings.updateSite = updateSite;
+      }
+    }
+
+    System.out.print("Reload launcher metadata [Y/n]: ");
     {
       String updateReleaseChannels = in.nextLine().trim();
       if (!updateReleaseChannels.contains("n")) {
@@ -437,6 +445,7 @@ public class ChunkyLauncher {
   }
 
   private static void reloadReleaseChannels(LauncherSettings settings) {
+    System.out.print("...");
     LauncherInfoChecker checker = new LauncherInfoChecker(
       settings,
       error -> {
@@ -446,17 +455,21 @@ public class ChunkyLauncher {
       info -> {
         if (info != null) {
           if (info.version.compareTo(ChunkyLauncher.LAUNCHER_VERSION) > 0) {
-            System.out.printf("Launcher update found! Version %s released on %s: %s\n",
-              info.version, info.date, settings.getResourceUrl(info.path));
+            System.out.println("Launcher update found!");
+            System.out.printf("Version %s released on %s\n", info.version, info.date);
+            System.out.println(settings.getResourceUrl(info.path));
             if (info.notes.isEmpty()) {
               System.out.println("No release notes available.");
             } else {
               System.out.println(info.notes);
             }
             System.out.println();
+          } else {
+            System.out.println("Launcher is up to date!");
           }
 
           settings.setReleaseChannels(info.channels);
+          System.out.printf("%d release channels found.\n", info.channels.size());
         }
       }
     );
