@@ -162,8 +162,11 @@ public class ChunkyFxController
     @Override public void setProgress(String task, int done, int start, int target) {
       Platform.runLater(() -> {
         progressBar.setProgress((double) done / (target - start));
-        progressLbl.setText(String.format("%s: %s of %s", task, decimalFormat.format(done),
-            decimalFormat.format(target)));
+        if (target - start > 0) {
+          progressLbl.setText(String.format("%s - %s%%", task, Math.round(100 * (double) done / (target - start))));
+        } else {
+          progressLbl.setText(String.format("%s", task));
+        }
         etaLbl.setText("ETA: N/A");
       });
     }
@@ -171,8 +174,11 @@ public class ChunkyFxController
     @Override public void setProgress(String task, int done, int start, int target, String eta) {
       Platform.runLater(() -> {
         progressBar.setProgress((double) done / (target - start));
-        progressLbl.setText(String.format("%s: %s of %s", task, decimalFormat.format(done),
-            decimalFormat.format(target)));
+        if (target - start > 0) {
+          progressLbl.setText(String.format("%s - %s%%", task, Math.round(100 * (double) done / (target - start))));
+        } else {
+          progressLbl.setText(String.format("%s", task));
+        }
         etaLbl.setText("ETA: " + eta);
       });
     }
@@ -205,8 +211,7 @@ public class ChunkyFxController
         int seconds = (int) ((time / 1000) % 60);
         int minutes = (int) ((time / 60000) % 60);
         int hours = (int) (time / 3600000);
-        gui.renderTimeLbl.setText(String
-            .format("Render time: %d hours, %d minutes, %d seconds", hours, minutes, seconds));
+        gui.renderTimeLbl.setText(String.format("Time: %d:%02d:%02d", hours, minutes, seconds));
       });
     }
 
@@ -222,7 +227,7 @@ public class ChunkyFxController
 
     private void updateSppStats() {
       Platform.runLater(() -> gui.sppLbl.setText(String
-          .format("%s SPP, %s SPS", gui.decimalFormat.format(spp),
+          .format("%s SPP | %s SPS", gui.decimalFormat.format(spp),
               gui.decimalFormat.format(sps))));
     }
 
