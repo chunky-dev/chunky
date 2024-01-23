@@ -163,9 +163,11 @@ public class ChunkyFxController
       Platform.runLater(() -> {
         progressBar.setProgress((double) done / (target - start));
         if (target - start > 0) {
-          progressLbl.setText(String.format("%s - %s%%", task, Math.round(100 * (double) done / (target - start))));
+          progressLbl.setText(String.format("%s – %.1f%%", task, 100 * (double) done / (target - start)));
+          progressLbl.setTooltip(new Tooltip(String.format("%d of %d completed", done, target)));
         } else {
           progressLbl.setText(String.format("%s", task));
+          progressLbl.setTooltip(null);
         }
         etaLbl.setText("ETA: N/A");
       });
@@ -175,9 +177,11 @@ public class ChunkyFxController
       Platform.runLater(() -> {
         progressBar.setProgress((double) done / (target - start));
         if (target - start > 0) {
-          progressLbl.setText(String.format("%s - %s%%", task, Math.round(100 * (double) done / (target - start))));
+          progressLbl.setText(String.format("%s – %.1f%%", task, 100 * (double) done / (target - start)));
+          progressLbl.setTooltip(new Tooltip(String.format("%d of %d completed", done, target)));
         } else {
           progressLbl.setText(String.format("%s", task));
+          progressLbl.setTooltip(null);
         }
         etaLbl.setText("ETA: " + eta);
       });
