@@ -37,6 +37,7 @@ public class ChunkDataSource {
   public ChunkDataSource(int timestamp) {
     this(timestamp, new byte[0], null);
   }
+
   public ChunkDataSource(int timestamp, byte[] data, CompressionScheme compressionScheme) {
     this.timestamp = timestamp;
     this.data = data;
@@ -57,9 +58,11 @@ public class ChunkDataSource {
 
   public enum CompressionScheme {
     GZIP(GZIPInputStream::new),
-    ZLIB(InflaterInputStream::new);
+    ZLIB(InflaterInputStream::new),
+    UNCOMPRESSED((inputStream) -> inputStream);
 
     private final WrapStream wrapper;
+
     CompressionScheme(WrapStream wrapper) {
       this.wrapper = wrapper;
     }

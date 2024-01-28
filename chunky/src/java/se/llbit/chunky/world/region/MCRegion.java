@@ -351,6 +351,8 @@ public class MCRegion implements Region {
         return ChunkDataSource.CompressionScheme.GZIP;
       case 2:
         return ChunkDataSource.CompressionScheme.ZLIB;
+      case 3:
+        return ChunkDataSource.CompressionScheme.UNCOMPRESSED;
       default:
         throw new ChunkReadException(chunkPos, String.format(
           "Unknown chunk data compression method: %d",
