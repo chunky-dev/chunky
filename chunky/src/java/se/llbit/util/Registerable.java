@@ -5,6 +5,21 @@ package se.llbit.util;
  * This would be, for example, different Octree implementations.
  */
 public interface Registerable {
+  enum DeprecationStatus {
+    /**
+     * Not deprecated.
+     */
+    ACTIVE,
+    /**
+     * Deprecated. Use is discouraged but not hidden.
+     */
+    DEPRECATED,
+    /**
+     * Deprecated. This option should be hidden.
+     */
+    HIDDEN,
+  }
+
   /**
    * Get the pretty name of this object.
    * For example, "Chunky Path Tracer".
@@ -22,4 +37,11 @@ public interface Registerable {
    * For example, "PathTracingRenderer".
    */
   String getId();
+
+  /**
+   * Get the deprecation status of this object.
+   */
+  default DeprecationStatus getDeprecationStatus() {
+    return DeprecationStatus.ACTIVE;
+  }
 }
