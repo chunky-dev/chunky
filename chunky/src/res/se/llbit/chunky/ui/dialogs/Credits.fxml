@@ -208,33 +208,47 @@
                       </padding>
                     </Hyperlink>
 
-                     <Hyperlink fx:id="simplexnoise" text="Simplex noise">
-                       <padding>
-                         <Insets/>
-                       </padding>
-                     </Hyperlink>
-                     <Hyperlink fx:id="simplexnoiseLicense" text="Public domain / Unlicense">
-                        <font>
-                           <Font size="10.0" />
-                        </font>
-                        <padding>
-                           <Insets left="20.0" />
-                        </padding>
-                     </Hyperlink>
+                    <Hyperlink fx:id="simplexnoise" text="Simplex noise">
+                      <padding>
+                        <Insets/>
+                      </padding>
+                    </Hyperlink>
+                    <Hyperlink fx:id="simplexnoiseLicense" text="Public domain / Unlicense">
+                      <font>
+                        <Font size="10.0" />
+                      </font>
+                      <padding>
+                        <Insets left="20.0" />
+                      </padding>
+                    </Hyperlink>
 
-                     <Hyperlink fx:id="semver4j" text="semver4j">
-                       <padding>
-                         <Insets/>
-                       </padding>
-                     </Hyperlink>
-                     <Hyperlink fx:id="semver4jLicense" text="MIT License">
-                        <font>
-                           <Font size="10.0" />
-                        </font>
-                        <padding>
-                           <Insets left="20.0" />
-                        </padding>
-                     </Hyperlink>
+                    <Hyperlink fx:id="semver4j" text="semver4j">
+                      <padding>
+                        <Insets/>
+                      </padding>
+                    </Hyperlink>
+                    <Hyperlink fx:id="semver4jLicense" text="MIT License">
+                      <font>
+                        <Font size="10.0" />
+                      </font>
+                      <padding>
+                        <Insets left="20.0" />
+                      </padding>
+                    </Hyperlink>
+
+                    <Hyperlink fx:id="lz4Java" text="lz4-java">
+                      <padding>
+                        <Insets/>
+                      </padding>
+                    </Hyperlink>
+                    <Hyperlink fx:id="lz4JavaLicense" text="Apache License 2.0">
+                      <font>
+                        <Font size="10.0" />
+                      </font>
+                      <padding>
+                        <Insets left="20.0" />
+                      </padding>
+                    </Hyperlink>
                   </children>
                 </VBox>
               </children>
