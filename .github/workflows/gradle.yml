@@ -9,11 +9,12 @@ on:
   pull_request:
     branches: [ master, chunky-2.4.x ]
 
+env:
+  VERSION: 2.4.7
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 1.8
@@ -31,13 +32,13 @@ jobs:
       run: |
         case "${GITHUB_EVENT_NAME}" in
           "pull_request")
-            ./gradlew -PnewVersion=2.4.3-PR.${PR_NUMBER}.$(git rev-parse --short HEAD)
+            ./gradlew -PnewVersion=${VERSION}-PR.${PR_NUMBER}.$(git rev-parse --short HEAD)
             ;;
           "push")
-            ./gradlew -PnewVersion=2.4.3-SNAPSHOT.$(git rev-parse --short HEAD)
+            ./gradlew -PnewVersion=${VERSION}-SNAPSHOT.$(git rev-parse --short HEAD)
             ;;
           *)
-            ./gradlew -PnewVersion=2.4.3-DEV.$(git rev-parse --short HEAD)
+            ./gradlew -PnewVersion=${VERSION}-DEV.$(git rev-parse --short HEAD)
             ;;
         esac
     - name: Upload build
