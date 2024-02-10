@@ -1449,6 +1449,24 @@ public class Texture {
   public static final Texture crafterTopTriggered = new Texture();
   @TexturePath("assets/minecraft/textures/block/crafter_bottom")
   public static final Texture crafterBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_top_on")
+  public static final Texture vaultTopOn = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_top_off")
+  public static final Texture vaultTopOff = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_top_ejecting")
+  public static final Texture vaultTopEjecting = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_bottom")
+  public static final Texture vaultBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_front_on")
+  public static final Texture vaultFrontOn = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_front_off")
+  public static final Texture vaultFrontOff = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_front_ejecting")
+  public static final Texture vaultFrontEjecting = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_side_off")
+  public static final Texture vaultSideOff = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_front_ejecting")
+  public static final Texture vaultSideOn = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
