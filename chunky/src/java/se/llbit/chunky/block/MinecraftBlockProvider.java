@@ -1118,6 +1118,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       Texture.crafterNorth, Texture.crafterNorthCrafting, Texture.crafterEast, Texture.crafterEastCrafting, Texture.crafterEastTriggered,
       Texture.crafterSouth, Texture.crafterSouthTriggered, Texture.crafterWest, Texture.crafterWestCrafting, Texture.crafterWestTriggered,
       Texture.crafterTop, Texture.crafterTopCrafting, Texture.crafterTopTriggered, Texture.crafterBottom));
+    addBlock("vault", (name, tag) -> new Vault(tag.get("Properties").get("facing").stringValue("north"), tag.get("Properties").get("vault_state").stringValue("active")));
   }
 
   @Override
