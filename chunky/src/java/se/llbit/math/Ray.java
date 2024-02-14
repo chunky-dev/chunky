@@ -21,7 +21,7 @@ import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.minecraft.Lava;
 import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.renderer.scene.Sun;
+import se.llbit.chunky.renderer.scene.sky.Sun;
 import se.llbit.chunky.world.Material;
 
 import java.util.Random;
