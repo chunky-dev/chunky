@@ -1,4 +1,5 @@
-/* Copyright (c) 2021 Chunky contributors
+/*
+ * Copyright (c) 2023 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -14,32 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.scene;
 
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
+package se.llbit.util.interner;
 
 /**
- * Interface for simulated skies.
+ * This deduplicates objects similar to `String.intern()`, but for arbitrary objects.
  */
-public interface SimulatedSky {
+public interface Interner<T> {
   /**
-   * Update the sun if necessary. Returns true if the sun was updated (and cache needs to be purged).
+   * Intern the given object, returning an existing object if one exists. Returns `null` if no such object exists.
+   * This is intended for use in cases where the caller needs to know whether the object was interned or not.
    */
-  boolean updateSun(Sun sun, double horizonOffset);
+  T maybeIntern(T sample);
 
   /**
-   * Calculate the sky color for a given ray.
+   * Intern the given object, returning an existing object if one exists.
    */
-  Vector3 calcIncidentLight(Ray ray);
-
-  /**
-   * Get the friendly name.
-   */
-  String getName();
-
-  /**
-   * Get the sky renderer tooltip.
-   */
-  String getDescription();
+  default T intern(T sample) {
+    T interned = maybeIntern(sample);
+    if (interned != null) {
+      return interned;
+    }
+    return sample;
+  }
 }

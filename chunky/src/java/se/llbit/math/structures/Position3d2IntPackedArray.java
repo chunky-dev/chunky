@@ -3,6 +3,7 @@ package se.llbit.math.structures;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class Position3d2IntPackedArray implements Position2IntStructure {
@@ -28,7 +29,7 @@ public class Position3d2IntPackedArray implements Position2IntStructure {
     if(xSection == this.lastX && ySection == this.lastY && zSection == this.lastZ) {
       arr = this.lastData;
     } else {
-      arr = this.structure.computeIfAbsent(new XYZTriple(xSection, ySection, zSection), sectionPos -> new int[16 * 16 * 16]);
+      arr = this.structure.computeIfAbsent(new XYZTriple(xSection, ySection, zSection), sectionPos -> newSection());
       this.lastX = xSection;
       this.lastY = ySection;
       this.lastZ = zSection;
@@ -37,6 +38,12 @@ public class Position3d2IntPackedArray implements Position2IntStructure {
     if(arr != null) {
       arr[packedIndex(x, y, z)] = data;
     }
+  }
+
+  private static int[] newSection() {
+    int[] section = new int[16*16*16];
+    Arrays.fill(section, -1);
+    return section;
   }
 
   @Override
@@ -48,7 +55,7 @@ public class Position3d2IntPackedArray implements Position2IntStructure {
     if(xSection == this.lastX && ySection == this.lastY && zSection == this.lastZ) {
       arr = this.lastData;
     } else {
-      arr = this.structure.computeIfAbsent(new XYZTriple(xSection, ySection, zSection), sectionPos -> new int[16 * 16 * 16]);
+      arr = this.structure.computeIfAbsent(new XYZTriple(xSection, ySection, zSection), sectionPos -> newSection());
       this.lastX = xSection;
       this.lastY = ySection;
       this.lastZ = zSection;
@@ -57,7 +64,7 @@ public class Position3d2IntPackedArray implements Position2IntStructure {
     if(arr != null) {
       return arr[packedIndex(x, y, z)];
     }
-    return 0;
+    return -1;
   }
 
   protected static class XYZTriple {

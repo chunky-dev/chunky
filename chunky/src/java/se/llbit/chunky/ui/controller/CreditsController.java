@@ -79,6 +79,10 @@ public class CreditsController implements Initializable {
   @FXML
   private Hyperlink semver4jLicense;
   @FXML
+  private Hyperlink lz4Java;
+  @FXML
+  private Hyperlink lz4JavaLicense;
+  @FXML
   private VBox pluginBox;
   @FXML
   private ImageView logoImage;
@@ -178,7 +182,12 @@ public class CreditsController implements Initializable {
     semver4jLicense.setBorder(Border.EMPTY);
     semver4jLicense.setOnAction(e -> launchAndReset(semver4jLicense, "https://github.com/vdurmont/semver4j/blob/master/LICENSE.md"));
 
-    if (plugins.size() > 0) {
+    lz4Java.setBorder(Border.EMPTY);
+    lz4Java.setOnAction(e -> launchAndReset(lz4Java, "https://github.com/lz4/lz4-java"));
+    lz4JavaLicense.setBorder(Border.EMPTY);
+    lz4JavaLicense.setOnAction(e -> launchAndReset(lz4JavaLicense, "https://github.com/lz4/lz4-java/blob/master/LICENSE.txt"));
+
+    if (!plugins.isEmpty()) {
       plugins.forEach((key, item) -> pluginBox.getChildren().addAll(buildBox(item)));
     } else {
       Label label = new Label("You have no plugins activated!");

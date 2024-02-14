@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2023 Chunky contributors
+/* Copyright (c) 2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -15,18 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
+package se.llbit.chunky.renderer.scene.sky;
 
-package se.llbit.chunky.block.minecraft;
+import se.llbit.math.Ray;
+import se.llbit.math.Vector3;
 
-import se.llbit.chunky.block.AbstractModelBlock;
-import se.llbit.chunky.model.GrassTintedSpriteModel;
-import se.llbit.chunky.resources.Texture;
+/**
+ * Interface for simulated skies.
+ */
+public interface SimulatedSky {
+  /**
+   * Update the sun if necessary. Returns true if the sun was updated (and cache needs to be purged).
+   */
+  boolean updateSun(Sun sun, double horizonOffset);
 
-public class Grass extends AbstractModelBlock {
+  /**
+   * Calculate the sky color for a given ray.
+   */
+  Vector3 calcIncidentLight(Ray ray);
 
-  public Grass() {
-    super("short_grass", Texture.tallGrass);
-    solid = false;
-    model = new GrassTintedSpriteModel(texture);
-  }
+  /**
+   * Get the friendly name.
+   */
+  String getName();
+
+  /**
+   * Get the sky renderer tooltip.
+   */
+  String getDescription();
 }

@@ -16,17 +16,28 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.llbit.chunky.block.minecraft;
+package se.llbit.util.interner;
 
-import se.llbit.chunky.block.AbstractModelBlock;
-import se.llbit.chunky.model.GrassTintedSpriteModel;
-import se.llbit.chunky.resources.Texture;
+import java.util.HashMap;
 
-public class Grass extends AbstractModelBlock {
+/**
+ * A simple interner that keeps strong references to interned objects.
+ */
+public class StrongInterner<T> implements Interner<T> {
+  protected final HashMap<T, T> pool = new HashMap<>();
 
-  public Grass() {
-    super("short_grass", Texture.tallGrass);
-    solid = false;
-    model = new GrassTintedSpriteModel(texture);
+  @Override
+  public T maybeIntern(T sample) {
+    T interned = pool.get(sample);
+    if (interned != null) {
+      return interned;
+    }
+    pool.put(sample, sample);
+    return null;
+  }
+
+  @Override
+  public T intern(T sample) {
+    return pool.computeIfAbsent(sample, k -> k);
   }
 }

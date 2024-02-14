@@ -41,7 +41,11 @@ import se.llbit.chunky.renderer.postprocessing.PreviewFilter;
 import se.llbit.chunky.renderer.projection.ParallelProjector;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
+import se.llbit.chunky.renderer.scene.biome.BiomeBlendingUtility;
 import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
+import se.llbit.chunky.renderer.scene.biome.ChunkBiomeBlendingHelper;
+import se.llbit.chunky.renderer.scene.sky.Sky;
+import se.llbit.chunky.renderer.scene.sky.Sun;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.*;
@@ -236,7 +240,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public final Fog fog = new Fog(this);
 
   protected boolean biomeColors = true;
-  protected boolean biomeBlending = true;
+  protected int biomeBlendingRadius = 2;
   protected boolean transparentSky = false;
   protected Collection<ChunkPosition> chunks = new ArrayList<>();
   protected JsonObject cameraPresets = new JsonObject();
@@ -519,18 +523,18 @@ public class Scene implements JsonSerializable, Refreshable {
    * @throws IOException
    * @throws InterruptedException
    */
-  public synchronized void saveScene(SceneIOProvider context, TaskTracker taskTracker)
+  public synchronized void saveScene(SceneIOProvider ioContext, TaskTracker taskTracker)
       throws IOException {
     try (TaskTracker.Task task = taskTracker.task("Saving scene", 2)) {
       task.update(1);
 
-      try (BufferedOutputStream out = new BufferedOutputStream(context.getSceneDescriptionOutputStream(name))) {
+      try (BufferedOutputStream out = new BufferedOutputStream(ioContext.getSceneDescriptionOutputStream(name))) {
         saveDescription(out);
       }
 
-      saveOctree(context, taskTracker);
-      saveDump(context, taskTracker);
-      saveEmitterGrid(context, taskTracker);
+      saveOctree(ioContext, taskTracker);
+      saveDump(ioContext, taskTracker);
+      saveEmitterGrid(ioContext, taskTracker);
     }
   }
 
@@ -558,7 +562,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       // Load the configured skymap file.
-      sky.reloadSkymap(context.getSceneDirectory());
+      sky.reloadSkymap(context);
 
       loadedWorld = EmptyWorld.INSTANCE;
       if (!worldPath.isEmpty()) {
@@ -856,6 +860,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
     Position2IntStructure biomePaletteIdxStructure = biomeStructureFactory.createIndexStructure();
     boolean use3dBiomes = biomeStructureFactory.is3d();
+    Map<ChunkPosition, ChunkBiomeBlendingHelper> biomeBlendingHelper = new HashMap<>();
 
     final Mutable<ChunkData> loadingChunkData = new Mutable<>(null); // chunkData currently being used for loading from save
     final Mutable<ChunkData> activeChunkData = new Mutable<>(null); // chunkData for loading into the octree
@@ -924,14 +929,25 @@ public class Scene implements JsonSerializable, Refreshable {
         int wx0 = cp.x * 16; // Start of this chunk in world coordinates.
         int wz0 = cp.z * 16;
         BiomeData biomeData = chunkData.getBiomeData();
+        ChunkBiomeBlendingHelper chunkBiomeHelper = new ChunkBiomeBlendingHelper();
+        biomeBlendingHelper.put(cp, chunkBiomeHelper);
 
         if (use3dBiomes) {
-          for (int y = chunkData.minY(); y < chunkData.maxY(); y++) {
+          // We need to load biome data for the full height of the chunk
+          // and not only limited to the sections where there are blocks
+          // because it is possible that a neighboring chunks has blocks
+          // that will observe the biome color (via biome blending)
+          for (int y = yMin; y < yMax; y++) {
             for (int cz = 0; cz < 16; ++cz) {
               int wz = cz + wz0;
               for (int cx = 0; cx < 16; ++cx) {
                 int wx = cx + wx0;
                 int biomePaletteIdx = biomeData.getBiome(cx, y, cz);
+                if(y != yMin) {
+                  int biomeUnder = biomeData.getBiome(cx, y-1, cz);
+                  if(biomeUnder != biomePaletteIdx)
+                    chunkBiomeHelper.addTransition(y);
+                }
                 biomePaletteIdxStructure.set(wx, y, wz, biomePaletteIdx);
               }
             }
@@ -982,6 +998,9 @@ public class Scene implements JsonSerializable, Refreshable {
                   int currentBlock = chunkData.getBlockAt(cx, y, cz);
                   int octNode = currentBlock;
                   Block block = palette.get(currentBlock);
+
+                  if(block.isBiomeDependant())
+                    chunkBiomeHelper.makeBiomeRelevant(y);
 
                   if(block.isEntity()) {
                     Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
@@ -1214,177 +1233,170 @@ public class Scene implements JsonSerializable, Refreshable {
 
       int done = 0;
       int target = nonEmptyChunks.size();
+
       for (ChunkPosition cp : nonEmptyChunks) {
 //        TODO: make this less special cased in some way, having 2 ifs for biomeBlending and use3dBiomes is quite awful to read and maintain
 
 //        Finalize grass and foliage textures.
 //        3x3 box blur.
-        if (biomeBlending) {
-          if (use3dBiomes) {
-            for (int sectionY = yMin >> 4; sectionY < (yMax - 1 >> 4) + 1; sectionY++) {
-              for (int x = 0; x < 16; ++x) {
-                for (int z = 0; z < 16; ++z) {
-                  for (int y = 0; y < 16; y++) {
-                    int nsum = 0;
+        ChunkBiomeBlendingHelper chunkBiomeHelper = biomeBlendingHelper.get(cp);
+        if(chunkBiomeHelper.isBiomeUsed()) {
+          if(biomeBlendingRadius > 0) {
+            if(use3dBiomes) {
+              ChunkBiomeBlendingHelper[] neighboringChunks = new ChunkBiomeBlendingHelper[]{
+                biomeBlendingHelper.get(new ChunkPosition(cp.x - 1, cp.z - 1)),
+                biomeBlendingHelper.get(new ChunkPosition(cp.x - 1, cp.z)),
+                biomeBlendingHelper.get(new ChunkPosition(cp.x - 1, cp.z + 1)),
+                biomeBlendingHelper.get(new ChunkPosition(cp.x, cp.z - 1)),
+                biomeBlendingHelper.get(new ChunkPosition(cp.x, cp.z + 1)),
+                biomeBlendingHelper.get(new ChunkPosition(cp.x + 1, cp.z - 1)),
+                biomeBlendingHelper.get(new ChunkPosition(cp.x + 1, cp.z)),
+                biomeBlendingHelper.get(new ChunkPosition(cp.x + 1, cp.z + 1))
+              };
 
-                    float[] grassMix = {0, 0, 0};
-                    float[] foliageMix = {0, 0, 0};
-                    float[] waterMix = {0, 0, 0};
-                    for (int sx = x - 1; sx <= x + 1; ++sx) {
-                      int wx = cp.x * 16 + sx;
-                      for (int sz = z - 1; sz <= z + 1; ++sz) {
-                        int wz = cp.z * 16 + sz;
-                        for (int sy = y - 1; sy < y + 1; sy++) {
-                          int wy = sectionY * 16 + sy;
-                          ChunkPosition ccp = new ChunkPosition(wx >> 4, wz >> 4);
-                          if (nonEmptyChunks.contains(ccp)) {
-                            nsum += 1;
-                            Integer id = biomePaletteIdxStructure.get(wx, wy, wz);
-                            if (id == null) {
-                              continue;
-                            }
-                            Biome biome = biomePalette.get(id);
-                            float[] grassColor = biome.grassColorLinear;
-                            grassMix[0] += grassColor[0];
-                            grassMix[1] += grassColor[1];
-                            grassMix[2] += grassColor[2];
-                            float[] foliageColor = biome.foliageColorLinear;
-                            foliageMix[0] += foliageColor[0];
-                            foliageMix[1] += foliageColor[1];
-                            foliageMix[2] += foliageColor[2];
-                            float[] waterColor = biome.waterColorLinear;
-                            waterMix[0] += waterColor[0];
-                            waterMix[1] += waterColor[1];
-                            waterMix[2] += waterColor[2];
-                          }
-                        }
-                      }
-                    }
-                    grassMix[0] /= nsum;
-                    grassMix[1] /= nsum;
-                    grassMix[2] /= nsum;
-                    grassTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, grassMix);
+              int[] combinedBiomeTransitions = chunkBiomeHelper.combineAndTrimTransitions(neighboringChunks, biomeBlendingRadius);
 
-                    foliageMix[0] /= nsum;
-                    foliageMix[1] /= nsum;
-                    foliageMix[2] /= nsum;
-                    foliageTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, foliageMix);
+              // When doing 3D blur we use the list of (vertical) biome transition
+              // in the chunk or in neighboring ones
+              // If there is no transition, a 2D blur is enough, otherwise we only
+              // need to compute the colors around the transitions
 
-                    waterMix[0] /= nsum;
-                    waterMix[1] /= nsum;
-                    waterMix[2] /= nsum;
-                    waterTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, waterMix);
-                  }
+              // For example, if loading from y=0 to y=200 with a biome transition at y=20
+              // and another one at y=50 and with a blur radius of 2 (5*5*5 box)
+              // We can compute a 2D blur at y=0 and use those color for up to y=17
+              // For y in [18, 21] we need to compute the real 3D blur (because of the biome transition
+              // at y=20 and the blur radius of 2)
+              // Then we can compute the 2D blur at y=22 and use those colors for up to y=47
+              // And so on, 3D blur for y in [48, 51] and 2D blur for y in [52,200]
+
+              // As such, in spirit every transition make us compute an additional 16*16*(2*biomeBlendingRadius) 3D blur
+              // and a 16*16 2D blur (that can be combined in a 16*16*(2*biomeBlendingRadius+1) 3D blur)
+              // (ignoring cases where transition are close to one another which are handled by the code)
+
+              // Note that having a single (x, y) column that effectively has a biome transition
+              // in the chunk are a neighboring chunk causes us to compute the 3D blur for the whole 16*16
+              // vertical slice of the chunk. Because vertical biome transition are pretty rare,
+              // that's probably ok.
+              int nextY = chunkBiomeHelper.getyMinBiomeRelevant();
+
+              for(int i = 0; i < combinedBiomeTransitions.length; ++i) {
+                int transition = combinedBiomeTransitions[i];
+                if(nextY < transition - biomeBlendingRadius) {
+                  // Do a 2d blur to fill up to the height affected by the transition
+                  BiomeBlendingUtility.chunk2DBlur(
+                    cp,
+                    biomeBlendingRadius,
+                    nextY,
+                    transition - biomeBlendingRadius,
+                    origin,
+                    biomePaletteIdxStructure,
+                    biomePalette,
+                    nonEmptyChunks,
+                    grassTexture,
+                    foliageTexture,
+                    waterTexture);
+                  nextY = transition - biomeBlendingRadius;
                 }
+
+                // Do a 3D blur to fill the next 2*biomeBlendingRadius layers
+                // or more if the next transition is close by, in which case
+                // both transition (or even more) are handled by a bigger 3D blur
+                int maxYWorkedOn = transition + biomeBlendingRadius;
+                while(i < combinedBiomeTransitions.length - 1 && maxYWorkedOn >= combinedBiomeTransitions[i + 1] - biomeBlendingRadius) {
+                  // Extends the 3D blur to enclose the next transition as well
+                  maxYWorkedOn = combinedBiomeTransitions[i + 1] + biomeBlendingRadius;
+                  ++i;
+                }
+                int maxYWorkedOnClamped = Math.min(maxYWorkedOn, chunkBiomeHelper.getyMaxBiomeRelevant());
+                BiomeBlendingUtility.chunk3DBlur(
+                  cp,
+                  biomeBlendingRadius,
+                  nextY,
+                  maxYWorkedOnClamped + 1,
+                  origin,
+                  biomePaletteIdxStructure,
+                  biomePalette,
+                  nonEmptyChunks,
+                  grassTexture,
+                  foliageTexture,
+                  waterTexture);
+                nextY = maxYWorkedOnClamped + 1;
               }
+
+              // Last 2D blur that extent up to the top
+              if(nextY <= chunkBiomeHelper.getyMaxBiomeRelevant()) {
+                BiomeBlendingUtility.chunk2DBlur(
+                  cp,
+                  biomeBlendingRadius,
+                  nextY,
+                  chunkBiomeHelper.getyMaxBiomeRelevant() + 1,
+                  origin,
+                  biomePaletteIdxStructure,
+                  biomePalette,
+                  nonEmptyChunks,
+                  grassTexture,
+                  foliageTexture,
+                  waterTexture);
+              }
+            } else {
+              BiomeBlendingUtility.chunk2DBlur(cp, biomeBlendingRadius, 0, 1, origin, biomePaletteIdxStructure, biomePalette, nonEmptyChunks, grassTexture, foliageTexture, waterTexture);
             }
           } else {
-            for (int x = 0; x < 16; ++x) {
-              for (int z = 0; z < 16; ++z) {
+            if(use3dBiomes) {
+              for(int sectionY = yMin >> 4; sectionY < (yMax - 1 >> 4) + 1; sectionY++) {
+                for(int y = 0; y < 16; y++) {
+                  int wy = sectionY * 16 + y;
+                  for(int x = 0; x < 16; ++x) {
+                    int wx = cp.x * Chunk.X_MAX + x;
+                    for(int z = 0; z < 16; ++z) {
+                      int wz = cp.z * Chunk.Z_MAX + z;
 
-                int nsum = 0;
-                float[] grassMix = {0, 0, 0};
-                float[] foliageMix = {0, 0, 0};
-                float[] waterMix = {0, 0, 0};
-                for (int sx = x - 1; sx <= x + 1; ++sx) {
-                  int wx = cp.x * 16 + sx;
-                  for (int sz = z - 1; sz <= z + 1; ++sz) {
-                    int wz = cp.z * 16 + sz;
+                      int id = biomePaletteIdxStructure.get(wx, wy, wz);
 
-                    ChunkPosition ccp = new ChunkPosition(wx >> 4, wz >> 4);
-                    if (nonEmptyChunks.contains(ccp)) {
-                      nsum += 1;
-                      Biome biome = biomePalette.get(biomePaletteIdxStructure.get(wx, 0, wz));
-                      float[] grassColor = biome.grassColorLinear;
-                      grassMix[0] += grassColor[0];
-                      grassMix[1] += grassColor[1];
-                      grassMix[2] += grassColor[2];
-                      float[] foliageColor = biome.foliageColorLinear;
-                      foliageMix[0] += foliageColor[0];
-                      foliageMix[1] += foliageColor[1];
-                      foliageMix[2] += foliageColor[2];
-                      float[] waterColor = biome.waterColorLinear;
-                      waterMix[0] += waterColor[0];
-                      waterMix[1] += waterColor[1];
-                      waterMix[2] += waterColor[2];
+                      Biome biome = biomePalette.get(id);
+                      grassTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.grassColorLinear);
+                      foliageTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.foliageColorLinear);
+                      waterTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.waterColorLinear);
                     }
                   }
                 }
-                grassMix[0] /= nsum;
-                grassMix[1] /= nsum;
-                grassMix[2] /= nsum;
-                grassTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, grassMix);
-
-                foliageMix[0] /= nsum;
-                foliageMix[1] /= nsum;
-                foliageMix[2] /= nsum;
-                foliageTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, foliageMix);
-
-                waterMix[0] /= nsum;
-                waterMix[1] /= nsum;
-                waterMix[2] /= nsum;
-                waterTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, waterMix);
               }
-            }
-          }
-        } else {
-          if (use3dBiomes) {
-            for (int sectionY = yMin >> 4; sectionY < (yMax - 1 >> 4) + 1; sectionY++) {
-              for (int y = 0; y < 16; y++) {
-                int wy = sectionY * 16 + y;
-                for (int x = 0; x < 16; ++x) {
-                  int wx = cp.x * Chunk.X_MAX + x;
-                  for (int z = 0; z < 16; ++z) {
-                    int wz = cp.z * Chunk.Z_MAX + z;
-                    int nsum = 0;
+            } else {
+              for(int x = 0; x < 16; ++x) {
+                int wx = cp.x * 16 + x;
+                for(int z = 0; z < 16; ++z) {
+                  int wz = cp.z * 16 + z;
 
-                    Integer id = biomePaletteIdxStructure.get(wx, wy, wz);
-                    if (id == null) {
-                      continue;
-                    }
-                    if(id != 0) {
-                      int asd = 0;
-                    }
+                  int id = biomePaletteIdxStructure.get(wx, 0, wz);
+                  Biome biome = biomePalette.get(id);
 
-                    Biome biome = biomePalette.get(id);
-                    grassTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.grassColorLinear);
-                    foliageTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.foliageColorLinear);
-                    waterTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.waterColorLinear);
-                  }
+                  grassTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.grassColorLinear);
+                  foliageTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.foliageColorLinear);
+                  waterTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.waterColorLinear);
                 }
-              }
-            }
-          } else {
-            for (int x = 0; x < 16; ++x) {
-              int wx = cp.x * 16 + x;
-              for (int z = 0; z < 16; ++z) {
-                int wz = cp.z * 16 + z;
-
-                int id = biomePaletteIdxStructure.get(wx, 0, wz);
-                Biome biome = biomePalette.get(id);
-
-                grassTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.grassColorLinear);
-                foliageTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.foliageColorLinear);
-                waterTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.waterColorLinear);
               }
             }
           }
         }
-        task.updateEta(target, done);
-        done += 1;
         OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
         if (legacyChunks.contains(cp)) {
           LegacyBlocksFinalizer
               .finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
         }
+        task.updateEta(target, done);
+        done += 1;
+
+        grassTexture.compact();
+        foliageTexture.compact();
+        waterTexture.compact();
       }
 
       worldOctree.endFinalization();
       waterOctree.endFinalization();
 
-      grassTexture.compact();
-      foliageTexture.compact();
-      waterTexture.compact();
+      grassTexture.endFinalization();
+      foliageTexture.endFinalization();
+      waterTexture.endFinalization();
     }
 
     entities.loadDataFromOctree(worldOctree, palette, origin);
@@ -1537,9 +1549,9 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  public void setBiomeBlendingEnabled(boolean value) {
-    if (value != biomeBlending) {
-      biomeBlending = value;
+  public void setBiomeBlendingRadius(int value) {
+    if (value != biomeBlendingRadius) {
+      biomeBlendingRadius = value;
       refresh();
     }
   }
@@ -1618,8 +1630,8 @@ public class Scene implements JsonSerializable, Refreshable {
     return biomeColors;
   }
 
-  public boolean biomeBlendingEnabled() {
-    return biomeBlending;
+  public int biomeBlendingRadius() {
+    return biomeBlendingRadius;
   }
 
   /**
@@ -2119,7 +2131,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  private synchronized void saveEmitterGrid(SceneIOProvider context, TaskTracker taskTracker) {
+  private synchronized void saveEmitterGrid(SceneIOProvider ioContext, TaskTracker taskTracker) {
     if (emitterGrid == null)
       return;
 
@@ -2128,7 +2140,7 @@ public class Scene implements JsonSerializable, Refreshable {
     try (TaskTracker.Task task = taskTracker.task("Saving Grid")) {
       Log.info("Saving Grid " + filename);
 
-      try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(filename)))) {
+      try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(ioContext.getSceneFileOutputStream(filename)))) {
         emitterGrid.store(out, this);
       } catch (IOException e) {
         Log.warn("Couldn't save Grid", e);
@@ -2136,9 +2148,9 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  private synchronized void saveOctree(SceneIOProvider context, TaskTracker taskTracker) {
+  private synchronized void saveOctree(SceneIOProvider ioContext, TaskTracker taskTracker) {
     String fileName = name + ".octree2";
-    if (context.fileUnchangedSince(fileName, worldOctree.getTimestamp())) {
+    if (ioContext.fileUnchangedSince(fileName, worldOctree.getTimestamp())) {
       Log.info("Skipping redundant Octree write");
       return;
     }
@@ -2147,7 +2159,7 @@ public class Scene implements JsonSerializable, Refreshable {
       Log.info("Saving octree " + fileName);
 
       boolean saved = false;
-      try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName))))) {
+      try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new GZIPOutputStream(ioContext.getSceneFileOutputStream(fileName))))) {
         OctreeFileFormat.store(out, worldOctree, waterOctree, palette,
             grassTexture, foliageTexture, waterTexture);
         saved = true;
@@ -2159,13 +2171,13 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       if (saved) {
-        worldOctree.setTimestamp(context.fileTimestamp(fileName));
+        worldOctree.setTimestamp(ioContext.fileTimestamp(fileName));
       }
     }
   }
 
-  public synchronized void saveDump(SceneIOProvider context, TaskTracker taskTracker) {
-    File dumpFile = context.getSceneFile(name + ".dump");
+  public synchronized void saveDump(SceneIOProvider ioContext, TaskTracker taskTracker) {
+    File dumpFile = ioContext.getSceneFile(name + ".dump");
     Log.info("Saving render dump: " + dumpFile);
     try (FileOutputStream outputStream = new FileOutputStream(dumpFile)) {
       RenderDump.save(outputStream, this, taskTracker);
@@ -2175,11 +2187,11 @@ public class Scene implements JsonSerializable, Refreshable {
     Log.info("Render dump saved: " + dumpFile);
   }
 
-  private synchronized boolean loadEmitterGrid(SceneIOProvider context, TaskTracker taskTracker) {
+  private synchronized boolean loadEmitterGrid(SceneIOProvider ioContext, TaskTracker taskTracker) {
     String filename = name + ".emittergrid";
     try (TaskTracker.Task task = taskTracker.task("Loading grid")) {
       Log.info("Load grid " + filename);
-      try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(context.getSceneFileInputStream(filename))))) {
+      try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(ioContext.getSceneFileInputStream(filename))))) {
         emitterGrid = Grid.load(in, this);
         return true;
       } catch (Exception e) {
@@ -2189,29 +2201,29 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  private synchronized boolean loadOctree(SceneIOProvider context, TaskTracker taskTracker) {
+  private synchronized boolean loadOctree(SceneIOProvider ioContext, TaskTracker taskTracker) {
     String fileName = name + ".octree2";
     try (TaskTracker.Task task = taskTracker.task("(1/3) Loading octree", 2)) {
       task.update(1);
       Log.info("Loading octree " + fileName);
 
-      long length = context.getSceneFile(fileName).length();
+      long length = ioContext.getSceneFile(fileName).length();
       double progressScale = 1000.0 / length;
       task.update(1000, 0);
 
       try {
-        long fileTimestamp = context.fileTimestamp(fileName);
+        long fileTimestamp = ioContext.fileTimestamp(fileName);
         OctreeFileFormat.OctreeData data;
         Consumer<String> stepConsumer = step -> task.update("(1/3) Loading octree (" + step + ")");
 
-        try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(context.getSceneFileInputStream(fileName), pos -> {
+        try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(ioContext.getSceneFileInputStream(fileName), pos -> {
           task.updateInterval((int) (pos * progressScale), 1);
         }))))) {
           data = OctreeFileFormat.load(in, octreeImplementation, this.biomeStructureImplementation, stepConsumer);
         } catch (PackedOctree.OctreeTooBigException e) {
           // Octree too big, reload file and force loading as NodeBasedOctree
           Log.warn("Octree was too big when loading dump, reloading with old (slower and bigger) implementation.");
-          DataInputStream inRetry = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(context.getSceneFileInputStream(fileName), pos -> {
+          DataInputStream inRetry = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(ioContext.getSceneFileInputStream(fileName), pos -> {
             task.updateInterval((int) (pos * progressScale), 1);
           }))));
           data = OctreeFileFormat.load(inRetry, "NODE", this.biomeStructureImplementation, stepConsumer);
@@ -2248,10 +2260,10 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  public synchronized boolean loadDump(SceneIOProvider context, TaskTracker taskTracker) {
-    if (!tryLoadDump(context, name + ".dump", taskTracker)) {
+  public synchronized boolean loadDump(SceneIOProvider ioContext, TaskTracker taskTracker) {
+    if (!tryLoadDump(ioContext, name + ".dump", taskTracker)) {
       // Failed to load the default render dump - try the backup file.
-      if (!tryLoadDump(context, name + ".dump.backup", taskTracker)) {
+      if (!tryLoadDump(ioContext, name + ".dump.backup", taskTracker)) {
         // we don't have the old render state, so reset spp and render time
         spp = 0;
         renderTime = 0;
@@ -2264,8 +2276,8 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * @return {@code true} if the render dump was successfully loaded
    */
-  private boolean tryLoadDump(SceneIOProvider context, String fileName, TaskTracker taskTracker) {
-    File dumpFile = context.getSceneFile(fileName);
+  private boolean tryLoadDump(SceneIOProvider ioContext, String fileName, TaskTracker taskTracker) {
+    File dumpFile = ioContext.getSceneFile(fileName);
     if (!dumpFile.isFile()) {
       if (spp != 0) {
         // The scene state says the render had some progress, so we should warn

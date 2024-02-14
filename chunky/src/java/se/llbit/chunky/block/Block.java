@@ -146,4 +146,11 @@ public abstract class Block extends Material {
   public Tag getNewTagWithBlockEntity(Tag blockTag, CompoundTag entityTag) {
     return null;
   }
+
+  /**
+   * Does this block use biome tint for its rendering
+   */
+  public boolean isBiomeDependant() {
+    return isWaterFilled();
+  }
 }

@@ -104,7 +104,8 @@ public class PluginManagerController implements Initializable {
           alert.setTitle("Replace Plugin");
           alert.setContentText(String.format("Replace the plugin %s, with the new file %s?",
               jar.getName(), jar.getAbsolutePath()));
-          if (alert.showAndWait().get() != ButtonType.OK) {
+          boolean isAlertOkButton = alert.showAndWait().map(result -> result == ButtonType.OK).orElse(false);
+          if (!isAlertOkButton) {
             return;
           }
         }

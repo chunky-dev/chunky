@@ -349,7 +349,8 @@ public class MinecraftBlockProvider implements BlockProvider {
     "minecraft:granite_stairs",
     "minecraft:granite_wall",
     "minecraft:grass_block",
-    "minecraft:grass",
+    "minecraft:grass", // pre 1.20.3-pre2
+    "minecraft:short_grass", // since 1.20.3-pre2
     "minecraft:grass_path", // pre 20w45a
     "minecraft:gravel",
     "minecraft:gray_banner",
@@ -1117,6 +1118,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       Texture.crafterNorth, Texture.crafterNorthCrafting, Texture.crafterEast, Texture.crafterEastCrafting, Texture.crafterEastTriggered,
       Texture.crafterSouth, Texture.crafterSouthTriggered, Texture.crafterWest, Texture.crafterWestCrafting, Texture.crafterWestTriggered,
       Texture.crafterTop, Texture.crafterTopCrafting, Texture.crafterTopTriggered, Texture.crafterBottom));
+    addBlock("vault", (name, tag) -> new Vault(tag.get("Properties").get("facing").stringValue("north"), tag.get("Properties").get("vault_state").stringValue("active")));
   }
 
   @Override
@@ -1306,6 +1308,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "cobweb":
         return new SpriteBlock(name, Texture.cobweb);
       case "grass":
+      case "short_grass": // since 1.20.3-pre2
         return new Grass();
       case "fern":
         return new Fern();
