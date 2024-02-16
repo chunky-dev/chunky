@@ -56,7 +56,9 @@ public class SceneEntities {
 
   protected boolean renderActors = true;
 
-  /** Poseable entities in the scene. */
+  /**
+   * Poseable entities in the scene.
+   */
   private Map<PlayerEntity, MinecraftProfile> profiles = new HashMap<>();
 
   private BVH bvh = BVH.EMPTY;
@@ -146,16 +148,17 @@ public class SceneEntities {
 
         if (y >= scene.yClipMin && y < scene.yClipMax) {
           String id = tag.get("id").stringValue("");
+          // Before 1.12 paintings had id=Painting.
+          // After 1.12 paintings had id=minecraft:painting.
           if ((id.equals("minecraft:painting") || id.equals("Painting")) && entityLoadingPreferences.shouldLoadClass(PaintingEntity.class)) {
-            // Before 1.12 paintings had id=Painting.
-            // After 1.12 paintings had id=minecraft:painting.
-            float yaw = tag.get("Rotation").get(0).floatValue();
-
             Tag paintingVariant = NbtUtil.getTagFromNames(tag, "Motive", "variant");
+            int facing = (tag.get("facing").isError())
+              ? tag.get("Facing").byteValue(0) // pre 1.17
+              : tag.get("facing").byteValue(0); // 1.17+
             addEntity(new PaintingEntity(
               new Vector3(x, y, z),
               paintingVariant.stringValue(),
-              yaw
+              facing
             ));
           } else if (id.equals("minecraft:armor_stand") && entityLoadingPreferences.shouldLoadClass(ArmorStand.class)) {
             addActor(new ArmorStand(
@@ -178,8 +181,8 @@ public class SceneEntities {
 
   public void addActor(Entity entity) {
     // don't add the actor again if it was already loaded from json
-    if(actors.stream().noneMatch(actor -> {
-      if(actor.getClass().equals(entity.getClass())) {
+    if (actors.stream().noneMatch(actor -> {
+      if (actor.getClass().equals(entity.getClass())) {
         Vector3 distance = new Vector3(actor.position);
         distance.sub(entity.position);
         return distance.lengthSquared() < Ray.EPSILON;
@@ -260,7 +263,7 @@ public class SceneEntities {
   }
 
   public void removeEntity(Entity entity) {
-    if(entity instanceof PlayerEntity) {
+    if (entity instanceof PlayerEntity) {
       profiles.remove(entity);
     }
     actors.remove(entity);

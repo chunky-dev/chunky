@@ -149,7 +149,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       }
     });
     outputMode.getSelectionModel().selectedItemProperty()
-            .addListener((observable, oldValue, newValue) -> scene.setOutputMode(newValue));
+            .addListener((observable, oldValue, newValue) -> scene.setPictureExportFormat(newValue));
     if(!ShutdownAlert.canShutdown()) {
       shutdown.setDisable(true);
     }
@@ -331,7 +331,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
   @Override
   public void update(Scene scene) {
-    outputMode.getSelectionModel().select(scene.getOutputMode());
+    outputMode.getSelectionModel().select(scene.getPictureExportFormat());
     fastFog.setSelected(scene.fog.fastFog());
     fancierTranslucency.setSelected(scene.getFancierTranslucency());
     transmissivityCap.set(scene.getTransmissivityCap());

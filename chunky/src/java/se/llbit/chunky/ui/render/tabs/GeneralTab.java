@@ -232,10 +232,12 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
           Alert alert = Dialogs.createAlert(AlertType.CONFIRMATION);
           alert.setTitle("Restore default settings");
           alert.setContentText("Do you really want to reset all scene settings?");
-          if (alert.showAndWait().get() == ButtonType.OK) {
-            scene.resetScene(scene.name, controller.getContext().getChunky().getSceneFactory());
-            chunkyFxController.refreshSettings();
-          }
+          alert.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+              scene.resetScene(scene.name, controller.getContext().getChunky().getSceneFactory());
+              chunkyFxController.refreshSettings();
+            }
+          });
         });
 
     loadPlayers.setTooltip(new Tooltip("Enable/disable player entity loading. "

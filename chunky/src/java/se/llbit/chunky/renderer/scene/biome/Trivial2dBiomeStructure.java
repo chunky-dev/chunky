@@ -76,6 +76,11 @@ public class Trivial2dBiomeStructure implements BiomeStructure.Factory {
     return ID;
   }
 
+  @Override
+  public DeprecationStatus getDeprecationStatus() {
+    return DeprecationStatus.HIDDEN;
+  }
+
   static class Impl extends Position2d2ReferencePackedArrayStructure<float[]> implements BiomeStructure {
 
     public void setCube(long packedPosition, float[][] data) {
@@ -113,10 +118,6 @@ public class Trivial2dBiomeStructure implements BiomeStructure.Factory {
     @Override
     public String biomeFormat() {
       return ID;
-    }
-
-    @Override
-    public void compact() {
     }
   }
 }

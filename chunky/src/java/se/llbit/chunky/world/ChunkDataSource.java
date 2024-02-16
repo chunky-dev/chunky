@@ -17,6 +17,8 @@
 package se.llbit.chunky.world;
 
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4Factory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -37,6 +39,7 @@ public class ChunkDataSource {
   public ChunkDataSource(int timestamp) {
     this(timestamp, new byte[0], null);
   }
+
   public ChunkDataSource(int timestamp, byte[] data, CompressionScheme compressionScheme) {
     this.timestamp = timestamp;
     this.data = data;
@@ -57,9 +60,12 @@ public class ChunkDataSource {
 
   public enum CompressionScheme {
     GZIP(GZIPInputStream::new),
-    ZLIB(InflaterInputStream::new);
+    ZLIB(InflaterInputStream::new),
+    UNCOMPRESSED((inputStream) -> inputStream),
+    LZ4((inputStream) -> new LZ4BlockInputStream(inputStream, LZ4Factory.fastestInstance().fastDecompressor()));
 
     private final WrapStream wrapper;
+
     CompressionScheme(WrapStream wrapper) {
       this.wrapper = wrapper;
     }

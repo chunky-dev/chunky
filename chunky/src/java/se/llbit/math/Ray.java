@@ -153,7 +153,7 @@ public class Ray {
   public void set(Ray other) {
     prevMaterial = other.prevMaterial;
     currentMaterial = other.currentMaterial;
-    depth = other.depth + 1;
+    depth = other.depth;
     distance = 0;
     o.set(other.o);
     d.set(other.d);

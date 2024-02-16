@@ -45,4 +45,9 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
   public boolean intersect(Ray ray, Scene scene) {
     return model.intersect(ray, scene);
   }
+
+  @Override
+  public boolean isBiomeDependant() {
+    return super.isBiomeDependant() || model.isBiomeDependant();
+  }
 }

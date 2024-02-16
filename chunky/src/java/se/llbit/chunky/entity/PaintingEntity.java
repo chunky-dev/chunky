@@ -18,22 +18,18 @@
  */
 package se.llbit.chunky.entity;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Transform;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 import se.llbit.math.primitive.Primitive;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class PaintingEntity extends Entity {
 
@@ -50,32 +46,31 @@ public class PaintingEntity extends Entity {
 
       double offset = -1 / 16.;
       double off = 0;
-      int pw = w * 16;
-      int ph = h * 16;
+
       quads = new Quad[]{
-          // north (front)
-          new Quad(new Vector3(w, 0, offset), new Vector3(0, 0, offset),
-              new Vector3(w, h, offset), new Vector4(0, 1, 0, 1)),
+        // north (front)
+        new Quad(new Vector3(w, 0, offset), new Vector3(0, 0, offset),
+          new Vector3(w, h, offset), new Vector4(0, 1, 0, 1)),
 
-          // south (back)
-          new Quad(new Vector3(0, 0, off), new Vector3(w, 0, off), new Vector3(0, h, off),
-              new Vector4(0, w / 4., 1, 1 - h / 4.)),
+        // south (back)
+        new Quad(new Vector3(0, 0, off), new Vector3(w, 0, off), new Vector3(0, h, off),
+          new Vector4(0, w / 4., 1, 1 - h / 4.)),
 
-          // west (left)
-          new Quad(new Vector3(0, 0, offset), new Vector3(0, 0, off), new Vector3(0, h, offset),
-              new Vector4(0, 1 / 64., 1 - h / 4., 1)),
+        // west (left)
+        new Quad(new Vector3(0, 0, offset), new Vector3(0, 0, off), new Vector3(0, h, offset),
+          new Vector4(0, 1 / 64., 1 - h / 4., 1)),
 
-          // east (right)
-          new Quad(new Vector3(w, 0, off), new Vector3(w, 0, offset), new Vector3(w, h, off),
-              new Vector4(0, 1 / 64., 1 - h / 4., 1)),
+        // east (right)
+        new Quad(new Vector3(w, 0, off), new Vector3(w, 0, offset), new Vector3(w, h, off),
+          new Vector4(0, 1 / 64., 1 - h / 4., 1)),
 
-          // top
-          new Quad(new Vector3(w, h, offset), new Vector3(0, h, offset), new Vector3(w, h, off),
-              new Vector4(0, w / 4., 1 - 1 / 64., 1)),
+        // top
+        new Quad(new Vector3(w, h, offset), new Vector3(0, h, offset), new Vector3(w, h, off),
+          new Vector4(0, w / 4., 1 - 1 / 64., 1)),
 
-          // bottom
-          new Quad(new Vector3(0, 0, offset), new Vector3(w, 0, offset), new Vector3(0, 0, off),
-              new Vector4(0, w / 4., 1, 1 - 1 / 64.)),};
+        // bottom
+        new Quad(new Vector3(0, 0, offset), new Vector3(w, 0, offset), new Vector3(0, 0, off),
+          new Vector4(0, w / 4., 1, 1 - 1 / 64.)),};
       material = new TextureMaterial(painting);
     }
   }
@@ -148,6 +143,26 @@ public class PaintingEntity extends Entity {
     this.angle = angle;
   }
 
+  public PaintingEntity(Vector3 position, String art, int facing) {
+    super(position);
+    this.art = art;
+    switch (facing) {
+      case 1:
+        this.angle = 90;
+        break;
+      case 2:
+        this.angle = 180;
+        break;
+      case 3:
+        this.angle = 270;
+        break;
+      case 0:
+      default:
+        this.angle = 0;
+        break;
+    }
+  }
+
   @Override
   public Collection<Primitive> primitives(Vector3 offset) {
     Collection<Primitive> primitives = new LinkedList<>();
@@ -157,7 +172,7 @@ public class PaintingEntity extends Entity {
     }
     double rot = QuickMath.degToRad(180 - angle);
     Transform transform = Transform.NONE.translate(painting.ox, painting.oy, 0.5 / 16).rotateY(rot)
-        .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
+      .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     Quad[] quads = painting.quads;
     quads[0].addTriangles(primitives, painting.material, transform); // front face
     for (int i = 1; i < quads.length; i++) { // other faces

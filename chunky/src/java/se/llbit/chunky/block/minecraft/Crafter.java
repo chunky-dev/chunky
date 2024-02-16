@@ -41,10 +41,10 @@ public class Crafter extends AbstractModelBlock {
       bottom);
     // Fix top quad
     m.setFaceQuad(4, new Quad(
-      new Vector3(1, 1, 0),
-      new Vector3(0, 1, 0),
+      new Vector3(0, 1, 1),
       new Vector3(1, 1, 1),
-      new Vector4(1, 0, 0, 1))); // texture is mirrored for some reason??
+      new Vector3(0, 1, 0),
+      new Vector4(1, 0, 1, 0)));
     switch(orientation) {
       case "north_up":
         break;

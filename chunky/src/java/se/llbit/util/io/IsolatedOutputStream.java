@@ -1,4 +1,4 @@
-package se.llbit.util;
+package se.llbit.util.io;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;

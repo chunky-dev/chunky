@@ -37,8 +37,8 @@ import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
 import se.llbit.log.Log;
-import se.llbit.util.PositionalInputStream;
-import se.llbit.util.PositionalOutputStream;
+import se.llbit.util.io.PositionalInputStream;
+import se.llbit.util.io.PositionalOutputStream;
 import se.llbit.util.TaskTracker;
 
 /**

@@ -320,7 +320,7 @@ public class Chunky {
           System.err.println("Failed to load the dump file found for this scene");
           return 1;
         }
-        PictureExportFormat outputMode = scene.getOutputMode();
+        PictureExportFormat outputMode = scene.getPictureExportFormat();
         if (options.imageOutputFile.isEmpty()) {
           options.imageOutputFile = String
               .format("%s-%d%s", scene.name(), scene.spp, outputMode.getExtension());
