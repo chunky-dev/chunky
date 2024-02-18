@@ -1204,6 +1204,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "minecraft:sugar_cane":
       case "minecraft:flower_pot":
         return new Tint[] { Tint.BIOME_GRASS };
+      case "minecraft:pink_petals":
+        return new Tint[] { Tint.NONE, Tint.BIOME_FOLIAGE };
       default:
         return null;
     }
