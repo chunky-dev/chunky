@@ -18,7 +18,7 @@ import se.llbit.math.Vector3;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 
-public class QuadBlock extends AbstractModelBlock  {
+public class QuadBlock extends AbstractModelBlock {
   private final boolean isEntity;
   public boolean supportsOpacity = true; // some blocks only support full or zero opacity and round alpha values to 0 or 1
 
