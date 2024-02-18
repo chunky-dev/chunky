@@ -1260,6 +1260,7 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new Tint[] { Tint.REDSTONE_WIRE };
       case "minecraft:grass_block":
       case "minecraft:grass":
+      case "minecraft:short_grass":
       case "minecraft:tall_grass":
       case "minecraft:fern":
       case "minecraft:large_fern":
