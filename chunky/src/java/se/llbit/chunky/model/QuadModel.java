@@ -18,9 +18,6 @@
 
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.model.BlockModel;
-import se.llbit.chunky.model.Tint;
-import se.llbit.chunky.block.jsonmodels.TintedQuad;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
@@ -30,7 +27,6 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -127,11 +123,7 @@ public abstract class QuadModel implements BlockModel {
         if (texture == null) continue;
         float[] c = texture.getColor(ray.u, ray.v);
         if (c[3] > Ray.EPSILON) {
-          if (quad instanceof TintedQuad){
-            tint = ((TintedQuad) quad).tint;
-          } else {
-            tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
-          }
+          tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
           color = c;
           ray.t = ray.tNext;
           if (quad.doubleSided) {

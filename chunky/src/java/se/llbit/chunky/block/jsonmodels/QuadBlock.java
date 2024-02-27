@@ -1,12 +1,10 @@
 package se.llbit.chunky.block.jsonmodels;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.QuadModel;
+import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
@@ -17,6 +15,9 @@ import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
+
+import java.util.Collection;
+import java.util.LinkedList;
 
 public class QuadBlock extends AbstractModelBlock {
   private final boolean isEntity;
@@ -50,8 +51,8 @@ public class QuadBlock extends AbstractModelBlock {
       public Collection<Primitive> primitives(Vector3 offset) {
         Collection<Primitive> faces = new LinkedList<>();
         Transform transform =
-            Transform.NONE.translate(
-                position.x + offset.x, position.y + offset.y, position.z + offset.z);
+          Transform.NONE.translate(
+            position.x + offset.x, position.y + offset.y, position.z + offset.z);
         for (int i = 0; i < ((Model) model).quads.length; i++) {
           Quad quad = ((Model) model).quads[i];
           Texture texture = ((Model) model).textures[i];
@@ -72,13 +73,19 @@ public class QuadBlock extends AbstractModelBlock {
     };
   }
 
-  private static class Model extends QuadModel{
-     final Quad[] quads;
-     final Texture[] textures;
+  private static class Model extends QuadModel {
+    final Quad[] quads;
+    final Texture[] textures;
+    final Tint[] tints;
 
     Model(Quad[] quads, Texture[] textures) {
+      this(quads, textures, null);
+    }
+
+    Model(Quad[] quads, Texture[] textures, Tint[] tints) {
       this.quads = quads;
       this.textures = textures;
+      this.tints = tints;
     }
 
     @Override
