@@ -18,19 +18,14 @@
 
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.model.BlockModel;
-import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Quad;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.chunky.world.material.TextureMaterial;
+import se.llbit.math.*;
+import se.llbit.math.primitive.Primitive;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 /**
  * A block model that is made out of textured quads.
@@ -154,10 +149,23 @@ public abstract class QuadModel implements BlockModel {
   @Override
   public boolean isBiomeDependant() {
     Tint[] tints = getTints();
-    if(tints == null)
+    if (tints == null)
       return false;
 
     return Arrays.stream(tints)
       .anyMatch(Tint::isBiomeTint);
+  }
+
+  @Override
+  public Collection<Primitive> getPrimitives(Transform transform) {
+    List<Primitive> primitives = new ArrayList<>();
+    Quad[] quads = getQuads();
+    Texture[] textures = getTextures();
+    for (int i = 0; i < quads.length; ++i) {
+      Quad quad = quads[i];
+      quad.addTriangles(primitives, new TextureMaterial(textures[i]), transform);
+    }
+    // TODO material properties, tinting
+    return primitives;
   }
 }

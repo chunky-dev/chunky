@@ -158,8 +158,5 @@ public abstract class Block extends Material {
     return isWaterFilled();
   }
 
-  public Collection<Primitive> getPrimitives(Transform transform) {
-    // TODO implement this for all block types
-    return Collections.emptyList();
-  }
+  public abstract Collection<Primitive> getPrimitives(Transform transform);
 }
