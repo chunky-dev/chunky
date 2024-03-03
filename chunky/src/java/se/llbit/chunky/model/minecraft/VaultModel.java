@@ -127,11 +127,10 @@ public class VaultModel extends QuadModel {
       case "ejecting":
         return Texture.vaultTopEjecting;
       case "inactive":
-        return Texture.vaultTopOff;
       case "active":
       case "unlocking":
       default:
-        return Texture.vaultTopOn;
+        return Texture.vaultTop;
     }
   }
 
