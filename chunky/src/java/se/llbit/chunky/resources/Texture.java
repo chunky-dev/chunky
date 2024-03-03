@@ -1449,10 +1449,8 @@ public class Texture {
   public static final Texture crafterTopTriggered = new Texture();
   @TexturePath("assets/minecraft/textures/block/crafter_bottom")
   public static final Texture crafterBottom = new Texture();
-  @TexturePath("assets/minecraft/textures/block/vault_top_on")
-  public static final Texture vaultTopOn = new Texture();
-  @TexturePath("assets/minecraft/textures/block/vault_top_off")
-  public static final Texture vaultTopOff = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_top")
+  public static final Texture vaultTop = new Texture();
   @TexturePath("assets/minecraft/textures/block/vault_top_ejecting")
   public static final Texture vaultTopEjecting = new Texture();
   @TexturePath("assets/minecraft/textures/block/vault_bottom")
