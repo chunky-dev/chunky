@@ -430,8 +430,8 @@ public class DefaultRenderManager extends Thread implements RenderManager {
 
         // Split up to 10 tasks per thread
         int tasksPerThread = 10;
-        int pixelsPerTask = (totalPixelCount / (pool.threads * tasksPerThread - 1));
-        ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(pool.threads * tasksPerThread);
+        int pixelsPerTask = totalPixelCount / (pool.getThreadCount() * tasksPerThread - 1);
+        ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(pool.getThreadCount() * tasksPerThread);
 
         for (int i = 0; i < totalPixelCount; i += pixelsPerTask) {
           int start = i;
@@ -548,6 +548,11 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   public void setCPULoad(int value) {
     this.cpuLoad = value;
     pool.setCpuLoad(value);
+  }
+
+  @Override
+  public void setThreadCount(int threads) {
+    this.pool.setThreadCount(threads);
   }
 
   @Override

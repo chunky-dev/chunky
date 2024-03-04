@@ -193,7 +193,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     renderThreads.clampMin();
     renderThreads.onValueChange(value -> {
       PersistentSettings.setNumRenderThreads(value);
-      renderControls.showPopup("This change takes effect after restarting Chunky.", renderThreads);
+      controller.getRenderManager().setThreadCount(value);
+      Chunky.setCommonThreadsCount(value);
     });
 
     ArrayList<String> octreeNames = new ArrayList<>();

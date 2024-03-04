@@ -339,6 +339,7 @@ public class Chunky {
 
   /**
    * Get the common thread pool. This should only be used for parallelized processing, not for wait tasks.
+   * Note: This is not guaranteed to return the same object on subsequent calls.
    */
   public static ForkJoinPool getCommonThreads() {
     if (commonThreads == null) {
@@ -346,6 +347,16 @@ public class Chunky {
       commonThreads = new ForkJoinPool(Math.max(PersistentSettings.getNumThreads(), 2));
     }
     return commonThreads;
+  }
+
+  /**
+   * Replace the common thread pool with a new thread pool with a specified number of threads.
+   * Note: This is done on a best-effort basis.
+   */
+  public static void setCommonThreadsCount(int threads) {
+    ForkJoinPool t = getCommonThreads();
+    commonThreads = new ForkJoinPool(threads);
+    t.shutdown();
   }
 
   public synchronized SceneManager getSceneManager() {

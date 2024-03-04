@@ -19,6 +19,7 @@ package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.log.Log;
 import se.llbit.util.Registerable;
 import se.llbit.util.TaskTracker;
 
@@ -50,6 +51,13 @@ public interface RenderManager {
    * Instructs the renderer to change its CPU load.
    */
   void setCPULoad(int loadPercent);
+
+  /**
+   * Optionally instructs the renderer to change its thread count.
+   */
+  default void setThreadCount(int threads) {
+    Log.warn("Changing thread count only applies after restarting Chunky.");
+  }
 
   /**
    * Set a listener for render completion.

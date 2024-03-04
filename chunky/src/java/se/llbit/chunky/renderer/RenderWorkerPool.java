@@ -19,6 +19,7 @@ package se.llbit.chunky.renderer;
 
 import se.llbit.log.Log;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -47,6 +48,8 @@ public class RenderWorkerPool {
     private long lastSleep;
     private long sleepTime = 0;
 
+    private boolean running = true;
+
     public RenderWorker(RenderWorkerPool pool, int id, long seed) {
       super("3D Render Worker " + id);
 
@@ -55,6 +58,10 @@ public class RenderWorkerPool {
       this.random = new Random(seed);
 
       lastSleep = System.currentTimeMillis();
+    }
+
+    public void shutdown() {
+      this.running = false;
     }
 
     /**
@@ -98,7 +105,7 @@ public class RenderWorkerPool {
     @Override
     public void run() {
       try {
-        while (!isInterrupted()) pool.work(this);
+        while (!isInterrupted() && running) pool.work(this);
       } catch (InterruptedException e) {
         // Interrupted
       } catch (Throwable e) {
@@ -107,30 +114,57 @@ public class RenderWorkerPool {
     }
   }
 
-  public final int threads;
-
   private volatile int cpuLoad = 100;
 
   private final ConcurrentLinkedQueue<RenderJobFuture> workQueue = new ConcurrentLinkedQueue<>();
   private final AtomicInteger progress = new AtomicInteger(0);
   private final AtomicInteger localProgress = new AtomicInteger(0);
 
-  protected final RenderWorker[] workers;
+  protected final ArrayList<RenderWorker> workers = new ArrayList<>();
+
+  private long seed;
+  private int workerId = 0;
 
   public RenderWorkerPool(int threads, long seed) {
-    this.threads = threads;
+    this.seed = seed;
+    setThreadCount(threads);
+  }
 
-    workers = new RenderWorker[threads];
-    for (int i = 0; i < threads; i++) {
-      workers[i] = new RenderWorker(this, i, seed + i);
-      workers[i].start();
+  /**
+   * Get an approximation of the number workers in this pool.
+   */
+  public int getThreadCount() {
+    return workers.size();
+  }
+
+  /**
+   * Set the number of workers in this pool. Will add / kill workers in order to reach
+   * the number desired.
+   */
+  public void setThreadCount(int threads) {
+    // Must have at least 1 thread
+    if (threads < 1) threads = 1;
+
+    synchronized (workers) {
+      // Kill off some workers
+      while (workers.size() > threads) {
+        RenderWorker worker = workers.remove(workers.size()-1);
+        worker.shutdown();
+      }
+
+      // Not enough workers
+      while (workers.size() < threads) {
+        RenderWorker worker = new RenderWorker(this, workerId++, this.seed++);
+        workers.add(worker);
+        worker.start();
+      }
     }
   }
 
   private void work(RenderWorker worker) throws Throwable {
     worker.pauseSleep();
     synchronized (workQueue) {
-      while (workQueue.isEmpty()) {
+      if (workQueue.isEmpty()) {
         workQueue.wait();
       }
     }
@@ -176,8 +210,14 @@ public class RenderWorkerPool {
   }
 
   public void interrupt() {
-    for (RenderWorker worker : workers) {
-      worker.interrupt();
+    synchronized (workers) {
+      // This will kill all alive workers
+      workers.forEach(RenderWorker::interrupt);
+
+      // This will wake up and kill any zombie workers
+      synchronized (workQueue) {
+        workQueue.notifyAll();
+      }
     }
   }
 
