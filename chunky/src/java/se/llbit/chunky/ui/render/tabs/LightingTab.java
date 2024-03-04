@@ -39,6 +39,7 @@ import se.llbit.fx.LuxColorPicker;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
+import se.llbit.util.Registerable;
 
 import java.io.IOException;
 import java.net.URL;
@@ -135,9 +136,11 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     drawSun.selectedProperty().addListener((observable, oldValue, newValue) -> scene.sun().setDrawTexture(newValue));
     drawSun.setTooltip(new Tooltip("Draws the sun texture on top of the skymap."));
 
-    sunSamplingStrategy.getItems().addAll(SunSamplingStrategy.values());
-    // Hide HIGH_QUALITY in the GUI but leave it available through JSON editing/loading existing scenes
-    sunSamplingStrategy.getItems().remove(SunSamplingStrategy.HIGH_QUALITY);
+    for (SunSamplingStrategy strategy : SunSamplingStrategy.values()) {
+      if (strategy.getDeprecationStatus() != Registerable.DeprecationStatus.HIDDEN) {
+        sunSamplingStrategy.getItems().add(strategy);
+      }
+    }
     sunSamplingStrategy.getSelectionModel().selectedItemProperty().addListener(
             (observable, oldValue, newValue) -> {
               scene.setSunSamplingStrategy(newValue);
