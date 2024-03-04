@@ -20,11 +20,13 @@ import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.MapTile;
+import se.llbit.chunky.ui.ChunkMap;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.util.Mutable;
 
 /**
- * Empty or non-existent chunk.
+ * Empty or non-existent chunk in a region that <b>does not</b> exist.
+ * In the {@link ChunkMap map view} an {@link EmptyChunk} is represented as gray.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
