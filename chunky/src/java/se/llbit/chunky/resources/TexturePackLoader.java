@@ -17,7 +17,7 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.renderer.scene.PlayerModel;
-import se.llbit.chunky.renderer.scene.Sun;
+import se.llbit.chunky.renderer.scene.sky.Sun;
 import se.llbit.chunky.resources.texturepack.*;
 
 import java.lang.reflect.Field;
@@ -325,6 +325,7 @@ public class TexturePackLoader {
         new SimpleTexture("textures/blocks/grass_side_overlay", Texture.grassSide),
         new IndexedTexture(0x26, Texture.grassSide)));
     ALL_TEXTURES.put("tallgrass", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/block/short_grass", Texture.tallGrass), // since 1.20.3-pre2
         new SimpleTexture("assets/minecraft/textures/block/grass", Texture.tallGrass),
         new SimpleTexture("assets/minecraft/textures/blocks/grass", Texture.tallGrass),
         new SimpleTexture("assets/minecraft/textures/blocks/tallgrass", Texture.tallGrass),
@@ -3658,8 +3659,7 @@ public class TexturePackLoader {
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
-    String[] path = file.split("/");
-    addSimpleTexture(path[path.length - 1], file, texture);
+    addSimpleTexture(file, file, texture);
   }
 
   private static void addSimpleTexture(String name, String file, Texture texture) {

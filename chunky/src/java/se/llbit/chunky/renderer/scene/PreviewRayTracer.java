@@ -17,9 +17,9 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.MinecraftBlock;
-import se.llbit.chunky.block.Water;
+import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -62,7 +62,7 @@ public class PreviewRayTracer implements RayTracer {
 
   /**
    * Calculate sky occlusion.
-   * @return occlusion value
+   * @return occlusion value (1 = occluded, 0 = transparent)
    */
   public static double skyOcclusion(Scene scene, WorkerState state) {
     Ray ray = state.ray;
@@ -83,7 +83,7 @@ public class PreviewRayTracer implements RayTracer {
 
   /**
    * Find next ray intersection.
-   * @return Next intersection
+   * @return true if intersected, false if no intersection has been found
    */
   public static boolean nextIntersection(Scene scene, Ray ray) {
     ray.setPrevMaterial(ray.getCurrentMaterial(), ray.getCurrentData());

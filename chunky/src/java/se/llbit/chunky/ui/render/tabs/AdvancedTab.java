@@ -64,9 +64,12 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private IntegerAdjuster renderThreads;
   @FXML private IntegerAdjuster cpuLoad;
   @FXML private IntegerAdjuster rayDepth;
+  @FXML private IntegerAdjuster branchCount;
   @FXML private Button mergeRenderDump;
   @FXML private CheckBox shutdown;
   @FXML private CheckBox fastFog;
+  @FXML private CheckBox fancierTranslucency;
+  @FXML private DoubleAdjuster transmissivityCap;
   @FXML private IntegerAdjuster cacheResolution;
   @FXML private DoubleAdjuster animationTime;
   @FXML private ChoiceBox<PictureExportFormat> outputMode;
@@ -105,6 +108,18 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     rayDepth.setRange(1, 25);
     rayDepth.clampMin();
     rayDepth.onValueChange(value -> scene.setRayDepth(value));
+
+    branchCount.setName("Branch count");
+    branchCount.setTooltip("Sets the number of rays cast after the first intersection, effectively reusing the first ray that many times." +
+      "\nHigher values will result in faster rendering, but with diminishing returns." +
+      "\nNote that if this is set to more than about 5% of your target SPP, you will likely notice artifacts due to poor antialiasing.");
+    branchCount.setRange(1, 50);
+    branchCount.clampMin();
+    branchCount.onValueChange(value -> {
+      scene.setBranchCount(value);
+      PersistentSettings.setBranchCountDefault(value);
+    });
+
     mergeRenderDump
             .setTooltip(new Tooltip("Merge an existing render dump with the current render."));
     mergeRenderDump.setOnAction(e -> {
@@ -134,13 +149,28 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       }
     });
     outputMode.getSelectionModel().selectedItemProperty()
-            .addListener((observable, oldValue, newValue) -> scene.setOutputMode(newValue));
+            .addListener((observable, oldValue, newValue) -> scene.setPictureExportFormat(newValue));
     if(!ShutdownAlert.canShutdown()) {
       shutdown.setDisable(true);
     }
     fastFog.setTooltip(new Tooltip("Enable faster fog rendering algorithm."));
     fastFog.selectedProperty()
             .addListener((observable, oldValue, newValue) -> scene.setFastFog(newValue));
+    fancierTranslucency.setTooltip(new Tooltip("Enable more sophisticated algorithm for computing color changes through translucent materials."));
+    fancierTranslucency.selectedProperty()
+      .addListener((observable, oldValue, newValue) -> {
+        scene.setFancierTranslucency(newValue);
+        transmissivityCap.setVisible(newValue);
+        transmissivityCap.setManaged(newValue);
+      });
+    boolean tcapVisible = scene != null && scene.getFancierTranslucency();
+    transmissivityCap.setVisible(tcapVisible);
+    transmissivityCap.setManaged(tcapVisible);
+    transmissivityCap.setName("Transmissivity cap");
+    transmissivityCap.setRange(Scene.MIN_TRANSMISSIVITY_CAP, Scene.MAX_TRANSMISSIVITY_CAP);
+    transmissivityCap.clampBoth();
+    transmissivityCap.setTooltip("Maximum amplification of one color channel as a ray passes through a translucent block (stained glass, ice, etc.).\nA value of 1 prevents amplification entirely; higher values result in more vibrant colors.");
+    transmissivityCap.onValueChange(value -> scene.setTransmissivityCap(value));
     cacheResolution.setName("Sky cache resolution");
     cacheResolution.setTooltip("Resolution of the sky cache. Lower values will use less memory and improve performance but can cause sky artifacts.");
     cacheResolution.setRange(1, 4096);
@@ -159,7 +189,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     });
     renderThreads.setName("Render threads");
     renderThreads.setTooltip("Number of rendering threads.");
-    renderThreads.setRange(1, 20);
+    renderThreads.setRange(1, Runtime.getRuntime().availableProcessors());
     renderThreads.clampMin();
     renderThreads.onValueChange(value -> {
       PersistentSettings.setNumRenderThreads(value);
@@ -181,8 +211,10 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     octreeImplementation.getSelectionModel().selectedItemProperty()
             .addListener((observable, oldvalue, newvalue) -> {
               PersistentSettings.setOctreeImplementation(newvalue);
-              scene.setOctreeImplementation(newvalue);
-              scene.softRefresh();
+              if (!scene.getOctreeImplementation().equals(newvalue)) {
+                scene.setOctreeImplementation(newvalue);
+                scene.softRefresh();
+              }
             });
     octreeImplementation.setTooltip(new Tooltip(tooltipTextBuilder.toString()));
 
@@ -300,11 +332,14 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
   @Override
   public void update(Scene scene) {
-    outputMode.getSelectionModel().select(scene.getOutputMode());
+    outputMode.getSelectionModel().select(scene.getPictureExportFormat());
     fastFog.setSelected(scene.fog.fastFog());
+    fancierTranslucency.setSelected(scene.getFancierTranslucency());
+    transmissivityCap.set(scene.getTransmissivityCap());
     renderThreads.set(PersistentSettings.getNumThreads());
     cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());
+    branchCount.set(scene.getBranchCount());
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
     bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
     biomeStructureImplementation.getSelectionModel().select(scene.getBiomeStructureImplementation());

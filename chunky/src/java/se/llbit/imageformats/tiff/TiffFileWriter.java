@@ -17,205 +17,138 @@
  */
 package se.llbit.imageformats.tiff;
 
-import java.io.DataOutputStream;
-import java.io.File;
+import java.io.DataOutput;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.nio.FloatBuffer;
+import java.nio.channels.FileChannel;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import se.llbit.chunky.main.Version;
 import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
+import se.llbit.chunky.renderer.scene.AlphaBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.log.Log;
 import se.llbit.util.TaskTracker;
 
 /**
- * TIFF image output. This supports 32-bit floating point channel output.
- *
- * <p>Non-32bit output has been removed sine it was unused.
- *
- * @author Jesper Öqvist <jesper@llbit.se>
+ * Basic writer for the TIFF image format.
+ * <p>Supports (only) 32-bit floating point channel output.
+ * See the <a href="https://download.osgeo.org/libtiff/doc/TIFF6.pdf">format specification</a> for details.
  */
 public class TiffFileWriter implements AutoCloseable {
 
-  private static final int ASCII = 2;
-  private static final int SHORT = 3;
-  private static final int LONG = 4;
-  private static final int RATIONAL = 5;
+  private final FinalizableBFCOutputStream out;
+  private final CompressionType compressionType;
+  private FinalizableBFCOutputStream.UnfinalizedData.Int nextIFDOffset;
 
-  private final DataOutputStream out;
-
-  public TiffFileWriter(OutputStream out) throws IOException {
-    this.out = new DataOutputStream(out);
-    out.write(0x4D);
-    out.write(0x4D);
-    out.write(0x00);
-    out.write(0x2A);
+  public TiffFileWriter(
+    FileChannel fileChannel,
+    CompressionType compressionType
+  ) throws IOException {
+    this.compressionType = compressionType;
+    out = new FinalizableBFCOutputStream(fileChannel);
+    // "MM\0*"
+    // - MM -> magic bytes
+    // - \0* -> magic number 42 for big-endian byte order
+    out.writeInt(0x4D4D002A);
+    nextIFDOffset = out.writeUnfinalizedInt();
   }
 
-  /**
-   * @throws IOException
-   */
-  public TiffFileWriter(File file) throws IOException {
-    this(new FileOutputStream(file));
+  public TiffFileWriter(FileOutputStream outputStream) throws IOException {
+    this(outputStream.getChannel(), CompressionType.NONE);
   }
 
-  /**
-   * @throws IOException
-   */
+  public void doFinalization() throws IOException {
+    out.doFinalization();
+  }
+
   @Override
   public void close() throws IOException {
     out.close();
   }
 
-  private void writeHeader(int width, int height, int bytesPerSample) throws IOException {
-    out.writeInt(ifdOffset(width, height, bytesPerSample));
+  /**
+   * Export sample buffer as Baseline TIFF RGB image / TIFF Class R image
+   * with 32 bits per color component.
+   *
+   * <p>Note: This method does not close the output stream, and can be called multiple times for multiple layers.
+   *       Use {@link #doFinalization()} to complete the export.
+   */
+  public void export(Scene scene, TaskTracker.Task task) throws IOException {
+    nextIFDOffset = writePrimaryIDF(nextIFDOffset, scene, task);
   }
 
-  private void writeFooter(int width, int height, int bytesPerSample) throws IOException {
-    int ifdOffset = ifdOffset(width, height, bytesPerSample);
-    int numEntries = 15;
+  private static final DateTimeFormatter DATETIME_FORMAT = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
 
-    // Number of IFD entries.
-    out.writeShort(numEntries);
+  private static final int BYTES_PER_SAMPLE = 4;
 
-    // 1: Width.
-    out.writeShort(0x0100);
-    out.writeShort(SHORT);
-    out.writeInt(1);
-    out.writeShort(width);
-    out.writeShort(0);
+  private FinalizableBFCOutputStream.UnfinalizedData.Int writePrimaryIDF(
+    FinalizableBFCOutputStream.UnfinalizedData.Int ifdOffset,
+    Scene scene,
+    TaskTracker.Task task
+  ) throws IOException {
+    int width = scene.canvasConfig.getWidth();
+    int height = scene.canvasConfig.getHeight();
 
-    // 2: Height.
-    out.writeShort(0x0101);
-    out.writeShort(SHORT);
-    out.writeInt(1);
-    out.writeShort(height);
-    out.writeShort(0);
+    BasicIFD idf = new BasicIFD(width, height, compressionType);
 
-    // 3: Bits per sample.
-    out.writeShort(0x0102);
-    out.writeShort(SHORT);
-    out.writeInt(3);
-    int offsetBps = ifdOffset + 2 + 12 * numEntries + 2;
-    out.writeInt(offsetBps);
-
-    // 4: Compression type.
-    out.writeShort(0x0103);
-    out.writeShort(SHORT);
-    out.writeInt(1);
-    out.writeShort(1);
-    out.writeShort(0);
-
-    // 5: PhotometricInterpretation
-    out.writeShort(0x0106);
-    out.writeShort(SHORT);
-    out.writeInt(1);
-    out.writeShort(2);
-    out.writeShort(0);
-
-    // 7: StripOffsets
-    out.writeShort(0x0111);
-    out.writeShort(LONG);
-    out.writeInt(1);
-    out.writeInt(8);
-
-    // 6: Orientation
-    out.writeShort(0x0112);
-    out.writeShort(SHORT);
-    out.writeInt(1);
-    out.writeShort(1); // First row is at the top of the image.
-    out.writeShort(0);
-
-    // 8: SamplesPerPixel
-    out.writeShort(0x0115);
-    out.writeShort(SHORT);
-    out.writeInt(1);
-    out.writeShort(3);
-    out.writeShort(0);
-
-    // 9: RowsPerStrip
-    out.writeShort(0x0116);
-    out.writeShort(LONG);
-    out.writeInt(1);
-    out.writeInt(height);
-
-    // 10: StripByteCounts
-    out.writeShort(0x0117);
-    out.writeShort(LONG);
-    out.writeInt(1);
-    int offsetSbc = ifdOffset + 2 + 12 * numEntries + 2 + 2 * 3;
-    out.writeInt(offsetSbc);
-
-    // 11: XResolution
-    out.writeShort(0x011A);
-    out.writeShort(RATIONAL);
-    out.writeInt(1);
-    int offsetXres = ifdOffset + 2 + 12 * numEntries + 2 + 2 * 3 + 4;
-    out.writeInt(offsetXres);
-
-    // 12: YResolution
-    out.writeShort(0x011B);
-    out.writeShort(RATIONAL);
-    out.writeInt(1);
-    int offsetYres = ifdOffset + 2 + 12 * numEntries + 2 + 2 * 3 + 4 + 8;
-    out.writeInt(offsetYres);
-
-    // 13: ResolutionUnit
-    out.writeShort(0x0128);
-    out.writeShort(SHORT);
-    out.writeInt(1);
-    out.writeShort(1);
-    out.writeShort(0);
-
-    // 14: SampleFormat
-    out.writeShort(0x0153);
-    out.writeShort(SHORT);
-    out.writeInt(3);
-    int offsetSampleFormat = ifdOffset + 2 + 12 * numEntries + 2 + 2 * 3 + 4 + 8 + 8;
-    out.writeInt(offsetSampleFormat);
-
-    // 15: Software
-    out.writeShort(0x0131);
-    out.writeShort(ASCII);
-    out.writeInt("Chunky".length() + 1);
-    int offsetSoftware = ifdOffset + 2 + 12 * numEntries + 2 + 2 * 3 + 4 + 8 + 8 + 2 * 3;
-    out.writeInt(offsetSoftware);
-
-    // End of IFD.
-    out.writeShort(0);
-
-    // Bits per sample, values.
-    out.writeShort(8 * bytesPerSample);
-    out.writeShort(8 * bytesPerSample);
-    out.writeShort(8 * bytesPerSample);
-
-    // Strip byte count.
-    out.writeInt(width * height * 3 * bytesPerSample);
-
-    // X resolution.
-    out.writeInt(0);
-    out.writeInt(1);
-
-    // Y resolution.
-    out.writeInt(0);
-    out.writeInt(1);
-
-    // Sample formats.
-    if (bytesPerSample == 1) {
-      out.writeShort(1);
-      out.writeShort(1);
-      out.writeShort(1);
+    boolean embedAlpha = scene.getAlphaBuffer().getType() == AlphaBuffer.Type.FP32;
+    if (embedAlpha) {
+      // Number of components per pixel (R, G, B, A)
+      idf.addTag(IFDTag.TAG_SAMPLES_PER_PIXEL, (short) 4);
+      short bitsPerSample = (short) (8 * BYTES_PER_SAMPLE);
+      idf.addMultiTag(IFDTag.TAG_BITS_PER_SAMPLE, new short[]{bitsPerSample, bitsPerSample, bitsPerSample, bitsPerSample});
+      // Interpret each component as IEEE754 float32
+      idf.addMultiTag(IFDTag.TAG_SAMPLE_FORMAT, new short[]{3, 3, 3, 3});
+      // Extra sample component as unassociated alpha (non-premultiplied)
+      idf.addTag(IFDTag.TAG_EXTRA_SAMPLES, (short) 1);
     } else {
-      out.writeShort(3);
-      out.writeShort(3);
-      out.writeShort(3);
+      // Number of components per pixel (R, G, B)
+      idf.addTag(IFDTag.TAG_SAMPLES_PER_PIXEL, (short) 3);
+      short bitsPerSample = (short) (8 * BYTES_PER_SAMPLE);
+      idf.addMultiTag(IFDTag.TAG_BITS_PER_SAMPLE, new short[]{bitsPerSample, bitsPerSample, bitsPerSample});
+      // Interpret each component as IEEE754 float32
+      idf.addMultiTag(IFDTag.TAG_SAMPLE_FORMAT, new short[]{3, 3, 3});
     }
 
-    for (byte b : "Chunky".getBytes()) {
-      out.write(b);
-    }
-    out.write(0);
+    idf.addTag(IFDTag.TAG_SOFTWARE, "Chunky " + Version.getVersion());
+    idf.addTag(IFDTag.TAG_DATETIME, DATETIME_FORMAT.format(LocalDateTime.now()));
+
+    return idf.write(out, ifdOffset, (out) -> {
+      PixelPostProcessingFilter filter = requirePixelPostProcessingFilter(scene);
+      double[] sampleBuffer = scene.getSampleBuffer();
+      AlphaBuffer alpha = scene.getAlphaBuffer();
+      FloatBuffer buffer = null;
+      if(embedAlpha) {
+        assert alpha.getType() == AlphaBuffer.Type.FP32;
+        buffer = alpha.getBuffer().asFloatBuffer();
+      }
+      double[] pixelBuffer = new double[embedAlpha ? 4 : 3];
+      for (int y = 0; y < height; ++y) {
+        task.update(height, y);
+        for (int x = 0; x < width; ++x) {
+          // TODO: refactor pixel access to remove duplicate post processing code from here
+          filter.processPixel(width, height, sampleBuffer, x, y, scene.getExposure(), pixelBuffer);
+          if(embedAlpha) {
+            pixelBuffer[3] = buffer.get(y * width + x);
+          }
+          writePixel(out, pixelBuffer);
+        }
+      }
+      task.update(height, height);
+    });
+  }
+
+  void writePixel(DataOutput out, double[] pixelBuffer) throws IOException {
+    out.writeFloat((float) pixelBuffer[0]);
+    out.writeFloat((float) pixelBuffer[1]);
+    out.writeFloat((float) pixelBuffer[2]);
+    if(pixelBuffer.length > 3)
+      out.writeFloat((float) pixelBuffer[3]);
   }
 
   private PixelPostProcessingFilter requirePixelPostProcessingFilter(Scene scene) {
@@ -225,41 +158,9 @@ public class TiffFileWriter implements AutoCloseable {
       return (PixelPostProcessingFilter) filter;
     } else {
       Log.warn("The selected post processing filter (" + filter.getName()
-        + ") doesn't support pixel based processing and can't be used to export TIFF files. "+
+        + ") doesn't support pixel based processing and can't be used to export TIFF files. " +
         "The TIFF will be exported without post-processing instead.");
       return PostProcessingFilters.NONE;
     }
-  }
-
-  /**
-   * Write an image as a 32-bit per channel TIFF file.
-   */
-  public void write32(Scene scene, TaskTracker.Task task) throws IOException {
-    PixelPostProcessingFilter filter = requirePixelPostProcessingFilter(scene);
-
-    int width = scene.canvasWidth();
-    int height = scene.canvasHeight();
-    writeHeader(width, height, 4);
-
-    double[] sampleBuffer = scene.getSampleBuffer();
-
-    for (int y = 0; y < height; ++y) {
-      task.update(height, y);
-      for (int x = 0; x < width; ++x) {
-        double[] pixelBuffer = new double[3];
-        // TODO: refactor pixel access to remove duplicate post processing code from here
-        filter.processPixel(width, height, sampleBuffer, x, y, scene.getExposure(), pixelBuffer);
-        out.writeFloat((float) pixelBuffer[0]);
-        out.writeFloat((float) pixelBuffer[1]);
-        out.writeFloat((float) pixelBuffer[2]);
-      }
-      task.update(height, y + 1);
-    }
-
-    writeFooter(width, height, 4);
-  }
-
-  private int ifdOffset(int width, int height, int bytesPerSample) {
-    return 8 + width * height * 3 * bytesPerSample; // Offset to first IFD from file start.
   }
 }

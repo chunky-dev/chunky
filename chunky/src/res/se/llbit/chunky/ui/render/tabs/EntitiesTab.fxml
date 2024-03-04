@@ -15,6 +15,8 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.control.ComboBox?>
+
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
     <padding>
@@ -27,8 +29,9 @@
       </columns>
     </TableView>
     <HBox spacing="10.0">
-      <Button fx:id="delete" mnemonicParsing="false" text="-" />
-      <Button fx:id="add" mnemonicParsing="false" text="+" />
+      <ComboBox fx:id="entityType" prefWidth="150.0" />
+      <Button fx:id="add" mnemonicParsing="false" text="Add entity" />
+      <Button fx:id="delete" mnemonicParsing="false" text="Remove entity" />
     </HBox>
     <HBox spacing="10.0">
       <Button fx:id="cameraToEntity" mnemonicParsing="false" text="Camera to entity" />

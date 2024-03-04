@@ -156,15 +156,15 @@
     </padding>
     <BorderPane>
       <left>
-        <Label fx:id="renderTimeLbl" text="Render time: 0"/>
+        <Label fx:id="progressLbl" text="Initialized"/>
       </left>
       <right>
-        <Label fx:id="sppLbl" text="0 SPP, 0 SPS"/>
+        <Label fx:id="sppLbl" text="0 SPP | 0 SPS"/>
       </right>
     </BorderPane>
     <BorderPane>
       <left>
-        <Label fx:id="progressLbl" text="Progress"/>
+        <Label fx:id="renderTimeLbl" text="Time: 0:00:00"/>
       </left>
       <right>
         <Label fx:id="etaLbl" text="ETA: N/A"/>

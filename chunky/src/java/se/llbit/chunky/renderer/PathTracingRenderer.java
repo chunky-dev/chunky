@@ -17,6 +17,7 @@
 package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.chunky.renderer.scene.PathTracer;
 import se.llbit.chunky.renderer.scene.RayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 
@@ -52,15 +53,15 @@ public class PathTracingRenderer extends TileBasedRenderer {
   public void render(DefaultRenderManager manager) throws InterruptedException {
     Scene scene = manager.bufferedScene;
 
-    int width = scene.width;
-    int height = scene.height;
+    int width = scene.canvasConfig.getWidth();
 
-    int fullWidth = scene.getFullWidth();
-    int fullHeight = scene.getFullHeight();
-    int cropX = scene.getCropX();
-    int cropY = scene.getCropY();
+    int fullWidth = scene.canvasConfig.getCropWidth();
+    int fullHeight = scene.canvasConfig.getCropHeight();
+    int cropX = scene.canvasConfig.getCropX();
+    int cropY = scene.canvasConfig.getCropY();
 
     int sppPerPass = manager.context.sppPerPass();
+
     Camera cam = scene.camera();
     double halfWidth = fullWidth / (2.0 * fullHeight);
     double invHeight = 1.0 / fullHeight;
@@ -69,7 +70,8 @@ public class PathTracingRenderer extends TileBasedRenderer {
 
     while (scene.spp < scene.getTargetSpp()) {
       int spp = scene.spp;
-      double sinv = 1.0 / (sppPerPass + spp);
+      int branchCount = (tracer instanceof PathTracer) ? scene.getCurrentBranchCount() : 1;
+      double sinv = 1.0 / (sppPerPass * branchCount + spp);
 
       submitTiles(manager, (state, pixel) -> {
         int x = pixel.firstInt();
@@ -88,9 +90,9 @@ public class PathTracingRenderer extends TileBasedRenderer {
               -0.5 + (y + oy + cropY) * invHeight);
           scene.rayTrace(tracer, state);
 
-          sr += state.ray.color.x;
-          sg += state.ray.color.y;
-          sb += state.ray.color.z;
+          sr += state.ray.color.x * branchCount;
+          sg += state.ray.color.y * branchCount;
+          sb += state.ray.color.z * branchCount;
         }
 
         int offset = 3 * (y*width + x);
@@ -100,7 +102,7 @@ public class PathTracingRenderer extends TileBasedRenderer {
       });
 
       manager.pool.awaitEmpty();
-      scene.spp += sppPerPass;
+      scene.spp += sppPerPass * branchCount;
       if (postRender.getAsBoolean()) break;
     }
   }

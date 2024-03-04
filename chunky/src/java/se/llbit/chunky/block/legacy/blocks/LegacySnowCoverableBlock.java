@@ -1,7 +1,7 @@
 package se.llbit.chunky.block.legacy.blocks;
 
 import se.llbit.chunky.block.FinalizationState;
-import se.llbit.chunky.block.Snow;
+import se.llbit.chunky.block.minecraft.Snow;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
 import se.llbit.chunky.world.Material;

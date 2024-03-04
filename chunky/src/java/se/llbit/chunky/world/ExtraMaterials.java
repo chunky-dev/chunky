@@ -16,12 +16,13 @@
  */
 package se.llbit.chunky.world;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import se.llbit.chunky.block.Candle;
+import se.llbit.chunky.block.minecraft.Candle;
+import se.llbit.chunky.entity.CalibratedSculkSensorAmethyst;
 import se.llbit.chunky.entity.Campfire;
 import se.llbit.chunky.world.material.CloudMaterial;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ExtraMaterials {
 
@@ -33,6 +34,8 @@ public class ExtraMaterials {
     idMap.put("candle_flame", Candle.flameMaterial);
     idMap.put("campfire_flame", Campfire.flameMaterial);
     idMap.put("soul_campfire_flame", Campfire.soulFlameMaterial);
+    idMap.put("calibrated_sculk_sensor_amethyst_active", CalibratedSculkSensorAmethyst.activeMaterial);
+    idMap.put("calibrated_sculk_sensor_amethyst_inactive", CalibratedSculkSensorAmethyst.inactiveMaterial);
   }
 
   public static void loadDefaultMaterialProperties() {
@@ -46,5 +49,10 @@ public class ExtraMaterials {
 
     Campfire.soulFlameMaterial.restoreDefaults();
     Campfire.soulFlameMaterial.emittance = 0.6f;
+
+    CalibratedSculkSensorAmethyst.activeMaterial.restoreDefaults();
+    CalibratedSculkSensorAmethyst.activeMaterial.emittance = 1.0f / 15;
+
+    CalibratedSculkSensorAmethyst.inactiveMaterial.restoreDefaults();
   }
 }

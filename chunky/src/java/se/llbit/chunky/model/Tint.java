@@ -98,4 +98,8 @@ public class Tint {
       color.z *= tintColor[2];
     }
   }
+
+  public boolean isBiomeTint() {
+    return type == TintType.BIOME_FOLIAGE || type == TintType.BIOME_GRASS || type == TintType.BIOME_WATER;
+  }
 }

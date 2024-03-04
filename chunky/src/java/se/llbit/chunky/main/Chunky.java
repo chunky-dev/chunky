@@ -217,7 +217,8 @@ public class Chunky {
     if (cmdline.mode == CommandLineOptions.Mode.CLI_OPERATION) {
       exitCode = cmdline.exitCode;
     } else {
-      commonThreads = new ForkJoinPool(PersistentSettings.getNumThreads());
+      // Initialize the common thread pool.
+      getCommonThreads();
 
       Chunky chunky = new Chunky(cmdline.options);
       chunky.headless = cmdline.mode == Mode.HEADLESS_RENDER || cmdline.mode == Mode.CREATE_SNAPSHOT;
@@ -319,7 +320,7 @@ public class Chunky {
           System.err.println("Failed to load the dump file found for this scene");
           return 1;
         }
-        PictureExportFormat outputMode = scene.getOutputMode();
+        PictureExportFormat outputMode = scene.getPictureExportFormat();
         if (options.imageOutputFile.isEmpty()) {
           options.imageOutputFile = String
               .format("%s-%d%s", scene.name(), scene.spp, outputMode.getExtension());
@@ -342,7 +343,8 @@ public class Chunky {
    */
   public static ForkJoinPool getCommonThreads() {
     if (commonThreads == null) {
-      commonThreads = new ForkJoinPool(PersistentSettings.getNumThreads());
+      // use at least two threads to prevent deadlocks in some java versions (see #1631)
+      commonThreads = new ForkJoinPool(Math.max(PersistentSettings.getNumThreads(), 2));
     }
     return commonThreads;
   }

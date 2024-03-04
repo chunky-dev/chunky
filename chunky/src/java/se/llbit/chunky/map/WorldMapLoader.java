@@ -20,15 +20,10 @@ import java.util.function.BiConsumer;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
-import se.llbit.chunky.world.Chunk;
-import se.llbit.chunky.world.ChunkPosition;
-import se.llbit.chunky.world.ChunkTopographyUpdater;
-import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.EmptyWorld;
+import se.llbit.chunky.world.*;
 import se.llbit.chunky.world.region.RegionChangeWatcher;
 import se.llbit.chunky.world.region.RegionParser;
 import se.llbit.chunky.world.region.RegionQueue;
-import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 
 import java.io.File;
@@ -51,7 +46,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   private final ChunkTopographyUpdater topographyUpdater = new ChunkTopographyUpdater();
 
   /** The dimension to load in the current world. */
-  private int currentDimension = PersistentSettings.getDimension();
+  private int currentDimensionId = PersistentSettings.getDimension();
 
   private List<BiConsumer<World, Boolean>> worldLoadListeners = new ArrayList<>();
 
@@ -70,28 +65,41 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   }
 
   /**
-   * This is called when a new world is loaded, and when switching to a
-   * different dimension.
+   * This is called when a new world is loaded
    */
   public void loadWorld(File worldDir) {
     if (World.isWorldDir(worldDir)) {
       if (world != null) {
-        world.removeChunkTopographyListener(this);
+        world.currentDimension().removeChunkTopographyListener(this);
       }
       boolean isSameWorld = !(world instanceof EmptyWorld) && worldDir.equals(world.getWorldDirectory());
-      World newWorld = World.loadWorld(worldDir, currentDimension, World.LoggedWarnings.NORMAL);
-      newWorld.addChunkTopographyListener(this);
+      World newWorld = World.loadWorld(worldDir, currentDimensionId, World.LoggedWarnings.NORMAL);
+      newWorld.currentDimension().addChunkTopographyListener(this);
       synchronized (this) {
         world = newWorld;
-        updateRegionChangeWatcher(newWorld);
+        updateRegionChangeWatcher(newWorld.currentDimension());
 
         File newWorldDir = world.getWorldDirectory();
-        if (newWorldDir != null) {
+        if (newWorldDir != null && !newWorldDir.equals(PersistentSettings.getLastWorld())) {
           PersistentSettings.setLastWorld(newWorldDir);
         }
       }
       worldLoadListeners.forEach(listener -> listener.accept(newWorld, isSameWorld));
     }
+  }
+
+  /**
+   * This is called when switching to a different dimension within the same world
+   */
+  public void loadDimension() {
+    world.currentDimension().removeChunkTopographyListener(this);
+
+    world.loadDimension(currentDimensionId);
+    world.currentDimension().addChunkTopographyListener(this);
+    synchronized (this) {
+      updateRegionChangeWatcher(world.currentDimension());
+    }
+    worldLoadListeners.forEach(listener -> listener.accept(world, false));
   }
 
   /** Adds a listener to be notified when a new world has been loaded. */
@@ -142,24 +150,24 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
    */
   public void reloadWorld() {
     topographyUpdater.clearQueue();
-    world.removeChunkTopographyListener(this);
-    World newWorld = World.loadWorld(world.getWorldDirectory(), currentDimension,
+    world.currentDimension().removeChunkTopographyListener(this);
+    World newWorld = World.loadWorld(world.getWorldDirectory(), currentDimensionId,
         World.LoggedWarnings.NORMAL);
-    newWorld.addChunkTopographyListener(this);
+    newWorld.currentDimension().addChunkTopographyListener(this);
     synchronized (this) {
       world = newWorld;
-      updateRegionChangeWatcher(newWorld);
+      updateRegionChangeWatcher(newWorld.currentDimension());
     }
     worldLoadListeners.forEach(listener -> listener.accept(newWorld, true));
     viewUpdated(mapView.getMapView()); // update visible chunks immediately
   }
 
   /** Stops the current RegionChangeWatcher, and creates a new one for the specified world */
-  private void updateRegionChangeWatcher(World newWorld) {
+  private void updateRegionChangeWatcher(Dimension dimension) {
     if(regionChangeWatcher != null) {
       regionChangeWatcher.interrupt();
     }
-    regionChangeWatcher = newWorld.createRegionChangeWatcher(this, mapView);
+    regionChangeWatcher = dimension.createRegionChangeWatcher(this, mapView);
     regionChangeWatcher.start();
   }
 
@@ -169,20 +177,17 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
    * @param value Must be a valid dimension index (0, -1, 1)
    */
   public void setDimension(int value) {
-    if (value != currentDimension) {
-      currentDimension = value;
-      PersistentSettings.setDimension(currentDimension);
+    if (value != currentDimensionId) {
+      currentDimensionId = value;
+      PersistentSettings.setDimension(currentDimensionId);
 
-      // Note: here we are loading the same world again just to load the
-      // next dimension. However, this is a very ugly way to handle dimension
-      // switching and it would probably be much better to just create a fresh
-      // world instance to load.
-      loadWorld(world.getWorldDirectory());
+      loadDimension();
+      viewUpdated(mapView.getMapView()); // update visible chunks immediately
     }
   }
 
   /** Get the currently loaded dimension. */
   public int getDimension() {
-    return currentDimension;
+    return currentDimensionId;
   }
 }

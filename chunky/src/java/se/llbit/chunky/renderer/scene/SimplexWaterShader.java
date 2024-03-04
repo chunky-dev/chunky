@@ -79,7 +79,6 @@ public class SimplexWaterShader implements WaterShader {
 
   @Override
   public void save(JsonObject json) {
-    json.add("waterShader", "SIMPLEX");
     JsonObject params = new JsonObject();
     params.add("iterations", iterations);
     params.add("frequency", baseFrequency);

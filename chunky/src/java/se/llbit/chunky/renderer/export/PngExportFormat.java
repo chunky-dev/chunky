@@ -20,6 +20,7 @@ package se.llbit.chunky.renderer.export;
 import java.io.IOException;
 import java.io.OutputStream;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.scene.AlphaBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.imageformats.png.ITXT;
@@ -42,20 +43,22 @@ public class PngExportFormat implements PictureExportFormat {
   }
 
   @Override
-  public boolean isTransparencySupported() {
-    return true;
+  public AlphaBuffer.Type getTransparencyType() {
+    return AlphaBuffer.Type.UINT8;
   }
 
   @Override
   public void write(OutputStream out, Scene scene, TaskTracker taskTracker) throws IOException {
     try (TaskTracker.Task task = taskTracker.task("Writing PNG");
         PngFileWriter writer = new PngFileWriter(out)) {
+      int width = scene.canvasConfig.getWidth();
+      int height = scene.canvasConfig.getHeight();
       BitmapImage backBuffer = scene.getBackBuffer();
-      if (scene.transparentSky()) {
-        writer.write(backBuffer.data, scene.getAlphaChannel(), scene.canvasWidth(),
-            scene.canvasHeight(), task);
+      AlphaBuffer alpha = scene.getAlphaBuffer();
+      if (alpha.getType() == getTransparencyType()) {
+        writer.write(backBuffer.data, alpha.getBuffer(), width, height, task);
       } else {
-        writer.write(backBuffer.data, scene.canvasWidth(), scene.canvasHeight(), task);
+        writer.write(backBuffer.data, width, height, task);
       }
       if (scene.camera().getProjectionMode() == ProjectionMode.PANORAMIC
           && scene.camera().getFov() >= 179
@@ -85,10 +88,10 @@ public class PngExportFormat implements PictureExportFormat {
       "XML:com.adobe.xmp",
       String.format(
         PNG_PANORAMA_META_ADOBE_RDF_XML,
-        scene.canvasHeight(),
-        scene.canvasWidth(),
-        scene.canvasHeight(),
-        scene.canvasWidth()
+        scene.canvasConfig.getHeight(),
+        scene.canvasConfig.getWidth(),
+        scene.canvasConfig.getHeight(),
+        scene.canvasConfig.getWidth()
       )
     ));
   }

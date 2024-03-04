@@ -3,11 +3,15 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.VBox?>
+<?import se.llbit.chunky.ui.IntegerAdjuster?>
+<?import javafx.scene.layout.HBox?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40"
          xmlns:fx="http://javafx.com/fxml/1">
   <VBox spacing="10.0">
     <CheckBox fx:id="biomeColors" mnemonicParsing="false" text="Enable biome colors" />
-    <CheckBox fx:id="biomeBlending" mnemonicParsing="false" text="Enable biome blending" />
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+      <IntegerAdjuster fx:id="biomeBlendingRadiusInput" name="Biome blending radius" />
+    </HBox>
     <CheckBox fx:id="singleColorBtn" mnemonicParsing="false" text="Single color textures"/>
     <Button fx:id="editResourcePacks" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
             text="Edit resource packs"/>

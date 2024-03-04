@@ -149,11 +149,11 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     saveScene(resolveSceneDirectory(newName));
   }
 
-  public void saveScene(SceneIOProvider context, Scene scene) throws InterruptedException {
+  public void saveScene(SceneIOProvider ioContext, Scene scene) throws InterruptedException {
     try {
       String sceneName = scene.name();
       Log.info("Saving scene " + sceneName);
-      File sceneDir = context.getSceneDirectory();
+      File sceneDir = ioContext.getSceneDirectory();
       if (!sceneDir.isDirectory()) {
         sceneDir = resolveSceneDirectory(sceneName);
       }
@@ -173,7 +173,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       RenderStatus status = renderManager.getRenderStatus();
       scene.renderTime = status.getRenderTime();
       scene.spp = status.getSpp();
-      scene.saveScene(context, taskTracker);
+      scene.saveScene(ioContext, taskTracker);
       Log.info("Scene saved");
       this.onSceneSaved.run();
     } catch (IOException e) {
@@ -344,7 +344,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   protected void mergeDump(File dumpFile) {
     synchronized (scene) {
       renderManager.withSampleBufferProtected((samples, width, height) -> {
-        if (width != scene.width || height != scene.height) {
+        if (width != scene.canvasConfig.getWidth() || height != scene.canvasConfig.getHeight()) {
           throw new Error("Failed to merge render dump - wrong canvas size.");
         }
         scene.mergeDump(dumpFile, taskTracker);

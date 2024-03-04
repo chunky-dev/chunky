@@ -19,9 +19,8 @@ package se.llbit.chunky.entity;
 
 import java.util.Collection;
 
-import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.model.DecoratedPotModel;
+import se.llbit.chunky.model.minecraft.DecoratedPotModel;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Grid;
@@ -29,6 +28,8 @@ import se.llbit.math.Octree;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
 import se.llbit.math.primitive.Primitive;
+
+import java.util.Collection;
 
 /**
  * Represents Minecraft entities that are not stored in the octree.
@@ -45,16 +46,19 @@ abstract public class Entity {
 
   abstract public Collection<Primitive> primitives(Vector3 offset);
 
-  public Grid.EmitterPosition[] getEmitterPosition() { return new Grid.EmitterPosition[0]; }
+  public Grid.EmitterPosition[] getEmitterPosition() {
+    return new Grid.EmitterPosition[0];
+  }
 
   /**
    * Called on every entity in a scene to allow it to load it's data from other blocks in the Octree.
    *
-   * @param octree The scene's worldOctree
+   * @param octree  The scene's worldOctree
    * @param palette The scene's block palate
-   * @param origin The Octree's origin
+   * @param origin  The Octree's origin
    */
-  public void loadDataFromOctree(Octree octree, BlockPalette palette, Vector3i origin) {}
+  public void loadDataFromOctree(Octree octree, BlockPalette palette, Vector3i origin) {
+  }
 
   /**
    * Marshalls this entity to JSON.
@@ -110,6 +114,12 @@ abstract public class Entity {
         return SporeBlossom.fromJson(json);
       case "decoratedPotSpout":
         return DecoratedPotModel.DecoratedPotSpoutEntity.fromJson(json);
+      case "calibratedSculkSensorAmethyst":
+        return CalibratedSculkSensorAmethyst.fromJson(json);
+      case "hangingSign":
+        return HangingSignEntity.fromJson(json);
+      case "wallHangingSign":
+        return WallHangingSignEntity.fromJson(json);
     }
     return null;
   }

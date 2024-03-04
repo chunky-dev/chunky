@@ -123,7 +123,7 @@ public final class UpdateDialogController implements Initializable {
             case DOWNLOADED_OK:
               imageStream = getClass().getResourceAsStream("cached.png");
               break;
-            case MD5_MISMATCH:
+            case CHECKSUM_MISMATCH:
             case MISSING:
               imageStream = getClass().getResourceAsStream("refresh.png");
               break;

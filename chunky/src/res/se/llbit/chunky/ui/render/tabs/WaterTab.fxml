@@ -3,18 +3,35 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import se.llbit.chunky.ui.DoubleAdjuster?>
 
-<?import se.llbit.fx.LuxColorPicker?>
+<?import se.llbit.chunky.ui.DoubleAdjuster?>
 <?import se.llbit.chunky.ui.IntegerAdjuster?>
+<?import se.llbit.fx.LuxColorPicker?>
+
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
   <VBox prefWidth="480.0" spacing="10.0">
-    <CheckBox fx:id="stillWater" mnemonicParsing="false" text="Still water" />
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+      <Label text="Water shader:" />
+      <ChoiceBox fx:id="waterShader" />
+    </HBox>
+    <TitledPane fx:id="proceduralWaterDetailsPane" animated="false" text="Procedural water settings">
+      <VBox spacing="10.0">
+        <padding>
+          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </padding>
+        <IntegerAdjuster fx:id="proceduralWaterIterations" />
+        <DoubleAdjuster fx:id="proceduralWaterFrequency" />
+        <DoubleAdjuster fx:id="proceduralWaterAmplitude" />
+        <DoubleAdjuster fx:id="proceduralWaterAnimationSpeed" />
+      </VBox>
+    </TitledPane>
     <DoubleAdjuster fx:id="waterVisibility" />
     <DoubleAdjuster fx:id="waterOpacity" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -32,18 +49,6 @@
         <DoubleAdjuster fx:id="waterPlaneHeight" />
         <CheckBox fx:id="waterPlaneOffsetEnabled" mnemonicParsing="false" text="Lower water by minecraft offset (default)" />
         <CheckBox fx:id="waterPlaneClip" mnemonicParsing="false" text="Hide the water plane in loaded chunks" />
-      </VBox>
-    </TitledPane>
-    <CheckBox fx:id="useProceduralWater" mnemonicParsing="false" text="Procedural water" />
-    <TitledPane fx:id="proceduralWaterDetailsPane" animated="false" text="Procedural water settings">
-      <VBox spacing="10.0">
-        <padding>
-          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-        </padding>
-        <IntegerAdjuster fx:id="proceduralWaterIterations" />
-        <DoubleAdjuster fx:id="proceduralWaterFrequency" />
-        <DoubleAdjuster fx:id="proceduralWaterAmplitude" />
-        <DoubleAdjuster fx:id="proceduralWaterAnimationSpeed" />
       </VBox>
     </TitledPane>
     <padding>

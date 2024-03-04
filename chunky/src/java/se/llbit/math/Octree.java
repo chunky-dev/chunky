@@ -27,18 +27,18 @@ import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import org.apache.commons.math3.util.FastMath;
 
-import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.Block;
-import se.llbit.chunky.block.Water;
+import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.model.TexturedBlockModel;
-import se.llbit.chunky.model.WaterModel;
+import se.llbit.chunky.model.minecraft.WaterModel;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
 import se.llbit.log.Log;
-import se.llbit.util.PositionalInputStream;
-import se.llbit.util.PositionalOutputStream;
+import se.llbit.util.io.PositionalInputStream;
+import se.llbit.util.io.PositionalOutputStream;
 import se.llbit.util.TaskTracker;
 
 /**

@@ -17,7 +17,7 @@
 package se.llbit.chunky.renderer.renderdump;
 
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.util.IsolatedOutputStream;
+import se.llbit.util.io.IsolatedOutputStream;
 import se.llbit.util.TaskTracker;
 
 import java.io.DataInputStream;
@@ -69,9 +69,9 @@ public class ClassicDumpFormat extends AbstractDumpFormat {
     double r, g, b;
 
     // Warning: This format writes in column major order
-    for (int x = 0; x < scene.width; x++) {
-      for (int y = 0; y < scene.height; y++) {
-        pixelIndex = (y * scene.width + x);
+    for (int x = 0; x < scene.canvasConfig.getWidth(); x++) {
+      for (int y = 0; y < scene.canvasConfig.getHeight(); y++) {
+        pixelIndex = (y * scene.canvasConfig.getWidth() + x);
         r = inputStream.readDouble();
         g = inputStream.readDouble();
         b = inputStream.readDouble();
@@ -90,9 +90,9 @@ public class ClassicDumpFormat extends AbstractDumpFormat {
     int done = 0;
 
     // Warning: This format writes in column major order
-    for (int x = 0; x < scene.width; ++x) {
-      for (int y = 0; y < scene.height; ++y) {
-        offset = (y * scene.width + x) * 3;
+    for (int x = 0; x < scene.canvasConfig.getWidth(); ++x) {
+      for (int y = 0; y < scene.canvasConfig.getHeight(); ++y) {
+        offset = (y * scene.canvasConfig.getWidth() + x) * 3;
         outputStream.writeDouble(samples[offset + 0]);
         outputStream.writeDouble(samples[offset + 1]);
         outputStream.writeDouble(samples[offset + 2]);

@@ -17,13 +17,9 @@
  */
 package se.llbit.chunky.entity;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -35,6 +31,9 @@ import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 public class WallSignEntity extends Entity {
 
   // Distance the sign is offset from the wall (as in Minecraft).
@@ -42,87 +41,111 @@ public class WallSignEntity extends Entity {
 
   private static Quad[][] faces = {{}, {},
 
-      // Facing north
-      {
-          // North (front) face.
-          new Quad(new Vector3(1, .2, .875 + offset), new Vector3(0, .2, .875 + offset),
-              new Vector3(1, .8, .875 + offset), new Vector4(0, 1, 0, 1)),
+    // Facing north
+    {
+      // North (front) face.
+      new Quad(new Vector3(1, 4.5 / 16, .875 + offset), new Vector3(0, 4.5 / 16, .875 + offset),
+        new Vector3(1, 12.5 / 16, .875 + offset), new Vector4(2 / 64., 26 / 64., 18 / 32., 30 / 32.)),
 
-          // South (back) face.
-          new Quad(new Vector3(0, .2, 1 - offset), new Vector3(1, .2, 1 - offset),
-              new Vector3(0, .8, 1 - offset),
-              new Vector4(28 / 64., 52 / 64., 18 / 32., 30 / 32.)),
+      // South (back) face.
+      new Quad(new Vector3(0, 4.5 / 16, 1 - offset), new Vector3(1, 4.5 / 16, 1 - offset),
+        new Vector3(0, 12.5 / 16, 1 - offset),
+        new Vector4(28 / 64., 52 / 64., 18 / 32., 30 / 32.)),
 
-          // West (left) face.
-          new Quad(new Vector3(0, .2, .875 + offset), new Vector3(0, .2, 1 - offset),
-              new Vector3(0, .8, .875 + offset),
-              new Vector4(26 / 64., 28 / 64., 18 / 32., 30 / 32.)),
+      // West (left) face.
+      new Quad(new Vector3(0, 4.5 / 16, .875 + offset), new Vector3(0, 4.5 / 16, 1 - offset),
+        new Vector3(0, 12.5 / 16, .875 + offset),
+        new Vector4(26 / 64., 28 / 64., 18 / 32., 30 / 32.)),
 
-          // East (right) face.
-          new Quad(new Vector3(1, .2, 1 - offset), new Vector3(1, .2, .875 + offset),
-              new Vector3(1, .8, 1 - offset), new Vector4(0, 2 / 64., 18 / 32., 30 / 32.)),
+      // East (right) face.
+      new Quad(new Vector3(1, 4.5 / 16, 1 - offset), new Vector3(1, 4.5 / 16, .875 + offset),
+        new Vector3(1, 12.5 / 16, 1 - offset), new Vector4(0, 2 / 64., 18 / 32., 30 / 32.)),
 
-          // Top face.
-          new Quad(new Vector3(1, .8, .875 + offset), new Vector3(0, .8, .875 + offset),
-              new Vector3(1, .8, 1 - offset), new Vector4(2 / 64., 26 / 64., 30 / 32., 1)),
+      // Top face.
+      new Quad(new Vector3(1, 12.5 / 16, .875 + offset), new Vector3(0, 12.5 / 16, .875 + offset),
+        new Vector3(1, 12.5 / 16, 1 - offset), new Vector4(2 / 64., 26 / 64., 30 / 32., 1)),
 
-          // Bottom face
-          new Quad(new Vector3(0, .2, .875 + offset), new Vector3(1, .2, .875 + offset),
-              new Vector3(0, .2, 1 - offset), new Vector4(50 / 64., 26 / 64., 30 / 32., 1)),},
+      // Bottom face
+      new Quad(new Vector3(0, 4.5 / 16, .875 + offset), new Vector3(1, 4.5 / 16, .875 + offset),
+        new Vector3(0, 4.5 / 16, 1 - offset), new Vector4(50 / 64., 26 / 64., 30 / 32., 1)),},
 
-      // Facing south.
-      {},
+    // Facing south.
+    {},
 
-      // Facing west.
-      {},
+    // Facing west.
+    {},
 
-      // Facing east.
-      {},};
+    // Facing east.
+    {},};
+
+  private static Quad[] frontFaceWithText = new Quad[6];
 
   static {
     faces[5] = Model.rotateY(faces[2]);
     faces[3] = Model.rotateY(faces[5]);
     faces[4] = Model.rotateY(faces[3]);
+
+    frontFaceWithText[2] = new Quad(new Vector3(1, 4.5 / 16, .875 + offset), new Vector3(0, 4.5 / 16, .875 + offset),
+      new Vector3(1, 12.5 / 16, .875 + offset), new Vector4(0, 1, 0, 1));
+    frontFaceWithText[5] = frontFaceWithText[2].transform(Transform.NONE.rotateY());
+    frontFaceWithText[3] = frontFaceWithText[5].transform(Transform.NONE.rotateY());
+    frontFaceWithText[4] = frontFaceWithText[3].transform(Transform.NONE.rotateY());
   }
 
   private final JsonArray[] text;
+  private final SignEntity.Color dye;
+  private final boolean glowing;
   private final int orientation;
   private final SignTexture frontTexture;
   private final Texture texture;
   private final String material;
 
   public WallSignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
-    this(position, SignEntity.getTextLines(entityTag), blockData % 6, material);
+    this(position, SignEntity.getFrontTextLines(entityTag), SignEntity.getFrontDyeColor(entityTag), SignEntity.getFrontGlowing(entityTag), blockData % 6, material);
   }
 
-  public WallSignEntity(Vector3 position, JsonArray[] text, int direction, String material) {
+  public WallSignEntity(Vector3 position, JsonArray[] text, SignEntity.Color dye, boolean isGlowing, int direction, String material) {
     super(position);
     Texture signTexture = SignEntity.textureFromMaterial(material);
     this.orientation = direction;
     this.text = text;
-    this.frontTexture = new SignTexture(text, signTexture);
+    this.dye = dye;
+    this.glowing = isGlowing;
+    this.frontTexture = text != null ? new SignTexture(text, dye, isGlowing, signTexture, 24, 12, 2 / 64., 18 / 32., 26 / 64., 30 / 32., 4, 1, 10) : null;
     this.texture = signTexture;
     this.material = material;
   }
 
-  @Override public Collection<Primitive> primitives(Vector3 offset) {
+  @Override
+  public Collection<Primitive> primitives(Vector3 offset) {
     Collection<Primitive> primitives = new LinkedList<>();
     Transform transform = Transform.NONE
-        .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
+      .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     Quad[] quads = faces[orientation];
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
-      Material material = new TextureMaterial(i == 0 ? frontTexture : texture);
-      quad.addTriangles(primitives, material, transform);
+      Texture tex = texture;
+      if (i == 0 && frontTexture != null) {
+        tex = frontTexture;
+        quad = frontFaceWithText[orientation];
+      }
+      quad.addTriangles(primitives, new TextureMaterial(tex), transform);
     }
     return primitives;
   }
 
-  @Override public JsonValue toJson() {
+  @Override
+  public JsonValue toJson() {
     JsonObject json = new JsonObject();
     json.add("kind", "wallsign");
     json.add("position", position.toJson());
-    json.add("text", SignEntity.textToJson(text));
+    if (text != null) {
+      json.add("text", SignEntity.textToJson(text));
+      if (dye != null) {
+        json.add("dye", dye.name().replace("DYE_", "").toLowerCase());
+      }
+      json.add("glowing", glowing);
+    }
     json.add("direction", orientation);
     json.add("material", material);
     return json;
@@ -134,9 +157,14 @@ public class WallSignEntity extends Entity {
   public static Entity fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
-    JsonArray[] text = SignEntity.textFromJson(json.get("text"));
+    JsonArray[] text = null;
+    if (json.get("text").isArray()) {
+      text = SignEntity.textFromJson(json.get("text"));
+    }
     int direction = json.get("direction").intValue(0);
     String material = json.get("material").stringValue("oak");
-    return new WallSignEntity(position, text, direction, material);
+    SignEntity.Color dye = SignEntity.Color.getFromDyedSign(json.get("dye").stringValue(null));
+    boolean glowing = json.get("glowing").boolValue(false);
+    return new WallSignEntity(position, text, dye, glowing, direction, material);
   }
 }

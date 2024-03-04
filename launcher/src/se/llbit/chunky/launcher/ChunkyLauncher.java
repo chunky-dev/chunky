@@ -163,6 +163,10 @@ public class ChunkyLauncher {
                 System.err.println("This does not appear to be a 64-bit JVM.");
               }
               System.exit(is64Bit ? 0 : -1);
+            case "--dangerouslyDisableLibraryValidation":
+              System.out.println("Library validation is disabled.");
+              LauncherSettings.disableLibraryValidation = true;
+              break;
             default:
               if (!headlessOptions.isEmpty()) {
                 headlessOptions += " ";

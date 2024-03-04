@@ -189,7 +189,7 @@ when in doubt.
 
 ## Copyright & License
 
-Chunky is Copyright (c) 2010-2022, Jesper Öqvist <jesper@llbit.se> and [Chunky Contributors][chunky-contributors].
+Chunky is Copyright (c) 2010-2023, Jesper Öqvist <jesper@llbit.se> and [Chunky Contributors][chunky-contributors].
 
 Permission to modify and redistribute is granted under the terms of
 the GPLv3 license. See the file `LICENSE` for the full license.
@@ -210,6 +210,11 @@ Chunky uses the following 3rd party libraries:
   See the file `licenses/gson.txt` for the copyright notice.
 - **Simplex noise implementation by Stefan Gustavson and Keijiro Takahashi**  
   Released in the public domain.
+- **lz4-java by Adrien Grand and the lz4-java contributors**  
+  The library is covered by Apache License, version 2.0.
+  See the file `licenses/Apache-2.0.txt` for the full license text.
+  See the file `licenses/lz4-java.txt` for the copyright notice.
+  lz4-java uses LZ4, by Yann Collet, which is covered by the BSD 2-Clause license. See the file `licenses/lz4.txt` for the copyright notice and full license.
 
 ## Special Thanks
 

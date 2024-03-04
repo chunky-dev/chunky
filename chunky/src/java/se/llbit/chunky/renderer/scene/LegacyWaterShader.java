@@ -16,7 +16,7 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import se.llbit.chunky.model.WaterModel;
+import se.llbit.chunky.model.minecraft.WaterModel;
 import se.llbit.json.JsonObject;
 import se.llbit.math.Ray;
 
@@ -33,7 +33,6 @@ public class LegacyWaterShader implements WaterShader {
 
   @Override
   public void save(JsonObject json) {
-    json.add("waterShader", "LEGACY");
   }
 
   @Override

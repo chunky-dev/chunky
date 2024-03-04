@@ -44,7 +44,7 @@ public class Util {
     try {
       MessageDigest digest = MessageDigest.getInstance("MD5");
       try (FileInputStream in = new FileInputStream(library);
-          DigestInputStream dis = new DigestInputStream(in, digest)) {
+           DigestInputStream dis = new DigestInputStream(in, digest)) {
         byte[] buf = new byte[2048];
         int n;
         do {
@@ -56,6 +56,29 @@ public class Util {
       }
     } catch (NoSuchAlgorithmException e) {
       return "md5 compute error: " + e.getMessage();
+    }
+  }
+
+  /**
+   * @return the SHA256 hash sum of the given file, in hexadecimal format.
+   * Returns an error message if there was an error computing the checksum.
+   */
+  public static String sha256sum(File library) {
+    try {
+      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      try (FileInputStream in = new FileInputStream(library);
+           DigestInputStream dis = new DigestInputStream(in, digest)) {
+        byte[] buf = new byte[2048];
+        int n;
+        do {
+          n = dis.read(buf);
+        } while (n != -1);
+        return byteArrayToHexString(digest.digest());
+      } catch (IOException e) {
+        return "sha256 compute error: " + e.getMessage();
+      }
+    } catch (NoSuchAlgorithmException e) {
+      return "sha256 compute error: " + e.getMessage();
     }
   }
 

@@ -50,21 +50,20 @@ import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
+import se.llbit.chunky.world.Dimension;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.PlayerEntityData;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.log.Log;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector2;
-import se.llbit.math.Vector3;
+import se.llbit.math.*;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -330,8 +329,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       // If ctrlModifier to deselect, then do deselect
       // If no ctrlModifier, select chunks
       // but if they are all already selected, then deselect.
-      if (ctrlModifier || !chunkSelection.setChunks(mapLoader.getWorld(), x0, z0, x1, z1, true)) //TODO: what the..?
-        chunkSelection.setChunks(mapLoader.getWorld(), x0, z0, x1, z1, false);
+      if (ctrlModifier || !chunkSelection.setChunks(mapLoader.getWorld().currentDimension(), x0, z0, x1, z1, true)) //TODO: what the..?
+        chunkSelection.setChunks(mapLoader.getWorld().currentDimension(), x0, z0, x1, z1, false);
     }
   }
 
@@ -486,7 +485,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     int worldBlockZ = cz * Chunk.Z_MAX + bz;
     ChunkPosition cp = new ChunkPosition(cx, cz);
     if (!mouseDown) {
-      Chunk hoveredChunk = mapLoader.getWorld().getChunk(cp);
+      Chunk hoveredChunk = mapLoader.getWorld().currentDimension().getChunk(cp);
       if (!hoveredChunk.isEmpty()) {
         tooltip.setText(
             String.format("%s, %s\nBlock: [%s, %s]\n%d chunks selected", hoveredChunk.toString(), hoveredChunk.biomeAt(bx, bz), worldBlockX, worldBlockZ, chunkSelection.size()));
@@ -546,9 +545,9 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
         int cx = (int) QuickMath.floor(theView.x + (x - getWidth() / 2) / scale);
         int cz = (int) QuickMath.floor(theView.z + (y - getHeight() / 2) / scale);
         if (theView.scale >= 16) {
-          chunkSelection.toggleChunk(mapLoader.getWorld(), cx, cz);
+          chunkSelection.toggleChunk(mapLoader.getWorld().currentDimension(), cx, cz);
         } else {
-          chunkSelection.toggleRegion(mapLoader.getWorld(), cx, cz);
+          chunkSelection.toggleRegion(mapLoader.getWorld().currentDimension(), cx, cz);
         }
       }
     } else {
@@ -598,17 +597,19 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     ChunkView mapView = new ChunkView(view);  // Make thread-local copy.
     World world = mapLoader.getWorld();
     double blockScale = mapView.scale / 16.;
-    for (PlayerEntityData player : world.getPlayerPositions()) {
-      int px = (int) QuickMath.floor(player.x * blockScale);
-      int py = (int) QuickMath.floor(player.y);
-      int pz = (int) QuickMath.floor(player.z * blockScale);
-      int ppx = px - (int) QuickMath.floor(mapView.x0 * mapView.scale);
-      int ppy = pz - (int) QuickMath.floor(mapView.z0 * mapView.scale);
-      int pw = (int) QuickMath.max(16, QuickMath.min(32, blockScale * 4));
-      ppx = Math.min(mapView.width - pw, Math.max(0, ppx - pw / 2));
-      ppy = Math.min(mapView.height - pw, Math.max(0, ppy - pw / 2));
+    for (PlayerEntityData player : world.currentDimension().getPlayerPositions()) {
+      if (player.dimension == world.currentDimensionId()) {
+        int px = (int) QuickMath.floor(player.x * blockScale);
+        int py = (int) QuickMath.floor(player.y);
+        int pz = (int) QuickMath.floor(player.z * blockScale);
+        int ppx = px - (int) QuickMath.floor(mapView.x0 * mapView.scale);
+        int ppy = pz - (int) QuickMath.floor(mapView.z0 * mapView.scale);
+        int pw = (int) QuickMath.max(16, QuickMath.min(32, blockScale * 4));
+        ppx = Math.min(mapView.width - pw, Math.max(0, ppx - pw / 2));
+        ppy = Math.min(mapView.height - pw, Math.max(0, ppy - pw / 2));
 
-      gc.drawImage(Icon.player.fxImage(), ppx, ppy, pw, pw);
+        gc.drawImage(Icon.player.fxImage(), ppx, ppy, pw, pw);
+      }
     }
   }
 
@@ -616,19 +617,18 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     ChunkView mapView = new ChunkView(view);  // Make thread-local copy.
     World world = mapLoader.getWorld();
     double blockScale = mapView.scale / 16.;
-    if (!world.haveSpawnPos()) {
-      return;
-    }
-    int px = (int) QuickMath.floor(world.spawnPosX() * blockScale);
-    int py = (int) QuickMath.floor(world.spawnPosY());
-    int pz = (int) QuickMath.floor(world.spawnPosZ() * blockScale);
-    int ppx = px - (int) QuickMath.floor(mapView.x0 * mapView.scale);
-    int ppy = pz - (int) QuickMath.floor(mapView.z0 * mapView.scale);
-    int pw = (int) QuickMath.max(8, QuickMath.min(16, blockScale * 2));
-    ppx = Math.min(mapView.width - pw, Math.max(0, ppx - pw / 2));
-    ppy = Math.min(mapView.height - pw, Math.max(0, ppy - pw / 2));
+    world.currentDimension().getSpawnPosition().ifPresent(spawnPos -> {
+      int px = (int) QuickMath.floor(spawnPos.x * blockScale);
+      int py = (int) QuickMath.floor(spawnPos.y);
+      int pz = (int) QuickMath.floor(spawnPos.z * blockScale);
+      int ppx = px - (int) QuickMath.floor(mapView.x0 * mapView.scale);
+      int ppy = pz - (int) QuickMath.floor(mapView.z0 * mapView.scale);
+      int pw = (int) QuickMath.max(8, QuickMath.min(16, blockScale * 2));
+      ppx = Math.min(mapView.width - pw, Math.max(0, ppx - pw / 2));
+      ppy = Math.min(mapView.height - pw, Math.max(0, ppy - pw / 2));
 
-    gc.drawImage(Icon.home.fxImage(), ppx, ppy, pw, pw);
+      gc.drawImage(Icon.home.fxImage(), ppx, ppy, pw, pw);
+    });
   }
 
   public ChunkView getView() {
@@ -647,8 +647,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
   public void selectVisibleChunks(ChunkView cv, se.llbit.chunky.renderer.scene.Scene scene) {
     Camera camera = scene.camera();
-    int width = scene.canvasWidth();
-    int height = scene.canvasHeight();
+    int width = scene.canvasConfig.getWidth();
+    int height = scene.canvasConfig.getHeight();
 
     double halfWidth = width / (2.0 * height);
 
@@ -680,7 +680,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     norm[3].cross(corners[0], corners[3]);
     norm[3].normalize();
 
-    World world = mapLoader.getWorld();
+    Dimension currentDimension = mapLoader.getWorld().currentDimension();
     for (int x = cv.px0; x <= cv.px1; ++x) {
       for (int z = cv.pz0; z <= cv.pz1; ++z) {
         // Chunk top center position:
@@ -688,7 +688,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
         pos.sub(o);
         if (norm[0].dot(pos) > CHUNK_SELECT_RADIUS && norm[1].dot(pos) > CHUNK_SELECT_RADIUS
             && norm[2].dot(pos) > CHUNK_SELECT_RADIUS && norm[3].dot(pos) > CHUNK_SELECT_RADIUS) {
-          chunkSelection.selectChunk(world, x, z);
+          chunkSelection.selectChunk(currentDimension, x, z);
         }
       }
     }
@@ -700,8 +700,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   public static void drawViewBounds(GraphicsContext gc, ChunkView cv,
       se.llbit.chunky.renderer.scene.Scene scene) {
     Camera camera = scene.camera();
-    int width = scene.canvasWidth();
-    int height = scene.canvasHeight();
+    int width = scene.canvasConfig.getWidth();
+    int height = scene.canvasConfig.getHeight();
 
     double halfWidth = width / (2.0 * height);
 
@@ -869,7 +869,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
       if (selectionRadiusDialog.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
         chunkSelection.setChunkRadius(
-          mapLoader.getWorld(),
+          mapLoader.getWorld().currentDimension(),
           this.selectionRadiusDialog.getSelectionX(),
           this.selectionRadiusDialog.getSelectionZ(),
           this.selectionRadiusDialog.getRadius(),

@@ -29,7 +29,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.main.SceneHelper;
+import se.llbit.chunky.renderer.SceneIOProvider;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.TableSortConfigSerializer;
 import se.llbit.fxutil.Dialogs;
@@ -99,10 +99,13 @@ public class SceneChooserController implements Initializable {
         alert.setTitle("Delete Scene");
         alert.setContentText(String.format("Are you sure you want to delete the scene %s? "
             + "All files for the scene, except snapshot images, will be deleted.", scene.sceneName));
-        if (alert.showAndWait().get() == ButtonType.OK) {
-          Scene.delete(scene.sceneName, scene.sceneDirectory);
-          sceneTbl.getItems().remove(sceneTbl.getSelectionModel().getSelectedItem());
-        }
+        alert.showAndWait()
+          .ifPresent(result -> {
+              if (result == ButtonType.OK) {
+                Scene.delete(scene.sceneName, scene.sceneDirectory);
+                sceneTbl.getItems().remove(sceneTbl.getSelectionModel().getSelectedItem());
+              }
+          });
       }
     });
 
@@ -122,6 +125,7 @@ public class SceneChooserController implements Initializable {
         // an API for getting/setting the scene directory so that custom render contexts can
         // use a fixed scene directory.
         controller.getChunky().options.sceneDir = directory;
+        populateSceneTable(controller.getChunky().options.sceneDir);
       }
     });
 
@@ -216,7 +220,7 @@ public class SceneChooserController implements Initializable {
 
     loadExecutor.execute(() -> {
       List<SceneListItem> scenes = new ArrayList<>();
-      List<File> fileList = SceneHelper.getAvailableSceneFiles(sceneDir);
+      List<File> fileList = SceneIOProvider.getAvailableSceneFiles(sceneDir);
       fileList.sort(Comparator.comparing(File::length));
 
       Platform.runLater(() -> {

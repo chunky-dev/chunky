@@ -39,6 +39,7 @@ import se.llbit.fxutil.CustomizedListCellFactory;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -114,7 +115,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
 
     memoryLimit.setTooltip("Maximum Java heap space in megabytes (MiB).\n"
         + "Limited by the available memory in your computer.");
-    memoryLimit.setRange(512, 1 << 14);
+    memoryLimit.setRange(512, getUpperMemoryLimitMb());
     memoryLimit.makeLogarithmic();
     memoryLimit.set(settings.memoryLimit);
     memoryLimit.onValueChange(value -> settings.memoryLimit = value);
@@ -296,6 +297,16 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     updateChecker.start();
   }
 
+  private int getUpperMemoryLimitMb() {
+    try {
+      return (int) (((com.sun.management.OperatingSystemMXBean) ManagementFactory
+        .getOperatingSystemMXBean()).getTotalPhysicalMemorySize() / 1024 / 1024);
+    } catch (Exception e) {
+      // fallback for JDKs that don't have com.sun.management.OperatingSystemMXBean
+      return 1 << 14; // 16 GiB
+    }
+  }
+
   /**
    * Updates the launcher settings when opening the main launcher window.
    *
@@ -437,6 +448,12 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
 
     // Resolve specific version.
     VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
+    if (version == VersionInfo.NONE) {
+      setBusy(true);
+      UpdateChecker updateThread = new UpdateChecker(settings, settings.selectedChannel, this);
+      updateThread.start();
+      return;
+    }
     if (!ChunkyDeployer.canLaunch(version, this, true)) {
       return;
     }
