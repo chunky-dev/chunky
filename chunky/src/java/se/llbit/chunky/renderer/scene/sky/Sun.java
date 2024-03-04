@@ -62,6 +62,36 @@ public class Sun implements JsonSerializable {
    */
   public static final double MAX_APPARENT_BRIGHTNESS = 50;
 
+  /**
+   * Default probability for importance sun sampling
+   */
+  public static final double DEFAULT_IMPORTANCE_SAMPLE_CHANCE = 0.1;
+
+  /**
+   * Minimum probability for importance sun sampling
+   */
+  public static final double MIN_IMPORTANCE_SAMPLE_CHANCE = 0.001;
+
+  /**
+   * Maximum probability for importance sun sampling
+   */
+  public static final double MAX_IMPORTANCE_SAMPLE_CHANCE = 0.9;
+
+  /**
+   * Default radius (relative to sun) for importance sun sampling
+   */
+  public static final double DEFAULT_IMPORTANCE_SAMPLE_RADIUS = 1.2;
+
+  /**
+   * Minimum radius (relative to sun) for importance sun sampling
+   */
+  public static final double MIN_IMPORTANCE_SAMPLE_RADIUS = 0.1;
+
+  /**
+   * Maximum radius (relative to sun) for importance sun sampling
+   */
+  public static final double MAX_IMPORTANCE_SAMPLE_RADIUS = 5;
+
   private static final double xZenithChroma[][] =
       {{0.00166, -0.00375, 0.00209, 0}, {-0.02903, 0.06377, -0.03203, 0.00394},
           {0.11693, -0.21196, 0.06052, 0.25886},};
@@ -138,6 +168,9 @@ public class Sun implements JsonSerializable {
   private Vector3 apparentTextureBrightness = new Vector3(1, 1, 1);
   private boolean enableTextureModification = false;
 
+  private double importanceSampleChance = DEFAULT_IMPORTANCE_SAMPLE_CHANCE;
+  private double importanceSampleRadius = DEFAULT_IMPORTANCE_SAMPLE_RADIUS;
+
   private double azimuth = Math.PI / 2.5;
   private double altitude = Math.PI / 3;
 
@@ -203,6 +236,8 @@ public class Sun implements JsonSerializable {
     radius = other.radius;
     enableTextureModification = other.enableTextureModification;
     luminosityPdf = other.luminosityPdf;
+    importanceSampleRadius = other.importanceSampleRadius;
+    importanceSampleChance = other.importanceSampleChance;
     initSun();
   }
 
@@ -305,7 +340,7 @@ public class Sun implements JsonSerializable {
   }
 
   /**
-   * Used with <code>SSS: OFF</code> and <code>SSS: HIGH_QUALITY</code>.
+   * Used with <code>SSS: OFF</code>, <code>SSS: IMPORTANCE</code>, and <code>SSS: HIGH_QUALITY</code>.
    */
   public boolean intersectDiffuse(Ray ray) {
     if (ray.d.dot(sw) < .5) {
@@ -476,6 +511,10 @@ public class Sun implements JsonSerializable {
     apparentColorObj.add("green", apparentColor.y);
     apparentColorObj.add("blue", apparentColor.z);
     sun.add("apparentColor", apparentColorObj);
+    JsonObject importanceSamplingObj = new JsonObject();
+    importanceSamplingObj.add("chance", importanceSampleChance);
+    importanceSamplingObj.add("radius", importanceSampleRadius);
+    sun.add("importanceSampling", importanceSamplingObj);
     sun.add("drawTexture", drawTexture);
     return sun;
   }
@@ -501,6 +540,12 @@ public class Sun implements JsonSerializable {
       apparentColor.x = apparentColorObj.get("red").doubleValue(1);
       apparentColor.y = apparentColorObj.get("green").doubleValue(1);
       apparentColor.z = apparentColorObj.get("blue").doubleValue(1);
+    }
+
+    if(json.get("importanceSampling").isObject()) {
+      JsonObject importanceSamplingObj = json.get("importanceSampling").object();
+      importanceSampleChance = importanceSamplingObj.get("chance").doubleValue(DEFAULT_IMPORTANCE_SAMPLE_CHANCE);
+      importanceSampleRadius = importanceSamplingObj.get("radius").doubleValue(DEFAULT_IMPORTANCE_SAMPLE_RADIUS);
     }
 
     drawTexture = json.get("drawTexture").boolValue(drawTexture);
@@ -532,5 +577,19 @@ public class Sun implements JsonSerializable {
 
   public boolean drawTexture() {
     return drawTexture;
+  }
+
+  public double getImportanceSampleChance() { return importanceSampleChance; }
+
+  public void setImportanceSampleChance(double d) {
+    importanceSampleChance = d;
+    scene.refresh();
+  }
+
+  public double getImportanceSampleRadius() { return importanceSampleRadius; }
+
+  public void setImportanceSampleRadius(double d) {
+    importanceSampleRadius = d;
+    scene.refresh();
   }
 }

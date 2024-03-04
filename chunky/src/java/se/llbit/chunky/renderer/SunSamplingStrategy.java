@@ -19,57 +19,72 @@ package se.llbit.chunky.renderer;
 import se.llbit.util.Registerable;
 
 public enum SunSamplingStrategy implements Registerable {
-    OFF("Off", "Sun is not sampled with next event estimation.", false, true, false, true),
-    NON_LUMINOUS("Non-Luminous", "Sun is drawn on the skybox but it does not contribute to the lighting of the scene.", false, false, false, false),
-    FAST("Fast", "Fast sun sampling algorithm. Lower noise but does not correctly model some visual effects.", true, false, false, false),
-    HIGH_QUALITY("High Quality", "High quality sun sampling. More noise but correctly models visual effects such as caustics.", true, true, true, true);
+  OFF("Off", "Sun is not sampled with next event estimation.", false, true, false, true, false),
+  NON_LUMINOUS("Non-Luminous", "Sun is drawn on the skybox but it does not contribute to the lighting of the scene.", false, false, false, false, false),
+  FAST("Fast", "Fast sun sampling algorithm. Lower noise but does not correctly model some visual effects.", true, false, false, false, false),
+  IMPORTANCE("Importance", "Sun is sampled on a certain percentage of diffuse reflections. Correctly models visual effects while reducing noise for direct and diffuse illumination.", false, true, false, true, true),
+  HIGH_QUALITY("High Quality", "High quality sun sampling. More noise but correctly models visual effects such as caustics.", true, true, true, true, false);
 
-    private final String displayName;
-    private final String description;
+  private final String displayName;
+  private final String description;
 
-    private final boolean sunSampling;
-    private final boolean diffuseSun;
-    private final boolean strictDirectLight;
-    private final boolean sunLuminosity;
+  private final boolean sunSampling;
+  private final boolean diffuseSun;
+  private final boolean strictDirectLight;
+  private final boolean sunLuminosity;
+  private final boolean importanceSampling;
 
-    SunSamplingStrategy(String displayName, String description, boolean sunSampling, boolean diffuseSun, boolean strictDirectLight, boolean sunLuminosity) {
-        this.displayName = displayName;
-        this.description = description;
+  SunSamplingStrategy(String displayName, String description, boolean sunSampling, boolean diffuseSun, boolean strictDirectLight, boolean sunLuminosity, boolean importanceSampling) {
+    this.displayName = displayName;
+    this.description = description;
 
-        this.sunSampling = sunSampling;
-        this.diffuseSun = diffuseSun;
-        this.strictDirectLight = strictDirectLight;
-        this.sunLuminosity = sunLuminosity;
+    this.sunSampling = sunSampling;
+    this.diffuseSun = diffuseSun;
+    this.strictDirectLight = strictDirectLight;
+    this.sunLuminosity = sunLuminosity;
+    this.importanceSampling = importanceSampling;
+  }
+
+  @Override
+  public String getName() {
+    return this.displayName;
+  }
+
+  @Override
+  public String getDescription() {
+    return this.description;
+  }
+
+  @Override
+  public String getId() {
+    return this.name();
+  }
+
+  public boolean doSunSampling() {
+    return sunSampling;
+  }
+
+  public boolean isDiffuseSun() {
+    return diffuseSun;
+  }
+
+  public boolean isStrictDirectLight() {
+    return strictDirectLight;
+  }
+
+  public boolean isSunLuminosity() {
+    return sunLuminosity;
+  }
+
+  public boolean isImportanceSampling() {
+    return importanceSampling;
+  }
+
+  @Override
+  public DeprecationStatus getDeprecationStatus() {
+    if (this == HIGH_QUALITY) {
+      return DeprecationStatus.HIDDEN;
     }
-
-    @Override
-    public String getName() {
-        return this.displayName;
-    }
-
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public String getId() {
-        return this.name();
-    }
-
-    public boolean doSunSampling() {
-        return sunSampling;
-    }
-
-    public boolean isDiffuseSun() {
-        return diffuseSun;
-    }
-
-    public boolean isStrictDirectLight() {
-        return strictDirectLight;
-    }
-
-    public boolean isSunLuminosity() {
-        return sunLuminosity;
-    }
+    return DeprecationStatus.ACTIVE;
+  }
 }

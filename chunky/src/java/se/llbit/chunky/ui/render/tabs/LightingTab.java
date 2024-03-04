@@ -39,6 +39,7 @@ import se.llbit.fx.LuxColorPicker;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
+import se.llbit.util.Registerable;
 
 import java.io.IOException;
 import java.net.URL;
@@ -55,6 +56,9 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster sunIntensity;
   @FXML private CheckBox drawSun;
   @FXML private ComboBox<SunSamplingStrategy> sunSamplingStrategy;
+  @FXML private TitledPane importanceSamplingDetailsPane;
+  @FXML private DoubleAdjuster importanceSampleChance;
+  @FXML private DoubleAdjuster importanceSampleRadius;
   @FXML private DoubleAdjuster sunLuminosity;
   @FXML private DoubleAdjuster apparentSunBrightness;
   @FXML private DoubleAdjuster sunRadius;
@@ -132,10 +136,38 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     drawSun.selectedProperty().addListener((observable, oldValue, newValue) -> scene.sun().setDrawTexture(newValue));
     drawSun.setTooltip(new Tooltip("Draws the sun texture on top of the skymap."));
 
-    sunSamplingStrategy.getItems().addAll(SunSamplingStrategy.values());
+    for (SunSamplingStrategy strategy : SunSamplingStrategy.values()) {
+      if (strategy.getDeprecationStatus() != Registerable.DeprecationStatus.HIDDEN) {
+        sunSamplingStrategy.getItems().add(strategy);
+      }
+    }
     sunSamplingStrategy.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, newValue) -> scene.setSunSamplingStrategy(newValue));
+            (observable, oldValue, newValue) -> {
+              scene.setSunSamplingStrategy(newValue);
+
+              boolean visible = scene != null && scene.getSunSamplingStrategy().isImportanceSampling();
+              importanceSamplingDetailsPane.setVisible(visible);
+              importanceSamplingDetailsPane.setExpanded(visible);
+              importanceSamplingDetailsPane.setManaged(visible);
+            });
     sunSamplingStrategy.setTooltip(new Tooltip("Determines how the sun is sampled at each bounce."));
+
+    boolean visible = scene != null && scene.getSunSamplingStrategy().isImportanceSampling();
+    importanceSamplingDetailsPane.setVisible(visible);
+    importanceSamplingDetailsPane.setExpanded(visible);
+    importanceSamplingDetailsPane.setManaged(visible);
+
+    importanceSampleChance.setName("Importance sample chance");
+    importanceSampleChance.setTooltip("Probability of sampling the sun on each importance bounce");
+    importanceSampleChance.setRange(Sun.MIN_IMPORTANCE_SAMPLE_CHANCE, Sun.MAX_IMPORTANCE_SAMPLE_CHANCE);
+    importanceSampleChance.clampBoth();
+    importanceSampleChance.onValueChange(value -> scene.sun().setImportanceSampleChance(value));
+
+    importanceSampleRadius.setName("Importance sample radius");
+    importanceSampleRadius.setTooltip("Radius of possible sun sampling bounces (relative to the sun's radius)");
+    importanceSampleRadius.setRange(Sun.MIN_IMPORTANCE_SAMPLE_RADIUS, Sun.MAX_IMPORTANCE_SAMPLE_RADIUS);
+    importanceSampleRadius.clampMin();
+    importanceSampleRadius.onValueChange(value -> scene.sun().setImportanceSampleRadius(value));
 
     sunIntensity.setName("Sunlight intensity");
     sunIntensity.setTooltip("Changes the intensity of sunlight. Only used when Sun Sampling Strategy is set to FAST or HIGH_QUALITY.");
@@ -203,6 +235,8 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunAltitude.set(QuickMath.radToDeg(scene.sun().getAltitude()));
     enableEmitters.setSelected(scene.getEmittersEnabled());
     sunSamplingStrategy.getSelectionModel().select(scene.getSunSamplingStrategy());
+    importanceSampleChance.set(scene.sun().getImportanceSampleChance());
+    importanceSampleRadius.set(scene.sun().getImportanceSampleRadius());
     drawSun.setSelected(scene.sun().drawTexture());
     sunColor.colorProperty().removeListener(sunColorListener);
     sunColor.setColor(ColorUtil.toFx(scene.sun().getColor()));
