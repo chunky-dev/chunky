@@ -1033,7 +1033,8 @@ public class Scene implements JsonSerializable, Refreshable {
                     }
                   }
 
-                  if(block.isWaterFilled()) {
+                  // check if block is water filled, but exclude waterlogged air blocks. This is a temporary fix for #1692
+                  if(block.isWaterFilled() && !(block instanceof Air)) {
                     int waterNode = palette.waterId;
                     if(y + 1 < yMax) {
                       if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)).isWaterFilled()) {
