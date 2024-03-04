@@ -17,7 +17,6 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
@@ -228,6 +227,16 @@ public class PathTracer implements RayTracer {
     Vector3 emittance = new Vector3();
     Vector4 indirectEmitterColor = new Vector4(0, 0, 0, 0);
 
+    float pTransmit = currentMat.additionalTransmission;
+
+    boolean transmitBack = pTransmit > Ray.EPSILON && random.nextFloat() < pTransmit;
+
+    double eventProb = (transmitBack ? pTransmit: 1- pTransmit ) + Ray.EPSILON;
+
+    if (transmitBack) {
+      ray.invertNormal();
+    }
+
     if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance > Ray.EPSILON) {
 
       // Quadratic emittance mapping, so a pixel that's 50% darker will emit only 25% as much light
@@ -267,8 +276,8 @@ public class PathTracer implements RayTracer {
       double directLightB = 0;
 
       boolean frontLight = next.d.dot(ray.getNormal()) > 0;
-
-      if (frontLight || (currentMat.subSurfaceScattering
+      //check if normal faces the sun direction, if so do sampling
+      if (frontLight || (false
         && random.nextFloat() < Scene.fSubSurface)) {
 
         if (!frontLight) {
@@ -289,7 +298,7 @@ public class PathTracer implements RayTracer {
         }
       }
 
-      next.diffuseReflection(ray, random);
+      next.diffuseLobes(ray, random, transmitBack);
       hit = pathTrace(scene, next, state, false) || hit;
       if (hit) {
         Vector3 sunEmittance = scene.sun().getEmittance();
@@ -304,7 +313,7 @@ public class PathTracer implements RayTracer {
       }
 
     } else {
-      next.diffuseReflection(ray, random);
+      next.diffuseLobes(ray, random, transmitBack);
 
       hit = pathTrace(scene, next, state, false) || hit;
       if (hit) {
@@ -317,6 +326,10 @@ public class PathTracer implements RayTracer {
         cumulativeColor.y += ray.color.y * indirectEmitterColor.y;
         cumulativeColor.z += ray.color.z * indirectEmitterColor.z;
       }
+    }
+    //fix the normal if inverted for use in other things
+    if (transmitBack) {
+      ray.invertNormal();
     }
     return hit;
   }
@@ -362,31 +375,7 @@ public class PathTracer implements RayTracer {
         }
       } else {
         if (doRefraction) {
-
-          double t2 = FastMath.sqrt(radicand);
-          Vector3 n = ray.getNormal();
-          if (cosTheta > 0) {
-            next.d.x = n1n2 * ray.d.x + (n1n2 * cosTheta - t2) * n.x;
-            next.d.y = n1n2 * ray.d.y + (n1n2 * cosTheta - t2) * n.y;
-            next.d.z = n1n2 * ray.d.z + (n1n2 * cosTheta - t2) * n.z;
-          } else {
-            next.d.x = n1n2 * ray.d.x - (-n1n2 * cosTheta - t2) * n.x;
-            next.d.y = n1n2 * ray.d.y - (-n1n2 * cosTheta - t2) * n.y;
-            next.d.z = n1n2 * ray.d.z - (-n1n2 * cosTheta - t2) * n.z;
-          }
-
-          next.d.normalize();
-
-          // See Ray.specularReflection for information on why this is needed
-          // This is the same thing but for refraction instead of reflection
-          // so this time we want the signs of the dot product to be the same
-          if (QuickMath.signum(next.getGeometryNormal().dot(next.d)) != QuickMath.signum(next.getGeometryNormal().dot(ray.d))) {
-            double factor = QuickMath.signum(next.getGeometryNormal().dot(ray.d)) * -Ray.EPSILON - next.d.dot(next.getGeometryNormal());
-            next.d.scaleAdd(factor, next.getGeometryNormal());
-            next.d.normalize();
-          }
-
-          next.o.scaleAdd(Ray.OFFSET, next.d);
+          next.specularRefraction(ray, random, radicand, n1n2, cosTheta);
         }
 
         if (pathTrace(scene, next, state, false)) {
@@ -557,12 +546,14 @@ public class PathTracer implements RayTracer {
     attenuation.y = 1;
     attenuation.z = 1;
     attenuation.w = 1;
-    while (attenuation.w > 0) {
+    while (attenuation.w > Ray.EPSILON) {
       ray.o.scaleAdd(Ray.OFFSET, ray.d);
       if (!PreviewRayTracer.nextIntersection(scene, ray)) {
         break;
       }
-      double mult = 1 - ray.color.w;
+      Material mat = ray.getCurrentMaterial();
+      double pDiffuse = scene.fancierTranslucency ? 1 - Math.sqrt(1 - ray.color.w) : ray.color.w;
+      double mult = 1 - pDiffuse*(1 -Math.pow(mat.additionalTransmission, 1));
       attenuation.x *= ray.color.x * ray.color.w + mult;
       attenuation.y *= ray.color.y * ray.color.w + mult;
       attenuation.z *= ray.color.z * ray.color.w + mult;

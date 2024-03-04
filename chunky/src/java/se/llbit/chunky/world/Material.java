@@ -67,6 +67,12 @@ public abstract class Material {
   public float roughness = 0f;
 
   /**
+   * The (linear) roughness controlling how blurry a refraction/transmission though a block is. A value of 0 makes the
+   * effect perfectly specular, a value of 1 makes it diffuse.
+   */
+  public float transmissionRoughness = 0f;
+
+  /**
    * The metalness value controls how metal-y a block appears. In reality this is a boolean value
    * but in practice usually a float is used in PBR to allow adding dirt or scratches on metals
    * without increasing the texture resolution.
@@ -76,9 +82,11 @@ public abstract class Material {
   public float metalness = 0;
 
   /**
-   * Subsurface scattering property.
+   * Additional amount of transmission to do for a given mat, for opaque materials this provides a first order
+   * approximation to subsurface scattering
+   * #TODO: figure out if to take a chunk of outgoing energy or use up left over energy
    */
-  public boolean subSurfaceScattering = false;
+  public float additionalTransmission = 0f;
 
   /**
    * Base texture.
@@ -104,7 +112,8 @@ public abstract class Material {
     specular = 0;
     emittance = 0;
     roughness = 0;
-    subSurfaceScattering = false;
+    transmissionRoughness = 0;
+    additionalTransmission = 0f;
   }
 
   public void getColor(Ray ray) {
@@ -125,6 +134,8 @@ public abstract class Material {
     emittance = json.get("emittance").floatValue(emittance);
     roughness = json.get("roughness").floatValue(roughness);
     metalness = json.get("metalness").floatValue(metalness);
+    transmissionRoughness = json.get("transmissionRoughness").floatValue(transmissionRoughness);
+    additionalTransmission  = json.get("additionalTransmission").floatValue(additionalTransmission);
   }
 
   public boolean isWater() {
@@ -145,5 +156,13 @@ public abstract class Material {
 
   public void setPerceptualSmoothness(double perceptualSmoothness) {
     roughness = (float) Math.pow(1 - perceptualSmoothness, 2);
+  }
+
+  public double getPerceptualTransmissionSmoothness() {
+    return 1 - Math.sqrt(transmissionRoughness);
+  }
+
+  public void setPerceptualTransmissionSmoothness(double perceptualSmoothness) {
+    transmissionRoughness = (float) Math.pow(1 - perceptualSmoothness, 2);
   }
 }
