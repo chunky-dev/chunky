@@ -66,7 +66,7 @@ public class PfmFileWriter implements AutoCloseable {
     out.write(0x0a);
 
     // Declare Image Size
-    out.write((scene.canvasWidth()+" "+scene.canvasHeight()).getBytes(StandardCharsets.US_ASCII));
+    out.write((scene.canvasConfig.getWidth()+" "+scene.canvasConfig.getHeight()).getBytes(StandardCharsets.US_ASCII));
     out.write(0x0a);
 
     // Declare Byte Order
@@ -75,8 +75,8 @@ public class PfmFileWriter implements AutoCloseable {
   }
 
   private void writePixelData(Scene scene, ByteOrder byteOrder, TaskTracker.Task task) throws IOException {
-    int width = scene.canvasWidth();
-    int height = scene.canvasHeight();
+    int width = scene.canvasConfig.getWidth();
+    int height = scene.canvasConfig.getHeight();
 
     double[] sampleBuffer = scene.getSampleBuffer();
 

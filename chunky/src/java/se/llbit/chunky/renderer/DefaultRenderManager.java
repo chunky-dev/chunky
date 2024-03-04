@@ -379,9 +379,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
    * @return the current rendering speed in samples per second (SPS)
    */
   private int samplesPerSecond() {
-    int canvasWidth = bufferedScene.canvasWidth();
-    int canvasHeight = bufferedScene.canvasHeight();
-    long pixelsPerFrame = (long) canvasWidth * canvasHeight;
+    long pixelsPerFrame = bufferedScene.canvasConfig.getPixelCount();
     double renderTime = bufferedScene.renderTime / 1000.0;
     return (int) ((bufferedScene.spp * pixelsPerFrame) / renderTime);
   }
@@ -423,19 +421,21 @@ public class DefaultRenderManager extends Thread implements RenderManager {
       if (filter instanceof PixelPostProcessingFilter) {
         PixelPostProcessingFilter pixelFilter = (PixelPostProcessingFilter) filter;
 
-        int width = bufferedScene.width;
-        int height = bufferedScene.height;
+        int width = bufferedScene.canvasConfig.getWidth();
+        int height = bufferedScene.canvasConfig.getHeight();
+        int totalPixelCount = bufferedScene.canvasConfig.getPixelCount();
+
         double[] sampleBuffer = bufferedScene.getSampleBuffer();
         double exposure = bufferedScene.getExposure();
 
         // Split up to 10 tasks per thread
         int tasksPerThread = 10;
-        int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.threads * tasksPerThread - 1);
+        int pixelsPerTask = (totalPixelCount / (pool.threads * tasksPerThread - 1));
         ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(pool.threads * tasksPerThread);
 
-        for (int i = 0; i < bufferedScene.width * bufferedScene.height; i += pixelsPerTask) {
+        for (int i = 0; i < totalPixelCount; i += pixelsPerTask) {
           int start = i;
-          int end = Math.min(bufferedScene.width * bufferedScene.height, i + pixelsPerTask);
+          int end = Math.min(totalPixelCount, i + pixelsPerTask);
           jobs.add(pool.submit(worker -> {
             double[] pixelbuffer = new double[3];
 
@@ -572,7 +572,8 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   @Override
   public void withSampleBufferProtected(SampleBufferConsumer consumer) {
     synchronized (bufferedScene) {
-      consumer.accept(bufferedScene.getSampleBuffer(), bufferedScene.width, bufferedScene.height);
+      consumer.accept(bufferedScene.getSampleBuffer(),
+        bufferedScene.canvasConfig.getWidth(), bufferedScene.canvasConfig.getHeight());
     }
   }
 

@@ -51,12 +51,14 @@ public class PngExportFormat implements PictureExportFormat {
   public void write(OutputStream out, Scene scene, TaskTracker taskTracker) throws IOException {
     try (TaskTracker.Task task = taskTracker.task("Writing PNG");
         PngFileWriter writer = new PngFileWriter(out)) {
+      int width = scene.canvasConfig.getWidth();
+      int height = scene.canvasConfig.getHeight();
       BitmapImage backBuffer = scene.getBackBuffer();
       AlphaBuffer alpha = scene.getAlphaBuffer();
       if (alpha.getType() == getTransparencyType()) {
-        writer.write(backBuffer.data, alpha.getBuffer(), scene.canvasWidth(), scene.canvasHeight(), task);
+        writer.write(backBuffer.data, alpha.getBuffer(), width, height, task);
       } else {
-        writer.write(backBuffer.data, scene.canvasWidth(), scene.canvasHeight(), task);
+        writer.write(backBuffer.data, width, height, task);
       }
       if (scene.camera().getProjectionMode() == ProjectionMode.PANORAMIC
           && scene.camera().getFov() >= 179
@@ -86,10 +88,10 @@ public class PngExportFormat implements PictureExportFormat {
       "XML:com.adobe.xmp",
       String.format(
         PNG_PANORAMA_META_ADOBE_RDF_XML,
-        scene.canvasHeight(),
-        scene.canvasWidth(),
-        scene.canvasHeight(),
-        scene.canvasWidth()
+        scene.canvasConfig.getHeight(),
+        scene.canvasConfig.getWidth(),
+        scene.canvasConfig.getHeight(),
+        scene.canvasConfig.getWidth()
       )
     ));
   }

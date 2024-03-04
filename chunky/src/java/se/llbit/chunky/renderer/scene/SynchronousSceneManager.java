@@ -344,7 +344,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   protected void mergeDump(File dumpFile) {
     synchronized (scene) {
       renderManager.withSampleBufferProtected((samples, width, height) -> {
-        if (width != scene.width || height != scene.height) {
+        if (width != scene.canvasConfig.getWidth() || height != scene.canvasConfig.getHeight()) {
           throw new Error("Failed to merge render dump - wrong canvas size.");
         }
         scene.mergeDump(dumpFile, taskTracker);

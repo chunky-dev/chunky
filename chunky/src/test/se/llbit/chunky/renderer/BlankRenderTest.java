@@ -21,6 +21,7 @@ import org.junit.Test;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ChunkyOptions;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.scene.CanvasConfig;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.sky.Sky;
 import se.llbit.json.JsonObject;
@@ -40,8 +41,8 @@ import static org.junit.Assert.fail;
  * only two samples per pixel.
  */
 public class BlankRenderTest {
-  private static final int WIDTH = Math.max(10, Scene.MIN_CANVAS_WIDTH);
-  private static final int HEIGHT = Math.max(10, Scene.MIN_CANVAS_HEIGHT);
+  private static final int WIDTH = Math.max(10, CanvasConfig.MIN_CANVAS_WIDTH);
+  private static final int HEIGHT = Math.max(10, CanvasConfig.MIN_CANVAS_HEIGHT);
 
   /**
    * Renders one sample per pixel and checks that the color values are

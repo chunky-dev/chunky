@@ -91,8 +91,8 @@ public class TiffFileWriter implements AutoCloseable {
     Scene scene,
     TaskTracker.Task task
   ) throws IOException {
-    int width = scene.canvasWidth();
-    int height = scene.canvasHeight();
+    int width = scene.canvasConfig.getWidth();
+    int height = scene.canvasConfig.getHeight();
 
     BasicIFD idf = new BasicIFD(width, height, compressionType);
 

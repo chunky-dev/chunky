@@ -72,19 +72,21 @@ public class AlphaBuffer {
 
     try (TaskTracker.Task task = taskTracker.task("Computing alpha channel")) {
       this.type = type;
-      buffer = ByteBuffer.allocate(scene.width * scene.height * type.byteSize);
+      int width = scene.canvasConfig.getWidth();
+      int height = scene.canvasConfig.getHeight();
+      buffer = ByteBuffer.allocate(scene.canvasConfig.getPixelCount() * type.byteSize);
 
       AtomicInteger done = new AtomicInteger(0);
       Chunky.getCommonThreads().submit(() -> {
-        IntStream.range(0, scene.width).parallel().forEach(x -> {
+        IntStream.range(0, width).parallel().forEach(x -> {
           WorkerState state = new WorkerState();
           state.ray = new Ray();
 
-          for (int y = 0; y < scene.height; y++) {
-            computeAlpha(scene, x, y, state);
+          for (int y = 0; y < height; y++) {
+            computeAlpha(scene, x, y, width, height, state);
           }
 
-          task.update(scene.width, done.incrementAndGet());
+          task.update(width, done.incrementAndGet());
         });
       }).get();
     } catch (InterruptedException | ExecutionException e) {
@@ -95,10 +97,10 @@ public class AlphaBuffer {
   /**
    * Compute the alpha channel based on sky visibility.
    */
-  public void computeAlpha(Scene scene, int x, int y, WorkerState state) {
+  public void computeAlpha(Scene scene, int x, int y, int width, int height, WorkerState state) {
     Ray ray = state.ray;
-    double halfWidth = scene.width / (2.0 * scene.height);
-    double invHeight = 1.0 / scene.height;
+    double halfWidth = width / (2.0 * height);
+    double invHeight = 1.0 / height;
 
     // Rotated grid supersampling.
     double[][] offsets = new double[][]{
@@ -124,6 +126,6 @@ public class AlphaBuffer {
     }
     occlusion /= 4.0;
 
-    type.writer.write(buffer, y * scene.width + x, occlusion);
+    type.writer.write(buffer, y * width + x, occlusion);
   }
 }

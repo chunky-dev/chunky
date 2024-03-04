@@ -334,7 +334,7 @@ public class ChunkyFxController
       CountDownLatch guiUpdateLatch = new CountDownLatch(1);
       Platform.runLater(() -> {
         synchronized (scene) {
-          canvas.setCanvasSize(scene.width, scene.height);
+          canvas.setCanvasSize(scene.canvasConfig.getWidth(), scene.canvasConfig.getHeight());
         }
         updateTitle();
         refreshSettings();

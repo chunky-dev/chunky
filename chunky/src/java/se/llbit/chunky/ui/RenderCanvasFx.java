@@ -98,9 +98,9 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
     canvas = new Canvas();
     synchronized (scene) {
-      canvas.setWidth(scene.width);
-      canvas.setHeight(scene.height);
-      image = new WritableImage(scene.width, scene.height);
+      canvas.setWidth(scene.canvasConfig.getWidth());
+      canvas.setHeight(scene.canvasConfig.getHeight());
+      image = new WritableImage(scene.canvasConfig.getWidth(), scene.canvasConfig.getHeight());
     }
 
     canvasPane = new StackPane(canvas);
