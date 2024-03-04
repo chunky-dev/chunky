@@ -25,7 +25,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew build -x docs -x distTar -x distZip
     - name: Build release jar
       env:
         PR_NUMBER: ${{ github.event.pull_request.number }}
