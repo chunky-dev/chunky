@@ -55,6 +55,10 @@ public class ChunkPosition {
     return new ChunkPosition(x >> 5, z >> 5);
   }
 
+  public ChunkPosition chunkPositionFromRegion(int localX, int localZ) {
+    return new ChunkPosition((this.x << 5) | (localX & 0x1f), (this.z << 5) | (localZ & 0x1f));
+  }
+
   /**
    * @return The packed {@code long} chunk position for the x and z
    */
