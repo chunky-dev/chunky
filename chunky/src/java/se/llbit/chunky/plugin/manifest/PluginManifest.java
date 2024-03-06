@@ -39,6 +39,12 @@ public class PluginManifest {
     this.dependencies = dependencies;
   }
 
+  /**
+   * Parse a json object into a PluginManifest if possible
+   * @param manifest The manifest json data
+   * @param pluginJar The plugin jar to associate with the manifest
+   * @return The PluginManifest if it could be created.
+   */
   public static Optional<PluginManifest> parse(JsonObject manifest, File pluginJar) {
     String name = manifest.get("name").stringValue("");
     String author = manifest.get("author").stringValue("");
@@ -74,14 +80,14 @@ public class PluginManifest {
     for (JsonMember dependency : manifest.get("dependencies").asObject()) {
       String dependencyVersion = dependency.getValue().stringValue("");
       if (dependency.name.isEmpty() || dependencyVersion.isEmpty()) {
-        Log.errorf("Plugin %s has no invalid dependency specified %s: %s.", name, dependency.name, dependency.value);
+        Log.errorf("Plugin %s has an invalid dependency specified %s: %s.", name, dependency.name, dependency.value);
         return Optional.empty();
       }
       try {
         dependencies.add(new PluginDependency(dependency.name, VersionRange.createFromVersionSpec(dependencyVersion)));
       } catch (InvalidVersionSpecificationException exception) {
         Log.error(
-          String.format("Could not parse plugin %s dependency version spec %s.", name, dependencyVersion),
+          String.format("Could not parse plugin %s dependency version range %s.", name, dependencyVersion),
           exception
         );
         return Optional.empty();
