@@ -18,7 +18,7 @@ public class ResolvedPlugin {
    * @param pluginsByName All plugins to be loaded
    */
   public void resolveDependencies(Map<String, List<ResolvedPlugin>> pluginsByName) {
-    // Adds any plugin as a dependency if it matches a dependency's name and version.
+    // Adds any plugin as a resolved dependency if it matches an unresolved dependency's name and version.
     this.manifest.getDependencies().forEach(unresolvedDep -> {
       List<ResolvedPlugin> resolvedDeps = pluginsByName.get(unresolvedDep.name);
       boolean resolved = false;
