@@ -812,12 +812,12 @@ public class Scene implements JsonSerializable, Refreshable {
         emitterGrid = new Grid(gridSize);
 
       // Parse the regions first - force chunk lists to be populated!
-      Set<ChunkPosition> regions = new HashSet<>();
+      Set<RegionPosition> regions = new HashSet<>();
       for (ChunkPosition cp : chunksToLoad) {
-        regions.add(cp.getRegionPosition());
+        regions.add(cp.asRegionPosition());
       }
 
-      for (ChunkPosition region : regions) {
+      for (RegionPosition region : regions) {
         dimension.getRegion(region).parse(yMin, yMax);
       }
     }
