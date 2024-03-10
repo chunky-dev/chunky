@@ -45,7 +45,6 @@ import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleTextField;
-import se.llbit.chunky.ui.dialogs.DialogUtils;
 import se.llbit.chunky.ui.dialogs.ValidatingTextInputDialog;
 import se.llbit.chunky.ui.elements.AngleAdjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
@@ -55,6 +54,7 @@ import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.material.BeaconBeamMaterial;
 import se.llbit.fx.LuxColorPicker;
+import se.llbit.fxutil.Dialogs;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -239,7 +239,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
           playerIdentifierInput.setTitle("Input player identifier");
           playerIdentifierInput.setHeaderText("Please enter the UUID or name of the player.");
           playerIdentifierInput.setContentText("UUID / player name:");
-          DialogUtils.setupDialogDesign(playerIdentifierInput, getScene());
+          Dialogs.setupDialogDesign(playerIdentifierInput, getScene());
           playerIdentifierInput.showAndWait().map(playerIdentifier -> {
             try {
               // TODO: refactor this (deduplicate code, check UUID format, trim input, better error handling)

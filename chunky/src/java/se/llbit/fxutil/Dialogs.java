@@ -1,5 +1,6 @@
 package se.llbit.fxutil;
 
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -42,6 +43,20 @@ public class Dialogs {
     );
   }
 
+  /**
+   * Init design of the dialog to the design of the main window.
+   * This sets the icon and color scheme.
+   */
+  public static void setupDialogDesign(Dialog<?> dialog, Scene mainScene) {
+    Window mainWindow = mainScene.getWindow();
+    if(mainWindow instanceof Stage) {
+      Stage mainWindowStage = (Stage) mainWindow;
+      Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
+
+      dialogStage.getIcons().addAll(mainWindowStage.getIcons());
+    }
+    dialog.initOwner(mainWindow);
+  }
   /**
    * Makes the given dialog always stay on top of its parent window.
    * @param dialog A dialog

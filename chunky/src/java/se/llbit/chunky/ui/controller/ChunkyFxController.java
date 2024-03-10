@@ -820,7 +820,7 @@ public class ChunkyFxController
           ButtonType.CANCEL
         );
         confirmReset.setTitle("Reset render to apply setting changes?");
-        DialogUtils.setupDialogDesign(confirmReset, mapCanvas.getScene());
+        Dialogs.setupDialogDesign(confirmReset, mapCanvas.getScene());
 
         ButtonType resultAction = confirmReset
           .showAndWait()
