@@ -3,6 +3,7 @@ package se.llbit.fxutil;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
@@ -57,6 +58,17 @@ public class Dialogs {
     }
     dialog.initOwner(mainWindow);
   }
+
+  /**
+   * Sets the default button to the one matching the <code>targetButtonType</code>.
+   */
+  public static void setDefaultButton(Alert alert, ButtonType targetButtonType) {
+    alert.getButtonTypes().forEach(buttonType -> {
+      Button button = (Button) alert.getDialogPane().lookupButton(buttonType);
+      button.setDefaultButton(buttonType == targetButtonType);
+    });
+  }
+
   /**
    * Makes the given dialog always stay on top of its parent window.
    * @param dialog A dialog

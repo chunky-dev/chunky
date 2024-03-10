@@ -682,8 +682,21 @@ public class ChunkyFxController
     }
 
     menuExit.setOnAction(event -> {
-      Platform.exit();
-      System.exit(0);
+      Alert confirmQuit = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
+      confirmQuit.setTitle("Quit Chunky");
+      confirmQuit.setHeaderText("You have unsaved changes in your scene.");
+      confirmQuit.setContentText("Do you want to quit chunky without saving?\nAll unsaved changes will be lost.");
+      confirmQuit.getButtonTypes().setAll(
+        new ButtonType("Quit Chunky", ButtonBar.ButtonData.YES),
+        ButtonType.CANCEL
+      );
+      Dialogs.setDefaultButton(confirmQuit, ButtonType.CANCEL);
+      confirmQuit.showAndWait()
+        .filter((bt) -> bt.getButtonData() == ButtonBar.ButtonData.YES)
+        .ifPresent((bt) -> {
+          Platform.exit();
+          System.exit(0);
+        });
     });
 
     canvas = new RenderCanvasFx(this, chunky.getSceneManager().getScene(),
