@@ -736,7 +736,7 @@ public class ChunkyFxController
   public void confirmAndClose(Event event) {
     Alert confirmQuit = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
     confirmQuit.setTitle("Quit Chunky");
-    confirmQuit.setHeaderText("You have unsaved changes in your scene.");
+    confirmQuit.setHeaderText("You may have unsaved changes in your scene.");
     confirmQuit.setContentText("Do you want to quit chunky without saving?\nAll unsaved changes will be lost.");
     confirmQuit.getButtonTypes().setAll(
       new ButtonType("Quit Chunky", ButtonBar.ButtonData.YES),
