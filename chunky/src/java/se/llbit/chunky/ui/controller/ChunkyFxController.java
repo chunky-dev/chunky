@@ -37,6 +37,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -322,6 +323,9 @@ public class ChunkyFxController
   }
 
   @Override public void initialize(URL fxmlUrl, ResourceBundle resources) {
+    stage.setOnCloseRequest(this::confirmAndClose);
+    menuExit.setOnAction(this::confirmAndClose);
+
     scene = chunky.getSceneManager().getScene();
     renderController = chunky.getRenderController();
     renderManager = renderController.getRenderManager();
@@ -681,11 +685,6 @@ public class ChunkyFxController
       mapView.setYMax(256);
     }
 
-    menuExit.setOnAction(event -> {
-      Platform.exit();
-      System.exit(0);
-    });
-
     canvas = new RenderCanvasFx(this, chunky.getSceneManager().getScene(),
         chunky.getRenderController().getRenderManager());
     canvas.setRenderListener(renderTracker);
@@ -732,6 +731,24 @@ public class ChunkyFxController
     saveDefaultSpp.setTooltip(new Tooltip("Make the current SPP target the default."));
     saveDefaultSpp.setOnAction(e ->
         PersistentSettings.setSppTargetDefault(scene.getTargetSpp()));
+  }
+
+  public void confirmAndClose(Event event) {
+    Alert confirmQuit = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
+    confirmQuit.setTitle("Quit Chunky");
+    confirmQuit.setHeaderText("You may have unsaved changes in your scene.");
+    confirmQuit.setContentText("Do you want to quit chunky without saving?\nAll unsaved changes will be lost.");
+    confirmQuit.getButtonTypes().setAll(
+      new ButtonType("Quit Chunky", ButtonBar.ButtonData.YES),
+      ButtonType.CANCEL
+    );
+    Dialogs.setDefaultButton(confirmQuit, ButtonType.CANCEL);
+    ButtonType result = confirmQuit.showAndWait().orElse(ButtonType.CANCEL);
+    if(result.getButtonData() == ButtonBar.ButtonData.YES) {
+      Platform.exit();
+    } else {
+      event.consume();
+    }
   }
 
   public void openSceneChooser() {
@@ -820,7 +837,7 @@ public class ChunkyFxController
           ButtonType.CANCEL
         );
         confirmReset.setTitle("Reset render to apply setting changes?");
-        DialogUtils.setupDialogDesign(confirmReset, mapCanvas.getScene());
+        Dialogs.setupDialogDesign(confirmReset, mapCanvas.getScene());
 
         ButtonType resultAction = confirmReset
           .showAndWait()
