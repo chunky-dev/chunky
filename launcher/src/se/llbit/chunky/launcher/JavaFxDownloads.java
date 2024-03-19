@@ -127,7 +127,9 @@ public class JavaFxDownloads {
     int responseCode = conn.getResponseCode();
     if (responseCode == HttpURLConnection.HTTP_MOVED_PERM ||
       responseCode == HttpURLConnection.HTTP_MOVED_TEMP ||
-      responseCode == HttpURLConnection.HTTP_SEE_OTHER) {
+      responseCode == HttpURLConnection.HTTP_SEE_OTHER ||
+      responseCode == 307 || // HTTP 307: Temporary Redirect. Does not have const in HttpURLConnection
+      responseCode == 308) { // HTTP 308: Permanent Redirect. Does not have a const in HttpURLConnection
       return fetch(new URL(conn.getHeaderField("Location")));
     }
 
