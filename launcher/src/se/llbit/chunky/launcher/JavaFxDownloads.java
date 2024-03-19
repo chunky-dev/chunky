@@ -22,13 +22,16 @@ import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class JavaFxDownloads {
   public static class SyntaxException extends Exception {
@@ -127,7 +130,8 @@ public class JavaFxDownloads {
     int responseCode = conn.getResponseCode();
     if (responseCode == HttpURLConnection.HTTP_MOVED_PERM ||
       responseCode == HttpURLConnection.HTTP_MOVED_TEMP ||
-      responseCode == HttpURLConnection.HTTP_SEE_OTHER) {
+      responseCode == HttpURLConnection.HTTP_SEE_OTHER ||
+      responseCode == 307) { // HTTP 307: Temporary Redirect. Does not have const in HttpURLConnection
       return fetch(new URL(conn.getHeaderField("Location")));
     }
 
