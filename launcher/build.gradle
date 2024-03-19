@@ -1,3 +1,7 @@
+apply plugin: 'application'
+
+mainClassName = 'se.llbit.chunky.launcher.ChunkyLauncher'
+
 configurations {
     bundled
     implementation.extendsFrom configurations.bundled
@@ -20,7 +24,7 @@ sourceSets.main {
 }
 
 jar {
-    manifest.attributes 'Main-Class': 'se.llbit.chunky.launcher.ChunkyLauncher'
+    manifest.attributes 'Main-Class': mainClassName
 
     // Include classes from the common library.
     from project(':lib').configurations.archives.allArtifacts.files.collect {

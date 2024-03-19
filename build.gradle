@@ -125,6 +125,7 @@ task release {
 }
 
 task buildReleaseJar(type: Jar) {
+    dependsOn ':launcher:assembleDist'
     dependsOn 'versionInfo'
 
     archiveFileName = "chunky-${project.version}.jar"
