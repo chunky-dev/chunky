@@ -876,6 +876,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         }
       }
     }
+    texture.compress();
     TextureCache.put(item, texture);
     return texture;
   }

@@ -19,6 +19,7 @@ package se.llbit.chunky.world;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.Image;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
@@ -55,16 +56,17 @@ public class SkymapTexture extends Texture {
       for (int y = y0; y <= y1; ++y) {
         for (int x = x0; x <= x1; ++x) {
           int index = width * y + x;
-          ColorUtil.getRGBAComponents(image.data[index], c);
           ColorUtil.getRGBAComponents(image.getPixel(x, y), c);
           c[0] = (float) FastMath.pow(c[0], Scene.DEFAULT_GAMMA);
           c[1] = (float) FastMath.pow(c[1], Scene.DEFAULT_GAMMA);
           c[2] = (float) FastMath.pow(c[2], Scene.DEFAULT_GAMMA);
-          image.data[index] = ColorUtil.getRGB(c);
+          bitmapImage.data[index] = ColorUtil.getRGB(c);
         }
       }
     }
   }
+
+  private BitmapImage bitmapImage;
 
   /**
    * Create new skymap.
@@ -73,12 +75,17 @@ public class SkymapTexture extends Texture {
     super(image);
   }
 
-  @Override public void setTexture(BitmapImage newImage) {
-    image = newImage;
+  @Override public void setTexture(Image newImage) {
+    setTexture(newImage.asBitmap());
+  }
 
-    width = image.width;
-    height = image.height;
-    avgColor = ImageTools.calcAvgColor(image);
+  public void setTexture(BitmapImage newImage) {
+    image = newImage;
+    bitmapImage = newImage;
+
+    width = bitmapImage.width;
+    height = bitmapImage.height;
+    avgColor = ImageTools.calcAvgColor(bitmapImage);
 
     Log.info("Preprocessing skymap texture");
     long start = System.currentTimeMillis();
