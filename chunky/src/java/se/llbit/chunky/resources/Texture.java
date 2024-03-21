@@ -1583,6 +1583,15 @@ public class Texture {
   }
 
   /**
+   * Get alpha channel value
+   *
+   * @return alpha value as float between 0 and 1
+   */
+  public float getAlpha(int x, int y) {
+    return (image.data[width * y + x] >>> 24) / 255.0f;
+  }
+
+  /**
    * Get bilinear interpolated color value.
    */
   public void getColorInterpolated(double u, double v, Vector4 c) {
