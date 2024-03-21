@@ -18,8 +18,12 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.block.BlockSpec;
+import se.llbit.chunky.block.jsonmodels.ResourcepackBlockProvider;
+import se.llbit.chunky.world.MaterialStore;
 import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.log.Log;
+import se.llbit.util.FileSystemUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -164,22 +168,25 @@ public class ResourcePackLoader {
         .map(s -> "- " + s)
         .collect(Collectors.joining("\n"))
     );
-    return loadResourcePacks(
-      resourcePacks.iterator(),
-      loaders
-    );
-  }
 
-  /**
-   * Load resources from the given resource packs.
-   * Resource pack files are loaded in list order - if a texture is not found in a pack,
-   * the next packs is checked as a fallback.
-   *
-   * @return True if all resources have been found and loaded.
-   */
-  private static boolean loadResourcePacks(Iterator<File> resourcePacks, List<PackLoader> loaders) {
-    while (resourcePacks.hasNext()) {
-      File resourcePack = resourcePacks.next();
+    BlockSpec.blockProviders.stream() // TODO move this
+      .filter(bp -> bp instanceof ResourcepackBlockProvider)
+      .forEach(
+        bp -> {
+          try {
+            List<File> blocks = new ArrayList<>(resourcePacks);
+            File minecraftJar = MinecraftFinder.getMinecraftJar();
+            if (minecraftJar != null) {
+              blocks.add(minecraftJar);
+            }
+            ((ResourcepackBlockProvider) bp).loadBlocks(blocks);
+            MaterialStore.blockIds.addAll(bp.getSupportedBlocks());
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        });
+
+    for(File resourcePack : resourcePacks) {
       if (resourcePack.isFile() || resourcePack.isDirectory()) {
         if (loadSingleResourcePack(resourcePack, loaders)) {
           return true;
@@ -235,7 +242,7 @@ public class ResourcePackLoader {
         // for resource packs in directories
         ? FileSystems.getDefault()
         // for resource packs in jar or zip files
-        : FileSystems.newFileSystem(URI.create("jar:" + pack.toURI()), Collections.emptyMap());
+        : FileSystemUtil.getZipFileSystem(pack);
     } catch (ZipError e) {
       // This catch is required for Java 8. This error appears safe to catch.
       // https://stackoverflow.com/a/51715939
