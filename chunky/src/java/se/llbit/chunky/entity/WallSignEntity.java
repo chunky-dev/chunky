@@ -122,14 +122,16 @@ public class WallSignEntity extends Entity {
     Transform transform = Transform.NONE
       .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     Quad[] quads = faces[orientation];
+    // Front texture is unique so it is useless to use the cache for it
+    // it will just take space in the cache for nothing
+    // The other texture is shared so retrieving the material from the cache is a gain
+    TextureMaterial otherMaterial = TextureMaterial.getForTexture(texture);
     for (int i = 0; i < quads.length; ++i) {
-      Quad quad = quads[i];
-      Texture tex = texture;
       if (i == 0 && frontTexture != null) {
-        tex = frontTexture;
-        quad = frontFaceWithText[orientation];
+        frontFaceWithText[orientation].addTriangles(primitives, new TextureMaterial(frontTexture), transform);
+      } else {
+        quads[i].addTriangles(primitives, otherMaterial, transform);
       }
-      quad.addTriangles(primitives, new TextureMaterial(tex), transform);
     }
     return primitives;
   }

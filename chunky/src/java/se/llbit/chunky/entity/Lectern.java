@@ -176,11 +176,11 @@ public class Lectern extends Entity implements Poseable {
         .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     int facing = getOrientationIndex(this.facing);
     for (int i = 0; i < orientedQuads[facing].length; i++) {
-      orientedQuads[facing][i].addTriangles(faces, new TextureMaterial(tex[i]), transform);
+      orientedQuads[facing][i].addTriangles(faces, TextureMaterial.getForTexture(tex[i]), transform);
     }
     for (int i = 0; i < orientedTopQuads[facing].length; i++) {
       orientedTopQuads[facing][i]
-          .addTriangles(faces, new TextureMaterial(tex[i + orientedQuads[facing].length]),
+          .addTriangles(faces, TextureMaterial.getForTexture(tex[i + orientedQuads[facing].length]),
               transform);
     }
 

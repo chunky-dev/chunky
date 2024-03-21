@@ -597,7 +597,7 @@ public class SkullEntity extends Entity {
       .chain(transform)
       .translate(0, 0.5 - 4 / 16., 0);
     Collection<Primitive> faces = new LinkedList<>();
-    Material material = new TextureMaterial(Texture.dragon);
+    Material material = TextureMaterial.getForTexture(Texture.dragon);
     for (Quad quad : dragonHead) {
       quad.addTriangles(faces, material, transform);
     }

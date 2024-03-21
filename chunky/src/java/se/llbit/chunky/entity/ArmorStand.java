@@ -440,7 +440,7 @@ public class ArmorStand extends Entity implements Poseable, Geared {
 
   @Override public Collection<Primitive> primitives(Vector3 offset) {
     Collection<Primitive> primitives = new LinkedList<>();
-    Material material = new TextureMaterial(Texture.armorStand);
+    Material material = TextureMaterial.getForTexture(Texture.armorStand);
 
     Vector3 worldOffset = new Vector3(
         position.x + offset.x,

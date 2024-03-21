@@ -91,7 +91,7 @@ public class CoralFanEntity extends Entity {
             position.y + offset.y,
             position.z + offset.z);
     Texture texture = CoralFan.coralTexture(coralType);
-    Material mat = new TextureMaterial(texture);
+    Material mat = TextureMaterial.getForTexture(texture);
     for (Quad quad : quads) {
       quad.addTriangles(faces, mat, transform);
     }

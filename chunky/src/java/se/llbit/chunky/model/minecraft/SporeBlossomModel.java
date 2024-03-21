@@ -109,8 +109,8 @@ public class SporeBlossomModel {
 
   public static Collection<Primitive> primitives(Transform transform) {
     Collection<Primitive> faces = new LinkedList<>();
-    TextureMaterial baseMaterial = new TextureMaterial(Texture.sporeBlossomBase);
-    TextureMaterial flowerMaterial = new TextureMaterial(Texture.sporeBlossom);
+    TextureMaterial baseMaterial = TextureMaterial.getForTexture(Texture.sporeBlossomBase);
+    TextureMaterial flowerMaterial = TextureMaterial.getForTexture(Texture.sporeBlossom);
 
     for (int i = 0; i < quads.length; i++) {
       quads[i].addTriangles(faces, i < 2 ? baseMaterial : flowerMaterial, transform);

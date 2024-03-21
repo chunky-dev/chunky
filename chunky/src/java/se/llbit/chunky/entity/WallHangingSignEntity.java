@@ -264,18 +264,21 @@ public class WallHangingSignEntity extends Entity {
   public Collection<Primitive> primitives(Vector3 offset) {
     LinkedHashSet<Primitive> set = new LinkedHashSet<>();
     Quad[] quads = rotatedQuads[orientation.ordinal()];
+    // Front and back textures are unique so it is useless to use the cache for them
+    // it will just take space in the cache for nothing
+    // The other texture is shared so retrieving the material from the cache is a gain
+    TextureMaterial otherMaterial = TextureMaterial.getForTexture(texture);
     for (int i = 0; i < quads.length; ++i) {
-      Quad quad = quads[i];
-      Texture tex = texture;
       if (i == 4 && frontTexture != null) {
-        tex = frontTexture;
-        quad = frontFaceWithText[orientation.ordinal()];
+        frontFaceWithText[orientation.ordinal()].addTriangles(set, new TextureMaterial(frontTexture),
+          Transform.NONE.translate(position.x + offset.x, position.y + offset.y, position.z + offset.z));
       } else if (i == 5 && backTexture != null) {
-        tex = backTexture;
-        quad = backFaceWithText[orientation.ordinal()];
+        backFaceWithText[orientation.ordinal()].addTriangles(set, new TextureMaterial(backTexture),
+          Transform.NONE.translate(position.x + offset.x, position.y + offset.y, position.z + offset.z));
+      } else {
+        quads[i].addTriangles(set, otherMaterial,
+          Transform.NONE.translate(position.x + offset.x, position.y + offset.y, position.z + offset.z));
       }
-      quad.addTriangles(set, new TextureMaterial(tex),
-        Transform.NONE.translate(position.x + offset.x, position.y + offset.y, position.z + offset.z));
     }
     return set;
   }

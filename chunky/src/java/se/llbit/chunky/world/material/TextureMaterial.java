@@ -16,10 +16,30 @@
  */
 package se.llbit.chunky.world.material;
 
+import org.apache.commons.collections4.map.AbstractReferenceMap;
+import org.apache.commons.collections4.map.ReferenceMap;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 
+import java.util.Collections;
+import java.util.Map;
+
 public class TextureMaterial extends Material {
+
+  // Cache the Texture -> TextureMaterial association to prevent creating tons of
+  // TextureMaterial using the same Texture
+  static private final Map<Texture, TextureMaterial> cache = Collections.synchronizedMap(
+    new ReferenceMap<>(AbstractReferenceMap.ReferenceStrength.HARD, AbstractReferenceMap.ReferenceStrength.WEAK)
+  );
+
+  public static TextureMaterial getForTexture(Texture texture) {
+    TextureMaterial mat = cache.get(texture);
+    if(mat == null) {
+      mat = new TextureMaterial(texture);
+      cache.put(texture, mat);
+    }
+    return mat;
+  }
 
   public TextureMaterial(Texture texture) {
     super("texture", texture);
