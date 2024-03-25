@@ -18,6 +18,7 @@ package se.llbit.chunky.world;
 
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.MapTile;
 import se.llbit.chunky.ui.ChunkMap;
@@ -48,7 +49,12 @@ public class EmptyChunk extends Chunk {
     surface = IconLayer.CORRUPT;
   }
 
-  @Override public synchronized void getChunkData(Mutable<ChunkData> reuseChunkData, BlockPalette palette, BiomePalette biomePalette, int yMin, int yMax) { }
+  @Override public synchronized void getChunkData(Mutable<ChunkData> reuseChunkData, BlockPalette palette, BiomePalette biomePalette, int yMin, int yMax) {
+    ChunkData chunkData = reuseChunkData.get();
+    if (chunkData != null && !(reuseChunkData.get() instanceof EmptyChunkData)) {
+      chunkData.clear();
+    }
+  }
 
   @Override public void renderSurface(MapTile tile) {
     renderEmpty(tile);
