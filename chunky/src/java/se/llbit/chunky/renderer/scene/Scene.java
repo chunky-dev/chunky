@@ -3257,7 +3257,6 @@ public class Scene implements JsonSerializable, Refreshable {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("emitterMappingType", Json.of(value.toString()));
     materials.put(materialName, material);
-    System.out.println(materialName + ", " + value);
     refresh(ResetReason.MATERIALS_CHANGED);
   }
 
