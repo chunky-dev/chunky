@@ -18,6 +18,8 @@ package se.llbit.log;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collections;
+import java.util.List;
 
 abstract public class Receiver {
   abstract public void logEvent(Level level, String message);
@@ -37,4 +39,21 @@ abstract public class Receiver {
     logEvent(level, writer.toString());
   }
 
+  public boolean isBuffered() {
+    return false;
+  }
+
+  public List<Event> getBufferedEvents() {
+    return Collections.emptyList();
+  }
+
+  public static class Event {
+    public final Level level;
+    public final String message;
+
+      public Event(Level level, String message) {
+        this.level = level;
+        this.message = message;
+      }
+  }
 }

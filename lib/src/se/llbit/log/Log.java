@@ -29,7 +29,7 @@ public class Log {
   private static final int WARNING = Level.WARNING.ordinal();
   private static final int ERROR = Level.ERROR.ordinal();
   private static final Receiver[] receiver =
-      {ConsoleReceiver.INSTANCE, ConsoleReceiver.INSTANCE, ConsoleReceiver.INSTANCE};
+      {BufferingConsoleReceiver.INSTANCE, BufferingConsoleReceiver.INSTANCE, BufferingConsoleReceiver.INSTANCE};
 
   static {
     try {
@@ -51,7 +51,15 @@ public class Log {
       throw new IllegalArgumentException("No log level specified for receiver.");
     }
     for (Level level : levels) {
+      Receiver previousReceiver = Log.receiver[level.ordinal()];
       Log.receiver[level.ordinal()] = receiver;
+
+      // flush the buffered receiver, if required.
+      if (previousReceiver.isBuffered()) {
+        previousReceiver.getBufferedEvents().stream()
+          .filter(event -> event.level == level)
+          .forEach(event -> receiver.logEvent(event.level, event.message));
+      }
     }
   }
 
