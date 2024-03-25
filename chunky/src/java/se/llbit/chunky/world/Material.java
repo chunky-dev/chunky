@@ -16,11 +16,17 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.renderer.EmitterMappingType;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector4;
+
+import java.util.ArrayList;
 
 public abstract class Material {
 
@@ -59,6 +65,22 @@ public abstract class Material {
    * The amount of light the material emits.
    */
   public float emittance = 0;
+
+  /**
+   * Offset to apply to the global emitter mapping exponent (the resulting value will be constrained to be >= 0).
+   */
+  public float emitterMappingOffset = 0;
+
+  /**
+   * Overrides the global emitter mapping type unless set to NONE.
+   */
+  public EmitterMappingType emitterMappingType = EmitterMappingType.NONE;
+
+  /**
+   * (x, y, z): The color to use for the REFERENCE_COLORS emitter mapping type.
+   * w: The range surrounding the specified color to apply full brightness.
+   */
+  public ArrayList<Vector4> emitterMappingReferenceColors = new ArrayList<>();
 
   /**
    * The (linear) roughness controlling how rough a shiny block appears. A value of 0 makes the
@@ -103,6 +125,9 @@ public abstract class Material {
     solid = true;
     specular = 0;
     emittance = 0;
+    emitterMappingOffset = 0;
+    emitterMappingType = EmitterMappingType.NONE;
+    emitterMappingReferenceColors = new ArrayList<>();
     roughness = 0;
     subSurfaceScattering = false;
   }
@@ -122,9 +147,24 @@ public abstract class Material {
   public void loadMaterialProperties(JsonObject json) {
     ior = json.get("ior").floatValue(ior);
     specular = json.get("specular").floatValue(specular);
-    emittance = json.get("emittance").floatValue(emittance);
     roughness = json.get("roughness").floatValue(roughness);
     metalness = json.get("metalness").floatValue(metalness);
+    emittance = json.get("emittance").floatValue(emittance);
+    emitterMappingOffset = json.get("emitterMappingOffset").floatValue(emitterMappingOffset);
+    emitterMappingType = EmitterMappingType.valueOf(json.get("emitterMappingType").asString(emitterMappingType.toString()));
+    JsonArray referenceColors = json.get("emitterMappingReferenceColors").array();
+    // Overwrite existing reference colors, but only if any are specified
+    if(referenceColors.size() > 0) {
+      emitterMappingReferenceColors = new ArrayList<>();
+    }
+    for(JsonValue refColorJson : referenceColors.elements) {
+      Vector4 refColor = new Vector4();
+      refColor.x = refColorJson.object().get("red").floatValue(0);
+      refColor.y = refColorJson.object().get("green").floatValue(0);
+      refColor.z = refColorJson.object().get("blue").floatValue(0);
+      refColor.w = refColorJson.object().get("range").floatValue(0);
+      emitterMappingReferenceColors.add(refColor);
+    }
   }
 
   public boolean isWater() {
@@ -145,5 +185,17 @@ public abstract class Material {
 
   public void setPerceptualSmoothness(double perceptualSmoothness) {
     roughness = (float) Math.pow(1 - perceptualSmoothness, 2);
+  }
+
+  /**
+   * Set the emittance based on a Minecraft light level
+   * @param level The light level from 0 to 15
+   */
+  public void setLightLevel(float level) {
+    emittance = level / 15;
+  }
+
+  public void addRefColorGammaCorrected(float r, float g, float b, float delta) {
+    emitterMappingReferenceColors.add(new Vector4(Math.pow(r/255, Scene.DEFAULT_GAMMA), Math.pow(g/255, Scene.DEFAULT_GAMMA), Math.pow(b/255, Scene.DEFAULT_GAMMA), delta));
   }
 }
