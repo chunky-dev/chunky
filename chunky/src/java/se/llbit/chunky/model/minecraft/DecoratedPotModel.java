@@ -234,6 +234,12 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
         return Texture.decoratedPotPatternSkull;
       case "minecraft:snort_pottery_sherd":
         return Texture.decoratedPotPatternSnort;
+      case "minecraft:flow_pottery_sherd":
+        return Texture.decoratedPotPatternFlow;
+      case "minecraft:guster_pottery_sherd":
+        return Texture.decoratedPotPatternGuster;
+      case "minecraft:scrape_pottery_sherd":
+        return Texture.decoratedPotPatternScrape;
       default:
         Log.warn("Unknown pottery sherd: " + sherd);
         return Texture.decoratedPotSide;
