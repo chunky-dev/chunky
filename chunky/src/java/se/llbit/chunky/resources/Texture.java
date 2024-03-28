@@ -1183,7 +1183,8 @@ public class Texture {
   public static final Texture chiseledBookshelfTop = new Texture();
 
   public static final Texture[] chiseledBookshelfCombinations = new ChiseledBookshelfTexture[64];
-  static {
+
+    static {
     for(int i = 0; i < chiseledBookshelfCombinations.length; i++) {
       chiseledBookshelfCombinations[i] = new ChiseledBookshelfTexture(Texture.chiseledBookshelfEmpty, Texture.chiseledBookshelfOccupied,
         i % 2 == 1, (i >> 1) % 2 == 1, (i >> 2) % 2 == 1, (i >> 3) % 2 == 1, (i >> 4) % 2 == 1, (i >> 5) % 2 == 1);
@@ -1465,6 +1466,12 @@ public class Texture {
   public static final Texture vaultSideOff = new Texture();
   @TexturePath("assets/minecraft/textures/block/vault_front_ejecting")
   public static final Texture vaultSideOn = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/flow_pottery_pattern")
+  public static final Texture decoratedPotPatternFlow = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/guster_pottery_pattern")
+  public static final Texture decoratedPotPatternGuster = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/scrape_pottery_pattern")
+  public static final Texture decoratedPotPatternScrape = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
