@@ -100,21 +100,4 @@ public interface BlockData {
   int CONNECTED_BELOW = 32;
 
   int BED_COLOR = 16;
-
-  int COLOR_WHITE = 0;
-  int COLOR_ORANGE = 1;
-  int COLOR_MAGENTA = 2;
-  int COLOR_LIGHT_BLUE = 3;
-  int COLOR_YELLOW = 4;
-  int COLOR_LIME = 5;
-  int COLOR_PINK = 6;
-  int COLOR_GRAY = 7;
-  int COLOR_SILVER = 8;
-  int COLOR_CYAN = 9;
-  int COLOR_PURPLE = 10;
-  int COLOR_BLUE = 11;
-  int COLOR_BROWN = 12;
-  int COLOR_GREEN = 13;
-  int COLOR_RED = 14;
-  int COLOR_BLACK = 15;
 }

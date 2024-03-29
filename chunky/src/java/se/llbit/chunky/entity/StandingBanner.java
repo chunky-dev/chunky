@@ -18,122 +18,116 @@
 package se.llbit.chunky.entity;
 
 import se.llbit.chunky.model.Model;
-import se.llbit.chunky.resources.*;
-import se.llbit.chunky.resources.texturepack.SimpleTexture;
-import se.llbit.chunky.resources.texturepack.TextureLoader;
-import se.llbit.chunky.world.BlockData;
+import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.TextureCache;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
-import se.llbit.math.ColorUtil;
-import se.llbit.math.Quad;
-import se.llbit.math.Transform;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.SpecificTag;
+import se.llbit.util.NbtUtil;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Map;
 
 /**
- * A mob head (skull) entity.
+ * A standing banner entity.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class StandingBanner extends Entity {
 
   private static final Quad[] quads = {
-      // Pole:
-      new Quad(
-          new Vector3(7.5 / 16.0, 0, 7.5 / 16.0),
-          new Vector3(8.5 / 16.0, 0, 7.5 / 16.0),
-          new Vector3(7.5 / 16.0, 0, 8.5 / 16.0),
-          new Vector4(48 / 64.0, 50 / 64.0, 62 / 64.0, 64 / 64.0)),
-      new Quad(
-          new Vector3(8.5 / 16.0, 0, 8.5 / 16.0),
-          new Vector3(8.5 / 16.0, 0, 7.5 / 16.0),
-          new Vector3(8.5 / 16.0, 28 / 16.0, 8.5 / 16.0),
-          new Vector4(46 / 64.0, 48 / 64.0, 20 / 64.0, 62 / 64.0)),
-      new Quad(
-          new Vector3(7.5 / 16.0, 0, 7.5 / 16.0),
-          new Vector3(7.5 / 16.0, 0, 8.5 / 16.0),
-          new Vector3(7.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
-          new Vector4(50 / 64.0, 52 / 64.0, 20 / 64.0, 62 / 64.0)),
-      new Quad(
-          new Vector3(8.5 / 16.0, 0, 7.5 / 16.0),
-          new Vector3(7.5 / 16.0, 0, 7.5 / 16.0),
-          new Vector3(8.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
-          new Vector4(44 / 64.0, 46 / 64.0, 20 / 64.0, 62 / 64.0)),
-      new Quad(
-          new Vector3(7.5 / 16.0, 0, 8.5 / 16.0),
-          new Vector3(8.5 / 16.0, 0, 8.5 / 16.0),
-          new Vector3(7.5 / 16.0, 28 / 16.0, 8.5 / 16.0),
-          new Vector4(48 / 64.0, 50 / 64.0, 20 / 64.0, 62 / 64.0)),
-      // Banner:
-      new Quad(
-          new Vector3(1.5 / 16.0, 29 / 16.0, 9 / 16.0),
-          new Vector3(14.5 / 16.0, 29 / 16.0, 9 / 16.0),
-          new Vector3(1.5 / 16.0, 29 / 16.0, 8.5 / 16.0),
-          new Vector4(1 / 64.0, 21 / 64.0, 63 / 64.0, 64 / 64.0)),
-      new Quad(
-          new Vector3(1.5 / 16.0, 3 / 16.0, 8.5 / 16.0),
-          new Vector3(14.5 / 16.0, 3 / 16.0, 8.5 / 16.0),
-          new Vector3(1.5 / 16.0, 3 / 16.0, 9 / 16.0),
-          new Vector4(21 / 64.0, 41 / 64.0, 63 / 64.0, 64 / 64.0)),
-      new Quad(
-          new Vector3(14.5 / 16.0, 3 / 16.0, 9 / 16.0),
-          new Vector3(14.5 / 16.0, 3 / 16.0, 8.5 / 16.0),
-          new Vector3(14.5 / 16.0, 29 / 16.0, 9 / 16.0),
-          new Vector4(21 / 64.0, 22 / 64.0, 23 / 64.0, 63 / 64.0)),
-      new Quad(
-          new Vector3(1.5 / 16.0, 3 / 16.0, 8.5 / 16.0),
-          new Vector3(1.5 / 16.0, 3 / 16.0, 9 / 16.0),
-          new Vector3(1.5 / 16.0, 29 / 16.0, 8.5 / 16.0),
-          new Vector4(0, 1 / 64.0, 23 / 64.0, 63 / 64.0)),
-      new Quad(
-          new Vector3(14.5 / 16.0, 3 / 16.0, 8.5 / 16.0),
-          new Vector3(1.5 / 16.0, 3 / 16.0, 8.5 / 16.0),
-          new Vector3(14.5 / 16.0, 29 / 16.0, 8.5 / 16.0),
-          new Vector4(22 / 64.0, 42 / 64.0, 23 / 64.0, 63 / 64.0)),
-      new Quad(
-          new Vector3(1.5 / 16.0, 3 / 16.0, 9 / 16.0),
-          new Vector3(14.5 / 16.0, 3 / 16.0, 9 / 16.0),
-          new Vector3(1.5 / 16.0, 29 / 16.0, 9 / 16.0),
-          new Vector4(1 / 64.0, 21 / 64.0, 23 / 64.0, 63 / 64.0)),
-      // Crossbar:
-      new Quad(
-          new Vector3(1.5 / 16.0, 29 / 16.0, 8.5 / 16.0),
-          new Vector3(14.5 / 16.0, 29 / 16.0, 8.5 / 16.0),
-          new Vector3(1.5 / 16.0, 29 / 16.0, 7.5 / 16.0),
-          new Vector4(2 / 64.0, 21 / 64.0, 20 / 64.0, 22 / 64.0)),
-      new Quad(
-          new Vector3(1.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
-          new Vector3(14.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
-          new Vector3(1.5 / 16.0, 28 / 16.0, 8.5 / 16.0),
-          new Vector4(22 / 64.0, 42 / 64.0, 20 / 64.0, 22 / 64.0)),
-      new Quad(
-          new Vector3(14.5 / 16.0, 28 / 16.0, 8.5 / 16.0),
-          new Vector3(14.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
-          new Vector3(14.5 / 16.0, 29 / 16.0, 8.5 / 16.0),
-          new Vector4(22 / 64.0, 24 / 64.0, 18 / 64.0, 20 / 64.0)),
-      new Quad(
-          new Vector3(1.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
-          new Vector3(1.5 / 16.0, 28 / 16.0, 8.5 / 16.0),
-          new Vector3(1.5 / 16.0, 29 / 16.0, 7.5 / 16.0),
-          new Vector4(0, 2 / 64.0, 18 / 64.0, 20 / 64.0)),
-      new Quad(
-          new Vector3(14.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
-          new Vector3(1.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
-          new Vector3(14.5 / 16.0, 29 / 16.0, 7.5 / 16.0),
-          new Vector4(2 / 64.0, 21 / 64.0, 18 / 64.0, 20 / 64.0)),
+    // Pole:
+    new Quad(
+      new Vector3(7.5 / 16.0, 0, 7.5 / 16.0),
+      new Vector3(8.5 / 16.0, 0, 7.5 / 16.0),
+      new Vector3(7.5 / 16.0, 0, 8.5 / 16.0),
+      new Vector4(48 / 64.0, 50 / 64.0, 62 / 64.0, 64 / 64.0)),
+    new Quad(
+      new Vector3(8.5 / 16.0, 0, 8.5 / 16.0),
+      new Vector3(8.5 / 16.0, 0, 7.5 / 16.0),
+      new Vector3(8.5 / 16.0, 28 / 16.0, 8.5 / 16.0),
+      new Vector4(46 / 64.0, 48 / 64.0, 20 / 64.0, 62 / 64.0)),
+    new Quad(
+      new Vector3(7.5 / 16.0, 0, 7.5 / 16.0),
+      new Vector3(7.5 / 16.0, 0, 8.5 / 16.0),
+      new Vector3(7.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
+      new Vector4(50 / 64.0, 52 / 64.0, 20 / 64.0, 62 / 64.0)),
+    new Quad(
+      new Vector3(8.5 / 16.0, 0, 7.5 / 16.0),
+      new Vector3(7.5 / 16.0, 0, 7.5 / 16.0),
+      new Vector3(8.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
+      new Vector4(44 / 64.0, 46 / 64.0, 20 / 64.0, 62 / 64.0)),
+    new Quad(
+      new Vector3(7.5 / 16.0, 0, 8.5 / 16.0),
+      new Vector3(8.5 / 16.0, 0, 8.5 / 16.0),
+      new Vector3(7.5 / 16.0, 28 / 16.0, 8.5 / 16.0),
+      new Vector4(48 / 64.0, 50 / 64.0, 20 / 64.0, 62 / 64.0)),
+    // Banner:
+    new Quad(
+      new Vector3(1.5 / 16.0, 29 / 16.0, 9 / 16.0),
+      new Vector3(14.5 / 16.0, 29 / 16.0, 9 / 16.0),
+      new Vector3(1.5 / 16.0, 29 / 16.0, 8.5 / 16.0),
+      new Vector4(1 / 64.0, 21 / 64.0, 63 / 64.0, 64 / 64.0)),
+    new Quad(
+      new Vector3(1.5 / 16.0, 3 / 16.0, 8.5 / 16.0),
+      new Vector3(14.5 / 16.0, 3 / 16.0, 8.5 / 16.0),
+      new Vector3(1.5 / 16.0, 3 / 16.0, 9 / 16.0),
+      new Vector4(21 / 64.0, 41 / 64.0, 63 / 64.0, 64 / 64.0)),
+    new Quad(
+      new Vector3(14.5 / 16.0, 3 / 16.0, 9 / 16.0),
+      new Vector3(14.5 / 16.0, 3 / 16.0, 8.5 / 16.0),
+      new Vector3(14.5 / 16.0, 29 / 16.0, 9 / 16.0),
+      new Vector4(21 / 64.0, 22 / 64.0, 23 / 64.0, 63 / 64.0)),
+    new Quad(
+      new Vector3(1.5 / 16.0, 3 / 16.0, 8.5 / 16.0),
+      new Vector3(1.5 / 16.0, 3 / 16.0, 9 / 16.0),
+      new Vector3(1.5 / 16.0, 29 / 16.0, 8.5 / 16.0),
+      new Vector4(0, 1 / 64.0, 23 / 64.0, 63 / 64.0)),
+    new Quad(
+      new Vector3(14.5 / 16.0, 3 / 16.0, 8.5 / 16.0),
+      new Vector3(1.5 / 16.0, 3 / 16.0, 8.5 / 16.0),
+      new Vector3(14.5 / 16.0, 29 / 16.0, 8.5 / 16.0),
+      new Vector4(22 / 64.0, 42 / 64.0, 23 / 64.0, 63 / 64.0)),
+    new Quad(
+      new Vector3(1.5 / 16.0, 3 / 16.0, 9 / 16.0),
+      new Vector3(14.5 / 16.0, 3 / 16.0, 9 / 16.0),
+      new Vector3(1.5 / 16.0, 29 / 16.0, 9 / 16.0),
+      new Vector4(1 / 64.0, 21 / 64.0, 23 / 64.0, 63 / 64.0)),
+    // Crossbar:
+    new Quad(
+      new Vector3(1.5 / 16.0, 29 / 16.0, 8.5 / 16.0),
+      new Vector3(14.5 / 16.0, 29 / 16.0, 8.5 / 16.0),
+      new Vector3(1.5 / 16.0, 29 / 16.0, 7.5 / 16.0),
+      new Vector4(2 / 64.0, 21 / 64.0, 20 / 64.0, 22 / 64.0)),
+    new Quad(
+      new Vector3(1.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
+      new Vector3(14.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
+      new Vector3(1.5 / 16.0, 28 / 16.0, 8.5 / 16.0),
+      new Vector4(22 / 64.0, 42 / 64.0, 20 / 64.0, 22 / 64.0)),
+    new Quad(
+      new Vector3(14.5 / 16.0, 28 / 16.0, 8.5 / 16.0),
+      new Vector3(14.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
+      new Vector3(14.5 / 16.0, 29 / 16.0, 8.5 / 16.0),
+      new Vector4(22 / 64.0, 24 / 64.0, 18 / 64.0, 20 / 64.0)),
+    new Quad(
+      new Vector3(1.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
+      new Vector3(1.5 / 16.0, 28 / 16.0, 8.5 / 16.0),
+      new Vector3(1.5 / 16.0, 29 / 16.0, 7.5 / 16.0),
+      new Vector4(0, 2 / 64.0, 18 / 64.0, 20 / 64.0)),
+    new Quad(
+      new Vector3(14.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
+      new Vector3(1.5 / 16.0, 28 / 16.0, 7.5 / 16.0),
+      new Vector3(14.5 / 16.0, 29 / 16.0, 7.5 / 16.0),
+      new Vector4(2 / 64.0, 21 / 64.0, 18 / 64.0, 20 / 64.0)),
   };
 
   private static final Quad[][] rot = new Quad[16][];
@@ -164,27 +158,33 @@ public class StandingBanner extends Entity {
 
   public static JsonObject parseDesign(CompoundTag entityTag) {
     JsonObject design = new JsonObject();
-    int base = entityTag.get("Base").intValue(BlockData.COLOR_WHITE);
+    BannerDesign.Color base = BannerDesign.Color.get(entityTag.get("Base").intValue(BannerDesign.Color.WHITE.id));
     JsonArray patterns = new JsonArray();
-    ListTag listTag = entityTag.get("Patterns").asList();
+    // tag names are Titlecase in 1.20 or earlier
+    ListTag listTag = NbtUtil.getTagFromNames(entityTag, "Patterns", "patterns").asList();
     for (SpecificTag tag : listTag) {
       CompoundTag patternTag = tag.asCompound();
-      int color = patternTag.get("Color").intValue();
-      String pattern = patternTag.get("Pattern").stringValue();
+      int color = NbtUtil.getTagFromNames(patternTag, "Color").intValue();
+      String colorName = patternTag.get("color").stringValue(null);
+      if (colorName != null) {
+        color = BannerDesign.Color.get(colorName).id;
+      }
+      String pattern = NbtUtil.getTagFromNames(patternTag, "Pattern", "pattern").stringValue();
       JsonObject patternJson = new JsonObject();
       patternJson.add("pattern", pattern);
       patternJson.add("color", color);
       patterns.add(patternJson);
     }
-    design.add("base", base);
+    design.add("base", base.id);
     design.add("patterns", patterns);
     return design;
   }
 
-  @Override public Collection<Primitive> primitives(Vector3 offset) {
+  @Override
+  public Collection<Primitive> primitives(Vector3 offset) {
     Collection<Primitive> faces = new LinkedList<>();
     Transform transform = Transform.NONE
-        .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
+      .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     Material material = getBannerTexture(design);
     for (Quad quad : rot[rotation]) {
       quad.addTriangles(faces, material, transform);
@@ -192,148 +192,17 @@ public class StandingBanner extends Entity {
     return faces;
   }
 
-  protected static BitmapImage getPatternBitmap(String pattern) {
-    String filename = "";
-    switch (pattern) {
-      case "bs":
-        filename = "stripe_bottom";
-        break;
-      case "ts":
-        filename = "stripe_top";
-        break;
-      case "ls":
-        filename = "stripe_left";
-        break;
-      case "rs":
-        filename = "stripe_right";
-        break;
-      case "cs":
-        filename = "stripe_center";
-        break;
-      case "ms":
-        filename = "stripe_middle";
-        break;
-      case "drs":
-        filename = "stripe_downright";
-        break;
-      case "dls":
-        filename = "stripe_downleft";
-        break;
-      case "ss":
-        filename = "small_stripes";
-        break;
-      case "cr":
-        filename = "cross";
-        break;
-      case "sc":
-        filename = "straight_cross";
-        break;
-      case "ld":
-        filename = "diagonal_left";
-        break;
-      case "rud":
-        filename = "diagonal_right"; // swapped in mc, see rd
-        break;
-      case "lud":
-        filename = "diagonal_up_left";
-        break;
-      case "rd":
-        filename = "diagonal_up_right"; // swapped in mc, see rud
-        break;
-      case "vh":
-        filename = "half_vertical";
-        break;
-      case "vhr":
-        filename = "half_vertical_right";
-        break;
-      case "hh":
-        filename = "half_horizontal";
-        break;
-      case "hhb":
-        filename = "half_horizontal_bottom";
-        break;
-      case "bl":
-        filename = "square_bottom_left";
-        break;
-      case "br":
-        filename = "square_bottom_right";
-        break;
-      case "tl":
-        filename = "square_top_left";
-        break;
-      case "tr":
-        filename = "square_top_right";
-        break;
-      case "bt":
-        filename = "triangle_bottom";
-        break;
-      case "tt":
-        filename = "triangle_top";
-        break;
-      case "bts":
-        filename = "triangles_bottom";
-        break;
-      case "tts":
-        filename = "triangles_top";
-        break;
-      case "mc":
-        filename = "circle";
-        break;
-      case "mr":
-        filename = "rhombus";
-        break;
-      case "bo":
-        filename = "border";
-        break;
-      case "cbo":
-        filename = "curly_border";
-        break;
-      case "bri":
-        filename = "bricks";
-        break;
-      case "gra":
-        filename = "gradient";
-        break;
-      case "gru":
-        filename = "gradient_up";
-        break;
-      case "cre":
-        filename = "creeper";
-        break;
-      case "sku":
-        filename = "skull";
-        break;
-      case "flo":
-        filename = "flower";
-        break;
-      case "moj":
-        filename = "mojang";
-        break;
-      case "pig":
-        filename = "piglin";
-        break;
-    }
-    if (filename.isEmpty()) {
+  protected static BitmapImage getPatternBitmap(String patternName) {
+    BannerDesign.Pattern pattern = BannerDesign.getPattern(patternName);
+    if (pattern == null) {
+      Log.warn("Unknown banner pattern: " + patternName);
       return Texture.bannerBase.getBitmap();
-    } else {
-      String texId = "assets/minecraft/textures/entity/banner/" + filename;
-      Texture texture = TextureCache.get(texId);
-      if (texture == null) {
-        texture = new Texture();
-        TextureCache.put(texId, texture);
-
-        if(!ResourcePackLoader.loadResources(
-          ResourcePackTextureLoader.singletonLoader(filename, new SimpleTexture(texId, texture)))
-        ) {
-          // not completed singleton load --> failure
-          Log.infof("Failed to load banner pattern: %s", texId);
-        }
-      }
-      return texture.getBitmap();
     }
+    return pattern.getBitmap();
   }
 
-  @Override public JsonValue toJson() {
+  @Override
+  public JsonValue toJson() {
     JsonObject json = new JsonObject();
     json.add("kind", "standing_banner");
     json.add("position", position.toJson());
@@ -349,68 +218,10 @@ public class StandingBanner extends Entity {
     return new StandingBanner(position, rotation, json.get("design").object());
   }
 
-
-  public static float[] getColor(int colorCode) {
-    int color = 0;
-    switch (colorCode) {
-      case BlockData.COLOR_BLACK:
-        color = 0x000000;
-        break;
-      case BlockData.COLOR_BLUE:
-        color = 0x454FC4;
-        break;
-      case BlockData.COLOR_BROWN:
-        color = 0x96613A;
-        break;
-      case BlockData.COLOR_CYAN:
-        color = 0x1CC6C6;
-        break;
-      case BlockData.COLOR_GRAY:
-        color = 0x6E7B80;
-        break;
-      case BlockData.COLOR_GREEN:
-        color = 0x81AA1E;
-        break;
-      case BlockData.COLOR_LIGHT_BLUE:
-        color = 0x39AFD5;
-        break;
-      case BlockData.COLOR_LIME:
-        color = 0x89D520;
-        break;
-      case BlockData.COLOR_MAGENTA:
-        color = 0xCF51C5;
-        break;
-      case BlockData.COLOR_ORANGE:
-        color = 0xD76F19;
-        break;
-      case BlockData.COLOR_PINK:
-        color = 0xCF7691;
-        break;
-      case BlockData.COLOR_PURPLE:
-        color = 0x9536C9;
-        break;
-      case BlockData.COLOR_RED:
-        color = 0xCC352C;
-        break;
-      case BlockData.COLOR_SILVER:
-        color = 0xCCCCCC;
-        break;
-      case BlockData.COLOR_WHITE:
-        color = 0xFFFFFF;
-        break;
-      case BlockData.COLOR_YELLOW:
-        color = 0xE6C438;
-        break;
-    }
-    float[] components = new float[4];
-    ColorUtil.getRGBAComponents(color, components);
-    return components;
-  }
-
   public static Material getBannerTexture(JsonObject design) {
-    int base = design.get("base").asInt(BlockData.COLOR_WHITE);
+    BannerDesign.Color base = BannerDesign.Color.get(design.get("base").asInt(BannerDesign.Color.WHITE.id));
     JsonArray patterns = design.get("patterns").array();
-    if (base == BlockData.COLOR_WHITE && patterns.isEmpty()) {
+    if (base == BannerDesign.Color.WHITE && patterns.isEmpty()) {
       return new TextureMaterial(Texture.bannerBase);
     }
     Texture cachedTexture = TextureCache.get(design);
@@ -424,20 +235,20 @@ public class StandingBanner extends Entity {
     }
     int scale = plain.width / 64;
     BitmapImage tinted = new BitmapImage(plain.width, plain.height);
-    float[] color = getColor(base);
+    float[] color = base.rgbaColor;
     float[] col = new float[4];
     float[] com = new float[4];
     tinted.blit(plain, 0, 0);
-    if (base != BlockData.COLOR_WHITE) {
+    if (base != BannerDesign.Color.WHITE) {
       for (int y = 0; y < 41 * scale; ++y) {
         for (int x = 0; x < 42 * scale; ++x) {
           int argb = plain.getPixel(x, y);
           ColorUtil.getRGBAComponents(argb, col);
           tinted.setPixel(x, y, ColorUtil.getArgb(
-              color[0] * col[0],
-              color[1] * col[1],
-              color[2] * col[2],
-              1.f));
+            color[0] * col[0],
+            color[1] * col[1],
+            color[2] * col[2],
+            1.f));
         }
       }
     }
@@ -446,7 +257,7 @@ public class StandingBanner extends Entity {
       if (bitmap.width != plain.width || bitmap.height != plain.height) {
         Log.info("Banner pattern does not match base texture size.");
       } else {
-        color = getColor(pattern.object().get("color").intValue(BlockData.COLOR_BLACK));
+        color = BannerDesign.Color.get(pattern.object().get("color").intValue(BannerDesign.Color.BLACK.id)).rgbaColor;
         for (int y = 0; y < 41 * scale; ++y) {
           for (int x = 0; x < 42 * scale; ++x) {
             int argb = bitmap.getPixel(x, y);
@@ -454,10 +265,10 @@ public class StandingBanner extends Entity {
             ColorUtil.getRGBAComponents(tinted.getPixel(x, y), com);
             float f = col[3];
             tinted.setPixel(x, y, ColorUtil.getArgb(
-                color[0] * f + (1 - f) * com[0],
-                color[1] * f + (1 - f) * com[1],
-                color[2] * f + (1 - f) * com[2],
-                1.f));
+              color[0] * f + (1 - f) * com[0],
+              color[1] * f + (1 - f) * com[1],
+              color[2] * f + (1 - f) * com[2],
+              1.f));
           }
         }
       }

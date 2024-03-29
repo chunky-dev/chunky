@@ -4,6 +4,7 @@ import se.llbit.chunky.block.minecraft.Comparator;
 import se.llbit.chunky.block.minecraft.Observer;
 import se.llbit.chunky.block.minecraft.Tripwire;
 import se.llbit.chunky.block.minecraft.*;
+import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.model.minecraft.FlowerPotModel;
 import se.llbit.chunky.model.minecraft.FlowerPotModel.Kind;
@@ -2464,69 +2465,69 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "dragon_wall_head":
         return wallSkull(tag, Texture.dragon, SkullEntity.Kind.DRAGON);
       case "white_banner":
-        return banner(tag, Texture.whiteWool, BlockData.COLOR_WHITE);
+        return banner(tag, Texture.whiteWool, BannerDesign.Color.WHITE);
       case "orange_banner":
-        return banner(tag, Texture.orangeWool, BlockData.COLOR_ORANGE);
+        return banner(tag, Texture.orangeWool, BannerDesign.Color.ORANGE);
       case "magenta_banner":
-        return banner(tag, Texture.magentaWool, BlockData.COLOR_MAGENTA);
+        return banner(tag, Texture.magentaWool, BannerDesign.Color.MAGENTA);
       case "light_blue_banner":
-        return banner(tag, Texture.lightBlueWool, BlockData.COLOR_LIGHT_BLUE);
+        return banner(tag, Texture.lightBlueWool, BannerDesign.Color.LIGHT_BLUE);
       case "yellow_banner":
-        return banner(tag, Texture.yellowWool, BlockData.COLOR_YELLOW);
+        return banner(tag, Texture.yellowWool, BannerDesign.Color.YELLOW);
       case "lime_banner":
-        return banner(tag, Texture.limeWool, BlockData.COLOR_LIME);
+        return banner(tag, Texture.limeWool, BannerDesign.Color.LIME);
       case "pink_banner":
-        return banner(tag, Texture.pinkWool, BlockData.COLOR_PINK);
+        return banner(tag, Texture.pinkWool, BannerDesign.Color.PINK);
       case "gray_banner":
-        return banner(tag, Texture.grayWool, BlockData.COLOR_GRAY);
+        return banner(tag, Texture.grayWool, BannerDesign.Color.GRAY);
       case "light_gray_banner":
-        return banner(tag, Texture.lightGrayWool, BlockData.COLOR_SILVER);
+        return banner(tag, Texture.lightGrayWool, BannerDesign.Color.SILVER);
       case "cyan_banner":
-        return banner(tag, Texture.cyanWool, BlockData.COLOR_CYAN);
+        return banner(tag, Texture.cyanWool, BannerDesign.Color.CYAN);
       case "purple_banner":
-        return banner(tag, Texture.purpleWool, BlockData.COLOR_PURPLE);
+        return banner(tag, Texture.purpleWool, BannerDesign.Color.PURPLE);
       case "blue_banner":
-        return banner(tag, Texture.blueWool, BlockData.COLOR_BLUE);
+        return banner(tag, Texture.blueWool, BannerDesign.Color.BLUE);
       case "brown_banner":
-        return banner(tag, Texture.brownWool, BlockData.COLOR_BROWN);
+        return banner(tag, Texture.brownWool, BannerDesign.Color.BROWN);
       case "green_banner":
-        return banner(tag, Texture.greenWool, BlockData.COLOR_GREEN);
+        return banner(tag, Texture.greenWool, BannerDesign.Color.GREEN);
       case "red_banner":
-        return banner(tag, Texture.redWool, BlockData.COLOR_RED);
+        return banner(tag, Texture.redWool, BannerDesign.Color.RED);
       case "black_banner":
-        return banner(tag, Texture.blackWool, BlockData.COLOR_BLACK);
+        return banner(tag, Texture.blackWool, BannerDesign.Color.BLACK);
       case "white_wall_banner":
-        return wallBanner(tag, Texture.whiteWool, BlockData.COLOR_WHITE);
+        return wallBanner(tag, Texture.whiteWool, BannerDesign.Color.WHITE);
       case "orange_wall_banner":
-        return wallBanner(tag, Texture.orangeWool, BlockData.COLOR_ORANGE);
+        return wallBanner(tag, Texture.orangeWool, BannerDesign.Color.ORANGE);
       case "magenta_wall_banner":
-        return wallBanner(tag, Texture.magentaWool, BlockData.COLOR_MAGENTA);
+        return wallBanner(tag, Texture.magentaWool, BannerDesign.Color.MAGENTA);
       case "light_blue_wall_banner":
-        return wallBanner(tag, Texture.lightBlueWool, BlockData.COLOR_LIGHT_BLUE);
+        return wallBanner(tag, Texture.lightBlueWool, BannerDesign.Color.LIGHT_BLUE);
       case "yellow_wall_banner":
-        return wallBanner(tag, Texture.yellowWool, BlockData.COLOR_YELLOW);
+        return wallBanner(tag, Texture.yellowWool, BannerDesign.Color.YELLOW);
       case "lime_wall_banner":
-        return wallBanner(tag, Texture.limeWool, BlockData.COLOR_LIME);
+        return wallBanner(tag, Texture.limeWool, BannerDesign.Color.LIME);
       case "pink_wall_banner":
-        return wallBanner(tag, Texture.pinkWool, BlockData.COLOR_PINK);
+        return wallBanner(tag, Texture.pinkWool, BannerDesign.Color.PINK);
       case "gray_wall_banner":
-        return wallBanner(tag, Texture.grayWool, BlockData.COLOR_GRAY);
+        return wallBanner(tag, Texture.grayWool, BannerDesign.Color.GRAY);
       case "light_gray_wall_banner":
-        return wallBanner(tag, Texture.lightGrayWool, BlockData.COLOR_SILVER);
+        return wallBanner(tag, Texture.lightGrayWool, BannerDesign.Color.SILVER);
       case "cyan_wall_banner":
-        return wallBanner(tag, Texture.cyanWool, BlockData.COLOR_CYAN);
+        return wallBanner(tag, Texture.cyanWool, BannerDesign.Color.CYAN);
       case "purple_wall_banner":
-        return wallBanner(tag, Texture.purpleWool, BlockData.COLOR_PURPLE);
+        return wallBanner(tag, Texture.purpleWool, BannerDesign.Color.PURPLE);
       case "blue_wall_banner":
-        return wallBanner(tag, Texture.blueWool, BlockData.COLOR_BLUE);
+        return wallBanner(tag, Texture.blueWool, BannerDesign.Color.BLUE);
       case "brown_wall_banner":
-        return wallBanner(tag, Texture.brownWool, BlockData.COLOR_BROWN);
+        return wallBanner(tag, Texture.brownWool, BannerDesign.Color.BROWN);
       case "green_wall_banner":
-        return wallBanner(tag, Texture.greenWool, BlockData.COLOR_GREEN);
+        return wallBanner(tag, Texture.greenWool, BannerDesign.Color.GREEN);
       case "red_wall_banner":
-        return wallBanner(tag, Texture.redWool, BlockData.COLOR_RED);
+        return wallBanner(tag, Texture.redWool, BannerDesign.Color.RED);
       case "black_wall_banner":
-        return wallBanner(tag, Texture.blackWool, BlockData.COLOR_BLACK);
+        return wallBanner(tag, Texture.blackWool, BannerDesign.Color.BLACK);
       case "beetroots":
         return new Beetroots(BlockProvider.stringToInt(tag.get("Properties").get("age"), 3));
       case "loom":
@@ -3342,13 +3343,13 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new WallHangingSign(BlockProvider.blockName(tag), material, BlockProvider.facing(tag));
   }
 
-  private static Block banner(Tag tag, Texture texture, int color) {
+  private static Block banner(Tag tag, Texture texture, BannerDesign.Color color) {
     String name = BlockProvider.blockName(tag);
     int rotation = BlockProvider.stringToInt(tag.get("Properties").get("rotation"), 0);
     return new Banner(name, texture, rotation, color);
   }
 
-  private static Block wallBanner(Tag tag, Texture texture, int color) {
+  private static Block wallBanner(Tag tag, Texture texture, BannerDesign.Color color) {
     String name = BlockProvider.blockName(tag);
     String facing = BlockProvider.facing(tag);
     return new WallBanner(name, texture, facing, color);
