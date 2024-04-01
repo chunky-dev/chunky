@@ -456,7 +456,7 @@ public class StandingBanner extends Entity {
             int argb = bitmap.getPixel(x, y);
             ColorUtil.getRGBAComponents(argb, col);
             ColorUtil.getRGBAComponents(tinted.getPixel(x, y), com);
-            float f = col[0];
+            float f = col[3];
             tinted.setPixel(x, y, ColorUtil.getArgb(
                 color[0] * f + (1 - f) * com[0],
                 color[1] * f + (1 - f) * com[1],
