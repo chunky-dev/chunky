@@ -10,7 +10,6 @@ import se.llbit.chunky.model.minecraft.FlowerPotModel;
 import se.llbit.chunky.model.minecraft.FlowerPotModel.Kind;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
 
