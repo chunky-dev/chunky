@@ -17,7 +17,8 @@
  */
 package se.llbit.chunky.entity;
 
-import se.llbit.chunky.model.Model;
+import se.llbit.chunky.model.builder.BoxModelBuilder;
+import se.llbit.chunky.model.builder.UVMapHelper;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
@@ -252,238 +253,65 @@ public class SkullEntity extends Entity {
   //#endregion
 
   //#region Piglin head
-  private static final UVMapHelper piglinHeadCube1 = new UVMapHelper(10, 8, 8, 0, 0).flipX();
-  private static final UVMapHelper piglinHeadCube2 = new UVMapHelper(4, 1, 4, 31, 1);
-  private static final UVMapHelper piglinHeadCube3 = new UVMapHelper(1, 1, 2, 2, 0);
-  private static final UVMapHelper piglinHeadCube4 = new UVMapHelper(1, 1, 2, 2, 4);
-  private static final UVMapHelper piglinHeadEarLeft = new UVMapHelper(1, 4, 5, 39, 6).flipY();
-  private static final UVMapHelper piglinHeadEarRight = new UVMapHelper(1, 4, 5, 51, 6).flipY();
-  private static final Quad[] piglinHead = Model.join(
-    new Quad[]{
-      new Quad(
-        new Vector3(-5 / 16.0, 8 / 16.0, 4 / 16.0),
-        new Vector3(5 / 16.0, 8 / 16.0, 4 / 16.0),
-        new Vector3(-5 / 16.0, 8 / 16.0, -4 / 16.0),
-        piglinHeadCube1.top().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(-5 / 16.0, 0 / 16.0, -4 / 16.0),
-        new Vector3(5 / 16.0, 0 / 16.0, -4 / 16.0),
-        new Vector3(-5 / 16.0, 0 / 16.0, 4 / 16.0),
-        piglinHeadCube1.bottom().flipY().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(-5 / 16.0, 8 / 16.0, 4 / 16.0),
-        new Vector3(-5 / 16.0, 8 / 16.0, -4 / 16.0),
-        new Vector3(-5 / 16.0, 0 / 16.0, 4 / 16.0),
-        piglinHeadCube1.left().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(5 / 16.0, 8 / 16.0, -4 / 16.0),
-        new Vector3(5 / 16.0, 8 / 16.0, 4 / 16.0),
-        new Vector3(5 / 16.0, 0 / 16.0, -4 / 16.0),
-        piglinHeadCube1.right().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(-5 / 16.0, 8 / 16.0, -4 / 16.0),
-        new Vector3(5 / 16.0, 8 / 16.0, -4 / 16.0),
-        new Vector3(-5 / 16.0, 0 / 16.0, -4 / 16.0),
-        piglinHeadCube1.front().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(5 / 16.0, 8 / 16.0, 4 / 16.0),
-        new Vector3(-5 / 16.0, 8 / 16.0, 4 / 16.0),
-        new Vector3(5 / 16.0, 0 / 16.0, 4 / 16.0),
-        piglinHeadCube1.back().toVectorForQuad()
-      )
-    },
-    new Quad[]{
-      new Quad(
-        new Vector3(-2 / 16.0, 4 / 16.0, -4 / 16.0),
-        new Vector3(2 / 16.0, 4 / 16.0, -4 / 16.0),
-        new Vector3(-2 / 16.0, 4 / 16.0, -5 / 16.0),
-        piglinHeadCube2.top().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(-2 / 16.0, 0 / 16.0, -5 / 16.0),
-        new Vector3(2 / 16.0, 0 / 16.0, -5 / 16.0),
-        new Vector3(-2 / 16.0, 0 / 16.0, -4 / 16.0),
-        piglinHeadCube2.bottom().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(-2 / 16.0, 4 / 16.0, -4 / 16.0),
-        new Vector3(-2 / 16.0, 4 / 16.0, -5 / 16.0),
-        new Vector3(-2 / 16.0, 0 / 16.0, -4 / 16.0),
-        piglinHeadCube2.left().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(2 / 16.0, 4 / 16.0, -5 / 16.0),
-        new Vector3(2 / 16.0, 4 / 16.0, -4 / 16.0),
-        new Vector3(2 / 16.0, 0 / 16.0, -5 / 16.0),
-        piglinHeadCube2.right().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(-2 / 16.0, 4 / 16.0, -5 / 16.0),
-        new Vector3(2 / 16.0, 4 / 16.0, -5 / 16.0),
-        new Vector3(-2 / 16.0, 0 / 16.0, -5 / 16.0),
-        piglinHeadCube2.front().toVectorForQuad()
-      )
-    },
-    new Quad[]{
-      new Quad(
-        new Vector3(2 / 16.0, 2 / 16.0, -4 / 16.0),
-        new Vector3(3 / 16.0, 2 / 16.0, -4 / 16.0),
-        new Vector3(2 / 16.0, 2 / 16.0, -5 / 16.0),
-        piglinHeadCube3.top().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(2 / 16.0, 0 / 16.0, -5 / 16.0),
-        new Vector3(3 / 16.0, 0 / 16.0, -5 / 16.0),
-        new Vector3(2 / 16.0, 0 / 16.0, -4 / 16.0),
-        piglinHeadCube3.bottom().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(2 / 16.0, 2 / 16.0, -4 / 16.0),
-        new Vector3(2 / 16.0, 2 / 16.0, -5 / 16.0),
-        new Vector3(2 / 16.0, 0 / 16.0, -4 / 16.0),
-        piglinHeadCube3.left().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(3 / 16.0, 2 / 16.0, -5 / 16.0),
-        new Vector3(3 / 16.0, 2 / 16.0, -4 / 16.0),
-        new Vector3(3 / 16.0, 0 / 16.0, -5 / 16.0),
-        piglinHeadCube3.right().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(2 / 16.0, 2 / 16.0, -5 / 16.0),
-        new Vector3(3 / 16.0, 2 / 16.0, -5 / 16.0),
-        new Vector3(2 / 16.0, 0 / 16.0, -5 / 16.0),
-        piglinHeadCube3.front().toVectorForQuad()
-      )
-    },
-    new Quad[]{
-      new Quad(
-        new Vector3(-3 / 16.0, 2 / 16.0, -4 / 16.0),
-        new Vector3(-2 / 16.0, 2 / 16.0, -4 / 16.0),
-        new Vector3(-3 / 16.0, 2 / 16.0, -5 / 16.0),
-        piglinHeadCube4.top().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(-3 / 16.0, 0 / 16.0, -5 / 16.0),
-        new Vector3(-2 / 16.0, 0 / 16.0, -5 / 16.0),
-        new Vector3(-3 / 16.0, 0 / 16.0, -4 / 16.0),
-        piglinHeadCube4.bottom().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(-3 / 16.0, 2 / 16.0, -4 / 16.0),
-        new Vector3(-3 / 16.0, 2 / 16.0, -5 / 16.0),
-        new Vector3(-3 / 16.0, 0 / 16.0, -4 / 16.0),
-        piglinHeadCube4.left().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(-2 / 16.0, 2 / 16.0, -5 / 16.0),
-        new Vector3(-2 / 16.0, 2 / 16.0, -4 / 16.0),
-        new Vector3(-2 / 16.0, 0 / 16.0, -5 / 16.0),
-        piglinHeadCube4.right().toVectorForQuad()
-      ),
-      new Quad(
-        new Vector3(-3 / 16.0, 2 / 16.0, -5 / 16.0),
-        new Vector3(-2 / 16.0, 2 / 16.0, -5 / 16.0),
-        new Vector3(-3 / 16.0, 0 / 16.0, -5 / 16.0),
-        piglinHeadCube4.front().toVectorForQuad()
-      )
-    },
-    Model.transform(
-      new Quad[]{
-        new Quad(
-          new Vector3(0 / 16.0, 5 / 16.0, 2 / 16.0),
-          new Vector3(1 / 16.0, 5 / 16.0, 2 / 16.0),
-          new Vector3(0 / 16.0, 5 / 16.0, -2 / 16.0),
-          piglinHeadEarLeft.bottom().toVectorForQuad()
-        ),
-        new Quad(
-          new Vector3(0 / 16.0, 0 / 16.0, -2 / 16.0),
-          new Vector3(1 / 16.0, 0 / 16.0, -2 / 16.0),
-          new Vector3(0 / 16.0, 0 / 16.0, 2 / 16.0),
-          piglinHeadEarLeft.top().toVectorForQuad()
-        ),
-        new Quad(
-          new Vector3(0 / 16.0, 5 / 16.0, 2 / 16.0),
-          new Vector3(0 / 16.0, 5 / 16.0, -2 / 16.0),
-          new Vector3(0 / 16.0, 0 / 16.0, 2 / 16.0),
-          piglinHeadEarLeft.left().toVectorForQuad()
-        ),
-        new Quad(
-          new Vector3(1 / 16.0, 5 / 16.0, -2 / 16.0),
-          new Vector3(1 / 16.0, 5 / 16.0, 2 / 16.0),
-          new Vector3(1 / 16.0, 0 / 16.0, -2 / 16.0),
-          piglinHeadEarLeft.right().toVectorForQuad()
-        ),
-        new Quad(
-          new Vector3(0 / 16.0, 5 / 16.0, -2 / 16.0),
-          new Vector3(1 / 16.0, 5 / 16.0, -2 / 16.0),
-          new Vector3(0 / 16.0, 0 / 16.0, -2 / 16.0),
-          piglinHeadEarLeft.front().toVectorForQuad()
-        ),
-        new Quad(
-          new Vector3(1 / 16.0, 5 / 16.0, 2 / 16.0),
-          new Vector3(0 / 16.0, 5 / 16.0, 2 / 16.0),
-          new Vector3(1 / 16.0, 0 / 16.0, 2 / 16.0),
-          piglinHeadEarLeft.back().toVectorForQuad()
-        )
-      },
-      Transform.NONE
-        .translate(0.5 - 1 / 16., 0.5, 0.5)
-        .rotateZ(Math.toRadians(220))
-        .translate(-0.5, -0.5, -0.5)
-        .translate(4.5 / 16.0, 6 / 16.0, 0 / 16.0)
-    ),
-    Model.transform(
-      new Quad[]{
-        new Quad(
-          new Vector3(-1 / 16.0, 5 / 16.0, 2 / 16.0),
-          new Vector3(0 / 16.0, 5 / 16.0, 2 / 16.0),
-          new Vector3(-1 / 16.0, 5 / 16.0, -2 / 16.0),
-          piglinHeadEarRight.bottom().toVectorForQuad()
-        ),
-        new Quad(
-          new Vector3(-1 / 16.0, 0 / 16.0, -2 / 16.0),
-          new Vector3(0 / 16.0, 0 / 16.0, -2 / 16.0),
-          new Vector3(-1 / 16.0, 0 / 16.0, 2 / 16.0),
-          piglinHeadEarRight.top().toVectorForQuad()
-        ),
-        new Quad(
-          new Vector3(-1 / 16.0, 5 / 16.0, 2 / 16.0),
-          new Vector3(-1 / 16.0, 5 / 16.0, -2 / 16.0),
-          new Vector3(-1 / 16.0, 0 / 16.0, 2 / 16.0),
-          piglinHeadEarRight.left().toVectorForQuad()
-        ),
-        new Quad(
-          new Vector3(0 / 16.0, 5 / 16.0, -2 / 16.0),
-          new Vector3(0 / 16.0, 5 / 16.0, 2 / 16.0),
-          new Vector3(0 / 16.0, 0 / 16.0, -2 / 16.0),
-          piglinHeadEarRight.right().toVectorForQuad()
-        ),
-        new Quad(
-          new Vector3(-1 / 16.0, 5 / 16.0, -2 / 16.0),
-          new Vector3(0 / 16.0, 5 / 16.0, -2 / 16.0),
-          new Vector3(-1 / 16.0, 0 / 16.0, -2 / 16.0),
-          piglinHeadEarRight.front().toVectorForQuad()
-        ),
-        new Quad(
-          new Vector3(0 / 16.0, 5 / 16.0, 2 / 16.0),
-          new Vector3(-1 / 16.0, 5 / 16.0, 2 / 16.0),
-          new Vector3(0 / 16.0, 0 / 16.0, 2 / 16.0),
-          piglinHeadEarRight.back().toVectorForQuad()
-        )
-      },
-      Transform.NONE
-        .translate(0.5 + 1 / 16., 0.5, 0.5)
-        .rotateZ(Math.toRadians(140))
-        .translate(-0.5, -0.5, -0.5)
-        .translate(-4.5 / 16.0, 6 / 16.0, 0 / 16.0)
-    )
-  );
+  private static final Quad[] piglinHead = new BoxModelBuilder()
+    .addBox(new Vector3(-5 / 16., 0, -4 / 16.), new Vector3(5 / 16., 8 / 16., 4 / 16.), box ->
+      box.useEntityTexture(Texture.piglin).atUVCoordinates(0, 0).flipX()
+        .addTopFace(UVMapHelper.Side::flipX)
+        .addBottomFace(UVMapHelper.Side::flipY)
+        .addLeftFace()
+        .addRightFace()
+        .addFrontFace()
+        .addBackFace())
+    .addBox(new Vector3(-2 / 16., 0, -5 / 16.), new Vector3(2 / 16., 4 / 16., -4 / 16.), box ->
+      box.useEntityTexture(Texture.piglin).atUVCoordinates(31, 1)
+        .addTopFace()
+        .addBottomFace()
+        .addLeftFace()
+        .addRightFace()
+        .addFrontFace())
+    .addBox(new Vector3(2 / 16., 0, -5 / 16.), new Vector3(3 / 16., 2 / 16., -4 / 16.), box ->
+      box.useEntityTexture(Texture.piglin).atUVCoordinates(2, 0)
+        .addTopFace()
+        .addBottomFace()
+        .addLeftFace()
+        .addRightFace()
+        .addFrontFace())
+    .addBox(new Vector3(-3 / 16., 0, -5 / 16.), new Vector3(-2 / 16., 2 / 16., -4 / 16.), box ->
+      box.useEntityTexture(Texture.piglin).atUVCoordinates(2, 4)
+        .addTopFace()
+        .addBottomFace()
+        .addLeftFace()
+        .addRightFace()
+        .addFrontFace())
+    .addBox(new Vector3(0, 0, -2 / 16.), new Vector3(1 / 16., 5 / 16., 2 / 16.), box ->
+      box.useEntityTexture(Texture.piglin).atUVCoordinates(39, 6).flipY()
+        .addTopFace()
+        .addBottomFace()
+        .addLeftFace()
+        .addRightFace()
+        .addFrontFace()
+        .addBackFace()
+        .transform(Transform.NONE
+          .translate(0.5 - 1 / 16., 0.5, 0.5)
+          .rotateZ(Math.toRadians(220))
+          .translate(-0.5, -0.5, -0.5)
+          .translate(4.5 / 16.0, 6 / 16.0, 0 / 16.0)
+        ))
+    .addBox(new Vector3(-1 / 16., 0, -2 / 16.), new Vector3(0, 5 / 16., 2 / 16.), box ->
+      box.useEntityTexture(Texture.piglin).atUVCoordinates(51, 6).flipY()
+        .addTopFace()
+        .addBottomFace()
+        .addLeftFace()
+        .addRightFace()
+        .addFrontFace()
+        .addBackFace()
+        .transform(Transform.NONE
+          .translate(0.5 + 1 / 16., 0.5, 0.5)
+          .rotateZ(Math.toRadians(140))
+          .translate(-0.5, -0.5, -0.5)
+          .translate(-4.5 / 16.0, 6 / 16.0, 0 / 16.0)
+        ))
+    .toQuads();
   //#endregion
 
   /**

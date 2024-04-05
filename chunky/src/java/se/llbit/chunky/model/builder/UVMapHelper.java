@@ -1,8 +1,10 @@
-package se.llbit.chunky.entity;
+package se.llbit.chunky.model.builder;
 
 import se.llbit.math.Vector4;
 
 public class UVMapHelper {
+  private final int textureWidth;
+  private final int textureHeight;
   private final int width;
   private final int length;
   private final int height;
@@ -12,12 +14,19 @@ public class UVMapHelper {
   private boolean flipX = false;
   private boolean flipY = false;
 
-  public UVMapHelper(int width, int length, int height, int boxU, int boxV) {
+  public UVMapHelper(int textureWidth, int textureHeight, int width, int length, int height, int boxU, int boxV) {
+    this.textureWidth = textureWidth;
+    this.textureHeight = textureHeight;
     this.width = width;
     this.length = length;
     this.height = height;
     this.boxU = boxU;
     this.boxV = boxV;
+  }
+
+  @Deprecated
+  public UVMapHelper(int width, int length, int height, int boxU, int boxV) {
+    this(64, 64, width, length, height, boxU, boxV);
   }
 
   public UVMapHelper flipX() {
@@ -58,7 +67,7 @@ public class UVMapHelper {
     return new Side(flipX ? x1 : x0, flipX ? x0 : x1, flipY ? y1 : y0, flipY ? y0 : y1);
   }
 
-  public static class Side {
+  public class Side {
     private double x0;
     private double x1;
     private double y0;
@@ -91,7 +100,7 @@ public class UVMapHelper {
      * @return UV vector t hat can be used to construct a Quad
      */
     public Vector4 toVectorForQuad() {
-      return new Vector4(x0 / 64., x1 / 64., 1 - y0 / 64., 1 - y1 / 64.);
+      return new Vector4(x0 / textureWidth, x1 / textureWidth, 1 - y0 / textureHeight, 1 - y1 / textureHeight);
     }
   }
 }
