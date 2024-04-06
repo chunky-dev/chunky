@@ -80,6 +80,11 @@ public class UVMapHelper {
       this.y1 = y1;
     }
 
+    /**
+     * Flip the texture horizontally.
+     *
+     * @return This side
+     */
     public Side flipX() {
       double tmp = x0;
       x0 = x1;
@@ -87,6 +92,11 @@ public class UVMapHelper {
       return this;
     }
 
+    /**
+     * Flip the texture vertically.
+     *
+     * @return This side
+     */
     public Side flipY() {
       double tmp = y0;
       y0 = y1;

@@ -255,7 +255,7 @@ public class SkullEntity extends Entity {
   //#region Piglin head
   private static final Quad[] piglinHead = new BoxModelBuilder()
     .addBox(new Vector3(-5 / 16., 0, -4 / 16.), new Vector3(5 / 16., 8 / 16., 4 / 16.), box ->
-      box.useEntityTexture(Texture.piglin).atUVCoordinates(0, 0).flipX()
+      box.forTextureSize(Texture.piglin, 64, 64).atUVCoordinates(0, 0).flipX()
         .addTopFace(UVMapHelper.Side::flipX)
         .addBottomFace(UVMapHelper.Side::flipY)
         .addLeftFace()
@@ -263,28 +263,28 @@ public class SkullEntity extends Entity {
         .addFrontFace()
         .addBackFace())
     .addBox(new Vector3(-2 / 16., 0, -5 / 16.), new Vector3(2 / 16., 4 / 16., -4 / 16.), box ->
-      box.useEntityTexture(Texture.piglin).atUVCoordinates(31, 1)
+      box.forTextureSize(Texture.piglin, 64, 64).atUVCoordinates(31, 1)
         .addTopFace()
         .addBottomFace()
         .addLeftFace()
         .addRightFace()
         .addFrontFace())
     .addBox(new Vector3(2 / 16., 0, -5 / 16.), new Vector3(3 / 16., 2 / 16., -4 / 16.), box ->
-      box.useEntityTexture(Texture.piglin).atUVCoordinates(2, 0)
+      box.forTextureSize(Texture.piglin, 64, 64).atUVCoordinates(2, 0)
         .addTopFace()
         .addBottomFace()
         .addLeftFace()
         .addRightFace()
         .addFrontFace())
     .addBox(new Vector3(-3 / 16., 0, -5 / 16.), new Vector3(-2 / 16., 2 / 16., -4 / 16.), box ->
-      box.useEntityTexture(Texture.piglin).atUVCoordinates(2, 4)
+      box.forTextureSize(Texture.piglin, 64, 64).atUVCoordinates(2, 4)
         .addTopFace()
         .addBottomFace()
         .addLeftFace()
         .addRightFace()
         .addFrontFace())
     .addBox(new Vector3(0, 0, -2 / 16.), new Vector3(1 / 16., 5 / 16., 2 / 16.), box ->
-      box.useEntityTexture(Texture.piglin).atUVCoordinates(39, 6).flipY()
+      box.forTextureSize(Texture.piglin, 64, 64).atUVCoordinates(39, 6).flipY()
         .addTopFace()
         .addBottomFace()
         .addLeftFace()
@@ -298,7 +298,7 @@ public class SkullEntity extends Entity {
           .translate(4.5 / 16.0, 6 / 16.0, 0 / 16.0)
         ))
     .addBox(new Vector3(-1 / 16., 0, -2 / 16.), new Vector3(0, 5 / 16., 2 / 16.), box ->
-      box.useEntityTexture(Texture.piglin).atUVCoordinates(51, 6).flipY()
+      box.forTextureSize(Texture.piglin, 64, 64).atUVCoordinates(51, 6).flipY()
         .addTopFace()
         .addBottomFace()
         .addLeftFace()
