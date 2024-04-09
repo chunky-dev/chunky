@@ -56,14 +56,14 @@ public final class SettingsDirectory {
    * if the settings directory could not be located.
    */
   public static File getSettingsDirectory() { // TODO: make this return Optional<File>.
-    String chunkyHomeProperty = System.getProperty("chunky.home");
-    if (chunkyHomeProperty != null && !chunkyHomeProperty.isEmpty()) {
+    File directory = getChunkyHomeDirectory();
+    if (directory != null) {
       // We don't check if this is a valid settings directory because
       // we should always respect the system property in case the user
       // has manually specified it.
-      return new File(chunkyHomeProperty);
+      return directory;
     }
-    File directory = getWorkingDirectory();
+    directory = getWorkingDirectory();
     if (isSettingsDirectory(directory)) {
       return directory;
     }
@@ -90,6 +90,17 @@ public final class SettingsDirectory {
       }
     }
     return false;
+  }
+
+  /**
+   * @return the path specified by the "chunky.home" system property.
+   */
+  public static File getChunkyHomeDirectory() {
+    String chunkyHomeProperty = System.getProperty("chunky.home");
+    if (chunkyHomeProperty != null && !chunkyHomeProperty.isEmpty()) {
+      return new File(chunkyHomeProperty);
+    }
+    return null;
   }
 
   /**
