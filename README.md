@@ -205,7 +205,7 @@ Chunky uses the following 3rd party libraries:
   See the file `licenses/Apache-2.0.txt` for the full license text.
   See the file `licenses/fast-util.txt` for the copyright notice.
 - **Gson by Google**  
-  The library is convered by the Apache License, version 2.0.
+  The library is covered by the Apache License, version 2.0.
   See the file `licenses/Apache-2.0.txt` for the full license text.
   See the file `licenses/gson.txt` for the copyright notice.
 - **Simplex noise implementation by Stefan Gustavson and Keijiro Takahashi**  
@@ -215,6 +215,9 @@ Chunky uses the following 3rd party libraries:
   See the file `licenses/Apache-2.0.txt` for the full license text.
   See the file `licenses/lz4-java.txt` for the copyright notice.
   lz4-java uses LZ4, by Yann Collet, which is covered by the BSD 2-Clause license. See the file `licenses/lz4.txt` for the copyright notice and full license.
+- **Semver4j by Vincent Durmont**
+  The library is covered by the MIT License.
+  See the file `licenses/semver4j.txt` for the copyright notice.
 
 ## Special Thanks
 
