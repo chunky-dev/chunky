@@ -532,6 +532,15 @@ public final class PersistentSettings {
     save();
   }
 
+  public static boolean getLoadPigs() {
+    return settings.getBool("loadPigs", true);
+  }
+
+  public static void setLoadPigs(boolean value) {
+    settings.setBool("loadPigs", value);
+    save();
+  }
+
   public static boolean getLoadOtherEntities() {
     return settings.getBool("loadOtherEntities", true);
   }

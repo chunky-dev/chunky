@@ -124,6 +124,8 @@ abstract public class Entity {
         return CowEntity.fromJson(json);
       case "chicken":
         return ChickenEntity.fromJson(json);
+      case "pig":
+        return PigEntity.fromJson(json);
     }
     return null;
   }
