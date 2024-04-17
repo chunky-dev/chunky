@@ -531,6 +531,10 @@ public class Texture {
   public static final EntityTexture cow = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/chicken")
   public static final EntityTexture chicken = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/pig/pig")
+  public static final EntityTexture pig = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/pig/pig_saddle")
+  public static final EntityTexture pigSaddle = new EntityTexture();
 
   // [1.10] Bone, magma, nether wart block, red nether brick.
   public static final Texture boneSide = new Texture();

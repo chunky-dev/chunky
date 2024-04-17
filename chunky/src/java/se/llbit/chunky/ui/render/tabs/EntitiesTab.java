@@ -96,6 +96,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     entityTypes.put("Sheep", (position, scene) -> new SheepEntity(position, new CompoundTag()));
     entityTypes.put("Cow", (position, scene) -> new CowEntity(position, new CompoundTag()));
     entityTypes.put("Chicken", (position, scene) -> new ChickenEntity(position, new CompoundTag()));
+    entityTypes.put("Pig", (position, scene) -> new PigEntity(position, new CompoundTag()));
   }
 
   private Scene scene;
@@ -682,6 +683,23 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       propertyControls.getChildren().addAll(emittance, specular, perceptualSmoothness, ior, metalness, sheepColorPicker);
       colorBox.getChildren().addAll(propertyControls);
       controls.getChildren().add(colorBox);
+    }
+
+    if (entity instanceof Saddleable) {
+      Saddleable saddleable = (Saddleable) entity;
+      CheckBox showOuterLayer = new CheckBox("Is Saddled?");
+      showOuterLayer.setPadding(new Insets(10));
+      showOuterLayer.setSelected(saddleable.isSaddled());
+      showOuterLayer.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+        saddleable.setIsSaddled(newValue);
+        scene.rebuildActorBvh();
+      }));
+      HBox layerBox = new HBox();
+      layerBox.setSpacing(10.0);
+      layerBox.setAlignment(Pos.CENTER_LEFT);
+      layerBox.getChildren().addAll(showOuterLayer);
+
+      controls.getChildren().addAll(layerBox);
     }
   }
 

@@ -8,6 +8,7 @@ import se.llbit.chunky.entity.ChickenEntity;
 import se.llbit.chunky.entity.CowEntity;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.PaintingEntity;
+import se.llbit.chunky.entity.PigEntity;
 import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.entity.SheepEntity;
 import se.llbit.chunky.world.Dimension;
@@ -174,6 +175,8 @@ public class SceneEntities {
             addActor(new CowEntity(new Vector3(x, y, z), tag));
           } else if (id.equals("minecraft:chicken") && entityLoadingPreferences.shouldLoadClass(ChickenEntity.class)) {
             addActor(new ChickenEntity(new Vector3(x, y, z), tag));
+          } else if (id.equals("minecraft:pig") && entityLoadingPreferences.shouldLoadClass(PigEntity.class)) {
+            addActor(new PigEntity(new Vector3(x, y, z), tag));
           }
         }
       }

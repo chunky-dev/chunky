@@ -23,6 +23,7 @@ public class EntityLoadingPreferences {
         loadingPreferences.put(SheepEntity.class, PersistentSettings.getLoadSheep());
         loadingPreferences.put(CowEntity.class, PersistentSettings.getLoadCows());
         loadingPreferences.put(ChickenEntity.class, PersistentSettings.getLoadChickens());
+        loadingPreferences.put(PigEntity.class, PersistentSettings.getLoadPigs());
         loadOtherEntities = PersistentSettings.getLoadOtherEntities();
     }
 
