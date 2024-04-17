@@ -4,6 +4,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.entity.ArmorStand;
+import se.llbit.chunky.entity.ChickenEntity;
 import se.llbit.chunky.entity.CowEntity;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.PaintingEntity;
@@ -171,6 +172,8 @@ public class SceneEntities {
             addActor(new SheepEntity(new Vector3(x, y, z), tag));
           } else if (id.equals("minecraft:cow") && entityLoadingPreferences.shouldLoadClass(CowEntity.class)) {
             addActor(new CowEntity(new Vector3(x, y, z), tag));
+          } else if (id.equals("minecraft:chicken") && entityLoadingPreferences.shouldLoadClass(ChickenEntity.class)) {
+            addActor(new ChickenEntity(new Vector3(x, y, z), tag));
           }
         }
       }

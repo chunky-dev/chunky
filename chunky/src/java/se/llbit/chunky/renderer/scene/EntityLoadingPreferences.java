@@ -22,6 +22,7 @@ public class EntityLoadingPreferences {
         loadingPreferences.put(BeaconBeam.class, PersistentSettings.getLoadBeaconBeams());
         loadingPreferences.put(SheepEntity.class, PersistentSettings.getLoadSheep());
         loadingPreferences.put(CowEntity.class, PersistentSettings.getLoadCows());
+        loadingPreferences.put(ChickenEntity.class, PersistentSettings.getLoadChickens());
         loadOtherEntities = PersistentSettings.getLoadOtherEntities();
     }
 
