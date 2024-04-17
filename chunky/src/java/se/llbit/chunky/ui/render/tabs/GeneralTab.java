@@ -33,6 +33,7 @@ import javafx.scene.text.Text;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Book;
+import se.llbit.chunky.entity.CowEntity;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.BeaconBeam;
 import se.llbit.chunky.entity.PlayerEntity;
@@ -96,6 +97,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private CheckBox loadPaintings;
   @FXML private CheckBox loadBeaconBeams;
   @FXML private CheckBox loadSheep;
+  @FXML private CheckBox loadCows;
   @FXML private CheckBox loadOtherEntities;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
@@ -146,6 +148,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadPaintings.setSelected(preferences.shouldLoadClass(PaintingEntity.class));
       loadBeaconBeams.setSelected(preferences.shouldLoadClass(BeaconBeam.class));
       loadSheep.setSelected(preferences.shouldLoadClass(SheepEntity.class));
+      loadCows.setSelected(preferences.shouldLoadClass(CowEntity.class));
       loadOtherEntities.setSelected(preferences.shouldLoadClass(null));
     }
 
@@ -302,6 +305,16 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     loadSheep.setOnAction(event -> {
       renderControls.showPopup(
         "This takes effect the next time a new scene is created.", loadSheep);
+    });
+    loadCows.setTooltip(new Tooltip("Enable/disable cow entity loading. "
+      + "Takes effect on next scene creation."));
+    loadCows.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(CowEntity.class, newValue);
+      PersistentSettings.setLoadCows(newValue);
+    });
+    loadCows.setOnAction(event -> {
+      renderControls.showPopup(
+        "This takes effect the next time a new scene is created.", loadCows);
     });
     loadOtherEntities.setTooltip(new Tooltip("Enable/disable other entity loading. "
             + "Takes effect on next scene creation."));

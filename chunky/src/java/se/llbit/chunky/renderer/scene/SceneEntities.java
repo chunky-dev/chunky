@@ -4,6 +4,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.entity.ArmorStand;
+import se.llbit.chunky.entity.CowEntity;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
@@ -168,6 +169,8 @@ public class SceneEntities {
             ));
           } else if (id.equals("minecraft:sheep") && entityLoadingPreferences.shouldLoadClass(SheepEntity.class)) {
             addActor(new SheepEntity(new Vector3(x, y, z), tag));
+          } else if (id.equals("minecraft:cow") && entityLoadingPreferences.shouldLoadClass(CowEntity.class)) {
+            addActor(new CowEntity(new Vector3(x, y, z), tag));
           }
         }
       }
