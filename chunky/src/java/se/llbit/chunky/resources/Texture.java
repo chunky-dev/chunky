@@ -523,6 +523,10 @@ public class Texture {
   public static final EntityTexture wither = new EntityTexture();
   public static final EntityTexture dragon = new EntityTexture();
   public static final EntityTexture book = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/sheep/sheep")
+  public static final EntityTexture sheep = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/sheep/sheep_fur")
+  public static final EntityTexture sheepFur = new EntityTexture();
 
   // [1.10] Bone, magma, nether wart block, red nether brick.
   public static final Texture boneSide = new Texture();

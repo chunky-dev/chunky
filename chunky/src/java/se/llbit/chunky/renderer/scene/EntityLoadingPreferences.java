@@ -20,6 +20,7 @@ public class EntityLoadingPreferences {
         loadingPreferences.put(Book.class, PersistentSettings.getLoadBooks());
         loadingPreferences.put(PaintingEntity.class, PersistentSettings.getLoadPaintings());
         loadingPreferences.put(BeaconBeam.class, PersistentSettings.getLoadBeaconBeams());
+        loadingPreferences.put(SheepEntity.class, PersistentSettings.getLoadSheep());
         loadOtherEntities = PersistentSettings.getLoadOtherEntities();
     }
 
