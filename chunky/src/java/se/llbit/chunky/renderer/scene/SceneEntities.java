@@ -7,6 +7,7 @@ import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
+import se.llbit.chunky.entity.SheepEntity;
 import se.llbit.chunky.world.Dimension;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -165,6 +166,8 @@ public class SceneEntities {
               new Vector3(x, y, z),
               tag
             ));
+          } else if (id.equals("minecraft:sheep") && entityLoadingPreferences.shouldLoadClass(SheepEntity.class)) {
+            addActor(new SheepEntity(new Vector3(x, y, z), tag));
           }
         }
       }

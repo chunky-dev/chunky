@@ -17,8 +17,6 @@
  */
 package se.llbit.chunky.entity;
 
-import java.util.Collection;
-
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.model.minecraft.DecoratedPotModel;
 import se.llbit.json.JsonObject;
@@ -120,6 +118,8 @@ abstract public class Entity {
         return HangingSignEntity.fromJson(json);
       case "wallHangingSign":
         return WallHangingSignEntity.fromJson(json);
+      case "sheep":
+        return SheepEntity.fromJson(json);
     }
     return null;
   }

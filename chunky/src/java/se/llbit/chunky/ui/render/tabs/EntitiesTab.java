@@ -16,12 +16,6 @@
  */
 package se.llbit.chunky.ui.render.tabs;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
-import java.util.function.Consumer;
-
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -32,27 +26,23 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import se.llbit.chunky.entity.ArmorStand;
-import se.llbit.chunky.entity.BeaconBeam;
-import se.llbit.chunky.entity.Book;
-import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.entity.Geared;
-import se.llbit.chunky.entity.Lectern;
-import se.llbit.chunky.entity.PlayerEntity;
-import se.llbit.chunky.entity.Poseable;
+import se.llbit.chunky.entity.*;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.ui.DoubleTextField;
-import se.llbit.chunky.ui.dialogs.ValidatingTextInputDialog;
-import se.llbit.chunky.ui.elements.AngleAdjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.DoubleTextField;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.IntegerTextField;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
+import se.llbit.chunky.ui.dialogs.ValidatingTextInputDialog;
+import se.llbit.chunky.ui.elements.AngleAdjuster;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.material.BeaconBeamMaterial;
+import se.llbit.chunky.world.material.DyedTextureMaterial;
 import se.llbit.fx.LuxColorPicker;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.json.Json;
@@ -65,6 +55,18 @@ import se.llbit.nbt.CompoundTag;
 import se.llbit.util.mojangapi.MinecraftProfile;
 import se.llbit.util.mojangapi.MinecraftSkin;
 import se.llbit.util.mojangapi.MojangApi;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.function.Consumer;
 
 public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initializable {
   private static final Map<String, EntitiesTab.EntityType<?>> entityTypes = new HashMap<>();
@@ -91,6 +93,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     entityTypes.put("Lectern", (position, scene) -> new Lectern(position, "north", true));
     entityTypes.put("Book", (position, scene) -> new Book(position, Math.PI - Math.PI / 16, Math.toRadians(30), Math.toRadians(180 - 30)));
     entityTypes.put("Beacon beam", (position, scene) -> new BeaconBeam(position));
+    entityTypes.put("Sheep", (position, scene) -> new SheepEntity(position, new CompoundTag()));
   }
 
   private Scene scene;
@@ -290,8 +293,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
 
         controls.getChildren().addAll(modelBox, skinBox, layerBox);
       }
-
-      if (entity instanceof Book || entity instanceof Lectern) {
+      else if (entity instanceof Book || entity instanceof Lectern) {
         Book book;
         if (entity instanceof Lectern) {
           book = ((Lectern) entity).getBook();
@@ -334,7 +336,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
           controls.getChildren().add(page2Angle);
         }
       }
-      else if(entity instanceof BeaconBeam) {
+      else if (entity instanceof BeaconBeam) {
         BeaconBeam beam = (BeaconBeam) entity;
         IntegerAdjuster height = new IntegerAdjuster();
         height.setName("Height");
@@ -453,6 +455,22 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         listControls.getChildren().addAll(new Label("Start Height:"), colorHeightList, listButtons);
         beamColor.getChildren().addAll(listControls, propertyControls);
         controls.getChildren().add(beamColor);
+      }
+      else if (entity instanceof SheepEntity) {
+        SheepEntity sheep = (SheepEntity) entity;
+        CheckBox showOuterLayer = new CheckBox("Is Sheared?");
+        showOuterLayer.setPadding(new Insets(10));
+        showOuterLayer.setSelected(sheep.sheared);
+        showOuterLayer.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+          sheep.sheared = newValue;
+          scene.rebuildActorBvh();
+        }));
+        HBox layerBox = new HBox();
+        layerBox.setSpacing(10.0);
+        layerBox.setAlignment(Pos.CENTER_LEFT);
+        layerBox.getChildren().addAll(showOuterLayer);
+
+        controls.getChildren().addAll(layerBox);
       }
 
       updatePositionFields(entity);
@@ -590,6 +608,78 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         }
         controls.getChildren().add(slotBox);
       }
+    }
+
+    if (entity instanceof Dyeable) {
+      Dyeable dyedEntity = (Dyeable) entity;
+
+      HBox colorBox = new HBox();
+      VBox propertyControls = new VBox();
+
+      colorBox.setPadding(new Insets(10));
+      colorBox.setSpacing(15);
+      propertyControls.setSpacing(10);
+
+      DoubleAdjuster emittance = new DoubleAdjuster();
+      emittance.setName("Emittance");
+      emittance.setRange(0, 100);
+
+      DoubleAdjuster specular = new DoubleAdjuster();
+      specular.setName("Specular");
+      specular.setRange(0, 1);
+
+      DoubleAdjuster ior = new DoubleAdjuster();
+      ior.setName("IoR");
+      ior.setRange(0, 5);
+
+      DoubleAdjuster perceptualSmoothness = new DoubleAdjuster();
+      perceptualSmoothness.setName("Smoothness");
+      perceptualSmoothness.setRange(0, 1);
+
+      DoubleAdjuster metalness = new DoubleAdjuster();
+      metalness.setName("Metalness");
+      metalness.setRange(0, 1);
+
+      LuxColorPicker sheepColorPicker = new LuxColorPicker();
+
+      DyedTextureMaterial material = dyedEntity.getMaterial();
+      emittance.set(material.emittance);
+      specular.set(material.specular);
+      ior.set(material.ior);
+      perceptualSmoothness.set(material.getPerceptualSmoothness());
+      metalness.set(material.metalness);
+      sheepColorPicker.setColor(ColorUtil.toFx(material.getColorInt()));
+
+      emittance.onValueChange(value -> {
+        material.emittance = value.floatValue();
+        scene.rebuildActorBvh();
+      });
+      specular.onValueChange(value -> {
+        material.specular = value.floatValue();
+        scene.rebuildActorBvh();
+      });
+      ior.onValueChange(value -> {
+        material.ior = value.floatValue();
+        scene.rebuildActorBvh();
+      });
+      perceptualSmoothness.onValueChange(value -> {
+        material.setPerceptualSmoothness(value);
+        scene.rebuildActorBvh();
+      });
+      metalness.onValueChange(value -> {
+        material.metalness = value.floatValue();
+        scene.rebuildActorBvh();
+      });
+      sheepColorPicker.colorProperty().addListener(
+        (observableColor, oldColorValue, newColorValue) -> {
+          dyedEntity.getMaterial().updateColor(ColorUtil.getRGB(ColorUtil.fromFx(newColorValue)));
+          scene.rebuildActorBvh();
+        }
+      );
+
+      propertyControls.getChildren().addAll(emittance, specular, perceptualSmoothness, ior, metalness, sheepColorPicker);
+      colorBox.getChildren().addAll(propertyControls);
+      controls.getChildren().add(colorBox);
     }
   }
 

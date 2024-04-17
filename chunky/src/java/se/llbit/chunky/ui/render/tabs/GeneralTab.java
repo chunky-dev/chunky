@@ -36,6 +36,7 @@ import se.llbit.chunky.entity.Book;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.BeaconBeam;
 import se.llbit.chunky.entity.PlayerEntity;
+import se.llbit.chunky.entity.SheepEntity;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
@@ -44,11 +45,11 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.Icons;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.IntegerTextField;
-import se.llbit.chunky.ui.elements.SizeInput;
 import se.llbit.chunky.ui.ValidatingNumberStringConverter;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.SettingsExport;
+import se.llbit.chunky.ui.elements.SizeInput;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Icon;
@@ -94,6 +95,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private CheckBox loadBooks;
   @FXML private CheckBox loadPaintings;
   @FXML private CheckBox loadBeaconBeams;
+  @FXML private CheckBox loadSheep;
   @FXML private CheckBox loadOtherEntities;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
@@ -143,6 +145,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadBooks.setSelected(preferences.shouldLoadClass(Book.class));
       loadPaintings.setSelected(preferences.shouldLoadClass(PaintingEntity.class));
       loadBeaconBeams.setSelected(preferences.shouldLoadClass(BeaconBeam.class));
+      loadSheep.setSelected(preferences.shouldLoadClass(SheepEntity.class));
       loadOtherEntities.setSelected(preferences.shouldLoadClass(null));
     }
 
@@ -290,6 +293,16 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       renderControls.showPopup(
         "This takes effect the next time a new scene is created.", loadBeaconBeams);
     });
+    loadSheep.setTooltip(new Tooltip("Enable/disable sheep entity loading. "
+      + "Takes effect on next scene creation."));
+    loadSheep.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(SheepEntity.class, newValue);
+      PersistentSettings.setLoadSheep(newValue);
+    });
+    loadSheep.setOnAction(event -> {
+      renderControls.showPopup(
+        "This takes effect the next time a new scene is created.", loadSheep);
+    });
     loadOtherEntities.setTooltip(new Tooltip("Enable/disable other entity loading. "
             + "Takes effect on next scene creation."));
     loadOtherEntities.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -306,6 +319,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadBooks.setSelected(true);
       loadPaintings.setSelected(true);
       loadBeaconBeams.setSelected(true);
+      loadSheep.setSelected(true);
       loadOtherEntities.setSelected(true);
     });
     loadNoEntity.setOnAction(event -> {
@@ -314,6 +328,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadBooks.setSelected(false);
       loadPaintings.setSelected(false);
       loadBeaconBeams.setSelected(false);
+      loadSheep.setSelected(false);
       loadOtherEntities.setSelected(false);
     });
 
