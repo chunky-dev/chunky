@@ -120,6 +120,8 @@ abstract public class Entity {
         return WallHangingSignEntity.fromJson(json);
       case "sheep":
         return SheepEntity.fromJson(json);
+      case "cow":
+        return CowEntity.fromJson(json);
     }
     return null;
   }

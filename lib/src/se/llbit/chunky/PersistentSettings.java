@@ -514,6 +514,15 @@ public final class PersistentSettings {
     save();
   }
 
+  public static boolean getLoadCows() {
+    return settings.getBool("loadCows", true);
+  }
+
+  public static void setLoadCows(boolean value) {
+    settings.setBool("loadCows", value);
+    save();
+  }
+
   public static boolean getLoadOtherEntities() {
     return settings.getBool("loadOtherEntities", true);
   }

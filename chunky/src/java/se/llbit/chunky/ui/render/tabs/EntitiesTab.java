@@ -94,6 +94,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     entityTypes.put("Book", (position, scene) -> new Book(position, Math.PI - Math.PI / 16, Math.toRadians(30), Math.toRadians(180 - 30)));
     entityTypes.put("Beacon beam", (position, scene) -> new BeaconBeam(position));
     entityTypes.put("Sheep", (position, scene) -> new SheepEntity(position, new CompoundTag()));
+    entityTypes.put("Cow", (position, scene) -> new CowEntity(position, new CompoundTag()));
   }
 
   private Scene scene;

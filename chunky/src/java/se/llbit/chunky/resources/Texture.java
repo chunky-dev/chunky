@@ -527,6 +527,8 @@ public class Texture {
   public static final EntityTexture sheep = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/sheep/sheep_fur")
   public static final EntityTexture sheepFur = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/cow/cow")
+  public static final EntityTexture cow = new EntityTexture();
 
   // [1.10] Bone, magma, nether wart block, red nether brick.
   public static final Texture boneSide = new Texture();
