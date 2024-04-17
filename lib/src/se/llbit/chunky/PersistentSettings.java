@@ -523,6 +523,15 @@ public final class PersistentSettings {
     save();
   }
 
+  public static boolean getLoadChickens() {
+    return settings.getBool("loadChickens", true);
+  }
+
+  public static void setLoadChickens(boolean value) {
+    settings.setBool("loadChickens", value);
+    save();
+  }
+
   public static boolean getLoadOtherEntities() {
     return settings.getBool("loadOtherEntities", true);
   }
