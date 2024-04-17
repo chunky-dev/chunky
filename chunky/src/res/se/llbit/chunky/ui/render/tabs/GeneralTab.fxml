@@ -77,6 +77,7 @@
               <CheckBox fx:id="loadBeaconBeams" mnemonicParsing="false" text="Beacon beams" />
               <CheckBox fx:id="loadSheep" mnemonicParsing="false" text="Sheep" />
               <CheckBox fx:id="loadCows" mnemonicParsing="false" text="Cows" />
+              <CheckBox fx:id="loadChickens" mnemonicParsing="false" text="Chickens" />
               <CheckBox fx:id="loadOtherEntities" mnemonicParsing="false" text="Other" />
             </VBox>
           </TitledPane>

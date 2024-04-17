@@ -346,6 +346,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadPaintings.setSelected(true);
       loadBeaconBeams.setSelected(true);
       loadSheep.setSelected(true);
+      loadCows.setSelected(true);
       loadChickens.setSelected(true);
       loadOtherEntities.setSelected(true);
     });
@@ -356,6 +357,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadPaintings.setSelected(false);
       loadBeaconBeams.setSelected(false);
       loadSheep.setSelected(false);
+      loadCows.setSelected(false);
       loadChickens.setSelected(false);
       loadOtherEntities.setSelected(false);
     });
