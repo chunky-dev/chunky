@@ -324,7 +324,7 @@ public class ChunkyLauncher {
       if (afterFirstTimeSetup.showLauncher()) {
         ChunkyLauncherFx.withLauncher(settings, Stage::show);
       }
-    } else if (SettingsDirectory.getChunkyHomeDirectory() != null) {
+    } else if (SettingsDirectory.getChunkyHomeDirectoryOverwrite().isPresent()) {
       headlessCreateSettingsDirectory();
       if (afterFirstTimeSetup.showLauncher()) {
         ChunkyLauncherFx.withLauncher(settings, Stage::show);
