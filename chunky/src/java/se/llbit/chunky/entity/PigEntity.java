@@ -38,10 +38,10 @@ public class PigEntity extends Entity implements Poseable, Saddleable {
     ).toQuads();
 
   private static final Quad[] head = new BoxModelBuilder()
-    .addBox(new Vector3(-4 / 16.0, -4 / 16.0, -6 / 16.0), new Vector3(4 / 16.0, 4 / 16.0, 2 / 16.0), box ->
+    .addBox(new Vector3(-4 / 16.0, 0 / 16.0, -7 / 16.0), new Vector3(4 / 16.0, 8 / 16.0, 1 / 16.0), box ->
       box.forTextureSize(Texture.pig, 64, 32).atUVCoordinates(0, 0).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
-    ).addBox(new Vector3(-2 / 16.0, -3 / 16.0, -7 / 16.0), new Vector3(2 / 16.0, 0, -6 / 16.0), box ->
+    ).addBox(new Vector3(-2 / 16.0, 1 / 16.0, -8 / 16.0), new Vector3(2 / 16.0, 4 / 16.0, -7 / 16.0), box ->
       box.forTextureSize(Texture.pig, 64, 32).atUVCoordinates(16, 16).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
     ).toQuads();
@@ -73,6 +73,12 @@ public class PigEntity extends Entity implements Poseable, Saddleable {
     Tag rotation = tag.get("Rotation");
     double yaw = rotation.get(0).floatValue();
     double pitch = rotation.get(1).floatValue();
+
+    boolean isBaby = tag.get("Age").intValue(1) < 0;
+    if (isBaby) {
+      this.scale = 0.5;
+      this.headScale = 2;
+    }
 
     pose = new JsonObject();
     pose.add("all", JsonUtil.vec3ToJson(new Vector3(0, QuickMath.degToRad(180 - yaw), 0)));
@@ -167,7 +173,7 @@ public class PigEntity extends Entity implements Poseable, Saddleable {
       .rotateY(headPose.y)
       .rotateZ(headPose.z)
       .scale(headScale)
-      .translate(0, 12 / 16.0, -8 / 16.0)
+      .translate(0, 8 / 16.0, -7 / 16.0)
       .chain(worldTransform);
     for (Quad quad : head) {
       quad.addTriangles(faces, skinMaterial, transform);

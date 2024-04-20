@@ -72,6 +72,12 @@ public class ChickenEntity extends Entity implements Poseable {
     double yaw = rotation.get(0).floatValue();
     double pitch = rotation.get(1).floatValue();
 
+    boolean isBaby = tag.get("Age").intValue(1) < 0;
+    if (isBaby) {
+      this.scale = 0.5;
+      this.headScale = 2;
+    }
+
     pose = new JsonObject();
     pose.add("all", JsonUtil.vec3ToJson(new Vector3(0, QuickMath.degToRad(180 - yaw), 0)));
     pose.add("head", JsonUtil.vec3ToJson(new Vector3(QuickMath.degToRad(pitch), 0, 0)));
