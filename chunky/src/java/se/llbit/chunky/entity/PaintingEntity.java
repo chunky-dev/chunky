@@ -33,7 +33,7 @@ import java.util.Map;
 
 public class PaintingEntity extends Entity {
 
-  static class Painting {
+  public static class Painting {
 
     protected final Quad[] quads;
     protected final Material material;
@@ -78,58 +78,7 @@ public class PaintingEntity extends Entity {
   static final Map<String, Painting> paintings = new HashMap<>();
 
   static {
-    paintings.put("Kebab", new Painting(Texture.paintingKebab, 1, 1));
-    paintings.put("minecraft:kebab", new Painting(Texture.paintingKebab, 1, 1));
-    paintings.put("Aztec", new Painting(Texture.paintingAztec, 1, 1));
-    paintings.put("minecraft:aztec", new Painting(Texture.paintingAztec, 1, 1));
-    paintings.put("Alban", new Painting(Texture.paintingAlban, 1, 1));
-    paintings.put("minecraft:alban", new Painting(Texture.paintingAlban, 1, 1));
-    paintings.put("Aztec2", new Painting(Texture.paintingAztec2, 1, 1));
-    paintings.put("minecraft:aztec2", new Painting(Texture.paintingAztec2, 1, 1));
-    paintings.put("Bomb", new Painting(Texture.paintingBomb, 1, 1));
-    paintings.put("minecraft:bomb", new Painting(Texture.paintingBomb, 1, 1));
-    paintings.put("Plant", new Painting(Texture.paintingPlant, 1, 1));
-    paintings.put("minecraft:plant", new Painting(Texture.paintingPlant, 1, 1));
-    paintings.put("Wasteland", new Painting(Texture.paintingWasteland, 1, 1));
-    paintings.put("minecraft:wasteland", new Painting(Texture.paintingWasteland, 1, 1));
-    paintings.put("Wanderer", new Painting(Texture.paintingWanderer, 1, 2));
-    paintings.put("minecraft:wanderer", new Painting(Texture.paintingWanderer, 1, 2));
-    paintings.put("Graham", new Painting(Texture.paintingGraham, 1, 2));
-    paintings.put("minecraft:graham", new Painting(Texture.paintingGraham, 1, 2));
-    paintings.put("Pool", new Painting(Texture.paintingPool, 2, 1));
-    paintings.put("minecraft:pool", new Painting(Texture.paintingPool, 2, 1));
-    paintings.put("Courbet", new Painting(Texture.paintingCourbet, 2, 1));
-    paintings.put("minecraft:courbet", new Painting(Texture.paintingCourbet, 2, 1));
-    paintings.put("Sunset", new Painting(Texture.paintingSunset, 2, 1));
-    paintings.put("minecraft:sunset", new Painting(Texture.paintingSunset, 2, 1));
-    paintings.put("Sea", new Painting(Texture.paintingSea, 2, 1));
-    paintings.put("minecraft:sea", new Painting(Texture.paintingSea, 2, 1));
-    paintings.put("Creebet", new Painting(Texture.paintingCreebet, 2, 1));
-    paintings.put("minecraft:creebet", new Painting(Texture.paintingCreebet, 2, 1));
-    paintings.put("Match", new Painting(Texture.paintingMatch, 2, 2));
-    paintings.put("minecraft:match", new Painting(Texture.paintingMatch, 2, 2));
-    paintings.put("Bust", new Painting(Texture.paintingBust, 2, 2));
-    paintings.put("minecraft:bust", new Painting(Texture.paintingBust, 2, 2));
-    paintings.put("Stage", new Painting(Texture.paintingStage, 2, 2));
-    paintings.put("minecraft:stage", new Painting(Texture.paintingStage, 2, 2));
-    paintings.put("Void", new Painting(Texture.paintingVoid, 2, 2));
-    paintings.put("minecraft:void", new Painting(Texture.paintingVoid, 2, 2));
-    paintings.put("SkullAndRoses", new Painting(Texture.paintingSkullAndRoses, 2, 2));
-    paintings.put("minecraft:skull_and_roses", new Painting(Texture.paintingSkullAndRoses, 2, 2));
-    paintings.put("Wither", new Painting(Texture.paintingWither, 2, 2));
-    paintings.put("minecraft:wither", new Painting(Texture.paintingWither, 2, 2));
-    paintings.put("Fighters", new Painting(Texture.paintingFighters, 4, 2));
-    paintings.put("minecraft:fighters", new Painting(Texture.paintingFighters, 4, 2));
-    paintings.put("Skeleton", new Painting(Texture.paintingSkeleton, 4, 3));
-    paintings.put("minecraft:skeleton", new Painting(Texture.paintingSkeleton, 4, 3));
-    paintings.put("DonkeyKong", new Painting(Texture.paintingDonkeyKong, 4, 3));
-    paintings.put("minecraft:donkey_kong", new Painting(Texture.paintingDonkeyKong, 4, 3));
-    paintings.put("Pointer", new Painting(Texture.paintingPointer, 4, 4));
-    paintings.put("minecraft:pointer", new Painting(Texture.paintingPointer, 4, 4));
-    paintings.put("Pigscene", new Painting(Texture.paintingPigscene, 4, 4));
-    paintings.put("minecraft:pigscene", new Painting(Texture.paintingPigscene, 4, 4));
-    paintings.put("BurningSkull", new Painting(Texture.paintingBurningSkull, 4, 4));
-    paintings.put("minecraft:burning_skull", new Painting(Texture.paintingBurningSkull, 4, 4));
+    resetPaintings();
   }
 
   private static final Material BACK_MATERIAL = new TextureMaterial(Texture.paintingBack);
@@ -203,5 +152,71 @@ public class PaintingEntity extends Entity {
     String art = json.get("art").stringValue("");
     double angle = json.get("angle").doubleValue(0.0);
     return new PaintingEntity(position, art, angle);
+  }
+
+  public static void resetPaintings() {
+    paintings.clear();
+
+    // hard-coded pre-24w18a paintings with legacy aliases
+    paintings.put("Kebab", new Painting(Texture.paintingKebab, 1, 1));
+    paintings.put("minecraft:kebab", new Painting(Texture.paintingKebab, 1, 1));
+    paintings.put("Aztec", new Painting(Texture.paintingAztec, 1, 1));
+    paintings.put("minecraft:aztec", new Painting(Texture.paintingAztec, 1, 1));
+    paintings.put("Alban", new Painting(Texture.paintingAlban, 1, 1));
+    paintings.put("minecraft:alban", new Painting(Texture.paintingAlban, 1, 1));
+    paintings.put("Aztec2", new Painting(Texture.paintingAztec2, 1, 1));
+    paintings.put("minecraft:aztec2", new Painting(Texture.paintingAztec2, 1, 1));
+    paintings.put("Bomb", new Painting(Texture.paintingBomb, 1, 1));
+    paintings.put("minecraft:bomb", new Painting(Texture.paintingBomb, 1, 1));
+    paintings.put("Plant", new Painting(Texture.paintingPlant, 1, 1));
+    paintings.put("minecraft:plant", new Painting(Texture.paintingPlant, 1, 1));
+    paintings.put("Wasteland", new Painting(Texture.paintingWasteland, 1, 1));
+    paintings.put("minecraft:wasteland", new Painting(Texture.paintingWasteland, 1, 1));
+    paintings.put("Wanderer", new Painting(Texture.paintingWanderer, 1, 2));
+    paintings.put("minecraft:wanderer", new Painting(Texture.paintingWanderer, 1, 2));
+    paintings.put("Graham", new Painting(Texture.paintingGraham, 1, 2));
+    paintings.put("minecraft:graham", new Painting(Texture.paintingGraham, 1, 2));
+    paintings.put("Pool", new Painting(Texture.paintingPool, 2, 1));
+    paintings.put("minecraft:pool", new Painting(Texture.paintingPool, 2, 1));
+    paintings.put("Courbet", new Painting(Texture.paintingCourbet, 2, 1));
+    paintings.put("minecraft:courbet", new Painting(Texture.paintingCourbet, 2, 1));
+    paintings.put("Sunset", new Painting(Texture.paintingSunset, 2, 1));
+    paintings.put("minecraft:sunset", new Painting(Texture.paintingSunset, 2, 1));
+    paintings.put("Sea", new Painting(Texture.paintingSea, 2, 1));
+    paintings.put("minecraft:sea", new Painting(Texture.paintingSea, 2, 1));
+    paintings.put("Creebet", new Painting(Texture.paintingCreebet, 2, 1));
+    paintings.put("minecraft:creebet", new Painting(Texture.paintingCreebet, 2, 1));
+    paintings.put("Match", new Painting(Texture.paintingMatch, 2, 2));
+    paintings.put("minecraft:match", new Painting(Texture.paintingMatch, 2, 2));
+    paintings.put("Bust", new Painting(Texture.paintingBust, 2, 2));
+    paintings.put("minecraft:bust", new Painting(Texture.paintingBust, 2, 2));
+    paintings.put("Stage", new Painting(Texture.paintingStage, 2, 2));
+    paintings.put("minecraft:stage", new Painting(Texture.paintingStage, 2, 2));
+    paintings.put("Void", new Painting(Texture.paintingVoid, 2, 2));
+    paintings.put("minecraft:void", new Painting(Texture.paintingVoid, 2, 2));
+    paintings.put("SkullAndRoses", new Painting(Texture.paintingSkullAndRoses, 2, 2));
+    paintings.put("minecraft:skull_and_roses", new Painting(Texture.paintingSkullAndRoses, 2, 2));
+    paintings.put("Wither", new Painting(Texture.paintingWither, 2, 2));
+    paintings.put("minecraft:wither", new Painting(Texture.paintingWither, 2, 2));
+    paintings.put("Fighters", new Painting(Texture.paintingFighters, 4, 2));
+    paintings.put("minecraft:fighters", new Painting(Texture.paintingFighters, 4, 2));
+    paintings.put("Skeleton", new Painting(Texture.paintingSkeleton, 4, 3));
+    paintings.put("minecraft:skeleton", new Painting(Texture.paintingSkeleton, 4, 3));
+    paintings.put("DonkeyKong", new Painting(Texture.paintingDonkeyKong, 4, 3));
+    paintings.put("minecraft:donkey_kong", new Painting(Texture.paintingDonkeyKong, 4, 3));
+    paintings.put("Pointer", new Painting(Texture.paintingPointer, 4, 4));
+    paintings.put("minecraft:pointer", new Painting(Texture.paintingPointer, 4, 4));
+    paintings.put("Pigscene", new Painting(Texture.paintingPigscene, 4, 4));
+    paintings.put("minecraft:pigscene", new Painting(Texture.paintingPigscene, 4, 4));
+    paintings.put("BurningSkull", new Painting(Texture.paintingBurningSkull, 4, 4));
+    paintings.put("minecraft:burning_skull", new Painting(Texture.paintingBurningSkull, 4, 4));
+  }
+
+  public static void registerPainting(String id, Painting painting) {
+    paintings.put(id, painting);
+  }
+
+  public static boolean containsPainting(String id) {
+    return paintings.containsKey(id);
   }
 }
