@@ -1489,6 +1489,28 @@ public class Texture {
   public static final Texture vaultTopEjectingOminous = new Texture();
   @TexturePath("assets/minecraft/textures/block/vault_front_ejecting_ominous")
   public static final Texture vaultFrontEjectingOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_bottom")
+  public static final Texture trialSpawnerBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_side_inactive")
+  public static final Texture trialSpawnerSideInactive = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_side_inactive_ominous")
+  public static final Texture trialSpawnerSideInactiveOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_top_inactive")
+  public static final Texture trialSpawnerTopInactive = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_top_inactive_ominous")
+  public static final Texture trialSpawnerTopInactiveOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_side_active")
+  public static final Texture trialSpawnerSideActive = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_side_active_ominous")
+  public static final Texture trialSpawnerSideActiveOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_top_active")
+  public static final Texture trialSpawnerTopActive = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_top_active_ominous")
+  public static final Texture trialSpawnerTopActiveOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_top_ejecting_reward")
+  public static final Texture trialSpawnerTopEjectingReward = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_top_ejecting_reward_ominous")
+  public static final Texture trialSpawnerTopEjectingRewardOminous = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
