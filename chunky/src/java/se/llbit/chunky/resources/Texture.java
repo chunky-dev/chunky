@@ -1473,6 +1473,22 @@ public class Texture {
   public static final Texture decoratedPotPatternScrape = new Texture();
   @TexturePath("assets/minecraft/textures/block/heavy_core")
   public static final Texture heavyCore = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_bottom_ominous")
+  public static final Texture vaultBottomOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_front_off_ominous")
+  public static final Texture vaultFrontOffOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_side_off_ominous")
+  public static final Texture vaultSideOffOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_top_ominous")
+  public static final Texture vaultTopOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_side_on_ominous")
+  public static final Texture vaultSideOnOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_front_on_ominous")
+  public static final Texture vaultFrontOnOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_top_ejecting_ominous")
+  public static final Texture vaultTopEjectingOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_front_ejecting_ominous")
+  public static final Texture vaultFrontEjectingOminous = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

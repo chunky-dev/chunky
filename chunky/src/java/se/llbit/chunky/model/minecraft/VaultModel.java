@@ -95,26 +95,26 @@ public class VaultModel extends QuadModel {
   private final Texture[] textures;
 
   public VaultModel(
-    String facing, String vaultState
+    String facing, boolean ominous, String vaultState
   ) {
     quads = orientedQuads[getOrientationIndex(facing)];
-    Texture top = getTopTexture(vaultState);
-    Texture bottom = Texture.vaultBottom;
+    Texture top = getTopTexture(ominous, vaultState);
+    Texture bottom = ominous ? Texture.vaultBottomOminous : Texture.vaultBottom;
     Texture front, side;
     switch (vaultState) {
       case "ejecting":
       case "unlocking":
-        front = Texture.vaultFrontEjecting;
-        side = Texture.vaultSideOn;
+        front = ominous ? Texture.vaultFrontEjectingOminous : Texture.vaultFrontEjecting;
+        side = ominous ? Texture.vaultSideOnOminous : Texture.vaultSideOn;
         break;
       case "inactive":
-        front = Texture.vaultFrontOff;
-        side = Texture.vaultSideOff;
+        front = ominous ? Texture.vaultFrontOffOminous : Texture.vaultFrontOff;
+        side = ominous ? Texture.vaultSideOffOminous : Texture.vaultSideOff;
         break;
       case "active":
       default:
-        front = Texture.vaultFrontOn;
-        side = Texture.vaultSideOn;
+        front = ominous ? Texture.vaultFrontOnOminous : Texture.vaultFrontOn;
+        side = ominous ? Texture.vaultSideOnOminous : Texture.vaultSideOn;
         break;
     }
     textures = new Texture[]{
@@ -122,15 +122,15 @@ public class VaultModel extends QuadModel {
     };
   }
 
-  public static Texture getTopTexture(String vaultState) {
+  public static Texture getTopTexture(boolean ominous, String vaultState) {
     switch (vaultState) {
       case "ejecting":
-        return Texture.vaultTopEjecting;
+        return ominous ? Texture.vaultTopEjectingOminous : Texture.vaultTopEjecting;
       case "inactive":
       case "active":
       case "unlocking":
       default:
-        return Texture.vaultTop;
+        return ominous ? Texture.vaultTopOminous : Texture.vaultTop;
     }
   }
 
