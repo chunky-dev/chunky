@@ -17,6 +17,7 @@
 package se.llbit.chunky.world;
 
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonString;
@@ -29,8 +30,11 @@ import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 
 import java.util.Random;
+import java.util.Vector;
 
 public abstract class Material {
+
+  public MaterialType materialType = MaterialType.LAMBERTIAN;
 
   /**
    * Index of refraction of air.
@@ -59,11 +63,6 @@ public abstract class Material {
   public boolean solid = true;
 
   /**
-   * The specular coefficient controlling how shiny the block appears.
-   */
-  public float specular = 0;
-
-  /**
    * The amount of light the material emits.
    */
   public float emittance = 0;
@@ -74,14 +73,14 @@ public abstract class Material {
    */
   public float roughness = 0f;
 
+  public float transmissionRoughness = 0f;
+
+  public Vector3 specularColor = new Vector3();
+
   /**
-   * The metalness value controls how metal-y a block appears. In reality this is a boolean value
-   * but in practice usually a float is used in PBR to allow adding dirt or scratches on metals
-   * without increasing the texture resolution.
-   * Metals only do specular reflection for certain wavelengths (effectively tinting the reflection)
-   * and have no diffuse reflection. The albedo color is used for tinting.
+   * Texture alpha multiplier.
    */
-  public float metalness = 0;
+  public float alpha = 1f;
 
   /**
    * Subsurface scattering property.
@@ -92,8 +91,6 @@ public abstract class Material {
    * Base texture.
    */
   public final Texture texture;
-
-  public boolean refractive = false;
 
   public boolean waterlogged = false;
 
@@ -106,13 +103,15 @@ public abstract class Material {
    * Restore the default material properties.
    */
   public void restoreDefaults() {
+    materialType = MaterialType.LAMBERTIAN;
     ior = DEFAULT_IOR;
     opaque = false;
     solid = true;
-    specular = 0;
     emittance = 0;
     roughness = 0;
+    transmissionRoughness = 0;
     subSurfaceScattering = false;
+    alpha = 1;
   }
 
   public void getColor(IntersectionRecord intersectionRecord) {
@@ -128,11 +127,12 @@ public abstract class Material {
   }
 
   public void loadMaterialProperties(JsonObject json) {
+    materialType = MaterialType.valueOf(json.get("materialType").asString(MaterialType.LAMBERTIAN.getId()));
     ior = json.get("ior").floatValue(ior);
-    specular = json.get("specular").floatValue(specular);
     emittance = json.get("emittance").floatValue(emittance);
     roughness = json.get("roughness").floatValue(roughness);
-    metalness = json.get("metalness").floatValue(metalness);
+    transmissionRoughness = json.get("transmissionRoughness").floatValue(transmissionRoughness);
+    alpha = json.get("alpha").floatValue(alpha);
   }
 
   public boolean isWater() {
@@ -155,32 +155,223 @@ public abstract class Material {
     roughness = (float) Math.pow(1 - perceptualSmoothness, 2);
   }
 
-  public boolean setOutboundDir(Ray2 ray, IntersectionRecord intersectionRecord, Random random) {
-    Material currentMat = intersectionRecord.material;
+  public double getPerceptualTransmissionSmoothness() {
+    return 1 - Math.sqrt(transmissionRoughness);
+  }
+
+  public void setPerceptualTransmissionSmoothness(double perceptualTransmissionSmoothness) {
+    transmissionRoughness = (float) Math.pow(1 - perceptualTransmissionSmoothness, 2);
+  }
+
+  public boolean scatter(Ray2 ray, IntersectionRecord intersectionRecord, Random random) {
+
+    boolean mediumChanged = false;
+    Vector3 direction = new Vector3();
+
+    switch (materialType) {
+      case LAMBERTIAN: {
+        if (intersectionRecord.color.w < Constants.EPSILON) {
+          ray.o.scaleAdd(-Constants.OFFSET, intersectionRecord.n);
+          return false;
+        }
+
+        direction = intersectionRecord.shadeN.rAdd(Vector3.randomUnitVector(random));
+        if (direction.nearZero()) {
+          direction.set(intersectionRecord.shadeN);
+        } else {
+          direction.normalize();
+        }
+        break;
+      }
+
+      case DIELECTRIC: {
+        double n2 = intersectionRecord.material.ior;
+        double n1 = ray.getCurrentMedium().ior;
+        double ri = (intersectionRecord.shadeN.dot(ray.d) > 0) ? (n1 / n2) : (n2 / n1);
+
+        Vector3 unitDirection = ray.d.normalized();
+        double cosTheta = FastMath.min(unitDirection.rScale(-1).dot(intersectionRecord.shadeN), 1.0);
+        double sinTheta = FastMath.sqrt(1.0 - cosTheta * cosTheta);
+
+        boolean cannotRefract = ri * sinTheta > 1.0;
+
+        if (cannotRefract || schlickReflectance(cosTheta, ri) > random.nextDouble()) {
+          direction = specularReflection(unitDirection, intersectionRecord.shadeN);
+        } else {
+          direction = specularRefraction(unitDirection, intersectionRecord.shadeN, ri);
+          mediumChanged = true;
+        }
+
+        break;
+      }
+
+      case METAL: {
+        direction = specularReflection(ray.d, intersectionRecord.shadeN);
+        if (roughness > Constants.EPSILON) {
+          Vector3 randomDir = randomHemisphereDir(intersectionRecord.shadeN, random);
+          randomDir.scale(roughness);
+          randomDir.scaleAdd(1 - roughness, direction);
+          randomDir.normalize();
+          direction.set(randomDir);
+        }
+
+        if (QuickMath.signum(intersectionRecord.n.dot(direction)) == QuickMath.signum(intersectionRecord.n.dot(ray.d))) {
+          double factor = QuickMath.signum(intersectionRecord.n.dot(ray.d)) * -Constants.EPSILON - direction.dot(intersectionRecord.n);
+          direction.scaleAdd(factor, intersectionRecord.n);
+          direction.normalize();
+        }
+
+        break;
+      }
+    }
+
+    int sign;
+    if (mediumChanged) {
+      sign = -1;
+      ray.setCurrentMedium(this);
+    } else {
+      sign = 1;
+    }
+    if (QuickMath.signum(intersectionRecord.n.dot(direction)) == sign * QuickMath.signum(intersectionRecord.n.dot(ray.d))) {
+      double factor = QuickMath.signum(intersectionRecord.n.dot(ray.d)) * -Constants.EPSILON - direction.dot(intersectionRecord.n);
+      direction.scaleAdd(factor, intersectionRecord.n);
+      direction.normalize();
+    }
+    ray.d.set(direction);
+
+    int sign2 = QuickMath.signum(ray.d.dot(intersectionRecord.n));
+    ray.o.scaleAdd(sign * sign2 * Constants.OFFSET, intersectionRecord.n);
+
+    return true;
+
+    /*Material currentMat = this;
     Material prevMat = ray.getCurrentMedium();
 
     double pDiffuse = intersectionRecord.color.w;
 
     float pSpecular = currentMat.specular;
     float pMetal = currentMat.metalness;
-    float roughness = currentMat.roughness;
+    float roughness = Math.max(currentMat.roughness, prevMat.roughness);
+    float transmissionRoughness = Math.max(currentMat.transmissionRoughness, prevMat.transmissionRoughness);
     float n1 = prevMat.ior;
     float n2 = currentMat.ior;
 
-    if (pDiffuse + pSpecular < Constants.EPSILON && n1 != n2) {
-      ray.o.add(ray.d.x * Constants.OFFSET, ray.d.y * Constants.OFFSET, ray.d.z * Constants.OFFSET);
-      return true;
+    Vector3 invDir = new Vector3(ray.d);
+    invDir.scale(-1);
+
+//    if (pDiffuse + pSpecular < Constants.EPSILON){// && (n1 - n2 <= DEFAULT_IOR)) {
+//      ray.o.scaleAdd(Constants.OFFSET, ray.d);
+//      if (currentMat.refractive) {
+//        ray.setCurrentMedium(currentMat);
+//        if (currentMat == Air.INSTANCE) {
+//          intersectionRecord.color.set(1, 0.5, 0.5, 0);
+//        }
+//      }
+//      return true;
+//    }
+
+    boolean doMetal = pMetal > Constants.EPSILON && random.nextFloat() < pMetal;
+
+    if (doMetal || pSpecular > Constants.EPSILON && random.nextFloat() < pSpecular) {
+      double sign = QuickMath.signum(ray.d.dot(intersectionRecord.n));
+      ray.o.scaleAdd(-sign * Constants.OFFSET, intersectionRecord.n);
+
+      if (!doMetal) {
+        intersectionRecord.color.set(1, 1, 1, 1);
+      }
+
+      Vector3 direction = specularReflection(invDir, intersectionRecord.shadeN);
+
+      if (QuickMath.signum(intersectionRecord.n.dot(direction)) == QuickMath.signum(intersectionRecord.n.dot(ray.d))) {
+        double factor = QuickMath.signum(intersectionRecord.n.dot(ray.d)) * -Constants.EPSILON - ray.d.dot(direction);
+        direction.scaleAdd(factor, intersectionRecord.n);
+      }
+      direction.normalize();
+
+      ray.d.set(direction);
+
+    } else if (pDiffuse > Constants.EPSILON && random.nextFloat() < pDiffuse) {
+      ray.o.scaleAdd(Constants.OFFSET, intersectionRecord.n);
+      ray.d.set(diffuseReflection(intersectionRecord, random));
+
+    } else if (Math.abs(n1 - n2) > DEFAULT_IOR - 1) {
+      double sign = QuickMath.signum(ray.d.dot(intersectionRecord.n));
+
+      double eta = n2 / n1;
+      if (!(pMetal > Constants.EPSILON && random.nextFloat() < pMetal)) {
+        intersectionRecord.color.set(1, 1, 1, 0);
+      }
+
+      Vector3 direction = new Vector3();
+
+      double cosTheta_i = ray.d.dot(intersectionRecord.shadeN);
+      double factor = FrDielectric(cosTheta_i, eta);
+      if (specularRefraction(invDir, intersectionRecord.shadeN, eta, direction)) {
+        if (random.nextDouble() < factor) {
+          ray.o.scaleAdd(sign * Constants.OFFSET, intersectionRecord.n);
+          ray.d.set(direction);
+          intersectionRecord.color.scale(1 - factor);
+          ray.setCurrentMedium(this);
+        } else {
+          ray.o.scaleAdd(-sign * Constants.OFFSET, intersectionRecord.n);
+          ray.d.set(specularReflection(invDir, intersectionRecord.shadeN));
+          intersectionRecord.color.scale(factor);
+        }
+
+      } else {
+        ray.o.scaleAdd(-sign * Constants.OFFSET, intersectionRecord.n);
+        ray.d.set(specularReflection(invDir, intersectionRecord.shadeN));
+        intersectionRecord.color.scale(factor);
+      }
+
+    } else if (pDiffuse > Constants.EPSILON) {
+      double sign = QuickMath.signum(ray.d.dot(intersectionRecord.n));
+      ray.o.scaleAdd(sign * Constants.OFFSET, intersectionRecord.n);
+
+    } else {
+      double sign = QuickMath.signum(ray.d.dot(intersectionRecord.n));
+      ray.o.scaleAdd(sign * Constants.OFFSET, intersectionRecord.n);
+      intersectionRecord.color.set(1, 1, 1, 0);
+    }
+    return false;*/
+  }
+
+  private static boolean shouldRefract(Vector3 wi, Vector3 normal, double eta, Vector3 wt) {
+    double cosTheta_i = normal.dot(wi);
+    if (cosTheta_i < 0) {
+      eta = 1 / eta;
+      cosTheta_i = -cosTheta_i;
+      normal.scale(-1);
+    }
+    double sin2Theta_i = Math.max(0, 1 - cosTheta_i * cosTheta_i);
+    double sin2Theta_t = sin2Theta_i / (eta * eta);
+    if (sin2Theta_t >= 1) {
+      return false;
+    }
+    double cosTheta_t = Math.sqrt(Math.max(0.0, 1 - sin2Theta_t));
+    wt.x = -wi.x / eta + (cosTheta_i / eta - cosTheta_t) * normal.x;
+    wt.y = -wi.y / eta + (cosTheta_i / eta - cosTheta_t) * normal.y;
+    wt.z = -wi.z / eta + (cosTheta_i / eta - cosTheta_t) * normal.z;
+    return true;
+  }
+
+  private static double FrDielectric(double cosTheta_i, double eta) {
+    cosTheta_i = QuickMath.clamp(cosTheta_i, -1, 1);
+    if (cosTheta_i < 0) {
+      eta = 1 / eta;
+      cosTheta_i = -cosTheta_i;
     }
 
-    if (pMetal > Constants.EPSILON && random.nextFloat() < pMetal) {
-      ray.d.set(specularReflection(ray, intersectionRecord, random));
-    } else if (pSpecular > Constants.EPSILON && random.nextFloat() < pSpecular) {
-      ray.d.set(specularReflection(ray, intersectionRecord, random));
-      intersectionRecord.color.set(1, 1, 1, 1);
-    } else {
-      ray.d.set(diffuseReflection(intersectionRecord, random));
+    double sin2Theta_i = 1 - cosTheta_i * cosTheta_i;
+    double sin2Theta_t = sin2Theta_i / (eta * eta);
+    if (sin2Theta_t >= 1) {
+      return 1.0;
     }
-    return false;
+    double cosTheta_t = Math.sqrt(Math.max(0.0, 1 - sin2Theta_t));
+
+    double r_parl = (eta * cosTheta_i - cosTheta_t) / (eta * cosTheta_i + cosTheta_t);
+    double r_perp = (cosTheta_i - eta * cosTheta_t) / (cosTheta_i + eta * cosTheta_t);
+    return (r_parl * r_parl + r_perp * r_perp) / 2;
   }
 
   private Vector3 randomHemisphereDir(Vector3 normal, Random random) {
@@ -189,6 +380,7 @@ public abstract class Material {
     double r = FastMath.sqrt(x1);
     double theta = 2 * FastMath.PI * x2;
 
+    // project to point on hemisphere in tangent space
     double tx = r * FastMath.cos(theta);
     double ty = r * FastMath.sin(theta);
     double tz = FastMath.sqrt(1 - x1);
@@ -232,24 +424,71 @@ public abstract class Material {
     return randomHemisphereDir(intersectionRecord.shadeN, random);
   }
 
-  private Vector3 specularReflection(Ray2 ray, IntersectionRecord intersectionRecord, Random random) {
-    Vector3 direction = new Vector3(ray.d);
-    Vector3 normal = new Vector3(intersectionRecord.shadeN);
-    normal.scale(-2 * direction.dot(normal));
-    direction.add(normal);
+  private Vector3 specularReflection(Vector3 v, Vector3 n) {
+    return v.rSub(n.rScale(2 * v.dot(n)));
+  }
 
-    if (intersectionRecord.material.roughness > Constants.EPSILON) {
-      Vector3 randomHemisphereDir = randomHemisphereDir(intersectionRecord.shadeN, random);
-      randomHemisphereDir.scale(intersectionRecord.material.roughness);
-      direction.scale(1 - intersectionRecord.material.roughness);
-      direction.add(randomHemisphereDir);
+  private static double schlickReflectance(double cosine, double refractionIndex) {
+    double r0 = (1 - refractionIndex) / (1 + refractionIndex);
+    r0 = r0 * r0;
+    return r0 + (1 - r0) * FastMath.pow((1 - cosine), 5);
+  }
+
+  private Vector3 specularRefraction(Vector3 uv, Vector3 n, double etaiOverEtat) {
+    double cosTheta = FastMath.min(uv.rScale(-1).dot(n), 1.0);
+    Vector3 rOutPerp = n.rScale(cosTheta).rAdd(uv).rScale(etaiOverEtat);
+    Vector3 rOutParallel = n.rScale(-FastMath.sqrt(FastMath.abs(1.0 - rOutPerp.lengthSquared())));
+    return rOutPerp.rAdd(rOutParallel);
+  }
+
+  private boolean specularRefraction(Vector3 wi, Vector3 n, double eta, Vector3 wt) {
+    double cosTheta_i =  wi.dot(n);
+
+    if (cosTheta_i < 0) {
+      eta = 1 / eta;
+      cosTheta_i = -cosTheta_i;
+      n.scale(-1);
     }
 
-    if (QuickMath.signum(intersectionRecord.n.dot(direction)) == QuickMath.signum(intersectionRecord.n.dot(ray.d))) {
-      double factor = QuickMath.signum(intersectionRecord.n.dot(ray.d)) * -Constants.EPSILON - ray.d.dot(direction);
-      direction.scaleAdd(factor, intersectionRecord.n);
+    double sin2Theta_i = FastMath.max(0, 1 - cosTheta_i * cosTheta_i);
+    double sin2Theta_t = sin2Theta_i / (eta * eta);
+
+    if (sin2Theta_t >= 1) {
+      return false;
     }
-    direction.normalize();
-    return direction;
+
+    double cosTheta_t = FastMath.sqrt(FastMath.max(0, 1 - sin2Theta_t));
+
+    Vector3 n2 = new Vector3(n);
+    Vector3 wi2 = new Vector3(wi);
+
+    n2.scale(eta + (cosTheta_i / eta - cosTheta_t));
+
+    wi2.scale(-1);
+    wi2.scale(1 / eta);
+
+    wt.add(n2, wi2);
+
+    return true;
+
+    //    double sign = QuickMath.signum(ray.d.dot(intersectionRecord.n));
+//    Vector3 invDir = new Vector3(-ray.d.x, -ray.d.y, -ray.d.z);
+//    Vector3 direction = new Vector3();
+//    double factor = FrDielectric(-ray.d.dot(intersectionRecord.shadeN), eta);
+//    if (!shouldRefract(invDir, intersectionRecord.shadeN, eta, direction)) {
+//      ray.o.scaleAdd(-sign * Constants.OFFSET, intersectionRecord.n);
+//      direction.set(specularReflection(ray, intersectionRecord, random, roughness));
+//    } else {
+//      if (random.nextDouble() > factor) {
+//        ray.o.scaleAdd(-sign * Constants.OFFSET, intersectionRecord.n);
+//        direction.set(specularReflection(ray, intersectionRecord, random, roughness));
+//        intersectionRecord.color.scale(factor);
+//      } else {
+//        ray.o.scaleAdd(sign * Constants.OFFSET, intersectionRecord.n);
+//        intersectionRecord.color.scale(1 - factor);
+//        ray.setCurrentMedium(this);
+//      }
+//    }
+//    ray.d.set(direction);
   }
 }

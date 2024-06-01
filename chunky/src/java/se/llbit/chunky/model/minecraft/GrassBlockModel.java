@@ -23,14 +23,17 @@ import static se.llbit.chunky.model.Tint.NONE;
 
 import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.model.Tint;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
 
 public class GrassBlockModel extends AABBModel {
 
   private final static Tint[][] tints = new Tint[][] {
-      {BIOME_GRASS, BIOME_GRASS, BIOME_GRASS, BIOME_GRASS, NONE, NONE},
-      {NONE, NONE, NONE, NONE, BIOME_GRASS, NONE}
+      {NONE, NONE, NONE, NONE, BIOME_GRASS, NONE},
+      {BIOME_GRASS, BIOME_GRASS, BIOME_GRASS, BIOME_GRASS, NONE, NONE}
   };
 
   private final static AABB[] boxes = new AABB[]{
@@ -40,14 +43,14 @@ public class GrassBlockModel extends AABBModel {
 
   private static final Texture[][] textures = new Texture[][]{
       {
-          Texture.grassSide, Texture.grassSide,
-          Texture.grassSide, Texture.grassSide,
-          null, null
-      },
-      {
           Texture.grassSideSaturated, Texture.grassSideSaturated,
           Texture.grassSideSaturated, Texture.grassSideSaturated,
           Texture.grassTop, Texture.dirt
+      },
+      {
+        Texture.grassSide, Texture.grassSide,
+        Texture.grassSide, Texture.grassSide,
+        null, null
       }
   };
 
@@ -64,5 +67,48 @@ public class GrassBlockModel extends AABBModel {
   @Override
   public Tint[][] getTints() {
     return tints;
+  }
+  
+  @Override
+  public boolean intersectFace(IntersectionRecord intersectionRecord, Scene scene, Texture texture, UVMapping mapping) {
+    // This is the method that handles intersecting faces of all AABB-based models.
+    // Do normal mapping, parallax occlusion mapping, specular maps and all the good stuff here!
+
+    if (texture == null) {
+      return false;
+    }
+
+    double tmp;
+    if (mapping != null) {
+      switch (mapping) {
+        case ROTATE_90:
+          tmp = intersectionRecord.uv.x;
+          intersectionRecord.uv.x = 1 - intersectionRecord.uv.y;
+          intersectionRecord.uv.y = tmp;
+          break;
+        case ROTATE_180:
+          intersectionRecord.uv.x = 1 - intersectionRecord.uv.x;
+          intersectionRecord.uv.y = 1 - intersectionRecord.uv.y;
+          break;
+        case ROTATE_270:
+          tmp = intersectionRecord.uv.y;
+          intersectionRecord.uv.y = 1 - intersectionRecord.uv.x;
+          intersectionRecord.uv.x = tmp;
+          break;
+        case FLIP_U:
+          intersectionRecord.uv.x = 1 - intersectionRecord.uv.x;
+          break;
+        case FLIP_V:
+          intersectionRecord.uv.y = 1 - intersectionRecord.uv.y;
+          break;
+      }
+    }
+
+    float[] color = texture.getColor(intersectionRecord.uv.x, intersectionRecord.uv.y);
+    if (color[3] > Constants.EPSILON) {
+      intersectionRecord.color.set(color);
+      return true;
+    }
+    return false;
   }
 }

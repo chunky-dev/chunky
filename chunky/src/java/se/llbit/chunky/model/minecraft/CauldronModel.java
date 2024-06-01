@@ -338,17 +338,20 @@ public class CauldronModel {
               new Vector3(2 / 16.0, 9 / 16.0, 14 / 16.0),
               new Vector3(14 / 16.0, 9 / 16.0, 14 / 16.0),
               new Vector3(2 / 16.0, 9 / 16.0, 2 / 16.0),
-              new Vector4(2 / 16.0, 14 / 16.0, 1 - 14 / 16.0, 1 - 2 / 16.0)),
+              new Vector4(2 / 16.0, 14 / 16.0, 1 - 14 / 16.0, 1 - 2 / 16.0),
+            true),
           new Quad(
               new Vector3(2 / 16.0, 12 / 16.0, 14 / 16.0),
               new Vector3(14 / 16.0, 12 / 16.0, 14 / 16.0),
               new Vector3(2 / 16.0, 12 / 16.0, 2 / 16.0),
-              new Vector4(2 / 16.0, 14 / 16.0, 1 - 14 / 16.0, 1 - 2 / 16.0)),
+              new Vector4(2 / 16.0, 14 / 16.0, 1 - 14 / 16.0, 1 - 2 / 16.0),
+            true),
           new Quad(
               new Vector3(2 / 16.0, 15 / 16.0, 14 / 16.0),
               new Vector3(14 / 16.0, 15 / 16.0, 14 / 16.0),
               new Vector3(2 / 16.0, 15 / 16.0, 2 / 16.0),
-              new Vector4(2 / 16.0, 14 / 16.0, 1 - 14 / 16.0, 1 - 2 / 16.0))
+              new Vector4(2 / 16.0, 14 / 16.0, 1 - 14 / 16.0, 1 - 2 / 16.0),
+            true)
       };
 
   private static final Texture top = Texture.cauldronTop;
@@ -390,7 +393,7 @@ public class CauldronModel {
     }
 
     if (hit) {
-      intersectionRecord.distance += intersectionTest.distance;
+      intersectionRecord.distance = intersectionTest.distance;
     }
     return hit;
   }
@@ -419,10 +422,11 @@ public class CauldronModel {
         intersectionRecord.setNormal(water.n);
       }
       intersectionRecord.material = Water.INSTANCE;
+      Texture.water.getAvgColorLinear(intersectionRecord.color);
     }
 
     if (hit) {
-      intersectionRecord.distance += intersectionRecord.distance;
+      intersectionRecord.distance = intersectionTest.distance;
       /*ray.o.scaleAdd(ray.t, ray.d);
       int x;
        */
@@ -459,7 +463,7 @@ public class CauldronModel {
     }
 
     if (hit) {
-      intersectionRecord.distance += intersectionTest.distance;
+      intersectionRecord.distance = intersectionTest.distance;
       /*ray.o.scaleAdd(ray.t, ray.d);
       int x;
        */

@@ -9,7 +9,6 @@ import se.llbit.json.JsonValue;
 import se.llbit.math.AABB;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
@@ -18,7 +17,7 @@ import se.llbit.nbt.Tag;
 import java.util.Random;
 
 public abstract class Block extends Material {
-  private final static AABB block =  new AABB(0, 1, 0, 1,0, 1);
+  public static final AABB fullBlock =  new AABB(0, 1, 0, 1,0, 1);
 
   /**
    * Set to true if there is a local intersection model for this block. If this is set to
@@ -51,14 +50,14 @@ public abstract class Block extends Material {
    * @param rand Random number source.
    */
   public void sample(int face, Vector3 loc, Random rand) {
-    block.sampleFace(face, loc, rand);
+    fullBlock.sampleFace(face, loc, rand);
   }
 
   /**
    * Get the surface area of this face of the block.
    */
   public double surfaceArea(int face) {
-    return block.faceSurfaceArea(face);
+    return fullBlock.faceSurfaceArea(face);
   }
 
   /**
@@ -71,7 +70,7 @@ public abstract class Block extends Material {
    * @return True if the ray hit this block, false if not
    */
   public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    if (block.intersect(ray, intersectionRecord)) {
+    if (fullBlock.intersect(ray, intersectionRecord)) {
       float[] color = texture.getColor(intersectionRecord.uv.x, intersectionRecord.uv.y);
       if (color[3] > Constants.EPSILON) {
         intersectionRecord.color.set(color);
@@ -145,5 +144,9 @@ public abstract class Block extends Material {
    */
   public Tag getNewTagWithBlockEntity(Tag blockTag, CompoundTag entityTag) {
     return null;
+  }
+
+  public boolean isInside(Ray2 ray) {
+    return fullBlock.inside(ray.o);
   }
 }

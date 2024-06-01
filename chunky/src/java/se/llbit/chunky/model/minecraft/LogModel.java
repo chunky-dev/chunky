@@ -56,6 +56,7 @@ public class LogModel extends QuadModel {
   private final Texture[] textures;
 
   public LogModel(String facing, Texture side, Texture top) {
+    refractive = true;
     switch (facing) {
       case "x":
         quads = Model.rotateZ(sides);

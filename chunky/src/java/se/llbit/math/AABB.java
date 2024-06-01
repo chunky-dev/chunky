@@ -101,88 +101,83 @@ public class AABB {
     double u, v;
     boolean hit = false;
 
-    double tNext = Double.POSITIVE_INFINITY;
-
     t = (xmin - ix) / ray.d.x;
-    if (t < tNext && t > -Constants.EPSILON) {
+    if (t < intersectionRecord.distance + Constants.OFFSET && t > -Constants.EPSILON) {
       u = iz + ray.d.z * t;
       v = iy + ray.d.y * t;
       if (u >= zmin && u <= zmax &&
           v >= ymin && v <= ymax) {
         hit = true;
-        tNext = t;
+        intersectionRecord.distance = t;
         intersectionRecord.uv.x = u;
         intersectionRecord.uv.y = v;
         intersectionRecord.setNormal(-1, 0, 0);
       }
     }
     t = (xmax - ix) / ray.d.x;
-    if (t < tNext && t > -Constants.EPSILON) {
+    if (t < intersectionRecord.distance + Constants.OFFSET && t > -Constants.EPSILON) {
       u = iz + ray.d.z * t;
       v = iy + ray.d.y * t;
       if (u >= zmin && u <= zmax &&
           v >= ymin && v <= ymax) {
         hit = true;
-        tNext = t;
+        intersectionRecord.distance = t;
         intersectionRecord.uv.x = 1 - u;
         intersectionRecord.uv.y = v;
         intersectionRecord.setNormal(1, 0, 0);
       }
     }
     t = (ymin - iy) / ray.d.y;
-    if (t < tNext && t > -Constants.EPSILON) {
+    if (t < intersectionRecord.distance + Constants.OFFSET && t > -Constants.EPSILON) {
       u = ix + ray.d.x * t;
       v = iz + ray.d.z * t;
       if (u >= xmin && u <= xmax &&
           v >= zmin && v <= zmax) {
         hit = true;
-        tNext = t;
+        intersectionRecord.distance = t;
         intersectionRecord.uv.x = u;
         intersectionRecord.uv.y = v;
         intersectionRecord.setNormal(0, -1, 0);
       }
     }
     t = (ymax - iy) / ray.d.y;
-    if (t < tNext && t > -Constants.EPSILON) {
+    if (t < intersectionRecord.distance + Constants.OFFSET && t > -Constants.EPSILON) {
       u = ix + ray.d.x * t;
       v = iz + ray.d.z * t;
       if (u >= xmin && u <= xmax &&
           v >= zmin && v <= zmax) {
         hit = true;
-        tNext = t;
+        intersectionRecord.distance = t;
         intersectionRecord.uv.x = u;
         intersectionRecord.uv.y = v;
         intersectionRecord.setNormal(0, 1, 0);
       }
     }
     t = (zmin - iz) / ray.d.z;
-    if (t < tNext && t > -Constants.EPSILON) {
+    if (t < intersectionRecord.distance + Constants.OFFSET && t > -Constants.EPSILON) {
       u = ix + ray.d.x * t;
       v = iy + ray.d.y * t;
       if (u >= xmin && u <= xmax &&
           v >= ymin && v <= ymax) {
         hit = true;
-        tNext = t;
+        intersectionRecord.distance = t;
         intersectionRecord.uv.x = 1 - u;
         intersectionRecord.uv.y = v;
         intersectionRecord.setNormal(0, 0, -1);
       }
     }
     t = (zmax - iz) / ray.d.z;
-    if (t < tNext && t > -Constants.EPSILON) {
+    if (t < intersectionRecord.distance + Constants.OFFSET && t > -Constants.EPSILON) {
       u = ix + ray.d.x * t;
       v = iy + ray.d.y * t;
       if (u >= xmin && u <= xmax &&
           v >= ymin && v <= ymax) {
         hit = true;
-        tNext = t;
+        intersectionRecord.distance = t;
         intersectionRecord.uv.x = u;
         intersectionRecord.uv.y = v;
         intersectionRecord.setNormal(0, 0, 1);
       }
-    }
-    if (hit) {
-      intersectionRecord.distance += tNext;
     }
     return hit;
   }
@@ -192,8 +187,27 @@ public class AABB {
    *
    * @return {@code true} if there is an intersection
    */
-  public boolean quickIntersect(Ray ray) {
-    double t1, t2;
+  public double quickIntersect(Ray2 ray) {
+    double tx1 = (xmin - ray.o.x) / ray.d.x;
+    double tx2 = (xmax - ray.o.x) / ray.d.x;
+
+    double ty1 = (ymin - ray.o.y) / ray.d.y;
+    double ty2 = (ymax - ray.o.y) / ray.d.y;
+
+    double tz1 = (zmin - ray.o.z) / ray.d.z;
+    double tz2 = (zmax - ray.o.z) / ray.d.z;
+
+    double tmin = Math.max(Math.max(Math.min(tx1, tx2), Math.min(ty1, ty2)), Math.min(tz1, tz2));
+    double tmax = Math.min(Math.min(Math.max(tx1, tx2), Math.max(ty1, ty2)), Math.max(tz1, tz2));
+
+    if (tmax < tmin) {
+      return Double.NaN;
+    } else {
+      return tmin;
+    }
+
+
+    /*double t1, t2;
     double tNear = Double.NEGATIVE_INFINITY;
     double tFar = Double.POSITIVE_INFINITY;
     Vector3 d = ray.d;
@@ -257,7 +271,7 @@ public class AABB {
       return true;
     } else {
       return false;
-    }
+    }*/
   }
 
   /**
@@ -267,8 +281,8 @@ public class AABB {
    */
   public boolean inside(Vector3 p) {
     return (p.x >= xmin && p.x <= xmax) &&
-        (p.y >= ymin && p.y <= ymax) &&
-        (p.z >= zmin && p.z <= zmax);
+           (p.y >= ymin && p.y <= ymax) &&
+           (p.z >= zmin && p.z <= zmax);
   }
 
   /**

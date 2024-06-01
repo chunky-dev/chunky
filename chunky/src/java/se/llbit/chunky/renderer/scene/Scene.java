@@ -693,10 +693,10 @@ public class Scene implements JsonSerializable, Refreshable {
       ray.d.set(0, 1, 0);
     }
 
+//    if (entities.intersect(ray, intersectionRecord)) {
+//      hit = true;
+//    }
     if (worldIntersection(ray, intersectionRecord)) {
-      hit = true;
-    }
-    if (entities.intersect(ray, intersectionRecord)) {
       hit = true;
     }
     if (hit) {
@@ -711,33 +711,33 @@ public class Scene implements JsonSerializable, Refreshable {
   private boolean worldIntersection(Ray2 ray, IntersectionRecord intersectionRecord) {
     boolean hit = false;
     IntersectionRecord intersectionTest = new IntersectionRecord();
-    if (worldOctree.enterBlock(this, ray, intersectionTest, palette)
-        && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
+    if (worldOctree.enterBlock(this, ray, intersectionTest, palette)) {
       intersectionRecord.distance = intersectionTest.distance;
       intersectionRecord.setNormal(intersectionTest.shadeN);
       intersectionRecord.color.set(intersectionTest.color);
       intersectionRecord.material = intersectionTest.material;
       hit = true;
     }
-    intersectionTest = new IntersectionRecord();
-    if (ray.getCurrentMedium().isWater()) {
-      if (waterOctree.exitWater(this, ray, intersectionTest, palette)) {
-        intersectionRecord.distance = intersectionTest.distance;
-        intersectionRecord.setNormal(intersectionTest.shadeN);
-        intersectionRecord.color.set(intersectionTest.color);
-        intersectionRecord.material = intersectionTest.material;
-        hit = true;
-      }
-    } else {
-      if (waterOctree.enterBlock(this, ray, intersectionTest, palette)
-          && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
-        intersectionRecord.distance = intersectionTest.distance;
-        intersectionRecord.setNormal(intersectionTest.shadeN);
-        intersectionRecord.color.set(intersectionTest.color);
-        intersectionRecord.material = intersectionTest.material;
-        hit = true;
-      }
-    }
+//    intersectionTest = new IntersectionRecord();
+//    if (ray.getCurrentMedium().isWater()) {
+//      if (waterOctree.exitWater(this, ray, intersectionTest, palette)
+//          && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
+//        intersectionRecord.distance = intersectionTest.distance;
+//        intersectionRecord.setNormal(intersectionTest.shadeN);
+//        intersectionRecord.color.set(intersectionTest.color);
+//        intersectionRecord.material = intersectionTest.material;
+//        hit = true;
+//      }
+//    } else {
+//      if (waterOctree.enterBlock(this, ray, intersectionTest, palette)
+//          && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
+//        intersectionRecord.distance = intersectionTest.distance;
+//        intersectionRecord.setNormal(intersectionTest.shadeN);
+//        intersectionRecord.color.set(intersectionTest.color);
+//        intersectionRecord.material = intersectionTest.material;
+//        hit = true;
+//      }
+//    }
     return hit;
   }
 
@@ -1689,22 +1689,27 @@ public class Scene implements JsonSerializable, Refreshable {
   public boolean traceTarget(Ray2 ray, IntersectionRecord intersectionRecord) {
     WorkerState state = new WorkerState();
     state.ray = ray;
-    if (isInWater(ray)) {
-      ray.setCurrentMedium(Water.INSTANCE);
-    } else {
-      ray.setCurrentMedium(Air.INSTANCE);
-    }
     camera.getTargetDirection(ray);
     ray.o.x -= origin.x;
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
-    while (intersect(ray, intersectionRecord)) {
-      if (intersectionRecord.material != Air.INSTANCE) {
+    ray.setCurrentMedium(getWorldMaterial(ray));
+    while (true) {
+      IntersectionRecord intersectionTest = new IntersectionRecord();
+      if (!intersect(ray, intersectionTest)) {
+        break;
+      } else if (!intersectionTest.material.isSameMaterial(ray.getCurrentMedium()) && intersectionTest.color.w > Constants.EPSILON) {
+        ray.o.scaleAdd((intersectionTest.distance), ray.d);
+        intersectionRecord.material = intersectionTest.material;
+        intersectionRecord.setNormal(intersectionTest.n);
+        intersectionRecord.distance = intersectionTest.distance;
         return true;
+      } else {
+        ray.o.scaleAdd((intersectionTest.distance + Constants.OFFSET), ray.d);
+        if (!intersectionTest.material.isSameMaterial(ray.getCurrentMedium())) {
+          ray.setCurrentMedium(intersectionTest.material);
+        }
       }
-      ray.o.add(ray.d.x * (intersectionRecord.distance + Constants.OFFSET),
-                ray.d.x * (intersectionRecord.distance + Constants.OFFSET),
-                ray.d.x * (intersectionRecord.distance + Constants.OFFSET));
     }
     return false;
   }
@@ -2519,15 +2524,22 @@ public class Scene implements JsonSerializable, Refreshable {
     return saveSnapshots;
   }
 
-  public Material getWorldMaterial(Vector3 point) {
-    int x = (int) QuickMath.floor(point.x);
-    int y = (int) QuickMath.floor(point.y);
-    int z = (int) QuickMath.floor(point.z);
-    Material material = waterOctree.getMaterial(x, y, z, palette);
-    if (!material.isWater()) {
-      material = worldOctree.getMaterial(x, y, z, palette);
+  public Material getWorldMaterial(Ray2 ray) {
+    int x = (int) QuickMath.floor(ray.o.x);
+    int y = (int) QuickMath.floor(ray.o.y);
+    int z = (int) QuickMath.floor(ray.o.z);
+    Material waterMat = waterOctree.getMaterial(x, y, z, palette);
+    Material material = worldOctree.getMaterial(x, y, z, palette);
+    if (material != Air.INSTANCE && material instanceof Block && ((Block) material).isInside(ray)) {
+      return material;
+    } else if (waterMat.isWater()) {
+      if (((Water) waterMat).isFullBlock()) {
+        return Water.INSTANCE;
+      } else if (((Water) waterMat).isInside(ray)) {
+        return Water.INSTANCE;
+      }
     }
-    return material;
+    return Air.INSTANCE;
   }
 
   public boolean isInWater(Ray2 ray) {
@@ -3242,6 +3254,16 @@ public class Scene implements JsonSerializable, Refreshable {
   public void setPerceptualSmoothness(String materialName, float value) {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("roughness", Json.of(Math.pow(1 - value, 2)));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the transmission roughness property for the given material.
+   */
+  public void setPerceptualTransmissionSmoothness(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("transmissionRoughness", Json.of(Math.pow(1 - value, 2)));
     materials.put(materialName, material);
     refresh(ResetReason.MATERIALS_CHANGED);
   }

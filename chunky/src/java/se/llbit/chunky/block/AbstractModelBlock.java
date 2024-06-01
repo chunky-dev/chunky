@@ -47,4 +47,9 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
   public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     return model.intersect(ray, intersectionRecord, scene);
   }
+
+  @Override
+  public boolean isInside(Ray2 ray) {
+    return model.isInside(ray);
+  }
 }

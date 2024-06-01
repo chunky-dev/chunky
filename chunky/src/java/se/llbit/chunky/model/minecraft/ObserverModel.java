@@ -91,6 +91,7 @@ public class ObserverModel extends QuadModel {
   private final Texture[] textures;
 
   public ObserverModel(int facing, boolean powered) {
+    refractive = true;
     quads = faces[facing];
     textures = powered ? texturesOn : texturesOff;
   }

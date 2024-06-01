@@ -61,9 +61,9 @@ import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 
 /**
- * Chunky is a Minecraft mapping and rendering tool created byJesper Öqvist (jesper@llbit.se).
+ * Chunky is a Minecraft mapping and rendering tool created by Jesper Öqvist (jesper@llbit.se).
  *
- * <p>Read more about Chunky at <a href="https://chunky.llbit.se">https://chunky.llbit.se</a>.
+ * <p>Read more about Chunky at <a href="https://chunky-dev.github.io/docs/">https://chunky-dev.github.io/docs/</a>.
  */
 public class Chunky {
   static {

@@ -18,129 +18,120 @@
 
 package se.llbit.chunky.model.minecraft;
 
+import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.*;
 
-public class SlimeBlockModel {
+public class SlimeBlockModel extends QuadModel {
     private static final Quad[] quads = {
-            new Quad(
-                    new Vector3(13 / 16.0, 13 / 16.0, 3 / 16.0),
-                    new Vector3(3 / 16.0, 13 / 16.0, 3 / 16.0),
-                    new Vector3(13 / 16.0, 13 / 16.0, 13 / 16.0),
-                    new Vector4(3 / 16.0, 13 / 16.0, 3 / 16.0, 13 / 16.0)
-            ),
-            new Quad(
-                    new Vector3(3 / 16.0, 3 / 16.0, 3 / 16.0),
-                    new Vector3(13 / 16.0, 3 / 16.0, 3 / 16.0),
-                    new Vector3(3 / 16.0, 3 / 16.0, 13 / 16.0),
-                    new Vector4(3 / 16.0, 13 / 16.0, 3 / 16.0, 13 / 16.0)
-            ),
-            new Quad(
-                    new Vector3(13 / 16.0, 3 / 16.0, 13 / 16.0),
-                    new Vector3(13 / 16.0, 3 / 16.0, 3 / 16.0),
-                    new Vector3(13 / 16.0, 13 / 16.0, 13 / 16.0),
-                    new Vector4(3 / 16.0, 13 / 16.0, 3 / 16.0, 13 / 16.0)
-            ),
-            new Quad(
-                    new Vector3(3 / 16.0, 3 / 16.0, 3 / 16.0),
-                    new Vector3(3 / 16.0, 3 / 16.0, 13 / 16.0),
-                    new Vector3(3 / 16.0, 13 / 16.0, 3 / 16.0),
-                    new Vector4(3 / 16.0, 13 / 16.0, 3 / 16.0, 13 / 16.0)
-            ),
-            new Quad(
-                    new Vector3(13 / 16.0, 3 / 16.0, 3 / 16.0),
-                    new Vector3(3 / 16.0, 3 / 16.0, 3 / 16.0),
-                    new Vector3(13 / 16.0, 13 / 16.0, 3 / 16.0),
-                    new Vector4(3 / 16.0, 13 / 16.0, 3 / 16.0, 13 / 16.0)
-            ),
-            new Quad(
-                    new Vector3(3 / 16.0, 3 / 16.0, 13 / 16.0),
-                    new Vector3(13 / 16.0, 3 / 16.0, 13 / 16.0),
-                    new Vector3(3 / 16.0, 13 / 16.0, 13 / 16.0),
-                    new Vector4(3 / 16.0, 13 / 16.0, 3 / 16.0, 13 / 16.0)
-            ),
-            new Quad(
-                    new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
-                    new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
-                    new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
-                    new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
-            ),
-            new Quad(
-                    new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
-                    new Vector3(16 / 16.0, 0 / 16.0, 0 / 16.0),
-                    new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
-                    new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
-            ),
-            new Quad(
-                    new Vector3(16 / 16.0, 0 / 16.0, 16 / 16.0),
-                    new Vector3(16 / 16.0, 0 / 16.0, 0 / 16.0),
-                    new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
-                    new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
-            ),
-            new Quad(
-                    new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
-                    new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
-                    new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
-                    new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
-            ),
-            new Quad(
-                    new Vector3(16 / 16.0, 0 / 16.0, 0 / 16.0),
-                    new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
-                    new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
-                    new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
-            ),
-            new Quad(
-                    new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
-                    new Vector3(16 / 16.0, 0 / 16.0, 16 / 16.0),
-                    new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
-                    new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
-            ),
+      new Quad(
+        new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
+        new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
+        new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
+        new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0),
+        true
+      ),
+      new Quad(
+        new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
+        new Vector3(16 / 16.0, 0 / 16.0, 0 / 16.0),
+        new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
+        new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0),
+        true
+      ),
+      new Quad(
+        new Vector3(16 / 16.0, 0 / 16.0, 16 / 16.0),
+        new Vector3(16 / 16.0, 0 / 16.0, 0 / 16.0),
+        new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
+        new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0),
+        true
+      ),
+      new Quad(
+        new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
+        new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
+        new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
+        new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0),
+        true
+      ),
+      new Quad(
+        new Vector3(16 / 16.0, 0 / 16.0, 0 / 16.0),
+        new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
+        new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
+        new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0),
+        true
+      ),
+      new Quad(
+        new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
+        new Vector3(16 / 16.0, 0 / 16.0, 16 / 16.0),
+        new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
+        new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0),
+        true
+      ),
+      new Quad(
+        new Vector3(13 / 16.0, 13 / 16.0, 3 / 16.0),
+        new Vector3(3 / 16.0, 13 / 16.0, 3 / 16.0),
+        new Vector3(13 / 16.0, 13 / 16.0, 13 / 16.0),
+        new Vector4(3 / 16.0, 13 / 16.0, 3 / 16.0, 13 / 16.0),
+        true
+      ),
+      new Quad(
+        new Vector3(3 / 16.0, 3 / 16.0, 3 / 16.0),
+        new Vector3(13 / 16.0, 3 / 16.0, 3 / 16.0),
+        new Vector3(3 / 16.0, 3 / 16.0, 13 / 16.0),
+        new Vector4(3 / 16.0, 13 / 16.0, 3 / 16.0, 13 / 16.0),
+        true
+      ),
+      new Quad(
+        new Vector3(13 / 16.0, 3 / 16.0, 13 / 16.0),
+        new Vector3(13 / 16.0, 3 / 16.0, 3 / 16.0),
+        new Vector3(13 / 16.0, 13 / 16.0, 13 / 16.0),
+        new Vector4(3 / 16.0, 13 / 16.0, 3 / 16.0, 13 / 16.0),
+        true
+      ),
+      new Quad(
+        new Vector3(3 / 16.0, 3 / 16.0, 3 / 16.0),
+        new Vector3(3 / 16.0, 3 / 16.0, 13 / 16.0),
+        new Vector3(3 / 16.0, 13 / 16.0, 3 / 16.0),
+        new Vector4(3 / 16.0, 13 / 16.0, 3 / 16.0, 13 / 16.0),
+        true
+      ),
+      new Quad(
+        new Vector3(13 / 16.0, 3 / 16.0, 3 / 16.0),
+        new Vector3(3 / 16.0, 3 / 16.0, 3 / 16.0),
+        new Vector3(13 / 16.0, 13 / 16.0, 3 / 16.0),
+        new Vector4(3 / 16.0, 13 / 16.0, 3 / 16.0, 13 / 16.0),
+        true
+      ),
+      new Quad(
+        new Vector3(3 / 16.0, 3 / 16.0, 13 / 16.0),
+        new Vector3(13 / 16.0, 3 / 16.0, 13 / 16.0),
+        new Vector3(3 / 16.0, 13 / 16.0, 13 / 16.0),
+        new Vector4(3 / 16.0, 13 / 16.0, 3 / 16.0, 13 / 16.0),
+        true
+      )
     };
 
-    private static final Texture[] tex = {
-            Texture.slime, Texture.slime, Texture.slime, Texture.slime, Texture.slime, Texture.slime,
-
-            Texture.slime, Texture.slime, Texture.slime, Texture.slime, Texture.slime, Texture.slime
+    private static final Texture[] textures = new Texture[] {
+      Texture.slime, Texture.slime, Texture.slime, Texture.slime,
+      Texture.slime, Texture.slime, Texture.slime, Texture.slime,
+      Texture.slime, Texture.slime, Texture.slime, Texture.slime
     };
 
-    public static boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
-        IntersectionRecord intersectionTest = new IntersectionRecord();
-        boolean hit = false;
-        Vector4 oldColor = new Vector4(intersectionRecord.color);
-        for (int i = 0; i < 6; ++i) {
-            Quad quad = quads[i];
-            if (quad.intersect(ray, intersectionTest)) {
-                float[] color = tex[i].getColor(intersectionTest.uv.x, intersectionTest.uv.y);
-                if (color[3] > Constants.EPSILON) {
-                    ColorUtil.overlayColor(intersectionRecord.color, color);
-                    intersectionRecord.setNormal(quad.n);
-                    hit = true;
-                }
-            }
-        }
-        boolean innerHit = hit;
-        Vector4 innerColor = hit ? new Vector4(intersectionRecord.color) : null;
+    public SlimeBlockModel() {
+      refractive = true;
+    }
 
-        intersectionRecord.color.set(oldColor);
-        hit = false;
+    @Override
+    public Quad[] getQuads() {
+      return quads;
+    }
 
-        for (int i = 6; i < quads.length; ++i) {
-            Quad quad = quads[i];
-            if (quad.intersect(ray, intersectionTest)) {
-                float[] color = tex[i].getColor(intersectionTest.uv.x, intersectionTest.uv.y);
-                if (color[3] > Constants.EPSILON) {
-                    ColorUtil.overlayColor(intersectionRecord.color, color);
-                    intersectionRecord.setNormal(quad.n);
-                    hit = true;
-                }
-            }
-        }
-        if (hit) {
-            intersectionRecord.distance += intersectionTest.distance;
-            if (innerHit) {
-                ColorUtil.overlayColor(intersectionRecord.color, innerColor);
-            }
-        }
-        return hit;
+    @Override
+    public Texture[] getTextures() {
+      return textures;
+    }
+
+    @Override
+    public boolean isInside(Ray2 ray) {
+      return true;
     }
 }

@@ -79,6 +79,8 @@ public class SpriteModel extends QuadModel {
     return textures;
   }
 
+  // TODO: Are this method and the one below necessary?
+
   public static boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Texture material) {
     boolean hit = false;
     IntersectionRecord intersectionTest = new IntersectionRecord();
@@ -99,7 +101,7 @@ public class SpriteModel extends QuadModel {
     }
     if (hit) {
       intersectionRecord.color.set(color);
-      intersectionRecord.distance += intersectionTest.distance;
+      intersectionRecord.distance = intersectionTest.distance;
     }
     return hit;
   }
@@ -124,7 +126,7 @@ public class SpriteModel extends QuadModel {
     }
     if (hit) {
       intersectionRecord.color.set(color);
-      intersectionRecord.distance += intersectionTest.distance;
+      intersectionRecord.distance = intersectionTest.distance;
     }
     return hit;
   }

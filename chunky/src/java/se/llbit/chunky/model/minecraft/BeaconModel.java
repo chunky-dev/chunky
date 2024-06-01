@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
+import se.llbit.math.Vector3;
 
 /**
  * Beacon block.
@@ -48,5 +49,10 @@ public class BeaconModel extends AABBModel {
   @Override
   public Texture[][] getTextures() {
     return textures;
+  }
+
+  @Override
+  public boolean isInside(Vector3 p) {
+    return boxes[0].inside(p) && !boxes[1].inside(p) && boxes[2].inside(p);
   }
 }

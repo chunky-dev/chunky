@@ -18,26 +18,18 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.block.MinecraftBlockTranslucent;
+import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.HoneyBlockModel;
+import se.llbit.chunky.model.minecraft.SlimeBlockModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 
-public class Honey extends MinecraftBlockTranslucent {
+public class Honey extends AbstractModelBlock {
     public Honey() {
         super("honey_block", Texture.honeyBlockSide);
-        localIntersect = true;
-        opaque = false;
         ior = 1.474f; // according to https://study.com/academy/answer/what-is-the-refractive-index-of-honey.html
-        solid = false;
-        refractive = true;
-    }
-
-    @Override
-    public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-        return HoneyBlockModel.intersect(ray, intersectionRecord);
+        model = new HoneyBlockModel();
     }
 }

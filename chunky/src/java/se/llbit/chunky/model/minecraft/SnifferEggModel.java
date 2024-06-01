@@ -90,6 +90,7 @@ public class SnifferEggModel extends QuadModel {
   private final int age;
 
   public SnifferEggModel(int age) {
+    refractive = true;
     this.age = QuickMath.clamp(age, 0, 2);
   }
 

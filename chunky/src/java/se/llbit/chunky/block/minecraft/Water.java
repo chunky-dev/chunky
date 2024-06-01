@@ -49,7 +49,6 @@ public class Water extends MinecraftBlockTranslucent {
     localIntersect = true;
     specular = 0.12f;
     ior = 1.333f;
-    refractive = true;
   }
 
   public Water(int level) {
@@ -193,7 +192,7 @@ public class Water extends MinecraftBlockTranslucent {
     }
   }
 
-  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  private boolean testIntersect(Ray2 ray, IntersectionRecord intersectionRecord) {
     IntersectionRecord intersectionTest = new IntersectionRecord();
 
     int data = intersectionRecord.material instanceof Water ? ((Water) intersectionRecord.material).data : 0;
@@ -209,7 +208,7 @@ public class Water extends MinecraftBlockTranslucent {
         }
       }
       if (hit) {
-        intersectionRecord.distance += intersectionTest.distance;
+        intersectionRecord.distance = intersectionTest.distance;
       }
       return hit;
     }
@@ -285,11 +284,19 @@ public class Water extends MinecraftBlockTranslucent {
       hit = true;
     }
     if (hit) {
+      intersectionRecord.distance = intersectionTest.distance;
+      return true;
+    }
+    return false;
+  }
+
+  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+    boolean hit = testIntersect(ray, intersectionRecord);
+    if (hit) {
       if (!(scene.getCurrentWaterShader() instanceof StillWaterShader) && intersectionRecord.shadeN.y != 0) {
         scene.getCurrentWaterShader().doWaterShading(ray, intersectionRecord, scene.getAnimationTime());
       }
       texture.getAvgColorLinear(intersectionRecord.color);
-      intersectionRecord.distance += intersectionTest.distance;
     }
     return hit;
   }
@@ -297,4 +304,23 @@ public class Water extends MinecraftBlockTranslucent {
   @Override public String description() {
     return String.format("level=%d", level);
   }
+
+  @Override
+  public boolean isInside(Ray2 ray) {
+    if (isFullBlock()) {
+      return true;
+    } else {
+      Ray2 testRay = new Ray2(ray);
+      testRay.d.set(0, 1, 0);
+      IntersectionRecord intersectionRecord = new IntersectionRecord();
+      return testIntersect(testRay, intersectionRecord);
+    }
+  }
+
+  public boolean isInside(double x, double y, double z) {
+    Ray2 ray = new Ray2();
+    ray.o.set(x, y, z);
+    return isInside(ray);
+  }
+
 }

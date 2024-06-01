@@ -31,7 +31,7 @@ public class Vector2 {
   public double x, y;
 
   /**
-   * Creates a new vector (0, 0, 0)
+   * Creates a new vector (0, 0)
    */
   public Vector2() {
     this(0, 0);

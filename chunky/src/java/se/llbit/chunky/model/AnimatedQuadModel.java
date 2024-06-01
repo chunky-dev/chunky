@@ -58,19 +58,47 @@ public abstract class AnimatedQuadModel extends QuadModel {
 
     float[] color = null;
     Tint tint = Tint.NONE;
-    for (int i = 0; i < quads.length; ++i) {
-      Quad quad = quads[i];
-      if (quad.intersect(ray, intersectionTest)) {
-        float[] c = textures[i].getColor(intersectionTest.uv.x, intersectionTest.uv.y, j);
-        if (c[3] > Constants.EPSILON) {
-          tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
-          color = c;
-          if (quad.doubleSided) {
-            intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, quad.n));
+    if (refractive) {
+      for (int i = 0; i < quads.length; ++i) {
+        Quad quad = quads[i];
+        if (quad.intersect(ray, intersectionTest)) {
+          if (ray.d.dot(quad.n) < 0) {
+            float[] c = textures[i].getColor(intersectionTest.uv.x, intersectionTest.uv.y);
+            if (c[3] > Constants.EPSILON) {
+              tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
+              color = c;
+            } else {
+              tint = Tint.NONE;
+              color = new float[] {1, 1, 1, 0};
+            }
           } else {
-            intersectionRecord.setNormal(quad.n);
+            tint = Tint.NONE;
+            color = new float[] {1, 1, 1, 0};
           }
           hit = true;
+          intersectionRecord.setNormal(quad.n);
+          intersectionRecord.distance = intersectionTest.distance;
+        }
+      }
+    } else {
+      for (int i = 0; i < quads.length; ++i) {
+        Quad quad = quads[i];
+        double distance = intersectionTest.distance;
+        if (quad.intersect(ray, intersectionTest)) {
+          float[] c = textures[i].getColor(intersectionTest.uv.x, intersectionTest.uv.y);
+          if (c[3] > Constants.EPSILON) {
+            tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
+            color = c;
+            if (quad.doubleSided) {
+              intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, quad.n));
+            } else {
+              intersectionRecord.setNormal(quad.n);
+            }
+            intersectionRecord.distance = intersectionTest.distance;
+            hit = true;
+          } else {
+            intersectionTest.distance = distance;
+          }
         }
       }
     }
@@ -86,7 +114,6 @@ public abstract class AnimatedQuadModel extends QuadModel {
 
       intersectionRecord.color.set(color);
       tint.tint(intersectionRecord.color, ray, scene);
-      intersectionRecord.distance += intersectionTest.distance;
       /*ray.o.scaleAdd(ray.t, ray.d);
       int x;
        */

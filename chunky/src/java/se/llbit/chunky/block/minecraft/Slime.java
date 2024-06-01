@@ -18,26 +18,15 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.block.MinecraftBlockTranslucent;
+import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.SlimeBlockModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray;
-import se.llbit.math.Ray2;
 
-public class Slime extends MinecraftBlockTranslucent {
+public class Slime extends AbstractModelBlock {
     public Slime() {
         super("slime_block", Texture.slime);
-        localIntersect = true;
-        opaque = false;
         ior = 1.516f; // gelatin, according to https://study.com/academy/answer/what-is-the-refractive-index-of-gelatin.html
         solid = true;
-        refractive = true;
-    }
-
-    @Override
-    public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-        return SlimeBlockModel.intersect(ray, intersectionRecord);
+        model = new SlimeBlockModel();
     }
 }

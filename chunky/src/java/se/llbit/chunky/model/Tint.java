@@ -66,11 +66,23 @@ public class Tint {
       case CONSTANT:
         return this.tint;
       case BIOME_FOLIAGE:
-        return scene.getFoliageColor((int) (ray.o.x + ray.d.x * Constants.OFFSET), (int) (ray.o.y + ray.d.y * Constants.OFFSET), (int) (ray.o.z + ray.d.z * Constants.OFFSET));
+        return scene.getFoliageColor(
+          (int) (ray.o.x + ray.d.x * Constants.OFFSET),
+          (int) (ray.o.y + ray.d.y * Constants.OFFSET),
+          (int) (ray.o.z + ray.d.z * Constants.OFFSET)
+        );
       case BIOME_GRASS:
-        return scene.getGrassColor((int) (ray.o.x + ray.d.x * Constants.OFFSET), (int) (ray.o.y + ray.d.y * Constants.OFFSET), (int) (ray.o.z + ray.d.z * Constants.OFFSET));
+        return scene.getGrassColor(
+          (int) (ray.o.x + ray.d.x * Constants.OFFSET),
+          (int) (ray.o.y + ray.d.y * Constants.OFFSET),
+          (int) (ray.o.z + ray.d.z * Constants.OFFSET)
+        );
       case BIOME_WATER:
-        return scene.getWaterColor((int) (ray.o.x + ray.d.x * Constants.OFFSET), (int) (ray.o.y + ray.d.y * Constants.OFFSET), (int) (ray.o.z + ray.d.z * Constants.OFFSET));
+        return scene.getWaterColor(
+          (int) (ray.o.x + ray.d.x * Constants.OFFSET),
+          (int) (ray.o.y + ray.d.y * Constants.OFFSET),
+          (int) (ray.o.z + ray.d.z * Constants.OFFSET)
+        );
       default:
         Log.warn("Unsupported tint type " + type);
         return null;

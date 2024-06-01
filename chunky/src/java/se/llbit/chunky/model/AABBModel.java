@@ -3,6 +3,7 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.Material;
 import se.llbit.math.AABB;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
@@ -13,6 +14,7 @@ import se.llbit.math.Vector3;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
 
 /**
  * A block model that is made out of textured AABBs.
@@ -83,7 +85,7 @@ public abstract class AABBModel implements BlockModel {
     for (int i = 0; i < boxes.length; ++i) {
       if (boxes[i].intersect(ray, intersectionRecord)) {
         Tint[] tintedFacesBox = tintedFaces != null ? tintedFaces[i] : null;
-        Vector3 n = intersectionRecord.n;
+        Vector3 n = intersectionRecord.shadeN;
         if (n.y > 0) { // top
           intersectionRecord.uv.x = 1 - intersectionRecord.uv.x;
           if (intersectFace(intersectionRecord, scene, textures[i][4],
@@ -94,7 +96,8 @@ public abstract class AABBModel implements BlockModel {
           }
         } else if (n.y < 0) { // bottom
           if (intersectFace(intersectionRecord, scene, textures[i][5],
-            mapping != null ? mapping[i][5] : null)) {
+            mapping != null ? mapping[i][5] : null
+          )) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[5] : Tint.NONE;
           }
@@ -114,13 +117,15 @@ public abstract class AABBModel implements BlockModel {
           }
         } else if (n.x < 0) { // west
           if (intersectFace(intersectionRecord, scene, textures[i][3],
-            mapping != null ? mapping[i][3] : null)) {
+            mapping != null ? mapping[i][3] : null
+          )) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[3] : Tint.NONE;
           }
         } else if (n.x > 0) { // east
           if (intersectFace(intersectionRecord, scene, textures[i][1],
-            mapping != null ? mapping[i][1] : null)) {
+            mapping != null ? mapping[i][1] : null
+          )) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[1] : Tint.NONE;
           }
@@ -128,6 +133,11 @@ public abstract class AABBModel implements BlockModel {
       }
     }
     if (hit) {
+      Vector3 o = new Vector3(ray.o);
+      o.scaleAdd(intersectionRecord.distance + Constants.OFFSET, ray.d);
+      if (isInside(o)) {
+        return false;
+      }
       if (intersectionRecord.material.opaque) {
         intersectionRecord.color.w = 1;
       }
@@ -139,12 +149,13 @@ public abstract class AABBModel implements BlockModel {
     return hit;
   }
 
-  private boolean intersectFace(IntersectionRecord intersectionRecord, Scene scene, Texture texture, UVMapping mapping) {
+  public boolean intersectFace(IntersectionRecord intersectionRecord, Scene scene, Texture texture, UVMapping mapping) {
     // This is the method that handles intersecting faces of all AABB-based models.
     // Do normal mapping, parallax occlusion mapping, specular maps and all the good stuff here!
 
     if (texture == null) {
-      return false;
+      intersectionRecord.color.set(1, 1, 1, 0);
+      return true;
     }
 
     double tmp;
@@ -176,8 +187,26 @@ public abstract class AABBModel implements BlockModel {
     float[] color = texture.getColor(intersectionRecord.uv.x, intersectionRecord.uv.y);
     if (color[3] > Constants.EPSILON) {
       intersectionRecord.color.set(color);
-      return true;
+    } else {
+      intersectionRecord.color.set(1, 1, 1, 0);
+    }
+    return true;
+  }
+
+  @Override
+  public boolean isInside(Ray2 ray) {
+    AABB[] boxes = getBoxes();
+    for (AABB box: boxes) {
+      if (box.inside(ray.o)) {
+        return true;
+      }
     }
     return false;
+  }
+
+  public boolean isInside(Vector3 p) {
+    Ray2 ray = new Ray2();
+    ray.o.set(p);
+    return isInside(ray);
   }
 }

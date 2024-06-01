@@ -181,7 +181,7 @@ public class Lava extends MinecraftBlockTranslucent {
       texture.getColor(intersectionTest);
       intersectionRecord.color.set(intersectionTest.color);
       intersectionRecord.color.w = 1;
-      intersectionRecord.distance += intersectionTest.distance;
+      intersectionRecord.distance = intersectionTest.distance;
       return true;
     }
     return false;

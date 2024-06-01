@@ -196,7 +196,7 @@ public class WaterModel {
         }
       }
       if (hit) {
-        intersectionRecord.distance += intersectionTest.distance;
+        intersectionRecord.distance = intersectionTest.distance;
       }
       return hit;
     }

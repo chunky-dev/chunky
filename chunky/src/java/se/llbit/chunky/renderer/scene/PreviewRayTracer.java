@@ -17,10 +17,12 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.MinecraftBlock;
 import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.WorkerState;
+import se.llbit.chunky.world.Material;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
@@ -39,20 +41,21 @@ public class PreviewRayTracer implements RayTracer {
   @Override public void trace(Scene scene, WorkerState state) {
     Ray2 ray = state.ray;
     IntersectionRecord intersectionRecord;
-    ray.setCurrentMedium(scene.getWorldMaterial(ray.o));
+    ray.setCurrentMedium(scene.getWorldMaterial(ray));
     while (true) {
-       intersectionRecord = new IntersectionRecord();
+      intersectionRecord = new IntersectionRecord();
       if (!scene.intersect(ray, intersectionRecord)) {
-        if (mapIntersection(scene, ray, intersectionRecord)) {
-          break;
-        }
+        mapIntersection(scene, ray, intersectionRecord);
         break;
-      } else if (intersectionRecord.material != Air.INSTANCE && intersectionRecord.color.w > 0) {
+      } else if (!intersectionRecord.material.isSameMaterial(ray.getCurrentMedium())) {
         ray.o.scaleAdd((intersectionRecord.distance), ray.d);
         break;
-      } else {
+      } /*else {
         ray.o.scaleAdd((intersectionRecord.distance + Constants.OFFSET), ray.d);
-      }
+        if (intersectionRecord.material.refractive) {
+          ray.setCurrentMedium(intersectionRecord.material);
+        }
+      }*/
     }
 
     if (intersectionRecord.material == Air.INSTANCE) {

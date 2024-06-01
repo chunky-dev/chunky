@@ -17,9 +17,11 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.WorkerState;
+import se.llbit.chunky.world.Material;
 import se.llbit.math.*;
 
 import java.util.Random;
@@ -36,8 +38,8 @@ public class PathTracer implements RayTracer {
    */
   @Override public void trace(Scene scene, WorkerState state) {
     Ray2 ray = state.ray;
-    ray.setCurrentMedium(scene.getWorldMaterial(ray.o));
-    pathTrace(scene, ray, state, true);
+    ray.setCurrentMedium(scene.getWorldMaterial(ray));
+    pathTrace(scene, ray, state);
   }
 
   /**
@@ -46,8 +48,7 @@ public class PathTracer implements RayTracer {
    * @param firstReflection {@code true} if the ray has not yet hit the first
    * diffuse or specular reflection
    */
-  public static void pathTrace(Scene scene, Ray2 ray, WorkerState state,
-                                  boolean firstReflection) {
+  public static void pathTrace(Scene scene, Ray2 ray, WorkerState state) {
     Random random = state.random;
 //    Vector3 ox = new Vector3(ray.o);
 //    Vector3 od = new Vector3(ray.d);
@@ -62,19 +63,20 @@ public class PathTracer implements RayTracer {
 
       if (scene.intersect(ray, intersectionRecord)) {
 
-        if (intersectionRecord.material.setOutboundDir(ray, intersectionRecord, random)) {
-          rayDepth--;
+        double emittance = intersectionRecord.material.emittance;
+        ray.o.scaleAdd(intersectionRecord.distance, ray.d);
+        if (!intersectionRecord.material.scatter(ray, intersectionRecord, random)) {
+          //rayDepth--;
+          emittance = 0;
         }
-
-        ray.o.add(ray.d.x * (intersectionRecord.distance - Constants.OFFSET), ray.d.y * (intersectionRecord.distance - Constants.OFFSET), ray.d.z * (intersectionRecord.distance - Constants.OFFSET));
 
         throughput.x *= intersectionRecord.color.x;
         throughput.y *= intersectionRecord.color.y;
         throughput.z *= intersectionRecord.color.z;
 
-        cumulativeColor.x += intersectionRecord.color.x * intersectionRecord.material.emittance * scene.emitterIntensity * throughput.x;
-        cumulativeColor.y += intersectionRecord.color.y * intersectionRecord.material.emittance * scene.emitterIntensity * throughput.y;
-        cumulativeColor.z += intersectionRecord.color.z * intersectionRecord.material.emittance * scene.emitterIntensity * throughput.z;
+        cumulativeColor.x += intersectionRecord.color.x * emittance * scene.emitterIntensity * throughput.x;
+        cumulativeColor.y += intersectionRecord.color.y * emittance * scene.emitterIntensity * throughput.y;
+        cumulativeColor.z += intersectionRecord.color.z * emittance * scene.emitterIntensity * throughput.z;
 
       } else {
         scene.sky.getSkyColor(ray, intersectionRecord);
