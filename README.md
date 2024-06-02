@@ -239,6 +239,6 @@ JetBrains supports core contributors of non-commercial open source projects by p
 [chunky-dev-skymaps]: https://chunky-dev.github.io/docs/user_guides/skymaps/
 [chunkylauncherjar]: http://chunkyupdate.lemaik.de/ChunkyLauncher.jar
 [jdk]: https://adoptium.net/
-[chunky-opencl]: https://github.com/ThatRedox/ChunkyClPlugin
+[chunky-opencl]: https://github.com/chunky-dev/chunky-opencl
 [chunky-discord]: https://discord.gg/VqcHpsF
 [jfx]: https://gluonhq.com/products/javafx/
