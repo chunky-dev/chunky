@@ -18,6 +18,7 @@
 package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.log.Log;
 
@@ -78,7 +79,7 @@ public class BedTextureAdapter extends TextureLoader {
         new IndexedTexture(0x98, bedHeadEnd));
   }
 
-  @Override public boolean load(Path texturePack) {
+  @Override public boolean load(LayeredResourcePacks texturePack) {
     boolean allLoaded = true;
     int scale = 1;
     BitmapImage bitmap = new BitmapImage(64, 64);
