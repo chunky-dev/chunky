@@ -1479,12 +1479,13 @@ public class Texture {
 
   public static final Texture armorStand = new Texture();
 
+  protected static boolean useAverageColor = PersistentSettings.getSingleColorTextures();
+
   @NotNull protected BitmapImage image;
   protected int width;
   protected int height;
   protected int avgColor;
   private float[] avgColorLinear;
-  private boolean usesAverageColor = false;
   private float[] avgColorFlat;
 
   private Image fxImage = null;
@@ -1499,14 +1500,6 @@ public class Texture {
 
   public Texture(BitmapImage img) {
     setTexture(img);
-    useAverageColor(PersistentSettings.getSingleColorTextures());
-  }
-
-  public void useAverageColor(boolean enable) {
-    usesAverageColor = enable;
-  }
-  public boolean usesAverageColor() {
-    return usesAverageColor;
   }
 
   public void setTexture(Texture texture) {
@@ -1583,7 +1576,7 @@ public class Texture {
    * @return color
    */
   public float[] getColor(int x, int y) {
-    if(usesAverageColor)
+    if(useAverageColor)
       return avgColorFlat;
     float[] result = new float[4];
     ColorUtil.getRGBAComponentsGammaCorrected(image.data[width*y + x], result);
@@ -1685,5 +1678,9 @@ public class Texture {
 
   public BitmapImage getBitmap() {
     return image;
+  }
+
+  public static void setUseAverageColor(boolean useAverageColor) {
+    Texture.useAverageColor = useAverageColor;
   }
 }
