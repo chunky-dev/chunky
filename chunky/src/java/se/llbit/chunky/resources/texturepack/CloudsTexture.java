@@ -17,6 +17,7 @@
 package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.world.Clouds;
 import se.llbit.resources.ImageLoader;
 
@@ -49,8 +50,9 @@ public class CloudsTexture extends TextureLoader {
     return true;
   }
 
-  @Override public boolean load(Path texturePack) {
-    return load(file, texturePack);
+  @Override
+  public boolean load(LayeredResourcePacks texturePack) {
+    return super.load(file, texturePack);
   }
 }
 

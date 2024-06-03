@@ -17,6 +17,7 @@
 package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.resources.Texture;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class RotatedTextureLoader extends TextureLoader {
   }
 
   @Override
-  public boolean load(Path texturePack) {
+  public boolean load(LayeredResourcePacks texturePack) {
     if (!loader.load(texturePack)) {
       return false;
     }

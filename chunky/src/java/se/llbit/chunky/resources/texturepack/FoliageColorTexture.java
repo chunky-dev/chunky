@@ -17,6 +17,7 @@
 package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.resources.ImageLoader;
 
@@ -45,7 +46,7 @@ public class FoliageColorTexture extends TextureLoader {
   }
 
   @Override
-  public boolean load(Path texturePack) {
+  public boolean load(LayeredResourcePacks texturePack) {
     return load(file, texturePack);
   }
 }

@@ -18,6 +18,7 @@
 package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.ColorUtil;
 import se.llbit.resources.ImageLoader;
@@ -61,7 +62,7 @@ public class ColoredTexture extends TextureLoader {
     return true;
   }
 
-  @Override public boolean load(Path texturePack) {
+  @Override public boolean load(LayeredResourcePacks texturePack) {
     return load(textureName, texturePack);
   }
 
