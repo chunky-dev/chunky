@@ -17,6 +17,7 @@
 package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.resources.Texture;
 
 import java.io.IOException;
@@ -50,7 +51,7 @@ public class IndexedTexture extends TextureLoader {
     return true;
   }
 
-  @Override public boolean load(Path texturePack) {
+  @Override public boolean load(LayeredResourcePacks texturePack) {
     return false;
   }
 

@@ -18,6 +18,7 @@
 package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.resources.Texture;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ import java.nio.file.Path;
 public class PaintingTextureAdapter extends TextureLoader {
 
   @Override
-  public boolean load(Path texturePack) {
+  public boolean load(LayeredResourcePacks texturePack) {
     PaintingsAtlas paintings = new PaintingsAtlas();
     if (new SimpleTexture("assets/minecraft/textures/painting/paintings_kristoffer_zetterstrand",
             paintings).load(texturePack)) {

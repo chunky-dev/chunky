@@ -1,6 +1,7 @@
 package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.LayeredResourcePacks;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +31,7 @@ public class AllTextures extends TextureLoader {
   }
 
   @Override
-  public boolean load(Path texturePack) {
+  public boolean load(LayeredResourcePacks texturePack) {
     int loaded = 0;
     for (TextureLoader alternative : textures) {
       if (alternative.load(texturePack)) {
