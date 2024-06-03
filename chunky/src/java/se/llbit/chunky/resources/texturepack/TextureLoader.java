@@ -17,14 +17,14 @@
 package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.log.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * This class loads textures from a Minecraft resource pack.
@@ -48,10 +48,10 @@ public abstract class TextureLoader {
   /**
    * Attempt to load a texture from a texture pack.
    *
-   * @param texturePack Reference to the texture pack file or directory
+   * @param resourcePacks Resource packs to load the texture from
    * @return <code>true</code> if the texture was successfully loaded
    */
-  public abstract boolean load(Path texturePack);
+  public abstract boolean load(LayeredResourcePacks resourcePacks);
 
   /**
    * Attempt to load a texture from a PNG image file.
@@ -77,13 +77,28 @@ public abstract class TextureLoader {
    * @param texturePack Reference to the texture pack file or directory
    * @return <code>true</code> if the texture was successfully loaded
    */
-  protected boolean load(String file, Path texturePack) {
-    try (InputStream in = Files.newInputStream(texturePack.resolve(file + ".png"))) {
-      return load(in);
+  protected boolean load(String file, LayeredResourcePacks texturePack) {
+    Optional<InputStream> in;
+    try {
+      in = texturePack.getInputStream(file + ".png");
+    } catch (IOException e) {
+      return false;
+    }
+    if (!in.isPresent()) {
+      return false;
+    }
+    try {
+      return load(in.get());
     } catch (TextureFormatError e) {
       Log.info(e.getMessage());
     } catch (IOException | NullPointerException e) {
       // Safe to ignore - will be handled implicitly later.
+    } finally {
+      try {
+        in.get().close();
+      } catch (IOException e) {
+        // ignore
+      }
     }
     return false;
   }

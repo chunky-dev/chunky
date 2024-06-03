@@ -1,6 +1,7 @@
 package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.LayeredResourcePacks;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,8 +23,8 @@ public class ConditionalTextures extends TextureLoader {
   }
 
   @Override
-  public boolean load(Path texturePack) {
-    if (Files.exists(texturePack.resolve(testFor))) {
+  public boolean load(LayeredResourcePacks texturePack) {
+    if (texturePack.getFirstEntry(testFor).isPresent()) {
       return then.load(texturePack);
     }
     return otherwise.load(texturePack);
