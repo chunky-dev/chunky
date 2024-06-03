@@ -54,7 +54,7 @@ public class ChiseledBookshelfTexture extends Texture {
   }
   @Override
   public float[] getColor(int x, int y) {
-    if(empty.usesAverageColor())
+    if(useAverageColor)
       return empty.getAvgColorFlat();
     float[] result = new float[4];
     boolean shouldOverlay = bookPresentAt(x, y);
