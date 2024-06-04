@@ -25,6 +25,7 @@ import se.llbit.chunky.block.legacy.LegacyMinecraftBlockProvider;
 import se.llbit.chunky.main.CommandLineOptions.Mode;
 import se.llbit.chunky.plugin.ContextMenuTransformer;
 import se.llbit.chunky.plugin.PluginApi;
+import se.llbit.chunky.block.jsonmodels.ResourcepackBlockProvider;
 import se.llbit.chunky.plugin.ChunkyPlugin;
 import se.llbit.chunky.plugin.TabTransformer;
 import se.llbit.chunky.renderer.*;
@@ -37,6 +38,7 @@ import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
 import se.llbit.chunky.resources.ResourcePackLoader;
+import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.ui.ChunkyFx;
 import se.llbit.chunky.ui.controller.CreditsController;
@@ -110,6 +112,7 @@ public class Chunky {
     this.options = options;
     registerBlockProvider(new MinecraftBlockProvider());
     registerBlockProvider(new LegacyMinecraftBlockProvider());
+    registerBlockProvider(new ResourcepackBlockProvider());
   }
 
   /**

@@ -48,6 +48,7 @@ import se.llbit.chunky.ui.Icons;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.log.Log;
+import se.llbit.util.FileSystemUtil;
 import se.llbit.util.MinecraftText;
 
 import java.awt.*;
@@ -474,10 +475,7 @@ public class ResourcePackChooserController implements Initializable {
     public static Image MISSING_PACK_PNG = null;
 
     private static void loadMissingPackPng(File minecraftJar) {
-      try (FileSystem zipFs = FileSystems.newFileSystem(
-        URI.create("jar:" + minecraftJar.toURI()),
-        Collections.emptyMap()
-      )) {
+      try (FileSystem zipFs = FileSystemUtil.getZipFileSystem(minecraftJar)) {
         Path unknownPackPng = zipFs.getPath("assets/minecraft/textures/misc/unknown_pack.png");
         try (InputStream unknownPackPngStream = Files.newInputStream(unknownPackPng)) {
           MISSING_PACK_PNG = new Image(unknownPackPngStream);

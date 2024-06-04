@@ -24,6 +24,7 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
+import se.llbit.util.FileSystemUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -107,8 +108,7 @@ public class JsonModel {
   }
 
   public static Collection<Cube> get(File resourcePack, String model) {
-    try (FileSystem jarFs = FileSystems.newFileSystem(URI.create("jar:" + resourcePack.toURI()),
-        Collections.emptyMap())) {
+    try (FileSystem jarFs = FileSystemUtil.getZipFileSystem(resourcePack)) {
       JsonObject json = getModel(jarFs, model);
       return fromJson(json);
     } catch (IOException | JsonParser.SyntaxError e) {

@@ -21,6 +21,7 @@ import se.llbit.chunky.main.Version;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.log.Log;
+import se.llbit.util.FileSystemUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,8 +56,7 @@ public final class ChunkyPlugin {
    * are sent to after it successfully loads.
    */
   public static void load(File pluginJar, BiConsumer<Plugin, JsonObject> onLoad) {
-    try (FileSystem zipFs = FileSystems.newFileSystem(URI.create("jar:" + pluginJar.toURI()),
-        Collections.emptyMap())) {
+    try (FileSystem zipFs = FileSystemUtil.getZipFileSystem(pluginJar)) {
       Path manifestPath = zipFs.getPath("/plugin.json");
       if (!Files.exists(manifestPath)) {
         Log.errorf("Missing plugin manifest file (plugin.json) in plugin %s", pluginJar.getName());
