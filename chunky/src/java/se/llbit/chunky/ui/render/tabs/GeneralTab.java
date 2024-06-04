@@ -31,15 +31,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.entity.ArmorStand;
-import se.llbit.chunky.entity.BeaconBeam;
-import se.llbit.chunky.entity.Book;
-import se.llbit.chunky.entity.ChickenEntity;
-import se.llbit.chunky.entity.CowEntity;
-import se.llbit.chunky.entity.PaintingEntity;
-import se.llbit.chunky.entity.PigEntity;
-import se.llbit.chunky.entity.PlayerEntity;
-import se.llbit.chunky.entity.SheepEntity;
+import se.llbit.chunky.entity.*;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
@@ -102,6 +94,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private CheckBox loadCows;
   @FXML private CheckBox loadChickens;
   @FXML private CheckBox loadPigs;
+  @FXML private CheckBox loadMooshrooms;
   @FXML private CheckBox loadOtherEntities;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
@@ -155,6 +148,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadCows.setSelected(preferences.shouldLoadClass(CowEntity.class));
       loadChickens.setSelected(preferences.shouldLoadClass(ChickenEntity.class));
       loadPigs.setSelected(preferences.shouldLoadClass(PigEntity.class));
+      loadMooshrooms.setSelected(preferences.shouldLoadClass(MooshroomEntity.class));
       loadOtherEntities.setSelected(preferences.shouldLoadClass(null));
     }
 
@@ -332,7 +326,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       renderControls.showPopup(
         "This takes effect the next time a new scene is created.", loadChickens);
     });
-    loadPigs.setTooltip(new Tooltip("Enable/disable chicken entity loading. "
+    loadPigs.setTooltip(new Tooltip("Enable/disable Pig entity loading. "
       + "Takes effect on next scene creation."));
     loadPigs.selectedProperty().addListener((observable, oldValue, newValue) -> {
       scene.getEntityLoadingPreferences().setPreference(PigEntity.class, newValue);
@@ -341,6 +335,16 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     loadPigs.setOnAction(event -> {
       renderControls.showPopup(
         "This takes effect the next time a new scene is created.", loadPigs);
+    });
+    loadMooshrooms.setTooltip(new Tooltip("Enable/disable Mooshroom entity loading. "
+      + "Takes effect on next scene creation."));
+    loadMooshrooms.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(MooshroomEntity.class, newValue);
+      PersistentSettings.setLoadMooshrooms(newValue);
+    });
+    loadMooshrooms.setOnAction(event -> {
+      renderControls.showPopup(
+        "This takes effect the next time a new scene is created.", loadMooshrooms);
     });
     loadOtherEntities.setTooltip(new Tooltip("Enable/disable other entity loading. "
             + "Takes effect on next scene creation."));
@@ -362,6 +366,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadCows.setSelected(true);
       loadChickens.setSelected(true);
       loadPigs.setSelected(true);
+      loadMooshrooms.setSelected(true);
       loadOtherEntities.setSelected(true);
     });
     loadNoEntity.setOnAction(event -> {
@@ -374,6 +379,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadCows.setSelected(false);
       loadChickens.setSelected(false);
       loadPigs.setSelected(false);
+      loadMooshrooms.setSelected(false);
       loadOtherEntities.setSelected(false);
     });
 

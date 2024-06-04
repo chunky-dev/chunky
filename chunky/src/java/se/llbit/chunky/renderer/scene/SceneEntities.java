@@ -7,6 +7,7 @@ import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.ChickenEntity;
 import se.llbit.chunky.entity.CowEntity;
 import se.llbit.chunky.entity.Entity;
+import se.llbit.chunky.entity.MooshroomEntity;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PigEntity;
 import se.llbit.chunky.entity.PlayerEntity;
@@ -177,6 +178,8 @@ public class SceneEntities {
             addActor(new ChickenEntity(new Vector3(x, y, z), tag));
           } else if (id.equals("minecraft:pig") && entityLoadingPreferences.shouldLoadClass(PigEntity.class)) {
             addActor(new PigEntity(new Vector3(x, y, z), tag));
+          } else if (id.equals("minecraft:mooshroom") && entityLoadingPreferences.shouldLoadClass(MooshroomEntity.class)) {
+            addActor(new MooshroomEntity(new Vector3(x, y, z), tag));
           }
         }
       }
