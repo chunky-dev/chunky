@@ -97,6 +97,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     entityTypes.put("Cow", (position, scene) -> new CowEntity(position, new CompoundTag()));
     entityTypes.put("Chicken", (position, scene) -> new ChickenEntity(position, new CompoundTag()));
     entityTypes.put("Pig", (position, scene) -> new PigEntity(position, new CompoundTag()));
+    entityTypes.put("Mooshroom", (position, scene) -> new MooshroomEntity(position, new CompoundTag()));
   }
 
   private Scene scene;
@@ -610,6 +611,41 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
           slotBox.setManaged(false);
         }
         controls.getChildren().add(slotBox);
+      }
+    }
+
+    if (entity instanceof Variant) {
+      Variant variant = (Variant) entity;
+
+      HBox variantHBox = new HBox();
+      variantHBox.setSpacing(10.0);
+
+      ComboBox<String> variantBox = new ComboBox<>();
+      variantBox.getItems().addAll(variant.variants());
+      variantBox.setValue(variant.getVariant());
+      variantBox.valueProperty().addListener(((observable, oldValue, newValue) -> {
+        variant.setVariant(newValue);
+        scene.rebuildActorBvh();
+      }));
+
+      variantHBox.getChildren().addAll(new Label("Variant:"), variantBox);
+      controls.getChildren().addAll(variantHBox);
+
+      if (entity instanceof MooshroomEntity) {
+        MooshroomEntity mooshroom = (MooshroomEntity) entity;
+        CheckBox showMushrooms = new CheckBox("Show Mushrooms?");
+        showMushrooms.setPadding(new Insets(10));
+        showMushrooms.setSelected(mooshroom.showMushrooms);
+        showMushrooms.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+          mooshroom.showMushrooms = newValue;
+          scene.rebuildActorBvh();
+        }));
+        HBox mushroomBox = new HBox();
+        mushroomBox.setSpacing(10.0);
+        mushroomBox.setAlignment(Pos.CENTER_LEFT);
+        mushroomBox.getChildren().addAll(showMushrooms);
+
+        controls.getChildren().addAll(mushroomBox);
       }
     }
 

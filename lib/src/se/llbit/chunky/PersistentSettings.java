@@ -541,6 +541,15 @@ public final class PersistentSettings {
     save();
   }
 
+  public static boolean getLoadMooshrooms() {
+    return settings.getBool("loadMooshrooms", true);
+  }
+
+  public static void setLoadMooshrooms(boolean value) {
+    settings.setBool("loadMooshrooms", value);
+    save();
+  }
+
   public static boolean getLoadOtherEntities() {
     return settings.getBool("loadOtherEntities", true);
   }
