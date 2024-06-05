@@ -281,9 +281,10 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
     json.add("headScale", headScale);
     json.add("pose", pose);
 
-    JsonObject colorData = new JsonObject();
+    JsonObject furMatData = new JsonObject();
+    materialFur.saveMaterialProperties(furMatData);
 
-    json.add("color", colorData);
+    json.add("furMaterial", furMatData);
     json.add("sheared", sheared);
     return json;
   }
