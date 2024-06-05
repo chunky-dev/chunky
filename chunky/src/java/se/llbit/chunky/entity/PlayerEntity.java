@@ -122,25 +122,40 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     } else if (id.equals("minecraft:player_head")) {
       Tag skinTag = tag.get("tag").get("SkullOwner").get("Properties").get("textures").get(0).get("Value");
       if (!skinTag.isError()) {
-        String skinUrl = Head.getTextureUrl(tag.get("tag").asCompound());
-        if (skinUrl != null && !skinUrl.isEmpty()) {
-          item.add("skin", skinUrl);
+        try {
+          String skinUrl = Head.getTextureUrl(tag.get("tag").asCompound());
+          if (skinUrl != null && !skinUrl.isEmpty()) {
+            item.add("skin", skinUrl);
+          }
+        } catch (IOException e) {
+          Log.warn("Could not download skin", e);
         }
       } else {
-        Tag skinPlayername = tag.get("tag").get("SkullOwner");
-        if (!skinPlayername.isError()) {
+        Tag profileTag = tag.get("components").get("minecraft:profile");
+        if (profileTag.isCompoundTag()) {
+          // 24w10a (i.e. 1.21) or later
           try {
-            String playername = skinPlayername.stringValue();
-            if (playername != null) {
-              String uuid = MojangApi.usernameToUUID(playername);
-              if (uuid != null) {
-                MinecraftProfile profile = MojangApi.fetchProfile(uuid);
-                Optional<MinecraftSkin> skin = profile.getSkin();
-                skin.ifPresent(minecraftSkin -> item.add("skin", minecraftSkin.getSkinUrl()));
-              }
-            }
+            Head.getSkinFromProfileTag(profileTag.asCompound()).ifPresent(minecraftSkin -> item.add("skin", minecraftSkin.getSkinUrl()));
           } catch (IOException e) {
             Log.warn("Could not download skin", e);
+          }
+        } else {
+          // 1.20 or earlier
+          Tag skinPlayername = tag.get("tag").get("SkullOwner");
+          if (!skinPlayername.isError()) {
+            try {
+              String playername = skinPlayername.stringValue();
+              if (playername != null) {
+                String uuid = MojangApi.usernameToUUID(playername);
+                if (uuid != null) {
+                  MinecraftProfile profile = MojangApi.fetchProfile(uuid);
+                  Optional<MinecraftSkin> skin = profile.getSkin();
+                  skin.ifPresent(minecraftSkin -> item.add("skin", minecraftSkin.getSkinUrl()));
+                }
+              }
+            } catch (IOException e) {
+              Log.warn("Could not download skin", e);
+            }
           }
         }
       }

@@ -319,8 +319,13 @@ public class ChunkyLauncher {
    * callback. Ensures that the JavaFX application (ChunkyLauncherFx) is initialized
    * before calling afterFirstTimeSetup.
    */
-  private static void firstTimeSetup(LauncherSettings settings, ShowLauncher afterFirstTimeSetup) {
+  private static void firstTimeSetup(LauncherSettings settings, ShowLauncher afterFirstTimeSetup) throws FileNotFoundException {
     if (SettingsDirectory.findSettingsDirectory()) {
+      if (afterFirstTimeSetup.showLauncher()) {
+        ChunkyLauncherFx.withLauncher(settings, Stage::show);
+      }
+    } else if (SettingsDirectory.getChunkyHomeDirectoryOverwrite().isPresent()) {
+      headlessCreateSettingsDirectory();
       if (afterFirstTimeSetup.showLauncher()) {
         ChunkyLauncherFx.withLauncher(settings, Stage::show);
       }

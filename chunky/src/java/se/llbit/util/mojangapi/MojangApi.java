@@ -169,7 +169,7 @@ public class MojangApi {
    * @throws IOException if downloading the profile failed
    */
   public static MinecraftProfile fetchProfile(String uuid) throws IOException {
-    uuid = uuid.toLowerCase();
+    uuid = uuid.toLowerCase().replaceAll("-", "");
     String key = uuid + ":profile";
     File cacheFile =
       new File(PersistentSettings.cacheDirectory(), Util.cacheEncode(key.hashCode()));

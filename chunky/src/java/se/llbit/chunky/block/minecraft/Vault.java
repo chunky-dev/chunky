@@ -6,10 +6,10 @@ import se.llbit.chunky.model.minecraft.VaultModel;
 public class Vault extends AbstractModelBlock {
   private final String description;
 
-  public Vault(String facing, String vaultState) {
-    super("vault", VaultModel.getTopTexture(vaultState));
-    this.description = "facing=" + facing + ", vault_state=" + vaultState;
-    this.model = new VaultModel(facing, vaultState);
+  public Vault(String facing, boolean ominous, String vaultState) {
+    super("vault", VaultModel.getTopTexture(ominous, vaultState));
+    this.description = "facing=" + facing + ", ominous=" + ominous + ", vault_state=" + vaultState;
+    this.model = new VaultModel(facing, ominous, vaultState);
   }
 
   @Override

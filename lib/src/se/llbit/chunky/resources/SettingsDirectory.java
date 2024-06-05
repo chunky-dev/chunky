@@ -21,6 +21,7 @@ import se.llbit.chunky.PersistentSettings;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * Utility class with helper function to locate the Chunky settings directory.
@@ -56,14 +57,14 @@ public final class SettingsDirectory {
    * if the settings directory could not be located.
    */
   public static File getSettingsDirectory() { // TODO: make this return Optional<File>.
-    String chunkyHomeProperty = System.getProperty("chunky.home");
-    if (chunkyHomeProperty != null && !chunkyHomeProperty.isEmpty()) {
+    File directory = getChunkyHomeDirectoryOverwrite().orElse(null);
+    if (directory != null) {
       // We don't check if this is a valid settings directory because
       // we should always respect the system property in case the user
       // has manually specified it.
-      return new File(chunkyHomeProperty);
+      return directory;
     }
-    File directory = getWorkingDirectory();
+    directory = getWorkingDirectory();
     if (isSettingsDirectory(directory)) {
       return directory;
     }
@@ -90,6 +91,17 @@ public final class SettingsDirectory {
       }
     }
     return false;
+  }
+
+  /**
+   * @return the path specified by the "chunky.home" system property, if any
+   */
+  public static Optional<File> getChunkyHomeDirectoryOverwrite() {
+    String chunkyHomeProperty = System.getProperty("chunky.home");
+    if (chunkyHomeProperty != null && !chunkyHomeProperty.isEmpty()) {
+      return Optional.of(new File(chunkyHomeProperty));
+    }
+    return Optional.empty();
   }
 
   /**

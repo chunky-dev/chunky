@@ -25,9 +25,12 @@ import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.log.Log;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
+
+import java.io.IOException;
 
 public class WallHead extends MinecraftBlockTranslucent {
 
@@ -86,11 +89,14 @@ public class WallHead extends MinecraftBlockTranslucent {
   @Override
   public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
     if (type == Kind.PLAYER) {
-      String textureUrl = Head.getTextureUrl(entityTag);
-      return textureUrl != null ? new HeadEntity(position, textureUrl, 0, facing)
+      try {
+        String textureUrl = Head.getTextureUrl(entityTag);
+        return textureUrl != null ? new HeadEntity(position, textureUrl, 0, facing)
           : new SkullEntity(position, type, 0, facing);
-    } else {
-      return null;
+      } catch (IOException e) {
+        Log.warn("Could not download skin", e);
+      }
     }
+    return null;
   }
 }

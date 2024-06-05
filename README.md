@@ -205,7 +205,7 @@ Chunky uses the following 3rd party libraries:
   See the file `licenses/Apache-2.0.txt` for the full license text.
   See the file `licenses/fast-util.txt` for the copyright notice.
 - **Gson by Google**  
-  The library is convered by the Apache License, version 2.0.
+  The library is covered by the Apache License, version 2.0.
   See the file `licenses/Apache-2.0.txt` for the full license text.
   See the file `licenses/gson.txt` for the copyright notice.
 - **Simplex noise implementation by Stefan Gustavson and Keijiro Takahashi**  
@@ -215,6 +215,9 @@ Chunky uses the following 3rd party libraries:
   See the file `licenses/Apache-2.0.txt` for the full license text.
   See the file `licenses/lz4-java.txt` for the copyright notice.
   lz4-java uses LZ4, by Yann Collet, which is covered by the BSD 2-Clause license. See the file `licenses/lz4.txt` for the copyright notice and full license.
+- **Semver4j by Vincent Durmont**
+  The library is covered by the MIT License.
+  See the file `licenses/semver4j.txt` for the copyright notice.
 
 ## Special Thanks
 
@@ -225,17 +228,17 @@ YourKit supports open source projects with innovative and intelligent tools for 
 JetBrains supports core contributors of non-commercial open source projects by providing them with professional coding tools free of charge. <a href="https://jb.gg/OpenSourceSupport"> Find out more</a>.
 
 [chunky-dev]: https://chunky-dev.github.io/docs/
-[chunky-dev-troubleshooting]: https://chunky-dev.github.io/docs/faq/troubleshooting/
+[chunky-dev-troubleshooting]: https://chunky-dev.github.io/docs/support/troubleshooting/
 [chunky-reddit]: http://www.reddit.com/r/chunky
-[chunky-dev-headless]: https://chunky-dev.github.io/docs/user_interface/headless/
+[chunky-dev-headless]: https://chunky-dev.github.io/docs/reference/user_interface/chunky_launcher/headless/
 [google-styleguide]: https://google.github.io/styleguide/javaguide.html
 [chunky-releasetools]: https://github.com/llbit/chunky-releasetools
 [chunky-contributors]: https://github.com/chunky-dev/chunky/graphs/contributors
-[chunky-dev-rendering]: https://chunky-dev.github.io/docs/rendering/
+[chunky-dev-rendering]: https://chunky-dev.github.io/docs/user_guides/introduction/path_tracing/
 [chunky-denoiser]: https://github.com/leMaik/chunky-denoiser
-[chunky-dev-skymaps]: https://chunky-dev.github.io/docs/rendering/skymaps/
+[chunky-dev-skymaps]: https://chunky-dev.github.io/docs/user_guides/skymaps/
 [chunkylauncherjar]: http://chunkyupdate.lemaik.de/ChunkyLauncher.jar
 [jdk]: https://adoptium.net/
-[chunky-opencl]: https://github.com/alexhliu/ChunkyClPlugin
+[chunky-opencl]: https://github.com/chunky-dev/chunky-opencl
 [chunky-discord]: https://discord.gg/VqcHpsF
 [jfx]: https://gluonhq.com/products/javafx/
