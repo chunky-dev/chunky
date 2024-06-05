@@ -98,6 +98,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     entityTypes.put("Chicken", (position, scene) -> new ChickenEntity(position, new CompoundTag()));
     entityTypes.put("Pig", (position, scene) -> new PigEntity(position, new CompoundTag()));
     entityTypes.put("Mooshroom", (position, scene) -> new MooshroomEntity(position, new CompoundTag()));
+    entityTypes.put("Squid", (position, scene) -> new SquidEntity(position, new CompoundTag()));
   }
 
   private Scene scene;
