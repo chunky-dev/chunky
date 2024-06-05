@@ -95,6 +95,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private CheckBox loadChickens;
   @FXML private CheckBox loadPigs;
   @FXML private CheckBox loadMooshrooms;
+  @FXML private CheckBox loadSquids;
   @FXML private CheckBox loadOtherEntities;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
@@ -149,6 +150,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadChickens.setSelected(preferences.shouldLoadClass(ChickenEntity.class));
       loadPigs.setSelected(preferences.shouldLoadClass(PigEntity.class));
       loadMooshrooms.setSelected(preferences.shouldLoadClass(MooshroomEntity.class));
+      loadSquids.setSelected(preferences.shouldLoadClass(SquidEntity.class));
       loadOtherEntities.setSelected(preferences.shouldLoadClass(null));
     }
 
@@ -345,6 +347,16 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     loadMooshrooms.setOnAction(event -> {
       renderControls.showPopup(
         "This takes effect the next time a new scene is created.", loadMooshrooms);
+    });
+    loadSquids.setTooltip(new Tooltip("Enable/disable Squid entity loading. "
+      + "Takes effect on next scene creation."));
+    loadSquids.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(SquidEntity.class, newValue);
+      PersistentSettings.setLoadSquids(newValue);
+    });
+    loadSquids.setOnAction(event -> {
+      renderControls.showPopup(
+        "This takes effect the next time a new scene is created.", loadSquids);
     });
     loadOtherEntities.setTooltip(new Tooltip("Enable/disable other entity loading. "
             + "Takes effect on next scene creation."));

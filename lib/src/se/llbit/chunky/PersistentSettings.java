@@ -550,6 +550,15 @@ public final class PersistentSettings {
     save();
   }
 
+  public static boolean getLoadSquids() {
+    return settings.getBool("loadSquids", true);
+  }
+
+  public static void setLoadSquids(boolean value) {
+    settings.setBool("loadSquids", value);
+    save();
+  }
+
   public static boolean getLoadOtherEntities() {
     return settings.getBool("loadOtherEntities", true);
   }
