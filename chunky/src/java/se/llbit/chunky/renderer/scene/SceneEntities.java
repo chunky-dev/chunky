@@ -94,8 +94,13 @@ public class SceneEntities {
       hit = true;
     }
     if (renderActors) {
-      if (actorBvh.closestIntersection(ray, intersectionRecord)) {
+      IntersectionRecord intersectionTest = new IntersectionRecord();
+      if (actorBvh.closestIntersection(ray, intersectionTest) && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
         hit = true;
+        intersectionRecord.distance = intersectionTest.distance;
+        intersectionRecord.setNormal(intersectionTest);
+        intersectionRecord.color.set(intersectionTest.color);
+        intersectionRecord.material = intersectionTest.material;
       }
     }
 
@@ -312,7 +317,7 @@ public class SceneEntities {
       // rather than the actors array. In future versions only the actors
       // array should contain poseable entities.
       for (JsonValue element : json.get("entities").array()) {
-        Entity entity = Entity.fromJson(element.object());
+        Entity entity = Entity.loadFromJson(element.object());
         if (entity != null) {
           if (entity instanceof PlayerEntity) {
             actors.add(entity);
@@ -322,7 +327,7 @@ public class SceneEntities {
         }
       }
       for (JsonValue element : json.get("actors").array()) {
-        Entity entity = Entity.fromJson(element.object());
+        Entity entity = Entity.loadFromJson(element.object());
         actors.add(entity);
       }
     }

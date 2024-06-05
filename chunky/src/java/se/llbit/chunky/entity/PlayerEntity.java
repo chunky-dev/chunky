@@ -18,12 +18,21 @@
  */
 package se.llbit.chunky.entity;
 
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import se.llbit.chunky.block.minecraft.Head;
 import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.PlayerModel;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.*;
 import se.llbit.chunky.resources.PlayerTexture.ExtendedUVMap;
 import se.llbit.chunky.resources.texturepack.*;
+import se.llbit.chunky.ui.dialogs.DialogUtils;
+import se.llbit.chunky.ui.dialogs.ValidatingTextInputDialog;
 import se.llbit.chunky.world.PlayerEntityData;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.chunky.world.model.CubeModel;
@@ -983,5 +992,115 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   @Override
   public JsonObject getGear() {
     return gear;
+  }
+
+  @Override
+  public VBox getControls(Node tab, Scene scene) {
+    ChoiceBox<PlayerModel> playerModel = new ChoiceBox<>();
+    playerModel.getSelectionModel().select(this.model);
+    playerModel.getItems().addAll(PlayerModel.values());
+    playerModel.getSelectionModel().selectedItemProperty().addListener(
+      (observable, oldValue, newValue) -> {
+        this.model = newValue;
+        scene.rebuildActorBvh();
+      });
+    HBox modelBox = new HBox();
+    modelBox.setSpacing(10.0);
+    modelBox.setAlignment(Pos.CENTER_LEFT);
+    modelBox.getChildren().addAll(new Label("Player model:"), playerModel);
+
+    HBox skinBox = new HBox();
+    skinBox.setSpacing(10.0);
+    skinBox.setAlignment(Pos.CENTER_LEFT);
+    TextField skinField = new TextField();
+    skinField.setText(skin);
+    Button selectSkin = new Button("Select skin...");
+    selectSkin.setOnAction(e -> {
+      FileChooser fileChooser = new FileChooser();
+      fileChooser.setTitle("Load Skin");
+      fileChooser
+        .getExtensionFilters()
+        .add(new FileChooser.ExtensionFilter("Minecraft skin", "*.png"));
+      File skinFile = fileChooser.showOpenDialog(tab.getScene().getWindow());
+      if (skinFile != null) {
+        setTexture(skinFile.getAbsolutePath());
+        skinField.setText(skinFile.getAbsolutePath());
+        scene.rebuildActorBvh();
+      }
+    });
+    Button downloadSkin = new Button("Download skin...");
+    downloadSkin.setOnAction(e -> {
+      TextInputDialog playerIdentifierInput = new ValidatingTextInputDialog(input -> input != null && !input.isEmpty());
+      playerIdentifierInput.setTitle("Input player identifier");
+      playerIdentifierInput.setHeaderText("Please enter the UUID or name of the player.");
+      playerIdentifierInput.setContentText("UUID / player name:");
+      DialogUtils.setupDialogDesign(playerIdentifierInput, tab.getScene());
+      playerIdentifierInput.showAndWait().map(playerIdentifier -> {
+        try {
+          // TODO: refactor this (deduplicate code, check UUID format, trim input, better error handling)
+          MinecraftProfile profile = MojangApi.fetchProfile(playerIdentifier); //Search by uuid
+          Optional<MinecraftSkin> skin = profile.getSkin();
+          if (skin.isPresent()) { // If it found a skin, pass it back to caller
+            downloadAndApplySkinForPlayer(
+              skin.get(),
+              playerModel,
+              skinField,
+              scene
+            );
+            return true;
+          } else { // Otherwise, search by Username
+            String uuid = MojangApi.usernameToUUID(playerIdentifier);
+            profile = MojangApi.fetchProfile(uuid);
+            skin = profile.getSkin();
+            if (skin.isPresent()) {
+              downloadAndApplySkinForPlayer(
+                skin.get(),
+                playerModel,
+                skinField,
+                scene
+              );
+              return true;
+            } else { //If still not found, warn user.
+              Log.warn("Could not find player with that identifier");
+            }
+          }
+        } catch (IOException ex) {
+          Log.warn("Could not download skin", ex);
+        }
+        return false;
+      });
+    });
+    skinBox.getChildren().addAll(new Label("Skin:"), skinField, selectSkin, downloadSkin);
+
+    CheckBox showOuterLayer = new CheckBox("Show second layer");
+    showOuterLayer.setSelected(this.showOuterLayer);
+    showOuterLayer.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+      this.showOuterLayer = newValue;
+      scene.rebuildActorBvh();
+    }));
+    HBox layerBox = new HBox();
+    layerBox.setSpacing(10.0);
+    layerBox.setAlignment(Pos.CENTER_LEFT);
+    layerBox.getChildren().addAll(showOuterLayer);
+
+    VBox controls = new VBox();
+    controls.getChildren().addAll(modelBox, skinBox, layerBox);
+    return controls;
+  }
+
+  private void downloadAndApplySkinForPlayer(
+    MinecraftSkin skin,
+    ChoiceBox<PlayerModel> playerModelSelector,
+    TextField skinField,
+    Scene scene
+  ) throws IOException {
+    if (skin != null) {
+      String filePath = MojangApi.downloadSkin(skin.getSkinUrl()).getAbsolutePath();
+      setTexture(filePath);
+      playerModelSelector.getSelectionModel().select(skin.getPlayerModel());
+      skinField.setText(filePath);
+      Log.info("Successfully set skin");
+      scene.rebuildActorBvh();
+    }
   }
 }

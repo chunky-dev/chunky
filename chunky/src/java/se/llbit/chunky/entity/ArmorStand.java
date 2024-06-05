@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.entity;
 
+import javafx.scene.layout.VBox;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;

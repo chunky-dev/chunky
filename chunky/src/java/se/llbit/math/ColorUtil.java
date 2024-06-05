@@ -21,6 +21,7 @@ import javafx.scene.paint.Color;
 import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.json.JsonObject;
 
 /**
  * Collection of utility methods for converting between different color representations.
@@ -405,5 +406,21 @@ public final class ColorUtil {
    */
   public static float RGBComponentToLinear(byte value) {
     return toLinearLut[value & 0xFF];
+  }
+
+  public static JsonObject rgbToJson(Vector3 color) {
+    JsonObject jsonObject = new JsonObject();
+    jsonObject.add("red", color.x);
+    jsonObject.add("green", color.y);
+    jsonObject.add("blue", color.z);
+    return jsonObject;
+  }
+
+  public static Vector3 jsonToRGB(JsonObject json) {
+    Vector3 color = new Vector3();
+    color.x = json.get("red").doubleValue(1);
+    color.y = json.get("green").doubleValue(1);
+    color.z = json.get("blue").doubleValue(1);
+    return color;
   }
 }

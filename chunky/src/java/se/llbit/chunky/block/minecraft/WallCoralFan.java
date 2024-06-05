@@ -49,7 +49,7 @@ public class WallCoralFan extends MinecraftBlockTranslucent {
     return true;
   }
 
-  @Override public Entity toEntity(Vector3 position) {
-    return new WallCoralFanEntity(position, coralType, facing);
+  @Override public Entity[] toEntity(Vector3 position) {
+    return new WallCoralFanEntity[] {new WallCoralFanEntity(position, coralType, facing)};
   }
 }

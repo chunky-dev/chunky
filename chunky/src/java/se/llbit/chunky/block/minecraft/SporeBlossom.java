@@ -47,7 +47,7 @@ public class SporeBlossom extends Block {
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
-    return new se.llbit.chunky.entity.SporeBlossom(position);
+  public Entity[] toEntity(Vector3 position) {
+    return new se.llbit.chunky.entity.SporeBlossom[] {new se.llbit.chunky.entity.SporeBlossom(position)};
   }
 }

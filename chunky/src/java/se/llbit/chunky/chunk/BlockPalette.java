@@ -19,8 +19,6 @@ package se.llbit.chunky.chunk;
 import se.llbit.chunky.block.*;
 import se.llbit.chunky.block.minecraft.*;
 import se.llbit.chunky.plugin.PluginApi;
-import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.MaterialType;
 import se.llbit.math.Octree;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.IntTag;
@@ -239,9 +237,7 @@ public class BlockPalette {
     materialProperties.put(
         "minecraft:water",
         block -> {
-          block.specular = 0.255f;
           block.ior = 1.333f;
-          block.materialType = MaterialType.DIELECTRIC;
         });
     materialProperties.put(
         "minecraft:lava",
@@ -251,7 +247,6 @@ public class BlockPalette {
     Consumer<Block> glassConfig =
         block -> {
           block.ior = 1.52f;
-          block.materialType = MaterialType.DIELECTRIC;
         };
     materialProperties.put("minecraft:glass", glassConfig);
     materialProperties.put("minecraft:glass_pane", glassConfig);
@@ -288,46 +283,54 @@ public class BlockPalette {
     materialProperties.put("minecraft:red_stained_glass_pane", glassConfig);
     materialProperties.put("minecraft:black_stained_glass_pane", glassConfig);
     materialProperties.put("minecraft:gold_block", block -> {
-      block.materialType = MaterialType.METAL;
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.9);
     });
     materialProperties.put("minecraft:raw_gold_block", block -> {
-      block.materialType = MaterialType.METAL;
+      block.metalness = 0.8f;
       block.setPerceptualSmoothness(0.5);
     });
     materialProperties.put("minecraft:diamond_block", block -> {
-      block.materialType = MaterialType.DIELECTRIC;
+      block.specular = 0.04f;
     });
     materialProperties.put("minecraft:iron_block", block -> {
-      block.materialType = MaterialType.METAL;
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.9);
     });
     materialProperties.put("minecraft:raw_iron_block", block -> {
-      block.materialType = MaterialType.METAL;
+      block.metalness = 0.66f;
       block.setPerceptualSmoothness(0.3);
     });
     materialProperties.put("minecraft:iron_bars", block -> {
-      block.materialType = MaterialType.METAL;
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.9);
     });
     materialProperties.put("minecraft:iron_door", block -> {
-      block.materialType = MaterialType.METAL;
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.8);
     });
     materialProperties.put("minecraft:iron_trapdoor", block -> {
-      block.materialType = MaterialType.METAL;
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.8);
     });
     materialProperties.put("minecraft:cauldron", block -> {
-      block.materialType = MaterialType.METAL;
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.7);
     });
     materialProperties.put("minecraft:hopper", block -> {
-      block.materialType = MaterialType.METAL;
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.7);
     });
     materialProperties.put("minecraft:chain", block -> {
-      block.materialType = MaterialType.METAL;
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.9);
     });
     materialProperties.put("minecraft:redstone_torch", block -> {
@@ -377,7 +380,7 @@ public class BlockPalette {
       }
     });
     materialProperties.put("minecraft:emerald_block", block -> {
-      block.materialType = MaterialType.DIELECTRIC;
+      block.specular = 0.04f;
     });
     materialProperties.put("minecraft:sea_lantern", block -> {
       block.emittance = 1.0f;

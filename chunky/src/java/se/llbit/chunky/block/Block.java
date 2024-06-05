@@ -6,11 +6,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
-import se.llbit.math.AABB;
-import se.llbit.math.Constants;
-import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray2;
-import se.llbit.math.Vector3;
+import se.llbit.math.*;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
@@ -118,7 +114,7 @@ public abstract class Block extends Material {
     return false;
   }
 
-  public Entity toEntity(Vector3 position) {
+  public Entity[] toEntity(Vector3 position) {
     throw new Error("This block type can not be converted to an entity: "
         + getClass().getSimpleName());
   }
@@ -147,6 +143,9 @@ public abstract class Block extends Material {
   }
 
   public boolean isInside(Ray2 ray) {
-    return fullBlock.inside(ray.o);
+    double ix = ray.o.x - QuickMath.floor(ray.o.x);
+    double iy = ray.o.y - QuickMath.floor(ray.o.y);
+    double iz = ray.o.z - QuickMath.floor(ray.o.z);
+    return fullBlock.inside(new Vector3(ix, iy, iz));
   }
 }

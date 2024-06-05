@@ -19,8 +19,11 @@ package se.llbit.chunky.entity;
 
 import java.util.Collection;
 
+import javafx.scene.Node;
+import javafx.scene.layout.VBox;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.model.minecraft.DecoratedPotModel;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Grid;
@@ -73,7 +76,7 @@ abstract public class Entity {
    * @param json json data.
    * @return unmarshalled entity, or {@code null} if it was not a valid entity.
    */
-  public static Entity fromJson(JsonObject json) {
+  public static Entity loadFromJson(JsonObject json) {
     String kind = json.get("kind").stringValue("");
     switch (kind) {
       case "painting":
@@ -120,6 +123,8 @@ abstract public class Entity {
         return HangingSignEntity.fromJson(json);
       case "wallHangingSign":
         return WallHangingSignEntity.fromJson(json);
+      case "sphere":
+        return SphereEntity.fromJson(json);
     }
     return null;
   }
@@ -130,5 +135,12 @@ abstract public class Entity {
 
   public void setPosition(Vector3 position) {
     this.position.set(position);
+  }
+
+  public VBox getControls(Node tab, Scene scene) {
+    VBox vBox = new VBox();
+    vBox.setVisible(false);
+    vBox.setManaged(false);
+    return vBox;
   }
 }

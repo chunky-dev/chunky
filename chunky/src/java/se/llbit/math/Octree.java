@@ -591,9 +591,7 @@ public class Octree {
         } else {
           // Origin and distance of ray need to be updated
           TexturedBlockModel.getIntersectionColor(testRay, intersectionRecord);
-          if (currentBlock.opaque) {
-            intersectionRecord.color.w = 1;
-          } /*else if (intersectionRecord.color.w < Constants.EPSILON) {
+          /*else if (intersectionRecord.color.w < Constants.EPSILON) {
             if (currentBlock.refractive) {
               intersectionRecord.color.set(1, 1, 1, 0);
             } else {

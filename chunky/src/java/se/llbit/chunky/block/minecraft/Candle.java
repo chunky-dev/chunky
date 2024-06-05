@@ -89,11 +89,11 @@ public class Candle extends AbstractModelBlock {
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
+  public Entity[] toEntity(Vector3 position) {
     if (entity != null) {
-      return new FlameParticles(position, entity);
+      return new FlameParticles[] {new FlameParticles(position, entity)};
     } else {
-      return new FlameParticles(position, this, new Vector3[0]);
+      return new FlameParticles[] {new FlameParticles(position, this, new Vector3[0])};
     }
   }
 

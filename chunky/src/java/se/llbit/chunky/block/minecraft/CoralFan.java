@@ -74,7 +74,7 @@ public class CoralFan extends MinecraftBlockTranslucent {
     return true;
   }
 
-  @Override public Entity toEntity(Vector3 position) {
-    return new CoralFanEntity(position, coralType);
+  @Override public Entity[] toEntity(Vector3 position) {
+    return new CoralFanEntity[] {new CoralFanEntity(position, coralType)};
   }
 }

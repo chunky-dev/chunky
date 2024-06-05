@@ -44,14 +44,9 @@ public class PathTracer implements RayTracer {
 
   /**
    * Path trace the ray in this scene.
-   *
-   * @param firstReflection {@code true} if the ray has not yet hit the first
-   * diffuse or specular reflection
    */
   public static void pathTrace(Scene scene, Ray2 ray, WorkerState state) {
     Random random = state.random;
-//    Vector3 ox = new Vector3(ray.o);
-//    Vector3 od = new Vector3(ray.d);
 
     Vector4 cumulativeColor = state.color;
     Vector3 throughput = new Vector3(1, 1, 1);
@@ -62,6 +57,16 @@ public class PathTracer implements RayTracer {
       IntersectionRecord intersectionRecord = new IntersectionRecord();
 
       if (scene.intersect(ray, intersectionRecord)) {
+        if (intersectionRecord.material.opaque) {
+          intersectionRecord.color.w = 1;
+        } else if (intersectionRecord.color.w < Constants.EPSILON) {
+          intersectionRecord.color.set(1, 1, 1, 0);
+        }
+
+        if (ray.d.dot(intersectionRecord.n) > 0) {
+          intersectionRecord.n.scale(-1);
+          intersectionRecord.shadeN.scale(-1);
+        }
 
         double emittance = intersectionRecord.material.emittance;
         ray.o.scaleAdd(intersectionRecord.distance, ray.d);

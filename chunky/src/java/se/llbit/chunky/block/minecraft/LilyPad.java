@@ -44,7 +44,7 @@ public class LilyPad extends MinecraftBlockTranslucent {
     return true;
   }
 
-  @Override public Entity toEntity(Vector3 position) {
-    return new LilyPadEntity(position);
+  @Override public Entity[] toEntity(Vector3 position) {
+    return new LilyPadEntity[] {new LilyPadEntity(position)};
   }
 }

@@ -20,13 +20,34 @@ public class IntersectionRecord {
     this.color.set(0, 0, 0, 0);
   }
 
-  public void setNormal(Vector3 normal) {
+  public void setGeomNormal(double x, double y, double z) {
+    n.set(x, y, z);
+  }
+
+  public void setShadeNormal(double x, double y, double z) {
+    shadeN.set(x, y, z);
+  }
+
+  public void setGeomNormal(Vector3 normal) {
     n.set(normal);
+  }
+
+  public void setShadeNormal(Vector3 normal) {
     shadeN.set(normal);
   }
 
   public void setNormal(double x, double y, double z) {
     n.set(x, y, z);
     shadeN.set(x, y, z);
+  }
+
+  public void setNormal(Vector3 normal) {
+    n.set(normal);
+    shadeN.set(normal);
+  }
+
+  public void setNormal(IntersectionRecord intersectionRecord) {
+    n.set(intersectionRecord.n);
+    shadeN.set(intersectionRecord.shadeN);
   }
 }

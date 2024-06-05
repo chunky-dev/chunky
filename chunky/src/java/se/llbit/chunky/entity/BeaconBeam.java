@@ -1,11 +1,25 @@
 package se.llbit.chunky.entity;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import se.llbit.chunky.block.minecraft.Beacon;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.IntegerAdjuster;
+import se.llbit.chunky.ui.IntegerTextField;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.BeaconBeamMaterial;
+import se.llbit.fx.LuxColorPicker;
 import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
@@ -265,5 +279,130 @@ public class BeaconBeam extends Entity implements Poseable {
 
   public Map<Integer, BeaconBeamMaterial> getMaterials() {
     return materials;
+  }
+
+  @Override
+  public VBox getControls(Node tab, Scene scene) {
+    VBox controls = new VBox();
+
+    IntegerAdjuster height = new IntegerAdjuster();
+    height.setName("Height");
+    height.setTooltip("Modifies the height of the beam. Useful if your scene is taller than the world height.");
+    height.set(getHeight());
+    height.setRange(1, 512);
+    height.onValueChange(value -> {
+      setHeight(value);
+      scene.rebuildActorBvh();
+    });
+    controls.getChildren().add(height);
+
+    HBox beamColor = new HBox();
+    VBox listControls = new VBox();
+    VBox propertyControls = new VBox();
+
+    listControls.setMaxWidth(200);
+    beamColor.setPadding(new Insets(10));
+    beamColor.setSpacing(15);
+    propertyControls.setSpacing(10);
+
+    DoubleAdjuster emittance = new DoubleAdjuster();
+    emittance.setName("Emittance");
+    emittance.setRange(0, 100);
+
+    DoubleAdjuster specular = new DoubleAdjuster();
+    specular.setName("Specular");
+    specular.setRange(0, 1);
+
+    DoubleAdjuster ior = new DoubleAdjuster();
+    ior.setName("IoR");
+    ior.setRange(0, 5);
+
+    DoubleAdjuster perceptualSmoothness = new DoubleAdjuster();
+    perceptualSmoothness.setName("Smoothness");
+    perceptualSmoothness.setRange(0, 1);
+
+    DoubleAdjuster metalness = new DoubleAdjuster();
+    metalness.setName("Metalness");
+    metalness.setRange(0, 1);
+
+    LuxColorPicker beamColorPicker = new LuxColorPicker();
+
+    ObservableList<Integer> colorHeights = FXCollections.observableArrayList();
+    colorHeights.addAll(getMaterials().keySet());
+    ListView<Integer> colorHeightList = new ListView<>(colorHeights);
+    colorHeightList.setMaxHeight(150.0);
+    colorHeightList.getSelectionModel().selectedItemProperty().addListener(
+      (observable, oldValue, heightIndex) -> {
+
+        BeaconBeamMaterial beamMat = getMaterials().get(heightIndex);
+        emittance.set(beamMat.emittance);
+        specular.set(beamMat.specular);
+        ior.set(beamMat.ior);
+        perceptualSmoothness.set(beamMat.getPerceptualSmoothness());
+        metalness.set(beamMat.metalness);
+        beamColorPicker.setColor(ColorUtil.toFx(beamMat.getColorInt()));
+
+        emittance.onValueChange(value -> {
+          beamMat.emittance = value.floatValue();
+          scene.rebuildActorBvh();
+        });
+        specular.onValueChange(value -> {
+          beamMat.specular = value.floatValue();
+          scene.rebuildActorBvh();
+        });
+        ior.onValueChange(value -> {
+          beamMat.ior = value.floatValue();
+          scene.rebuildActorBvh();
+        });
+        perceptualSmoothness.onValueChange(value -> {
+          beamMat.setPerceptualSmoothness(value);
+          scene.rebuildActorBvh();
+        });
+        metalness.onValueChange(value -> {
+          beamMat.metalness = value.floatValue();
+          scene.rebuildActorBvh();
+        });
+      }
+    );
+    beamColorPicker.colorProperty().addListener(
+      (observableColor, oldColorValue, newColorValue) -> {
+        Integer index = colorHeightList.getSelectionModel().getSelectedItem();
+        if (index != null) {
+          getMaterials().get(index).updateColor(ColorUtil.getRGB(ColorUtil.fromFx(newColorValue)));
+          scene.rebuildActorBvh();
+        }
+      }
+    );
+
+    HBox listButtons = new HBox();
+    listButtons.setPadding(new Insets(10));
+    listButtons.setSpacing(15);
+    Button deleteButton = new Button("Delete");
+    deleteButton.setOnAction(e -> {
+      Integer index = colorHeightList.getSelectionModel().getSelectedItem();
+      if (index != null && index != 0) { //Prevent removal of the bottom layer
+        getMaterials().remove(index);
+        colorHeightList.getItems().removeAll(index);
+        scene.rebuildActorBvh();
+      }
+    });
+    IntegerTextField layerInput = new IntegerTextField();
+    layerInput.setMaxWidth(50);
+    Button addButton = new Button("Add");
+    addButton.setOnAction(e -> {
+      if (!getMaterials().containsKey(layerInput.valueProperty().get())) { //Don't allow duplicate indices
+        getMaterials().put(layerInput.valueProperty().get(), new BeaconBeamMaterial(BeaconBeamMaterial.DEFAULT_COLOR));
+        colorHeightList.getItems().add(layerInput.valueProperty().get());
+        scene.rebuildActorBvh();
+      }
+    });
+
+    listButtons.getChildren().addAll(deleteButton, layerInput, addButton);
+    propertyControls.getChildren().addAll(emittance, specular, perceptualSmoothness, ior, metalness, beamColorPicker);
+    listControls.getChildren().addAll(new Label("Start Height:"), colorHeightList, listButtons);
+    beamColor.getChildren().addAll(listControls, propertyControls);
+    controls.getChildren().add(beamColor);
+
+    return controls;
   }
 }

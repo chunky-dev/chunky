@@ -58,9 +58,14 @@ public class Vector3 {
   }
 
   public static Vector3 randomUnitVector(Random random) {
-    Vector3 randomUnitVector = new Vector3(random.nextDouble(), random.nextDouble(), random.nextDouble());
-    randomUnitVector.normalize();
-    return randomUnitVector;
+    Vector3 randomUnitVector;
+    while (true) {
+      randomUnitVector = new Vector3(random.nextDouble(-1, 1), random.nextDouble(-1, 1), random.nextDouble(-1, 1));
+      if (randomUnitVector.lengthSquared() < 1) {
+        randomUnitVector.normalize();
+        return randomUnitVector;
+      }
+    }
   }
 
   public boolean nearZero() {

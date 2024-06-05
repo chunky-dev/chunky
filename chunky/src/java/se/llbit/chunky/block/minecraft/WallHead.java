@@ -76,8 +76,8 @@ public class WallHead extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
-    return new SkullEntity(position, type, 0, facing);
+  public Entity[] toEntity(Vector3 position) {
+    return new SkullEntity[] {new SkullEntity(position, type, 0, facing)};
   }
 
   @Override

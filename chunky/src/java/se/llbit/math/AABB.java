@@ -280,9 +280,9 @@ public class AABB {
    * @return true if p is inside this BB.
    */
   public boolean inside(Vector3 p) {
-    return (p.x >= xmin && p.x <= xmax) &&
-           (p.y >= ymin && p.y <= ymax) &&
-           (p.z >= zmin && p.z <= zmax);
+    return (p.x > xmin && p.x < xmax) &&
+           (p.y > ymin && p.y < ymax) &&
+           (p.z > zmin && p.z < zmax);
   }
 
   /**

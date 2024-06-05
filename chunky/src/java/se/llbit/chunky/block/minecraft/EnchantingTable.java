@@ -45,7 +45,7 @@ public class EnchantingTable extends AbstractModelBlock {
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
+  public Entity[] toEntity(Vector3 position) {
     Vector3 newPosition = new Vector3(position);
     newPosition.add(0, 0.35, 0);
     Book book = new Book(
@@ -55,6 +55,6 @@ public class EnchantingTable extends AbstractModelBlock {
         Math.toRadians(180 - 30));
     book.setPitch(Math.toRadians(80));
     book.setYaw(Math.toRadians(45));
-    return book;
+    return new Book[] {book};
   }
 }

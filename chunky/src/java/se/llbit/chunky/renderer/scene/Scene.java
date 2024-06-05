@@ -693,11 +693,16 @@ public class Scene implements JsonSerializable, Refreshable {
       ray.d.set(0, 1, 0);
     }
 
-//    if (entities.intersect(ray, intersectionRecord)) {
-//      hit = true;
-//    }
-    if (worldIntersection(ray, intersectionRecord)) {
+    if (entities.intersect(ray, intersectionRecord)) {
       hit = true;
+    }
+    IntersectionRecord intersectionTest = new IntersectionRecord();
+    if (worldIntersection(ray, intersectionTest) && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
+      hit = true;
+      intersectionRecord.distance = intersectionTest.distance;
+      intersectionRecord.setNormal(intersectionTest);
+      intersectionRecord.color.set(intersectionTest.color);
+      intersectionRecord.material = intersectionTest.material;
     }
     if (hit) {
       /*ray.distance += ray.t;
@@ -712,8 +717,11 @@ public class Scene implements JsonSerializable, Refreshable {
     boolean hit = false;
     IntersectionRecord intersectionTest = new IntersectionRecord();
     if (worldOctree.enterBlock(this, ray, intersectionTest, palette)) {
+      if (intersectionTest.distance < Constants.EPSILON && ray.getCurrentMedium() instanceof BVHMaterial) {
+        return false;
+      }
       intersectionRecord.distance = intersectionTest.distance;
-      intersectionRecord.setNormal(intersectionTest.shadeN);
+      intersectionRecord.setNormal(intersectionTest);
       intersectionRecord.color.set(intersectionTest.color);
       intersectionRecord.material = intersectionTest.material;
       hit = true;
@@ -1018,33 +1026,37 @@ public class Scene implements JsonSerializable, Refreshable {
 
                   if(block.isEntity()) {
                     Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
-                    Entity entity = block.toEntity(position);
+                    Entity[] blockEntities = block.toEntity(position);
 
-                    if (entities.shouldLoad(entity)) {
-                      if(entity instanceof Poseable && !(entity instanceof Lectern && !((Lectern) entity).hasBook())) {
-                        entities.addActor(entity);
-                      } else {
-                        entities.addEntity(entity);
-                        if (emitterGrid != null) {
-                          for (Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
-                            emitterPos.x -= origin.x;
-                            emitterPos.y -= origin.y;
-                            emitterPos.z -= origin.z;
-                            emitterGrid.addEmitter(emitterPos);
+                    for (Entity entity : blockEntities) {
+                      if (entities.shouldLoad(entity)) {
+                        if(entity instanceof Poseable) {
+                          entities.addActor(entity);
+                        } else {
+                          entities.addEntity(entity);
+                          if (emitterGrid != null) {
+                            for (Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
+                              emitterPos.x -= origin.x;
+                              emitterPos.y -= origin.y;
+                              emitterPos.z -= origin.z;
+                              emitterGrid.addEmitter(emitterPos);
+                            }
+                          }
+                        }
+
+                        if(!block.isBlockWithEntity()) {
+                          if(block.waterlogged) {
+                            block = palette.water;
+                            octNode = palette.waterId;
+                          } else {
+                            block = Air.INSTANCE;
+                            octNode = palette.airId;
                           }
                         }
                       }
-
-                      if(!block.isBlockWithEntity()) {
-                        if(block.waterlogged) {
-                          block = palette.water;
-                          octNode = palette.waterId;
-                        } else {
-                          block = Air.INSTANCE;
-                          octNode = palette.airId;
-                        }
-                      }
                     }
+
+
                   }
 
                   if(block.isWaterFilled()) {

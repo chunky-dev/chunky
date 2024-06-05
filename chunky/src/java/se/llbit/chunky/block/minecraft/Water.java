@@ -23,13 +23,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.StillWaterShader;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
-import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Quad;
-import se.llbit.math.Ray;
-import se.llbit.math.Ray2;
-import se.llbit.math.Triangle;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 import se.llbit.util.VectorUtil;
 
 public class Water extends MinecraftBlockTranslucent {
@@ -47,8 +41,6 @@ public class Water extends MinecraftBlockTranslucent {
     this.data = data;
     solid = false;
     localIntersect = true;
-    specular = 0.12f;
-    ior = 1.333f;
   }
 
   public Water(int level) {
@@ -310,8 +302,10 @@ public class Water extends MinecraftBlockTranslucent {
     if (isFullBlock()) {
       return true;
     } else {
-      Ray2 testRay = new Ray2(ray);
-      testRay.d.set(0, 1, 0);
+      double ix = ray.o.x - QuickMath.floor(ray.o.x);
+      double iy = ray.o.y - QuickMath.floor(ray.o.y);
+      double iz = ray.o.z - QuickMath.floor(ray.o.z);
+      Ray2 testRay = new Ray2(new Vector3(ix, iy, iz), new Vector3(0, 1, 0));
       IntersectionRecord intersectionRecord = new IntersectionRecord();
       return testIntersect(testRay, intersectionRecord);
     }

@@ -20,6 +20,8 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
+import se.llbit.math.Constants;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
 /**
@@ -53,6 +55,10 @@ public class BeaconModel extends AABBModel {
 
   @Override
   public boolean isInside(Vector3 p) {
+    double ix = p.x - QuickMath.floor(p.x);
+    double iy = p.y - QuickMath.floor(p.y);
+    double iz = p.z - QuickMath.floor(p.z);
+    p = new Vector3(ix, iy, iz);
     return boxes[0].inside(p) && !boxes[1].inside(p) && boxes[2].inside(p);
   }
 }

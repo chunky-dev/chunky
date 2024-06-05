@@ -4,12 +4,7 @@ import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
-import se.llbit.math.AABB;
-import se.llbit.math.Constants;
-import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray;
-import se.llbit.math.Ray2;
-import se.llbit.math.Vector3;
+import se.llbit.math.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -134,7 +129,7 @@ public abstract class AABBModel implements BlockModel {
     }
     if (hit) {
       Vector3 o = new Vector3(ray.o);
-      o.scaleAdd(intersectionRecord.distance + Constants.OFFSET, ray.d);
+      o.scaleAdd(intersectionRecord.distance, ray.d);
       if (isInside(o)) {
         return false;
       }
@@ -195,9 +190,12 @@ public abstract class AABBModel implements BlockModel {
 
   @Override
   public boolean isInside(Ray2 ray) {
+    double ix = ray.o.x - QuickMath.floor(ray.o.x);
+    double iy = ray.o.y - QuickMath.floor(ray.o.y);
+    double iz = ray.o.z - QuickMath.floor(ray.o.z);
     AABB[] boxes = getBoxes();
     for (AABB box: boxes) {
-      if (box.inside(ray.o)) {
+      if (box.inside(new Vector3(ix, iy, iz))) {
         return true;
       }
     }
@@ -205,8 +203,11 @@ public abstract class AABBModel implements BlockModel {
   }
 
   public boolean isInside(Vector3 p) {
+    double ix = p.x - QuickMath.floor(p.x);
+    double iy = p.y - QuickMath.floor(p.y);
+    double iz = p.z - QuickMath.floor(p.z);
     Ray2 ray = new Ray2();
-    ray.o.set(p);
+    ray.o.set(ix, iy, iz);
     return isInside(ray);
   }
 }

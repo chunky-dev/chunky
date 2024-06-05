@@ -63,8 +63,8 @@ public class Head extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
-    return new SkullEntity(position, type, rotation, 1);
+  public Entity[] toEntity(Vector3 position) {
+    return new SkullEntity[]{new SkullEntity(position, type, rotation, 1)};
   }
 
   @Override

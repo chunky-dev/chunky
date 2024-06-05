@@ -25,7 +25,6 @@ import se.llbit.chunky.world.Material;
 public class Glass extends MinecraftBlockTranslucent {
   public Glass(String name, Texture texture) {
     super(name, texture);
-    ior = 1.52f;
   }
 
   @Override
