@@ -128,6 +128,8 @@ abstract public class Entity {
         return PigEntity.fromJson(json);
       case "mooshroom":
         return MooshroomEntity.fromJson(json);
+      case "squid":
+        return SquidEntity.fromJson(json);
     }
     return null;
   }
