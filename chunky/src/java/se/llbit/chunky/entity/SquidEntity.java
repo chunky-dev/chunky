@@ -158,7 +158,7 @@ public class SquidEntity extends Entity implements Poseable {
       .rotateX(rightTentacle.x)
       .rotateY(rightTentacle.y)
       .rotateZ(rightTentacle.z)
-      .translate(5 / 16.0 + Ray.OFFSET, -3 / 16.0, 0 / 16.0)
+      .translate(5 / 16.0 - Ray.OFFSET, -3 / 16.0, 0 / 16.0)
       .chain(worldTransform);
     for (Quad quad : tentacle) {
       quad.addTriangles(faces, skinMaterial, transform);
