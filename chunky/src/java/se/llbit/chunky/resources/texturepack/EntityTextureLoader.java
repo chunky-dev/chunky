@@ -49,6 +49,7 @@ public class EntityTextureLoader extends TextureLoader {
     }
 
     texture.setTexture(image);
+    texture.compress();
     return true;
   }
 
