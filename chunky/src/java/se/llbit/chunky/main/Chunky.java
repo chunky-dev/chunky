@@ -44,6 +44,7 @@ import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.chunky.world.MaterialStore;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
+import se.llbit.log.ConsoleReceiver;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
 import se.llbit.log.Receiver;
@@ -237,6 +238,8 @@ public class Chunky {
             break;
         }
       } catch (Throwable t) {
+        // set receiver in case an exception was thrown before it was set in one of the start modes.
+        Log.setReceiver(ConsoleReceiver.INSTANCE, Level.INFO, Level.WARNING, Level.ERROR);
         Log.error("Unchecked exception caused Chunky to close.", t);
         exitCode = 2;
       }
