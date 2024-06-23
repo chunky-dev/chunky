@@ -194,7 +194,7 @@ public class ChunkView {
     return px0 <= x && px1 >= x && pz0 <= z && pz1 >= z;
   }
 
-  public boolean isRegionVisible(ChunkPosition pos) {
+  public boolean isRegionVisible(RegionPosition pos) {
     return isRegionVisible(pos.x, pos.z);
   }
 

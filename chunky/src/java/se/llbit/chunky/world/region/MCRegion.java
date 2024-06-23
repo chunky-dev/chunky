@@ -62,7 +62,7 @@ public class MCRegion implements Region {
   private final static int SECTOR_SIZE = 4096;
 
   private final Chunk[] chunks = new Chunk[NUM_CHUNKS];
-  private final ChunkPosition position;
+  private final RegionPosition position;
   private final Dimension dimension;
   private final String fileName;
   private long regionFileTime = 0;
@@ -80,7 +80,7 @@ public class MCRegion implements Region {
    *
    * @param pos the region position
    */
-  public MCRegion(ChunkPosition pos, Dimension dimension) {
+  public MCRegion(RegionPosition pos, Dimension dimension) {
     this.dimension = dimension;
     fileName = pos.getMcaName();
     position = pos;
@@ -181,7 +181,7 @@ public class MCRegion implements Region {
    * @return The region position
    */
   @Override
-  public final ChunkPosition getPosition() {
+  public final RegionPosition getPosition() {
     return position;
   }
 
@@ -391,7 +391,7 @@ public class MCRegion implements Region {
    *
    * @throws IOException
    */
-  public static synchronized void writeRegion(File regionDirectory, ChunkPosition regionPos,
+  public static synchronized void writeRegion(File regionDirectory, RegionPosition regionPos,
     DataOutputStream out, Set<ChunkPosition> chunks) throws IOException {
     String fileName = regionPos.getMcaName();
     File regionFile = new File(regionDirectory, fileName);
