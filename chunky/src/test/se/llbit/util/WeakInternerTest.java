@@ -18,8 +18,9 @@
 
 package se.llbit.util;
 
-import org.junit.Assume;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
+
 import se.llbit.util.interner.Interner;
 import se.llbit.util.interner.StrongInterner;
 import se.llbit.util.interner.WeakInterner;
@@ -28,7 +29,8 @@ import java.lang.ref.WeakReference;
 import java.util.Objects;
 import java.util.Random;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class WeakInternerTest {
   private static class TestInternable {
@@ -153,9 +155,9 @@ public class WeakInternerTest {
         break;
       }
     }
-    Assume.assumeTrue(weakTest1.get() == null);
-    Assume.assumeTrue(weakTest2.get() == null);
-    Assume.assumeTrue(weakTest3.get() == null);
+    assumeTrue(weakTest1.get() == null);
+    assumeTrue(weakTest2.get() == null);
+    assumeTrue(weakTest3.get() == null);
 
     // Test that we get the copy back when interning the copy
     assertSame(interner.intern(test21), test21);

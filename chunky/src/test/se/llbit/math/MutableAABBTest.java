@@ -16,13 +16,14 @@
  */
 package se.llbit.math;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.llbit.math.primitive.MutableAABB;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MutableAABBTest {
-  @Test public void testSurfaceArea() {
+  @Test
+  public void testSurfaceArea() {
     MutableAABB unitBox1 = new MutableAABB(0, 1, 0, 1, 0, 1);
     MutableAABB unitBox2 = new MutableAABB(-1, 0, -1, 0, -1, 0);
     MutableAABB unitBox3 = new MutableAABB(-Math.PI, 1-Math.PI, -0.5, 0.5, -0.25, 0.75);
