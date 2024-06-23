@@ -1,12 +1,16 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.model.BlockModel;
+import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
+import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
+import se.llbit.math.primitive.Primitive;
 
+import java.util.Collection;
 import java.util.Random;
 
 @PluginApi
@@ -49,5 +53,10 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
   @Override
   public boolean isBiomeDependant() {
     return super.isBiomeDependant() || model.isBiomeDependant();
+  }
+
+  @Override
+  public Collection<Primitive> getPrimitives(Transform transform) {
+    return getModel().getPrimitives(transform);
   }
 }
