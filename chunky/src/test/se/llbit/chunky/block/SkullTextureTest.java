@@ -1,13 +1,11 @@
 package se.llbit.chunky.block;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import se.llbit.chunky.block.minecraft.Head;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.nbt.CompoundTag;
@@ -15,6 +13,9 @@ import se.llbit.nbt.ListTag;
 import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.mojangapi.MinecraftSkin;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class SkullTextureTest {
 

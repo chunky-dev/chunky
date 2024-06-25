@@ -18,7 +18,7 @@
  */
 package se.llbit.chunky.main;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.llbit.chunky.main.CommandLineOptions.InvalidCommandLineArgumentsException;
 import se.llbit.chunky.main.CommandLineOptions.OptionHandler;
 import se.llbit.chunky.main.CommandLineOptions.Range;
@@ -27,7 +27,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 public class OptionHandlerTest {
   private void expectBart(List<String> arguments) {
@@ -48,7 +50,8 @@ public class OptionHandlerTest {
     assertThat(arguments).hasSize(2);
   }
 
-  @Test public void testOptionWithNoArgument() throws InvalidCommandLineArgumentsException {
+  @Test
+  public void testOptionWithNoArgument() throws InvalidCommandLineArgumentsException {
     OptionHandler handler1 = new OptionHandler("-bart", new Range(0), arguments -> {});
     List<String> extraArgs1 = handler1.handle(Collections.emptyList());
     assertThat(extraArgs1).isEmpty();
@@ -132,28 +135,28 @@ public class OptionHandlerTest {
     assertThat(extraArgs6).containsExactly("-42");
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testError_NoOptionGiven() throws InvalidCommandLineArgumentsException {
     OptionHandler handler = new OptionHandler("-bart", new Range(1), arguments -> {});
-    handler.handle(Collections.emptyList());
+    assertThrows(IllegalArgumentException.class, () -> handler.handle(Collections.emptyList()));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testError_WrongOptionGiven() throws InvalidCommandLineArgumentsException {
     OptionHandler handler = new OptionHandler("-bart", new Range(1), arguments -> {});
     // The -bort argument is treated as a separate option.
-    handler.handle(Collections.singletonList("-bort"));
+    assertThrows(IllegalArgumentException.class, () -> handler.handle(Collections.singletonList("-bort")));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testError_ArgumentInsteadOfOptionGiven() throws InvalidCommandLineArgumentsException {
     OptionHandler handler = new OptionHandler("-bart", new Range(1), this::expectBart);
-    handler.handle(Collections.singletonList("bort"));
+    assertThrows(IllegalArgumentException.class, () -> handler.handle(Collections.singletonList("bort")));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testError_NumberInsteadOfOptionGiven() throws InvalidCommandLineArgumentsException {
     OptionHandler handler = new OptionHandler("-bart", new Range(1), this::expectBart);
-    handler.handle(Collections.singletonList("-42"));
+    assertThrows(IllegalArgumentException.class, () -> handler.handle(Collections.singletonList("-42")));
   }
 }

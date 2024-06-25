@@ -16,8 +16,8 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import se.llbit.chunky.renderer.scene.CanvasConfig;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.ProgressListener;
@@ -31,9 +31,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RenderDumpTest {
   protected static final int testWidth = CanvasConfig.MIN_CANVAS_WIDTH;
@@ -66,7 +64,7 @@ public class RenderDumpTest {
 
   protected TaskTracker taskTracker;
 
-  @Before
+  @BeforeEach
   public void init() {
     taskTracker = new TaskTracker(new ProgressListener() {
       final Map<String, Integer> previousProgress = new HashMap<>();
@@ -75,7 +73,7 @@ public class RenderDumpTest {
       public void setProgress(String task, int done, int start, int target) {
         int previous = previousProgress.getOrDefault(task, Integer.MIN_VALUE);
         // check that progress is monotonically increasing
-        assertTrue("progress (" + done + ") should be greater or equal to previous progress (" + previous + ")", done >= previous);
+        assertTrue(done >= previous, "progress (" + done + ") should be greater or equal to previous progress (" + previous + ")");
         previousProgress.put(task, done);
       }
     });

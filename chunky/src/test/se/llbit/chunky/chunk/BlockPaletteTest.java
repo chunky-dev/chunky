@@ -1,21 +1,23 @@
 package se.llbit.chunky.chunk;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.StringTag;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class BlockPaletteTest {
   // Test that the block palette reuses existing blocks with the same tag data.
-  @Test public void testBlockReuse() {
+  @Test
+  public void testBlockReuse() {
     CompoundTag t1 = new CompoundTag();
     t1.add("Name", new StringTag("some block"));
     CompoundTag t2 = new CompoundTag();
     t2.add("Name", new StringTag("some block"));
     BlockPalette palette = new BlockPalette();
-    assertEquals("Block palette does not reuse block IDs for duplicate tags",
-        palette.put(t1), palette.put(t2));
+    assertEquals(palette.put(t1), palette.put(t2),
+      "Block palette does not reuse block IDs for duplicate tags");
   }
 
   // Test that the block palette reuses the existing air id.
