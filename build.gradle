@@ -49,6 +49,14 @@ subprojects {
 
         // Always run tests, even when nothing changed.
         dependsOn 'cleanTest'
+
+        finalizedBy jacocoTestReport // report is always generated after tests run (it's very cheap)
+    }
+    jacoco {
+        toolVersion = "0.8.11"
+    }
+    jacocoTestReport {
+        dependsOn test // tests are required to run before generating the report
     }
 
     javafx {
@@ -253,6 +261,7 @@ task docs(type: Javadoc) {
 }
 
 task clean {
+    group = "Build"
     doLast {
         delete "./build"
     }
