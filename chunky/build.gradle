@@ -1,5 +1,6 @@
 apply plugin: 'application'
 apply plugin: 'maven-publish'
+apply plugin: 'org.openjfx.javafxplugin'
 
 mainClassName = 'se.llbit.chunky.main.Chunky'
 archivesBaseName = 'chunky-core'
@@ -17,6 +18,12 @@ dependencies {
   implementation 'com.google.code.gson:gson:2.9.0'
   implementation 'org.lz4:lz4-java:1.8.0'
   implementation project(':lib')
+}
+
+javafx {
+  version = '17.0.11'
+  configuration = 'implementation'
+  modules = ['javafx.base', 'javafx.controls', 'javafx.fxml']
 }
 
 jar {
