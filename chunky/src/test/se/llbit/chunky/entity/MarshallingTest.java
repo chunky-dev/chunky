@@ -17,14 +17,14 @@
  */
 package se.llbit.chunky.entity;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test entity marshalling/unmarshalling to/from JSON.

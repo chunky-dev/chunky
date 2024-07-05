@@ -17,7 +17,7 @@
  */
 package se.llbit.chunky.renderer;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ChunkyOptions;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
@@ -31,8 +31,8 @@ import se.llbit.math.Vector4;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Simple integration tests to verify that rendering
@@ -57,8 +57,8 @@ public class BlankRenderTest {
       for (int cc = 0; cc < 3; ++cc) {
         if (samples[offset + cc] < expected[cc] - 0.005
             || samples[offset + cc] > expected[cc] + 0.005) {
-          assertEquals("Sampled pixel is outside expected value range.",
-              expected[cc], samples[offset + cc], 0.005);
+          assertEquals(expected[cc], samples[offset + cc], 0.005,
+            "Sampled pixel is outside expected value range.");
           fail("Sampled pixel is outside expected value range.");
         }
       }
@@ -87,8 +87,8 @@ public class BlankRenderTest {
       throws InterruptedException {
     for (int i = 0; i < size; ++i) {
       if (actual[i] < expected[i] - delta || actual[i] > expected[i] + delta) {
-        assertEquals("Sampled pixel is outside expected value range.",
-            expected[i], actual[i], delta);
+        assertEquals(expected[i], actual[i], delta,
+          "Sampled pixel is outside expected value range.");
         fail("Sampled pixel is outside expected value range.");
       }
     }

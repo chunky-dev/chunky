@@ -17,36 +17,36 @@
  */
 package se.llbit.log;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.IllegalFormatConversionException;
 import java.util.MissingFormatArgumentException;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests for the logging utility class.
  */
 public class LogTest {
-  @Rule public ExpectedException thrown = ExpectedException.none();
-
   private final static Receiver DO_NOTHING_RECEIVER = new Receiver() {
     @Override public void logEvent(Level level, String message) {
     }
   };
 
-  @Test public void testReceiver1() {
-    thrown.expect(IllegalArgumentException.class);
-    Log.setReceiver(DO_NOTHING_RECEIVER);
+  @Test
+  public void testReceiver1() {
+    assertThrows(IllegalArgumentException.class, () ->
+      Log.setReceiver(DO_NOTHING_RECEIVER)
+    );
   }
 
   @Test public void testReceiver2() {
-    thrown.expect(IllegalArgumentException.class);
-    Log.setReceiver(null, Level.INFO);
+    assertThrows(IllegalArgumentException.class, () ->
+      Log.setReceiver(null, Level.INFO)
+    );
   }
 
   @Test public void testReceiver3() {
@@ -70,17 +70,19 @@ public class LogTest {
   }
 
   @Test public void testInfo2() {
-    thrown.expect(MissingFormatArgumentException.class);
     Log.setLevel(Level.INFO);
     Log.setReceiver(DO_NOTHING_RECEIVER, Level.INFO);
-    Log.infof("Missing argument %s");
+    assertThrows(MissingFormatArgumentException.class, () ->
+      Log.infof("Missing argument %s")
+    );
   }
 
   @Test public void testInfo3() {
-    thrown.expect(IllegalFormatConversionException.class);
     Log.setLevel(Level.INFO);
     Log.setReceiver(DO_NOTHING_RECEIVER, Level.INFO);
-    Log.infof("Wrong argument type %d", 0.1);
+    assertThrows(IllegalFormatConversionException.class, () ->
+      Log.infof("Wrong argument type %d", 0.1)
+    );
   }
 
   @Test public void testWarning1() {
@@ -91,17 +93,19 @@ public class LogTest {
   }
 
   @Test public void testWarning2() {
-    thrown.expect(MissingFormatArgumentException.class);
     Log.setLevel(Level.WARNING);
     Log.setReceiver(DO_NOTHING_RECEIVER, Level.WARNING);
-    Log.warnf("Missing argument %s");
+    assertThrows(MissingFormatArgumentException.class, () ->
+      Log.warnf("Missing argument %s")
+    );
   }
 
   @Test public void testWarning3() {
-    thrown.expect(IllegalFormatConversionException.class);
     Log.setLevel(Level.WARNING);
     Log.setReceiver(DO_NOTHING_RECEIVER, Level.WARNING);
-    Log.warnf("Wrong argument type %d", 0.1);
+    assertThrows(IllegalFormatConversionException.class, () ->
+      Log.warnf("Wrong argument type %d", 0.1)
+    );
   }
 
   @Test public void testError1() {
@@ -112,16 +116,18 @@ public class LogTest {
   }
 
   @Test public void testError2() {
-    thrown.expect(MissingFormatArgumentException.class);
     Log.setLevel(Level.ERROR);
     Log.setReceiver(DO_NOTHING_RECEIVER, Level.ERROR);
-    Log.errorf("Missing argument %s");
+    assertThrows(MissingFormatArgumentException.class, () ->
+      Log.errorf("Missing argument %s")
+    );
   }
 
   @Test public void testError3() {
-    thrown.expect(IllegalFormatConversionException.class);
     Log.setLevel(Level.ERROR);
     Log.setReceiver(DO_NOTHING_RECEIVER, Level.ERROR);
-    Log.errorf("Wrong argument type %d", 0.1);
+    assertThrows(IllegalFormatConversionException.class, () ->
+      Log.errorf("Wrong argument type %d", 0.1)
+    );
   }
 }
