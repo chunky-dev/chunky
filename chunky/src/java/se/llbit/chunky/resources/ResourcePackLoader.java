@@ -18,6 +18,7 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.log.Log;
@@ -40,6 +41,7 @@ public class ResourcePackLoader {
     ResourcePackLoader.PACK_LOADER_FACTORIES.add(() -> new ResourcePackTextureLoader(TexturePackLoader.ALL_TEXTURES));
     ResourcePackLoader.PACK_LOADER_FACTORIES.add(ResourcePackBiomeLoader::new);
     ResourcePackLoader.PACK_LOADER_FACTORIES.add(ResourcePackPaintingLoader::new);
+    ResourcePackLoader.PACK_LOADER_FACTORIES.add(ResourcePackBannerPatternLoader::new);
   }
 
   public interface PackLoader {
@@ -122,6 +124,7 @@ public class ResourcePackLoader {
     TextureCache.reset();
     Biomes.reset();
     PaintingEntity.resetPaintings();
+    BannerDesign.resetPatterns();
 
     if (ResourcePackLoader.resourcePacks != null) {
       try {
