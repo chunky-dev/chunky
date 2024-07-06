@@ -33,6 +33,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneManager;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.ResourcePackChooser;
@@ -87,6 +88,7 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
     singleColorBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
       Scene scene = sceneManager.getScene();
       PersistentSettings.setSingleColorTextures(newValue);
+      Texture.setUseAverageColor(newValue);
       scene.refresh();
       scene.rebuildBvh();
     });

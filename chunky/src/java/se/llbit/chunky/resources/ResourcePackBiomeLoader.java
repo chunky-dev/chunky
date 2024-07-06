@@ -24,7 +24,8 @@ import se.llbit.chunky.world.biome.BiomeBuilder;
 import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.log.Log;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -33,7 +34,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
-  public ResourcePackBiomeLoader() {}
+  public ResourcePackBiomeLoader() {
+  }
 
   protected static final Gson GSON = new GsonBuilder()
     .disableJdkUnsafe()
@@ -54,10 +56,9 @@ public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
   }
 
   @Override
-  public boolean load(Path pack, String baseName) {
-    Path data = pack.resolve("data");
-    if (Files.exists(data)) {
-      try (Stream<Path> namespaces = Files.list(data)) {
+  public boolean load(LayeredResourcePacks resourcePacks) {
+    for (LayeredResourcePacks.Entry data : resourcePacks.getAllEntries("data")) {
+      try (Stream<Path> namespaces = Files.list(data.getPath())) {
         namespaces.forEach(ns -> {
           String namespace = String.valueOf(ns.getFileName());
 

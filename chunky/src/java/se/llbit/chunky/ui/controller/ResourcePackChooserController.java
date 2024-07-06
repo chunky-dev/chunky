@@ -29,10 +29,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
@@ -56,17 +56,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -211,7 +206,7 @@ public class ResourcePackChooserController implements Initializable {
       this.setContextMenu(new ContextMenu(
         buildMenuItem("Open in system file browser",
           evt -> {
-            if(getItem() == null)
+            if (getItem() == null)
               return;
             try {
               File texturePackFile = getItem().file;
@@ -240,7 +235,7 @@ public class ResourcePackChooserController implements Initializable {
             }
           },
           menuItem -> {
-            if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
               menuItem.disableProperty().bind(itemProperty().isNull());
             } else {
               menuItem.setDisable(true);
@@ -256,8 +251,10 @@ public class ResourcePackChooserController implements Initializable {
     }
 
     private MenuItem buildMenuItem(String label, EventHandler<ActionEvent> eventHandler) {
-      return buildMenuItem(label,eventHandler, menuItem -> {});
+      return buildMenuItem(label, eventHandler, menuItem -> {
+      });
     }
+
     private MenuItem buildMenuItem(String label, EventHandler<ActionEvent> eventHandler, Consumer<MenuItem> init) {
       MenuItem item = new MenuItem(label);
       item.setOnAction(eventHandler);
@@ -363,10 +360,10 @@ public class ResourcePackChooserController implements Initializable {
       "pack.mcmeta"
     ));
     File dir = MinecraftFinder.getResourcePacksDirectory();
-    if(dir.isDirectory()) {
+    if (dir.isDirectory()) {
       fileChooser.setInitialDirectory(dir);
     }
-    
+
     List<File> newlyAddedFiles = fileChooser.showOpenMultipleDialog(addNewTargetPackBtn.getScene().getWindow());
     if (newlyAddedFiles == null)
       return;
@@ -474,10 +471,7 @@ public class ResourcePackChooserController implements Initializable {
     public static Image MISSING_PACK_PNG = null;
 
     private static void loadMissingPackPng(File minecraftJar) {
-      try (FileSystem zipFs = FileSystems.newFileSystem(
-        URI.create("jar:" + minecraftJar.toURI()),
-        Collections.emptyMap()
-      )) {
+      try (FileSystem zipFs = ResourcePackLoader.getPackFileSystem(minecraftJar)) {
         Path unknownPackPng = zipFs.getPath("assets/minecraft/textures/misc/unknown_pack.png");
         try (InputStream unknownPackPngStream = Files.newInputStream(unknownPackPng)) {
           MISSING_PACK_PNG = new Image(unknownPackPngStream);
@@ -518,8 +512,8 @@ public class ResourcePackChooserController implements Initializable {
 
     public String getFormatVersionString() {
       return formatVersion <= 0
-         ? ""
-         : ("v" + formatVersion);
+        ? ""
+        : ("v" + formatVersion);
     }
 
     public PackListItem(File resourcePackFile) {

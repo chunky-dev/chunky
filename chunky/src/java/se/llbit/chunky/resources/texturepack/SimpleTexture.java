@@ -17,6 +17,7 @@
 package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.resources.ImageLoader;
 
@@ -62,7 +63,7 @@ public class SimpleTexture extends TextureLoader {
   }
 
   @Override
-  public boolean load(Path texturePack) {
+  public boolean load(LayeredResourcePacks texturePack) {
     return load(file, texturePack);
   }
 
