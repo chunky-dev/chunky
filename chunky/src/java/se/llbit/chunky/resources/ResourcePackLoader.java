@@ -18,9 +18,6 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.entity.BannerDesign;
-import se.llbit.chunky.entity.PaintingEntity;
-import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.log.Log;
 
 import java.io.File;
@@ -62,6 +59,16 @@ public class ResourcePackLoader {
 
     default boolean hasUnloaded() {
       return !notLoaded().isEmpty();
+    }
+
+    /**
+     * Reset everything this loader has loaded previously. For example if this loader loads biomes, this should reset
+     * the biomes as if this loader had never run.
+     * <p/>
+     * Some pack loaders, eg. the {@link ResourcePackTextureLoader}, don't support this and will do nothing. Resetting
+     * the loaded resources might take a restart of Chunky in that case.
+     */
+    default void resetLoadedResources() {
     }
   }
 
@@ -122,9 +129,6 @@ public class ResourcePackLoader {
    */
   public static void loadResourcePacks(List<File> resourcePacks) {
     TextureCache.reset();
-    Biomes.reset();
-    PaintingEntity.resetPaintings();
-    BannerDesign.resetPatterns();
 
     if (ResourcePackLoader.resourcePacks != null) {
       try {
@@ -172,6 +176,10 @@ public class ResourcePackLoader {
     List<PackLoader> loaders = PACK_LOADER_FACTORIES.stream()
       .map(PackLoaderFactory::create)
       .collect(Collectors.toList());
+
+    for (PackLoader loader : loaders) {
+      loader.resetLoadedResources();
+    }
 
     if (!loadResources(loaders)) {
       Log.info(buildMissingResourcesErrorMessage(loaders));

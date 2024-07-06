@@ -50,4 +50,9 @@ public class ResourcePackPaintingLoader implements ResourcePackLoader.PackLoader
     });
     return false;
   }
+
+  @Override
+  public void resetLoadedResources() {
+    PaintingEntity.resetPaintings();
+  }
 }

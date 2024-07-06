@@ -40,4 +40,9 @@ public class ResourcePackBannerPatternLoader implements ResourcePackLoader.PackL
     });
     return false;
   }
+
+  @Override
+  public void resetLoadedResources() {
+    BannerDesign.resetPatterns();
+  }
 }
