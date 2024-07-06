@@ -13,6 +13,36 @@ public class BannerDesign {
   private static final Map<String, Pattern> patternByLegacyName = new HashMap<>();
 
   static {
+    resetPatterns();
+  }
+
+  private static void registerPattern(String namespacedName, String legacyName) {
+    Pattern pattern = new Pattern(namespacedName);
+    patternByName.put(namespacedName, pattern);
+    patternByLegacyName.put(legacyName, pattern);
+  }
+
+  public static void registerPattern(String namespacedName, Pattern pattern) {
+    patternByName.put(namespacedName, pattern);
+  }
+
+  public static boolean containsPattern(String namespacedName) {
+    return patternByName.containsKey(namespacedName);
+  }
+
+  public static Pattern getPattern(String patternName) {
+    Pattern pattern = patternByName.get(patternName);
+    if (pattern == null) {
+      pattern = patternByLegacyName.get(patternName);
+    }
+    return pattern;
+  }
+
+  public static void resetPatterns() {
+    patternByName.clear();
+    patternByLegacyName.clear();
+
+    // hard-coded pre-24w10a patterns with legacy aliases
     registerPattern("minecraft:stripe_bottom", "bs");
     registerPattern("minecraft:stripe_top", "ts");
     registerPattern("minecraft:stripe_left", "ls");
@@ -52,28 +82,6 @@ public class BannerDesign {
     registerPattern("minecraft:flower", "flo");
     registerPattern("minecraft:mojang", "moj");
     registerPattern("minecraft:piglin", "pig");
-
-    // 1.21
-    registerPattern("minecraft:flow");
-    registerPattern("minecraft:guster");
-  }
-
-  public static void registerPattern(String namespacedName) {
-    patternByName.put(namespacedName, new Pattern(namespacedName));
-  }
-
-  public static void registerPattern(String namespacedName, String legacyName) {
-    Pattern pattern = new Pattern(namespacedName);
-    patternByName.put(namespacedName, pattern);
-    patternByLegacyName.put(legacyName, pattern);
-  }
-
-  public static Pattern getPattern(String patternName) {
-    Pattern pattern = patternByName.get(patternName);
-    if (pattern == null) {
-      pattern = patternByLegacyName.get(patternName);
-    }
-    return pattern;
   }
 
   public enum Color {

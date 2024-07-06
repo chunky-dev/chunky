@@ -85,4 +85,9 @@ public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
     });
     return false;
   }
+
+  @Override
+  public void resetLoadedResources() {
+    Biomes.reset();
+  }
 }
