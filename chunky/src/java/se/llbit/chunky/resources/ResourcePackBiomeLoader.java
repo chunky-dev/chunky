@@ -27,11 +27,7 @@ import se.llbit.log.Log;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
   public ResourcePackBiomeLoader() {
@@ -57,69 +53,36 @@ public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
 
   @Override
   public boolean load(LayeredResourcePacks resourcePacks) {
-    for (LayeredResourcePacks.Entry data : resourcePacks.getAllEntries("data")) {
-      try (Stream<Path> namespaces = Files.list(data.getPath())) {
-        namespaces.forEach(ns -> {
-          String namespace = String.valueOf(ns.getFileName());
+    DataPackUtil.forEachDataRegistryEntry(resourcePacks, "worldgen/biome", biome -> {
+      if (!Biomes.contains(biome.getNamespacedName())) {
+        try (Reader f = Files.newBufferedReader(biome.path())) {
+          BiomeJson json = GSON.fromJson(f, BiomeJson.class);
 
-          Path biomes = ns.resolve("worldgen").resolve("biome");
-          try (Stream<Path> biomeStream = Files.walk(biomes)) {
-            biomeStream
-              .filter(p -> Files.isRegularFile(p, LinkOption.NOFOLLOW_LINKS))
-              .forEach(biome -> {
-                if (biome.toString().endsWith(".json")) {
-                  String biomeName = getBiomeName(biomes.relativize(biome));
-                  String resourceLocation = namespace + ":" + biomeName;
+          BiomeBuilder builder = Biome.create(biome.getNamespacedName(), biome.name(), json.temperature, json.downfall);
+          Optional.ofNullable(json.effects.foliage_color).ifPresent(builder::foliageColor);
+          Optional.ofNullable(json.effects.grass_color).ifPresent(builder::grassColor);
+          Optional.ofNullable(json.effects.water_color).ifPresent(builder::waterColor);
+          Optional.ofNullable(json.effects.grass_color_modifier).ifPresent(modifier -> {
+            switch (modifier.toLowerCase()) {
+              case "none":
+                break;
+              case "dark_forest":
+                builder.darkForest();
+                break;
+              case "swamp":
+                builder.swamp();
+                break;
+              default:
+                Log.warnf("Unsupported biome `grass_modifier_color`: %s", modifier);
+            }
+          });
+          // TODO Custom fog colors
 
-                  if (!Biomes.contains(resourceLocation)) {
-                    try (Reader f = Files.newBufferedReader(biome)) {
-                      BiomeJson json = GSON.fromJson(f, BiomeJson.class);
-
-                      BiomeBuilder builder = Biome.create(resourceLocation, biomeName, json.temperature, json.downfall);
-                      Optional.ofNullable(json.effects.foliage_color).ifPresent(builder::foliageColor);
-                      Optional.ofNullable(json.effects.grass_color).ifPresent(builder::grassColor);
-                      Optional.ofNullable(json.effects.water_color).ifPresent(builder::waterColor);
-                      Optional.ofNullable(json.effects.grass_color_modifier).ifPresent(modifier -> {
-                        switch (modifier.toLowerCase()) {
-                          case "none":
-                            break;
-                          case "dark_forest":
-                            builder.darkForest();
-                            break;
-                          case "swamp":
-                            builder.swamp();
-                            break;
-                          default:
-                            Log.warnf("Unsupported biome `grass_modifier_color`: %s", modifier);
-                        }
-                      });
-                      // TODO Custom fog colors
-
-                      Biomes.register(builder);
-                    } catch (IOException ignored) {
-                    }
-                  }
-                }
-              });
-          } catch (IOException ignored) {
-          }
-        });
-      } catch (IOException e) {
-        throw new RuntimeException(e);
+          Biomes.register(builder);
+        } catch (IOException ignored) {
+        }
       }
-    }
-
+    });
     return false;
-  }
-
-  private static String getBiomeName(Path biome) {
-    ArrayList<String> path = new ArrayList<>();
-    biome.iterator().forEachRemaining(p -> path.add(String.valueOf(p)));
-
-    String out = String.join("/", path);
-    if (out.toLowerCase().endsWith(".json")) {
-      out = out.substring(0, out.length() - ".json".length());
-    }
-    return out;
   }
 }
