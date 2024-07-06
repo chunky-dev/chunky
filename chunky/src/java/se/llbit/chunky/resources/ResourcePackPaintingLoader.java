@@ -10,10 +10,6 @@ import se.llbit.util.Pair;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.stream.Stream;
 
 public class ResourcePackPaintingLoader implements ResourcePackLoader.PackLoader {
 
@@ -35,55 +31,23 @@ public class ResourcePackPaintingLoader implements ResourcePackLoader.PackLoader
 
   @Override
   public boolean load(LayeredResourcePacks resourcePacks) {
-    for (LayeredResourcePacks.Entry data : resourcePacks.getAllEntries("data")) {
-      try (Stream<Path> namespaces = Files.list(data.getPath())) {
-        namespaces.forEach(ns -> {
-          String namespace = String.valueOf(ns.getFileName());
-          Path paintingVariants = ns.resolve("painting_variant");
-          try (Stream<Path> paintingVariantStream = Files.walk(paintingVariants)) {
-            paintingVariantStream
-              .filter(p -> Files.isRegularFile(p, LinkOption.NOFOLLOW_LINKS))
-              .forEach(paintingVariant -> {
-                if (paintingVariant.toString().endsWith(".json")) {
-                  String paintingVariantName = getPaintingVariantName(paintingVariants.relativize(paintingVariant));
-                  String resourceLocation = namespace + ":" + paintingVariantName;
-
-                  if (!PaintingEntity.containsPainting(resourceLocation)) {
-                    try (Reader f = Files.newBufferedReader(paintingVariant)) {
-                      PaintingVariantJson json = GSON.fromJson(f, PaintingVariantJson.class);
-                      Texture paintingTexture = new Texture();
-                      Pair<String, String> asset = json.getAsset();
-                      if (!ResourcePackLoader.loadResources(
-                        ResourcePackTextureLoader.singletonLoader(json.asset_id, new SimpleTexture("assets/" + asset.thing1 + "/textures/painting/" + asset.thing2, paintingTexture)))
-                      ) {
-                        Log.warnf("Failed to load painting texture: %s", json.asset_id);
-                      }
-                      PaintingEntity.registerPainting(resourceLocation, new PaintingEntity.Painting(paintingTexture, json.width, json.height));
-                    } catch (IOException ignored) {
-                      Log.warnf("Failed to load painting variant: %s", paintingVariantName);
-                    }
-                  }
-                }
-              });
-          } catch (IOException ignored) {
+    DataPackUtil.forEachDataRegistryEntry(resourcePacks, "painting_variant", paintingVariant -> {
+      if (!PaintingEntity.containsPainting(paintingVariant.getNamespacedName())) {
+        try (Reader f = Files.newBufferedReader(paintingVariant.path())) {
+          PaintingVariantJson json = GSON.fromJson(f, PaintingVariantJson.class);
+          Texture paintingTexture = new Texture();
+          Pair<String, String> asset = json.getAsset();
+          if (!ResourcePackLoader.loadResources(
+            ResourcePackTextureLoader.singletonLoader(json.asset_id, new SimpleTexture("assets/" + asset.thing1 + "/textures/painting/" + asset.thing2, paintingTexture)))
+          ) {
+            Log.warnf("Failed to load painting texture: %s", json.asset_id);
           }
-        });
-      } catch (IOException e) {
-        throw new RuntimeException(e);
+          PaintingEntity.registerPainting(paintingVariant.getNamespacedName(), new PaintingEntity.Painting(paintingTexture, json.width, json.height));
+        } catch (IOException ignored) {
+          Log.warnf("Failed to load painting variant: %s", paintingVariant.getNamespacedName());
+        }
       }
-    }
-
+    });
     return false;
-  }
-
-  private static String getPaintingVariantName(Path paintingVariant) {
-    ArrayList<String> path = new ArrayList<>();
-    paintingVariant.iterator().forEachRemaining(p -> path.add(String.valueOf(p)));
-
-    String out = String.join("/", path);
-    if (out.toLowerCase().endsWith(".json")) {
-      out = out.substring(0, out.length() - ".json".length());
-    }
-    return out;
   }
 }
