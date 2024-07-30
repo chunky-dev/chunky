@@ -114,7 +114,7 @@ public class PathTracer implements RayTracer {
         airDistance = ray.distance;
       }
 
-      if (pDiffuse + pSpecular < Ray.EPSILON && n1 == n2) {
+      if (ray.color.w + pSpecular < Ray.EPSILON && n1 == n2) {
         // Transmission without refraction.
         // This can happen when the ray passes through a transparent
         // material into another. It can also happen for example
