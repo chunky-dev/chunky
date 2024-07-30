@@ -104,7 +104,7 @@ public class PathTracer implements RayTracer {
 
       float pSpecular = currentMat.specular;
 
-      double pDiffuse = scene.fancierTranslucency ? 1 - Math.pow(1 - ray.color.w, Math.max(ray.color.x, Math.max(ray.color.y, ray.color.z))) : ray.color.w;
+      double pDiffuse = scene.fancierTranslucency ? 1 - Math.pow(1 - ray.color.w, Math.max(Math.max(Ray.EPSILON, ray.color.x), Math.max(ray.color.y, ray.color.z))) : ray.color.w;
       double pAbsorb = scene.fancierTranslucency ? 1 - (1 - ray.color.w)/(1 - pDiffuse + Ray.EPSILON) : ray.color.w;
 
       float n1 = prevMat.ior;
