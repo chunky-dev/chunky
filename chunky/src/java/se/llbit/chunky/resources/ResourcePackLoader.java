@@ -64,12 +64,8 @@ public class ResourcePackLoader {
     /**
      * Reset everything this loader has loaded previously. For example if this loader loads biomes, this should reset
      * the biomes as if this loader had never run.
-     * <p/>
-     * Some pack loaders, eg. the {@link ResourcePackTextureLoader}, don't support this and will do nothing. Resetting
-     * the loaded resources might take a restart of Chunky in that case.
      */
-    default void resetLoadedResources() {
-    }
+    void resetLoadedResources();
   }
 
   interface PackLoaderFactory {

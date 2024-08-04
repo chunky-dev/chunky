@@ -156,4 +156,15 @@ public class ChestTexture extends TextureLoader {
   public boolean load(LayeredResourcePacks texturePack) {
     return load(file, texturePack);
   }
+
+  @Override
+  public void reset() {
+    lock.reset();
+    top.reset();
+    bottom.reset();
+    left.reset();
+    right.reset();
+    front.reset();
+    back.reset();
+  }
 }

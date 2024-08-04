@@ -70,6 +70,13 @@ public class ResourcePackTextureLoader implements ResourcePackLoader.PackLoader 
     return Collections.unmodifiableCollection(texturesToLoad.keySet());
   }
 
+  @Override
+  public void resetLoadedResources() {
+    for (TextureLoader loader : texturesToLoad.values()) {
+      loader.reset();
+    }
+  }
+
   private void loadTerrainTextures(LayeredResourcePacks root, ArrayList<String> toRemove) {
     Optional<InputStream> in = Optional.empty();
     try {

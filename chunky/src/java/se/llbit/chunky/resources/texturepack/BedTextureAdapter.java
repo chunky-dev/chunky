@@ -213,4 +213,17 @@ public class BedTextureAdapter extends TextureLoader {
   @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
     return false;
   }
+
+  @Override
+  public void reset() {
+    bottomLoader.reset();
+    footTopLoader.reset();
+    headTopLoader.reset();
+    headTopLoader.reset();
+    footEndLoader.reset();
+    footSideLoader.reset();
+    headSideLoader.reset();
+    headEndLoader.reset();
+    Texture.bedRed.reset();
+  }
 }

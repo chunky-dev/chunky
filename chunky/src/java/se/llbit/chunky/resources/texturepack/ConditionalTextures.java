@@ -39,4 +39,10 @@ public class ConditionalTextures extends TextureLoader {
   protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
     throw new UnsupportedOperationException("Call load(ZipFile) instead!");
   }
+
+  @Override
+  public void reset() {
+    then.reset();
+    otherwise.reset();
+  }
 }

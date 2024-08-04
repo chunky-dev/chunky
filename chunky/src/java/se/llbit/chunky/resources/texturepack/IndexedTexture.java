@@ -58,4 +58,9 @@ public class IndexedTexture extends TextureLoader {
   @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
     return false;
   }
+
+  @Override
+  public void reset() {
+    texture.reset();
+  }
 }

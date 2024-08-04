@@ -18,6 +18,7 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.pbr.NormalMap;
 import se.llbit.math.AABB;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -63,7 +64,25 @@ public class TexturedBlockModel extends AABBModel {
       return;
     }
     getTextureCoordinates(ray);
-    ray.getCurrentMaterial().getColor(ray);
+    Texture texture = ray.getCurrentMaterial().texture;
+    if (ray.getNormal().y > 0) {
+      NormalMap.apply(ray, NormalMap.tbnCubeTop, texture);
+    } else if (ray.getNormal().y < 0) {
+      NormalMap.apply(ray, NormalMap.tbnCubeBottom, texture);
+    } else if (ray.getNormal().x > 0) {
+      NormalMap.apply(ray, NormalMap.tbnCubeEast, texture);
+    } else if (ray.getNormal().x < 0) {
+      NormalMap.apply(ray, NormalMap.tbnCubeWest, texture);
+    } else if (ray.getNormal().z > 0) {
+      NormalMap.apply(ray, NormalMap.tbnCubeSouth, texture);
+    } else if (ray.getNormal().z < 0) {
+      NormalMap.apply(ray, NormalMap.tbnCubeNorth, texture);
+    }
+    texture.getColor(ray);
+    ray.emittanceValue = texture.getEmittanceAt(ray.u, ray.v);
+    ray.reflectanceValue = texture.getReflectanceAt(ray.u, ray.v);
+    ray.roughnessValue = texture.getRoughnessAt(ray.u, ray.v);
+    ray.metalnessValue = texture.getMetalnessAt(ray.u, ray.v);
   }
 
   /**
