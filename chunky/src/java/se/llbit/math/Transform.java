@@ -125,6 +125,18 @@ public class Transform {
     });
   }
 
+  public final Transform inflate(final Vector3 scale) {
+    return chain(new Transform() {
+      @Override public void apply(Vector3 v) {
+        v.scaleEntrywise(scale);
+      }
+
+      @Override public void applyRotScale(Vector3 v) {
+        v.scaleEntrywise(scale);
+      }
+    });
+  }
+
   /**
    * Rotation by 90 degrees around the Y axis
    */
