@@ -9,10 +9,14 @@ import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
+import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
+import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -153,4 +157,6 @@ public abstract class Block extends Material {
   public boolean isBiomeDependant() {
     return isWaterFilled();
   }
+
+  public abstract Collection<Primitive> getPrimitives(Transform transform);
 }

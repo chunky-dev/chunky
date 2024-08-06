@@ -126,6 +126,27 @@ public class Transform {
   }
 
   /**
+   * Scales all coordinates.
+   */
+  public final Transform scale(final double scaleX, final double scaleY, final double scaleZ) {
+    return chain(new Transform() {
+      @Override
+      public void apply(Vector3 v) {
+        v.x *= scaleX;
+        v.y *= scaleY;
+        v.z *= scaleZ;
+      }
+
+      @Override
+      public void applyRotScale(Vector3 v) {
+        v.x *= scaleX;
+        v.y *= scaleY;
+        v.z *= scaleZ;
+      }
+    });
+  }
+
+  /**
    * Rotation by 90 degrees around the Y axis
    */
   public final Transform rotateY() {
@@ -235,6 +256,34 @@ public class Transform {
         double tmp = o.x;
         o.x = o.y;
         o.y = -tmp;
+      }
+    });
+  }
+
+  public Transform rotateQuaternion(Vector4 quaternion) {
+    return chain(new Transform() {
+      @Override
+      public void apply(Vector3 o) {
+        Vector4 oAsVec4 = new Vector4(0, o);
+        Vector4 quaternionConj = new Vector4(quaternion.x, quaternion.y * -1, quaternion.z * -1, quaternion.w * -1);
+        Vector4 result = multiplyQuaternion(multiplyQuaternion(quaternion, oAsVec4), quaternionConj);
+        o.x = result.y;
+        o.y = result.z;
+        o.z = result.w;
+      }
+
+      @Override
+      public void applyRotScale(Vector3 o) {
+        apply(o);
+      }
+
+      private Vector4 multiplyQuaternion(Vector4 q, Vector4 r) {
+        return new Vector4(
+          r.x * q.x - r.y * q.y - r.z * q.z - r.w * q.w,
+          r.x * q.y + r.y * q.x - r.z * q.w + r.w * q.z,
+          r.x * q.z + r.y * q.w + r.z * q.x - r.w * q.y,
+          r.x * q.w - r.y * q.z + r.z * q.y + r.w * q.x
+        );
       }
     });
   }
