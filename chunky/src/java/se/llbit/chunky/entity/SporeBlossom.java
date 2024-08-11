@@ -2,6 +2,9 @@ package se.llbit.chunky.entity;
 
 import java.util.Collection;
 import se.llbit.chunky.model.minecraft.SporeBlossomModel;
+import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.Material;
+import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Transform;
@@ -10,6 +13,8 @@ import se.llbit.math.primitive.Primitive;
 import se.llbit.util.JsonUtil;
 
 public class SporeBlossom extends Entity {
+  public static final Material blossomMaterial = new TextureMaterial(Texture.sporeBlossom);
+  public static final Material baseMaterial = new TextureMaterial(Texture.sporeBlossomBase);
 
   public SporeBlossom(Vector3 position) {
     super(position);

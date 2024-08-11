@@ -21,9 +21,8 @@ package se.llbit.chunky.model.minecraft;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import se.llbit.chunky.entity.SporeBlossom;
 import se.llbit.chunky.model.Model;
-import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
@@ -109,13 +108,9 @@ public class SporeBlossomModel {
 
   public static Collection<Primitive> primitives(Transform transform) {
     Collection<Primitive> faces = new LinkedList<>();
-    TextureMaterial baseMaterial = new TextureMaterial(Texture.sporeBlossomBase);
-    TextureMaterial flowerMaterial = new TextureMaterial(Texture.sporeBlossom);
-
     for (int i = 0; i < quads.length; i++) {
-      quads[i].addTriangles(faces, i < 2 ? baseMaterial : flowerMaterial, transform);
+      quads[i].addTriangles(faces, i < 2 ? SporeBlossom.baseMaterial : SporeBlossom.blossomMaterial, transform);
     }
-
     return faces;
   }
 }

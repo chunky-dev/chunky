@@ -19,6 +19,7 @@ package se.llbit.chunky.world;
 import se.llbit.chunky.block.minecraft.Candle;
 import se.llbit.chunky.entity.CalibratedSculkSensorAmethyst;
 import se.llbit.chunky.entity.Campfire;
+import se.llbit.chunky.entity.SporeBlossom;
 import se.llbit.chunky.world.material.CloudMaterial;
 
 import java.util.HashMap;
@@ -36,6 +37,8 @@ public class ExtraMaterials {
     idMap.put("soul_campfire_flame", Campfire.soulFlameMaterial);
     idMap.put("calibrated_sculk_sensor_amethyst_active", CalibratedSculkSensorAmethyst.activeMaterial);
     idMap.put("calibrated_sculk_sensor_amethyst_inactive", CalibratedSculkSensorAmethyst.inactiveMaterial);
+    idMap.put("spore_blossom (base)", SporeBlossom.baseMaterial);
+    idMap.put("spore_blossom (blossom)", SporeBlossom.blossomMaterial);
   }
 
   public static void loadDefaultMaterialProperties() {
@@ -54,5 +57,8 @@ public class ExtraMaterials {
     CalibratedSculkSensorAmethyst.activeMaterial.emittance = 1.0f / 15;
 
     CalibratedSculkSensorAmethyst.inactiveMaterial.restoreDefaults();
+
+    SporeBlossom.blossomMaterial.restoreDefaults();
+    SporeBlossom.baseMaterial.restoreDefaults();
   }
 }
