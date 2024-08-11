@@ -69,6 +69,7 @@ public class PathTracer implements RayTracer {
         if (ray.getPrevMaterial().isWater()) {
           ray.color.set(0, 0, 0, 1);
           hit = true;
+          state.hit = true;
         } else if (ray.depth == 0) {
           // Direct sky hit.
           if (!scene.transparentSky()) {
@@ -81,11 +82,13 @@ public class PathTracer implements RayTracer {
           scene.sky.getSkyColor(ray, true);
           addSkyFog(scene, ray, state, ox, od);
           hit = true;
+          state.hit = true;
         } else {
           // Indirect sky hit - diffuse color.
           scene.sky.getSkyColorDiffuseSun(ray, scene.getSunSamplingStrategy().isDiffuseSun());
           // Skip sky fog - likely not noticeable in diffuse reflection.
           hit = true;
+          state.hit = true;
         }
         break;
       }
