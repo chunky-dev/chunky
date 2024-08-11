@@ -69,11 +69,8 @@ public abstract class TileBasedRenderer implements Renderer {
 
     cachedTiles.forEach(tile ->
         manager.pool.submit(worker -> {
-          WorkerState state = new WorkerState();
-          state.ray = new Ray();
-          state.ray.setNormal(0, 0, -1);
-          state.random = worker.random;
-
+          WorkerState state = worker.state;
+          state.reset();
           IntIntMutablePair pair = new IntIntMutablePair(0, 0);
 
           for (int i = tile.x0; i < tile.x1; i++) {

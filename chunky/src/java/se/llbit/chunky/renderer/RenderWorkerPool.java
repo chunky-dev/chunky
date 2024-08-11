@@ -44,6 +44,7 @@ public class RenderWorkerPool {
 
     public final Random random;
     public final int id;
+    public final WorkerState state = new WorkerState();
 
     private long lastSleep;
     private long sleepTime = 0;
@@ -56,6 +57,7 @@ public class RenderWorkerPool {
       this.pool = pool;
       this.id = id;
       this.random = new Random(seed);
+      state.random = this.random;
 
       lastSleep = System.currentTimeMillis();
     }
