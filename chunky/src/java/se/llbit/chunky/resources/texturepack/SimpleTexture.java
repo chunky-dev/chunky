@@ -19,11 +19,12 @@ package se.llbit.chunky.resources.texturepack;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.pbr.*;
 import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * Non-animated texture loader.
@@ -42,6 +43,11 @@ public class SimpleTexture extends TextureLoader {
 
   @Override
   protected boolean load(InputStream imageStream) throws IOException {
+    texture.setTexture(getTextureOrFirstFrame(imageStream));
+    return true;
+  }
+
+  private static BitmapImage getTextureOrFirstFrame(InputStream imageStream) throws IOException {
     BitmapImage image = ImageLoader.read(imageStream);
 
     if (image.height > image.width) {
@@ -55,11 +61,10 @@ public class SimpleTexture extends TextureLoader {
           frame0.setPixel(x, y, image.getPixel(x, y));
         }
       }
-      texture.setTexture(frame0);
+      return frame0;
     } else {
-      texture.setTexture(image);
+      return image;
     }
-    return true;
   }
 
   @Override
@@ -68,7 +73,81 @@ public class SimpleTexture extends TextureLoader {
   }
 
   @Override
+  public boolean load(String file, LayeredResourcePacks texturePack) {
+    boolean loaded = super.load(file, texturePack);
+    String specularFormat = System.getProperty("chunky.pbr.specular", "labpbr");
+    if (specularFormat.equals("oldpbr") || specularFormat.equals("labpbr")) {
+      Optional<InputStream> in = Optional.empty();
+      try {
+        in = texturePack.getInputStream(file + "_s.png");
+      } catch (IOException e) {
+      }
+      if (in.isPresent()) {
+        try {
+          // LabPBR uses the alpha channel for the emission map
+          // Some resource packs use the blue channel (Red=Smoothness, Green=Metalness, Blue=Emission)
+          // (In BSL, this option is called "Old PBR + Emissive")
+          if (specularFormat.equals("oldpbr")) {
+            OldPbrSpecularMap specular = new OldPbrSpecularMap(getTextureOrFirstFrame(in.get()));
+            texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
+            texture.setReflectanceMap(specular.hasReflectance() ? specular : ReflectanceMap.EMPTY);
+            texture.setRoughnessMap(specular.hasRoughness() ? specular : RoughnessMap.EMPTY);
+            texture.setMetalnessMap(MetalnessMap.EMPTY);
+          } else if (specularFormat.equals("labpbr")) {
+            LabPbrSpecularMap specular = new LabPbrSpecularMap(getTextureOrFirstFrame(in.get()));
+            texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
+            texture.setReflectanceMap(specular.hasReflectance() ? specular : ReflectanceMap.EMPTY);
+            texture.setRoughnessMap(specular.hasRoughness() ? specular : RoughnessMap.EMPTY);
+            texture.setMetalnessMap(specular.hasMetalness() ? specular : MetalnessMap.EMPTY);
+          }
+        } catch (IOException e) {
+          // Safe to ignore
+          texture.setEmissionMap(EmissionMap.EMPTY);
+          texture.setReflectanceMap(ReflectanceMap.EMPTY);
+          texture.setRoughnessMap(RoughnessMap.EMPTY);
+          texture.setMetalnessMap(MetalnessMap.EMPTY);
+        } finally {
+          try {
+            in.get().close();
+          } catch (IOException e) {
+            // ignore
+          }
+        }
+      }
+    }
+
+    String normalFormat = System.getProperty("chunky.pbr.normal", "");
+    if (normalFormat.equals("oldpbr") || normalFormat.equals("labpbr")) {
+      Optional<InputStream> in = Optional.empty();
+      try {
+        in = texturePack.getInputStream(file + "_n.png");
+      } catch (IOException e) {
+      }
+      if (in.isPresent()) {
+        try {
+          if (normalFormat.equals("oldpbr")) {
+            texture.setNormalMap(new OldPbrNormalMap(getTextureOrFirstFrame(in.get())));
+          } else if (normalFormat.equals("labpbr")) {
+            texture.setNormalMap(new LabPbrNormalMap(getTextureOrFirstFrame(in.get())));
+          }
+        } catch (IOException e) {
+          texture.setNormalMap(null);
+        }
+      } else {
+        texture.setNormalMap(null);
+      }
+    }
+
+    return loaded;
+  }
+
+  @Override
   public String toString() {
     return "texture:" + file;
+  }
+
+  @Override
+  public void reset() {
+    texture.reset();
   }
 }

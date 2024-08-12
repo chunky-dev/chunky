@@ -19,7 +19,13 @@ package se.llbit.chunky.resources;
 import javafx.scene.image.Image;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.projection.ApertureProjector;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.pbr.EmissionMap;
+import se.llbit.chunky.resources.pbr.MetalnessMap;
+import se.llbit.chunky.resources.pbr.NormalMap;
+import se.llbit.chunky.resources.pbr.ReflectanceMap;
+import se.llbit.chunky.resources.pbr.RoughnessMap;
 import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.TexturePath;
 import se.llbit.fxutil.FxImageUtil;
@@ -41,15 +47,18 @@ import se.llbit.util.annotation.NotNull;
 public class Texture {
 
   public static final Texture EMPTY_TEXTURE = new Texture() {
-    @Override public void getColor(double u, double v, Vector4 c) {
+    @Override
+    public void getColor(double u, double v, Vector4 c) {
       c.set(0, 0, 0, 0);
     }
 
-    @Override public void getColorInterpolated(double u, double v, Vector4 c) {
+    @Override
+    public void getColorInterpolated(double u, double v, Vector4 c) {
       c.set(0, 0, 0, 0);
     }
 
-    @Override public boolean isEmptyTexture() {
+    @Override
+    public boolean isEmptyTexture() {
       return true;
     }
   };
@@ -1527,6 +1536,11 @@ public class Texture {
   private float[] avgColorFlat;
 
   private Image fxImage = null;
+  private EmissionMap emissionMap = EmissionMap.DEFAULT;
+  private ReflectanceMap reflectanceMap = ReflectanceMap.DEFAULT;
+  private RoughnessMap roughnessMap = RoughnessMap.DEFAULT;
+  private MetalnessMap metalnessMap = MetalnessMap.DEFAULT;
+  private NormalMap normalMap;
 
   public Texture() {
     this(ImageLoader.missingImage);
@@ -1548,7 +1562,7 @@ public class Texture {
     image = newImage;
 
     // Gamma correct the texture.
-    avgColorLinear = new float[] {0, 0, 0, 0};
+    avgColorLinear = new float[]{0, 0, 0, 0};
 
     int[] data = image.data;
     width = image.width;
@@ -1583,6 +1597,46 @@ public class Texture {
         FastMath.pow(avgColorLinear[2], 1 / Scene.DEFAULT_GAMMA), avgColorLinear[3]);
   }
 
+  public void setEmissionMap(EmissionMap emissionMap) {
+    this.emissionMap = emissionMap;
+  }
+
+  public double getEmittanceAt(double u, double v) {
+    return emissionMap.getEmittanceAt(u, v);
+  }
+
+  public void setReflectanceMap(ReflectanceMap reflectanceMap) {
+    this.reflectanceMap = reflectanceMap;
+  }
+
+  public double getReflectanceAt(double u, double v) {
+    return reflectanceMap.getReflectanceAt(u, v);
+  }
+
+  public void setRoughnessMap(RoughnessMap roughnessMap) {
+    this.roughnessMap = roughnessMap;
+  }
+
+  public double getRoughnessAt(double u, double v) {
+    return roughnessMap.getRoughnessAt(u, v);
+  }
+
+  public void setMetalnessMap(MetalnessMap metalnessMap) {
+    this.metalnessMap = metalnessMap;
+  }
+
+  public float getMetalnessAt(double u, double v) {
+    return metalnessMap.getMetalnessAt(u, v);
+  }
+
+  public NormalMap getNormalMap() {
+    return normalMap;
+  }
+
+  public void setNormalMap(NormalMap normalMap) {
+    this.normalMap = normalMap;
+  }
+
   /**
    * Get linear color values.
    */
@@ -1597,6 +1651,14 @@ public class Texture {
    */
   public void getColor(Ray ray) {
     getColor(ray.u, ray.v, ray.color);
+    if (ray.getCurrentMaterial().emittance > 0) {
+      ray.emittanceValue = getEmittanceAt(ray.u, ray.v);
+    }
+    if (ray.getCurrentMaterial().specular > 0 || ray.getCurrentMaterial().metalness > 0) {
+      ray.reflectanceValue = getReflectanceAt(ray.u, ray.v);
+      ray.roughnessValue = getRoughnessAt(ray.u, ray.v);
+      ray.metalnessValue = getMetalnessAt(ray.u, ray.v);
+    }
   }
 
   /**
@@ -1614,10 +1676,11 @@ public class Texture {
    * @return color
    */
   public float[] getColor(int x, int y) {
-    if(useAverageColor)
+    if(useAverageColor) {
       return avgColorFlat;
+    }
     float[] result = new float[4];
-    ColorUtil.getRGBAComponentsGammaCorrected(image.data[width*y + x], result);
+    ColorUtil.getRGBAComponentsGammaCorrected(image.data[width * y + x], result);
     return result;
   }
 
@@ -1625,7 +1688,6 @@ public class Texture {
    * Get bilinear interpolated color value.
    */
   public void getColorInterpolated(double u, double v, Vector4 c) {
-
     double x = u * (width - 1);
     double y = (1 - v) * (height - 1);
     double weight;
@@ -1709,7 +1771,9 @@ public class Texture {
     return fxImage;
   }
 
-  /** Access the raw image data for this texture. */
+  /**
+   * Access the raw image data for this texture.
+   */
   public int[] getData() {
     return image.data;
   }
@@ -1720,5 +1784,14 @@ public class Texture {
 
   public static void setUseAverageColor(boolean useAverageColor) {
     Texture.useAverageColor = useAverageColor;
+  }
+
+  public void reset() {
+    setTexture(ImageLoader.missingImage);
+    setEmissionMap(EmissionMap.DEFAULT);
+    setReflectanceMap(ReflectanceMap.DEFAULT);
+    setRoughnessMap(RoughnessMap.DEFAULT);
+    setMetalnessMap(MetalnessMap.DEFAULT);
+    setNormalMap(null);
   }
 }

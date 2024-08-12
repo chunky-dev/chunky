@@ -20,6 +20,7 @@ package se.llbit.chunky.resources.texturepack;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.pbr.EmissionMap;
 import se.llbit.math.ColorUtil;
 import se.llbit.resources.ImageLoader;
 
@@ -68,5 +69,10 @@ public class ColoredTexture extends TextureLoader {
 
   @Override public String toString() {
     return String.format("{texture: %s, color: %s}", textureName, Arrays.toString(color));
+  }
+
+  @Override
+  public void reset() {
+    texture.reset();
   }
 }

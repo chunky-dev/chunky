@@ -56,4 +56,11 @@ public class AllTextures extends TextureLoader {
   protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
     throw new UnsupportedOperationException("Call load(ZipFile) instead!");
   }
+
+  @Override
+  public void reset() {
+    for (TextureLoader alternative : textures) {
+      alternative.reset();
+    }
+  }
 }

@@ -27,16 +27,14 @@ import java.io.InputStream;
 import java.util.Optional;
 
 /**
- * This class loads textures from a Minecraft resource pack.
- * Subclasses of this class are used for loading different kinds of
- * textures, e.g. entity textures, simple textures, chest textures etc.
+ * This class loads textures from a Minecraft resource pack. Subclasses of this class are used for
+ * loading different kinds of textures, e.g. entity textures, simple textures, chest textures etc.
  *
  * <p>Some textures need special processing to load, especially when
- * different texture formats are used in different Minecraft versions.
- * For example, block textures used to be stored in a texture atlas but now
- * are stored in separate files. We first try to load the texture from the
- * newest location, then try the texture atlas. Sometimes textures have
- * been renamed multiple times, and we try to load from several different files.
+ * different texture formats are used in different Minecraft versions. For example, block textures
+ * used to be stored in a texture atlas but now are stored in separate files. We first try to load
+ * the texture from the newest location, then try the texture atlas. Sometimes textures have been
+ * renamed multiple times, and we try to load from several different files.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
@@ -113,4 +111,12 @@ public abstract class TextureLoader {
   }
 
   protected abstract boolean load(InputStream imageStream) throws IOException, TextureFormatError;
+
+  /**
+   * Reset this texture.
+   *
+   * <p>This is used to get consistent and predictable results when switching
+   * resourcepacks.
+   */
+  public abstract void reset();
 }

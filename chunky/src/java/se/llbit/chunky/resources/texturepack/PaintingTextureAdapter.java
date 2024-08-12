@@ -74,6 +74,11 @@ public class PaintingTextureAdapter extends TextureLoader {
     return false;
   }
 
+  @Override
+  public void reset() {
+    // the painting textures are reset by the corresponding PaintingTexture loaders
+  }
+
   private static class PaintingsAtlas extends Texture {
 
     public BitmapImage getPainting(int px0, int px1, int py0, int py1) {

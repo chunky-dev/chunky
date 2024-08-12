@@ -4,6 +4,7 @@ import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.pbr.NormalMap;
 import se.llbit.chunky.world.Material;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
@@ -74,7 +75,24 @@ public abstract class Block extends Material {
     if (block.intersect(ray)) {
       float[] color = texture.getColor(ray.u, ray.v);
       if (color[3] > Ray.EPSILON) {
+        if (ray.getNormal().y > 0) {
+          NormalMap.apply(ray, NormalMap.tbnCubeTop, texture);
+        } else if (ray.getNormal().y < 0) {
+          NormalMap.apply(ray, NormalMap.tbnCubeBottom, texture);
+        } else if (ray.getNormal().x > 0) {
+          NormalMap.apply(ray, NormalMap.tbnCubeEast, texture);
+        } else if (ray.getNormal().x < 0) {
+          NormalMap.apply(ray, NormalMap.tbnCubeWest, texture);
+        } else if (ray.getNormal().z > 0) {
+          NormalMap.apply(ray, NormalMap.tbnCubeSouth, texture);
+        } else if (ray.getNormal().z < 0) {
+          NormalMap.apply(ray, NormalMap.tbnCubeNorth, texture);
+        }
         ray.color.set(color);
+        ray.emittanceValue = texture.getEmittanceAt(ray.u, ray.v);
+        ray.reflectanceValue = texture.getReflectanceAt(ray.u, ray.v);
+        ray.roughnessValue = texture.getRoughnessAt(ray.u, ray.v);
+        ray.metalnessValue = texture.getMetalnessAt(ray.u, ray.v);
         ray.distance += ray.tNext;
         ray.o.scaleAdd(ray.tNext, ray.d);
         return true;

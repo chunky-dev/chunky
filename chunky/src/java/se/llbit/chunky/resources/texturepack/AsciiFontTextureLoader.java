@@ -54,4 +54,8 @@ public class AsciiFontTextureLoader extends TextureLoader {
 
     Texture.fonts.setGlyph(' ', new Glyph(new int[8], 0, 2, 8, 8, 7));
   }
+
+  @Override public void reset() {
+    Texture.fonts.clear();
+  }
 }

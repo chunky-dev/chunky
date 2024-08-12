@@ -54,4 +54,9 @@ public class RotatedTextureLoader extends TextureLoader {
   protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
     throw new TextureFormatError("Call simple texture sub-loader instead.");
   }
+
+  @Override
+  public void reset() {
+    texture.reset();
+  }
 }

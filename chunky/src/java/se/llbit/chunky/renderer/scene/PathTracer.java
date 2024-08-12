@@ -68,6 +68,10 @@ public class PathTracer implements RayTracer {
       if (!PreviewRayTracer.nextIntersection(scene, ray)) {
         if (ray.getPrevMaterial().isWater()) {
           ray.color.set(0, 0, 0, 1);
+          ray.emittanceValue = 0;
+          ray.reflectanceValue = 0;
+          ray.roughnessValue = 0;
+          ray.metalnessValue = 0;
           hit = true;
         } else if (ray.depth == 0) {
           // Direct sky hit.
@@ -102,7 +106,7 @@ public class PathTracer implements RayTracer {
         }
       }
 
-      float pSpecular = currentMat.specular;
+      float pSpecular = (float) (currentMat.specular * ray.reflectanceValue);
 
       double pDiffuse = scene.fancierTranslucency ? 1 - Math.pow(1 - ray.color.w, Math.max(ray.color.x, Math.max(ray.color.y, ray.color.z))) : ray.color.w;
       double pAbsorb = scene.fancierTranslucency ? 1 - (1 - ray.color.w)/(1 - pDiffuse + Ray.EPSILON) : ray.color.w;
@@ -129,7 +133,7 @@ public class PathTracer implements RayTracer {
       ray.depth += 1;
       Vector4 cumulativeColor = new Vector4(0, 0, 0, 0);
       Ray next = new Ray();
-      float pMetal = currentMat.metalness;
+      float pMetal = currentMat.metalness * ray.metalnessValue;
       // Reusing first rays - a simplified form of "branched path tracing" (what Blender used to call it before they implemented something fancier)
       // The initial rays cast into the scene are very similar between each sample, since they are almost entirely a function of the pixel coordinates
       // Because of that, casting those initial rays on every sample is redundant and can be skipped
@@ -168,6 +172,10 @@ public class PathTracer implements RayTracer {
     }
     if (!hit) {
       ray.color.set(0, 0, 0, 1);
+      ray.emittanceValue = 0;
+      ray.reflectanceValue = 0;
+      ray.roughnessValue = 0;
+      ray.metalnessValue = 0;
       if (firstReflection) {
         airDistance = ray.distance;
       }
@@ -228,12 +236,12 @@ public class PathTracer implements RayTracer {
     Vector3 emittance = new Vector3();
     Vector4 indirectEmitterColor = new Vector4(0, 0, 0, 0);
 
-    if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance > Ray.EPSILON) {
+    if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance * ray.emittanceValue > Ray.EPSILON) {
 
       // Quadratic emittance mapping, so a pixel that's 50% darker will emit only 25% as much light
       // This is arbitrary but gives pretty good results in most cases.
       emittance = new Vector3(ray.color.x * ray.color.x, ray.color.y * ray.color.y, ray.color.z * ray.color.z);
-      emittance.scale(currentMat.emittance * scene.emitterIntensity);
+      emittance.scale(currentMat.emittance * ray.emittanceValue * scene.emitterIntensity);
 
       hit = true;
     } else if (scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
@@ -512,6 +520,7 @@ public class PathTracer implements RayTracer {
         e /= Math.max(distance * distance, 1);
         e *= pos.block.surfaceArea(face);
         e *= emitterRay.getCurrentMaterial().emittance;
+        e *= emitterRay.emittanceValue;
         e *= scene.emitterIntensity;
         e *= scaler;
 

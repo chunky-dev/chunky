@@ -23,6 +23,7 @@ import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.pbr.NormalMap;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -117,6 +118,9 @@ public abstract class QuadModel implements BlockModel {
 
     float[] color = null;
     Tint tint = Tint.NONE;
+    Quad hitQuad = null;
+    Texture hitTexture = null;
+
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
       if (quad.intersect(ray)) {
@@ -129,6 +133,9 @@ public abstract class QuadModel implements BlockModel {
             ray.orientNormal(quad.n);
           else
             ray.setNormal(quad.n);
+            
+          hitQuad = quad;
+          hitTexture = textures[i];
           hit = true;
         }
       }
@@ -143,11 +150,17 @@ public abstract class QuadModel implements BlockModel {
         return false;
       }
 
+      NormalMap.apply(ray, hitQuad, hitTexture);
       ray.color.set(color);
       tint.tint(ray.color, ray, scene);
+      ray.emittanceValue = hitTexture.getEmittanceAt(ray.u, ray.v);
+      ray.reflectanceValue = hitTexture.getReflectanceAt(ray.u, ray.v);
+      ray.roughnessValue = hitTexture.getRoughnessAt(ray.u, ray.v);
+      ray.metalnessValue = hitTexture.getMetalnessAt(ray.u, ray.v);
       ray.distance += ray.t;
       ray.o.scaleAdd(ray.t, ray.d);
     }
+
     return hit;
   }
 
