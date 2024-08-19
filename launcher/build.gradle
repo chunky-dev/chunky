@@ -17,7 +17,7 @@ dependencies {
 java {
   toolchain {
     languageVersion = JavaLanguageVersion.of(8) // pinned to java 8 for backwards compatibility
-    vendor = JvmVendorSpec.AZUL // using azul as it's one of few jdks to include jfx and isn't oracle
+    vendor = JvmVendorSpec.AMAZON // using corretto as it's one of few jdks to include jfx (on windows+linux) and isn't oracle
   }
 }
 
