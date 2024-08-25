@@ -1463,7 +1463,7 @@ public class Texture {
   public static final Texture vaultFrontEjecting = new Texture();
   @TexturePath("assets/minecraft/textures/block/vault_side_off")
   public static final Texture vaultSideOff = new Texture();
-  @TexturePath("assets/minecraft/textures/block/vault_front_ejecting")
+  @TexturePath("assets/minecraft/textures/block/vault_side_on")
   public static final Texture vaultSideOn = new Texture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/flow_pottery_pattern")
   public static final Texture decoratedPotPatternFlow = new Texture();
