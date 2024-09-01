@@ -351,6 +351,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       if (unique) {
         cameras.getItems().add(newName);
         cameras.setValue(newName);
+        scene.saveCameraPreset(newName);
         break;
       } else {
         index += 1;
