@@ -20,13 +20,13 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.TerracottaModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class GlazedTerracotta extends AbstractModelBlock {
 
   private final String description;
 
-  public GlazedTerracotta(String name, Texture texture, String facingString) {
+  public GlazedTerracotta(String name, AbstractTexture texture, String facingString) {
     super(name, texture);
     this.description = "facing=" + facingString;
     int facing;

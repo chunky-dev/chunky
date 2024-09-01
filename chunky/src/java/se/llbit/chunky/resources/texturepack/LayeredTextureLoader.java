@@ -19,13 +19,12 @@ package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.log.Log;
 import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 
 /**
  * Loads two textures and overlays them on top of each other.
@@ -35,9 +34,9 @@ import java.nio.file.Path;
 public class LayeredTextureLoader extends TextureLoader {
   private final TextureLoader baseTexture;
   private final String textureName;
-  private final Texture texture;
+  private final BitmapTexture texture;
 
-  public LayeredTextureLoader(String file, Texture texture,
+  public LayeredTextureLoader(String file, BitmapTexture texture,
                               TextureLoader baseTextureLoader) {
     this.textureName = file;
     this.texture = texture;

@@ -21,14 +21,14 @@ package se.llbit.chunky.block.minecraft;
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.model.minecraft.FenceGateModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class FenceGate extends AbstractModelBlock {
   private final BlockFace facing;
   private final String description;
 
-  public FenceGate(String name, Texture texture, String facingString, boolean inWall,
-      boolean open) {
+  public FenceGate(String name, AbstractTexture texture, String facingString, boolean inWall,
+                   boolean open) {
     super(name, texture);
     this.description = String.format("facing=%s, in_wall=%s, open=%s",
         facingString, inWall, open);

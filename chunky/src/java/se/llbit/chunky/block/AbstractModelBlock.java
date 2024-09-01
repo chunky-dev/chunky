@@ -3,7 +3,7 @@ package se.llbit.chunky.block;
 import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
@@ -14,7 +14,7 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
 
   protected BlockModel model;
 
-  public AbstractModelBlock(String name, Texture texture) {
+  public AbstractModelBlock(String name, AbstractTexture texture) {
     super(name, texture);
     localIntersect = true;
     opaque = false;

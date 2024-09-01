@@ -21,13 +21,14 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class PitcherPlantTopModel extends QuadModel {
-  private static final Texture top = Texture.pitcherCropTopStage4;
-  private static final Texture[] textures = new Texture[]{
+  private static final AbstractTexture top = Texture.pitcherCropTopStage4;
+  private static final AbstractTexture[] textures = new AbstractTexture[]{
     top, top, top, top, top, top, top, top, top, top, top, top
   };
 
@@ -112,7 +113,7 @@ public class PitcherPlantTopModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

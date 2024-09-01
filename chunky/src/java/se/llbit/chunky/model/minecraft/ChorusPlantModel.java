@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.*;
 
 import java.util.ArrayList;
@@ -84,7 +85,7 @@ public class ChorusPlantModel extends QuadModel {
   }
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public ChorusPlantModel(
       boolean north, boolean south, boolean east, boolean west,
@@ -121,7 +122,7 @@ public class ChorusPlantModel extends QuadModel {
       Collections.addAll(quads, noside[5]);
     }
     this.quads = quads.toArray(new Quad[0]);
-    this.textures = new Texture[this.quads.length];
+    this.textures = new AbstractTexture[this.quads.length];
     Arrays.fill(this.textures, Texture.chorusPlant);
   }
 
@@ -131,7 +132,7 @@ public class ChorusPlantModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

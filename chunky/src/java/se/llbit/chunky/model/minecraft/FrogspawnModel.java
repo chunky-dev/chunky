@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -30,7 +31,7 @@ public class FrogspawnModel extends QuadModel {
       new Vector3(0, 0.25 / 16, 1), new Vector4(0, 1, 1, 0), true),
   };
 
-  private static final Texture[] textures = {
+  private static final AbstractTexture[] textures = {
     Texture.frogspawn
   };
 
@@ -40,7 +41,7 @@ public class FrogspawnModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

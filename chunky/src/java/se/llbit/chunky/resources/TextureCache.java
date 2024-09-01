@@ -16,6 +16,8 @@
  */
 package se.llbit.chunky.resources;
 
+import se.llbit.chunky.resources.texture.BitmapTexture;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -25,13 +27,13 @@ import java.util.WeakHashMap;
  */
 public class TextureCache {
 
-  private static Map<Object, Texture> map = Collections.synchronizedMap(new WeakHashMap<>());
+  private static Map<Object, BitmapTexture> map = Collections.synchronizedMap(new WeakHashMap<>());
 
-  public static Texture get(Object key) {
+  public static BitmapTexture get(Object key) {
     return map.get(key);
   }
 
-  public static Texture put(Object key, Texture texture) {
+  public static BitmapTexture put(Object key, BitmapTexture texture) {
     return map.put(key, texture);
   }
 

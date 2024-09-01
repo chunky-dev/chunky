@@ -23,6 +23,8 @@ import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.*;
 import se.llbit.chunky.resources.PlayerTexture.ExtendedUVMap;
+import se.llbit.chunky.resources.texture.AbstractTexture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.chunky.resources.texturepack.*;
 import se.llbit.chunky.world.PlayerEntityData;
 import se.llbit.chunky.world.material.TextureMaterial;
@@ -628,56 +630,56 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
                                Transform baseTransform) {
     for (int i = 0; i < model.quads.length; ++i) {
       Quad quad = model.quads[i];
-      Texture texture = model.textures[i];
+      AbstractTexture texture = model.textures[i];
       quad.addTriangles(primitives, new TextureMaterial(texture), baseTransform);
     }
   }
 
   static CubeModel getChestModel(JsonObject item) {
     JsonObject json = parseJson(chestJson);
-    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    Map<String, AbstractTexture> textureMap = Collections.singletonMap("#texture", getTexture(item));
     return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
   private static CubeModel getLeggingsModel(JsonObject item) {
     JsonObject json = parseJson(leggingsJson);
-    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    Map<String, AbstractTexture> textureMap = Collections.singletonMap("#texture", getTexture(item));
     return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
   static CubeModel getLeftPauldron(JsonObject item) {
     JsonObject json = parseJson(leftPauldron);
-    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    Map<String, AbstractTexture> textureMap = Collections.singletonMap("#texture", getTexture(item));
     return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
   static CubeModel getRightPauldron(JsonObject item) {
     JsonObject json = parseJson(rightPauldron);
-    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    Map<String, AbstractTexture> textureMap = Collections.singletonMap("#texture", getTexture(item));
     return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
   private static CubeModel getLeftLeg(JsonObject item) {
     JsonObject json = parseJson(leftLeg);
-    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    Map<String, AbstractTexture> textureMap = Collections.singletonMap("#texture", getTexture(item));
     return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
   private static CubeModel getRightLeg(JsonObject item) {
     JsonObject json = parseJson(rightLeg);
-    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    Map<String, AbstractTexture> textureMap = Collections.singletonMap("#texture", getTexture(item));
     return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
   private static CubeModel getLeftBoot(JsonObject item) {
     JsonObject json = parseJson(leftBoot);
-    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    Map<String, AbstractTexture> textureMap = Collections.singletonMap("#texture", getTexture(item));
     return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
   private static CubeModel getRightBoot(JsonObject item) {
     JsonObject json = parseJson(rightBoot);
-    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    Map<String, AbstractTexture> textureMap = Collections.singletonMap("#texture", getTexture(item));
     return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
@@ -725,7 +727,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         json = parseJson(skullJson);
         break;
     }
-    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    Map<String, AbstractTexture> textureMap = Collections.singletonMap("#texture", getTexture(item));
     return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
@@ -755,12 +757,12 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     return json;
   }
 
-  static Texture getTexture(JsonObject item) {
+  static BitmapTexture getTexture(JsonObject item) {
     String id = item.get("id").asString("");
     if (TextureCache.containsKey(item)) {
       return TextureCache.get(item);
     }
-    Texture texture = new Texture();
+    BitmapTexture texture = new BitmapTexture();
     String textureId = id; // Texture ID is used for log messages.
     if (id.startsWith("minecraft:")) {
       TextureLoader loader = null;
@@ -895,11 +897,11 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     return texture;
   }
 
-  private static TextureLoader simpleTexture(String id, Texture texture) {
+  private static TextureLoader simpleTexture(String id, BitmapTexture texture) {
     return new SimpleTexture("assets/minecraft/textures/" + id, texture);
   }
 
-  private static TextureLoader leatherTexture(String id, int color, Texture texture) {
+  private static TextureLoader leatherTexture(String id, int color, BitmapTexture texture) {
     String textureName = "assets/minecraft/textures/" + id;
     return new LayeredTextureLoader(textureName + "_overlay", texture,
       new ColoredTexture(textureName, color, texture));

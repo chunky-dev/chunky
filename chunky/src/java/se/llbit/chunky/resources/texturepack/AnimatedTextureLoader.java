@@ -18,12 +18,11 @@ package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AnimatedTexture;
 import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 
 /**
  * Animated texture loader.
@@ -33,9 +32,9 @@ import java.nio.file.Path;
 public class AnimatedTextureLoader extends TextureLoader {
 
   private final String file;
-  protected Texture texture;
+  protected AnimatedTexture texture;
 
-  public AnimatedTextureLoader(String file, Texture texture) {
+  public AnimatedTextureLoader(String file, AnimatedTexture texture) {
     this.file = file;
     this.texture = texture;
   }

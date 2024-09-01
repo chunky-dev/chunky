@@ -19,7 +19,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -54,10 +54,10 @@ public class ButtonModel extends QuadModel {
   };
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
-  public ButtonModel(String face, String facing, Texture tex) {
-    textures = new Texture[attachedSouth.length];
+  public ButtonModel(String face, String facing, AbstractTexture tex) {
+    textures = new AbstractTexture[attachedSouth.length];
     Arrays.fill(textures, tex);
 
     switch (face) {
@@ -93,7 +93,7 @@ public class ButtonModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

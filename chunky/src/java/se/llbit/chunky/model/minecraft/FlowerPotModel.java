@@ -21,6 +21,8 @@ import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -71,21 +73,21 @@ public class FlowerPotModel extends QuadModel {
     CHERRY_SAPLING
   }
 
-  private static final Texture flowerpot = Texture.flowerPot;
-  private static final Texture dirt = Texture.dirt;
-  private static final Texture[] flowerPotTex = new Texture[]{
+  private static final BitmapTexture flowerpot = Texture.flowerPot;
+  private static final BitmapTexture dirt = Texture.dirt;
+  private static final BitmapTexture[] flowerPotTex = new BitmapTexture[]{
     flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot,
     flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot, flowerpot,
     dirt, flowerpot
   };
 
-  private static final Texture cactus_top = Texture.cactusTop;
-  private static final Texture cactus = Texture.cactusSide;
-  private static final Texture[] cactusTex = new Texture[]{
+  private static final BitmapTexture cactus_top = Texture.cactusTop;
+  private static final BitmapTexture cactus = Texture.cactusSide;
+  private static final BitmapTexture[] cactusTex = new BitmapTexture[]{
     cactus_top, cactus, cactus, cactus, cactus
   };
 
-  private static final Texture[] azaleaBushTex = {
+  private static final BitmapTexture[] azaleaBushTex = {
     Texture.pottedAzaleaBushTop, Texture.pottedAzaleaBushTop,
     Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
     Texture.pottedAzaleaBushSide, Texture.pottedAzaleaBushSide,
@@ -95,7 +97,7 @@ public class FlowerPotModel extends QuadModel {
     Texture.pottedAzaleaBushPlant, Texture.pottedAzaleaBushPlant
   };
 
-  private static final Texture[] floweringAzaleaBushTex = {
+  private static final BitmapTexture[] floweringAzaleaBushTex = {
     Texture.pottedFloweringAzaleaBushTop, Texture.pottedFloweringAzaleaBushTop,
     Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
     Texture.pottedFloweringAzaleaBushSide, Texture.pottedFloweringAzaleaBushSide,
@@ -476,7 +478,7 @@ public class FlowerPotModel extends QuadModel {
   //endregion
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
   private final Tint[] tints;
 
   public FlowerPotModel(Kind kind) {
@@ -488,14 +490,14 @@ public class FlowerPotModel extends QuadModel {
         break;
       case CACTUS:
         quads = Model.join(flowerPot, cactusQuads);
-        textures = new Texture[flowerPotTex.length + cactusTex.length];
+        textures = new AbstractTexture[flowerPotTex.length + cactusTex.length];
         tints = null;
         System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
         System.arraycopy(cactusTex, 0, textures, flowerPotTex.length, cactusTex.length);
         break;
       case FERN:
         quads = Model.join(flowerPot, flowerSmall);
-        textures = new Texture[flowerPotTex.length + flowerSmall.length];
+        textures = new AbstractTexture[flowerPotTex.length + flowerSmall.length];
         tints = new Tint[flowerPotTex.length + flowerSmall.length];
         System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
         Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.fern);
@@ -504,7 +506,7 @@ public class FlowerPotModel extends QuadModel {
         break;
       case BAMBOO:
         quads = Model.join(flowerPot, bamboo, bambooLeaf);
-        textures = new Texture[flowerPotTex.length + bamboo.length + bambooLeaf.length];
+        textures = new AbstractTexture[flowerPotTex.length + bamboo.length + bambooLeaf.length];
         tints = null;
         System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
         Arrays.fill(textures, flowerPotTex.length, flowerPotTex.length + bamboo.length, Texture.bambooStalk);
@@ -513,7 +515,7 @@ public class FlowerPotModel extends QuadModel {
       case AZALEA_BUSH:
       case FLOWERING_AZALEA_BUSH:
         quads = Model.join(flowerPot, azaleaBush);
-        textures = new Texture[flowerPotTex.length + azaleaBush.length];
+        textures = new AbstractTexture[flowerPotTex.length + azaleaBush.length];
         tints = null;
         System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
         System.arraycopy(kind == Kind.AZALEA_BUSH ? azaleaBushTex : floweringAzaleaBushTex, 0, textures,
@@ -521,14 +523,14 @@ public class FlowerPotModel extends QuadModel {
         break;
       case MANGROVE_PROPAGULE:
         quads = Model.join(flowerPot, mangrovePropagule);
-        textures = new Texture[flowerPotTex.length + mangrovePropagule.length];
+        textures = new AbstractTexture[flowerPotTex.length + mangrovePropagule.length];
         tints = null;
         System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
         Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.mangrovePropagule);
         break;
       default:
         quads = Model.join(flowerPot, flowerSmall);
-        textures = new Texture[flowerPotTex.length + flowerSmall.length];
+        textures = new AbstractTexture[flowerPotTex.length + flowerSmall.length];
         tints = null;
         System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
         switch (kind) {
@@ -627,7 +629,7 @@ public class FlowerPotModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 

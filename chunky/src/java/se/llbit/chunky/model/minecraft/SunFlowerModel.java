@@ -19,6 +19,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -38,7 +39,7 @@ public class SunFlowerModel extends QuadModel {
           new Vector4(0, 1, 0, 1)),
   };
 
-  private final static Texture[] bottomTex = {
+  private final static AbstractTexture[] bottomTex = {
       Texture.sunflowerBottom, Texture.sunflowerBottom, Texture.sunflowerBottom, Texture.sunflowerBottom
   };
 
@@ -64,13 +65,13 @@ public class SunFlowerModel extends QuadModel {
           new Vector4(2 / 16., 14 / 16., 2 / 16., 14 / 16.)),
   };
 
-  private final static Texture[] topTex = {
+  private final static AbstractTexture[] topTex = {
       Texture.sunflowerTop, Texture.sunflowerTop, Texture.sunflowerTop, Texture.sunflowerTop,
       Texture.sunflowerFront, Texture.sunflowerBack
   };
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public SunFlowerModel(boolean isTop) {
     quads = isTop ? top : bottom;
@@ -83,7 +84,7 @@ public class SunFlowerModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

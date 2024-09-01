@@ -20,11 +20,11 @@ package se.llbit.chunky.resources.texturepack;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 
 /**
  * Texture loader for the 1.14+ painting back texture.
@@ -37,9 +37,9 @@ import java.nio.file.Path;
 public class PaintingBackTexture extends TextureLoader {
 
   public final String file;
-  protected Texture texture;
+  protected BitmapTexture texture;
 
-  public PaintingBackTexture(String file, Texture texture) {
+  public PaintingBackTexture(String file, BitmapTexture texture) {
     this.file = file;
     this.texture = texture;
   }

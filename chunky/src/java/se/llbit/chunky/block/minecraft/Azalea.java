@@ -20,11 +20,11 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.AzaleaModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class Azalea extends AbstractModelBlock {
 
-  public Azalea(String name, Texture top, Texture side) {
+  public Azalea(String name, AbstractTexture top, AbstractTexture side) {
     super(name, top);
     solid = false;
     model = new AzaleaModel(top, side);

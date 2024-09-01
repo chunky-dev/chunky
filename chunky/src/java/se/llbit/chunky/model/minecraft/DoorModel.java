@@ -19,7 +19,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -100,11 +100,11 @@ public class DoorModel extends QuadModel {
   }
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
-  public DoorModel(Texture texture, int mirror, int facing) {
+  public DoorModel(AbstractTexture texture, int mirror, int facing) {
     quads = rot[mirror][facing];
-    textures = new Texture[quads.length];
+    textures = new AbstractTexture[quads.length];
     Arrays.fill(textures, texture);
   }
 
@@ -114,7 +114,7 @@ public class DoorModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

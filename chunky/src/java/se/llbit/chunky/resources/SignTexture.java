@@ -17,13 +17,15 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.entity.SignEntity.Color;
+import se.llbit.chunky.resources.texture.AbstractTexture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.chunky.resources.texturepack.FontTexture.Glyph;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Ray;
 import se.llbit.util.annotation.Nullable;
 
-public class SignTexture extends Texture {
+public class SignTexture extends BitmapTexture {
   /**
    * We use this for the glow dye color to not require more memory (color palette only has 16 colors, the dye color is a 17th color).
    * If the text mask is false but the color is set to this value, we use the glow dye color (the bright one).
@@ -38,7 +40,7 @@ public class SignTexture extends Texture {
   private final double hh, ww, u0, v0;
   private final Color dyeColor;
   private final boolean isGlowing;
-  private final Texture signTexture;
+  private final AbstractTexture signTexture;
   @Nullable
   private final PalettizedBitmapImage textColor;
   @Nullable
@@ -53,7 +55,7 @@ public class SignTexture extends Texture {
     return false;
   }
 
-  public SignTexture(JsonArray[] text, Color dyeColor, boolean isGlowing, Texture signTexture, int signWidth, int signHeight, double x0, double y0, double x1, double y1, double fontSize, int ymargin, int lineHeight) {
+  public SignTexture(JsonArray[] text, Color dyeColor, boolean isGlowing, AbstractTexture signTexture, int signWidth, int signHeight, double x0, double y0, double x1, double y1, double fontSize, int ymargin, int lineHeight) {
     this.dyeColor = dyeColor;
     this.signTexture = signTexture;
     this.isGlowing = isGlowing;

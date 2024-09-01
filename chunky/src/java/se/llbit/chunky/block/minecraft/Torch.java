@@ -20,14 +20,14 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.TorchModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 /**
  * A standing torch (on ground).
  */
 public class Torch extends AbstractModelBlock {
 
-  public Torch(String name, Texture texture) {
+  public Torch(String name, AbstractTexture texture) {
     super(name, texture);
     solid = false;
     model = new TorchModel(texture, 5);

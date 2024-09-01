@@ -19,7 +19,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -51,17 +51,17 @@ public class SpriteModel extends QuadModel {
     orientedQuads[5] = Model.rotateY(orientedQuads[3]);
   }
 
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
   private final int facing;
 
-  public SpriteModel(Texture texture, String facing) {
-    this.textures = new Texture[]{
+  public SpriteModel(AbstractTexture texture, String facing) {
+    this.textures = new AbstractTexture[]{
         texture, texture, texture, texture
     };
     this.facing = getOrientationIndex(facing);
   }
 
-  public SpriteModel(Texture texture) {
+  public SpriteModel(AbstractTexture texture) {
     this(texture, "up");
   }
 
@@ -71,11 +71,11 @@ public class SpriteModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 
-  public static boolean intersect(Ray ray, Texture material) {
+  public static boolean intersect(Ray ray, AbstractTexture material) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     for (Quad quad : quads) {
@@ -99,7 +99,7 @@ public class SpriteModel extends QuadModel {
     return hit;
   }
 
-  public static boolean intersect(Ray ray, Texture material, String facing) {
+  public static boolean intersect(Ray ray, AbstractTexture material, String facing) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     for (Quad quad : orientedQuads[getOrientationIndex(facing)]) {

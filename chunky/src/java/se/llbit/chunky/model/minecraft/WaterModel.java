@@ -18,6 +18,7 @@
 package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -83,7 +84,7 @@ public class WaterModel {
 
   static {
     // precompute normal map
-    Texture waterHeight = new Texture("water-height");
+    BitmapTexture waterHeight = new BitmapTexture("water-height");
     normalMapW = waterHeight.getWidth();
     normalMap = new float[normalMapW*normalMapW*2];
     for (int u = 0; u < normalMapW; ++u) {
@@ -184,7 +185,7 @@ public class WaterModel {
       boolean hit = false;
       for (Quad quad : fullBlock) {
         if (quad.intersect(ray)) {
-          Texture.water.getAvgColorLinear(ray.color);
+          ray.color.set(Texture.water.getAvgColorLinear());
           ray.t = ray.tNext;
           ray.orientNormal(quad.n);
           hit = true;
@@ -279,7 +280,7 @@ public class WaterModel {
       hit = true;
     }
     if (hit) {
-      Texture.water.getAvgColorLinear(ray.color);
+      ray.color.set(Texture.water.getAvgColorLinear());
       ray.distance += ray.t;
       ray.o.scaleAdd(ray.t, ray.d);
     }
@@ -311,7 +312,7 @@ public class WaterModel {
       hit = true;
     }
     if (hit) {
-      Texture.water.getAvgColorLinear(ray.color);
+      ray.color.set(Texture.water.getAvgColorLinear());
       ray.distance += ray.t;
       ray.o.scaleAdd(ray.t, ray.d);
     }

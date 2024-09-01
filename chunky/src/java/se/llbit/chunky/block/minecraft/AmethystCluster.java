@@ -18,13 +18,13 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class AmethystCluster extends SpriteBlock {
 
   private final boolean lit;
 
-  public AmethystCluster(String name, Texture texture, String facing, boolean lit) {
+  public AmethystCluster(String name, AbstractTexture texture, String facing, boolean lit) {
     super(name, texture, facing);
     this.lit = lit;
   }

@@ -18,12 +18,11 @@ package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 
 public class SplitLargeChestTexture extends TextureLoader {
   public enum Part {
@@ -33,22 +32,22 @@ public class SplitLargeChestTexture extends TextureLoader {
 
   private final String file;
   private final Part part;
-  private final Texture left;
-  private final Texture top;
-  private final Texture right;
-  private final Texture bottom;
-  private final Texture front;
-  private final Texture back;
+  private final BitmapTexture left;
+  private final BitmapTexture top;
+  private final BitmapTexture right;
+  private final BitmapTexture bottom;
+  private final BitmapTexture front;
+  private final BitmapTexture back;
 
   public SplitLargeChestTexture(
           String file,
           Part part,
-          Texture top,
-          Texture bottom,
-          Texture left,
-          Texture right,
-          Texture front,
-          Texture back) {
+          BitmapTexture top,
+          BitmapTexture bottom,
+          BitmapTexture left,
+          BitmapTexture right,
+          BitmapTexture front,
+          BitmapTexture back) {
     this.file = file;
     this.part = part;
     this.top = top;

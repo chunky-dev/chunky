@@ -19,6 +19,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 
 /**
@@ -44,7 +45,7 @@ public class AnvilModel extends AABBModel {
       },
   };
 
-  public static final Texture[] topTexture = {
+  public static final AbstractTexture[] topTexture = {
       Texture.anvilTop,
       Texture.anvilTopDamaged1,
       Texture.anvilTopDamaged2,
@@ -52,15 +53,15 @@ public class AnvilModel extends AABBModel {
   };
 
   private final int orientation;
-  private final Texture[][] textures;
+  private final AbstractTexture[][] textures;
   private final UVMapping[][] mapping;
 
   public AnvilModel(int orientation, int damage) {
     this.orientation = orientation;
 
-    Texture side = Texture.anvilSide;
-    Texture top = topTexture[damage];
-    this.textures = new Texture[][] {
+    AbstractTexture side = Texture.anvilSide;
+    AbstractTexture top = topTexture[damage];
+    this.textures = new AbstractTexture[][] {
         {side, side, side, side, top, side},
         {side, side, side, side, side, side},
         {side, side, side, side, side, side},
@@ -90,7 +91,7 @@ public class AnvilModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     return this.textures;
   }
 }

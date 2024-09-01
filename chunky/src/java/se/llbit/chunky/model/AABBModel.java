@@ -2,13 +2,12 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
@@ -42,7 +41,7 @@ public abstract class AABBModel implements BlockModel {
   public abstract AABB[] getBoxes();
 
   @PluginApi
-  public abstract Texture[][] getTextures();
+  public abstract AbstractTexture[][] getTextures();
 
   @PluginApi
   public Tint[][] getTints() {
@@ -72,7 +71,7 @@ public abstract class AABBModel implements BlockModel {
   @Override
   public boolean intersect(Ray ray, Scene scene) {
     AABB[] boxes = getBoxes();
-    Texture[][] textures = getTextures();
+    AbstractTexture[][] textures = getTextures();
     UVMapping[][] mapping = getUVMapping();
     Tint[][] tintedFaces = getTints();
 
@@ -141,7 +140,7 @@ public abstract class AABBModel implements BlockModel {
     return hit;
   }
 
-  private boolean intersectFace(Ray ray, Scene scene, Texture texture, UVMapping mapping) {
+  private boolean intersectFace(Ray ray, Scene scene, AbstractTexture texture, UVMapping mapping) {
     // This is the method that handles intersecting faces of all AABB-based models.
     // Do normal mapping, parallax occlusion mapping, specular maps and all the good stuff here!
 

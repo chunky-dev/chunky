@@ -19,7 +19,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -193,13 +193,13 @@ public class BedModel extends QuadModel {
    };
   //endregion
 
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
   private final Quad[] quads;
 
-  public BedModel(boolean isHead, int facing, Texture color) {
+  public BedModel(boolean isHead, int facing, AbstractTexture color) {
     quads = Model.rotateY(isHead ? head : foot, -Math.toRadians(90 * facing));
 
-    textures = new Texture[quads.length];
+    textures = new AbstractTexture[quads.length];
     Arrays.fill(textures, color);
   }
 
@@ -209,7 +209,7 @@ public class BedModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

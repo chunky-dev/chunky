@@ -21,14 +21,15 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.*;
 
 public class ComposterModel extends QuadModel {
-  private static final Texture top = Texture.composterTop;
-  private static final Texture bottom = Texture.composterBottom;
-  private static final Texture side = Texture.composterSide;
-  private static final Texture inside = Texture.composterBottom;
-  private static final Texture[] composterTex = new Texture[] {
+  private static final AbstractTexture top = Texture.composterTop;
+  private static final AbstractTexture bottom = Texture.composterBottom;
+  private static final AbstractTexture side = Texture.composterSide;
+  private static final AbstractTexture inside = Texture.composterBottom;
+  private static final AbstractTexture[] composterTex = new AbstractTexture[] {
       inside, bottom, top, side, side, side, side, top, side, side, side, side, top, side, side, top, side, side
   };
 
@@ -146,7 +147,7 @@ public class ComposterModel extends QuadModel {
   //endregion
 
 
-  private static final Texture[] contentTex = new Texture[] {
+  private static final AbstractTexture[] contentTex = new AbstractTexture[] {
       null, Texture.composterCompost, Texture.composterCompost, Texture.composterCompost, Texture.composterCompost,
       Texture.composterCompost, Texture.composterCompost, Texture.composterCompost, Texture.composterReady
   };
@@ -206,7 +207,7 @@ public class ComposterModel extends QuadModel {
   //endregion
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public ComposterModel(int level) {
     if (level == 0) {
@@ -214,7 +215,7 @@ public class ComposterModel extends QuadModel {
       textures = composterTex;
     } else {
       quads = Model.join(composter, new Quad[] {content[level]});
-      textures = new Texture[quads.length];
+      textures = new AbstractTexture[quads.length];
       System.arraycopy(composterTex, 0, textures, 0, composterTex.length);
       textures[composterTex.length] =  contentTex[level];
     }
@@ -226,7 +227,7 @@ public class ComposterModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

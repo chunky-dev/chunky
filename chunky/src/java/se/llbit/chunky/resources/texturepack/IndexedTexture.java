@@ -18,11 +18,10 @@ package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 
 /**
  * A texture indexed by position in Minecraft's old terrain.png.
@@ -35,13 +34,13 @@ import java.nio.file.Path;
 public class IndexedTexture extends TextureLoader {
 
   private final int index;
-  private final Texture texture;
+  private final BitmapTexture texture;
 
   /**
    * @param index   Index of the texture in the terrain file
    * @param texture The loaded image is written to this texture
    */
-  public IndexedTexture(int index, Texture texture) {
+  public IndexedTexture(int index, BitmapTexture texture) {
     this.index = index;
     this.texture = texture;
   }

@@ -28,6 +28,7 @@ import java.util.Arrays;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -388,11 +389,11 @@ public class TripwireModel extends QuadModel {
   }
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public TripwireModel(int connections) {
     quads = model[connections];
-    textures = new Texture[quads.length];
+    textures = new AbstractTexture[quads.length];
     Arrays.fill(textures, Texture.tripwire);
   }
 
@@ -402,7 +403,7 @@ public class TripwireModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

@@ -19,11 +19,12 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 
 public class GrassPathModel extends AABBModel {
   private static final AABB[] boxes = { new AABB(0, 1, 0, 15 / 16., 0, 1) };
-  private static final Texture[][] textures = { {
+  private static final AbstractTexture[][] textures = { {
       Texture.grassPathSide, Texture.grassPathSide, Texture.grassPathSide, Texture.grassPathSide,
       Texture.grassPathTop, Texture.dirt
   } };
@@ -34,7 +35,7 @@ public class GrassPathModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     return textures;
   }
 }

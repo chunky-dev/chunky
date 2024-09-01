@@ -19,6 +19,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -49,7 +50,7 @@ public class CactusModel extends QuadModel {
       new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
           new Vector4(0, 1, 0, 1)),};
 
-  private static final Texture[] textures = {
+  private static final AbstractTexture[] textures = {
       Texture.cactusSide, Texture.cactusSide, Texture.cactusSide, Texture.cactusSide,
       Texture.cactusTop, Texture.cactusBottom
   };
@@ -61,7 +62,7 @@ public class CactusModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

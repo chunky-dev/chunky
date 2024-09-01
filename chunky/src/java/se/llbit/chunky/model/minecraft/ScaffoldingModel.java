@@ -20,15 +20,16 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class ScaffoldingModel extends QuadModel {
-  private static final Texture top = Texture.scaffoldingTop;
-  private static final Texture side = Texture.scaffoldingSide;
-  private static final Texture bottom = Texture.scaffoldingBottom;
-  private static final Texture[] textures = new Texture[] {
+  private static final AbstractTexture top = Texture.scaffoldingTop;
+  private static final AbstractTexture side = Texture.scaffoldingSide;
+  private static final AbstractTexture bottom = Texture.scaffoldingBottom;
+  private static final AbstractTexture[] textures = new AbstractTexture[] {
       top, top, bottom, side, side, side, side, bottom, side, side, side, side, bottom, side, side, side, side, bottom,
       side, side, side, side, bottom, side, side, bottom, side, side, bottom, side, side, bottom, side, side, top, top,
       bottom, side, side, bottom, side, side, bottom, side, side, bottom, side, side
@@ -340,7 +341,7 @@ public class ScaffoldingModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

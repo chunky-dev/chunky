@@ -3,6 +3,7 @@ package se.llbit.chunky.resources;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import se.llbit.chunky.entity.PaintingEntity;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
 import se.llbit.log.Log;
 import se.llbit.util.Pair;
@@ -35,7 +36,7 @@ public class ResourcePackPaintingLoader implements ResourcePackLoader.PackLoader
       if (!PaintingEntity.containsPainting(paintingVariant.getNamespacedName())) {
         try (Reader f = Files.newBufferedReader(paintingVariant.path())) {
           PaintingVariantJson json = GSON.fromJson(f, PaintingVariantJson.class);
-          Texture paintingTexture = new Texture();
+          BitmapTexture paintingTexture = new BitmapTexture();
           Pair<String, String> asset = json.getAsset();
           if (!ResourcePackLoader.loadResources(
             ResourcePackTextureLoader.singletonLoader(json.asset_id, new SimpleTexture("assets/" + asset.thing1 + "/textures/painting/" + asset.thing2, paintingTexture)))

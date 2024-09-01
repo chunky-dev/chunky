@@ -3,6 +3,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -92,15 +93,15 @@ public class VaultModel extends QuadModel {
   }
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public VaultModel(
     String facing, boolean ominous, String vaultState
   ) {
     quads = orientedQuads[getOrientationIndex(facing)];
-    Texture top = getTopTexture(ominous, vaultState);
-    Texture bottom = ominous ? Texture.vaultBottomOminous : Texture.vaultBottom;
-    Texture front, side;
+    AbstractTexture top = getTopTexture(ominous, vaultState);
+    AbstractTexture bottom = ominous ? Texture.vaultBottomOminous : Texture.vaultBottom;
+    AbstractTexture front, side;
     switch (vaultState) {
       case "ejecting":
       case "unlocking":
@@ -117,12 +118,12 @@ public class VaultModel extends QuadModel {
         side = ominous ? Texture.vaultSideOnOminous : Texture.vaultSideOn;
         break;
     }
-    textures = new Texture[]{
+    textures = new AbstractTexture[]{
       top, bottom, side, side, front, side, top, bottom, side, side, front, side
     };
   }
 
-  public static Texture getTopTexture(boolean ominous, String vaultState) {
+  public static AbstractTexture getTopTexture(boolean ominous, String vaultState) {
     switch (vaultState) {
       case "ejecting":
         return ominous ? Texture.vaultTopEjectingOminous : Texture.vaultTopEjecting;
@@ -154,7 +155,7 @@ public class VaultModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

@@ -21,6 +21,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -125,11 +126,11 @@ public class AzaleaModel extends QuadModel {
   );
   //endregion
 
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
-  public AzaleaModel(Texture top, Texture side) {
-    Texture plant = Texture.azaleaPlant;
-    textures = new Texture[14];
+  public AzaleaModel(AbstractTexture top, AbstractTexture side) {
+    AbstractTexture plant = Texture.azaleaPlant;
+    textures = new AbstractTexture[14];
     for (int i = 0; i < 2; i++) textures[i] = top;
     for (int i = 2; i < 10; i++) textures[i] = side;
     for (int i = 10; i < 14; i++) textures[i] = plant;
@@ -141,7 +142,7 @@ public class AzaleaModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

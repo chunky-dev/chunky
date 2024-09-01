@@ -1,6 +1,6 @@
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 
 /**
@@ -11,7 +11,7 @@ import se.llbit.math.Quad;
 public class FixedTopBottomRotatableTexturedBlockModel extends QuadModel {
 
   protected final Quad[] quads;
-  protected final Texture[] textures;
+  protected final AbstractTexture[] textures;
 
   /**
    * @param facing accepted values: "north", "south", "west", "east"
@@ -21,15 +21,15 @@ public class FixedTopBottomRotatableTexturedBlockModel extends QuadModel {
   public FixedTopBottomRotatableTexturedBlockModel(
     String facing,
     Quad[] quads,
-    Texture[] textures
+    AbstractTexture[] textures
   ) {
     this.quads = rotateToFacing(facing, quads);
     this.textures = textures;
   }
 
   public FixedTopBottomRotatableTexturedBlockModel(String facing,
-                                                   Texture north, Texture east, Texture south, Texture west, Texture top, Texture bottom) {
-    this(facing, FULL_BLOCK_QUADS, new Texture[]{north, south, west, east, top, bottom});
+                                                   AbstractTexture north, AbstractTexture east, AbstractTexture south, AbstractTexture west, AbstractTexture top, AbstractTexture bottom) {
+    this(facing, FULL_BLOCK_QUADS, new AbstractTexture[]{north, south, west, east, top, bottom});
   }
 
   public static Quad[] rotateToFacing(String facing, Quad[] quads) {
@@ -66,7 +66,7 @@ public class FixedTopBottomRotatableTexturedBlockModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

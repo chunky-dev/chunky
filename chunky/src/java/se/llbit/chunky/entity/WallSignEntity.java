@@ -19,7 +19,7 @@ package se.llbit.chunky.entity;
 
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -97,7 +97,7 @@ public class WallSignEntity extends Entity {
   private final boolean glowing;
   private final int orientation;
   private final SignTexture frontTexture;
-  private final Texture texture;
+  private final AbstractTexture texture;
   private final String material;
 
   public WallSignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
@@ -106,7 +106,7 @@ public class WallSignEntity extends Entity {
 
   public WallSignEntity(Vector3 position, JsonArray[] text, SignEntity.Color dye, boolean isGlowing, int direction, String material) {
     super(position);
-    Texture signTexture = SignEntity.textureFromMaterial(material);
+    AbstractTexture signTexture = SignEntity.textureFromMaterial(material);
     this.orientation = direction;
     this.text = text;
     this.dye = dye;
@@ -124,7 +124,7 @@ public class WallSignEntity extends Entity {
     Quad[] quads = faces[orientation];
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
-      Texture tex = texture;
+      AbstractTexture tex = texture;
       if (i == 0 && frontTexture != null) {
         tex = frontTexture;
         quad = frontFaceWithText[orientation];

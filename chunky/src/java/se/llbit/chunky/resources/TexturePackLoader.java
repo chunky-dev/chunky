@@ -18,6 +18,7 @@ package se.llbit.chunky.resources;
 
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.sky.Sun;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.chunky.resources.texturepack.*;
 
 import java.lang.reflect.Field;
@@ -3651,18 +3652,18 @@ public class TexturePackLoader {
     TexturePath path = textureField.getAnnotation(TexturePath.class);
     if (path != null) {
       try {
-        addSimpleTexture(path.value(), (Texture) textureField.get(Texture.class));
+        addSimpleTexture(path.value(), (BitmapTexture) textureField.get(BitmapTexture.class));
       } catch (IllegalAccessException e) {
         throw new RuntimeException("Could not get texture field for " + path.value(), e);
       }
     }
   }
 
-  private static void addSimpleTexture(String file, Texture texture) {
+  private static void addSimpleTexture(String file, BitmapTexture texture) {
     addSimpleTexture(file, file, texture);
   }
 
-  private static void addSimpleTexture(String name, String file, Texture texture) {
+  private static void addSimpleTexture(String name, String file, BitmapTexture texture) {
     ALL_TEXTURES.put(name, new SimpleTexture(file, texture));
   }
 }

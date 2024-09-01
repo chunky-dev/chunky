@@ -19,6 +19,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 
 /**
@@ -33,7 +34,7 @@ public class BeaconModel extends AABBModel {
       new AABB(2 / 16., 14 / 16., 0, 3 / 16., 2 / 16., 14 / 16.)
   };
 
-  private static final Texture[][] textures = {
+  private static final AbstractTexture[][] textures = {
       {Texture.glass, Texture.glass, Texture.glass, Texture.glass, Texture.glass, Texture.glass},
       {Texture.beacon, Texture.beacon, Texture.beacon, Texture.beacon, Texture.beacon, Texture.beacon},
       {Texture.obsidian, Texture.obsidian,Texture.obsidian,Texture.obsidian,Texture.obsidian,Texture.obsidian}
@@ -46,7 +47,7 @@ public class BeaconModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     return textures;
   }
 }

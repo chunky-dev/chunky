@@ -20,7 +20,7 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.TorchModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 /**
  * A torch attached to a wall.
@@ -28,7 +28,7 @@ import se.llbit.chunky.resources.Texture;
 public class WallTorch extends AbstractModelBlock {
   protected final String facing;
 
-  public WallTorch(String name, Texture texture, String facing) {
+  public WallTorch(String name, AbstractTexture texture, String facing) {
     super(name, texture);
     this.facing = facing;
     solid = false;

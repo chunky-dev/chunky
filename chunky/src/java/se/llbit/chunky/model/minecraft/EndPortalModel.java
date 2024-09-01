@@ -19,7 +19,8 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -31,12 +32,12 @@ public class EndPortalModel extends QuadModel {
       new Quad(new Vector3(1, .75, 0), new Vector3(0, .75, 0), new Vector3(1, .75, 1),
           new Vector4(1, 0, 0, 1), true)
   };
-  private static final Texture[] textures = new Texture[1];
+  private static final AbstractTexture[] textures = new AbstractTexture[1];
 
   static {
     BitmapImage black = new BitmapImage(16, 16);
     Arrays.fill(black.data, 0xFF000000);
-    textures[0] = new Texture(black);
+    textures[0] = new BitmapTexture(black);
   }
 
   @Override
@@ -45,7 +46,7 @@ public class EndPortalModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

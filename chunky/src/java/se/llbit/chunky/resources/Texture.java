@@ -16,19 +16,11 @@
  */
 package se.llbit.chunky.resources;
 
-import javafx.scene.image.Image;
-import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.texture.AnimatedTexture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
+import se.llbit.chunky.resources.texture.SolidColorTexture;
 import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.TexturePath;
-import se.llbit.fxutil.FxImageUtil;
-import se.llbit.math.ColorUtil;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector4;
-import se.llbit.resources.ImageLoader;
-import se.llbit.util.annotation.NotNull;
 
 /**
  * This class contains static fields for common textures.
@@ -39,434 +31,419 @@ import se.llbit.util.annotation.NotNull;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Texture {
+  public static SolidColorTexture black = new SolidColorTexture(0, 0, 0, 1);
 
-  public static final Texture EMPTY_TEXTURE = new Texture() {
-    @Override public void getColor(double u, double v, Vector4 c) {
-      c.set(0, 0, 0, 0);
-    }
-
-    @Override public void getColorInterpolated(double u, double v, Vector4 c) {
-      c.set(0, 0, 0, 0);
-    }
-
-    @Override public boolean isEmptyTexture() {
-      return true;
-    }
-  };
-
-  public static Texture black = new SolidColorTexture(new Vector4(0, 0, 0, 1));
-
-  public static final Texture paintingAlban = new Texture();
-  public static final Texture paintingAztec2 = new Texture();
-  public static final Texture paintingAztec = new Texture();
-  public static final Texture paintingBack = new Texture();
-  public static final Texture paintingBomb = new Texture();
-  public static final Texture paintingBurningSkull = new Texture();
-  public static final Texture paintingBust = new Texture();
-  public static final Texture paintingCourbet = new Texture();
-  public static final Texture paintingCreebet = new Texture();
-  public static final Texture paintingDonkeyKong = new Texture();
-  public static final Texture paintingFighters = new Texture();
-  public static final Texture paintingGraham = new Texture();
-  public static final Texture paintingKebab = new Texture();
-  public static final Texture paintingMatch = new Texture();
-  public static final Texture paintingPigscene = new Texture();
-  public static final Texture paintingPlant = new Texture();
-  public static final Texture paintingPointer = new Texture();
-  public static final Texture paintingPool = new Texture();
-  public static final Texture paintingSea = new Texture();
-  public static final Texture paintingSkeleton = new Texture();
-  public static final Texture paintingSkullAndRoses = new Texture();
-  public static final Texture paintingStage = new Texture();
-  public static final Texture paintingSunset = new Texture();
-  public static final Texture paintingVoid = new Texture();
-  public static final Texture paintingWanderer = new Texture();
-  public static final Texture paintingWasteland = new Texture();
-  public static final Texture paintingWither = new Texture();
+  public static final BitmapTexture paintingAlban = new BitmapTexture();
+  public static final BitmapTexture paintingAztec2 = new BitmapTexture();
+  public static final BitmapTexture paintingAztec = new BitmapTexture();
+  public static final BitmapTexture paintingBack = new BitmapTexture();
+  public static final BitmapTexture paintingBomb = new BitmapTexture();
+  public static final BitmapTexture paintingBurningSkull = new BitmapTexture();
+  public static final BitmapTexture paintingBust = new BitmapTexture();
+  public static final BitmapTexture paintingCourbet = new BitmapTexture();
+  public static final BitmapTexture paintingCreebet = new BitmapTexture();
+  public static final BitmapTexture paintingDonkeyKong = new BitmapTexture();
+  public static final BitmapTexture paintingFighters = new BitmapTexture();
+  public static final BitmapTexture paintingGraham = new BitmapTexture();
+  public static final BitmapTexture paintingKebab = new BitmapTexture();
+  public static final BitmapTexture paintingMatch = new BitmapTexture();
+  public static final BitmapTexture paintingPigscene = new BitmapTexture();
+  public static final BitmapTexture paintingPlant = new BitmapTexture();
+  public static final BitmapTexture paintingPointer = new BitmapTexture();
+  public static final BitmapTexture paintingPool = new BitmapTexture();
+  public static final BitmapTexture paintingSea = new BitmapTexture();
+  public static final BitmapTexture paintingSkeleton = new BitmapTexture();
+  public static final BitmapTexture paintingSkullAndRoses = new BitmapTexture();
+  public static final BitmapTexture paintingStage = new BitmapTexture();
+  public static final BitmapTexture paintingSunset = new BitmapTexture();
+  public static final BitmapTexture paintingVoid = new BitmapTexture();
+  public static final BitmapTexture paintingWanderer = new BitmapTexture();
+  public static final BitmapTexture paintingWasteland = new BitmapTexture();
+  public static final BitmapTexture paintingWither = new BitmapTexture();
 
   public static final FontTexture fonts = new FontTexture();
 
-  public static final Texture air = new Texture("air");
-  public static final Texture stone = new Texture("stone");
-  public static final Texture prismarine = new Texture();
-  public static final Texture prismarineBricks = new Texture();
-  public static final Texture darkPrismarine = new Texture();
-  public static final Texture granite = new Texture();
-  public static final Texture smoothGranite = new Texture();
-  public static final Texture diorite = new Texture();
-  public static final Texture smoothDiorite = new Texture();
-  public static final Texture andesite = new Texture();
-  public static final Texture smoothAndesite = new Texture();
-  public static final Texture dirt = new Texture("dirt");
-  public static final Texture coarseDirt = new Texture("dirt");
-  public static final Texture grassSideSaturated = new Texture("grass-side-saturated");
-  public static final Texture grassTop = new Texture("grass");
-  public static final Texture grassSide = new Texture();
-  public static final Texture water = new Texture("water");
-  public static final Texture cauldronSide = new Texture();
-  public static final Texture cauldronInside = new Texture();
-  public static final Texture cauldronTop = new Texture();
-  public static final Texture cauldronBottom = new Texture();
-  public static final Texture smoothStone = new Texture();
-  public static final Texture smoothStoneSlabSide = new Texture();
-  public static final Texture brick = new Texture("bricks");
-  public static final Texture tntTop = new Texture();
-  public static final Texture tntSide = new Texture("tnt");
-  public static final Texture tntBottom = new Texture();
-  public static final Texture cobweb = new Texture("cobweb");
-  public static final Texture portal = new Texture("nether-portal");
-  public static final Texture cobblestone = new Texture("cobblestone");
-  public static final Texture bedrock = new Texture("bedrock");
-  public static final Texture sand = new Texture("sand");
-  public static final Texture gravel = new Texture("gravel");
-  public static final Texture ironBlock = new Texture("iron-block");
-  public static final Texture goldBlock = new Texture("gold-block");
-  public static final Texture diamondBlock = new Texture("diamond-block");
-  public static final Texture chestTop = new Texture();
-  public static final Texture chestBottom = new Texture();
-  public static final Texture chestLeft = new Texture();
-  public static final Texture chestRight = new Texture();
-  public static final Texture chestFront = new Texture("chest");
-  public static final Texture chestBack = new Texture();
-  public static final Texture chestLock = new Texture();
-  public static final Texture enderChestTop = new Texture();
-  public static final Texture enderChestBottom = new Texture();
-  public static final Texture enderChestLeft = new Texture();
-  public static final Texture enderChestRight = new Texture();
-  public static final Texture enderChestFront = new Texture();
-  public static final Texture enderChestBack = new Texture();
-  public static final Texture enderChestLock = new Texture();
-  public static final Texture redMushroom = new Texture("red-mushroom");
-  public static final Texture brownMushroom = new Texture("brown-mushroom");
-  public static final Texture goldOre = new Texture("gold-ore");
-  public static final Texture ironOre = new Texture("iron-ore");
-  public static final Texture coalOre = new Texture("coal-ore");
-  public static final Texture netherQuartzOre = new Texture();
-  public static final Texture bookshelf = new Texture("bookshelf");
-  public static final Texture mossStone = new Texture("moss-stone");
-  public static final Texture obsidian = new Texture("obsidian");
-  public static final Texture workbenchTop = new Texture();
-  public static final Texture workbenchSide = new Texture("workbench");
-  public static final Texture workbenchFront = new Texture("workbench");
-  public static final Texture furnaceTop = new Texture();
-  public static final Texture furnaceSide = new Texture();
-  public static final Texture furnaceUnlitFront = new Texture("furnace");
-  public static final Texture furnaceLitFront = new Texture("furnace-lit");
-  public static final Texture dispenserFront = new Texture("dispenser");
-  public static final Texture dispenserFrontVertical = new Texture("dispenser");
-  public static final Texture dropperFront = new Texture();
-  public static final Texture dropperFrontVertical = new Texture();
-  public static final Texture sponge = new Texture("sponge");
-  public static final Texture wetSponge = new Texture("sponge");
-  public static final Texture glass = new Texture("glass");
-  public static final Texture diamondOre = new Texture("diamond-ore");
-  public static final Texture redstoneOre = new Texture("redstone-ore");
-  public static final Texture stoneBrick = new Texture("stone-bricks");
-  public static final Texture mossyStoneBrick = new Texture();
-  public static final Texture crackedStoneBrick = new Texture();
-  public static final Texture circleStoneBrick = new Texture();
-  public static final Texture monsterSpawner = new Texture("spawner");
-  public static final Texture snowBlock = new Texture("snow");
-  public static final Texture snowSide = new Texture();
-  public static final Texture ice = new Texture("ice");
-  public static final Texture cactusTop = new Texture();
-  public static final Texture cactusSide = new Texture();
-  public static final Texture cactusBottom = new Texture();
-  public static final Texture clay = new Texture("clay");
-  public static final Texture sugarCane = new Texture("sugar-canes");
-  public static final Texture jukeboxSide = new Texture();
-  public static final Texture jukeboxTop = new Texture();
-  public static final Texture noteBlock = new Texture();
-  public static final Texture torch = new Texture("torch");
-  public static final Texture oakDoorTop = new Texture();
-  public static final Texture oakDoorBottom = new Texture();
-  public static final Texture ironDoorTop = new Texture();
-  public static final Texture ironDoorBottom = new Texture();
-  public static final Texture ladder = new Texture("ladder");
-  public static final Texture trapdoor = new Texture("trapdoor");
-  public static final Texture ironTrapdoor = new Texture("trapdoor");
-  public static final Texture birchTrapdoor = new Texture("trapdoor");
-  public static final Texture spruceTrapdoor = new Texture("trapdoor");
-  public static final Texture jungleTrapdoor = new Texture("trapdoor");
-  public static final Texture acaciaTrapdoor = new Texture("trapdoor");
-  public static final Texture darkOakTrapdoor = new Texture("trapdoor");
-  public static final Texture ironBars = new Texture("iron-bars");
-  public static final Texture farmlandWet = new Texture();
-  public static final Texture farmlandDry = new Texture();
-  public static final Texture lever = new Texture();
-  public static final Texture redstoneTorchOn = new Texture("redstone-torch-on");
-  public static final Texture redstoneTorchOff = new Texture("redstone-torch-off");
-  public static final Texture redstoneWireCross = new Texture("redstone-wire-off-intersect");
-  public static final Texture redstoneWire = new Texture();
-  public static final Texture pumpkinTop = new Texture();
-  public static final Texture pumpkinSide = new Texture();
-  public static final Texture pumpkinFront = new Texture();
-  public static final Texture jackolanternFront = new Texture();
-  public static final Texture netherrack = new Texture("netherrack");
-  public static final Texture soulsand = new Texture("soul-sand");
-  public static final Texture glowstone = new Texture("glowstone");
-  public static final Texture seaLantern = new Texture();
-  public static final Texture sandstoneSide = new Texture("sandstone");
-  public static final Texture sandstoneTop = new Texture();
-  public static final Texture sandstoneBottom = new Texture();
-  public static final Texture sandstoneDecorated = new Texture();
-  public static final Texture sandstoneCut = new Texture();
-  public static final Texture redSandstoneSide = new Texture();
-  public static final Texture redSandstoneTop = new Texture();
-  public static final Texture redSandstoneBottom = new Texture();
-  public static final Texture redSandstoneDecorated = new Texture();
-  public static final Texture redSandstoneCut = new Texture();
-  public static final Texture deadBush = new Texture("dead-bush");
-  public static final Texture tallGrass = new Texture("tall-grass");
-  public static final Texture fern = new Texture();
-  public static final Texture vines = new Texture("vines");
-  public static final Texture crops0 = new Texture();
-  public static final Texture crops1 = new Texture();
-  public static final Texture crops2 = new Texture();
-  public static final Texture crops3 = new Texture();
-  public static final Texture crops4 = new Texture();
-  public static final Texture crops5 = new Texture();
-  public static final Texture crops6 = new Texture();
-  public static final Texture crops7 = new Texture();
-  public static final Texture rails = new Texture("minecart-track");
-  public static final Texture railsCurved = new Texture();
-  public static final Texture poweredRailOn = new Texture();
-  public static final Texture poweredRailOff = new Texture();
-  public static final Texture detectorRail = new Texture();
-  public static final Texture detectorRailOn = new Texture();
-  public static final Texture activatorRail = new Texture();
-  public static final Texture activatorRailPowered = new Texture();
-  public static final Texture whiteWool = new Texture("wool");
-  public static final Texture orangeWool = new Texture("wool");
-  public static final Texture magentaWool = new Texture("wool");
-  public static final Texture lightBlueWool = new Texture("wool");
-  public static final Texture yellowWool = new Texture("wool");
-  public static final Texture limeWool = new Texture("wool");
-  public static final Texture pinkWool = new Texture("wool");
-  public static final Texture grayWool = new Texture("wool");
-  public static final Texture lightGrayWool = new Texture("wool");
-  public static final Texture cyanWool = new Texture("wool");
-  public static final Texture purpleWool = new Texture("wool");
-  public static final Texture blueWool = new Texture("wool");
-  public static final Texture brownWool = new Texture("wool");
-  public static final Texture greenWool = new Texture("wool");
-  public static final Texture redWool = new Texture("wool");
-  public static final Texture blackWool = new Texture("wool");
-  public static final Texture lava = new Texture("lava");
-  public static final Texture lapisOre = new Texture("lapis-lazuli-ore");
-  public static final Texture lapisBlock = new Texture("lapis-lazuli-block");
-  public static final Texture pistonSide = new Texture("piston");
-  public static final Texture pistonInnerTop = new Texture();
-  public static final Texture pistonBottom = new Texture();
-  public static final Texture pistonTop = new Texture("piston-extension");
-  public static final Texture pistonTopSticky = new Texture();
-  public static final Texture fire = new Texture("fire");
+  public static final BitmapTexture air = new BitmapTexture("air");
+  public static final BitmapTexture stone = new BitmapTexture("stone");
+  public static final BitmapTexture prismarine = new BitmapTexture();
+  public static final BitmapTexture prismarineBricks = new BitmapTexture();
+  public static final BitmapTexture darkPrismarine = new BitmapTexture();
+  public static final BitmapTexture granite = new BitmapTexture();
+  public static final BitmapTexture smoothGranite = new BitmapTexture();
+  public static final BitmapTexture diorite = new BitmapTexture();
+  public static final BitmapTexture smoothDiorite = new BitmapTexture();
+  public static final BitmapTexture andesite = new BitmapTexture();
+  public static final BitmapTexture smoothAndesite = new BitmapTexture();
+  public static final BitmapTexture dirt = new BitmapTexture("dirt");
+  public static final BitmapTexture coarseDirt = new BitmapTexture("dirt");
+  public static final BitmapTexture grassSideSaturated = new BitmapTexture("grass-side-saturated");
+  public static final BitmapTexture grassTop = new BitmapTexture("grass");
+  public static final BitmapTexture grassSide = new BitmapTexture();
+  public static final BitmapTexture water = new BitmapTexture("water");
+  public static final BitmapTexture cauldronSide = new BitmapTexture();
+  public static final BitmapTexture cauldronInside = new BitmapTexture();
+  public static final BitmapTexture cauldronTop = new BitmapTexture();
+  public static final BitmapTexture cauldronBottom = new BitmapTexture();
+  public static final BitmapTexture smoothStone = new BitmapTexture();
+  public static final BitmapTexture smoothStoneSlabSide = new BitmapTexture();
+  public static final BitmapTexture brick = new BitmapTexture("bricks");
+  public static final BitmapTexture tntTop = new BitmapTexture();
+  public static final BitmapTexture tntSide = new BitmapTexture("tnt");
+  public static final BitmapTexture tntBottom = new BitmapTexture();
+  public static final BitmapTexture cobweb = new BitmapTexture("cobweb");
+  public static final BitmapTexture portal = new BitmapTexture("nether-portal");
+  public static final BitmapTexture cobblestone = new BitmapTexture("cobblestone");
+  public static final BitmapTexture bedrock = new BitmapTexture("bedrock");
+  public static final BitmapTexture sand = new BitmapTexture("sand");
+  public static final BitmapTexture gravel = new BitmapTexture("gravel");
+  public static final BitmapTexture ironBlock = new BitmapTexture("iron-block");
+  public static final BitmapTexture goldBlock = new BitmapTexture("gold-block");
+  public static final BitmapTexture diamondBlock = new BitmapTexture("diamond-block");
+  public static final BitmapTexture chestTop = new BitmapTexture();
+  public static final BitmapTexture chestBottom = new BitmapTexture();
+  public static final BitmapTexture chestLeft = new BitmapTexture();
+  public static final BitmapTexture chestRight = new BitmapTexture();
+  public static final BitmapTexture chestFront = new BitmapTexture("chest");
+  public static final BitmapTexture chestBack = new BitmapTexture();
+  public static final BitmapTexture chestLock = new BitmapTexture();
+  public static final BitmapTexture enderChestTop = new BitmapTexture();
+  public static final BitmapTexture enderChestBottom = new BitmapTexture();
+  public static final BitmapTexture enderChestLeft = new BitmapTexture();
+  public static final BitmapTexture enderChestRight = new BitmapTexture();
+  public static final BitmapTexture enderChestFront = new BitmapTexture();
+  public static final BitmapTexture enderChestBack = new BitmapTexture();
+  public static final BitmapTexture enderChestLock = new BitmapTexture();
+  public static final BitmapTexture redMushroom = new BitmapTexture("red-mushroom");
+  public static final BitmapTexture brownMushroom = new BitmapTexture("brown-mushroom");
+  public static final BitmapTexture goldOre = new BitmapTexture("gold-ore");
+  public static final BitmapTexture ironOre = new BitmapTexture("iron-ore");
+  public static final BitmapTexture coalOre = new BitmapTexture("coal-ore");
+  public static final BitmapTexture netherQuartzOre = new BitmapTexture();
+  public static final BitmapTexture bookshelf = new BitmapTexture("bookshelf");
+  public static final BitmapTexture mossStone = new BitmapTexture("moss-stone");
+  public static final BitmapTexture obsidian = new BitmapTexture("obsidian");
+  public static final BitmapTexture workbenchTop = new BitmapTexture();
+  public static final BitmapTexture workbenchSide = new BitmapTexture("workbench");
+  public static final BitmapTexture workbenchFront = new BitmapTexture("workbench");
+  public static final BitmapTexture furnaceTop = new BitmapTexture();
+  public static final BitmapTexture furnaceSide = new BitmapTexture();
+  public static final BitmapTexture furnaceUnlitFront = new BitmapTexture("furnace");
+  public static final BitmapTexture furnaceLitFront = new BitmapTexture("furnace-lit");
+  public static final BitmapTexture dispenserFront = new BitmapTexture("dispenser");
+  public static final BitmapTexture dispenserFrontVertical = new BitmapTexture("dispenser");
+  public static final BitmapTexture dropperFront = new BitmapTexture();
+  public static final BitmapTexture dropperFrontVertical = new BitmapTexture();
+  public static final BitmapTexture sponge = new BitmapTexture("sponge");
+  public static final BitmapTexture wetSponge = new BitmapTexture("sponge");
+  public static final BitmapTexture glass = new BitmapTexture("glass");
+  public static final BitmapTexture diamondOre = new BitmapTexture("diamond-ore");
+  public static final BitmapTexture redstoneOre = new BitmapTexture("redstone-ore");
+  public static final BitmapTexture stoneBrick = new BitmapTexture("stone-bricks");
+  public static final BitmapTexture mossyStoneBrick = new BitmapTexture();
+  public static final BitmapTexture crackedStoneBrick = new BitmapTexture();
+  public static final BitmapTexture circleStoneBrick = new BitmapTexture();
+  public static final BitmapTexture monsterSpawner = new BitmapTexture("spawner");
+  public static final BitmapTexture snowBlock = new BitmapTexture("snow");
+  public static final BitmapTexture snowSide = new BitmapTexture();
+  public static final BitmapTexture ice = new BitmapTexture("ice");
+  public static final BitmapTexture cactusTop = new BitmapTexture();
+  public static final BitmapTexture cactusSide = new BitmapTexture();
+  public static final BitmapTexture cactusBottom = new BitmapTexture();
+  public static final BitmapTexture clay = new BitmapTexture("clay");
+  public static final BitmapTexture sugarCane = new BitmapTexture("sugar-canes");
+  public static final BitmapTexture jukeboxSide = new BitmapTexture();
+  public static final BitmapTexture jukeboxTop = new BitmapTexture();
+  public static final BitmapTexture noteBlock = new BitmapTexture();
+  public static final BitmapTexture torch = new BitmapTexture("torch");
+  public static final BitmapTexture oakDoorTop = new BitmapTexture();
+  public static final BitmapTexture oakDoorBottom = new BitmapTexture();
+  public static final BitmapTexture ironDoorTop = new BitmapTexture();
+  public static final BitmapTexture ironDoorBottom = new BitmapTexture();
+  public static final BitmapTexture ladder = new BitmapTexture("ladder");
+  public static final BitmapTexture trapdoor = new BitmapTexture("trapdoor");
+  public static final BitmapTexture ironTrapdoor = new BitmapTexture("trapdoor");
+  public static final BitmapTexture birchTrapdoor = new BitmapTexture("trapdoor");
+  public static final BitmapTexture spruceTrapdoor = new BitmapTexture("trapdoor");
+  public static final BitmapTexture jungleTrapdoor = new BitmapTexture("trapdoor");
+  public static final BitmapTexture acaciaTrapdoor = new BitmapTexture("trapdoor");
+  public static final BitmapTexture darkOakTrapdoor = new BitmapTexture("trapdoor");
+  public static final BitmapTexture ironBars = new BitmapTexture("iron-bars");
+  public static final BitmapTexture farmlandWet = new BitmapTexture();
+  public static final BitmapTexture farmlandDry = new BitmapTexture();
+  public static final BitmapTexture lever = new BitmapTexture();
+  public static final BitmapTexture redstoneTorchOn = new BitmapTexture("redstone-torch-on");
+  public static final BitmapTexture redstoneTorchOff = new BitmapTexture("redstone-torch-off");
+  public static final BitmapTexture redstoneWireCross = new BitmapTexture("redstone-wire-off-intersect");
+  public static final BitmapTexture redstoneWire = new BitmapTexture();
+  public static final BitmapTexture pumpkinTop = new BitmapTexture();
+  public static final BitmapTexture pumpkinSide = new BitmapTexture();
+  public static final BitmapTexture pumpkinFront = new BitmapTexture();
+  public static final BitmapTexture jackolanternFront = new BitmapTexture();
+  public static final BitmapTexture netherrack = new BitmapTexture("netherrack");
+  public static final BitmapTexture soulsand = new BitmapTexture("soul-sand");
+  public static final BitmapTexture glowstone = new BitmapTexture("glowstone");
+  public static final BitmapTexture seaLantern = new BitmapTexture();
+  public static final BitmapTexture sandstoneSide = new BitmapTexture("sandstone");
+  public static final BitmapTexture sandstoneTop = new BitmapTexture();
+  public static final BitmapTexture sandstoneBottom = new BitmapTexture();
+  public static final BitmapTexture sandstoneDecorated = new BitmapTexture();
+  public static final BitmapTexture sandstoneCut = new BitmapTexture();
+  public static final BitmapTexture redSandstoneSide = new BitmapTexture();
+  public static final BitmapTexture redSandstoneTop = new BitmapTexture();
+  public static final BitmapTexture redSandstoneBottom = new BitmapTexture();
+  public static final BitmapTexture redSandstoneDecorated = new BitmapTexture();
+  public static final BitmapTexture redSandstoneCut = new BitmapTexture();
+  public static final BitmapTexture deadBush = new BitmapTexture("dead-bush");
+  public static final BitmapTexture tallGrass = new BitmapTexture("tall-grass");
+  public static final BitmapTexture fern = new BitmapTexture();
+  public static final BitmapTexture vines = new BitmapTexture("vines");
+  public static final BitmapTexture crops0 = new BitmapTexture();
+  public static final BitmapTexture crops1 = new BitmapTexture();
+  public static final BitmapTexture crops2 = new BitmapTexture();
+  public static final BitmapTexture crops3 = new BitmapTexture();
+  public static final BitmapTexture crops4 = new BitmapTexture();
+  public static final BitmapTexture crops5 = new BitmapTexture();
+  public static final BitmapTexture crops6 = new BitmapTexture();
+  public static final BitmapTexture crops7 = new BitmapTexture();
+  public static final BitmapTexture rails = new BitmapTexture("minecart-track");
+  public static final BitmapTexture railsCurved = new BitmapTexture();
+  public static final BitmapTexture poweredRailOn = new BitmapTexture();
+  public static final BitmapTexture poweredRailOff = new BitmapTexture();
+  public static final BitmapTexture detectorRail = new BitmapTexture();
+  public static final BitmapTexture detectorRailOn = new BitmapTexture();
+  public static final BitmapTexture activatorRail = new BitmapTexture();
+  public static final BitmapTexture activatorRailPowered = new BitmapTexture();
+  public static final BitmapTexture whiteWool = new BitmapTexture("wool");
+  public static final BitmapTexture orangeWool = new BitmapTexture("wool");
+  public static final BitmapTexture magentaWool = new BitmapTexture("wool");
+  public static final BitmapTexture lightBlueWool = new BitmapTexture("wool");
+  public static final BitmapTexture yellowWool = new BitmapTexture("wool");
+  public static final BitmapTexture limeWool = new BitmapTexture("wool");
+  public static final BitmapTexture pinkWool = new BitmapTexture("wool");
+  public static final BitmapTexture grayWool = new BitmapTexture("wool");
+  public static final BitmapTexture lightGrayWool = new BitmapTexture("wool");
+  public static final BitmapTexture cyanWool = new BitmapTexture("wool");
+  public static final BitmapTexture purpleWool = new BitmapTexture("wool");
+  public static final BitmapTexture blueWool = new BitmapTexture("wool");
+  public static final BitmapTexture brownWool = new BitmapTexture("wool");
+  public static final BitmapTexture greenWool = new BitmapTexture("wool");
+  public static final BitmapTexture redWool = new BitmapTexture("wool");
+  public static final BitmapTexture blackWool = new BitmapTexture("wool");
+  public static final BitmapTexture lava = new BitmapTexture("lava");
+  public static final BitmapTexture lapisOre = new BitmapTexture("lapis-lazuli-ore");
+  public static final BitmapTexture lapisBlock = new BitmapTexture("lapis-lazuli-block");
+  public static final BitmapTexture pistonSide = new BitmapTexture("piston");
+  public static final BitmapTexture pistonInnerTop = new BitmapTexture();
+  public static final BitmapTexture pistonBottom = new BitmapTexture();
+  public static final BitmapTexture pistonTop = new BitmapTexture("piston-extension");
+  public static final BitmapTexture pistonTopSticky = new BitmapTexture();
+  public static final BitmapTexture fire = new BitmapTexture("fire");
   public static final AnimatedTexture fireLayer0 = new AnimatedTexture("fire");
   public static final AnimatedTexture fireLayer1 = new AnimatedTexture("fire");
-  public static final Texture redstoneRepeaterOn = new Texture("redstone-repeater-off");
-  public static final Texture redstoneRepeaterOff = new Texture("redstone-repeater-on");
-  public static final Texture redstoneLampOn = new Texture("redstone-lamp-off");
-  public static final Texture redstoneLampOff = new Texture("redstone-lamp-on");
-  public static final Texture endPortalFrameTop = new Texture();
-  public static final Texture endPortalFrameSide = new Texture();
-  public static final Texture endPortal = new Texture("end-portal");
-  public static final Texture endStone = new Texture("end-stone");
-  public static final Texture brewingStandSide = new Texture();
-  public static final Texture brewingStandBase = new Texture();
-  public static final Texture cakeTop = new Texture();
-  public static final Texture cakeSide = new Texture();
-  public static final Texture cakeInside = new Texture();
-  public static final Texture cakeBottom = new Texture();
-  public static final Texture hugeBrownMushroom = new Texture();
-  public static final Texture hugeRedMushroom = new Texture();
-  public static final Texture mushroomStem = new Texture();
-  public static final Texture mushroomPores = new Texture();
-  public static final Texture melonSide = new Texture();
-  public static final Texture melonTop = new Texture();
-  public static final Texture stemStraight = new Texture();
-  public static final Texture stemBent = new Texture();
-  public static final Texture myceliumTop = new Texture();
-  public static final Texture myceliumSide = new Texture();
-  public static final Texture lilyPad = new Texture("lily-pad");
-  public static final Texture netherBrick = new Texture();
-  public static final Texture netherWart0 = new Texture();
-  public static final Texture netherWart1 = new Texture();
-  public static final Texture netherWart2 = new Texture();
-  public static final Texture largeChestFrontLeft = new Texture();
-  public static final Texture largeChestFrontRight = new Texture();
-  public static final Texture largeChestBackLeft = new Texture();
-  public static final Texture largeChestBackRight = new Texture();
-  public static final Texture largeChestTopLeft = new Texture();
-  public static final Texture largeChestTopRight = new Texture();
-  public static final Texture largeChestBottomLeft = new Texture();
-  public static final Texture largeChestBottomRight = new Texture();
-  public static final Texture largeChestLeft = new Texture();
-  public static final Texture largeChestRight = new Texture();
-  public static final Texture enchantmentTableSide = new Texture();
-  public static final Texture enchantmentTableTop = new Texture();
-  public static final Texture enchantmentTableBottom = new Texture();
+  public static final BitmapTexture redstoneRepeaterOn = new BitmapTexture("redstone-repeater-off");
+  public static final BitmapTexture redstoneRepeaterOff = new BitmapTexture("redstone-repeater-on");
+  public static final BitmapTexture redstoneLampOn = new BitmapTexture("redstone-lamp-off");
+  public static final BitmapTexture redstoneLampOff = new BitmapTexture("redstone-lamp-on");
+  public static final BitmapTexture endPortalFrameTop = new BitmapTexture();
+  public static final BitmapTexture endPortalFrameSide = new BitmapTexture();
+  public static final BitmapTexture endPortal = new BitmapTexture("end-portal");
+  public static final BitmapTexture endStone = new BitmapTexture("end-stone");
+  public static final BitmapTexture brewingStandSide = new BitmapTexture();
+  public static final BitmapTexture brewingStandBase = new BitmapTexture();
+  public static final BitmapTexture cakeTop = new BitmapTexture();
+  public static final BitmapTexture cakeSide = new BitmapTexture();
+  public static final BitmapTexture cakeInside = new BitmapTexture();
+  public static final BitmapTexture cakeBottom = new BitmapTexture();
+  public static final BitmapTexture hugeBrownMushroom = new BitmapTexture();
+  public static final BitmapTexture hugeRedMushroom = new BitmapTexture();
+  public static final BitmapTexture mushroomStem = new BitmapTexture();
+  public static final BitmapTexture mushroomPores = new BitmapTexture();
+  public static final BitmapTexture melonSide = new BitmapTexture();
+  public static final BitmapTexture melonTop = new BitmapTexture();
+  public static final BitmapTexture stemStraight = new BitmapTexture();
+  public static final BitmapTexture stemBent = new BitmapTexture();
+  public static final BitmapTexture myceliumTop = new BitmapTexture();
+  public static final BitmapTexture myceliumSide = new BitmapTexture();
+  public static final BitmapTexture lilyPad = new BitmapTexture("lily-pad");
+  public static final BitmapTexture netherBrick = new BitmapTexture();
+  public static final BitmapTexture netherWart0 = new BitmapTexture();
+  public static final BitmapTexture netherWart1 = new BitmapTexture();
+  public static final BitmapTexture netherWart2 = new BitmapTexture();
+  public static final BitmapTexture largeChestFrontLeft = new BitmapTexture();
+  public static final BitmapTexture largeChestFrontRight = new BitmapTexture();
+  public static final BitmapTexture largeChestBackLeft = new BitmapTexture();
+  public static final BitmapTexture largeChestBackRight = new BitmapTexture();
+  public static final BitmapTexture largeChestTopLeft = new BitmapTexture();
+  public static final BitmapTexture largeChestTopRight = new BitmapTexture();
+  public static final BitmapTexture largeChestBottomLeft = new BitmapTexture();
+  public static final BitmapTexture largeChestBottomRight = new BitmapTexture();
+  public static final BitmapTexture largeChestLeft = new BitmapTexture();
+  public static final BitmapTexture largeChestRight = new BitmapTexture();
+  public static final BitmapTexture enchantmentTableSide = new BitmapTexture();
+  public static final BitmapTexture enchantmentTableTop = new BitmapTexture();
+  public static final BitmapTexture enchantmentTableBottom = new BitmapTexture();
 
-  public static final Texture commandBlockBack = new Texture();
-  public static final Texture commandBlockFront = new Texture();
-  public static final Texture commandBlockSide = new Texture();
-  public static final Texture commandBlockConditional = new Texture();
+  public static final BitmapTexture commandBlockBack = new BitmapTexture();
+  public static final BitmapTexture commandBlockFront = new BitmapTexture();
+  public static final BitmapTexture commandBlockSide = new BitmapTexture();
+  public static final BitmapTexture commandBlockConditional = new BitmapTexture();
 
-  public static final Texture repeatingCommandBlockBack = new Texture();
-  public static final Texture repeatingCommandBlockFront = new Texture();
-  public static final Texture repeatingCommandBlockSide = new Texture();
-  public static final Texture repeatingCommandBlockConditional = new Texture();
+  public static final BitmapTexture repeatingCommandBlockBack = new BitmapTexture();
+  public static final BitmapTexture repeatingCommandBlockFront = new BitmapTexture();
+  public static final BitmapTexture repeatingCommandBlockSide = new BitmapTexture();
+  public static final BitmapTexture repeatingCommandBlockConditional = new BitmapTexture();
 
-  public static final Texture chainCommandBlockBack = new Texture();
-  public static final Texture chainCommandBlockFront = new Texture();
-  public static final Texture chainCommandBlockSide = new Texture();
-  public static final Texture chainCommandBlockConditional = new Texture();
+  public static final BitmapTexture chainCommandBlockBack = new BitmapTexture();
+  public static final BitmapTexture chainCommandBlockFront = new BitmapTexture();
+  public static final BitmapTexture chainCommandBlockSide = new BitmapTexture();
+  public static final BitmapTexture chainCommandBlockConditional = new BitmapTexture();
 
-  public static final Texture eyeOfTheEnder = new Texture();
-  public static final Texture dragonEgg = new Texture();
-  public static final Texture cocoaPlantSmall = new Texture();
-  public static final Texture cocoaPlantMedium = new Texture();
-  public static final Texture cocoaPlantLarge = new Texture();
-  public static final Texture emeraldOre = new Texture();
-  public static final Texture emeraldBlock = new Texture();
-  public static final Texture redstoneBlock = new Texture();
-  public static final Texture tripwireHook = new Texture();
-  public static final Texture tripwire = new Texture();
-  public static final Texture carrots0 = new Texture();
-  public static final Texture carrots1 = new Texture();
-  public static final Texture carrots2 = new Texture();
-  public static final Texture carrots3 = new Texture();
-  public static final Texture potatoes0 = new Texture();
-  public static final Texture potatoes1 = new Texture();
-  public static final Texture potatoes2 = new Texture();
-  public static final Texture potatoes3 = new Texture();
-  public static final Texture beacon = new Texture();
-  public static final Texture beaconBeam = new Texture();
-  public static final Texture anvilSide = new Texture();
-  public static final Texture anvilTop = new Texture();
-  public static final Texture anvilTopDamaged1 = new Texture();
-  public static final Texture anvilTopDamaged2 = new Texture();
-  public static final Texture flowerPot = new Texture();
-  public static final Texture quartzSide = new Texture();
-  public static final Texture quartzTop = new Texture();
-  public static final Texture quartzBottom = new Texture();
-  public static final Texture quartzChiseled = new Texture();
-  public static final Texture quartzChiseledTop = new Texture();
-  public static final Texture quartzPillar = new Texture();
-  public static final Texture quartzPillarTop = new Texture();
-  public static final Texture daylightDetectorTop = new Texture();
-  public static final Texture daylightDetectorInvertedTop = new Texture();
-  public static final Texture daylightDetectorSide = new Texture();
-  public static final Texture comparatorOff = new Texture();
-  public static final Texture comparatorOn = new Texture();
-  public static final Texture hopperOutside = new Texture();
-  public static final Texture hopperInside = new Texture();
-  public static final Texture hopperTop = new Texture();
-  public static final Texture slime = new Texture();
+  public static final BitmapTexture eyeOfTheEnder = new BitmapTexture();
+  public static final BitmapTexture dragonEgg = new BitmapTexture();
+  public static final BitmapTexture cocoaPlantSmall = new BitmapTexture();
+  public static final BitmapTexture cocoaPlantMedium = new BitmapTexture();
+  public static final BitmapTexture cocoaPlantLarge = new BitmapTexture();
+  public static final BitmapTexture emeraldOre = new BitmapTexture();
+  public static final BitmapTexture emeraldBlock = new BitmapTexture();
+  public static final BitmapTexture redstoneBlock = new BitmapTexture();
+  public static final BitmapTexture tripwireHook = new BitmapTexture();
+  public static final BitmapTexture tripwire = new BitmapTexture();
+  public static final BitmapTexture carrots0 = new BitmapTexture();
+  public static final BitmapTexture carrots1 = new BitmapTexture();
+  public static final BitmapTexture carrots2 = new BitmapTexture();
+  public static final BitmapTexture carrots3 = new BitmapTexture();
+  public static final BitmapTexture potatoes0 = new BitmapTexture();
+  public static final BitmapTexture potatoes1 = new BitmapTexture();
+  public static final BitmapTexture potatoes2 = new BitmapTexture();
+  public static final BitmapTexture potatoes3 = new BitmapTexture();
+  public static final BitmapTexture beacon = new BitmapTexture();
+  public static final BitmapTexture beaconBeam = new BitmapTexture();
+  public static final BitmapTexture anvilSide = new BitmapTexture();
+  public static final BitmapTexture anvilTop = new BitmapTexture();
+  public static final BitmapTexture anvilTopDamaged1 = new BitmapTexture();
+  public static final BitmapTexture anvilTopDamaged2 = new BitmapTexture();
+  public static final BitmapTexture flowerPot = new BitmapTexture();
+  public static final BitmapTexture quartzSide = new BitmapTexture();
+  public static final BitmapTexture quartzTop = new BitmapTexture();
+  public static final BitmapTexture quartzBottom = new BitmapTexture();
+  public static final BitmapTexture quartzChiseled = new BitmapTexture();
+  public static final BitmapTexture quartzChiseledTop = new BitmapTexture();
+  public static final BitmapTexture quartzPillar = new BitmapTexture();
+  public static final BitmapTexture quartzPillarTop = new BitmapTexture();
+  public static final BitmapTexture daylightDetectorTop = new BitmapTexture();
+  public static final BitmapTexture daylightDetectorInvertedTop = new BitmapTexture();
+  public static final BitmapTexture daylightDetectorSide = new BitmapTexture();
+  public static final BitmapTexture comparatorOff = new BitmapTexture();
+  public static final BitmapTexture comparatorOn = new BitmapTexture();
+  public static final BitmapTexture hopperOutside = new BitmapTexture();
+  public static final BitmapTexture hopperInside = new BitmapTexture();
+  public static final BitmapTexture hopperTop = new BitmapTexture();
+  public static final BitmapTexture slime = new BitmapTexture();
 
   // [1.6] Hay Block, Hardened Clay, Coal Block
-  public static final Texture hayBlockSide = new Texture();
-  public static final Texture hayBlockTop = new Texture();
-  public static final Texture hardenedClay = new Texture();
-  public static final Texture coalBlock = new Texture();
+  public static final BitmapTexture hayBlockSide = new BitmapTexture();
+  public static final BitmapTexture hayBlockTop = new BitmapTexture();
+  public static final BitmapTexture hardenedClay = new BitmapTexture();
+  public static final BitmapTexture coalBlock = new BitmapTexture();
 
   // [1.6] Colored Clay
-  public static final Texture whiteClay = new Texture();
-  public static final Texture orangeClay = new Texture();
-  public static final Texture magentaClay = new Texture();
-  public static final Texture lightBlueClay = new Texture();
-  public static final Texture yellowClay = new Texture();
-  public static final Texture limeClay = new Texture();
-  public static final Texture pinkClay = new Texture();
-  public static final Texture grayClay = new Texture();
-  public static final Texture lightGrayClay = new Texture();
-  public static final Texture cyanClay = new Texture();
-  public static final Texture purpleClay = new Texture();
-  public static final Texture blueClay = new Texture();
-  public static final Texture brownClay = new Texture();
-  public static final Texture greenClay = new Texture();
-  public static final Texture redClay = new Texture();
-  public static final Texture blackClay = new Texture();
+  public static final BitmapTexture whiteClay = new BitmapTexture();
+  public static final BitmapTexture orangeClay = new BitmapTexture();
+  public static final BitmapTexture magentaClay = new BitmapTexture();
+  public static final BitmapTexture lightBlueClay = new BitmapTexture();
+  public static final BitmapTexture yellowClay = new BitmapTexture();
+  public static final BitmapTexture limeClay = new BitmapTexture();
+  public static final BitmapTexture pinkClay = new BitmapTexture();
+  public static final BitmapTexture grayClay = new BitmapTexture();
+  public static final BitmapTexture lightGrayClay = new BitmapTexture();
+  public static final BitmapTexture cyanClay = new BitmapTexture();
+  public static final BitmapTexture purpleClay = new BitmapTexture();
+  public static final BitmapTexture blueClay = new BitmapTexture();
+  public static final BitmapTexture brownClay = new BitmapTexture();
+  public static final BitmapTexture greenClay = new BitmapTexture();
+  public static final BitmapTexture redClay = new BitmapTexture();
+  public static final BitmapTexture blackClay = new BitmapTexture();
 
   // [1.7.2] Stained Glass
-  public static final Texture whiteGlass = new Texture("glass");
-  public static final Texture orangeGlass = new Texture("glass");
-  public static final Texture magentaGlass = new Texture("glass");
-  public static final Texture lightBlueGlass = new Texture("glass");
-  public static final Texture yellowGlass = new Texture("glass");
-  public static final Texture limeGlass = new Texture("glass");
-  public static final Texture pinkGlass = new Texture("glass");
-  public static final Texture grayGlass = new Texture("glass");
-  public static final Texture lightGrayGlass = new Texture("glass");
-  public static final Texture cyanGlass = new Texture("glass");
-  public static final Texture purpleGlass = new Texture("glass");
-  public static final Texture blueGlass = new Texture("glass");
-  public static final Texture brownGlass = new Texture("glass");
-  public static final Texture greenGlass = new Texture("glass");
-  public static final Texture redGlass = new Texture("glass");
-  public static final Texture blackGlass = new Texture("glass");
+  public static final BitmapTexture whiteGlass = new BitmapTexture("glass");
+  public static final BitmapTexture orangeGlass = new BitmapTexture("glass");
+  public static final BitmapTexture magentaGlass = new BitmapTexture("glass");
+  public static final BitmapTexture lightBlueGlass = new BitmapTexture("glass");
+  public static final BitmapTexture yellowGlass = new BitmapTexture("glass");
+  public static final BitmapTexture limeGlass = new BitmapTexture("glass");
+  public static final BitmapTexture pinkGlass = new BitmapTexture("glass");
+  public static final BitmapTexture grayGlass = new BitmapTexture("glass");
+  public static final BitmapTexture lightGrayGlass = new BitmapTexture("glass");
+  public static final BitmapTexture cyanGlass = new BitmapTexture("glass");
+  public static final BitmapTexture purpleGlass = new BitmapTexture("glass");
+  public static final BitmapTexture blueGlass = new BitmapTexture("glass");
+  public static final BitmapTexture brownGlass = new BitmapTexture("glass");
+  public static final BitmapTexture greenGlass = new BitmapTexture("glass");
+  public static final BitmapTexture redGlass = new BitmapTexture("glass");
+  public static final BitmapTexture blackGlass = new BitmapTexture("glass");
 
   // [1.7.2] Podzol
-  public static final Texture podzolTop = new Texture();
-  public static final Texture podzolSide = new Texture();
+  public static final BitmapTexture podzolTop = new BitmapTexture();
+  public static final BitmapTexture podzolSide = new BitmapTexture();
 
   // [1.7.2] Flowers
-  public static final Texture dandelion = new Texture("yellow-flower");
-  public static final Texture poppy = new Texture("rose");
-  public static final Texture blueOrchid = new Texture();
-  public static final Texture allium = new Texture();
-  public static final Texture azureBluet = new Texture();
-  public static final Texture redTulip = new Texture();
-  public static final Texture orangeTulip = new Texture();
-  public static final Texture whiteTulip = new Texture();
-  public static final Texture pinkTulip = new Texture();
-  public static final Texture oxeyeDaisy = new Texture();
+  public static final BitmapTexture dandelion = new BitmapTexture("yellow-flower");
+  public static final BitmapTexture poppy = new BitmapTexture("rose");
+  public static final BitmapTexture blueOrchid = new BitmapTexture();
+  public static final BitmapTexture allium = new BitmapTexture();
+  public static final BitmapTexture azureBluet = new BitmapTexture();
+  public static final BitmapTexture redTulip = new BitmapTexture();
+  public static final BitmapTexture orangeTulip = new BitmapTexture();
+  public static final BitmapTexture whiteTulip = new BitmapTexture();
+  public static final BitmapTexture pinkTulip = new BitmapTexture();
+  public static final BitmapTexture oxeyeDaisy = new BitmapTexture();
 
   // [1.7.2] Large Flowers
-  public static final Texture sunflowerBottom = new Texture();
-  public static final Texture sunflowerTop = new Texture();
-  public static final Texture sunflowerFront = new Texture();
-  public static final Texture sunflowerBack = new Texture();
-  public static final Texture lilacBottom = new Texture();
-  public static final Texture lilacTop = new Texture();
-  public static final Texture doubleTallGrassBottom = new Texture();
-  public static final Texture doubleTallGrassTop = new Texture();
-  public static final Texture largeFernBottom = new Texture();
-  public static final Texture largeFernTop = new Texture();
-  public static final Texture roseBushBottom = new Texture();
-  public static final Texture roseBushTop = new Texture();
-  public static final Texture peonyBottom = new Texture();
-  public static final Texture peonyTop = new Texture();
+  public static final BitmapTexture sunflowerBottom = new BitmapTexture();
+  public static final BitmapTexture sunflowerTop = new BitmapTexture();
+  public static final BitmapTexture sunflowerFront = new BitmapTexture();
+  public static final BitmapTexture sunflowerBack = new BitmapTexture();
+  public static final BitmapTexture lilacBottom = new BitmapTexture();
+  public static final BitmapTexture lilacTop = new BitmapTexture();
+  public static final BitmapTexture doubleTallGrassBottom = new BitmapTexture();
+  public static final BitmapTexture doubleTallGrassTop = new BitmapTexture();
+  public static final BitmapTexture largeFernBottom = new BitmapTexture();
+  public static final BitmapTexture largeFernTop = new BitmapTexture();
+  public static final BitmapTexture roseBushBottom = new BitmapTexture();
+  public static final BitmapTexture roseBushTop = new BitmapTexture();
+  public static final BitmapTexture peonyBottom = new BitmapTexture();
+  public static final BitmapTexture peonyTop = new BitmapTexture();
 
   // [1.7.2] Colored Glass Panes
-  public static final Texture glassPaneTop = new Texture();
-  public static final Texture whiteGlassPaneSide = new Texture();
-  public static final Texture orangeGlassPaneSide = new Texture();
-  public static final Texture magentaGlassPaneSide = new Texture();
-  public static final Texture lightBlueGlassPaneSide = new Texture();
-  public static final Texture yellowGlassPaneSide = new Texture();
-  public static final Texture limeGlassPaneSide = new Texture();
-  public static final Texture pinkGlassPaneSide = new Texture();
-  public static final Texture grayGlassPaneSide = new Texture();
-  public static final Texture lightGrayGlassPaneSide = new Texture();
-  public static final Texture cyanGlassPaneSide = new Texture();
-  public static final Texture purpleGlassPaneSide = new Texture();
-  public static final Texture blueGlassPaneSide = new Texture();
-  public static final Texture brownGlassPaneSide = new Texture();
-  public static final Texture greenGlassPaneSide = new Texture();
-  public static final Texture redGlassPaneSide = new Texture();
-  public static final Texture blackGlassPaneSide = new Texture();
+  public static final BitmapTexture glassPaneTop = new BitmapTexture();
+  public static final BitmapTexture whiteGlassPaneSide = new BitmapTexture();
+  public static final BitmapTexture orangeGlassPaneSide = new BitmapTexture();
+  public static final BitmapTexture magentaGlassPaneSide = new BitmapTexture();
+  public static final BitmapTexture lightBlueGlassPaneSide = new BitmapTexture();
+  public static final BitmapTexture yellowGlassPaneSide = new BitmapTexture();
+  public static final BitmapTexture limeGlassPaneSide = new BitmapTexture();
+  public static final BitmapTexture pinkGlassPaneSide = new BitmapTexture();
+  public static final BitmapTexture grayGlassPaneSide = new BitmapTexture();
+  public static final BitmapTexture lightGrayGlassPaneSide = new BitmapTexture();
+  public static final BitmapTexture cyanGlassPaneSide = new BitmapTexture();
+  public static final BitmapTexture purpleGlassPaneSide = new BitmapTexture();
+  public static final BitmapTexture blueGlassPaneSide = new BitmapTexture();
+  public static final BitmapTexture brownGlassPaneSide = new BitmapTexture();
+  public static final BitmapTexture greenGlassPaneSide = new BitmapTexture();
+  public static final BitmapTexture redGlassPaneSide = new BitmapTexture();
+  public static final BitmapTexture blackGlassPaneSide = new BitmapTexture();
 
   // Minecraft 1.9 blocks.
-  public static final Texture grassPathSide = new Texture();
-  public static final Texture grassPathTop = new Texture();
-  public static final Texture endBricks = new Texture();
-  public static final Texture purpurBlock = new Texture();
-  public static final Texture purpurPillarTop = new Texture();
-  public static final Texture purpurPillarSide = new Texture();
-  public static final Texture chorusFlower = new Texture();
-  public static final Texture chorusFlowerDead = new Texture();
-  public static final Texture chorusPlant = new Texture();
-  public static final Texture endRod = new Texture();
+  public static final BitmapTexture grassPathSide = new BitmapTexture();
+  public static final BitmapTexture grassPathTop = new BitmapTexture();
+  public static final BitmapTexture endBricks = new BitmapTexture();
+  public static final BitmapTexture purpurBlock = new BitmapTexture();
+  public static final BitmapTexture purpurPillarTop = new BitmapTexture();
+  public static final BitmapTexture purpurPillarSide = new BitmapTexture();
+  public static final BitmapTexture chorusFlower = new BitmapTexture();
+  public static final BitmapTexture chorusFlowerDead = new BitmapTexture();
+  public static final BitmapTexture chorusPlant = new BitmapTexture();
+  public static final BitmapTexture endRod = new BitmapTexture();
 
   // [1.11] Shulker boxes.
   public static final ShulkerTexture shulker = new ShulkerTexture();
@@ -488,31 +465,31 @@ public class Texture {
   public static final ShulkerTexture shulkerYellow = new ShulkerTexture();
 
   // [1.11] Observer block.
-  public static final Texture observerBack = new Texture();
-  public static final Texture observerBackOn = new Texture();
-  public static final Texture observerFront = new Texture();
-  public static final Texture observerSide = new Texture();
-  public static final Texture observerTop = new Texture();
+  public static final BitmapTexture observerBack = new BitmapTexture();
+  public static final BitmapTexture observerBackOn = new BitmapTexture();
+  public static final BitmapTexture observerFront = new BitmapTexture();
+  public static final BitmapTexture observerSide = new BitmapTexture();
+  public static final BitmapTexture observerTop = new BitmapTexture();
 
   // Trapped Chest.
-  public static final Texture trappedChestTop = new Texture();
-  public static final Texture trappedChestBottom = new Texture();
-  public static final Texture trappedChestLeft = new Texture();
-  public static final Texture trappedChestRight = new Texture();
-  public static final Texture trappedChestFront = new Texture("chest");
-  public static final Texture trappedChestBack = new Texture();
-  public static final Texture trappedChestLock = new Texture();
+  public static final BitmapTexture trappedChestTop = new BitmapTexture();
+  public static final BitmapTexture trappedChestBottom = new BitmapTexture();
+  public static final BitmapTexture trappedChestLeft = new BitmapTexture();
+  public static final BitmapTexture trappedChestRight = new BitmapTexture();
+  public static final BitmapTexture trappedChestFront = new BitmapTexture("chest");
+  public static final BitmapTexture trappedChestBack = new BitmapTexture();
+  public static final BitmapTexture trappedChestLock = new BitmapTexture();
 
-  public static final Texture largeTrappedChestFrontLeft = new Texture();
-  public static final Texture largeTrappedChestFrontRight = new Texture();
-  public static final Texture largeTrappedChestBackLeft = new Texture();
-  public static final Texture largeTrappedChestBackRight = new Texture();
-  public static final Texture largeTrappedChestTopLeft = new Texture();
-  public static final Texture largeTrappedChestTopRight = new Texture();
-  public static final Texture largeTrappedChestBottomLeft = new Texture();
-  public static final Texture largeTrappedChestBottomRight = new Texture();
-  public static final Texture largeTrappedChestLeft = new Texture();
-  public static final Texture largeTrappedChestRight = new Texture();
+  public static final BitmapTexture largeTrappedChestFrontLeft = new BitmapTexture();
+  public static final BitmapTexture largeTrappedChestFrontRight = new BitmapTexture();
+  public static final BitmapTexture largeTrappedChestBackLeft = new BitmapTexture();
+  public static final BitmapTexture largeTrappedChestBackRight = new BitmapTexture();
+  public static final BitmapTexture largeTrappedChestTopLeft = new BitmapTexture();
+  public static final BitmapTexture largeTrappedChestTopRight = new BitmapTexture();
+  public static final BitmapTexture largeTrappedChestBottomLeft = new BitmapTexture();
+  public static final BitmapTexture largeTrappedChestBottomRight = new BitmapTexture();
+  public static final BitmapTexture largeTrappedChestLeft = new BitmapTexture();
+  public static final BitmapTexture largeTrappedChestRight = new BitmapTexture();
 
   // Entity textures.
   public static final PlayerTexture alex = new PlayerTexture();
@@ -525,664 +502,664 @@ public class Texture {
   public static final EntityTexture book = new EntityTexture();
 
   // [1.10] Bone, magma, nether wart block, red nether brick.
-  public static final Texture boneSide = new Texture();
-  public static final Texture boneTop = new Texture();
-  public static final Texture magma = new Texture();
-  public static final Texture netherWartBlock = new Texture();
-  public static final Texture redNetherBrick = new Texture();
+  public static final BitmapTexture boneSide = new BitmapTexture();
+  public static final BitmapTexture boneTop = new BitmapTexture();
+  public static final BitmapTexture magma = new BitmapTexture();
+  public static final BitmapTexture netherWartBlock = new BitmapTexture();
+  public static final BitmapTexture redNetherBrick = new BitmapTexture();
 
   // [1.12] Glazed Terracotta:
-  public static final Texture terracottaBlack = new Texture();
-  public static final Texture terracottaBlue = new Texture();
-  public static final Texture terracottaBrown = new Texture();
-  public static final Texture terracottaCyan = new Texture();
-  public static final Texture terracottaGray = new Texture();
-  public static final Texture terracottaGreen = new Texture();
-  public static final Texture terracottaLightBlue = new Texture();
-  public static final Texture terracottaLime = new Texture();
-  public static final Texture terracottaMagenta = new Texture();
-  public static final Texture terracottaOrange = new Texture();
-  public static final Texture terracottaPink = new Texture();
-  public static final Texture terracottaPurple = new Texture();
-  public static final Texture terracottaRed = new Texture();
-  public static final Texture terracottaSilver = new Texture();
-  public static final Texture terracottaWhite = new Texture();
-  public static final Texture terracottaYellow = new Texture();
+  public static final BitmapTexture terracottaBlack = new BitmapTexture();
+  public static final BitmapTexture terracottaBlue = new BitmapTexture();
+  public static final BitmapTexture terracottaBrown = new BitmapTexture();
+  public static final BitmapTexture terracottaCyan = new BitmapTexture();
+  public static final BitmapTexture terracottaGray = new BitmapTexture();
+  public static final BitmapTexture terracottaGreen = new BitmapTexture();
+  public static final BitmapTexture terracottaLightBlue = new BitmapTexture();
+  public static final BitmapTexture terracottaLime = new BitmapTexture();
+  public static final BitmapTexture terracottaMagenta = new BitmapTexture();
+  public static final BitmapTexture terracottaOrange = new BitmapTexture();
+  public static final BitmapTexture terracottaPink = new BitmapTexture();
+  public static final BitmapTexture terracottaPurple = new BitmapTexture();
+  public static final BitmapTexture terracottaRed = new BitmapTexture();
+  public static final BitmapTexture terracottaSilver = new BitmapTexture();
+  public static final BitmapTexture terracottaWhite = new BitmapTexture();
+  public static final BitmapTexture terracottaYellow = new BitmapTexture();
 
   // [1.12] Concrete:
-  public static final Texture concreteBlack = new Texture();
-  public static final Texture concreteBlue = new Texture();
-  public static final Texture concreteBrown = new Texture();
-  public static final Texture concreteCyan = new Texture();
-  public static final Texture concreteGray = new Texture();
-  public static final Texture concreteGreen = new Texture();
-  public static final Texture concreteLightBlue = new Texture();
-  public static final Texture concreteLime = new Texture();
-  public static final Texture concreteMagenta = new Texture();
-  public static final Texture concreteOrange = new Texture();
-  public static final Texture concretePink = new Texture();
-  public static final Texture concretePurple = new Texture();
-  public static final Texture concreteRed = new Texture();
-  public static final Texture concreteSilver = new Texture();
-  public static final Texture concreteWhite = new Texture();
-  public static final Texture concreteYellow = new Texture();
+  public static final BitmapTexture concreteBlack = new BitmapTexture();
+  public static final BitmapTexture concreteBlue = new BitmapTexture();
+  public static final BitmapTexture concreteBrown = new BitmapTexture();
+  public static final BitmapTexture concreteCyan = new BitmapTexture();
+  public static final BitmapTexture concreteGray = new BitmapTexture();
+  public static final BitmapTexture concreteGreen = new BitmapTexture();
+  public static final BitmapTexture concreteLightBlue = new BitmapTexture();
+  public static final BitmapTexture concreteLime = new BitmapTexture();
+  public static final BitmapTexture concreteMagenta = new BitmapTexture();
+  public static final BitmapTexture concreteOrange = new BitmapTexture();
+  public static final BitmapTexture concretePink = new BitmapTexture();
+  public static final BitmapTexture concretePurple = new BitmapTexture();
+  public static final BitmapTexture concreteRed = new BitmapTexture();
+  public static final BitmapTexture concreteSilver = new BitmapTexture();
+  public static final BitmapTexture concreteWhite = new BitmapTexture();
+  public static final BitmapTexture concreteYellow = new BitmapTexture();
 
-  public static final Texture concretePowderBlack = new Texture();
-  public static final Texture concretePowderBlue = new Texture();
-  public static final Texture concretePowderBrown = new Texture();
-  public static final Texture concretePowderCyan = new Texture();
-  public static final Texture concretePowderGray = new Texture();
-  public static final Texture concretePowderGreen = new Texture();
-  public static final Texture concretePowderLightBlue = new Texture();
-  public static final Texture concretePowderLime = new Texture();
-  public static final Texture concretePowderMagenta = new Texture();
-  public static final Texture concretePowderOrange = new Texture();
-  public static final Texture concretePowderPink = new Texture();
-  public static final Texture concretePowderPurple = new Texture();
-  public static final Texture concretePowderRed = new Texture();
-  public static final Texture concretePowderSilver = new Texture();
-  public static final Texture concretePowderWhite = new Texture();
-  public static final Texture concretePowderYellow = new Texture();
+  public static final BitmapTexture concretePowderBlack = new BitmapTexture();
+  public static final BitmapTexture concretePowderBlue = new BitmapTexture();
+  public static final BitmapTexture concretePowderBrown = new BitmapTexture();
+  public static final BitmapTexture concretePowderCyan = new BitmapTexture();
+  public static final BitmapTexture concretePowderGray = new BitmapTexture();
+  public static final BitmapTexture concretePowderGreen = new BitmapTexture();
+  public static final BitmapTexture concretePowderLightBlue = new BitmapTexture();
+  public static final BitmapTexture concretePowderLime = new BitmapTexture();
+  public static final BitmapTexture concretePowderMagenta = new BitmapTexture();
+  public static final BitmapTexture concretePowderOrange = new BitmapTexture();
+  public static final BitmapTexture concretePowderPink = new BitmapTexture();
+  public static final BitmapTexture concretePowderPurple = new BitmapTexture();
+  public static final BitmapTexture concretePowderRed = new BitmapTexture();
+  public static final BitmapTexture concretePowderSilver = new BitmapTexture();
+  public static final BitmapTexture concretePowderWhite = new BitmapTexture();
+  public static final BitmapTexture concretePowderYellow = new BitmapTexture();
 
   // [1.12] Beetroots:
-  public static final Texture beets0 = new Texture();
-  public static final Texture beets1 = new Texture();
-  public static final Texture beets2 = new Texture();
-  public static final Texture beets3 = new Texture();
+  public static final BitmapTexture beets0 = new BitmapTexture();
+  public static final BitmapTexture beets1 = new BitmapTexture();
+  public static final BitmapTexture beets2 = new BitmapTexture();
+  public static final BitmapTexture beets3 = new BitmapTexture();
 
   /**
    * Missing or unknown texture.
    */
-  public static final Texture unknown = new Texture("unknown");
+  public static final BitmapTexture unknown = new BitmapTexture("unknown");
 
-  public static final Texture oakSignPost = new Texture();
-  public static final Texture packedIce = new Texture();
-  public static final Texture redSand = new Texture();
+  public static final BitmapTexture oakSignPost = new BitmapTexture();
+  public static final BitmapTexture packedIce = new BitmapTexture();
+  public static final BitmapTexture redSand = new BitmapTexture();
 
   // Tree variants.
-  public static final Texture oakWoodTop = new Texture("wood-top");
-  public static final Texture spruceWoodTop = new Texture("wood-top");
-  public static final Texture birchWoodTop = new Texture("wood-top");
-  public static final Texture jungleTreeTop = new Texture("wood-top");
-  public static final Texture acaciaWoodTop = new Texture("wood-top");
-  public static final Texture darkOakWoodTop = new Texture("wood-top");
+  public static final BitmapTexture oakWoodTop = new BitmapTexture("wood-top");
+  public static final BitmapTexture spruceWoodTop = new BitmapTexture("wood-top");
+  public static final BitmapTexture birchWoodTop = new BitmapTexture("wood-top");
+  public static final BitmapTexture jungleTreeTop = new BitmapTexture("wood-top");
+  public static final BitmapTexture acaciaWoodTop = new BitmapTexture("wood-top");
+  public static final BitmapTexture darkOakWoodTop = new BitmapTexture("wood-top");
 
-  public static final Texture oakLeaves = new Texture("leaves");
-  public static final Texture spruceLeaves = new Texture("leaves");
-  public static final Texture birchLeaves = new Texture("leaves");
-  public static final Texture jungleTreeLeaves = new Texture("leaves");
-  public static final Texture acaciaLeaves = new Texture("leaves");
-  public static final Texture darkOakLeaves = new Texture("leaves");
+  public static final BitmapTexture oakLeaves = new BitmapTexture("leaves");
+  public static final BitmapTexture spruceLeaves = new BitmapTexture("leaves");
+  public static final BitmapTexture birchLeaves = new BitmapTexture("leaves");
+  public static final BitmapTexture jungleTreeLeaves = new BitmapTexture("leaves");
+  public static final BitmapTexture acaciaLeaves = new BitmapTexture("leaves");
+  public static final BitmapTexture darkOakLeaves = new BitmapTexture("leaves");
 
-  public static final Texture oakSapling = new Texture("sapling");
-  public static final Texture spruceSapling = new Texture("sapling");
-  public static final Texture birchSapling = new Texture("sapling");
-  public static final Texture jungleSapling = new Texture("sapling");
-  public static final Texture acaciaSapling = new Texture("sapling");
-  public static final Texture darkOakSapling = new Texture("sapling");
+  public static final BitmapTexture oakSapling = new BitmapTexture("sapling");
+  public static final BitmapTexture spruceSapling = new BitmapTexture("sapling");
+  public static final BitmapTexture birchSapling = new BitmapTexture("sapling");
+  public static final BitmapTexture jungleSapling = new BitmapTexture("sapling");
+  public static final BitmapTexture acaciaSapling = new BitmapTexture("sapling");
+  public static final BitmapTexture darkOakSapling = new BitmapTexture("sapling");
 
-  public static final Texture oakPlanks = new Texture("wooden-planks");
-  public static final Texture sprucePlanks = new Texture("wooden-planks");
-  public static final Texture birchPlanks = new Texture("wooden-planks");
-  public static final Texture jungleTreePlanks = new Texture("wooden-planks");
-  public static final Texture acaciaPlanks = new Texture("wooden-planks");
-  public static final Texture darkOakPlanks = new Texture("wooden-planks");
+  public static final BitmapTexture oakPlanks = new BitmapTexture("wooden-planks");
+  public static final BitmapTexture sprucePlanks = new BitmapTexture("wooden-planks");
+  public static final BitmapTexture birchPlanks = new BitmapTexture("wooden-planks");
+  public static final BitmapTexture jungleTreePlanks = new BitmapTexture("wooden-planks");
+  public static final BitmapTexture acaciaPlanks = new BitmapTexture("wooden-planks");
+  public static final BitmapTexture darkOakPlanks = new BitmapTexture("wooden-planks");
 
-  public static final Texture oakWood = new Texture("wood");
-  public static final Texture spruceWood = new Texture("wood");
-  public static final Texture birchWood = new Texture("wood");
-  public static final Texture jungleWood = new Texture("wood");
-  public static final Texture acaciaWood = new Texture("wood");
-  public static final Texture darkOakWood = new Texture("wood");
+  public static final BitmapTexture oakWood = new BitmapTexture("wood");
+  public static final BitmapTexture spruceWood = new BitmapTexture("wood");
+  public static final BitmapTexture birchWood = new BitmapTexture("wood");
+  public static final BitmapTexture jungleWood = new BitmapTexture("wood");
+  public static final BitmapTexture acaciaWood = new BitmapTexture("wood");
+  public static final BitmapTexture darkOakWood = new BitmapTexture("wood");
 
-  public static final Texture frostedIce0 = new Texture();
-  public static final Texture frostedIce1 = new Texture();
-  public static final Texture frostedIce2 = new Texture();
-  public static final Texture frostedIce3 = new Texture();
+  public static final BitmapTexture frostedIce0 = new BitmapTexture();
+  public static final BitmapTexture frostedIce1 = new BitmapTexture();
+  public static final BitmapTexture frostedIce2 = new BitmapTexture();
+  public static final BitmapTexture frostedIce3 = new BitmapTexture();
 
-  public static final Texture spruceDoorTop = new Texture();
-  public static final Texture birchDoorTop = new Texture();
-  public static final Texture jungleDoorTop = new Texture();
-  public static final Texture acaciaDoorTop = new Texture();
-  public static final Texture darkOakDoorTop = new Texture();
+  public static final BitmapTexture spruceDoorTop = new BitmapTexture();
+  public static final BitmapTexture birchDoorTop = new BitmapTexture();
+  public static final BitmapTexture jungleDoorTop = new BitmapTexture();
+  public static final BitmapTexture acaciaDoorTop = new BitmapTexture();
+  public static final BitmapTexture darkOakDoorTop = new BitmapTexture();
 
-  public static final Texture spruceDoorBottom = new Texture();
-  public static final Texture birchDoorBottom = new Texture();
-  public static final Texture jungleDoorBottom = new Texture();
-  public static final Texture acaciaDoorBottom = new Texture();
-  public static final Texture darkOakDoorBottom = new Texture();
+  public static final BitmapTexture spruceDoorBottom = new BitmapTexture();
+  public static final BitmapTexture birchDoorBottom = new BitmapTexture();
+  public static final BitmapTexture jungleDoorBottom = new BitmapTexture();
+  public static final BitmapTexture acaciaDoorBottom = new BitmapTexture();
+  public static final BitmapTexture darkOakDoorBottom = new BitmapTexture();
 
-  public static final Texture strippedOakLog = new Texture();
-  public static final Texture strippedOakLogTop = new Texture();
+  public static final BitmapTexture strippedOakLog = new BitmapTexture();
+  public static final BitmapTexture strippedOakLogTop = new BitmapTexture();
 
-  public static final Texture strippedDarkOakLog = new Texture();
-  public static final Texture strippedDarkOakLogTop = new Texture();
+  public static final BitmapTexture strippedDarkOakLog = new BitmapTexture();
+  public static final BitmapTexture strippedDarkOakLogTop = new BitmapTexture();
 
-  public static final Texture strippedSpruceLog = new Texture();
-  public static final Texture strippedSpruceLogTop = new Texture();
+  public static final BitmapTexture strippedSpruceLog = new BitmapTexture();
+  public static final BitmapTexture strippedSpruceLogTop = new BitmapTexture();
 
-  public static final Texture strippedBirchLog = new Texture();
-  public static final Texture strippedBirchLogTop = new Texture();
+  public static final BitmapTexture strippedBirchLog = new BitmapTexture();
+  public static final BitmapTexture strippedBirchLogTop = new BitmapTexture();
 
-  public static final Texture strippedJungleLog = new Texture();
-  public static final Texture strippedJungleLogTop = new Texture();
+  public static final BitmapTexture strippedJungleLog = new BitmapTexture();
+  public static final BitmapTexture strippedJungleLogTop = new BitmapTexture();
 
-  public static final Texture strippedAcaciaLog = new Texture();
-  public static final Texture strippedAcaciaLogTop = new Texture();
+  public static final BitmapTexture strippedAcaciaLog = new BitmapTexture();
+  public static final BitmapTexture strippedAcaciaLogTop = new BitmapTexture();
 
-  public static final Texture bedWhite = new Texture();
-  public static final Texture bedOrange = new Texture();
-  public static final Texture bedMagenta = new Texture();
-  public static final Texture bedLightBlue = new Texture();
-  public static final Texture bedYellow = new Texture();
-  public static final Texture bedLime = new Texture();
-  public static final Texture bedPink = new Texture();
-  public static final Texture bedGray = new Texture();
-  public static final Texture bedSilver = new Texture();
-  public static final Texture bedCyan = new Texture();
-  public static final Texture bedPurple = new Texture();
-  public static final Texture bedBlue = new Texture();
-  public static final Texture bedBrown = new Texture();
-  public static final Texture bedGreen = new Texture();
-  public static final Texture bedRed = new Texture();
-  public static final Texture bedBlack = new Texture();
+  public static final BitmapTexture bedWhite = new BitmapTexture();
+  public static final BitmapTexture bedOrange = new BitmapTexture();
+  public static final BitmapTexture bedMagenta = new BitmapTexture();
+  public static final BitmapTexture bedLightBlue = new BitmapTexture();
+  public static final BitmapTexture bedYellow = new BitmapTexture();
+  public static final BitmapTexture bedLime = new BitmapTexture();
+  public static final BitmapTexture bedPink = new BitmapTexture();
+  public static final BitmapTexture bedGray = new BitmapTexture();
+  public static final BitmapTexture bedSilver = new BitmapTexture();
+  public static final BitmapTexture bedCyan = new BitmapTexture();
+  public static final BitmapTexture bedPurple = new BitmapTexture();
+  public static final BitmapTexture bedBlue = new BitmapTexture();
+  public static final BitmapTexture bedBrown = new BitmapTexture();
+  public static final BitmapTexture bedGreen = new BitmapTexture();
+  public static final BitmapTexture bedRed = new BitmapTexture();
+  public static final BitmapTexture bedBlack = new BitmapTexture();
 
   // [1.13]
-  public static final Texture kelp = new Texture();
-  public static final Texture kelpPlant = new Texture();
-  public static final Texture seagrass = new Texture();
-  public static final Texture tallSeagrassTop = new Texture();
-  public static final Texture tallSeagrassBottom = new Texture();
+  public static final BitmapTexture kelp = new BitmapTexture();
+  public static final BitmapTexture kelpPlant = new BitmapTexture();
+  public static final BitmapTexture seagrass = new BitmapTexture();
+  public static final BitmapTexture tallSeagrassTop = new BitmapTexture();
+  public static final BitmapTexture tallSeagrassBottom = new BitmapTexture();
 
-  public static final Texture driedKelpSide = new Texture();
-  public static final Texture driedKelpTop = new Texture();
-  public static final Texture driedKelpBottom = new Texture();
+  public static final BitmapTexture driedKelpSide = new BitmapTexture();
+  public static final BitmapTexture driedKelpTop = new BitmapTexture();
+  public static final BitmapTexture driedKelpBottom = new BitmapTexture();
 
-  public static final Texture tubeCoral = new Texture();
-  public static final Texture brainCoral = new Texture();
-  public static final Texture bubbleCoral = new Texture();
-  public static final Texture fireCoral = new Texture();
-  public static final Texture hornCoral = new Texture();
+  public static final BitmapTexture tubeCoral = new BitmapTexture();
+  public static final BitmapTexture brainCoral = new BitmapTexture();
+  public static final BitmapTexture bubbleCoral = new BitmapTexture();
+  public static final BitmapTexture fireCoral = new BitmapTexture();
+  public static final BitmapTexture hornCoral = new BitmapTexture();
 
-  public static final Texture tubeCoralBlock = new Texture();
-  public static final Texture brainCoralBlock = new Texture();
-  public static final Texture bubbleCoralBlock = new Texture();
-  public static final Texture fireCoralBlock = new Texture();
-  public static final Texture hornCoralBlock = new Texture();
+  public static final BitmapTexture tubeCoralBlock = new BitmapTexture();
+  public static final BitmapTexture brainCoralBlock = new BitmapTexture();
+  public static final BitmapTexture bubbleCoralBlock = new BitmapTexture();
+  public static final BitmapTexture fireCoralBlock = new BitmapTexture();
+  public static final BitmapTexture hornCoralBlock = new BitmapTexture();
 
-  public static final Texture deadTubeCoralBlock = new Texture();
-  public static final Texture deadBrainCoralBlock = new Texture();
-  public static final Texture deadBubbleCoralBlock = new Texture();
-  public static final Texture deadFireCoralBlock = new Texture();
-  public static final Texture deadHornCoralBlock = new Texture();
+  public static final BitmapTexture deadTubeCoralBlock = new BitmapTexture();
+  public static final BitmapTexture deadBrainCoralBlock = new BitmapTexture();
+  public static final BitmapTexture deadBubbleCoralBlock = new BitmapTexture();
+  public static final BitmapTexture deadFireCoralBlock = new BitmapTexture();
+  public static final BitmapTexture deadHornCoralBlock = new BitmapTexture();
 
-  public static final Texture tubeCoralFan = new Texture();
-  public static final Texture brainCoralFan = new Texture();
-  public static final Texture bubbleCoralFan = new Texture();
-  public static final Texture fireCoralFan = new Texture();
-  public static final Texture hornCoralFan = new Texture();
+  public static final BitmapTexture tubeCoralFan = new BitmapTexture();
+  public static final BitmapTexture brainCoralFan = new BitmapTexture();
+  public static final BitmapTexture bubbleCoralFan = new BitmapTexture();
+  public static final BitmapTexture fireCoralFan = new BitmapTexture();
+  public static final BitmapTexture hornCoralFan = new BitmapTexture();
 
-  public static final Texture deadTubeCoral = new Texture();
-  public static final Texture deadBrainCoral = new Texture();
-  public static final Texture deadBubbleCoral = new Texture();
-  public static final Texture deadFireCoral = new Texture();
-  public static final Texture deadHornCoral = new Texture();
+  public static final BitmapTexture deadTubeCoral = new BitmapTexture();
+  public static final BitmapTexture deadBrainCoral = new BitmapTexture();
+  public static final BitmapTexture deadBubbleCoral = new BitmapTexture();
+  public static final BitmapTexture deadFireCoral = new BitmapTexture();
+  public static final BitmapTexture deadHornCoral = new BitmapTexture();
 
-  public static final Texture deadTubeCoralFan = new Texture();
-  public static final Texture deadBrainCoralFan = new Texture();
-  public static final Texture deadBubbleCoralFan = new Texture();
-  public static final Texture deadFireCoralFan = new Texture();
-  public static final Texture deadHornCoralFan = new Texture();
+  public static final BitmapTexture deadTubeCoralFan = new BitmapTexture();
+  public static final BitmapTexture deadBrainCoralFan = new BitmapTexture();
+  public static final BitmapTexture deadBubbleCoralFan = new BitmapTexture();
+  public static final BitmapTexture deadFireCoralFan = new BitmapTexture();
+  public static final BitmapTexture deadHornCoralFan = new BitmapTexture();
 
-  public static final Texture turtleEgg = new Texture();
-  public static final Texture turtleEggSlightlyCracked = new Texture();
-  public static final Texture turtleEggVeryCracked = new Texture();
+  public static final BitmapTexture turtleEgg = new BitmapTexture();
+  public static final BitmapTexture turtleEggSlightlyCracked = new BitmapTexture();
+  public static final BitmapTexture turtleEggVeryCracked = new BitmapTexture();
 
-  public static final Texture blueIce = new Texture();
-  public static final Texture seaPickle = new Texture();
-  public static final Texture conduit = new Texture();
-  public static final Texture structureBlock = new Texture();
-  public static final Texture structureBlockCorner = new Texture();
-  public static final Texture structureBlockData = new Texture();
-  public static final Texture structureBlockLoad = new Texture();
-  public static final Texture structureBlockSave = new Texture();
+  public static final BitmapTexture blueIce = new BitmapTexture();
+  public static final BitmapTexture seaPickle = new BitmapTexture();
+  public static final BitmapTexture conduit = new BitmapTexture();
+  public static final BitmapTexture structureBlock = new BitmapTexture();
+  public static final BitmapTexture structureBlockCorner = new BitmapTexture();
+  public static final BitmapTexture structureBlockData = new BitmapTexture();
+  public static final BitmapTexture structureBlockLoad = new BitmapTexture();
+  public static final BitmapTexture structureBlockSave = new BitmapTexture();
 
   // [1.14]
-  public static final Texture barrelTop = new Texture();
-  public static final Texture barrelOpen = new Texture();
-  public static final Texture barrelSide = new Texture();
-  public static final Texture barrelBottom = new Texture();
-  public static final Texture loomBottom = new Texture();
-  public static final Texture loomFront = new Texture();
-  public static final Texture loomSide = new Texture();
-  public static final Texture loomTop = new Texture();
-  public static final Texture acaciaSignPost = new Texture();
-  public static final Texture birchSignPost = new Texture();
-  public static final Texture darkOakSignPost = new Texture();
-  public static final Texture jungleSignPost = new Texture();
-  public static final Texture spruceSignPost = new Texture();
-  public static final Texture cartographyTableSide1 = new Texture();
-  public static final Texture cartographyTableSide2 = new Texture();
-  public static final Texture cartographyTableSide3 = new Texture();
-  public static final Texture cartographyTableTop = new Texture();
-  public static final Texture fletchingTableFront = new Texture();
-  public static final Texture fletchingTableSide = new Texture();
-  public static final Texture fletchingTableTop = new Texture();
-  public static final Texture smithingTableFront = new Texture();
-  public static final Texture smithingTableSide = new Texture();
-  public static final Texture smithingTableTop = new Texture();
-  public static final Texture smithingTableBottom = new Texture();
-  public static final Texture blastFurnaceTop = new Texture();
-  public static final Texture blastFurnaceSide = new Texture();
-  public static final Texture blastFurnaceFrontOn = new Texture();
-  public static final Texture blastFurnaceFront = new Texture();
-  public static final Texture smokerTop = new Texture();
-  public static final Texture smokerSide = new Texture();
-  public static final Texture smokerBottom = new Texture();
-  public static final Texture smokerFrontOn = new Texture();
-  public static final Texture smokerFront = new Texture();
-  public static final Texture sweetBerryBushStage0 = new Texture();
-  public static final Texture sweetBerryBushStage1 = new Texture();
-  public static final Texture sweetBerryBushStage2 = new Texture();
-  public static final Texture sweetBerryBushStage3 = new Texture();
-  public static final Texture cornflower = new Texture();
-  public static final Texture lilyOfTheValley = new Texture();
-  public static final Texture witherRose = new Texture();
-  public static final Texture bambooSapling = new Texture();
-  public static final Texture lecternBase = new Texture();
-  public static final Texture lecternFront = new Texture();
-  public static final Texture lecternSides = new Texture();
-  public static final Texture lecternTop = new Texture();
-  public static final Texture composterTop = new Texture();
-  public static final Texture composterBottom = new Texture();
-  public static final Texture composterSide = new Texture();
-  public static final Texture composterCompost = new Texture();
-  public static final Texture composterReady = new Texture();
-  public static final Texture bambooStalk = new Texture();
-  public static final Texture bambooSmallLeaves = new Texture();
-  public static final Texture bambooLargeLeaves = new Texture();
-  public static final Texture bambooSingleLeaf = new Texture();
-  public static final Texture stonecutterBottom = new Texture();
-  public static final Texture stonecutterTop = new Texture();
-  public static final Texture stonecutterSide = new Texture();
-  public static final Texture stonecutterSaw = new Texture();
-  public static final Texture grindstonePivot = new Texture();
-  public static final Texture grindstoneRound = new Texture();
-  public static final Texture grindstoneSide = new Texture();
-  public static final Texture campfireLog = new Texture();
-  public static final Texture campfireLogLit = new Texture();
-  public static final Texture campfireFire = new Texture();
-  public static final Texture lantern = new Texture();
-  public static final Texture bellBody = new Texture();
-  public static final Texture scaffoldingTop = new Texture();
-  public static final Texture scaffoldingSide = new Texture();
-  public static final Texture scaffoldingBottom = new Texture();
-  public static final Texture jigsawTop = new Texture();
-  public static final Texture jigsawSide = new Texture();
-  public static final Texture jigsawBottom = new Texture();
+  public static final BitmapTexture barrelTop = new BitmapTexture();
+  public static final BitmapTexture barrelOpen = new BitmapTexture();
+  public static final BitmapTexture barrelSide = new BitmapTexture();
+  public static final BitmapTexture barrelBottom = new BitmapTexture();
+  public static final BitmapTexture loomBottom = new BitmapTexture();
+  public static final BitmapTexture loomFront = new BitmapTexture();
+  public static final BitmapTexture loomSide = new BitmapTexture();
+  public static final BitmapTexture loomTop = new BitmapTexture();
+  public static final BitmapTexture acaciaSignPost = new BitmapTexture();
+  public static final BitmapTexture birchSignPost = new BitmapTexture();
+  public static final BitmapTexture darkOakSignPost = new BitmapTexture();
+  public static final BitmapTexture jungleSignPost = new BitmapTexture();
+  public static final BitmapTexture spruceSignPost = new BitmapTexture();
+  public static final BitmapTexture cartographyTableSide1 = new BitmapTexture();
+  public static final BitmapTexture cartographyTableSide2 = new BitmapTexture();
+  public static final BitmapTexture cartographyTableSide3 = new BitmapTexture();
+  public static final BitmapTexture cartographyTableTop = new BitmapTexture();
+  public static final BitmapTexture fletchingTableFront = new BitmapTexture();
+  public static final BitmapTexture fletchingTableSide = new BitmapTexture();
+  public static final BitmapTexture fletchingTableTop = new BitmapTexture();
+  public static final BitmapTexture smithingTableFront = new BitmapTexture();
+  public static final BitmapTexture smithingTableSide = new BitmapTexture();
+  public static final BitmapTexture smithingTableTop = new BitmapTexture();
+  public static final BitmapTexture smithingTableBottom = new BitmapTexture();
+  public static final BitmapTexture blastFurnaceTop = new BitmapTexture();
+  public static final BitmapTexture blastFurnaceSide = new BitmapTexture();
+  public static final BitmapTexture blastFurnaceFrontOn = new BitmapTexture();
+  public static final BitmapTexture blastFurnaceFront = new BitmapTexture();
+  public static final BitmapTexture smokerTop = new BitmapTexture();
+  public static final BitmapTexture smokerSide = new BitmapTexture();
+  public static final BitmapTexture smokerBottom = new BitmapTexture();
+  public static final BitmapTexture smokerFrontOn = new BitmapTexture();
+  public static final BitmapTexture smokerFront = new BitmapTexture();
+  public static final BitmapTexture sweetBerryBushStage0 = new BitmapTexture();
+  public static final BitmapTexture sweetBerryBushStage1 = new BitmapTexture();
+  public static final BitmapTexture sweetBerryBushStage2 = new BitmapTexture();
+  public static final BitmapTexture sweetBerryBushStage3 = new BitmapTexture();
+  public static final BitmapTexture cornflower = new BitmapTexture();
+  public static final BitmapTexture lilyOfTheValley = new BitmapTexture();
+  public static final BitmapTexture witherRose = new BitmapTexture();
+  public static final BitmapTexture bambooSapling = new BitmapTexture();
+  public static final BitmapTexture lecternBase = new BitmapTexture();
+  public static final BitmapTexture lecternFront = new BitmapTexture();
+  public static final BitmapTexture lecternSides = new BitmapTexture();
+  public static final BitmapTexture lecternTop = new BitmapTexture();
+  public static final BitmapTexture composterTop = new BitmapTexture();
+  public static final BitmapTexture composterBottom = new BitmapTexture();
+  public static final BitmapTexture composterSide = new BitmapTexture();
+  public static final BitmapTexture composterCompost = new BitmapTexture();
+  public static final BitmapTexture composterReady = new BitmapTexture();
+  public static final BitmapTexture bambooStalk = new BitmapTexture();
+  public static final BitmapTexture bambooSmallLeaves = new BitmapTexture();
+  public static final BitmapTexture bambooLargeLeaves = new BitmapTexture();
+  public static final BitmapTexture bambooSingleLeaf = new BitmapTexture();
+  public static final BitmapTexture stonecutterBottom = new BitmapTexture();
+  public static final BitmapTexture stonecutterTop = new BitmapTexture();
+  public static final BitmapTexture stonecutterSide = new BitmapTexture();
+  public static final BitmapTexture stonecutterSaw = new BitmapTexture();
+  public static final BitmapTexture grindstonePivot = new BitmapTexture();
+  public static final BitmapTexture grindstoneRound = new BitmapTexture();
+  public static final BitmapTexture grindstoneSide = new BitmapTexture();
+  public static final BitmapTexture campfireLog = new BitmapTexture();
+  public static final BitmapTexture campfireLogLit = new BitmapTexture();
+  public static final BitmapTexture campfireFire = new BitmapTexture();
+  public static final BitmapTexture lantern = new BitmapTexture();
+  public static final BitmapTexture bellBody = new BitmapTexture();
+  public static final BitmapTexture scaffoldingTop = new BitmapTexture();
+  public static final BitmapTexture scaffoldingSide = new BitmapTexture();
+  public static final BitmapTexture scaffoldingBottom = new BitmapTexture();
+  public static final BitmapTexture jigsawTop = new BitmapTexture();
+  public static final BitmapTexture jigsawSide = new BitmapTexture();
+  public static final BitmapTexture jigsawBottom = new BitmapTexture();
 
   // [1.15]
-  public static final Texture honeyBlockTop = new Texture();
-  public static final Texture honeyBlockSide = new Texture();
-  public static final Texture honeyBlockBottom = new Texture();
-  public static final Texture beeNestFront = new Texture();
-  public static final Texture beeNestFrontHoney = new Texture();
-  public static final Texture beeNestSide = new Texture();
-  public static final Texture beeNestTop = new Texture();
-  public static final Texture beeNestBottom = new Texture();
-  public static final Texture beehiveFront = new Texture();
-  public static final Texture beehiveFrontHoney = new Texture();
-  public static final Texture beehiveSide = new Texture();
-  public static final Texture beehiveEnd = new Texture();
-  public static final Texture honeycombBlock = new Texture();
+  public static final BitmapTexture honeyBlockTop = new BitmapTexture();
+  public static final BitmapTexture honeyBlockSide = new BitmapTexture();
+  public static final BitmapTexture honeyBlockBottom = new BitmapTexture();
+  public static final BitmapTexture beeNestFront = new BitmapTexture();
+  public static final BitmapTexture beeNestFrontHoney = new BitmapTexture();
+  public static final BitmapTexture beeNestSide = new BitmapTexture();
+  public static final BitmapTexture beeNestTop = new BitmapTexture();
+  public static final BitmapTexture beeNestBottom = new BitmapTexture();
+  public static final BitmapTexture beehiveFront = new BitmapTexture();
+  public static final BitmapTexture beehiveFrontHoney = new BitmapTexture();
+  public static final BitmapTexture beehiveSide = new BitmapTexture();
+  public static final BitmapTexture beehiveEnd = new BitmapTexture();
+  public static final BitmapTexture honeycombBlock = new BitmapTexture();
 
   // [1.16]
-  public static final Texture soulSoil = new Texture();
-  public static final Texture crimsonNylium = new Texture();
-  public static final Texture crimsonNyliumSide = new Texture();
-  public static final Texture warpedNylium = new Texture();
-  public static final Texture warpedNyliumSide = new Texture();
-  public static final Texture netherGoldOre = new Texture();
-  public static final Texture targetSide = new Texture();
-  public static final Texture targetTop = new Texture();
-  public static final Texture netheriteBlock = new Texture();
-  public static final Texture shroomlight = new Texture();
-  public static final Texture warpedWartBlock = new Texture();
-  public static final Texture basaltSide = new Texture();
-  public static final Texture basaltTop = new Texture();
-  public static final Texture polishedBasaltSide = new Texture();
-  public static final Texture polishedBasaltTop = new Texture();
-  public static final Texture ancientDebrisSide = new Texture();
-  public static final Texture ancientDebrisTop = new Texture();
-  public static final Texture warpedFungus = new Texture();
-  public static final Texture crimsonFungus = new Texture();
-  public static final Texture netherSprouts = new Texture();
-  public static final Texture warpedRoots = new Texture();
-  public static final Texture crimsonRoots = new Texture();
-  public static final Texture warpedRootsPot = new Texture();
-  public static final Texture crimsonRootsPot = new Texture();
-  public static final Texture cryingObsidian = new Texture();
-  public static final Texture warpedStem = new Texture();
-  public static final Texture warpedStemTop = new Texture();
-  public static final Texture strippedWarpedStem = new Texture();
-  public static final Texture strippedWarpedStemTop = new Texture();
-  public static final Texture crimsonStem = new Texture();
-  public static final Texture crimsonStemTop = new Texture();
-  public static final Texture strippedCrimsonStem = new Texture();
-  public static final Texture strippedCrimsonStemTop = new Texture();
-  public static final Texture soulFireLantern = new Texture();
-  public static final Texture twistingVines = new Texture();
-  public static final Texture twistingVinesPlant = new Texture();
-  public static final Texture weepingVines = new Texture();
-  public static final Texture weepingVinesPlant = new Texture();
-  public static final Texture soulFireTorch = new Texture();
-  public static final Texture respawnAnchorTop = new Texture();
-  public static final Texture respawnAnchorBottom = new Texture();
-  public static final Texture respawnAnchorSide0 = new Texture();
-  public static final Texture respawnAnchorSide1 = new Texture();
-  public static final Texture respawnAnchorSide2 = new Texture();
-  public static final Texture respawnAnchorSide3 = new Texture();
-  public static final Texture respawnAnchorSide4 = new Texture();
-  public static final Texture crimsonSignPost = new Texture();
-  public static final Texture warpedSignPost = new Texture();
-  public static final Texture crimsonPlanks = new Texture();
-  public static final Texture warpedPlanks = new Texture();
-  public static final Texture crimsonDoorTop = new Texture();
-  public static final Texture crimsonDoorBottom = new Texture();
-  public static final Texture warpedDoorTop = new Texture();
-  public static final Texture warpedDoorBottom = new Texture();
-  public static final Texture crimsonTrapdoor = new Texture();
-  public static final Texture warpedTrapdoor = new Texture();
-  public static final Texture soulFire = new Texture();
+  public static final BitmapTexture soulSoil = new BitmapTexture();
+  public static final BitmapTexture crimsonNylium = new BitmapTexture();
+  public static final BitmapTexture crimsonNyliumSide = new BitmapTexture();
+  public static final BitmapTexture warpedNylium = new BitmapTexture();
+  public static final BitmapTexture warpedNyliumSide = new BitmapTexture();
+  public static final BitmapTexture netherGoldOre = new BitmapTexture();
+  public static final BitmapTexture targetSide = new BitmapTexture();
+  public static final BitmapTexture targetTop = new BitmapTexture();
+  public static final BitmapTexture netheriteBlock = new BitmapTexture();
+  public static final BitmapTexture shroomlight = new BitmapTexture();
+  public static final BitmapTexture warpedWartBlock = new BitmapTexture();
+  public static final BitmapTexture basaltSide = new BitmapTexture();
+  public static final BitmapTexture basaltTop = new BitmapTexture();
+  public static final BitmapTexture polishedBasaltSide = new BitmapTexture();
+  public static final BitmapTexture polishedBasaltTop = new BitmapTexture();
+  public static final BitmapTexture ancientDebrisSide = new BitmapTexture();
+  public static final BitmapTexture ancientDebrisTop = new BitmapTexture();
+  public static final BitmapTexture warpedFungus = new BitmapTexture();
+  public static final BitmapTexture crimsonFungus = new BitmapTexture();
+  public static final BitmapTexture netherSprouts = new BitmapTexture();
+  public static final BitmapTexture warpedRoots = new BitmapTexture();
+  public static final BitmapTexture crimsonRoots = new BitmapTexture();
+  public static final BitmapTexture warpedRootsPot = new BitmapTexture();
+  public static final BitmapTexture crimsonRootsPot = new BitmapTexture();
+  public static final BitmapTexture cryingObsidian = new BitmapTexture();
+  public static final BitmapTexture warpedStem = new BitmapTexture();
+  public static final BitmapTexture warpedStemTop = new BitmapTexture();
+  public static final BitmapTexture strippedWarpedStem = new BitmapTexture();
+  public static final BitmapTexture strippedWarpedStemTop = new BitmapTexture();
+  public static final BitmapTexture crimsonStem = new BitmapTexture();
+  public static final BitmapTexture crimsonStemTop = new BitmapTexture();
+  public static final BitmapTexture strippedCrimsonStem = new BitmapTexture();
+  public static final BitmapTexture strippedCrimsonStemTop = new BitmapTexture();
+  public static final BitmapTexture soulFireLantern = new BitmapTexture();
+  public static final BitmapTexture twistingVines = new BitmapTexture();
+  public static final BitmapTexture twistingVinesPlant = new BitmapTexture();
+  public static final BitmapTexture weepingVines = new BitmapTexture();
+  public static final BitmapTexture weepingVinesPlant = new BitmapTexture();
+  public static final BitmapTexture soulFireTorch = new BitmapTexture();
+  public static final BitmapTexture respawnAnchorTop = new BitmapTexture();
+  public static final BitmapTexture respawnAnchorBottom = new BitmapTexture();
+  public static final BitmapTexture respawnAnchorSide0 = new BitmapTexture();
+  public static final BitmapTexture respawnAnchorSide1 = new BitmapTexture();
+  public static final BitmapTexture respawnAnchorSide2 = new BitmapTexture();
+  public static final BitmapTexture respawnAnchorSide3 = new BitmapTexture();
+  public static final BitmapTexture respawnAnchorSide4 = new BitmapTexture();
+  public static final BitmapTexture crimsonSignPost = new BitmapTexture();
+  public static final BitmapTexture warpedSignPost = new BitmapTexture();
+  public static final BitmapTexture crimsonPlanks = new BitmapTexture();
+  public static final BitmapTexture warpedPlanks = new BitmapTexture();
+  public static final BitmapTexture crimsonDoorTop = new BitmapTexture();
+  public static final BitmapTexture crimsonDoorBottom = new BitmapTexture();
+  public static final BitmapTexture warpedDoorTop = new BitmapTexture();
+  public static final BitmapTexture warpedDoorBottom = new BitmapTexture();
+  public static final BitmapTexture crimsonTrapdoor = new BitmapTexture();
+  public static final BitmapTexture warpedTrapdoor = new BitmapTexture();
+  public static final BitmapTexture soulFire = new BitmapTexture();
   public static final AnimatedTexture soulFireLayer0 = new AnimatedTexture();
   public static final AnimatedTexture soulFireLayer1 = new AnimatedTexture();
-  public static final Texture lodestoneSide = new Texture();
-  public static final Texture lodestoneTop = new Texture();
-  public static final Texture blackstone = new Texture();
-  public static final Texture blackstoneTop = new Texture();
-  public static final Texture chiseledNetherBricks = new Texture();
-  public static final Texture crackedNetherBricks = new Texture();
-  public static final Texture gildedBlackstone = new Texture();
-  public static final Texture soulCampfireLogLit = new Texture();
-  public static final Texture soulCampfireFire = new Texture();
-  public static final Texture polishedBlackstone = new Texture();
-  public static final Texture chiseledPolishedBlackstone = new Texture();
-  public static final Texture polishedBlackstoneBricks = new Texture();
-  public static final Texture crackedPolishedBlackstoneBricks = new Texture();
-  public static final Texture quartzBricks = new Texture();
-  public static final Texture chain = new Texture();
-  public static final Texture jigsawLock = new Texture();
+  public static final BitmapTexture lodestoneSide = new BitmapTexture();
+  public static final BitmapTexture lodestoneTop = new BitmapTexture();
+  public static final BitmapTexture blackstone = new BitmapTexture();
+  public static final BitmapTexture blackstoneTop = new BitmapTexture();
+  public static final BitmapTexture chiseledNetherBricks = new BitmapTexture();
+  public static final BitmapTexture crackedNetherBricks = new BitmapTexture();
+  public static final BitmapTexture gildedBlackstone = new BitmapTexture();
+  public static final BitmapTexture soulCampfireLogLit = new BitmapTexture();
+  public static final BitmapTexture soulCampfireFire = new BitmapTexture();
+  public static final BitmapTexture polishedBlackstone = new BitmapTexture();
+  public static final BitmapTexture chiseledPolishedBlackstone = new BitmapTexture();
+  public static final BitmapTexture polishedBlackstoneBricks = new BitmapTexture();
+  public static final BitmapTexture crackedPolishedBlackstoneBricks = new BitmapTexture();
+  public static final BitmapTexture quartzBricks = new BitmapTexture();
+  public static final BitmapTexture chain = new BitmapTexture();
+  public static final BitmapTexture jigsawLock = new BitmapTexture();
 
   // [1.17]
-  public static final Texture candle = new Texture();
-  public static final Texture whiteCandle = new Texture();
-  public static final Texture orangeCandle = new Texture();
-  public static final Texture magentaCandle = new Texture();
-  public static final Texture lightBlueCandle = new Texture();
-  public static final Texture yellowCandle = new Texture();
-  public static final Texture limeCandle = new Texture();
-  public static final Texture pinkCandle = new Texture();
-  public static final Texture grayCandle = new Texture();
-  public static final Texture lightGrayCandle = new Texture();
-  public static final Texture cyanCandle = new Texture();
-  public static final Texture purpleCandle = new Texture();
-  public static final Texture blueCandle = new Texture();
-  public static final Texture brownCandle = new Texture();
-  public static final Texture greenCandle = new Texture();
-  public static final Texture redCandle = new Texture();
-  public static final Texture blackCandle = new Texture();
-  public static final Texture candleLit = new Texture();
-  public static final Texture whiteCandleLit = new Texture();
-  public static final Texture orangeCandleLit = new Texture();
-  public static final Texture magentaCandleLit = new Texture();
-  public static final Texture lightBlueCandleLit = new Texture();
-  public static final Texture yellowCandleLit = new Texture();
-  public static final Texture limeCandleLit = new Texture();
-  public static final Texture pinkCandleLit = new Texture();
-  public static final Texture grayCandleLit = new Texture();
-  public static final Texture lightGrayCandleLit = new Texture();
-  public static final Texture cyanCandleLit = new Texture();
-  public static final Texture purpleCandleLit = new Texture();
-  public static final Texture blueCandleLit = new Texture();
-  public static final Texture brownCandleLit = new Texture();
-  public static final Texture greenCandleLit = new Texture();
-  public static final Texture redCandleLit = new Texture();
-  public static final Texture blackCandleLit = new Texture();
-  public static final Texture flameParticle = new Texture();
-  public static final Texture copperOre = new Texture();
-  public static final Texture calcite = new Texture();
-  public static final Texture tuff = new Texture();
-  public static final Texture amethyst = new Texture();
-  public static final Texture buddingAmethyst = new Texture();
-  public static final Texture copperBlock = new Texture();
-  public static final Texture exposedCopper = new Texture();
-  public static final Texture weatheredCopper = new Texture();
-  public static final Texture oxidizedCopper = new Texture();
-  public static final Texture cutCopper = new Texture();
-  public static final Texture exposedCutCopper = new Texture();
-  public static final Texture weatheredCutCopper = new Texture();
-  public static final Texture oxidizedCutCopper = new Texture();
-  public static final Texture lightningRod = new Texture();
-  public static final Texture smallAmethystBud = new Texture();
-  public static final Texture mediumAmethystBud = new Texture();
-  public static final Texture largeAmethystBud = new Texture();
-  public static final Texture amethystCluster = new Texture();
-  public static final Texture tintedGlass = new Texture();
-  public static final Texture powderSnow = new Texture();
-  public static final Texture dripstoneBlock = new Texture();
-  public static final Texture pointedDripstoneDownBase = new Texture();
-  public static final Texture pointedDripstoneDownFrustum = new Texture();
-  public static final Texture pointedDripstoneDownMiddle = new Texture();
-  public static final Texture pointedDripstoneDownTip = new Texture();
-  public static final Texture pointedDripstoneDownTipMerge = new Texture();
-  public static final Texture pointedDripstoneUpBase = new Texture();
-  public static final Texture pointedDripstoneUpFrustum = new Texture();
-  public static final Texture pointedDripstoneUpMiddle = new Texture();
-  public static final Texture pointedDripstoneUpTip = new Texture();
-  public static final Texture pointedDripstoneUpTipMerge = new Texture();
-  public static final Texture sculkSensorBottom = new Texture();
-  public static final Texture sculkSensorSide = new Texture();
-  public static final Texture sculkSensorTendrilActive = new Texture();
-  public static final Texture sculkSensorTendrilInactive = new Texture();
-  public static final Texture sculkSensorTop = new Texture();
-  public static final Texture glowLichen = new Texture();
-  public static final Texture azaleaTop = new Texture();
-  public static final Texture azaleaSide = new Texture();
-  public static final Texture azaleaPlant = new Texture();
-  public static final Texture floweringAzaleaTop = new Texture();
-  public static final Texture floweringAzaleaSide = new Texture();
-  public static final Texture azaleaLeaves = new Texture();
-  public static final Texture floweringAzaleaLeaves = new Texture();
-  public static final Texture mossBlock = new Texture();
-  public static final Texture caveVinesPlant = new Texture();
-  public static final Texture caveVinesPlantLit = new Texture();
-  public static final Texture caveVines = new Texture();
-  public static final Texture caveVinesLit = new Texture();
-  public static final Texture hangingRoots = new Texture();
-  public static final Texture rootedDirt = new Texture();
-  public static final Texture bigDripleafStem = new Texture();
-  public static final Texture bigDripleafTop = new Texture();
-  public static final Texture bigDripleafSide = new Texture();
-  public static final Texture bigDripleafTip = new Texture();
-  public static final Texture smallDripleafTop = new Texture();
-  public static final Texture smallDripleafSide = new Texture();
-  public static final Texture smallDripleafStemTop = new Texture();
-  public static final Texture smallDripleafStemBottom = new Texture();
-  public static final Texture sporeBlossom = new Texture();
-  public static final Texture sporeBlossomBase = new Texture();
-  public static final Texture deepslate = new Texture();
-  public static final Texture deepslateTop = new Texture();
-  public static final Texture polishedDeepslate = new Texture();
-  public static final Texture chiseledDeepslate = new Texture();
-  public static final Texture deepslateBricks = new Texture();
-  public static final Texture deepslateTiles = new Texture();
-  public static final Texture smoothBasalt = new Texture();
-  public static final Texture cobbledDeepslate = new Texture();
-  public static final Texture deepslateGoldOre = new Texture();
-  public static final Texture deepslateIronOre = new Texture();
-  public static final Texture deepslateDiamondOre = new Texture();
-  public static final Texture deepslateLapisOre = new Texture();
-  public static final Texture deepslateRedstoneOre = new Texture();
-  public static final Texture crackedDeepslateBricks = new Texture();
-  public static final Texture crackedDeepslateTiles = new Texture();
-  public static final Texture deepslateCoalOre = new Texture();
-  public static final Texture deepslateCopperOre = new Texture();
-  public static final Texture deepslateEmeraldOre = new Texture();
-  public static final Texture lightningRodOn = new Texture();
-  public static final Texture light = new Texture();
-  public static final Texture rawCopperBlock = new Texture();
-  public static final Texture rawGoldBlock = new Texture();
-  public static final Texture rawIronBlock = new Texture();
-  public static final Texture pottedAzaleaBushTop = new Texture();
-  public static final Texture pottedAzaleaBushSide = new Texture();
-  public static final Texture pottedAzaleaBushPlant = new Texture();
-  public static final Texture pottedFloweringAzaleaBushTop = new Texture();
-  public static final Texture pottedFloweringAzaleaBushSide = new Texture();
+  public static final BitmapTexture candle = new BitmapTexture();
+  public static final BitmapTexture whiteCandle = new BitmapTexture();
+  public static final BitmapTexture orangeCandle = new BitmapTexture();
+  public static final BitmapTexture magentaCandle = new BitmapTexture();
+  public static final BitmapTexture lightBlueCandle = new BitmapTexture();
+  public static final BitmapTexture yellowCandle = new BitmapTexture();
+  public static final BitmapTexture limeCandle = new BitmapTexture();
+  public static final BitmapTexture pinkCandle = new BitmapTexture();
+  public static final BitmapTexture grayCandle = new BitmapTexture();
+  public static final BitmapTexture lightGrayCandle = new BitmapTexture();
+  public static final BitmapTexture cyanCandle = new BitmapTexture();
+  public static final BitmapTexture purpleCandle = new BitmapTexture();
+  public static final BitmapTexture blueCandle = new BitmapTexture();
+  public static final BitmapTexture brownCandle = new BitmapTexture();
+  public static final BitmapTexture greenCandle = new BitmapTexture();
+  public static final BitmapTexture redCandle = new BitmapTexture();
+  public static final BitmapTexture blackCandle = new BitmapTexture();
+  public static final BitmapTexture candleLit = new BitmapTexture();
+  public static final BitmapTexture whiteCandleLit = new BitmapTexture();
+  public static final BitmapTexture orangeCandleLit = new BitmapTexture();
+  public static final BitmapTexture magentaCandleLit = new BitmapTexture();
+  public static final BitmapTexture lightBlueCandleLit = new BitmapTexture();
+  public static final BitmapTexture yellowCandleLit = new BitmapTexture();
+  public static final BitmapTexture limeCandleLit = new BitmapTexture();
+  public static final BitmapTexture pinkCandleLit = new BitmapTexture();
+  public static final BitmapTexture grayCandleLit = new BitmapTexture();
+  public static final BitmapTexture lightGrayCandleLit = new BitmapTexture();
+  public static final BitmapTexture cyanCandleLit = new BitmapTexture();
+  public static final BitmapTexture purpleCandleLit = new BitmapTexture();
+  public static final BitmapTexture blueCandleLit = new BitmapTexture();
+  public static final BitmapTexture brownCandleLit = new BitmapTexture();
+  public static final BitmapTexture greenCandleLit = new BitmapTexture();
+  public static final BitmapTexture redCandleLit = new BitmapTexture();
+  public static final BitmapTexture blackCandleLit = new BitmapTexture();
+  public static final BitmapTexture flameParticle = new BitmapTexture();
+  public static final BitmapTexture copperOre = new BitmapTexture();
+  public static final BitmapTexture calcite = new BitmapTexture();
+  public static final BitmapTexture tuff = new BitmapTexture();
+  public static final BitmapTexture amethyst = new BitmapTexture();
+  public static final BitmapTexture buddingAmethyst = new BitmapTexture();
+  public static final BitmapTexture copperBlock = new BitmapTexture();
+  public static final BitmapTexture exposedCopper = new BitmapTexture();
+  public static final BitmapTexture weatheredCopper = new BitmapTexture();
+  public static final BitmapTexture oxidizedCopper = new BitmapTexture();
+  public static final BitmapTexture cutCopper = new BitmapTexture();
+  public static final BitmapTexture exposedCutCopper = new BitmapTexture();
+  public static final BitmapTexture weatheredCutCopper = new BitmapTexture();
+  public static final BitmapTexture oxidizedCutCopper = new BitmapTexture();
+  public static final BitmapTexture lightningRod = new BitmapTexture();
+  public static final BitmapTexture smallAmethystBud = new BitmapTexture();
+  public static final BitmapTexture mediumAmethystBud = new BitmapTexture();
+  public static final BitmapTexture largeAmethystBud = new BitmapTexture();
+  public static final BitmapTexture amethystCluster = new BitmapTexture();
+  public static final BitmapTexture tintedGlass = new BitmapTexture();
+  public static final BitmapTexture powderSnow = new BitmapTexture();
+  public static final BitmapTexture dripstoneBlock = new BitmapTexture();
+  public static final BitmapTexture pointedDripstoneDownBase = new BitmapTexture();
+  public static final BitmapTexture pointedDripstoneDownFrustum = new BitmapTexture();
+  public static final BitmapTexture pointedDripstoneDownMiddle = new BitmapTexture();
+  public static final BitmapTexture pointedDripstoneDownTip = new BitmapTexture();
+  public static final BitmapTexture pointedDripstoneDownTipMerge = new BitmapTexture();
+  public static final BitmapTexture pointedDripstoneUpBase = new BitmapTexture();
+  public static final BitmapTexture pointedDripstoneUpFrustum = new BitmapTexture();
+  public static final BitmapTexture pointedDripstoneUpMiddle = new BitmapTexture();
+  public static final BitmapTexture pointedDripstoneUpTip = new BitmapTexture();
+  public static final BitmapTexture pointedDripstoneUpTipMerge = new BitmapTexture();
+  public static final BitmapTexture sculkSensorBottom = new BitmapTexture();
+  public static final BitmapTexture sculkSensorSide = new BitmapTexture();
+  public static final BitmapTexture sculkSensorTendrilActive = new BitmapTexture();
+  public static final BitmapTexture sculkSensorTendrilInactive = new BitmapTexture();
+  public static final BitmapTexture sculkSensorTop = new BitmapTexture();
+  public static final BitmapTexture glowLichen = new BitmapTexture();
+  public static final BitmapTexture azaleaTop = new BitmapTexture();
+  public static final BitmapTexture azaleaSide = new BitmapTexture();
+  public static final BitmapTexture azaleaPlant = new BitmapTexture();
+  public static final BitmapTexture floweringAzaleaTop = new BitmapTexture();
+  public static final BitmapTexture floweringAzaleaSide = new BitmapTexture();
+  public static final BitmapTexture azaleaLeaves = new BitmapTexture();
+  public static final BitmapTexture floweringAzaleaLeaves = new BitmapTexture();
+  public static final BitmapTexture mossBlock = new BitmapTexture();
+  public static final BitmapTexture caveVinesPlant = new BitmapTexture();
+  public static final BitmapTexture caveVinesPlantLit = new BitmapTexture();
+  public static final BitmapTexture caveVines = new BitmapTexture();
+  public static final BitmapTexture caveVinesLit = new BitmapTexture();
+  public static final BitmapTexture hangingRoots = new BitmapTexture();
+  public static final BitmapTexture rootedDirt = new BitmapTexture();
+  public static final BitmapTexture bigDripleafStem = new BitmapTexture();
+  public static final BitmapTexture bigDripleafTop = new BitmapTexture();
+  public static final BitmapTexture bigDripleafSide = new BitmapTexture();
+  public static final BitmapTexture bigDripleafTip = new BitmapTexture();
+  public static final BitmapTexture smallDripleafTop = new BitmapTexture();
+  public static final BitmapTexture smallDripleafSide = new BitmapTexture();
+  public static final BitmapTexture smallDripleafStemTop = new BitmapTexture();
+  public static final BitmapTexture smallDripleafStemBottom = new BitmapTexture();
+  public static final BitmapTexture sporeBlossom = new BitmapTexture();
+  public static final BitmapTexture sporeBlossomBase = new BitmapTexture();
+  public static final BitmapTexture deepslate = new BitmapTexture();
+  public static final BitmapTexture deepslateTop = new BitmapTexture();
+  public static final BitmapTexture polishedDeepslate = new BitmapTexture();
+  public static final BitmapTexture chiseledDeepslate = new BitmapTexture();
+  public static final BitmapTexture deepslateBricks = new BitmapTexture();
+  public static final BitmapTexture deepslateTiles = new BitmapTexture();
+  public static final BitmapTexture smoothBasalt = new BitmapTexture();
+  public static final BitmapTexture cobbledDeepslate = new BitmapTexture();
+  public static final BitmapTexture deepslateGoldOre = new BitmapTexture();
+  public static final BitmapTexture deepslateIronOre = new BitmapTexture();
+  public static final BitmapTexture deepslateDiamondOre = new BitmapTexture();
+  public static final BitmapTexture deepslateLapisOre = new BitmapTexture();
+  public static final BitmapTexture deepslateRedstoneOre = new BitmapTexture();
+  public static final BitmapTexture crackedDeepslateBricks = new BitmapTexture();
+  public static final BitmapTexture crackedDeepslateTiles = new BitmapTexture();
+  public static final BitmapTexture deepslateCoalOre = new BitmapTexture();
+  public static final BitmapTexture deepslateCopperOre = new BitmapTexture();
+  public static final BitmapTexture deepslateEmeraldOre = new BitmapTexture();
+  public static final BitmapTexture lightningRodOn = new BitmapTexture();
+  public static final BitmapTexture light = new BitmapTexture();
+  public static final BitmapTexture rawCopperBlock = new BitmapTexture();
+  public static final BitmapTexture rawGoldBlock = new BitmapTexture();
+  public static final BitmapTexture rawIronBlock = new BitmapTexture();
+  public static final BitmapTexture pottedAzaleaBushTop = new BitmapTexture();
+  public static final BitmapTexture pottedAzaleaBushSide = new BitmapTexture();
+  public static final BitmapTexture pottedAzaleaBushPlant = new BitmapTexture();
+  public static final BitmapTexture pottedFloweringAzaleaBushTop = new BitmapTexture();
+  public static final BitmapTexture pottedFloweringAzaleaBushSide = new BitmapTexture();
 
   // [1.19]
   @TexturePath("assets/minecraft/textures/block/mud")
-  public static final Texture mud = new Texture();
+  public static final BitmapTexture mud = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/mud_bricks")
-  public static final Texture mudBricks = new Texture();
+  public static final BitmapTexture mudBricks = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/packed_mud")
-  public static final Texture packedMud = new Texture();
+  public static final BitmapTexture packedMud = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/muddy_mangrove_roots_side")
-  public static final Texture muddyMangroveRootsSide = new Texture();
+  public static final BitmapTexture muddyMangroveRootsSide = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/muddy_mangrove_roots_top")
-  public static final Texture muddyMangroveRootsTop = new Texture();
+  public static final BitmapTexture muddyMangroveRootsTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/reinforced_deepslate_top")
-  public static final Texture reinforcedDeepslateTop = new Texture();
+  public static final BitmapTexture reinforcedDeepslateTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/reinforced_deepslate_side")
-  public static final Texture reinforcedDeepslateSide = new Texture();
+  public static final BitmapTexture reinforcedDeepslateSide = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/reinforced_deepslate_bottom")
-  public static final Texture reinforcedDeepslateBottom = new Texture();
+  public static final BitmapTexture reinforcedDeepslateBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/frogspawn")
-  public static final Texture frogspawn = new Texture();
+  public static final BitmapTexture frogspawn = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/ochre_froglight_side")
-  public static final Texture ochreFroglightSide = new Texture();
+  public static final BitmapTexture ochreFroglightSide = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/ochre_froglight_top")
-  public static final Texture ochreFroglightTop = new Texture();
+  public static final BitmapTexture ochreFroglightTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/verdant_froglight_side")
-  public static final Texture verdantFroglightSide = new Texture();
+  public static final BitmapTexture verdantFroglightSide = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/verdant_froglight_top")
-  public static final Texture verdantFroglightTop = new Texture();
+  public static final BitmapTexture verdantFroglightTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/pearlescent_froglight_side")
-  public static final Texture pearlescentFroglightSide = new Texture();
+  public static final BitmapTexture pearlescentFroglightSide = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/pearlescent_froglight_top")
-  public static final Texture pearlescentFroglightTop = new Texture();
+  public static final BitmapTexture pearlescentFroglightTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/mangrove_planks")
-  public static final Texture mangrovePlanks = new Texture();
+  public static final BitmapTexture mangrovePlanks = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/mangrove_door_top")
-  public static final Texture mangroveDoorTop = new Texture();
+  public static final BitmapTexture mangroveDoorTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/mangrove_door_bottom")
-  public static final Texture mangroveDoorBottom = new Texture();
+  public static final BitmapTexture mangroveDoorBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/mangrove_leaves")
-  public static final Texture mangroveLeaves = new Texture();
+  public static final BitmapTexture mangroveLeaves = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/mangrove_log")
-  public static final Texture mangroveLog = new Texture();
+  public static final BitmapTexture mangroveLog = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/mangrove_log_top")
-  public static final Texture mangroveLogTop = new Texture();
+  public static final BitmapTexture mangroveLogTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/stripped_mangrove_log")
-  public static final Texture strippedMangroveLog = new Texture();
+  public static final BitmapTexture strippedMangroveLog = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/stripped_mangrove_log_top")
-  public static final Texture strippedMangroveLogTop = new Texture();
+  public static final BitmapTexture strippedMangroveLogTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/signs/mangrove")
-  public static final Texture mangroveSignPost = new Texture();
+  public static final BitmapTexture mangroveSignPost = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/mangrove_trapdoor")
-  public static final Texture mangroveTrapdoor = new Texture();
+  public static final BitmapTexture mangroveTrapdoor = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/mangrove_roots_side")
-  public static final Texture mangroveRootsSide = new Texture();
+  public static final BitmapTexture mangroveRootsSide = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/mangrove_roots_top")
-  public static final Texture mangroveRootsTop = new Texture();
+  public static final BitmapTexture mangroveRootsTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/mangrove_propagule")
-  public static final Texture mangrovePropagule = new Texture();
+  public static final BitmapTexture mangrovePropagule = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/mangrove_propagule_hanging")
-  public static final Texture mangrovePropaguleHanging = new Texture();
+  public static final BitmapTexture mangrovePropaguleHanging = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sculk_catalyst_top")
-  public static final Texture sculkCatalystTop = new Texture();
+  public static final BitmapTexture sculkCatalystTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sculk_catalyst_side")
-  public static final Texture sculkCatalystSide = new Texture();
+  public static final BitmapTexture sculkCatalystSide = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sculk_catalyst_bottom")
-  public static final Texture sculkCatalystBottom = new Texture();
+  public static final BitmapTexture sculkCatalystBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sculk_catalyst_top_bloom")
-  public static final Texture sculkCatalystTopBloom = new Texture();
+  public static final BitmapTexture sculkCatalystTopBloom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sculk_catalyst_side_bloom")
-  public static final Texture sculkCatalystSideBloom = new Texture();
+  public static final BitmapTexture sculkCatalystSideBloom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sculk")
-  public static final Texture sculk = new Texture();
+  public static final BitmapTexture sculk = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sculk_shrieker_top")
-  public static final Texture sculkShriekerTop = new Texture();
+  public static final BitmapTexture sculkShriekerTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sculk_shrieker_side")
-  public static final Texture sculkShriekerSide = new Texture();
+  public static final BitmapTexture sculkShriekerSide = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sculk_shrieker_bottom")
-  public static final Texture sculkShriekerBottom = new Texture();
+  public static final BitmapTexture sculkShriekerBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sculk_shrieker_can_summon_inner_top")
-  public static final Texture sculkShriekerCanSummonInnerTop = new Texture();
+  public static final BitmapTexture sculkShriekerCanSummonInnerTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sculk_shrieker_inner_top")
-  public static final Texture sculkShriekerInnerTop = new Texture();
+  public static final BitmapTexture sculkShriekerInnerTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sculk_vein")
-  public static final Texture sculkVein = new Texture();
+  public static final BitmapTexture sculkVein = new BitmapTexture();
 
   //1.20
   @TexturePath("assets/minecraft/textures/block/bamboo_planks")
-  public static final Texture bambooPlanks = new Texture();
+  public static final BitmapTexture bambooPlanks = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/bamboo_mosaic")
-  public static final Texture bambooMosaic = new Texture();
+  public static final BitmapTexture bambooMosaic = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/bamboo_door_top")
-  public static final Texture bambooDoorTop = new Texture();
+  public static final BitmapTexture bambooDoorTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/bamboo_door_bottom")
-  public static final Texture bambooDoorBottom = new Texture();
+  public static final BitmapTexture bambooDoorBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/bamboo_block")
-  public static final Texture bambooBlock = new Texture();
+  public static final BitmapTexture bambooBlock = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/bamboo_block_top")
-  public static final Texture bambooBlockTop = new Texture();
+  public static final BitmapTexture bambooBlockTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/stripped_bamboo_block")
-  public static final Texture strippedBambooBlock = new Texture();
+  public static final BitmapTexture strippedBambooBlock = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/stripped_bamboo_block_top")
-  public static final Texture strippedBambooBlockTop = new Texture();
+  public static final BitmapTexture strippedBambooBlockTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/signs/bamboo")
-  public static final Texture bambooSignPost = new Texture();
+  public static final BitmapTexture bambooSignPost = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/bamboo_trapdoor")
-  public static final Texture bambooTrapdoor = new Texture();
+  public static final BitmapTexture bambooTrapdoor = new BitmapTexture();
 
   @TexturePath("assets/minecraft/textures/block/cherry_planks")
-  public static final Texture cherryPlanks = new Texture();
+  public static final BitmapTexture cherryPlanks = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/cherry_door_top")
-  public static final Texture cherryDoorTop = new Texture();
+  public static final BitmapTexture cherryDoorTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/cherry_door_bottom")
-  public static final Texture cherryDoorBottom = new Texture();
+  public static final BitmapTexture cherryDoorBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/cherry_leaves")
-  public static final Texture cherryLeaves = new Texture();
+  public static final BitmapTexture cherryLeaves = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/cherry_log")
-  public static final Texture cherryLog = new Texture();
+  public static final BitmapTexture cherryLog = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/cherry_log_top")
-  public static final Texture cherryLogTop = new Texture();
+  public static final BitmapTexture cherryLogTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/stripped_cherry_log")
-  public static final Texture strippedCherryLog = new Texture();
+  public static final BitmapTexture strippedCherryLog = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/stripped_cherry_log_top")
-  public static final Texture strippedCherryLogTop = new Texture();
+  public static final BitmapTexture strippedCherryLogTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/signs/cherry")
-  public static final Texture cherrySignPost = new Texture();
+  public static final BitmapTexture cherrySignPost = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/cherry_trapdoor")
-  public static final Texture cherryTrapdoor = new Texture();
+  public static final BitmapTexture cherryTrapdoor = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/cherry_sapling")
-  public static final Texture cherrySapling = new Texture();
+  public static final BitmapTexture cherrySapling = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/torchflower")
-  public static final Texture torchflower = new Texture();
+  public static final BitmapTexture torchflower = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/torchflower_crop_stage0")
-  public static final Texture torchflowerCropStage0 = new Texture();
+  public static final BitmapTexture torchflowerCropStage0 = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/torchflower_crop_stage1")
-  public static final Texture torchflowerCropStage1 = new Texture();
+  public static final BitmapTexture torchflowerCropStage1 = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_empty")
-  public static final Texture chiseledBookshelfEmpty = new Texture();
+  public static final BitmapTexture chiseledBookshelfEmpty = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_occupied")
-  public static final Texture chiseledBookshelfOccupied = new Texture();
+  public static final BitmapTexture chiseledBookshelfOccupied = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_side")
-  public static final Texture chiseledBookshelfSide = new Texture();
+  public static final BitmapTexture chiseledBookshelfSide = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_top")
-  public static final Texture chiseledBookshelfTop = new Texture();
+  public static final BitmapTexture chiseledBookshelfTop = new BitmapTexture();
 
-  public static final Texture[] chiseledBookshelfCombinations = new ChiseledBookshelfTexture[64];
+  public static final ChiseledBookshelfTexture[] chiseledBookshelfCombinations = new ChiseledBookshelfTexture[64];
   static {
     for(int i = 0; i < chiseledBookshelfCombinations.length; i++) {
       chiseledBookshelfCombinations[i] = new ChiseledBookshelfTexture(Texture.chiseledBookshelfEmpty, Texture.chiseledBookshelfOccupied,
@@ -1191,534 +1168,331 @@ public class Texture {
   }
 
   @TexturePath("assets/minecraft/textures/block/suspicious_sand_0")
-  public static final Texture suspiciousSandStage0 = new Texture();
+  public static final BitmapTexture suspiciousSandStage0 = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/suspicious_sand_1")
-  public static final Texture suspiciousSandStage1 = new Texture();
+  public static final BitmapTexture suspiciousSandStage1 = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/suspicious_sand_2")
-  public static final Texture suspiciousSandStage2 = new Texture();
+  public static final BitmapTexture suspiciousSandStage2 = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/suspicious_sand_3")
-  public static final Texture suspiciousSandStage3 = new Texture();
+  public static final BitmapTexture suspiciousSandStage3 = new BitmapTexture();
 
   @TexturePath("assets/minecraft/textures/block/suspicious_gravel_0")
-  public static final Texture suspiciousGravelStage0 = new Texture();
+  public static final BitmapTexture suspiciousGravelStage0 = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/suspicious_gravel_1")
-  public static final Texture suspiciousGravelStage1 = new Texture();
+  public static final BitmapTexture suspiciousGravelStage1 = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/suspicious_gravel_2")
-  public static final Texture suspiciousGravelStage2 = new Texture();
+  public static final BitmapTexture suspiciousGravelStage2 = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/suspicious_gravel_3")
-  public static final Texture suspiciousGravelStage3 = new Texture();
+  public static final BitmapTexture suspiciousGravelStage3 = new BitmapTexture();
 
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/decorated_pot_base")
-  public static final Texture decoratedPotBase = new Texture();
+  public static final BitmapTexture decoratedPotBase = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/decorated_pot_side")
-  public static final Texture decoratedPotSide = new Texture();
+  public static final BitmapTexture decoratedPotSide = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/angler_pottery_pattern")
-  public static final Texture decoratedPotPatternAngler = new Texture();
+  public static final BitmapTexture decoratedPotPatternAngler = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/archer_pottery_pattern")
-  public static final Texture decoratedPotPatternArcher = new Texture();
+  public static final BitmapTexture decoratedPotPatternArcher = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/arms_up_pottery_pattern")
-  public static final Texture decoratedPotPatternArmsUp = new Texture();
+  public static final BitmapTexture decoratedPotPatternArmsUp = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/blade_pottery_pattern")
-  public static final Texture decoratedPotPatternBlade = new Texture();
+  public static final BitmapTexture decoratedPotPatternBlade = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/brewer_pottery_pattern")
-  public static final Texture decoratedPotPatternBrewer = new Texture();
+  public static final BitmapTexture decoratedPotPatternBrewer = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/burn_pottery_pattern")
-  public static final Texture decoratedPotPatternBurn = new Texture();
+  public static final BitmapTexture decoratedPotPatternBurn = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/danger_pottery_pattern")
-  public static final Texture decoratedPotPatternDanger = new Texture();
+  public static final BitmapTexture decoratedPotPatternDanger = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/explorer_pottery_pattern")
-  public static final Texture decoratedPotPatternExplorer = new Texture();
+  public static final BitmapTexture decoratedPotPatternExplorer = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/friend_pottery_pattern")
-  public static final Texture decoratedPotPatternFriend = new Texture();
+  public static final BitmapTexture decoratedPotPatternFriend = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/heartbreak_pottery_pattern")
-  public static final Texture decoratedPotPatternHeartbreak = new Texture();
+  public static final BitmapTexture decoratedPotPatternHeartbreak = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/heart_pottery_pattern")
-  public static final Texture decoratedPotPatternHeart = new Texture();
+  public static final BitmapTexture decoratedPotPatternHeart = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/howl_pottery_pattern")
-  public static final Texture decoratedPotPatternHowl = new Texture();
+  public static final BitmapTexture decoratedPotPatternHowl = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/miner_pottery_pattern")
-  public static final Texture decoratedPotPatternMiner = new Texture();
+  public static final BitmapTexture decoratedPotPatternMiner = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/mourner_pottery_pattern")
-  public static final Texture decoratedPotPatternMourner = new Texture();
+  public static final BitmapTexture decoratedPotPatternMourner = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/plenty_pottery_pattern")
-  public static final Texture decoratedPotPatternPlenty = new Texture();
+  public static final BitmapTexture decoratedPotPatternPlenty = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/prize_pottery_pattern")
-  public static final Texture decoratedPotPatternPrize = new Texture();
+  public static final BitmapTexture decoratedPotPatternPrize = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/sheaf_pottery_pattern")
-  public static final Texture decoratedPotPatternSheaf = new Texture();
+  public static final BitmapTexture decoratedPotPatternSheaf = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/shelter_pottery_pattern")
-  public static final Texture decoratedPotPatternShelter = new Texture();
+  public static final BitmapTexture decoratedPotPatternShelter = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/skull_pottery_pattern")
-  public static final Texture decoratedPotPatternSkull = new Texture();
+  public static final BitmapTexture decoratedPotPatternSkull = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/snort_pottery_pattern")
-  public static final Texture decoratedPotPatternSnort = new Texture();
+  public static final BitmapTexture decoratedPotPatternSnort = new BitmapTexture();
 
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_bottom")
-  public static final Texture snifferEggNotCrackedBottom = new Texture();
+  public static final BitmapTexture snifferEggNotCrackedBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_east")
-  public static final Texture snifferEggNotCrackedEast = new Texture();
+  public static final BitmapTexture snifferEggNotCrackedEast = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_north")
-  public static final Texture snifferEggNotCrackedNorth = new Texture();
+  public static final BitmapTexture snifferEggNotCrackedNorth = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_south")
-  public static final Texture snifferEggNotCrackedSouth = new Texture();
+  public static final BitmapTexture snifferEggNotCrackedSouth = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_top")
-  public static final Texture snifferEggNotCrackedTop = new Texture();
+  public static final BitmapTexture snifferEggNotCrackedTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_not_cracked_west")
-  public static final Texture snifferEggNotCrackedWest = new Texture();
+  public static final BitmapTexture snifferEggNotCrackedWest = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_bottom")
-  public static final Texture snifferEggSlightlyCrackedBottom = new Texture();
+  public static final BitmapTexture snifferEggSlightlyCrackedBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_east")
-  public static final Texture snifferEggSlightlyCrackedEast = new Texture();
+  public static final BitmapTexture snifferEggSlightlyCrackedEast = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_north")
-  public static final Texture snifferEggSlightlyCrackedNorth = new Texture();
+  public static final BitmapTexture snifferEggSlightlyCrackedNorth = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_south")
-  public static final Texture snifferEggSlightlyCrackedSouth = new Texture();
+  public static final BitmapTexture snifferEggSlightlyCrackedSouth = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_top")
-  public static final Texture snifferEggSlightlyCrackedTop = new Texture();
+  public static final BitmapTexture snifferEggSlightlyCrackedTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_slightly_cracked_west")
-  public static final Texture snifferEggSlightlyCrackedWest = new Texture();
+  public static final BitmapTexture snifferEggSlightlyCrackedWest = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_bottom")
-  public static final Texture snifferEggVeryCrackedBottom = new Texture();
+  public static final BitmapTexture snifferEggVeryCrackedBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_east")
-  public static final Texture snifferEggVeryCrackedEast = new Texture();
+  public static final BitmapTexture snifferEggVeryCrackedEast = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_north")
-  public static final Texture snifferEggVeryCrackedNorth = new Texture();
+  public static final BitmapTexture snifferEggVeryCrackedNorth = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_south")
-  public static final Texture snifferEggVeryCrackedSouth = new Texture();
+  public static final BitmapTexture snifferEggVeryCrackedSouth = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_top")
-  public static final Texture snifferEggVeryCrackedTop = new Texture();
+  public static final BitmapTexture snifferEggVeryCrackedTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/sniffer_egg_very_cracked_west")
-  public static final Texture snifferEggVeryCrackedWest = new Texture();
+  public static final BitmapTexture snifferEggVeryCrackedWest = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/pink_petals")
-  public static final Texture pinkPetals = new Texture();
+  public static final BitmapTexture pinkPetals = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/pink_petals_stem")
-  public static final Texture pinkPetalsStem = new Texture();
+  public static final BitmapTexture pinkPetalsStem = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/pitcher_crop_bottom_stage_1")
-  public static final Texture pitcherCropBottomStage1 = new Texture();
+  public static final BitmapTexture pitcherCropBottomStage1 = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/pitcher_crop_bottom_stage_2")
-  public static final Texture pitcherCropBottomStage2 = new Texture();
+  public static final BitmapTexture pitcherCropBottomStage2 = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/pitcher_crop_bottom_stage_3")
-  public static final Texture pitcherCropBottomStage3 = new Texture();
+  public static final BitmapTexture pitcherCropBottomStage3 = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/pitcher_crop_bottom_stage_4")
-  public static final Texture pitcherCropBottomStage4 = new Texture();
+  public static final BitmapTexture pitcherCropBottomStage4 = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/pitcher_crop_top_stage_3")
-  public static final Texture pitcherCropTopStage3 = new Texture();
+  public static final BitmapTexture pitcherCropTopStage3 = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/pitcher_crop_top_stage_4")
-  public static final Texture pitcherCropTopStage4 = new Texture();
+  public static final BitmapTexture pitcherCropTopStage4 = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/pitcher_crop_top")
-  public static final Texture pitcherCropTop = new Texture();
+  public static final BitmapTexture pitcherCropTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/pitcher_crop_side")
-  public static final Texture pitcherCropSide = new Texture();
+  public static final BitmapTexture pitcherCropSide = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/pitcher_crop_bottom")
-  public static final Texture pitcherCropBottom = new Texture();
+  public static final BitmapTexture pitcherCropBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/calibrated_sculk_sensor_amethyst")
-  public static final Texture calibratedSculkSensorAmethyst = new Texture();
+  public static final BitmapTexture calibratedSculkSensorAmethyst = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/calibrated_sculk_sensor_top")
-  public static final Texture calibratedSculkSensorTop = new Texture();
+  public static final BitmapTexture calibratedSculkSensorTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/calibrated_sculk_sensor_input_side")
-  public static final Texture calibratedSculkSensorInputSide = new Texture();
+  public static final BitmapTexture calibratedSculkSensorInputSide = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/signs/hanging/oak")
-  public static final Texture oakHangingSign = new Texture();
+  public static final BitmapTexture oakHangingSign = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/signs/hanging/spruce")
-  public static final Texture spruceHangingSign = new Texture();
+  public static final BitmapTexture spruceHangingSign = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/signs/hanging/birch")
-  public static final Texture birchHangingSign = new Texture();
+  public static final BitmapTexture birchHangingSign = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/signs/hanging/jungle")
-  public static final Texture jungleHangingSign = new Texture();
+  public static final BitmapTexture jungleHangingSign = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/signs/hanging/acacia")
-  public static final Texture acaciaHangingSign = new Texture();
+  public static final BitmapTexture acaciaHangingSign = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/signs/hanging/dark_oak")
-  public static final Texture darkOakHangingSign = new Texture();
+  public static final BitmapTexture darkOakHangingSign = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/signs/hanging/crimson")
-  public static final Texture crimsonHangingSign = new Texture();
+  public static final BitmapTexture crimsonHangingSign = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/signs/hanging/warped")
-  public static final Texture warpedHangingSign = new Texture();
+  public static final BitmapTexture warpedHangingSign = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/signs/hanging/mangrove")
-  public static final Texture mangroveHangingSign = new Texture();
+  public static final BitmapTexture mangroveHangingSign = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/signs/hanging/bamboo")
-  public static final Texture bambooHangingSign = new Texture();
+  public static final BitmapTexture bambooHangingSign = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/signs/hanging/cherry")
-  public static final Texture cherryHangingSign = new Texture();
+  public static final BitmapTexture cherryHangingSign = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/piglin/piglin")
-  public static final Texture piglin = new Texture();
+  public static final BitmapTexture piglin = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/polished_tuff")
-  public static final Texture polishedTuff = new Texture();
+  public static final BitmapTexture polishedTuff = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/tuff_bricks")
-  public static final Texture tuffBricks = new Texture();
+  public static final BitmapTexture tuffBricks = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/chiseled_tuff")
-  public static final Texture chiseledTuff = new Texture();
+  public static final BitmapTexture chiseledTuff = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/chiseled_tuff_bricks")
-  public static final Texture chiseledTuffBricks = new Texture();
+  public static final BitmapTexture chiseledTuffBricks = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/chiseled_copper")
-  public static final Texture chiseledCopper = new Texture();
+  public static final BitmapTexture chiseledCopper = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/copper_grate")
-  public static final Texture copperGrate = new Texture();
+  public static final BitmapTexture copperGrate = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/copper_bulb")
-  public static final Texture copperBulb = new Texture();
+  public static final BitmapTexture copperBulb = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/copper_bulb_lit")
-  public static final Texture copperBulbLit = new Texture();
+  public static final BitmapTexture copperBulbLit = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/copper_bulb_powered")
-  public static final Texture copperBulbPowered = new Texture();
+  public static final BitmapTexture copperBulbPowered = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/copper_bulb_lit_powered")
-  public static final Texture copperBulbLitPowered = new Texture();
+  public static final BitmapTexture copperBulbLitPowered = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/copper_door_top")
-  public static final Texture copperDoorTop = new Texture();
+  public static final BitmapTexture copperDoorTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/copper_door_bottom")
-  public static final Texture copperDoorBottom = new Texture();
+  public static final BitmapTexture copperDoorBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/copper_trapdoor")
-  public static final Texture copperTrapdoor = new Texture();
+  public static final BitmapTexture copperTrapdoor = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/exposed_chiseled_copper")
-  public static final Texture exposedChiseledCopper = new Texture();
+  public static final BitmapTexture exposedChiseledCopper = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/exposed_copper_grate")
-  public static final Texture exposedCopperGrate = new Texture();
+  public static final BitmapTexture exposedCopperGrate = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/exposed_copper_bulb")
-  public static final Texture exposedCopperBulb = new Texture();
+  public static final BitmapTexture exposedCopperBulb = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/exposed_copper_bulb_lit")
-  public static final Texture exposedCopperBulbLit = new Texture();
+  public static final BitmapTexture exposedCopperBulbLit = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/exposed_copper_bulb_powered")
-  public static final Texture exposedCopperBulbPowered = new Texture();
+  public static final BitmapTexture exposedCopperBulbPowered = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/exposed_copper_bulb_lit_powered")
-  public static final Texture exposedCopperBulbLitPowered = new Texture();
+  public static final BitmapTexture exposedCopperBulbLitPowered = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/exposed_copper_door_top")
-  public static final Texture exposedCopperDoorTop = new Texture();
+  public static final BitmapTexture exposedCopperDoorTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/exposed_copper_door_bottom")
-  public static final Texture exposedCopperDoorBottom = new Texture();
+  public static final BitmapTexture exposedCopperDoorBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/exposed_copper_trapdoor")
-  public static final Texture exposedCopperTrapdoor = new Texture();
+  public static final BitmapTexture exposedCopperTrapdoor = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/weathered_chiseled_copper")
-  public static final Texture weatheredChiseledCopper = new Texture();
+  public static final BitmapTexture weatheredChiseledCopper = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/weathered_copper_grate")
-  public static final Texture weatheredCopperGrate = new Texture();
+  public static final BitmapTexture weatheredCopperGrate = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/weathered_copper_bulb")
-  public static final Texture weatheredCopperBulb = new Texture();
+  public static final BitmapTexture weatheredCopperBulb = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/weathered_copper_bulb_lit")
-  public static final Texture weatheredCopperBulbLit = new Texture();
+  public static final BitmapTexture weatheredCopperBulbLit = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/weathered_copper_bulb_powered")
-  public static final Texture weatheredCopperBulbPowered = new Texture();
+  public static final BitmapTexture weatheredCopperBulbPowered = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/weathered_copper_bulb_lit_powered")
-  public static final Texture weatheredCopperBulbLitPowered = new Texture();
+  public static final BitmapTexture weatheredCopperBulbLitPowered = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/weathered_copper_door_top")
-  public static final Texture weatheredCopperDoorTop = new Texture();
+  public static final BitmapTexture weatheredCopperDoorTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/weathered_copper_door_bottom")
-  public static final Texture weatheredCopperDoorBottom = new Texture();
+  public static final BitmapTexture weatheredCopperDoorBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/weathered_copper_trapdoor")
-  public static final Texture weatheredCopperTrapdoor = new Texture();
+  public static final BitmapTexture weatheredCopperTrapdoor = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/oxidized_chiseled_copper")
-  public static final Texture oxidizedChiseledCopper = new Texture();
+  public static final BitmapTexture oxidizedChiseledCopper = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/oxidized_copper_grate")
-  public static final Texture oxidizedCopperGrate = new Texture();
+  public static final BitmapTexture oxidizedCopperGrate = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/oxidized_copper_bulb")
-  public static final Texture oxidizedCopperBulb = new Texture();
+  public static final BitmapTexture oxidizedCopperBulb = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/oxidized_copper_bulb_lit")
-  public static final Texture oxidizedCopperBulbLit = new Texture();
+  public static final BitmapTexture oxidizedCopperBulbLit = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/oxidized_copper_bulb_powered")
-  public static final Texture oxidizedCopperBulbPowered = new Texture();
+  public static final BitmapTexture oxidizedCopperBulbPowered = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/oxidized_copper_bulb_lit_powered")
-  public static final Texture oxidizedCopperBulbLitPowered = new Texture();
+  public static final BitmapTexture oxidizedCopperBulbLitPowered = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/oxidized_copper_door_top")
-  public static final Texture oxidizedCopperDoorTop = new Texture();
+  public static final BitmapTexture oxidizedCopperDoorTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/oxidized_copper_door_bottom")
-  public static final Texture oxidizedCopperDoorBottom = new Texture();
+  public static final BitmapTexture oxidizedCopperDoorBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/oxidized_copper_trapdoor")
-  public static final Texture oxidizedCopperTrapdoor = new Texture();
+  public static final BitmapTexture oxidizedCopperTrapdoor = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/crafter_north")
-  public static final Texture crafterNorth = new Texture();
+  public static final BitmapTexture crafterNorth = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/crafter_north_crafting")
-  public static final Texture crafterNorthCrafting = new Texture();
+  public static final BitmapTexture crafterNorthCrafting = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/crafter_east")
-  public static final Texture crafterEast = new Texture();
+  public static final BitmapTexture crafterEast = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/crafter_east_crafting")
-  public static final Texture crafterEastCrafting = new Texture();
+  public static final BitmapTexture crafterEastCrafting = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/crafter_east_triggered")
-  public static final Texture crafterEastTriggered = new Texture();
+  public static final BitmapTexture crafterEastTriggered = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/crafter_south")
-  public static final Texture crafterSouth = new Texture();
+  public static final BitmapTexture crafterSouth = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/crafter_south_triggered")
-  public static final Texture crafterSouthTriggered = new Texture();
+  public static final BitmapTexture crafterSouthTriggered = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/crafter_west")
-  public static final Texture crafterWest = new Texture();
+  public static final BitmapTexture crafterWest = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/crafter_west_crafting")
-  public static final Texture crafterWestCrafting = new Texture();
+  public static final BitmapTexture crafterWestCrafting = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/crafter_west_triggered")
-  public static final Texture crafterWestTriggered = new Texture();
+  public static final BitmapTexture crafterWestTriggered = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/crafter_top")
-  public static final Texture crafterTop = new Texture();
+  public static final BitmapTexture crafterTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/crafter_top_crafting")
-  public static final Texture crafterTopCrafting = new Texture();
+  public static final BitmapTexture crafterTopCrafting = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/crafter_top_triggered")
-  public static final Texture crafterTopTriggered = new Texture();
+  public static final BitmapTexture crafterTopTriggered = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/crafter_bottom")
-  public static final Texture crafterBottom = new Texture();
+  public static final BitmapTexture crafterBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_top")
-  public static final Texture vaultTop = new Texture();
+  public static final BitmapTexture vaultTop = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_top_ejecting")
-  public static final Texture vaultTopEjecting = new Texture();
+  public static final BitmapTexture vaultTopEjecting = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_bottom")
-  public static final Texture vaultBottom = new Texture();
+  public static final BitmapTexture vaultBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_front_on")
-  public static final Texture vaultFrontOn = new Texture();
+  public static final BitmapTexture vaultFrontOn = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_front_off")
-  public static final Texture vaultFrontOff = new Texture();
+  public static final BitmapTexture vaultFrontOff = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_front_ejecting")
-  public static final Texture vaultFrontEjecting = new Texture();
+  public static final BitmapTexture vaultFrontEjecting = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_side_off")
-  public static final Texture vaultSideOff = new Texture();
+  public static final BitmapTexture vaultSideOff = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_front_ejecting")
-  public static final Texture vaultSideOn = new Texture();
+  public static final BitmapTexture vaultSideOn = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/flow_pottery_pattern")
-  public static final Texture decoratedPotPatternFlow = new Texture();
+  public static final BitmapTexture decoratedPotPatternFlow = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/guster_pottery_pattern")
-  public static final Texture decoratedPotPatternGuster = new Texture();
+  public static final BitmapTexture decoratedPotPatternGuster = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/entity/decorated_pot/scrape_pottery_pattern")
-  public static final Texture decoratedPotPatternScrape = new Texture();
+  public static final BitmapTexture decoratedPotPatternScrape = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/heavy_core")
-  public static final Texture heavyCore = new Texture();
+  public static final BitmapTexture heavyCore = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_bottom_ominous")
-  public static final Texture vaultBottomOminous = new Texture();
+  public static final BitmapTexture vaultBottomOminous = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_front_off_ominous")
-  public static final Texture vaultFrontOffOminous = new Texture();
+  public static final BitmapTexture vaultFrontOffOminous = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_side_off_ominous")
-  public static final Texture vaultSideOffOminous = new Texture();
+  public static final BitmapTexture vaultSideOffOminous = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_top_ominous")
-  public static final Texture vaultTopOminous = new Texture();
+  public static final BitmapTexture vaultTopOminous = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_side_on_ominous")
-  public static final Texture vaultSideOnOminous = new Texture();
+  public static final BitmapTexture vaultSideOnOminous = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_front_on_ominous")
-  public static final Texture vaultFrontOnOminous = new Texture();
+  public static final BitmapTexture vaultFrontOnOminous = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_top_ejecting_ominous")
-  public static final Texture vaultTopEjectingOminous = new Texture();
+  public static final BitmapTexture vaultTopEjectingOminous = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/vault_front_ejecting_ominous")
-  public static final Texture vaultFrontEjectingOminous = new Texture();
+  public static final BitmapTexture vaultFrontEjectingOminous = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/trial_spawner_bottom")
-  public static final Texture trialSpawnerBottom = new Texture();
+  public static final BitmapTexture trialSpawnerBottom = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/trial_spawner_side_inactive")
-  public static final Texture trialSpawnerSideInactive = new Texture();
+  public static final BitmapTexture trialSpawnerSideInactive = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/trial_spawner_side_inactive_ominous")
-  public static final Texture trialSpawnerSideInactiveOminous = new Texture();
+  public static final BitmapTexture trialSpawnerSideInactiveOminous = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/trial_spawner_top_inactive")
-  public static final Texture trialSpawnerTopInactive = new Texture();
+  public static final BitmapTexture trialSpawnerTopInactive = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/trial_spawner_top_inactive_ominous")
-  public static final Texture trialSpawnerTopInactiveOminous = new Texture();
+  public static final BitmapTexture trialSpawnerTopInactiveOminous = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/trial_spawner_side_active")
-  public static final Texture trialSpawnerSideActive = new Texture();
+  public static final BitmapTexture trialSpawnerSideActive = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/trial_spawner_side_active_ominous")
-  public static final Texture trialSpawnerSideActiveOminous = new Texture();
+  public static final BitmapTexture trialSpawnerSideActiveOminous = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/trial_spawner_top_active")
-  public static final Texture trialSpawnerTopActive = new Texture();
+  public static final BitmapTexture trialSpawnerTopActive = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/trial_spawner_top_active_ominous")
-  public static final Texture trialSpawnerTopActiveOminous = new Texture();
+  public static final BitmapTexture trialSpawnerTopActiveOminous = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/trial_spawner_top_ejecting_reward")
-  public static final Texture trialSpawnerTopEjectingReward = new Texture();
+  public static final BitmapTexture trialSpawnerTopEjectingReward = new BitmapTexture();
   @TexturePath("assets/minecraft/textures/block/trial_spawner_top_ejecting_reward_ominous")
-  public static final Texture trialSpawnerTopEjectingRewardOminous = new Texture();
+  public static final BitmapTexture trialSpawnerTopEjectingRewardOminous = new BitmapTexture();
 
   /** Banner base texture. */
-  public static final Texture bannerBase = new Texture();
+  public static final BitmapTexture bannerBase = new BitmapTexture();
 
-  public static final Texture armorStand = new Texture();
+  public static final BitmapTexture armorStand = new BitmapTexture();
 
-  protected static boolean useAverageColor = PersistentSettings.getSingleColorTextures();
-
-  @NotNull protected BitmapImage image;
-  protected int width;
-  protected int height;
-  protected int avgColor;
-  private float[] avgColorLinear;
-  private float[] avgColorFlat;
-
-  private Image fxImage = null;
-
-  public Texture() {
-    this(ImageLoader.missingImage);
-  }
-
-  public Texture(String resourceName) {
-    this(ImageLoader.readResourceNonNull("textures/" + resourceName + ".png"));
-  }
-
-  public Texture(BitmapImage img) {
-    setTexture(img);
-  }
-
-  public void setTexture(Texture texture) {
-    setTexture(texture.image);
-  }
-
-  public void setTexture(BitmapImage newImage) {
-    image = newImage;
-
-    // Gamma correct the texture.
-    avgColorLinear = new float[] {0, 0, 0, 0};
-
-    int[] data = image.data;
-    width = image.width;
-    height = image.height;
-    float[] pixelBuffer = new float[4];
-    for (int y = 0; y < height; ++y) {
-      for (int x = 0; x < width; ++x) {
-        int index = width * y + x;
-        ColorUtil.getRGBAComponentsGammaCorrected(data[index], pixelBuffer);
-        avgColorLinear[0] += pixelBuffer[3] * pixelBuffer[0];
-        avgColorLinear[1] += pixelBuffer[3] * pixelBuffer[1];
-        avgColorLinear[2] += pixelBuffer[3] * pixelBuffer[2];
-        avgColorLinear[3] += pixelBuffer[3];
-      }
-    }
-
-    avgColorFlat = new float[4];
-    if (avgColorLinear[3] > 0.001) {
-      avgColorFlat[0] = avgColorLinear[0] / avgColorLinear[3];
-      avgColorFlat[1] = avgColorLinear[1] / avgColorLinear[3];
-      avgColorFlat[2] = avgColorLinear[2] / avgColorLinear[3];
-      avgColorFlat[3] = 1;
-    }
-
-    avgColorLinear[0] /= width * height;
-    avgColorLinear[1] /= width * height;
-    avgColorLinear[2] /= width * height;
-    avgColorLinear[3] /= width * height;
-
-    avgColor = ColorUtil.getArgb(FastMath.pow(avgColorLinear[0], 1 / Scene.DEFAULT_GAMMA),
-        FastMath.pow(avgColorLinear[1], 1 / Scene.DEFAULT_GAMMA),
-        FastMath.pow(avgColorLinear[2], 1 / Scene.DEFAULT_GAMMA), avgColorLinear[3]);
-  }
-
-  /**
-   * Get linear color values.
-   */
-  public void getColor(double u, double v, Vector4 c) {
-    c.set(getColor(u, v));
-  }
-
-  /**
-   * Get linear color values.
-   *
-   * @param ray ray to store color value in.
-   */
-  public void getColor(Ray ray) {
-    getColor(ray.u, ray.v, ray.color);
-  }
-
-  /**
-   * Get linear color values.
-   *
-   * @return color
-   */
-  public float[] getColor(double u, double v) {
-    return getColor((int) (u * width - Ray.EPSILON), (int) ((1 - v) * height - Ray.EPSILON));
-  }
-
-  /**
-   * Get linear color values
-   *
-   * @return color
-   */
-  public float[] getColor(int x, int y) {
-    if(useAverageColor)
-      return avgColorFlat;
-    float[] result = new float[4];
-    ColorUtil.getRGBAComponentsGammaCorrected(image.data[width*y + x], result);
-    return result;
-  }
-
-  /**
-   * Get bilinear interpolated color value.
-   */
-  public void getColorInterpolated(double u, double v, Vector4 c) {
-
-    double x = u * (width - 1);
-    double y = (1 - v) * (height - 1);
-    double weight;
-    int fx = (int) QuickMath.floor(x);
-    int cx = (int) QuickMath.ceil(x);
-    int fy = (int) QuickMath.floor(y);
-    int cy = (int) QuickMath.ceil(y);
-
-    float[] rgb = getColor(fx, fy);
-    weight = (1 - (y - fy)) * (1 - (x - fx));
-    c.x = weight * rgb[0];
-    c.y = weight * rgb[1];
-    c.z = weight * rgb[2];
-    rgb = getColor(cx, fy);
-    weight = (1 - (y - fy)) * (1 - (cx - x));
-    c.x += weight * rgb[0];
-    c.y += weight * rgb[1];
-    c.z += weight * rgb[2];
-    rgb = getColor(fx, cy);
-    weight = (1 - (cy - y)) * (1 - (x - fx));
-    c.x += weight * rgb[0];
-    c.y += weight * rgb[1];
-    c.z += weight * rgb[2];
-    rgb = getColor(cx, cy);
-    weight = (1 - (cy - y)) * (1 - (cx - x));
-    c.x += weight * rgb[0];
-    c.y += weight * rgb[1];
-    c.z += weight * rgb[2];
-  }
-
-  public int getColorWrapped(int u, int v) {
-    return image.getPixel((u + width) % width, (v + height) % height);
-  }
-
-  /**
-   * @return The average color of this texture
-   */
-  public int getAvgColor() {
-    return avgColor;
-  }
-
-  /**
-   * Get the average linear color of this texture
-   */
-  public void getAvgColorLinear(Vector4 c) {
-    c.set(avgColorLinear);
-  }
-
-  /**
-   * @return The average color of this texture
-   */
-  public float[] getAvgColorLinear() {
-    return avgColorLinear;
-  }
-  /**
-   * @return The average flat color of this texture
-   */
-  public float[] getAvgColorFlat() {
-    return avgColorFlat;
-  }
-
-  public int getWidth() {
-    return width;
-  }
-
-  public int getHeight() {
-    return height;
-  }
-
-  /**
-   * @return {@code true} if this is the dedicated empty texture
-   */
-  public boolean isEmptyTexture() {
-    return false;
-  }
-
-  public Image fxImage() {
-    if (fxImage == null) {
-      fxImage = FxImageUtil.toFxImage(image);
-    }
-    return fxImage;
-  }
-
-  /** Access the raw image data for this texture. */
-  public int[] getData() {
-    return image.data;
-  }
-
-  public BitmapImage getBitmap() {
-    return image;
-  }
-
-  public static void setUseAverageColor(boolean useAverageColor) {
-    Texture.useAverageColor = useAverageColor;
-  }
+  private Texture() {}
 }

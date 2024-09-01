@@ -22,8 +22,9 @@ import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.renderer.SceneIOProvider;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.HDRTexture;
-import se.llbit.chunky.resources.PFMTexture;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.PFMTexture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
+import se.llbit.chunky.resources.texture.EmptyTexture;
 import se.llbit.chunky.world.Clouds;
 import se.llbit.chunky.world.SkymapTexture;
 import se.llbit.chunky.world.material.CloudMaterial;
@@ -37,10 +38,8 @@ import se.llbit.resources.ImageLoader;
 import se.llbit.util.JsonSerializable;
 import se.llbit.util.JsonUtil;
 import se.llbit.util.annotation.NotNull;
-import se.llbit.util.annotation.Nullable;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -144,10 +143,10 @@ public class Sky implements JsonSerializable {
 
   }
 
-  @NotNull private Texture skymap = Texture.EMPTY_TEXTURE;
-  private final Texture[] skybox =
-      {Texture.EMPTY_TEXTURE, Texture.EMPTY_TEXTURE, Texture.EMPTY_TEXTURE, Texture.EMPTY_TEXTURE,
-          Texture.EMPTY_TEXTURE, Texture.EMPTY_TEXTURE};
+  @NotNull private AbstractTexture skymap = EmptyTexture.INSTANCE;
+  private final AbstractTexture[] skybox =
+      {EmptyTexture.INSTANCE, EmptyTexture.INSTANCE, EmptyTexture.INSTANCE, EmptyTexture.INSTANCE,
+        EmptyTexture.INSTANCE, EmptyTexture.INSTANCE};
   private String skymapFileName = "";
   private final String[] skyboxFileName = {"", "", "", "", "", ""};
   private final Scene scene;
@@ -571,11 +570,11 @@ public class Sky implements JsonSerializable {
       this.mode = newMode;
       if (newMode != SkyMode.SKYMAP_EQUIRECTANGULAR && newMode != SkyMode.SKYMAP_ANGULAR) {
         skymapFileName = "";
-        skymap = Texture.EMPTY_TEXTURE;
+        skymap = EmptyTexture.INSTANCE;
       }
       if (newMode != SkyMode.SKYBOX) {
         for (int i = 0; i < 6; ++i) {
-          skybox[i] = Texture.EMPTY_TEXTURE;
+          skybox[i] = EmptyTexture.INSTANCE;
           skyboxFileName[i] = "";
         }
       }
@@ -650,7 +649,7 @@ public class Sky implements JsonSerializable {
     switch (mode) {
       case SKYMAP_EQUIRECTANGULAR:
       case SKYMAP_ANGULAR: {
-        if (!skymap.isEmptyTexture()) {
+        if (!(skymap instanceof EmptyTexture)) {
           sky.add("skymap", skymapFileName);
         }
         break;
@@ -658,7 +657,7 @@ public class Sky implements JsonSerializable {
       case SKYBOX: {
         JsonArray array = new JsonArray();
         for (int i = 0; i < 6; ++i) {
-          if (!skybox[i].isEmptyTexture()) {
+          if (!(skybox[i] instanceof EmptyTexture)) {
             array.add(skyboxFileName[i]);
           } else {
             array.add(Json.NULL);
@@ -872,7 +871,7 @@ public class Sky implements JsonSerializable {
     scene.refresh();
   }
 
-  private Texture loadSkyTexture(SceneIOProvider ioContext, String fileName, Texture prevTexture) {
+  private AbstractTexture loadSkyTexture(SceneIOProvider ioContext, String fileName, AbstractTexture prevTexture) {
     try {
       File textureFile = ioContext.resolveLinkedFile(fileName);
       Log.info("Loading skymap: " + fileName);

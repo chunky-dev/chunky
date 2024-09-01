@@ -24,6 +24,7 @@ import static se.llbit.chunky.model.Tint.NONE;
 import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 
 public class GrassBlockModel extends AABBModel {
@@ -38,7 +39,7 @@ public class GrassBlockModel extends AABBModel {
       new AABB(0, 1, 0, 1, 0, 1)
   };
 
-  private static final Texture[][] textures = new Texture[][]{
+  private static final AbstractTexture[][] textures = new AbstractTexture[][]{
       {
           Texture.grassSide, Texture.grassSide,
           Texture.grassSide, Texture.grassSide,
@@ -57,7 +58,7 @@ public class GrassBlockModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     return textures;
   }
 

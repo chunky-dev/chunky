@@ -19,6 +19,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -272,7 +273,7 @@ public class DragonEggModel extends QuadModel {
       };
   //endregion
 
-  private static final Texture[] textures = new Texture[quads.length];
+  private static final AbstractTexture[] textures = new AbstractTexture[quads.length];
   static { Arrays.fill(textures, Texture.dragonEgg); }
 
   @Override
@@ -281,7 +282,7 @@ public class DragonEggModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

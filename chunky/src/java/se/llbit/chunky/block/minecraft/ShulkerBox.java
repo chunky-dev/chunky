@@ -20,13 +20,13 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.DirectionalBlockModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class ShulkerBox extends AbstractModelBlock {
 
   private final String description;
 
-  public ShulkerBox(String name, Texture side, Texture top, Texture bottom, String facing) {
+  public ShulkerBox(String name, AbstractTexture side, AbstractTexture top, AbstractTexture bottom, String facing) {
     super(name, side);
     this.description = "facing=" + facing;
     this.model = new DirectionalBlockModel(facing, top, bottom, side);

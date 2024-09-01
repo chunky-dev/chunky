@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -95,9 +96,9 @@ public class ComparatorModel extends QuadModel {
 
   private static final Quad[][] rot = new Quad[4][];
 
-  private static final Texture[] blockTex = {Texture.comparatorOff, Texture.comparatorOn,};
+  private static final AbstractTexture[] blockTex = {Texture.comparatorOff, Texture.comparatorOn,};
 
-  private static final Texture[] torchTex = {Texture.redstoneTorchOff, Texture.redstoneTorchOn,};
+  private static final AbstractTexture[] torchTex = {Texture.redstoneTorchOff, Texture.redstoneTorchOn,};
 
   static {
     rot[0] = north;
@@ -137,12 +138,12 @@ public class ComparatorModel extends QuadModel {
   }
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public ComparatorModel(int direction, int active, int powered) {
     quads = Model.join(rot[direction], torch1[active][direction],
                        torch2[active][direction], torch3[active][direction]);
-    textures = new Texture[quads.length];
+    textures = new AbstractTexture[quads.length];
     Arrays.fill(textures, torchTex[powered]);
     Arrays.fill(textures, 0, rot[direction].length, blockTex[powered]);
     Arrays.fill(textures,
@@ -158,7 +159,7 @@ public class ComparatorModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

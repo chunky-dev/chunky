@@ -18,7 +18,7 @@
 package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -40,10 +40,10 @@ public class CropsModel extends QuadModel {
           new Vector3(.75, 1, 1), new Vector4(1, 0, 0, 1), true),
   };
 
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
-  public CropsModel(Texture texture) {
-    textures = new Texture[quads.length];
+  public CropsModel(AbstractTexture texture) {
+    textures = new AbstractTexture[quads.length];
     Arrays.fill(textures, texture);
   }
 
@@ -53,7 +53,7 @@ public class CropsModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

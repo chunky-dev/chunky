@@ -19,6 +19,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 
 import java.util.Arrays;
@@ -30,11 +31,11 @@ public class ChorusFlowerModel extends AABBModel {
       new AABB(2 / 16., 14 / 16., 2 / 16., 14 / 16., 0, 1),
   };
 
-  private final Texture[][] textures;
+  private final AbstractTexture[][] textures;
 
   public ChorusFlowerModel(int age) {
-    Texture tex = age < 5 ? Texture.chorusFlower : Texture.chorusFlowerDead;
-    textures = new Texture[3][6];
+    AbstractTexture tex = age < 5 ? Texture.chorusFlower : Texture.chorusFlowerDead;
+    textures = new AbstractTexture[3][6];
     for (int i = 0; i < 3; i++) Arrays.fill(textures[i], tex);
   }
 
@@ -44,7 +45,7 @@ public class ChorusFlowerModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     return textures;
   }
 }

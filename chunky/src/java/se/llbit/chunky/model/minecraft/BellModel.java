@@ -21,31 +21,32 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class BellModel extends QuadModel {
-  private static final Texture bell = Texture.bellBody;
-  private static final Texture bar = Texture.darkOakPlanks;
-  private static final Texture post = Texture.stone;
+  private static final AbstractTexture bell = Texture.bellBody;
+  private static final AbstractTexture bar = Texture.darkOakPlanks;
+  private static final AbstractTexture post = Texture.stone;
 
-  private static final Texture[] texBellFloor = new Texture[] {
+  private static final AbstractTexture[] texBellFloor = new AbstractTexture[] {
       bar, bar, bar, bar, post, post, post, post, post, post, post, post, post, post, post, post,
       bell, bell, bell, bell, bell, bell, bell, bell, bell, bell, bell
   };
 
-  private static final Texture[] texBellWall = new Texture[] {
+  private static final AbstractTexture[] texBellWall = new AbstractTexture[] {
       bar, bar, bar, bar, bar, bar,
       bell, bell, bell, bell, bell, bell, bell, bell, bell, bell, bell
   };
 
-  private static final Texture[] texBellDoubleWall = new Texture[] {
+  private static final AbstractTexture[] texBellDoubleWall = new AbstractTexture[] {
       bar, bar, bar, bar, bar, bar,
       bell, bell, bell, bell, bell, bell, bell, bell, bell, bell, bell
   };
 
-  private static final Texture[] texBellCeiling = new Texture[] {
+  private static final AbstractTexture[] texBellCeiling = new AbstractTexture[] {
       bar, bar, bar, bar, bar,
       bell, bell, bell, bell, bell, bell, bell, bell, bell, bell, bell
   };
@@ -339,7 +340,7 @@ public class BellModel extends QuadModel {
   };
   //endregion
 
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
   private Quad[] quads;
 
   public BellModel(String facing, String attachment) {
@@ -403,7 +404,7 @@ public class BellModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

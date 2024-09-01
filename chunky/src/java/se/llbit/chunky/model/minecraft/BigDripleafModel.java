@@ -21,6 +21,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -282,14 +283,14 @@ public class BigDripleafModel extends QuadModel {
   );
   //#endregion
 
-  private static final Texture[] textures;
+  private static final AbstractTexture[] textures;
 
   static {
-    Texture top = Texture.bigDripleafTop;
-    Texture tip = Texture.bigDripleafTip;
-    Texture side = Texture.bigDripleafSide;
-    Texture stem = Texture.bigDripleafStem;
-    textures = new Texture[] {top, top, tip, tip, side, side, side, side, stem, stem, stem, stem};
+    AbstractTexture top = Texture.bigDripleafTop;
+    AbstractTexture tip = Texture.bigDripleafTip;
+    AbstractTexture side = Texture.bigDripleafSide;
+    AbstractTexture stem = Texture.bigDripleafStem;
+    textures = new AbstractTexture[] {top, top, tip, tip, side, side, side, side, stem, stem, stem, stem};
   }
 
   private Quad[] quads;
@@ -322,7 +323,7 @@ public class BigDripleafModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 

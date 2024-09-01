@@ -1,9 +1,8 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.chunky.world.Material;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
@@ -13,7 +12,6 @@ import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
-import java.util.List;
 import java.util.Random;
 
 public abstract class Block extends Material {
@@ -33,7 +31,7 @@ public abstract class Block extends Material {
    */
   public boolean invisible = false;
 
-  public Block(String name, Texture texture) {
+  public Block(String name, AbstractTexture texture) {
     super(name, texture);
   }
 

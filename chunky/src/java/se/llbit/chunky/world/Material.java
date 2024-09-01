@@ -16,7 +16,7 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
@@ -83,13 +83,13 @@ public abstract class Material {
   /**
    * Base texture.
    */
-  public final Texture texture;
+  public final AbstractTexture texture;
 
   public boolean refractive = false;
 
   public boolean waterlogged = false;
 
-  public Material(String name, Texture texture) {
+  public Material(String name, AbstractTexture texture) {
     this.name = name;
     this.texture = texture;
   }

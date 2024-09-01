@@ -3,6 +3,7 @@ package se.llbit.chunky.entity;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -257,7 +258,7 @@ public class HangingSignEntity extends Entity {
   private final boolean frontGlowing;
   private final SignEntity.Color backDye;
   private final boolean backGlowing;
-  private final Texture texture;
+  private final AbstractTexture texture;
   private final String material;
 
   public HangingSignEntity(Vector3 position, CompoundTag entityTag, int rotation, boolean attached, String material) {
@@ -266,7 +267,7 @@ public class HangingSignEntity extends Entity {
 
   public HangingSignEntity(Vector3 position, JsonArray[] frontText, SignEntity.Color frontDye, boolean frontGlowing, JsonArray[] backText, SignEntity.Color backDye, boolean backGlowing, int rotation, boolean attached, String material) {
     super(position);
-    Texture signTexture = HangingSignEntity.textureFromMaterial(material);
+    AbstractTexture signTexture = HangingSignEntity.textureFromMaterial(material);
     this.frontText = frontText;
     this.backText = backText;
     this.frontDye = frontDye;
@@ -288,7 +289,7 @@ public class HangingSignEntity extends Entity {
     Quad[] quads = attached ? rotatedQuadsAttached[angle] : rotatedQuadsNotAttached[angle];
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
-      Texture tex = texture;
+      AbstractTexture tex = texture;
       if (i == 4 && frontTexture != null) {
         tex = frontTexture;
         quad = frontFaceWithText[angle];
@@ -350,7 +351,7 @@ public class HangingSignEntity extends Entity {
     return new HangingSignEntity(position, frontText, dye, glowing, backText, backDye, backGlowing, direction, attached, material);
   }
 
-  public static Texture textureFromMaterial(String material) {
+  public static AbstractTexture textureFromMaterial(String material) {
     switch (material) {
       case "oak":
         return Texture.oakHangingSign;

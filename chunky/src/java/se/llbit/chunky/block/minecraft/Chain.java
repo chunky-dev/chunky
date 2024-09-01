@@ -20,13 +20,13 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.ChainModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class Chain extends AbstractModelBlock {
 
   private final String description;
 
-  public Chain(String name, Texture texture, String axis) {
+  public Chain(String name, AbstractTexture texture, String axis) {
     super(name, texture);
     model = new ChainModel(axis);
     description = "axis=" + axis;

@@ -191,6 +191,16 @@ public final class ColorUtil {
   }
 
   /**
+   * Get the RGBA color component gamma corrected from an ARGB int
+   */
+  public static void getRGBAComponentsGammaCorrected(int argb, Vector4 components) {
+    components.w = (argb >>> 24) / 255.0f;
+    components.x = toLinearLut[(0xFF & (argb >> 16))];
+    components.y = toLinearLut[(0xFF & (argb >> 8))];
+    components.z = toLinearLut[(0xFF & argb)];
+  }
+
+  /**
    * Wraps {@link ColorUtil#getRGBAComponentsGammaCorrected} creating a new float[4]
    */
   public static float[] getRGBAComponentsGammaCorrected(int src) {
@@ -389,6 +399,17 @@ public final class ColorUtil {
     target.y = ((1 - target.w) * a * overlayColor.y + target.w * target.y) / alpha;
     target.z = ((1 - target.w) * a * overlayColor.z + target.w * target.z) / alpha;
     target.w = alpha;
+  }
+
+  /**
+   * Convert a linear RGBA color into a non-linear ARGB color
+   */
+  public static int ArgbFromLinear(float[] linearColor) {
+    float r = ColorUtil.RGBComponentFromLinear(linearColor[0]);
+    float g = ColorUtil.RGBComponentFromLinear(linearColor[1]);
+    float b = ColorUtil.RGBComponentFromLinear(linearColor[2]);
+    float a = ColorUtil.RGBComponentFromLinear(linearColor[3]);
+    return ColorUtil.getArgb(r, g, b, a);
   }
 
   /**

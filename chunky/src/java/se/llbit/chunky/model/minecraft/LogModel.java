@@ -20,7 +20,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -53,9 +53,9 @@ public class LogModel extends QuadModel {
   };
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
-  public LogModel(String facing, Texture side, Texture top) {
+  public LogModel(String facing, AbstractTexture side, AbstractTexture top) {
     switch (facing) {
       case "x":
         quads = Model.rotateZ(sides);
@@ -68,7 +68,7 @@ public class LogModel extends QuadModel {
         quads = Model.rotateX(sides);
         break;
     }
-    textures = new Texture[] {
+    textures = new AbstractTexture[] {
         side, side, side, side, top, top
     };
   }
@@ -79,7 +79,7 @@ public class LogModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

@@ -20,17 +20,18 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class TripwireHookModel extends QuadModel {
 
-  private static final Texture hookT = Texture.tripwireHook;
-  private static final Texture wood = Texture.oakPlanks;
-  private static final Texture tripwire = Texture.tripwire;
+  private static final AbstractTexture hookT = Texture.tripwireHook;
+  private static final AbstractTexture wood = Texture.oakPlanks;
+  private static final AbstractTexture tripwire = Texture.tripwire;
 
-  private static final Texture[] tex = new Texture[]{
+  private static final AbstractTexture[] tex = new AbstractTexture[]{
       hookT, hookT, hookT, hookT, hookT, hookT, hookT, hookT, hookT, hookT,
       wood, wood, wood, wood, wood, wood, wood, wood, wood, wood, wood, wood
   };
@@ -314,7 +315,7 @@ public class TripwireHookModel extends QuadModel {
       }));
   //endregion
 
-  private static final Texture[] texAttached = new Texture[]{
+  private static final AbstractTexture[] texAttached = new AbstractTexture[]{
       tripwire, tripwire, hookT, hookT, hookT, hookT, hookT, hookT, hookT, hookT, hookT, hookT,
       wood, wood, wood, wood, wood, wood, wood, wood, wood, wood, wood, wood
   };
@@ -624,7 +625,7 @@ public class TripwireHookModel extends QuadModel {
   //endregion
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public TripwireHookModel(int direction, boolean attached, boolean powered) {
     if (attached) {
@@ -642,7 +643,7 @@ public class TripwireHookModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

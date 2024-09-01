@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -112,9 +113,9 @@ public class RedstoneRepeaterModel extends QuadModel {
 
   private static final Quad[][] rot = new Quad[4][];
 
-  private static final Texture[] tex = {Texture.redstoneRepeaterOff, Texture.redstoneRepeaterOn,};
+  private static final AbstractTexture[] tex = {Texture.redstoneRepeaterOff, Texture.redstoneRepeaterOn,};
 
-  private static final Texture[][] torchTex = {
+  private static final AbstractTexture[][] torchTex = {
       { Texture.redstoneTorchOff, Texture.redstoneTorchOn, },
       { Texture.bedrock, Texture.bedrock, },
   };
@@ -172,11 +173,11 @@ public class RedstoneRepeaterModel extends QuadModel {
   }
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public RedstoneRepeaterModel(int delay, int direction, int on, int locked) {
     this.quads = Model.join(rot[direction], torch1[direction], torch2[locked][delay][direction]);
-    this.textures = new Texture[this.quads.length];
+    this.textures = new AbstractTexture[this.quads.length];
     Arrays.fill(textures, 0, rot[direction].length, tex[on]);
     Arrays.fill(textures, rot[direction].length, rot[direction].length+torch1[direction].length, torchTex[0][on]);
     Arrays.fill(textures, rot[direction].length+torch1[direction].length, this.textures.length, torchTex[locked][on]);
@@ -188,7 +189,7 @@ public class RedstoneRepeaterModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

@@ -24,6 +24,7 @@ import static se.llbit.chunky.model.Model.translate;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -150,7 +151,7 @@ public class LeverModel extends QuadModel {
     leverRotated[7][1] = leverCeilingNSOn;
   }
 
-  private static final Texture[] textures = new Texture[base.length + lever.length];
+  private static final AbstractTexture[] textures = new AbstractTexture[base.length + lever.length];
   static {
     Arrays.fill(textures, 0, base.length, Texture.cobblestone);
     Arrays.fill(textures, base.length, textures.length, Texture.lever);
@@ -171,7 +172,7 @@ public class LeverModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

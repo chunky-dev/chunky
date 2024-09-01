@@ -21,6 +21,7 @@ package se.llbit.chunky.block.minecraft;
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.DispenserModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 /**
  * The dispenser behaves almost like a TopBottomOrientedTexturedBlock. If it's facing up or down, it
@@ -35,8 +36,8 @@ public class Dispenser extends AbstractModelBlock {
         Texture.furnaceSide, Texture.furnaceTop);
   }
 
-  public Dispenser(String name, String facing, Texture front, Texture frontVertical, Texture side,
-      Texture back) {
+  public Dispenser(String name, String facing, AbstractTexture front, AbstractTexture frontVertical, AbstractTexture side,
+                   AbstractTexture back) {
     super(name, front);
     opaque = true;
     solid = true;

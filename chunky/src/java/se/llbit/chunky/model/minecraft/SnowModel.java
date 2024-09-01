@@ -19,6 +19,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.*;
 
 public class SnowModel extends QuadModel {
@@ -59,7 +60,7 @@ public class SnowModel extends QuadModel {
     }
   }
 
-  private final static Texture[] textures = {
+  private final static AbstractTexture[] textures = {
       Texture.snowBlock, Texture.snowBlock,Texture.snowBlock,
       Texture.snowBlock, Texture.snowBlock,Texture.snowBlock
   };
@@ -76,7 +77,7 @@ public class SnowModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

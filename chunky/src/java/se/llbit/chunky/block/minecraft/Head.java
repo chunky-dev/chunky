@@ -23,7 +23,7 @@ import se.llbit.chunky.entity.HeadEntity;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.log.Log;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -42,7 +42,7 @@ public class Head extends MinecraftBlockTranslucent {
   private final int rotation;
   private final SkullEntity.Kind type;
 
-  public Head(String name, Texture texture, SkullEntity.Kind type, int rotation) {
+  public Head(String name, AbstractTexture texture, SkullEntity.Kind type, int rotation) {
     super(name, texture);
     localIntersect = true;
     invisible = true;

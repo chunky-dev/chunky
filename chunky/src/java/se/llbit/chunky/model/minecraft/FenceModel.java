@@ -18,7 +18,7 @@
 package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AABBModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 
 import java.util.ArrayList;
@@ -52,9 +52,9 @@ public class FenceModel extends AABBModel {
   };
 
   private final AABB[] boxes;
-  private final Texture[][] textures;
+  private final AbstractTexture[][] textures;
 
-  public FenceModel(Texture texture, int connections) {
+  public FenceModel(AbstractTexture texture, int connections) {
     ArrayList<AABB> boxes = new ArrayList<>();
     boxes.add(post);
     for (int i = 0; i < 4; i++) {
@@ -62,8 +62,8 @@ public class FenceModel extends AABBModel {
         Collections.addAll(boxes, plank[i]);
     }
     this.boxes = boxes.toArray(new AABB[0]);
-    this.textures = new Texture[this.boxes.length][];
-    Texture[] tex = new Texture[6];
+    this.textures = new AbstractTexture[this.boxes.length][];
+    AbstractTexture[] tex = new AbstractTexture[6];
     Arrays.fill(tex, texture);
     Arrays.fill(this.textures, tex);
   }
@@ -74,7 +74,7 @@ public class FenceModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     return textures;
   }
 }

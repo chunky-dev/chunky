@@ -20,19 +20,19 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.SpriteModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class SpriteBlock extends AbstractModelBlock {
 
   protected String facing;
 
-  public SpriteBlock(String name, Texture texture) {
+  public SpriteBlock(String name, AbstractTexture texture) {
     super(name, texture);
     solid = false;
     model = new SpriteModel(texture);
   }
 
-  public SpriteBlock(String name, Texture texture, String facing) {
+  public SpriteBlock(String name, AbstractTexture texture, String facing) {
     super(name, texture);
     solid = false;
     model = new SpriteModel(texture, facing);

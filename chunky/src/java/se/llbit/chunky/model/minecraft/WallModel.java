@@ -18,7 +18,7 @@
 package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AABBModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 
 import java.util.ArrayList;
@@ -42,9 +42,9 @@ public class WallModel extends AABBModel {
     };
 
     private final AABB[] boxes;
-    private final Texture[][] textures;
+    private final AbstractTexture[][] textures;
 
-    public WallModel(Texture texture, int[] connections, boolean midsection) {
+    public WallModel(AbstractTexture texture, int[] connections, boolean midsection) {
         ArrayList<AABB> boxes = new ArrayList<>();
         if (midsection)
             boxes.add(post);
@@ -56,9 +56,9 @@ public class WallModel extends AABBModel {
             }
         }
         this.boxes = boxes.toArray(new AABB[0]);
-        Texture[] tex = new Texture[6];
+      AbstractTexture[] tex = new AbstractTexture[6];
         Arrays.fill(tex, texture);
-        this.textures = new Texture[this.boxes.length][];
+        this.textures = new AbstractTexture[this.boxes.length][];
         Arrays.fill(this.textures, tex);
     }
 
@@ -68,7 +68,7 @@ public class WallModel extends AABBModel {
     }
 
     @Override
-    public Texture[][] getTextures() {
+    public AbstractTexture[][] getTextures() {
         return textures;
     }
 }

@@ -21,6 +21,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -63,7 +64,7 @@ public class JigsawModel extends QuadModel {
 
   static final Quad[][] orientedQuads = new Quad[12][];
 
-  private final static Texture[] texturesLock = {
+  private final static AbstractTexture[] texturesLock = {
       Texture.jigsawLock,
       Texture.jigsawSide,
       Texture.jigsawSide,
@@ -72,7 +73,7 @@ public class JigsawModel extends QuadModel {
       Texture.jigsawBottom
   };
 
-  private final static Texture[] textureNoLock = {
+  private final static AbstractTexture[] textureNoLock = {
       Texture.jigsawSide,
       Texture.jigsawSide,
       Texture.jigsawSide,
@@ -97,7 +98,7 @@ public class JigsawModel extends QuadModel {
   }
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public JigsawModel(String orientation) {
     switch (orientation) {
@@ -138,7 +139,7 @@ public class JigsawModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 

@@ -21,6 +21,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -28,11 +29,11 @@ import se.llbit.math.Vector4;
 import java.util.Arrays;
 
 public class CalibratedSculkSensorModel extends QuadModel {
-  private static final Texture bottom = Texture.sculkSensorBottom;
-  private static final Texture side = Texture.sculkSensorSide;
-  private static final Texture calibrated_side = Texture.calibratedSculkSensorInputSide;
-  private static final Texture top = Texture.calibratedSculkSensorTop;
-  private static final Texture[] tex = new Texture[]{
+  private static final AbstractTexture bottom = Texture.sculkSensorBottom;
+  private static final AbstractTexture side = Texture.sculkSensorSide;
+  private static final AbstractTexture calibrated_side = Texture.calibratedSculkSensorInputSide;
+  private static final AbstractTexture top = Texture.calibratedSculkSensorTop;
+  private static final AbstractTexture[] tex = new AbstractTexture[]{
     top, bottom, side, side, side, calibrated_side,
   };
 
@@ -153,10 +154,10 @@ public class CalibratedSculkSensorModel extends QuadModel {
   private static final Quad[] quadsWest = Model.rotateNegY(quadsNorth);
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public CalibratedSculkSensorModel(boolean active, String facing) {
-    textures = new Texture[quadsNorth.length];
+    textures = new AbstractTexture[quadsNorth.length];
     if (facing.equals("east")) {
       quads = quadsEast;
     } else if (facing.equals("south")) {
@@ -177,7 +178,7 @@ public class CalibratedSculkSensorModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

@@ -7,6 +7,7 @@ import java.util.Random;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
@@ -29,21 +30,21 @@ public class Campfire extends Entity {
     }
   }
 
-  private static final Texture log = Texture.campfireLog;
-  private static final Texture litlog = Texture.campfireLogLit;
-  private static final Texture soullitlog = Texture.soulCampfireLogLit;
+  private static final AbstractTexture log = Texture.campfireLog;
+  private static final AbstractTexture litlog = Texture.campfireLogLit;
+  private static final AbstractTexture soullitlog = Texture.soulCampfireLogLit;
 
-  private static final Texture[] tex = new Texture[]{
+  private static final AbstractTexture[] tex = new AbstractTexture[]{
       log, log, log, log, log, log, log, log, log, log, log, log, log, log, log,
       log, log, log, log, log, log, log, log, log, log, log, log, log,
   };
 
-  private static final Texture[] texLitCampfire = new Texture[]{
+  private static final AbstractTexture[] texLitCampfire = new AbstractTexture[]{
       log, log, log, litlog, log, log, log, litlog, log, log, litlog, litlog, log, log, litlog,
       log, log, log, log, litlog, log, log, litlog, litlog, litlog, log, log, log
   };
 
-  private static final Texture[] texLitSoulCampfire = new Texture[]{
+  private static final AbstractTexture[] texLitSoulCampfire = new AbstractTexture[]{
       log, log, log, soullitlog, log, log, log, soullitlog, log, log, soullitlog, soullitlog, log,
       log, soullitlog,
       log, log, log, log, soullitlog, log, log, soullitlog, soullitlog, soullitlog, log, log, log
@@ -303,7 +304,7 @@ public class Campfire extends Entity {
     Transform transform = Transform.NONE
         .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     int facing = getOrientationIndex(this.facing);
-    Texture[] textures =
+    AbstractTexture[] textures =
         isLit ? (kind == Kind.SOUL_CAMPFIRE ? texLitSoulCampfire : texLitCampfire) : tex;
     for (int i = 0; i < orientedQuads[facing].length - 4; i++) {
       Material material = new TextureMaterial(textures[i]);

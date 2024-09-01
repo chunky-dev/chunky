@@ -17,11 +17,8 @@
  */
 package se.llbit.chunky.world.model;
 
-import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.resources.TextureCache;
-import se.llbit.chunky.resources.TexturePackLoader;
-import se.llbit.chunky.resources.texturepack.SimpleTexture;
-import se.llbit.chunky.resources.texturepack.TextureLoader;
+import se.llbit.chunky.resources.texture.AbstractTexture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.log.Log;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
@@ -41,12 +38,12 @@ import java.util.Map;
  */
 public class CubeModel {
   public Quad[] quads = new Quad[0];
-  public Texture[] textures = new Texture[0];
+  public AbstractTexture[] textures = new AbstractTexture[0];
 
   public CubeModel() {
   }
 
-  public CubeModel(Collection<Cube> cubes, double uvScale, Map<String, Texture> textureMap) {
+  public CubeModel(Collection<Cube> cubes, double uvScale, Map<String, AbstractTexture> textureMap) {
     Collection<Quad> theFaces = new ArrayList<>();
     Collection<String> theTextures = new ArrayList<>();
     for (Cube cube : cubes) {
@@ -135,13 +132,13 @@ public class CubeModel {
       }
     }
 
-    textures = new Texture[theTextures.size()];
+    textures = new AbstractTexture[theTextures.size()];
     int index = 0;
     for (String texture : theTextures) {
       textures[index] = textureMap.get(texture);
       if (textures[index] == null) {
         Log.error("Missing texture in cube model.");
-        textures[index] = new Texture();
+        textures[index] = new BitmapTexture();
       }
       index += 1;
     }

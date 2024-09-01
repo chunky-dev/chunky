@@ -19,17 +19,17 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.model.Tint;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 
 public class LeafModel extends AABBModel {
   private static final AABB[] boxes = { new AABB(0, 1, 0, 1, 0, 1) };
 
-  private final Texture[][] textures;
+  private final AbstractTexture[][] textures;
   private final Tint[][] tints;
 
-  public LeafModel(Texture texture) {
-    this.textures = new Texture[][] {
+  public LeafModel(AbstractTexture texture) {
+    this.textures = new AbstractTexture[][] {
         {texture, texture, texture, texture, texture, texture}
     };
     this.tints = new Tint[][] {{
@@ -38,8 +38,8 @@ public class LeafModel extends AABBModel {
     }};
   }
 
-  public LeafModel(Texture texture, int tint) {
-    this.textures = new Texture[][] {
+  public LeafModel(AbstractTexture texture, int tint) {
+    this.textures = new AbstractTexture[][] {
         {texture, texture, texture, texture, texture, texture}
     };
     Tint t = new Tint(tint);
@@ -52,7 +52,7 @@ public class LeafModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     return textures;
   }
 

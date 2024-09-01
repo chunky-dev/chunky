@@ -24,6 +24,7 @@ import java.nio.channels.FileChannel;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import se.llbit.chunky.resources.texture.AbstractHdriTexture;
 import se.llbit.log.Log;
 
 public class HDRTexture extends AbstractHdriTexture {

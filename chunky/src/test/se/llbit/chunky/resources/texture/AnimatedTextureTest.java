@@ -1,4 +1,4 @@
-/* Copyright (c) 2019 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -14,22 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.resources;
+package se.llbit.chunky.resources.texture;
 
-import se.llbit.math.ColorUtil;
-import se.llbit.math.Vector4;
+import org.junit.jupiter.api.Test;
 
-public class SolidColorTexture extends Texture {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-  private final Vector4 color;
+public class AnimatedTextureTest {
 
-  public SolidColorTexture(Vector4 color) {
-    this.color = color;
-    this.avgColor = ColorUtil.getArgb(color);
-  }
-
-  @Override public void getColor(double u, double v, Vector4 c) {
-    c.set(color);
-  }
-
+	@Test
+	public void testInitialization() {
+		AnimatedTexture texture = new AnimatedTexture("fire");
+		assertEquals(1, texture.numFrames);
+		assertEquals(16, texture.frameHeight);
+	}
 }

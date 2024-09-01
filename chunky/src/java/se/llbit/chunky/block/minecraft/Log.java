@@ -20,13 +20,13 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.LogModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class Log extends AbstractModelBlock {
 
   private final String description;
 
-  public Log(String name, Texture side, Texture top, String axis) {
+  public Log(String name, AbstractTexture side, AbstractTexture top, String axis) {
     super(name, side);
     this.description = "axis=" + axis;
     this.model = new LogModel(axis, side, top);

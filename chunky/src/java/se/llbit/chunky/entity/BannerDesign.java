@@ -1,6 +1,7 @@
 package se.llbit.chunky.entity;
 
 import se.llbit.chunky.resources.*;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
 import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
@@ -169,9 +170,9 @@ public class BannerDesign {
     public BitmapImage getBitmap() {
       String[] namespaceFilename = pattern.split(":");
       String texId = "assets/" + namespaceFilename[0] + "/textures/entity/banner/" + namespaceFilename[1];
-      Texture texture = TextureCache.get(texId);
+      BitmapTexture texture = TextureCache.get(texId);
       if (texture == null) {
-        texture = new Texture();
+        texture = new BitmapTexture();
         TextureCache.put(texId, texture);
 
         if (!ResourcePackLoader.loadResources(

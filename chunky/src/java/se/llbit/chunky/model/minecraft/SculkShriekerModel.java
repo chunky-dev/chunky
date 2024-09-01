@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -131,19 +132,19 @@ public class SculkShriekerModel extends QuadModel {
     )
   };
 
-  private static final Texture top = Texture.sculkShriekerTop;
-  private static final Texture side = Texture.sculkShriekerSide;
-  private static final Texture bottom = Texture.sculkShriekerBottom;
+  private static final AbstractTexture top = Texture.sculkShriekerTop;
+  private static final AbstractTexture side = Texture.sculkShriekerSide;
+  private static final AbstractTexture bottom = Texture.sculkShriekerBottom;
 
-  private static final Texture[] defaultTextures = new Texture[]{
+  private static final AbstractTexture[] defaultTextures = new AbstractTexture[]{
     Texture.sculkShriekerInnerTop, bottom, side, side, side, side, top, side, side, side, side, top, side, side, side, side
   };
 
-  private static final Texture[] canSummonTextures = new Texture[]{
+  private static final AbstractTexture[] canSummonTextures = new AbstractTexture[]{
     Texture.sculkShriekerCanSummonInnerTop, bottom, side, side, side, side, top, side, side, side, side, top, side, side, side, side
   };
 
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public SculkShriekerModel(boolean canSummon) {
     this.textures = canSummon ? canSummonTextures : defaultTextures;
@@ -155,7 +156,7 @@ public class SculkShriekerModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

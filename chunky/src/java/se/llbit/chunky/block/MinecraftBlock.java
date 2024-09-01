@@ -1,6 +1,7 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.chunky.world.Material;
 
 /**
@@ -9,7 +10,7 @@ import se.llbit.chunky.world.Material;
 public class MinecraftBlock extends Block {
   public static final Material STONE = new MinecraftBlock("stone", Texture.stone);
 
-  public MinecraftBlock(String name, Texture texture) {
+  public MinecraftBlock(String name, AbstractTexture texture) {
     super("minecraft:" + name, texture);
     opaque = true;
     solid = true;

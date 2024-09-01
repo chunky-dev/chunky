@@ -20,7 +20,7 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.RotatableBlockModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -29,8 +29,8 @@ public class Crafter extends AbstractModelBlock {
 
   private final String description;
 
-  public Crafter(String name, String orientation, boolean crafting, boolean triggered, Texture north, Texture northCrafting, Texture east, Texture eastCrafting, Texture eastTriggered,
-                 Texture south, Texture southTriggered, Texture west, Texture westCrafting, Texture westTriggered, Texture top, Texture topCrafting, Texture topTriggered, Texture bottom) {
+  public Crafter(String name, String orientation, boolean crafting, boolean triggered, AbstractTexture north, AbstractTexture northCrafting, AbstractTexture east, AbstractTexture eastCrafting, AbstractTexture eastTriggered,
+                 AbstractTexture south, AbstractTexture southTriggered, AbstractTexture west, AbstractTexture westCrafting, AbstractTexture westTriggered, AbstractTexture top, AbstractTexture topCrafting, AbstractTexture topTriggered, AbstractTexture bottom) {
     super(name, north);
     this.description = "orientation=" + orientation + ", crafting=" + crafting + ", triggered=" + triggered;
     RotatableBlockModel m = new RotatableBlockModel(crafting ? northCrafting : north,

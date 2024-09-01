@@ -22,6 +22,7 @@ import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.StillWaterShader;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -348,12 +349,12 @@ public class CauldronModel {
               new Vector4(2 / 16.0, 14 / 16.0, 1 - 14 / 16.0, 1 - 2 / 16.0))
       };
 
-  private static final Texture top = Texture.cauldronTop;
-  private static final Texture bottom = Texture.cauldronBottom;
-  private static final Texture side = Texture.cauldronSide;
-  private static final Texture inside = Texture.cauldronInside;
-  private static final Texture[] tex =
-      new Texture[]{
+  private static final AbstractTexture top = Texture.cauldronTop;
+  private static final AbstractTexture bottom = Texture.cauldronBottom;
+  private static final AbstractTexture side = Texture.cauldronSide;
+  private static final AbstractTexture inside = Texture.cauldronInside;
+  private static final AbstractTexture[] tex =
+      new AbstractTexture[]{
           top, inside, side, side, side, side, inside, inside, top, inside, side, side, side, side,
           top, inside, side, side, top, inside, side, side, bottom, side, side, side, side, bottom,
           side, side, side, bottom, side, side, side, side, bottom, side, side, side, bottom, side,
@@ -361,7 +362,7 @@ public class CauldronModel {
           side, side
       };
 
-  public static boolean intersect(Ray ray, int level, Texture contentTexture) {
+  public static boolean intersect(Ray ray, int level, AbstractTexture contentTexture) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     for (int i = 0; i < quads.length; ++i) {

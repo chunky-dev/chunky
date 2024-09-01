@@ -23,6 +23,7 @@ import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.FlameParticles;
 import se.llbit.chunky.model.minecraft.CandleModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.math.Vector3;
@@ -37,7 +38,7 @@ public class Candle extends AbstractModelBlock {
   private final boolean lit;
   private final FlameParticles entity;
 
-  public Candle(String name, Texture candle, Texture candleLit, int candles, boolean lit) {
+  public Candle(String name, AbstractTexture candle, AbstractTexture candleLit, int candles, boolean lit) {
     super(name, candle);
     this.candles = Math.max(1, Math.min(4, candles));
     this.lit = lit;

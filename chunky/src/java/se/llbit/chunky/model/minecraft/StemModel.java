@@ -21,12 +21,13 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class StemModel extends QuadModel {
-  private static final Texture[] textures = {Texture.stemStraight, Texture.stemStraight};
+  private static final AbstractTexture[] textures = {Texture.stemStraight, Texture.stemStraight};
   private static final Tint[][] stemColors = {
       {new Tint(0xFF00E210), new Tint(0xFF00E210)},
       {new Tint(0xFF00E210), new Tint(0xFF00E210)},
@@ -57,7 +58,7 @@ public class StemModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 

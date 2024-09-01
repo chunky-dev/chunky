@@ -2,7 +2,7 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.resources.AnimatedTexture;
+import se.llbit.chunky.resources.texture.AnimatedTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;

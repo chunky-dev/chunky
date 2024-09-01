@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.*;
 
 import java.util.Arrays;
@@ -65,7 +66,7 @@ public class EndPortalFrameModel extends QuadModel {
 
     private static final Quad[][] orientedEndPortalQuads = new Quad[4][];
 
-    private static final Texture[] tex = new Texture[]{
+    private static final AbstractTexture[] tex = new AbstractTexture[]{
             Texture.endPortalFrameTop, Texture.endStone,
             Texture.endPortalFrameSide, Texture.endPortalFrameSide, Texture.endPortalFrameSide, Texture.endPortalFrameSide
     };
@@ -118,7 +119,7 @@ public class EndPortalFrameModel extends QuadModel {
     }
 
     private final Quad[] quads;
-    private final Texture[] textures;
+    private final AbstractTexture[] textures;
 
     public EndPortalFrameModel(boolean hasEye, String facingString) {
         int orientation;
@@ -140,7 +141,7 @@ public class EndPortalFrameModel extends QuadModel {
 
         if (hasEye) {
             quads = Model.join(orientedEndPortalQuads[orientation], orientedEyeOfEnderQuads[orientation]);
-            textures = new Texture[quads.length];
+            textures = new AbstractTexture[quads.length];
             Arrays.fill(textures, Texture.eyeOfTheEnder);
             System.arraycopy(tex, 0, textures, 0, tex.length);
         } else {
@@ -155,7 +156,7 @@ public class EndPortalFrameModel extends QuadModel {
     }
 
     @Override
-    public Texture[] getTextures() {
+    public AbstractTexture[] getTextures() {
         return textures;
     }
 }

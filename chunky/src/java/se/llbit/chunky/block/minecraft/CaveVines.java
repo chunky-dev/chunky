@@ -19,6 +19,7 @@
 package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class CaveVines extends SpriteBlock {
 
@@ -29,7 +30,7 @@ public class CaveVines extends SpriteBlock {
     this.berries = berries;
   }
 
-  private static Texture getTexture(boolean body, boolean lit) {
+  private static AbstractTexture getTexture(boolean body, boolean lit) {
     if (body) {
       return lit ? Texture.caveVinesPlantLit : Texture.caveVinesPlant;
     }

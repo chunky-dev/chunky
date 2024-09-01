@@ -19,6 +19,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -59,16 +60,16 @@ public class CakeModel extends QuadModel {
     }
 
     private final Quad[] quads;
-    private final Texture[] textures;
+    private final AbstractTexture[] textures;
 
     public CakeModel(int bites) {
         this.quads = cake[bites];
 
-        Texture top = Texture.cakeTop;
-        Texture side = Texture.cakeSide;
-        Texture bottom = Texture.cakeBottom;
-        Texture inside = Texture.cakeInside;
-        textures = new Texture[]{side, side, bites == 0 ? side : inside, side, top, bottom};
+        AbstractTexture top = Texture.cakeTop;
+        AbstractTexture side = Texture.cakeSide;
+        AbstractTexture bottom = Texture.cakeBottom;
+        AbstractTexture inside = Texture.cakeInside;
+        textures = new AbstractTexture[]{side, side, bites == 0 ? side : inside, side, top, bottom};
     }
 
     @Override
@@ -77,7 +78,7 @@ public class CakeModel extends QuadModel {
     }
 
     @Override
-    public Texture[] getTextures() {
+    public AbstractTexture[] getTextures() {
         return textures;
     }
 }

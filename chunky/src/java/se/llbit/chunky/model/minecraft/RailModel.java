@@ -18,7 +18,7 @@
 package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -73,11 +73,11 @@ public class RailModel extends QuadModel {
   };
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
-  public RailModel(Texture texture, int type) {
+  public RailModel(AbstractTexture texture, int type) {
     this.quads = new Quad[] { rails[type] };
-    this.textures = new Texture[] { texture };
+    this.textures = new AbstractTexture[] { texture };
   }
 
   @Override
@@ -86,7 +86,7 @@ public class RailModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

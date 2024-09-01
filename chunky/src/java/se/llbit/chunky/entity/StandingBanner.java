@@ -21,6 +21,8 @@ import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.resources.TextureCache;
+import se.llbit.chunky.resources.texture.AbstractTexture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
@@ -224,7 +226,7 @@ public class StandingBanner extends Entity {
     if (base == BannerDesign.Color.WHITE && patterns.isEmpty()) {
       return new TextureMaterial(Texture.bannerBase);
     }
-    Texture cachedTexture = TextureCache.get(design);
+    AbstractTexture cachedTexture = TextureCache.get(design);
     if (cachedTexture != null) {
       return new TextureMaterial(cachedTexture);
     }
@@ -273,7 +275,7 @@ public class StandingBanner extends Entity {
         }
       }
     }
-    Texture texture = new Texture(tinted);
+    BitmapTexture texture = new BitmapTexture(tinted);
     TextureCache.put(design, texture);
     return new TextureMaterial(texture);
   }

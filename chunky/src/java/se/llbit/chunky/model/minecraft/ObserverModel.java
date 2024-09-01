@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -75,20 +76,20 @@ public class ObserverModel extends QuadModel {
     faces[7] = observer;
   }
 
-  private static final Texture[] texturesOff = {
+  private static final AbstractTexture[] texturesOff = {
       Texture.observerTop, Texture.observerTop,
       Texture.observerSide, Texture.observerSide,
       Texture.observerFront, Texture.observerBack
   };
 
-  private static final Texture[] texturesOn = {
+  private static final AbstractTexture[] texturesOn = {
       Texture.observerTop, Texture.observerTop,
       Texture.observerSide, Texture.observerSide,
       Texture.observerFront, Texture.observerBackOn
   };
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public ObserverModel(int facing, boolean powered) {
     quads = faces[facing];
@@ -101,7 +102,7 @@ public class ObserverModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }
