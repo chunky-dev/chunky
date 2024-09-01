@@ -20,6 +20,7 @@ import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.sky.Sun;
 import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.chunky.resources.texturepack.*;
+import se.llbit.log.Log;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -3664,6 +3665,10 @@ public class TexturePackLoader {
   }
 
   private static void addSimpleTexture(String name, String file, BitmapTexture texture) {
+    if (ALL_TEXTURES.containsKey(name)) {
+      Log.warnf("Duplicate texture %s (path %s). This is probably a bug, please report it at https://github.com/chunky-dev/chunky/issues", name, file);
+      addSimpleTexture(name + "_duplicate", file, texture);
+    }
     ALL_TEXTURES.put(name, new SimpleTexture(file, texture));
   }
 }
