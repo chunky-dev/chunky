@@ -114,6 +114,15 @@ public class Head extends MinecraftBlockTranslucent {
     Tag properties = profileTag.get("properties");
     if (properties.isCompoundTag()) {
       return MinecraftSkin.getSkinFromEncodedTextures(properties.get("value").stringValue());
+    } else if (properties.isList()) {
+      for (Tag property : properties.asList()) {
+        if (property.get("name").stringValue("").equals("textures")) {
+          String encodedTexture = property.get("value").stringValue("");
+          if (!encodedTexture.isEmpty()) {
+            return MinecraftSkin.getSkinFromEncodedTextures(encodedTexture);
+          }
+        }
+      }
     }
     int[] uuidInts = profileTag.get("id").intArray();
     return MojangApi.fetchProfile(UuidUtil.intsToUuid(uuidInts).toString()).getSkin();
