@@ -22,10 +22,17 @@ package se.llbit.chunky.world;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Clouds {
-  private static long[][] clouds = new long[32][32];
+  private static final long[][] clouds = new long[32][32];
 
   static {
     // zero the cloud data
+    zeroClouds();
+  }
+
+  /**
+   * Zero the cloud data
+   */
+  private static void zeroClouds() {
     for (int i = 0; i < 32; ++i) {
       for (int j = 0; j < 32; ++j) {
         clouds[i][j] = 0L;
@@ -54,6 +61,7 @@ public class Clouds {
    * @param v 0 = no cloud, 1 = cloud
    */
   public static void setCloud(int x, int y, int v) {
+    zeroClouds();
     x = ((x % 256) + 256) % 256; // Compute modulo 256 >=0.
     y = ((y % 256) + 256) % 256; // Compute modulo 256 >=0.
     int tilex = x / 8;

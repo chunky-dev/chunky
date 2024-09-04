@@ -56,7 +56,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class SkyTab extends ScrollPane implements RenderControlsTab, Initializable {
+public class SkyTab extends VBox implements RenderControlsTab, Initializable {
   private Scene scene;
 
   @FXML private ChoiceBox<Sky.SkyMode> skyMode;
@@ -72,7 +72,6 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   @FXML private TitledPane fogDetailsPane;
   @FXML private VBox fogDetailsBox;
   private final VBox simulatedSettings = new VBox();
-  private DoubleAdjuster horizonOffset = new DoubleAdjuster();
   private ChoiceBox<SimulatedSky> simulatedSky = new ChoiceBox<>();
   private final GradientEditor gradientEditor = new GradientEditor(this);
   private final LuxColorPicker colorPicker = new LuxColorPicker();
@@ -87,7 +86,15 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   private EventHandler<ActionEvent> simSkyListener = event -> {
     int selected = simulatedSky.getSelectionModel().getSelectedIndex();
     scene.sky().setSimulatedSkyMode(selected);
+    getSimulatedSkySettings();
   };
+
+  private void getSimulatedSkySettings() {
+    if (simulatedSettings.getChildren().size() == 2) {
+      simulatedSettings.getChildren().remove(1);
+    }
+    simulatedSettings.getChildren().add(scene.sky().getSimulatedSky().getControls(this, scene));
+  }
 
   public SkyTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("SkyTab.fxml"));
@@ -105,13 +112,6 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
-    simulatedSettings.getChildren().add(horizonOffset);
-    horizonOffset.setName("Horizon offset");
-    horizonOffset.setTooltip("Moves the simulated horizon.");
-    horizonOffset.setRange(0, 1);
-    horizonOffset.clampBoth();
-    horizonOffset.onValueChange(value -> scene.sky().setHorizonOffset(value));
-
     HBox simulatedSkyBox = new HBox(new Label("Sky Mode:"), simulatedSky);
     simulatedSkyBox.setSpacing(10);
     simulatedSkyBox.setAlignment(Pos.CENTER_LEFT);
@@ -226,6 +226,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     simulatedSky.setOnAction(null);
     simulatedSky.getSelectionModel().select(scene.sky().getSimulatedSky());
     simulatedSky.setOnAction(simSkyListener);
+    getSimulatedSkySettings();
     cloudsEnabled.setSelected(scene.sky().cloudsEnabled());
     transparentSkyEnabled.setSelected(scene.transparentSky());
     cloudSize.set(scene.sky().cloudSize());
@@ -233,7 +234,6 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     cloudY.set(scene.sky().cloudYOffset());
     cloudZ.set(scene.sky().cloudZOffset());
     fogMode.getSelectionModel().select(scene.fog.getFogMode());
-    horizonOffset.set(scene.sky().getHorizonOffset());
     simulatedSky.setValue(scene.sky().getSimulatedSky());
     gradientEditor.setGradient(scene.sky().getGradient());
     colorPicker.colorProperty().removeListener(skyColorListener);
@@ -249,7 +249,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     return "Sky & Fog";
   }
 
-  @Override public Node getTabContent() {
+  @Override public VBox getTabContent() {
     return this;
   }
 

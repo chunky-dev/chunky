@@ -29,24 +29,11 @@ public class UntintedLeafModel extends AABBModel {
   private static final AABB[] boxes = { new AABB(0, 1, 0, 1, 0, 1) };
 
   private final Texture[][] textures;
-  private final Tint[][] tints;
 
   public UntintedLeafModel(Texture texture) {
     this.textures = new Texture[][] {
       {texture, texture, texture, texture, texture, texture}
     };
-    this.tints = new Tint[][] {{
-      Tint.BIOME_FOLIAGE, Tint.BIOME_FOLIAGE, Tint.BIOME_FOLIAGE,
-      Tint.BIOME_FOLIAGE, Tint.BIOME_FOLIAGE, Tint.BIOME_FOLIAGE
-    }};
-  }
-
-  public UntintedLeafModel(Texture texture, int tint) {
-    this.textures = new Texture[][] {
-      {texture, texture, texture, texture, texture, texture}
-    };
-    Tint t = new Tint(tint);
-    this.tints = new Tint[][] {{t, t, t, t, t, t}};
   }
 
   @Override
@@ -61,7 +48,7 @@ public class UntintedLeafModel extends AABBModel {
 
   @Override
   public Tint[][] getTints() {
-    return tints;
+    return null;
   }
 
   @Override

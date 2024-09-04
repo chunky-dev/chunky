@@ -19,6 +19,7 @@ package se.llbit.math.bvh;
 
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.plugin.PluginApi;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.log.Log;
 import se.llbit.math.Intersectable;
@@ -34,15 +35,15 @@ import java.util.Map;
  * Bounding Volume Hierarchy based on AABBs.
  */
 public interface BVH extends Intersectable {
-  BVH EMPTY = (ray, intersectionRecord) -> false;
+  BVH EMPTY = (ray, intersectionRecord, scene) -> false;
 
   /**
-   * Find closest intersection between the ray and any object in the BVH
+   * Find the closest intersection between the ray and any object in the BVH
    *
    * @return {@code true} if there exists any intersection
    */
   @Override
-  boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord);
+  boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene);
 
   final class Factory {
 

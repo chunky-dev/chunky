@@ -3,13 +3,9 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.Material;
 import se.llbit.math.*;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
-import java.util.function.Predicate;
 
 /**
  * A block model that is made out of textured AABBs.
@@ -78,7 +74,7 @@ public abstract class AABBModel implements BlockModel {
     boolean hit = false;
     Tint tint = Tint.NONE;
     for (int i = 0; i < boxes.length; ++i) {
-      if (boxes[i].intersect(ray, intersectionRecord)) {
+      if (boxes[i].closestIntersection(ray, intersectionRecord)) {
         Tint[] tintedFacesBox = tintedFaces != null ? tintedFaces[i] : null;
         Vector3 n = intersectionRecord.shadeN;
         if (n.y > 0) { // top
@@ -128,18 +124,7 @@ public abstract class AABBModel implements BlockModel {
       }
     }
     if (hit) {
-      Vector3 o = new Vector3(ray.o);
-      o.scaleAdd(intersectionRecord.distance, ray.d);
-      if (isInside(o)) {
-        return false;
-      }
-      if (intersectionRecord.material.opaque) {
-        intersectionRecord.color.w = 1;
-      }
-
       tint.tint(intersectionRecord.color, ray, scene);
-      /*ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);*/
     }
     return hit;
   }
@@ -190,24 +175,19 @@ public abstract class AABBModel implements BlockModel {
 
   @Override
   public boolean isInside(Ray2 ray) {
-    double ix = ray.o.x - QuickMath.floor(ray.o.x);
-    double iy = ray.o.y - QuickMath.floor(ray.o.y);
-    double iz = ray.o.z - QuickMath.floor(ray.o.z);
-    AABB[] boxes = getBoxes();
-    for (AABB box: boxes) {
-      if (box.inside(new Vector3(ix, iy, iz))) {
-        return true;
-      }
-    }
-    return false;
+    return isInside(ray.o);
   }
 
   public boolean isInside(Vector3 p) {
     double ix = p.x - QuickMath.floor(p.x);
     double iy = p.y - QuickMath.floor(p.y);
     double iz = p.z - QuickMath.floor(p.z);
-    Ray2 ray = new Ray2();
-    ray.o.set(ix, iy, iz);
-    return isInside(ray);
+    AABB[] boxes = getBoxes();
+    for (AABB box: boxes) {
+      if (box.inside(ix, iy, iz)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

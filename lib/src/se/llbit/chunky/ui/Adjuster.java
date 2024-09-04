@@ -45,11 +45,11 @@ public abstract class Adjuster<T extends Number> extends HBox {
     this.value = value;
     valueField = new NumericTextField<>(value);
     valueField.triggerRefresh();
-    nameLbl.textProperty().bind(Bindings.concat(name, ":"));
+    nameLbl.textProperty().bind(name);
     setAlignment(Pos.CENTER_LEFT);
     setSpacing(10);
-    valueField.setPrefWidth(103);
-    getChildren().addAll(nameLbl, valueField);
+    valueField.setPrefWidth(80);
+    getChildren().addAll(valueField, nameLbl);
 
     Number[] oldValue = new Number[1];
     valueField.focusedProperty().addListener(observable -> {

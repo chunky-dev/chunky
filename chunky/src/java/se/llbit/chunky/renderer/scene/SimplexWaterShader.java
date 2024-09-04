@@ -41,7 +41,7 @@ public class SimplexWaterShader implements WaterShader {
 
 
   @Override
-  public void doWaterShading(Ray2 ray, IntersectionRecord intersectionRecord, double animationTime) {
+  public Vector3 doWaterShading(Ray2 ray, IntersectionRecord intersectionRecord, double animationTime) {
     double frequency = baseFrequency;
     double amplitude = baseAmplitude;
 
@@ -66,7 +66,7 @@ public class SimplexWaterShader implements WaterShader {
     Vector3 normal = new Vector3();
     normal.cross(zslope, xslope);
     normal.normalize();
-    intersectionRecord.shadeN.set(normal.x, normal.y, normal.z);
+    return normal;
   }
 
   @Override

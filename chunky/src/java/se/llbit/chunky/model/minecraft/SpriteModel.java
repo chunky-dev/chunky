@@ -27,7 +27,6 @@ import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
-import se.llbit.util.VectorUtil;
 
 public class SpriteModel extends QuadModel {
 
@@ -77,58 +76,6 @@ public class SpriteModel extends QuadModel {
   @Override
   public Texture[] getTextures() {
     return textures;
-  }
-
-  // TODO: Are this method and the one below necessary?
-
-  public static boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Texture material) {
-    boolean hit = false;
-    IntersectionRecord intersectionTest = new IntersectionRecord();
-    float[] color = null;
-    for (Quad quad : quads) {
-      if (quad.intersect(ray, intersectionTest)) {
-        float[] c = material.getColor(intersectionTest.uv.x, intersectionTest.uv.y);
-        if (c[3] > Constants.EPSILON) {
-          color = c;
-          if (quad.doubleSided) {
-            intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, quad.n));
-          } else {
-            intersectionRecord.setNormal(quad.n);
-          }
-          hit = true;
-        }
-      }
-    }
-    if (hit) {
-      intersectionRecord.color.set(color);
-      intersectionRecord.distance = intersectionTest.distance;
-    }
-    return hit;
-  }
-
-  public static boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Texture material, String facing) {
-    boolean hit = false;
-    IntersectionRecord intersectionTest = new IntersectionRecord();
-    float[] color = null;
-    for (Quad quad : orientedQuads[getOrientationIndex(facing)]) {
-      if (quad.intersect(ray, intersectionTest)) {
-        float[] c = material.getColor(intersectionTest.uv.x, intersectionTest.uv.y);
-        color = c;
-        if (c[3] > Constants.EPSILON) {
-          if (quad.doubleSided) {
-            intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, quad.n));
-          } else {
-            intersectionRecord.setNormal(quad.n);
-          }
-          hit = true;
-        }
-      }
-    }
-    if (hit) {
-      intersectionRecord.color.set(color);
-      intersectionRecord.distance = intersectionTest.distance;
-    }
-    return hit;
   }
 
   private static int getOrientationIndex(String facing) {

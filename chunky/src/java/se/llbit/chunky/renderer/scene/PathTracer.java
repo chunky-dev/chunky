@@ -17,9 +17,6 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import se.llbit.chunky.block.Block;
-import se.llbit.chunky.block.minecraft.Air;
-import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.*;
@@ -29,7 +26,7 @@ import java.util.Random;
 /**
  * Static methods for path tracing.
  *
- * @author Jesper Öqvist <jesper@llbit.se>
+ * @author Jesper Öqvist <jesper@llbit.se>, Peregrine05, and Chunky Contributors
  */
 public class PathTracer implements RayTracer {
 
@@ -38,50 +35,58 @@ public class PathTracer implements RayTracer {
    */
   @Override public void trace(Scene scene, WorkerState state) {
     Ray2 ray = state.ray;
+    ray.flags = Ray2.SPECULAR;
+
     ray.setCurrentMedium(scene.getWorldMaterial(ray));
-    pathTrace(scene, ray, state);
+    pathTrace(scene, state);
   }
 
   /**
    * Path trace the ray in this scene.
    */
-  public static void pathTrace(Scene scene, Ray2 ray, WorkerState state) {
-    Random random = state.random;
+  public static void pathTrace(Scene scene, WorkerState state) {
+    final Random random = state.random;
+    final Ray2 ray = state.ray;
 
-    Vector4 cumulativeColor = state.color;
-    Vector3 throughput = new Vector3(1, 1, 1);
+    final Vector4 cumulativeColor = state.color;
+    final Vector3 throughput = state.throughput;
+    final IntersectionRecord intersectionRecord = state.intersectionRecord;
+    final Vector3 emittance = state.emittance;
+    final Vector4 sunColor = state.sunColor;
 
-    int rayDepth = 0;
-    while (rayDepth < scene.rayDepth) {
+    for (int i = scene.rayDepth; i > 0; i--) {
+      intersectionRecord.reset();
+      emittance.set(0, 0, 0);
+      sunColor.set(0, 0, 0, 0);
 
-      IntersectionRecord intersectionRecord = new IntersectionRecord();
-
-      if (scene.intersect(ray, intersectionRecord)) {
-        if (intersectionRecord.material.opaque) {
-          intersectionRecord.color.w = 1;
-        } else if (intersectionRecord.color.w < Constants.EPSILON) {
+      if (scene.intersect(ray, intersectionRecord, random)) {
+        if (intersectionRecord.color.w < Constants.EPSILON) {
           intersectionRecord.color.set(1, 1, 1, 0);
         }
 
-        if (ray.d.dot(intersectionRecord.n) > 0) {
-          intersectionRecord.n.scale(-1);
-          intersectionRecord.shadeN.scale(-1);
+        ray.o.scaleAdd(intersectionRecord.distance, ray.d);
+
+        ray.getCurrentMedium().absorption(throughput, intersectionRecord.distance);
+
+        ray.clearReflectionFlags();
+        if ((intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0) {
+          emittance.set(intersectionRecord.material.volumeEmittance);
+          intersectionRecord.material.volumeScatter(ray, random);
+        } else {
+          if (intersectionRecord.material.scatter(ray, intersectionRecord, emittance, random)) {
+            ray.setCurrentMedium(intersectionRecord.material);
+          }
         }
 
-        double emittance = intersectionRecord.material.emittance;
-        ray.o.scaleAdd(intersectionRecord.distance, ray.d);
-        if (!intersectionRecord.material.scatter(ray, intersectionRecord, random)) {
-          //rayDepth--;
-          emittance = 0;
-        }
+        doSunSampling(scene, state, i);
 
         throughput.x *= intersectionRecord.color.x;
         throughput.y *= intersectionRecord.color.y;
         throughput.z *= intersectionRecord.color.z;
 
-        cumulativeColor.x += intersectionRecord.color.x * emittance * scene.emitterIntensity * throughput.x;
-        cumulativeColor.y += intersectionRecord.color.y * emittance * scene.emitterIntensity * throughput.y;
-        cumulativeColor.z += intersectionRecord.color.z * emittance * scene.emitterIntensity * throughput.z;
+        cumulativeColor.x += (intersectionRecord.color.x * emittance.x * scene.emitterIntensity + sunColor.x) * throughput.x;
+        cumulativeColor.y += (intersectionRecord.color.y * emittance.y * scene.emitterIntensity + sunColor.y) * throughput.y;
+        cumulativeColor.z += (intersectionRecord.color.z * emittance.z * scene.emitterIntensity + sunColor.z) * throughput.z;
 
       } else {
         scene.sky.getSkyColor(ray, intersectionRecord);
@@ -93,11 +98,85 @@ public class PathTracer implements RayTracer {
         cumulativeColor.x += throughput.x;
         cumulativeColor.y += throughput.y;
         cumulativeColor.z += throughput.z;
-
         break;
-
       }
-      rayDepth++;
+    }
+  }
+
+  private static void doSunSampling(Scene scene, WorkerState state, int rayDepth) {
+    if (!scene.sunSamplingStrategy.doSunSampling()) {
+      return;
+    }
+    if (!scene.sun.getDrawTexture()) {
+      return;
+    }
+    if ((state.ray.flags & Ray2.DIFFUSE) == 0 && (state.intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) == 0) {
+      return;
+    }
+
+    state.sampleRay.set(state.ray);
+    state.sampleRecord.reset();
+    scene.sun.getRandomSunDirection(state.sampleRay, state.random);
+    switch (scene.sunSamplingStrategy) {
+      case SAMPLE_ONLY:
+      case MIX:
+        if (!scene.intersect(state.sampleRay, state.sampleRecord, state.random)) {
+          state.sunColor.set(scene.sun.getSunIntersectionColor(state.sampleRay));
+          double scaleFactor;
+          if ((state.intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0) {
+            scaleFactor = Material.phaseHG(state.ray.d.rScale(-1).dot(state.sampleRay.d), state.intersectionRecord.material.volumeAnisotropy);
+          } else {
+            scaleFactor = QuickMath.abs(state.sampleRay.d.dot(state.intersectionRecord.shadeN));
+          }
+          scaleFactor *= scene.sun.radius * scene.sun.radius;
+          state.sunColor.scale(scaleFactor);
+        }
+        break;
+      case SAMPLE_THROUGH_OPACITY:
+        state.attenuation.set(1);
+        for (int i = 0; i < rayDepth; i++) {
+          if (!scene.intersect(state.sampleRay, state.sampleRecord, state.random)) {
+            state.sunColor.set(scene.sun.getSunIntersectionColor(state.sampleRay));
+            double scaleFactor;
+            if ((state.intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0) {
+              scaleFactor = Material.phaseHG(state.ray.d.rScale(-1).dot(state.sampleRay.d), state.intersectionRecord.material.volumeAnisotropy);
+            } else {
+              scaleFactor = QuickMath.abs(state.sampleRay.d.dot(state.intersectionRecord.shadeN));
+            }
+            scaleFactor *= scene.sun.radius * scene.sun.radius;
+            state.sunColor.scale(scaleFactor);
+            state.sunColor.x *= state.attenuation.x;
+            state.sunColor.y *= state.attenuation.y;
+            state.sunColor.z *= state.attenuation.z;
+            break;
+          }
+          if (1 - state.sampleRecord.material.specular < Constants.EPSILON) {
+            break;
+          }
+          state.attenuation.scale(1 - state.sampleRecord.material.specular);
+          double mult = 1 - state.sampleRecord.color.w * state.sampleRecord.material.alpha;
+          if (mult < Constants.EPSILON) {
+            break;
+          }
+          state.attenuation.scale(mult);
+          state.attenuation.x *= 1 - state.sampleRecord.material.transmissionMetalness * (1 - state.sampleRecord.color.x);
+          state.attenuation.y *= 1 - state.sampleRecord.material.transmissionMetalness * (1 - state.sampleRecord.color.y);
+          state.attenuation.z *= 1 - state.sampleRecord.material.transmissionMetalness * (1 - state.sampleRecord.color.z);
+
+          state.attenuation.x *= state.sampleRecord.material.transmissionSpecularColor.x;
+          state.attenuation.y *= state.sampleRecord.material.transmissionSpecularColor.y;
+          state.attenuation.z *= state.sampleRecord.material.transmissionSpecularColor.z;
+
+          state.sampleRay.getCurrentMedium().absorption(state.attenuation, state.sampleRecord.distance);
+
+          state.sampleRay.o.scaleAdd(state.sampleRecord.distance, state.sampleRay.d);
+          if ((state.sampleRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) == 0) {
+            state.sampleRay.setCurrentMedium(state.sampleRecord.material);
+          }
+          state.sampleRay.o.scaleAdd(-Constants.OFFSET, state.sampleRecord.n);
+          state.sampleRecord.reset();
+        }
+        break;
     }
   }
 }

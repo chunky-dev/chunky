@@ -27,7 +27,7 @@ import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 
-public class WallCoralFan extends MinecraftBlockTranslucent {
+public class WallCoralFan extends EmptyModelBlock {
 
   private final String coralType;
   private final String facing;
@@ -36,13 +36,7 @@ public class WallCoralFan extends MinecraftBlockTranslucent {
     super(name, CoralFan.coralTexture(coralType));
     this.coralType = coralType;
     this.facing = facing;
-    localIntersect = true;
-    solid = false;
     invisible = true;
-  }
-
-  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    return false;
   }
 
   @Override public boolean isEntity() {

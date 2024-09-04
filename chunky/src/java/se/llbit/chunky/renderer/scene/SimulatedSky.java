@@ -17,21 +17,24 @@
 package se.llbit.chunky.renderer.scene;
 
 import se.llbit.math.Ray;
+import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
+import se.llbit.util.Configurable;
+import se.llbit.util.HasControls;
 
 /**
  * Interface for simulated skies.
  */
-public interface SimulatedSky {
+public interface SimulatedSky extends Configurable, HasControls {
   /**
    * Update the sun if necessary. Returns true if the sun was updated (and cache needs to be purged).
    */
-  boolean updateSun(Sun sun, double horizonOffset);
+  boolean updateSun(Sun sun);
 
   /**
    * Calculate the sky color for a given ray.
    */
-  Vector3 calcIncidentLight(Ray ray);
+  Vector3 calcIncidentLight(Ray2 ray);
 
   /**
    * Get the friendly name.

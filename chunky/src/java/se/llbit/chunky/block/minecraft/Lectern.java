@@ -28,7 +28,7 @@ import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 
-public class Lectern extends MinecraftBlockTranslucent {
+public class Lectern extends EmptyModelBlock {
     private final String facing;
     private final boolean hasBook;
 
@@ -37,13 +37,6 @@ public class Lectern extends MinecraftBlockTranslucent {
         this.facing = facing;
         this.hasBook = hasBook;
         invisible = true;
-        opaque = false;
-        localIntersect = true;
-    }
-
-    @Override
-    public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-        return false;
     }
 
     @Override

@@ -45,7 +45,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class PostprocessingTab extends ScrollPane implements RenderControlsTab, Initializable {
+public class PostprocessingTab extends VBox implements RenderControlsTab, Initializable {
   private Scene scene;
   private RenderControlsFxController controller;
 
@@ -115,7 +115,7 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
     return "Postprocessing";
   }
 
-  @Override public Node getTabContent() {
+  @Override public VBox getTabContent() {
     return this;
   }
 

@@ -22,6 +22,11 @@ public enum EmitterSamplingStrategy implements Registerable {
   }
 
   @Override
+  public String toString() {
+    return name;
+  }
+
+  @Override
   public String getDescription() {
     return description;
   }

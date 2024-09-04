@@ -30,7 +30,7 @@ import se.llbit.nbt.CompoundTag;
 
 import java.util.Random;
 
-public class Campfire extends MinecraftBlockTranslucent {
+public class Campfire extends EmptyModelBlock {
     private final se.llbit.chunky.entity.Campfire.Kind kind;
     private final String facing;
     public final boolean isLit;
@@ -38,16 +38,9 @@ public class Campfire extends MinecraftBlockTranslucent {
     public Campfire(String name, se.llbit.chunky.entity.Campfire.Kind kind, String facing, boolean lit) {
         super(name, Texture.campfireLog);
         invisible = true;
-        opaque = false;
-        localIntersect = true;
         this.kind = kind;
         this.facing = facing;
         this.isLit = lit;
-    }
-
-    @Override
-    public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-        return false;
     }
 
     @Override

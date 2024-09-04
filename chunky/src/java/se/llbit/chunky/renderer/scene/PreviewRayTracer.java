@@ -40,30 +40,39 @@ public class PreviewRayTracer implements RayTracer {
    */
   @Override public void trace(Scene scene, WorkerState state) {
     Ray2 ray = state.ray;
-    IntersectionRecord intersectionRecord;
+    ray.flags |= Ray2.SPECULAR;
     ray.setCurrentMedium(scene.getWorldMaterial(ray));
-    while (true) {
-      intersectionRecord = new IntersectionRecord();
-      if (!scene.intersect(ray, intersectionRecord)) {
-        mapIntersection(scene, ray, intersectionRecord);
-        break;
-      } else if (!intersectionRecord.material.isSameMaterial(ray.getCurrentMedium())) {
-        ray.o.scaleAdd((intersectionRecord.distance), ray.d);
-        break;
-      } /*else {
-        ray.o.scaleAdd((intersectionRecord.distance + Constants.OFFSET), ray.d);
-        if (intersectionRecord.material.refractive) {
+
+    IntersectionRecord intersectionRecord = state.intersectionRecord;
+    Vector3 throughput = state.throughput;
+
+    for (int i = scene.rayDepth; i > 0; i--) {
+      intersectionRecord.reset();
+      if (scene.intersect(ray, intersectionRecord, null)) {
+        ray.o.scaleAdd(intersectionRecord.distance, ray.d);
+        ray.getCurrentMedium().absorption(throughput, intersectionRecord.distance);
+        ray.flags = 0;
+        if (intersectionRecord.material.scatter(ray, intersectionRecord, state.emittance, state.random)) {
           ray.setCurrentMedium(intersectionRecord.material);
         }
-      }*/
+        if ((ray.flags & Ray2.DIFFUSE) != 0) {
+          scene.sun.flatShading(intersectionRecord);
+          break;
+        } else {
+          throughput.x *= intersectionRecord.color.x;
+          throughput.y *= intersectionRecord.color.y;
+          throughput.z *= intersectionRecord.color.z;
+        }
+      } else if (mapIntersection(scene, ray, intersectionRecord)) {
+        break;
+      } else {
+        scene.sky.getSkyColor(ray, intersectionRecord);
+        break;
+      }
     }
-
-    if (intersectionRecord.material == Air.INSTANCE) {
-      scene.sky.getSkyColor(ray, intersectionRecord);
-    } else {
-      scene.sun.flatShading(intersectionRecord);
-    }
-    state.color.set(intersectionRecord.color);
+    state.color.x = throughput.x * intersectionRecord.color.x;
+    state.color.y = throughput.y * intersectionRecord.color.y;
+    state.color.z = throughput.z * intersectionRecord.color.z;
   }
 
   /**
@@ -76,7 +85,7 @@ public class PreviewRayTracer implements RayTracer {
     double occlusion = 1.0;
     while (true) {
       intersectionRecord = new IntersectionRecord();
-      if (!scene.intersect(ray, intersectionRecord)) {
+      if (!scene.intersect(ray, intersectionRecord, state.random)) {
         break;
       } else {
         occlusion *= (1 - intersectionRecord.color.w);

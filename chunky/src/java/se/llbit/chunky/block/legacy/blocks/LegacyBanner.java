@@ -1,6 +1,7 @@
 package se.llbit.chunky.block.legacy.blocks;
 
 import se.llbit.chunky.block.MinecraftBlockTranslucent;
+import se.llbit.chunky.block.minecraft.EmptyModelBlock;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.StandingBanner;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -22,7 +23,7 @@ import se.llbit.nbt.SpecificTag;
  * The block itself is invisible and the banner is rendered as an entity so this block doesn't get
  * finalized but just creates the corresponding {@link StandingBanner}.
  */
-public class LegacyBanner extends MinecraftBlockTranslucent {
+public class LegacyBanner extends EmptyModelBlock {
 
   private static final int[] COLOR_MAP = {
       BlockData.COLOR_BLACK,
@@ -47,7 +48,6 @@ public class LegacyBanner extends MinecraftBlockTranslucent {
 
   public LegacyBanner(String name, CompoundTag tag) {
     super(name, Texture.whiteWool);
-    localIntersect = true;
     invisible = true;
     rotation = tag.get("Data").intValue(0);
   }
@@ -60,11 +60,6 @@ public class LegacyBanner extends MinecraftBlockTranslucent {
   @Override
   public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
     return new StandingBanner(position, rotation, parseDesign(entityTag));
-  }
-
-  @Override
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    return false;
   }
 
   /**

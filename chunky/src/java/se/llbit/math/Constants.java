@@ -26,4 +26,5 @@ public class Constants {
   public static final double TAU = Math.PI * 2;
   public static final double SQRT_HALF = Math.sqrt(0.5);
   public static final double INV_SQRT_HALF = 1 / Math.sqrt(0.5);
+  public static final double SQRT_2 = Math.sqrt(2);
 }

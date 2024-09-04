@@ -24,11 +24,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.JsonObject;
-import se.llbit.math.IntersectionRecord;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
-import se.llbit.math.Ray2;
-import se.llbit.math.Vector3;
+import se.llbit.math.*;
 import se.llbit.util.JsonSerializable;
 
 /**
@@ -41,27 +37,17 @@ public class Sun implements JsonSerializable {
   /**
    * Default sun intensity
    */
-  public static final double DEFAULT_INTENSITY = 1.25;
+  public static final double DEFAULT_INTENSITY = 2_500;
 
   /**
    * Maximum sun intensity
    */
-  public static final double MAX_INTENSITY = 50;
+  public static final double MAX_INTENSITY = 1_000_000_000;
 
   /**
    * Minimum sun intensity
    */
-  public static final double MIN_INTENSITY = 0.1;
-
-  /**
-   * Minimum apparent sun brightness
-   */
-  public static final double MIN_APPARENT_BRIGHTNESS = 0.01;
-
-  /**
-   * Maximum apparent sun brightness
-   */
-  public static final double MAX_APPARENT_BRIGHTNESS = 50;
+  public static final double MIN_INTENSITY = 0.001;
 
   private static final double xZenithChroma[][] =
       {{0.00166, -0.00375, 0.00209, 0}, {-0.02903, 0.06377, -0.03203, 0.00394},
@@ -124,7 +110,7 @@ public class Sun implements JsonSerializable {
   /**
    * Sun radius
    */
-  public double radius = .03;
+  public double radius = 0.041887902;
   public double radiusCos = FastMath.cos(radius);
   public double radiusSin = FastMath.sin(radius);
 
@@ -132,12 +118,7 @@ public class Sun implements JsonSerializable {
 
   private double intensity = DEFAULT_INTENSITY;
 
-  private double luminosity = 100;
-  private double luminosityPdf = 1.0 / luminosity;
-
-  private double apparentBrightness = DEFAULT_INTENSITY;
-  private Vector3 apparentTextureBrightness = new Vector3(1, 1, 1);
-  private boolean enableTextureModification = false;
+  private boolean useFlatTexture = true;
 
   private double azimuth = Math.PI / 2.5;
   private double altitude = Math.PI / 3;
@@ -151,18 +132,8 @@ public class Sun implements JsonSerializable {
    */
   private final Vector3 sw = new Vector3();
 
-  protected final Vector3 emittance = new Vector3(1, 1, 1);
-
-  protected static final Vector3 previewEmittance = new Vector3(
-    DEFAULT_INTENSITY,
-    DEFAULT_INTENSITY,
-    DEFAULT_INTENSITY
-  );
-
   // final to ensure that we don't do a lot of redundant re-allocation
   private final Vector3 color = new Vector3(1, 1, 1);
-
-  private final Vector3 apparentColor = new Vector3(1, 1, 1);
 
   private boolean drawTexture = true;
 
@@ -198,14 +169,10 @@ public class Sun implements JsonSerializable {
     azimuth = other.azimuth;
     altitude = other.altitude;
     color.set(other.color);
-    apparentColor.set(other.apparentColor);
     drawTexture = other.drawTexture;
+    useFlatTexture = other.useFlatTexture;
     intensity = other.intensity;
-    luminosity = other.luminosity;
-    apparentBrightness = other.apparentBrightness;
     radius = other.radius;
-    enableTextureModification = other.enableTextureModification;
-    luminosityPdf = other.luminosityPdf;
     initSun();
   }
 
@@ -228,16 +195,6 @@ public class Sun implements JsonSerializable {
     sv.cross(sw, su);
     sv.normalize();
     su.cross(sv, sw);
-
-    emittance.set(color);
-    emittance.scale(intensity);
-
-    if (enableTextureModification) {
-      apparentTextureBrightness.set(apparentColor);
-    } else {
-      apparentTextureBrightness.set(1, 1, 1);
-    }
-    apparentTextureBrightness.scale(FastMath.pow(apparentBrightness, Scene.DEFAULT_GAMMA));
 
     Sky sky = ((Scene) scene).sky();
     if (sky.getSkyMode() == Sky.SkyMode.SIMULATED) {
@@ -285,24 +242,31 @@ public class Sun implements JsonSerializable {
    * @return <code>true</code> if the ray intersects the sun model
    */
   public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
-    if (!drawTexture || ray.d.dot(sw) < radiusCos) {
-      return false;
-    }
+    return drawTexture && !(ray.d.dot(sw) < radiusCos);
+  }
 
-    double width = radius * 4;
-    double width2 = width * 2;
-    double a;
-    a = Math.PI / 2 - FastMath.acos(ray.d.dot(su)) + width;
-    if (a >= 0 && a < width2) {
-      double b = Math.PI / 2 - FastMath.acos(ray.d.dot(sv)) + width;
-      if (b >= 0 && b < width2) {
-        texture.getColor(a / width2, b / width2, intersectionRecord.color);
-        intersectionRecord.color.set(color.x, color.y, color.z, 1);
-        return true;
+  public Vector4 getSunIntersectionColor(Ray2 ray) {
+    final Vector4 sunColor = new Vector4(1, 1, 1, 1);
+    if (intersect(ray, null)) {
+      double width = radius * Constants.SQRT_2;
+      double half_width = width / 2;
+      double a;
+      a = Math.PI / 2 - FastMath.acos(ray.d.dot(su)) + half_width;
+      if (a >= 0 && a < width) {
+        double b = Math.PI / 2 - FastMath.acos(ray.d.dot(sv)) + half_width;
+        if (b >= 0 && b < width) {
+          if (!useFlatTexture) {
+            texture.getColor(a / width, b / width, sunColor);
+          }
+          sunColor.x *= color.x * intensity;
+          sunColor.y *= color.y * intensity;
+          sunColor.z *= color.z * intensity;
+          return sunColor;
+        }
       }
     }
-
-    return false;
+    sunColor.set(0, 0, 0, 1);
+    return sunColor;
   }
 
   /**
@@ -312,19 +276,11 @@ public class Sun implements JsonSerializable {
     Vector3 n = intersectionRecord.shadeN;
     double shading = n.x * sw.x + n.y * sw.y + n.z * sw.z;
     shading = QuickMath.max(AMBIENT, shading);
-    intersectionRecord.color.x *= previewEmittance.x * shading;
-    intersectionRecord.color.y *= previewEmittance.y * shading;
-    intersectionRecord.color.z *= previewEmittance.z * shading;
+    intersectionRecord.color.scale(shading);
   }
 
   public void setColor(Vector3 newColor) {
     this.color.set(newColor);
-    initSun();
-    scene.refresh();
-  }
-
-  public void setApparentColor(Vector3 newColor) {
-    this.apparentColor.set(newColor);
     initSun();
     scene.refresh();
   }
@@ -359,40 +315,6 @@ public class Sun implements JsonSerializable {
     return intensity;
   }
 
-  public void setLuminosity(double value) {
-    luminosity = value;
-    luminosityPdf = 1 / value;
-    scene.refresh();
-  }
-
-  public double getLuminosity() {
-    return luminosity;
-  }
-
-  public double getLuminosityPdf() {
-    return luminosityPdf;
-  }
-
-  public void setApparentBrightness(double value) {
-    apparentBrightness = value;
-    initSun();
-    scene.refresh();
-  }
-
-  public double getApparentBrightness() {
-    return apparentBrightness;
-  }
-
-  public void setEnableTextureModification(boolean value) {
-    enableTextureModification = value;
-    initSun();
-    scene.refresh();
-  }
-
-  public boolean getEnableTextureModification() {
-    return enableTextureModification;
-  }
-
   /**
    * @param value Sun radius in radians.
    */
@@ -412,7 +334,7 @@ public class Sun implements JsonSerializable {
   /**
    * Point ray in random direction within sun solid angle
    */
-  public void getRandomSunDirection(Ray reflected, Random random) {
+  public void getRandomSunDirection(Ray2 ray, Random random) {
     double x1 = random.nextDouble();
     double x2 = random.nextDouble();
     double cos_a = 1 - x1 + x1 * radiusCos;
@@ -427,9 +349,9 @@ public class Sun implements JsonSerializable {
     v.scale(FastMath.sin(phi) * sin_a);
     w.scale(cos_a);
 
-    reflected.d.add(u, v);
-    reflected.d.add(w);
-    reflected.d.normalize();
+    ray.d.add(u, v);
+    ray.d.add(w);
+    ray.d.normalize();
   }
 
   @Override public JsonObject toJson() {
@@ -437,21 +359,10 @@ public class Sun implements JsonSerializable {
     sun.add("altitude", altitude);
     sun.add("azimuth", azimuth);
     sun.add("intensity", intensity);
-    sun.add("luminosity", luminosity);
-    sun.add("apparentBrightness", apparentBrightness);
     sun.add("radius", radius);
-    sun.add("modifySunTexture", enableTextureModification);
-    JsonObject colorObj = new JsonObject();
-    colorObj.add("red", color.x);
-    colorObj.add("green", color.y);
-    colorObj.add("blue", color.z);
-    sun.add("color", colorObj);
-    JsonObject apparentColorObj = new JsonObject();
-    apparentColorObj.add("red", apparentColor.x);
-    apparentColorObj.add("green", apparentColor.y);
-    apparentColorObj.add("blue", apparentColor.z);
-    sun.add("apparentColor", apparentColorObj);
+    sun.add("color", ColorUtil.rgbToJson(color));
     sun.add("drawTexture", drawTexture);
+    sun.add("useFlatTexture", useFlatTexture);
     return sun;
   }
 
@@ -459,27 +370,10 @@ public class Sun implements JsonSerializable {
     azimuth = json.get("azimuth").doubleValue(azimuth);
     altitude = json.get("altitude").doubleValue(altitude);
     intensity = json.get("intensity").doubleValue(intensity);
-    setLuminosity(json.get("luminosity").doubleValue(luminosity));
-    apparentBrightness = json.get("apparentBrightness").doubleValue(apparentBrightness);
     radius = json.get("radius").doubleValue(radius);
-    enableTextureModification = json.get("modifySunTexture").boolValue(enableTextureModification);
-
-    if (json.get("color").isObject()) {
-      JsonObject colorObj = json.get("color").object();
-      color.x = colorObj.get("red").doubleValue(1);
-      color.y = colorObj.get("green").doubleValue(1);
-      color.z = colorObj.get("blue").doubleValue(1);
-    }
-
-    if (json.get("apparentColor").isObject()) {
-      JsonObject apparentColorObj = json.get("apparentColor").object();
-      apparentColor.x = apparentColorObj.get("red").doubleValue(1);
-      apparentColor.y = apparentColorObj.get("green").doubleValue(1);
-      apparentColor.z = apparentColorObj.get("blue").doubleValue(1);
-    }
-
+    color.set(ColorUtil.jsonToRGB(json.get("color").asObject()));
     drawTexture = json.get("drawTexture").boolValue(drawTexture);
-
+    useFlatTexture = json.get("useFlatTexture").boolValue(useFlatTexture);
     initSun();
   }
 
@@ -490,10 +384,6 @@ public class Sun implements JsonSerializable {
     return color;
   }
 
-  public Vector3 getApparentColor() {
-    return apparentColor;
-  }
-
   public void setDrawTexture(boolean value) {
     if (value != drawTexture) {
       drawTexture = value;
@@ -501,7 +391,18 @@ public class Sun implements JsonSerializable {
     }
   }
 
-  public boolean drawTexture() {
+  public boolean getDrawTexture() {
     return drawTexture;
+  }
+
+  public void setUseFlatTexture(boolean value) {
+    if (value != useFlatTexture) {
+      useFlatTexture = value;
+      scene.refresh();
+    }
+  }
+
+  public boolean getUseFlatTexture() {
+    return useFlatTexture;
   }
 }

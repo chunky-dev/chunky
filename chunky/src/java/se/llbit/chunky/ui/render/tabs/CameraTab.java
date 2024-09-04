@@ -27,6 +27,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.MapView;
@@ -50,7 +51,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class CameraTab extends ScrollPane implements RenderControlsTab, Initializable {
+public class CameraTab extends VBox implements RenderControlsTab, Initializable {
   private Scene scene;
 
   @FXML private MenuButton loadPreset;
@@ -106,7 +107,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     return "Camera";
   }
 
-  @Override public Node getTabContent() {
+  @Override public VBox getTabContent() {
     return this;
   }
 
@@ -351,6 +352,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       if (unique) {
         cameras.getItems().add(newName);
         cameras.setValue(newName);
+        scene.saveCameraPreset(newName);
         break;
       } else {
         index += 1;

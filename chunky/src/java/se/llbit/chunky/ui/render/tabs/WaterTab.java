@@ -23,6 +23,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderController;
@@ -41,7 +42,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class WaterTab extends ScrollPane implements RenderControlsTab, Initializable {
+public class WaterTab extends VBox implements RenderControlsTab, Initializable {
   private Scene scene;
 
   @FXML private ChoiceBox<WaterShadingStrategy> waterShader;
@@ -121,7 +122,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   }
 
   @Override
-  public Node getTabContent() {
+  public VBox getTabContent() {
     return this;
   }
 

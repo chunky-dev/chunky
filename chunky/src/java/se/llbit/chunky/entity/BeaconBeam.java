@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -308,22 +309,27 @@ public class BeaconBeam extends Entity implements Poseable {
     DoubleAdjuster emittance = new DoubleAdjuster();
     emittance.setName("Emittance");
     emittance.setRange(0, 100);
+    emittance.clampBoth();
 
     DoubleAdjuster specular = new DoubleAdjuster();
     specular.setName("Specular");
     specular.setRange(0, 1);
+    specular.clampBoth();
 
     DoubleAdjuster ior = new DoubleAdjuster();
     ior.setName("IoR");
     ior.setRange(0, 5);
+    ior.clampMin();
 
     DoubleAdjuster perceptualSmoothness = new DoubleAdjuster();
     perceptualSmoothness.setName("Smoothness");
     perceptualSmoothness.setRange(0, 1);
+    perceptualSmoothness.clampBoth();
 
     DoubleAdjuster metalness = new DoubleAdjuster();
     metalness.setName("Metalness");
     metalness.setRange(0, 1);
+    metalness.clampBoth();
 
     LuxColorPicker beamColorPicker = new LuxColorPicker();
 
@@ -344,23 +350,23 @@ public class BeaconBeam extends Entity implements Poseable {
 
         emittance.onValueChange(value -> {
           beamMat.emittance = value.floatValue();
-          scene.rebuildActorBvh();
+          scene.refresh();
         });
         specular.onValueChange(value -> {
           beamMat.specular = value.floatValue();
-          scene.rebuildActorBvh();
+          scene.refresh();
         });
         ior.onValueChange(value -> {
           beamMat.ior = value.floatValue();
-          scene.rebuildActorBvh();
+          scene.refresh();
         });
         perceptualSmoothness.onValueChange(value -> {
           beamMat.setPerceptualSmoothness(value);
-          scene.rebuildActorBvh();
+          scene.refresh();
         });
         metalness.onValueChange(value -> {
           beamMat.metalness = value.floatValue();
-          scene.rebuildActorBvh();
+          scene.refresh();
         });
       }
     );
@@ -398,10 +404,13 @@ public class BeaconBeam extends Entity implements Poseable {
     });
 
     listButtons.getChildren().addAll(deleteButton, layerInput, addButton);
+    propertyControls.setAlignment(Pos.TOP_RIGHT);
     propertyControls.getChildren().addAll(emittance, specular, perceptualSmoothness, ior, metalness, beamColorPicker);
     listControls.getChildren().addAll(new Label("Start Height:"), colorHeightList, listButtons);
     beamColor.getChildren().addAll(listControls, propertyControls);
     controls.getChildren().add(beamColor);
+
+    controls.setSpacing(10);
 
     return controls;
   }

@@ -8,63 +8,60 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.ScrollPane?>
 <?import se.llbit.chunky.ui.IntegerAdjuster?>
 
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
-<fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
-  <VBox spacing="10.0">
-    <IntegerAdjuster fx:id="renderThreads" />
-    <IntegerAdjuster fx:id="cpuLoad" />
-    <Separator prefWidth="200.0" />
-    <IntegerAdjuster fx:id="rayDepth" />
-    <IntegerAdjuster fx:id="branchCount" />
-    <Separator layoutX="20.0" layoutY="90.0" prefWidth="200.0" />
-    <Button fx:id="mergeRenderDump" mnemonicParsing="false" text="Merge render dumps" />
-    <Separator prefWidth="200.0" />
-    <CheckBox fx:id="shutdown" mnemonicParsing="false" text="Shutdown computer when render completes" />
-    <CheckBox fx:id="fastFog" mnemonicParsing="false" text="Fast fog" />
-    <CheckBox fx:id="fancierTranslucency" mnemonicParsing="false" text="Fancier translucency" />
-    <DoubleAdjuster fx:id="transmissivityCap" />
-    <IntegerAdjuster fx:id="cacheResolution" />
-    <DoubleAdjuster fx:id="animationTime" />
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <Label text="Output mode:" />
-      <ChoiceBox fx:id="outputMode" prefWidth="150.0" />
-    </HBox>
-    <CheckBox fx:id="hideUnknownBlocks" mnemonicParsing="false" text="Hide unknown blocks" />
-    <Separator prefWidth="200.0" />
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <Label text="Octree implementation:" />
-      <ChoiceBox fx:id="octreeImplementation" prefWidth="150.0" />
-      <Button fx:id="octreeSwitchImplementation" text="Switch Current Scene" />
-    </HBox>
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <Label text="BVH build method:" />
-      <ChoiceBox fx:id="bvhMethod" prefWidth="150" />
-    </HBox>
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <Label text="BiomeStructure implementation:" />
-      <ChoiceBox fx:id="biomeStructureImplementation" prefWidth="150" />
-    </HBox>
-    <IntegerAdjuster fx:id="gridSize" />
-    <CheckBox fx:id="preventNormalEmitterWithSampling" mnemonicParsing="false" text="Prevent normal emitter when using emitter sampling" />
+<fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+  <IntegerAdjuster fx:id="renderThreads" />
+  <IntegerAdjuster fx:id="cpuLoad" />
+  <Separator prefWidth="200.0" />
+  <IntegerAdjuster fx:id="rayDepth" />
+  <IntegerAdjuster fx:id="branchCount" />
+  <Separator layoutX="20.0" layoutY="90.0" prefWidth="200.0" />
+  <Button fx:id="mergeRenderDump" mnemonicParsing="false" text="Merge render dumps" />
+  <Separator prefWidth="200.0" />
+  <CheckBox fx:id="shutdown" mnemonicParsing="false" text="Shutdown computer when render completes" />
+  <CheckBox fx:id="fastFog" mnemonicParsing="false" text="Fast fog" />
+  <CheckBox fx:id="fancierTranslucency" mnemonicParsing="false" text="Fancier translucency" />
+  <DoubleAdjuster fx:id="transmissivityCap" />
+  <IntegerAdjuster fx:id="cacheResolution" />
+  <DoubleAdjuster fx:id="animationTime" />
+  <HBox alignment="CENTER_LEFT" spacing="10.0">
+    <Label text="Output mode:" />
+    <ChoiceBox fx:id="outputMode" prefWidth="150.0" />
+  </HBox>
+  <CheckBox fx:id="hideUnknownBlocks" mnemonicParsing="false" text="Hide unknown blocks" />
+  <Separator prefWidth="200.0" />
+  <HBox alignment="CENTER_LEFT" spacing="10.0">
+    <Label text="Octree implementation:" />
+    <ChoiceBox fx:id="octreeImplementation" prefWidth="150.0" />
+    <Button fx:id="octreeSwitchImplementation" text="Switch Current Scene" />
+  </HBox>
+  <HBox alignment="CENTER_LEFT" spacing="10.0">
+    <Label text="BVH build method:" />
+    <ChoiceBox fx:id="bvhMethod" prefWidth="150" />
+  </HBox>
+  <HBox alignment="CENTER_LEFT" spacing="10.0">
+    <Label text="BiomeStructure implementation:" />
+    <ChoiceBox fx:id="biomeStructureImplementation" prefWidth="150" />
+  </HBox>
+  <IntegerAdjuster fx:id="gridSize" />
+  <CheckBox fx:id="preventNormalEmitterWithSampling" mnemonicParsing="false" text="Prevent normal emitter when using emitter sampling" />
 
-    <Separator prefWidth="200.0" />
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <Label text="Renderer:" />
-      <ChoiceBox fx:id="rendererSelect" prefWidth="150.0" />
-    </HBox>
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <Label text="Preview Renderer:" />
-      <ChoiceBox fx:id="previewSelect" prefWidth="150.0" />
-    </HBox>
+  <Separator prefWidth="200.0" />
+  <HBox alignment="CENTER_LEFT" spacing="10.0">
+    <Label text="Renderer:" />
+    <ChoiceBox fx:id="rendererSelect" prefWidth="150.0" />
+  </HBox>
+  <HBox alignment="CENTER_LEFT" spacing="10.0">
+    <Label text="Preview Renderer:" />
+    <ChoiceBox fx:id="previewSelect" prefWidth="150.0" />
+  </HBox>
 
-    <Separator prefWidth="200.0" />
-    <CheckBox fx:id="showLauncher" mnemonicParsing="false" text="Show launcher when starting Chunky" />
+  <Separator prefWidth="200.0" />
+  <CheckBox fx:id="showLauncher" mnemonicParsing="false" text="Show launcher when starting Chunky" />
 
-    <padding>
-      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-    </padding>
-  </VBox>
+  <padding>
+    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+  </padding>
 </fx:root>

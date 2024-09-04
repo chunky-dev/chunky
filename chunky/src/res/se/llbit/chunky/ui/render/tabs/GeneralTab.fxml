@@ -7,102 +7,105 @@
 <?import se.llbit.chunky.ui.*?>
 <?import se.llbit.chunky.ui.elements.*?>
 
-<fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
-  <VBox spacing="10.0">
-    <Button fx:id="openSceneDirBtn" mnemonicParsing="false" text="Open scene directory" />
-    <Separator />
-    <HBox alignment="CENTER_LEFT" spacing="16">
-      <VBox spacing="4">
-        <Label fx:id="canvasSizeLabel" text="Canvas size:" styleClass="group-label"/>
-        <padding>
-          <Insets left="8"/>
-        </padding>
-        <SizeInput fx:id="canvasSizeInput" initialWidth="400" initialHeight="400" showAspectRatioDetails="true"/>
-      </VBox>
-      <VBox alignment="CENTER_LEFT" spacing="4">
-        <HBox spacing="4">
-          <Button fx:id="applySize" mnemonicParsing="false" text="Apply"/>
-          <Button fx:id="makeDefaultSize" mnemonicParsing="false" text="Set default"/>
-        </HBox>
-        <Button fx:id="flipAxesBtn" mnemonicParsing="false" text="Flip axes"/>
-        <HBox spacing="4" fx:id="scaleButtonArea"/>
-      </VBox>
-    </HBox>
-
-    <CheckBox fx:id="renderRegions" mnemonicParsing="false" text="Render region" />
-    <GridPane fx:id="renderRegionsArea" vgap="4.0" hgap="4.0" prefWidth="200.0">
+<fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+  <Button fx:id="openSceneDirBtn" mnemonicParsing="false" text="Open scene directory" maxWidth="Infinity"/>
+  <Separator />
+  <HBox alignment="CENTER_LEFT" spacing="16">
+    <VBox spacing="4">
+      <Label fx:id="canvasSizeLabel" text="Canvas size:" styleClass="group-label"/>
       <padding>
-        <Insets right="10.0" />
+        <Insets left="8"/>
       </padding>
-
-      <Label text="Width:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-      <IntegerTextField fx:id="cameraCropWidth" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="70.0" />
-      <Label text="Height:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-      <IntegerTextField fx:id="cameraCropHeight" GridPane.columnIndex="3" GridPane.rowIndex="0" prefWidth="70.0" />
-
-      <Label text="X Offset:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-      <IntegerTextField fx:id="cameraCropX" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="70.0" />
-      <Label text="Y Offset:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-      <IntegerTextField fx:id="cameraCropY" GridPane.columnIndex="3" GridPane.rowIndex="1" prefWidth="70.0" />
-    </GridPane>
-    <Separator />
-    <VBox spacing="10.0">
-      <HBox spacing="10.0">
-        <Button fx:id="loadSelectedChunks" mnemonicParsing="false" text="Load selected chunks" />
-        <Button fx:id="reloadChunks" mnemonicParsing="false" text="Reload chunks" />
+      <SizeInput fx:id="canvasSizeInput" initialWidth="400" initialHeight="400" showAspectRatioDetails="true"/>
+    </VBox>
+    <VBox alignment="CENTER_LEFT" spacing="4">
+      <HBox spacing="4">
+        <Button fx:id="applySize" mnemonicParsing="false" text="Apply"/>
+        <Button fx:id="makeDefaultSize" mnemonicParsing="false" text="Set default"/>
       </HBox>
-      <TitledPane animated="false" text="Scene Y clip">
-        <VBox spacing="10.0">
-          <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <IntegerAdjuster fx:id="yMin" name="Min Y level" />
-          </HBox>
-          <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <IntegerAdjuster fx:id="yMax" name="Max Y level" />
-          </HBox>
-          <Text fx:id="yClipInvalid" styleClass="invalid" managed="false" visible="false">Min Y level must be smaller than Max Y level.</Text>
-        </VBox>
-      </TitledPane>
-      <Accordion>
-        <panes>
-          <TitledPane animated="false" text="Load entities">
-            <VBox spacing="10.0">
-              <HBox spacing="10.0">
-                <Button fx:id="loadAllEntities" mnemonicParsing="false" text="Select All" />
-                <Button fx:id="loadNoEntity" mnemonicParsing="false" text="Deselect All" />
-              </HBox>
-              <CheckBox fx:id="loadPlayers" mnemonicParsing="false" text="Players" />
-              <CheckBox fx:id="loadArmorStands" mnemonicParsing="false" text="Armor stands" />
-              <CheckBox fx:id="loadBooks" mnemonicParsing="false" text="Books" />
-              <CheckBox fx:id="loadPaintings" mnemonicParsing="false" text="Paintings" />
-              <CheckBox fx:id="loadBeaconBeams" mnemonicParsing="false" text="Beacon beams" />
-              <CheckBox fx:id="loadOtherEntities" mnemonicParsing="false" text="Other" />
-            </VBox>
-          </TitledPane>
-        </panes>
-      </Accordion>
+      <Button fx:id="flipAxesBtn" mnemonicParsing="false" text="Flip axes"/>
+      <HBox spacing="4" fx:id="scaleButtonArea"/>
     </VBox>
-    <Separator />
-    <FlowPane hgap="10" vgap="10">
-      <Button fx:id="exportSettings" mnemonicParsing="false" text="Export settings" />
-      <Button fx:id="importSettings" mnemonicParsing="false" text="Import settings" />
-      <Button fx:id="restoreDefaults" mnemonicParsing="false" text="Restore default settings" />
-    </FlowPane>
-    <Separator />
-    <VBox alignment="CENTER_LEFT" spacing="10.0">
-      <CheckBox fx:id="saveDumps" mnemonicParsing="false" text="Enable autosave" />
-      <TitledPane fx:id="dumpSettings" animated="false" text="Autosave settings">
-        <VBox spacing="10.0">
-          <HBox spacing="10.0">
-            <Label text="Autosave frequency: " />
-            <ComboBox fx:id="dumpFrequency" />
-            <Label text=" SPP" />
-          </HBox>
-          <CheckBox fx:id="saveSnapshots" mnemonicParsing="false" text="Save snapshot on each autosave" />
-        </VBox>
-      </TitledPane>
+  </HBox>
+
+  <CheckBox fx:id="renderRegions" mnemonicParsing="false" text="Render region" />
+  <GridPane fx:id="renderRegionsArea" vgap="4.0" hgap="4.0" prefWidth="200.0" alignment="CENTER_LEFT">
+    <Label text="Width:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+    <IntegerTextField fx:id="cameraCropWidth" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="70.0" />
+    <Label text="Height:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+    <IntegerTextField fx:id="cameraCropHeight" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="70.0" />
+
+    <Label text="X Offset:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+    <IntegerTextField fx:id="cameraCropX" GridPane.columnIndex="3" GridPane.rowIndex="0" prefWidth="70.0" />
+    <Label text="Y Offset:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+    <IntegerTextField fx:id="cameraCropY" GridPane.columnIndex="3" GridPane.rowIndex="1" prefWidth="70.0" />
+  </GridPane>
+  <Separator />
+  <HBox spacing="10" maxWidth="Infinity">
+    <Button fx:id="loadSelectedChunks" mnemonicParsing="false" text="Load selected chunks" maxWidth="1.7976931348623157E308"
+            HBox.hgrow="ALWAYS"/>
+    <Button fx:id="reloadChunks" mnemonicParsing="false" text="Reload chunks" maxWidth="1.7976931348623157E308"
+            HBox.hgrow="ALWAYS"/>
+  </HBox>
+  <TitledPane animated="false" text="Scene Y clip">
+    <GridPane hgap="10.0">
+      <columnConstraints>
+        <ColumnConstraints percentWidth="50"/>
+        <ColumnConstraints percentWidth="50"/>
+      </columnConstraints>
+      <IntegerAdjuster fx:id="yMin" name="Min Y level" alignment="CENTER_LEFT"
+                       GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+      <IntegerAdjuster fx:id="yMax" name="Max Y level" alignment="CENTER_LEFT"
+                       GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+      <Text fx:id="yClipInvalid" styleClass="invalid" managed="false" visible="false">Min Y level must be smaller than Max Y level.</Text>
+    </GridPane>
+  </TitledPane>
+  <TitledPane animated="false" text="Load entities">
+    <VBox spacing="10.0">
+      <GridPane hgap="10" vgap="5">
+        <columnConstraints>
+          <ColumnConstraints percentWidth="50"/>
+          <ColumnConstraints percentWidth="50"/>
+        </columnConstraints>
+        <Button fx:id="loadAllEntities" mnemonicParsing="false" text="Select All"
+                GridPane.rowIndex="0" GridPane.columnIndex="0" maxWidth="Infinity"/>
+        <Button fx:id="loadNoEntity" mnemonicParsing="false" text="Deselect All"
+                GridPane.rowIndex="0" GridPane.columnIndex="1" maxWidth="Infinity"/>
+        <ToggleButton fx:id="loadPlayers" mnemonicParsing="false" text="Players"
+                      GridPane.rowIndex="1" GridPane.columnIndex="0" maxWidth="Infinity"/>
+        <ToggleButton fx:id="loadArmorStands" mnemonicParsing="false" text="Armor stands"
+                      GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="Infinity"/>
+        <ToggleButton fx:id="loadBooks" mnemonicParsing="false" text="Books"
+                      GridPane.rowIndex="2" GridPane.columnIndex="0" maxWidth="Infinity"/>
+        <ToggleButton fx:id="loadPaintings" mnemonicParsing="false" text="Paintings"
+                      GridPane.rowIndex="2" GridPane.columnIndex="1" maxWidth="Infinity"/>
+        <ToggleButton fx:id="loadBeaconBeams" mnemonicParsing="false" text="Beacon beams"
+                      GridPane.rowIndex="3" GridPane.columnIndex="0" maxWidth="Infinity"/>
+        <ToggleButton fx:id="loadOtherEntities" mnemonicParsing="false" text="Other"
+                      GridPane.rowIndex="3" GridPane.columnIndex="1" maxWidth="Infinity"/>
+      </GridPane>
     </VBox>
-    <padding>
-      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-    </padding>
+  </TitledPane>
+  <Separator />
+  <FlowPane hgap="10" vgap="10">
+    <Button fx:id="exportSettings" mnemonicParsing="false" text="Export settings" />
+    <Button fx:id="importSettings" mnemonicParsing="false" text="Import settings" />
+    <Button fx:id="restoreDefaults" mnemonicParsing="false" text="Restore default settings" />
+  </FlowPane>
+  <Separator />
+  <VBox spacing="10.0">
+    <CheckBox fx:id="saveDumps" mnemonicParsing="false" text="Enable autosave" />
+    <TitledPane fx:id="dumpSettings" animated="false" text="Autosave settings">
+      <VBox spacing="10.0">
+        <HBox spacing="10.0" alignment="CENTER_LEFT">
+          <ComboBox fx:id="dumpFrequency" prefWidth="100"/>
+          <Label text="Autosave frequency (SPP)" />
+        </HBox>
+        <CheckBox fx:id="saveSnapshots" mnemonicParsing="false" text="Save snapshot on each autosave" />
+      </VBox>
+    </TitledPane>
   </VBox>
+  <padding>
+    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+  </padding>
 </fx:root>

@@ -25,6 +25,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.SunSamplingStrategy;
@@ -44,7 +45,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class LightingTab extends ScrollPane implements RenderControlsTab, Initializable {
+public class LightingTab extends VBox implements RenderControlsTab, Initializable {
   private RenderControlsFxController controller;
   private Scene scene;
 
@@ -52,21 +53,15 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster emitterIntensity;
   @FXML private DoubleAdjuster sunIntensity;
   @FXML private CheckBox drawSun;
-  @FXML private ComboBox<SunSamplingStrategy> sunSamplingStrategy;
-  @FXML private DoubleAdjuster sunLuminosity;
-  @FXML private DoubleAdjuster apparentSunBrightness;
+  @FXML private CheckBox useFlatTexture;
+  @FXML private ChoiceBox<SunSamplingStrategy> sunSamplingStrategy;
   @FXML private DoubleAdjuster sunRadius;
   @FXML private AngleAdjuster sunAzimuth;
   @FXML private AngleAdjuster sunAltitude;
-  @FXML private CheckBox enableEmitters;
   @FXML private LuxColorPicker sunColor;
-  @FXML private LuxColorPicker apparentSunColor;
-  @FXML private CheckBox modifySunTexture;
   @FXML private ChoiceBox<EmitterSamplingStrategy> emitterSamplingStrategy;
 
-  private ChangeListener<Color> sunColorListener = (observable, oldValue, newValue) -> scene.sun().setColor(ColorUtil.fromFx(newValue));
-
-  private ChangeListener<Color> apparentSunColorListener = (observable, oldValue, newValue) -> scene.sun().setApparentColor(ColorUtil.fromFx(newValue));
+  private final ChangeListener<Color> sunColorListener = (observable, oldValue, newValue) -> scene.sun().setColor(ColorUtil.fromFx(newValue));
 
   public LightingTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("LightingTab.fxml"));
@@ -82,10 +77,6 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     skyEmittance.makeLogarithmic();
     skyEmittance.clampMin();
     skyEmittance.onValueChange(value -> scene.sky().setSkyEmittance(value));
-
-    enableEmitters.setTooltip(new Tooltip("Allow blocks to emit light based on their material settings."));
-    enableEmitters.selectedProperty().addListener(
-      (observable, oldValue, newValue) -> scene.setEmittersEnabled(newValue));
 
     emitterIntensity.setName("Emitter intensity");
     emitterIntensity.setTooltip("Modifies the intensity of emitter light.");
@@ -116,6 +107,9 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     drawSun.selectedProperty().addListener((observable, oldValue, newValue) -> scene.sun().setDrawTexture(newValue));
     drawSun.setTooltip(new Tooltip("Draws the sun texture on top of the skymap."));
 
+    useFlatTexture.selectedProperty().addListener((observable, oldValue, newValue) -> scene.sun().setUseFlatTexture(newValue));
+    useFlatTexture.setTooltip(new Tooltip("Use a solid color as the sun texture."));
+
     sunSamplingStrategy.getItems().addAll(SunSamplingStrategy.values());
     sunSamplingStrategy.getSelectionModel().selectedItemProperty().addListener(
             (observable, oldValue, newValue) -> scene.setSunSamplingStrategy(newValue));
@@ -128,19 +122,6 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunIntensity.clampMin();
     sunIntensity.onValueChange(value -> scene.sun().setIntensity(value));
 
-    sunLuminosity.setName("Sun luminosity");
-    sunLuminosity.setTooltip("Changes the absolute brightness of the sun. Only used when Sun Sampling Strategy is set to OFF or HIGH_QUALITY.");    sunLuminosity.setRange(1, 10000);
-    sunLuminosity.makeLogarithmic();
-    sunLuminosity.clampMin();
-    sunLuminosity.onValueChange(value -> scene.sun().setLuminosity(value));
-
-    apparentSunBrightness.setName("Apparent sun brightness");
-    apparentSunBrightness.setTooltip("Changes the apparent brightness of the sun texture.");
-    apparentSunBrightness.setRange(Sun.MIN_APPARENT_BRIGHTNESS, Sun.MAX_APPARENT_BRIGHTNESS);
-    apparentSunBrightness.makeLogarithmic();
-    apparentSunBrightness.clampMin();
-    apparentSunBrightness.onValueChange(value -> scene.sun().setApparentBrightness(value));
-
     sunRadius.setName("Sun size");
     sunRadius.setTooltip("Sun radius in degrees.");
     sunRadius.setRange(0.01, 20);
@@ -148,15 +129,6 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunRadius.onValueChange(value -> scene.sun().setSunRadius(Math.toRadians(value)));
 
     sunColor.colorProperty().addListener(sunColorListener);
-
-    modifySunTexture.setTooltip(new Tooltip("Changes whether the the color of the sun texture is modified by the apparent sun color."));
-    modifySunTexture.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      scene.sun().setEnableTextureModification(newValue);
-      apparentSunColor.setDisable(!newValue);
-    });
-
-    apparentSunColor.setDisable(true);
-    apparentSunColor.colorProperty().addListener(apparentSunColorListener);
 
     sunAzimuth.setName("Sun azimuth");
     sunAzimuth.setTooltip("Changes the horizontal direction of the sun from a reference direction of East.");
@@ -177,21 +149,15 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     skyEmittance.set(scene.sky().getSkyEmittance());
     emitterIntensity.set(scene.getEmitterIntensity());
     sunIntensity.set(scene.sun().getIntensity());
-    sunLuminosity.set(scene.sun().getLuminosity());
-    apparentSunBrightness.set(scene.sun().getApparentBrightness());
     sunRadius.set(Math.toDegrees(scene.sun().getSunRadius()));
-    modifySunTexture.setSelected(scene.sun().getEnableTextureModification());
     sunAzimuth.set(-QuickMath.radToDeg(scene.sun().getAzimuth()));
     sunAltitude.set(QuickMath.radToDeg(scene.sun().getAltitude()));
-    enableEmitters.setSelected(scene.getEmittersEnabled());
     sunSamplingStrategy.getSelectionModel().select(scene.getSunSamplingStrategy());
-    drawSun.setSelected(scene.sun().drawTexture());
+    drawSun.setSelected(scene.sun().getDrawTexture());
+    useFlatTexture.setSelected(scene.sun().getUseFlatTexture());
     sunColor.colorProperty().removeListener(sunColorListener);
     sunColor.setColor(ColorUtil.toFx(scene.sun().getColor()));
     sunColor.colorProperty().addListener(sunColorListener);
-    apparentSunColor.colorProperty().removeListener(apparentSunColorListener);
-    apparentSunColor.setColor(ColorUtil.toFx(scene.sun().getApparentColor()));
-    apparentSunColor.colorProperty().addListener(apparentSunColorListener);
     emitterSamplingStrategy.getSelectionModel().select(scene.getEmitterSamplingStrategy());
   }
 
@@ -199,7 +165,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     return "Lighting";
   }
 
-  @Override public Node getTabContent() {
+  @Override public VBox getTabContent() {
     return this;
   }
 }

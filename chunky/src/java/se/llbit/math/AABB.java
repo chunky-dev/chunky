@@ -16,6 +16,8 @@
  */
 package se.llbit.math;
 
+import se.llbit.chunky.renderer.scene.Scene;
+
 import java.util.Random;
 
 /**
@@ -24,7 +26,7 @@ import java.util.Random;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class AABB {
+public class AABB implements Intersectable {
 
   public double xmin;
   public double xmax;
@@ -93,7 +95,7 @@ public class AABB {
    *
    * @return <code>true</code> if the ray intersects this AABB
    */
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
+  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Constants.OFFSET);
     double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Constants.OFFSET);
     double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Constants.OFFSET);
@@ -277,12 +279,21 @@ public class AABB {
   /**
    * Test if point is inside the bounding box.
    *
-   * @return true if p is inside this BB.
+   * @return true if p is inside this AABB.
    */
   public boolean inside(Vector3 p) {
-    return (p.x > xmin && p.x < xmax) &&
-           (p.y > ymin && p.y < ymax) &&
-           (p.z > zmin && p.z < zmax);
+    return inside(p.x, p.y, p.z);
+  }
+
+  /**
+   * Test if point is inside the bounding box.
+   *
+   * @return true if p is inside this AABB.
+   */
+  public boolean inside(double x, double y, double z) {
+    return (x > xmin && x < xmax) &&
+      (y > ymin && y < ymax) &&
+      (z > zmin && z < zmax);
   }
 
   /**

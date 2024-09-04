@@ -65,9 +65,8 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class GeneralTab extends ScrollPane implements RenderControlsTab, Initializable {
+public class GeneralTab extends VBox implements RenderControlsTab, Initializable {
   private Scene scene;
-  private final Node wrapper;
 
   @FXML private Button openSceneDirBtn;
   @FXML private Button exportSettings;
@@ -89,12 +88,12 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private IntegerTextField cameraCropY;
   @FXML private Button loadAllEntities;
   @FXML private Button loadNoEntity;
-  @FXML private CheckBox loadPlayers;
-  @FXML private CheckBox loadArmorStands;
-  @FXML private CheckBox loadBooks;
-  @FXML private CheckBox loadPaintings;
-  @FXML private CheckBox loadBeaconBeams;
-  @FXML private CheckBox loadOtherEntities;
+  @FXML private ToggleButton loadPlayers;
+  @FXML private ToggleButton loadArmorStands;
+  @FXML private ToggleButton loadBooks;
+  @FXML private ToggleButton loadPaintings;
+  @FXML private ToggleButton loadBeaconBeams;
+  @FXML private ToggleButton loadOtherEntities;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
   @FXML private TitledPane dumpSettings;
@@ -116,8 +115,6 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     loader.setRoot(this);
     loader.setController(this);
     loader.load();
-
-    this.wrapper = new VBox(this);
   }
 
   @Override public void update(Scene scene) {
@@ -191,8 +188,8 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     return "Scene";
   }
 
-  @Override public Node getTabContent() {
-    return this.wrapper;
+  @Override public VBox getTabContent() {
+    return this;
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
@@ -458,6 +455,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         cameraCropY.valueProperty().set(0);
       }
     });
+    renderRegions.setTooltip(new Tooltip("Render a subset region of the main canvas."));
     cameraCropWidth.valueProperty().addListener(canvasCropListener);
     cameraCropHeight.valueProperty().addListener(canvasCropListener);
     cameraCropX.valueProperty().addListener(canvasCropListener);

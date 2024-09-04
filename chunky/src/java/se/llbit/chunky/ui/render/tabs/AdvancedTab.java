@@ -22,6 +22,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import se.llbit.chunky.PersistentSettings;
@@ -56,7 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initializable {
+public class AdvancedTab extends VBox implements RenderControlsTab, Initializable {
   private RenderControlsFxController renderControls;
   private RenderController controller;
   private Scene scene;
@@ -220,11 +221,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     octreeSwitchImplementation.setOnAction(event -> Chunky.getCommonThreads().submit(() -> {
       TaskTracker tracker = controller.getSceneManager().getTaskTracker();
       try {
-        try (TaskTracker.Task task = tracker.task("(1/2) Converting world octree", 1000)) {
+        try (TaskTracker.Task task = tracker.task("(1/1) Converting world octree", 1000)) {
           scene.getWorldOctree().switchImplementation(octreeImplementation.getValue(), task);
-        }
-        try (TaskTracker.Task task = tracker.task("(2/2) Converting water octree")) {
-          scene.getWaterOctree().switchImplementation(octreeImplementation.getValue(), task);
         }
       } catch (IOException e) {
         Log.error("Switching octrees failed. Reload the scene.\n", e);
@@ -356,7 +354,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   }
 
   @Override
-  public Node getTabContent() {
+  public VBox getTabContent() {
     return this;
   }
 

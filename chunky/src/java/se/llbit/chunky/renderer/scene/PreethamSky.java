@@ -16,11 +16,12 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import javafx.scene.Node;
+import javafx.scene.layout.VBox;
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.math.Constants;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
+import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.json.JsonObject;
+import se.llbit.math.*;
 
 import static java.lang.Math.PI;
 
@@ -94,7 +95,7 @@ public class PreethamSky implements SimulatedSky {
   }
 
   @Override
-  public boolean updateSun(Sun sun, double horizonOffset) {
+  public boolean updateSun(Sun sun) {
     // Clamp sky to be above horizon and follow sun properly
     double alt = QuickMath.clamp(sun.getAltitude(), 0, PI);
     if (alt > PI/2) {
@@ -107,8 +108,6 @@ public class PreethamSky implements SimulatedSky {
       double r = QuickMath.abs(FastMath.cos(phi));
       sw.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
       updateSkylightValues(alt);
-
-      this.horizonOffset = horizonOffset;
 
       return true;
     }
@@ -126,7 +125,7 @@ public class PreethamSky implements SimulatedSky {
   }
 
   @Override
-  public Vector3 calcIncidentLight(Ray ray) {
+  public Vector3 calcIncidentLight(Ray2 ray) {
     double cosTheta = ray.d.y;
     cosTheta += horizonOffset;
     if (cosTheta < 0)
@@ -184,5 +183,41 @@ public class PreethamSky implements SimulatedSky {
   private static double perezF(double cosTheta, double gamma, double cos2Gamma, double A, double B,
                  double C, double D, double E) {
     return (1 + A * FastMath.exp(B / cosTheta)) * (1 + C * FastMath.exp(D * gamma) + E * cos2Gamma);
+  }
+
+  @Override
+  public void loadConfiguration(JsonObject json) {
+    json.add("horizonOffset", horizonOffset);
+  }
+
+  @Override
+  public void storeConfiguration(JsonObject json) {
+    horizonOffset = json.get("horizonOffset").doubleValue(horizonOffset);
+  }
+
+  @Override
+  public void reset() {
+
+  }
+
+  @Override
+  public VBox getControls(Node parent, Scene scene) {
+    VBox controls = new VBox();
+
+    DoubleAdjuster horizonOffsetAdjuster = new DoubleAdjuster();
+    horizonOffsetAdjuster.setName("Horizon offset");
+    horizonOffsetAdjuster.setRange(0, 1);
+    horizonOffsetAdjuster.clampBoth();
+    horizonOffsetAdjuster.set(this.horizonOffset);
+    horizonOffsetAdjuster.onValueChange(value -> {
+      this.horizonOffset = value;
+      scene.sky.updateSimulatedSky(scene.sun);
+      scene.refresh();
+    });
+    controls.getChildren().add(horizonOffsetAdjuster);
+
+    controls.setSpacing(10);
+
+    return controls;
   }
 }

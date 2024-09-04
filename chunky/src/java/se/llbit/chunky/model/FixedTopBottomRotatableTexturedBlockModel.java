@@ -28,8 +28,8 @@ public class FixedTopBottomRotatableTexturedBlockModel extends QuadModel {
   }
 
   public FixedTopBottomRotatableTexturedBlockModel(String facing,
-                                                   Texture north, Texture east, Texture south, Texture west, Texture top, Texture bottom) {
-    this(facing, FULL_BLOCK_QUADS, new Texture[]{north, south, west, east, top, bottom});
+                                                   Texture north, Texture east, Texture south, Texture west, Texture bottom, Texture top) {
+    this(facing, FULL_BLOCK_QUADS, new Texture[]{north, south, west, east, bottom, top});
   }
 
   public static Quad[] rotateToFacing(String facing, Quad[] quads) {

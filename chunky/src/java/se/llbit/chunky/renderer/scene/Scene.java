@@ -20,6 +20,7 @@ package se.llbit.chunky.renderer.scene;
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.minecraft.Lava;
@@ -31,6 +32,7 @@ import se.llbit.chunky.chunk.ChunkLoadingException;
 import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.chunk.biome.BiomeData;
 import se.llbit.chunky.entity.*;
+import se.llbit.chunky.model.minecraft.WaterModel;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
@@ -53,8 +55,7 @@ import se.llbit.json.*;
 import se.llbit.log.Log;
 import se.llbit.math.*;
 import se.llbit.math.structures.Position2IntStructure;
-import se.llbit.nbt.CompoundTag;
-import se.llbit.nbt.Tag;
+import se.llbit.nbt.*;
 import se.llbit.util.*;
 import se.llbit.util.annotation.NotNull;
 import se.llbit.util.io.PositionalInputStream;
@@ -69,6 +70,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -108,8 +111,6 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public static final float DEFAULT_GAMMA = 2.2f;
 
-  public static final boolean DEFAULT_EMITTERS_ENABLED = false;
-
   /**
    * Default emitter intensity.
    */
@@ -118,7 +119,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Minimum emitter intensity.
    */
-  public static final double MIN_EMITTER_INTENSITY = 0.01;
+  public static final double MIN_EMITTER_INTENSITY = 0;
 
   /**
    * Maximum emitter intensity.
@@ -207,13 +208,13 @@ public class Scene implements JsonSerializable, Refreshable {
   protected RenderMode mode = RenderMode.PREVIEW;
   protected int dumpFrequency = DEFAULT_DUMP_FREQUENCY;
   protected boolean saveSnapshots = false;
-  protected boolean emittersEnabled = DEFAULT_EMITTERS_ENABLED;
   protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
   protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.NONE;
+  protected EmitterSamplingMode emitterSamplingMode = EmitterSamplingMode.OFF;
   protected boolean fancierTranslucency = true;
   protected double transmissivityCap = DEFAULT_TRANSMISSIVITY_CAP;
 
-  protected SunSamplingStrategy sunSamplingStrategy = SunSamplingStrategy.FAST;
+  protected SunSamplingStrategy sunSamplingStrategy = SunSamplingStrategy.SAMPLE_THROUGH_OPACITY;
 
   /**
    * Water opacity modifier.
@@ -266,7 +267,6 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private BlockPalette palette;
   private Octree worldOctree;
-  private Octree waterOctree;
 
   private SceneEntities entities = new SceneEntities();
 
@@ -361,7 +361,6 @@ public class Scene implements JsonSerializable, Refreshable {
 
     palette = new BlockPalette();
     worldOctree = new Octree(octreeImplementation, 1);
-    waterOctree = new Octree(octreeImplementation, 1);
     emitterGrid = null;
   }
 
@@ -422,7 +421,6 @@ public class Scene implements JsonSerializable, Refreshable {
       // When the other scene is changed it must create a new octree.
       palette = other.palette;
       worldOctree = other.worldOctree;
-      waterOctree = other.waterOctree;
 
       entities.copyState(other.entities);
 
@@ -452,9 +450,9 @@ public class Scene implements JsonSerializable, Refreshable {
     fog.set(other.fog);
     biomeColors = other.biomeColors;
     sunSamplingStrategy = other.sunSamplingStrategy;
-    emittersEnabled = other.emittersEnabled;
     emitterIntensity = other.emitterIntensity;
     emitterSamplingStrategy = other.emitterSamplingStrategy;
+    emitterSamplingMode = other.emitterSamplingMode;
     preventNormalEmitterWithSampling = other.preventNormalEmitterWithSampling;
     fancierTranslucency = other.fancierTranslucency;
     transmissivityCap = other.transmissivityCap;
@@ -580,7 +578,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       boolean emitterGridNeedChunkReload = false;
       boolean octreeLoaded = loadOctree(context, taskTracker);
-      if (emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
+      if (emitterSamplingMode != EmitterSamplingMode.OFF)
         emitterGridNeedChunkReload = !loadEmitterGrid(context, taskTracker);
       if (emitterGridNeedChunkReload || !octreeLoaded) {
         // Could not load stored octree or emitter grid.
@@ -617,16 +615,6 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Set emitters enable flag.
-   */
-  public synchronized void setEmittersEnabled(boolean value) {
-    if (value != emittersEnabled) {
-      emittersEnabled = value;
-      refresh();
-    }
-  }
-
-  /**
    * Set sun sampling strategy.
    */
   public synchronized void setSunSamplingStrategy(SunSamplingStrategy strategy) {
@@ -647,11 +635,11 @@ public class Scene implements JsonSerializable, Refreshable {
    * @return <code>true</code> if emitters are enabled
    */
   public boolean getEmittersEnabled() {
-    return emittersEnabled;
+    return emitterIntensity > Constants.EPSILON;
   }
 
   /**
-   * @return The <code>BlockPallete</code> for the scene
+   * @return The <code>BlockPalette</code> for the scene
    */
   public BlockPalette getPalette() { return palette; }
 
@@ -678,7 +666,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * @param ray ray to test against scene
    * @return <code>true</code> if an intersection was found
    */
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
+  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Random random) {
     boolean hit = false;
 
     if (Double.isNaN(ray.d.x) || Double.isNaN(ray.d.y) || Double.isNaN(ray.d.z) ||
@@ -693,109 +681,43 @@ public class Scene implements JsonSerializable, Refreshable {
       ray.d.set(0, 1, 0);
     }
 
-    if (entities.intersect(ray, intersectionRecord)) {
-      hit = true;
+    if (worldOctree.closestIntersection(ray, intersectionRecord, this)) {
+      if (intersectionRecord.distance > Constants.EPSILON) {
+        hit = true;
+      } else {
+        intersectionRecord.reset();
+      }
     }
-    IntersectionRecord intersectionTest = new IntersectionRecord();
-    if (worldIntersection(ray, intersectionTest) && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
-      hit = true;
-      intersectionRecord.distance = intersectionTest.distance;
-      intersectionRecord.setNormal(intersectionTest);
-      intersectionRecord.color.set(intersectionTest.color);
-      intersectionRecord.material = intersectionTest.material;
-    }
-    if (hit) {
-      /*ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);*/
-      updateOpacity(ray, intersectionRecord);
-      return true;
-    }
-    return false;
-  }
 
-  private boolean worldIntersection(Ray2 ray, IntersectionRecord intersectionRecord) {
-    boolean hit = false;
     IntersectionRecord intersectionTest = new IntersectionRecord();
-    if (worldOctree.enterBlock(this, ray, intersectionTest, palette)) {
-      if (intersectionTest.distance < Constants.EPSILON && ray.getCurrentMedium() instanceof BVHMaterial) {
-        return false;
+    if (entities.closestIntersection(ray, intersectionTest, this) && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
+      hit = true;
+      if (intersectionTest.material == Air.INSTANCE) {
+        Vector3 o = ray.o.rScaleAdd(intersectionTest.distance, ray.d);
+        o.scaleAdd(-Constants.OFFSET, intersectionTest.n);
+        intersectionTest.material = getWorldMaterial(new Ray2(o, ray.d));
       }
       intersectionRecord.distance = intersectionTest.distance;
       intersectionRecord.setNormal(intersectionTest);
       intersectionRecord.color.set(intersectionTest.color);
       intersectionRecord.material = intersectionTest.material;
-      hit = true;
+      intersectionRecord.flags = intersectionTest.flags;
     }
-//    intersectionTest = new IntersectionRecord();
-//    if (ray.getCurrentMedium().isWater()) {
-//      if (waterOctree.exitWater(this, ray, intersectionTest, palette)
-//          && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
-//        intersectionRecord.distance = intersectionTest.distance;
-//        intersectionRecord.setNormal(intersectionTest.shadeN);
-//        intersectionRecord.color.set(intersectionTest.color);
-//        intersectionRecord.material = intersectionTest.material;
-//        hit = true;
-//      }
-//    } else {
-//      if (waterOctree.enterBlock(this, ray, intersectionTest, palette)
-//          && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
-//        intersectionRecord.distance = intersectionTest.distance;
-//        intersectionRecord.setNormal(intersectionTest.shadeN);
-//        intersectionRecord.color.set(intersectionTest.color);
-//        intersectionRecord.material = intersectionTest.material;
-//        hit = true;
-//      }
-//    }
+
+    intersectionTest.reset();
+    if (random != null) {
+      if (ray.getCurrentMedium().volumeIntersect(intersectionTest, random) && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
+        hit = true;
+        intersectionRecord.distance = intersectionTest.distance;
+        intersectionRecord.setNormal(intersectionTest);
+        intersectionRecord.color.set(intersectionTest.color);
+        intersectionRecord.material = intersectionTest.material;
+        intersectionRecord.flags = intersectionTest.flags;
+      }
+    }
+
     return hit;
   }
-
-  /**
-   * Test whether the ray intersects any voxel before exiting the Octree.
-   *
-   * @param ray   the ray
-   * @return {@code true} if the ray intersects a voxel
-   */
-  /*private boolean worldIntersection(Ray ray) {
-    Ray start = new Ray(ray);
-    start.setCurrentMaterial(ray.getPrevMaterial(), ray.getPrevData());
-    boolean hit = false;
-    Ray r = new Ray(start);
-    r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
-    if (worldOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
-      ray.t = r.distance;
-      ray.setNormal(r.getNormal());
-      ray.color.set(r.color);
-      ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
-      ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
-      hit = true;
-    }
-    if (start.getCurrentMaterial().isWater()) {
-      r = new Ray(start);
-      r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
-      if(waterOctree.exitWater(this, r, palette) && r.distance < ray.t - Ray.EPSILON) {
-        ray.t = r.distance;
-        ray.setNormal(r.getNormal());
-        ray.color.set(r.color);
-        ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
-        ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
-        hit = true;
-      } else if(ray.getPrevMaterial() == Air.INSTANCE) {
-        ray.setPrevMaterial(Water.INSTANCE, 1 << Water.FULL_BLOCK);
-      }
-    } else {
-      r = new Ray(start);
-      r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
-      if (waterOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
-        ray.t = r.distance;
-        ray.setNormal(r.getNormal());
-        ray.color.set(r.color);
-        ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
-        ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
-        hit = true;
-      }
-    }
-    return hit;
-  }*/
 
   public void updateOpacity(Ray2 ray, IntersectionRecord intersectionRecord) {
     if (intersectionRecord.material.isWater() || (!intersectionRecord.material.isWater()
@@ -864,15 +786,14 @@ public class Scene implements JsonSerializable, Refreshable {
       int requiredDepth = calculateOctreeOrigin(chunksToLoad, false);
 
       // Create new octree to fit all chunks.
-      palette = new BlockPalette();
+      palette = new BlockPalette(materials);
       worldOctree = new Octree(octreeImplementation, requiredDepth);
-      waterOctree = new Octree(octreeImplementation, requiredDepth);
 
       grassTexture = biomeStructureFactory.create();
       foliageTexture = biomeStructureFactory.create();
       waterTexture = biomeStructureFactory.create();
 
-      if(emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
+      if(emitterSamplingMode != EmitterSamplingMode.OFF)
         emitterGrid = new Grid(gridSize);
 
       // Parse the regions first - force chunk lists to be populated!
@@ -908,7 +829,6 @@ public class Scene implements JsonSerializable, Refreshable {
       ChunkPosition[] chunkPositions = chunksToLoad.toArray(new ChunkPosition[0]);
 
       int[] cubeWorldBlocks = new int[16*16*16];
-      int[] cubeWaterBlocks = new int[16*16*16];
 
       ExecutorService executor = Executors.newSingleThreadExecutor();
       Future<?> nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
@@ -995,7 +915,6 @@ public class Scene implements JsonSerializable, Refreshable {
         for(int yCube = yCubeMin; yCube < yCubeMax; ++yCube) {
           // Reset the cubes
           Arrays.fill(cubeWorldBlocks, 0);
-          Arrays.fill(cubeWaterBlocks, 0);
           for(int cy = 0; cy < 16; ++cy) { //Uses chunk min and max, rather than global - minor optimisation for pre1.13 worlds
             int y = yCube * 16 + cy;
             if(y < yMin || y >= yMax)
@@ -1055,25 +974,38 @@ public class Scene implements JsonSerializable, Refreshable {
                         }
                       }
                     }
-
-
                   }
 
                   if(block.isWaterFilled()) {
-                    int waterNode = palette.waterId;
-                    if(y + 1 < yMax) {
-                      if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)).isWaterFilled()) {
-                        waterNode = palette.getWaterId(0, 1 << Water.FULL_BLOCK);
-                      }
-                    }
+//                    if (block.waterlogged) {
+//                      if(y + 1 < yMax) {
+//                        if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)).isWaterFilled()) {
+//                          Tag blockTag = palette.getBlockSpec(octNode).getTag();
+//                          CompoundTag newBlockTag = new CompoundTag();
+//                          // create a copy of the block tag
+//                          for (NamedTag namedTag : blockTag.asCompound()) {
+//                            newBlockTag.add(namedTag);
+//                          }
+//                          newBlockTag.add("waterloggedFull", new ByteTag(1));
+//                          int id = palette.put(newBlockTag);
+//                          Block waterloggedFullBlock = palette.get(id);
+//                          waterloggedFullBlock.waterloggedFull = true;
+//                          octNode = id;
+//                        }
+//                      }
+//                    }
                     if(block.isWater()) {
-                      // Move plain water blocks to the water octree.
-                      octNode = palette.airId;
+                      octNode = palette.waterId;
+                      if(y + 1 < yMax) {
+                        if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)).isWaterFilled()) {
+                          octNode = palette.getWaterId(0, 1 << Water.FULL_BLOCK);
+                        }
+                      }
 
                       if(!onEdge) {
                         // Perform water computation now for water blocks that are not on th edge of the chunk
                         // Test if the block has not already be marked as full
-                        if(((Water) palette.get(waterNode)).data == 0) {
+                        if(((Water) palette.get(octNode)).data == 0) {
                           int level0 = 8 - ((Water) block).level;
                           int corner0 = level0;
                           int corner1 = level0;
@@ -1112,17 +1044,16 @@ public class Scene implements JsonSerializable, Refreshable {
                           corner1 = Math.min(7, 8 - (corner1 / 4));
                           corner2 = Math.min(7, 8 - (corner2 / 4));
                           corner3 = Math.min(7, 8 - (corner3 / 4));
-                          waterNode = palette.getWaterId(((Water) block).level, (corner0 << Water.CORNER_0)
-                                          | (corner1 << Water.CORNER_1)
-                                          | (corner2 << Water.CORNER_2)
-                                          | (corner3 << Water.CORNER_3));
+                          octNode = palette.getWaterId(((Water) block).level, (corner0 << WaterModel.CORNER_0)
+                            | (corner1 << WaterModel.CORNER_1)
+                            | (corner2 << WaterModel.CORNER_2)
+                            | (corner3 << WaterModel.CORNER_3));
                         }
                       } else {
                         // Water computation for water blocks on the edge of a chunk is done by the OctreeFinalizer but we need the water level information
-                        waterNode = palette.getWaterId(((Water) block).level, 0);
+                        octNode = palette.getWaterId(((Water) block).level, 0);
                       }
                     }
-                    cubeWaterBlocks[cubeIndex] = waterNode;
                   } else if(y + 1 < yMax && block instanceof Lava) {
                     if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)) instanceof Lava) {
                       octNode = palette.getLavaId(0, 1 << Water.FULL_BLOCK);
@@ -1169,10 +1100,10 @@ public class Scene implements JsonSerializable, Refreshable {
                       corner3 = Math.min(7, 8 - (corner3 / 4));
                       octNode = palette.getLavaId(
                               lava.level,
-                              (corner0 << Water.CORNER_0)
-                                      | (corner1 << Water.CORNER_1)
-                                      | (corner2 << Water.CORNER_2)
-                                      | (corner3 << Water.CORNER_3)
+                              (corner0 << WaterModel.CORNER_0)
+                                      | (corner1 << WaterModel.CORNER_1)
+                                      | (corner2 << WaterModel.CORNER_2)
+                                      | (corner3 << WaterModel.CORNER_3)
                       );
                     }
                   }
@@ -1187,7 +1118,6 @@ public class Scene implements JsonSerializable, Refreshable {
             }
           }
           worldOctree.setCube(4, cubeWorldBlocks, cp.x*16 - origin.x, yCube*16 - origin.y, cp.z*16 - origin.z);
-          waterOctree.setCube(4, cubeWaterBlocks, cp.x*16 - origin.x, yCube*16 - origin.y, cp.z*16 - origin.z);
         }
 
         // Block entities are also called "tile entities". These are extra bits of metadata
@@ -1255,7 +1185,6 @@ public class Scene implements JsonSerializable, Refreshable {
     try (TaskTracker.Task task = taskTracker.task("(4/6) Finalizing octree")) {
 
       worldOctree.startFinalization();
-      waterOctree.startFinalization();
 
       int done = 0;
       int target = nonEmptyChunks.size();
@@ -1413,15 +1342,14 @@ public class Scene implements JsonSerializable, Refreshable {
         }
         task.updateEta(target, done);
         done += 1;
-        OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
+        OctreeFinalizer.finalizeChunk(worldOctree, palette, origin, cp, yMin, yMax);
         if (legacyChunks.contains(cp)) {
           LegacyBlocksFinalizer
-              .finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
+              .finalizeChunk(worldOctree, palette, origin, cp, yMin, yMax);
         }
       }
 
       worldOctree.endFinalization();
-      waterOctree.endFinalization();
 
       grassTexture.compact();
       foliageTexture.compact();
@@ -1708,7 +1636,7 @@ public class Scene implements JsonSerializable, Refreshable {
     ray.setCurrentMedium(getWorldMaterial(ray));
     while (true) {
       IntersectionRecord intersectionTest = new IntersectionRecord();
-      if (!intersect(ray, intersectionTest)) {
+      if (!intersect(ray, intersectionTest, null)) {
         break;
       } else if (!intersectionTest.material.isSameMaterial(ray.getCurrentMedium()) && intersectionTest.color.w > Constants.EPSILON) {
         ray.o.scaleAdd((intersectionTest.distance), ray.d);
@@ -1860,7 +1788,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public double getEffectiveWaterPlaneHeight() {
     if(waterPlaneOffsetEnabled) {
-      return waterPlaneHeight - Water.TOP_BLOCK_GAP;
+      return waterPlaneHeight - WaterModel.TOP_BLOCK_GAP;
     } else {
       return waterPlaneHeight;
     }
@@ -2198,7 +2126,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       boolean saved = false;
       try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName))))) {
-        OctreeFileFormat.store(out, worldOctree, waterOctree, palette,
+        OctreeFileFormat.store(out, worldOctree, palette,
             grassTexture, foliageTexture, waterTexture);
         saved = true;
 
@@ -2269,7 +2197,6 @@ public class Scene implements JsonSerializable, Refreshable {
 
         worldOctree = data.worldTree;
         worldOctree.setTimestamp(fileTimestamp);
-        waterOctree = data.waterTree;
         grassTexture = data.grassColors;
         foliageTexture = data.foliageColors;
         waterTexture = data.waterColors;
@@ -2540,15 +2467,16 @@ public class Scene implements JsonSerializable, Refreshable {
     int x = (int) QuickMath.floor(ray.o.x);
     int y = (int) QuickMath.floor(ray.o.y);
     int z = (int) QuickMath.floor(ray.o.z);
-    Material waterMat = waterOctree.getMaterial(x, y, z, palette);
     Material material = worldOctree.getMaterial(x, y, z, palette);
-    if (material != Air.INSTANCE && material instanceof Block && ((Block) material).isInside(ray)) {
-      return material;
-    } else if (waterMat.isWater()) {
-      if (((Water) waterMat).isFullBlock()) {
-        return Water.INSTANCE;
-      } else if (((Water) waterMat).isInside(ray)) {
-        return Water.INSTANCE;
+    if (material instanceof Block && !material.hidden) {
+      if (((Block) material).isInside(ray)) {
+        return material;
+      } else if (material.waterlogged) {
+        if (worldOctree.getMaterial(x, y + 1, z, palette).isWaterFilled()) {
+          return palette.water;
+        } else if (ray.o.y - QuickMath.floor(ray.o.y) < 1 - WaterModel.TOP_BLOCK_GAP) {
+          return palette.water;
+        }
       }
     }
     return Air.INSTANCE;
@@ -2564,13 +2492,13 @@ public class Scene implements JsonSerializable, Refreshable {
         return true;
       }
     }
-    if (waterOctree.isInside(ray.o)) {
+    if (worldOctree.isInside(ray.o)) {
       int x = (int) QuickMath.floor(ray.o.x);
       int y = (int) QuickMath.floor(ray.o.y);
       int z = (int) QuickMath.floor(ray.o.z);
-      Material block = waterOctree.getMaterial(x, y, z, palette);
+      Material block = worldOctree.getMaterial(x, y, z, palette);
       return block.isWater()
-          && ((ray.o.y - y) < 0.875 || ((Water) block).isFullBlock());
+          && ((Water) block).isInside(ray);
     }
     return false;
   }
@@ -2656,7 +2584,6 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("pathTrace", mode != RenderMode.PREVIEW);
     json.add("dumpFrequency", dumpFrequency);
     json.add("saveSnapshots", saveSnapshots);
-    json.add("emittersEnabled", emittersEnabled);
     json.add("emitterIntensity", emitterIntensity);
     json.add("fancierTranslucency", fancierTranslucency);
     json.add("transmissivityCap", transmissivityCap);
@@ -2710,6 +2637,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
     json.add("octreeImplementation", octreeImplementation);
     json.add("emitterSamplingStrategy", emitterSamplingStrategy.name());
+    json.add("emitterSamplingMode", emitterSamplingMode.name());
     json.add("preventNormalEmitterWithSampling", preventNormalEmitterWithSampling);
 
     json.add("animationTime", animationTime);
@@ -2924,52 +2852,13 @@ public class Scene implements JsonSerializable, Refreshable {
     }
     dumpFrequency = json.get("dumpFrequency").intValue(dumpFrequency);
     saveSnapshots = json.get("saveSnapshots").boolValue(saveSnapshots);
-    emittersEnabled = json.get("emittersEnabled").boolValue(emittersEnabled);
     emitterIntensity = json.get("emitterIntensity").doubleValue(emitterIntensity);
     fancierTranslucency = json.get("fancierTranslucency").boolValue(fancierTranslucency);
     transmissivityCap = json.get("transmissivityCap").doubleValue(transmissivityCap);
 
-    if (json.get("sunSamplingStrategy").isUnknown()) {
-      boolean sunSampling = json.get("sunEnabled").boolValue(false);
-      boolean drawSun = json.get("sun").asObject().get("drawTexture").boolValue(false);
-      if (drawSun) {
-        if (sunSampling) {
-          sunSamplingStrategy = SunSamplingStrategy.FAST;
-        } else {
-          sunSamplingStrategy = SunSamplingStrategy.NON_LUMINOUS;
-        }
-      } else {
-        sunSamplingStrategy = SunSamplingStrategy.FAST;
-      }
-    } else {
-      sunSamplingStrategy = SunSamplingStrategy.valueOf(json.get("sunSamplingStrategy").asString(SunSamplingStrategy.FAST.getId()));
-    }
+    sunSamplingStrategy = SunSamplingStrategy.get(json.get("sunSamplingStrategy").asString(sunSamplingStrategy.getId()));
 
-    if (json.get("sunEnabled").boolValue(false)) {
-      sunSamplingStrategy = SunSamplingStrategy.FAST;
-    } else {
-      sunSamplingStrategy = SunSamplingStrategy.valueOf(json.get("sunSamplingStrategy").asString(SunSamplingStrategy.FAST.getId()));
-    }
-
-    waterShadingStrategy = WaterShadingStrategy.valueOf(json.get("waterShadingStrategy").asString(WaterShadingStrategy.SIMPLEX.getId()));
-    if (!json.get("waterShader").isUnknown()) {
-      String waterShader = json.get("waterShader").stringValue("SIMPLEX");
-      if(waterShader.equals("LEGACY"))
-        waterShadingStrategy = WaterShadingStrategy.TILED_NORMALMAP;
-      else if(waterShader.equals("SIMPLEX"))
-        waterShadingStrategy = WaterShadingStrategy.SIMPLEX;
-      else {
-        Log.infof("Unknown water shader %s, using SIMPLEX", waterShader);
-        waterShadingStrategy = WaterShadingStrategy.SIMPLEX;
-      }
-    } else {
-      waterShadingStrategy = WaterShadingStrategy.TILED_NORMALMAP;
-    }
-    if (!json.get("stillWater").isUnknown()) {
-      if (json.get("stillWater").boolValue(false)) {
-        waterShadingStrategy = WaterShadingStrategy.STILL;
-      }
-    }
+    waterShadingStrategy = WaterShadingStrategy.valueOf(json.get("waterShadingStrategy").asString(waterShadingStrategy.getId()));
     setCurrentWaterShader(waterShadingStrategy);
     currentWaterShader.load(json);
 
@@ -3050,7 +2939,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     octreeImplementation = json.get("octreeImplementation").asString(PersistentSettings.getOctreeImplementation());
 
-    emitterSamplingStrategy = EmitterSamplingStrategy.valueOf(json.get("emitterSamplingStrategy").asString("NONE"));
+    emitterSamplingStrategy = EmitterSamplingStrategy.valueOf(json.get("emitterSamplingStrategy").asString(emitterSamplingStrategy.getId()));
+    emitterSamplingMode = EmitterSamplingMode.valueOf(json.get("emitterSamplingMode").asString(emitterSamplingMode.getId()));
     preventNormalEmitterWithSampling = json.get("preventNormalEmitterWithSampling").asBoolean(PersistentSettings.getPreventNormalEmitterWithSampling());
 
     animationTime = json.get("animationTime").doubleValue(animationTime);
@@ -3201,9 +3091,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  public void importMaterials() {
-    ExtraMaterials.loadDefaultMaterialProperties();
-    MaterialStore.collections.forEach((name, coll) -> importMaterial(materials, name, coll));
+  private void importPaletteMaterials() {
     MaterialStore.blockIds.forEach((name) -> {
       JsonValue properties = materials.get(name);
       if (properties != null) {
@@ -3212,6 +3100,12 @@ public class Scene implements JsonSerializable, Refreshable {
         });
       }
     });
+  }
+
+  public void importMaterials() {
+    ExtraMaterials.loadDefaultMaterialProperties();
+    MaterialStore.collections.forEach((name, coll) -> importMaterial(materials, name, coll));
+    importPaletteMaterials();
     ExtraMaterials.idMap.forEach((name, material) -> {
       JsonValue properties = materials.get(name);
       if (properties != null) {
@@ -3236,6 +3130,36 @@ public class Scene implements JsonSerializable, Refreshable {
   public void setEmittance(String materialName, float value) {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("emittance", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the alpha property for the given material.
+   */
+  public void setAlpha(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("alpha", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the subsurface scattering probability property for the given material.
+   */
+  public void setSubsurfaceScattering(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("subsurfaceScattering", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the diffuse color property for the given material.
+   */
+  public void setDiffuseColor(String materialName, Vector3 value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("diffuseColor", ColorUtil.rgbToJson(value));
     materials.put(materialName, material);
     refresh(ResetReason.MATERIALS_CHANGED);
   }
@@ -3290,6 +3214,116 @@ public class Scene implements JsonSerializable, Refreshable {
     refresh(ResetReason.MATERIALS_CHANGED);
   }
 
+  /**
+   * Modifies the transmission metalness property for the given material.
+   */
+  public void setTransmissionMetalness(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("transmissionMetalness", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the specular color property for the given material.
+   */
+  public void setSpecularColor(String materialName, Vector3 value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("specularColor", ColorUtil.rgbToJson(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the transmission specular color property for the given material.
+   */
+  public void setTransmissionSpecularColor(String materialName, Vector3 value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("transmissionSpecularColor", ColorUtil.rgbToJson(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the volume density property for the given material.
+   */
+  public void setVolumeDensity(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("volumeDensity", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the volume anisotropy property for the given material.
+   */
+  public void setVolumeAnisotropy(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("volumeAnisotropy", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the volume anisotropy property for the given material.
+   */
+  public void setVolumeEmittance(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("volumeEmittance", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the volume color property for the given material.
+   */
+  public void setVolumeColor(String materialName, Vector3 value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("volumeColor", ColorUtil.rgbToJson(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the absorption property for the given material.
+   */
+  public void setAbsorption(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("absorption", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the absorption color property for the given material.
+   */
+  public void setAbsorptionColor(String materialName, Vector3 value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("absorptionColor", ColorUtil.rgbToJson(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the opaque property for the given material.
+   */
+  public void setOpaque(String materialName, boolean value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("opaque", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the hidden property for the given material.
+   */
+  public void setHidden(String materialName, boolean value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("hidden", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
   public int getYClipMin() {
     return yClipMin;
   }
@@ -3340,18 +3374,30 @@ public class Scene implements JsonSerializable, Refreshable {
     return worldOctree;
   }
 
+  @Deprecated
   @PluginApi
   public Octree getWaterOctree() {
-    return waterOctree;
+    return getWorldOctree();
   }
 
   public EmitterSamplingStrategy getEmitterSamplingStrategy() {
     return emitterSamplingStrategy;
   }
 
+  public EmitterSamplingMode getEmitterSamplingMode() {
+    return emitterSamplingMode;
+  }
+
   public void setEmitterSamplingStrategy(EmitterSamplingStrategy emitterSamplingStrategy) {
     if(this.emitterSamplingStrategy != emitterSamplingStrategy) {
       this.emitterSamplingStrategy = emitterSamplingStrategy;
+      refresh();
+    }
+  }
+
+  public void setEmitterSamplingMode(EmitterSamplingMode emitterSamplingMode) {
+    if (this.emitterSamplingMode != emitterSamplingMode) {
+      this.emitterSamplingMode = emitterSamplingMode;
       refresh();
     }
   }

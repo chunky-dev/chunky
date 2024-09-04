@@ -169,7 +169,7 @@ public class SkyCache {
    * Calculate the sky color for a pixel on the cache.
    */
   private Vector3 getSkyColorAt(int x, int y) {
-    Ray ray = new Ray();
+    Ray2 ray = new Ray2();
 
     double theta = ((double) x / skyResolution) * 2 * PI;
     double phi = ((double) y / skyResolution) * PI - PI / 2;

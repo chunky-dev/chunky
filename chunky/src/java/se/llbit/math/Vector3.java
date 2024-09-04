@@ -57,10 +57,16 @@ public class Vector3 {
     z = o.z;
   }
 
+  public Vector3(double v) {
+    x = v;
+    y = v;
+    z = v;
+  }
+
   public static Vector3 randomUnitVector(Random random) {
-    Vector3 randomUnitVector;
+    Vector3 randomUnitVector = new Vector3();
     while (true) {
-      randomUnitVector = new Vector3(random.nextDouble(-1, 1), random.nextDouble(-1, 1), random.nextDouble(-1, 1));
+      randomUnitVector.set(random.nextDouble(-1, 1), random.nextDouble(-1, 1), random.nextDouble(-1, 1));
       if (randomUnitVector.lengthSquared() < 1) {
         randomUnitVector.normalize();
         return randomUnitVector;
@@ -97,6 +103,12 @@ public class Vector3 {
     x = d;
     y = e;
     z = f;
+  }
+
+  public final void set(double a) {
+    x = a;
+    y = a;
+    z = a;
   }
 
 
@@ -191,6 +203,16 @@ public class Vector3 {
 
   public final Vector3 rScale(double s) {
     return new Vector3(x * s, y * s, z * s);
+  }
+
+  public final Vector3 rMultiplyEntrywise(Vector3 other) {
+    return new Vector3(this.x * other.x, this.y * other.y, this.z * other.z);
+  }
+
+  public final void multiplyEntrywise(Vector3 other) {
+    this.x *= other.x;
+    this.y *= other.y;
+    this.z *= other.z;
   }
 
   /**
@@ -300,6 +322,10 @@ public class Vector3 {
     return new Vector3(x - a, y - b, z - c);
   }
 
+  public final double distance(Vector3 other) {
+    return this.rSub(other).length();
+  }
+
   @Override public String toString() {
     return String.format("(%.2f, %.2f, %.2f)", x, y, z);
   }
@@ -324,5 +350,12 @@ public class Vector3 {
     object.add("y", y);
     object.add("z", z);
     return object;
+  }
+
+  public static Vector3 orientNormal(Vector3 direction, Vector3 normal) {
+    if(direction.dot(normal) > 0) {
+      return new Vector3(-normal.x, -normal.y, -normal.z);
+    }
+    return normal;
   }
 }

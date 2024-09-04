@@ -28,21 +28,15 @@ import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
-public class Sign extends MinecraftBlockTranslucent {
+public class Sign extends EmptyModelBlock {
   private final int rotation;
   private final String material;
 
   public Sign(String name, String material, int rotation) {
     super(name, SignEntity.textureFromMaterial(material));
     invisible = true;
-    solid = false;
-    localIntersect = true;
     this.rotation = rotation % 16;
     this.material = material;
-  }
-
-  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    return false;
   }
 
   @Override public boolean isBlockEntity() {

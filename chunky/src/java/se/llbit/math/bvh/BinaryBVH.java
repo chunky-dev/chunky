@@ -20,6 +20,7 @@ package se.llbit.math.bvh;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntStack;
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
@@ -214,7 +215,7 @@ public abstract class BinaryBVH implements BVH {
      * @return {@code true} if there exists any intersection
      */
     @Override
-    public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord) {
+    public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
         boolean hit = false;
         int currentNode = 0;
         IntStack nodesToVisit = new IntArrayList(depth/2);
@@ -228,7 +229,7 @@ public abstract class BinaryBVH implements BVH {
                 // Is leaf
                 int primIndex = -packed[currentNode];
                 for (Primitive primitive : packedPrimitives[primIndex]) {
-                    hit = primitive.intersect(ray, intersectionRecord) | hit;
+                    hit = primitive.closestIntersection(ray, intersectionRecord) | hit;
                 }
 
                 if (nodesToVisit.isEmpty()) break;

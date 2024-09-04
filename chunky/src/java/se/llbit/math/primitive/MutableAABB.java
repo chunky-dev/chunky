@@ -16,6 +16,7 @@
  */
 package se.llbit.math.primitive;
 
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.AABB;
@@ -116,7 +117,7 @@ public class MutableAABB implements Primitive {
     return tNear < tFar + Constants.EPSILON && tFar > 0;
   }
 
-  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
+  @Override public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     double t1, t2;
     double tNear = Double.NEGATIVE_INFINITY;
     double tFar = Double.POSITIVE_INFINITY;

@@ -31,14 +31,12 @@ import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
-public class WallBanner extends MinecraftBlockTranslucent {
+public class WallBanner extends EmptyModelBlock {
   private final int facing, color;
 
   public WallBanner(String name, Texture texture, String facing, int color) {
     super(name, texture);
     invisible = true;
-    opaque = false;
-    localIntersect = true;
     switch (facing) {
       default:
       case "north":
@@ -55,10 +53,6 @@ public class WallBanner extends MinecraftBlockTranslucent {
         break;
     }
     this.color = color;
-  }
-
-  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    return false;
   }
 
   @Override public boolean isBlockEntity() {

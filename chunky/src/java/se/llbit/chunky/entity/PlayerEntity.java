@@ -1085,6 +1085,9 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
 
     VBox controls = new VBox();
     controls.getChildren().addAll(modelBox, skinBox, layerBox);
+
+    controls.setSpacing(10);
+
     return controls;
   }
 

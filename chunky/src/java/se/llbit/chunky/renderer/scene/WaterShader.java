@@ -20,9 +20,10 @@ import se.llbit.json.JsonObject;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
+import se.llbit.math.Vector3;
 
 public interface WaterShader {
-  void doWaterShading(Ray2 ray, IntersectionRecord intersectionRecord, double animationTime);
+  Vector3 doWaterShading(Ray2 ray, IntersectionRecord intersectionRecord, double animationTime);
 
   WaterShader clone();
   void save(JsonObject json);

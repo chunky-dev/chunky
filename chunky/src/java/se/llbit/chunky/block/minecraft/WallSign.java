@@ -29,15 +29,13 @@ import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
-public class WallSign extends MinecraftBlockTranslucent {
+public class WallSign extends EmptyModelBlock {
   private final int facing;
   private final String material;
 
   public WallSign(String name, String material, String facing) {
     super(name, SignEntity.textureFromMaterial(material));
     invisible = true;
-    solid = false;
-    localIntersect = true;
     this.material = material;
     switch (facing) {
       default:
@@ -54,10 +52,6 @@ public class WallSign extends MinecraftBlockTranslucent {
         this.facing = 5;
         break;
     }
-  }
-
-  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    return false;
   }
 
   @Override public boolean isBlockEntity() {

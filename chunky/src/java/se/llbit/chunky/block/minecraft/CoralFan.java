@@ -28,15 +28,13 @@ import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 
-public class CoralFan extends MinecraftBlockTranslucent {
+public class CoralFan extends EmptyModelBlock {
 
   private final String coralType;
 
   public CoralFan(String name, String coralType) {
     super(name, coralTexture(coralType));
     this.coralType = coralType;
-    localIntersect = true;
-    solid = false;
     invisible = true;
   }
 
@@ -64,10 +62,6 @@ public class CoralFan extends MinecraftBlockTranslucent {
       case "dead_fire":
         return Texture.deadFireCoralFan;
     }
-  }
-
-  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    return false;
   }
 
   @Override public boolean isEntity() {

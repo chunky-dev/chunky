@@ -34,20 +34,14 @@ import se.llbit.nbt.CompoundTag;
 // Note: Mojang changed the ID values for banner colors in Minecraft 1.13,
 // for backward compatibility we need some way of mapping the old color IDs to the
 // new color IDs. This would require tracking the world format version somewhere.
-public class Banner extends MinecraftBlockTranslucent {
+public class Banner extends EmptyModelBlock {
   private final int rotation, color;
 
   public Banner(String name, Texture texture, int rotation, int color) {
     super(name, texture);
     invisible = true;
-    opaque = false;
-    localIntersect = true;
     this.rotation = rotation % 16;
     this.color = color;
-  }
-
-  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    return false;
   }
 
   @Override public boolean isBlockEntity() {

@@ -6,11 +6,9 @@ import se.llbit.chunky.resources.AnimatedTexture;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.util.MinecraftPRNG;
-import se.llbit.util.VectorUtil;
 
 public abstract class AnimatedQuadModel extends QuadModel {
   public final static class AnimationMode {
@@ -41,7 +39,6 @@ public abstract class AnimatedQuadModel extends QuadModel {
   @Override
   public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     boolean hit = false;
-    IntersectionRecord intersectionTest = new IntersectionRecord();
 
     Quad[] quads = getQuads();
     AnimatedTexture[] textures = getTextures();
@@ -61,9 +58,9 @@ public abstract class AnimatedQuadModel extends QuadModel {
     if (refractive) {
       for (int i = 0; i < quads.length; ++i) {
         Quad quad = quads[i];
-        if (quad.intersect(ray, intersectionTest)) {
+        if (quad.closestIntersection(ray, intersectionRecord)) {
           if (ray.d.dot(quad.n) < 0) {
-            float[] c = textures[i].getColor(intersectionTest.uv.x, intersectionTest.uv.y);
+            float[] c = textures[i].getColor(intersectionRecord.uv.x, intersectionRecord.uv.y, j);
             if (c[3] > Constants.EPSILON) {
               tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
               color = c;
@@ -77,46 +74,33 @@ public abstract class AnimatedQuadModel extends QuadModel {
           }
           hit = true;
           intersectionRecord.setNormal(quad.n);
-          intersectionRecord.distance = intersectionTest.distance;
         }
       }
     } else {
       for (int i = 0; i < quads.length; ++i) {
         Quad quad = quads[i];
-        double distance = intersectionTest.distance;
-        if (quad.intersect(ray, intersectionTest)) {
-          float[] c = textures[i].getColor(intersectionTest.uv.x, intersectionTest.uv.y);
+        double distance = intersectionRecord.distance;
+        if (quad.closestIntersection(ray, intersectionRecord)) {
+          float[] c = textures[i].getColor(intersectionRecord.uv.x, intersectionRecord.uv.y, j);
           if (c[3] > Constants.EPSILON) {
             tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
             color = c;
             if (quad.doubleSided) {
-              intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, quad.n));
+              intersectionRecord.setNormal(Vector3.orientNormal(ray.d, quad.n));
             } else {
               intersectionRecord.setNormal(quad.n);
             }
-            intersectionRecord.distance = intersectionTest.distance;
             hit = true;
           } else {
-            intersectionTest.distance = distance;
+            intersectionRecord.distance = distance;
           }
         }
       }
     }
 
     if (hit) {
-      double px = ray.o.x - Math.floor(ray.o.x + ray.d.x * Constants.OFFSET) + ray.d.x * intersectionTest.distance;
-      double py = ray.o.y - Math.floor(ray.o.y + ray.d.y * Constants.OFFSET) + ray.d.y * intersectionTest.distance;
-      double pz = ray.o.z - Math.floor(ray.o.z + ray.d.z * Constants.OFFSET) + ray.d.z * intersectionTest.distance;
-      if (px < E0 || px > E1 || py < E0 || py > E1 || pz < E0 || pz > E1) {
-        // TODO this check is only really needed for wall torches
-        return false;
-      }
-
       intersectionRecord.color.set(color);
       tint.tint(intersectionRecord.color, ray, scene);
-      /*ray.o.scaleAdd(ray.t, ray.d);
-      int x;
-       */
     }
     return hit;
   }

@@ -2,20 +2,17 @@ package se.llbit.math.primitive;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.minecraft.Air;
-import se.llbit.chunky.entity.BVHMaterial;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
-import se.llbit.math.AABB;
-import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray2;
-import se.llbit.math.Vector3;
+import se.llbit.math.*;
 
 public class Sphere implements Primitive {
   private final double radius;
   private final Vector3 center;
 
-  public BVHMaterial material;
+  public Material material;
 
-  public Sphere(Vector3 center, double radius, BVHMaterial material) {
+  public Sphere(Vector3 center, double radius, Material material) {
     this.center = new Vector3(center);
     this.radius = radius;
     this.material = material;
@@ -26,7 +23,7 @@ public class Sphere implements Primitive {
     return distance < this.radius;
   }
 
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
+  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     double t0;
     double t1;
 
@@ -58,20 +55,26 @@ public class Sphere implements Primitive {
         return false;
       }
     }
-    intersectionRecord.distance = t0;
-    Vector3 pHit = ray.o.rScaleAdd(t0, ray.d);
-    Vector3 nHit = pHit.rSub(center).normalized();
-    intersectionRecord.setNormal(nHit);
-    if (ray.d.dot(nHit) > 0) {
-      intersectionRecord.material = Air.INSTANCE;
-    } else {
-      intersectionRecord.material = material;
+    if (t0 > Constants.EPSILON && t0 < intersectionRecord.distance) {
+      intersectionRecord.distance = t0;
+      Vector3 nHit = ray.o.rScaleAdd(t0, ray.d);
+      nHit.sub(center);
+      nHit.normalize();
+      intersectionRecord.setNormal(nHit);
+      if (ray.d.dot(nHit) > 0) {
+        intersectionRecord.material = Air.INSTANCE;
+        intersectionRecord.n.scale(-1);
+        intersectionRecord.shadeN.scale(-1);
+        intersectionRecord.color.set(1, 1, 1, 0);
+      } else {
+        intersectionRecord.material = material;
+        material.getColor(intersectionRecord);
+      }
+
+      return true;
     }
 
-    material.getColor(intersectionRecord);
-
-    return true;
-
+    return false;
   }
 
   @Override

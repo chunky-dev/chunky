@@ -63,7 +63,7 @@ public final class PersistentSettings {
       RM + (1 - RM) * W * Math.pow(WAVELENGTH_GREEN / 1e3, -4);
   public static final double DEFAULT_FOG_BLUE = 1;
 
-  public static final int DEFAULT_RAY_DEPTH = 5;
+  public static final int DEFAULT_RAY_DEPTH = 10;
   public static final int DEFAULT_BRANCH_COUNT = 10;
   public static final int DEFAULT_SPP_TARGET = 1000;
 

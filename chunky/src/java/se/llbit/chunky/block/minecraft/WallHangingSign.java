@@ -29,7 +29,7 @@ import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
-public class WallHangingSign extends MinecraftBlockTranslucent {
+public class WallHangingSign extends EmptyModelBlock {
   private final String material;
   private final Facing facing;
 
@@ -38,13 +38,6 @@ public class WallHangingSign extends MinecraftBlockTranslucent {
     this.material = material;
     this.facing = Facing.fromString(facing);
     invisible = true;
-    solid = false;
-    localIntersect = true;
-  }
-
-  @Override
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    return false;
   }
 
   @Override

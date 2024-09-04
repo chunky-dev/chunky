@@ -39,12 +39,10 @@ public class LightBlock extends AbstractModelBlock {
 
   private final int level;
 
-  private final Vector4 color = new Vector4(1, 1, 1, 1);
-
   public LightBlock(String name, int level) {
     super(name, Texture.light);
     this.level = level;
-    this.model = new LightBlockModel(color);
+    this.model = new LightBlockModel();
     localIntersect = true;
     solid = false;
   }
@@ -57,10 +55,6 @@ public class LightBlock extends AbstractModelBlock {
   public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     if (scene.getMode() == RenderMode.PREVIEW) {
       return previewBlockModel.intersect(ray, intersectionRecord, scene);
-    }
-    if (scene.getMode() != RenderMode.PREVIEW &&
-        (!scene.getEmittersEnabled() || emittance < Constants.EPSILON)) {
-      return false;
     }
     return this.model.intersect(ray, intersectionRecord, scene);
   }

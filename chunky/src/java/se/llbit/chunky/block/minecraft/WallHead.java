@@ -31,7 +31,7 @@ import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
-public class WallHead extends MinecraftBlockTranslucent {
+public class WallHead extends EmptyModelBlock {
 
   private final String description;
   private final int facing;
@@ -39,7 +39,6 @@ public class WallHead extends MinecraftBlockTranslucent {
 
   public WallHead(String name, Texture texture, SkullEntity.Kind type, String facing) {
     super(name, texture);
-    localIntersect = true;
     invisible = true;
     description = "facing=" + facing;
     this.type = type;
@@ -58,11 +57,6 @@ public class WallHead extends MinecraftBlockTranslucent {
         this.facing = 5;
         break;
     }
-  }
-
-  @Override
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    return false;
   }
 
   @Override

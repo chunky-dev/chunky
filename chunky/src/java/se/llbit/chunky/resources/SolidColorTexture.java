@@ -20,6 +20,7 @@ import se.llbit.math.ColorUtil;
 import se.llbit.math.Vector4;
 
 public class SolidColorTexture extends Texture {
+  public static final SolidColorTexture EMPTY = new SolidColorTexture(new Vector4(1, 1, 1, 1));
 
   private final Vector4 color;
 

@@ -51,6 +51,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -108,7 +109,7 @@ public class ChunkyFxController
   @FXML private Canvas mapOverlay;
   @FXML private Label mapName;
   @FXML private MenuItem menuExit;
-  @FXML private ToolPane renderControls;
+  @FXML private VBox renderControls;
   @FXML private Button changeWorldBtn;
   @FXML private Button reloadWorldBtn;
   @FXML private ToggleButton overworldBtn;

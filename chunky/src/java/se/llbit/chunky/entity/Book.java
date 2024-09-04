@@ -397,6 +397,8 @@ public class Book extends Entity implements Poseable {
     });
     controls.getChildren().add(page2Angle);
 
+    controls.setSpacing(10);
+
     return controls;
   }
 }

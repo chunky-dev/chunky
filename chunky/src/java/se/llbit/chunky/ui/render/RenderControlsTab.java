@@ -17,6 +17,7 @@
 package se.llbit.chunky.ui.render;
 
 import javafx.scene.Node;
+import javafx.scene.layout.VBox;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 
@@ -42,7 +43,7 @@ public interface RenderControlsTab {
   /**
    * @return the JavaFX tab component for this render controls tab
    */
-  Node getTabContent();
+  VBox getTabContent();
 
   /**
    * Called after chunks have been loaded.

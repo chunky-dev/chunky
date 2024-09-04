@@ -19,30 +19,36 @@ package se.llbit.chunky.renderer;
 import se.llbit.util.Registerable;
 
 public enum WaterShadingStrategy implements Registerable {
-    SIMPLEX("Simplex", "Uses configurable noise to shade the water, which prevents tiling at great distances."),
-    TILED_NORMALMAP("Tiled normal map", "Uses a built-in tiled normal map to shade the water"),
-    STILL("Still", "Renders the water surface as flat.");
+  SIMPLEX("Simplex", "Uses configurable noise to shade the water, which prevents tiling at great distances."),
+  TILED_NORMALMAP("Tiled normal map", "Uses a built-in tiled normal map to shade the water"),
+  STILL("Still", "Renders the water surface as flat.");
 
-    private final String displayName;
-    private final String description;
+  private final String displayName;
+  private final String description;
 
-    WaterShadingStrategy(String displayName, String description) {
-        this.displayName = displayName;
-        this.description = description;
-    }
+  WaterShadingStrategy(String displayName, String description) {
+    this.displayName = displayName;
+    this.description = description;
+  }
 
-    @Override
-    public String getName() {
-        return this.displayName;
-    }
+  @Override
+  public String getName() {
+    return this.displayName;
+  }
 
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
+  @Override
+  public String toString() {
+    return this.displayName;
+  }
 
-    @Override
-    public String getId() {
-        return this.name();
-    }
+
+  @Override
+  public String getDescription() {
+    return this.description;
+  }
+
+  @Override
+  public String getId() {
+    return this.name();
+  }
 }

@@ -63,8 +63,6 @@ public class OctreeFileFormat {
     data.palette = BlockPalette.read(in);
     stepConsumer.accept("world octree");
     data.worldTree = Octree.load(octreeImpl, version < 5 ? convertDataNodes(data.palette, in) : in);
-    stepConsumer.accept("water octree");
-    data.waterTree = Octree.load(octreeImpl, version < 5 ? convertDataNodes(data.palette, in) : in);
 
     if(version >= 7) {
       stepConsumer.accept("grass tints");
@@ -173,7 +171,7 @@ public class OctreeFileFormat {
    * Save octrees and grass/foliage/water textures to a file.
    */
   public static void store(DataOutputStream out, Octree octree,
-                           Octree waterTree, BlockPalette palette,
+                           BlockPalette palette,
                            BiomeStructure grassColors,
                            BiomeStructure foliageColors,
                            BiomeStructure waterColors)
@@ -181,7 +179,6 @@ public class OctreeFileFormat {
     out.writeInt(OCTREE_VERSION);
     palette.write(out);
     octree.store(out);
-    waterTree.store(out);
     if (grassColors != null) {
       out.writeUTF(grassColors.biomeFormat());
       grassColors.store(out);
@@ -204,7 +201,7 @@ public class OctreeFileFormat {
 
   public static class OctreeData {
 
-    public Octree worldTree, waterTree;
+    public Octree worldTree;
     public BiomeStructure grassColors, foliageColors, waterColors;
     public BlockPalette palette;
     public int version;

@@ -78,9 +78,13 @@ public abstract class TileBasedRenderer implements Renderer {
 
           for (int i = tile.x0; i < tile.x1; i++) {
             for (int j = tile.y0; j < tile.y1; j++) {
-              state.color.set(0, 0, 0, 0);
               pair.left(i).right(j);
               perPixel.accept(state, pair);
+              state.color.set(0, 0, 0, 0);
+              state.throughput.set(1);
+              state.emittance.set(0);
+              state.sunColor.set(0, 0, 0, 0);
+              state.attenuation.set(1);
             }
           }
         })

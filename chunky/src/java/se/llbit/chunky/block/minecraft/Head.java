@@ -32,7 +32,7 @@ import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.mojangapi.MinecraftSkin;
 
-public class Head extends MinecraftBlockTranslucent {
+public class Head extends EmptyModelBlock {
 
   private final String description;
   private final int rotation;
@@ -40,16 +40,10 @@ public class Head extends MinecraftBlockTranslucent {
 
   public Head(String name, Texture texture, SkullEntity.Kind type, int rotation) {
     super(name, texture);
-    localIntersect = true;
     invisible = true;
     description = "rotation=" + rotation;
     this.type = type;
     this.rotation = rotation;
-  }
-
-  @Override
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    return false;
   }
 
   @Override

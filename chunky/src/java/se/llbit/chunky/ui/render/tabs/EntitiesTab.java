@@ -16,51 +16,37 @@
  */
 package se.llbit.chunky.ui.render.tabs;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.function.Consumer;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.stage.FileChooser;
 import se.llbit.chunky.entity.*;
-import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleTextField;
-import se.llbit.chunky.ui.dialogs.DialogUtils;
-import se.llbit.chunky.ui.dialogs.ValidatingTextInputDialog;
+import se.llbit.chunky.ui.dialogs.AddEntityDialog;
 import se.llbit.chunky.ui.elements.AngleAdjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
-import se.llbit.chunky.ui.IntegerAdjuster;
-import se.llbit.chunky.ui.IntegerTextField;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.render.RenderControlsTab;
-import se.llbit.chunky.world.material.BeaconBeamMaterial;
-import se.llbit.fx.LuxColorPicker;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
-import se.llbit.log.Log;
-import se.llbit.math.ColorUtil;
 import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.util.mojangapi.MinecraftProfile;
-import se.llbit.util.mojangapi.MinecraftSkin;
-import se.llbit.util.mojangapi.MojangApi;
 
-public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initializable {
-  private static final Map<String, EntitiesTab.EntityType<?>> entityTypes = new HashMap<>();
+public class EntitiesTab extends VBox implements RenderControlsTab, Initializable {
+  public static final Map<String, EntitiesTab.EntityType<?>> entityTypes = new HashMap<>();
 
   static {
     entityTypes.put("Player", (position, scene) -> {
@@ -84,10 +70,27 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     entityTypes.put("Lectern", (position, scene) -> new Lectern(position, "north", true));
     entityTypes.put("Book", (position, scene) -> new Book(position, Math.PI - Math.PI / 16, Math.toRadians(30), Math.toRadians(180 - 30)));
     entityTypes.put("Beacon beam", (position, scene) -> new BeaconBeam(position));
-    entityTypes.put("Sphere", (position, scene) -> new SphereEntity(position, new Vector3(1, 1, 1), 0.5));
+    entityTypes.put("Sphere", (position, scene) -> new SphereEntity(position, new Vector4(1, 1, 1, 1), 0.5));
   }
 
   private Scene scene;
+
+  public enum EntityPlacement {
+    TARGET("Preview target position"),
+    CAMERA("Camera position"),
+    POSITION("Specific position");
+
+    private final String name;
+
+    EntityPlacement(String name) {
+      this.name = name;
+    }
+
+    @Override
+    public String toString() {
+      return name;
+    }
+  }
 
   public interface EntityType<T extends Entity> {
     T createInstance(Vector3 position, Scene scene);
@@ -156,7 +159,8 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleTextField posY;
   @FXML private DoubleTextField posZ;
   @FXML private VBox controls;
-  @FXML private ComboBox<String> entityType;
+
+  private final AddEntityDialog addEntityDialog = new AddEntityDialog();
 
   public EntitiesTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("EntitiesTab.fxml"));
@@ -192,7 +196,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
   }
 
   @Override
-  public Node getTabContent() {
+  public VBox getTabContent() {
     return this;
   }
 
@@ -353,31 +357,49 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    entityType.getItems().addAll(entityTypes.keySet());
-    entityType.setValue("Player");
     add.setTooltip(new Tooltip("Add an entity at the target position."));
     add.setOnAction(e -> {
-      Vector3 position = scene.getTargetPosition();
-      if (position == null) {
-        position = new Vector3(scene.camera().getPosition());
-      }
+      if (addEntityDialog.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+        EntityType<?> entityType = addEntityDialog.getType();
+        EntityPlacement entityPlacement = addEntityDialog.getPlacement();
 
-      Entity entity = entityTypes.get(entityType.getValue()).createInstance(position, scene);
-      if (entity instanceof PlayerEntity) {
-        PlayerEntity player = (PlayerEntity) entity;
-        withEntity(selected -> {
-          if (selected instanceof PlayerEntity) {
-            player.skin = ((PlayerEntity) selected).skin;
-            player.model = ((PlayerEntity) selected).model;
-          }
-        });
-        scene.addPlayer(player);
-      } else {
-        scene.addActor(entity);
+        Vector3 position;
+        switch (entityPlacement) {
+          case POSITION:
+            position = addEntityDialog.getPosition();
+            break;
+
+          case TARGET:
+            position = scene.getTargetPosition();
+            if (position == null) {
+              position = new Vector3(scene.camera().getPosition());
+            }
+            break;
+
+          case CAMERA:
+          default:
+            position = new Vector3(scene.camera().getPosition());
+        }
+
+        Entity entity = entityType.createInstance(position, scene);
+        if (entity instanceof PlayerEntity) {
+          PlayerEntity player = (PlayerEntity) entity;
+          withEntity(selected -> {
+            if (selected instanceof PlayerEntity) {
+              player.skin = ((PlayerEntity) selected).skin;
+              player.model = ((PlayerEntity) selected).model;
+            }
+          });
+          scene.addPlayer(player);
+
+        } else {
+          scene.addActor(entity);
+        }
+
+        EntityData data = new EntityData(entity, scene);
+        entityTable.getItems().add(data);
+        entityTable.getSelectionModel().select(data);
       }
-      EntityData data = new EntityData(entity, scene);
-      entityTable.getItems().add(data);
-      entityTable.getSelectionModel().select(data);
     });
     delete.setTooltip(new Tooltip("Delete the selected entity."));
     delete.setOnAction(e -> withEntity(entity -> {

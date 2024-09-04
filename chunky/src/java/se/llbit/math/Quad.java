@@ -19,6 +19,7 @@ package se.llbit.math;
 import java.util.Collection;
 import java.util.Random;
 
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.math.primitive.TexturedTriangle;
@@ -28,7 +29,7 @@ import se.llbit.math.primitive.TexturedTriangle;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class Quad {
+public class Quad implements Intersectable {
 
   /** Note: This is public for some plugins. Stability is not guaranteed. */
   public Vector3 o = new Vector3();
@@ -156,7 +157,7 @@ public class Quad {
    *
    * @return <code>true</code> if the ray intersects this quad
    */
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
+  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     double u, v;
 
     double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Constants.OFFSET);

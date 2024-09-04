@@ -1,5 +1,8 @@
 package se.llbit.util;
 
+import javafx.scene.Node;
+import javafx.scene.layout.VBox;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.json.JsonObject;
 
 /**

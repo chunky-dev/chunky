@@ -21,11 +21,12 @@ import se.llbit.json.JsonObject;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
+import se.llbit.math.Vector3;
 
 public class LegacyWaterShader implements WaterShader {
   @Override
-  public void doWaterShading(Ray2 ray, IntersectionRecord intersectionRecord, double animationTime) {
-    WaterModel.doWaterDisplacement(ray, intersectionRecord);
+  public Vector3 doWaterShading(Ray2 ray, IntersectionRecord intersectionRecord, double animationTime) {
+    return WaterModel.doWaterDisplacement(ray, intersectionRecord);
   }
 
   @Override

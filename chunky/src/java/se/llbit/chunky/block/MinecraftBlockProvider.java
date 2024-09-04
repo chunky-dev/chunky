@@ -349,7 +349,8 @@ public class MinecraftBlockProvider implements BlockProvider {
     "minecraft:granite_stairs",
     "minecraft:granite_wall",
     "minecraft:grass_block",
-    "minecraft:grass",
+    "minecraft:grass", // pre 1.20.3-pre2
+    "minecraft:short_grass", // since 1.20.3-pre2
     "minecraft:grass_path", // pre 20w45a
     "minecraft:gravel",
     "minecraft:gray_banner",
@@ -939,7 +940,8 @@ public class MinecraftBlockProvider implements BlockProvider {
   }
 
   static {
-    addBlocks((name, tag) -> Air.INSTANCE, "air", "cave_air", "void_air", "structure_void", "barrier");
+    addBlocks((name, tag) -> Air.INSTANCE, "air", "cave_air", "void_air", "structure_void");
+    addBlock("barrier", (name, tag) -> tag.get("Properties").get("waterlogged").stringValue("").equals("true") ? Water.INSTANCE : Air.INSTANCE);
     addBlocks(Texture.stone, "infested_stone", "stone");
 
     // 1.19
@@ -959,7 +961,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("mangrove_door", (name, tag) -> door(tag, Texture.mangroveDoorTop, Texture.mangroveDoorBottom));
     addBlock("mangrove_fence", (name, tag) -> fence(tag, Texture.mangrovePlanks));
     addBlock("mangrove_fence_gate", (name, tag) -> fenceGate(tag, Texture.mangrovePlanks));
-    addBlock("mangrove_leaves", (name, tag) -> new Leaves(name, Texture.mangroveLeaves));
+    addBlock("mangrove_leaves", (name, tag) -> new Leaves(name, Texture.mangroveLeaves, true));
     addBlock("mangrove_log", (name, tag) -> log(tag, Texture.mangroveLog, Texture.mangroveLogTop));
     addBlock("stripped_mangrove_log", (name, tag) ->  log(tag, Texture.strippedMangroveLog, Texture.strippedMangroveLogTop));
     addBlock("mangrove_planks", Texture.mangrovePlanks);
@@ -1008,7 +1010,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("cherry_door", (name, tag) -> door(tag, Texture.cherryDoorTop, Texture.cherryDoorBottom));
     addBlock("cherry_fence", (name, tag) -> fence(tag, Texture.cherryPlanks));
     addBlock("cherry_fence_gate", (name, tag) -> fenceGate(tag, Texture.cherryPlanks));
-    addBlock("cherry_leaves", (name, tag) -> new UntintedLeaves(name, Texture.cherryLeaves));
+    addBlock("cherry_leaves", (name, tag) -> new Leaves(name, Texture.cherryLeaves, false));
     addBlock("cherry_log", (name, tag) -> log(tag, Texture.cherryLog, Texture.cherryLogTop));
     addBlock("stripped_cherry_log", (name, tag) -> log(tag, Texture.strippedCherryLog, Texture.strippedCherryLogTop));
     addBlock("cherry_planks", Texture.cherryPlanks);
@@ -1258,17 +1260,17 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "dark_oak_wood":
         return new MinecraftBlock(name, Texture.darkOakWood);
       case "oak_leaves":
-        return new Leaves(name, Texture.oakLeaves);
+        return new Leaves(name, Texture.oakLeaves, true);
       case "spruce_leaves":
         return new Leaves(name, Texture.spruceLeaves, 0x619961);
       case "birch_leaves":
         return new Leaves(name, Texture.birchLeaves, 0x80a755);
       case "jungle_leaves":
-        return new Leaves(name, Texture.jungleTreeLeaves);
+        return new Leaves(name, Texture.jungleTreeLeaves, true);
       case "acacia_leaves":
-        return new Leaves(name, Texture.acaciaLeaves);
+        return new Leaves(name, Texture.acaciaLeaves, true);
       case "dark_oak_leaves":
-        return new Leaves(name, Texture.darkOakLeaves);
+        return new Leaves(name, Texture.darkOakLeaves, true);
       case "sponge":
         return new MinecraftBlock(name, Texture.sponge);
       case "wet_sponge":
@@ -1306,6 +1308,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "cobweb":
         return new SpriteBlock(name, Texture.cobweb);
       case "grass":
+      case "short_grass": // since 1.20.3-pre2
         return new Grass();
       case "fern":
         return new Fern();
@@ -1394,6 +1397,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "iron_block":
         return new MinecraftBlock(name, Texture.ironBlock);
       case "oak_slab":
+      case "petrified_oak_slab":
         return slab(tag, Texture.oakPlanks);
       case "spruce_slab":
         return slab(tag, Texture.sprucePlanks);
@@ -1412,8 +1416,6 @@ public class MinecraftBlockProvider implements BlockProvider {
         return slab(tag, Texture.smoothStoneSlabSide, Texture.smoothStone);
       case "sandstone_slab":
         return slab(tag, Texture.sandstoneSide, Texture.sandstoneTop);
-      case "petrified_oak_slab":
-        return slab(tag, Texture.oakPlanks);
       case "cobblestone_slab":
         return slab(tag, Texture.cobblestone);
       case "brick_slab":
@@ -1549,7 +1551,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "ice":
         return new MinecraftBlockTranslucent(name, Texture.ice);
       case "snow_block":
-        return new MinecraftBlock(name, Texture.snowBlock);
+        return new MinecraftBlockTranslucent(name, Texture.snowBlock);
       case "cactus":
         return new Cactus();
       case "clay":
@@ -1935,9 +1937,7 @@ public class MinecraftBlockProvider implements BlockProvider {
         return stairs(
             tag, Texture.redSandstoneSide, Texture.redSandstoneTop, Texture.redSandstoneBottom);
       case "magma_block": {
-        Block block = new MinecraftBlock(name, Texture.magma);
-        block.emittance = 0.6f;
-        return block;
+        return new MinecraftBlock(name, Texture.magma);
       }
       case "nether_wart_block":
         return new MinecraftBlock(name, Texture.netherWartBlock);
@@ -2987,9 +2987,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "flowering_azalea":
         return new Azalea(name, Texture.floweringAzaleaTop, Texture.floweringAzaleaSide);
       case "azalea_leaves":
-        return new UntintedLeaves(name, Texture.azaleaLeaves);
+        return new Leaves(name, Texture.azaleaLeaves, false);
       case "flowering_azalea_leaves":
-        return new UntintedLeaves(name, Texture.floweringAzaleaLeaves);
+        return new Leaves(name, Texture.floweringAzaleaLeaves, false);
       case "moss_block":
         return new MinecraftBlock(name, Texture.mossBlock);
       case "moss_carpet":

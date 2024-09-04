@@ -31,6 +31,8 @@ import se.llbit.math.Octree;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
 import se.llbit.math.primitive.Primitive;
+import se.llbit.util.Configurable;
+import se.llbit.util.HasControls;
 
 import java.util.Collection;
 
@@ -39,7 +41,7 @@ import java.util.Collection;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-abstract public class Entity {
+abstract public class Entity implements HasControls {
 
   public final Vector3 position;
 
@@ -135,12 +137,5 @@ abstract public class Entity {
 
   public void setPosition(Vector3 position) {
     this.position.set(position);
-  }
-
-  public VBox getControls(Node tab, Scene scene) {
-    VBox vBox = new VBox();
-    vBox.setVisible(false);
-    vBox.setManaged(false);
-    return vBox;
   }
 }

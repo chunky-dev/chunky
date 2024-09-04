@@ -27,18 +27,11 @@ import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 
-public class SporeBlossom extends Block {
+public class SporeBlossom extends EmptyModelBlock {
 
   public SporeBlossom() {
     super("spore_blossom", Texture.sporeBlossom);
     invisible = true;
-    opaque = false;
-    localIntersect = true;
-  }
-
-  @Override
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    return false;
   }
 
   @Override

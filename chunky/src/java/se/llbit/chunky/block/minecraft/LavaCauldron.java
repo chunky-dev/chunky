@@ -33,7 +33,7 @@ public class LavaCauldron extends Cauldron {
 
   @Override
   public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    return CauldronModel.intersectWithLava(ray, intersectionRecord);
+    return CauldronModel.intersectWithLava(ray, intersectionRecord, scene);
   }
 
   @Override

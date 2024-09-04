@@ -28,7 +28,7 @@ import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
-public class HangingSign extends MinecraftBlockTranslucent {
+public class HangingSign extends EmptyModelBlock {
   private final String material;
   private final int rotation;
   private final boolean attached;
@@ -39,13 +39,6 @@ public class HangingSign extends MinecraftBlockTranslucent {
     this.rotation = rotation;
     this.attached = attached;
     invisible = true;
-    solid = false;
-    localIntersect = true;
-  }
-
-  @Override
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    return false;
   }
 
   @Override

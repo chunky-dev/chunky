@@ -28,16 +28,10 @@ import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 
-public class LilyPad extends MinecraftBlockTranslucent {
+public class LilyPad extends EmptyModelBlock {
   public LilyPad() {
     super("lily_pad", Texture.lilyPad);
     invisible = true;
-    opaque = false;
-    localIntersect = true;
-  }
-
-  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    return false;
   }
 
   @Override public boolean isEntity() {

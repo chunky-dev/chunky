@@ -73,16 +73,6 @@ public class Sky implements JsonSerializable {
    */
   public static final double MAX_INTENSITY = 50;
 
-  /**
-   * Minimum apparent sky light intensity
-   */
-  public static final double MIN_APPARENT_INTENSITY = 0.0;
-
-  /**
-   * Maximum apparent sky light intensity
-   */
-  public static final double MAX_APPARENT_INTENSITY = 50;
-
   public static final int SKYBOX_UP = 0;
   public static final int SKYBOX_DOWN = 1;
   public static final int SKYBOX_FRONT = 2;
@@ -181,7 +171,6 @@ public class Sky implements JsonSerializable {
 
   /** Simulated sky mode. */
   private SimulatedSky simulatedSkyMode = skies.get(0);
-  double horizonOffset = 0;
 
   private final SkyCache skyCache;
 
@@ -241,7 +230,6 @@ public class Sky implements JsonSerializable {
     gradient = new ArrayList<>(other.gradient);
     color.set(other.color);
     mode = other.mode;
-    horizonOffset = other.horizonOffset;
     for (int i = 0; i < 6; ++i) {
       skybox[i] = other.skybox[i];
       skyboxFileName[i] = other.skyboxFileName[i];
@@ -250,7 +238,7 @@ public class Sky implements JsonSerializable {
     simulatedSkyMode = other.simulatedSkyMode;
     skyCache.set(other.skyCache);
     skyCache.setSimulatedSkyMode(other.simulatedSkyMode);
-    if (simulatedSkyMode.updateSun(scene.sun, horizonOffset)) {
+    if (simulatedSkyMode.updateSun(scene.sun)) {
       skyCache.precalculateSky();
     }
     textureInterpolation = other.textureInterpolation;
@@ -259,7 +247,7 @@ public class Sky implements JsonSerializable {
   /**
    * Calculate sky color for the ray, based on sky mode.
    */
-  public void getSkyColorInner(Ray2 ray, IntersectionRecord intersectionRecord) {
+  private void getSkyColorInner(Ray2 ray, IntersectionRecord intersectionRecord) {
     switch (mode) {
       case SOLID_COLOR: {
         intersectionRecord.color.set(color.x, color.y, color.z, 1);
@@ -365,33 +353,17 @@ public class Sky implements JsonSerializable {
     }
   }
 
-  public Vector3 getSolidColor() {
-    return color;
-  }
-
   /**
    * Panoramic skymap color.
    */
   public void getSkyColor(Ray2 ray, IntersectionRecord intersectionRecord) {
     getSkyColorInner(ray, intersectionRecord);
     intersectionRecord.color.scale(skyEmittance);
-    addSunColor(ray, intersectionRecord);
-    intersectionRecord.color.w = 1;
-  }
-
-  /**
-   * Add sun color contribution. This does not alpha blend the sun color
-   * because the Minecraft sun texture has no alpha channel.
-   */
-  private void addSunColor(Ray2 ray, IntersectionRecord intersectionRecord) {
-    Vector4 skyColor = new Vector4(intersectionRecord.color);
-    if (scene.sun().intersect(ray, intersectionRecord)) {
-      double mult = scene.sun.getLuminosity();
-
-      // Blend sun color with current color.
-      intersectionRecord.color.scale(mult);
-      intersectionRecord.color.add(skyColor);
+    if ((scene.sunSamplingStrategy.isDiffuseSun() && (ray.flags & Ray2.SPECULAR) != 0) ||
+        (!scene.sunSamplingStrategy.doSunSampling() && (ray.flags & Ray2.DIFFUSE) != 0)) {
+      intersectionRecord.color.add(scene.sun.getSunIntersectionColor(ray));
     }
+    intersectionRecord.color.w = 1;
   }
 
   /**
@@ -491,7 +463,7 @@ public class Sky implements JsonSerializable {
    */
   public void setSimulatedSkyMode(int mode) {
     this.simulatedSkyMode = skies.get(mode);
-    this.simulatedSkyMode.updateSun(scene.sun, horizonOffset);
+    this.simulatedSkyMode.updateSun(scene.sun);
     skyCache.setSimulatedSkyMode(this.simulatedSkyMode);
     scene.refresh();
   }
@@ -507,9 +479,8 @@ public class Sky implements JsonSerializable {
    * Update the current simulated sky
    */
   public void updateSimulatedSky(Sun sun) {
-    if (simulatedSkyMode.updateSun(sun, horizonOffset)) {
-      skyCache.precalculateSky();
-    }
+    simulatedSkyMode.updateSun(sun);
+    skyCache.precalculateSky();
   }
 
   /**
@@ -527,7 +498,6 @@ public class Sky implements JsonSerializable {
     sky.add("skyMirrored", mirrored);
     sky.add("skyEmittance", skyEmittance);
     sky.add("mode", mode.name());
-    sky.add("horizonOffset", horizonOffset);
     sky.add("cloudsEnabled", cloudsEnabled);
     sky.add("cloudSize", cloudSize);
     sky.add("cloudOffset", cloudOffset.toJson());
@@ -563,6 +533,9 @@ public class Sky implements JsonSerializable {
       }
       case SIMULATED: {
         sky.add("simulatedSky", simulatedSkyMode.getName());
+        JsonObject simulatedSkySettings = new JsonObject();
+        simulatedSkyMode.storeConfiguration(simulatedSkySettings);
+        sky.add("simulatedSkySettings", simulatedSkySettings);
         sky.add("skyCacheResolution", skyCache.getSkyResolution());
         break;
       }
@@ -580,14 +553,7 @@ public class Sky implements JsonSerializable {
     updateTransform();
     mirrored = json.get("skyMirrored").boolValue(mirrored);
     skyEmittance = json.get("skyExposure").doubleValue(skyEmittance);
-    if (!(json.get("mode").stringValue(mode.name()).equals("SKYMAP_PANORAMIC") || json.get("mode").stringValue(mode.name()).equals("SKYMAP_SPHERICAL"))) {
-      mode = SkyMode.get(json.get("mode").stringValue(mode.name()));
-    } else if (json.get("mode").stringValue(mode.name()).equals("SKYMAP_PANORAMIC")) {
-      mode = SkyMode.SKYMAP_EQUIRECTANGULAR;
-    } else if (json.get("mode").stringValue(mode.name()).equals("SKYMAP_SPHERICAL")) {
-      mode = SkyMode.SKYMAP_ANGULAR;
-    }
-    horizonOffset = json.get("horizonOffset").doubleValue(horizonOffset);
+    mode = SkyMode.get(json.get("mode").stringValue(SkyMode.SIMULATED.name()));
     cloudsEnabled = json.get("cloudsEnabled").boolValue(cloudsEnabled);
     cloudSize = json.get("cloudSize").doubleValue(cloudSize);
     if (json.get("cloudOffset").isObject()) {
@@ -629,15 +595,14 @@ public class Sky implements JsonSerializable {
         break;
       }
       case SIMULATED: {
-        skyCache.setSkyResolution(json.get("skyCacheResolution").asInt(skyCache.getSkyResolution()));
-
         String simSkyName = json.get("simulatedSky").asString(simulatedSkyMode.getName());
         Optional<SimulatedSky> match = skies.stream().filter(skyMode -> skyMode.getName().equals(simSkyName)).findAny();
 
         simulatedSkyMode = match.orElseGet(() -> simulatedSkyMode);
-        simulatedSkyMode.updateSun(scene.sun(), horizonOffset);
+        simulatedSkyMode.loadConfiguration(json.get("simulatedSkySettings").asObject());
+        simulatedSkyMode.updateSun(scene.sun());
         skyCache.setSimulatedSkyMode(simulatedSkyMode);
-        skyCache.precalculateSky();
+        skyCache.setSkyResolution(json.get("skyCacheResolution").asInt(skyCache.getSkyResolution()));
         scene.refresh();
         break;
       }
@@ -767,18 +732,6 @@ public class Sky implements JsonSerializable {
       Log.errorf("Failed to load skymap: %s (file does not exist)", fileName);
       return prevTexture;
     }
-  }
-
-  public void setHorizonOffset(double newValue) {
-    newValue = Math.min(1, Math.max(0, newValue));
-    if (newValue != horizonOffset) {
-      horizonOffset = newValue;
-      scene.refresh();
-    }
-  }
-
-  public double getHorizonOffset() {
-    return horizonOffset;
   }
 
   public void setCloudSize(double newValue) {

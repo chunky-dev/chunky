@@ -13,13 +13,13 @@ public class FixedTopBottomRotatableTexturedBlock extends AbstractModelBlock {
         this(name, facing, front, side, side, side, top, top);
     }
 
-    public FixedTopBottomRotatableTexturedBlock(String name, String facing, Texture front, Texture side, Texture top, Texture bottom) {
-        this(name, facing, front, side, side, side, top, bottom);
+    public FixedTopBottomRotatableTexturedBlock(String name, String facing, Texture front, Texture side, Texture bottom, Texture top) {
+        this(name, facing, front, side, side, side, bottom, top);
     }
 
-    public FixedTopBottomRotatableTexturedBlock(String name, String facing, Texture front, Texture south, Texture east, Texture west, Texture top, Texture bottom) {
+    public FixedTopBottomRotatableTexturedBlock(String name, String facing, Texture front, Texture south, Texture east, Texture west, Texture bottom, Texture top) {
         super(name, front);
-        this.model = new FixedTopBottomRotatableTexturedBlockModel(facing, front, south, east, west, top, bottom);
+        this.model = new FixedTopBottomRotatableTexturedBlockModel(facing, front, south, east, west, bottom, top);
         solid = true;
         opaque = true;
     }

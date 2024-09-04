@@ -29,6 +29,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -44,7 +45,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class TexturesTab extends ScrollPane implements RenderControlsTab, Initializable {
+public class TexturesTab extends VBox implements RenderControlsTab, Initializable {
   private RenderController controller;
   private SceneManager sceneManager;
 
@@ -157,7 +158,7 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
   }
 
   @Override
-  public Node getTabContent() {
+  public VBox getTabContent() {
     return this;
   }
 }

@@ -66,15 +66,6 @@ public abstract class Block extends Material {
    * @return True if the ray hit this block, false if not
    */
   public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    if (fullBlock.intersect(ray, intersectionRecord)) {
-      float[] color = texture.getColor(intersectionRecord.uv.x, intersectionRecord.uv.y);
-      if (color[3] > Constants.EPSILON) {
-        intersectionRecord.color.set(color);
-        /*ray.distance += ray.tNext;
-        ray.o.scaleAdd(ray.tNext, ray.d);*/
-        return true;
-      }
-    }
     return false;
   }
 

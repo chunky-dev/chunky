@@ -19,15 +19,15 @@
 package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.MinecraftBlockTranslucent;
+import se.llbit.chunky.model.minecraft.WaterModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.*;
-import se.llbit.util.VectorUtil;
 
-import static se.llbit.chunky.block.minecraft.Water.CORNER_0;
-import static se.llbit.chunky.block.minecraft.Water.CORNER_1;
-import static se.llbit.chunky.block.minecraft.Water.CORNER_2;
-import static se.llbit.chunky.block.minecraft.Water.CORNER_3;
+import static se.llbit.chunky.model.minecraft.WaterModel.CORNER_0;
+import static se.llbit.chunky.model.minecraft.WaterModel.CORNER_1;
+import static se.llbit.chunky.model.minecraft.WaterModel.CORNER_2;
+import static se.llbit.chunky.model.minecraft.WaterModel.CORNER_3;
 import static se.llbit.chunky.block.minecraft.Water.FULL_BLOCK;
 
 public class Lava extends MinecraftBlockTranslucent {
@@ -46,7 +46,6 @@ public class Lava extends MinecraftBlockTranslucent {
     this.data = data;
     solid = false;
     localIntersect = true;
-    emittance = 1.0f;
   }
 
   public Lava(int level) {
@@ -59,7 +58,7 @@ public class Lava extends MinecraftBlockTranslucent {
 
   @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     if (isFullBlock()) {
-      if (fullBlock.intersect(ray, intersectionRecord)) {
+      if (fullBlock.closestIntersection(ray, intersectionRecord)) {
         texture.getColor(intersectionRecord);
         return true;
       }
@@ -68,8 +67,8 @@ public class Lava extends MinecraftBlockTranslucent {
 
     boolean hit = false;
     IntersectionRecord intersectionTest = new IntersectionRecord();
-    if (bottom.intersect(ray, intersectionTest)) {
-      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, bottom.n));
+    if (bottom.closestIntersection(ray, intersectionTest)) {
+      intersectionRecord.setNormal(Vector3.orientNormal(ray.d, bottom.n));
       hit = true;
     }
 
@@ -77,21 +76,21 @@ public class Lava extends MinecraftBlockTranslucent {
     int c1 = (0xF & (data >> CORNER_1)) % 8;
     int c2 = (0xF & (data >> CORNER_2)) % 8;
     int c3 = (0xF & (data >> CORNER_3)) % 8;
-    Triangle triangle = Water.t012[c0][c1][c2];
+    Triangle triangle = WaterModel.t012[c0][c1][c2];
     if (triangle.intersect(ray, intersectionTest)) {
-      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionRecord.setNormal(Vector3.orientNormal(ray.d, triangle.n));
       hit = true;
     }
-    triangle = Water.t230[c2][c3][c0];
+    triangle = WaterModel.t230[c2][c3][c0];
     if (triangle.intersect(ray, intersectionTest)) {
-      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionRecord.setNormal(Vector3.orientNormal(ray.d, triangle.n));
       intersectionTest.uv.x = 1 - intersectionTest.uv.x;
       intersectionTest.uv.y = 1 - intersectionTest.uv.y;
       hit = true;
     }
-    triangle = Water.westt[c0][c3];
+    triangle = WaterModel.westt[c0][c3];
     if (triangle.intersect(ray, intersectionTest)) {
-      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionRecord.setNormal(Vector3.orientNormal(ray.d, triangle.n));
       double y = intersectionTest.distance * ray.d.y + ray.o.y;
       double z = intersectionTest.distance * ray.d.z + ray.o.z;
       y -= QuickMath.floor(y);
@@ -100,9 +99,9 @@ public class Lava extends MinecraftBlockTranslucent {
       intersectionTest.uv.y = y;
       hit = true;
     }
-    triangle = Water.westb[c0];
+    triangle = WaterModel.westb[c0];
     if (triangle.intersect(ray, intersectionTest)) {
-      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionRecord.setNormal(Vector3.orientNormal(ray.d, triangle.n));
       double y = intersectionTest.distance * ray.d.y + ray.o.y;
       double z = intersectionTest.distance * ray.d.z + ray.o.z;
       y -= QuickMath.floor(y);
@@ -111,9 +110,9 @@ public class Lava extends MinecraftBlockTranslucent {
       intersectionTest.uv.y = y;
       hit = true;
     }
-    triangle = Water.eastt[c1][c2];
+    triangle = WaterModel.eastt[c1][c2];
     if (triangle.intersect(ray, intersectionTest)) {
-      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionRecord.setNormal(Vector3.orientNormal(ray.d, triangle.n));
       double y = intersectionTest.distance * ray.d.y + ray.o.y;
       double z = intersectionTest.distance * ray.d.z + ray.o.z;
       y -= QuickMath.floor(y);
@@ -122,9 +121,9 @@ public class Lava extends MinecraftBlockTranslucent {
       intersectionTest.uv.y = y;
       hit = true;
     }
-    triangle = Water.eastb[c1];
+    triangle = WaterModel.eastb[c1];
     if (triangle.intersect(ray, intersectionTest)) {
-      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionRecord.setNormal(Vector3.orientNormal(ray.d, triangle.n));
       double y = intersectionTest.distance * ray.d.y + ray.o.y;
       double z = intersectionTest.distance * ray.d.z + ray.o.z;
       y -= QuickMath.floor(y);
@@ -133,9 +132,9 @@ public class Lava extends MinecraftBlockTranslucent {
       intersectionTest.uv.y = y;
       hit = true;
     }
-    triangle = Water.southt[c0][c1];
+    triangle = WaterModel.southt[c0][c1];
     if (triangle.intersect(ray, intersectionTest)) {
-      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionRecord.setNormal(Vector3.orientNormal(ray.d, triangle.n));
       double x = intersectionTest.distance * ray.d.x + ray.o.x;
       double y = intersectionTest.distance * ray.d.y + ray.o.y;
       x -= QuickMath.floor(x);
@@ -144,9 +143,9 @@ public class Lava extends MinecraftBlockTranslucent {
       intersectionTest.uv.y = y;
       hit = true;
     }
-    triangle = Water.southb[c1];
+    triangle = WaterModel.southb[c1];
     if (triangle.intersect(ray, intersectionTest)) {
-      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionRecord.setNormal(Vector3.orientNormal(ray.d, triangle.n));
       double x = intersectionTest.distance * ray.d.x + ray.o.x;
       double y = intersectionTest.distance * ray.d.y + ray.o.y;
       x -= QuickMath.floor(x);
@@ -155,9 +154,9 @@ public class Lava extends MinecraftBlockTranslucent {
       intersectionTest.uv.y = y;
       hit = true;
     }
-    triangle = Water.northt[c2][c3];
+    triangle = WaterModel.northt[c2][c3];
     if (triangle.intersect(ray, intersectionTest)) {
-      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionRecord.setNormal(Vector3.orientNormal(ray.d, triangle.n));
       double x = intersectionTest.distance * ray.d.x + ray.o.x;
       double y = intersectionTest.distance * ray.d.y + ray.o.y;
       x -= QuickMath.floor(x);
@@ -166,9 +165,9 @@ public class Lava extends MinecraftBlockTranslucent {
       intersectionTest.uv.y = y;
       hit = true;
     }
-    triangle = Water.northb[c2];
+    triangle = WaterModel.northb[c2];
     if (triangle.intersect(ray, intersectionTest)) {
-      intersectionRecord.setNormal(VectorUtil.orientNormal(ray.d, triangle.n));
+      intersectionRecord.setNormal(Vector3.orientNormal(ray.d, triangle.n));
       double x = intersectionTest.distance * ray.d.x + ray.o.x;
       double y = intersectionTest.distance * ray.d.y + ray.o.y;
       x -= QuickMath.floor(x);

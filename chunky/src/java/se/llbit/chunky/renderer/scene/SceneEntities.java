@@ -12,13 +12,7 @@ import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
-import se.llbit.math.Constants;
-import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Octree;
-import se.llbit.math.Ray;
-import se.llbit.math.Ray2;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector3i;
+import se.llbit.math.*;
 import se.llbit.math.bvh.BVH;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
@@ -43,7 +37,7 @@ import java.util.stream.Stream;
 /**
  * Encapsulates entity handling for a scene.
  */
-public class SceneEntities {
+public class SceneEntities implements Intersectable {
 
   private EntityLoadingPreferences entityLoadingPreferences = new EntityLoadingPreferences();
 
@@ -87,15 +81,13 @@ public class SceneEntities {
     bvhImplementation = other.bvhImplementation;
   }
 
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
-    boolean hit = false;
+  @Override
+  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+    boolean hit = bvh.closestIntersection(ray, intersectionRecord, scene);
 
-    if (bvh.closestIntersection(ray, intersectionRecord)) {
-      hit = true;
-    }
     if (renderActors) {
       IntersectionRecord intersectionTest = new IntersectionRecord();
-      if (actorBvh.closestIntersection(ray, intersectionTest) && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
+      if (actorBvh.closestIntersection(ray, intersectionTest, scene) && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
         hit = true;
         intersectionRecord.distance = intersectionTest.distance;
         intersectionRecord.setNormal(intersectionTest);

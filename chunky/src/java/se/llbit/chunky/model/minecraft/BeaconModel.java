@@ -52,13 +52,4 @@ public class BeaconModel extends AABBModel {
   public Texture[][] getTextures() {
     return textures;
   }
-
-  @Override
-  public boolean isInside(Vector3 p) {
-    double ix = p.x - QuickMath.floor(p.x);
-    double iy = p.y - QuickMath.floor(p.y);
-    double iz = p.z - QuickMath.floor(p.z);
-    p = new Vector3(ix, iy, iz);
-    return boxes[0].inside(p) && !boxes[1].inside(p) && boxes[2].inside(p);
-  }
 }

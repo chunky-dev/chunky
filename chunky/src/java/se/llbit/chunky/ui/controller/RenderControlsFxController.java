@@ -18,9 +18,14 @@
 package se.llbit.chunky.ui.controller;
 
 import javafx.application.Platform;
+import javafx.geometry.NodeOrientation;
 import javafx.geometry.Point2D;
-import javafx.scene.control.Tooltip;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
@@ -63,13 +68,13 @@ public class RenderControlsFxController {
   /** Maps JavaFX tabs to tab controllers. */
   private final Tooltip tooltip;
 
-  private final ToolPane toolPane;
+  private final VBox toolPane;
 
   private ChunkyFxController controller;
 
-  private final Map<RenderControlsTab, ToolTab> tabMap = new IdentityHashMap<>();
+  private final Map<RenderControlsTab, TitledPane> tabMap = new IdentityHashMap<>();
 
-  public RenderControlsFxController(ChunkyFxController controller, ToolPane toolPane,
+  public RenderControlsFxController(ChunkyFxController controller, VBox toolPane,
       RenderCanvasFx canvas, RenderManager renderManager) {
     this.controller = controller;
     this.toolPane = toolPane;
@@ -119,10 +124,18 @@ public class RenderControlsFxController {
         // We run this in runLater because it fails if run directly, for unknown reasons.
         // TODO(llbit): check why adding tabs has to happen inside runLater!
         for (RenderControlsTab tab : tabs) {
-          ToolTab toolTab = new ToolTab(tab.getTabTitle(), tab.getTabContent());
+          String title = tab.getTabTitle();
+
+          VBox content = tab.getTabContent();
+          content.setSpacing(10);
+
+          TitledPane toolTab = new TitledPane(title, content);
+          toolTab.setAnimated(false);
+          toolTab.setExpanded(false);
+
           tabMap.put(tab, toolTab);
-          toolPane.getTabs().add(toolTab);
-          toolTab.selectedProperty().addListener((observable, oldValue, selected) -> {
+          toolPane.getChildren().add(toolTab);
+          toolTab.expandedProperty().addListener((observable, oldValue, selected) -> {
             if (selected) {
               tab.update(scene);
             }
@@ -135,8 +148,8 @@ public class RenderControlsFxController {
   }
 
   public void refreshSettings() {
-    for (Map.Entry<RenderControlsTab, ToolTab> entry : tabMap.entrySet()) {
-      if (entry.getValue().getSelected()) {
+    for (Map.Entry<RenderControlsTab, TitledPane> entry : tabMap.entrySet()) {
+      if (entry.getValue().isExpanded()) {
         entry.getKey().update(scene);
       }
     }

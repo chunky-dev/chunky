@@ -423,4 +423,12 @@ public final class ColorUtil {
     color.z = json.get("blue").doubleValue(1);
     return color;
   }
+
+  public static Vector3 jsonToRGB(JsonObject json, Vector3 undefined) {
+    Vector3 color = new Vector3();
+    color.x = json.get("red").doubleValue(undefined.x);
+    color.y = json.get("green").doubleValue(undefined.y);
+    color.z = json.get("blue").doubleValue(undefined.z);
+    return color;
+  }
 }

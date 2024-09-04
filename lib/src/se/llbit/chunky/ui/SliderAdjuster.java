@@ -21,8 +21,14 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.event.Event;
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseDragEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
+import se.llbit.math.QuickMath;
 
 /**
  * A control for editing numeric values with a slider and text field.
@@ -42,7 +48,10 @@ public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
   protected SliderAdjuster(Property<Number> value) {
     super(value);
     setSpacing(10);
-    getChildren().setAll(nameLbl, valueSlider, valueField);
+    VBox inputBox = new VBox(0, valueField, valueSlider);
+    inputBox.setAlignment(Pos.TOP_CENTER);
+    getChildren().setAll(inputBox, nameLbl);
+    valueSlider.setPrefWidth(80);
     valueSlider.valueProperty().bindBidirectional(value);
     valueSlider.setMin(0);
     valueSlider.setMax(100);

@@ -224,7 +224,7 @@ public final class Fog implements JsonSerializable {
   }
 
   public void importFromJson(JsonObject json, Scene scene) {
-    mode = FogMode.get(json.get("mode").stringValue(mode.name()));
+    mode = FogMode.valueOf(json.get("mode").stringValue(mode.getId()));
     uniformDensity = json.get("uniformDensity").doubleValue(uniformDensity);
     skyFogDensity = json.get("skyFogDensity").doubleValue(skyFogDensity);
     layers = json.get("layers").array().elements.stream().map(JsonValue::object).map(o -> new FogLayer(

@@ -33,6 +33,6 @@ public class PowderSnowCauldron extends Cauldron {
 
   @Override
   public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    return CauldronModel.intersect(ray, intersectionRecord, getLevel(), Texture.powderSnow);
+    return CauldronModel.intersect(ray, intersectionRecord, scene, getLevel(), Texture.powderSnow, "powder_snow");
   }
 }

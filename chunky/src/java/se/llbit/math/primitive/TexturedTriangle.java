@@ -16,6 +16,7 @@
  */
 package se.llbit.math.primitive;
 
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.AABB;
@@ -81,7 +82,7 @@ public class TexturedTriangle implements Primitive {
     bounds = AABB.bounds(c1, c2, c3);
   }
 
-  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
+  @Override public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
     // Möller-Trumbore triangle intersection algorithm!
     Vector3 pvec = new Vector3();
     Vector3 qvec = new Vector3();
@@ -120,14 +121,12 @@ public class TexturedTriangle implements Primitive {
       double w = 1 - u - v;
       intersectionRecord.uv.x = t1u * u + t2u * v + t3u * w;
       intersectionRecord.uv.y = t1v * u + t2v * v + t3v * w;
-      float[] color = material.getColor(intersectionRecord.uv.x, intersectionRecord.uv.y);
-      if (color[3] > 0) {
-        intersectionRecord.color.set(color);
-        intersectionRecord.material = material;
-        intersectionRecord.distance = t;
-        intersectionRecord.setNormal(n);
-        return true;
-      }
+      material.getColor(intersectionRecord);
+      intersectionRecord.material = material;
+      intersectionRecord.distance = t;
+      intersectionRecord.setNormal(n);
+      intersectionRecord.flags |= IntersectionRecord.NO_MEDIUM_CHANGE;
+      return true;
     }
     return false;
   }
