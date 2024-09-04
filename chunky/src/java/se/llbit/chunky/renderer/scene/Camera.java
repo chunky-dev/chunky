@@ -684,7 +684,7 @@ public class Camera implements JsonSerializable {
     shiftX = shift.get("x").doubleValue(0);
     shiftY = shift.get("y").doubleValue(0);
 
-    apertureShape = ApertureShape.valueOf(json.get("apertureShape").asString(apertureShape.getId()));
+    apertureShape = ApertureShape.get(json.get("apertureShape").asString(apertureShape.getId()));
     apertureMaskFilename = json.get("apertureMask").stringValue(null);
 
     initProjector();
