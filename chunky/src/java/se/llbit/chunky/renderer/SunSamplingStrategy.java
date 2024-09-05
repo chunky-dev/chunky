@@ -24,7 +24,7 @@ public enum SunSamplingStrategy implements Registerable {
 //    FAST("Fast", "Fast sun sampling algorithm. Lower noise but does not correctly model some visual effects.", true, false, false, false),
 //    HIGH_QUALITY("High Quality", "High quality sun sampling. More noise but correctly models visual effects such as caustics.", true, true, true, true);
 
-  SAMPLE_THROUGH_OPACITY("Sample through opacity", "Sample the sun through translucent textures", true, false),
+  SAMPLE_THROUGH_OPACITY("Sample through opacity", "Sample the sun and sky through translucent textures", true, false),
   SAMPLE_ONLY("Sample only", "Sample the sun on diffuse reflections.", true, false),
   MIX("Mix", "Sample the sun on diffuse reflections, and diffusely intersect on specular interactions.", true, true),
   OFF("Diffuse", "Diffusely intersect on all interactions.", false, true);

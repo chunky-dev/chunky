@@ -34,7 +34,7 @@ public class WorkerState {
   public Vector3 throughput = new Vector3(1);
   public Vector4 color = new Vector4();
   public Vector3 emittance = new Vector3();
-  public Vector4 sunColor = new Vector4();
+  public Vector4 sampleColor = new Vector4();
   public Vector3 attenuation = new Vector3();
   public Random random;
 }

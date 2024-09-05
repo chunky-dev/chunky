@@ -52,7 +52,7 @@ public class PathTracer implements RayTracer {
     final Vector3 throughput = state.throughput;
     final IntersectionRecord intersectionRecord = state.intersectionRecord;
     final Vector3 emittance = state.emittance;
-    final Vector4 sunColor = state.sunColor;
+    final Vector4 sunColor = state.sampleColor;
 
     for (int i = scene.rayDepth; i > 0; i--) {
       intersectionRecord.reset();
@@ -89,7 +89,7 @@ public class PathTracer implements RayTracer {
         cumulativeColor.z += (intersectionRecord.color.z * emittance.z * scene.emitterIntensity + sunColor.z) * throughput.z;
 
       } else {
-        scene.sky.getSkyColor(ray, intersectionRecord);
+        scene.sky.intersect(ray, intersectionRecord);
 
         throughput.x *= intersectionRecord.color.x;
         throughput.y *= intersectionRecord.color.y;
@@ -107,9 +107,6 @@ public class PathTracer implements RayTracer {
     if (!scene.sunSamplingStrategy.doSunSampling()) {
       return;
     }
-    if (!scene.sun.getDrawTexture()) {
-      return;
-    }
     if ((state.ray.flags & Ray2.DIFFUSE) == 0 && (state.intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) == 0) {
       return;
     }
@@ -121,7 +118,8 @@ public class PathTracer implements RayTracer {
       case SAMPLE_ONLY:
       case MIX:
         if (!scene.intersect(state.sampleRay, state.sampleRecord, state.random)) {
-          state.sunColor.set(scene.sun.getSunIntersectionColor(state.sampleRay));
+          scene.sky.getSkyColor(state.sampleRay, state.sampleRecord);
+          state.sampleColor.set(state.sampleRecord.color);
           double scaleFactor;
           if ((state.intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0) {
             scaleFactor = Material.phaseHG(state.ray.d.rScale(-1).dot(state.sampleRay.d), state.intersectionRecord.material.volumeAnisotropy);
@@ -129,14 +127,15 @@ public class PathTracer implements RayTracer {
             scaleFactor = QuickMath.abs(state.sampleRay.d.dot(state.intersectionRecord.shadeN));
           }
           scaleFactor *= scene.sun.radius * scene.sun.radius;
-          state.sunColor.scale(scaleFactor);
+          state.sampleColor.scale(scaleFactor);
         }
         break;
       case SAMPLE_THROUGH_OPACITY:
         state.attenuation.set(1);
         for (int i = 0; i < rayDepth; i++) {
           if (!scene.intersect(state.sampleRay, state.sampleRecord, state.random)) {
-            state.sunColor.set(scene.sun.getSunIntersectionColor(state.sampleRay));
+            scene.sky.getSkyColor(state.sampleRay, state.sampleRecord);
+            state.sampleColor.set(state.sampleRecord.color);
             double scaleFactor;
             if ((state.intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0) {
               scaleFactor = Material.phaseHG(state.ray.d.rScale(-1).dot(state.sampleRay.d), state.intersectionRecord.material.volumeAnisotropy);
@@ -144,10 +143,10 @@ public class PathTracer implements RayTracer {
               scaleFactor = QuickMath.abs(state.sampleRay.d.dot(state.intersectionRecord.shadeN));
             }
             scaleFactor *= scene.sun.radius * scene.sun.radius;
-            state.sunColor.scale(scaleFactor);
-            state.sunColor.x *= state.attenuation.x;
-            state.sunColor.y *= state.attenuation.y;
-            state.sunColor.z *= state.attenuation.z;
+            state.sampleColor.scale(scaleFactor);
+            state.sampleColor.x *= state.attenuation.x;
+            state.sampleColor.y *= state.attenuation.y;
+            state.sampleColor.z *= state.attenuation.z;
             break;
           }
           if (1 - state.sampleRecord.material.specular < Constants.EPSILON) {

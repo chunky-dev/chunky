@@ -40,7 +40,7 @@ public class PreviewRayTracer implements RayTracer {
    */
   @Override public void trace(Scene scene, WorkerState state) {
     Ray2 ray = state.ray;
-    ray.flags |= Ray2.SPECULAR;
+    ray.flags |= Ray2.SPECULAR | Ray2.INDIRECT;
     ray.setCurrentMedium(scene.getWorldMaterial(ray));
 
     IntersectionRecord intersectionRecord = state.intersectionRecord;
@@ -51,7 +51,7 @@ public class PreviewRayTracer implements RayTracer {
       if (scene.intersect(ray, intersectionRecord, null)) {
         ray.o.scaleAdd(intersectionRecord.distance, ray.d);
         ray.getCurrentMedium().absorption(throughput, intersectionRecord.distance);
-        ray.flags = 0;
+        ray.clearReflectionFlags();
         if (intersectionRecord.material.scatter(ray, intersectionRecord, state.emittance, state.random)) {
           ray.setCurrentMedium(intersectionRecord.material);
         }
@@ -66,7 +66,7 @@ public class PreviewRayTracer implements RayTracer {
       } else if (mapIntersection(scene, ray, intersectionRecord)) {
         break;
       } else {
-        scene.sky.getSkyColor(ray, intersectionRecord);
+        scene.sky.intersect(ray, intersectionRecord);
         break;
       }
     }

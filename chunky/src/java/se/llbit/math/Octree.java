@@ -551,6 +551,8 @@ public class Octree implements Intersectable {
             hit = true;
           } else {
             intersectionRecord.distance = Double.POSITIVE_INFINITY;
+            distance += exitBlock(testRay, intersectionRecord, bx, by, bz);
+            continue;
           }
         } else if (!currentBlock.isSameMaterial(prevBlock)) {
           testRay.o.set(ray.o);

@@ -359,11 +359,20 @@ public class Sky implements JsonSerializable {
   public void getSkyColor(Ray2 ray, IntersectionRecord intersectionRecord) {
     getSkyColorInner(ray, intersectionRecord);
     intersectionRecord.color.scale(skyEmittance);
-    if ((scene.sunSamplingStrategy.isDiffuseSun() && (ray.flags & Ray2.SPECULAR) != 0) ||
-        (!scene.sunSamplingStrategy.doSunSampling() && (ray.flags & Ray2.DIFFUSE) != 0)) {
-      intersectionRecord.color.add(scene.sun.getSunIntersectionColor(ray));
-    }
+    intersectionRecord.color.add(scene.sun.getSunIntersectionColor(ray));
     intersectionRecord.color.w = 1;
+  }
+
+  public void intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
+    if (scene.sun.intersect(ray, intersectionRecord) && (ray.flags & Ray2.INDIRECT) != 0) {
+      if (((ray.flags & Ray2.DIFFUSE) != 0) && scene.sunSamplingStrategy.doSunSampling()) {
+        return;
+      }
+      if (((ray.flags & Ray2.SPECULAR) != 0) && !scene.sunSamplingStrategy.isDiffuseSun()) {
+        return;
+      }
+    }
+    getSkyColor(ray, intersectionRecord);
   }
 
   /**

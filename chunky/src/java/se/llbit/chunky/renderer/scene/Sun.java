@@ -242,12 +242,12 @@ public class Sun implements JsonSerializable {
    * @return <code>true</code> if the ray intersects the sun model
    */
   public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
-    return drawTexture && !(ray.d.dot(sw) < radiusCos);
+    return (ray.d.dot(sw) > radiusCos);
   }
 
   public Vector4 getSunIntersectionColor(Ray2 ray) {
     final Vector4 sunColor = new Vector4(1, 1, 1, 1);
-    if (intersect(ray, null)) {
+    if (intersect(ray, null) && drawTexture) {
       double width = radius * Constants.SQRT_2;
       double half_width = width / 2;
       double a;

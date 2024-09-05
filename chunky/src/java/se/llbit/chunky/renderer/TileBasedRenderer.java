@@ -20,9 +20,6 @@ import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.math.Ray;
-import se.llbit.math.Ray2;
-import se.llbit.math.Vector4;
 
 import java.util.ArrayList;
 import java.util.function.BiConsumer;
@@ -83,7 +80,7 @@ public abstract class TileBasedRenderer implements Renderer {
               state.color.set(0, 0, 0, 0);
               state.throughput.set(1);
               state.emittance.set(0);
-              state.sunColor.set(0, 0, 0, 0);
+              state.sampleColor.set(0, 0, 0, 0);
               state.attenuation.set(1);
             }
           }

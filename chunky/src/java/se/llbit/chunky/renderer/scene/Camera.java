@@ -636,7 +636,7 @@ public class Camera implements JsonSerializable {
     orientation.add("yaw", yaw);
     camera.add("orientation", orientation);
 
-    camera.add("projectionMode", projectionMode.name());
+    camera.add("projectionMode", projectionMode.getId());
     camera.add("fov", fov);
     if (dof == Double.POSITIVE_INFINITY) {
       camera.add("dof", "Infinity");
@@ -650,7 +650,7 @@ public class Camera implements JsonSerializable {
     shift.add("y", shiftY);
     camera.add("shift", shift);
 
-    camera.add("apertureShape", apertureShape.toString());
+    camera.add("apertureShape", apertureShape.getId());
     if(apertureMaskFilename != null)
       camera.add("apertureMask", apertureMaskFilename);
 
@@ -672,7 +672,7 @@ public class Camera implements JsonSerializable {
     fov = json.get("fov").doubleValue(fov);
     subjectDistance = json.get("focalOffset").doubleValue(subjectDistance);
     projectionMode = ProjectionMode.get(
-        json.get("projectionMode").stringValue(projectionMode.name()));
+        json.get("projectionMode").stringValue(projectionMode.getId()));
     if (json.get("infDof").boolValue(false)) {
       // The infDof setting is deprecated.
       dof = Double.POSITIVE_INFINITY;
