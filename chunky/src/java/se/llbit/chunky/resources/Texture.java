@@ -27,8 +27,6 @@ import se.llbit.math.ColorUtil;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
-import se.llbit.math.Ray2;
 import se.llbit.math.Vector4;
 import se.llbit.resources.ImageLoader;
 import se.llbit.util.annotation.NotNull;

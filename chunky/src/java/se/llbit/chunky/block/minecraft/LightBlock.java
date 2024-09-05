@@ -24,11 +24,8 @@ import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
-import se.llbit.math.Vector4;
 
 public class LightBlock extends AbstractModelBlock {
 

@@ -19,7 +19,6 @@ package se.llbit.chunky.renderer.projection;
 import java.util.Random;
 
 import se.llbit.math.Constants;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 /**

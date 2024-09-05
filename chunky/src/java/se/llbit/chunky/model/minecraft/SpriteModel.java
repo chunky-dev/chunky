@@ -20,11 +20,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Constants;
-import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
-import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 

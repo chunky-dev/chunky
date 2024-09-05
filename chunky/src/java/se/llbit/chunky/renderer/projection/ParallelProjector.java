@@ -20,7 +20,6 @@ import java.util.Random;
 
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Constants;
-import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 

@@ -2,10 +2,8 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.world.Material;
 import se.llbit.math.*;
 
-import java.util.List;
 import java.util.Random;
 
 @PluginApi

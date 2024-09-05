@@ -23,7 +23,6 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.AABB;
-import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.primitive.Primitive;
 

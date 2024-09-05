@@ -19,10 +19,8 @@
 package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.MinecraftBlockTranslucent;
-import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.model.minecraft.WaterModel;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.renderer.scene.StillWaterShader;
 import se.llbit.chunky.resources.SolidColorTexture;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.*;

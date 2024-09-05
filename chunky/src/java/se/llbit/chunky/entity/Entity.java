@@ -19,11 +19,8 @@ package se.llbit.chunky.entity;
 
 import java.util.Collection;
 
-import javafx.scene.Node;
-import javafx.scene.layout.VBox;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.model.minecraft.DecoratedPotModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Grid;
@@ -31,10 +28,7 @@ import se.llbit.math.Octree;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
 import se.llbit.math.primitive.Primitive;
-import se.llbit.util.Configurable;
 import se.llbit.util.HasControls;
-
-import java.util.Collection;
 
 /**
  * Represents Minecraft entities that are not stored in the octree.

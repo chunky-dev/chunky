@@ -18,7 +18,6 @@ package se.llbit.chunky.renderer.scene;
 
 import se.llbit.json.JsonObject;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.SimplexNoise;
 import se.llbit.math.Vector3;

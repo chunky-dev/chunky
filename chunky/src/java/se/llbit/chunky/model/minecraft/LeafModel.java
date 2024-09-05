@@ -24,7 +24,6 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray2;
-import se.llbit.math.Vector3;
 
 public class LeafModel extends AABBModel {
   private static final AABB[] boxes = { new AABB(0, 1, 0, 1, 0, 1) };

@@ -18,21 +18,15 @@
 package se.llbit.chunky.world.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.resources.TextureCache;
-import se.llbit.chunky.resources.TexturePackLoader;
-import se.llbit.chunky.resources.texturepack.SimpleTexture;
-import se.llbit.chunky.resources.texturepack.TextureLoader;
 import se.llbit.log.Log;
 import se.llbit.math.Constants;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 /**

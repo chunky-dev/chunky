@@ -26,19 +26,19 @@ import se.llbit.math.*;
 import static java.lang.Math.PI;
 
 public class PreethamSky implements SimulatedSky {
-  private static final double xZenithChroma[][] =
+  private static final double[][] xZenithChroma =
       {{0.00166, -0.00375, 0.00209, 0}, {-0.02903, 0.06377, -0.03203, 0.00394},
           {0.11693, -0.21196, 0.06052, 0.25886},};
-  private static final double yZenithChroma[][] =
+  private static final double[][] yZenithChroma =
       {{0.00275, -0.00610, 0.00317, 0}, {-0.04214, 0.08970, -0.04153, 0.00516},
           {0.15346, -0.26756, 0.06670, 0.26688},};
-  private static final double mdx[][] =
+  private static final double[][] mdx =
       {{-0.0193, -0.2592}, {-0.0665, 0.0008}, {-0.0004, 0.2125}, {-0.0641, -0.8989},
           {-0.0033, 0.0452}};
-  private static final double mdy[][] =
+  private static final double[][] mdy =
       {{-0.0167, -0.2608}, {-0.0950, 0.0092}, {-0.0079, 0.2102}, {-0.0441, -1.6537},
           {-0.0109, 0.0529}};
-  private static final double mdY[][] =
+  private static final double[][] mdY =
       {{0.1787, -1.4630}, {-0.3554, 0.4275}, {-0.0227, 5.3251}, {0.1206, -2.5771},
           {-0.0670, 0.3703}};
 

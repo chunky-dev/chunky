@@ -17,15 +17,10 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import se.llbit.chunky.block.Block;
-import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.MinecraftBlock;
-import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.WorkerState;
-import se.llbit.chunky.world.Material;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;

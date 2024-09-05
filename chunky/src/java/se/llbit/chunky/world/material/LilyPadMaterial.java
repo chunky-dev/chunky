@@ -21,7 +21,6 @@ import se.llbit.chunky.world.Material;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray;
 
 public class LilyPadMaterial extends Material {
 

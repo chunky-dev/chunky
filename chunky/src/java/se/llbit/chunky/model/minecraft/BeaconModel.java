@@ -20,9 +20,6 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
-import se.llbit.math.Constants;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Vector3;
 
 /**
  * Beacon block.

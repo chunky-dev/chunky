@@ -247,17 +247,17 @@ public final class SimplexNoise
 
   // Helper functions to compute gradients in 1D to 4D
   // and gradients-dot-residualvectors in 2D to 4D.
-  static final float grad3x(int hash)
+  static float grad3x(int hash)
   {
     return grad3lut[hash & 15][0];
   }
 
-  static final float grad3y(int hash)
+  static float grad3y(int hash)
   {
     return grad3lut[hash & 15][1];
   }
 
-  static final float grad3z(int hash)
+  static float grad3z(int hash)
   {
     return grad3lut[hash & 15][2];
   }

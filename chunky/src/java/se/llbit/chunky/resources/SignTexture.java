@@ -21,7 +21,6 @@ import se.llbit.chunky.resources.texturepack.FontTexture.Glyph;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Constants;
-import se.llbit.math.Ray;
 import se.llbit.util.annotation.Nullable;
 
 public class SignTexture extends Texture {

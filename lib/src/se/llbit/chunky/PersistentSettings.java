@@ -30,7 +30,6 @@ import se.llbit.fxutil.WindowPosition;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.log.Log;
 
 /**
  * Utility class for managing global Chunky settings.

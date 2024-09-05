@@ -190,26 +190,7 @@ public class AABB implements Intersectable {
    * @return {@code true} if there is an intersection
    */
   public double quickIntersect(Ray2 ray) {
-    double tx1 = (xmin - ray.o.x) / ray.d.x;
-    double tx2 = (xmax - ray.o.x) / ray.d.x;
-
-    double ty1 = (ymin - ray.o.y) / ray.d.y;
-    double ty2 = (ymax - ray.o.y) / ray.d.y;
-
-    double tz1 = (zmin - ray.o.z) / ray.d.z;
-    double tz2 = (zmax - ray.o.z) / ray.d.z;
-
-    double tmin = Math.max(Math.max(Math.min(tx1, tx2), Math.min(ty1, ty2)), Math.min(tz1, tz2));
-    double tmax = Math.min(Math.min(Math.max(tx1, tx2), Math.max(ty1, ty2)), Math.max(tz1, tz2));
-
-    if (tmax < tmin) {
-      return Double.NaN;
-    } else {
-      return tmin;
-    }
-
-
-    /*double t1, t2;
+    double t1, t2;
     double tNear = Double.NEGATIVE_INFINITY;
     double tFar = Double.POSITIVE_INFINITY;
     Vector3 d = ray.d;
@@ -268,12 +249,11 @@ public class AABB implements Intersectable {
       }
     }
 
-    if (tNear < tFar + Constants.EPSILON && tNear >= 0 && tNear < ray.t) {
-      ray.tNext = tNear;
-      return true;
+    if (tNear < tFar + Constants.EPSILON && tNear >= 0) {
+      return tNear;
     } else {
-      return false;
-    }*/
+      return Double.NaN;
+    }
   }
 
   /**

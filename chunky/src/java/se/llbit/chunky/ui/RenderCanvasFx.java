@@ -49,7 +49,6 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.PopupWindow;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.*;
-import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.controller.ChunkyFxController;

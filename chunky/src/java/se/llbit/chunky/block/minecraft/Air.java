@@ -20,8 +20,6 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.MinecraftBlock;
 import se.llbit.chunky.resources.SolidColorTexture;
-import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Vector4;
 
 public class Air extends MinecraftBlock {
   public static final Air INSTANCE = new Air();

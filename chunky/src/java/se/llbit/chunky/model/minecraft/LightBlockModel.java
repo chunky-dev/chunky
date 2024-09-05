@@ -25,7 +25,6 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray2;
-import se.llbit.math.Vector4;
 
 public class LightBlockModel extends AABBModel {
   public static final AABB[] aabb = { new AABB(0.125, 0.875, 0.125, 0.875, 0.125, 0.875) };

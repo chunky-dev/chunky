@@ -29,13 +29,10 @@ import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.Block;
-import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.model.TexturedBlockModel;
-import se.llbit.chunky.model.minecraft.WaterModel;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.renderer.scene.StillWaterShader;
 import se.llbit.chunky.world.Material;
 import se.llbit.log.Log;
 import se.llbit.util.io.PositionalInputStream;

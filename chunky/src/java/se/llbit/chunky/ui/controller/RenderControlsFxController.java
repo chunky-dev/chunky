@@ -18,12 +18,8 @@
 package se.llbit.chunky.ui.controller;
 
 import javafx.application.Platform;
-import javafx.geometry.NodeOrientation;
 import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import se.llbit.chunky.renderer.RenderController;

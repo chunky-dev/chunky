@@ -24,7 +24,6 @@ import se.llbit.chunky.renderer.ApertureShape;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
 import se.llbit.math.Constants;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.resources.ImageLoader;
 import se.llbit.util.annotation.Nullable;

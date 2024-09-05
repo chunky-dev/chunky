@@ -133,11 +133,11 @@ public class Sky implements JsonSerializable {
   }
 
   @NotNull private Texture skymap = Texture.EMPTY_TEXTURE;
-  private final Texture skybox[] =
+  private final Texture[] skybox =
       {Texture.EMPTY_TEXTURE, Texture.EMPTY_TEXTURE, Texture.EMPTY_TEXTURE, Texture.EMPTY_TEXTURE,
           Texture.EMPTY_TEXTURE, Texture.EMPTY_TEXTURE};
   private String skymapFileName = "";
-  private final String skyboxFileName[] = {"", "", "", "", "", ""};
+  private final String[] skyboxFileName = {"", "", "", "", "", ""};
   private final Scene scene;
 
   private Matrix3 rotation = new Matrix3();

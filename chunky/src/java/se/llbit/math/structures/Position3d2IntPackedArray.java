@@ -3,8 +3,6 @@ package se.llbit.math.structures;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 
-import java.util.Objects;
-
 public class Position3d2IntPackedArray implements Position2IntStructure {
 
   protected final Object2ReferenceMap<XYZTriple, int[]> structure = new Object2ReferenceOpenHashMap<>();

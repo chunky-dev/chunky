@@ -17,8 +17,6 @@
 package se.llbit.chunky.ui.render.tabs;
 
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.render.RenderControlsTab;

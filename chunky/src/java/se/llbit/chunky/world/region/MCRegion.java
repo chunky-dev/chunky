@@ -424,7 +424,7 @@ public class MCRegion implements Region {
         int numSectors = loc & 0xFF;
         int sectorOffset = loc >> 8;
 
-        file.seek(sectorOffset * SECTOR_SIZE);
+        file.seek((long) sectorOffset * SECTOR_SIZE);
         byte[] buffer = new byte[SECTOR_SIZE];
         for (int j = 0; j < numSectors; ++j) {
           file.read(buffer);

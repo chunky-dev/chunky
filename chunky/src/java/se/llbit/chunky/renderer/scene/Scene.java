@@ -20,7 +20,6 @@ package se.llbit.chunky.renderer.scene;
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.minecraft.Lava;
@@ -70,8 +69,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -977,23 +974,6 @@ public class Scene implements JsonSerializable, Refreshable {
                   }
 
                   if(block.isWaterFilled()) {
-//                    if (block.waterlogged) {
-//                      if(y + 1 < yMax) {
-//                        if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)).isWaterFilled()) {
-//                          Tag blockTag = palette.getBlockSpec(octNode).getTag();
-//                          CompoundTag newBlockTag = new CompoundTag();
-//                          // create a copy of the block tag
-//                          for (NamedTag namedTag : blockTag.asCompound()) {
-//                            newBlockTag.add(namedTag);
-//                          }
-//                          newBlockTag.add("waterloggedFull", new ByteTag(1));
-//                          int id = palette.put(newBlockTag);
-//                          Block waterloggedFullBlock = palette.get(id);
-//                          waterloggedFullBlock.waterloggedFull = true;
-//                          octNode = id;
-//                        }
-//                      }
-//                    }
                     if(block.isWater()) {
                       octNode = palette.waterId;
                       if(y + 1 < yMax) {

@@ -18,13 +18,8 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.WallCoralFanEntity;
-import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray;
-import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 
 public class WallCoralFan extends EmptyModelBlock {

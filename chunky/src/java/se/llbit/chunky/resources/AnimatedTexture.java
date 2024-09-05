@@ -17,7 +17,6 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.math.Constants;
-import se.llbit.math.Ray;
 
 /**
  * Basic animated texture extension.

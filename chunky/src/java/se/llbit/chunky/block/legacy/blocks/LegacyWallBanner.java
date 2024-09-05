@@ -1,14 +1,9 @@
 package se.llbit.chunky.block.legacy.blocks;
 
-import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.block.minecraft.EmptyModelBlock;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.WallBanner;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray;
-import se.llbit.math.Ray2;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 

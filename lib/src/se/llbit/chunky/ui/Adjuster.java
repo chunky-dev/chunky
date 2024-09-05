@@ -16,7 +16,6 @@
  */
 package se.llbit.chunky.ui;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.event.Event;

@@ -5,7 +5,6 @@ import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.projection.ParallelProjector;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.log.Log;
-import se.llbit.math.Ray;
 import se.llbit.math.Ray2;
 import se.llbit.util.TaskTracker;
 
