@@ -34,105 +34,149 @@ import java.util.Arrays;
  */
 public class CocoaPlantModel extends QuadModel {
   //region Large
-  private static final Quad[] large = {
-      // front
-      new Quad(new Vector3(12 / 16., 3 / 16., 7 / 16.), new Vector3(4 / 16., 3 / 16., 7 / 16.),
-          new Vector3(12 / 16., 12 / 16., 7 / 16.),
-          new Vector4(7 / 16., 15 / 16., 3 / 16., 12 / 16.)),
-
-      // back
-      new Quad(new Vector3(4 / 16., 3 / 16., 15 / 16.), new Vector3(12 / 16., 3 / 16., 15 / 16.),
-          new Vector3(4 / 16., 12 / 16., 15 / 16.),
-          new Vector4(15 / 16., 7 / 16., 3 / 16., 12 / 16.)),
-
-      // left
-      new Quad(new Vector3(4 / 16., 3 / 16., 7 / 16.), new Vector3(4 / 16., 3 / 16., 15 / 16.),
-          new Vector3(4 / 16., 12 / 16., 7 / 16.),
-          new Vector4(7 / 16., 15 / 16., 3 / 16., 12 / 16.)),
-
-      // right
-      new Quad(new Vector3(12 / 16., 3 / 16., 15 / 16.), new Vector3(12 / 16., 3 / 16., 7 / 16.),
-          new Vector3(12 / 16., 12 / 16., 15 / 16.),
-          new Vector4(15 / 16., 7 / 16., 3 / 16., 12 / 16.)),
-
-      // top
-      new Quad(new Vector3(12 / 16., 12 / 16., 7 / 16.), new Vector3(4 / 16., 12 / 16., 7 / 16.),
-          new Vector3(12 / 16., 12 / 16., 15 / 16.), new Vector4(7 / 16., 0, 9 / 16., 1)),
-
-      // bottom
-      new Quad(new Vector3(4 / 16., 3 / 16., 7 / 16.), new Vector3(12 / 16., 3 / 16., 7 / 16.),
-          new Vector3(4 / 16., 3 / 16., 15 / 16.), new Vector4(0, 7 / 16., 9 / 16., 1)),
+  private static final Quad[] large = new Quad[]{
+    new Quad(
+      new Vector3(4 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(12 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(4 / 16.0, 12 / 16.0, 7 / 16.0),
+      new Vector4(0 / 16.0, 8 / 16.0, 8 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(4 / 16.0, 3 / 16.0, 7 / 16.0),
+      new Vector3(12 / 16.0, 3 / 16.0, 7 / 16.0),
+      new Vector3(4 / 16.0, 3 / 16.0, 15 / 16.0),
+      new Vector4(0 / 16.0, 8 / 16.0, 8 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(4 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(4 / 16.0, 12 / 16.0, 7 / 16.0),
+      new Vector3(4 / 16.0, 3 / 16.0, 15 / 16.0),
+      new Vector4(16 / 16.0, 8 / 16.0, 12 / 16.0, 3 / 16.0)
+    ),
+    new Quad(
+      new Vector3(12 / 16.0, 12 / 16.0, 7 / 16.0),
+      new Vector3(12 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(12 / 16.0, 3 / 16.0, 7 / 16.0),
+      new Vector4(16 / 16.0, 8 / 16.0, 12 / 16.0, 3 / 16.0)
+    ),
+    new Quad(
+      new Vector3(4 / 16.0, 12 / 16.0, 7 / 16.0),
+      new Vector3(12 / 16.0, 12 / 16.0, 7 / 16.0),
+      new Vector3(4 / 16.0, 3 / 16.0, 7 / 16.0),
+      new Vector4(16 / 16.0, 8 / 16.0, 12 / 16.0, 3 / 16.0)
+    ),
+    new Quad(
+      new Vector3(12 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(4 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(12 / 16.0, 3 / 16.0, 15 / 16.0),
+      new Vector4(16 / 16.0, 8 / 16.0, 12 / 16.0, 3 / 16.0)
+    ),
+    new Quad(
+      new Vector3(8 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(8 / 16.0, 16 / 16.0, 12 / 16.0),
+      new Vector3(8 / 16.0, 12 / 16.0, 16 / 16.0),
+      new Vector4(16 / 16.0, 12 / 16.0, 16 / 16.0, 12 / 16.0)
+    )
   };
   //endregion
 
   //region Medium
-  private static final Quad[] medium = {
-      // front
-      new Quad(new Vector3(11 / 16., 5 / 16., 9 / 16.), new Vector3(5 / 16., 5 / 16., 9 / 16.),
-          new Vector3(11 / 16., 12 / 16., 9 / 16.),
-          new Vector4(9 / 16., 15 / 16., 5 / 16., 12 / 16.)),
-
-      // back
-      new Quad(new Vector3(5 / 16., 5 / 16., 15 / 16.), new Vector3(11 / 16., 5 / 16., 15 / 16.),
-          new Vector3(5 / 16., 12 / 16., 15 / 16.),
-          new Vector4(15 / 16., 9 / 16., 5 / 16., 12 / 16.)),
-
-      // left
-      new Quad(new Vector3(5 / 16., 5 / 16., 9 / 16.), new Vector3(5 / 16., 5 / 16., 15 / 16.),
-          new Vector3(5 / 16., 12 / 16., 9 / 16.),
-          new Vector4(9 / 16., 15 / 16., 5 / 16., 12 / 16.)),
-
-      // right
-      new Quad(new Vector3(11 / 16., 5 / 16., 15 / 16.), new Vector3(11 / 16., 5 / 16., 9 / 16.),
-          new Vector3(11 / 16., 12 / 16., 15 / 16.),
-          new Vector4(15 / 16., 9 / 16., 5 / 16., 12 / 16.)),
-
-      // top
-      new Quad(new Vector3(11 / 16., 12 / 16., 9 / 16.), new Vector3(5 / 16., 12 / 16., 9 / 16.),
-          new Vector3(11 / 16., 12 / 16., 15 / 16.), new Vector4(6 / 16., 0, 10 / 16., 1)),
-
-      // bottom
-      new Quad(new Vector3(5 / 16., 5 / 16., 9 / 16.), new Vector3(11 / 16., 5 / 16., 9 / 16.),
-          new Vector3(5 / 16., 5 / 16., 15 / 16.), new Vector4(0, 6 / 16., 10 / 16., 1)),
+  private static final Quad[] medium = new Quad[]{
+    new Quad(
+      new Vector3(5 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(11 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(5 / 16.0, 12 / 16.0, 9 / 16.0),
+      new Vector4(0 / 16.0, 6 / 16.0, 10 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(5 / 16.0, 5 / 16.0, 9 / 16.0),
+      new Vector3(11 / 16.0, 5 / 16.0, 9 / 16.0),
+      new Vector3(5 / 16.0, 5 / 16.0, 15 / 16.0),
+      new Vector4(0 / 16.0, 6 / 16.0, 10 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(5 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(5 / 16.0, 12 / 16.0, 9 / 16.0),
+      new Vector3(5 / 16.0, 5 / 16.0, 15 / 16.0),
+      new Vector4(15 / 16.0, 9 / 16.0, 12 / 16.0, 5 / 16.0)
+    ),
+    new Quad(
+      new Vector3(11 / 16.0, 12 / 16.0, 9 / 16.0),
+      new Vector3(11 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(11 / 16.0, 5 / 16.0, 9 / 16.0),
+      new Vector4(15 / 16.0, 9 / 16.0, 12 / 16.0, 5 / 16.0)
+    ),
+    new Quad(
+      new Vector3(5 / 16.0, 12 / 16.0, 9 / 16.0),
+      new Vector3(11 / 16.0, 12 / 16.0, 9 / 16.0),
+      new Vector3(5 / 16.0, 5 / 16.0, 9 / 16.0),
+      new Vector4(15 / 16.0, 9 / 16.0, 12 / 16.0, 5 / 16.0)
+    ),
+    new Quad(
+      new Vector3(11 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(5 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(11 / 16.0, 5 / 16.0, 15 / 16.0),
+      new Vector4(15 / 16.0, 9 / 16.0, 12 / 16.0, 5 / 16.0)
+    ),
+    new Quad(
+      new Vector3(8 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(8 / 16.0, 16 / 16.0, 12 / 16.0),
+      new Vector3(8 / 16.0, 12 / 16.0, 16 / 16.0),
+      new Vector4(16 / 16.0, 12 / 16.0, 16 / 16.0, 12 / 16.0)
+    )
   };
   //endregion
 
   //region Small
-  private static final Quad[] small = {
-      // front
-      new Quad(new Vector3(10 / 16., 7 / 16., 11 / 16.), new Vector3(6 / 16., 7 / 16., 11 / 16.),
-          new Vector3(10 / 16., 12 / 16., 11 / 16.),
-          new Vector4(11 / 16., 15 / 16., 7 / 16., 12 / 16.)),
-
-      // back
-      new Quad(new Vector3(6 / 16., 7 / 16., 15 / 16.), new Vector3(10 / 16., 7 / 16., 15 / 16.),
-          new Vector3(6 / 16., 12 / 16., 15 / 16.),
-          new Vector4(15 / 16., 11 / 16., 7 / 16., 12 / 16.)),
-
-      // left
-      new Quad(new Vector3(6 / 16., 7 / 16., 11 / 16.), new Vector3(6 / 16., 7 / 16., 15 / 16.),
-          new Vector3(6 / 16., 12 / 16., 11 / 16.),
-          new Vector4(11 / 16., 15 / 16., 7 / 16., 12 / 16.)),
-
-      // right
-      new Quad(new Vector3(10 / 16., 7 / 16., 15 / 16.), new Vector3(10 / 16., 7 / 16., 11 / 16.),
-          new Vector3(10 / 16., 12 / 16., 15 / 16.),
-          new Vector4(15 / 16., 11 / 16., 7 / 16., 12 / 16.)),
-
-      // top
-      new Quad(new Vector3(10 / 16., 12 / 16., 11 / 16.),
-          new Vector3(6 / 16., 12 / 16., 11 / 16.), new Vector3(10 / 16., 12 / 16., 15 / 16.),
-          new Vector4(4 / 16., 0, 12 / 16., 1)),
-
-      // bottom
-      new Quad(new Vector3(6 / 16., 7 / 16., 11 / 16.), new Vector3(10 / 16., 7 / 16., 11 / 16.),
-          new Vector3(6 / 16., 7 / 16., 15 / 16.), new Vector4(0, 4 / 16., 12 / 16., 1)),
+  private static final Quad[] small = new Quad[]{
+    new Quad(
+      new Vector3(6 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(10 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(6 / 16.0, 12 / 16.0, 11 / 16.0),
+      new Vector4(0 / 16.0, 4 / 16.0, 12 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 7 / 16.0, 11 / 16.0),
+      new Vector3(10 / 16.0, 7 / 16.0, 11 / 16.0),
+      new Vector3(6 / 16.0, 7 / 16.0, 15 / 16.0),
+      new Vector4(0 / 16.0, 4 / 16.0, 12 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(6 / 16.0, 12 / 16.0, 11 / 16.0),
+      new Vector3(6 / 16.0, 7 / 16.0, 15 / 16.0),
+      new Vector4(15 / 16.0, 11 / 16.0, 12 / 16.0, 7 / 16.0)
+    ),
+    new Quad(
+      new Vector3(10 / 16.0, 12 / 16.0, 11 / 16.0),
+      new Vector3(10 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(10 / 16.0, 7 / 16.0, 11 / 16.0),
+      new Vector4(15 / 16.0, 11 / 16.0, 12 / 16.0, 7 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 12 / 16.0, 11 / 16.0),
+      new Vector3(10 / 16.0, 12 / 16.0, 11 / 16.0),
+      new Vector3(6 / 16.0, 7 / 16.0, 11 / 16.0),
+      new Vector4(15 / 16.0, 11 / 16.0, 12 / 16.0, 7 / 16.0)
+    ),
+    new Quad(
+      new Vector3(10 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(6 / 16.0, 12 / 16.0, 15 / 16.0),
+      new Vector3(10 / 16.0, 7 / 16.0, 15 / 16.0),
+      new Vector4(15 / 16.0, 11 / 16.0, 12 / 16.0, 7 / 16.0)
+    ),
+    new Quad(
+      new Vector3(8 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(8 / 16.0, 16 / 16.0, 12 / 16.0),
+      new Vector3(8 / 16.0, 12 / 16.0, 16 / 16.0),
+      new Vector4(16 / 16.0, 12 / 16.0, 16 / 16.0, 12 / 16.0)
+    )
   };
   //endregion
 
   private static final Quad stemNorth = new Quad(
-      new Vector3(.5, 12 / 16., .5), new Vector3(.5, 12 / 16., 1),
-      new Vector3(.5, 1, .5), new Vector4(.5, 1, 12 / 16., 1), true);
+    new Vector3(.5, 12 / 16., .5), new Vector3(.5, 12 / 16., 1),
+    new Vector3(.5, 1, .5), new Vector4(.5, 1, 12 / 16., 1), true);
 
   private static final Quad[][][] fruit = new Quad[3][4][];
   private static final Quad[] stem = new Quad[4];
@@ -157,9 +201,9 @@ public class CocoaPlantModel extends QuadModel {
   private final Texture[] textures;
 
   public CocoaPlantModel(int facing, int age) {
-    quads = new Quad[fruit[age][facing].length+1];
-    System.arraycopy(fruit[age][facing], 0, quads, 0, quads.length-1);
-    quads[quads.length-1] = stem[facing];
+    quads = new Quad[fruit[age][facing].length + 1];
+    System.arraycopy(fruit[age][facing], 0, quads, 0, quads.length - 1);
+    quads[quads.length - 1] = stem[facing];
     textures = new Texture[quads.length];
     Arrays.fill(textures, tex[age]);
   }
