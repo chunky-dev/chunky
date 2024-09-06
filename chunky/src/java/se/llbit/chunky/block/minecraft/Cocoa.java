@@ -46,7 +46,7 @@ public class Cocoa extends AbstractModelBlock {
         facing = 3;
         break;
     }
-    model = System.getProperty("chunky.oldCocoaModel", "false").equals("true")
+    model = System.getProperty("chunky.oldModels.cocoa", "false").equals("true")
       ? new CocoaPlantModel(facing, age)
       : new CocoaPlantModel119(facing, age);
   }
