@@ -14,11 +14,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up JDK 17
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '17'
@@ -42,12 +42,12 @@ jobs:
             ;;
         esac
     - name: Upload build
-      uses: actions/upload-artifact@v2.2.2
+      uses: actions/upload-artifact@v4
       with:
         name: Chunky Build
         path: build/installer
     - name: Upload build
-      uses: actions/upload-artifact@v2.2.2
+      uses: actions/upload-artifact@v4
       with:
         name: Chunky Core
         path: build/chunky-core-*.jar
