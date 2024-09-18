@@ -42,7 +42,7 @@ jobs:
             ;;
         esac
     - name: Upload build
-      uses: actions/upload-artifact@v2.2.2
+      uses: actions/upload-artifact@v4
       with:
         name: Chunky Core
         path: build/chunky-core-*.jar
