@@ -28,7 +28,7 @@ import se.llbit.math.Vector4;
 import java.util.Arrays;
 
 /**
- * Renders the Cocoa Plant
+ * Cocoa Plant model used before Minecraft 1.19 (22w11a).
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
