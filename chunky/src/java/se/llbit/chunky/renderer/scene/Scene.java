@@ -938,7 +938,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
         entities.loadEntitiesInChunk(this, chunkData);
 
-        int yCubeMin = yMin / 16;
+        int yCubeMin = Math.floorDiv(yMin, 16); // round towards -infinity
         int yCubeMax = (yMax+15) / 16;
         for(int yCube = yCubeMin; yCube < yCubeMax; ++yCube) {
           // Reset the cubes
