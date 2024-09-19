@@ -1443,18 +1443,23 @@ public class Scene implements JsonSerializable, Refreshable {
     zmin *= 16;
     zmax *= 16;
 
-    int maxDimension = Math.max(yMax - yMin, Math.max(xmax - xmin, zmax - zmin));
-    int requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
-
+    int requiredDepth;
     if(centerOctree) {
+      int maxDimension = Math.max(yMax - yMin, Math.max(xmax - xmin, zmax - zmin));
+      requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
+
       int xroom = (1 << requiredDepth) - (xmax - xmin);
       int yroom = (1 << requiredDepth) - (yMax - yMin);
       int zroom = (1 << requiredDepth) - (zmax - zmin);
 
       origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
     } else {
-      // Note: Math.floorDiv rather than integer division for round toward -infinity
-      origin.set(xmin, Math.floorDiv(yMin, 16) * 16, zmin);
+      int yMin16 = yMin & ~0xf; // closest multiple of 16 below yMin
+
+      int maxDimension = Math.max(yMax - yMin16, Math.max(xmax - xmin, zmax - zmin));
+      requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
+
+      origin.set(xmin, yMin16, zmin);
     }
     return requiredDepth;
   }
