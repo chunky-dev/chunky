@@ -76,6 +76,8 @@ import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import static se.llbit.math.QuickMath.prevMul16;
+
 /**
  * Encapsulates scene and render state.
  *
@@ -1454,7 +1456,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
     } else {
-      int yMin16 = yMin & ~0xf; // closest multiple of 16 below yMin
+      int yMin16 = prevMul16(yMin); // closest multiple of 16 below yMin
 
       int maxDimension = Math.max(yMax - yMin16, Math.max(xmax - xmin, zmax - zmin));
       requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
