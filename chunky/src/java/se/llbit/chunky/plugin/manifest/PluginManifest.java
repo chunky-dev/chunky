@@ -27,6 +27,16 @@ public class PluginManifest {
   public final String main;
   private final Set<PluginDependency> dependencies;
 
+  /**
+   * @param pluginJar Location of a valid plugin .jar file
+   * @param name The name of the plugin
+   * @param author The author of the plugin
+   * @param description The description of the plugin
+   * @param version The version of the plugin
+   * @param targetVersion The target chunky version range of the plugin
+   * @param main The main class of the plugin within its .jar
+   * @param dependencies The required dependencies of the plugin
+   */
   public PluginManifest(File pluginJar, String name, String author, String description, ArtifactVersion version,
                         VersionRange targetVersion, String main, Set<PluginDependency> dependencies) {
     this.pluginJar = pluginJar;
@@ -94,14 +104,14 @@ public class PluginManifest {
       }
     }
 
-      VersionRange targetVersionRange;
-      try {
-          targetVersionRange = VersionRange.createFromVersionSpec(targetVersion);
-      } catch (InvalidVersionSpecificationException e) {
-          Log.error(String.format("Failed to parse plugin %s targetVersion %s into version range.", name, targetVersion), e);
-          targetVersionRange = VersionRange.createFromVersion(targetVersion);
-      }
-      return Optional.of(new PluginManifest(pluginJar, name, author, description, new DefaultArtifactVersion(version), targetVersionRange, main, dependencies));
+    VersionRange targetVersionRange;
+    try {
+        targetVersionRange = VersionRange.createFromVersionSpec(targetVersion);
+    } catch (InvalidVersionSpecificationException e) {
+        Log.error(String.format("Failed to parse plugin %s targetVersion %s into version range.", name, targetVersion), e);
+        targetVersionRange = VersionRange.createFromVersion(targetVersion);
+    }
+    return Optional.of(new PluginManifest(pluginJar, name, author, description, new DefaultArtifactVersion(version), targetVersionRange, main, dependencies));
   }
 
   public Set<PluginDependency> getDependencies() {

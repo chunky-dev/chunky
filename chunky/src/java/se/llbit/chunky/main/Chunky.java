@@ -24,8 +24,8 @@ import se.llbit.chunky.block.MinecraftBlockProvider;
 import se.llbit.chunky.block.legacy.LegacyMinecraftBlockProvider;
 import se.llbit.chunky.main.CommandLineOptions.Mode;
 import se.llbit.chunky.plugin.*;
-import se.llbit.chunky.plugin.loader.ChunkyPluginLoader;
-import se.llbit.chunky.plugin.loader.PluginLoader;
+import se.llbit.chunky.plugin.loader.PluginManager;
+import se.llbit.chunky.plugin.loader.JarPluginLoader;
 import se.llbit.chunky.plugin.manifest.PluginManifest;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.RenderManager;
@@ -264,19 +264,19 @@ public class Chunky {
     Path pluginsPath = pluginsDirectory.toPath();
     JsonArray plugins = PersistentSettings.getPlugins();
     // TODO: allow plugins to implement a custom plugin loader.
-    PluginLoader pluginLoader = new ChunkyPluginLoader();
+    PluginManager pluginManager = new PluginManager(new JarPluginLoader());
 
     // Parse plugin manifests
     Set<PluginManifest> pluginManifests = plugins.elements.stream()
       .map(value -> value.asString(""))
       .filter(jarName -> !jarName.isEmpty())
       .map(jarName -> pluginsPath.resolve(jarName).toAbsolutePath().toFile())
-      .map(ChunkyPluginLoader::parsePluginManifest)
+      .map(PluginManager::parsePluginManifest)
       .flatMap(o -> o.map(Stream::of).orElseGet(Stream::empty)) // replace with Optional::stream in java9+
       .collect(Collectors.toSet());
 
     // Load plugins
-    pluginLoader.load(pluginManifests, (plugin, manifest) -> {
+    pluginManager.load(pluginManifests, (plugin, manifest) -> {
       String jarName = manifest.pluginJar.getName();
       Log.infof("Loading plugin: %s", jarName);
       CreditsController.addPlugin(manifest.name, manifest.version.toString(), manifest.author, manifest.description);

@@ -17,7 +17,6 @@
 package se.llbit.chunky.plugin.loader;
 
 import se.llbit.chunky.Plugin;
-import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.plugin.manifest.PluginDependency;
 import se.llbit.chunky.plugin.manifest.PluginManifest;
 import se.llbit.json.JsonParser;
@@ -26,11 +25,7 @@ import se.llbit.log.Log;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -39,14 +34,15 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-/**
- * Chunky's default plugin loader.
- */
-@PluginApi
-public class ChunkyPluginLoader implements PluginLoader {
-  private static final int MAX_CYCLES = 100;
+public class PluginManager {
+  private static final int MAX_CYCLES = Integer.parseInt(System.getProperty("chunky.plugins.maxLoadCycles", "100"));
 
-  @Override
+  private final PluginLoader pluginLoader;
+
+  public PluginManager(PluginLoader pluginLoader) {
+    this.pluginLoader = pluginLoader;
+  }
+
   public void load(Set<PluginManifest> pluginManifests, BiConsumer<Plugin, PluginManifest> onLoad) {
     // create plugin objects
     Map<String, List<ResolvedPlugin>> pluginsByName = new HashMap<>();
@@ -69,6 +65,8 @@ public class ChunkyPluginLoader implements PluginLoader {
     pluginsToLoad.forEach(plugin -> plugin.resolveDependencies(pluginsByName));
 
     // load plugins in dependency-first order, cyclic dependencies will never be loaded and will hit MAX_CYCLES cap.
+    // this was so trivial to implement using cycles that I decided against any kind of dependency tree structure,
+    // in the worst case this approach requires one cycle per plugin (if every plugin depended on the previous one in the list).
     Set<ResolvedPlugin> loadedPlugins = new HashSet<>();
     int loadCycles = 0;
     while (!pluginsToLoad.isEmpty() && loadCycles < MAX_CYCLES) {
@@ -83,7 +81,7 @@ public class ChunkyPluginLoader implements PluginLoader {
             plugin.getManifest().getDependencies().stream().map(PluginDependency::toString).collect(Collectors.joining(", ")),
             plugin.getDependencies().stream().map(ResolvedPlugin::toString).collect(Collectors.joining(", "))
           );
-          loadPlugin(onLoad, plugin.getManifest());
+          pluginLoader.load(onLoad, plugin.getManifest());
         }
       });
     }
@@ -96,39 +94,6 @@ public class ChunkyPluginLoader implements PluginLoader {
         pluginsToLoad.stream().map(ResolvedPlugin::toString).collect(Collectors.joining(", "))
       );
     }
-  }
-
-  /**
-   * Load the plugin specified in the manifest
-   * @param onLoad The consumer to call with the loaded plugin
-   * @param pluginManifest The plugin to load.
-   */
-  private void loadPlugin(BiConsumer<Plugin, PluginManifest> onLoad, PluginManifest pluginManifest) {
-    try {
-      Class<?> pluginClass = loadPluginClass(pluginManifest.main, pluginManifest.pluginJar);
-      Plugin plugin = (Plugin) pluginClass.getDeclaredConstructor().newInstance();
-      onLoad.accept(plugin, pluginManifest);
-    } catch (IOException e) {
-      Log.error("Could not load the plugin", e);
-    } catch (ClassCastException e) {
-      Log.error("Plugin main class has wrong type", e);
-    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException e) {
-      Log.error("Could not create plugin instance", e);
-    }
-  }
-
-  /**
-   * This method is {@link PluginApi} to allow plugins to override only classloading functionality of the plugin loader.
-   *
-   * @param pluginMainClass The plugin's main class to load.
-   * @param pluginJarFile The jar file to load classes from.
-   * @return The loaded plugin's main class
-   * @throws ClassNotFoundException If the main class doesn't exist
-   * @throws MalformedURLException If the jar file cannot be converted to a URL
-   */
-  @PluginApi
-  protected Class<?> loadPluginClass(String pluginMainClass, File pluginJarFile) throws ClassNotFoundException, MalformedURLException {
-    return new URLClassLoader(new URL[] { pluginJarFile.toURI().toURL() }).loadClass(pluginMainClass);
   }
 
   /**
