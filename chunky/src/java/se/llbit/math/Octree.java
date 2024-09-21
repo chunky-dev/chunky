@@ -774,9 +774,9 @@ public class Octree {
 
     int cubeSize = 1 << cubeDepth;
     int octreeSize = 1 << implementation.getDepth();
-    assert x + cubeSize < octreeSize : "setCube x (" + x + "," + (x + cubeSize) + ") out of bounds for octree (0," + (octreeSize - 1) + ")";
-    assert y + cubeSize < octreeSize : "setCube y (" + y + "," + (y + cubeSize) + ") out of bounds for octree (0," + (octreeSize - 1) + ")";
-    assert z + cubeSize < octreeSize : "setCube z (" + z + "," + (z + cubeSize) + ") out of bounds for octree (0," + (octreeSize - 1) + ")";
+    assert x + cubeSize <= octreeSize : "setCube x (" + x + "," + (x + cubeSize) + ") out of bounds for octree (0," + (octreeSize - 1) + ")";
+    assert y + cubeSize <= octreeSize : "setCube y (" + y + "," + (y + cubeSize) + ") out of bounds for octree (0," + (octreeSize - 1) + ")";
+    assert z + cubeSize <= octreeSize : "setCube z (" + z + "," + (z + cubeSize) + ") out of bounds for octree (0," + (octreeSize - 1) + ")";
     int blocksInCube = cubeSize * cubeSize * cubeSize;
     assert types.length == blocksInCube : "setCube types has length " + types.length + " expected " + blocksInCube;
 

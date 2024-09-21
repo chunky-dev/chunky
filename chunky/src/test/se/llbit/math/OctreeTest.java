@@ -23,12 +23,12 @@ public class OctreeTest {
       }
     }
 
-    assertThrowsWithExpectedMessage(AssertionError.class, () -> octree.setCube(cubeDepth, types, 24, 0, 0),
-      "setCube x (24,32) out of bounds for octree (0,31)");
-    assertThrowsWithExpectedMessage(AssertionError.class, () -> octree.setCube(cubeDepth, types, 0, 24, 0),
-      "setCube y (24,32) out of bounds for octree (0,31)");
-    assertThrowsWithExpectedMessage(AssertionError.class, () -> octree.setCube(cubeDepth, types, 0, 0, 24),
-      "setCube z (24,32) out of bounds for octree (0,31)");
+    assertThrowsWithExpectedMessage(AssertionError.class, () -> octree.setCube(cubeDepth, types, 25, 0, 0),
+      "setCube x (25,33) out of bounds for octree (0,31)");
+    assertThrowsWithExpectedMessage(AssertionError.class, () -> octree.setCube(cubeDepth, types, 0, 25, 0),
+      "setCube y (25,33) out of bounds for octree (0,31)");
+    assertThrowsWithExpectedMessage(AssertionError.class, () -> octree.setCube(cubeDepth, types, 0, 0, 25),
+      "setCube z (25,33) out of bounds for octree (0,31)");
     assertThrowsWithExpectedMessage(AssertionError.class, () -> octree.setCube(cubeDepth, types, 64, 13, 23),
       "setCube x (64,72) out of bounds for octree (0,31)");
 
