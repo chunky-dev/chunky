@@ -1446,7 +1446,7 @@ public class Scene implements JsonSerializable, Refreshable {
     zmax *= 16;
 
     int requiredDepth;
-    if(centerOctree) {
+    if(centerOctree) { // legacy codepath (for octree data version 5 and below).
       int maxDimension = Math.max(yMax - yMin, Math.max(xmax - xmin, zmax - zmin));
       requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
 
@@ -1456,7 +1456,11 @@ public class Scene implements JsonSerializable, Refreshable {
 
       origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
     } else {
-      int yMin16 = prevMul16(yMin); // closest multiple of 16 below yMin
+      // The yMin of the octree is being rounded down to the nearest multiple of 16 in an effort to increase the
+      // performance of Octree#setCube by keeping octree nodes aligned to ChunkSections within a chunk.
+      // This does result in slightly larger octrees (up to 15 blocks taller) than required in scenes where the
+      // loaded area is taller than it is wide.
+      int yMin16 = prevMul16(yMin);
 
       int maxDimension = Math.max(yMax - yMin16, Math.max(xmax - xmin, zmax - zmin));
       requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
