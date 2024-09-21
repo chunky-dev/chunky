@@ -83,6 +83,7 @@ import se.llbit.chunky.world.World;
 import se.llbit.fx.ToolPane;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.fxutil.GroupedChangeListener;
+import se.llbit.log.ConsoleReceiver;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
 import se.llbit.math.Vector3;
@@ -453,6 +454,7 @@ public class ChunkyFxController
       }
     });
 
+    Log.setReceiver(ConsoleReceiver.INSTANCE, Level.INFO);
     Log.setReceiver(new UILogReceiver(), Level.ERROR, Level.WARNING);
 
     mapLoader = new WorldMapLoader(this, mapView);
