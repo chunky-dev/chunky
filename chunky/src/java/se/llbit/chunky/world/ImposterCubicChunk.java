@@ -67,7 +67,7 @@ public class ImposterCubicChunk extends Chunk {
     }
 
     surfaceTimestamp = dataTimestamp;
-    mutableChunkData.set(this.dimension.createChunkData(mutableChunkData.get(), 0)); //chunk version ignored for cubic worlds
+    mutableChunkData.set(this.dimension.createChunkData(mutableChunkData.get(), Integer.MIN_VALUE, Integer.MAX_VALUE));
     ChunkData chunkData = mutableChunkData.get();
     loadSurfaceCubic(data, chunkData, yMin, yMax);
     biomes = IconLayer.UNKNOWN;
@@ -170,7 +170,7 @@ public class ImposterCubicChunk extends Chunk {
     request.add(LEVEL_TILEENTITIES);
     Map<Integer, Map<String, Tag>> data = getCubeTags(request);
     if(reuseChunkData.get() == null || reuseChunkData.get() instanceof EmptyChunkData) {
-      reuseChunkData.set(dimension.createChunkData(reuseChunkData.get(), 0));
+      reuseChunkData.set(dimension.createChunkData(reuseChunkData.get(), Integer.MIN_VALUE, Integer.MAX_VALUE));
     } else {
       reuseChunkData.get().clear();
     }
