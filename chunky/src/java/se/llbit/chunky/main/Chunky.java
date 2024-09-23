@@ -272,7 +272,7 @@ public class Chunky {
       .filter(jarName -> !jarName.isEmpty())
       .map(jarName -> pluginsPath.resolve(jarName).toAbsolutePath().toFile())
       .map(PluginManager::parsePluginManifest)
-      .flatMap(o -> o.map(Stream::of).orElseGet(Stream::empty)) // replace with Optional::stream in java9+
+      .flatMap(Optional::stream)
       .collect(Collectors.toSet());
 
     // Load plugins

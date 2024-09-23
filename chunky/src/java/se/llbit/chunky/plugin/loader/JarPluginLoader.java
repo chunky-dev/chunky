@@ -23,7 +23,7 @@ public class JarPluginLoader implements PluginLoader {
     } catch (IOException | ClassNotFoundException e) {
       Log.error("Could not load the plugin", e);
     } catch (ClassCastException e) {
-      Log.error("Plugin main class has wrong type", e);
+      Log.error("Plugin main class has wrong type (must implement se.llbit.chunky.Plugin)", e);
     } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
       Log.error("Could not create plugin instance", e);
     }
