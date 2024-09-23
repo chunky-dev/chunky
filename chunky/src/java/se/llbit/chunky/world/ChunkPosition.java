@@ -51,21 +51,11 @@ public class ChunkPosition {
     return String.format("r.%d.%d.mca", x, z);
   }
 
-  public RegionPosition asRegionPosition() {
-    return new RegionPosition(x >> 5, z >> 5);
-  }
-
   /**
    * @return The region position of this chunk position
-   *
-   * @deprecated Use {@link ChunkPosition#asRegionPosition()}. Remove in 2.6
    */
-  public ChunkPosition getRegionPosition() {
-    return new ChunkPosition(x >> 5, z >> 5);
-  }
-
-  public ChunkPosition chunkPositionFromRegion(int localX, int localZ) {
-    return new ChunkPosition((this.x << 5) | (localX & 0x1f), (this.z << 5) | (localZ & 0x1f));
+  public RegionPosition getRegionPosition() {
+    return new RegionPosition(x >> 5, z >> 5);
   }
 
   /**
@@ -106,14 +96,6 @@ public class ChunkPosition {
   @Override
   public int hashCode() {
     return 31 * x + z;
-  }
-
-  /**
-   * @deprecated Use {@link ChunkPosition#asRegionPosition()}. Remove in 2.6.
-   */
-  @Deprecated
-  public ChunkPosition regionPosition() {
-    return getRegionPosition();
   }
 
   /**

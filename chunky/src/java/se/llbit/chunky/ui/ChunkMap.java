@@ -216,7 +216,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       mapBuffer.drawTile(mapLoader, chunk, chunkSelection);
       repaintRatelimited();
     } else {
-      regionUpdated(chunk.asRegionPosition());
+      regionUpdated(chunk.getRegionPosition());
     }
   }
 

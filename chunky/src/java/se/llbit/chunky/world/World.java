@@ -298,7 +298,7 @@ public class World implements Comparable<World> {
     Map<RegionPosition, Set<ChunkPosition>> regionMap = new HashMap<>();
 
     for (ChunkPosition chunk : chunks) {
-      RegionPosition regionPosition = chunk.asRegionPosition();
+      RegionPosition regionPosition = chunk.getRegionPosition();
       Set<ChunkPosition> chunkSet = regionMap.computeIfAbsent(regionPosition, k -> new HashSet<>());
       chunkSet.add(new ChunkPosition(chunk.x & 31, chunk.z & 31));
     }

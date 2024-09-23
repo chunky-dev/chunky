@@ -116,7 +116,7 @@ public class Chunk {
    * @return loaded data, or null if something went wrong
    */
   private Map<String, Tag> getChunkTags(Set<String> request) throws ChunkLoadingException {
-    MCRegion region = (MCRegion) dimension.getRegion(position.asRegionPosition());
+    MCRegion region = (MCRegion) dimension.getRegion(position.getRegionPosition());
     Mutable<Integer> timestamp = new Mutable<>(dataTimestamp);
     Map<String, Tag> chunkTags = region.getChunkTags(this.position, request, timestamp);
     this.dataTimestamp = timestamp.get();
@@ -128,7 +128,7 @@ public class Chunk {
    * @return loaded data, or null if something went wrong
    */
   private Map<String, Tag> getEntityTags(Set<String> request) throws ChunkLoadingException {
-    MCRegion region = (MCRegion) dimension.getRegion(position.asRegionPosition());
+    MCRegion region = (MCRegion) dimension.getRegion(position.getRegionPosition());
     return region.getEntityTags(this.position, request);
   }
 
@@ -375,7 +375,7 @@ public class Chunk {
     if (timestamp == 0) {
       return true;
     }
-    Region region = dimension.getRegion(position.asRegionPosition());
+    Region region = dimension.getRegion(position.getRegionPosition());
     return region.chunkChangedSince(position, timestamp);
   }
 

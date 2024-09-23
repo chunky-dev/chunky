@@ -78,7 +78,7 @@ public class MapTile {
         for (int x = 0; x < 32; ++x) {
           Chunk chunk = region.getChunk(x, z);
           //Calculate the chunk position as empty chunks are (0, 0)
-          ChunkPosition pos = region.getPosition().chunkPositionFromRegion(x, z);
+          ChunkPosition pos = region.getPosition().asChunkPosition(x, z);
 
           pixels[pixelOffset] = chunk.biomeColor();
           if (isValid && !(chunk instanceof EmptyRegionChunk) && selection.isSelected(pos)) {

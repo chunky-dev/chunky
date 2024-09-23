@@ -235,7 +235,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
    */
   public synchronized void toggleRegion(Dimension dimension, int cx, int cz) {
     ChunkPosition chunk = new ChunkPosition(cx, cz);
-    setRegion(dimension, chunk.asRegionPosition(), !isChunkSelected(chunk));
+    setRegion(dimension, chunk.getRegionPosition(), !isChunkSelected(chunk));
     notifyChunkSelectionChange();
   }
 

@@ -814,7 +814,7 @@ public class Scene implements JsonSerializable, Refreshable {
       // Parse the regions first - force chunk lists to be populated!
       Set<RegionPosition> regions = new HashSet<>();
       for (ChunkPosition cp : chunksToLoad) {
-        regions.add(cp.asRegionPosition());
+        regions.add(cp.getRegionPosition());
       }
 
       for (RegionPosition region : regions) {

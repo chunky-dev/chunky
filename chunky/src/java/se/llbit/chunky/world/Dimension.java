@@ -93,7 +93,7 @@ public class Dimension {
    * @return The chunk at the given position
    */
   public synchronized Chunk getChunk(ChunkPosition pos) {
-    return getRegion(pos.asRegionPosition()).getChunk(pos);
+    return getRegion(pos.getRegionPosition()).getChunk(pos);
   }
 
   /**
