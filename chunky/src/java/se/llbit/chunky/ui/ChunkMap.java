@@ -46,14 +46,8 @@ import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.ui.dialogs.SelectChunksInRadiusDialog;
 import se.llbit.chunky.ui.elements.TextFieldLabelWrapper;
-import se.llbit.chunky.world.Chunk;
-import se.llbit.chunky.world.ChunkPosition;
-import se.llbit.chunky.world.ChunkSelectionTracker;
-import se.llbit.chunky.world.ChunkView;
+import se.llbit.chunky.world.*;
 import se.llbit.chunky.world.Dimension;
-import se.llbit.chunky.world.Icon;
-import se.llbit.chunky.world.PlayerEntityData;
-import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.log.Log;
@@ -226,7 +220,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     }
   }
 
-  @Override public void regionChunksUpdated(ChunkPosition region) {
+  @Override public void regionChunksUpdated(RegionPosition region) {
     if (view.chunkScale >= 16) {
       int minChunkX = region.x << 5;
       int minChunkZ = region.z << 5;
@@ -241,7 +235,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     }
   }
 
-  @Override public void regionChunksUpdated(ChunkPosition region, Collection<ChunkPosition> chunks) {
+  @Override public void regionChunksUpdated(RegionPosition region, Collection<ChunkPosition> chunks) {
     if (view.chunkScale >= 16) {
       for (ChunkPosition chunk : chunks) {
         mapBuffer.drawTile(mapLoader, chunk, chunkSelection);
@@ -403,9 +397,10 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     }
   }
 
-  @Override public void regionUpdated(ChunkPosition region) {
+  @Override public void regionUpdated(RegionPosition region) {
     if (view.scale < 16) {
-      mapBuffer.drawTile(mapLoader, region, chunkSelection);
+      // intentionally don't convert, positions are all stored as ChunkPosition internally.
+      mapBuffer.drawTile(mapLoader, new ChunkPosition(region.x, region.z), chunkSelection);
       mapLoader.regionUpdated(region);
       repaintRatelimited();
     }

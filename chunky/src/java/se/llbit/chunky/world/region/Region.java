@@ -3,6 +3,7 @@ package se.llbit.chunky.world.region;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.RegionPosition;
 
 public interface Region extends Iterable<Chunk> {
   /**
@@ -37,7 +38,7 @@ public interface Region extends Iterable<Chunk> {
     return false;
   }
 
-  ChunkPosition getPosition();
+  RegionPosition getPosition();
 
   boolean hasChanged();
 
