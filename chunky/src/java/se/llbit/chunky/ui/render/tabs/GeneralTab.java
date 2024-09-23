@@ -195,6 +195,12 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     canvasSizeInput.setSize(scene.canvasConfig.getCropWidth(), scene.canvasConfig.getCropHeight());
   }
 
+  @Override
+  public void onChunksLoaded() {
+    yMin.set(scene.getYClipMin());
+    yMax.set(scene.getYClipMax());
+  }
+
   @Override public String getTabTitle() {
     return "Scene";
   }
