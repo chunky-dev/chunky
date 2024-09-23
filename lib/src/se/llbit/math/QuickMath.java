@@ -175,4 +175,18 @@ public class QuickMath {
     }
     return a;
   }
+
+  /**
+   * Previous multiple of 16 of val (Or given value, if a multiple of 16). Respects negative numbers.
+   * <h4>Examples:</h4>
+   * <ul>
+   * <li>1 returns 0</li>
+   * <li>34 returns 32</li>
+   * <li>16 returns 16</li>
+   * <li>-1 returns -16</li>
+   * </ul>
+   */
+  public static int prevMul16(int val) {
+    return val & ~0xf;
+  }
 }

@@ -76,6 +76,8 @@ import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import static se.llbit.math.QuickMath.prevMul16;
+
 /**
  * Encapsulates scene and render state.
  *
@@ -1443,18 +1445,27 @@ public class Scene implements JsonSerializable, Refreshable {
     zmin *= 16;
     zmax *= 16;
 
-    int maxDimension = Math.max(yMax - yMin, Math.max(xmax - xmin, zmax - zmin));
-    int requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
+    int requiredDepth;
+    if(centerOctree) { // legacy codepath (for octree data version 5 and below).
+      int maxDimension = Math.max(yMax - yMin, Math.max(xmax - xmin, zmax - zmin));
+      requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
 
-    if(centerOctree) {
       int xroom = (1 << requiredDepth) - (xmax - xmin);
       int yroom = (1 << requiredDepth) - (yMax - yMin);
       int zroom = (1 << requiredDepth) - (zmax - zmin);
 
       origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
     } else {
-      // Note: Math.floorDiv rather than integer division for round toward -infinity
-      origin.set(xmin, Math.floorDiv(yMin, 16) * 16, zmin);
+      // The yMin of the octree is being rounded down to the nearest multiple of 16 in an effort to increase the
+      // performance of Octree#setCube by keeping octree nodes aligned to ChunkSections within a chunk.
+      // This does result in slightly larger octrees (up to 15 blocks taller) than required in scenes where the
+      // loaded area is taller than it is wide.
+      int yMin16 = prevMul16(yMin);
+
+      int maxDimension = Math.max(yMax - yMin16, Math.max(xmax - xmin, zmax - zmin));
+      requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
+
+      origin.set(xmin, yMin16, zmin);
     }
     return requiredDepth;
   }

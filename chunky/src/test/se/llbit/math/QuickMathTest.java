@@ -79,4 +79,16 @@ public class QuickMathTest {
     assertEquals(0.0, QuickMath.abs(0.0));
     //assertEquals(0.0, QuickMath.abs(-0.0)); This actually fails... might want to fix // TODO: abs(-0) returns -0
 	}
+
+  @Test
+  public void testPreviousMultipleOf16() {
+    assertEquals(-1293856, QuickMath.prevMul16(-1293856));
+    assertEquals(12395856, QuickMath.prevMul16(12395867));
+    assertEquals(16, QuickMath.prevMul16(16));
+    assertEquals(32, QuickMath.prevMul16(32));
+    assertEquals(64, QuickMath.prevMul16(64));
+    assertEquals(0, QuickMath.prevMul16(6));
+    assertEquals(-16, QuickMath.prevMul16(-1));
+    assertEquals(-128, QuickMath.prevMul16(-123));
+  }
 }
