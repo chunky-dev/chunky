@@ -71,7 +71,7 @@ public class RenderDumpTest {
       final Map<String, Integer> previousProgress = new HashMap<>();
 
       @Override
-      public void setProgress(String task, int done, int start, int target, Duration duration) {
+      public void setProgress(String task, int done, int start, int target, Duration elapsedTime) {
         int previous = previousProgress.getOrDefault(task, Integer.MIN_VALUE);
         // check that progress is monotonically increasing
         assertTrue(done >= previous, "progress (" + done + ") should be greater or equal to previous progress (" + previous + ")");

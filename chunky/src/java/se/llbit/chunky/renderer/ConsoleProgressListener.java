@@ -36,17 +36,17 @@ public class ConsoleProgressListener implements ProgressListener {
     decimalFormat.setGroupingUsed(true);
   }
 
-  @Override public void setProgress(String task, int done, int start, int target, Duration duration) {
+  @Override public void setProgress(String task, int done, int start, int target, Duration elapsedTime) {
     String line = String.format("%s: %.1f%% (%s of %s)", task, 100 * done / (float) target,
         decimalFormat.format(done), decimalFormat.format(target));
     output(line, done == target);
   }
 
-  @Override public void setProgress(String task, int done, int start, int target, Duration duration, Duration eta) {
+  @Override public void setProgress(String task, int done, int start, int target, Duration elapsedTime, Duration remainingTime) {
     output(String.format("%s: %.1f%% (%s of %s) [ETA=%s]",
         task, 100 * done / (float) target,
         decimalFormat.format(done), decimalFormat.format(target),
-        String.format("%d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart())),
+        String.format("%d:%02d:%02d", remainingTime.toHours(), remainingTime.toMinutesPart(), remainingTime.toSecondsPart())),
         done == target);
   }
 

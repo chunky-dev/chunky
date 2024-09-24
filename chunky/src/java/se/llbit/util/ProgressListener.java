@@ -30,12 +30,12 @@ public interface ProgressListener {
   /**
    * Update progress without ETA.
    */
-  void setProgress(String task, int done, int start, int target, Duration duration);
+  void setProgress(String task, int done, int start, int target, Duration elapsedTime);
 
   /**
    * Update progress with ETA.
    */
-  default void setProgress(String task, int done, int start, int target, Duration duration, Duration eta) {
-    setProgress(task, done, start, target, duration);
+  default void setProgress(String task, int done, int start, int target, Duration elapsedTime, Duration remainingTime) {
+    setProgress(task, done, start, target, elapsedTime);
   }
 }

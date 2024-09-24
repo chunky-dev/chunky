@@ -159,7 +159,7 @@ public class ChunkyFxController
   }
 
   private final ProgressListener progressListener = new ProgressListener() {
-    @Override public void setProgress(String task, int done, int start, int target, Duration duration) {
+    @Override public void setProgress(String task, int done, int start, int target, Duration elapsedTime) {
       Platform.runLater(() -> {
         progressBar.setProgress((double) done / (target - start));
         if (target - start > 0) {
@@ -170,11 +170,11 @@ public class ChunkyFxController
           progressLbl.setTooltip(null);
         }
         etaLbl.setText("ETA: N/A");
-        renderTimeLbl.setText(String.format("Time: %d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart()));
+        renderTimeLbl.setText(String.format("Time: %d:%02d:%02d", elapsedTime.toHours(), elapsedTime.toMinutesPart(), elapsedTime.toSecondsPart()));
       });
     }
 
-    @Override public void setProgress(String task, int done, int start, int target, Duration duration, Duration eta) {
+    @Override public void setProgress(String task, int done, int start, int target, Duration elapsedTime, Duration remainingTime) {
       Platform.runLater(() -> {
         progressBar.setProgress((double) done / (target - start));
         if (target - start > 0) {
@@ -184,8 +184,8 @@ public class ChunkyFxController
           progressLbl.setText(String.format("%s", task));
           progressLbl.setTooltip(null);
         }
-        etaLbl.setText(String.format("ETA: %d:%02d:%02d", eta.toHours(), eta.toMinutesPart(), eta.toSecondsPart()));
-        renderTimeLbl.setText(String.format("Time: %d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart()));
+        etaLbl.setText(String.format("ETA: %d:%02d:%02d", remainingTime.toHours(), remainingTime.toMinutesPart(), remainingTime.toSecondsPart()));
+        renderTimeLbl.setText(String.format("Time: %d:%02d:%02d", elapsedTime.toHours(), elapsedTime.toMinutesPart(), elapsedTime.toSecondsPart()));
       });
     }
   };
