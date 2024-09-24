@@ -63,6 +63,10 @@ public class CreditsController implements Initializable {
   @FXML
   private Hyperlink fastMathLicense;
   @FXML
+  private Hyperlink mavenArtifact;
+  @FXML
+  private Hyperlink mavenArtifactLicense;
+  @FXML
   private Hyperlink fastutil;
   @FXML
   private Hyperlink fastutilLicense;
@@ -160,6 +164,13 @@ public class CreditsController implements Initializable {
         e -> launchAndReset(fastMath, "https://commons.apache.org/proper/commons-math/"));
     fastMathLicense.setBorder(Border.EMPTY);
     fastMathLicense.setOnAction(
+        e -> launchAndReset(fastMathLicense, "http://www.apache.org/licenses/LICENSE-2.0"));
+
+    mavenArtifact.setBorder(Border.EMPTY);
+    mavenArtifact.setOnAction(
+        e -> launchAndReset(fastMath, "https://maven.apache.org/ref/3.9.9/maven-artifact/"));
+    mavenArtifactLicense.setBorder(Border.EMPTY);
+    mavenArtifactLicense.setOnAction(
         e -> launchAndReset(fastMathLicense, "http://www.apache.org/licenses/LICENSE-2.0"));
 
     fastutil.setBorder(Border.EMPTY);
