@@ -597,13 +597,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       yMax.setRange(-64, 320);
     } else {
       yMin.setRange(0, 256);
-      if (yMin.get() < 0) {
-        yMin.set(0);
-      }
       yMax.setRange(0, 256);
-      if (yMax.get() > 256) {
-        yMax.set(256);
-      }
     }
   }
 }
