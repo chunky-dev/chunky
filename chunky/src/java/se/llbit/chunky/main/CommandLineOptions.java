@@ -33,7 +33,6 @@ import se.llbit.json.JsonValue;
 import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
 import se.llbit.util.mojangapi.MojangApi;
-import se.llbit.util.StringUtil;
 import se.llbit.util.TaskTracker;
 
 import java.io.ByteArrayInputStream;
@@ -86,7 +85,7 @@ public class CommandLineOptions {
   /**
    * This is the usage output generated for the --help flag.
    */
-  private static final String USAGE = StringUtil
+  private static final String USAGE = String
       .join("\n", "Usage: mapLoader [OPTIONS] [WORLD DIRECTORY]", "Options:",
           "  -texture <FILE>        use FILE as the texture pack (must be a Zip file)",
           "  -textures <FILES>      use FILES as the texture packs (must be Zip files), ",
