@@ -20,6 +20,9 @@ package se.llbit.util;
 
 import se.llbit.log.Log;
 
+import java.time.Duration;
+import java.util.Optional;
+
 /**
  * A task tracker is used to update a progress listener with current task progress.
  * The task tracker has a stack of tasks. When a new task is created the previous
@@ -57,7 +60,7 @@ public class TaskTracker {
   }
 
   public TaskTracker(ProgressListener progress, TaskBuilder taskBuilder,
-      TaskBuilder backgroundTaskBuilder) {
+                     TaskBuilder backgroundTaskBuilder) {
     this.progress = progress;
     this.taskBuilder = taskBuilder;
     this.backgroundTask = backgroundTaskBuilder.newTask(this, null, "N/A", 1);
@@ -66,9 +69,17 @@ public class TaskTracker {
 
   public static class Task implements AutoCloseable {
     public static final Task NONE = new Task(null, null, "None", 1) {
-      @Override protected void update() { }
-      @Override protected void updateEta() { }
-      @Override public void close() { }
+      @Override
+      protected void update() {
+      }
+
+      @Override
+      protected void updateEta() {
+      }
+
+      @Override
+      public void close() {
+      }
     };
 
     private String taskName;
@@ -76,7 +87,7 @@ public class TaskTracker {
     private int done;
     protected final TaskTracker tracker;
     protected final Task previous;
-    private String eta = "";
+    private Optional<Duration> eta = Optional.empty();
     protected long startTime;
 
     public Task(TaskTracker tracker, Task previous, String taskName, int size) {
@@ -88,7 +99,8 @@ public class TaskTracker {
       this.startTime = System.currentTimeMillis();
     }
 
-    @Override public void close() {
+    @Override
+    public void close() {
       tracker.currentTask = previous;
       previous.update();
       Log.infof("Task %s: %d in %.3f seconds", taskName, done,
@@ -96,77 +108,92 @@ public class TaskTracker {
     }
 
     protected void update() {
-      tracker.updateProgress(taskName, target, done, eta);
+      eta.ifPresentOrElse(
+        eta -> tracker.updateProgress(taskName, target, done, Duration.ofMillis(System.currentTimeMillis() - startTime), eta),
+        () -> tracker.updateProgress(taskName, target, done, Duration.ofMillis(System.currentTimeMillis() - startTime)));
     }
 
-    /** Change the task name. */
+    /**
+     * Change the task name.
+     */
     public void update(String task) {
       this.taskName = task;
       update();
     }
 
-    /** Set the current progress. */
+    /**
+     * Set the current progress.
+     */
     public void update(int done) {
       this.done = done;
       update();
     }
 
-    /** Set the current progress. */
+    /**
+     * Set the current progress.
+     */
     public void update(int target, int done) {
       this.done = done;
       this.target = target;
       update();
     }
 
-    /** Changes the task name and state. */
+    /**
+     * Changes the task name and state.
+     */
     public void update(String task, int target, int done) {
-      update(task, target, done, "");
+      update(task, target, done, null);
     }
 
-    /** Changes the task name and state. */
-    public void update(String task, int target, int done, String eta) {
+    /**
+     * Changes the task name and state.
+     */
+    public void update(String task, int target, int done, Duration eta) {
       this.taskName = task;
       this.done = done;
       this.target = target;
-      this.eta = eta;
+      this.eta = Optional.ofNullable(eta);
       update();
     }
 
     protected void updateEta() {
       long etaSeconds = 0;
-      if (done > 0) {
+      if (done > 0 && done <= target) {
         etaSeconds = ((target - done) * (System.currentTimeMillis() - startTime) / 1000) / done;
-      }
-      if (etaSeconds > 0) {
-        int seconds = (int) ((etaSeconds) % 60);
-        int minutes = (int) ((etaSeconds / 60) % 60);
-        int hours = (int) (etaSeconds / 3600);
-        eta = String.format("%d:%02d:%02d", hours, minutes, seconds);
+        eta = Optional.of(Duration.ofSeconds(etaSeconds));
       } else {
-        eta = "N/A";
+        eta = Optional.empty();
       }
       update();
     }
 
-    /** Set the current progress and calculate an ETA. */
+    /**
+     * Set the current progress and calculate an ETA.
+     */
     public void updateEta(int done) {
       this.done = done;
       updateEta();
     }
 
-    /** Set the current progress and calculate an ETA. */
+    /**
+     * Set the current progress and calculate an ETA.
+     */
     public void updateEta(int target, int done) {
       this.done = done;
       this.target = target;
       updateEta();
     }
 
-    /** Reset the ETA start time. */
+    /**
+     * Reset the ETA start time.
+     */
     public void updateStartTime() {
       this.startTime = System.currentTimeMillis();
     }
 
-    /** Ratelimited update. Only update when the new progress is greater than the old progress + {@code interval} */
+    /**
+     * Ratelimited update. Only update when the new progress is greater than the old progress + {@code interval}
+     */
     public void updateInterval(int target, int done, int interval) {
       if (target != this.target || done > this.done + interval) {
         this.updateEta(target, done);
@@ -180,12 +207,12 @@ public class TaskTracker {
     }
   }
 
-  private void updateProgress(String taskName, int target, int done, String eta) {
-    if (!eta.isEmpty()) {
-      progress.setProgress(taskName, done, 0, target, eta);
-    } else {
-      progress.setProgress(taskName, done, 0, target);
-    }
+  private void updateProgress(String taskName, int target, int done, Duration duration, Duration eta) {
+    progress.setProgress(taskName, done, 0, target, duration, eta);
+  }
+
+  private void updateProgress(String taskName, int target, int done, Duration duration) {
+    progress.setProgress(taskName, done, 0, target, duration);
   }
 
   public final Task task(String taskName) {

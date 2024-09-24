@@ -30,6 +30,7 @@ import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
 import se.llbit.util.TaskTracker;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
@@ -385,19 +386,13 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   }
 
   private void updateRenderProgress() {
-    double renderTime = bufferedScene.renderTime / 1000.0;
-
     // Notify progress listener.
     int target = bufferedScene.getTargetSpp();
-    long etaSeconds = (long) (((target - bufferedScene.spp) * renderTime) / bufferedScene.spp);
-    if (etaSeconds > 0) {
-      int seconds = (int) ((etaSeconds) % 60);
-      int minutes = (int) ((etaSeconds / 60) % 60);
-      int hours = (int) (etaSeconds / 3600);
-      String eta = String.format("%d:%02d:%02d", hours, minutes, seconds);
-      renderTask.update("Rendering", target, bufferedScene.spp, eta);
+    long etaMillis = (long) (((target - bufferedScene.spp) * bufferedScene.renderTime) / bufferedScene.spp);
+    if (etaMillis > 0) {
+      renderTask.update("Rendering", target, bufferedScene.spp, Duration.ofMillis(etaMillis));
     } else {
-      renderTask.update("Rendering", target, bufferedScene.spp, "");
+      renderTask.update("Rendering", target, bufferedScene.spp);
     }
 
     synchronized (this) {

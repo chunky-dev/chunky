@@ -22,6 +22,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.IdentityHashMap;
@@ -63,7 +64,6 @@ import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
-import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.ui.ChunkMap;
 import se.llbit.chunky.ui.dialogs.*;
@@ -73,7 +73,6 @@ import se.llbit.chunky.ui.PositiveIntegerAdjuster;
 import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.ui.RenderCanvasFx;
 import se.llbit.chunky.ui.UILogReceiver;
-import se.llbit.chunky.ui.dialogs.WorldChooser;
 import se.llbit.chunky.renderer.scene.*;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
@@ -160,7 +159,7 @@ public class ChunkyFxController
   }
 
   private final ProgressListener progressListener = new ProgressListener() {
-    @Override public void setProgress(String task, int done, int start, int target) {
+    @Override public void setProgress(String task, int done, int start, int target, Duration duration) {
       Platform.runLater(() -> {
         progressBar.setProgress((double) done / (target - start));
         if (target - start > 0) {
@@ -171,10 +170,11 @@ public class ChunkyFxController
           progressLbl.setTooltip(null);
         }
         etaLbl.setText("ETA: N/A");
+        renderTimeLbl.setText(String.format("Time: %d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart()));
       });
     }
 
-    @Override public void setProgress(String task, int done, int start, int target, String eta) {
+    @Override public void setProgress(String task, int done, int start, int target, Duration duration, Duration eta) {
       Platform.runLater(() -> {
         progressBar.setProgress((double) done / (target - start));
         if (target - start > 0) {
@@ -184,7 +184,8 @@ public class ChunkyFxController
           progressLbl.setText(String.format("%s", task));
           progressLbl.setTooltip(null);
         }
-        etaLbl.setText("ETA: " + eta);
+        etaLbl.setText(String.format("ETA: %d:%02d:%02d", eta.toHours(), eta.toMinutesPart(), eta.toSecondsPart()));
+        renderTimeLbl.setText(String.format("Time: %d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart()));
       });
     }
   };
