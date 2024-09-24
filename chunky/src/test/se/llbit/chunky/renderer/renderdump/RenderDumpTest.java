@@ -26,6 +26,7 @@ import se.llbit.util.TaskTracker;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
@@ -70,7 +71,7 @@ public class RenderDumpTest {
       final Map<String, Integer> previousProgress = new HashMap<>();
 
       @Override
-      public void setProgress(String task, int done, int start, int target) {
+      public void setProgress(String task, int done, int start, int target, Duration duration) {
         int previous = previousProgress.getOrDefault(task, Integer.MIN_VALUE);
         // check that progress is monotonically increasing
         assertTrue(done >= previous, "progress (" + done + ") should be greater or equal to previous progress (" + previous + ")");
