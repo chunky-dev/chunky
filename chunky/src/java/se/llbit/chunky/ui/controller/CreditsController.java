@@ -79,10 +79,6 @@ public class CreditsController implements Initializable {
   @FXML
   private Hyperlink simplexnoiseLicense;
   @FXML
-  private Hyperlink semver4j;
-  @FXML
-  private Hyperlink semver4jLicense;
-  @FXML
   private Hyperlink lz4Java;
   @FXML
   private Hyperlink lz4JavaLicense;
@@ -187,11 +183,6 @@ public class CreditsController implements Initializable {
     simplexnoise.setOnAction(e -> launchAndReset(simplexnoise, "https://github.com/keijiro/sketches2016/blob/master/Simplex2/SimplexNoise.java"));
     simplexnoiseLicense.setBorder(Border.EMPTY);
     simplexnoiseLicense.setOnAction(e -> launchAndReset(simplexnoiseLicense, "https://unlicense.org/"));
-
-    semver4j.setBorder(Border.EMPTY);
-    semver4j.setOnAction(e -> launchAndReset(semver4j, "https://github.com/vdurmont/semver4j"));
-    semver4jLicense.setBorder(Border.EMPTY);
-    semver4jLicense.setOnAction(e -> launchAndReset(semver4jLicense, "https://github.com/vdurmont/semver4j/blob/master/LICENSE.md"));
 
     lz4Java.setBorder(Border.EMPTY);
     lz4Java.setOnAction(e -> launchAndReset(lz4Java, "https://github.com/lz4/lz4-java"));
