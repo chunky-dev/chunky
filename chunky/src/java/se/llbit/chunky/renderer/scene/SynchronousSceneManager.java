@@ -249,9 +249,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       scene.setResetReason(ResetReason.SCENE_LOADED);
       scene.setRenderMode(RenderMode.PREVIEW);
     }
-    System.out.println(scene.getYClipMin()+" min, 2 max "+scene.getYClipMax());
     onSceneLoaded.run();
-    System.out.println(scene.getYClipMin()+" min, 3 max "+scene.getYClipMax());
   }
 
   @Override public void loadChunks(World world, Map<RegionPosition, List<ChunkPosition>> chunksToLoadByRegion) {
