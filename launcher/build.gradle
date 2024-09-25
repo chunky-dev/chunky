@@ -44,5 +44,7 @@ jar {
     // Include other dependencies
     from {
         configurations.bundled.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+      exclude "META-INF/*"
     }
 }
