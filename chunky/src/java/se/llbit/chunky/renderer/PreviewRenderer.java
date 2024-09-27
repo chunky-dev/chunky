@@ -54,7 +54,7 @@ public class PreviewRenderer extends TileBasedRenderer {
   @Override
   public void render(DefaultRenderManager manager) throws InterruptedException {
     TaskTracker.Task task = manager.getRenderTask();
-    task.update("Preparing preview", 2, 0, "");
+    task.update("Preparing preview", 2, 0);
 
     Scene scene = manager.bufferedScene;
 
