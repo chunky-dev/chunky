@@ -36,7 +36,7 @@ public class CubicDimension extends Dimension {
   }
 
   @Override
-  public ChunkData createChunkData(ChunkData chunkData, int chunkVersion) {
+  public ChunkData createChunkData(ChunkData chunkData, int minY, int maxY) {
     if (chunkData instanceof GenericChunkData) {
       return chunkData;
     }
