@@ -17,8 +17,9 @@
  */
 package se.llbit.chunky.launcher;
 
-import com.vdurmont.semver4j.Semver;
 import javafx.stage.Stage;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.ui.ChunkyLauncherFx;
 import se.llbit.chunky.launcher.ui.DebugConsole;
@@ -46,7 +47,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ChunkyLauncher {
 
-  public static final Semver LAUNCHER_VERSION = new Semver("1.14.0");
+  public static final ArtifactVersion LAUNCHER_VERSION = new DefaultArtifactVersion("1.14.0");
+
   public static final int LAUNCHER_SETTINGS_REVISION = 1;
 
   /**

@@ -16,7 +16,8 @@
  */
 package se.llbit.chunky.launcher;
 
-import com.vdurmont.semver4j.Semver;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
@@ -32,7 +33,7 @@ public class LauncherInfo {
     public final String path;
 
     public final Date date;
-    public final Semver version;
+    public final ArtifactVersion version;
 
     public final Map<String, ReleaseChannel> channels = new LinkedHashMap<>();
 
@@ -46,7 +47,7 @@ public class LauncherInfo {
     }
 
     public LauncherInfo(JsonObject obj) {
-        version = new Semver(obj.get("name").stringValue(""));
+        version = new DefaultArtifactVersion(obj.get("name").stringValue(""));
         notes = obj.get("notes").stringValue("");
         path = obj.get("path").stringValue("ChunkyLauncher.jar");
         date = Util.dateFromISO8601(obj.get("timestamp").stringValue(""));

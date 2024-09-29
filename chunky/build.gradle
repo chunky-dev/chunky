@@ -10,6 +10,13 @@ configurations {
   implementation.extendsFrom configurations.nbtlib
   implementation.extendsFrom configurations.cplib
   implementation.extendsFrom configurations.toolpanelib
+
+  // dependencies that are not bundled with chunky-core but downloaded separately by the launcher
+  externalDependencies {
+    extendsFrom configurations.implementation
+    exclude group: "se.llbit" // bundled in chunky-core
+    exclude group: "org.openjfx" // provided at runtime
+  }
 }
 
 dependencies {
@@ -102,6 +109,11 @@ task javadocJar(type: Jar) {
 task sourcesJar(type: Jar) {
   from sourceSets.main.allSource
   archiveClassifier.set('sources')
+}
+
+task copyExternalDependencies(type: Copy) {
+  into "${buildDir}/${libsDirName}"
+  from configurations.externalDependencies
 }
 
 artifacts {

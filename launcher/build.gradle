@@ -9,7 +9,7 @@ configurations {
 }
 
 dependencies {
-    bundled 'com.vdurmont:semver4j:3.1.0'
+    bundled 'org.apache.maven:maven-artifact:3.9.9'
 
     implementation project(':lib')
 }
@@ -44,5 +44,7 @@ jar {
     // Include other dependencies
     from {
         configurations.bundled.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+      exclude "META-INF/*"
     }
 }
