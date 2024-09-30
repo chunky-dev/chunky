@@ -17,12 +17,8 @@
 package se.llbit.math.primitive;
 
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.math.IntersectionRecord;
+import se.llbit.math.*;
 import se.llbit.chunky.world.Material;
-import se.llbit.math.AABB;
-import se.llbit.math.Ray2;
-import se.llbit.math.Vector2;
-import se.llbit.math.Vector3;
 
 /**
  * A simple triangle primitive.
@@ -30,8 +26,6 @@ import se.llbit.math.Vector3;
  * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
  */
 public class TexturedTriangle implements Primitive {
-
-  private static final double EPSILON = 0.000001;
 
   /** Note: This is public for some plugins. Stability is not guaranteed. */
   public final Vector3 e1 = new Vector3(0, 0, 0);
@@ -91,10 +85,10 @@ public class TexturedTriangle implements Primitive {
     pvec.cross(ray.d, e2);
     double det = e1.dot(pvec);
     if (doubleSided) {
-      if (det > -EPSILON && det < EPSILON) {
+      if (det > -Constants.EPSILON && det < Constants.EPSILON) {
         return false;
       }
-    } else if (det > -EPSILON) {
+    } else if (det > -Constants.EPSILON) {
       return false;
     }
     double recip = 1 / det;
@@ -117,7 +111,7 @@ public class TexturedTriangle implements Primitive {
 
     double t = e2.dot(qvec) * recip;
 
-    if (t > EPSILON && t < intersectionRecord.distance) {
+    if (t > Constants.EPSILON && t < intersectionRecord.distance) {
       double w = 1 - u - v;
       intersectionRecord.uv.x = t1u * u + t2u * v + t3u * w;
       intersectionRecord.uv.y = t1v * u + t2v * v + t3v * w;

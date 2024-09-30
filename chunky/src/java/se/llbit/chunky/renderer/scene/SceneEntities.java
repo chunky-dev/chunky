@@ -93,6 +93,7 @@ public class SceneEntities implements Intersectable {
         intersectionRecord.setNormal(intersectionTest);
         intersectionRecord.color.set(intersectionTest.color);
         intersectionRecord.material = intersectionTest.material;
+        intersectionRecord.flags = intersectionTest.flags;
       }
     }
 
