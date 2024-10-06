@@ -387,12 +387,17 @@ public class DefaultRenderManager extends Thread implements RenderManager {
 
   private void updateRenderProgress() {
     // Notify progress listener.
+    int current = bufferedScene.spp;
     int target = bufferedScene.getTargetSpp();
-    long etaMillis = (long) (((target - bufferedScene.spp) * bufferedScene.renderTime) / bufferedScene.spp);
-    if (etaMillis > 0) {
-      renderTask.update("Rendering", target, bufferedScene.spp, Duration.ofMillis(etaMillis));
-    } else {
+    if (current == 0) {
       renderTask.update("Rendering", target, bufferedScene.spp);
+    } else {
+      long etaMillis = ((target - current) * bufferedScene.renderTime) / current;
+      if (etaMillis > 0) {
+        renderTask.update("Rendering", target, current, Duration.ofMillis(etaMillis));
+      } else {
+        renderTask.update("Rendering", target, current);
+      }
     }
 
     synchronized (this) {
