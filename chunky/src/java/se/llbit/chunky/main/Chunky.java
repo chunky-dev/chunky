@@ -165,7 +165,7 @@ public class Chunky {
     });
 
     try {
-      sceneManager.loadScene(options.sceneDir, options.sceneName);
+      sceneManager.loadScene(options.getSceneDescriptionFile().getParentFile(), options.sceneName);
       if (options.target != -1) {
         sceneManager.getScene().setTargetSpp(options.target);
       }
