@@ -95,19 +95,6 @@ public class BlankRenderTest {
   }
 
   /**
-   * Render with a fully black sky.
-   */
-  @Test public void testBlackSky() throws InterruptedException {
-    final Scene scene = new Scene();
-    scene.setCanvasSize(WIDTH, HEIGHT);
-    scene.setRenderMode(RenderMode.RENDERING);
-    scene.setTargetSpp(2);
-    scene.setName("foobar");
-    scene.sky().setSkyMode(Sky.SkyMode.BLACK);
-    renderAndCheckSamples(scene, new double[] {0, 0, 0});
-  }
-
-  /**
    * Render with a solid sky color.
    */
   @Test public void testSolidColorSky() throws InterruptedException {

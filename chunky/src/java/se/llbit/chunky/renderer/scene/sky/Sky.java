@@ -116,10 +116,7 @@ public class Sky implements JsonSerializable {
     SKYMAP_ANGULAR("Skymap (angular)"),
 
     /** Skybox. */
-    SKYBOX("Skybox"),
-
-    /** A completely black sky, useful for rendering an emitter-only pass. */
-    BLACK("Black");
+    SKYBOX("Skybox");
 
     private String name;
 
@@ -351,10 +348,6 @@ public class Sky implements JsonSerializable {
           double alpha = 1 / yabs;
           skybox[SKYBOX_DOWN].getColor((1 + x * alpha) / 2.0, (1 - z * alpha) / 2.0, ray.color);
         }
-        break;
-      }
-      case BLACK: {
-        ray.color.set(0, 0, 0, 1);
         break;
       }
     }
@@ -688,12 +681,17 @@ public class Sky implements JsonSerializable {
     skyExposure = json.get("skyExposure").doubleValue(skyExposure);
     skyLightModifier = json.get("skyLight").doubleValue(skyLightModifier);
     apparentSkyLightModifier = json.get("apparentSkyLight").doubleValue(apparentSkyLightModifier);
-    if (!(json.get("mode").stringValue(mode.name()).equals("SKYMAP_PANORAMIC") || json.get("mode").stringValue(mode.name()).equals("SKYMAP_SPHERICAL"))) {
-      mode = SkyMode.get(json.get("mode").stringValue(mode.name()));
+    if (json.get("mode").stringValue(mode.name()).equals("BLACK")) {
+      mode = SkyMode.SOLID_COLOR;
+      color.x = 0;
+      color.y = 0;
+      color.z = 0;
     } else if (json.get("mode").stringValue(mode.name()).equals("SKYMAP_PANORAMIC")) {
       mode = SkyMode.SKYMAP_EQUIRECTANGULAR;
     } else if (json.get("mode").stringValue(mode.name()).equals("SKYMAP_SPHERICAL")) {
       mode = SkyMode.SKYMAP_ANGULAR;
+    } else {
+      mode = SkyMode.get(json.get("mode").stringValue(mode.name()));
     }
     horizonOffset = json.get("horizonOffset").doubleValue(horizonOffset);
     cloudsEnabled = json.get("cloudsEnabled").boolValue(cloudsEnabled);
