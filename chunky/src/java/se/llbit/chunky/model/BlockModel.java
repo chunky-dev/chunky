@@ -3,8 +3,11 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Ray;
+import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
+import se.llbit.math.primitive.Primitive;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -20,4 +23,6 @@ public interface BlockModel {
   double faceSurfaceArea(int face);
 
   boolean isBiomeDependant();
+
+  Collection<Primitive> getPrimitives(Transform transform);
 }
