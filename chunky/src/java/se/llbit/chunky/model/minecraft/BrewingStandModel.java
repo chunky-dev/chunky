@@ -19,6 +19,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -209,9 +210,9 @@ public class BrewingStandModel extends QuadModel {
   };
   //endregion
 
-  private static final Texture base = Texture.brewingStandBase;
-  private static final Texture stand = Texture.brewingStandSide;
-  private static final Texture[] tex = new Texture[] {
+  private static final AbstractTexture base = Texture.brewingStandBase;
+  private static final AbstractTexture stand = Texture.brewingStandSide;
+  private static final AbstractTexture[] tex = new AbstractTexture[] {
       stand, stand, stand, stand, stand, stand, base, base, base, base, base, base, base, base, base, base, base,
       base, base, base, base, base, base, base, stand, stand, stand
   };
@@ -233,7 +234,7 @@ public class BrewingStandModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return tex;
   }
 }

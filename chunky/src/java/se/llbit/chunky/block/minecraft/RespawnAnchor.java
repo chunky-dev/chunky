@@ -20,9 +20,10 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.TexturedBlock;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class RespawnAnchor extends TexturedBlock {
-    private static final Texture[] sideTextures = new Texture[]{
+    private static final AbstractTexture[] sideTextures = new AbstractTexture[]{
             Texture.respawnAnchorSide0,
             Texture.respawnAnchorSide1,
             Texture.respawnAnchorSide2,

@@ -23,7 +23,7 @@ import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.StandingBanner;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.json.Json;
 import se.llbit.json.JsonObject;
 import se.llbit.math.Ray;
@@ -34,7 +34,7 @@ public class WallBanner extends MinecraftBlockTranslucent {
   private final int facing;
   private final BannerDesign.Color color;
 
-  public WallBanner(String name, Texture texture, String facing, BannerDesign.Color color) {
+  public WallBanner(String name, AbstractTexture texture, String facing, BannerDesign.Color color) {
     super(name, texture);
     invisible = true;
     opaque = false;

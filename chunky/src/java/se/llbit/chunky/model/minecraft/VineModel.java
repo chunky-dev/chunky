@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
@@ -86,7 +87,7 @@ public class VineModel extends QuadModel {
 
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
   private final Tint[] tints;
 
   public VineModel(int connections) {
@@ -100,7 +101,7 @@ public class VineModel extends QuadModel {
     }
 
     this.quads = quads.toArray(new Quad[0]);
-    this.textures = new Texture[this.quads.length];
+    this.textures = new AbstractTexture[this.quads.length];
     Arrays.fill(textures, Texture.vines);
     this.tints = new Tint[this.quads.length];
     Arrays.fill(tints, Tint.BIOME_FOLIAGE);
@@ -112,7 +113,7 @@ public class VineModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 

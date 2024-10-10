@@ -21,6 +21,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -46,7 +47,7 @@ public class AttachedStemModel extends QuadModel {
         new Vector3(1, (height + 1) / 8., 0), new Vector4(0, 1, (7 - height) / 8., 1), true);
   }
 
-  private static final Texture[] textures = {
+  private static final AbstractTexture[] textures = {
       Texture.stemStraight, Texture.stemStraight, Texture.stemBent
   };
 
@@ -72,7 +73,7 @@ public class AttachedStemModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 

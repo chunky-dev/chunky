@@ -18,38 +18,37 @@ package se.llbit.chunky.resources.texturepack;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.resources.ImageLoader;
 
 /** @author Jesper Öqvist <jesper@llbit.se> */
 public class LargeChestTexture extends TextureLoader {
   private final String file;
-  private final Texture left;
-  private final Texture topLeft;
-  private final Texture topRight;
-  private final Texture frontLeft;
-  private final Texture frontRight;
-  private final Texture bottomLeft;
-  private final Texture right;
-  private final Texture bottomRight;
-  private final Texture backLeft;
-  private final Texture backRight;
+  private final BitmapTexture left;
+  private final BitmapTexture topLeft;
+  private final BitmapTexture topRight;
+  private final BitmapTexture frontLeft;
+  private final BitmapTexture frontRight;
+  private final BitmapTexture bottomLeft;
+  private final BitmapTexture right;
+  private final BitmapTexture bottomRight;
+  private final BitmapTexture backLeft;
+  private final BitmapTexture backRight;
 
   public LargeChestTexture(
       String file,
-      Texture left,
-      Texture right,
-      Texture topLeft,
-      Texture topRight,
-      Texture frontLeft,
-      Texture frontRight,
-      Texture bottomLeft,
-      Texture bottomRight,
-      Texture backLeft,
-      Texture backRight) {
+      BitmapTexture left,
+      BitmapTexture right,
+      BitmapTexture topLeft,
+      BitmapTexture topRight,
+      BitmapTexture frontLeft,
+      BitmapTexture frontRight,
+      BitmapTexture bottomLeft,
+      BitmapTexture bottomRight,
+      BitmapTexture backLeft,
+      BitmapTexture backRight) {
     this.file = file;
     this.left = left;
     this.right = right;

@@ -17,7 +17,7 @@
 package se.llbit.chunky.world;
 
 import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.resources.ImageLoader;
 
 /**
@@ -25,7 +25,7 @@ import se.llbit.resources.ImageLoader;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class Icon extends Texture {
+public class Icon extends BitmapTexture {
   public static final Icon bed = new Icon("bed");
   public static final Icon cake = new Icon("cake");
   public static final Icon fence = new Icon("fence");
@@ -71,10 +71,10 @@ public class Icon extends Texture {
   public static final Icon question = new Icon("question");
   public static final Icon eye = new Icon("eye");
   public static final Icon scale = new Icon("scale");
-  public static final Texture grass = new Texture("grass-side-saturated");
-  public static final Texture netherrack = new Texture("netherrack");
-  public static final Texture endStone = new Texture("end-stone");
-  public static final Texture failed = new Icon("failed");
+  public static final BitmapTexture grass = new BitmapTexture("grass-side-saturated");
+  public static final BitmapTexture netherrack = new BitmapTexture("netherrack");
+  public static final BitmapTexture endStone = new BitmapTexture("end-stone");
+  public static final BitmapTexture failed = new Icon("failed");
 
   public static final Icon face = new Icon("face");
   public static final Icon player = new Icon("player");

@@ -20,14 +20,14 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.TrapdoorModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 // TODO: fix rendering/texturing bugs.
 public class Trapdoor extends AbstractModelBlock {
 
   private final String description;
 
-  public Trapdoor(String name, Texture texture,
+  public Trapdoor(String name, AbstractTexture texture,
       String half, String facing, boolean open) {
     super(name, texture);
     solid = false;

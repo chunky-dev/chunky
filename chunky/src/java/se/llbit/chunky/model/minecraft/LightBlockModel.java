@@ -21,6 +21,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
@@ -30,7 +31,7 @@ public class LightBlockModel extends AABBModel {
 
   private final AABB[] box = aabb;
 
-  private final Texture[][] textures = new Texture[][] {{
+  private final AbstractTexture[][] textures = new AbstractTexture[][] {{
     Texture.light, Texture.light, Texture.light,
     Texture.light, Texture.light, Texture.light
   }};
@@ -60,7 +61,7 @@ public class LightBlockModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     return textures;
   }
 }

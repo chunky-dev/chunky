@@ -21,6 +21,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -111,14 +112,14 @@ public class LightningRodModel extends QuadModel {
     orientedQuads[5] = Model.rotateY(orientedQuads[3]);
   }
 
-  private final static Texture[] texturesOn = new Texture[lightningRod.length];
+  private final static AbstractTexture[] texturesOn = new AbstractTexture[lightningRod.length];
   static { Arrays.fill(texturesOn, Texture.lightningRodOn); }
 
-  private final static Texture[] texturesOff = new Texture[lightningRod.length];
+  private final static AbstractTexture[] texturesOff = new AbstractTexture[lightningRod.length];
   static { Arrays.fill(texturesOff, Texture.lightningRod); }
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public LightningRodModel(String facing, boolean powered) {
     this.quads = orientedQuads[getOrientationIndex(facing)];
@@ -149,7 +150,7 @@ public class LightningRodModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

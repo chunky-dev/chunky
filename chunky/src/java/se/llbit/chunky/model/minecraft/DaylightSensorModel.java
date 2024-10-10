@@ -19,16 +19,17 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 
 public class DaylightSensorModel extends AABBModel {
   private static final AABB[] aabbs = { new AABB(0, 1, 0, 6 / 16., 0, 1) };
 
-  private final Texture[][] textures;
+  private final AbstractTexture[][] textures;
 
-  public DaylightSensorModel(Texture top) {
-    Texture side = Texture.daylightDetectorSide;
-    textures = new Texture[][] { {side, side, side, side, top, side} };
+  public DaylightSensorModel(AbstractTexture top) {
+    AbstractTexture side = Texture.daylightDetectorSide;
+    textures = new AbstractTexture[][] { {side, side, side, side, top, side} };
   }
 
   @Override
@@ -37,7 +38,7 @@ public class DaylightSensorModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     return textures;
   }
 }

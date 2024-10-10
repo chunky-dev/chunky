@@ -21,7 +21,7 @@ package se.llbit.chunky.block.minecraft;
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.model.minecraft.DoorModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 // TODO: hinge placement is wrong for some variants.
 public class Door extends AbstractModelBlock {
@@ -30,8 +30,8 @@ public class Door extends AbstractModelBlock {
   public final boolean open;
   private final String description;
 
-  public Door(String name, Texture texture, String facingString, String half,
-      String hinge, boolean open) {
+  public Door(String name, AbstractTexture texture, String facingString, String half,
+              String hinge, boolean open) {
     super(name, texture);
     this.description = String.format("facing=%s, half=%s, hinge=%s, open=%s",
         facingString, half, hinge, open);

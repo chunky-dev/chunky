@@ -21,6 +21,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -29,10 +30,10 @@ import java.util.Arrays;
 
 public class SculkSensorModel extends QuadModel {
 
-  private static final Texture bottom = Texture.sculkSensorBottom;
-  private static final Texture side = Texture.sculkSensorSide;
-  private static final Texture top = Texture.sculkSensorTop;
-  private static final Texture[] tex = new Texture[]{
+  private static final AbstractTexture bottom = Texture.sculkSensorBottom;
+  private static final AbstractTexture side = Texture.sculkSensorSide;
+  private static final AbstractTexture top = Texture.sculkSensorTop;
+  private static final AbstractTexture[] tex = new AbstractTexture[]{
       top, bottom, side, side, side, side
   };
 
@@ -135,10 +136,10 @@ public class SculkSensorModel extends QuadModel {
   );
   //endregion
 
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public SculkSensorModel(boolean active) {
-    textures = new Texture[quads.length];
+    textures = new AbstractTexture[quads.length];
     System.arraycopy(tex, 0, textures, 0, tex.length);
     Arrays.fill(textures, tex.length, textures.length,
         active ? Texture.sculkSensorTendrilActive : Texture.sculkSensorTendrilInactive);
@@ -150,7 +151,7 @@ public class SculkSensorModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

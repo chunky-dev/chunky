@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -64,7 +65,7 @@ public class ConduitModel extends QuadModel {
           new Vector4(8 / 16.0, 14 / 16.0, 8 / 16.0, 14 / 16.0)),
   };
 
-  private static final Texture[] textures = {
+  private static final AbstractTexture[] textures = {
       Texture.conduit, Texture.conduit, Texture.conduit,
       Texture.conduit, Texture.conduit, Texture.conduit
   };
@@ -75,7 +76,7 @@ public class ConduitModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

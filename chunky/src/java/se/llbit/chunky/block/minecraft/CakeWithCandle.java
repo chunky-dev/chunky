@@ -23,6 +23,7 @@ import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.FlameParticles;
 import se.llbit.chunky.model.minecraft.CakeWithCandleModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Vector3;
 
 import java.util.Random;
@@ -32,7 +33,7 @@ public class CakeWithCandle extends AbstractModelBlock {
   private final boolean lit;
   private final FlameParticles entity;
 
-  public CakeWithCandle(String name, Texture candle, Texture candleLit, boolean lit) {
+  public CakeWithCandle(String name, AbstractTexture candle, AbstractTexture candleLit, boolean lit) {
     super(name, Texture.cakeTop);
     this.lit = lit;
     this.model = new CakeWithCandleModel(lit ? candleLit : candle);

@@ -18,7 +18,7 @@
 package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AABBModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 
 public class StairModel extends AABBModel {
@@ -128,21 +128,21 @@ public class StairModel extends AABBModel {
   private final boolean isCorner;
   private final int corner;
   private final int facing;
-  private final Texture[][] cornerTextures;
-  private final Texture[][] textures;
+  private final AbstractTexture[][] cornerTextures;
+  private final AbstractTexture[][] textures;
 
-  public StairModel(Texture side, Texture top, Texture bottom, int flipped, boolean isCorner,
-      int corner, int facing) {
+  public StairModel(AbstractTexture side, AbstractTexture top, AbstractTexture bottom, int flipped, boolean isCorner,
+                    int corner, int facing) {
     this.flipped = flipped;
     this.isCorner = isCorner;
     this.corner = corner;
     this.facing = facing;
-    this.cornerTextures = new Texture[][]{
+    this.cornerTextures = new AbstractTexture[][]{
         {side, side, side, side, top, bottom},
         {side, side, side, side, top, bottom},
         {side, side, side, side, top, bottom}
     };
-    this.textures = new Texture[][]{
+    this.textures = new AbstractTexture[][]{
         {side, side, side, side, top, bottom},
         {side, side, side, side, top, bottom}
     };
@@ -158,7 +158,7 @@ public class StairModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     if (isCorner) {
       return cornerTextures;
     } else {

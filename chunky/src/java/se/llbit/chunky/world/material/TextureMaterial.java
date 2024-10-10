@@ -16,12 +16,12 @@
  */
 package se.llbit.chunky.world.material;
 
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.chunky.world.Material;
 
 public class TextureMaterial extends Material {
 
-  public TextureMaterial(Texture texture) {
+  public TextureMaterial(AbstractTexture texture) {
     super("texture", texture);
 
     if (texture == null) {

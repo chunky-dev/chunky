@@ -18,7 +18,7 @@
 package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AABBModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 
 import java.util.Arrays;
@@ -26,10 +26,10 @@ import java.util.Arrays;
 public class CarpetModel extends AABBModel {
   private static final AABB[] aabbs = { new AABB(0, 1, 0, 1 / 16., 0, 1) };
 
-  private final Texture[][] textures;
+  private final AbstractTexture[][] textures;
 
-  public CarpetModel(Texture color) {
-    textures = new Texture[1][6];
+  public CarpetModel(AbstractTexture color) {
+    textures = new AbstractTexture[1][6];
     Arrays.fill(textures[0], color);
   }
 
@@ -39,7 +39,7 @@ public class CarpetModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     return textures;
   }
 }

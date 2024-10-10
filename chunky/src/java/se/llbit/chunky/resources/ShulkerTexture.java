@@ -17,8 +17,10 @@
  */
 package se.llbit.chunky.resources;
 
+import se.llbit.chunky.resources.texture.BitmapTexture;
+
 public class ShulkerTexture {
-  public Texture side = new Texture();
-  public Texture top = new Texture();
-  public Texture bottom = new Texture();
+  public BitmapTexture side = new BitmapTexture();
+  public BitmapTexture top = new BitmapTexture();
+  public BitmapTexture bottom = new BitmapTexture();
 }

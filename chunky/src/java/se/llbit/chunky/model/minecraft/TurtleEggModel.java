@@ -21,6 +21,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -167,7 +168,7 @@ public class TurtleEggModel extends QuadModel {
   };
   //endregion
 
-  private static final Texture[] eggTextures = {
+  private static final AbstractTexture[] eggTextures = {
       Texture.turtleEgg,
       Texture.turtleEggSlightlyCracked,
       Texture.turtleEggVeryCracked
@@ -189,7 +190,7 @@ public class TurtleEggModel extends QuadModel {
   }
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public TurtleEggModel(int eggs, int hatch) {
     eggs = Math.max(1, Math.min(egg_models.length, eggs));
@@ -198,7 +199,7 @@ public class TurtleEggModel extends QuadModel {
     for (int i = 0; i < eggs; i++)
       Collections.addAll(quads, rot[hatch][i]);
     this.quads = quads.toArray(new Quad[0]);
-    this.textures = new Texture[this.quads.length];
+    this.textures = new AbstractTexture[this.quads.length];
     Arrays.fill(this.textures, eggTextures[hatch]);
   }
 
@@ -208,7 +209,7 @@ public class TurtleEggModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

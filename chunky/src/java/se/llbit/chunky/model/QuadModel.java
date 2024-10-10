@@ -18,11 +18,9 @@
 
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.model.BlockModel;
-import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -84,7 +82,7 @@ public abstract class QuadModel implements BlockModel {
   public abstract Quad[] getQuads();
 
   @PluginApi
-  public abstract Texture[] getTextures();
+  public abstract AbstractTexture[] getTextures();
 
   @PluginApi
   public Tint[] getTints() {
@@ -112,7 +110,7 @@ public abstract class QuadModel implements BlockModel {
     ray.t = Double.POSITIVE_INFINITY;
 
     Quad[] quads = getQuads();
-    Texture[] textures = getTextures();
+    AbstractTexture[] textures = getTextures();
     Tint[] tintedQuads = getTints();
 
     float[] color = null;

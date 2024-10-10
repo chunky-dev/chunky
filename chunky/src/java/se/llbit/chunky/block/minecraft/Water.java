@@ -199,7 +199,7 @@ public class Water extends MinecraftBlockTranslucent {
       boolean hit = false;
       for (Quad quad : fullBlock) {
         if (quad.intersect(ray)) {
-          texture.getAvgColorLinear(ray.color);
+          ray.color.set(texture.getAvgColorLinear());
           ray.t = ray.tNext;
           ray.orientNormal(quad.n);
           hit = true;
@@ -294,7 +294,7 @@ public class Water extends MinecraftBlockTranslucent {
       hit = true;
     }
     if (hit) {
-      texture.getAvgColorLinear(ray.color);
+      ray.color.set(texture.getAvgColorLinear());
       ray.distance += ray.t;
       ray.o.scaleAdd(ray.t, ray.d);
     }

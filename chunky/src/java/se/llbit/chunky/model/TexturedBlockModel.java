@@ -17,7 +17,7 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.block.minecraft.Air;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -31,10 +31,10 @@ import se.llbit.math.Vector3;
 public class TexturedBlockModel extends AABBModel {
   private static final AABB[] boxes = { new AABB(0, 1, 0, 1, 0, 1) };
 
-  private final Texture[][] textures;
+  private final AbstractTexture[][] textures;
 
-  public TexturedBlockModel(Texture north, Texture east, Texture south, Texture west, Texture top, Texture bottom) {
-    this.textures = new Texture[][] {{
+  public TexturedBlockModel(AbstractTexture north, AbstractTexture east, AbstractTexture south, AbstractTexture west, AbstractTexture top, AbstractTexture bottom) {
+    this.textures = new AbstractTexture[][] {{
       north, east, south, west, top, bottom
     }};
   }
@@ -45,7 +45,7 @@ public class TexturedBlockModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     return textures;
   }
 

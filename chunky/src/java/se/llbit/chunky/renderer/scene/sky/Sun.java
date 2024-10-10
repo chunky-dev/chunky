@@ -23,7 +23,7 @@ import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.json.JsonObject;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -119,7 +119,7 @@ public class Sun implements JsonSerializable {
   /**
    * Sun texture
    */
-  public static Texture texture = new Texture();
+  public static BitmapTexture texture = new BitmapTexture();
 
   static {
     A.x = mdx[0][0] * turb + mdx[0][1];

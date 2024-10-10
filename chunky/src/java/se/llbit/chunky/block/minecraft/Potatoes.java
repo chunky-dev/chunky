@@ -21,10 +21,11 @@ package se.llbit.chunky.block.minecraft;
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.CropsModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class Potatoes extends AbstractModelBlock {
 
-  private static final Texture[] texture = {
+  private static final AbstractTexture[] texture = {
       Texture.potatoes0, Texture.potatoes0, Texture.potatoes1, Texture.potatoes1,
       Texture.potatoes2, Texture.potatoes2, Texture.potatoes2, Texture.potatoes3
   };

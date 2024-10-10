@@ -20,14 +20,14 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.WallModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class Wall extends AbstractModelBlock {
 
   private final String description;
 
-  public Wall(String name, Texture texture, String north, String south, String east, String west,
-      boolean up) {
+  public Wall(String name, AbstractTexture texture, String north, String south, String east, String west,
+              boolean up) {
     super(name, texture);
     this.description = String
         .format("north=%s, south=%s, east=%s, west=%s, up=%s", north, south, east, west, up);

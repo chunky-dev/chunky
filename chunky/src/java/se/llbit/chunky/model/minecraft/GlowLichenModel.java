@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -56,7 +57,7 @@ public class GlowLichenModel extends QuadModel {
   };
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public GlowLichenModel(int connections) {
     ArrayList<Quad> quads = new ArrayList<>();
@@ -65,7 +66,7 @@ public class GlowLichenModel extends QuadModel {
         quads.add(glowLichen[i]);
     }
     this.quads = quads.toArray(new Quad[0]);
-    this.textures = new Texture[this.quads.length];
+    this.textures = new AbstractTexture[this.quads.length];
     Arrays.fill(this.textures, Texture.glowLichen);
   }
 
@@ -75,7 +76,7 @@ public class GlowLichenModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

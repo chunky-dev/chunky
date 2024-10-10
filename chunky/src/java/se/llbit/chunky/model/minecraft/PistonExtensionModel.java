@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -91,20 +92,20 @@ public class PistonExtensionModel extends QuadModel {
     extension[4] = Model.rotateY(extension[3]);
   }
 
-  private static final Texture[] textureNormal = {
+  private static final AbstractTexture[] textureNormal = {
       Texture.pistonTop, Texture.pistonTop, Texture.pistonSide, Texture.pistonSide,
       Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
       Texture.pistonSide, Texture.pistonSide
   };
 
-  private static final Texture[] textureSticky = {
+  private static final AbstractTexture[] textureSticky = {
       Texture.pistonTopSticky, Texture.pistonTop, Texture.pistonSide, Texture.pistonSide,
       Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
       Texture.pistonSide, Texture.pistonSide,
   };
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public PistonExtensionModel(boolean sticky, int facing) {
     quads = extension[facing];
@@ -117,7 +118,7 @@ public class PistonExtensionModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

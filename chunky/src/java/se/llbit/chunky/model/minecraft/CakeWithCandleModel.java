@@ -21,6 +21,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -29,9 +30,9 @@ import java.util.Arrays;
 
 public class CakeWithCandleModel extends QuadModel {
 
-  private static final Texture bottom = Texture.cakeBottom;
-  private static final Texture top = Texture.cakeTop;
-  private static final Texture side = Texture.cakeSide;
+  private static final AbstractTexture bottom = Texture.cakeBottom;
+  private static final AbstractTexture top = Texture.cakeTop;
+  private static final AbstractTexture side = Texture.cakeSide;
 
   //region Cake With Candle
   private static final Quad[] quads = Model.join(
@@ -139,12 +140,12 @@ public class CakeWithCandleModel extends QuadModel {
       }, Math.toRadians(45)));
   //endregion
 
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
-  public CakeWithCandleModel(Texture candle) {
-    textures = new Texture[quads.length];
+  public CakeWithCandleModel(AbstractTexture candle) {
+    textures = new AbstractTexture[quads.length];
     Arrays.fill(textures, candle);
-    System.arraycopy(new Texture[] {top, bottom, side, side, side, side}, 0, textures, 0, 6);
+    System.arraycopy(new AbstractTexture[] {top, bottom, side, side, side, side}, 0, textures, 0, 6);
   }
 
   @Override
@@ -153,7 +154,7 @@ public class CakeWithCandleModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

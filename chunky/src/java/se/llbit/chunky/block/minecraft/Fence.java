@@ -20,14 +20,14 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.FenceModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.chunky.world.BlockData;
 
 public class Fence extends AbstractModelBlock {
 
   private final String description;
 
-  public Fence(String name, Texture texture,
+  public Fence(String name, AbstractTexture texture,
       boolean north, boolean south, boolean east, boolean west) {
     super(name, texture);
     solid = false;

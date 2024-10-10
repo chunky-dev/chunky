@@ -21,33 +21,34 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class PitcherCropBottomModel extends QuadModel {
-  private static final Texture pitcher_top = Texture.pitcherCropTop;
-  private static final Texture pitcher_side = Texture.pitcherCropSide;
-  private static final Texture pitcher_bottom = Texture.pitcherCropBottom;
-  private static final Texture stage_1 = Texture.pitcherCropBottomStage1;
-  private static final Texture stage_2 = Texture.pitcherCropBottomStage2;
-  private static final Texture stage_3_bottom = Texture.pitcherCropBottomStage3;
-  private static final Texture stage_4_bottom = Texture.pitcherCropBottomStage4;
+  private static final AbstractTexture pitcher_top = Texture.pitcherCropTop;
+  private static final AbstractTexture pitcher_side = Texture.pitcherCropSide;
+  private static final AbstractTexture pitcher_bottom = Texture.pitcherCropBottom;
+  private static final AbstractTexture stage_1 = Texture.pitcherCropBottomStage1;
+  private static final AbstractTexture stage_2 = Texture.pitcherCropBottomStage2;
+  private static final AbstractTexture stage_3_bottom = Texture.pitcherCropBottomStage3;
+  private static final AbstractTexture stage_4_bottom = Texture.pitcherCropBottomStage4;
 
-  private static final Texture[][] textures = new Texture[][]{
-    new Texture[]{
+  private static final AbstractTexture[][] textures = new AbstractTexture[][]{
+    new AbstractTexture[]{
       pitcher_top, pitcher_bottom, pitcher_side, pitcher_side, pitcher_side, pitcher_side
     },
-    new Texture[]{
+    new AbstractTexture[]{
       stage_1, stage_1, stage_1, stage_1, pitcher_top, pitcher_bottom, pitcher_side, pitcher_side, pitcher_side, pitcher_side
     },
-    new Texture[]{
+    new AbstractTexture[]{
       stage_2, stage_2, stage_2, stage_2, pitcher_top, pitcher_bottom, pitcher_side, pitcher_side, pitcher_side, pitcher_side
     },
-    new Texture[]{
+    new AbstractTexture[]{
       stage_3_bottom, stage_3_bottom, stage_3_bottom, stage_3_bottom, pitcher_top, pitcher_bottom, pitcher_side, pitcher_side, pitcher_side, pitcher_side
     },
-    new Texture[]{
+    new AbstractTexture[]{
       stage_4_bottom, stage_4_bottom, stage_4_bottom, stage_4_bottom, pitcher_top, pitcher_bottom, pitcher_side, pitcher_side, pitcher_side, pitcher_side
     }
   };
@@ -375,7 +376,7 @@ public class PitcherCropBottomModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures[age];
   }
 }

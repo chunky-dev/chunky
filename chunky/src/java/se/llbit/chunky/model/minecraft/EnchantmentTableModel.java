@@ -19,16 +19,17 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 
 public class EnchantmentTableModel extends AABBModel {
   private static final AABB[] aabbs = new AABB[]{ new AABB(0, 1, 0, .75, 0, 1) };
-  private static final Texture[][] textures;
+  private static final AbstractTexture[][] textures;
   static {
-    Texture top = Texture.enchantmentTableTop;
-    Texture bottom = Texture.enchantmentTableBottom;
-    Texture side = Texture.enchantmentTableSide;
-    textures = new Texture[][] {
+    AbstractTexture top = Texture.enchantmentTableTop;
+    AbstractTexture bottom = Texture.enchantmentTableBottom;
+    AbstractTexture side = Texture.enchantmentTableSide;
+    textures = new AbstractTexture[][] {
         {side, side, side, side, top, bottom}
     };
   }
@@ -39,7 +40,7 @@ public class EnchantmentTableModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     return textures;
   }
 }

@@ -17,7 +17,7 @@
  */
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -77,10 +77,10 @@ public class DirectionalBlockModel extends QuadModel {
   }
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
-  public DirectionalBlockModel(String facing, Texture front, Texture back, Texture side) {
-    textures = new Texture[] {side, side, side, side, front, back};
+  public DirectionalBlockModel(String facing, AbstractTexture front, AbstractTexture back, AbstractTexture side) {
+    textures = new AbstractTexture[] {side, side, side, side, front, back};
     switch (facing) {
       case "up":
         quads = faces[1];
@@ -110,7 +110,7 @@ public class DirectionalBlockModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

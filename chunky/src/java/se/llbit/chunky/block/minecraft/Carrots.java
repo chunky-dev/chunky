@@ -21,10 +21,11 @@ package se.llbit.chunky.block.minecraft;
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.CropsModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class Carrots extends AbstractModelBlock {
 
-  private static final Texture[] texture = {
+  private static final AbstractTexture[] texture = {
       Texture.carrots0, Texture.carrots0, Texture.carrots1, Texture.carrots1,
       Texture.carrots2, Texture.carrots2, Texture.carrots2, Texture.carrots3
   };

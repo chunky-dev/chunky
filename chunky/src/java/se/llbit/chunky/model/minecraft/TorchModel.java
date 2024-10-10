@@ -19,7 +19,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -113,12 +113,12 @@ public class TorchModel extends QuadModel {
     rotatedQuadsWall[4] = Model.rotateY(rotatedQuadsWall[2]); // north
   }
 
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   private final int rotation;
 
-  public TorchModel(Texture texture, int rotation) {
-    this.textures = new Texture[]{texture, texture, texture, texture, texture, texture};
+  public TorchModel(AbstractTexture texture, int rotation) {
+    this.textures = new AbstractTexture[]{texture, texture, texture, texture, texture, texture};
     this.rotation = rotation;
   }
 
@@ -131,7 +131,7 @@ public class TorchModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

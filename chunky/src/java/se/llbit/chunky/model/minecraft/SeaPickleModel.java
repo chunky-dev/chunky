@@ -23,6 +23,7 @@ import java.util.Arrays;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
@@ -749,11 +750,11 @@ public class SeaPickleModel extends QuadModel {
   };
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public SeaPickleModel(int pickles, boolean live) {
     quads = Model.join(pickleModels[pickles - 1], live ? picklePickle[pickles - 1] : new Quad[0]);
-    textures = new Texture[quads.length];
+    textures = new AbstractTexture[quads.length];
     Arrays.fill(textures, Texture.seaPickle);
   }
 
@@ -763,7 +764,7 @@ public class SeaPickleModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

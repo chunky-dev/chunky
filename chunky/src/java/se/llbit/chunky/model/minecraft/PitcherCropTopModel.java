@@ -21,27 +21,28 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class PitcherCropTopModel extends QuadModel {
-  private static final Texture top = Texture.pitcherCropTop;
-  private static final Texture side = Texture.pitcherCropSide;
-  private static final Texture bottom = Texture.pitcherCropBottom;
-  private static final Texture bottomStage2 = Texture.pitcherCropBottomStage2;
-  private static final Texture topStage3 = Texture.pitcherCropTopStage3;
-  private static final Texture topStage4 = Texture.pitcherCropTopStage4;
+  private static final AbstractTexture top = Texture.pitcherCropTop;
+  private static final AbstractTexture side = Texture.pitcherCropSide;
+  private static final AbstractTexture bottom = Texture.pitcherCropBottom;
+  private static final AbstractTexture bottomStage2 = Texture.pitcherCropBottomStage2;
+  private static final AbstractTexture topStage3 = Texture.pitcherCropTopStage3;
+  private static final AbstractTexture topStage4 = Texture.pitcherCropTopStage4;
 
-  private static final Texture[][] textures = new Texture[][]{
+  private static final AbstractTexture[][] textures = new AbstractTexture[][]{
     null, null,
-    new Texture[]{
+    new AbstractTexture[]{
       bottomStage2, bottomStage2, bottomStage2, bottomStage2, top, bottom, side, side, side, side
     },
-    new Texture[]{
+    new AbstractTexture[]{
       topStage3, topStage3, topStage3, topStage3
     },
-    new Texture[]{
+    new AbstractTexture[]{
       topStage4, topStage4, topStage4, topStage4
     }
   };
@@ -184,7 +185,7 @@ public class PitcherCropTopModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures[age];
   }
 }

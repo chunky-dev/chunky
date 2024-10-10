@@ -18,10 +18,9 @@ package se.llbit.chunky.resources.texturepack;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.resources.ImageLoader;
 
 /** @author Jesper Öqvist <jesper@llbit.se> */
@@ -33,36 +32,36 @@ public class ChestTexture extends TextureLoader {
 
   private final String file;
   private Layout layout;
-  private final Texture lock;
-  private final Texture top;
-  private final Texture bottom;
-  private final Texture left;
-  private final Texture right;
-  private final Texture front;
-  private final Texture back;
+  private final BitmapTexture lock;
+  private final BitmapTexture top;
+  private final BitmapTexture bottom;
+  private final BitmapTexture left;
+  private final BitmapTexture right;
+  private final BitmapTexture front;
+  private final BitmapTexture back;
 
   public ChestTexture(
       String file,
-      Texture lock,
-      Texture top,
-      Texture bottom,
-      Texture left,
-      Texture right,
-      Texture front,
-      Texture back) {
+      BitmapTexture lock,
+      BitmapTexture top,
+      BitmapTexture bottom,
+      BitmapTexture left,
+      BitmapTexture right,
+      BitmapTexture front,
+      BitmapTexture back) {
     this(file, Layout.OLD_LAYOUT, lock, top, bottom, left, right, front, back);
   }
 
   public ChestTexture(
       String file,
       Layout layout,
-      Texture lock,
-      Texture top,
-      Texture bottom,
-      Texture left,
-      Texture right,
-      Texture front,
-      Texture back) {
+      BitmapTexture lock,
+      BitmapTexture top,
+      BitmapTexture bottom,
+      BitmapTexture left,
+      BitmapTexture right,
+      BitmapTexture front,
+      BitmapTexture back) {
     this.file = file;
     this.layout = layout;
     this.lock = lock;

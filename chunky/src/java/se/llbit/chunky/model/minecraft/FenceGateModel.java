@@ -18,7 +18,7 @@
 package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AABBModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 
 import java.util.Arrays;
@@ -72,12 +72,12 @@ public class FenceGateModel extends AABBModel {
   }
 
   private final AABB[] boxes;
-  private final Texture[][] textures;
+  private final AbstractTexture[][] textures;
 
-  public FenceGateModel(Texture texture, int facing, int inWall, int isOpen) {
+  public FenceGateModel(AbstractTexture texture, int facing, int inWall, int isOpen) {
     boxes = rot[inWall][isOpen][facing];
-    textures = new Texture[boxes.length][];
-    Texture[] tex = new Texture[6];
+    textures = new AbstractTexture[boxes.length][];
+    AbstractTexture[] tex = new AbstractTexture[6];
     Arrays.fill(tex, texture);
     Arrays.fill(textures, tex);
   }
@@ -88,7 +88,7 @@ public class FenceGateModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     return textures;
   }
 }

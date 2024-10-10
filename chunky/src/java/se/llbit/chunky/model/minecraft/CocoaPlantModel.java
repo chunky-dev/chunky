@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
@@ -151,16 +152,16 @@ public class CocoaPlantModel extends QuadModel {
     }
   }
 
-  private static final Texture[] tex = {Texture.cocoaPlantSmall, Texture.cocoaPlantMedium, Texture.cocoaPlantLarge};
+  private static final AbstractTexture[] tex = {Texture.cocoaPlantSmall, Texture.cocoaPlantMedium, Texture.cocoaPlantLarge};
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public CocoaPlantModel(int facing, int age) {
     quads = new Quad[fruit[age][facing].length+1];
     System.arraycopy(fruit[age][facing], 0, quads, 0, quads.length-1);
     quads[quads.length-1] = stem[facing];
-    textures = new Texture[quads.length];
+    textures = new AbstractTexture[quads.length];
     Arrays.fill(textures, tex[age]);
   }
 
@@ -170,7 +171,7 @@ public class CocoaPlantModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

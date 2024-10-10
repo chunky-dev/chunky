@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.resources;
+package se.llbit.chunky.resources.texture;
 
+import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.math.Ray;
 
 /**
@@ -23,7 +24,7 @@ import se.llbit.math.Ray;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class AnimatedTexture extends Texture {
+public class AnimatedTexture extends BitmapTexture {
 
   protected int numFrames = 1;
   protected int frameHeight = 0;

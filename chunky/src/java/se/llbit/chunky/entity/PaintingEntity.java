@@ -19,6 +19,7 @@
 package se.llbit.chunky.entity;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
@@ -40,7 +41,7 @@ public class PaintingEntity extends Entity {
     protected double ox;
     protected double oy;
 
-    public Painting(Texture painting, int w, int h) {
+    public Painting(AbstractTexture painting, int w, int h) {
       this.ox = -w / 2.0;
       this.oy = -h / 2.0;
 

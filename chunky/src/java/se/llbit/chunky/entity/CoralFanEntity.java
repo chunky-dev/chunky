@@ -18,7 +18,7 @@
 package se.llbit.chunky.entity;
 
 import se.llbit.chunky.block.minecraft.CoralFan;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
@@ -90,7 +90,7 @@ public class CoralFanEntity extends Entity {
         .translate(position.x + offset.x,
             position.y + offset.y,
             position.z + offset.z);
-    Texture texture = CoralFan.coralTexture(coralType);
+    AbstractTexture texture = CoralFan.coralTexture(coralType);
     Material mat = new TextureMaterial(texture);
     for (Quad quad : quads) {
       quad.addTriangles(faces, mat, transform);

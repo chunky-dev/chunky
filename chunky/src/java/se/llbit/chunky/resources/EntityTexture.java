@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.resources;
 
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.math.Vector4;
 
 /**
@@ -24,7 +25,7 @@ import se.llbit.math.Vector4;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class EntityTexture extends Texture {
+public class EntityTexture extends BitmapTexture {
 
   private static final UVMap UV = new UVMap(false); // e.g. skeleton
   private static final UVMap UV_EXTENDED = new UVMap(true); // e.g. zombie

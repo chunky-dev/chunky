@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -166,7 +167,7 @@ public class ChestModel extends QuadModel {
   //endregion
 
   //region Normal Chest
-  private static final Texture[][] normalChest = {
+  private static final AbstractTexture[][] normalChest = {
       // Single.
       {
           Texture.chestFront, Texture.chestBack, Texture.chestLeft, Texture.chestRight,
@@ -191,7 +192,7 @@ public class ChestModel extends QuadModel {
   //endregion
 
   //region Trapped Chest
-  private static final Texture[][] trappedChest = {
+  private static final AbstractTexture[][] trappedChest = {
       // Single.
       {
           Texture.trappedChestFront, Texture.trappedChestBack, Texture.trappedChestLeft, Texture.trappedChestRight,
@@ -216,7 +217,7 @@ public class ChestModel extends QuadModel {
   //endregion
 
   //region Ender Chest
-  private static final Texture[] enderChest = {
+  private static final AbstractTexture[] enderChest = {
       Texture.enderChestFront, Texture.enderChestBack, Texture.enderChestLeft,
       Texture.enderChestRight, Texture.enderChestTop, Texture.enderChestBottom,
       Texture.enderChestLock, Texture.enderChestLock, Texture.enderChestLock,
@@ -245,7 +246,7 @@ public class ChestModel extends QuadModel {
   }
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public ChestModel(int type, int facing, boolean trapped, boolean ender) {
     if (ender) {
@@ -264,7 +265,7 @@ public class ChestModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

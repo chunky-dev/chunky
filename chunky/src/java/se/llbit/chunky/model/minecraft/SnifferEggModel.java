@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
@@ -27,18 +28,18 @@ import se.llbit.math.Vector4;
 
 public class SnifferEggModel extends QuadModel {
   //region Textures
-  private static final Texture[][] textures = new Texture[][]{
-    new Texture[]{
+  private static final AbstractTexture[][] textures = new AbstractTexture[][]{
+    new AbstractTexture[]{
       Texture.snifferEggNotCrackedTop, Texture.snifferEggNotCrackedBottom,
       Texture.snifferEggNotCrackedWest, Texture.snifferEggNotCrackedEast,
       Texture.snifferEggNotCrackedNorth, Texture.snifferEggNotCrackedSouth
     },
-    new Texture[]{
+    new AbstractTexture[]{
       Texture.snifferEggSlightlyCrackedTop, Texture.snifferEggSlightlyCrackedBottom,
       Texture.snifferEggSlightlyCrackedWest, Texture.snifferEggSlightlyCrackedEast,
       Texture.snifferEggSlightlyCrackedNorth, Texture.snifferEggSlightlyCrackedSouth
     },
-    new Texture[]{
+    new AbstractTexture[]{
       Texture.snifferEggVeryCrackedTop, Texture.snifferEggVeryCrackedBottom,
       Texture.snifferEggVeryCrackedWest, Texture.snifferEggVeryCrackedEast,
       Texture.snifferEggVeryCrackedNorth, Texture.snifferEggVeryCrackedSouth
@@ -99,7 +100,7 @@ public class SnifferEggModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures[age];
   }
 }

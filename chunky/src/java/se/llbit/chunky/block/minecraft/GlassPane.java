@@ -20,13 +20,13 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.GlassPaneModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class GlassPane extends AbstractModelBlock {
   private final String description;
 
-  public GlassPane(String name, Texture side, Texture top,
-      boolean north, boolean south, boolean east, boolean west) {
+  public GlassPane(String name, AbstractTexture side, AbstractTexture top,
+                   boolean north, boolean south, boolean east, boolean west) {
     super(name, side);
     localIntersect = true;
     this.description = String.format("north=%s, south=%s, east=%s, west=%s",

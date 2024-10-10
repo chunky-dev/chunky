@@ -20,15 +20,16 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class MangroveRootsModel extends QuadModel {
-  private static final Texture side = Texture.mangroveRootsSide;
-  private static final Texture top = Texture.mangroveRootsTop;
+  private static final AbstractTexture side = Texture.mangroveRootsSide;
+  private static final AbstractTexture top = Texture.mangroveRootsTop;
 
-  private static final Texture[] textures = new Texture[]{
+  private static final AbstractTexture[] textures = new AbstractTexture[]{
     side, side, side, side, top, top, top, top, side, side, side, side, side, side, side, side
   };
 
@@ -137,7 +138,7 @@ public class MangroveRootsModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

@@ -19,7 +19,7 @@ package se.llbit.chunky.world;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
@@ -33,7 +33,7 @@ import se.llbit.util.ImageTools;
  *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
-public class SkymapTexture extends Texture {
+public class SkymapTexture extends BitmapTexture {
 
   class TexturePreprocessor extends Thread {
     private final int x0;
@@ -185,10 +185,6 @@ public class SkymapTexture extends Texture {
   }
 
   @Override public int getAvgColor() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override public void getAvgColorLinear(Vector4 c) {
     throw new UnsupportedOperationException();
   }
 

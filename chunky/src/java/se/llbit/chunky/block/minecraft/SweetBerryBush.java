@@ -19,13 +19,14 @@
 package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class SweetBerryBush extends SpriteBlock {
     public SweetBerryBush(int age) {
         super("sweet_berry_bush", getTextureByAge(age));
     }
 
-    protected static Texture getTextureByAge(int age) {
+    protected static AbstractTexture getTextureByAge(int age) {
         switch (age) {
             case 0:
                 return Texture.sweetBerryBushStage0;

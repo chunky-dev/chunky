@@ -19,13 +19,12 @@ package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.math.ColorUtil;
 import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.Arrays;
 
 /**
@@ -36,9 +35,9 @@ import java.util.Arrays;
 public class ColoredTexture extends TextureLoader {
   private final String textureName;
   private final float[] color = new float[4];
-  private final Texture texture;
+  private final BitmapTexture texture;
 
-  public ColoredTexture(String textureName, int color, Texture texture) {
+  public ColoredTexture(String textureName, int color, BitmapTexture texture) {
     this.textureName = textureName;
     this.texture = texture;
     ColorUtil.getRGBAComponents(color, this.color);

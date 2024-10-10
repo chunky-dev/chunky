@@ -20,6 +20,7 @@ package se.llbit.chunky.entity;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -319,7 +320,7 @@ public class SignEntity extends Entity {
   private final Color backDye;
   private final boolean frontGlowing;
   private final boolean backGlowing;
-  private final Texture texture;
+  private final AbstractTexture texture;
   private final String material;
 
   public SignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
@@ -328,7 +329,7 @@ public class SignEntity extends Entity {
 
   public SignEntity(Vector3 position, JsonArray[] frontText, Color frontDye, boolean frontGlowing, JsonArray[] backText, Color backDye, boolean backGlowing, int direction, String material) {
     super(position);
-    Texture signTexture = SignEntity.textureFromMaterial(material);
+    AbstractTexture signTexture = SignEntity.textureFromMaterial(material);
     this.frontText = frontText;
     this.backText = backText;
     this.frontDye = frontDye;
@@ -530,7 +531,7 @@ public class SignEntity extends Entity {
       .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     for (int i = 0; i < sides.length; ++i) {
       Quad quad = rot[angle][i];
-      Texture tex = texture;
+      AbstractTexture tex = texture;
       if (i == 0 && frontTexture != null) {
         tex = frontTexture;
         quad = frontFaceWithText[angle];
@@ -615,7 +616,7 @@ public class SignEntity extends Entity {
     return text;
   }
 
-  public static Texture textureFromMaterial(String material) {
+  public static AbstractTexture textureFromMaterial(String material) {
     switch (material) {
       case "oak":
         return Texture.oakSignPost;

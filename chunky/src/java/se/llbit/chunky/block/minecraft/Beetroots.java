@@ -21,10 +21,11 @@ package se.llbit.chunky.block.minecraft;
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.CropsModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class Beetroots extends AbstractModelBlock {
 
-  private static final Texture[] texture = {
+  private static final AbstractTexture[] texture = {
       Texture.beets0, Texture.beets1, Texture.beets2, Texture.beets3
   };
 

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
@@ -134,7 +135,7 @@ public class Lectern extends Entity implements Poseable {
     orientedTopQuads[3] = Model.rotateY(orientedTopQuads[2]);
   }
 
-  public static final Texture[] tex = {
+  public static final AbstractTexture[] tex = {
       Texture.lecternBase, Texture.oakPlanks,
       Texture.lecternBase, Texture.lecternBase, Texture.lecternBase, Texture.lecternBase,
 

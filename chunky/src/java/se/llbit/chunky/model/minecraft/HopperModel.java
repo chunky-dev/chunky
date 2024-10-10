@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -30,10 +31,10 @@ import se.llbit.math.Vector4;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class HopperModel extends QuadModel {
-  private static final Texture top = Texture.hopperTop;
-  private static final Texture side = Texture.hopperOutside;
-  private static final Texture inside = Texture.hopperInside;
-  private static final Texture[] tex = new Texture[]{
+  private static final AbstractTexture top = Texture.hopperTop;
+  private static final AbstractTexture side = Texture.hopperOutside;
+  private static final AbstractTexture inside = Texture.hopperInside;
+  private static final AbstractTexture[] tex = new AbstractTexture[]{
       inside, side, side, side, side, side, top, side, side, side, side, top, side, side, side, side, top, side, side,
       top, side, side, side, side, side, side, side, side, side, side, side, side
   };
@@ -459,7 +460,7 @@ public class HopperModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return tex;
   }
 }

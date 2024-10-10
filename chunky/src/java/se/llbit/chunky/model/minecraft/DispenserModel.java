@@ -19,35 +19,35 @@
 package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AABBModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 
 public class DispenserModel extends AABBModel {
   private final static AABB[] boxes = { new AABB(0, 1, 0, 1, 0, 1) };
 
-  private final Texture[][] textures;
+  private final AbstractTexture[][] textures;
 
-  public DispenserModel(String facing, Texture front, Texture frontVertical, Texture side, Texture back) {
-    textures = new Texture[1][];
+  public DispenserModel(String facing, AbstractTexture front, AbstractTexture frontVertical, AbstractTexture side, AbstractTexture back) {
+    textures = new AbstractTexture[1][];
 
     switch (facing) {
       case "up":
-        textures[0] = new Texture[] {back, back, back, back, frontVertical, back};
+        textures[0] = new AbstractTexture[] {back, back, back, back, frontVertical, back};
         break;
       case "down":
-        textures[0] = new Texture[] {back, back, back, back, back, frontVertical};
+        textures[0] = new AbstractTexture[] {back, back, back, back, back, frontVertical};
         break;
       case "north":
-        textures[0] = new Texture[] {front, side, side, side, back, back};
+        textures[0] = new AbstractTexture[] {front, side, side, side, back, back};
         break;
       case "east":
-        textures[0] = new Texture[] {side, front, side, side, back, back};
+        textures[0] = new AbstractTexture[] {side, front, side, side, back, back};
         break;
       case "south":
-        textures[0] = new Texture[] {side, side, front, side, back, back};
+        textures[0] = new AbstractTexture[] {side, side, front, side, back, back};
         break;
       case "west":
-        textures[0] = new Texture[] {side, side, side, front, back, back};
+        textures[0] = new AbstractTexture[] {side, side, side, front, back, back};
         break;
     }
   }
@@ -58,7 +58,7 @@ public class DispenserModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     return textures;
   }
 }

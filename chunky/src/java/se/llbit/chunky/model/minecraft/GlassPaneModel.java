@@ -19,7 +19,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.*;
 
 import java.util.ArrayList;
@@ -115,11 +115,11 @@ public class GlassPaneModel extends QuadModel {
   //endregion
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
-  public GlassPaneModel(Texture top, Texture side, boolean north, boolean south, boolean east, boolean west) {
+  public GlassPaneModel(AbstractTexture top, AbstractTexture side, boolean north, boolean south, boolean east, boolean west) {
     ArrayList<Quad> quads = new ArrayList<>();
-    ArrayList<Texture> textures = new ArrayList<>();
+    ArrayList<AbstractTexture> textures = new ArrayList<>();
 
     Consumer<Quad[]> addConnector = qs -> {
       quads.addAll(Arrays.asList(qs));
@@ -149,7 +149,7 @@ public class GlassPaneModel extends QuadModel {
     if (west) addConnector.accept(panes[3]);
 
     this.quads = quads.toArray(new Quad[0]);
-    this.textures = textures.toArray(new Texture[0]);
+    this.textures = textures.toArray(new AbstractTexture[0]);
   }
 
   @Override
@@ -158,7 +158,7 @@ public class GlassPaneModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

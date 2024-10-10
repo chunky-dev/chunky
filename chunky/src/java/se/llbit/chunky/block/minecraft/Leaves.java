@@ -20,17 +20,17 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.LeafModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class Leaves extends AbstractModelBlock {
 
-  public Leaves(String name, Texture texture) {
+  public Leaves(String name, AbstractTexture texture) {
     super(name, texture);
     solid = false;
     this.model = new LeafModel(texture);
   }
 
-  public Leaves(String name, Texture texture, int tint) {
+  public Leaves(String name, AbstractTexture texture, int tint) {
     super(name, texture);
     solid = false;
     this.model = new LeafModel(texture, tint);

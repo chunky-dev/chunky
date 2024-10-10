@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Quad;
@@ -111,7 +112,7 @@ public class RedstoneWireModel extends QuadModel {
       new Quad(new Vector3(1, 1, 1), new Vector3(1, 0, 1), new Vector3(0, 1, 1),
           new Vector4(1, 0, 1, 0));
 
-  private static final Texture[] tex = {
+  private static final AbstractTexture[] tex = {
       Texture.redstoneWireCross, Texture.redstoneWire, Texture.redstoneWire, Texture.redstoneWire,
       Texture.redstoneWire, Texture.redstoneWireCross, Texture.redstoneWireCross,
       Texture.redstoneWireCross, Texture.redstoneWire, Texture.redstoneWireCross,
@@ -138,7 +139,7 @@ public class RedstoneWireModel extends QuadModel {
   }
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
   private final Tint[] tints;
 
   public RedstoneWireModel(int power, int data) {
@@ -154,7 +155,7 @@ public class RedstoneWireModel extends QuadModel {
     if ((data & (1 << BlockData.RSW_SOUTH_UP)) != 0)
       quads.add(southSide);
     this.quads = quads.toArray(new Quad[0]);
-    this.textures = new Texture[this.quads.length];
+    this.textures = new AbstractTexture[this.quads.length];
     Arrays.fill(this.textures, Texture.redstoneWire);
     this.textures[0] = tex[connection];
     this.tints = new Tint[this.quads.length];
@@ -167,7 +168,7 @@ public class RedstoneWireModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 

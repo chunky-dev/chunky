@@ -1,18 +1,19 @@
 package se.llbit.chunky.resources;
 
-import se.llbit.math.ColorUtil;
+import se.llbit.chunky.resources.texture.AbstractNonlinearTexture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 
-public class ChiseledBookshelfTexture extends Texture {
+public class ChiseledBookshelfTexture extends AbstractNonlinearTexture {
   // The texture when no books are present
-  private Texture empty;
+  private AbstractNonlinearTexture empty;
 
   // The texture when all six books are present
-  private Texture full;
+  private AbstractNonlinearTexture full;
 
   // slot0 is top left, slot2 is top right, slot5 is bottom right
   private boolean slot0, slot1, slot2, slot3, slot4, slot5;
 
-  public ChiseledBookshelfTexture(Texture empty, Texture full, boolean slot0, boolean slot1, boolean slot2, boolean slot3, boolean slot4, boolean slot5) {
+  public ChiseledBookshelfTexture(BitmapTexture empty, BitmapTexture full, boolean slot0, boolean slot1, boolean slot2, boolean slot3, boolean slot4, boolean slot5) {
     this.empty = empty;
     this.full = full;
     this.slot0 = slot0;
@@ -23,46 +24,51 @@ public class ChiseledBookshelfTexture extends Texture {
     this.slot5 = slot5;
   }
   private boolean bookPresentAt(int x, int y) {
-    if(y * 2 < empty.image.height) {
-      if(x * 3 < empty.image.width) {
+    if(y * 2 < empty.getHeight()) {
+      if(x * 3 < empty.getWidth()) {
         return slot0;
-      } else if(x * 3 / 2 < empty.image.width) {
+      } else if(x * 3 / 2 < empty.getWidth()) {
         return slot1;
       } else {
         return slot2;
       }
     } else {
-      if(x * 3 < empty.image.width) {
+      if(x * 3 < empty.getWidth()) {
         return slot3;
-      } else if(x * 3 / 2 < empty.image.width) {
+      } else if(x * 3 / 2 < empty.getWidth()) {
         return slot4;
       } else {
         return slot5;
       }
     }
   }
+
   @Override
-  public int[] getData() {
-    int[] overlaidData = new int[image.data.length];
-    for(int i = 0; i < overlaidData.length; i++) {
-      int x = i % empty.image.width;
-      int y = i / empty.image.height;
-      boolean shouldOverlay = bookPresentAt(x, y);
-      overlaidData[i] = shouldOverlay ? full.image.data[i] : empty.image.data[i];
-    }
-    return overlaidData;
+  public int getWidth() {
+    return empty.getWidth();
   }
+
   @Override
-  public float[] getColor(int x, int y) {
-    if(useAverageColor)
-      return empty.getAvgColorFlat();
-    float[] result = new float[4];
-    boolean shouldOverlay = bookPresentAt(x, y);
-    if(shouldOverlay) {
-      ColorUtil.getRGBAComponentsGammaCorrected(full.image.data[width * y + x], result);
+  public int getHeight() {
+    return empty.getHeight();
+  }
+
+  @Override
+  public float[] getAvgColorLinear() {
+    return empty.getAvgColorLinear();
+  }
+
+  @Override
+  public int getAvgColor() {
+    return empty.getAvgColor();
+  }
+
+  @Override
+  public int getTextureColorI(int x, int y) {
+    if (bookPresentAt(x, y)) {
+      return full.getTextureColorI(x, y);
     } else {
-      ColorUtil.getRGBAComponentsGammaCorrected(empty.image.data[width * y + x], result);
+      return empty.getTextureColorI(x, y);
     }
-    return result;
   }
 }

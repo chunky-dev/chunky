@@ -19,13 +19,13 @@
 package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.MinecraftBlock;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class CopperBulb extends MinecraftBlock {
   private final boolean lit;
   private final boolean powered;
 
-  public CopperBulb(String name, boolean lit, boolean powered, Texture lp, Texture lnp, Texture nlp, Texture nlnp) {
+  public CopperBulb(String name, boolean lit, boolean powered, AbstractTexture lp, AbstractTexture lnp, AbstractTexture nlp, AbstractTexture nlnp) {
     super(name, lit ? (powered ? lp : lnp) : (powered ? nlp : nlnp));
     this.lit = lit;
     this.powered = powered;

@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.TopBottomOrientedTexturedBlockModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.log.Log;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
@@ -174,7 +175,7 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
   }
 
   public DecoratedPotModel(String facing, String[] sherds) {
-    super(facing, DEFAULT_QUADS, new Texture[]{
+    super(facing, DEFAULT_QUADS, new AbstractTexture[]{
       // sherds[0] top crafting slot -> north
       getTextureForsherd(sherds[0]),
       // sherds[3] bottom crafting slot -> south
@@ -188,7 +189,7 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
     });
   }
 
-  private static Texture getTextureForsherd(String sherd) {
+  private static AbstractTexture getTextureForsherd(String sherd) {
     if(sherd == null) {
       return Texture.decoratedPotSide;
     }
@@ -252,7 +253,7 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

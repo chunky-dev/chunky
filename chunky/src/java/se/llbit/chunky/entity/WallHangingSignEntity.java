@@ -3,7 +3,7 @@ package se.llbit.chunky.entity;
 import se.llbit.chunky.block.minecraft.WallHangingSign;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -237,7 +237,7 @@ public class WallHangingSignEntity extends Entity {
   private final SignEntity.Color backDye;
   private final boolean frontGlowing;
   private final boolean backGlowing;
-  private final Texture texture;
+  private final AbstractTexture texture;
   private final String material;
 
   public WallHangingSignEntity(Vector3 position, CompoundTag entityTag, WallHangingSign.Facing direction, String material) {
@@ -246,7 +246,7 @@ public class WallHangingSignEntity extends Entity {
 
   public WallHangingSignEntity(Vector3 position, JsonArray[] frontText, SignEntity.Color frontDye, boolean frontGlowing, JsonArray[] backText, SignEntity.Color backDye, boolean backGlowing, WallHangingSign.Facing direction, String material) {
     super(position);
-    Texture signTexture = HangingSignEntity.textureFromMaterial(material);
+    AbstractTexture signTexture = HangingSignEntity.textureFromMaterial(material);
     this.frontText = frontText;
     this.backText = backText;
     this.frontDye = frontDye;
@@ -266,7 +266,7 @@ public class WallHangingSignEntity extends Entity {
     Quad[] quads = rotatedQuads[orientation.ordinal()];
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
-      Texture tex = texture;
+      AbstractTexture tex = texture;
       if (i == 4 && frontTexture != null) {
         tex = frontTexture;
         quad = frontFaceWithText[orientation.ordinal()];

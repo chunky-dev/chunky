@@ -23,13 +23,14 @@ import java.util.Arrays;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class BambooModel extends QuadModel {
 
-  private static final Texture[] tex = new Texture[]{
+  private static final AbstractTexture[] tex = new AbstractTexture[]{
       Texture.bambooStalk, Texture.bambooStalk, Texture.bambooStalk, Texture.bambooStalk,
       Texture.bambooStalk, Texture.bambooStalk
   };
@@ -118,7 +119,7 @@ public class BambooModel extends QuadModel {
   };
   //endregion
 
-  private static final Texture[] smallLeavesTex = new Texture[]{
+  private static final AbstractTexture[] smallLeavesTex = new AbstractTexture[]{
       Texture.bambooSmallLeaves, Texture.bambooSmallLeaves, Texture.bambooSmallLeaves,
       Texture.bambooSmallLeaves,
   };
@@ -152,7 +153,7 @@ public class BambooModel extends QuadModel {
   };
   //endregion
 
-  private static final Texture[] largeLeavesTex = new Texture[]{
+  private static final AbstractTexture[] largeLeavesTex = new AbstractTexture[]{
       Texture.bambooLargeLeaves, Texture.bambooLargeLeaves, Texture.bambooLargeLeaves,
       Texture.bambooLargeLeaves
   };
@@ -187,7 +188,7 @@ public class BambooModel extends QuadModel {
   //endregion
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public BambooModel(int age, String leaves) {
     if ("small".equals(leaves)) {
@@ -214,12 +215,12 @@ public class BambooModel extends QuadModel {
     }
   }
 
-  private Texture[] joinTextures(Texture[]... textures) {
+  private AbstractTexture[] joinTextures(AbstractTexture[]... textures) {
     int length = 0;
-    for (Texture[] tex : textures) {
+    for (AbstractTexture[] tex : textures) {
       length += tex.length;
     }
-    Texture[] joined = Arrays.copyOf(textures[0], length);
+    AbstractTexture[] joined = Arrays.copyOf(textures[0], length);
     int offset = textures[0].length;
     for (int i = 1; i < textures.length; i++) {
       System.arraycopy(textures[i], 0, joined, offset, textures[i].length);
@@ -234,7 +235,7 @@ public class BambooModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

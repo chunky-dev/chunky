@@ -18,7 +18,7 @@
 package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -54,9 +54,9 @@ public class PressurePlateModel extends QuadModel {
 
   };
 
-  private final Texture[] textures = new Texture[quads.length];
+  private final AbstractTexture[] textures = new AbstractTexture[quads.length];
 
-  public PressurePlateModel(Texture texture) {
+  public PressurePlateModel(AbstractTexture texture) {
     Arrays.fill(textures, texture);
   }
 
@@ -66,7 +66,7 @@ public class PressurePlateModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

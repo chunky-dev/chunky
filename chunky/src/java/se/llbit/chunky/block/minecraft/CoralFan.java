@@ -23,6 +23,7 @@ import se.llbit.chunky.entity.CoralFanEntity;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
@@ -38,7 +39,7 @@ public class CoralFan extends MinecraftBlockTranslucent {
     invisible = true;
   }
 
-  public static Texture coralTexture(String coralType) {
+  public static AbstractTexture coralTexture(String coralType) {
     switch (coralType) {
       default:
       case "tube":

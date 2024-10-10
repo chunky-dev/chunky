@@ -21,10 +21,11 @@ package se.llbit.chunky.block.minecraft;
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.CropsModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class NetherWart extends AbstractModelBlock {
 
-  private static final Texture[] texture = {
+  private static final AbstractTexture[] texture = {
       Texture.netherWart0, Texture.netherWart1, Texture.netherWart1, Texture.netherWart2
   };
 

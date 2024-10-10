@@ -21,7 +21,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.model.Tint;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -33,7 +33,7 @@ import java.util.function.BiFunction;
 
 public class Flowerbed extends QuadModel {
   //region flowerbed_1
-  private static final BiFunction<Texture, Texture, Texture[]> flowerbed1Textures = (flowerbed, stem) -> new Texture[]{
+  private static final BiFunction<AbstractTexture, AbstractTexture, AbstractTexture[]> flowerbed1Textures = (flowerbed, stem) -> new AbstractTexture[]{
     flowerbed, flowerbed, stem, stem, stem, stem, stem, stem, stem, stem, stem, stem, stem, stem
   };
 
@@ -138,7 +138,7 @@ public class Flowerbed extends QuadModel {
   //endregion
 
   //region flowerbed_2
-  private static final BiFunction<Texture, Texture, Texture[]> flowerbed2Textures = (flowerbed, stem) -> new Texture[]{
+  private static final BiFunction<AbstractTexture, AbstractTexture, AbstractTexture[]> flowerbed2Textures = (flowerbed, stem) -> new AbstractTexture[]{
     flowerbed, flowerbed, flowerbed, flowerbed, stem, stem, stem, stem
   };
 
@@ -204,7 +204,7 @@ public class Flowerbed extends QuadModel {
   //endregion
 
   //region flowerbed_3
-  private static final BiFunction<Texture, Texture, Texture[]> flowerbed3Textures = (flowerbed, stem) -> new Texture[]{
+  private static final BiFunction<AbstractTexture, AbstractTexture, AbstractTexture[]> flowerbed3Textures = (flowerbed, stem) -> new AbstractTexture[]{
     flowerbed, flowerbed, stem, stem, stem, stem, stem, stem, stem, stem, stem, stem, stem, stem
   };
 
@@ -310,7 +310,7 @@ public class Flowerbed extends QuadModel {
   //endregion
 
   //region flowerbed_4
-  private static final BiFunction<Texture, Texture, Texture[]> flowerbed4Textures = (flowerbed, stem) -> new Texture[]{
+  private static final BiFunction<AbstractTexture, AbstractTexture, AbstractTexture[]> flowerbed4Textures = (flowerbed, stem) -> new AbstractTexture[]{
     flowerbed, flowerbed, stem, stem, stem, stem
   };
 
@@ -363,14 +363,14 @@ public class Flowerbed extends QuadModel {
   );
   //endregion
 
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   private final Quad[] quads;
 
   private final Tint[] tints;
 
-  public Flowerbed(Texture flowerbed, Texture stem, int flowerAmount, String facing) {
-    List<Texture> textures = new ArrayList<>();
+  public Flowerbed(AbstractTexture flowerbed, AbstractTexture stem, int flowerAmount, String facing) {
+    List<AbstractTexture> textures = new ArrayList<>();
     List<Quad> quadList = new ArrayList<>();
     List<Tint> tints = new ArrayList<>();
 
@@ -394,7 +394,7 @@ public class Flowerbed extends QuadModel {
       Collections.addAll(tints, flowerbed4Tints);
     }
 
-    this.textures = textures.toArray(new Texture[0]);
+    this.textures = textures.toArray(new AbstractTexture[0]);
     Quad[] quads = quadList.toArray(new Quad[0]);
     this.tints = tints.toArray(new Tint[0]);
 
@@ -418,7 +418,7 @@ public class Flowerbed extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 

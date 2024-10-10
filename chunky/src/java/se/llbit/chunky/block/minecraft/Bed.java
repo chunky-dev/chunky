@@ -20,13 +20,13 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.BedModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class Bed extends AbstractModelBlock {
 
   private final String description;
 
-  public Bed(String name, Texture texture, String part, String facing) {
+  public Bed(String name, AbstractTexture texture, String part, String facing) {
     super(name, texture);
     this.description = String.format("part=%s, facing=%s", part, facing);
     boolean head = part.equals("head");

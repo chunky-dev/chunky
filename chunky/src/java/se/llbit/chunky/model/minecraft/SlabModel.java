@@ -19,7 +19,7 @@
 package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AABBModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.AABB;
 
 public class SlabModel extends AABBModel {
@@ -28,9 +28,9 @@ public class SlabModel extends AABBModel {
   private final static AABB[] full = { new AABB(0, 1, 0, 1, 0, 1) };
 
   private final AABB[] boxes;
-  private final Texture[][] textures;
+  private final AbstractTexture[][] textures;
 
-  public SlabModel(Texture side, Texture top, String type) {
+  public SlabModel(AbstractTexture side, AbstractTexture top, String type) {
     switch (type) {
       case "top":
         boxes = upper;
@@ -44,7 +44,7 @@ public class SlabModel extends AABBModel {
         break;
     }
 
-    textures = new Texture[][] {{
+    textures = new AbstractTexture[][] {{
       side, side, side, side, top, top
     }};
   }
@@ -55,7 +55,7 @@ public class SlabModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
+  public AbstractTexture[][] getTextures() {
     return textures;
   }
 }

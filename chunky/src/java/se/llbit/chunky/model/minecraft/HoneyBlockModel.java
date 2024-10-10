@@ -19,6 +19,7 @@
 package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.*;
 
 public class HoneyBlockModel {
@@ -97,7 +98,7 @@ public class HoneyBlockModel {
             ),
     };
 
-    private static final Texture[] tex = {
+    private static final AbstractTexture[] tex = {
             Texture.honeyBlockBottom, Texture.honeyBlockBottom, Texture.honeyBlockBottom,
             Texture.honeyBlockBottom, Texture.honeyBlockBottom, Texture.honeyBlockBottom,
 

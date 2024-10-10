@@ -17,10 +17,8 @@
  */
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
 
 /**
  * This block model is used to render blocks which can face east, west, north, south, up and down.
@@ -35,10 +33,10 @@ public class RotatableBlockModel extends QuadModel {
     FULL_BLOCK_TOP_SIDE,
     FULL_BLOCK_BOTTOM_SIDE
   };
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
-  public RotatableBlockModel(Texture north, Texture east, Texture south, Texture west, Texture top, Texture bottom) {
-    textures = new Texture[] {north, east, south, west, top, bottom};
+  public RotatableBlockModel(AbstractTexture north, AbstractTexture east, AbstractTexture south, AbstractTexture west, AbstractTexture top, AbstractTexture bottom) {
+    textures = new AbstractTexture[] {north, east, south, west, top, bottom};
   }
 
   public void setFaceQuad(int face, Quad quad) {
@@ -105,7 +103,7 @@ public class RotatableBlockModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

@@ -20,11 +20,11 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.PressurePlateModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class PressurePlate extends AbstractModelBlock {
 
-  public PressurePlate(String name, Texture texture) {
+  public PressurePlate(String name, AbstractTexture texture) {
     super(name, texture);
     model = new PressurePlateModel(texture);
   }

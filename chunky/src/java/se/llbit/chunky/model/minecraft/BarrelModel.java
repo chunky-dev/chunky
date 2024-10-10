@@ -21,6 +21,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -53,10 +54,10 @@ public class BarrelModel extends QuadModel {
   };
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public BarrelModel(String facing, String open) {
-    textures = new Texture[] {Texture.barrelSide, Texture.barrelSide, Texture.barrelSide, Texture.barrelSide,
+    textures = new AbstractTexture[] {Texture.barrelSide, Texture.barrelSide, Texture.barrelSide, Texture.barrelSide,
         open.equals("true") ? Texture.barrelOpen : Texture.barrelTop, Texture.barrelBottom};
     switch (facing) {
       default:
@@ -87,7 +88,7 @@ public class BarrelModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

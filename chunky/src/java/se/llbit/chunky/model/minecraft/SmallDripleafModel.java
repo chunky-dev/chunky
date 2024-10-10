@@ -21,6 +21,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -208,19 +209,19 @@ public class SmallDripleafModel extends QuadModel {
   private static final Quad[][] orientedTopQuads = new Quad[4][];
   private static final Quad[][] orientedBottomQuads = new Quad[4][];
 
-  private static final Texture[] topTextures;
-  private static final Texture[] bottomTextures;
+  private static final AbstractTexture[] topTextures;
+  private static final AbstractTexture[] bottomTextures;
 
   static {
-    Texture top = Texture.smallDripleafTop;
-    Texture side = Texture.smallDripleafSide;
-    Texture stemTop = Texture.smallDripleafStemTop;
-    Texture stemBottom = Texture.smallDripleafStemBottom;
-    topTextures = new Texture[] {
+    AbstractTexture top = Texture.smallDripleafTop;
+    AbstractTexture side = Texture.smallDripleafSide;
+    AbstractTexture stemTop = Texture.smallDripleafStemTop;
+    AbstractTexture stemBottom = Texture.smallDripleafStemBottom;
+    topTextures = new AbstractTexture[] {
         top, top, top, top, top, top, side, side, side, side, side, side, side, side, side, side,
         side, side, stemTop, stemTop, stemTop, stemTop
     };
-    bottomTextures = new Texture[] {stemBottom, stemBottom, stemBottom, stemBottom};
+    bottomTextures = new AbstractTexture[] {stemBottom, stemBottom, stemBottom, stemBottom};
 
     orientedTopQuads[0] = topQuadsNorth;
     orientedTopQuads[1] = Model.rotateY(orientedTopQuads[0]);
@@ -233,7 +234,7 @@ public class SmallDripleafModel extends QuadModel {
   }
 
   private final Quad[] quads;
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public SmallDripleafModel(String facingString, String halfString) {
     quads = halfString.equals("upper")
@@ -262,7 +263,7 @@ public class SmallDripleafModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

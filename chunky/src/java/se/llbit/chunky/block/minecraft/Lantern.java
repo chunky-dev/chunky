@@ -20,13 +20,13 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.LanternModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class Lantern extends AbstractModelBlock {
 
   private final boolean hanging;
 
-  public Lantern(String name, Texture texture, boolean hanging) {
+  public Lantern(String name, AbstractTexture texture, boolean hanging) {
     super(name, texture);
     this.hanging = hanging;
     this.model = new LanternModel(texture, hanging);

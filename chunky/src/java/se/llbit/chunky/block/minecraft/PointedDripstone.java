@@ -19,6 +19,7 @@
 package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class PointedDripstone extends SpriteBlock {
 
@@ -27,7 +28,7 @@ public class PointedDripstone extends SpriteBlock {
     this.waterlogged = waterlogged;
   }
 
-  private static Texture getTexture(String thickness, String verticalDirection) {
+  private static AbstractTexture getTexture(String thickness, String verticalDirection) {
     if (verticalDirection.equals("down")) {
       switch (thickness) {
         case "tip_merge":

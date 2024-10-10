@@ -21,14 +21,15 @@ package se.llbit.chunky.block.minecraft;
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.RailModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class Rail extends AbstractModelBlock {
 
   private final String description;
 
-  public Rail(String name, Texture straightTrack, String shape) {
+  public Rail(String name, AbstractTexture straightTrack, String shape) {
     super(name, Texture.dispenserFront);
-    Texture[] texture = new Texture[]{
+    AbstractTexture[] texture = new AbstractTexture[]{
         straightTrack, straightTrack, straightTrack, straightTrack, straightTrack, straightTrack,
         Texture.railsCurved, Texture.railsCurved, Texture.railsCurved, Texture.railsCurved
     };

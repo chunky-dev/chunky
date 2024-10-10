@@ -18,7 +18,7 @@
 package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AnimatedQuadModel;
-import se.llbit.chunky.resources.AnimatedTexture;
+import se.llbit.chunky.resources.texture.AnimatedTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;

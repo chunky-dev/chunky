@@ -20,14 +20,14 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.ButtonModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class Button extends AbstractModelBlock {
 
   private final String description;
   // TODO(llbit): render powered buttons
 
-  public Button(String name, Texture texture, String face, String facing, boolean powered) {
+  public Button(String name, AbstractTexture texture, String face, String facing, boolean powered) {
     super(name, texture);
     this.description = String.format("face=%s, facing=%s, powered=%s",
         face, facing, powered);

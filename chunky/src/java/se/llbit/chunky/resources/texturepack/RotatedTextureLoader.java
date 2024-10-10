@@ -18,11 +18,10 @@ package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 
 /**
  * Loads a single texture and rotates it 90 degrees clockwise and
@@ -32,9 +31,9 @@ import java.nio.file.Path;
  */
 public class RotatedTextureLoader extends TextureLoader {
   protected TextureLoader loader;
-  protected Texture texture;
+  protected BitmapTexture texture;
 
-  public RotatedTextureLoader(String file, Texture texture) {
+  public RotatedTextureLoader(String file, BitmapTexture texture) {
     this.texture = texture;
     loader = new SimpleTexture(file, texture);
   }

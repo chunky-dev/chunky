@@ -19,11 +19,11 @@
 package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.MinecraftBlockTranslucent;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.chunky.world.Material;
 
 public class Glass extends MinecraftBlockTranslucent {
-  public Glass(String name, Texture texture) {
+  public Glass(String name, AbstractTexture texture) {
     super(name, texture);
     ior = 1.52f;
   }

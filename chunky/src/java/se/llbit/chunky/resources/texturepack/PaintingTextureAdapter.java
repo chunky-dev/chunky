@@ -20,10 +20,10 @@ package se.llbit.chunky.resources.texturepack;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 
 /**
  * This texture loader is an adapter for the pre-1.14 painting textures. It splits the pre-1.14
@@ -74,7 +74,7 @@ public class PaintingTextureAdapter extends TextureLoader {
     return false;
   }
 
-  private static class PaintingsAtlas extends Texture {
+  private static class PaintingsAtlas extends BitmapTexture {
 
     public BitmapImage getPainting(int px0, int px1, int py0, int py1) {
       BitmapImage painting = new BitmapImage(px1 - px0, py1 - py0);

@@ -20,6 +20,7 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -78,7 +79,7 @@ public class EndRodModel extends QuadModel {
     orientations[5] = east;
   }
 
-  private final static Texture[] textures = new Texture[up.length];
+  private final static AbstractTexture[] textures = new AbstractTexture[up.length];
   static { Arrays.fill(textures, Texture.endRod); }
 
   private final Quad[] quads;
@@ -93,7 +94,7 @@ public class EndRodModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

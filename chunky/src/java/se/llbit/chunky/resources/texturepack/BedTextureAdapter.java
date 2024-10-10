@@ -20,11 +20,11 @@ package se.llbit.chunky.resources.texturepack;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.BitmapTexture;
 import se.llbit.log.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 
 /**
  * This texture loader is an adapter for the pre-1.12 bed textures.
@@ -33,13 +33,13 @@ import java.nio.file.Path;
  * <p>This texture loader is only used if a post-1.12 red bed texture is not found.
  */
 public class BedTextureAdapter extends TextureLoader {
-  private final Texture bedHeadTop = new Texture();
-  private final Texture bedFootTop = new Texture();
-  private final Texture bedFootEnd = new Texture();
-  private final Texture bedFootSide = new Texture();
-  private final Texture bedHeadSide = new Texture();
-  private final Texture bedHeadEnd = new Texture();
-  private final Texture bottom = new Texture();
+  private final BitmapTexture bedHeadTop = new BitmapTexture();
+  private final BitmapTexture bedFootTop = new BitmapTexture();
+  private final BitmapTexture bedFootEnd = new BitmapTexture();
+  private final BitmapTexture bedFootSide = new BitmapTexture();
+  private final BitmapTexture bedHeadSide = new BitmapTexture();
+  private final BitmapTexture bedHeadEnd = new BitmapTexture();
+  private final BitmapTexture bottom = new BitmapTexture();
   private final AlternateTextures bottomLoader;
   private final AlternateTextures footTopLoader;
   private final AlternateTextures headTopLoader;
@@ -196,7 +196,7 @@ public class BedTextureAdapter extends TextureLoader {
    * Ensures that the bed texture part has the right dimensions.
    * @return {@code true} if the texture has the correct size
    */
-  private boolean checkSize(Texture texture, int scale) {
+  private boolean checkSize(BitmapTexture texture, int scale) {
     if (texture.getWidth() != 16 * scale) {
       Log.warnf("Bed texture has wrong scale: expected %d, but was %d.",
           16 * scale, texture.getWidth());

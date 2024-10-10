@@ -21,16 +21,17 @@ package se.llbit.chunky.model.minecraft;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class GrindstoneModel extends QuadModel {
-  private static final Texture pivot = Texture.grindstonePivot;
-  private static final Texture round = Texture.grindstoneRound;
-  private static final Texture side = Texture.grindstoneSide;
-  private static final Texture leg = Texture.darkOakWood;
-  private static final Texture[] textures = new Texture[] {
+  private static final AbstractTexture pivot = Texture.grindstonePivot;
+  private static final AbstractTexture round = Texture.grindstoneRound;
+  private static final AbstractTexture side = Texture.grindstoneSide;
+  private static final AbstractTexture leg = Texture.darkOakWood;
+  private static final AbstractTexture[] textures = new AbstractTexture[] {
       leg, leg, leg, leg, leg,
       leg, leg, leg, leg, leg,
       pivot, pivot, pivot, pivot, pivot,
@@ -263,7 +264,7 @@ public class GrindstoneModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }

@@ -20,9 +20,10 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class FrostedIce extends MinecraftBlockTranslucent {
-  private static final Texture[] texture = {
+  private static final AbstractTexture[] texture = {
       Texture.frostedIce0, Texture.frostedIce1, Texture.frostedIce2, Texture.frostedIce3
   };
 

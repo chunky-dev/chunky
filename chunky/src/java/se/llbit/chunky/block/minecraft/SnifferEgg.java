@@ -21,6 +21,7 @@ package se.llbit.chunky.block.minecraft;
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.SnifferEggModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class SnifferEgg extends AbstractModelBlock {
 
@@ -37,7 +38,7 @@ public class SnifferEgg extends AbstractModelBlock {
     return description;
   }
 
-  private static Texture getTopTexture(int hatch) {
+  private static AbstractTexture getTopTexture(int hatch) {
     switch (hatch) {
       case 1:
         return Texture.snifferEggSlightlyCrackedTop;

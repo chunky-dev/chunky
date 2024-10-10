@@ -21,7 +21,7 @@ package se.llbit.chunky.block.minecraft;
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.block.BlockFace;
 import se.llbit.chunky.model.minecraft.StairModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class Stairs extends AbstractModelBlock {
 
@@ -29,11 +29,11 @@ public class Stairs extends AbstractModelBlock {
   private final BlockFace facing;
   private final String description;
 
-  public Stairs(String name, Texture texture, String half, String shape, String facing) {
+  public Stairs(String name, AbstractTexture texture, String half, String shape, String facing) {
     this(name, texture, texture, texture, half, shape, facing);
   }
 
-  public Stairs(String name, Texture side, Texture top, Texture bottom,
+  public Stairs(String name, AbstractTexture side, AbstractTexture top, AbstractTexture bottom,
       String half, String shape, String facing) {
     super(name, side);
     this.description = String.format("half=%s, shape=%s, facing=%s", half, shape, facing);

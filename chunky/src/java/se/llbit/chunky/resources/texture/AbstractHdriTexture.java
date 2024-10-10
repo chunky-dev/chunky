@@ -14,12 +14,43 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.resources;
+package se.llbit.chunky.resources.texture;
 
 import se.llbit.math.Vector4;
 
-public class AbstractHdriTexture extends Texture {
+public class AbstractHdriTexture extends AbstractTexture {
+  protected int width;
+  protected int height;
+  private final float[] avgColor = new float[] {0, 0, 0, 1};
+
   public float[] buf;
+
+  public AbstractHdriTexture() {
+    this.followAverageColor = false;
+  }
+
+  @Override
+  public int getWidth() {
+    return width;
+  }
+
+  @Override
+  public int getHeight() {
+    return height;
+  }
+
+  @Override
+  public float[] getTextureColor(int x, int y) {
+    float[] result = new float[4];
+    System.arraycopy(buf, (y*width + x)*3, result, 0, 3);
+    result[4] = 1;
+    return result;
+  }
+
+  @Override
+  public float[] getAvgColorLinear() {
+    return avgColor;
+  }
 
   @Override public void getColorInterpolated(double u, double v, Vector4 sample) {
     double x = width * u;

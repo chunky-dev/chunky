@@ -17,7 +17,7 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.model.minecraft.SpriteModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 
 public class GrassTintedSpriteModel extends SpriteModel {
 
@@ -25,7 +25,7 @@ public class GrassTintedSpriteModel extends SpriteModel {
     Tint.BIOME_GRASS, Tint.BIOME_GRASS, Tint.BIOME_GRASS, Tint.BIOME_GRASS
   };
 
-  public GrassTintedSpriteModel(Texture texture) {
+  public GrassTintedSpriteModel(AbstractTexture texture) {
     super(texture);
   }
 

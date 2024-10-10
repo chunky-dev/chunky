@@ -2,6 +2,7 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texture.AbstractTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -82,14 +83,14 @@ public class TrialSpawnerModel extends QuadModel {
     )
   };
 
-  private final Texture[] textures;
+  private final AbstractTexture[] textures;
 
   public TrialSpawnerModel(
     boolean ominous, String trialSpawnerState
   ) {
-    Texture top = getTopTexture(ominous, trialSpawnerState);
-    Texture bottom = Texture.trialSpawnerBottom;
-    Texture side;
+    AbstractTexture top = getTopTexture(ominous, trialSpawnerState);
+    AbstractTexture bottom = Texture.trialSpawnerBottom;
+    AbstractTexture side;
     switch (trialSpawnerState) {
       case "active":
       case "waiting_for_players":
@@ -103,12 +104,12 @@ public class TrialSpawnerModel extends QuadModel {
         side = ominous ? Texture.trialSpawnerSideInactiveOminous : Texture.trialSpawnerSideInactive;
         break;
     }
-    textures = new Texture[]{
+    textures = new AbstractTexture[]{
       top, bottom, side, side, side, side, top, bottom, side, side, side, side
     };
   }
 
-  public static Texture getTopTexture(boolean ominous, String trialSpawnerState) {
+  public static AbstractTexture getTopTexture(boolean ominous, String trialSpawnerState) {
     switch (trialSpawnerState) {
       case "active":
       case "waiting_for_players":
@@ -129,7 +130,7 @@ public class TrialSpawnerModel extends QuadModel {
   }
 
   @Override
-  public Texture[] getTextures() {
+  public AbstractTexture[] getTextures() {
     return textures;
   }
 }
