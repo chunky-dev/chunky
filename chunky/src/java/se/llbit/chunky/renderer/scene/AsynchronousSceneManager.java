@@ -30,7 +30,8 @@ import se.llbit.util.TaskTracker;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * This scene manager is used for asynchronous loading and saving of scenes.
@@ -39,16 +40,39 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class AsynchronousSceneManager extends Thread implements SceneManager {
+public class AsynchronousSceneManager implements SceneManager {
 
   private final SynchronousSceneManager sceneManager;
-  private final LinkedBlockingQueue<Runnable> taskQueue;
+  private final ExecutorService executorService = Executors.newSingleThreadExecutor(runnable -> {
+    Thread thread = new Thread(runnable, "AsynchronousSceneManager-Thread");
+    thread.setUncaughtExceptionHandler((t, exception) -> {
+      if (exception instanceof OutOfMemoryError) {
+        Log.error(
+          "Chunky has run out of memory! Increase the memory given to Chunky in the launcher.",
+          exception);
+        throw (Error) exception;
+      } else if(exception instanceof InterruptedException) {
+        Thread.currentThread().interrupt();
+      } else {
+        Log.error("Scene manager has crashed due to an uncaught exception. \n" +
+          "Chunky might not work properly until you restart it.\n" +
+          "If you think this is a bug, please report it and the following lines to the developers.",
+          exception);
+        // a new thread will be created by the executor after the current one terminated and a new task is enqueued
+      }
+    });
+    return thread;
+  });
 
   public AsynchronousSceneManager(RenderContext context, RenderManager renderManager) {
-    super("Scene Manager");
-
     sceneManager = new SynchronousSceneManager(context, renderManager);
-    taskQueue = new LinkedBlockingQueue<>();
+  }
+
+  /**
+   * Schedule a task to be run soon.
+   */
+  public void enqueueTask(Runnable task) {
+    executorService.execute(task);
   }
 
   @Override
@@ -83,26 +107,6 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
 
   @Override public Scene getScene() {
     return sceneManager.getScene();
-  }
-
-  @Override public void run() {
-    try {
-      while (!isInterrupted()) {
-        Runnable task = taskQueue.take();
-        task.run();
-      }
-    } catch (InterruptedException ignored) {
-      // Interrupted.
-    } catch (Throwable e) {
-      if (e instanceof OutOfMemoryError) {
-        Log.error("Chunky has run out of memory! Increase the memory given to Chunky in the launcher.", e);
-      } else {
-        Log.error("Scene manager has crashed due to an uncaught exception. " +
-            "Chunky will not work properly until you restart it. " +
-            "If you think this is a bug, please report it to the developers.", e);
-      }
-      throw e;
-    }
   }
 
   /**
@@ -227,84 +231,6 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
    */
   public void mergeRenderDump(File renderDump) {
     enqueueTask(() -> sceneManager.mergeDump(renderDump));
-  }
-
-  /**
-   * Schedule a task to be run soon.
-   */
-  public void enqueueTask(Runnable task) {
-    taskQueue.add(task);
-  }
-
-  /**
-   * Remove problematic characters from scene name.
-   *
-   * @return sanitized scene name
-   */
-  public static String sanitizedSceneName(String name, String fallbackName) {
-    name = name.trim();
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < name.length(); ++i) {
-      char c = name.charAt(i);
-      if (isValidSceneNameChar(c)) {
-        sb.append(c);
-      } else if (c >= '\u0020' && c <= '\u007e') {
-        sb.append('_');
-      }
-    }
-    String stripped = sb.toString().trim();
-    if (stripped.isEmpty()) {
-      return fallbackName;
-    } else {
-      return stripped;
-    }
-  }
-
-  /**
-   * Remove problematic characters from scene name.
-   *
-   * @return sanitized scene name
-   */
-  public static String sanitizedSceneName(String name) {
-    return sanitizedSceneName(name, "Scene");
-  }
-
-  /**
-   * @return <code>false</code> if the character can cause problems on any
-   * supported platform.
-   */
-  public static boolean isValidSceneNameChar(char c) {
-    switch (c) {
-      case '/':
-      case ':':
-      case ';':
-      case '\\': // Windows file separator.
-      case '*':
-      case '?':
-      case '"':
-      case '<':
-      case '>':
-      case '|':
-        return false;
-    }
-    if (c < '\u0020') {
-      return false;
-    }
-    return c <= '\u007e' || c >= '\u00a0';
-  }
-
-  /**
-   * Check for scene name validity.
-   *
-   * @return <code>true</code> if the scene name contains only legal characters
-   */
-  public static boolean sceneNameIsValid(String name) {
-    for (int i = 0; i < name.length(); ++i) {
-      if (!isValidSceneNameChar(name.charAt(i))) {
-        return false;
-      }
-    }
-    return true;
   }
 
   public void discardSceneChanges() {
