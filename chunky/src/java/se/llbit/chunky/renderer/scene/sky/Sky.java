@@ -804,7 +804,11 @@ public class Sky implements JsonSerializable {
     JsonArray array = new JsonArray();
     for (Vector4 stop : gradient) {
       JsonObject obj = new JsonObject();
-      obj.add("rgb", ColorUtil.toString(stop.x, stop.y, stop.z));
+      JsonObject colorObj = new JsonObject();
+      colorObj.add("red", stop.x);
+      colorObj.add("green", stop.y);
+      colorObj.add("blue", stop.z);
+      obj.add("color", colorObj);
       obj.add("pos", stop.w);
       array.add(obj);
     }
@@ -820,9 +824,16 @@ public class Sky implements JsonSerializable {
       JsonObject obj = array.get(i).object();
       Vector3 color = new Vector3();
       try {
-        ColorUtil.fromString(obj.get("rgb").stringValue(""), 16, color);
+        if (obj.get("color").isUnknown()) {
+          ColorUtil.fromString(obj.get("rgb").stringValue(""), 16, color);
+        } else  {
+          JsonObject colorObj = obj.get("color").asObject();
+          color.x = colorObj.get("red").doubleValue(0);
+          color.y = colorObj.get("green").doubleValue(0);
+          color.z = colorObj.get("blue").doubleValue(0);
+        }
         Vector4 stop =
-            new Vector4(color.x, color.y, color.z, obj.get("pos").doubleValue(Double.NaN));
+          new Vector4(color.x, color.y, color.z, obj.get("pos").doubleValue(Double.NaN));
         if (!Double.isNaN(stop.w)) {
           gradient.add(stop);
         }
