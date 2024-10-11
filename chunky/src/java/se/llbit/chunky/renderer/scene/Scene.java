@@ -2595,7 +2595,11 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("camera", camera.toJson());
     json.add("sun", sun.toJson());
     json.add("sky", sky.toJson());
-    json.add("cameraPresets", cameraPresets.copy());
+    JsonObject cameraPresets = this.cameraPresets.copy();
+    for (JsonMember item : cameraPresets.members) {
+      item.value.object().remove("name");
+    }
+    json.add("cameraPresets", cameraPresets);
     JsonArray chunkList = new JsonArray();
     for (ChunkPosition pos : chunks) {
       JsonArray chunk = new JsonArray();
@@ -2923,7 +2927,11 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     if (json.get("cameraPresets").isObject()) {
-      cameraPresets = json.get("cameraPresets").object();
+      JsonObject cameraPresets = json.get("cameraPresets").object();
+      for (JsonMember member : cameraPresets.members) {
+        member.value.object().set("name", new JsonString(member.name));
+      }
+      this.cameraPresets = cameraPresets;
     }
 
     // Current SPP and render time are read after loading
