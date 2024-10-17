@@ -118,7 +118,7 @@ public class TexturedTriangle implements Primitive {
       material.getColor(intersectionRecord);
       intersectionRecord.material = material;
       intersectionRecord.distance = t;
-      intersectionRecord.setNormal(n);
+      intersectionRecord.setNormal(Vector3.orientNormal(ray.d, n));
       intersectionRecord.flags |= IntersectionRecord.NO_MEDIUM_CHANGE;
       return true;
     }
