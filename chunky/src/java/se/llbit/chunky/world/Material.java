@@ -271,51 +271,60 @@ public abstract class Material {
     double n1 = ray.getCurrentMedium().ior;
 
     double pDiffuse = intersectionRecord.color.w * alpha;
-    if (random.nextDouble() < specular) {
-      direction = specularReflection(ray.d, intersectionRecord.shadeN);
-      if (roughness > Constants.EPSILON) {
-        Vector3 roughnessDirection = lambertianReflection(intersectionRecord.n, random);
-        roughnessDirection.scale(roughness);
-        roughnessDirection.scaleAdd(1 - roughness, direction);
-        roughnessDirection.normalize();
-        direction = roughnessDirection;
-      }
-      colorSpecular(intersectionRecord.color, metalness, specularColor, random);
-      ray.flags |= Ray2.SPECULAR;
 
-    } else if (FastMath.abs(n2 - n1) > Constants.EPSILON) {
-      boolean front_face = ray.d.dot(intersectionRecord.shadeN) < 0.0;
-      double ri = (front_face) ? (n1 / n2) : (n2 / n1);
-
-      Vector3 unitDirection = ray.d.normalized();
-      double cosTheta = FastMath.min(unitDirection.rScale(-1).dot(intersectionRecord.shadeN), 1.0);
-      double sinTheta = FastMath.sqrt(1.0 - cosTheta * cosTheta);
-
-      boolean cannotRefract = ri * sinTheta > 1.0;
-
-      if (cannotRefract || schlickReflectance(cosTheta, ri) > random.nextDouble()) {
-        direction = specularReflection(unitDirection, intersectionRecord.shadeN);
-        double interfaceRoughness = FastMath.max(roughness, ray.getCurrentMedium().roughness);
-        if (interfaceRoughness > Constants.EPSILON) {
+    if (random.nextDouble() < pDiffuse) {
+      // Reflection
+      if (random.nextDouble() < specular) {
+        // Specular reflection with roughness
+        direction = specularReflection(ray.d, intersectionRecord.shadeN);
+        if (roughness > Constants.EPSILON) {
           Vector3 roughnessDirection = lambertianReflection(intersectionRecord.n, random);
-          roughnessDirection.scale(interfaceRoughness);
-          roughnessDirection.scaleAdd(1 - interfaceRoughness, direction);
+          roughnessDirection.scale(roughness);
+          roughnessDirection.scaleAdd(1 - roughness, direction);
           roughnessDirection.normalize();
           direction = roughnessDirection;
         }
         colorSpecular(intersectionRecord.color, metalness, specularColor, random);
         ray.flags |= Ray2.SPECULAR;
       } else {
-        if (random.nextDouble() < pDiffuse) {
-          if (random.nextDouble() < subSurfaceScattering) {
-            intersectionRecord.shadeN.scale(-1);
-            intersectionRecord.n.scale(-1);
+        // Lambertian reflection
+        if (random.nextDouble() < subSurfaceScattering) {
+          intersectionRecord.shadeN.scale(-1);
+          intersectionRecord.n.scale(-1);
+        }
+        direction = lambertianReflection(intersectionRecord.shadeN, random);
+        colorSpecular(intersectionRecord.color, 1, diffuseColor, random);
+        ray.flags |= Ray2.DIFFUSE | Ray2.INDIRECT;
+        emittance.set(this.emittance);
+      }
+    } else {
+      // Transmission / Refraction
+      if (FastMath.abs(n2 - n1) > Constants.EPSILON) {
+        // Refraction / Total internal reflection
+        boolean front_face = ray.d.dot(intersectionRecord.shadeN) < 0.0;
+        double ri = (front_face) ? (n1 / n2) : (n2 / n1);
+
+        Vector3 unitDirection = ray.d.normalized();
+        double cosTheta = FastMath.min(unitDirection.rScale(-1).dot(intersectionRecord.shadeN), 1.0);
+        double sinTheta = FastMath.sqrt(1.0 - cosTheta * cosTheta);
+
+        boolean cannotRefract = ri * sinTheta > 1.0;
+
+        if (cannotRefract || schlickReflectance(cosTheta, ri) > random.nextDouble()) {
+          // Total internal reflection
+          direction = specularReflection(unitDirection, intersectionRecord.shadeN);
+          double interfaceRoughness = FastMath.max(roughness, ray.getCurrentMedium().roughness);
+          if (interfaceRoughness > Constants.EPSILON) {
+            Vector3 roughnessDirection = lambertianReflection(intersectionRecord.n, random);
+            roughnessDirection.scale(interfaceRoughness);
+            roughnessDirection.scaleAdd(1 - interfaceRoughness, direction);
+            roughnessDirection.normalize();
+            direction = roughnessDirection;
           }
-          direction = lambertianReflection(intersectionRecord.shadeN, random);
-          colorSpecular(intersectionRecord.color, 1, diffuseColor, random);
-          ray.flags |= Ray2.DIFFUSE | Ray2.INDIRECT;
-          emittance.set(this.emittance);
+          colorSpecular(intersectionRecord.color, metalness, specularColor, random);
+          ray.flags |= Ray2.SPECULAR;
         } else {
+          // Refraction
           if ((intersectionRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) != 0) {
             direction = new Vector3(ray.d);
           } else {
@@ -334,28 +343,104 @@ public abstract class Material {
           ray.flags |= Ray2.SPECULAR;
           throughSurface = true;
         }
-      }
-    } else if (random.nextDouble() < pDiffuse) {
-      if (random.nextDouble() < subSurfaceScattering) {
-        intersectionRecord.shadeN.scale(-1);
-        intersectionRecord.n.scale(-1);
+      } else {
+        // Transmission
+        direction = new Vector3(ray.d);
+        colorSpecular(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor, random);
+        ray.flags |= Ray2.SPECULAR;
+        throughSurface = true;
         if ((intersectionRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) == 0) {
           mediumChanged = true;
         }
       }
-      direction = lambertianReflection(intersectionRecord.shadeN, random);
-      colorSpecular(intersectionRecord.color, 1, diffuseColor, random);
-      ray.flags |= Ray2.DIFFUSE | Ray2.INDIRECT;
-      emittance.set(this.emittance);
-    } else {
-      direction = new Vector3(ray.d);
-      colorSpecular(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor, random);
-      ray.flags |= Ray2.SPECULAR;
-      throughSurface = true;
-      if ((intersectionRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) == 0) {
-        mediumChanged = true;
-      }
     }
+
+//    if (random.nextDouble() < specular) {
+//      // Specular reflection with roughness
+//      direction = specularReflection(ray.d, intersectionRecord.shadeN);
+//      if (roughness > Constants.EPSILON) {
+//        Vector3 roughnessDirection = lambertianReflection(intersectionRecord.n, random);
+//        roughnessDirection.scale(roughness);
+//        roughnessDirection.scaleAdd(1 - roughness, direction);
+//        roughnessDirection.normalize();
+//        direction = roughnessDirection;
+//      }
+//      colorSpecular(intersectionRecord.color, metalness, specularColor, random);
+//      ray.flags |= Ray2.SPECULAR;
+//
+//    } else if (FastMath.abs(n2 - n1) > Constants.EPSILON) {
+//      boolean front_face = ray.d.dot(intersectionRecord.shadeN) < 0.0;
+//      double ri = (front_face) ? (n1 / n2) : (n2 / n1);
+//
+//      Vector3 unitDirection = ray.d.normalized();
+//      double cosTheta = FastMath.min(unitDirection.rScale(-1).dot(intersectionRecord.shadeN), 1.0);
+//      double sinTheta = FastMath.sqrt(1.0 - cosTheta * cosTheta);
+//
+//      boolean cannotRefract = ri * sinTheta > 1.0;
+//
+//      if (cannotRefract || schlickReflectance(cosTheta, ri) > random.nextDouble()) {
+//        direction = specularReflection(unitDirection, intersectionRecord.shadeN);
+//        double interfaceRoughness = FastMath.max(roughness, ray.getCurrentMedium().roughness);
+//        if (interfaceRoughness > Constants.EPSILON) {
+//          Vector3 roughnessDirection = lambertianReflection(intersectionRecord.n, random);
+//          roughnessDirection.scale(interfaceRoughness);
+//          roughnessDirection.scaleAdd(1 - interfaceRoughness, direction);
+//          roughnessDirection.normalize();
+//          direction = roughnessDirection;
+//        }
+//        colorSpecular(intersectionRecord.color, metalness, specularColor, random);
+//        ray.flags |= Ray2.SPECULAR;
+//      } else {
+//        if (random.nextDouble() < pDiffuse) {
+//          if (random.nextDouble() < subSurfaceScattering) {
+//            intersectionRecord.shadeN.scale(-1);
+//            intersectionRecord.n.scale(-1);
+//          }
+//          direction = lambertianReflection(intersectionRecord.shadeN, random);
+//          colorSpecular(intersectionRecord.color, 1, diffuseColor, random);
+//          ray.flags |= Ray2.DIFFUSE | Ray2.INDIRECT;
+//          emittance.set(this.emittance);
+//        } else {
+//          if ((intersectionRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) != 0) {
+//            direction = new Vector3(ray.d);
+//          } else {
+//            direction = specularRefraction(unitDirection, intersectionRecord.shadeN, ri);
+//            double interfaceTransmissionRoughness = FastMath.max(transmissionRoughness, ray.getCurrentMedium().transmissionRoughness);
+//            if (interfaceTransmissionRoughness > Constants.EPSILON) {
+//              Vector3 roughnessDirection = lambertianReflection(intersectionRecord.n.rScale(-1), random);
+//              roughnessDirection.scale(interfaceTransmissionRoughness);
+//              roughnessDirection.scaleAdd(1 - interfaceTransmissionRoughness, direction);
+//              roughnessDirection.normalize();
+//              direction = roughnessDirection;
+//            }
+//            mediumChanged = true;
+//          }
+//          colorSpecular(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor, random);
+//          ray.flags |= Ray2.SPECULAR;
+//          throughSurface = true;
+//        }
+//      }
+//    } else if (random.nextDouble() < pDiffuse) {
+//      if (random.nextDouble() < subSurfaceScattering) {
+//        intersectionRecord.shadeN.scale(-1);
+//        intersectionRecord.n.scale(-1);
+//        if ((intersectionRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) == 0) {
+//          mediumChanged = true;
+//        }
+//      }
+//      direction = lambertianReflection(intersectionRecord.shadeN, random);
+//      colorSpecular(intersectionRecord.color, 1, diffuseColor, random);
+//      ray.flags |= Ray2.DIFFUSE | Ray2.INDIRECT;
+//      emittance.set(this.emittance);
+//    } else {
+//      direction = new Vector3(ray.d);
+//      colorSpecular(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor, random);
+//      ray.flags |= Ray2.SPECULAR;
+//      throughSurface = true;
+//      if ((intersectionRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) == 0) {
+//        mediumChanged = true;
+//      }
+//    }
 
     byte sign;
     if (throughSurface) {
