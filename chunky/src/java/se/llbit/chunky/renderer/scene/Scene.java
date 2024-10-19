@@ -89,7 +89,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public static final String EXTENSION = ".json";
 
   /** The current Scene Description Format (SDF) version. */
-  public static final int SDF_VERSION = 9;
+  public static final int SDF_VERSION = 10;
 
   protected static final double fSubSurface = 0.3;
 
