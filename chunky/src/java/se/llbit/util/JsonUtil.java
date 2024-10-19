@@ -17,10 +17,8 @@
  */
 package se.llbit.util;
 
-import se.llbit.json.Json;
-import se.llbit.json.JsonArray;
-import se.llbit.json.JsonObject;
-import se.llbit.json.JsonValue;
+import se.llbit.json.*;
+import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.Tag;
@@ -63,5 +61,56 @@ public final class JsonUtil {
     array.add(Json.of(vec.y));
     array.add(Json.of(vec.z));
     return array;
+  }
+
+  public static Vector3 rgbFromJson(JsonValue json) {
+    Vector3 color = new Vector3();
+    rgbFromJson(json, color);
+    return color;
+  }
+
+  /**
+   * Parse RGB color from JSON.
+   *
+   * @param json  Either an object with red, green and blue keys (0…1), an array with 1…3 values (r,g,b) in range 0…1, or six digit hex color.
+   * @param color Target color vector (r,g,b from 0…1)
+   */
+  public static void rgbFromJson(JsonValue json, Vector3 color) {
+    if (json.isObject()) {
+      color.set(
+        json.object().get("red").doubleValue(0),
+        json.object().get("green").doubleValue(0),
+        json.object().get("blue").doubleValue(0)
+      );
+    } else if (json.isArray()) {
+      // Maintain backwards-compatibility with scenes saved in older Chunky versions (eg. for sky color)
+      color.set(vec3FromJsonArray(json));
+    } else {
+      ColorUtil.fromHexString(json.stringValue("#000000"), color);
+    }
+  }
+
+  /**
+   * Serialize an RGB color to JSON in a way that can be parsed by {@link #rgbFromJson(JsonValue)}.
+   * <p/>
+   * Depending on the <code>chunky.colorSerializationFormat</code> system property, this returns either an object with red, green and blue keys, or a hex string.
+   *
+   * @param color Color vector (r,g,b from 0…1)
+   * @return Serialized color
+   */
+  public static JsonValue rgbToJson(Vector3 color) {
+    switch (System.getProperty("chunky.colorSerializationFormat", "object")) {
+      case "hex": {
+        return new JsonString(String.format("#%02x%02x%02x", (int) (color.x * 255), (int) (color.y * 255), (int) (color.z * 255)));
+      }
+      case "object":
+      default: {
+        JsonObject colorObj = new JsonObject();
+        colorObj.add("red", color.x);
+        colorObj.add("green", color.y);
+        colorObj.add("blue", color.z);
+        return colorObj;
+      }
+    }
   }
 }

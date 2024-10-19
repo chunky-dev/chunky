@@ -116,10 +116,7 @@ public class Sky implements JsonSerializable {
     SKYMAP_ANGULAR("Skymap (angular)"),
 
     /** Skybox. */
-    SKYBOX("Skybox"),
-
-    /** A completely black sky, useful for rendering an emitter-only pass. */
-    BLACK("Black");
+    SKYBOX("Skybox");
 
     private String name;
 
@@ -351,10 +348,6 @@ public class Sky implements JsonSerializable {
           double alpha = 1 / yabs;
           skybox[SKYBOX_DOWN].getColor((1 + x * alpha) / 2.0, (1 - z * alpha) / 2.0, ray.color);
         }
-        break;
-      }
-      case BLACK: {
-        ray.color.set(0, 0, 0, 1);
         break;
       }
     }
@@ -641,11 +634,7 @@ public class Sky implements JsonSerializable {
     // Always save gradient.
     sky.add("gradient", gradientJson(gradient));
 
-    JsonObject colorObj = new JsonObject();
-    colorObj.add("red", color.x);
-    colorObj.add("green", color.y);
-    colorObj.add("blue", color.z);
-    sky.add("color", colorObj);
+    sky.add("color", JsonUtil.rgbToJson(color));
 
     switch (mode) {
       case SKYMAP_EQUIRECTANGULAR:
@@ -688,12 +677,17 @@ public class Sky implements JsonSerializable {
     skyExposure = json.get("skyExposure").doubleValue(skyExposure);
     skyLightModifier = json.get("skyLight").doubleValue(skyLightModifier);
     apparentSkyLightModifier = json.get("apparentSkyLight").doubleValue(apparentSkyLightModifier);
-    if (!(json.get("mode").stringValue(mode.name()).equals("SKYMAP_PANORAMIC") || json.get("mode").stringValue(mode.name()).equals("SKYMAP_SPHERICAL"))) {
-      mode = SkyMode.get(json.get("mode").stringValue(mode.name()));
+    if (json.get("mode").stringValue(mode.name()).equals("BLACK")) {
+      mode = SkyMode.SOLID_COLOR;
+      color.x = 0;
+      color.y = 0;
+      color.z = 0;
     } else if (json.get("mode").stringValue(mode.name()).equals("SKYMAP_PANORAMIC")) {
       mode = SkyMode.SKYMAP_EQUIRECTANGULAR;
     } else if (json.get("mode").stringValue(mode.name()).equals("SKYMAP_SPHERICAL")) {
       mode = SkyMode.SKYMAP_ANGULAR;
+    } else {
+      mode = SkyMode.get(json.get("mode").stringValue(mode.name()));
     }
     horizonOffset = json.get("horizonOffset").doubleValue(horizonOffset);
     cloudsEnabled = json.get("cloudsEnabled").boolValue(cloudsEnabled);
@@ -709,15 +703,7 @@ public class Sky implements JsonSerializable {
       }
     }
 
-    if (json.get("color").isObject()) {
-      JsonObject colorObj = json.get("color").object();
-      color.x = colorObj.get("red").doubleValue(1);
-      color.y = colorObj.get("green").doubleValue(1);
-      color.z = colorObj.get("blue").doubleValue(1);
-    } else {
-      // Maintain backwards-compatibility with scenes saved in older Chunky versions
-      color.set(JsonUtil.vec3FromJsonArray(json.get("color")));
-    }
+    JsonUtil.rgbFromJson(json.get("color"), color);
 
     switch (mode) {
       case SKYMAP_EQUIRECTANGULAR:
@@ -804,7 +790,11 @@ public class Sky implements JsonSerializable {
     JsonArray array = new JsonArray();
     for (Vector4 stop : gradient) {
       JsonObject obj = new JsonObject();
-      obj.add("rgb", ColorUtil.toString(stop.x, stop.y, stop.z));
+      JsonObject colorObj = new JsonObject();
+      colorObj.add("red", stop.x);
+      colorObj.add("green", stop.y);
+      colorObj.add("blue", stop.z);
+      obj.add("color", JsonUtil.rgbToJson(stop.toVec3()));
       obj.add("pos", stop.w);
       array.add(obj);
     }
@@ -820,13 +810,18 @@ public class Sky implements JsonSerializable {
       JsonObject obj = array.get(i).object();
       Vector3 color = new Vector3();
       try {
-        ColorUtil.fromString(obj.get("rgb").stringValue(""), 16, color);
+        if (obj.get("color").isUnknown()) {
+          // support for old scene files (2.5.0 snapshot phase)
+          ColorUtil.fromString(obj.get("rgb").stringValue(""), 16, color);
+        } else  {
+          JsonUtil.rgbFromJson(obj.get("color"), color);
+        }
         Vector4 stop =
-            new Vector4(color.x, color.y, color.z, obj.get("pos").doubleValue(Double.NaN));
+          new Vector4(color.x, color.y, color.z, obj.get("pos").doubleValue(Double.NaN));
         if (!Double.isNaN(stop.w)) {
           gradient.add(stop);
         }
-      } catch (NumberFormatException e) {
+      } catch (IllegalArgumentException e) {
         // Ignored.
       }
     }

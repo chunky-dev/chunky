@@ -189,9 +189,6 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
             case GRADIENT:
               skyModeSettings.getChildren().setAll(gradientEditor);
               break;
-            case BLACK:
-              skyModeSettings.getChildren().setAll(new Label("Selected mode has no settings."));
-              break;
             case SKYBOX:
               skyModeSettings.getChildren().setAll(skyboxSettings);
               break;
