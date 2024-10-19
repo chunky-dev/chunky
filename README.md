@@ -203,6 +203,9 @@ Chunky uses the following 3rd party libraries:
 - **Apache Maven Artifact by the Apache Software Foundation**  
   The library is covered by the Apache License, version 2.0.
   See the file `licenses/Apache-2.0.txt` for the full license text.
+- **Apache Commons CLI by the Apache Software Foundation**  
+  The library is covered by the Apache License, version 2.0.
+  See the file `licenses/Apache-2.0.txt` for the full license text.
 - **FastUtil by Sebastiano Vigna**  
   FastUtil is covered by Apache License, version 2.0.
   See the file `licenses/Apache-2.0.txt` for the full license text.
