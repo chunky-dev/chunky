@@ -2568,11 +2568,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("waterVisibility", waterVisibility);
     json.add("useCustomWaterColor", useCustomWaterColor);
     if (useCustomWaterColor) {
-      JsonObject colorObj = new JsonObject();
-      colorObj.add("red", waterColor.x);
-      colorObj.add("green", waterColor.y);
-      colorObj.add("blue", waterColor.z);
-      json.add("waterColor", colorObj);
+      json.add("waterColor", JsonUtil.rgbToJson(waterColor));
     }
     currentWaterShader.save(json);
     json.add("fog", fog.toJson());
@@ -2877,10 +2873,7 @@ public class Scene implements JsonSerializable, Refreshable {
     waterVisibility = json.get("waterVisibility").doubleValue(waterVisibility);
     useCustomWaterColor = json.get("useCustomWaterColor").boolValue(useCustomWaterColor);
     if (useCustomWaterColor) {
-      JsonObject colorObj = json.get("waterColor").object();
-      waterColor.x = colorObj.get("red").doubleValue(waterColor.x);
-      waterColor.y = colorObj.get("green").doubleValue(waterColor.y);
-      waterColor.z = colorObj.get("blue").doubleValue(waterColor.z);
+      JsonUtil.rgbFromJson(json.get("waterColor"), waterColor);
     }
     biomeColors = json.get("biomeColorsEnabled").boolValue(biomeColors);
     transparentSky = json.get("transparentSky").boolValue(transparentSky);
