@@ -29,6 +29,7 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.util.JsonSerializable;
+import se.llbit.util.JsonUtil;
 
 /**
  * Sun model for ray tracing.
@@ -501,16 +502,8 @@ public class Sun implements JsonSerializable {
     sun.add("apparentBrightness", apparentBrightness);
     sun.add("radius", radius);
     sun.add("modifySunTexture", enableTextureModification);
-    JsonObject colorObj = new JsonObject();
-    colorObj.add("red", color.x);
-    colorObj.add("green", color.y);
-    colorObj.add("blue", color.z);
-    sun.add("color", colorObj);
-    JsonObject apparentColorObj = new JsonObject();
-    apparentColorObj.add("red", apparentColor.x);
-    apparentColorObj.add("green", apparentColor.y);
-    apparentColorObj.add("blue", apparentColor.z);
-    sun.add("apparentColor", apparentColorObj);
+    sun.add("color", JsonUtil.rgbToJson(color));
+    sun.add("apparentColor", JsonUtil.rgbToJson(apparentColor));
     JsonObject importanceSamplingObj = new JsonObject();
     importanceSamplingObj.add("chance", importanceSampleChance);
     importanceSamplingObj.add("radius", importanceSampleRadius);
@@ -528,18 +521,12 @@ public class Sun implements JsonSerializable {
     radius = json.get("radius").doubleValue(radius);
     enableTextureModification = json.get("modifySunTexture").boolValue(enableTextureModification);
 
-    if (json.get("color").isObject()) {
-      JsonObject colorObj = json.get("color").object();
-      color.x = colorObj.get("red").doubleValue(1);
-      color.y = colorObj.get("green").doubleValue(1);
-      color.z = colorObj.get("blue").doubleValue(1);
+    if (!json.get("color").isUnknown()) {
+      JsonUtil.rgbFromJson(json.get("color"), color);
     }
 
-    if (json.get("apparentColor").isObject()) {
-      JsonObject apparentColorObj = json.get("apparentColor").object();
-      apparentColor.x = apparentColorObj.get("red").doubleValue(1);
-      apparentColor.y = apparentColorObj.get("green").doubleValue(1);
-      apparentColor.z = apparentColorObj.get("blue").doubleValue(1);
+    if (!json.get("apparentColor").isUnknown()) {
+      JsonUtil.rgbFromJson(json.get("apparentColor"), apparentColor);
     }
 
     if(json.get("importanceSampling").isObject()) {

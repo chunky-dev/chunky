@@ -349,6 +349,24 @@ public final class ColorUtil {
     ColorUtil.getRGBAComponents(rgb, color);
   }
 
+  public static void fromHexString(String hex, Vector3 color) {
+    if (hex.startsWith("#")) {
+      hex = hex.substring(1);
+    }
+
+    if (hex.length() == 3) {
+      hex = "" + hex.charAt(0) + hex.charAt(0)
+        + hex.charAt(1) + hex.charAt(1)
+        + hex.charAt(2) + hex.charAt(2);
+    }
+
+    if (hex.length() != 6) {
+      throw new IllegalArgumentException("Expected three or six digit hex color");
+    }
+
+    fromString(hex, 16, color);
+  }
+
   public static javafx.scene.paint.Color toFx(Vector3 color) {
     return new javafx.scene.paint.Color(color.x, color.y, color.z, 1);
   }
