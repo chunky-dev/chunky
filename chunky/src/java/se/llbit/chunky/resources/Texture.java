@@ -1512,6 +1512,19 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/trial_spawner_top_ejecting_reward_ominous")
   public static final Texture trialSpawnerTopEjectingRewardOminous = new Texture();
 
+  @TexturePath("assets/minecraft/textures/block/pale_moss_block")
+  public static final Texture paleMossBlock = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_leaves")
+  public static final Texture paleOakLeaves = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_log")
+  public static final Texture paleOakLog= new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_log_top")
+  public static final Texture paleOakLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_hanging_moss")
+  public static final Texture paleHangingMoss = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_hanging_moss_tip")
+  public static final Texture paleHangingMossTip = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 
