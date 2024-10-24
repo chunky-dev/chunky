@@ -135,6 +135,15 @@ public final class ColorUtil {
   /**
    * Get the RGB color components from an INT RGB value.
    */
+  public static void getRGBComponents(int irgb, Vector3 v) {
+    v.x = (0xFF & (irgb >> 16)) / 255.f;
+    v.y = (0xFF & (irgb >> 8)) / 255.f;
+    v.z = (0xFF & irgb) / 255.f;
+  }
+
+  /**
+   * Get the RGB color components from an INT RGB value.
+   */
   public static void getRGBComponents(int irgb, double[] frgb) {
     frgb[0] = (0xFF & (irgb >> 16)) / 255.0;
     frgb[1] = (0xFF & (irgb >> 8)) / 255.0;
@@ -162,8 +171,10 @@ public final class ColorUtil {
   }
 
   /**
-   * Get the RGBA color components from an INT ARGB value.
+   * Get the RGB color components from an INT RGB value.
+   * @deprecated Use {@link #getRGBComponents(int, Vector3)} instead, this method name is incorrect.
    */
+  @Deprecated
   public static void getRGBAComponents(int irgb, Vector3 v) {
     v.x = (0xFF & (irgb >> 16)) / 255.f;
     v.y = (0xFF & (irgb >> 8)) / 255.f;
@@ -346,7 +357,25 @@ public final class ColorUtil {
   public static void fromString(String text, int radix, Vector3 color)
       throws NumberFormatException {
     int rgb = Integer.parseInt(text, radix);
-    ColorUtil.getRGBAComponents(rgb, color);
+    ColorUtil.getRGBComponents(rgb, color);
+  }
+
+  public static void fromHexString(String hex, Vector3 color) {
+    if (hex.startsWith("#")) {
+      hex = hex.substring(1);
+    }
+
+    if (hex.length() == 3) {
+      hex = "" + hex.charAt(0) + hex.charAt(0)
+        + hex.charAt(1) + hex.charAt(1)
+        + hex.charAt(2) + hex.charAt(2);
+    }
+
+    if (hex.length() != 6) {
+      throw new IllegalArgumentException("Expected three or six digit hex color");
+    }
+
+    fromString(hex, 16, color);
   }
 
   public static javafx.scene.paint.Color toFx(Vector3 color) {

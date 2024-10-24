@@ -89,7 +89,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public static final String EXTENSION = ".json";
 
   /** The current Scene Description Format (SDF) version. */
-  public static final int SDF_VERSION = 9;
+  public static final int SDF_VERSION = 10;
 
   protected static final double fSubSurface = 0.3;
 
@@ -2568,11 +2568,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("waterVisibility", waterVisibility);
     json.add("useCustomWaterColor", useCustomWaterColor);
     if (useCustomWaterColor) {
-      JsonObject colorObj = new JsonObject();
-      colorObj.add("red", waterColor.x);
-      colorObj.add("green", waterColor.y);
-      colorObj.add("blue", waterColor.z);
-      json.add("waterColor", colorObj);
+      json.add("waterColor", JsonUtil.rgbToJson(waterColor));
     }
     currentWaterShader.save(json);
     json.add("fog", fog.toJson());
@@ -2595,7 +2591,11 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("camera", camera.toJson());
     json.add("sun", sun.toJson());
     json.add("sky", sky.toJson());
-    json.add("cameraPresets", cameraPresets.copy());
+    JsonObject cameraPresets = this.cameraPresets.copy();
+    for (JsonMember item : cameraPresets.members) {
+      item.value.object().remove("name");
+    }
+    json.add("cameraPresets", cameraPresets);
     JsonArray chunkList = new JsonArray();
     for (ChunkPosition pos : chunks) {
       JsonArray chunk = new JsonArray();
@@ -2873,10 +2873,7 @@ public class Scene implements JsonSerializable, Refreshable {
     waterVisibility = json.get("waterVisibility").doubleValue(waterVisibility);
     useCustomWaterColor = json.get("useCustomWaterColor").boolValue(useCustomWaterColor);
     if (useCustomWaterColor) {
-      JsonObject colorObj = json.get("waterColor").object();
-      waterColor.x = colorObj.get("red").doubleValue(waterColor.x);
-      waterColor.y = colorObj.get("green").doubleValue(waterColor.y);
-      waterColor.z = colorObj.get("blue").doubleValue(waterColor.z);
+      JsonUtil.rgbFromJson(json.get("waterColor"), waterColor);
     }
     biomeColors = json.get("biomeColorsEnabled").boolValue(biomeColors);
     transparentSky = json.get("transparentSky").boolValue(transparentSky);
@@ -2923,7 +2920,11 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     if (json.get("cameraPresets").isObject()) {
-      cameraPresets = json.get("cameraPresets").object();
+      JsonObject cameraPresets = json.get("cameraPresets").object();
+      for (JsonMember member : cameraPresets.members) {
+        member.value.object().set("name", new JsonString(member.name));
+      }
+      this.cameraPresets = cameraPresets;
     }
 
     // Current SPP and render time are read after loading
