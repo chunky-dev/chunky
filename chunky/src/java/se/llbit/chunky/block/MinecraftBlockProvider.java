@@ -1122,6 +1122,12 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("vault", (name, tag) -> new Vault(tag.get("Properties").get("facing").stringValue("north"), tag.get("Properties").get("ominous").stringValue().equals("true"), tag.get("Properties").get("vault_state").stringValue("active")));
     addBlock("heavy_core", (name, tag) -> new HeavyCore());
     addBlock("trial_spawner", (name, tag) -> new TrialSpawner(tag.get("Properties").get("ominous").stringValue().equals("true"), tag.get("Properties").get("trial_spawner_state").stringValue("active")));
+
+    // Winter drop (1.22?)
+    addBlock("pale_moss_block", Texture.paleMossBlock);
+    addBlock("pale_oak_leaves", (name, tag) -> new UntintedLeaves(name, Texture.paleOakLeaves));
+    addBlock("pale_oak_log", (name, tag) -> log(tag, Texture.paleOakLog, Texture.paleOakLogTop));
+    addBlock("pale_hanging_moss", (name, tag) -> new SpriteBlock(name, tag.get("Properties").get("tip").stringValue().equals("true") ? Texture.paleHangingMossTip : Texture.paleHangingMoss));
   }
 
   @Override
