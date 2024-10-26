@@ -1524,6 +1524,24 @@ public class Texture {
   public static final Texture paleHangingMoss = new Texture();
   @TexturePath("assets/minecraft/textures/block/pale_hanging_moss_tip")
   public static final Texture paleHangingMossTip = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_planks")
+  public static final Texture paleOakPlanks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_trapdoor")
+  public static final Texture paleOakTrapdoor = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_door_top")
+  public static final Texture paleOakDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_door_bottom")
+  public static final Texture paleOakDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_pale_oak_log")
+  public static final Texture strippedPaleOakLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_pale_oak_log_top")
+  public static final Texture strippedPaleOakLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_sapling")
+  public static final Texture paleOakSapling = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/pale_oak")
+  public static final Texture paleOakSignPost = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/pale_oak")
+  public static final Texture paleOakHangingSign = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
