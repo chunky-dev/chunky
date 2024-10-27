@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Chunky contributors
+ * Copyright (c) 2024 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -19,18 +19,18 @@
 package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
-import se.llbit.chunky.model.minecraft.TrapdoorModel;
+import se.llbit.chunky.model.minecraft.OrientableTrapdoorModel;
 import se.llbit.chunky.resources.Texture;
 
-public class Trapdoor extends AbstractModelBlock {
+public class OrientableTrapdoor extends AbstractModelBlock {
   private final String description;
 
-  public Trapdoor(String name, Texture texture,
-                  String half, String facing, boolean open) {
+  public OrientableTrapdoor(String name, Texture texture,
+                            String half, String facing, boolean open) {
     super(name, texture);
     solid = false;
     this.description = String.format("half=%s, facing=%s, open=%s", half, facing, open);
-    this.model = new TrapdoorModel(texture, half, facing, open);
+    this.model = new OrientableTrapdoorModel(texture, half, facing, open);
   }
 
   @Override
