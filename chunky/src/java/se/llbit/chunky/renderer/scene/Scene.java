@@ -2060,9 +2060,9 @@ public class Scene implements JsonSerializable, Refreshable {
     if (transparentSky) {
       if (mode.getTransparencyType() == AlphaBuffer.Type.UNSUPPORTED) {
         Log.warn("You selected \"transparent sky\", but the selected picture format \"" + mode.getName() + "\" does not support alpha layers.\nUse a different format like PNG instead.");
-        }
-      alphaBuffer.computeAlpha(this, mode.getTransparencyType(), taskTracker);
       }
+      alphaBuffer.computeAlpha(this, mode.getTransparencyType(), taskTracker);
+    }
     if (mode.wantsPostprocessing() && !finalized) {
       postProcessFrame(taskTracker);
     }
