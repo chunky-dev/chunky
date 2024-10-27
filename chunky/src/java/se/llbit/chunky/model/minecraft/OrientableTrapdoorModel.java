@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2023 Chunky contributors
+ * Copyright (c) 2024 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -26,13 +26,13 @@ import se.llbit.math.Vector4;
 
 import java.util.Arrays;
 
-public class TrapdoorModel extends QuadModel {
+public class OrientableTrapdoorModel extends QuadModel {
   private static final Quad[] quadsTop = new Quad[]{
     new Quad(
       new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
       new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
       new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
-      new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
+      new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 0 / 16.0)
     ),
     new Quad(
       new Vector3(0 / 16.0, 13 / 16.0, 0 / 16.0),
@@ -44,25 +44,25 @@ public class TrapdoorModel extends QuadModel {
       new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
       new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
       new Vector3(0 / 16.0, 13 / 16.0, 16 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 3 / 16.0)
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 13 / 16.0)
     ),
     new Quad(
       new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
       new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
       new Vector3(16 / 16.0, 13 / 16.0, 0 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 3 / 16.0)
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 13 / 16.0)
     ),
     new Quad(
       new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
       new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
       new Vector3(0 / 16.0, 13 / 16.0, 0 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 3 / 16.0)
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 13 / 16.0)
     ),
     new Quad(
       new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
       new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
       new Vector3(16 / 16.0, 13 / 16.0, 16 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 3 / 16.0)
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 13 / 16.0)
     )
   };
 
@@ -71,7 +71,7 @@ public class TrapdoorModel extends QuadModel {
       new Vector3(0 / 16.0, 3 / 16.0, 16 / 16.0),
       new Vector3(16 / 16.0, 3 / 16.0, 16 / 16.0),
       new Vector3(0 / 16.0, 3 / 16.0, 0 / 16.0),
-      new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
+      new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 0 / 16.0)
     ),
     new Quad(
       new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
@@ -83,25 +83,25 @@ public class TrapdoorModel extends QuadModel {
       new Vector3(0 / 16.0, 3 / 16.0, 16 / 16.0),
       new Vector3(0 / 16.0, 3 / 16.0, 0 / 16.0),
       new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 3 / 16.0)
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 13 / 16.0)
     ),
     new Quad(
       new Vector3(16 / 16.0, 3 / 16.0, 0 / 16.0),
       new Vector3(16 / 16.0, 3 / 16.0, 16 / 16.0),
       new Vector3(16 / 16.0, 0 / 16.0, 0 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 3 / 16.0)
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 13 / 16.0)
     ),
     new Quad(
       new Vector3(0 / 16.0, 3 / 16.0, 0 / 16.0),
       new Vector3(16 / 16.0, 3 / 16.0, 0 / 16.0),
       new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 3 / 16.0)
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 13 / 16.0)
     ),
     new Quad(
       new Vector3(16 / 16.0, 3 / 16.0, 16 / 16.0),
       new Vector3(0 / 16.0, 3 / 16.0, 16 / 16.0),
       new Vector3(16 / 16.0, 0 / 16.0, 16 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 3 / 16.0)
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 13 / 16.0)
     )
   };
 
@@ -110,59 +110,71 @@ public class TrapdoorModel extends QuadModel {
       new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
       new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
       new Vector3(0 / 16.0, 16 / 16.0, 13 / 16.0),
-      new Vector4(0 / 16.0, 16 / 16.0, 3 / 16.0, 0 / 16.0)
+      new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 13 / 16.0)
     ),
     new Quad(
       new Vector3(0 / 16.0, 0 / 16.0, 13 / 16.0),
       new Vector3(16 / 16.0, 0 / 16.0, 13 / 16.0),
       new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
-      new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 3 / 16.0)
+      new Vector4(0 / 16.0, 16 / 16.0, 13 / 16.0, 16 / 16.0)
     ),
     new Quad(
+      new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
       new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
-      new Vector3(0 / 16.0, 16 / 16.0, 13 / 16.0),
-      new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
-      new Vector4(13 / 16.0, 16 / 16.0, 16 / 16.0, 0 / 16.0)
+      new Vector3(0 / 16.0, 0 / 16.0, 13 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 13 / 16.0)
     ),
     new Quad(
-      new Vector3(16 / 16.0, 16 / 16.0, 13 / 16.0),
-      new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
       new Vector3(16 / 16.0, 0 / 16.0, 13 / 16.0),
-      new Vector4(16 / 16.0, 13 / 16.0, 16 / 16.0, 0 / 16.0)
+      new Vector3(16 / 16.0, 16 / 16.0, 13 / 16.0),
+      new Vector3(16 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 13 / 16.0, 16 / 16.0)
     ),
     new Quad(
       new Vector3(0 / 16.0, 16 / 16.0, 13 / 16.0),
       new Vector3(16 / 16.0, 16 / 16.0, 13 / 16.0),
       new Vector3(0 / 16.0, 0 / 16.0, 13 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+      new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 16 / 16.0)
     ),
     new Quad(
       new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
       new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
       new Vector3(16 / 16.0, 0 / 16.0, 16 / 16.0),
-      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+      new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 16 / 16.0)
     )
   };
 
-  private final Quad[] quads;
+  private Quad[] quads;
   private final Texture[] textures;
 
-  public TrapdoorModel(Texture texture, String half, String facing, boolean open) {
+  public OrientableTrapdoorModel(Texture texture, String half, String facing, boolean open) {
     if (open) {
-      if (facing.equals("east")) {
-        quads = Model.rotateY(quadsOpen, Math.toRadians(90));
-      } else if (facing.equals("south")) {
-        quads = Model.rotateY(quadsOpen, Math.toRadians(180));
-      } else if (facing.equals("west")) {
-        quads = Model.rotateY(quadsOpen, Math.toRadians(270));
+      quads = quadsOpen;
+    } else if (half.equals("top")) {
+      quads = quadsTop;
+    } else {
+      quads = quadsBottom;
+    }
+
+    if (facing.equals("east")) {
+      if (open && half.equals("top")) {
+        quads = Model.rotateX(Model.rotateY(quads, Math.toRadians(270)), Math.toRadians(180));
       } else {
-        quads = quadsOpen;
+        quads = Model.rotateY(quads, Math.toRadians(90));
+      }
+    } else if (facing.equals("north") && open && half.equals("top")) {
+      quads = Model.rotateX(Model.rotateY(quads, Math.toRadians(180)), Math.toRadians(180));
+    } else if (facing.equals("south")) {
+      if (half.equals("top") && open) {
+        quads = Model.rotateX(quads, Math.toRadians(180));
+      } else {
+        quads = Model.rotateY(quads, Math.toRadians(180));
       }
     } else {
-      if (half.equals("bottom")) {
-        quads = quadsBottom;
+      if (half.equals("top") && open) {
+        quads = Model.rotateY(Model.rotateX(quads, Math.toRadians(180)), Math.toRadians(90));
       } else {
-        quads = quadsTop;
+        quads = Model.rotateY(quads, Math.toRadians(270));
       }
     }
 

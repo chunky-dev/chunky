@@ -970,7 +970,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("mangrove_wall_sign", (name, tag) -> wallSign(tag, "mangrove"));
     addBlock("mangrove_slab", (name, tag) -> slab(tag, Texture.mangrovePlanks));
     addBlock("mangrove_stairs", (name, tag) -> stairs(tag, Texture.mangrovePlanks));
-    addBlock("mangrove_trapdoor", (name, tag) -> trapdoor(tag, Texture.mangroveTrapdoor));
+    addBlock("mangrove_trapdoor", (name, tag) -> orientableTrapdoor(tag, Texture.mangroveTrapdoor));
     addBlock("mangrove_wood", (name, tag) -> log(tag, Texture.mangroveLog, Texture.mangroveLog));
     addBlock("stripped_mangrove_wood", (name, tag) -> log(tag, Texture.strippedMangroveLog, Texture.strippedMangroveLog));
     addBlock("mangrove_roots", (name, tag) -> new MangroveRoots());
@@ -1005,7 +1005,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("bamboo_stairs", (name, tag) -> stairs(tag, Texture.bambooPlanks));
     addBlock("bamboo_mosaic_slab", (name, tag) -> slab(tag, Texture.bambooMosaic));
     addBlock("bamboo_mosaic_stairs", (name, tag) -> stairs(tag, Texture.bambooMosaic));
-    addBlock("bamboo_trapdoor", (name, tag) -> trapdoor(tag, Texture.bambooTrapdoor));
+    addBlock("bamboo_trapdoor", (name, tag) -> orientableTrapdoor(tag, Texture.bambooTrapdoor));
     addBlock("cherry_button", (name, tag) -> button(tag, Texture.cherryPlanks));
     addBlock("cherry_door", (name, tag) -> door(tag, Texture.cherryDoorTop, Texture.cherryDoorBottom));
     addBlock("cherry_fence", (name, tag) -> fence(tag, Texture.cherryPlanks));
@@ -1019,7 +1019,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("cherry_wall_sign", (name, tag) -> wallSign(tag, "cherry"));
     addBlock("cherry_slab", (name, tag) -> slab(tag, Texture.cherryPlanks));
     addBlock("cherry_stairs", (name, tag) -> stairs(tag, Texture.cherryPlanks));
-    addBlock("cherry_trapdoor", (name, tag) -> trapdoor(tag, Texture.cherryTrapdoor));
+    addBlock("cherry_trapdoor", (name, tag) -> orientableTrapdoor(tag, Texture.cherryTrapdoor));
     addBlock("cherry_wood", (name, tag) -> log(tag, Texture.cherryLog, Texture.cherryLog));
     addBlock("stripped_cherry_wood", (name, tag) -> log(tag, Texture.strippedCherryLog, Texture.strippedCherryLog));
     addBlock("cherry_sapling", (name, tag) -> new SpriteBlock(name, Texture.cherrySapling));
@@ -1600,13 +1600,13 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "oak_trapdoor":
         return trapdoor(tag, Texture.trapdoor);
       case "spruce_trapdoor":
-        return trapdoor(tag, Texture.spruceTrapdoor);
+        return orientableTrapdoor(tag, Texture.spruceTrapdoor);
       case "birch_trapdoor":
-        return trapdoor(tag, Texture.birchTrapdoor);
+        return orientableTrapdoor(tag, Texture.birchTrapdoor);
       case "jungle_trapdoor":
-        return trapdoor(tag, Texture.jungleTrapdoor);
+        return orientableTrapdoor(tag, Texture.jungleTrapdoor);
       case "acacia_trapdoor":
-        return trapdoor(tag, Texture.acaciaTrapdoor);
+        return orientableTrapdoor(tag, Texture.acaciaTrapdoor);
       case "dark_oak_trapdoor":
         return trapdoor(tag, Texture.darkOakTrapdoor);
       case "infested_stone_bricks":
@@ -2768,9 +2768,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "warped_door":
         return door(tag, Texture.warpedDoorTop, Texture.warpedDoorBottom);
       case "crimson_trapdoor":
-        return trapdoor(tag, Texture.crimsonTrapdoor);
+        return orientableTrapdoor(tag, Texture.crimsonTrapdoor);
       case "warped_trapdoor":
-        return trapdoor(tag, Texture.warpedTrapdoor);
+        return orientableTrapdoor(tag, Texture.warpedTrapdoor);
       case "soul_fire":
         return new SoulFire();
       case "lodestone":
@@ -3456,6 +3456,15 @@ public class MinecraftBlockProvider implements BlockProvider {
     String facing = BlockProvider.facing(tag);
     String open = properties.get("open").stringValue("false");
     return new Trapdoor(name, texture, half, facing, open.equals("true"));
+  }
+
+  private static Block orientableTrapdoor(Tag tag, Texture texture) {
+    String name = BlockProvider.blockName(tag);
+    Tag properties = tag.get("Properties");
+    String half = properties.get("half").stringValue("bottom");
+    String facing = BlockProvider.facing(tag);
+    String open = properties.get("open").stringValue("false");
+    return new OrientableTrapdoor(name, texture, half, facing, open.equals("true"));
   }
 
   private Block vine(Tag tag) {
