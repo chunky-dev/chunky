@@ -1542,6 +1542,12 @@ public class Texture {
   public static final Texture paleOakSignPost = new Texture();
   @TexturePath("assets/minecraft/textures/entity/signs/hanging/pale_oak")
   public static final Texture paleOakHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_moss_carpet")
+  public static final Texture paleMossCarpet = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_moss_carpet_side_small")
+  public static final Texture paleMossCarpetSideSmall = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_moss_carpet_side_tall")
+  public static final Texture paleMossCarpetSideTall = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

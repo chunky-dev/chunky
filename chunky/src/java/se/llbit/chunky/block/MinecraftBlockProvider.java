@@ -8,6 +8,7 @@ import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.model.minecraft.FlowerPotModel;
 import se.llbit.chunky.model.minecraft.FlowerPotModel.Kind;
+import se.llbit.chunky.model.minecraft.PaleMossCarpetModel;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.nbt.ListTag;
@@ -1146,6 +1147,12 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("pale_oak_wall_sign", (name, tag) -> wallSign(tag, "pale_oak"));
     addBlock("pale_oak_hanging_sign", (name, tag) -> hangingSign(tag, "pale_oak"));
     addBlock("pale_oak_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "pale_oak"));
+    addBlock("pale_moss_carpet", (name, tag) -> new PaleMossCarpet(name,
+      tag.get("Properties").get("bottom").stringValue("false").equals("true"),
+      tag.get("Properties").get("north").stringValue("none"),
+      tag.get("Properties").get("east").stringValue("none"),
+      tag.get("Properties").get("south").stringValue("none"),
+      tag.get("Properties").get("west").stringValue("none")));
   }
 
   @Override
