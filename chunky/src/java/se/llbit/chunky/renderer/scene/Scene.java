@@ -436,6 +436,7 @@ public class Scene implements JsonSerializable, Refreshable {
     waterColor.set(other.waterColor);
     fog.set(other.fog);
     biomeColors = other.biomeColors;
+    biomeBlendingRadius = other.biomeBlendingRadius;
     sunSamplingStrategy = other.sunSamplingStrategy;
     emittersEnabled = other.emittersEnabled;
     emitterIntensity = other.emitterIntensity;
@@ -2573,6 +2574,7 @@ public class Scene implements JsonSerializable, Refreshable {
     currentWaterShader.save(json);
     json.add("fog", fog.toJson());
     json.add("biomeColorsEnabled", biomeColors);
+    json.add("biomeBlendingRadius", biomeBlendingRadius);
     json.add("transparentSky", transparentSky);
     json.add("waterWorldEnabled", waterPlaneEnabled);
     json.add("waterWorldHeight", waterPlaneHeight);
@@ -2876,6 +2878,7 @@ public class Scene implements JsonSerializable, Refreshable {
       JsonUtil.rgbFromJson(json.get("waterColor"), waterColor);
     }
     biomeColors = json.get("biomeColorsEnabled").boolValue(biomeColors);
+    biomeBlendingRadius = json.get("biomeBlendingRadius").intValue(biomeBlendingRadius);
     transparentSky = json.get("transparentSky").boolValue(transparentSky);
     JsonValue fogObj = json.get("fog");
     if (fogObj.isObject()) {
