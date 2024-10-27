@@ -8,6 +8,7 @@ import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.model.minecraft.FlowerPotModel;
 import se.llbit.chunky.model.minecraft.FlowerPotModel.Kind;
+import se.llbit.chunky.model.minecraft.PaleMossCarpetModel;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.nbt.ListTag;
@@ -1122,6 +1123,39 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("vault", (name, tag) -> new Vault(tag.get("Properties").get("facing").stringValue("north"), tag.get("Properties").get("ominous").stringValue().equals("true"), tag.get("Properties").get("vault_state").stringValue("active")));
     addBlock("heavy_core", (name, tag) -> new HeavyCore());
     addBlock("trial_spawner", (name, tag) -> new TrialSpawner(tag.get("Properties").get("ominous").stringValue().equals("true"), tag.get("Properties").get("trial_spawner_state").stringValue("active")));
+
+    // Winter drop (1.22?)
+    addBlock("pale_moss_block", Texture.paleMossBlock);
+    addBlock("pale_oak_leaves", (name, tag) -> new UntintedLeaves(name, Texture.paleOakLeaves));
+    addBlock("pale_oak_log", (name, tag) -> log(tag, Texture.paleOakLog, Texture.paleOakLogTop));
+    addBlock("pale_hanging_moss", (name, tag) -> new SpriteBlock(name, tag.get("Properties").get("tip").stringValue().equals("true") ? Texture.paleHangingMossTip : Texture.paleHangingMoss));
+    addBlock("pale_oak_button", (name, tag) -> button(tag, Texture.paleOakPlanks));
+    addBlock("pale_oak_planks", Texture.paleOakPlanks);
+    addBlock("pale_oak_slab", (name, tag) -> slab(tag, Texture.paleOakPlanks));
+    addBlock("pale_oak_stairs", (name, tag) -> stairs(tag, Texture.paleOakPlanks));
+    addBlock("pale_oak_pressure_plate", (name, tag) -> new PressurePlate(name, Texture.sprucePlanks));
+    addBlock("pale_oak_fence", (name, tag) -> fence(tag, Texture.paleOakPlanks));
+    addBlock("pale_oak_fence_gate", (name, tag) -> fenceGate(tag, Texture.paleOakPlanks));
+    addBlock("pale_oak_trapdoor", (name, tag) -> orientableTrapdoor(tag, Texture.paleOakTrapdoor));
+    addBlock("pale_oak_door", (name, tag) -> door(tag, Texture.paleOakDoorTop, Texture.paleOakDoorBottom));
+    addBlock("stripped_pale_oak_log", (name, tag) -> log(tag, Texture.strippedPaleOakLog, Texture.strippedPaleOakLogTop));
+    addBlock("stripped_pale_oak_wood", (name, tag) -> log(tag, Texture.strippedPaleOakLog, Texture.strippedPaleOakLog));
+    addBlock("pale_oak_wood", (name, tag) -> log(tag, Texture.paleOakLog, Texture.paleOakLog));
+    addBlock("pale_oak_sapling", (name, tag) -> new SpriteBlock(name, Texture.paleOakSapling));
+    addBlock("potted_pale_oak_sapling", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.PALE_OAK_SAPLING));
+    addBlock("pale_oak_sign", (name, tag) -> sign(tag, "pale_oak"));
+    addBlock("pale_oak_wall_sign", (name, tag) -> wallSign(tag, "pale_oak"));
+    addBlock("pale_oak_hanging_sign", (name, tag) -> hangingSign(tag, "pale_oak"));
+    addBlock("pale_oak_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "pale_oak"));
+    addBlock("pale_moss_carpet", (name, tag) -> new PaleMossCarpet(name,
+      tag.get("Properties").get("bottom").stringValue("false").equals("true"),
+      tag.get("Properties").get("north").stringValue("none"),
+      tag.get("Properties").get("east").stringValue("none"),
+      tag.get("Properties").get("south").stringValue("none"),
+      tag.get("Properties").get("west").stringValue("none")));
+    addBlock("creaking_heart", (name, tag) -> new CreakingHeart(name,
+      tag.get("Properties").get("axis").stringValue("y"),
+      tag.get("Properties").get("creaking").stringValue("active")));
   }
 
   @Override

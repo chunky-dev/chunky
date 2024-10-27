@@ -1512,6 +1512,51 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/trial_spawner_top_ejecting_reward_ominous")
   public static final Texture trialSpawnerTopEjectingRewardOminous = new Texture();
 
+  @TexturePath("assets/minecraft/textures/block/pale_moss_block")
+  public static final Texture paleMossBlock = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_leaves")
+  public static final Texture paleOakLeaves = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_log")
+  public static final Texture paleOakLog= new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_log_top")
+  public static final Texture paleOakLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_hanging_moss")
+  public static final Texture paleHangingMoss = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_hanging_moss_tip")
+  public static final Texture paleHangingMossTip = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_planks")
+  public static final Texture paleOakPlanks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_trapdoor")
+  public static final Texture paleOakTrapdoor = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_door_top")
+  public static final Texture paleOakDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_door_bottom")
+  public static final Texture paleOakDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_pale_oak_log")
+  public static final Texture strippedPaleOakLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_pale_oak_log_top")
+  public static final Texture strippedPaleOakLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_sapling")
+  public static final Texture paleOakSapling = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/pale_oak")
+  public static final Texture paleOakSignPost = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/pale_oak")
+  public static final Texture paleOakHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_moss_carpet")
+  public static final Texture paleMossCarpet = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_moss_carpet_side_small")
+  public static final Texture paleMossCarpetSideSmall = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_moss_carpet_side_tall")
+  public static final Texture paleMossCarpetSideTall = new Texture();
+  @TexturePath("assets/minecraft/textures/block/creaking_heart")
+  public static final Texture creakingHeart = new Texture();
+  @TexturePath("assets/minecraft/textures/block/creaking_heart_top")
+  public static final Texture creakingHeartTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/creaking_heart_active")
+  public static final Texture creakingHeartActive = new Texture();
+  @TexturePath("assets/minecraft/textures/block/creaking_heart_top_active")
+  public static final Texture creakingHeartTopActive = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 
