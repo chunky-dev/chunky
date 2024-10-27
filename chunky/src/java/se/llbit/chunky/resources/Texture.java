@@ -1548,6 +1548,14 @@ public class Texture {
   public static final Texture paleMossCarpetSideSmall = new Texture();
   @TexturePath("assets/minecraft/textures/block/pale_moss_carpet_side_tall")
   public static final Texture paleMossCarpetSideTall = new Texture();
+  @TexturePath("assets/minecraft/textures/block/creaking_heart")
+  public static final Texture creakingHeart = new Texture();
+  @TexturePath("assets/minecraft/textures/block/creaking_heart_top")
+  public static final Texture creakingHeartTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/creaking_heart_active")
+  public static final Texture creakingHeartActive = new Texture();
+  @TexturePath("assets/minecraft/textures/block/creaking_heart_top_active")
+  public static final Texture creakingHeartTopActive = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

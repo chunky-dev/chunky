@@ -1153,6 +1153,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       tag.get("Properties").get("east").stringValue("none"),
       tag.get("Properties").get("south").stringValue("none"),
       tag.get("Properties").get("west").stringValue("none")));
+    addBlock("creaking_heart", (name, tag) -> new CreakingHeart(name,
+      tag.get("Properties").get("axis").stringValue("y"),
+      tag.get("Properties").get("creaking").stringValue("active")));
   }
 
   @Override
