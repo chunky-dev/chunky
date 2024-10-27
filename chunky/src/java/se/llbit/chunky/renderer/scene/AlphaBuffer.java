@@ -72,8 +72,12 @@ public class AlphaBuffer {
 
     try (TaskTracker.Task task = taskTracker.task("Computing alpha channel")) {
       this.type = type;
+      int cropX = scene.canvasConfig.getCropX();
+      int cropY = scene.canvasConfig.getCropY();
       int width = scene.canvasConfig.getWidth();
       int height = scene.canvasConfig.getHeight();
+      int fullWidth = scene.canvasConfig.getCropWidth();
+      int fullHeight = scene.canvasConfig.getCropHeight();
       buffer = ByteBuffer.allocate(scene.canvasConfig.getPixelCount() * type.byteSize);
 
       AtomicInteger done = new AtomicInteger(0);
@@ -83,10 +87,10 @@ public class AlphaBuffer {
           state.ray = new Ray();
 
           for (int y = 0; y < height; y++) {
-            computeAlpha(scene, x, y, width, height, state);
+            computeAlpha(scene, x, y, cropX, cropY, width, height, fullWidth, fullHeight, state);
           }
 
-          task.update(width, done.incrementAndGet());
+          task.update(height, done.incrementAndGet());
         });
       }).get();
     } catch (InterruptedException | ExecutionException e) {
@@ -97,10 +101,10 @@ public class AlphaBuffer {
   /**
    * Compute the alpha channel based on sky visibility.
    */
-  public void computeAlpha(Scene scene, int x, int y, int width, int height, WorkerState state) {
+  public void computeAlpha(Scene scene, int x, int y, int cropX, int cropY, int width, int height, int fullWidth, int fullHeight, WorkerState state) {
     Ray ray = state.ray;
-    double halfWidth = width / (2.0 * height);
-    double invHeight = 1.0 / height;
+    double halfWidth = fullWidth / (2.0 * fullHeight);
+    double invHeight = 1.0 / fullHeight;
 
     // Rotated grid supersampling.
     double[][] offsets = new double[][]{
@@ -113,8 +117,8 @@ public class AlphaBuffer {
     double occlusion = 0.0;
     for (double[] offset : offsets) {
       scene.camera.calcViewRay(ray,
-        -halfWidth + (x + offset[0]) * invHeight,
-        -0.5 + (y + offset[1]) * invHeight);
+        -halfWidth + (x + offset[0] + cropX) * invHeight,
+        -0.5 + (y + offset[1] + cropY) * invHeight);
       ray.o.x -= scene.origin.x;
       ray.o.y -= scene.origin.y;
       ray.o.z -= scene.origin.z;
