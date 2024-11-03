@@ -160,21 +160,23 @@ public class OrientableTrapdoorModel extends QuadModel {
       if (open && half.equals("top")) {
         quads = Model.rotateX(Model.rotateY(quads, Math.toRadians(270)), Math.toRadians(180));
       } else {
-        quads = Model.rotateY(quads, Math.toRadians(90));
+        quads = Model.rotateY(quads, Math.toRadians(-90));
       }
-    } else if (facing.equals("north") && open && half.equals("top")) {
-      quads = Model.rotateX(Model.rotateY(quads, Math.toRadians(180)), Math.toRadians(180));
+    } else if (facing.equals("north")) {
+      if (open && half.equals("top")) {
+        quads = Model.rotateX(Model.rotateY(quads, Math.toRadians(180)), Math.toRadians(180));
+      }
     } else if (facing.equals("south")) {
       if (half.equals("top") && open) {
         quads = Model.rotateX(quads, Math.toRadians(180));
       } else {
         quads = Model.rotateY(quads, Math.toRadians(180));
       }
-    } else {
+    } else { // west
       if (half.equals("top") && open) {
-        quads = Model.rotateY(Model.rotateX(quads, Math.toRadians(180)), Math.toRadians(90));
+        quads = Model.rotateY(Model.rotateX(quads, Math.toRadians(180)), Math.toRadians(-90));
       } else {
-        quads = Model.rotateY(quads, Math.toRadians(270));
+        quads = Model.rotateY(quads, Math.toRadians(-270));
       }
     }
 
