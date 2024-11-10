@@ -114,6 +114,15 @@ public class Scene implements JsonSerializable, Refreshable {
    * Default emitter intensity.
    */
   public static final double DEFAULT_EMITTER_INTENSITY = 13;
+  /**
+   * Default exponent for emitter mapping.
+   */
+  public static final double DEFAULT_EMITTER_MAPPING_EXPONENT = 1.5;
+
+  /**
+   * Default method for emitter mapping.
+   */
+  public static final EmitterMappingType DEFAULT_EMITTER_MAPPING_TYPE = EmitterMappingType.BRIGHTEST_CHANNEL;
 
   /**
    * Minimum emitter intensity.
@@ -124,6 +133,16 @@ public class Scene implements JsonSerializable, Refreshable {
    * Maximum emitter intensity.
    */
   public static final double MAX_EMITTER_INTENSITY = 1000;
+
+  /**
+   * Minimum emitter mapping exponent.
+   */
+  public static final double MIN_EMITTER_MAPPING_EXPONENT = 0;
+
+  /**
+   * Maximum emitter mapping exponent.
+   */
+  public static final double MAX_EMITTER_MAPPING_EXPONENT = 5;
 
   /**
    * Default transmissivity cap.
@@ -196,6 +215,8 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean saveSnapshots = false;
   protected boolean emittersEnabled = DEFAULT_EMITTERS_ENABLED;
   protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
+  protected double emitterMappingExponent = DEFAULT_EMITTER_MAPPING_EXPONENT;
+  protected EmitterMappingType emitterMappingType = DEFAULT_EMITTER_MAPPING_TYPE;
   protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.NONE;
   protected boolean fancierTranslucency = true;
   protected double transmissivityCap = DEFAULT_TRANSMISSIVITY_CAP;
@@ -440,6 +461,8 @@ public class Scene implements JsonSerializable, Refreshable {
     sunSamplingStrategy = other.sunSamplingStrategy;
     emittersEnabled = other.emittersEnabled;
     emitterIntensity = other.emitterIntensity;
+    emitterMappingExponent = other.emitterMappingExponent;
+    emitterMappingType = other.emitterMappingType;
     emitterSamplingStrategy = other.emitterSamplingStrategy;
     preventNormalEmitterWithSampling = other.preventNormalEmitterWithSampling;
     fancierTranslucency = other.fancierTranslucency;
@@ -1754,6 +1777,36 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
+   * @return The current emitter mapping exponent
+   */
+  public double getEmitterMappingExponent() {
+    return emitterMappingExponent;
+  }
+
+  /**
+   * Set the emitter mapping exponent.
+   */
+  public void setEmitterMappingExponent(double value) {
+    emitterMappingExponent = value;
+    refresh();
+  }
+
+  /**
+   * @return The current emitter mapping type.
+   */
+  public EmitterMappingType getEmitterMappingType() {
+    return emitterMappingType;
+  }
+
+  /**
+   * Set the emitter mapping type.
+   */
+  public void setEmitterMappingType(EmitterMappingType value) {
+    emitterMappingType = value;
+    refresh();
+  }
+
+  /**
    * Set the transparent sky option.
    */
   public void setTransparentSky(boolean value) {
@@ -2561,6 +2614,8 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("saveSnapshots", saveSnapshots);
     json.add("emittersEnabled", emittersEnabled);
     json.add("emitterIntensity", emitterIntensity);
+    json.add("emitterMappingExponent", emitterMappingExponent);
+    json.add("emitterMappingType", emitterMappingType.getId());
     json.add("fancierTranslucency", fancierTranslucency);
     json.add("transmissivityCap", transmissivityCap);
     json.add("sunSamplingStrategy", sunSamplingStrategy.getId());
@@ -2824,6 +2879,8 @@ public class Scene implements JsonSerializable, Refreshable {
     saveSnapshots = json.get("saveSnapshots").boolValue(saveSnapshots);
     emittersEnabled = json.get("emittersEnabled").boolValue(emittersEnabled);
     emitterIntensity = json.get("emitterIntensity").doubleValue(emitterIntensity);
+    emitterMappingExponent = json.get("emitterMappingExponent").doubleValue(emitterMappingExponent);
+    emitterMappingType = EmitterMappingType.valueOf(json.get("emitterMappingType").asString(DEFAULT_EMITTER_MAPPING_TYPE.getId()));
     fancierTranslucency = json.get("fancierTranslucency").boolValue(fancierTranslucency);
     transmissivityCap = json.get("transmissivityCap").doubleValue(transmissivityCap);
 
@@ -3136,6 +3193,26 @@ public class Scene implements JsonSerializable, Refreshable {
   public void setEmittance(String materialName, float value) {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("emittance", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the emittance property for the given material.
+   */
+  public void setEmitterMappingOffset(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("emitterMappingOffset", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the emittance property for the given material.
+   */
+  public void setEmitterMappingTypeOverride(String materialName, EmitterMappingType value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("emitterMappingType", Json.of(value.toString()));
     materials.put(materialName, material);
     refresh(ResetReason.MATERIALS_CHANGED);
   }
