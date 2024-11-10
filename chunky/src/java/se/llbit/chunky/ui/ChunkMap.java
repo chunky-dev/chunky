@@ -153,16 +153,22 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     newScene.setGraphic(new ImageView(Icon.sky.fxImage()));
     newScene.setOnAction(event -> {
       SceneManager sceneManager = controller.getRenderController().getSceneManager();
-      sceneManager
-          .loadFreshChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
+      sceneManager.getSceneProvider().withEditSceneProtected(scene -> {
+        scene.setYClipMin(mapView.getYMin());
+        scene.setYClipMax(mapView.getYMax());
+      });
+      sceneManager.loadFreshChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
     });
     newScene.setDisable(chunkSelection.isEmpty());
 
     MenuItem loadSelection = new MenuItem("Load selected chunks");
     loadSelection.setOnAction(event -> {
       SceneManager sceneManager = controller.getRenderController().getSceneManager();
-      sceneManager
-          .loadChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
+      sceneManager.getSceneProvider().withEditSceneProtected(scene -> {
+        scene.setYClipMin(mapView.getYMin());
+        scene.setYClipMax(mapView.getYMax());
+      });
+      sceneManager.loadChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
     });
     loadSelection.setDisable(chunkSelection.isEmpty());
 
