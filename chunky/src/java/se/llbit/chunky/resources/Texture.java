@@ -1556,6 +1556,14 @@ public class Texture {
   public static final Texture creakingHeartActive = new Texture();
   @TexturePath("assets/minecraft/textures/block/creaking_heart_top_active")
   public static final Texture creakingHeartTopActive = new Texture();
+  @TexturePath("assets/minecraft/textures/block/chiseled_resin_bricks")
+  public static final Texture chiseledResinBricks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/closed_eyeblossom")
+  public static final Texture closedEyeblossom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/open_eyeblossom")
+  public static final Texture openEyeblossom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/open_eyeblossom_emissive")
+  public static final Texture openEyeblossomEmissive = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

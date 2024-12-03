@@ -8,7 +8,6 @@ import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.model.minecraft.FlowerPotModel;
 import se.llbit.chunky.model.minecraft.FlowerPotModel.Kind;
-import se.llbit.chunky.model.minecraft.PaleMossCarpetModel;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.nbt.ListTag;
@@ -1156,6 +1155,9 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("creaking_heart", (name, tag) -> new CreakingHeart(name,
       tag.get("Properties").get("axis").stringValue("y"),
       tag.get("Properties").get("creaking").stringValue("active")));
+    addBlock("chiseled_resin_bricks", Texture.chiseledResinBricks);
+    addBlock("closed_eyeblossom", (name, tag) -> new SpriteBlock(name, Texture.closedEyeblossom));
+    addBlock("potted_closed_eyeblossom", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.CLOSED_EYEBLOSSOM));
   }
 
   @Override
