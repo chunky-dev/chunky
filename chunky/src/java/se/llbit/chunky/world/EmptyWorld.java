@@ -16,6 +16,11 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.ui.ProgressTracker;
+
+import java.io.File;
+import java.util.Collection;
+
 /**
  * Represents an empty or non-existent world.
  *
@@ -31,8 +36,16 @@ public class EmptyWorld extends World {
     this.currentDimension = EmptyDimension.INSTANCE;
   }
 
+  @Override
+  public void loadDimension(int dimensionId) { }
+
+  @Override
+  public void exportChunksToZip(File target, Collection<ChunkPosition> chunks, ProgressTracker progress) { }
+
+  @Override
+  public void exportWorldToZip(File target, ProgressTracker progress) { }
+
   @Override public String toString() {
     return "[empty world]";
   }
-
 }

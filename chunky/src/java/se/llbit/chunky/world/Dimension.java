@@ -1,7 +1,6 @@
 package se.llbit.chunky.world;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntIntPair;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
@@ -12,7 +11,7 @@ import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.world.listeners.ChunkDeletionListener;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
-import se.llbit.chunky.world.region.*;
+import se.llbit.chunky.world.region.RegionChangeWatcher;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
 import se.llbit.util.annotation.Nullable;
@@ -23,10 +22,8 @@ import java.util.*;
 /**
  *
  */
-public class Dimension {
-  private final World world;
-
-  protected final Long2ObjectMap<Region> regionMap = new Long2ObjectOpenHashMap<>();
+public abstract class Dimension {
+  protected final World world;
 
   protected final File dimensionDirectory;
   private Set<PlayerEntityData> playerEntities;
@@ -64,37 +61,12 @@ public class Dimension {
    * Reload player data.
    * @return {@code true} if player data was reloaded.
    */
-  public synchronized boolean reloadPlayerData() {
-    return this.world.reloadPlayerData();
-  }
-
-  /** Add a chunk deletion listener. */
-  public void addChunkDeletionListener(ChunkDeletionListener listener) {
-    synchronized (chunkDeletionListeners) {
-      chunkDeletionListeners.add(listener);
-    }
-  }
-
-  /** Add a region discovery listener. */
-  public void addChunkUpdateListener(ChunkUpdateListener listener) {
-    synchronized (chunkUpdateListeners) {
-      chunkUpdateListeners.add(listener);
-    }
-  }
-
-  private void fireChunkDeleted(ChunkPosition chunk) {
-    synchronized (chunkDeletionListeners) {
-      for (ChunkDeletionListener listener : chunkDeletionListeners)
-        listener.chunkDeleted(chunk);
-    }
-  }
+  public abstract boolean reloadPlayerData();
 
   /**
    * @return The chunk at the given position
    */
-  public synchronized Chunk getChunk(ChunkPosition pos) {
-    return getRegion(pos.getRegionPosition()).getChunk(pos);
-  }
+  public abstract Chunk getChunk(ChunkPosition pos);
 
   /**
    * Returns a ChunkData instance that is compatible with the given chunk version.
@@ -114,56 +86,16 @@ public class Dimension {
     return new GenericChunkData();
   }
 
-  public Region createRegion(RegionPosition pos) {
-    return new MCRegion(pos, this);
-  }
-
-  public RegionChangeWatcher createRegionChangeWatcher(WorldMapLoader worldMapLoader, MapView mapView) {
-    return new MCRegionChangeWatcher(worldMapLoader, mapView);
-  }
-
   /**
-   * @param pos Region position
-   * @return The region at the given position
+   * WARNING: In some dimensions this could be from {@link Integer#MIN_VALUE} to {@link Integer#MAX_VALUE}
+   * <p>
+   * Lower bound is inclusive, upper is exclusive
+   *
+   * @return The height range of the dimension.
    */
-  public synchronized Region getRegion(RegionPosition pos) {
-    return regionMap.computeIfAbsent(pos.getLong(), p -> {
-      // check if the region is present in the world directory
-      Region region = EmptyRegion.instance;
-      if (regionExists(pos)) {
-        region = createRegion(pos);
-      }
-      return region;
-    });
-  }
+  public abstract IntIntPair heightRange();
 
-  public Region getRegionWithinRange(RegionPosition pos, int yMin, int yMax) {
-    return getRegion(pos);
-  }
-
-  /** Set the region for the given position. */
-  public synchronized void setRegion(RegionPosition pos, Region region) {
-    regionMap.put(pos.getLong(), region);
-  }
-
-  /**
-   * @param pos region position
-   * @return {@code true} if a region file exists for the given position
-   */
-  public boolean regionExists(RegionPosition pos) {
-    File regionFile = new File(getRegionDirectory(), pos.getMcaName());
-    return regionFile.exists();
-  }
-
-  /**
-   * @param pos Position of the region to load
-   * @param minY Minimum block Y (inclusive)
-   * @param maxY Maximum block Y (exclusive)
-   * @return Whether the region exists
-   */
-  public boolean regionExistsWithinRange(RegionPosition pos, int minY, int maxY) {
-    return this.regionExists(pos);
-  }
+  public abstract RegionChangeWatcher createRegionChangeWatcher(WorldMapLoader worldMapLoader, MapView mapView);
 
   /**
    * Get the data directory for the given dimension.
@@ -174,12 +106,6 @@ public class Dimension {
     return dimensionDirectory;
   }
 
-  /**
-   * @return File object pointing to the region file directory
-   */
-  public synchronized File getRegionDirectory() {
-    return new File(getDimensionDirectory(), "region");
-  }
 
   /**
    * Get the current player position as an optional vector.
@@ -202,15 +128,39 @@ public class Dimension {
     return heightmap;
   }
 
-  /** Called when a new region has been discovered by the region parser. */
-  public void regionDiscovered(RegionPosition pos) {
-    synchronized (this) {
-      regionMap.computeIfAbsent(pos.getLong(), p -> createRegion(pos));
+  @Override public String toString() {
+    return dimensionDirectory.getName() ;
+  }
+
+  /** Add a chunk deletion listener. */
+  public void addChunkDeletionListener(ChunkDeletionListener listener) {
+    synchronized (chunkDeletionListeners) {
+      chunkDeletionListeners.add(listener);
     }
   }
 
-  /** Notify region update listeners. */
-  private void fireChunkUpdated(ChunkPosition chunk) {
+  /**
+   * Called when chunks have been deleted from this world.
+   * Triggers the chunk deletion listeners.
+   *
+   * @param pos Position of deleted chunk
+   */
+  public void chunkDeleted(ChunkPosition pos) {
+    synchronized (chunkDeletionListeners) {
+      for (ChunkDeletionListener listener : chunkDeletionListeners)
+        listener.chunkDeleted(pos);
+    }
+  }
+
+  /** Add a region discovery listener. */
+  public void addChunkUpdateListener(ChunkUpdateListener listener) {
+    synchronized (chunkUpdateListeners) {
+      chunkUpdateListeners.add(listener);
+    }
+  }
+
+  /** Called when a chunk has been updated. */
+  public void chunkUpdated(ChunkPosition chunk) {
     synchronized (chunkUpdateListeners) {
       for (ChunkUpdateListener listener : chunkUpdateListeners) {
         listener.chunkUpdated(chunk);
@@ -218,27 +168,13 @@ public class Dimension {
     }
   }
 
-  /** Notify region update listeners. */
-  private void fireRegionUpdated(RegionPosition region) {
+  /** Called when a chunk has been updated. */
+  public void regionUpdated(RegionPosition region) {
     synchronized (chunkUpdateListeners) {
       for (ChunkUpdateListener listener : chunkUpdateListeners) {
         listener.regionUpdated(region);
       }
     }
-  }
-
-  @Override public String toString() {
-    return dimensionDirectory.getName() ;
-  }
-
-  /** Called when a chunk has been updated. */
-  public void chunkUpdated(ChunkPosition chunk) {
-    fireChunkUpdated(chunk);
-  }
-
-  /** Called when a chunk has been updated. */
-  public void regionUpdated(RegionPosition region) {
-    fireRegionUpdated(region);
   }
 
   /** Add a chunk discovery listener */
@@ -266,6 +202,8 @@ public class Dimension {
     }
   }
 
+  public abstract boolean regionExistsWithinRange(RegionPosition regionPos, int yMin, int yMax);
+
   public Optional<Vector3i> getSpawnPosition() {
     return Optional.ofNullable(this.spawnPos);
   }
@@ -274,19 +212,9 @@ public class Dimension {
     this.spawnPos = spawnPos;
   }
 
-  /**
-   * Called when chunks have been deleted from this world.
-   * Triggers the chunk deletion listeners.
-   *
-   * @param pos Position of deleted chunk
-   */
-  public void chunkDeleted(ChunkPosition pos) {
-    fireChunkDeleted(pos);
-  }
+  public abstract boolean chunkChangedSince(ChunkPosition chunkPosition, int timestamp);
 
-  public Date getLastModified() {
-    return new Date(this.dimensionDirectory.lastModified());
-  }
+  public abstract Date getLastModified();
 
   /**
    * Load entities from world the file.

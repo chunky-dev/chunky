@@ -18,7 +18,6 @@ package se.llbit.chunky.map;
 
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.world.*;
-import se.llbit.chunky.world.region.Region;
 
 /**
  * A tile in the 2D world map or minimap. The tile contains either a chunk or a region.
@@ -71,14 +70,14 @@ public class MapTile {
       }
     } else {
       RegionPosition regionPos = new RegionPosition(pos.x, pos.z); // intentionally don't convert, this position represented a region already.
+
       boolean isValid = mapLoader.getWorld().currentDimension().regionExistsWithinRange(regionPos, view.yMin, view.yMax);
-      Region region = mapLoader.getWorld().currentDimension().getRegionWithinRange(regionPos, view.yMin, view.yMax);
+
       int pixelOffset = 0;
       for (int z = 0; z < 32; ++z) {
         for (int x = 0; x < 32; ++x) {
-          Chunk chunk = region.getChunk(x, z);
-          //Calculate the chunk position as empty chunks are (0, 0)
-          ChunkPosition pos = region.getPosition().asChunkPosition(x, z);
+          ChunkPosition pos = regionPos.asChunkPosition(x, z);
+          Chunk chunk = mapLoader.getWorld().currentDimension().getChunk(pos);
 
           pixels[pixelOffset] = chunk.biomeColor();
           if (isValid && !(chunk instanceof EmptyRegionChunk) && selection.isSelected(pos)) {

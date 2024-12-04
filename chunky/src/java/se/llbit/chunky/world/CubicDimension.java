@@ -17,13 +17,13 @@ import java.util.stream.Stream;
 import static se.llbit.chunky.world.region.ImposterCubicRegion.blockToCube;
 import static se.llbit.chunky.world.region.ImposterCubicRegion.cubeToCubicRegion;
 
-public class CubicDimension extends Dimension {
+public class CubicDimension extends JavaDimension {
 
   /**
    * @param dimensionDirectory Minecraft world directory.
    * @param timestamp
    */
-  protected CubicDimension(World world, int dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, long timestamp) {
+  protected CubicDimension(JavaWorld world, int dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, long timestamp) {
     super(world, dimensionId, dimensionDirectory, playerEntities, timestamp);
   }
 
@@ -54,7 +54,7 @@ public class CubicDimension extends Dimension {
     return regionMap.computeIfAbsent(pos.getLong(), p -> {
       // check if the region is present in the world directory
       Region region = EmptyRegion.instance;
-      if (regionExistsWithinRange(pos, minY, maxY)) {
+      if (this.regionExistsWithinRange(pos, minY, maxY)) {
         region = createRegion(pos);
       }
       return region;

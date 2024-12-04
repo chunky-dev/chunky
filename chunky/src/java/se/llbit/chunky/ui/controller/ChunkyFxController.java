@@ -32,6 +32,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import it.unimi.dsi.fastutil.ints.IntIntPair;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -482,19 +483,15 @@ public class ChunkyFxController
                 }
                 if (!reloaded) {
                   ignoreYUpdate.set(true);
-                  if (mapLoader.getWorld().getVersionId() >= World.VERSION_21W06A) {
-                    yMin.setRange(-64, 320);
-                    yMin.set(-64);
-                    yMax.setRange(-64, 320);
-                    yMax.set(320);
-                    mapView.setYMinMax(-64, 320);
-                  } else {
-                    yMin.setRange(0, 256);
-                    yMin.set(0);
-                    yMax.setRange(0, 256);
-                    yMax.set(256);
-                    mapView.setYMinMax(0, 256);
-                  }
+                  IntIntPair heightRange = mapLoader.getWorld().currentDimension().heightRange();
+                  int min = heightRange.firstInt();
+                  int max = heightRange.secondInt();
+                  yMin.setRange(min, max);
+                  yMin.set(min);
+                  yMax.setRange(min, max);
+                  yMax.set(max);
+                  mapView.setYMinMax(min, max);
+
                   yMin.getStyleClass().removeAll("invalid");
                   yMax.getStyleClass().removeAll("invalid");
                   ignoreYUpdate.set(false);
@@ -680,13 +677,9 @@ public class ChunkyFxController
     mapOverlay.setOnKeyReleased(map::onKeyReleased);
 
     mapLoader.loadWorld(PersistentSettings.getLastWorld());
-    if (mapLoader.getWorld().getVersionId() >= World.VERSION_21W06A) {
-      mapView.setYMin(-64);
-      mapView.setYMax(320);
-    } else {
-      mapView.setYMin(0);
-      mapView.setYMax(256);
-    }
+    IntIntPair heightRange = mapLoader.getWorld().currentDimension().heightRange();
+    mapView.setYMin(heightRange.firstInt());
+    mapView.setYMax(heightRange.secondInt());
 
     canvas = new RenderCanvasFx(this, chunky.getSceneManager().getScene(),
         chunky.getRenderController().getRenderManager());

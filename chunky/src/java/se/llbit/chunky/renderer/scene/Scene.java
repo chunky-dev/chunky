@@ -821,7 +821,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       for (RegionPosition region : regions) {
-        dimension.getRegion(region).parse(yMin, yMax);
+        ((JavaDimension) dimension).getRegion(region).parse(yMin, yMax);
       }
     }
 
@@ -1192,7 +1192,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
         if (!chunkData.isEmpty()){
           nonEmptyChunks.add(cp);
-          if (dimension.getChunk(cp).getVersion() == ChunkVersion.PRE_FLATTENING) {
+          Chunk chunk = dimension.getChunk(cp);
+          if (chunk instanceof JavaChunk javaChunk && javaChunk.getVersion() == ChunkVersion.PRE_FLATTENING) {
             legacyChunks.add(cp);
           }
         }
