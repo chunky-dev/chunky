@@ -7,14 +7,14 @@ import se.llbit.chunky.resources.Texture;
 public class CreakingHeart extends AbstractModelBlock {
   private final String description;
 
-  public CreakingHeart(String name, String axis, String creaking) {
+  public CreakingHeart(String name, String axis, boolean active) {
     super(name, Texture.creakingHeartTop);
     this.model = new LogModel(
       axis,
-      creaking.equals("disabled") ? Texture.creakingHeart : Texture.creakingHeartActive,
-      creaking.equals("disabled") ? Texture.creakingHeartTop : Texture.creakingHeartTopActive
+      active ? Texture.creakingHeartActive : Texture.creakingHeart,
+      active ? Texture.creakingHeartTopActive : Texture.creakingHeartTop
     );
-    this.description = String.format("axis=%s, creaking=%s", axis, creaking);
+    this.description = String.format("active=%s, axis=%s", active, axis);
   }
 
   @Override
