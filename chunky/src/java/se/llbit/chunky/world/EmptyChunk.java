@@ -24,6 +24,7 @@ import se.llbit.chunky.map.MapTile;
 import se.llbit.chunky.ui.ChunkMap;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.util.Mutable;
+import se.llbit.util.annotation.NotNull;
 
 /**
  * Empty or non-existent chunk in a region that <b>does</b> exist.
@@ -86,7 +87,7 @@ public class EmptyChunk extends Chunk {
     // Do nothing.
   }
 
-  @Override public synchronized boolean loadChunk(Mutable<ChunkData> chunkData, int yMin, int yMax) {
+  @Override public synchronized boolean loadChunk(@NotNull Mutable<ChunkData> chunkData, int yMin, int yMax) {
     return false;
   }
 
