@@ -1564,6 +1564,10 @@ public class Texture {
   public static final Texture openEyeblossom = new Texture();
   @TexturePath("assets/minecraft/textures/block/open_eyeblossom_emissive")
   public static final Texture openEyeblossomEmissive = new Texture();
+  @TexturePath("assets/minecraft/textures/block/resin_block")
+  public static final Texture resinBlock = new Texture();
+  @TexturePath("assets/minecraft/textures/block/resin_bricks")
+  public static final Texture resinBricks = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

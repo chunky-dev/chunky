@@ -1158,6 +1158,11 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("chiseled_resin_bricks", Texture.chiseledResinBricks);
     addBlock("closed_eyeblossom", (name, tag) -> new SpriteBlock(name, Texture.closedEyeblossom));
     addBlock("potted_closed_eyeblossom", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.CLOSED_EYEBLOSSOM));
+    addBlock("resin_block", Texture.resinBlock);
+    addBlock("resin_bricks", Texture.resinBricks);
+    addBlock("resin_brick_stairs", (name, tag) -> stairs(tag, Texture.resinBricks));
+    addBlock("resin_brick_slab", (name, tag) -> slab(tag, Texture.resinBricks));
+    addBlock("resin_brick_walls", (name, tag) -> wall(tag, Texture.resinBricks));
   }
 
   @Override
