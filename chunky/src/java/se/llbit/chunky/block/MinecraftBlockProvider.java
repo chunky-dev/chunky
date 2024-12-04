@@ -8,7 +8,6 @@ import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.model.minecraft.FlowerPotModel;
 import se.llbit.chunky.model.minecraft.FlowerPotModel.Kind;
-import se.llbit.chunky.model.minecraft.PaleMossCarpetModel;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.nbt.ListTag;
@@ -1155,7 +1154,15 @@ public class MinecraftBlockProvider implements BlockProvider {
       tag.get("Properties").get("west").stringValue("none")));
     addBlock("creaking_heart", (name, tag) -> new CreakingHeart(name,
       tag.get("Properties").get("axis").stringValue("y"),
-      tag.get("Properties").get("creaking").stringValue("active")));
+      tag.get("Properties").get("active").stringValue("false").equals("true")));
+    addBlock("chiseled_resin_bricks", Texture.chiseledResinBricks);
+    addBlock("closed_eyeblossom", (name, tag) -> new SpriteBlock(name, Texture.closedEyeblossom));
+    addBlock("potted_closed_eyeblossom", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.CLOSED_EYEBLOSSOM));
+    addBlock("resin_block", Texture.resinBlock);
+    addBlock("resin_bricks", Texture.resinBricks);
+    addBlock("resin_brick_stairs", (name, tag) -> stairs(tag, Texture.resinBricks));
+    addBlock("resin_brick_slab", (name, tag) -> slab(tag, Texture.resinBricks));
+    addBlock("resin_brick_walls", (name, tag) -> wall(tag, Texture.resinBricks));
   }
 
   @Override
@@ -3585,22 +3592,14 @@ public class MinecraftBlockProvider implements BlockProvider {
 
   private static Block structureBlock(Tag tag) {
     Tag properties = tag.get("Properties");
-    Texture texture = Texture.structureBlock;
     String mode = properties.get("mode").stringValue("");
-    switch (mode) {
-      case "corner":
-        texture = Texture.structureBlockCorner;
-        break;
-      case "data":
-        texture = Texture.structureBlockData;
-        break;
-      case "load":
-        texture = Texture.structureBlockLoad;
-        break;
-      case "save":
-        texture = Texture.structureBlockSave;
-        break;
-    }
+    Texture texture = switch (mode) {
+      case "corner" -> Texture.structureBlockCorner;
+      case "data" -> Texture.structureBlockData;
+      case "load" -> Texture.structureBlockLoad;
+      case "save" -> Texture.structureBlockSave;
+      default -> Texture.structureBlock;
+    };
     return new MinecraftBlock("structure_block", texture);
   }
 
@@ -3620,31 +3619,23 @@ public class MinecraftBlockProvider implements BlockProvider {
   private static Block suspiciousSand(Tag tag) {
     Tag properties = tag.get("Properties");
     String dusted = properties.get("dusted").stringValue("0");
-    switch(dusted) {
-      case "1":
-        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage1);
-      case "2":
-        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage2);
-      case "3":
-        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage3);
-      default:
-        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage0);
-    }
+    return switch (dusted) {
+      case "1" -> new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage1);
+      case "2" -> new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage2);
+      case "3" -> new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage3);
+      default -> new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage0);
+    };
   }
 
   private static Block suspiciousGravel(Tag tag) {
     Tag properties = tag.get("Properties");
     String dusted = properties.get("dusted").stringValue("0");
-    switch(dusted) {
-      case "1":
-        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage1);
-      case "2":
-        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage2);
-      case "3":
-        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage3);
-      default:
-        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage0);
-    }
+    return switch (dusted) {
+      case "1" -> new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage1);
+      case "2" -> new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage2);
+      case "3" -> new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage3);
+      default -> new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage0);
+    };
   }
 
   private static Block decoratedPot(Tag tag) {
