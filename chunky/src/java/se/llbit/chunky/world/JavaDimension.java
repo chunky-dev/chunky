@@ -13,13 +13,15 @@ import java.util.*;
 
 public class JavaDimension extends Dimension {
   protected final Long2ObjectMap<Region> regionMap = new Long2ObjectOpenHashMap<>();
+  protected final File dimensionDirectory;
 
   /**
    * @param dimensionDirectory Minecraft world directory.
    * @param timestamp
    */
   protected JavaDimension(JavaWorld world, int dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, long timestamp) {
-    super(world, dimensionId, dimensionDirectory, playerEntities, timestamp);
+    super(world, dimensionId, playerEntities, timestamp);
+    this.dimensionDirectory = dimensionDirectory;
   }
 
   /**
@@ -118,5 +120,19 @@ public class JavaDimension extends Dimension {
 
   public Date getLastModified() {
     return new Date(this.dimensionDirectory.lastModified());
+  }
+
+  /**
+   * Get the data directory for the given dimension.
+   *
+   * @return File object pointing to the data directory
+   */
+  protected synchronized File getDimensionDirectory() {
+    return dimensionDirectory;
+  }
+
+  @Override
+  public String toString() {
+    return dimensionDirectory.getName() ;
   }
 }

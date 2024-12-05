@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.world;
 
+import it.unimi.dsi.fastutil.ints.IntArraySet;
 import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.log.Log;
@@ -40,7 +41,7 @@ import java.util.zip.ZipOutputStream;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class JavaWorld extends World{
+public class JavaWorld extends World {
 
   /** The currently supported NBT version of level.dat files. */
   public static final int NBT_VERSION = 19133;
@@ -61,9 +62,15 @@ public class JavaWorld extends World{
     super(levelName, worldDirectory, seed, timestamp);
   }
 
-  public void loadDimension(int dimensionId) {
+  @Override
+  public Set<Integer> listDimensions() {
+    return new IntArraySet(new int[] { -1, 0, 1 });
+  }
+
+  public Dimension loadDimension(int dimensionId) {
     currentDimension = loadDimension(this, this.worldDirectory, dimensionId, -1, Collections.emptySet());
     currentDimension.reloadPlayerData();
+    return currentDimension;
   }
 
   /**

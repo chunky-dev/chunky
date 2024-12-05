@@ -16,7 +16,6 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
 import se.llbit.util.annotation.Nullable;
 
-import java.io.File;
 import java.util.*;
 
 /**
@@ -24,8 +23,6 @@ import java.util.*;
  */
 public abstract class Dimension {
   protected final World world;
-
-  protected final File dimensionDirectory;
   private Set<PlayerEntityData> playerEntities;
 
   private final Heightmap heightmap = new Heightmap();
@@ -42,13 +39,11 @@ public abstract class Dimension {
   private long timestamp;
 
   /**
-   * @param dimensionDirectory Minecraft world directory.
    * @param timestamp
    */
-  protected Dimension(World world, int dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, long timestamp) {
+  protected Dimension(World world, int dimensionId, Set<PlayerEntityData> playerEntities, long timestamp) {
     this.world = world;
     this.dimensionId = dimensionId;
-    this.dimensionDirectory = dimensionDirectory;
     this.playerEntities = playerEntities;
     this.timestamp = timestamp;
   }
@@ -97,15 +92,6 @@ public abstract class Dimension {
 
   public abstract RegionChangeWatcher createRegionChangeWatcher(WorldMapLoader worldMapLoader, MapView mapView);
 
-  /**
-   * Get the data directory for the given dimension.
-   *
-   * @return File object pointing to the data directory
-   */
-  protected synchronized File getDimensionDirectory() {
-    return dimensionDirectory;
-  }
-
 
   /**
    * Get the current player position as an optional vector.
@@ -128,9 +114,10 @@ public abstract class Dimension {
     return heightmap;
   }
 
-  @Override public String toString() {
-    return dimensionDirectory.getName() ;
-  }
+  /**
+   * @return A user presentable name of the dimension
+   */
+  public abstract String toString();
 
   /** Add a chunk deletion listener. */
   public void addChunkDeletionListener(ChunkDeletionListener listener) {

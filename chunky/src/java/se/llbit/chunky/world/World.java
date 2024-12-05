@@ -72,13 +72,22 @@ public abstract class World implements Comparable<World> {
     SILENT
   }
 
-  public abstract void loadDimension(int dimensionId);
+  /**
+   * The dimensions returned here are later provided to {@link #loadDimension(int)} when requesting a dimension be
+   * loaded.
+   *
+   * @return List the viewable dimensions within the world.
+   */
+  public abstract Set<Integer> listDimensions();
+
+  public abstract Dimension loadDimension(int dimensionId);
 
   /**
    * Parse player location and level name.
    *
    * @return {@code true} if the world data was loaded
    */
+  @Deprecated
   public static World loadWorld(File worldDirectory, int dimensionId, LoggedWarnings warnings) {
     if (worldDirectory == null) {
       return EmptyWorld.INSTANCE;
@@ -137,18 +146,6 @@ public abstract class World implements Comparable<World> {
   /** The name of this world (not the world directory name). */
   public String levelName() {
     return levelName;
-  }
-
-  /**
-   * @return <code>true</code> if the given directory exists and
-   * contains a level.dat file
-   */
-  public static boolean isWorldDir(File worldDir) {
-    if (worldDir != null && worldDir.isDirectory()) {
-      File levelDat = new File(worldDir, "level.dat");
-      return levelDat.exists() && levelDat.isFile();
-    }
-    return false;
   }
 
   /**

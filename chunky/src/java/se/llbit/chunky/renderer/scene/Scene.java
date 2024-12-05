@@ -543,7 +543,7 @@ public class Scene implements JsonSerializable, Refreshable {
       loadedWorld = EmptyWorld.INSTANCE;
       if (!worldPath.isEmpty()) {
         File worldDirectory = new File(worldPath);
-        if (World.isWorldDir(worldDirectory)) {
+        if (JavaWorld.isWorldDir(worldDirectory)) {
           loadedWorld = World.loadWorld(worldDirectory, worldDimension, World.LoggedWarnings.NORMAL);
         } else {
           Log.info("Could not load world: " + worldPath);

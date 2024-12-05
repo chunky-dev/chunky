@@ -20,6 +20,8 @@ import se.llbit.chunky.ui.ProgressTracker;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Represents an empty or non-existent world.
@@ -37,7 +39,14 @@ public class EmptyWorld extends World {
   }
 
   @Override
-  public void loadDimension(int dimensionId) { }
+  public Set<Integer> listDimensions() {
+    return Collections.emptySet();
+  }
+
+  @Override
+  public Dimension loadDimension(int dimensionId) {
+    return EmptyDimension.INSTANCE;
+  }
 
   @Override
   public void exportChunksToZip(File target, Collection<ChunkPosition> chunks, ProgressTracker progress) { }
