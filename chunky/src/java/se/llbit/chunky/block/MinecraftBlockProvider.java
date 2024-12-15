@@ -1163,6 +1163,13 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("resin_brick_stairs", (name, tag) -> stairs(tag, Texture.resinBricks));
     addBlock("resin_brick_slab", (name, tag) -> slab(tag, Texture.resinBricks));
     addBlock("resin_brick_walls", (name, tag) -> wall(tag, Texture.resinBricks));
+    addBlock("resin_clump", (name, tag) -> new ResinClump(
+      tag.get("Properties").get("north").stringValue("false").equals("true"),
+      tag.get("Properties").get("south").stringValue("false").equals("true"),
+      tag.get("Properties").get("east").stringValue("false").equals("true"),
+      tag.get("Properties").get("west").stringValue("false").equals("true"),
+      tag.get("Properties").get("up").stringValue("false").equals("true"),
+      tag.get("Properties").get("down").stringValue("false").equals("true")));
   }
 
   @Override

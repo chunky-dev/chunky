@@ -1568,6 +1568,8 @@ public class Texture {
   public static final Texture resinBlock = new Texture();
   @TexturePath("assets/minecraft/textures/block/resin_bricks")
   public static final Texture resinBricks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/resin_clump")
+  public static final Texture resinClump = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
