@@ -17,11 +17,15 @@
  */
 package se.llbit.chunky.model.minecraft;
 
+import se.llbit.chunky.block.minecraft.OpenEyeBlossom;
+import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.model.Tint;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
@@ -70,7 +74,8 @@ public class FlowerPotModel extends QuadModel {
     TORCHFLOWER,
     CHERRY_SAPLING,
     PALE_OAK_SAPLING,
-    CLOSED_EYEBLOSSOM
+    CLOSED_EYEBLOSSOM,
+    OPEN_EYEBLOSSOM
   }
 
   private static final Texture flowerpot = Texture.flowerPot;
@@ -481,7 +486,7 @@ public class FlowerPotModel extends QuadModel {
   private final Texture[] textures;
   private final Tint[] tints;
 
-  public FlowerPotModel(Kind kind) {
+  private FlowerPotModel(Kind kind) {
     switch (kind) {
       case NONE:
         quads = flowerPot;
@@ -527,6 +532,14 @@ public class FlowerPotModel extends QuadModel {
         tints = null;
         System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
         Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.mangrovePropagule);
+        break;
+      case OPEN_EYEBLOSSOM:
+        quads = Model.join(flowerPot, flowerSmall, flowerSmall);
+        textures = new Texture[flowerPotTex.length + 2 * flowerSmall.length];
+        tints = null;
+        System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
+        Arrays.fill(textures, flowerPotTex.length, flowerPotTex.length + flowerSmall.length, Texture.openEyeblossom);
+        Arrays.fill(textures, flowerPotTex.length + flowerSmall.length, textures.length, Texture.openEyeblossomEmissive);
         break;
       default:
         quads = Model.join(flowerPot, flowerSmall);
@@ -643,4 +656,53 @@ public class FlowerPotModel extends QuadModel {
   public Tint[] getTints() {
     return tints;
   }
+
+  public static BlockModel forKind(Kind kind) {
+    if (kind == Kind.OPEN_EYEBLOSSOM) {
+      return new FlowerPotModel(Kind.OPEN_EYEBLOSSOM) {
+        @Override
+        public boolean intersect(Ray ray, Scene scene) {
+          boolean hit = false;
+          ray.t = Double.POSITIVE_INFINITY;
+
+          Quad[] quads = getQuads();
+          Texture[] textures = getTextures();
+          Tint[] tintedQuads = getTints();
+
+          float[] color = null;
+          Tint tint = Tint.NONE;
+          for (int i = 0; i < quads.length; ++i) {
+            Quad quad = quads[i];
+            if (quad.intersect(ray)) {
+              float[] c = textures[i].getColor(ray.u, ray.v);
+              if (c[3] > Ray.EPSILON) {
+                tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
+                color = c;
+                ray.t = ray.tNext;
+                if (quad.doubleSided)
+                  ray.orientNormal(quad.n);
+                else
+                  ray.setNormal(quad.n);
+                hit = true;
+                if (textures[i] == Texture.openEyeblossomEmissive) {
+                  ray.setCurrentMaterial(OpenEyeBlossom.emissiveMaterial);
+                }
+              }
+            }
+          }
+
+          if (hit) {
+            ray.color.set(color);
+            tint.tint(ray.color, ray, scene);
+            ray.distance += ray.t;
+            ray.o.scaleAdd(ray.t, ray.d);
+          }
+          return hit;
+        }
+      };
+    } else {
+      return new FlowerPotModel(kind);
+    }
+  }
+
 }

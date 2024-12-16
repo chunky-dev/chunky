@@ -7,7 +7,6 @@ import se.llbit.chunky.block.minecraft.*;
 import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.model.minecraft.FlowerPotModel;
-import se.llbit.chunky.model.minecraft.FlowerPotModel.Kind;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.nbt.ListTag;
@@ -977,7 +976,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("mangrove_propagule", (name, tag) -> new MangrovePropagule(
       BlockProvider.stringToInt(tag.get("Properties").get("age"), 0),
       tag.get("Properties").get("hanging").stringValue("false").equals("true")));
-    addBlock("potted_mangrove_propagule", (name, tag) -> new FlowerPot(name, Kind.MANGROVE_PROPAGULE));
+    addBlock("potted_mangrove_propagule", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.MANGROVE_PROPAGULE));
     addBlock("sculk_catalyst", (name, tag) -> new SculkCatalyst(tag.get("Properties").get("bloom").stringValue("false").equals("true")));
     addBlock("sculk", Texture.sculk);
     addBlock("sculk_shrieker", (name, tag) -> new SculkShrieker(tag.get("Properties").get("can_summon").stringValue("false").equals("true")));
@@ -1023,10 +1022,10 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("cherry_wood", (name, tag) -> log(tag, Texture.cherryLog, Texture.cherryLog));
     addBlock("stripped_cherry_wood", (name, tag) -> log(tag, Texture.strippedCherryLog, Texture.strippedCherryLog));
     addBlock("cherry_sapling", (name, tag) -> new SpriteBlock(name, Texture.cherrySapling));
-    addBlock("potted_cherry_sapling", (name, tag) -> new FlowerPot(name, Kind.CHERRY_SAPLING));
+    addBlock("potted_cherry_sapling", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.CHERRY_SAPLING));
     addBlock("torchflower", (name, tag) -> new SpriteBlock(name, Texture.torchflower));
     addBlock("torchflower_crop", (name, tag) -> new TorchflowerCrop(BlockProvider.stringToInt(tag.get("Properties").get("age"), 2)));
-    addBlock("potted_torchflower", (name, tag) -> new FlowerPot(name, Kind.TORCHFLOWER));
+    addBlock("potted_torchflower", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.TORCHFLOWER));
     addBlock("suspicious_sand", (name, tag) -> suspiciousSand(tag));
     addBlock("suspicious_gravel", (name, tag) -> suspiciousGravel(tag));
     addBlock("chiseled_bookshelf", (name, tag) -> new ChiseledBookshelf(
@@ -1123,7 +1122,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("heavy_core", (name, tag) -> new HeavyCore());
     addBlock("trial_spawner", (name, tag) -> new TrialSpawner(tag.get("Properties").get("ominous").stringValue().equals("true"), tag.get("Properties").get("trial_spawner_state").stringValue("active")));
 
-    // Winter drop (1.22?)
+    //1.21.4 (Winter Drop)
     addBlock("pale_moss_block", Texture.paleMossBlock);
     addBlock("pale_oak_leaves", (name, tag) -> new UntintedLeaves(name, Texture.paleOakLeaves));
     addBlock("pale_oak_log", (name, tag) -> log(tag, Texture.paleOakLog, Texture.paleOakLogTop));
@@ -1157,7 +1156,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       tag.get("Properties").get("active").stringValue("false").equals("true")));
     addBlock("chiseled_resin_bricks", Texture.chiseledResinBricks);
     addBlock("closed_eyeblossom", (name, tag) -> new SpriteBlock(name, Texture.closedEyeblossom));
+    addBlock("open_eyeblossom", (name, tag) -> new OpenEyeBlossom());
     addBlock("potted_closed_eyeblossom", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.CLOSED_EYEBLOSSOM));
+    addBlock("potted_open_eyeblossom", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.OPEN_EYEBLOSSOM));
     addBlock("resin_block", Texture.resinBlock);
     addBlock("resin_bricks", Texture.resinBricks);
     addBlock("resin_brick_stairs", (name, tag) -> stairs(tag, Texture.resinBricks));
