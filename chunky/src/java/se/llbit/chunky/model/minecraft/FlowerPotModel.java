@@ -17,7 +17,7 @@
  */
 package se.llbit.chunky.model.minecraft;
 
-import se.llbit.chunky.block.minecraft.OpenEyeBlossom;
+import se.llbit.chunky.block.minecraft.OpenEyeblossom;
 import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
@@ -685,7 +685,7 @@ public class FlowerPotModel extends QuadModel {
                   ray.setNormal(quad.n);
                 hit = true;
                 if (textures[i] == Texture.openEyeblossomEmissive) {
-                  ray.setCurrentMaterial(OpenEyeBlossom.emissiveMaterial);
+                  ray.setCurrentMaterial(OpenEyeblossom.emissiveMaterial);
                 }
               }
             }

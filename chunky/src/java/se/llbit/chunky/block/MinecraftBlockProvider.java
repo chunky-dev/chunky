@@ -1156,7 +1156,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       tag.get("Properties").get("active").stringValue("false").equals("true")));
     addBlock("chiseled_resin_bricks", Texture.chiseledResinBricks);
     addBlock("closed_eyeblossom", (name, tag) -> new SpriteBlock(name, Texture.closedEyeblossom));
-    addBlock("open_eyeblossom", (name, tag) -> new OpenEyeBlossom());
+    addBlock("open_eyeblossom", (name, tag) -> new OpenEyeblossom());
     addBlock("potted_closed_eyeblossom", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.CLOSED_EYEBLOSSOM));
     addBlock("potted_open_eyeblossom", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.OPEN_EYEBLOSSOM));
     addBlock("resin_block", Texture.resinBlock);
