@@ -7,8 +7,6 @@ import se.llbit.chunky.block.minecraft.*;
 import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.model.minecraft.FlowerPotModel;
-import se.llbit.chunky.model.minecraft.FlowerPotModel.Kind;
-import se.llbit.chunky.model.minecraft.PaleMossCarpetModel;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.nbt.ListTag;
@@ -978,7 +976,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("mangrove_propagule", (name, tag) -> new MangrovePropagule(
       BlockProvider.stringToInt(tag.get("Properties").get("age"), 0),
       tag.get("Properties").get("hanging").stringValue("false").equals("true")));
-    addBlock("potted_mangrove_propagule", (name, tag) -> new FlowerPot(name, Kind.MANGROVE_PROPAGULE));
+    addBlock("potted_mangrove_propagule", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.MANGROVE_PROPAGULE));
     addBlock("sculk_catalyst", (name, tag) -> new SculkCatalyst(tag.get("Properties").get("bloom").stringValue("false").equals("true")));
     addBlock("sculk", Texture.sculk);
     addBlock("sculk_shrieker", (name, tag) -> new SculkShrieker(tag.get("Properties").get("can_summon").stringValue("false").equals("true")));
@@ -1024,10 +1022,10 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("cherry_wood", (name, tag) -> log(tag, Texture.cherryLog, Texture.cherryLog));
     addBlock("stripped_cherry_wood", (name, tag) -> log(tag, Texture.strippedCherryLog, Texture.strippedCherryLog));
     addBlock("cherry_sapling", (name, tag) -> new SpriteBlock(name, Texture.cherrySapling));
-    addBlock("potted_cherry_sapling", (name, tag) -> new FlowerPot(name, Kind.CHERRY_SAPLING));
+    addBlock("potted_cherry_sapling", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.CHERRY_SAPLING));
     addBlock("torchflower", (name, tag) -> new SpriteBlock(name, Texture.torchflower));
     addBlock("torchflower_crop", (name, tag) -> new TorchflowerCrop(BlockProvider.stringToInt(tag.get("Properties").get("age"), 2)));
-    addBlock("potted_torchflower", (name, tag) -> new FlowerPot(name, Kind.TORCHFLOWER));
+    addBlock("potted_torchflower", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.TORCHFLOWER));
     addBlock("suspicious_sand", (name, tag) -> suspiciousSand(tag));
     addBlock("suspicious_gravel", (name, tag) -> suspiciousGravel(tag));
     addBlock("chiseled_bookshelf", (name, tag) -> new ChiseledBookshelf(
@@ -1124,7 +1122,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("heavy_core", (name, tag) -> new HeavyCore());
     addBlock("trial_spawner", (name, tag) -> new TrialSpawner(tag.get("Properties").get("ominous").stringValue().equals("true"), tag.get("Properties").get("trial_spawner_state").stringValue("active")));
 
-    // Winter drop (1.22?)
+    //1.21.4 (Winter Drop)
     addBlock("pale_moss_block", Texture.paleMossBlock);
     addBlock("pale_oak_leaves", (name, tag) -> new UntintedLeaves(name, Texture.paleOakLeaves));
     addBlock("pale_oak_log", (name, tag) -> log(tag, Texture.paleOakLog, Texture.paleOakLogTop));
@@ -1155,7 +1153,24 @@ public class MinecraftBlockProvider implements BlockProvider {
       tag.get("Properties").get("west").stringValue("none")));
     addBlock("creaking_heart", (name, tag) -> new CreakingHeart(name,
       tag.get("Properties").get("axis").stringValue("y"),
-      tag.get("Properties").get("creaking").stringValue("active")));
+      tag.get("Properties").get("active").stringValue("false").equals("true")));
+    addBlock("chiseled_resin_bricks", Texture.chiseledResinBricks);
+    addBlock("closed_eyeblossom", (name, tag) -> new SpriteBlock(name, Texture.closedEyeblossom));
+    addBlock("open_eyeblossom", (name, tag) -> new OpenEyeblossom());
+    addBlock("potted_closed_eyeblossom", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.CLOSED_EYEBLOSSOM));
+    addBlock("potted_open_eyeblossom", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.OPEN_EYEBLOSSOM));
+    addBlock("resin_block", Texture.resinBlock);
+    addBlock("resin_bricks", Texture.resinBricks);
+    addBlock("resin_brick_stairs", (name, tag) -> stairs(tag, Texture.resinBricks));
+    addBlock("resin_brick_slab", (name, tag) -> slab(tag, Texture.resinBricks));
+    addBlock("resin_brick_walls", (name, tag) -> wall(tag, Texture.resinBricks));
+    addBlock("resin_clump", (name, tag) -> new ResinClump(
+      tag.get("Properties").get("north").stringValue("false").equals("true"),
+      tag.get("Properties").get("south").stringValue("false").equals("true"),
+      tag.get("Properties").get("east").stringValue("false").equals("true"),
+      tag.get("Properties").get("west").stringValue("false").equals("true"),
+      tag.get("Properties").get("up").stringValue("false").equals("true"),
+      tag.get("Properties").get("down").stringValue("false").equals("true")));
   }
 
   @Override
@@ -3585,22 +3600,14 @@ public class MinecraftBlockProvider implements BlockProvider {
 
   private static Block structureBlock(Tag tag) {
     Tag properties = tag.get("Properties");
-    Texture texture = Texture.structureBlock;
     String mode = properties.get("mode").stringValue("");
-    switch (mode) {
-      case "corner":
-        texture = Texture.structureBlockCorner;
-        break;
-      case "data":
-        texture = Texture.structureBlockData;
-        break;
-      case "load":
-        texture = Texture.structureBlockLoad;
-        break;
-      case "save":
-        texture = Texture.structureBlockSave;
-        break;
-    }
+    Texture texture = switch (mode) {
+      case "corner" -> Texture.structureBlockCorner;
+      case "data" -> Texture.structureBlockData;
+      case "load" -> Texture.structureBlockLoad;
+      case "save" -> Texture.structureBlockSave;
+      default -> Texture.structureBlock;
+    };
     return new MinecraftBlock("structure_block", texture);
   }
 
@@ -3620,31 +3627,23 @@ public class MinecraftBlockProvider implements BlockProvider {
   private static Block suspiciousSand(Tag tag) {
     Tag properties = tag.get("Properties");
     String dusted = properties.get("dusted").stringValue("0");
-    switch(dusted) {
-      case "1":
-        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage1);
-      case "2":
-        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage2);
-      case "3":
-        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage3);
-      default:
-        return new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage0);
-    }
+    return switch (dusted) {
+      case "1" -> new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage1);
+      case "2" -> new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage2);
+      case "3" -> new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage3);
+      default -> new MinecraftBlock("suspicious_sand", Texture.suspiciousSandStage0);
+    };
   }
 
   private static Block suspiciousGravel(Tag tag) {
     Tag properties = tag.get("Properties");
     String dusted = properties.get("dusted").stringValue("0");
-    switch(dusted) {
-      case "1":
-        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage1);
-      case "2":
-        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage2);
-      case "3":
-        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage3);
-      default:
-        return new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage0);
-    }
+    return switch (dusted) {
+      case "1" -> new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage1);
+      case "2" -> new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage2);
+      case "3" -> new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage3);
+      default -> new MinecraftBlock("suspicious_gravel", Texture.suspiciousGravelStage0);
+    };
   }
 
   private static Block decoratedPot(Tag tag) {
