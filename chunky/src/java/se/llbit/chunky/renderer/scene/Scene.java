@@ -2902,6 +2902,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
     hideUnknownBlocks = json.get("hideUnknownBlocks").boolValue(hideUnknownBlocks);
     materials = json.get("materials").object().copy().toMap();
+    importMaterials();
 
     // Load world info.
     if (json.get("world").isObject()) {
