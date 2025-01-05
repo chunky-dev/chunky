@@ -158,6 +158,7 @@ public class SettingsExport extends Stage {
 
     HBox buttonBox = new HBox();
     buttonBox.setAlignment(Pos.BOTTOM_CENTER);
+    buttonBox.setSpacing(10);
 
     Button selectAllButton = new Button("Select All");
     selectAllButton.setOnAction(event -> {
@@ -165,6 +166,13 @@ public class SettingsExport extends Stage {
       update();
     });
     buttonBox.getChildren().add(selectAllButton);
+
+    Button unselectAllButton = new Button("Unselect All");
+    unselectAllButton.setOnAction(event -> {
+      checkMap.values().forEach(checkbox -> checkbox.setSelected(false));
+      update();
+    });
+    buttonBox.getChildren().add(unselectAllButton);
 
     Label spacer = new Label(" ");
     spacer.setMaxWidth(Double.POSITIVE_INFINITY);
