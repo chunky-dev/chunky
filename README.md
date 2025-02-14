@@ -224,10 +224,10 @@ Chunky uses the following 3rd party libraries:
 
 ## Special Thanks
 
-![YourKit](https://www.yourkit.com/images/yklogo.png)<br/>
-YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling Java and .NET applications. YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/%22%3EYourKit"> Java Profiler</a>, <a href="https://www.yourkit.com/.net/profiler/%22%3EYourKit"> .NET Profiler</a>, and <a href="https://www.yourkit.com/youmonitor/%22%3EYourKit"> YouMonitor</a>.
+<a href="https://www.yourkit.com/"><img src="https://www.yourkit.com/images/yklogo.png" alt="YourKit"></a><br/>
+YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling Java and .NET applications. YourKit is the creator of <a href="https://www.yourkit.com/java/profiler">Java Profiler</a>, <a href="https://www.yourkit.com/.net/profiler">.NET Profiler</a>, and <a href="https://www.yourkit.com/youmonitor">YouMonitor</a>.
 
-<img src="https://raw.githubusercontent.com/JetBrains/logos/master/web/jetbrains/jetbrains-simple.svg" height="44" title="Copyright © 2000-2022 JetBrains s.r.o. JetBrains and the JetBrains logo are registered trademarks of JetBrains s.r.o."><br/>
+<a href="https://www.jetbrains.com/"><img src="https://raw.githubusercontent.com/JetBrains/logos/master/web/jetbrains/jetbrains-simple.svg" height="44" title="Copyright © 2000-2022 JetBrains s.r.o. JetBrains and the JetBrains logo are registered trademarks of JetBrains s.r.o."></a><br/>
 JetBrains supports core contributors of non-commercial open source projects by providing them with professional coding tools free of charge. <a href="https://jb.gg/OpenSourceSupport"> Find out more</a>.
 
 [chunky-dev]: https://chunky-dev.github.io/docs/
