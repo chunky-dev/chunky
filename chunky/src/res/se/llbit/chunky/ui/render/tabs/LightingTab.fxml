@@ -21,15 +21,22 @@
     <DoubleAdjuster fx:id="apparentSkyBrightness" maxWidth="1.7976931348623157E308" />
     <Separator />
     <CheckBox fx:id="enableEmitters" mnemonicParsing="false" text="Enable emitters" />
-    <DoubleAdjuster fx:id="emitterIntensity" maxWidth="1.7976931348623157E308" />
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <Label text="Emitter Sampling Strategy:" />
-      <ChoiceBox fx:id="emitterSamplingStrategy" />
-    </HBox>
+    <VBox fx:id="emitterSettings" spacing="10.0">
+      <DoubleAdjuster fx:id="emitterIntensity" maxWidth="1.7976931348623157E308" />
+      <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="Emitter mapping type:" />
+        <ComboBox fx:id="emitterMappingType" />
+      </HBox>
+      <DoubleAdjuster fx:id="emitterMappingExponent" maxWidth="1.7976931348623157E308" />
+      <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="Emitter sampling strategy:" />
+        <ChoiceBox fx:id="emitterSamplingStrategy" />
+      </HBox>
+    </VBox>
     <Separator />
     <CheckBox fx:id="drawSun" mnemonicParsing="false" text="Draw sun" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <Label text="Sun Sampling Strategy:" />
+      <Label text="Sun sampling strategy:" />
       <ComboBox fx:id="sunSamplingStrategy" />
     </HBox>
     <TitledPane fx:id="importanceSamplingDetailsPane" animated="false" text="Importance sampling details">
