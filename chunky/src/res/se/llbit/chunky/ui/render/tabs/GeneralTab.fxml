@@ -75,6 +75,12 @@
               <CheckBox fx:id="loadBooks" mnemonicParsing="false" text="Books" />
               <CheckBox fx:id="loadPaintings" mnemonicParsing="false" text="Paintings" />
               <CheckBox fx:id="loadBeaconBeams" mnemonicParsing="false" text="Beacon beams" />
+              <CheckBox fx:id="loadSheep" mnemonicParsing="false" text="Sheep" />
+              <CheckBox fx:id="loadCows" mnemonicParsing="false" text="Cows" />
+              <CheckBox fx:id="loadChickens" mnemonicParsing="false" text="Chickens" />
+              <CheckBox fx:id="loadPigs" mnemonicParsing="false" text="Pigs" />
+              <CheckBox fx:id="loadMooshrooms" mnemonicParsing="false" text="Mooshrooms" />
+              <CheckBox fx:id="loadSquids" mnemonicParsing="false" text="Squids" />
               <CheckBox fx:id="loadOtherEntities" mnemonicParsing="false" text="Other" />
             </VBox>
           </TitledPane>
