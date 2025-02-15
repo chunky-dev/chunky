@@ -385,7 +385,6 @@ public class Chunky {
         SceneProvider sceneProvider = sceneManager.getSceneProvider();
         renderManager.setSceneProvider(sceneProvider);
         renderManager.start();
-        sceneManager.start();
         renderController = new RenderController(context, renderManager, sceneManager, sceneProvider);
       }
     }
