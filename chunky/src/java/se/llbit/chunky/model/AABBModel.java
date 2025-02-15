@@ -3,14 +3,11 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.AABB;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
+import se.llbit.math.*;
+import se.llbit.math.primitive.Box;
+import se.llbit.math.primitive.Primitive;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 /**
  * A block model that is made out of textured AABBs.
@@ -186,12 +183,46 @@ public abstract class AABBModel implements BlockModel {
   @Override
   public boolean isBiomeDependant() {
     Tint[][] tints = getTints();
-    if(tints == null)
+    if (tints == null)
       return false;
 
     return Arrays.stream(tints)
       .filter(Objects::nonNull)
       .flatMap(Arrays::stream)
       .anyMatch(Tint::isBiomeTint);
+  }
+
+  @Override
+  public Collection<Primitive> getPrimitives(Transform transform) {
+    List<Primitive> primitives = new ArrayList<>();
+
+    AABB[] boxes = getBoxes();
+    Texture[][] textures = getTextures();
+
+    for (int i = 0; i < boxes.length; ++i) {
+      AABB aabb = boxes[i];
+      Box box = new Box(aabb.xmin, aabb.xmax, aabb.ymin, aabb.ymax, aabb.zmin, aabb.zmax);
+      box.transform(transform);
+      if (textures[i][0] != null) {
+        box.addFrontFaces(primitives, textures[i][0], new Vector4(0, 1, 0, 1)); // TODO
+      }
+      if (textures[i][1] != null) {
+        box.addBackFaces(primitives, textures[i][1], new Vector4(0, 1, 0, 1)); // TODO
+      }
+      if (textures[i][2] != null) {
+        box.addLeftFaces(primitives, textures[i][2], new Vector4(0, 1, 0, 1)); // TODO
+      }
+      if (textures[i][3] != null) {
+        box.addRightFaces(primitives, textures[i][3], new Vector4(0, 1, 0, 1)); // TODO
+      }
+      if (textures[i][4] != null) {
+        box.addTopFaces(primitives, textures[i][4], new Vector4(0, 1, 0, 1));
+      }
+      if (textures[i][5] != null) {
+        box.addBottomFaces(primitives, textures[i][5], new Vector4(0, 1, 0, 1));
+      }
+    }
+    // TODO apply correct texture index, tint and uv-mapping, material properties
+    return primitives;
   }
 }

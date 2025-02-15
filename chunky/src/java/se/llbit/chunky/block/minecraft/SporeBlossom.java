@@ -20,10 +20,15 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.entity.Entity;
+import se.llbit.chunky.model.minecraft.SporeBlossomModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
+import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
+import se.llbit.math.primitive.Primitive;
+
+import java.util.Collection;
 
 public class SporeBlossom extends Block {
 
@@ -47,5 +52,10 @@ public class SporeBlossom extends Block {
   @Override
   public Entity toEntity(Vector3 position) {
     return new se.llbit.chunky.entity.SporeBlossom(position);
+  }
+
+  @Override
+  public Collection<Primitive> getPrimitives(Transform transform) {
+    return SporeBlossomModel.primitives(transform);
   }
 }
