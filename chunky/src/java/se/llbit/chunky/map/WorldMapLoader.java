@@ -68,7 +68,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
    * This is called when a new world is loaded
    */
   public void loadWorld(File worldDir) {
-    if (World.isWorldDir(worldDir)) {
+    if (JavaWorld.isWorldDir(worldDir)) {
       if (world != null) {
         world.currentDimension().removeChunkTopographyListener(this);
       }
