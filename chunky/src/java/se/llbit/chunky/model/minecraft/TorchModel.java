@@ -27,81 +27,81 @@ import se.llbit.math.Vector4;
 public class TorchModel extends QuadModel {
 
   private static final Quad[] quadsGround = new Quad[]{
-      new Quad(
-          new Vector3(7 / 16.0, 10 / 16.0, 9 / 16.0),
-          new Vector3(9 / 16.0, 10 / 16.0, 9 / 16.0),
-          new Vector3(7 / 16.0, 10 / 16.0, 7 / 16.0),
-          new Vector4(7 / 16.0, 9 / 16.0, 8 / 16.0, 10 / 16.0)
-      ),
-      new Quad(
-          new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
-          new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
-          new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
-          new Vector4(7 / 16.0, 9 / 16.0, 1 / 16.0, 3 / 16.0)
-      ),
-      new Quad(
-          new Vector3(7 / 16.0, 16 / 16.0, 16 / 16.0),
-          new Vector3(7 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(7 / 16.0, 0 / 16.0, 16 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-      ),
-      new Quad(
-          new Vector3(9 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(9 / 16.0, 16 / 16.0, 16 / 16.0),
-          new Vector3(9 / 16.0, 0 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-      ),
-      new Quad(
-          new Vector3(0 / 16.0, 16 / 16.0, 7 / 16.0),
-          new Vector3(16 / 16.0, 16 / 16.0, 7 / 16.0),
-          new Vector3(0 / 16.0, 0 / 16.0, 7 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-      ),
-      new Quad(
-          new Vector3(16 / 16.0, 16 / 16.0, 9 / 16.0),
-          new Vector3(0 / 16.0, 16 / 16.0, 9 / 16.0),
-          new Vector3(16 / 16.0, 0 / 16.0, 9 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-      )
+    new Quad(
+      new Vector3(7 / 16.0, 10 / 16.0, 9 / 16.0),
+      new Vector3(9 / 16.0, 10 / 16.0, 9 / 16.0),
+      new Vector3(7 / 16.0, 10 / 16.0, 7 / 16.0),
+      new Vector4(7 / 16.0, 9 / 16.0, 8 / 16.0, 10 / 16.0)
+    ),
+    new Quad(
+      new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector4(7 / 16.0, 9 / 16.0, 1 / 16.0, 3 / 16.0)
+    ),
+    new Quad(
+      new Vector3(7 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(7 / 16.0, 16 / 16.0, 0 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(9 / 16.0, 16 / 16.0, 0 / 16.0),
+      new Vector3(9 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(9 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(0 / 16.0, 16 / 16.0, 7 / 16.0),
+      new Vector3(16 / 16.0, 16 / 16.0, 7 / 16.0),
+      new Vector3(0 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(16 / 16.0, 16 / 16.0, 9 / 16.0),
+      new Vector3(0 / 16.0, 16 / 16.0, 9 / 16.0),
+      new Vector3(16 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    )
   };
 
   private static final Quad[] quadsWall = Model.rotateZ(new Quad[]{
-      new Quad(
-          new Vector3(-1 / 16.0, 13.5 / 16.0, 9 / 16.0),
-          new Vector3(1 / 16.0, 13.5 / 16.0, 9 / 16.0),
-          new Vector3(-1 / 16.0, 13.5 / 16.0, 7 / 16.0),
-          new Vector4(7 / 16.0, 9 / 16.0, 8 / 16.0, 10 / 16.0)
-      ),
-      new Quad(
-          new Vector3(-1 / 16.0, 3.5 / 16.0, 7 / 16.0),
-          new Vector3(1 / 16.0, 3.5 / 16.0, 7 / 16.0),
-          new Vector3(-1 / 16.0, 3.5 / 16.0, 9 / 16.0),
-          new Vector4(7 / 16.0, 9 / 16.0, 1 / 16.0, 3 / 16.0)
-      ),
-      new Quad(
-          new Vector3(-1 / 16.0, 19.5 / 16.0, 16 / 16.0),
-          new Vector3(-1 / 16.0, 19.5 / 16.0, 0 / 16.0),
-          new Vector3(-1 / 16.0, 3.5 / 16.0, 16 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-      ),
-      new Quad(
-          new Vector3(1 / 16.0, 19.5 / 16.0, 0 / 16.0),
-          new Vector3(1 / 16.0, 19.5 / 16.0, 16 / 16.0),
-          new Vector3(1 / 16.0, 3.5 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-      ),
-      new Quad(
-          new Vector3(-8 / 16.0, 19.5 / 16.0, 7 / 16.0),
-          new Vector3(8 / 16.0, 19.5 / 16.0, 7 / 16.0),
-          new Vector3(-8 / 16.0, 3.5 / 16.0, 7 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-      ),
-      new Quad(
-          new Vector3(8 / 16.0, 19.5 / 16.0, 9 / 16.0),
-          new Vector3(-8 / 16.0, 19.5 / 16.0, 9 / 16.0),
-          new Vector3(8 / 16.0, 3.5 / 16.0, 9 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-      )
+    new Quad(
+      new Vector3(-1 / 16.0, 13.5 / 16.0, 9 / 16.0),
+      new Vector3(1 / 16.0, 13.5 / 16.0, 9 / 16.0),
+      new Vector3(-1 / 16.0, 13.5 / 16.0, 7 / 16.0),
+      new Vector4(7 / 16.0, 9 / 16.0, 8 / 16.0, 10 / 16.0)
+    ),
+    new Quad(
+      new Vector3(-1 / 16.0, 3.5 / 16.0, 7 / 16.0),
+      new Vector3(1 / 16.0, 3.5 / 16.0, 7 / 16.0),
+      new Vector3(-1 / 16.0, 3.5 / 16.0, 9 / 16.0),
+      new Vector4(7 / 16.0, 9 / 16.0, 1 / 16.0, 3 / 16.0)
+    ),
+    new Quad(
+      new Vector3(-1 / 16.0, 19.5 / 16.0, 16 / 16.0),
+      new Vector3(-1 / 16.0, 19.5 / 16.0, 0 / 16.0),
+      new Vector3(-1 / 16.0, 3.5 / 16.0, 16 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(1 / 16.0, 19.5 / 16.0, 0 / 16.0),
+      new Vector3(1 / 16.0, 19.5 / 16.0, 16 / 16.0),
+      new Vector3(1 / 16.0, 3.5 / 16.0, 0 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(-8 / 16.0, 19.5 / 16.0, 7 / 16.0),
+      new Vector3(8 / 16.0, 19.5 / 16.0, 7 / 16.0),
+      new Vector3(-8 / 16.0, 3.5 / 16.0, 7 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(8 / 16.0, 19.5 / 16.0, 9 / 16.0),
+      new Vector3(-8 / 16.0, 19.5 / 16.0, 9 / 16.0),
+      new Vector3(8 / 16.0, 3.5 / 16.0, 9 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    )
   }, Math.toRadians(-22.5), new Vector3(0, 3.5 / 16, 8 / 16.));
 
   private static final Quad[][] rotatedQuadsWall = new Quad[6][];
@@ -117,9 +117,15 @@ public class TorchModel extends QuadModel {
 
   private final int rotation;
 
-  public TorchModel(Texture texture, int rotation) {
+  public TorchModel(Texture texture, String facing) {
     this.textures = new Texture[]{texture, texture, texture, texture, texture, texture};
-    this.rotation = rotation;
+    this.rotation = switch (facing) {
+      case "north" -> 4;
+      case "south" -> 3;
+      case "west" -> 2;
+      case "east" -> 1;
+      default -> 5;
+    };
   }
 
   @Override
