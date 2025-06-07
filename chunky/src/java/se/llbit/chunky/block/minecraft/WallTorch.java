@@ -32,23 +32,7 @@ public class WallTorch extends AbstractModelBlock {
     super(name, texture);
     this.facing = facing;
     solid = false;
-    int facingInt;
-    switch (facing) {
-      default:
-      case "north":
-        facingInt = 4;
-        break;
-      case "south":
-        facingInt = 3;
-        break;
-      case "west":
-        facingInt = 2;
-        break;
-      case "east":
-        facingInt = 1;
-        break;
-    }
-    model = new TorchModel(texture, facingInt);
+    model = new TorchModel(texture, facing);
   }
 
   @Override
