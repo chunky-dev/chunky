@@ -18,14 +18,22 @@
 
 package se.llbit.chunky.block.minecraft;
 
+import se.llbit.chunky.block.AbstractModelBlock;
+import se.llbit.chunky.model.minecraft.RedstoneWallTorchModel;
+import se.llbit.chunky.model.minecraft.TorchModel;
 import se.llbit.chunky.resources.Texture;
 
-public class RedstoneWallTorch extends WallTorch {
+public class RedstoneWallTorch extends AbstractModelBlock {
   private final boolean lit;
+  private final String facing;
 
   public RedstoneWallTorch(String facing, boolean lit) {
-    super("redstone_wall_torch", lit ? Texture.redstoneTorchOn : Texture.redstoneTorchOff, facing);
+    super("redstone_wall_torch", lit ? Texture.redstoneTorchOn : Texture.redstoneTorchOff);
     this.lit = lit;
+    this.facing = facing;
+    model = System.getProperty("chunky.blockModels.redstoneTorch", "1.21.2").equals("pre-1.21.2")
+      ? new TorchModel(texture, facing)
+      : new RedstoneWallTorchModel(lit, facing);
   }
 
   public boolean isLit() {
