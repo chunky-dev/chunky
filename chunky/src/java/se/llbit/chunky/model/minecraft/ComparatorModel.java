@@ -29,64 +29,64 @@ import java.util.Arrays;
 public class ComparatorModel extends QuadModel {
   // The comparator base-plate facing north:
   private static final Quad[] north = {
-      // Front face.
-      new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, .125, 0),
-          new Vector4(1, 0, 0, .125)),
+    // Front face.
+    new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, .125, 0),
+      new Vector4(1, 0, 0, .125)),
 
-      // Back face.
-      new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 1), new Vector3(0, .125, 1),
-          new Vector4(0, 1, 0, .125)),
+    // Back face.
+    new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 1), new Vector3(0, .125, 1),
+      new Vector4(0, 1, 0, .125)),
 
-      // Right face.
-      new Quad(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, .125, 0),
-          new Vector4(0, 1, 0, .125)),
+    // Right face.
+    new Quad(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, .125, 0),
+      new Vector4(0, 1, 0, .125)),
 
-      // Left face.
-      new Quad(new Vector3(1, 0, 1), new Vector3(1, 0, 0), new Vector3(1, .125, 1),
-          new Vector4(1, 0, 0, .125)),
+    // Left face.
+    new Quad(new Vector3(1, 0, 1), new Vector3(1, 0, 0), new Vector3(1, .125, 1),
+      new Vector4(1, 0, 0, .125)),
 
-      // Top face.
-      new Quad(new Vector3(1, .125, 0), new Vector3(0, .125, 0), new Vector3(1, .125, 1),
-          new Vector4(1, 0, 1, 0)),
+    // Top face.
+    new Quad(new Vector3(1, .125, 0), new Vector3(0, .125, 0), new Vector3(1, .125, 1),
+      new Vector4(1, 0, 1, 0)),
   };
 
   private static final Quad[] torchHigh = {
-      new Quad(new Vector3(.75, 2 / 16., 7 / 16.), new Vector3(4 / 16., 2 / 16., 7 / 16.),
-          new Vector3(.75, 13 / 16., 7 / 16.), new Vector4(12 / 16., 4 / 16., 5 / 16., 1)),
+    new Quad(new Vector3(.75, 2 / 16., 7 / 16.), new Vector3(4 / 16., 2 / 16., 7 / 16.),
+      new Vector3(.75, 13 / 16., 7 / 16.), new Vector4(12 / 16., 4 / 16., 5 / 16., 1)),
 
-      new Quad(new Vector3(4 / 16., 2 / 16., 9 / 16.), new Vector3(.75, 2 / 16., 9 / 16.),
-          new Vector3(4 / 16., 13 / 16., 9 / 16.), new Vector4(4 / 16., .75, 5 / 16., 1)),
+    new Quad(new Vector3(4 / 16., 2 / 16., 9 / 16.), new Vector3(.75, 2 / 16., 9 / 16.),
+      new Vector3(4 / 16., 13 / 16., 9 / 16.), new Vector4(4 / 16., .75, 5 / 16., 1)),
 
-      new Quad(new Vector3(7 / 16., 2 / 16., 4 / 16.), new Vector3(7 / 16., 2 / 16., .75),
-          new Vector3(7 / 16., 13 / 16., 4 / 16.), new Vector4(4 / 16., .75, 5 / 16., 1)),
+    new Quad(new Vector3(7 / 16., 2 / 16., 4 / 16.), new Vector3(7 / 16., 2 / 16., .75),
+      new Vector3(7 / 16., 13 / 16., 4 / 16.), new Vector4(4 / 16., .75, 5 / 16., 1)),
 
-      new Quad(new Vector3(9 / 16., 2 / 16., .75), new Vector3(9 / 16., 2 / 16., 4 / 16.),
-          new Vector3(9 / 16., 13 / 16., .75), new Vector4(.75, 4 / 16., 5 / 16., 1)),
+    new Quad(new Vector3(9 / 16., 2 / 16., .75), new Vector3(9 / 16., 2 / 16., 4 / 16.),
+      new Vector3(9 / 16., 13 / 16., .75), new Vector4(.75, 4 / 16., 5 / 16., 1)),
 
-      // Top face.
-      new Quad(new Vector3(7 / 16., 7 / 16., 9 / 16.), new Vector3(9 / 16., 7 / 16., 9 / 16.),
-          new Vector3(7 / 16., 7 / 16., 7 / 16.),
-          new Vector4(7 / 16., 9 / 16., 8 / 16., .625))
+    // Top face.
+    new Quad(new Vector3(7 / 16., 7 / 16., 9 / 16.), new Vector3(9 / 16., 7 / 16., 9 / 16.),
+      new Vector3(7 / 16., 7 / 16., 7 / 16.),
+      new Vector4(7 / 16., 9 / 16., 8 / 16., .625))
   };
 
   // The lowered torch is 3 texels lower than the high version.
   private static final Quad[] torchLow = {
-      new Quad(new Vector3(.75, 2 / 16., 7 / 16.), new Vector3(4 / 16., 2 / 16., 7 / 16.),
-          new Vector3(.75, 10 / 16., 7 / 16.), new Vector4(12 / 16., 4 / 16., 8 / 16., 1)),
+    new Quad(new Vector3(.75, 2 / 16., 7 / 16.), new Vector3(4 / 16., 2 / 16., 7 / 16.),
+      new Vector3(.75, 10 / 16., 7 / 16.), new Vector4(12 / 16., 4 / 16., 8 / 16., 1)),
 
-      new Quad(new Vector3(4 / 16., 2 / 16., 9 / 16.), new Vector3(.75, 2 / 16., 9 / 16.),
-          new Vector3(4 / 16., 10 / 16., 9 / 16.), new Vector4(4 / 16., .75, 8 / 16., 1)),
+    new Quad(new Vector3(4 / 16., 2 / 16., 9 / 16.), new Vector3(.75, 2 / 16., 9 / 16.),
+      new Vector3(4 / 16., 10 / 16., 9 / 16.), new Vector4(4 / 16., .75, 8 / 16., 1)),
 
-      new Quad(new Vector3(7 / 16., 2 / 16., 4 / 16.), new Vector3(7 / 16., 2 / 16., .75),
-          new Vector3(7 / 16., 10 / 16., 4 / 16.), new Vector4(4 / 16., .75, 8 / 16., 1)),
+    new Quad(new Vector3(7 / 16., 2 / 16., 4 / 16.), new Vector3(7 / 16., 2 / 16., .75),
+      new Vector3(7 / 16., 10 / 16., 4 / 16.), new Vector4(4 / 16., .75, 8 / 16., 1)),
 
-      new Quad(new Vector3(9 / 16., 2 / 16., .75), new Vector3(9 / 16., 2 / 16., 4 / 16.),
-          new Vector3(9 / 16., 10 / 16., .75), new Vector4(.75, 4 / 16., 8 / 16., 1)),
+    new Quad(new Vector3(9 / 16., 2 / 16., .75), new Vector3(9 / 16., 2 / 16., 4 / 16.),
+      new Vector3(9 / 16., 10 / 16., .75), new Vector4(.75, 4 / 16., 8 / 16., 1)),
 
-      // Top face.
-      new Quad(new Vector3(7 / 16., 4 / 16., 9 / 16.), new Vector3(9 / 16., 4 / 16., 9 / 16.),
-          new Vector3(7 / 16., 4 / 16., 7 / 16.),
-          new Vector4(7 / 16., 9 / 16., 8 / 16., .625))
+    // Top face.
+    new Quad(new Vector3(7 / 16., 4 / 16., 9 / 16.), new Vector3(9 / 16., 4 / 16., 9 / 16.),
+      new Vector3(7 / 16., 4 / 16., 7 / 16.),
+      new Vector4(7 / 16., 9 / 16., 8 / 16., .625))
   };
 
   private static final Quad[][][] torch1 = new Quad[2][4][];
@@ -139,16 +139,24 @@ public class ComparatorModel extends QuadModel {
   private final Quad[] quads;
   private final Texture[] textures;
 
-  public ComparatorModel(int direction, int active, int powered) {
+  public ComparatorModel(String facing, String mode, boolean powered) {
+    int direction = switch (facing) {
+      case "north" -> 2;
+      case "south" -> 0;
+      case "west" -> 1;
+      case "east" -> 3;
+      default -> 0;
+    };
+    int active = mode.equals("subtract") ? 1 : 0;
     quads = Model.join(rot[direction], torch1[active][direction],
-                       torch2[active][direction], torch3[active][direction]);
+      torch2[active][direction], torch3[active][direction]);
     textures = new Texture[quads.length];
-    Arrays.fill(textures, torchTex[powered]);
-    Arrays.fill(textures, 0, rot[direction].length, blockTex[powered]);
+    Arrays.fill(textures, torchTex[powered ? 1 : 0]);
+    Arrays.fill(textures, 0, rot[direction].length, blockTex[powered ? 1 : 0]);
     Arrays.fill(textures,
-        rot[direction].length,
-        rot[direction].length + torch1[active][direction].length,
-        torchTex[active]);
+      rot[direction].length,
+      rot[direction].length + torch1[active][direction].length,
+      torchTex[active]);
   }
 
 
