@@ -150,22 +150,22 @@ public class RedstoneRepeaterModel extends QuadModel {
     torch2[0][3][2] = Model.rotateY(torch2[0][3][1]);
     torch2[0][3][3] = Model.rotateY(torch2[0][3][2]);
 
-    torch2[1][0][0] = Model.translate(lock, 0, 0, -1 / 16.);
+    torch2[1][0][0] = Model.translate(lock, 0, 0, -2 / 16.);
     torch2[1][0][1] = Model.rotateY(torch2[1][0][0]);
     torch2[1][0][2] = Model.rotateY(torch2[1][0][1]);
     torch2[1][0][3] = Model.rotateY(torch2[1][0][2]);
 
-    torch2[1][1][0] = Model.translate(lock, 0, 0, 1 / 16.);
+    torch2[1][1][0] = Model.translate(lock, 0, 0, 0 / 16.);
     torch2[1][1][1] = Model.rotateY(torch2[1][1][0]);
     torch2[1][1][2] = Model.rotateY(torch2[1][1][1]);
     torch2[1][1][3] = Model.rotateY(torch2[1][1][2]);
 
-    torch2[1][2][0] = Model.translate(lock, 0, 0, 3 / 16.);
+    torch2[1][2][0] = Model.translate(lock, 0, 0, 2 / 16.);
     torch2[1][2][1] = Model.rotateY(torch2[1][2][0]);
     torch2[1][2][2] = Model.rotateY(torch2[1][2][1]);
     torch2[1][2][3] = Model.rotateY(torch2[1][2][2]);
 
-    torch2[1][3][0] = Model.translate(lock, 0, 0, 5 / 16.);
+    torch2[1][3][0] = Model.translate(lock, 0, 0, 4 / 16.);
     torch2[1][3][1] = Model.rotateY(torch2[1][3][0]);
     torch2[1][3][2] = Model.rotateY(torch2[1][3][1]);
     torch2[1][3][3] = Model.rotateY(torch2[1][3][2]);
