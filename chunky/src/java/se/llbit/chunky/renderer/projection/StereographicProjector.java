@@ -43,7 +43,7 @@ public class StereographicProjector implements Projector {
     x *= scale;
     double xx_yy = x * x + y * y;
     double r = 1 / (1 + xx_yy);
-    d.set(2 * x * r, 2 * y * r, -(-1 + xx_yy) * r);
+    d.set(x * r, y * r, -(-1 + xx_yy) * r);
     o.set(0, 0, 0);
   }
 

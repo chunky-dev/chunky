@@ -64,8 +64,8 @@ public class Camera implements JsonSerializable {
   private Runnable projectionListener = () -> {};
 
   /**
-   * @param fov Field of view, in degrees. Maximum 180.
-   * @return {@code tan(fov/2)}
+   * @param fov Field of view, in degrees, will be clamped to [0, 180].
+   * @return {@code 2 * tan(fov / 2)}
    */
   public static double clampedFovTan(double fov) {
     double clampedFoV = Math.max(0, Math.min(180, fov));
