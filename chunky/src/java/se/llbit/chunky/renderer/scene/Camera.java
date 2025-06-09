@@ -245,13 +245,13 @@ public class Camera implements JsonSerializable {
       case PANORAMIC:
         return applySphericalDoF(new PanoramicProjector(fov));
       case STEREOGRAPHIC:
-        return new StereographicProjector(fov);
+        return applySphericalDoF(new StereographicProjector(fov));
       case ODS_LEFT:
-        return new ODSSinglePerspectiveProjector(Eye.LEFT);
+        return applySphericalDoF(new ODSSinglePerspectiveProjector(Eye.LEFT));
       case ODS_RIGHT:
-        return new ODSSinglePerspectiveProjector(Eye.RIGHT);
+        return applySphericalDoF(new ODSSinglePerspectiveProjector(Eye.RIGHT));
       case ODS_STACKED:
-        return new ODSVerticalStackedProjector();
+        return applySphericalDoF(new ODSVerticalStackedProjector());
     }
   }
 
