@@ -93,11 +93,11 @@ public class ApertureProjector implements Projector {
     return null;
   }
 
-  @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
-    wrapped.apply(x, y, random, o, d);
-
-    d.scale(subjectDistance / d.z);
-
+  /**
+   * Finds a random point in the aperture mask.
+   * @return Array of two doubles which are the x- and y- coordinates of the point.
+   */
+  protected double[] getPointInAperture(Random random) {
     double rx = 0, ry = 0;
 
     if(apertureMask != null) {
@@ -139,6 +139,18 @@ public class ApertureProjector implements Projector {
       rx = Math.cos(theta) * r;
       ry = Math.sin(theta) * r;
     }
+
+    return new double[] {rx, ry};
+  }
+
+  @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
+    wrapped.apply(x, y, random, o, d);
+
+    d.scale(subjectDistance / d.z);
+
+    double[] point = getPointInAperture(random);
+    double rx = point[0];
+    double ry = point[1];
 
     d.sub(rx, ry, 0);
     o.add(rx, ry, 0);
