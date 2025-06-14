@@ -153,4 +153,12 @@ public abstract class Block extends Material {
   public boolean isBiomeDependant() {
     return isWaterFilled();
   }
+
+  /**
+   * Get the color to be used for this block on the surface map.
+   * @return ARGB color representing this block
+   */
+  public int getMapColor() {
+    return texture.getAvgColor();
+  }
 }
