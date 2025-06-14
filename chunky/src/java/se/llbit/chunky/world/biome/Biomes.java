@@ -237,9 +237,9 @@ public class Biomes {
       } else if (biome.grassColorMode != Biome.GrassColorMode.FIXED_COLOR) {
         biome.grassColor = getFoliageOrGrassColor(texture, biome);
         if (biome.grassColorMode == Biome.GrassColorMode.DARK_FOREST) {
-          // Dark forest biomes' grass color is retrieved normally, then averaged with 0x28340A to produce the final color
+          // Dark forest biomes' grass color is retrieved normally, then bit masked with 0xFEFEFE averaged with 0x28340A to produce the final color
           float[] color = new float[3];
-          ColorUtil.getRGBComponents(biome.grassColor, color);
+          ColorUtil.getRGBComponents(biome.grassColor & 0xFEFEFE, color);
           color[0] += 40 / 255.f;
           color[1] += 52 / 255.f;
           color[2] += 10 / 255.f;
