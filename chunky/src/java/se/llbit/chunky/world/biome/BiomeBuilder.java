@@ -65,11 +65,13 @@ public class BiomeBuilder {
   public BiomeBuilder swamp() {
     this.grassColorMode = Biome.GrassColorMode.SWAMP;
     this.foliageColorMode = Biome.FoliageColorMode.SWAMP;
+    dryFoliageColor(0x7B5334);
     return this;
   }
 
   public BiomeBuilder darkForest() {
     this.grassColorMode = Biome.GrassColorMode.DARK_FOREST;
+    dryFoliageColor(0x7B5334);
     return this;
   }
 
