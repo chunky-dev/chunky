@@ -1571,6 +1571,9 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/resin_clump")
   public static final Texture resinClump = new Texture();
 
+  @TexturePath("assets/minecraft/textures/block/leaf_litter")
+  public static final Texture leafLitter = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 
