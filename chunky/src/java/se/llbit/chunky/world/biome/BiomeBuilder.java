@@ -14,6 +14,8 @@ public class BiomeBuilder {
   private Biome.GrassColorMode grassColorMode = Biome.GrassColorMode.DEFAULT;
   private int foliageColor;
   private Biome.FoliageColorMode foliageColorMode = Biome.FoliageColorMode.DEFAULT;
+  private int dryFoliageColor;
+  private Biome.FoliageColorMode dryFoliageColorMode = Biome.FoliageColorMode.DEFAULT;
 
   public BiomeBuilder(String resourceLocation, String name, double temperature, double rain) {
     this.resourceLocation = resourceLocation;
@@ -49,6 +51,12 @@ public class BiomeBuilder {
     return this;
   }
 
+  public BiomeBuilder dryFoliageColor(int dryFoliageColor) {
+    this.dryFoliageColor = dryFoliageColor;
+    this.dryFoliageColorMode = Biome.FoliageColorMode.FIXED_COLOR;
+    return this;
+  }
+
   public BiomeBuilder waterColor(int waterColor) {
     this.waterColor = waterColor;
     return this;
@@ -78,6 +86,7 @@ public class BiomeBuilder {
       mapColor,
       grassColor, grassColorMode,
       foliageColor, foliageColorMode,
+      dryFoliageColor, dryFoliageColorMode,
       waterColor
     );
   }

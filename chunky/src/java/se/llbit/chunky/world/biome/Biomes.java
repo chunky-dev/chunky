@@ -251,7 +251,7 @@ public class Biomes {
   }
 
   /**
-   * Loads foliage colors from a grass color texture.
+   * Loads foliage colors from a foliage color texture.
    */
   public static void loadFoliageColors(BitmapImage texture) {
     for (Biome biome : biomes) {
@@ -261,6 +261,17 @@ public class Biomes {
         biome.foliageColor = getFoliageOrGrassColor(texture, biome);
       }
       biome.foliageColorLinear = getRGBAComponentsGammaCorrected(biome.foliageColor);
+    }
+  }
+
+  /**
+   * Loads dry foliage colors from a dry foliage color texture.
+   */
+  public static void loadDryFoliageColors(BitmapImage texture) {
+    for (Biome biome : biomes) {
+      // TODO check if we need special handling for swamp, badlands or pale garden
+      biome.dryFoliageColor = getFoliageOrGrassColor(texture, biome);
+      biome.dryFoliageColorLinear = getRGBAComponentsGammaCorrected(biome.dryFoliageColor);
     }
   }
 

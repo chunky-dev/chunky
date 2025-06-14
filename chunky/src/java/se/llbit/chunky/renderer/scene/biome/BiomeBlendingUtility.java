@@ -116,7 +116,9 @@ public class BiomeBlendingUtility {
    * Compute the blended biome colors for a chunk by doing a 2D blur and store the result in the given biome structures
    * Sample the biome at a given y level and writes the result for y levels going from samplingY (inclusive) to maxFillY (exclusive)
    */
-  static public void chunk2DBlur(ChunkPosition cp, int blurRadius, int samplingY, int maxFillY, Vector3i origin, Position2IntStructure biomeIdx, BiomePalette biomePalette, Set<ChunkPosition> nonEmptyChunks, BiomeStructure grassTexture, BiomeStructure foliageTexture, BiomeStructure waterTexture) {
+  static public void chunk2DBlur(ChunkPosition cp, int blurRadius, int samplingY, int maxFillY, Vector3i origin,
+                                 Position2IntStructure biomeIdx, BiomePalette biomePalette, Set<ChunkPosition> nonEmptyChunks,
+                                 BiomeStructure grassTexture, BiomeStructure foliageTexture, BiomeStructure dryFoliageTexture, BiomeStructure waterTexture) {
 
     SummedAreaTable table = new SummedAreaTable(blurRadius);
     for(int x = -blurRadius; x < 16 + blurRadius; ++x) {
@@ -293,7 +295,9 @@ public class BiomeBlendingUtility {
   /**
    * Compute the blended biome colors for a portion of chunk by doing a 3D blur and store the result in the given biome structures
    */
-  static public void chunk3DBlur(ChunkPosition cp, int blurRadius, int minY, int maxY, Vector3i origin, Position2IntStructure biomeIdx, BiomePalette biomePalette, Set<ChunkPosition> nonEmptyChunks, BiomeStructure grassTexture, BiomeStructure foliageTexture, BiomeStructure waterTexture) {
+  static public void chunk3DBlur(ChunkPosition cp, int blurRadius, int minY, int maxY, Vector3i origin,
+                                 Position2IntStructure biomeIdx, BiomePalette biomePalette, Set<ChunkPosition> nonEmptyChunks,
+                                 BiomeStructure grassTexture, BiomeStructure foliageTexture, BiomeStructure dryFoliageTexture, BiomeStructure waterTexture) {
     SummedVolumeTable table = new SummedVolumeTable(blurRadius, minY, maxY);
     for(int y = minY - blurRadius; y < maxY + blurRadius; ++y) {
       for(int x = -blurRadius; x < 16 + blurRadius; ++x) {
