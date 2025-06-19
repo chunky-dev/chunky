@@ -93,6 +93,10 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     setSpacing(15);
     TextField filterField = new TextField();
     filterField.textProperty().addListener((observable, oldValue, newValue) -> {
+      blockIds.clear();
+      blockIds.addAll(MaterialStore.collections.keySet());
+      blockIds.addAll(ExtraMaterials.idMap.keySet());
+      blockIds.addAll(MaterialStore.blockIds);
       if (newValue.trim().isEmpty()) {
         filteredList.setPredicate(name -> true);
       } else {
