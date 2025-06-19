@@ -41,6 +41,8 @@ public class Vector4 {
 
   public Vector4(Vector3 v, double w) { this(v.x, v.y, v.z, w); }
 
+  public Vector4(double x, Vector3 v) { this(x, v.x, v.y, v.z); }
+
   public Vector4(double i, double j, double k, double l) {
     x = i;
     y = j;

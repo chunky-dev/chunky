@@ -1,12 +1,10 @@
 package se.llbit.chunky.renderer.scene;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
-import se.llbit.chunky.entity.ArmorStand;
-import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.entity.PaintingEntity;
-import se.llbit.chunky.entity.PlayerEntity;
+import se.llbit.chunky.entity.*;
 import se.llbit.chunky.world.Dimension;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -139,37 +137,53 @@ public class SceneEntities {
 
   public void loadEntitiesInChunk(Scene scene, ChunkData chunkData) {
     for (CompoundTag tag : chunkData.getEntities()) {
-      Tag posTag = tag.get("Pos");
-      if (posTag.isList()) {
-        ListTag pos = posTag.asList();
-        double x = pos.get(0).doubleValue();
-        double y = pos.get(1).doubleValue();
-        double z = pos.get(2).doubleValue();
+      this.loadEntity(scene, tag);
+    }
+  }
 
-        if (y >= scene.yClipMin && y < scene.yClipMax) {
-          String id = tag.get("id").stringValue("");
-          // Before 1.12 paintings had id=Painting.
-          // After 1.12 paintings had id=minecraft:painting.
-          if ((id.equals("minecraft:painting") || id.equals("Painting")) && entityLoadingPreferences.shouldLoadClass(PaintingEntity.class)) {
-            Tag paintingVariant = NbtUtil.getTagFromNames(tag, "Motive", "variant");
-            int facing = (tag.get("facing").isError())
-              ? tag.get("Facing").byteValue(0) // pre 1.17
-              : tag.get("facing").byteValue(0); // 1.17+
-            addEntity(new PaintingEntity(
-              new Vector3(x, y, z),
-              paintingVariant.stringValue(),
-              facing
-            ));
-          } else if (id.equals("minecraft:armor_stand") && entityLoadingPreferences.shouldLoadClass(ArmorStand.class)) {
-            addActor(new ArmorStand(
-              new Vector3(x, y, z),
-              tag
-            ));
-          }
+  private void loadEntity(Scene scene, CompoundTag tag) {
+    Tag posTag = tag.get("Pos");
+    if (!posTag.isList()) {
+      return;
+    }
+
+    ListTag pos = posTag.asList();
+    double x = pos.get(0).doubleValue();
+    double y = pos.get(1).doubleValue();
+    double z = pos.get(2).doubleValue();
+
+    if (y >= scene.yClipMin && y < scene.yClipMax) {
+      String id = tag.get("id").stringValue("");
+      // Before 1.12 paintings had id=Painting.
+      // After 1.12 paintings had id=minecraft:painting.
+      if ((id.equals("minecraft:painting") || id.equals("Painting")) && entityLoadingPreferences.shouldLoadClass(PaintingEntity.class)) {
+        Tag paintingVariant = NbtUtil.getTagFromNames(tag, "Motive", "variant");
+        int facing = (tag.get("facing").isError())
+          ? tag.get("Facing").byteValue(0) // pre 1.17
+          : tag.get("facing").byteValue(0); // 1.17+
+        addEntity(new PaintingEntity(
+          new Vector3(x, y, z),
+          paintingVariant.stringValue(),
+          facing
+        ));
+      } else if (id.equals("minecraft:armor_stand") && entityLoadingPreferences.shouldLoadClass(ArmorStand.class)) {
+        addActor(new ArmorStand(
+          new Vector3(x, y, z),
+          tag
+        ));
+      } else if (id.equals("minecraft:block_display")) {
+        addEntity(new BlockDisplayEntity(
+          new Vector3(x, y, z),
+          new BlockSpec(tag.get("block_state")).toBlock(),
+          tag
+        ));
+        for (Tag passenger : tag.get("Passengers").asList()) {
+          loadEntity(scene, passenger.asCompound());
         }
       }
     }
   }
+
 
   public boolean shouldLoad(Entity entity) {
     return entityLoadingPreferences.shouldLoad(entity);

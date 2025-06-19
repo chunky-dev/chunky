@@ -6,7 +6,12 @@ import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.log.Log;
 import se.llbit.math.Ray;
+import se.llbit.math.Transform;
+import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * A wrapper for legacy blocks (before the flattening in Minecraft 1.13) that have properties that
@@ -79,4 +84,9 @@ public abstract class UnfinalizedLegacyBlock extends Block {
    * @param state Current finalization state
    */
   public abstract void finalizeBlock(FinalizationState state);
+
+  @Override
+  public Collection<Primitive> getPrimitives(Transform transform) {
+    return Collections.emptyList();
+  }
 }
