@@ -11,6 +11,7 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
@@ -19,7 +20,7 @@ import se.llbit.util.JsonUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class ChickenEntity extends Entity implements Poseable {
+public class ChickenEntity extends Entity implements Poseable, Variant {
 
   private static final Quad[] body = new BoxModelBuilder()
     .addBox(new Vector3(-3 / 16.0, -4 / 16.0, -3 / 16.0), new Vector3(3 / 16.0, 4 / 16.0, 3 / 16.0), box ->
@@ -58,12 +59,35 @@ public class ChickenEntity extends Entity implements Poseable {
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
     ).toQuads();
 
+  private static final Quad[] cold_head = new BoxModelBuilder()
+    .addBox(new Vector3(-2 / 16.0, 0 / 16.0, -3 / 16.0), new Vector3(2 / 16.0, 6 / 16.0, 0 / 16.0), box ->
+      box.forTextureSize(Texture.chicken, 64, 32).atUVCoordinates(0, 0).flipX()
+        .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
+    ).addBox(new Vector3(-2 / 16.0, 2 / 16.0, -5 / 16.0), new Vector3(2 / 16.0, 4 / 16.0, -3 / 16.0), box ->
+      box.forTextureSize(Texture.chicken, 64, 32).atUVCoordinates(14, 0).flipX()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+    ).addBox(new Vector3(-1 / 16.0, 0 / 16.0, -4 / 16.0), new Vector3(1 / 16.0, 2 / 16.0, -2 / 16.0), box ->
+      box.forTextureSize(Texture.chicken, 64, 32).atUVCoordinates(14, 4).flipX()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+    ).addBox(new Vector3(-3 / 16.0, 4 / 16.0, -3 / 16.0), new Vector3(3 / 16.0, 7 / 16.0, 1 / 16.0), box ->
+      box.forTextureSize(Texture.chicken, 64, 32).atUVCoordinates(44, 0).flipX()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+        .transform(Transform.NONE.translate(0, 0, -Ray.OFFSET)).doubleSided()
+    ).toQuads();
+
+  private static final Quad[] cold_tail = {
+    new Quad(new Vector3(0, 3 / 16.0, 3 / 16.0), new Vector3(0, -2 / 16.0, 3 / 16.0), new Vector3(0, 3 / 16.0, 0), new Vector4(38 / 64.0, 43 / 64.0, 15 / 32.0, 18 / 32.0)),
+    new Quad(new Vector3(0, 3 / 16.0, 0 / 16.0), new Vector3(0, -2 / 16.0, 0), new Vector3(0, 3 / 16.0, 3 / 16.0), new Vector4(48 / 64.0, 43 / 64.0, 18 / 32.0, 15 / 32.0))
+  };
+
   private final JsonObject pose;
 
   private double scale = 1;
   private double headScale = 1;
 
-  private static final String[] partNames = {"all", "head", "body", "left_leg", "right_leg", "left_wing", "right_wing"};
+  private String variant = "minecraft:temperate";
+
+  private static final String[] partNames = {"all", "head", "body", "left_leg", "right_leg", "left_wing", "right_wing", "tail"};
 
   public ChickenEntity(Vector3 position, CompoundTag tag) {
     super(position);
@@ -81,6 +105,8 @@ public class ChickenEntity extends Entity implements Poseable {
     pose = new JsonObject();
     pose.add("all", JsonUtil.vec3ToJson(new Vector3(0, QuickMath.degToRad(180 - yaw), 0)));
     pose.add("head", JsonUtil.vec3ToJson(new Vector3(QuickMath.degToRad(pitch), 0, 0)));
+
+    variant = tag.get("variant").stringValue("minecraft:temperate");
   }
 
   public ChickenEntity(JsonObject json) {
@@ -88,13 +114,18 @@ public class ChickenEntity extends Entity implements Poseable {
     this.scale = json.get("scale").asDouble(1);
     this.headScale = json.get("headScale").asDouble(1);
     this.pose = json.get("pose").object();
+    this.variant = json.get("variant").stringValue("minecraft:temperate");
   }
 
   @Override
   public Collection<Primitive> primitives(Vector3 offset) {
     ArrayList<Primitive> faces = new ArrayList<>();
 
-    TextureMaterial skinMaterial = new TextureMaterial(Texture.chicken);
+    TextureMaterial skinMaterial = switch (variant) {
+      case "minecraft:cold" -> new TextureMaterial(Texture.cold_chicken);
+      case "minecraft:warm" -> new TextureMaterial(Texture.warm_chicken);
+      default -> new TextureMaterial(Texture.chicken);
+    };
 
     Vector3 allPose = JsonUtil.vec3FromJsonArray(pose.get("all"));
     Vector3 bodyPose = JsonUtil.vec3FromJsonArray(pose.get("body"));
@@ -103,6 +134,7 @@ public class ChickenEntity extends Entity implements Poseable {
     Vector3 leftWingPose = JsonUtil.vec3FromJsonArray(pose.get("left_wing"));
     Vector3 rightWingPose = JsonUtil.vec3FromJsonArray(pose.get("right_wing"));
     Vector3 headPose = JsonUtil.vec3FromJsonArray(pose.get("head"));
+    Vector3 tailPose = JsonUtil.vec3FromJsonArray(pose.get("tail"));
 
     Vector3 worldOffset = new Vector3(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     Transform worldTransform = Transform.NONE
@@ -120,6 +152,18 @@ public class ChickenEntity extends Entity implements Poseable {
       .chain(worldTransform);
     for (Quad quad : body) {
       quad.addTriangles(faces, skinMaterial, transform);
+    }
+
+    if (variant.equals("minecraft:cold")) {
+      transform = Transform.NONE
+        .rotateX(tailPose.x)
+        .rotateY(tailPose.y)
+        .rotateZ(tailPose.z)
+        .translate(0, 9 / 16.0, 3 / 16.0)
+        .chain(worldTransform);
+      for (Quad quad : cold_tail) {
+        quad.addTriangles(faces, skinMaterial, transform);
+      }
     }
 
     transform = Transform.NONE
@@ -172,10 +216,16 @@ public class ChickenEntity extends Entity implements Poseable {
       .scale(headScale)
       .translate(0, 9 / 16.0, -3 / 16.0)
       .chain(worldTransform);
-    for (Quad quad : head) {
-      quad.addTriangles(faces, skinMaterial, transform);
-    }
 
+    if (variant.equals("minecraft:cold")) {
+      for (Quad quad : cold_head) {
+        quad.addTriangles(faces, skinMaterial, transform);
+      }
+    } else {
+      for (Quad quad : head) {
+        quad.addTriangles(faces, skinMaterial, transform);
+      }
+    }
     return faces;
   }
 
@@ -187,6 +237,7 @@ public class ChickenEntity extends Entity implements Poseable {
     json.add("scale", getScale());
     json.add("headScale", headScale);
     json.add("pose", pose);
+    json.add("variant", variant);
 
     return json;
   }
@@ -211,13 +262,32 @@ public class ChickenEntity extends Entity implements Poseable {
   }
 
   @Override
-  public void setHeadScale(double value) { headScale = value; }
+  public void setHeadScale(double value) {
+    headScale = value;
+  }
 
   @Override
-  public double getHeadScale() { return headScale; }
+  public double getHeadScale() {
+    return headScale;
+  }
 
   @Override
   public JsonObject getPose() {
     return pose;
+  }
+
+  @Override
+  public String[] variants() {
+    return new String[]{"minecraft:temperate", "minecraft:cold", "minecraft:warm"};
+  }
+
+  @Override
+  public String getVariant() {
+    return variant;
+  }
+
+  @Override
+  public void setVariant(String variant) {
+    this.variant = variant;
   }
 }
