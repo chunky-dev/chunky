@@ -24,7 +24,7 @@ public class MooshroomEntity extends Entity implements Poseable, Variant {
 
   private static final Quad[] body = new BoxModelBuilder()
     .addBox(new Vector3(-6 / 16.0, -9 / 16.0, -5 / 16.0), new Vector3(6 / 16.0, 9 / 16.0, 5 / 16.0), box ->
-      box.forTextureSize(Texture.brownMooshroom, 64, 32).atUVCoordinates(18, 4).flipX()
+      box.forTextureSize(Texture.brownMooshroom, 64, 64).atUVCoordinates(18, 4).flipX()
         .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
         .transform(Transform.NONE
           .translate(0.5, 0.5, 0.5)
@@ -32,7 +32,7 @@ public class MooshroomEntity extends Entity implements Poseable, Variant {
           .translate(-0.5, -0.5, -0.5)
         )
     ).addBox(new Vector3(-2 / 16.0, -9 / 16.0, -6 / 16.0), new Vector3(2 / 16.0, -3 / 16.0, -5 / 16.0), box ->
-      box.forTextureSize(Texture.brownMooshroom, 64, 32).atUVCoordinates(52, 0).flipX()
+      box.forTextureSize(Texture.brownMooshroom, 64, 64).atUVCoordinates(52, 0).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
         .transform(Transform.NONE
           .translate(0.5, 0.5, 0.5)
@@ -43,19 +43,22 @@ public class MooshroomEntity extends Entity implements Poseable, Variant {
 
   private static final Quad[] leg = new BoxModelBuilder()
     .addBox(new Vector3(-2 / 16.0, -12 / 16.0, -2 / 16.0), new Vector3(2 / 16.0, 0, 2 / 16.0), box ->
-      box.forTextureSize(Texture.brownMooshroom, 64, 32).atUVCoordinates(0, 16).flipX()
+      box.forTextureSize(Texture.brownMooshroom, 64, 64).atUVCoordinates(0, 16).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
     ).toQuads();
 
   private static final Quad[] head = new BoxModelBuilder()
     .addBox(new Vector3(-4 / 16.0, -4 / 16.0, -6 / 16.0), new Vector3(4 / 16.0, 4 / 16.0, 0 / 16.0), box ->
-      box.forTextureSize(Texture.brownMooshroom, 64, 32).atUVCoordinates(0, 0).flipX()
+      box.forTextureSize(Texture.brownMooshroom, 64, 64).atUVCoordinates(0, 0).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
     ).addBox(new Vector3(-5 / 16.0, 2 / 16.0, -4 / 16.0), new Vector3(-4 / 16.0, 5 / 16.0, -3 / 16.0), box ->
-      box.forTextureSize(Texture.brownMooshroom, 64, 32).atUVCoordinates(22, 0).flipX()
+      box.forTextureSize(Texture.brownMooshroom, 64, 64).atUVCoordinates(22, 0).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
     ).addBox(new Vector3(4 / 16.0, 2 / 16.0, -4 / 16.0), new Vector3(5 / 16.0, 5 / 16.0, -3 / 16.0), box ->
-      box.forTextureSize(Texture.brownMooshroom, 64, 32).atUVCoordinates(22, 0).flipX()
+      box.forTextureSize(Texture.brownMooshroom, 64, 64).atUVCoordinates(22, 0).flipX()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+    ).addBox(new Vector3(-3 / 16.0, -4 / 16.0, -7 / 16.0), new Vector3(3 / 16.0, -1 / 16.0, -6 / 16.0), box ->
+      box.forTextureSize(Texture.brownMooshroom, 64, 64).atUVCoordinates(1, 33).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
     ).toQuads();
 
