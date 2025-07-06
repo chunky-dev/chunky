@@ -18,37 +18,47 @@ import se.llbit.util.JsonUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class PigEntity extends Entity implements Poseable, Saddleable {
+public class PigEntity extends Entity implements Poseable, Variant, Saddleable {
 
+  // Body model for the pig. Also includes the Cold variant's second layer. Transparent on all other variants.
   private static final Quad[] body = new BoxModelBuilder()
     .addBox(new Vector3(-5 / 16.0, -8 / 16.0, -4 / 16.0), new Vector3(5 / 16.0, 8 / 16.0, 4 / 16.0), box ->
-      box.forTextureSize(Texture.pig, 64, 32).atUVCoordinates(28, 8).flipX()
+      box.forTextureSize(Texture.pig, 64, 64).atUVCoordinates(28, 8).flipX()
         .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
         .transform(Transform.NONE
           .translate(0.5, 0.5, 0.5)
           .rotateX(Math.toRadians(-90)) // Body Boxes are often sideways for some reason?
           .translate(-0.5, -0.5, -0.5)
         )
+    ).addBox(new Vector3(-5 / 16.0, -8 / 16.0, -4 / 16.0), new Vector3(5 / 16.0, 8 / 16.0, 4 / 16.0), box ->
+      box.forTextureSize(Texture.pig, 64, 64).atUVCoordinates(28, 32).flipX().doubleSided()
+        .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
+        .transform(Transform.NONE
+          .translate(0.5, 0.5, 0.5)
+          .rotateX(Math.toRadians(-90)) // Body Boxes are often sideways for some reason?
+          .inflate(new Vector3(10.5 / 10.0, 8.5 / 8.0, 16.5 / 16.0))
+          .translate(-0.5, -0.5, -0.5)
+        )
     ).toQuads();
 
   private static final Quad[] leg = new BoxModelBuilder()
     .addBox(new Vector3(-2 / 16.0, -6 / 16.0, -2 / 16.0), new Vector3(2 / 16.0, 0, 2 / 16.0), box ->
-      box.forTextureSize(Texture.pig, 64, 32).atUVCoordinates(0, 16).flipX()
+      box.forTextureSize(Texture.pig, 64, 64).atUVCoordinates(0, 16).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
     ).toQuads();
 
   private static final Quad[] head = new BoxModelBuilder()
     .addBox(new Vector3(-4 / 16.0, 0 / 16.0, -7 / 16.0), new Vector3(4 / 16.0, 8 / 16.0, 1 / 16.0), box ->
-      box.forTextureSize(Texture.pig, 64, 32).atUVCoordinates(0, 0).flipX()
+      box.forTextureSize(Texture.pig, 64, 64).atUVCoordinates(0, 0).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
     ).addBox(new Vector3(-2 / 16.0, 1 / 16.0, -8 / 16.0), new Vector3(2 / 16.0, 4 / 16.0, -7 / 16.0), box ->
-      box.forTextureSize(Texture.pig, 64, 32).atUVCoordinates(16, 16).flipX()
+      box.forTextureSize(Texture.pig, 64, 64).atUVCoordinates(16, 16).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
     ).toQuads();
 
   private static final Quad[] saddle = new BoxModelBuilder()
     .addBox(new Vector3(-5 / 16.0, -8 / 16.0, -4 / 16.0), new Vector3(5 / 16.0, 8 / 16.0, 4 / 16.0), box ->
-      box.forTextureSize(Texture.pigSaddle, 64, 32).atUVCoordinates(28, 8).flipX().doubleSided()
+      box.forTextureSize(Texture.pigSaddle, 64, 64).atUVCoordinates(28, 8).flipX().doubleSided()
         .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
         .transform(Transform.NONE
           .translate(0.5, 0.5, 0.5)
@@ -63,6 +73,7 @@ public class PigEntity extends Entity implements Poseable, Saddleable {
   private double scale = 1;
   private double headScale = 1;
 
+  private String variant = "minecrat:temperate";
   private boolean saddled;
 
   private static final String[] partNames = {"all", "head", "body", "front_left_leg", "front_right_leg", "back_left_leg", "back_right_leg"};
@@ -84,6 +95,7 @@ public class PigEntity extends Entity implements Poseable, Saddleable {
     pose.add("all", JsonUtil.vec3ToJson(new Vector3(0, QuickMath.degToRad(180 - yaw), 0)));
     pose.add("head", JsonUtil.vec3ToJson(new Vector3(QuickMath.degToRad(pitch), 0, 0)));
 
+    variant = tag.get("variant").stringValue("minecraft:temperate");
     saddled = tag.get("Saddle").boolValue(false);
   }
 
@@ -93,14 +105,20 @@ public class PigEntity extends Entity implements Poseable, Saddleable {
     this.headScale = json.get("headScale").asDouble(1);
     this.pose = json.get("pose").object();
     this.saddled = json.get("saddled").asBoolean(false);
+    this.variant = json.get("variant").asString("minecraft:temperate");
   }
 
   @Override
   public Collection<Primitive> primitives(Vector3 offset) {
     ArrayList<Primitive> faces = new ArrayList<>();
 
-    TextureMaterial skinMaterial = new TextureMaterial(Texture.pig);
     TextureMaterial saddleMaterial = new TextureMaterial(Texture.pigSaddle);
+    TextureMaterial skinMaterial = switch (variant) {
+      case "minecraft:cold" -> new TextureMaterial(Texture.cold_pig);
+      case "minecraft:warm" -> new TextureMaterial(Texture.warm_pig);
+      // temperate covered under default
+      default -> new TextureMaterial(Texture.pig);
+    };
 
     Vector3 allPose = JsonUtil.vec3FromJsonArray(pose.get("all"));
     Vector3 bodyPose = JsonUtil.vec3FromJsonArray(pose.get("body"));
@@ -179,7 +197,7 @@ public class PigEntity extends Entity implements Poseable, Saddleable {
       quad.addTriangles(faces, skinMaterial, transform);
     }
 
-    if(saddled) {
+    if (saddled) {
       transform = Transform.NONE
         .rotateX(bodyPose.x)
         .rotateY(bodyPose.y)
@@ -203,7 +221,7 @@ public class PigEntity extends Entity implements Poseable, Saddleable {
     json.add("headScale", headScale);
     json.add("pose", pose);
     json.add("saddled", saddled);
-
+    json.add("variant", variant);
     return json;
   }
 
@@ -227,10 +245,14 @@ public class PigEntity extends Entity implements Poseable, Saddleable {
   }
 
   @Override
-  public void setHeadScale(double value) { headScale = value; }
+  public void setHeadScale(double value) {
+    headScale = value;
+  }
 
   @Override
-  public double getHeadScale() { return headScale; }
+  public double getHeadScale() {
+    return headScale;
+  }
 
   @Override
   public JsonObject getPose() {
@@ -238,8 +260,27 @@ public class PigEntity extends Entity implements Poseable, Saddleable {
   }
 
   @Override
-  public void setIsSaddled(boolean saddled) { this.saddled = saddled; }
+  public void setIsSaddled(boolean saddled) {
+    this.saddled = saddled;
+  }
 
   @Override
-  public boolean isSaddled() { return saddled; }
+  public boolean isSaddled() {
+    return saddled;
+  }
+
+  @Override
+  public String[] variants() {
+    return new String[]{"minecraft:temperate", "minecraft:cold", "minecraft:warm"};
+  }
+
+  @Override
+  public String getVariant() {
+    return variant;
+  }
+
+  @Override
+  public void setVariant(String variant) {
+    this.variant = variant;
+  }
 }

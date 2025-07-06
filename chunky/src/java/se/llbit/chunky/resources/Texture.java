@@ -539,9 +539,13 @@ public class Texture {
   public static final EntityTexture cold_chicken = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/chicken/warm_chicken")
   public static final EntityTexture warm_chicken = new EntityTexture();
-  @TexturePath("assets/minecraft/textures/entity/pig/pig")
+  @TexturePath("assets/minecraft/textures/entity/pig/temperate_pig")
   public static final EntityTexture pig = new EntityTexture();
-  @TexturePath("assets/minecraft/textures/entity/pig/pig_saddle")
+  @TexturePath("assets/minecraft/textures/entity/pig/cold_pig")
+  public static final EntityTexture cold_pig = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/pig/warm_pig")
+  public static final EntityTexture warm_pig = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/equipment/pig_saddle/saddle")
   public static final EntityTexture pigSaddle = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/cow/brown_mooshroom")
   public static final EntityTexture brownMooshroom = new EntityTexture();
