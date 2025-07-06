@@ -18,11 +18,11 @@ import se.llbit.util.JsonUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class CowEntity extends Entity implements Poseable {
+public class CowEntity extends Entity implements Poseable, Variant {
 
   private static final Quad[] body = new BoxModelBuilder()
     .addBox(new Vector3(-6 / 16.0, -9 / 16.0, -5 / 16.0), new Vector3(6 / 16.0, 9 / 16.0, 5 / 16.0), box ->
-      box.forTextureSize(Texture.cow, 64, 32).atUVCoordinates(18, 4).flipX()
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(18, 4).flipX()
         .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
         .transform(Transform.NONE
           .translate(0.5, 0.5, 0.5)
@@ -30,7 +30,7 @@ public class CowEntity extends Entity implements Poseable {
           .translate(-0.5, -0.5, -0.5)
         )
     ).addBox(new Vector3(-2 / 16.0, -9 / 16.0, -6 / 16.0), new Vector3(2 / 16.0, -3 / 16.0, -5 / 16.0), box ->
-      box.forTextureSize(Texture.cow, 64, 32).atUVCoordinates(52, 0).flipX()
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(52, 0).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
         .transform(Transform.NONE
           .translate(0.5, 0.5, 0.5)
@@ -39,21 +39,84 @@ public class CowEntity extends Entity implements Poseable {
         )
     ).toQuads();
 
+  private static final Quad[] cold_wool = new BoxModelBuilder()
+    .addBox(new Vector3(-6 / 16.0, -9 / 16.0, -5 / 16.0), new Vector3(6 / 16.0, 9 / 16.0, 5 / 16.0), box ->
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(20, 32).flipX()
+        .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
+        .transform(Transform.NONE
+          .translate(0.5, 0.5, 0.5)
+          .rotateX(Math.toRadians(-90))
+          .inflate(new Vector3(13 / 12.0, 11 / 10.0, 19 / 18.0))
+          .translate(-0.5, -0.5, -0.5)
+        )
+    ).toQuads();
+
   private static final Quad[] leg = new BoxModelBuilder()
     .addBox(new Vector3(-2 / 16.0, -12 / 16.0, -2 / 16.0), new Vector3(2 / 16.0, 0, 2 / 16.0), box ->
-      box.forTextureSize(Texture.cow, 64, 32).atUVCoordinates(0, 16).flipX()
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(0, 16).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
     ).toQuads();
 
-  private static final Quad[] head = new BoxModelBuilder()
+  private static final Quad[] temperate_head = new BoxModelBuilder()
     .addBox(new Vector3(-4 / 16.0, -4 / 16.0, -6 / 16.0), new Vector3(4 / 16.0, 4 / 16.0, 0 / 16.0), box ->
-      box.forTextureSize(Texture.cow, 64, 32).atUVCoordinates(0, 0).flipX()
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(0, 0).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
     ).addBox(new Vector3(-5 / 16.0, 2 / 16.0, -4 / 16.0), new Vector3(-4 / 16.0, 5 / 16.0, -3 / 16.0), box ->
-      box.forTextureSize(Texture.cow, 64, 32).atUVCoordinates(22, 0).flipX()
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(22, 0).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
     ).addBox(new Vector3(4 / 16.0, 2 / 16.0, -4 / 16.0), new Vector3(5 / 16.0, 5 / 16.0, -3 / 16.0), box ->
-      box.forTextureSize(Texture.cow, 64, 32).atUVCoordinates(22, 0).flipX()
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(22, 0).flipX()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+    ).addBox(new Vector3(-3 / 16.0, -4 / 16.0, -7 / 16.0), new Vector3(3 / 16.0, -1 / 16.0, -6 / 16.0), box ->
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(1, 33).flipX()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+    ).toQuads();
+
+  private static final Quad[] cold_head = new BoxModelBuilder()
+    .addBox(new Vector3(-4 / 16.0, -4 / 16.0, -6 / 16.0), new Vector3(4 / 16.0, 4 / 16.0, 0 / 16.0), box ->
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(0, 0).flipX()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+    ).addBox(new Vector3(-3 / 16.0, -4 / 16.0, -7 / 16.0), new Vector3(3 / 16.0, -1 / 16.0, -6 / 16.0), box ->
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(9, 33).flipX()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+    ).addBox(new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0), new Vector3(2 / 16.0, 6 / 16.0, 2 / 16.0), box ->
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(0, 32).flipX()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+        .transform(Transform.NONE
+          .translate(0.5, 0.5, 0.5)
+          .rotateX(Math.toRadians(-90))
+          .translate(-0.5, -0.5, -0.5)
+          .translate(-6 / 16.0, 2 / 16.0, -2 / 16.0)
+        )
+    ).addBox(new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0), new Vector3(2 / 16.0, 6 / 16.0, 2 / 16.0), box ->
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(0, 40).flipX()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+        .transform(Transform.NONE
+          .translate(0.5, 0.5, 0.5)
+          .rotateX(Math.toRadians(-90))
+          .translate(-0.5, -0.5, -0.5)
+          .translate(4 / 16.0, 2 / 16.0, -2 / 16.0)
+        )
+    ).toQuads();
+
+  private static final Quad[] warm_head = new BoxModelBuilder()
+    .addBox(new Vector3(-4 / 16.0, -4 / 16.0, -6 / 16.0), new Vector3(4 / 16.0, 4 / 16.0, 0 / 16.0), box ->
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(0, 0).flipX()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+    ).addBox(new Vector3(-3 / 16.0, -4 / 16.0, -7 / 16.0), new Vector3(3 / 16.0, -1 / 16.0, -6 / 16.0), box ->
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(1, 33).flipX()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+    ).addBox(new Vector3(-8 / 16.0, 1 / 16.0, -5 / 16.0), new Vector3(-4 / 16.0, 3 / 16.0, -3 / 16.0), box ->
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(27, 0)
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+    ).addBox(new Vector3(-8 / 16.0, 3 / 16.0, -5 / 16.0), new Vector3(-6 / 16.0, 5 / 16.0, -3 / 16.0), box ->
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(39, 0)
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+    ).addBox(new Vector3(4 / 16.0, 1 / 16.0, -5 / 16.0), new Vector3(8 / 16.0, 3 / 16.0, -3 / 16.0), box ->
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(27, 0).flipX()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+    ).addBox(new Vector3(6 / 16.0, 3 / 16.0, -5 / 16.0), new Vector3(8 / 16.0, 5 / 16.0, -3 / 16.0), box ->
+      box.forTextureSize(Texture.cow, 64, 64).atUVCoordinates(39, 0).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
     ).toQuads();
 
@@ -61,6 +124,7 @@ public class CowEntity extends Entity implements Poseable {
 
   private double scale = 1;
   private double headScale = 1;
+  private String variant = "minecraft:temperate";
 
   private static final String[] partNames = {"all", "head", "body", "front_left_leg", "front_right_leg", "back_left_leg", "back_right_leg"};
 
@@ -80,6 +144,8 @@ public class CowEntity extends Entity implements Poseable {
     pose = new JsonObject();
     pose.add("all", JsonUtil.vec3ToJson(new Vector3(0, QuickMath.degToRad(180 - yaw), 0)));
     pose.add("head", JsonUtil.vec3ToJson(new Vector3(QuickMath.degToRad(pitch), 0, 0)));
+
+    this.variant = tag.get("variant").stringValue("minecraft:temperate");
   }
 
   public CowEntity(JsonObject json) {
@@ -87,13 +153,19 @@ public class CowEntity extends Entity implements Poseable {
     this.scale = json.get("scale").asDouble(1);
     this.headScale = json.get("headScale").asDouble(1);
     this.pose = json.get("pose").object();
+    this.variant = json.get("variant").stringValue("minecraft:temperate");
   }
 
   @Override
   public Collection<Primitive> primitives(Vector3 offset) {
     ArrayList<Primitive> faces = new ArrayList<>();
 
-    TextureMaterial skinMaterial = new TextureMaterial(Texture.cow);
+    TextureMaterial skinMaterial = switch (variant) {
+      case "minecraft:cold" -> new TextureMaterial(Texture.cold_cow);
+      case "minecraft:warm" -> new TextureMaterial(Texture.warm_cow);
+      // "minecraft:temperate" covered by default
+      default -> new TextureMaterial(Texture.cow);
+    };
 
     Vector3 allPose = JsonUtil.vec3FromJsonArray(pose.get("all"));
     Vector3 bodyPose = JsonUtil.vec3FromJsonArray(pose.get("body"));
@@ -119,6 +191,18 @@ public class CowEntity extends Entity implements Poseable {
       .chain(worldTransform);
     for (Quad quad : body) {
       quad.addTriangles(faces, skinMaterial, transform);
+    }
+
+    if (variant.equals("minecraft:cold")) {
+      transform = Transform.NONE
+        .rotateX(bodyPose.x)
+        .rotateY(bodyPose.y)
+        .rotateZ(bodyPose.z)
+        .translate(0, 17 / 16.0, 1 / 16.0)
+        .chain(worldTransform);
+      for (Quad quad : cold_wool) {
+        quad.addTriangles(faces, skinMaterial, transform);
+      }
     }
 
     transform = Transform.NONE
@@ -168,8 +252,23 @@ public class CowEntity extends Entity implements Poseable {
       .scale(headScale)
       .translate(0, 20 / 16.0, -8 / 16.0)
       .chain(worldTransform);
-    for (Quad quad : head) {
-      quad.addTriangles(faces, skinMaterial, transform);
+    switch (variant) {
+      case "minecraft:cold" -> {
+        for (Quad quad : cold_head) {
+          quad.addTriangles(faces, skinMaterial, transform);
+        }
+      }
+      case "minecraft:warm" -> {
+        for (Quad quad : warm_head) {
+          quad.addTriangles(faces, skinMaterial, transform);
+        }
+      }
+      // "minecraft:temperate" covered by default
+      default -> {
+        for (Quad quad : temperate_head) {
+          quad.addTriangles(faces, skinMaterial, transform);
+        }
+      }
     }
 
     return faces;
@@ -183,6 +282,7 @@ public class CowEntity extends Entity implements Poseable {
     json.add("scale", getScale());
     json.add("headScale", headScale);
     json.add("pose", pose);
+    json.add("variant", variant);
 
     return json;
   }
@@ -207,13 +307,32 @@ public class CowEntity extends Entity implements Poseable {
   }
 
   @Override
-  public void setHeadScale(double value) { headScale = value; }
+  public void setHeadScale(double value) {
+    headScale = value;
+  }
 
   @Override
-  public double getHeadScale() { return headScale; }
+  public double getHeadScale() {
+    return headScale;
+  }
 
   @Override
   public JsonObject getPose() {
     return pose;
+  }
+
+  @Override
+  public String[] variants() {
+    return new String[]{"minecraft:temperate", "minecraft:cold", "minecraft:warm"};
+  }
+
+  @Override
+  public String getVariant() {
+    return variant;
+  }
+
+  @Override
+  public void setVariant(String variant) {
+    this.variant = variant;
   }
 }

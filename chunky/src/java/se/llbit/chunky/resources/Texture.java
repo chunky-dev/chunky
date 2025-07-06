@@ -527,8 +527,12 @@ public class Texture {
   public static final EntityTexture sheep = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/sheep/sheep_fur")
   public static final EntityTexture sheepFur = new EntityTexture();
-  @TexturePath("assets/minecraft/textures/entity/cow/cow")
+  @TexturePath("assets/minecraft/textures/entity/cow/temperate_cow")
   public static final EntityTexture cow = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/cow/cold_cow")
+  public static final EntityTexture cold_cow = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/cow/warm_cow")
+  public static final EntityTexture warm_cow = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/chicken")
   public static final EntityTexture chicken = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/pig/pig")
