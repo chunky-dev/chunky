@@ -525,26 +525,28 @@ public class Texture {
   public static final EntityTexture book = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/sheep/sheep")
   public static final EntityTexture sheep = new EntityTexture();
-  @TexturePath("assets/minecraft/textures/entity/sheep/sheep_fur")
+  @TexturePath("assets/minecraft/textures/entity/sheep/sheep_wool")
   public static final EntityTexture sheepFur = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/sheep/sheep_wool_undercoat")
+  public static final EntityTexture sheepUndercoat = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/cow/temperate_cow")
   public static final EntityTexture cow = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/cow/cold_cow")
-  public static final EntityTexture cold_cow = new EntityTexture();
+  public static final EntityTexture coldCow = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/cow/warm_cow")
-  public static final EntityTexture warm_cow = new EntityTexture();
+  public static final EntityTexture warmCow = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/chicken/temperate_chicken")
   public static final EntityTexture chicken = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/chicken/cold_chicken")
-  public static final EntityTexture cold_chicken = new EntityTexture();
+  public static final EntityTexture coldChicken = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/chicken/warm_chicken")
-  public static final EntityTexture warm_chicken = new EntityTexture();
+  public static final EntityTexture warmChicken = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/pig/temperate_pig")
   public static final EntityTexture pig = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/pig/cold_pig")
-  public static final EntityTexture cold_pig = new EntityTexture();
+  public static final EntityTexture coldPig = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/pig/warm_pig")
-  public static final EntityTexture warm_pig = new EntityTexture();
+  public static final EntityTexture warmPig = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/equipment/pig_saddle/saddle")
   public static final EntityTexture pigSaddle = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/cow/brown_mooshroom")

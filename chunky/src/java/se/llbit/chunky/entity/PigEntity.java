@@ -114,8 +114,8 @@ public class PigEntity extends Entity implements Poseable, Variant, Saddleable {
 
     TextureMaterial saddleMaterial = new TextureMaterial(Texture.pigSaddle);
     TextureMaterial skinMaterial = switch (variant) {
-      case "minecraft:cold" -> new TextureMaterial(Texture.cold_pig);
-      case "minecraft:warm" -> new TextureMaterial(Texture.warm_pig);
+      case "minecraft:cold" -> new TextureMaterial(Texture.coldPig);
+      case "minecraft:warm" -> new TextureMaterial(Texture.warmPig);
       // temperate covered under default
       default -> new TextureMaterial(Texture.pig);
     };

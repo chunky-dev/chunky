@@ -122,8 +122,8 @@ public class ChickenEntity extends Entity implements Poseable, Variant {
     ArrayList<Primitive> faces = new ArrayList<>();
 
     TextureMaterial skinMaterial = switch (variant) {
-      case "minecraft:cold" -> new TextureMaterial(Texture.cold_chicken);
-      case "minecraft:warm" -> new TextureMaterial(Texture.warm_chicken);
+      case "minecraft:cold" -> new TextureMaterial(Texture.coldChicken);
+      case "minecraft:warm" -> new TextureMaterial(Texture.warmChicken);
       default -> new TextureMaterial(Texture.chicken);
     };
 

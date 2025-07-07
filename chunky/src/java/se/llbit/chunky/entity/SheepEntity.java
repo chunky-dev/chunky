@@ -10,6 +10,7 @@ import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
+import se.llbit.math.Ray;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.primitive.Primitive;
@@ -79,7 +80,7 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
           .translate(-0.5, -0.5, -0.5)
           .translate(0, 0, 0.6 / 16.0)
         )
-      ).toQuads();
+    ).toQuads();
 
   private final JsonObject pose;
 
@@ -128,6 +129,12 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
     ArrayList<Primitive> faces = new ArrayList<>();
 
     TextureMaterial skinMaterial = new TextureMaterial(Texture.sheep);
+    DyedTextureMaterial undercoatMaterial = new DyedTextureMaterial(materialFur.getColorInt(), Texture.sheepUndercoat);
+    undercoatMaterial.emittance = materialFur.emittance;
+    undercoatMaterial.specular = materialFur.specular;
+    undercoatMaterial.ior = materialFur.ior;
+    undercoatMaterial.roughness = materialFur.roughness;
+    undercoatMaterial.metalness = materialFur.metalness;
 
     Vector3 allPose = JsonUtil.vec3FromJsonArray(pose.get("all"));
     Vector3 bodyPose = JsonUtil.vec3FromJsonArray(pose.get("body"));
@@ -206,7 +213,82 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
       quad.addTriangles(faces, skinMaterial, transform);
     }
 
-    if(!sheared) {
+    double inflateOffset = 1.0 + Ray.OFFSET;
+
+    if (sheared) {
+      // The sheared overlay needs some specific translations and scaling to prevent z-fighting because of their rotation points.
+      transform = Transform.NONE
+        .scale(inflateOffset)
+        .rotateX(bodyPose.x)
+        .rotateY(bodyPose.y)
+        .rotateZ(bodyPose.z)
+        .translate(0, 15 / 16.0, 0)
+        .chain(worldTransform);
+      for (Quad quad : body) {
+        quad.addTriangles(faces, undercoatMaterial, transform);
+      }
+
+      transform = Transform.NONE
+        .translate(0, Ray.OFFSET, 0)
+        .scale(inflateOffset)
+        .rotateX(frontRightLegPose.x)
+        .rotateY(frontRightLegPose.y)
+        .rotateZ(frontRightLegPose.z)
+        .translate(3 / 16.0, 12 / 16.0, -5 / 16.0)
+        .chain(worldTransform);
+      for (Quad quad : leg) {
+        quad.addTriangles(faces, undercoatMaterial, transform);
+      }
+
+      transform = Transform.NONE
+        .translate(0, Ray.OFFSET, 0)
+        .scale(inflateOffset)
+        .rotateX(frontLeftLegPose.x)
+        .rotateY(frontLeftLegPose.y)
+        .rotateZ(frontLeftLegPose.z)
+        .translate(-3 / 16.0, 12 / 16.0, -5 / 16.0)
+        .chain(worldTransform);
+      for (Quad quad : leg) {
+        quad.addTriangles(faces, undercoatMaterial, transform);
+      }
+
+      transform = Transform.NONE
+        .translate(0, Ray.OFFSET, 0)
+        .scale(inflateOffset)
+        .rotateX(backRightLegPose.x)
+        .rotateY(backRightLegPose.y)
+        .rotateZ(backRightLegPose.z)
+        .translate(3 / 16.0, 12 / 16.0, 7 / 16.0)
+        .chain(worldTransform);
+      for (Quad quad : leg) {
+        quad.addTriangles(faces, undercoatMaterial, transform);
+      }
+
+      transform = Transform.NONE
+        .translate(0, Ray.OFFSET, 0)
+        .scale(inflateOffset)
+        .rotateX(backLeftLegPose.x)
+        .rotateY(backLeftLegPose.y)
+        .rotateZ(backLeftLegPose.z)
+        .translate(-3 / 16.0, 12 / 16.0, 7 / 16.0)
+        .chain(worldTransform);
+      for (Quad quad : leg) {
+        quad.addTriangles(faces, undercoatMaterial, transform);
+      }
+
+      transform = Transform.NONE
+        .translate(0, 0, Ray.OFFSET)
+        .scale(inflateOffset)
+        .rotateX(headPose.x)
+        .rotateY(headPose.y)
+        .rotateZ(headPose.z)
+        .scale(headScale)
+        .translate(0, 19 / 16.0, -6 / 16.0)
+        .chain(worldTransform);
+      for (Quad quad : head) {
+        quad.addTriangles(faces, undercoatMaterial, transform);
+      }
+    } else {
       transform = Transform.NONE
         .rotateX(frontRightLegPose.x)
         .rotateY(frontRightLegPose.y)
@@ -309,10 +391,14 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
   }
 
   @Override
-  public void setHeadScale(double value) { headScale = value; }
+  public void setHeadScale(double value) {
+    headScale = value;
+  }
 
   @Override
-  public double getHeadScale() { return headScale; }
+  public double getHeadScale() {
+    return headScale;
+  }
 
   @Override
   public JsonObject getPose() {
@@ -320,5 +406,7 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
   }
 
   @Override
-  public DyedTextureMaterial getMaterial() { return materialFur; }
+  public DyedTextureMaterial getMaterial() {
+    return materialFur;
+  }
 }

@@ -161,8 +161,8 @@ public class CowEntity extends Entity implements Poseable, Variant {
     ArrayList<Primitive> faces = new ArrayList<>();
 
     TextureMaterial skinMaterial = switch (variant) {
-      case "minecraft:cold" -> new TextureMaterial(Texture.cold_cow);
-      case "minecraft:warm" -> new TextureMaterial(Texture.warm_cow);
+      case "minecraft:cold" -> new TextureMaterial(Texture.coldCow);
+      case "minecraft:warm" -> new TextureMaterial(Texture.warmCow);
       // "minecraft:temperate" covered by default
       default -> new TextureMaterial(Texture.cow);
     };
