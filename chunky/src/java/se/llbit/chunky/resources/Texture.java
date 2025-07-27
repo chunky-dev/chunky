@@ -1577,6 +1577,10 @@ public class Texture {
   public static final Texture creakingHeartDormant = new Texture();
   @TexturePath("assets/minecraft/textures/block/creaking_heart_top_dormant")
   public static final Texture creakingHeartTopDormant = new Texture();
+  @TexturePath("assets/minecraft/textures/block/wildflowers")
+  public static final Texture wildflowers = new Texture();
+  @TexturePath("assets/minecraft/textures/block/wildflowers_stem")
+  public static final Texture wildflowersStem = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

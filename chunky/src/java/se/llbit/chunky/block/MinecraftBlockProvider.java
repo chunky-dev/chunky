@@ -1180,6 +1180,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       BlockProvider.facing(tag, "north"),
       BlockProvider.stringToInt(tag.get("Properties").get("segment_amount"), 1)
     ));
+    addBlock("wildflowers", (name, tag) -> new Wildflowers(name, BlockProvider.stringToInt(tag.get("Properties").get("flower_amount"), 1), BlockProvider.facing(tag)));
   }
 
   @Override
