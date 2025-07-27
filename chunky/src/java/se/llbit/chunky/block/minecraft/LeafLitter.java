@@ -15,7 +15,7 @@ public class LeafLitter extends AbstractModelBlock {
 
   @Override
   public int getMapColor() {
-    return 0xFF7B5334;
+    return 0xAA7B5334;
   }
 
   @Override
