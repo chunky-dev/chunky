@@ -1181,6 +1181,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       BlockProvider.stringToInt(tag.get("Properties").get("segment_amount"), 1)
     ));
     addBlock("wildflowers", (name, tag) -> new Wildflowers(name, BlockProvider.stringToInt(tag.get("Properties").get("flower_amount"), 1), BlockProvider.facing(tag)));
+    addBlock("bush", (name, tag) -> new Bush());
+    addBlock("firefly_bush", (name, tag) -> new FireflyBush());
   }
 
   @Override

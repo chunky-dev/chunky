@@ -1581,6 +1581,12 @@ public class Texture {
   public static final Texture wildflowers = new Texture();
   @TexturePath("assets/minecraft/textures/block/wildflowers_stem")
   public static final Texture wildflowersStem = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bush")
+  public static final Texture bush = new Texture();
+  @TexturePath("assets/minecraft/textures/block/firefly_bush")
+  public static final Texture fireflyBush = new Texture();
+  @TexturePath("assets/minecraft/textures/block/firefly_bush_emissive")
+  public static final Texture fireflyBushEmissive = new AnimatedTexture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
