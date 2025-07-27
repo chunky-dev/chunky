@@ -17,6 +17,7 @@
 package se.llbit.chunky.world;
 
 import se.llbit.chunky.block.minecraft.Candle;
+import se.llbit.chunky.block.minecraft.FireflyBush;
 import se.llbit.chunky.block.minecraft.OpenEyeblossom;
 import se.llbit.chunky.entity.CalibratedSculkSensorAmethyst;
 import se.llbit.chunky.entity.Campfire;
@@ -41,6 +42,7 @@ public class ExtraMaterials {
     idMap.put("spore_blossom (base)", SporeBlossom.baseMaterial);
     idMap.put("spore_blossom (blossom)", SporeBlossom.blossomMaterial);
     idMap.put("open_eyeblossom (emissive)", OpenEyeblossom.emissiveMaterial);
+    idMap.put("firefly_bush (emissive)", FireflyBush.emissiveMaterial);
   }
 
   public static void loadDefaultMaterialProperties() {
@@ -65,5 +67,8 @@ public class ExtraMaterials {
 
     OpenEyeblossom.emissiveMaterial.restoreDefaults();
     OpenEyeblossom.emissiveMaterial.emittance = 1.0f / 15;
+
+    FireflyBush.emissiveMaterial.restoreDefaults();
+    FireflyBush.emissiveMaterial.emittance = 1.0f / 15;
   }
 }

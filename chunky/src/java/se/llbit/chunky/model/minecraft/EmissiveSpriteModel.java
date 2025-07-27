@@ -1,27 +1,32 @@
 package se.llbit.chunky.model.minecraft;
 
-import se.llbit.chunky.block.minecraft.OpenEyeblossom;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 
-import java.util.Arrays;
-
-public class OpenEyeblossomModel extends QuadModel {
+public class EmissiveSpriteModel extends QuadModel {
   private static final Quad[] quads;
-  private static final Texture[] textures;
+  private final Texture[] textures;
 
   static {
-    SpriteModel base = new SpriteModel(Texture.openEyeblossom, "up");
-    SpriteModel emissive = new SpriteModel(Texture.openEyeblossomEmissive, "up");
+    SpriteModel sprite = new SpriteModel(Texture.unknown, "up");
+    quads = Model.join(sprite.getQuads(), sprite.getQuads());
+  }
 
-    quads = Model.join(base.getQuads(), emissive.getQuads());
-    textures = Arrays.copyOf(base.getTextures(), base.getTextures().length + emissive.getTextures().length);
-    System.arraycopy(emissive.getTextures(), 0, textures, base.getTextures().length, emissive.getTextures().length);
+  private final TextureMaterial emissiveMaterial;
+
+  public EmissiveSpriteModel(Texture texture, TextureMaterial emissiveMaterial) {
+    this.emissiveMaterial = emissiveMaterial;
+    textures = new Texture[quads.length];
+    for (int i = 0; i < quads.length / 2; i++) {
+      textures[i] = emissiveMaterial.texture;
+      textures[i + quads.length / 2] = texture;
+    }
   }
 
   @Override
@@ -58,8 +63,8 @@ public class OpenEyeblossomModel extends QuadModel {
           else
             ray.setNormal(quad.n);
           hit = true;
-          if (textures[i] == Texture.openEyeblossomEmissive) {
-            ray.setCurrentMaterial(OpenEyeblossom.emissiveMaterial);
+          if (i < quads.length / 2) {
+            ray.setCurrentMaterial(emissiveMaterial);
           }
         }
       }
