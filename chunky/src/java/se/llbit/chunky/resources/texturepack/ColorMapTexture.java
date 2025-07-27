@@ -23,31 +23,44 @@ import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class GrassColorTexture extends TextureLoader {
+public class ColorMapTexture extends TextureLoader {
   private final String file;
+  private final Type type;
 
-  public GrassColorTexture(String file) {
+  public ColorMapTexture(String file, Type type) {
     this.file = file;
+    this.type = type;
   }
 
   @Override
   protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
-    BitmapImage grassColor = ImageLoader.read(imageStream);
-    if (grassColor.width != 256 || grassColor.height != 256) {
-      throw new TextureFormatError("Grass color texture must be 256 by 256 pixels!");
+    BitmapImage colorMap = ImageLoader.read(imageStream);
+    if (colorMap.width != 256 || colorMap.height != 256) {
+      throw new TextureFormatError("Color map texture must be 256 by 256 pixels");
     }
-    Biomes.loadGrassColors(grassColor);
+    if (this.type == Type.GRASS) {
+      Biomes.loadGrassColors(colorMap);
+    } else if (this.type == Type.FOLIAGE) {
+      Biomes.loadFoliageColors(colorMap);
+    } else if (this.type == Type.DRY_FOLIAGE) {
+      Biomes.loadDryFoliageColors(colorMap);
+    }
     return true;
   }
 
   @Override
   public boolean load(LayeredResourcePacks texturePack) {
     return load(file, texturePack);
+  }
+
+  public enum Type {
+    GRASS,
+    FOLIAGE,
+    DRY_FOLIAGE
   }
 }
 

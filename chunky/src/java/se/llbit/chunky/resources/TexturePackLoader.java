@@ -109,13 +109,15 @@ public class TexturePackLoader {
         // MC 1.6
         new CloudsTexture("environment/clouds")));
     ALL_TEXTURES.put("grass color map", new AlternateTextures(
-        new GrassColorTexture("assets/minecraft/textures/colormap/grass"),
+        new ColorMapTexture("assets/minecraft/textures/colormap/grass", ColorMapTexture.Type.GRASS),
         // MC 1.6
-        new GrassColorTexture("misc/grasscolor")));
+        new ColorMapTexture("misc/grasscolor", ColorMapTexture.Type.GRASS)));
     ALL_TEXTURES.put("foliage color map", new AlternateTextures(
-        new FoliageColorTexture("assets/minecraft/textures/colormap/foliage"),
+        new ColorMapTexture("assets/minecraft/textures/colormap/foliage", ColorMapTexture.Type.FOLIAGE),
         // MC 1.6
-        new FoliageColorTexture("misc/foliagecolor")));
+        new ColorMapTexture("misc/foliagecolor", ColorMapTexture.Type.FOLIAGE)));
+    ALL_TEXTURES.put("dry foliage color map",
+      new ColorMapTexture("assets/minecraft/textures/colormap/dry_foliage", ColorMapTexture.Type.DRY_FOLIAGE));
 
     ALL_TEXTURES.put("grass_top", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/grass_block_top", Texture.grassTop),

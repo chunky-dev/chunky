@@ -273,6 +273,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private BiomeStructure grassTexture;
   private BiomeStructure foliageTexture;
+  private BiomeStructure dryFoliageTexture;
   private BiomeStructure waterTexture;
 
   /** This is the 8-bit channel frame buffer. */
@@ -413,6 +414,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       grassTexture = other.grassTexture;
       foliageTexture = other.foliageTexture;
+      dryFoliageTexture = other.dryFoliageTexture;
       waterTexture = other.waterTexture;
       origin.set(other.origin);
       yMin = other.yMin;
@@ -809,6 +811,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       grassTexture = biomeStructureFactory.create();
       foliageTexture = biomeStructureFactory.create();
+      dryFoliageTexture = biomeStructureFactory.create();
       waterTexture = biomeStructureFactory.create();
 
       if(emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
@@ -1271,6 +1274,7 @@ public class Scene implements JsonSerializable, Refreshable {
                     nonEmptyChunks,
                     grassTexture,
                     foliageTexture,
+                    dryFoliageTexture,
                     waterTexture);
                   nextY = transition - biomeBlendingRadius;
                 }
@@ -1296,6 +1300,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   nonEmptyChunks,
                   grassTexture,
                   foliageTexture,
+                  dryFoliageTexture,
                   waterTexture);
                 nextY = maxYWorkedOnClamped + 1;
               }
@@ -1313,10 +1318,22 @@ public class Scene implements JsonSerializable, Refreshable {
                   nonEmptyChunks,
                   grassTexture,
                   foliageTexture,
+                  dryFoliageTexture,
                   waterTexture);
               }
             } else {
-              BiomeBlendingUtility.chunk2DBlur(cp, biomeBlendingRadius, 0, 1, origin, biomePaletteIdxStructure, biomePalette, nonEmptyChunks, grassTexture, foliageTexture, waterTexture);
+              BiomeBlendingUtility.chunk2DBlur(
+                cp,
+                biomeBlendingRadius,
+                0, 1,
+                origin,
+                biomePaletteIdxStructure,
+                biomePalette,
+                nonEmptyChunks,
+                grassTexture,
+                foliageTexture,
+                dryFoliageTexture,
+                waterTexture);
             }
           } else {
             if(use3dBiomes) {
@@ -1333,6 +1350,7 @@ public class Scene implements JsonSerializable, Refreshable {
                       Biome biome = biomePalette.get(id);
                       grassTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.grassColorLinear);
                       foliageTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.foliageColorLinear);
+                      dryFoliageTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.dryFoliageColorLinear);
                       waterTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.waterColorLinear);
                     }
                   }
@@ -1349,6 +1367,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
                   grassTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.grassColorLinear);
                   foliageTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.foliageColorLinear);
+                  dryFoliageTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.dryFoliageColorLinear);
                   waterTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.waterColorLinear);
                 }
               }
@@ -1365,6 +1384,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
         grassTexture.compact();
         foliageTexture.compact();
+        dryFoliageTexture.compact();
         waterTexture.compact();
       }
 
@@ -1373,6 +1393,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       grassTexture.endFinalization();
       foliageTexture.endFinalization();
+      dryFoliageTexture.endFinalization();
       waterTexture.endFinalization();
     }
 
@@ -2124,8 +2145,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       boolean saved = false;
       try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new GZIPOutputStream(ioContext.getSceneFileOutputStream(fileName))))) {
-        OctreeFileFormat.store(out, worldOctree, waterOctree, palette,
-            grassTexture, foliageTexture, waterTexture);
+        OctreeFileFormat.store(out, worldOctree, waterOctree, palette, grassTexture, foliageTexture, dryFoliageTexture, waterTexture);
         saved = true;
 
         task.update(2);
@@ -2198,6 +2218,7 @@ public class Scene implements JsonSerializable, Refreshable {
         waterOctree = data.waterTree;
         grassTexture = data.grassColors;
         foliageTexture = data.foliageColors;
+        dryFoliageTexture = data.dryFoliageColors;
         waterTexture = data.waterColors;
         if (waterTexture == null) {
           // this dump is so old that it doesn't contain a water texture (Chunky 2.3.0, #691)
@@ -2398,6 +2419,21 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
     return Biomes.biomesPrePalette[0].foliageColorLinear;
+  }
+
+  /**
+   * @param x X coordinate in octree space
+   * @param z Z coordinate in octree space
+   * @return Foliage color for the given coordinates
+   */
+  public float[] getDryFoliageColor(int x, int y, int z) {
+    if (biomeColors) {
+      float[] color = dryFoliageTexture.get(x, y, z);
+      if (color != null) {
+        return color;
+      }
+    }
+    return Biomes.biomesPrePalette[0].dryFoliageColorLinear;
   }
 
   /**

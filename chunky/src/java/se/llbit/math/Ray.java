@@ -245,6 +245,13 @@ public class Ray {
   }
 
   /**
+   * @return foliage color for the current block
+   */
+  public float[] getBiomeDryFoliageColor(Scene scene) {
+    return scene.getDryFoliageColor((int) (o.x + d.x * OFFSET), (int) (o.y + d.y * OFFSET), (int) (o.z + d.z * OFFSET));
+  }
+
+  /**
    * @return grass color for the current block
    */
   public float[] getBiomeGrassColor(Scene scene) {

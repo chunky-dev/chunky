@@ -12,7 +12,8 @@ public class Tint {
     CONSTANT,
     BIOME_FOLIAGE,
     BIOME_GRASS,
-    BIOME_WATER
+    BIOME_WATER,
+    BIOME_DRY_FOLIAGE
   }
 
   /**
@@ -20,6 +21,7 @@ public class Tint {
    */
   public static final Tint NONE = new Tint(TintType.NONE);
   public static final Tint BIOME_FOLIAGE = new Tint(TintType.BIOME_FOLIAGE);
+  public static final Tint BIOME_DRY_FOLIAGE = new Tint(TintType.BIOME_DRY_FOLIAGE);
   public static final Tint BIOME_GRASS = new Tint(TintType.BIOME_GRASS);
   public static final Tint BIOME_WATER = new Tint(TintType.BIOME_WATER);
 
@@ -65,6 +67,8 @@ public class Tint {
         return this.tint;
       case BIOME_FOLIAGE:
         return ray.getBiomeFoliageColor(scene);
+      case BIOME_DRY_FOLIAGE:
+        return ray.getBiomeDryFoliageColor(scene);
       case BIOME_GRASS:
         return ray.getBiomeGrassColor(scene);
       case BIOME_WATER:
@@ -100,6 +104,7 @@ public class Tint {
   }
 
   public boolean isBiomeTint() {
-    return type == TintType.BIOME_FOLIAGE || type == TintType.BIOME_GRASS || type == TintType.BIOME_WATER;
+    return type == TintType.BIOME_FOLIAGE || type == TintType.BIOME_DRY_FOLIAGE ||
+      type == TintType.BIOME_GRASS || type == TintType.BIOME_WATER;
   }
 }

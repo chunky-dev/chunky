@@ -1171,6 +1171,12 @@ public class MinecraftBlockProvider implements BlockProvider {
       tag.get("Properties").get("west").stringValue("false").equals("true"),
       tag.get("Properties").get("up").stringValue("false").equals("true"),
       tag.get("Properties").get("down").stringValue("false").equals("true")));
+
+    // 1.21.5 (Spring to Life drop)
+    addBlock("leaf_litter", (name, tag) -> new LeafLitter(
+      BlockProvider.facing(tag, "north"),
+      BlockProvider.stringToInt(tag.get("Properties").get("segment_amount"), 1)
+    ));
   }
 
   @Override
