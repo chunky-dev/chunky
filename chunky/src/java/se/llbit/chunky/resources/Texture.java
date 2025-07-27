@@ -1587,6 +1587,12 @@ public class Texture {
   public static final Texture fireflyBush = new Texture();
   @TexturePath("assets/minecraft/textures/block/firefly_bush_emissive")
   public static final Texture fireflyBushEmissive = new AnimatedTexture();
+  @TexturePath("assets/minecraft/textures/block/cactus_flower")
+  public static final Texture cactusFlower = new Texture();
+  @TexturePath("assets/minecraft/textures/block/short_dry_grass")
+  public static final Texture shortDryGrass = new Texture();
+  @TexturePath("assets/minecraft/textures/block/tall_dry_grass")
+  public static final Texture tallDryGrass = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

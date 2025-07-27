@@ -6,6 +6,7 @@ import se.llbit.chunky.block.minecraft.Tripwire;
 import se.llbit.chunky.block.minecraft.*;
 import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.chunky.entity.SkullEntity;
+import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.model.minecraft.FlowerPotModel;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
@@ -1181,8 +1182,11 @@ public class MinecraftBlockProvider implements BlockProvider {
       BlockProvider.stringToInt(tag.get("Properties").get("segment_amount"), 1)
     ));
     addBlock("wildflowers", (name, tag) -> new Wildflowers(name, BlockProvider.stringToInt(tag.get("Properties").get("flower_amount"), 1), BlockProvider.facing(tag)));
-    addBlock("bush", (name, tag) -> new Bush());
+    addBlock("bush", (name, tag) -> new TintedSpriteBlock(name, Texture.bush, Tint.BIOME_GRASS));
     addBlock("firefly_bush", (name, tag) -> new FireflyBush());
+    addBlock("cactus_flower", (name, tag) -> new SpriteBlock(name, Texture.cactusFlower));
+    addBlock("short_dry_grass", (name, tag) -> new TintedSpriteBlock(name, Texture.shortDryGrass, Tint.BIOME_DRY_FOLIAGE));
+    addBlock("tall_dry_grass", (name, tag) -> new TintedSpriteBlock(name, Texture.tallDryGrass, Tint.BIOME_DRY_FOLIAGE));
   }
 
   @Override
