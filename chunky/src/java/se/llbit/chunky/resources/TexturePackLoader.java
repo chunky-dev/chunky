@@ -3654,7 +3654,16 @@ public class TexturePackLoader {
     TexturePath path = textureField.getAnnotation(TexturePath.class);
     if (path != null) {
       try {
-        addSimpleTexture(path.value(), (Texture) textureField.get(Texture.class));
+        if (path.alternatives().length > 0) {
+          TextureLoader[] loaders = new TextureLoader[path.alternatives().length + 1];
+          loaders[0] = new SimpleTexture(path.value(), (Texture) textureField.get(Texture.class));
+          for (int i = 0; i < path.alternatives().length; i++) {
+            loaders[i + 1] = new SimpleTexture(path.alternatives()[i], (Texture) textureField.get(Texture.class));
+          }
+          ALL_TEXTURES.put(path.value(), new AlternateTextures(loaders));
+        } else {
+          addSimpleTexture(path.value(), (Texture) textureField.get(Texture.class));
+        }
       } catch (IllegalAccessException e) {
         throw new RuntimeException("Could not get texture field for " + path.value(), e);
       }

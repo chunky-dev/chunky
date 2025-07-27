@@ -1153,7 +1153,10 @@ public class MinecraftBlockProvider implements BlockProvider {
       tag.get("Properties").get("west").stringValue("none")));
     addBlock("creaking_heart", (name, tag) -> new CreakingHeart(name,
       tag.get("Properties").get("axis").stringValue("y"),
-      tag.get("Properties").get("active").stringValue("false").equals("true")));
+      tag.get("Properties").get("creaking_heart_state").stringValue(
+        // pre 25w02a compatibility (active => awake, not active => uprooted)
+        tag.get("Properties").get("active").stringValue("false").equals("true") ? "awake" : "uprooted"
+      )));
     addBlock("chiseled_resin_bricks", Texture.chiseledResinBricks);
     addBlock("closed_eyeblossom", (name, tag) -> new SpriteBlock(name, Texture.closedEyeblossom));
     addBlock("open_eyeblossom", (name, tag) -> new OpenEyeblossom());
