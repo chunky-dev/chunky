@@ -33,9 +33,10 @@ public class BiomeBuilder {
     return this;
   }
 
-  public BiomeBuilder defaultColors(int grassColor, int foliageColor) {
+  public BiomeBuilder defaultColors(int grassColor, int foliageColor, int dryFoliageColor) {
     this.grassColor = grassColor;
     this.foliageColor = foliageColor;
+    this.dryFoliageColor = dryFoliageColor;
     return this;
   }
 
