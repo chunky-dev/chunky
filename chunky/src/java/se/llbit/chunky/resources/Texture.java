@@ -1552,10 +1552,10 @@ public class Texture {
   public static final Texture creakingHeart = new Texture();
   @TexturePath("assets/minecraft/textures/block/creaking_heart_top")
   public static final Texture creakingHeartTop = new Texture();
-  @TexturePath("assets/minecraft/textures/block/creaking_heart_active")
-  public static final Texture creakingHeartActive = new Texture();
-  @TexturePath("assets/minecraft/textures/block/creaking_heart_top_active")
-  public static final Texture creakingHeartTopActive = new Texture();
+  @TexturePath(value = "assets/minecraft/textures/block/creaking_heart_awake", alternatives = { "assets/minecraft/textures/block/creaking_heart_active" })
+  public static final Texture creakingHeartAwake = new Texture();
+  @TexturePath(value = "assets/minecraft/textures/block/creaking_heart_top_awake", alternatives = { "assets/minecraft/textures/block/creaking_heart_top_active" })
+  public static final Texture creakingHeartTopAwake = new Texture();
   @TexturePath("assets/minecraft/textures/block/chiseled_resin_bricks")
   public static final Texture chiseledResinBricks = new Texture();
   @TexturePath("assets/minecraft/textures/block/closed_eyeblossom")
@@ -1573,6 +1573,14 @@ public class Texture {
 
   @TexturePath("assets/minecraft/textures/block/leaf_litter")
   public static final Texture leafLitter = new Texture();
+  @TexturePath("assets/minecraft/textures/block/creaking_heart_dormant")
+  public static final Texture creakingHeartDormant = new Texture();
+  @TexturePath("assets/minecraft/textures/block/creaking_heart_top_dormant")
+  public static final Texture creakingHeartTopDormant = new Texture();
+  @TexturePath("assets/minecraft/textures/block/wildflowers")
+  public static final Texture wildflowers = new Texture();
+  @TexturePath("assets/minecraft/textures/block/wildflowers_stem")
+  public static final Texture wildflowersStem = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
