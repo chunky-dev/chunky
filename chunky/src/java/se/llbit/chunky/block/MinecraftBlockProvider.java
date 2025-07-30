@@ -1377,9 +1377,9 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new SpriteBlock(name, Texture.cobweb);
       case "grass":
       case "short_grass": // since 1.20.3-pre2
-        return new Grass();
+        return new TintedSpriteBlock(name, Texture.tallGrass, Tint.BIOME_GRASS);
       case "fern":
-        return new Fern();
+        return new TintedSpriteBlock(name, Texture.fern, Tint.BIOME_GRASS);
       case "dead_bush":
         return new SpriteBlock(name, Texture.deadBush);
       case "seagrass":
@@ -2372,7 +2372,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "redstone_wire":
         return redstoneWire(tag);
       case "sugar_cane":
-        return new SugarCane(); // tinted since 1.7.2 (13w36a)
+        return new TintedSpriteBlock(name, Texture.sugarCane, Tint.BIOME_GRASS); // tinted since 1.7.2 (13w36a)
       case "kelp":
         return new SpriteBlock(name, Texture.kelp);
       case "kelp_plant":
