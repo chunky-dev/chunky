@@ -1123,7 +1123,7 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/sculk_vein")
   public static final Texture sculkVein = new Texture();
 
-  //1.20
+  // [1.20]
   @TexturePath("assets/minecraft/textures/block/bamboo_planks")
   public static final Texture bambooPlanks = new Texture();
   @TexturePath("assets/minecraft/textures/block/bamboo_mosaic")
@@ -1341,6 +1341,8 @@ public class Texture {
   public static final Texture cherryHangingSign = new Texture();
   @TexturePath("assets/minecraft/textures/entity/piglin/piglin")
   public static final Texture piglin = new Texture();
+
+  // [1.21]
   @TexturePath("assets/minecraft/textures/block/polished_tuff")
   public static final Texture polishedTuff = new Texture();
   @TexturePath("assets/minecraft/textures/block/tuff_bricks")
@@ -1512,6 +1514,7 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/trial_spawner_top_ejecting_reward_ominous")
   public static final Texture trialSpawnerTopEjectingRewardOminous = new Texture();
 
+  // [1.21.4]
   @TexturePath("assets/minecraft/textures/block/pale_moss_block")
   public static final Texture paleMossBlock = new Texture();
   @TexturePath("assets/minecraft/textures/block/pale_oak_leaves")
@@ -1571,6 +1574,7 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/resin_clump")
   public static final Texture resinClump = new Texture();
 
+  // [1.21.5]
   @TexturePath("assets/minecraft/textures/block/leaf_litter")
   public static final Texture leafLitter = new Texture();
   @TexturePath("assets/minecraft/textures/block/creaking_heart_dormant")
@@ -1593,6 +1597,64 @@ public class Texture {
   public static final Texture shortDryGrass = new Texture();
   @TexturePath("assets/minecraft/textures/block/tall_dry_grass")
   public static final Texture tallDryGrass = new Texture();
+
+  // [1.21.6]
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_0_bottom")
+  public static final Texture driedGhastHydration0Bottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_1_bottom")
+  public static final Texture driedGhastHydration1Bottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_2_bottom")
+  public static final Texture driedGhastHydration2Bottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_bottom")
+  public static final Texture driedGhastHydration3Bottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_0_east")
+  public static final Texture driedGhastHydration0East = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_1_east")
+  public static final Texture driedGhastHydration1East = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_2_east")
+  public static final Texture driedGhastHydration2East = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_east")
+  public static final Texture driedGhastHydration3East = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_0_north")
+  public static final Texture driedGhastHydration0North = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_1_north")
+  public static final Texture driedGhastHydration1North = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_2_north")
+  public static final Texture driedGhastHydration2North = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_north")
+  public static final Texture driedGhastHydration3North = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_0_south")
+  public static final Texture driedGhastHydration0South = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_1_south")
+  public static final Texture driedGhastHydration1South = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_2_south")
+  public static final Texture driedGhastHydration2South = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_south")
+  public static final Texture driedGhastHydration3South = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_0_top")
+  public static final Texture driedGhastHydration0Top = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_1_top")
+  public static final Texture driedGhastHydration1Top = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_2_top")
+  public static final Texture driedGhastHydration2Top = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_top")
+  public static final Texture driedGhastHydration3Top = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_0_west")
+  public static final Texture driedGhastHydration0West = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_1_west")
+  public static final Texture driedGhastHydration1West = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_2_west")
+  public static final Texture driedGhastHydration2West = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_west")
+  public static final Texture driedGhastHydration3West = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_0_tentacles")
+  public static final Texture driedGhastHydration0Tentacles = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_1_tentacles")
+  public static final Texture driedGhastHydration1Tentacles = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_2_tentacles")
+  public static final Texture driedGhastHydration2Tentacles = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_tentacles")
+  public static final Texture driedGhastHydration3Tentacles = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
