@@ -18,18 +18,16 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.block.AbstractModelBlock;
-import se.llbit.chunky.model.GrassTintedSpriteModel;
+import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.resources.Texture;
 
-public class TallGrass extends AbstractModelBlock {
+public class TallGrass extends TintedSpriteBlock {
 
   public TallGrass(String half) {
     super("tall_grass",
-        half.equals("upper")
-            ? Texture.doubleTallGrassTop
-            : Texture.doubleTallGrassBottom);
-    solid = false;
-    model = new GrassTintedSpriteModel(texture);
+      half.equals("upper")
+        ? Texture.doubleTallGrassTop
+        : Texture.doubleTallGrassBottom,
+      Tint.BIOME_GRASS);
   }
 }

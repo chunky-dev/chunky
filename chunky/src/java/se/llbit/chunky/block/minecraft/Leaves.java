@@ -21,6 +21,7 @@ package se.llbit.chunky.block.minecraft;
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.LeafModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.biome.Biome;
 
 public class Leaves extends AbstractModelBlock {
 
@@ -34,5 +35,10 @@ public class Leaves extends AbstractModelBlock {
     super(name, texture);
     solid = false;
     this.model = new LeafModel(texture, tint);
+  }
+
+  @Override
+  public int getMapColor(Biome biome) {
+    return biome.foliageColor | 0xFF000000;
   }
 }

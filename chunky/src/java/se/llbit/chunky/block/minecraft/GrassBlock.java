@@ -21,6 +21,7 @@ package se.llbit.chunky.block.minecraft;
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.GrassBlockModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.biome.Biome;
 
 public class GrassBlock extends AbstractModelBlock {
 
@@ -29,5 +30,10 @@ public class GrassBlock extends AbstractModelBlock {
     model = new GrassBlockModel();
     opaque = true;
     solid = true;
+  }
+
+  @Override
+  public int getMapColor(Biome biome) {
+    return biome.grassColor | 0xFF000000;
   }
 }
