@@ -24,21 +24,28 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.biome.Biome;
 
 public class Leaves extends AbstractModelBlock {
+  private final int tint;
 
   public Leaves(String name, Texture texture) {
     super(name, texture);
     solid = false;
     this.model = new LeafModel(texture);
+    this.tint = -1;
   }
 
   public Leaves(String name, Texture texture, int tint) {
     super(name, texture);
     solid = false;
     this.model = new LeafModel(texture, tint);
+    this.tint = tint;
   }
 
   @Override
   public int getMapColor(Biome biome) {
+    if (this.tint >= 0) {
+      // this leave type has a blending color that is independent from the biome (eg. spruce or birch leaves)
+      return this.tint | 0xFF000000;
+    }
     return biome.foliageColor | 0xFF000000;
   }
 }
