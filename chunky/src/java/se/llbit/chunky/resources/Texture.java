@@ -1688,6 +1688,14 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_tentacles")
   public static final Texture driedGhastHydration3Tentacles = new Texture();
 
+  // [1.21.x (2025 Fall Drop)]
+  @TexturePath("assets/minecraft/textures/block/exposed_lightning_rod")
+  public static final Texture exposedLightningRod = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_lightning_rod")
+  public static final Texture oxidizedLightningRod = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_lightning_rod")
+  public static final Texture weatheredLightningRod = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 

@@ -468,7 +468,6 @@ public class MinecraftBlockProvider implements BlockProvider {
     "minecraft:exposed_cut_copper",
     "minecraft:exposed_cut_copper_slab",
     "minecraft:exposed_cut_copper_stairs",
-    "minecraft:lightning_rod",
     "minecraft:light_weighted_pressure_plate",
     "minecraft:lilac",
     "minecraft:lily_of_the_valley",
@@ -1188,6 +1187,18 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("short_dry_grass", (name, tag) -> new SpriteBlock(name, Texture.shortDryGrass));
     addBlock("tall_dry_grass", (name, tag) -> new SpriteBlock(name, Texture.tallDryGrass));
     addBlock("dried_ghast", (name, tag) -> new DriedGhast(BlockProvider.facing(tag), BlockProvider.stringToInt(tag.get("Properties").get("hydration"), 0)));
+
+    // 1.21.x (2025 Fall Drop)
+    for (String s : new String[]{"", "waxed_"}) {
+      addBlock(s + "lightning_rod", (name, tag) -> new LightningRod(name, Texture.lightningRod, BlockProvider.facing(tag, "up"),
+        tag.get("Properties").get("powered").stringValue("false").equals("true")));
+      addBlock(s + "exposed_lightning_rod", (name, tag) -> new LightningRod(name, Texture.exposedLightningRod, BlockProvider.facing(tag, "up"),
+        tag.get("Properties").get("powered").stringValue("false").equals("true")));
+      addBlock(s + "oxidized_lightning_rod", (name, tag) -> new LightningRod(name, Texture.oxidizedLightningRod, BlockProvider.facing(tag, "up"),
+        tag.get("Properties").get("powered").stringValue("false").equals("true")));
+      addBlock(s + "weathered_lightning_rod", (name, tag) -> new LightningRod(name, Texture.weatheredLightningRod, BlockProvider.facing(tag, "up"),
+        tag.get("Properties").get("powered").stringValue("false").equals("true")));
+    }
   }
 
   @Override
@@ -3019,8 +3030,6 @@ public class MinecraftBlockProvider implements BlockProvider {
         return slab(tag, Texture.oxidizedCutCopper);
       case "lava_cauldron":
         return new LavaCauldron();
-      case "lightning_rod":
-        return new LightningRod(BlockProvider.facing(tag, "up"), tag.get("Properties").get("powered").stringValue("false").equals("true"));
       case "small_amethyst_bud":
         return new SpriteBlock(name, Texture.smallAmethystBud, BlockProvider.facing(tag, "up"));
       case "medium_amethyst_bud":
