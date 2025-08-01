@@ -327,7 +327,6 @@ public class DriedGhastModel extends QuadModel {
       tentacles, tentacles, tentacles, tentacles, tentacles, tentacles, tentacles, tentacles, tentacles,
       tentacles, tentacles, tentacles, tentacles, tentacles, tentacles, tentacles, tentacles, tentacles
     };
-    System.out.println(textures.length + " moep");
   }
 
   private static int getOrientationIndex(String facing) {
