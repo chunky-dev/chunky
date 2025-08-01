@@ -30,73 +30,73 @@ import java.util.Arrays;
 public class LightningRodModel extends QuadModel {
 
   //region Model
-  private static final Quad[] lightningRod = new Quad[] {
-      new Quad(
-          new Vector3(6 / 16.0, 16 / 16.0, 10 / 16.0),
-          new Vector3(10 / 16.0, 16 / 16.0, 10 / 16.0),
-          new Vector3(6 / 16.0, 16 / 16.0, 6 / 16.0),
-          new Vector4(4 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
-      ),
-      new Quad(
-          new Vector3(6 / 16.0, 12 / 16.0, 6 / 16.0),
-          new Vector3(10 / 16.0, 12 / 16.0, 6 / 16.0),
-          new Vector3(6 / 16.0, 12 / 16.0, 10 / 16.0),
-          new Vector4(0 / 16.0, 4 / 16.0, 12 / 16.0, 16 / 16.0)
-      ),
-      new Quad(
-          new Vector3(6 / 16.0, 16 / 16.0, 10 / 16.0),
-          new Vector3(6 / 16.0, 16 / 16.0, 6 / 16.0),
-          new Vector3(6 / 16.0, 12 / 16.0, 10 / 16.0),
-          new Vector4(4 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
-      ),
-      new Quad(
-          new Vector3(10 / 16.0, 16 / 16.0, 6 / 16.0),
-          new Vector3(10 / 16.0, 16 / 16.0, 10 / 16.0),
-          new Vector3(10 / 16.0, 12 / 16.0, 6 / 16.0),
-          new Vector4(4 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
-      ),
-      new Quad(
-          new Vector3(6 / 16.0, 16 / 16.0, 6 / 16.0),
-          new Vector3(10 / 16.0, 16 / 16.0, 6 / 16.0),
-          new Vector3(6 / 16.0, 12 / 16.0, 6 / 16.0),
-          new Vector4(4 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
-      ),
-      new Quad(
-          new Vector3(10 / 16.0, 16 / 16.0, 10 / 16.0),
-          new Vector3(6 / 16.0, 16 / 16.0, 10 / 16.0),
-          new Vector3(10 / 16.0, 12 / 16.0, 10 / 16.0),
-          new Vector4(4 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
-      ),
-      new Quad(
-          new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
-          new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
-          new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
-          new Vector4(0 / 16.0, 2 / 16.0, 10 / 16.0, 12 / 16.0)
-      ),
-      new Quad(
-          new Vector3(7 / 16.0, 12 / 16.0, 9 / 16.0),
-          new Vector3(7 / 16.0, 12 / 16.0, 7 / 16.0),
-          new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
-          new Vector4(2 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
-      ),
-      new Quad(
-          new Vector3(9 / 16.0, 12 / 16.0, 7 / 16.0),
-          new Vector3(9 / 16.0, 12 / 16.0, 9 / 16.0),
-          new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
-          new Vector4(2 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
-      ),
-      new Quad(
-          new Vector3(7 / 16.0, 12 / 16.0, 7 / 16.0),
-          new Vector3(9 / 16.0, 12 / 16.0, 7 / 16.0),
-          new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
-          new Vector4(2 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
-      ),
-      new Quad(
-          new Vector3(9 / 16.0, 12 / 16.0, 9 / 16.0),
-          new Vector3(7 / 16.0, 12 / 16.0, 9 / 16.0),
-          new Vector3(9 / 16.0, 0 / 16.0, 9 / 16.0),
-          new Vector4(2 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
-      )
+  private static final Quad[] lightningRod = new Quad[]{
+    new Quad(
+      new Vector3(6 / 16.0, 16 / 16.0, 10 / 16.0),
+      new Vector3(10 / 16.0, 16 / 16.0, 10 / 16.0),
+      new Vector3(6 / 16.0, 16 / 16.0, 6 / 16.0),
+      new Vector4(4 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 12 / 16.0, 6 / 16.0),
+      new Vector3(10 / 16.0, 12 / 16.0, 6 / 16.0),
+      new Vector3(6 / 16.0, 12 / 16.0, 10 / 16.0),
+      new Vector4(0 / 16.0, 4 / 16.0, 12 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 16 / 16.0, 10 / 16.0),
+      new Vector3(6 / 16.0, 16 / 16.0, 6 / 16.0),
+      new Vector3(6 / 16.0, 12 / 16.0, 10 / 16.0),
+      new Vector4(4 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
+    ),
+    new Quad(
+      new Vector3(10 / 16.0, 16 / 16.0, 6 / 16.0),
+      new Vector3(10 / 16.0, 16 / 16.0, 10 / 16.0),
+      new Vector3(10 / 16.0, 12 / 16.0, 6 / 16.0),
+      new Vector4(4 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
+    ),
+    new Quad(
+      new Vector3(6 / 16.0, 16 / 16.0, 6 / 16.0),
+      new Vector3(10 / 16.0, 16 / 16.0, 6 / 16.0),
+      new Vector3(6 / 16.0, 12 / 16.0, 6 / 16.0),
+      new Vector4(4 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
+    ),
+    new Quad(
+      new Vector3(10 / 16.0, 16 / 16.0, 10 / 16.0),
+      new Vector3(6 / 16.0, 16 / 16.0, 10 / 16.0),
+      new Vector3(10 / 16.0, 12 / 16.0, 10 / 16.0),
+      new Vector4(4 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
+    ),
+    new Quad(
+      new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector4(0 / 16.0, 2 / 16.0, 10 / 16.0, 12 / 16.0)
+    ),
+    new Quad(
+      new Vector3(7 / 16.0, 12 / 16.0, 9 / 16.0),
+      new Vector3(7 / 16.0, 12 / 16.0, 7 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector4(2 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(9 / 16.0, 12 / 16.0, 7 / 16.0),
+      new Vector3(9 / 16.0, 12 / 16.0, 9 / 16.0),
+      new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector4(2 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(7 / 16.0, 12 / 16.0, 7 / 16.0),
+      new Vector3(9 / 16.0, 12 / 16.0, 7 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector4(2 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(9 / 16.0, 12 / 16.0, 9 / 16.0),
+      new Vector3(7 / 16.0, 12 / 16.0, 9 / 16.0),
+      new Vector3(9 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector4(2 / 16.0, 0 / 16.0, 12 / 16.0, 0 / 16.0)
+    )
   };
   //endregion
 
@@ -114,15 +114,17 @@ public class LightningRodModel extends QuadModel {
   private final static Texture[] texturesOn = new Texture[lightningRod.length];
   static { Arrays.fill(texturesOn, Texture.lightningRodOn); }
 
-  private final static Texture[] texturesOff = new Texture[lightningRod.length];
-  static { Arrays.fill(texturesOff, Texture.lightningRod); }
-
   private final Quad[] quads;
   private final Texture[] textures;
 
-  public LightningRodModel(String facing, boolean powered) {
+  public LightningRodModel(Texture texture, String facing, boolean powered) {
     this.quads = orientedQuads[getOrientationIndex(facing)];
-    this.textures = powered ? texturesOn : texturesOff;
+    if (powered) {
+      this.textures = texturesOn;
+    } else {
+      this.textures = new Texture[quads.length];
+      Arrays.fill(textures, texture);
+    }
   }
 
   private static int getOrientationIndex(String facing) {
