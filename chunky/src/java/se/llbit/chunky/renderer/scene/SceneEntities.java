@@ -162,17 +162,17 @@ public class SceneEntities {
               new Vector3(x, y, z),
               tag
             ));
-          } else if (id.equals("minecraft:sheep") && entityLoadingPreferences.shouldLoadClass(SheepEntity.class)) {
+          } else if ((id.equals("minecraft:sheep") || id.equals("Sheep")) && entityLoadingPreferences.shouldLoadClass(SheepEntity.class)) {
             addActor(new SheepEntity(new Vector3(x, y, z), tag));
-          } else if (id.equals("minecraft:cow") && entityLoadingPreferences.shouldLoadClass(CowEntity.class)) {
+          } else if ((id.equals("minecraft:cow") || id.equals("Cow")) && entityLoadingPreferences.shouldLoadClass(CowEntity.class)) {
             addActor(new CowEntity(new Vector3(x, y, z), tag));
-          } else if (id.equals("minecraft:chicken") && entityLoadingPreferences.shouldLoadClass(ChickenEntity.class)) {
+          } else if ((id.equals("minecraft:chicken") || id.equals("Chicken")) && entityLoadingPreferences.shouldLoadClass(ChickenEntity.class)) {
             addActor(new ChickenEntity(new Vector3(x, y, z), tag));
-          } else if (id.equals("minecraft:pig") && entityLoadingPreferences.shouldLoadClass(PigEntity.class)) {
+          } else if ((id.equals("minecraft:pig") || id.equals("Pig")) && entityLoadingPreferences.shouldLoadClass(PigEntity.class)) {
             addActor(new PigEntity(new Vector3(x, y, z), tag));
-          } else if (id.equals("minecraft:mooshroom") && entityLoadingPreferences.shouldLoadClass(MooshroomEntity.class)) {
+          } else if ((id.equals("minecraft:mooshroom") || id.equals("MushroomCow")) && entityLoadingPreferences.shouldLoadClass(MooshroomEntity.class)) {
             addActor(new MooshroomEntity(new Vector3(x, y, z), tag));
-          } else if (id.equals("minecraft:squid") && entityLoadingPreferences.shouldLoadClass(SquidEntity.class)) {
+          } else if ((id.equals("minecraft:squid") || id.equals("Squid")) && entityLoadingPreferences.shouldLoadClass(SquidEntity.class)) {
             addActor(new SquidEntity(new Vector3(x, y, z), tag));
           }
         }
