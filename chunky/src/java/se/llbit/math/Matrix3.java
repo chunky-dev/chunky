@@ -67,7 +67,7 @@ public class Matrix3 {
 
   /**
    * Set the matrix to be a rotation matrix for rotation
-   * around the X axis.
+   * around the Z axis.
    */
   public final void rotZ(double theta) {
     double cost = FastMath.cos(theta);
