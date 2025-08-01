@@ -3,10 +3,7 @@ package se.llbit.chunky.renderer.scene;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
-import se.llbit.chunky.entity.ArmorStand;
-import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.entity.PaintingEntity;
-import se.llbit.chunky.entity.PlayerEntity;
+import se.llbit.chunky.entity.*;
 import se.llbit.chunky.world.Dimension;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -165,6 +162,18 @@ public class SceneEntities {
               new Vector3(x, y, z),
               tag
             ));
+          } else if ((id.equals("minecraft:sheep") || id.equals("Sheep")) && entityLoadingPreferences.shouldLoadClass(SheepEntity.class)) {
+            addActor(new SheepEntity(new Vector3(x, y, z), tag));
+          } else if ((id.equals("minecraft:cow") || id.equals("Cow")) && entityLoadingPreferences.shouldLoadClass(CowEntity.class)) {
+            addActor(new CowEntity(new Vector3(x, y, z), tag));
+          } else if ((id.equals("minecraft:chicken") || id.equals("Chicken")) && entityLoadingPreferences.shouldLoadClass(ChickenEntity.class)) {
+            addActor(new ChickenEntity(new Vector3(x, y, z), tag));
+          } else if ((id.equals("minecraft:pig") || id.equals("Pig")) && entityLoadingPreferences.shouldLoadClass(PigEntity.class)) {
+            addActor(new PigEntity(new Vector3(x, y, z), tag));
+          } else if ((id.equals("minecraft:mooshroom") || id.equals("MushroomCow")) && entityLoadingPreferences.shouldLoadClass(MooshroomEntity.class)) {
+            addActor(new MooshroomEntity(new Vector3(x, y, z), tag));
+          } else if ((id.equals("minecraft:squid") || id.equals("Squid")) && entityLoadingPreferences.shouldLoadClass(SquidEntity.class)) {
+            addActor(new SquidEntity(new Vector3(x, y, z), tag));
           }
         }
       }
