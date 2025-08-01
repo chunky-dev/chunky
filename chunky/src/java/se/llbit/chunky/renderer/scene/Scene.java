@@ -346,8 +346,8 @@ public class Scene implements JsonSerializable, Refreshable {
     branchCount = PersistentSettings.getBranchCountDefault();
 
     palette = new BlockPalette();
-    worldOctree = new Octree(octreeImplementation, 1);
-    waterOctree = new Octree(octreeImplementation, 1);
+    worldOctree = new Octree(octreeImplementation, 1, Octree.OctreeType.WORLD);
+    waterOctree = new Octree(octreeImplementation, 1, Octree.OctreeType.WATER);
     emitterGrid = null;
   }
 
@@ -726,7 +726,7 @@ public class Scene implements JsonSerializable, Refreshable {
     } else {
       r = new Ray(start);
       r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
-      if (waterOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
+      if (waterOctree.enterBlock(this, r, palette) && r.distance < ray.t + Ray.EPSILON) {
         ray.t = r.distance;
         ray.setNormal(r.getNormal());
         ray.color.set(r.color);
@@ -806,8 +806,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
       // Create new octree to fit all chunks.
       palette = new BlockPalette();
-      worldOctree = new Octree(octreeImplementation, requiredDepth);
-      waterOctree = new Octree(octreeImplementation, requiredDepth);
+      worldOctree = new Octree(octreeImplementation, requiredDepth, Octree.OctreeType.WORLD);
+      waterOctree = new Octree(octreeImplementation, requiredDepth, Octree.OctreeType.WATER);
 
       grassTexture = biomeStructureFactory.create();
       foliageTexture = biomeStructureFactory.create();
@@ -2223,6 +2223,12 @@ public class Scene implements JsonSerializable, Refreshable {
         if (waterTexture == null) {
           // this dump is so old that it doesn't contain a water texture (Chunky 2.3.0, #691)
           waterTexture = BiomeStructure.get(this.biomeStructureImplementation).create();
+        }
+        if (worldOctree.type == null) {
+          worldOctree.type = Octree.OctreeType.WORLD;
+        }
+        if (waterOctree.type == null) {
+          waterOctree.type = Octree.OctreeType.WATER;
         }
         palette = data.palette;
         palette.applyMaterials();
