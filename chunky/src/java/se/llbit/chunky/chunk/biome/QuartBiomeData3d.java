@@ -6,7 +6,7 @@ import se.llbit.nbt.Tag;
 
 import java.util.Arrays;
 
-import static se.llbit.chunky.world.Chunk.LEVEL_BIOMES;
+import static se.llbit.chunky.world.JavaChunk.LEVEL_BIOMES;
 
 /**
  * Implementation of a 3D biome grid where the smallest size of a biome is 4x4x4 blocks

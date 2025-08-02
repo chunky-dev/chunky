@@ -1,6 +1,7 @@
 package se.llbit.chunky.chunk.biome;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import se.llbit.chunky.world.JavaChunk;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.biome.Biomes;
@@ -60,7 +61,7 @@ public class GenericQuartBiomeData3d implements BiomeData {
   }
 
   public static void loadBiomeDataPost21w39a(Tag chunkData, GenericQuartBiomeData3d biomeData, BiomePalette biomePalette, int yMin, int yMax) {
-    Tag sections = chunkData.get(SECTIONS_POST_21W39A);
+    Tag sections = chunkData.get(JavaChunk.SECTIONS_POST_21W39A);
     if (sections.isList()) {
       for (SpecificTag section : sections.asList()) {
         Tag yTag = section.get("Y");

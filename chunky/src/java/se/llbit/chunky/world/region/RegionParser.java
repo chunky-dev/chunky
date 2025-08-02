@@ -17,8 +17,6 @@
 package se.llbit.chunky.world.region;
 
 import se.llbit.chunky.chunk.ChunkData;
-import se.llbit.chunky.chunk.GenericChunkData;
-import se.llbit.chunky.chunk.SimpleChunkData;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.world.*;
@@ -60,7 +58,7 @@ public class RegionParser extends Thread {
         }
         ChunkView map = mapView.getMapView();
         if (map.isRegionVisible(position)) {
-          Dimension dimension = mapLoader.getWorld().currentDimension();
+          JavaDimension dimension = (JavaDimension) mapLoader.getWorld().currentDimension(); // FIXME: don't cast
           Region region = dimension.getRegionWithinRange(position, mapView.getYMin(), mapView.getYMax());
           region.parse(mapView.getYMin(), mapView.getYMax());
           Mutable<ChunkData> chunkData = new Mutable<>(null);

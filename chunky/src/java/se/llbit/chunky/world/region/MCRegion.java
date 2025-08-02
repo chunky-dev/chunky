@@ -63,7 +63,7 @@ public class MCRegion implements Region {
 
   private final Chunk[] chunks = new Chunk[NUM_CHUNKS];
   private final RegionPosition position;
-  private final Dimension dimension;
+  private final JavaDimension dimension;
   private final String fileName;
   private long regionFileTime = 0;
   private final int[] chunkTimestamps = new int[NUM_CHUNKS];
@@ -80,7 +80,7 @@ public class MCRegion implements Region {
    *
    * @param pos the region position
    */
-  public MCRegion(RegionPosition pos, Dimension dimension) {
+  public MCRegion(RegionPosition pos, JavaDimension dimension) {
     this.dimension = dimension;
     fileName = pos.getMcaName();
     position = pos;
@@ -156,7 +156,7 @@ public class MCRegion implements Region {
           int loc = file.readInt();
           if (loc != 0) {
             if (chunk.isEmpty()) {
-              chunk = new Chunk(pos, dimension);
+              chunk = new JavaChunk(pos, dimension);
               setChunk(pos, chunk);
             }
           } else {
