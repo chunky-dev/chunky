@@ -17,20 +17,19 @@
  */
 package se.llbit.chunky;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import se.llbit.chunky.renderer.RenderConstants;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.fxutil.WindowPosition;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.log.Log;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Utility class for managing global Chunky settings.
@@ -503,6 +502,60 @@ public final class PersistentSettings {
 
   public static void setLoadBeaconBeams(boolean value) {
     settings.setBool("loadBeaconBeams", value);
+    save();
+  }
+
+  public static boolean getLoadSheep() {
+    return settings.getBool("loadSheep", true);
+  }
+
+  public static void setLoadSheep(boolean value) {
+    settings.setBool("loadSheep", value);
+    save();
+  }
+
+  public static boolean getLoadCows() {
+    return settings.getBool("loadCows", true);
+  }
+
+  public static void setLoadCows(boolean value) {
+    settings.setBool("loadCows", value);
+    save();
+  }
+
+  public static boolean getLoadChickens() {
+    return settings.getBool("loadChickens", true);
+  }
+
+  public static void setLoadChickens(boolean value) {
+    settings.setBool("loadChickens", value);
+    save();
+  }
+
+  public static boolean getLoadPigs() {
+    return settings.getBool("loadPigs", true);
+  }
+
+  public static void setLoadPigs(boolean value) {
+    settings.setBool("loadPigs", value);
+    save();
+  }
+
+  public static boolean getLoadMooshrooms() {
+    return settings.getBool("loadMooshrooms", true);
+  }
+
+  public static void setLoadMooshrooms(boolean value) {
+    settings.setBool("loadMooshrooms", value);
+    save();
+  }
+
+  public static boolean getLoadSquids() {
+    return settings.getBool("loadSquids", true);
+  }
+
+  public static void setLoadSquids(boolean value) {
+    settings.setBool("loadSquids", value);
     save();
   }
 

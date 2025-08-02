@@ -31,11 +31,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.entity.ArmorStand;
-import se.llbit.chunky.entity.Book;
-import se.llbit.chunky.entity.PaintingEntity;
-import se.llbit.chunky.entity.BeaconBeam;
-import se.llbit.chunky.entity.PlayerEntity;
+import se.llbit.chunky.entity.*;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
@@ -44,11 +40,11 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.Icons;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.IntegerTextField;
-import se.llbit.chunky.ui.elements.SizeInput;
 import se.llbit.chunky.ui.ValidatingNumberStringConverter;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.SettingsExport;
+import se.llbit.chunky.ui.elements.SizeInput;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Icon;
@@ -94,6 +90,12 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private CheckBox loadBooks;
   @FXML private CheckBox loadPaintings;
   @FXML private CheckBox loadBeaconBeams;
+  @FXML private CheckBox loadSheep;
+  @FXML private CheckBox loadCows;
+  @FXML private CheckBox loadChickens;
+  @FXML private CheckBox loadPigs;
+  @FXML private CheckBox loadMooshrooms;
+  @FXML private CheckBox loadSquids;
   @FXML private CheckBox loadOtherEntities;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
@@ -143,6 +145,12 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadBooks.setSelected(preferences.shouldLoadClass(Book.class));
       loadPaintings.setSelected(preferences.shouldLoadClass(PaintingEntity.class));
       loadBeaconBeams.setSelected(preferences.shouldLoadClass(BeaconBeam.class));
+      loadSheep.setSelected(preferences.shouldLoadClass(SheepEntity.class));
+      loadCows.setSelected(preferences.shouldLoadClass(CowEntity.class));
+      loadChickens.setSelected(preferences.shouldLoadClass(ChickenEntity.class));
+      loadPigs.setSelected(preferences.shouldLoadClass(PigEntity.class));
+      loadMooshrooms.setSelected(preferences.shouldLoadClass(MooshroomEntity.class));
+      loadSquids.setSelected(preferences.shouldLoadClass(SquidEntity.class));
       loadOtherEntities.setSelected(preferences.shouldLoadClass(null));
     }
 
@@ -290,6 +298,66 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       renderControls.showPopup(
         "This takes effect the next time a new scene is created.", loadBeaconBeams);
     });
+    loadSheep.setTooltip(new Tooltip("Enable/disable sheep entity loading. "
+      + "Takes effect on next scene creation."));
+    loadSheep.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(SheepEntity.class, newValue);
+      PersistentSettings.setLoadSheep(newValue);
+    });
+    loadSheep.setOnAction(event -> {
+      renderControls.showPopup(
+        "This takes effect the next time a new scene is created.", loadSheep);
+    });
+    loadCows.setTooltip(new Tooltip("Enable/disable cow entity loading. "
+      + "Takes effect on next scene creation."));
+    loadCows.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(CowEntity.class, newValue);
+      PersistentSettings.setLoadCows(newValue);
+    });
+    loadCows.setOnAction(event -> {
+      renderControls.showPopup(
+        "This takes effect the next time a new scene is created.", loadCows);
+    });
+    loadChickens.setTooltip(new Tooltip("Enable/disable chicken entity loading. "
+      + "Takes effect on next scene creation."));
+    loadChickens.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(ChickenEntity.class, newValue);
+      PersistentSettings.setLoadChickens(newValue);
+    });
+    loadChickens.setOnAction(event -> {
+      renderControls.showPopup(
+        "This takes effect the next time a new scene is created.", loadChickens);
+    });
+    loadPigs.setTooltip(new Tooltip("Enable/disable Pig entity loading. "
+      + "Takes effect on next scene creation."));
+    loadPigs.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(PigEntity.class, newValue);
+      PersistentSettings.setLoadPigs(newValue);
+    });
+    loadPigs.setOnAction(event -> {
+      renderControls.showPopup(
+        "This takes effect the next time a new scene is created.", loadPigs);
+    });
+    loadMooshrooms.setTooltip(new Tooltip("Enable/disable Mooshroom entity loading. "
+      + "Takes effect on next scene creation."));
+    loadMooshrooms.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(MooshroomEntity.class, newValue);
+      PersistentSettings.setLoadMooshrooms(newValue);
+    });
+    loadMooshrooms.setOnAction(event -> {
+      renderControls.showPopup(
+        "This takes effect the next time a new scene is created.", loadMooshrooms);
+    });
+    loadSquids.setTooltip(new Tooltip("Enable/disable Squid entity loading. "
+      + "Takes effect on next scene creation."));
+    loadSquids.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(SquidEntity.class, newValue);
+      PersistentSettings.setLoadSquids(newValue);
+    });
+    loadSquids.setOnAction(event -> {
+      renderControls.showPopup(
+        "This takes effect the next time a new scene is created.", loadSquids);
+    });
     loadOtherEntities.setTooltip(new Tooltip("Enable/disable other entity loading. "
             + "Takes effect on next scene creation."));
     loadOtherEntities.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -306,6 +374,11 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadBooks.setSelected(true);
       loadPaintings.setSelected(true);
       loadBeaconBeams.setSelected(true);
+      loadSheep.setSelected(true);
+      loadCows.setSelected(true);
+      loadChickens.setSelected(true);
+      loadPigs.setSelected(true);
+      loadMooshrooms.setSelected(true);
       loadOtherEntities.setSelected(true);
     });
     loadNoEntity.setOnAction(event -> {
@@ -314,6 +387,11 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadBooks.setSelected(false);
       loadPaintings.setSelected(false);
       loadBeaconBeams.setSelected(false);
+      loadSheep.setSelected(false);
+      loadCows.setSelected(false);
+      loadChickens.setSelected(false);
+      loadPigs.setSelected(false);
+      loadMooshrooms.setSelected(false);
       loadOtherEntities.setSelected(false);
     });
 

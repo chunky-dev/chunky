@@ -48,7 +48,8 @@ public class BoxModelBuilder {
             new Vector3(box.from.x, box.to.y, box.to.z),
             new Vector3(box.to.x, box.to.y, box.to.z),
             new Vector3(box.from.x, box.to.y, box.from.z),
-            top.toVectorForQuad()
+            top.toVectorForQuad(),
+            box.doubleSided
           )
         );
       }
@@ -59,7 +60,8 @@ public class BoxModelBuilder {
             new Vector3(box.from.x, box.from.y, box.from.z),
             new Vector3(box.to.x, box.from.y, box.from.z),
             new Vector3(box.from.x, box.from.y, box.to.z),
-            bottom.toVectorForQuad()
+            bottom.toVectorForQuad(),
+            box.doubleSided
           )
         );
       }
@@ -70,7 +72,8 @@ public class BoxModelBuilder {
             new Vector3(box.from.x, box.to.y, box.to.z),
             new Vector3(box.from.x, box.to.y, box.from.z),
             new Vector3(box.from.x, box.from.y, box.to.z),
-            left.toVectorForQuad()
+            left.toVectorForQuad(),
+            box.doubleSided
           )
         );
       }
@@ -81,7 +84,8 @@ public class BoxModelBuilder {
             new Vector3(box.to.x, box.to.y, box.from.z),
             new Vector3(box.to.x, box.to.y, box.to.z),
             new Vector3(box.to.x, box.from.y, box.from.z),
-            right.toVectorForQuad()
+            right.toVectorForQuad(),
+            box.doubleSided
           )
         );
       }
@@ -92,7 +96,8 @@ public class BoxModelBuilder {
             new Vector3(box.from.x, box.to.y, box.from.z),
             new Vector3(box.to.x, box.to.y, box.from.z),
             new Vector3(box.from.x, box.from.y, box.from.z),
-            front.toVectorForQuad()
+            front.toVectorForQuad(),
+            box.doubleSided
           )
         );
       }
@@ -103,7 +108,8 @@ public class BoxModelBuilder {
             new Vector3(box.to.x, box.to.y, box.to.z),
             new Vector3(box.from.x, box.to.y, box.to.z),
             new Vector3(box.to.x, box.from.y, box.to.z),
-            back.toVectorForQuad()
+            back.toVectorForQuad(),
+            box.doubleSided
           )
         );
       }
@@ -130,6 +136,7 @@ public class BoxModelBuilder {
     private boolean flipX = false;
     private boolean flipY = false;
     private boolean mirrorX = false;
+    private boolean doubleSided = false;
     private Transform transform = Transform.NONE;
 
     private BoxBuilder(Vector3 from, Vector3 to) {
@@ -373,6 +380,16 @@ public class BoxModelBuilder {
      */
     public BoxBuilder transform(Transform transform) {
       this.transform = this.transform.chain(transform);
+      return this;
+    }
+
+    /**
+     * Set the Quads generated from this box to be double-sided.
+     *
+     * @return This box builder
+     */
+    public BoxBuilder doubleSided() {
+      doubleSided = !doubleSided;
       return this;
     }
 
