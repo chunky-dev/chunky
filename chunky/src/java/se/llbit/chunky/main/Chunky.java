@@ -57,7 +57,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Chunky is a Minecraft mapping and rendering tool created byJesper Öqvist (jesper@llbit.se).
@@ -279,7 +278,9 @@ public class Chunky {
     pluginManager.load(pluginManifests, (plugin, manifest) -> {
       String jarName = manifest.pluginJar.getName();
       Log.infof("Loading plugin: %s", jarName);
-      CreditsController.addPlugin(manifest.name, manifest.version.toString(), manifest.author, manifest.description);
+      if (!isHeadless()) {
+        CreditsController.addPlugin(manifest.name, manifest.version.toString(), manifest.author, manifest.description);
+      }
 
       try {
         plugin.attach(this);
