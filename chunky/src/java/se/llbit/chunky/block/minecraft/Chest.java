@@ -23,42 +23,45 @@ import se.llbit.chunky.model.minecraft.ChestModel;
 import se.llbit.chunky.resources.Texture;
 
 public class Chest extends AbstractModelBlock {
+  public enum Kind {
+    NORMAL,
+    TRAPPED,
+    ENDER,
+    COPPER,
+    EXPOSED_COPPER,
+    OXIDIZED_COPPER,
+    WEATHERED_COPPER
+  }
+
+  public enum Type {
+    SINGLE,
+    LEFT,
+    RIGHT
+  }
 
   private final String description;
 
-  public Chest(String name, String typeString, String facingString, boolean trapped) {
-    super(name, trapped ? Texture.trappedChestFront : Texture.chestFront);
+  public Chest(String name, String typeString, String facingString, Kind kind) {
+    super(name, switch (kind) {
+      case TRAPPED -> Texture.trappedChest.front;
+      case ENDER -> Texture.enderChest.front;
+      case COPPER -> Texture.copperChest.front;
+      default -> Texture.chest.front;
+    });
     this.description = String.format("type=%s, facing=%s", typeString, facingString);
-    int type;
-    switch (typeString) {
-      default:
-      case "single":
-        type = 0;
-        break;
-      case "left":
-        type = 1;
-        break;
-      case "right":
-        type = 2;
-        break;
-    }
-    int facing;
-    switch (facingString) {
-      default:
-      case "north":
-        facing = 2;
-        break;
-      case "south":
-        facing = 3;
-        break;
-      case "west":
-        facing = 4;
-        break;
-      case "east":
-        facing = 5;
-        break;
-    }
-    model = new ChestModel(type, facing, trapped, false);
+    Type type = switch (typeString) {
+      case "left" -> Type.LEFT;
+      case "right" -> Type.RIGHT;
+      default -> Type.SINGLE;
+    };
+    int facing = switch (facingString) {
+      case "north" -> 2;
+      case "south" -> 3;
+      case "west" -> 4;
+      case "east" -> 5;
+      default -> 2;
+    };
+    model = new ChestModel(type, facing, kind);
   }
 
   @Override

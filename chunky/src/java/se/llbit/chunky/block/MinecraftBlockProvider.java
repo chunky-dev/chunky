@@ -1198,6 +1198,11 @@ public class MinecraftBlockProvider implements BlockProvider {
         tag.get("Properties").get("powered").stringValue("false").equals("true")));
       addBlock(s + "weathered_lightning_rod", (name, tag) -> new LightningRod(name, Texture.weatheredLightningRod, BlockProvider.facing(tag, "up"),
         tag.get("Properties").get("powered").stringValue("false").equals("true")));
+
+      addBlock(s + "copper_chest", (name, tag) -> chest(tag, Chest.Kind.COPPER));
+      addBlock(s + "exposed_copper_chest", (name, tag) -> chest(tag, Chest.Kind.EXPOSED_COPPER));
+      addBlock(s + "weathered_copper_chest", (name, tag) -> chest(tag, Chest.Kind.WEATHERED_COPPER));
+      addBlock(s + "oxidized_copper_chest", (name, tag) -> chest(tag, Chest.Kind.OXIDIZED_COPPER));
     }
   }
 
@@ -1578,7 +1583,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "dark_oak_stairs":
         return stairs(tag, Texture.darkOakPlanks);
       case "chest":
-        return chest(tag, false);
+        return chest(tag, Chest.Kind.NORMAL);
       case "diamond_ore":
         return new MinecraftBlock(name, Texture.diamondOre);
       case "diamond_block":
@@ -1795,7 +1800,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "damaged_anvil":
         return anvil(tag, 2);
       case "trapped_chest":
-        return chest(tag, true);
+        return chest(tag, Chest.Kind.TRAPPED);
       case "light_weighted_pressure_plate":
         return new PressurePlate(name, Texture.goldBlock);
       case "heavy_weighted_pressure_plate":
@@ -3287,11 +3292,6 @@ public class MinecraftBlockProvider implements BlockProvider {
     return tag.get("Properties").get("lit").stringValue("false").equals("true");
   }
 
-  private static boolean isLit(Tag tag, boolean defaultValue) {
-    return tag.get("Properties").get("lit").stringValue(Boolean.toString(defaultValue))
-      .equals("true");
-  }
-
   private static Block redstoneWire(Tag tag) {
     Tag properties = tag.get("Properties");
     String north = properties.get("north").stringValue("none");
@@ -3302,12 +3302,12 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new RedstoneWire(power, north, south, east, west);
   }
 
-  private static Block chest(Tag tag, boolean trapped) {
+  private static Block chest(Tag tag, Chest.Kind kind) {
     String name = BlockProvider.blockName(tag);
     Tag properties = tag.get("Properties");
     String facing = BlockProvider.facing(tag, "north");
     String type = properties.get("type").stringValue("single");
-    return new Chest(name, type, facing, trapped);
+    return new Chest(name, type, facing, kind);
   }
 
   private static Block chain(Tag tag, String name, Texture texture) {
