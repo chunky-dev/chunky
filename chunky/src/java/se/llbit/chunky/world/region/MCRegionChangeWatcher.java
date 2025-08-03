@@ -20,9 +20,8 @@ import javafx.application.Platform;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
-import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.Dimension;
+import se.llbit.chunky.world.JavaDimension;
 import se.llbit.chunky.world.RegionPosition;
 
 /**
@@ -39,7 +38,7 @@ public class MCRegionChangeWatcher extends RegionChangeWatcher {
     try {
       while (!isInterrupted()) {
         sleep(3000);
-        Dimension dimension = mapLoader.getWorld().currentDimension();
+        JavaDimension dimension = (JavaDimension) mapLoader.getWorld().currentDimension();
         if (dimension.reloadPlayerData()) {
           if (PersistentSettings.getFollowPlayer()) {
             Platform.runLater(() -> dimension.getPlayerPos().ifPresent(mapView::panTo));
