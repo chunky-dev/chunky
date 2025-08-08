@@ -1185,8 +1185,8 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("bush", (name, tag) -> new TintedSpriteBlock(name, Texture.bush, Tint.BIOME_GRASS));
     addBlock("firefly_bush", (name, tag) -> new FireflyBush());
     addBlock("cactus_flower", (name, tag) -> new SpriteBlock(name, Texture.cactusFlower));
-    addBlock("short_dry_grass", (name, tag) -> new TintedSpriteBlock(name, Texture.shortDryGrass, Tint.BIOME_DRY_FOLIAGE));
-    addBlock("tall_dry_grass", (name, tag) -> new TintedSpriteBlock(name, Texture.tallDryGrass, Tint.BIOME_DRY_FOLIAGE));
+    addBlock("short_dry_grass", (name, tag) -> new SpriteBlock(name, Texture.shortDryGrass));
+    addBlock("tall_dry_grass", (name, tag) -> new SpriteBlock(name, Texture.tallDryGrass));
     addBlock("dried_ghast", (name, tag) -> new DriedGhast(BlockProvider.facing(tag), BlockProvider.stringToInt(tag.get("Properties").get("hydration"), 0)));
   }
 
