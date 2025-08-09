@@ -1204,6 +1204,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       addBlock(s + "weathered_copper_chest", (name, tag) -> chest(tag, Chest.Kind.WEATHERED_COPPER));
       addBlock(s + "oxidized_copper_chest", (name, tag) -> chest(tag, Chest.Kind.OXIDIZED_COPPER));
     }
+    addBlock("oak_shelf", (name, tag) -> shelf(tag, Texture.oakShelf));
   }
 
   @Override
@@ -3687,6 +3688,13 @@ public class MinecraftBlockProvider implements BlockProvider {
       waterlogged,
       sherds
     );
+  }
+
+  private static Block shelf(Tag tag, Texture texture) {
+    return new Shelf(BlockProvider.blockName(tag), texture,
+      BlockProvider.facing(tag),
+      BlockProvider.stringToBoolean(tag.get("Properties").get("powered")),
+      tag.get("Properties").get("side_chain").stringValue("unconnected"));
   }
 
   private static Block nonSolid(Block block) {

@@ -1673,6 +1673,8 @@ public class Texture {
   public static final ChestTexture.Textures oxidizedCopperChest = new ChestTexture.Textures();
   public static final ChestTexture.Textures largeOxidizedCopperChestLeft = ChestTexture.Textures.newWithLockFrom(oxidizedCopperChest);
   public static final ChestTexture.Textures largeOxidizedCopperChestRight = ChestTexture.Textures.newWithLockFrom(oxidizedCopperChest);
+  @TexturePath("assets/minecraft/textures/block/oak_shelf")
+  public static final Texture oakShelf = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
