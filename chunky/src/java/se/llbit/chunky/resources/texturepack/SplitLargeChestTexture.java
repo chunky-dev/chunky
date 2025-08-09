@@ -18,12 +18,10 @@ package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
-import se.llbit.chunky.resources.Texture;
 import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 
 public class SplitLargeChestTexture extends TextureLoader {
   public enum Part {
@@ -33,30 +31,14 @@ public class SplitLargeChestTexture extends TextureLoader {
 
   private final String file;
   private final Part part;
-  private final Texture left;
-  private final Texture top;
-  private final Texture right;
-  private final Texture bottom;
-  private final Texture front;
-  private final Texture back;
+  private final ChestTexture.Textures textures;
 
   public SplitLargeChestTexture(
-          String file,
-          Part part,
-          Texture top,
-          Texture bottom,
-          Texture left,
-          Texture right,
-          Texture front,
-          Texture back) {
+    String file,
+    Part part, ChestTexture.Textures textures) {
     this.file = file;
     this.part = part;
-    this.top = top;
-    this.bottom = bottom;
-    this.left = left;
-    this.right = right;
-    this.front = front;
-    this.back = back;
+    this.textures = textures;
   }
 
   @Override
@@ -70,24 +52,24 @@ public class SplitLargeChestTexture extends TextureLoader {
     int imgW = spritemap.width;
     int scale = imgW / (16 * 4);
 
-    top.setTexture(getSprite(spritemap, scale, 29, 0, 15, 14, true, true));
-    bottom.setTexture(getSprite(spritemap, scale, 14, 19, 15, 14, true, true));
-    front.setTexture(
+    textures.top.setTexture(getSprite(spritemap, scale, 29, 0, 15, 14, true, true));
+    textures.bottom.setTexture(getSprite(spritemap, scale, 14, 19, 15, 14, true, true));
+    textures.front.setTexture(
             BitmapImage.concatY(
                     getSprite(spritemap, scale, 43, 15, 15, 4, false, true),
                     getSprite(spritemap, scale, 43, 33, 15, 10, false, true)));
-    back.setTexture(
+    textures.back.setTexture(
             BitmapImage.concatY(
                     getSprite(spritemap, scale, 14, 15, 15, 4, true, true),
                     getSprite(spritemap, scale, 14, 33, 15, 10, true, true)));
 
     if (this.part == Part.LEFT) {
-      left.setTexture(
+      textures.left.setTexture(
               BitmapImage.concatY(
                       getSprite(spritemap, scale, 29, 15, 14, 4, true, true),
                       getSprite(spritemap, scale, 29, 33, 14, 10, true, true)));
     } else {
-      right.setTexture(
+      textures.right.setTexture(
               BitmapImage.concatY(
                       getSprite(spritemap, scale, 0, 15, 14, 4, false, true),
                       getSprite(spritemap, scale, 0, 33, 14, 10, false, true)));

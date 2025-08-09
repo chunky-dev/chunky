@@ -502,7 +502,8 @@ public class BlockPalette {
       materialProperties.put(s + "copper_grate", copperConfig);
       materialProperties.put(s + "copper_door", copperConfig);
       materialProperties.put(s + "copper_trapdoor", copperConfig);
-      
+      materialProperties.put(s + "copper_chest", copperConfig);
+
       materialProperties.put(s + "exposed_copper", exposedCopperConfig);
       materialProperties.put(s + "exposed_cut_copper", exposedCopperConfig);
       materialProperties.put(s + "exposed_cut_copper_stairs", exposedCopperConfig);
@@ -511,6 +512,7 @@ public class BlockPalette {
       materialProperties.put(s + "exposed_copper_grate", exposedCopperConfig);
       materialProperties.put(s + "exposed_copper_door", exposedCopperConfig);
       materialProperties.put(s + "exposed_copper_trapdoor", exposedCopperConfig);
+      materialProperties.put(s + "exposed_copper_chest", exposedCopperConfig);
 
       materialProperties.put(s + "weathered_copper", weatheredCopperConfig);
       materialProperties.put(s + "weathered_cut_copper", weatheredCopperConfig);
@@ -520,13 +522,27 @@ public class BlockPalette {
       materialProperties.put(s + "weathered_copper_grate", weatheredCopperConfig);
       materialProperties.put(s + "weathered_copper_door", weatheredCopperConfig);
       materialProperties.put(s + "weathered_copper_trapdoor", weatheredCopperConfig);
+      materialProperties.put(s + "weathered_copper_chest", weatheredCopperConfig);
+
+      materialProperties.put(s + "lightning_rod", block -> {
+        // apply copper attributes only to non-powered lightning rods
+        if (block instanceof LightningRod && !((LightningRod) block).isPowered()) {
+          copperConfig.accept(block);
+        }
+      });
+      materialProperties.put(s + "exposed_lightning_rod", block -> {
+        // apply copper attributes only to non-powered lightning rods
+        if (block instanceof LightningRod && !((LightningRod) block).isPowered()) {
+          exposedCopperConfig.accept(block);
+        }
+      });
+      materialProperties.put(s + "weathered_lightning_rod", block -> {
+        // apply copper attributes only to non-powered lightning rods
+        if (block instanceof LightningRod && !((LightningRod) block).isPowered()) {
+          weatheredCopperConfig.accept(block);
+        }
+      });
     }
-    materialProperties.put("minecraft:lightning_rod", block -> {
-      // apply copper attributes only to non-powered lightning rods
-      if (block instanceof LightningRod && !((LightningRod) block).isPowered()) {
-        copperConfig.accept(block);
-      }
-    });
     materialProperties.put("minecraft:small_amethyst_bud", block -> {
       block.emittance = 1.0f / 15f;
     });

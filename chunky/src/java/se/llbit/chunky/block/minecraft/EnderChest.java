@@ -27,7 +27,7 @@ public class EnderChest extends AbstractModelBlock {
   private final String description;
 
   public EnderChest(String facingString) {
-    super("ender_chest", Texture.chestFront);
+    super("ender_chest", Texture.enderChest.front);
     this.description = "facing=" + facingString;
     int facing;
     switch (facingString) {
@@ -45,7 +45,7 @@ public class EnderChest extends AbstractModelBlock {
         facing = 5;
         break;
     }
-    model = new ChestModel(0, facing, false, true);
+    model = new ChestModel(Chest.Type.SINGLE, facing, Chest.Kind.ENDER);
   }
 
   @Override
