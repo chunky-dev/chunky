@@ -1697,6 +1697,14 @@ public class Texture {
   public static final Texture spruceShelf = new Texture();
   @TexturePath("assets/minecraft/textures/block/warped_shelf")
   public static final Texture warpedShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_chain")
+  public static final Texture copperChain = new Texture();
+  @TexturePath("assets/minecraft/textures/block/exposed_copper_chain")
+  public static final Texture exposedCopperChain = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_copper_chain")
+  public static final Texture weatheredCopperChain = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_copper_chain")
+  public static final Texture oxidizedCopperChain = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
