@@ -17,9 +17,11 @@
  */
 package se.llbit.chunky.model.minecraft;
 
+import se.llbit.chunky.block.minecraft.Chest;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texturepack.ChestTexture;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -32,197 +34,169 @@ import se.llbit.math.Vector4;
 public class ChestModel extends QuadModel {
   //region Single Chest
   protected static final Quad[] single = {
-      // north
-      new Quad(new Vector3(.9375, 0, .0625), new Vector3(.0625, 0, .0625),
-          new Vector3(.9375, .875, .0625), new Vector4(1, 0, 0, 1)),
+    // north
+    new Quad(new Vector3(.9375, 0, .0625), new Vector3(.0625, 0, .0625),
+      new Vector3(.9375, .875, .0625), new Vector4(1, 0, 0, 1)),
 
-      // south
-      new Quad(new Vector3(.0625, 0, .9375), new Vector3(.9375, 0, .9375),
-          new Vector3(.0625, .875, .9375), new Vector4(0, 1, 0, 1)),
+    // south
+    new Quad(new Vector3(.0625, 0, .9375), new Vector3(.9375, 0, .9375),
+      new Vector3(.0625, .875, .9375), new Vector4(0, 1, 0, 1)),
 
-      // west
-      new Quad(new Vector3(.0625, 0, .0625), new Vector3(.0625, 0, .9375),
-          new Vector3(.0625, .875, .0625), new Vector4(0, 1, 0, 1)),
+    // west
+    new Quad(new Vector3(.0625, 0, .0625), new Vector3(.0625, 0, .9375),
+      new Vector3(.0625, .875, .0625), new Vector4(0, 1, 0, 1)),
 
-      // east
-      new Quad(new Vector3(.9375, 0, .9375), new Vector3(.9375, 0, .0625),
-          new Vector3(.9375, .875, .9375), new Vector4(1, 0, 0, 1)),
+    // east
+    new Quad(new Vector3(.9375, 0, .9375), new Vector3(.9375, 0, .0625),
+      new Vector3(.9375, .875, .9375), new Vector4(1, 0, 0, 1)),
 
-      // top
-      new Quad(new Vector3(.9375, .875, .0625), new Vector3(.0625, .875, .0625),
-          new Vector3(.9375, .875, .9375), new Vector4(1, 0, 0, 1)),
+    // top
+    new Quad(new Vector3(.9375, .875, .0625), new Vector3(.0625, .875, .0625),
+      new Vector3(.9375, .875, .9375), new Vector4(1, 0, 0, 1)),
 
-      // bottom
-      new Quad(new Vector3(.0625, 0, .0625), new Vector3(.9375, 0, .0625),
-          new Vector3(.0625, 0, .9375), new Vector4(0, 1, 0, 1)),
+    // bottom
+    new Quad(new Vector3(.0625, 0, .0625), new Vector3(.9375, 0, .0625),
+      new Vector3(.0625, 0, .9375), new Vector4(0, 1, 0, 1)),
 
-      // -- lock
+    // -- lock
 
-      // north
-      new Quad(new Vector3(.5626, .4375, 0), new Vector3(.4375, .4375, 0),
-          new Vector3(.5626, .6875, 0), new Vector4(.125, .375, .375, .875)),
+    // north
+    new Quad(new Vector3(.5626, .4375, 0), new Vector3(.4375, .4375, 0),
+      new Vector3(.5626, .6875, 0), new Vector4(.125, .375, .375, .875)),
 
-      // west
-      new Quad(new Vector3(.4375, .4375, 0), new Vector3(.4375, .4375, .0625),
-          new Vector3(.4375, .6875, 0), new Vector4(.625, .75, .375, .875)),
+    // west
+    new Quad(new Vector3(.4375, .4375, 0), new Vector3(.4375, .4375, .0625),
+      new Vector3(.4375, .6875, 0), new Vector4(.625, .75, .375, .875)),
 
-      // east
-      new Quad(new Vector3(.5626, .4375, .0625), new Vector3(.5626, .4375, 0),
-          new Vector3(.5626, .6875, .0625), new Vector4(0, .125, .375, .875)),
+    // east
+    new Quad(new Vector3(.5626, .4375, .0625), new Vector3(.5626, .4375, 0),
+      new Vector3(.5626, .6875, .0625), new Vector4(0, .125, .375, .875)),
 
-      // top
-      new Quad(new Vector3(.5626, .6875, 0), new Vector3(.4375, .6875, 0),
-          new Vector3(.5626, .6875, .0625), new Vector4(.125, .375, .875, 1)),
+    // top
+    new Quad(new Vector3(.5626, .6875, 0), new Vector3(.4375, .6875, 0),
+      new Vector3(.5626, .6875, .0625), new Vector4(.125, .375, .875, 1)),
 
-      // bottom
-      new Quad(new Vector3(.4375, .4375, 0), new Vector3(.5626, .4375, 0),
-          new Vector3(.4375, .4375, .0625), new Vector4(.625, .375, .875, 1)),
+    // bottom
+    new Quad(new Vector3(.4375, .4375, 0), new Vector3(.5626, .4375, 0),
+      new Vector3(.4375, .4375, .0625), new Vector4(.625, .375, .875, 1)),
 
   };
   //endregion
 
   //region Large Chest (left)
   protected static final Quad[] left = {
-      // north
-      new Quad(new Vector3(1, 0, .0625), new Vector3(.0625, 0, .0625),
-          new Vector3(1, .875, .0625), new Vector4(1, 0, 0, 1)),
+    // north
+    new Quad(new Vector3(1, 0, .0625), new Vector3(.0625, 0, .0625),
+      new Vector3(1, .875, .0625), new Vector4(1, 0, 0, 1)),
 
-      // south
-      new Quad(new Vector3(.0625, 0, .9375), new Vector3(1, 0, .9375),
-          new Vector3(.0625, .875, .9375), new Vector4(0, 1, 0, 1)),
+    // south
+    new Quad(new Vector3(.0625, 0, .9375), new Vector3(1, 0, .9375),
+      new Vector3(.0625, .875, .9375), new Vector4(0, 1, 0, 1)),
 
-      // west
-      new Quad(new Vector3(.0625, 0, .0625), new Vector3(.0625, 0, .9375),
-          new Vector3(.0625, .875, .0625), new Vector4(0, 1, 0, 1)),
+    // west
+    new Quad(new Vector3(.0625, 0, .0625), new Vector3(.0625, 0, .9375),
+      new Vector3(.0625, .875, .0625), new Vector4(0, 1, 0, 1)),
 
-      // top
-      new Quad(new Vector3(1, .875, .0625), new Vector3(.0625, .875, .0625),
-          new Vector3(1, .875, .9375), new Vector4(1, 0, 0, 1)),
+    // top
+    new Quad(new Vector3(1, .875, .0625), new Vector3(.0625, .875, .0625),
+      new Vector3(1, .875, .9375), new Vector4(1, 0, 0, 1)),
 
-      // bottom
-      new Quad(new Vector3(.0625, 0, .0625), new Vector3(1, 0, .0625),
-          new Vector3(.0625, 0, .9375), new Vector4(0, 1, 0, 1)),
+    // bottom
+    new Quad(new Vector3(.0625, 0, .0625), new Vector3(1, 0, .0625),
+      new Vector3(.0625, 0, .9375), new Vector4(0, 1, 0, 1)),
 
-      // -- lock
+    // -- lock
 
-      // north
-      new Quad(new Vector3(1, .4375, 0), new Vector3(.9375, .4375, 0),
-          new Vector3(1, .6875, 0), new Vector4(.25, .375, .375, .875)),
+    // north
+    new Quad(new Vector3(1, .4375, 0), new Vector3(.9375, .4375, 0),
+      new Vector3(1, .6875, 0), new Vector4(.25, .375, .375, .875)),
 
-      // west
-      new Quad(new Vector3(.9375, .4375, 0), new Vector3(.9375, .4375, .0625),
-          new Vector3(.9375, .6875, 0), new Vector4(.625, .75, .375, .875)),
+    // west
+    new Quad(new Vector3(.9375, .4375, 0), new Vector3(.9375, .4375, .0625),
+      new Vector3(.9375, .6875, 0), new Vector4(.625, .75, .375, .875)),
 
-      // top
-      new Quad(new Vector3(1, .6875, 0), new Vector3(.9375, .6875, 0),
-          new Vector3(1, .6875, .0625), new Vector4(.25, .375, .875, 1)),
+    // top
+    new Quad(new Vector3(1, .6875, 0), new Vector3(.9375, .6875, 0),
+      new Vector3(1, .6875, .0625), new Vector4(.25, .375, .875, 1)),
 
-      // bottom
-      new Quad(new Vector3(.9375, .4375, 0), new Vector3(1, .4375, 0),
-          new Vector3(.9375, .4375, .0625), new Vector4(.625, .5, .875, 1))
+    // bottom
+    new Quad(new Vector3(.9375, .4375, 0), new Vector3(1, .4375, 0),
+      new Vector3(.9375, .4375, .0625), new Vector4(.625, .5, .875, 1))
   };
   //endregion
 
   //region Large Chest (right)
   protected static final Quad[] right = {
-      // north
-      new Quad(new Vector3(.9375, 0, .0625), new Vector3(0, 0, .0625),
-          new Vector3(.9375, .875, .0625), new Vector4(1, 0, 0, 1)),
+    // north
+    new Quad(new Vector3(.9375, 0, .0625), new Vector3(0, 0, .0625),
+      new Vector3(.9375, .875, .0625), new Vector4(1, 0, 0, 1)),
 
-      // south
-      new Quad(new Vector3(0, 0, .9375), new Vector3(.9375, 0, .9375),
-          new Vector3(0, .875, .9375), new Vector4(0, 1, 0, 1)),
+    // south
+    new Quad(new Vector3(0, 0, .9375), new Vector3(.9375, 0, .9375),
+      new Vector3(0, .875, .9375), new Vector4(0, 1, 0, 1)),
 
-      // east
-      new Quad(new Vector3(.9375, 0, .9375), new Vector3(.9375, 0, .0625),
-          new Vector3(.9375, .875, .9375), new Vector4(1, 0, 0, 1)),
+    // east
+    new Quad(new Vector3(.9375, 0, .9375), new Vector3(.9375, 0, .0625),
+      new Vector3(.9375, .875, .9375), new Vector4(1, 0, 0, 1)),
 
-      // top
-      new Quad(new Vector3(.9375, .875, .0625), new Vector3(0, .875, .0625),
-          new Vector3(.9375, .875, .9375), new Vector4(1, 0, 0, 1)),
+    // top
+    new Quad(new Vector3(.9375, .875, .0625), new Vector3(0, .875, .0625),
+      new Vector3(.9375, .875, .9375), new Vector4(1, 0, 0, 1)),
 
-      // bottom
-      new Quad(new Vector3(0, 0, .0625), new Vector3(.9375, 0, .0625), new Vector3(0, 0, .9375),
-          new Vector4(0, 1, 0, 1)),
+    // bottom
+    new Quad(new Vector3(0, 0, .0625), new Vector3(.9375, 0, .0625), new Vector3(0, 0, .9375),
+      new Vector4(0, 1, 0, 1)),
 
-      // -- lock
+    // -- lock
 
-      // north
-      new Quad(new Vector3(.0625, .4375, 0), new Vector3(0, .4375, 0),
-          new Vector3(.0625, .6875, 0), new Vector4(.125, .25, .375, .875)),
+    // north
+    new Quad(new Vector3(.0625, .4375, 0), new Vector3(0, .4375, 0),
+      new Vector3(.0625, .6875, 0), new Vector4(.125, .25, .375, .875)),
 
-      // east
-      new Quad(new Vector3(.0625, .4375, .0625), new Vector3(.0625, .4375, 0),
-          new Vector3(.0625, .6875, .0625), new Vector4(0, .125, .375, .875)),
+    // east
+    new Quad(new Vector3(.0625, .4375, .0625), new Vector3(.0625, .4375, 0),
+      new Vector3(.0625, .6875, .0625), new Vector4(0, .125, .375, .875)),
 
-      // top
-      new Quad(new Vector3(.0625, .6875, 0), new Vector3(0, .6875, 0),
-          new Vector3(.0625, .6875, .0625), new Vector4(.125, .25, .875, 1)),
+    // top
+    new Quad(new Vector3(.0625, .6875, 0), new Vector3(0, .6875, 0),
+      new Vector3(.0625, .6875, .0625), new Vector4(.125, .25, .875, 1)),
 
-      // bottom
-      new Quad(new Vector3(0, .4375, 0), new Vector3(.0625, .4375, 0),
-          new Vector3(0, .4375, .0625), new Vector4(.5, .375, .875, 1))
+    // bottom
+    new Quad(new Vector3(0, .4375, 0), new Vector3(.0625, .4375, 0),
+      new Vector3(0, .4375, .0625), new Vector4(.5, .375, .875, 1))
   };
   //endregion
 
-  //region Normal Chest
-  private static final Texture[][] normalChest = {
-      // Single.
-      {
-          Texture.chestFront, Texture.chestBack, Texture.chestLeft, Texture.chestRight,
-          Texture.chestTop, Texture.chestBottom, Texture.chestLock, Texture.chestLock,
-          Texture.chestLock, Texture.chestLock, Texture.chestLock,
-      },
-
-      // Left.
-      {
-          Texture.largeChestFrontLeft, Texture.largeChestBackLeft, Texture.largeChestLeft,
-          Texture.largeChestTopLeft, Texture.largeChestBottomLeft, Texture.chestLock,
-          Texture.chestLock, Texture.chestLock, Texture.chestLock,
-      },
-
-      // Right.
-      {
-          Texture.largeChestFrontRight, Texture.largeChestBackRight, Texture.largeChestRight,
-          Texture.largeChestTopRight, Texture.largeChestBottomRight, Texture.chestLock,
-          Texture.chestLock, Texture.chestLock, Texture.chestLock,
-      }
+  private static final ChestTexture.Textures[] normalChest = {
+    Texture.chest,
+    Texture.largeChestLeft,
+    Texture.largeChestRight
   };
-  //endregion
-
-  //region Trapped Chest
-  private static final Texture[][] trappedChest = {
-      // Single.
-      {
-          Texture.trappedChestFront, Texture.trappedChestBack, Texture.trappedChestLeft, Texture.trappedChestRight,
-          Texture.trappedChestTop, Texture.trappedChestBottom, Texture.trappedChestLock, Texture.trappedChestLock,
-          Texture.trappedChestLock, Texture.trappedChestLock, Texture.trappedChestLock,
-      },
-
-      // Left.
-      {
-          Texture.largeTrappedChestFrontLeft, Texture.largeTrappedChestBackLeft, Texture.largeTrappedChestLeft,
-          Texture.largeTrappedChestTopLeft, Texture.largeTrappedChestBottomLeft, Texture.trappedChestLock,
-          Texture.trappedChestLock, Texture.trappedChestLock, Texture.trappedChestLock,
-      },
-
-      // Right.
-      {
-          Texture.largeTrappedChestFrontRight, Texture.largeTrappedChestBackRight, Texture.largeTrappedChestRight,
-          Texture.largeTrappedChestTopRight, Texture.largeTrappedChestBottomRight, Texture.trappedChestLock,
-          Texture.trappedChestLock, Texture.trappedChestLock, Texture.trappedChestLock,
-      }
+  private static final ChestTexture.Textures[] trappedChest = {
+    Texture.trappedChest,
+    Texture.largeTrappedChestLeft,
+    Texture.largeTrappedChestRight
   };
-  //endregion
-
-  //region Ender Chest
-  private static final Texture[] enderChest = {
-      Texture.enderChestFront, Texture.enderChestBack, Texture.enderChestLeft,
-      Texture.enderChestRight, Texture.enderChestTop, Texture.enderChestBottom,
-      Texture.enderChestLock, Texture.enderChestLock, Texture.enderChestLock,
-      Texture.enderChestLock, Texture.enderChestLock,
+  private static final ChestTexture.Textures[] copperChest = {
+    Texture.copperChest,
+    Texture.largeCopperChestLeft,
+    Texture.largeCopperChestRight
   };
-  //endregion
+  private static final ChestTexture.Textures[] exposedCopperChest = {
+    Texture.exposedCopperChest,
+    Texture.largeExposedCopperChestLeft,
+    Texture.largeExposedCopperChestRight
+  };
+  private static final ChestTexture.Textures[] weatheredCopperChest = {
+    Texture.weatheredCopperChest,
+    Texture.largeWeatheredCopperChestLeft,
+    Texture.largeWeatheredCopperChestRight
+  };
+  private static final ChestTexture.Textures[] oxidizedCopperChest = {
+    Texture.oxidizedCopperChest,
+    Texture.largeOxidizedCopperChestLeft,
+    Texture.largeOxidizedCopperChestRight
+  };
 
   protected static final Quad[][][] variants = new Quad[3][6][];
 
@@ -247,15 +221,34 @@ public class ChestModel extends QuadModel {
   private final Quad[] quads;
   private final Texture[] textures;
 
-  public ChestModel(int type, int facing, boolean trapped, boolean ender) {
-    if (ender) {
-      textures = enderChest;
-    } else if (trapped) {
-      textures = trappedChest[type];
-    } else {
-      textures = normalChest[type];
-    }
-    quads = variants[type][facing];
+  public ChestModel(Chest.Type type, int facing, Chest.Kind kind) {
+    ChestTexture.Textures textures = switch (kind) {
+      case ENDER -> Texture.enderChest;
+      case TRAPPED -> trappedChest[type.ordinal()];
+      case COPPER -> copperChest[type.ordinal()];
+      case EXPOSED_COPPER ->  exposedCopperChest[type.ordinal()];
+      case OXIDIZED_COPPER -> oxidizedCopperChest[type.ordinal()];
+      case WEATHERED_COPPER -> weatheredCopperChest[type.ordinal()];
+      case NORMAL -> normalChest[type.ordinal()];
+    };
+    quads = variants[type.ordinal()][facing];
+    this.textures = switch (type) {
+      case SINGLE -> new Texture[]{
+        textures.front, textures.back, textures.left, textures.right,
+        textures.top, textures.bottom, textures.lock, textures.lock,
+        textures.lock, textures.lock, textures.lock,
+      };
+      case LEFT -> new Texture[]{
+        textures.front, textures.back, textures.left,
+        textures.top, textures.bottom, textures.lock,
+        textures.lock, textures.lock, textures.lock,
+      };
+      case RIGHT -> new Texture[]{
+        textures.front, textures.back, textures.right,
+        textures.top, textures.bottom, textures.lock,
+        textures.lock, textures.lock, textures.lock,
+      };
+    };
   }
 
   @Override

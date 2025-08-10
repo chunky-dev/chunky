@@ -468,7 +468,6 @@ public class MinecraftBlockProvider implements BlockProvider {
     "minecraft:exposed_cut_copper",
     "minecraft:exposed_cut_copper_slab",
     "minecraft:exposed_cut_copper_stairs",
-    "minecraft:lightning_rod",
     "minecraft:light_weighted_pressure_plate",
     "minecraft:lilac",
     "minecraft:lily_of_the_valley",
@@ -1188,6 +1187,35 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("short_dry_grass", (name, tag) -> new SpriteBlock(name, Texture.shortDryGrass));
     addBlock("tall_dry_grass", (name, tag) -> new SpriteBlock(name, Texture.tallDryGrass));
     addBlock("dried_ghast", (name, tag) -> new DriedGhast(BlockProvider.facing(tag), BlockProvider.stringToInt(tag.get("Properties").get("hydration"), 0)));
+
+    // 1.21.x (2025 Fall Drop)
+    for (String s : new String[]{"", "waxed_"}) {
+      addBlock(s + "lightning_rod", (name, tag) -> new LightningRod(name, Texture.lightningRod, BlockProvider.facing(tag, "up"),
+        tag.get("Properties").get("powered").stringValue("false").equals("true")));
+      addBlock(s + "exposed_lightning_rod", (name, tag) -> new LightningRod(name, Texture.exposedLightningRod, BlockProvider.facing(tag, "up"),
+        tag.get("Properties").get("powered").stringValue("false").equals("true")));
+      addBlock(s + "oxidized_lightning_rod", (name, tag) -> new LightningRod(name, Texture.oxidizedLightningRod, BlockProvider.facing(tag, "up"),
+        tag.get("Properties").get("powered").stringValue("false").equals("true")));
+      addBlock(s + "weathered_lightning_rod", (name, tag) -> new LightningRod(name, Texture.weatheredLightningRod, BlockProvider.facing(tag, "up"),
+        tag.get("Properties").get("powered").stringValue("false").equals("true")));
+
+      addBlock(s + "copper_chest", (name, tag) -> chest(tag, Chest.Kind.COPPER));
+      addBlock(s + "exposed_copper_chest", (name, tag) -> chest(tag, Chest.Kind.EXPOSED_COPPER));
+      addBlock(s + "weathered_copper_chest", (name, tag) -> chest(tag, Chest.Kind.WEATHERED_COPPER));
+      addBlock(s + "oxidized_copper_chest", (name, tag) -> chest(tag, Chest.Kind.OXIDIZED_COPPER));
+    }
+    addBlock("acacia_shelf", (name, tag) -> shelf(tag, Texture.acaciaShelf));
+    addBlock("bamboo_shelf", (name, tag) -> shelf(tag, Texture.bambooShelf));
+    addBlock("birch_shelf", (name, tag) -> shelf(tag, Texture.birchShelf));
+    addBlock("cherry_shelf", (name, tag) -> shelf(tag, Texture.cherryShelf));
+    addBlock("crimson_shelf", (name, tag) -> shelf(tag, Texture.crimsonShelf));
+    addBlock("dark_oak_shelf", (name, tag) -> shelf(tag, Texture.darkOakShelf));
+    addBlock("jungle_shelf", (name, tag) -> shelf(tag, Texture.jungleShelf));
+    addBlock("mangrove_shelf", (name, tag) -> shelf(tag, Texture.mangroveShelf));
+    addBlock("oak_shelf", (name, tag) -> shelf(tag, Texture.oakShelf));
+    addBlock("pale_oak_shelf", (name, tag) -> shelf(tag, Texture.paleOakShelf));
+    addBlock("spruce_shelf", (name, tag) -> shelf(tag, Texture.spruceShelf));
+    addBlock("warped_shelf", (name, tag) -> shelf(tag, Texture.warpedShelf));
   }
 
   @Override
@@ -1567,7 +1595,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "dark_oak_stairs":
         return stairs(tag, Texture.darkOakPlanks);
       case "chest":
-        return chest(tag, false);
+        return chest(tag, Chest.Kind.NORMAL);
       case "diamond_ore":
         return new MinecraftBlock(name, Texture.diamondOre);
       case "diamond_block":
@@ -1784,7 +1812,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "damaged_anvil":
         return anvil(tag, 2);
       case "trapped_chest":
-        return chest(tag, true);
+        return chest(tag, Chest.Kind.TRAPPED);
       case "light_weighted_pressure_plate":
         return new PressurePlate(name, Texture.goldBlock);
       case "heavy_weighted_pressure_plate":
@@ -3019,8 +3047,6 @@ public class MinecraftBlockProvider implements BlockProvider {
         return slab(tag, Texture.oxidizedCutCopper);
       case "lava_cauldron":
         return new LavaCauldron();
-      case "lightning_rod":
-        return new LightningRod(BlockProvider.facing(tag, "up"), tag.get("Properties").get("powered").stringValue("false").equals("true"));
       case "small_amethyst_bud":
         return new SpriteBlock(name, Texture.smallAmethystBud, BlockProvider.facing(tag, "up"));
       case "medium_amethyst_bud":
@@ -3278,11 +3304,6 @@ public class MinecraftBlockProvider implements BlockProvider {
     return tag.get("Properties").get("lit").stringValue("false").equals("true");
   }
 
-  private static boolean isLit(Tag tag, boolean defaultValue) {
-    return tag.get("Properties").get("lit").stringValue(Boolean.toString(defaultValue))
-      .equals("true");
-  }
-
   private static Block redstoneWire(Tag tag) {
     Tag properties = tag.get("Properties");
     String north = properties.get("north").stringValue("none");
@@ -3293,12 +3314,12 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new RedstoneWire(power, north, south, east, west);
   }
 
-  private static Block chest(Tag tag, boolean trapped) {
+  private static Block chest(Tag tag, Chest.Kind kind) {
     String name = BlockProvider.blockName(tag);
     Tag properties = tag.get("Properties");
     String facing = BlockProvider.facing(tag, "north");
     String type = properties.get("type").stringValue("single");
-    return new Chest(name, type, facing, trapped);
+    return new Chest(name, type, facing, kind);
   }
 
   private static Block chain(Tag tag, String name, Texture texture) {
@@ -3678,6 +3699,13 @@ public class MinecraftBlockProvider implements BlockProvider {
       waterlogged,
       sherds
     );
+  }
+
+  private static Block shelf(Tag tag, Texture texture) {
+    return new Shelf(BlockProvider.blockName(tag), texture,
+      BlockProvider.facing(tag),
+      BlockProvider.stringToBoolean(tag.get("Properties").get("powered")),
+      tag.get("Properties").get("side_chain").stringValue("unconnected"));
   }
 
   private static Block nonSolid(Block block) {

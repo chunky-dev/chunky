@@ -20,6 +20,7 @@ import javafx.scene.image.Image;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.texturepack.ChestTexture;
 import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.TexturePath;
 import se.llbit.fxutil.FxImageUtil;
@@ -122,20 +123,8 @@ public class Texture {
   public static final Texture ironBlock = new Texture("iron-block");
   public static final Texture goldBlock = new Texture("gold-block");
   public static final Texture diamondBlock = new Texture("diamond-block");
-  public static final Texture chestTop = new Texture();
-  public static final Texture chestBottom = new Texture();
-  public static final Texture chestLeft = new Texture();
-  public static final Texture chestRight = new Texture();
-  public static final Texture chestFront = new Texture("chest");
-  public static final Texture chestBack = new Texture();
-  public static final Texture chestLock = new Texture();
-  public static final Texture enderChestTop = new Texture();
-  public static final Texture enderChestBottom = new Texture();
-  public static final Texture enderChestLeft = new Texture();
-  public static final Texture enderChestRight = new Texture();
-  public static final Texture enderChestFront = new Texture();
-  public static final Texture enderChestBack = new Texture();
-  public static final Texture enderChestLock = new Texture();
+  public static final ChestTexture.Textures chest = new ChestTexture.Textures();
+  public static final ChestTexture.Textures enderChest = new ChestTexture.Textures();
   public static final Texture redMushroom = new Texture("red-mushroom");
   public static final Texture brownMushroom = new Texture("brown-mushroom");
   public static final Texture goldOre = new Texture("gold-ore");
@@ -292,16 +281,8 @@ public class Texture {
   public static final Texture netherWart0 = new Texture();
   public static final Texture netherWart1 = new Texture();
   public static final Texture netherWart2 = new Texture();
-  public static final Texture largeChestFrontLeft = new Texture();
-  public static final Texture largeChestFrontRight = new Texture();
-  public static final Texture largeChestBackLeft = new Texture();
-  public static final Texture largeChestBackRight = new Texture();
-  public static final Texture largeChestTopLeft = new Texture();
-  public static final Texture largeChestTopRight = new Texture();
-  public static final Texture largeChestBottomLeft = new Texture();
-  public static final Texture largeChestBottomRight = new Texture();
-  public static final Texture largeChestLeft = new Texture();
-  public static final Texture largeChestRight = new Texture();
+  public static final ChestTexture.Textures largeChestLeft = ChestTexture.Textures.newWithLockFrom(chest);
+  public static final ChestTexture.Textures largeChestRight = ChestTexture.Textures.newWithLockFrom(chest);
   public static final Texture enchantmentTableSide = new Texture();
   public static final Texture enchantmentTableTop = new Texture();
   public static final Texture enchantmentTableBottom = new Texture();
@@ -495,24 +476,9 @@ public class Texture {
   public static final Texture observerTop = new Texture();
 
   // Trapped Chest.
-  public static final Texture trappedChestTop = new Texture();
-  public static final Texture trappedChestBottom = new Texture();
-  public static final Texture trappedChestLeft = new Texture();
-  public static final Texture trappedChestRight = new Texture();
-  public static final Texture trappedChestFront = new Texture("chest");
-  public static final Texture trappedChestBack = new Texture();
-  public static final Texture trappedChestLock = new Texture();
-
-  public static final Texture largeTrappedChestFrontLeft = new Texture();
-  public static final Texture largeTrappedChestFrontRight = new Texture();
-  public static final Texture largeTrappedChestBackLeft = new Texture();
-  public static final Texture largeTrappedChestBackRight = new Texture();
-  public static final Texture largeTrappedChestTopLeft = new Texture();
-  public static final Texture largeTrappedChestTopRight = new Texture();
-  public static final Texture largeTrappedChestBottomLeft = new Texture();
-  public static final Texture largeTrappedChestBottomRight = new Texture();
-  public static final Texture largeTrappedChestLeft = new Texture();
-  public static final Texture largeTrappedChestRight = new Texture();
+  public static final ChestTexture.Textures trappedChest = new ChestTexture.Textures();
+  public static final ChestTexture.Textures largeTrappedChestLeft = ChestTexture.Textures.newWithLockFrom(trappedChest);
+  public static final ChestTexture.Textures largeTrappedChestRight = ChestTexture.Textures.newWithLockFrom(trappedChest);
 
   // Entity textures.
   public static final PlayerTexture alex = new PlayerTexture();
@@ -1687,6 +1653,50 @@ public class Texture {
   public static final Texture driedGhastHydration2Tentacles = new Texture();
   @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_tentacles")
   public static final Texture driedGhastHydration3Tentacles = new Texture();
+
+  // [1.21.x (2025 Fall Drop)]
+  @TexturePath("assets/minecraft/textures/block/exposed_lightning_rod")
+  public static final Texture exposedLightningRod = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_lightning_rod")
+  public static final Texture oxidizedLightningRod = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_lightning_rod")
+  public static final Texture weatheredLightningRod = new Texture();
+  public static final ChestTexture.Textures copperChest = new ChestTexture.Textures();
+  public static final ChestTexture.Textures largeCopperChestLeft = ChestTexture.Textures.newWithLockFrom(copperChest);
+  public static final ChestTexture.Textures largeCopperChestRight = ChestTexture.Textures.newWithLockFrom(copperChest);
+  public static final ChestTexture.Textures exposedCopperChest = new ChestTexture.Textures();
+  public static final ChestTexture.Textures largeExposedCopperChestLeft = ChestTexture.Textures.newWithLockFrom(exposedCopperChest);
+  public static final ChestTexture.Textures largeExposedCopperChestRight = ChestTexture.Textures.newWithLockFrom(exposedCopperChest);
+  public static final ChestTexture.Textures weatheredCopperChest = new ChestTexture.Textures();
+  public static final ChestTexture.Textures largeWeatheredCopperChestLeft = ChestTexture.Textures.newWithLockFrom(weatheredCopperChest);
+  public static final ChestTexture.Textures largeWeatheredCopperChestRight = ChestTexture.Textures.newWithLockFrom(weatheredCopperChest);
+  public static final ChestTexture.Textures oxidizedCopperChest = new ChestTexture.Textures();
+  public static final ChestTexture.Textures largeOxidizedCopperChestLeft = ChestTexture.Textures.newWithLockFrom(oxidizedCopperChest);
+  public static final ChestTexture.Textures largeOxidizedCopperChestRight = ChestTexture.Textures.newWithLockFrom(oxidizedCopperChest);
+  @TexturePath("assets/minecraft/textures/block/acacia_shelf")
+  public static final Texture acaciaShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_shelf")
+  public static final Texture bambooShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/birch_shelf")
+  public static final Texture birchShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_shelf")
+  public static final Texture cherryShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crimson_shelf")
+  public static final Texture crimsonShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dark_oak_shelf")
+  public static final Texture darkOakShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/jungle_shelf")
+  public static final Texture jungleShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_shelf")
+  public static final Texture mangroveShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oak_shelf")
+  public static final Texture oakShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_shelf")
+  public static final Texture paleOakShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/spruce_shelf")
+  public static final Texture spruceShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/warped_shelf")
+  public static final Texture warpedShelf = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
