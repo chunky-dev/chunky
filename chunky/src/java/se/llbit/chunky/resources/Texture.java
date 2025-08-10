@@ -1673,8 +1673,30 @@ public class Texture {
   public static final ChestTexture.Textures oxidizedCopperChest = new ChestTexture.Textures();
   public static final ChestTexture.Textures largeOxidizedCopperChestLeft = ChestTexture.Textures.newWithLockFrom(oxidizedCopperChest);
   public static final ChestTexture.Textures largeOxidizedCopperChestRight = ChestTexture.Textures.newWithLockFrom(oxidizedCopperChest);
+  @TexturePath("assets/minecraft/textures/block/acacia_shelf")
+  public static final Texture acaciaShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_shelf")
+  public static final Texture bambooShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/birch_shelf")
+  public static final Texture birchShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_shelf")
+  public static final Texture cherryShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crimson_shelf")
+  public static final Texture crimsonShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dark_oak_shelf")
+  public static final Texture darkOakShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/jungle_shelf")
+  public static final Texture jungleShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_shelf")
+  public static final Texture mangroveShelf = new Texture();
   @TexturePath("assets/minecraft/textures/block/oak_shelf")
   public static final Texture oakShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_shelf")
+  public static final Texture paleOakShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/spruce_shelf")
+  public static final Texture spruceShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/warped_shelf")
+  public static final Texture warpedShelf = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

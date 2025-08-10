@@ -1204,7 +1204,18 @@ public class MinecraftBlockProvider implements BlockProvider {
       addBlock(s + "weathered_copper_chest", (name, tag) -> chest(tag, Chest.Kind.WEATHERED_COPPER));
       addBlock(s + "oxidized_copper_chest", (name, tag) -> chest(tag, Chest.Kind.OXIDIZED_COPPER));
     }
+    addBlock("acacia_shelf", (name, tag) -> shelf(tag, Texture.acaciaShelf));
+    addBlock("bamboo_shelf", (name, tag) -> shelf(tag, Texture.bambooShelf));
+    addBlock("birch_shelf", (name, tag) -> shelf(tag, Texture.birchShelf));
+    addBlock("cherry_shelf", (name, tag) -> shelf(tag, Texture.cherryShelf));
+    addBlock("crimson_shelf", (name, tag) -> shelf(tag, Texture.crimsonShelf));
+    addBlock("dark_oak_shelf", (name, tag) -> shelf(tag, Texture.darkOakShelf));
+    addBlock("jungle_shelf", (name, tag) -> shelf(tag, Texture.jungleShelf));
+    addBlock("mangrove_shelf", (name, tag) -> shelf(tag, Texture.mangroveShelf));
     addBlock("oak_shelf", (name, tag) -> shelf(tag, Texture.oakShelf));
+    addBlock("pale_oak_shelf", (name, tag) -> shelf(tag, Texture.paleOakShelf));
+    addBlock("spruce_shelf", (name, tag) -> shelf(tag, Texture.spruceShelf));
+    addBlock("warped_shelf", (name, tag) -> shelf(tag, Texture.warpedShelf));
   }
 
   @Override
