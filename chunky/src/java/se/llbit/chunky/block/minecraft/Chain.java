@@ -28,7 +28,7 @@ public class Chain extends AbstractModelBlock {
 
   public Chain(String name, Texture texture, String axis) {
     super(name, texture);
-    model = new ChainModel(axis);
+    model = new ChainModel(axis, texture);
     description = "axis=" + axis;
   }
 

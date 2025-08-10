@@ -1203,6 +1203,11 @@ public class MinecraftBlockProvider implements BlockProvider {
       addBlock(s + "exposed_copper_chest", (name, tag) -> chest(tag, Chest.Kind.EXPOSED_COPPER));
       addBlock(s + "weathered_copper_chest", (name, tag) -> chest(tag, Chest.Kind.WEATHERED_COPPER));
       addBlock(s + "oxidized_copper_chest", (name, tag) -> chest(tag, Chest.Kind.OXIDIZED_COPPER));
+
+      addBlock(s + "copper_chain", (name, tag) -> chain(tag, Texture.copperChain));
+      addBlock(s + "exposed_copper_chain", (name, tag) -> chain(tag, Texture.exposedCopperChain));
+      addBlock(s + "weathered_copper_chain", (name, tag) -> chain(tag, Texture.weatheredCopperChain));
+      addBlock(s + "oxidized_copper_chain", (name, tag) -> chain(tag, Texture.oxidizedCopperChain));
     }
     addBlock("acacia_shelf", (name, tag) -> shelf(tag, Texture.acaciaShelf));
     addBlock("bamboo_shelf", (name, tag) -> shelf(tag, Texture.bambooShelf));
@@ -2918,7 +2923,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "quartz_bricks":
         return new MinecraftBlock(name, Texture.quartzBricks);
       case "chain":
-        return chain(tag, "chain", Texture.chain);
+        return chain(tag, Texture.chain);
       case "candle_cake":
         return candleCake(tag, Texture.candle, Texture.candleLit);
       case "white_candle_cake":
@@ -3322,7 +3327,8 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new Chest(name, type, facing, kind);
   }
 
-  private static Block chain(Tag tag, String name, Texture texture) {
+  private static Block chain(Tag tag, Texture texture) {
+    String name = BlockProvider.blockName(tag);
     String axis = tag.get("Properties").get("axis").stringValue("y");
     return new Chain(name, texture, axis);
   }
