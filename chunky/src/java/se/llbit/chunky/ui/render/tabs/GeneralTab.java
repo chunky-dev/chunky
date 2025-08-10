@@ -379,6 +379,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadChickens.setSelected(true);
       loadPigs.setSelected(true);
       loadMooshrooms.setSelected(true);
+      loadSquids.setSelected(true);
       loadOtherEntities.setSelected(true);
     });
     loadNoEntity.setOnAction(event -> {
@@ -392,6 +393,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       loadChickens.setSelected(false);
       loadPigs.setSelected(false);
       loadMooshrooms.setSelected(false);
+      loadSquids.setSelected(false);
       loadOtherEntities.setSelected(false);
     });
 
