@@ -56,23 +56,23 @@ public class SplitLargeChestTexture extends TextureLoader {
     textures.bottom.setTexture(getSprite(spritemap, scale, 14, 19, 15, 14, true, true));
     textures.front.setTexture(
             BitmapImage.concatY(
-                    getSprite(spritemap, scale, 43, 15, 15, 4, false, true),
-                    getSprite(spritemap, scale, 43, 33, 15, 10, false, true)));
+                    getSprite(spritemap, scale, 43, 14, 15, 5, false, true),
+                    getSprite(spritemap, scale, 43, 33, 15, 9, false, true)));
     textures.back.setTexture(
             BitmapImage.concatY(
-                    getSprite(spritemap, scale, 14, 15, 15, 4, true, true),
-                    getSprite(spritemap, scale, 14, 33, 15, 10, true, true)));
+                    getSprite(spritemap, scale, 14, 14, 15, 5, true, true),
+                    getSprite(spritemap, scale, 14, 33, 15, 9, true, true)));
 
     if (this.part == Part.LEFT) {
       textures.left.setTexture(
               BitmapImage.concatY(
-                      getSprite(spritemap, scale, 29, 15, 14, 4, true, true),
-                      getSprite(spritemap, scale, 29, 33, 14, 10, true, true)));
+                      getSprite(spritemap, scale, 29, 14, 14, 5, true, true),
+                      getSprite(spritemap, scale, 29, 33, 14, 9, true, true)));
     } else {
       textures.right.setTexture(
               BitmapImage.concatY(
-                      getSprite(spritemap, scale, 0, 15, 14, 4, false, true),
-                      getSprite(spritemap, scale, 0, 33, 14, 10, false, true)));
+                      getSprite(spritemap, scale, 0, 14, 14, 5, false, true),
+                      getSprite(spritemap, scale, 0, 33, 14, 9, false, true)));
     }
 
     return true;
