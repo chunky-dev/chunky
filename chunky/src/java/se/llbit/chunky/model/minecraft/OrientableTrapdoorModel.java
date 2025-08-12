@@ -158,7 +158,7 @@ public class OrientableTrapdoorModel extends QuadModel {
 
     if (facing.equals("east")) {
       if (open && half.equals("top")) {
-        quads = Model.rotateX(Model.rotateY(quads, Math.toRadians(270)), Math.toRadians(180));
+        quads = Model.rotateY(Model.rotateX(quads, Math.toRadians(180)), Math.toRadians(-270));
       } else {
         quads = Model.rotateY(quads, Math.toRadians(-90));
       }

@@ -150,11 +150,11 @@ public class TrapdoorModel extends QuadModel {
   public TrapdoorModel(Texture texture, String half, String facing, boolean open) {
     if (open) {
       if (facing.equals("east")) {
-        quads = Model.rotateY(quadsOpen, Math.toRadians(90));
+        quads = Model.rotateY(quadsOpen, Math.toRadians(-90));
       } else if (facing.equals("south")) {
         quads = Model.rotateY(quadsOpen, Math.toRadians(180));
       } else if (facing.equals("west")) {
-        quads = Model.rotateY(quadsOpen, Math.toRadians(270));
+        quads = Model.rotateY(quadsOpen, Math.toRadians(-270));
       } else {
         quads = quadsOpen;
       }
