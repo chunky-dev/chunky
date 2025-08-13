@@ -3,8 +3,10 @@ package se.llbit.chunky.entity;
 import se.llbit.chunky.block.minecraft.Head;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.*;
-import se.llbit.chunky.resources.texturepack.*;
-import se.llbit.chunky.world.PlayerEntityData;
+import se.llbit.chunky.resources.texturepack.ColoredTexture;
+import se.llbit.chunky.resources.texturepack.LayeredTextureLoader;
+import se.llbit.chunky.resources.texturepack.SimpleTexture;
+import se.llbit.chunky.resources.texturepack.TextureLoader;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.chunky.world.model.CubeModel;
 import se.llbit.chunky.world.model.JsonModel;
@@ -39,25 +41,22 @@ public abstract class HumanoidEntityBase extends Entity implements Poseable, Gea
   public JsonObject pose = new JsonObject();
   public double scale = 1.0;
   public double headScale = 1.0;
-  public PlayerModel model;
+  public PlayerModel model = PlayerModel.DEFAULT;
 
   public boolean showOuterLayer = true;
 
-  public HumanoidEntityBase(Vector3 position) {
-    this(position, 0, 0, new JsonObject());
+  protected HumanoidEntityBase(Vector3 pos) {
+    super(pos);
   }
 
-  public HumanoidEntityBase(PlayerEntityData data) {
-    this(new Vector3(data.x, data.y, data.z), data.rotation, data.pitch,
-      buildGear(data));
-  }
+  protected HumanoidEntityBase(Vector3 pos, CompoundTag tag) {
+    super(pos);
 
-  protected HumanoidEntityBase(Vector3 position, double rotationDegrees, double pitchDegrees,
-                         JsonObject gear) {
-    super(position);
-    this.model = PlayerModel.STEVE;
-    this.gear = gear;
-    double rotation = QuickMath.degToRad(180 - rotationDegrees);
+    Tag rot = tag.get("Rotation");
+    double yawDegrees =  rot.get(0).floatValue();
+    double pitchDegrees = rot.get(1).floatValue();
+
+    double rotation = QuickMath.degToRad(180 - yawDegrees);
     JsonObject pose = new JsonObject();
     pose.add("all", JsonUtil.vec3ToJson(new Vector3(0, rotation, 0)));
     pose.add("head", JsonUtil.vec3ToJson(new Vector3(-QuickMath.degToRad(pitchDegrees), 0, 0)));
@@ -66,6 +65,8 @@ public abstract class HumanoidEntityBase extends Entity implements Poseable, Gea
     pose.add("leftLeg", JsonUtil.vec3ToJson(new Vector3(0.4, 0, 0)));
     pose.add("rightLeg", JsonUtil.vec3ToJson(new Vector3(-0.4, 0, 0)));
     this.pose = pose;
+
+    this.gear = buildGear(tag);
   }
 
   public HumanoidEntityBase(JsonObject settings) {
@@ -77,7 +78,6 @@ public abstract class HumanoidEntityBase extends Entity implements Poseable, Gea
     this.pose = settings.get("pose").object();
     this.gear = settings.get("gear").object();
   }
-
 
   static JsonObject parseItem(CompoundTag tag) {
     JsonObject item = new JsonObject();
@@ -135,19 +135,70 @@ public abstract class HumanoidEntityBase extends Entity implements Poseable, Gea
     return item;
   }
 
-  static JsonObject buildGear(PlayerEntityData data) {
+  static JsonObject buildGear(CompoundTag tag) {
+
+    // TODO: held item rendering
+    // Main and offhand can be left or right depending on game settings.
+    // Safe to assume Right is main and Left is offhand?
+    // Maybe add a button in the UI to easily swap the two.
+
+    Tag offhand = new CompoundTag();
+    Tag feet = new CompoundTag();
+    Tag legs = new CompoundTag();
+    Tag chest = new CompoundTag();
+    Tag head = new CompoundTag();
+    Tag mainHand = new CompoundTag();
+
+    if(tag.get("equipment").isCompoundTag()) {
+      CompoundTag equipment = tag.get("equipment").asCompound();
+      offhand = equipment.get("offhand");
+      feet = equipment.get("feet");
+      legs = equipment.get("legs");
+      chest = equipment.get("chestplate");
+      head = equipment.get("head");
+      mainHand = equipment.get("mainhand");
+    }
+
+    // Player's main hand item isn't stored in equipment tag, so still have to iterate over inventory for it.
+    // Still look for other slots in loop in case world is pre-1.21.5
+    int selectedItem = tag.get("SelectedItemSlot").intValue(0);
+
+    for (Tag item : tag.get("Inventory").asList()) {
+      int slot = item.get("Slot").byteValue(0);
+      switch (slot) {
+        case -106:
+          offhand = item;
+          break;
+        case 100:
+          feet = item;
+          break;
+        case 101:
+          legs = item;
+          break;
+        case 102:
+          chest = item;
+          break;
+        case 103:
+          head = item;
+          break;
+      }
+      if (slot == selectedItem) {
+        mainHand = item;
+      }
+    }
+
     JsonObject gear = new JsonObject();
-    if (!data.chestplate.asCompound().isEmpty()) {
-      gear.add("chest", parseItem(data.chestplate.asCompound()));
+    if (!chest.asCompound().isEmpty()) {
+      gear.add("chest", parseItem(chest.asCompound()));
     }
-    if (!data.feet.asCompound().isEmpty()) {
-      gear.add("feet", parseItem(data.feet.asCompound()));
+    if (!feet.asCompound().isEmpty()) {
+      gear.add("feet", parseItem(feet.asCompound()));
     }
-    if (!data.head.asCompound().isEmpty()) {
-      gear.add("head", parseItem(data.head.asCompound()));
+    if (!head.asCompound().isEmpty()) {
+      gear.add("head", parseItem(head.asCompound()));
     }
-    if (!data.legs.asCompound().isEmpty()) {
-      gear.add("legs", parseItem(data.legs.asCompound()));
+    if (!legs.asCompound().isEmpty()) {
+      gear.add("legs", parseItem(legs.asCompound()));
     }
     return gear;
   }

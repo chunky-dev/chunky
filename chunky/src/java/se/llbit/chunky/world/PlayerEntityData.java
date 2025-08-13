@@ -17,7 +17,6 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
 public class PlayerEntityData {
@@ -25,78 +24,38 @@ public class PlayerEntityData {
   public final double x;
   public final double y;
   public final double z;
-  public final double rotation;
-  public final double pitch;
   public final int dimension;
-  public Tag feet = new CompoundTag();
-  public Tag legs = new CompoundTag();
-  public Tag head = new CompoundTag();
-  public Tag chestplate = new CompoundTag();
-  public Tag offhand = new CompoundTag();
-  public Tag mainHand = new CompoundTag();
   public final String uuid;
 
-  public PlayerEntityData(Tag player) {
-    Tag pos = player.get("Pos");
-    Tag rotation = player.get("Rotation");
+  public final Tag player;
 
+  public PlayerEntityData(Tag player) {
+    this.player = player;
+
+    Tag pos = player.get("Pos");
+    x = pos.get(0).doubleValue();
+    y = pos.get(1).doubleValue();
+    z = pos.get(2).doubleValue();
+
+    this.uuid = loadUUID(player);
+
+    dimension = player.get("Dimension").intValue();
+  }
+
+  public static String loadUUID(Tag tag) {
     long uuidHi;
     long uuidLo;
-    if (player.get("UUID").isIntArray(4)) {
+    if (tag.get("UUID").isIntArray(4)) {
       // since 20w12a (1.16) the UUID is saved in four 32-bit integers, ordered from most significant to least significant
-      int[] uuid = player.get("UUID").intArray();
+      int[] uuid = tag.get("UUID").intArray();
       uuidHi = (((long) uuid[0]) << 32) | (uuid[1] & 0xffffffffL);
       uuidLo = (((long) uuid[2]) << 32) | (uuid[3] & 0xffffffffL);
     } else {
       // before 20w12a, the UUID was saved as two longs (64-bit)
-      uuidLo = player.get("UUIDLeast").longValue(-1);
-      uuidHi = player.get("UUIDMost").longValue(-1);
+      uuidLo = tag.get("UUIDLeast").longValue(-1);
+      uuidHi = tag.get("UUIDMost").longValue(-1);
     }
-    uuid = String.format("%016X%016X", uuidHi, uuidLo);
-    x = pos.get(0).doubleValue();
-    y = pos.get(1).doubleValue();
-    z = pos.get(2).doubleValue();
-    this.rotation = rotation.get(0).floatValue();
-    pitch = rotation.get(1).floatValue();
-    dimension = player.get("Dimension").intValue();
-
-    if(player.get("equipment").isCompoundTag()) {
-      CompoundTag equipment = player.get("equipment").asCompound();
-      offhand = equipment.get("offhand");
-      feet = equipment.get("feet");
-      legs = equipment.get("legs");
-      chestplate = equipment.get("chestplate");
-      head = equipment.get("head");
-      mainHand = equipment.get("mainhand");
-    }
-
-    // Player's main hand item isn't stored in equipment tag, so still have to iterate over inventory for it.
-    // Still look for other slots in loop in case world is pre-1.21.5
-    int selectedItem = player.get("SelectedItemSlot").intValue(0);
-
-    for (Tag item : player.get("Inventory").asList()) {
-      int slot = item.get("Slot").byteValue(0);
-      switch (slot) {
-        case -106:
-          offhand = item;
-          break;
-        case 100:
-          feet = item;
-          break;
-        case 101:
-          legs = item;
-          break;
-        case 102:
-          chestplate = item;
-          break;
-        case 103:
-          head = item;
-          break;
-      }
-      if (slot == selectedItem) {
-        mainHand = item;
-      }
-    }
+    return String.format("%016X%016X", uuidHi, uuidLo);
   }
 
   @Override

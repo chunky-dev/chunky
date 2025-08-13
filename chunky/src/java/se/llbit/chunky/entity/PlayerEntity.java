@@ -18,35 +18,26 @@
  */
 package se.llbit.chunky.entity;
 
-import se.llbit.chunky.block.minecraft.Head;
-import se.llbit.chunky.entity.SkullEntity.Kind;
-import se.llbit.chunky.renderer.scene.PlayerModel;
-import se.llbit.chunky.resources.*;
-import se.llbit.chunky.resources.PlayerTexture.ExtendedUVMap;
-import se.llbit.chunky.resources.texturepack.*;
+import se.llbit.chunky.resources.PlayerTexture;
+import se.llbit.chunky.resources.texturepack.PlayerTextureLoader;
+import se.llbit.chunky.resources.texturepack.TextureFormatError;
 import se.llbit.chunky.world.PlayerEntityData;
-import se.llbit.chunky.world.material.TextureMaterial;
-import se.llbit.chunky.world.model.CubeModel;
-import se.llbit.chunky.world.model.JsonModel;
 import se.llbit.json.Json;
 import se.llbit.json.JsonObject;
-import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
-import se.llbit.math.*;
-import se.llbit.math.primitive.Box;
-import se.llbit.math.primitive.Primitive;
+import se.llbit.math.QuickMath;
+import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
-import se.llbit.nbt.Tag;
 import se.llbit.util.JsonUtil;
 import se.llbit.util.mojangapi.MinecraftProfile;
 import se.llbit.util.mojangapi.MinecraftSkin;
 import se.llbit.util.mojangapi.MojangApi;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Optional;
+import java.util.Random;
 
 public class PlayerEntity extends HumanoidEntityBase {
 
@@ -56,21 +47,19 @@ public class PlayerEntity extends HumanoidEntityBase {
    */
   public String skin = "";
 
-  public PlayerEntity(String uuid, Vector3 position) {
-    this(uuid, position, 0, 0, new JsonObject());
-  }
-
   public PlayerEntity(PlayerEntityData data) {
-    this(data.uuid, new Vector3(data.x, data.y, data.z), data.rotation, data.pitch,
-      buildGear(data));
+    this(new Vector3(data.x, data.y, data.z), (CompoundTag) data.player);
   }
 
-  protected PlayerEntity(String uuid, Vector3 position, double rotationDegrees, double pitchDegrees,
-                         JsonObject gear) {
-    super(position, rotationDegrees, pitchDegrees, gear);
+  public PlayerEntity(String uuid, Vector3 pos) {
+    super(pos);
     this.uuid = uuid;
   }
 
+  public PlayerEntity(Vector3 pos, CompoundTag tag) {
+    super(pos, tag);
+    this.uuid = PlayerEntityData.loadUUID(tag);
+  }
 
   public PlayerEntity(JsonObject settings) {
     super(settings);
