@@ -556,6 +556,30 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/entity/squid/squid")
   public static final EntityTexture squid = new EntityTexture();
 
+  @TexturePath("assets/minecraft/textures/entity/equipment/humanoid/chainmail")
+  public static final EntityTexture chainmailArmor = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/equipment/humanoid/diamond")
+  public static final EntityTexture diamondArmor = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/equipment/humanoid/gold")
+  public static final EntityTexture goldArmor = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/equipment/humanoid/iron")
+  public static final EntityTexture ironArmor = new EntityTexture();=
+  @TexturePath("assets/minecraft/textures/entity/equipment/humanoid/netherite")
+  public static final EntityTexture netheriteArmor = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/equipment/humanoid/turtle_scute")
+  public static final EntityTexture turtleScuteAmor = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/equipment/humanoid_leggings/chainmail")
+  public static final EntityTexture chainmailLeggings = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/equipment/humanoid_leggings/diamond")
+  public static final EntityTexture diamondLeggings = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/equipment/humanoid_leggings/gold")
+  public static final EntityTexture goldLeggings = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/equipment/humanoid_leggings/iron")
+  public static final EntityTexture ironLeggings = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/equipment/humanoid_leggings/netherite")
+  public static final EntityTexture netheriteLeggings = new EntityTexture();
+  // Leather armor is constructed in HumanoidEntityBase
+
   // [1.10] Bone, magma, nether wart block, red nether brick.
   public static final Texture boneSide = new Texture();
   public static final Texture boneTop = new Texture();

@@ -728,56 +728,45 @@ public abstract class HumanoidEntityBase extends Entity implements Poseable, Gea
         case "leather_boots":
         case "leather_helmet":
         case "leather_chestplate":
-          loader = leatherTexture("models/armor/leather_layer_1",
+          loader = leatherTexture("entity/equipment/humanoid/leather",
             item.get("color").intValue(0x96613A), texture);
           break;
         case "leather_leggings":
-          loader = leatherTexture("models/armor/leather_layer_2",
+          loader = leatherTexture("entity/equipment/humanoid_leggings/leather",
             item.get("color").intValue(0x96613A), texture);
           break;
         case "golden_boots":
         case "golden_helmet":
         case "golden_chestplate":
-          loader = simpleTexture("models/armor/gold_layer_1", texture);
-          break;
+          return Texture.goldArmor;
         case "golden_leggings":
-          loader = simpleTexture("models/armor/gold_layer_2", texture);
-          break;
+          return Texture.goldLeggings;
         case "iron_boots":
         case "iron_helmet":
         case "iron_chestplate":
-          loader = simpleTexture("models/armor/iron_layer_1", texture);
-          break;
+          return Texture.ironArmor;
         case "iron_leggings":
-          loader = simpleTexture("models/armor/iron_layer_2", texture);
-          break;
+          return Texture.ironLeggings;
         case "chainmail_boots":
         case "chainmail_helmet":
         case "chainmail_chestplate":
-          loader = simpleTexture("models/armor/chainmail_layer_1", texture);
-          break;
+          return Texture.chainmailArmor;
         case "chainmail_leggings":
-          loader = simpleTexture("models/armor/chainmail_layer_2", texture);
-          break;
+          return Texture.chainmailLeggings;
         case "diamond_boots":
         case "diamond_helmet":
         case "diamond_chestplate":
-          loader = simpleTexture("models/armor/diamond_layer_1", texture);
-          break;
+          return Texture.diamondArmor;
         case "diamond_leggings":
-          loader = simpleTexture("models/armor/diamond_layer_2", texture);
-          break;
+          return Texture.diamondLeggings;
         case "netherite_boots":
         case "netherite_helmet":
         case "netherite_chestplate":
-          loader = simpleTexture("models/armor/netherite_layer_1", texture);
-          break;
+          return Texture.netheriteArmor;
         case "netherite_leggings":
-          loader = simpleTexture("models/armor/netherite_layer_2", texture);
-          break;
+          return Texture.netheriteLeggings;
         case "turtle_helmet":
-          loader = simpleTexture("models/armor/turtle_layer_1", texture);
-          break;
+          return Texture.turtleScuteAmor;
         case "player_head":
           String skin = item.get("skin").asString("");
           if (!skin.isEmpty()) {
