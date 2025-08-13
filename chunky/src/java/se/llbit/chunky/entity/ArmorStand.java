@@ -17,7 +17,6 @@
  */
 package se.llbit.chunky.entity;
 
-import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
@@ -397,25 +396,25 @@ public class ArmorStand extends Entity implements Poseable, Geared {
       CompoundTag boots = armorItems.get(0).asCompound();
       // TODO: handle colored leather.
       if (!boots.isEmpty()) {
-        gear.add("feet", PlayerEntity.parseItem(boots));
+        gear.add("feet", HumanoidEntityBase.parseItem(boots));
       }
     }
     if (armorItemsCount > 1) {
       CompoundTag legs = armorItems.get(1).asCompound();
       if (!legs.isEmpty()) {
-        gear.add("legs", PlayerEntity.parseItem(legs));
+        gear.add("legs", HumanoidEntityBase.parseItem(legs));
       }
     }
     if (armorItemsCount > 2) {
       CompoundTag chest = armorItems.get(2).asCompound();
       if (!chest.isEmpty()) {
-        gear.add("chest", PlayerEntity.parseItem(chest));
+        gear.add("chest", HumanoidEntityBase.parseItem(chest));
       }
     }
     if (armorItemsCount > 3) {
       CompoundTag head = armorItems.get(3).asCompound();
       if (!head.isEmpty()) {
-        gear.add("head", PlayerEntity.parseItem(head));
+        gear.add("head", HumanoidEntityBase.parseItem(head));
       }
     }
     showArms = tag.get("ShowArms").boolValue(false);
@@ -482,7 +481,7 @@ public class ArmorStand extends Entity implements Poseable, Geared {
         .rotateY(allPose.y)
         .rotateZ(allPose.z)
         .translate(worldOffset);
-    PlayerEntity.addArmor(primitives, gear, pose, armWidth, worldTransform, headScale);
+    HumanoidEntityBase.addArmor(primitives, gear, pose, armWidth, worldTransform, headScale);
 
     Transform transform = Transform.NONE.translate(-0.5, 0, -0.5).translate(worldOffset);
 
