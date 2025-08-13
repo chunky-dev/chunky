@@ -32,7 +32,7 @@ public class PlayerEntityData {
   public Tag legs = new CompoundTag();
   public Tag head = new CompoundTag();
   public Tag chestplate = new CompoundTag();
-  public Tag shield = new CompoundTag();
+  public Tag offhand = new CompoundTag();
   public Tag mainHand = new CompoundTag();
   public final String uuid;
 
@@ -60,13 +60,25 @@ public class PlayerEntityData {
     pitch = rotation.get(1).floatValue();
     dimension = player.get("Dimension").intValue();
 
+    if(player.get("equipment").isCompoundTag()) {
+      CompoundTag equipment = player.get("equipment").asCompound();
+      offhand = equipment.get("offhand");
+      feet = equipment.get("feet");
+      legs = equipment.get("legs");
+      chestplate = equipment.get("chestplate");
+      head = equipment.get("head");
+      mainHand = equipment.get("mainhand");
+    }
+
+    // Player's main hand item isn't stored in equipment tag, so still have to iterate over inventory for it.
+    // Still look for other slots in loop in case world is pre-1.21.5
     int selectedItem = player.get("SelectedItemSlot").intValue(0);
 
     for (Tag item : player.get("Inventory").asList()) {
       int slot = item.get("Slot").byteValue(0);
       switch (slot) {
         case -106:
-          shield = item;
+          offhand = item;
           break;
         case 100:
           feet = item;

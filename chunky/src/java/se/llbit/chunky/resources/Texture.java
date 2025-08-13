@@ -563,7 +563,7 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/entity/equipment/humanoid/gold")
   public static final EntityTexture goldArmor = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/equipment/humanoid/iron")
-  public static final EntityTexture ironArmor = new EntityTexture();=
+  public static final EntityTexture ironArmor = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/equipment/humanoid/netherite")
   public static final EntityTexture netheriteArmor = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/equipment/humanoid/turtle_scute")
