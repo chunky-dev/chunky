@@ -39,9 +39,6 @@ public interface WorldFormat {
     return worldsByFormat.values().stream().findFirst();
   }
 
-  /**
-   * @return The user-recognisable name of the world format. Shown to the user if this format has issues or throws.
-   */
   String name();
 
   /**

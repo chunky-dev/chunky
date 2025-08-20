@@ -792,7 +792,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       loadedWorld = world;
       worldPath = loadedWorld.getWorldDirectory().getAbsolutePath();
-      worldDimension = world.currentDimension().id();
+      worldDimension = world.currentDimension().getId();
 
       if (chunksToLoad.isEmpty()) {
         return;

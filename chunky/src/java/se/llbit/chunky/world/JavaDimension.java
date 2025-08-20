@@ -33,7 +33,7 @@ public class JavaDimension extends Dimension {
     boolean changed = ((JavaWorld) this.world).reloadPlayerData();
     if (changed) {
       this.setPlayerEntities(((JavaWorld) this.world).playerEntities.stream()
-        .filter(player -> player.dimension.equals(this.id()))
+        .filter(player -> player.dimension.equals(this.getId()))
         .collect(Collectors.toSet()));
     }
     return changed;
@@ -121,7 +121,7 @@ public class JavaDimension extends Dimension {
   /**
    * @return File object pointing to the region file directory
    */
-  public synchronized File getRegionDirectory() {
+  public File getRegionDirectory() {
     return new File(getDimensionDirectory(), "region");
   }
 
@@ -134,12 +134,12 @@ public class JavaDimension extends Dimension {
    *
    * @return File object pointing to the data directory
    */
-  protected synchronized File getDimensionDirectory() {
+  protected File getDimensionDirectory() {
     return dimensionDirectory;
   }
 
   @Override
-  public String toString() {
+  public String getName() {
     return dimensionDirectory.getName() ;
   }
 }

@@ -133,7 +133,7 @@ public class JavaChunk extends Chunk {
         int[] heightmapData = extractHeightmapData(data, chunkData);
         updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
 
-        surface = new SurfaceLayer(JavaWorld.VANILLA_DIMENSION_ID_TO_IDX.get(dimension.id()), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
+        surface = new SurfaceLayer(JavaWorld.VANILLA_DIMENSION_ID_TO_IDX.get(dimension.getId()), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
         queueTopography();
       }
     } else {

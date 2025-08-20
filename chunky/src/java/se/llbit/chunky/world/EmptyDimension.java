@@ -38,7 +38,7 @@ public class EmptyDimension extends Dimension {
     return new MCRegionChangeWatcher(worldMapLoader, mapView);
   }
 
-  @Override public String toString() {
+  @Override public String getName() {
     return "[empty dimension]";
   }
 

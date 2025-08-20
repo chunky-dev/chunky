@@ -48,7 +48,15 @@ public abstract class Dimension {
     this.timestamp = timestamp;
   }
 
-  public String id() {
+  /**
+   * @return A user presentable name of the dimension
+   */
+  public abstract String getName();
+
+  /**
+   * @return The dimension id, such as: {@code minecraft:overworld} (See {@link World#OVERWORLD_DIMENSION_ID})
+   */
+  public String getId() {
     return dimensionId;
   }
 
@@ -113,11 +121,6 @@ public abstract class Dimension {
   public Heightmap getHeightmap() {
     return heightmap;
   }
-
-  /**
-   * @return A user presentable name of the dimension
-   */
-  public abstract String toString();
 
   /** Add a chunk deletion listener. */
   public void addChunkDeletionListener(ChunkDeletionListener listener) {

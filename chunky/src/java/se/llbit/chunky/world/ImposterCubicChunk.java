@@ -113,7 +113,7 @@ public class ImposterCubicChunk extends Chunk {
 
     int[] heightmapData = extractHeightmapDataCubic(null, chunkData);
     updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
-    surface = new SurfaceLayer(JavaWorld.VANILLA_DIMENSION_ID_TO_IDX.get(dimension.id()), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
+    surface = new SurfaceLayer(JavaWorld.VANILLA_DIMENSION_ID_TO_IDX.get(dimension.getId()), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
   }
 
   private int[] extractHeightmapDataCubic(Map<String, Tag> cubeData, ChunkData chunkData) {

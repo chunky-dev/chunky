@@ -83,7 +83,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
     boolean isSameWorld = !(this.world instanceof EmptyWorld) && newWorld.getWorldDirectory().equals(this.world.getWorldDirectory());
 
     Optional<String> dimensionToLoad = Optional.of(world.currentDimension())
-      .map(Dimension::id)
+      .map(Dimension::getId)
       .filter(dimension -> newWorld.availableDimensions().contains(dimension))
       .or(newWorld::defaultDimension)
       .or(() -> newWorld.availableDimensions().stream().findFirst());

@@ -71,7 +71,7 @@ public class JavaWorld extends World {
     new String[] { NETHER_DIMENSION_ID, OVERWORLD_DIMENSION_ID, END_DIMENSION_ID }
   ));
 
-  protected int versionId;
+  protected final int versionId;
 
   /**
    * In a java world player data is per-world and not per-dimension, so we store it here.
@@ -89,10 +89,12 @@ public class JavaWorld extends World {
    * @param seed
    * @param timestamp
    */
-  protected JavaWorld(String levelName, File worldDirectory, long seed, long timestamp, Set<PlayerEntityData> playerEntities, Vector3i spawnPos) {
+  protected JavaWorld(String levelName, File worldDirectory, long seed, long timestamp, Set<PlayerEntityData> playerEntities, Vector3i spawnPos, int gameMode, int versionId) {
     super(levelName, worldDirectory, seed, timestamp);
     this.playerEntities = playerEntities;
     this.spawnPos = spawnPos;
+    this.gameMode = gameMode;
+    this.versionId = versionId;
   }
 
   @Override
@@ -164,11 +166,7 @@ public class JavaWorld extends World {
         spawnPos = new Vector3i(0, 0, 0);
       }
 
-      JavaWorld world = new JavaWorld(levelName, worldDirectory, seed, modtime, playerEntities, spawnPos);
-      world.gameMode = gameType.intValue(0);
-      world.versionId = versionId.intValue();
-
-      return world;
+      return new JavaWorld(levelName, worldDirectory, seed, modtime, playerEntities, spawnPos, gameType.intValue(0), versionId.intValue());
     } catch (FileNotFoundException e) {
       if (warnings == LoggedWarnings.NORMAL) {
         Log.infof("Could not find level.dat file for world %s!", levelName);
@@ -293,8 +291,8 @@ public class JavaWorld extends World {
     progress.setJobSize(regionMap.size() + 1);
 
     String regionDirectory =
-      currentDim.id().equals(JavaWorld.OVERWORLD_DIMENSION_ID) ? currentDim.getDimensionDirectory().getName() :
-        currentDim.getDimensionDirectory().getName() + "/DIM" + JavaWorld.VANILLA_DIMENSION_ID_TO_IDX.get(currentDim.id());
+      currentDim.getId().equals(JavaWorld.OVERWORLD_DIMENSION_ID) ? currentDim.getDimensionDirectory().getName() :
+        currentDim.getDimensionDirectory().getName() + "/DIM" + JavaWorld.VANILLA_DIMENSION_ID_TO_IDX.get(currentDim.getId());
     regionDirectory += "/region";
 
     try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(target))) {
