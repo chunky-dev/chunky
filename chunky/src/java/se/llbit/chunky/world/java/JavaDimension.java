@@ -130,4 +130,9 @@ public class JavaDimension extends Dimension {
   public synchronized File getRegionDirectory() {
     return new File(getDimensionDirectory(), "region");
   }
+
+  @Override
+  public String getName() {
+    return dimensionDirectory.getName() ;
+  }
 }

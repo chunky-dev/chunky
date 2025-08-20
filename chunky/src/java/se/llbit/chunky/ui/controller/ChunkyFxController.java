@@ -341,7 +341,7 @@ public class ChunkyFxController
               "This scene shows a different world than the one that is currently loaded. Do you want to load the world of this scene?");
             Dialogs.stayOnTop(loadWorldConfirm);
             if (loadWorldConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
-              mapLoader.loadWorld(newWorld.getWorldDirectory());
+              mapLoader.loadWorld(newWorld);
               getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
             }
           }
@@ -652,7 +652,7 @@ public class ChunkyFxController
     mapOverlay.setOnKeyPressed(map::onKeyPressed);
     mapOverlay.setOnKeyReleased(map::onKeyReleased);
 
-    mapLoader.loadWorld(PersistentSettings.getLastWorld());
+    mapLoader.loadWorldFromDirectory(PersistentSettings.getLastWorld());
     IntIntPair heightRange = mapLoader.getWorld().currentDimension().heightRange();
     mapView.setYMin(heightRange.firstInt());
     mapView.setYMax(heightRange.secondInt());

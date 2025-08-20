@@ -60,7 +60,7 @@ public class JavaWorld extends World {
    *
    * @return {@code true} if the world data was loaded
    */
-  public static World loadWorld(File worldDirectory, Dimension.Identifier dimensionId, LoggedWarnings warnings) {
+  public static World loadWorld(File worldDirectory, LoggedWarnings warnings) {
     if (worldDirectory == null) {
       return EmptyWorld.INSTANCE;
     }
@@ -108,13 +108,12 @@ public class JavaWorld extends World {
 
       JavaWorld world = new JavaWorld(levelName, worldDirectory, seed, modtime, versionId.intValue(), playerEntities, spawnPos);
       world.gameMode = gameType.intValue(0);
+
       if (singleplayerUuid.isIntArray(4)) {
         world.singleplayerPlayerUuid = UuidUtil.intsToUuid(singleplayerUuid.intArray());
       } else if (!player.isError()) {
         world.singleplayerPlayerUuid = PlayerEntityData.getUuid(player);
       }
-
-      world.currentDimension = loadDimension(world, worldDirectory, dimensionId, playerEntities, spawnPos);
 
       return world;
     } catch (FileNotFoundException e) {
@@ -130,11 +129,16 @@ public class JavaWorld extends World {
   }
 
   @Override
-  public Set<Dimension.Identifier> listDimensions() {
+  public Set<Dimension.Identifier> availableDimensions() {
     return Set.of(Dimension.Identifier.OVERWORLD,
       Dimension.Identifier.THE_NETHER,
       Dimension.Identifier.THE_END
     );
+  }
+
+  @Override
+  public Optional<Dimension.Identifier> defaultDimension() {
+    return Optional.empty();
   }
 
   @Override
