@@ -87,6 +87,11 @@ public abstract class Dimension {
     this.spawnPos = spawnPos;
   }
 
+  /**
+   * @return A user presentable name of the dimension
+   */
+  public abstract String getName();
+
   public Identifier getDimensionId() {
     return dimensionId;
   }
@@ -163,11 +168,6 @@ public abstract class Dimension {
    */
   public Heightmap getHeightmap() {
     return heightmap;
-  }
-
-  @Override
-  public String toString() {
-    return dimensionDirectory.getName();
   }
 
   public Optional<Vector3i> getSpawnPosition() {

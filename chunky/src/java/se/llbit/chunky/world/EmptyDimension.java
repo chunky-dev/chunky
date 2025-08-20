@@ -60,8 +60,7 @@ public class EmptyDimension extends Dimension {
     return new IntIntImmutablePair(0, 0);
   }
 
-  @Override
-  public String toString() {
+  @Override public String getName() {
     return "[empty dimension]";
   }
 

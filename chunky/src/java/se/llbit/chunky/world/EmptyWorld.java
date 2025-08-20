@@ -17,6 +17,7 @@
 package se.llbit.chunky.world;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -35,8 +36,13 @@ public class EmptyWorld extends World {
   }
 
   @Override
-  public Set<Dimension.Identifier> listDimensions() {
+  public Set<Dimension.Identifier> availableDimensions() {
     return Collections.emptySet();
+  }
+
+  @Override
+  public Optional<Dimension.Identifier> defaultDimension() {
+    return Optional.empty();
   }
 
   @Override
@@ -48,5 +54,4 @@ public class EmptyWorld extends World {
   public String toString() {
     return "[empty world]";
   }
-
 }
