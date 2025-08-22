@@ -1705,6 +1705,8 @@ public class Texture {
   public static final Texture weatheredCopperChain = new Texture();
   @TexturePath("assets/minecraft/textures/block/oxidized_copper_chain")
   public static final Texture oxidizedCopperChain = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_torch")
+  public static final Texture copperTorch = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

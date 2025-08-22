@@ -621,6 +621,12 @@ public class BlockPalette {
         }
       });
     }
+    materialProperties.put("minecraft:copper_wall_torch", block -> {
+      block.emittance = 1.0f;
+    });
+    materialProperties.put("minecraft:copper_torch", block -> {
+      block.emittance = 1.0f;
+    });
     return materialProperties;
   }
 

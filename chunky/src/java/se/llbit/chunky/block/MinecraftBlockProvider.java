@@ -1221,6 +1221,8 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("pale_oak_shelf", (name, tag) -> shelf(tag, Texture.paleOakShelf));
     addBlock("spruce_shelf", (name, tag) -> shelf(tag, Texture.spruceShelf));
     addBlock("warped_shelf", (name, tag) -> shelf(tag, Texture.warpedShelf));
+    addBlock("copper_torch", (name, tag) -> new Torch(name, Texture.copperTorch));
+    addBlock("copper_wall_torch", (name, tag) -> new WallTorch(name, Texture.copperTorch, BlockProvider.facing(tag)));
   }
 
   @Override
