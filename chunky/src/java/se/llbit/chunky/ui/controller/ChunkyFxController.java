@@ -75,11 +75,7 @@ import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.ui.RenderCanvasFx;
 import se.llbit.chunky.ui.UILogReceiver;
 import se.llbit.chunky.renderer.scene.*;
-import se.llbit.chunky.world.ChunkSelectionTracker;
-import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.EmptyWorld;
-import se.llbit.chunky.world.Icon;
-import se.llbit.chunky.world.World;
+import se.llbit.chunky.world.*;
 import se.llbit.fx.ToolPane;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.fxutil.GroupedChangeListener;
@@ -364,7 +360,7 @@ public class ChunkyFxController
               "This scene shows a different world than the one that is currently loaded. Do you want to load the world of this scene?");
             Dialogs.stayOnTop(loadWorldConfirm);
             if (loadWorldConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
-              mapLoader.loadWorld(newWorld.getWorldDirectory());
+              mapLoader.loadWorld(newWorld);
               getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
             }
           }
@@ -629,14 +625,14 @@ public class ChunkyFxController
     trackCameraBtn.selectedProperty().bindBidirectional(trackCamera);
     trackCameraBtn.setTooltip(new Tooltip("Center the map view over the camera."));
 
-    int currentDimension = mapLoader.getDimension();
-    overworldBtn.setSelected(currentDimension == World.OVERWORLD_DIMENSION);
+    String currentDimension = mapLoader.getDimension();
+    overworldBtn.setSelected(currentDimension.equals(JavaWorld.OVERWORLD_DIMENSION_ID));
     overworldBtn.setTooltip(new Tooltip("Full of grass and Creepers!"));
 
-    netherBtn.setSelected(currentDimension == World.NETHER_DIMENSION);
+    netherBtn.setSelected(currentDimension.equals(JavaWorld.NETHER_DIMENSION_ID));
     netherBtn.setTooltip(new Tooltip("The land of Zombie Pig-men."));
 
-    endBtn.setSelected(currentDimension == World.END_DIMENSION);
+    endBtn.setSelected(currentDimension.equals(JavaWorld.END_DIMENSION_ID));
     endBtn.setTooltip(new Tooltip("Watch out for the dragon."));
 
     changeWorldBtn.setOnAction(e -> {
@@ -652,13 +648,13 @@ public class ChunkyFxController
     reloadWorldBtn.setOnAction(e -> mapLoader.reloadWorld());
 
     overworldBtn.setGraphic(new ImageView(Icon.grass.fxImage()));
-    overworldBtn.setOnAction(e -> mapLoader.setDimension(World.OVERWORLD_DIMENSION));
+    overworldBtn.setOnAction(e -> mapLoader.setDimension(JavaWorld.OVERWORLD_DIMENSION_ID));
 
     netherBtn.setGraphic(new ImageView(Icon.netherrack.fxImage()));
-    netherBtn.setOnAction(e -> mapLoader.setDimension(World.NETHER_DIMENSION));
+    netherBtn.setOnAction(e -> mapLoader.setDimension(JavaWorld.NETHER_DIMENSION_ID));
 
     endBtn.setGraphic(new ImageView(Icon.endStone.fxImage()));
-    endBtn.setOnAction(e -> mapLoader.setDimension(World.END_DIMENSION));
+    endBtn.setOnAction(e -> mapLoader.setDimension(JavaWorld.END_DIMENSION_ID));
 
     loadScene.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
     loadSceneFile.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
@@ -676,7 +672,7 @@ public class ChunkyFxController
     mapOverlay.setOnKeyPressed(map::onKeyPressed);
     mapOverlay.setOnKeyReleased(map::onKeyReleased);
 
-    mapLoader.loadWorld(PersistentSettings.getLastWorld());
+    mapLoader.loadWorldFromDirectory(PersistentSettings.getLastWorld());
     IntIntPair heightRange = mapLoader.getWorld().currentDimension().heightRange();
     mapView.setYMin(heightRange.firstInt());
     mapView.setYMax(heightRange.secondInt());
