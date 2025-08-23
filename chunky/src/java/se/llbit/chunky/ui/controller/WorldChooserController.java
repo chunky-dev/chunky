@@ -40,7 +40,6 @@ import se.llbit.json.JsonArray;
 import se.llbit.log.Log;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.*;
@@ -135,7 +134,7 @@ public class WorldChooserController implements Initializable {
       File directory = chooser.showDialog(stage);
       if (directory != null) {
         if (directory.isDirectory()) {
-          this.loadWorld(World.loadWorld(directory, mapLoader.getDimension(), World.LoggedWarnings.NORMAL), mapLoader);
+          this.loadWorld(WorldFormat.loadWorld(directory).orElse(EmptyWorld.INSTANCE), mapLoader);
           stage.close();
         } else {
           Log.warn("Non-directory selected.");
@@ -171,7 +170,7 @@ public class WorldChooserController implements Initializable {
           }
         }
       });
-    mapLoader.loadWorld(world.getWorldDirectory());
+    mapLoader.loadWorld(world);
   }
 
   /**
@@ -196,18 +195,7 @@ public class WorldChooserController implements Initializable {
           File[] worldDirs = worldSavesDir.listFiles();
           if (worldDirs != null) {
             for (File dir : worldDirs) {
-              for (WorldFormat worldFormat : WorldFormat.worldFormats) {
-                if (worldFormat.isValid(dir.toPath())) {
-                  try {
-                    World world = worldFormat.loadWorld(dir.toPath(), String.valueOf(World.OVERWORLD_DIMENSION));
-                    if (world != EmptyWorld.INSTANCE) {
-                      worlds.add(world);
-                    }
-                  } catch (IOException e) {
-                    throw new RuntimeException(e);
-                  }
-                }
-              }
+              WorldFormat.loadWorld(dir).ifPresent(worlds::add);
             }
           }
         }

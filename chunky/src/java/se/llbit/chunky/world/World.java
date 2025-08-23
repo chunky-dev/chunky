@@ -71,28 +71,19 @@ public abstract class World implements Comparable<World> {
    *
    * @return List the viewable dimensions within the world.
    */
-  public abstract Set<String> listDimensions();
+  public abstract Set<String> availableDimensions();
 
-  public abstract Dimension loadDimension(int dimensionId);
+  /**
+   * <b>MUST</b> be one of {@link #availableDimensions()}
+   * @return The preferred default dimension of this world (typically the overworld)
+   */
+  public abstract Optional<String> defaultDimension();
 
   /**
    * @param dimension The dimension to load, guaranteed to be one of the dimensions previously returned by {@link #availableDimensions()}
    * @return The loaded dimension
    */
   public abstract Dimension loadDimension(String dimension);
-
-  /**
-   * Parse player location and level name.
-   *
-   * @return {@code true} if the world data was loaded
-   */
-  @Deprecated
-  public static World loadWorld(File worldDirectory, String dimensionId, LoggedWarnings warnings) {
-    if (worldDirectory == null) {
-      return EmptyWorld.INSTANCE;
-    }
-    return JavaWorld.loadWorld(worldDirectory, dimensionId, warnings);
-  }
 
   /**
    * @return The current dimension

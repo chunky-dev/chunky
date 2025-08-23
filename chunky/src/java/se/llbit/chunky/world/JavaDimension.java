@@ -10,6 +10,7 @@ import se.llbit.chunky.world.region.*;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JavaDimension extends Dimension {
   protected final Long2ObjectMap<Region> regionMap = new Long2ObjectOpenHashMap<>();
@@ -29,7 +30,13 @@ public class JavaDimension extends Dimension {
    * @return {@code true} if player data was reloaded.
    */
   public synchronized boolean reloadPlayerData() {
-    return ((JavaWorld) this.world).reloadPlayerData();
+    boolean changed = ((JavaWorld) this.world).reloadPlayerData();
+    if (changed) {
+      this.setPlayerEntities(((JavaWorld) this.world).playerEntities.stream()
+        .filter(player -> player.dimension.equals(this.id()))
+        .collect(Collectors.toSet()));
+    }
+    return changed;
   }
 
   /**

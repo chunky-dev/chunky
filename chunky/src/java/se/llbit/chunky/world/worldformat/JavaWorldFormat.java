@@ -13,6 +13,11 @@ public class JavaWorldFormat implements WorldFormat {
   }
 
   @Override
+  public String name() {
+    return "Java (Anvil)";
+  }
+
+  @Override
   public boolean isValid(Path path) {
     return JavaWorld.isWorldDir(path.toFile());
   }

@@ -40,11 +40,15 @@ public class EmptyWorld extends World {
   }
 
   @Override
-  public Set<String> listDimensions() {
+  public Set<String> availableDimensions() {
     return Collections.emptySet();
   }
 
   @Override
+  public Optional<String> defaultDimension() {
+    return Optional.empty();
+  }
+
   @Override
   public EmptyDimension loadDimension(String dimension) {
     return EmptyDimension.INSTANCE;

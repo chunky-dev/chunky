@@ -22,6 +22,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.log.Log;
+import se.llbit.math.Vector3i;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.MinecraftText;
@@ -70,7 +71,17 @@ public class JavaWorld extends World {
     new String[] { NETHER_DIMENSION_ID, OVERWORLD_DIMENSION_ID, END_DIMENSION_ID }
   ));
 
-  int versionId;
+  protected int versionId;
+
+  /**
+   * In a java world player data is per-world and not per-dimension, so we store it here.
+   */
+  protected final Set<PlayerEntityData> playerEntities;
+
+  /**
+   * In a java world spawn position is per-world and not per-dimension, so we store it here.
+   */
+  protected final Vector3i spawnPos;
 
   /**
    * @param levelName name of the world (not the world directory).
@@ -78,18 +89,30 @@ public class JavaWorld extends World {
    * @param seed
    * @param timestamp
    */
-  protected JavaWorld(String levelName, File worldDirectory, long seed, long timestamp) {
+  protected JavaWorld(String levelName, File worldDirectory, long seed, long timestamp, Set<PlayerEntityData> playerEntities, Vector3i spawnPos) {
     super(levelName, worldDirectory, seed, timestamp);
+    this.playerEntities = playerEntities;
+    this.spawnPos = spawnPos;
   }
 
   @Override
-  public Set<String> listDimensions() {
+  public Set<String> availableDimensions() {
     return new ObjectArraySet<>(VANILLA_DIMENSION_ID_TO_IDX.keySet());
   }
 
+  @Override
+  public Optional<String> defaultDimension() {
+    return Optional.of(OVERWORLD_DIMENSION_ID);
+  }
+
   public Dimension loadDimension(String dimension) {
-    currentDimension = loadDimension(this, this.worldDirectory, dimension, -1, Collections.emptySet());
-    currentDimension.reloadPlayerData();
+    currentDimension = loadDimension(
+      this,
+      this.worldDirectory,
+      dimension,
+      -1,
+      this.playerEntities.stream().filter(player -> player.dimension.equals(dimension)).collect(Collectors.toSet())
+    );
     return currentDimension;
   }
 
@@ -122,7 +145,7 @@ public class JavaWorld extends World {
       }
       Tag versionId = result.get(".Data.Version.Id");
       Tag player = result.get(".Data.Player");
-      Tag spawnX = player.get("SpawnX");
+      Tag spawnX = player.get("SpawnX"); // TODO: not sure what to do with spawn location now. I guess for java worlds: the world should store it and the dimension should set it in the map view when loaded...?
       Tag spawnY = player.get("SpawnY");
       Tag spawnZ = player.get("SpawnZ");
       Tag gameType = result.get(".Data.GameType");
@@ -131,20 +154,19 @@ public class JavaWorld extends World {
 
       long seed = randomSeed.longValue(0);
 
-      Set<PlayerEntityData> playerEntities = getPlayerEntityData(worldDirectory, dimensionId, player);
-
-      JavaWorld world = new JavaWorld(levelName, worldDirectory, seed, modtime);
-      world.gameMode = gameType.intValue(0);
-      world.versionId = versionId.intValue();
-
-      Dimension dimension = loadDimension(world, worldDirectory, dimensionId, modtime, playerEntities);
+      Set<PlayerEntityData> playerEntities = getPlayerEntityData(worldDirectory, player);
 
       boolean haveSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
+      Vector3i spawnPos;
       if (haveSpawnPos) {
-        dimension.setSpawnPos(new Vector3i(spawnX.intValue(0), spawnY.intValue(0), spawnZ.intValue(0)));
+        spawnPos = new Vector3i(spawnX.intValue(0), spawnY.intValue(0), spawnZ.intValue(0));
+      } else {
+        spawnPos = new Vector3i(0, 0, 0);
       }
 
-      world.currentDimension = dimension;
+      JavaWorld world = new JavaWorld(levelName, worldDirectory, seed, modtime, playerEntities, spawnPos);
+      world.gameMode = gameType.intValue(0);
+      world.versionId = versionId.intValue();
 
       return world;
     } catch (FileNotFoundException e) {
@@ -172,14 +194,12 @@ public class JavaWorld extends World {
   }
 
   @NotNull
-  static Set<PlayerEntityData> getPlayerEntityData(File worldDirectory, String dimensionId, Tag player) {
+  static Set<PlayerEntityData> getPlayerEntityData(File worldDirectory, Tag player) {
     Set<PlayerEntityData> playerEntities = new HashSet<>();
     if (!player.isError()) {
       playerEntities.add(new PlayerEntityData(player));
     }
     loadAdditionalPlayers(worldDirectory, playerEntities);
-    // Filter for the players only within the requested dimension
-    playerEntities = playerEntities.stream().filter(playerData -> playerData.dimension.equals(dimensionId)).collect(Collectors.toSet());
     return playerEntities;
   }
 
@@ -206,8 +226,8 @@ public class JavaWorld extends World {
       request.add(".Data.Player");
       Map<String, Tag> result = NamedTag.quickParse(in, request);
       Tag player = result.get(".Data.Player");
-
-      currentDimension.setPlayerEntities(getPlayerEntityData(worldDirectory, currentDimension.id(), player));
+      this.playerEntities.clear();
+      this.playerEntities.addAll(getPlayerEntityData(worldDirectory, player));
     } catch (IOException e) {
       Log.infof("Could not read the level.dat file for world %s while trying to reload player data!", levelName);
       return false;
@@ -236,25 +256,12 @@ public class JavaWorld extends World {
     }
   }
 
-  @Override
-  public synchronized JavaDimension currentDimension() {
-    return (JavaDimension) this.currentDimension;
-  }
-
-  /**
-   * @deprecated Use {@link JavaWorld#currentDimension()} -> {@link Dimension#getDimensionDirectory()} ()}. Removed once there are no more usages
-   */
-  @Deprecated
   protected synchronized File getDataDirectory(int dimension) {
     return dimension == 0 ?
       worldDirectory :
       new File(worldDirectory, "DIM" + dimension);
   }
 
-  /**
-    @deprecated Use {@link JavaWorld#currentDimension()} -> {@link JavaDimension#getRegionDirectory()}. Removed once there are no more usages
-   */
-  @Deprecated
   protected synchronized File getRegionDirectory(int dimension) {
     return new File(getDataDirectory(dimension), "region");
   }
@@ -399,7 +406,4 @@ public class JavaWorld extends World {
     return false;
   }
 
-  public Date getLastModified() {
-    return new Date(this.worldDirectory.lastModified());
-  }
 }
