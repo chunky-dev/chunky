@@ -65,29 +65,39 @@ public abstract class Dimension {
   }
 
   protected final File dimensionDirectory;
-  protected final Set<PlayerEntityData> playerEntities;
 
   protected final Heightmap heightmap = new Heightmap();
 
   protected final Identifier dimensionId;
 
+  @Nullable protected final Vector3i spawnPos;
+  protected final Set<PlayerEntityData> playerEntities;
+
   protected final Collection<ChunkDeletionListener> chunkDeletionListeners = new LinkedList<>();
   protected final Collection<ChunkTopographyListener> chunkTopographyListeners = new LinkedList<>();
   protected final Collection<ChunkUpdateListener> chunkUpdateListeners = new LinkedList<>();
 
-  protected Vector3i spawnPos = null;
-
   /**
    * @param dimensionDirectory Minecraft world directory.
    */
-  protected Dimension(Identifier dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities) {
+  protected Dimension(Identifier dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
     this.dimensionId = dimensionId;
-    this.dimensionDirectory = dimensionDirectory;
     this.playerEntities = playerEntities;
+    this.dimensionDirectory = dimensionDirectory;
+    this.spawnPos = spawnPos;
   }
 
   public Identifier getDimensionId() {
     return dimensionId;
+  }
+
+  /**
+   * Get the data directory for the given dimension.
+   *
+   * @return File object pointing to the data directory
+   */
+  protected synchronized File getDimensionDirectory() {
+    return dimensionDirectory;
   }
 
   /**
@@ -194,11 +204,6 @@ public abstract class Dimension {
       }
     }
     return list;
-  }
-
-  public synchronized void setPlayerEntities(Set<PlayerEntityData> playerEntities) {
-    this.playerEntities.clear();
-    this.playerEntities.addAll(playerEntities);
   }
 
   public synchronized Collection<PlayerEntityData> getPlayerPositions() {

@@ -16,7 +16,7 @@ public class EmptyDimension extends Dimension {
   public static final EmptyDimension INSTANCE = new EmptyDimension();
 
   private EmptyDimension() {
-    super(Dimension.Identifier.OVERWORLD, null, Collections.emptySet());
+    super(Dimension.Identifier.OVERWORLD, null, Collections.emptySet(), null);
   }
 
   @Override

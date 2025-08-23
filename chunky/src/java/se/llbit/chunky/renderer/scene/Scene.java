@@ -53,6 +53,7 @@ import se.llbit.chunky.world.biome.ArrayBiomePalette;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.biome.Biomes;
+import se.llbit.chunky.world.java.JavaWorld;
 import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.json.*;
 import se.llbit.log.Log;
@@ -547,7 +548,7 @@ public class Scene implements JsonSerializable {
       loadedWorld = EmptyWorld.INSTANCE;
       if (!worldPath.isEmpty()) {
         File worldDirectory = new File(worldPath);
-        if (World.isWorldDir(worldDirectory)) {
+        if (JavaWorld.isWorldDir(worldDirectory)) {
           loadedWorld = World.loadWorld(worldDirectory, worldDimension, World.LoggedWarnings.NORMAL);
         } else {
           Log.info("Could not load world: " + worldPath);

@@ -15,6 +15,7 @@ import se.llbit.util.annotation.Nullable;
 import java.io.File;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class JavaDimension extends Dimension {
   protected final JavaWorld world;
@@ -26,8 +27,8 @@ public class JavaDimension extends Dimension {
    * @param dimensionDirectory Minecraft world directory.
    * @param playerEntities
    */
-  protected JavaDimension(JavaWorld world, Identifier dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities) {
-    super(dimensionId, dimensionDirectory, playerEntities);
+  protected JavaDimension(JavaWorld world, Identifier dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
+    super(dimensionId, dimensionDirectory, playerEntities, spawnPos);
     this.world = world;
   }
 
@@ -91,24 +92,27 @@ public class JavaDimension extends Dimension {
 
   @Override
   public synchronized boolean reloadPlayerData() {
-    return this.world.reloadPlayerData();
+    boolean changed = this.world.reloadPlayerData();
+    if (changed) {
+      this.playerEntities.clear();
+      this.playerEntities.addAll(this.world.playerEntities.stream()
+        .filter(player -> player.dimension.equals(this.dimensionId))
+        .collect(Collectors.toSet()));
+    }
+    return changed;
   }
 
   @Override
   public synchronized Optional<Vector3> getPlayerPos() {
-    if (!playerEntities.isEmpty()) {
+    if (!this.playerEntities.isEmpty()) {
       return world.getSingleplayerPlayerUuid()
-        .flatMap(uuid -> playerEntities.stream()
+        .flatMap(uuid -> this.playerEntities.stream()
           .filter(player -> player.uuid.equals(uuid))
           .map(pos -> new Vector3(pos.x, pos.y, pos.z))
           .findFirst());
     } else {
       return Optional.empty();
     }
-  }
-
-  public void setSpawnPos(@Nullable Vector3i spawnPos) {
-    this.spawnPos = spawnPos;
   }
 
   /**
@@ -118,15 +122,6 @@ public class JavaDimension extends Dimension {
     synchronized (this) {
       regionMap.computeIfAbsent(pos.getLong(), p -> createRegion(pos));
     }
-  }
-
-  /**
-   * Get the data directory for the given dimension.
-   *
-   * @return File object pointing to the data directory
-   */
-  protected synchronized File getDimensionDirectory() {
-    return dimensionDirectory;
   }
 
   /**

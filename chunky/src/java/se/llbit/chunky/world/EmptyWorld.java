@@ -16,6 +16,9 @@
  */
 package se.llbit.chunky.world;
 
+import java.util.Collections;
+import java.util.Set;
+
 /**
  * Represents an empty or non-existent world.
  *
@@ -32,7 +35,14 @@ public class EmptyWorld extends World {
   }
 
   @Override
-  public void loadDimension(Dimension.Identifier dimensionId) { }
+  public Set<Dimension.Identifier> listDimensions() {
+    return Collections.emptySet();
+  }
+
+  @Override
+  public Dimension loadDimension(Dimension.Identifier dimensionId) {
+    return EmptyDimension.INSTANCE;
+  }
 
   @Override public String toString() {
     return "[empty world]";
