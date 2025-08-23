@@ -16,11 +16,12 @@
  */
 package se.llbit.chunky.world;
 
-import it.unimi.dsi.fastutil.ints.IntArraySet;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.log.Log;
-import se.llbit.math.Vector3i;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.MinecraftText;
@@ -50,6 +51,25 @@ public class JavaWorld extends World {
   public static final int VERSION_21W06A = 2694;
   public static final int VERSION_1_12_2 = 1343;
 
+  /** Nether dimension index. */
+  public static final int NETHER_DIMENSION_IDX = -1;
+
+  /** Overworld dimension index. */
+  public static final int OVERWORLD_DIMENSION_IDX = 0;
+
+  /** End dimension index. */
+  public static final int END_DIMENSION_IDX = 1;
+
+  public static final Map<String, Integer> VANILLA_DIMENSION_ID_TO_IDX = Collections.unmodifiableMap(new Object2IntOpenHashMap<>(
+    new String[] { NETHER_DIMENSION_ID, OVERWORLD_DIMENSION_ID, END_DIMENSION_ID },
+    new int[] { NETHER_DIMENSION_IDX, OVERWORLD_DIMENSION_IDX, END_DIMENSION_IDX }
+  ));
+
+  public static final Map<Integer, String> VANILLA_DIMENSION_IDX_TO_ID = Collections.unmodifiableMap(new Int2ObjectOpenHashMap<>(
+    new int[] { NETHER_DIMENSION_IDX, OVERWORLD_DIMENSION_IDX, END_DIMENSION_IDX },
+    new String[] { NETHER_DIMENSION_ID, OVERWORLD_DIMENSION_ID, END_DIMENSION_ID }
+  ));
+
   int versionId;
 
   /**
@@ -63,12 +83,12 @@ public class JavaWorld extends World {
   }
 
   @Override
-  public Set<Integer> listDimensions() {
-    return new IntArraySet(new int[] { -1, 0, 1 });
+  public Set<String> listDimensions() {
+    return new ObjectArraySet<>(VANILLA_DIMENSION_ID_TO_IDX.keySet());
   }
 
-  public Dimension loadDimension(int dimensionId) {
-    currentDimension = loadDimension(this, this.worldDirectory, dimensionId, -1, Collections.emptySet());
+  public Dimension loadDimension(String dimension) {
+    currentDimension = loadDimension(this, this.worldDirectory, dimension, -1, Collections.emptySet());
     currentDimension.reloadPlayerData();
     return currentDimension;
   }
@@ -78,7 +98,7 @@ public class JavaWorld extends World {
    *
    * @return {@code true} if the world data was loaded
    */
-  public static World loadWorld(File worldDirectory, int dimensionId, LoggedWarnings warnings) {
+  public static World loadWorld(File worldDirectory, LoggedWarnings warnings) {
     String levelName = worldDirectory.getName(); // Default level name.
     File worldFile = new File(worldDirectory, "level.dat");
     long modtime = worldFile.lastModified();
@@ -140,9 +160,9 @@ public class JavaWorld extends World {
   }
 
   @NotNull
-  protected static Dimension loadDimension(JavaWorld world, File worldDirectory, int dimensionId, long modtime, Set<PlayerEntityData> playerEntities) {
-    Dimension dimension;
-    File dimensionDirectory = dimensionId == 0 ? worldDirectory : new File(worldDirectory, "DIM" + dimensionId);
+  protected static JavaDimension loadDimension(JavaWorld world, File worldDirectory, String dimensionId, long modtime, Set<PlayerEntityData> playerEntities) {
+    JavaDimension dimension;
+    File dimensionDirectory = dimensionId.equals(JavaWorld.OVERWORLD_DIMENSION_ID) ? worldDirectory : new File(worldDirectory, "DIM" + JavaWorld.VANILLA_DIMENSION_ID_TO_IDX.get(dimensionId));
     if (new File(dimensionDirectory, "region3d").exists()) {
       dimension = new CubicDimension(world, dimensionId, dimensionDirectory, playerEntities, modtime);
     } else {
@@ -152,14 +172,14 @@ public class JavaWorld extends World {
   }
 
   @NotNull
-  static Set<PlayerEntityData> getPlayerEntityData(File worldDirectory, int dimensionId, Tag player) {
+  static Set<PlayerEntityData> getPlayerEntityData(File worldDirectory, String dimensionId, Tag player) {
     Set<PlayerEntityData> playerEntities = new HashSet<>();
     if (!player.isError()) {
       playerEntities.add(new PlayerEntityData(player));
     }
     loadAdditionalPlayers(worldDirectory, playerEntities);
     // Filter for the players only within the requested dimension
-    playerEntities = playerEntities.stream().filter(playerData -> playerData.dimension == dimensionId).collect(Collectors.toSet());
+    playerEntities = playerEntities.stream().filter(playerData -> playerData.dimension.equals(dimensionId)).collect(Collectors.toSet());
     return playerEntities;
   }
 
@@ -187,7 +207,7 @@ public class JavaWorld extends World {
       Map<String, Tag> result = NamedTag.quickParse(in, request);
       Tag player = result.get(".Data.Player");
 
-      currentDimension.setPlayerEntities(getPlayerEntityData(worldDirectory, currentDimensionId, player));
+      currentDimension.setPlayerEntities(getPlayerEntityData(worldDirectory, currentDimension.id(), player));
     } catch (IOException e) {
       Log.infof("Could not read the level.dat file for world %s while trying to reload player data!", levelName);
       return false;
@@ -249,6 +269,10 @@ public class JavaWorld extends World {
    */
   public synchronized void exportChunksToZip(File target, Collection<ChunkPosition> chunks,
                                              ProgressTracker progress) throws IOException {
+    if (this.currentDimension == EmptyDimension.INSTANCE) {
+      return;
+    }
+    JavaDimension currentDim = (JavaDimension) this.currentDimension;
 
     Map<RegionPosition, Set<ChunkPosition>> regionMap = new HashMap<>();
 
@@ -262,8 +286,8 @@ public class JavaWorld extends World {
     progress.setJobSize(regionMap.size() + 1);
 
     String regionDirectory =
-      currentDimensionId == 0 ? currentDimension().getDimensionDirectory().getName() :
-        currentDimension().getDimensionDirectory().getName() + "/DIM" + currentDimensionId;
+      currentDim.id().equals(JavaWorld.OVERWORLD_DIMENSION_ID) ? currentDim.getDimensionDirectory().getName() :
+        currentDim.getDimensionDirectory().getName() + "/DIM" + JavaWorld.VANILLA_DIMENSION_ID_TO_IDX.get(currentDim.id());
     regionDirectory += "/region";
 
     try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(target))) {
@@ -277,7 +301,7 @@ public class JavaWorld extends World {
 
         RegionPosition region = entry.getKey();
 
-        appendRegionToZip(zout, currentDimension().getRegionDirectory(), region,
+        appendRegionToZip(zout, currentDim.getRegionDirectory(), region,
           regionDirectory + "/" + region.getMcaName(), entry.getValue());
 
         progress.setProgress(++work);
@@ -302,10 +326,10 @@ public class JavaWorld extends World {
     WorldScanner.Operator operator = (regionDirectory, x, z) ->
         regions.add(new Pair<>(regionDirectory, new RegionPosition(x, z)));
     // TODO make this more dynamic
-    File overworld = getRegionDirectory(OVERWORLD_DIMENSION);
+    File overworld = getRegionDirectory(OVERWORLD_DIMENSION_IDX);
     WorldScanner.findExistingChunks(overworld, operator);
-    WorldScanner.findExistingChunks(getRegionDirectory(NETHER_DIMENSION), operator);
-    WorldScanner.findExistingChunks(getRegionDirectory(END_DIMENSION), operator);
+    WorldScanner.findExistingChunks(getRegionDirectory(NETHER_DIMENSION_IDX), operator);
+    WorldScanner.findExistingChunks(getRegionDirectory(END_DIMENSION_IDX), operator);
 
     int work = 0;
     progress.setJobSize(regions.size() + 1);

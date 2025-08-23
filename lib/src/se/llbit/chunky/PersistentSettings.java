@@ -67,7 +67,7 @@ public final class PersistentSettings {
   public static final int DEFAULT_BRANCH_COUNT = 10;
   public static final int DEFAULT_SPP_TARGET = 1000;
 
-  public static final int DEFAULT_DIMENSION = 0;
+  public static final String DEFAULT_DIMENSION = "minecraft:overworld";
 
   /**
    * Default canvas width.
@@ -452,13 +452,13 @@ public final class PersistentSettings {
     return settings.getBool("singleColorTextures", false);
   }
 
-  public static void setDimension(int value) {
-    settings.setInt("dimension", value);
+  public static void setDimension(String value) {
+    settings.setString("dimension", value);
     save();
   }
 
-  public static int getDimension() {
-    return settings.getInt("dimension", DEFAULT_DIMENSION);
+  public static String getDimension() {
+    return settings.getString("dimension", DEFAULT_DIMENSION);
   }
 
   public static boolean getLoadPlayers() {

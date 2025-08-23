@@ -18,6 +18,7 @@
 package se.llbit.chunky.world;
 
 import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
 
 public class PlayerEntityData {
@@ -27,7 +28,7 @@ public class PlayerEntityData {
   public final double z;
   public final double rotation;
   public final double pitch;
-  public final int dimension;
+  public final String dimension;
   public Tag feet = new CompoundTag();
   public Tag legs = new CompoundTag();
   public Tag head = new CompoundTag();
@@ -58,7 +59,12 @@ public class PlayerEntityData {
     z = pos.get(2).doubleValue();
     this.rotation = rotation.get(0).floatValue();
     pitch = rotation.get(1).floatValue();
-    dimension = player.get("Dimension").intValue();
+    Tag dimensionTag = player.get("Dimension");
+    if (dimensionTag instanceof StringTag) {
+      dimension = dimensionTag.stringValue();
+    } else {
+      dimension = JavaWorld.VANILLA_DIMENSION_IDX_TO_ID.get(dimensionTag.intValue());
+    }
 
     int selectedItem = player.get("SelectedItemSlot").intValue(0);
 
@@ -89,7 +95,7 @@ public class PlayerEntityData {
 
   @Override
   public String toString() {
-    return String.format("%d: %d, %d, %d", dimension, (int) x, (int) y, (int) z);
+    return String.format("%s: %d, %d, %d", dimension, (int) x, (int) y, (int) z);
   }
 
   @Override

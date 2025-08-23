@@ -19,7 +19,7 @@ public class JavaDimension extends Dimension {
    * @param dimensionDirectory Minecraft world directory.
    * @param timestamp
    */
-  protected JavaDimension(JavaWorld world, int dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, long timestamp) {
+  protected JavaDimension(JavaWorld world, String dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, long timestamp) {
     super(world, dimensionId, playerEntities, timestamp);
     this.dimensionDirectory = dimensionDirectory;
   }

@@ -585,7 +585,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     World world = mapLoader.getWorld();
     double blockScale = mapView.scale / 16.;
     for (PlayerEntityData player : world.currentDimension().getPlayerPositions()) {
-      if (player.dimension == world.currentDimensionId()) {
+      if (player.dimension.equals(world.currentDimension().id())) {
         int px = (int) QuickMath.floor(player.x * blockScale);
         int py = (int) QuickMath.floor(player.y);
         int pz = (int) QuickMath.floor(player.z * blockScale);

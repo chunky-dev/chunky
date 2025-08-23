@@ -190,7 +190,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   protected int rayDepth = PersistentSettings.getRayDepthDefault();
   protected String worldPath = "";
-  protected int worldDimension = 0;
+  protected String worldDimension = PersistentSettings.DEFAULT_DIMENSION;
   protected RenderMode mode = RenderMode.PREVIEW;
   protected int dumpFrequency = DEFAULT_DUMP_FREQUENCY;
   protected boolean saveSnapshots = false;
@@ -761,7 +761,7 @@ public class Scene implements JsonSerializable, Refreshable {
       Log.warn("Can not reload chunks for scene - world directory not found!");
       return;
     }
-    loadedWorld = World.loadWorld(loadedWorld.getWorldDirectory(), worldDimension, World.LoggedWarnings.NORMAL);
+    loadedWorld.loadDimension(worldDimension);
     loadChunks(taskTracker, loadedWorld, chunks);
     refresh();
   }
@@ -794,7 +794,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       loadedWorld = world;
       worldPath = loadedWorld.getWorldDirectory().getAbsolutePath();
-      worldDimension = world.currentDimensionId();
+      worldDimension = world.currentDimension().id();
 
       if (chunksToLoad.isEmpty()) {
         return;
@@ -2908,7 +2908,14 @@ public class Scene implements JsonSerializable, Refreshable {
     if (json.get("world").isObject()) {
       JsonObject world = json.get("world").object();
       worldPath = world.get("path").stringValue(worldPath);
-      worldDimension = world.get("dimension").intValue(worldDimension);
+
+      String dimensionString = world.get("dimension").stringValue("");
+      if (dimensionString.isEmpty()) {
+        // legacy int-based dimension indices
+        worldDimension = JavaWorld.VANILLA_DIMENSION_IDX_TO_ID.get(world.get("dimension").intValue(0));
+      } else {
+        worldDimension = dimensionString;
+      }
     }
 
     if (json.get("camera").isObject()) {

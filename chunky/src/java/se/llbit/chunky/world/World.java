@@ -29,23 +29,16 @@ import java.util.*;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public abstract class World implements Comparable<World> {
-  /** Overworld dimension index. */
-  public static final int OVERWORLD_DIMENSION = 0;
-
-  /** Nether dimension index. */
-  public static final int NETHER_DIMENSION = -1;
-
-  /** End dimension index. */
-  public static final int END_DIMENSION = 1;
+  public static final String OVERWORLD_DIMENSION_ID = "minecraft:overworld";
+  public static final String NETHER_DIMENSION_ID = "minecraft:the_nether";
+  public static final String END_DIMENSION_ID = "minecraft:the_end";
 
   /** Default sea water level. */
   public static final int SEA_LEVEL = 63;
 
-
   protected final File worldDirectory;
 
-  protected Dimension currentDimension;
-  protected int currentDimensionId;
+  protected Dimension currentDimension = EmptyDimension.INSTANCE;
 
   protected final String levelName;
   protected int gameMode = 0;
@@ -73,14 +66,20 @@ public abstract class World implements Comparable<World> {
   }
 
   /**
-   * The dimensions returned here are later provided to {@link #loadDimension(int)} when requesting a dimension be
+   * The dimensions returned here are later provided to {@link #loadDimension(String)} when requesting a dimension be
    * loaded.
    *
    * @return List the viewable dimensions within the world.
    */
-  public abstract Set<Integer> listDimensions();
+  public abstract Set<String> listDimensions();
 
   public abstract Dimension loadDimension(int dimensionId);
+
+  /**
+   * @param dimension The dimension to load, guaranteed to be one of the dimensions previously returned by {@link #availableDimensions()}
+   * @return The loaded dimension
+   */
+  public abstract Dimension loadDimension(String dimension);
 
   /**
    * Parse player location and level name.
@@ -88,7 +87,7 @@ public abstract class World implements Comparable<World> {
    * @return {@code true} if the world data was loaded
    */
   @Deprecated
-  public static World loadWorld(File worldDirectory, int dimensionId, LoggedWarnings warnings) {
+  public static World loadWorld(File worldDirectory, String dimensionId, LoggedWarnings warnings) {
     if (worldDirectory == null) {
       return EmptyWorld.INSTANCE;
     }
@@ -101,14 +100,6 @@ public abstract class World implements Comparable<World> {
   public synchronized Dimension currentDimension() {
     return this.currentDimension;
   }
-
-  /**
-   * @return The current dimension
-   */
-  public synchronized int currentDimensionId() {
-    return this.currentDimensionId;
-  }
-
 
   /**
    * @return The world directory

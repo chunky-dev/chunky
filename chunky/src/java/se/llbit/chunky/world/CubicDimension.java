@@ -23,7 +23,7 @@ public class CubicDimension extends JavaDimension {
    * @param dimensionDirectory Minecraft world directory.
    * @param timestamp
    */
-  protected CubicDimension(JavaWorld world, int dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, long timestamp) {
+  protected CubicDimension(JavaWorld world, String dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, long timestamp) {
     super(world, dimensionId, dimensionDirectory, playerEntities, timestamp);
   }
 

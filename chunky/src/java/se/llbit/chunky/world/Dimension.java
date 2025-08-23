@@ -27,7 +27,7 @@ public abstract class Dimension {
 
   private final Heightmap heightmap = new Heightmap();
 
-  private final int dimensionId;
+  private final String dimensionId;
 
   private final Collection<ChunkDeletionListener> chunkDeletionListeners = new LinkedList<>();
   private final Collection<ChunkTopographyListener> chunkTopographyListeners = new LinkedList<>();
@@ -41,14 +41,14 @@ public abstract class Dimension {
   /**
    * @param timestamp
    */
-  protected Dimension(World world, int dimensionId, Set<PlayerEntityData> playerEntities, long timestamp) {
+  protected Dimension(World world, String dimensionId, Set<PlayerEntityData> playerEntities, long timestamp) {
     this.world = world;
     this.dimensionId = dimensionId;
     this.playerEntities = playerEntities;
     this.timestamp = timestamp;
   }
 
-  public int getDimensionId() {
+  public String id() {
     return dimensionId;
   }
 

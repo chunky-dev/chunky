@@ -21,6 +21,7 @@ import se.llbit.chunky.ui.ProgressTracker;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -39,12 +40,13 @@ public class EmptyWorld extends World {
   }
 
   @Override
-  public Set<Integer> listDimensions() {
+  public Set<String> listDimensions() {
     return Collections.emptySet();
   }
 
   @Override
-  public Dimension loadDimension(int dimensionId) {
+  @Override
+  public EmptyDimension loadDimension(String dimension) {
     return EmptyDimension.INSTANCE;
   }
 

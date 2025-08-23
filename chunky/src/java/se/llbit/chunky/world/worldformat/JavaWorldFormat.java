@@ -8,8 +8,8 @@ import java.nio.file.Path;
 
 public class JavaWorldFormat implements WorldFormat {
   @Override
-  public World loadWorld(Path path, String dimension) throws IOException {
-    return JavaWorld.loadWorld(path.toFile(), Integer.parseInt(dimension), World.LoggedWarnings.SILENT);
+  public World loadWorld(Path path) throws IOException {
+    return JavaWorld.loadWorld(path.toFile(), World.LoggedWarnings.SILENT);
   }
 
   @Override
