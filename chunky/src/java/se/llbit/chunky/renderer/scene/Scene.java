@@ -53,6 +53,7 @@ import se.llbit.chunky.world.biome.ArrayBiomePalette;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.biome.Biomes;
+import se.llbit.chunky.world.worldformat.WorldFormats;
 import se.llbit.json.*;
 import se.llbit.log.Log;
 import se.llbit.math.*;
@@ -190,7 +191,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   protected int rayDepth = PersistentSettings.getRayDepthDefault();
   protected String worldPath = "";
-  protected int worldDimension = 0;
+  protected String worldDimension = PersistentSettings.DEFAULT_DIMENSION;
   protected RenderMode mode = RenderMode.PREVIEW;
   protected int dumpFrequency = DEFAULT_DUMP_FREQUENCY;
   protected boolean saveSnapshots = false;
@@ -545,11 +546,8 @@ public class Scene implements JsonSerializable, Refreshable {
       loadedWorld = EmptyWorld.INSTANCE;
       if (!worldPath.isEmpty()) {
         File worldDirectory = new File(worldPath);
-        if (World.isWorldDir(worldDirectory)) {
-          loadedWorld = World.loadWorld(worldDirectory, worldDimension, World.LoggedWarnings.NORMAL);
-        } else {
-          Log.info("Could not load world: " + worldPath);
-        }
+        loadedWorld = WorldFormats.createWorld(worldDirectory).orElse(EmptyWorld.INSTANCE);
+        loadedWorld.loadDimension(this.worldDimension);
       }
 
       loadDump(context, taskTracker);
@@ -763,7 +761,7 @@ public class Scene implements JsonSerializable, Refreshable {
       Log.warn("Can not reload chunks for scene - world directory not found!");
       return;
     }
-    loadedWorld = World.loadWorld(loadedWorld.getWorldDirectory(), worldDimension, World.LoggedWarnings.NORMAL);
+    loadedWorld.loadDimension(worldDimension);
     loadChunks(taskTracker, loadedWorld, chunks);
     refresh();
   }
@@ -796,7 +794,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       loadedWorld = world;
       worldPath = loadedWorld.getWorldDirectory().getAbsolutePath();
-      worldDimension = world.currentDimensionId();
+      worldDimension = world.currentDimension().getId();
 
       if (chunksToLoad.isEmpty()) {
         return;
@@ -824,7 +822,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       for (RegionPosition region : regions) {
-        dimension.getRegion(region).parse(yMin, yMax);
+        ((JavaDimension) dimension).getRegion(region).parse(yMin, yMax);
       }
     }
 
@@ -1195,7 +1193,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
         if (!chunkData.isEmpty()){
           nonEmptyChunks.add(cp);
-          if (dimension.getChunk(cp).getVersion() == ChunkVersion.PRE_FLATTENING) {
+          Chunk chunk = dimension.getChunk(cp);
+          if (chunk instanceof JavaChunk javaChunk && javaChunk.getVersion() == ChunkVersion.PRE_FLATTENING) {
             legacyChunks.add(cp);
           }
         }
@@ -2944,7 +2943,14 @@ public class Scene implements JsonSerializable, Refreshable {
     if (json.get("world").isObject()) {
       JsonObject world = json.get("world").object();
       worldPath = world.get("path").stringValue(worldPath);
-      worldDimension = world.get("dimension").intValue(worldDimension);
+
+      String dimensionString = world.get("dimension").stringValue("");
+      if (dimensionString.isEmpty()) {
+        // legacy int-based dimension indices
+        worldDimension = JavaWorld.VANILLA_DIMENSION_IDX_TO_ID.get(world.get("dimension").intValue(0));
+      } else {
+        worldDimension = dimensionString;
+      }
     }
 
     if (json.get("camera").isObject()) {

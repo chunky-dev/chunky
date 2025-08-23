@@ -21,6 +21,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static se.llbit.chunky.world.JavaChunk.SECTION_BYTES;
+import static se.llbit.chunky.world.JavaChunk.SECTION_HALF_NIBBLES;
+
 /**
  * An implementation of a cube wrapper for pre flattening cubic chunks (1.10, 1.11, 1.12)
  *
@@ -57,9 +60,9 @@ public class ImposterCubicChunk extends Chunk {
     }
 
     Set<String> request = new HashSet<>();
-    request.add(Chunk.DATAVERSION);
-    request.add(Chunk.LEVEL_SECTIONS);
-    request.add(Chunk.LEVEL_BIOMES);
+    request.add(JavaChunk.DATAVERSION);
+    request.add(JavaChunk.LEVEL_SECTIONS);
+    request.add(JavaChunk.LEVEL_BIOMES);
     Map<Integer, Map<String, Tag>> data = getCubeTags(request);
     // TODO: improve error handling here.
     if (data == null) {
@@ -98,7 +101,7 @@ public class ImposterCubicChunk extends Chunk {
       Integer yPos = entry.getKey();
       Map<String, Tag> cubeData = entry.getValue();
 
-      Tag sections = cubeData.get(LEVEL_SECTIONS);
+      Tag sections = cubeData.get(JavaChunk.LEVEL_SECTIONS);
       if (sections.isList()) {
 //        extractBiomeData(cubeData.get(LEVEL_BIOMES), chunkData);
         if (version == ChunkVersion.PRE_FLATTENING || version == ChunkVersion.POST_FLATTENING) {
@@ -110,7 +113,7 @@ public class ImposterCubicChunk extends Chunk {
 
     int[] heightmapData = extractHeightmapDataCubic(null, chunkData);
     updateHeightmap(heightmap, position, chunkData, heightmapData, palette, yMax);
-    surface = new SurfaceLayer(dimension.getDimensionId(), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
+    surface = new SurfaceLayer(JavaWorld.VANILLA_DIMENSION_ID_TO_IDX.get(dimension.getId()), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
   }
 
   private int[] extractHeightmapDataCubic(Map<String, Tag> cubeData, ChunkData chunkData) {
@@ -124,7 +127,7 @@ public class ImposterCubicChunk extends Chunk {
 
   private static final int CUBE_DIAMETER_IN_BLOCKS = 16;
   private void loadBlockDataCubic(int cubeY, Map<String, Tag> cubeData, ChunkData chunkData, BlockPalette blockPalette, int yMin, int yMax) {
-    Tag sections = cubeData.get(LEVEL_SECTIONS);
+    Tag sections = cubeData.get(JavaChunk.LEVEL_SECTIONS);
     if(sections.isList()) {
       ListTag sectionTags = sections.asList();
       if(sectionTags.size() == 1) {
@@ -163,11 +166,11 @@ public class ImposterCubicChunk extends Chunk {
   @Override
   public synchronized void getChunkData(@NotNull Mutable<ChunkData> reuseChunkData, BlockPalette palette, BiomePalette biomePalette, int minY, int maxY) {
     Set<String> request = new HashSet<>();
-    request.add(DATAVERSION);
-    request.add(LEVEL_SECTIONS);
-    request.add(LEVEL_BIOMES);
-    request.add(LEVEL_ENTITIES);
-    request.add(LEVEL_TILEENTITIES);
+    request.add(JavaChunk.DATAVERSION);
+    request.add(JavaChunk.LEVEL_SECTIONS);
+    request.add(JavaChunk.LEVEL_BIOMES);
+    request.add(JavaChunk.LEVEL_ENTITIES);
+    request.add(JavaChunk.LEVEL_TILEENTITIES);
     Map<Integer, Map<String, Tag>> data = getCubeTags(request);
     if(reuseChunkData.get() == null || reuseChunkData.get() instanceof EmptyChunkData) {
       reuseChunkData.set(dimension.createChunkData(reuseChunkData.get(), Integer.MIN_VALUE, Integer.MAX_VALUE));
@@ -184,10 +187,10 @@ public class ImposterCubicChunk extends Chunk {
       Integer yPos = entry.getKey();
       Map<String, Tag> cubeData = entry.getValue();
 
-      Tag sections = cubeData.get(LEVEL_SECTIONS);
-      Tag biomesTag = cubeData.get(LEVEL_BIOMES);
-      Tag entitiesTag = cubeData.get(LEVEL_ENTITIES);
-      Tag tileEntitiesTag = cubeData.get(LEVEL_TILEENTITIES);
+      Tag sections = cubeData.get(JavaChunk.LEVEL_SECTIONS);
+      Tag biomesTag = cubeData.get(JavaChunk.LEVEL_BIOMES);
+      Tag entitiesTag = cubeData.get(JavaChunk.LEVEL_ENTITIES);
+      Tag tileEntitiesTag = cubeData.get(JavaChunk.LEVEL_TILEENTITIES);
       // TODO: add biomes support once we have 3d biomes support
 //      if (biomesTag.isByteArray(X_MAX * Z_MAX) || biomesTag.isIntArray(X_MAX * Z_MAX)) {
 //        extractBiomeData(biomesTag, reuseChunkData);

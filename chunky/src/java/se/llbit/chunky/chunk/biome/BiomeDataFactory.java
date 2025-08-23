@@ -1,6 +1,7 @@
 package se.llbit.chunky.chunk.biome;
 
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.world.JavaChunk;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.biome.Biomes;
@@ -19,7 +20,7 @@ public class BiomeDataFactory {
   //TODO: Ideally we would have registered factory impls with an isValidFor(Tag chunkTag), but this messy if chain works for now
   public static void loadBiomeData(ChunkData chunkData, Tag chunkTag, BiomePalette biomePalette, int yMin, int yMax) {
     BiomeData biomeData = chunkData.getBiomeData();
-    Tag biomeTagsPre21w39a = chunkTag.get(LEVEL_BIOMES);
+    Tag biomeTagsPre21w39a = chunkTag.get(JavaChunk.LEVEL_BIOMES);
     if (!biomeTagsPre21w39a.isError()) { // pre21w39a tag exists
       if (biomeTagsPre21w39a.isByteArray(X_MAX * Z_MAX)) {
         if (!(biomeData instanceof BiomeData2d)) {
@@ -43,7 +44,7 @@ public class BiomeDataFactory {
         chunkData.setBiomeData(biomeData);
         return;
       }
-    } else if (!chunkTag.get(SECTIONS_POST_21W39A).isError()) { // in 21w39a biome tags moved into the sections array
+    } else if (!chunkTag.get(JavaChunk.SECTIONS_POST_21W39A).isError()) { // in 21w39a biome tags moved into the sections array
       if(!(biomeData instanceof GenericQuartBiomeData3d)) {
         biomeData = new GenericQuartBiomeData3d();
       }

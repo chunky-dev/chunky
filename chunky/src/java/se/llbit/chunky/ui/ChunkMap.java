@@ -19,22 +19,16 @@ package se.llbit.chunky.ui;
 
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.MenuItem;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.GridPane;
 import javafx.stage.PopupWindow;
 import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.MapView;
@@ -45,7 +39,6 @@ import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.ui.dialogs.SelectChunksInRadiusDialog;
-import se.llbit.chunky.ui.elements.TextFieldLabelWrapper;
 import se.llbit.chunky.world.*;
 import se.llbit.chunky.world.Dimension;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
@@ -57,7 +50,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -593,7 +585,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     World world = mapLoader.getWorld();
     double blockScale = mapView.scale / 16.;
     for (PlayerEntityData player : world.currentDimension().getPlayerPositions()) {
-      if (player.dimension == world.currentDimensionId()) {
+      if (player.dimension.equals(world.currentDimension().getId())) {
         int px = (int) QuickMath.floor(player.x * blockScale);
         int py = (int) QuickMath.floor(player.y);
         int pz = (int) QuickMath.floor(player.z * blockScale);

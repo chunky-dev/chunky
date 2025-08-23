@@ -26,7 +26,7 @@ import se.llbit.util.Mutable;
 
 /**
  * Empty or non-existent chunk in a region that <b>does not</b> exist.
- * In the {@link ChunkMap map view} an {@link EmptyChunk} is represented as gray.
+ * In the {@link ChunkMap map view} an {@link EmptyRegionChunk} is represented as gray.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
