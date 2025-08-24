@@ -1705,6 +1705,14 @@ public class Texture {
   public static final Texture weatheredCopperChain = new Texture();
   @TexturePath("assets/minecraft/textures/block/oxidized_copper_chain")
   public static final Texture oxidizedCopperChain = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_lantern")
+  public static final Texture copperLantern = new Texture();
+  @TexturePath("assets/minecraft/textures/block/exposed_copper_lantern")
+  public static final Texture exposedCopperLantern = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_copper_lantern")
+  public static final Texture weatheredCopperLantern = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_copper_lantern")
+  public static final Texture oxidizedCopperLantern = new Texture();
   @TexturePath("assets/minecraft/textures/block/copper_torch")
   public static final Texture copperTorch = new Texture();
   @TexturePath("assets/minecraft/textures/block/copper_bars")

@@ -548,6 +548,23 @@ public class BlockPalette {
           weatheredCopperConfig.accept(block);
         }
       });
+
+      materialProperties.put(s + "copper_lantern", block -> {
+        copperConfig.accept(block);
+        block.metalness = 0.95f; // workaround for emittance not supporting metals
+        block.emittance = 1.0f;
+      });
+      materialProperties.put(s + "exposed_copper_lantern", block -> {
+        exposedCopperConfig.accept(block);
+        block.emittance = 1.0f;
+      });
+      materialProperties.put(s + "weathered_copper_lantern", block -> {
+        weatheredCopperConfig.accept(block);
+        block.emittance = 1.0f;
+      });
+      materialProperties.put(s + "oxidized_copper_lantern", block -> {
+        block.emittance = 1.0f;
+      });
     }
     materialProperties.put("minecraft:small_amethyst_bud", block -> {
       block.emittance = 1.0f / 15f;

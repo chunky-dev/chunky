@@ -1209,6 +1209,11 @@ public class MinecraftBlockProvider implements BlockProvider {
       addBlock(s + "weathered_copper_chain", (name, tag) -> chain(tag, Texture.weatheredCopperChain));
       addBlock(s + "oxidized_copper_chain", (name, tag) -> chain(tag, Texture.oxidizedCopperChain));
 
+      addBlock(s + "copper_lantern", (name, tag) -> lantern(tag, Texture.copperLantern));
+      addBlock(s + "exposed_copper_lantern", (name, tag) -> lantern(tag, Texture.exposedCopperLantern));
+      addBlock(s + "weathered_copper_lantern", (name, tag) -> lantern(tag, Texture.weatheredCopperLantern));
+      addBlock(s + "oxidized_copper_lantern", (name, tag) -> lantern(tag, Texture.oxidizedCopperLantern));
+
       addBlock(s + "copper_bars", (name, tag) -> copperBars(tag, Texture.copperBars));
       addBlock(s + "exposed_copper_bars", (name, tag) -> copperBars(tag, Texture.exposedCopperBars));
       addBlock(s + "weathered_copper_bars", (name, tag) -> copperBars(tag, Texture.weatheredCopperBars));
