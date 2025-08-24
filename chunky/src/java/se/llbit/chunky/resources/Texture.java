@@ -1707,6 +1707,14 @@ public class Texture {
   public static final Texture oxidizedCopperChain = new Texture();
   @TexturePath("assets/minecraft/textures/block/copper_torch")
   public static final Texture copperTorch = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_bars")
+  public static final Texture copperBars = new Texture();
+  @TexturePath("assets/minecraft/textures/block/exposed_copper_bars")
+  public static final Texture exposedCopperBars = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_copper_bars")
+  public static final Texture weatheredCopperBars = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_copper_bars")
+  public static final Texture oxidizedCopperBars = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

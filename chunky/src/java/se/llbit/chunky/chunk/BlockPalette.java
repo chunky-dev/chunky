@@ -504,6 +504,7 @@ public class BlockPalette {
       materialProperties.put(s + "copper_trapdoor", copperConfig);
       materialProperties.put(s + "copper_chest", copperConfig);
       materialProperties.put(s + "copper_chain", copperConfig);
+      materialProperties.put(s + "copper_bars", copperConfig);
 
       materialProperties.put(s + "exposed_copper", exposedCopperConfig);
       materialProperties.put(s + "exposed_cut_copper", exposedCopperConfig);
@@ -515,6 +516,7 @@ public class BlockPalette {
       materialProperties.put(s + "exposed_copper_trapdoor", exposedCopperConfig);
       materialProperties.put(s + "exposed_copper_chest", exposedCopperConfig);
       materialProperties.put(s + "exposed_copper_chain", exposedCopperConfig);
+      materialProperties.put(s + "exposed_copper_bars", exposedCopperConfig);
 
       materialProperties.put(s + "weathered_copper", weatheredCopperConfig);
       materialProperties.put(s + "weathered_cut_copper", weatheredCopperConfig);
@@ -526,6 +528,7 @@ public class BlockPalette {
       materialProperties.put(s + "weathered_copper_trapdoor", weatheredCopperConfig);
       materialProperties.put(s + "weathered_copper_chest", weatheredCopperConfig);
       materialProperties.put(s + "weathered_copper_chain", weatheredCopperConfig);
+      materialProperties.put(s + "weathered_copper_bars", weatheredCopperConfig);
 
       materialProperties.put(s + "lightning_rod", block -> {
         // apply copper attributes only to non-powered lightning rods
