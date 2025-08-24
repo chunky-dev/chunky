@@ -19,9 +19,8 @@
 package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
-import se.llbit.chunky.model.minecraft.IronBarsModel;
+import se.llbit.chunky.model.minecraft.BarsModel;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
 
 public class IronBars extends AbstractModelBlock {
 
@@ -29,22 +28,8 @@ public class IronBars extends AbstractModelBlock {
 
   public IronBars(boolean north, boolean south, boolean east, boolean west) {
     super("iron_bars", Texture.ironBars);
-    this.description = String.format("north=%s, south=%s, east=%s, west=%s",
-        north, south, east, west);
-    int connections = 0;
-    if (north) {
-      connections |= BlockData.CONNECTED_NORTH;
-    }
-    if (south) {
-      connections |= BlockData.CONNECTED_SOUTH;
-    }
-    if (east) {
-      connections |= BlockData.CONNECTED_EAST;
-    }
-    if (west) {
-      connections |= BlockData.CONNECTED_WEST;
-    }
-    model = new IronBarsModel(connections);
+    description = String.format("north=%s, south=%s, east=%s, west=%s", north, south, east, west);
+    model = new BarsModel(north, east, south, west, Texture.ironBars, Texture.ironBars);
   }
 
   @Override
