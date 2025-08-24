@@ -503,6 +503,8 @@ public class BlockPalette {
       materialProperties.put(s + "copper_door", copperConfig);
       materialProperties.put(s + "copper_trapdoor", copperConfig);
       materialProperties.put(s + "copper_chest", copperConfig);
+      materialProperties.put(s + "copper_chain", copperConfig);
+      materialProperties.put(s + "copper_bars", copperConfig);
 
       materialProperties.put(s + "exposed_copper", exposedCopperConfig);
       materialProperties.put(s + "exposed_cut_copper", exposedCopperConfig);
@@ -513,6 +515,8 @@ public class BlockPalette {
       materialProperties.put(s + "exposed_copper_door", exposedCopperConfig);
       materialProperties.put(s + "exposed_copper_trapdoor", exposedCopperConfig);
       materialProperties.put(s + "exposed_copper_chest", exposedCopperConfig);
+      materialProperties.put(s + "exposed_copper_chain", exposedCopperConfig);
+      materialProperties.put(s + "exposed_copper_bars", exposedCopperConfig);
 
       materialProperties.put(s + "weathered_copper", weatheredCopperConfig);
       materialProperties.put(s + "weathered_cut_copper", weatheredCopperConfig);
@@ -523,6 +527,8 @@ public class BlockPalette {
       materialProperties.put(s + "weathered_copper_door", weatheredCopperConfig);
       materialProperties.put(s + "weathered_copper_trapdoor", weatheredCopperConfig);
       materialProperties.put(s + "weathered_copper_chest", weatheredCopperConfig);
+      materialProperties.put(s + "weathered_copper_chain", weatheredCopperConfig);
+      materialProperties.put(s + "weathered_copper_bars", weatheredCopperConfig);
 
       materialProperties.put(s + "lightning_rod", block -> {
         // apply copper attributes only to non-powered lightning rods
@@ -541,6 +547,23 @@ public class BlockPalette {
         if (block instanceof LightningRod && !((LightningRod) block).isPowered()) {
           weatheredCopperConfig.accept(block);
         }
+      });
+
+      materialProperties.put(s + "copper_lantern", block -> {
+        copperConfig.accept(block);
+        block.metalness = 0.95f; // workaround for emittance not supporting metals
+        block.emittance = 1.0f;
+      });
+      materialProperties.put(s + "exposed_copper_lantern", block -> {
+        exposedCopperConfig.accept(block);
+        block.emittance = 1.0f;
+      });
+      materialProperties.put(s + "weathered_copper_lantern", block -> {
+        weatheredCopperConfig.accept(block);
+        block.emittance = 1.0f;
+      });
+      materialProperties.put(s + "oxidized_copper_lantern", block -> {
+        block.emittance = 1.0f;
       });
     }
     materialProperties.put("minecraft:small_amethyst_bud", block -> {
@@ -618,6 +641,12 @@ public class BlockPalette {
         }
       });
     }
+    materialProperties.put("minecraft:copper_wall_torch", block -> {
+      block.emittance = 1.0f;
+    });
+    materialProperties.put("minecraft:copper_torch", block -> {
+      block.emittance = 1.0f;
+    });
     return materialProperties;
   }
 

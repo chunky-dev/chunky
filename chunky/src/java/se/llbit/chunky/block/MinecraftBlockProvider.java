@@ -1203,6 +1203,21 @@ public class MinecraftBlockProvider implements BlockProvider {
       addBlock(s + "exposed_copper_chest", (name, tag) -> chest(tag, Chest.Kind.EXPOSED_COPPER));
       addBlock(s + "weathered_copper_chest", (name, tag) -> chest(tag, Chest.Kind.WEATHERED_COPPER));
       addBlock(s + "oxidized_copper_chest", (name, tag) -> chest(tag, Chest.Kind.OXIDIZED_COPPER));
+
+      addBlock(s + "copper_chain", (name, tag) -> chain(tag, Texture.copperChain));
+      addBlock(s + "exposed_copper_chain", (name, tag) -> chain(tag, Texture.exposedCopperChain));
+      addBlock(s + "weathered_copper_chain", (name, tag) -> chain(tag, Texture.weatheredCopperChain));
+      addBlock(s + "oxidized_copper_chain", (name, tag) -> chain(tag, Texture.oxidizedCopperChain));
+
+      addBlock(s + "copper_lantern", (name, tag) -> lantern(tag, Texture.copperLantern));
+      addBlock(s + "exposed_copper_lantern", (name, tag) -> lantern(tag, Texture.exposedCopperLantern));
+      addBlock(s + "weathered_copper_lantern", (name, tag) -> lantern(tag, Texture.weatheredCopperLantern));
+      addBlock(s + "oxidized_copper_lantern", (name, tag) -> lantern(tag, Texture.oxidizedCopperLantern));
+
+      addBlock(s + "copper_bars", (name, tag) -> copperBars(tag, Texture.copperBars));
+      addBlock(s + "exposed_copper_bars", (name, tag) -> copperBars(tag, Texture.exposedCopperBars));
+      addBlock(s + "weathered_copper_bars", (name, tag) -> copperBars(tag, Texture.weatheredCopperBars));
+      addBlock(s + "oxidized_copper_bars", (name, tag) -> copperBars(tag, Texture.oxidizedCopperBars));
     }
     addBlock("acacia_shelf", (name, tag) -> shelf(tag, Texture.acaciaShelf));
     addBlock("bamboo_shelf", (name, tag) -> shelf(tag, Texture.bambooShelf));
@@ -1216,6 +1231,8 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("pale_oak_shelf", (name, tag) -> shelf(tag, Texture.paleOakShelf));
     addBlock("spruce_shelf", (name, tag) -> shelf(tag, Texture.spruceShelf));
     addBlock("warped_shelf", (name, tag) -> shelf(tag, Texture.warpedShelf));
+    addBlock("copper_torch", (name, tag) -> new Torch(name, Texture.copperTorch));
+    addBlock("copper_wall_torch", (name, tag) -> new WallTorch(name, Texture.copperTorch, BlockProvider.facing(tag)));
   }
 
   @Override
@@ -2681,10 +2698,7 @@ public class MinecraftBlockProvider implements BlockProvider {
           BlockProvider.facing(tag),
           tag.get("Properties").get("attachment").stringValue("floor"));
       case "lantern":
-        return new Lantern(
-          "lantern",
-          Texture.lantern,
-          tag.get("Properties").get("hanging").stringValue("false").equals("true"));
+        return lantern(tag, Texture.lantern);
       case "sweet_berry_bush":
         return new SweetBerryBush(BlockProvider.stringToInt(tag.get("Properties").get("age"), 3));
       case "campfire":
@@ -2800,10 +2814,7 @@ public class MinecraftBlockProvider implements BlockProvider {
         return log(tag, Texture.strippedCrimsonStem, Texture.strippedCrimsonStemTop);
       case "soul_fire_lantern": // 20w06a - 20w16a
       case "soul_lantern": // since 20w17a
-        return new Lantern(
-          name,
-          Texture.soulFireLantern,
-          tag.get("Properties").get("hanging").stringValue("false").equals("true"));
+        return lantern(tag, Texture.soulFireLantern);
       case "twisting_vines":
         return new SpriteBlock("twisting_vines", Texture.twistingVines);
       case "twisting_vines_plant":
@@ -2918,7 +2929,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "quartz_bricks":
         return new MinecraftBlock(name, Texture.quartzBricks);
       case "chain":
-        return chain(tag, "chain", Texture.chain);
+        return chain(tag, Texture.chain);
       case "candle_cake":
         return candleCake(tag, Texture.candle, Texture.candleLit);
       case "white_candle_cake":
@@ -3322,7 +3333,8 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new Chest(name, type, facing, kind);
   }
 
-  private static Block chain(Tag tag, String name, Texture texture) {
+  private static Block chain(Tag tag, Texture texture) {
+    String name = BlockProvider.blockName(tag);
     String axis = tag.get("Properties").get("axis").stringValue("y");
     return new Chain(name, texture, axis);
   }
@@ -3706,6 +3718,24 @@ public class MinecraftBlockProvider implements BlockProvider {
       BlockProvider.facing(tag),
       BlockProvider.stringToBoolean(tag.get("Properties").get("powered")),
       tag.get("Properties").get("side_chain").stringValue("unconnected"));
+  }
+
+  private static Block lantern(Tag tag, Texture texture) {
+    return new Lantern(
+      BlockProvider.blockName(tag),
+      texture,
+      tag.get("Properties").get("hanging").stringValue("false").equals("true"));
+  }
+
+  private static Block copperBars(Tag tag, Texture texture) {
+    return new CopperBars(
+      BlockProvider.blockName(tag),
+      texture,
+      BlockProvider.stringToBoolean(tag.get("Properties").get("north")),
+      BlockProvider.stringToBoolean(tag.get("Properties").get("south")),
+      BlockProvider.stringToBoolean(tag.get("Properties").get("east")),
+      BlockProvider.stringToBoolean(tag.get("Properties").get("west"))
+    );
   }
 
   private static Block nonSolid(Block block) {
