@@ -31,7 +31,7 @@ public class StereographicProjector implements Projector {
   private final double scale;
 
   public StereographicProjector(double fov) {
-    scale = Camera.clampedFovTan(fov);
+    scale = Camera.clampedFovTan(fov / 2);
   }
 
   @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {

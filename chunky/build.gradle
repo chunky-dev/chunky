@@ -15,6 +15,7 @@ dependencies {
   implementation 'it.unimi.dsi:fastutil:8.4.4'
   implementation 'org.apache.commons:commons-math3:3.2'
   implementation 'com.google.code.gson:gson:2.9.0'
+  implementation 'org.controlsfx:controlsfx:11.2.1'
   implementation project(':lib')
 
   testImplementation 'com.google.truth:truth:1.1.3'

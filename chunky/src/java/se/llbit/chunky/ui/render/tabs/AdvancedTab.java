@@ -24,11 +24,11 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
+import org.controlsfx.control.ToggleSwitch;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.Chunky;
-import se.llbit.chunky.renderer.EmitterSamplingStrategy;
-import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.scene.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
@@ -56,19 +56,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public class AdvancedTab extends VBox implements RenderControlsTab, Initializable {
-  private RenderControlsFxController renderControls;
-  private RenderController controller;
-  private Scene scene;
-
+public class AdvancedTab extends RenderControlsTab implements Initializable {
   @FXML private IntegerAdjuster renderThreads;
   @FXML private IntegerAdjuster cpuLoad;
   @FXML private IntegerAdjuster rayDepth;
   @FXML private IntegerAdjuster branchCount;
   @FXML private Button mergeRenderDump;
   @FXML private CheckBox shutdown;
-  @FXML private CheckBox fastFog;
-  @FXML private CheckBox fancierTranslucency;
+  @FXML private ToggleSwitch fastFog;
+  @FXML private ToggleSwitch fancierTranslucency;
   @FXML private DoubleAdjuster transmissivityCap;
   @FXML private IntegerAdjuster cacheResolution;
   @FXML private DoubleAdjuster animationTime;
@@ -78,8 +74,8 @@ public class AdvancedTab extends VBox implements RenderControlsTab, Initializabl
   @FXML private ChoiceBox<String> bvhMethod;
   @FXML private ChoiceBox<String> biomeStructureImplementation;
   @FXML private IntegerAdjuster gridSize;
-  @FXML private CheckBox preventNormalEmitterWithSampling;
-  @FXML private CheckBox hideUnknownBlocks;
+  @FXML private ToggleSwitch preventNormalEmitterWithSampling;
+  @FXML private ToggleSwitch hideUnknownBlocks;
   @FXML private ChoiceBox<String> rendererSelect;
   @FXML private ChoiceBox<String> previewSelect;
   @FXML private CheckBox showLauncher;
@@ -101,7 +97,7 @@ public class AdvancedTab extends VBox implements RenderControlsTab, Initializabl
     cpuLoad.clampBoth();
     cpuLoad.onValueChange(value -> {
       PersistentSettings.setCPULoad(value);
-      controller.getRenderManager().setCPULoad(value);
+      controller.getRenderController().getRenderManager().setCPULoad(value);
     });
     rayDepth.setName("Ray depth");
     rayDepth.setTooltip("Sets the minimum recursive ray depth.");
@@ -131,7 +127,7 @@ public class AdvancedTab extends VBox implements RenderControlsTab, Initializabl
       List<File> dumps = fileChooser.showOpenMultipleDialog(getScene().getWindow());
       if (dumps != null) {
         // TODO: remove cast.
-        AsynchronousSceneManager sceneManager = ((AsynchronousSceneManager) controller.getSceneManager());
+        AsynchronousSceneManager sceneManager = ((AsynchronousSceneManager) controller.getRenderController().getSceneManager());
         for (File dump : dumps) {
           sceneManager.mergeRenderDump(dump);
         }
@@ -193,7 +189,7 @@ public class AdvancedTab extends VBox implements RenderControlsTab, Initializabl
     renderThreads.clampMin();
     renderThreads.onValueChange(value -> {
       PersistentSettings.setNumRenderThreads(value);
-      renderControls.showPopup("This change takes effect after restarting Chunky.", renderThreads);
+      controller.showPopup("This change takes effect after restarting Chunky.", renderThreads);
     });
 
     ArrayList<String> octreeNames = new ArrayList<>();
@@ -218,7 +214,7 @@ public class AdvancedTab extends VBox implements RenderControlsTab, Initializabl
     octreeImplementation.setTooltip(new Tooltip(tooltipTextBuilder.toString()));
 
     octreeSwitchImplementation.setOnAction(event -> Chunky.getCommonThreads().submit(() -> {
-      TaskTracker tracker = controller.getSceneManager().getTaskTracker();
+      TaskTracker tracker = controller.getRenderController().getSceneManager().getTaskTracker();
       try {
         try (TaskTracker.Task task = tracker.task("(1/1) Converting world octree", 1000)) {
           scene.getWorldOctree().switchImplementation(octreeImplementation.getValue(), task);
@@ -285,7 +281,7 @@ public class AdvancedTab extends VBox implements RenderControlsTab, Initializabl
         warning.setTitle("Chunk reload required");
         ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
         if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
-          controller.getSceneManager().reloadChunks();
+          controller.getRenderController().getSceneManager().reloadChunks();
         }
       }
     });
@@ -329,7 +325,7 @@ public class AdvancedTab extends VBox implements RenderControlsTab, Initializabl
   @Override
   public void update(Scene scene) {
     outputMode.getSelectionModel().select(scene.getPictureExportFormat());
-    fastFog.setSelected(scene.fog.fastFog());
+    fastFog.setSelected(scene.fog.isFastFog());
     fancierTranslucency.setSelected(scene.getFancierTranslucency());
     transmissivityCap.set(scene.getTransmissivityCap());
     renderThreads.set(PersistentSettings.getNumThreads());
@@ -358,11 +354,8 @@ public class AdvancedTab extends VBox implements RenderControlsTab, Initializabl
   }
 
   @Override
-  public void setController(RenderControlsFxController controls) {
-    this.renderControls = controls;
-    this.controller = controls.getRenderController();
-    scene = controller.getSceneManager().getScene();
-    controller.getRenderManager().setOnRenderCompleted((time, sps) -> {
+  public void onSetController(RenderControlsFxController controls) {
+    controller.getRenderController().getRenderManager().setOnRenderCompleted((time, sps) -> {
       if(shutdownAfterCompletedRender()) {
         // TODO: rewrite the shutdown alert in JavaFX.
         new ShutdownAlert(null);
@@ -371,7 +364,7 @@ public class AdvancedTab extends VBox implements RenderControlsTab, Initializabl
 
     // Set the renderers
     rendererSelect.getItems().clear();
-    RenderManager renderManager = controller.getRenderManager();
+    RenderManager renderManager = controller.getRenderController().getRenderManager();
     ArrayList<String> ids = new ArrayList<>();
 
     for (Registerable renderer : renderManager.getRenderers())

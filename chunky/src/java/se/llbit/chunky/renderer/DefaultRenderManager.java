@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.renderer;
 
+import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
@@ -417,50 +418,96 @@ public class DefaultRenderManager extends Thread implements RenderManager {
    */
   protected void finalizeFrame(boolean force) {
     if (force || snapshotControl.saveSnapshot(bufferedScene, bufferedScene.spp)) {
-      PostProcessingFilter filter = bufferedScene.getPostProcessingFilter();
-      if (mode == RenderMode.PREVIEW) filter = PreviewFilter.INSTANCE;
 
-      if (filter instanceof PixelPostProcessingFilter) {
-        PixelPostProcessingFilter pixelFilter = (PixelPostProcessingFilter) filter;
-
-        int width = bufferedScene.width;
-        int height = bufferedScene.height;
-        double[] sampleBuffer = bufferedScene.getSampleBuffer();
-        double exposure = bufferedScene.getExposure();
-
-        // Split up to 10 tasks per thread
-        int tasksPerThread = 10;
-        int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.threads * tasksPerThread - 1);
-        ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(pool.threads * tasksPerThread);
-
-        for (int i = 0; i < bufferedScene.width * bufferedScene.height; i += pixelsPerTask) {
-          int start = i;
-          int end = Math.min(bufferedScene.width * bufferedScene.height, i + pixelsPerTask);
-          jobs.add(pool.submit(worker -> {
-            double[] pixelbuffer = new double[3];
-
-            for (int j = start; j < end; j++) {
-              int x = j % width;
-              int y = j / width;
-
-              pixelFilter.processPixel(width, height, sampleBuffer, x, y, exposure, pixelbuffer);
-              Arrays.setAll(pixelbuffer, k -> Math.min(1, pixelbuffer[k]));
-              bufferedScene.getBackBuffer().setPixel(x, y, ColorUtil.getRGB(pixelbuffer));
-            }
-          }));
-        }
-
-        try {
-          for (RenderWorkerPool.RenderJobFuture job : jobs) {
-            job.awaitFinish();
-          }
-        } catch (InterruptedException e) {
-          // Interrupted
-        }
+      List<PostProcessingFilter> filters;
+      if (mode == RenderMode.PREVIEW) {
+        filters = Collections.singletonList(PreviewFilter.INSTANCE);
       } else {
-        bufferedScene.postProcessFrame(TaskTracker.Task.NONE);
+        filters = bufferedScene.getPostprocessingFilters();
       }
 
+      int width = bufferedScene.width;
+      int height = bufferedScene.height;
+      double exposure = FastMath.pow(2, bufferedScene.getExposure());
+      double[] sampleBuffer = bufferedScene.getSampleBuffer();
+      double[] intermediate = new double[sampleBuffer.length];
+      for (int i = 0; i < intermediate.length; i++) {
+        intermediate[i] = sampleBuffer[i] * exposure;
+      }
+
+      for (PostProcessingFilter filter : filters) {
+        if (filter instanceof PixelPostProcessingFilter) {
+          PixelPostProcessingFilter pixelFilter = (PixelPostProcessingFilter) filter;
+
+          // Split up to 10 tasks per thread
+          int tasksPerThread = 10;
+          int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.threads * tasksPerThread - 1);
+          ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(pool.threads * tasksPerThread);
+
+          for (int i = 0; i < bufferedScene.width * bufferedScene.height; i += pixelsPerTask) {
+            int start = i;
+            int end = Math.min(bufferedScene.width * bufferedScene.height, i + pixelsPerTask);
+            jobs.add(pool.submit(worker -> {
+              double[] pixelBuffer = new double[3];
+
+              for (int j = start; j < end; j++) {
+                int x = j % width;
+                int y = j / width;
+
+                int index = (y * width + x) * 3;
+                System.arraycopy(intermediate, index, pixelBuffer, 0, 3);
+                pixelFilter.processPixel(pixelBuffer);
+                System.arraycopy(pixelBuffer, 0, intermediate, index, 3);
+
+                // TODO: extract clamping into own interface
+                Arrays.setAll(pixelBuffer, k -> Math.min(1, pixelBuffer[k]));
+                bufferedScene.getBackBuffer().setPixel(x, y, ColorUtil.getRGB(pixelBuffer));
+              }
+            }));
+          }
+
+          try {
+            for (RenderWorkerPool.RenderJobFuture job : jobs) {
+              job.awaitFinish();
+            }
+          } catch (InterruptedException e) {
+            // Interrupted
+          }
+        } else {
+          filter.processFrame(width, height, intermediate);
+        }
+      }
+
+      // Split up to 10 tasks per thread
+      int tasksPerThread = 10;
+      int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.threads * tasksPerThread - 1);
+      ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(pool.threads * tasksPerThread);
+      for (int i = 0; i < bufferedScene.width * bufferedScene.height; i += pixelsPerTask) {
+        int start = i;
+        int end = Math.min(bufferedScene.width * bufferedScene.height, i + pixelsPerTask);
+        jobs.add(pool.submit(worker -> {
+          double[] pixelBuffer = new double[3];
+
+          for (int j = start; j < end; j++) {
+            int x = j % width;
+            int y = j / width;
+
+            int index = (y * width + x) * 3;
+            System.arraycopy(intermediate, index, pixelBuffer, 0, 3);
+
+            // TODO: extract clamping into own interface
+            Arrays.setAll(pixelBuffer, k -> Math.min(1, pixelBuffer[k]));
+            bufferedScene.getBackBuffer().setPixel(x, y, ColorUtil.getRGB(pixelBuffer));
+          }
+        }));
+      }
+      try {
+        for (RenderWorkerPool.RenderJobFuture job : jobs) {
+          job.awaitFinish();
+        }
+      } catch (InterruptedException e) {
+        // Interrupted
+      }
       redrawScreen();
     }
   }

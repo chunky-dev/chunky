@@ -183,7 +183,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
     MenuItem exportZip = new MenuItem("Export selected chunks…");
     exportZip.setOnAction(e -> controller.exportZip());
-    exportZip.setDisable(chunkSelection.size() == 0);
+    exportZip.setDisable(chunkSelection.isEmpty());
 
     MenuItem exportPng = new MenuItem("Save map view as…");
     exportPng.setOnAction(e -> controller.exportMapView());
@@ -201,7 +201,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       .forEach(t -> t.accept(contextMenu));
 
     chunkSelection.addSelectionListener(() -> {
-      boolean noChunksSelected = chunkSelection.size() == 0;
+      boolean noChunksSelected = chunkSelection.isEmpty();
       clearSelection.setDisable(noChunksSelected);
       newScene.setDisable(noChunksSelected);
       loadSelection.setDisable(noChunksSelected);
@@ -480,10 +480,10 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       Chunk hoveredChunk = mapLoader.getWorld().currentDimension().getChunk(cp);
       if (!hoveredChunk.isEmpty()) {
         tooltip.setText(
-            String.format("%s, %s\nBlock: [%s, %s]\n%d chunks selected", hoveredChunk.toString(), hoveredChunk.biomeAt(bx, bz), worldBlockX, worldBlockZ, chunkSelection.size()));
+            String.format("%s, %s\nBlock: [%s, %s]\n%d chunks selected", hoveredChunk, hoveredChunk.biomeAt(bx, bz), worldBlockX, worldBlockZ, chunkSelection.size()));
       } else {
         tooltip.setText(
-            String.format("%s\nBlock: [%s, %s]\n%d chunks selected", hoveredChunk.toString(), worldBlockX, worldBlockZ, chunkSelection.size()));
+            String.format("%s\nBlock: [%s, %s]\n%d chunks selected", hoveredChunk, worldBlockX, worldBlockZ, chunkSelection.size()));
       }
       Scene scene = mapOverlay.getScene();
       if (mapOverlay.isFocused()) {

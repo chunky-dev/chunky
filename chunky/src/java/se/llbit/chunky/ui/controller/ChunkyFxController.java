@@ -78,7 +78,6 @@ import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
-import se.llbit.fx.ToolPane;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.fxutil.GroupedChangeListener;
 import se.llbit.log.Level;
@@ -912,10 +911,8 @@ public class ChunkyFxController
       alert.setTitle("Overwrite existing scene");
       alert.setContentText("A scene with that name already exists. This will overwrite the existing scene, are you sure you want to continue?");
 
-      if (alert.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
-        return false;
-      }
+      return alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK;
     }
-    return  true;
+    return true;
   }
 }

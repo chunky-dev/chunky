@@ -16,15 +16,18 @@
  */
 package se.llbit.math;
 
-public class Constants {
+public final class Constants {
   public static final double EPSILON = 5e-8;
   public static final double OFFSET = 1e-6;
 
   public static final double INV_4_PI = 1 / (4 * Math.PI);
   public static final double HALF_PI = Math.PI / 2;
+  public static final double INV_PI = 1 / Math.PI;
   // TODO INV_TAU
   public static final double TAU = Math.PI * 2;
   public static final double SQRT_HALF = Math.sqrt(0.5);
   public static final double INV_SQRT_HALF = 1 / Math.sqrt(0.5);
   public static final double SQRT_2 = Math.sqrt(2);
+
+  private Constants() {}
 }

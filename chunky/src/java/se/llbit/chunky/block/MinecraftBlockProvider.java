@@ -940,6 +940,7 @@ public class MinecraftBlockProvider implements BlockProvider {
   }
 
   static {
+    addBlock("void", (name, tag) -> Void.INSTANCE);
     addBlocks((name, tag) -> Air.INSTANCE, "air", "cave_air", "void_air", "structure_void");
     addBlock("barrier", (name, tag) -> tag.get("Properties").get("waterlogged").stringValue("").equals("true") ? Water.INSTANCE : Air.INSTANCE);
     addBlocks(Texture.stone, "infested_stone", "stone");

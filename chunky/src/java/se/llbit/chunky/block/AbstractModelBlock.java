@@ -67,7 +67,7 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
           waterModel = WaterModel.WATER_TOP;
         }
       } else {
-        waterModel = (isWaterloggedFull) ? Block.fullBlock : WaterModel.NOT_FULL_BLOCK;
+        waterModel = (isWaterloggedFull) ? Block.FULL_BLOCK : WaterModel.NOT_FULL_BLOCK;
       }
     }
 
@@ -144,11 +144,14 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
         return false;
       }
     } else {
-      if (!waterlogged && (!modelHit || modelIntersect.distance > Constants.EPSILON) && ray.getCurrentMedium() != Air.INSTANCE) {
-        intersectionRecord.distance = 0;
-        intersectionRecord.material = Air.INSTANCE;
-        Air.INSTANCE.getColor(intersectionRecord);
-        return true;
+      if (!waterlogged && (!modelHit || modelIntersect.distance > Constants.EPSILON)) {
+        Block waterPlaneMaterial;
+        if (ray.getCurrentMedium() != (waterPlaneMaterial = scene.waterPlaneMaterial(ray.o))) {
+          intersectionRecord.distance = 0;
+          intersectionRecord.material = waterPlaneMaterial;
+          waterPlaneMaterial.getColor(intersectionRecord);
+          return true;
+        }
       }
       if (modelHit && modelIntersect.distance < waterIntersect.distance + Constants.EPSILON) {
         intersectionRecord.distance = modelIntersect.distance;

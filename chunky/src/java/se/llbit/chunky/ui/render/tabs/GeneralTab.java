@@ -29,6 +29,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
+import org.controlsfx.control.ToggleSwitch;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Book;
@@ -64,9 +65,7 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class GeneralTab extends VBox implements RenderControlsTab, Initializable {
-  private Scene scene;
-
+public class GeneralTab extends RenderControlsTab implements Initializable {
   @FXML private Button openSceneDirBtn;
   @FXML private Button exportSettings;
   @FXML private Button importSettings;
@@ -79,7 +78,7 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
   @FXML private Button makeDefaultSize;
   @FXML private Button flipAxesBtn;
   @FXML private Pane scaleButtonArea;
-  @FXML private CheckBox renderRegions;
+  @FXML private ToggleSwitch renderRegions;
   @FXML private Pane renderRegionsArea;
   @FXML private IntegerTextField cameraCropWidth;
   @FXML private IntegerTextField cameraCropHeight;
@@ -103,9 +102,8 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
 
   private final Double[] scaleButtonValues = {0.5, 1.5, 2.0};
 
-  private RenderController controller;
+  private RenderController renderController;
   private WorldMapLoader mapLoader;
-  private RenderControlsFxController renderControls;
   private ChunkyFxController chunkyFxController;
   private ChangeListener<? super Number> canvasCropListener = (observable, oldValue, newValue) -> updateCanvasCrop();
 
@@ -158,10 +156,10 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
         chunkyFxController.getChunkSelection().isEmpty()
       );
     });
-    openSceneDirBtn.setDisable(!controller.getContext().getSceneDirectory().exists());
+    openSceneDirBtn.setDisable(!renderController.getContext().getSceneDirectory().exists());
     openSceneDirBtn.setTooltip(new Tooltip("Open the directory of the scene, if it has been saved."));
-    ((AsynchronousSceneManager) controller.getSceneManager()).setOnSceneSaved(() -> {
-      openSceneDirBtn.setDisable(!controller.getContext().getSceneDirectory().exists());
+    ((AsynchronousSceneManager) renderController.getSceneManager()).setOnSceneSaved(() -> {
+      openSceneDirBtn.setDisable(!renderController.getContext().getSceneDirectory().exists());
     });
 
     cameraCropWidth.valueProperty().removeListener(canvasCropListener);
@@ -212,8 +210,8 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
         try (JsonParser parser = new JsonParser(new ByteArrayInputStream(text.getBytes()))) {
           JsonObject json = parser.parse().object();
           scene.importFromJson(json);
-          renderControls.getCanvas().setCanvasSize(scene.width, scene.height);
-          renderControls.refreshSettings();
+          controller.getCanvas().setCanvasSize(scene.width, scene.height);
+          controller.refreshSettings();
         } catch (IOException e) {
           Log.warn("Failed to import scene settings.");
         } catch (JsonParser.SyntaxError syntaxError) {
@@ -229,7 +227,7 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
           alert.setTitle("Restore default settings");
           alert.setContentText("Do you really want to reset all scene settings?");
           if (alert.showAndWait().get() == ButtonType.OK) {
-            scene.resetScene(scene.name, controller.getContext().getChunky().getSceneFactory());
+            scene.resetScene(scene.name, renderController.getContext().getChunky().getSceneFactory());
             chunkyFxController.refreshSettings();
           }
         });
@@ -241,7 +239,7 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
       PersistentSettings.setLoadPlayers(newValue);
     });
     loadPlayers.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
               "This takes effect the next time a new scene is created.", loadPlayers);
     });
     loadArmorStands.setTooltip(new Tooltip("Enable/disable armor stand entity loading. "
@@ -251,7 +249,7 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
       PersistentSettings.setLoadArmorStands(newValue);
     });
     loadArmorStands.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
               "This takes effect the next time a new scene is created.", loadArmorStands);
     });
     loadBooks.setTooltip(new Tooltip("Enable/disable book entity loading. "
@@ -261,7 +259,7 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
       PersistentSettings.setLoadBooks(newValue);
     });
     loadBooks.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
               "This takes effect the next time a new scene is created.", loadBooks);
     });
     loadPaintings.setTooltip(new Tooltip("Enable/disable painting entity loading. "
@@ -271,7 +269,7 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
       PersistentSettings.setLoadPaintings(newValue);
     });
     loadPaintings.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
               "This takes effect the next time a new scene is created.", loadPaintings);
     });
     loadBeaconBeams.setTooltip(new Tooltip("Enable/disable beacon beam entity loading. "
@@ -281,7 +279,7 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
       PersistentSettings.setLoadBeaconBeams(newValue);
     });
     loadBeaconBeams.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
         "This takes effect the next time a new scene is created.", loadBeaconBeams);
     });
     loadOtherEntities.setTooltip(new Tooltip("Enable/disable other entity loading. "
@@ -291,7 +289,7 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
       PersistentSettings.setLoadOtherEntities(newValue);
     });
     loadOtherEntities.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
               "This takes effect the next time a new scene is created.", loadOtherEntities);
     });
     loadAllEntities.setOnAction(event -> {
@@ -353,13 +351,13 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
       if (value >= yMax.get()) {
         yMin.setInvalid(true);
         yMax.setInvalid(true);
-        renderControls.hidePopup();
+        controller.hidePopup();
       } else {
         yMin.setInvalid(false);
         yMax.setInvalid(false);
 
         scene.setYClipMin(value);
-        renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
+        controller.showPopup("Reload the chunks for this to take effect.", yMax);
       }
     });
 
@@ -369,13 +367,13 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
       if (yMin.get() >= value) {
         yMin.setInvalid(true);
         yMax.setInvalid(true);
-        renderControls.hidePopup();
+        controller.hidePopup();
       } else {
         yMin.setInvalid(false);
         yMax.setInvalid(false);
 
         scene.setYClipMax(value);
-        renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
+        controller.showPopup("Reload the chunks for this to take effect.", yMax);
       }
     });
 
@@ -389,14 +387,14 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
     loadSelectedChunks
         .setTooltip(new Tooltip("Load the chunks that are currently selected in the map view"));
     loadSelectedChunks.setOnAction(e -> {
-      controller.getSceneManager()
+      renderController.getSceneManager()
           .loadChunks(mapLoader.getWorld(), chunkyFxController.getChunkSelection().getSelection());
       reloadChunks.setDisable(chunkyFxController.getChunkSelection().isEmpty());
     });
 
     reloadChunks.setTooltip(new Tooltip("Reload all chunks in the scene."));
     reloadChunks.setGraphic(new ImageView(Icon.reload.fxImage()));
-    reloadChunks.setOnAction(e -> controller.getSceneManager().reloadChunks());
+    reloadChunks.setOnAction(e -> renderController.getSceneManager().reloadChunks());
 
     canvasSizeLabel.setGraphic(new ImageView(Icon.scale.fxImage()));
     canvasSizeInput.getSize().addListener(this::updateCanvasSize);
@@ -479,7 +477,7 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
     } else {
       scene.setCanvasCropSize(width, height, 0, 0, 0, 0);
     }
-    renderControls.getCanvas().setCanvasSize(scene.width, scene.height);
+    controller.getCanvas().setCanvasSize(scene.width, scene.height);
   }
 
   private void updateCanvasCrop() {
@@ -487,17 +485,15 @@ public class GeneralTab extends VBox implements RenderControlsTab, Initializable
     updateCanvasSize(size.getWidth(), size.getHeight());
   }
 
-  @Override public void setController(RenderControlsFxController controls) {
-    this.renderControls = controls;
-    this.chunkyFxController = controls.getChunkyController();
+  @Override protected void onSetController(RenderControlsFxController controller) {
+    this.chunkyFxController = this.controller.getChunkyController();
+    this.renderController = this.controller.getRenderController();
     this.mapLoader = chunkyFxController.getMapLoader();
     mapLoader.addWorldLoadListener((world, reloaded) -> {
       loadSelectedChunks.setDisable(world instanceof EmptyWorld || world == null);
     });
     mapLoader.addWorldLoadListener((world, reloaded) -> updateYClipSlidersRanges(world));
     updateYClipSlidersRanges(mapLoader.getWorld());
-    this.controller = controls.getRenderController();
-    this.scene = this.controller.getSceneManager().getScene();
   }
 
   private void updateYClipSlidersRanges(World world) {

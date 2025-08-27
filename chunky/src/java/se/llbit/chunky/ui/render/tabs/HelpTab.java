@@ -23,7 +23,7 @@ import se.llbit.chunky.ui.render.RenderControlsTab;
 
 import java.io.IOException;
 
-public class HelpTab extends VBox implements RenderControlsTab {
+public class HelpTab extends RenderControlsTab {
   public HelpTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("HelpTab.fxml"));
     loader.setRoot(this);

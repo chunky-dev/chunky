@@ -52,6 +52,8 @@ import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
+import se.llbit.chunky.ui.dialogs.EditMaterialDialog;
+import se.llbit.chunky.world.Material;
 import se.llbit.math.Vector2;
 
 import java.nio.IntBuffer;
@@ -235,6 +237,15 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     MenuItem copyFrame = new MenuItem("Copy image to clipboard");
     copyFrame.setOnAction(e -> chunkyFxController.copyCurrentFrame());
     contextMenu.getItems().add(copyFrame);
+
+    MenuItem editMaterial = new MenuItem("Edit material");
+    editMaterial.setOnAction(e -> {
+      Material material = scene.getTargetMaterial(target.x, target.y);
+      EditMaterialDialog dialog = new EditMaterialDialog(material, scene);
+      dialog.showAndWait();
+      dialog = null;
+    });
+    contextMenu.getItems().add(editMaterial);
 
     chunkyFxController.getChunky()
       .getRenderContextMenuTransformers()

@@ -4,21 +4,30 @@ import se.llbit.chunky.plugin.PluginApi;
 
 import java.util.*;
 
-public abstract class PostProcessingFilters {
-
-  public static final PixelPostProcessingFilter NONE = new NoneFilter();
+public class PostProcessingFilters {
+  /**
+   * Don't let anyone instantiate this class.
+   */
+  private PostProcessingFilters() {}
 
   private static final Map<String, PostProcessingFilter> filters = new HashMap<>();
   // using tree map for the added benefit of sorting by name
   private static final Map<String, PostProcessingFilter> filtersByName = new TreeMap<>();
+  private static final List<PostProcessingFilter> filters2 = new ArrayList<>(0);
 
   static {
-    addPostProcessingFilter(NONE);
     addPostProcessingFilter(new GammaCorrectionFilter());
-    addPostProcessingFilter(new Tonemap1Filter());
-    addPostProcessingFilter(new ACESFilmicFilter());
-    addPostProcessingFilter(new HableToneMappingFilter());
-    addPostProcessingFilter(new UE4ToneMappingFilter());
+    addPostProcessingFilter(new HejlBurgessDawsonFilmicFilter());
+    addPostProcessingFilter(new AldridgeFilmicFilter());
+    addPostProcessingFilter(new HableFilmicFilter());
+    addPostProcessingFilter(new HableUpdatedFilmicFilter());
+    addPostProcessingFilter(new LottesFilmicFilter());
+    addPostProcessingFilter(new DayFilmicFilter());
+    addPostProcessingFilter(new UchimuraFilmicFilter());
+    addPostProcessingFilter(new HillACESFilmicFilter());
+    addPostProcessingFilter(new NarkowiczACESFilmicFilter());
+    addPostProcessingFilter(new GuyACESFilmicFilter());
+    addPostProcessingFilter(new UE4FilmicFilter());
   }
 
   public static Optional<PostProcessingFilter> getPostProcessingFilterFromId(String id) {
@@ -33,12 +42,13 @@ public abstract class PostProcessingFilters {
   }
 
   public static Collection<PostProcessingFilter> getFilters() {
-    return filtersByName.values();
+    return filters2;
   }
 
   @PluginApi
   public static void addPostProcessingFilter(PostProcessingFilter filter) {
     filters.put(filter.getId(), filter);
     filtersByName.put(filter.getName(), filter);
+    filters2.add(filter);
   }
 }

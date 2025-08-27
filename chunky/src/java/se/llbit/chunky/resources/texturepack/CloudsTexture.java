@@ -40,6 +40,7 @@ public class CloudsTexture extends TextureLoader {
       throw new TextureFormatError("Clouds texture size must be 256 by 256 pixels!");
     }
 
+    Clouds.zero();
     for (int y = 0; y < 256; ++y) {
       for (int x = 0; x < 256; ++x) {
         int v = texture.getPixel(x, y) >>> 31;

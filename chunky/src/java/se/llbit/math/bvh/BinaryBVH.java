@@ -28,6 +28,7 @@ import se.llbit.math.primitive.Primitive;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Random;
 import java.util.Stack;
 
 import static se.llbit.math.Constants.OFFSET;
@@ -214,7 +215,7 @@ public abstract class BinaryBVH implements BVH {
      * @return {@code true} if there exists any intersection
      */
     @Override
-    public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+    public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
         boolean hit = false;
         int currentNode = 0;
         IntStack nodesToVisit = new IntArrayList(depth/2);
@@ -228,7 +229,7 @@ public abstract class BinaryBVH implements BVH {
                 // Is leaf
                 int primIndex = -packed[currentNode];
                 for (Primitive primitive : packedPrimitives[primIndex]) {
-                    hit = primitive.closestIntersection(ray, intersectionRecord) | hit;
+                    hit = primitive.closestIntersection(ray, intersectionRecord, scene, random) | hit;
                 }
 
                 if (nodesToVisit.isEmpty()) break;

@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.ui.render.tabs;
 
+import java.util.ArrayList;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,19 +27,25 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import org.controlsfx.control.ToggleSwitch;
 import se.llbit.chunky.block.*;
 import se.llbit.chunky.block.minecraft.UnknownBlock;
+import se.llbit.chunky.renderer.scene.EmitterMappingType;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
-import se.llbit.chunky.ui.controller.RenderControlsFxController;
+import se.llbit.chunky.ui.IntegerAdjuster;
+import se.llbit.chunky.ui.data.MaterialReferenceColorData;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.ExtraMaterials;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.MaterialStore;
 import se.llbit.fx.LuxColorPicker;
 import se.llbit.math.ColorUtil;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 import se.llbit.nbt.CompoundTag;
 
 import java.net.URL;
@@ -47,10 +54,12 @@ import java.util.Comparator;
 import java.util.ResourceBundle;
 
 // TODO: customization of textures, base color, etc.
-public class MaterialsTab extends VBox implements RenderControlsTab, Initializable {
-  private Scene scene;
-
+public class MaterialsTab extends RenderControlsTab implements Initializable {
   private final DoubleAdjuster emittance = new DoubleAdjuster();
+  private final LuxColorPicker emittanceColor = new LuxColorPicker();
+  private final DoubleAdjuster emitterMappingOffset = new DoubleAdjuster();
+  private final ChoiceBox<EmitterMappingType> emitterMappingType = new ChoiceBox<>();
+  private final ToggleSwitch useReferenceColors = new ToggleSwitch();
   private final DoubleAdjuster alpha = new DoubleAdjuster();
   private final DoubleAdjuster subsurfaceScattering = new DoubleAdjuster();
   private final LuxColorPicker diffuseColor = new LuxColorPicker();
@@ -66,12 +75,19 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
   private final DoubleAdjuster volumeAnisotropy = new DoubleAdjuster();
   private final DoubleAdjuster volumeEmittance = new DoubleAdjuster();
   private final LuxColorPicker volumeColor = new LuxColorPicker();
-
   private final DoubleAdjuster absorption = new DoubleAdjuster();
   private final LuxColorPicker absorptionColor = new LuxColorPicker();
   private final CheckBox opaque = new CheckBox();
-  private final CheckBox hidden = new CheckBox();
+  private final ToggleSwitch hidden = new ToggleSwitch();
+  private final TableView<MaterialReferenceColorData> referenceColorTable = new TableView<>();
+  private final Button addReferenceColor = new Button();
+  private final Button removeReferenceColor = new Button();
+  private final LuxColorPicker referenceColorPicker = new LuxColorPicker();
+  private final IntegerAdjuster referenceColorRangeSlider = new IntegerAdjuster();
 
+  private ChangeListener<Color> emittanceColorListener = (observable, oldValue, newValue) -> {};
+  private ChangeListener<? super EmitterMappingType> emitterMappingTypeListener = (observable, oldValue, newValue) -> {};
+  private ChangeListener<Boolean> useReferenceColorsListener = (observable, oldValue, newValue) -> {};
   private ChangeListener<Color> specularColorListener = (observable, oldValue, newValue) -> {};
   private ChangeListener<Color> transmissionSpecularColorListener = (observable, oldValue, newValue) -> {};
   private ChangeListener<Color> diffuseColorListener = (observable, oldValue, newValue) -> {};
@@ -79,6 +95,9 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
   private ChangeListener<Color> absorptionColorListener = (observable, oldValue, newValue) -> {};
   private ChangeListener<Boolean> opaqueListener = (observable, oldValue, newValue) -> {};
   private ChangeListener<Boolean> hiddenListener = (observable, oldValue, newValue) -> {};
+  private ChangeListener<? super MaterialReferenceColorData> referenceColorTableListener = (observable, oldValue, newValue) -> {};
+  private ChangeListener<Color> referenceColorPickerListener = (observable, oldValue, newValue) -> {};
+
 
   private final ListView<String> listView;
 
@@ -87,6 +106,20 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
     emittance.setRange(0, 100);
     emittance.clampMin();
     emittance.setTooltip("Intensity of the light emitted from the selected material.");
+
+    emittanceColor.setText("Emittance color");
+    emittanceColor.colorProperty().addListener(diffuseColorListener);
+
+    emitterMappingOffset.setName("Emitter mapping offset");
+    emitterMappingOffset.setRange(-5, 5);
+    emitterMappingOffset.setTooltip("Offset applied to the global emitter mapping exponent.");
+
+    emitterMappingType.getItems().addAll(EmitterMappingType.values());
+    emitterMappingType.setTooltip(new Tooltip("Overrides the global setting for emitter mapping type."));
+    emitterMappingType.getSelectionModel().selectedItemProperty().addListener(emitterMappingTypeListener);
+
+    useReferenceColors.setText("Use reference colors");
+    useReferenceColors.selectedProperty().addListener(useReferenceColorsListener);
 
     alpha.setName("Alpha");
     alpha.setRange(0, 1);
@@ -98,9 +131,8 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
     subsurfaceScattering.clampBoth();
     subsurfaceScattering.setTooltip("Probability of a ray to be scattered behind the surface.");
 
-    Label diffuseColorLabel = new Label("Diffuse color:");
+    diffuseColor.setText("Diffuse color");
     diffuseColor.colorProperty().addListener(diffuseColorListener);
-    HBox diffuseColorBox = new HBox(10, diffuseColorLabel, diffuseColor);
 
     specular.setName("Specular");
     specular.setRange(0, 1);
@@ -133,13 +165,11 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
     transmissionMetalness.clampBoth();
     transmissionMetalness.setTooltip("Texture tinting of refracted/transmitted light.");
 
-    Label specularColorLabel = new Label("Specular color:");
+    specularColor.setText("Specular color");
     specularColor.colorProperty().addListener(specularColorListener);
-    HBox specularColorBox = new HBox(10, specularColorLabel, specularColor);
 
-    Label transmissionSpecularColorLabel = new Label("Transmission specular color:");
+    transmissionSpecularColor.setText("Transmission specular color");
     transmissionSpecularColor.colorProperty().addListener(transmissionSpecularColorListener);
-    HBox transmissionSpecularColorBox = new HBox(10, transmissionSpecularColorLabel, transmissionSpecularColor);
 
     volumeDensity.setName("Volume density");
     volumeDensity.setRange(0, 1);
@@ -158,19 +188,17 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
     volumeEmittance.clampMin();
     volumeEmittance.setTooltip("Emittance of volume medium.");
 
-    Label volumeColorLabel = new Label("Volume color:");
+    volumeColor.setText("Volume color");
     volumeColor.colorProperty().addListener(volumeColorListener);
-    HBox volumeColorBox = new HBox(10, volumeColorLabel, volumeColor);
 
     absorption.setName("Absorption");
     absorption.setRange(0, 10);
     absorption.clampMin();
     absorption.makeLogarithmic();
-    absorption.setTooltip("Absorption of selected material.");
+    absorption.setTooltip("Absorption of volume medium.");
 
-    Label absorptionColorLabel = new Label("Absorption color:");
+    absorptionColor.setText("Absorption color");
     absorptionColor.colorProperty().addListener(absorptionColorListener);
-    HBox absorptionColorBox = new HBox(10, absorptionColorLabel, absorptionColor);
 
     opaque.setText("Opaque");
     opaque.setTooltip(new Tooltip("Blocks surrounded by opaque blocks are replaced with stone to improve performance.\n" +
@@ -203,22 +231,17 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
     settings.setHgap(10);
     settings.setVgap(10);
 
-    VBox diffuseSettings = new VBox(10, emittance, alpha, subsurfaceScattering, diffuseColorBox);
-    VBox volumeSettings = new VBox(10, volumeDensity, volumeAnisotropy, volumeEmittance, volumeColorBox);
-    VBox specularSettings = new VBox(10, specular, ior, perceptualSmoothness, perceptualTransmissionSmoothness);
-    VBox specularColorSettings = new VBox(10, metalness, transmissionMetalness, specularColorBox, transmissionSpecularColorBox);
-    VBox absorptionSettings = new VBox(10, absorption, absorptionColorBox);
-    VBox otherSettings = new VBox(10, opaque, hidden);
+    VBox diffuseSettings = new VBox(6, emittance, emittanceColor, emitterMappingOffset, emitterMappingType, useReferenceColors, alpha, subsurfaceScattering, diffuseColor);
+    VBox volumeSettings = new VBox(6, volumeDensity, volumeAnisotropy, volumeEmittance, volumeColor, absorption, absorptionColor);
+    VBox specularSettings = new VBox(6, specular, ior, perceptualSmoothness, perceptualTransmissionSmoothness);
+    VBox specularColorSettings = new VBox(6, metalness, transmissionMetalness, specularColor, transmissionSpecularColor);
+    VBox otherSettings = new VBox(6, opaque, hidden);
 
     settings.add(diffuseSettings, 0, 0);
     settings.add(volumeSettings, 1, 0);
     settings.add(specularSettings, 0, 1);
     settings.add(specularColorSettings, 1, 1);
-    settings.add(absorptionSettings, 0, 2);
-    settings.add(otherSettings, 1, 2);
-
-    setPadding(new Insets(10));
-    setSpacing(15);
+    settings.add(otherSettings, 0, 2);
 
     TextField filterField = new TextField();
     filterField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -239,11 +262,51 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
     listPane.getChildren().addAll(filterBox, listView);
     listPane.setPrefHeight(200);
 
-    getChildren().addAll(listPane, settings);
+    addReferenceColor.setText("Add reference color");
+    removeReferenceColor.setText("Remove reference color");
+
+    HBox addRemoveControls = new HBox(10, addReferenceColor, removeReferenceColor);
+
+    TableColumn<MaterialReferenceColorData, String> redColumn = new TableColumn<>("Red");
+    TableColumn<MaterialReferenceColorData, String> greenColumn = new TableColumn<>("Green");
+    TableColumn<MaterialReferenceColorData, String> blueColumn = new TableColumn<>("Blue");
+    TableColumn<MaterialReferenceColorData, String> rangeColumn = new TableColumn<>("Range");
+
+    redColumn.setCellValueFactory(new PropertyValueFactory<>("red"));
+    greenColumn.setCellValueFactory(new PropertyValueFactory<>("green"));
+    blueColumn.setCellValueFactory(new PropertyValueFactory<>("blue"));
+    rangeColumn.setCellValueFactory(new PropertyValueFactory<>("range"));
+
+    redColumn.setSortable(true);
+    greenColumn.setSortable(true);
+    blueColumn.setSortable(true);
+    rangeColumn.setSortable(true);
+
+    referenceColorTable.getColumns().add(redColumn);
+    referenceColorTable.getColumns().add(greenColumn);
+    referenceColorTable.getColumns().add(blueColumn);
+    referenceColorTable.getColumns().add(rangeColumn);
+    referenceColorTable.getSelectionModel().selectedItemProperty().addListener(
+        referenceColorTableListener);
+    referenceColorTable.setMaxHeight(200);
+
+    referenceColorPicker.setText("Reference color");
+    referenceColorPicker.colorProperty().addListener(referenceColorPickerListener);
+
+    referenceColorRangeSlider.setName("Range");
+    referenceColorRangeSlider.setRange(0, 255);
+    referenceColorRangeSlider.clampBoth();
+
+    getChildren().addAll(listPane, settings, addRemoveControls, referenceColorTable, referenceColorPicker, referenceColorRangeSlider);
+    setPadding(new Insets(10));
+    setSpacing(15);
   }
 
   private void updateSelectedMaterial(String materialName) {
     boolean materialExists = false;
+    emittanceColor.colorProperty().removeListener(emittanceColorListener);
+    emitterMappingType.getSelectionModel().selectedItemProperty().removeListener(emitterMappingTypeListener);
+    useReferenceColors.selectedProperty().removeListener(useReferenceColorsListener);
     diffuseColor.colorProperty().removeListener(diffuseColorListener);
     specularColor.colorProperty().removeListener(specularColorListener);
     transmissionSpecularColor.colorProperty().removeListener(transmissionSpecularColorListener);
@@ -251,8 +314,12 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
     absorptionColor.colorProperty().removeListener(absorptionColorListener);
     opaque.selectedProperty().removeListener(opaqueListener);
     hidden.selectedProperty().removeListener(hiddenListener);
+    referenceColorTable.getSelectionModel().selectedItemProperty().removeListener(referenceColorTableListener);
+    referenceColorTable.getItems().clear();
+    referenceColorPicker.colorProperty().removeListener(referenceColorPickerListener);
     if (MaterialStore.collections.containsKey(materialName)) {
       double emAcc = 0;
+      double emitterMappingOffsetAcc = 0;
       double alphaAcc = 0;
       double subsurfaceScatteringAcc = 0;
       double specAcc = 0;
@@ -269,6 +336,7 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
       Collection<Block> blocks = MaterialStore.collections.get(materialName);
       for (Block block : blocks) {
         emAcc += block.emittance;
+        emitterMappingOffsetAcc += block.emitterMappingOffset;
         alphaAcc += block.alpha;
         subsurfaceScatteringAcc += block.subSurfaceScattering;
         specAcc += block.specular;
@@ -284,6 +352,7 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
       }
 
       emittance.set(emAcc / blocks.size());
+      emitterMappingOffset.set(emitterMappingOffsetAcc / blocks.size());
       alpha.set(alphaAcc / blocks.size());
       subsurfaceScattering.set(subsurfaceScatteringAcc / blocks.size());
       specular.set(specAcc / blocks.size());
@@ -302,6 +371,32 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
       Material material = ExtraMaterials.idMap.get(materialName);
       if (material != null) {
         emittance.set(material.emittance);
+        emittanceColor.setColor(ColorUtil.toFx(material.emittanceColor));
+        emitterMappingOffset.set(material.emitterMappingOffset);
+        emitterMappingType.getSelectionModel().select(material.emitterMappingType);
+        useReferenceColors.setSelected(material.useReferenceColors);
+        if (material.emitterMappingReferenceColors != null && !material.emitterMappingReferenceColors.isEmpty()) {
+          material.emitterMappingReferenceColors.forEach(referenceColor -> referenceColorTable.getItems().add(new MaterialReferenceColorData(referenceColor)));
+        }
+        referenceColorTableListener = (observable, oldValue, newValue) -> {
+          if (newValue != null) {
+            referenceColorPicker.colorProperty().removeListener(referenceColorPickerListener);
+            referenceColorPicker.setColor(ColorUtil.toFx(newValue.getReferenceColor().toVec3()));
+            referenceColorPickerListener = (observable2, oldValue2, newValue2) -> {
+              Vector3 color = ColorUtil.fromFx(newValue2);
+              newValue.setReferenceColor(color);
+              setEmitterMappingReferenceColors(materialName);
+            };
+            referenceColorPicker.colorProperty().addListener(referenceColorPickerListener);
+            referenceColorRangeSlider.set(newValue.getReferenceColor().w * 255);
+            referenceColorRangeSlider.onValueChange(value -> {
+              newValue.setRange(value);
+              setEmitterMappingReferenceColors(materialName);
+            });
+          } else {
+            referenceColorRangeSlider.onValueChange(value -> {});
+          }
+        };
         alpha.set(material.alpha);
         subsurfaceScattering.set(material.subSurfaceScattering);
         diffuseColor.setColor(ColorUtil.toFx(material.diffuseColor));
@@ -334,6 +429,32 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
       }
       scene.getPalette().applyMaterial(block);
       emittance.set(block.emittance);
+      emittanceColor.setColor(ColorUtil.toFx(block.emittanceColor));
+      emitterMappingOffset.set(block.emitterMappingOffset);
+      emitterMappingType.getSelectionModel().select(block.emitterMappingType);
+      useReferenceColors.setSelected(block.useReferenceColors);
+      if (block.emitterMappingReferenceColors != null && !block.emitterMappingReferenceColors.isEmpty()) {
+        block.emitterMappingReferenceColors.forEach(referenceColor -> referenceColorTable.getItems().add(new MaterialReferenceColorData(referenceColor)));
+      }
+      referenceColorTableListener = (observable, oldValue, newValue) -> {
+        if (newValue != null) {
+          referenceColorPicker.colorProperty().removeListener(referenceColorPickerListener);
+          referenceColorPicker.setColor(ColorUtil.toFx(newValue.getReferenceColor().toVec3()));
+          referenceColorPickerListener = (observable2, oldValue2, newValue2) -> {
+            Vector3 color = ColorUtil.fromFx(newValue2);
+            newValue.setReferenceColor(color);
+            setEmitterMappingReferenceColors(materialName);
+          };
+          referenceColorPicker.colorProperty().addListener(referenceColorPickerListener);
+          referenceColorRangeSlider.set(newValue.getReferenceColor().w * 255);
+          referenceColorRangeSlider.onValueChange(value -> {
+            newValue.setRange(value);
+            setEmitterMappingReferenceColors(materialName);
+          });
+        } else {
+          referenceColorRangeSlider.onValueChange(value -> {});
+        }
+      };
       alpha.set(block.alpha);
       subsurfaceScattering.set(block.subSurfaceScattering);
       diffuseColor.setColor(ColorUtil.toFx(block.diffuseColor));
@@ -357,6 +478,13 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
     }
     if (materialExists) {
       emittance.onValueChange(value -> scene.setEmittance(materialName, value.floatValue()));
+      emittanceColorListener = (observable, oldValue, newValue) -> scene.setEmittanceColor(materialName, ColorUtil.fromFx(newValue));
+      emittanceColor.colorProperty().addListener(emittanceColorListener);
+      emitterMappingOffset.onValueChange(value -> scene.setEmitterMappingOffset(materialName, value.floatValue()));
+      emitterMappingTypeListener = (observable, oldValue, newValue) -> scene.setEmitterMappingTypeOverride(materialName, newValue);
+      emitterMappingType.getSelectionModel().selectedItemProperty().addListener(emitterMappingTypeListener);
+      useReferenceColorsListener = (observable, oldValue, newValue) -> scene.setUseReferenceColors(materialName, newValue);
+      useReferenceColors.selectedProperty().addListener(useReferenceColorsListener);
       alpha.onValueChange(value -> scene.setAlpha(materialName, value.floatValue()));
       subsurfaceScattering.onValueChange(value -> scene.setSubsurfaceScattering(materialName, value.floatValue()));
       diffuseColorListener = (observable, oldValue, newValue) -> scene.setDiffuseColor(materialName, ColorUtil.fromFx(newValue));
@@ -387,8 +515,24 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
       opaque.selectedProperty().addListener(opaqueListener);
       hiddenListener = (observable, oldValue, newValue) -> scene.setHidden(materialName, newValue);
       hidden.selectedProperty().addListener(hiddenListener);
+      addReferenceColor.setOnAction(e -> {
+        referenceColorPicker.colorProperty().removeListener(referenceColorPickerListener);
+        referenceColorRangeSlider.onValueChange(value -> {});
+        referenceColorTable.getItems().add(new MaterialReferenceColorData(new Vector4(1, 1, 1, 1)));
+        setEmitterMappingReferenceColors(materialName);
+        referenceColorTable.getSelectionModel().selectLast();
+      });
+      removeReferenceColor.setOnAction(e -> {
+        referenceColorPicker.colorProperty().removeListener(referenceColorPickerListener);
+        referenceColorRangeSlider.onValueChange(value -> {});
+        int index = referenceColorTable.getSelectionModel().getSelectedIndex();
+        referenceColorTable.getItems().remove(index);
+        setEmitterMappingReferenceColors(materialName);
+      });
+      referenceColorTable.getSelectionModel().selectedItemProperty().addListener(referenceColorTableListener);
     } else {
       emittance.onValueChange(value -> {});
+      emitterMappingOffset.onValueChange(value -> {});
       alpha.onValueChange(value -> {});
       subsurfaceScattering.onValueChange(value -> {});
       specular.onValueChange(value -> {});
@@ -401,7 +545,16 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
       volumeAnisotropy.onValueChange(value -> {});
       volumeEmittance.onValueChange(value -> {});
       absorption.onValueChange(value -> {});
+      referenceColorRangeSlider.onValueChange(value -> {});
+      addReferenceColor.setOnAction(e -> {});
+      removeReferenceColor.setOnAction(e -> {});
     }
+  }
+
+  private void setEmitterMappingReferenceColors(String materialName) {
+    ArrayList<Vector4> referenceColors = new ArrayList<>(referenceColorTable.getItems().size());
+    referenceColorTable.getItems().forEach(data -> referenceColors.add(data.getReferenceColor()));
+    scene.setEmitterMappingReferenceColors(materialName, referenceColors);
   }
 
   @Override public void update(Scene scene) {
@@ -418,9 +571,5 @@ public class MaterialsTab extends VBox implements RenderControlsTab, Initializab
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
-  }
-
-  @Override public void setController(RenderControlsFxController controller) {
-    scene = controller.getRenderController().getSceneManager().getScene();
   }
 }

@@ -54,7 +54,7 @@ public class Leaves extends AbstractModelBlock {
           waterModel = WaterModel.WATER_TOP;
         }
       } else {
-        waterModel = (isWaterloggedFull) ? Block.fullBlock : WaterModel.NOT_FULL_BLOCK;
+        waterModel = (isWaterloggedFull) ? Block.FULL_BLOCK : WaterModel.NOT_FULL_BLOCK;
       }
     }
 
@@ -73,8 +73,8 @@ public class Leaves extends AbstractModelBlock {
       if (hitTop) {
         intersectionRecord.distance = waterIntersect.distance;
         intersectionRecord.setNormal(waterIntersect);
-        Air.INSTANCE.getColor(intersectionRecord);
-        intersectionRecord.material = Air.INSTANCE;
+        intersectionRecord.material = (scene.waterPlaneMaterial(ray.o.rScaleAdd(intersectionRecord.distance, ray.d)));
+        intersectionRecord.material.getColor(intersectionRecord);
 
         Ray2 testRay = new Ray2(ray);
         testRay.o.scaleAdd(intersectionRecord.distance, testRay.d);
@@ -111,8 +111,19 @@ public class Leaves extends AbstractModelBlock {
         }
         return true;
       } else {
+        Block waterPlaneMaterial;
+        if (ray.getCurrentMedium() != (waterPlaneMaterial = scene.waterPlaneMaterial(ray.o))) {
+          intersectionRecord.distance = 0;
+          intersectionRecord.material = waterPlaneMaterial;
+          waterPlaneMaterial.getColor(intersectionRecord);
+          return true;
+        }
         return false;
       }
     }
+  }
+
+  @Override public boolean isInside(Ray2 ray) {
+    return false;
   }
 }

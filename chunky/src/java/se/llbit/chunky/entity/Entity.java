@@ -17,17 +17,15 @@
  */
 package se.llbit.chunky.entity;
 
-import java.util.Collection;
-
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.model.minecraft.DecoratedPotModel;
+import se.llbit.chunky.renderer.HasPrimitives;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Grid;
 import se.llbit.math.Octree;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
-import se.llbit.math.primitive.Primitive;
 import se.llbit.util.HasControls;
 
 /**
@@ -35,15 +33,13 @@ import se.llbit.util.HasControls;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-abstract public class Entity implements HasControls {
+public abstract class Entity implements HasPrimitives, HasControls {
 
   public final Vector3 position;
 
   protected Entity(Vector3 position) {
     this.position = new Vector3(position);
   }
-
-  abstract public Collection<Primitive> primitives(Vector3 offset);
 
   public Grid.EmitterPosition[] getEmitterPosition() {
     return new Grid.EmitterPosition[0];

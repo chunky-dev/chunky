@@ -3,12 +3,12 @@ package se.llbit.chunky.entity;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.Json;
 import se.llbit.json.JsonObject;
@@ -360,7 +360,9 @@ public class Book extends Entity implements Poseable {
   }
 
   @Override
-  public VBox getControls(Node tab, Scene scene) {
+  public VBox getControls(RenderControlsTab parent) {
+    Scene scene = parent.getChunkyScene();
+
     VBox controls = new VBox();
 
     DoubleAdjuster openingAngle = new DoubleAdjuster();
@@ -396,7 +398,7 @@ public class Book extends Entity implements Poseable {
     });
     controls.getChildren().add(page2Angle);
 
-    controls.setSpacing(10);
+    controls.setSpacing(6);
 
     return controls;
   }

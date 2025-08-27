@@ -128,7 +128,7 @@ public class OctreeFinalizer {
             | (corner2 << WaterModel.CORNER_2)
             | (corner3 << WaterModel.CORNER_3)), x, y, z);
       } else if (above.isWaterFilled()) {
-        worldTree.set(palette.getWaterId(0, 1 << Water.FULL_BLOCK), x, y, z);
+        worldTree.set(palette.getWaterId(0, 1 << Water.FULL_WATER_BLOCK), x, y, z);
       }
     } else if (mat instanceof Lava) {
       Material above = worldTree.getMaterial(x, y + 1, z, palette);

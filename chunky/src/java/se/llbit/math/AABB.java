@@ -16,6 +16,7 @@
  */
 package se.llbit.math;
 
+import it.unimi.dsi.fastutil.doubles.DoubleDoubleImmutablePair;
 import se.llbit.chunky.renderer.scene.Scene;
 
 import java.util.Random;
@@ -95,7 +96,7 @@ public class AABB implements Intersectable {
    *
    * @return <code>true</code> if the ray intersects this AABB
    */
-  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
     double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Constants.OFFSET);
     double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Constants.OFFSET);
     double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Constants.OFFSET);
@@ -256,6 +257,72 @@ public class AABB implements Intersectable {
     }
   }
 
+  public DoubleDoubleImmutablePair intersectionDistance(Ray2 ray) {
+    double t1, t2;
+    double tNear = Double.NEGATIVE_INFINITY;
+    double tFar = Double.POSITIVE_INFINITY;
+    Vector3 d = ray.d;
+    Vector3 o = ray.o;
+
+    if (d.x != 0) {
+      double rx = 1 / d.x;
+      t1 = (xmin - o.x) * rx;
+      t2 = (xmax - o.x) * rx;
+
+      if (t1 > t2) {
+        double t = t1;
+        t1 = t2;
+        t2 = t;
+      }
+
+      tNear = t1;
+      tFar = t2;
+    }
+
+    if (d.y != 0) {
+      double ry = 1 / d.y;
+      t1 = (ymin - o.y) * ry;
+      t2 = (ymax - o.y) * ry;
+
+      if (t1 > t2) {
+        double t = t1;
+        t1 = t2;
+        t2 = t;
+      }
+
+      if (t1 > tNear) {
+        tNear = t1;
+      }
+      if (t2 < tFar) {
+        tFar = t2;
+      }
+    }
+
+    if (d.z != 0) {
+      double rz = 1 / d.z;
+      t1 = (zmin - o.z) * rz;
+      t2 = (zmax - o.z) * rz;
+
+      if (t1 > t2) {
+        double t = t1;
+        t1 = t2;
+        t2 = t;
+      }
+
+      if (t1 > tNear) {
+        tNear = t1;
+      }
+      if (t2 < tFar) {
+        tFar = t2;
+      }
+    }
+    if (tNear < tFar + Constants.EPSILON && tFar >= 0) {
+      return new DoubleDoubleImmutablePair(tNear, tFar);
+    } else {
+      return new DoubleDoubleImmutablePair(Double.NaN, Double.NaN);
+    }
+  }
+
   /**
    * Test if point is inside the bounding box.
    *
@@ -281,7 +348,7 @@ public class AABB implements Intersectable {
    *
    * @return {@code true} if there is an intersection
    */
-  public boolean hitTest(Ray ray) {
+  public boolean hitTest(Ray2 ray) {
     double t1, t2;
     double tNear = Double.NEGATIVE_INFINITY;
     double tFar = Double.POSITIVE_INFINITY;

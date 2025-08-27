@@ -184,4 +184,12 @@ public class Vector2 {
     object.add("y", y);
     return object;
   }
+
+  /**
+   * Unmarshals a vector from JSON.
+   */
+  public void fromJson(JsonObject object) {
+    x = object.get("x").doubleValue(0);
+    y = object.get("y").doubleValue(0);
+  }
 }

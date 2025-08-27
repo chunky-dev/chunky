@@ -3,12 +3,13 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.ToggleSwitch?>
 
 <fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40"
          xmlns:fx="http://javafx.com/fxml/1">
-  <CheckBox fx:id="biomeColors" mnemonicParsing="false" text="Enable biome colors" />
-  <CheckBox fx:id="biomeBlending" mnemonicParsing="false" text="Enable biome blending" />
-  <CheckBox fx:id="singleColorBtn" mnemonicParsing="false" text="Single color textures"/>
+  <ToggleSwitch fx:id="biomeColors" text="Enable biome colors" />
+  <ToggleSwitch fx:id="biomeBlending" text="Enable biome blending" />
+  <ToggleSwitch fx:id="singleColorBtn" text="Single color textures"/>
   <Button fx:id="editResourcePacks" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
           text="Edit resource packs"/>
 

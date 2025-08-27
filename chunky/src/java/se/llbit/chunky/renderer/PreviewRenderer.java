@@ -75,9 +75,9 @@ public class PreviewRenderer extends TileBasedRenderer {
     Ray2 target = new Ray2();
     IntersectionRecord intersectionRecord = new IntersectionRecord();
     boolean hit = scene.traceTarget(target, intersectionRecord);
-    int tx = (int) Math.floor(target.o.x + target.d.x * Constants.OFFSET);
-    int ty = (int) Math.floor(target.o.y + target.d.y * Constants.OFFSET);
-    int tz = (int) Math.floor(target.o.z + target.d.z * Constants.OFFSET);
+    int tx = (int) Math.floor(target.o.x + intersectionRecord.n.x * -2 * Constants.OFFSET);
+    int ty = (int) Math.floor(target.o.y + intersectionRecord.n.y * -2 * Constants.OFFSET);
+    int tz = (int) Math.floor(target.o.z + intersectionRecord.n.z * -2 * Constants.OFFSET);
 
     double[] sampleBuffer = scene.getSampleBuffer();
 
@@ -110,9 +110,9 @@ public class PreviewRenderer extends TileBasedRenderer {
         scene.rayTrace(tracer, state);
 
         // Target highlighting.
-        int rx = (int) Math.floor(state.ray.o.x + state.ray.d.x * Constants.OFFSET);
-        int ry = (int) Math.floor(state.ray.o.y + state.ray.d.y * Constants.OFFSET);
-        int rz = (int) Math.floor(state.ray.o.z + state.ray.d.z * Constants.OFFSET);
+        int rx = (int) Math.floor(state.ray.o.x + state.intersectionRecord.n.x * -2 * Constants.OFFSET);
+        int ry = (int) Math.floor(state.ray.o.y + state.intersectionRecord.n.y * -2 * Constants.OFFSET);
+        int rz = (int) Math.floor(state.ray.o.z + state.intersectionRecord.n.z * -2 * Constants.OFFSET);
         if (hit && tx == rx && ty == ry && tz == rz) {
           state.color.x = 1 - state.color.x;
           state.color.y = 1 - state.color.y;

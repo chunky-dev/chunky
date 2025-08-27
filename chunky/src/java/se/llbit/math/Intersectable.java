@@ -19,6 +19,8 @@ package se.llbit.math;
 
 import se.llbit.chunky.renderer.scene.Scene;
 
+import java.util.Random;
+
 /**
  * Anything which can intersect a ray in space.
  */
@@ -28,7 +30,11 @@ public interface Intersectable {
    *
    * @return {@code true} if there exists any intersection
    */
-  boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene);
+  boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random);
+
+  default boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+    return closestIntersection(ray, intersectionRecord, scene, null);
+  }
 
   default boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord) {
     return closestIntersection(ray, intersectionRecord, null);

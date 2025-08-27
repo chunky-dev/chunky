@@ -11,7 +11,7 @@ public class BeaconBeamMaterial extends Material {
 
     public static final int DEFAULT_COLOR = 0xF9FFFE;
     private int color;
-    private float[] beamColor = new float[4];
+    private final float[] beamColor = new float[4];
 
     public BeaconBeamMaterial(int color) {
         super("beacon_beam", Texture.beaconBeam);
@@ -57,12 +57,10 @@ public class BeaconBeamMaterial extends Material {
         updateColor(json.get("color").asInt(DEFAULT_COLOR));
     }
 
-    public void saveMaterialProperties(JsonObject json) {
-        json.add("ior", this.ior);
-        json.add("specular", this.specular);
-        json.add("emittance", this.emittance);
-        json.add("roughness", this.roughness);
-        json.add("metalness", this.metalness);
+    @Override
+    public JsonObject saveMaterialProperties() {
+        JsonObject json = super.saveMaterialProperties();
         json.add("color", this.color);
+        return json;
     }
 }

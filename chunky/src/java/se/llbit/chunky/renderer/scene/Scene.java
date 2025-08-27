@@ -19,7 +19,13 @@ package se.llbit.chunky.renderer.scene;
 
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
+
+import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.block.Void;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.minecraft.Lava;
@@ -31,6 +37,7 @@ import se.llbit.chunky.chunk.ChunkLoadingException;
 import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.chunk.biome.BiomeData;
 import se.llbit.chunky.entity.*;
+import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.model.minecraft.WaterModel;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.*;
@@ -43,6 +50,16 @@ import se.llbit.chunky.renderer.projection.ParallelProjector;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
+import se.llbit.chunky.renderer.scene.fog.Fog;
+import se.llbit.chunky.renderer.scene.fog.FogMode;
+import se.llbit.chunky.renderer.scene.volumetricfog.FogVolume;
+import se.llbit.chunky.renderer.scene.volumetricfog.FogVolumeShape;
+import se.llbit.chunky.renderer.scene.volumetricfog.FogVolumeStore;
+import se.llbit.chunky.renderer.scene.watershading.LegacyWaterShader;
+import se.llbit.chunky.renderer.scene.watershading.SimplexWaterShader;
+import se.llbit.chunky.renderer.scene.watershading.StillWaterShader;
+import se.llbit.chunky.renderer.scene.watershading.WaterShader;
+import se.llbit.chunky.renderer.scene.watershading.WaterShadingStrategy;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.*;
@@ -50,6 +67,7 @@ import se.llbit.chunky.world.biome.ArrayBiomePalette;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.biome.Biomes;
+import se.llbit.chunky.world.material.WaterPlaneMaterial;
 import se.llbit.json.*;
 import se.llbit.log.Log;
 import se.llbit.math.*;
@@ -78,14 +96,12 @@ import java.util.zip.GZIPOutputStream;
  * <p>Render state is stored in a sample buffer. Two frame buffers
  * are also kept for when a snapshot should be rendered.
  */
-public class Scene implements JsonSerializable, Refreshable {
+public class Scene implements Configurable, Refreshable {
   public static final int DEFAULT_DUMP_FREQUENCY = 500;
   public static final String EXTENSION = ".json";
 
   /** The current Scene Description Format (SDF) version. */
-  public static final int SDF_VERSION = 9;
-
-  protected static final double fSubSurface = 0.3;
+  public static final int SDF_VERSION = 11;
 
   /** Minimum canvas width. */
   public static final int MIN_CANVAS_WIDTH = 20;
@@ -96,12 +112,12 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Minimum exposure.
    */
-  public static final double MIN_EXPOSURE = 0.001;
+  public static final double MIN_EXPOSURE = -10;
 
   /**
    * Maximum exposure.
    */
-  public static final double MAX_EXPOSURE = 1000.0;
+  public static final double MAX_EXPOSURE = 10;
 
   /**
    * Default gamma for the gamma correction post process.
@@ -124,6 +140,27 @@ public class Scene implements JsonSerializable, Refreshable {
   public static final double MAX_EMITTER_INTENSITY = 1000;
 
   /**
+   * Default method for emitter mapping.
+   */
+  public static final EmitterMappingType DEFAULT_EMITTER_MAPPING_TYPE =
+      EmitterMappingType.BRIGHTEST_CHANNEL;
+
+  /**
+   * Default exponent for emitter mapping.
+   */
+  public static final double DEFAULT_EMITTER_MAPPING_EXPONENT = 1.5;
+
+  /**
+   * Minimum emitter mapping exponent.
+   */
+  public static final double MIN_EMITTER_MAPPING_EXPONENT = 0;
+
+  /**
+   * Maximum emitter mapping exponent.
+   */
+  public static final double MAX_EMITTER_MAPPING_EXPONENT = 5;
+
+  /**
    * Default transmissivity cap.
    */
   public static final double DEFAULT_TRANSMISSIVITY_CAP = 1;
@@ -141,7 +178,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Default exposure.
    */
-  public static final double DEFAULT_EXPOSURE = 1.0;
+  public static final double DEFAULT_EXPOSURE = 0.0;
 
   /**
    * Default fog density.
@@ -152,16 +189,13 @@ public class Scene implements JsonSerializable, Refreshable {
    * Default post processing filter.
    */
   public static final PostProcessingFilter DEFAULT_POSTPROCESSING_FILTER = PostProcessingFilters
-      .getPostProcessingFilterFromId("GAMMA").orElse(PostProcessingFilters.NONE);
+      .getPostProcessingFilterFromId("GAMMA").get();
 
   private static boolean invalidWarn = false;
 
   protected final Sky sky = new Sky(this);
   protected final Camera camera = new Camera(this);
   protected final Sun sun = new Sun(this);
-  protected final Vector3 waterColor =
-      new Vector3(PersistentSettings.getWaterColorRed(), PersistentSettings.getWaterColorGreen(),
-          PersistentSettings.getWaterColorBlue());
   public int sdfVersion = -1;
   public String name = "default_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
 
@@ -180,7 +214,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public int cropX = 0;
   public int cropY = 0;
 
-  public PostProcessingFilter postProcessingFilter = DEFAULT_POSTPROCESSING_FILTER;
+  public ArrayList<PostProcessingFilter> postprocessingFilters = new ArrayList<>();
   private PictureExportFormat pictureExportFormat = PictureExportFormats.PNG;
   public long renderTime;
   /**
@@ -206,25 +240,20 @@ public class Scene implements JsonSerializable, Refreshable {
   protected int dumpFrequency = DEFAULT_DUMP_FREQUENCY;
   protected boolean saveSnapshots = false;
   protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
+  protected double emitterMappingExponent = DEFAULT_EMITTER_MAPPING_EXPONENT;
+  protected EmitterMappingType emitterMappingType = DEFAULT_EMITTER_MAPPING_TYPE;
   protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.NONE;
-  protected EmitterSamplingMode emitterSamplingMode = EmitterSamplingMode.OFF;
   protected boolean fancierTranslucency = true;
   protected double transmissivityCap = DEFAULT_TRANSMISSIVITY_CAP;
 
   protected SunSamplingStrategy sunSamplingStrategy = SunSamplingStrategy.SAMPLE_THROUGH_OPACITY;
 
-  /**
-   * Water opacity modifier.
-   */
-  protected double waterOpacity = PersistentSettings.getWaterOpacity();
-  protected double waterVisibility = PersistentSettings.getWaterVisibility();
   protected WaterShadingStrategy waterShadingStrategy = WaterShadingStrategy.valueOf(PersistentSettings.getWaterShadingStrategy());
   private final StillWaterShader stillWaterShader = new StillWaterShader();
   private final LegacyWaterShader legacyWaterShader = new LegacyWaterShader();
   private final SimplexWaterShader simplexWaterShader = new SimplexWaterShader();
 
   private WaterShader currentWaterShader = getWaterShader(waterShadingStrategy);
-  protected boolean useCustomWaterColor = PersistentSettings.getUseCustomWaterColor();
 
   protected boolean waterPlaneEnabled = false;
   protected double waterPlaneHeight = World.SEA_LEVEL;
@@ -265,7 +294,9 @@ public class Scene implements JsonSerializable, Refreshable {
   private BlockPalette palette;
   private Octree worldOctree;
 
-  private SceneEntities entities = new SceneEntities();
+  private final SceneEntities entities = new SceneEntities();
+  private final FogVolumeStore fogVolumeStore = new FogVolumeStore();
+  private final ArrayList<CloudLayer> cloudLayers = new ArrayList<>(0);
 
   /** Material properties for this scene. */
   public Map<String, JsonValue> materials = new HashMap<>();
@@ -348,7 +379,7 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * <p>Note: this does not initialize the render buffers for the scene!
    * Render buffers are initialized either by using loadDescription(),
-   * fromJson(), or importFromJson(), or by calling initBuffers().
+   * fromJson(), or fromJson(), or by calling initBuffers().
    */
   public Scene() {
     width = PersistentSettings.get3DCanvasWidth();
@@ -359,6 +390,7 @@ public class Scene implements JsonSerializable, Refreshable {
     palette = new BlockPalette();
     worldOctree = new Octree(octreeImplementation, 1);
     emitterGrid = null;
+    postprocessingFilters.add(DEFAULT_POSTPROCESSING_FILTER);
   }
 
   /**
@@ -440,16 +472,16 @@ public class Scene implements JsonSerializable, Refreshable {
 
     waterShadingStrategy = other.waterShadingStrategy;
     currentWaterShader = other.currentWaterShader.clone();
-    waterOpacity = other.waterOpacity;
-    waterVisibility = other.waterVisibility;
-    useCustomWaterColor = other.useCustomWaterColor;
-    waterColor.set(other.waterColor);
     fog.set(other.fog);
+    fogVolumeStore.copyState(other.fogVolumeStore);
+    cloudLayers.clear();
+    cloudLayers.addAll(other.cloudLayers);
     biomeColors = other.biomeColors;
     sunSamplingStrategy = other.sunSamplingStrategy;
     emitterIntensity = other.emitterIntensity;
+    emitterMappingExponent = other.emitterMappingExponent;
+    emitterMappingType = other.emitterMappingType;
     emitterSamplingStrategy = other.emitterSamplingStrategy;
-    emitterSamplingMode = other.emitterSamplingMode;
     preventNormalEmitterWithSampling = other.preventNormalEmitterWithSampling;
     fancierTranslucency = other.fancierTranslucency;
     transmissivityCap = other.transmissivityCap;
@@ -575,7 +607,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       boolean emitterGridNeedChunkReload = false;
       boolean octreeLoaded = loadOctree(context, taskTracker);
-      if (emitterSamplingMode != EmitterSamplingMode.OFF)
+      if (emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
         emitterGridNeedChunkReload = !loadEmitterGrid(context, taskTracker);
       if (emitterGridNeedChunkReload || !octreeLoaded) {
         // Could not load stored octree or emitter grid.
@@ -702,7 +734,17 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     intersectionTest.reset();
+    if (waterPlaneEnabled && waterPlaneIntersection(ray, intersectionTest) && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
+      hit = true;
+      intersectionRecord.distance = intersectionTest.distance;
+      intersectionRecord.setNormal(intersectionTest);
+      intersectionRecord.color.set(intersectionTest.color);
+      intersectionRecord.material = intersectionTest.material;
+      intersectionRecord.flags = intersectionTest.flags;
+    }
+
     if (random != null) {
+      intersectionTest.reset();
       if (ray.getCurrentMedium().volumeIntersect(intersectionTest, random) && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
         hit = true;
         intersectionRecord.distance = intersectionTest.distance;
@@ -711,26 +753,87 @@ public class Scene implements JsonSerializable, Refreshable {
         intersectionRecord.material = intersectionTest.material;
         intersectionRecord.flags = intersectionTest.flags;
       }
+
+      intersectionTest.reset();
+      if (fogVolumeStore.closestIntersection(ray, intersectionTest, this, random) && intersectionTest.distance < intersectionRecord.distance) {
+        hit = true;
+        intersectionRecord.distance = intersectionTest.distance;
+        intersectionRecord.setNormal(intersectionTest);
+        intersectionRecord.color.set(intersectionTest.color);
+        intersectionRecord.material = intersectionTest.material;
+        intersectionRecord.flags = intersectionTest.flags;
+      }
+
+      for (CloudLayer cloudLayer : cloudLayers) {
+        intersectionTest.reset();
+        if (cloudLayer.closestIntersection(ray, intersectionTest, this, random) && intersectionTest.distance < intersectionRecord.distance) {
+          hit = true;
+          if (intersectionTest.material == Air.INSTANCE) {
+            Vector3 o = ray.o.rScaleAdd(intersectionTest.distance, ray.d);
+            o.scaleAdd(-Constants.OFFSET, intersectionTest.n);
+            intersectionTest.material = getWorldMaterial(new Ray2(o, ray.d));
+          }
+          intersectionRecord.distance = intersectionTest.distance;
+          intersectionRecord.setNormal(intersectionTest);
+          intersectionRecord.color.set(intersectionTest.color);
+          intersectionRecord.material = intersectionTest.material;
+          intersectionRecord.flags = intersectionTest.flags;
+        }
+      }
+    }
+
+    if (hit && intersectionRecord.material == Air.INSTANCE && isUnderWaterPlane(ray.o.rScaleAdd(intersectionRecord.distance + Constants.OFFSET, ray.d))) {
+      intersectionRecord.material = WaterPlaneMaterial.INSTANCE;
     }
 
     return hit;
   }
 
-  public void updateOpacity(Ray2 ray, IntersectionRecord intersectionRecord) {
-    if (intersectionRecord.material.isWater() || (!intersectionRecord.material.isWater()
-        && ray.getCurrentMedium().isWater())) {
-      if (useCustomWaterColor) {
-        intersectionRecord.color.x *= waterColor.x;
-        intersectionRecord.color.y *= waterColor.y;
-        intersectionRecord.color.z *= waterColor.z;
-      } else {
-        float[] waterColor = getWaterColor((int) (ray.o.x + ray.d.x * Constants.OFFSET), (int) (ray.o.y + ray.d.y * Constants.OFFSET), (int) (ray.o.z + ray.d.z * Constants.OFFSET));
-        intersectionRecord.color.x *= waterColor[0];
-        intersectionRecord.color.y *= waterColor[1];
-        intersectionRecord.color.z *= waterColor[2];
+  private boolean waterPlaneIntersection(Ray2 ray, IntersectionRecord intersectionRecord) {
+    double t = (getEffectiveWaterPlaneHeight() - ray.o.y - origin.y) / ray.d.y;
+    if (getWaterPlaneChunkClip()) {
+      Vector3 pos = ray.o.rScaleAdd(t, ray.d);
+      if (isChunkLoaded((int)Math.floor(pos.x), (int)Math.floor(pos.y), (int)Math.floor(pos.z))) {
+        return false;
       }
-      intersectionRecord.color.w = waterOpacity;
     }
+    if (t > 0) {
+      intersectionRecord.distance = t;
+      // Create a new ray at the intersection position to get the normal.
+      Ray2 testRay = new Ray2(ray);
+      testRay.o.scaleAdd(intersectionRecord.distance, testRay.d);
+      Vector3 shadeNormal = currentWaterShader.doWaterShading(testRay, intersectionRecord, animationTime);
+      intersectionRecord.shadeN.set(shadeNormal);
+      if (ray.d.y < 0) {
+        WaterPlaneMaterial.INSTANCE.getColor(intersectionRecord);
+        intersectionRecord.n.set(0, 1, 0);
+        intersectionRecord.material = WaterPlaneMaterial.INSTANCE;
+      } else if (ray.d.y > 0) {
+        Air.INSTANCE.getColor(intersectionRecord);
+        intersectionRecord.n.set(0, -1, 0);
+        intersectionRecord.shadeN.scale(-1);
+        intersectionRecord.material = Air.INSTANCE;
+      } else {
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  public boolean isUnderWaterPlane(Vector3 pos) {
+    if (waterPlaneEnabled && pos.y + origin.y < getEffectiveWaterPlaneHeight()) {
+      if (waterPlaneChunkClip) {
+        return !isChunkLoaded((int) Math.floor(pos.x), (int) Math.floor(pos.y),
+            (int) Math.floor(pos.z));
+      }
+      return true;
+    }
+    return false;
+  }
+
+  public Block waterPlaneMaterial(Vector3 pos) {
+    return isUnderWaterPlane(pos) ? WaterPlaneMaterial.INSTANCE : Air.INSTANCE;
   }
 
   /**
@@ -790,7 +893,7 @@ public class Scene implements JsonSerializable, Refreshable {
       foliageTexture = biomeStructureFactory.create();
       waterTexture = biomeStructureFactory.create();
 
-      if(emitterSamplingMode != EmitterSamplingMode.OFF)
+      if(emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
         emitterGrid = new Grid(gridSize);
 
       // Parse the regions first - force chunk lists to be populated!
@@ -911,7 +1014,7 @@ public class Scene implements JsonSerializable, Refreshable {
         int yCubeMax = (yMax+15) / 16;
         for(int yCube = yCubeMin; yCube < yCubeMax; ++yCube) {
           // Reset the cubes
-          Arrays.fill(cubeWorldBlocks, 0);
+          Arrays.fill(cubeWorldBlocks, 1);
           for(int cy = 0; cy < 16; ++cy) { //Uses chunk min and max, rather than global - minor optimisation for pre1.13 worlds
             int y = yCube * 16 + cy;
             if(y < yMin || y >= yMax)
@@ -978,7 +1081,7 @@ public class Scene implements JsonSerializable, Refreshable {
                       octNode = palette.waterId;
                       if(y + 1 < yMax) {
                         if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)).isWaterFilled()) {
-                          octNode = palette.getWaterId(0, 1 << Water.FULL_BLOCK);
+                          octNode = palette.getWaterId(0, 1 << Water.FULL_WATER_BLOCK);
                         }
                       }
 
@@ -1036,7 +1139,7 @@ public class Scene implements JsonSerializable, Refreshable {
                     }
                   } else if(y + 1 < yMax && block instanceof Lava) {
                     if(palette.get(chunkData.getBlockAt(cx, y + 1, cz)) instanceof Lava) {
-                      octNode = palette.getLavaId(0, 1 << Water.FULL_BLOCK);
+                      octNode = palette.getLavaId(0, 1 << Water.FULL_WATER_BLOCK);
                     } else if(!onEdge) {
                       // Compute lava level for blocks not on edge
                       Lava lava = (Lava) block;
@@ -1469,7 +1572,7 @@ public class Scene implements JsonSerializable, Refreshable {
     for (int y = Math.min(ycenter+127, yMax); y >= Math.max(ycenter-128, yMin); --y) {
       Material block = worldOctree.getMaterial(xcenter - origin.x, y - origin.y, zcenter - origin.z,
           palette);
-      if (!(block instanceof Air)) {
+      if (block != Void.INSTANCE && block != Air.INSTANCE) {
         return new Vector3(xcenter, y + 5, zcenter);
       }
     }
@@ -1607,8 +1710,6 @@ public class Scene implements JsonSerializable, Refreshable {
    * @return {@code true} if the ray hit something
    */
   public boolean traceTarget(Ray2 ray, IntersectionRecord intersectionRecord) {
-    WorkerState state = new WorkerState();
-    state.ray = ray;
     camera.getTargetDirection(ray);
     ray.o.x -= origin.x;
     ray.o.y -= origin.y;
@@ -1658,6 +1759,23 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
+  public Material getTargetMaterial(double x, double y) {
+    Ray2 ray = new Ray2();
+
+    camera.calcViewRay(ray, x, y);
+    ray.o.x -= origin.x;
+    ray.o.y -= origin.y;
+    ray.o.z -= origin.z;
+    ray.setCurrentMedium(getWorldMaterial(ray));
+
+    IntersectionRecord intersectionRecord = new IntersectionRecord();
+    if (intersect(ray, intersectionRecord, null)) {
+      return intersectionRecord.material;
+    } else {
+      return Air.INSTANCE;
+    }
+  }
+
   /**
    * @return World origin in the Octree
    */
@@ -1670,7 +1788,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void setName(String newName) {
     newName = AsynchronousSceneManager.sanitizedSceneName(newName);
-    if (newName.length() > 0) {
+    if (!newName.isEmpty()) {
       name = newName;
     }
   }
@@ -1678,19 +1796,26 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * @return The current postprocessing filter
    */
-  public PostProcessingFilter getPostProcessingFilter() {
-    return postProcessingFilter;
+  public List<PostProcessingFilter> getPostprocessingFilters() {
+    return new ArrayList<>(postprocessingFilters);
   }
 
   /**
-   * Change the postprocessing filter
+   * Add a postprocessing filter
    *
    * @param p The new postprocessing filter
    */
-  public synchronized void setPostprocess(PostProcessingFilter p) {
-    postProcessingFilter = p;
-    if (postProcessingFilter instanceof Configurable) {
-      ((Configurable) postProcessingFilter).reset();
+  public synchronized void addPostprocessingFilter(PostProcessingFilter p) {
+    postprocessingFilters.add(p);
+    if (mode == RenderMode.PREVIEW) {
+      // Don't interrupt the render if we are currently rendering.
+      refresh();
+    }
+  }
+
+  public synchronized void removePostprocessingFilter(int index) {
+    if (index < postprocessingFilters.size()) {
+      postprocessingFilters.remove(index);
     }
     if (mode == RenderMode.PREVIEW) {
       // Don't interrupt the render if we are currently rendering.
@@ -1710,6 +1835,36 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void setEmitterIntensity(double value) {
     emitterIntensity = value;
+    refresh();
+  }
+
+  /**
+   * @return The current emitter mapping exponent
+   */
+  public double getEmitterMappingExponent() {
+    return emitterMappingExponent;
+  }
+
+  /**
+   * Set the emitter mapping exponent.
+   */
+  public void setEmitterMappingExponent(double value) {
+    emitterMappingExponent = value;
+    refresh();
+  }
+
+  /**
+   * @return The current emitter mapping type.
+   */
+  public EmitterMappingType getEmitterMappingType() {
+    return emitterMappingType;
+  }
+
+  /**
+   * Set the emitter mapping type.
+   */
+  public void setEmitterMappingType(EmitterMappingType value) {
+    emitterMappingType = value;
     refresh();
   }
 
@@ -1839,7 +1994,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public synchronized void copyTransients(Scene other) {
     name = other.name;
-    postProcessingFilter = other.postProcessingFilter;
+    postprocessingFilters = other.postprocessingFilters;
     exposure = other.exposure;
     dumpFrequency = other.dumpFrequency;
     saveSnapshots = other.saveSnapshots;
@@ -2058,16 +2213,49 @@ public class Scene implements JsonSerializable, Refreshable {
    * but in some cases a separate post-processing pass is needed.
    */
   public void postProcessFrame(TaskTracker.Task task) {
-    PostProcessingFilter filter = postProcessingFilter;
-    if(mode == RenderMode.PREVIEW) {
-      filter = PreviewFilter.INSTANCE;
+    List<PostProcessingFilter> filters;
+    if (mode == RenderMode.PREVIEW) {
+      filters = Collections.singletonList(PreviewFilter.INSTANCE);
+    } else {
+      filters = getPostprocessingFilters();
     }
-    filter.processFrame(
-      width, height,
-      samples, backBuffer,
-      exposure,
-      task
-    );
+
+    double[] intermediate = new double[samples.length];
+    for (int i = 0; i < intermediate.length; i++) {
+      intermediate[i] = samples[i] * FastMath.pow(2, exposure);
+    }
+
+    task.update(height, 0);
+    AtomicInteger done = new AtomicInteger(0);
+
+    for (PostProcessingFilter filter : filters) {
+      filter.processFrame(width, height, intermediate);
+    }
+
+    Chunky.getCommonThreads()
+      .submit(() ->
+          // do rows in parallel
+          IntStream.range(0, height).parallel()
+            .forEach(y -> {
+              double[] pixelBuffer = new double[3];
+
+              int rowOffset = y * width;
+              // columns will be processed sequential
+              // TODO: SIMD support once Vector API is finalized
+              for (int x = 0; x < width; x++) {
+                int pixelOffset = (rowOffset + x) * 3;
+                System.arraycopy(intermediate, pixelOffset, pixelBuffer, 0, 3);
+                // TODO: extract clamping into own interface
+                Arrays.setAll(pixelBuffer, k -> Math.min(1, pixelBuffer[k]));
+                backBuffer.setPixel(x, y, ColorUtil.getRGB(pixelBuffer));
+              }
+
+              task.update(height, done.incrementAndGet());
+            })
+      ).join();
+
+    task.update(height, done.incrementAndGet());
+
     finalized = true;
   }
 
@@ -2449,7 +2637,13 @@ public class Scene implements JsonSerializable, Refreshable {
     int z = (int) QuickMath.floor(ray.o.z);
     Material material = worldOctree.getMaterial(x, y, z, palette);
     if (material instanceof Block && !material.hidden) {
-      if (((Block) material).isInside(ray)) {
+      if (material == Air.INSTANCE || material == Void.INSTANCE) {
+        if (isUnderWaterPlane(ray.o)) {
+          return WaterPlaneMaterial.INSTANCE;
+        } else {
+          return material;
+        }
+      } else if (((Block) material).isInside(ray)) {
         return material;
       } else if (material.waterlogged) {
         if (worldOctree.getMaterial(x, y + 1, z, palette).isWaterFilled()) {
@@ -2459,7 +2653,11 @@ public class Scene implements JsonSerializable, Refreshable {
         }
       }
     }
-    return Air.INSTANCE;
+    if (isUnderWaterPlane(ray.o)) {
+      return WaterPlaneMaterial.INSTANCE;
+    } else {
+      return Air.INSTANCE;
+    }
   }
 
   public boolean isInWater(Ray2 ray) {
@@ -2487,51 +2685,9 @@ public class Scene implements JsonSerializable, Refreshable {
     return worldOctree.isInside(point);
   }
 
-  public double getWaterOpacity() {
-    return waterOpacity;
-  }
-
-  public void setWaterOpacity(double opacity) {
-    if (opacity != waterOpacity) {
-      this.waterOpacity = opacity;
-      refresh();
-    }
-  }
-
-  public double getWaterVisibility() {
-    return waterVisibility;
-  }
-
-  public void setWaterVisibility(double visibility) {
-    if (visibility != waterVisibility) {
-      this.waterVisibility = visibility;
-      refresh();
-    }
-  }
-
-  public Vector3 getWaterColor() {
-    return waterColor;
-  }
-
-  public void setWaterColor(Vector3 color) {
-    waterColor.set(color);
-    refresh();
-  }
-
   public void setFogColor(Vector3 color) {
     fog.getFogColor().set(color);
     refresh();
-  }
-
-  public boolean getUseCustomWaterColor() {
-    return useCustomWaterColor;
-  }
-
-  public void setUseCustomWaterColor(boolean value) {
-    if (value != useCustomWaterColor) {
-      useCustomWaterColor = value;
-      refresh();
-    }
   }
 
   @Override public synchronized JsonObject toJson() {
@@ -2549,12 +2705,11 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("yMin", yMin);
     json.add("yMax", yMax);
     json.add("exposure", exposure);
-    json.add("postprocess", postProcessingFilter.getId());
-    if (postProcessingFilter instanceof Configurable) {
-      JsonObject postprocessJson = new JsonObject();
-      ((Configurable) postProcessingFilter).storeConfiguration(postprocessJson);
-      json.add("postprocessSettings", postprocessJson);
+    JsonArray postprocessingFilters = new JsonArray();
+    for (PostProcessingFilter filter : this.postprocessingFilters) {
+      postprocessingFilters.add(filter.toJson());
     }
+    json.add("postprocessingFilters", postprocessingFilters);
     json.add("outputMode", pictureExportFormat.getName());
     json.add("renderTime", renderTime);
     json.add("spp", spp);
@@ -2565,22 +2720,19 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("dumpFrequency", dumpFrequency);
     json.add("saveSnapshots", saveSnapshots);
     json.add("emitterIntensity", emitterIntensity);
+    json.add("emitterMappingExponent", emitterMappingExponent);
+    json.add("emitterMappingType", emitterMappingType.getId());
     json.add("fancierTranslucency", fancierTranslucency);
     json.add("transmissivityCap", transmissivityCap);
     json.add("sunSamplingStrategy", sunSamplingStrategy.getId());
     json.add("waterShadingStrategy", waterShadingStrategy.getId());
-    json.add("waterOpacity", waterOpacity);
-    json.add("waterVisibility", waterVisibility);
-    json.add("useCustomWaterColor", useCustomWaterColor);
-    if (useCustomWaterColor) {
-      JsonObject colorObj = new JsonObject();
-      colorObj.add("red", waterColor.x);
-      colorObj.add("green", waterColor.y);
-      colorObj.add("blue", waterColor.z);
-      json.add("waterColor", colorObj);
-    }
-    currentWaterShader.save(json);
+    json.add("currentWaterShader", currentWaterShader.toJson());
     json.add("fog", fog.toJson());
+    json.add("fogVolumeStore", fogVolumeStore.toJson());
+    JsonArray cloudLayersArray = new JsonArray();
+    for (CloudLayer cloudLayer : cloudLayers) {
+      cloudLayersArray.add(cloudLayer.toJson());
+    }
     json.add("biomeColorsEnabled", biomeColors);
     json.add("transparentSky", transparentSky);
     json.add("waterWorldEnabled", waterPlaneEnabled);
@@ -2617,7 +2769,6 @@ public class Scene implements JsonSerializable, Refreshable {
 
     json.add("octreeImplementation", octreeImplementation);
     json.add("emitterSamplingStrategy", emitterSamplingStrategy.name());
-    json.add("emitterSamplingMode", emitterSamplingMode.name());
     json.add("preventNormalEmitterWithSampling", preventNormalEmitterWithSampling);
 
     json.add("animationTime", animationTime);
@@ -2640,6 +2791,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Reset the scene settings and import from a JSON object.
    */
+  @Override
   public synchronized void fromJson(JsonObject json) {
     boolean finalizeBufferPrev = finalizeBuffer;  // Remember the finalize setting.
     Scene scene = new Scene();
@@ -2651,6 +2803,11 @@ public class Scene implements JsonSerializable, Refreshable {
     setResetReason(ResetReason.SCENE_LOADED);
     sdfVersion = json.get("sdfVersion").intValue(-1);
     name = json.get("name").stringValue("default");
+  }
+
+  @Override
+  public void reset() {
+
   }
 
   public EntityLoadingPreferences getEntityLoadingPreferences() {
@@ -2684,12 +2841,54 @@ public class Scene implements JsonSerializable, Refreshable {
     rebuildActorBvh();
   }
 
+  public List<CloudLayer> getCloudLayers() {
+    return this.cloudLayers;
+  }
+
+  public void addCloudLayer() {
+    this.cloudLayers.add(new CloudLayer());
+    refresh();
+  }
+
+  public void removeCloudLayer(int index) {
+    this.cloudLayers.remove(index);
+    refresh();
+  }
+
+  public List<FogVolume> getFogVolumes() {
+    return this.fogVolumeStore.listFogVolumes();
+  }
+
+  public void addFogVolume(FogVolumeShape shape) {
+    if (fogVolumeStore.addVolume(shape)) {
+      buildFogVolumeBVH();
+    } else {
+      refresh();
+    }
+  }
+
+  public void removeFogVolume(int index) {
+    if (fogVolumeStore.removeVolume(index)) {
+      buildFogVolumeBVH();
+    } else {
+      refresh();
+    }
+  }
+
+  public void buildFogVolumeBVH() {
+    fogVolumeStore.finalizeLoading();
+    fogVolumeStore.buildBvh(TaskTracker.Task.NONE, origin);
+    refresh();
+  }
+
   /**
    * Clears the scene, preparing to load fresh chunks.
    */
   public void clear() {
     cameraPresets = new JsonObject();
     entities.clear();
+    fogVolumeStore.clear();
+    materials.clear();
   }
 
   /** Create a backup of a scene file. */
@@ -2804,17 +3003,24 @@ public class Scene implements JsonSerializable, Refreshable {
     yMax = json.get("yMax").asInt(Math.min(yClipMax, yMax));
 
     exposure = json.get("exposure").doubleValue(exposure);
-    postProcessingFilter = PostProcessingFilters
-      .getPostProcessingFilterFromId(json.get("postprocess").stringValue(postProcessingFilter.getId()))
-      .orElseGet(() -> {
-        if (json.get("postprocess").stringValue(null) != null) {
-          Log.warn("The post processing filter " + json +
-            " is unknown. Maybe you're missing a plugin that was used to create this scene?");
-        }
-        return DEFAULT_POSTPROCESSING_FILTER;
-      });
-    if (postProcessingFilter instanceof Configurable) {
-      ((Configurable) postProcessingFilter).loadConfiguration(json.get("postprocessSettings").asObject());
+    JsonArray postprocessingFilters = json.get("postprocessingFilters").array();
+    this.postprocessingFilters.clear();
+    for (JsonValue filter : postprocessingFilters) {
+      JsonObject filterJson = filter.object();
+      PostProcessingFilter postprocessingFilter =
+          PostProcessingFilters.getPostProcessingFilterFromId(filterJson.get("id").
+              stringValue(DEFAULT_POSTPROCESSING_FILTER.getId())).
+              orElseGet(() -> {
+                String filterId = filterJson.get("id").stringValue(null);
+                if (filterId != null) {
+                  Log.warn("The post processing filter " + filterId
+                      + " is unknown. Maybe you're missing a plugin that was used to "
+                      + "create this scene?");
+                }
+                return DEFAULT_POSTPROCESSING_FILTER;
+              });
+      postprocessingFilter.fromJson(filterJson);
+      this.postprocessingFilters.add(postprocessingFilter);
     }
     pictureExportFormat = PictureExportFormats
       .getFormat(json.get("outputMode").stringValue(pictureExportFormat.getName()))
@@ -2833,6 +3039,8 @@ public class Scene implements JsonSerializable, Refreshable {
     dumpFrequency = json.get("dumpFrequency").intValue(dumpFrequency);
     saveSnapshots = json.get("saveSnapshots").boolValue(saveSnapshots);
     emitterIntensity = json.get("emitterIntensity").doubleValue(emitterIntensity);
+    emitterMappingExponent = json.get("emitterMappingExponent").doubleValue(emitterMappingExponent);
+    emitterMappingType = EmitterMappingType.valueOf(json.get("emitterMappingType").asString(DEFAULT_EMITTER_MAPPING_TYPE.getId()));
     fancierTranslucency = json.get("fancierTranslucency").boolValue(fancierTranslucency);
     transmissivityCap = json.get("transmissivityCap").doubleValue(transmissivityCap);
 
@@ -2840,17 +3048,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     waterShadingStrategy = WaterShadingStrategy.valueOf(json.get("waterShadingStrategy").asString(waterShadingStrategy.getId()));
     setCurrentWaterShader(waterShadingStrategy);
-    currentWaterShader.load(json);
+    currentWaterShader.fromJson(json.get("currentWaterShader").asObject());
 
-    waterOpacity = json.get("waterOpacity").doubleValue(waterOpacity);
-    waterVisibility = json.get("waterVisibility").doubleValue(waterVisibility);
-    useCustomWaterColor = json.get("useCustomWaterColor").boolValue(useCustomWaterColor);
-    if (useCustomWaterColor) {
-      JsonObject colorObj = json.get("waterColor").object();
-      waterColor.x = colorObj.get("red").doubleValue(waterColor.x);
-      waterColor.y = colorObj.get("green").doubleValue(waterColor.y);
-      waterColor.z = colorObj.get("blue").doubleValue(waterColor.z);
-    }
     biomeColors = json.get("biomeColorsEnabled").boolValue(biomeColors);
     transparentSky = json.get("transparentSky").boolValue(transparentSky);
     JsonValue fogObj = json.get("fog");
@@ -2899,6 +3098,18 @@ public class Scene implements JsonSerializable, Refreshable {
       cameraPresets = json.get("cameraPresets").object();
     }
 
+    fogVolumeStore.fromJson(json.get("fogVolumeStore").asObject());
+
+    cloudLayers.clear();
+    if (json.get("cloudLayers").isArray()) {
+      JsonArray cloudLayersArray = json.get("cloudLayers").array();
+      for (JsonValue element : cloudLayersArray) {
+        CloudLayer cloudLayer = new CloudLayer();
+        cloudLayer.fromJson(element.asObject());
+        cloudLayers.add(cloudLayer);
+      }
+    }
+
     // Current SPP and render time are read after loading
     // other settings which can reset the render status.
     spp = json.get("spp").intValue(spp);
@@ -2920,7 +3131,6 @@ public class Scene implements JsonSerializable, Refreshable {
     octreeImplementation = json.get("octreeImplementation").asString(PersistentSettings.getOctreeImplementation());
 
     emitterSamplingStrategy = EmitterSamplingStrategy.valueOf(json.get("emitterSamplingStrategy").asString(emitterSamplingStrategy.getId()));
-    emitterSamplingMode = EmitterSamplingMode.valueOf(json.get("emitterSamplingMode").asString(emitterSamplingMode.getId()));
     preventNormalEmitterWithSampling = json.get("preventNormalEmitterWithSampling").asBoolean(PersistentSettings.getPreventNormalEmitterWithSampling());
 
     animationTime = json.get("animationTime").doubleValue(animationTime);
@@ -3014,29 +3224,29 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public void setFogDensity(double newValue) {
-    if (newValue != fog.uniformDensity) {
-      fog.uniformDensity = newValue;
+    if (newValue != fog.getUniformDensity()) {
+      fog.setUniformDensity(newValue);
       refresh();
     }
   }
 
   public void setSkyFogDensity(double newValue) {
-    if (newValue != fog.skyFogDensity) {
-      fog.skyFogDensity = newValue;
+    if (newValue != fog.getSkyFogDensity()) {
+      fog.setSkyFogDensity(newValue);
       refresh();
     }
   }
 
   public void setFastFog(boolean value) {
-    if (fog.fastFog != value) {
-      fog.fastFog = value;
+    if (fog.isFastFog() != value) {
+      fog.setFastFog(value);
       refresh();
     }
   }
 
   public void setFogMode(FogMode mode) {
-    if (fog.mode != mode) {
-      fog.mode = mode;
+    if (fog.getFogMode() != mode) {
+      fog.setFogMode(mode);
       refresh();
     }
   }
@@ -3110,6 +3320,62 @@ public class Scene implements JsonSerializable, Refreshable {
   public void setEmittance(String materialName, float value) {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("emittance", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the emittance color property for the given material.
+   */
+  public void setEmittanceColor(String materialName, Vector3 value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("emittanceColor", ColorUtil.rgbToJson(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the emittance property for the given material.
+   */
+  public void setEmitterMappingOffset(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("emitterMappingOffset", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the useReferenceColors property for the given material.
+   */
+  public void setUseReferenceColors(String materialName, boolean value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("useReferenceColors", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the emittance property for the given material.
+   */
+  public void setEmitterMappingTypeOverride(String materialName, EmitterMappingType value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("emitterMappingType", Json.of(value.getId()));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  public void setEmitterMappingReferenceColors(String materialName, List<Vector4> values) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    JsonArray referenceColors = new JsonArray(values.size());
+    values.forEach(value -> {
+      JsonObject referenceColorObject = new JsonObject();
+      referenceColorObject.add("red", value.x);
+      referenceColorObject.add("green", value.y);
+      referenceColorObject.add("blue", value.z);
+      referenceColorObject.add("range", value.w);
+      referenceColors.add(referenceColorObject);
+    });
+    material.set("emitterMappingReferenceColors", referenceColors);
     materials.put(materialName, material);
     refresh(ResetReason.MATERIALS_CHANGED);
   }
@@ -3320,6 +3586,14 @@ public class Scene implements JsonSerializable, Refreshable {
     this.yClipMax = yClipMax;
   }
 
+  public int getYMin() {
+    return this.yMin;
+  }
+
+  public int getYMax() {
+    return this.yMax;
+  }
+
   public Grid getEmitterGrid() {
     return emitterGrid;
   }
@@ -3364,20 +3638,9 @@ public class Scene implements JsonSerializable, Refreshable {
     return emitterSamplingStrategy;
   }
 
-  public EmitterSamplingMode getEmitterSamplingMode() {
-    return emitterSamplingMode;
-  }
-
   public void setEmitterSamplingStrategy(EmitterSamplingStrategy emitterSamplingStrategy) {
     if(this.emitterSamplingStrategy != emitterSamplingStrategy) {
       this.emitterSamplingStrategy = emitterSamplingStrategy;
-      refresh();
-    }
-  }
-
-  public void setEmitterSamplingMode(EmitterSamplingMode emitterSamplingMode) {
-    if (this.emitterSamplingMode != emitterSamplingMode) {
-      this.emitterSamplingMode = emitterSamplingMode;
       refresh();
     }
   }

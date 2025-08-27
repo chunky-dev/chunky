@@ -65,13 +65,13 @@ public class Sun implements JsonSerializable {
       {{0.1787, -1.4630}, {-0.3554, 0.4275}, {-0.0227, 5.3251}, {0.1206, -2.5771},
           {-0.0670, 0.3703}};
 
-  private static double turb = 2.5;
-  private static double turb2 = turb * turb;
-  private static Vector3 A = new Vector3();
-  private static Vector3 B = new Vector3();
-  private static Vector3 C = new Vector3();
-  private static Vector3 D = new Vector3();
-  private static Vector3 E = new Vector3();
+  private static final double turb = 2.5;
+  private static final double turb2 = turb * turb;
+  private static final Vector3 A = new Vector3();
+  private static final Vector3 B = new Vector3();
+  private static final Vector3 C = new Vector3();
+  private static final Vector3 D = new Vector3();
+  private static final Vector3 E = new Vector3();
 
   /**
    * Sun texture
@@ -250,8 +250,7 @@ public class Sun implements JsonSerializable {
     if (intersect(ray, null) && drawTexture) {
       double width = radius * Constants.SQRT_2;
       double half_width = width / 2;
-      double a;
-      a = Math.PI / 2 - FastMath.acos(ray.d.dot(su)) + half_width;
+      double a = Math.PI / 2 - FastMath.acos(ray.d.dot(su)) + half_width;
       if (a >= 0 && a < width) {
         double b = Math.PI / 2 - FastMath.acos(ray.d.dot(sv)) + half_width;
         if (b >= 0 && b < width) {
@@ -334,7 +333,7 @@ public class Sun implements JsonSerializable {
   /**
    * Point ray in random direction within sun solid angle
    */
-  public void getRandomSunDirection(Ray2 ray, Random random) {
+  public void getRandomSunDirection(Vector3 d, Random random) {
     double x1 = random.nextDouble();
     double x2 = random.nextDouble();
     double cos_a = 1 - x1 + x1 * radiusCos;
@@ -349,9 +348,9 @@ public class Sun implements JsonSerializable {
     v.scale(FastMath.sin(phi) * sin_a);
     w.scale(cos_a);
 
-    ray.d.add(u, v);
-    ray.d.add(w);
-    ray.d.normalize();
+    d.add(u, v);
+    d.add(w);
+    d.normalize();
   }
 
   @Override public JsonObject toJson() {

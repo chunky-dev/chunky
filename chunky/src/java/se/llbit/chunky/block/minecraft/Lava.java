@@ -28,7 +28,7 @@ import static se.llbit.chunky.model.minecraft.WaterModel.CORNER_0;
 import static se.llbit.chunky.model.minecraft.WaterModel.CORNER_1;
 import static se.llbit.chunky.model.minecraft.WaterModel.CORNER_2;
 import static se.llbit.chunky.model.minecraft.WaterModel.CORNER_3;
-import static se.llbit.chunky.block.minecraft.Water.FULL_BLOCK;
+import static se.llbit.chunky.block.minecraft.Water.FULL_WATER_BLOCK;
 
 public class Lava extends MinecraftBlockTranslucent {
   private static final AABB fullBlock = new AABB(0, 1, 0, 1, 0, 1);
@@ -49,11 +49,11 @@ public class Lava extends MinecraftBlockTranslucent {
   }
 
   public Lava(int level) {
-    this(level, 1 << FULL_BLOCK);
+    this(level, 1 << FULL_WATER_BLOCK);
   }
 
   public boolean isFullBlock() {
-    return (this.data & (1 << FULL_BLOCK)) != 0;
+    return (this.data & (1 << FULL_WATER_BLOCK)) != 0;
   }
 
   @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {

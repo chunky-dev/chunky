@@ -16,8 +16,29 @@
  */
 package se.llbit.chunky.world;
 
+import java.util.ArrayList;
+import javafx.beans.value.ChangeListener;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import org.apache.commons.math3.util.FastMath;
+import org.controlsfx.control.ToggleSwitch;
+import se.llbit.chunky.renderer.scene.EmitterMappingType;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.IntegerAdjuster;
+import se.llbit.chunky.ui.data.MaterialReferenceColorData;
+import se.llbit.fx.LuxColorPicker;
+import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
@@ -64,6 +85,27 @@ public abstract class Material {
   public float emittance = 0f;
 
   /**
+   * Offset to apply to the global emitter mapping exponent (the resulting value will be constrained to be >= 0).
+   */
+  public float emitterMappingOffset = 0;
+
+  /**
+   * Overrides the global emitter mapping type unless set to NONE.
+   */
+  public EmitterMappingType emitterMappingType = EmitterMappingType.NONE;
+
+  /**
+   * Whether to use reference colors.
+   */
+  public boolean useReferenceColors = false;
+
+  /**
+   * (x, y, z): The color to use for the REFERENCE_COLORS emitter mapping type.
+   * w: The range surrounding the specified color to apply full brightness.
+   */
+  public ArrayList<Vector4> emitterMappingReferenceColors = null;
+
+  /**
    * The (linear) roughness controlling how rough a shiny block appears. A value of 0 makes the
    * surface perfectly specular, a value of 1 makes it diffuse.
    */
@@ -97,6 +139,8 @@ public abstract class Material {
   public float subSurfaceScattering = 0f;
 
   public final Vector3 diffuseColor = new Vector3(1, 1, 1);
+
+  public final Vector3 emittanceColor = new Vector3(1, 1, 1);
 
   public float volumeDensity = 0f;
 
@@ -135,6 +179,10 @@ public abstract class Material {
     metalness = 0f;
     transmissionMetalness = 0f;
     emittance = 0f;
+    emitterMappingOffset = 0;
+    emitterMappingType = EmitterMappingType.NONE;
+    useReferenceColors = false;
+    emitterMappingReferenceColors = null;
     roughness = 0f;
     transmissionRoughness = 0f;
     subSurfaceScattering = 0f;
@@ -142,6 +190,7 @@ public abstract class Material {
     specularColor.set(1, 1, 1);
     transmissionSpecularColor.set(1, 1, 1);
     diffuseColor.set(1, 1, 1);
+    emittanceColor.set(1);
     volumeDensity = 0f;
     volumeAnisotropy = 0f;
     volumeEmittance = 0f;
@@ -169,6 +218,23 @@ public abstract class Material {
     metalness = json.get("metalness").floatValue(metalness);
     transmissionMetalness = json.get("transmissionMetalness").floatValue(transmissionMetalness);
     emittance = json.get("emittance").floatValue(emittance);
+    emitterMappingOffset = json.get("emitterMappingOffset").floatValue(emitterMappingOffset);
+    emitterMappingType = EmitterMappingType.valueOf(json.get("emitterMappingType").asString(emitterMappingType.getId()));
+    useReferenceColors = json.get("useReferenceColors").boolValue(useReferenceColors);
+    JsonArray referenceColorsArray = json.get("emitterMappingReferenceColors").array();
+    if (!referenceColorsArray.isEmpty()) {
+      emitterMappingReferenceColors = new ArrayList<>();
+      for (JsonValue referenceColorJson : referenceColorsArray.elements) {
+        JsonObject referenceColorObject = referenceColorJson.object();
+        emitterMappingReferenceColors.add(new Vector4(
+            referenceColorObject.get("red").doubleValue(0),
+            referenceColorObject.get("green").doubleValue(0),
+            referenceColorObject.get("blue").doubleValue(0),
+            referenceColorObject.get("range").doubleValue(0)));
+      }
+    } else {
+      emitterMappingReferenceColors = null;
+    }
     roughness = json.get("roughness").floatValue(roughness);
     transmissionRoughness = json.get("transmissionRoughness").floatValue(transmissionRoughness);
     alpha = json.get("alpha").floatValue(alpha);
@@ -176,6 +242,7 @@ public abstract class Material {
     transmissionSpecularColor.set(ColorUtil.jsonToRGB(json.get("transmissionSpecularColor").asObject(), transmissionSpecularColor));
     subSurfaceScattering = json.get("subsurfaceScattering").floatValue(subSurfaceScattering);
     diffuseColor.set(ColorUtil.jsonToRGB(json.get("diffuseColor").asObject(), diffuseColor));
+    emittanceColor.set(ColorUtil.jsonToRGB(json.get("emittanceColor").asObject(), emittanceColor));
     volumeDensity = json.get("volumeDensity").floatValue(volumeDensity);
     volumeAnisotropy = json.get("volumeAnisotropy").floatValue(volumeAnisotropy);
     volumeEmittance = json.get("volumeEmittance").floatValue(volumeEmittance);
@@ -193,6 +260,21 @@ public abstract class Material {
     properties.add("metalness", metalness);
     properties.add("transmissionMetalness", transmissionMetalness);
     properties.add("emittance", emittance);
+    properties.add("emitterMappingOffset", emitterMappingOffset);
+    properties.add("emitterMappingType", emitterMappingType.getId());
+    properties.add("useReferenceColors", useReferenceColors);
+    JsonArray referenceColorsArray = new JsonArray(0);
+    if (emitterMappingReferenceColors != null) {
+      emitterMappingReferenceColors.forEach(referenceColor -> {
+        JsonObject referenceColorJson = new JsonObject();
+        referenceColorJson.add("red", referenceColor.x);
+        referenceColorJson.add("green", referenceColor.y);
+        referenceColorJson.add("blue", referenceColor.z);
+        referenceColorJson.add("range", referenceColor.w);
+        referenceColorsArray.add(referenceColorJson);
+      });
+    }
+    properties.add("emitterMappingReferenceColors", referenceColorsArray);
     properties.add("roughness", roughness);
     properties.add("transmissionRoughness", transmissionRoughness);
     properties.add("alpha", alpha);
@@ -200,6 +282,7 @@ public abstract class Material {
     properties.add("transmissionSpecularColor", ColorUtil.rgbToJson(transmissionSpecularColor));
     properties.add("subsurfaceScattering", subSurfaceScattering);
     properties.add("diffuseColor", ColorUtil.rgbToJson(diffuseColor));
+    properties.add("emittanceColor", ColorUtil.rgbToJson(emittanceColor));
     properties.add("volumeDensity", volumeDensity);
     properties.add("volumeAnisotropy", volumeAnisotropy);
     properties.add("volumeEmittance", volumeEmittance);
@@ -239,17 +322,31 @@ public abstract class Material {
     transmissionRoughness = (float) Math.pow(1 - perceptualTransmissionSmoothness, 2);
   }
 
+  public void setLightLevel(float level) {
+    emittance = level / 15;
+  }
+
+  public void addRefColorGammaCorrected(float r, float g, float b, float delta) {
+    if (emitterMappingReferenceColors == null) {
+      emitterMappingReferenceColors = new ArrayList<>();
+    }
+    emitterMappingReferenceColors.add(new Vector4(Math.pow(r/255, Scene.DEFAULT_GAMMA), Math.pow(g/255, Scene.DEFAULT_GAMMA), Math.pow(b/255, Scene.DEFAULT_GAMMA), delta));
+  }
+
   public boolean volumeIntersect(IntersectionRecord intersectionRecord, Random random) {
     if (volumeDensity < Constants.EPSILON) {
       return false;
     }
 
-    double fogPenetrated = -FastMath.log(1 - random.nextDouble());
-    intersectionRecord.distance = fogPenetrated / volumeDensity;
+    intersectionRecord.distance = fogDistance(volumeDensity, random);
     intersectionRecord.material = this;
     intersectionRecord.color.set(volumeColor.x, volumeColor.y, volumeColor.z, 1);
     intersectionRecord.flags |= IntersectionRecord.VOLUME_INTERSECT;
     return true;
+  }
+
+  public static double fogDistance(double density, Random random) {
+    return -FastMath.log(1 - random.nextDouble()) / density;
   }
 
   public void absorption(Vector3 color, double distance) {
@@ -261,7 +358,38 @@ public abstract class Material {
     color.z *= FastMath.exp((1 - absorptionColor.z) * absorption * -distance);
   }
 
-  public boolean scatter(Ray2 ray, IntersectionRecord intersectionRecord, final Vector3 emittance, Random random) {
+  public void doEmitterMapping(Vector3 emittance, Vector4 color, Scene scene) {
+    double exp = Math.max(scene.getEmitterMappingExponent() + emitterMappingOffset, 0);
+    EmitterMappingType emitterMappingType = this.emitterMappingType == EmitterMappingType.NONE ? scene.getEmitterMappingType() : this.emitterMappingType;
+
+    boolean emit = !useReferenceColors;
+    if (useReferenceColors) {
+      if (emitterMappingReferenceColors == null) {
+        emittance.set(0, 0, 0);
+        return;
+      }
+
+      for (Vector4 referenceColor : emitterMappingReferenceColors) {
+        emit |= (Math.max(Math.abs(color.x - referenceColor.x), Math.max(Math.abs(color.y - referenceColor.y), Math.abs(color.z - referenceColor.z))) <= referenceColor.w);
+      }
+    }
+    if (emit) {
+      switch (emitterMappingType) {
+        case BRIGHTEST_CHANNEL:
+          double val = FastMath.pow(Math.max(color.x, Math.max(color.y, color.z)), exp);
+          emittance.set(color.x * val, color.y * val, color.z * val);
+          break;
+        case INDEPENDENT_CHANNELS:
+          emittance.set(FastMath.pow(color.x, exp), FastMath.pow(color.y, exp), FastMath.pow(color.z, exp));
+          break;
+      }
+      emittance.scale(this.emittance);
+    } else {
+      emittance.set(0, 0, 0);
+    }
+  }
+
+  public boolean scatter(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, final Vector3 emittance, Random random) {
     boolean mediumChanged = false;
     boolean throughSurface = false;
 
@@ -276,6 +404,10 @@ public abstract class Material {
       // Reflection
       if (random.nextDouble() < specular) {
         // Specular reflection with roughness
+
+        // For rough specular reflections, we interpolate linearly between the diffuse ray direction and the specular direction,
+        // which is inspired by https://blog.demofox.org/2020/06/06/casual-shadertoy-path-tracing-2-image-improvement-and-glossy-reflections/
+        // This gives good-looking results, although a microfacet-based model would be more physically correct.
         direction = specularReflection(ray.d, intersectionRecord.shadeN);
         if (roughness > Constants.EPSILON) {
           Vector3 roughnessDirection = lambertianReflection(intersectionRecord.n, random);
@@ -284,18 +416,24 @@ public abstract class Material {
           roughnessDirection.normalize();
           direction = roughnessDirection;
         }
-        colorSpecular(intersectionRecord.color, metalness, specularColor, random);
+        tintColor(intersectionRecord.color, metalness, specularColor, random);
         ray.flags |= Ray2.SPECULAR;
+        Vector4 emittanceColor1 = new Vector4(intersectionRecord.color);
+        tintColor(emittanceColor1, 1, emittanceColor, random);
+        doEmitterMapping(emittance, emittanceColor1, scene);
       } else {
         // Lambertian reflection
         if (random.nextDouble() < subSurfaceScattering) {
           intersectionRecord.shadeN.scale(-1);
           intersectionRecord.n.scale(-1);
+          ray.d.scale(-1); // This is to prevent direction from being inverted later.
         }
         direction = lambertianReflection(intersectionRecord.shadeN, random);
-        colorSpecular(intersectionRecord.color, 1, diffuseColor, random);
+        tintColor(intersectionRecord.color, 1, diffuseColor, random);
         ray.flags |= Ray2.DIFFUSE | Ray2.INDIRECT;
-        emittance.set(this.emittance);
+        Vector4 emittanceColor1 = new Vector4(intersectionRecord.color);
+        tintColor(emittanceColor1, 1, emittanceColor, random);
+        doEmitterMapping(emittance, emittanceColor1, scene);
       }
     } else {
       // Transmission / Refraction
@@ -321,7 +459,7 @@ public abstract class Material {
             roughnessDirection.normalize();
             direction = roughnessDirection;
           }
-          colorSpecular(intersectionRecord.color, metalness, specularColor, random);
+          tintColor(intersectionRecord.color, metalness, specularColor, random);
           ray.flags |= Ray2.SPECULAR;
         } else {
           // Refraction
@@ -339,14 +477,14 @@ public abstract class Material {
             }
             mediumChanged = true;
           }
-          colorSpecular(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor, random);
+          tintColor(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor, random);
           ray.flags |= Ray2.SPECULAR;
           throughSurface = true;
         }
       } else {
         // Transmission
         direction = new Vector3(ray.d);
-        colorSpecular(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor, random);
+        tintColor(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor, random);
         ray.flags |= Ray2.SPECULAR;
         throughSurface = true;
         if ((intersectionRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) == 0) {
@@ -355,99 +493,8 @@ public abstract class Material {
       }
     }
 
-//    if (random.nextDouble() < specular) {
-//      // Specular reflection with roughness
-//      direction = specularReflection(ray.d, intersectionRecord.shadeN);
-//      if (roughness > Constants.EPSILON) {
-//        Vector3 roughnessDirection = lambertianReflection(intersectionRecord.n, random);
-//        roughnessDirection.scale(roughness);
-//        roughnessDirection.scaleAdd(1 - roughness, direction);
-//        roughnessDirection.normalize();
-//        direction = roughnessDirection;
-//      }
-//      colorSpecular(intersectionRecord.color, metalness, specularColor, random);
-//      ray.flags |= Ray2.SPECULAR;
-//
-//    } else if (FastMath.abs(n2 - n1) > Constants.EPSILON) {
-//      boolean front_face = ray.d.dot(intersectionRecord.shadeN) < 0.0;
-//      double ri = (front_face) ? (n1 / n2) : (n2 / n1);
-//
-//      Vector3 unitDirection = ray.d.normalized();
-//      double cosTheta = FastMath.min(unitDirection.rScale(-1).dot(intersectionRecord.shadeN), 1.0);
-//      double sinTheta = FastMath.sqrt(1.0 - cosTheta * cosTheta);
-//
-//      boolean cannotRefract = ri * sinTheta > 1.0;
-//
-//      if (cannotRefract || schlickReflectance(cosTheta, ri) > random.nextDouble()) {
-//        direction = specularReflection(unitDirection, intersectionRecord.shadeN);
-//        double interfaceRoughness = FastMath.max(roughness, ray.getCurrentMedium().roughness);
-//        if (interfaceRoughness > Constants.EPSILON) {
-//          Vector3 roughnessDirection = lambertianReflection(intersectionRecord.n, random);
-//          roughnessDirection.scale(interfaceRoughness);
-//          roughnessDirection.scaleAdd(1 - interfaceRoughness, direction);
-//          roughnessDirection.normalize();
-//          direction = roughnessDirection;
-//        }
-//        colorSpecular(intersectionRecord.color, metalness, specularColor, random);
-//        ray.flags |= Ray2.SPECULAR;
-//      } else {
-//        if (random.nextDouble() < pDiffuse) {
-//          if (random.nextDouble() < subSurfaceScattering) {
-//            intersectionRecord.shadeN.scale(-1);
-//            intersectionRecord.n.scale(-1);
-//          }
-//          direction = lambertianReflection(intersectionRecord.shadeN, random);
-//          colorSpecular(intersectionRecord.color, 1, diffuseColor, random);
-//          ray.flags |= Ray2.DIFFUSE | Ray2.INDIRECT;
-//          emittance.set(this.emittance);
-//        } else {
-//          if ((intersectionRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) != 0) {
-//            direction = new Vector3(ray.d);
-//          } else {
-//            direction = specularRefraction(unitDirection, intersectionRecord.shadeN, ri);
-//            double interfaceTransmissionRoughness = FastMath.max(transmissionRoughness, ray.getCurrentMedium().transmissionRoughness);
-//            if (interfaceTransmissionRoughness > Constants.EPSILON) {
-//              Vector3 roughnessDirection = lambertianReflection(intersectionRecord.n.rScale(-1), random);
-//              roughnessDirection.scale(interfaceTransmissionRoughness);
-//              roughnessDirection.scaleAdd(1 - interfaceTransmissionRoughness, direction);
-//              roughnessDirection.normalize();
-//              direction = roughnessDirection;
-//            }
-//            mediumChanged = true;
-//          }
-//          colorSpecular(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor, random);
-//          ray.flags |= Ray2.SPECULAR;
-//          throughSurface = true;
-//        }
-//      }
-//    } else if (random.nextDouble() < pDiffuse) {
-//      if (random.nextDouble() < subSurfaceScattering) {
-//        intersectionRecord.shadeN.scale(-1);
-//        intersectionRecord.n.scale(-1);
-//        if ((intersectionRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) == 0) {
-//          mediumChanged = true;
-//        }
-//      }
-//      direction = lambertianReflection(intersectionRecord.shadeN, random);
-//      colorSpecular(intersectionRecord.color, 1, diffuseColor, random);
-//      ray.flags |= Ray2.DIFFUSE | Ray2.INDIRECT;
-//      emittance.set(this.emittance);
-//    } else {
-//      direction = new Vector3(ray.d);
-//      colorSpecular(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor, random);
-//      ray.flags |= Ray2.SPECULAR;
-//      throughSurface = true;
-//      if ((intersectionRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) == 0) {
-//        mediumChanged = true;
-//      }
-//    }
+    int sign = throughSurface ? -1 : 1;
 
-    byte sign;
-    if (throughSurface) {
-      sign = -1;
-    } else {
-      sign = 1;
-    }
     if (QuickMath.signum(intersectionRecord.n.dot(direction)) == sign * QuickMath.signum(intersectionRecord.n.dot(ray.d))) {
       double factor = QuickMath.signum(intersectionRecord.n.dot(ray.d)) * -Constants.EPSILON - direction.dot(intersectionRecord.n);
       direction.scaleAdd(factor, intersectionRecord.n);
@@ -468,7 +515,7 @@ public abstract class Material {
     henyeyGreensteinSampleP(volumeAnisotropy, invDir, outDir, x1, x2);
     outDir.normalize();
     ray.d.set(outDir);
-    ray.flags |= Ray2.INDIRECT;
+    ray.flags |= Ray2.INDIRECT | Ray2.DIFFUSE;
   }
 
   public static double phaseHG(double cosTheta, double g) {
@@ -575,12 +622,8 @@ public abstract class Material {
   }
 
   private static Vector3 lambertianReflection(Vector3 n, Random random) {
-    Vector3 direction = n.rAdd(Vector3.randomUnitVector(random));
-    if (direction.nearZero()) {
-      direction.set(n);
-    } else {
-      direction.normalize();
-    }
+    Vector3 direction = randomHemisphereDir(n, random);
+    direction.normalize();
     return direction;
   }
 
@@ -601,12 +644,360 @@ public abstract class Material {
     return rOutPerp.rAdd(rOutParallel);
   }
 
-  private static void colorSpecular(Vector4 color, float metalness, Vector3 colorModifier, Random random) {
+  public static void tintColor(Vector4 color, float metalness, Vector3 colorModifier, Random random) {
     color.x = 1 - metalness * (1 - color.x);
     color.y = 1 - metalness * (1 - color.y);
     color.z = 1 - metalness * (1 - color.z);
     color.x *= colorModifier.x;
     color.y *= colorModifier.y;
     color.z *= colorModifier.z;
+  }
+
+  public static VBox getControls(Material material, Scene scene) {
+    DoubleAdjuster emittanceAdjuster = new DoubleAdjuster();
+    LuxColorPicker emittanceColorPicker = new LuxColorPicker();
+    DoubleAdjuster emitterMappingOffset = new DoubleAdjuster();
+    ChoiceBox<EmitterMappingType> emitterMappingType = new ChoiceBox<>();
+    ToggleSwitch useReferenceColors = new ToggleSwitch();
+    DoubleAdjuster alphaAdjuster = new DoubleAdjuster();
+    DoubleAdjuster subsurfaceScatteringAdjuster = new DoubleAdjuster();
+    LuxColorPicker diffuseColorPicker = new LuxColorPicker();
+    DoubleAdjuster specularAdjuster = new DoubleAdjuster();
+    DoubleAdjuster iorAdjuster = new DoubleAdjuster();
+    DoubleAdjuster smoothnessAdjuster = new DoubleAdjuster();
+    DoubleAdjuster transmissionSmoothnessAdjuster = new DoubleAdjuster();
+    DoubleAdjuster metalnessAdjuster = new DoubleAdjuster();
+    DoubleAdjuster transmissionMetalnessAdjuster = new DoubleAdjuster();
+    LuxColorPicker specularColorPicker = new LuxColorPicker();
+    LuxColorPicker transmissionSpecularColorPicker = new LuxColorPicker();
+    DoubleAdjuster volumeDensityAdjuster = new DoubleAdjuster();
+    DoubleAdjuster volumeAnisotropyAdjuster = new DoubleAdjuster();
+    DoubleAdjuster volumeEmittanceAdjuster = new DoubleAdjuster();
+    LuxColorPicker volumeColorPicker = new LuxColorPicker();
+    DoubleAdjuster absorptionAdjuster = new DoubleAdjuster();
+    LuxColorPicker absorptionColorPicker = new LuxColorPicker();
+
+    TableView<MaterialReferenceColorData> referenceColorTable = new TableView<>();
+    Button addReferenceColor = new Button();
+    Button removeReferenceColor = new Button();
+    LuxColorPicker referenceColorPicker = new LuxColorPicker();
+    IntegerAdjuster referenceColorRangeSlider = new IntegerAdjuster();
+
+    emittanceAdjuster.setName("Emittance");
+    emittanceAdjuster.setTooltip("Intensity of the light emitted from the selected material.");
+    emittanceAdjuster.setRange(0, 100);
+    emittanceAdjuster.clampMin();
+    emittanceAdjuster.set(material.emittance);
+    emittanceAdjuster.onValueChange(value -> {
+      material.emittance = value.floatValue();
+      scene.refresh();
+    });
+
+    emittanceColorPicker.setText("Emittance color");
+    emittanceColorPicker.setColor(ColorUtil.toFx(material.emittanceColor));
+    emittanceColorPicker.colorProperty().addListener(
+        ((observable, oldValue, newValue) -> {
+          material.emittanceColor.set(ColorUtil.fromFx(newValue));
+          scene.refresh();
+        })
+    );
+
+    emitterMappingOffset.setName("Emitter mapping offset");
+    emitterMappingOffset.setRange(-5, 5);
+    emitterMappingOffset.setTooltip("Offset applied to the global emitter mapping exponent.");
+    emitterMappingOffset.set(material.emitterMappingOffset);
+    emitterMappingOffset.onValueChange(value -> {
+      material.emitterMappingOffset = value.floatValue();
+      scene.refresh();
+    });
+
+    emitterMappingType.getItems().addAll(EmitterMappingType.values());
+    emitterMappingType.setTooltip(new Tooltip("Overrides the global setting for emitter mapping type."));
+    emitterMappingType.getSelectionModel().select(material.emitterMappingType);
+    emitterMappingType.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+      material.emitterMappingType = newValue;
+      scene.refresh();
+    });
+
+    useReferenceColors.setText("Use reference colors");
+    useReferenceColors.setSelected(material.useReferenceColors);
+    useReferenceColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      material.useReferenceColors = newValue;
+      scene.refresh();
+    });
+
+    alphaAdjuster.setName("Alpha");
+    alphaAdjuster.setTooltip("Alpha (opacity) of the selected material.");
+    alphaAdjuster.setRange(0, 1);
+    alphaAdjuster.clampBoth();
+    alphaAdjuster.set(material.alpha);
+    alphaAdjuster.onValueChange(value -> {
+      material.alpha = value.floatValue();
+      scene.refresh();
+    });
+
+    subsurfaceScatteringAdjuster.setName("Subsurface scattering");
+    subsurfaceScatteringAdjuster.setTooltip("Probability of a ray to be scattered behind the surface.");
+    subsurfaceScatteringAdjuster.setRange(0, 1);
+    subsurfaceScatteringAdjuster.clampBoth();
+    subsurfaceScatteringAdjuster.set(material.subSurfaceScattering);
+    subsurfaceScatteringAdjuster.onValueChange(value -> {
+      material.subSurfaceScattering = value.floatValue();
+      scene.refresh();
+    });
+
+    diffuseColorPicker.setText("Diffuse color");
+    diffuseColorPicker.setColor(ColorUtil.toFx(material.diffuseColor));
+    diffuseColorPicker.colorProperty().addListener(
+        ((observable, oldValue, newValue) -> {
+          material.diffuseColor.set(ColorUtil.fromFx(newValue));
+          scene.refresh();
+        })
+    );
+
+    specularAdjuster.setName("Specular");
+    specularAdjuster.setTooltip("Reflectivity of the selected material.");
+    specularAdjuster.setRange(0, 1);
+    specularAdjuster.clampBoth();
+    specularAdjuster.set(material.specular);
+    specularAdjuster.onValueChange(value -> {
+      material.specular = value.floatValue();
+      scene.refresh();
+    });
+
+    iorAdjuster.setName("IoR");
+    iorAdjuster.setTooltip("Index of Refraction of the selected material.");
+    iorAdjuster.setRange(0, 5);
+    iorAdjuster.clampMin();
+    iorAdjuster.setMaximumFractionDigits(6);
+    iorAdjuster.set(material.ior);
+    iorAdjuster.onValueChange(value -> {
+      material.ior = value.floatValue();
+      scene.refresh();
+    });
+
+    smoothnessAdjuster.setName("Smoothness");
+    smoothnessAdjuster.setTooltip("Smoothness of the selected material.");
+    smoothnessAdjuster.setRange(0, 1);
+    smoothnessAdjuster.clampBoth();
+    smoothnessAdjuster.set(material.getPerceptualSmoothness());
+    smoothnessAdjuster.onValueChange(value -> {
+      material.setPerceptualSmoothness(value);
+      scene.refresh();
+    });
+
+    transmissionSmoothnessAdjuster.setName("Transmission smoothness");
+    transmissionSmoothnessAdjuster.setTooltip("Transmission smoothness of the selected material.");
+    transmissionSmoothnessAdjuster.setRange(0, 1);
+    transmissionSmoothnessAdjuster.clampBoth();
+    transmissionSmoothnessAdjuster.set(material.getPerceptualTransmissionSmoothness());
+    transmissionSmoothnessAdjuster.onValueChange(value -> {
+      material.setPerceptualTransmissionSmoothness(value);
+      scene.refresh();
+    });
+
+    metalnessAdjuster.setName("Metalness");
+    metalnessAdjuster.setTooltip("Texture tinting of reflected light.");
+    metalnessAdjuster.setRange(0, 1);
+    metalnessAdjuster.clampBoth();
+    metalnessAdjuster.set(material.metalness);
+    metalnessAdjuster.onValueChange(value -> {
+      material.metalness = value.floatValue();
+      scene.refresh();
+    });
+
+    transmissionMetalnessAdjuster.setName("Transmission metalness");
+    transmissionMetalnessAdjuster.setTooltip("Texture tinting of refracted/transmitted light.");
+    transmissionMetalnessAdjuster.setRange(0, 1);
+    transmissionMetalnessAdjuster.clampBoth();
+    transmissionMetalnessAdjuster.set(material.transmissionMetalness);
+    transmissionMetalnessAdjuster.onValueChange(value -> {
+      material.transmissionMetalness = value.floatValue();
+      scene.refresh();
+    });
+
+    specularColorPicker.setText("Specular color");
+    specularColorPicker.setColor(ColorUtil.toFx(material.specularColor));
+    specularColorPicker.colorProperty().addListener(
+        ((observable, oldValue, newValue) -> {
+          material.specularColor.set(ColorUtil.fromFx(newValue));
+          scene.refresh();
+        })
+    );
+
+    transmissionSpecularColorPicker.setText("Transmission specular color");
+    transmissionSpecularColorPicker.setColor(ColorUtil.toFx(material.transmissionSpecularColor));
+    transmissionSpecularColorPicker.colorProperty().addListener(
+        ((observable, oldValue, newValue) -> {
+          material.transmissionSpecularColor.set(ColorUtil.fromFx(newValue));
+          scene.refresh();
+        })
+    );
+
+    volumeDensityAdjuster.setName("Volume density");
+    volumeDensityAdjuster.setTooltip("Density of volume medium.");
+    volumeDensityAdjuster.setRange(0, 1);
+    volumeDensityAdjuster.clampMin();
+    volumeDensityAdjuster.set(material.volumeDensity);
+    volumeDensityAdjuster.onValueChange( value -> {
+      material.volumeDensity = value.floatValue();
+      scene.refresh();
+    });
+
+    volumeAnisotropyAdjuster.setName("Volume anisotropy");
+    volumeAnisotropyAdjuster.setTooltip("Changes the direction light is more likely to be scattered.\n" +
+        "Positive values increase the chance light scatters into its original direction of travel.\n" +
+        "Negative values increase the chance light scatters away from its original direction of travel.");
+    volumeAnisotropyAdjuster.setRange(-1, 1);
+    volumeAnisotropyAdjuster.clampBoth();
+    volumeAnisotropyAdjuster.set(material.volumeAnisotropy);
+    volumeAnisotropyAdjuster.onValueChange( value -> {
+      material.volumeAnisotropy = value.floatValue();
+      scene.refresh();
+    });
+
+    volumeEmittanceAdjuster.setName("Volume emittance");
+    volumeEmittanceAdjuster.setTooltip("Emittance of volume medium.");
+    volumeEmittanceAdjuster.setRange(0, 100);
+    volumeEmittanceAdjuster.clampMin();
+    volumeEmittanceAdjuster.set(material.volumeEmittance);
+    volumeEmittanceAdjuster.onValueChange( value -> {
+      material.volumeEmittance = value.floatValue();
+      scene.refresh();
+    });
+
+    volumeColorPicker.setText("Volume color");
+    volumeColorPicker.setColor(ColorUtil.toFx(material.volumeColor));
+    volumeColorPicker.colorProperty().addListener(
+        ((observable, oldValue, newValue) -> {
+          material.volumeColor.set(ColorUtil.fromFx(newValue));
+          scene.refresh();
+        })
+    );
+
+    absorptionAdjuster.setName("Absorption");
+    absorptionAdjuster.setTooltip("Absorption of volume medium.");
+    absorptionAdjuster.setRange(0, 10);
+    absorptionAdjuster.clampMin();
+    absorptionAdjuster.makeLogarithmic();
+    absorptionAdjuster.set(material.absorption);
+    absorptionAdjuster.onValueChange( value -> {
+      material.absorption = value.floatValue();
+      scene.refresh();
+    });
+
+    absorptionColorPicker.setText("Absorption color");
+    absorptionColorPicker.setColor(ColorUtil.toFx(material.absorptionColor));
+    absorptionColorPicker.colorProperty().addListener(
+        ((observable, oldValue, newValue) -> {
+          material.absorptionColor.set(ColorUtil.fromFx(newValue));
+          scene.refresh();
+        })
+    );
+
+    GridPane settings = new GridPane();
+
+    ColumnConstraints columnConstraints = new ColumnConstraints();
+    columnConstraints.setPercentWidth(50);
+
+    settings.getColumnConstraints().addAll(columnConstraints, columnConstraints);
+    settings.setHgap(10);
+    settings.setVgap(10);
+
+    VBox diffuseSettings = new VBox(6, emittanceAdjuster, emittanceColorPicker, emitterMappingOffset, emitterMappingType, useReferenceColors, alphaAdjuster, subsurfaceScatteringAdjuster, diffuseColorPicker);
+    VBox volumeSettings = new VBox(6, volumeDensityAdjuster, volumeAnisotropyAdjuster, volumeEmittanceAdjuster, volumeColorPicker, absorptionAdjuster, absorptionColorPicker);
+    VBox specularSettings = new VBox(6, specularAdjuster, iorAdjuster, smoothnessAdjuster, transmissionSmoothnessAdjuster);
+    VBox specularColorSettings = new VBox(6, metalnessAdjuster, transmissionMetalnessAdjuster, specularColorPicker, transmissionSpecularColorPicker);
+
+    settings.add(diffuseSettings, 0, 0);
+    settings.add(volumeSettings, 1, 0);
+    settings.add(specularSettings, 0, 1);
+    settings.add(specularColorSettings, 1, 1);
+
+    final ArrayList<ChangeListener<Color>> referenceColorPickerListener = new ArrayList<>(1);
+    referenceColorPickerListener.add((observable, oldValue, newValue) -> {});
+
+    referenceColorPicker.setText("Reference color");
+    referenceColorPicker.colorProperty().addListener(referenceColorPickerListener.get(0));
+
+    referenceColorRangeSlider.setName("Range");
+    referenceColorRangeSlider.setRange(0, 255);
+    referenceColorRangeSlider.clampBoth();
+
+    TableColumn<MaterialReferenceColorData, String> redColumn = new TableColumn<>("Red");
+    TableColumn<MaterialReferenceColorData, String> greenColumn = new TableColumn<>("Green");
+    TableColumn<MaterialReferenceColorData, String> blueColumn = new TableColumn<>("Blue");
+    TableColumn<MaterialReferenceColorData, String> rangeColumn = new TableColumn<>("Range");
+
+    redColumn.setCellValueFactory(new PropertyValueFactory<>("red"));
+    greenColumn.setCellValueFactory(new PropertyValueFactory<>("green"));
+    blueColumn.setCellValueFactory(new PropertyValueFactory<>("blue"));
+    rangeColumn.setCellValueFactory(new PropertyValueFactory<>("range"));
+
+    redColumn.setSortable(true);
+    greenColumn.setSortable(true);
+    blueColumn.setSortable(true);
+    rangeColumn.setSortable(true);
+
+    referenceColorTable.getColumns().add(redColumn);
+    referenceColorTable.getColumns().add(greenColumn);
+    referenceColorTable.getColumns().add(blueColumn);
+    referenceColorTable.getColumns().add(rangeColumn);
+    referenceColorTable.setMaxHeight(200);
+
+    if (material.emitterMappingReferenceColors != null && !material.emitterMappingReferenceColors.isEmpty()) {
+      material.emitterMappingReferenceColors.forEach(referenceColor -> {
+        referenceColorTable.getItems().add(new MaterialReferenceColorData(referenceColor));
+      });
+    }
+
+    referenceColorTable.getSelectionModel().selectedItemProperty().addListener(
+        (observable, oldValue, newValue) -> {
+          referenceColorPicker.colorProperty().removeListener(referenceColorPickerListener.get(0));
+          if (newValue != null) {
+            referenceColorPicker.setColor(ColorUtil.toFx(newValue.getReferenceColor().toVec3()));
+            referenceColorPickerListener.set(0, (observable2, oldValue2, newValue2) -> {
+              Vector3 color = ColorUtil.fromFx(newValue2);
+              newValue.setReferenceColor(color);
+              scene.refresh();
+            });
+            referenceColorPicker.colorProperty().addListener(referenceColorPickerListener.get(0));
+            referenceColorRangeSlider.set(newValue.getReferenceColor().w * 255);
+            referenceColorRangeSlider.onValueChange(value -> {
+              newValue.setRange(value);
+              scene.refresh();
+            });
+          } else {
+            referenceColorRangeSlider.onValueChange(value -> {});
+          }
+        });
+
+    addReferenceColor.setText("Add reference color");
+    addReferenceColor.setOnAction(e -> {
+      Vector4 referenceColor = new Vector4(1, 1, 1, 1);
+      if (material.emitterMappingReferenceColors == null) {
+        material.emitterMappingReferenceColors = new ArrayList<>(1);
+      }
+      material.emitterMappingReferenceColors.add(referenceColor);
+      referenceColorPicker.colorProperty().removeListener(referenceColorPickerListener.get(0));
+      referenceColorRangeSlider.onValueChange(value -> {});
+      referenceColorTable.getItems().add(new MaterialReferenceColorData(referenceColor));
+      referenceColorTable.getSelectionModel().selectLast();
+    });
+    removeReferenceColor.setText("Remove reference color");
+    removeReferenceColor.setOnAction(e -> {
+      referenceColorPicker.colorProperty().removeListener(referenceColorPickerListener.get(0));
+      referenceColorRangeSlider.onValueChange(value -> {});
+      Vector4 referenceColor = referenceColorTable.getSelectionModel().getSelectedItem().getReferenceColor();
+      material.emitterMappingReferenceColors.remove(referenceColor);
+      if (material.emitterMappingReferenceColors.isEmpty()) {
+        material.emitterMappingReferenceColors = null;
+      }
+      referenceColorTable.getItems().remove(referenceColorTable.getSelectionModel().getSelectedItem());
+    });
+
+    HBox addRemoveControls = new HBox(10, addReferenceColor, removeReferenceColor);
+
+    return new VBox(10, settings, addRemoveControls, referenceColorTable, referenceColorPicker, referenceColorRangeSlider);
   }
 }

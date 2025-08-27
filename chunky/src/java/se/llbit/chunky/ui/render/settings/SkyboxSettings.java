@@ -22,6 +22,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import org.controlsfx.control.ToggleSwitch;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
@@ -45,6 +46,7 @@ public class SkyboxSettings extends VBox implements Initializable {
   @FXML private DoubleAdjuster skyboxYaw;
   @FXML private DoubleAdjuster skyboxPitch;
   @FXML private DoubleAdjuster skyboxRoll;
+  @FXML private ToggleSwitch textureInterpolation;
 
   private File skyboxDirectory;
 
@@ -77,6 +79,9 @@ public class SkyboxSettings extends VBox implements Initializable {
     skyboxRoll.setRange(0, 360);
     skyboxRoll
       .onValueChange(value -> scene.sky().setRoll(QuickMath.degToRad(value)));
+    textureInterpolation.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.sky().setTextureInterpolation(newValue);
+    });
   }
 
   private void selectSkyboxTexture(int textureIndex) {
@@ -102,5 +107,6 @@ public class SkyboxSettings extends VBox implements Initializable {
     skyboxYaw.set(QuickMath.radToDeg(scene.sky().getYaw()));
     skyboxPitch.set(QuickMath.radToDeg(scene.sky().getPitch()));
     skyboxRoll.set(QuickMath.radToDeg(scene.sky().getRoll()));
+    textureInterpolation.setSelected(scene.sky().getTextureInterpolation());
   }
 }

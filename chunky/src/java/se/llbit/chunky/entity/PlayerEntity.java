@@ -19,7 +19,6 @@
 package se.llbit.chunky.entity;
 
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -33,6 +32,7 @@ import se.llbit.chunky.resources.PlayerTexture.ExtendedUVMap;
 import se.llbit.chunky.resources.texturepack.*;
 import se.llbit.chunky.ui.dialogs.DialogUtils;
 import se.llbit.chunky.ui.dialogs.ValidatingTextInputDialog;
+import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.PlayerEntityData;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.chunky.world.model.CubeModel;
@@ -995,7 +995,9 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   }
 
   @Override
-  public VBox getControls(Node tab, Scene scene) {
+  public VBox getControls(RenderControlsTab parent) {
+    Scene scene = parent.getChunkyScene();
+
     ChoiceBox<PlayerModel> playerModel = new ChoiceBox<>();
     playerModel.getSelectionModel().select(this.model);
     playerModel.getItems().addAll(PlayerModel.values());
@@ -1021,7 +1023,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       fileChooser
         .getExtensionFilters()
         .add(new FileChooser.ExtensionFilter("Minecraft skin", "*.png"));
-      File skinFile = fileChooser.showOpenDialog(tab.getScene().getWindow());
+      File skinFile = fileChooser.showOpenDialog(parent.getScene().getWindow());
       if (skinFile != null) {
         setTexture(skinFile.getAbsolutePath());
         skinField.setText(skinFile.getAbsolutePath());
@@ -1034,7 +1036,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       playerIdentifierInput.setTitle("Input player identifier");
       playerIdentifierInput.setHeaderText("Please enter the UUID or name of the player.");
       playerIdentifierInput.setContentText("UUID / player name:");
-      DialogUtils.setupDialogDesign(playerIdentifierInput, tab.getScene());
+      DialogUtils.setupDialogDesign(playerIdentifierInput, parent.getScene());
       playerIdentifierInput.showAndWait().map(playerIdentifier -> {
         try {
           // TODO: refactor this (deduplicate code, check UUID format, trim input, better error handling)
@@ -1086,7 +1088,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     VBox controls = new VBox();
     controls.getChildren().addAll(modelBox, skinBox, layerBox);
 
-    controls.setSpacing(10);
+    controls.setSpacing(6);
 
     return controls;
   }

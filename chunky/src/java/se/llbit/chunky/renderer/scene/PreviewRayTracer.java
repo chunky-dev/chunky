@@ -43,11 +43,14 @@ public class PreviewRayTracer implements RayTracer {
 
     for (int i = scene.rayDepth; i > 0; i--) {
       intersectionRecord.reset();
-      if (scene.intersect(ray, intersectionRecord, null)) {
+      if (scene.intersect(ray, intersectionRecord, state.random)) {
+        if ((intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0) {
+          break;
+        }
         ray.o.scaleAdd(intersectionRecord.distance, ray.d);
         ray.getCurrentMedium().absorption(throughput, intersectionRecord.distance);
         ray.clearReflectionFlags();
-        if (intersectionRecord.material.scatter(ray, intersectionRecord, state.emittance, state.random)) {
+        if (intersectionRecord.material.scatter(ray, intersectionRecord, scene, state.emittance, state.random)) {
           ray.setCurrentMedium(intersectionRecord.material);
         }
         if ((ray.flags & Ray2.DIFFUSE) != 0) {
@@ -76,80 +79,22 @@ public class PreviewRayTracer implements RayTracer {
    */
   public static double skyOcclusion(Scene scene, WorkerState state) {
     Ray2 ray = state.ray;
-    IntersectionRecord intersectionRecord;
+    IntersectionRecord intersectionRecord = state.intersectionRecord;
     double occlusion = 1.0;
-    while (true) {
-      intersectionRecord = new IntersectionRecord();
+    while (occlusion > Constants.EPSILON) {
+      intersectionRecord.reset();
       if (!scene.intersect(ray, intersectionRecord, state.random)) {
         break;
       } else {
-        occlusion *= (1 - intersectionRecord.color.w);
-        if (occlusion == 0) {
-          return 1; // occlusion can't become > 0 anymore
-        }
+        occlusion *= (1 - intersectionRecord.color.w * intersectionRecord.material.alpha);
         ray.o.scaleAdd((intersectionRecord.distance + Constants.OFFSET), ray.d);
+        if ((intersectionRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) == 0) {
+          ray.setCurrentMedium(intersectionRecord.material);
+        }
       }
     }
     return 1 - occlusion;
   }
-
-//  /**
-//   * Find next ray intersection.
-//   * @return true if intersected, false if no intersection has been found
-//   */
-//  public static boolean nextIntersection(Scene scene, Ray ray) {
-//    ray.setPrevMaterial(ray.getCurrentMaterial(), ray.getCurrentData());
-//    ray.t = Double.POSITIVE_INFINITY;
-//    boolean hit = false;
-//    if (scene.sky().cloudsEnabled()) {
-//      hit = scene.sky().cloudIntersection(scene, ray);
-//    }
-//    if (scene.isWaterPlaneEnabled()) {
-//      hit = waterPlaneIntersection(scene, ray) || hit;
-//    }
-//    if (scene.intersect(ray)) {
-//      // Octree tracer handles updating distance.
-//      return true;
-//    }
-//    if (hit) {
-//      ray.distance += ray.t;
-//      ray.o.scaleAdd(ray.t, ray.d);
-//      scene.updateOpacity(ray);
-//      return true;
-//    } else {
-//      ray.setCurrentMaterial(Air.INSTANCE);
-//      return false;
-//    }
-//  }
-
-//  private static boolean waterPlaneIntersection(Scene scene, Ray ray) {
-//    double t = (scene.getEffectiveWaterPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
-//    if (scene.getWaterPlaneChunkClip()) {
-//      Vector3 pos = new Vector3(ray.o);
-//      pos.scaleAdd(t, ray.d);
-//      if (scene.isChunkLoaded((int)Math.floor(pos.x), (int)Math.floor(pos.y), (int)Math.floor(pos.z)))
-//        return false;
-//    }
-//    if (ray.d.y < 0) {
-//      if (t > 0 && t < ray.t) {
-//        ray.t = t;
-//        Water.INSTANCE.getColor(ray);
-//        ray.setNormal(0, 1, 0);
-//        ray.setCurrentMaterial(scene.getPalette().water);
-//        return true;
-//      }
-//    }
-//    if (ray.d.y > 0) {
-//      if (t > 0 && t < ray.t) {
-//        ray.t = t;
-//        Water.INSTANCE.getColor(ray);
-//        ray.setNormal(0, -1, 0);
-//        ray.setCurrentMaterial(Air.INSTANCE);
-//        return true;
-//      }
-//    }
-//    return false;
-//  }
 
   // Chunk pattern config
   private static final double chunkPatternLineWidth = 0.5; // in blocks

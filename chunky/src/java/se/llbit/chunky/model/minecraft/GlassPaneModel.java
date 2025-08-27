@@ -175,7 +175,7 @@ public class GlassPaneModel extends QuadModel {
 
     Consumer<Quad[]> addConnector = qs -> {
       quads.addAll(Arrays.asList(qs));
-      textures.addAll(Arrays.asList(side, side, top, top, new Texture("air")));
+      textures.addAll(Arrays.asList(side, side, top, top, Texture.air));
     };
 
     // Top and bottom

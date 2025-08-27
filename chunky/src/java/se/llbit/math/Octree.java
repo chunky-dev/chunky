@@ -21,12 +21,14 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import org.apache.commons.math3.util.FastMath;
 
+import se.llbit.chunky.block.Void;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.chunk.BlockPalette;
@@ -34,6 +36,7 @@ import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
+import se.llbit.chunky.world.material.WaterPlaneMaterial;
 import se.llbit.log.Log;
 import se.llbit.util.io.PositionalInputStream;
 import se.llbit.util.io.PositionalOutputStream;
@@ -290,12 +293,12 @@ public class Octree implements Intersectable {
    * @param y y position
    * @param z z position
    * @param palette Block palette
-   * @return Material at the given position or {@link Air#INSTANCE} if the position is outside of this octree
+   * @return Material at the given position or {@link Void#INSTANCE} if the position is outside of this octree
    */
   public Material getMaterial(int x, int y, int z, BlockPalette palette) {
     int size = (1 << implementation.getDepth());
     if(x < 0 || y < 0 || z < 0 || x >= size || y >= size || z >= size)
-      return Air.INSTANCE;
+      return Void.INSTANCE;
     return implementation.getMaterial(x, y, z, palette);
   }
 
@@ -474,7 +477,7 @@ public class Octree implements Intersectable {
    * @return {@code false} if the ray did not hit the geometry
    */
   @Override
-  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
     BlockPalette palette = scene.getPalette();
     double distance = 0;
     IntIntMutablePair typeAndLevel = new IntIntMutablePair(0, 0);
@@ -513,13 +516,16 @@ public class Octree implements Intersectable {
       int bz = (int) Math.floor(pos.z);
 
       if (!isInside(pos)) {
-        if (ray.getCurrentMedium() == Air.INSTANCE) {
+        Block currentBlock = scene.isUnderWaterPlane(pos) ? WaterPlaneMaterial.INSTANCE : Void.INSTANCE;
+        Material prevBlock = ray.getCurrentMedium();
+        if (currentBlock.isSameMaterial(prevBlock)
+            || currentBlock == Void.INSTANCE && prevBlock == Air.INSTANCE) {
           return false;
         }
         testRay.o.set(ray.o);
         testRay.o.scaleAdd(distance, ray.d);
-        intersectionRecord.material = Air.INSTANCE;
-        TexturedBlockModel.getIntersectionColor(testRay, intersectionRecord);
+        intersectionRecord.material = currentBlock;
+        currentBlock.getColor(intersectionRecord);
         intersectionRecord.distance = distance;
         return true;
       }
@@ -534,6 +540,9 @@ public class Octree implements Intersectable {
 
       // Test intersection
       Block currentBlock = palette.get(type);
+      if (scene.isUnderWaterPlane(pos) && (currentBlock == Air.INSTANCE || currentBlock == Void.INSTANCE)) {
+        currentBlock = WaterPlaneMaterial.INSTANCE;
+      }
       Material prevBlock = ray.getCurrentMedium();
 
       intersectionRecord.material = currentBlock;
@@ -551,7 +560,8 @@ public class Octree implements Intersectable {
             distance += exitBlock(testRay, intersectionRecord, bx, by, bz);
             continue;
           }
-        } else if (!currentBlock.isSameMaterial(prevBlock)) {
+        } else if (!currentBlock.isSameMaterial(prevBlock) && !(currentBlock == Void.INSTANCE && prevBlock == Air.INSTANCE || currentBlock == Air.INSTANCE && prevBlock == Void.INSTANCE)) {
+          // && !((currentBlock == Void.INSTANCE && prevBlock == Air.INSTANCE || currentBlock == Air.INSTANCE && prevBlock == Void.INSTANCE) && (!scene.isWaterPlaneEnabled() || !scene.getWaterPlaneChunkClip()))
           testRay.o.set(ray.o);
           testRay.o.scaleAdd(distance, ray.d);
           TexturedBlockModel.getIntersectionColor(testRay, intersectionRecord);

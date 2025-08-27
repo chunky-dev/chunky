@@ -24,10 +24,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import org.controlsfx.control.ToggleSwitch;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -43,16 +43,16 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class TexturesTab extends VBox implements RenderControlsTab, Initializable {
-  private RenderController controller;
+public class TexturesTab extends RenderControlsTab implements Initializable {
+  private RenderController renderController;
   private SceneManager sceneManager;
 
   @FXML
-  private CheckBox biomeColors;
+  private ToggleSwitch biomeColors;
   @FXML
-  private CheckBox biomeBlending;
+  private ToggleSwitch biomeBlending;
   @FXML
-  private CheckBox singleColorBtn;
+  private ToggleSwitch singleColorBtn;
   @FXML
   private Button editResourcePacks;
 
@@ -133,14 +133,14 @@ public class TexturesTab extends VBox implements RenderControlsTab, Initializabl
     warning.setTitle("Chunk reload required");
     ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
     if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
-      controller.getSceneManager().reloadChunks();
+      renderController.getSceneManager().reloadChunks();
     }
   }
 
   @Override
-  public void setController(RenderControlsFxController fxController) {
-    controller = fxController.getRenderController();
-    sceneManager = controller.getSceneManager();
+  protected void onSetController(RenderControlsFxController fxController) {
+    renderController = fxController.getRenderController();
+    sceneManager = renderController.getSceneManager();
   }
 
   @Override

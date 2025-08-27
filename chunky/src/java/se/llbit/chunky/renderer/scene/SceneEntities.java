@@ -24,14 +24,7 @@ import se.llbit.util.mojangapi.MinecraftSkin;
 import se.llbit.util.mojangapi.MojangApi;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -82,7 +75,7 @@ public class SceneEntities implements Intersectable {
   }
 
   @Override
-  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
     boolean hit = bvh.closestIntersection(ray, intersectionRecord, scene);
 
     if (renderActors) {
@@ -247,12 +240,12 @@ public class SceneEntities implements Intersectable {
 
   public void buildBvh(TaskTracker.Task task, Vector3i origin) {
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    bvh = BVH.Factory.create(bvhImplementation, entities, worldOffset, task);
+    bvh = BVH.Factory.create(bvhImplementation, Collections.unmodifiableList(entities), worldOffset, task);
   }
 
   public void buildActorBvh(TaskTracker.Task task, Vector3i origin) {
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    actorBvh = BVH.Factory.create(bvhImplementation, actors, worldOffset, task);
+    actorBvh = BVH.Factory.create(bvhImplementation, Collections.unmodifiableList(actors), worldOffset, task);
   }
 
   public void finalizeLoading() {

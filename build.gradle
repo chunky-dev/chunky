@@ -41,9 +41,9 @@ subprojects {
     }
 
     javafx {
-        version = '11.0.2'
+        version = '17.0.13'
         configuration = 'implementation'
-        modules = ['javafx.base', 'javafx.controls', 'javafx.fxml']
+        modules = ['javafx.base', 'javafx.controls', 'javafx.fxml', 'javafx.media']
     }
 
     javadoc {

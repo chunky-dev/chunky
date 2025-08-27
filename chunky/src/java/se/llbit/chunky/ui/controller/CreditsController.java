@@ -178,7 +178,7 @@ public class CreditsController implements Initializable {
     semver4jLicense.setBorder(Border.EMPTY);
     semver4jLicense.setOnAction(e -> launchAndReset(semver4jLicense, "https://github.com/vdurmont/semver4j/blob/master/LICENSE.md"));
 
-    if (plugins.size() > 0) {
+    if (!plugins.isEmpty()) {
       plugins.forEach((key, item) -> pluginBox.getChildren().addAll(buildBox(item)));
     } else {
       Label label = new Label("You have no plugins activated!");

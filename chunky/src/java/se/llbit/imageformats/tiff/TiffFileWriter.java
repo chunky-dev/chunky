@@ -25,10 +25,11 @@ import java.nio.channels.FileChannel;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import java.util.ArrayList;
+import java.util.List;
 import se.llbit.chunky.main.Version;
 import se.llbit.chunky.renderer.postprocessing.PixelPostProcessingFilter;
 import se.llbit.chunky.renderer.postprocessing.PostProcessingFilter;
-import se.llbit.chunky.renderer.postprocessing.PostProcessingFilters;
 import se.llbit.chunky.renderer.scene.AlphaBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.log.Log;
@@ -119,7 +120,7 @@ public class TiffFileWriter implements AutoCloseable {
     idf.addTag(IFDTag.TAG_DATETIME, DATETIME_FORMAT.format(LocalDateTime.now()));
 
     return idf.write(out, ifdOffset, (out) -> {
-      PixelPostProcessingFilter filter = requirePixelPostProcessingFilter(scene);
+      List<PixelPostProcessingFilter> filters = requirePixelPostProcessingFilter(scene);
       double[] sampleBuffer = scene.getSampleBuffer();
       AlphaBuffer alpha = scene.getAlphaBuffer();
       FloatBuffer buffer = null;
@@ -132,7 +133,13 @@ public class TiffFileWriter implements AutoCloseable {
         task.update(height, y);
         for (int x = 0; x < width; ++x) {
           // TODO: refactor pixel access to remove duplicate post processing code from here
-          filter.processPixel(width, height, sampleBuffer, x, y, scene.getExposure(), pixelBuffer);
+
+          int index = (y * width + x) * 3;
+          System.arraycopy(sampleBuffer, index, pixelBuffer, 0, 3);
+
+          for (PixelPostProcessingFilter filter : filters) {
+            filter.processPixel(pixelBuffer);
+          }
           if(embedAlpha) {
             pixelBuffer[3] = buffer.get(y * width + x);
           }
@@ -151,16 +158,18 @@ public class TiffFileWriter implements AutoCloseable {
       out.writeFloat((float) pixelBuffer[3]);
   }
 
-  private PixelPostProcessingFilter requirePixelPostProcessingFilter(Scene scene) {
-    PostProcessingFilter filter = scene.getPostProcessingFilter();
-    if (filter instanceof PixelPostProcessingFilter) {
-      // TODO: use https://openjdk.java.net/jeps/394
-      return (PixelPostProcessingFilter) filter;
-    } else {
-      Log.warn("The selected post processing filter (" + filter.getName()
-        + ") doesn't support pixel based processing and can't be used to export TIFF files. " +
-        "The TIFF will be exported without post-processing instead.");
-      return PostProcessingFilters.NONE;
+  private List<PixelPostProcessingFilter> requirePixelPostProcessingFilter(Scene scene) {
+    List<PostProcessingFilter> filters = scene.getPostprocessingFilters();
+    List<PixelPostProcessingFilter> pixelPostProcessingFilters = new ArrayList<>(0);
+    for (PostProcessingFilter filter : filters) {
+      if (filter instanceof PixelPostProcessingFilter) {
+        pixelPostProcessingFilters.add((PixelPostProcessingFilter) filter);
+      } else {
+        Log.warn("The selected post processing filter (" + filter.getName()
+            + ") doesn't support pixel based processing and can't be used to export TIFF files. " +
+            "The TIFF will be exported without post-processing instead.");
+      }
     }
+    return pixelPostProcessingFilters;
   }
 }

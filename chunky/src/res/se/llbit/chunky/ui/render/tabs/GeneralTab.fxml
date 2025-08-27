@@ -6,6 +6,7 @@
 <?import javafx.scene.text.Text?>
 <?import se.llbit.chunky.ui.*?>
 <?import se.llbit.chunky.ui.elements.*?>
+<?import org.controlsfx.control.ToggleSwitch?>
 
 <fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <Button fx:id="openSceneDirBtn" mnemonicParsing="false" text="Open scene directory" maxWidth="Infinity"/>
@@ -28,7 +29,7 @@
     </VBox>
   </HBox>
 
-  <CheckBox fx:id="renderRegions" mnemonicParsing="false" text="Render region" />
+  <ToggleSwitch fx:id="renderRegions" text="Render region" />
   <GridPane fx:id="renderRegionsArea" vgap="4.0" hgap="4.0" prefWidth="200.0" alignment="CENTER_LEFT">
     <Label text="Width:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
     <IntegerTextField fx:id="cameraCropWidth" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="70.0" />

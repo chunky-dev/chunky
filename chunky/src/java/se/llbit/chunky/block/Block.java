@@ -13,7 +13,7 @@ import se.llbit.nbt.Tag;
 import java.util.Random;
 
 public abstract class Block extends Material {
-  public static final AABB fullBlock =  new AABB(0, 1, 0, 1,0, 1);
+  public static final AABB FULL_BLOCK =  new AABB(0, 1, 0, 1,0, 1);
 
   /**
    * Set to true if there is a local intersection model for this block. If this is set to
@@ -46,14 +46,14 @@ public abstract class Block extends Material {
    * @param rand Random number source.
    */
   public void sample(int face, Vector3 loc, Random rand) {
-    fullBlock.sampleFace(face, loc, rand);
+    FULL_BLOCK.sampleFace(face, loc, rand);
   }
 
   /**
    * Get the surface area of this face of the block.
    */
   public double surfaceArea(int face) {
-    return fullBlock.faceSurfaceArea(face);
+    return FULL_BLOCK.faceSurfaceArea(face);
   }
 
   /**
@@ -137,6 +137,6 @@ public abstract class Block extends Material {
     double ix = ray.o.x - QuickMath.floor(ray.o.x);
     double iy = ray.o.y - QuickMath.floor(ray.o.y);
     double iz = ray.o.z - QuickMath.floor(ray.o.z);
-    return fullBlock.inside(new Vector3(ix, iy, iz));
+    return FULL_BLOCK.inside(new Vector3(ix, iy, iz));
   }
 }

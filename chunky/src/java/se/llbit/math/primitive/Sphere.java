@@ -6,6 +6,8 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.*;
 
+import java.util.Random;
+
 public class Sphere implements Primitive {
   private final double radius;
   private final Vector3 center;
@@ -23,7 +25,7 @@ public class Sphere implements Primitive {
     return distance < this.radius;
   }
 
-  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
     double t0;
     double t1;
 
@@ -70,10 +72,8 @@ public class Sphere implements Primitive {
         intersectionRecord.material = material;
         material.getColor(intersectionRecord);
       }
-
       return true;
     }
-
     return false;
   }
 

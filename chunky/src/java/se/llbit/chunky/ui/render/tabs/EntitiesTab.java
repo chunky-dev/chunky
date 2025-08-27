@@ -34,17 +34,15 @@ import se.llbit.chunky.ui.DoubleTextField;
 import se.llbit.chunky.ui.dialogs.AddEntityDialog;
 import se.llbit.chunky.ui.elements.AngleAdjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
-import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.util.mojangapi.MinecraftProfile;
 
-public class EntitiesTab extends VBox implements RenderControlsTab, Initializable {
+public class EntitiesTab extends RenderControlsTab implements Initializable {
   public static final Map<String, EntitiesTab.EntityType<?>> entityTypes = new HashMap<>();
 
   static {
@@ -69,10 +67,8 @@ public class EntitiesTab extends VBox implements RenderControlsTab, Initializabl
     entityTypes.put("Lectern", (position, scene) -> new Lectern(position, "north", true));
     entityTypes.put("Book", (position, scene) -> new Book(position, Math.PI - Math.PI / 16, Math.toRadians(30), Math.toRadians(180 - 30)));
     entityTypes.put("Beacon beam", (position, scene) -> new BeaconBeam(position));
-    entityTypes.put("Sphere", (position, scene) -> new SphereEntity(position, new Vector4(1, 1, 1, 1), 0.5));
+    entityTypes.put("Sphere", (position, scene) -> new SphereEntity(position, 0.5));
   }
-
-  private Scene scene;
 
   public enum EntityPlacement {
     TARGET("Preview target position"),
@@ -233,7 +229,7 @@ public class EntitiesTab extends VBox implements RenderControlsTab, Initializabl
 
     controls.getChildren().add(new Separator());
 
-    controls.getChildren().add(entity.getControls(this, scene));
+    controls.getChildren().add(entity.getControls(this));
 
     controls.getChildren().add(new Separator());
 
@@ -497,10 +493,5 @@ public class EntitiesTab extends VBox implements RenderControlsTab, Initializabl
     posX.valueProperty().set(entity.position.x);
     posY.valueProperty().set(entity.position.y);
     posZ.valueProperty().set(entity.position.z);
-  }
-
-  @Override
-  public void setController(RenderControlsFxController controller) {
-    scene = controller.getRenderController().getSceneManager().getScene();
   }
 }

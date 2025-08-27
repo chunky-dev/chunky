@@ -17,10 +17,10 @@
  */
 package se.llbit.chunky.model.minecraft;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.resources.Texture;
 import se.llbit.math.*;
 
 /**
@@ -60,9 +60,6 @@ public class WaterModel {
   static final double[] height =
       {14 / 16., 12.25 / 16., 10.5 / 16, 8.75 / 16, 7. / 16, 5.25 / 16, 3.5 / 16, 1.75 / 16};
 
-  private static final float[] normalMap;
-  private static final int normalMapW;
-
   public static final int CORNER_0 = 0;
   public static final int CORNER_1 = 4;
   public static final int CORNER_2 = 8;
@@ -75,22 +72,6 @@ public class WaterModel {
     new Vector4(0, 1, 0, 1), true);
 
   static {
-    // precompute normal map
-    Texture waterHeight = new Texture("water-height");
-    normalMapW = waterHeight.getWidth();
-    normalMap = new float[normalMapW*normalMapW*2];
-    for (int u = 0; u < normalMapW; ++u) {
-      for (int v = 0; v < normalMapW; ++v) {
-
-        float hx0 = (waterHeight.getColorWrapped(u, v) & 0xFF) / 255.f;
-        float hx1 = (waterHeight.getColorWrapped(u + 1, v) & 0xFF) / 255.f;
-        float hz0 = (waterHeight.getColorWrapped(u, v) & 0xFF) / 255.f;
-        float hz1 = (waterHeight.getColorWrapped(u, v + 1) & 0xFF) / 255.f;
-        normalMap[(u*normalMapW + v) * 2] = hx1 - hx0;
-        normalMap[(u*normalMapW + v) * 2 + 1] = hz1 - hz0;
-      }
-    }
-
     // precompute water triangles
     for (int i = 0; i < 8; ++i) {
       double c0 = height[i];
@@ -301,8 +282,16 @@ public class WaterModel {
       intersectionRecord.setNormal(triangle.n);
       hitTop = true;
     }
-
+    Block waterPlaneMaterial;
     if (hitTop) {
+      if (intersectionRecord.distance > Constants.EPSILON &&
+          ray.getCurrentMedium() != (waterPlaneMaterial = scene.waterPlaneMaterial(ray.o)) &&
+          !ray.getCurrentMedium().isWater()) {
+        intersectionRecord.distance = 0;
+        intersectionRecord.material = waterPlaneMaterial;
+        waterPlaneMaterial.getColor(intersectionRecord);
+        return true;
+      }
       // Create a new ray at the intersection position to get the normal.
       Ray2 testRay = new Ray2(ray);
       testRay.o.scaleAdd(intersectionRecord.distance, testRay.d);
@@ -318,7 +307,13 @@ public class WaterModel {
       return true;
 
     } else if (hit) {
-      return !(ray.d.dot(intersectionRecord.n) > 0);
+      return ray.d.dot(intersectionRecord.n) < 0;
+    } else if (ray.getCurrentMedium() != (waterPlaneMaterial = scene.waterPlaneMaterial(ray.o)) &&
+        !ray.getCurrentMedium().isWater()) {
+      intersectionRecord.distance = 0;
+      intersectionRecord.material = waterPlaneMaterial;
+      waterPlaneMaterial.getColor(intersectionRecord);
+      return true;
     } else {
       return false;
     }
@@ -329,26 +324,5 @@ public class WaterModel {
       return ray.d.dot(intersectionRecord.n) > 0;
     }
     return false;
-  }
-
-  /**
-   * Displace the normal using the water displacement map.
-   */
-  public static Vector3 doWaterDisplacement(Ray2 ray, IntersectionRecord intersectionRecord) {
-    int w = (1 << 4);
-    double x = ray.o.x / w - QuickMath.floor(ray.o.x / w);
-    double z = ray.o.z / w - QuickMath.floor(ray.o.z / w);
-    int u = (int) (x * normalMapW - Constants.EPSILON);
-    int v = (int) ((1 - z) * normalMapW - Constants.EPSILON);
-    Vector3 n = new Vector3(normalMap[(u*normalMapW + v) * 2], .15f, normalMap[(u*normalMapW + v) * 2 + 1]);
-    w = (1 << 1);
-    x = ray.o.x / w - QuickMath.floor(ray.o.x / w);
-    z = ray.o.z / w - QuickMath.floor(ray.o.z / w);
-    u = (int) (x * normalMapW - Constants.EPSILON);
-    v = (int) ((1 - z) * normalMapW - Constants.EPSILON);
-    n.x += normalMap[(u*normalMapW + v) * 2] / 2;
-    n.z += normalMap[(u*normalMapW + v) * 2 + 1] / 2;
-    n.normalize();
-    return n;
   }
 }

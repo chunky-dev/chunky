@@ -1,14 +1,16 @@
 package se.llbit.util;
 
-import javafx.scene.Node;
 import javafx.scene.layout.VBox;
-import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.render.RenderControlsTab;
 
+/**
+ * This interface specifies an object that has its own set of controls.
+ */
 public interface HasControls {
   /**
    * Get controls for this object.
    */
-  default VBox getControls(Node parent, Scene scene) {
+  default VBox getControls(RenderControlsTab parent) {
     VBox vBox = new VBox();
     vBox.setVisible(false);
     vBox.setManaged(false);

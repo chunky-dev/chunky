@@ -11,6 +11,7 @@
 <?import se.llbit.chunky.ui.IntegerAdjuster?>
 
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
+<?import org.controlsfx.control.ToggleSwitch?>
 <fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <IntegerAdjuster fx:id="renderThreads" />
   <IntegerAdjuster fx:id="cpuLoad" />
@@ -21,8 +22,8 @@
   <Button fx:id="mergeRenderDump" mnemonicParsing="false" text="Merge render dumps" />
   <Separator prefWidth="200.0" />
   <CheckBox fx:id="shutdown" mnemonicParsing="false" text="Shutdown computer when render completes" />
-  <CheckBox fx:id="fastFog" mnemonicParsing="false" text="Fast fog" />
-  <CheckBox fx:id="fancierTranslucency" mnemonicParsing="false" text="Fancier translucency" />
+  <ToggleSwitch fx:id="fastFog" text="Fast fog" />
+  <ToggleSwitch fx:id="fancierTranslucency" text="Fancier translucency" />
   <DoubleAdjuster fx:id="transmissivityCap" />
   <IntegerAdjuster fx:id="cacheResolution" />
   <DoubleAdjuster fx:id="animationTime" />
@@ -30,7 +31,7 @@
     <Label text="Output mode:" />
     <ChoiceBox fx:id="outputMode" prefWidth="150.0" />
   </HBox>
-  <CheckBox fx:id="hideUnknownBlocks" mnemonicParsing="false" text="Hide unknown blocks" />
+  <ToggleSwitch fx:id="hideUnknownBlocks" text="Hide unknown blocks" />
   <Separator prefWidth="200.0" />
   <HBox alignment="CENTER_LEFT" spacing="10.0">
     <Label text="Octree implementation:" />
@@ -46,7 +47,7 @@
     <ChoiceBox fx:id="biomeStructureImplementation" prefWidth="150" />
   </HBox>
   <IntegerAdjuster fx:id="gridSize" />
-  <CheckBox fx:id="preventNormalEmitterWithSampling" mnemonicParsing="false" text="Prevent normal emitter when using emitter sampling" />
+  <ToggleSwitch fx:id="preventNormalEmitterWithSampling" text="Prevent normal emitter when using emitter sampling" />
 
   <Separator prefWidth="200.0" />
   <HBox alignment="CENTER_LEFT" spacing="10.0">

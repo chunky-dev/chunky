@@ -1,0 +1,48 @@
+/* Copyright (c) 2021 Chunky contributors
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package se.llbit.chunky.renderer.scene.simulatedsky;
+
+import se.llbit.chunky.renderer.scene.Sun;
+import se.llbit.math.Ray2;
+import se.llbit.math.Vector3;
+import se.llbit.util.Configurable;
+import se.llbit.util.HasControls;
+
+/**
+ * Interface for simulated skies.
+ */
+public interface SimulatedSky extends Configurable, HasControls {
+  /**
+   * Update the sun if necessary. Returns true if the sun was updated (and cache needs to be purged).
+   */
+  boolean updateSun(Sun sun);
+
+  /**
+   * Calculate the sky color for a given ray.
+   */
+  Vector3 calcIncidentLight(Ray2 ray);
+
+  /**
+   * Get the friendly name.
+   */
+  String getName();
+
+  /**
+   * Get the sky renderer tooltip.
+   */
+  String getDescription();
+}

@@ -29,8 +29,6 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.RenderCanvasFx;
 import se.llbit.chunky.ui.render.tabs.*;
 import se.llbit.chunky.ui.render.RenderControlsTab;
-import se.llbit.fx.ToolPane;
-import se.llbit.fx.ToolTab;
 import se.llbit.log.Log;
 
 import java.util.ArrayList;
@@ -97,8 +95,9 @@ public class RenderControlsFxController {
     try {
       // Create the default tabs:
       tabs.add(new GeneralTab());
-      tabs.add(new LightingTab());
-      tabs.add(new SkyTab());
+      tabs.add(new EnvironmentTab());
+      tabs.add(new FogTab());
+      tabs.add(new EmittersTab());
       tabs.add(new WaterTab());
       tabs.add(new CameraTab());
       tabs.add(new EntitiesTab());
@@ -123,7 +122,7 @@ public class RenderControlsFxController {
           String title = tab.getTabTitle();
 
           VBox content = tab.getTabContent();
-          content.setSpacing(10);
+          content.setSpacing(6);
 
           TitledPane toolTab = new TitledPane(title, content);
           toolTab.setAnimated(false);

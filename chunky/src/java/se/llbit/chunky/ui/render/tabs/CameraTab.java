@@ -28,6 +28,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import org.controlsfx.control.ToggleSwitch;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.renderer.ApertureShape;
@@ -50,14 +51,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class CameraTab extends VBox implements RenderControlsTab, Initializable {
-  private Scene scene;
-
+public class CameraTab extends RenderControlsTab implements Initializable {
   @FXML private MenuButton loadPreset;
   @FXML private ComboBox<String> cameras;
   @FXML private Button duplicate;
   @FXML private Button removeCamera;
-  @FXML private CheckBox lockCamera;
+  @FXML private ToggleSwitch lockCamera;
   @FXML private TitledPane positionOrientation;
   @FXML private DoubleTextField posX;
   @FXML private DoubleTextField posY;
@@ -405,7 +404,8 @@ public class CameraTab extends VBox implements RenderControlsTab, Initializable 
     update(scene);
   }
 
-  @Override public void setController(RenderControlsFxController controller) {
+  @Override
+  protected void onSetController(RenderControlsFxController controller) {
     this.mapView = controller.getChunkyController().getMapView();
     this.cameraViewListener = controller.getChunkyController();
 
