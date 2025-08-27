@@ -118,6 +118,8 @@ public class MaterialsTab extends RenderControlsTab implements Initializable {
     emitterMappingType.setTooltip(new Tooltip("Overrides the global setting for emitter mapping type."));
     emitterMappingType.getSelectionModel().selectedItemProperty().addListener(emitterMappingTypeListener);
 
+    VBox emitterMappingTypeBox = new VBox(6, new Label("Emitter mapping type"), emitterMappingType);
+
     useReferenceColors.setText("Use reference colors");
     useReferenceColors.selectedProperty().addListener(useReferenceColorsListener);
 
@@ -231,7 +233,7 @@ public class MaterialsTab extends RenderControlsTab implements Initializable {
     settings.setHgap(10);
     settings.setVgap(10);
 
-    VBox diffuseSettings = new VBox(6, emittance, emittanceColor, emitterMappingOffset, emitterMappingType, useReferenceColors, alpha, subsurfaceScattering, diffuseColor);
+    VBox diffuseSettings = new VBox(6, emittance, emittanceColor, emitterMappingOffset, emitterMappingTypeBox, useReferenceColors, alpha, subsurfaceScattering, diffuseColor);
     VBox volumeSettings = new VBox(6, volumeDensity, volumeAnisotropy, volumeEmittance, volumeColor, absorption, absorptionColor);
     VBox specularSettings = new VBox(6, specular, ior, perceptualSmoothness, perceptualTransmissionSmoothness);
     VBox specularColorSettings = new VBox(6, metalness, transmissionMetalness, specularColor, transmissionSpecularColor);

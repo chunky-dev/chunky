@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
@@ -719,6 +720,8 @@ public abstract class Material {
       scene.refresh();
     });
 
+    VBox emitterMappingTypeBox = new VBox(6, new Label("Emitter mapping type"), emitterMappingType);
+
     useReferenceColors.setText("Use reference colors");
     useReferenceColors.setSelected(material.useReferenceColors);
     useReferenceColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -904,7 +907,7 @@ public abstract class Material {
     settings.setHgap(10);
     settings.setVgap(10);
 
-    VBox diffuseSettings = new VBox(6, emittanceAdjuster, emittanceColorPicker, emitterMappingOffset, emitterMappingType, useReferenceColors, alphaAdjuster, subsurfaceScatteringAdjuster, diffuseColorPicker);
+    VBox diffuseSettings = new VBox(6, emittanceAdjuster, emittanceColorPicker, emitterMappingOffset, emitterMappingTypeBox, useReferenceColors, alphaAdjuster, subsurfaceScatteringAdjuster, diffuseColorPicker);
     VBox volumeSettings = new VBox(6, volumeDensityAdjuster, volumeAnisotropyAdjuster, volumeEmittanceAdjuster, volumeColorPicker, absorptionAdjuster, absorptionColorPicker);
     VBox specularSettings = new VBox(6, specularAdjuster, iorAdjuster, smoothnessAdjuster, transmissionSmoothnessAdjuster);
     VBox specularColorSettings = new VBox(6, metalnessAdjuster, transmissionMetalnessAdjuster, specularColorPicker, transmissionSpecularColorPicker);
