@@ -111,6 +111,8 @@ public class AdvancedTab extends RenderControlsTab implements Initializable {
       scene.setBranchCount(value);
       PersistentSettings.setBranchCountDefault(value);
     });
+    branchCount.setVisible(false);
+    branchCount.setManaged(false);
 
     mergeRenderDump
             .setTooltip(new Tooltip("Merge an existing render dump with the current render."));

@@ -224,7 +224,9 @@ public class Scene implements Configurable, Refreshable {
   /**
    * Branch count for the scene.
    */
-  protected int branchCount = PersistentSettings.getBranchCountDefault();
+  // TODO: Make branched path tracing work on the new path tracer.
+  // protected int branchCount = PersistentSettings.getBranchCountDefault();
+  protected int branchCount = 1;
   /**
    * Recursive ray depth limit (not including Russian Roulette).
    */
