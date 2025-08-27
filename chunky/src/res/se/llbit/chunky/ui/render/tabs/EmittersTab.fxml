@@ -6,18 +6,22 @@
 <?import javafx.scene.layout.VBox?>
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import se.llbit.chunky.ui.IntegerAdjuster?>
+<?import org.controlsfx.control.ToggleSwitch?>
 
 <fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <DoubleAdjuster fx:id="emitterIntensity" maxWidth="1.7976931348623157E308" />
-  <HBox alignment="CENTER_LEFT" spacing="10.0">
-    <ChoiceBox fx:id="emitterSamplingStrategy" />
-    <Label text="Emitter Sampling Strategy" />
-  </HBox>
   <HBox alignment="CENTER_LEFT" spacing="10.0">
     <ChoiceBox fx:id="emitterMappingType" />
     <Label text="Emitter mapping type" />
   </HBox>
   <DoubleAdjuster fx:id="emitterMappingExponent" />
+  <HBox alignment="CENTER_LEFT" spacing="10.0">
+    <ChoiceBox fx:id="emitterSamplingStrategy" />
+    <Label text="Emitter Sampling Strategy" />
+  </HBox>
+  <IntegerAdjuster fx:id="gridSize" />
+  <ToggleSwitch fx:id="preventNormalEmitterWithSampling" text="Prevent normal emitter when using emitter sampling" />
   <padding>
     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
   </padding>

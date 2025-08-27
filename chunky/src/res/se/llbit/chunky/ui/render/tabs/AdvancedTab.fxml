@@ -23,8 +23,6 @@
   <Separator prefWidth="200.0" />
   <CheckBox fx:id="shutdown" mnemonicParsing="false" text="Shutdown computer when render completes" />
   <ToggleSwitch fx:id="fastFog" text="Fast fog" />
-  <ToggleSwitch fx:id="fancierTranslucency" text="Fancier translucency" />
-  <DoubleAdjuster fx:id="transmissivityCap" />
   <IntegerAdjuster fx:id="cacheResolution" />
   <DoubleAdjuster fx:id="animationTime" />
   <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -46,8 +44,6 @@
     <Label text="BiomeStructure implementation:" />
     <ChoiceBox fx:id="biomeStructureImplementation" prefWidth="150" />
   </HBox>
-  <IntegerAdjuster fx:id="gridSize" />
-  <ToggleSwitch fx:id="preventNormalEmitterWithSampling" text="Prevent normal emitter when using emitter sampling" />
 
   <Separator prefWidth="200.0" />
   <HBox alignment="CENTER_LEFT" spacing="10.0">

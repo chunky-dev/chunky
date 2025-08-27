@@ -24,10 +24,14 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.layout.VBox;
+import org.controlsfx.control.ToggleSwitch;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.EmitterMappingType;
 import se.llbit.chunky.renderer.scene.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.Adjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.fxutil.Dialogs;
 
@@ -37,9 +41,11 @@ import java.util.ResourceBundle;
 
 public class EmittersTab extends RenderControlsTab implements Initializable {
   @FXML private DoubleAdjuster emitterIntensity;
-  @FXML private ChoiceBox<EmitterSamplingStrategy> emitterSamplingStrategy;
   @FXML private ChoiceBox<EmitterMappingType> emitterMappingType;
   @FXML private DoubleAdjuster emitterMappingExponent;
+  @FXML private ChoiceBox<EmitterSamplingStrategy> emitterSamplingStrategy;
+  @FXML private IntegerAdjuster gridSize;
+  @FXML private ToggleSwitch preventNormalEmitterWithSampling;
 
   public EmittersTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("EmittersTab.fxml"));
@@ -75,6 +81,36 @@ public class EmittersTab extends RenderControlsTab implements Initializable {
       });
     emitterSamplingStrategy.setTooltip(new Tooltip("Determine how emitters are sampled at each bounce."));
 
+    gridSize.setRange(4, 64);
+    gridSize.setName("Emitter grid size");
+    gridSize.setTooltip("Size of the cells of the emitter grid. " +
+        "The bigger, the more emitter will be sampled. " +
+        "Need the chunks to be reloaded to apply");
+    gridSize.onValueChange(value -> {
+      scene.setGridSize(value);
+      PersistentSettings.setGridSizeDefault(value);
+    });
+    gridSize.addEventHandler(Adjuster.AFTER_VALUE_CHANGE, e -> {
+      if (scene.getEmitterSamplingStrategy() != EmitterSamplingStrategy.NONE && scene.haveLoadedChunks()) {
+        Alert warning = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
+        warning.setContentText("The selected chunks need to be reloaded to update the emitter grid size.");
+        warning.getButtonTypes().setAll(
+            ButtonType.CANCEL,
+            new ButtonType("Reload chunks", ButtonBar.ButtonData.FINISH));
+        warning.setTitle("Chunk reload required");
+        ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
+        if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
+          controller.getRenderController().getSceneManager().reloadChunks();
+        }
+      }
+    });
+
+    preventNormalEmitterWithSampling.setTooltip(new Tooltip("Prevent usual emitter contribution when emitter sampling is used"));
+    preventNormalEmitterWithSampling.selectedProperty().addListener((observable, oldvalue, newvalue) -> {
+      scene.setPreventNormalEmitterWithSampling(newvalue);
+      PersistentSettings.setPreventNormalEmitterWithSampling(newvalue);
+    });
+
     emitterMappingType.getItems().addAll(EmitterMappingType.values());
     emitterMappingType.getItems().remove(EmitterMappingType.NONE);
     emitterMappingType.getSelectionModel().selectedItemProperty().addListener(
@@ -91,6 +127,8 @@ public class EmittersTab extends RenderControlsTab implements Initializable {
   @Override public void update(Scene scene) {
     emitterIntensity.set(scene.getEmitterIntensity());
     emitterSamplingStrategy.getSelectionModel().select(scene.getEmitterSamplingStrategy());
+    gridSize.set(scene.getGridSize());
+    preventNormalEmitterWithSampling.setSelected(scene.isPreventNormalEmitterWithSampling());
     emitterMappingExponent.set(scene.getEmitterMappingExponent());
     emitterMappingType.getSelectionModel().select(scene.getEmitterMappingType());
   }

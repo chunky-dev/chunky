@@ -161,11 +161,6 @@ public class Scene implements Configurable, Refreshable {
   public static final double MAX_EMITTER_MAPPING_EXPONENT = 5;
 
   /**
-   * Default transmissivity cap.
-   */
-  public static final double DEFAULT_TRANSMISSIVITY_CAP = 1;
-
-  /**
    * Minimum transmissivity cap.
    */
   public static final double MIN_TRANSMISSIVITY_CAP = 1;
@@ -243,8 +238,6 @@ public class Scene implements Configurable, Refreshable {
   protected double emitterMappingExponent = DEFAULT_EMITTER_MAPPING_EXPONENT;
   protected EmitterMappingType emitterMappingType = DEFAULT_EMITTER_MAPPING_TYPE;
   protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.NONE;
-  protected boolean fancierTranslucency = true;
-  protected double transmissivityCap = DEFAULT_TRANSMISSIVITY_CAP;
 
   protected SunSamplingStrategy sunSamplingStrategy = SunSamplingStrategy.SAMPLE_THROUGH_OPACITY;
 
@@ -483,8 +476,6 @@ public class Scene implements Configurable, Refreshable {
     emitterMappingType = other.emitterMappingType;
     emitterSamplingStrategy = other.emitterSamplingStrategy;
     preventNormalEmitterWithSampling = other.preventNormalEmitterWithSampling;
-    fancierTranslucency = other.fancierTranslucency;
-    transmissivityCap = other.transmissivityCap;
     transparentSky = other.transparentSky;
     yClipMin = other.yClipMin;
     yClipMax = other.yClipMax;
@@ -2722,8 +2713,6 @@ public class Scene implements Configurable, Refreshable {
     json.add("emitterIntensity", emitterIntensity);
     json.add("emitterMappingExponent", emitterMappingExponent);
     json.add("emitterMappingType", emitterMappingType.getId());
-    json.add("fancierTranslucency", fancierTranslucency);
-    json.add("transmissivityCap", transmissivityCap);
     json.add("sunSamplingStrategy", sunSamplingStrategy.getId());
     json.add("waterShadingStrategy", waterShadingStrategy.getId());
     json.add("currentWaterShader", currentWaterShader.toJson());
@@ -3041,8 +3030,6 @@ public class Scene implements Configurable, Refreshable {
     emitterIntensity = json.get("emitterIntensity").doubleValue(emitterIntensity);
     emitterMappingExponent = json.get("emitterMappingExponent").doubleValue(emitterMappingExponent);
     emitterMappingType = EmitterMappingType.valueOf(json.get("emitterMappingType").asString(DEFAULT_EMITTER_MAPPING_TYPE.getId()));
-    fancierTranslucency = json.get("fancierTranslucency").boolValue(fancierTranslucency);
-    transmissivityCap = json.get("transmissivityCap").doubleValue(transmissivityCap);
 
     sunSamplingStrategy = SunSamplingStrategy.get(json.get("sunSamplingStrategy").asString(sunSamplingStrategy.getId()));
 
@@ -3758,22 +3745,5 @@ public class Scene implements Configurable, Refreshable {
 
   public void setHideUnknownBlocks(boolean hideUnknownBlocks) {
     this.hideUnknownBlocks = hideUnknownBlocks;
-  }
-  public boolean getFancierTranslucency() {
-    return fancierTranslucency;
-  }
-
-  public void setFancierTranslucency(boolean value) {
-    fancierTranslucency = value;
-    refresh();
-  }
-
-  public double getTransmissivityCap() {
-    return transmissivityCap;
-  }
-
-  public void setTransmissivityCap(double value) {
-    transmissivityCap = value;
-    refresh();
   }
 }

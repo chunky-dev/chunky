@@ -64,8 +64,6 @@ public class AdvancedTab extends RenderControlsTab implements Initializable {
   @FXML private Button mergeRenderDump;
   @FXML private CheckBox shutdown;
   @FXML private ToggleSwitch fastFog;
-  @FXML private ToggleSwitch fancierTranslucency;
-  @FXML private DoubleAdjuster transmissivityCap;
   @FXML private IntegerAdjuster cacheResolution;
   @FXML private DoubleAdjuster animationTime;
   @FXML private ChoiceBox<PictureExportFormat> outputMode;
@@ -73,8 +71,6 @@ public class AdvancedTab extends RenderControlsTab implements Initializable {
   @FXML private Button octreeSwitchImplementation;
   @FXML private ChoiceBox<String> bvhMethod;
   @FXML private ChoiceBox<String> biomeStructureImplementation;
-  @FXML private IntegerAdjuster gridSize;
-  @FXML private ToggleSwitch preventNormalEmitterWithSampling;
   @FXML private ToggleSwitch hideUnknownBlocks;
   @FXML private ChoiceBox<String> rendererSelect;
   @FXML private ChoiceBox<String> previewSelect;
@@ -152,21 +148,6 @@ public class AdvancedTab extends RenderControlsTab implements Initializable {
     fastFog.setTooltip(new Tooltip("Enable faster fog rendering algorithm."));
     fastFog.selectedProperty()
             .addListener((observable, oldValue, newValue) -> scene.setFastFog(newValue));
-    fancierTranslucency.setTooltip(new Tooltip("Enable more sophisticated algorithm for computing color changes through translucent materials."));
-    fancierTranslucency.selectedProperty()
-      .addListener((observable, oldValue, newValue) -> {
-        scene.setFancierTranslucency(newValue);
-        transmissivityCap.setVisible(newValue);
-        transmissivityCap.setManaged(newValue);
-      });
-    boolean tcapVisible = scene != null && scene.getFancierTranslucency();
-    transmissivityCap.setVisible(tcapVisible);
-    transmissivityCap.setManaged(tcapVisible);
-    transmissivityCap.setName("Transmissivity cap");
-    transmissivityCap.setRange(Scene.MIN_TRANSMISSIVITY_CAP, Scene.MAX_TRANSMISSIVITY_CAP);
-    transmissivityCap.clampBoth();
-    transmissivityCap.setTooltip("Maximum amplification of one color channel as a ray passes through a translucent block (stained glass, ice, etc.).\nA value of 1 prevents amplification entirely; higher values result in more vibrant colors.");
-    transmissivityCap.onValueChange(value -> scene.setTransmissivityCap(value));
     cacheResolution.setName("Sky cache resolution");
     cacheResolution.setTooltip("Resolution of the sky cache. Lower values will use less memory and improve performance but can cause sky artifacts.");
     cacheResolution.setRange(1, 4096);
@@ -262,36 +243,6 @@ public class AdvancedTab extends RenderControlsTab implements Initializable {
       });
     biomeStructureImplementation.setTooltip(new Tooltip(biomeStructureTooltipBuilder.toString()));
 
-    gridSize.setRange(4, 64);
-    gridSize.setName("Emitter grid size");
-    gridSize.setTooltip("Size of the cells of the emitter grid. " +
-            "The bigger, the more emitter will be sampled. " +
-            "Need the chunks to be reloaded to apply");
-    gridSize.onValueChange(value -> {
-      scene.setGridSize(value);
-      PersistentSettings.setGridSizeDefault(value);
-    });
-    gridSize.addEventHandler(Adjuster.AFTER_VALUE_CHANGE, e -> {
-      if (scene.getEmitterSamplingStrategy() != EmitterSamplingStrategy.NONE && scene.haveLoadedChunks()) {
-        Alert warning = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
-        warning.setContentText("The selected chunks need to be reloaded to update the emitter grid size.");
-        warning.getButtonTypes().setAll(
-          ButtonType.CANCEL,
-          new ButtonType("Reload chunks", ButtonBar.ButtonData.FINISH));
-        warning.setTitle("Chunk reload required");
-        ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
-        if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
-          controller.getRenderController().getSceneManager().reloadChunks();
-        }
-      }
-    });
-
-    preventNormalEmitterWithSampling.setTooltip(new Tooltip("Prevent usual emitter contribution when emitter sampling is used"));
-    preventNormalEmitterWithSampling.selectedProperty().addListener((observable, oldvalue, newvalue) -> {
-      scene.setPreventNormalEmitterWithSampling(newvalue);
-      PersistentSettings.setPreventNormalEmitterWithSampling(newvalue);
-    });
-
     hideUnknownBlocks.setTooltip(new Tooltip("Hide unknown blocks instead of rendering them as question marks."));
     hideUnknownBlocks.selectedProperty().addListener((observable, oldValue, newValue) -> {
       scene.setHideUnknownBlocks(newValue);
@@ -326,8 +277,6 @@ public class AdvancedTab extends RenderControlsTab implements Initializable {
   public void update(Scene scene) {
     outputMode.getSelectionModel().select(scene.getPictureExportFormat());
     fastFog.setSelected(scene.fog.isFastFog());
-    fancierTranslucency.setSelected(scene.getFancierTranslucency());
-    transmissivityCap.set(scene.getTransmissivityCap());
     renderThreads.set(PersistentSettings.getNumThreads());
     cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());
@@ -335,8 +284,6 @@ public class AdvancedTab extends RenderControlsTab implements Initializable {
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
     bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
     biomeStructureImplementation.getSelectionModel().select(scene.getBiomeStructureImplementation());
-    gridSize.set(scene.getGridSize());
-    preventNormalEmitterWithSampling.setSelected(scene.isPreventNormalEmitterWithSampling());
     animationTime.set(scene.getAnimationTime());
     hideUnknownBlocks.setSelected(scene.getHideUnknownBlocks());
     rendererSelect.getSelectionModel().select(scene.getRenderer());
