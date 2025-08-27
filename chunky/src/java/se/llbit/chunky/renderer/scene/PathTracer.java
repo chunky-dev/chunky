@@ -20,6 +20,7 @@ package se.llbit.chunky.renderer.scene;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.minecraft.Water;
+import se.llbit.chunky.renderer.EmitterMappingType;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
@@ -141,7 +142,7 @@ public class PathTracer implements RayTracer {
       for (int i = 0; i < count; i++) {
         boolean doMetal = pMetal > Ray.EPSILON && random.nextFloat() < pMetal;
         if (doMetal || (pSpecular > Ray.EPSILON && random.nextFloat() < pSpecular)) {
-          hit |= doSpecularReflection(ray, next, cumulativeColor, doMetal, random, state, scene);
+          hit |= doSpecularReflection(ray, next, currentMat, cumulativeColor, doMetal, random, state, scene);
         } else if(random.nextFloat() < pDiffuse) {
           hit |= doDiffuseReflection(ray, next, currentMat, cumulativeColor, random, state, scene);
         } else if (n1 != n2) {
@@ -203,20 +204,23 @@ public class PathTracer implements RayTracer {
     return hit;
   }
 
-  private static boolean doSpecularReflection(Ray ray, Ray next, Vector4 cumulativeColor, boolean doMetal, Random random, WorkerState state, Scene scene) {
+  private static boolean doSpecularReflection(Ray ray, Ray next, Material currentMat, Vector4 cumulativeColor, boolean doMetal, Random random, WorkerState state, Scene scene) {
     boolean hit = false;
+    Vector3 emittance = new Vector3();
+    if(scene.emittersEnabled && currentMat.emittance > Ray.EPSILON) {
+      doEmittanceMapping(emittance, ray.color, scene, currentMat);
+    }
     next.specularReflection(ray, random);
     if (pathTrace(scene, next, state, false)) {
-
       if (doMetal) {
         // use the albedo color as specular color
-        cumulativeColor.x += ray.color.x * next.color.x;
-        cumulativeColor.y += ray.color.y * next.color.y;
-        cumulativeColor.z += ray.color.z * next.color.z;
+        cumulativeColor.x += emittance.x + ray.color.x * next.color.x;
+        cumulativeColor.y += emittance.y + ray.color.y * next.color.y;
+        cumulativeColor.z += emittance.z + ray.color.z * next.color.z;
       } else {
-        cumulativeColor.x += next.color.x;
-        cumulativeColor.y += next.color.y;
-        cumulativeColor.z += next.color.z;
+        cumulativeColor.x += emittance.x + next.color.x;
+        cumulativeColor.y += emittance.y + next.color.y;
+        cumulativeColor.z += emittance.z + next.color.z;
       }
       hit = true;
     }
@@ -230,12 +234,9 @@ public class PathTracer implements RayTracer {
 
     if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 1) && currentMat.emittance > Ray.EPSILON) {
 
-      // Quadratic emittance mapping, so a pixel that's 50% darker will emit only 25% as much light
-      // This is arbitrary but gives pretty good results in most cases.
-      emittance = new Vector3(ray.color.x * ray.color.x, ray.color.y * ray.color.y, ray.color.z * ray.color.z);
-      emittance.scale(currentMat.emittance * scene.emitterIntensity);
-
+      doEmittanceMapping(emittance, ray.color, scene, currentMat);
       hit = true;
+
     } else if (scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
       // Sample emitter
       switch (scene.emitterSamplingStrategy) {
@@ -474,6 +475,30 @@ public class PathTracer implements RayTracer {
     cumulativeColor.add(outputColor);
   }
 
+  private static void doEmittanceMapping(Vector3 emittance, Vector4 color, Scene scene, Material material) {
+    double exp = Math.max(scene.getEmitterMappingExponent() + material.emitterMappingOffset, 0);
+    EmitterMappingType mt = material.emitterMappingType == EmitterMappingType.NONE ? scene.getEmitterMappingType() : material.emitterMappingType;
+    double val;
+    switch(mt) {
+      case BRIGHTEST_CHANNEL:
+        val = FastMath.pow(Math.max(color.x, Math.max(color.y, color.z)), exp);
+        emittance.set(color.x * val, color.y * val, color.z * val);
+        break;
+      case REFERENCE_COLORS:
+        boolean emit = false;
+        for(Vector4 refcolor : material.emitterMappingReferenceColors) {
+          emit = emit || (Math.max(Math.abs(color.x - refcolor.x), Math.max(Math.abs(color.y - refcolor.y), Math.abs(color.z - refcolor.z))) <= refcolor.w);
+        }
+        val = emit ? FastMath.pow(Math.max(color.x, Math.max(color.y, color.z)), exp) : 0;
+        emittance.set(color.x * val, color.y * val, color.z * val);
+        break;
+      case INDEPENDENT_CHANNELS:
+        emittance.set(FastMath.pow(color.x, exp), FastMath.pow(color.y, exp), FastMath.pow(color.z, exp));
+        break;
+    }
+    emittance.scale(material.emittance * scene.emitterIntensity);
+  }
+
   private static double reassignTransmissivity(double from, double to, double other, double trans, double cap) {
     // Formula here derived algebraically from this system:
     // (cap - to_new)/(cap - other_new) = (from - to)/(from - other), (cap + to_new + other_new)/3 = trans
@@ -511,11 +536,12 @@ public class PathTracer implements RayTracer {
         double e = Math.abs(emitterRay.d.dot(emitterRay.getNormal()));
         e /= Math.max(distance * distance, 1);
         e *= pos.block.surfaceArea(face);
-        e *= emitterRay.getCurrentMaterial().emittance;
-        e *= scene.emitterIntensity;
         e *= scaler;
+        Vector3 emittance = new Vector3();
+        doEmittanceMapping(emittance, emitterRay.color, scene, emitterRay.getCurrentMaterial());
+        emittance.scale(e);
 
-        result.scaleAdd(e, emitterRay.color);
+        result.add(new Vector4(emittance, 0));
       }
     }
   }

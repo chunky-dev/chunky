@@ -2035,9 +2035,7 @@ public class MinecraftBlockProvider implements BlockProvider {
         return stairs(
           tag, Texture.redSandstoneSide, Texture.redSandstoneTop, Texture.redSandstoneBottom);
       case "magma_block": {
-        Block block = new MinecraftBlock(name, Texture.magma);
-        block.emittance = 0.6f;
-        return block;
+        return new MinecraftBlock(name, Texture.magma);
       }
       case "nether_wart_block":
         return new MinecraftBlock(name, Texture.netherWartBlock);

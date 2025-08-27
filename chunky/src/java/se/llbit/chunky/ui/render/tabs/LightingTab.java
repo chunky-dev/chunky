@@ -25,7 +25,9 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import se.llbit.chunky.renderer.EmitterMappingType;
 import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.SunSamplingStrategy;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -53,6 +55,9 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster skyIntensity;
   @FXML private DoubleAdjuster apparentSkyBrightness;
   @FXML private DoubleAdjuster emitterIntensity;
+  @FXML private VBox emitterSettings;
+  @FXML private ComboBox<EmitterMappingType> emitterMappingType;
+  @FXML private DoubleAdjuster emitterMappingExponent;
   @FXML private DoubleAdjuster sunIntensity;
   @FXML private CheckBox drawSun;
   @FXML private ComboBox<SunSamplingStrategy> sunSamplingStrategy;
@@ -105,7 +110,21 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
 
     enableEmitters.setTooltip(new Tooltip("Allow blocks to emit light based on their material settings."));
     enableEmitters.selectedProperty().addListener(
-      (observable, oldValue, newValue) -> scene.setEmittersEnabled(newValue));
+      (observable, oldValue, newValue) -> {
+        scene.setEmittersEnabled(newValue);
+        emitterSettings.setVisible(newValue);
+        emitterSettings.setManaged(newValue);
+      });
+    boolean showEmitterSettings = scene != null && scene.getEmittersEnabled();
+    emitterSettings.setVisible(showEmitterSettings);
+    emitterSettings.setManaged(showEmitterSettings);
+
+//    fancierTranslucency.selectedProperty()
+//      .addListener((observable, oldValue, newValue) -> {
+//        scene.setFancierTranslucency(newValue);
+//        transmissivityCap.setVisible(newValue);
+//        transmissivityCap.setManaged(newValue);
+//      });
 
     emitterIntensity.setName("Emitter intensity");
     emitterIntensity.setTooltip("Modifies the intensity of emitter light.");
@@ -113,6 +132,18 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     emitterIntensity.makeLogarithmic();
     emitterIntensity.clampMin();
     emitterIntensity.onValueChange(value -> scene.setEmitterIntensity(value));
+
+    emitterMappingType.getItems().addAll(EmitterMappingType.values());
+    emitterMappingType.getItems().remove(EmitterMappingType.NONE);
+    emitterMappingType.getSelectionModel().selectedItemProperty().addListener(
+      (observable, oldValue, newValue) -> scene.setEmitterMappingType(newValue));
+    emitterMappingType.setTooltip(new Tooltip("Determines how per-pixel light emission is computed."));
+
+    emitterMappingExponent.setName("Emitter mapping exponent");
+    emitterMappingExponent.setTooltip("Determines how much light is emitted from darker or lighter pixels.\nHigher values will result in darker pixels emitting less light.");
+    emitterMappingExponent.setRange(Scene.MIN_EMITTER_MAPPING_EXPONENT, Scene.MAX_EMITTER_MAPPING_EXPONENT);
+    emitterMappingExponent.clampMin();
+    emitterMappingExponent.onValueChange(value -> scene.setEmitterMappingExponent(value));
 
     emitterSamplingStrategy.getItems().addAll(EmitterSamplingStrategy.values());
     emitterSamplingStrategy.getSelectionModel().selectedItemProperty()
@@ -226,6 +257,8 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     skyIntensity.set(scene.sky().getSkyLight());
     apparentSkyBrightness.set(scene.sky().getApparentSkyLight());
     emitterIntensity.set(scene.getEmitterIntensity());
+    emitterMappingExponent.set(scene.getEmitterMappingExponent());
+    emitterMappingType.getSelectionModel().select(scene.getEmitterMappingType());
     sunIntensity.set(scene.sun().getIntensity());
     sunLuminosity.set(scene.sun().getLuminosity());
     apparentSunBrightness.set(scene.sun().getApparentBrightness());
