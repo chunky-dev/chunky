@@ -82,7 +82,7 @@ public class Triangle {
    *
    * @return <code>true</code> if the ray intersects the triangle
    */
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord) {
     double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Constants.OFFSET);
     double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Constants.OFFSET);
     double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Constants.OFFSET);

@@ -6,7 +6,7 @@ import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.log.Log;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.nbt.CompoundTag;
 
 /**
@@ -54,7 +54,7 @@ public abstract class UnfinalizedLegacyBlock extends Block {
   }
 
   @Override
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     Log.info("Intersecting a UnfinalizedLegacyBlock (" + block.name
         + "), which is supposed to be replaced");
     return block.intersect(ray, intersectionRecord, scene);

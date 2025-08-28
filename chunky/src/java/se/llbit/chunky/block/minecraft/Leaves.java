@@ -41,7 +41,7 @@ public class Leaves extends AbstractModelBlock {
   }
 
   @Override
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     Intersectable waterModel = null;
     boolean isWaterloggedFull = false;
     if (waterlogged) {
@@ -76,7 +76,7 @@ public class Leaves extends AbstractModelBlock {
         intersectionRecord.material = (scene.waterPlaneMaterial(ray.o.rScaleAdd(intersectionRecord.distance, ray.d)));
         intersectionRecord.material.getColor(intersectionRecord);
 
-        Ray2 testRay = new Ray2(ray);
+        Ray testRay = new Ray(ray);
         testRay.o.scaleAdd(intersectionRecord.distance, testRay.d);
         Vector3 shadeNormal = scene.getCurrentWaterShader().doWaterShading(testRay, intersectionRecord, scene.getAnimationTime());
         intersectionRecord.shadeN.set(shadeNormal);
@@ -104,7 +104,7 @@ public class Leaves extends AbstractModelBlock {
         intersectionRecord.flags = 0;
 
         if (intersectionRecord.n.y > 0) {
-          Ray2 testRay = new Ray2(ray);
+          Ray testRay = new Ray(ray);
           testRay.o.scaleAdd(intersectionRecord.distance, testRay.d);
           Vector3 shadeNormal = scene.getCurrentWaterShader().doWaterShading(testRay, intersectionRecord, scene.getAnimationTime());
           intersectionRecord.shadeN.set(shadeNormal);
@@ -123,7 +123,7 @@ public class Leaves extends AbstractModelBlock {
     }
   }
 
-  @Override public boolean isInside(Ray2 ray) {
+  @Override public boolean isInside(Ray ray) {
     return false;
   }
 }

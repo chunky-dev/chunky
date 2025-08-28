@@ -25,7 +25,7 @@ import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 /**
@@ -128,7 +128,7 @@ public class SkyCache {
    * @param ray Ray to calculate the incident light for
    * @return Incident light color (RGB)
    */
-  public Vector3 calcIncidentLight(Ray2 ray) {
+  public Vector3 calcIncidentLight(Ray ray) {
     double theta = FastMath.atan2(ray.d.z, ray.d.x);
     theta /= PI * 2;
     theta = ((theta % 1) + 1) % 1;
@@ -168,7 +168,7 @@ public class SkyCache {
    * Calculate the sky color for a pixel on the cache.
    */
   private Vector3 getSkyColorAt(int x, int y) {
-    Ray2 ray = new Ray2();
+    Ray ray = new Ray();
 
     double theta = ((double) x / skyResolution) * 2 * PI;
     double phi = ((double) y / skyResolution) * PI - PI / 2;

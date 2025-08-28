@@ -24,7 +24,7 @@ import se.llbit.chunky.resources.SolidColorTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 
 public class LightBlockModel extends AABBModel {
   public static final AABB[] aabb = { new AABB(0.125, 0.875, 0.125, 0.875, 0.125, 0.875) };
@@ -42,8 +42,8 @@ public class LightBlockModel extends AABBModel {
   }
 
   @Override
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
-    if ((ray.flags & Ray2.INDIRECT) != 0) {
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
+    if ((ray.flags & Ray.INDIRECT) != 0) {
       if (getBoxes()[0].closestIntersection(ray, intersectionRecord)) {
         SolidColorTexture.EMPTY.getColor(intersectionRecord);
         return true;

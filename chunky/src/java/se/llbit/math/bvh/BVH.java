@@ -23,7 +23,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.log.Log;
 import se.llbit.math.Intersectable;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.util.TaskTracker;
 
@@ -44,7 +44,7 @@ public interface BVH extends Intersectable {
    * @return {@code true} if there exists any intersection
    */
   @Override
-  boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random);
+  boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random);
 
   final class Factory {
 

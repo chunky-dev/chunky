@@ -53,7 +53,7 @@ public class LegacyWaterShader implements WaterShader {
    * Displace the normal using the water displacement map.
    */
   @Override
-  public Vector3 doWaterShading(Ray2 ray, IntersectionRecord intersectionRecord, double animationTime) {
+  public Vector3 doWaterShading(Ray ray, IntersectionRecord intersectionRecord, double animationTime) {
     int w = (1 << 4);
     double ox = (ray.o.x + offset.x) / scale.x;
     double oz = (ray.o.z + offset.y) / scale.y;

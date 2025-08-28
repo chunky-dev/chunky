@@ -41,7 +41,7 @@ import se.llbit.log.Log;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Matrix3;
 import se.llbit.math.QuickMath;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 import se.llbit.util.JsonSerializable;
@@ -523,7 +523,7 @@ public class Camera implements JsonSerializable {
    * @param x      normalized image coordinate [-0.5, 0.5]
    * @param y      normalized image coordinate [-0.5, 0.5]
    */
-  public void calcViewRay(Ray2 ray, Random random, double x, double y) {
+  public void calcViewRay(Ray ray, Random random, double x, double y) {
     projector.apply(x, y, random, ray.o, ray.d);
 
     ray.d.normalize();
@@ -542,7 +542,7 @@ public class Camera implements JsonSerializable {
    * @param x   normalized image coordinate [-0.5, 0.5]
    * @param y   normalized image coordinate [-0.5, 0.5]
    */
-  public void calcViewRay(Ray2 ray, double x, double y) {
+  public void calcViewRay(Ray ray, double x, double y) {
     projector.apply(x, y, ray.o, ray.d);
 
     ray.d.normalize();
@@ -713,8 +713,8 @@ public class Camera implements JsonSerializable {
     onViewChange();
   }
 
-  public void autoFocus(BiPredicate<Ray2, IntersectionRecord> traceInScene) {
-    Ray2 ray = new Ray2();
+  public void autoFocus(BiPredicate<Ray, IntersectionRecord> traceInScene) {
+    Ray ray = new Ray();
     IntersectionRecord intersectionRecord = new IntersectionRecord();
     if (!traceInScene.test(ray, intersectionRecord)) {
       setDof(Double.POSITIVE_INFINITY);
@@ -742,7 +742,7 @@ public class Camera implements JsonSerializable {
   /**
    * Update the argument ray to point toward the current target.
    */
-  public void getTargetDirection(Ray2 ray) {
+  public void getTargetDirection(Ray ray) {
     calcViewRay(ray, target.x, target.y);
   }
 

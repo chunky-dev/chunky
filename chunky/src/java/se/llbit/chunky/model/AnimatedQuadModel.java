@@ -6,7 +6,7 @@ import se.llbit.chunky.resources.AnimatedTexture;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.util.MinecraftPRNG;
 
@@ -37,7 +37,7 @@ public abstract class AnimatedQuadModel extends QuadModel {
   public abstract AnimatedTexture[] getTextures();
 
   @Override
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     boolean hit = false;
 
     Quad[] quads = getQuads();

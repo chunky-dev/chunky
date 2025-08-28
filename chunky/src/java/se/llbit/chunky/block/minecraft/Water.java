@@ -58,7 +58,7 @@ public class Water extends MinecraftBlockTranslucent {
     return other.isWater();
   }
 
-  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  @Override public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     boolean hit = WaterModel.intersect(ray, intersectionRecord, scene, data);
     if (hit) {
       intersectionRecord.material.getColor(intersectionRecord);
@@ -71,7 +71,7 @@ public class Water extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public boolean isInside(Ray2 ray) {
+  public boolean isInside(Ray ray) {
     if (isFullBlock()) {
       return true;
     } else {
@@ -82,14 +82,14 @@ public class Water extends MinecraftBlockTranslucent {
       if (iy > 1 - WaterModel.TOP_BLOCK_GAP) {
         return false;
       }
-      Ray2 testRay = new Ray2(new Vector3(ix, iy, iz), ray.d);
+      Ray testRay = new Ray(new Vector3(ix, iy, iz), ray.d);
       IntersectionRecord intersectionRecord = new IntersectionRecord();
       return WaterModel.isInside(testRay, intersectionRecord, data);
     }
   }
 
   public boolean isInside(double x, double y, double z) {
-    Ray2 ray = new Ray2();
+    Ray ray = new Ray();
     ray.o.set(x, y, z);
     return isInside(ray);
   }

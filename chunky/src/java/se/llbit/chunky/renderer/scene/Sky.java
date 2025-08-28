@@ -235,7 +235,7 @@ public class Sky implements JsonSerializable {
   /**
    * Calculate sky color for the ray, based on sky mode.
    */
-  private void getSkyColorInner(Ray2 ray, IntersectionRecord intersectionRecord) {
+  private void getSkyColorInner(Ray ray, IntersectionRecord intersectionRecord) {
     switch (mode) {
       case SOLID_COLOR: {
         intersectionRecord.color.set(color.x, color.y, color.z, 1);
@@ -344,7 +344,7 @@ public class Sky implements JsonSerializable {
   /**
    * Panoramic skymap color.
    */
-  public void getSkyColor(Ray2 ray, IntersectionRecord intersectionRecord, boolean addSun) {
+  public void getSkyColor(Ray ray, IntersectionRecord intersectionRecord, boolean addSun) {
     getSkyColorInner(ray, intersectionRecord);
     intersectionRecord.color.scale(skyEmittance);
     if (addSun) {
@@ -353,12 +353,12 @@ public class Sky implements JsonSerializable {
     intersectionRecord.color.w = 1;
   }
 
-  public void intersect(Ray2 ray, IntersectionRecord intersectionRecord) {
-    if (((ray.flags & Ray2.INDIRECT) != 0) && scene.sun.intersect(ray, intersectionRecord)) {
-      if (((ray.flags & Ray2.DIFFUSE) != 0) && scene.sunSamplingStrategy.doSunSampling()) {
+  public void intersect(Ray ray, IntersectionRecord intersectionRecord) {
+    if (((ray.flags & Ray.INDIRECT) != 0) && scene.sun.intersect(ray, intersectionRecord)) {
+      if (((ray.flags & Ray.DIFFUSE) != 0) && scene.sunSamplingStrategy.doSunSampling()) {
         return;
       }
-      if (((ray.flags & Ray2.SPECULAR) != 0) && !scene.sunSamplingStrategy.isDiffuseSun()) {
+      if (((ray.flags & Ray.SPECULAR) != 0) && !scene.sunSamplingStrategy.isDiffuseSun()) {
         return;
       }
     }

@@ -21,7 +21,7 @@ package se.llbit.chunky.block.minecraft;
 import se.llbit.chunky.model.minecraft.CauldronModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 
 public class LavaCauldron extends Cauldron {
 
@@ -31,7 +31,7 @@ public class LavaCauldron extends Cauldron {
   }
 
   @Override
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     return CauldronModel.intersectWithLava(ray, intersectionRecord, scene);
   }
 

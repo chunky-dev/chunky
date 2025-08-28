@@ -20,7 +20,7 @@ import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.math.Intersectable;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
 import se.llbit.util.Configurable;
 import se.llbit.util.HasControls;
@@ -70,7 +70,7 @@ public class CloudLayer implements Intersectable, Configurable, HasControls {
   }
 
   @Override
-  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene,
+  public boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene,
       Random random) {
     Pair<Boolean, Boolean> intersection = cloudIntersection(ray, intersectionRecord, scene);
     boolean hit = intersection.thing1;
@@ -98,7 +98,7 @@ public class CloudLayer implements Intersectable, Configurable, HasControls {
    * <code>pair.thing1</code>: <code>true</code> if the ray intersected a cloud.
    * <code>pair.thing2</code>: <code>true</code> if the ray origin is inside a cloud.
    */
-  private Pair<Boolean, Boolean> cloudIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  private Pair<Boolean, Boolean> cloudIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     double ox = ray.o.x + scene.origin.x;
     double oy = ray.o.y + scene.origin.y;
     double oz = ray.o.z + scene.origin.z;

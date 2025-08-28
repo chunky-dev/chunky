@@ -23,7 +23,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.AABB;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.primitive.Primitive;
 
 import java.util.ArrayList;
@@ -215,7 +215,7 @@ public abstract class BinaryBVH implements BVH {
      * @return {@code true} if there exists any intersection
      */
     @Override
-    public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
+    public boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
         boolean hit = false;
         int currentNode = 0;
         IntStack nodesToVisit = new IntArrayList(depth/2);
@@ -273,7 +273,7 @@ public abstract class BinaryBVH implements BVH {
      * Perform a fast AABB intersection with cached reciprocal direction. This is a branchless approach based on:
      * https://gamedev.stackexchange.com/a/146362
      */
-    public double quickAabbIntersect(Ray2 ray, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax, double rx, double ry, double rz) {
+    public double quickAabbIntersect(Ray ray, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax, double rx, double ry, double rz) {
         double tx1 = (xmin - ray.o.x) * rx;
         double tx2 = (xmax - ray.o.x) * rx;
 

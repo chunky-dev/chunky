@@ -25,7 +25,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.math.AABB;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
@@ -148,7 +148,7 @@ public class Box implements Primitive {
             new Vector2(uv.y, uv.z), material));
   }
 
-  @Override public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
+  @Override public boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
     // TODO Auto-generated method stub
     return false;
   }

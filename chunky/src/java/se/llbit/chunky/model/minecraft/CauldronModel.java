@@ -26,7 +26,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
@@ -367,7 +367,7 @@ public class CauldronModel {
           side, side
       };
 
-  public static boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, int level, Texture contentTexture, String materialName) {
+  public static boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene, int level, Texture contentTexture, String materialName) {
     boolean hit = false;
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
@@ -400,7 +400,7 @@ public class CauldronModel {
     return hit;
   }
 
-  public static boolean intersectWithWater(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, int level) {
+  public static boolean intersectWithWater(Ray ray, IntersectionRecord intersectionRecord, Scene scene, int level) {
     boolean hit = false;
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
@@ -418,7 +418,7 @@ public class CauldronModel {
     if (water != null && water.closestIntersection(ray, intersectionRecord)) {
       hit = true;
       intersectionRecord.setNormal(water.n);
-      Ray2 testRay = new Ray2(ray);
+      Ray testRay = new Ray(ray);
       testRay.o.scaleAdd(intersectionRecord.distance, testRay.d);
       Vector3 shadeNormal = scene.getCurrentWaterShader().doWaterShading(testRay, intersectionRecord, scene.getAnimationTime());
       intersectionRecord.shadeN.set(shadeNormal);
@@ -435,7 +435,7 @@ public class CauldronModel {
     return hit;
   }
 
-  public static boolean intersectWithLava(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  public static boolean intersectWithLava(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     boolean hit = false;
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];

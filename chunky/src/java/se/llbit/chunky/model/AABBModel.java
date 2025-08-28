@@ -65,7 +65,7 @@ public abstract class AABBModel implements BlockModel {
   }
 
   @Override
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     AABB[] boxes = getBoxes();
     Texture[][] textures = getTextures();
     UVMapping[][] mapping = getUVMapping();
@@ -174,7 +174,7 @@ public abstract class AABBModel implements BlockModel {
   }
 
   @Override
-  public boolean isInside(Ray2 ray) {
+  public boolean isInside(Ray ray) {
     return isInside(ray.o);
   }
 

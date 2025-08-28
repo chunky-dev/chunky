@@ -16,7 +16,7 @@ public class SimpleSphere {
     return distance < this.radius;
   }
 
-  public double intersect(Ray2 ray) {
+  public double intersect(Ray ray) {
     double t0;
     double t1;
 

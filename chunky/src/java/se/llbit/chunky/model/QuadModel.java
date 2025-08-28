@@ -24,7 +24,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
@@ -103,7 +103,7 @@ public abstract class QuadModel implements BlockModel {
   }
 
   @Override
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     boolean hit = false;
 
     Quad[] quads = getQuads();
@@ -164,7 +164,7 @@ public abstract class QuadModel implements BlockModel {
   }
 
   @Override
-  public boolean isInside(Ray2 ray) {
+  public boolean isInside(Ray ray) {
     if (!refractive) {
       return false;
     }

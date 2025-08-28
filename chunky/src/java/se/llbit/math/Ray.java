@@ -6,7 +6,7 @@ import se.llbit.chunky.world.Material;
 /**
  * The ray representation used for ray tracing.
  */
-public class Ray2 {
+public class Ray {
   public static final int DIFFUSE = 1;
   public static final int SPECULAR = 1 << 1;
   public static final int INDIRECT = 1 << 2;
@@ -16,21 +16,21 @@ public class Ray2 {
   private Material currentMedium = Air.INSTANCE;
   public int flags = 0;
 
-  public Ray2() {}
+  public Ray() {}
 
-  public Ray2(Ray2 ray) {
+  public Ray(Ray ray) {
     o.set(ray.o);
     d.set(ray.d);
     currentMedium = ray.currentMedium;
     flags = ray.flags;
   }
 
-  public Ray2(Vector3 origin, Vector3 direction) {
+  public Ray(Vector3 origin, Vector3 direction) {
     o.set(origin);
     d.set(direction);
   }
 
-  public void set(Ray2 other) {
+  public void set(Ray other) {
     o.set(other.o);
     d.set(other.d);
     currentMedium = other.currentMedium;

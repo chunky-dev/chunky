@@ -147,7 +147,7 @@ public class WaterModel {
     }
   }
 
-  public static boolean quickIntersect(Ray2 ray, IntersectionRecord intersectionRecord, int data) {
+  public static boolean quickIntersect(Ray ray, IntersectionRecord intersectionRecord, int data) {
     boolean hit = false;
 
     if (FULL_BLOCK_BOTTOM_SIDE.closestIntersection(ray, intersectionRecord)) {
@@ -214,7 +214,7 @@ public class WaterModel {
     return hit;
   }
 
-  public static boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, int data) {
+  public static boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene, int data) {
     boolean hit = false;
     
     int c0 = (0xF & (data >> CORNER_0)) % 8;
@@ -293,7 +293,7 @@ public class WaterModel {
         return true;
       }
       // Create a new ray at the intersection position to get the normal.
-      Ray2 testRay = new Ray2(ray);
+      Ray testRay = new Ray(ray);
       testRay.o.scaleAdd(intersectionRecord.distance, testRay.d);
       Vector3 shadeNormal = scene.getCurrentWaterShader().doWaterShading(testRay, intersectionRecord, scene.getAnimationTime());
       intersectionRecord.shadeN.set(shadeNormal);
@@ -319,7 +319,7 @@ public class WaterModel {
     }
   }
 
-  public static boolean isInside(Ray2 ray, IntersectionRecord intersectionRecord, int data) {
+  public static boolean isInside(Ray ray, IntersectionRecord intersectionRecord, int data) {
     if (quickIntersect(ray, intersectionRecord, data)) {
       return ray.d.dot(intersectionRecord.n) > 0;
     }

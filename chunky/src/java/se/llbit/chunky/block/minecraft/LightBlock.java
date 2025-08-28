@@ -25,7 +25,7 @@ import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 
 public class LightBlock extends MinecraftBlock {
 
@@ -50,7 +50,7 @@ public class LightBlock extends MinecraftBlock {
   }
 
   @Override
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     if (scene.getMode() == RenderMode.PREVIEW) {
       return PREVIEW_BLOCK_MODEL.intersect(ray, intersectionRecord, scene);
     }

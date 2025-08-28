@@ -40,8 +40,8 @@ public class PathTracer implements RayTracer {
    * Path trace the ray.
    */
   @Override public void trace(Scene scene, WorkerState state) {
-    Ray2 ray = state.ray;
-    ray.flags = Ray2.SPECULAR;
+    Ray ray = state.ray;
+    ray.flags = Ray.SPECULAR;
 
     ray.setCurrentMedium(scene.getWorldMaterial(ray));
     pathTrace(scene, state);
@@ -52,7 +52,7 @@ public class PathTracer implements RayTracer {
    */
   private static void pathTrace(Scene scene, WorkerState state) {
     final Random random = state.random;
-    final Ray2 ray = state.ray;
+    final Ray ray = state.ray;
 
     final Vector4 cumulativeColor = state.color;
     final Vector3 throughput = state.throughput;
@@ -94,7 +94,7 @@ public class PathTracer implements RayTracer {
 
         // Sun sampling
 
-        if (scene.sunSamplingStrategy.doSunSampling() && ((state.ray.flags & Ray2.DIFFUSE) != 0 || (state.intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0)) {
+        if (scene.sunSamplingStrategy.doSunSampling() && ((state.ray.flags & Ray.DIFFUSE) != 0 || (state.intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0)) {
           state.sampleRay.set(ray);
           scene.sun.getRandomSunDirection(state.sampleRay.d, state.random);
 
@@ -134,7 +134,7 @@ public class PathTracer implements RayTracer {
           // travelled through glass or other materials between air gaps.
           // However, the results are probably close enough to not be distracting,
           // so this seems like a reasonable approximation.
-          Ray2 atmos = state.sampleRay;
+          Ray atmos = state.sampleRay;
           double offset = scene.fog.sampleGroundScatterOffset(ray, intersectionRecord.distance, ox, od, random);
           atmos.o.scaleAdd(offset, od, ox);
           scene.sun.getRandomSunDirection(atmos.d, random);
@@ -154,7 +154,7 @@ public class PathTracer implements RayTracer {
 
         if (scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE
             && scene.getEmitterGrid() != null
-            && ((state.ray.flags & Ray2.DIFFUSE) != 0
+            && ((state.ray.flags & Ray.DIFFUSE) != 0
                 || (state.intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0)) {
           switch (scene.emitterSamplingStrategy) {
             case ONE:
@@ -163,7 +163,7 @@ public class PathTracer implements RayTracer {
               if (pos != null) {
                 sampleColor.scaleAdd(FastMath.PI, sampleEmitter(scene, ray, intersectionRecord, pos, random));
 
-                if (scene.isPreventNormalEmitterWithSampling() && (prevFlags & Ray2.INDIRECT) != 0) {
+                if (scene.isPreventNormalEmitterWithSampling() && (prevFlags & Ray.INDIRECT) != 0) {
                   emittance.set(0);
                 }
               }
@@ -176,7 +176,7 @@ public class PathTracer implements RayTracer {
               for (Grid.EmitterPosition pos : positions) {
                 sampleColor.scaleAdd(sampleScaler, sampleEmitter(scene, ray, intersectionRecord, pos, random));
 
-                if (scene.isPreventNormalEmitterWithSampling() && (prevFlags & Ray2.INDIRECT) != 0) {
+                if (scene.isPreventNormalEmitterWithSampling() && (prevFlags & Ray.INDIRECT) != 0) {
                   emittance.set(0);
                 }
               }
@@ -261,7 +261,7 @@ public class PathTracer implements RayTracer {
     if (scene.fog.getFogMode() == FogMode.UNIFORM) {
       scene.fog.addSkyFog(state.ray, state.intersectionRecord, null);
     } else if (scene.fog.getFogMode() == FogMode.LAYERED) {
-      Ray2 atmos = state.sampleRay;
+      Ray atmos = state.sampleRay;
       double offset = scene.fog.sampleSkyScatterOffset(scene, state.ray, state.random);
       atmos.o.scaleAdd(offset, od, ox);
       scene.sun.getRandomSunDirection(atmos.d, state.random);
@@ -270,8 +270,8 @@ public class PathTracer implements RayTracer {
     }
   }
 
-  private static void sampleEmitterFace(Scene scene, Ray2 ray, IntersectionRecord intersectionRecord, Grid.EmitterPosition pos, int face, Vector4 result, double scaler, Random random) {
-    Ray2 emitterRay = new Ray2(ray);
+  private static void sampleEmitterFace(Scene scene, Ray ray, IntersectionRecord intersectionRecord, Grid.EmitterPosition pos, int face, Vector4 result, double scaler, Random random) {
+    Ray emitterRay = new Ray(ray);
 
     pos.sampleFace(face, emitterRay.d, random);
     emitterRay.d.sub(emitterRay.o);
@@ -315,7 +315,7 @@ public class PathTracer implements RayTracer {
    * @param random RNG
    * @return The contribution of the emitter
    */
-  private static Vector4 sampleEmitter(Scene scene, Ray2 ray, IntersectionRecord intersectionRecord, Grid.EmitterPosition pos, Random random) {
+  private static Vector4 sampleEmitter(Scene scene, Ray ray, IntersectionRecord intersectionRecord, Grid.EmitterPosition pos, Random random) {
     Vector4 result = new Vector4();
     result.set(0, 0, 0, 1);
 

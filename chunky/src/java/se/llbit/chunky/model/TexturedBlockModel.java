@@ -21,7 +21,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.QuickMath;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 /**
@@ -55,7 +55,7 @@ public class TexturedBlockModel extends AABBModel {
    *
    * @param ray ray to test
    */
-  public static void getIntersectionColor(Ray2 ray, IntersectionRecord intersectionRecord) {
+  public static void getIntersectionColor(Ray ray, IntersectionRecord intersectionRecord) {
     if (intersectionRecord.material == Air.INSTANCE) {
       intersectionRecord.color.x = 1;
       intersectionRecord.color.y = 1;
@@ -72,7 +72,7 @@ public class TexturedBlockModel extends AABBModel {
    *
    * @param ray ray to test
    */
-  private static void getTextureCoordinates(Ray2 ray, IntersectionRecord intersectionRecord) {
+  private static void getTextureCoordinates(Ray ray, IntersectionRecord intersectionRecord) {
     int bx = (int) QuickMath.floor(ray.o.x);
     int by = (int) QuickMath.floor(ray.o.y);
     int bz = (int) QuickMath.floor(ray.o.z);

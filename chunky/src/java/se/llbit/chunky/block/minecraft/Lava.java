@@ -56,7 +56,7 @@ public class Lava extends MinecraftBlockTranslucent {
     return (this.data & (1 << FULL_WATER_BLOCK)) != 0;
   }
 
-  @Override public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  @Override public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     if (isFullBlock()) {
       if (fullBlock.closestIntersection(ray, intersectionRecord)) {
         texture.getColor(intersectionRecord);

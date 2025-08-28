@@ -96,7 +96,7 @@ public class AABB implements Intersectable {
    *
    * @return <code>true</code> if the ray intersects this AABB
    */
-  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
+  public boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
     double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Constants.OFFSET);
     double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Constants.OFFSET);
     double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Constants.OFFSET);
@@ -190,7 +190,7 @@ public class AABB implements Intersectable {
    *
    * @return {@code true} if there is an intersection
    */
-  public double quickIntersect(Ray2 ray) {
+  public double quickIntersect(Ray ray) {
     double t1, t2;
     double tNear = Double.NEGATIVE_INFINITY;
     double tFar = Double.POSITIVE_INFINITY;
@@ -257,7 +257,7 @@ public class AABB implements Intersectable {
     }
   }
 
-  public DoubleDoubleImmutablePair intersectionDistance(Ray2 ray) {
+  public DoubleDoubleImmutablePair intersectionDistance(Ray ray) {
     double t1, t2;
     double tNear = Double.NEGATIVE_INFINITY;
     double tFar = Double.POSITIVE_INFINITY;
@@ -348,7 +348,7 @@ public class AABB implements Intersectable {
    *
    * @return {@code true} if there is an intersection
    */
-  public boolean hitTest(Ray2 ray) {
+  public boolean hitTest(Ray ray) {
     double t1, t2;
     double tNear = Double.NEGATIVE_INFINITY;
     double tFar = Double.POSITIVE_INFINITY;

@@ -347,7 +347,7 @@ public class Octree implements Intersectable {
    * @param ray Ray that will be moved to the boundary of the octree. The origin, distance and normals will be modified.
    * @return {@code false} if the ray doesn't intersect the octree.
    */
-  private double enterOctree(Ray2 ray, IntersectionRecord intersectionRecord) {
+  private double enterOctree(Ray ray, IntersectionRecord intersectionRecord) {
     double nx = 0, ny = 0, nz = 0;
     double octree_size = 1 << getDepth();
 
@@ -477,7 +477,7 @@ public class Octree implements Intersectable {
    * @return {@code false} if the ray did not hit the geometry
    */
   @Override
-  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
+  public boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
     BlockPalette palette = scene.getPalette();
     double distance = 0;
     IntIntMutablePair typeAndLevel = new IntIntMutablePair(0, 0);
@@ -492,7 +492,7 @@ public class Octree implements Intersectable {
       -ray.o.z * invDir.z
     );
     Vector3 pos = new Vector3(ray.o);
-    Ray2 testRay = new Ray2(ray);
+    Ray testRay = new Ray(ray);
 
     // Check if we are in-bounds
     if (!isInside(ray.o)) {
@@ -633,7 +633,7 @@ public class Octree implements Intersectable {
    * @param by block y coordinate
    * @param bz block z coordinate
    */
-  public double exitBlock(Ray2 ray, IntersectionRecord intersectionRecord, int bx, int by, int bz) {
+  public double exitBlock(Ray ray, IntersectionRecord intersectionRecord, int bx, int by, int bz) {
     int nx = 0;
     int ny = 0;
     int nz = 0;

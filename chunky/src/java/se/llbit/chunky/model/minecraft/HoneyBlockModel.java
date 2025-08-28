@@ -133,7 +133,7 @@ public class HoneyBlockModel extends QuadModel {
   }
 
   @Override
-  public boolean isInside(Ray2 ray) {
+  public boolean isInside(Ray ray) {
     return true;
   }
 }

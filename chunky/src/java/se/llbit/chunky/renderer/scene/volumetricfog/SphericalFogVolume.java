@@ -52,7 +52,7 @@ public class SphericalFogVolume extends DiscreteFogVolume {
   }
 
   @Override
-  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
+  public boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
     double t0;
     double t1;
 

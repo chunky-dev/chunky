@@ -4,7 +4,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Constants;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
 
 public class Tint {
@@ -58,7 +58,7 @@ public class Tint {
     System.arraycopy(tint, 0, this.tint, 0, 3);
   }
 
-  private float[] getTintColor(Ray2 ray, Scene scene) {
+  private float[] getTintColor(Ray ray, Scene scene) {
     switch (type) {
       case NONE:
         return null;
@@ -91,7 +91,7 @@ public class Tint {
   /**
    * Tint a color array with the tint option of this Tint object.
    */
-  public void tint(float[] color, Ray2 ray, Scene scene) {
+  public void tint(float[] color, Ray ray, Scene scene) {
     float[] tintColor = this.getTintColor(ray, scene);
     if (tintColor != null) {
       color[0] *= tintColor[0];
@@ -103,7 +103,7 @@ public class Tint {
   /**
    * Tint a color vector with the tint option of this Tint object.
    */
-  public void tint(Vector4 color, Ray2 ray, Scene scene) {
+  public void tint(Vector4 color, Ray ray, Scene scene) {
     float[] tintColor = this.getTintColor(ray, scene);
     if (tintColor != null) {
       color.x *= tintColor[0];

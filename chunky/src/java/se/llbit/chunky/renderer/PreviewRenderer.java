@@ -22,7 +22,7 @@ import se.llbit.chunky.renderer.scene.RayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.util.TaskTracker;
 
 public class PreviewRenderer extends TileBasedRenderer {
@@ -72,7 +72,7 @@ public class PreviewRenderer extends TileBasedRenderer {
     double halfWidth = fullWidth / (2.0 * fullHeight);
     double invHeight = 1.0 / fullHeight;
 
-    Ray2 target = new Ray2();
+    Ray target = new Ray();
     IntersectionRecord intersectionRecord = new IntersectionRecord();
     boolean hit = scene.traceTarget(target, intersectionRecord);
     int tx = (int) Math.floor(target.o.x + intersectionRecord.n.x * -2 * Constants.OFFSET);

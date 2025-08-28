@@ -17,7 +17,7 @@
 package se.llbit.chunky.renderer.scene.simulatedsky;
 
 import se.llbit.chunky.renderer.scene.Sun;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.util.Configurable;
 import se.llbit.util.HasControls;
@@ -34,7 +34,7 @@ public interface SimulatedSky extends Configurable, HasControls {
   /**
    * Calculate the sky color for a given ray.
    */
-  Vector3 calcIncidentLight(Ray2 ray);
+  Vector3 calcIncidentLight(Ray ray);
 
   /**
    * Get the friendly name.

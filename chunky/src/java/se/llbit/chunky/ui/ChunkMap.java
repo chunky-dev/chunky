@@ -646,7 +646,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
     Vector3 o = new Vector3(camera.getPosition());
 
-    Ray2 ray = new Ray2();
+    Ray ray = new Ray();
     Vector3[] corners = new Vector3[4];
 
     camera.calcViewRay(ray, -halfWidth, -0.5);
@@ -697,7 +697,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
     double halfWidth = width / (2.0 * height);
 
-    Ray2 ray = new Ray2();
+    Ray ray = new Ray();
 
     Vector3[] direction = new Vector3[4];
     Vector2[] bounds = new Vector2[4];
@@ -788,7 +788,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
    *
    * <p>The result is given in chunk coordinates.
    */
-  private static Vector2 findMapPos(Ray2 ray, ChunkView cv) {
+  private static Vector2 findMapPos(Ray ray, ChunkView cv) {
     if (ray.d.y < 0 && ray.o.y > 63 || ray.d.y > 0 && ray.o.y < 63) {
       // Ray intersects ground.
       double d = (63 - ray.o.y) / ray.d.y;

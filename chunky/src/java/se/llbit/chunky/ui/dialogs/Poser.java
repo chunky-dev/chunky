@@ -38,7 +38,7 @@ import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.render.tabs.EntitiesTab;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.bvh.BVH;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Matrix3;
@@ -191,7 +191,7 @@ public class Poser extends Stage implements Initializable {
   private void redraw() {
     buildBvh();
     GraphicsContext gc = preview.getGraphicsContext2D();
-    Ray2 ray = new Ray2();
+    Ray ray = new Ray();
     IntersectionRecord intersectionRecord = new IntersectionRecord();
     double aspect = width / (double) height;
     double fovTan = Camera.clampedFovTan(70);

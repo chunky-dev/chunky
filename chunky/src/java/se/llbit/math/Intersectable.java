@@ -30,13 +30,13 @@ public interface Intersectable {
    *
    * @return {@code true} if there exists any intersection
    */
-  boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random);
+  boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random);
 
-  default boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  default boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     return closestIntersection(ray, intersectionRecord, scene, null);
   }
 
-  default boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord) {
+  default boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord) {
     return closestIntersection(ray, intersectionRecord, null);
   }
 }

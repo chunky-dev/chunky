@@ -20,7 +20,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.AABB;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 import java.util.Random;
@@ -55,7 +55,7 @@ public class MutableAABB implements Primitive {
    *
    * @return {@code true} if there is an intersection
    */
-  public boolean hitTest(Ray2 ray) {
+  public boolean hitTest(Ray ray) {
     double t1, t2;
     double tNear = Double.NEGATIVE_INFINITY;
     double tFar = Double.POSITIVE_INFINITY;
@@ -118,7 +118,7 @@ public class MutableAABB implements Primitive {
     return tNear < tFar + Constants.EPSILON && tFar > 0;
   }
 
-  @Override public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
+  @Override public boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
     double t1, t2;
     double tNear = Double.NEGATIVE_INFINITY;
     double tFar = Double.POSITIVE_INFINITY;

@@ -18,7 +18,7 @@ public abstract class Block extends Material {
   /**
    * Set to true if there is a local intersection model for this block. If this is set to
    * <code>false</code> (default), this block is assumed to be an opaque cube block and {@link
-   * #intersect(Ray2, IntersectionRecord, Scene)} will never be called.
+   * #intersect(Ray, IntersectionRecord, Scene)} will never be called.
    */
   public boolean localIntersect = false;
 
@@ -65,7 +65,7 @@ public abstract class Block extends Material {
    * @param scene Scene
    * @return True if the ray hit this block, false if not
    */
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     return false;
   }
 
@@ -133,7 +133,7 @@ public abstract class Block extends Material {
     return null;
   }
 
-  public boolean isInside(Ray2 ray) {
+  public boolean isInside(Ray ray) {
     double ix = ray.o.x - QuickMath.floor(ray.o.x);
     double iy = ray.o.y - QuickMath.floor(ray.o.y);
     double iz = ray.o.z - QuickMath.floor(ray.o.z);

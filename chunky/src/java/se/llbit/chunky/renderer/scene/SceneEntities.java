@@ -75,7 +75,7 @@ public class SceneEntities implements Intersectable {
   }
 
   @Override
-  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
+  public boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
     boolean hit = bvh.closestIntersection(ray, intersectionRecord, scene);
 
     if (renderActors) {

@@ -10,7 +10,7 @@ import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.json.JsonObject;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 import java.util.Random;
@@ -28,7 +28,7 @@ public class LayerFogVolume extends ContinuousFogVolume {
   private double lowerBounds = 42;
 
   @Override
-  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
+  public boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
     double actualLowerBounds = (useLowerBounds) ? lowerBounds : Double.NEGATIVE_INFINITY;
     double actualUpperBounds = (useUpperBounds) ? upperBounds : Double.POSITIVE_INFINITY;
 

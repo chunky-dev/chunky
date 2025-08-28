@@ -78,7 +78,7 @@ public class TexturedTriangle implements Primitive {
     bounds = AABB.bounds(c1, c2, c3);
   }
 
-  @Override public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
+  @Override public boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
     // Möller-Trumbore triangle intersection algorithm!
     Vector3 pvec = new Vector3();
     Vector3 qvec = new Vector3();

@@ -688,7 +688,7 @@ public class Scene implements Configurable, Refreshable {
    * @param ray ray to test against scene
    * @return <code>true</code> if an intersection was found
    */
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Random random) {
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Random random) {
     boolean hit = false;
 
     if (Double.isNaN(ray.d.x) || Double.isNaN(ray.d.y) || Double.isNaN(ray.d.z) ||
@@ -717,7 +717,7 @@ public class Scene implements Configurable, Refreshable {
       if (intersectionTest.material == Air.INSTANCE) {
         Vector3 o = ray.o.rScaleAdd(intersectionTest.distance, ray.d);
         o.scaleAdd(-Constants.OFFSET, intersectionTest.n);
-        intersectionTest.material = getWorldMaterial(new Ray2(o, ray.d));
+        intersectionTest.material = getWorldMaterial(new Ray(o, ray.d));
       }
       intersectionRecord.distance = intersectionTest.distance;
       intersectionRecord.setNormal(intersectionTest);
@@ -764,7 +764,7 @@ public class Scene implements Configurable, Refreshable {
           if (intersectionTest.material == Air.INSTANCE) {
             Vector3 o = ray.o.rScaleAdd(intersectionTest.distance, ray.d);
             o.scaleAdd(-Constants.OFFSET, intersectionTest.n);
-            intersectionTest.material = getWorldMaterial(new Ray2(o, ray.d));
+            intersectionTest.material = getWorldMaterial(new Ray(o, ray.d));
           }
           intersectionRecord.distance = intersectionTest.distance;
           intersectionRecord.setNormal(intersectionTest);
@@ -782,7 +782,7 @@ public class Scene implements Configurable, Refreshable {
     return hit;
   }
 
-  private boolean waterPlaneIntersection(Ray2 ray, IntersectionRecord intersectionRecord) {
+  private boolean waterPlaneIntersection(Ray ray, IntersectionRecord intersectionRecord) {
     double t = (getEffectiveWaterPlaneHeight() - ray.o.y - origin.y) / ray.d.y;
     if (getWaterPlaneChunkClip()) {
       Vector3 pos = ray.o.rScaleAdd(t, ray.d);
@@ -793,7 +793,7 @@ public class Scene implements Configurable, Refreshable {
     if (t > 0) {
       intersectionRecord.distance = t;
       // Create a new ray at the intersection position to get the normal.
-      Ray2 testRay = new Ray2(ray);
+      Ray testRay = new Ray(ray);
       testRay.o.scaleAdd(intersectionRecord.distance, testRay.d);
       Vector3 shadeNormal = currentWaterShader.doWaterShading(testRay, intersectionRecord, animationTime);
       intersectionRecord.shadeN.set(shadeNormal);
@@ -1702,7 +1702,7 @@ public class Scene implements Configurable, Refreshable {
    *
    * @return {@code true} if the ray hit something
    */
-  public boolean traceTarget(Ray2 ray, IntersectionRecord intersectionRecord) {
+  public boolean traceTarget(Ray ray, IntersectionRecord intersectionRecord) {
     camera.getTargetDirection(ray);
     ray.o.x -= origin.x;
     ray.o.y -= origin.y;
@@ -1741,7 +1741,7 @@ public class Scene implements Configurable, Refreshable {
    * @return {@code null} if the camera is not aiming at some intersectable object
    */
   public Vector3 getTargetPosition() {
-    Ray2 ray = new Ray2();
+    Ray ray = new Ray();
     IntersectionRecord intersectionRecord = new IntersectionRecord();
     if (!traceTarget(ray, intersectionRecord)) {
       return null;
@@ -1753,7 +1753,7 @@ public class Scene implements Configurable, Refreshable {
   }
 
   public Material getTargetMaterial(double x, double y) {
-    Ray2 ray = new Ray2();
+    Ray ray = new Ray();
 
     camera.calcViewRay(ray, x, y);
     ray.o.x -= origin.x;
@@ -2443,7 +2443,7 @@ public class Scene implements Configurable, Refreshable {
         return "No chunks loaded!";
       } else {
         StringBuilder buf = new StringBuilder();
-        Ray2 ray = new Ray2();
+        Ray ray = new Ray();
         IntersectionRecord intersectionRecord = new IntersectionRecord();
         if (traceTarget(ray, intersectionRecord) && intersectionRecord.material instanceof Block) {
           Block block = (Block) intersectionRecord.material;
@@ -2624,7 +2624,7 @@ public class Scene implements Configurable, Refreshable {
     return saveSnapshots;
   }
 
-  public Material getWorldMaterial(Ray2 ray) {
+  public Material getWorldMaterial(Ray ray) {
     int x = (int) QuickMath.floor(ray.o.x);
     int y = (int) QuickMath.floor(ray.o.y);
     int z = (int) QuickMath.floor(ray.o.z);
@@ -2653,7 +2653,7 @@ public class Scene implements Configurable, Refreshable {
     }
   }
 
-  public boolean isInWater(Ray2 ray) {
+  public boolean isInWater(Ray ray) {
     if (isWaterPlaneEnabled() && ray.o.y + origin.y < getEffectiveWaterPlaneHeight()) {
       if (getWaterPlaneChunkClip()) {
         if (!isChunkLoaded((int)Math.floor(ray.o.x), (int)Math.floor(ray.o.y), (int)Math.floor(ray.o.z))) {

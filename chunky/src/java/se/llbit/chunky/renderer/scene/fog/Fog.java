@@ -12,7 +12,7 @@ import se.llbit.json.JsonValue;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.QuickMath;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 import se.llbit.util.JsonSerializable;
@@ -115,7 +115,7 @@ public final class Fog implements JsonSerializable {
     return dy;
   }
 
-  public void addSkyFog(Ray2 ray, IntersectionRecord intersectionRecord, Vector4 scatterLight) {
+  public void addSkyFog(Ray ray, IntersectionRecord intersectionRecord, Vector4 scatterLight) {
     if (mode == FogMode.UNIFORM) {
       if (uniformDensity > 0.0) {
         double fog;
@@ -138,7 +138,7 @@ public final class Fog implements JsonSerializable {
     }
   }
 
-  public void addGroundFog(Ray2 ray, Vector4 fogColor1, Vector4 color, Vector3 emittance, Vector3 ox, Vector3 od, double airDistance, Vector4 scatterLight, double scatterOffset) {
+  public void addGroundFog(Ray ray, Vector4 fogColor1, Vector4 color, Vector3 emittance, Vector3 ox, Vector3 od, double airDistance, Vector4 scatterLight, double scatterOffset) {
     if (mode == FogMode.UNIFORM) {
       double fogDensity = uniformDensity * EXTINCTION_FACTOR;
       double extinction = Math.exp(-airDistance * fogDensity);
@@ -182,7 +182,7 @@ public final class Fog implements JsonSerializable {
     }
   }
 
-  public double sampleGroundScatterOffset(Ray2 ray, double airDistance, Vector3 ox, Vector3 od, Random random) {
+  public double sampleGroundScatterOffset(Ray ray, double airDistance, Vector3 ox, Vector3 od, Random random) {
     if (mode == FogMode.UNIFORM) {
       return QuickMath.clamp(airDistance * random.nextFloat(), Constants.EPSILON, airDistance - Constants.EPSILON);
     } else if (mode == FogMode.LAYERED) {
@@ -195,7 +195,7 @@ public final class Fog implements JsonSerializable {
     }
   }
 
-  public double sampleSkyScatterOffset(Scene scene, Ray2 ray, Random random) {
+  public double sampleSkyScatterOffset(Scene scene, Ray ray, Random random) {
     if (mode == FogMode.LAYERED) {
       double dy = ray.d.y;
       double y1 = ray.o.y;

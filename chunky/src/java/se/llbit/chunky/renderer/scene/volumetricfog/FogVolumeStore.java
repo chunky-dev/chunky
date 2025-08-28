@@ -153,7 +153,7 @@ public class FogVolumeStore implements Intersectable, JsonSerializable {
   }
 
   @Override
-  public boolean closestIntersection(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
+  public boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
     boolean hit = fogVolumeBVH.closestIntersection(ray, intersectionRecord, scene, random);
 
     IntersectionRecord intersectionTest = new IntersectionRecord();

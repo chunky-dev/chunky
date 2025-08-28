@@ -20,7 +20,7 @@ import java.util.Random;
 
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Constants;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 /**
@@ -56,7 +56,7 @@ public class ParallelProjector implements Projector {
     return worldDiagonalSize / 2;
   }
 
-  public static void fixRay(Ray2 ray, Scene scene) {
+  public static void fixRay(Ray ray, Scene scene) {
     // When in parallel projection, push the ray origin back so the
     // ray start outside the octree to prevent ray spawning inside some blocks
     int limit = (1 << scene.getWorldOctree().getDepth());

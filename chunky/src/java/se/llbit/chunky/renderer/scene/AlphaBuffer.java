@@ -5,7 +5,7 @@ import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.projection.ParallelProjector;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.log.Log;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.util.TaskTracker;
 
 import java.nio.ByteBuffer;
@@ -95,7 +95,7 @@ public class AlphaBuffer {
    * Compute the alpha channel based on sky visibility.
    */
   public void computeAlpha(Scene scene, int x, int y, WorkerState state) {
-    Ray2 ray = state.ray;
+    Ray ray = state.ray;
     double halfWidth = scene.width / (2.0 * scene.height);
     double invHeight = 1.0 / scene.height;
 

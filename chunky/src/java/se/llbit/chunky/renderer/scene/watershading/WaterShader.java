@@ -17,13 +17,13 @@
 package se.llbit.chunky.renderer.scene.watershading;
 
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.util.Configurable;
 import se.llbit.util.HasControls;
 
 public interface WaterShader extends Configurable, HasControls {
-  Vector3 doWaterShading(Ray2 ray, IntersectionRecord intersectionRecord, double animationTime);
+  Vector3 doWaterShading(Ray ray, IntersectionRecord intersectionRecord, double animationTime);
 
   WaterShader clone();
 }

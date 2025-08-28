@@ -9,7 +9,7 @@ import java.util.Random;
 @PluginApi
 public interface BlockModel {
 
-  boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene);
+  boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene);
 
   int faceCount();
 
@@ -17,5 +17,5 @@ public interface BlockModel {
 
   double faceSurfaceArea(int face);
 
-  boolean isInside(Ray2 ray);
+  boolean isInside(Ray ray);
 }

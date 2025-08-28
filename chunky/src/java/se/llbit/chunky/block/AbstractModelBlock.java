@@ -54,7 +54,7 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
   }
 
   @Override
-  public boolean intersect(Ray2 ray, IntersectionRecord intersectionRecord, Scene scene) {
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     Intersectable waterModel = null;
     boolean isWaterloggedFull = false;
     if (waterlogged) {
@@ -132,7 +132,7 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
         Air.INSTANCE.getColor(intersectionRecord);
         intersectionRecord.material = Air.INSTANCE;
 
-        Ray2 testRay = new Ray2(ray);
+        Ray testRay = new Ray(ray);
         testRay.o.scaleAdd(intersectionRecord.distance, testRay.d);
         Vector3 shadeNormal = scene.getCurrentWaterShader().doWaterShading(testRay, intersectionRecord, scene.getAnimationTime());
         intersectionRecord.shadeN.set(shadeNormal);
@@ -167,7 +167,7 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
         intersectionRecord.flags = 0;
 
         if (intersectionRecord.n.y > 0) {
-          Ray2 testRay = new Ray2(ray);
+          Ray testRay = new Ray(ray);
           testRay.o.scaleAdd(intersectionRecord.distance, testRay.d);
           Vector3 shadeNormal = scene.getCurrentWaterShader().doWaterShading(testRay, intersectionRecord, scene.getAnimationTime());
           intersectionRecord.shadeN.set(shadeNormal);
@@ -180,7 +180,7 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
   }
 
   @Override
-  public boolean isInside(Ray2 ray) {
+  public boolean isInside(Ray ray) {
     return model.isInside(ray);
   }
 }

@@ -21,7 +21,7 @@ import se.llbit.chunky.block.MinecraftBlock;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
-import se.llbit.math.Ray2;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
@@ -34,8 +34,8 @@ public class PreviewRayTracer implements RayTracer {
    * Do a quick preview ray tracing for the current ray.
    */
   @Override public void trace(Scene scene, WorkerState state) {
-    Ray2 ray = state.ray;
-    ray.flags |= Ray2.SPECULAR | Ray2.INDIRECT;
+    Ray ray = state.ray;
+    ray.flags |= Ray.SPECULAR | Ray.INDIRECT;
     ray.setCurrentMedium(scene.getWorldMaterial(ray));
 
     IntersectionRecord intersectionRecord = state.intersectionRecord;
@@ -53,7 +53,7 @@ public class PreviewRayTracer implements RayTracer {
         if (intersectionRecord.material.scatter(ray, intersectionRecord, scene, state.emittance, state.random)) {
           ray.setCurrentMedium(intersectionRecord.material);
         }
-        if ((ray.flags & Ray2.DIFFUSE) != 0) {
+        if ((ray.flags & Ray.DIFFUSE) != 0) {
           scene.sun.flatShading(intersectionRecord);
           break;
         } else {
@@ -78,7 +78,7 @@ public class PreviewRayTracer implements RayTracer {
    * @return occlusion value (1 = occluded, 0 = transparent)
    */
   public static double skyOcclusion(Scene scene, WorkerState state) {
-    Ray2 ray = state.ray;
+    Ray ray = state.ray;
     IntersectionRecord intersectionRecord = state.intersectionRecord;
     double occlusion = 1.0;
     while (occlusion > Constants.EPSILON) {
@@ -114,7 +114,7 @@ public class PreviewRayTracer implements RayTracer {
    * Changes colors for chunks inside the octree and submerged scenes.
    * Use only in preview mode - the ray should hit the sky in a real render.
    */
-  private static boolean mapIntersection(Scene scene, Ray2 ray, IntersectionRecord intersectionRecord) {
+  private static boolean mapIntersection(Scene scene, Ray ray, IntersectionRecord intersectionRecord) {
     if (ray.d.y < 0) { // ray going below horizon
       double t = (scene.yMin - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < intersectionRecord.distance) {
