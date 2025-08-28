@@ -334,7 +334,7 @@ public class CloudLayer implements Intersectable, Configurable, HasControls {
       scene.refresh();
     });
     scaleZ.valueProperty().addListener((observable, oldValue, newValue) -> {
-      this.scaleZ.set(oldValue.doubleValue());
+      this.scaleZ.set(newValue.doubleValue());
       scene.refresh();
     });
 

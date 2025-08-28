@@ -116,10 +116,9 @@ public class FogTab extends RenderControlsTab implements Initializable {
     });
 
     cloudLayerTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+      layerSpecificControls.getChildren().clear();
       if (newValue != null) {
         layerSpecificControls.getChildren().add(scene.getCloudLayers().get(cloudLayerTable.getSelectionModel().getSelectedIndex()).getControls(this));
-      } else {
-        layerSpecificControls.getChildren().clear();
       }
     });
     cloudLayerTable.refresh();
