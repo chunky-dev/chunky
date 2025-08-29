@@ -386,8 +386,8 @@ public class CauldronModel {
       hit = true;
       intersectionRecord.setNormal(water.n);
       if (ray.d.dot(water.n) > 0) {
-        intersectionRecord.material = Air.INSTANCE;
-        Air.INSTANCE.getColor(intersectionRecord);
+        intersectionRecord.material = scene.waterPlaneMaterial(ray.o.rScaleAdd(intersectionRecord.distance, ray.d));
+        intersectionRecord.material.getColor(intersectionRecord);
         intersectionRecord.n.scale(-1);
         intersectionRecord.shadeN.scale(-1);
       } else {
@@ -423,8 +423,8 @@ public class CauldronModel {
       Vector3 shadeNormal = scene.getCurrentWaterShader().doWaterShading(testRay, intersectionRecord, scene.getAnimationTime());
       intersectionRecord.shadeN.set(shadeNormal);
       if (ray.d.dot(water.n) > 0) {
-        intersectionRecord.material = Air.INSTANCE;
-        Air.INSTANCE.getColor(intersectionRecord);
+        intersectionRecord.material = scene.waterPlaneMaterial(testRay.o);
+        intersectionRecord.material.getColor(intersectionRecord);
         intersectionRecord.n.scale(-1);
         intersectionRecord.shadeN.scale(-1);
       } else {
@@ -454,8 +454,8 @@ public class CauldronModel {
       hit = true;
       intersectionRecord.setNormal(lava.n);
       if (ray.d.dot(lava.n) > 0) {
-        intersectionRecord.material = Air.INSTANCE;
-        Air.INSTANCE.getColor(intersectionRecord);
+        intersectionRecord.material = scene.waterPlaneMaterial(ray.o.rScaleAdd(intersectionRecord.distance, ray.d));
+        intersectionRecord.material.getColor(intersectionRecord);
         intersectionRecord.n.scale(-1);
         intersectionRecord.shadeN.scale(-1);
       } else {
