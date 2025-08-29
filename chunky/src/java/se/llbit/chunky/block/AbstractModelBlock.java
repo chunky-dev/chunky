@@ -56,6 +56,8 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
   @Override
   public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     Intersectable waterModel = null;
+
+    // TODO this shouldn't be checked at intersection time, but rather when loading chunks.
     boolean isWaterloggedFull = false;
     if (waterlogged) {
       int x = (int) QuickMath.floor(ray.o.x + ray.d.x * Constants.OFFSET);
@@ -92,17 +94,19 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
           }
           intersectionRecord.n.scale(-1);
           intersectionRecord.shadeN.scale(-1);
+
+          Block waterPlaneMaterial = scene.waterPlaneMaterial(ray.o.rScaleAdd(intersectionRecord.distance, ray.d));
           if (waterlogged) {
             if (isWaterloggedFull || o.y < 1 - WaterModel.TOP_BLOCK_GAP) {
               intersectionRecord.material = scene.getPalette().water;
               Water.INSTANCE.getColor(intersectionRecord);
             } else {
-              intersectionRecord.material = Air.INSTANCE;
-              Air.INSTANCE.getColor(intersectionRecord);
+              intersectionRecord.material = waterPlaneMaterial;
+              waterPlaneMaterial.getColor(intersectionRecord);
             }
           } else {
-            intersectionRecord.material = Air.INSTANCE;
-            Air.INSTANCE.getColor(intersectionRecord);
+            intersectionRecord.material = waterPlaneMaterial;
+            waterPlaneMaterial.getColor(intersectionRecord);
           }
         } else {
           intersectionRecord.color.set(modelIntersect.color);
@@ -129,11 +133,12 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
       } else if (hitTop) {
         intersectionRecord.distance = waterIntersect.distance;
         intersectionRecord.setNormal(waterIntersect);
-        Air.INSTANCE.getColor(intersectionRecord);
-        intersectionRecord.material = Air.INSTANCE;
 
         Ray testRay = new Ray(ray);
         testRay.o.scaleAdd(intersectionRecord.distance, testRay.d);
+        intersectionRecord.material = scene.waterPlaneMaterial(testRay.o);
+        intersectionRecord.material.getColor(intersectionRecord);
+
         Vector3 shadeNormal = scene.getCurrentWaterShader().doWaterShading(testRay, intersectionRecord, scene.getAnimationTime());
         intersectionRecord.shadeN.set(shadeNormal);
 
