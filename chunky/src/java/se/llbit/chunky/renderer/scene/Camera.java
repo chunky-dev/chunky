@@ -378,8 +378,7 @@ public class Camera implements JsonSerializable {
       u.set(0, -1, 0);
     }
     transform.transform(u);
-    u.scale(v);
-    pos.add(u);
+    pos.scaleAdd(v, u);
     onViewChange();
     positionListener.run();
   }
@@ -394,8 +393,7 @@ public class Camera implements JsonSerializable {
       u.set(0, -1, 0);
     }
     transform.transform(u);
-    u.scale(-v);
-    pos.add(u);
+    pos.scaleAdd(-v, u);
     onViewChange();
     positionListener.run();
   }
@@ -405,8 +403,7 @@ public class Camera implements JsonSerializable {
    */
   public synchronized void moveUp(double v) {
     u.set(0, 1, 0);
-    u.scale(v);
-    pos.add(u);
+    pos.scaleAdd(v, u);
     onViewChange();
     positionListener.run();
   }
@@ -416,8 +413,7 @@ public class Camera implements JsonSerializable {
    */
   public synchronized void moveDown(double v) {
     u.set(0, 1, 0);
-    u.scale(-v);
-    pos.add(u);
+    pos.scaleAdd(-v, u);
     onViewChange();
     positionListener.run();
   }
@@ -428,8 +424,7 @@ public class Camera implements JsonSerializable {
   public synchronized void strafeLeft(double v) {
     u.set(1, 0, 0);
     transform.transform(u);
-    u.scale(-v);
-    pos.add(u);
+    pos.scaleAdd(-v, u);
     onViewChange();
     positionListener.run();
   }
@@ -440,8 +435,7 @@ public class Camera implements JsonSerializable {
   public synchronized void strafeRight(double v) {
     u.set(1, 0, 0);
     transform.transform(u);
-    u.scale(v);
-    pos.add(u);
+    pos.scaleAdd(v, u);
     onViewChange();
     positionListener.run();
   }
