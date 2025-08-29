@@ -58,7 +58,7 @@ public class PluginApiTest {
 
   @Test public void testSetPreviewRayTracerFactory() throws Exception {
     Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
-    RayTracer tracer = (scene, state) -> state.ray.color.set(0, 0, 0, 1);
+    RayTracer tracer = (scene, state) -> state.intersectionRecord.color.set(0, 0, 0, 1);
     RayTracerFactory myFactory = () -> tracer;
     //noinspection deprecation
     chunky.setPreviewRayTracerFactory(myFactory);
@@ -72,7 +72,7 @@ public class PluginApiTest {
 
   @Test public void testSetRayTracerFactory() throws Exception {
     Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
-    RayTracer tracer = (scene, state) -> state.ray.color.set(0, 0, 0, 1);
+    RayTracer tracer = (scene, state) -> state.intersectionRecord.color.set(0, 0, 0, 1);
     RayTracerFactory myFactory = () -> tracer;
     //noinspection deprecation
     chunky.setRayTracerFactory(myFactory);
