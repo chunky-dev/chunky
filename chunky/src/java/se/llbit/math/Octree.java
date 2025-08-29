@@ -561,7 +561,6 @@ public class Octree implements Intersectable {
             continue;
           }
         } else if (!currentBlock.isSameMaterial(prevBlock) && !(currentBlock == Void.INSTANCE && prevBlock == Air.INSTANCE || currentBlock == Air.INSTANCE && prevBlock == Void.INSTANCE)) {
-          // && !((currentBlock == Void.INSTANCE && prevBlock == Air.INSTANCE || currentBlock == Air.INSTANCE && prevBlock == Void.INSTANCE) && (!scene.isWaterPlaneEnabled() || !scene.getWaterPlaneChunkClip()))
           testRay.o.set(ray.o);
           testRay.o.scaleAdd(distance, ray.d);
           TexturedBlockModel.getIntersectionColor(testRay, intersectionRecord);
