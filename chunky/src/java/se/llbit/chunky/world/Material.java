@@ -417,10 +417,10 @@ public abstract class Material {
           roughnessDirection.normalize();
           direction = roughnessDirection;
         }
-        tintColor(intersectionRecord.color, metalness, specularColor, random);
+        tintColor(intersectionRecord.color, metalness, specularColor);
         ray.flags |= Ray.SPECULAR;
         Vector4 emittanceColor1 = new Vector4(intersectionRecord.color);
-        tintColor(emittanceColor1, 1, emittanceColor, random);
+        tintColor(emittanceColor1, 1, emittanceColor);
         doEmitterMapping(emittance, emittanceColor1, scene);
       } else {
         // Lambertian reflection
@@ -430,10 +430,10 @@ public abstract class Material {
           ray.d.scale(-1); // This is to prevent direction from being inverted later.
         }
         direction = lambertianReflection(intersectionRecord.shadeN, random);
-        tintColor(intersectionRecord.color, 1, diffuseColor, random);
+        tintColor(intersectionRecord.color, 1, diffuseColor);
         ray.flags |= Ray.DIFFUSE | Ray.INDIRECT;
         Vector4 emittanceColor1 = new Vector4(intersectionRecord.color);
-        tintColor(emittanceColor1, 1, emittanceColor, random);
+        tintColor(emittanceColor1, 1, emittanceColor);
         doEmitterMapping(emittance, emittanceColor1, scene);
       }
     } else {
@@ -460,7 +460,7 @@ public abstract class Material {
             roughnessDirection.normalize();
             direction = roughnessDirection;
           }
-          tintColor(intersectionRecord.color, metalness, specularColor, random);
+          tintColor(intersectionRecord.color, metalness, specularColor);
           ray.flags |= Ray.SPECULAR;
         } else {
           // Refraction
@@ -478,14 +478,14 @@ public abstract class Material {
             }
             mediumChanged = true;
           }
-          tintColor(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor, random);
+          tintColor(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor);
           ray.flags |= Ray.SPECULAR;
           throughSurface = true;
         }
       } else {
         // Transmission
         direction = new Vector3(ray.d);
-        tintColor(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor, random);
+        tintColor(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor);
         ray.flags |= Ray.SPECULAR;
         throughSurface = true;
         if ((intersectionRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) == 0) {
@@ -645,10 +645,10 @@ public abstract class Material {
     return rOutPerp.rAdd(rOutParallel);
   }
 
-  public static void tintColor(Vector4 color, float metalness, Vector3 colorModifier, Random random) {
-    color.x = 1 - metalness * (1 - color.x);
-    color.y = 1 - metalness * (1 - color.y);
-    color.z = 1 - metalness * (1 - color.z);
+  public static void tintColor(Vector4 color, float tintStrength, Vector3 colorModifier) {
+    color.x = 1 - tintStrength * (1 - color.x);
+    color.y = 1 - tintStrength * (1 - color.y);
+    color.z = 1 - tintStrength * (1 - color.z);
     color.x *= colorModifier.x;
     color.y *= colorModifier.y;
     color.z *= colorModifier.z;

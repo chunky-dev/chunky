@@ -297,7 +297,7 @@ public class PathTracer implements RayTracer {
         e *= scaler;
 
         Vector3 emittance = new Vector3();
-        Material.tintColor(emitterIntersection.color, 1, emitterIntersection.material.emittanceColor, random);
+        Material.tintColor(emitterIntersection.color, 1, emitterIntersection.material.emittanceColor);
         emitterIntersection.material.doEmitterMapping(emittance, emitterIntersection.color, scene);
         result.x += emittance.x * e;
         result.y += emittance.y * e;
