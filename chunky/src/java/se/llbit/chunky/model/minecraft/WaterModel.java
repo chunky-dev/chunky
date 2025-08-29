@@ -222,6 +222,8 @@ public class WaterModel {
     int c2 = (0xF & (data >> CORNER_2)) % 8;
     int c3 = (0xF & (data >> CORNER_3)) % 8;
 
+    Vector3 n = new Vector3(intersectionRecord.n);
+
     if (!ray.getCurrentMedium().isWater()) {
       if (QuadModel.FULL_BLOCK_BOTTOM_SIDE.closestIntersection(ray, intersectionRecord)) {
         intersectionRecord.setNormal(QuadModel.FULL_BLOCK_BOTTOM_SIDE.n);
@@ -282,6 +284,7 @@ public class WaterModel {
       intersectionRecord.setNormal(triangle.n);
       hitTop = true;
     }
+
     Block waterPlaneMaterial;
     if (hitTop) {
       if (intersectionRecord.distance > Constants.EPSILON &&
@@ -290,6 +293,7 @@ public class WaterModel {
         intersectionRecord.distance = 0;
         intersectionRecord.material = waterPlaneMaterial;
         waterPlaneMaterial.getColor(intersectionRecord);
+        intersectionRecord.setNormal(n);
         return true;
       }
       // Create a new ray at the intersection position to get the normal.
