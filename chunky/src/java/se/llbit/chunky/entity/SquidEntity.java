@@ -18,6 +18,7 @@ import se.llbit.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 public class SquidEntity extends Entity implements Poseable {
 
@@ -188,8 +189,8 @@ public class SquidEntity extends Entity implements Poseable {
     return json;
   }
 
-  public static SquidEntity fromJson(JsonObject json) {
-    return new SquidEntity(json);
+  public static Collection<Entity> fromJson(JsonObject json) {
+    return Collections.singleton(new SquidEntity(json));
   }
 
   @Override

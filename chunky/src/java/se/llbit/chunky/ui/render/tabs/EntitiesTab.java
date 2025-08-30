@@ -90,7 +90,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       return player;
     });
     entityTypes.put("Armor stand", (position, scene) -> new ArmorStand(position, new CompoundTag()));
-    entityTypes.put("Lectern", (position, scene) -> new Lectern(position, "north", true));
+    entityTypes.put("Lectern", (position, scene) -> new Lectern(position, "north"));
     entityTypes.put("Book", (position, scene) -> new Book(position, Math.PI - Math.PI / 16, Math.toRadians(30), Math.toRadians(180 - 30)));
     entityTypes.put("Beacon beam", (position, scene) -> new BeaconBeam(position));
     entityTypes.put("Sheep", (position, scene) -> new SheepEntity(position, new CompoundTag()));
@@ -298,15 +298,9 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
 
         controls.getChildren().addAll(modelBox, skinBox, layerBox);
       }
-      else if (entity instanceof Book || entity instanceof Lectern) {
-        Book book;
-        if (entity instanceof Lectern) {
-          book = ((Lectern) entity).getBook();
-        } else {
-          book = (Book) entity;
-        }
+      else if (entity instanceof Book) {
+        Book book = (Book) entity;
 
-        if (book != null) {
           DoubleAdjuster openingAngle = new DoubleAdjuster();
           openingAngle.setName("Opening angle");
           openingAngle.setTooltip("Modifies the book's opening angle.");
@@ -339,7 +333,6 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
             scene.rebuildActorBvh();
           });
           controls.getChildren().add(page2Angle);
-        }
       }
       else if (entity instanceof BeaconBeam) {
         BeaconBeam beam = (BeaconBeam) entity;
