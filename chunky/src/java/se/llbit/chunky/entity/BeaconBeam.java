@@ -228,7 +228,7 @@ public class BeaconBeam extends Entity implements Poseable {
   }
 
   public static Collection<Entity> fromJson(JsonObject json) {
-    return Collections.singletonList(new BeaconBeam(json));
+    return Collections.singleton(new BeaconBeam(json));
   }
 
   @Override

@@ -64,7 +64,7 @@ public class CakeWithCandle extends AbstractModelBlock {
 
   @Override
   public Collection<Entity> toEntity(Vector3 position) {
-    return Collections.singletonList(new FlameParticles(position, entity));
+    return Collections.singleton(new FlameParticles(position, entity));
   }
 
   @Override
