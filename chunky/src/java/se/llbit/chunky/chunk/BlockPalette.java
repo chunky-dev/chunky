@@ -41,13 +41,13 @@ import java.util.function.Consumer;
  * instance that corresponds to an ID. Only one instance of every block configuration will be created and then
  * re-used for all blocks of that type with the same configuration (i.e. the same block data).
  * The numerical IDs are used to efficiently store the blocks in the octree.
- *
+ * <p>
  * This class also manages material properties.
  *
  * <p>Before <code>{@link BlockPalette#unsynchronize()}</code> is called, <code>{@link BlockPalette}</code> is thread safe
  * for N writer and N reader threads. It locks on <code>{@link BlockPalette#put(BlockSpec)}</code>, and has concurrent
  * data structures to achieve this.</p>
- *
+ * <p>
  * After <code>{@link BlockPalette#unsynchronize()}</code> is called, it is only safe to be read by multiple threads concurrently.
  */
 public class BlockPalette {
@@ -57,7 +57,9 @@ public class BlockPalette {
 
   private final Map<String, Consumer<Block>> materialProperties;
 
-  /** Stone blocks are used for filling invisible regions in the Octree. */
+  /**
+   * Stone blocks are used for filling invisible regions in the Octree.
+   */
   public final Block stone, water;
 
   private final Map<BlockSpec, Integer> blockMap;
@@ -88,15 +90,20 @@ public class BlockPalette {
 
   /**
    * This method should be called when no threads are acting on the palette anymore.
-   *
+   * <p>
    * It replaces the lock with one that does nothing and switches the palette list for a non-concurrent one.
    * This is done to not limit render performance once async chunk loading is done.
    */
   public void unsynchronize() {
     palette = new ArrayList<>(palette);
     lock = new ReentrantLock() {
-      @Override public void lock() { }
-      @Override public void unlock() { }
+      @Override
+      public void lock() {
+      }
+
+      @Override
+      public void unlock() {
+      }
     };
   }
 
@@ -133,19 +140,20 @@ public class BlockPalette {
   }
 
   public Block get(int id) {
-    if(id == ANY_ID)
+    if (id == ANY_ID)
       return stone;
     return palette.get(id);
   }
 
   /**
    * Get the block specification by its ID in this palette.
+   *
    * @param id ID of a block in this palette
    * @return Block specification or null if not found
    */
   public BlockSpec getBlockSpec(int id) {
     for (Entry<BlockSpec, Integer> entry : blockMap.entrySet()) {
-      if (entry.getValue() == id){
+      if (entry.getValue() == id) {
         return entry.getKey();
       }
     }
@@ -197,18 +205,18 @@ public class BlockPalette {
   /**
    * Updates the material properties of the block and applies them.
    *
-   * @param name the id of the block to be updated, e.g. "minecraft:stone"
+   * @param name       the id of the block to be updated, e.g. "minecraft:stone"
    * @param properties function that modifies the block's properties
    */
   public void updateProperties(String name, Consumer<Block> properties) {
     materialProperties.put(name, properties);
     blockMap.forEach(
-        (spec, id) -> {
-          Block block = palette.get(id);
-          if (block.name.equals(name)) {
-            applyMaterial(block);
-          }
-        });
+      (spec, id) -> {
+        Block block = palette.get(id);
+        if (block.name.equals(name)) {
+          applyMaterial(block);
+        }
+      });
   }
 
   /**
@@ -232,26 +240,28 @@ public class BlockPalette {
     palette.forEach(this::applyMaterial);
   }
 
-  /** @return Default material properties. */
+  /**
+   * @return Default material properties.
+   */
   public static Map<String, Consumer<Block>> getDefaultMaterialProperties() {
     Map<String, Consumer<Block>> materialProperties = new HashMap<>();
     materialProperties.put(
-        "minecraft:water",
-        block -> {
-          block.specular = 0.255f;
-          block.ior = 1.333f;
-          block.refractive = true;
-        });
+      "minecraft:water",
+      block -> {
+        block.specular = 0.255f;
+        block.ior = 1.333f;
+        block.refractive = true;
+      });
     materialProperties.put(
-        "minecraft:lava",
-        block -> {
-          block.emittance = 1.0f;
-        });
+      "minecraft:lava",
+      block -> {
+        block.emittance = 1.0f;
+      });
     Consumer<Block> glassConfig =
-        block -> {
-          block.ior = 1.52f;
-          block.refractive = true;
-        };
+      block -> {
+        block.ior = 1.52f;
+        block.refractive = true;
+      };
     materialProperties.put("minecraft:glass", glassConfig);
     materialProperties.put("minecraft:glass_pane", glassConfig);
     materialProperties.put("minecraft:white_stained_glass", glassConfig);
@@ -332,7 +342,7 @@ public class BlockPalette {
       block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.7);
     });
-    materialProperties.put("minecraft:chain", block -> {
+    materialProperties.put("minecraft:iron_chain", block -> {
       block.specular = 0.04f;
       block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.9);
@@ -343,7 +353,7 @@ public class BlockPalette {
       }
     });
     materialProperties.put("minecraft:redstone_wall_torch", block -> {
-      if (block instanceof  RedstoneWallTorch && ((RedstoneWallTorch) block).isLit()) {
+      if (block instanceof RedstoneWallTorch && ((RedstoneWallTorch) block).isLit()) {
         block.emittance = 1.0f;
       }
     });
@@ -417,22 +427,22 @@ public class BlockPalette {
       }
     });
     materialProperties.put("minecraft:campfire", block -> {
-      if (block instanceof Campfire && ((Campfire)block).isLit) {
+      if (block instanceof Campfire && ((Campfire) block).isLit) {
         block.emittance = 1.0f;
       }
     });
     materialProperties.put("minecraft:furnace", block -> {
-      if(block instanceof Furnace && ((Furnace)block).isLit()) {
+      if (block instanceof Furnace && ((Furnace) block).isLit()) {
         block.emittance = 1.0f;
       }
     });
     materialProperties.put("minecraft:smoker", block -> {
-      if(block instanceof Smoker && ((Smoker)block).isLit()) {
+      if (block instanceof Smoker && ((Smoker) block).isLit()) {
         block.emittance = 1.0f;
       }
     });
     materialProperties.put("minecraft:blast_furnace", block -> {
-      if(block instanceof BlastFurnace && ((BlastFurnace)block).isLit()) {
+      if (block instanceof BlastFurnace && ((BlastFurnace) block).isLit()) {
         block.emittance = 1.0f;
       }
     });
@@ -471,7 +481,7 @@ public class BlockPalette {
     });
     materialProperties.put("minecraft:respawn_anchor", block -> {
       if (block instanceof RespawnAnchor) {
-        int charges = ((RespawnAnchor)block).charges;
+        int charges = ((RespawnAnchor) block).charges;
         if (charges > 0) {
           block.emittance = 1.0f / 15 * (charges * 4 - 2);
         }
@@ -493,7 +503,7 @@ public class BlockPalette {
       block.metalness = 0.66f;
       block.setPerceptualSmoothness(0.5);
     });
-    for(String s : new String[]{"minecraft:", "minecraft:waxed_"}) {
+    for (String s : new String[]{"minecraft:", "minecraft:waxed_"}) {
       materialProperties.put(s + "copper_block", copperConfig);
       materialProperties.put(s + "cut_copper", copperConfig);
       materialProperties.put(s + "cut_copper_stairs", copperConfig);
@@ -619,24 +629,24 @@ public class BlockPalette {
     materialProperties.put("minecraft:sculk_catalyst", block -> {
       block.emittance = 1.0f / 15f * 6;
     });
-    for(String s : new String[]{"minecraft:", "minecraft:waxed_"}) {
+    for (String s : new String[]{"minecraft:", "minecraft:waxed_"}) {
       materialProperties.put(s + "copper_bulb", block -> {
-        if(block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
+        if (block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
           block.emittance = 1.0f;
         }
       });
       materialProperties.put(s + "exposed_copper_bulb", block -> {
-        if(block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
+        if (block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
           block.emittance = 12 / 15f;
         }
       });
       materialProperties.put(s + "weathered_copper_bulb", block -> {
-        if(block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
+        if (block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
           block.emittance = 8 / 15f;
         }
       });
       materialProperties.put(s + "oxidized_copper_bulb", block -> {
-        if(block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
+        if (block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
           block.emittance = 4 / 15f;
         }
       });
@@ -655,7 +665,9 @@ public class BlockPalette {
     return palette;
   }
 
-  /** Writes the block specifications to file. */
+  /**
+   * Writes the block specifications to file.
+   */
   public void write(DataOutputStream out) throws IOException {
     out.writeInt(BLOCK_PALETTE_VERSION);
     BlockSpec[] specs = new BlockSpec[blockMap.size()];

@@ -158,7 +158,8 @@ public class MinecraftBlockProvider implements BlockProvider {
     "minecraft:cave_vines_plant",
     "minecraft:cave_vines",
     "minecraft:chain_command_block",
-    "minecraft:chain",
+    "minecraft:chain", // < 25w35a
+    "minecraft:iron_chain", // >= 25w35a
     "minecraft:chest",
     "minecraft:chipped_anvil",
     "minecraft:chiseled_deepslate",
@@ -1204,10 +1205,10 @@ public class MinecraftBlockProvider implements BlockProvider {
       addBlock(s + "weathered_copper_chest", (name, tag) -> chest(tag, Chest.Kind.WEATHERED_COPPER));
       addBlock(s + "oxidized_copper_chest", (name, tag) -> chest(tag, Chest.Kind.OXIDIZED_COPPER));
 
-      addBlock(s + "copper_chain", (name, tag) -> chain(tag, Texture.copperChain));
-      addBlock(s + "exposed_copper_chain", (name, tag) -> chain(tag, Texture.exposedCopperChain));
-      addBlock(s + "weathered_copper_chain", (name, tag) -> chain(tag, Texture.weatheredCopperChain));
-      addBlock(s + "oxidized_copper_chain", (name, tag) -> chain(tag, Texture.oxidizedCopperChain));
+      addBlock(s + "copper_chain", (name, tag) -> chain(tag, name, Texture.copperChain));
+      addBlock(s + "exposed_copper_chain", (name, tag) -> chain(tag, name, Texture.exposedCopperChain));
+      addBlock(s + "weathered_copper_chain", (name, tag) -> chain(tag, name, Texture.weatheredCopperChain));
+      addBlock(s + "oxidized_copper_chain", (name, tag) -> chain(tag, name, Texture.oxidizedCopperChain));
 
       addBlock(s + "copper_lantern", (name, tag) -> lantern(tag, Texture.copperLantern));
       addBlock(s + "exposed_copper_lantern", (name, tag) -> lantern(tag, Texture.exposedCopperLantern));
@@ -2928,8 +2929,9 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new PressurePlate(name, Texture.polishedBlackstone);
       case "quartz_bricks":
         return new MinecraftBlock(name, Texture.quartzBricks);
-      case "chain":
-        return chain(tag, Texture.chain);
+      case "chain": // < 25w35a
+      case "iron_chain": // >= 25w35a
+        return chain(tag, "iron_chain", Texture.chain);
       case "candle_cake":
         return candleCake(tag, Texture.candle, Texture.candleLit);
       case "white_candle_cake":
@@ -3333,8 +3335,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new Chest(name, type, facing, kind);
   }
 
-  private static Block chain(Tag tag, Texture texture) {
-    String name = BlockProvider.blockName(tag);
+  private static Block chain(Tag tag, String name, Texture texture) {
     String axis = tag.get("Properties").get("axis").stringValue("y");
     return new Chain(name, texture, axis);
   }

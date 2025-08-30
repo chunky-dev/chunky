@@ -908,6 +908,7 @@ public class Texture {
   public static final Texture polishedBlackstoneBricks = new Texture();
   public static final Texture crackedPolishedBlackstoneBricks = new Texture();
   public static final Texture quartzBricks = new Texture();
+  @TexturePath(value = "assets/minecraft/textures/block/iron_chain", alternatives = { "assets/minecraft/textures/block/chain" })
   public static final Texture chain = new Texture();
   public static final Texture jigsawLock = new Texture();
 
