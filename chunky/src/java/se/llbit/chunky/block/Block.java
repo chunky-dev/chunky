@@ -103,7 +103,7 @@ public abstract class Block extends Material {
   }
 
   public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
-    throw new Error("This block type can not be converted to a block entity: "
+    throw new UnsupportedOperationException("This block type can not be converted to a block entity: "
       + getClass().getSimpleName());
   }
 
@@ -121,7 +121,7 @@ public abstract class Block extends Material {
   }
 
   public Collection<Entity> toEntity(Vector3 position) {
-    throw new Error("This block type can not be converted to an entity: "
+    throw new UnsupportedOperationException("This block type can not be converted to an entity: "
       + getClass().getSimpleName());
   }
 
