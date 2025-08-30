@@ -1730,7 +1730,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Set the scene name.
    */
   public void setName(String newName) {
-    newName = AsynchronousSceneManager.sanitizedSceneName(newName);
+    newName = SceneUtils.sanitizedSceneName(newName);
     if (newName.length() > 0) {
       name = newName;
     }
