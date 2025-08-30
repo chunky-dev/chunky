@@ -200,7 +200,7 @@ public class HeadEntity extends Entity {
     int rotation = json.get("rotation").intValue(0);
     int placement = json.get("placement").intValue(0);
     String skin = json.get("skin").stringValue("");
-    return Collections.singletonList(new HeadEntity(position, skin, rotation, placement));
+    return Collections.singleton(new HeadEntity(position, skin, rotation, placement));
   }
 
 

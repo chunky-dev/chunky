@@ -93,9 +93,9 @@ public class Candle extends AbstractModelBlock {
   @Override
   public Collection<Entity> toEntity(Vector3 position) {
     if (entity != null) {
-      return Collections.singletonList(new FlameParticles(position, entity));
+      return Collections.singleton(new FlameParticles(position, entity));
     } else {
-      return Collections.singletonList(new FlameParticles(position, this, new Vector3[0]));
+      return Collections.singleton(new FlameParticles(position, this, new Vector3[0]));
     }
   }
 

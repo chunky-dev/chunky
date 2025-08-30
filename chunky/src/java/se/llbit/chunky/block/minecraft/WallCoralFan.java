@@ -51,6 +51,6 @@ public class WallCoralFan extends MinecraftBlockTranslucent {
   }
 
   @Override public Collection<Entity> toEntity(Vector3 position) {
-    return Collections.singletonList(new WallCoralFanEntity(position, coralType, facing));
+    return Collections.singleton(new WallCoralFanEntity(position, coralType, facing));
   }
 }

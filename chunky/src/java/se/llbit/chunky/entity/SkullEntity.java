@@ -305,6 +305,6 @@ public class SkullEntity extends Entity {
     Kind type = Kind.values()[json.get("type").intValue(0)];
     int rotation = json.get("rotation").intValue(0);
     int placement = json.get("placement").intValue(0);
-    return Collections.singletonList(new SkullEntity(position, type, rotation, placement));
+    return Collections.singleton(new SkullEntity(position, type, rotation, placement));
   }
 }

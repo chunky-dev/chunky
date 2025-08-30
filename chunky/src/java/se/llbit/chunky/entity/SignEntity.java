@@ -584,7 +584,7 @@ public class SignEntity extends Entity {
     boolean glowing = json.get("glowing").boolValue(false);
     Color backDye = Color.getFromDyedSign(json.get("backDye").stringValue(null));
     boolean backGlowing = json.get("backGlowing").boolValue(false);
-    return Collections.singletonList(new SignEntity(position, frontText, dye, glowing, backText, backDye, backGlowing, direction, material));
+    return Collections.singleton(new SignEntity(position, frontText, dye, glowing, backText, backDye, backGlowing, direction, material));
   }
 
   /**

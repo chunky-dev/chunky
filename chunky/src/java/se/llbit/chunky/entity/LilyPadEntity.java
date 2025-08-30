@@ -94,7 +94,7 @@ public class LilyPadEntity extends Entity {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     int rotation = json.get("rotation").intValue(0);
-    return Collections.singletonList(new LilyPadEntity(position, rotation));
+    return Collections.singleton(new LilyPadEntity(position, rotation));
   }
 
 }
