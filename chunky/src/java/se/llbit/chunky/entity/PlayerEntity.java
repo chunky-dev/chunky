@@ -906,7 +906,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   }
 
   public static Collection<Entity> fromJson(JsonObject json) {
-    return Collections.singletonList(new PlayerEntity(json));
+    return Collections.singleton(new PlayerEntity(json));
   }
 
   @Override

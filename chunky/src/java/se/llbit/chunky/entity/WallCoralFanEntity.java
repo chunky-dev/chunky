@@ -110,6 +110,6 @@ public class WallCoralFanEntity extends Entity {
     position.fromJson(json.get("position").object());
     String coralType = json.get("coral_type").stringValue("tube");
     String facing = json.get("facing").stringValue("north");
-    return Collections.singletonList(new WallCoralFanEntity(position, coralType, facing));
+    return Collections.singleton(new WallCoralFanEntity(position, coralType, facing));
   }
 }

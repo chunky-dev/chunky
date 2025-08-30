@@ -166,6 +166,6 @@ public class WallSignEntity extends Entity {
     String material = json.get("material").stringValue("oak");
     SignEntity.Color dye = SignEntity.Color.getFromDyedSign(json.get("dye").stringValue(null));
     boolean glowing = json.get("glowing").boolValue(false);
-    return Collections.singletonList(new WallSignEntity(position, text, dye, glowing, direction, material));
+    return Collections.singleton(new WallSignEntity(position, text, dye, glowing, direction, material));
   }
 }

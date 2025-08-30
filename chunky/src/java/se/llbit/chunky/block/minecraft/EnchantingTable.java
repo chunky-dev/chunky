@@ -58,6 +58,6 @@ public class EnchantingTable extends AbstractModelBlock {
         Math.toRadians(180 - 30));
     book.setPitch(Math.toRadians(80));
     book.setYaw(Math.toRadians(45));
-    return Collections.singletonList(book);
+    return Collections.singleton(book);
   }
 }

@@ -588,7 +588,7 @@ public class ArmorStand extends Entity implements Poseable, Geared {
    * @return deserialized entity, or {@code null} if it was not a valid entity
    */
   public static Collection<Entity> fromJson(JsonObject json) {
-    return Collections.singletonList(new ArmorStand(json));
+    return Collections.singleton(new ArmorStand(json));
   }
 
   @Override public String[] partNames() {

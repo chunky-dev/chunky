@@ -330,7 +330,7 @@ public class Campfire extends Entity {
   }
 
   public static Collection<Entity> fromJson(JsonObject json) {
-    return Collections.singletonList(new Campfire(json));
+    return Collections.singleton(new Campfire(json));
   }
 
   private static int getOrientationIndex(String facing) {

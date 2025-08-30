@@ -152,7 +152,7 @@ public class PaintingEntity extends Entity {
     position.fromJson(json.get("position").object());
     String art = json.get("art").stringValue("");
     double angle = json.get("angle").doubleValue(0.0);
-    return Collections.singletonList(new PaintingEntity(position, art, angle));
+    return Collections.singleton(new PaintingEntity(position, art, angle));
   }
 
   public static void resetPaintings() {

@@ -79,7 +79,7 @@ public class WallHead extends MinecraftBlockTranslucent {
 
   @Override
   public Collection<Entity> toEntity(Vector3 position) {
-    return Collections.singletonList(new SkullEntity(position, type, 0, facing));
+    return Collections.singleton(new SkullEntity(position, type, 0, facing));
   }
 
   @Override
