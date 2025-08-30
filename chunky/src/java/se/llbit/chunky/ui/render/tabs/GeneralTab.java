@@ -476,7 +476,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         .setTooltip(new Tooltip("Load the chunks that are currently selected in the map view"));
     loadSelectedChunks.setOnAction(e -> {
       controller.getSceneManager()
-          .loadChunks(mapLoader.getWorld(), chunkyFxController.getChunkSelection().getSelection());
+          .loadChunks(mapLoader.getWorld(), chunkyFxController.getChunkSelection().getSelectionByRegion());
       reloadChunks.setDisable(chunkyFxController.getChunkSelection().isEmpty());
     });
 
