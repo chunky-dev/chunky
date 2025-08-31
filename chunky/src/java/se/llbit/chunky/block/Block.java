@@ -151,7 +151,8 @@ public abstract class Block extends Material {
   }
 
   /**
-   * Whether to remove this block from the octree if it contains entities (i.e. {@link #hasEntities()} returns true).
+   * Whether to remove this block from the octree if it contains entities (i.e. {@link #hasEntities()} or {@link #isBlockEntity()}
+   * return true).
    * <p>
    * Most blocks are replaced by their entities (eg. signs create a sign entity that does the rendering and the block itself
    * does nothing, but some blocks use block model and entities, e.g. candle (where the candle flame is an entity but the candle is a block).
