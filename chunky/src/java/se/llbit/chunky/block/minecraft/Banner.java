@@ -39,15 +39,9 @@ public class Banner extends MinecraftBlockTranslucent {
 
   public Banner(String name, Texture texture, int rotation, BannerDesign.Color color) {
     super(name, texture);
-    invisible = true;
     opaque = false;
-    localIntersect = true;
     this.rotation = rotation % 16;
     this.color = color;
-  }
-
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override public boolean isBlockEntity() {

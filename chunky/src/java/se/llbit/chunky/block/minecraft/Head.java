@@ -46,16 +46,9 @@ public class Head extends MinecraftBlockTranslucent {
 
   public Head(String name, Texture texture, SkullEntity.Kind type, int rotation) {
     super(name, texture);
-    localIntersect = true;
-    invisible = true;
     description = "rotation=" + rotation;
     this.type = type;
     this.rotation = rotation;
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override
@@ -75,7 +68,7 @@ public class Head extends MinecraftBlockTranslucent {
 
   @Override
   public boolean isBlockEntity() {
-    return true;
+    return type == Kind.PLAYER;
   }
 
   @Override

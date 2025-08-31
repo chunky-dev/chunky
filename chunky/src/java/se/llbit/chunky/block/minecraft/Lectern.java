@@ -35,14 +35,7 @@ public class Lectern extends MinecraftBlockTranslucent {
         super("lectern", Texture.lecternFront);
         this.facing = facing;
         this.hasBook = hasBook;
-        invisible = true;
         opaque = false;
-        localIntersect = true;
-    }
-
-    @Override
-    public boolean intersect(Ray ray, Scene scene) {
-        return false;
     }
 
     @Override

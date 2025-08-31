@@ -36,14 +36,7 @@ public class HangingSign extends MinecraftBlockTranslucent {
     this.material = material;
     this.rotation = rotation;
     this.attached = attached;
-    invisible = true;
     solid = false;
-    localIntersect = true;
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override

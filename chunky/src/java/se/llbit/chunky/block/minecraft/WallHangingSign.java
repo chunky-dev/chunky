@@ -35,14 +35,7 @@ public class WallHangingSign extends MinecraftBlockTranslucent {
     super(name, HangingSignEntity.textureFromMaterial(material));
     this.material = material;
     this.facing = Facing.fromString(facing);
-    invisible = true;
     solid = false;
-    localIntersect = true;
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override

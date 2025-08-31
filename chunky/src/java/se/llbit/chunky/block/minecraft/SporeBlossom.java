@@ -32,14 +32,7 @@ public class SporeBlossom extends Block {
 
   public SporeBlossom() {
     super("spore_blossom", Texture.sporeBlossom);
-    invisible = true;
     opaque = false;
-    localIntersect = true;
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override
