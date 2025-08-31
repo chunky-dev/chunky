@@ -43,12 +43,12 @@ public class SporeBlossom extends Block {
   }
 
   @Override
-  public boolean isEntity() {
+  public boolean hasEntities() {
     return true;
   }
 
   @Override
-  public Collection<Entity> toEntity(Vector3 position) {
+  public Collection<Entity> createEntities(Vector3 position) {
     return Collections.singleton(new se.llbit.chunky.entity.SporeBlossom(position));
   }
 }

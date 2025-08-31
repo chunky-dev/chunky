@@ -46,11 +46,11 @@ public class WallCoralFan extends MinecraftBlockTranslucent {
     return false;
   }
 
-  @Override public boolean isEntity() {
+  @Override public boolean hasEntities() {
     return true;
   }
 
-  @Override public Collection<Entity> toEntity(Vector3 position) {
+  @Override public Collection<Entity> createEntities(Vector3 position) {
     return Collections.singleton(new WallCoralFanEntity(position, coralType, facing));
   }
 }
