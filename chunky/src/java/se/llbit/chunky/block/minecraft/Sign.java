@@ -47,7 +47,7 @@ public class Sign extends MinecraftBlockTranslucent {
     return true;
   }
 
-  @Override public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  @Override public Entity createBlockEntity(Vector3 position, CompoundTag entityTag) {
     return new SignEntity(position, entityTag, rotation, material);
   }
 }

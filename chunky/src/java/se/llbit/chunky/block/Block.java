@@ -98,31 +98,66 @@ public abstract class Block extends Material {
     return name;
   }
 
+  /**
+   * Check if this block is a block entity, i.e. {@link #createBlockEntity(Vector3, CompoundTag)} should be invoked to
+   * create an entity from this block and its entity data tag. This is used for blocks that need to create a new entity
+   * that needs the block entity data, e.g. signs.
+   * <p>
+   * This is mutually exclusive with {@link #hasEntities()}, use that one if you don't need block entity data.
+   *
+   * @return True if this block is a block entity, false otherwise
+   */
   public boolean isBlockEntity() {
     return false;
   }
 
-  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  /**
+   * Create a block entity from this block and the given block entity tag at the specified position.
+   *
+   * @param position  Position
+   * @param entityTag Block entity tag
+   * @return The block entity created from this block's data and the entity tag
+   * @throws UnsupportedOperationException If this block is not a block entity (i.e. {@link #isBlockEntity()} returns false
+   */
+  public Entity createBlockEntity(Vector3 position, CompoundTag entityTag) {
     throw new UnsupportedOperationException("This block type can not be converted to a block entity: "
       + getClass().getSimpleName());
   }
 
-  public boolean isEntity() {
+  /**
+   * Check if this block has entities, i.e. {@link #createEntities(Vector3)} should be invoked to create entities from this
+   * block. A block can create multiple entities (e.g. the lectern may create a lectern and a book entity).
+   * <p>
+   * This is mutually exclusive with {@link #isBlockEntity()}, use that one if you need block entity data.
+   *
+   * @return True if this block has entities, false otherwise
+   */
+  public boolean hasEntities() {
     return false;
   }
 
   /**
-   * If this returns true, the block won't be removed from the octree even if this is an entity
-   * (i.e. {@link #isEntity()} returns true). This can be used for blocks that also contain
-   * entities, e.g. candle (where the candle flame is an entity).
+   * Create entities from this block at the specified position.
+   * <p>
+   * This may return multiple entities, e.g. the lectern has a lectern entity and an optional book entity.
+   *
+   * @param position Position
+   * @return The entities created from this block's data
+   * @throws UnsupportedOperationException If this block is not a block entity (i.e. {@link #hasEntities()} returns false
    */
-  public boolean isBlockWithEntity() {
-    return false;
+  public Collection<Entity> createEntities(Vector3 position) {
+    throw new UnsupportedOperationException("This block type can not be converted to entities: "
+      + getClass().getSimpleName());
   }
 
-  public Collection<Entity> toEntity(Vector3 position) {
-    throw new UnsupportedOperationException("This block type can not be converted to an entity: "
-      + getClass().getSimpleName());
+  /**
+   * Whether to remove this block from the octree if it contains entities (i.e. {@link #hasEntities()} returns true).
+   * <p>
+   * Most blocks are replaced by their entities (eg. signs create a sign entity that does the rendering and the block itself
+   * does nothing, but some blocks use block model and entities, e.g. candle (where the candle flame is an entity but the candle is a block).
+   */
+  public boolean isReplacedByEntities() {
+    return true;
   }
 
   /**

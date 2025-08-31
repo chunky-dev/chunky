@@ -53,17 +53,17 @@ public class CakeWithCandle extends AbstractModelBlock {
   }
 
   @Override
-  public boolean isEntity() {
+  public boolean hasEntities() {
     return isLit();
   }
 
   @Override
-  public boolean isBlockWithEntity() {
-    return true;
+  public boolean isReplacedByEntities() {
+    return false;
   }
 
   @Override
-  public Collection<Entity> toEntity(Vector3 position) {
+  public Collection<Entity> createEntities(Vector3 position) {
     return Collections.singleton(new FlameParticles(position, entity));
   }
 

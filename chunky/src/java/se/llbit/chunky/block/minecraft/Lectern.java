@@ -46,12 +46,12 @@ public class Lectern extends MinecraftBlockTranslucent {
     }
 
     @Override
-    public boolean isEntity() {
+    public boolean hasEntities() {
         return true;
     }
 
     @Override
-    public Collection<Entity> toEntity(Vector3 position) {
+    public Collection<Entity> createEntities(Vector3 position) {
       return se.llbit.chunky.entity.Lectern.create(position, this.facing, this.hasBook);
     }
 }

@@ -1001,9 +1001,9 @@ public class Scene implements JsonSerializable, Refreshable {
                       chunkBiomeHelper.makeBiomeRelevant(y);
                     }
 
-                    if (block.isEntity()) {
+                    if (block.hasEntities()) {
                       Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
-                      Collection<Entity> entitiesFromBlock = block.toEntity(position);
+                      Collection<Entity> entitiesFromBlock = block.createEntities(position);
 
                       for (Entity entity : entitiesFromBlock) {
                         if (entities.shouldLoad(entity)) {
@@ -1023,7 +1023,7 @@ public class Scene implements JsonSerializable, Refreshable {
                         }
                       }
 
-                      if (!block.isBlockWithEntity()) {
+                      if (block.isReplacedByEntities()) {
                         if (block.waterlogged) {
                           block = palette.water;
                           octNode = palette.waterId;
@@ -1191,7 +1191,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 }
               }
               if (block.isBlockEntity()) {
-                Entity blockEntity = block.toBlockEntity(position, entityTag);
+                Entity blockEntity = block.createBlockEntity(position, entityTag);
                 if (blockEntity == null) {
                   continue;
                 }

@@ -39,7 +39,7 @@ public class LegacySkull extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  public Entity createBlockEntity(Vector3 position, CompoundTag entityTag) {
     Kind kind = getSkullKind(entityTag.get("SkullType").byteValue(0));
     int rotation = entityTag.get("Rot").byteValue(0);
     if (kind == Kind.PLAYER) {

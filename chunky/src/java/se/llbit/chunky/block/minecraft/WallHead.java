@@ -73,12 +73,12 @@ public class WallHead extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public boolean isEntity() {
+  public boolean hasEntities() {
     return type != Kind.PLAYER;
   }
 
   @Override
-  public Collection<Entity> toEntity(Vector3 position) {
+  public Collection<Entity> createEntities(Vector3 position) {
     return Collections.singleton(new SkullEntity(position, type, 0, facing));
   }
 
@@ -88,7 +88,7 @@ public class WallHead extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  public Entity createBlockEntity(Vector3 position, CompoundTag entityTag) {
     if (type == Kind.PLAYER) {
       try {
         String textureUrl = Head.getTextureUrl(entityTag);
