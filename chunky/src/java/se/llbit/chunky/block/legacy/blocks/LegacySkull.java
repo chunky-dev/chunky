@@ -30,7 +30,6 @@ public class LegacySkull extends MinecraftBlockTranslucent {
     super(name, Texture.steve);
     this.placement = tag.get("Data").intValue(0);
     localIntersect = true;
-    invisible = true;
   }
 
   @Override
@@ -53,11 +52,6 @@ public class LegacySkull extends MinecraftBlockTranslucent {
       }
     }
     return new SkullEntity(position, kind, rotation, placement);
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   private static Kind getSkullKind(int skullType) {
