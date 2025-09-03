@@ -547,30 +547,30 @@ public class Octree implements Intersectable {
 
       intersectionRecord.material = currentBlock;
 
-      boolean hit = false;
       if (!currentBlock.hidden) {
         if (currentBlock.localIntersect) {
           testRay.o.set(ray.o);
           testRay.o.scaleAdd(distance, ray.d);
+          testRay.setCurrentMedium(ray.getCurrentMedium());
           if (currentBlock.intersect(testRay, intersectionRecord, scene)) {
             intersectionRecord.distance += distance;
-            hit = true;
+            return true;
           } else {
             intersectionRecord.distance = Double.POSITIVE_INFINITY;
             distance += exitBlock(testRay, intersectionRecord, bx, by, bz);
             continue;
           }
-        } else if (!currentBlock.isSameMaterial(prevBlock) && !(currentBlock == Void.INSTANCE && prevBlock == Air.INSTANCE || currentBlock == Air.INSTANCE && prevBlock == Void.INSTANCE)) {
-          testRay.o.set(ray.o);
-          testRay.o.scaleAdd(distance, ray.d);
-          TexturedBlockModel.getIntersectionColor(testRay, intersectionRecord);
-          intersectionRecord.distance = distance;
-          return true;
+        } else if (!currentBlock.isSameMaterial(prevBlock)) {
+          if (!(currentBlock == Void.INSTANCE && prevBlock == Air.INSTANCE || currentBlock == Air.INSTANCE && prevBlock == Void.INSTANCE)) {
+            testRay.o.set(ray.o);
+            testRay.o.scaleAdd(distance, ray.d);
+            TexturedBlockModel.getIntersectionColor(testRay, intersectionRecord);
+            intersectionRecord.distance = distance;
+            return true;
+          }
+          // Set ray medium to currentBlock (which is either Air or Void), but don't intersect.
+          ray.setCurrentMedium(currentBlock);
         }
-      }
-
-      if (hit) {
-        return true;
       }
 
       // No intersection, exit current octree leaf.

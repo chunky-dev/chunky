@@ -38,6 +38,10 @@ public class SimpleChunkData implements ChunkData {
     if(y < 0 || y > 255) {
       return 0;
     }
+    int block = blocks[chunkIndex(x & (X_MAX - 1), y, z & (Z_MAX - 1))];
+    if (block == 0) {
+      return 1;
+    }
     return blocks[chunkIndex(x & (X_MAX - 1), y, z & (Z_MAX - 1))];
   }
 
