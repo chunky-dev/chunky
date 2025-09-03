@@ -16,25 +16,58 @@
  */
 package se.llbit.chunky.renderer;
 
-public enum ApertureShape {
-  CIRCLE,
-  HEXAGON("hexagon-aperture.png"),
-  PENTAGON("pentagon-aperture.png"),
-  STAR("star-aperture.png"),
-  GAUSSIAN("gaussian-aperture.png"),
-  CUSTOM;
+import se.llbit.util.Registerable;
+
+public enum ApertureShape implements Registerable {
+  CIRCLE("Circle"),
+  HEXAGON("Hexagon", "hexagon-aperture.png"),
+  PENTAGON("Pentagon", "pentagon-aperture.png"),
+  STAR("Star", "star-aperture.png"),
+  GAUSSIAN("Gaussian", "gaussian-aperture.png"),
+  CUSTOM("Custom");
 
   private final String resourceName;
 
-  ApertureShape() {
-    resourceName = null;
+  private final String name;
+
+  ApertureShape(String name) {
+    this(name, null);
   }
 
-  ApertureShape(String resourceName) {
+  ApertureShape(String name, String resourceName) {
+    this.name = name;
     this.resourceName = resourceName;
   }
 
   public String getResourceName() {
     return resourceName;
+  }
+
+  @Override
+  public String toString() {
+    return name;
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public String getDescription() {
+    return "";
+  }
+
+  @Override
+  public String getId() {
+    return this.name();
+  }
+
+  public static ApertureShape get(String name) {
+    try {
+      return valueOf(name);
+    } catch (IllegalArgumentException e) {
+      return CIRCLE;
+    }
   }
 }
