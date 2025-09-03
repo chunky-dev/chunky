@@ -25,15 +25,11 @@ import se.llbit.math.AABB;
 import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
 
-public class UntintedLeafModel extends AABBModel {
+public class UntintedLeafModel extends LeafModel {
   private static final AABB[] boxes = { new AABB(0, 1, 0, 1, 0, 1) };
 
-  private final Texture[][] textures;
-
   public UntintedLeafModel(Texture texture) {
-    this.textures = new Texture[][] {
-      {texture, texture, texture, texture, texture, texture}
-    };
+    super(texture, Tint.NONE);
   }
 
   @Override
@@ -42,24 +38,7 @@ public class UntintedLeafModel extends AABBModel {
   }
 
   @Override
-  public Texture[][] getTextures() {
-    return textures;
-  }
-
-  @Override
   public Tint[][] getTints() {
     return null;
-  }
-
-  @Override
-  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
-    if (super.intersect(ray, intersectionRecord, scene)) {
-      if (ray.d.dot(intersectionRecord.n) > 0) {
-        return false;
-      }
-      intersectionRecord.setNoMediumChange(true);
-      return true;
-    }
-    return false;
   }
 }

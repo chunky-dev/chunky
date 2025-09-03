@@ -28,10 +28,15 @@ import se.llbit.math.*;
 
 public class Leaves extends AbstractModelBlock {
 
-  public Leaves(String name, Texture texture, boolean tinted) {
+  public Leaves(String name, Texture texture) {
     super(name, texture);
     solid = false;
-    this.model = new LeafModel(texture, tinted);
+    this.model = new LeafModel(texture);
+  }
+
+  protected Leaves(Texture texture, String name) {
+    super(name, texture);
+    solid = false;
   }
 
   public Leaves(String name, Texture texture, int tint) {

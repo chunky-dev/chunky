@@ -962,7 +962,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("mangrove_door", (name, tag) -> door(tag, Texture.mangroveDoorTop, Texture.mangroveDoorBottom));
     addBlock("mangrove_fence", (name, tag) -> fence(tag, Texture.mangrovePlanks));
     addBlock("mangrove_fence_gate", (name, tag) -> fenceGate(tag, Texture.mangrovePlanks));
-    addBlock("mangrove_leaves", (name, tag) -> new Leaves(name, Texture.mangroveLeaves, true));
+    addBlock("mangrove_leaves", (name, tag) -> new Leaves(name, Texture.mangroveLeaves));
     addBlock("mangrove_log", (name, tag) -> log(tag, Texture.mangroveLog, Texture.mangroveLogTop));
     addBlock("stripped_mangrove_log", (name, tag) ->  log(tag, Texture.strippedMangroveLog, Texture.strippedMangroveLogTop));
     addBlock("mangrove_planks", Texture.mangrovePlanks);
@@ -1011,7 +1011,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("cherry_door", (name, tag) -> door(tag, Texture.cherryDoorTop, Texture.cherryDoorBottom));
     addBlock("cherry_fence", (name, tag) -> fence(tag, Texture.cherryPlanks));
     addBlock("cherry_fence_gate", (name, tag) -> fenceGate(tag, Texture.cherryPlanks));
-    addBlock("cherry_leaves", (name, tag) -> new Leaves(name, Texture.cherryLeaves, false));
+    addBlock("cherry_leaves", (name, tag) -> new UntintedLeaves(name, Texture.cherryLeaves));
     addBlock("cherry_log", (name, tag) -> log(tag, Texture.cherryLog, Texture.cherryLogTop));
     addBlock("stripped_cherry_log", (name, tag) -> log(tag, Texture.strippedCherryLog, Texture.strippedCherryLogTop));
     addBlock("cherry_planks", Texture.cherryPlanks);
@@ -1261,17 +1261,17 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "dark_oak_wood":
         return new MinecraftBlock(name, Texture.darkOakWood);
       case "oak_leaves":
-        return new Leaves(name, Texture.oakLeaves, true);
+        return new Leaves(name, Texture.oakLeaves);
       case "spruce_leaves":
         return new Leaves(name, Texture.spruceLeaves, 0x619961);
       case "birch_leaves":
         return new Leaves(name, Texture.birchLeaves, 0x80a755);
       case "jungle_leaves":
-        return new Leaves(name, Texture.jungleTreeLeaves, true);
+        return new Leaves(name, Texture.jungleTreeLeaves);
       case "acacia_leaves":
-        return new Leaves(name, Texture.acaciaLeaves, true);
+        return new Leaves(name, Texture.acaciaLeaves);
       case "dark_oak_leaves":
-        return new Leaves(name, Texture.darkOakLeaves, true);
+        return new Leaves(name, Texture.darkOakLeaves);
       case "sponge":
         return new MinecraftBlock(name, Texture.sponge);
       case "wet_sponge":
@@ -2988,9 +2988,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "flowering_azalea":
         return new Azalea(name, Texture.floweringAzaleaTop, Texture.floweringAzaleaSide);
       case "azalea_leaves":
-        return new Leaves(name, Texture.azaleaLeaves, false);
+        return new UntintedLeaves(name, Texture.azaleaLeaves);
       case "flowering_azalea_leaves":
-        return new Leaves(name, Texture.floweringAzaleaLeaves, false);
+        return new UntintedLeaves(name, Texture.floweringAzaleaLeaves);
       case "moss_block":
         return new MinecraftBlock(name, Texture.mossBlock);
       case "moss_carpet":

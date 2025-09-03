@@ -31,15 +31,22 @@ public class LeafModel extends AABBModel {
   private final Texture[][] textures;
   private final Tint[][] tints;
 
-  public LeafModel(Texture texture, boolean tinted) {
+  public LeafModel(Texture texture) {
     this.textures = new Texture[][] {
       {texture, texture, texture, texture, texture, texture}
     };
-    this.tints = (tinted) ? new Tint[][] {{
+    this.tints = new Tint[][] {{
       Tint.BIOME_FOLIAGE, Tint.BIOME_FOLIAGE, Tint.BIOME_FOLIAGE,
       Tint.BIOME_FOLIAGE, Tint.BIOME_FOLIAGE, Tint.BIOME_FOLIAGE
-    }} : new Tint[][] {{
-      Tint.NONE, Tint.NONE, Tint.NONE, Tint.NONE, Tint.NONE, Tint.NONE
+    }};
+  }
+
+  protected LeafModel(Texture texture, Tint tint) {
+    this.textures = new Texture[][] {
+        {texture, texture, texture, texture, texture, texture}
+    };
+    this.tints = new Tint[][] {{
+        tint, tint, tint, tint, tint, tint
     }};
   }
 
