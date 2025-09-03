@@ -15,6 +15,22 @@ public class IntersectionRecord {
   public final Vector4 color = new Vector4();
   public int flags = 0;
 
+  public void setNoMediumChange(boolean value) {
+    this.flags = value ? this.flags | NO_MEDIUM_CHANGE : this.flags & ~NO_MEDIUM_CHANGE;
+  }
+
+  public void setVolumeIntersect(boolean value) {
+    this.flags = value ? this.flags | VOLUME_INTERSECT : this.flags & ~VOLUME_INTERSECT;
+  }
+
+  public boolean isNoMediumChange() {
+    return (this.flags & NO_MEDIUM_CHANGE) != 0;
+  }
+
+  public boolean isVolumeIntersect() {
+    return (this.flags & VOLUME_INTERSECT) != 0;
+  }
+
   public void reset() {
     this.distance = Double.POSITIVE_INFINITY;
     this.n.set(0, 1, 0);

@@ -35,7 +35,8 @@ public class PreviewRayTracer implements RayTracer {
    */
   @Override public void trace(Scene scene, WorkerState state) {
     Ray ray = state.ray;
-    ray.flags |= Ray.SPECULAR | Ray.INDIRECT;
+    ray.setSpecular(true);
+    ray.setIndirect(true);
     ray.setCurrentMedium(scene.getWorldMaterial(ray));
 
     IntersectionRecord intersectionRecord = state.intersectionRecord;
@@ -44,7 +45,7 @@ public class PreviewRayTracer implements RayTracer {
     for (int i = scene.rayDepth; i > 0; i--) {
       intersectionRecord.reset();
       if (scene.intersect(ray, intersectionRecord, state.random)) {
-        if ((intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0) {
+        if (intersectionRecord.isVolumeIntersect()) {
           break;
         }
         ray.o.scaleAdd(intersectionRecord.distance, ray.d);
@@ -53,7 +54,7 @@ public class PreviewRayTracer implements RayTracer {
         if (intersectionRecord.material.scatter(ray, intersectionRecord, scene, state.emittance, state.random)) {
           ray.setCurrentMedium(intersectionRecord.material);
         }
-        if ((ray.flags & Ray.DIFFUSE) != 0) {
+        if (ray.isDiffuse()) {
           scene.sun.flatShading(intersectionRecord);
           break;
         } else {
@@ -88,7 +89,7 @@ public class PreviewRayTracer implements RayTracer {
       } else {
         occlusion *= (1 - intersectionRecord.color.w * intersectionRecord.material.alpha);
         ray.o.scaleAdd((intersectionRecord.distance + Constants.OFFSET), ray.d);
-        if ((intersectionRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) == 0) {
+        if (!intersectionRecord.isNoMediumChange()) {
           ray.setCurrentMedium(intersectionRecord.material);
         }
       }

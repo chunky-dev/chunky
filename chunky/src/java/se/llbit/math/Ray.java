@@ -16,6 +16,30 @@ public class Ray {
   private Material currentMedium = Air.INSTANCE;
   public int flags = 0;
 
+  public void setDiffuse(boolean value) {
+    this.flags = value ? this.flags | DIFFUSE : this.flags & ~DIFFUSE;
+  }
+
+  public void setSpecular(boolean value) {
+    this.flags = value ? this.flags | SPECULAR : this.flags & ~SPECULAR;
+  }
+
+  public void setIndirect(boolean value) {
+    this.flags = value ? this.flags | INDIRECT : this.flags & ~INDIRECT;
+  }
+
+  public boolean isDiffuse() {
+    return (this.flags & DIFFUSE) != 0;
+  }
+
+  public boolean isSpecular() {
+    return (this.flags & SPECULAR) != 0;
+  }
+
+  public boolean isIndirect() {
+    return (this.flags & INDIRECT) != 0;
+  }
+
   public Ray() {}
 
   public Ray(Ray ray) {

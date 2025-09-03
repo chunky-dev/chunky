@@ -354,11 +354,11 @@ public class Sky implements JsonSerializable {
   }
 
   public void intersect(Ray ray, IntersectionRecord intersectionRecord) {
-    if (((ray.flags & Ray.INDIRECT) != 0) && scene.sun.intersect(ray, intersectionRecord)) {
-      if (((ray.flags & Ray.DIFFUSE) != 0) && scene.sunSamplingStrategy.doSunSampling()) {
+    if ((ray.isIndirect()) && scene.sun.intersect(ray, intersectionRecord)) {
+      if ((ray.isDiffuse()) && scene.sunSamplingStrategy.doSunSampling()) {
         return;
       }
-      if (((ray.flags & Ray.SPECULAR) != 0) && !scene.sunSamplingStrategy.isDiffuseSun()) {
+      if ((ray.isSpecular()) && !scene.sunSamplingStrategy.isDiffuseSun()) {
         return;
       }
     }

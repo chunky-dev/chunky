@@ -72,7 +72,7 @@ public class LeafModel extends AABBModel {
       if (ray.d.dot(intersectionRecord.n) > 0) {
         return false;
       }
-      intersectionRecord.flags |= IntersectionRecord.NO_MEDIUM_CHANGE;
+      intersectionRecord.setNoMediumChange(true);
       return true;
     }
     return false;

@@ -342,7 +342,7 @@ public abstract class Material {
     intersectionRecord.distance = fogDistance(volumeDensity, random);
     intersectionRecord.material = this;
     intersectionRecord.color.set(volumeColor.x, volumeColor.y, volumeColor.z, 1);
-    intersectionRecord.flags |= IntersectionRecord.VOLUME_INTERSECT;
+    intersectionRecord.setVolumeIntersect(true);
     return true;
   }
 
@@ -418,7 +418,7 @@ public abstract class Material {
           direction = roughnessDirection;
         }
         tintColor(intersectionRecord.color, metalness, specularColor);
-        ray.flags |= Ray.SPECULAR;
+        ray.setSpecular(true);
         Vector4 emittanceColor1 = new Vector4(intersectionRecord.color);
         tintColor(emittanceColor1, 1, emittanceColor);
         doEmitterMapping(emittance, emittanceColor1, scene);
@@ -431,7 +431,8 @@ public abstract class Material {
         }
         direction = lambertianReflection(intersectionRecord.shadeN, random);
         tintColor(intersectionRecord.color, 1, diffuseColor);
-        ray.flags |= Ray.DIFFUSE | Ray.INDIRECT;
+        ray.setDiffuse(true);
+        ray.setIndirect(true);
         Vector4 emittanceColor1 = new Vector4(intersectionRecord.color);
         tintColor(emittanceColor1, 1, emittanceColor);
         doEmitterMapping(emittance, emittanceColor1, scene);
@@ -461,10 +462,10 @@ public abstract class Material {
             direction = roughnessDirection;
           }
           tintColor(intersectionRecord.color, metalness, specularColor);
-          ray.flags |= Ray.SPECULAR;
+          ray.setSpecular(true);
         } else {
           // Refraction
-          if ((intersectionRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) != 0) {
+          if (intersectionRecord.isNoMediumChange()) {
             direction = new Vector3(ray.d);
           } else {
             direction = specularRefraction(unitDirection, intersectionRecord.shadeN, ri);
@@ -479,16 +480,16 @@ public abstract class Material {
             mediumChanged = true;
           }
           tintColor(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor);
-          ray.flags |= Ray.SPECULAR;
+          ray.setSpecular(true);
           throughSurface = true;
         }
       } else {
         // Transmission
         direction = new Vector3(ray.d);
         tintColor(intersectionRecord.color, transmissionMetalness, transmissionSpecularColor);
-        ray.flags |= Ray.SPECULAR;
+        ray.setSpecular(true);
         throughSurface = true;
-        if ((intersectionRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) == 0) {
+        if (!intersectionRecord.isNoMediumChange()) {
           mediumChanged = true;
         }
       }
@@ -516,7 +517,8 @@ public abstract class Material {
     henyeyGreensteinSampleP(volumeAnisotropy, invDir, outDir, x1, x2);
     outDir.normalize();
     ray.d.set(outDir);
-    ray.flags |= Ray.INDIRECT | Ray.DIFFUSE;
+    ray.setDiffuse(true);
+    ray.setIndirect(true);
   }
 
   public static double phaseHG(double cosTheta, double g) {

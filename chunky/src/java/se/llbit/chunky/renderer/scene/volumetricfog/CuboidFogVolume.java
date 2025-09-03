@@ -95,7 +95,7 @@ public class CuboidFogVolume extends DiscreteFogVolume {
       intersectionRecord.distance = dist + distance;
       intersectionRecord.material = this.material;
       intersectionRecord.color.set(material.volumeColor.x, material.volumeColor.y, material.volumeColor.z, 1);
-      intersectionRecord.flags |= IntersectionRecord.VOLUME_INTERSECT;
+      intersectionRecord.setVolumeIntersect(true);
       return true;
     }
     return false;

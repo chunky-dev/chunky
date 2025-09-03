@@ -43,7 +43,7 @@ public class LightBlockModel extends AABBModel {
 
   @Override
   public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
-    if ((ray.flags & Ray.INDIRECT) != 0) {
+    if (ray.isIndirect()) {
       if (getBoxes()[0].closestIntersection(ray, intersectionRecord)) {
         SolidColorTexture.EMPTY.getColor(intersectionRecord);
         return true;

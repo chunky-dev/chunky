@@ -41,7 +41,7 @@ public class PathTracer implements RayTracer {
    */
   @Override public void trace(Scene scene, WorkerState state) {
     Ray ray = state.ray;
-    ray.flags = Ray.SPECULAR;
+    ray.setSpecular(true);
 
     ray.setCurrentMedium(scene.getWorldMaterial(ray));
     pathTrace(scene, state);
@@ -83,7 +83,7 @@ public class PathTracer implements RayTracer {
         int prevFlags = ray.flags; // saving this for emitter sampling
 
         ray.clearReflectionFlags();
-        if ((intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0) {
+        if (intersectionRecord.isVolumeIntersect()) {
           emittance.set(intersectionRecord.material.volumeEmittance);
           intersectionRecord.material.volumeScatter(ray, random);
         } else {
@@ -94,7 +94,7 @@ public class PathTracer implements RayTracer {
 
         // Sun sampling
 
-        if (scene.sunSamplingStrategy.doSunSampling() && ((state.ray.flags & Ray.DIFFUSE) != 0 || (state.intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0)) {
+        if (scene.sunSamplingStrategy.doSunSampling() && (ray.isDiffuse() || state.intersectionRecord.isVolumeIntersect())) {
           doSunSampling(scene, state, i);
         }
 
@@ -112,8 +112,8 @@ public class PathTracer implements RayTracer {
 
         if (scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE
             && scene.getEmitterGrid() != null
-            && ((state.ray.flags & Ray.DIFFUSE) != 0
-                || (state.intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0)) {
+            && (state.ray.isDiffuse()
+                || state.intersectionRecord.isVolumeIntersect())) {
           doEmitterSampling(scene, state, prevFlags);
         }
 
@@ -159,7 +159,7 @@ public class PathTracer implements RayTracer {
     transmittance(scene, state, rayDepth);
 
     double scaleFactor;
-    if ((intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0) {
+    if (intersectionRecord.isVolumeIntersect()) {
       scaleFactor = Material.phaseHG(ray.d.rScale(-1).dot(state.sampleRay.d), intersectionRecord.material.volumeAnisotropy);
     } else {
       scaleFactor = QuickMath.abs(state.sampleRay.d.dot(intersectionRecord.shadeN));
@@ -204,7 +204,7 @@ public class PathTracer implements RayTracer {
           state.sampleRay.getCurrentMedium().absorption(state.attenuation.toVec3(), state.sampleRecord.distance);
 
           state.sampleRay.o.scaleAdd(state.sampleRecord.distance, state.sampleRay.d);
-          if ((state.sampleRecord.flags & IntersectionRecord.NO_MEDIUM_CHANGE) == 0) {
+          if (!state.sampleRecord.isNoMediumChange()) {
             state.sampleRay.setCurrentMedium(state.sampleRecord.material);
           }
           state.sampleRay.o.scaleAdd(-Constants.OFFSET, state.sampleRecord.n);
@@ -314,7 +314,7 @@ public class PathTracer implements RayTracer {
       scene.intersect(emitterRay, emitterIntersection, random);
       if (FastMath.abs(emitterIntersection.distance + Constants.OFFSET - distance) < Constants.OFFSET) {
         double e;
-        if ((intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0) {
+        if (intersectionRecord.isVolumeIntersect()) {
           e = Material.phaseHG(ray.d.rScale(-1).dot(emitterRay.d), intersectionRecord.material.volumeAnisotropy);
         } else {
           e = FastMath.abs(emitterRay.d.dot(emitterIntersection.n));

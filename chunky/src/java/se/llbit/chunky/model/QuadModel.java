@@ -147,7 +147,7 @@ public abstract class QuadModel implements BlockModel {
             } else {
               intersectionRecord.setNormal(quad.n);
             }
-            intersectionRecord.flags |= IntersectionRecord.NO_MEDIUM_CHANGE;
+            intersectionRecord.setNoMediumChange(true);
             hit = true;
           } else {
             intersectionRecord.distance = distance;
