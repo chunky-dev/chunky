@@ -61,8 +61,8 @@ public class CakeWithCandle extends AbstractModelBlock {
   }
 
   @Override
-  public Entity[] toEntity(Vector3 position) {
-    return new FlameParticles[] {new FlameParticles(position, entity)};
+  public Entity toEntity(Vector3 position) {
+    return new FlameParticles(position, entity);
   }
 
   @Override

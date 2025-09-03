@@ -18,7 +18,6 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.entity.Book;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Vector3;
@@ -40,38 +39,7 @@ public class Lectern extends EmptyModelBlock {
     }
 
     @Override
-    public Entity[] toEntity(Vector3 position) {
-        Vector3 bookPosition = position.rAdd(0, 8.5 / 16.0, 0);
-
-        double bookYaw;
-        switch (facing) {
-            case "north":
-                bookPosition.add(0, 0, -2 / 16.0);
-                bookYaw = 0;
-                break;
-            case "east":
-                bookPosition.add(2 / 16.0, 0, 0);
-                bookYaw = -Math.PI / 2;
-                break;
-            case "south":
-                bookPosition.add(0, 0, 2 / 16.0);
-                bookYaw = Math.PI;
-                break;
-            case "west":
-                bookPosition.add(-2 / 16.0, 0, 0);
-                bookYaw = Math.PI / 2;
-                break;
-            default:
-                bookYaw = 0;
-        }
-
-        Book book = new Book(
-            bookPosition,
-            Math.PI - Math.PI / 16,
-            Math.PI / 8,
-            Math.PI - Math.PI / 8);
-        book.setPitch(Math.toRadians(90 - 22.5));
-        book.setYaw(bookYaw);
-        return new Entity[] {new se.llbit.chunky.entity.Lectern(position, this.facing, this.hasBook), book};
+    public Entity toEntity(Vector3 position) {
+        return new se.llbit.chunky.entity.Lectern(position, this.facing, this.hasBook);
     }
 }

@@ -65,8 +65,8 @@ public class WallHead extends EmptyModelBlock {
   }
 
   @Override
-  public Entity[] toEntity(Vector3 position) {
-    return new SkullEntity[] {new SkullEntity(position, type, 0, facing)};
+  public Entity toEntity(Vector3 position) {
+    return new SkullEntity(position, type, 0, facing);
   }
 
   @Override

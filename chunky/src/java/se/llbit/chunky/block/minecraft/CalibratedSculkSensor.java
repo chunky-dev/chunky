@@ -56,7 +56,7 @@ public class CalibratedSculkSensor extends AbstractModelBlock {
   }
 
   @Override
-  public Entity[] toEntity(Vector3 position) {
-    return new CalibratedSculkSensorAmethyst[] {new CalibratedSculkSensorAmethyst(position, this.facing, isActive(), this)};
+  public Entity toEntity(Vector3 position) {
+    return new CalibratedSculkSensorAmethyst(position, this.facing, isActive(), this);
   }
 }

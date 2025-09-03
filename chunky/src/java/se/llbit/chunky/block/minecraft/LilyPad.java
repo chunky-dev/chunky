@@ -33,7 +33,7 @@ public class LilyPad extends EmptyModelBlock {
     return true;
   }
 
-  @Override public Entity[] toEntity(Vector3 position) {
-    return new LilyPadEntity[] {new LilyPadEntity(position)};
+  @Override public Entity toEntity(Vector3 position) {
+    return new LilyPadEntity(position);
   }
 }
