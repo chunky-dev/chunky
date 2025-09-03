@@ -95,25 +95,7 @@ public class PathTracer implements RayTracer {
         // Sun sampling
 
         if (scene.sunSamplingStrategy.doSunSampling() && ((state.ray.flags & Ray.DIFFUSE) != 0 || (state.intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0)) {
-          state.sampleRay.set(ray);
-          scene.sun.getRandomSunDirection(state.sampleRay.d, state.random);
-
-          scene.sky.getSkyColor(state.sampleRay, state.sampleRecord, true);
-          state.sampleColor.set(state.sampleRecord.color);
-
-          transmittance(scene, state, i);
-
-          double scaleFactor;
-          if ((intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0) {
-            scaleFactor = Material.phaseHG(ray.d.rScale(-1).dot(state.sampleRay.d), intersectionRecord.material.volumeAnisotropy);
-          } else {
-            scaleFactor = QuickMath.abs(state.sampleRay.d.dot(intersectionRecord.shadeN));
-          }
-          scaleFactor *= scene.sun.radius * scene.sun.radius;
-          state.sampleColor.scale(scaleFactor);
-          state.sampleColor.x *= state.attenuation.x;
-          state.sampleColor.y *= state.attenuation.y;
-          state.sampleColor.z *= state.attenuation.z;
+          doSunSampling(scene, state, i);
         }
 
         // --------
@@ -122,31 +104,7 @@ public class PathTracer implements RayTracer {
         // less realism. The user can select fog color and density; in a more
         // realistic model color would depend on viewing angle and sun color/position.
         if (intersectionRecord.distance > 0 && scene.fog.isFogEnabled() && (ray.getCurrentMedium() == Air.INSTANCE || ray.getCurrentMedium() == Void.INSTANCE)) {
-
-          // Pick point between ray origin and intersected object.
-          // The chosen point is used to test if the sun is lighting the
-          // fog between the camera and the first diffuse ray target.
-          // The sun contribution will be proportional to the amount of
-          // sunlit fog areas in the ray path, thus giving an approximation
-          // of the sun inscatter leading to effects like god rays.
-          // The way the sun contribution point is chosen is not
-          // entirely correct because the original ray may have
-          // travelled through glass or other materials between air gaps.
-          // However, the results are probably close enough to not be distracting,
-          // so this seems like a reasonable approximation.
-          Ray atmos = state.sampleRay;
-          double offset = scene.fog.sampleGroundScatterOffset(ray, intersectionRecord.distance, ox, od, random);
-          atmos.o.scaleAdd(offset, od, ox);
-          scene.sun.getRandomSunDirection(atmos.d, random);
-
-          // Check sun visibility at random point to determine inscatter brightness.
-          transmittance(scene, state, i);
-          Vector4 fogColor = new Vector4(0);
-          scene.fog.addGroundFog(ray, fogColor, intersectionRecord.color, emittance, ox, od, intersectionRecord.distance, state.attenuation, offset);
-
-          cumulativeColor.x += fogColor.x * throughput.x;
-          cumulativeColor.y += fogColor.y * throughput.y;
-          cumulativeColor.z += fogColor.z * throughput.z;
+          sampleFog(scene, state, ox, od, i);
         }
 
         // --------
@@ -156,33 +114,7 @@ public class PathTracer implements RayTracer {
             && scene.getEmitterGrid() != null
             && ((state.ray.flags & Ray.DIFFUSE) != 0
                 || (state.intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0)) {
-          switch (scene.emitterSamplingStrategy) {
-            case ONE:
-            case ONE_BLOCK: {
-              Grid.EmitterPosition pos = scene.getEmitterGrid().sampleEmitterPosition((int) ray.o.x, (int) ray.o.y, (int) ray.o.z, random);
-              if (pos != null) {
-                sampleColor.scaleAdd(FastMath.PI, sampleEmitter(scene, ray, intersectionRecord, pos, random));
-
-                if (scene.isPreventNormalEmitterWithSampling() && (prevFlags & Ray.INDIRECT) != 0) {
-                  emittance.set(0);
-                }
-              }
-              break;
-            }
-            case ALL: {
-              List<EmitterPosition> positions = scene.getEmitterGrid()
-                  .getEmitterPositions((int) ray.o.x, (int) ray.o.y, (int) ray.o.z);
-              double sampleScaler = FastMath.PI / positions.size();
-              for (Grid.EmitterPosition pos : positions) {
-                sampleColor.scaleAdd(sampleScaler, sampleEmitter(scene, ray, intersectionRecord, pos, random));
-
-                if (scene.isPreventNormalEmitterWithSampling() && (prevFlags & Ray.INDIRECT) != 0) {
-                  emittance.set(0);
-                }
-              }
-              break;
-            }
-          }
+          doEmitterSampling(scene, state, prevFlags);
         }
 
         // Light emitted by object should not be affected by the tinting of reflected light.
@@ -212,6 +144,31 @@ public class PathTracer implements RayTracer {
         break;
       }
     }
+  }
+
+  private static void doSunSampling(Scene scene, WorkerState state, int rayDepth) {
+    Ray ray = state.ray;
+    IntersectionRecord intersectionRecord = state.intersectionRecord;
+
+    state.sampleRay.set(ray);
+    scene.sun.getRandomSunDirection(state.sampleRay.d, state.random);
+
+    scene.sky.getSkyColor(state.sampleRay, state.sampleRecord, true);
+    state.sampleColor.set(state.sampleRecord.color);
+
+    transmittance(scene, state, rayDepth);
+
+    double scaleFactor;
+    if ((intersectionRecord.flags & IntersectionRecord.VOLUME_INTERSECT) != 0) {
+      scaleFactor = Material.phaseHG(ray.d.rScale(-1).dot(state.sampleRay.d), intersectionRecord.material.volumeAnisotropy);
+    } else {
+      scaleFactor = QuickMath.abs(state.sampleRay.d.dot(intersectionRecord.shadeN));
+    }
+    scaleFactor *= scene.sun.radius * scene.sun.radius;
+    state.sampleColor.scale(scaleFactor);
+    state.sampleColor.x *= state.attenuation.x;
+    state.sampleColor.y *= state.attenuation.y;
+    state.sampleColor.z *= state.attenuation.z;
   }
 
   private static void transmittance(Scene scene, WorkerState state, int rayDepth) {
@@ -257,6 +214,41 @@ public class PathTracer implements RayTracer {
     }
   }
 
+  private static void sampleFog(Scene scene, WorkerState state, Vector3 ox, Vector3 od, int rayDepth) {
+    // Pick point between ray origin and intersected object.
+    // The chosen point is used to test if the sun is lighting the
+    // fog between the camera and the first diffuse ray target.
+    // The sun contribution will be proportional to the amount of
+    // sunlit fog areas in the ray path, thus giving an approximation
+    // of the sun inscatter leading to effects like god rays.
+    // The way the sun contribution point is chosen is not
+    // entirely correct because the original ray may have
+    // travelled through glass or other materials between air gaps.
+    // However, the results are probably close enough to not be distracting,
+    // so this seems like a reasonable approximation.
+    Ray ray = state.ray;
+    IntersectionRecord intersectionRecord = state.intersectionRecord;
+    Random random = state.random;
+    Vector3 emittance = state.emittance;
+    Vector4 cumulativeColor = state.color;
+    Vector3 throughput = state.throughput;
+
+    Ray atmos = state.sampleRay;
+    double offset = scene.fog.sampleGroundScatterOffset(ray, intersectionRecord.distance, ox, od, random);
+    atmos.o.scaleAdd(offset, od, ox);
+    atmos.setCurrentMedium(scene.getWorldMaterial(atmos));
+    scene.sun.getRandomSunDirection(atmos.d, random);
+
+    // Check sun visibility at random point to determine inscatter brightness.
+    transmittance(scene, state, rayDepth);
+    Vector4 fogColor = new Vector4(0);
+    scene.fog.addGroundFog(ray, fogColor, intersectionRecord.color, emittance, ox, od, intersectionRecord.distance, state.attenuation, offset);
+
+    cumulativeColor.x += fogColor.x * throughput.x;
+    cumulativeColor.y += fogColor.y * throughput.y;
+    cumulativeColor.z += fogColor.z * throughput.z;
+  }
+
   private static void addSkyFog(Scene scene, WorkerState state, Vector3 ox, Vector3 od, int rayDepth) {
     if (scene.fog.getFogMode() == FogMode.UNIFORM) {
       scene.fog.addSkyFog(state.ray, state.intersectionRecord, null);
@@ -264,9 +256,46 @@ public class PathTracer implements RayTracer {
       Ray atmos = state.sampleRay;
       double offset = scene.fog.sampleSkyScatterOffset(scene, state.ray, state.random);
       atmos.o.scaleAdd(offset, od, ox);
+      atmos.setCurrentMedium(scene.getWorldMaterial(atmos));
       scene.sun.getRandomSunDirection(atmos.d, state.random);
       transmittance(scene, state, rayDepth);
       scene.fog.addSkyFog(state.ray, state.intersectionRecord, state.attenuation);
+    }
+  }
+
+  private static void doEmitterSampling(Scene scene, WorkerState state, int prevFlags) {
+    Ray ray = state.ray;
+    IntersectionRecord intersectionRecord = state.intersectionRecord;
+    Vector3 emittance = state.emittance;
+    Vector4 sampleColor = state.sampleColor;
+    Random random = state.random;
+
+    switch (scene.emitterSamplingStrategy) {
+      case ONE:
+      case ONE_BLOCK: {
+        Grid.EmitterPosition pos = scene.getEmitterGrid().sampleEmitterPosition((int) ray.o.x, (int) ray.o.y, (int) ray.o.z, random);
+        if (pos != null) {
+          sampleColor.scaleAdd(FastMath.PI, sampleEmitter(scene, ray, intersectionRecord, pos, random));
+
+          if (scene.isPreventNormalEmitterWithSampling() && (prevFlags & Ray.INDIRECT) != 0) {
+            emittance.set(0);
+          }
+        }
+        break;
+      }
+      case ALL: {
+        List<EmitterPosition> positions = scene.getEmitterGrid()
+            .getEmitterPositions((int) ray.o.x, (int) ray.o.y, (int) ray.o.z);
+        double sampleScaler = FastMath.PI / positions.size();
+        for (Grid.EmitterPosition pos : positions) {
+          sampleColor.scaleAdd(sampleScaler, sampleEmitter(scene, ray, intersectionRecord, pos, random));
+
+          if (scene.isPreventNormalEmitterWithSampling() && (prevFlags & Ray.INDIRECT) != 0) {
+            emittance.set(0);
+          }
+        }
+        break;
+      }
     }
   }
 
