@@ -2447,8 +2447,8 @@ public class Scene implements Configurable, Refreshable {
         IntersectionRecord intersectionRecord = new IntersectionRecord();
         if (traceTarget(ray, intersectionRecord) && intersectionRecord.material instanceof Block) {
           Block block = (Block) intersectionRecord.material;
-          buf.append(String.format("target: %.2f m\n", intersectionRecord.distance));
-          buf.append(block.name);
+          buf.append(String.format("Target distance: %.2f m\n", intersectionRecord.distance));
+          buf.append(String.format("Target material: %s\n", block.name));
           String description = block.description();
           if (!description.isEmpty()) {
             buf.append(" (").append(description).append(")");
@@ -2456,9 +2456,11 @@ public class Scene implements Configurable, Refreshable {
           buf.append("\n");
         }
         Vector3 pos = camera.getPosition();
-        buf.append(String.format("pos: (%.1f, %.1f, %.1f)\n", pos.x, pos.y, pos.z));
+        buf.append(String.format("Camera position: (%.1f, %.1f, %.1f)\n", pos.x, pos.y, pos.z));
+        ray.o.set(pos.rSub(origin));
+        buf.append(String.format("Ray material: %s\n", getWorldMaterial(ray).name));
 
-        buf.append("facing: ");
+        buf.append("Camera facing: ");
         double yaw = camera.getYaw();
         yaw = (yaw + Math.PI*2) % (Math.PI*2);
         int index = (int)Math.floor((yaw + Math.PI/8) / (Math.PI/4)) % 8;
