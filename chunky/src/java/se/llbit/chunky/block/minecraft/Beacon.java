@@ -62,7 +62,7 @@ public class Beacon extends AbstractModelBlock {
       if (ray.getCurrentMedium() == this) {
         if (ray.d.dot(intersectionRecord.n) > 0) {
           Vector3 o = new Vector3(ray.o);
-          if (onEdge(o, ray.d, intersectionRecord)) {
+          if (onEdge(o, ray.d, intersectionRecord.distance)) {
             return false;
           }
           intersectionRecord.n.scale(-1);

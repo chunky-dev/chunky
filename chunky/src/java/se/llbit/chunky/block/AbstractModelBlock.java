@@ -43,8 +43,8 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
     return model;
   }
 
-  public static boolean onEdge(Vector3 o, Vector3 d, IntersectionRecord intersectionRecord) {
-    o.scaleAdd(intersectionRecord.distance, d);
+  public static boolean onEdge(Vector3 o, Vector3 d, double distance) {
+    o.scaleAdd(distance, d);
     double ix = o.x - QuickMath.floor(o.x);
     double iy = o.y - QuickMath.floor(o.y);
     double iz = o.z - QuickMath.floor(o.z);
@@ -89,7 +89,7 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
         intersectionRecord.setNormal(modelIntersect);
         if (ray.d.dot(intersectionRecord.n) > 0) {
           Vector3 o = new Vector3(ray.o);
-          if (onEdge(o, ray.d, modelIntersect)) {
+          if (onEdge(ray.o, ray.d, modelIntersect.distance)) {
             return false;
           }
           intersectionRecord.n.scale(-1);
