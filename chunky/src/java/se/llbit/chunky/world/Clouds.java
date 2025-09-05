@@ -22,16 +22,10 @@ package se.llbit.chunky.world;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Clouds {
-  private static final long[][] clouds = new long[32][32];
+  private static long[][] clouds = new long[32][32];
 
   static {
-    zero();
-  }
-
-  /**
-   * Zero the cloud data
-   */
-  public static void zero() {
+    // Zero the cloud data
     for (int i = 0; i < 32; ++i) {
       for (int j = 0; j < 32; ++j) {
         clouds[i][j] = 0L;

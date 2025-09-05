@@ -172,7 +172,7 @@ public class SkyCache {
     double phi = ((double) y / skyResolution) * PI - PI / 2;
     double r = FastMath.cos(phi);
     ray.d.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
-    
+
     return simSky.calcIncidentLight(ray);
   }
 }
