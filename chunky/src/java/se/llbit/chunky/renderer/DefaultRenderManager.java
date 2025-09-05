@@ -460,8 +460,6 @@ public class DefaultRenderManager extends Thread implements RenderManager {
                 System.arraycopy(pixelBuffer, 0, intermediate, index, 3);
 
                 // TODO: extract clamping into own interface
-                Arrays.setAll(pixelBuffer, k -> Math.min(1, pixelBuffer[k]));
-                bufferedScene.getBackBuffer().setPixel(x, y, ColorUtil.getRGB(pixelBuffer));
               }
             }));
           }
