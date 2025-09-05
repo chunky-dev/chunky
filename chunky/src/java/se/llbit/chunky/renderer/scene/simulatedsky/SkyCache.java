@@ -134,9 +134,7 @@ public class SkyCache {
     theta = ((theta % 1) + 1) % 1;
     double phi = (FastMath.asin(QuickMath.clamp(ray.d.y, -1, 1)) + PI / 2) / PI;
 
-    Vector3 color = getColorInterpolated(theta, phi);
-    //ColorUtil.RGBfromHSL(color, color.x, color.y, color.z);
-    return color;
+    return getColorInterpolated(theta, phi);
   }
 
   // Linear interpolation between 2 points in 1 dimension
@@ -174,9 +172,7 @@ public class SkyCache {
     double phi = ((double) y / skyResolution) * PI - PI / 2;
     double r = FastMath.cos(phi);
     ray.d.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
-
-    Vector3 color = simSky.calcIncidentLight(ray);
-    //ColorUtil.RGBtoHSL(color, color.x, color.y, color.z);
-    return color;
+    
+    return simSky.calcIncidentLight(ray);
   }
 }
