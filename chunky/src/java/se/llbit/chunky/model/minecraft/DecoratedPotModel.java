@@ -34,6 +34,7 @@ import se.llbit.math.primitive.Primitive;
 import se.llbit.util.JsonUtil;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
@@ -156,11 +157,11 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
       return primitives;
     }
 
-    public static Entity fromJson(JsonObject json) {
-      return new DecoratedPotSpoutEntity(
+    public static Collection<Entity> fromJson(JsonObject json) {
+      return Collections.singleton(new DecoratedPotSpoutEntity(
         JsonUtil.vec3FromJsonObject(json.get("position")),
         json.get("facing").stringValue("north")
-      );
+      ));
     }
 
     @Override

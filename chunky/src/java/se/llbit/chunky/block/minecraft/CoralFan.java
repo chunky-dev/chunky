@@ -26,6 +26,9 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class CoralFan extends MinecraftBlockTranslucent {
 
   private final String coralType;
@@ -33,9 +36,7 @@ public class CoralFan extends MinecraftBlockTranslucent {
   public CoralFan(String name, String coralType) {
     super(name, coralTexture(coralType));
     this.coralType = coralType;
-    localIntersect = true;
     solid = false;
-    invisible = true;
   }
 
   public static Texture coralTexture(String coralType) {
@@ -64,15 +65,11 @@ public class CoralFan extends MinecraftBlockTranslucent {
     }
   }
 
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return false;
-  }
-
-  @Override public boolean isEntity() {
+  @Override public boolean hasEntities() {
     return true;
   }
 
-  @Override public Entity toEntity(Vector3 position) {
-    return new CoralFanEntity(position, coralType);
+  @Override public Collection<Entity> createEntities(Vector3 position) {
+    return Collections.singleton(new CoralFanEntity(position, coralType));
   }
 }

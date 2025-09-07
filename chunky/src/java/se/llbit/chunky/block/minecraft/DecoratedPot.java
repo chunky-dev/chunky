@@ -64,7 +64,12 @@ public class DecoratedPot extends AbstractModelBlock {
   }
 
   @Override
-  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  public boolean isReplacedByEntities() {
+    return false;
+  }
+
+  @Override
+  public Entity createBlockEntity(Vector3 position, CompoundTag entityTag) {
     return new DecoratedPotModel.DecoratedPotSpoutEntity(position, facing);
   }
 
