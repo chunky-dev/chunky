@@ -16,7 +16,14 @@ import se.llbit.math.Intersectable;
 import se.llbit.util.Configurable;
 import se.llbit.util.HasControls;
 
+/**
+ * A volume of volumetric fog.
+ */
 public abstract class FogVolume implements HasControls, Configurable, Intersectable {
+
+  /**
+   * Custom Simplex Noise Config for volumetric fog.
+   */
   public static class NoiseConfig extends SimplexNoiseConfig {
     public boolean useNoise = false;
     public int marchSteps = 10;
@@ -173,6 +180,5 @@ public abstract class FogVolume implements HasControls, Configurable, Intersecta
 
   @Override
   public void reset() {
-
   }
 }

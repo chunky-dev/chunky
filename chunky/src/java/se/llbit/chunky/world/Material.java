@@ -112,6 +112,9 @@ public abstract class Material {
    */
   public float roughness = 0f;
 
+  /**
+   * The (linear) roughness applied to transmitted / refracted rays.
+   */
   public float transmissionRoughness = 0f;
 
   /**
@@ -123,10 +126,19 @@ public abstract class Material {
    */
   public float metalness = 0f;
 
+  /**
+   * The amount of texture tinting applied to transmitted rays.
+   */
   public float transmissionMetalness = 0f;
 
+  /**
+   * Additional color tinting applied to specularly-reflected rays.
+   */
   public final Vector3 specularColor = new Vector3(1, 1, 1);
 
+  /**
+   * Additional color tinting applied to specularly-transmitted or -refracted rays.
+   */
   public final Vector3 transmissionSpecularColor = new Vector3(1, 1, 1);
 
   /**
@@ -135,26 +147,56 @@ public abstract class Material {
   public float alpha = 1f;
 
   /**
-   * Subsurface scattering property.
+   * Subsurface scattering property. This is extremely basic subsurface scattering that simply
+   * inverts the normal of the surface to diffusely reflect rays to the other side of the surface.
    */
   public float subSurfaceScattering = 0f;
 
+  /**
+   * Color tinting applied to diffusely-reflected rays.
+   */
   public final Vector3 diffuseColor = new Vector3(1, 1, 1);
 
+  /**
+   * Color tinting applied to emitted light.
+   */
   public final Vector3 emittanceColor = new Vector3(1, 1, 1);
 
+  /**
+   * The density of the volume medium of the material. Rays that are traversing the medium are more
+   * likely to hit the volume medium the higher the volume density.
+   */
   public float volumeDensity = 0f;
 
+  /**
+   * The phase function that is applied to rays scattering off the volume medium.
+   */
   public float volumeAnisotropy = 0f;
 
+  /**
+   * The emittance applied from rays intersecting the volume medium.
+   */
   public float volumeEmittance = 0f;
 
+  /**
+   * The color of the volume medium.
+   */
   public Vector3 volumeColor = new Vector3(1, 1, 1);
 
+  /**
+   * Rays traversing this material will have their light attenuated. The strength of the
+   * attenuation is controlled by this value.
+   */
   public float absorption = 0f;
 
+  /**
+   * The color of light absorbed by the medium.
+   */
   public Vector3 absorptionColor = new Vector3(1, 1, 1);
 
+  /**
+   * Whether the block is intersected.
+   */
   public boolean hidden = false;
 
   /**
@@ -162,6 +204,9 @@ public abstract class Material {
    */
   public final Texture texture;
 
+  /**
+   * Whether this block is waterlogged.
+   */
   public boolean waterlogged = false;
 
   public Material(String name, Texture texture) {
@@ -295,10 +340,16 @@ public abstract class Material {
     return properties;
   }
 
+  /**
+   * Whether this material is a water block.
+   */
   public boolean isWater() {
     return false;
   }
 
+  /**
+   * Whether this material is waterlogged or a water block.
+   */
   public boolean isWaterFilled() {
     return waterlogged || isWater();
   }
@@ -323,6 +374,10 @@ public abstract class Material {
     transmissionRoughness = (float) Math.pow(1 - perceptualTransmissionSmoothness, 2);
   }
 
+  /**
+   * Sets the emittance of the material based on its in-game light level.
+   * @param level The light level of the block in Minecraft.
+   */
   public void setLightLevel(float level) {
     emittance = level / 15;
   }
@@ -334,6 +389,9 @@ public abstract class Material {
     emitterMappingReferenceColors.add(new Vector4(Math.pow(r/255, Scene.DEFAULT_GAMMA), Math.pow(g/255, Scene.DEFAULT_GAMMA), Math.pow(b/255, Scene.DEFAULT_GAMMA), delta));
   }
 
+  /**
+   * Intersect with the volume medium of this material.
+   */
   public boolean volumeIntersect(IntersectionRecord intersectionRecord, Random random) {
     if (volumeDensity < Constants.EPSILON) {
       return false;
@@ -346,10 +404,22 @@ public abstract class Material {
     return true;
   }
 
+  /**
+   * Finds the distance to the volume medium intersection.
+   * @param density The density of the volume medium
+   * @param random Random number generator
+   * @return The distance to the volume medium intersection.
+   */
   public static double fogDistance(double density, Random random) {
     return -FastMath.log(1 - random.nextDouble()) / density;
   }
 
+  /**
+   * Attenuates the color based on the {@code absorption} of this material, and the distance the
+   * ray has travelled through it.
+   * @param color The color to be attenuated.
+   * @param distance The distance the ray has travelled through this material.
+   */
   public void absorption(Vector3 color, double distance) {
     if (absorption < Constants.EPSILON) {
       return;
@@ -359,6 +429,13 @@ public abstract class Material {
     color.z *= FastMath.exp((1 - absorptionColor.z) * absorption * -distance);
   }
 
+  /**
+   * Sets the {@code emittance} based on the {@code emitterMappingType} and
+   * {@code emitterMappingReferenceColors}.
+   * @param emittance The emittance color to be set.
+   * @param color The intersection color.
+   * @param scene The scene state.
+   */
   public void doEmitterMapping(Vector3 emittance, Vector4 color, Scene scene) {
     double exp = Math.max(scene.getEmitterMappingExponent() + emitterMappingOffset, 0);
     EmitterMappingType emitterMappingType = this.emitterMappingType == EmitterMappingType.NONE ? scene.getEmitterMappingType() : this.emitterMappingType;
@@ -390,6 +467,15 @@ public abstract class Material {
     }
   }
 
+  /**
+   * Scatter the incoming ray and update the {@code emittance} based on the material properties.
+   * @param ray The incoming ray.
+   * @param intersectionRecord The {@code intersectionRecord} containing the intersection details.
+   * @param scene The scene state.
+   * @param emittance The emittance color to be updated.
+   * @param random Random number generator.
+   * @return Whether to update the ray material to the intersection material.
+   */
   public boolean scatter(Ray ray, IntersectionRecord intersectionRecord, Scene scene, final Vector3 emittance, Random random) {
     boolean mediumChanged = false;
     boolean throughSurface = false;
@@ -425,6 +511,7 @@ public abstract class Material {
       } else {
         // Lambertian reflection
         if (random.nextDouble() < subSurfaceScattering) {
+          // Subsurface scattering
           intersectionRecord.shadeN.scale(-1);
           intersectionRecord.n.scale(-1);
           ray.d.scale(-1); // This is to prevent direction from being inverted later.
@@ -497,18 +584,39 @@ public abstract class Material {
 
     int sign = throughSurface ? -1 : 1;
 
+    // After reflection, the dot product between the direction and the real surface normal
+    // should have the opposite sign as the dot product between the incoming direction
+    // and the normal (because the incoming is going toward the volume enclosed
+    // by the surface and the reflected ray is going away)
+    // If this is not the case, we need to fix that
     if (QuickMath.signum(intersectionRecord.n.dot(direction)) == sign * QuickMath.signum(intersectionRecord.n.dot(ray.d))) {
+      // The reflected ray goes is going through the geometry,
+      // we need to alter its direction so it doesn't.
+      // The way we do that is by adding the geometry normal multiplied by some factor
+      // The factor can be determined by projecting the direction on the normal,
+      // ie doing a dot product because, for every unit vector d and n,
+      // we have the relation:
+      // `(d - d.n * n) . n = 0`
+      // This tells us that if we chose `-d.n` as the factor we would have a dot product
+      // equals to 0, as we want something positive or negative,
+      // we will use the factor `-d.n +/- epsilon`
       double factor = QuickMath.signum(intersectionRecord.n.dot(ray.d)) * -Constants.EPSILON - direction.dot(intersectionRecord.n);
       direction.scaleAdd(factor, intersectionRecord.n);
       direction.normalize();
     }
     ray.d.set(direction);
 
+    // Offset the ray so that it does not intersect the same spot again.
     ray.o.scaleAdd(sign * Constants.OFFSET, intersectionRecord.n);
 
     return mediumChanged;
   }
 
+  /**
+   * Scatter the ray based on the Henyey-Greenstein phase function for volume intersections.
+   * @param ray The ray whose direction will be updated.
+   * @param random Random number generator.
+   */
   public void volumeScatter(Ray ray, Random random) {
     Vector3 invDir = ray.d.rScale(-1);
     Vector3 outDir = new Vector3();
@@ -521,6 +629,11 @@ public abstract class Material {
     ray.setIndirect(true);
   }
 
+  /**
+   * Henyey-Greenstein phase function.
+   * @param cosTheta Dot product between incoming and outgoing directions.
+   * @param g Anisotropy of the volume medium.
+   */
   public static double phaseHG(double cosTheta, double g) {
     double denominator = 1 + (g * g) + (2 * g * cosTheta);
     return Constants.INV_4_PI * (1 - g * g) / (denominator * FastMath.sqrt(denominator));
@@ -578,6 +691,11 @@ public abstract class Material {
     return x1;
   }
 
+  /**
+   * Return a random cosine-weighted Vector3 in the hemisphere defined by {@code normal}.
+   * @param normal The normal defining the hemisphere.
+   * @param random Random number generator.
+   */
   private static Vector3 randomHemisphereDir(Vector3 normal, Random random) {
     double x1 = random.nextDouble();
     double x2 = random.nextDouble();
@@ -624,6 +742,11 @@ public abstract class Material {
     );
   }
 
+  /**
+   * Return a Lambertian (diffuse) reflection in the hemisphere defined by {@code n}, the normal.
+   * @param n The normal of the reflecting surface.
+   * @param random Random number generator.
+   */
   private static Vector3 lambertianReflection(Vector3 n, Random random) {
     Vector3 direction = randomHemisphereDir(n, random);
     direction.normalize();
@@ -656,6 +779,10 @@ public abstract class Material {
     color.z *= colorModifier.z;
   }
 
+  /**
+   * Return a {@code VBox} containing a set of controls that change the properties of
+   * {@code material}.
+   */
   public static VBox getControls(Material material, Scene scene) {
     DoubleAdjuster emittanceAdjuster = new DoubleAdjuster();
     LuxColorPicker emittanceColorPicker = new LuxColorPicker();

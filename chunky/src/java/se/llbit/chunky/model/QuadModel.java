@@ -71,9 +71,13 @@ public abstract class QuadModel implements BlockModel {
   public static final Quad[] FULL_BLOCK_QUADS = {
     FULL_BLOCK_NORTH_SIDE, FULL_BLOCK_SOUTH_SIDE,
     FULL_BLOCK_WEST_SIDE, FULL_BLOCK_EAST_SIDE,
-    FULL_BLOCK_BOTTOM_SIDE, FULL_BLOCK_TOP_SIDE
+    FULL_BLOCK_TOP_SIDE, FULL_BLOCK_BOTTOM_SIDE
   };
 
+  /**
+   * Whether this block model will allow intersecting rays to update their mediums when traversing
+   * the model.
+   */
   public boolean refractive = false;
 
   @PluginApi

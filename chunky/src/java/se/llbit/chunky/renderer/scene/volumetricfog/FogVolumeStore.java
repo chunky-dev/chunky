@@ -7,6 +7,7 @@ import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.*;
 import se.llbit.math.bvh.BVH;
+import se.llbit.util.Configurable;
 import se.llbit.util.JsonSerializable;
 import se.llbit.util.TaskTracker;
 
@@ -19,7 +20,7 @@ import java.util.stream.Stream;
 /**
  * Wrapper for fog volumes.
  */
-public class FogVolumeStore implements Intersectable, JsonSerializable {
+public class FogVolumeStore implements Intersectable, JsonSerializable, Configurable {
   private static final float DEFAULT_DENSITY = 0.1f;
 
   private final ArrayList<ContinuousFogVolume> continuousFogVolumes = new ArrayList<>(0);
@@ -29,6 +30,7 @@ public class FogVolumeStore implements Intersectable, JsonSerializable {
   public FogVolumeStore() {
   }
 
+  @Override
   public JsonObject toJson() {
     JsonObject json = new JsonObject();
     JsonArray continuousFogVolumesArray = new JsonArray();
@@ -46,6 +48,7 @@ public class FogVolumeStore implements Intersectable, JsonSerializable {
     return json;
   }
 
+  @Override
   public void fromJson(JsonObject json) {
     clear();
     JsonArray continuousFogVolumesArray = json.get("continuousFogVolumes").array();
@@ -145,6 +148,11 @@ public class FogVolumeStore implements Intersectable, JsonSerializable {
   public void clear() {
     this.continuousFogVolumes.clear();
     this.discreteFogVolumes.clear();
+  }
+
+  @Override
+  public void reset() {
+    clear();
   }
 
   public void finalizeLoading() {

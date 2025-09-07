@@ -16,6 +16,9 @@ import se.llbit.math.Vector3;
 import se.llbit.util.Configurable;
 import se.llbit.util.HasControls;
 
+/**
+ * Wraps a {@link se.llbit.math.SimplexNoise} instance and provides controls for the noise.
+ */
 public class SimplexNoiseConfig implements Configurable, HasControls {
   private long seed;
   private int iterations = 5;

@@ -133,6 +133,9 @@ public abstract class Block extends Material {
     return null;
   }
 
+  /**
+   * Checks whether the given ray is inside this block.
+   */
   public boolean isInside(Ray ray) {
     double ix = ray.o.x - QuickMath.floor(ray.o.x);
     double iy = ray.o.y - QuickMath.floor(ray.o.y);
