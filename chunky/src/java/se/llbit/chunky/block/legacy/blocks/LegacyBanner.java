@@ -56,7 +56,7 @@ public class LegacyBanner extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  public Entity createBlockEntity(Vector3 position, CompoundTag entityTag) {
     return new StandingBanner(position, rotation, parseDesign(entityTag));
   }
 

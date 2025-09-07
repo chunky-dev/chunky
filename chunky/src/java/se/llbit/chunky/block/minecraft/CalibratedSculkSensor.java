@@ -25,6 +25,9 @@ import se.llbit.chunky.model.minecraft.CalibratedSculkSensorModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Vector3;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class CalibratedSculkSensor extends AbstractModelBlock {
   private final String phase;
   private final String facing;
@@ -46,17 +49,17 @@ public class CalibratedSculkSensor extends AbstractModelBlock {
   }
 
   @Override
-  public boolean isEntity() {
+  public boolean hasEntities() {
     return true;
   }
 
   @Override
-  public boolean isBlockWithEntity() {
-    return true;
+  public boolean isReplacedByEntities() {
+    return false;
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
-    return new CalibratedSculkSensorAmethyst(position, this.facing, isActive(), this);
+  public Collection<Entity> createEntities(Vector3 position) {
+    return Collections.singleton(new CalibratedSculkSensorAmethyst(position, this.facing, isActive(), this));
   }
 }
