@@ -18,7 +18,10 @@ package se.llbit.chunky.renderer.projection;
 
 import java.util.Random;
 
-import se.llbit.math.Ray;
+import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.renderer.ApertureShape;
+import se.llbit.math.Transform;
+import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 
 /**
@@ -26,29 +29,36 @@ import se.llbit.math.Vector3;
  */
 public class SphericalApertureProjector extends ApertureProjector {
   public SphericalApertureProjector(Projector wrapped, double apertureSize,
-      double subjectDistance) {
+                                    double subjectDistance) {
     super(wrapped, apertureSize, subjectDistance);
+  }
+
+  public SphericalApertureProjector(Projector wrapped, double apertureSize, double subjectDistance, String apertureMaskFilename) {
+    super(wrapped, apertureSize, subjectDistance, apertureMaskFilename);
+  }
+
+  public SphericalApertureProjector(Projector wrapped, double apertureSize, double subjectDistance, ApertureShape apertureShape) {
+    super(wrapped, apertureSize, subjectDistance, apertureShape);
   }
 
   @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
     wrapped.apply(x, y, random, o, d);
 
+    double yaw = FastMath.atan2(d.x, d.z);
+    double pitch = FastMath.atan2(d.y, FastMath.sqrt(d.x * d.x + d.z * d.z));
+
     d.scale(subjectDistance);
 
-    // find random point in aperture
-    double rx, ry;
-    while (true) {
-      rx = 2 * random.nextDouble() - 1;
-      ry = 2 * random.nextDouble() - 1;
-      double s = rx * rx + ry * ry;
-      if (s > Ray.EPSILON && s <= 1) {
-        rx *= aperture;
-        ry *= aperture;
-        break;
-      }
-    }
+    Vector2 point = getPointInAperture(random);
+    double rx = point.x;
+    double ry = point.y;
 
-    d.sub(rx, ry, 0);
-    o.add(rx, ry, 0);
+    Vector3 aperturePoint = new Vector3(rx, ry, 0);
+
+    Transform transform = Transform.NONE;
+    transform.rotateX(-pitch).rotateY(yaw).apply(aperturePoint);
+
+    d.sub(aperturePoint.x, aperturePoint.y, aperturePoint.z);
+    o.add(aperturePoint.x, aperturePoint.y, aperturePoint.z);
   }
 }

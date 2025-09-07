@@ -208,10 +208,19 @@ public class Camera implements JsonSerializable {
       return new ApertureProjector(p, subjectDistance / dof, subjectDistance, apertureShape);
   }
 
-  private Projector applySphericalDoF(Projector p) {
-    return infiniteDoF() ?
-        p :
-        new SphericalApertureProjector(p, subjectDistance / dof, subjectDistance);
+  private Projector applySphericalDoF(Projector p, double subjectDistance) {
+    if (infiniteDoF()) {
+      return p;
+    } else if (apertureShape == ApertureShape.CUSTOM) {
+      return new SphericalApertureProjector(p, subjectDistance / dof,
+        subjectDistance, apertureMaskFilename);
+    } else if (apertureShape == ApertureShape.CIRCLE) {
+      return new SphericalApertureProjector(p, subjectDistance / dof, subjectDistance);
+    }
+    else {
+      return new SphericalApertureProjector(p, subjectDistance / dof,
+        subjectDistance, apertureShape);
+    }
   }
 
   private Projector applyShift(Projector p) {
@@ -239,19 +248,19 @@ public class Camera implements JsonSerializable {
             subjectDistance + worldDiagonalSize
         ));
       case FISHEYE:
-        return applySphericalDoF(new FisheyeProjector(fov));
+        return applySphericalDoF(new FisheyeProjector(fov), subjectDistance);
       case PANORAMIC_SLOT:
-        return applySphericalDoF(new PanoramicSlotProjector(fov));
+        return applySphericalDoF(new PanoramicSlotProjector(fov), subjectDistance);
       case PANORAMIC:
-        return applySphericalDoF(new PanoramicProjector(fov));
+        return applySphericalDoF(new PanoramicProjector(fov), subjectDistance);
       case STEREOGRAPHIC:
-        return applySphericalDoF(new StereographicProjector(fov));
+        return applySphericalDoF(new StereographicProjector(fov), subjectDistance);
       case ODS_LEFT:
-        return applySphericalDoF(new ODSSinglePerspectiveProjector(Eye.LEFT));
+        return applySphericalDoF(new ODSSinglePerspectiveProjector(Eye.LEFT), subjectDistance);
       case ODS_RIGHT:
-        return applySphericalDoF(new ODSSinglePerspectiveProjector(Eye.RIGHT));
+        return applySphericalDoF(new ODSSinglePerspectiveProjector(Eye.RIGHT), subjectDistance);
       case ODS_STACKED:
-        return applySphericalDoF(new ODSVerticalStackedProjector());
+        return applySphericalDoF(new ODSVerticalStackedProjector(), subjectDistance);
     }
   }
 
