@@ -105,7 +105,7 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
         if (ray.d.dot(intersectionRecord.n) > 0) {
           // Ray is exiting the block.
           Vector3 o = new Vector3(ray.o);
-          if (onEdge(ray.o, ray.d, modelIntersect.distance)) {
+          if (onEdge(o, ray.d, modelIntersect.distance)) {
             return false;
           }
           intersectionRecord.n.scale(-1);
