@@ -169,7 +169,6 @@ public class GlassPaneModel extends QuadModel {
   private final Texture[] textures;
 
   public GlassPaneModel(Texture top, Texture side, boolean north, boolean south, boolean east, boolean west) {
-    refractive = true;
     ArrayList<Quad> quads = new ArrayList<>();
     ArrayList<Texture> textures = new ArrayList<>();
 
