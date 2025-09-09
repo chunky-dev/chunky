@@ -112,8 +112,8 @@ public class PathTracer implements RayTracer {
 
         if (scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE
             && scene.getEmitterGrid() != null
-            && (state.ray.isDiffuse()
-                || state.intersectionRecord.isVolumeIntersect())) {
+            && (ray.isDiffuse()
+                || intersectionRecord.isVolumeIntersect())) {
           doEmitterSampling(scene, state, prevFlags);
         }
 
