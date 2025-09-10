@@ -120,7 +120,7 @@ public class AlphaBuffer {
         ParallelProjector.fixRay(state.ray, scene);
       }
       ray.setCurrentMedium(scene.getWorldMaterial(ray));
-      occlusion += PreviewRayTracer.skyOcclusion(scene, state);
+      occlusion += scene.skyOcclusion(state);
     }
     occlusion /= 4.0;
 

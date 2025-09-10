@@ -830,6 +830,29 @@ public class Scene implements Configurable, Refreshable {
   }
 
   /**
+   * Calculate sky occlusion.
+   * @return occlusion value (1 = occluded, 0 = transparent)
+   */
+  public double skyOcclusion(WorkerState state) {
+    Ray ray = state.ray;
+    IntersectionRecord intersectionRecord = state.intersectionRecord;
+    double occlusion = 1.0;
+    while (occlusion > Constants.EPSILON) {
+      intersectionRecord.reset();
+      if (!intersect(ray, intersectionRecord, state.random)) {
+        break;
+      } else {
+        occlusion *= (1 - intersectionRecord.color.w * intersectionRecord.material.alpha);
+        ray.o.scaleAdd((intersectionRecord.distance + Constants.OFFSET), ray.d);
+        if (!intersectionRecord.isNoMediumChange()) {
+          ray.setCurrentMedium(intersectionRecord.material);
+        }
+      }
+    }
+    return 1 - occlusion;
+  }
+
+  /**
    * Reload all loaded chunks.
    */
   public synchronized void reloadChunks(TaskTracker taskTracker) {
