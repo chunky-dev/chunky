@@ -144,6 +144,7 @@ public class EntitiesTab extends RenderControlsTab implements Initializable {
   @FXML private TableColumn<EntityData, String> kindCol;
   @FXML private Button delete;
   @FXML private Button add;
+  @FXML private Button clear;
   @FXML private Button cameraToEntity;
   @FXML private Button entityToCamera;
   @FXML private Button entityToTarget;
@@ -401,6 +402,11 @@ public class EntitiesTab extends RenderControlsTab implements Initializable {
       scene.removeEntity(entity);
       update(scene);
     }));
+    clear.setTooltip(new Tooltip("Remove all entities from the scene."));
+    clear.setOnAction(e -> {
+      scene.clearEntities();
+      update(scene);
+    });
     // TODO: remove or update the pose editing dialog.
     /*entityTable.setRowFactory(tbl -> {
       TableRow<PlayerData> row = new TableRow<>();

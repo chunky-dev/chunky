@@ -28,6 +28,7 @@
   <HBox spacing="10.0">
     <Button fx:id="add" mnemonicParsing="false" text="Add entity" />
     <Button fx:id="delete" mnemonicParsing="false" text="Remove entity" />
+    <Button fx:id="clear" mnemonicParsing="false" text="Remove all entities" />
   </HBox>
   <HBox spacing="10.0">
     <Button fx:id="cameraToEntity" mnemonicParsing="false" text="Camera to entity" />

@@ -2855,6 +2855,11 @@ public class Scene implements Configurable, Refreshable {
     rebuildActorBvh();
   }
 
+  public void clearEntities() {
+    entities.clear();
+    rebuildBvh();
+  }
+
   public List<CloudLayer> getCloudLayers() {
     return this.cloudLayers;
   }
