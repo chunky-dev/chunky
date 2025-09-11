@@ -515,6 +515,9 @@ public abstract class Material {
           intersectionRecord.shadeN.scale(-1);
           intersectionRecord.n.scale(-1);
           ray.d.scale(-1); // This is to prevent direction from being inverted later.
+          if (!intersectionRecord.isNoMediumChange()) {
+            mediumChanged = true;
+          }
         }
         direction = lambertianReflection(intersectionRecord.shadeN, random);
         tintColor(intersectionRecord.color, 1, diffuseColor);
