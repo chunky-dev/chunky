@@ -161,16 +161,6 @@ public class Scene implements Configurable, Refreshable {
   public static final double MAX_EMITTER_MAPPING_EXPONENT = 5;
 
   /**
-   * Minimum transmissivity cap.
-   */
-  public static final double MIN_TRANSMISSIVITY_CAP = 1;
-
-  /**
-   * Maximum transmissivity cap.
-   */
-  public static final double MAX_TRANSMISSIVITY_CAP = 3;
-
-  /**
    * Default exposure.
    */
   public static final double DEFAULT_EXPOSURE = 0.0;
