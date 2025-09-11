@@ -50,8 +50,6 @@ import java.util.stream.Collectors;
  */
 public class Sky implements JsonSerializable {
 
-  //private static final double CLOUD_OPACITY = 0.4;
-
   /**
    * Default sky light intensity
    */
