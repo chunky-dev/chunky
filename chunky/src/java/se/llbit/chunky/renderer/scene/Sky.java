@@ -547,7 +547,7 @@ public class Sky implements JsonSerializable {
     roll = json.get("skyRoll").doubleValue(roll);
     updateTransform();
     mirrored = json.get("skyMirrored").boolValue(mirrored);
-    skyEmittance = json.get("skyExposure").doubleValue(skyEmittance);
+    skyEmittance = json.get("skyEmittance").doubleValue(skyEmittance);
     mode = SkyMode.get(json.get("mode").stringValue(SkyMode.SIMULATED.name()));
 
     if (json.get("gradient").isArray()) {
