@@ -42,10 +42,6 @@ public abstract class SimplePixelPostProcessingFilter extends PixelPostProcessin
                     System.arraycopy(sampleBuffer, pixelOffset, pixelBuffer, 0, 3);
                     processPixel(pixelBuffer);
                     System.arraycopy(pixelBuffer, 0, sampleBuffer, pixelOffset, 3);
-//                    for (int i = 0; i < 3; ++i) {
-//                      // TODO: extract clamping into own interface
-//                      pixelBuffer[i] = Math.min(1.0, pixelBuffer[i]);
-//                    }
                   }
                 })
         ).join();
