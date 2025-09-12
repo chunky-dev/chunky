@@ -154,10 +154,6 @@ public class AgXFilter extends SimplePixelPostProcessingFilter {
 
     matrixMultiplyByVector(LINEAR_REC2020_TO_LINEAR_SRGB, color);
 
-    color.x = QuickMath.clamp(color.x, 0, 1);
-    color.y = QuickMath.clamp(color.y, 0, 1);
-    color.z = QuickMath.clamp(color.z, 0, 1);
-
     pixel[0] = color.x;
     pixel[1] = color.y;
     pixel[2] = color.z;
