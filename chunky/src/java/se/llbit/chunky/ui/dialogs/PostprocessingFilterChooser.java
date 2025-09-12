@@ -14,7 +14,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 
 public class PostprocessingFilterChooser extends Dialog<ButtonType> {
 
-  private final ChoiceBox<PostProcessingFilter> choiceBox = new ChoiceBox<>();
+  private final ChoiceBox<Class<? extends PostProcessingFilter>> choiceBox = new ChoiceBox<>();
 
   public PostprocessingFilterChooser() {
     this.setTitle("Select Postprocessing Filter");
@@ -22,22 +22,22 @@ public class PostprocessingFilterChooser extends Dialog<ButtonType> {
     DialogPane dialogPane = this.getDialogPane();
     VBox vBox = new VBox();
 
-    choiceBox.getItems().addAll(PostProcessingFilters.getFilters());
-    choiceBox.setConverter(new StringConverter<PostProcessingFilter>() {
+    choiceBox.getItems().addAll(PostProcessingFilters.getFilterClasses());
+    choiceBox.setConverter(new StringConverter<Class<? extends PostProcessingFilter>>() {
       @Override
-      public String toString(PostProcessingFilter object) {
-        return object == null ? null : object.getName();
+      public String toString(Class<? extends PostProcessingFilter> filterClass) {
+        return filterClass == null ? null : PostProcessingFilters.getFilterName(filterClass);
       }
 
       @Override
-      public PostProcessingFilter fromString(String string) {
+      public Class<? extends PostProcessingFilter> fromString(String string) {
         return PostProcessingFilters.getPostProcessingFilterFromName(string)
-            .orElse(Scene.DEFAULT_POSTPROCESSING_FILTER);
+            .get();
       }
     });
     choiceBox.getSelectionModel().selectedItemProperty()
         .addListener(((observable, oldValue, newValue) -> choiceBox.setTooltip(
-            new Tooltip(newValue.getDescription()))));
+            new Tooltip(PostProcessingFilters.getSampleFilterFromClass(newValue).getDescription()))));
 
     vBox.getChildren().addAll(choiceBox);
     vBox.setPadding(new Insets(10));
@@ -46,7 +46,7 @@ public class PostprocessingFilterChooser extends Dialog<ButtonType> {
     dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
   }
 
-  public PostProcessingFilter getFilter() {
+  public Class<? extends PostProcessingFilter> getFilter() {
     return choiceBox.getSelectionModel().getSelectedItem();
   }
 }

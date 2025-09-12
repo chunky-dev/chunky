@@ -173,8 +173,7 @@ public class Scene implements Configurable, Refreshable {
   /**
    * Default post processing filter.
    */
-  public static final PostProcessingFilter DEFAULT_POSTPROCESSING_FILTER = PostProcessingFilters
-      .getPostProcessingFilterFromId("GAMMA").get();
+  public static final String DEFAULT_POSTPROCESSING_FILTER_ID = "GAMMA";
 
   private static boolean invalidWarn = false;
 
@@ -375,7 +374,13 @@ public class Scene implements Configurable, Refreshable {
     palette = new BlockPalette();
     worldOctree = new Octree(octreeImplementation, 1);
     emitterGrid = null;
-    postprocessingFilters.add(DEFAULT_POSTPROCESSING_FILTER);
+    try {
+      postprocessingFilters.add(PostProcessingFilters.getPostProcessingFilterFromId(DEFAULT_POSTPROCESSING_FILTER_ID).get()
+          .newInstance());
+    } catch (InstantiationException | IllegalAccessException ex) {
+      throw new RuntimeException(ex);
+    }
+
   }
 
   /**
@@ -3016,18 +3021,23 @@ public class Scene implements Configurable, Refreshable {
     this.postprocessingFilters.clear();
     for (JsonValue filter : postprocessingFilters) {
       JsonObject filterJson = filter.object();
-      PostProcessingFilter postprocessingFilter =
-          PostProcessingFilters.getPostProcessingFilterFromId(filterJson.get("id").
-              stringValue(DEFAULT_POSTPROCESSING_FILTER.getId())).
-              orElseGet(() -> {
-                String filterId = filterJson.get("id").stringValue(null);
-                if (filterId != null) {
-                  Log.warn("The post processing filter " + filterId
-                      + " is unknown. Maybe you're missing a plugin that was used to "
-                      + "create this scene?");
-                }
-                return DEFAULT_POSTPROCESSING_FILTER;
-              });
+      PostProcessingFilter postprocessingFilter;
+      try {
+        postprocessingFilter =
+            PostProcessingFilters.getPostProcessingFilterFromId(filterJson.get("id").
+                    stringValue(DEFAULT_POSTPROCESSING_FILTER_ID)).
+                orElseGet(() -> {
+                  String filterId = filterJson.get("id").stringValue(null);
+                  if (filterId != null) {
+                    Log.warn("The post processing filter " + filterId
+                        + " is unknown. Maybe you're missing a plugin that was used to "
+                        + "create this scene?");
+                  }
+                  return PostProcessingFilters.getPostProcessingFilterFromId(DEFAULT_POSTPROCESSING_FILTER_ID).get();
+                }).newInstance();
+      } catch (InstantiationException | IllegalAccessException ex) {
+        throw new RuntimeException(ex);
+      }
       postprocessingFilter.fromJson(filterJson);
       this.postprocessingFilters.add(postprocessingFilter);
     }

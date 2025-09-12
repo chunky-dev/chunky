@@ -104,9 +104,9 @@ public class PostprocessingTab extends RenderControlsTab implements Initializabl
     addFilter.setOnAction(e -> {
       PostprocessingFilterChooser dialog = new PostprocessingFilterChooser();
       if (dialog.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
-        PostProcessingFilter filter = dialog.getFilter();
+        Class<? extends PostProcessingFilter> filterClass = dialog.getFilter();
         try {
-          scene.addPostprocessingFilter(filter.getClass().newInstance());
+          scene.addPostprocessingFilter(filterClass.newInstance());
         } catch (InstantiationException | IllegalAccessException ex) {
           throw new RuntimeException(ex);
         }
