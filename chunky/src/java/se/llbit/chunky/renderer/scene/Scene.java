@@ -2837,7 +2837,7 @@ public class Scene implements Configurable, Refreshable {
 
   public void removeEntity(Entity entity) {
     entities.removeEntity(entity);
-    rebuildActorBvh();
+    rebuildBvh();
   }
 
   public void addPlayer(PlayerEntity player) {
