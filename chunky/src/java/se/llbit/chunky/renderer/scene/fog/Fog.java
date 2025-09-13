@@ -16,6 +16,7 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 import se.llbit.util.JsonSerializable;
+import se.llbit.util.JsonUtil;
 
 public final class Fog implements JsonSerializable {
   private final Scene scene;
@@ -235,11 +236,7 @@ public final class Fog implements JsonSerializable {
       jsonLayers.add(jsonLayer);
     }
     fogObj.add("layers", jsonLayers);
-    JsonObject colorObj = new JsonObject();
-    colorObj.add("red", fogColor.x);
-    colorObj.add("green", fogColor.y);
-    colorObj.add("blue", fogColor.z);
-    fogObj.add("color", colorObj);
+    fogObj.add("color", JsonUtil.rgbToJson(fogColor));
     fogObj.add("fastFog", fastFog);
     return fogObj;
   }
@@ -253,10 +250,7 @@ public final class Fog implements JsonSerializable {
         o.get("breadth").doubleValue(0),
         o.get("density").doubleValue(0),
         scene)).collect(Collectors.toCollection(ArrayList<FogLayer>::new));
-    JsonObject colorObj = json.get("color").object();
-    fogColor.x = colorObj.get("red").doubleValue(fogColor.x);
-    fogColor.y = colorObj.get("green").doubleValue(fogColor.y);
-    fogColor.z = colorObj.get("blue").doubleValue(fogColor.z);
+    JsonUtil.rgbFromJson(json.get("color"), fogColor);
     fastFog = json.get("fastFog").boolValue(fastFog);
   }
 
@@ -265,10 +259,7 @@ public final class Fog implements JsonSerializable {
     uniformDensity = json.get("fogDensity").doubleValue(uniformDensity);
     skyFogDensity = json.get("skyFogDensity").doubleValue(skyFogDensity);
     layers = new ArrayList<>(0);
-    JsonObject colorObj = json.get("fogColor").object();
-    fogColor.x = colorObj.get("red").doubleValue(fogColor.x);
-    fogColor.y = colorObj.get("green").doubleValue(fogColor.y);
-    fogColor.z = colorObj.get("blue").doubleValue(fogColor.z);
+    JsonUtil.rgbFromJson(json.get("fogColor"), fogColor);
     fastFog = json.get("fastFog").boolValue(fastFog);
   }
 

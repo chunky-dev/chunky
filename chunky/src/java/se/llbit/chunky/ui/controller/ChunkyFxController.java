@@ -22,6 +22,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.IdentityHashMap;
@@ -37,6 +38,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -80,6 +82,7 @@ import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.fxutil.GroupedChangeListener;
+import se.llbit.log.ConsoleReceiver;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
 import se.llbit.math.Vector3;
@@ -157,21 +160,33 @@ public class ChunkyFxController
   }
 
   private final ProgressListener progressListener = new ProgressListener() {
-    @Override public void setProgress(String task, int done, int start, int target) {
+    @Override public void setProgress(String task, int done, int start, int target, Duration elapsedTime) {
       Platform.runLater(() -> {
         progressBar.setProgress((double) done / (target - start));
-        progressLbl.setText(String.format("%s: %s of %s", task, decimalFormat.format(done),
-            decimalFormat.format(target)));
+        if (target - start > 0) {
+          progressLbl.setText(String.format("%s – %.1f%%", task, 100 * (double) done / (target - start)));
+          progressLbl.setTooltip(new Tooltip(String.format("%d of %d completed", done, target)));
+        } else {
+          progressLbl.setText(String.format("%s", task));
+          progressLbl.setTooltip(null);
+        }
         etaLbl.setText("ETA: N/A");
+        renderTimeLbl.setText(String.format("Time: %d:%02d:%02d", elapsedTime.toHours(), elapsedTime.toMinutesPart(), elapsedTime.toSecondsPart()));
       });
     }
 
-    @Override public void setProgress(String task, int done, int start, int target, String eta) {
+    @Override public void setProgress(String task, int done, int start, int target, Duration elapsedTime, Duration remainingTime) {
       Platform.runLater(() -> {
         progressBar.setProgress((double) done / (target - start));
-        progressLbl.setText(String.format("%s: %s of %s", task, decimalFormat.format(done),
-            decimalFormat.format(target)));
-        etaLbl.setText("ETA: " + eta);
+        if (target - start > 0) {
+          progressLbl.setText(String.format("%s – %.1f%%", task, 100 * (double) done / (target - start)));
+          progressLbl.setTooltip(new Tooltip(String.format("%d of %d completed", done, target)));
+        } else {
+          progressLbl.setText(String.format("%s", task));
+          progressLbl.setTooltip(null);
+        }
+        etaLbl.setText(String.format("ETA: %d:%02d:%02d", remainingTime.toHours(), remainingTime.toMinutesPart(), remainingTime.toSecondsPart()));
+        renderTimeLbl.setText(String.format("Time: %d:%02d:%02d", elapsedTime.toHours(), elapsedTime.toMinutesPart(), elapsedTime.toSecondsPart()));
       });
     }
   };
@@ -203,8 +218,7 @@ public class ChunkyFxController
         int seconds = (int) ((time / 1000) % 60);
         int minutes = (int) ((time / 60000) % 60);
         int hours = (int) (time / 3600000);
-        gui.renderTimeLbl.setText(String
-            .format("Render time: %d hours, %d minutes, %d seconds", hours, minutes, seconds));
+        gui.renderTimeLbl.setText(String.format("Time: %d:%02d:%02d", hours, minutes, seconds));
       });
     }
 
@@ -220,7 +234,7 @@ public class ChunkyFxController
 
     private void updateSppStats() {
       Platform.runLater(() -> gui.sppLbl.setText(String
-          .format("%s SPP, %s SPS", gui.decimalFormat.format(spp),
+          .format("%s SPP | %s SPS", gui.decimalFormat.format(spp),
               gui.decimalFormat.format(sps))));
     }
 
@@ -311,6 +325,9 @@ public class ChunkyFxController
   }
 
   @Override public void initialize(URL fxmlUrl, ResourceBundle resources) {
+    stage.setOnCloseRequest(this::confirmAndClose);
+    menuExit.setOnAction(this::confirmAndClose);
+
     scene = chunky.getSceneManager().getScene();
     renderController = chunky.getRenderController();
     renderManager = renderController.getRenderManager();
@@ -323,7 +340,7 @@ public class ChunkyFxController
       CountDownLatch guiUpdateLatch = new CountDownLatch(1);
       Platform.runLater(() -> {
         synchronized (scene) {
-          canvas.setCanvasSize(scene.width, scene.height);
+          canvas.setCanvasSize(scene.canvasConfig.getWidth(), scene.canvasConfig.getHeight());
         }
         updateTitle();
         refreshSettings();
@@ -438,6 +455,7 @@ public class ChunkyFxController
       }
     });
 
+    Log.setReceiver(ConsoleReceiver.INSTANCE, Level.INFO);
     Log.setReceiver(new UILogReceiver(), Level.ERROR, Level.WARNING);
 
     mapLoader = new WorldMapLoader(this, mapView);
@@ -670,11 +688,6 @@ public class ChunkyFxController
       mapView.setYMax(256);
     }
 
-    menuExit.setOnAction(event -> {
-      Platform.exit();
-      System.exit(0);
-    });
-
     canvas = new RenderCanvasFx(this, chunky.getSceneManager().getScene(),
         chunky.getRenderController().getRenderManager());
     canvas.setRenderListener(renderTracker);
@@ -721,6 +734,24 @@ public class ChunkyFxController
     saveDefaultSpp.setTooltip(new Tooltip("Make the current SPP target the default."));
     saveDefaultSpp.setOnAction(e ->
         PersistentSettings.setSppTargetDefault(scene.getTargetSpp()));
+  }
+
+  public void confirmAndClose(Event event) {
+    Alert confirmQuit = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
+    confirmQuit.setTitle("Quit Chunky");
+    confirmQuit.setHeaderText("You may have unsaved changes in your scene.");
+    confirmQuit.setContentText("Do you want to quit chunky without saving?\nAll unsaved changes will be lost.");
+    confirmQuit.getButtonTypes().setAll(
+      new ButtonType("Quit Chunky", ButtonBar.ButtonData.YES),
+      ButtonType.CANCEL
+    );
+    Dialogs.setDefaultButton(confirmQuit, ButtonType.CANCEL);
+    ButtonType result = confirmQuit.showAndWait().orElse(ButtonType.CANCEL);
+    if(result.getButtonData() == ButtonBar.ButtonData.YES) {
+      Platform.exit();
+    } else {
+      event.consume();
+    }
   }
 
   public void openSceneChooser() {
@@ -809,7 +840,7 @@ public class ChunkyFxController
           ButtonType.CANCEL
         );
         confirmReset.setTitle("Reset render to apply setting changes?");
-        DialogUtils.setupDialogDesign(confirmReset, mapCanvas.getScene());
+        Dialogs.setupDialogDesign(confirmReset, mapCanvas.getScene());
 
         ButtonType resultAction = confirmReset
           .showAndWait()

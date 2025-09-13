@@ -279,7 +279,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
         errorCallback,
         info -> {
           if (info != null) {
-            if (info.version.isGreaterThan(ChunkyLauncher.LAUNCHER_VERSION)) {
+            if (info.version.compareTo(ChunkyLauncher.LAUNCHER_VERSION) > 0) {
               Platform.runLater(() -> {
                 try {
                   LauncherUpdateDialog updateDialog = new LauncherUpdateDialog(settings, info);
@@ -448,6 +448,12 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
 
     // Resolve specific version.
     VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
+    if (version == VersionInfo.NONE) {
+      setBusy(true);
+      UpdateChecker updateThread = new UpdateChecker(settings, settings.selectedChannel, this);
+      updateThread.start();
+      return;
+    }
     if (!ChunkyDeployer.canLaunch(version, this, true)) {
       return;
     }

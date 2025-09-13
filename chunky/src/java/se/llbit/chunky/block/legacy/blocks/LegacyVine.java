@@ -27,4 +27,9 @@ public class LegacyVine extends UnfinalizedLegacyBlock {
     // otherwise just unwrap the block
     state.replaceCurrentBlock(tag);
   }
+
+  @Override
+  public boolean isBiomeDependant() {
+    return true;
+  }
 }

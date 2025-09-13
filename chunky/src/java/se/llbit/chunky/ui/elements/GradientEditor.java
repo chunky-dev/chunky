@@ -33,8 +33,8 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.chunky.ui.render.tabs.EnvironmentTab;
+import se.llbit.chunky.renderer.scene.sky.Sky;
 import se.llbit.fx.LuxColorPicker;
 import se.llbit.json.JsonParser;
 import se.llbit.math.ColorUtil;
@@ -133,9 +133,7 @@ public class GradientEditor extends VBox implements Initializable {
       dialog.setHeaderText("Gradient Import");
       dialog.setContentText("Graident JSON:");
       Optional<String> result = dialog.showAndWait();
-      if (result.isPresent()) {
-        importGradient(result.get());
-      }
+      result.ifPresent(this::importGradient);
     });
     exportBtn.setOnAction(e -> {
       TextInputDialog dialog = new TextInputDialog(Sky.gradientJson(gradient).toCompactString());

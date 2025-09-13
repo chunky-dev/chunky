@@ -19,6 +19,7 @@ package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.resources.PlayerTexture;
 import se.llbit.resources.ImageLoader;
 
@@ -53,7 +54,7 @@ public class PlayerTextureLoader extends TextureLoader {
   }
 
   @Override
-  public boolean load(Path texturePack) {
+  public boolean load(LayeredResourcePacks texturePack) {
     return load(file, texturePack);
   }
 }

@@ -35,7 +35,7 @@ import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
 public class OctreeFileFormat {
 
   private static final int MIN_OCTREE_VERSION = 3;
-  private static final int OCTREE_VERSION = 7;
+  private static final int OCTREE_VERSION = 8;
 
   /**
    * In octree v3-v4, the top bit of the type field in a serialized octree node is reserved for
@@ -69,6 +69,10 @@ public class OctreeFileFormat {
       data.grassColors = loadBiomeStructure(in);
       stepConsumer.accept("foliage tints");
       data.foliageColors = loadBiomeStructure(in);
+      if (version >= 8) {
+        stepConsumer.accept("dry foliage tints");
+        data.dryFoliageColors = loadBiomeStructure(in);
+      }
       stepConsumer.accept("water tints");
       data.waterColors = loadBiomeStructure(in);
     } else {
@@ -174,6 +178,7 @@ public class OctreeFileFormat {
                            BlockPalette palette,
                            BiomeStructure grassColors,
                            BiomeStructure foliageColors,
+                           BiomeStructure dryFoliageColors,
                            BiomeStructure waterColors)
       throws IOException {
     out.writeInt(OCTREE_VERSION);
@@ -191,6 +196,12 @@ public class OctreeFileFormat {
     } else {
       out.writeUTF("NONE");
     }
+    if (dryFoliageColors != null) {
+      out.writeUTF(dryFoliageColors.biomeFormat());
+      dryFoliageColors.store(out);
+    } else {
+      out.writeUTF("NONE");
+    }
     if (waterColors != null) {
       out.writeUTF(waterColors.biomeFormat());
       waterColors.store(out);
@@ -200,9 +211,8 @@ public class OctreeFileFormat {
   }
 
   public static class OctreeData {
-
     public Octree worldTree;
-    public BiomeStructure grassColors, foliageColors, waterColors;
+    public BiomeStructure grassColors, foliageColors, dryFoliageColors, waterColors;
     public BlockPalette palette;
     public int version;
   }

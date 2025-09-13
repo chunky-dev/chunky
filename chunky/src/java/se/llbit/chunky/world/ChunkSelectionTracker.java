@@ -64,7 +64,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
   private boolean setChunk(Dimension dimension, ChunkPosition pos, boolean selected) {
     //Only need to check if the chunk isn't empty on selecting a chunk, as it must exist if it's already selected
     Chunk chunk = dimension.getChunk(pos);
-    if(selected && (chunk == EmptyRegionChunk.INSTANCE || chunk == EmptyChunk.INSTANCE)) {
+    if(selected && (chunk == EmptyRegionChunk.INSTANCE)) {
       return false;
     }
     return setChunk(pos, selected);
@@ -74,7 +74,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
    * Minimum and maximum are both INCLUSIVE
    * @return Whether the selection changed
    */
-  private boolean setChunksWithinRegion(Dimension dimension, ChunkPosition regionPos, int minX, int maxX, int minZ, int maxZ, boolean selected) {
+  private boolean setChunksWithinRegion(Dimension dimension, RegionPosition regionPos, int minX, int maxX, int minZ, int maxZ, boolean selected) {
     BitSet selectedChunksForRegion = selectedChunksByRegion.computeIfAbsent(regionPos.getLong(), p -> new BitSet(MCRegion.CHUNKS_X * MCRegion.CHUNKS_Z));
 
     Collection<ChunkPosition> changedChunks = new ArrayList<>();
@@ -87,7 +87,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
         if(previousValue != selected) {
           ChunkPosition chunkPos = new ChunkPosition(chunkX, chunkZ);
           Chunk chunk = dimension.getChunk(chunkPos);
-          if(chunk != EmptyRegionChunk.INSTANCE && chunk != EmptyChunk.INSTANCE) {
+          if(chunk != EmptyRegionChunk.INSTANCE) {
             selectionChanged = true;
             selectedChunksForRegion.set(bitIndex, selected);
 
@@ -111,7 +111,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
   /**
    * @return Whether the selection changed
    */
-  private boolean setRegion(Dimension dimension, ChunkPosition regionPos, boolean selected) {
+  private boolean setRegion(Dimension dimension, RegionPosition regionPos, boolean selected) {
     return setChunks(dimension, regionPos.x << 5, regionPos.z << 5, (regionPos.x << 5) + 31, (regionPos.z << 5) + 31, selected);
   }
 
@@ -157,7 +157,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
    *
    * @param region the region with updated chunks
    */
-  private void notifyRegionChunksUpdated(ChunkPosition region) {
+  private void notifyRegionChunksUpdated(RegionPosition region) {
     for (ChunkUpdateListener listener : chunkUpdateListeners) {
       listener.regionChunksUpdated(region);
     }
@@ -169,7 +169,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
    * @param region the region with updated chunks
    * @param chunks the chunks within the region that have been updated
    */
-  private void notifyRegionChunksUpdated(ChunkPosition region, Collection<ChunkPosition> chunks) {
+  private void notifyRegionChunksUpdated(RegionPosition region, Collection<ChunkPosition> chunks) {
     for (ChunkUpdateListener listener : chunkUpdateListeners) {
       listener.regionChunksUpdated(region, chunks);
     }
@@ -235,7 +235,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
    */
   public synchronized void toggleRegion(Dimension dimension, int cx, int cz) {
     ChunkPosition chunk = new ChunkPosition(cx, cz);
-    setRegion(dimension, new ChunkPosition(cx >> 5, cz >> 5), !isChunkSelected(chunk));
+    setRegion(dimension, chunk.getRegionPosition(), !isChunkSelected(chunk));
     notifyChunkSelectionChange();
   }
 
@@ -277,10 +277,10 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
         for (int regionZ = minRegionZ; regionZ < maxRegionZ + 1; regionZ++) {
           if(regionX >= minInnerRegionX && regionX < maxInnerRegionX && regionZ >= minInnerRegionZ && regionZ < maxInnerRegionZ) {
             // this region is an inner region, we set all chunks within it
-            selectionChanged |= setRegion(dimension, new ChunkPosition(regionX, regionZ), selected);
+            selectionChanged |= setRegion(dimension, new RegionPosition(regionX, regionZ), selected);
           } else {
             // this region is an outer region, we set only the chunks within the bounds of the selection area
-            selectionChanged |= setChunksWithinRegion(dimension, new ChunkPosition(regionX, regionZ),
+            selectionChanged |= setChunksWithinRegion(dimension, new RegionPosition(regionX, regionZ),
               Math.max(regionX << 5, minChunkX), Math.min(((regionX + 1) << 5) - 1, maxChunkX),
               Math.max(regionZ << 5, minChunkZ), Math.min(((regionZ + 1) << 5) - 1, maxChunkZ),
               selected);
@@ -297,7 +297,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
 
       for (int regionX = minRegionX; regionX < maxRegionX + 1; regionX++) {
         for (int regionZ = minRegionZ; regionZ < maxRegionZ + 1; regionZ++) {
-          selectionChanged |= setChunksWithinRegion(dimension, new ChunkPosition(regionX, regionZ),
+          selectionChanged |= setChunksWithinRegion(dimension, new RegionPosition(regionX, regionZ),
             Math.max(regionX << 5, minChunkX), Math.min(((regionX + 1) << 5) - 1, maxChunkX),
             Math.max(regionZ << 5, minChunkZ), Math.min(((regionZ + 1) << 5) - 1, maxChunkZ),
             selected);
@@ -350,13 +350,13 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
     if (!selectedChunksByRegion.isEmpty()) {
       //Collect all region positions currently selected (slightly weird because concurrent map)
       Enumeration<Long> keys = selectedChunksByRegion.keys();
-      Collection<ChunkPosition> regionPositions = new ArrayList<>();
+      Collection<RegionPosition> regionPositions = new ArrayList<>();
       while (keys.hasMoreElements()) {
-        regionPositions.add(new ChunkPosition(keys.nextElement()));
+        regionPositions.add(new RegionPosition(keys.nextElement()));
       }
 
       selectedChunksByRegion.clear();
-      for (ChunkPosition regionPosition : regionPositions) {
+      for (RegionPosition regionPosition : regionPositions) {
         notifyRegionChunksUpdated(regionPosition);
       }
       notifyChunkSelectionChange();
@@ -386,27 +386,35 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
    * @return The currently selected chunks
    */
   public synchronized Collection<ChunkPosition> getSelection() {
-    Map<ChunkPosition, List<ChunkPosition>> selectionByRegion = getSelectionByRegion();
+    Map<RegionPosition, List<ChunkPosition>> selectionByRegion = getSelectionByRegion();
     List<ChunkPosition> selectedChunks = new ArrayList<>();
     selectionByRegion.forEach((regionPosition, chunks) -> selectedChunks.addAll(chunks));
     return selectedChunks;
   }
 
-  public synchronized Map<ChunkPosition, List<ChunkPosition>> getSelectionByRegion() {
-    Map<ChunkPosition, List<ChunkPosition>> selectedChunksByRegionPosition = new Object2ReferenceOpenHashMap<>();
+  public synchronized Map<RegionPosition, List<ChunkPosition>> getSelectionByRegion() {
+    Map<RegionPosition, List<ChunkPosition>> selectedChunksByRegionPosition = new Object2ReferenceOpenHashMap<>();
     selectedChunksByRegion.forEach((regionPosition, selectedChunksBitSet) -> {
-      ChunkPosition regionPos = new ChunkPosition(regionPosition);
+      RegionPosition regionPos = new RegionPosition(regionPosition);
       List<ChunkPosition> positions = new ArrayList<>();
       for (int localX = 0; localX < MCRegion.CHUNKS_X; localX++) {
         for (int localZ = 0; localZ < MCRegion.CHUNKS_Z; localZ++) {
           int idx = localX + (localZ * MCRegion.CHUNKS_X);
           if(selectedChunksBitSet.get(idx)) {
-            positions.add(new ChunkPosition((regionPos.x << 5) + localX, (regionPos.z << 5) + localZ));
+            positions.add(regionPos.asChunkPosition(localX, localZ));
           }
         }
       }
-      selectedChunksByRegionPosition.put(new ChunkPosition(regionPosition), positions);
+      selectedChunksByRegionPosition.put(regionPos, positions);
     });
+    return selectedChunksByRegionPosition;
+  }
+
+  public static Map<RegionPosition, List<ChunkPosition>> selectionByRegion(Collection<ChunkPosition> chunkPositions) {
+    Map<RegionPosition, List<ChunkPosition>> selectedChunksByRegionPosition = new Object2ReferenceOpenHashMap<>();
+    chunkPositions.forEach(chunkPosition ->
+      selectedChunksByRegionPosition.computeIfAbsent(new RegionPosition(chunkPosition.x >> 5, chunkPosition.z >> 5), r -> new ArrayList<>())
+        .add(chunkPosition));
     return selectedChunksByRegionPosition;
   }
 

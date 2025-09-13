@@ -20,6 +20,7 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.CocoaPlantModel;
+import se.llbit.chunky.model.minecraft.CocoaPlantModel119;
 import se.llbit.chunky.resources.Texture;
 
 public class Cocoa extends AbstractModelBlock {
@@ -45,7 +46,9 @@ public class Cocoa extends AbstractModelBlock {
         facing = 3;
         break;
     }
-    model = new CocoaPlantModel(facing, age);
+    model = System.getProperty("chunky.blockModels.cocoa", "1.19").equals("pre-1.19")
+      ? new CocoaPlantModel(facing, age)
+      : new CocoaPlantModel119(facing, age);
   }
 
   @Override

@@ -20,6 +20,7 @@ import javafx.scene.image.Image;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.texturepack.ChestTexture;
 import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.TexturePath;
 import se.llbit.fxutil.FxImageUtil;
@@ -123,20 +124,8 @@ public class Texture {
   public static final Texture ironBlock = new Texture("iron-block");
   public static final Texture goldBlock = new Texture("gold-block");
   public static final Texture diamondBlock = new Texture("diamond-block");
-  public static final Texture chestTop = new Texture();
-  public static final Texture chestBottom = new Texture();
-  public static final Texture chestLeft = new Texture();
-  public static final Texture chestRight = new Texture();
-  public static final Texture chestFront = new Texture("chest");
-  public static final Texture chestBack = new Texture();
-  public static final Texture chestLock = new Texture();
-  public static final Texture enderChestTop = new Texture();
-  public static final Texture enderChestBottom = new Texture();
-  public static final Texture enderChestLeft = new Texture();
-  public static final Texture enderChestRight = new Texture();
-  public static final Texture enderChestFront = new Texture();
-  public static final Texture enderChestBack = new Texture();
-  public static final Texture enderChestLock = new Texture();
+  public static final ChestTexture.Textures chest = new ChestTexture.Textures();
+  public static final ChestTexture.Textures enderChest = new ChestTexture.Textures();
   public static final Texture redMushroom = new Texture("red-mushroom");
   public static final Texture brownMushroom = new Texture("brown-mushroom");
   public static final Texture goldOre = new Texture("gold-ore");
@@ -293,16 +282,8 @@ public class Texture {
   public static final Texture netherWart0 = new Texture();
   public static final Texture netherWart1 = new Texture();
   public static final Texture netherWart2 = new Texture();
-  public static final Texture largeChestFrontLeft = new Texture();
-  public static final Texture largeChestFrontRight = new Texture();
-  public static final Texture largeChestBackLeft = new Texture();
-  public static final Texture largeChestBackRight = new Texture();
-  public static final Texture largeChestTopLeft = new Texture();
-  public static final Texture largeChestTopRight = new Texture();
-  public static final Texture largeChestBottomLeft = new Texture();
-  public static final Texture largeChestBottomRight = new Texture();
-  public static final Texture largeChestLeft = new Texture();
-  public static final Texture largeChestRight = new Texture();
+  public static final ChestTexture.Textures largeChestLeft = ChestTexture.Textures.newWithLockFrom(chest);
+  public static final ChestTexture.Textures largeChestRight = ChestTexture.Textures.newWithLockFrom(chest);
   public static final Texture enchantmentTableSide = new Texture();
   public static final Texture enchantmentTableTop = new Texture();
   public static final Texture enchantmentTableBottom = new Texture();
@@ -496,24 +477,9 @@ public class Texture {
   public static final Texture observerTop = new Texture();
 
   // Trapped Chest.
-  public static final Texture trappedChestTop = new Texture();
-  public static final Texture trappedChestBottom = new Texture();
-  public static final Texture trappedChestLeft = new Texture();
-  public static final Texture trappedChestRight = new Texture();
-  public static final Texture trappedChestFront = new Texture("chest");
-  public static final Texture trappedChestBack = new Texture();
-  public static final Texture trappedChestLock = new Texture();
-
-  public static final Texture largeTrappedChestFrontLeft = new Texture();
-  public static final Texture largeTrappedChestFrontRight = new Texture();
-  public static final Texture largeTrappedChestBackLeft = new Texture();
-  public static final Texture largeTrappedChestBackRight = new Texture();
-  public static final Texture largeTrappedChestTopLeft = new Texture();
-  public static final Texture largeTrappedChestTopRight = new Texture();
-  public static final Texture largeTrappedChestBottomLeft = new Texture();
-  public static final Texture largeTrappedChestBottomRight = new Texture();
-  public static final Texture largeTrappedChestLeft = new Texture();
-  public static final Texture largeTrappedChestRight = new Texture();
+  public static final ChestTexture.Textures trappedChest = new ChestTexture.Textures();
+  public static final ChestTexture.Textures largeTrappedChestLeft = ChestTexture.Textures.newWithLockFrom(trappedChest);
+  public static final ChestTexture.Textures largeTrappedChestRight = ChestTexture.Textures.newWithLockFrom(trappedChest);
 
   // Entity textures.
   public static final PlayerTexture alex = new PlayerTexture();
@@ -524,6 +490,38 @@ public class Texture {
   public static final EntityTexture wither = new EntityTexture();
   public static final EntityTexture dragon = new EntityTexture();
   public static final EntityTexture book = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/sheep/sheep")
+  public static final EntityTexture sheep = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/sheep/sheep_wool")
+  public static final EntityTexture sheepFur = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/sheep/sheep_wool_undercoat")
+  public static final EntityTexture sheepUndercoat = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/cow/temperate_cow")
+  public static final EntityTexture cow = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/cow/cold_cow")
+  public static final EntityTexture coldCow = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/cow/warm_cow")
+  public static final EntityTexture warmCow = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/chicken/temperate_chicken")
+  public static final EntityTexture chicken = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/chicken/cold_chicken")
+  public static final EntityTexture coldChicken = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/chicken/warm_chicken")
+  public static final EntityTexture warmChicken = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/pig/temperate_pig")
+  public static final EntityTexture pig = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/pig/cold_pig")
+  public static final EntityTexture coldPig = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/pig/warm_pig")
+  public static final EntityTexture warmPig = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/equipment/pig_saddle/saddle")
+  public static final EntityTexture pigSaddle = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/cow/brown_mooshroom")
+  public static final EntityTexture brownMooshroom = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/cow/red_mooshroom")
+  public static final EntityTexture redMooshroom = new EntityTexture();
+  @TexturePath("assets/minecraft/textures/entity/squid/squid")
+  public static final EntityTexture squid = new EntityTexture();
 
   // [1.10] Bone, magma, nether wart block, red nether brick.
   public static final Texture boneSide = new Texture();
@@ -911,6 +909,7 @@ public class Texture {
   public static final Texture polishedBlackstoneBricks = new Texture();
   public static final Texture crackedPolishedBlackstoneBricks = new Texture();
   public static final Texture quartzBricks = new Texture();
+  @TexturePath(value = "assets/minecraft/textures/block/iron_chain", alternatives = { "assets/minecraft/textures/block/chain" })
   public static final Texture chain = new Texture();
   public static final Texture jigsawLock = new Texture();
 
@@ -1124,7 +1123,7 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/sculk_vein")
   public static final Texture sculkVein = new Texture();
 
-  //1.20
+  // [1.20]
   @TexturePath("assets/minecraft/textures/block/bamboo_planks")
   public static final Texture bambooPlanks = new Texture();
   @TexturePath("assets/minecraft/textures/block/bamboo_mosaic")
@@ -1342,6 +1341,8 @@ public class Texture {
   public static final Texture cherryHangingSign = new Texture();
   @TexturePath("assets/minecraft/textures/entity/piglin/piglin")
   public static final Texture piglin = new Texture();
+
+  // [1.21]
   @TexturePath("assets/minecraft/textures/block/polished_tuff")
   public static final Texture polishedTuff = new Texture();
   @TexturePath("assets/minecraft/textures/block/tuff_bricks")
@@ -1450,18 +1451,293 @@ public class Texture {
   public static final Texture crafterTopTriggered = new Texture();
   @TexturePath("assets/minecraft/textures/block/crafter_bottom")
   public static final Texture crafterBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_top")
+  public static final Texture vaultTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_top_ejecting")
+  public static final Texture vaultTopEjecting = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_bottom")
+  public static final Texture vaultBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_front_on")
+  public static final Texture vaultFrontOn = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_front_off")
+  public static final Texture vaultFrontOff = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_front_ejecting")
+  public static final Texture vaultFrontEjecting = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_side_off")
+  public static final Texture vaultSideOff = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_side_on")
+  public static final Texture vaultSideOn = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/flow_pottery_pattern")
+  public static final Texture decoratedPotPatternFlow = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/guster_pottery_pattern")
+  public static final Texture decoratedPotPatternGuster = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/decorated_pot/scrape_pottery_pattern")
+  public static final Texture decoratedPotPatternScrape = new Texture();
+  @TexturePath("assets/minecraft/textures/block/heavy_core")
+  public static final Texture heavyCore = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_bottom_ominous")
+  public static final Texture vaultBottomOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_front_off_ominous")
+  public static final Texture vaultFrontOffOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_side_off_ominous")
+  public static final Texture vaultSideOffOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_top_ominous")
+  public static final Texture vaultTopOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_side_on_ominous")
+  public static final Texture vaultSideOnOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_front_on_ominous")
+  public static final Texture vaultFrontOnOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_top_ejecting_ominous")
+  public static final Texture vaultTopEjectingOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/vault_front_ejecting_ominous")
+  public static final Texture vaultFrontEjectingOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_bottom")
+  public static final Texture trialSpawnerBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_side_inactive")
+  public static final Texture trialSpawnerSideInactive = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_side_inactive_ominous")
+  public static final Texture trialSpawnerSideInactiveOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_top_inactive")
+  public static final Texture trialSpawnerTopInactive = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_top_inactive_ominous")
+  public static final Texture trialSpawnerTopInactiveOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_side_active")
+  public static final Texture trialSpawnerSideActive = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_side_active_ominous")
+  public static final Texture trialSpawnerSideActiveOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_top_active")
+  public static final Texture trialSpawnerTopActive = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_top_active_ominous")
+  public static final Texture trialSpawnerTopActiveOminous = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_top_ejecting_reward")
+  public static final Texture trialSpawnerTopEjectingReward = new Texture();
+  @TexturePath("assets/minecraft/textures/block/trial_spawner_top_ejecting_reward_ominous")
+  public static final Texture trialSpawnerTopEjectingRewardOminous = new Texture();
+
+  // [1.21.4]
+  @TexturePath("assets/minecraft/textures/block/pale_moss_block")
+  public static final Texture paleMossBlock = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_leaves")
+  public static final Texture paleOakLeaves = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_log")
+  public static final Texture paleOakLog= new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_log_top")
+  public static final Texture paleOakLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_hanging_moss")
+  public static final Texture paleHangingMoss = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_hanging_moss_tip")
+  public static final Texture paleHangingMossTip = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_planks")
+  public static final Texture paleOakPlanks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_trapdoor")
+  public static final Texture paleOakTrapdoor = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_door_top")
+  public static final Texture paleOakDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_door_bottom")
+  public static final Texture paleOakDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_pale_oak_log")
+  public static final Texture strippedPaleOakLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_pale_oak_log_top")
+  public static final Texture strippedPaleOakLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_sapling")
+  public static final Texture paleOakSapling = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/pale_oak")
+  public static final Texture paleOakSignPost = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/signs/hanging/pale_oak")
+  public static final Texture paleOakHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_moss_carpet")
+  public static final Texture paleMossCarpet = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_moss_carpet_side_small")
+  public static final Texture paleMossCarpetSideSmall = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_moss_carpet_side_tall")
+  public static final Texture paleMossCarpetSideTall = new Texture();
+  @TexturePath("assets/minecraft/textures/block/creaking_heart")
+  public static final Texture creakingHeart = new Texture();
+  @TexturePath("assets/minecraft/textures/block/creaking_heart_top")
+  public static final Texture creakingHeartTop = new Texture();
+  @TexturePath(value = "assets/minecraft/textures/block/creaking_heart_awake", alternatives = { "assets/minecraft/textures/block/creaking_heart_active" })
+  public static final Texture creakingHeartAwake = new Texture();
+  @TexturePath(value = "assets/minecraft/textures/block/creaking_heart_top_awake", alternatives = { "assets/minecraft/textures/block/creaking_heart_top_active" })
+  public static final Texture creakingHeartTopAwake = new Texture();
+  @TexturePath("assets/minecraft/textures/block/chiseled_resin_bricks")
+  public static final Texture chiseledResinBricks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/closed_eyeblossom")
+  public static final Texture closedEyeblossom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/open_eyeblossom")
+  public static final Texture openEyeblossom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/open_eyeblossom_emissive")
+  public static final Texture openEyeblossomEmissive = new Texture();
+  @TexturePath("assets/minecraft/textures/block/resin_block")
+  public static final Texture resinBlock = new Texture();
+  @TexturePath("assets/minecraft/textures/block/resin_bricks")
+  public static final Texture resinBricks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/resin_clump")
+  public static final Texture resinClump = new Texture();
+
+  // [1.21.5]
+  @TexturePath("assets/minecraft/textures/block/leaf_litter")
+  public static final Texture leafLitter = new Texture();
+  @TexturePath("assets/minecraft/textures/block/creaking_heart_dormant")
+  public static final Texture creakingHeartDormant = new Texture();
+  @TexturePath("assets/minecraft/textures/block/creaking_heart_top_dormant")
+  public static final Texture creakingHeartTopDormant = new Texture();
+  @TexturePath("assets/minecraft/textures/block/wildflowers")
+  public static final Texture wildflowers = new Texture();
+  @TexturePath("assets/minecraft/textures/block/wildflowers_stem")
+  public static final Texture wildflowersStem = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bush")
+  public static final Texture bush = new Texture();
+  @TexturePath("assets/minecraft/textures/block/firefly_bush")
+  public static final Texture fireflyBush = new Texture();
+  @TexturePath("assets/minecraft/textures/block/firefly_bush_emissive")
+  public static final Texture fireflyBushEmissive = new AnimatedTexture();
+  @TexturePath("assets/minecraft/textures/block/cactus_flower")
+  public static final Texture cactusFlower = new Texture();
+  @TexturePath("assets/minecraft/textures/block/short_dry_grass")
+  public static final Texture shortDryGrass = new Texture();
+  @TexturePath("assets/minecraft/textures/block/tall_dry_grass")
+  public static final Texture tallDryGrass = new Texture();
+
+  // [1.21.6]
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_0_bottom")
+  public static final Texture driedGhastHydration0Bottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_1_bottom")
+  public static final Texture driedGhastHydration1Bottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_2_bottom")
+  public static final Texture driedGhastHydration2Bottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_bottom")
+  public static final Texture driedGhastHydration3Bottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_0_east")
+  public static final Texture driedGhastHydration0East = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_1_east")
+  public static final Texture driedGhastHydration1East = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_2_east")
+  public static final Texture driedGhastHydration2East = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_east")
+  public static final Texture driedGhastHydration3East = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_0_north")
+  public static final Texture driedGhastHydration0North = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_1_north")
+  public static final Texture driedGhastHydration1North = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_2_north")
+  public static final Texture driedGhastHydration2North = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_north")
+  public static final Texture driedGhastHydration3North = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_0_south")
+  public static final Texture driedGhastHydration0South = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_1_south")
+  public static final Texture driedGhastHydration1South = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_2_south")
+  public static final Texture driedGhastHydration2South = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_south")
+  public static final Texture driedGhastHydration3South = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_0_top")
+  public static final Texture driedGhastHydration0Top = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_1_top")
+  public static final Texture driedGhastHydration1Top = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_2_top")
+  public static final Texture driedGhastHydration2Top = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_top")
+  public static final Texture driedGhastHydration3Top = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_0_west")
+  public static final Texture driedGhastHydration0West = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_1_west")
+  public static final Texture driedGhastHydration1West = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_2_west")
+  public static final Texture driedGhastHydration2West = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_west")
+  public static final Texture driedGhastHydration3West = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_0_tentacles")
+  public static final Texture driedGhastHydration0Tentacles = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_1_tentacles")
+  public static final Texture driedGhastHydration1Tentacles = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_2_tentacles")
+  public static final Texture driedGhastHydration2Tentacles = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_tentacles")
+  public static final Texture driedGhastHydration3Tentacles = new Texture();
+
+  // [1.21.x (2025 Fall Drop)]
+  @TexturePath("assets/minecraft/textures/block/exposed_lightning_rod")
+  public static final Texture exposedLightningRod = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_lightning_rod")
+  public static final Texture oxidizedLightningRod = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_lightning_rod")
+  public static final Texture weatheredLightningRod = new Texture();
+  public static final ChestTexture.Textures copperChest = new ChestTexture.Textures();
+  public static final ChestTexture.Textures largeCopperChestLeft = ChestTexture.Textures.newWithLockFrom(copperChest);
+  public static final ChestTexture.Textures largeCopperChestRight = ChestTexture.Textures.newWithLockFrom(copperChest);
+  public static final ChestTexture.Textures exposedCopperChest = new ChestTexture.Textures();
+  public static final ChestTexture.Textures largeExposedCopperChestLeft = ChestTexture.Textures.newWithLockFrom(exposedCopperChest);
+  public static final ChestTexture.Textures largeExposedCopperChestRight = ChestTexture.Textures.newWithLockFrom(exposedCopperChest);
+  public static final ChestTexture.Textures weatheredCopperChest = new ChestTexture.Textures();
+  public static final ChestTexture.Textures largeWeatheredCopperChestLeft = ChestTexture.Textures.newWithLockFrom(weatheredCopperChest);
+  public static final ChestTexture.Textures largeWeatheredCopperChestRight = ChestTexture.Textures.newWithLockFrom(weatheredCopperChest);
+  public static final ChestTexture.Textures oxidizedCopperChest = new ChestTexture.Textures();
+  public static final ChestTexture.Textures largeOxidizedCopperChestLeft = ChestTexture.Textures.newWithLockFrom(oxidizedCopperChest);
+  public static final ChestTexture.Textures largeOxidizedCopperChestRight = ChestTexture.Textures.newWithLockFrom(oxidizedCopperChest);
+  @TexturePath("assets/minecraft/textures/block/acacia_shelf")
+  public static final Texture acaciaShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/bamboo_shelf")
+  public static final Texture bambooShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/birch_shelf")
+  public static final Texture birchShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cherry_shelf")
+  public static final Texture cherryShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/crimson_shelf")
+  public static final Texture crimsonShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/dark_oak_shelf")
+  public static final Texture darkOakShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/jungle_shelf")
+  public static final Texture jungleShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/mangrove_shelf")
+  public static final Texture mangroveShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oak_shelf")
+  public static final Texture oakShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/pale_oak_shelf")
+  public static final Texture paleOakShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/spruce_shelf")
+  public static final Texture spruceShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/warped_shelf")
+  public static final Texture warpedShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_chain")
+  public static final Texture copperChain = new Texture();
+  @TexturePath("assets/minecraft/textures/block/exposed_copper_chain")
+  public static final Texture exposedCopperChain = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_copper_chain")
+  public static final Texture weatheredCopperChain = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_copper_chain")
+  public static final Texture oxidizedCopperChain = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_lantern")
+  public static final Texture copperLantern = new Texture();
+  @TexturePath("assets/minecraft/textures/block/exposed_copper_lantern")
+  public static final Texture exposedCopperLantern = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_copper_lantern")
+  public static final Texture weatheredCopperLantern = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_copper_lantern")
+  public static final Texture oxidizedCopperLantern = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_torch")
+  public static final Texture copperTorch = new Texture();
+  @TexturePath("assets/minecraft/textures/block/copper_bars")
+  public static final Texture copperBars = new Texture();
+  @TexturePath("assets/minecraft/textures/block/exposed_copper_bars")
+  public static final Texture exposedCopperBars = new Texture();
+  @TexturePath("assets/minecraft/textures/block/weathered_copper_bars")
+  public static final Texture weatheredCopperBars = new Texture();
+  @TexturePath("assets/minecraft/textures/block/oxidized_copper_bars")
+  public static final Texture oxidizedCopperBars = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 
   public static final Texture armorStand = new Texture();
 
+  protected static boolean useAverageColor = PersistentSettings.getSingleColorTextures();
+
   @NotNull protected BitmapImage image;
   protected int width;
   protected int height;
   protected int avgColor;
   private float[] avgColorLinear;
-  private boolean usesAverageColor = false;
   private float[] avgColorFlat;
 
   private Image fxImage = null;
@@ -1476,14 +1752,6 @@ public class Texture {
 
   public Texture(BitmapImage img) {
     setTexture(img);
-    useAverageColor(PersistentSettings.getSingleColorTextures());
-  }
-
-  public void useAverageColor(boolean enable) {
-    usesAverageColor = enable;
-  }
-  public boolean usesAverageColor() {
-    return usesAverageColor;
   }
 
   public void setTexture(Texture texture) {
@@ -1560,7 +1828,7 @@ public class Texture {
    * @return color
    */
   public float[] getColor(int x, int y) {
-    if(usesAverageColor)
+    if(useAverageColor)
       return avgColorFlat;
     float[] result = new float[4];
     ColorUtil.getRGBAComponentsGammaCorrected(image.data[width*y + x], result);
@@ -1662,5 +1930,9 @@ public class Texture {
 
   public BitmapImage getBitmap() {
     return image;
+  }
+
+  public static void setUseAverageColor(boolean useAverageColor) {
+    Texture.useAverageColor = useAverageColor;
   }
 }

@@ -41,13 +41,13 @@ import java.util.function.Consumer;
  * instance that corresponds to an ID. Only one instance of every block configuration will be created and then
  * re-used for all blocks of that type with the same configuration (i.e. the same block data).
  * The numerical IDs are used to efficiently store the blocks in the octree.
- *
+ * <p>
  * This class also manages material properties.
  *
  * <p>Before <code>{@link BlockPalette#unsynchronize()}</code> is called, <code>{@link BlockPalette}</code> is thread safe
  * for N writer and N reader threads. It locks on <code>{@link BlockPalette#put(BlockSpec)}</code>, and has concurrent
  * data structures to achieve this.</p>
- *
+ * <p>
  * After <code>{@link BlockPalette#unsynchronize()}</code> is called, it is only safe to be read by multiple threads concurrently.
  */
 public class BlockPalette {
@@ -58,7 +58,9 @@ public class BlockPalette {
   private final Map<String, Consumer<Block>> materialProperties;
   public static final Map<String, Consumer<Block>> DEFAULT_MATERIAL_PROPERTIES = getDefaultMaterialProperties();
 
-  /** Stone blocks are used for filling invisible regions in the Octree. */
+  /**
+   * Stone blocks are used for filling invisible regions in the Octree.
+   */
   public final Block stone, water;
 
   private final Map<BlockSpec, Integer> blockMap;
@@ -101,15 +103,20 @@ public class BlockPalette {
 
   /**
    * This method should be called when no threads are acting on the palette anymore.
-   *
+   * <p>
    * It replaces the lock with one that does nothing and switches the palette list for a non-concurrent one.
    * This is done to not limit render performance once async chunk loading is done.
    */
   public void unsynchronize() {
     palette = new ArrayList<>(palette);
     lock = new ReentrantLock() {
-      @Override public void lock() { }
-      @Override public void unlock() { }
+      @Override
+      public void lock() {
+      }
+
+      @Override
+      public void unlock() {
+      }
     };
   }
 
@@ -146,19 +153,20 @@ public class BlockPalette {
   }
 
   public Block get(int id) {
-    if(id == ANY_ID)
+    if (id == ANY_ID)
       return stone;
     return palette.get(id);
   }
 
   /**
    * Get the block specification by its ID in this palette.
+   *
    * @param id ID of a block in this palette
    * @return Block specification or null if not found
    */
   public BlockSpec getBlockSpec(int id) {
     for (Entry<BlockSpec, Integer> entry : blockMap.entrySet()) {
-      if (entry.getValue() == id){
+      if (entry.getValue() == id) {
         return entry.getKey();
       }
     }
@@ -210,18 +218,18 @@ public class BlockPalette {
   /**
    * Updates the material properties of the block and applies them.
    *
-   * @param name the id of the block to be updated, e.g. "minecraft:stone"
+   * @param name       the id of the block to be updated, e.g. "minecraft:stone"
    * @param properties function that modifies the block's properties
    */
   public void updateProperties(String name, Consumer<Block> properties) {
     materialProperties.put(name, properties);
     blockMap.forEach(
-        (spec, id) -> {
-          Block block = palette.get(id);
-          if (block.name.equals(name)) {
-            applyMaterial(block);
-          }
-        });
+      (spec, id) -> {
+        Block block = palette.get(id);
+        if (block.name.equals(name)) {
+          applyMaterial(block);
+        }
+      });
   }
 
   /**
@@ -249,7 +257,9 @@ public class BlockPalette {
     palette.forEach(this::applyMaterial);
   }
 
-  /** @return Default material properties. */
+  /**
+   * @return Default material properties.
+   */
   public static Map<String, Consumer<Block>> getDefaultMaterialProperties() {
     Map<String, Consumer<Block>> materialProperties = new HashMap<>();
     materialProperties.put(
@@ -383,7 +393,7 @@ public class BlockPalette {
       block.metalness = 0.96f;
       block.setPerceptualSmoothness(0.7);
     });
-    materialProperties.put("minecraft:chain", ironConfig);
+    materialProperties.put("minecraft:iron_chain", ironConfig);
     Consumer<Block> redstoneTorchConfig = block -> {
       block.useReferenceColors = true;
       block.addRefColorGammaCorrected(255, 255, 210, 0.35f);
@@ -551,7 +561,7 @@ public class BlockPalette {
     });
     materialProperties.put("minecraft:respawn_anchor", block -> {
       if (block instanceof RespawnAnchor) {
-        int charges = ((RespawnAnchor)block).charges;
+        int charges = ((RespawnAnchor) block).charges;
         if (charges > 0) {
           block.setLightLevel(charges * 4 - 2);
         }
@@ -577,7 +587,7 @@ public class BlockPalette {
       block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.5);
     });
-    for(String s : new String[]{"minecraft:", "minecraft:waxed_"}) {
+    for (String s : new String[]{"minecraft:", "minecraft:waxed_"}) {
       materialProperties.put(s + "copper_block", copperConfig);
       materialProperties.put(s + "cut_copper", copperConfig);
       materialProperties.put(s + "cut_copper_stairs", copperConfig);
@@ -586,7 +596,10 @@ public class BlockPalette {
       materialProperties.put(s + "copper_grate", copperConfig);
       materialProperties.put(s + "copper_door", copperConfig);
       materialProperties.put(s + "copper_trapdoor", copperConfig);
-      
+      materialProperties.put(s + "copper_chest", copperConfig);
+      materialProperties.put(s + "copper_chain", copperConfig);
+      materialProperties.put(s + "copper_bars", copperConfig);
+
       materialProperties.put(s + "exposed_copper", exposedCopperConfig);
       materialProperties.put(s + "exposed_cut_copper", exposedCopperConfig);
       materialProperties.put(s + "exposed_cut_copper_stairs", exposedCopperConfig);
@@ -595,6 +608,9 @@ public class BlockPalette {
       materialProperties.put(s + "exposed_copper_grate", exposedCopperConfig);
       materialProperties.put(s + "exposed_copper_door", exposedCopperConfig);
       materialProperties.put(s + "exposed_copper_trapdoor", exposedCopperConfig);
+      materialProperties.put(s + "exposed_copper_chest", exposedCopperConfig);
+      materialProperties.put(s + "exposed_copper_chain", exposedCopperConfig);
+      materialProperties.put(s + "exposed_copper_bars", exposedCopperConfig);
 
       materialProperties.put(s + "weathered_copper", weatheredCopperConfig);
       materialProperties.put(s + "weathered_cut_copper", weatheredCopperConfig);
@@ -604,13 +620,46 @@ public class BlockPalette {
       materialProperties.put(s + "weathered_copper_grate", weatheredCopperConfig);
       materialProperties.put(s + "weathered_copper_door", weatheredCopperConfig);
       materialProperties.put(s + "weathered_copper_trapdoor", weatheredCopperConfig);
-    }
-    materialProperties.put("minecraft:lightning_rod", block -> {
-      // apply copper attributes only to non-powered lightning rods
-      if (block instanceof LightningRod && !((LightningRod) block).isPowered()) {
+      materialProperties.put(s + "weathered_copper_chest", weatheredCopperConfig);
+      materialProperties.put(s + "weathered_copper_chain", weatheredCopperConfig);
+      materialProperties.put(s + "weathered_copper_bars", weatheredCopperConfig);
+
+      materialProperties.put(s + "lightning_rod", block -> {
+        // apply copper attributes only to non-powered lightning rods
+        if (block instanceof LightningRod && !((LightningRod) block).isPowered()) {
+          copperConfig.accept(block);
+        }
+      });
+      materialProperties.put(s + "exposed_lightning_rod", block -> {
+        // apply copper attributes only to non-powered lightning rods
+        if (block instanceof LightningRod && !((LightningRod) block).isPowered()) {
+          exposedCopperConfig.accept(block);
+        }
+      });
+      materialProperties.put(s + "weathered_lightning_rod", block -> {
+        // apply copper attributes only to non-powered lightning rods
+        if (block instanceof LightningRod && !((LightningRod) block).isPowered()) {
+          weatheredCopperConfig.accept(block);
+        }
+      });
+
+      materialProperties.put(s + "copper_lantern", block -> {
         copperConfig.accept(block);
-      }
-    });
+        block.metalness = 0.95f; // workaround for emittance not supporting metals
+        block.emittance = 1.0f;
+      });
+      materialProperties.put(s + "exposed_copper_lantern", block -> {
+        exposedCopperConfig.accept(block);
+        block.emittance = 1.0f;
+      });
+      materialProperties.put(s + "weathered_copper_lantern", block -> {
+        weatheredCopperConfig.accept(block);
+        block.emittance = 1.0f;
+      });
+      materialProperties.put(s + "oxidized_copper_lantern", block -> {
+        block.emittance = 1.0f;
+      });
+    }
     materialProperties.put("minecraft:small_amethyst_bud", block -> {
       block.setLightLevel(1);
       block.ior = 1.543f;
@@ -830,6 +879,12 @@ public class BlockPalette {
         block.volumeDensity = 0.3f;
       });
     }
+    materialProperties.put("minecraft:copper_wall_torch", block -> {
+      block.emittance = 1.0f;
+    });
+    materialProperties.put("minecraft:copper_torch", block -> {
+      block.emittance = 1.0f;
+    });
     return materialProperties;
   }
 
@@ -838,7 +893,9 @@ public class BlockPalette {
     return palette;
   }
 
-  /** Writes the block specifications to file. */
+  /**
+   * Writes the block specifications to file.
+   */
   public void write(DataOutputStream out) throws IOException {
     out.writeInt(BLOCK_PALETTE_VERSION);
     BlockSpec[] specs = new BlockSpec[blockMap.size()];

@@ -2,10 +2,13 @@ package se.llbit.chunky.world.material;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
+import se.llbit.json.JsonNumber;
 import se.llbit.json.JsonObject;
+import se.llbit.json.JsonValue;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Constants;
 import se.llbit.math.IntersectionRecord;
+import se.llbit.util.JsonUtil;
 
 public class BeaconBeamMaterial extends Material {
 
@@ -21,7 +24,7 @@ public class BeaconBeamMaterial extends Material {
 
     public void updateColor(int color) {
         this.color = color;
-        ColorUtil.getRGBAComponents(color, beamColor);
+        ColorUtil.getRGBComponents(color, beamColor);
         ColorUtil.toLinear(beamColor);
     }
 
@@ -54,7 +57,13 @@ public class BeaconBeamMaterial extends Material {
     @Override
     public void loadMaterialProperties(JsonObject json) {
         super.loadMaterialProperties(json);
-        updateColor(json.get("color").asInt(DEFAULT_COLOR));
+        JsonValue color = json.get("color");
+        if (color instanceof JsonNumber) {
+            // compatibility with older scene files
+            updateColor(color.asInt(DEFAULT_COLOR));
+        } else {
+            updateColor(ColorUtil.getRGB(JsonUtil.rgbFromJson(color)));
+        }
     }
 
     @Override

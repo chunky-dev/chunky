@@ -25,40 +25,39 @@ import se.llbit.math.Quad;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
+import java.util.Arrays;
+
 public class ChainModel extends QuadModel {
   private static final Quad[] quadsY =
-      Model.rotateY(
-          new Quad[] {
-            new Quad(
-                new Vector3(6.5 / 16.0, 16 / 16.0, 8 / 16.0),
-                new Vector3(9.5 / 16.0, 16 / 16.0, 8 / 16.0),
-                new Vector3(6.5 / 16.0, 0 / 16.0, 8 / 16.0),
-                new Vector4(0 / 16.0, 3 / 16.0, 16 / 16.0, 0 / 16.0)),
-            new Quad(
-                new Vector3(9.5 / 16.0, 16 / 16.0, 8 / 16.0),
-                new Vector3(6.5 / 16.0, 16 / 16.0, 8 / 16.0),
-                new Vector3(9.5 / 16.0, 0 / 16.0, 8 / 16.0),
-                new Vector4(3 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)),
-            new Quad(
-                new Vector3(8 / 16.0, 16 / 16.0, 9.5 / 16.0),
-                new Vector3(8 / 16.0, 16 / 16.0, 6.5 / 16.0),
-                new Vector3(8 / 16.0, 0 / 16.0, 9.5 / 16.0),
-                new Vector4(3 / 16.0, 6 / 16.0, 16 / 16.0, 0 / 16.0)),
-            new Quad(
-                new Vector3(8 / 16.0, 16 / 16.0, 6.5 / 16.0),
-                new Vector3(8 / 16.0, 16 / 16.0, 9.5 / 16.0),
-                new Vector3(8 / 16.0, 0 / 16.0, 6.5 / 16.0),
-                new Vector4(6 / 16.0, 3 / 16.0, 16 / 16.0, 0 / 16.0))
-          },
-          Math.toRadians(45));
+    Model.rotateY(
+      new Quad[]{
+        new Quad(
+          new Vector3(6.5 / 16.0, 16 / 16.0, 8 / 16.0),
+          new Vector3(9.5 / 16.0, 16 / 16.0, 8 / 16.0),
+          new Vector3(6.5 / 16.0, 0 / 16.0, 8 / 16.0),
+          new Vector4(0 / 16.0, 3 / 16.0, 16 / 16.0, 0 / 16.0)),
+        new Quad(
+          new Vector3(9.5 / 16.0, 16 / 16.0, 8 / 16.0),
+          new Vector3(6.5 / 16.0, 16 / 16.0, 8 / 16.0),
+          new Vector3(9.5 / 16.0, 0 / 16.0, 8 / 16.0),
+          new Vector4(3 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)),
+        new Quad(
+          new Vector3(8 / 16.0, 16 / 16.0, 9.5 / 16.0),
+          new Vector3(8 / 16.0, 16 / 16.0, 6.5 / 16.0),
+          new Vector3(8 / 16.0, 0 / 16.0, 9.5 / 16.0),
+          new Vector4(3 / 16.0, 6 / 16.0, 16 / 16.0, 0 / 16.0)),
+        new Quad(
+          new Vector3(8 / 16.0, 16 / 16.0, 6.5 / 16.0),
+          new Vector3(8 / 16.0, 16 / 16.0, 9.5 / 16.0),
+          new Vector3(8 / 16.0, 0 / 16.0, 6.5 / 16.0),
+          new Vector4(6 / 16.0, 3 / 16.0, 16 / 16.0, 0 / 16.0))
+      },
+      Math.toRadians(45));
 
-  private static final Texture[] textures = {
-      Texture.chain, Texture.chain, Texture.chain, Texture.chain
-  };
-
+  private final Texture[] textures;
   private final Quad[] quads;
 
-  public ChainModel(String axisName) {
+  public ChainModel(String axisName, Texture texture) {
     switch (axisName) {
       default:
       case "y":
@@ -71,6 +70,8 @@ public class ChainModel extends QuadModel {
         quads = Model.rotateX(quadsY);
         break;
     }
+    textures = new Texture[quads.length];
+    Arrays.fill(textures, texture);
   }
 
   @Override

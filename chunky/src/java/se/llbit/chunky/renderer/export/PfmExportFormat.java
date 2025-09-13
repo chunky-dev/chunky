@@ -45,7 +45,7 @@ public class PfmExportFormat implements PictureExportFormat {
 
   @Override
   public void write(OutputStream out, Scene scene, TaskTracker taskTracker) throws IOException {
-    try (TaskTracker.Task task = taskTracker.task("Writing PFM rows", scene.canvasHeight());
+    try (TaskTracker.Task task = taskTracker.task("Writing PFM rows", scene.canvasConfig.getHeight());
         PfmFileWriter writer = new PfmFileWriter(out)) {
       writer.write(scene, task);
     }

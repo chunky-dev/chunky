@@ -22,10 +22,16 @@ import se.llbit.chunky.entity.HeadEntity;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.log.Log;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
+import se.llbit.util.UuidUtil;
 import se.llbit.util.mojangapi.MinecraftSkin;
+import se.llbit.util.mojangapi.MojangApi;
+
+import java.io.IOException;
+import java.util.Optional;
 
 public class Head extends EmptyModelBlock {
 
@@ -64,24 +70,52 @@ public class Head extends EmptyModelBlock {
   @Override
   public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
     if (type == Kind.PLAYER) {
-      String textureUrl = getTextureUrl(entityTag);
-      return textureUrl != null ? new HeadEntity(position, textureUrl, rotation, 1)
-        : new SkullEntity(position, type, rotation, 1);
-    } else {
-      return null;
-    }
-  }
-
-  public static String getTextureUrl(CompoundTag entityTag) {
-    Tag ownerTag = entityTag.get("Owner"); // used by skulls
-    if (!ownerTag.isCompoundTag()) {
-      ownerTag = entityTag.get("SkullOwner"); // used by player heads
-    }
-    String textureBase64 = ownerTag.get("Properties").get("textures").get(0)
-      .get("Value").stringValue();
-    if (!textureBase64.isEmpty()) {
-      return MinecraftSkin.getSkinFromEncodedTextures(textureBase64).map(MinecraftSkin::getSkinUrl).orElse(null);
+      try {
+        String textureUrl = getTextureUrl(entityTag);
+        return textureUrl != null ? new HeadEntity(position, textureUrl, rotation, 1)
+          : new SkullEntity(position, type, rotation, 1);
+      } catch (IOException e) {
+        Log.warn("Could not download skin", e);
+      }
     }
     return null;
+  }
+
+  public static String getTextureUrl(CompoundTag entityTag) throws IOException {
+    Tag ownerTag = entityTag.get("Owner"); // used by skulls
+    if (!ownerTag.isCompoundTag()) {
+      ownerTag = entityTag.get("SkullOwner"); // used by player heads (1.20 or earlier)
+    }
+    if (ownerTag.isCompoundTag()) {
+      String textureBase64 = ownerTag.get("Properties").get("textures").get(0)
+        .get("Value").stringValue();
+      if (!textureBase64.isEmpty()) {
+        return MinecraftSkin.getSkinFromEncodedTextures(textureBase64).map(MinecraftSkin::getSkinUrl).orElse(null);
+      }
+    }
+    Tag profileTag = entityTag.get("profile");
+    if (profileTag.isCompoundTag()) {
+      // 24w10a (i.e. 1.21) or later
+      return getSkinFromProfileTag(profileTag.asCompound()).map(MinecraftSkin::getSkinUrl).orElse(null);
+    }
+    return null;
+  }
+
+  public static Optional<MinecraftSkin> getSkinFromProfileTag(CompoundTag profileTag) throws IOException {
+    Tag properties = profileTag.get("properties");
+    if (properties.isCompoundTag()) {
+      return MinecraftSkin.getSkinFromEncodedTextures(properties.get("value").stringValue());
+    } else if (properties.isList()) {
+      for (Tag property : properties.asList()) {
+        if (property.get("name").stringValue("").equals("textures")) {
+          String encodedTexture = property.get("value").stringValue("");
+          if (!encodedTexture.isEmpty()) {
+            return MinecraftSkin.getSkinFromEncodedTextures(encodedTexture);
+          }
+        }
+      }
+    }
+    int[] uuidInts = profileTag.get("id").intArray();
+    return MojangApi.fetchProfile(UuidUtil.intsToUuid(uuidInts).toString()).getSkin();
   }
 }

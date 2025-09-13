@@ -17,7 +17,6 @@
 package se.llbit.math;
 
 import org.apache.commons.math3.util.FastMath;
-
 import se.llbit.json.JsonObject;
 
 import java.util.Random;
@@ -213,6 +212,15 @@ public class Vector3 {
     this.x *= other.x;
     this.y *= other.y;
     this.z *= other.z;
+  }
+
+  /**
+   * Scale each component of this vector by v
+   */
+  public final void scaleEntrywise(Vector3 v) {
+    x *= v.x;
+    y *= v.y;
+    z *= v.z;
   }
 
   /**

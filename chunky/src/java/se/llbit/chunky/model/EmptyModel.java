@@ -34,4 +34,9 @@ public class EmptyModel implements BlockModel {
   public boolean isInside(Ray ray) {
     return false;
   }
+
+  @Override
+  public boolean isBiomeDependant() {
+    return false;
+  }
 }

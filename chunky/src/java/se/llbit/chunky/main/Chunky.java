@@ -23,10 +23,10 @@ import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.MinecraftBlockProvider;
 import se.llbit.chunky.block.legacy.LegacyMinecraftBlockProvider;
 import se.llbit.chunky.main.CommandLineOptions.Mode;
-import se.llbit.chunky.plugin.ContextMenuTransformer;
-import se.llbit.chunky.plugin.PluginApi;
-import se.llbit.chunky.plugin.ChunkyPlugin;
-import se.llbit.chunky.plugin.TabTransformer;
+import se.llbit.chunky.plugin.*;
+import se.llbit.chunky.plugin.loader.PluginManager;
+import se.llbit.chunky.plugin.loader.JarPluginLoader;
+import se.llbit.chunky.plugin.manifest.PluginManifest;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
@@ -42,7 +42,7 @@ import se.llbit.chunky.ui.controller.CreditsController;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.chunky.world.MaterialStore;
 import se.llbit.json.JsonArray;
-import se.llbit.json.JsonValue;
+import se.llbit.log.ConsoleReceiver;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
 import se.llbit.log.Receiver;
@@ -53,11 +53,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
 
 /**
  * Chunky is a Minecraft mapping and rendering tool created by Jesper Öqvist (jesper@llbit.se).
@@ -165,7 +163,7 @@ public class Chunky {
     });
 
     try {
-      sceneManager.loadScene(options.sceneDir, options.sceneName);
+      sceneManager.loadScene(options.getSceneDescriptionFile().getParentFile(), options.sceneName);
       if (options.target != -1) {
         sceneManager.getScene().setTargetSpp(options.target);
       }
@@ -236,6 +234,8 @@ public class Chunky {
             break;
         }
       } catch (Throwable t) {
+        // set receiver in case an exception was thrown before it was set in one of the start modes.
+        Log.setReceiver(ConsoleReceiver.INSTANCE, Level.INFO, Level.WARNING, Level.ERROR);
         Log.error("Unchecked exception caused Chunky to close.", t);
         exitCode = 2;
       }
@@ -261,35 +261,33 @@ public class Chunky {
     }
     Path pluginsPath = pluginsDirectory.toPath();
     JsonArray plugins = PersistentSettings.getPlugins();
-    Set<String> loadedPlugins = new HashSet<>();
-    for (JsonValue value : plugins) {
-      String jarName = value.asString("");
-      if (!jarName.isEmpty()) {
-        Log.info("Loading plugin: " + value);
-        try {
-          ChunkyPlugin
-              .load(pluginsPath.resolve(jarName).toRealPath().toFile(), (plugin, manifest) -> {
-                CreditsController.addPlugin(manifest);
-                String pluginName = manifest.get("name").asString("");
-                if (loadedPlugins.contains(pluginName)) {
-                  Log.warnf(
-                      "Multiple plugins with the same name (\"%s\") are enabled. Loading multiple versions of the same plugin can lead to strange behavior.",
-                      pluginName);
-                }
-                loadedPlugins.add(pluginName);
-                try {
-                  plugin.attach(this);
-                } catch (Throwable t) {
-                  Log.error("Plugin " + jarName + " failed to load.", t);
-                }
-                Log.infof("Plugin loaded: %s %s", manifest.get("name").asString(""),
-                    manifest.get("version").asString(""));
-              });
-        } catch (Throwable t) {
-          Log.error("Plugin " + jarName + " failed to load.", t);
-        }
+    // TODO: allow plugins to implement a custom plugin loader.
+    PluginManager pluginManager = new PluginManager(new JarPluginLoader());
+
+    // Parse plugin manifests
+    Set<PluginManifest> pluginManifests = plugins.elements.stream()
+      .map(value -> value.asString(""))
+      .filter(jarName -> !jarName.isEmpty())
+      .map(jarName -> pluginsPath.resolve(jarName).toAbsolutePath().toFile())
+      .map(PluginManager::parsePluginManifest)
+      .flatMap(Optional::stream)
+      .collect(Collectors.toSet());
+
+    // Load plugins
+    pluginManager.load(pluginManifests, (plugin, manifest) -> {
+      String jarName = manifest.pluginJar.getName();
+      Log.infof("Loading plugin: %s", jarName);
+      if (!isHeadless()) {
+        CreditsController.addPlugin(manifest.name, manifest.version.toString(), manifest.author, manifest.description);
       }
-    }
+
+      try {
+        plugin.attach(this);
+      } catch (Throwable t) {
+        Log.error("Plugin " + jarName + " failed to load.", t);
+      }
+      Log.infof("Plugin loaded: %s %s", manifest.name, manifest.version);
+    });
   }
 
   /**
@@ -338,6 +336,7 @@ public class Chunky {
 
   /**
    * Get the common thread pool. This should only be used for parallelized processing, not for wait tasks.
+   * Note: This is not guaranteed to return the same object on subsequent calls.
    */
   public static ForkJoinPool getCommonThreads() {
     if (commonThreads == null) {
@@ -345,6 +344,16 @@ public class Chunky {
       commonThreads = new ForkJoinPool(Math.max(PersistentSettings.getNumThreads(), 2));
     }
     return commonThreads;
+  }
+
+  /**
+   * Replace the common thread pool with a new thread pool with a specified number of threads.
+   * Note: This is done on a best-effort basis.
+   */
+  public static void setCommonThreadsCount(int threads) {
+    ForkJoinPool t = getCommonThreads();
+    commonThreads = new ForkJoinPool(threads);
+    t.shutdown();
   }
 
   public synchronized SceneManager getSceneManager() {

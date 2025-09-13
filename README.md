@@ -200,37 +200,48 @@ Chunky uses the following 3rd party libraries:
   The library is covered by the Apache License, version 2.0.
   See the file `licenses/Apache-2.0.txt` for the full license text.
   See the file `licenses/commons-math.txt` for the copyright notices.
+- **Apache Maven Artifact by the Apache Software Foundation**  
+  The library is covered by the Apache License, version 2.0.
+  See the file `licenses/Apache-2.0.txt` for the full license text.
+- **Apache Commons CLI by the Apache Software Foundation**  
+  The library is covered by the Apache License, version 2.0.
+  See the file `licenses/Apache-2.0.txt` for the full license text.
 - **FastUtil by Sebastiano Vigna**  
   FastUtil is covered by Apache License, version 2.0.
   See the file `licenses/Apache-2.0.txt` for the full license text.
   See the file `licenses/fast-util.txt` for the copyright notice.
 - **Gson by Google**  
-  The library is convered by the Apache License, version 2.0.
+  The library is covered by the Apache License, version 2.0.
   See the file `licenses/Apache-2.0.txt` for the full license text.
   See the file `licenses/gson.txt` for the copyright notice.
 - **Simplex noise implementation by Stefan Gustavson and Keijiro Takahashi**  
   Released in the public domain.
+- **lz4-java by Adrien Grand and the lz4-java contributors**  
+  The library is covered by Apache License, version 2.0.
+  See the file `licenses/Apache-2.0.txt` for the full license text.
+  See the file `licenses/lz4-java.txt` for the copyright notice.
+  lz4-java uses LZ4, by Yann Collet, which is covered by the BSD 2-Clause license. See the file `licenses/lz4.txt` for the copyright notice and full license.
 
 ## Special Thanks
 
-![YourKit](https://www.yourkit.com/images/yklogo.png)<br/>
-YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling Java and .NET applications. YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/%22%3EYourKit"> Java Profiler</a>, <a href="https://www.yourkit.com/.net/profiler/%22%3EYourKit"> .NET Profiler</a>, and <a href="https://www.yourkit.com/youmonitor/%22%3EYourKit"> YouMonitor</a>.
+<a href="https://www.yourkit.com/"><img src="https://www.yourkit.com/images/yklogo.png" alt="YourKit"></a><br/>
+YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling Java and .NET applications. YourKit is the creator of <a href="https://www.yourkit.com/java/profiler">Java Profiler</a>, <a href="https://www.yourkit.com/.net/profiler">.NET Profiler</a>, and <a href="https://www.yourkit.com/youmonitor">YouMonitor</a>.
 
-<img src="https://raw.githubusercontent.com/JetBrains/logos/master/web/jetbrains/jetbrains-simple.svg" height="44" title="Copyright © 2000-2022 JetBrains s.r.o. JetBrains and the JetBrains logo are registered trademarks of JetBrains s.r.o."><br/>
+<a href="https://www.jetbrains.com/"><img src="https://raw.githubusercontent.com/JetBrains/logos/master/web/jetbrains/jetbrains-simple.svg" height="44" title="Copyright © 2000-2022 JetBrains s.r.o. JetBrains and the JetBrains logo are registered trademarks of JetBrains s.r.o."></a><br/>
 JetBrains supports core contributors of non-commercial open source projects by providing them with professional coding tools free of charge. <a href="https://jb.gg/OpenSourceSupport"> Find out more</a>.
 
 [chunky-dev]: https://chunky-dev.github.io/docs/
-[chunky-dev-troubleshooting]: https://chunky-dev.github.io/docs/faq/troubleshooting/
+[chunky-dev-troubleshooting]: https://chunky-dev.github.io/docs/support/troubleshooting/
 [chunky-reddit]: http://www.reddit.com/r/chunky
-[chunky-dev-headless]: https://chunky-dev.github.io/docs/user_interface/headless/
+[chunky-dev-headless]: https://chunky-dev.github.io/docs/reference/user_interface/chunky_launcher/headless/
 [google-styleguide]: https://google.github.io/styleguide/javaguide.html
 [chunky-releasetools]: https://github.com/llbit/chunky-releasetools
 [chunky-contributors]: https://github.com/chunky-dev/chunky/graphs/contributors
-[chunky-dev-rendering]: https://chunky-dev.github.io/docs/rendering/
+[chunky-dev-rendering]: https://chunky-dev.github.io/docs/user_guides/introduction/path_tracing/
 [chunky-denoiser]: https://github.com/leMaik/chunky-denoiser
-[chunky-dev-skymaps]: https://chunky-dev.github.io/docs/rendering/skymaps/
+[chunky-dev-skymaps]: https://chunky-dev.github.io/docs/user_guides/skymaps/
 [chunkylauncherjar]: http://chunkyupdate.lemaik.de/ChunkyLauncher.jar
 [jdk]: https://adoptium.net/
-[chunky-opencl]: https://github.com/alexhliu/ChunkyClPlugin
+[chunky-opencl]: https://github.com/chunky-dev/chunky-opencl
 [chunky-discord]: https://discord.gg/VqcHpsF
 [jfx]: https://gluonhq.com/products/javafx/

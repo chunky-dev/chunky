@@ -72,18 +72,24 @@ public class AlphaBuffer {
 
     try (TaskTracker.Task task = taskTracker.task("Computing alpha channel")) {
       this.type = type;
-      buffer = ByteBuffer.allocate(scene.width * scene.height * type.byteSize);
+      int cropX = scene.canvasConfig.getCropX();
+      int cropY = scene.canvasConfig.getCropY();
+      int width = scene.canvasConfig.getWidth();
+      int height = scene.canvasConfig.getHeight();
+      int fullWidth = scene.canvasConfig.getCropWidth();
+      int fullHeight = scene.canvasConfig.getCropHeight();
+      buffer = ByteBuffer.allocate(scene.canvasConfig.getPixelCount() * type.byteSize);
 
       AtomicInteger done = new AtomicInteger(0);
       Chunky.getCommonThreads().submit(() -> {
-        IntStream.range(0, scene.width).parallel().forEach(x -> {
+        IntStream.range(0, width).parallel().forEach(x -> {
           WorkerState state = new WorkerState();
 
-          for (int y = 0; y < scene.height; y++) {
-            computeAlpha(scene, x, y, state);
+          for (int y = 0; y < height; y++) {
+            computeAlpha(scene, x, y, cropX, cropY, width, height, fullWidth, fullHeight, state);
           }
 
-          task.update(scene.width, done.incrementAndGet());
+          task.update(height, done.incrementAndGet());
         });
       }).get();
     } catch (InterruptedException | ExecutionException e) {
@@ -94,10 +100,10 @@ public class AlphaBuffer {
   /**
    * Compute the alpha channel based on sky visibility.
    */
-  public void computeAlpha(Scene scene, int x, int y, WorkerState state) {
+  public void computeAlpha(Scene scene, int x, int y, int cropX, int cropY, int width, int height, int fullWidth, int fullHeight, WorkerState state) {
     Ray ray = state.ray;
-    double halfWidth = scene.width / (2.0 * scene.height);
-    double invHeight = 1.0 / scene.height;
+    double halfWidth = fullWidth / (2.0 * fullHeight);
+    double invHeight = 1.0 / fullHeight;
 
     // Rotated grid supersampling.
     double[][] offsets = new double[][]{
@@ -110,8 +116,8 @@ public class AlphaBuffer {
     double occlusion = 0.0;
     for (double[] offset : offsets) {
       scene.camera.calcViewRay(ray,
-        -halfWidth + (x + offset[0]) * invHeight,
-        -0.5 + (y + offset[1]) * invHeight);
+        -halfWidth + (x + offset[0] + cropX) * invHeight,
+        -0.5 + (y + offset[1] + cropY) * invHeight);
       ray.o.x -= scene.origin.x;
       ray.o.y -= scene.origin.y;
       ray.o.z -= scene.origin.z;
@@ -124,6 +130,6 @@ public class AlphaBuffer {
     }
     occlusion /= 4.0;
 
-    type.writer.write(buffer, y * scene.width + x, occlusion);
+    type.writer.write(buffer, y * width + x, occlusion);
   }
 }

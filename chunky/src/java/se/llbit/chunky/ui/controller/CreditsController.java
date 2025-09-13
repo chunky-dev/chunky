@@ -40,6 +40,7 @@ import javafx.scene.layout.Border;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import se.llbit.chunky.HelpCopyright;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.ui.ChunkyFx;
@@ -49,9 +50,10 @@ import se.llbit.log.Log;
 import se.llbit.util.Pair;
 
 public class CreditsController implements Initializable {
-
   @FXML
   private Label version;
+  @FXML
+  public Label copyrightLine;
   @FXML
   private Hyperlink gplv3;
   @FXML
@@ -62,6 +64,10 @@ public class CreditsController implements Initializable {
   private Hyperlink fastMath;
   @FXML
   private Hyperlink fastMathLicense;
+  @FXML
+  private Hyperlink mavenArtifact;
+  @FXML
+  private Hyperlink mavenArtifactLicense;
   @FXML
   private Hyperlink fastutil;
   @FXML
@@ -75,9 +81,17 @@ public class CreditsController implements Initializable {
   @FXML
   private Hyperlink simplexnoiseLicense;
   @FXML
-  private Hyperlink semver4j;
+  private Hyperlink lz4Java;
   @FXML
-  private Hyperlink semver4jLicense;
+  private Hyperlink lz4JavaLicense;
+  @FXML
+  private Hyperlink apacheCli;
+  @FXML
+  private Hyperlink apacheCliLicense;
+  @FXML
+  private Hyperlink controlsfx;
+  @FXML
+  private Hyperlink controlsFXLicense;
   @FXML
   private VBox pluginBox;
   @FXML
@@ -136,6 +150,8 @@ public class CreditsController implements Initializable {
 
     version.setText(Chunky.getMainWindowTitle());
 
+    copyrightLine.setText(HelpCopyright.COPYRIGHT_LINE);
+
     gplv3.setOnAction(
         e -> launchAndReset(gplv3, "https://github.com/chunky-dev/chunky/blob/master/LICENSE")
     );
@@ -158,6 +174,13 @@ public class CreditsController implements Initializable {
     fastMathLicense.setOnAction(
         e -> launchAndReset(fastMathLicense, "http://www.apache.org/licenses/LICENSE-2.0"));
 
+    mavenArtifact.setBorder(Border.EMPTY);
+    mavenArtifact.setOnAction(
+        e -> launchAndReset(fastMath, "https://maven.apache.org/ref/3.9.9/maven-artifact/"));
+    mavenArtifactLicense.setBorder(Border.EMPTY);
+    mavenArtifactLicense.setOnAction(
+        e -> launchAndReset(fastMathLicense, "http://www.apache.org/licenses/LICENSE-2.0"));
+
     fastutil.setBorder(Border.EMPTY);
     fastutil.setOnAction(e -> launchAndReset(fastutil, "https://fastutil.di.unimi.it/"));
     fastutilLicense.setBorder(Border.EMPTY);
@@ -173,10 +196,20 @@ public class CreditsController implements Initializable {
     simplexnoiseLicense.setBorder(Border.EMPTY);
     simplexnoiseLicense.setOnAction(e -> launchAndReset(simplexnoiseLicense, "https://unlicense.org/"));
 
-    semver4j.setBorder(Border.EMPTY);
-    semver4j.setOnAction(e -> launchAndReset(semver4j, "https://github.com/vdurmont/semver4j"));
-    semver4jLicense.setBorder(Border.EMPTY);
-    semver4jLicense.setOnAction(e -> launchAndReset(semver4jLicense, "https://github.com/vdurmont/semver4j/blob/master/LICENSE.md"));
+    lz4Java.setBorder(Border.EMPTY);
+    lz4Java.setOnAction(e -> launchAndReset(lz4Java, "https://github.com/lz4/lz4-java"));
+    lz4JavaLicense.setBorder(Border.EMPTY);
+    lz4JavaLicense.setOnAction(e -> launchAndReset(lz4JavaLicense, "https://github.com/lz4/lz4-java/blob/master/LICENSE.txt"));
+
+    apacheCli.setBorder(Border.EMPTY);
+    apacheCli.setOnAction(e -> launchAndReset(apacheCli, "https://commons.apache.org/proper/commons-cli/"));
+    apacheCliLicense.setBorder(Border.EMPTY);
+    apacheCliLicense.setOnAction(e -> launchAndReset(apacheCliLicense, "http://www.apache.org/licenses/LICENSE-2.0"));
+
+    controlsfx.setBorder(Border.EMPTY);
+    controlsfx.setOnAction(e -> launchAndReset(controlsfx, "https://controlsfx.github.io/"));
+    controlsFXLicense.setBorder(Border.EMPTY);
+    controlsFXLicense.setOnAction(e -> launchAndReset(controlsFXLicense, "https://github.com/controlsfx/controlsfx/blob/master/license.txt"));
 
     if (!plugins.isEmpty()) {
       plugins.forEach((key, item) -> pluginBox.getChildren().addAll(buildBox(item)));

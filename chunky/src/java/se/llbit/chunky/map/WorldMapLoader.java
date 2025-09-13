@@ -117,7 +117,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
     // Enqueue visible regions and chunks to be loaded.
     for (int rx = rx0; rx <= rx1; ++rx) {
       for (int rz = rz0; rz <= rz1; ++rz) {
-        regionQueue.add(new ChunkPosition(rx, rz));
+        regionQueue.add(new RegionPosition(rx, rz));
       }
     }
   }
@@ -136,7 +136,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   }
 
   /** Called to notify the world loader that a region was changed. */
-  public void regionUpdated(ChunkPosition region) {
+  public void regionUpdated(RegionPosition region) {
     regionQueue.add(region);
   }
 

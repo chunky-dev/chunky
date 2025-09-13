@@ -36,7 +36,10 @@ import javafx.util.StringConverter;
 import org.controlsfx.control.ToggleSwitch;
 import se.llbit.chunky.renderer.scene.SunSamplingStrategy;
 import se.llbit.chunky.renderer.scene.*;
-import se.llbit.chunky.renderer.scene.simulatedsky.SimulatedSky;
+import se.llbit.chunky.renderer.scene.sky.SimulatedSky;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.sky.Sky;
+import se.llbit.chunky.renderer.scene.sky.Sun;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.elements.AngleAdjuster;
 import se.llbit.chunky.ui.elements.GradientEditor;
@@ -190,9 +193,6 @@ public class EnvironmentTab extends RenderControlsTab implements Initializable {
               break;
             case GRADIENT:
               skyModeSettings.getChildren().setAll(gradientEditor);
-              break;
-            case BLACK:
-              skyModeSettings.getChildren().setAll(new Label("Selected mode has no settings."));
               break;
             case SKYBOX:
               skyModeSettings.getChildren().setAll(skyboxSettings);

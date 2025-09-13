@@ -26,6 +26,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.controlsfx.control.ToggleSwitch;
 import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.SceneIOProvider;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.math.QuickMath;
@@ -37,6 +38,7 @@ import java.util.ResourceBundle;
 
 public class SkymapSettings extends VBox implements Initializable {
   private Scene scene;
+  private SceneIOProvider ioContext;
   private File lastDirectory;
 
   @FXML private Button loadSkymap;
@@ -71,7 +73,7 @@ public class SkymapSettings extends VBox implements Initializable {
       File imageFile = fileChooser.showOpenDialog(getScene().getWindow());
       if (imageFile != null) {
         lastDirectory = imageFile.getParentFile();
-        scene.sky().loadSkymap(imageFile.getAbsolutePath(), null);
+        scene.sky().loadSkymap(ioContext, imageFile.toString());
       }
     });
     skymapYaw.setName("Skymap yaw");
@@ -106,5 +108,6 @@ public class SkymapSettings extends VBox implements Initializable {
 
   public void setRenderController(RenderController controller) {
     scene = controller.getSceneManager().getScene();
+    ioContext = controller.getContext();
   }
 }

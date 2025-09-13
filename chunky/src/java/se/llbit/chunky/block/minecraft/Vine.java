@@ -22,6 +22,7 @@ import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.VineModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
+import se.llbit.chunky.world.biome.Biome;
 
 public class Vine extends AbstractModelBlock {
 
@@ -59,5 +60,10 @@ public class Vine extends AbstractModelBlock {
   @Override
   public String description() {
     return description;
+  }
+
+  @Override
+  public int getMapColor(Biome biome) {
+    return biome.foliageColor | 0xFF000000;
   }
 }

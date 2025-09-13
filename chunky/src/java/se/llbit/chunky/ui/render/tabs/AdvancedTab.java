@@ -172,7 +172,8 @@ public class AdvancedTab extends RenderControlsTab implements Initializable {
     renderThreads.clampMin();
     renderThreads.onValueChange(value -> {
       PersistentSettings.setNumRenderThreads(value);
-      controller.showPopup("This change takes effect after restarting Chunky.", renderThreads);
+      controller.getRenderController().getRenderManager().setThreadCount(value);
+      Chunky.setCommonThreadsCount(value);
     });
 
     ArrayList<String> octreeNames = new ArrayList<>();

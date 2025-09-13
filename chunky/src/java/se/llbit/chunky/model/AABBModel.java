@@ -5,6 +5,8 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.*;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -189,5 +191,17 @@ public abstract class AABBModel implements BlockModel {
       }
     }
     return false;
+  }
+
+  @Override
+  public boolean isBiomeDependant() {
+    Tint[][] tints = getTints();
+    if(tints == null)
+      return false;
+
+    return Arrays.stream(tints)
+      .filter(Objects::nonNull)
+      .flatMap(Arrays::stream)
+      .anyMatch(Tint::isBiomeTint);
   }
 }

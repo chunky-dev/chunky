@@ -46,8 +46,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -76,6 +79,8 @@ public final class UpdateDialogController implements Initializable {
   @FXML protected ProgressBar progress;
   @FXML protected Label updateComplete;
 
+  private final Map<VersionInfo.LibraryStatus, Image> statusIcons = new EnumMap<>(VersionInfo.LibraryStatus.class);
+
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public UpdateDialogController(ChunkyLauncherController launcher, VersionInfo versionInfo) {
     this.launcher = launcher;
@@ -97,6 +102,28 @@ public final class UpdateDialogController implements Initializable {
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
+    try {
+      try (InputStream inputStream = getClass().getResourceAsStream("cached.png")) {
+        Image statusCachedIcon = new Image(Objects.requireNonNull(inputStream));
+        statusIcons.put(VersionInfo.LibraryStatus.PASSED, statusCachedIcon);
+        statusIcons.put(VersionInfo.LibraryStatus.DOWNLOADED_OK, statusCachedIcon);
+      }
+      try (InputStream inputStream = getClass().getResourceAsStream("refresh.png")) {
+        Image statusRefreshIcon = new Image(Objects.requireNonNull(inputStream));
+        statusIcons.put(VersionInfo.LibraryStatus.CHECKSUM_MISMATCH, statusRefreshIcon);
+        statusIcons.put(VersionInfo.LibraryStatus.MISSING, statusRefreshIcon);
+      }
+      try (InputStream inputStream = getClass().getResourceAsStream("failed.png")) {
+        Image statusFailedIcon = new Image(Objects.requireNonNull(inputStream));
+        statusIcons.put(VersionInfo.LibraryStatus.INCOMPLETE_INFO, statusFailedIcon);
+        statusIcons.put(VersionInfo.LibraryStatus.MALFORMED_URL, statusFailedIcon);
+        statusIcons.put(VersionInfo.LibraryStatus.FILE_NOT_FOUND, statusFailedIcon);
+        statusIcons.put(VersionInfo.LibraryStatus.DOWNLOAD_FAILED, statusFailedIcon);
+      }
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
+
     releaseInfo.setText(String.format("Version %s released on %s",
         versionInfo.name, versionInfo.date()));
     if (versionInfo.notes.isEmpty()) {
@@ -116,27 +143,13 @@ public final class UpdateDialogController implements Initializable {
         ChunkyLauncher.prettyPrintSize(data.getValue().thing1.size)));
     statusCol.setCellFactory(param -> new TableCell<Pair<VersionInfo.Library, VersionInfo.LibraryStatus>, VersionInfo.LibraryStatus>() {
       @Override protected void updateItem(VersionInfo.LibraryStatus status, boolean empty) {
-        if (status != null) {
-          InputStream imageStream = null;
-          switch (status) {
-            case PASSED:
-            case DOWNLOADED_OK:
-              imageStream = getClass().getResourceAsStream("cached.png");
-              break;
-            case CHECKSUM_MISMATCH:
-            case MISSING:
-              imageStream = getClass().getResourceAsStream("refresh.png");
-              break;
-            case INCOMPLETE_INFO:
-            case MALFORMED_URL:
-            case FILE_NOT_FOUND:
-            case DOWNLOAD_FAILED:
-              imageStream = getClass().getResourceAsStream("failed.png");
-              break;
-          }
-          if (imageStream != null) {
-            ImageView image = new ImageView(new Image(imageStream));
-            setGraphic(image);
+        if (empty || status == null) {
+          setText(null);
+          setGraphic(null);
+        } else {
+          Image icon = statusIcons.get(status);
+          if (icon != null) {
+            setGraphic(new ImageView(icon));
           }
           setText(status.downloadStatus());
         }
@@ -317,13 +330,12 @@ public final class UpdateDialogController implements Initializable {
 
   /** Update status of a single library dependency in the table view. */
   private void updateDependencyStatus(VersionInfo.Library lib, VersionInfo.LibraryStatus newStatus) {
-    dependencies.getItems().setAll(dependencies.getItems().stream().map(
-        item -> {
-          if (item.thing1 != lib) {
-            return item;
-          } else {
-            return new Pair<>(item.thing1, newStatus);
-          }
-        }).collect(Collectors.toList()));
+    dependencies.getItems().replaceAll(item -> {
+      if(item.thing1 == lib) {
+        return new Pair<>(item.thing1, newStatus);
+      } else {
+        return item;
+      }
+    });
   }
 }

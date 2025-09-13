@@ -710,6 +710,16 @@ public class Octree implements Intersectable {
   }
 
   public void setCube(int cubeDepth, int[] types, int x, int y, int z) {
+    assert x >= 0 && y >= 0 && z >= 0 : "setCube position must not be negative (" + x + "," + y + "," + z + ")";
+
+    int cubeSize = 1 << cubeDepth;
+    int octreeSize = 1 << implementation.getDepth();
+    assert x + cubeSize <= octreeSize : "setCube x (" + x + "," + (x + cubeSize) + ") out of bounds for octree (0," + (octreeSize - 1) + ")";
+    assert y + cubeSize <= octreeSize : "setCube y (" + y + "," + (y + cubeSize) + ") out of bounds for octree (0," + (octreeSize - 1) + ")";
+    assert z + cubeSize <= octreeSize : "setCube z (" + z + "," + (z + cubeSize) + ") out of bounds for octree (0," + (octreeSize - 1) + ")";
+    int blocksInCube = cubeSize * cubeSize * cubeSize;
+    assert types.length == blocksInCube : "setCube types has length " + types.length + " expected " + blocksInCube;
+
     implementation.setCube(cubeDepth, types, x, y, z);
   }
 

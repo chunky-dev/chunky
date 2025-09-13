@@ -21,6 +21,7 @@ import java.util.Random;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.ApertureShape;
 import se.llbit.math.Transform;
+import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 
 /**
@@ -28,7 +29,7 @@ import se.llbit.math.Vector3;
  */
 public class SphericalApertureProjector extends ApertureProjector {
   public SphericalApertureProjector(Projector wrapped, double apertureSize,
-      double subjectDistance) {
+                                    double subjectDistance) {
     super(wrapped, apertureSize, subjectDistance);
   }
 
@@ -48,9 +49,9 @@ public class SphericalApertureProjector extends ApertureProjector {
 
     d.scale(subjectDistance);
 
-    double[] point = getPointInAperture(random);
-    double rx = point[0];
-    double ry = point[1];
+    Vector2 point = getPointInAperture(random);
+    double rx = point.x;
+    double ry = point.y;
 
     Vector3 aperturePoint = new Vector3(rx, ry, 0);
 

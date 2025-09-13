@@ -65,30 +65,30 @@ abstract class AbstractDumpFormat implements DumpFormat {
       throws IOException, IllegalStateException {
     double[] samples = scene.getSampleBuffer();
 
-    try (TaskTracker.Task task = taskTracker.task("Loading render dump", scene.width * scene.height)) {
+    try (TaskTracker.Task task = taskTracker.task("Loading render dump", scene.canvasConfig.getPixelCount())) {
       readHeader(inputStream, scene);
       readSamples(inputStream, scene, (index, r, g, b) -> {
         int offset = index * 3;
         samples[offset + 0] = r;
         samples[offset + 1] = g;
         samples[offset + 2] = b;
-      }, i -> task.updateInterval(i, scene.width));
+      }, i -> task.updateInterval(i, scene.canvasConfig.getWidth()));
     }
   }
 
   @Override
   public void save(DataOutputStream outputStream, Scene scene, TaskTracker taskTracker)
       throws IOException {
-    try (TaskTracker.Task task = taskTracker.task("Saving render dump", scene.width * scene.height)) {
+    try (TaskTracker.Task task = taskTracker.task("Saving render dump", scene.canvasConfig.getPixelCount())) {
       writeHeader(outputStream, scene);
-      writeSamples(outputStream, scene, i -> task.updateInterval(i, scene.width));
+      writeSamples(outputStream, scene, i -> task.updateInterval(i, scene.canvasConfig.getWidth()));
     }
   }
 
   @Override
   public void merge(DataInputStream inputStream, Scene scene, TaskTracker taskTracker)
       throws IOException, IllegalStateException {
-    try (TaskTracker.Task task = taskTracker.task("Merging render dump", scene.width * scene.height)) {
+    try (TaskTracker.Task task = taskTracker.task("Merging render dump", scene.canvasConfig.getPixelCount())) {
       int sceneSpp = scene.spp;
       long previousRenderTime = scene.renderTime;
 
@@ -104,7 +104,7 @@ abstract class AbstractDumpFormat implements DumpFormat {
         samples[offset + 0] = (samples[offset + 0] * sceneSpp + r * dumpSpp) * sinv;
         samples[offset + 1] = (samples[offset + 1] * sceneSpp + g * dumpSpp) * sinv;
         samples[offset + 2] = (samples[offset + 2] * sceneSpp + b * dumpSpp) * sinv;
-      }, i -> task.updateInterval(i, scene.width));
+      }, i -> task.updateInterval(i, scene.canvasConfig.getWidth()));
 
       scene.spp += sceneSpp;
       scene.renderTime += previousRenderTime;
@@ -115,7 +115,7 @@ abstract class AbstractDumpFormat implements DumpFormat {
     int width = inputStream.readInt();
     int height = inputStream.readInt();
 
-    if (width != scene.canvasWidth() || height != scene.canvasHeight()) {
+    if (width != scene.canvasConfig.getWidth() || height != scene.canvasConfig.getHeight()) {
       throw new IllegalStateException("Scene size does not match dump size");
     }
 
@@ -124,8 +124,8 @@ abstract class AbstractDumpFormat implements DumpFormat {
   }
 
   protected void writeHeader(DataOutputStream outputStream, Scene scene) throws IOException {
-    outputStream.writeInt(scene.width);
-    outputStream.writeInt(scene.height);
+    outputStream.writeInt(scene.canvasConfig.getWidth());
+    outputStream.writeInt(scene.canvasConfig.getHeight());
     outputStream.writeInt(scene.spp);
     outputStream.writeLong(scene.renderTime);
   }

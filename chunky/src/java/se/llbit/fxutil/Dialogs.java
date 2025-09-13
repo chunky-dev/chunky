@@ -1,7 +1,9 @@
 package se.llbit.fxutil;
 
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
@@ -40,6 +42,31 @@ public class Dialogs {
       content,
       confirmLabel
     );
+  }
+
+  /**
+   * Init design of the dialog to the design of the main window.
+   * This sets the icon and color scheme.
+   */
+  public static void setupDialogDesign(Dialog<?> dialog, Scene mainScene) {
+    Window mainWindow = mainScene.getWindow();
+    if(mainWindow instanceof Stage) {
+      Stage mainWindowStage = (Stage) mainWindow;
+      Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
+
+      dialogStage.getIcons().addAll(mainWindowStage.getIcons());
+    }
+    dialog.initOwner(mainWindow);
+  }
+
+  /**
+   * Sets the default button to the one matching the <code>targetButtonType</code>.
+   */
+  public static void setDefaultButton(Alert alert, ButtonType targetButtonType) {
+    alert.getButtonTypes().forEach(buttonType -> {
+      Button button = (Button) alert.getDialogPane().lookupButton(buttonType);
+      button.setDefaultButton(buttonType == targetButtonType);
+    });
   }
 
   /**

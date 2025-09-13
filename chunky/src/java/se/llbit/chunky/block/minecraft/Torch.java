@@ -30,6 +30,6 @@ public class Torch extends AbstractModelBlock {
   public Torch(String name, Texture texture) {
     super(name, texture);
     solid = false;
-    model = new TorchModel(texture, 5);
+    model = new TorchModel(texture, "none");
   }
 }

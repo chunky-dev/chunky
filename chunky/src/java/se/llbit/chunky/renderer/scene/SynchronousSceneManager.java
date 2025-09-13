@@ -21,6 +21,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.RegionPosition;
 import se.llbit.chunky.world.World;
 import se.llbit.log.Log;
 import se.llbit.util.ProgressListener;
@@ -28,7 +29,8 @@ import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.BiConsumer;
@@ -149,11 +151,11 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     saveScene(resolveSceneDirectory(newName));
   }
 
-  public void saveScene(SceneIOProvider context, Scene scene) throws InterruptedException {
+  public void saveScene(SceneIOProvider ioContext, Scene scene) throws InterruptedException {
     try {
       String sceneName = scene.name();
       Log.info("Saving scene " + sceneName);
-      File sceneDir = context.getSceneDirectory();
+      File sceneDir = ioContext.getSceneDirectory();
       if (!sceneDir.isDirectory()) {
         sceneDir = resolveSceneDirectory(sceneName);
       }
@@ -173,7 +175,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       RenderStatus status = renderManager.getRenderStatus();
       scene.renderTime = status.getRenderTime();
       scene.spp = status.getSpp();
-      scene.saveScene(context, taskTracker);
+      scene.saveScene(ioContext, taskTracker);
       Log.info("Scene saved");
       this.onSceneSaved.run();
     } catch (IOException e) {
@@ -233,11 +235,10 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     onSceneLoaded.run();
   }
 
-  @Override public void loadFreshChunks(World world, Collection<ChunkPosition> chunksToLoad) {
+  @Override public void loadFreshChunks(World world, Map<RegionPosition, List<ChunkPosition>> chunksToLoadByRegion) {
     synchronized (scene) {
       scene.clear();
-
-      scene.loadChunks(taskTracker, world, chunksToLoad);
+      scene.loadChunks(taskTracker, world, chunksToLoadByRegion);
       scene.resetScene(null, context.getChunky().getSceneFactory());
       context.setSceneDirectory(new File(context.getChunky().options.sceneDir, scene.name));
       scene.refresh();
@@ -247,10 +248,10 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     onSceneLoaded.run();
   }
 
-  @Override public void loadChunks(World world, Collection<ChunkPosition> chunksToLoad) {
+  @Override public void loadChunks(World world, Map<RegionPosition, List<ChunkPosition>> chunksToLoadByRegion) {
     synchronized (scene) {
       int prevChunkCount = scene.numberOfChunks();
-      scene.loadChunks(taskTracker, world, chunksToLoad);
+      scene.loadChunks(taskTracker, world, chunksToLoadByRegion);
       if (prevChunkCount == 0) {
         scene.moveCameraToCenter();
       }
@@ -345,7 +346,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   protected void mergeDump(File dumpFile) {
     synchronized (scene) {
       renderManager.withSampleBufferProtected((samples, width, height) -> {
-        if (width != scene.width || height != scene.height) {
+        if (width != scene.canvasConfig.getWidth() || height != scene.canvasConfig.getHeight()) {
           throw new Error("Failed to merge render dump - wrong canvas size.");
         }
         scene.mergeDump(dumpFile, taskTracker);

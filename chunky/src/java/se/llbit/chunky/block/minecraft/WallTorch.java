@@ -31,9 +31,8 @@ import se.llbit.math.Ray;
  */
 public class WallTorch extends AbstractModelBlock {
   // Epsilons to clip ray intersections to the current block.
-  protected static final double E0 = -Constants.EPSILON;
-  protected static final double E1 = 1 + Constants.EPSILON;
-
+  public static final double E0 = -Constants.EPSILON;
+  public static final double E1 = 1 + Constants.EPSILON;
 
   protected final String facing;
 
@@ -41,23 +40,7 @@ public class WallTorch extends AbstractModelBlock {
     super(name, texture);
     this.facing = facing;
     solid = false;
-    int facingInt;
-    switch (facing) {
-      default:
-      case "north":
-        facingInt = 4;
-        break;
-      case "south":
-        facingInt = 3;
-        break;
-      case "west":
-        facingInt = 2;
-        break;
-      case "east":
-        facingInt = 1;
-        break;
-    }
-    model = new TorchModel(texture, facingInt);
+    model = new TorchModel(texture, facing);
   }
 
   @Override

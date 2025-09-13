@@ -1,16 +1,17 @@
 package se.llbit.chunky.nbt;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.StringTag;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests to ensure that the NBT library works.
  */
 public class NBTTest {
-  @Test public void testEqualTags() {
+  @Test
+  public void testEqualTags() {
     CompoundTag tag1 = new CompoundTag();
     tag1.add("Name", new StringTag("minecraft:stone"));
     CompoundTag tag2 = new CompoundTag();

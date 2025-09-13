@@ -19,6 +19,7 @@ package se.llbit.chunky.renderer;
 import se.llbit.util.ProgressListener;
 
 import java.text.DecimalFormat;
+import java.time.Duration;
 
 /**
  * Prints progress to standard out.
@@ -35,16 +36,17 @@ public class ConsoleProgressListener implements ProgressListener {
     decimalFormat.setGroupingUsed(true);
   }
 
-  @Override public void setProgress(String task, int done, int start, int target) {
+  @Override public void setProgress(String task, int done, int start, int target, Duration elapsedTime) {
     String line = String.format("%s: %.1f%% (%s of %s)", task, 100 * done / (float) target,
         decimalFormat.format(done), decimalFormat.format(target));
     output(line, done == target);
   }
 
-  @Override public void setProgress(String task, int done, int start, int target, String eta) {
+  @Override public void setProgress(String task, int done, int start, int target, Duration elapsedTime, Duration remainingTime) {
     output(String.format("%s: %.1f%% (%s of %s) [ETA=%s]",
         task, 100 * done / (float) target,
-        decimalFormat.format(done), decimalFormat.format(target), eta),
+        decimalFormat.format(done), decimalFormat.format(target),
+        String.format("%d:%02d:%02d", remainingTime.toHours(), remainingTime.toMinutesPart(), remainingTime.toSecondsPart())),
         done == target);
   }
 

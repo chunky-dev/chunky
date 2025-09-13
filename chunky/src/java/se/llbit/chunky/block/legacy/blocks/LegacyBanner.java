@@ -1,10 +1,10 @@
 package se.llbit.chunky.block.legacy.blocks;
 
 import se.llbit.chunky.block.minecraft.EmptyModelBlock;
+import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.StandingBanner;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.math.Vector3;
@@ -20,23 +20,23 @@ import se.llbit.nbt.SpecificTag;
  */
 public class LegacyBanner extends EmptyModelBlock {
 
-  private static final int[] COLOR_MAP = {
-      BlockData.COLOR_BLACK,
-      BlockData.COLOR_RED,
-      BlockData.COLOR_GREEN,
-      BlockData.COLOR_BROWN,
-      BlockData.COLOR_BLUE,
-      BlockData.COLOR_PURPLE,
-      BlockData.COLOR_ORANGE,
-      BlockData.COLOR_SILVER,
-      BlockData.COLOR_GRAY,
-      BlockData.COLOR_PINK,
-      BlockData.COLOR_LIME,
-      BlockData.COLOR_YELLOW,
-      BlockData.COLOR_LIGHT_BLUE,
-      BlockData.COLOR_MAGENTA,
-      BlockData.COLOR_CYAN,
-      BlockData.COLOR_WHITE
+  private static final BannerDesign.Color[] COLOR_MAP = {
+    BannerDesign.Color.BLACK,
+    BannerDesign.Color.RED,
+    BannerDesign.Color.GREEN,
+    BannerDesign.Color.BROWN,
+    BannerDesign.Color.BLUE,
+    BannerDesign.Color.PURPLE,
+    BannerDesign.Color.ORANGE,
+    BannerDesign.Color.SILVER,
+    BannerDesign.Color.GRAY,
+    BannerDesign.Color.PINK,
+    BannerDesign.Color.LIME,
+    BannerDesign.Color.YELLOW,
+    BannerDesign.Color.LIGHT_BLUE,
+    BannerDesign.Color.MAGENTA,
+    BannerDesign.Color.CYAN,
+    BannerDesign.Color.WHITE
   };
 
   private final int rotation;
@@ -66,12 +66,12 @@ public class LegacyBanner extends EmptyModelBlock {
    */
   public static JsonObject parseDesign(CompoundTag entityTag) {
     JsonObject design = new JsonObject();
-    int base = COLOR_MAP[(entityTag.get("Base").intValue(15)) & 0b111];
+    int base = COLOR_MAP[(entityTag.get("Base").intValue(15)) & 0b111].id;
     JsonArray patterns = new JsonArray();
     ListTag listTag = entityTag.get("Patterns").asList();
     for (SpecificTag tag : listTag) {
       CompoundTag patternTag = tag.asCompound();
-      int color = COLOR_MAP[patternTag.get("Color").intValue() & 0b111];
+      int color = COLOR_MAP[patternTag.get("Color").intValue() & 0b111].id;
       String pattern = patternTag.get("Pattern").stringValue();
       JsonObject patternJson = new JsonObject();
       patternJson.add("pattern", pattern);

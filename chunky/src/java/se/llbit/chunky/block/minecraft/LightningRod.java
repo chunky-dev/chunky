@@ -27,9 +27,9 @@ public class LightningRod extends AbstractModelBlock {
   private final String facing;
   private final boolean powered;
 
-  public LightningRod(String facing, boolean powered) {
-    super("lightning_rod", Texture.lightningRod);
-    this.model = new LightningRodModel(facing, powered);
+  public LightningRod(String name, Texture texture, String facing, boolean powered) {
+    super(name, texture);
+    this.model = new LightningRodModel(texture, facing, powered);
     this.powered = powered;
     this.facing = facing;
   }

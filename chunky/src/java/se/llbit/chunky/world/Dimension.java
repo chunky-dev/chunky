@@ -100,21 +100,21 @@ public class Dimension {
    * Returns a ChunkData instance that is compatible with the given chunk version.
    * The provided ChunkData instance may or may not be re-used.
    */
-  public ChunkData createChunkData(@Nullable ChunkData chunkData, int chunkVersion) {
-    if(chunkVersion >= World.VERSION_21W06A) {
-      if(chunkData instanceof GenericChunkData) {
-        return chunkData;
-      }
-      return new GenericChunkData();
-    } else {
-      if(chunkData instanceof SimpleChunkData) {
+  public ChunkData createChunkData(@Nullable ChunkData chunkData, int minY, int maxY) {
+    if (minY >= 0 && maxY <= 255) {
+      if (chunkData instanceof SimpleChunkData) {
         return chunkData;
       }
       return new SimpleChunkData();
     }
+
+    if (chunkData instanceof GenericChunkData) {
+      return chunkData;
+    }
+    return new GenericChunkData();
   }
 
-  public Region createRegion(ChunkPosition pos) {
+  public Region createRegion(RegionPosition pos) {
     return new MCRegion(pos, this);
   }
 
@@ -126,7 +126,7 @@ public class Dimension {
    * @param pos Region position
    * @return The region at the given position
    */
-  public synchronized Region getRegion(ChunkPosition pos) {
+  public synchronized Region getRegion(RegionPosition pos) {
     return regionMap.computeIfAbsent(pos.getLong(), p -> {
       // check if the region is present in the world directory
       Region region = EmptyRegion.instance;
@@ -137,12 +137,12 @@ public class Dimension {
     });
   }
 
-  public Region getRegionWithinRange(ChunkPosition pos, int yMin, int yMax) {
+  public Region getRegionWithinRange(RegionPosition pos, int yMin, int yMax) {
     return getRegion(pos);
   }
 
   /** Set the region for the given position. */
-  public synchronized void setRegion(ChunkPosition pos, Region region) {
+  public synchronized void setRegion(RegionPosition pos, Region region) {
     regionMap.put(pos.getLong(), region);
   }
 
@@ -150,8 +150,8 @@ public class Dimension {
    * @param pos region position
    * @return {@code true} if a region file exists for the given position
    */
-  public boolean regionExists(ChunkPosition pos) {
-    File regionFile = new File(getRegionDirectory(), MCRegion.getFileName(pos));
+  public boolean regionExists(RegionPosition pos) {
+    File regionFile = new File(getRegionDirectory(), pos.getMcaName());
     return regionFile.exists();
   }
 
@@ -161,7 +161,7 @@ public class Dimension {
    * @param maxY Maximum block Y (exclusive)
    * @return Whether the region exists
    */
-  public boolean regionExistsWithinRange(ChunkPosition pos, int minY, int maxY) {
+  public boolean regionExistsWithinRange(RegionPosition pos, int minY, int maxY) {
     return this.regionExists(pos);
   }
 
@@ -203,7 +203,7 @@ public class Dimension {
   }
 
   /** Called when a new region has been discovered by the region parser. */
-  public void regionDiscovered(ChunkPosition pos) {
+  public void regionDiscovered(RegionPosition pos) {
     synchronized (this) {
       regionMap.computeIfAbsent(pos.getLong(), p -> createRegion(pos));
     }
@@ -219,7 +219,7 @@ public class Dimension {
   }
 
   /** Notify region update listeners. */
-  private void fireRegionUpdated(ChunkPosition region) {
+  private void fireRegionUpdated(RegionPosition region) {
     synchronized (chunkUpdateListeners) {
       for (ChunkUpdateListener listener : chunkUpdateListeners) {
         listener.regionUpdated(region);
@@ -237,7 +237,7 @@ public class Dimension {
   }
 
   /** Called when a chunk has been updated. */
-  public void regionUpdated(ChunkPosition region) {
+  public void regionUpdated(RegionPosition region) {
     fireRegionUpdated(region);
   }
 

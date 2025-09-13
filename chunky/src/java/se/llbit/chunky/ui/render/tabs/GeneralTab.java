@@ -31,11 +31,7 @@ import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 import org.controlsfx.control.ToggleSwitch;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.entity.ArmorStand;
-import se.llbit.chunky.entity.Book;
-import se.llbit.chunky.entity.PaintingEntity;
-import se.llbit.chunky.entity.BeaconBeam;
-import se.llbit.chunky.entity.PlayerEntity;
+import se.llbit.chunky.entity.*;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
@@ -44,11 +40,11 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.Icons;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.IntegerTextField;
-import se.llbit.chunky.ui.elements.SizeInput;
 import se.llbit.chunky.ui.ValidatingNumberStringConverter;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.SettingsExport;
+import se.llbit.chunky.ui.elements.SizeInput;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Icon;
@@ -86,12 +82,18 @@ public class GeneralTab extends RenderControlsTab implements Initializable {
   @FXML private IntegerTextField cameraCropY;
   @FXML private Button loadAllEntities;
   @FXML private Button loadNoEntity;
-  @FXML private ToggleButton loadPlayers;
-  @FXML private ToggleButton loadArmorStands;
-  @FXML private ToggleButton loadBooks;
-  @FXML private ToggleButton loadPaintings;
-  @FXML private ToggleButton loadBeaconBeams;
-  @FXML private ToggleButton loadOtherEntities;
+  @FXML private CheckBox loadPlayers;
+  @FXML private CheckBox loadArmorStands;
+  @FXML private CheckBox loadBooks;
+  @FXML private CheckBox loadPaintings;
+  @FXML private CheckBox loadBeaconBeams;
+  @FXML private CheckBox loadSheep;
+  @FXML private CheckBox loadCows;
+  @FXML private CheckBox loadChickens;
+  @FXML private CheckBox loadPigs;
+  @FXML private CheckBox loadMooshrooms;
+  @FXML private CheckBox loadSquids;
+  @FXML private CheckBox loadOtherEntities;
   @FXML private CheckBox saveDumps;
   @FXML private CheckBox saveSnapshots;
   @FXML private TitledPane dumpSettings;
@@ -105,7 +107,7 @@ public class GeneralTab extends RenderControlsTab implements Initializable {
   private RenderController renderController;
   private WorldMapLoader mapLoader;
   private ChunkyFxController chunkyFxController;
-  private ChangeListener<? super Number> canvasCropListener = (observable, oldValue, newValue) -> updateCanvasCrop();
+  private final ChangeListener<? super Number> canvasCropListener = (observable, oldValue, newValue) -> updateCanvasCrop();
 
   public GeneralTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("GeneralTab.fxml"));
@@ -137,6 +139,12 @@ public class GeneralTab extends RenderControlsTab implements Initializable {
       loadBooks.setSelected(preferences.shouldLoadClass(Book.class));
       loadPaintings.setSelected(preferences.shouldLoadClass(PaintingEntity.class));
       loadBeaconBeams.setSelected(preferences.shouldLoadClass(BeaconBeam.class));
+      loadSheep.setSelected(preferences.shouldLoadClass(SheepEntity.class));
+      loadCows.setSelected(preferences.shouldLoadClass(CowEntity.class));
+      loadChickens.setSelected(preferences.shouldLoadClass(ChickenEntity.class));
+      loadPigs.setSelected(preferences.shouldLoadClass(PigEntity.class));
+      loadMooshrooms.setSelected(preferences.shouldLoadClass(MooshroomEntity.class));
+      loadSquids.setSelected(preferences.shouldLoadClass(SquidEntity.class));
       loadOtherEntities.setSelected(preferences.shouldLoadClass(null));
     }
 
@@ -167,18 +175,18 @@ public class GeneralTab extends RenderControlsTab implements Initializable {
     cameraCropX.valueProperty().removeListener(canvasCropListener);
     cameraCropY.valueProperty().removeListener(canvasCropListener);
 
-    cameraCropWidth.valueProperty().set(scene.width);
-    cameraCropHeight.valueProperty().set(scene.height);
-    cameraCropX.valueProperty().set(scene.cropX);
-    cameraCropY.valueProperty().set(scene.cropY);
+    cameraCropWidth.valueProperty().set(scene.canvasConfig.getWidth());
+    cameraCropHeight.valueProperty().set(scene.canvasConfig.getHeight());
+    cameraCropX.valueProperty().set(scene.canvasConfig.getSavedCropX());
+    cameraCropY.valueProperty().set(scene.canvasConfig.getSavedCropY());
 
     cameraCropWidth.valueProperty().addListener(canvasCropListener);
     cameraCropHeight.valueProperty().addListener(canvasCropListener);
     cameraCropX.valueProperty().addListener(canvasCropListener);
     cameraCropY.valueProperty().addListener(canvasCropListener);
 
-    renderRegions.setSelected(scene.isCanvasCropped());
-    canvasSizeInput.setSize(scene.getFullWidth(), scene.getFullHeight());
+    renderRegions.setSelected(scene.canvasConfig.isCanvasCropped());
+    canvasSizeInput.setSize(scene.canvasConfig.getCropWidth(), scene.canvasConfig.getCropHeight());
   }
 
   @Override public String getTabTitle() {
@@ -210,7 +218,7 @@ public class GeneralTab extends RenderControlsTab implements Initializable {
         try (JsonParser parser = new JsonParser(new ByteArrayInputStream(text.getBytes()))) {
           JsonObject json = parser.parse().object();
           scene.importFromJson(json);
-          controller.getCanvas().setCanvasSize(scene.width, scene.height);
+          controller.getCanvas().setCanvasSize(scene.canvasConfig.getWidth(), scene.canvasConfig.getHeight());
           controller.refreshSettings();
         } catch (IOException e) {
           Log.warn("Failed to import scene settings.");
@@ -226,10 +234,12 @@ public class GeneralTab extends RenderControlsTab implements Initializable {
           Alert alert = Dialogs.createAlert(AlertType.CONFIRMATION);
           alert.setTitle("Restore default settings");
           alert.setContentText("Do you really want to reset all scene settings?");
-          if (alert.showAndWait().get() == ButtonType.OK) {
-            scene.resetScene(scene.name, renderController.getContext().getChunky().getSceneFactory());
-            chunkyFxController.refreshSettings();
-          }
+          alert.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+              scene.resetScene(scene.name, controller.getRenderController().getContext().getChunky().getSceneFactory());
+              chunkyFxController.refreshSettings();
+            }
+          });
         });
 
     loadPlayers.setTooltip(new Tooltip("Enable/disable player entity loading. "
@@ -282,6 +292,66 @@ public class GeneralTab extends RenderControlsTab implements Initializable {
       controller.showPopup(
         "This takes effect the next time a new scene is created.", loadBeaconBeams);
     });
+    loadSheep.setTooltip(new Tooltip("Enable/disable sheep entity loading. "
+      + "Takes effect on next scene creation."));
+    loadSheep.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(SheepEntity.class, newValue);
+      PersistentSettings.setLoadSheep(newValue);
+    });
+    loadSheep.setOnAction(event -> {
+      controller.showPopup(
+        "This takes effect the next time a new scene is created.", loadSheep);
+    });
+    loadCows.setTooltip(new Tooltip("Enable/disable cow entity loading. "
+      + "Takes effect on next scene creation."));
+    loadCows.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(CowEntity.class, newValue);
+      PersistentSettings.setLoadCows(newValue);
+    });
+    loadCows.setOnAction(event -> {
+      controller.showPopup(
+        "This takes effect the next time a new scene is created.", loadCows);
+    });
+    loadChickens.setTooltip(new Tooltip("Enable/disable chicken entity loading. "
+      + "Takes effect on next scene creation."));
+    loadChickens.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(ChickenEntity.class, newValue);
+      PersistentSettings.setLoadChickens(newValue);
+    });
+    loadChickens.setOnAction(event -> {
+      controller.showPopup(
+        "This takes effect the next time a new scene is created.", loadChickens);
+    });
+    loadPigs.setTooltip(new Tooltip("Enable/disable Pig entity loading. "
+      + "Takes effect on next scene creation."));
+    loadPigs.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(PigEntity.class, newValue);
+      PersistentSettings.setLoadPigs(newValue);
+    });
+    loadPigs.setOnAction(event -> {
+      controller.showPopup(
+        "This takes effect the next time a new scene is created.", loadPigs);
+    });
+    loadMooshrooms.setTooltip(new Tooltip("Enable/disable Mooshroom entity loading. "
+      + "Takes effect on next scene creation."));
+    loadMooshrooms.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(MooshroomEntity.class, newValue);
+      PersistentSettings.setLoadMooshrooms(newValue);
+    });
+    loadMooshrooms.setOnAction(event -> {
+      controller.showPopup(
+        "This takes effect the next time a new scene is created.", loadMooshrooms);
+    });
+    loadSquids.setTooltip(new Tooltip("Enable/disable Squid entity loading. "
+      + "Takes effect on next scene creation."));
+    loadSquids.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.getEntityLoadingPreferences().setPreference(SquidEntity.class, newValue);
+      PersistentSettings.setLoadSquids(newValue);
+    });
+    loadSquids.setOnAction(event -> {
+      controller.showPopup(
+        "This takes effect the next time a new scene is created.", loadSquids);
+    });
     loadOtherEntities.setTooltip(new Tooltip("Enable/disable other entity loading. "
             + "Takes effect on next scene creation."));
     loadOtherEntities.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -298,6 +368,12 @@ public class GeneralTab extends RenderControlsTab implements Initializable {
       loadBooks.setSelected(true);
       loadPaintings.setSelected(true);
       loadBeaconBeams.setSelected(true);
+      loadSheep.setSelected(true);
+      loadCows.setSelected(true);
+      loadChickens.setSelected(true);
+      loadPigs.setSelected(true);
+      loadMooshrooms.setSelected(true);
+      loadSquids.setSelected(true);
       loadOtherEntities.setSelected(true);
     });
     loadNoEntity.setOnAction(event -> {
@@ -306,6 +382,12 @@ public class GeneralTab extends RenderControlsTab implements Initializable {
       loadBooks.setSelected(false);
       loadPaintings.setSelected(false);
       loadBeaconBeams.setSelected(false);
+      loadSheep.setSelected(false);
+      loadCows.setSelected(false);
+      loadChickens.setSelected(false);
+      loadPigs.setSelected(false);
+      loadMooshrooms.setSelected(false);
+      loadSquids.setSelected(false);
       loadOtherEntities.setSelected(false);
     });
 
@@ -382,13 +464,13 @@ public class GeneralTab extends RenderControlsTab implements Initializable {
 
     openSceneDirBtn.setTooltip(
         new Tooltip("Open the directory where Chunky stores the scene description and renders of this scene."));
-    openSceneDirBtn.setOnAction(e -> chunkyFxController.openDirectory(chunkyFxController.getRenderController().getContext().getSceneDirectory()));
+    openSceneDirBtn.setOnAction(e -> chunkyFxController.openDirectory(renderController.getContext().getSceneDirectory()));
 
     loadSelectedChunks
         .setTooltip(new Tooltip("Load the chunks that are currently selected in the map view"));
     loadSelectedChunks.setOnAction(e -> {
       renderController.getSceneManager()
-          .loadChunks(mapLoader.getWorld(), chunkyFxController.getChunkSelection().getSelection());
+          .loadChunks(mapLoader.getWorld(), chunkyFxController.getChunkSelection().getSelectionByRegion());
       reloadChunks.setDisable(chunkyFxController.getChunkSelection().isEmpty());
     });
 
@@ -433,15 +515,15 @@ public class GeneralTab extends RenderControlsTab implements Initializable {
     applySize.setOnAction(e -> canvasSizeInput.applyChanges());
     makeDefaultSize.setTooltip(new Tooltip("Make the current canvas size the default."));
     makeDefaultSize.setOnAction(e -> PersistentSettings
-      .set3DCanvasSize(scene.canvasWidth(), scene.canvasHeight()));
+      .set3DCanvasSize(scene.canvasConfig.getWidth(), scene.canvasConfig.getHeight()));
 
     renderRegionsArea.visibleProperty().bind(renderRegions.selectedProperty());
     renderRegionsArea.managedProperty().bind(renderRegionsArea.visibleProperty());
     renderRegions.selectedProperty().addListener((observable, oldValue, newValue) -> {
       if (newValue) {
         if (cameraCropWidth.getValue() == 0 || cameraCropHeight.getValue() == 0) {
-          cameraCropWidth.valueProperty().set(scene.getFullWidth());
-          cameraCropHeight.valueProperty().set(scene.getFullHeight());
+          cameraCropWidth.valueProperty().set(scene.canvasConfig.getCropWidth());
+          cameraCropHeight.valueProperty().set(scene.canvasConfig.getCropHeight());
           cameraCropX.valueProperty().set(0);
           cameraCropY.valueProperty().set(0);
         }
@@ -468,16 +550,16 @@ public class GeneralTab extends RenderControlsTab implements Initializable {
     }
     if (renderRegions.isSelected()) {
       scene.setCanvasCropSize(cameraCropWidth.getValue(), cameraCropHeight.getValue(), width, height, cameraCropX.getValue(), cameraCropY.getValue());
-      if (cameraCropX.getValue() != scene.cropX) {
-        cameraCropX.valueProperty().set(scene.getCropX());
+      if (cameraCropX.getValue() != scene.canvasConfig.getSavedCropX()) {
+        cameraCropX.valueProperty().set(scene.canvasConfig.getCropX());
       }
-      if (cameraCropY.getValue() != scene.cropY) {
-        cameraCropY.valueProperty().set(scene.getCropY());
+      if (cameraCropY.getValue() != scene.canvasConfig.getSavedCropY()) {
+        cameraCropY.valueProperty().set(scene.canvasConfig.getCropY());
       }
     } else {
       scene.setCanvasCropSize(width, height, 0, 0, 0, 0);
     }
-    controller.getCanvas().setCanvasSize(scene.width, scene.height);
+    controller.getCanvas().setCanvasSize(scene.canvasConfig.getWidth(), scene.canvasConfig.getHeight());
   }
 
   private void updateCanvasCrop() {

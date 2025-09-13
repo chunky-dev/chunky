@@ -1,5 +1,6 @@
 apply plugin: 'application'
 apply plugin: 'maven-publish'
+apply plugin: 'org.openjfx.javafxplugin'
 
 mainClassName = 'se.llbit.chunky.main.Chunky'
 archivesBaseName = 'chunky-core'
@@ -9,6 +10,13 @@ configurations {
   implementation.extendsFrom configurations.nbtlib
   implementation.extendsFrom configurations.cplib
   implementation.extendsFrom configurations.toolpanelib
+
+  // dependencies that are not bundled with chunky-core but downloaded separately by the launcher
+  externalDependencies {
+    extendsFrom configurations.implementation
+    exclude group: "se.llbit" // bundled in chunky-core
+    exclude group: "org.openjfx" // provided at runtime
+  }
 }
 
 dependencies {
@@ -16,10 +24,15 @@ dependencies {
   implementation 'org.apache.commons:commons-math3:3.2'
   implementation 'com.google.code.gson:gson:2.9.0'
   implementation 'org.controlsfx:controlsfx:11.2.1'
+  implementation 'org.lz4:lz4-java:1.8.0'
+  implementation 'org.apache.maven:maven-artifact:3.9.9'
   implementation project(':lib')
+}
 
-  testImplementation 'com.google.truth:truth:1.1.3'
-  testImplementation 'junit:junit:4.13.2'
+javafx {
+  version = '17.0.11'
+  configuration = 'implementation'
+  modules = ['javafx.base', 'javafx.controls', 'javafx.fxml', 'javafx.media']
 }
 
 jar {
@@ -97,6 +110,11 @@ task javadocJar(type: Jar) {
 task sourcesJar(type: Jar) {
   from sourceSets.main.allSource
   archiveClassifier.set('sources')
+}
+
+task copyExternalDependencies(type: Copy) {
+  into "${buildDir}/${libsDirName}"
+  from configurations.externalDependencies
 }
 
 artifacts {

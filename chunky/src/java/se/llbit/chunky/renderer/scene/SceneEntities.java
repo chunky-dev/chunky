@@ -3,10 +3,7 @@ package se.llbit.chunky.renderer.scene;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
-import se.llbit.chunky.entity.ArmorStand;
-import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.entity.PaintingEntity;
-import se.llbit.chunky.entity.PlayerEntity;
+import se.llbit.chunky.entity.*;
 import se.llbit.chunky.world.Dimension;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -46,7 +43,9 @@ public class SceneEntities implements Intersectable {
 
   protected boolean renderActors = true;
 
-  /** Poseable entities in the scene. */
+  /**
+   * Poseable entities in the scene.
+   */
   private Map<PlayerEntity, MinecraftProfile> profiles = new HashMap<>();
 
   private BVH bvh = BVH.EMPTY;
@@ -140,22 +139,35 @@ public class SceneEntities implements Intersectable {
 
         if (y >= scene.yClipMin && y < scene.yClipMax) {
           String id = tag.get("id").stringValue("");
+          // Before 1.12 paintings had id=Painting.
+          // After 1.12 paintings had id=minecraft:painting.
           if ((id.equals("minecraft:painting") || id.equals("Painting")) && entityLoadingPreferences.shouldLoadClass(PaintingEntity.class)) {
-            // Before 1.12 paintings had id=Painting.
-            // After 1.12 paintings had id=minecraft:painting.
-            float yaw = tag.get("Rotation").get(0).floatValue();
-
             Tag paintingVariant = NbtUtil.getTagFromNames(tag, "Motive", "variant");
+            int facing = (tag.get("facing").isError())
+              ? tag.get("Facing").byteValue(0) // pre 1.17
+              : tag.get("facing").byteValue(0); // 1.17+
             addEntity(new PaintingEntity(
               new Vector3(x, y, z),
               paintingVariant.stringValue(),
-              yaw
+              facing
             ));
           } else if (id.equals("minecraft:armor_stand") && entityLoadingPreferences.shouldLoadClass(ArmorStand.class)) {
             addActor(new ArmorStand(
               new Vector3(x, y, z),
               tag
             ));
+          } else if ((id.equals("minecraft:sheep") || id.equals("Sheep")) && entityLoadingPreferences.shouldLoadClass(SheepEntity.class)) {
+            addActor(new SheepEntity(new Vector3(x, y, z), tag));
+          } else if ((id.equals("minecraft:cow") || id.equals("Cow")) && entityLoadingPreferences.shouldLoadClass(CowEntity.class)) {
+            addActor(new CowEntity(new Vector3(x, y, z), tag));
+          } else if ((id.equals("minecraft:chicken") || id.equals("Chicken")) && entityLoadingPreferences.shouldLoadClass(ChickenEntity.class)) {
+            addActor(new ChickenEntity(new Vector3(x, y, z), tag));
+          } else if ((id.equals("minecraft:pig") || id.equals("Pig")) && entityLoadingPreferences.shouldLoadClass(PigEntity.class)) {
+            addActor(new PigEntity(new Vector3(x, y, z), tag));
+          } else if ((id.equals("minecraft:mooshroom") || id.equals("MushroomCow")) && entityLoadingPreferences.shouldLoadClass(MooshroomEntity.class)) {
+            addActor(new MooshroomEntity(new Vector3(x, y, z), tag));
+          } else if ((id.equals("minecraft:squid") || id.equals("Squid")) && entityLoadingPreferences.shouldLoadClass(SquidEntity.class)) {
+            addActor(new SquidEntity(new Vector3(x, y, z), tag));
           }
         }
       }
@@ -172,8 +184,8 @@ public class SceneEntities implements Intersectable {
 
   public void addActor(Entity entity) {
     // don't add the actor again if it was already loaded from json
-    if(actors.stream().noneMatch(actor -> {
-      if(actor.getClass().equals(entity.getClass())) {
+    if (actors.stream().noneMatch(actor -> {
+      if (actor.getClass().equals(entity.getClass())) {
         Vector3 distance = new Vector3(actor.position);
         distance.sub(entity.position);
         return distance.lengthSquared() < Constants.EPSILON;
@@ -254,7 +266,7 @@ public class SceneEntities implements Intersectable {
   }
 
   public void removeEntity(Entity entity) {
-    if(entity instanceof PlayerEntity) {
+    if (entity instanceof PlayerEntity) {
       profiles.remove(entity);
     }
     actors.remove(entity);

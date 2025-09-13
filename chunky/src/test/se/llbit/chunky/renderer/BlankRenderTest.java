@@ -17,12 +17,13 @@
  */
 package se.llbit.chunky.renderer;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ChunkyOptions;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.scene.CanvasConfig;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.renderer.scene.Sky;
+import se.llbit.chunky.renderer.scene.sky.Sky;
 import se.llbit.json.JsonObject;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -30,8 +31,8 @@ import se.llbit.math.Vector4;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Simple integration tests to verify that rendering
@@ -40,8 +41,8 @@ import static org.junit.Assert.fail;
  * only two samples per pixel.
  */
 public class BlankRenderTest {
-  private static final int WIDTH = Math.max(10, Scene.MIN_CANVAS_WIDTH);
-  private static final int HEIGHT = Math.max(10, Scene.MIN_CANVAS_HEIGHT);
+  private static final int WIDTH = Math.max(10, CanvasConfig.MIN_CANVAS_WIDTH);
+  private static final int HEIGHT = Math.max(10, CanvasConfig.MIN_CANVAS_HEIGHT);
 
   /**
    * Renders one sample per pixel and checks that the color values are
@@ -56,8 +57,8 @@ public class BlankRenderTest {
       for (int cc = 0; cc < 3; ++cc) {
         if (samples[offset + cc] < expected[cc] - 0.005
             || samples[offset + cc] > expected[cc] + 0.005) {
-          assertEquals("Sampled pixel is outside expected value range.",
-              expected[cc], samples[offset + cc], 0.005);
+          assertEquals(expected[cc], samples[offset + cc], 0.005,
+            "Sampled pixel is outside expected value range.");
           fail("Sampled pixel is outside expected value range.");
         }
       }
@@ -86,24 +87,11 @@ public class BlankRenderTest {
       throws InterruptedException {
     for (int i = 0; i < size; ++i) {
       if (actual[i] < expected[i] - delta || actual[i] > expected[i] + delta) {
-        assertEquals("Sampled pixel is outside expected value range.",
-            expected[i], actual[i], delta);
+        assertEquals(expected[i], actual[i], delta,
+          "Sampled pixel is outside expected value range.");
         fail("Sampled pixel is outside expected value range.");
       }
     }
-  }
-
-  /**
-   * Render with a fully black sky.
-   */
-  @Test public void testBlackSky() throws InterruptedException {
-    final Scene scene = new Scene();
-    scene.setCanvasSize(WIDTH, HEIGHT);
-    scene.setRenderMode(RenderMode.RENDERING);
-    scene.setTargetSpp(2);
-    scene.setName("foobar");
-    scene.sky().setSkyMode(Sky.SkyMode.BLACK);
-    renderAndCheckSamples(scene, new double[] {0, 0, 0});
   }
 
   /**

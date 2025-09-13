@@ -35,7 +35,7 @@
                      <children>
                         <Label text="Minecraft directory:" />
                         <TextField fx:id="minecraftDirectory" editable="false" HBox.hgrow="ALWAYS" />
-                        <Button fx:id="browseMinecraft" mnemonicParsing="false" text="..." />
+                        <Button fx:id="browseMinecraft" mnemonicParsing="false" text="Browse" />
                      </children>
                   </HBox>
                   <IntegerAdjuster fx:id="memoryLimit" name="Memory limit (MiB)" />
@@ -54,7 +54,7 @@
                                  <children>
                                     <Label text="Java Runtime:" />
                                     <TextField fx:id="javaRuntime" editable="false" HBox.hgrow="ALWAYS" />
-                                    <Button fx:id="browseJava" mnemonicParsing="false" text="..." />
+                                    <Button fx:id="browseJava" mnemonicParsing="false" text="Browse" />
                                  </children>
                                  <VBox.margin>
                                     <Insets />

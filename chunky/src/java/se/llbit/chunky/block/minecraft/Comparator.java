@@ -20,36 +20,18 @@ package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.model.minecraft.ComparatorModel;
+import se.llbit.chunky.model.minecraft.ComparatorModel1212;
 import se.llbit.chunky.resources.Texture;
 
-// TODO: render locked repeaters.
 public class Comparator extends AbstractModelBlock {
-
   private final String description;
 
-  public Comparator(String facingString, String modeString, boolean powered) {
-    super("comparator", Texture.redstoneRepeaterOn);
-    this.description = String.format("facing=%s, mode=%s, powered=%s",
-        facingString, modeString, powered);
-    int mode = modeString.equals("compare") ? 0 : 1;
-    int facing;
-    switch (facingString) {
-      default:
-      case "north":
-        facing = 2;
-        break;
-      case "south":
-        facing = 0;
-        break;
-      case "west":
-        facing = 1;
-        break;
-      case "east":
-        facing = 3;
-        break;
-    }
-
-    this.model = new ComparatorModel(facing, mode, powered ? 1 : 0);
+  public Comparator(String facing, String mode, boolean powered) {
+    super("comparator", Texture.comparatorOn);
+    description = String.format("facing=%s, mode=%s, powered=%s", facing, mode, powered);
+    model = System.getProperty("chunky.blockModels.redstoneTorch", "1.21.2").equals("pre-1.21.2")
+      ? new ComparatorModel(facing, mode, powered)
+      : new ComparatorModel1212(facing, mode, powered);
   }
 
   @Override

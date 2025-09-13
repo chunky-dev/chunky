@@ -225,4 +225,9 @@ public abstract class AbstractModelBlock extends MinecraftBlock implements Model
   public boolean isInside(Ray ray) {
     return model.isInside(ray);
   }
+
+  @Override
+  public boolean isBiomeDependant() {
+    return super.isBiomeDependant() || model.isBiomeDependant();
+  }
 }

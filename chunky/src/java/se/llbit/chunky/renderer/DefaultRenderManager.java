@@ -31,6 +31,7 @@ import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
 import se.llbit.util.TaskTracker;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
@@ -380,27 +381,24 @@ public class DefaultRenderManager extends Thread implements RenderManager {
    * @return the current rendering speed in samples per second (SPS)
    */
   private int samplesPerSecond() {
-    int canvasWidth = bufferedScene.canvasWidth();
-    int canvasHeight = bufferedScene.canvasHeight();
-    long pixelsPerFrame = (long) canvasWidth * canvasHeight;
+    long pixelsPerFrame = bufferedScene.canvasConfig.getPixelCount();
     double renderTime = bufferedScene.renderTime / 1000.0;
     return (int) ((bufferedScene.spp * pixelsPerFrame) / renderTime);
   }
 
   private void updateRenderProgress() {
-    double renderTime = bufferedScene.renderTime / 1000.0;
-
     // Notify progress listener.
+    int current = bufferedScene.spp;
     int target = bufferedScene.getTargetSpp();
-    long etaSeconds = (long) (((target - bufferedScene.spp) * renderTime) / bufferedScene.spp);
-    if (etaSeconds > 0) {
-      int seconds = (int) ((etaSeconds) % 60);
-      int minutes = (int) ((etaSeconds / 60) % 60);
-      int hours = (int) (etaSeconds / 3600);
-      String eta = String.format("%d:%02d:%02d", hours, minutes, seconds);
-      renderTask.update("Rendering", target, bufferedScene.spp, eta);
+    if (current == 0) {
+      renderTask.update("Rendering", target, bufferedScene.spp);
     } else {
-      renderTask.update("Rendering", target, bufferedScene.spp, "");
+      long etaMillis = ((target - current) * bufferedScene.renderTime) / current;
+      if (etaMillis > 0) {
+        renderTask.update("Rendering", target, current, Duration.ofMillis(etaMillis));
+      } else {
+        renderTask.update("Rendering", target, current);
+      }
     }
 
     synchronized (this) {
@@ -426,8 +424,8 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         filters = bufferedScene.getPostprocessingFilters();
       }
 
-      int width = bufferedScene.width;
-      int height = bufferedScene.height;
+      int width = bufferedScene.canvasConfig.getWidth();
+      int height = bufferedScene.canvasConfig.getHeight();
       double exposure = FastMath.pow(2, bufferedScene.getExposure());
       double[] sampleBuffer = bufferedScene.getSampleBuffer();
       double[] intermediate = new double[sampleBuffer.length];
@@ -435,18 +433,20 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         intermediate[i] = sampleBuffer[i] * exposure;
       }
 
+      int numThreads = pool.getThreadCount();
+
       for (PostProcessingFilter filter : filters) {
         if (filter instanceof PixelPostProcessingFilter) {
           PixelPostProcessingFilter pixelFilter = (PixelPostProcessingFilter) filter;
 
           // Split up to 10 tasks per thread
           int tasksPerThread = 10;
-          int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.threads * tasksPerThread - 1);
-          ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(pool.threads * tasksPerThread);
+          int pixelsPerTask = (width * height) / (numThreads * tasksPerThread - 1);
+          ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(numThreads * tasksPerThread);
 
-          for (int i = 0; i < bufferedScene.width * bufferedScene.height; i += pixelsPerTask) {
+          for (int i = 0; i < width * height; i += pixelsPerTask) {
             int start = i;
-            int end = Math.min(bufferedScene.width * bufferedScene.height, i + pixelsPerTask);
+            int end = Math.min(width * height, i + pixelsPerTask);
             jobs.add(pool.submit(worker -> {
               double[] pixelBuffer = new double[3];
 
@@ -478,11 +478,11 @@ public class DefaultRenderManager extends Thread implements RenderManager {
 
       // Split up to 10 tasks per thread
       int tasksPerThread = 10;
-      int pixelsPerTask = (bufferedScene.width * bufferedScene.height) / (pool.threads * tasksPerThread - 1);
-      ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(pool.threads * tasksPerThread);
-      for (int i = 0; i < bufferedScene.width * bufferedScene.height; i += pixelsPerTask) {
+      int pixelsPerTask = (width * height) / (numThreads * tasksPerThread - 1);
+      ArrayList<RenderWorkerPool.RenderJobFuture> jobs = new ArrayList<>(numThreads * tasksPerThread);
+      for (int i = 0; i < width * height; i += pixelsPerTask) {
         int start = i;
-        int end = Math.min(bufferedScene.width * bufferedScene.height, i + pixelsPerTask);
+        int end = Math.min(width * height, i + pixelsPerTask);
         jobs.add(pool.submit(worker -> {
           double[] pixelBuffer = new double[3];
 
@@ -596,6 +596,11 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   }
 
   @Override
+  public void setThreadCount(int threads) {
+    this.pool.setThreadCount(threads);
+  }
+
+  @Override
   public synchronized void addSceneStatusListener(SceneStatusListener listener) {
     sceneStatusListeners.add(listener);
   }
@@ -617,7 +622,8 @@ public class DefaultRenderManager extends Thread implements RenderManager {
   @Override
   public void withSampleBufferProtected(SampleBufferConsumer consumer) {
     synchronized (bufferedScene) {
-      consumer.accept(bufferedScene.getSampleBuffer(), bufferedScene.width, bufferedScene.height);
+      consumer.accept(bufferedScene.getSampleBuffer(),
+        bufferedScene.canvasConfig.getWidth(), bufferedScene.canvasConfig.getHeight());
     }
   }
 

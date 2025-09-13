@@ -17,23 +17,25 @@
  */
 package se.llbit.util;
 
+import java.time.Duration;
+
 /**
  * Progress listener.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public interface ProgressListener {
-  ProgressListener NONE = (task, done, start, target) -> {};
+  ProgressListener NONE = (task, done, start, target, duration) -> {};
 
   /**
    * Update progress without ETA.
    */
-  void setProgress(String task, int done, int start, int target);
+  void setProgress(String task, int done, int start, int target, Duration elapsedTime);
 
   /**
    * Update progress with ETA.
    */
-  default void setProgress(String task, int done, int start, int target, String eta) {
-    setProgress(task, done, start, target);
+  default void setProgress(String task, int done, int start, int target, Duration elapsedTime, Duration remainingTime) {
+    setProgress(task, done, start, target, elapsedTime);
   }
 }

@@ -1,12 +1,11 @@
 package se.llbit.chunky.block;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import se.llbit.chunky.block.minecraft.Head;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.nbt.CompoundTag;
@@ -15,10 +14,13 @@ import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.mojangapi.MinecraftSkin;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 public class SkullTextureTest {
 
   @Test
-  public void testValidJson() {
+  public void testValidJson() throws IOException {
     CompoundTag validOwnerTag = createSkullTag("Owner", Base64.getEncoder().encodeToString(
         "{ \"textures\": { \"SKIN\": { \"url\": \"http://textures.minecraft.net/texture/1acde954db327685201f785a6b248b73fdc8982c2aed430f697cdebec9b7e14\" } } }"
             .getBytes(StandardCharsets.UTF_8)));
@@ -28,18 +30,29 @@ public class SkullTextureTest {
   }
 
   @Test
-  public void testSkullOwner() {
+  public void testSkullOwner() throws IOException {
     // player heads use SkullOwner, which should work too
     CompoundTag validOwnerTag = createSkullTag("SkullOwner", Base64.getEncoder().encodeToString(
-        "{ \"textures\": { \"SKIN\": { \"url\": \"http://textures.minecraft.net/texture/1acde954db327685201f785a6b248b73fdc8982c2aed430f697cdebec9b7e14\" } } }"
-            .getBytes(StandardCharsets.UTF_8)));
+      "{ \"textures\": { \"SKIN\": { \"url\": \"http://textures.minecraft.net/texture/1acde954db327685201f785a6b248b73fdc8982c2aed430f697cdebec9b7e14\" } } }"
+        .getBytes(StandardCharsets.UTF_8)));
     assertEquals(
-        "http://textures.minecraft.net/texture/1acde954db327685201f785a6b248b73fdc8982c2aed430f697cdebec9b7e14",
-        Head.getTextureUrl(validOwnerTag));
+      "http://textures.minecraft.net/texture/1acde954db327685201f785a6b248b73fdc8982c2aed430f697cdebec9b7e14",
+      Head.getTextureUrl(validOwnerTag));
   }
 
   @Test
-  public void testInvalidJson() { // test for #680, #681
+  public void testProfileTag() throws IOException {
+    // player heads use profile (1.21+), which should work too
+    CompoundTag validTagWithProfile = createTagWithProfile(Base64.getEncoder().encodeToString(
+      "{ \"textures\": { \"SKIN\": { \"url\": \"http://textures.minecraft.net/texture/1acde954db327685201f785a6b248b73fdc8982c2aed430f697cdebec9b7e14\" } } }"
+        .getBytes(StandardCharsets.UTF_8)));
+    assertEquals(
+      "http://textures.minecraft.net/texture/1acde954db327685201f785a6b248b73fdc8982c2aed430f697cdebec9b7e14",
+      Head.getTextureUrl(validTagWithProfile));
+  }
+
+  @Test
+  public void testInvalidJson() throws IOException { // test for #680, #681
     CompoundTag validOwnerTag = createSkullTag("Owner", Base64.getEncoder().encodeToString(
         "{textures:{SKIN:{url:\"http://textures.minecraft.net/texture/1acde954db327685201f785a6b248b73fdc8982c2aed430f697cdebec9b7e14\"}}}"
             .getBytes(StandardCharsets.UTF_8)));
@@ -49,7 +62,7 @@ public class SkullTextureTest {
   }
 
   @Test
-  public void testAlexSkull() { // test for #749
+  public void testAlexSkull() throws IOException { // test for #749
     CompoundTag validJsonAlexTag = createSkullTag("Owner", Base64.getEncoder().encodeToString(
         "{ \"textures\": { \"SKIN\": {\"metadata\": {\"model\": \"slim\"}, \"url\": \"http://textures.minecraft.net/texture/1acde954db327685201f785a6b248b73fdc8982c2aed430f697cdebec9b7e14\" } } }"
             .getBytes(StandardCharsets.UTF_8)));
@@ -66,7 +79,7 @@ public class SkullTextureTest {
   }
 
   @Test
-  public void testMetadataAfterUrl() { // test for #969
+  public void testMetadataAfterUrl() throws IOException { // test for #969
     CompoundTag validJsonAlexTag = createSkullTag("Owner", Base64.getEncoder().encodeToString(
         "{\"timestamp\":1425828978186,\"profileId\":\"00000000000000000000000000000000\",\"profileName\":\"chunky\",\"isPublic\":true,\"textures\":{\"SKIN\":{\"url\":\"http://textures.minecraft.net/texture/8e9fa6f8f2a1141524ff37c4df642dc2da29a6c05a35c38f43fe4919b84b34f\",\"metadata\":{\"model\":\"slim\"}}}}"
             .getBytes(StandardCharsets.UTF_8)));
@@ -76,7 +89,7 @@ public class SkullTextureTest {
   }
 
   @Test
-  public void testBadBase64Padding() { // test for #900
+  public void testBadBase64Padding() throws IOException { // test for #900
     CompoundTag validOwnerTag = createSkullTag("Owner",
         // the following base64 string has intentional wrong padding
         "eyAidGV4dHVyZXMiOiB7ICJTS0lOIjogeyJtZXRhZGF0YSI6IHsibW9kZWwiOiAic2xpbSJ9LCAidXJsIjogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWFjZGU5NTRkYjMyNzY4NTIwMWY3ODVhNmIyNDhiNzNmZGM4OTgyYzJhZWQ0MzBmNjk3Y2RlYmVjOWI3ZTE0IiB9IH0gfQ=");
@@ -86,7 +99,7 @@ public class SkullTextureTest {
   }
 
   @Test
-  public void testLinebreaks() { // test for #764
+  public void testLinebreaks() throws IOException { // test for #764
     CompoundTag validOwnerTag = createSkullTag("Owner", Base64.getEncoder().encodeToString(
         "{ \"textures\":\n{ \"SKIN\": {\n  \"metadata\": {\n\"model\": \"slim\"},\n \"url\":\n \"http://textures.minecraft.net/texture/1acde954db327685201f785a6b248b73fdc8982c2aed430f697cdebec9b7e14\" } } }"
             .getBytes(StandardCharsets.UTF_8)));
@@ -96,7 +109,7 @@ public class SkullTextureTest {
   }
 
   @Test
-  public void testCape() { // test for #1001
+  public void testCape() throws IOException { // test for #1001
     CompoundTag capeTag = createSkullTag("Owner", Base64.getEncoder().encodeToString(
         ("{\n"
             + "  \"timestamp\" : 1633816089260,\n"
@@ -139,10 +152,20 @@ public class SkullTextureTest {
     CompoundTag valueTag = new CompoundTag();
     valueTag.add("Value", new StringTag(value));
     properties.add("textures", new ListTag(Tag.TAG_COMPOUND, Collections.singletonList(
-        valueTag
+      valueTag
     )));
     ownerTag.add("Properties", properties);
     skull.add(rootKey, ownerTag);
     return skull;
+  }
+
+  private static CompoundTag createTagWithProfile(String value) {
+    CompoundTag tag = new CompoundTag();
+    CompoundTag profile = new CompoundTag();
+    CompoundTag properties = new CompoundTag();
+    properties.add("value", new StringTag(value));
+    profile.add("properties", properties);
+    tag.add("profile", profile);
+    return tag;
   }
 }

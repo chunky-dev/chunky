@@ -1,13 +1,12 @@
 package se.llbit.chunky.block;
 
-import se.llbit.chunky.block.minecraft.Leaves;
 import se.llbit.chunky.model.minecraft.UntintedLeafModel;
 import se.llbit.chunky.resources.Texture;
 
-public class UntintedLeaves extends Leaves {
+public class UntintedLeaves extends LeavesBase {
 
   public UntintedLeaves(String name, Texture texture) {
-    super(texture, name);
+    super(name, texture);
     this.model = new UntintedLeafModel(texture);
   }
 }

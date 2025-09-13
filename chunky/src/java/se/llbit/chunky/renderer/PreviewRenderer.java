@@ -56,17 +56,16 @@ public class PreviewRenderer extends TileBasedRenderer {
   @Override
   public void render(DefaultRenderManager manager) throws InterruptedException {
     TaskTracker.Task task = manager.getRenderTask();
-    task.update("Preview", 2, 0, "");
+    task.update("Preparing preview", 2, 0);
 
     Scene scene = manager.bufferedScene;
 
-    int width = scene.width;
-    int height = scene.height;
+    int width = scene.canvasConfig.getWidth();
 
-    int fullWidth = scene.getFullWidth();
-    int fullHeight = scene.getFullHeight();
-    int cropX = scene.getCropX();
-    int cropY = scene.getCropY();
+    int fullWidth = scene.canvasConfig.getCropWidth();
+    int fullHeight = scene.canvasConfig.getCropHeight();
+    int cropX = scene.canvasConfig.getCropX();
+    int cropY = scene.canvasConfig.getCropY();
 
     Camera cam = scene.camera();
     double halfWidth = fullWidth / (2.0 * fullHeight);

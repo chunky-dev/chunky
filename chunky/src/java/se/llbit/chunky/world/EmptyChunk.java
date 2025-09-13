@@ -18,13 +18,16 @@ package se.llbit.chunky.world;
 
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.MapTile;
+import se.llbit.chunky.ui.ChunkMap;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.util.Mutable;
 
 /**
- * Empty or non-existent chunk.
+ * Empty or non-existent chunk in a region that <b>does</b> exist.
+ * In the {@link ChunkMap map view} an {@link EmptyChunk} is represented as white.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
@@ -46,7 +49,12 @@ public class EmptyChunk extends Chunk {
     surface = IconLayer.CORRUPT;
   }
 
-  @Override public synchronized void getChunkData(Mutable<ChunkData> reuseChunkData, BlockPalette palette, BiomePalette biomePalette, int yMin, int yMax) { }
+  @Override public synchronized void getChunkData(Mutable<ChunkData> reuseChunkData, BlockPalette palette, BiomePalette biomePalette, int yMin, int yMax) {
+    ChunkData chunkData = reuseChunkData.get();
+    if (chunkData != null && !(reuseChunkData.get() instanceof EmptyChunkData)) {
+      chunkData.clear();
+    }
+  }
 
   @Override public void renderSurface(MapTile tile) {
     renderEmpty(tile);

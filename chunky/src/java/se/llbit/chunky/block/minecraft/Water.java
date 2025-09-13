@@ -29,7 +29,7 @@ public class Water extends MinecraftBlockTranslucent {
 
   public static final Water INSTANCE = new Water(0);
 
-  public static final int FULL_WATER_BLOCK = 16;
+  public static final int FULL_BLOCK_DATA = 16;
 
   public final int level;
   public final int data;
@@ -47,7 +47,7 @@ public class Water extends MinecraftBlockTranslucent {
   }
 
   public boolean isFullBlock() {
-    return (this.data & (1 << FULL_WATER_BLOCK)) != 0;
+    return (this.data & (1 << FULL_BLOCK_DATA)) != 0;
   }
 
   @Override public boolean isWater() {

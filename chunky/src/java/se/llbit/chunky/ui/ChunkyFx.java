@@ -19,7 +19,6 @@ package se.llbit.chunky.ui;
 
 import javafx.application.Application;
 import javafx.application.HostServices;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -44,10 +43,12 @@ public class ChunkyFx extends Application {
 
   private static HostServices hostServices = null;
   private static Chunky chunkyInstance;
+  private static Stage mainStage = null;
 
   @Override public void start(Stage stage) {
     try {
       ChunkyFx.hostServices = this.getHostServices();
+      mainStage = stage;
 
       FXMLLoader loader = new FXMLLoader(getClass().getResource("Chunky.fxml"));
       ChunkyFxController controller = new ChunkyFxController(stage, chunkyInstance);
@@ -56,11 +57,6 @@ public class ChunkyFx extends Application {
       Scene scene = new Scene(root);
       stage.setScene(scene);
       stage.getIcons().add(Icons.CHUNKY_ICON);
-      stage.setOnCloseRequest(event -> {
-        PersistentSettings.setWindowPosition(new WindowPosition(stage));
-        Platform.exit();
-        System.exit(0);
-      });
       File stylesheet = new File(SettingsDirectory.getSettingsDirectory(), "style.css");
       if (stylesheet.isFile()) {
         scene.getStylesheets().add(stylesheet.toURI().toURL().toExternalForm());
@@ -79,6 +75,14 @@ public class ChunkyFx extends Application {
     } catch (Exception e) {
       e.printStackTrace(System.err);
     }
+  }
+
+  @Override
+  public void stop() throws Exception {
+    if(mainStage != null) {
+      PersistentSettings.setWindowPosition(new WindowPosition(mainStage));
+    }
+    System.exit(0);
   }
 
   public static void startChunkyUI(Chunky chunkyInstance) {

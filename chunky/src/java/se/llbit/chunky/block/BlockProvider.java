@@ -10,7 +10,6 @@ public interface BlockProvider {
   Block getBlockByTag(String name, Tag tag);
 
   /**
-   *
    * @return A collection of block IDs that this provider provides.
    */
   Collection<String> getSupportedBlocks();
@@ -25,7 +24,8 @@ public interface BlockProvider {
 
   /**
    * Get the integer value of the given tag (either a {@link StringTag} or an {@link IntTag}.
-   * @param tag String or int tag
+   *
+   * @param tag          String or int tag
    * @param defaultValue Default value if the tag doesn't exist or the value is not an integer
    * @return Integer value of the given tag or the default value
    */
@@ -38,6 +38,16 @@ public interface BlockProvider {
     } catch (NumberFormatException ignored) {
       return defaultValue;
     }
+  }
+
+  /**
+   * Get the boolean value of the given {@link StringTag}.
+   *
+   * @param tag String tag
+   * @return True if the tag is a string tag with the value "true", false otherwise
+   */
+  static boolean stringToBoolean(Tag tag) {
+    return tag.stringValue("false").equals("true");
   }
 
   static String blockName(Tag tag) {

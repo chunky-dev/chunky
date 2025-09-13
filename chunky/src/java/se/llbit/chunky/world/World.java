@@ -295,10 +295,10 @@ public class World implements Comparable<World> {
   public synchronized void exportChunksToZip(File target, Collection<ChunkPosition> chunks,
                                              ProgressTracker progress) throws IOException {
 
-    Map<ChunkPosition, Set<ChunkPosition>> regionMap = new HashMap<>();
+    Map<RegionPosition, Set<ChunkPosition>> regionMap = new HashMap<>();
 
     for (ChunkPosition chunk : chunks) {
-      ChunkPosition regionPosition = chunk.getRegionPosition();
+      RegionPosition regionPosition = chunk.getRegionPosition();
       Set<ChunkPosition> chunkSet = regionMap.computeIfAbsent(regionPosition, k -> new HashSet<>());
       chunkSet.add(new ChunkPosition(chunk.x & 31, chunk.z & 31));
     }
@@ -315,12 +315,12 @@ public class World implements Comparable<World> {
       writeLevelDatToZip(zout);
       progress.setProgress(++work);
 
-      for (Map.Entry<ChunkPosition, Set<ChunkPosition>> entry : regionMap.entrySet()) {
+      for (Map.Entry<RegionPosition, Set<ChunkPosition>> entry : regionMap.entrySet()) {
 
         if (progress.isInterrupted())
           break;
 
-        ChunkPosition region = entry.getKey();
+        RegionPosition region = entry.getKey();
 
         appendRegionToZip(zout, currentDimension.getRegionDirectory(), region,
           regionDirectory + "/" + region.getMcaName(), entry.getValue());
@@ -342,10 +342,10 @@ public class World implements Comparable<World> {
       throws IOException {
     System.out.println("exporting all dimensions to " + target.getName());
 
-    final Collection<Pair<File, ChunkPosition>> regions = new LinkedList<>();
+    final Collection<Pair<File, RegionPosition>> regions = new LinkedList<>();
 
     WorldScanner.Operator operator = (regionDirectory, x, z) ->
-        regions.add(new Pair<>(regionDirectory, new ChunkPosition(x, z)));
+        regions.add(new Pair<>(regionDirectory, new RegionPosition(x, z)));
     // TODO make this more dynamic
     File overworld = getRegionDirectory(OVERWORLD_DIMENSION);
     WorldScanner.findExistingChunks(overworld, operator);
@@ -359,7 +359,7 @@ public class World implements Comparable<World> {
       writeLevelDatToZip(zout);
       progress.setProgress(++work);
 
-      for (Pair<File, ChunkPosition> region : regions) {
+      for (Pair<File, RegionPosition> region : regions) {
 
         if (progress.isInterrupted()) {
           break;
@@ -396,7 +396,7 @@ public class World implements Comparable<World> {
   }
 
   private void appendRegionToZip(ZipOutputStream zout, File regionDirectory,
-      ChunkPosition regionPos, String regionZipFileName, Set<ChunkPosition> chunks)
+      RegionPosition regionPos, String regionZipFileName, Set<ChunkPosition> chunks)
       throws IOException {
 
     zout.putNextEntry(new ZipEntry(regionZipFileName));

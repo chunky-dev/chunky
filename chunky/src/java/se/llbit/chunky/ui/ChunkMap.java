@@ -39,14 +39,8 @@ import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.ui.dialogs.SelectChunksInRadiusDialog;
-import se.llbit.chunky.world.Chunk;
-import se.llbit.chunky.world.ChunkPosition;
-import se.llbit.chunky.world.ChunkSelectionTracker;
-import se.llbit.chunky.world.ChunkView;
+import se.llbit.chunky.world.*;
 import se.llbit.chunky.world.Dimension;
-import se.llbit.chunky.world.Icon;
-import se.llbit.chunky.world.PlayerEntityData;
-import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.log.Log;
@@ -152,7 +146,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     newScene.setOnAction(event -> {
       SceneManager sceneManager = controller.getRenderController().getSceneManager();
       sceneManager
-          .loadFreshChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
+          .loadFreshChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelectionByRegion());
     });
     newScene.setDisable(chunkSelection.isEmpty());
 
@@ -160,7 +154,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     loadSelection.setOnAction(event -> {
       SceneManager sceneManager = controller.getRenderController().getSceneManager();
       sceneManager
-          .loadChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
+          .loadChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelectionByRegion());
     });
     loadSelection.setDisable(chunkSelection.isEmpty());
 
@@ -218,7 +212,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     }
   }
 
-  @Override public void regionChunksUpdated(ChunkPosition region) {
+  @Override public void regionChunksUpdated(RegionPosition region) {
     if (view.chunkScale >= 16) {
       int minChunkX = region.x << 5;
       int minChunkZ = region.z << 5;
@@ -233,7 +227,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     }
   }
 
-  @Override public void regionChunksUpdated(ChunkPosition region, Collection<ChunkPosition> chunks) {
+  @Override public void regionChunksUpdated(RegionPosition region, Collection<ChunkPosition> chunks) {
     if (view.chunkScale >= 16) {
       for (ChunkPosition chunk : chunks) {
         mapBuffer.drawTile(mapLoader, chunk, chunkSelection);
@@ -395,9 +389,10 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     }
   }
 
-  @Override public void regionUpdated(ChunkPosition region) {
+  @Override public void regionUpdated(RegionPosition region) {
     if (view.scale < 16) {
-      mapBuffer.drawTile(mapLoader, region, chunkSelection);
+      // intentionally don't convert, positions are all stored as ChunkPosition internally.
+      mapBuffer.drawTile(mapLoader, new ChunkPosition(region.x, region.z), chunkSelection);
       mapLoader.regionUpdated(region);
       repaintRatelimited();
     }
@@ -639,8 +634,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
   public void selectVisibleChunks(ChunkView cv, se.llbit.chunky.renderer.scene.Scene scene) {
     Camera camera = scene.camera();
-    int width = scene.canvasWidth();
-    int height = scene.canvasHeight();
+    int width = scene.canvasConfig.getWidth();
+    int height = scene.canvasConfig.getHeight();
 
     double halfWidth = width / (2.0 * height);
 
@@ -692,8 +687,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   public static void drawViewBounds(GraphicsContext gc, ChunkView cv,
       se.llbit.chunky.renderer.scene.Scene scene) {
     Camera camera = scene.camera();
-    int width = scene.canvasWidth();
-    int height = scene.canvasHeight();
+    int width = scene.canvasConfig.getWidth();
+    int height = scene.canvasConfig.getHeight();
 
     double halfWidth = width / (2.0 * height);
 

@@ -117,6 +117,18 @@ public abstract class Entity implements HasPrimitives, HasControls {
         return WallHangingSignEntity.fromJson(json);
       case "sphere":
         return SphereEntity.fromJson(json);
+      case "sheep":
+        return SheepEntity.fromJson(json);
+      case "cow":
+        return CowEntity.fromJson(json);
+      case "chicken":
+        return ChickenEntity.fromJson(json);
+      case "pig":
+        return PigEntity.fromJson(json);
+      case "mooshroom":
+        return MooshroomEntity.fromJson(json);
+      case "squid":
+        return SquidEntity.fromJson(json);
     }
     return null;
   }

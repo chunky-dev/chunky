@@ -18,25 +18,22 @@
  */
 package se.llbit.chunky.entity;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Transform;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 import se.llbit.math.primitive.Primitive;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class PaintingEntity extends Entity {
 
-  static class Painting {
+  public static class Painting {
 
     protected final Quad[] quads;
     protected final Material material;
@@ -49,32 +46,31 @@ public class PaintingEntity extends Entity {
 
       double offset = -1 / 16.;
       double off = 0;
-      int pw = w * 16;
-      int ph = h * 16;
+
       quads = new Quad[]{
-          // north (front)
-          new Quad(new Vector3(w, 0, offset), new Vector3(0, 0, offset),
-              new Vector3(w, h, offset), new Vector4(0, 1, 0, 1)),
+        // north (front)
+        new Quad(new Vector3(w, 0, offset), new Vector3(0, 0, offset),
+          new Vector3(w, h, offset), new Vector4(0, 1, 0, 1)),
 
-          // south (back)
-          new Quad(new Vector3(0, 0, off), new Vector3(w, 0, off), new Vector3(0, h, off),
-              new Vector4(0, w / 4., 1, 1 - h / 4.)),
+        // south (back)
+        new Quad(new Vector3(0, 0, off), new Vector3(w, 0, off), new Vector3(0, h, off),
+          new Vector4(0, w / 4., 1, 1 - h / 4.)),
 
-          // west (left)
-          new Quad(new Vector3(0, 0, offset), new Vector3(0, 0, off), new Vector3(0, h, offset),
-              new Vector4(0, 1 / 64., 1 - h / 4., 1)),
+        // west (left)
+        new Quad(new Vector3(0, 0, offset), new Vector3(0, 0, off), new Vector3(0, h, offset),
+          new Vector4(0, 1 / 64., 1 - h / 4., 1)),
 
-          // east (right)
-          new Quad(new Vector3(w, 0, off), new Vector3(w, 0, offset), new Vector3(w, h, off),
-              new Vector4(0, 1 / 64., 1 - h / 4., 1)),
+        // east (right)
+        new Quad(new Vector3(w, 0, off), new Vector3(w, 0, offset), new Vector3(w, h, off),
+          new Vector4(0, 1 / 64., 1 - h / 4., 1)),
 
-          // top
-          new Quad(new Vector3(w, h, offset), new Vector3(0, h, offset), new Vector3(w, h, off),
-              new Vector4(0, w / 4., 1 - 1 / 64., 1)),
+        // top
+        new Quad(new Vector3(w, h, offset), new Vector3(0, h, offset), new Vector3(w, h, off),
+          new Vector4(0, w / 4., 1 - 1 / 64., 1)),
 
-          // bottom
-          new Quad(new Vector3(0, 0, offset), new Vector3(w, 0, offset), new Vector3(0, 0, off),
-              new Vector4(0, w / 4., 1, 1 - 1 / 64.)),};
+        // bottom
+        new Quad(new Vector3(0, 0, offset), new Vector3(w, 0, offset), new Vector3(0, 0, off),
+          new Vector4(0, w / 4., 1, 1 - 1 / 64.)),};
       material = new TextureMaterial(painting);
     }
   }
@@ -82,6 +78,86 @@ public class PaintingEntity extends Entity {
   static final Map<String, Painting> paintings = new HashMap<>();
 
   static {
+    resetPaintings();
+  }
+
+  private static final Material BACK_MATERIAL = new TextureMaterial(Texture.paintingBack);
+
+  private final double angle;
+  private final String art;
+
+  public PaintingEntity(Vector3 position, String art, double angle) {
+    super(position);
+    this.art = art;
+    this.angle = angle;
+  }
+
+  public PaintingEntity(Vector3 position, String art, int facing) {
+    super(position);
+    this.art = art;
+    switch (facing) {
+      case 1:
+        this.angle = 90;
+        break;
+      case 2:
+        this.angle = 180;
+        break;
+      case 3:
+        this.angle = 270;
+        break;
+      case 0:
+      default:
+        this.angle = 0;
+        break;
+    }
+  }
+
+  @Override
+  public Collection<Primitive> primitives(Vector3 offset) {
+    Collection<Primitive> primitives = new LinkedList<>();
+    Painting painting = paintings.get(art);
+    if (painting == null) {
+      return primitives;
+    }
+    double rot = QuickMath.degToRad(180 - angle);
+    Transform transform = Transform.NONE.translate(painting.ox, painting.oy, 0.5 / 16).rotateY(rot)
+      .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
+    Quad[] quads = painting.quads;
+    quads[0].addTriangles(primitives, painting.material, transform); // front face
+    for (int i = 1; i < quads.length; i++) { // other faces
+      Quad quad = quads[i];
+      quad.addTriangles(primitives, BACK_MATERIAL, transform);
+    }
+    return primitives;
+  }
+
+  @Override
+  public JsonValue toJson() {
+    JsonObject json = new JsonObject();
+    json.add("kind", "painting");
+    json.add("position", position.toJson());
+    json.add("art", art);
+    json.add("angle", angle);
+    return json;
+  }
+
+  /**
+   * Deserialize entity from JSON.
+   *
+   * @return deserialized entity, or {@code null} if it was not a valid entity
+   */
+  public static Entity fromJson(JsonObject json) {
+    Vector3 position = new Vector3();
+    position.fromJson(json.get("position").object());
+    String art = json.get("art").stringValue("");
+    double angle = json.get("angle").doubleValue(0.0);
+    return new PaintingEntity(position, art, angle);
+  }
+
+  public static void resetPaintings() {
+    paintings.clear();
+
+    // hard-coded pre-24w18a paintings with legacy aliases
     paintings.put("Kebab", new Painting(Texture.paintingKebab, 1, 1));
     paintings.put("minecraft:kebab", new Painting(Texture.paintingKebab, 1, 1));
     paintings.put("Aztec", new Painting(Texture.paintingAztec, 1, 1));
@@ -136,56 +212,11 @@ public class PaintingEntity extends Entity {
     paintings.put("minecraft:burning_skull", new Painting(Texture.paintingBurningSkull, 4, 4));
   }
 
-  private static final Material BACK_MATERIAL = new TextureMaterial(Texture.paintingBack);
-
-  private final double angle;
-  private final String art;
-
-  public PaintingEntity(Vector3 position, String art, double angle) {
-    super(position);
-    this.art = art;
-    this.angle = angle;
+  public static void registerPainting(String id, Painting painting) {
+    paintings.put(id, painting);
   }
 
-  @Override
-  public Collection<Primitive> primitives(Vector3 offset) {
-    Collection<Primitive> primitives = new LinkedList<>();
-    Painting painting = paintings.get(art);
-    if (painting == null) {
-      return primitives;
-    }
-    double rot = QuickMath.degToRad(180 - angle);
-    Transform transform = Transform.NONE.translate(painting.ox, painting.oy, 0.5 / 16).rotateY(rot)
-        .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
-    Quad[] quads = painting.quads;
-    quads[0].addTriangles(primitives, painting.material, transform); // front face
-    for (int i = 1; i < quads.length; i++) { // other faces
-      Quad quad = quads[i];
-      quad.addTriangles(primitives, BACK_MATERIAL, transform);
-    }
-    return primitives;
-  }
-
-  @Override
-  public JsonValue toJson() {
-    JsonObject json = new JsonObject();
-    json.add("kind", "painting");
-    json.add("position", position.toJson());
-    json.add("art", art);
-    json.add("angle", angle);
-    return json;
-  }
-
-  /**
-   * Deserialize entity from JSON.
-   *
-   * @return deserialized entity, or {@code null} if it was not a valid entity
-   */
-  public static Entity fromJson(JsonObject json) {
-    Vector3 position = new Vector3();
-    position.fromJson(json.get("position").object());
-    String art = json.get("art").stringValue("");
-    double angle = json.get("angle").doubleValue(0.0);
-    return new PaintingEntity(position, art, angle);
+  public static boolean containsPainting(String id) {
+    return paintings.containsKey(id);
   }
 }

@@ -19,6 +19,7 @@ package se.llbit.chunky.world.region;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.EmptyRegionChunk;
+import se.llbit.chunky.world.RegionPosition;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -29,7 +30,7 @@ import java.util.NoSuchElementException;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class EmptyRegion implements Region {
-  private static final ChunkPosition position = new ChunkPosition(0,0);
+  private static final RegionPosition position = new RegionPosition(0,0);
 
   /**
    * Singleton instance.
@@ -56,7 +57,7 @@ public class EmptyRegion implements Region {
   }
 
   @Override
-  public ChunkPosition getPosition() {
+  public RegionPosition getPosition() {
     return position;
   }
 

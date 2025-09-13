@@ -33,14 +33,17 @@ public class Biome {
   public GrassColorMode grassColorMode;
   public int foliageColor;
   public FoliageColorMode foliageColorMode;
+  public int dryFoliageColor;
+  public FoliageColorMode dryFoliageColorMode;
   public int waterColor;
 
   public float[] grassColorLinear;
   public float[] foliageColorLinear;
+  public float[] dryFoliageColorLinear;
   public float[] waterColorLinear;
 
   Biome(String resourceLocation, String name, double temperature, double rain, int mapColor, int grassColor,
-        GrassColorMode grassColorMode, int foliageColor, FoliageColorMode foliageColorMode, int waterColor) {
+        GrassColorMode grassColorMode, int foliageColor, FoliageColorMode foliageColorMode, int dryFoliageColor, FoliageColorMode dryFoliageColorMode, int waterColor) {
     this.resourceLocation = resourceLocation;
     this.name = name;
     this.temperature = (float) temperature;
@@ -50,10 +53,13 @@ public class Biome {
     this.grassColorMode = grassColorMode;
     this.foliageColor = foliageColor;
     this.foliageColorMode = foliageColorMode;
+    this.dryFoliageColor = dryFoliageColor;
+    this.dryFoliageColorMode = dryFoliageColorMode;
     this.waterColor = waterColor;
 
     this.grassColorLinear = getRGBAComponentsGammaCorrected(grassColor);
     this.foliageColorLinear = getRGBAComponentsGammaCorrected(foliageColor);
+    this.dryFoliageColorLinear = getRGBAComponentsGammaCorrected(dryFoliageColor);
     this.waterColorLinear = getRGBAComponentsGammaCorrected(waterColor);
   }
 

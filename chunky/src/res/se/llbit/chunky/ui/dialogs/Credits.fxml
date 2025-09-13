@@ -31,7 +31,7 @@
                     <Font name="System Bold" size="14.0"/>
                   </font>
                 </Label>
-                <Label text="Copyright (c) 2010-2023, Jesper Öqvist and Chunky contributors." wrapText="true">
+                <Label fx:id="copyrightLine" text="Copyright (c) 2010-2025, Jesper Öqvist and Chunky contributors" wrapText="true">
                   <padding>
                     <Insets top="10.0"/>
                   </padding>
@@ -60,12 +60,17 @@
           <children>
             <VBox>
               <children>
-                <Label text="Lead Developers">
+                <Label text="Creator">
                   <font>
                     <Font name="System Bold" size="12.0"/>
                   </font>
                 </Label>
                 <Label text="Jesper Öqvist"/>
+                <Label text="Main maintainer">
+                  <font>
+                    <Font name="System Bold" size="12.0"/>
+                  </font>
+                </Label>
                 <Label text="leMaik"/>
               </children>
             </VBox>
@@ -98,6 +103,7 @@
                         <Label text="ThatRedox"/>
                         <Label text="TOGoS"/>
                         <Label text="NotStirred"/>
+                        <Label text="Peregrine05"/>
                       </children>
                     </VBox>
                     <VBox>
@@ -180,6 +186,20 @@
                       </padding>
                     </Hyperlink>
 
+                    <Hyperlink fx:id="mavenArtifact" text="Apache Maven Artifact">
+                      <padding>
+                        <Insets/>
+                      </padding>
+                    </Hyperlink>
+                    <Hyperlink fx:id="mavenArtifactLicense" text="Apache License 2.0">
+                      <font>
+                        <Font size="10.0"/>
+                      </font>
+                      <padding>
+                        <Insets left="20.0"/>
+                      </padding>
+                    </Hyperlink>
+
                     <Hyperlink fx:id="fastutil" text="fastutil">
                       <padding>
                         <Insets/>
@@ -208,33 +228,47 @@
                       </padding>
                     </Hyperlink>
 
-                     <Hyperlink fx:id="simplexnoise" text="Simplex noise">
-                       <padding>
-                         <Insets/>
-                       </padding>
-                     </Hyperlink>
-                     <Hyperlink fx:id="simplexnoiseLicense" text="Public domain / Unlicense">
-                        <font>
-                           <Font size="10.0" />
-                        </font>
-                        <padding>
-                           <Insets left="20.0" />
-                        </padding>
-                     </Hyperlink>
+                    <Hyperlink fx:id="simplexnoise" text="Simplex noise">
+                      <padding>
+                        <Insets/>
+                      </padding>
+                    </Hyperlink>
+                    <Hyperlink fx:id="simplexnoiseLicense" text="Public domain / Unlicense">
+                      <font>
+                        <Font size="10.0" />
+                      </font>
+                      <padding>
+                        <Insets left="20.0" />
+                      </padding>
+                    </Hyperlink>
 
-                     <Hyperlink fx:id="semver4j" text="semver4j">
-                       <padding>
-                         <Insets/>
-                       </padding>
-                     </Hyperlink>
-                     <Hyperlink fx:id="semver4jLicense" text="MIT License">
-                        <font>
-                           <Font size="10.0" />
-                        </font>
-                        <padding>
-                           <Insets left="20.0" />
-                        </padding>
-                     </Hyperlink>
+                    <Hyperlink fx:id="lz4Java" text="lz4-java">
+                      <padding>
+                        <Insets/>
+                      </padding>
+                    </Hyperlink>
+                    <Hyperlink fx:id="lz4JavaLicense" text="Apache License 2.0">
+                      <font>
+                        <Font size="10.0" />
+                      </font>
+                      <padding>
+                        <Insets left="20.0" />
+                      </padding>
+                    </Hyperlink>
+
+                    <Hyperlink fx:id="apacheCli" text="Apache Commons CLI">
+                      <padding>
+                        <Insets/>
+                      </padding>
+                    </Hyperlink>
+                    <Hyperlink fx:id="apacheCliLicense" text="Apache License 2.0">
+                      <font>
+                        <Font size="10.0"/>
+                      </font>
+                      <padding>
+                        <Insets left="20.0"/>
+                      </padding>
+                    </Hyperlink>
                   </children>
                 </VBox>
               </children>

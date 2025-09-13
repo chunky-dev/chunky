@@ -17,11 +17,17 @@
  */
 package se.llbit.chunky.model.minecraft;
 
+import se.llbit.chunky.block.minecraft.OpenEyeblossom;
+import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.model.Tint;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Quad;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
@@ -68,7 +74,10 @@ public class FlowerPotModel extends QuadModel {
     FLOWERING_AZALEA_BUSH,
     MANGROVE_PROPAGULE,
     TORCHFLOWER,
-    CHERRY_SAPLING
+    CHERRY_SAPLING,
+    PALE_OAK_SAPLING,
+    CLOSED_EYEBLOSSOM,
+    OPEN_EYEBLOSSOM
   }
 
   private static final Texture flowerpot = Texture.flowerPot;
@@ -479,7 +488,7 @@ public class FlowerPotModel extends QuadModel {
   private final Texture[] textures;
   private final Tint[] tints;
 
-  public FlowerPotModel(Kind kind) {
+  private FlowerPotModel(Kind kind) {
     switch (kind) {
       case NONE:
         quads = flowerPot;
@@ -525,6 +534,14 @@ public class FlowerPotModel extends QuadModel {
         tints = null;
         System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
         Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.mangrovePropagule);
+        break;
+      case OPEN_EYEBLOSSOM:
+        quads = Model.join(flowerPot, flowerSmall, flowerSmall);
+        textures = new Texture[flowerPotTex.length + 2 * flowerSmall.length];
+        tints = null;
+        System.arraycopy(flowerPotTex, 0, textures, 0, flowerPotTex.length);
+        Arrays.fill(textures, flowerPotTex.length, flowerPotTex.length + flowerSmall.length, Texture.openEyeblossom);
+        Arrays.fill(textures, flowerPotTex.length + flowerSmall.length, textures.length, Texture.openEyeblossomEmissive);
         break;
       default:
         quads = Model.join(flowerPot, flowerSmall);
@@ -616,6 +633,12 @@ public class FlowerPotModel extends QuadModel {
           case TORCHFLOWER:
             Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.torchflower);
             break;
+          case PALE_OAK_SAPLING:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.paleOakSapling);
+            break;
+          case CLOSED_EYEBLOSSOM:
+            Arrays.fill(textures, flowerPotTex.length, textures.length, Texture.closedEyeblossom);
+            break;
         }
         break;
     }
@@ -635,4 +658,55 @@ public class FlowerPotModel extends QuadModel {
   public Tint[] getTints() {
     return tints;
   }
+
+  public static BlockModel forKind(Kind kind) {
+    if (kind == Kind.OPEN_EYEBLOSSOM) {
+      return new FlowerPotModel(Kind.OPEN_EYEBLOSSOM) {
+        @Override
+        public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
+          boolean hit = false;
+
+          Quad[] quads = getQuads();
+          Texture[] textures = getTextures();
+          Tint[] tintedQuads = getTints();
+
+          float[] color = null;
+          Tint tint = Tint.NONE;
+          for (int i = 0; i < quads.length; ++i) {
+            Quad quad = quads[i];
+            double distance = intersectionRecord.distance;
+            if (quad.closestIntersection(ray, intersectionRecord)) {
+              float[] c = textures[i].getColor(intersectionRecord.uv.x, intersectionRecord.uv.y);
+              if (c[3] > Constants.EPSILON) {
+                tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
+                color = c;
+                if (quad.doubleSided) {
+                  intersectionRecord.setNormal(Vector3.orientNormal(ray.d, quad.n));
+                }
+                else {
+                  intersectionRecord.setNormal(quad.n);
+                }
+                intersectionRecord.setNoMediumChange(true);
+                hit = true;
+                if (textures[i] == Texture.openEyeblossomEmissive) {
+                  intersectionRecord.material = OpenEyeblossom.emissiveMaterial;
+                }
+              } else {
+                intersectionRecord.distance = distance;
+              }
+            }
+          }
+
+          if (hit) {
+            intersectionRecord.color.set(color);
+            tint.tint(intersectionRecord.color, ray, scene);
+          }
+          return hit;
+        }
+      };
+    } else {
+      return new FlowerPotModel(kind);
+    }
+  }
+
 }

@@ -64,20 +64,24 @@ public class MapTile {
     if (scale >= 16) {
       Chunk chunk = mapLoader.getWorld().currentDimension().getChunk(pos);
       renderChunk(chunk);
-      if (!(chunk instanceof EmptyChunk) && selection.isSelected(pos)) {
+      if (!(chunk instanceof EmptyRegionChunk) && selection.isSelected(pos)) {
         for (int i = 0; i < tileWidth * tileWidth; ++i) {
           pixels[i] = selectionTint(pixels[i]);
         }
       }
     } else {
-      boolean isValid = mapLoader.getWorld().currentDimension().regionExistsWithinRange(pos, view.yMin, view.yMax);
-      Region region = mapLoader.getWorld().currentDimension().getRegionWithinRange(pos, view.yMin, view.yMax);
+      RegionPosition regionPos = new RegionPosition(pos.x, pos.z); // intentionally don't convert, this position represented a region already.
+      boolean isValid = mapLoader.getWorld().currentDimension().regionExistsWithinRange(regionPos, view.yMin, view.yMax);
+      Region region = mapLoader.getWorld().currentDimension().getRegionWithinRange(regionPos, view.yMin, view.yMax);
       int pixelOffset = 0;
       for (int z = 0; z < 32; ++z) {
         for (int x = 0; x < 32; ++x) {
           Chunk chunk = region.getChunk(x, z);
+          //Calculate the chunk position as empty chunks are (0, 0)
+          ChunkPosition pos = region.getPosition().asChunkPosition(x, z);
+
           pixels[pixelOffset] = chunk.biomeColor();
-          if (isValid && !(chunk instanceof EmptyChunk) && selection.isSelected(chunk.getPosition())) {
+          if (isValid && !(chunk instanceof EmptyRegionChunk) && selection.isSelected(pos)) {
             pixels[pixelOffset] = selectionTint(pixels[pixelOffset]);
           }
           pixelOffset += 1;

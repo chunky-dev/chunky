@@ -17,6 +17,7 @@
 package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.LayeredResourcePacks;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +50,7 @@ public class AlternateTextures extends TextureLoader {
         "It is pointless to create an alternative texture loader with only one alternative.");
   }
 
-  @Override public boolean load(Path texturePack) {
+  @Override public boolean load(LayeredResourcePacks texturePack) {
     for (TextureLoader alternative : alternatives) {
       if (alternative.load(texturePack)) {
         return true;

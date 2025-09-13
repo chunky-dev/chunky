@@ -32,6 +32,8 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneManager;
+import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 import se.llbit.chunky.ui.dialogs.ResourcePackChooser;
 import se.llbit.chunky.ui.render.RenderControlsTab;
@@ -50,7 +52,7 @@ public class TexturesTab extends RenderControlsTab implements Initializable {
   @FXML
   private ToggleSwitch biomeColors;
   @FXML
-  private ToggleSwitch biomeBlending;
+  private IntegerAdjuster biomeBlendingRadiusInput;
   @FXML
   private ToggleSwitch singleColorBtn;
   @FXML
@@ -85,6 +87,7 @@ public class TexturesTab extends RenderControlsTab implements Initializable {
     singleColorBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
       Scene scene = sceneManager.getScene();
       PersistentSettings.setSingleColorTextures(newValue);
+      Texture.setUseAverageColor(newValue);
       scene.refresh();
       scene.rebuildBvh();
     });
@@ -98,7 +101,7 @@ public class TexturesTab extends RenderControlsTab implements Initializable {
       boolean enabled = scene.biomeColorsEnabled();
 
       scene.setBiomeColorsEnabled(newValue);
-      biomeBlending.setDisable(!newValue);
+      biomeBlendingRadiusInput.setDisable(!newValue);
 
       if(!scene.haveLoadedChunks()) {
         return;
@@ -108,14 +111,16 @@ public class TexturesTab extends RenderControlsTab implements Initializable {
       }
     });
 
-    biomeBlending.setTooltip(new Tooltip("Blend edges of biomes (looks better but loads slower)."));
-    biomeBlending.selectedProperty().addListener((observable, oldValue, newValue) -> {
+    biomeBlendingRadiusInput.setTooltip("Set the radius used for the blending of biome colors. 0 to disable. (1 is what minecraft calls 3×3, 2 is 5×5 and so on)");
+    biomeBlendingRadiusInput.setRange(0, 16);
+    biomeBlendingRadiusInput.clampBoth();
+    biomeBlendingRadiusInput.onValueChange(value -> {
       Scene scene = sceneManager.getScene();
-      boolean enabled = scene.biomeBlendingEnabled();
+      int previous = scene.biomeBlendingRadius();
 
-      scene.setBiomeBlendingEnabled(newValue);
+      scene.setBiomeBlendingRadius(value);
 
-      if(enabled != newValue) {
+      if(previous != value) {
         alertIfReloadNeeded("biome blending");
       }
     });
@@ -146,8 +151,8 @@ public class TexturesTab extends RenderControlsTab implements Initializable {
   @Override
   public void update(Scene scene) {
     biomeColors.setSelected(scene.biomeColorsEnabled());
-    biomeBlending.setDisable(!scene.biomeColorsEnabled());
-    biomeBlending.setSelected(scene.biomeBlendingEnabled());
+    biomeBlendingRadiusInput.setDisable(!scene.biomeColorsEnabled());
+    biomeBlendingRadiusInput.set(scene.biomeBlendingRadius());
   }
 
   @Override

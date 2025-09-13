@@ -17,8 +17,9 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.renderer.scene.PlayerModel;
-import se.llbit.chunky.renderer.scene.Sun;
+import se.llbit.chunky.renderer.scene.sky.Sun;
 import se.llbit.chunky.resources.texturepack.*;
+import se.llbit.log.Log;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -34,71 +35,41 @@ public class TexturePackLoader {
   static {
     ALL_TEXTURES.put("normal chest", new ConditionalTextures(
         "assets/minecraft/textures/entity/chest/normal_left.png",
-        new ChestTexture("assets/minecraft/textures/entity/chest/normal", ChestTexture.Layout.NEW_LAYOUT,
-            Texture.chestLock, Texture.chestTop, Texture.chestBottom, Texture.chestLeft,
-            Texture.chestRight, Texture.chestFront, Texture.chestBack), // MC 1.15
+        new ChestTexture("assets/minecraft/textures/entity/chest/normal", ChestTexture.Layout.NEW_LAYOUT, Texture.chest), // MC 1.15
         new AlternateTextures(
             new ChestTexture("assets/minecraft/textures/entity/chest/normal",
-                Texture.chestLock, Texture.chestTop, Texture.chestBottom, Texture.chestLeft,
-                Texture.chestRight, Texture.chestFront, Texture.chestBack), // MC 1.6
-            new ChestTexture("item/chest", Texture.chestLock, Texture.chestTop, Texture.chestBottom,
-                Texture.chestLeft, Texture.chestRight, Texture.chestFront, Texture.chestBack))));
+                ChestTexture.Layout.OLD_LAYOUT, Texture.chest), // MC 1.6
+            new ChestTexture("item/chest", ChestTexture.Layout.OLD_LAYOUT, Texture.chest))));
     ALL_TEXTURES.put("ender chest", new ConditionalTextures(
         "assets/minecraft/textures/entity/chest/normal_left.png",
-        new ChestTexture("assets/minecraft/textures/entity/chest/ender", ChestTexture.Layout.NEW_LAYOUT,
-            Texture.enderChestLock, Texture.enderChestTop, Texture.enderChestBottom,
-            Texture.enderChestLeft, Texture.enderChestRight, Texture.enderChestFront,
-            Texture.enderChestBack), // MC 1.15
+        new ChestTexture("assets/minecraft/textures/entity/chest/ender", ChestTexture.Layout.NEW_LAYOUT, Texture.enderChest), // MC 1.15
         new AlternateTextures(
-            new ChestTexture("assets/minecraft/textures/entity/chest/ender", // MC 1.6
-                Texture.enderChestLock, Texture.enderChestTop, Texture.enderChestBottom,
-                Texture.enderChestLeft, Texture.enderChestRight, Texture.enderChestFront,
-                Texture.enderChestBack),
-            new ChestTexture("item/enderchest", Texture.enderChestLock, Texture.enderChestTop,
-                Texture.enderChestBottom, Texture.enderChestLeft, Texture.enderChestRight,
-                Texture.enderChestFront, Texture.enderChestBack))));
+            new ChestTexture("assets/minecraft/textures/entity/chest/ender",
+              ChestTexture.Layout.OLD_LAYOUT, Texture.enderChest), // MC 1.6
+            new ChestTexture("item/enderchest", ChestTexture.Layout.OLD_LAYOUT, Texture.enderChest))));
     ALL_TEXTURES.put("normal double chest", new AlternateTextures(
         new AllTextures( // MC 1.15
             new SplitLargeChestTexture("assets/minecraft/textures/entity/chest/normal_left", SplitLargeChestTexture.Part.LEFT,
-                Texture.largeChestTopLeft, Texture.largeChestBottomLeft, Texture.largeChestLeft, null,
-                Texture.largeChestFrontLeft, Texture.largeChestBackLeft),
+                Texture.largeChestLeft),
             new SplitLargeChestTexture("assets/minecraft/textures/entity/chest/normal_right", SplitLargeChestTexture.Part.RIGHT,
-                Texture.largeChestTopRight, Texture.largeChestBottomRight, null, Texture.largeChestRight,
-                Texture.largeChestFrontRight, Texture.largeChestBackRight)),
+                Texture.largeChestRight)),
         new LargeChestTexture("assets/minecraft/textures/entity/chest/normal_double", // MC 1.6
-            Texture.largeChestLeft, Texture.largeChestRight, Texture.largeChestTopLeft,
-            Texture.largeChestTopRight, Texture.largeChestFrontLeft, Texture.largeChestFrontRight,
-            Texture.largeChestBottomLeft, Texture.largeChestBottomRight, Texture.largeChestBackLeft,
-            Texture.largeChestBackRight),
-        new LargeChestTexture("item/largechest", Texture.largeChestLeft, Texture.largeChestRight,
-            Texture.largeChestTopLeft, Texture.largeChestTopRight, Texture.largeChestFrontLeft,
-            Texture.largeChestFrontRight, Texture.largeChestBottomLeft,
-            Texture.largeChestBottomRight, Texture.largeChestBackLeft,
-            Texture.largeChestBackRight)));
+          Texture.largeChestLeft, Texture.largeChestRight),
+        new LargeChestTexture("item/largechest",
+          Texture.largeChestLeft, Texture.largeChestRight)));
     ALL_TEXTURES.put("trapped chest", new ConditionalTextures(
         "assets/minecraft/textures/entity/chest/trapped_left.png",
-        new ChestTexture("assets/minecraft/textures/entity/chest/trapped", ChestTexture.Layout.NEW_LAYOUT,
-            Texture.trappedChestLock, Texture.trappedChestTop, Texture.trappedChestBottom,
-            Texture.trappedChestLeft, Texture.trappedChestRight, Texture.trappedChestFront,
-            Texture.trappedChestBack), // MC 1.15
+        new ChestTexture("assets/minecraft/textures/entity/chest/trapped", ChestTexture.Layout.NEW_LAYOUT, Texture.trappedChest), // MC 1.15
         new ChestTexture("assets/minecraft/textures/entity/chest/trapped", // MC 1.6
-            Texture.trappedChestLock, Texture.trappedChestTop, Texture.trappedChestBottom,
-            Texture.trappedChestLeft, Texture.trappedChestRight, Texture.trappedChestFront,
-            Texture.trappedChestBack)));
+          ChestTexture.Layout.OLD_LAYOUT, Texture.trappedChest)));
     ALL_TEXTURES.put("trapped double chest", new AlternateTextures(
         new AllTextures( // MC 1.15
             new SplitLargeChestTexture("assets/minecraft/textures/entity/chest/trapped_left", SplitLargeChestTexture.Part.LEFT,
-                Texture.largeTrappedChestTopLeft, Texture.largeTrappedChestBottomLeft, Texture.largeTrappedChestLeft, null,
-                Texture.largeTrappedChestFrontLeft, Texture.largeTrappedChestBackLeft),
+                Texture.largeTrappedChestLeft),
             new SplitLargeChestTexture("assets/minecraft/textures/entity/chest/trapped_right", SplitLargeChestTexture.Part.RIGHT,
-                Texture.largeTrappedChestTopRight, Texture.largeTrappedChestBottomRight, null, Texture.largeTrappedChestRight,
-                Texture.largeTrappedChestFrontRight, Texture.largeTrappedChestBackRight)),
+                Texture.largeTrappedChestRight)),
         new LargeChestTexture("assets/minecraft/textures/entity/chest/trapped_double", // MC 1.6
-            Texture.largeTrappedChestLeft, Texture.largeTrappedChestRight,
-            Texture.largeTrappedChestTopLeft, Texture.largeTrappedChestTopRight,
-            Texture.largeTrappedChestFrontLeft, Texture.largeTrappedChestFrontRight,
-            Texture.largeTrappedChestBottomLeft, Texture.largeTrappedChestBottomRight,
-            Texture.largeTrappedChestBackLeft, Texture.largeTrappedChestBackRight)));
+          Texture.largeTrappedChestLeft, Texture.largeTrappedChestRight)));
     ALL_TEXTURES.put("sun", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/environment/sun", Sun.texture),// MC 1.6
         new SimpleTexture("environment/sun", Sun.texture),// MC 1.5
@@ -108,13 +79,15 @@ public class TexturePackLoader {
         // MC 1.6
         new CloudsTexture("environment/clouds")));
     ALL_TEXTURES.put("grass color map", new AlternateTextures(
-        new GrassColorTexture("assets/minecraft/textures/colormap/grass"),
+        new ColorMapTexture("assets/minecraft/textures/colormap/grass", ColorMapTexture.Type.GRASS),
         // MC 1.6
-        new GrassColorTexture("misc/grasscolor")));
+        new ColorMapTexture("misc/grasscolor", ColorMapTexture.Type.GRASS)));
     ALL_TEXTURES.put("foliage color map", new AlternateTextures(
-        new FoliageColorTexture("assets/minecraft/textures/colormap/foliage"),
+        new ColorMapTexture("assets/minecraft/textures/colormap/foliage", ColorMapTexture.Type.FOLIAGE),
         // MC 1.6
-        new FoliageColorTexture("misc/foliagecolor")));
+        new ColorMapTexture("misc/foliagecolor", ColorMapTexture.Type.FOLIAGE)));
+    ALL_TEXTURES.put("dry foliage color map",
+      new ColorMapTexture("assets/minecraft/textures/colormap/dry_foliage", ColorMapTexture.Type.DRY_FOLIAGE));
 
     ALL_TEXTURES.put("grass_top", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/grass_block_top", Texture.grassTop),
@@ -3511,7 +3484,6 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/polished_blackstone_bricks", Texture.polishedBlackstoneBricks);
     addSimpleTexture("assets/minecraft/textures/block/cracked_polished_blackstone_bricks", Texture.crackedPolishedBlackstoneBricks);
     addSimpleTexture("assets/minecraft/textures/block/quartz_bricks", Texture.quartzBricks);
-    addSimpleTexture("assets/minecraft/textures/block/chain", Texture.chain);
     addSimpleTexture("assets/minecraft/textures/block/jigsaw_lock", Texture.jigsawLock);
 
     // Minecraft 1.17
@@ -3640,6 +3612,27 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/potted_flowering_azalea_bush_top", Texture.pottedFloweringAzaleaBushTop);
     addSimpleTexture("assets/minecraft/textures/block/potted_flowering_azalea_bush_side", Texture.pottedFloweringAzaleaBushSide);
 
+    ALL_TEXTURES.put("copper chest",
+      new ChestTexture("assets/minecraft/textures/entity/chest/copper", ChestTexture.Layout.NEW_LAYOUT, Texture.copperChest));
+    ALL_TEXTURES.put("copper double chest", new AllTextures(
+      new SplitLargeChestTexture("assets/minecraft/textures/entity/chest/copper_left", SplitLargeChestTexture.Part.LEFT, Texture.largeCopperChestLeft),
+      new SplitLargeChestTexture("assets/minecraft/textures/entity/chest/copper_right", SplitLargeChestTexture.Part.RIGHT, Texture.largeCopperChestRight)));
+    ALL_TEXTURES.put("exposed copper chest",
+      new ChestTexture("assets/minecraft/textures/entity/chest/copper_exposed", ChestTexture.Layout.NEW_LAYOUT, Texture.exposedCopperChest));
+    ALL_TEXTURES.put("exposed copper double chest", new AllTextures(
+      new SplitLargeChestTexture("assets/minecraft/textures/entity/chest/copper_exposed_left", SplitLargeChestTexture.Part.LEFT, Texture.largeExposedCopperChestLeft),
+      new SplitLargeChestTexture("assets/minecraft/textures/entity/chest/copper_exposed_right", SplitLargeChestTexture.Part.RIGHT, Texture.largeExposedCopperChestRight)));
+    ALL_TEXTURES.put("weathered copper chest",
+      new ChestTexture("assets/minecraft/textures/entity/chest/copper_weathered", ChestTexture.Layout.NEW_LAYOUT, Texture.weatheredCopperChest));
+    ALL_TEXTURES.put("weathered copper double chest", new AllTextures(
+      new SplitLargeChestTexture("assets/minecraft/textures/entity/chest/copper_weathered_left", SplitLargeChestTexture.Part.LEFT, Texture.largeWeatheredCopperChestLeft),
+      new SplitLargeChestTexture("assets/minecraft/textures/entity/chest/copper_weathered_right", SplitLargeChestTexture.Part.RIGHT, Texture.largeWeatheredCopperChestRight)));
+    ALL_TEXTURES.put("oxidized copper chest",
+      new ChestTexture("assets/minecraft/textures/entity/chest/copper_oxidized", ChestTexture.Layout.NEW_LAYOUT, Texture.oxidizedCopperChest));
+    ALL_TEXTURES.put("oxidized copper double chest", new AllTextures(
+      new SplitLargeChestTexture("assets/minecraft/textures/entity/chest/copper_oxidized_left", SplitLargeChestTexture.Part.LEFT, Texture.largeOxidizedCopperChestLeft),
+      new SplitLargeChestTexture("assets/minecraft/textures/entity/chest/copper_oxidized_right", SplitLargeChestTexture.Part.RIGHT, Texture.largeOxidizedCopperChestRight)));
+
     for (Field field : Texture.class.getFields()) {
       if (Texture.class.isAssignableFrom(field.getType())) {
         addTextureLoader(field);
@@ -3651,7 +3644,16 @@ public class TexturePackLoader {
     TexturePath path = textureField.getAnnotation(TexturePath.class);
     if (path != null) {
       try {
-        addSimpleTexture(path.value(), (Texture) textureField.get(Texture.class));
+        if (path.alternatives().length > 0) {
+          TextureLoader[] loaders = new TextureLoader[path.alternatives().length + 1];
+          loaders[0] = new SimpleTexture(path.value(), (Texture) textureField.get(Texture.class));
+          for (int i = 0; i < path.alternatives().length; i++) {
+            loaders[i + 1] = new SimpleTexture(path.alternatives()[i], (Texture) textureField.get(Texture.class));
+          }
+          ALL_TEXTURES.put(path.value(), new AlternateTextures(loaders));
+        } else {
+          addSimpleTexture(path.value(), (Texture) textureField.get(Texture.class));
+        }
       } catch (IllegalAccessException e) {
         throw new RuntimeException("Could not get texture field for " + path.value(), e);
       }
@@ -3663,6 +3665,10 @@ public class TexturePackLoader {
   }
 
   private static void addSimpleTexture(String name, String file, Texture texture) {
+    if (ALL_TEXTURES.containsKey(name)) {
+      Log.warnf("Duplicate texture %s (path %s). This is probably a bug, please report it at https://github.com/chunky-dev/chunky/issues", name, file);
+      addSimpleTexture(name + "_duplicate", file, texture);
+    }
     ALL_TEXTURES.put(name, new SimpleTexture(file, texture));
   }
 }

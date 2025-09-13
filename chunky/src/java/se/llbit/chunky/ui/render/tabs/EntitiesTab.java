@@ -18,7 +18,12 @@ package se.llbit.chunky.ui.render.tabs;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -32,12 +37,20 @@ import se.llbit.chunky.entity.*;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleTextField;
 import se.llbit.chunky.ui.dialogs.AddEntityDialog;
+import se.llbit.chunky.ui.dialogs.EditMaterialDialog;
 import se.llbit.chunky.ui.elements.AngleAdjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.render.RenderControlsTab;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import se.llbit.chunky.entity.*;
+import se.llbit.chunky.world.material.DyedTextureMaterial;
+import se.llbit.fx.LuxColorPicker;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
+import se.llbit.math.ColorUtil;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.util.mojangapi.MinecraftProfile;
@@ -68,6 +81,12 @@ public class EntitiesTab extends RenderControlsTab implements Initializable {
     entityTypes.put("Book", (position, scene) -> new Book(position, Math.PI - Math.PI / 16, Math.toRadians(30), Math.toRadians(180 - 30)));
     entityTypes.put("Beacon beam", (position, scene) -> new BeaconBeam(position));
     entityTypes.put("Sphere", (position, scene) -> new SphereEntity(position, 0.5));
+    entityTypes.put("Sheep", (position, scene) -> new SheepEntity(position, new CompoundTag()));
+    entityTypes.put("Cow", (position, scene) -> new CowEntity(position, new CompoundTag()));
+    entityTypes.put("Chicken", (position, scene) -> new ChickenEntity(position, new CompoundTag()));
+    entityTypes.put("Pig", (position, scene) -> new PigEntity(position, new CompoundTag()));
+    entityTypes.put("Mooshroom", (position, scene) -> new MooshroomEntity(position, new CompoundTag()));
+    entityTypes.put("Squid", (position, scene) -> new SquidEntity(position, new CompoundTag()));
   }
 
   public enum EntityPlacement {
@@ -348,6 +367,55 @@ public class EntitiesTab extends RenderControlsTab implements Initializable {
         }
         controls.getChildren().add(slotBox);
       }
+    }
+
+    if (entity instanceof Variant) {
+      Variant variant = (Variant) entity;
+
+      HBox variantHBox = new HBox();
+      variantHBox.setSpacing(10.0);
+
+      ComboBox<String> variantBox = new ComboBox<>();
+      variantBox.getItems().addAll(variant.variants());
+      variantBox.setValue(variant.getVariant());
+      variantBox.valueProperty().addListener(((observable, oldValue, newValue) -> {
+        variant.setVariant(newValue);
+        scene.rebuildActorBvh();
+      }));
+
+      variantHBox.getChildren().addAll(new Label("Variant:"), variantBox);
+      controls.getChildren().addAll(variantHBox);
+    }
+
+    if (entity instanceof Dyeable) {
+      Dyeable dyedEntity = (Dyeable) entity;
+
+      DyedTextureMaterial material = dyedEntity.getMaterial();
+
+      LuxColorPicker sheepColorPicker = new LuxColorPicker();
+      sheepColorPicker.setColor(ColorUtil.toFx(material.getColorInt()));
+      sheepColorPicker.colorProperty().addListener(
+        (observableColor, oldColorValue, newColorValue) -> {
+          dyedEntity.getMaterial().updateColor(ColorUtil.getRGB(ColorUtil.fromFx(newColorValue)));
+        }
+      );
+
+      Button editMaterialButton = new Button("Edit material");
+      editMaterialButton.setOnAction(e -> new EditMaterialDialog(material, scene).showAndWait());
+
+      controls.getChildren().addAll(sheepColorPicker, editMaterialButton);
+    }
+
+    if (entity instanceof Saddleable) {
+      Saddleable saddleable = (Saddleable) entity;
+      CheckBox showOuterLayer = new CheckBox("Is Saddled?");
+      showOuterLayer.setSelected(saddleable.isSaddled());
+      showOuterLayer.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+        saddleable.setIsSaddled(newValue);
+        scene.rebuildActorBvh();
+      }));
+
+      controls.getChildren().addAll(showOuterLayer);
     }
   }
 

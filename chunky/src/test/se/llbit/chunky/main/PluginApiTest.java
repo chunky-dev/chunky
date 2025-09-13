@@ -17,7 +17,8 @@
  */
 package se.llbit.chunky.main;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import se.llbit.chunky.plugin.TabTransformer;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.scene.RayTracer;
@@ -30,11 +31,13 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.function.BiConsumer;
 
-import static org.junit.Assert.assertSame;
-import static com.google.common.truth.Truth.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
 
 public class PluginApiTest {
-  @Test public void testSetRenderContextFactory() {
+  @Test
+  public void testSetRenderContextFactory() {
     Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
     RenderContextFactory myFactory = chunky1 -> null;
     chunky.setRenderContextFactory(myFactory);
@@ -114,7 +117,8 @@ public class PluginApiTest {
     assertSame(transformer, chunky.getMainTabTransformer());
   }
 
-  @Test(timeout = 10000)
+  @Test
+  @Timeout(10)
   // 10 second timeout (should only happen with a test programming error,
   // or a very, very slow computer)
   public void testSetSceneResetListener() throws InterruptedException {

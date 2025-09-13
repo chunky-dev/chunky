@@ -18,6 +18,7 @@
 
 package se.llbit.chunky.block.minecraft;
 
+import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.StandingBanner;
 import se.llbit.chunky.resources.Texture;
@@ -30,9 +31,10 @@ import se.llbit.nbt.CompoundTag;
 // for backward compatibility we need some way of mapping the old color IDs to the
 // new color IDs. This would require tracking the world format version somewhere.
 public class Banner extends EmptyModelBlock {
-  private final int rotation, color;
+  private final int rotation;
+  private final BannerDesign.Color color;
 
-  public Banner(String name, Texture texture, int rotation, int color) {
+  public Banner(String name, Texture texture, int rotation, BannerDesign.Color color) {
     super(name, texture);
     invisible = true;
     this.rotation = rotation % 16;
@@ -45,7 +47,7 @@ public class Banner extends EmptyModelBlock {
 
   @Override public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
     JsonObject design = StandingBanner.parseDesign(entityTag);
-    design.set("base", Json.of(color)); // Base color is not included in the entity tag in Minecraft 1.13+.
+    design.set("base", Json.of(color.id)); // Base color is not included in the entity tag in Minecraft 1.13+.
     return new StandingBanner(position, rotation, design);
   }
 }

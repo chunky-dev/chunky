@@ -17,9 +17,12 @@
  */
 package se.llbit.chunky.launcher;
 
-import com.vdurmont.semver4j.Semver;
 import javafx.stage.Stage;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.commons.cli.*;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.cli.CliUtil;
 import se.llbit.chunky.launcher.ui.ChunkyLauncherFx;
 import se.llbit.chunky.launcher.ui.DebugConsole;
 import se.llbit.chunky.launcher.ui.FirstTimeSetupDialog;
@@ -46,16 +49,95 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ChunkyLauncher {
 
-  public static final Semver LAUNCHER_VERSION = new Semver("1.14.0");
+  public static final ArtifactVersion LAUNCHER_VERSION = new DefaultArtifactVersion("1.14.0");
+
   public static final int LAUNCHER_SETTINGS_REVISION = 1;
 
-  /**
-   * Print a launch error message to the console.
-   * Prints the command that was used to try to launch Chunky.
-   */
-  protected static void launchFailure(String command) {
-    System.out.println("Failed to launch Chunky. Command used:");
-    System.out.println(command);
+  public static Options cliOptionsPublic() {
+    Options options = new Options();
+
+    options.addOption(Option.builder()
+      .option("h")
+      .longOpt("help")
+      .desc("Show this help message")
+      .build()
+    );
+
+    options.addOption(Option.builder()
+      .longOpt("launcher")
+      .desc("Forces the launcher GUI to be shown")
+      .build()
+    );
+
+    options.addOption(Option.builder()
+      .longOpt("version")
+      .desc("Show the launcher version and exit")
+      .build()
+    );
+
+    options.addOption(Option.builder()
+      .longOpt("verbose")
+      .desc("Enables verbose logging")
+      .build()
+    );
+
+    options.addOption(Option.builder()
+      .longOpt("console")
+      .desc("Forces debug console to be opened")
+      .build()
+    );
+
+    options.addOption(Option.builder()
+      .longOpt("update")
+      .argName("release channel")
+      .optionalArg(true)
+      .desc("Update Chunky to the latest release")
+      .build()
+    );
+
+    options.addOption(Option.builder()
+      .longOpt("setup")
+      .desc("Runs the interactive command-line launcher setup")
+      .build()
+    );
+
+    options.addOption(Option.builder()
+      .longOpt("javaOptions")
+      .hasArg(true)
+      .argName("options")
+      .desc("Add a Java option when launching Chunky")
+      .build()
+    );
+
+    options.addOption(Option.builder()
+      .longOpt("dangerouslyDisableLibraryValidation")
+      .desc("Disable library validation. This can be dangerous!")
+      .build()
+    );
+
+    return options;
+  }
+
+  public static Options cliOptionsFull() {
+    Options options = cliOptionsPublic();
+
+    options.addOption(Option.builder()
+      .longOpt("noRetryJavafx")
+      .build()
+    );
+
+    options.addOption(Option.builder()
+      .longOpt("checkJvm")
+      .build()
+    );
+
+    return options;
+  }
+
+  public static CommandLine parseCli(String[] args) throws ParseException {
+    Options options = cliOptionsFull();
+    return new DefaultParser()
+      .parse(options, args);
   }
 
   public static void main(String[] args) throws FileNotFoundException {
@@ -82,99 +164,89 @@ public class ChunkyLauncher {
 
       if (args.length > 0) {
         mode = LaunchMode.HEADLESS;
-        for (int i = 0; i < args.length; i++) {
-          String arg = args[i];
-          switch (arg) {
-            case "--nolauncher":
-              mode = LaunchMode.GUI;
-              break;
-            case "--launcher":
-              forceLauncher = true;
-              break;
-            case "--version":
-              System.out.println("Chunky Launcher v" + LAUNCHER_VERSION);
-              return;
-            case "--verbose":
-              settings.verboseLauncher = true;
-              break;
-            case "--console":
-              settings.forceGuiConsole = true;
-              break;
-            case "--update":
-            case "--updateAlpha":
-              ReleaseChannel channel;
-              if (arg.equals("--updateAlpha")) {
-                channel = LauncherSettings.SNAPSHOT_RELEASE_CHANNEL;
-              } else {
-                channel = settings.selectedChannel;
-                if (i < args.length - 1 && settings.releaseChannels.containsKey(args[i + 1])) {
-                  channel = settings.releaseChannels.getOrDefault(args[i + 1], channel);
-                }
-              }
-              System.out.println("Checking for updates on the \"" + channel.name + "\" channel...");
-              UpdateChecker updateThread = new UpdateChecker(settings, channel, new UpdateListener() {
-                @Override
-                public void updateError(String message) {
-                }
 
-                @Override
-                public void updateAvailable(VersionInfo latest) {
-                  try {
-                    headlessCreateSettingsDirectory();
-                  } catch (FileNotFoundException e) {
-                    throw new Error(e);
-                  }
-                  System.out.println("Downloading Chunky " + latest + ":");
-                  ConsoleUpdater.update(latest, settings);
-                }
+        CommandLine cmd = parseCli(args);
 
-                @Override
-                public void noUpdateAvailable() {
-                  System.out.println("No updates found.");
-                }
-              });
-              updateThread.start();
-              return;
-            case "--setup":
-              // Configure launcher settings.
-              doSetup(settings);
-              settings.save();
-              return;
-            case "--noRetryJavafx":
-              retryIfMissingJavafx = false;
-              // if this is the only option, with "--javaOptions" "<param>" we want the launcher
-              if (args.length == 3)
-                forceLauncher = true;
-              break;
-            case "--javaOptions":
-              if (i == args.length - 1) {
-                System.err.println("--javaOptions must be followed by the options to can chunky with");
-                System.exit(1);
-              }
-              if (settings.javaOptions.isEmpty())
-                settings.javaOptions = args[i + 1];
-              else if (!settings.javaOptions.contains(args[i + 1]))
-                settings.javaOptions = args[i + 1] + " " + settings.javaOptions;
-              ++i;
-              break;
-            case "--checkJvm":
-              boolean is64Bit = JreUtil.is64BitJvm();
-              if (!is64Bit) {
-                System.err.println("This does not appear to be a 64-bit JVM.");
-              }
-              System.exit(is64Bit ? 0 : -1);
-            case "--dangerouslyDisableLibraryValidation":
-              System.out.println("Library validation is disabled.");
-              LauncherSettings.disableLibraryValidation = true;
-              break;
-            default:
-              if (!headlessOptions.isEmpty()) {
-                headlessOptions += " ";
-              }
-              headlessOptions += arg;
-              break;
+        if (cmd.hasOption("help")) {
+          String header = CliUtil.makeHelpHeader("Chunky Launcher", LAUNCHER_VERSION.toString(), "");
+          String footer = "\n" +
+            "Command line options after -- are passed to Chunky.\n" +
+            "For Chunky's command line help, run:\n" +
+            "  java -jar ChunkyLauncher.jar -- --help";
+
+          HelpFormatter help = new HelpFormatter();
+          help.setWidth(CliUtil.CLI_WIDTH);
+          help.printHelp("java -jar ChunkyLauncher.jar", header, cliOptionsPublic(), footer);
+          return;
+        }
+
+        if (cmd.hasOption("launcher")) {
+          forceLauncher = true;
+        }
+
+        if (cmd.hasOption("version")) {
+          System.out.println("Chunky Launcher v" + LAUNCHER_VERSION);
+          return;
+        }
+
+        if (cmd.hasOption("verbose")) {
+          settings.verboseLauncher = true;
+        }
+
+        if (cmd.hasOption("console")) {
+          settings.forceGuiConsole = true;
+        }
+
+        if (cmd.hasOption("update")) {
+          ReleaseChannel channel = settings.selectedChannel;
+
+          String selected = cmd.getOptionValue("update");
+          if (selected != null) {
+            channel = settings.releaseChannels.getOrDefault(selected, channel);
+          }
+
+          headlessUpdateChunky(settings, channel);
+          return;
+        }
+
+        if (cmd.hasOption("setup")) {
+          doSetup(settings);
+          settings.save();
+          return;
+        }
+
+        if (cmd.hasOption("noRetryJavafx")) {
+          retryIfMissingJavafx = false;
+          // If this is the only option, with "--javaOptions" "<param>" we want to launch as if there were no arguments
+          if (args.length == 3) {
+            mode = LaunchMode.GUI;
           }
         }
+
+        if (cmd.hasOption("javaOptions")) {
+          String options = cmd.getOptionValue("javaOptions");
+          if (settings.javaOptions.isEmpty()) {
+            settings.javaOptions = options;
+          } else if (!settings.javaOptions.contains(options)) {
+            settings.javaOptions = options + " " + settings.javaOptions;
+          }
+        }
+
+        if (cmd.hasOption("checkJvm")) {
+          boolean is64Bit = JreUtil.is64BitJvm();
+          if (!is64Bit) {
+            System.err.println("This does not appear to be a 64-bit JVM.");
+          }
+          System.exit(is64Bit ? 0 : -1);
+        }
+
+        if (cmd.hasOption("dangerouslyDisableLibraryValidation")) {
+          System.out.println("Library validation is disabled.");
+          LauncherSettings.disableLibraryValidation = true;
+        }
+
+        headlessOptions = String.join(" ", cmd.getArgList());
+
         if (forceLauncher) {
           mode = LaunchMode.GUI;
         }
@@ -257,6 +329,8 @@ public class ChunkyLauncher {
         JavaFxInstaller.launch(settings, args);
       }
       e.printStackTrace(System.err);
+    } catch (ParseException e) {
+        System.out.println(e.getMessage());
     }
   }
 
@@ -300,18 +374,111 @@ public class ChunkyLauncher {
     }
   }
 
+  private static void headlessUpdateChunky(LauncherSettings settings, ReleaseChannel channel) {
+    System.out.println("Checking for updates on the \"" + channel.name + "\" channel...");
+    UpdateChecker updateThread = new UpdateChecker(settings, channel, new UpdateListener() {
+      @Override
+      public void updateError(String message) {
+      }
+
+      @Override
+      public void updateAvailable(VersionInfo latest) {
+        try {
+          headlessCreateSettingsDirectory();
+        } catch (FileNotFoundException e) {
+          throw new Error(e);
+        }
+        System.out.println("Downloading Chunky " + latest + ":");
+        ConsoleUpdater.update(latest, settings);
+      }
+
+      @Override
+      public void noUpdateAvailable() {
+        System.out.println("No updates found.");
+      }
+    });
+    updateThread.start();
+    try {
+      updateThread.join();
+    } catch (InterruptedException ignored) {
+    }
+  }
+
   interface ShowLauncher {
     boolean showLauncher();
   }
 
   private static void doSetup(LauncherSettings settings) throws FileNotFoundException {
     headlessCreateSettingsDirectory();
-    System.out.print("Memory limit (MiB): ");
     Scanner in = new Scanner(System.in);
-    settings.memoryLimit = in.nextInt();
-    in.nextLine();
-    System.out.print("Java options: ");
-    settings.javaOptions = in.nextLine();
+
+    System.out.printf("Memory limit (MiB) [%d]: ", settings.memoryLimit);
+    try {
+      String memoryLimit = in.nextLine().trim();
+      settings.memoryLimit = Integer.parseInt(memoryLimit);
+    } catch (NumberFormatException ignored) {
+    }
+
+    System.out.printf("Java options [%s]: ", settings.javaOptions);
+    {
+      String javaOptions = in.nextLine().trim();
+      if (!javaOptions.isEmpty()) {
+        settings.javaOptions = javaOptions;
+      }
+    }
+
+    System.out.printf("Update site [%s]: ", settings.updateSite);
+    {
+      String updateSite = in.nextLine().trim();
+      if (!updateSite.isEmpty()) {
+        settings.updateSite = updateSite;
+      }
+    }
+
+    System.out.print("Reload launcher metadata [Y/n]: ");
+    {
+      String updateReleaseChannels = in.nextLine().trim();
+      if (!updateReleaseChannels.contains("n")) {
+        reloadReleaseChannels(settings);
+      }
+    }
+  }
+
+  private static void reloadReleaseChannels(LauncherSettings settings) {
+    System.out.print("...");
+    LauncherInfoChecker checker = new LauncherInfoChecker(
+      settings,
+      error -> {
+        System.err.println("Failed to fetch launcher info!");
+        System.err.println(error);
+      },
+      info -> {
+        if (info != null) {
+          if (info.version.compareTo(ChunkyLauncher.LAUNCHER_VERSION) > 0) {
+            System.out.println("Launcher update found!");
+            System.out.printf("Version %s released on %s\n", info.version, info.date);
+            System.out.println(settings.getResourceUrl(info.path));
+            if (info.notes.isEmpty()) {
+              System.out.println("No release notes available.");
+            } else {
+              System.out.println(info.notes);
+            }
+            System.out.println();
+          } else {
+            System.out.println("Launcher is up to date!");
+          }
+
+          settings.setReleaseChannels(info.channels);
+          System.out.printf("%d release channels found.\n", info.channels.size());
+        }
+      }
+    );
+    checker.start();
+    try {
+      checker.join();
+    } catch (InterruptedException e) {
+      System.err.println("Interrupted!");
+    }
   }
 
   /**
@@ -319,8 +486,13 @@ public class ChunkyLauncher {
    * callback. Ensures that the JavaFX application (ChunkyLauncherFx) is initialized
    * before calling afterFirstTimeSetup.
    */
-  private static void firstTimeSetup(LauncherSettings settings, ShowLauncher afterFirstTimeSetup) {
+  private static void firstTimeSetup(LauncherSettings settings, ShowLauncher afterFirstTimeSetup) throws FileNotFoundException {
     if (SettingsDirectory.findSettingsDirectory()) {
+      if (afterFirstTimeSetup.showLauncher()) {
+        ChunkyLauncherFx.withLauncher(settings, Stage::show);
+      }
+    } else if (SettingsDirectory.getChunkyHomeDirectoryOverwrite().isPresent()) {
+      headlessCreateSettingsDirectory();
       if (afterFirstTimeSetup.showLauncher()) {
         ChunkyLauncherFx.withLauncher(settings, Stage::show);
       }
@@ -383,5 +555,14 @@ public class ChunkyLauncher {
     } else {
       return String.format("%.1f %s", fSize, unit);
     }
+  }
+
+  /**
+   * Print a launch error message to the console.
+   * Prints the command that was used to try to launch Chunky.
+   */
+  protected static void launchFailure(String command) {
+    System.out.println("Failed to launch Chunky. Command used:");
+    System.out.println(command);
   }
 }

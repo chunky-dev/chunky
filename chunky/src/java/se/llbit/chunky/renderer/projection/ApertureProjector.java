@@ -24,6 +24,7 @@ import se.llbit.chunky.renderer.ApertureShape;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
 import se.llbit.math.Constants;
+import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 import se.llbit.resources.ImageLoader;
 import se.llbit.util.annotation.Nullable;
@@ -95,9 +96,9 @@ public class ApertureProjector implements Projector {
 
   /**
    * Finds a random point in the aperture mask.
-   * @return Array of two doubles which are the x- and y- coordinates of the point.
+   * @return Vector2 which is the x- and y- coordinates of the point.
    */
-  protected double[] getPointInAperture(Random random) {
+  protected Vector2 getPointInAperture(Random random) {
     double rx = 0, ry = 0;
 
     if(apertureMask != null) {
@@ -140,7 +141,7 @@ public class ApertureProjector implements Projector {
       ry = Math.sin(theta) * r;
     }
 
-    return new double[] {rx, ry};
+    return new Vector2(rx, ry);
   }
 
   @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
@@ -148,9 +149,9 @@ public class ApertureProjector implements Projector {
 
     d.scale(subjectDistance / d.z);
 
-    double[] point = getPointInAperture(random);
-    double rx = point[0];
-    double ry = point[1];
+    Vector2 point = getPointInAperture(random);
+    double rx = point.x;
+    double ry = point.y;
 
     d.sub(rx, ry, 0);
     o.add(rx, ry, 0);

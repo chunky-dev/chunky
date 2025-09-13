@@ -4,6 +4,7 @@ import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
+import se.llbit.chunky.world.biome.Biome;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
 import se.llbit.math.*;
@@ -42,6 +43,7 @@ public abstract class Block extends Material {
 
   /**
    * Sample a random point on this block. Coordinates are normalized to be in [0, 1].
+   *
    * @param loc  Location vector where the point is stored.
    * @param rand Random number source.
    */
@@ -89,7 +91,7 @@ public abstract class Block extends Material {
 
   public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
     throw new Error("This block type can not be converted to a block entity: "
-        + getClass().getSimpleName());
+      + getClass().getSimpleName());
   }
 
   public boolean isEntity() {
@@ -107,7 +109,7 @@ public abstract class Block extends Material {
 
   public Entity toEntity(Vector3 position) {
     throw new Error("This block type can not be converted to an entity: "
-        + getClass().getSimpleName());
+      + getClass().getSimpleName());
   }
 
   /**
@@ -125,7 +127,8 @@ public abstract class Block extends Material {
    * block.
    * This is used to handle legacy blocks that used to have information stored in block entities
    * but are blocks now (e.g. colored beds).
-   * @param blockTag Tag of this block (not to be modified)
+   *
+   * @param blockTag  Tag of this block (not to be modified)
    * @param entityTag Block entity data
    * @return A new tag that will be used to create a new block that will replace this block
    */
@@ -141,5 +144,21 @@ public abstract class Block extends Material {
     double iy = ray.o.y - QuickMath.floor(ray.o.y);
     double iz = ray.o.z - QuickMath.floor(ray.o.z);
     return FULL_BLOCK.inside(new Vector3(ix, iy, iz));
+  }
+  /**
+   * Does this block use biome tint for its rendering
+   */
+  public boolean isBiomeDependant() {
+    return isWaterFilled();
+  }
+
+  /**
+   * Get the color to be used for this block on the surface map.
+   *
+   * @param biome Biome to return the color for (for tinted blocks)
+   * @return ARGB color representing this block
+   */
+  public int getMapColor(Biome biome) {
+    return texture.getAvgColor();
   }
 }

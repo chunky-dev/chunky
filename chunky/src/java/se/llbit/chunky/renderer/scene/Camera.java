@@ -214,13 +214,13 @@ public class Camera implements JsonSerializable {
       return p;
     } else if (apertureShape == ApertureShape.CUSTOM) {
       return new SphericalApertureProjector(p, subjectDistance / dof,
-          subjectDistance, apertureMaskFilename);
+        subjectDistance, apertureMaskFilename);
     } else if (apertureShape == ApertureShape.CIRCLE) {
       return new SphericalApertureProjector(p, subjectDistance / dof, subjectDistance);
     }
     else {
       return new SphericalApertureProjector(p, subjectDistance / dof,
-          subjectDistance, apertureShape);
+        subjectDistance, apertureShape);
     }
   }
 

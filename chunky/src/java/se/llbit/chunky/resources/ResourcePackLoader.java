@@ -18,13 +18,13 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.log.Log;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.*;
@@ -37,6 +37,8 @@ public class ResourcePackLoader {
   static {
     ResourcePackLoader.PACK_LOADER_FACTORIES.add(() -> new ResourcePackTextureLoader(TexturePackLoader.ALL_TEXTURES));
     ResourcePackLoader.PACK_LOADER_FACTORIES.add(ResourcePackBiomeLoader::new);
+    ResourcePackLoader.PACK_LOADER_FACTORIES.add(ResourcePackPaintingLoader::new);
+    ResourcePackLoader.PACK_LOADER_FACTORIES.add(ResourcePackBannerPatternLoader::new);
   }
 
   public interface PackLoader {
@@ -46,7 +48,7 @@ public class ResourcePackLoader {
      * @return True if this loader has found and loaded _all_ the things it is responsible for.
      * False if there is more to load (by a fallback resource pack).
      */
-    boolean load(Path pack, String baseName);
+    boolean load(LayeredResourcePacks resourcePacks);
 
     /**
      * All resources that failed to load. Empty if all resources were loaded.
@@ -58,19 +60,29 @@ public class ResourcePackLoader {
     default boolean hasUnloaded() {
       return !notLoaded().isEmpty();
     }
+
+    /**
+     * Reset everything this loader has loaded previously. For example if this loader loads biomes, this should reset
+     * the biomes as if this loader had never run.
+     * <p/>
+     * Some pack loaders, eg. the {@link ResourcePackTextureLoader}, don't support this and will do nothing. Resetting
+     * the loaded resources might take a restart of Chunky in that case.
+     */
+    default void resetLoadedResources() {
+    }
   }
 
   interface PackLoaderFactory {
     PackLoader create();
   }
 
-  private static List<File> loadedResourcePacks = Collections.emptyList();
+  private static LayeredResourcePacks resourcePacks = new LayeredResourcePacks();
 
   /**
-   * @return loaded resource packs without default pack
+   * @return loaded resource packs
    */
   public static List<File> getLoadedResourcePacks() {
-    return Collections.unmodifiableList(loadedResourcePacks);
+    return resourcePacks.getResourcePackFiles();
   }
 
   public static List<File> getAvailableResourcePacks() {
@@ -117,17 +129,59 @@ public class ResourcePackLoader {
    */
   public static void loadResourcePacks(List<File> resourcePacks) {
     TextureCache.reset();
-    Biomes.reset();
 
-    loadedResourcePacks = resourcePacks.stream()
-      .distinct()
-      .collect(Collectors.toList());
+    if (ResourcePackLoader.resourcePacks != null) {
+      try {
+        ResourcePackLoader.resourcePacks.close();
+      } catch (IOException e) {
+        // ignore
+      }
+    }
+
+    LayeredResourcePacks packs = new LayeredResourcePacks();
+    for (File packFile : resourcePacks) {
+      try {
+        packs.addResourcePack(packFile);
+      } catch (IOException e) {
+        Log.warnf(
+          "Failed to open %s (%s): %s",
+          getResourcePackDescriptor(packFile),
+          packFile.getAbsolutePath(),
+          e.getMessage()
+        );
+      }
+    }
+    if (!PersistentSettings.getDisableDefaultTextures()) {
+      File file = MinecraftFinder.getMinecraftJar();
+      if (file != null) {
+        try {
+          packs.addResourcePack(file);
+        } catch (IOException e) {
+          Log.warn("Minecraft Jar could not be opened: falling back to placeholder textures.");
+        }
+      } else {
+        Log.warn("Minecraft Jar not found: falling back to placeholder textures.");
+      }
+    }
+    ResourcePackLoader.resourcePacks = packs;
+
+    Log.infof(
+      "Loading resource packs: \n%s",
+      resourcePacks.stream()
+        .map(File::toString)
+        .map(s -> "- " + s)
+        .collect(Collectors.joining("\n"))
+    );
 
     List<PackLoader> loaders = PACK_LOADER_FACTORIES.stream()
       .map(PackLoaderFactory::create)
       .collect(Collectors.toList());
 
-    if (!reloadResourcePacks(loaders)) {
+    for (PackLoader loader : loaders) {
+      loader.resetLoadedResources();
+    }
+
+    if (!loadResources(loaders)) {
       Log.info(buildMissingResourcesErrorMessage(loaders));
     }
   }
@@ -138,88 +192,22 @@ public class ResourcePackLoader {
    * @return True if all resources have been found and loaded.
    */
   public static boolean loadResources(PackLoader... loaders) {
-    return reloadResourcePacks(Arrays.asList(loaders));
-  }
-
-  private static boolean reloadResourcePacks(List<PackLoader> loaders) {
-    List<File> resourcePacks = new ArrayList<>(getLoadedResourcePacks());
-
-    if (!PersistentSettings.getDisableDefaultTextures()) {
-      File file = MinecraftFinder.getMinecraftJar();
-      if (file != null) {
-        resourcePacks.add(file);
-      } else {
-        Log.warn("Minecraft Jar not found: falling back to placeholder textures.");
-      }
-    }
-
-    return loadResourcePacks(resourcePacks, loaders);
-  }
-
-  private static boolean loadResourcePacks(List<File> resourcePacks, List<PackLoader> loaders) {
-    Log.infof(
-      "Loading resource packs: \n%s",
-      resourcePacks.stream()
-        .map(File::toString)
-        .map(s -> "- " + s)
-        .collect(Collectors.joining("\n"))
-    );
-    return loadResourcePacks(
-      resourcePacks.iterator(),
-      loaders
-    );
+    return loadResources(Arrays.asList(loaders));
   }
 
   /**
-   * Load resources from the given resource packs.
-   * Resource pack files are loaded in list order - if a texture is not found in a pack,
-   * the next packs is checked as a fallback.
+   * Load resources from all resource packs.
    *
-   * @return True if all resources have been found and loaded.
+   * @return True if all resources have been found in the packs and no fallback is required.
    */
-  private static boolean loadResourcePacks(Iterator<File> resourcePacks, List<PackLoader> loaders) {
-    while (resourcePacks.hasNext()) {
-      File resourcePack = resourcePacks.next();
-      if (resourcePack.isFile() || resourcePack.isDirectory()) {
-        if (loadSingleResourcePack(resourcePack, loaders)) {
-          return true;
-        }
-        Log.infof("Missing %d resources in: %s", countMissingResources(loaders), resourcePack.getAbsolutePath());
-      } else {
-        Log.errorf("Invalid path to resource pack: %s", resourcePack.getAbsolutePath());
+  private static boolean loadResources(List<PackLoader> loaders) {
+    boolean complete = true;
+    for (PackLoader loader : loaders) {
+      if (!loader.load(resourcePacks)) {
+        complete = false;
       }
     }
-    return false;
-  }
-
-  /**
-   * Load resources from a single resource pack.
-   *
-   * @return True if all resources have been found in this pack and no fallback is required.
-   */
-  private static boolean loadSingleResourcePack(File pack, List<PackLoader> loaders) {
-    Log.infof("Loading %s %s", getResourcePackDescriptor(pack), pack.getAbsolutePath());
-    try (FileSystem resourcePack = getPackFileSystem(pack)) {
-      Path root = getPackRootPath(pack, resourcePack);
-
-      boolean complete = true;
-      for (PackLoader loader : loaders) {
-        if (!loader.load(root, pack.getName())) {
-          complete = false;
-        }
-      }
-      return complete;
-    } catch (UnsupportedOperationException uoex) {
-      // default file systems do not support closing
-    } catch (IOException ioex) {
-      Log.warnf(
-        "Failed to open %s (%s): %s",
-        getResourcePackDescriptor(pack),
-        pack.getAbsolutePath(),
-        ioex.getMessage()
-      );
-    }
-    return false;
+    return complete;
   }
 
   public static String getResourcePackDescriptor(File pack) {
@@ -240,6 +228,9 @@ public class ResourcePackLoader {
       // This catch is required for Java 8. This error appears safe to catch.
       // https://stackoverflow.com/a/51715939
       throw new IOException(e);
+    } catch (FileSystemAlreadyExistsException e) {
+      // for resource packs in jar or zip files (re-use existing fs)
+      return FileSystems.getFileSystem(URI.create("jar:" + pack.toURI()));
     }
   }
 

@@ -4,11 +4,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.ToggleSwitch?>
+<?import se.llbit.chunky.ui.IntegerAdjuster?>
 
 <fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40"
          xmlns:fx="http://javafx.com/fxml/1">
   <ToggleSwitch fx:id="biomeColors" text="Enable biome colors" />
-  <ToggleSwitch fx:id="biomeBlending" text="Enable biome blending" />
+  <IntegerAdjuster fx:id="biomeBlendingRadiusInput" name="Biome blending radius" />
   <ToggleSwitch fx:id="singleColorBtn" text="Single color textures"/>
   <Button fx:id="editResourcePacks" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
           text="Edit resource packs"/>
@@ -17,3 +18,4 @@
     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
   </padding>
 </fx:root>
+

@@ -1,3 +1,7 @@
+apply plugin: 'application'
+
+mainClassName = 'se.llbit.chunky.launcher.ChunkyLauncher'
+
 configurations {
     bundled
     implementation.extendsFrom configurations.bundled
@@ -5,22 +9,42 @@ configurations {
 }
 
 dependencies {
-    bundled 'com.vdurmont:semver4j:3.1.0'
+  bundled 'org.apache.maven:maven-artifact:3.9.9'
+  bundled 'commons-cli:commons-cli:1.6.0'
 
-    implementation project(':lib')
+  implementation project(':lib')
+
+  testImplementation 'com.google.truth:truth:1.1.3'
+  testImplementation 'junit:junit:4.13.2'
 }
 
-sourceSets.main {
-    java.srcDir 'src'
-    resources {
-        srcDir 'src'
-        include '**/*.png'
-        include '**/*.fxml'
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(8) // pinned to java 8 for backwards compatibility
+    vendor = JvmVendorSpec.AMAZON // using corretto as it's one of few jdks to include jfx (on windows+linux) and isn't oracle
+  }
+}
+
+sourceSets {
+  main {
+    java {
+      srcDir 'src'
     }
+    resources {
+      srcDir 'src'
+      include '**/*.png'
+      include '**/*.fxml'
+    }
+  }
+  test {
+    java {
+      srcDir 'test'
+    }
+  }
 }
 
 jar {
-    manifest.attributes 'Main-Class': 'se.llbit.chunky.launcher.ChunkyLauncher'
+    manifest.attributes 'Main-Class': mainClassName
 
     // Include classes from the common library.
     from project(':lib').configurations.archives.allArtifacts.files.collect {
@@ -33,5 +57,7 @@ jar {
     // Include other dependencies
     from {
         configurations.bundled.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+      exclude "META-INF/*"
     }
 }
