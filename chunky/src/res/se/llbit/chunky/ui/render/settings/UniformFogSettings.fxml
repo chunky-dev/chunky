@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
@@ -10,9 +8,6 @@
 <fx:root spacing="10.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <DoubleAdjuster fx:id="fogDensity" />
   <DoubleAdjuster fx:id="skyFogDensity" />
-  <HBox alignment="CENTER_LEFT" spacing="10.0">
-    <Label text="Fog color:" />
-    <LuxColorPicker fx:id="fogColor" />
-  </HBox>
+  <LuxColorPicker fx:id="fogColor" />
   <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="350" text="Hint: Set fog density &gt; 0.1 for thick fog, and &lt; 0.1 for haze effect." />
 </fx:root>

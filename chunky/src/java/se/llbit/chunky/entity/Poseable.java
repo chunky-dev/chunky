@@ -19,6 +19,7 @@ package se.llbit.chunky.entity;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.json.Json;
+import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.math.Vector3;
 import se.llbit.util.JsonUtil;
@@ -50,9 +51,17 @@ public interface Poseable {
     dir.sub(face);
     dir.normalize();
     double headYaw = getPose("head").y;
-    getPose().set("rotation", Json.of(FastMath.atan2(dir.x, dir.z) + Math.PI - headYaw));
     double pitch = Math.asin(dir.y);
-    getPose().add("head", JsonUtil.vec3ToJson(new Vector3(pitch, headYaw, 0)));
+
+    JsonArray headPose = getPose().get("head").array();
+    headPose.set(0, Json.of(pitch));
+    headPose.set(1, Json.of(0));
+    headPose.set(2, Json.of(0));
+
+    JsonArray rotation = getPose().get("all").array();
+    rotation.set(0, Json.of(0));
+    rotation.set(1, Json.of(FastMath.atan2(dir.x, dir.z) + Math.PI - headYaw));
+    rotation.set(2, Json.of(0));
   }
 
 

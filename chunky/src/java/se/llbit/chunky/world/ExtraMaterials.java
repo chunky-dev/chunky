@@ -22,10 +22,10 @@ import se.llbit.chunky.block.minecraft.OpenEyeblossom;
 import se.llbit.chunky.entity.CalibratedSculkSensorAmethyst;
 import se.llbit.chunky.entity.Campfire;
 import se.llbit.chunky.entity.SporeBlossom;
-import se.llbit.chunky.world.material.CloudMaterial;
 
 import java.util.HashMap;
 import java.util.Map;
+import se.llbit.chunky.world.material.WaterPlaneMaterial;
 
 public class ExtraMaterials {
 
@@ -33,12 +33,12 @@ public class ExtraMaterials {
   public static final Map<String, Material> idMap = new HashMap<>();
 
   static {
-    idMap.put("cloud", CloudMaterial.INSTANCE);
     idMap.put("candle_flame", Candle.flameMaterial);
     idMap.put("campfire_flame", Campfire.flameMaterial);
     idMap.put("soul_campfire_flame", Campfire.soulFlameMaterial);
     idMap.put("calibrated_sculk_sensor_amethyst_active", CalibratedSculkSensorAmethyst.activeMaterial);
     idMap.put("calibrated_sculk_sensor_amethyst_inactive", CalibratedSculkSensorAmethyst.inactiveMaterial);
+    idMap.put("water_plane", WaterPlaneMaterial.INSTANCE);
     idMap.put("spore_blossom (base)", SporeBlossom.baseMaterial);
     idMap.put("spore_blossom (blossom)", SporeBlossom.blossomMaterial);
     idMap.put("open_eyeblossom (emissive)", OpenEyeblossom.emissiveMaterial);
@@ -46,8 +46,6 @@ public class ExtraMaterials {
   }
 
   public static void loadDefaultMaterialProperties() {
-    CloudMaterial.INSTANCE.restoreDefaults();
-
     Candle.flameMaterial.restoreDefaults();
     Candle.flameMaterial.emittance = 1.0f;
 
@@ -58,17 +56,18 @@ public class ExtraMaterials {
     Campfire.soulFlameMaterial.emittance = 0.6f;
 
     CalibratedSculkSensorAmethyst.activeMaterial.restoreDefaults();
-    CalibratedSculkSensorAmethyst.activeMaterial.emittance = 1.0f / 15;
+    CalibratedSculkSensorAmethyst.activeMaterial.setLightLevel(1f);
 
     CalibratedSculkSensorAmethyst.inactiveMaterial.restoreDefaults();
 
+    WaterPlaneMaterial.INSTANCE.restoreDefaults();
     SporeBlossom.blossomMaterial.restoreDefaults();
     SporeBlossom.baseMaterial.restoreDefaults();
 
     OpenEyeblossom.emissiveMaterial.restoreDefaults();
-    OpenEyeblossom.emissiveMaterial.emittance = 1.0f / 15;
+    OpenEyeblossom.emissiveMaterial.setLightLevel(1f);
 
     FireflyBush.emissiveMaterial.restoreDefaults();
-    FireflyBush.emissiveMaterial.emittance = 1.0f / 15;
+    FireflyBush.emissiveMaterial.setLightLevel(1f);
   }
 }

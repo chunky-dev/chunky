@@ -17,8 +17,8 @@
  */
 package se.llbit.math.bvh;
 
-import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.main.Chunky;
+import se.llbit.chunky.renderer.HasPrimitives;
 import se.llbit.log.Log;
 import se.llbit.math.Vector3;
 import se.llbit.math.primitive.MutableAABB;
@@ -32,13 +32,13 @@ public class SahBVH extends BinaryBVH {
     public static void registerImplementation() {
         Factory.addBVHBuilder(new Factory.BVHBuilder() {
             @Override
-            public BVH create(Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task) {
+            public BVH create(Collection<HasPrimitives> entities, Vector3 worldOffset, TaskTracker.Task task) {
                 task.update(1000, 0);
                 double entityScaler = 500.0 / entities.size();
                 int done = 0;
 
                 List<Primitive> primitives = new ArrayList<>();
-                for (Entity entity : entities) {
+                for (HasPrimitives entity : entities) {
                     primitives.addAll(entity.primitives(worldOffset));
 
                     done++;

@@ -18,15 +18,12 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.HangingSignEntity;
-import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
-public class HangingSign extends MinecraftBlockTranslucent {
+public class HangingSign extends EmptyModelBlock {
   private final String material;
   private final int rotation;
   private final boolean attached;
@@ -37,13 +34,6 @@ public class HangingSign extends MinecraftBlockTranslucent {
     this.rotation = rotation;
     this.attached = attached;
     invisible = true;
-    solid = false;
-    localIntersect = true;
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override

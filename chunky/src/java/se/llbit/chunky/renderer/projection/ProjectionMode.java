@@ -17,10 +17,12 @@
  */
 package se.llbit.chunky.renderer.projection;
 
+import se.llbit.util.Registerable;
+
 /**
  * Available projection modes.
  */
-public enum ProjectionMode {
+public enum ProjectionMode implements Registerable {
   PINHOLE("Standard"),
   PARALLEL("Parallel"),
   FISHEYE("Fisheye"),
@@ -47,5 +49,20 @@ public enum ProjectionMode {
     } catch (IllegalArgumentException e) {
       return PINHOLE;
     }
+  }
+
+  @Override
+  public String getName() {
+    return niceName;
+  }
+
+  @Override
+  public String getDescription() {
+    return "";
+  }
+
+  @Override
+  public String getId() {
+    return this.name();
   }
 }

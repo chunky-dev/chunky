@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
-import se.llbit.chunky.renderer.scene.AlphaBuffer;
 import se.llbit.util.TaskTracker;
 
 import java.io.DataOutputStream;

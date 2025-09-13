@@ -30,10 +30,8 @@ public class Snow extends AbstractModelBlock {
     super("snow", Texture.snowBlock);
     this.layers = layers;
     localIntersect = layers < 8;
-    opaque = layers == 8;
+    opaque = false;
     this.model = new SnowModel(layers);
-    localIntersect = layers < 8;
-    opaque = layers == 8;
   }
 
   @Override

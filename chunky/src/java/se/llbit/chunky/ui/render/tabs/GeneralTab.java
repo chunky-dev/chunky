@@ -22,7 +22,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.ImageView;
@@ -30,6 +29,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
+import org.controlsfx.control.ToggleSwitch;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.entity.*;
 import se.llbit.chunky.map.WorldMapLoader;
@@ -61,10 +61,7 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class GeneralTab extends ScrollPane implements RenderControlsTab, Initializable {
-  private Scene scene;
-  private final Node wrapper;
-
+public class GeneralTab extends RenderControlsTab implements Initializable {
   @FXML private Button openSceneDirBtn;
   @FXML private Button exportSettings;
   @FXML private Button importSettings;
@@ -77,7 +74,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private Button makeDefaultSize;
   @FXML private Button flipAxesBtn;
   @FXML private Pane scaleButtonArea;
-  @FXML private CheckBox renderRegions;
+  @FXML private ToggleSwitch renderRegions;
   @FXML private Pane renderRegionsArea;
   @FXML private IntegerTextField cameraCropWidth;
   @FXML private IntegerTextField cameraCropHeight;
@@ -107,19 +104,16 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
 
   private final Double[] scaleButtonValues = {0.5, 1.5, 2.0};
 
-  private RenderController controller;
+  private RenderController renderController;
   private WorldMapLoader mapLoader;
-  private RenderControlsFxController renderControls;
   private ChunkyFxController chunkyFxController;
-  private ChangeListener<? super Number> canvasCropListener = (observable, oldValue, newValue) -> updateCanvasCrop();
+  private final ChangeListener<? super Number> canvasCropListener = (observable, oldValue, newValue) -> updateCanvasCrop();
 
   public GeneralTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("GeneralTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
     loader.load();
-
-    this.wrapper = new VBox(this);
   }
 
   @Override public void update(Scene scene) {
@@ -170,10 +164,10 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         chunkyFxController.getChunkSelection().isEmpty()
       );
     });
-    openSceneDirBtn.setDisable(!controller.getContext().getSceneDirectory().exists());
+    openSceneDirBtn.setDisable(!renderController.getContext().getSceneDirectory().exists());
     openSceneDirBtn.setTooltip(new Tooltip("Open the directory of the scene, if it has been saved."));
-    ((AsynchronousSceneManager) controller.getSceneManager()).setOnSceneSaved(() -> {
-      openSceneDirBtn.setDisable(!controller.getContext().getSceneDirectory().exists());
+    ((AsynchronousSceneManager) renderController.getSceneManager()).setOnSceneSaved(() -> {
+      openSceneDirBtn.setDisable(!renderController.getContext().getSceneDirectory().exists());
     });
 
     cameraCropWidth.valueProperty().removeListener(canvasCropListener);
@@ -199,8 +193,8 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     return "Scene";
   }
 
-  @Override public Node getTabContent() {
-    return this.wrapper;
+  @Override public VBox getTabContent() {
+    return this;
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
@@ -224,8 +218,8 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         try (JsonParser parser = new JsonParser(new ByteArrayInputStream(text.getBytes()))) {
           JsonObject json = parser.parse().object();
           scene.importFromJson(json);
-          renderControls.getCanvas().setCanvasSize(scene.canvasConfig.getWidth(), scene.canvasConfig.getHeight());
-          renderControls.refreshSettings();
+          controller.getCanvas().setCanvasSize(scene.canvasConfig.getWidth(), scene.canvasConfig.getHeight());
+          controller.refreshSettings();
         } catch (IOException e) {
           Log.warn("Failed to import scene settings.");
         } catch (JsonParser.SyntaxError syntaxError) {
@@ -242,7 +236,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
           alert.setContentText("Do you really want to reset all scene settings?");
           alert.showAndWait().ifPresent(result -> {
             if (result == ButtonType.OK) {
-              scene.resetScene(scene.name, controller.getContext().getChunky().getSceneFactory());
+              scene.resetScene(scene.name, controller.getRenderController().getContext().getChunky().getSceneFactory());
               chunkyFxController.refreshSettings();
             }
           });
@@ -255,7 +249,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       PersistentSettings.setLoadPlayers(newValue);
     });
     loadPlayers.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
               "This takes effect the next time a new scene is created.", loadPlayers);
     });
     loadArmorStands.setTooltip(new Tooltip("Enable/disable armor stand entity loading. "
@@ -265,7 +259,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       PersistentSettings.setLoadArmorStands(newValue);
     });
     loadArmorStands.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
               "This takes effect the next time a new scene is created.", loadArmorStands);
     });
     loadBooks.setTooltip(new Tooltip("Enable/disable book entity loading. "
@@ -275,7 +269,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       PersistentSettings.setLoadBooks(newValue);
     });
     loadBooks.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
               "This takes effect the next time a new scene is created.", loadBooks);
     });
     loadPaintings.setTooltip(new Tooltip("Enable/disable painting entity loading. "
@@ -285,7 +279,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       PersistentSettings.setLoadPaintings(newValue);
     });
     loadPaintings.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
               "This takes effect the next time a new scene is created.", loadPaintings);
     });
     loadBeaconBeams.setTooltip(new Tooltip("Enable/disable beacon beam entity loading. "
@@ -295,7 +289,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       PersistentSettings.setLoadBeaconBeams(newValue);
     });
     loadBeaconBeams.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
         "This takes effect the next time a new scene is created.", loadBeaconBeams);
     });
     loadSheep.setTooltip(new Tooltip("Enable/disable sheep entity loading. "
@@ -305,7 +299,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       PersistentSettings.setLoadSheep(newValue);
     });
     loadSheep.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
         "This takes effect the next time a new scene is created.", loadSheep);
     });
     loadCows.setTooltip(new Tooltip("Enable/disable cow entity loading. "
@@ -315,7 +309,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       PersistentSettings.setLoadCows(newValue);
     });
     loadCows.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
         "This takes effect the next time a new scene is created.", loadCows);
     });
     loadChickens.setTooltip(new Tooltip("Enable/disable chicken entity loading. "
@@ -325,7 +319,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       PersistentSettings.setLoadChickens(newValue);
     });
     loadChickens.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
         "This takes effect the next time a new scene is created.", loadChickens);
     });
     loadPigs.setTooltip(new Tooltip("Enable/disable Pig entity loading. "
@@ -335,7 +329,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       PersistentSettings.setLoadPigs(newValue);
     });
     loadPigs.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
         "This takes effect the next time a new scene is created.", loadPigs);
     });
     loadMooshrooms.setTooltip(new Tooltip("Enable/disable Mooshroom entity loading. "
@@ -345,7 +339,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       PersistentSettings.setLoadMooshrooms(newValue);
     });
     loadMooshrooms.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
         "This takes effect the next time a new scene is created.", loadMooshrooms);
     });
     loadSquids.setTooltip(new Tooltip("Enable/disable Squid entity loading. "
@@ -355,7 +349,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       PersistentSettings.setLoadSquids(newValue);
     });
     loadSquids.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
         "This takes effect the next time a new scene is created.", loadSquids);
     });
     loadOtherEntities.setTooltip(new Tooltip("Enable/disable other entity loading. "
@@ -365,7 +359,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       PersistentSettings.setLoadOtherEntities(newValue);
     });
     loadOtherEntities.setOnAction(event -> {
-      renderControls.showPopup(
+      controller.showPopup(
               "This takes effect the next time a new scene is created.", loadOtherEntities);
     });
     loadAllEntities.setOnAction(event -> {
@@ -439,13 +433,13 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       if (value >= yMax.get()) {
         yMin.setInvalid(true);
         yMax.setInvalid(true);
-        renderControls.hidePopup();
+        controller.hidePopup();
       } else {
         yMin.setInvalid(false);
         yMax.setInvalid(false);
 
         scene.setYClipMin(value);
-        renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
+        controller.showPopup("Reload the chunks for this to take effect.", yMax);
       }
     });
 
@@ -455,13 +449,13 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       if (yMin.get() >= value) {
         yMin.setInvalid(true);
         yMax.setInvalid(true);
-        renderControls.hidePopup();
+        controller.hidePopup();
       } else {
         yMin.setInvalid(false);
         yMax.setInvalid(false);
 
         scene.setYClipMax(value);
-        renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
+        controller.showPopup("Reload the chunks for this to take effect.", yMax);
       }
     });
 
@@ -470,19 +464,19 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
 
     openSceneDirBtn.setTooltip(
         new Tooltip("Open the directory where Chunky stores the scene description and renders of this scene."));
-    openSceneDirBtn.setOnAction(e -> chunkyFxController.openDirectory(chunkyFxController.getRenderController().getContext().getSceneDirectory()));
+    openSceneDirBtn.setOnAction(e -> chunkyFxController.openDirectory(renderController.getContext().getSceneDirectory()));
 
     loadSelectedChunks
         .setTooltip(new Tooltip("Load the chunks that are currently selected in the map view"));
     loadSelectedChunks.setOnAction(e -> {
-      controller.getSceneManager()
+      renderController.getSceneManager()
           .loadChunks(mapLoader.getWorld(), chunkyFxController.getChunkSelection().getSelectionByRegion());
       reloadChunks.setDisable(chunkyFxController.getChunkSelection().isEmpty());
     });
 
     reloadChunks.setTooltip(new Tooltip("Reload all chunks in the scene."));
     reloadChunks.setGraphic(new ImageView(Icon.reload.fxImage()));
-    reloadChunks.setOnAction(e -> controller.getSceneManager().reloadChunks());
+    reloadChunks.setOnAction(e -> renderController.getSceneManager().reloadChunks());
 
     canvasSizeLabel.setGraphic(new ImageView(Icon.scale.fxImage()));
     canvasSizeInput.getSize().addListener(this::updateCanvasSize);
@@ -540,6 +534,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         cameraCropY.valueProperty().set(0);
       }
     });
+    renderRegions.setTooltip(new Tooltip("Render a subset region of the main canvas."));
     cameraCropWidth.valueProperty().addListener(canvasCropListener);
     cameraCropHeight.valueProperty().addListener(canvasCropListener);
     cameraCropX.valueProperty().addListener(canvasCropListener);
@@ -564,7 +559,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     } else {
       scene.setCanvasCropSize(width, height, 0, 0, 0, 0);
     }
-    renderControls.getCanvas().setCanvasSize(scene.canvasConfig.getWidth(), scene.canvasConfig.getHeight());
+    controller.getCanvas().setCanvasSize(scene.canvasConfig.getWidth(), scene.canvasConfig.getHeight());
   }
 
   private void updateCanvasCrop() {
@@ -572,17 +567,15 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     updateCanvasSize(size.getWidth(), size.getHeight());
   }
 
-  @Override public void setController(RenderControlsFxController controls) {
-    this.renderControls = controls;
-    this.chunkyFxController = controls.getChunkyController();
+  @Override protected void onSetController(RenderControlsFxController controller) {
+    this.chunkyFxController = this.controller.getChunkyController();
+    this.renderController = this.controller.getRenderController();
     this.mapLoader = chunkyFxController.getMapLoader();
     mapLoader.addWorldLoadListener((world, reloaded) -> {
       loadSelectedChunks.setDisable(world instanceof EmptyWorld || world == null);
     });
     mapLoader.addWorldLoadListener((world, reloaded) -> updateYClipSlidersRanges(world));
     updateYClipSlidersRanges(mapLoader.getWorld());
-    this.controller = controls.getRenderController();
-    this.scene = this.controller.getSceneManager().getScene();
   }
 
   private void updateYClipSlidersRanges(World world) {

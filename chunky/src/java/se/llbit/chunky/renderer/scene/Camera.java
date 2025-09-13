@@ -38,6 +38,7 @@ import se.llbit.chunky.renderer.projection.StereographicProjector;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.json.JsonObject;
 import se.llbit.log.Log;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Matrix3;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -47,7 +48,7 @@ import se.llbit.util.JsonSerializable;
 import se.llbit.util.annotation.Nullable;
 
 import java.util.Random;
-import java.util.function.Function;
+import java.util.function.BiPredicate;
 
 /**
  * Camera model for 3D rendering.
@@ -274,8 +275,8 @@ public class Camera implements JsonSerializable {
   /**
    * Set the camera position.
    */
-  public void setPosition(Vector3 v) {
-    pos.set(v);
+  public void setPosition(Vector3 p) {
+    pos.set(p);
     onViewChange();
     positionListener.run();
   }
@@ -517,9 +518,6 @@ public class Camera implements JsonSerializable {
    * @param y      normalized image coordinate [-0.5, 0.5]
    */
   public void calcViewRay(Ray ray, Random random, double x, double y) {
-    // Reset the ray properties - current material etc.
-    ray.setDefault();
-
     projector.apply(x, y, random, ray.o, ray.d);
 
     ray.d.normalize();
@@ -539,9 +537,6 @@ public class Camera implements JsonSerializable {
    * @param y   normalized image coordinate [-0.5, 0.5]
    */
   public void calcViewRay(Ray ray, double x, double y) {
-    // Reset the ray properties - current material etc.
-    ray.setDefault();
-
     projector.apply(x, y, ray.o, ray.d);
 
     ray.d.normalize();
@@ -643,7 +638,7 @@ public class Camera implements JsonSerializable {
     orientation.add("yaw", yaw);
     camera.add("orientation", orientation);
 
-    camera.add("projectionMode", projectionMode.name());
+    camera.add("projectionMode", projectionMode.getId());
     camera.add("fov", fov);
     if (dof == Double.POSITIVE_INFINITY) {
       camera.add("dof", "Infinity");
@@ -679,7 +674,7 @@ public class Camera implements JsonSerializable {
     fov = json.get("fov").doubleValue(fov);
     subjectDistance = json.get("focalOffset").doubleValue(subjectDistance);
     projectionMode = ProjectionMode.get(
-        json.get("projectionMode").stringValue(projectionMode.name()));
+        json.get("projectionMode").stringValue(projectionMode.getId()));
     if (json.get("infDof").boolValue(false)) {
       // The infDof setting is deprecated.
       dof = Double.POSITIVE_INFINITY;
@@ -712,16 +707,17 @@ public class Camera implements JsonSerializable {
     onViewChange();
   }
 
-  public void autoFocus(Function<Ray, Boolean> traceInScene) {
+  public void autoFocus(BiPredicate<Ray, IntersectionRecord> traceInScene) {
     Ray ray = new Ray();
-    if (!traceInScene.apply(ray)) {
+    IntersectionRecord intersectionRecord = new IntersectionRecord();
+    if (!traceInScene.test(ray, intersectionRecord)) {
       setDof(Double.POSITIVE_INFINITY);
     } else {
       if(projectionMode == ProjectionMode.PARALLEL) {
-        ray.distance -= worldDiagonalSize;
+        intersectionRecord.distance -= worldDiagonalSize;
       }
-      setSubjectDistance(ray.distance);
-      setDof(ray.distance * ray.distance);
+      setSubjectDistance(intersectionRecord.distance);
+      setDof(intersectionRecord.distance * intersectionRecord.distance);
     }
   }
 

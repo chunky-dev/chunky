@@ -1,38 +1,48 @@
 package se.llbit.chunky.renderer.postprocessing;
 
 import se.llbit.chunky.plugin.PluginApi;
-import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.json.JsonObject;
+import se.llbit.util.Configurable;
+import se.llbit.util.HasControls;
 import se.llbit.util.Registerable;
-import se.llbit.util.TaskTracker;
 
 /**
  * A post-processing filter.
  * <p>
  * These filters are used to convert the HDR sample buffer into an SDR image that can be displayed.
- * Exposure is also applied by the filter.
+ * Exposure is applied before filters are applied.
  * <p>
  * Filters that support processing a single pixel at a time should implement {@link
  * PixelPostProcessingFilter} instead.
  */
 @PluginApi
-public interface PostProcessingFilter extends Registerable {
+public abstract class PostProcessingFilter implements Registerable, Configurable, HasControls {
   /**
    * Post process the entire frame
    * @param width The width of the image
    * @param height The height of the image
-   * @param input The input linear image as double array, exposure has not been applied
-   * @param output The output image
-   * @param exposure The exposure value
-   * @param task Task
+   * @param input The input linear image as double array, exposure has been applied
    */
-  void processFrame(int width, int height, double[] input, BitmapImage output, double exposure, TaskTracker.Task task);
+  public abstract void processFrame(int width, int height, double[] input);
 
   /**
    * Get description of the post processing filter
    * @return The description of the post processing filter
    */
   @Override
-  default String getDescription() {
-    return null;
+  public abstract String getDescription();
+
+  @Override
+  public JsonObject toJson() {
+    JsonObject json = new JsonObject();
+    json.add("id", getId());
+    filterSettingsToJson(json);
+    return json;
   }
+
+  /**
+   * Write filter-specific settings to the JSON
+   * @param json The JsonObject to write settings to
+   */
+  public abstract void filterSettingsToJson(JsonObject json);
 }

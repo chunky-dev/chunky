@@ -4,6 +4,7 @@ import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -124,7 +125,7 @@ public class RedstoneWallTorchModel extends QuadModel {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return RedstoneTorchModel.intersectWithGlow(ray, scene, this);
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
+    return RedstoneTorchModel.intersectWithGlow(ray, intersectionRecord, this);
   }
 }

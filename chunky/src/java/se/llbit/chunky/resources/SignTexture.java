@@ -20,7 +20,7 @@ import se.llbit.chunky.entity.SignEntity.Color;
 import se.llbit.chunky.resources.texturepack.FontTexture.Glyph;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
-import se.llbit.math.Ray;
+import se.llbit.math.Constants;
 import se.llbit.util.annotation.Nullable;
 
 public class SignTexture extends Texture {
@@ -151,8 +151,8 @@ public class SignTexture extends Texture {
   @Override
   public float[] getColor(double u, double v) {
     if (textColor != null) {
-      int x = (int) (u * textColor.width - Ray.EPSILON);
-      int y = (int) ((1 - v) * textColor.height - Ray.EPSILON);
+      int x = (int) (u * textColor.width - Constants.EPSILON);
+      int y = (int) ((1 - v) * textColor.height - Constants.EPSILON);
       if (textMask != null && textMask.getPixel(x, y)) {
         Color characterColor = Color.get(textColor.getPixel(x, y));
         return characterColor.linearColor;

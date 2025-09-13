@@ -48,6 +48,13 @@ public class Vector4 {
     w = l;
   }
 
+  public Vector4(double i) {
+    x = i;
+    y = i;
+    z = i;
+    w = i;
+  }
+
   /**
    * Set the vector equal to other vector.
    */
@@ -66,6 +73,16 @@ public class Vector4 {
     y = j;
     z = k;
     w = l;
+  }
+
+  /**
+   * Set the vector.
+   */
+  public final void set(double a) {
+    x = a;
+    y = a;
+    z = a;
+    w = a;
   }
 
   /**

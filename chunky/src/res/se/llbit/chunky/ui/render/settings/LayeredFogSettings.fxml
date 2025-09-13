@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
@@ -18,10 +17,7 @@
   <DoubleAdjuster fx:id="layerY" />
   <DoubleAdjuster fx:id="layerBreadth" />
   <DoubleAdjuster fx:id="layerDensity" />
-  <HBox alignment="CENTER_LEFT" spacing="10.0">
-    <Label text="Fog color:" />
-    <LuxColorPicker fx:id="fogColor" />
-  </HBox>
+  <LuxColorPicker fx:id="fogColor" />
   <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="350" text="Hint: Set fog density &gt; 0.1 for thick fog, and &lt; 0.1 for haze effect." />
   <Text strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="350" text="Note: The 'Fog Color' control affects the color of all fog layers." />
 </fx:root>

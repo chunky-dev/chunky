@@ -61,12 +61,12 @@ public class PFMTexture extends AbstractHdriTexture {
       scan.close();
       try (RandomAccessFile f = new RandomAccessFile(file, "r")) {
         long len = f.length();
-        long start = len - width * height * components * 4;
+        long start = len - (long) width * height * components * 4;
         buf = new float[width * height * 3];
         int offset = 0;
 
         FileChannel channel = f.getChannel();
-        MappedByteBuffer byteBuf = channel.map(FileChannel.MapMode.READ_ONLY, start, buf.length * 4);
+        MappedByteBuffer byteBuf = channel.map(FileChannel.MapMode.READ_ONLY, start, buf.length * 4L);
         if (bigEndian) {
           byteBuf.order(ByteOrder.BIG_ENDIAN);
         } else {

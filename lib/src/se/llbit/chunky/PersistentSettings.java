@@ -62,7 +62,7 @@ public final class PersistentSettings {
       RM + (1 - RM) * W * Math.pow(WAVELENGTH_GREEN / 1e3, -4);
   public static final double DEFAULT_FOG_BLUE = 1;
 
-  public static final int DEFAULT_RAY_DEPTH = 5;
+  public static final int DEFAULT_RAY_DEPTH = 10;
   public static final int DEFAULT_BRANCH_COUNT = 10;
   public static final int DEFAULT_SPP_TARGET = 1000;
 
@@ -374,52 +374,6 @@ public final class PersistentSettings {
   public static String getWaterShadingStrategy() {
     String defaultValue = getStillWater() ? "STILL" : "SIMPLEX";
     return settings.getString("waterShadingStrategy", defaultValue);
-  }
-
-  public static void setWaterOpacity(double value) {
-    settings.setDouble("waterOpacity", value);
-    save();
-  }
-
-  public static double getWaterOpacity() {
-    return settings.getDouble("waterOpacity", DEFAULT_WATER_OPACITY);
-  }
-
-  public static void setWaterVisibility(double value) {
-    settings.setDouble("waterVisibility", value);
-    save();
-  }
-
-  public static double getWaterVisibility() {
-    return settings.getDouble("waterVisibility", DEFAULT_WATER_VISIBILITY);
-  }
-
-  public static void setUseCustomWaterColor(boolean value) {
-    settings.setBool("useCustomWaterColor", value);
-    save();
-  }
-
-  public static boolean getUseCustomWaterColor() {
-    return settings.getBool("useCustomWaterColor", false);
-  }
-
-  public static void setWaterColor(double red, double green, double blue) {
-    settings.setDouble("waterColorRed", red);
-    settings.setDouble("waterColorGreen", green);
-    settings.setDouble("waterColorBlue", blue);
-    save();
-  }
-
-  public static double getWaterColorRed() {
-    return settings.getDouble("waterColorRed", DEFAULT_WATER_RED);
-  }
-
-  public static double getWaterColorGreen() {
-    return settings.getDouble("waterColorGreen", DEFAULT_WATER_GREEN);
-  }
-
-  public static double getWaterColorBlue() {
-    return settings.getDouble("waterColorBlue", DEFAULT_WATER_BLUE);
   }
 
   /** Set the default fog color. */

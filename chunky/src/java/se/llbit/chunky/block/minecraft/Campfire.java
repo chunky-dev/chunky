@@ -18,17 +18,14 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
 import java.util.Random;
 
-public class Campfire extends MinecraftBlockTranslucent {
+public class Campfire extends EmptyModelBlock {
     private final se.llbit.chunky.entity.Campfire.Kind kind;
     private final String facing;
     public final boolean isLit;
@@ -36,16 +33,9 @@ public class Campfire extends MinecraftBlockTranslucent {
     public Campfire(String name, se.llbit.chunky.entity.Campfire.Kind kind, String facing, boolean lit) {
         super(name, Texture.campfireLog);
         invisible = true;
-        opaque = false;
-        localIntersect = true;
         this.kind = kind;
         this.facing = facing;
         this.isLit = lit;
-    }
-
-    @Override
-    public boolean intersect(Ray ray, Scene scene) {
-        return false;
     }
 
     @Override

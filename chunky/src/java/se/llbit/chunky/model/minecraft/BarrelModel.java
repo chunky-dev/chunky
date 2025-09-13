@@ -56,6 +56,7 @@ public class BarrelModel extends QuadModel {
   private final Texture[] textures;
 
   public BarrelModel(String facing, String open) {
+    refractive = true;
     textures = new Texture[] {Texture.barrelSide, Texture.barrelSide, Texture.barrelSide, Texture.barrelSide,
         open.equals("true") ? Texture.barrelOpen : Texture.barrelTop, Texture.barrelBottom};
     switch (facing) {

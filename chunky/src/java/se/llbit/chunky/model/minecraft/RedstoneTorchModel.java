@@ -101,14 +101,13 @@ public class RedstoneTorchModel extends QuadModel {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return intersectWithGlow(ray, scene, this);
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
+    return intersectWithGlow(ray, intersectionRecord, this);
   }
 
-  static boolean intersectWithGlow(Ray ray, Scene scene, QuadModel model) {
+  static boolean intersectWithGlow(Ray ray, IntersectionRecord intersectionRecord, QuadModel model) {
     boolean hit = false;
     Quad lastFrontHitQuad = null;
-    ray.t = Double.POSITIVE_INFINITY;
 
     Quad[] quads = model.getQuads();
     Texture[] textures = model.getTextures();
@@ -117,7 +116,8 @@ public class RedstoneTorchModel extends QuadModel {
     int hitCount = 0;
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
-      if (quad.intersect(ray)) {
+      double distance = intersectionRecord.distance;
+      if (quad.closestIntersection(ray, intersectionRecord)) {
         if (quad instanceof GlowQuad) {
           // hitCount++;
           if (ray.d.dot(quad.n) < 0) {
@@ -126,31 +126,21 @@ public class RedstoneTorchModel extends QuadModel {
             hitCount--;
           }
         }
-        float[] c = textures[i].getColor(ray.u, ray.v);
-        if (c[3] > Ray.EPSILON) {
-          if (ray.d.dot(quad.n) < 0) {
-            color = c;
-            ray.t = ray.tNext;
-            ray.setNormal(quad.n);
-            hit = true;
-            lastFrontHitQuad = quad;
-          }
+        float[] c = textures[i].getColor(intersectionRecord.uv.x, intersectionRecord.uv.y);
+        if (c[3] > Constants.EPSILON && ray.d.dot(quad.n) < 0) {
+          color = c;
+          intersectionRecord.setNormal(quad.n);
+          intersectionRecord.setNoMediumChange(true);
+          hit = true;
+          lastFrontHitQuad = quad;
+        } else {
+          intersectionRecord.distance = distance;
         }
       }
     }
 
     if (hit && (hitCount % 2 == 0 || !(lastFrontHitQuad instanceof GlowQuad))) {
-      double px = ray.o.x - Math.floor(ray.o.x + ray.d.x * Ray.OFFSET) + ray.d.x * ray.tNext;
-      double py = ray.o.y - Math.floor(ray.o.y + ray.d.y * Ray.OFFSET) + ray.d.y * ray.tNext;
-      double pz = ray.o.z - Math.floor(ray.o.z + ray.d.z * Ray.OFFSET) + ray.d.z * ray.tNext;
-      if (px < E0 || px > E1 || py < E0 || py > E1 || pz < E0 || pz > E1) {
-        // TODO this check is only really needed for wall torches
-        return false;
-      }
-
-      ray.color.set(color);
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
+      intersectionRecord.color.set(color);
       return true;
     }
     return false;

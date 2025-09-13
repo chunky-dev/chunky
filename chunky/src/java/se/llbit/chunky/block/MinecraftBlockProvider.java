@@ -940,6 +940,7 @@ public class MinecraftBlockProvider implements BlockProvider {
   }
 
   static {
+    addBlock("void", (name, tag) -> Void.INSTANCE);
     addBlocks((name, tag) -> Air.INSTANCE, "air", "cave_air", "void_air", "structure_void");
     addBlock("barrier", (name, tag) -> tag.get("Properties").get("waterlogged").stringValue("").equals("true") ? Water.INSTANCE : Air.INSTANCE);
     addBlocks(Texture.stone, "infested_stone", "stone");
@@ -1091,25 +1092,25 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("chiseled_tuff_bricks", Texture.chiseledTuffBricks);
     for (String s : new String[]{"", "waxed_"}) {
       addBlock(s + "chiseled_copper", Texture.chiseledCopper);
-      addBlock(s + "copper_grate", (name, tag) -> new SolidNonOpaqueBlock(name, Texture.copperGrate));
+      addBlock(s + "copper_grate", (name, tag) -> new CopperGrate(name, Texture.copperGrate));
       addBlock(s + "copper_bulb", (name, tag) -> new CopperBulb(name, tag.get("Properties").get("lit").stringValue().equals("true"), tag.get("Properties").get("powered").stringValue().equals("true"),
         Texture.copperBulbLitPowered, Texture.copperBulbLit, Texture.copperBulbPowered, Texture.copperBulb));
       addBlock(s + "copper_door", (name, tag) -> door(tag, Texture.copperDoorTop, Texture.copperDoorBottom));
       addBlock(s + "copper_trapdoor", (name, tag) -> trapdoor(tag, Texture.copperTrapdoor));
       addBlock(s + "exposed_chiseled_copper", Texture.exposedChiseledCopper);
-      addBlock(s + "exposed_copper_grate", (name, tag) -> new SolidNonOpaqueBlock(name, Texture.exposedCopperGrate));
+      addBlock(s + "exposed_copper_grate", (name, tag) -> new CopperGrate(name, Texture.exposedCopperGrate));
       addBlock(s + "exposed_copper_bulb", (name, tag) -> new CopperBulb(name, tag.get("Properties").get("lit").stringValue().equals("true"), tag.get("Properties").get("powered").stringValue().equals("true"),
         Texture.exposedCopperBulbLitPowered, Texture.exposedCopperBulbLit, Texture.exposedCopperBulbPowered, Texture.exposedCopperBulb));
       addBlock(s + "exposed_copper_door", (name, tag) -> door(tag, Texture.exposedCopperDoorTop, Texture.exposedCopperDoorBottom));
       addBlock(s + "exposed_copper_trapdoor", (name, tag) -> trapdoor(tag, Texture.exposedCopperTrapdoor));
       addBlock(s + "weathered_chiseled_copper", Texture.weatheredChiseledCopper);
-      addBlock(s + "weathered_copper_grate", (name, tag) -> new SolidNonOpaqueBlock(name, Texture.weatheredCopperGrate));
+      addBlock(s + "weathered_copper_grate", (name, tag) -> new CopperGrate(name, Texture.weatheredCopperGrate));
       addBlock(s + "weathered_copper_bulb", (name, tag) -> new CopperBulb(name, tag.get("Properties").get("lit").stringValue().equals("true"), tag.get("Properties").get("powered").stringValue().equals("true"),
         Texture.weatheredCopperBulbLitPowered, Texture.weatheredCopperBulbLit, Texture.weatheredCopperBulbPowered, Texture.weatheredCopperBulb));
       addBlock(s + "weathered_copper_door", (name, tag) -> door(tag, Texture.weatheredCopperDoorTop, Texture.weatheredCopperDoorBottom));
       addBlock(s + "weathered_copper_trapdoor", (name, tag) -> trapdoor(tag, Texture.weatheredCopperTrapdoor));
       addBlock(s + "oxidized_chiseled_copper", Texture.oxidizedChiseledCopper);
-      addBlock(s + "oxidized_copper_grate", (name, tag) -> new SolidNonOpaqueBlock(name, Texture.oxidizedCopperGrate));
+      addBlock(s + "oxidized_copper_grate", (name, tag) -> new CopperGrate(name, Texture.oxidizedCopperGrate));
       addBlock(s + "oxidized_copper_bulb", (name, tag) -> new CopperBulb(name, tag.get("Properties").get("lit").stringValue().equals("true"), tag.get("Properties").get("powered").stringValue().equals("true"),
         Texture.oxidizedCopperBulbLitPowered, Texture.oxidizedCopperBulbLit, Texture.oxidizedCopperBulbPowered, Texture.oxidizedCopperBulb));
       addBlock(s + "oxidized_copper_door", (name, tag) -> door(tag, Texture.oxidizedCopperDoorTop, Texture.oxidizedCopperDoorBottom));
@@ -1512,6 +1513,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "iron_block":
         return new MinecraftBlock(name, Texture.ironBlock);
       case "oak_slab":
+      case "petrified_oak_slab":
         return slab(tag, Texture.oakPlanks);
       case "spruce_slab":
         return slab(tag, Texture.sprucePlanks);
@@ -1530,8 +1532,6 @@ public class MinecraftBlockProvider implements BlockProvider {
         return slab(tag, Texture.smoothStoneSlabSide, Texture.smoothStone);
       case "sandstone_slab":
         return slab(tag, Texture.sandstoneSide, Texture.sandstoneTop);
-      case "petrified_oak_slab":
-        return slab(tag, Texture.oakPlanks);
       case "cobblestone_slab":
         return slab(tag, Texture.cobblestone);
       case "brick_slab":
@@ -1667,7 +1667,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "ice":
         return new MinecraftBlockTranslucent(name, Texture.ice);
       case "snow_block":
-        return new MinecraftBlock(name, Texture.snowBlock);
+        return new SolidNonOpaqueBlock(name, Texture.snowBlock);
       case "cactus":
         return new Cactus();
       case "clay":
@@ -2053,9 +2053,7 @@ public class MinecraftBlockProvider implements BlockProvider {
         return stairs(
           tag, Texture.redSandstoneSide, Texture.redSandstoneTop, Texture.redSandstoneBottom);
       case "magma_block": {
-        Block block = new MinecraftBlock(name, Texture.magma);
-        block.emittance = 0.6f;
-        return block;
+        return new MinecraftBlock(name, Texture.magma);
       }
       case "nether_wart_block":
         return new MinecraftBlock(name, Texture.netherWartBlock);

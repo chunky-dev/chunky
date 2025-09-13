@@ -55,7 +55,7 @@ For guides and more information please checkout the [Documentation][chunky-dev].
 <details>
 <summary><strong>Which Minecraft versions are supported?</strong></summary>
 
-> Chunky 2.4.4 supports Minecraft 1.2-1.19.2 worlds and Cubic Chunks for Minecraft 1.10-1.12 worlds.
+> Chunky 2.5.0 supports Minecraft 1.2-1.21.8 worlds and Cubic Chunks for Minecraft 1.10-1.12 worlds.
 >
 > We typically add new blocks shortly after a new Minecraft snapshot is released. Use the latest Chunky snapshot to render them until a new Chunky version is released.
 
@@ -189,7 +189,7 @@ when in doubt.
 
 ## Copyright & License
 
-Chunky is Copyright (c) 2010-2023, Jesper Öqvist <jesper@llbit.se> and [Chunky Contributors][chunky-contributors].
+Chunky is Copyright (c) 2010-2025, Jesper Öqvist <jesper@llbit.se> and [Chunky Contributors][chunky-contributors].
 
 Permission to modify and redistribute is granted under the terms of
 the GPLv3 license. See the file `LICENSE` for the full license.
@@ -221,6 +221,8 @@ Chunky uses the following 3rd party libraries:
   See the file `licenses/Apache-2.0.txt` for the full license text.
   See the file `licenses/lz4-java.txt` for the copyright notice.
   lz4-java uses LZ4, by Yann Collet, which is covered by the BSD 2-Clause license. See the file `licenses/lz4.txt` for the copyright notice and full license.
+- **ControlsFX by the ControlsFX Project team**  
+  The library is released under the BSD 3-Clause license. See the file `licenses/controlsfx.txt` for the copyright notice and license text.
 
 ## Special Thanks
 

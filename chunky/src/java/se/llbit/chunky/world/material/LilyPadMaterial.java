@@ -19,7 +19,8 @@ package se.llbit.chunky.world.material;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.ColorUtil;
-import se.llbit.math.Ray;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
 
 public class LilyPadMaterial extends Material {
 
@@ -36,19 +37,19 @@ public class LilyPadMaterial extends Material {
   }
 
   @Override
-  public void getColor(Ray ray) {
-    super.getColor(ray);
-    if (ray.color.w > Ray.EPSILON) {
-      ray.color.x *= lilyPadColor[0];
-      ray.color.y *= lilyPadColor[1];
-      ray.color.z *= lilyPadColor[2];
+  public void getColor(IntersectionRecord intersectionRecord) {
+    super.getColor(intersectionRecord);
+    if (intersectionRecord.color.w > Constants.EPSILON) {
+      intersectionRecord.color.x *= lilyPadColor[0];
+      intersectionRecord.color.y *= lilyPadColor[1];
+      intersectionRecord.color.z *= lilyPadColor[2];
     }
   }
 
   @Override
   public float[] getColor(double u, double v) {
     float[] color = super.getColor(u, v);
-    if (color[3] > Ray.EPSILON) {
+    if (color[3] > Constants.EPSILON) {
       color = color.clone();
       color[0] *= lilyPadColor[0];
       color[1] *= lilyPadColor[1];

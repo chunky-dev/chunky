@@ -79,13 +79,13 @@ public class LayeredFogSettings extends VBox implements Initializable {
     });
 
     removeLayer.setOnAction(e -> {
-      if (scene.fog.getFogLayers().size() > 0) {
+      if (!scene.fog.getFogLayers().isEmpty()) {
         scene.fog.removeLayer(layers.getSelectionModel().getSelectedIndex());
         update(scene);
       }
     });
 
-    if (!(layers.getItems().size() > 0)) {
+    if (layers.getItems().isEmpty()) {
       disableControls();
     }
 
@@ -109,6 +109,7 @@ public class LayeredFogSettings extends VBox implements Initializable {
     layerDensity.onValueChange(value -> scene.fog.setDensity(layers.getSelectionModel().getSelectedIndex(), value));
     layerDensity.setName("Fog density");
 
+    fogColor.setText("Fog color");
     fogColor.colorProperty().addListener(fogColorListener);
   }
 

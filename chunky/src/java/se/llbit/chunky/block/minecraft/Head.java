@@ -17,15 +17,12 @@
  */
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.HeadEntity;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.entity.SkullEntity.Kind;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.log.Log;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
@@ -36,7 +33,7 @@ import se.llbit.util.mojangapi.MojangApi;
 import java.io.IOException;
 import java.util.Optional;
 
-public class Head extends MinecraftBlockTranslucent {
+public class Head extends EmptyModelBlock {
 
   private final String description;
   private final int rotation;
@@ -44,16 +41,10 @@ public class Head extends MinecraftBlockTranslucent {
 
   public Head(String name, Texture texture, SkullEntity.Kind type, int rotation) {
     super(name, texture);
-    localIntersect = true;
     invisible = true;
     description = "rotation=" + rotation;
     this.type = type;
     this.rotation = rotation;
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override

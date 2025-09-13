@@ -27,33 +27,33 @@ public class CakeModel extends QuadModel {
     private static final Quad[][] cake = new Quad[7][];
 
     static {
-        int[] fromX = new int[] {1, 3, 5, 7, 9, 11, 13};
-        for (int i = 0; i < 7; i++) {
-            double xMin = fromX[i] / 16.0;
-            cake[i] = new Quad[]{
-                    // front
-                    new Quad(new Vector3(.9375, 0, .0625), new Vector3(xMin, 0, .0625),
-                            new Vector3(.9375, .5, .0625), new Vector4(.9375, xMin, 0, .5)),
+      int[] fromX = new int[] {1, 3, 5, 7, 9, 11, 13};
+      for (int i = 0; i < 7; i++) {
+        double xMin = fromX[i] / 16.0;
+        cake[i] = new Quad[]{
+          // front
+          new Quad(new Vector3(.9375, 0, .0625), new Vector3(xMin, 0, .0625),
+              new Vector3(.9375, .5, .0625), new Vector4(.9375, xMin, 0, .5)),
 
-                    // back
-                    new Quad(new Vector3(xMin, 0, .9375), new Vector3(.9375, 0, .9375),
-                            new Vector3(xMin, .5, .9375), new Vector4(xMin, .9375, 0, .5)),
+          // back
+          new Quad(new Vector3(xMin, 0, .9375), new Vector3(.9375, 0, .9375),
+              new Vector3(xMin, .5, .9375), new Vector4(xMin, .9375, 0, .5)),
 
-                    // right
-                    new Quad(new Vector3(xMin, 0, .0625), new Vector3(xMin, 0, .9375),
-                            new Vector3(xMin, .5, .0625), new Vector4(0.0625, .9375, 0, .5)),
+          // right
+          new Quad(new Vector3(xMin, 0, .0625), new Vector3(xMin, 0, .9375),
+              new Vector3(xMin, .5, .0625), new Vector4(0.0625, .9375, 0, .5)),
 
-                    // left
-                    new Quad(new Vector3(.9375, 0, .9375), new Vector3(.9375, 0, .0625),
-                            new Vector3(.9375, .5, .9375), new Vector4(.9375, 0.0625, 0, .5)),
+          // left
+          new Quad(new Vector3(.9375, 0, .9375), new Vector3(.9375, 0, .0625),
+              new Vector3(.9375, .5, .9375), new Vector4(.9375, 0.0625, 0, .5)),
 
-                    // top
-                    new Quad(new Vector3(.9375, .5, .0625), new Vector3(xMin, .5, .0625),
-                            new Vector3(.9375, .5, .9375), new Vector4(.9375, xMin, .9375, .0625)),
+          // top
+          new Quad(new Vector3(.9375, .5, .0625), new Vector3(xMin, .5, .0625),
+              new Vector3(.9375, .5, .9375), new Vector4(.9375, xMin, .9375, .0625)),
 
-                    // bottom
-                    new Quad(new Vector3(xMin, 0, .0625), new Vector3(.9375, 0, .0625),
-                            new Vector3(xMin, 0, .9375), new Vector4(xMin, .9375, .0625, .9375))
+          // bottom
+          new Quad(new Vector3(xMin, 0, .0625), new Vector3(.9375, 0, .0625),
+              new Vector3(xMin, 0, .9375), new Vector4(xMin, .9375, .0625, .9375))
             };
         }
     }
@@ -62,22 +62,23 @@ public class CakeModel extends QuadModel {
     private final Texture[] textures;
 
     public CakeModel(int bites) {
-        this.quads = cake[bites];
+      refractive = true;
 
-        Texture top = Texture.cakeTop;
-        Texture side = Texture.cakeSide;
-        Texture bottom = Texture.cakeBottom;
-        Texture inside = Texture.cakeInside;
-        textures = new Texture[]{side, side, bites == 0 ? side : inside, side, top, bottom};
+      this.quads = cake[bites];
+      Texture top = Texture.cakeTop;
+      Texture side = Texture.cakeSide;
+      Texture bottom = Texture.cakeBottom;
+      Texture inside = Texture.cakeInside;
+      textures = new Texture[]{side, side, bites == 0 ? side : inside, side, top, bottom};
     }
 
     @Override
     public Quad[] getQuads() {
-        return quads;
+      return quads;
     }
 
     @Override
     public Texture[] getTextures() {
-        return textures;
+      return textures;
     }
 }

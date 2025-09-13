@@ -17,6 +17,7 @@
 package se.llbit.chunky.map;
 
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.block.Void;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
@@ -57,7 +58,8 @@ public class SurfaceLayer extends BitmapLayer {
         int y = Math.min(Math.min(chunkData.maxY() - 1, yMax), heightmapData[z*Chunk.X_MAX + x]);
         int minY = Math.max(chunkData.minY(), yMin);
         for (; y > minY; --y) {
-          if (palette.get(chunkData.getBlockAt(x, y, z)) != Air.INSTANCE) {
+          Block block = palette.get(chunkData.getBlockAt(x, y, z));
+          if (block != Air.INSTANCE && block != Void.INSTANCE) {
             break;
           }
         }

@@ -82,18 +82,18 @@ public class Triangle {
    *
    * @return <code>true</code> if the ray intersects the triangle
    */
-  public boolean intersect(Ray ray) {
-    double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
-    double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
-    double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord) {
+    double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Constants.OFFSET);
+    double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Constants.OFFSET);
+    double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Constants.OFFSET);
 
     // test that the ray is heading toward the plane
     double denom = ray.d.dot(n);
-    if (QuickMath.abs(denom) > Ray.EPSILON) {
+    if (QuickMath.abs(denom) > Constants.EPSILON) {
 
       // test for intersection with the plane at origin
       double t = -(ix * n.x + iy * n.y + iz * n.z + d) / denom;
-      if (t > -Ray.EPSILON && t < ray.t) {
+      if (t > -Constants.EPSILON && t < intersectionRecord.distance) {
 
         // plane intersection confirmed
         // translate to get hit point relative to the triangle origin
@@ -106,9 +106,9 @@ public class Triangle {
         double si = (uv * wv - vv * wu) / (uv2 - uu * vv);
         double ti = (uv * wu - uu * wv) / (uv2 - uu * vv);
         if ((si >= 0) && (ti >= 0) && (si + ti <= 1)) {
-          ray.tNext = t;
-          ray.u = si;
-          ray.v = ti;
+          intersectionRecord.distance = t;
+          intersectionRecord.uv.x = si;
+          intersectionRecord.uv.y = ti;
           return true;
         }
       }

@@ -69,6 +69,10 @@ public class ConduitModel extends QuadModel {
       Texture.conduit, Texture.conduit, Texture.conduit
   };
 
+  public ConduitModel() {
+    refractive = true;
+  }
+
   @Override
   public Quad[] getQuads() {
     return quads;

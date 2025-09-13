@@ -15,13 +15,13 @@ public class Grid {
   private static final int GRID_FORMAT_VERSION = 3;
 
   /**
-   * Holds a 3D grid of blocks cube
-   * Each cell of the grid holds the position of the emitters present in this cell and in neighboring cells
-   * As such when we want to sample emitters close from an intersection point, we only have to look at
-   * the cell where this intersection falls in and we will find every emitters we are interested in.
-   * The reason we need to hold emitter of neighboring cells is because emitters a fex block away from the intersection point
-   * to have an effect even if it falls in a different cell.
-   * With this every emitters away for cellSize or less blocks from the intersection points will always be found.
+   * Holds a 3D grid of blocks
+   * Each cell of the grid holds the position of the emitters present in this cell and in neighboring cells.
+   * As such, when we want to sample emitters close to an intersection point, we only have to look at
+   * the cell where the intersection falls in, and we will find every emitter we are interested in.
+   * The reason we need to hold emitter of neighboring cells is because emitters a few block away from the intersection point
+   * can have an effect even if it falls in a different cell.
+   * With this, every emitter that are cellSize or less blocks away from the intersection points will always be found.
    * The maximum distance where an emitter can be found in some cases is 2*cellSize-1 blocks away.
    */
   public static class EmitterPosition {

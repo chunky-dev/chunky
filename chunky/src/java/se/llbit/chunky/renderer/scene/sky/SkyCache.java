@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package se.llbit.chunky.renderer.scene.sky;
 
 import static java.lang.Math.PI;
@@ -23,7 +24,6 @@ import java.util.stream.IntStream;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.log.Log;
-import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -134,9 +134,7 @@ public class SkyCache {
     theta = ((theta % 1) + 1) % 1;
     double phi = (FastMath.asin(QuickMath.clamp(ray.d.y, -1, 1)) + PI / 2) / PI;
 
-    Vector3 color = getColorInterpolated(theta, phi);
-    ColorUtil.RGBfromHSL(color, color.x, color.y, color.z);
-    return color;
+    return getColorInterpolated(theta, phi);
   }
 
   // Linear interpolation between 2 points in 1 dimension
@@ -175,8 +173,6 @@ public class SkyCache {
     double r = FastMath.cos(phi);
     ray.d.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
 
-    Vector3 color = simSky.calcIncidentLight(ray);
-    ColorUtil.RGBtoHSL(color, color.x, color.y, color.z);
-    return color;
+    return simSky.calcIncidentLight(ray);
   }
 }

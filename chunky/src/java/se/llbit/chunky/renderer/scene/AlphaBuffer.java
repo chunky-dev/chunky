@@ -84,7 +84,6 @@ public class AlphaBuffer {
       Chunky.getCommonThreads().submit(() -> {
         IntStream.range(0, width).parallel().forEach(x -> {
           WorkerState state = new WorkerState();
-          state.ray = new Ray();
 
           for (int y = 0; y < height; y++) {
             computeAlpha(scene, x, y, cropX, cropY, width, height, fullWidth, fullHeight, state);
@@ -126,7 +125,8 @@ public class AlphaBuffer {
       if (scene.camera.getProjectionMode() == ProjectionMode.PARALLEL) {
         ParallelProjector.fixRay(state.ray, scene);
       }
-      occlusion += PreviewRayTracer.skyOcclusion(scene, state);
+      ray.setCurrentMedium(scene.getWorldMaterial(ray));
+      occlusion += scene.skyOcclusion(state);
     }
     occlusion /= 4.0;
 

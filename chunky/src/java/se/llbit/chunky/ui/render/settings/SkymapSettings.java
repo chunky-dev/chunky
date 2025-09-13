@@ -24,6 +24,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import org.controlsfx.control.ToggleSwitch;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.SceneIOProvider;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -46,6 +47,7 @@ public class SkymapSettings extends VBox implements Initializable {
   @FXML private DoubleAdjuster skymapRoll;
   @FXML private ToggleButton v90;
   @FXML private HBox panoSpecific;
+  @FXML private ToggleSwitch textureInterpolation;
 
   public SkymapSettings() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("SkymapSettings.fxml"));
@@ -91,6 +93,9 @@ public class SkymapSettings extends VBox implements Initializable {
       .onValueChange(value -> scene.sky().setRoll(QuickMath.degToRad(value)));
     v90.selectedProperty().addListener(
         (observable, oldValue, newValue) -> scene.sky().setMirrored(newValue));
+    textureInterpolation.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      scene.sky().setTextureInterpolation(newValue);
+    });
   }
 
   public void update(Scene scene) {
@@ -98,6 +103,7 @@ public class SkymapSettings extends VBox implements Initializable {
     skymapPitch.set(QuickMath.radToDeg(scene.sky().getPitch()));
     skymapRoll.set(QuickMath.radToDeg(scene.sky().getRoll()));
     v90.setSelected(scene.sky().isMirrored());
+    textureInterpolation.setSelected(scene.sky().getTextureInterpolation());
   }
 
   public void setRenderController(RenderController controller) {

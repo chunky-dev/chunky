@@ -19,9 +19,6 @@ package se.llbit.chunky.world;
 import it.unimi.dsi.fastutil.longs.Long2ReferenceMap;
 import it.unimi.dsi.fastutil.longs.Long2ReferenceOpenHashMap;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Chunk heightmap.
  *

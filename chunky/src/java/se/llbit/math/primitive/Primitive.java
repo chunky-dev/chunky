@@ -16,22 +16,15 @@
  */
 package se.llbit.math.primitive;
 
+import se.llbit.math.Intersectable;
 import se.llbit.math.AABB;
-import se.llbit.math.Ray;
 
 /**
  * An intersectable primitive piece of geometry
  *
  * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
  */
-public interface Primitive {
-
-  /**
-   * Intersect the ray with this geometry.
-   *
-   * @return {@code true} if there was an intersection
-   */
-  boolean intersect(Ray ray);
+public interface Primitive extends Intersectable {
 
   /**
    * @return axis-aligned bounding box for the primitive

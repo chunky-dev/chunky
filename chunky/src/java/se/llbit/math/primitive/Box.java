@@ -17,7 +17,10 @@
 package se.llbit.math.primitive;
 
 import java.util.Collection;
+import java.util.Random;
 
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
@@ -145,7 +148,7 @@ public class Box implements Primitive {
             new Vector2(uv.y, uv.z), material));
   }
 
-  @Override public boolean intersect(Ray ray) {
+  @Override public boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
     // TODO Auto-generated method stub
     return false;
   }

@@ -7,21 +7,19 @@ import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
-import se.llbit.math.AABB;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
+import se.llbit.math.*;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
 import java.util.Random;
 
 public abstract class Block extends Material {
-  private final static AABB block = new AABB(0, 1, 0, 1, 0, 1);
+  public static final AABB FULL_BLOCK =  new AABB(0, 1, 0, 1,0, 1);
 
   /**
    * Set to true if there is a local intersection model for this block. If this is set to
    * <code>false</code> (default), this block is assumed to be an opaque cube block and {@link
-   * #intersect(Ray, Scene)} will never be called.
+   * #intersect(Ray, IntersectionRecord, Scene)} will never be called.
    */
   public boolean localIntersect = false;
 
@@ -50,14 +48,14 @@ public abstract class Block extends Material {
    * @param rand Random number source.
    */
   public void sample(int face, Vector3 loc, Random rand) {
-    block.sampleFace(face, loc, rand);
+    FULL_BLOCK.sampleFace(face, loc, rand);
   }
 
   /**
    * Get the surface area of this face of the block.
    */
   public double surfaceArea(int face) {
-    return block.faceSurfaceArea(face);
+    return FULL_BLOCK.faceSurfaceArea(face);
   }
 
   /**
@@ -69,17 +67,7 @@ public abstract class Block extends Material {
    * @param scene Scene
    * @return True if the ray hit this block, false if not
    */
-  public boolean intersect(Ray ray, Scene scene) {
-    ray.t = Double.POSITIVE_INFINITY;
-    if (block.intersect(ray)) {
-      float[] color = texture.getColor(ray.u, ray.v);
-      if (color[3] > Ray.EPSILON) {
-        ray.color.set(color);
-        ray.distance += ray.tNext;
-        ray.o.scaleAdd(ray.tNext, ray.d);
-        return true;
-      }
-    }
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     return false;
   }
 
@@ -148,6 +136,15 @@ public abstract class Block extends Material {
     return null;
   }
 
+  /**
+   * Checks whether the given ray is inside this block.
+   */
+  public boolean isInside(Ray ray) {
+    double ix = ray.o.x - QuickMath.floor(ray.o.x);
+    double iy = ray.o.y - QuickMath.floor(ray.o.y);
+    double iz = ray.o.z - QuickMath.floor(ray.o.z);
+    return FULL_BLOCK.inside(new Vector3(ix, iy, iz));
+  }
   /**
    * Does this block use biome tint for its rendering
    */

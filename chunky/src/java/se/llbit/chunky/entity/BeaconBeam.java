@@ -1,11 +1,25 @@
 package se.llbit.chunky.entity;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import se.llbit.chunky.block.minecraft.Beacon;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.IntegerAdjuster;
+import se.llbit.chunky.ui.IntegerTextField;
+import se.llbit.chunky.ui.dialogs.EditMaterialDialog;
+import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.BeaconBeamMaterial;
+import se.llbit.fx.LuxColorPicker;
 import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
@@ -217,8 +231,7 @@ public class BeaconBeam extends Entity implements Poseable {
     JsonObject materialsList = new JsonObject();
     for (int i : materials.keySet()) {
       BeaconBeamMaterial material = materials.get(i);
-      JsonObject object = new JsonObject(materials.size());
-      material.saveMaterialProperties(object);
+      JsonObject object = material.saveMaterialProperties();
       materialsList.add(String.valueOf(i), object);
     }
 
@@ -265,5 +278,92 @@ public class BeaconBeam extends Entity implements Poseable {
 
   public Map<Integer, BeaconBeamMaterial> getMaterials() {
     return materials;
+  }
+
+  @Override
+  public VBox getControls(RenderControlsTab parent) {
+    Scene scene = parent.getChunkyScene();
+
+    VBox controls = new VBox();
+
+    IntegerAdjuster height = new IntegerAdjuster();
+    height.setName("Height");
+    height.setTooltip("Modifies the height of the beam. Useful if your scene is taller than the world height.");
+    height.set(getHeight());
+    height.setRange(1, 512);
+    height.onValueChange(value -> {
+      setHeight(value);
+      scene.rebuildActorBvh();
+    });
+    controls.getChildren().add(height);
+
+    HBox beamColor = new HBox();
+    VBox listControls = new VBox();
+
+    listControls.setMaxWidth(200);
+    beamColor.setPadding(new Insets(10));
+    beamColor.setSpacing(15);
+
+    LuxColorPicker beamColorPicker = new LuxColorPicker();
+
+    Button editMaterial = new Button("Edit material");
+
+    ObservableList<Integer> colorHeights = FXCollections.observableArrayList();
+    colorHeights.addAll(getMaterials().keySet());
+    ListView<Integer> colorHeightList = new ListView<>(colorHeights);
+    colorHeightList.setMaxHeight(150.0);
+    colorHeightList.getSelectionModel().selectedItemProperty().addListener(
+      (observable, oldValue, heightIndex) -> {
+
+        BeaconBeamMaterial beamMat = getMaterials().get(heightIndex);
+        editMaterial.setOnAction(e -> {
+          EditMaterialDialog dialog = new EditMaterialDialog(beamMat, scene);
+          dialog.showAndWait();
+          dialog = null;
+        });
+        beamColorPicker.setColor(ColorUtil.toFx(beamMat.getColorInt()));
+      }
+    );
+    beamColorPicker.colorProperty().addListener(
+      (observableColor, oldColorValue, newColorValue) -> {
+        Integer index = colorHeightList.getSelectionModel().getSelectedItem();
+        if (index != null) {
+          getMaterials().get(index).updateColor(ColorUtil.getRGB(ColorUtil.fromFx(newColorValue)));
+          scene.rebuildActorBvh();
+        }
+      }
+    );
+
+    HBox listButtons = new HBox();
+    listButtons.setPadding(new Insets(10));
+    listButtons.setSpacing(15);
+    Button deleteButton = new Button("Delete");
+    deleteButton.setOnAction(e -> {
+      Integer index = colorHeightList.getSelectionModel().getSelectedItem();
+      if (index != null && index != 0) { //Prevent removal of the bottom layer
+        getMaterials().remove(index);
+        colorHeightList.getItems().removeAll(index);
+        scene.rebuildActorBvh();
+      }
+    });
+    IntegerTextField layerInput = new IntegerTextField();
+    layerInput.setMaxWidth(50);
+    Button addButton = new Button("Add");
+    addButton.setOnAction(e -> {
+      if (!getMaterials().containsKey(layerInput.valueProperty().get())) { //Don't allow duplicate indices
+        getMaterials().put(layerInput.valueProperty().get(), new BeaconBeamMaterial(BeaconBeamMaterial.DEFAULT_COLOR));
+        colorHeightList.getItems().add(layerInput.valueProperty().get());
+        scene.rebuildActorBvh();
+      }
+    });
+
+    listButtons.getChildren().addAll(deleteButton, layerInput, addButton);
+    listControls.getChildren().addAll(new Label("Start Height:"), colorHeightList, listButtons);
+    beamColor.getChildren().addAll(listControls, beamColorPicker, editMaterial);
+    controls.getChildren().add(beamColor);
+
+    controls.setSpacing(6);
+
+    return controls;
   }
 }

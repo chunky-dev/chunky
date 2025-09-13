@@ -18,36 +18,27 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.StandingBanner;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.Json;
 import se.llbit.json.JsonObject;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
 // Note: Mojang changed the ID values for banner colors in Minecraft 1.13,
 // for backward compatibility we need some way of mapping the old color IDs to the
 // new color IDs. This would require tracking the world format version somewhere.
-public class Banner extends MinecraftBlockTranslucent {
+public class Banner extends EmptyModelBlock {
   private final int rotation;
   private final BannerDesign.Color color;
 
   public Banner(String name, Texture texture, int rotation, BannerDesign.Color color) {
     super(name, texture);
     invisible = true;
-    opaque = false;
-    localIntersect = true;
     this.rotation = rotation % 16;
     this.color = color;
-  }
-
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override public boolean isBlockEntity() {

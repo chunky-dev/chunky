@@ -13,7 +13,6 @@ import se.llbit.nbt.Tag;
 import se.llbit.util.BitBuffer;
 
 import static se.llbit.chunky.world.Chunk.*;
-import static se.llbit.chunky.world.Chunk.Z_MAX;
 import static se.llbit.util.NbtUtil.getTagFromNames;
 
 /**
