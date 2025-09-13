@@ -5,8 +5,6 @@ import se.llbit.chunky.resources.LayeredResourcePacks;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 /**
  * This texture loader will load different textures depending on a texture being available.
@@ -28,11 +26,6 @@ public class ConditionalTextures extends TextureLoader {
       return then.load(texturePack);
     }
     return otherwise.load(texturePack);
-  }
-
-  @Override
-  public boolean loadFromTerrain(BitmapImage[] terrain) {
-    throw new UnsupportedOperationException("ConditionalTextures doesn't support loadFromTerrain");
   }
 
   @Override

@@ -86,7 +86,8 @@ public class JsonFontTextureLoader extends TextureLoader {
       JsonObject definition = fontDefinition.asObject();
       if (definition.get("type").stringValue("").equals("bitmap")) {
         BitmapImage spritemap;
-        String texture = definition.get("file").stringValue("").split(":")[1];
+        String[] textureAndNamespace = definition.get("file").stringValue("").split(":");
+        String texture = textureAndNamespace.length > 1 ? textureAndNamespace[1] : textureAndNamespace[0];
         Optional<LayeredResourcePacks.Entry> texturePath = texturePack.getFirstEntry("assets/minecraft/textures/" + texture);
         if (texturePath.isPresent()) {
           try (InputStream imageStream = texturePath.get().getInputStream()) {
@@ -106,6 +107,10 @@ public class JsonFontTextureLoader extends TextureLoader {
 
         int width = spritemap.width / 16;
         int height = fontDefinition.asObject().get("height").asInt(8);
+        if (width <= 0 || height <= 0) {
+          // some resource packs somehow do this, ignore
+          continue;
+        }
         int ascent =
           fontDefinition
             .asObject()
