@@ -556,7 +556,7 @@ public class Octree {
           offsetZ = -ray.o.z * invDz;
           continue;
         }
-      } else if (!currentBlock.isSameMaterial(prevBlock) && currentBlock != Air.INSTANCE) {
+      } else if (!currentBlock.isSameMaterial(prevBlock)) {
         // Origin and distance of ray need to be updated
         ray.o.scaleAdd(distance, ray.d);
         ray.distance += distance;
