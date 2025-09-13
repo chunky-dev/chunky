@@ -269,6 +269,19 @@
                         <Insets left="20.0"/>
                       </padding>
                     </Hyperlink>
+                    <Hyperlink fx:id="controlsfx" text="ControlsFX">
+                      <padding>
+                        <Insets/>
+                      </padding>
+                    </Hyperlink>
+                    <Hyperlink fx:id="controlsFXLicense" text="BSD-3-Clause license">
+                      <font>
+                        <Font size="10.0"/>
+                      </font>
+                      <padding>
+                        <Insets left="20.0"/>
+                      </padding>
+                    </Hyperlink>
                   </children>
                 </VBox>
               </children>
