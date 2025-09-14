@@ -228,18 +228,6 @@ public class Model {
 
   /**
    * @param src source quads
-   * @return Scaled copies of the source quads
-   */
-  public static Quad[] scale(Quad[] src, double scale) {
-    Quad[] out = new Quad[src.length];
-    for (int i = 0; i < src.length; ++i) {
-      out[i] = src[i].getScaled(scale);
-    }
-    return out;
-  }
-
-  /**
-   * @param src source quads
    * @return Quads rotated about the Z axis by some angle
    */
   public static Quad[] transform(Quad[] src, Transform transform) {

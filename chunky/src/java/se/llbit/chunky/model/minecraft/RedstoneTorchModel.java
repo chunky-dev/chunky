@@ -165,17 +165,6 @@ public class RedstoneTorchModel extends QuadModel {
       super(quad, transform);
     }
 
-    public GlowQuad(Quad quad, Matrix3 transform) {
-      super(quad, transform);
-    }
-
-    @Override
-    public Quad getScaled(double scale) {
-      Matrix3 transform = new Matrix3();
-      transform.scale(scale);
-      return new GlowQuad(this, transform);
-    }
-
     @Override
     public Quad transform(Transform transform) {
       return new GlowQuad(this, transform);
