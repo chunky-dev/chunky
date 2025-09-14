@@ -327,8 +327,18 @@ public class SceneChooserController implements Initializable {
       try (JsonParser parser = new JsonParser(new FileInputStream(new File(sceneFile.getParentFile(), sceneFile.getName())))) {
         JsonObject scene = parser.parse().object();
 
-        int width = scene.get("width").intValue(400);
-        int height = scene.get("height").intValue(400);
+        int width;
+        int height;
+
+        if (scene.get("canvasConfig").isObject()) {
+          JsonObject canvasConfig = scene.get("canvasConfig").asObject();
+          width = canvasConfig.get("width").intValue(400);
+          height = canvasConfig.get("height").intValue(400);
+        } else {
+          width = scene.get("width").intValue(400);
+          height = scene.get("height").intValue(400);
+        }
+
         dimensions = String.format("%sx%s", width, height);
 
         chunkSize = scene.get("chunkList").array().size();
