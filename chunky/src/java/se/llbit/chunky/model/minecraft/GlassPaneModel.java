@@ -19,137 +19,149 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
+import se.llbit.chunky.model.builder.QuadModelBuilder;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.*;
+import se.llbit.math.Quad;
+import se.llbit.math.Ray;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.function.Consumer;
+import java.util.function.BiFunction;
 
 public class GlassPaneModel extends QuadModel {
-  //region quads
-  private static final Quad[] core = {
-      // Top
-      new Quad(
-          new Vector3(7 / 16.0, 16 / 16.0, 9 / 16.0),
-          new Vector3(9 / 16.0, 16 / 16.0, 9 / 16.0),
-          new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
-          new Vector4(7 / 16.0, 9 / 16.0, 7 / 16.0, 9 / 16.0)
-      ),
-
-      // Bottom
-      new Quad(
-          new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
-          new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
-          new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
-          new Vector4(7 / 16.0, 9 / 16.0, 7 / 16.0, 9 / 16.0)
-      ),
-
-      // North
-      new Quad(
-          new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
-          new Vector3(9 / 16.0, 16 / 16.0, 7 / 16.0),
-          new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
-          new Vector4(7 / 16.0, 9 / 16.0, 16 / 16.0, 0 / 16.0)
-      ),
-      null, // East
-      null, // South
-      null  // West
+  private static final Quad[] panePostQuads = {
+    new Quad(
+      new Vector3(7 / 16.0, 16 / 16.0, 9 / 16.0),
+      new Vector3(9 / 16.0, 16 / 16.0, 9 / 16.0),
+      new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
+      new Vector4(7 / 16.0, 9 / 16.0, 7 / 16.0, 9 / 16.0)
+    ),
+    new Quad(
+      new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector4(7 / 16.0, 9 / 16.0, 7 / 16.0, 9 / 16.0)
+    )
   };
 
-  static {
-    core[3] = new Quad(core[2], Transform.NONE.rotateY());
-    core[4] = new Quad(core[3], Transform.NONE.rotateY());
-    core[5] = new Quad(core[4], Transform.NONE.rotateY());
-  }
-
-  private static final Quad[][] connector = {
-      // Front side.
-      {
-          // Left face.
-          new Quad(new Vector3(7 / 16., 1, 7 / 16.), new Vector3(7 / 16., 1, 0),
-              new Vector3(7 / 16., 0, 7 / 16.), new Vector4(7 / 16., 0, 1, 0)),
-
-          // Right face.
-          new Quad(new Vector3(9 / 16., 1, 0), new Vector3(9 / 16., 1, 7 / 16.),
-              new Vector3(9 / 16., 0, 0), new Vector4(0, 7 / 16., 1, 0)),
-
-          // Top face.
-          new Quad(new Vector3(9 / 16., 1, 0), new Vector3(7 / 16., 1, 0),
-              new Vector3(9 / 16., 1, 7 / 16.), new Vector4(9 / 16., 7 / 16., 0, 7 / 16.)),
-
-          // Bottom face.
-          new Quad(new Vector3(7 / 16., 0, 0), new Vector3(9 / 16., 0, 0),
-              new Vector3(7 / 16., 0, 7 / 16.), new Vector4(7 / 16., 9 / 16., 0, 7 / 16.)),
-
-      },
-      // Back side.
-      {
-          // Left face.
-          new Quad(new Vector3(7 / 16., 1, 1), new Vector3(7 / 16., 1, 9 / 16.),
-              new Vector3(7 / 16., 0, 1), new Vector4(1, 9 / 16., 1, 0)),
-
-          // Right face.
-          new Quad(new Vector3(9 / 16., 1, 9 / 16.), new Vector3(9 / 16., 1, 1),
-              new Vector3(9 / 16., 0, 9 / 16.), new Vector4(9 / 16., 1, 1, 0)),
-
-          // Top face.
-          new Quad(new Vector3(9 / 16., 1, 9 / 16.), new Vector3(7 / 16., 1, 9 / 16.),
-              new Vector3(9 / 16., 1, 1), new Vector4(9 / 16., 7 / 16., 9 / 16., 1)),
-
-          // Bottom face.
-          new Quad(new Vector3(7 / 16., 0, 9 / 16.), new Vector3(9 / 16., 0, 9 / 16.),
-              new Vector3(7 / 16., 0, 1), new Vector4(7 / 16., 9 / 16., 9 / 16., 1)),
-      },
+  private static final BiFunction<Texture, Texture, Texture[]> paneSideTex = (edge, pane) -> new Texture[]{
+    edge, edge, pane, pane, edge
   };
 
-  private static final Quad[][] panes = new Quad[4][];
+  private static final Quad[] paneSideQuads = new Quad[]{
+    new Quad(
+      new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
+      new Vector3(9 / 16.0, 16 / 16.0, 7 / 16.0),
+      new Vector3(7 / 16.0, 16 / 16.0, 0 / 16.0),
+      new Vector4(7 / 16.0, 9 / 16.0, 9 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(7 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector3(9 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector4(7 / 16.0, 9 / 16.0, 9 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
+      new Vector3(7 / 16.0, 16 / 16.0, 0 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector4(9 / 16.0, 16 / 16.0, 16 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(9 / 16.0, 16 / 16.0, 0 / 16.0),
+      new Vector3(9 / 16.0, 16 / 16.0, 7 / 16.0),
+      new Vector3(9 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector4(16 / 16.0, 9 / 16.0, 16 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(7 / 16.0, 16 / 16.0, 0 / 16.0),
+      new Vector3(9 / 16.0, 16 / 16.0, 0 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector4(9 / 16.0, 7 / 16.0, 16 / 16.0, 0 / 16.0)
+    )
+  };
 
-  static {
-    panes[0] = connector[0];
-    panes[1] = connector[1];
-    for (int j = 2; j < 4; ++j) {
-      panes[j] = Model.rotateY(connector[j - 2]);
-    }
-  }
-  //endregion
+  private static final Quad[] paneSideAltQuads = new Quad[]{
+    new Quad(
+      new Vector3(7 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(9 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(7 / 16.0, 16 / 16.0, 9 / 16.0),
+      new Vector4(7 / 16.0, 9 / 16.0, 9 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector3(9 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector4(7 / 16.0, 9 / 16.0, 9 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(7 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(7 / 16.0, 16 / 16.0, 9 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector4(0 / 16.0, 7 / 16.0, 16 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(9 / 16.0, 16 / 16.0, 9 / 16.0),
+      new Vector3(9 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(9 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector4(7 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(9 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(7 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(9 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector4(9 / 16.0, 7 / 16.0, 16 / 16.0, 0 / 16.0)
+    )
+  };
+
+
+  private static final Quad[] paneNoSideQuads = new Quad[]{
+    new Quad(
+      new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
+      new Vector3(9 / 16.0, 16 / 16.0, 7 / 16.0),
+      new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector4(7 / 16.0, 9 / 16.0, 16 / 16.0, 0 / 16.0)
+    )
+  };
+
+  private static final Quad[] paneNoSideAltQuads = new Quad[]{
+    new Quad(
+      new Vector3(9 / 16.0, 16 / 16.0, 7 / 16.0),
+      new Vector3(9 / 16.0, 16 / 16.0, 9 / 16.0),
+      new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector4(9 / 16.0, 7 / 16.0, 16 / 16.0, 0 / 16.0)
+    )
+  };
 
   private final Quad[] quads;
   private final Texture[] textures;
 
-  public GlassPaneModel(Texture top, Texture side, boolean north, boolean south, boolean east, boolean west) {
-    ArrayList<Quad> quads = new ArrayList<>();
-    ArrayList<Texture> textures = new ArrayList<>();
-
-    Consumer<Quad[]> addConnector = qs -> {
-      quads.addAll(Arrays.asList(qs));
-      textures.addAll(Arrays.asList(side, side, top, top));
-    };
-
-    // Top and bottom
-    quads.add(core[0]);
-    quads.add(core[1]);
-    textures.add(top);
-    textures.add(top);
-
-    // Cull sides
-    if (!north) quads.add(core[2]);
-    if (!east) quads.add(core[3]);
-    if (!south) quads.add(core[4]);
-    if (!west) quads.add(core[5]);
-
-    while (textures.size() < quads.size()) {
-      textures.add(side);
+  public GlassPaneModel(Texture edge, Texture pane, boolean north, boolean south, boolean east, boolean west) {
+    QuadModelBuilder builder = new QuadModelBuilder();
+    builder.addModel(panePostQuads, edge);
+    if (north) {
+      builder.addModel(paneSideQuads, paneSideTex.apply(edge, pane));
+    } else {
+      builder.addModel(paneNoSideQuads, pane);
     }
-
-    // Add connectors
-    if (north) addConnector.accept(panes[0]);
-    if (south) addConnector.accept(panes[1]);
-    if (east) addConnector.accept(panes[2]);
-    if (west) addConnector.accept(panes[3]);
-
-    this.quads = quads.toArray(new Quad[0]);
-    this.textures = textures.toArray(new Texture[0]);
+    if (east) {
+      builder.addModel(Model.rotateY(paneSideQuads), paneSideTex.apply(edge, pane));
+    } else {
+      builder.addModel(paneNoSideAltQuads, pane);
+    }
+    if (south) {
+      builder.addModel(paneSideAltQuads, paneSideTex.apply(edge, pane));
+    } else {
+      builder.addModel(Model.rotateY(paneNoSideAltQuads), pane);
+    }
+    if (west) {
+      builder.addModel(Model.rotateY(paneSideAltQuads), paneSideTex.apply(edge, pane));
+    } else {
+      builder.addModel(Model.rotateNegY(paneNoSideQuads), pane);
+    }
+    quads = builder.getQuads();
+    textures = builder.getTextures();
   }
 
   @Override
