@@ -2,7 +2,6 @@ package se.llbit.chunky.block.jsonmodels;
 
 import se.llbit.chunky.block.AbstractModelBlock;
 import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.resources.Texture;
@@ -23,19 +22,14 @@ public class QuadBlock extends AbstractModelBlock {
   private final boolean isEntity;
   public boolean supportsOpacity = true; // some blocks only support full or zero opacity and round alpha values to 0 or 1
 
-  public QuadBlock(String name, Texture texture, Quad[] quads, Texture[] textures, boolean isEntity) {
+  public QuadBlock(String name, Texture texture, Quad[] quads, Texture[] textures, Tint[] tints, boolean isEntity) {
     super(name, texture);
     localIntersect = true;
     opaque = false;
     solid = false;
     invisible = isEntity;
     this.isEntity = isEntity;
-    model = new Model(quads, textures);
-  }
-
-  @Override
-  public BlockModel getModel() {
-    return model;
+    model = new Model(quads, textures, tints);
   }
 
   @Override
@@ -96,6 +90,11 @@ public class QuadBlock extends AbstractModelBlock {
     @Override
     public Texture[] getTextures() {
       return textures;
+    }
+
+    @Override
+    public Tint[] getTints() {
+      return tints;
     }
   }
 }

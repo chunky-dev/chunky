@@ -10,7 +10,7 @@ public class MinecraftBlock extends Block {
   public static final Material STONE = new MinecraftBlock("stone", Texture.stone);
 
   public MinecraftBlock(String name, Texture texture) {
-    super("minecraft:" + name, texture);
+    super(name, texture);
     opaque = true;
     solid = true;
   }

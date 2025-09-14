@@ -388,7 +388,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
         return applicableParts.get(0);
       }
       MultipartJsonModel block = new MultipartJsonModel(name, applicableParts.toArray(new JsonModel[0]));
-      block.tints = replaceBlockSpecificTints(MinecraftBlockProvider.getHardCodedTints(name), properties);
+      // block.tints = replaceBlockSpecificTints(MinecraftBlockProvider.getHardCodedTints(name), properties);
       return block;
     }
   }
@@ -815,11 +815,14 @@ public class ResourcepackBlockProvider implements BlockProvider {
         .map(f -> this.textures.get(f.texture))
         .toArray(Texture[]::new);
       Quad[] quads = Arrays.stream(faces)
-        .map(f -> tints != null && tints.length > 0 && f.tintindex >= 0 ? new TintedQuad(f.quad, getTint(f.tintindex)) : f.quad)
+        .map(f -> f.quad)
         .toArray(Quad[]::new);
+      Tint[] t = Arrays.stream(faces)
+        .map(f -> tints != null && tints.length > 0 && f.tintindex >= 0 ? getTint(f.tintindex) : Tint.NONE)
+        .toArray(Tint[]::new);
 
       QuadBlock qb = new QuadBlock(name, this.textures.getOrDefault("up", Texture.unknown), quads,
-        textures, isEntity());
+        textures, t, isEntity());
       qb.opaque = opaque;
       return qb;
     }
@@ -879,6 +882,11 @@ public class ResourcepackBlockProvider implements BlockProvider {
         return this.tints[tintIndex];
       }
       return Tint.NONE;
+    }
+
+    @Override
+    public boolean isBiomeDependant() {
+      return this.tints != null;
     }
 
     @Override
@@ -983,7 +991,6 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
   private static class MultipartJsonModel extends Block {
     private final JsonModel[] parts;
-    private Tint[] tints;
 
     public MultipartJsonModel(String name, JsonModel[] parts) {
       super(name, parts.length > 0 ? parts[0].texture : Texture.EMPTY_TEXTURE);
@@ -1005,6 +1012,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
       }
 
       List<Texture> textures = new ArrayList<>();
+      List<Tint> tints = new ArrayList<>();
       Texture upTexture = Texture.unknown;
       for (JsonModel part : parts) {
         Texture newUp = part.getTexture("up");
@@ -1015,25 +1023,19 @@ public class ResourcepackBlockProvider implements BlockProvider {
           for (JsonModelFace face : element.faces) {
             if (face != null) {
               textures.add(part.getTexture(face.texture));
+              tints.add(part.getTint(face.tintindex));
             }
           }
         }
       }
 
       QuadBlock qb = new QuadBlock(name, upTexture,
-        faces.stream().map(f -> tints != null && tints.length > 0 && f.tintindex >= 0 ? new TintedQuad(f.quad, this.getTint(f.tintindex)) : f.quad)
+        faces.stream().map(f -> f.quad)
           .toArray(Quad[]::new),
         textures.toArray(
-          new Texture[0]), isEntity());
+          new Texture[0]), tints.toArray(Tint[]::new), isEntity());
       qb.opaque = opaque;
       return qb;
-    }
-
-    private Tint getTint(int tintIndex) {
-      if (this.tints != null && tintIndex >= 0 && tintIndex < this.tints.length) {
-        return this.tints[tintIndex];
-      }
-      return Tint.NONE;
     }
 
     @Override
