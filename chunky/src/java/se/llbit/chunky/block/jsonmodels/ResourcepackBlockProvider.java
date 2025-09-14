@@ -465,7 +465,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
       return model;
     }
 
-    public Block loadBlockModel(LayeredResourcePacks resourcePacks, String model, String blockName) {
+    public Block loadBlockModel(LayeredResourcePacks resourcePacks, String model, String blockName, boolean forceJsonModel) {
       if (model.equals("unknown:unknown")) {
         System.err.println("unknown block model for " + blockName);
         return UnknownBlock.UNKNOWN;
@@ -478,8 +478,10 @@ public class ResourcepackBlockProvider implements BlockProvider {
       block.applyDefinition(blockDefinition, name -> this.getTexture(resourcePacks, name), false);
       String parentName = blockDefinition.get("parent").stringValue("block/block");
       if ((parentName.equals("block/cube_all") || parentName.equals("minecraft:block/cube_all")) && !block.textures.get("all").hasOpacity()) {
-        // System.out.println("optimized block/cube_all");
-        return new MinecraftBlock(blockName, block.textures.get("all"));
+        if (!forceJsonModel) {
+          // System.out.println("optimized block/cube_all");
+          return new MinecraftBlock(blockName, block.textures.get("all"));
+        }
       } else if (parentName.equals("block/cube") || parentName.equals("minecraft:block/cube")) {
         // System.out.println("optimized block/cube");
         block.opaque = true;
@@ -488,7 +490,9 @@ public class ResourcepackBlockProvider implements BlockProvider {
         .equals("minecraft:block/cross")) {
         block.supportsOpacity = false;
       } else if (blockDefinition.isEmpty()) {
-        return Air.INSTANCE;
+        if (!forceJsonModel) {
+          return Air.INSTANCE;
+        }
       }
       try {
         while (!blockDefinition.get("parent").isUnknown()) {
@@ -499,8 +503,10 @@ public class ResourcepackBlockProvider implements BlockProvider {
           block.texture = block.textures.get("particle");
           if ((parentName.equals("block/cube_all") || parentName
             .equals("minecraft:block/cube_all")) && !block.textures.get("all").hasOpacity()) {
-            // System.out.println("optimized block/cube_all");
-            return new MinecraftBlock(blockName, block.textures.get("all"));
+            if (!forceJsonModel) {
+              // System.out.println("optimized block/cube_all");
+              return new MinecraftBlock(blockName, block.textures.get("all"));
+            }
           } else if (parentName.equals("block/cube") || parentName.equals("minecraft:block/cube")) {
             // System.out.println("optimized block/cube");
             block.opaque = true;

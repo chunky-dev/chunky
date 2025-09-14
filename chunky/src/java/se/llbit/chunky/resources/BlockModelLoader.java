@@ -49,7 +49,7 @@ public class BlockModelLoader implements ResourcePackLoader.PackLoader {
             } else {
               Block model =
                 modelLoader.loadBlockModel(
-                  resourcePacks, modelName, fqBlockName);
+                  resourcePacks, modelName, fqBlockName, false);
               if (model instanceof ResourcepackBlockProvider.JsonModel) {
                 if (blockDefinition.get("x").doubleValue(0) > 0) {
                   ((ResourcepackBlockProvider.JsonModel) model)
@@ -88,7 +88,7 @@ public class BlockModelLoader implements ResourcePackLoader.PackLoader {
 
             Block model =
               modelLoader.loadBlockModel(
-                resourcePacks, modelName, fqBlockName);
+                resourcePacks, modelName, fqBlockName, true);
 
             if (model instanceof ResourcepackBlockProvider.JsonModel) {
               if (blockDefinition.get("x").doubleValue(0) > 0) {
