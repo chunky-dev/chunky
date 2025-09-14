@@ -191,15 +191,6 @@ public class Quad {
     return false;
   }
 
-  /**
-   * @return Scaled copy of this quad
-   */
-  public Quad getScaled(double scale) {
-    Matrix3 transform = new Matrix3();
-    transform.scale(scale);
-    return new Quad(this, transform);
-  }
-
   public void addTriangles(Collection<Primitive> primitives, Material material, Transform transform) {
     Vector3 c0 = new Vector3(o);
     Vector3 c1 = new Vector3();
