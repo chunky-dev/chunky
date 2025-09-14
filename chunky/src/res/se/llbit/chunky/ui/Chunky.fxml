@@ -137,6 +137,7 @@
               <IntegerAdjuster fx:id="yMax" name="Max Y level"/>
             </VBox>
             <Text fx:id="yClipInvalid" styleClass="invalid" managed="false" visible="false">Min Y level must be smaller than Max Y level.</Text>
+            <Label wrapText="true">The map Y clip also applies to new scenes. To change the Y clip of the current scene, use the sliders in the Scene panel and then reload the chunks.</Label>
             <Separator/>
             <HBox spacing="10.0">
               <Label text="Show Players"/>
