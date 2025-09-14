@@ -17,6 +17,7 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.math.Ray;
+import se.llbit.math.Vector4;
 
 /**
  * Basic animated texture extension.
@@ -37,21 +38,26 @@ public class AnimatedTexture extends Texture {
     updateNumFrames();
   }
 
-  @Override
-  public float[] getColor(double u, double v) {
-    return getColor(u, v, 0);
+  public AnimatedTexture(BitmapImage img) {
+    super(img);
+    updateNumFrames();
   }
 
-  /**
-   * Get color for animation frame.
-   */
+  /** Get color for animation frame. */
   public float[] getColor(double u, double v, int frame) {
     int i = Math.floorMod(frame, numFrames);
-    return getColor((int) (u * width - Ray.EPSILON),
+    return getColor(
+        (int) (u * width - Ray.EPSILON),
         (int) ((1 - v) * frameHeight - Ray.EPSILON + i * frameHeight));
   }
 
-  @Override public void setTexture(BitmapImage newImage) {
+  @Override
+  public float[] getColor(double u, double v) {
+    return this.getColor(u, v, 0);
+  }
+
+  @Override
+  public void setTexture(BitmapImage newImage) {
     super.setTexture(newImage);
     updateNumFrames();
   }

@@ -119,7 +119,7 @@ public class RedstoneWireModel extends QuadModel {
       Texture.redstoneWireCross, Texture.redstoneWireCross, Texture.redstoneWireCross
   };
 
-  private static final Tint[] wireTints = new Tint[16];
+  public static final Tint[] wireTints = new Tint[16];
 
   static {
     float[] color0 = new float[3];

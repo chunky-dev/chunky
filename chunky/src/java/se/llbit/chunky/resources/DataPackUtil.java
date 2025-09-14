@@ -39,6 +39,31 @@ public class DataPackUtil {
     }
   }
 
+  public static void forEachBlockstate(LayeredResourcePacks resourcePacks, Consumer<DataRegistryEntry> consumer) {
+    for (LayeredResourcePacks.Entry assets : resourcePacks.getAllEntries("assets")) {
+      try (Stream<Path> namespaces = Files.list(assets.getPath())) {
+        namespaces.forEach(ns -> {
+          String namespace = String.valueOf(ns.getFileName());
+          Path entriesPath = ns.resolve("blockstates");
+          try (Stream<Path> entriesStream = Files.walk(entriesPath)) {
+            entriesStream
+              .filter(p -> Files.isRegularFile(p, LinkOption.NOFOLLOW_LINKS))
+              .forEach(file -> {
+                String name = file.getFileName().toString();
+                if (name.toLowerCase().endsWith(".json")) {
+                  name = name.substring(0, name.length() - ".json".length());
+                }
+                consumer.accept(new DataRegistryEntry(namespace, name, file));
+              });
+          } catch (IOException ignored) {
+          }
+        });
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
   public record DataRegistryEntry(String namespace, String name, Path path) {
     public String getNamespacedName() {
       return namespace + ":" + name;
