@@ -422,13 +422,6 @@ public class MaterialsTab extends RenderControlsTab implements Initializable {
       }
     } else if (MaterialStore.blockIds.contains(materialName)) {
       Block block = new UnknownBlock(materialName.substring(10));
-      for (BlockProvider provider : BlockSpec.blockProviders) {
-        Block aBlock = provider.getBlockByTag(materialName, new CompoundTag());
-        if (aBlock != null) {
-          block = aBlock;
-          break;
-        }
-      }
       scene.getPalette().applyMaterial(block);
       emittance.set(block.emittance);
       emittanceColor.setColor(ColorUtil.toFx(block.emittanceColor));
