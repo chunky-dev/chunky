@@ -109,6 +109,9 @@ public class LayeredResourcePacks implements Closeable {
 
     @Override
     public void close() throws IOException {
+      if (fileSystem == null) {
+        return;
+      }
       try {
         fileSystem.close();
       } catch (UnsupportedOperationException e) {
