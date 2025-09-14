@@ -20,7 +20,7 @@ import java.util.Random;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.ApertureShape;
-import se.llbit.math.Transform;
+import se.llbit.math.Matrix3;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 
@@ -55,10 +55,11 @@ public class SphericalApertureProjector extends ApertureProjector {
 
     Vector3 aperturePoint = new Vector3(rx, ry, 0);
 
-    Transform transform = Transform.NONE;
-    transform.rotateX(-pitch).rotateY(yaw).apply(aperturePoint);
+    Matrix3 transform = new Matrix3();
+    transform.rotate(-pitch, yaw, 0);
+    transform.transform(aperturePoint);
 
-    d.sub(aperturePoint.x, aperturePoint.y, aperturePoint.z);
-    o.add(aperturePoint.x, aperturePoint.y, aperturePoint.z);
+    d.sub(aperturePoint);
+    o.add(aperturePoint);
   }
 }
