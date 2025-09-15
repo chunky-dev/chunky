@@ -2779,6 +2779,7 @@ public class Scene implements Configurable, Refreshable {
     for (CloudLayer cloudLayer : cloudLayers) {
       cloudLayersArray.add(cloudLayer.toJson());
     }
+    json.add("cloudLayers", cloudLayersArray);
     json.add("biomeColorsEnabled", biomeColors);
     json.add("biomeBlendingRadius", biomeBlendingRadius);
     json.add("transparentSky", transparentSky);
