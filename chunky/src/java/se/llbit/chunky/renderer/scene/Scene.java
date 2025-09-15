@@ -3148,17 +3148,15 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Clears the reset reason and returns the previous reason.
+   * Get the reset reason.
    * @return the current reset reason
    */
-  public synchronized ResetReason getResetReason() {
+  public ResetReason getResetReason() {
     return resetReason;
   }
 
   public void setResetReason(ResetReason resetReason) {
-    if (this.resetReason != ResetReason.SCENE_LOADED) {
-      this.resetReason = resetReason;
-    }
+    this.resetReason = resetReason;
   }
 
   public void importMaterials() {
