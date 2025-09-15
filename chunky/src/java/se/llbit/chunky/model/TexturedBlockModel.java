@@ -19,6 +19,7 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -54,16 +55,16 @@ public class TexturedBlockModel extends AABBModel {
    *
    * @param ray ray to test
    */
-  public static void getIntersectionColor(Ray ray) {
-    if (ray.getCurrentMaterial() == Air.INSTANCE) {
-      ray.color.x = 1;
-      ray.color.y = 1;
-      ray.color.z = 1;
-      ray.color.w = 0;
+  public static void getIntersectionColor(Ray ray, IntersectionRecord intersectionRecord) {
+    if (intersectionRecord.material == Air.INSTANCE) {
+      intersectionRecord.color.x = 1;
+      intersectionRecord.color.y = 1;
+      intersectionRecord.color.z = 1;
+      intersectionRecord.color.w = 0;
       return;
     }
-    getTextureCoordinates(ray);
-    ray.getCurrentMaterial().getColor(ray);
+    getTextureCoordinates(ray, intersectionRecord);
+    intersectionRecord.material.getColor(intersectionRecord);
   }
 
   /**
@@ -71,26 +72,26 @@ public class TexturedBlockModel extends AABBModel {
    *
    * @param ray ray to test
    */
-  private static void getTextureCoordinates(Ray ray) {
+  private static void getTextureCoordinates(Ray ray, IntersectionRecord intersectionRecord) {
     int bx = (int) QuickMath.floor(ray.o.x);
     int by = (int) QuickMath.floor(ray.o.y);
     int bz = (int) QuickMath.floor(ray.o.z);
-    Vector3 n = ray.getNormal();
+    Vector3 n = intersectionRecord.n;
     if (n.y != 0) {
-      ray.u = ray.o.x - bx;
-      ray.v = ray.o.z - bz;
+      intersectionRecord.uv.x = ray.o.x - bx;
+      intersectionRecord.uv.y = ray.o.z - bz;
     } else if (n.x != 0) {
-      ray.u = ray.o.z - bz;
-      ray.v = ray.o.y - by;
+      intersectionRecord.uv.x = ray.o.z - bz;
+      intersectionRecord.uv.y = ray.o.y - by;
     } else {
-      ray.u = ray.o.x - bx;
-      ray.v = ray.o.y - by;
+      intersectionRecord.uv.x = ray.o.x - bx;
+      intersectionRecord.uv.y = ray.o.y - by;
     }
     if (n.x > 0 || n.z < 0) {
-      ray.u = 1 - ray.u;
+      intersectionRecord.uv.x = 1 - intersectionRecord.uv.x;
     }
     if (n.y > 0) {
-      ray.v = 1 - ray.v;
+      intersectionRecord.uv.y = 1 - intersectionRecord.uv.y;
     }
   }
 }

@@ -31,7 +31,7 @@ public class Vector2 {
   public double x, y;
 
   /**
-   * Creates a new vector (0, 0, 0)
+   * Creates a new vector (0, 0)
    */
   public Vector2() {
     this(0, 0);
@@ -183,5 +183,13 @@ public class Vector2 {
     object.add("x", x);
     object.add("y", y);
     return object;
+  }
+
+  /**
+   * Unmarshals a vector from JSON.
+   */
+  public void fromJson(JsonObject object) {
+    x = object.get("x").doubleValue(0);
+    y = object.get("y").doubleValue(0);
   }
 }

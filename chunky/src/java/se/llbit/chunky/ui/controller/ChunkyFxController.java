@@ -53,6 +53,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -79,7 +80,6 @@ import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
-import se.llbit.fx.ToolPane;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.fxutil.GroupedChangeListener;
 import se.llbit.log.ConsoleReceiver;
@@ -109,7 +109,7 @@ public class ChunkyFxController
   @FXML private Canvas mapOverlay;
   @FXML private Label mapName;
   @FXML private MenuItem menuExit;
-  @FXML private ToolPane renderControls;
+  @FXML private VBox renderControls;
   @FXML private Button changeWorldBtn;
   @FXML private Button reloadWorldBtn;
   @FXML private ToggleButton overworldBtn;
@@ -942,10 +942,8 @@ public class ChunkyFxController
       alert.setTitle("Overwrite existing scene");
       alert.setContentText("A scene with that name already exists. This will overwrite the existing scene, are you sure you want to continue?");
 
-      if (alert.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
-        return false;
-      }
+      return alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK;
     }
-    return  true;
+    return true;
   }
 }

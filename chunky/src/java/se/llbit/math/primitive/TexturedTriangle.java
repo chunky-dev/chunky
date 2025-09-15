@@ -16,11 +16,11 @@
  */
 package se.llbit.math.primitive;
 
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.math.*;
 import se.llbit.chunky.world.Material;
-import se.llbit.math.AABB;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector2;
-import se.llbit.math.Vector3;
+
+import java.util.Random;
 
 /**
  * A simple triangle primitive.
@@ -28,8 +28,6 @@ import se.llbit.math.Vector3;
  * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
  */
 public class TexturedTriangle implements Primitive {
-
-  private static final double EPSILON = 0.000001;
 
   /** Note: This is public for some plugins. Stability is not guaranteed. */
   public final Vector3 e1 = new Vector3(0, 0, 0);
@@ -80,7 +78,7 @@ public class TexturedTriangle implements Primitive {
     bounds = AABB.bounds(c1, c2, c3);
   }
 
-  @Override public boolean intersect(Ray ray) {
+  @Override public boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
     // Möller-Trumbore triangle intersection algorithm!
     Vector3 pvec = new Vector3();
     Vector3 qvec = new Vector3();
@@ -89,10 +87,10 @@ public class TexturedTriangle implements Primitive {
     pvec.cross(ray.d, e2);
     double det = e1.dot(pvec);
     if (doubleSided) {
-      if (det > -EPSILON && det < EPSILON) {
+      if (det > -Constants.EPSILON && det < Constants.EPSILON) {
         return false;
       }
-    } else if (det > -EPSILON) {
+    } else if (det > -Constants.EPSILON) {
       return false;
     }
     double recip = 1 / det;
@@ -115,18 +113,16 @@ public class TexturedTriangle implements Primitive {
 
     double t = e2.dot(qvec) * recip;
 
-    if (t > EPSILON && t < ray.t) {
+    if (t > Constants.EPSILON && t < intersectionRecord.distance) {
       double w = 1 - u - v;
-      ray.u = t1u * u + t2u * v + t3u * w;
-      ray.v = t1v * u + t2v * v + t3v * w;
-      float[] color = material.getColor(ray.u, ray.v);
-      if (color[3] > 0) {
-        ray.color.set(color);
-        ray.setCurrentMaterial(material);
-        ray.t = t;
-        ray.setNormal(n);
-        return true;
-      }
+      intersectionRecord.uv.x = t1u * u + t2u * v + t3u * w;
+      intersectionRecord.uv.y = t1v * u + t2v * v + t3v * w;
+      material.getColor(intersectionRecord);
+      intersectionRecord.material = material;
+      intersectionRecord.distance = t;
+      intersectionRecord.setNormal(Vector3.orientNormal(ray.d, n));
+      intersectionRecord.setNoMediumChange(true);
+      return true;
     }
     return false;
   }

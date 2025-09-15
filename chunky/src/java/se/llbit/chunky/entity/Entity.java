@@ -19,30 +19,27 @@ package se.llbit.chunky.entity;
 
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.model.minecraft.DecoratedPotModel;
+import se.llbit.chunky.renderer.HasPrimitives;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Grid;
 import se.llbit.math.Octree;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
-import se.llbit.math.primitive.Primitive;
-
-import java.util.Collection;
+import se.llbit.util.HasControls;
 
 /**
  * Represents Minecraft entities that are not stored in the octree.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-abstract public class Entity {
+public abstract class Entity implements HasPrimitives, HasControls {
 
   public final Vector3 position;
 
   protected Entity(Vector3 position) {
     this.position = new Vector3(position);
   }
-
-  abstract public Collection<Primitive> primitives(Vector3 offset);
 
   public Grid.EmitterPosition[] getEmitterPosition() {
     return new Grid.EmitterPosition[0];
@@ -71,7 +68,7 @@ abstract public class Entity {
    * @param json json data.
    * @return unmarshalled entity, or {@code null} if it was not a valid entity.
    */
-  public static Entity fromJson(JsonObject json) {
+  public static Entity loadFromJson(JsonObject json) {
     String kind = json.get("kind").stringValue("");
     switch (kind) {
       case "painting":
@@ -118,6 +115,8 @@ abstract public class Entity {
         return HangingSignEntity.fromJson(json);
       case "wallHangingSign":
         return WallHangingSignEntity.fromJson(json);
+      case "sphere":
+        return SphereEntity.fromJson(json);
       case "sheep":
         return SheepEntity.fromJson(json);
       case "cow":

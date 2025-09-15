@@ -16,7 +16,9 @@
  */
 package se.llbit.chunky.renderer;
 
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 import java.util.Random;
@@ -25,7 +27,14 @@ import java.util.Random;
  * State for a render worker.
  */
 public class WorkerState {
-  public Ray ray;
+  public Ray ray = new Ray();
+  public IntersectionRecord intersectionRecord = new IntersectionRecord();
+  public Ray sampleRay = new Ray();
+  public IntersectionRecord sampleRecord = new IntersectionRecord();
+  public Vector3 throughput = new Vector3(1);
+  public Vector4 color = new Vector4();
+  public Vector3 emittance = new Vector3();
+  public Vector4 sampleColor = new Vector4();
   public Vector4 attenuation = new Vector4();
   public Random random;
 }

@@ -20,15 +20,14 @@ package se.llbit.chunky.ui.render.tabs;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
+import org.controlsfx.control.ToggleSwitch;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -46,16 +45,16 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class TexturesTab extends ScrollPane implements RenderControlsTab, Initializable {
-  private RenderController controller;
+public class TexturesTab extends RenderControlsTab implements Initializable {
+  private RenderController renderController;
   private SceneManager sceneManager;
 
   @FXML
-  private CheckBox biomeColors;
+  private ToggleSwitch biomeColors;
   @FXML
   private IntegerAdjuster biomeBlendingRadiusInput;
   @FXML
-  private CheckBox singleColorBtn;
+  private ToggleSwitch singleColorBtn;
   @FXML
   private Button editResourcePacks;
 
@@ -139,14 +138,14 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
     warning.setTitle("Chunk reload required");
     ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
     if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
-      controller.getSceneManager().reloadChunks();
+      renderController.getSceneManager().reloadChunks();
     }
   }
 
   @Override
-  public void setController(RenderControlsFxController fxController) {
-    controller = fxController.getRenderController();
-    sceneManager = controller.getSceneManager();
+  protected void onSetController(RenderControlsFxController fxController) {
+    renderController = fxController.getRenderController();
+    sceneManager = renderController.getSceneManager();
   }
 
   @Override
@@ -162,7 +161,7 @@ public class TexturesTab extends ScrollPane implements RenderControlsTab, Initia
   }
 
   @Override
-  public Node getTabContent() {
+  public VBox getTabContent() {
     return this;
   }
 }

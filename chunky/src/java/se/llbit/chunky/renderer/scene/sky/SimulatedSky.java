@@ -14,19 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package se.llbit.chunky.renderer.scene.sky;
 
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
+import se.llbit.util.Configurable;
+import se.llbit.util.HasControls;
 
 /**
  * Interface for simulated skies.
  */
-public interface SimulatedSky {
+public interface SimulatedSky extends Configurable, HasControls {
   /**
    * Update the sun if necessary. Returns true if the sun was updated (and cache needs to be purged).
    */
-  boolean updateSun(Sun sun, double horizonOffset);
+  boolean updateSun(Sun sun);
 
   /**
    * Calculate the sky color for a given ray.

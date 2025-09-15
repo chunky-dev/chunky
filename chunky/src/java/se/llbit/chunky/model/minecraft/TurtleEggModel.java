@@ -192,6 +192,7 @@ public class TurtleEggModel extends QuadModel {
   private final Texture[] textures;
 
   public TurtleEggModel(int eggs, int hatch) {
+    refractive = true;
     eggs = Math.max(1, Math.min(egg_models.length, eggs));
     hatch = Math.max(0, Math.min(rot.length, hatch));
     ArrayList<Quad> quads = new ArrayList<>();

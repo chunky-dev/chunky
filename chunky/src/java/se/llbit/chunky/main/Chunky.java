@@ -28,7 +28,6 @@ import se.llbit.chunky.plugin.loader.PluginManager;
 import se.llbit.chunky.plugin.loader.JarPluginLoader;
 import se.llbit.chunky.plugin.manifest.PluginManifest;
 import se.llbit.chunky.renderer.*;
-import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -59,9 +58,9 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 /**
- * Chunky is a Minecraft mapping and rendering tool created byJesper Öqvist (jesper@llbit.se).
+ * Chunky is a Minecraft mapping and rendering tool created by Jesper Öqvist (jesper@llbit.se).
  *
- * <p>Read more about Chunky at <a href="https://chunky.llbit.se">https://chunky.llbit.se</a>.
+ * <p>Read more about Chunky at <a href="https://chunky-dev.github.io/docs/">https://chunky-dev.github.io/docs/</a>.
  */
 public class Chunky {
   static {

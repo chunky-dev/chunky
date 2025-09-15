@@ -24,6 +24,8 @@ import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -661,9 +663,8 @@ public class FlowerPotModel extends QuadModel {
     if (kind == Kind.OPEN_EYEBLOSSOM) {
       return new FlowerPotModel(Kind.OPEN_EYEBLOSSOM) {
         @Override
-        public boolean intersect(Ray ray, Scene scene) {
+        public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
           boolean hit = false;
-          ray.t = Double.POSITIVE_INFINITY;
 
           Quad[] quads = getQuads();
           Texture[] textures = getTextures();
@@ -673,29 +674,32 @@ public class FlowerPotModel extends QuadModel {
           Tint tint = Tint.NONE;
           for (int i = 0; i < quads.length; ++i) {
             Quad quad = quads[i];
-            if (quad.intersect(ray)) {
-              float[] c = textures[i].getColor(ray.u, ray.v);
-              if (c[3] > Ray.EPSILON) {
+            double distance = intersectionRecord.distance;
+            if (quad.closestIntersection(ray, intersectionRecord)) {
+              float[] c = textures[i].getColor(intersectionRecord.uv.x, intersectionRecord.uv.y);
+              if (c[3] > Constants.EPSILON) {
                 tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
                 color = c;
-                ray.t = ray.tNext;
-                if (quad.doubleSided)
-                  ray.orientNormal(quad.n);
-                else
-                  ray.setNormal(quad.n);
+                if (quad.doubleSided) {
+                  intersectionRecord.setNormal(Vector3.orientNormal(ray.d, quad.n));
+                }
+                else {
+                  intersectionRecord.setNormal(quad.n);
+                }
+                intersectionRecord.setNoMediumChange(true);
                 hit = true;
                 if (textures[i] == Texture.openEyeblossomEmissive) {
-                  ray.setCurrentMaterial(OpenEyeblossom.emissiveMaterial);
+                  intersectionRecord.material = OpenEyeblossom.emissiveMaterial;
                 }
+              } else {
+                intersectionRecord.distance = distance;
               }
             }
           }
 
           if (hit) {
-            ray.color.set(color);
-            tint.tint(ray.color, ray, scene);
-            ray.distance += ray.t;
-            ray.o.scaleAdd(ray.t, ray.d);
+            intersectionRecord.color.set(color);
+            tint.tint(intersectionRecord.color, ray, scene);
           }
           return hit;
         }

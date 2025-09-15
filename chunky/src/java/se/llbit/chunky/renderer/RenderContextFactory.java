@@ -18,7 +18,6 @@
 package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.main.Chunky;
-import se.llbit.chunky.main.ChunkyOptions;
 
 public interface RenderContextFactory {
   RenderContext newRenderContext(Chunky chunky);

@@ -4,6 +4,8 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.json.JsonObject;
 import se.llbit.math.ColorUtil;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
 
 public class DyedTextureMaterial extends Material {
@@ -84,39 +86,24 @@ public class DyedTextureMaterial extends Material {
   }
 
   @Override
-  public void getColor(Ray ray) {
-    super.getColor(ray);
-    if (ray.color.w > Ray.EPSILON) {
-      ray.color.x *= colorRGBA[0];
-      ray.color.y *= colorRGBA[1];
-      ray.color.z *= colorRGBA[2];
+  public void getColor(IntersectionRecord intersectionRecord) {
+    super.getColor(intersectionRecord);
+    if (intersectionRecord.color.w > Constants.EPSILON) {
+      intersectionRecord.color.x *= colorRGBA[0];
+      intersectionRecord.color.y *= colorRGBA[1];
+      intersectionRecord.color.z *= colorRGBA[2];
     }
   }
 
   @Override
   public float[] getColor(double u, double v) {
     float[] color = super.getColor(u, v);
-    if (color[3] > Ray.EPSILON) {
+    if (color[3] > Constants.EPSILON) {
       color = color.clone();
       color[0] *= colorRGBA[0];
       color[1] *= colorRGBA[1];
       color[2] *= colorRGBA[2];
     }
     return color;
-  }
-
-  @Override
-  public void loadMaterialProperties(JsonObject json) {
-    super.loadMaterialProperties(json);
-    updateColor(json.get("color").asInt(DyeColor.WHITE.colorDecimal));
-  }
-
-  public void saveMaterialProperties(JsonObject json) {
-    json.add("ior", this.ior);
-    json.add("specular", this.specular);
-    json.add("emittance", this.emittance);
-    json.add("roughness", this.roughness);
-    json.add("metalness", this.metalness);
-    json.add("color", this.color);
   }
 }

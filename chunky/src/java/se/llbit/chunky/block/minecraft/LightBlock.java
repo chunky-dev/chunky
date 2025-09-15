@@ -18,30 +18,29 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.block.AbstractModelBlock;
-import se.llbit.chunky.model.minecraft.LightBlockModel;
+import se.llbit.chunky.block.MinecraftBlock;
 import se.llbit.chunky.model.TexturedBlockModel;
+import se.llbit.chunky.model.minecraft.LightBlockModel;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector4;
 
-public class LightBlock extends AbstractModelBlock {
+public class LightBlock extends MinecraftBlock {
 
-  private static final TexturedBlockModel previewBlockModel = new TexturedBlockModel(
+  private static final TexturedBlockModel PREVIEW_BLOCK_MODEL = new TexturedBlockModel(
       Texture.light, Texture.light, Texture.light,
       Texture.light, Texture.light, Texture.light
   );
 
-  private final int level;
+  private static final LightBlockModel MODEL = new LightBlockModel();
 
-  private final Vector4 color = new Vector4(1, 1, 1, 1);
+  private final int level;
 
   public LightBlock(String name, int level) {
     super(name, Texture.light);
     this.level = level;
-    this.model = new LightBlockModel(color);
     localIntersect = true;
     solid = false;
   }
@@ -51,16 +50,11 @@ public class LightBlock extends AbstractModelBlock {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
     if (scene.getMode() == RenderMode.PREVIEW) {
-      return previewBlockModel.intersect(ray, scene);
+      return PREVIEW_BLOCK_MODEL.intersect(ray, intersectionRecord, scene);
     }
-    if (scene.getMode() != RenderMode.PREVIEW &&
-        (!scene.getEmittersEnabled() || emittance < Ray.EPSILON
-            || ray.depth >= scene.getRayDepth() - 1 || ray.specular)) {
-      return false;
-    }
-    return this.model.intersect(ray, scene);
+    return MODEL.intersect(ray, intersectionRecord, scene);
   }
 
   @Override

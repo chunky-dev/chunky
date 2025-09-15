@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.block.Void;
 import se.llbit.chunky.block.minecraft.Air;
 import it.unimi.dsi.fastutil.ints.IntIntImmutablePair;
 import se.llbit.chunky.block.Block;
@@ -362,7 +363,7 @@ public class Chunk {
         int y = Math.max(chunkData.minY()+1, Math.min(chunkHeightmap[z * 16 + x] - 1, yMax));
         for (; y > chunkData.minY()+1; --y) {
           Block block = palette.get(chunkData.getBlockAt(x, y, z));
-          if (block != Air.INSTANCE && !block.isWater())
+          if (block != Air.INSTANCE && block != Void.INSTANCE && !block.isWater())
             break;
         }
         heightmap.set(y, pos.x * 16 + x, pos.z * 16 + z);

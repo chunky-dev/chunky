@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.objects.Object2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 public class Position3d2IntPackedArray implements Position2IntStructure {
 

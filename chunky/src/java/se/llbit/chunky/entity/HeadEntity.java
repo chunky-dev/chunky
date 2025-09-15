@@ -202,6 +202,4 @@ public class HeadEntity extends Entity {
     String skin = json.get("skin").stringValue("");
     return new HeadEntity(position, skin, rotation, placement);
   }
-
-
 }

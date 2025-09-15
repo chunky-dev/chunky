@@ -37,11 +37,12 @@ import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.render.tabs.EntitiesTab;
+import se.llbit.math.IntersectionRecord;
+import se.llbit.math.Ray;
 import se.llbit.math.bvh.BVH;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Matrix3;
 import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 import java.io.File;
@@ -191,6 +192,7 @@ public class Poser extends Stage implements Initializable {
     buildBvh();
     GraphicsContext gc = preview.getGraphicsContext2D();
     Ray ray = new Ray();
+    IntersectionRecord intersectionRecord = new IntersectionRecord();
     double aspect = width / (double) height;
     double fovTan = Camera.clampedFovTan(70);
     camPos.set(0, 1, -2);
@@ -198,32 +200,30 @@ public class Poser extends Stage implements Initializable {
       double rayy = fovTan * (.5 - ((double) y) / height);
       for (int x = 0; x < width; ++x) {
         double rayx = fovTan * aspect * (.5 - ((double) x) / width);
-        ray.setDefault();
-        ray.t = Double.MAX_VALUE;
         ray.d.set(rayx, rayy, 1);
         ray.d.normalize();
 
         ray.o.set(camPos);
         while (true) {
-          if (bvh.closestIntersection(ray)) {
-            if (ray.color.w > 0.9) {
+          if (bvh.closestIntersection(ray, intersectionRecord)) {
+            if (intersectionRecord.color.w > 0.9) {
               break;
             }
-            ray.o.scaleAdd(ray.t, ray.d);
+            ray.o.scaleAdd(intersectionRecord.distance, ray.d);
           } else {
             if (x % 20 == 0 || y % 20 == 0) {
-              ray.color.set(0.7, 0.7, 0.7, 1);
+              intersectionRecord.color.set(0.7, 0.7, 0.7, 1);
             } else {
-              ray.color.set(1, 1, 1, 1);
+              intersectionRecord.color.set(1, 1, 1, 1);
             }
             break;
           }
         }
 
-        ray.color.x = QuickMath.min(1, FastMath.sqrt(ray.color.x));
-        ray.color.y = QuickMath.min(1, FastMath.sqrt(ray.color.y));
-        ray.color.z = QuickMath.min(1, FastMath.sqrt(ray.color.z));
-        pixels[y * width + x] = ColorUtil.getRGB(ray.color);
+        intersectionRecord.color.x = QuickMath.min(1, FastMath.sqrt(intersectionRecord.color.x));
+        intersectionRecord.color.y = QuickMath.min(1, FastMath.sqrt(intersectionRecord.color.y));
+        intersectionRecord.color.z = QuickMath.min(1, FastMath.sqrt(intersectionRecord.color.z));
+        pixels[y * width + x] = ColorUtil.getRGB(intersectionRecord.color);
       }
     }
     image.getPixelWriter().setPixels(0, 0, width, height, PIXEL_FORMAT, pixels, 0, width);

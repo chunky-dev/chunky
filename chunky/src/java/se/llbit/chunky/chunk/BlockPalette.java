@@ -19,7 +19,7 @@ package se.llbit.chunky.chunk;
 import se.llbit.chunky.block.*;
 import se.llbit.chunky.block.minecraft.*;
 import se.llbit.chunky.plugin.PluginApi;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.json.JsonValue;
 import se.llbit.math.Octree;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.IntTag;
@@ -52,10 +52,11 @@ import java.util.function.Consumer;
  */
 public class BlockPalette {
   private static final int BLOCK_PALETTE_VERSION = 4;
-  public final int airId, stoneId, waterId;
+  public final int voidId, airId, stoneId, waterId;
   public static final int ANY_ID = Octree.ANY_TYPE;
 
   private final Map<String, Consumer<Block>> materialProperties;
+  public static final Map<String, Consumer<Block>> DEFAULT_MATERIAL_PROPERTIES = getDefaultMaterialProperties();
 
   /**
    * Stone blocks are used for filling invisible regions in the Octree.
@@ -70,13 +71,16 @@ public class BlockPalette {
   public BlockPalette(Map<BlockSpec, Integer> initialMap, List<Block> initialList) {
     this.blockMap = initialMap;
     this.palette = initialList;
-    this.materialProperties = getDefaultMaterialProperties();
+    this.materialProperties = new HashMap<>();
+    CompoundTag voidTag = new CompoundTag();
+    voidTag.add("Name", new StringTag("minecraft:void"));
     CompoundTag airTag = new CompoundTag();
     airTag.add("Name", new StringTag("minecraft:air"));
     CompoundTag stoneTag = new CompoundTag();
     stoneTag.add("Name", new StringTag("minecraft:stone"));
     CompoundTag waterTag = new CompoundTag();
     waterTag.add("Name", new StringTag("minecraft:water"));
+    voidId = put(voidTag);
     airId = put(airTag);
     stoneId = put(stoneTag);
     waterId = put(waterTag);
@@ -86,6 +90,15 @@ public class BlockPalette {
 
   public BlockPalette() {
     this(new ConcurrentHashMap<>(), new CopyOnWriteArrayList<>());
+  }
+
+  public BlockPalette(Map<String, JsonValue> materials) {
+    this();
+    materials.forEach((name, properties) -> {
+      materialProperties.put(name, block -> {
+        block.loadMaterialProperties(properties.asObject());
+      });
+    });
   }
 
   /**
@@ -226,6 +239,10 @@ public class BlockPalette {
    * @param block Block to apply the material configuration to
    */
   public void applyMaterial(Block block) {
+    Consumer<Block> defaultProperties = DEFAULT_MATERIAL_PROPERTIES.get(block.name);
+    if (defaultProperties != null) {
+      defaultProperties.accept(block);
+    }
     Consumer<Block> properties = materialProperties.get(block.name);
     if (properties != null) {
       properties.accept(block);
@@ -246,166 +263,215 @@ public class BlockPalette {
   public static Map<String, Consumer<Block>> getDefaultMaterialProperties() {
     Map<String, Consumer<Block>> materialProperties = new HashMap<>();
     materialProperties.put(
-      "minecraft:water",
-      block -> {
-        block.specular = 0.255f;
-        block.ior = 1.333f;
-        block.refractive = true;
-      });
+        "minecraft:water",
+        block -> {
+          block.ior = 1.333f;
+          block.alpha = 0;
+        });
     materialProperties.put(
-      "minecraft:lava",
+      "minecraft:air",
       block -> {
-        block.emittance = 1.0f;
-      });
+        block.alpha = 0;
+      }
+    );
+    materialProperties.put(
+        "minecraft:void",
+        block -> {
+          block.alpha = 0;
+        }
+    );
+    materialProperties.put(
+        "minecraft:lava",
+        block -> {
+          block.setLightLevel(15);
+        });
     Consumer<Block> glassConfig =
+        block -> {
+          block.ior = 1.52f;
+        };
+    Consumer<Block> stainedGlassConfig =
       block -> {
         block.ior = 1.52f;
-        block.refractive = true;
+        block.transmissionMetalness = 0.95f;
+        float[] color = block.texture.getAvgColorFlat();
+        block.absorptionColor.x = color[0];
+        block.absorptionColor.y = color[1];
+        block.absorptionColor.z = color[2];
+        block.absorption = 1.0f;
+        block.volumeDensity = 0.3f;
       };
     materialProperties.put("minecraft:glass", glassConfig);
     materialProperties.put("minecraft:glass_pane", glassConfig);
-    materialProperties.put("minecraft:white_stained_glass", glassConfig);
-    materialProperties.put("minecraft:orange_stained_glass", glassConfig);
-    materialProperties.put("minecraft:magenta_stained_glass", glassConfig);
-    materialProperties.put("minecraft:light_blue_stained_glass", glassConfig);
-    materialProperties.put("minecraft:yellow_stained_glass", glassConfig);
-    materialProperties.put("minecraft:lime_stained_glass", glassConfig);
-    materialProperties.put("minecraft:pink_stained_glass", glassConfig);
-    materialProperties.put("minecraft:gray_stained_glass", glassConfig);
-    materialProperties.put("minecraft:light_gray_stained_glass", glassConfig);
-    materialProperties.put("minecraft:cyan_stained_glass", glassConfig);
-    materialProperties.put("minecraft:purple_stained_glass", glassConfig);
-    materialProperties.put("minecraft:blue_stained_glass", glassConfig);
-    materialProperties.put("minecraft:brown_stained_glass", glassConfig);
-    materialProperties.put("minecraft:green_stained_glass", glassConfig);
-    materialProperties.put("minecraft:red_stained_glass", glassConfig);
-    materialProperties.put("minecraft:black_stained_glass", glassConfig);
-    materialProperties.put("minecraft:white_stained_glass_pane", glassConfig);
-    materialProperties.put("minecraft:orange_stained_glass_pane", glassConfig);
-    materialProperties.put("minecraft:magenta_stained_glass_pane", glassConfig);
-    materialProperties.put("minecraft:light_blue_stained_glass_pane", glassConfig);
-    materialProperties.put("minecraft:yellow_stained_glass_pane", glassConfig);
-    materialProperties.put("minecraft:lime_stained_glass_pane", glassConfig);
-    materialProperties.put("minecraft:pink_stained_glass_pane", glassConfig);
-    materialProperties.put("minecraft:gray_stained_glass_pane", glassConfig);
-    materialProperties.put("minecraft:light_gray_stained_glass_pane", glassConfig);
-    materialProperties.put("minecraft:cyan_stained_glass_pane", glassConfig);
-    materialProperties.put("minecraft:purple_stained_glass_pane", glassConfig);
-    materialProperties.put("minecraft:blue_stained_glass_pane", glassConfig);
-    materialProperties.put("minecraft:brown_stained_glass_pane", glassConfig);
-    materialProperties.put("minecraft:green_stained_glass_pane", glassConfig);
-    materialProperties.put("minecraft:red_stained_glass_pane", glassConfig);
-    materialProperties.put("minecraft:black_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:white_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:orange_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:magenta_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:light_blue_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:yellow_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:lime_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:pink_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:gray_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:light_gray_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:cyan_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:purple_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:blue_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:brown_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:green_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:red_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:black_stained_glass", stainedGlassConfig);
+    materialProperties.put("minecraft:white_stained_glass_pane", stainedGlassConfig);
+    materialProperties.put("minecraft:orange_stained_glass_pane", stainedGlassConfig);
+    materialProperties.put("minecraft:magenta_stained_glass_pane", stainedGlassConfig);
+    materialProperties.put("minecraft:light_blue_stained_glass_pane", stainedGlassConfig);
+    materialProperties.put("minecraft:yellow_stained_glass_pane", stainedGlassConfig);
+    materialProperties.put("minecraft:lime_stained_glass_pane", stainedGlassConfig);
+    materialProperties.put("minecraft:pink_stained_glass_pane", stainedGlassConfig);
+    materialProperties.put("minecraft:gray_stained_glass_pane", stainedGlassConfig);
+    materialProperties.put("minecraft:light_gray_stained_glass_pane", stainedGlassConfig);
+    materialProperties.put("minecraft:cyan_stained_glass_pane", stainedGlassConfig);
+    materialProperties.put("minecraft:purple_stained_glass_pane", stainedGlassConfig);
+    materialProperties.put("minecraft:blue_stained_glass_pane", stainedGlassConfig);
+    materialProperties.put("minecraft:brown_stained_glass_pane", stainedGlassConfig);
+    materialProperties.put("minecraft:green_stained_glass_pane", stainedGlassConfig);
+    materialProperties.put("minecraft:red_stained_glass_pane", stainedGlassConfig);
+    materialProperties.put("minecraft:black_stained_glass_pane", stainedGlassConfig);
+
+    // IoR for glossy surface
+    materialProperties.put("minecraft:white_glazed_terracotta", glassConfig);
+    materialProperties.put("minecraft:orange_glazed_terracotta", glassConfig);
+    materialProperties.put("minecraft:magenta_glazed_terracotta", glassConfig);
+    materialProperties.put("minecraft:light_blue_glazed_terracotta", glassConfig);
+    materialProperties.put("minecraft:yellow_glazed_terracotta", glassConfig);
+    materialProperties.put("minecraft:lime_glazed_terracotta", glassConfig);
+    materialProperties.put("minecraft:pink_glazed_terracotta", glassConfig);
+    materialProperties.put("minecraft:gray_glazed_terracotta", glassConfig);
+    materialProperties.put("minecraft:light_gray_glazed_terracotta", glassConfig);
+    materialProperties.put("minecraft:cyan_glazed_terracotta", glassConfig);
+    materialProperties.put("minecraft:purple_glazed_terracotta", glassConfig);
+    materialProperties.put("minecraft:blue_glazed_terracotta", glassConfig);
+    materialProperties.put("minecraft:brown_glazed_terracotta", glassConfig);
+    materialProperties.put("minecraft:green_glazed_terracotta", glassConfig);
+    materialProperties.put("minecraft:red_glazed_terracotta", glassConfig);
+    materialProperties.put("minecraft:black_glazed_terracotta", glassConfig);
     materialProperties.put("minecraft:gold_block", block -> {
-      block.specular = 0.04f;
-      block.metalness = 1.0f;
+      block.specular = 1.0f;
+      block.metalness = 0.96f;
       block.setPerceptualSmoothness(0.9);
     });
     materialProperties.put("minecraft:raw_gold_block", block -> {
-      block.metalness = 0.8f;
+      block.specular = 0.8f;
+      block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.5);
     });
     materialProperties.put("minecraft:diamond_block", block -> {
-      block.specular = 0.04f;
+      block.ior = 2.418f;
     });
-    materialProperties.put("minecraft:iron_block", block -> {
-      block.specular = 0.04f;
-      block.metalness = 1.0f;
+    Consumer<Block> ironConfig = block -> {
+      block.specular = 1.0f;
+      block.metalness = 0.96f;
       block.setPerceptualSmoothness(0.9);
-    });
+    };
+    materialProperties.put("minecraft:iron_block", ironConfig);
     materialProperties.put("minecraft:raw_iron_block", block -> {
-      block.metalness = 0.66f;
+      block.specular = 0.66f;
+      block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.3);
     });
-    materialProperties.put("minecraft:iron_bars", block -> {
-      block.specular = 0.04f;
-      block.metalness = 1.0f;
-      block.setPerceptualSmoothness(0.9);
-    });
-    materialProperties.put("minecraft:iron_door", block -> {
-      block.specular = 0.04f;
-      block.metalness = 1.0f;
-      block.setPerceptualSmoothness(0.8);
-    });
-    materialProperties.put("minecraft:iron_trapdoor", block -> {
-      block.specular = 0.04f;
-      block.metalness = 1.0f;
-      block.setPerceptualSmoothness(0.8);
-    });
-    materialProperties.put("minecraft:cauldron", block -> {
-      block.specular = 0.04f;
-      block.metalness = 1.0f;
-      block.setPerceptualSmoothness(0.7);
-    });
+    materialProperties.put("minecraft:iron_bars", ironConfig);
+    materialProperties.put("minecraft:iron_door", ironConfig);
+    materialProperties.put("minecraft:iron_trapdoor", ironConfig);
+    Consumer<Block> cauldronConfig = block -> {
+      block.specular = 1.0f;
+      block.metalness = 0.96f;
+      block.setPerceptualSmoothness(0.5);
+    };
+    materialProperties.put("minecraft:cauldron", cauldronConfig);
+    materialProperties.put("minecraft:lava_cauldron", cauldronConfig);
+    materialProperties.put("minecraft:powder_snow_cauldron", cauldronConfig);
+    materialProperties.put("minecraft:water_cauldron", cauldronConfig);
     materialProperties.put("minecraft:hopper", block -> {
-      block.specular = 0.04f;
-      block.metalness = 1.0f;
+      block.specular = 1.0f;
+      block.metalness = 0.96f;
       block.setPerceptualSmoothness(0.7);
     });
-    materialProperties.put("minecraft:iron_chain", block -> {
-      block.specular = 0.04f;
-      block.metalness = 1.0f;
-      block.setPerceptualSmoothness(0.9);
-    });
-    materialProperties.put("minecraft:redstone_torch", block -> {
+    materialProperties.put("minecraft:iron_chain", ironConfig);
+    Consumer<Block> redstoneTorchConfig = block -> {
+      block.useReferenceColors = true;
+      block.addRefColorGammaCorrected(255, 255, 210, 0.35f);
+      block.addRefColorGammaCorrected(255, 185, 0, 0.25f);
+      block.addRefColorGammaCorrected(221, 0, 0, 0.3f);
       if (block instanceof RedstoneTorch && ((RedstoneTorch) block).isLit()) {
-        block.emittance = 1.0f;
+        block.setLightLevel(7);
       }
+    };
+    materialProperties.put("minecraft:redstone_torch", redstoneTorchConfig);
+    materialProperties.put("minecraft:redstone_wall_torch", redstoneTorchConfig);
+    materialProperties.put("minecraft:redstone_ore", block -> {
+      block.useReferenceColors = true;
+      block.addRefColorGammaCorrected(254, 118, 118, 0.2f);
+      block.addRefColorGammaCorrected(210, 3, 3, 0.2f);
     });
-    materialProperties.put("minecraft:redstone_wall_torch", block -> {
-      if (block instanceof RedstoneWallTorch && ((RedstoneWallTorch) block).isLit()) {
-        block.emittance = 1.0f;
-      }
+    materialProperties.put("minecraft:deepslate_redstone_ore", block -> {
+      block.useReferenceColors = true;
+      block.addRefColorGammaCorrected(254, 118, 118, 0.2f);
+      block.addRefColorGammaCorrected(210, 3, 3, 0.35f);
     });
-    materialProperties.put("minecraft:torch", block -> {
-      block.emittance = 1.0f;
-    });
-    materialProperties.put("minecraft:wall_torch", block -> {
-      block.emittance = 1.0f;
-    });
+    Consumer<Block> torchConfig = block -> {
+      block.useReferenceColors = true;
+      block.addRefColorGammaCorrected(255, 255, 210, 0.35f);
+      block.addRefColorGammaCorrected(255, 185, 0, 0.25f);
+      block.setLightLevel(14);
+    };
+    materialProperties.put("minecraft:torch", torchConfig);
+    materialProperties.put("minecraft:wall_torch", torchConfig);
     materialProperties.put("minecraft:fire", block -> {
-      block.emittance = 1.0f;
+      block.setLightLevel(15);
+      block.emitterMappingOffset = -0.5f;
     });
-    materialProperties.put("minecraft:ice", block -> {
+    Consumer<Block> iceConfig = block -> {
       block.ior = 1.31f;
-      block.refractive = true;
-    });
-    materialProperties.put("minecraft:frosted_ice", block -> {
-      block.ior = 1.31f;
-      block.refractive = true;
-    });
+    };
+    materialProperties.put("minecraft:ice", iceConfig);
+    materialProperties.put("minecraft:frosted_ice", iceConfig);
+    materialProperties.put("minecraft:packed_ice", iceConfig);
+    materialProperties.put("minecraft:blue_ice", iceConfig);
     materialProperties.put("minecraft:glowstone", block -> {
-      block.emittance = 1.0f;
+      block.setLightLevel(15);
     });
     materialProperties.put("minecraft:portal", block -> { // MC <1.13
-      block.emittance = 0.4f;
+      block.setLightLevel(11);
     });
     materialProperties.put("minecraft:nether_portal", block -> { // MC >=1.13
-      block.emittance = 0.4f;
+      block.setLightLevel(11);
     });
     materialProperties.put("minecraft:jack_o_lantern", block -> {
-      block.emittance = 1.0f;
+      block.setLightLevel(15);
+      block.emitterMappingOffset = 0.5f;
     });
     materialProperties.put("minecraft:beacon", block -> {
-      block.emittance = 1.0f;
+      block.setLightLevel(15);
       block.ior = 1.52f;
     });
     materialProperties.put("minecraft:redstone_lamp", block -> {
       if (block instanceof RedstoneLamp && ((RedstoneLamp) block).isLit()) {
-        block.emittance = 1.0f;
+        block.setLightLevel(15);
       }
     });
     materialProperties.put("minecraft:emerald_block", block -> {
-      block.specular = 0.04f;
+      block.ior = 1.5825f;
     });
     materialProperties.put("minecraft:sea_lantern", block -> {
-      block.emittance = 1.0f;
+      block.setLightLevel(15);
     });
     materialProperties.put("minecraft:magma", block -> {
-      block.emittance = 0.6f;
+      block.setLightLevel(3);
+    });
+    materialProperties.put("minecraft:magma_block", block -> {
+      block.setLightLevel(3);
     });
     materialProperties.put("minecraft:end_rod", block -> {
-      block.emittance = 1.0f;
+      block.useReferenceColors = true;
+      block.addRefColorGammaCorrected(248, 236, 219, 0.3f);
+      block.setLightLevel(14);
     });
     materialProperties.put("minecraft:kelp", block -> {
       block.waterlogged = true;
@@ -415,92 +481,110 @@ public class BlockPalette {
     });
     materialProperties.put("minecraft:seagrass", block -> {
       block.waterlogged = true;
+      block.subSurfaceScattering = 0.3f;
     });
     materialProperties.put("minecraft:tall_seagrass", block -> {
       block.waterlogged = true;
+      block.subSurfaceScattering = 0.3f;
     });
     materialProperties.put("minecraft:sea_pickle", block -> {
       if (block instanceof SeaPickle) {
         if (((SeaPickle) block).live) {
-          block.emittance = 1.0f / 15f * (3 * ((SeaPickle) block).pickles + 1);
+          block.setLightLevel(3 * ((SeaPickle) block).pickles + 1);
         }
       }
     });
-    materialProperties.put("minecraft:campfire", block -> {
-      if (block instanceof Campfire && ((Campfire) block).isLit) {
-        block.emittance = 1.0f;
-      }
-    });
     materialProperties.put("minecraft:furnace", block -> {
-      if (block instanceof Furnace && ((Furnace) block).isLit()) {
-        block.emittance = 1.0f;
+      block.useReferenceColors = true;
+      block.addRefColorGammaCorrected(255, 255, 215, 0.38f);
+      block.addRefColorGammaCorrected(230, 171, 16, 0.38f);
+      if(block instanceof Furnace && ((Furnace)block).isLit()) {
+        block.setLightLevel(13);
       }
     });
     materialProperties.put("minecraft:smoker", block -> {
-      if (block instanceof Smoker && ((Smoker) block).isLit()) {
-        block.emittance = 1.0f;
+      block.useReferenceColors = true;
+      block.addRefColorGammaCorrected(228, 169, 17, 0.32f);
+      if(block instanceof Smoker && ((Smoker)block).isLit()) {
+        block.setLightLevel(13);
       }
     });
     materialProperties.put("minecraft:blast_furnace", block -> {
-      if (block instanceof BlastFurnace && ((BlastFurnace) block).isLit()) {
-        block.emittance = 1.0f;
+      block.useReferenceColors = true;
+      block.addRefColorGammaCorrected(224, 128, 46, 0.25f);
+      if(block instanceof BlastFurnace && ((BlastFurnace)block).isLit()) {
+        block.setLightLevel(13);
       }
     });
     materialProperties.put("minecraft:lantern", block -> {
-      block.emittance = 1.0f;
+      block.useReferenceColors = true;
+      block.addRefColorGammaCorrected(254, 254, 179, 0.25f);
+      block.addRefColorGammaCorrected(253, 158, 76, 0.45f);
+      block.addRefColorGammaCorrected(134, 73, 42, 0.05f);
+      block.setLightLevel(15);
     });
     materialProperties.put("minecraft:shroomlight", block -> {
-      block.emittance = 1.0f;
+      block.setLightLevel(15);
     });
     materialProperties.put("minecraft:soul_fire_lantern", block -> { // MC 20w06a-20w16a
-      block.emittance = 0.6f;
+      block.useReferenceColors = true;
+      block.addRefColorGammaCorrected(220, 252, 255, 0.5f);
+      block.addRefColorGammaCorrected(76, 198, 202, 0.3f);
+      block.setLightLevel(10);
     });
     materialProperties.put("minecraft:soul_lantern", block -> { // MC >= 20w17a
-      block.emittance = 0.6f;
+      block.useReferenceColors = true;
+      block.addRefColorGammaCorrected(220, 252, 255, 0.5f);
+      block.addRefColorGammaCorrected(76, 198, 202, 0.3f);
+      block.setLightLevel(10);
     });
-    materialProperties.put("minecraft:soul_fire_torch", block -> { // MC 20w06a-20w16a
-      block.emittance = 0.6f;
-    });
-    materialProperties.put("minecraft:soul_torch", block -> { // MC >= 20w17a
-      block.emittance = 0.6f;
-    });
-    materialProperties.put("minecraft:soul_fire_wall_torch", block -> { // MC 20w06a-20w16a
-      block.emittance = 0.6f;
-    });
-    materialProperties.put("minecraft:soul_wall_torch", block -> { // MC >= 20w17a
-      block.emittance = 0.6f;
-    });
+    Consumer<Block> soulTorchConfig = block -> {
+      block.useReferenceColors = true;
+      block.addRefColorGammaCorrected(199, 252, 254, 0.45f);
+      block.addRefColorGammaCorrected(35, 204, 209, 0.25f);
+      block.setLightLevel(10);
+    };
+    materialProperties.put("minecraft:soul_fire_torch", soulTorchConfig);
+    materialProperties.put("minecraft:soul_torch", soulTorchConfig);
+    materialProperties.put("minecraft:soul_fire_wall_torch", soulTorchConfig);
+    materialProperties.put("minecraft:soul_wall_torch", soulTorchConfig);
     materialProperties.put("minecraft:soul_fire", block -> {
-      block.emittance = 0.6f;
+      block.setLightLevel(10);
+      block.emitterMappingOffset = -0.5f;
     });
     materialProperties.put("minecraft:crying_obsidian", block -> {
-      block.emittance = 0.6f;
+      block.setLightLevel(10);
+      block.ior = 1.493f;
     });
     materialProperties.put("minecraft:enchanting_table", block -> {
-      block.emittance = 0.5f;
+      block.setLightLevel(7);
     });
     materialProperties.put("minecraft:respawn_anchor", block -> {
       if (block instanceof RespawnAnchor) {
         int charges = ((RespawnAnchor) block).charges;
         if (charges > 0) {
-          block.emittance = 1.0f / 15 * (charges * 4 - 2);
+          block.setLightLevel(charges * 4 - 2);
         }
       }
     });
     Consumer<Block> copperConfig = block -> {
+      block.specular = 1.0f;
       block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.75);
     };
     Consumer<Block> exposedCopperConfig = block -> {
-      block.metalness = 0.66f;
+      block.specular = 0.66f;
+      block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.75);
     };
     Consumer<Block> weatheredCopperConfig = block -> {
-      block.metalness = 0.66f;
+      block.specular = 0.66f;
+      block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.75);
     };
     materialProperties.put("minecraft:raw_copper_block", block -> {
-      block.metalness = 0.66f;
+      block.specular = 0.66f;
+      block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.5);
     });
     for (String s : new String[]{"minecraft:", "minecraft:waxed_"}) {
@@ -577,78 +661,222 @@ public class BlockPalette {
       });
     }
     materialProperties.put("minecraft:small_amethyst_bud", block -> {
-      block.emittance = 1.0f / 15f;
+      block.setLightLevel(1);
+      block.ior = 1.543f;
     });
     materialProperties.put("minecraft:medium_amethyst_bud", block -> {
-      block.emittance = 1.0f / 15f * 2;
+      block.setLightLevel(2);
+      block.ior = 1.543f;
     });
     materialProperties.put("minecraft:large_amethyst_bud", block -> {
-      block.emittance = 1.0f / 15f * 4;
+      block.setLightLevel(4);
+      block.ior = 1.543f;
     });
     materialProperties.put("minecraft:amethyst_cluster", block -> {
-      block.emittance = 1.0f / 15f * 5;
+      block.setLightLevel(5);
+      block.ior = 1.543f;
+    });
+    materialProperties.put("minecraft:budding_amethyst", block -> {
+      block.ior = 1.543f;
+    });
+    materialProperties.put("minecraft:amethyst_block", block -> {
+      block.ior = 1.543f;
     });
     materialProperties.put("minecraft:tinted_glass", glassConfig);
     materialProperties.put("minecraft:sculk_sensor", block -> {
       if (block instanceof SculkSensor && ((SculkSensor) block).isActive()) {
-        block.emittance = 1.0f / 15f;
+        block.setLightLevel(1);
       }
     });
     materialProperties.put("minecraft:calibrated_sculk_sensor", block -> {
       if (block instanceof CalibratedSculkSensor && ((CalibratedSculkSensor) block).isActive()) {
-        block.emittance = 1.0f / 15f;
+        block.setLightLevel(1);
       }
     });
+    Consumer<Block> foliageConfig = block -> {
+      block.subSurfaceScattering = 0.3f;
+    };
+    materialProperties.put("minecraft:grass", foliageConfig);
+    materialProperties.put("minecraft:tall_grass", foliageConfig);
+    materialProperties.put("minecraft:short_grass", foliageConfig);
+    materialProperties.put("minecraft:sugar_cane", foliageConfig);
+    materialProperties.put("minecraft:beetroots", foliageConfig);
+    materialProperties.put("minecraft:carrots", foliageConfig);
+    materialProperties.put("minecraft:potatoes", foliageConfig);
+    materialProperties.put("minecraft:melon_stem", foliageConfig);
+    materialProperties.put("minecraft:attached_melon_stem", foliageConfig);
+    materialProperties.put("minecraft:pumpkin_stem", foliageConfig);
+    materialProperties.put("minecraft:attached_pumpkin_stem", foliageConfig);
+    materialProperties.put("minecraft:wheat", foliageConfig);
+    materialProperties.put("minecraft:big_dripleaf", foliageConfig);
+    materialProperties.put("minecraft:big_dripleaf_stem", foliageConfig);
+    materialProperties.put("minecraft:small_dripleaf", foliageConfig);
+    materialProperties.put("minecraft:fern", foliageConfig);
+    materialProperties.put("minecraft:large_fern", foliageConfig);
+    materialProperties.put("minecraft:allium", foliageConfig);
+    materialProperties.put("minecraft:azure_bluet", foliageConfig);
+    materialProperties.put("minecraft:blue_orchid", foliageConfig);
+    materialProperties.put("minecraft:cornflower", foliageConfig);
+    materialProperties.put("minecraft:dandelion", foliageConfig);
+    materialProperties.put("minecraft:lily_of_the_valley", foliageConfig);
+    materialProperties.put("minecraft:oxeye_daisy", foliageConfig);
+    materialProperties.put("minecraft:poppy", foliageConfig);
+    materialProperties.put("minecraft:torchflower", foliageConfig);
+    materialProperties.put("minecraft:orange_tulip", foliageConfig);
+    materialProperties.put("minecraft:pink_tulip", foliageConfig);
+    materialProperties.put("minecraft:red_tulip", foliageConfig);
+    materialProperties.put("minecraft:white_tulip", foliageConfig);
+    materialProperties.put("minecraft:wither_rose", foliageConfig);
+    materialProperties.put("minecraft:lilac", foliageConfig);
+    materialProperties.put("minecraft:peony", foliageConfig);
+    materialProperties.put("minecraft:pitcher_plant", foliageConfig);
+    materialProperties.put("minecraft:rose_bush", foliageConfig);
+    materialProperties.put("minecraft:sunflower", foliageConfig);
+    materialProperties.put("minecraft:mangrove_propagule", foliageConfig);
+    materialProperties.put("minecraft:pink_petals", foliageConfig);
+    materialProperties.put("minecraft:oak_sapling", foliageConfig);
+    materialProperties.put("minecraft:spruce_sapling", foliageConfig);
+    materialProperties.put("minecraft:birch_sapling", foliageConfig);
+    materialProperties.put("minecraft:jungle_sapling", foliageConfig);
+    materialProperties.put("minecraft:acacia_sapling", foliageConfig);
+    materialProperties.put("minecraft:dark_oak_sapling", foliageConfig);
+    materialProperties.put("minecraft:cherry_sapling", foliageConfig);
+    materialProperties.put("minecraft:oak_leaves", foliageConfig);
+    materialProperties.put("minecraft:spruce_leaves", foliageConfig);
+    materialProperties.put("minecraft:birch_leaves", foliageConfig);
+    materialProperties.put("minecraft:jungle_leaves", foliageConfig);
+    materialProperties.put("minecraft:acacia_acacia", foliageConfig);
+    materialProperties.put("minecraft:dark_oak_leaves", foliageConfig);
+    materialProperties.put("minecraft:mangrove_leaves", foliageConfig);
+    materialProperties.put("minecraft:cherry_leaves", foliageConfig);
+    materialProperties.put("minecraft:azalea_leaves", foliageConfig);
+    materialProperties.put("minecraft:flowering_azalea_leaves", foliageConfig);
+    materialProperties.put("minecraft:sweet_berry_bush", foliageConfig);
     materialProperties.put("minecraft:glow_lichen", block -> {
-      block.emittance = 1.0f / 15f * 7;
+      block.setLightLevel(1);
+      block.subSurfaceScattering = 0.3f;
     });
-    materialProperties.put("minecraft:cave_vines_plant", block -> {
+    Consumer<Block> caveVinesConfig = block -> {
+      block.subSurfaceScattering = 0.3f;
+      block.useReferenceColors = true;
+      block.addRefColorGammaCorrected(241, 189, 85, 0.3f);
+      block.addRefColorGammaCorrected(164, 100, 34, 0.05f);
       if (block instanceof CaveVines && ((CaveVines) block).hasBerries()) {
-        block.emittance = 1.0f / 15f * 14;
+        block.setLightLevel(14);
       }
-    });
-    materialProperties.put("minecraft:cave_vines", block -> {
-      if (block instanceof CaveVines && ((CaveVines) block).hasBerries()) {
-        block.emittance = 1.0f / 15f * 14;
-      }
-    });
+    };
+    materialProperties.put("minecraft:cave_vines_plant", caveVinesConfig);
+    materialProperties.put("minecraft:cave_vines", caveVinesConfig);
+    materialProperties.put("minecraft:vines", foliageConfig);
     materialProperties.put("minecraft:light", block -> {
       if (block instanceof LightBlock) {
         block.emittance = 1.0f / 15f * 4 * ((LightBlock) block).getLevel();
       }
     });
     materialProperties.put("minecraft:ochre_froglight", block -> {
-      block.emittance = 1.0f;
+      block.setLightLevel(15);
+      block.emitterMappingOffset = 1.0f;
     });
     materialProperties.put("minecraft:verdant_froglight", block -> {
-      block.emittance = 1.0f;
+      block.setLightLevel(15);
+      block.emitterMappingOffset = 1.0f;
     });
     materialProperties.put("minecraft:pearlescent_froglight", block -> {
-      block.emittance = 1.0f;
+      block.setLightLevel(15);
+      block.emitterMappingOffset = 1.0f;
     });
     materialProperties.put("minecraft:sculk_catalyst", block -> {
-      block.emittance = 1.0f / 15f * 6;
+      block.setLightLevel(6);
     });
-    for (String s : new String[]{"minecraft:", "minecraft:waxed_"}) {
+    Consumer<Block> copperBulbRedLight = block -> {
+      block.addRefColorGammaCorrected(217, 35, 35, 0.05f);
+      block.addRefColorGammaCorrected(176, 23, 23, 0.05f);
+      block.addRefColorGammaCorrected(163, 24, 24, 0.05f);
+      block.addRefColorGammaCorrected(138, 24, 24, 0.05f);
+    };
+    for(String s : new String[]{"minecraft:", "minecraft:waxed_"}) {
       materialProperties.put(s + "copper_bulb", block -> {
-        if (block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
-          block.emittance = 1.0f;
+        block.useReferenceColors = true;
+        block.addRefColorGammaCorrected(255, 235, 186, 0.25f);
+        block.addRefColorGammaCorrected(251, 184, 96, 0.25f);
+        copperBulbRedLight.accept(block);
+        copperConfig.accept(block);
+        if(block instanceof CopperBulb && (((CopperBulb) block).isLit() || ((CopperBulb) block).isPowered())) {
+          block.setLightLevel(15);
         }
       });
       materialProperties.put(s + "exposed_copper_bulb", block -> {
-        if (block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
-          block.emittance = 12 / 15f;
+        block.useReferenceColors = true;
+        block.addRefColorGammaCorrected(253, 202, 138, 0.25f);
+        block.addRefColorGammaCorrected(223, 139, 41, 0.2f);
+        copperBulbRedLight.accept(block);
+        exposedCopperConfig.accept(block);
+        if(block instanceof CopperBulb && (((CopperBulb) block).isLit() || ((CopperBulb) block).isPowered())) {
+          block.setLightLevel(12);
         }
       });
       materialProperties.put(s + "weathered_copper_bulb", block -> {
-        if (block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
-          block.emittance = 8 / 15f;
+        block.useReferenceColors = true;
+        block.addRefColorGammaCorrected(234, 184, 91, 0.25f);
+        block.addRefColorGammaCorrected(224, 151, 53, 0.25f);
+        copperBulbRedLight.accept(block);
+        weatheredCopperConfig.accept(block);
+        if(block instanceof CopperBulb && (((CopperBulb) block).isLit() || ((CopperBulb) block).isPowered())) {
+          block.setLightLevel(8);
         }
       });
       materialProperties.put(s + "oxidized_copper_bulb", block -> {
-        if (block instanceof CopperBulb && ((CopperBulb) block).isLit()) {
-          block.emittance = 4 / 15f;
+        block.useReferenceColors = true;
+        block.addRefColorGammaCorrected(212, 153, 67, 0.25f);
+        block.addRefColorGammaCorrected(191, 113, 65, 0.25f);
+        copperBulbRedLight.accept(block);
+        if(block instanceof CopperBulb && (((CopperBulb) block).isLit() || ((CopperBulb) block).isPowered())) {
+          block.setLightLevel(4);
         }
+      });
+      materialProperties.put("minecraft:calcite", block -> {
+        block.ior = 1.486f;
+      });
+      materialProperties.put("minecraft:lapis_block", block -> {
+        block.ior = 1.525f;
+      });
+      materialProperties.put("minecraft:obsidian", block -> {
+        block.ior = 1.493f;
+      });
+      materialProperties.put("minecraft:quartz_block", block -> {
+        block.ior = 1.594f;
+      });
+      materialProperties.put("minecraft:quartz_pillar", block -> {
+        block.ior = 1.594f;
+      });
+      materialProperties.put("minecraft:chiseled_quartz_block", block -> {
+        block.ior = 1.594f;
+      });
+      materialProperties.put("minecraft:smooth_quartz", block -> {
+        block.ior = 1.594f;
+      });
+      materialProperties.put("minecraft:quartz_bricks", block -> {
+        block.ior = 1.594f;
+      });
+      materialProperties.put("minecraft:honey_block", block -> {
+        block.ior = 1.474f; // according to https://study.com/academy/answer/what-is-the-refractive-index-of-honey.html
+        block.transmissionMetalness = 0.95f;
+        float[] color = block.texture.getAvgColorFlat();
+        block.absorptionColor.x = color[0];
+        block.absorptionColor.y = color[1];
+        block.absorptionColor.z = color[2];
+        block.absorption = 1.0f;
+        block.volumeDensity = 0.3f;
+      });
+      materialProperties.put("minecraft:slime_block", block -> {
+        block.ior = 1.516f; // gelatin, according to https://study.com/academy/answer/what-is-the-refractive-index-of-gelatin.html
+        block.transmissionMetalness = 0.95f;
+        float[] color = block.texture.getAvgColorFlat();
+        block.absorptionColor.x = color[0];
+        block.absorptionColor.y = color[1];
+        block.absorptionColor.z = color[2];
+        block.absorption = 1.0f;
+        block.volumeDensity = 0.3f;
       });
     }
     materialProperties.put("minecraft:copper_wall_torch", block -> {

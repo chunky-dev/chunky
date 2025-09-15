@@ -7,6 +7,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
+<?import org.controlsfx.control.ToggleSwitch?>
 
 <fx:root spacing="10.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <Label text="Load skybox textures:" />
@@ -30,4 +31,5 @@
   <DoubleAdjuster fx:id="skyboxPitch" />
   <DoubleAdjuster fx:id="skyboxYaw" />
   <DoubleAdjuster fx:id="skyboxRoll" />
+  <ToggleSwitch fx:id="textureInterpolation" text="Texture interpolation"/>
 </fx:root>

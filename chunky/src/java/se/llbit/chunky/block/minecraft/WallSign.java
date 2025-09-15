@@ -18,24 +18,19 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.SignEntity;
 import se.llbit.chunky.entity.WallSignEntity;
-import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
-public class WallSign extends MinecraftBlockTranslucent {
+public class WallSign extends EmptyModelBlock {
   private final int facing;
   private final String material;
 
   public WallSign(String name, String material, String facing) {
     super(name, SignEntity.textureFromMaterial(material));
     invisible = true;
-    solid = false;
-    localIntersect = true;
     this.material = material;
     switch (facing) {
       default:
@@ -52,10 +47,6 @@ public class WallSign extends MinecraftBlockTranslucent {
         this.facing = 5;
         break;
     }
-  }
-
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override public boolean isBlockEntity() {

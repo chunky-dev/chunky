@@ -3,15 +3,18 @@ package se.llbit.chunky.entity;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import se.llbit.chunky.PersistentSettings;
+import javafx.scene.layout.VBox;
 import se.llbit.chunky.model.Model;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.Json;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.math.Constants;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -234,7 +237,7 @@ public class Book extends Entity implements Poseable {
     double pagesDistance = (1 - Math.sin(Math.PI / 2 - pageAngle)) / 16.0;
 
     for (int i = 0; i < leftPages.length; i++) {
-      if (i == 5 && openAngle < Ray.EPSILON) {
+      if (i == 5 && openAngle < Constants.EPSILON) {
         continue; // the cover would overlay the pages if the book is closed
       }
       if (i == 4 && (pageAngleA >= (Math.PI + openAngle) / 2
@@ -247,7 +250,7 @@ public class Book extends Entity implements Poseable {
     }
 
     for (int i = 0; i < rightPages.length; i++) {
-      if (i == 5 && openAngle < Ray.EPSILON) {
+      if (i == 5 && openAngle < Constants.EPSILON) {
         continue; // the cover would overlay the pages if the book is closed
       }
       if (i == 4 && (pageAngleA <= (Math.PI - openAngle) / 2
@@ -354,5 +357,49 @@ public class Book extends Entity implements Poseable {
 
   public void setPageAngleB(double pageAngleB) {
     this.pageAngleB = pageAngleB;
+  }
+
+  @Override
+  public VBox getControls(RenderControlsTab parent) {
+    Scene scene = parent.getChunkyScene();
+
+    VBox controls = new VBox();
+
+    DoubleAdjuster openingAngle = new DoubleAdjuster();
+    openingAngle.setName("Opening angle");
+    openingAngle.setTooltip("Modifies the book's opening angle.");
+    openingAngle.set(Math.toDegrees(getOpenAngle()));
+    openingAngle.setRange(0, 180);
+    openingAngle.onValueChange(value -> {
+      setOpenAngle(Math.toRadians(value));
+      scene.rebuildActorBvh();
+    });
+    controls.getChildren().add(openingAngle);
+
+    DoubleAdjuster page1Angle = new DoubleAdjuster();
+    page1Angle.setName("Page 1 angle");
+    page1Angle.setTooltip("Modifies the book's first visible page's angle.");
+    page1Angle.set(Math.toDegrees(getPageAngleA()));
+    page1Angle.setRange(0, 180);
+    page1Angle.onValueChange(value -> {
+      setPageAngleA(Math.toRadians(value));
+      scene.rebuildActorBvh();
+    });
+    controls.getChildren().add(page1Angle);
+
+    DoubleAdjuster page2Angle = new DoubleAdjuster();
+    page2Angle.setName("Page 2 angle");
+    page2Angle.setTooltip("Modifies the book's second visible page's angle.");
+    page2Angle.set(Math.toDegrees(getPageAngleB()));
+    page2Angle.setRange(0, 180);
+    page2Angle.onValueChange(value -> {
+      setPageAngleB(Math.toRadians(value));
+      scene.rebuildActorBvh();
+    });
+    controls.getChildren().add(page2Angle);
+
+    controls.setSpacing(6);
+
+    return controls;
   }
 }

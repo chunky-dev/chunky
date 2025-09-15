@@ -31,7 +31,7 @@
                     <Font name="System Bold" size="14.0"/>
                   </font>
                 </Label>
-                <Label fx:id="copyrightLine" text="Copyright (c) 2010-2024, Jesper Öqvist and Chunky contributors" wrapText="true">
+                <Label fx:id="copyrightLine" text="Copyright (c) 2010-2025, Jesper Öqvist and Chunky contributors" wrapText="true">
                   <padding>
                     <Insets top="10.0"/>
                   </padding>
@@ -60,12 +60,17 @@
           <children>
             <VBox>
               <children>
-                <Label text="Lead Developers">
+                <Label text="Creator">
                   <font>
                     <Font name="System Bold" size="12.0"/>
                   </font>
                 </Label>
                 <Label text="Jesper Öqvist"/>
+                <Label text="Main maintainer">
+                  <font>
+                    <Font name="System Bold" size="12.0"/>
+                  </font>
+                </Label>
                 <Label text="leMaik"/>
               </children>
             </VBox>
@@ -98,6 +103,7 @@
                         <Label text="ThatRedox"/>
                         <Label text="TOGoS"/>
                         <Label text="NotStirred"/>
+                        <Label text="Peregrine05"/>
                       </children>
                     </VBox>
                     <VBox>
@@ -256,6 +262,19 @@
                       </padding>
                     </Hyperlink>
                     <Hyperlink fx:id="apacheCliLicense" text="Apache License 2.0">
+                      <font>
+                        <Font size="10.0"/>
+                      </font>
+                      <padding>
+                        <Insets left="20.0"/>
+                      </padding>
+                    </Hyperlink>
+                    <Hyperlink fx:id="controlsfx" text="ControlsFX">
+                      <padding>
+                        <Insets/>
+                      </padding>
+                    </Hyperlink>
+                    <Hyperlink fx:id="controlsFXLicense" text="BSD-3-Clause license">
                       <font>
                         <Font size="10.0"/>
                       </font>

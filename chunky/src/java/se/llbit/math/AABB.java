@@ -16,6 +16,9 @@
  */
 package se.llbit.math;
 
+import it.unimi.dsi.fastutil.doubles.DoubleDoubleImmutablePair;
+import se.llbit.chunky.renderer.scene.Scene;
+
 import java.util.Random;
 
 /**
@@ -24,7 +27,7 @@ import java.util.Random;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class AABB {
+public class AABB implements Intersectable {
 
   public double xmin;
   public double xmax;
@@ -93,92 +96,90 @@ public class AABB {
    *
    * @return <code>true</code> if the ray intersects this AABB
    */
-  public boolean intersect(Ray ray) {
-    double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
-    double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
-    double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
+  public boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
+    double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Constants.OFFSET);
+    double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Constants.OFFSET);
+    double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Constants.OFFSET);
     double t;
     double u, v;
     boolean hit = false;
 
-    ray.tNext = ray.t;
-
     t = (xmin - ix) / ray.d.x;
-    if (t < ray.tNext && t > -Ray.EPSILON) {
+    if (t < intersectionRecord.distance + Constants.OFFSET && t > -Constants.EPSILON) {
       u = iz + ray.d.z * t;
       v = iy + ray.d.y * t;
       if (u >= zmin && u <= zmax &&
           v >= ymin && v <= ymax) {
         hit = true;
-        ray.tNext = t;
-        ray.u = u;
-        ray.v = v;
-        ray.setNormal(-1, 0, 0);
+        intersectionRecord.distance = t;
+        intersectionRecord.uv.x = u;
+        intersectionRecord.uv.y = v;
+        intersectionRecord.setNormal(-1, 0, 0);
       }
     }
     t = (xmax - ix) / ray.d.x;
-    if (t < ray.tNext && t > -Ray.EPSILON) {
+    if (t < intersectionRecord.distance + Constants.OFFSET && t > -Constants.EPSILON) {
       u = iz + ray.d.z * t;
       v = iy + ray.d.y * t;
       if (u >= zmin && u <= zmax &&
           v >= ymin && v <= ymax) {
         hit = true;
-        ray.tNext = t;
-        ray.u = 1 - u;
-        ray.v = v;
-        ray.setNormal(1, 0, 0);
+        intersectionRecord.distance = t;
+        intersectionRecord.uv.x = 1 - u;
+        intersectionRecord.uv.y = v;
+        intersectionRecord.setNormal(1, 0, 0);
       }
     }
     t = (ymin - iy) / ray.d.y;
-    if (t < ray.tNext && t > -Ray.EPSILON) {
+    if (t < intersectionRecord.distance + Constants.OFFSET && t > -Constants.EPSILON) {
       u = ix + ray.d.x * t;
       v = iz + ray.d.z * t;
       if (u >= xmin && u <= xmax &&
           v >= zmin && v <= zmax) {
         hit = true;
-        ray.tNext = t;
-        ray.u = u;
-        ray.v = v;
-        ray.setNormal(0, -1, 0);
+        intersectionRecord.distance = t;
+        intersectionRecord.uv.x = u;
+        intersectionRecord.uv.y = v;
+        intersectionRecord.setNormal(0, -1, 0);
       }
     }
     t = (ymax - iy) / ray.d.y;
-    if (t < ray.tNext && t > -Ray.EPSILON) {
+    if (t < intersectionRecord.distance + Constants.OFFSET && t > -Constants.EPSILON) {
       u = ix + ray.d.x * t;
       v = iz + ray.d.z * t;
       if (u >= xmin && u <= xmax &&
           v >= zmin && v <= zmax) {
         hit = true;
-        ray.tNext = t;
-        ray.u = u;
-        ray.v = v;
-        ray.setNormal(0, 1, 0);
+        intersectionRecord.distance = t;
+        intersectionRecord.uv.x = u;
+        intersectionRecord.uv.y = v;
+        intersectionRecord.setNormal(0, 1, 0);
       }
     }
     t = (zmin - iz) / ray.d.z;
-    if (t < ray.tNext && t > -Ray.EPSILON) {
+    if (t < intersectionRecord.distance + Constants.OFFSET && t > -Constants.EPSILON) {
       u = ix + ray.d.x * t;
       v = iy + ray.d.y * t;
       if (u >= xmin && u <= xmax &&
           v >= ymin && v <= ymax) {
         hit = true;
-        ray.tNext = t;
-        ray.u = 1 - u;
-        ray.v = v;
-        ray.setNormal(0, 0, -1);
+        intersectionRecord.distance = t;
+        intersectionRecord.uv.x = 1 - u;
+        intersectionRecord.uv.y = v;
+        intersectionRecord.setNormal(0, 0, -1);
       }
     }
     t = (zmax - iz) / ray.d.z;
-    if (t < ray.tNext && t > -Ray.EPSILON) {
+    if (t < intersectionRecord.distance + Constants.OFFSET && t > -Constants.EPSILON) {
       u = ix + ray.d.x * t;
       v = iy + ray.d.y * t;
       if (u >= xmin && u <= xmax &&
           v >= ymin && v <= ymax) {
         hit = true;
-        ray.tNext = t;
-        ray.u = u;
-        ray.v = v;
-        ray.setNormal(0, 0, 1);
+        intersectionRecord.distance = t;
+        intersectionRecord.uv.x = u;
+        intersectionRecord.uv.y = v;
+        intersectionRecord.setNormal(0, 0, 1);
       }
     }
     return hit;
@@ -189,7 +190,7 @@ public class AABB {
    *
    * @return {@code true} if there is an intersection
    */
-  public boolean quickIntersect(Ray ray) {
+  public double quickIntersect(Ray ray) {
     double t1, t2;
     double tNear = Double.NEGATIVE_INFINITY;
     double tFar = Double.POSITIVE_INFINITY;
@@ -249,23 +250,97 @@ public class AABB {
       }
     }
 
-    if (tNear < tFar + Ray.EPSILON && tNear >= 0 && tNear < ray.t) {
-      ray.tNext = tNear;
-      return true;
+    if (tNear < tFar + Constants.EPSILON && tNear >= 0) {
+      return tNear;
     } else {
-      return false;
+      return Double.NaN;
+    }
+  }
+
+  public DoubleDoubleImmutablePair intersectionDistance(Ray ray) {
+    double t1, t2;
+    double tNear = Double.NEGATIVE_INFINITY;
+    double tFar = Double.POSITIVE_INFINITY;
+    Vector3 d = ray.d;
+    Vector3 o = ray.o;
+
+    if (d.x != 0) {
+      double rx = 1 / d.x;
+      t1 = (xmin - o.x) * rx;
+      t2 = (xmax - o.x) * rx;
+
+      if (t1 > t2) {
+        double t = t1;
+        t1 = t2;
+        t2 = t;
+      }
+
+      tNear = t1;
+      tFar = t2;
+    }
+
+    if (d.y != 0) {
+      double ry = 1 / d.y;
+      t1 = (ymin - o.y) * ry;
+      t2 = (ymax - o.y) * ry;
+
+      if (t1 > t2) {
+        double t = t1;
+        t1 = t2;
+        t2 = t;
+      }
+
+      if (t1 > tNear) {
+        tNear = t1;
+      }
+      if (t2 < tFar) {
+        tFar = t2;
+      }
+    }
+
+    if (d.z != 0) {
+      double rz = 1 / d.z;
+      t1 = (zmin - o.z) * rz;
+      t2 = (zmax - o.z) * rz;
+
+      if (t1 > t2) {
+        double t = t1;
+        t1 = t2;
+        t2 = t;
+      }
+
+      if (t1 > tNear) {
+        tNear = t1;
+      }
+      if (t2 < tFar) {
+        tFar = t2;
+      }
+    }
+    if (tNear < tFar + Constants.EPSILON && tFar >= 0) {
+      return new DoubleDoubleImmutablePair(tNear, tFar);
+    } else {
+      return new DoubleDoubleImmutablePair(Double.NaN, Double.NaN);
     }
   }
 
   /**
    * Test if point is inside the bounding box.
    *
-   * @return true if p is inside this BB.
+   * @return true if p is inside this AABB.
    */
   public boolean inside(Vector3 p) {
-    return (p.x >= xmin && p.x <= xmax) &&
-        (p.y >= ymin && p.y <= ymax) &&
-        (p.z >= zmin && p.z <= zmax);
+    return inside(p.x, p.y, p.z);
+  }
+
+  /**
+   * Test if point is inside the bounding box.
+   *
+   * @return true if p is inside this AABB.
+   */
+  public boolean inside(double x, double y, double z) {
+    return (x > xmin && x < xmax) &&
+      (y > ymin && y < ymax) &&
+      (z > zmin && z < zmax);
   }
 
   /**
@@ -333,7 +408,7 @@ public class AABB {
       }
     }
 
-    return tNear < tFar + Ray.EPSILON && tFar > 0;
+    return tNear < tFar + Constants.EPSILON && tFar > 0;
   }
 
   /**

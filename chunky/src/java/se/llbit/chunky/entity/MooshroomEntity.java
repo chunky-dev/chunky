@@ -1,10 +1,14 @@
 package se.llbit.chunky.entity;
 
+import javafx.scene.control.CheckBox;
+import javafx.scene.layout.VBox;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.model.builder.BoxModelBuilder;
 import se.llbit.chunky.model.builder.UVMapHelper;
 import se.llbit.chunky.model.minecraft.SpriteModel;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
@@ -255,6 +259,20 @@ public class MooshroomEntity extends Entity implements Poseable, Variant {
     json.add("type", type);
 
     return json;
+  }
+
+  @Override
+  public VBox getControls(RenderControlsTab parent) {
+    Scene scene = parent.getChunkyScene();
+
+    CheckBox showMushrooms = new CheckBox("Show mushrooms");
+    showMushrooms.setSelected(this.showMushrooms);
+    showMushrooms.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+      this.showMushrooms = newValue;
+      scene.rebuildActorBvh();
+    }));
+
+    return new VBox(6, showMushrooms);
   }
 
   public static MooshroomEntity fromJson(JsonObject json) {

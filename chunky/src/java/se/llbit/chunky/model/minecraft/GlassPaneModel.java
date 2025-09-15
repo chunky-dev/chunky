@@ -34,7 +34,8 @@ public class GlassPaneModel extends QuadModel {
           new Vector3(7 / 16.0, 16 / 16.0, 9 / 16.0),
           new Vector3(9 / 16.0, 16 / 16.0, 9 / 16.0),
           new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
-          new Vector4(7 / 16.0, 9 / 16.0, 7 / 16.0, 9 / 16.0)
+          new Vector4(7 / 16.0, 9 / 16.0, 7 / 16.0, 9 / 16.0),
+          true
       ),
 
       // Bottom
@@ -42,7 +43,8 @@ public class GlassPaneModel extends QuadModel {
           new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
           new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
           new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
-          new Vector4(7 / 16.0, 9 / 16.0, 7 / 16.0, 9 / 16.0)
+          new Vector4(7 / 16.0, 9 / 16.0, 7 / 16.0, 9 / 16.0),
+          true
       ),
 
       // North
@@ -50,7 +52,8 @@ public class GlassPaneModel extends QuadModel {
           new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
           new Vector3(9 / 16.0, 16 / 16.0, 7 / 16.0),
           new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
-          new Vector4(7 / 16.0, 9 / 16.0, 16 / 16.0, 0 / 16.0)
+          new Vector4(7 / 16.0, 9 / 16.0, 16 / 16.0, 0 / 16.0),
+          true
       ),
       null, // East
       null, // South
@@ -67,39 +70,87 @@ public class GlassPaneModel extends QuadModel {
       // Front side.
       {
           // Left face.
-          new Quad(new Vector3(7 / 16., 1, 7 / 16.), new Vector3(7 / 16., 1, 0),
-              new Vector3(7 / 16., 0, 7 / 16.), new Vector4(7 / 16., 0, 1, 0)),
+          new Quad(
+            new Vector3(7 / 16., 1, 7 / 16.),
+            new Vector3(7 / 16., 1, 0),
+            new Vector3(7 / 16., 0, 7 / 16.),
+            new Vector4(7 / 16., 0, 1, 0)
+          ),
 
           // Right face.
-          new Quad(new Vector3(9 / 16., 1, 0), new Vector3(9 / 16., 1, 7 / 16.),
-              new Vector3(9 / 16., 0, 0), new Vector4(0, 7 / 16., 1, 0)),
+          new Quad(
+            new Vector3(9 / 16., 1, 0),
+            new Vector3(9 / 16., 1, 7 / 16.),
+            new Vector3(9 / 16., 0, 0),
+            new Vector4(0, 7 / 16., 1, 0)
+          ),
 
           // Top face.
-          new Quad(new Vector3(9 / 16., 1, 0), new Vector3(7 / 16., 1, 0),
-              new Vector3(9 / 16., 1, 7 / 16.), new Vector4(9 / 16., 7 / 16., 0, 7 / 16.)),
+          new Quad(
+            new Vector3(9 / 16., 1, 0),
+            new Vector3(7 / 16., 1, 0),
+            new Vector3(9 / 16., 1, 7 / 16.),
+            new Vector4(9 / 16., 7 / 16., 0, 7 / 16.)
+          ),
 
           // Bottom face.
-          new Quad(new Vector3(7 / 16., 0, 0), new Vector3(9 / 16., 0, 0),
-              new Vector3(7 / 16., 0, 7 / 16.), new Vector4(7 / 16., 9 / 16., 0, 7 / 16.)),
+          new Quad(
+            new Vector3(7 / 16., 0, 0),
+            new Vector3(9 / 16., 0, 0),
+            new Vector3(7 / 16., 0, 7 / 16.),
+            new Vector4(7 / 16., 9 / 16., 0, 7 / 16.)
+          ),
+
+          // Outside face.
+          new Quad(
+            new Vector3(9 / 16., 1, 0),
+            new Vector3(7 / 16., 1, 0),
+            new Vector3(9 / 16., 0, 0),
+            new Vector4(9 / 16., 1, 7 / 16., 0)
+          )
 
       },
       // Back side.
       {
           // Left face.
-          new Quad(new Vector3(7 / 16., 1, 1), new Vector3(7 / 16., 1, 9 / 16.),
-              new Vector3(7 / 16., 0, 1), new Vector4(1, 9 / 16., 1, 0)),
+          new Quad(
+            new Vector3(7 / 16., 1, 1),
+            new Vector3(7 / 16., 1, 9 / 16.),
+            new Vector3(7 / 16., 0, 1),
+            new Vector4(1, 9 / 16., 1, 0)
+          ),
 
           // Right face.
-          new Quad(new Vector3(9 / 16., 1, 9 / 16.), new Vector3(9 / 16., 1, 1),
-              new Vector3(9 / 16., 0, 9 / 16.), new Vector4(9 / 16., 1, 1, 0)),
+          new Quad(
+            new Vector3(9 / 16., 1, 9 / 16.),
+            new Vector3(9 / 16., 1, 1),
+            new Vector3(9 / 16., 0, 9 / 16.),
+            new Vector4(9 / 16., 1, 1, 0)
+          ),
 
           // Top face.
-          new Quad(new Vector3(9 / 16., 1, 9 / 16.), new Vector3(7 / 16., 1, 9 / 16.),
-              new Vector3(9 / 16., 1, 1), new Vector4(9 / 16., 7 / 16., 9 / 16., 1)),
+          new Quad(
+            new Vector3(9 / 16., 1, 9 / 16.),
+            new Vector3(7 / 16., 1, 9 / 16.),
+            new Vector3(9 / 16., 1, 1),
+            new Vector4(9 / 16., 7 / 16., 9 / 16., 1)
+          ),
 
           // Bottom face.
-          new Quad(new Vector3(7 / 16., 0, 9 / 16.), new Vector3(9 / 16., 0, 9 / 16.),
-              new Vector3(7 / 16., 0, 1), new Vector4(7 / 16., 9 / 16., 9 / 16., 1)),
+          new Quad(
+            new Vector3(7 / 16., 0, 9 / 16.),
+            new Vector3(9 / 16., 0, 9 / 16.),
+            new Vector3(7 / 16., 0, 1),
+            new Vector4(7 / 16., 9 / 16., 9 / 16., 1)
+          ),
+
+          // Outside face.
+          new Quad(
+            new Vector3(7 / 16., 1, 1),
+            new Vector3(9 / 16., 1, 1),
+            new Vector3(7 / 16., 0, 1),
+            new Vector4(7 / 16., 0, 9 / 16., 1)
+          )
       },
   };
 
@@ -123,7 +174,7 @@ public class GlassPaneModel extends QuadModel {
 
     Consumer<Quad[]> addConnector = qs -> {
       quads.addAll(Arrays.asList(qs));
-      textures.addAll(Arrays.asList(side, side, top, top));
+      textures.addAll(Arrays.asList(side, side, top, top, Texture.air));
     };
 
     // Top and bottom

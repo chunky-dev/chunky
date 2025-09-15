@@ -7,7 +7,6 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 <?import se.llbit.chunky.ui.*?>
-<?import se.llbit.fx.ToolPane?>
 <?import se.llbit.chunky.ui.elements.TextFieldLabelWrapper?>
 
 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.65"
@@ -35,34 +34,38 @@
       <MenuItem fx:id="creditsMenuItem" mnemonicParsing="false" text="About"/>
     </Menu>
   </MenuBar>
-  <SplitPane fx:id="splitPane" VBox.vgrow="ALWAYS">
-    <VBox prefWidth="450" maxWidth="800">
-      <ToolPane fx:id="renderControls" prefWidth="350" VBox.vgrow="ALWAYS"/>
+  <SplitPane fx:id="splitPane" VBox.vgrow="ALWAYS" dividerPositions="0.25f">
+    <VBox>
+      <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+        <VBox fx:id="renderControls" VBox.vgrow="ALWAYS"/>
+      </ScrollPane>
       <Separator/>
-      <VBox spacing="5.0">
-        <padding>
-          <Insets top="2.0" bottom="4.0" left="10.0" right="10.0"/>
-        </padding>
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-          <Label text="Render:"/>
-          <ToggleButton fx:id="start" mnemonicParsing="false" text="Start">
-            <toggleGroup>
-              <ToggleGroup fx:id="renderControl"/>
-            </toggleGroup>
-          </ToggleButton>
-          <ToggleButton fx:id="pause" mnemonicParsing="false" text="Pause" toggleGroup="$renderControl"/>
-          <ToggleButton fx:id="reset" mnemonicParsing="false" text="Reset" toggleGroup="$renderControl"
-                        selected="true"/>
-        </HBox>
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-          <PositiveIntegerAdjuster fx:id="targetSpp"/>
-          <Button fx:id="saveDefaultSpp" mnemonicParsing="false" text="Set default"/>
-        </HBox>
+      <VBox VBox.vgrow="NEVER" minHeight="90">
+        <VBox spacing="5.0">
+          <padding>
+            <Insets top="2.0" bottom="4.0" left="10.0" right="10.0"/>
+          </padding>
+          <HBox spacing="10.0">
+            <Label text="Render:"/>
+            <ToggleButton fx:id="start" mnemonicParsing="false" text="Start">
+              <toggleGroup>
+                <ToggleGroup fx:id="renderControl"/>
+              </toggleGroup>
+            </ToggleButton>
+            <ToggleButton fx:id="pause" mnemonicParsing="false" text="Pause" toggleGroup="$renderControl"/>
+            <ToggleButton fx:id="reset" mnemonicParsing="false" text="Reset" toggleGroup="$renderControl"
+                          selected="true"/>
+          </HBox>
+          <HBox spacing="10.0">
+            <PositiveIntegerAdjuster fx:id="targetSpp"/>
+            <Button fx:id="saveDefaultSpp" mnemonicParsing="false" text="Set default"/>
+          </HBox>
+        </VBox>
       </VBox>
     </VBox>
     <TabPane fx:id="mainTabs" tabClosingPolicy="UNAVAILABLE">
       <Tab fx:id="worldMapTab" text="Map">
-        <SplitPane>
+        <SplitPane dividerPositions="0.75">
           <StackPane fx:id="mapPane" minWidth="50">
             <Canvas fx:id="mapCanvas" />
             <Canvas fx:id="mapOverlay" />
@@ -138,10 +141,7 @@
             </VBox>
             <Text fx:id="yClipInvalid" styleClass="invalid" managed="false" visible="false">Min Y level must be smaller than Max Y level.</Text>
             <Separator/>
-            <HBox spacing="10.0">
-              <Label text="Show Players"/>
-              <CheckBox fx:id="showPlayers"/>
-            </HBox>
+            <CheckBox fx:id="showPlayers" text="Show Players"/>
           </VBox>
         </SplitPane>
       </Tab>

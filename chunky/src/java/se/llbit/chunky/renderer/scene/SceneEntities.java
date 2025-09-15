@@ -9,10 +9,7 @@ import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
-import se.llbit.math.Octree;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector3i;
+import se.llbit.math.*;
 import se.llbit.math.bvh.BVH;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
@@ -24,20 +21,13 @@ import se.llbit.util.mojangapi.MinecraftSkin;
 import se.llbit.util.mojangapi.MojangApi;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
  * Encapsulates entity handling for a scene.
  */
-public class SceneEntities {
+public class SceneEntities implements Intersectable {
 
   private EntityLoadingPreferences entityLoadingPreferences = new EntityLoadingPreferences();
 
@@ -83,15 +73,19 @@ public class SceneEntities {
     bvhImplementation = other.bvhImplementation;
   }
 
-  public boolean intersect(Ray ray) {
-    boolean hit = false;
+  @Override
+  public boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random) {
+    boolean hit = bvh.closestIntersection(ray, intersectionRecord, scene);
 
-    if (bvh.closestIntersection(ray)) {
-      hit = true;
-    }
     if (renderActors) {
-      if (actorBvh.closestIntersection(ray)) {
+      IntersectionRecord intersectionTest = new IntersectionRecord();
+      if (actorBvh.closestIntersection(ray, intersectionTest, scene) && intersectionTest.distance < intersectionRecord.distance - Constants.EPSILON) {
         hit = true;
+        intersectionRecord.distance = intersectionTest.distance;
+        intersectionRecord.setNormal(intersectionTest);
+        intersectionRecord.color.set(intersectionTest.color);
+        intersectionRecord.material = intersectionTest.material;
+        intersectionRecord.flags = intersectionTest.flags;
       }
     }
 
@@ -194,7 +188,7 @@ public class SceneEntities {
       if (actor.getClass().equals(entity.getClass())) {
         Vector3 distance = new Vector3(actor.position);
         distance.sub(entity.position);
-        return distance.lengthSquared() < Ray.EPSILON;
+        return distance.lengthSquared() < Constants.EPSILON;
       }
       return false;
     })) {
@@ -258,12 +252,12 @@ public class SceneEntities {
 
   public void buildBvh(TaskTracker.Task task, Vector3i origin) {
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    bvh = BVH.Factory.create(bvhImplementation, entities, worldOffset, task);
+    bvh = BVH.Factory.create(bvhImplementation, Collections.unmodifiableList(entities), worldOffset, task);
   }
 
   public void buildActorBvh(TaskTracker.Task task, Vector3i origin) {
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    actorBvh = BVH.Factory.create(bvhImplementation, actors, worldOffset, task);
+    actorBvh = BVH.Factory.create(bvhImplementation, Collections.unmodifiableList(actors), worldOffset, task);
   }
 
   public void finalizeLoading() {
@@ -321,7 +315,7 @@ public class SceneEntities {
       // rather than the actors array. In future versions only the actors
       // array should contain poseable entities.
       for (JsonValue element : json.get("entities").array()) {
-        Entity entity = Entity.fromJson(element.object());
+        Entity entity = Entity.loadFromJson(element.object());
         if (entity != null) {
           if (entity instanceof PlayerEntity) {
             actors.add(entity);
@@ -331,7 +325,7 @@ public class SceneEntities {
         }
       }
       for (JsonValue element : json.get("actors").array()) {
-        Entity entity = Entity.fromJson(element.object());
+        Entity entity = Entity.loadFromJson(element.object());
         actors.add(entity);
       }
     }

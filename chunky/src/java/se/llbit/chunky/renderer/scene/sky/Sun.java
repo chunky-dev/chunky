@@ -25,11 +25,8 @@ import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.JsonObject;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
+import se.llbit.math.*;
 import se.llbit.util.JsonSerializable;
-import se.llbit.util.JsonUtil;
 
 /**
  * Sun model for ray tracing.
@@ -41,120 +38,29 @@ public class Sun implements JsonSerializable {
   /**
    * Default sun intensity
    */
-  public static final double DEFAULT_INTENSITY = 1.25;
+  public static final double DEFAULT_INTENSITY = 2_500;
 
   /**
    * Maximum sun intensity
    */
-  public static final double MAX_INTENSITY = 50;
+  public static final double MAX_INTENSITY = 1_000_000_000;
 
   /**
    * Minimum sun intensity
    */
-  public static final double MIN_INTENSITY = 0.1;
-
-  /**
-   * Minimum apparent sun brightness
-   */
-  public static final double MIN_APPARENT_BRIGHTNESS = 0.01;
-
-  /**
-   * Maximum apparent sun brightness
-   */
-  public static final double MAX_APPARENT_BRIGHTNESS = 50;
-
-  /**
-   * Default probability for importance sun sampling
-   */
-  public static final double DEFAULT_IMPORTANCE_SAMPLE_CHANCE = 0.1;
-
-  /**
-   * Minimum probability for importance sun sampling
-   */
-  public static final double MIN_IMPORTANCE_SAMPLE_CHANCE = 0.001;
-
-  /**
-   * Maximum probability for importance sun sampling
-   */
-  public static final double MAX_IMPORTANCE_SAMPLE_CHANCE = 0.9;
-
-  /**
-   * Default radius (relative to sun) for importance sun sampling
-   */
-  public static final double DEFAULT_IMPORTANCE_SAMPLE_RADIUS = 1.2;
-
-  /**
-   * Minimum radius (relative to sun) for importance sun sampling
-   */
-  public static final double MIN_IMPORTANCE_SAMPLE_RADIUS = 0.1;
-
-  /**
-   * Maximum radius (relative to sun) for importance sun sampling
-   */
-  public static final double MAX_IMPORTANCE_SAMPLE_RADIUS = 5;
-
-  private static final double xZenithChroma[][] =
-      {{0.00166, -0.00375, 0.00209, 0}, {-0.02903, 0.06377, -0.03203, 0.00394},
-          {0.11693, -0.21196, 0.06052, 0.25886},};
-  private static final double yZenithChroma[][] =
-      {{0.00275, -0.00610, 0.00317, 0}, {-0.04214, 0.08970, -0.04153, 0.00516},
-          {0.15346, -0.26756, 0.06670, 0.26688},};
-  private static final double mdx[][] =
-      {{-0.0193, -0.2592}, {-0.0665, 0.0008}, {-0.0004, 0.2125}, {-0.0641, -0.8989},
-          {-0.0033, 0.0452}};
-  private static final double mdy[][] =
-      {{-0.0167, -0.2608}, {-0.0950, 0.0092}, {-0.0079, 0.2102}, {-0.0441, -1.6537},
-          {-0.0109, 0.0529}};
-  private static final double mdY[][] =
-      {{0.1787, -1.4630}, {-0.3554, 0.4275}, {-0.0227, 5.3251}, {0.1206, -2.5771},
-          {-0.0670, 0.3703}};
-
-  private static double turb = 2.5;
-  private static double turb2 = turb * turb;
-  private static Vector3 A = new Vector3();
-  private static Vector3 B = new Vector3();
-  private static Vector3 C = new Vector3();
-  private static Vector3 D = new Vector3();
-  private static Vector3 E = new Vector3();
+  public static final double MIN_INTENSITY = 0.001;
 
   /**
    * Sun texture
    */
   public static Texture texture = new Texture();
 
-  static {
-    A.x = mdx[0][0] * turb + mdx[0][1];
-    B.x = mdx[1][0] * turb + mdx[1][1];
-    C.x = mdx[2][0] * turb + mdx[2][1];
-    D.x = mdx[3][0] * turb + mdx[3][1];
-    E.x = mdx[4][0] * turb + mdx[4][1];
-
-    A.y = mdy[0][0] * turb + mdy[0][1];
-    B.y = mdy[1][0] * turb + mdy[1][1];
-    C.y = mdy[2][0] * turb + mdy[2][1];
-    D.y = mdy[3][0] * turb + mdy[3][1];
-    E.y = mdy[4][0] * turb + mdy[4][1];
-
-    A.z = mdY[0][0] * turb + mdY[0][1];
-    B.z = mdY[1][0] * turb + mdY[1][1];
-    C.z = mdY[2][0] * turb + mdY[2][1];
-    D.z = mdY[3][0] * turb + mdY[3][1];
-    E.z = mdY[4][0] * turb + mdY[4][1];
-  }
-
-  private double zenith_Y;
-  private double zenith_x;
-  private double zenith_y;
-  private double f0_Y;
-  private double f0_x;
-  private double f0_y;
-
   private final Refreshable scene;
 
   /**
    * Sun radius
    */
-  public double radius = .03;
+  public double radius = 0.041887902;
   public double radiusCos = FastMath.cos(radius);
   public double radiusSin = FastMath.sin(radius);
 
@@ -162,15 +68,7 @@ public class Sun implements JsonSerializable {
 
   private double intensity = DEFAULT_INTENSITY;
 
-  private double luminosity = 100;
-  private double luminosityPdf = 1.0 / luminosity;
-
-  private double apparentBrightness = DEFAULT_INTENSITY;
-  private Vector3 apparentTextureBrightness = new Vector3(1, 1, 1);
-  private boolean enableTextureModification = false;
-
-  private double importanceSampleChance = DEFAULT_IMPORTANCE_SAMPLE_CHANCE;
-  private double importanceSampleRadius = DEFAULT_IMPORTANCE_SAMPLE_RADIUS;
+  private boolean useFlatTexture = true;
 
   private double azimuth = Math.PI / 2.5;
   private double altitude = Math.PI / 3;
@@ -184,35 +82,10 @@ public class Sun implements JsonSerializable {
    */
   private final Vector3 sw = new Vector3();
 
-  private final Vector3 emittance = new Vector3(1, 1, 1);
-
-  private static final double pE = FastMath.pow(DEFAULT_INTENSITY, Scene.DEFAULT_GAMMA);
-
-  protected static final Vector3 previewEmittance = new Vector3(pE, pE, pE);
-
   // final to ensure that we don't do a lot of redundant re-allocation
   private final Vector3 color = new Vector3(1, 1, 1);
 
-  private final Vector3 apparentColor = new Vector3(1, 1, 1);
-
   private boolean drawTexture = true;
-
-  private double chroma(double turb, double turb2, double sunTheta, double[][] matrix) {
-
-    double t1 = sunTheta;
-    double t2 = t1 * t1;
-    double t3 = t1 * t2;
-
-    return turb2 * (matrix[0][0] * t3 + matrix[0][1] * t2 + matrix[0][2] * t1 + matrix[0][3]) +
-        turb * (matrix[1][0] * t3 + matrix[1][1] * t2 + matrix[1][2] * t1 + matrix[1][3]) +
-        (matrix[2][0] * t3 + matrix[2][1] * t2 + matrix[2][2] * t1 + matrix[2][3]);
-  }
-
-  private static double perezF(double cosTheta, double gamma, double cos2Gamma, double A, double B,
-      double C, double D, double E) {
-
-    return (1 + A * FastMath.exp(B / cosTheta)) * (1 + C * FastMath.exp(D * gamma) + E * cos2Gamma);
-  }
 
   /**
    * Create new sun model.
@@ -229,16 +102,10 @@ public class Sun implements JsonSerializable {
     azimuth = other.azimuth;
     altitude = other.altitude;
     color.set(other.color);
-    apparentColor.set(other.apparentColor);
     drawTexture = other.drawTexture;
+    useFlatTexture = other.useFlatTexture;
     intensity = other.intensity;
-    luminosity = other.luminosity;
-    apparentBrightness = other.apparentBrightness;
     radius = other.radius;
-    enableTextureModification = other.enableTextureModification;
-    luminosityPdf = other.luminosityPdf;
-    importanceSampleRadius = other.importanceSampleRadius;
-    importanceSampleChance = other.importanceSampleChance;
     initSun();
   }
 
@@ -262,22 +129,10 @@ public class Sun implements JsonSerializable {
     sv.normalize();
     su.cross(sv, sw);
 
-    emittance.set(color);
-    emittance.scale(FastMath.pow(intensity, Scene.DEFAULT_GAMMA));
-
-    if (enableTextureModification) {
-      apparentTextureBrightness.set(apparentColor);
-    } else {
-      apparentTextureBrightness.set(1, 1, 1);
-    }
-    apparentTextureBrightness.scale(FastMath.pow(apparentBrightness, Scene.DEFAULT_GAMMA));
-
     Sky sky = ((Scene) scene).sky();
     if (sky.getSkyMode() == Sky.SkyMode.SIMULATED) {
       sky.updateSimulatedSky(this);
     }
-
-    updateSkylightValues();
   }
 
   /**
@@ -317,91 +172,47 @@ public class Sun implements JsonSerializable {
    *
    * @return <code>true</code> if the ray intersects the sun model
    */
-  public boolean intersect(Ray ray) {
-    if (!drawTexture || ray.d.dot(sw) < .5) {
-      return false;
-    }
-
-    double width = radius * 4;
-    double width2 = width * 2;
-    double a;
-    a = Math.PI / 2 - FastMath.acos(ray.d.dot(su)) + width;
-    if (a >= 0 && a < width2) {
-      double b = Math.PI / 2 - FastMath.acos(ray.d.dot(sv)) + width;
-      if (b >= 0 && b < width2) {
-        texture.getColor(a / width2, b / width2, ray.color);
-        ray.color.x *= apparentTextureBrightness.x * 10;
-        ray.color.y *= apparentTextureBrightness.y * 10;
-        ray.color.z *= apparentTextureBrightness.z * 10;
-        return true;
-      }
-    }
-
-    return false;
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord) {
+    return (ray.d.dot(sw) > radiusCos);
   }
 
-  /**
-   * Used with <code>SSS: OFF</code>, <code>SSS: IMPORTANCE</code>, and <code>SSS: HIGH_QUALITY</code>.
-   */
-  public boolean intersectDiffuse(Ray ray) {
-    if (ray.d.dot(sw) < .5) {
-      return false;
-    }
-
-    double width = radius * 4;
-    double width2 = width * 2;
-    double a;
-    a = Math.PI / 2 - FastMath.acos(ray.d.dot(su)) + width;
-    if (a >= 0 && a < width2) {
-      double b = Math.PI / 2 - FastMath.acos(ray.d.dot(sv)) + width;
-      if (b >= 0 && b < width2) {
-        texture.getColor(a / width2, b / width2, ray.color);
-        ray.color.x *= color.x * 10;
-        ray.color.y *= color.y * 10;
-        ray.color.z *= color.z * 10;
-        return true;
+  public Vector4 getSunIntersectionColor(Ray ray) {
+    final Vector4 sunColor = new Vector4(1, 1, 1, 1);
+    if (intersect(ray, null) && drawTexture) {
+      double width = radius * Constants.SQRT_2;
+      double half_width = width / 2;
+      double a = Math.PI / 2 - FastMath.acos(ray.d.dot(su)) + half_width;
+      if (a >= 0 && a < width) {
+        double b = Math.PI / 2 - FastMath.acos(ray.d.dot(sv)) + half_width;
+        if (b >= 0 && b < width) {
+          if (!useFlatTexture) {
+            texture.getColor(a / width, b / width, sunColor);
+          }
+          sunColor.x *= color.x * intensity;
+          sunColor.y *= color.y * intensity;
+          sunColor.z *= color.z * intensity;
+          return sunColor;
+        }
       }
     }
-
-    return false;
+    sunColor.set(0, 0, 0, 1);
+    return sunColor;
   }
 
   /**
    * Calculate flat shading for ray.
    */
-  public void flatShading(Ray ray) {
-    Vector3 n = ray.getNormal();
+  public void flatShading(IntersectionRecord intersectionRecord) {
+    Vector3 n = intersectionRecord.shadeN;
     double shading = n.x * sw.x + n.y * sw.y + n.z * sw.z;
     shading = QuickMath.max(AMBIENT, shading);
-    ray.color.x *= previewEmittance.x * shading;
-    ray.color.y *= previewEmittance.y * shading;
-    ray.color.z *= previewEmittance.z * shading;
+    intersectionRecord.color.scale(shading);
   }
 
   public void setColor(Vector3 newColor) {
     this.color.set(newColor);
     initSun();
     scene.refresh();
-  }
-
-  public void setApparentColor(Vector3 newColor) {
-    this.apparentColor.set(newColor);
-    initSun();
-    scene.refresh();
-  }
-
-  private void updateSkylightValues() {
-    double sunTheta = Math.PI / 2 - altitude;
-    double cosTheta = FastMath.cos(sunTheta);
-    double cos2Theta = cosTheta * cosTheta;
-    double chi = (4.0 / 9.0 - turb / 120.0) * (Math.PI - 2 * sunTheta);
-    zenith_Y = (4.0453 * turb - 4.9710) * Math.tan(chi) - 0.2155 * turb + 2.4192;
-    zenith_Y = (zenith_Y < 0) ? -zenith_Y : zenith_Y;
-    zenith_x = chroma(turb, turb2, sunTheta, xZenithChroma);
-    zenith_y = chroma(turb, turb2, sunTheta, yZenithChroma);
-    f0_x = 1 / perezF(1, sunTheta, cos2Theta, A.x, B.x, C.x, D.x, E.x);
-    f0_y = 1 / perezF(1, sunTheta, cos2Theta, A.y, B.y, C.y, D.y, E.y);
-    f0_Y = 1 / perezF(1, sunTheta, cos2Theta, A.z, B.z, C.z, D.z, E.z);
   }
 
   /**
@@ -418,40 +229,6 @@ public class Sun implements JsonSerializable {
    */
   public double getIntensity() {
     return intensity;
-  }
-
-  public void setLuminosity(double value) {
-    luminosity = value;
-    luminosityPdf = 1 / value;
-    scene.refresh();
-  }
-
-  public double getLuminosity() {
-    return luminosity;
-  }
-
-  public double getLuminosityPdf() {
-    return luminosityPdf;
-  }
-
-  public void setApparentBrightness(double value) {
-    apparentBrightness = value;
-    initSun();
-    scene.refresh();
-  }
-
-  public double getApparentBrightness() {
-    return apparentBrightness;
-  }
-
-  public void setEnableTextureModification(boolean value) {
-    enableTextureModification = value;
-    initSun();
-    scene.refresh();
-  }
-
-  public boolean getEnableTextureModification() {
-    return enableTextureModification;
   }
 
   /**
@@ -473,7 +250,7 @@ public class Sun implements JsonSerializable {
   /**
    * Point ray in random direction within sun solid angle
    */
-  public void getRandomSunDirection(Ray reflected, Random random) {
+  public void getRandomSunDirection(Vector3 d, Random random) {
     double x1 = random.nextDouble();
     double x2 = random.nextDouble();
     double cos_a = 1 - x1 + x1 * radiusCos;
@@ -488,9 +265,9 @@ public class Sun implements JsonSerializable {
     v.scale(FastMath.sin(phi) * sin_a);
     w.scale(cos_a);
 
-    reflected.d.add(u, v);
-    reflected.d.add(w);
-    reflected.d.normalize();
+    d.add(u, v);
+    d.add(w);
+    d.normalize();
   }
 
   @Override public JsonObject toJson() {
@@ -498,17 +275,10 @@ public class Sun implements JsonSerializable {
     sun.add("altitude", altitude);
     sun.add("azimuth", azimuth);
     sun.add("intensity", intensity);
-    sun.add("luminosity", luminosity);
-    sun.add("apparentBrightness", apparentBrightness);
     sun.add("radius", radius);
-    sun.add("modifySunTexture", enableTextureModification);
-    sun.add("color", JsonUtil.rgbToJson(color));
-    sun.add("apparentColor", JsonUtil.rgbToJson(apparentColor));
-    JsonObject importanceSamplingObj = new JsonObject();
-    importanceSamplingObj.add("chance", importanceSampleChance);
-    importanceSamplingObj.add("radius", importanceSampleRadius);
-    sun.add("importanceSampling", importanceSamplingObj);
+    sun.add("color", ColorUtil.rgbToJson(color));
     sun.add("drawTexture", drawTexture);
+    sun.add("useFlatTexture", useFlatTexture);
     return sun;
   }
 
@@ -516,27 +286,10 @@ public class Sun implements JsonSerializable {
     azimuth = json.get("azimuth").doubleValue(azimuth);
     altitude = json.get("altitude").doubleValue(altitude);
     intensity = json.get("intensity").doubleValue(intensity);
-    setLuminosity(json.get("luminosity").doubleValue(luminosity));
-    apparentBrightness = json.get("apparentBrightness").doubleValue(apparentBrightness);
     radius = json.get("radius").doubleValue(radius);
-    enableTextureModification = json.get("modifySunTexture").boolValue(enableTextureModification);
-
-    if (!json.get("color").isUnknown()) {
-      JsonUtil.rgbFromJson(json.get("color"), color);
-    }
-
-    if (!json.get("apparentColor").isUnknown()) {
-      JsonUtil.rgbFromJson(json.get("apparentColor"), apparentColor);
-    }
-
-    if(json.get("importanceSampling").isObject()) {
-      JsonObject importanceSamplingObj = json.get("importanceSampling").object();
-      importanceSampleChance = importanceSamplingObj.get("chance").doubleValue(DEFAULT_IMPORTANCE_SAMPLE_CHANCE);
-      importanceSampleRadius = importanceSamplingObj.get("radius").doubleValue(DEFAULT_IMPORTANCE_SAMPLE_RADIUS);
-    }
-
+    color.set(ColorUtil.jsonToRGB(json.get("color").asObject()));
     drawTexture = json.get("drawTexture").boolValue(drawTexture);
-
+    useFlatTexture = json.get("useFlatTexture").boolValue(useFlatTexture);
     initSun();
   }
 
@@ -547,14 +300,6 @@ public class Sun implements JsonSerializable {
     return color;
   }
 
-  public Vector3 getEmittance() {
-    return emittance;
-  }
-
-  public Vector3 getApparentColor() {
-    return apparentColor;
-  }
-
   public void setDrawTexture(boolean value) {
     if (value != drawTexture) {
       drawTexture = value;
@@ -562,21 +307,18 @@ public class Sun implements JsonSerializable {
     }
   }
 
-  public boolean drawTexture() {
+  public boolean getDrawTexture() {
     return drawTexture;
   }
 
-  public double getImportanceSampleChance() { return importanceSampleChance; }
-
-  public void setImportanceSampleChance(double d) {
-    importanceSampleChance = d;
-    scene.refresh();
+  public void setUseFlatTexture(boolean value) {
+    if (value != useFlatTexture) {
+      useFlatTexture = value;
+      scene.refresh();
+    }
   }
 
-  public double getImportanceSampleRadius() { return importanceSampleRadius; }
-
-  public void setImportanceSampleRadius(double d) {
-    importanceSampleRadius = d;
-    scene.refresh();
+  public boolean getUseFlatTexture() {
+    return useFlatTexture;
   }
 }

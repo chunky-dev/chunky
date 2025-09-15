@@ -72,7 +72,7 @@ public class HDRTexture extends AbstractHdriTexture {
       MappedByteBuffer byteBuf = channel.map(FileChannel.MapMode.READ_ONLY, start, byteBufLen);
 
       // Precompute exponents.
-      double exp[] = new double[256];
+      double[] exp = new double[256];
       for (int e = 0; e < 256; ++e) {
         exp[e] = Math.pow(2, e - 136);
       }

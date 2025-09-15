@@ -48,7 +48,6 @@ subprojects {
             languageVersion = JavaLanguageVersion.of(21)
         }
         useJUnitPlatform()
-
         // Always run tests, even when nothing changed.
         dependsOn 'cleanTest'
 

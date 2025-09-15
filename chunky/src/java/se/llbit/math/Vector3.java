@@ -19,14 +19,17 @@ package se.llbit.math;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.json.JsonObject;
 
+import java.util.Random;
+
 /**
  * A 3D vector of doubles.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Vector3 {
-
-  public double x, y, z;
+  public double x;
+  public double y;
+  public double z;
 
   /**
    * Creates a new vector (0, 0, 0).
@@ -53,10 +56,40 @@ public class Vector3 {
     z = o.z;
   }
 
+  public Vector3(double v) {
+    x = v;
+    y = v;
+    z = v;
+  }
+
+  public static Vector3 randomUnitVector(Random random) {
+    Vector3 randomUnitVector = new Vector3();
+    while (true) {
+      randomUnitVector.set(random.nextDouble(-1, 1), random.nextDouble(-1, 1), random.nextDouble(-1, 1));
+      if (randomUnitVector.lengthSquared() < 1) {
+        randomUnitVector.normalize();
+        return randomUnitVector;
+      }
+    }
+  }
+
+  public boolean nearZero() {
+    return (FastMath.abs(x) < Constants.EPSILON) && (FastMath.abs(y) < Constants.EPSILON) && (FastMath.abs(z) < Constants.EPSILON);
+  }
+
   /**
    * Set this vector equal to other vector.
    */
   public final void set(Vector3 o) {
+    x = o.x;
+    y = o.y;
+    z = o.z;
+  }
+
+  /**
+   * Set this vector equal to a.
+   */
+  public final void set(Vector3i o) {
     x = o.x;
     y = o.y;
     z = o.z;
@@ -71,20 +104,18 @@ public class Vector3 {
     z = f;
   }
 
+  public final void set(double a) {
+    x = a;
+    y = a;
+    z = a;
+  }
+
+
   /**
    * @return The dot product of this vector and o vector
    */
   public final double dot(Vector3 o) {
     return x * o.x + y * o.y + z * o.z;
-  }
-
-  /**
-   * Set this vector equal to a-b.
-   */
-  public final void sub(Vector3 a, Vector3 b) {
-    x = a.x - b.x;
-    y = a.y - b.y;
-    z = a.z - b.z;
   }
 
   /**
@@ -129,6 +160,11 @@ public class Vector3 {
     z *= s;
   }
 
+  public final Vector3 normalized() {
+    double s = 1 / FastMath.sqrt(lengthSquared());
+    return new Vector3(x * s, y * s, z * s);
+  }
+
   /**
    * Set this vector equal to s*d + o.
    */
@@ -136,6 +172,10 @@ public class Vector3 {
     x = s * d.x + o.x;
     y = s * d.y + o.y;
     z = s * d.z + o.z;
+  }
+
+  public final Vector3 rScaleAdd(double s, Vector3 d, Vector3 o) {
+    return new Vector3(s * d.x + o.x, s * d.y + o.y, s * d.z + o.z);
   }
 
   /**
@@ -147,6 +187,10 @@ public class Vector3 {
     z += s * d.z;
   }
 
+  public final Vector3 rScaleAdd(double s, Vector3 d) {
+    return new Vector3(x + s * d.x, y + s * d.y, z + s * d.z);
+  }
+
   /**
    * Scale this vector by s.
    */
@@ -154,6 +198,20 @@ public class Vector3 {
     x *= s;
     y *= s;
     z *= s;
+  }
+
+  public final Vector3 rScale(double s) {
+    return new Vector3(x * s, y * s, z * s);
+  }
+
+  public final Vector3 rMultiplyEntrywise(Vector3 other) {
+    return new Vector3(this.x * other.x, this.y * other.y, this.z * other.z);
+  }
+
+  public final void multiplyEntrywise(Vector3 other) {
+    this.x *= other.x;
+    this.y *= other.y;
+    this.z *= other.z;
   }
 
   /**
@@ -174,6 +232,10 @@ public class Vector3 {
     z = a.z + b.z;
   }
 
+  public final Vector3 rAdd(Vector3 a, Vector3 b) {
+    return new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+  }
+
   /**
    * Add a to this vector.
    */
@@ -181,6 +243,10 @@ public class Vector3 {
     x += a.x;
     y += a.y;
     z += a.z;
+  }
+
+  public final Vector3 rAdd(Vector3 a) {
+    return new Vector3(x + a.x, y + a.y, z + a.z);
   }
 
   /**
@@ -192,6 +258,10 @@ public class Vector3 {
     z += a.z;
   }
 
+  public final Vector3 rAdd(Vector3i a) {
+    return new Vector3(x + a.x, y + a.y, z + a.z);
+  }
+
   /**
    * Add vector (a, b, c) to this vector.
    */
@@ -199,6 +269,26 @@ public class Vector3 {
     x += a;
     y += b;
     z += c;
+  }
+
+  public final Vector3 rAdd(double a, double b, double c) {
+    return new Vector3(x + a, y + b, z + c);
+  }
+
+  /**
+   * Set this vector equal to a-b.
+   */
+  public final void sub(Vector3 a, Vector3 b) {
+    x = a.x - b.x;
+    y = a.y - b.y;
+    z = a.z - b.z;
+  }
+
+  /**
+   * @return difference of vector a and b.
+   */
+  public final Vector3 rSub(Vector3 a, Vector3 b) {
+    return new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
   }
 
   /**
@@ -210,13 +300,8 @@ public class Vector3 {
     z -= a.z;
   }
 
-  /**
-   * Subtract vector (a, b, c) from this vector.
-   */
-  public final void sub(double a, double b, double c) {
-    x -= a;
-    y -= b;
-    z -= c;
+  public final Vector3 rSub(Vector3 a) {
+    return new Vector3(x - a.x, y - a.y, z - a.z);
   }
 
   /**
@@ -228,13 +313,25 @@ public class Vector3 {
     z -= a.z;
   }
 
+  public final Vector3 rSub(Vector3i a) {
+    return new Vector3(x - a.x, y - a.y, z - a.z);
+  }
+
   /**
-   * Set this vector equal to a.
+   * Subtract vector (a, b, c) from this vector.
    */
-  public void set(Vector3i a) {
-    x = a.x;
-    y = a.y;
-    z = a.z;
+  public final void sub(double a, double b, double c) {
+    x -= a;
+    y -= b;
+    z -= c;
+  }
+
+  public final Vector3 rSub(double a, double b, double c) {
+    return new Vector3(x - a, y - b, z - c);
+  }
+
+  public final double distance(Vector3 other) {
+    return this.rSub(other).length();
   }
 
   @Override public String toString() {
@@ -261,5 +358,12 @@ public class Vector3 {
     object.add("y", y);
     object.add("z", z);
     return object;
+  }
+
+  public static Vector3 orientNormal(Vector3 direction, Vector3 normal) {
+    if(direction.dot(normal) > 0) {
+      return new Vector3(-normal.x, -normal.y, -normal.z);
+    }
+    return normal;
   }
 }

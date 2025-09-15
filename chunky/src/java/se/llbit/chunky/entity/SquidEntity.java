@@ -6,6 +6,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.math.Constants;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -98,7 +99,7 @@ public class SquidEntity extends Entity implements Poseable {
       .rotateX(frontTentacle.x)
       .rotateY(frontTentacle.y)
       .rotateZ(frontTentacle.z)
-      .translate(0 / 16.0, -3 / 16.0, -5 / 16.0 + Ray.OFFSET) // Prevent Z-fighting
+      .translate(0 / 16.0, -3 / 16.0, -5 / 16.0 + Constants.OFFSET) // Prevent Z-fighting
       .chain(worldTransform);
     for (Quad quad : tentacle) {
       quad.addTriangles(faces, skinMaterial, transform);
@@ -118,7 +119,7 @@ public class SquidEntity extends Entity implements Poseable {
       .rotateX(leftTentacle.x)
       .rotateY(leftTentacle.y)
       .rotateZ(leftTentacle.z)
-      .translate(-5 / 16.0 + Ray.OFFSET, -3 / 16.0, 0 / 16.0)
+      .translate(-5 / 16.0 + Constants.OFFSET, -3 / 16.0, 0 / 16.0)
       .chain(worldTransform);
     for (Quad quad : tentacle) {
       quad.addTriangles(faces, skinMaterial, transform);
@@ -138,7 +139,7 @@ public class SquidEntity extends Entity implements Poseable {
       .rotateX(backTentacle.x)
       .rotateY(backTentacle.y)
       .rotateZ(backTentacle.z)
-      .translate(0 / 16.0, -3 / 16.0, 5 / 16.0 - Ray.OFFSET)
+      .translate(0 / 16.0, -3 / 16.0, 5 / 16.0 - Constants.OFFSET)
       .chain(worldTransform);
     for (Quad quad : tentacle) {
       quad.addTriangles(faces, skinMaterial, transform);
@@ -158,7 +159,7 @@ public class SquidEntity extends Entity implements Poseable {
       .rotateX(rightTentacle.x)
       .rotateY(rightTentacle.y)
       .rotateZ(rightTentacle.z)
-      .translate(5 / 16.0 - Ray.OFFSET, -3 / 16.0, 0 / 16.0)
+      .translate(5 / 16.0 - Constants.OFFSET, -3 / 16.0, 0 / 16.0)
       .chain(worldTransform);
     for (Quad quad : tentacle) {
       quad.addTriangles(faces, skinMaterial, transform);

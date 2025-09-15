@@ -20,15 +20,15 @@ package se.llbit.chunky.ui.render.tabs;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
+import org.controlsfx.control.ToggleSwitch;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.Chunky;
-import se.llbit.chunky.renderer.EmitterSamplingStrategy;
-import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.scene.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.export.PictureExportFormats;
@@ -56,20 +56,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initializable {
-  private RenderControlsFxController renderControls;
-  private RenderController controller;
-  private Scene scene;
-
+public class AdvancedTab extends RenderControlsTab implements Initializable {
   @FXML private IntegerAdjuster renderThreads;
   @FXML private IntegerAdjuster cpuLoad;
   @FXML private IntegerAdjuster rayDepth;
   @FXML private IntegerAdjuster branchCount;
   @FXML private Button mergeRenderDump;
   @FXML private CheckBox shutdown;
-  @FXML private CheckBox fastFog;
-  @FXML private CheckBox fancierTranslucency;
-  @FXML private DoubleAdjuster transmissivityCap;
+  @FXML private ToggleSwitch fastFog;
   @FXML private IntegerAdjuster cacheResolution;
   @FXML private DoubleAdjuster animationTime;
   @FXML private ChoiceBox<PictureExportFormat> outputMode;
@@ -77,9 +71,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private Button octreeSwitchImplementation;
   @FXML private ChoiceBox<String> bvhMethod;
   @FXML private ChoiceBox<String> biomeStructureImplementation;
-  @FXML private IntegerAdjuster gridSize;
-  @FXML private CheckBox preventNormalEmitterWithSampling;
-  @FXML private CheckBox hideUnknownBlocks;
+  @FXML private ToggleSwitch hideUnknownBlocks;
   @FXML private ChoiceBox<String> rendererSelect;
   @FXML private ChoiceBox<String> previewSelect;
   @FXML private CheckBox showLauncher;
@@ -101,7 +93,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     cpuLoad.clampBoth();
     cpuLoad.onValueChange(value -> {
       PersistentSettings.setCPULoad(value);
-      controller.getRenderManager().setCPULoad(value);
+      controller.getRenderController().getRenderManager().setCPULoad(value);
     });
     rayDepth.setName("Ray depth");
     rayDepth.setTooltip("Sets the minimum recursive ray depth.");
@@ -119,6 +111,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       scene.setBranchCount(value);
       PersistentSettings.setBranchCountDefault(value);
     });
+    branchCount.setVisible(false);
+    branchCount.setManaged(false);
 
     mergeRenderDump
             .setTooltip(new Tooltip("Merge an existing render dump with the current render."));
@@ -131,7 +125,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       List<File> dumps = fileChooser.showOpenMultipleDialog(getScene().getWindow());
       if (dumps != null) {
         // TODO: remove cast.
-        AsynchronousSceneManager sceneManager = ((AsynchronousSceneManager) controller.getSceneManager());
+        AsynchronousSceneManager sceneManager = ((AsynchronousSceneManager) controller.getRenderController().getSceneManager());
         for (File dump : dumps) {
           sceneManager.mergeRenderDump(dump);
         }
@@ -156,21 +150,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     fastFog.setTooltip(new Tooltip("Enable faster fog rendering algorithm."));
     fastFog.selectedProperty()
             .addListener((observable, oldValue, newValue) -> scene.setFastFog(newValue));
-    fancierTranslucency.setTooltip(new Tooltip("Enable more sophisticated algorithm for computing color changes through translucent materials."));
-    fancierTranslucency.selectedProperty()
-      .addListener((observable, oldValue, newValue) -> {
-        scene.setFancierTranslucency(newValue);
-        transmissivityCap.setVisible(newValue);
-        transmissivityCap.setManaged(newValue);
-      });
-    boolean tcapVisible = scene != null && scene.getFancierTranslucency();
-    transmissivityCap.setVisible(tcapVisible);
-    transmissivityCap.setManaged(tcapVisible);
-    transmissivityCap.setName("Transmissivity cap");
-    transmissivityCap.setRange(Scene.MIN_TRANSMISSIVITY_CAP, Scene.MAX_TRANSMISSIVITY_CAP);
-    transmissivityCap.clampBoth();
-    transmissivityCap.setTooltip("Maximum amplification of one color channel as a ray passes through a translucent block (stained glass, ice, etc.).\nA value of 1 prevents amplification entirely; higher values result in more vibrant colors.");
-    transmissivityCap.onValueChange(value -> scene.setTransmissivityCap(value));
     cacheResolution.setName("Sky cache resolution");
     cacheResolution.setTooltip("Resolution of the sky cache. Lower values will use less memory and improve performance but can cause sky artifacts.");
     cacheResolution.setRange(1, 4096);
@@ -193,7 +172,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     renderThreads.clampMin();
     renderThreads.onValueChange(value -> {
       PersistentSettings.setNumRenderThreads(value);
-      controller.getRenderManager().setThreadCount(value);
+      controller.getRenderController().getRenderManager().setThreadCount(value);
       Chunky.setCommonThreadsCount(value);
     });
 
@@ -219,13 +198,10 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     octreeImplementation.setTooltip(new Tooltip(tooltipTextBuilder.toString()));
 
     octreeSwitchImplementation.setOnAction(event -> Chunky.getCommonThreads().submit(() -> {
-      TaskTracker tracker = controller.getSceneManager().getTaskTracker();
+      TaskTracker tracker = controller.getRenderController().getSceneManager().getTaskTracker();
       try {
-        try (TaskTracker.Task task = tracker.task("(1/2) Converting world octree", 1000)) {
+        try (TaskTracker.Task task = tracker.task("(1/1) Converting world octree", 1000)) {
           scene.getWorldOctree().switchImplementation(octreeImplementation.getValue(), task);
-        }
-        try (TaskTracker.Task task = tracker.task("(2/2) Converting water octree")) {
-          scene.getWaterOctree().switchImplementation(octreeImplementation.getValue(), task);
         }
       } catch (IOException e) {
         Log.error("Switching octrees failed. Reload the scene.\n", e);
@@ -270,36 +246,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       });
     biomeStructureImplementation.setTooltip(new Tooltip(biomeStructureTooltipBuilder.toString()));
 
-    gridSize.setRange(4, 64);
-    gridSize.setName("Emitter grid size");
-    gridSize.setTooltip("Size of the cells of the emitter grid. " +
-            "The bigger, the more emitter will be sampled. " +
-            "Need the chunks to be reloaded to apply");
-    gridSize.onValueChange(value -> {
-      scene.setGridSize(value);
-      PersistentSettings.setGridSizeDefault(value);
-    });
-    gridSize.addEventHandler(Adjuster.AFTER_VALUE_CHANGE, e -> {
-      if (scene.getEmitterSamplingStrategy() != EmitterSamplingStrategy.NONE && scene.haveLoadedChunks()) {
-        Alert warning = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
-        warning.setContentText("The selected chunks need to be reloaded to update the emitter grid size.");
-        warning.getButtonTypes().setAll(
-          ButtonType.CANCEL,
-          new ButtonType("Reload chunks", ButtonBar.ButtonData.FINISH));
-        warning.setTitle("Chunk reload required");
-        ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
-        if (result.getButtonData() == ButtonBar.ButtonData.FINISH) {
-          controller.getSceneManager().reloadChunks();
-        }
-      }
-    });
-
-    preventNormalEmitterWithSampling.setTooltip(new Tooltip("Prevent usual emitter contribution when emitter sampling is used"));
-    preventNormalEmitterWithSampling.selectedProperty().addListener((observable, oldvalue, newvalue) -> {
-      scene.setPreventNormalEmitterWithSampling(newvalue);
-      PersistentSettings.setPreventNormalEmitterWithSampling(newvalue);
-    });
-
     hideUnknownBlocks.setTooltip(new Tooltip("Hide unknown blocks instead of rendering them as question marks."));
     hideUnknownBlocks.selectedProperty().addListener((observable, oldValue, newValue) -> {
       scene.setHideUnknownBlocks(newValue);
@@ -333,9 +279,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @Override
   public void update(Scene scene) {
     outputMode.getSelectionModel().select(scene.getPictureExportFormat());
-    fastFog.setSelected(scene.fog.fastFog());
-    fancierTranslucency.setSelected(scene.getFancierTranslucency());
-    transmissivityCap.set(scene.getTransmissivityCap());
+    fastFog.setSelected(scene.fog.isFastFog());
     renderThreads.set(PersistentSettings.getNumThreads());
     cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());
@@ -343,8 +287,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
     bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
     biomeStructureImplementation.getSelectionModel().select(scene.getBiomeStructureImplementation());
-    gridSize.set(scene.getGridSize());
-    preventNormalEmitterWithSampling.setSelected(scene.isPreventNormalEmitterWithSampling());
     animationTime.set(scene.getAnimationTime());
     hideUnknownBlocks.setSelected(scene.getHideUnknownBlocks());
     rendererSelect.getSelectionModel().select(scene.getRenderer());
@@ -357,16 +299,13 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   }
 
   @Override
-  public Node getTabContent() {
+  public VBox getTabContent() {
     return this;
   }
 
   @Override
-  public void setController(RenderControlsFxController controls) {
-    this.renderControls = controls;
-    this.controller = controls.getRenderController();
-    scene = controller.getSceneManager().getScene();
-    controller.getRenderManager().setOnRenderCompleted((time, sps) -> {
+  public void onSetController(RenderControlsFxController controls) {
+    controller.getRenderController().getRenderManager().setOnRenderCompleted((time, sps) -> {
       if(shutdownAfterCompletedRender()) {
         // TODO: rewrite the shutdown alert in JavaFX.
         new ShutdownAlert(null);
@@ -375,7 +314,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
     // Set the renderers
     rendererSelect.getItems().clear();
-    RenderManager renderManager = controller.getRenderManager();
+    RenderManager renderManager = controller.getRenderController().getRenderManager();
     ArrayList<String> ids = new ArrayList<>();
 
     for (Registerable renderer : renderManager.getRenderers())

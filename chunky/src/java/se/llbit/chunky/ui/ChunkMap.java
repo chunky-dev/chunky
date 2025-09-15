@@ -19,22 +19,16 @@ package se.llbit.chunky.ui;
 
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.MenuItem;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.GridPane;
 import javafx.stage.PopupWindow;
 import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.MapView;
@@ -45,7 +39,6 @@ import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.ui.dialogs.SelectChunksInRadiusDialog;
-import se.llbit.chunky.ui.elements.TextFieldLabelWrapper;
 import se.llbit.chunky.world.*;
 import se.llbit.chunky.world.Dimension;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
@@ -57,7 +50,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -185,7 +177,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
     MenuItem exportZip = new MenuItem("Export selected chunks…");
     exportZip.setOnAction(e -> controller.exportZip());
-    exportZip.setDisable(chunkSelection.size() == 0);
+    exportZip.setDisable(chunkSelection.isEmpty());
 
     MenuItem exportPng = new MenuItem("Save map view as…");
     exportPng.setOnAction(e -> controller.exportMapView());
@@ -203,7 +195,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       .forEach(t -> t.accept(contextMenu));
 
     chunkSelection.addSelectionListener(() -> {
-      boolean noChunksSelected = chunkSelection.size() == 0;
+      boolean noChunksSelected = chunkSelection.isEmpty();
       clearSelection.setDisable(noChunksSelected);
       newScene.setDisable(noChunksSelected);
       loadSelection.setDisable(noChunksSelected);
@@ -483,10 +475,10 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       Chunk hoveredChunk = mapLoader.getWorld().currentDimension().getChunk(cp);
       if (!hoveredChunk.isEmpty()) {
         tooltip.setText(
-            String.format("%s, %s\nBlock: [%s, %s]\n%d chunks selected", hoveredChunk.toString(), hoveredChunk.biomeAt(bx, bz), worldBlockX, worldBlockZ, chunkSelection.size()));
+            String.format("%s, %s\nBlock: [%s, %s]\n%d chunks selected", hoveredChunk, hoveredChunk.biomeAt(bx, bz), worldBlockX, worldBlockZ, chunkSelection.size()));
       } else {
         tooltip.setText(
-            String.format("%s\nBlock: [%s, %s]\n%d chunks selected", hoveredChunk.toString(), worldBlockX, worldBlockZ, chunkSelection.size()));
+            String.format("%s\nBlock: [%s, %s]\n%d chunks selected", hoveredChunk, worldBlockX, worldBlockZ, chunkSelection.size()));
       }
       Scene scene = mapOverlay.getScene();
       if (mapOverlay.isFocused()) {

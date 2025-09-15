@@ -7,18 +7,16 @@ import se.llbit.math.Octree;
 public class OctreeFinalizationState extends FinalizationState {
 
   private final Octree worldTree;
-  private final Octree waterTree;
   private final int yMin;
   private final int yMax;
   private int x;
   private int y;
   private int z;
 
-  public OctreeFinalizationState(Octree worldTree, Octree waterTree,
+  public OctreeFinalizationState(Octree worldTree,
       BlockPalette palette, int yMin, int yMax) {
     super(palette);
     this.worldTree = worldTree;
-    this.waterTree = waterTree;
     this.yMin = yMin;
     this.yMax = yMax;
   }
