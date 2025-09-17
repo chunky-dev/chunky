@@ -27,6 +27,8 @@ import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.math.Vector3;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
 
 public class Candle extends AbstractModelBlock {
@@ -79,21 +81,21 @@ public class Candle extends AbstractModelBlock {
   }
 
   @Override
-  public boolean isEntity() {
+  public boolean hasEntities() {
     return isLit();
   }
 
   @Override
-  public boolean isBlockWithEntity() {
-    return true;
+  public boolean isReplacedByEntities() {
+    return false;
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
+  public Collection<Entity> createEntities(Vector3 position) {
     if (entity != null) {
-      return new FlameParticles(position, entity);
+      return Collections.singleton(new FlameParticles(position, entity));
     } else {
-      return new FlameParticles(position, this, new Vector3[0]);
+      return Collections.singleton(new FlameParticles(position, this, new Vector3[0]));
     }
   }
 

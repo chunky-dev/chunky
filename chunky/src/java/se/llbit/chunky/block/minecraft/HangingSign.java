@@ -36,14 +36,7 @@ public class HangingSign extends MinecraftBlockTranslucent {
     this.material = material;
     this.rotation = rotation;
     this.attached = attached;
-    invisible = true;
     solid = false;
-    localIntersect = true;
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override
@@ -52,7 +45,7 @@ public class HangingSign extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  public Entity createBlockEntity(Vector3 position, CompoundTag entityTag) {
     return new HangingSignEntity(position, entityTag, rotation, attached, material);
   }
 }

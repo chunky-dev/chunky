@@ -31,17 +31,16 @@ import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
 public class WallHead extends MinecraftBlockTranslucent {
-
   private final String description;
   private final int facing;
   private final SkullEntity.Kind type;
 
   public WallHead(String name, Texture texture, SkullEntity.Kind type, String facing) {
     super(name, texture);
-    localIntersect = true;
-    invisible = true;
     description = "facing=" + facing;
     this.type = type;
     switch (facing) {
@@ -62,32 +61,27 @@ public class WallHead extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return false;
-  }
-
-  @Override
   public String description() {
     return description;
   }
 
   @Override
-  public boolean isEntity() {
+  public boolean hasEntities() {
     return type != Kind.PLAYER;
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
-    return new SkullEntity(position, type, 0, facing);
+  public Collection<Entity> createEntities(Vector3 position) {
+    return Collections.singleton(new SkullEntity(position, type, 0, facing));
   }
 
   @Override
   public boolean isBlockEntity() {
-    return true;//return type == Kind.PLAYER;
+    return type == Kind.PLAYER;
   }
 
   @Override
-  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  public Entity createBlockEntity(Vector3 position, CompoundTag entityTag) {
     if (type == Kind.PLAYER) {
       try {
         String textureUrl = Head.getTextureUrl(entityTag);
