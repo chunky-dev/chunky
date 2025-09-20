@@ -462,8 +462,8 @@ public class ChunkyFxController
     map = new ChunkMap(mapLoader, this, mapView, chunkSelection,
         mapCanvas, mapOverlay);
 
-    yMin.setTooltip("Minimum Y level displayed in the map view.");
-    yMax.setTooltip("Maximum Y level displayed in the map view.");
+    yMin.setTooltip("Minimum Y-level displayed in the map view.");
+    yMax.setTooltip("Maximum Y-level displayed in the map view.");
 
     AtomicBoolean ignoreYUpdate = new AtomicBoolean(false); // used to not trigger a world reload after changing the world, see #926
     mapLoader.addWorldLoadListener(

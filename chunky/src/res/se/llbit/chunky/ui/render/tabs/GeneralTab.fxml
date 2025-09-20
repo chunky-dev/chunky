@@ -51,15 +51,15 @@
         <Button fx:id="loadSelectedChunks" mnemonicParsing="false" text="Load selected chunks" />
         <Button fx:id="reloadChunks" mnemonicParsing="false" text="Reload chunks" />
       </HBox>
-      <TitledPane animated="false" text="Scene Y clip">
+      <TitledPane animated="false" text="Scene Y-clip">
         <VBox spacing="10.0">
           <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <IntegerAdjuster fx:id="yMin" name="Min Y level" />
+            <IntegerAdjuster fx:id="yMin" name="Min Y-level" />
           </HBox>
           <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <IntegerAdjuster fx:id="yMax" name="Max Y level" />
+            <IntegerAdjuster fx:id="yMax" name="Max Y-level" />
           </HBox>
-          <Text fx:id="yClipInvalid" styleClass="invalid" managed="false" visible="false">Min Y level must be smaller than Max Y level.</Text>
+          <Text fx:id="yClipInvalid" styleClass="invalid" managed="false" visible="false">Min Y-level must be smaller than Max Y-level.</Text>
         </VBox>
       </TitledPane>
       <Accordion>
