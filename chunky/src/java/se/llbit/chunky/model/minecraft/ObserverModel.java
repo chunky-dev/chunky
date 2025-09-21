@@ -25,73 +25,69 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class ObserverModel extends QuadModel {
-
-  // Facing up:
-  private static final Quad[] observer = new Quad[] {
-      // Bottom face.
-      new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 0),
-          new Vector4(1, 0, 1, 0)),
-
-      // Top face.
-      new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 1), new Vector3(0, 1, 1),
-          new Vector4(0, 1, 1, 0)),
-
-      // West face.
-      new Quad(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 0),
-          new Vector4(0, 1, 0, 1)),
-
-      // East face.
-      new Quad(new Vector3(1, 0, 1), new Vector3(1, 0, 0), new Vector3(1, 1, 1),
-          new Vector4(1, 0, 0, 1)),
-
-      // Front face.
-      new Quad(new Vector3(1, 1, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 1),
-          new Vector4(1, 0, 0, 1)),
-
-      // Back face.
-      new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
-          new Vector4(0, 1, 0, 1)),
+  private static final Quad[] quadsNorth = new Quad[]{
+    new Quad(
+      new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector3(16 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
+      new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
+      new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(16 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(0 / 16.0, 16 / 16.0, 0 / 16.0),
+      new Vector3(16 / 16.0, 16 / 16.0, 0 / 16.0),
+      new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(16 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(0 / 16.0, 16 / 16.0, 16 / 16.0),
+      new Vector3(16 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    )
   };
 
-  private static final Quad[][] faces = new Quad[8][];
-
-  static {
-    // Rotate faces for all directions.
-    faces[1] = observer;
-    Quad[] temp = Model.rotateX(observer);
-    // Facing down:
-    faces[0] = Model.rotateX(temp);
-    // Facing north:
-    faces[2] = Model.rotateX(faces[0]);
-    // Facing east:
-    faces[5] = Model.rotateY(faces[2]);
-    // Facing south:
-    faces[3] = Model.rotateY(faces[5]);
-    // Facing west:
-    faces[4] = Model.rotateY(faces[3]);
-    // Facing down:
-    faces[6] = faces[1];
-    // Facing up:
-    faces[7] = observer;
-  }
-
   private static final Texture[] texturesOff = {
-      Texture.observerTop, Texture.observerTop,
-      Texture.observerSide, Texture.observerSide,
-      Texture.observerFront, Texture.observerBack
+    Texture.observerTop, Texture.observerTop,
+    Texture.observerSide, Texture.observerSide,
+    Texture.observerFront, Texture.observerBack
   };
 
   private static final Texture[] texturesOn = {
-      Texture.observerTop, Texture.observerTop,
-      Texture.observerSide, Texture.observerSide,
-      Texture.observerFront, Texture.observerBackOn
+    Texture.observerTop, Texture.observerTop,
+    Texture.observerSide, Texture.observerSide,
+    Texture.observerFront, Texture.observerBackOn
   };
 
   private final Quad[] quads;
   private final Texture[] textures;
 
-  public ObserverModel(int facing, boolean powered) {
-    quads = faces[facing];
+  public ObserverModel(String facing, boolean powered) {
+    quads = switch (facing) {
+      case "down" -> Model.rotateNegX(quadsNorth);
+      case "east" -> Model.rotateY(quadsNorth);
+      case "south" -> Model.rotateY(quadsNorth, Math.toRadians(180));
+      case "up" -> Model.rotateX(quadsNorth);
+      case "west" -> Model.rotateNegY(quadsNorth);
+      default -> quadsNorth;
+    };
     textures = powered ? texturesOn : texturesOff;
   }
 

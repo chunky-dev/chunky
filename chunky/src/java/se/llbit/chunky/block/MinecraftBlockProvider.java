@@ -965,7 +965,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("mangrove_log", (name, tag) -> log(tag, Texture.mangroveLog, Texture.mangroveLogTop));
     addBlock("stripped_mangrove_log", (name, tag) -> log(tag, Texture.strippedMangroveLog, Texture.strippedMangroveLogTop));
     addBlock("mangrove_planks", Texture.mangrovePlanks);
-    addBlock("mangrove_pressure_plate", (name, tag) -> new PressurePlate(name, Texture.mangrovePlanks));
+    addBlock("mangrove_pressure_plate", (name, tag) -> pressurePlate(tag, Texture.mangrovePlanks));
     addBlock("mangrove_sign", (name, tag) -> sign(tag, "mangrove"));
     addBlock("mangrove_wall_sign", (name, tag) -> wallSign(tag, "mangrove"));
     addBlock("mangrove_slab", (name, tag) -> slab(tag, Texture.mangrovePlanks));
@@ -998,7 +998,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("stripped_bamboo_block", (name, tag) -> log(tag, Texture.strippedBambooBlock, Texture.strippedBambooBlockTop));
     addBlock("bamboo_planks", Texture.bambooPlanks);
     addBlock("bamboo_mosaic", Texture.bambooMosaic);
-    addBlock("bamboo_pressure_plate", (name, tag) -> new PressurePlate(name, Texture.bambooPlanks));
+    addBlock("bamboo_pressure_plate", (name, tag) -> pressurePlate(tag, Texture.bambooPlanks));
     addBlock("bamboo_sign", (name, tag) -> sign(tag, "bamboo"));
     addBlock("bamboo_wall_sign", (name, tag) -> wallSign(tag, "bamboo"));
     addBlock("bamboo_slab", (name, tag) -> slab(tag, Texture.bambooPlanks));
@@ -1014,7 +1014,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("cherry_log", (name, tag) -> log(tag, Texture.cherryLog, Texture.cherryLogTop));
     addBlock("stripped_cherry_log", (name, tag) -> log(tag, Texture.strippedCherryLog, Texture.strippedCherryLogTop));
     addBlock("cherry_planks", Texture.cherryPlanks);
-    addBlock("cherry_pressure_plate", (name, tag) -> new PressurePlate(name, Texture.cherryPlanks));
+    addBlock("cherry_pressure_plate", (name, tag) -> pressurePlate(tag, Texture.cherryPlanks));
     addBlock("cherry_sign", (name, tag) -> sign(tag, "cherry"));
     addBlock("cherry_wall_sign", (name, tag) -> wallSign(tag, "cherry"));
     addBlock("cherry_slab", (name, tag) -> slab(tag, Texture.cherryPlanks));
@@ -1132,7 +1132,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("pale_oak_planks", Texture.paleOakPlanks);
     addBlock("pale_oak_slab", (name, tag) -> slab(tag, Texture.paleOakPlanks));
     addBlock("pale_oak_stairs", (name, tag) -> stairs(tag, Texture.paleOakPlanks));
-    addBlock("pale_oak_pressure_plate", (name, tag) -> new PressurePlate(name, Texture.sprucePlanks));
+    addBlock("pale_oak_pressure_plate", (name, tag) -> pressurePlate(tag, Texture.sprucePlanks));
     addBlock("pale_oak_fence", (name, tag) -> fence(tag, Texture.paleOakPlanks));
     addBlock("pale_oak_fence_gate", (name, tag) -> fenceGate(tag, Texture.paleOakPlanks));
     addBlock("pale_oak_trapdoor", (name, tag) -> orientableTrapdoor(tag, Texture.paleOakTrapdoor));
@@ -1640,19 +1640,19 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "lever":
         return lever(tag);
       case "stone_pressure_plate":
-        return new PressurePlate(name, Texture.stone);
+        return pressurePlate(tag, Texture.stone);
       case "oak_pressure_plate":
-        return new PressurePlate(name, Texture.oakPlanks);
+        return pressurePlate(tag, Texture.oakPlanks);
       case "spruce_pressure_plate":
-        return new PressurePlate(name, Texture.sprucePlanks);
+        return pressurePlate(tag, Texture.sprucePlanks);
       case "birch_pressure_plate":
-        return new PressurePlate(name, Texture.birchPlanks);
+        return pressurePlate(tag, Texture.birchPlanks);
       case "jungle_pressure_plate":
-        return new PressurePlate(name, Texture.jungleTreePlanks);
+        return pressurePlate(tag, Texture.jungleTreePlanks);
       case "acacia_pressure_plate":
-        return new PressurePlate(name, Texture.acaciaPlanks);
+        return pressurePlate(tag, Texture.acaciaPlanks);
       case "dark_oak_pressure_plate":
-        return new PressurePlate(name, Texture.darkOakPlanks);
+        return pressurePlate(tag, Texture.darkOakPlanks);
       case "redstone_ore":
         return new MinecraftBlock(name, Texture.redstoneOre);
       case "redstone_torch":
@@ -1832,9 +1832,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "trapped_chest":
         return chest(tag, Chest.Kind.TRAPPED);
       case "light_weighted_pressure_plate":
-        return new PressurePlate(name, Texture.goldBlock);
+        return pressurePlate(tag, Texture.goldBlock);
       case "heavy_weighted_pressure_plate":
-        return new PressurePlate(name, Texture.ironBlock);
+        return pressurePlate(tag, Texture.ironBlock);
       case "daylight_detector": {
         String inverted = tag.get("Properties").get("inverted").stringValue("false");
         return new DaylightDetector(inverted.equals("true"));
@@ -2846,9 +2846,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "warped_planks":
         return new MinecraftBlock(name, Texture.warpedPlanks);
       case "crimson_pressure_plate":
-        return new PressurePlate(name, Texture.crimsonPlanks);
+        return pressurePlate(tag, Texture.crimsonPlanks);
       case "warped_pressure_plate":
-        return new PressurePlate(name, Texture.warpedPlanks);
+        return pressurePlate(tag, Texture.warpedPlanks);
       case "crimson_slab":
         return slab(tag, Texture.crimsonPlanks);
       case "warped_slab":
@@ -2926,7 +2926,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "polished_blackstone_button":
         return button(tag, Texture.polishedBlackstone);
       case "polished_blackstone_pressure_plate":
-        return new PressurePlate(name, Texture.polishedBlackstone);
+        return pressurePlate(tag, Texture.polishedBlackstone);
       case "quartz_bricks":
         return new MinecraftBlock(name, Texture.quartzBricks);
       case "chain": // < 25w35a
@@ -3584,12 +3584,13 @@ public class MinecraftBlockProvider implements BlockProvider {
 
   private Block tripwire(Tag tag) {
     Tag properties = tag.get("Properties");
-    String north = properties.get("north").stringValue("false");
-    String south = properties.get("south").stringValue("false");
-    String east = properties.get("east").stringValue("false");
-    String west = properties.get("west").stringValue("false");
     return new Tripwire(
-      north.equals("true"), south.equals("true"), east.equals("true"), west.equals("true"));
+      BlockProvider.stringToBoolean(properties.get("attached")),
+      BlockProvider.stringToBoolean(properties.get("north")),
+      BlockProvider.stringToBoolean(properties.get("south")),
+      BlockProvider.stringToBoolean(properties.get("east")),
+      BlockProvider.stringToBoolean(properties.get("west"))
+    );
   }
 
   private Block tripwireHook(Tag tag) {
@@ -3736,6 +3737,14 @@ public class MinecraftBlockProvider implements BlockProvider {
       BlockProvider.stringToBoolean(tag.get("Properties").get("south")),
       BlockProvider.stringToBoolean(tag.get("Properties").get("east")),
       BlockProvider.stringToBoolean(tag.get("Properties").get("west"))
+    );
+  }
+
+  private static Block pressurePlate(Tag tag, Texture texture) {
+    return new PressurePlate(
+      BlockProvider.blockName(tag),
+      texture,
+      BlockProvider.stringToBoolean(tag.get("Properties").get("powered"))
     );
   }
 

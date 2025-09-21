@@ -23,9 +23,16 @@ import se.llbit.chunky.model.minecraft.PressurePlateModel;
 import se.llbit.chunky.resources.Texture;
 
 public class PressurePlate extends AbstractModelBlock {
+  private final String description;
 
-  public PressurePlate(String name, Texture texture) {
+  public PressurePlate(String name, Texture texture, boolean powered) {
     super(name, texture);
-    model = new PressurePlateModel(texture);
+    model = new PressurePlateModel(texture, powered);
+    description = String.format("powered=%s", powered);
+  }
+
+  @Override
+  public String description() {
+    return description;
   }
 }

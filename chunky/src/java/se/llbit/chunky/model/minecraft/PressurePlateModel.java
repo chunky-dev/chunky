@@ -26,37 +26,90 @@ import se.llbit.math.Vector4;
 import java.util.Arrays;
 
 public class PressurePlateModel extends QuadModel {
-  private static final Quad[] quads = {
-      // front
-      new Quad(new Vector3(15 / 16., 0, 1 / 16.), new Vector3(1 / 16., 0, 1 / 16.),
-          new Vector3(15 / 16., 1 / 16., 1 / 16.), new Vector4(15 / 16., 1 / 16., 0, 1 / 16.)),
-
-      // back
-      new Quad(new Vector3(1 / 16., 0, 15 / 16.), new Vector3(15 / 16., 0, 15 / 16.),
-          new Vector3(1 / 16., 1 / 16., 15 / 16.), new Vector4(1 / 16., 15 / 16., 0, 1 / 16.)),
-
-      // right
-      new Quad(new Vector3(1 / 16., 0, 1 / 16.), new Vector3(1 / 16., 0, 15 / 16.),
-          new Vector3(1 / 16., 1 / 16., 1 / 16.), new Vector4(1 / 16., 15 / 16., 0, 1 / 16.)),
-
-      // left
-      new Quad(new Vector3(15 / 16., 0, 15 / 16.), new Vector3(15 / 16., 0, 1 / 16.),
-          new Vector3(15 / 16., 1 / 16., 15 / 16.), new Vector4(15 / 16., 1 / 16., 0, 1 / 16.)),
-
-      // top
-      new Quad(new Vector3(15 / 16., 1 / 16., 1 / 16.), new Vector3(1 / 16., 1 / 16., 1 / 16.),
-          new Vector3(15 / 16., 1 / 16., 15 / 16.),
-          new Vector4(15 / 16., 1 / 16., 15 / 16., 1 / 16.)),
-
-      // bottom
-      new Quad(new Vector3(1 / 16., 0, 1 / 16.), new Vector3(15 / 16., 0, 1 / 16.),
-          new Vector3(1 / 16., 0, 15 / 16.), new Vector4(1 / 16., 15 / 16., 1 / 16., 15 / 16.)),
-
+  private static final Quad[] quadsUp = new Quad[]{
+    new Quad(
+      new Vector3(1 / 16.0, 1 / 16.0, 15 / 16.0),
+      new Vector3(15 / 16.0, 1 / 16.0, 15 / 16.0),
+      new Vector3(1 / 16.0, 1 / 16.0, 1 / 16.0),
+      new Vector4(1 / 16.0, 15 / 16.0, 1 / 16.0, 15 / 16.0)
+    ),
+    new Quad(
+      new Vector3(1 / 16.0, 0 / 16.0, 1 / 16.0),
+      new Vector3(15 / 16.0, 0 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, 0 / 16.0, 15 / 16.0),
+      new Vector4(1 / 16.0, 15 / 16.0, 1 / 16.0, 15 / 16.0)
+    ),
+    new Quad(
+      new Vector3(1 / 16.0, 1 / 16.0, 15 / 16.0),
+      new Vector3(1 / 16.0, 1 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, 0 / 16.0, 15 / 16.0),
+      new Vector4(15 / 16.0, 1 / 16.0, 1 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(15 / 16.0, 1 / 16.0, 1 / 16.0),
+      new Vector3(15 / 16.0, 1 / 16.0, 15 / 16.0),
+      new Vector3(15 / 16.0, 0 / 16.0, 1 / 16.0),
+      new Vector4(15 / 16.0, 1 / 16.0, 1 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(1 / 16.0, 1 / 16.0, 1 / 16.0),
+      new Vector3(15 / 16.0, 1 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, 0 / 16.0, 1 / 16.0),
+      new Vector4(15 / 16.0, 1 / 16.0, 1 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(15 / 16.0, 1 / 16.0, 15 / 16.0),
+      new Vector3(1 / 16.0, 1 / 16.0, 15 / 16.0),
+      new Vector3(15 / 16.0, 0 / 16.0, 15 / 16.0),
+      new Vector4(15 / 16.0, 1 / 16.0, 1 / 16.0, 0 / 16.0)
+    )
   };
 
-  private final Texture[] textures = new Texture[quads.length];
+  private static final Quad[] quadsDown = new Quad[]{
+    new Quad(
+      new Vector3(1 / 16.0, 0.5 / 16.0, 15 / 16.0),
+      new Vector3(15 / 16.0, 0.5 / 16.0, 15 / 16.0),
+      new Vector3(1 / 16.0, 0.5 / 16.0, 1 / 16.0),
+      new Vector4(1 / 16.0, 15 / 16.0, 1 / 16.0, 15 / 16.0)
+    ),
+    new Quad(
+      new Vector3(1 / 16.0, 0 / 16.0, 1 / 16.0),
+      new Vector3(15 / 16.0, 0 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, 0 / 16.0, 15 / 16.0),
+      new Vector4(1 / 16.0, 15 / 16.0, 1 / 16.0, 15 / 16.0)
+    ),
+    new Quad(
+      new Vector3(1 / 16.0, 0.5 / 16.0, 15 / 16.0),
+      new Vector3(1 / 16.0, 0.5 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, 0 / 16.0, 15 / 16.0),
+      new Vector4(15 / 16.0, 1 / 16.0, 1 / 16.0, 0.5 / 16.0)
+    ),
+    new Quad(
+      new Vector3(15 / 16.0, 0.5 / 16.0, 1 / 16.0),
+      new Vector3(15 / 16.0, 0.5 / 16.0, 15 / 16.0),
+      new Vector3(15 / 16.0, 0 / 16.0, 1 / 16.0),
+      new Vector4(15 / 16.0, 1 / 16.0, 1 / 16.0, 0.5 / 16.0)
+    ),
+    new Quad(
+      new Vector3(1 / 16.0, 0.5 / 16.0, 1 / 16.0),
+      new Vector3(15 / 16.0, 0.5 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, 0 / 16.0, 1 / 16.0),
+      new Vector4(15 / 16.0, 1 / 16.0, 1 / 16.0, 0.5 / 16.0)
+    ),
+    new Quad(
+      new Vector3(15 / 16.0, 0.5 / 16.0, 15 / 16.0),
+      new Vector3(1 / 16.0, 0.5 / 16.0, 15 / 16.0),
+      new Vector3(15 / 16.0, 0 / 16.0, 15 / 16.0),
+      new Vector4(15 / 16.0, 1 / 16.0, 1 / 16.0, 0.5 / 16.0)
+    )
+  };
 
-  public PressurePlateModel(Texture texture) {
+  private final Quad[] quads;
+  private final Texture[] textures;
+
+  public PressurePlateModel(Texture texture, boolean powered) {
+    quads = powered ? quadsDown : quadsUp;
+    textures = new Texture[quads.length];
     Arrays.fill(textures, texture);
   }
 
