@@ -3584,12 +3584,13 @@ public class MinecraftBlockProvider implements BlockProvider {
 
   private Block tripwire(Tag tag) {
     Tag properties = tag.get("Properties");
-    String north = properties.get("north").stringValue("false");
-    String south = properties.get("south").stringValue("false");
-    String east = properties.get("east").stringValue("false");
-    String west = properties.get("west").stringValue("false");
     return new Tripwire(
-      north.equals("true"), south.equals("true"), east.equals("true"), west.equals("true"));
+      BlockProvider.stringToBoolean(properties.get("attached")),
+      BlockProvider.stringToBoolean(properties.get("north")),
+      BlockProvider.stringToBoolean(properties.get("south")),
+      BlockProvider.stringToBoolean(properties.get("east")),
+      BlockProvider.stringToBoolean(properties.get("west"))
+    );
   }
 
   private Block tripwireHook(Tag tag) {
