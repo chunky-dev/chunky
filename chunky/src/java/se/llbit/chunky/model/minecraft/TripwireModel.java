@@ -662,48 +662,40 @@ public class TripwireModel extends QuadModel {
   private final Texture[] textures;
 
   public TripwireModel(boolean attached, boolean north, boolean south, boolean east, boolean west) {
+    Quad[] modelNS, modelN, modelNE, modelNSE, modelNSEW;
     int nsew = (north ? 1 : 0) << 3 | (south ? 1 : 0) << 2 | (east ? 1 : 0) << 1 | (west ? 1 : 0);
     if (attached) {
-      quads = switch (nsew) {
-        case 0b0000 -> tripwireAttachedNS;
-        case 0b0001 -> Model.rotateNegY(tripwireAttachedN);
-        case 0b0010 -> Model.rotateY(tripwireAttachedN);
-        case 0b0011 -> Model.rotateY(tripwireAttachedNS);
-        case 0b0100 -> Model.rotateY(tripwireAttachedN, Math.toRadians(180));
-        case 0b0101 -> Model.rotateY(tripwireAttachedNE, Math.toRadians(180));
-        case 0b0110 -> Model.rotateY(tripwireAttachedNE);
-        case 0b0111 -> Model.rotateY(tripwireAttachedNSE);
-        case 0b1000 -> tripwireAttachedN;
-        case 0b1001 -> Model.rotateNegY(tripwireAttachedNE);
-        case 0b1010 -> tripwireAttachedNE;
-        case 0b1011 -> Model.rotateNegY(tripwireAttachedNSE);
-        case 0b1100 -> tripwireAttachedNS;
-        case 0b1101 -> Model.rotateY(tripwireAttachedNSE, Math.toRadians(180));
-        case 0b1110 -> tripwireAttachedNSE;
-        case 0b1111 -> tripwireAttachedNSEW;
-        default -> tripwireAttachedN;
-      };
+      modelNS = tripwireAttachedNS;
+      modelN = tripwireAttachedN;
+      modelNE = tripwireAttachedNE;
+      modelNSE = tripwireAttachedNSE;
+      modelNSEW = tripwireAttachedNSEW;
     } else {
-      quads = switch (nsew) {
-        case 0b0000 -> tripwireNS;
-        case 0b0001 -> Model.rotateNegY(tripwireN);
-        case 0b0010 -> Model.rotateY(tripwireN);
-        case 0b0011 -> Model.rotateY(tripwireNS);
-        case 0b0100 -> Model.rotateY(tripwireN, Math.toRadians(180));
-        case 0b0101 -> Model.rotateY(tripwireNE, Math.toRadians(180));
-        case 0b0110 -> Model.rotateY(tripwireNE);
-        case 0b0111 -> Model.rotateY(tripwireNSE);
-        case 0b1000 -> tripwireN;
-        case 0b1001 -> Model.rotateNegY(tripwireNE);
-        case 0b1010 -> tripwireNE;
-        case 0b1011 -> Model.rotateNegY(tripwireNSE);
-        case 0b1100 -> tripwireNS;
-        case 0b1101 -> Model.rotateY(tripwireNSE, Math.toRadians(180));
-        case 0b1110 -> tripwireNSE;
-        case 0b1111 -> tripwireNSEW;
-        default -> tripwireN;
-      };
+      modelNS = tripwireNS;
+      modelN = tripwireN;
+      modelNE = tripwireNE;
+      modelNSE = tripwireNSE;
+      modelNSEW = tripwireNSEW;
     }
+    quads = switch (nsew) {
+      case 0b0000 -> modelNS;
+      case 0b0001 -> Model.rotateNegY(modelN);
+      case 0b0010 -> Model.rotateY(modelN);
+      case 0b0011 -> Model.rotateY(modelNS);
+      case 0b0100 -> Model.rotateY(modelN, Math.toRadians(180));
+      case 0b0101 -> Model.rotateY(modelNE, Math.toRadians(180));
+      case 0b0110 -> Model.rotateY(modelNE);
+      case 0b0111 -> Model.rotateY(modelNSE);
+      case 0b1000 -> modelN;
+      case 0b1001 -> Model.rotateNegY(modelNE);
+      case 0b1010 -> modelNE;
+      case 0b1011 -> Model.rotateNegY(modelNSE);
+      case 0b1100 -> modelNS;
+      case 0b1101 -> Model.rotateY(modelNSE, Math.toRadians(180));
+      case 0b1110 -> modelNSE;
+      case 0b1111 -> modelNSEW;
+      default -> modelN;
+    };
     textures = new Texture[quads.length];
     Arrays.fill(textures, Texture.tripwire);
   }
