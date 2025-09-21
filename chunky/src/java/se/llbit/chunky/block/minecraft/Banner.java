@@ -54,7 +54,7 @@ public class Banner extends MinecraftBlockTranslucent {
     return true;
   }
 
-  @Override public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  @Override public Entity createBlockEntity(Vector3 position, CompoundTag entityTag) {
     JsonObject design = StandingBanner.parseDesign(entityTag);
     design.set("base", Json.of(color.id)); // Base color is not included in the entity tag in Minecraft 1.13+.
     return new StandingBanner(position, rotation, design);
