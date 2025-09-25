@@ -19,6 +19,7 @@ import se.llbit.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 public class MooshroomEntity extends Entity implements Poseable, Variant {
 
@@ -257,8 +258,8 @@ public class MooshroomEntity extends Entity implements Poseable, Variant {
     return json;
   }
 
-  public static MooshroomEntity fromJson(JsonObject json) {
-    return new MooshroomEntity(json);
+  public static Collection<Entity> fromJson(JsonObject json) {
+    return Collections.singleton(new MooshroomEntity(json));
   }
 
   @Override
