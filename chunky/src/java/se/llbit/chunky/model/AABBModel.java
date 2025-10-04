@@ -80,45 +80,46 @@ public abstract class AABBModel implements BlockModel {
     ray.t = Double.POSITIVE_INFINITY;
     for (int i = 0; i < boxes.length; ++i) {
       if (boxes[i].intersect(ray)) {
+        Texture[] texturesBox = textures[i];
         Tint[] tintedFacesBox = tintedFaces != null ? tintedFaces[i] : null;
         UVMapping[] mappingBox = mapping != null ? mapping[i] : null;
         Vector3 n = ray.getNormal();
         if (n.y > 0) { // top
           ray.v = 1 - ray.v;
-          if (intersectFace(ray, textures[i][4],
+          if (intersectFace(ray, texturesBox[4],
             mappingBox != null ? mappingBox[4] : null
           )) {
             tint = tintedFacesBox != null ? tintedFacesBox[4] : Tint.NONE;
             hit = true;
           }
         } else if (n.y < 0) { // bottom
-          if (intersectFace(ray, textures[i][5],
+          if (intersectFace(ray, texturesBox[5],
             mappingBox != null ? mappingBox[5] : null)) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[5] : Tint.NONE;
           }
         } else if (n.z < 0) { // north
-          if (intersectFace(ray, textures[i][0],
+          if (intersectFace(ray, texturesBox[0],
             mappingBox != null ? mappingBox[0] : null
           )) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[0] : Tint.NONE;
           }
         } else if (n.z > 0) { // south
-          if (intersectFace(ray, textures[i][2],
+          if (intersectFace(ray, texturesBox[2],
             mappingBox != null ? mappingBox[2] : null
           )) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[2] : Tint.NONE;
           }
         } else if (n.x < 0) { // west
-          if (intersectFace(ray, textures[i][3],
+          if (intersectFace(ray, texturesBox[3],
             mappingBox != null ? mappingBox[3] : null)) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[3] : Tint.NONE;
           }
         } else if (n.x > 0) { // east
-          if (intersectFace(ray, textures[i][1],
+          if (intersectFace(ray, texturesBox[1],
             mappingBox != null ? mappingBox[1] : null)) {
             hit = true;
             tint = tintedFacesBox != null ? tintedFacesBox[1] : Tint.NONE;
@@ -186,7 +187,7 @@ public abstract class AABBModel implements BlockModel {
   @Override
   public boolean isBiomeDependant() {
     Tint[][] tints = getTints();
-    if(tints == null)
+    if (tints == null)
       return false;
 
     return Arrays.stream(tints)
