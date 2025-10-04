@@ -12,42 +12,72 @@ import java.util.Objects;
 import java.util.Random;
 
 /**
- * A block model that is made out of textured AABBs.
+ * A block model that is made out of textured axis-aligned bounding boxes (AABBs).
  */
 @PluginApi
 public abstract class AABBModel implements BlockModel {
 
   /**
    * Different UV mapping methods.
-   * - None: No change in mapping
-   * - ROTATE_90: Rotate 90 degrees clockwise
-   * - ROTATE_180: Rotate 180 degrees
-   * - ROTATE_270: Rotate 270 degrees clockwise (90 degrees counterclockwise)
-   * - FLIP_U: Flip along the X axis (u = 1 - u)
-   * - FLIP_V: Flip along the Y axis (v = 1 - v)
-   * <p>
-   * Note: a value of {@code null} is equivalent to {@code NONE}
    */
   public enum UVMapping {
+    /**
+     * No change in mapping.
+     */
     NONE,
+    /**
+     * Rotate by 90 degrees clockwise.
+     */
     ROTATE_90,
+    /**
+     * Rotate by 180 degrees.
+     */
     ROTATE_180,
+    /**
+     * Rotate 270 degrees clockwise (90 degrees counter clockwise).
+     */
     ROTATE_270,
+    /**
+     * Mirror horizontally (u = 1 - u).
+     */
     FLIP_U,
+    /**
+     * Mirror vertically (v = 1 - v).
+     */
     FLIP_V
   }
 
+  /**
+   * Get the boxes for this model.
+   *
+   * @return An array of boxes.
+   */
   @PluginApi
   public abstract AABB[] getBoxes();
 
+  /**
+   * Get textures for the boxes.
+   *
+   * @return An array of textures for the boxes, each in north, east, south, west, top, bottom order.
+   */
   @PluginApi
   public abstract Texture[][] getTextures();
 
+  /**
+   * Get tints for the boxes. If an entry is <code>null</code> or this method returns <code>null</code>, it is equivalent to {@link Tint#NONE}.
+   *
+   * @return An array of tints for the boxes, each in north, east, south, west, top, bottom order.
+   */
   @PluginApi
   public Tint[][] getTints() {
     return null;
   }
 
+  /**
+   * Get UV mappings for the boxes. If an entry is <code>null</code> or this method returns <code>null</code>, it is equivalent to {@link UVMapping#NONE}.
+   *
+   * @return An array of UV mappings for the boxes, each in north, east, south, west, top, bottom order.
+   */
   @PluginApi
   public UVMapping[][] getUVMapping() {
     return null;
