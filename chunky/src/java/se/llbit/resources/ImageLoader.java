@@ -43,13 +43,6 @@ public final class ImageLoader {
    */
   public final static BitmapImage missingImage;
 
-  /**
-   * ImageIO doesn't support PNGs with RGB and a transparent color before JDK 11. Since Chunky only
-   * supports Java 8 and 11+, this is a reasonable check.
-   * https://bugs.java.com/bugdatabase/view_bug.do?bug_id=6788458
-   */
-  private static final boolean IMAGEIO_PNG_TRANSPARENT_COLOR_SUPPORTED = !System.getProperty("java.version").startsWith("1.");
-
   static {
     missingImage = new BitmapImage(16, 16);
     for (int y = 0; y < 16; ++y) {
@@ -92,24 +85,6 @@ public final class ImageLoader {
   }
 
   public static BitmapImage read(InputStream in) throws IOException {
-    // TODO remove this when java 8 support is dropped
-    if (!IMAGEIO_PNG_TRANSPARENT_COLOR_SUPPORTED) {
-      ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-      int nRead;
-      byte[] data = new byte[4096];
-      while ((nRead = in.read(data, 0, data.length)) != -1) {
-        buffer.write(data, 0, nRead);
-      }
-
-      byte[] imgData = buffer.toByteArray();
-      try {
-        Image img = Toolkit.getDefaultToolkit().createImage(imgData);
-        return fromAwtImage(img);
-      } catch (Exception e) {
-        Log.info("Failed to load image with AWT. Trying with ImageIO.");
-        return fromBufferedImage(ImageIO.read(new ByteArrayInputStream(imgData)));
-      }
-    }
     return fromBufferedImage(ImageIO.read(in));
   }
 
@@ -171,11 +146,12 @@ public final class ImageLoader {
       Mutable<Boolean> stop = new Mutable<>(false);
       ImageObserver observer = (img, infoflags, x, y, width, height) -> {
         boolean fail = (infoflags &
-            (ImageObserver.ERROR | ImageObserver.ABORT)) != 0;
+          (ImageObserver.ERROR | ImageObserver.ABORT)) != 0;
         stop.set(fail);
         return !fail;
       };
-      while (!stop.get() && !g.drawImage(newImage, 0, 0, observer)) {}
+      while (!stop.get() && !g.drawImage(newImage, 0, 0, observer)) {
+      }
       g.dispose();
       if (stop.get()) {
         throw new IllegalArgumentException("Invalid image.");
