@@ -16,19 +16,20 @@
  */
 package se.llbit.resources;
 
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.image.ImageObserver;
-import java.io.*;
-
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
 import se.llbit.util.Mutable;
 
 import javax.imageio.ImageIO;
-import java.awt.Graphics;
+import java.awt.*;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.awt.image.ImageObserver;
+import java.awt.image.Raster;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -37,15 +38,10 @@ import java.net.URL;
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public final class ImageLoader {
-  /** The missing image is a 16x16 image with black background and red border and cross. */
-  public final static BitmapImage missingImage;
-
   /**
-   * ImageIO doesn't support PNGs with RGB and a transparent color before JDK 11. Since Chunky only
-   * supports Java 8 and 11+, this is a reasonable check.
-   * https://bugs.java.com/bugdatabase/view_bug.do?bug_id=6788458
+   * The missing image is a 16x16 image with black background and red border and cross.
    */
-  private static final boolean IMAGEIO_PNG_TRANSPARENT_COLOR_SUPPORTED = !System.getProperty("java.version").startsWith("1.");
+  public final static BitmapImage missingImage;
 
   static {
     missingImage = new BitmapImage(16, 16);
@@ -89,24 +85,6 @@ public final class ImageLoader {
   }
 
   public static BitmapImage read(InputStream in) throws IOException {
-    // TODO remove this when java 8 support is dropped
-    if (!IMAGEIO_PNG_TRANSPARENT_COLOR_SUPPORTED) {
-      ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-      int nRead;
-      byte[] data = new byte[4096];
-      while ((nRead = in.read(data, 0, data.length)) != -1) {
-        buffer.write(data, 0, nRead);
-      }
-
-      byte[] imgData = buffer.toByteArray();
-      try {
-        Image img = Toolkit.getDefaultToolkit().createImage(imgData);
-        return fromAwtImage(img);
-      } catch (Exception e) {
-        Log.info("Failed to load image with AWT. Trying with ImageIO.");
-        return fromBufferedImage(ImageIO.read(new ByteArrayInputStream(imgData)));
-      }
-    }
     return fromBufferedImage(ImageIO.read(in));
   }
 
@@ -123,6 +101,24 @@ public final class ImageLoader {
     BufferedImage image;
     if (newImage.getType() == BufferedImage.TYPE_INT_ARGB) {
       image = newImage;
+    } else if (newImage.getColorModel().getColorSpace().getType() == ColorSpace.TYPE_GRAY) {
+      // Convert grayscale to ARGB (workaround for bad gamma e.g. for anvil_top).
+      image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+      Raster raster = newImage.getRaster();
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+          int[] pixel = new int[newImage.getColorModel().getPixelSize()];
+          raster.getPixel(x, y, pixel);
+          int outARGB = newImage.getRGB(x, y);
+          int a = (outARGB >> 24) & 0xff;
+          int r = pixel[0];
+          int g = pixel[0];
+          int b = pixel[0];
+
+          outARGB = (a << 24) | (r << 16) | (g << 8) | b;
+          image.setRGB(x, y, outARGB);
+        }
+      }
     } else {
       // Convert to ARGB.
       image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -150,11 +146,12 @@ public final class ImageLoader {
       Mutable<Boolean> stop = new Mutable<>(false);
       ImageObserver observer = (img, infoflags, x, y, width, height) -> {
         boolean fail = (infoflags &
-            (ImageObserver.ERROR | ImageObserver.ABORT)) != 0;
+          (ImageObserver.ERROR | ImageObserver.ABORT)) != 0;
         stop.set(fail);
         return !fail;
       };
-      while (!stop.get() && !g.drawImage(newImage, 0, 0, observer)) {}
+      while (!stop.get() && !g.drawImage(newImage, 0, 0, observer)) {
+      }
       g.dispose();
       if (stop.get()) {
         throw new IllegalArgumentException("Invalid image.");
