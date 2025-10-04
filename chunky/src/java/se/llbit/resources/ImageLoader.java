@@ -16,19 +16,20 @@
  */
 package se.llbit.resources;
 
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.image.ImageObserver;
-import java.io.*;
-
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
 import se.llbit.util.Mutable;
 
 import javax.imageio.ImageIO;
-import java.awt.Graphics;
+import java.awt.*;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.awt.image.ImageObserver;
+import java.awt.image.Raster;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -37,7 +38,9 @@ import java.net.URL;
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public final class ImageLoader {
-  /** The missing image is a 16x16 image with black background and red border and cross. */
+  /**
+   * The missing image is a 16x16 image with black background and red border and cross.
+   */
   public final static BitmapImage missingImage;
 
   /**
@@ -123,6 +126,24 @@ public final class ImageLoader {
     BufferedImage image;
     if (newImage.getType() == BufferedImage.TYPE_INT_ARGB) {
       image = newImage;
+    } else if (newImage.getColorModel().getColorSpace().getType() == ColorSpace.TYPE_GRAY) {
+      // Convert grayscale to ARGB (workaround for bad gamma e.g. for anvil_top).
+      image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+      Raster raster = newImage.getRaster();
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+          int[] pixel = new int[newImage.getColorModel().getPixelSize()];
+          raster.getPixel(x, y, pixel);
+          int outARGB = newImage.getRGB(x, y);
+          int a = (outARGB >> 24) & 0xff;
+          int r = pixel[0];
+          int g = pixel[0];
+          int b = pixel[0];
+
+          outARGB = (a << 24) | (r << 16) | (g << 8) | b;
+          image.setRGB(x, y, outARGB);
+        }
+      }
     } else {
       // Convert to ARGB.
       image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
