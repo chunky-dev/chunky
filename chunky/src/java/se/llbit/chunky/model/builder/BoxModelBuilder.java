@@ -32,6 +32,12 @@ public class BoxModelBuilder {
     return this;
   }
 
+  public BoxModelBuilder addBlockUnitsBox(int x, int y, int z, int width, int height, int length, Consumer<BoxBuilder> boxConsumer) {
+    return this.addBox(new Vector3(x / 16.0, y / 16.0, z / 16.0),
+      new Vector3((x + width) / 16.0, (y + height) / 16.0, (z + length) / 16.0),
+      boxConsumer);
+  }
+
   /**
    * Create quads from all boxes, including all previously configured faces and taking the specified UV maps into account.
    *
@@ -313,7 +319,7 @@ public class BoxModelBuilder {
      *
      * @param texture Texture to be used
      * @param width   Texture width, eg. 64 for piglin texture, 256 for enderdragon texture
-     * @param width   Texture height, eg. 64 for piglin texture, 256 for enderdragon texture
+     * @param height  Texture height, eg. 64 for piglin texture, 256 for enderdragon texture
      * @return This box builder
      */
     public BoxBuilder forTextureSize(Texture texture, int width, int height) {
@@ -404,6 +410,12 @@ public class BoxModelBuilder {
       UVMapHelper.Side tmp = this.sides[2];
       this.sides[2] = this.sides[3];
       this.sides[3] = tmp;
+      return this;
+    }
+
+    public BoxBuilder grow(double growBy) {
+      this.from.sub(growBy, growBy, growBy);
+      this.to.add(growBy, growBy, growBy);
       return this;
     }
   }

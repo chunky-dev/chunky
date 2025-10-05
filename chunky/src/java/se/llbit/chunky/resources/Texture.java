@@ -1724,6 +1724,8 @@ public class Texture {
   public static final Texture weatheredCopperBars = new Texture();
   @TexturePath("assets/minecraft/textures/block/oxidized_copper_bars")
   public static final Texture oxidizedCopperBars = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/copper_golem/copper_golem")
+  public static final Texture copperGolem = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
