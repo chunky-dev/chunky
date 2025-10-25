@@ -105,6 +105,23 @@ public class UVMapHelper {
     }
 
     /**
+     * Set the UV map for this side.
+     *
+     * @param x0
+     * @param x1
+     * @param y0
+     * @param y1
+     * @return This side
+     */
+    public Side set(double x0, double x1, double y0, double y1) {
+      this.x0 = x0;
+      this.x1 = x1;
+      this.y0 = y0;
+      this.y1 = y1;
+      return this;
+    }
+
+    /**
      * Creates a UV vector that can be used by the {@link se.llbit.math.Quad} constructor.
      *
      * @return UV vector that can be used to construct a Quad
