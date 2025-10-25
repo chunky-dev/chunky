@@ -32,8 +32,9 @@ public class BoxModelBuilder {
     return this;
   }
 
-  public BoxModelBuilder addBlockUnitsBox(int x, int y, int z, int width, int height, int length, Consumer<BoxBuilder> boxConsumer) {
-    return this.addBox(new Vector3(x / 16.0, y / 16.0, z / 16.0),
+  public BoxModelBuilder addBlockUnitsBox(double x, double y, double z, double width, double height, double length, Consumer<BoxBuilder> boxConsumer) {
+    return this.addBox(
+      new Vector3(x / 16.0, y / 16.0, z / 16.0),
       new Vector3((x + width) / 16.0, (y + height) / 16.0, (z + length) / 16.0),
       boxConsumer);
   }
@@ -121,7 +122,11 @@ public class BoxModelBuilder {
       }
 
       Quad[] boxQuadsArray = boxQuads.toArray(new Quad[0]);
-      boxQuadsArray = Model.transform(boxQuadsArray, box.transform);
+      boxQuadsArray = Model.transform(boxQuadsArray,
+        Transform.NONE
+          .translate(0.5, 0.5, 0.5) // Model.transform rotates around 0.5, 0.5, 0.5 by default, which we don't want here
+          .chain(box.transform)
+          .translate(-0.5, -0.5, -0.5));
       quads.addAll(Arrays.asList(boxQuadsArray));
     }
     return quads.toArray(new Quad[0]);
@@ -178,6 +183,21 @@ public class BoxModelBuilder {
         helper.flipY();
       }
       return helper;
+    }
+
+    /**
+     * Add all faces.
+     *
+     * @return This box builder
+     */
+    public BoxBuilder addAllFaces() {
+      addTopFace();
+      addBottomFace();
+      addLeftFace();
+      addRightFace();
+      addFrontFace();
+      addBackFace();
+      return this;
     }
 
     /**
@@ -413,6 +433,12 @@ public class BoxModelBuilder {
       return this;
     }
 
+    /**
+     * Grow this box by the given amount of units. The box will be scaled relative to its center.
+     *
+     * @param growBy Units to grow this model by (in model space)
+     * @return This box builder
+     */
     public BoxBuilder grow(double growBy) {
       this.from.sub(growBy, growBy, growBy);
       this.to.add(growBy, growBy, growBy);

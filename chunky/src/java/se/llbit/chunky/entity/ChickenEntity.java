@@ -26,11 +26,7 @@ public class ChickenEntity extends Entity implements Poseable, Variant {
     .addBox(new Vector3(-3 / 16.0, -4 / 16.0, -3 / 16.0), new Vector3(3 / 16.0, 4 / 16.0, 3 / 16.0), box ->
       box.forTextureSize(Texture.chicken, 64, 32).atUVCoordinates(0, 9).flipX()
         .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
-        .transform(Transform.NONE
-          .translate(0.5, 0.5, 0.5)
-          .rotateX(Math.toRadians(-90))
-          .translate(-0.5, -0.5, -0.5)
-        )
+        .transform(Transform.NONE.rotateX(Math.toRadians(-90)))
     ).toQuads();
 
   //TODO: Skip adding blank faces on Chicken legs? Same for Pig's saddle.

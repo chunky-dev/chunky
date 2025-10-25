@@ -70,9 +70,9 @@ public class SkullEntity extends Entity {
         .forTextureSize(Texture.dragon, 256, 256).atUVCoordinates(176, 65)
         .addTopFace().addBottomFace().addFrontFace().addBackFace().addLeftFace().addRightFace()
         .transform(Transform.NONE
-          .translate(0, 0.5 - 3 / 16., 0.5 - 3.5 / 16.)
+          .translate(0, -3 / 16., -3.5 / 16.)
           .rotateX(Math.toRadians(-11.25))
-          .translate(0, -0.5 + 3 / 16., -0.5 + 3.5 / 16.)
+          .translate(0, 3 / 16., 3.5 / 16.)
         ))
     // ears
     .addBox(new Vector3(10.3 / 16., 12 / 16., 6.6 / 16.), new Vector3(11.7 / 16., 15 / 16., 10.9 / 16.), box ->
@@ -135,9 +135,8 @@ public class SkullEntity extends Entity {
         .addFrontFace()
         .addBackFace()
         .transform(Transform.NONE
-          .translate(0.5 - 1 / 16., 0.5, 0.5)
+          .translate(-1 / 16., 0, 0)
           .rotateZ(Math.toRadians(220))
-          .translate(-0.5, -0.5, -0.5)
           .translate(4.5 / 16.0, 6 / 16.0, 0 / 16.0)
         ))
     .addBox(new Vector3(-1 / 16., 0, -2 / 16.), new Vector3(0, 5 / 16., 2 / 16.), box ->
@@ -149,9 +148,8 @@ public class SkullEntity extends Entity {
         .addFrontFace()
         .addBackFace()
         .transform(Transform.NONE
-          .translate(0.5 + 1 / 16., 0.5, 0.5)
+          .translate(1 / 16., 0, 0)
           .rotateZ(Math.toRadians(140))
-          .translate(-0.5, -0.5, -0.5)
           .translate(-4.5 / 16.0, 6 / 16.0, 0 / 16.0)
         ))
     .toQuads();

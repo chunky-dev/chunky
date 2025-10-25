@@ -25,7 +25,6 @@ public class SquidEntity extends Entity implements Poseable {
     .addBox(new Vector3(-6 / 16.0, -3 / 16.0, -6 / 16.0), new Vector3(6 / 16.0, 13 / 16.0, 6 / 16.0), box ->
       box.forTextureSize(Texture.squid, 64, 32).atUVCoordinates(0, 0).flipX()
         .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
-        .transform(Transform.NONE)
     ).toQuads();
 
   private static final Quad[] tentacle = new BoxModelBuilder()

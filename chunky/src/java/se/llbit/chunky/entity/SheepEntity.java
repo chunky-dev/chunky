@@ -27,11 +27,7 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
     .addBox(new Vector3(-4 / 16.0, -8 / 16.0, -3 / 16.0), new Vector3(4 / 16.0, 8 / 16.0, 3 / 16.0), box ->
       box.forTextureSize(Texture.sheep, 64, 32).atUVCoordinates(28, 8).flipX()
         .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
-        .transform(Transform.NONE
-          .translate(0.5, 0.5, 0.5)
-          .rotateX(Math.toRadians(-90))
-          .translate(-0.5, -0.5, -0.5)
-        )
+        .transform(Transform.NONE.rotateX(Math.toRadians(-90)))
     ).toQuads();
 
   private static final Quad[] leg = new BoxModelBuilder()
@@ -51,9 +47,7 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
       box.forTextureSize(Texture.sheepFur, 64, 32).atUVCoordinates(0, 16).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
         .transform(Transform.NONE
-          .translate(0.5, 0.5, 0.5)
           .inflate(new Vector3(5 / 4.0, 7 / 6.0, 5 / 4.0))
-          .translate(-0.5, -0.5, -0.5)
           .translate(0, 0.5 / 16.0, 0)
         )
     ).toQuads();
@@ -63,10 +57,8 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
       box.forTextureSize(Texture.sheepFur, 64, 32).atUVCoordinates(28, 8).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
         .transform(Transform.NONE
-          .translate(0.5, 0.5, 0.5)
           .rotateX(Math.toRadians(-90))
           .inflate(new Vector3(11.5 / 8.0, 9.5 / 6.0, 19.5 / 16.0))
-          .translate(-0.5, -0.5, -0.5)
         )
     ).toQuads();
 
@@ -75,9 +67,7 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
       box.forTextureSize(Texture.sheepFur, 64, 32).atUVCoordinates(0, 0).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
         .transform(Transform.NONE
-          .translate(0.5, 0.5, 0.5)
           .inflate(new Vector3(7.2 / 6.0, 7.2 / 6.0, 7.2 / 6.0))
-          .translate(-0.5, -0.5, -0.5)
           .translate(0, 0, 0.6 / 16.0)
         )
     ).toQuads();
