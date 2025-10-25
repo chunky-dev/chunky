@@ -64,15 +64,15 @@ public class SkullEntity extends Entity {
     .addBox(new Vector3(3.5 / 16., 3 / 16., -8.5 / 16.), new Vector3(12.5 / 16., 6.75 / 16., 3.5 / 16.), box ->
       box.withBoxTextureDimensions(12, 5, 16)
         .forTextureSize(Texture.dragon, 256, 256).atUVCoordinates(176, 44)
-        .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addFrontFace().addBackFace().addLeftFace().addRightFace())
+        .addTopFace().addBottomFace().addFrontFace().addBackFace().addLeftFace().addRightFace())
     .addBox(new Vector3(3.5 / 16., 0 / 16., -8.5 / 16.), new Vector3(12.5 / 16., 3 / 16., 3.5 / 16.), box ->
       box.withBoxTextureDimensions(12, 4, 16)
         .forTextureSize(Texture.dragon, 256, 256).atUVCoordinates(176, 65)
         .addTopFace().addBottomFace().addFrontFace().addBackFace().addLeftFace().addRightFace()
         .transform(Transform.NONE
-          .translate(0, 0.5 - 3 / 16., 0.5 - 3.5 / 16.)
+          .translate(0, -3 / 16., -3.5 / 16.)
           .rotateX(Math.toRadians(-11.25))
-          .translate(0, -0.5 + 3 / 16., -0.5 + 3.5 / 16.)
+          .translate(0, 3 / 16., 3.5 / 16.)
         ))
     // ears
     .addBox(new Vector3(10.3 / 16., 12 / 16., 6.6 / 16.), new Vector3(11.7 / 16., 15 / 16., 10.9 / 16.), box ->
@@ -100,7 +100,7 @@ public class SkullEntity extends Entity {
     .addBox(new Vector3(-5 / 16., 0, -4 / 16.), new Vector3(5 / 16., 8 / 16., 4 / 16.), box ->
       box.forTextureSize(Texture.piglin, 64, 64).atUVCoordinates(0, 0).flipX()
         .addTopFace(UVMapHelper.Side::flipX)
-        .addBottomFace(UVMapHelper.Side::flipY)
+        .addBottomFace()
         .addLeftFace()
         .addRightFace()
         .addFrontFace()
@@ -135,9 +135,8 @@ public class SkullEntity extends Entity {
         .addFrontFace()
         .addBackFace()
         .transform(Transform.NONE
-          .translate(0.5 - 1 / 16., 0.5, 0.5)
+          .translate(-1 / 16., 0, 0)
           .rotateZ(Math.toRadians(220))
-          .translate(-0.5, -0.5, -0.5)
           .translate(4.5 / 16.0, 6 / 16.0, 0 / 16.0)
         ))
     .addBox(new Vector3(-1 / 16., 0, -2 / 16.), new Vector3(0, 5 / 16., 2 / 16.), box ->
@@ -149,9 +148,8 @@ public class SkullEntity extends Entity {
         .addFrontFace()
         .addBackFace()
         .transform(Transform.NONE
-          .translate(0.5 + 1 / 16., 0.5, 0.5)
+          .translate(1 / 16., 0, 0)
           .rotateZ(Math.toRadians(140))
-          .translate(-0.5, -0.5, -0.5)
           .translate(-4.5 / 16.0, 6 / 16.0, 0 / 16.0)
         ))
     .toQuads();
