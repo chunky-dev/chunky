@@ -25,7 +25,7 @@ public class MooshroomEntity extends Entity implements Poseable, Variant {
   private static final Quad[] body = new BoxModelBuilder()
     .addBox(new Vector3(-6 / 16.0, -9 / 16.0, -5 / 16.0), new Vector3(6 / 16.0, 9 / 16.0, 5 / 16.0), box ->
       box.forTextureSize(Texture.brownMooshroom, 64, 64).atUVCoordinates(18, 4).flipX()
-        .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
         .transform(Transform.NONE.rotateX(Math.toRadians(-90)))
     ).addBox(new Vector3(-2 / 16.0, -9 / 16.0, -6 / 16.0), new Vector3(2 / 16.0, -3 / 16.0, -5 / 16.0), box ->
       box.forTextureSize(Texture.brownMooshroom, 64, 64).atUVCoordinates(52, 0).flipX()

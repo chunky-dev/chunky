@@ -64,7 +64,7 @@ public class SkullEntity extends Entity {
     .addBox(new Vector3(3.5 / 16., 3 / 16., -8.5 / 16.), new Vector3(12.5 / 16., 6.75 / 16., 3.5 / 16.), box ->
       box.withBoxTextureDimensions(12, 5, 16)
         .forTextureSize(Texture.dragon, 256, 256).atUVCoordinates(176, 44)
-        .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addFrontFace().addBackFace().addLeftFace().addRightFace())
+        .addTopFace().addBottomFace().addFrontFace().addBackFace().addLeftFace().addRightFace())
     .addBox(new Vector3(3.5 / 16., 0 / 16., -8.5 / 16.), new Vector3(12.5 / 16., 3 / 16., 3.5 / 16.), box ->
       box.withBoxTextureDimensions(12, 4, 16)
         .forTextureSize(Texture.dragon, 256, 256).atUVCoordinates(176, 65)
@@ -100,7 +100,7 @@ public class SkullEntity extends Entity {
     .addBox(new Vector3(-5 / 16., 0, -4 / 16.), new Vector3(5 / 16., 8 / 16., 4 / 16.), box ->
       box.forTextureSize(Texture.piglin, 64, 64).atUVCoordinates(0, 0).flipX()
         .addTopFace(UVMapHelper.Side::flipX)
-        .addBottomFace(UVMapHelper.Side::flipY)
+        .addBottomFace()
         .addLeftFace()
         .addRightFace()
         .addFrontFace()

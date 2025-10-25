@@ -26,7 +26,7 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
   private static final Quad[] body = new BoxModelBuilder()
     .addBox(new Vector3(-4 / 16.0, -8 / 16.0, -3 / 16.0), new Vector3(4 / 16.0, 8 / 16.0, 3 / 16.0), box ->
       box.forTextureSize(Texture.sheep, 64, 32).atUVCoordinates(28, 8).flipX()
-        .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
         .transform(Transform.NONE.rotateX(Math.toRadians(-90)))
     ).toQuads();
 

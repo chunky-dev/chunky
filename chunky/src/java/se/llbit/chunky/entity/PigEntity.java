@@ -24,11 +24,11 @@ public class PigEntity extends Entity implements Poseable, Variant, Saddleable {
   private static final Quad[] body = new BoxModelBuilder()
     .addBox(new Vector3(-5 / 16.0, -8 / 16.0, -4 / 16.0), new Vector3(5 / 16.0, 8 / 16.0, 4 / 16.0), box ->
       box.forTextureSize(Texture.pig, 64, 64).atUVCoordinates(28, 8).flipX()
-        .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
         .transform(Transform.NONE.rotateX(Math.toRadians(-90))) // Body Boxes are often sideways for some reason?
     ).addBox(new Vector3(-5 / 16.0, -8 / 16.0, -4 / 16.0), new Vector3(5 / 16.0, 8 / 16.0, 4 / 16.0), box ->
       box.forTextureSize(Texture.pig, 64, 64).atUVCoordinates(28, 32).flipX().doubleSided()
-        .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
         .transform(Transform.NONE
           .rotateX(Math.toRadians(-90)) // Body Boxes are often sideways for some reason?
           .inflate(new Vector3(10.5 / 10.0, 8.5 / 8.0, 16.5 / 16.0))
@@ -53,7 +53,7 @@ public class PigEntity extends Entity implements Poseable, Variant, Saddleable {
   private static final Quad[] saddle = new BoxModelBuilder()
     .addBox(new Vector3(-5 / 16.0, -8 / 16.0, -4 / 16.0), new Vector3(5 / 16.0, 8 / 16.0, 4 / 16.0), box ->
       box.forTextureSize(Texture.pigSaddle, 64, 64).atUVCoordinates(28, 8).flipX().doubleSided()
-        .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
         .transform(Transform.NONE
           .rotateX(Math.toRadians(-90))
           .inflate(new Vector3(11 / 10.0, 9 / 8.0, 17 / 16.0))
