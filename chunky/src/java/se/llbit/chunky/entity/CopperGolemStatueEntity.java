@@ -117,8 +117,8 @@ public class CopperGolemStatueEntity extends Entity {
           .addAllFaces()
           .transform(Transform.NONE
             .translate(0 / 16., -4.8 / 16., -0.5 / 16.)
-            .rotateX(Math.toRadians(6.92217))
-            .rotateY(Math.toRadians(4.59656))
+            .rotateX(Math.toRadians(-6.92217))
+            .rotateY(Math.toRadians(-4.59656))
             .rotateZ(Math.toRadians(-3.86389))
             .translate(0 / 16., 4.8 / 16., 0.5 / 16.)
           )
@@ -150,7 +150,7 @@ public class CopperGolemStatueEntity extends Entity {
           .addAllFaces()
           .transform(Transform.NONE
             .translate(-4.4 / 16., -11 / 16., 1 / 16.)
-            .rotateX(Math.toRadians(57.5))
+            .rotateX(Math.toRadians(-57.5))
             .translate(4.4 / 16., 11 / 16., -1 / 16.)
           )
       )
@@ -161,7 +161,7 @@ public class CopperGolemStatueEntity extends Entity {
           .addAllFaces()
           .transform(Transform.NONE
             .translate(3.6 / 16., -11 / 16., 0 / 16.)
-            .rotateX(Math.toRadians(-50))
+            .rotateX(Math.toRadians(50))
             .translate(-3.6 / 16., 11 / 16., 0 / 16.)
           )
       )
@@ -172,7 +172,7 @@ public class CopperGolemStatueEntity extends Entity {
           .addAllFaces()
           .transform(Transform.NONE
             .translate(-2 / 16., -5 / 16., 0.9 / 16.)
-            .rotateX(Math.toRadians(-50))
+            .rotateX(Math.toRadians(50))
             .translate(2 / 16., 5 / 16., -0.9 / 16.)
           )
       )
@@ -183,7 +183,7 @@ public class CopperGolemStatueEntity extends Entity {
           .addAllFaces()
           .transform(Transform.NONE
             .translate(2 / 16., -5 / 16., 0 / 16.)
-            .rotateX(Math.toRadians(45))
+            .rotateX(Math.toRadians(-45))
             .translate(-2 / 16., 5 / 16., 0 / 16.)
           )
       )
@@ -285,33 +285,33 @@ public class CopperGolemStatueEntity extends Entity {
     }
   }
 
-  private static class CopperGolemSittingModel {
+  static class CopperGolemSittingModel {
     private static final Quad[] body = new BoxModelBuilder()
       .addBlockUnitsBox(-3, 1.1, 0.175, 6, 7.2, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).flipX()
-          .addBackFace(face -> face.set(6.5, 13.5, 21.1, 27))
-          .addLeftFace(face -> face.set(1, 6.5, 21.1, 27))
-          .addFrontFace(face -> face.set(20.1, 27.9, 21.1, 27.1))
-          .addRightFace(face -> face.set(13.5, 19, 21.1, 27))
-          .addTopFace(face -> face.set(7, 14, 15.2, 21))
+        box.forTextureSize(Texture.copperBlock, 64, 64)
+          .addBackFace(face -> face.set(6.5, 13.5, 21.1, 27).flipX())
+          .addLeftFace(face -> face.set(1, 6.5, 21.1, 27).flipX())
+          .addFrontFace(face -> face.set(20.1, 27.9, 21.1, 27.1).flipX())
+          .addRightFace(face -> face.set(13.5, 19, 21.1, 27).flipX())
+          .addTopFace(face -> face.set(7, 14, 15.2, 21).flipY())
           .addBottomFace(face -> face.set(13.8, 20.5, 15.2, 21))
       )
       .addBlockUnitsBox(-4.025, 0, -1.025, 8, 6, 6, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).flipX()
-          .addBackFace(face -> face.set(6.5, 13.5, 21.1, 27))
-          .addLeftFace(face -> face.set(1, 6.5, 21.1, 27))
-          .addFrontFace(face -> face.set(20.1, 27.9, 21.1, 27.1))
-          .addRightFace(face -> face.set(13.5, 19, 21.1, 27))
-          .addTopFace(face -> face.set(7, 14, 15.2, 21))
+        box.forTextureSize(Texture.copperBlock, 64, 64)
+          .addBackFace(face -> face.set(6.5, 13.5, 21.1, 27).flipX())
+          .addLeftFace(face -> face.set(1, 6.5, 21.1, 27).flipX())
+          .addFrontFace(face -> face.set(20.1, 27.9, 21.1, 27.1).flipX())
+          .addRightFace(face -> face.set(13.5, 19, 21.1, 27).flipX())
+          .addTopFace(face -> face.set(7, 14, 15.2, 21).flipY())
           .addBottomFace(face -> face.set(13.8, 20.5, 15.2, 21))
       )
       .addBlockUnitsBox(-4, 2.95, -3.825, 8, 7, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).flipX()
-          .addBackFace(face -> face.set(6.5, 13.5, 21.1, 27))
-          .addLeftFace(face -> face.set(1, 6.5, 21.1, 27))
-          .addFrontFace(face -> face.set(20.1, 27.9, 21.1, 27.1))
-          .addRightFace(face -> face.set(13.5, 19, 21.1, 27))
-          .addTopFace(face -> face.set(7, 14, 15.2, 21))
+        box.forTextureSize(Texture.copperBlock, 64, 64)
+          .addBackFace(face -> face.set(6.5, 13.5, 21.1, 27).flipX())
+          .addLeftFace(face -> face.set(1, 6.5, 21.1, 27).flipX())
+          .addFrontFace(face -> face.set(20.1, 27.9, 21.1, 27.1).flipX())
+          .addRightFace(face -> face.set(13.5, 19, 21.1, 27).flipX())
+          .addTopFace(face -> face.set(7, 14, 15.2, 21).flipY())
           .addBottomFace(face -> face.set(13.8, 20.5, 15.2, 21))
       )
       .toQuads();
@@ -324,13 +324,13 @@ public class CopperGolemStatueEntity extends Entity {
         box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(56, 0).flipX()
           .addAllFaces()
           .transform(Transform.NONE
-            .translate(-1 / 16., -7.8 / 16., 4.8 / 16.)
+            .translate(1 / 16., -7.8 / 16., 4.8 / 16.)
             .rotateY(Math.toRadians(-90))
-            .translate(1 / 16., 7.8 / 16., -4.8 / 16.)
+            .translate(-1 / 16., 7.8 / 16., -4.8 / 16.)
           )
       )
       .addBlockUnitsBox(-1, 8.3, -3.2, 2, 3, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(54, 0).flipX()
+        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(54, -2).flipX()
           .addAllFaces()
           .transform(Transform.NONE
             .translate(0 / 16., -9.8 / 16., 1.2 / 16.)
@@ -343,12 +343,12 @@ public class CopperGolemStatueEntity extends Entity {
           .addAllFaces()
       )
       .addBlockUnitsBox(-2, 16, -2, 4, 4, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).flipX()
-          .addBackFace(face -> face.set(41, 45, 4, 8))
-          .addLeftFace(face -> face.set(37, 41, 4, 8))
-          .addFrontFace(face -> face.set(49, 53, 4, 8))
-          .addRightFace(face -> face.set(45, 49, 4, 8))
-          .addTopFace(face -> face.set(41, 45, 0, 4))
+        box.forTextureSize(Texture.copperBlock, 64, 64)
+          .addBackFace(face -> face.set(41, 45, 4, 8).flipX())
+          .addLeftFace(face -> face.set(37, 41, 4, 8).flipX())
+          .addFrontFace(face -> face.set(49, 53, 4, 8).flipX())
+          .addRightFace(face -> face.set(45, 49, 4, 8).flipX())
+          .addTopFace(face -> face.set(41, 45, 0, 4).flipY())
           .addBottomFace(face -> face.set(45, 49, 0, 4))
           .grow(-0.01 / 16.)
       )
@@ -358,9 +358,12 @@ public class CopperGolemStatueEntity extends Entity {
         box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(36, 16).flipX()
           .addAllFaces()
           .transform(Transform.NONE
-            .translate(4 / 16., -14 / 16., 3 / 16.)
-            .rotateX(Math.toRadians(-60))
-            .translate(-4 / 16., 14 / 16., -3 / 16.)
+            .translate(-4 / 16., -14 / 16., 3 / 16.)
+            .rotateX(Math.toRadians(60))
+            .translate(4 / 16., 14 / 16., -3 / 16.)
+            .translate(-4 / 16., -14 / 16., -3.5 / 16.)
+            .rotateX(Math.toRadians(-25))
+            .translate(4 / 16., 14 / 16., 3.5 / 16.)
           )
       )
       .toQuads();
@@ -369,9 +372,12 @@ public class CopperGolemStatueEntity extends Entity {
         box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(50, 16).flipX()
           .addAllFaces()
           .transform(Transform.NONE
-            .translate(-4 / 16., -13 / 16., 1 / 16.)
-            .rotateX(Math.toRadians(-60))
-            .translate(4 / 16., 13 / 16., -1 / 16.)
+            .translate(4 / 16., -13 / 16., 1 / 16.)
+            .rotateX(Math.toRadians(60))
+            .translate(-4 / 16., 13 / 16., -1 / 16.)
+            .translate(4 / 16., -13 / 16., -5.5 / 16.)
+            .rotateX(Math.toRadians(-25))
+            .translate(-4 / 16., 13 / 16., 5.5 / 16.)
           )
       )
       .toQuads();
@@ -380,9 +386,9 @@ public class CopperGolemStatueEntity extends Entity {
         box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(0, 27).flipX()
           .addAllFaces()
           .transform(Transform.NONE
-            .translate(2 / 16., -4 / 16., -0.2 / 16.)
-            .rotateX(Math.toRadians(-90))
-            .translate(-2 / 16., 4 / 16., 0.2 / 16.)
+            .translate(-2 / 16., -4 / 16., -0.2 / 16.)
+            .rotateX(Math.toRadians(90))
+            .translate(2 / 16., 4 / 16., 0.2 / 16.)
           )
       )
       .toQuads();
@@ -391,13 +397,12 @@ public class CopperGolemStatueEntity extends Entity {
         box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(16, 27).flipX()
           .addAllFaces()
           .transform(Transform.NONE
-            .translate(-2 / 16., -4 / 16., -0.2 / 16.)
-            .rotateX(Math.toRadians(-90))
-            .translate(2 / 16., 4 / 16., 0.2 / 16.)
+            .translate(2 / 16., -4 / 16., -0.2 / 16.)
+            .rotateX(Math.toRadians(90))
+            .translate(-2 / 16., 4 / 16., 0.2 / 16.)
           )
       )
       .toQuads();
-
 
     public static void getPrimitives(Collection<Primitive> faces, Material material, Transform transform) {
       for (Quad quad : head) {

@@ -1837,8 +1837,12 @@ public class Texture {
   public float[] getColor(int x, int y) {
     if(useAverageColor)
       return avgColorFlat;
+    int index = width * y + x;
     float[] result = new float[4];
-    ColorUtil.getRGBAComponentsGammaCorrected(image.data[width*y + x], result);
+    if(index < 0 || index > image.data.length) {
+      return result;
+    }
+    ColorUtil.getRGBAComponentsGammaCorrected(image.data[index], result);
     return result;
   }
 
