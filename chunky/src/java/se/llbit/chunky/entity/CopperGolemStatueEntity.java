@@ -3,12 +3,14 @@ package se.llbit.chunky.entity;
 import se.llbit.chunky.model.builder.BoxModelBuilder;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
+import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.primitive.Primitive;
+import se.llbit.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -466,6 +468,21 @@ public class CopperGolemStatueEntity extends Entity {
 
   @Override
   public JsonValue toJson() {
-    return null;
+    JsonObject json = new JsonObject();
+    json.add("kind", "copperGolemStatue");
+    json.add("position", position.toJson());
+    json.add("pose", pose);
+    json.add("oxidation", oxidation.name().toLowerCase());
+    json.add("facing", facing);
+    return json;
+  }
+
+  public static CopperGolemStatueEntity fromJson(JsonObject json) {
+    return new CopperGolemStatueEntity(
+      JsonUtil.vec3FromJsonObject(json.get("position")),
+      json.get("pose").asString("standing"),
+      json.get("facing").asString("north"),
+      CopperGolemEntity.Oxidation.valueOf(json.get("oxidation").asString("NONE").toUpperCase())
+    );
   }
 }
