@@ -19,9 +19,10 @@ public class CopperGolemStatue extends MinecraftBlockTranslucent {
     this.facing = facing;
     this.pose = pose;
     this.oxidation = switch (name) {
-      case "expoded_copper_statue" -> CopperGolemEntity.Oxidation.EXPOSED;
-      case "weathered_copper_statue" -> CopperGolemEntity.Oxidation.WEATHERED;
-      case "oxidized_copper_statue" -> CopperGolemEntity.Oxidation.OXIDIZED;
+      case "exposed_copper_golem_statue", "waxed_exposed_copper_golem_statue" -> CopperGolemEntity.Oxidation.EXPOSED;
+      case "weathered_copper_golem_statue", "waxed_weathered_copper_golem_statue" ->
+        CopperGolemEntity.Oxidation.WEATHERED;
+      case "oxidized_copper_golem_statue", "waxed_oxidized_copper_golem_statue" -> CopperGolemEntity.Oxidation.OXIDIZED;
       default -> CopperGolemEntity.Oxidation.NONE;
     };
     invisible = true;
