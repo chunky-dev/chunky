@@ -21,6 +21,7 @@ import se.llbit.chunky.block.minecraft.FireflyBush;
 import se.llbit.chunky.block.minecraft.OpenEyeblossom;
 import se.llbit.chunky.entity.CalibratedSculkSensorAmethyst;
 import se.llbit.chunky.entity.Campfire;
+import se.llbit.chunky.entity.CopperGolemEntity;
 import se.llbit.chunky.entity.SporeBlossom;
 import se.llbit.chunky.world.material.CloudMaterial;
 
@@ -43,6 +44,10 @@ public class ExtraMaterials {
     idMap.put("spore_blossom (blossom)", SporeBlossom.blossomMaterial);
     idMap.put("open_eyeblossom (emissive)", OpenEyeblossom.emissiveMaterial);
     idMap.put("firefly_bush (emissive)", FireflyBush.emissiveMaterial);
+    idMap.put("copper_golem", CopperGolemEntity.material);
+    idMap.put("exposed_copper_golem", CopperGolemEntity.exposedMaterial);
+    idMap.put("weathered_copper_golem", CopperGolemEntity.weatheredMaterial);
+    idMap.put("oxidized_copper_golem", CopperGolemEntity.oxidizedMaterial);
   }
 
   public static void loadDefaultMaterialProperties() {
@@ -70,5 +75,19 @@ public class ExtraMaterials {
 
     FireflyBush.emissiveMaterial.restoreDefaults();
     FireflyBush.emissiveMaterial.emittance = 1.0f / 15;
+
+    CopperGolemEntity.material.restoreDefaults();
+    CopperGolemEntity.material.metalness = 1.0f;
+    CopperGolemEntity.material.setPerceptualSmoothness(0.75);
+
+    CopperGolemEntity.exposedMaterial.restoreDefaults();
+    CopperGolemEntity.exposedMaterial.metalness = 0.66f;
+    CopperGolemEntity.exposedMaterial.setPerceptualSmoothness(0.75);
+
+    CopperGolemEntity.weatheredMaterial.restoreDefaults();
+    CopperGolemEntity.weatheredMaterial.metalness = 0.66f;
+    CopperGolemEntity.weatheredMaterial.setPerceptualSmoothness(0.75);
+
+    CopperGolemEntity.oxidizedMaterial.restoreDefaults();
   }
 }
