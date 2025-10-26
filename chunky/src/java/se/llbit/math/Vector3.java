@@ -157,9 +157,9 @@ public class Vector3 {
   }
 
   /**
-   * Scale each component of this vector by v
+   * Multiply this vector component-wise with the given vector.
    */
-  public final void scaleEntrywise(Vector3 v) {
+  public final void multiplyEntrywise(Vector3 v) {
     x *= v.x;
     y *= v.y;
     z *= v.z;

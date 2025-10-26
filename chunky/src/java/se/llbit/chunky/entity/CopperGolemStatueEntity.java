@@ -1,7 +1,6 @@
 package se.llbit.chunky.entity;
 
 import se.llbit.chunky.model.builder.BoxModelBuilder;
-import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
@@ -19,33 +18,33 @@ public class CopperGolemStatueEntity extends Entity {
   private static class CopperGolemStarModel {
     private static final Quad[] body = new BoxModelBuilder()
       .addBlockUnitsBox(-4, 5, -3, 8, 6, 6, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(0, 15).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(0, 15).flipX()
           .addAllFaces()
       )
       .toQuads();
     private static final Quad[] head = new BoxModelBuilder()
       .addBlockUnitsBox(-4, 11, -5, 8, 5, 10, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(0, 0).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(0, 0).flipX()
           .addAllFaces()
       )
       .addBlockUnitsBox(-1, 10, -6, 2, 3, 2, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(56, 0).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(56, 0).flipX()
           .addAllFaces()
       )
       .addBlockUnitsBox(-1, 16, -1, 2, 4, 2, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(37, 8).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(37, 8).flipX()
           .addAllFaces()
           .grow(-0.01 / 16.)
       )
       .addBlockUnitsBox(-2, 20, -2, 4, 4, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(37, 0).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(37, 0).flipX()
           .addAllFaces()
           .grow(-0.01 / 16.)
       )
       .toQuads();
     private static final Quad[] rightArm = new BoxModelBuilder()
       .addBlockUnitsBox(1.5, 5, -2, 3, 10, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(36, 16).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(36, 16).flipX()
           .transform(Transform.NONE
             .translate(-3 / 16., -10 / 16., 0 / 16.)
             .rotateZ(Math.toRadians(110))
@@ -56,7 +55,7 @@ public class CopperGolemStatueEntity extends Entity {
       .toQuads();
     private static final Quad[] leftArm = new BoxModelBuilder()
       .addBlockUnitsBox(-4.5, 5, -2, 3, 10, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(50, 16).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(50, 16).flipX()
           .transform(Transform.NONE
             .translate(3 / 16., -10 / 16., 0 / 16.)
             .rotateZ(Math.toRadians(-110))
@@ -66,8 +65,8 @@ public class CopperGolemStatueEntity extends Entity {
       )
       .toQuads();
     private static final Quad[] rightLeg = new BoxModelBuilder()
-      .addBlockUnitsBox(0.6500000000000004, 0.5, -1.99, 4, 5, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(0, 27).flipX()
+      .addBlockUnitsBox(0.65, 0.5, -1.99, 4, 5, 4, box ->
+        box.forTextureSize(64, 64).atUVCoordinates(0, 27).flipX()
           .transform(Transform.NONE
             .translate(-2.65 / 16., -3 / 16., -0.01 / 16.)
             .rotateZ(Math.toRadians(15))
@@ -78,7 +77,7 @@ public class CopperGolemStatueEntity extends Entity {
       .toQuads();
     private static final Quad[] leftLeg = new BoxModelBuilder()
       .addBlockUnitsBox(-4.65, 0.5, -2, 4, 5, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(16, 27).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(16, 27).flipX()
           .transform(Transform.NONE
             .translate(2.65 / 16., -3 / 16., 0 / 16.)
             .rotateZ(Math.toRadians(-15))
@@ -113,7 +112,7 @@ public class CopperGolemStatueEntity extends Entity {
   private static class CopperGolemRunningModel {
     private static final Quad[] body = new BoxModelBuilder()
       .addBlockUnitsBox(-4, 4.8, -3, 8, 6, 6, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(0, 15).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(0, 15).flipX()
           .addAllFaces()
           .transform(Transform.NONE
             .translate(0 / 16., -4.8 / 16., -0.5 / 16.)
@@ -126,27 +125,27 @@ public class CopperGolemStatueEntity extends Entity {
       .toQuads();
     private static final Quad[] head = new BoxModelBuilder()
       .addBlockUnitsBox(-3.7, 10.6, -7, 8, 5, 10, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(0, 0).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(0, 0).flipX()
           .addAllFaces()
       )
       .addBlockUnitsBox(-0.7, 9.6, -8, 2, 3, 2, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(56, 0).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(56, 0).flipX()
           .addAllFaces()
       )
       .addBlockUnitsBox(-0.7, 15.6, -3, 2, 4, 2, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(37, 8).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(37, 8).flipX()
           .addAllFaces()
           .grow(-0.01 / 16.)
       )
-      .addBlockUnitsBox(-1.7000000000000002, 19.6, -4, 4, 4, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(37, 0).flipX()
+      .addBlockUnitsBox(-1.7, 19.6, -4, 4, 4, 4, box ->
+        box.forTextureSize(64, 64).atUVCoordinates(37, 0).flipX()
           .addAllFaces()
           .grow(-0.01 / 16.)
       )
       .toQuads();
     private static final Quad[] rightArm = new BoxModelBuilder()
       .addBlockUnitsBox(4.4, 2, -3, 3, 10, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(36, 16).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(36, 16).flipX()
           .addAllFaces()
           .transform(Transform.NONE
             .translate(-4.4 / 16., -11 / 16., 1 / 16.)
@@ -157,7 +156,7 @@ public class CopperGolemStatueEntity extends Entity {
       .toQuads();
     private static final Quad[] leftArm = new BoxModelBuilder()
       .addBlockUnitsBox(-6.6, 2, -2, 3, 10, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(50, 16).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(50, 16).flipX()
           .addAllFaces()
           .transform(Transform.NONE
             .translate(3.6 / 16., -11 / 16., 0 / 16.)
@@ -167,8 +166,8 @@ public class CopperGolemStatueEntity extends Entity {
       )
       .toQuads();
     private static final Quad[] rightLeg = new BoxModelBuilder()
-      .addBlockUnitsBox(-0.10000000000000009, 0, -1.99, 4, 5, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(0, 27).flipX()
+      .addBlockUnitsBox(-0.1, 0, -1.99, 4, 5, 4, box ->
+        box.forTextureSize(64, 64).atUVCoordinates(0, 27).flipX()
           .addAllFaces()
           .transform(Transform.NONE
             .translate(-2 / 16., -5 / 16., 0.9 / 16.)
@@ -179,7 +178,7 @@ public class CopperGolemStatueEntity extends Entity {
       .toQuads();
     private static final Quad[] leftLeg = new BoxModelBuilder()
       .addBlockUnitsBox(-3.9, 0, -2, 4, 5, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(16, 27).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(16, 27).flipX()
           .addAllFaces()
           .transform(Transform.NONE
             .translate(2 / 16., -5 / 16., 0 / 16.)
@@ -214,51 +213,51 @@ public class CopperGolemStatueEntity extends Entity {
   private static class CopperGolemStandingModel {
     private static final Quad[] body = new BoxModelBuilder()
       .addBlockUnitsBox(-4, 5, -3, 8, 6, 6, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(0, 15).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(0, 15).flipX()
           .addAllFaces()
       )
       .toQuads();
     private static final Quad[] head = new BoxModelBuilder()
       .addBlockUnitsBox(-4, 11, -5, 8, 5, 10, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(0, 0).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(0, 0).flipX()
           .addAllFaces()
       )
       .addBlockUnitsBox(-1, 10, -6, 2, 3, 2, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(56, 0).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(56, 0).flipX()
           .addAllFaces()
       )
       .addBlockUnitsBox(-1, 16, -1, 2, 4, 2, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(37, 8).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(37, 8).flipX()
           .addAllFaces()
           .grow(-0.01 / 16.)
       )
       .addBlockUnitsBox(-2, 20, -2, 4, 4, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(37, 0).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(37, 0).flipX()
           .addAllFaces()
           .grow(-0.01 / 16.)
       )
       .toQuads();
     private static final Quad[] rightArm = new BoxModelBuilder()
       .addBlockUnitsBox(4, 2, -2, 3, 10, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(36, 16).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(36, 16).flipX()
           .addAllFaces()
       )
       .toQuads();
     private static final Quad[] leftArm = new BoxModelBuilder()
       .addBlockUnitsBox(-7, 2, -2, 3, 10, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(50, 16).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(50, 16).flipX()
           .addAllFaces()
       )
       .toQuads();
     private static final Quad[] rightLeg = new BoxModelBuilder()
-      .addBlockUnitsBox(-0.10000000000000009, 0, -1.99, 4, 5, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(0, 27).flipX()
+      .addBlockUnitsBox(-0.1, 0, -1.99, 4, 5, 4, box ->
+        box.forTextureSize(64, 64).atUVCoordinates(0, 27).flipX()
           .addAllFaces()
       )
       .toQuads();
     private static final Quad[] leftLeg = new BoxModelBuilder()
       .addBlockUnitsBox(-3.9, 0, -2, 4, 5, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(16, 27).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(16, 27).flipX()
           .addAllFaces()
       )
       .toQuads();
@@ -288,7 +287,7 @@ public class CopperGolemStatueEntity extends Entity {
   static class CopperGolemSittingModel {
     private static final Quad[] body = new BoxModelBuilder()
       .addBlockUnitsBox(-3, 1.1, 0.175, 6, 7.2, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64)
+        box.forTextureSize(64, 64)
           .addBackFace(face -> face.set(6.5, 13.5, 21.1, 27).flipX())
           .addLeftFace(face -> face.set(1, 6.5, 21.1, 27).flipX())
           .addFrontFace(face -> face.set(20.1, 27.9, 21.1, 27.1).flipX())
@@ -297,7 +296,7 @@ public class CopperGolemStatueEntity extends Entity {
           .addBottomFace(face -> face.set(13.8, 20.5, 15.2, 21))
       )
       .addBlockUnitsBox(-4.025, 0, -1.025, 8, 6, 6, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64)
+        box.forTextureSize(64, 64)
           .addBackFace(face -> face.set(6.5, 13.5, 21.1, 27).flipX())
           .addLeftFace(face -> face.set(1, 6.5, 21.1, 27).flipX())
           .addFrontFace(face -> face.set(20.1, 27.9, 21.1, 27.1).flipX())
@@ -306,7 +305,7 @@ public class CopperGolemStatueEntity extends Entity {
           .addBottomFace(face -> face.set(13.8, 20.5, 15.2, 21))
       )
       .addBlockUnitsBox(-4, 2.95, -3.825, 8, 7, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64)
+        box.forTextureSize(64, 64)
           .addBackFace(face -> face.set(6.5, 13.5, 21.1, 27).flipX())
           .addLeftFace(face -> face.set(1, 6.5, 21.1, 27).flipX())
           .addFrontFace(face -> face.set(20.1, 27.9, 21.1, 27.1).flipX())
@@ -317,11 +316,11 @@ public class CopperGolemStatueEntity extends Entity {
       .toQuads();
     private static final Quad[] head = new BoxModelBuilder()
       .addBlockUnitsBox(-4.1, 7.3, -5, 8.2, 5, 10, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(0, 0).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(0, 0).flipX()
           .addAllFaces()
       )
       .addBlockUnitsBox(-2, 6.3, -6.8, 2, 3, 2, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(56, 0).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(56, 0).flipX()
           .addAllFaces()
           .transform(Transform.NONE
             .translate(1 / 16., -7.8 / 16., 4.8 / 16.)
@@ -330,7 +329,7 @@ public class CopperGolemStatueEntity extends Entity {
           )
       )
       .addBlockUnitsBox(-1, 8.3, -3.2, 2, 3, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(54, -2).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(54, -2).flipX()
           .addAllFaces()
           .transform(Transform.NONE
             .translate(0 / 16., -9.8 / 16., 1.2 / 16.)
@@ -339,11 +338,11 @@ public class CopperGolemStatueEntity extends Entity {
           )
       )
       .addBlockUnitsBox(-1, 12, -1, 2, 4, 2, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(37, 8).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(37, 8).flipX()
           .addAllFaces()
       )
       .addBlockUnitsBox(-2, 16, -2, 4, 4, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64)
+        box.forTextureSize(64, 64)
           .addBackFace(face -> face.set(41, 45, 4, 8).flipX())
           .addLeftFace(face -> face.set(37, 41, 4, 8).flipX())
           .addFrontFace(face -> face.set(49, 53, 4, 8).flipX())
@@ -355,7 +354,7 @@ public class CopperGolemStatueEntity extends Entity {
       .toQuads();
     private static final Quad[] rightArm = new BoxModelBuilder()
       .addBlockUnitsBox(4, 4.63211, -0.80571, 3, 10, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(36, 16).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(36, 16).flipX()
           .addAllFaces()
           .transform(Transform.NONE
             .translate(-4 / 16., -14 / 16., 3 / 16.)
@@ -369,7 +368,7 @@ public class CopperGolemStatueEntity extends Entity {
       .toQuads();
     private static final Quad[] leftArm = new BoxModelBuilder()
       .addBlockUnitsBox(-7, 3.3041, -1.01759, 3, 10, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(50, 16).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(50, 16).flipX()
           .addAllFaces()
           .transform(Transform.NONE
             .translate(4 / 16., -13 / 16., 1 / 16.)
@@ -383,7 +382,7 @@ public class CopperGolemStatueEntity extends Entity {
       .toQuads();
     private static final Quad[] rightLeg = new BoxModelBuilder()
       .addBlockUnitsBox(0, -2.225, 0.2, 4, 5, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(0, 27).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(0, 27).flipX()
           .addAllFaces()
           .transform(Transform.NONE
             .translate(-2 / 16., -4 / 16., -0.2 / 16.)
@@ -394,7 +393,7 @@ public class CopperGolemStatueEntity extends Entity {
       .toQuads();
     private static final Quad[] leftLeg = new BoxModelBuilder()
       .addBlockUnitsBox(-4, -2.225, 0.2, 4, 5, 4, box ->
-        box.forTextureSize(Texture.copperBlock, 64, 64).atUVCoordinates(16, 27).flipX()
+        box.forTextureSize(64, 64).atUVCoordinates(16, 27).flipX()
           .addAllFaces()
           .transform(Transform.NONE
             .translate(2 / 16., -4 / 16., -0.2 / 16.)

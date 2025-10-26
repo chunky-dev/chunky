@@ -341,9 +341,23 @@ public class BoxModelBuilder {
      * @param width   Texture width, eg. 64 for piglin texture, 256 for enderdragon texture
      * @param height  Texture height, eg. 64 for piglin texture, 256 for enderdragon texture
      * @return This box builder
+     * @deprecated Use {@link #forTextureSize(int, int)} instead
      */
+    @Deprecated(forRemoval = true)
     public BoxBuilder forTextureSize(Texture texture, int width, int height) {
-      this.texture = texture;
+      return this.forTextureSize(width, height);
+    }
+
+    /**
+     * Configure this box to use the given texture with the given dimensions.
+     * These dimensions are used for convenient UV calculations, it's recommended to set them to the Vanilla Minecraft texture dimensions.
+     * The actual size of the texture can be different, as all values are normalized to [0..1] in for the generated models.
+     *
+     * @param width  Texture width, eg. 64 for piglin texture, 256 for enderdragon texture
+     * @param height Texture height, eg. 64 for piglin texture, 256 for enderdragon texture
+     * @return This box builder
+     */
+    public BoxBuilder forTextureSize(int width, int height) {
       this.textureWidth = width;
       this.textureHeight = height;
       return this;
