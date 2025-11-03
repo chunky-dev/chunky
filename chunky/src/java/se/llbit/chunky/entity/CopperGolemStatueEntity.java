@@ -286,119 +286,95 @@ public class CopperGolemStatueEntity extends Entity {
 
   static class CopperGolemSittingModel {
     private static final Quad[] body = new BoxModelBuilder()
-      .addBlockUnitsBox(-3, 1.1, 0.175, 6, 7.2, 4, box ->
-        box.forTextureSize(64, 64)
-          .addBackFace(face -> face.set(6.5, 13.5, 21.1, 27).flipX())
-          .addLeftFace(face -> face.set(1, 6.5, 21.1, 27).flipX())
-          .addFrontFace(face -> face.set(20.1, 27.9, 21.1, 27.1).flipX())
-          .addRightFace(face -> face.set(13.5, 19, 21.1, 27).flipX())
-          .addTopFace(face -> face.set(7, 14, 15.2, 21).flipY())
-          .addBottomFace(face -> face.set(13.8, 20.5, 15.2, 21))
+      .addBlockUnitsBox(-3, 6, -2.2, 6, 1, 6, box ->
+        box.forTextureSize(64, 64).atUVCoordinates(3, 19).flipX()
+          .addAllFaces()
       )
-      .addBlockUnitsBox(-4.025, 0, -1.025, 8, 6, 6, box ->
-        box.forTextureSize(64, 64)
-          .addBackFace(face -> face.set(6.5, 13.5, 21.1, 27).flipX())
-          .addLeftFace(face -> face.set(1, 6.5, 21.1, 27).flipX())
-          .addFrontFace(face -> face.set(20.1, 27.9, 21.1, 27.1).flipX())
-          .addRightFace(face -> face.set(13.5, 19, 21.1, 27).flipX())
-          .addTopFace(face -> face.set(7, 14, 15.2, 21).flipY())
-          .addBottomFace(face -> face.set(13.8, 20.5, 15.2, 21))
+      .addBlockUnitsBox(-4, 0, -1.2, 8, 6, 6, box ->
+        box.forTextureSize(64, 64).atUVCoordinates(0, 15).flipX()
+          .addAllFaces()
       )
-      .addBlockUnitsBox(-4, 2.95, -3.825, 8, 7, 4, box ->
-        box.forTextureSize(64, 64)
-          .addBackFace(face -> face.set(6.5, 13.5, 21.1, 27).flipX())
-          .addLeftFace(face -> face.set(1, 6.5, 21.1, 27).flipX())
-          .addFrontFace(face -> face.set(20.1, 27.9, 21.1, 27.1).flipX())
-          .addRightFace(face -> face.set(13.5, 19, 21.1, 27).flipX())
-          .addTopFace(face -> face.set(7, 14, 15.2, 21).flipY())
-          .addBottomFace(face -> face.set(13.8, 20.5, 15.2, 21))
+      .addBlockUnitsBox(-4, 1, -4.2, 8, 6, 3, box ->
+        box.forTextureSize(64, 64).atUVCoordinates(3, 18).flipX()
+          .addAllFaces()
+          .transform(Transform.NONE
+            .translate(0 / 16., -4 / 16., 2 / 16.)
+            .rotateZ(Math.toRadians(-180))
+            .translate(0 / 16., 4 / 16., -2 / 16.)
+          )
       )
       .toQuads();
     private static final Quad[] head = new BoxModelBuilder()
-      .addBlockUnitsBox(-4.1, 7.3, -5, 8.2, 5, 10, box ->
+      .addBlockUnitsBox(-4, 7, -5.2, 8, 5, 10, box ->
         box.forTextureSize(64, 64).atUVCoordinates(0, 0).flipX()
           .addAllFaces()
       )
-      .addBlockUnitsBox(-2, 6.3, -6.8, 2, 3, 2, box ->
+      .addBlockUnitsBox(-0.975, 6, -6, 2, 3, 2, box ->
         box.forTextureSize(64, 64).atUVCoordinates(56, 0).flipX()
           .addAllFaces()
           .transform(Transform.NONE
-            .translate(1 / 16., -7.8 / 16., 4.8 / 16.)
+            .translate(0 / 16., -7.5 / 16., 5 / 16.)
             .rotateY(Math.toRadians(-90))
-            .translate(-1 / 16., 7.8 / 16., -4.8 / 16.)
+            .translate(0 / 16., 7.5 / 16., -5 / 16.)
           )
       )
-      .addBlockUnitsBox(-1, 8.3, -3.2, 2, 3, 4, box ->
-        box.forTextureSize(64, 64).atUVCoordinates(54, -2).flipX()
-          .addAllFaces()
-          .transform(Transform.NONE
-            .translate(0 / 16., -9.8 / 16., 1.2 / 16.)
-            .rotateY(Math.toRadians(-90))
-            .translate(0 / 16., 9.8 / 16., -1.2 / 16.)
-          )
-      )
-      .addBlockUnitsBox(-1, 12, -1, 2, 4, 2, box ->
+      .addBlockUnitsBox(-1, 12, -1.175, 2, 4, 2, box ->
         box.forTextureSize(64, 64).atUVCoordinates(37, 8).flipX()
           .addAllFaces()
       )
-      .addBlockUnitsBox(-2, 16, -2, 4, 4, 4, box ->
-        box.forTextureSize(64, 64)
-          .addBackFace(face -> face.set(41, 45, 4, 8).flipX())
-          .addLeftFace(face -> face.set(37, 41, 4, 8).flipX())
-          .addFrontFace(face -> face.set(49, 53, 4, 8).flipX())
-          .addRightFace(face -> face.set(45, 49, 4, 8).flipX())
-          .addTopFace(face -> face.set(41, 45, 0, 4).flipY())
-          .addBottomFace(face -> face.set(45, 49, 0, 4))
+      .addBlockUnitsBox(-2, 16, -2.175, 4, 4, 4, box ->
+        box.forTextureSize(64, 64).atUVCoordinates(37, 0).flipX()
+          .addAllFaces()
           .grow(-0.01 / 16.)
       )
       .toQuads();
     private static final Quad[] rightArm = new BoxModelBuilder()
-      .addBlockUnitsBox(4, 4.63211, -0.80571, 3, 10, 4, box ->
+      .addBlockUnitsBox(4.075, -0.516, -1.3518, 3, 10, 4, box ->
         box.forTextureSize(64, 64).atUVCoordinates(36, 16).flipX()
           .addAllFaces()
           .transform(Transform.NONE
-            .translate(-4 / 16., -14 / 16., 3 / 16.)
+            .translate(-4 / 16., -8.51073 / 16., -0.6448 / 16.)
             .rotateX(Math.toRadians(60))
-            .translate(4 / 16., 14 / 16., -3 / 16.)
-            .translate(-4 / 16., -14 / 16., -3.5 / 16.)
+            .translate(4 / 16., 8.51073 / 16., 0.6448 / 16.)
+            .translate(-4 / 16., -8.6 / 16., -0.525 / 16.)
             .rotateX(Math.toRadians(-25))
-            .translate(4 / 16., 14 / 16., 3.5 / 16.)
+            .translate(4 / 16., 8.6 / 16., 0.525 / 16.)
           )
       )
       .toQuads();
     private static final Quad[] leftArm = new BoxModelBuilder()
-      .addBlockUnitsBox(-7, 3.3041, -1.01759, 3, 10, 4, box ->
+      .addBlockUnitsBox(-7.075, -0.35426, -1.35548, 3, 10, 4, box ->
         box.forTextureSize(64, 64).atUVCoordinates(50, 16).flipX()
           .addAllFaces()
           .transform(Transform.NONE
-            .translate(4 / 16., -13 / 16., 1 / 16.)
+            .translate(4 / 16., -8.60145 / 16., -0.54417 / 16.)
             .rotateX(Math.toRadians(60))
-            .translate(-4 / 16., 13 / 16., -1 / 16.)
-            .translate(4 / 16., -13 / 16., -5.5 / 16.)
+            .translate(-4 / 16., 8.60145 / 16., 0.54417 / 16.)
+            .translate(4 / 16., -8.6 / 16., -0.625 / 16.)
             .rotateX(Math.toRadians(-25))
-            .translate(-4 / 16., 13 / 16., 5.5 / 16.)
+            .translate(-4 / 16., 8.6 / 16., 0.625 / 16.)
           )
       )
       .toQuads();
     private static final Quad[] rightLeg = new BoxModelBuilder()
-      .addBlockUnitsBox(0, -2.225, 0.2, 4, 5, 4, box ->
+      .addBlockUnitsBox(0.05, -1.975, -1, 4, 5, 4, box ->
         box.forTextureSize(64, 64).atUVCoordinates(0, 27).flipX()
           .addAllFaces()
           .transform(Transform.NONE
-            .translate(-2 / 16., -4 / 16., -0.2 / 16.)
+            .translate(-2.05 / 16., -4 / 16., 1 / 16.)
             .rotateX(Math.toRadians(90))
-            .translate(2 / 16., 4 / 16., 0.2 / 16.)
+            .translate(2.05 / 16., 4 / 16., -1 / 16.)
           )
       )
       .toQuads();
     private static final Quad[] leftLeg = new BoxModelBuilder()
-      .addBlockUnitsBox(-4, -2.225, 0.2, 4, 5, 4, box ->
+      .addBlockUnitsBox(-4.05, -1.975, -1, 4, 5, 4, box ->
         box.forTextureSize(64, 64).atUVCoordinates(16, 27).flipX()
           .addAllFaces()
           .transform(Transform.NONE
-            .translate(2 / 16., -4 / 16., -0.2 / 16.)
+            .translate(2.05 / 16., -4 / 16., 1 / 16.)
             .rotateX(Math.toRadians(90))
-            .translate(-2 / 16., 4 / 16., 0.2 / 16.)
+            .translate(-2.05 / 16., 4 / 16., -1 / 16.)
           )
       )
       .toQuads();
