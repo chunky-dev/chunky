@@ -71,7 +71,7 @@ abstract public class Entity {
    * @param json json data.
    * @return unmarshalled entity, or {@code null} if it was not a valid entity.
    */
-  public static Entity fromJson(JsonObject json) {
+  public static Collection<Entity> fromJson(JsonObject json) {
     String kind = json.get("kind").stringValue("");
     switch (kind) {
       case "painting":

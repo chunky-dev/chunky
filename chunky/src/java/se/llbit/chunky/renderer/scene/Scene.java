@@ -1001,33 +1001,35 @@ public class Scene implements JsonSerializable, Refreshable {
                       chunkBiomeHelper.makeBiomeRelevant(y);
                     }
 
-                    if (block.isEntity()) {
+                    if (block.hasEntities()) {
                       Vector3 position = new Vector3(cx + cp.x * 16, y, cz + cp.z * 16);
-                      Entity entity = block.toEntity(position);
+                      Collection<Entity> entitiesFromBlock = block.createEntities(position);
 
-                      if (entities.shouldLoad(entity)) {
-                        if (entity instanceof Poseable && !(entity instanceof Lectern && !((Lectern) entity).hasBook())) {
-                          entities.addActor(entity);
-                        } else {
-                          entities.addEntity(entity);
-                          if (emitterGrid != null) {
-                            for (Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
-                              emitterPos.x -= origin.x;
-                              emitterPos.y -= origin.y;
-                              emitterPos.z -= origin.z;
-                              emitterGrid.addEmitter(emitterPos);
+                      for (Entity entity : entitiesFromBlock) {
+                        if (entities.shouldLoad(entity)) {
+                          if (entity instanceof Poseable) {
+                            entities.addActor(entity);
+                          } else {
+                            entities.addEntity(entity);
+                            if (emitterGrid != null) {
+                              for (Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
+                                emitterPos.x -= origin.x;
+                                emitterPos.y -= origin.y;
+                                emitterPos.z -= origin.z;
+                                emitterGrid.addEmitter(emitterPos);
+                              }
                             }
                           }
                         }
+                      }
 
-                        if (!block.isBlockWithEntity()) {
-                          if (block.waterlogged) {
-                            block = palette.water;
-                            octNode = palette.waterId;
-                          } else {
-                            block = Air.INSTANCE;
-                            octNode = palette.airId;
-                          }
+                      if (block.isReplacedByEntities()) {
+                        if (block.waterlogged) {
+                          block = palette.water;
+                          octNode = palette.waterId;
+                        } else {
+                          block = Air.INSTANCE;
+                          octNode = palette.airId;
                         }
                       }
                     }
@@ -1189,7 +1191,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 }
               }
               if (block.isBlockEntity()) {
-                Entity blockEntity = block.toBlockEntity(position, entityTag);
+                Entity blockEntity = block.createBlockEntity(position, entityTag);
                 if (blockEntity == null) {
                   continue;
                 }
@@ -1207,6 +1209,16 @@ public class Scene implements JsonSerializable, Refreshable {
                         emitterGrid.addEmitter(emitterPos);
                       }
                     }
+                  }
+                }
+
+                if (block.isReplacedByEntities()) {
+                  if (block.waterlogged) {
+                    block = palette.water;
+                    worldOctree.set(palette.waterId, cp.x * 16 + x - origin.x, y - origin.y, cp.z * 16 + z - origin.z);
+                  } else {
+                    block = Air.INSTANCE;
+                    worldOctree.set(palette.airId, cp.x * 16 + x - origin.x, y - origin.y, cp.z * 16 + z - origin.z);
                   }
                 }
               }
