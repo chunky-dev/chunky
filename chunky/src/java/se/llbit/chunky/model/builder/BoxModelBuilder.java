@@ -32,6 +32,13 @@ public class BoxModelBuilder {
     return this;
   }
 
+  public BoxModelBuilder addBlockUnitsBox(double x, double y, double z, double width, double height, double length, Consumer<BoxBuilder> boxConsumer) {
+    return this.addBox(
+      new Vector3(x / 16.0, y / 16.0, z / 16.0),
+      new Vector3((x + width) / 16.0, (y + height) / 16.0, (z + length) / 16.0),
+      boxConsumer);
+  }
+
   /**
    * Create quads from all boxes, including all previously configured faces and taking the specified UV maps into account.
    *
@@ -115,7 +122,11 @@ public class BoxModelBuilder {
       }
 
       Quad[] boxQuadsArray = boxQuads.toArray(new Quad[0]);
-      boxQuadsArray = Model.transform(boxQuadsArray, box.transform);
+      boxQuadsArray = Model.transform(boxQuadsArray,
+        Transform.NONE
+          .translate(0.5, 0.5, 0.5) // Model.transform rotates around 0.5, 0.5, 0.5 by default, which we don't want here
+          .chain(box.transform)
+          .translate(-0.5, -0.5, -0.5));
       quads.addAll(Arrays.asList(boxQuadsArray));
     }
     return quads.toArray(new Quad[0]);
@@ -172,6 +183,21 @@ public class BoxModelBuilder {
         helper.flipY();
       }
       return helper;
+    }
+
+    /**
+     * Add all faces.
+     *
+     * @return This box builder
+     */
+    public BoxBuilder addAllFaces() {
+      addTopFace();
+      addBottomFace();
+      addLeftFace();
+      addRightFace();
+      addFrontFace();
+      addBackFace();
+      return this;
     }
 
     /**
@@ -313,11 +339,25 @@ public class BoxModelBuilder {
      *
      * @param texture Texture to be used
      * @param width   Texture width, eg. 64 for piglin texture, 256 for enderdragon texture
-     * @param width   Texture height, eg. 64 for piglin texture, 256 for enderdragon texture
+     * @param height  Texture height, eg. 64 for piglin texture, 256 for enderdragon texture
+     * @return This box builder
+     * @deprecated Use {@link #forTextureSize(int, int)} instead
+     */
+    @Deprecated(forRemoval = true)
+    public BoxBuilder forTextureSize(Texture texture, int width, int height) {
+      return this.forTextureSize(width, height);
+    }
+
+    /**
+     * Configure this box to use the given texture with the given dimensions.
+     * These dimensions are used for convenient UV calculations, it's recommended to set them to the Vanilla Minecraft texture dimensions.
+     * The actual size of the texture can be different, as all values are normalized to [0..1] in for the generated models.
+     *
+     * @param width  Texture width, eg. 64 for piglin texture, 256 for enderdragon texture
+     * @param height Texture height, eg. 64 for piglin texture, 256 for enderdragon texture
      * @return This box builder
      */
-    public BoxBuilder forTextureSize(Texture texture, int width, int height) {
-      this.texture = texture;
+    public BoxBuilder forTextureSize(int width, int height) {
       this.textureWidth = width;
       this.textureHeight = height;
       return this;
@@ -404,6 +444,18 @@ public class BoxModelBuilder {
       UVMapHelper.Side tmp = this.sides[2];
       this.sides[2] = this.sides[3];
       this.sides[3] = tmp;
+      return this;
+    }
+
+    /**
+     * Grow this box by the given amount of units. The box will be scaled relative to its center.
+     *
+     * @param growBy Units to grow this model by (in model space)
+     * @return This box builder
+     */
+    public BoxBuilder grow(double growBy) {
+      this.from.sub(growBy, growBy, growBy);
+      this.to.add(growBy, growBy, growBy);
       return this;
     }
   }

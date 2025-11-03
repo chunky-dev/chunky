@@ -125,14 +125,18 @@ public class Transform {
     });
   }
 
+  /**
+   * @deprecated Use {@link se.llbit.chunky.model.builder.BoxModelBuilder.BoxBuilder#grow(double)} instead if you need this to construct an entity model
+   */
+  @Deprecated(forRemoval = true)
   public final Transform inflate(final Vector3 scale) {
     return chain(new Transform() {
       @Override public void apply(Vector3 v) {
-        v.scaleEntrywise(scale);
+        v.multiplyEntrywise(scale);
       }
 
       @Override public void applyRotScale(Vector3 v) {
-        v.scaleEntrywise(scale);
+        v.multiplyEntrywise(scale);
       }
     });
   }

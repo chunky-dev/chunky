@@ -25,19 +25,15 @@ public class ChickenEntity extends Entity implements Poseable, Variant {
   private static final Quad[] body = new BoxModelBuilder()
     .addBox(new Vector3(-3 / 16.0, -4 / 16.0, -3 / 16.0), new Vector3(3 / 16.0, 4 / 16.0, 3 / 16.0), box ->
       box.forTextureSize(Texture.chicken, 64, 32).atUVCoordinates(0, 9).flipX()
-        .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
-        .transform(Transform.NONE
-          .translate(0.5, 0.5, 0.5)
-          .rotateX(Math.toRadians(-90))
-          .translate(-0.5, -0.5, -0.5)
-        )
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+        .transform(Transform.NONE.rotateX(Math.toRadians(-90)))
     ).toQuads();
 
   //TODO: Skip adding blank faces on Chicken legs? Same for Pig's saddle.
   private static final Quad[] leg = new BoxModelBuilder()
     .addBox(new Vector3(0 / 16.0, -5 / 16.0, 0 / 16.0), new Vector3(3 / 16.0, 0, 3 / 16.0), box ->
       box.forTextureSize(Texture.chicken, 64, 32).atUVCoordinates(26, 0).flipX().doubleSided()
-        .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
         .transform(Transform.NONE.translate(0, Ray.OFFSET, 0)) // Prevent Z-Fighting with the block the Chicken is standing on
     ).toQuads();
 
@@ -50,7 +46,7 @@ public class ChickenEntity extends Entity implements Poseable, Variant {
   private static final Quad[] head = new BoxModelBuilder()
     .addBox(new Vector3(-2 / 16.0, 0 / 16.0, -3 / 16.0), new Vector3(2 / 16.0, 6 / 16.0, 0 / 16.0), box ->
       box.forTextureSize(Texture.chicken, 64, 32).atUVCoordinates(0, 0).flipX()
-        .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
     ).addBox(new Vector3(-2 / 16.0, 2 / 16.0, -5 / 16.0), new Vector3(2 / 16.0, 4 / 16.0, -3 / 16.0), box ->
       box.forTextureSize(Texture.chicken, 64, 32).atUVCoordinates(14, 0).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
@@ -62,7 +58,7 @@ public class ChickenEntity extends Entity implements Poseable, Variant {
   private static final Quad[] cold_head = new BoxModelBuilder()
     .addBox(new Vector3(-2 / 16.0, 0 / 16.0, -3 / 16.0), new Vector3(2 / 16.0, 6 / 16.0, 0 / 16.0), box ->
       box.forTextureSize(Texture.chicken, 64, 32).atUVCoordinates(0, 0).flipX()
-        .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
     ).addBox(new Vector3(-2 / 16.0, 2 / 16.0, -5 / 16.0), new Vector3(2 / 16.0, 4 / 16.0, -3 / 16.0), box ->
       box.forTextureSize(Texture.chicken, 64, 32).atUVCoordinates(14, 0).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()

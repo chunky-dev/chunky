@@ -1724,6 +1724,14 @@ public class Texture {
   public static final Texture weatheredCopperBars = new Texture();
   @TexturePath("assets/minecraft/textures/block/oxidized_copper_bars")
   public static final Texture oxidizedCopperBars = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/copper_golem/copper_golem")
+  public static final Texture copperGolem = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/copper_golem/exposed_copper_golem")
+  public static final Texture copperGolemExposed = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/copper_golem/weathered_copper_golem")
+  public static final Texture copperGolemWeathered = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/copper_golem/oxidized_copper_golem")
+  public static final Texture copperGolemOxidized = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
@@ -1829,8 +1837,12 @@ public class Texture {
   public float[] getColor(int x, int y) {
     if(useAverageColor)
       return avgColorFlat;
+    int index = width * y + x;
     float[] result = new float[4];
-    ColorUtil.getRGBAComponentsGammaCorrected(image.data[width*y + x], result);
+    if(index < 0 || index > image.data.length) {
+      return result;
+    }
+    ColorUtil.getRGBAComponentsGammaCorrected(image.data[index], result);
     return result;
   }
 

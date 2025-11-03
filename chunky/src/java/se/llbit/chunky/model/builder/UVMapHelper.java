@@ -60,7 +60,7 @@ public class UVMapHelper {
   }
 
   public Side bottom() {
-    return createSide(boxU + length + width, boxU + length + 2 * width, boxV, boxV + length);
+    return createSide(boxU + length + width, boxU + length + 2 * width, boxV + length, boxV);
   }
 
   protected Side createSide(int x0, int x1, int y0, int y1) {
@@ -105,9 +105,26 @@ public class UVMapHelper {
     }
 
     /**
+     * Set the UV map for this side.
+     *
+     * @param x0
+     * @param x1
+     * @param y0
+     * @param y1
+     * @return This side
+     */
+    public Side set(double x0, double x1, double y0, double y1) {
+      this.x0 = x0;
+      this.x1 = x1;
+      this.y0 = y0;
+      this.y1 = y1;
+      return this;
+    }
+
+    /**
      * Creates a UV vector that can be used by the {@link se.llbit.math.Quad} constructor.
      *
-     * @return UV vector t hat can be used to construct a Quad
+     * @return UV vector that can be used to construct a Quad
      */
     public Vector4 toVectorForQuad() {
       return new Vector4(x0 / textureWidth, x1 / textureWidth, 1 - y0 / textureHeight, 1 - y1 / textureHeight);

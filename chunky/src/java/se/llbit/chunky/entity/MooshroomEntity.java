@@ -25,20 +25,12 @@ public class MooshroomEntity extends Entity implements Poseable, Variant {
   private static final Quad[] body = new BoxModelBuilder()
     .addBox(new Vector3(-6 / 16.0, -9 / 16.0, -5 / 16.0), new Vector3(6 / 16.0, 9 / 16.0, 5 / 16.0), box ->
       box.forTextureSize(Texture.brownMooshroom, 64, 64).atUVCoordinates(18, 4).flipX()
-        .addTopFace().addBottomFace(UVMapHelper.Side::flipY).addLeftFace().addRightFace().addFrontFace().addBackFace()
-        .transform(Transform.NONE
-          .translate(0.5, 0.5, 0.5)
-          .rotateX(Math.toRadians(-90))
-          .translate(-0.5, -0.5, -0.5)
-        )
+        .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
+        .transform(Transform.NONE.rotateX(Math.toRadians(-90)))
     ).addBox(new Vector3(-2 / 16.0, -9 / 16.0, -6 / 16.0), new Vector3(2 / 16.0, -3 / 16.0, -5 / 16.0), box ->
       box.forTextureSize(Texture.brownMooshroom, 64, 64).atUVCoordinates(52, 0).flipX()
         .addTopFace().addBottomFace().addLeftFace().addRightFace().addFrontFace().addBackFace()
-        .transform(Transform.NONE
-          .translate(0.5, 0.5, 0.5)
-          .rotateX(Math.toRadians(-90))
-          .translate(-0.5, -0.5, -0.5)
-        )
+        .transform(Transform.NONE.rotateX(Math.toRadians(-90)))
     ).toQuads();
 
   private static final Quad[] leg = new BoxModelBuilder()
