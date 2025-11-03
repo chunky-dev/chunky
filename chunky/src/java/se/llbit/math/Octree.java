@@ -244,10 +244,25 @@ public class Octree {
     }
   }
 
+  /** The type of Octree, used to adjust intersection code based on contents*/
+  public enum OctreeType {
+    /**
+     * Contains all world geometry excluding water, water is removed from water logged blocks
+     * and full water blocks are replaced with air
+     */
+    WORLD,
+    /**
+     * Contains all the water geometry only, other blocks are air
+     */
+    WATER
+  }
+
   /**
    * Timestamp of last serialization.
    */
   private long timestamp = 0;
+
+  public OctreeType type;
 
   private OctreeImplementation implementation;
 
@@ -257,9 +272,10 @@ public class Octree {
    *
    * @param octreeDepth The number of levels in the Octree.
    */
-  public Octree(String impl, int octreeDepth) {
+  public Octree(String impl, int octreeDepth, OctreeType type) {
     Log.infof("Building new octree (%s)", impl);
     implementation = getImplementationFactory(impl).create(octreeDepth);
+    this.type = type;
   }
 
   protected Octree(OctreeImplementation impl) {
@@ -484,6 +500,8 @@ public class Octree {
     int depth = implementation.getDepth();
 
     double distance = 0;
+    //tread air as a null block depending on octreetype and were we are in the trace
+    boolean includeAir = this.type == OctreeType.WORLD && !ray.getPrevMaterial().isWater();
 
     // floating point division are slower than multiplication so we cache them
     // We also try to limit the number of time the ray origin is updated
@@ -539,9 +557,14 @@ public class Octree {
         ray.distance += distance;
         distance = 0;
         if (currentBlock.intersect(ray, scene)) {
-          if (prevBlock != currentBlock)
+          if (prevBlock != currentBlock) { //|| (currentBlock.refractive)) {
+            //for things like glass panes coerce the current mat to be air or water
+            // TODO testing
+            if (currentBlock.refractive) {
+              //ray.setCurrentMaterial(currentBlock.waterlogged ? Water.INSTANCE : Air.INSTANCE);
+            }
             return true;
-
+          }
           ray.o.scaleAdd(Ray.OFFSET, ray.d);
           offsetX = -ray.o.x * invDx;
           offsetY = -ray.o.y * invDy;
@@ -556,7 +579,7 @@ public class Octree {
           offsetZ = -ray.o.z * invDz;
           continue;
         }
-      } else if (!currentBlock.isSameMaterial(prevBlock) && currentBlock != Air.INSTANCE) {
+      } else if (!currentBlock.isSameMaterial(prevBlock) && (currentBlock != Air.INSTANCE || includeAir)) {
         // Origin and distance of ray need to be updated
         ray.o.scaleAdd(distance, ray.d);
         ray.distance += distance;

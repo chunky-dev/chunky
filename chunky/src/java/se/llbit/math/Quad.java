@@ -158,14 +158,14 @@ public class Quad {
    */
   public boolean intersect(Ray ray) {
     double u, v;
-
+    Material mat = ray.getCurrentMaterial();
     double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
     double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
     double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
 
     // Test that the ray is heading toward the plane of this quad.
     double denom = ray.d.dot(n);
-    if (denom < -Ray.EPSILON || (doubleSided && denom > Ray.EPSILON)) {
+    if (denom < -Ray.EPSILON || ((doubleSided || mat.refractive) && denom > Ray.EPSILON)) {
 
       // Test for intersection with the plane at origin.
       double t = -(ix * n.x + iy * n.y + iz * n.z + d) / denom;
