@@ -1,20 +1,27 @@
 package se.llbit.chunky.entity;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Random;
-
 import se.llbit.chunky.block.Block;
+import se.llbit.chunky.model.GeneratedItemModel;
 import se.llbit.chunky.model.Model;
+import se.llbit.chunky.resources.ResourcePackLoader;
+import se.llbit.chunky.resources.ResourcePackTextureLoader;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.TextureCache;
+import se.llbit.chunky.resources.texturepack.SimpleTexture;
+import se.llbit.chunky.resources.texturepack.TextureLoader;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
+import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 import se.llbit.math.*;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.util.JsonUtil;
+
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Random;
 
 public class Campfire extends Entity {
 
@@ -34,217 +41,236 @@ public class Campfire extends Entity {
   private static final Texture soullitlog = Texture.soulCampfireLogLit;
 
   private static final Texture[] tex = new Texture[]{
-      log, log, log, log, log, log, log, log, log, log, log, log, log, log, log,
-      log, log, log, log, log, log, log, log, log, log, log, log, log,
+    log, log, log, log, log, log, log, log, log, log, log, log, log, log, log,
+    log, log, log, log, log, log, log, log, log, log, log, log, log,
   };
 
   private static final Texture[] texLitCampfire = new Texture[]{
-      log, log, log, litlog, log, log, log, litlog, log, log, litlog, litlog, log, log, litlog,
-      log, log, log, log, litlog, log, log, litlog, litlog, litlog, log, log, log
+    log, log, log, litlog, log, log, log, litlog, log, log, litlog, litlog, log, log, litlog,
+    log, log, log, log, litlog, log, log, litlog, litlog, litlog, log, log, log
   };
 
   private static final Texture[] texLitSoulCampfire = new Texture[]{
-      log, log, log, soullitlog, log, log, log, soullitlog, log, log, soullitlog, soullitlog, log,
-      log, soullitlog,
-      log, log, log, log, soullitlog, log, log, soullitlog, soullitlog, soullitlog, log, log, log
+    log, log, log, soullitlog, log, log, log, soullitlog, log, log, soullitlog, soullitlog, log,
+    log, soullitlog,
+    log, log, log, log, soullitlog, log, log, soullitlog, soullitlog, soullitlog, log, log, log
   };
 
   private static final Quad[] quads = new Quad[]{
-      new Quad(
-          new Vector3(5 / 16.0, 4 / 16.0, 16 / 16.0),
-          new Vector3(5 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector3(1 / 16.0, 4 / 16.0, 16 / 16.0),
-          new Vector4(0 / 16.0, 16 / 16.0, 12 / 16.0, 16 / 16.0)
-      ),
-      new Quad(
-          new Vector3(5 / 16.0, 0 / 16.0, 0 / 16.0),
-          new Vector3(5 / 16.0, 0 / 16.0, 16 / 16.0),
-          new Vector3(1 / 16.0, 0 / 16.0, 0 / 16.0),
-          new Vector4(0 / 16.0, 16 / 16.0, 12 / 16.0, 16 / 16.0)
-      ),
-      new Quad(
-          new Vector3(1 / 16.0, 4 / 16.0, 16 / 16.0),
-          new Vector3(1 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector3(1 / 16.0, 0 / 16.0, 16 / 16.0),
-          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 12 / 16.0)
-      ),
-      new Quad(
-          new Vector3(5 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector3(5 / 16.0, 4 / 16.0, 16 / 16.0),
-          new Vector3(5 / 16.0, 0 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 15 / 16.0, 11 / 16.0)
-      ),
-      new Quad(
-          new Vector3(1 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector3(5 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector3(1 / 16.0, 0 / 16.0, 0 / 16.0),
-          new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
-      ),
-      new Quad(
-          new Vector3(5 / 16.0, 4 / 16.0, 16 / 16.0),
-          new Vector3(1 / 16.0, 4 / 16.0, 16 / 16.0),
-          new Vector3(5 / 16.0, 0 / 16.0, 16 / 16.0),
-          new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
-      ),
-      new Quad(
-          new Vector3(16 / 16.0, 7 / 16.0, 11 / 16.0),
-          new Vector3(0 / 16.0, 7 / 16.0, 11 / 16.0),
-          new Vector3(16 / 16.0, 7 / 16.0, 15 / 16.0),
-          new Vector4(0 / 16.0, 16 / 16.0, 12 / 16.0, 16 / 16.0)
-      ),
-      new Quad(
-          new Vector3(0 / 16.0, 3 / 16.0, 11 / 16.0),
-          new Vector3(16 / 16.0, 3 / 16.0, 11 / 16.0),
-          new Vector3(0 / 16.0, 3 / 16.0, 15 / 16.0),
-          new Vector4(0 / 16.0, 16 / 16.0, 8 / 16.0, 12 / 16.0)
-      ),
-      new Quad(
-          new Vector3(0 / 16.0, 7 / 16.0, 15 / 16.0),
-          new Vector3(0 / 16.0, 7 / 16.0, 11 / 16.0),
-          new Vector3(0 / 16.0, 3 / 16.0, 15 / 16.0),
-          new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
-      ),
-      new Quad(
-          new Vector3(16 / 16.0, 7 / 16.0, 11 / 16.0),
-          new Vector3(16 / 16.0, 7 / 16.0, 15 / 16.0),
-          new Vector3(16 / 16.0, 3 / 16.0, 11 / 16.0),
-          new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
-      ),
-      new Quad(
-          new Vector3(0 / 16.0, 7 / 16.0, 11 / 16.0),
-          new Vector3(16 / 16.0, 7 / 16.0, 11 / 16.0),
-          new Vector3(0 / 16.0, 3 / 16.0, 11 / 16.0),
-          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 12 / 16.0)
-      ),
-      new Quad(
-          new Vector3(16 / 16.0, 7 / 16.0, 15 / 16.0),
-          new Vector3(0 / 16.0, 7 / 16.0, 15 / 16.0),
-          new Vector3(16 / 16.0, 3 / 16.0, 15 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
-      ),
-      new Quad(
-          new Vector3(15 / 16.0, 4 / 16.0, 16 / 16.0),
-          new Vector3(15 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector3(11 / 16.0, 4 / 16.0, 16 / 16.0),
-          new Vector4(0 / 16.0, 16 / 16.0, 12 / 16.0, 16 / 16.0)
-      ),
-      new Quad(
-          new Vector3(15 / 16.0, 0 / 16.0, 0 / 16.0),
-          new Vector3(15 / 16.0, 0 / 16.0, 16 / 16.0),
-          new Vector3(11 / 16.0, 0 / 16.0, 0 / 16.0),
-          new Vector4(0 / 16.0, 16 / 16.0, 12 / 16.0, 16 / 16.0)
-      ),
-      new Quad(
-          new Vector3(11 / 16.0, 4 / 16.0, 16 / 16.0),
-          new Vector3(11 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector3(11 / 16.0, 0 / 16.0, 16 / 16.0),
-          new Vector4(0 / 16.0, 16 / 16.0, 15 / 16.0, 11 / 16.0)
-      ),
-      new Quad(
-          new Vector3(15 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector3(15 / 16.0, 4 / 16.0, 16 / 16.0),
-          new Vector3(15 / 16.0, 0 / 16.0, 0 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
-      ),
-      new Quad(
-          new Vector3(11 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector3(15 / 16.0, 4 / 16.0, 0 / 16.0),
-          new Vector3(11 / 16.0, 0 / 16.0, 0 / 16.0),
-          new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
-      ),
-      new Quad(
-          new Vector3(15 / 16.0, 4 / 16.0, 16 / 16.0),
-          new Vector3(11 / 16.0, 4 / 16.0, 16 / 16.0),
-          new Vector3(15 / 16.0, 0 / 16.0, 16 / 16.0),
-          new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
-      ),
-      new Quad(
-          new Vector3(16 / 16.0, 7 / 16.0, 1 / 16.0),
-          new Vector3(0 / 16.0, 7 / 16.0, 1 / 16.0),
-          new Vector3(16 / 16.0, 7 / 16.0, 5 / 16.0),
-          new Vector4(0 / 16.0, 16 / 16.0, 12 / 16.0, 16 / 16.0)
-      ),
-      new Quad(
-          new Vector3(0 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector3(16 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector3(0 / 16.0, 3 / 16.0, 5 / 16.0),
-          new Vector4(0 / 16.0, 16 / 16.0, 8 / 16.0, 12 / 16.0)
-      ),
-      new Quad(
-          new Vector3(0 / 16.0, 7 / 16.0, 5 / 16.0),
-          new Vector3(0 / 16.0, 7 / 16.0, 1 / 16.0),
-          new Vector3(0 / 16.0, 3 / 16.0, 5 / 16.0),
-          new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
-      ),
-      new Quad(
-          new Vector3(16 / 16.0, 7 / 16.0, 1 / 16.0),
-          new Vector3(16 / 16.0, 7 / 16.0, 5 / 16.0),
-          new Vector3(16 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
-      ),
-      new Quad(
-          new Vector3(0 / 16.0, 7 / 16.0, 1 / 16.0),
-          new Vector3(16 / 16.0, 7 / 16.0, 1 / 16.0),
-          new Vector3(0 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
-      ),
-      new Quad(
-          new Vector3(16 / 16.0, 7 / 16.0, 5 / 16.0),
-          new Vector3(0 / 16.0, 7 / 16.0, 5 / 16.0),
-          new Vector3(16 / 16.0, 3 / 16.0, 5 / 16.0),
-          new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 12 / 16.0)
-      ),
-      new Quad(
-          new Vector3(11 / 16.0, 1 / 16.0, 16 / 16.0),
-          new Vector3(11 / 16.0, 1 / 16.0, 0 / 16.0),
-          new Vector3(5 / 16.0, 1 / 16.0, 16 / 16.0),
-          new Vector4(0 / 16.0, 16 / 16.0, 2 / 16.0, 8 / 16.0)
-      ),
-      new Quad(
-          new Vector3(11 / 16.0, 0 / 16.0, 0 / 16.0),
-          new Vector3(11 / 16.0, 0 / 16.0, 16 / 16.0),
-          new Vector3(5 / 16.0, 0 / 16.0, 0 / 16.0),
-          new Vector4(0 / 16.0, 16 / 16.0, 2 / 16.0, 8 / 16.0)
-      ),
-      new Quad(
-          new Vector3(5 / 16.0, 1 / 16.0, 0 / 16.0),
-          new Vector3(11 / 16.0, 1 / 16.0, 0 / 16.0),
-          new Vector3(5 / 16.0, 0 / 16.0, 0 / 16.0),
-          new Vector4(6 / 16.0, 0 / 16.0, 1 / 16.0, 0 / 16.0)
-      ),
-      new Quad(
-          new Vector3(11 / 16.0, 1 / 16.0, 16 / 16.0),
-          new Vector3(5 / 16.0, 1 / 16.0, 16 / 16.0),
-          new Vector3(11 / 16.0, 0 / 16.0, 16 / 16.0),
-          new Vector4(16 / 16.0, 10 / 16.0, 1 / 16.0, 0 / 16.0)
-      ),
-      rotateFire(new Quad(
-          new Vector3(0.8 / 16.0, 17 / 16.0, 8 / 16.0),
-          new Vector3(15.2 / 16.0, 17 / 16.0, 8 / 16.0),
-          new Vector3(0.8 / 16.0, 1 / 16.0, 8 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-      )),
-      rotateFire(new Quad(
-          new Vector3(15.2 / 16.0, 17 / 16.0, 8 / 16.0),
-          new Vector3(0.8 / 16.0, 17 / 16.0, 8 / 16.0),
-          new Vector3(15.2 / 16.0, 1 / 16.0, 8 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-      )),
-      rotateFire(new Quad(
-          new Vector3(8 / 16.0, 17 / 16.0, 15.2 / 16.0),
-          new Vector3(8 / 16.0, 17 / 16.0, 0.8 / 16.0),
-          new Vector3(8 / 16.0, 1 / 16.0, 15.2 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-      )),
-      rotateFire(new Quad(
-          new Vector3(8 / 16.0, 17 / 16.0, 0.8 / 16.0),
-          new Vector3(8 / 16.0, 17 / 16.0, 15.2 / 16.0),
-          new Vector3(8 / 16.0, 1 / 16.0, 0.8 / 16.0),
-          new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
-      ))
+    new Quad(
+      new Vector3(5 / 16.0, 4 / 16.0, 16 / 16.0),
+      new Vector3(5 / 16.0, 4 / 16.0, 0 / 16.0),
+      new Vector3(1 / 16.0, 4 / 16.0, 16 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 12 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(5 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector3(5 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector3(1 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 12 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(1 / 16.0, 4 / 16.0, 16 / 16.0),
+      new Vector3(1 / 16.0, 4 / 16.0, 0 / 16.0),
+      new Vector3(1 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 12 / 16.0)
+    ),
+    new Quad(
+      new Vector3(5 / 16.0, 4 / 16.0, 0 / 16.0),
+      new Vector3(5 / 16.0, 4 / 16.0, 16 / 16.0),
+      new Vector3(5 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 15 / 16.0, 11 / 16.0)
+    ),
+    new Quad(
+      new Vector3(1 / 16.0, 4 / 16.0, 0 / 16.0),
+      new Vector3(5 / 16.0, 4 / 16.0, 0 / 16.0),
+      new Vector3(1 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
+    ),
+    new Quad(
+      new Vector3(5 / 16.0, 4 / 16.0, 16 / 16.0),
+      new Vector3(1 / 16.0, 4 / 16.0, 16 / 16.0),
+      new Vector3(5 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
+    ),
+    new Quad(
+      new Vector3(16 / 16.0, 7 / 16.0, 11 / 16.0),
+      new Vector3(0 / 16.0, 7 / 16.0, 11 / 16.0),
+      new Vector3(16 / 16.0, 7 / 16.0, 15 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 12 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(0 / 16.0, 3 / 16.0, 11 / 16.0),
+      new Vector3(16 / 16.0, 3 / 16.0, 11 / 16.0),
+      new Vector3(0 / 16.0, 3 / 16.0, 15 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 8 / 16.0, 12 / 16.0)
+    ),
+    new Quad(
+      new Vector3(0 / 16.0, 7 / 16.0, 15 / 16.0),
+      new Vector3(0 / 16.0, 7 / 16.0, 11 / 16.0),
+      new Vector3(0 / 16.0, 3 / 16.0, 15 / 16.0),
+      new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
+    ),
+    new Quad(
+      new Vector3(16 / 16.0, 7 / 16.0, 11 / 16.0),
+      new Vector3(16 / 16.0, 7 / 16.0, 15 / 16.0),
+      new Vector3(16 / 16.0, 3 / 16.0, 11 / 16.0),
+      new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
+    ),
+    new Quad(
+      new Vector3(0 / 16.0, 7 / 16.0, 11 / 16.0),
+      new Vector3(16 / 16.0, 7 / 16.0, 11 / 16.0),
+      new Vector3(0 / 16.0, 3 / 16.0, 11 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 12 / 16.0)
+    ),
+    new Quad(
+      new Vector3(16 / 16.0, 7 / 16.0, 15 / 16.0),
+      new Vector3(0 / 16.0, 7 / 16.0, 15 / 16.0),
+      new Vector3(16 / 16.0, 3 / 16.0, 15 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
+    ),
+    new Quad(
+      new Vector3(15 / 16.0, 4 / 16.0, 16 / 16.0),
+      new Vector3(15 / 16.0, 4 / 16.0, 0 / 16.0),
+      new Vector3(11 / 16.0, 4 / 16.0, 16 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 12 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(15 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector3(15 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector3(11 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 12 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(11 / 16.0, 4 / 16.0, 16 / 16.0),
+      new Vector3(11 / 16.0, 4 / 16.0, 0 / 16.0),
+      new Vector3(11 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 15 / 16.0, 11 / 16.0)
+    ),
+    new Quad(
+      new Vector3(15 / 16.0, 4 / 16.0, 0 / 16.0),
+      new Vector3(15 / 16.0, 4 / 16.0, 16 / 16.0),
+      new Vector3(15 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
+    ),
+    new Quad(
+      new Vector3(11 / 16.0, 4 / 16.0, 0 / 16.0),
+      new Vector3(15 / 16.0, 4 / 16.0, 0 / 16.0),
+      new Vector3(11 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
+    ),
+    new Quad(
+      new Vector3(15 / 16.0, 4 / 16.0, 16 / 16.0),
+      new Vector3(11 / 16.0, 4 / 16.0, 16 / 16.0),
+      new Vector3(15 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
+    ),
+    new Quad(
+      new Vector3(16 / 16.0, 7 / 16.0, 1 / 16.0),
+      new Vector3(0 / 16.0, 7 / 16.0, 1 / 16.0),
+      new Vector3(16 / 16.0, 7 / 16.0, 5 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 12 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(0 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector3(16 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector3(0 / 16.0, 3 / 16.0, 5 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 8 / 16.0, 12 / 16.0)
+    ),
+    new Quad(
+      new Vector3(0 / 16.0, 7 / 16.0, 5 / 16.0),
+      new Vector3(0 / 16.0, 7 / 16.0, 1 / 16.0),
+      new Vector3(0 / 16.0, 3 / 16.0, 5 / 16.0),
+      new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
+    ),
+    new Quad(
+      new Vector3(16 / 16.0, 7 / 16.0, 1 / 16.0),
+      new Vector3(16 / 16.0, 7 / 16.0, 5 / 16.0),
+      new Vector3(16 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector4(4 / 16.0, 0 / 16.0, 12 / 16.0, 8 / 16.0)
+    ),
+    new Quad(
+      new Vector3(0 / 16.0, 7 / 16.0, 1 / 16.0),
+      new Vector3(16 / 16.0, 7 / 16.0, 1 / 16.0),
+      new Vector3(0 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
+    ),
+    new Quad(
+      new Vector3(16 / 16.0, 7 / 16.0, 5 / 16.0),
+      new Vector3(0 / 16.0, 7 / 16.0, 5 / 16.0),
+      new Vector3(16 / 16.0, 3 / 16.0, 5 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 12 / 16.0)
+    ),
+    new Quad(
+      new Vector3(11 / 16.0, 1 / 16.0, 16 / 16.0),
+      new Vector3(11 / 16.0, 1 / 16.0, 0 / 16.0),
+      new Vector3(5 / 16.0, 1 / 16.0, 16 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 2 / 16.0, 8 / 16.0)
+    ),
+    new Quad(
+      new Vector3(11 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector3(11 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector3(5 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector4(0 / 16.0, 16 / 16.0, 2 / 16.0, 8 / 16.0)
+    ),
+    new Quad(
+      new Vector3(5 / 16.0, 1 / 16.0, 0 / 16.0),
+      new Vector3(11 / 16.0, 1 / 16.0, 0 / 16.0),
+      new Vector3(5 / 16.0, 0 / 16.0, 0 / 16.0),
+      new Vector4(6 / 16.0, 0 / 16.0, 1 / 16.0, 0 / 16.0)
+    ),
+    new Quad(
+      new Vector3(11 / 16.0, 1 / 16.0, 16 / 16.0),
+      new Vector3(5 / 16.0, 1 / 16.0, 16 / 16.0),
+      new Vector3(11 / 16.0, 0 / 16.0, 16 / 16.0),
+      new Vector4(16 / 16.0, 10 / 16.0, 1 / 16.0, 0 / 16.0)
+    ),
+    rotateFire(new Quad(
+      new Vector3(0.8 / 16.0, 17 / 16.0, 8 / 16.0),
+      new Vector3(15.2 / 16.0, 17 / 16.0, 8 / 16.0),
+      new Vector3(0.8 / 16.0, 1 / 16.0, 8 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    )),
+    rotateFire(new Quad(
+      new Vector3(15.2 / 16.0, 17 / 16.0, 8 / 16.0),
+      new Vector3(0.8 / 16.0, 17 / 16.0, 8 / 16.0),
+      new Vector3(15.2 / 16.0, 1 / 16.0, 8 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    )),
+    rotateFire(new Quad(
+      new Vector3(8 / 16.0, 17 / 16.0, 15.2 / 16.0),
+      new Vector3(8 / 16.0, 17 / 16.0, 0.8 / 16.0),
+      new Vector3(8 / 16.0, 1 / 16.0, 15.2 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    )),
+    rotateFire(new Quad(
+      new Vector3(8 / 16.0, 17 / 16.0, 0.8 / 16.0),
+      new Vector3(8 / 16.0, 17 / 16.0, 15.2 / 16.0),
+      new Vector3(8 / 16.0, 1 / 16.0, 0.8 / 16.0),
+      new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+    ))
   };
 
   static final Quad[][] orientedQuads = new Quad[4][];
+
+  private static final Transform[] slotItemTransforms = new Transform[]{
+    Transform.NONE
+      .translate(-.5, 0, -.5)
+      .scale(0.38)
+      .translate(13 / 16., 7 / 16., 13 / 16.),
+    Transform.NONE
+      .translate(-.5, 0, -.5)
+      .rotateY(Math.toRadians(90))
+      .scale(0.38).translate(13 / 16., 7 / 16., 3 / 16.),
+    Transform.NONE
+      .translate(-.5, 0, -.5)
+      .rotateY(Math.toRadians(180))
+      .scale(0.38).translate(3 / 16., 7 / 16., 3 / 16.),
+    Transform.NONE
+      .translate(-.5, 0, -.5)
+      .rotateY(Math.toRadians(270))
+      .scale(0.38).translate(3 / 16., 7 / 16., 13 / 16.)
+  };
 
   static {
     orientedQuads[0] = quads;
@@ -258,13 +284,15 @@ public class Campfire extends Entity {
     return new Quad(quad, Transform.NONE.rotateY(Math.toRadians(45)));
   }
 
-  private static final Quad[] fireQuads = new Quad[] {
-      quads[quads.length-4], quads[quads.length-3],
-      quads[quads.length-2], quads[quads.length-1],
+  private static final Quad[] fireQuads = new Quad[]{
+    quads[quads.length - 4], quads[quads.length - 3],
+    quads[quads.length - 2], quads[quads.length - 1],
   };
+
   public static int faceCount() {
-      return fireQuads.length;
+    return fireQuads.length;
   }
+
   public static void sample(int face, Vector3 loc, Random rand) {
     fireQuads[face].sample(loc, rand);
   }
@@ -280,13 +308,15 @@ public class Campfire extends Entity {
   private final String facing;
   private final boolean isLit;
   private final Block block;
+  private final String[] slots;
 
-  public Campfire(Campfire.Kind kind, Vector3 position, String facing, boolean lit, Block block) {
+  public Campfire(Campfire.Kind kind, Vector3 position, String facing, boolean lit, Block block, String slot1, String slot2, String slot3, String slot4) {
     super(position);
     this.kind = kind;
     this.facing = facing;
     this.isLit = lit;
     this.block = block;
+    slots = new String[]{slot1, slot2, slot3, slot4};
   }
 
   public Campfire(JsonObject json) {
@@ -295,16 +325,23 @@ public class Campfire extends Entity {
     this.facing = json.get("facing").stringValue("north");
     this.isLit = json.get("lit").boolValue(true);
     this.block = null;
+    this.slots = new String[4];
+    JsonArray items = json.get("items").asArray();
+    for (int slot = 0; slot < 4; slot++) {
+      if (items.size() > slot) {
+        this.slots[slot] = items.get(slot).stringValue("");
+      }
+    }
   }
 
   @Override
   public Collection<Primitive> primitives(Vector3 offset) {
     Collection<Primitive> faces = new LinkedList<>();
     Transform transform = Transform.NONE
-        .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
+      .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     int facing = getOrientationIndex(this.facing);
     Texture[] textures =
-        isLit ? (kind == Kind.SOUL_CAMPFIRE ? texLitSoulCampfire : texLitCampfire) : tex;
+      isLit ? (kind == Kind.SOUL_CAMPFIRE ? texLitSoulCampfire : texLitCampfire) : tex;
     for (int i = 0; i < orientedQuads[facing].length - 4; i++) {
       Material material = new TextureMaterial(textures[i]);
       orientedQuads[facing][i].addTriangles(faces, material, transform);
@@ -314,6 +351,33 @@ public class Campfire extends Entity {
         orientedQuads[facing][i].addTriangles(faces, kind.flameMaterial, transform);
       }
     }
+
+    for (int slot = 0; slot < 4; slot++) {
+      if (slots[slot] == null) {
+        continue;
+      }
+      String[] namespaceAndId = slots[slot].split(":");
+      if (namespaceAndId.length == 2) {
+        String textureId = "assets/" + namespaceAndId[0] + "/textures/item/" + namespaceAndId[1];
+        Texture texture = TextureCache.get(textureId);
+        if (texture == null) {
+          texture = new Texture();
+          TextureLoader loader = new SimpleTexture(textureId, texture);
+          if (!ResourcePackLoader.loadResources(
+            ResourcePackTextureLoader.singletonLoader(textureId, loader))
+          ) {
+            Log.warnf("Failed to load texture: %s", textureId);
+          }
+          TextureCache.put(textureId, texture);
+        }
+        Quad[] quads = GeneratedItemModel.generateItemModelQuads(texture);
+        Material textureMaterial = new TextureMaterial(texture);
+        for (Quad quad : quads) {
+          quad.addTriangles(faces, textureMaterial, slotItemTransforms[slot].chain(transform));
+        }
+      }
+    }
+
     return faces;
   }
 
@@ -325,6 +389,12 @@ public class Campfire extends Entity {
     json.add("position", position.toJson());
     json.add("facing", facing);
     json.add("lit", isLit);
+    JsonArray items = new JsonArray();
+    items.add(slots[0]);
+    items.add(slots[1]);
+    items.add(slots[2]);
+    items.add(slots[3]);
+    json.add("items", items);
     return json;
   }
 
@@ -335,31 +405,31 @@ public class Campfire extends Entity {
   private static int getOrientationIndex(String facing) {
     switch (facing) {
       case "north":
-          return 0;
+        return 0;
       case "east":
-          return 1;
+        return 1;
       case "south":
-          return 2;
+        return 2;
       case "west":
-          return 3;
+        return 3;
       default:
-          return 0;
+        return 0;
     }
   }
 
   @Override
   public Grid.EmitterPosition[] getEmitterPosition() {
-      if (block == null) {
-          Log.warn("Attempted to build emitter grid from unassociated campfire entity.");
-          return new Grid.EmitterPosition[0];
-      }
+    if (block == null) {
+      Log.warn("Attempted to build emitter grid from unassociated campfire entity.");
+      return new Grid.EmitterPosition[0];
+    }
 
-      if (isLit) {
-          Grid.EmitterPosition[] pos = new Grid.EmitterPosition[1];
-          pos[0] = new Grid.EmitterPosition((int) position.x, (int) position.y, (int) position.z, block);
-          return pos;
-      } else {
-          return new Grid.EmitterPosition[0];
-      }
+    if (isLit) {
+      Grid.EmitterPosition[] pos = new Grid.EmitterPosition[1];
+      pos[0] = new Grid.EmitterPosition((int) position.x, (int) position.y, (int) position.z, block);
+      return pos;
+    } else {
+      return new Grid.EmitterPosition[0];
+    }
   }
 }
