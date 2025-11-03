@@ -54,7 +54,7 @@ public class Campfire extends MinecraftBlockTranslucent {
     }
 
     @Override
-    public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+    public Entity createBlockEntity(Vector3 position, CompoundTag entityTag) {
         return new se.llbit.chunky.entity.Campfire(this.kind, position, this.facing, this.isLit, this);
     }
 

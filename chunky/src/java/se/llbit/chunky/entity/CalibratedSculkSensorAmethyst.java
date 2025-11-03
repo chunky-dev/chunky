@@ -13,6 +13,7 @@ import se.llbit.math.primitive.Primitive;
 import se.llbit.util.JsonUtil;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 public class CalibratedSculkSensorAmethyst extends Entity {
@@ -112,8 +113,8 @@ public class CalibratedSculkSensorAmethyst extends Entity {
     return json;
   }
 
-  public static Entity fromJson(JsonObject json) {
-    return new CalibratedSculkSensorAmethyst(json);
+  public static Collection<Entity> fromJson(JsonObject json) {
+    return Collections.singleton(new CalibratedSculkSensorAmethyst(json));
   }
 
   @Override
