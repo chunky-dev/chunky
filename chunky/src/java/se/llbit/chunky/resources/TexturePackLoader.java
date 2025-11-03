@@ -17,7 +17,8 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.renderer.scene.PlayerModel;
-import se.llbit.chunky.renderer.scene.sky.Sun;
+import se.llbit.chunky.renderer.scene.sky.celestialbodies.Moon;
+import se.llbit.chunky.renderer.scene.sky.celestialbodies.Sun;
 import se.llbit.chunky.resources.texturepack.*;
 import se.llbit.log.Log;
 
@@ -71,9 +72,15 @@ public class TexturePackLoader {
         new LargeChestTexture("assets/minecraft/textures/entity/chest/trapped_double", // MC 1.6
           Texture.largeTrappedChestLeft, Texture.largeTrappedChestRight)));
     ALL_TEXTURES.put("sun", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/environment/sun", Sun.texture),// MC 1.6
-        new SimpleTexture("environment/sun", Sun.texture),// MC 1.5
+        new SimpleTexture("assets/minecraft/textures/environment/sun", Sun.texture), // MC 1.6
+        new SimpleTexture("environment/sun", Sun.texture), // MC 1.5
         new SimpleTexture("terrain/sun", Sun.texture)));
+    ALL_TEXTURES.put("moon", new AlternateTextures(
+      new SimpleTexture("assets/minecraft/textures/environment/moon_phases", Moon.textureAtlas), // MC 1.6
+      new SimpleTexture("environment/moon_phases", Moon.textureAtlas), // MC 1.5
+      new SimpleTexture("terrain/moon_phases", Moon.textureAtlas), // fallback to non-phase texture
+      new SimpleTexture("environment/moon", Moon.textureAtlas), // MC 1.5
+      new SimpleTexture("terrain/moon", Moon.textureAtlas))); // fallback to non-phase texture
     ALL_TEXTURES.put("clouds", new AlternateTextures(
         new CloudsTexture("assets/minecraft/textures/environment/clouds"),
         // MC 1.6
