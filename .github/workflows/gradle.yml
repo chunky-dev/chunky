@@ -8,6 +8,7 @@ on:
     branches: [ master, chunky-2.4.x ]
   pull_request:
     branches: [ master, chunky-2.4.x ]
+  workflow_dispatch:
 
 env:
   VERSION: 2.4.7
