@@ -125,6 +125,9 @@ public class Head extends MinecraftBlockTranslucent {
       }
     }
     int[] uuidInts = profileTag.get("id").intArray();
-    return MojangApi.fetchProfile(UuidUtil.intsToUuid(uuidInts).toString()).getSkin();
+    if (uuidInts.length == 4) {
+      return MojangApi.fetchProfile(UuidUtil.intsToUuid(uuidInts).toString()).getSkin();
+    }
+    return Optional.empty();
   }
 }
