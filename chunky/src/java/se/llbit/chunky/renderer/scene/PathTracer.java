@@ -127,6 +127,17 @@ public class PathTracer implements RayTracer {
         break;
       }
       ray.depth += 1;
+
+      // Russian Roulette
+      if (!firstReflection) {
+        double q = (1 - Math.max(ray.color.x, Math.max(ray.color.y, ray.color.z)));
+        if (random.nextDouble() < q) {
+          break;
+        } else {
+          ray.color.scale(1. / (1. - q));
+        }
+      }
+
       Vector4 cumulativeColor = new Vector4(0, 0, 0, 0);
       Ray next = new Ray();
       float pMetal = currentMat.metalness;
