@@ -43,6 +43,7 @@ public abstract class TileBasedRenderer implements Renderer {
   public static class RenderTile {
     public int x0, x1;
     public int y0, y1;
+    public boolean skip = false;
 
     public RenderTile(int x0, int x1, int y0, int y1) {
       this.x0 = x0;
@@ -67,7 +68,10 @@ public abstract class TileBasedRenderer implements Renderer {
   protected void submitTiles(DefaultRenderManager manager, BiConsumer<WorkerState, IntIntPair> perPixel) {
     initTiles(manager);
 
-    cachedTiles.forEach(tile ->
+    cachedTiles.forEach(tile -> {
+        if (tile.skip) {
+          return;
+        }
         manager.pool.submit(worker -> {
           WorkerState state = new WorkerState();
           state.ray = new Ray();
@@ -82,7 +86,12 @@ public abstract class TileBasedRenderer implements Renderer {
               perPixel.accept(state, pair);
             }
           }
-        })
+
+          if (!state.hit) {
+            tile.skip = true;
+          }
+        });
+      }
     );
   }
 
@@ -92,7 +101,7 @@ public abstract class TileBasedRenderer implements Renderer {
     int width = scene.canvasConfig.getWidth();
     int height = scene.canvasConfig.getHeight();
 
-    if (prevWidth != width || prevHeight != height) {
+    if (prevWidth != width || prevHeight != height || cachedTiles.isEmpty()) {
       prevWidth = width;
       prevHeight = height;
       cachedTiles.clear();
@@ -100,9 +109,13 @@ public abstract class TileBasedRenderer implements Renderer {
       for (int i = 0; i < width; i += tileWidth) {
         for (int j = 0; j < height; j += tileWidth) {
           cachedTiles.add(new RenderTile(i, FastMath.min(i + tileWidth, width),
-              j, FastMath.min(j + tileWidth, height)));
+            j, FastMath.min(j + tileWidth, height)));
         }
       }
     }
+  }
+
+  public void resetTiles(DefaultRenderManager manager) {
+    cachedTiles.clear();
   }
 }
