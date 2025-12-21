@@ -71,7 +71,8 @@ public class TexturePackLoader {
         new LargeChestTexture("assets/minecraft/textures/entity/chest/trapped_double", // MC 1.6
           Texture.largeTrappedChestLeft, Texture.largeTrappedChestRight)));
     ALL_TEXTURES.put("sun", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/environment/sun", Sun.texture),// MC 1.6
+      new SimpleTexture("assets/minecraft/textures/environment/celestial/sun", Sun.texture),// MC 1.21.11
+      new SimpleTexture("assets/minecraft/textures/environment/sun", Sun.texture),// MC 1.6
         new SimpleTexture("environment/sun", Sun.texture),// MC 1.5
         new SimpleTexture("terrain/sun", Sun.texture)));
     ALL_TEXTURES.put("clouds", new AlternateTextures(
