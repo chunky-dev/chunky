@@ -1433,6 +1433,8 @@ public class Scene implements JsonSerializable, Refreshable {
     }
     Log.info(String.format("Loaded %d chunks", numChunks));
 
+    importMaterials();
+
     isLoading = false;
   }
 
