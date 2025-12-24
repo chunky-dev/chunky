@@ -21,10 +21,12 @@ package se.llbit.chunky.block.minecraft;
 import se.llbit.chunky.resources.Texture;
 
 public class PointedDripstone extends SpriteBlock {
+  private final String description;
 
   public PointedDripstone(String thickness, String verticalDirection, boolean waterlogged) {
     super("pointed_dripstone", getTexture(thickness, verticalDirection));
     this.waterlogged = waterlogged;
+    description = "thickness=" + thickness + ", vertical_direction=" + verticalDirection;
   }
 
   private static Texture getTexture(String thickness, String verticalDirection) {
@@ -57,5 +59,10 @@ public class PointedDripstone extends SpriteBlock {
           return Texture.pointedDripstoneUpTip;
       }
     }
+  }
+
+  @Override
+  public String description() {
+    return description;
   }
 }
