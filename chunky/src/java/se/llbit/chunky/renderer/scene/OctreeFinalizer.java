@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.minecraft.Lava;
 import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.chunk.BlockPalette;
@@ -65,12 +66,12 @@ public class OctreeFinalizer {
     int y = cy - origin.y;
     if (cy > yMin && cy < yMax - 1) {
       boolean isHidden =
-          worldTree.getMaterial(x - 1, y, z, palette).opaque
-              && worldTree.getMaterial(x + 1, y, z, palette).opaque
-              && worldTree.getMaterial(x, y, z - 1, palette).opaque
-              && worldTree.getMaterial(x, y, z + 1, palette).opaque
-              && worldTree.getMaterial(x, y - 1, z, palette).opaque
-              && worldTree.getMaterial(x, y + 1, z, palette).opaque;
+          worldTree.getBlock(x - 1, y, z, palette).opaque
+              && worldTree.getBlock(x + 1, y, z, palette).opaque
+              && worldTree.getBlock(x, y, z - 1, palette).opaque
+              && worldTree.getBlock(x, y, z + 1, palette).opaque
+              && worldTree.getBlock(x, y - 1, z, palette).opaque
+              && worldTree.getBlock(x, y + 1, z, palette).opaque;
       if (isHidden) {
         worldTree.set(BlockPalette.ANY_ID, x, y, z);
       }
@@ -80,11 +81,11 @@ public class OctreeFinalizer {
   private static void processBlock(Octree worldTree, Octree waterTree, BlockPalette palette,
       Set<ChunkPosition> loadedChunks, int x, int cy, int z, Vector3i origin) {
     int y = cy - origin.y;
-    Material mat = worldTree.getMaterial(x, y, z, palette);
-    Material wmat = waterTree.getMaterial(x, y, z, palette);
+    Block mat = worldTree.getBlock(x, y, z, palette);
+    Block wmat = waterTree.getBlock(x, y, z, palette);
 
     if (wmat instanceof Water) {
-      Material above = waterTree.getMaterial(x, y + 1, z, palette);
+      Block above = waterTree.getBlock(x, y + 1, z, palette);
       int level0 = 8 - ((Water) wmat).level;
       if (!above.isWaterFilled()) {
         int cornerSW = level0;
@@ -141,7 +142,7 @@ public class OctreeFinalizer {
         waterTree.set(palette.getWaterId(0, 1 << Water.FULL_BLOCK), x, y, z);
       }
     } else if (mat instanceof Lava) {
-      Material above = worldTree.getMaterial(x, y + 1, z, palette);
+      Material above = worldTree.getBlock(x, y + 1, z, palette);
       if (!(above instanceof Lava)) {
         Lava lava = (Lava) mat;
 
@@ -201,14 +202,14 @@ public class OctreeFinalizer {
       return baseLevel;
     }
 
-    Material corner = waterTree.getMaterial(x, cy, z, palette);
+    Block corner = waterTree.getBlock(x, cy, z, palette);
     if (corner.isWater()) {
-      Material above = waterTree.getMaterial(x, cy + 1, z, palette);
+      Block above = waterTree.getBlock(x, cy + 1, z, palette);
       boolean isFullBlock = above.isWaterFilled();
       return isFullBlock ? 8 : 8 - ((Water) corner).level;
     } else if (corner.isWaterlogged()) {
       return 8;
-    } else if (!worldTree.getMaterial(x, cy, z, palette).solid) {
+    } else if (!worldTree.getBlock(x, cy, z, palette).solid) {
       return 0;
     }
     return baseLevel;
@@ -221,9 +222,9 @@ public class OctreeFinalizer {
       return baseLevel;
     }
 
-    Material corner = octree.getMaterial(x, cy, z, palette);
+    Block corner = octree.getBlock(x, cy, z, palette);
     if (corner instanceof Lava) {
-      Material above = octree.getMaterial(x, cy + 1, z, palette);
+      Block above = octree.getBlock(x, cy + 1, z, palette);
       boolean isFullBlock = above instanceof Lava;
       return isFullBlock ? 8 : 8 - ((Lava) corner).level;
     } else if (!corner.solid) {

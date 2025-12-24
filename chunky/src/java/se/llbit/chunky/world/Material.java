@@ -87,8 +87,6 @@ public abstract class Material {
 
   public boolean refractive = false;
 
-  protected boolean waterlogged = false;
-
   public Material(String name, Texture texture) {
     this.name = name;
     this.texture = texture;
@@ -129,14 +127,6 @@ public abstract class Material {
 
   public boolean isWater() {
     return false;
-  }
-
-  public boolean isWaterlogged() {
-    return waterlogged;
-  }
-
-  public boolean isWaterFilled() {
-    return waterlogged || isWater();
   }
 
   public boolean isSameMaterial(Material other) {

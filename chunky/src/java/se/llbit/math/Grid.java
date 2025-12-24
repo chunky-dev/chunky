@@ -45,7 +45,7 @@ public class Grid {
     }
 
     public static EmitterPosition create(int x, int y, int z, Scene scene) {
-      return new EmitterPosition(x, y, z, (Block) scene.getWorldOctree().getMaterial(x, y, z, scene.getPalette()));
+      return new EmitterPosition(x, y, z, scene.getWorldOctree().getBlock(x, y, z, scene.getPalette()));
     }
 
     public void sample(Vector3 loc, Random rand) {

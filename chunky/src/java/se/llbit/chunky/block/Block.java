@@ -32,6 +32,8 @@ public abstract class Block extends Material {
    */
   public boolean invisible = false;
 
+  protected boolean waterlogged = false;
+
   public Block(String name, Texture texture) {
     super(name, texture);
   }
@@ -175,5 +177,13 @@ public abstract class Block extends Material {
   public Block applyWaterlogging() {
     this.waterlogged = true;
     return this;
+  }
+
+  public boolean isWaterlogged() {
+    return waterlogged;
+  }
+
+  public boolean isWaterFilled() {
+    return waterlogged || isWater();
   }
 }

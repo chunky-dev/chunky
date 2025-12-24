@@ -1569,7 +1569,7 @@ public class Scene implements JsonSerializable {
     int zcenter = (zmax + zmin) / 2;
     int ycenter = (yMax + yMin) / 2;
     for (int y = Math.min(ycenter+127, yMax); y >= Math.max(ycenter-128, yMin); --y) {
-      Material block = worldOctree.getMaterial(xcenter - origin.x, y - origin.y, zcenter - origin.z,
+      Material block = worldOctree.getBlock(xcenter - origin.x, y - origin.y, zcenter - origin.z,
           palette);
       if (!(block instanceof Air)) {
         return new Vector3(xcenter, y + 5, zcenter);
@@ -2544,7 +2544,7 @@ public class Scene implements JsonSerializable {
       int x = (int) QuickMath.floor(ray.o.x);
       int y = (int) QuickMath.floor(ray.o.y);
       int z = (int) QuickMath.floor(ray.o.z);
-      Material block = waterOctree.getMaterial(x, y, z, palette);
+      Block block = waterOctree.getBlock(x, y, z, palette);
       return block.isWater()
           && ((ray.o.y - y) < 0.875 || ((Water) block).isFullBlock());
     }
