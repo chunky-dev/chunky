@@ -23,9 +23,8 @@ import se.llbit.chunky.resources.Texture;
 public class PointedDripstone extends SpriteBlock {
   private final String description;
 
-  public PointedDripstone(String thickness, String verticalDirection, boolean waterlogged) {
+  public PointedDripstone(String thickness, String verticalDirection) {
     super("pointed_dripstone", getTexture(thickness, verticalDirection));
-    this.waterlogged = waterlogged;
     description = "thickness=" + thickness + ", vertical_direction=" + verticalDirection;
   }
 

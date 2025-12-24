@@ -202,11 +202,11 @@ public class OctreeFinalizer {
     }
 
     Material corner = waterTree.getMaterial(x, cy, z, palette);
-    if (corner instanceof Water) {
+    if (corner.isWater()) {
       Material above = waterTree.getMaterial(x, cy + 1, z, palette);
       boolean isFullBlock = above.isWaterFilled();
       return isFullBlock ? 8 : 8 - ((Water) corner).level;
-    } else if (corner.waterlogged) {
+    } else if (corner.isWaterlogged()) {
       return 8;
     } else if (!worldTree.getMaterial(x, cy, z, palette).solid) {
       return 0;

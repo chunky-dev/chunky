@@ -164,4 +164,16 @@ public abstract class Block extends Material {
   public int getMapColor(Biome biome) {
     return texture.getAvgColor();
   }
+
+  /**
+   * Return a waterlogged instance of this block. This usually modifies this block and makes it waterlogged but can return
+   * a different instance if this block is used for different block states and thus may not be modified
+   * (e.g. {@link se.llbit.chunky.block.minecraft.Air#INSTANCE}).
+   *
+   * @return A waterlogged instance of this block
+   */
+  public Block applyWaterlogging() {
+    this.waterlogged = true;
+    return this;
+  }
 }

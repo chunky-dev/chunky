@@ -36,12 +36,10 @@ public class DecoratedPot extends AbstractModelBlock {
   private final String facing;
   private final String description;
 
-  public DecoratedPot(String facing, boolean waterlogged, String[] sherds) {
+  public DecoratedPot(String facing, String[] sherds) {
     super("decorated_pot", Texture.decoratedPotSide);
-    this.waterlogged = waterlogged;
     this.facing = facing;
-    description = "waterlogged=" + waterlogged
-      + ", facing=" + facing
+    description = "facing=" + facing
       + ", sherds=" + Arrays.stream(sherds)
       .map(sherd -> sherd == null ? "minecraft:brick" : sherd)
       .collect(Collectors.joining(", ", "[", "]"));

@@ -18,6 +18,7 @@
 
 package se.llbit.chunky.block.minecraft;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
@@ -303,5 +304,10 @@ public class Water extends MinecraftBlockTranslucent {
 
   @Override public String description() {
     return String.format("level=%d", level);
+  }
+
+  @Override
+  public Block applyWaterlogging() {
+    return this;
   }
 }
