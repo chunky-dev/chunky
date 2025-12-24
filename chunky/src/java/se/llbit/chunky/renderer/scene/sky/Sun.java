@@ -21,7 +21,6 @@ import java.util.Random;
 
 import org.apache.commons.math3.util.FastMath;
 
-import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.JsonObject;
@@ -149,7 +148,7 @@ public class Sun implements JsonSerializable {
   private double f0_x;
   private double f0_y;
 
-  private final Refreshable scene;
+  private final Scene scene;
 
   /**
    * Sun radius
@@ -217,8 +216,8 @@ public class Sun implements JsonSerializable {
   /**
    * Create new sun model.
    */
-  public Sun(Refreshable sceneDescription) {
-    this.scene = sceneDescription;
+  public Sun(Scene scene) {
+    this.scene = scene;
     initSun();
   }
 
@@ -272,7 +271,7 @@ public class Sun implements JsonSerializable {
     }
     apparentTextureBrightness.scale(FastMath.pow(apparentBrightness, Scene.DEFAULT_GAMMA));
 
-    Sky sky = ((Scene) scene).sky();
+    Sky sky = scene.sky();
     if (sky.getSkyMode() == Sky.SkyMode.SIMULATED) {
       sky.updateSimulatedSky(this);
     }
