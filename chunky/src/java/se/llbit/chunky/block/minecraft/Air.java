@@ -18,6 +18,7 @@
 
 package se.llbit.chunky.block.minecraft;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.MinecraftBlock;
 import se.llbit.chunky.resources.Texture;
 
@@ -29,5 +30,10 @@ public class Air extends MinecraftBlock {
     solid = false;
     opaque = false;
     invisible = true;
+  }
+
+  @Override
+  public Block applyWaterlogging() {
+    return Water.INSTANCE;
   }
 }

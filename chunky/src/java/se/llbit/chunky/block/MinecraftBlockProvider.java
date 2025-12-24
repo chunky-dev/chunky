@@ -935,14 +935,9 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock(name, (n, tag) -> new MinecraftBlock(n, texture));
   }
 
-  private static void addBlocks(Texture texture, String... names) {
-    addBlocks((name, tag) -> new MinecraftBlock(name, texture), names);
-  }
-
   static {
-    addBlocks((name, tag) -> Air.INSTANCE, "air", "cave_air", "void_air", "structure_void");
-    addBlock("barrier", (name, tag) -> tag.get("Properties").get("waterlogged").stringValue("").equals("true") ? Water.INSTANCE : Air.INSTANCE);
-    addBlocks(Texture.stone, "infested_stone", "stone");
+    addBlocks((name, tag) -> Air.INSTANCE, "air", "cave_air", "void_air", "structure_void", "barrier");
+    addBlocks((name, tag) -> new MinecraftBlock(name, Texture.stone), "infested_stone", "stone");
 
     // 1.19
     addBlock("mud", Texture.mud);
@@ -1434,10 +1429,10 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "dead_bush":
         return new SpriteBlock(name, Texture.deadBush);
       case "seagrass":
-        return new SpriteBlock(name, Texture.seagrass);
+        return new WaterloggedSpriteBlock(name, Texture.seagrass);
       case "tall_seagrass": {
         String half = tag.get("Properties").get("half").stringValue("lower");
-        return new SpriteBlock(
+        return new WaterloggedSpriteBlock(
           name, half.equals("lower") ? Texture.tallSeagrassBottom : Texture.tallSeagrassTop);
       }
       case "sea_pickle":
@@ -2425,9 +2420,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "sugar_cane":
         return new TintedSpriteBlock(name, Texture.sugarCane, Tint.BIOME_GRASS); // tinted since 1.7.2 (13w36a)
       case "kelp":
-        return new SpriteBlock(name, Texture.kelp);
+        return new WaterloggedSpriteBlock(name, Texture.kelp);
       case "kelp_plant":
-        return new SpriteBlock(name, Texture.kelpPlant);
+        return new WaterloggedSpriteBlock(name, Texture.kelpPlant);
       case "dried_kelp_block":
         return new TexturedBlock(
           name, Texture.driedKelpSide, Texture.driedKelpTop, Texture.driedKelpBottom);
@@ -3084,8 +3079,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "pointed_dripstone":
         return new PointedDripstone(
           tag.get("Properties").get("thickness").stringValue("tip"),
-          tag.get("Properties").get("vertical_direction").stringValue("up"),
-          tag.get("Properties").get("waterlogged").stringValue("").equals("true"));
+          tag.get("Properties").get("vertical_direction").stringValue("up"));
       case "sculk_sensor":
         return new SculkSensor(tag.get("Properties").get("sculk_sensor_phase").stringValue("cooldown"));
       case "glow_lichen":
@@ -3705,18 +3699,13 @@ public class MinecraftBlockProvider implements BlockProvider {
   private static Block decoratedPot(Tag tag) {
     Tag properties = tag.get("Properties");
     String facing = BlockProvider.facing(tag);
-    boolean waterlogged = properties.get("waterlogged").stringValue("").equals("true");
     String[] sherds = new String[4];
     ListTag sherdTags = properties.get("blockEntity#sherds").asList();
     for (int i = 0; i < sherdTags.size() && i < 4; i++) {
       String sherd = sherdTags.get(i).stringValue();
       if (!sherd.equals("minecraft:brick")) sherds[i] = sherd;
     }
-    return new DecoratedPot(
-      facing,
-      waterlogged,
-      sherds
-    );
+    return new DecoratedPot(facing, sherds);
   }
 
   private static Block shelf(Tag tag, Texture texture) {

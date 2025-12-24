@@ -407,18 +407,6 @@ public class BlockPalette {
     materialProperties.put("minecraft:end_rod", block -> {
       block.emittance = 1.0f;
     });
-    materialProperties.put("minecraft:kelp", block -> {
-      block.waterlogged = true;
-    });
-    materialProperties.put("minecraft:kelp_plant", block -> {
-      block.waterlogged = true;
-    });
-    materialProperties.put("minecraft:seagrass", block -> {
-      block.waterlogged = true;
-    });
-    materialProperties.put("minecraft:tall_seagrass", block -> {
-      block.waterlogged = true;
-    });
     materialProperties.put("minecraft:sea_pickle", block -> {
       if (block instanceof SeaPickle) {
         if (((SeaPickle) block).live) {
