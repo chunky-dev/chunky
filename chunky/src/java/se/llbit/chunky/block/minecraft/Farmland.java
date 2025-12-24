@@ -31,7 +31,8 @@ public class Farmland extends AbstractModelBlock {
     this.model = new TexturedBlockModel(Texture.dirt, Texture.dirt, Texture.dirt, Texture.dirt,
     moisture >= 7 ? Texture.farmlandWet : Texture.farmlandDry, Texture.dirt);
     this.moisture = moisture;
-    opaque = true; 
+    opaque = true;
+    solid = true;
     // TODO farmland shouldn't be a full block
   }
 
