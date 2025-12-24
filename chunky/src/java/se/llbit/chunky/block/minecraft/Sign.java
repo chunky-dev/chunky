@@ -32,9 +32,7 @@ public class Sign extends MinecraftBlockTranslucent {
 
   public Sign(String name, String material, int rotation) {
     super(name, SignEntity.textureFromMaterial(material));
-    invisible = true;
     solid = false;
-    localIntersect = true;
     this.rotation = rotation % 16;
     this.material = material;
   }
@@ -47,7 +45,7 @@ public class Sign extends MinecraftBlockTranslucent {
     return true;
   }
 
-  @Override public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  @Override public Entity createBlockEntity(Vector3 position, CompoundTag entityTag) {
     return new SignEntity(position, entityTag, rotation, material);
   }
 }

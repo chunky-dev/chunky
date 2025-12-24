@@ -33,9 +33,7 @@ public class WallSign extends MinecraftBlockTranslucent {
 
   public WallSign(String name, String material, String facing) {
     super(name, SignEntity.textureFromMaterial(material));
-    invisible = true;
     solid = false;
-    localIntersect = true;
     this.material = material;
     switch (facing) {
       default:
@@ -62,7 +60,7 @@ public class WallSign extends MinecraftBlockTranslucent {
     return true;
   }
 
-  @Override public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  @Override public Entity createBlockEntity(Vector3 position, CompoundTag entityTag) {
     return new WallSignEntity(position, entityTag, facing, material);
   }
 }
