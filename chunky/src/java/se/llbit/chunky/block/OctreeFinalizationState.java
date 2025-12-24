@@ -25,13 +25,12 @@ public class OctreeFinalizationState extends FinalizationState {
 
   @Override
   public Material getMaterial() {
-    return worldTree.getMaterial(x, y, z, getPalette());
+    return worldTree.getBlock(x, y, z, getPalette());
   }
 
   @Override
   public Material getMaterial(int rx, int ry, int rz) {
-    return worldTree
-        .getMaterial(x + rx, y + ry, z + rz, getPalette());
+    return worldTree.getBlock(x + rx, y + ry, z + rz, getPalette());
   }
 
   @Override

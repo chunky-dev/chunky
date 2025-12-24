@@ -89,8 +89,8 @@ public class BeaconBeam extends Entity implements Poseable {
     //Start i at 1 so the first beacon block is not checked. This would cause the base beam color to always be white.
     //Stop iterating if the we get outside octree.
     for (int i = 1; i < height && octree.isInside(new Vector3((position.x - origin.x), (position.y + i - origin.y), (position.z - origin.z))); i++) {
-      Material blockMaterial = octree.getMaterial((int)(position.x - origin.x), (int)(position.y + i - origin.y), (int)(position.z - origin.z), palette);
-      int color = getColorFromBlock((Block)blockMaterial);
+      Block block = octree.getBlock((int)(position.x - origin.x), (int)(position.y + i - origin.y), (int)(position.z - origin.z), palette);
+      int color = getColorFromBlock(block);
       if(color != -1) {
         if (!foundFirst) {
           this.materials.put(i, new BeaconBeamMaterial(color));
@@ -111,12 +111,12 @@ public class BeaconBeam extends Entity implements Poseable {
     }
   }
 
-  private int getColorFromBlock(Block blockMaterial) {
-    if(blockMaterial instanceof Beacon) {
+  private int getColorFromBlock(Block block) {
+    if(block instanceof Beacon) {
       return BeaconBeamMaterial.DEFAULT_COLOR;
     }
     Pattern stainedGlassPattern = Pattern.compile("(minecraft:)?(.+?)_stained_glass(_pane)?");
-    Matcher matcher = stainedGlassPattern.matcher(blockMaterial.name);
+    Matcher matcher = stainedGlassPattern.matcher(block.name);
     if (matcher.find()) {
       String prefix = matcher.group(2);
       switch (prefix) {
