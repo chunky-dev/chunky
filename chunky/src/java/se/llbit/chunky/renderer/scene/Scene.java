@@ -1049,47 +1049,55 @@ public class Scene implements JsonSerializable {
                           // Test if the block has not already be marked as full
                           if (((Water) palette.get(waterNode)).data == 0) {
                             int level0 = 8 - ((Water) block).level;
-                            int corner0 = level0;
-                            int corner1 = level0;
-                            int corner2 = level0;
-                            int corner3 = level0;
+                            int cornerSW = level0;
+                            int cornerSE = level0;
+                            int cornerNE = level0;
+                            int cornerNW = level0;
 
+                            // west
                             int level = Chunk.waterLevelAt(chunkData, palette, cx - 1, y, cz, level0);
-                            corner3 += level;
-                            corner0 += level;
+                            cornerNW += level;
+                            cornerSW += level;
 
+                            // south west
                             level = Chunk.waterLevelAt(chunkData, palette, cx - 1, y, cz + 1, level0);
-                            corner0 += level;
+                            cornerSW += level;
 
+                            // south
                             level = Chunk.waterLevelAt(chunkData, palette, cx, y, cz + 1, level0);
-                            corner0 += level;
-                            corner1 += level;
+                            cornerSW += level;
+                            cornerSE += level;
 
+                            // south east
                             level = Chunk.waterLevelAt(chunkData, palette, cx + 1, y, cz + 1, level0);
-                            corner1 += level;
+                            cornerSE += level;
 
+                            // east
                             level = Chunk.waterLevelAt(chunkData, palette, cx + 1, y, cz, level0);
-                            corner1 += level;
-                            corner2 += level;
+                            cornerSE += level;
+                            cornerNE += level;
 
+                            // north east
                             level = Chunk.waterLevelAt(chunkData, palette, cx + 1, y, cz - 1, level0);
-                            corner2 += level;
+                            cornerNE += level;
 
+                            // north
                             level = Chunk.waterLevelAt(chunkData, palette, cx, y, cz - 1, level0);
-                            corner2 += level;
-                            corner3 += level;
+                            cornerNE += level;
+                            cornerNW += level;
 
+                            // north west
                             level = Chunk.waterLevelAt(chunkData, palette, cx - 1, y, cz - 1, level0);
-                            corner3 += level;
+                            cornerNW += level;
 
-                            corner0 = Math.min(7, 8 - (corner0 / 4));
-                            corner1 = Math.min(7, 8 - (corner1 / 4));
-                            corner2 = Math.min(7, 8 - (corner2 / 4));
-                            corner3 = Math.min(7, 8 - (corner3 / 4));
-                            waterNode = palette.getWaterId(((Water) block).level, (corner0 << Water.CORNER_0)
-                              | (corner1 << Water.CORNER_1)
-                              | (corner2 << Water.CORNER_2)
-                              | (corner3 << Water.CORNER_3));
+                            cornerSW = Math.min(7, 8 - (cornerSW / 4));
+                            cornerSE = Math.min(7, 8 - (cornerSE / 4));
+                            cornerNE = Math.min(7, 8 - (cornerNE / 4));
+                            cornerNW = Math.min(7, 8 - (cornerNW / 4));
+                            waterNode = palette.getWaterId(((Water) block).level, (cornerSW << Water.CORNER_SW)
+                              | (cornerSE << Water.CORNER_SE)
+                              | (cornerNE << Water.CORNER_NE)
+                              | (cornerNW << Water.CORNER_NW));
                           }
                         } else {
                           // Water computation for water blocks on the edge of a chunk is done by the OctreeFinalizer but we need the water level information
@@ -1143,10 +1151,10 @@ public class Scene implements JsonSerializable {
                         corner3 = Math.min(7, 8 - (corner3 / 4));
                         octNode = palette.getLavaId(
                           lava.level,
-                          (corner0 << Water.CORNER_0)
-                            | (corner1 << Water.CORNER_1)
-                            | (corner2 << Water.CORNER_2)
-                            | (corner3 << Water.CORNER_3)
+                          (corner0 << Water.CORNER_SW)
+                            | (corner1 << Water.CORNER_SE)
+                            | (corner2 << Water.CORNER_NE)
+                            | (corner3 << Water.CORNER_NW)
                         );
                       }
                     }

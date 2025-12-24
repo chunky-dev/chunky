@@ -108,10 +108,10 @@ public class Water extends MinecraftBlockTranslucent {
    * Block data offset for water above flag.
    */
   public static final int FULL_BLOCK = 16;
-  public static final int CORNER_0 = 0;
-  public static final int CORNER_1 = 4;
-  public static final int CORNER_2 = 8;
-  public static final int CORNER_3 = 12;
+  public static final int CORNER_SW = 0;
+  public static final int CORNER_SE = 4;
+  public static final int CORNER_NE = 8;
+  public static final int CORNER_NW = 12;
 
   static {
     // Precompute water triangles.
@@ -219,10 +219,10 @@ public class Water extends MinecraftBlockTranslucent {
       hit = true;
     }
 
-    int c0 = (0xF & (data >> CORNER_0)) % 8;
-    int c1 = (0xF & (data >> CORNER_1)) % 8;
-    int c2 = (0xF & (data >> CORNER_2)) % 8;
-    int c3 = (0xF & (data >> CORNER_3)) % 8;
+    int c0 = (0xF & (data >> CORNER_SW)) % 8;
+    int c1 = (0xF & (data >> CORNER_SE)) % 8;
+    int c2 = (0xF & (data >> CORNER_NE)) % 8;
+    int c3 = (0xF & (data >> CORNER_NW)) % 8;
     Triangle triangle = t012[c0][c1][c2];
     if (triangle.intersect(ray)) {
       ray.orientNormal(triangle.n);

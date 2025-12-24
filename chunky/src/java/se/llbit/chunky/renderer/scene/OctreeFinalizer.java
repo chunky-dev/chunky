@@ -88,48 +88,56 @@ public class OctreeFinalizer {
       Material aboveBlock = worldTree.getMaterial(x, y + 1, z, palette);
       int level0 = 8 - ((Water) wmat).level;
       if (!above.isWaterFilled() && !aboveBlock.solid) {
-        int corner0 = level0;
-        int corner1 = level0;
-        int corner2 = level0;
-        int corner3 = level0;
+        int cornerSW = level0;
+        int cornerSE = level0;
+        int cornerNE = level0;
+        int cornerNW = level0;
 
+        // west
         int level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x - 1, y, z, level0);
-        corner3 += level;
-        corner0 += level;
+        cornerNW += level;
+        cornerSW += level;
 
+        // south west
         level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x - 1, y, z + 1, level0);
-        corner0 += level;
+        cornerSW += level;
 
+        // south
         level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x, y, z + 1, level0);
-        corner0 += level;
-        corner1 += level;
+        cornerSW += level;
+        cornerSE += level;
 
+        // south east
         level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x + 1, y, z + 1, level0);
-        corner1 += level;
+        cornerSE += level;
 
+        // east
         level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x + 1, y, z, level0);
-        corner1 += level;
-        corner2 += level;
+        cornerSE += level;
+        cornerNE += level;
 
+        // north east
         level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x + 1, y, z - 1, level0);
-        corner2 += level;
+        cornerNE += level;
 
+        // north
         level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x, y, z - 1, level0);
-        corner2 += level;
-        corner3 += level;
+        cornerNE += level;
+        cornerNW += level;
 
+        // north west
         level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x - 1, y, z - 1, level0);
-        corner3 += level;
+        cornerNW += level;
 
-        corner0 = Math.min(7, 8 - (corner0 / 4));
-        corner1 = Math.min(7, 8 - (corner1 / 4));
-        corner2 = Math.min(7, 8 - (corner2 / 4));
-        corner3 = Math.min(7, 8 - (corner3 / 4));
+        cornerSW = Math.min(7, 8 - (cornerSW / 4));
+        cornerSE = Math.min(7, 8 - (cornerSE / 4));
+        cornerNE = Math.min(7, 8 - (cornerNE / 4));
+        cornerNW = Math.min(7, 8 - (cornerNW / 4));
 
-        waterTree.set(palette.getWaterId(((Water) wmat).level, (corner0 << Water.CORNER_0)
-            | (corner1 << Water.CORNER_1)
-            | (corner2 << Water.CORNER_2)
-            | (corner3 << Water.CORNER_3)), x, y, z);
+        waterTree.set(palette.getWaterId(((Water) wmat).level, (cornerSW << Water.CORNER_SW)
+            | (cornerSE << Water.CORNER_SE)
+            | (cornerNE << Water.CORNER_NE)
+            | (cornerNW << Water.CORNER_NW)), x, y, z);
       } else if (above.isWaterFilled()) {
         waterTree.set(palette.getWaterId(0, 1 << Water.FULL_BLOCK), x, y, z);
       }
@@ -178,10 +186,10 @@ public class OctreeFinalizer {
         corner3 = Math.min(7, 8 - (corner3 / 4));
         worldTree.set(palette.getLavaId(
             lava.level,
-            (corner0 << Water.CORNER_0)
-                | (corner1 << Water.CORNER_1)
-                | (corner2 << Water.CORNER_2)
-                | (corner3 << Water.CORNER_3)
+            (corner0 << Water.CORNER_SW)
+                | (corner1 << Water.CORNER_SE)
+                | (corner2 << Water.CORNER_NE)
+                | (corner3 << Water.CORNER_NW)
         ), x, y, z);
       }
     }
