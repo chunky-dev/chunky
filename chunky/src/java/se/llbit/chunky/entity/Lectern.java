@@ -1,7 +1,10 @@
 package se.llbit.chunky.entity;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
+
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.material.TextureMaterial;
@@ -14,7 +17,7 @@ import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.util.JsonUtil;
 
-public class Lectern extends Entity implements Poseable {
+public class Lectern extends Entity {
 
   private static final Quad[] quadsNorth = new Quad[]{
       new Quad(
@@ -145,28 +148,25 @@ public class Lectern extends Entity implements Poseable {
   };
 
   private final String facing;
-  private final Book book;
 
-  public Lectern(Vector3 position, String facing, boolean hasBook) {
+  public Lectern(Vector3 position, String facing) {
     super(position);
     this.facing = facing;
-    if (hasBook) {
-      this.book = createBookEntity(position, facing);
-    } else {
-      this.book = null;
-    }
   }
 
   public Lectern(JsonObject json) {
     super(JsonUtil.vec3FromJsonObject(json.get("position")));
     this.facing = json.get("facing").stringValue("north");
-    if (json.get("book").isObject()) {
-      this.book = Book.fromJson(json.get("book").object());
-    } else if (json.get("hasBook").asBoolean(false)) {
-      this.book = createBookEntity(getPosition(), facing);
-    } else {
-      this.book = null;
+  }
+
+  public static Collection<Entity> create(Vector3 position, String facing, boolean hasBook) {
+    List<Entity> entities = new ArrayList<>();
+
+    entities.add(new se.llbit.chunky.entity.Lectern(position, facing));
+    if (hasBook) {
+      entities.add(createBookEntity(position, facing));
     }
+    return entities;
   }
 
   @Override
@@ -184,10 +184,6 @@ public class Lectern extends Entity implements Poseable {
               transform);
     }
 
-    if (book != null) {
-      faces.addAll(book.primitives(offset));
-    }
-
     return faces;
   }
 
@@ -197,22 +193,21 @@ public class Lectern extends Entity implements Poseable {
     json.add("kind", "lectern");
     json.add("position", position.toJson());
     json.add("facing", facing);
-    if (book != null) {
-      json.add("book", book.toJson());
-    }
     return json;
   }
 
-  public Book getBook() {
-    return book;
-  }
+  public static Collection<Entity> fromJson(JsonObject json) {
+    Lectern lectern = new Lectern(json);
 
-  public boolean hasBook() {
-    return book != null;
-  }
+    Collection<Entity> entities = new ArrayList<>();
+    entities.add(lectern);
+    if (json.get("book").isObject()) { // we still get the book from the lectern json to be compatible with the old format
+      entities.addAll(Book.fromJson(json.get("book").object()));
+    } else if (json.get("hasBook").asBoolean(false)) {
+      entities.add(createBookEntity(lectern.getPosition(), lectern.facing));
+    }
 
-  public static Entity fromJson(JsonObject json) {
-    return new Lectern(json);
+    return entities;
   }
 
   private static int getOrientationIndex(String facing) {
@@ -273,32 +268,5 @@ public class Lectern extends Entity implements Poseable {
     book.setYaw(getBookYaw(facing));
 
     return book;
-  }
-
-  @Override
-  public String[] partNames() {
-    return book != null ? book.partNames() : new String[0];
-  }
-
-  @Override
-  public double getScale() {
-    return book != null ? book.getScale() : 1;
-  }
-
-  @Override
-  public void setScale(double value) {
-    if (book != null) {
-      book.setScale(value);
-    }
-  }
-
-  @Override
-  public JsonObject getPose() {
-    return book != null ? book.getPose() : null;
-  }
-
-  @Override
-  public boolean hasHead() {
-    return false;
   }
 }

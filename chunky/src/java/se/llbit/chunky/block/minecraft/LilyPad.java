@@ -26,6 +26,9 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class LilyPad extends MinecraftBlockTranslucent {
   public LilyPad() {
     super("lily_pad", Texture.lilyPad);
@@ -38,11 +41,11 @@ public class LilyPad extends MinecraftBlockTranslucent {
     return false;
   }
 
-  @Override public boolean isEntity() {
+  @Override public boolean hasEntities() {
     return true;
   }
 
-  @Override public Entity toEntity(Vector3 position) {
-    return new LilyPadEntity(position);
+  @Override public Collection<Entity> createEntities(Vector3 position) {
+    return Collections.singleton(new LilyPadEntity(position));
   }
 }
