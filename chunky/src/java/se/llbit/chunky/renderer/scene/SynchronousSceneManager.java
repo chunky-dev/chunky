@@ -245,6 +245,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       scene.setYClipMax(yClipMax);
       context.setSceneDirectory(new File(context.getChunky().options.sceneDir, scene.name));
       scene.loadChunks(taskTracker, world, chunksToLoadByRegion);
+      scene.moveCameraToCenter();
       scene.refresh();
       scene.setResetReason(ResetReason.SCENE_LOADED);
       scene.setRenderMode(RenderMode.PREVIEW);
