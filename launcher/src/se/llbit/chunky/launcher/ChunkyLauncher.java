@@ -118,12 +118,6 @@ public class ChunkyLauncher {
     );
 
     options.addOption(Option.builder()
-      .longOpt("setup")
-      .desc("Runs the interactive command-line launcher setup")
-      .build()
-    );
-
-    options.addOption(Option.builder()
       .longOpt("javaOptions")
       .hasArg(true)
       .argName("options")
@@ -190,7 +184,10 @@ public class ChunkyLauncher {
         CommandLine cmd = parseCli(args);
 
         if (cmd.hasOption("help")) {
-          String header = CliUtil.makeHelpHeader("Chunky Launcher", LAUNCHER_VERSION.toString(), "");
+          String header = CliUtil.makeHelpHeader("Chunky Launcher", LAUNCHER_VERSION.toString(), "Commands:\n" +
+            "    setup    Runs the interactive command-line launcher setup\n" +
+            "    update   Download the latest version\n" +
+            "    (none)   Launch the latest version\n\nOptions:");
           String footer = "\n" +
             "Command line options after -- are passed to Chunky.\n" +
             "For Chunky's command line help, run:\n" +
@@ -198,7 +195,7 @@ public class ChunkyLauncher {
 
           HelpFormatter help = new HelpFormatter();
           help.setWidth(CliUtil.CLI_WIDTH);
-          help.printHelp("java -jar ChunkyLauncher.jar", header, cliOptionsPublic(), footer);
+          help.printHelp("java -jar ChunkyLauncher.jar [command] <options>", header, cliOptionsPublic(), footer);
           return;
         }
 
@@ -232,12 +229,14 @@ public class ChunkyLauncher {
           }
         }
 
-        if (cmd.hasOption("update")) {
+        if (cmd.hasOption("update") || args[0].equals("update")) {
           headlessUpdateChunky(settings, settings.selectedChannel);
-          return;
+          if (args[0].equals("update")) {
+            return;
+          }
         }
 
-        if (cmd.hasOption("setup")) {
+        if (args[0].equals("setup")) {
           doSetup(settings);
           settings.save();
           return;
