@@ -32,6 +32,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -89,9 +90,30 @@ public class ChunkyLauncher {
 
     options.addOption(Option.builder()
       .longOpt("update")
+      .desc("Update Chunky to the latest release")
+      .build()
+    );
+
+    options.addOption(Option.builder()
+      .longOpt("releaseChannel")
       .argName("release channel")
       .optionalArg(true)
-      .desc("Update Chunky to the latest release")
+      .desc("Specify the release channel (for use with --update and --chunkyVersion latest)")
+      .build()
+    );
+
+    options.addOption(Option.builder()
+      .longOpt("updateSite")
+      .argName("update site")
+      .desc("Update site to use for updating")
+      .build()
+    );
+
+    options.addOption(Option.builder()
+      .longOpt("chunkyVersion")
+      .argName("chunky version")
+      .numberOfArgs(1)
+      .desc("Chunky version to launch (latest for the latest installed version of the specified release channel)")
       .build()
     );
 
@@ -197,15 +219,21 @@ public class ChunkyLauncher {
           settings.forceGuiConsole = true;
         }
 
-        if (cmd.hasOption("update")) {
-          ReleaseChannel channel = settings.selectedChannel;
+        if (cmd.hasOption("updateSite")) {
+          settings.updateSite = cmd.getOptionValue("updateSite");
+          reloadReleaseChannels(settings);
+          return;
+        }
 
-          String selected = cmd.getOptionValue("update");
+        if (cmd.hasOption("releaseChannel")) {
+          String selected = cmd.getOptionValue("releaseChannel");
           if (selected != null) {
-            channel = settings.releaseChannels.getOrDefault(selected, channel);
+            settings.selectedChannel = settings.releaseChannels.getOrDefault(selected, settings.selectedChannel);
           }
+        }
 
-          headlessUpdateChunky(settings, channel);
+        if (cmd.hasOption("update")) {
+          headlessUpdateChunky(settings, settings.selectedChannel);
           return;
         }
 
@@ -243,6 +271,14 @@ public class ChunkyLauncher {
         if (cmd.hasOption("dangerouslyDisableLibraryValidation")) {
           System.out.println("Library validation is disabled.");
           LauncherSettings.disableLibraryValidation = true;
+        }
+
+        if (cmd.hasOption("chunkyVersion")) {
+          settings.version = cmd.getOptionValue("chunkyVersion");
+          if ("latest".equals(cmd.getOptionValue("chunkyVersion"))) {
+            List<VersionInfo> versions = new UpdateChecker(settings, settings.selectedChannel).getVersions();
+            settings.version = versions.stream().findAny().map(version -> version.name).orElse(settings.version);
+          }
         }
 
         headlessOptions = String.join(" ", cmd.getArgList());
@@ -330,7 +366,7 @@ public class ChunkyLauncher {
       }
       e.printStackTrace(System.err);
     } catch (ParseException e) {
-        System.out.println(e.getMessage());
+      System.out.println(e.getMessage());
     }
   }
 
