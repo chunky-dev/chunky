@@ -113,10 +113,13 @@ public class SceneChooserController implements Initializable {
       new Tooltip("Open the directory where Chunky stores scene descriptions and renders."));
     openSceneDirBtn.setOnAction(e -> controller.openDirectory(controller.getChunky().options.sceneDir));
 
-    DirectoryChooser sceneDirectoryChooser = new DirectoryChooser();
-    sceneDirectoryChooser.setTitle("Select directory for scene storage");
     changeSceneDirBtn.setOnAction(e -> {
-      sceneDirectoryChooser.setInitialDirectory(controller.getChunky().options.sceneDir);
+      DirectoryChooser sceneDirectoryChooser = new DirectoryChooser();
+      sceneDirectoryChooser.setTitle("Select directory for scene storage");
+      File sceneDirectory = controller.getChunky().options.sceneDir;
+      if (sceneDirectory.isDirectory()) {
+        sceneDirectoryChooser.setInitialDirectory(sceneDirectory);
+      }
       File directory = sceneDirectoryChooser.showDialog(changeSceneDirBtn.getScene().getWindow());
       if(directory != null && directory.canWrite()) {
         PersistentSettings.setSceneDirectory(directory);
