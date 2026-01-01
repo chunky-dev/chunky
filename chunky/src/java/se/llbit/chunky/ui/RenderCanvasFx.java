@@ -440,6 +440,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
   @Override public void sceneStatus(String status) {
     Platform.runLater(() -> {
+      if (!getScene().getWindow().isFocused()) {
+        return;
+      }
+
       Point2D offset = localToScene(0, 0);
       tooltip.setText(status);
       tooltip.show(this,
