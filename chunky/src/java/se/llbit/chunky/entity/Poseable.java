@@ -50,9 +50,9 @@ public interface Poseable {
     dir.sub(face);
     dir.normalize();
     double headYaw = getPose("head").y;
-    getPose().set("rotation", Json.of(FastMath.atan2(dir.x, dir.z) + Math.PI - headYaw));
     double pitch = Math.asin(dir.y);
-    getPose().add("head", JsonUtil.vec3ToJson(new Vector3(pitch, headYaw, 0)));
+    getPose().set("head", JsonUtil.vec3ToJson(new Vector3(pitch, 0, 0)));
+    getPose().set("all", JsonUtil.vec3ToJson(new Vector3(0, FastMath.atan2(dir.x, dir.z) + Math.PI - headYaw, 0)));
   }
 
 
