@@ -1253,97 +1253,53 @@ public class Scene implements JsonSerializable {
 //        3x3 box blur.
         ChunkBiomeBlendingHelper chunkBiomeHelper = biomeBlendingHelper.get(cp);
         boolean biomeUsed = chunkBiomeHelper.isBiomeUsed();
-          if(biomeBlendingRadius > 0) {
-            if(use3dBiomes) {
-              ChunkBiomeBlendingHelper[] neighboringChunks = new ChunkBiomeBlendingHelper[]{
-                biomeBlendingHelper.get(new ChunkPosition(cp.x - 1, cp.z - 1)),
-                biomeBlendingHelper.get(new ChunkPosition(cp.x - 1, cp.z)),
-                biomeBlendingHelper.get(new ChunkPosition(cp.x - 1, cp.z + 1)),
-                biomeBlendingHelper.get(new ChunkPosition(cp.x, cp.z - 1)),
-                biomeBlendingHelper.get(new ChunkPosition(cp.x, cp.z + 1)),
-                biomeBlendingHelper.get(new ChunkPosition(cp.x + 1, cp.z - 1)),
-                biomeBlendingHelper.get(new ChunkPosition(cp.x + 1, cp.z)),
-                biomeBlendingHelper.get(new ChunkPosition(cp.x + 1, cp.z + 1))
-              };
+        if (biomeBlendingRadius > 0) {
+          if (use3dBiomes) {
+            ChunkBiomeBlendingHelper[] neighboringChunks = new ChunkBiomeBlendingHelper[]{
+              biomeBlendingHelper.get(new ChunkPosition(cp.x - 1, cp.z - 1)),
+              biomeBlendingHelper.get(new ChunkPosition(cp.x - 1, cp.z)),
+              biomeBlendingHelper.get(new ChunkPosition(cp.x - 1, cp.z + 1)),
+              biomeBlendingHelper.get(new ChunkPosition(cp.x, cp.z - 1)),
+              biomeBlendingHelper.get(new ChunkPosition(cp.x, cp.z + 1)),
+              biomeBlendingHelper.get(new ChunkPosition(cp.x + 1, cp.z - 1)),
+              biomeBlendingHelper.get(new ChunkPosition(cp.x + 1, cp.z)),
+              biomeBlendingHelper.get(new ChunkPosition(cp.x + 1, cp.z + 1))
+            };
 
-              int[] combinedBiomeTransitions = chunkBiomeHelper.combineAndTrimTransitions(neighboringChunks, biomeBlendingRadius);
+            int[] combinedBiomeTransitions = chunkBiomeHelper.combineAndTrimTransitions(neighboringChunks, biomeBlendingRadius);
 
-              // When doing 3D blur we use the list of (vertical) biome transition
-              // in the chunk or in neighboring ones
-              // If there is no transition, a 2D blur is enough, otherwise we only
-              // need to compute the colors around the transitions
+            // When doing 3D blur we use the list of (vertical) biome transition
+            // in the chunk or in neighboring ones
+            // If there is no transition, a 2D blur is enough, otherwise we only
+            // need to compute the colors around the transitions
 
-              // For example, if loading from y=0 to y=200 with a biome transition at y=20
-              // and another one at y=50 and with a blur radius of 2 (5*5*5 box)
-              // We can compute a 2D blur at y=0 and use those color for up to y=17
-              // For y in [18, 21] we need to compute the real 3D blur (because of the biome transition
-              // at y=20 and the blur radius of 2)
-              // Then we can compute the 2D blur at y=22 and use those colors for up to y=47
-              // And so on, 3D blur for y in [48, 51] and 2D blur for y in [52,200]
+            // For example, if loading from y=0 to y=200 with a biome transition at y=20
+            // and another one at y=50 and with a blur radius of 2 (5*5*5 box)
+            // We can compute a 2D blur at y=0 and use those color for up to y=17
+            // For y in [18, 21] we need to compute the real 3D blur (because of the biome transition
+            // at y=20 and the blur radius of 2)
+            // Then we can compute the 2D blur at y=22 and use those colors for up to y=47
+            // And so on, 3D blur for y in [48, 51] and 2D blur for y in [52,200]
 
-              // As such, in spirit every transition make us compute an additional 16*16*(2*biomeBlendingRadius) 3D blur
-              // and a 16*16 2D blur (that can be combined in a 16*16*(2*biomeBlendingRadius+1) 3D blur)
-              // (ignoring cases where transition are close to one another which are handled by the code)
+            // As such, in spirit every transition make us compute an additional 16*16*(2*biomeBlendingRadius) 3D blur
+            // and a 16*16 2D blur (that can be combined in a 16*16*(2*biomeBlendingRadius+1) 3D blur)
+            // (ignoring cases where transition are close to one another which are handled by the code)
 
-              // Note that having a single (x, y) column that effectively has a biome transition
-              // in the chunk are a neighboring chunk causes us to compute the 3D blur for the whole 16*16
-              // vertical slice of the chunk. Because vertical biome transition are pretty rare,
-              // that's probably ok.
-              int nextY = chunkBiomeHelper.getyMinBiomeRelevant();
+            // Note that having a single (x, y) column that effectively has a biome transition
+            // in the chunk are a neighboring chunk causes us to compute the 3D blur for the whole 16*16
+            // vertical slice of the chunk. Because vertical biome transition are pretty rare,
+            // that's probably ok.
+            int nextY = chunkBiomeHelper.getyMinBiomeRelevant();
 
-              for(int i = 0; i < combinedBiomeTransitions.length; ++i) {
-                int transition = combinedBiomeTransitions[i];
-                if(nextY < transition - biomeBlendingRadius) {
-                  // Do a 2d blur to fill up to the height affected by the transition
-                  BiomeBlendingUtility.chunk2DBlur(
-                    cp,
-                    biomeBlendingRadius,
-                    nextY,
-                    transition - biomeBlendingRadius,
-                    origin,
-                    biomePaletteIdxStructure,
-                    biomePalette,
-                    nonEmptyChunks,
-                    grassTexture,
-                    foliageTexture,
-                    dryFoliageTexture,
-                    waterTexture);
-                  nextY = transition - biomeBlendingRadius;
-                }
-
-                // Do a 3D blur to fill the next 2*biomeBlendingRadius layers
-                // or more if the next transition is close by, in which case
-                // both transition (or even more) are handled by a bigger 3D blur
-                int maxYWorkedOn = transition + biomeBlendingRadius;
-                while(i < combinedBiomeTransitions.length - 1 && maxYWorkedOn >= combinedBiomeTransitions[i + 1] - biomeBlendingRadius) {
-                  // Extends the 3D blur to enclose the next transition as well
-                  maxYWorkedOn = combinedBiomeTransitions[i + 1] + biomeBlendingRadius;
-                  ++i;
-                }
-                int maxYWorkedOnClamped = Math.min(maxYWorkedOn, chunkBiomeHelper.getyMaxBiomeRelevant());
-                BiomeBlendingUtility.chunk3DBlur(
-                  cp,
-                  biomeBlendingRadius,
-                  nextY,
-                  maxYWorkedOnClamped + 1,
-                  origin,
-                  biomePaletteIdxStructure,
-                  biomePalette,
-                  nonEmptyChunks,
-                  grassTexture,
-                  foliageTexture,
-                  dryFoliageTexture,
-                  waterTexture);
-                nextY = maxYWorkedOnClamped + 1;
-              }
-
-              // Last 2D blur that extent up to the top
-              if(nextY <= chunkBiomeHelper.getyMaxBiomeRelevant()) {
+            for(int i = 0; i < combinedBiomeTransitions.length; ++i) {
+              int transition = combinedBiomeTransitions[i];
+              if(nextY < transition - biomeBlendingRadius) {
+                // Do a 2d blur to fill up to the height affected by the transition
                 BiomeBlendingUtility.chunk2DBlur(
                   cp,
                   biomeBlendingRadius,
                   nextY,
-                  chunkBiomeHelper.getyMaxBiomeRelevant() + 1,
+                  transition - biomeBlendingRadius,
                   origin,
                   biomePaletteIdxStructure,
                   biomePalette,
@@ -1352,20 +1308,24 @@ public class Scene implements JsonSerializable {
                   foliageTexture,
                   dryFoliageTexture,
                   waterTexture);
+                nextY = transition - biomeBlendingRadius;
               }
 
-            // TODO we could skip blending the grass, foliage and dry foliage textures in this case
-            if (!biomeUsed) {
-              grassTexture = biomeStructureFactory.create();
-              foliageTexture = biomeStructureFactory.create();
-              dryFoliageTexture = biomeStructureFactory.create();
-              // the water texture is still used to check for loaded chunks and tint the water plane
-            }
-            } else {
-              BiomeBlendingUtility.chunk2DBlur(
+              // Do a 3D blur to fill the next 2*biomeBlendingRadius layers
+              // or more if the next transition is close by, in which case
+              // both transition (or even more) are handled by a bigger 3D blur
+              int maxYWorkedOn = transition + biomeBlendingRadius;
+              while(i < combinedBiomeTransitions.length - 1 && maxYWorkedOn >= combinedBiomeTransitions[i + 1] - biomeBlendingRadius) {
+                // Extends the 3D blur to enclose the next transition as well
+                maxYWorkedOn = combinedBiomeTransitions[i + 1] + biomeBlendingRadius;
+                ++i;
+              }
+              int maxYWorkedOnClamped = Math.min(maxYWorkedOn, chunkBiomeHelper.getyMaxBiomeRelevant());
+              BiomeBlendingUtility.chunk3DBlur(
                 cp,
                 biomeBlendingRadius,
-                0, 1,
+                nextY,
+                maxYWorkedOnClamped + 1,
                 origin,
                 biomePaletteIdxStructure,
                 biomePalette,
@@ -1374,6 +1334,25 @@ public class Scene implements JsonSerializable {
                 foliageTexture,
                 dryFoliageTexture,
                 waterTexture);
+              nextY = maxYWorkedOnClamped + 1;
+            }
+
+            // Last 2D blur that extent up to the top
+            if(nextY <= chunkBiomeHelper.getyMaxBiomeRelevant()) {
+              BiomeBlendingUtility.chunk2DBlur(
+                cp,
+                biomeBlendingRadius,
+                nextY,
+                chunkBiomeHelper.getyMaxBiomeRelevant() + 1,
+                origin,
+                biomePaletteIdxStructure,
+                biomePalette,
+                nonEmptyChunks,
+                grassTexture,
+                foliageTexture,
+                dryFoliageTexture,
+                waterTexture);
+            }
 
             // TODO we could skip blending the grass, foliage and dry foliage textures in this case
             if (!biomeUsed) {
@@ -1382,46 +1361,67 @@ public class Scene implements JsonSerializable {
               dryFoliageTexture = biomeStructureFactory.create();
               // the water texture is still used to check for loaded chunks and tint the water plane
             }
-            }
           } else {
-            if(use3dBiomes) {
-              for(int sectionY = yMin >> 4; sectionY < (yMax - 1 >> 4) + 1; sectionY++) {
-                for(int y = 0; y < 16; y++) {
-                  int wy = sectionY * 16 + y;
-                  for(int x = 0; x < 16; ++x) {
-                    int wx = cp.x * Chunk.X_MAX + x;
-                    for(int z = 0; z < 16; ++z) {
-                      int wz = cp.z * Chunk.Z_MAX + z;
+            BiomeBlendingUtility.chunk2DBlur(
+              cp,
+              biomeBlendingRadius,
+              0, 1,
+              origin,
+              biomePaletteIdxStructure,
+              biomePalette,
+              nonEmptyChunks,
+              grassTexture,
+              foliageTexture,
+              dryFoliageTexture,
+              waterTexture);
 
-                      int id = biomePaletteIdxStructure.get(wx, wy, wz);
+            // TODO we could skip blending the grass, foliage and dry foliage textures in this case
+            if (!biomeUsed) {
+              grassTexture = biomeStructureFactory.create();
+              foliageTexture = biomeStructureFactory.create();
+              dryFoliageTexture = biomeStructureFactory.create();
+              // the water texture is still used to check for loaded chunks and tint the water plane
+            }
+          }
+        } else {
+          if(use3dBiomes) {
+            for(int sectionY = yMin >> 4; sectionY < (yMax - 1 >> 4) + 1; sectionY++) {
+              for(int y = 0; y < 16; y++) {
+                int wy = sectionY * 16 + y;
+                for(int x = 0; x < 16; ++x) {
+                  int wx = cp.x * Chunk.X_MAX + x;
+                  for(int z = 0; z < 16; ++z) {
+                    int wz = cp.z * Chunk.Z_MAX + z;
 
-                      Biome biome = biomePalette.get(id);
-                    if (biomeUsed) {
-                      grassTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.grassColorLinear);
-                      foliageTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.foliageColorLinear);
-                      dryFoliageTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.dryFoliageColorLinear);
-                    }
-                    // the water texture is used to check for loaded chunks and tint the water plane, so we always need that one
-                      waterTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.waterColorLinear);
-                    }
+                    int id = biomePaletteIdxStructure.get(wx, wy, wz);
+
+                    Biome biome = biomePalette.get(id);
+                  if (biomeUsed) {
+                    grassTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.grassColorLinear);
+                    foliageTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.foliageColorLinear);
+                    dryFoliageTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.dryFoliageColorLinear);
+                  }
+                  // the water texture is used to check for loaded chunks and tint the water plane, so we always need that one
+                    waterTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.waterColorLinear);
                   }
                 }
               }
-            } else {
-              for(int x = 0; x < 16; ++x) {
-                int wx = cp.x * 16 + x;
-                for(int z = 0; z < 16; ++z) {
-                  int wz = cp.z * 16 + z;
+            }
+          } else {
+            for(int x = 0; x < 16; ++x) {
+              int wx = cp.x * 16 + x;
+              for(int z = 0; z < 16; ++z) {
+                int wz = cp.z * 16 + z;
 
-                  int id = biomePaletteIdxStructure.get(wx, 0, wz);
-                  Biome biome = biomePalette.get(id);
+                int id = biomePaletteIdxStructure.get(wx, 0, wz);
+                Biome biome = biomePalette.get(id);
                 if (biomeUsed) {
                   grassTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.grassColorLinear);
                   foliageTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.foliageColorLinear);
                   dryFoliageTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.dryFoliageColorLinear);
                 }
                 // the water texture is used to check for loaded chunks and tint the water plane, so we always need that one
-                  waterTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.waterColorLinear);
+                waterTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.waterColorLinear);
               }
             }
           }
