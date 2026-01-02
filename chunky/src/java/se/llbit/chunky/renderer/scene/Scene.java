@@ -1248,7 +1248,7 @@ public class Scene implements JsonSerializable {
 //        Finalize grass and foliage textures.
 //        3x3 box blur.
         ChunkBiomeBlendingHelper chunkBiomeHelper = biomeBlendingHelper.get(cp);
-        if(chunkBiomeHelper.isBiomeUsed()) {
+        boolean biomeUsed = chunkBiomeHelper.isBiomeUsed();
           if(biomeBlendingRadius > 0) {
             if(use3dBiomes) {
               ChunkBiomeBlendingHelper[] neighboringChunks = new ChunkBiomeBlendingHelper[]{
@@ -1349,6 +1349,14 @@ public class Scene implements JsonSerializable {
                   dryFoliageTexture,
                   waterTexture);
               }
+
+            // TODO we could skip blending the grass, foliage and dry foliage textures in this case
+            if (!biomeUsed) {
+              grassTexture = biomeStructureFactory.create();
+              foliageTexture = biomeStructureFactory.create();
+              dryFoliageTexture = biomeStructureFactory.create();
+              // the water texture is still used to check for loaded chunks and tint the water plane
+              }
             } else {
               BiomeBlendingUtility.chunk2DBlur(
                 cp,
@@ -1362,6 +1370,14 @@ public class Scene implements JsonSerializable {
                 foliageTexture,
                 dryFoliageTexture,
                 waterTexture);
+
+            // TODO we could skip blending the grass, foliage and dry foliage textures in this case
+            if (!biomeUsed) {
+              grassTexture = biomeStructureFactory.create();
+              foliageTexture = biomeStructureFactory.create();
+              dryFoliageTexture = biomeStructureFactory.create();
+              // the water texture is still used to check for loaded chunks and tint the water plane
+            }
             }
           } else {
             if(use3dBiomes) {
@@ -1376,9 +1392,12 @@ public class Scene implements JsonSerializable {
                       int id = biomePaletteIdxStructure.get(wx, wy, wz);
 
                       Biome biome = biomePalette.get(id);
+                    if (biomeUsed) {
                       grassTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.grassColorLinear);
                       foliageTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.foliageColorLinear);
                       dryFoliageTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.dryFoliageColorLinear);
+                    }
+                    // the water texture is used to check for loaded chunks and tint the water plane, so we always need that one
                       waterTexture.set(cp.x * 16 + x - origin.x, sectionY * 16 + y - origin.y, cp.z * 16 + z - origin.z, biome.waterColorLinear);
                     }
                   }
@@ -1392,12 +1411,13 @@ public class Scene implements JsonSerializable {
 
                   int id = biomePaletteIdxStructure.get(wx, 0, wz);
                   Biome biome = biomePalette.get(id);
-
+                if (biomeUsed) {
                   grassTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.grassColorLinear);
                   foliageTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.foliageColorLinear);
                   dryFoliageTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.dryFoliageColorLinear);
-                  waterTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.waterColorLinear);
                 }
+                // the water texture is used to check for loaded chunks and tint the water plane, so we always need that one
+                  waterTexture.set(cp.x * 16 + x - origin.x, 0, cp.z * 16 + z - origin.z, biome.waterColorLinear);
               }
             }
           }
