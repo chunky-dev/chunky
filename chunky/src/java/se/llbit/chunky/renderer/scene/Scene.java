@@ -918,6 +918,7 @@ public class Scene implements JsonSerializable {
           loadedChunks.add(cp);
 
           ChunkData chunkData = chunkDataPair.second();
+          boolean didLoadVisibleBlocksFromChunk = false;
           if (chunkData == null) {
             chunkData = EmptyChunkData.INSTANCE;
           }
@@ -1163,6 +1164,8 @@ public class Scene implements JsonSerializable {
                       // X and Z are Chunky position but Y is world position
                       emitterGrid.addEmitter(new Grid.EmitterPosition(x, y - origin.y, z, block));
                     }
+
+                    didLoadVisibleBlocksFromChunk = didLoadVisibleBlocksFromChunk || !block.invisible;
                   }
                 }
               }
@@ -1193,6 +1196,7 @@ public class Scene implements JsonSerializable {
                   block = palette.get(id);
                   chunkData.setBlockAt(x, y, z, id);
                   worldOctree.set(id, cp.x * 16 + x - origin.x, y - origin.y, cp.z * 16 + z - origin.z);
+                  didLoadVisibleBlocksFromChunk = didLoadVisibleBlocksFromChunk || !block.invisible;
                 }
               }
               if (block.isBlockEntity()) {
@@ -1220,7 +1224,7 @@ public class Scene implements JsonSerializable {
             }
           }
 
-          if (!chunkData.isEmpty()) {
+          if (!chunkData.isEmpty() && didLoadVisibleBlocksFromChunk) {
             nonEmptyChunks.add(cp);
             if (dimension.getChunk(cp).getVersion() == ChunkVersion.PRE_FLATTENING) {
               legacyChunks.add(cp);
@@ -1356,7 +1360,7 @@ public class Scene implements JsonSerializable {
               foliageTexture = biomeStructureFactory.create();
               dryFoliageTexture = biomeStructureFactory.create();
               // the water texture is still used to check for loaded chunks and tint the water plane
-              }
+            }
             } else {
               BiomeBlendingUtility.chunk2DBlur(
                 cp,
