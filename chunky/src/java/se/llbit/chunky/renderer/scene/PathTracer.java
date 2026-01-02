@@ -129,12 +129,14 @@ public class PathTracer implements RayTracer {
       ray.depth += 1;
 
       // Russian Roulette
-      if (!firstReflection) {
-        double q = (1 - Math.max(ray.color.x, Math.max(ray.color.y, ray.color.z)));
-        if (random.nextDouble() < q) {
+      if (!firstReflection && ray.depth >= scene.minRayDepth) {
+        double max = FastMath.max(ray.color.x, FastMath.max(ray.color.y, ray.color.z));
+        double p = QuickMath.clamp(max, 0.05, 1.0);
+        if (random.nextDouble() > p) {
+          ray.color.set(0, 0, 0, 0);
           break;
         } else {
-          ray.color.scale(1. / (1. - q));
+          ray.color.scale(1 / p);
         }
       }
 
