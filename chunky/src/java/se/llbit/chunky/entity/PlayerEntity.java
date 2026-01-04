@@ -37,6 +37,7 @@ import se.llbit.math.*;
 import se.llbit.math.primitive.Box;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.JsonUtil;
 import se.llbit.util.mojangapi.MinecraftProfile;
@@ -73,8 +74,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   }
 
   public PlayerEntity(PlayerEntityData data) {
-    this(data.uuid, new Vector3(data.x, data.y, data.z), data.rotation, data.pitch,
-      buildGear(data));
+    this(data.uuid, new Vector3(data.x, data.y, data.z), data.rotation, data.pitch, buildGear(data));
   }
 
   protected PlayerEntity(String uuid, Vector3 position, double rotationDegrees, double pitchDegrees,
@@ -105,6 +105,16 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     this.headScale = settings.get("headScale").doubleValue(1.0);
     this.pose = settings.get("pose").object();
     this.gear = settings.get("gear").object();
+  }
+
+  static JsonObject parseEquipment(CompoundTag equipmentTag) {
+    JsonObject equipment = new JsonObject();
+    for (NamedTag tag : equipmentTag) {
+      if (tag.tag.isCompoundTag()) {
+        equipment.add(tag.name, parseItem(tag.tag.asCompound()));
+      }
+    }
+    return equipment;
   }
 
   static JsonObject parseItem(CompoundTag tag) {
@@ -164,7 +174,12 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   }
 
   static JsonObject buildGear(PlayerEntityData data) {
-    JsonObject gear = new JsonObject();
+    JsonObject gear;
+    if (data.equipment != null) {
+      // 25w03a or later
+      gear = parseEquipment(data.equipment);
+    } else {
+      gear = new JsonObject();
     if (!data.chestplate.asCompound().isEmpty()) {
       gear.add("chest", parseItem(data.chestplate.asCompound()));
     }
@@ -176,6 +191,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     }
     if (!data.legs.asCompound().isEmpty()) {
       gear.add("legs", parseItem(data.legs.asCompound()));
+      }
     }
     return gear;
   }
