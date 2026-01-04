@@ -112,9 +112,22 @@ public class Head extends MinecraftBlockTranslucent {
 
   public static Optional<MinecraftSkin> getSkinFromProfileTag(CompoundTag profileTag) throws IOException {
     Tag properties = profileTag.get("properties");
+    boolean hasId = profileTag.get("id").isIntArray(4);
+    boolean hasName = !profileTag.get("name").stringValue("").isEmpty();
+
+    // see https://www.minecraft.net/en-us/article/minecraft-snapshot-25w34a for the resolving logic
     if (properties.isCompoundTag()) {
+      // older tag
       return MinecraftSkin.getSkinFromEncodedTextures(properties.get("value").stringValue());
-    } else if (properties.isList()) {
+    } else if (properties.isList() || hasId == hasName) {
+      // if properties is set or name and id are present or both missing, render the encoded texture
+      if (!properties.isList()) {
+        // if properties isn't set, use a default skin based on id
+        if (hasId) {
+          return MojangApi.fetchProfile(UuidUtil.intsToUuid(profileTag.get("id").intArray()).toString()).getSkin();
+        }
+        return Optional.empty();
+      }
       for (Tag property : properties.asList()) {
         if (property.get("name").stringValue("").equals("textures")) {
           String encodedTexture = property.get("value").stringValue("");
@@ -124,9 +137,11 @@ public class Head extends MinecraftBlockTranslucent {
         }
       }
     }
-    int[] uuidInts = profileTag.get("id").intArray();
-    if (uuidInts.length == 4) {
-      return MojangApi.fetchProfile(UuidUtil.intsToUuid(uuidInts).toString()).getSkin();
+    if (hasId) {
+      return MojangApi.fetchProfile(UuidUtil.intsToUuid(profileTag.get("id").intArray()).toString()).getSkin();
+    }
+    if (hasName) {
+      return MojangApi.fetchProfile(MojangApi.usernameToUUID(profileTag.get("name").stringValue())).getSkin();
     }
     return Optional.empty();
   }
