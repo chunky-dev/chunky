@@ -878,6 +878,14 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         case "netherite_leggings":
           loader = simpleTexture("models/armor/netherite_layer_2", texture);
           break;
+        case "copper_boots":
+        case "copper_helmet":
+        case "copper_chestplate":
+          loader = simpleTexture("entity/equipment/humanoid/copper", texture);
+          break;
+        case "copper_leggings":
+          loader = simpleTexture("entity/equipment/humanoid_leggings/copper", texture);
+          break;
         case "turtle_helmet":
           loader = simpleTexture("models/armor/turtle_layer_1", texture);
           break;
