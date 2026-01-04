@@ -34,6 +34,7 @@ public class PlayerEntityData {
   public Tag chestplate = new CompoundTag();
   public Tag shield = new CompoundTag();
   public Tag mainHand = new CompoundTag();
+  public CompoundTag equipment;
   public final String uuid;
 
   public PlayerEntityData(Tag player) {
@@ -84,6 +85,11 @@ public class PlayerEntityData {
       if (slot == selectedItem) {
         mainHand = item;
       }
+    }
+
+    if (player.get("equipment").isCompoundTag()) {
+      // 25w03a or later
+      this.equipment = player.get("equipment").asCompound();
     }
   }
 
