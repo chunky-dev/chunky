@@ -38,334 +38,334 @@ import java.util.LinkedList;
 
 public class ArmorStand extends Entity implements Poseable, Geared {
   private static final String[] partNames =
-      { "all", "head", "chest", "leftArm", "rightArm", "leftLeg", "rightLeg" };
+    {"all", "head", "chest", "leftArm", "rightArm", "leftLeg", "rightLeg"};
   private static final String[] gearSlots =
-      { "leftHand", "rightHand", "head", "chest", "legs", "feet" };
+    {"leftHand", "rightHand", "head", "chest", "legs", "feet"};
 
   private static final Quad[] base = {
-      // cube1
-      new Quad(
-          new Vector3(2 / 16.0, 1 / 16.0, 14 / 16.0),
-          new Vector3(14 / 16.0, 1 / 16.0, 14 / 16.0),
-          new Vector3(2 / 16.0, 1 / 16.0, 2 / 16.0),
-          new Vector4(12 / 64.0, 24 / 64.0, 20 / 64.0, 32 / 64.0)),
-      new Quad(
-          new Vector3(2 / 16.0, 0, 2 / 16.0),
-          new Vector3(14 / 16.0, 0, 2 / 16.0),
-          new Vector3(2 / 16.0, 0, 14 / 16.0),
-          new Vector4(36 / 64.0, 24 / 64.0, 32 / 64.0, 20 / 64.0)),
-      new Quad(
-          new Vector3(14 / 16.0, 0, 14 / 16.0),
-          new Vector3(14 / 16.0, 0, 2 / 16.0),
-          new Vector3(14 / 16.0, 1 / 16.0, 14 / 16.0),
-          new Vector4(24 / 64.0, 36 / 64.0, 19 / 64.0, 20 / 64.0)),
-      new Quad(
-          new Vector3(2 / 16.0, 0, 2 / 16.0),
-          new Vector3(2 / 16.0, 0, 14 / 16.0),
-          new Vector3(2 / 16.0, 1 / 16.0, 2 / 16.0),
-          new Vector4(0, 12 / 64.0, 19 / 64.0, 20 / 64.0)),
-      new Quad(
-          new Vector3(14 / 16.0, 0, 2 / 16.0),
-          new Vector3(2 / 16.0, 0, 2 / 16.0),
-          new Vector3(14 / 16.0, 1 / 16.0, 2 / 16.0),
-          new Vector4(36 / 64.0, 48 / 64.0, 19 / 64.0, 20 / 64.0)),
-      new Quad(
-          new Vector3(2 / 16.0, 0, 14 / 16.0),
-          new Vector3(14 / 16.0, 0, 14 / 16.0),
-          new Vector3(2 / 16.0, 1 / 16.0, 14 / 16.0),
-          new Vector4(12 / 64.0, 24 / 64.0, 19 / 64.0, 20 / 64.0)),
+    // cube1
+    new Quad(
+      new Vector3(2 / 16.0, 1 / 16.0, 14 / 16.0),
+      new Vector3(14 / 16.0, 1 / 16.0, 14 / 16.0),
+      new Vector3(2 / 16.0, 1 / 16.0, 2 / 16.0),
+      new Vector4(12 / 64.0, 24 / 64.0, 20 / 64.0, 32 / 64.0)),
+    new Quad(
+      new Vector3(2 / 16.0, 0, 2 / 16.0),
+      new Vector3(14 / 16.0, 0, 2 / 16.0),
+      new Vector3(2 / 16.0, 0, 14 / 16.0),
+      new Vector4(36 / 64.0, 24 / 64.0, 32 / 64.0, 20 / 64.0)),
+    new Quad(
+      new Vector3(14 / 16.0, 0, 14 / 16.0),
+      new Vector3(14 / 16.0, 0, 2 / 16.0),
+      new Vector3(14 / 16.0, 1 / 16.0, 14 / 16.0),
+      new Vector4(24 / 64.0, 36 / 64.0, 19 / 64.0, 20 / 64.0)),
+    new Quad(
+      new Vector3(2 / 16.0, 0, 2 / 16.0),
+      new Vector3(2 / 16.0, 0, 14 / 16.0),
+      new Vector3(2 / 16.0, 1 / 16.0, 2 / 16.0),
+      new Vector4(0, 12 / 64.0, 19 / 64.0, 20 / 64.0)),
+    new Quad(
+      new Vector3(14 / 16.0, 0, 2 / 16.0),
+      new Vector3(2 / 16.0, 0, 2 / 16.0),
+      new Vector3(14 / 16.0, 1 / 16.0, 2 / 16.0),
+      new Vector4(36 / 64.0, 48 / 64.0, 19 / 64.0, 20 / 64.0)),
+    new Quad(
+      new Vector3(2 / 16.0, 0, 14 / 16.0),
+      new Vector3(14 / 16.0, 0, 14 / 16.0),
+      new Vector3(2 / 16.0, 1 / 16.0, 14 / 16.0),
+      new Vector4(12 / 64.0, 24 / 64.0, 19 / 64.0, 20 / 64.0)),
   };
 
   private static final Quad[] torso = {
-      // torsoTop
-      new Quad(
-          new Vector3(-6 / 16.0, 6 / 16.0, 1.5 / 16.0),
-          new Vector3(6 / 16.0, 6 / 16.0, 1.5 / 16.0),
-          new Vector3(-6 / 16.0, 6 / 16.0, -1.5 / 16.0),
-          new Vector4(0.75 / 16.0, 3.75 / 16.0, 8.75 / 16.0, 9.5 / 16.0)),
-      new Quad(
-          new Vector3(-6 / 16.0, 3 / 16.0, -1.5 / 16.0),
-          new Vector3(6 / 16.0, 3 / 16.0, -1.5 / 16.0),
-          new Vector3(-6 / 16.0, 3 / 16.0, 1.5 / 16.0),
-          new Vector4(3.75 / 16.0, 6.75 / 16.0, 9.5 / 16.0, 8.75 / 16.0)),
-      new Quad(
-          new Vector3(6 / 16.0, 3 / 16.0, 1.5 / 16.0),
-          new Vector3(6 / 16.0, 3 / 16.0, -1.5 / 16.0),
-          new Vector3(6 / 16.0, 6 / 16.0, 1.5 / 16.0),
-          new Vector4(3.75 / 16.0, 4.5 / 16.0, 8 / 16.0, 8.75 / 16.0)),
-      new Quad(
-          new Vector3(-6 / 16.0, 3 / 16.0, -1.5 / 16.0),
-          new Vector3(-6 / 16.0, 3 / 16.0, 1.5 / 16.0),
-          new Vector3(-6 / 16.0, 6 / 16.0, -1.5 / 16.0),
-          new Vector4(0, 0.75 / 16.0, 8 / 16.0, 8.75 / 16.0)),
-      new Quad(
-          new Vector3(6 / 16.0, 3 / 16.0, -1.5 / 16.0),
-          new Vector3(-6 / 16.0, 3 / 16.0, -1.5 / 16.0),
-          new Vector3(6 / 16.0, 6 / 16.0, -1.5 / 16.0),
-          new Vector4(4.5 / 16.0, 7.5 / 16.0, 8 / 16.0, 8.75 / 16.0)),
-      new Quad(
-          new Vector3(-6 / 16.0, 3 / 16.0, 1.5 / 16.0),
-          new Vector3(6 / 16.0, 3 / 16.0, 1.5 / 16.0),
-          new Vector3(-6 / 16.0, 6 / 16.0, 1.5 / 16.0),
-          new Vector4(0.75 / 16.0, 3.75 / 16.0, 8 / 16.0, 8.75 / 16.0)),
-      // torsoLeft
-      new Quad(
-          new Vector3(-3 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector3(-3 / 16.0, 3 / 16.0, -1 / 16.0),
-          new Vector4(4.5 / 16.0, 5 / 16.0, 15.5 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(-3 / 16.0, -4 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -4 / 16.0, -1 / 16.0),
-          new Vector3(-3 / 16.0, -4 / 16.0, 1 / 16.0),
-          new Vector4(5 / 16.0, 5.5 / 16.0, 15.5 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -4 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, -4 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector4(5 / 16.0, 5.5 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
-      new Quad(
-          new Vector3(-3 / 16.0, -4 / 16.0, -1 / 16.0),
-          new Vector3(-3 / 16.0, -4 / 16.0, 1 / 16.0),
-          new Vector3(-3 / 16.0, 3 / 16.0, -1 / 16.0),
-          new Vector4(4 / 16.0, 4.5 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -4 / 16.0, -1 / 16.0),
-          new Vector3(-3 / 16.0, -4 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, 3 / 16.0, -1 / 16.0),
-          new Vector4(5.5 / 16.0, 6 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
-      new Quad(
-          new Vector3(-3 / 16.0, -4 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, -4 / 16.0, 1 / 16.0),
-          new Vector3(-3 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector4(4.5 / 16.0, 5 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
-      // torsoRight
-      new Quad(
-          new Vector3(1 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector3(3 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, 3 / 16.0, -1 / 16.0),
-          new Vector4(12.5 / 16.0, 13 / 16.0, 11.5 / 16.0, 12 / 16.0)),
-      new Quad(
-          new Vector3(1 / 16.0, -4 / 16.0, -1 / 16.0),
-          new Vector3(3 / 16.0, -4 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, -4 / 16.0, 1 / 16.0),
-          new Vector4(13 / 16.0, 13.5 / 16.0, 11.5 / 16.0, 12 / 16.0)),
-      new Quad(
-          new Vector3(3 / 16.0, -4 / 16.0, 1 / 16.0),
-          new Vector3(3 / 16.0, -4 / 16.0, -1 / 16.0),
-          new Vector3(3 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector4(13 / 16.0, 13.5 / 16.0, 9.75 / 16.0, 11.5 / 16.0)),
-      new Quad(
-          new Vector3(1 / 16.0, -4 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, -4 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, 3 / 16.0, -1 / 16.0),
-          new Vector4(12 / 16.0, 12.5 / 16.0, 9.75 / 16.0, 11.5 / 16.0)),
-      new Quad(
-          new Vector3(3 / 16.0, -4 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, -4 / 16.0, -1 / 16.0),
-          new Vector3(3 / 16.0, 3 / 16.0, -1 / 16.0),
-          new Vector4(13.5 / 16.0, 14 / 16.0, 9.75 / 16.0, 11.5 / 16.0)),
-      new Quad(
-          new Vector3(1 / 16.0, -4 / 16.0, 1 / 16.0),
-          new Vector3(3 / 16.0, -4 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector4(12.5 / 16.0, 13 / 16.0, 9.75 / 16.0, 11.5 / 16.0)),
-      // pelvis
-      new Quad(
-          new Vector3(-4 / 16.0, -4 / 16.0, 1 / 16.0),
-          new Vector3(4 / 16.0, -4 / 16.0, 1 / 16.0),
-          new Vector3(-4 / 16.0, -4 / 16.0, -1 / 16.0),
-          new Vector4(4.5 / 16.0, 7.5 / 16.0, 8 / 16.0, 8.75 / 16.0)),
-      new Quad(
-          new Vector3(-4 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(4 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(-4 / 16.0, -6 / 16.0, 1 / 16.0),
-          new Vector4(4.5 / 16.0, 7.5 / 16.0, 8 / 16.0, 8.75 / 16.0)),
-      new Quad(
-          new Vector3(4 / 16.0, -6 / 16.0, 1 / 16.0),
-          new Vector3(4 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(4 / 16.0, -4 / 16.0, 1 / 16.0),
-          new Vector4(0, 0.75 / 16.0, 8 / 16.0, 8.75 / 16.0)),
-      new Quad(
-          new Vector3(-4 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(-4 / 16.0, -6 / 16.0, 1 / 16.0),
-          new Vector3(-4 / 16.0, -4 / 16.0, -1 / 16.0),
-          new Vector4(3.75 / 16.0, 4.5 / 16.0, 8 / 16.0, 8.75 / 16.0)),
-      new Quad(
-          new Vector3(4 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(-4 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(4 / 16.0, -4 / 16.0, -1 / 16.0),
-          new Vector4(4.5 / 16.0, 7.5 / 16.0, 8 / 16.0, 8.75 / 16.0)),
-      new Quad(
-          new Vector3(-4 / 16.0, -6 / 16.0, 1 / 16.0),
-          new Vector3(4 / 16.0, -6 / 16.0, 1 / 16.0),
-          new Vector3(-4 / 16.0, -4 / 16.0, 1 / 16.0),
-          new Vector4(4.5 / 16.0, 7.5 / 16.0, 8 / 16.0, 8.75 / 16.0)),
+    // torsoTop
+    new Quad(
+      new Vector3(-6 / 16.0, 6 / 16.0, 1.5 / 16.0),
+      new Vector3(6 / 16.0, 6 / 16.0, 1.5 / 16.0),
+      new Vector3(-6 / 16.0, 6 / 16.0, -1.5 / 16.0),
+      new Vector4(0.75 / 16.0, 3.75 / 16.0, 8.75 / 16.0, 9.5 / 16.0)),
+    new Quad(
+      new Vector3(-6 / 16.0, 3 / 16.0, -1.5 / 16.0),
+      new Vector3(6 / 16.0, 3 / 16.0, -1.5 / 16.0),
+      new Vector3(-6 / 16.0, 3 / 16.0, 1.5 / 16.0),
+      new Vector4(3.75 / 16.0, 6.75 / 16.0, 9.5 / 16.0, 8.75 / 16.0)),
+    new Quad(
+      new Vector3(6 / 16.0, 3 / 16.0, 1.5 / 16.0),
+      new Vector3(6 / 16.0, 3 / 16.0, -1.5 / 16.0),
+      new Vector3(6 / 16.0, 6 / 16.0, 1.5 / 16.0),
+      new Vector4(3.75 / 16.0, 4.5 / 16.0, 8 / 16.0, 8.75 / 16.0)),
+    new Quad(
+      new Vector3(-6 / 16.0, 3 / 16.0, -1.5 / 16.0),
+      new Vector3(-6 / 16.0, 3 / 16.0, 1.5 / 16.0),
+      new Vector3(-6 / 16.0, 6 / 16.0, -1.5 / 16.0),
+      new Vector4(0, 0.75 / 16.0, 8 / 16.0, 8.75 / 16.0)),
+    new Quad(
+      new Vector3(6 / 16.0, 3 / 16.0, -1.5 / 16.0),
+      new Vector3(-6 / 16.0, 3 / 16.0, -1.5 / 16.0),
+      new Vector3(6 / 16.0, 6 / 16.0, -1.5 / 16.0),
+      new Vector4(4.5 / 16.0, 7.5 / 16.0, 8 / 16.0, 8.75 / 16.0)),
+    new Quad(
+      new Vector3(-6 / 16.0, 3 / 16.0, 1.5 / 16.0),
+      new Vector3(6 / 16.0, 3 / 16.0, 1.5 / 16.0),
+      new Vector3(-6 / 16.0, 6 / 16.0, 1.5 / 16.0),
+      new Vector4(0.75 / 16.0, 3.75 / 16.0, 8 / 16.0, 8.75 / 16.0)),
+    // torsoLeft
+    new Quad(
+      new Vector3(-3 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector3(-3 / 16.0, 3 / 16.0, -1 / 16.0),
+      new Vector4(4.5 / 16.0, 5 / 16.0, 15.5 / 16.0, 16 / 16.0)),
+    new Quad(
+      new Vector3(-3 / 16.0, -4 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -4 / 16.0, -1 / 16.0),
+      new Vector3(-3 / 16.0, -4 / 16.0, 1 / 16.0),
+      new Vector4(5 / 16.0, 5.5 / 16.0, 15.5 / 16.0, 16 / 16.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -4 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, -4 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector4(5 / 16.0, 5.5 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
+    new Quad(
+      new Vector3(-3 / 16.0, -4 / 16.0, -1 / 16.0),
+      new Vector3(-3 / 16.0, -4 / 16.0, 1 / 16.0),
+      new Vector3(-3 / 16.0, 3 / 16.0, -1 / 16.0),
+      new Vector4(4 / 16.0, 4.5 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -4 / 16.0, -1 / 16.0),
+      new Vector3(-3 / 16.0, -4 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, 3 / 16.0, -1 / 16.0),
+      new Vector4(5.5 / 16.0, 6 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
+    new Quad(
+      new Vector3(-3 / 16.0, -4 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, -4 / 16.0, 1 / 16.0),
+      new Vector3(-3 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector4(4.5 / 16.0, 5 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
+    // torsoRight
+    new Quad(
+      new Vector3(1 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector3(3 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, 3 / 16.0, -1 / 16.0),
+      new Vector4(12.5 / 16.0, 13 / 16.0, 11.5 / 16.0, 12 / 16.0)),
+    new Quad(
+      new Vector3(1 / 16.0, -4 / 16.0, -1 / 16.0),
+      new Vector3(3 / 16.0, -4 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, -4 / 16.0, 1 / 16.0),
+      new Vector4(13 / 16.0, 13.5 / 16.0, 11.5 / 16.0, 12 / 16.0)),
+    new Quad(
+      new Vector3(3 / 16.0, -4 / 16.0, 1 / 16.0),
+      new Vector3(3 / 16.0, -4 / 16.0, -1 / 16.0),
+      new Vector3(3 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector4(13 / 16.0, 13.5 / 16.0, 9.75 / 16.0, 11.5 / 16.0)),
+    new Quad(
+      new Vector3(1 / 16.0, -4 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, -4 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, 3 / 16.0, -1 / 16.0),
+      new Vector4(12 / 16.0, 12.5 / 16.0, 9.75 / 16.0, 11.5 / 16.0)),
+    new Quad(
+      new Vector3(3 / 16.0, -4 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, -4 / 16.0, -1 / 16.0),
+      new Vector3(3 / 16.0, 3 / 16.0, -1 / 16.0),
+      new Vector4(13.5 / 16.0, 14 / 16.0, 9.75 / 16.0, 11.5 / 16.0)),
+    new Quad(
+      new Vector3(1 / 16.0, -4 / 16.0, 1 / 16.0),
+      new Vector3(3 / 16.0, -4 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector4(12.5 / 16.0, 13 / 16.0, 9.75 / 16.0, 11.5 / 16.0)),
+    // pelvis
+    new Quad(
+      new Vector3(-4 / 16.0, -4 / 16.0, 1 / 16.0),
+      new Vector3(4 / 16.0, -4 / 16.0, 1 / 16.0),
+      new Vector3(-4 / 16.0, -4 / 16.0, -1 / 16.0),
+      new Vector4(4.5 / 16.0, 7.5 / 16.0, 8 / 16.0, 8.75 / 16.0)),
+    new Quad(
+      new Vector3(-4 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(4 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(-4 / 16.0, -6 / 16.0, 1 / 16.0),
+      new Vector4(4.5 / 16.0, 7.5 / 16.0, 8 / 16.0, 8.75 / 16.0)),
+    new Quad(
+      new Vector3(4 / 16.0, -6 / 16.0, 1 / 16.0),
+      new Vector3(4 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(4 / 16.0, -4 / 16.0, 1 / 16.0),
+      new Vector4(0, 0.75 / 16.0, 8 / 16.0, 8.75 / 16.0)),
+    new Quad(
+      new Vector3(-4 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(-4 / 16.0, -6 / 16.0, 1 / 16.0),
+      new Vector3(-4 / 16.0, -4 / 16.0, -1 / 16.0),
+      new Vector4(3.75 / 16.0, 4.5 / 16.0, 8 / 16.0, 8.75 / 16.0)),
+    new Quad(
+      new Vector3(4 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(-4 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(4 / 16.0, -4 / 16.0, -1 / 16.0),
+      new Vector4(4.5 / 16.0, 7.5 / 16.0, 8 / 16.0, 8.75 / 16.0)),
+    new Quad(
+      new Vector3(-4 / 16.0, -6 / 16.0, 1 / 16.0),
+      new Vector3(4 / 16.0, -6 / 16.0, 1 / 16.0),
+      new Vector3(-4 / 16.0, -4 / 16.0, 1 / 16.0),
+      new Vector4(4.5 / 16.0, 7.5 / 16.0, 8 / 16.0, 8.75 / 16.0)),
   };
 
   private static final Quad[] neck = {
-      new Quad(
-          new Vector3(-1 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 3 / 16.0, -1 / 16.0),
-          new Vector4(0.5 / 16.0, 1 / 16.0, 15.5 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -3 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, -3 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -3 / 16.0, 1 / 16.0),
-          new Vector4(1 / 16.0, 1.5 / 16.0, 15.5 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(1 / 16.0, -3 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, -3 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector4(0, 0.5 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -3 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -3 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 3 / 16.0, -1 / 16.0),
-          new Vector4(1 / 16.0, 1.5 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
-      new Quad(
-          new Vector3(1 / 16.0, -3 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -3 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, 3 / 16.0, -1 / 16.0),
-          new Vector4(0.5 / 16.0, 1 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -3 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, -3 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 3 / 16.0, 1 / 16.0),
-          new Vector4(1.5 / 16.0, 2 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 3 / 16.0, -1 / 16.0),
+      new Vector4(0.5 / 16.0, 1 / 16.0, 15.5 / 16.0, 16 / 16.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -3 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, -3 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -3 / 16.0, 1 / 16.0),
+      new Vector4(1 / 16.0, 1.5 / 16.0, 15.5 / 16.0, 16 / 16.0)),
+    new Quad(
+      new Vector3(1 / 16.0, -3 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, -3 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector4(0, 0.5 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -3 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -3 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 3 / 16.0, -1 / 16.0),
+      new Vector4(1 / 16.0, 1.5 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
+    new Quad(
+      new Vector3(1 / 16.0, -3 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -3 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, 3 / 16.0, -1 / 16.0),
+      new Vector4(0.5 / 16.0, 1 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -3 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, -3 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 3 / 16.0, 1 / 16.0),
+      new Vector4(1.5 / 16.0, 2 / 16.0, 13.75 / 16.0, 15.5 / 16.0)),
   };
 
   private static final Quad[] leftArm = {
-      new Quad(
-          new Vector3(-1 / 16.0, 6 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, 6 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 6 / 16.0, -1 / 16.0),
-          new Vector4(36 / 64.0, 34 / 64.0, 46 / 64.0, 48 / 64.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -6 / 16.0, 1 / 16.0),
-          new Vector4(38 / 64.0, 36 / 64.0, 48 / 64.0, 46 / 64.0)),
-      new Quad(
-          new Vector3(1 / 16.0, -6 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, 6 / 16.0, 1 / 16.0),
-          new Vector4(38 / 64.0, 36 / 64.0, 34 / 64.0, 46 / 64.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -6 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 6 / 16.0, -1 / 16.0),
-          new Vector4(34 / 64.0, 32 / 64.0, 34 / 64.0, 46 / 64.0)),
-      new Quad(
-          new Vector3(1 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, 6 / 16.0, -1 / 16.0),
-          new Vector4(36 / 64.0, 34 / 64.0, 34 / 64.0, 46 / 64.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -6 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, -6 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 6 / 16.0, 1 / 16.0),
-          new Vector4(40 / 64.0, 38 / 64.0, 34 / 64.0, 46 / 64.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, 6 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, 6 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 6 / 16.0, -1 / 16.0),
+      new Vector4(36 / 64.0, 34 / 64.0, 46 / 64.0, 48 / 64.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -6 / 16.0, 1 / 16.0),
+      new Vector4(38 / 64.0, 36 / 64.0, 48 / 64.0, 46 / 64.0)),
+    new Quad(
+      new Vector3(1 / 16.0, -6 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, 6 / 16.0, 1 / 16.0),
+      new Vector4(38 / 64.0, 36 / 64.0, 34 / 64.0, 46 / 64.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -6 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 6 / 16.0, -1 / 16.0),
+      new Vector4(34 / 64.0, 32 / 64.0, 34 / 64.0, 46 / 64.0)),
+    new Quad(
+      new Vector3(1 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, 6 / 16.0, -1 / 16.0),
+      new Vector4(36 / 64.0, 34 / 64.0, 34 / 64.0, 46 / 64.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -6 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, -6 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 6 / 16.0, 1 / 16.0),
+      new Vector4(40 / 64.0, 38 / 64.0, 34 / 64.0, 46 / 64.0)),
   };
 
   private static final Quad[] rightArm = {
-      new Quad(
-          new Vector3(-1 / 16.0, 6 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, 6 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 6 / 16.0, -1 / 16.0),
-          new Vector4(28 / 64.0, 26 / 64.0, 64 / 64.0, 62 / 64.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -6 / 16.0, 1 / 16.0),
-          new Vector4(28 / 64.0, 30 / 64.0, 62 / 64.0, 64 / 64.0)),
-      new Quad(
-          new Vector3(1 / 16.0, -6 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, 6 / 16.0, 1 / 16.0),
-          new Vector4(24 / 64.0, 26 / 64.0, 50 / 64.0, 62 / 64.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -6 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 6 / 16.0, -1 / 16.0),
-          new Vector4(28 / 64.0, 30 / 64.0, 50 / 64.0, 62 / 64.0)),
-      new Quad(
-          new Vector3(1 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -6 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, 6 / 16.0, -1 / 16.0),
-          new Vector4(26 / 64.0, 28 / 64.0, 50 / 64.0, 62 / 64.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -6 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, -6 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 6 / 16.0, 1 / 16.0),
-          new Vector4(30 / 64.0, 32 / 64.0, 50 / 64.0, 62 / 64.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, 6 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, 6 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 6 / 16.0, -1 / 16.0),
+      new Vector4(28 / 64.0, 26 / 64.0, 64 / 64.0, 62 / 64.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -6 / 16.0, 1 / 16.0),
+      new Vector4(28 / 64.0, 30 / 64.0, 62 / 64.0, 64 / 64.0)),
+    new Quad(
+      new Vector3(1 / 16.0, -6 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, 6 / 16.0, 1 / 16.0),
+      new Vector4(24 / 64.0, 26 / 64.0, 50 / 64.0, 62 / 64.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -6 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 6 / 16.0, -1 / 16.0),
+      new Vector4(28 / 64.0, 30 / 64.0, 50 / 64.0, 62 / 64.0)),
+    new Quad(
+      new Vector3(1 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -6 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, 6 / 16.0, -1 / 16.0),
+      new Vector4(26 / 64.0, 28 / 64.0, 50 / 64.0, 62 / 64.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -6 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, -6 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 6 / 16.0, 1 / 16.0),
+      new Vector4(30 / 64.0, 32 / 64.0, 50 / 64.0, 62 / 64.0)),
   };
 
   private static final Quad[] leftLeg = {
-      new Quad(
-          new Vector3(-1 / 16.0, 5.5 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, 5.5 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 5.5 / 16.0, -1 / 16.0),
-          new Vector4(10.5 / 16.0, 11 / 16.0, 11.5 / 16.0, 12 / 16.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -5.5 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, -5.5 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -5.5 / 16.0, 1 / 16.0),
-          new Vector4(11 / 16.0, 11.5 / 16.0, 11.5 / 16.0, 12 / 16.0)),
-      new Quad(
-          new Vector3(1 / 16.0, -5.5 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, -5.5 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, 5.5 / 16.0, 1 / 16.0),
-          new Vector4(10.5 / 16.0, 10 / 16.0, 8.75 / 16.0, 11.5 / 16.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -5.5 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -5.5 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 5.5 / 16.0, -1 / 16.0),
-          new Vector4(11.5 / 16.0, 11 / 16.0, 8.75 / 16.0, 11.5 / 16.0)),
-      new Quad(
-          new Vector3(1 / 16.0, -5.5 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -5.5 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, 5.5 / 16.0, -1 / 16.0),
-          new Vector4(12 / 16.0, 11.5 / 16.0, 8.75 / 16.0, 11.5 / 16.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -5.5 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, -5.5 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 5.5 / 16.0, 1 / 16.0),
-          new Vector4(11 / 16.0, 10.5 / 16.0, 8.75 / 16.0, 11.5 / 16.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, 5.5 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, 5.5 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 5.5 / 16.0, -1 / 16.0),
+      new Vector4(10.5 / 16.0, 11 / 16.0, 11.5 / 16.0, 12 / 16.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -5.5 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, -5.5 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -5.5 / 16.0, 1 / 16.0),
+      new Vector4(11 / 16.0, 11.5 / 16.0, 11.5 / 16.0, 12 / 16.0)),
+    new Quad(
+      new Vector3(1 / 16.0, -5.5 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, -5.5 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, 5.5 / 16.0, 1 / 16.0),
+      new Vector4(10.5 / 16.0, 10 / 16.0, 8.75 / 16.0, 11.5 / 16.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -5.5 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -5.5 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 5.5 / 16.0, -1 / 16.0),
+      new Vector4(11.5 / 16.0, 11 / 16.0, 8.75 / 16.0, 11.5 / 16.0)),
+    new Quad(
+      new Vector3(1 / 16.0, -5.5 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -5.5 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, 5.5 / 16.0, -1 / 16.0),
+      new Vector4(12 / 16.0, 11.5 / 16.0, 8.75 / 16.0, 11.5 / 16.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -5.5 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, -5.5 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 5.5 / 16.0, 1 / 16.0),
+      new Vector4(11 / 16.0, 10.5 / 16.0, 8.75 / 16.0, 11.5 / 16.0)),
   };
 
   private static final Quad[] rightLeg = {
-      new Quad(
-          new Vector3(-1 / 16.0, 5.5 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, 5.5 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 5.5 / 16.0, -1 / 16.0),
-          new Vector4(2.5 / 16.0, 3 / 16.0, 15.5 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -5.5 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, -5.5 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -5.5 / 16.0, 1 / 16.0),
-          new Vector4(3 / 16.0, 3.5 / 16.0, 15.5 / 16.0, 16 / 16.0)),
-      new Quad(
-          new Vector3(1 / 16.0, -5.5 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, -5.5 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, 5.5 / 16.0, 1 / 16.0),
-          new Vector4(3 / 16.0, 3.5 / 16.0, 12.75 / 16.0, 15.5 / 16.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -5.5 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -5.5 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 5.5 / 16.0, -1 / 16.0),
-          new Vector4(2 / 16.0, 2.5 / 16.0, 12.75 / 16.0, 15.5 / 16.0)),
-      new Quad(
-          new Vector3(1 / 16.0, -5.5 / 16.0, -1 / 16.0),
-          new Vector3(-1 / 16.0, -5.5 / 16.0, -1 / 16.0),
-          new Vector3(1 / 16.0, 5.5 / 16.0, -1 / 16.0),
-          new Vector4(3.5 / 16.0, 4 / 16.0, 12.75 / 16.0, 15.5 / 16.0)),
-      new Quad(
-          new Vector3(-1 / 16.0, -5.5 / 16.0, 1 / 16.0),
-          new Vector3(1 / 16.0, -5.5 / 16.0, 1 / 16.0),
-          new Vector3(-1 / 16.0, 5.5 / 16.0, 1 / 16.0),
-          new Vector4(2.5 / 16.0, 3 / 16.0, 12.75 / 16.0, 15.5 / 16.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, 5.5 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, 5.5 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 5.5 / 16.0, -1 / 16.0),
+      new Vector4(2.5 / 16.0, 3 / 16.0, 15.5 / 16.0, 16 / 16.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -5.5 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, -5.5 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -5.5 / 16.0, 1 / 16.0),
+      new Vector4(3 / 16.0, 3.5 / 16.0, 15.5 / 16.0, 16 / 16.0)),
+    new Quad(
+      new Vector3(1 / 16.0, -5.5 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, -5.5 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, 5.5 / 16.0, 1 / 16.0),
+      new Vector4(3 / 16.0, 3.5 / 16.0, 12.75 / 16.0, 15.5 / 16.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -5.5 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -5.5 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 5.5 / 16.0, -1 / 16.0),
+      new Vector4(2 / 16.0, 2.5 / 16.0, 12.75 / 16.0, 15.5 / 16.0)),
+    new Quad(
+      new Vector3(1 / 16.0, -5.5 / 16.0, -1 / 16.0),
+      new Vector3(-1 / 16.0, -5.5 / 16.0, -1 / 16.0),
+      new Vector3(1 / 16.0, 5.5 / 16.0, -1 / 16.0),
+      new Vector4(3.5 / 16.0, 4 / 16.0, 12.75 / 16.0, 15.5 / 16.0)),
+    new Quad(
+      new Vector3(-1 / 16.0, -5.5 / 16.0, 1 / 16.0),
+      new Vector3(1 / 16.0, -5.5 / 16.0, 1 / 16.0),
+      new Vector3(-1 / 16.0, 5.5 / 16.0, 1 / 16.0),
+      new Vector4(2.5 / 16.0, 3 / 16.0, 12.75 / 16.0, 15.5 / 16.0)),
   };
 
   private double scale = 1.0;
@@ -389,34 +389,43 @@ public class ArmorStand extends Entity implements Poseable, Geared {
 
   public ArmorStand(Vector3 position, Tag tag) {
     super(position);
-    gear = new JsonObject();
     Tag handItems = tag.get("HandItems");
     Tag armorItems = tag.get("ArmorItems");
-    int armorItemsCount = armorItems.asList().size(); // in worlds upgraded from older versions the list only contains some gear pieces, see #895
-    if (armorItemsCount > 0) {
-      CompoundTag boots = armorItems.get(0).asCompound();
-      // TODO: handle colored leather.
-      if (!boots.isEmpty()) {
-        gear.add("feet", PlayerEntity.parseItem(boots));
+    if (armorItems.isList()) {
+      // pre 25w03a
+      gear = new JsonObject();
+      int armorItemsCount = armorItems.asList().size(); // in worlds upgraded from older versions the list only contains some gear pieces, see #895
+      if (armorItemsCount > 0) {
+        CompoundTag boots = armorItems.get(0).asCompound();
+        // TODO: handle colored leather.
+        if (!boots.isEmpty()) {
+          gear.add("feet", PlayerEntity.parseItem(boots));
+        }
       }
-    }
-    if (armorItemsCount > 1) {
-      CompoundTag legs = armorItems.get(1).asCompound();
-      if (!legs.isEmpty()) {
-        gear.add("legs", PlayerEntity.parseItem(legs));
+      if (armorItemsCount > 1) {
+        CompoundTag legs = armorItems.get(1).asCompound();
+        if (!legs.isEmpty()) {
+          gear.add("legs", PlayerEntity.parseItem(legs));
+        }
       }
-    }
-    if (armorItemsCount > 2) {
-      CompoundTag chest = armorItems.get(2).asCompound();
-      if (!chest.isEmpty()) {
-        gear.add("chest", PlayerEntity.parseItem(chest));
+      if (armorItemsCount > 2) {
+        CompoundTag chest = armorItems.get(2).asCompound();
+        if (!chest.isEmpty()) {
+          gear.add("chest", PlayerEntity.parseItem(chest));
+        }
       }
-    }
-    if (armorItemsCount > 3) {
-      CompoundTag head = armorItems.get(3).asCompound();
-      if (!head.isEmpty()) {
-        gear.add("head", PlayerEntity.parseItem(head));
+      if (armorItemsCount > 3) {
+        CompoundTag head = armorItems.get(3).asCompound();
+        if (!head.isEmpty()) {
+          gear.add("head", PlayerEntity.parseItem(head));
+        }
       }
+    } else if (tag.get("equipment").isCompoundTag()) {
+      // 25w03a or later
+      CompoundTag equipment = tag.get("equipment").asCompound();
+      gear = PlayerEntity.parseEquipment(equipment);
+    } else {
+      gear = new JsonObject();
     }
     showArms = tag.get("ShowArms").boolValue(false);
     if (tag.get("Small").boolValue(false)) {
@@ -438,14 +447,15 @@ public class ArmorStand extends Entity implements Poseable, Geared {
     noBasePlate = tag.get("NoBasePlate").boolValue(false);
   }
 
-  @Override public Collection<Primitive> primitives(Vector3 offset) {
+  @Override
+  public Collection<Primitive> primitives(Vector3 offset) {
     Collection<Primitive> primitives = new LinkedList<>();
     Material material = new TextureMaterial(Texture.armorStand);
 
     Vector3 worldOffset = new Vector3(
-        position.x + offset.x,
-        position.y + offset.y,
-        position.z + offset.z);
+      position.x + offset.x,
+      position.y + offset.y,
+      position.z + offset.z);
 
     double armWidth = 2;
     JsonObject pose = new JsonObject();
@@ -453,8 +463,8 @@ public class ArmorStand extends Entity implements Poseable, Geared {
     Vector3 allPose = JsonUtil.vec3FromJsonArray(this.pose.get("all"));
     double yaw = allPose.y;
     Vector3 headPose = JsonUtil.vec3FromJsonArray(this.pose.get("head"));
-    headPose.x = - headPose.x;
-    headPose.y = - headPose.y;
+    headPose.x = -headPose.x;
+    headPose.y = -headPose.y;
     Vector3 chestPose = JsonUtil.vec3FromJsonArray(this.pose.get("chest"));
     Vector3 leftArmPose = JsonUtil.vec3FromJsonArray(this.pose.get("leftArm"));
     leftArmPose.x = -leftArmPose.x;
@@ -477,11 +487,11 @@ public class ArmorStand extends Entity implements Poseable, Geared {
     pose.add("rightLeg", JsonUtil.vec3ToJson(rightLegPose));
 
     Transform worldTransform = Transform.NONE
-        .scale(scale)
-        .rotateX(allPose.x)
-        .rotateY(allPose.y)
-        .rotateZ(allPose.z)
-        .translate(worldOffset);
+      .scale(scale)
+      .rotateX(allPose.x)
+      .rotateY(allPose.y)
+      .rotateZ(allPose.z)
+      .translate(worldOffset);
     PlayerEntity.addArmor(primitives, gear, pose, armWidth, worldTransform, headScale);
 
     Transform transform = Transform.NONE.translate(-0.5, 0, -0.5).translate(worldOffset);
@@ -496,69 +506,69 @@ public class ArmorStand extends Entity implements Poseable, Geared {
 
       if (showArms) {
         transform = Transform.NONE
-            .translate(0, -5 / 16., 0)
-            .rotateX(leftArmPose.x)
-            .rotateY(leftArmPose.y)
-            .rotateZ(leftArmPose.z)
-            .translate(-(4 + armWidth) / 16., 23 / 16., 0)
-            .chain(worldTransform);
+          .translate(0, -5 / 16., 0)
+          .rotateX(leftArmPose.x)
+          .rotateY(leftArmPose.y)
+          .rotateZ(leftArmPose.z)
+          .translate(-(4 + armWidth) / 16., 23 / 16., 0)
+          .chain(worldTransform);
         for (Quad quad : leftArm) {
           quad.addTriangles(primitives, material, transform);
         }
 
         transform = Transform.NONE
-            .translate(0, -5 / 16., 0)
-            .rotateX(rightArmPose.x)
-            .rotateY(rightArmPose.y)
-            .rotateZ(rightArmPose.z)
-            .translate((4 + armWidth) / 16., 23 / 16., 0)
-            .chain(worldTransform);
+          .translate(0, -5 / 16., 0)
+          .rotateX(rightArmPose.x)
+          .rotateY(rightArmPose.y)
+          .rotateZ(rightArmPose.z)
+          .translate((4 + armWidth) / 16., 23 / 16., 0)
+          .chain(worldTransform);
         for (Quad quad : rightArm) {
           quad.addTriangles(primitives, material, transform);
         }
       }
 
       transform = Transform.NONE
-          .translate(0, -5 / 16., 0)
-          .rotateX(leftLegPose.x)
-          .rotateY(leftLegPose.y)
-          .rotateZ(leftLegPose.z)
-          .translate(-2 / 16., 11.5 / 16., 0)
-          .chain(worldTransform);
+        .translate(0, -5 / 16., 0)
+        .rotateX(leftLegPose.x)
+        .rotateY(leftLegPose.y)
+        .rotateZ(leftLegPose.z)
+        .translate(-2 / 16., 11.5 / 16., 0)
+        .chain(worldTransform);
       for (Quad quad : leftLeg) {
         quad.addTriangles(primitives, material, transform);
       }
 
       transform = Transform.NONE
-          .translate(0, -5 / 16., 0)
-          .rotateX(rightLegPose.x)
-          .rotateY(rightLegPose.y)
-          .rotateZ(rightLegPose.z)
-          .translate(2 / 16., 11.5 / 16., 0)
-          .chain(worldTransform);
+        .translate(0, -5 / 16., 0)
+        .rotateX(rightLegPose.x)
+        .rotateY(rightLegPose.y)
+        .rotateZ(rightLegPose.z)
+        .translate(2 / 16., 11.5 / 16., 0)
+        .chain(worldTransform);
       for (Quad quad : rightLeg) {
         quad.addTriangles(primitives, material, transform);
       }
 
       transform = Transform.NONE
-          .translate(0, -5 / 16., 0)
-          .rotateX(chestPose.x)
-          .rotateY(chestPose.y)
-          .rotateZ(chestPose.z)
-          .translate(0, (5 + 18) / 16., 0)
-          .chain(worldTransform);
+        .translate(0, -5 / 16., 0)
+        .rotateX(chestPose.x)
+        .rotateY(chestPose.y)
+        .rotateZ(chestPose.z)
+        .translate(0, (5 + 18) / 16., 0)
+        .chain(worldTransform);
       for (Quad quad : torso) {
         quad.addTriangles(primitives, material, transform);
       }
 
       transform = Transform.NONE
-          .translate(0, 2 / 16.0, 0)
-          .rotateX(headPose.x)
-          .rotateY(headPose.y)
-          .rotateZ(headPose.z)
-          .scale(headScale)
-          .translate(0, 24 / 16.0, 0)
-          .chain(worldTransform);
+        .translate(0, 2 / 16.0, 0)
+        .rotateX(headPose.x)
+        .rotateY(headPose.y)
+        .rotateZ(headPose.z)
+        .scale(headScale)
+        .translate(0, 24 / 16.0, 0)
+        .chain(worldTransform);
       for (Quad quad : neck) {
         quad.addTriangles(primitives, material, transform);
       }
@@ -567,7 +577,8 @@ public class ArmorStand extends Entity implements Poseable, Geared {
     return primitives;
   }
 
-  @Override public JsonValue toJson() {
+  @Override
+  public JsonValue toJson() {
     JsonObject json = new JsonObject();
     json.add("kind", "armor_stand");
     json.add("position", position.toJson());
@@ -590,35 +601,43 @@ public class ArmorStand extends Entity implements Poseable, Geared {
     return new ArmorStand(json);
   }
 
-  @Override public String[] partNames() {
+  @Override
+  public String[] partNames() {
     return partNames;
   }
 
-  @Override public double getScale() {
+  @Override
+  public double getScale() {
     return scale;
   }
 
-  @Override public void setScale(double scale) {
+  @Override
+  public void setScale(double scale) {
     this.scale = scale;
   }
 
-  @Override public double getHeadScale() {
+  @Override
+  public double getHeadScale() {
     return headScale;
   }
 
-  @Override public void setHeadScale(double headScale) {
+  @Override
+  public void setHeadScale(double headScale) {
     this.headScale = headScale;
   }
 
-  @Override public JsonObject getPose() {
+  @Override
+  public JsonObject getPose() {
     return pose;
   }
 
-  @Override public String[] gearSlots() {
+  @Override
+  public String[] gearSlots() {
     return gearSlots;
   }
 
-  @Override public JsonObject getGear() {
+  @Override
+  public JsonObject getGear() {
     return gear;
   }
 }
