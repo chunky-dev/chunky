@@ -989,6 +989,10 @@ public class Sky implements JsonSerializable {
     int target = 1;
     double t_offset = 0;
     if (oy < offsetY || oy > cloudTop) {
+      if (Math.abs(ray.d.y) < Ray.EPSILON) {
+        // ignore almost horizontal intersections that result in huge t_offset and negative t (issue #1664)
+        return false;
+      }
       if (ray.d.y > 0) {
         t_offset = (offsetY - oy) / ray.d.y;
       } else {
@@ -1126,7 +1130,9 @@ public class Sky implements JsonSerializable {
         return false;
       }
       ray.setNormal(nx, ny, nz);
-      enterCloud(ray, t + t_offset);
+      t += t_offset;
+      assert t >= 0 : "t negative, t_offset=" + t_offset;
+      enterCloud(ray, t);
       return true;
     } else {
       if (t > tExit) {
