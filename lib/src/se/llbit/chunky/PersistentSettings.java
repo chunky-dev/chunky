@@ -63,6 +63,7 @@ public final class PersistentSettings {
   public static final double DEFAULT_FOG_BLUE = 1;
 
   public static final int DEFAULT_RAY_DEPTH = 5;
+  public static final int DEFAULT_MIN_RAY_DEPTH = 3;
   public static final int DEFAULT_BRANCH_COUNT = 10;
   public static final int DEFAULT_SPP_TARGET = 1000;
 
@@ -272,11 +273,20 @@ public final class PersistentSettings {
     save();
   }
 
+  public static void setMinRayDepth(int rayDepth) {
+    settings.setInt("minRayDepth", rayDepth);
+    save();
+  }
+
   /**
    * @return the default configured ray depth
    */
   public static int getRayDepthDefault() {
     return settings.getInt("rayDepth", DEFAULT_RAY_DEPTH);
+  }
+
+  public static int getMinRayDepthDefault() {
+    return settings.getInt("minRayDepth", DEFAULT_MIN_RAY_DEPTH);
   }
 
   public static int get3DCanvasHeight() {

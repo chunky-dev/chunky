@@ -191,6 +191,10 @@ public class Scene implements JsonSerializable {
    * Recursive ray depth limit (not including Russian Roulette).
    */
   protected int rayDepth = PersistentSettings.getRayDepthDefault();
+  /**
+   * Minimum number of ray bounces before Russian Roulette starts.
+   */
+  protected int minRayDepth = PersistentSettings.getMinRayDepthDefault();
   protected String worldPath = "";
   protected int worldDimension = 0;
   protected RenderMode mode = RenderMode.PREVIEW;
@@ -1710,10 +1714,29 @@ public class Scene implements JsonSerializable {
   }
 
   /**
+   * Set the minimum recursive ray depth before Russian Roulette starts
+   */
+  public synchronized void setMinRayDepth(int value) {
+    value = Math.max(1, value);
+    if (minRayDepth != value) {
+      minRayDepth = value;
+      PersistentSettings.setMinRayDepth(minRayDepth);
+      refresh();
+    }
+  }
+
+  /**
    * @return Recursive ray depth limit
    */
   public int getRayDepth() {
     return rayDepth;
+  }
+
+  /**
+   * @return Minimum ray depth before Russion Roulette is applied
+   */
+  public int getMinRayDepth() {
+    return minRayDepth;
   }
 
   /**
@@ -1963,6 +1986,7 @@ public class Scene implements JsonSerializable {
     sppTarget = other.sppTarget;
     branchCount = other.branchCount;
     rayDepth = other.rayDepth;
+    minRayDepth = other.minRayDepth;
     mode = other.mode;
     pictureExportFormat = other.pictureExportFormat;
     cameraPresets = other.cameraPresets;
@@ -2648,6 +2672,7 @@ public class Scene implements JsonSerializable {
     json.add("sppTarget", sppTarget);
     json.add("branchCount", branchCount);
     json.add("rayDepth", rayDepth);
+    json.add("minRayDepth", minRayDepth);
     json.add("pathTrace", mode != RenderMode.PREVIEW);
     json.add("dumpFrequency", dumpFrequency);
     json.add("saveSnapshots", saveSnapshots);
@@ -2904,6 +2929,7 @@ public class Scene implements JsonSerializable {
     sppTarget = json.get("sppTarget").intValue(sppTarget);
     branchCount = json.get("branchCount").intValue(branchCount);
     rayDepth = json.get("rayDepth").intValue(rayDepth);
+    minRayDepth = json.get("minRayDepth").intValue(minRayDepth);
     if (!json.get("pathTrace").isUnknown()) {
       boolean pathTrace = json.get("pathTrace").boolValue(false);
       if (pathTrace) {
