@@ -3,6 +3,7 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.AnimatedTexture;
+import se.llbit.chunky.world.Material;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -42,7 +43,7 @@ public abstract class AnimatedQuadModel extends QuadModel {
     Quad[] quads = getQuads();
     AnimatedTexture[] textures = getTextures();
     Tint[] tintedQuads = getTints();
-
+    Material mat = ray.getCurrentMaterial();
     // The animation frame to use
     int j = (int) (scene.getAnimationTime() * animationMode.framerate);
     if (animationMode.positional) {
@@ -58,11 +59,11 @@ public abstract class AnimatedQuadModel extends QuadModel {
       Quad quad = quads[i];
       if (quad.intersect(ray)) {
         float[] c = textures[i].getColor(ray.u, ray.v, j);
-        if (c[3] > Ray.EPSILON) {
+        if (c[3] > Ray.EPSILON || mat.refractive) {
           tint = tintedQuads == null ? Tint.NONE : tintedQuads[i];
           color = c;
           ray.t = ray.tNext;
-          if (quad.doubleSided)
+          if (quad.doubleSided || mat.refractive)
             ray.orientNormal(quad.n);
           else
             ray.setNormal(quad.n);
