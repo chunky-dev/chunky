@@ -37,6 +37,7 @@ import se.llbit.math.*;
 import se.llbit.math.primitive.Box;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.JsonUtil;
 import se.llbit.util.mojangapi.MinecraftProfile;
@@ -73,8 +74,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   }
 
   public PlayerEntity(PlayerEntityData data) {
-    this(data.uuid, new Vector3(data.x, data.y, data.z), data.rotation, data.pitch,
-      buildGear(data));
+    this(data.uuid, new Vector3(data.x, data.y, data.z), data.rotation, data.pitch, buildGear(data));
   }
 
   protected PlayerEntity(String uuid, Vector3 position, double rotationDegrees, double pitchDegrees,
@@ -105,6 +105,16 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     this.headScale = settings.get("headScale").doubleValue(1.0);
     this.pose = settings.get("pose").object();
     this.gear = settings.get("gear").object();
+  }
+
+  static JsonObject parseEquipment(CompoundTag equipmentTag) {
+    JsonObject equipment = new JsonObject();
+    for (NamedTag tag : equipmentTag) {
+      if (tag.tag.isCompoundTag()) {
+        equipment.add(tag.name, parseItem(tag.tag.asCompound()));
+      }
+    }
+    return equipment;
   }
 
   static JsonObject parseItem(CompoundTag tag) {
@@ -164,18 +174,24 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   }
 
   static JsonObject buildGear(PlayerEntityData data) {
-    JsonObject gear = new JsonObject();
-    if (!data.chestplate.asCompound().isEmpty()) {
-      gear.add("chest", parseItem(data.chestplate.asCompound()));
-    }
-    if (!data.feet.asCompound().isEmpty()) {
-      gear.add("feet", parseItem(data.feet.asCompound()));
-    }
-    if (!data.head.asCompound().isEmpty()) {
-      gear.add("head", parseItem(data.head.asCompound()));
-    }
-    if (!data.legs.asCompound().isEmpty()) {
-      gear.add("legs", parseItem(data.legs.asCompound()));
+    JsonObject gear;
+    if (data.equipment != null) {
+      // 25w03a or later
+      gear = parseEquipment(data.equipment);
+    } else {
+      gear = new JsonObject();
+      if (!data.chestplate.asCompound().isEmpty()) {
+        gear.add("chest", parseItem(data.chestplate.asCompound()));
+      }
+      if (!data.feet.asCompound().isEmpty()) {
+        gear.add("feet", parseItem(data.feet.asCompound()));
+      }
+      if (!data.head.asCompound().isEmpty()) {
+        gear.add("head", parseItem(data.head.asCompound()));
+      }
+      if (!data.legs.asCompound().isEmpty()) {
+        gear.add("legs", parseItem(data.legs.asCompound()));
+      }
     }
     return gear;
   }
@@ -815,55 +831,91 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         case "leather_boots":
         case "leather_helmet":
         case "leather_chestplate":
-          loader = leatherTexture("models/armor/leather_layer_1",
-            item.get("color").intValue(0x96613A), texture);
+          loader = new AlternateTextures(
+            leatherTexture("entity/equipment/humanoid/leather",
+              item.get("color").intValue(0x96613A), texture),
+            leatherTexture("models/armor/leather_layer_1",
+              item.get("color").intValue(0x96613A), texture));
           break;
         case "leather_leggings":
-          loader = leatherTexture("models/armor/leather_layer_2",
-            item.get("color").intValue(0x96613A), texture);
+          loader = new AlternateTextures(
+            leatherTexture("entity/equipment/humanoid_leggings/leather",
+              item.get("color").intValue(0x96613A), texture),
+            leatherTexture("models/armor/leather_layer_2",
+              item.get("color").intValue(0x96613A), texture));
           break;
         case "golden_boots":
         case "golden_helmet":
         case "golden_chestplate":
-          loader = simpleTexture("models/armor/gold_layer_1", texture);
+          loader = new AlternateTextures(
+            simpleTexture("entity/equipment/humanoid/gold", texture),
+            simpleTexture("models/armor/gold_layer_1", texture));
           break;
         case "golden_leggings":
-          loader = simpleTexture("models/armor/gold_layer_2", texture);
+          loader = new AlternateTextures(
+            simpleTexture("entity/equipment/humanoid_leggings/gold", texture),
+            simpleTexture("models/armor/gold_layer_2", texture));
           break;
         case "iron_boots":
         case "iron_helmet":
         case "iron_chestplate":
-          loader = simpleTexture("models/armor/iron_layer_1", texture);
+          loader = new AlternateTextures(
+            simpleTexture("entity/equipment/humanoid/iron", texture),
+            simpleTexture("models/armor/iron_layer_1", texture));
           break;
         case "iron_leggings":
-          loader = simpleTexture("models/armor/iron_layer_2", texture);
+          loader = new AlternateTextures(
+            simpleTexture("entity/equipment/humanoid_leggings/iron", texture),
+            loader = simpleTexture("models/armor/iron_layer_2", texture));
           break;
         case "chainmail_boots":
         case "chainmail_helmet":
         case "chainmail_chestplate":
-          loader = simpleTexture("models/armor/chainmail_layer_1", texture);
+          loader = new AlternateTextures(
+            simpleTexture("entity/equipment/humanoid/chainmail", texture),
+            simpleTexture("models/armor/chainmail_layer_1", texture));
           break;
         case "chainmail_leggings":
-          loader = simpleTexture("models/armor/chainmail_layer_2", texture);
+          loader = new AlternateTextures(
+            simpleTexture("entity/equipment/humanoid_leggings/chainmail", texture),
+            simpleTexture("models/armor/chainmail_layer_2", texture));
           break;
         case "diamond_boots":
         case "diamond_helmet":
         case "diamond_chestplate":
-          loader = simpleTexture("models/armor/diamond_layer_1", texture);
+          loader = new AlternateTextures(
+            simpleTexture("entity/equipment/humanoid/diamond", texture),
+            simpleTexture("models/armor/diamond_layer_1", texture));
           break;
         case "diamond_leggings":
-          loader = simpleTexture("models/armor/diamond_layer_2", texture);
+          loader = new AlternateTextures(
+            simpleTexture("entity/equipment/humanoid_leggings/diamond", texture),
+            simpleTexture("models/armor/diamond_layer_2", texture));
           break;
         case "netherite_boots":
         case "netherite_helmet":
         case "netherite_chestplate":
-          loader = simpleTexture("models/armor/netherite_layer_1", texture);
+          loader = new AlternateTextures(
+            simpleTexture("entity/equipment/humanoid/netherite", texture),
+            simpleTexture("models/armor/netherite_layer_1", texture));
           break;
         case "netherite_leggings":
-          loader = simpleTexture("models/armor/netherite_layer_2", texture);
+          loader = new AlternateTextures(
+            simpleTexture("entity/equipment/humanoid_leggings/netherite", texture),
+            simpleTexture("models/armor/netherite_layer_2", texture));
+          break;
+        case "copper_boots":
+        case "copper_helmet":
+        case "copper_chestplate":
+          loader = simpleTexture("entity/equipment/humanoid/copper", texture);
+          break;
+        case "copper_leggings":
+          loader = simpleTexture("entity/equipment/humanoid_leggings/copper", texture);
           break;
         case "turtle_helmet":
-          loader = simpleTexture("models/armor/turtle_layer_1", texture);
+          loader = new AlternateTextures(
+            simpleTexture("entity/equipment/humanoid/turtle_scute", texture),
+            simpleTexture("models/armor/turtle_layer_1", texture));
           break;
         case "player_head":
           String skin = item.get("skin").asString("");
