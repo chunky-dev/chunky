@@ -1184,7 +1184,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("tall_dry_grass", (name, tag) -> new SpriteBlock(name, Texture.tallDryGrass));
     addBlock("dried_ghast", (name, tag) -> new DriedGhast(BlockProvider.facing(tag), BlockProvider.stringToInt(tag.get("Properties").get("hydration"), 0)));
 
-    // 1.21.x (2025 Fall Drop)
+    // 1.21.9 (The Copper Age drop)
     for (String s : new String[]{"", "waxed_"}) {
       addBlock(s + "lightning_rod", (name, tag) -> new LightningRod(name, Texture.lightningRod, BlockProvider.facing(tag, "up"),
         tag.get("Properties").get("powered").stringValue("false").equals("true")));
@@ -1233,6 +1233,10 @@ public class MinecraftBlockProvider implements BlockProvider {
       tag.get("Properties").get("copper_golem_pose").stringValue("standing")),
       "copper_golem_statue", "waxed_copper_golem_statue", "exposed_copper_golem_statue", "waxed_exposed_copper_golem_statue",
       "weathered_copper_golem_statue", "waxed_weathered_copper_golem_statue", "oxidized_copper_golem_statue", "waxed_oxidized_copper_golem_statue");
+
+    // 26.1 (2026 Spring Drop)
+    addBlock("golden_dandelion", (name, tag) -> new SpriteBlock(name, Texture.goldenDandelion));
+    addBlock("potted_golden_dandelion", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.GOLDEN_DANDELION));
   }
 
   @Override
