@@ -1655,7 +1655,7 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/dried_ghast_hydration_3_tentacles")
   public static final Texture driedGhastHydration3Tentacles = new Texture();
 
-  // [1.21.x (2025 Fall Drop)]
+  // [1.21.9 (The Copper Age drop)]
   @TexturePath("assets/minecraft/textures/block/exposed_lightning_rod")
   public static final Texture exposedLightningRod = new Texture();
   @TexturePath("assets/minecraft/textures/block/oxidized_lightning_rod")
@@ -1732,6 +1732,10 @@ public class Texture {
   public static final Texture copperGolemWeathered = new Texture();
   @TexturePath("assets/minecraft/textures/entity/copper_golem/oxidized_copper_golem")
   public static final Texture copperGolemOxidized = new Texture();
+
+  // [26.1 (2026 Spring Drop)]
+  @TexturePath("assets/minecraft/textures/block/golden_dandelion")
+  public static final Texture goldenDandelion = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
