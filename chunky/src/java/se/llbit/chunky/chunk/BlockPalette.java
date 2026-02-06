@@ -291,6 +291,11 @@ public class BlockPalette {
       block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.9);
     });
+    materialProperties.put("minecraft:light_weighted_pressure_plate", block -> {
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.9);
+    });
     materialProperties.put("minecraft:raw_gold_block", block -> {
       block.metalness = 0.8f;
       block.setPerceptualSmoothness(0.5);
@@ -299,6 +304,11 @@ public class BlockPalette {
       block.specular = 0.04f;
     });
     materialProperties.put("minecraft:iron_block", block -> {
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.9);
+    });
+    materialProperties.put("minecraft:heavy_weighted_pressure_plate", block -> {
       block.specular = 0.04f;
       block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.9);
