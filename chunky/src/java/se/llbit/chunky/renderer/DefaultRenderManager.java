@@ -294,6 +294,12 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         getRenderer().sceneReset(this, reason, resetCount);
         getPreviewRenderer().sceneReset(this, reason, resetCount);
 
+        // Reset sps rolling average
+        spp_history.clear();
+        spp_history_times.clear();
+        spp_history.addLast(0);
+        spp_history_times.addLast(0.0);
+
         // Select the correct renderer
         Renderer render = mode == RenderMode.PREVIEW ? getPreviewRenderer() : getRenderer();
 
@@ -376,13 +382,20 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     }
   }
 
+  private static final int SPS_AVERAGE_TIME = 30;
+  private LinkedList<Integer> spp_history = new LinkedList<Integer>();
+  private LinkedList<Double> spp_history_times = new LinkedList<Double>();
+
   /**
    * @return the current rendering speed in samples per second (SPS)
    */
   private int samplesPerSecond() {
     long pixelsPerFrame = bufferedScene.canvasConfig.getPixelCount();
     double renderTime = bufferedScene.renderTime / 1000.0;
-    return (int) ((bufferedScene.spp * pixelsPerFrame) / renderTime);
+
+    double timeDiff = renderTime - spp_history_times.getFirst();
+    int sppDiff = bufferedScene.spp - spp_history.getFirst();
+    return (int) (sppDiff * pixelsPerFrame / timeDiff);
   }
 
   private void updateRenderProgress() {
@@ -401,6 +414,15 @@ public class DefaultRenderManager extends Thread implements RenderManager {
     }
 
     synchronized (this) {
+      // Update list of spp values
+      spp_history_times.addLast(renderTime);
+      spp_history.addLast(bufferedScene.spp);
+      // These lists shouldn't contain information older than SPS_AVERAGE_TIME, but must contain at least one old value
+      while ((spp_history_times.getFirst() + SPS_AVERAGE_TIME < renderTime) && (spp_history_times.size() > 2)) {
+        spp_history_times.removeFirst();
+        spp_history.removeFirst();
+      }
+
       // Update render status display.
       renderStatusListeners.forEach(listener -> {
         listener.setRenderTime(bufferedScene.renderTime);
