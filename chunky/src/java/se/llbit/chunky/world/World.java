@@ -336,13 +336,17 @@ public class World implements Comparable<World> {
    * @return Resource pack file/directory or empty optional if this world has no bundled resource pack
    */
   public Optional<File> getResourcePack() {
-    File resourcePack = new File(getWorldDirectory(), "resources.zip");
+    for (File resourcepacksDirectory : new File[]{getWorldDirectory(), new File(getWorldDirectory(), "resourcepacks")}) {
+      if (resourcepacksDirectory.isDirectory()) {
+        File resourcePack = new File(resourcepacksDirectory, "resources.zip");
     if (resourcePack.isFile()) {
       return Optional.of(resourcePack);
     }
-    resourcePack = new File(getWorldDirectory(), "resources");
+        resourcePack = new File(resourcepacksDirectory, "resources");
     if (resourcePack.isDirectory()) {
       return Optional.of(resourcePack);
+        }
+      }
     }
     return Optional.empty();
   }
