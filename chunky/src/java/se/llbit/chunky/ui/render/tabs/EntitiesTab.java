@@ -245,19 +245,20 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
                 return true;
               } else { // Otherwise, search by Username
                 String uuid = MojangApi.usernameToUUID(playerIdentifier);
-                profile = MojangApi.fetchProfile(uuid);
-                skin = profile.getSkin();
-                if (skin.isPresent()) {
-                  downloadAndApplySkinForPlayer(
-                    skin.get(),
-                    player,
-                    playerModel,
-                    skinField
-                  );
-                  return true;
-                } else { //If still not found, warn user.
-                  Log.warn("Could not find player with that identifier");
+                if (uuid != null) {
+                  profile = MojangApi.fetchProfile(uuid);
+                  skin = profile.getSkin();
+                  if (skin.isPresent()) {
+                    downloadAndApplySkinForPlayer(
+                      skin.get(),
+                      player,
+                      playerModel,
+                      skinField
+                    );
+                    return true;
+                  }
                 }
+                Log.warn("Could not find player with that identifier");
               }
             } catch (IOException ex) {
               Log.warn("Could not download skin", ex);
