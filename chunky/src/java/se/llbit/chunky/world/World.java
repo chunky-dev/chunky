@@ -21,9 +21,11 @@ import se.llbit.math.Vector3i;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.MinecraftText;
+import se.llbit.util.UuidUtil;
 import se.llbit.util.annotation.NotNull;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
@@ -40,15 +42,6 @@ public class World implements Comparable<World> {
   /** The currently supported NBT version of level.dat files. */
   public static final int NBT_VERSION = 19133;
 
-  /** Overworld dimension index. */
-  public static final int OVERWORLD_DIMENSION = 0;
-
-  /** Nether dimension index. */
-  public static final int NETHER_DIMENSION = -1;
-
-  /** End dimension index. */
-  public static final int END_DIMENSION = 1;
-
   /** Default sea water level. */
   public static final int SEA_LEVEL = 63;
 
@@ -59,7 +52,6 @@ public class World implements Comparable<World> {
   private final File worldDirectory;
 
   protected Dimension currentDimension;
-  protected int currentDimensionId;
 
   private final String levelName;
   private int gameMode = 0;
@@ -69,6 +61,8 @@ public class World implements Comparable<World> {
 
   /** Timestamp for level.dat when player data was last loaded. */
   private long timestamp;
+
+  private Optional<UUID> singleplayerPlayerUuid;
 
   /**
    * @param levelName name of the world (not the world directory).
@@ -88,8 +82,8 @@ public class World implements Comparable<World> {
     SILENT
   }
 
-  public void loadDimension(int dimensionId) {
-    currentDimension = loadDimension(this, this.worldDirectory, dimensionId, -1, Collections.emptySet());
+  public void loadDimension(Dimension.Identifier dimensionId) {
+    currentDimension = loadDimension(this, this.worldDirectory, dimensionId, Collections.emptySet());
     currentDimension.reloadPlayerData();
   }
 
@@ -98,7 +92,7 @@ public class World implements Comparable<World> {
    *
    * @return {@code true} if the world data was loaded
    */
-  public static World loadWorld(File worldDirectory, int dimensionId, LoggedWarnings warnings) {
+  public static World loadWorld(File worldDirectory, Dimension.Identifier dimensionId, LoggedWarnings warnings) {
     if (worldDirectory == null) {
       return EmptyWorld.INSTANCE;
     }
@@ -113,6 +107,7 @@ public class World implements Comparable<World> {
       request.add(".Data.Version.Id");
       request.add(".Data.RandomSeed");
       request.add(".Data.Player");
+      request.add(".Data.singleplayer_uuid");
       request.add(".Data.LevelName");
       request.add(".Data.GameType");
       request.add(".Data.isCubicWorld");
@@ -128,6 +123,7 @@ public class World implements Comparable<World> {
       Tag spawnX = player.get("SpawnX");
       Tag spawnY = player.get("SpawnY");
       Tag spawnZ = player.get("SpawnZ");
+      Tag singleplayerUuid = result.get(".Data.singleplayer_uuid");
       Tag gameType = result.get(".Data.GameType");
       Tag randomSeed = result.get(".Data.RandomSeed");
       levelName = MinecraftText.removeFormatChars(result.get(".Data.LevelName").stringValue(levelName));
@@ -139,8 +135,13 @@ public class World implements Comparable<World> {
       World world = new World(levelName, worldDirectory, seed, modtime);
       world.gameMode = gameType.intValue(0);
       world.versionId = versionId.intValue();
+      if (singleplayerUuid.isIntArray(4)) {
+        world.singleplayerPlayerUuid = Optional.of(UuidUtil.intsToUuid(singleplayerUuid.intArray()));
+      } else if (!player.isError()) {
+        world.singleplayerPlayerUuid = Optional.of(PlayerEntityData.getUuid(player));
+      }
 
-      Dimension dimension = loadDimension(world, worldDirectory, dimensionId, modtime, playerEntities);
+      Dimension dimension = loadDimension(world, worldDirectory, dimensionId, playerEntities);
 
       boolean haveSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
       if (haveSpawnPos) {
@@ -163,26 +164,30 @@ public class World implements Comparable<World> {
   }
 
   @NotNull
-  private static Dimension loadDimension(World world, File worldDirectory, int dimensionId, long modtime, Set<PlayerEntityData> playerEntities) {
-    Dimension dimension;
-    File dimensionDirectory = dimensionId == 0 ? worldDirectory : new File(worldDirectory, "DIM" + dimensionId);
-    if (new File(dimensionDirectory, "region3d").exists()) {
-      dimension = new CubicDimension(world, dimensionId, dimensionDirectory, playerEntities, modtime);
-    } else {
-      dimension = new Dimension(world, dimensionId, dimensionDirectory, playerEntities, modtime);
+  private static Dimension loadDimension(World world, File worldDirectory, Dimension.Identifier dimensionId, Set<PlayerEntityData> playerEntities) {
+    File dimensionDirectory = Path.of(worldDirectory.getPath(), "dimensions", dimensionId.namespace(), dimensionId.name()).toFile();
+    if (dimensionDirectory.exists()) {
+      // 26.1-snapshot-6 or later
+      return new Dimension(world, dimensionId, dimensionDirectory, playerEntities);
     }
-    return dimension;
+
+    dimensionDirectory = dimensionId == Dimension.Identifier.OVERWORLD ? worldDirectory : new File(worldDirectory, "DIM" + dimensionId);
+    if (new File(dimensionDirectory, "region3d").exists()) {
+      return new CubicDimension(world, dimensionId, dimensionDirectory, playerEntities);
+    } else {
+      return new Dimension(world, dimensionId, dimensionDirectory, playerEntities);
+    }
   }
 
   @NotNull
-  private static Set<PlayerEntityData> getPlayerEntityData(File worldDirectory, int dimensionId, Tag player) {
+  private static Set<PlayerEntityData> getPlayerEntityData(File worldDirectory, Dimension.Identifier dimensionId, Tag player) {
     Set<PlayerEntityData> playerEntities = new HashSet<>();
     if (!player.isError()) {
       playerEntities.add(new PlayerEntityData(player));
     }
     loadAdditionalPlayers(worldDirectory, playerEntities);
     // Filter for the players only within the requested dimension
-    playerEntities = playerEntities.stream().filter(playerData -> playerData.dimension == dimensionId).collect(Collectors.toSet());
+    playerEntities = playerEntities.stream().filter(playerData -> playerData.dimension.equals(dimensionId)).collect(Collectors.toSet());
     return playerEntities;
   }
 
@@ -207,10 +212,17 @@ public class World implements Comparable<World> {
          DataInputStream in = new DataInputStream(gzin)) {
       Set<String> request = new HashSet<>();
       request.add(".Data.Player");
+      request.add(".Data.singleplayer_uuid");
       Map<String, Tag> result = NamedTag.quickParse(in, request);
       Tag player = result.get(".Data.Player");
+      Tag singleplayerUuid = result.get(".Data.singleplayer_uuid");
+      if (singleplayerUuid.isIntArray(4)) {
+        singleplayerPlayerUuid = Optional.of(UuidUtil.intsToUuid(singleplayerUuid.intArray()));
+      } else if (!player.isError()) {
+        singleplayerPlayerUuid = Optional.of(PlayerEntityData.getUuid(player));
+      }
 
-      currentDimension.setPlayerEntities(getPlayerEntityData(worldDirectory, currentDimensionId, player));
+      currentDimension.setPlayerEntities(getPlayerEntityData(worldDirectory, currentDimension.getDimensionId(), player));
     } catch (IOException e) {
       Log.infof("Could not read the level.dat file for world %s while trying to reload player data!", levelName);
       return false;
@@ -247,13 +259,9 @@ public class World implements Comparable<World> {
     return this.currentDimension;
   }
 
-  /**
-   * @return The current dimension
-   */
-  public synchronized int currentDimensionId() {
-    return this.currentDimensionId;
+  public Optional<UUID> getSingleplayerPlayerUuid() {
+    return singleplayerPlayerUuid;
   }
-
 
   /**
    * @return The world directory

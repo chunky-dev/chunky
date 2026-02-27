@@ -23,6 +23,7 @@ import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.biome.BiomeData;
+import se.llbit.chunky.world.Dimension;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.Chunk;
@@ -46,7 +47,7 @@ public class SurfaceLayer extends BitmapLayer {
    * @param dim current dimension
    * @param chunkData data for the chunk
    */
-  public SurfaceLayer(int dim, ChunkData chunkData, BlockPalette palette, BiomePalette biomePalette, int yMin, int yMax, int[] heightmapData) {
+  public SurfaceLayer(Dimension.Identifier dim, ChunkData chunkData, BlockPalette palette, BiomePalette biomePalette, int yMin, int yMax, int[] heightmapData) {
     bitmap = new int[Chunk.X_MAX * Chunk.Z_MAX];
     topo = new int[Chunk.X_MAX * Chunk.Z_MAX];
     BiomeData biomeData = chunkData.getBiomeData();
@@ -61,7 +62,7 @@ public class SurfaceLayer extends BitmapLayer {
             break;
           }
         }
-        if (dim == -1) {
+        if (dim.equals(Dimension.Identifier.THE_NETHER)) {
           // Nether worlds have a ceiling that we want to skip.
           for (; y > minY+1; --y) {
             if (palette.get(chunkData.getBlockAt(x, y, z)) == Air.INSTANCE) {

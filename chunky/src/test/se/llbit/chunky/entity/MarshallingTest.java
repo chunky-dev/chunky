@@ -26,12 +26,14 @@ import se.llbit.nbt.CompoundTag;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.UUID;
+
 /**
  * Test entity marshalling/unmarshalling to/from JSON.
  */
 public class MarshallingTest {
   @Test public void testPlayer() {
-    PlayerEntity entity = new PlayerEntity("1234", new Vector3(100, 200, 300));
+    PlayerEntity entity = new PlayerEntity(UUID.fromString("61699b2e-d327-4a01-9f1e-0ea8c3f06bc6"), new Vector3(100, 200, 300));
     JsonArray headPose = new JsonArray();
     headPose.add(Json.of(33));
     headPose.add(Json.of(66));

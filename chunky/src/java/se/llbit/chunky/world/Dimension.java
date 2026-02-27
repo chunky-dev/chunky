@@ -6,9 +6,9 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.chunk.SimpleChunkData;
+import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
-import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.world.listeners.ChunkDeletionListener;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
@@ -24,6 +24,45 @@ import java.util.*;
  *
  */
 public class Dimension {
+  public record Identifier(String namespace, String name) {
+    public static Identifier OVERWORLD = new Identifier("minecraft", "overworld");
+    public static Identifier THE_NETHER = new Identifier("minecraft", "the_nether");
+    public static Identifier THE_END = new Identifier("minecraft", "the_end");
+
+    public static Identifier fromNamespacedName(String name) {
+      return switch (name) {
+        case "minecraft:overworld" -> OVERWORLD;
+        case "minecraft:the_end" -> THE_END;
+        case "minecraft:the_nether" -> THE_NETHER;
+        default -> {
+          String[] parts = name.split(":", 2);
+          if (parts.length != 2) {
+            System.out.println("BANG BANG!!" + name);
+            throw new IllegalArgumentException("Bad dimension name: " + name);
+          }
+          yield new Identifier(parts[0], parts[1]);
+        }
+      };
+    }
+
+    public static Identifier fromLegacyId(int id) {
+      return switch (id) {
+        case -1 -> THE_NETHER;
+        case 1 -> THE_END;
+        default -> OVERWORLD;
+      };
+    }
+
+    public String getNamespacedName() {
+      return namespace + ":" + name;
+    }
+
+    @Override
+    public String toString() {
+      return getNamespacedName();
+    }
+  }
+
   private final World world;
 
   protected final Long2ObjectMap<Region> regionMap = new Long2ObjectOpenHashMap<>();
@@ -33,7 +72,7 @@ public class Dimension {
 
   private final Heightmap heightmap = new Heightmap();
 
-  private final int dimensionId;
+  private final Identifier dimensionId;
 
   private final Collection<ChunkDeletionListener> chunkDeletionListeners = new LinkedList<>();
   private final Collection<ChunkTopographyListener> chunkTopographyListeners = new LinkedList<>();
@@ -41,41 +80,41 @@ public class Dimension {
 
   private Vector3i spawnPos = null;
 
-  /** Timestamp for level.dat when player data was last loaded. */
-  private long timestamp;
-
   /**
    * @param dimensionDirectory Minecraft world directory.
-   * @param timestamp
    */
-  protected Dimension(World world, int dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, long timestamp) {
+  protected Dimension(World world, Identifier dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities) {
     this.world = world;
     this.dimensionId = dimensionId;
     this.dimensionDirectory = dimensionDirectory;
     this.playerEntities = playerEntities;
-    this.timestamp = timestamp;
   }
 
-  public int getDimensionId() {
+  public Identifier getDimensionId() {
     return dimensionId;
   }
 
-   /**
+  /**
    * Reload player data.
+   *
    * @return {@code true} if player data was reloaded.
    */
   public synchronized boolean reloadPlayerData() {
     return this.world.reloadPlayerData();
   }
 
-  /** Add a chunk deletion listener. */
+  /**
+   * Add a chunk deletion listener.
+   */
   public void addChunkDeletionListener(ChunkDeletionListener listener) {
     synchronized (chunkDeletionListeners) {
       chunkDeletionListeners.add(listener);
     }
   }
 
-  /** Add a region discovery listener. */
+  /**
+   * Add a region discovery listener.
+   */
   public void addChunkUpdateListener(ChunkUpdateListener listener) {
     synchronized (chunkUpdateListeners) {
       chunkUpdateListeners.add(listener);
@@ -141,7 +180,9 @@ public class Dimension {
     return getRegion(pos);
   }
 
-  /** Set the region for the given position. */
+  /**
+   * Set the region for the given position.
+   */
   public synchronized void setRegion(RegionPosition pos, Region region) {
     regionMap.put(pos.getLong(), region);
   }
@@ -156,7 +197,7 @@ public class Dimension {
   }
 
   /**
-   * @param pos Position of the region to load
+   * @param pos  Position of the region to load
    * @param minY Minimum block Y (inclusive)
    * @param maxY Maximum block Y (exclusive)
    * @return Whether the region exists
@@ -188,8 +229,11 @@ public class Dimension {
    */
   public synchronized Optional<Vector3> getPlayerPos() {
     if (!playerEntities.isEmpty()) {
-      PlayerEntityData pos = playerEntities.iterator().next();
-      return Optional.of(new Vector3(pos.x, pos.y, pos.z));
+      return world.getSingleplayerPlayerUuid()
+        .flatMap(uuid -> playerEntities.stream()
+          .filter(player -> player.uuid.equals(uuid))
+          .map(pos -> new Vector3(pos.x, pos.y, pos.z))
+          .findFirst());
     } else {
       return Optional.empty();
     }
@@ -202,14 +246,18 @@ public class Dimension {
     return heightmap;
   }
 
-  /** Called when a new region has been discovered by the region parser. */
+  /**
+   * Called when a new region has been discovered by the region parser.
+   */
   public void regionDiscovered(RegionPosition pos) {
     synchronized (this) {
       regionMap.computeIfAbsent(pos.getLong(), p -> createRegion(pos));
     }
   }
 
-  /** Notify region update listeners. */
+  /**
+   * Notify region update listeners.
+   */
   private void fireChunkUpdated(ChunkPosition chunk) {
     synchronized (chunkUpdateListeners) {
       for (ChunkUpdateListener listener : chunkUpdateListeners) {
@@ -218,7 +266,9 @@ public class Dimension {
     }
   }
 
-  /** Notify region update listeners. */
+  /**
+   * Notify region update listeners.
+   */
   private void fireRegionUpdated(RegionPosition region) {
     synchronized (chunkUpdateListeners) {
       for (ChunkUpdateListener listener : chunkUpdateListeners) {
@@ -227,28 +277,37 @@ public class Dimension {
     }
   }
 
-  @Override public String toString() {
-    return dimensionDirectory.getName() ;
+  @Override
+  public String toString() {
+    return dimensionDirectory.getName();
   }
 
-  /** Called when a chunk has been updated. */
+  /**
+   * Called when a chunk has been updated.
+   */
   public void chunkUpdated(ChunkPosition chunk) {
     fireChunkUpdated(chunk);
   }
 
-  /** Called when a chunk has been updated. */
+  /**
+   * Called when a chunk has been updated.
+   */
   public void regionUpdated(RegionPosition region) {
     fireRegionUpdated(region);
   }
 
-  /** Add a chunk discovery listener */
+  /**
+   * Add a chunk discovery listener
+   */
   public void addChunkTopographyListener(ChunkTopographyListener listener) {
     synchronized (chunkTopographyListeners) {
       chunkTopographyListeners.add(listener);
     }
   }
 
-  /** Remove a chunk discovery listener */
+  /**
+   * Remove a chunk discovery listener
+   */
   public void removeChunkTopographyListener(ChunkTopographyListener listener) {
     synchronized (chunkTopographyListeners) {
       chunkTopographyListeners.remove(listener);

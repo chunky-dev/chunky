@@ -114,7 +114,7 @@ public class SceneEntities {
         done += 1;
         MinecraftProfile profile;
         try {
-          profile = MojangApi.fetchProfile(entity.uuid);
+          profile = MojangApi.fetchProfile(entity.uuid.toString());
           Optional<MinecraftSkin> skin = profile.getSkin();
           if (skin.isPresent()) {
             String skinUrl = skin.get().getSkinUrl();

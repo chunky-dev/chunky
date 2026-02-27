@@ -59,13 +59,7 @@ import se.llbit.util.mojangapi.MojangApi;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initializable {
@@ -73,19 +67,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
 
   static {
     entityTypes.put("Player", (position, scene) -> {
-      Collection<Entity> entities = scene.getActors();
-      Set<String> ids = new HashSet<>();
-      for (Entity entity : entities) {
-        if (entity instanceof PlayerEntity) {
-          ids.add(((PlayerEntity) entity).uuid);
-        }
-      }
-      // Pick a new UUID for the new entity.
-      long id = System.currentTimeMillis();
-      while (ids.contains(String.format("%016X%016X", 0, id))) {
-        id += 1;
-      }
-      PlayerEntity player = new PlayerEntity(String.format("%016X%016X", 0, id), position);
+      PlayerEntity player = new PlayerEntity(UUID.randomUUID(), position);
       player.randomPoseAndLook();
       return player;
     });

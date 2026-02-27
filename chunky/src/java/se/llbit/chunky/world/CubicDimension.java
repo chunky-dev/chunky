@@ -21,10 +21,9 @@ public class CubicDimension extends Dimension {
 
   /**
    * @param dimensionDirectory Minecraft world directory.
-   * @param timestamp
    */
-  protected CubicDimension(World world, int dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, long timestamp) {
-    super(world, dimensionId, dimensionDirectory, playerEntities, timestamp);
+  protected CubicDimension(World world, Dimension.Identifier dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities) {
+    super(world, dimensionId, dimensionDirectory, playerEntities);
   }
 
   /**

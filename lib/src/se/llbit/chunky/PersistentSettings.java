@@ -451,13 +451,26 @@ public final class PersistentSettings {
     return settings.getBool("singleColorTextures", false);
   }
 
-  public static void setDimension(int value) {
-    settings.setInt("dimension", value);
+  public static void setDimension(String value) {
+    settings.setString("dimension", value);
     save();
   }
 
-  public static int getDimension() {
-    return settings.getInt("dimension", DEFAULT_DIMENSION);
+  public static String getDimension() {
+    int dimensionId = settings.getInt("dimension", 0xdeadbeef);
+    if (dimensionId == 0xdeadbeef) {
+      // dimension already is a string
+      return settings.getString("dimension", "minecraft:overworld");
+    }
+    // backward compatibility with old settings files
+    switch (dimensionId) {
+      case -1:
+        return "minecraft:the_nether";
+      case 1:
+        return "minecraft:the_end";
+      default:
+        return "minecraft:overworld";
+    }
   }
 
   public static boolean getLoadPlayers() {

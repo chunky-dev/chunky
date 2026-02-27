@@ -192,7 +192,7 @@ public class Scene implements JsonSerializable {
    */
   protected int rayDepth = PersistentSettings.getRayDepthDefault();
   protected String worldPath = "";
-  protected int worldDimension = 0;
+  protected Dimension.Identifier worldDimension = Dimension.Identifier.OVERWORLD;
   protected RenderMode mode = RenderMode.PREVIEW;
   protected int dumpFrequency = DEFAULT_DUMP_FREQUENCY;
   protected boolean saveSnapshots = false;
@@ -804,7 +804,7 @@ public class Scene implements JsonSerializable {
 
       loadedWorld = world;
       worldPath = loadedWorld.getWorldDirectory().getAbsolutePath();
-      worldDimension = world.currentDimensionId();
+      worldDimension = world.currentDimension().getDimensionId();
 
       if (chunksToLoadByRegion.isEmpty()) {
         return;
@@ -2678,7 +2678,7 @@ public class Scene implements JsonSerializable {
       // Save world info.
       JsonObject world = new JsonObject();
       world.add("path", worldPath);
-      world.add("dimension", worldDimension);
+      world.add("dimension", worldDimension.getNamespacedName());
       json.add("world", world);
     }
 
@@ -3000,7 +3000,15 @@ public class Scene implements JsonSerializable {
     if (json.get("world").isObject()) {
       JsonObject world = json.get("world").object();
       worldPath = world.get("path").stringValue(worldPath);
-      worldDimension = world.get("dimension").intValue(worldDimension);
+
+      int dimensionId = world.get("dimension").intValue(0xdeadbeef);
+      if (dimensionId == 0xdeadbeef) {
+        // dimension already is a string (or undefined)
+        worldDimension = Dimension.Identifier.fromNamespacedName(world.get("dimension").stringValue("minecraft:overworld"));
+      } else {
+        // backward compatibility with old scene files
+        worldDimension = Dimension.Identifier.fromLegacyId(world.get("dimension").intValue(0));
+      }
     }
 
     if (json.get("camera").isObject()) {
