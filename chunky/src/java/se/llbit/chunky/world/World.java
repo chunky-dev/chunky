@@ -226,6 +226,7 @@ public class World implements Comparable<World> {
   private static void loadAdditionalPlayers(File worldDirectory, Set<PlayerEntityData> playerEntities) {
     loadPlayerData(new File(worldDirectory, "players"), playerEntities);
     loadPlayerData(new File(worldDirectory, "playerdata"), playerEntities);
+    loadPlayerData(new File(new File(worldDirectory, "players"), "data"), playerEntities); // 26.1-snapshot-6 or later
   }
 
   private static void loadPlayerData(File playerdata, Set<PlayerEntityData> playerEntities) {
