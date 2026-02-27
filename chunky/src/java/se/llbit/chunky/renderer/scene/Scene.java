@@ -3001,8 +3001,7 @@ public class Scene implements JsonSerializable {
       JsonObject world = json.get("world").object();
       worldPath = world.get("path").stringValue(worldPath);
 
-      int dimensionId = world.get("dimension").intValue(0xdeadbeef);
-      if (dimensionId == 0xdeadbeef) {
+      if (world.get("dimension") instanceof JsonString) {
         // dimension already is a string (or undefined)
         worldDimension = Dimension.Identifier.fromNamespacedName(world.get("dimension").stringValue("minecraft:overworld"));
       } else {

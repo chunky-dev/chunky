@@ -18,6 +18,8 @@
 package se.llbit.chunky.world;
 
 import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.IntTag;
+import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.UuidUtil;
 
@@ -51,7 +53,7 @@ public class PlayerEntityData {
     this.rotation = rotation.get(0).floatValue();
     pitch = rotation.get(1).floatValue();
 
-    if (player.get("Dimension").intValue(0xdeadbeef) == 0xdeadbeef) {
+    if (player.get("Dimension") instanceof StringTag) {
       // 26.1-snapshot-6 or later
       this.dimension = Dimension.Identifier.fromNamespacedName(player.get("Dimension").stringValue());
     } else {

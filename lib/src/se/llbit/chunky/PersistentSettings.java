@@ -22,6 +22,7 @@ import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.fxutil.WindowPosition;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
+import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
 
 import java.io.File;
@@ -457,19 +458,20 @@ public final class PersistentSettings {
   }
 
   public static String getDimension() {
-    int dimensionId = settings.getInt("dimension", 0xdeadbeef);
-    if (dimensionId == 0xdeadbeef) {
+    if (settings.get("dimension") instanceof JsonString) {
       // dimension already is a string
       return settings.getString("dimension", "minecraft:overworld");
-    }
-    // backward compatibility with old settings files
-    switch (dimensionId) {
-      case -1:
-        return "minecraft:the_nether";
-      case 1:
-        return "minecraft:the_end";
-      default:
-        return "minecraft:overworld";
+    } else {
+      int dimensionId = settings.getInt("dimension", 0xdeadbeef);
+      // backward compatibility with old settings files
+      switch (dimensionId) {
+        case -1:
+          return "minecraft:the_nether";
+        case 1:
+          return "minecraft:the_end";
+        default:
+          return "minecraft:overworld";
+      }
     }
   }
 
