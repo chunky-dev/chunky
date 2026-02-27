@@ -191,10 +191,6 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       }
     });
 
-    MenuItem exportZip = new MenuItem("Export selected chunks…");
-    exportZip.setOnAction(e -> controller.exportZip());
-    exportZip.setDisable(chunkSelection.size() == 0);
-
     MenuItem exportPng = new MenuItem("Save map view as…");
     exportPng.setOnAction(e -> controller.exportMapView());
 
@@ -203,7 +199,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
         new SeparatorMenuItem(),
         moveCameraHere, selectVisible,
         new SeparatorMenuItem(),
-        exportZip, exportPng
+        exportPng
     );
 
     controller.getChunky()
@@ -215,7 +211,6 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       clearSelection.setDisable(noChunksSelected);
       newScene.setDisable(noChunksSelected);
       loadSelection.setDisable(noChunksSelected);
-      exportZip.setDisable(noChunksSelected);
     });
   }
 

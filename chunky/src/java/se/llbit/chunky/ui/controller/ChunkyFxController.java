@@ -59,7 +59,6 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
-import se.llbit.chunky.main.ZipExportJob;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.*;
@@ -284,24 +283,6 @@ public class ChunkyFxController
     this.chunky = chunky;
     mapView = new MapView();
     renderTracker = new GUIRenderListener(this);
-  }
-
-  /**
-   * Export the selected chunks to a zip file.
-   */
-  public synchronized void exportZip(File targetFile, ProgressTracker progress) {
-    new ZipExportJob(mapLoader.getWorld(), chunkSelection.getSelection(), targetFile, progress).start();
-  }
-
-  public void exportZip() {
-    FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Export selected chunks to Zip file");
-    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Zip archive", "*.zip"));
-    mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.levelName() + ".zip"));
-    File target = fileChooser.showSaveDialog(stage.getScene().getWindow());
-    if (target != null) {
-      exportZip(target, ProgressTracker.NONE);
-    }
   }
 
   public void exportMapView() {

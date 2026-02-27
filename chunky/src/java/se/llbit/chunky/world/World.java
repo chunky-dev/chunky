@@ -16,22 +16,17 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.chunky.ui.ProgressTracker;
-import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.log.Log;
 import se.llbit.math.Vector3i;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.MinecraftText;
-import se.llbit.util.Pair;
 import se.llbit.util.annotation.NotNull;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * The World class contains information about the currently viewed world.
@@ -277,134 +272,6 @@ public class World implements Comparable<World> {
       new File(worldDirectory, "DIM" + dimension);
   }
 
-  /**
-    @deprecated Use {@link World#currentDimension()} -> {@link Dimension#getRegionDirectory()}. Removed once there are no more usages
-   */
-  @Deprecated
-  protected synchronized File getRegionDirectory(int dimension) {
-    return new File(getDataDirectory(dimension), "region");
-  }
-
-
-  /**
-   * Export the given chunks to a Zip archive.
-   * The Zip arhive is written without compression since the chunks are
-   * already compressed with GZip.
-   *
-   * @throws IOException
-   */
-  public synchronized void exportChunksToZip(File target, Collection<ChunkPosition> chunks,
-                                             ProgressTracker progress) throws IOException {
-
-    Map<RegionPosition, Set<ChunkPosition>> regionMap = new HashMap<>();
-
-    for (ChunkPosition chunk : chunks) {
-      RegionPosition regionPosition = chunk.getRegionPosition();
-      Set<ChunkPosition> chunkSet = regionMap.computeIfAbsent(regionPosition, k -> new HashSet<>());
-      chunkSet.add(new ChunkPosition(chunk.x & 31, chunk.z & 31));
-    }
-
-    int work = 0;
-    progress.setJobSize(regionMap.size() + 1);
-
-    String regionDirectory =
-      currentDimensionId == 0 ? currentDimension().getDimensionDirectory().getName() :
-        currentDimension().getDimensionDirectory().getName() + "/DIM" + currentDimensionId;
-    regionDirectory += "/region";
-
-    try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(target))) {
-      writeLevelDatToZip(zout);
-      progress.setProgress(++work);
-
-      for (Map.Entry<RegionPosition, Set<ChunkPosition>> entry : regionMap.entrySet()) {
-
-        if (progress.isInterrupted())
-          break;
-
-        RegionPosition region = entry.getKey();
-
-        appendRegionToZip(zout, currentDimension.getRegionDirectory(), region,
-          regionDirectory + "/" + region.getMcaName(), entry.getValue());
-
-        progress.setProgress(++work);
-      }
-    }
-  }
-
-  /**
-   * Export the world to a zip file. The chunks which are included
-   * depends on the selected chunks. If any chunks are selected, then
-   * only those chunks are exported. If no chunks are selected then all
-   * chunks are exported.
-   *
-   * @throws IOException
-   */
-  public synchronized void exportWorldToZip(File target, ProgressTracker progress)
-      throws IOException {
-    System.out.println("exporting all dimensions to " + target.getName());
-
-    final Collection<Pair<File, RegionPosition>> regions = new LinkedList<>();
-
-    WorldScanner.Operator operator = (regionDirectory, x, z) ->
-        regions.add(new Pair<>(regionDirectory, new RegionPosition(x, z)));
-    // TODO make this more dynamic
-    File overworld = getRegionDirectory(OVERWORLD_DIMENSION);
-    WorldScanner.findExistingChunks(overworld, operator);
-    WorldScanner.findExistingChunks(getRegionDirectory(NETHER_DIMENSION), operator);
-    WorldScanner.findExistingChunks(getRegionDirectory(END_DIMENSION), operator);
-
-    int work = 0;
-    progress.setJobSize(regions.size() + 1);
-
-    try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(target))) {
-      writeLevelDatToZip(zout);
-      progress.setProgress(++work);
-
-      for (Pair<File, RegionPosition> region : regions) {
-
-        if (progress.isInterrupted()) {
-          break;
-        }
-
-        String regionDirectory = (region.thing1 == overworld) ?
-            worldDirectory.getName() :
-            worldDirectory.getName() + "/" + region.thing1.getParentFile().getName();
-        regionDirectory += "/region";
-        appendRegionToZip(zout, region.thing1, region.thing2,
-            regionDirectory + "/" + region.thing2.getMcaName(), null);
-
-        progress.setProgress(++work);
-      }
-    }
-  }
-
-  /**
-   * Write this worlds level.dat file to a ZipOutputStream.
-   *
-   * @throws IOException
-   */
-  private void writeLevelDatToZip(ZipOutputStream zout) throws IOException {
-    File levelDat = new File(worldDirectory, "level.dat");
-    try (FileInputStream in = new FileInputStream(levelDat)) {
-      zout.putNextEntry(new ZipEntry(worldDirectory.getName() + "/" + "level.dat"));
-      byte[] buf = new byte[4096];
-      int len;
-      while ((len = in.read(buf)) > 0) {
-        zout.write(buf, 0, len);
-      }
-      zout.closeEntry();
-    }
-  }
-
-  private void appendRegionToZip(ZipOutputStream zout, File regionDirectory,
-      RegionPosition regionPos, String regionZipFileName, Set<ChunkPosition> chunks)
-      throws IOException {
-
-    zout.putNextEntry(new ZipEntry(regionZipFileName));
-    MCRegion.writeRegion(regionDirectory, regionPos, new DataOutputStream(zout), chunks);
-    zout.closeEntry();
-  }
-
   @Override public String toString() {
     return levelName + " (" + worldDirectory.getName() + ")";
   }
@@ -434,16 +301,12 @@ public class World implements Comparable<World> {
    * @return String describing the game-mode of this world
    */
   public String gameMode() {
-    switch (gameMode) {
-      case 0:
-        return "Survival";
-      case 1:
-        return "Creative";
-      case 2:
-        return "Adventure";
-      default:
-        return "Unknown";
-    }
+    return switch (gameMode) {
+      case 0 -> "Survival";
+      case 1 -> "Creative";
+      case 2 -> "Adventure";
+      default -> "Unknown";
+    };
   }
 
   @Override public int compareTo(World o) {
