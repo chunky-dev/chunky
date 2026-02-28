@@ -171,7 +171,11 @@ public class World implements Comparable<World> {
       return new Dimension(world, dimensionId, dimensionDirectory, playerEntities);
     }
 
-    dimensionDirectory = dimensionId == Dimension.Identifier.OVERWORLD ? worldDirectory : new File(worldDirectory, "DIM" + dimensionId);
+    dimensionDirectory = switch (dimensionId.getNamespacedName()) { // TODO in Java 21+ we can use `switch (dimensionId)` here
+      case "minecraft:the_nether" -> new File(worldDirectory, "DIM-1");
+      case "minecraft:the_end" -> new File(worldDirectory, "DIM1");
+      default -> worldDirectory;
+    };
     if (new File(dimensionDirectory, "region3d").exists()) {
       return new CubicDimension(world, dimensionId, dimensionDirectory, playerEntities);
     } else {
