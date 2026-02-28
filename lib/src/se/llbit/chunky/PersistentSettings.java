@@ -67,8 +67,6 @@ public final class PersistentSettings {
   public static final int DEFAULT_BRANCH_COUNT = 10;
   public static final int DEFAULT_SPP_TARGET = 1000;
 
-  public static final int DEFAULT_DIMENSION = 0;
-
   /**
    * Default canvas width.
    */
@@ -462,7 +460,7 @@ public final class PersistentSettings {
       // dimension already is a string
       return settings.getString("dimension", "minecraft:overworld");
     } else {
-      int dimensionId = settings.getInt("dimension", 0xdeadbeef);
+      int dimensionId = settings.getInt("dimension", 0);
       // backward compatibility with old settings files
       switch (dimensionId) {
         case -1:

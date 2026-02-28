@@ -274,16 +274,6 @@ public class World implements Comparable<World> {
     return worldDirectory;
   }
 
-  /**
-   * @deprecated Use {@link World#currentDimension()} -> {@link Dimension#getDimensionDirectory()} ()}. Removed once there are no more usages
-   */
-  @Deprecated
-  protected synchronized File getDataDirectory(int dimension) {
-    return dimension == 0 ?
-      worldDirectory :
-      new File(worldDirectory, "DIM" + dimension);
-  }
-
   @Override public String toString() {
     return levelName + " (" + worldDirectory.getName() + ")";
   }
