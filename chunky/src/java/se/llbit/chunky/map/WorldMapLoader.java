@@ -46,7 +46,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   private final ChunkTopographyUpdater topographyUpdater = new ChunkTopographyUpdater();
 
   /** The dimension to load in the current world. */
-  private int currentDimensionId = PersistentSettings.getDimension();
+  private Dimension.Identifier currentDimensionId = Dimension.Identifier.fromNamespacedName(PersistentSettings.getDimension());
 
   private List<BiConsumer<World, Boolean>> worldLoadListeners = new ArrayList<>();
 
@@ -173,13 +173,11 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
 
   /**
    * Set the current dimension.
-   *
-   * @param value Must be a valid dimension index (0, -1, 1)
    */
-  public void setDimension(int value) {
+  public void setDimension(Dimension.Identifier value) {
     if (value != currentDimensionId) {
       currentDimensionId = value;
-      PersistentSettings.setDimension(currentDimensionId);
+      PersistentSettings.setDimension(currentDimensionId.getNamespacedName());
 
       loadDimension();
       viewUpdated(mapView.getMapView()); // update visible chunks immediately
@@ -187,7 +185,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   }
 
   /** Get the currently loaded dimension. */
-  public int getDimension() {
+  public Dimension.Identifier getDimension() {
     return currentDimensionId;
   }
 }

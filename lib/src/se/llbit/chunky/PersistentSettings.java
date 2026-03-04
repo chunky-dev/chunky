@@ -22,6 +22,7 @@ import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.fxutil.WindowPosition;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
+import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
 
 import java.io.File;
@@ -65,8 +66,6 @@ public final class PersistentSettings {
   public static final int DEFAULT_RAY_DEPTH = 5;
   public static final int DEFAULT_BRANCH_COUNT = 10;
   public static final int DEFAULT_SPP_TARGET = 1000;
-
-  public static final int DEFAULT_DIMENSION = 0;
 
   /**
    * Default canvas width.
@@ -451,13 +450,27 @@ public final class PersistentSettings {
     return settings.getBool("singleColorTextures", false);
   }
 
-  public static void setDimension(int value) {
-    settings.setInt("dimension", value);
+  public static void setDimension(String value) {
+    settings.setString("dimension", value);
     save();
   }
 
-  public static int getDimension() {
-    return settings.getInt("dimension", DEFAULT_DIMENSION);
+  public static String getDimension() {
+    if (settings.get("dimension") instanceof JsonString) {
+      // dimension already is a string
+      return settings.getString("dimension", "minecraft:overworld");
+    } else {
+      int dimensionId = settings.getInt("dimension", 0);
+      // backward compatibility with old settings files
+      switch (dimensionId) {
+        case -1:
+          return "minecraft:the_nether";
+        case 1:
+          return "minecraft:the_end";
+        default:
+          return "minecraft:overworld";
+      }
+    }
   }
 
   public static boolean getLoadPlayers() {

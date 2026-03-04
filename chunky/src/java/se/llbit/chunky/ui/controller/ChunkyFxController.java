@@ -59,7 +59,6 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
-import se.llbit.chunky.main.ZipExportJob;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.*;
@@ -74,11 +73,7 @@ import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.ui.RenderCanvasFx;
 import se.llbit.chunky.ui.UILogReceiver;
 import se.llbit.chunky.renderer.scene.*;
-import se.llbit.chunky.world.ChunkSelectionTracker;
-import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.EmptyWorld;
-import se.llbit.chunky.world.Icon;
-import se.llbit.chunky.world.World;
+import se.llbit.chunky.world.*;
 import se.llbit.fx.ToolPane;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.fxutil.GroupedChangeListener;
@@ -284,24 +279,6 @@ public class ChunkyFxController
     this.chunky = chunky;
     mapView = new MapView();
     renderTracker = new GUIRenderListener(this);
-  }
-
-  /**
-   * Export the selected chunks to a zip file.
-   */
-  public synchronized void exportZip(File targetFile, ProgressTracker progress) {
-    new ZipExportJob(mapLoader.getWorld(), chunkSelection.getSelection(), targetFile, progress).start();
-  }
-
-  public void exportZip() {
-    FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Export selected chunks to Zip file");
-    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Zip archive", "*.zip"));
-    mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.levelName() + ".zip"));
-    File target = fileChooser.showSaveDialog(stage.getScene().getWindow());
-    if (target != null) {
-      exportZip(target, ProgressTracker.NONE);
-    }
   }
 
   public void exportMapView() {
@@ -632,14 +609,14 @@ public class ChunkyFxController
     trackCameraBtn.selectedProperty().bindBidirectional(trackCamera);
     trackCameraBtn.setTooltip(new Tooltip("Center the map view over the camera."));
 
-    int currentDimension = mapLoader.getDimension();
-    overworldBtn.setSelected(currentDimension == World.OVERWORLD_DIMENSION);
+    Dimension.Identifier currentDimension = mapLoader.getDimension();
+    overworldBtn.setSelected(currentDimension.equals(Dimension.Identifier.OVERWORLD));
     overworldBtn.setTooltip(new Tooltip("Full of grass and Creepers!"));
 
-    netherBtn.setSelected(currentDimension == World.NETHER_DIMENSION);
+    netherBtn.setSelected(currentDimension.equals(Dimension.Identifier.THE_NETHER));
     netherBtn.setTooltip(new Tooltip("The land of Zombie Pig-men."));
 
-    endBtn.setSelected(currentDimension == World.END_DIMENSION);
+    endBtn.setSelected(currentDimension.equals(Dimension.Identifier.THE_END));
     endBtn.setTooltip(new Tooltip("Watch out for the dragon."));
 
     changeWorldBtn.setOnAction(e -> {
@@ -655,13 +632,13 @@ public class ChunkyFxController
     reloadWorldBtn.setOnAction(e -> mapLoader.reloadWorld());
 
     overworldBtn.setGraphic(new ImageView(Icon.grass.fxImage()));
-    overworldBtn.setOnAction(e -> mapLoader.setDimension(World.OVERWORLD_DIMENSION));
+    overworldBtn.setOnAction(e -> mapLoader.setDimension(Dimension.Identifier.OVERWORLD));
 
     netherBtn.setGraphic(new ImageView(Icon.netherrack.fxImage()));
-    netherBtn.setOnAction(e -> mapLoader.setDimension(World.NETHER_DIMENSION));
+    netherBtn.setOnAction(e -> mapLoader.setDimension(Dimension.Identifier.THE_NETHER));
 
     endBtn.setGraphic(new ImageView(Icon.endStone.fxImage()));
-    endBtn.setOnAction(e -> mapLoader.setDimension(World.END_DIMENSION));
+    endBtn.setOnAction(e -> mapLoader.setDimension(Dimension.Identifier.THE_END));
 
     loadScene.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
     loadSceneFile.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));

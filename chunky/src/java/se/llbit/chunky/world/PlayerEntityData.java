@@ -18,7 +18,12 @@
 package se.llbit.chunky.world;
 
 import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.IntTag;
+import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
+import se.llbit.util.UuidUtil;
+
+import java.util.UUID;
 
 public class PlayerEntityData {
 
@@ -27,7 +32,7 @@ public class PlayerEntityData {
   public final double z;
   public final double rotation;
   public final double pitch;
-  public final int dimension;
+  public final Dimension.Identifier dimension;
   public Tag feet = new CompoundTag();
   public Tag legs = new CompoundTag();
   public Tag head = new CompoundTag();
@@ -35,31 +40,26 @@ public class PlayerEntityData {
   public Tag shield = new CompoundTag();
   public Tag mainHand = new CompoundTag();
   public CompoundTag equipment;
-  public final String uuid;
+  public final UUID uuid;
 
   public PlayerEntityData(Tag player) {
     Tag pos = player.get("Pos");
     Tag rotation = player.get("Rotation");
 
-    long uuidHi;
-    long uuidLo;
-    if (player.get("UUID").isIntArray(4)) {
-      // since 20w12a (1.16) the UUID is saved in four 32-bit integers, ordered from most significant to least significant
-      int[] uuid = player.get("UUID").intArray();
-      uuidHi = (((long) uuid[0]) << 32) | (uuid[1] & 0xffffffffL);
-      uuidLo = (((long) uuid[2]) << 32) | (uuid[3] & 0xffffffffL);
-    } else {
-      // before 20w12a, the UUID was saved as two longs (64-bit)
-      uuidLo = player.get("UUIDLeast").longValue(-1);
-      uuidHi = player.get("UUIDMost").longValue(-1);
-    }
-    uuid = String.format("%016X%016X", uuidHi, uuidLo);
+    uuid = getUuid(player);
     x = pos.get(0).doubleValue();
     y = pos.get(1).doubleValue();
     z = pos.get(2).doubleValue();
     this.rotation = rotation.get(0).floatValue();
     pitch = rotation.get(1).floatValue();
-    dimension = player.get("Dimension").intValue();
+
+    if (player.get("Dimension") instanceof StringTag) {
+      // 26.1-snapshot-6 or later
+      this.dimension = Dimension.Identifier.fromNamespacedName(player.get("Dimension").stringValue());
+    } else {
+      // before 26.1-snapshot-6
+      this.dimension = Dimension.Identifier.fromLegacyId(player.get("Dimension").intValue());
+    }
 
     int selectedItem = player.get("SelectedItemSlot").intValue(0);
 
@@ -93,9 +93,25 @@ public class PlayerEntityData {
     }
   }
 
+  static UUID getUuid(Tag playerTag) {
+    final UUID uuid;
+    long uuidHi;
+    long uuidLo;
+    if (playerTag.get("UUID").isIntArray(4)) {
+      // since 20w12a (1.16) the UUID is saved in four 32-bit integers, ordered from most significant to least significant
+      uuid = UuidUtil.intsToUuid(playerTag.get("UUID").intArray());
+    } else {
+      // before 20w12a, the UUID was saved as two longs (64-bit)
+      uuidLo = playerTag.get("UUIDLeast").longValue(-1);
+      uuidHi = playerTag.get("UUIDMost").longValue(-1);
+      uuid = new UUID(uuidHi, uuidLo);
+    }
+    return uuid;
+  }
+
   @Override
   public String toString() {
-    return String.format("%d: %d, %d, %d", dimension, (int) x, (int) y, (int) z);
+    return String.format("%s: %d, %d, %d", dimension, (int) x, (int) y, (int) z);
   }
 
   @Override

@@ -191,10 +191,6 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       }
     });
 
-    MenuItem exportZip = new MenuItem("Export selected chunks…");
-    exportZip.setOnAction(e -> controller.exportZip());
-    exportZip.setDisable(chunkSelection.size() == 0);
-
     MenuItem exportPng = new MenuItem("Save map view as…");
     exportPng.setOnAction(e -> controller.exportMapView());
 
@@ -203,7 +199,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
         new SeparatorMenuItem(),
         moveCameraHere, selectVisible,
         new SeparatorMenuItem(),
-        exportZip, exportPng
+        exportPng
     );
 
     controller.getChunky()
@@ -215,7 +211,6 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       clearSelection.setDisable(noChunksSelected);
       newScene.setDisable(noChunksSelected);
       loadSelection.setDisable(noChunksSelected);
-      exportZip.setDisable(noChunksSelected);
     });
   }
 
@@ -601,7 +596,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     World world = mapLoader.getWorld();
     double blockScale = mapView.scale / 16.;
     for (PlayerEntityData player : world.currentDimension().getPlayerPositions()) {
-      if (player.dimension == world.currentDimensionId()) {
+      if (player.dimension.equals(world.currentDimension().getDimensionId())) {
         int px = (int) QuickMath.floor(player.x * blockScale);
         int py = (int) QuickMath.floor(player.y);
         int pz = (int) QuickMath.floor(player.z * blockScale);

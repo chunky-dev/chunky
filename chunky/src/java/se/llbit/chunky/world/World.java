@@ -16,22 +16,19 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.chunky.ui.ProgressTracker;
-import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.log.Log;
 import se.llbit.math.Vector3i;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.MinecraftText;
-import se.llbit.util.Pair;
+import se.llbit.util.UuidUtil;
 import se.llbit.util.annotation.NotNull;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * The World class contains information about the currently viewed world.
@@ -45,15 +42,6 @@ public class World implements Comparable<World> {
   /** The currently supported NBT version of level.dat files. */
   public static final int NBT_VERSION = 19133;
 
-  /** Overworld dimension index. */
-  public static final int OVERWORLD_DIMENSION = 0;
-
-  /** Nether dimension index. */
-  public static final int NETHER_DIMENSION = -1;
-
-  /** End dimension index. */
-  public static final int END_DIMENSION = 1;
-
   /** Default sea water level. */
   public static final int SEA_LEVEL = 63;
 
@@ -64,7 +52,6 @@ public class World implements Comparable<World> {
   private final File worldDirectory;
 
   protected Dimension currentDimension;
-  protected int currentDimensionId;
 
   private final String levelName;
   private int gameMode = 0;
@@ -74,6 +61,8 @@ public class World implements Comparable<World> {
 
   /** Timestamp for level.dat when player data was last loaded. */
   private long timestamp;
+
+  private Optional<UUID> singleplayerPlayerUuid;
 
   /**
    * @param levelName name of the world (not the world directory).
@@ -93,8 +82,8 @@ public class World implements Comparable<World> {
     SILENT
   }
 
-  public void loadDimension(int dimensionId) {
-    currentDimension = loadDimension(this, this.worldDirectory, dimensionId, -1, Collections.emptySet());
+  public void loadDimension(Dimension.Identifier dimensionId) {
+    currentDimension = loadDimension(this, this.worldDirectory, dimensionId, Collections.emptySet());
     currentDimension.reloadPlayerData();
   }
 
@@ -103,7 +92,7 @@ public class World implements Comparable<World> {
    *
    * @return {@code true} if the world data was loaded
    */
-  public static World loadWorld(File worldDirectory, int dimensionId, LoggedWarnings warnings) {
+  public static World loadWorld(File worldDirectory, Dimension.Identifier dimensionId, LoggedWarnings warnings) {
     if (worldDirectory == null) {
       return EmptyWorld.INSTANCE;
     }
@@ -118,6 +107,7 @@ public class World implements Comparable<World> {
       request.add(".Data.Version.Id");
       request.add(".Data.RandomSeed");
       request.add(".Data.Player");
+      request.add(".Data.singleplayer_uuid");
       request.add(".Data.LevelName");
       request.add(".Data.GameType");
       request.add(".Data.isCubicWorld");
@@ -133,6 +123,7 @@ public class World implements Comparable<World> {
       Tag spawnX = player.get("SpawnX");
       Tag spawnY = player.get("SpawnY");
       Tag spawnZ = player.get("SpawnZ");
+      Tag singleplayerUuid = result.get(".Data.singleplayer_uuid");
       Tag gameType = result.get(".Data.GameType");
       Tag randomSeed = result.get(".Data.RandomSeed");
       levelName = MinecraftText.removeFormatChars(result.get(".Data.LevelName").stringValue(levelName));
@@ -144,8 +135,13 @@ public class World implements Comparable<World> {
       World world = new World(levelName, worldDirectory, seed, modtime);
       world.gameMode = gameType.intValue(0);
       world.versionId = versionId.intValue();
+      if (singleplayerUuid.isIntArray(4)) {
+        world.singleplayerPlayerUuid = Optional.of(UuidUtil.intsToUuid(singleplayerUuid.intArray()));
+      } else if (!player.isError()) {
+        world.singleplayerPlayerUuid = Optional.of(PlayerEntityData.getUuid(player));
+      }
 
-      Dimension dimension = loadDimension(world, worldDirectory, dimensionId, modtime, playerEntities);
+      Dimension dimension = loadDimension(world, worldDirectory, dimensionId, playerEntities);
 
       boolean haveSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
       if (haveSpawnPos) {
@@ -168,26 +164,34 @@ public class World implements Comparable<World> {
   }
 
   @NotNull
-  private static Dimension loadDimension(World world, File worldDirectory, int dimensionId, long modtime, Set<PlayerEntityData> playerEntities) {
-    Dimension dimension;
-    File dimensionDirectory = dimensionId == 0 ? worldDirectory : new File(worldDirectory, "DIM" + dimensionId);
-    if (new File(dimensionDirectory, "region3d").exists()) {
-      dimension = new CubicDimension(world, dimensionId, dimensionDirectory, playerEntities, modtime);
-    } else {
-      dimension = new Dimension(world, dimensionId, dimensionDirectory, playerEntities, modtime);
+  private static Dimension loadDimension(World world, File worldDirectory, Dimension.Identifier dimensionId, Set<PlayerEntityData> playerEntities) {
+    File dimensionDirectory = Path.of(worldDirectory.getPath(), "dimensions", dimensionId.namespace(), dimensionId.name()).toFile();
+    if (dimensionDirectory.exists()) {
+      // 26.1-snapshot-6 or later
+      return new Dimension(world, dimensionId, dimensionDirectory, playerEntities);
     }
-    return dimension;
+
+    dimensionDirectory = switch (dimensionId.getNamespacedName()) { // TODO in Java 21+ we can use `switch (dimensionId)` here
+      case "minecraft:the_nether" -> new File(worldDirectory, "DIM-1");
+      case "minecraft:the_end" -> new File(worldDirectory, "DIM1");
+      default -> worldDirectory;
+    };
+    if (new File(dimensionDirectory, "region3d").exists()) {
+      return new CubicDimension(world, dimensionId, dimensionDirectory, playerEntities);
+    } else {
+      return new Dimension(world, dimensionId, dimensionDirectory, playerEntities);
+    }
   }
 
   @NotNull
-  private static Set<PlayerEntityData> getPlayerEntityData(File worldDirectory, int dimensionId, Tag player) {
+  private static Set<PlayerEntityData> getPlayerEntityData(File worldDirectory, Dimension.Identifier dimensionId, Tag player) {
     Set<PlayerEntityData> playerEntities = new HashSet<>();
     if (!player.isError()) {
       playerEntities.add(new PlayerEntityData(player));
     }
     loadAdditionalPlayers(worldDirectory, playerEntities);
     // Filter for the players only within the requested dimension
-    playerEntities = playerEntities.stream().filter(playerData -> playerData.dimension == dimensionId).collect(Collectors.toSet());
+    playerEntities = playerEntities.stream().filter(playerData -> playerData.dimension.equals(dimensionId)).collect(Collectors.toSet());
     return playerEntities;
   }
 
@@ -212,10 +216,17 @@ public class World implements Comparable<World> {
          DataInputStream in = new DataInputStream(gzin)) {
       Set<String> request = new HashSet<>();
       request.add(".Data.Player");
+      request.add(".Data.singleplayer_uuid");
       Map<String, Tag> result = NamedTag.quickParse(in, request);
       Tag player = result.get(".Data.Player");
+      Tag singleplayerUuid = result.get(".Data.singleplayer_uuid");
+      if (singleplayerUuid.isIntArray(4)) {
+        singleplayerPlayerUuid = Optional.of(UuidUtil.intsToUuid(singleplayerUuid.intArray()));
+      } else if (!player.isError()) {
+        singleplayerPlayerUuid = Optional.of(PlayerEntityData.getUuid(player));
+      }
 
-      currentDimension.setPlayerEntities(getPlayerEntityData(worldDirectory, currentDimensionId, player));
+      currentDimension.setPlayerEntities(getPlayerEntityData(worldDirectory, currentDimension.getDimensionId(), player));
     } catch (IOException e) {
       Log.infof("Could not read the level.dat file for world %s while trying to reload player data!", levelName);
       return false;
@@ -226,6 +237,7 @@ public class World implements Comparable<World> {
   private static void loadAdditionalPlayers(File worldDirectory, Set<PlayerEntityData> playerEntities) {
     loadPlayerData(new File(worldDirectory, "players"), playerEntities);
     loadPlayerData(new File(worldDirectory, "playerdata"), playerEntities);
+    loadPlayerData(new File(new File(worldDirectory, "players"), "data"), playerEntities); // 26.1-snapshot-6 or later
   }
 
   private static void loadPlayerData(File playerdata, Set<PlayerEntityData> playerEntities) {
@@ -251,157 +263,15 @@ public class World implements Comparable<World> {
     return this.currentDimension;
   }
 
-  /**
-   * @return The current dimension
-   */
-  public synchronized int currentDimensionId() {
-    return this.currentDimensionId;
+  public Optional<UUID> getSingleplayerPlayerUuid() {
+    return singleplayerPlayerUuid;
   }
-
 
   /**
    * @return The world directory
    */
   public File getWorldDirectory() {
     return worldDirectory;
-  }
-
-  /**
-   * @deprecated Use {@link World#currentDimension()} -> {@link Dimension#getDimensionDirectory()} ()}. Removed once there are no more usages
-   */
-  @Deprecated
-  protected synchronized File getDataDirectory(int dimension) {
-    return dimension == 0 ?
-      worldDirectory :
-      new File(worldDirectory, "DIM" + dimension);
-  }
-
-  /**
-    @deprecated Use {@link World#currentDimension()} -> {@link Dimension#getRegionDirectory()}. Removed once there are no more usages
-   */
-  @Deprecated
-  protected synchronized File getRegionDirectory(int dimension) {
-    return new File(getDataDirectory(dimension), "region");
-  }
-
-
-  /**
-   * Export the given chunks to a Zip archive.
-   * The Zip arhive is written without compression since the chunks are
-   * already compressed with GZip.
-   *
-   * @throws IOException
-   */
-  public synchronized void exportChunksToZip(File target, Collection<ChunkPosition> chunks,
-                                             ProgressTracker progress) throws IOException {
-
-    Map<RegionPosition, Set<ChunkPosition>> regionMap = new HashMap<>();
-
-    for (ChunkPosition chunk : chunks) {
-      RegionPosition regionPosition = chunk.getRegionPosition();
-      Set<ChunkPosition> chunkSet = regionMap.computeIfAbsent(regionPosition, k -> new HashSet<>());
-      chunkSet.add(new ChunkPosition(chunk.x & 31, chunk.z & 31));
-    }
-
-    int work = 0;
-    progress.setJobSize(regionMap.size() + 1);
-
-    String regionDirectory =
-      currentDimensionId == 0 ? currentDimension().getDimensionDirectory().getName() :
-        currentDimension().getDimensionDirectory().getName() + "/DIM" + currentDimensionId;
-    regionDirectory += "/region";
-
-    try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(target))) {
-      writeLevelDatToZip(zout);
-      progress.setProgress(++work);
-
-      for (Map.Entry<RegionPosition, Set<ChunkPosition>> entry : regionMap.entrySet()) {
-
-        if (progress.isInterrupted())
-          break;
-
-        RegionPosition region = entry.getKey();
-
-        appendRegionToZip(zout, currentDimension.getRegionDirectory(), region,
-          regionDirectory + "/" + region.getMcaName(), entry.getValue());
-
-        progress.setProgress(++work);
-      }
-    }
-  }
-
-  /**
-   * Export the world to a zip file. The chunks which are included
-   * depends on the selected chunks. If any chunks are selected, then
-   * only those chunks are exported. If no chunks are selected then all
-   * chunks are exported.
-   *
-   * @throws IOException
-   */
-  public synchronized void exportWorldToZip(File target, ProgressTracker progress)
-      throws IOException {
-    System.out.println("exporting all dimensions to " + target.getName());
-
-    final Collection<Pair<File, RegionPosition>> regions = new LinkedList<>();
-
-    WorldScanner.Operator operator = (regionDirectory, x, z) ->
-        regions.add(new Pair<>(regionDirectory, new RegionPosition(x, z)));
-    // TODO make this more dynamic
-    File overworld = getRegionDirectory(OVERWORLD_DIMENSION);
-    WorldScanner.findExistingChunks(overworld, operator);
-    WorldScanner.findExistingChunks(getRegionDirectory(NETHER_DIMENSION), operator);
-    WorldScanner.findExistingChunks(getRegionDirectory(END_DIMENSION), operator);
-
-    int work = 0;
-    progress.setJobSize(regions.size() + 1);
-
-    try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(target))) {
-      writeLevelDatToZip(zout);
-      progress.setProgress(++work);
-
-      for (Pair<File, RegionPosition> region : regions) {
-
-        if (progress.isInterrupted()) {
-          break;
-        }
-
-        String regionDirectory = (region.thing1 == overworld) ?
-            worldDirectory.getName() :
-            worldDirectory.getName() + "/" + region.thing1.getParentFile().getName();
-        regionDirectory += "/region";
-        appendRegionToZip(zout, region.thing1, region.thing2,
-            regionDirectory + "/" + region.thing2.getMcaName(), null);
-
-        progress.setProgress(++work);
-      }
-    }
-  }
-
-  /**
-   * Write this worlds level.dat file to a ZipOutputStream.
-   *
-   * @throws IOException
-   */
-  private void writeLevelDatToZip(ZipOutputStream zout) throws IOException {
-    File levelDat = new File(worldDirectory, "level.dat");
-    try (FileInputStream in = new FileInputStream(levelDat)) {
-      zout.putNextEntry(new ZipEntry(worldDirectory.getName() + "/" + "level.dat"));
-      byte[] buf = new byte[4096];
-      int len;
-      while ((len = in.read(buf)) > 0) {
-        zout.write(buf, 0, len);
-      }
-      zout.closeEntry();
-    }
-  }
-
-  private void appendRegionToZip(ZipOutputStream zout, File regionDirectory,
-      RegionPosition regionPos, String regionZipFileName, Set<ChunkPosition> chunks)
-      throws IOException {
-
-    zout.putNextEntry(new ZipEntry(regionZipFileName));
-    MCRegion.writeRegion(regionDirectory, regionPos, new DataOutputStream(zout), chunks);
-    zout.closeEntry();
   }
 
   @Override public String toString() {
@@ -433,16 +303,12 @@ public class World implements Comparable<World> {
    * @return String describing the game-mode of this world
    */
   public String gameMode() {
-    switch (gameMode) {
-      case 0:
-        return "Survival";
-      case 1:
-        return "Creative";
-      case 2:
-        return "Adventure";
-      default:
-        return "Unknown";
-    }
+    return switch (gameMode) {
+      case 0 -> "Survival";
+      case 1 -> "Creative";
+      case 2 -> "Adventure";
+      default -> "Unknown";
+    };
   }
 
   @Override public int compareTo(World o) {
@@ -464,13 +330,17 @@ public class World implements Comparable<World> {
    * @return Resource pack file/directory or empty optional if this world has no bundled resource pack
    */
   public Optional<File> getResourcePack() {
-    File resourcePack = new File(getWorldDirectory(), "resources.zip");
+    for (File resourcepacksDirectory : new File[]{getWorldDirectory(), new File(getWorldDirectory(), "resourcepacks")}) {
+      if (resourcepacksDirectory.isDirectory()) {
+        File resourcePack = new File(resourcepacksDirectory, "resources.zip");
     if (resourcePack.isFile()) {
       return Optional.of(resourcePack);
     }
-    resourcePack = new File(getWorldDirectory(), "resources");
+        resourcePack = new File(resourcepacksDirectory, "resources");
     if (resourcePack.isDirectory()) {
       return Optional.of(resourcePack);
+        }
+      }
     }
     return Optional.empty();
   }

@@ -57,7 +57,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   private static final String[] gearSlots =
     {"leftHand", "rightHand", "head", "chest", "legs", "feet"};
 
-  public final String uuid;
+  public final UUID uuid;
   public JsonObject gear = new JsonObject();
   public JsonObject pose = new JsonObject();
   public double scale = 1.0;
@@ -69,7 +69,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   public String skin = "";
   public boolean showOuterLayer = true;
 
-  public PlayerEntity(String uuid, Vector3 position) {
+  public PlayerEntity(UUID uuid, Vector3 position) {
     this(uuid, position, 0, 0, new JsonObject());
   }
 
@@ -77,7 +77,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     this(data.uuid, new Vector3(data.x, data.y, data.z), data.rotation, data.pitch, buildGear(data));
   }
 
-  protected PlayerEntity(String uuid, Vector3 position, double rotationDegrees, double pitchDegrees,
+  protected PlayerEntity(UUID uuid, Vector3 position, double rotationDegrees, double pitchDegrees,
                          JsonObject gear) {
     super(position);
     this.uuid = uuid;
@@ -98,7 +98,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   public PlayerEntity(JsonObject settings) {
     super(JsonUtil.vec3FromJsonObject(settings.get("position")));
     this.model = PlayerModel.get(settings.get("model").stringValue("STEVE"));
-    this.uuid = settings.get("uuid").stringValue("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+    this.uuid = UUID.fromString(settings.get("uuid").stringValue("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"));
     this.skin = settings.get("skin").stringValue("");
     this.showOuterLayer = settings.get("outerLayer").asBoolean(true);
     this.scale = settings.get("scale").doubleValue(1.0);
@@ -231,7 +231,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       } catch (IOException | TextureFormatError e) {
         Log.info("Failed to load cached skin. Trying API.", e);
         try {
-          MinecraftProfile profile = MojangApi.fetchProfile(uuid);
+          MinecraftProfile profile = MojangApi.fetchProfile(uuid.toString());
           Optional<String> skinUrl = profile.getSkin().map(MinecraftSkin::getSkinUrl);
           if (skinUrl.isPresent()) {
             File skinFile = MojangApi.downloadSkin(skinUrl.get());
@@ -759,7 +759,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   public JsonValue toJson() {
     JsonObject json = new JsonObject();
     json.add("kind", "player");
-    json.add("uuid", uuid);
+    json.add("uuid", uuid.toString());
     json.add("position", position.toJson());
     json.add("model", model.name());
     json.add("skin", skin);
