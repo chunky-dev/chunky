@@ -57,10 +57,6 @@ public class CreditsController implements Initializable {
   @FXML
   private Hyperlink gplv3;
   @FXML
-  private Hyperlink markdown;
-  @FXML
-  private Hyperlink markdownLicense;
-  @FXML
   private Hyperlink fastMath;
   @FXML
   private Hyperlink fastMathLicense;
@@ -155,13 +151,6 @@ public class CreditsController implements Initializable {
     ghContributors.setBorder(Border.EMPTY);
     ghContributors.setOnAction(e -> launchAndReset(ghContributors,
         "https://github.com/chunky-dev/chunky/graphs/contributors"));
-
-    markdown.setBorder(Border.EMPTY);
-    markdown.setOnAction(
-        e -> launchAndReset(markdown, "https://daringfireball.net/projects/markdown/"));
-    markdownLicense.setBorder(Border.EMPTY);
-    markdownLicense.setOnAction(e -> launchAndReset(markdownLicense,
-        "https://daringfireball.net/projects/markdown/license"));
 
     fastMath.setBorder(Border.EMPTY);
     fastMath.setOnAction(
