@@ -3634,6 +3634,10 @@ public class TexturePackLoader {
       new SplitLargeChestTexture("assets/minecraft/textures/entity/chest/copper_oxidized_left", SplitLargeChestTexture.Part.LEFT, Texture.largeOxidizedCopperChestLeft),
       new SplitLargeChestTexture("assets/minecraft/textures/entity/chest/copper_oxidized_right", SplitLargeChestTexture.Part.RIGHT, Texture.largeOxidizedCopperChestRight)));
 
+    ALL_TEXTURES.put("chiseled bookshelf", new ChiseledBookshelfTexture(
+      "assets/minecraft/textures/block/chiseled_bookshelf_empty",
+      "assets/minecraft/textures/block/chiseled_bookshelf_occupied"));
+
     for (Field field : Texture.class.getFields()) {
       if (Texture.class.isAssignableFrom(field.getType())) {
         addTextureLoader(field);
