@@ -152,20 +152,6 @@
                 </Label>
                 <VBox>
                   <children>
-                    <Hyperlink fx:id="markdown" text="Markdown">
-                      <padding>
-                        <Insets/>
-                      </padding>
-                    </Hyperlink>
-                    <Hyperlink fx:id="markdownLicense" text="BSD-style">
-                      <font>
-                        <Font size="10.0"/>
-                      </font>
-                      <padding>
-                        <Insets left="20.0"/>
-                      </padding>
-                    </Hyperlink>
-
                     <Hyperlink fx:id="fastMath" text="Apache Commons Math">
                       <padding>
                         <Insets/>
