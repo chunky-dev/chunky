@@ -1172,20 +1172,15 @@ public class Texture {
   public static final Texture torchflowerCropStage0 = new Texture();
   @TexturePath("assets/minecraft/textures/block/torchflower_crop_stage1")
   public static final Texture torchflowerCropStage1 = new Texture();
-  @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_empty")
-  public static final Texture chiseledBookshelfEmpty = new Texture();
-  @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_occupied")
-  public static final Texture chiseledBookshelfOccupied = new Texture();
   @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_side")
   public static final Texture chiseledBookshelfSide = new Texture();
   @TexturePath("assets/minecraft/textures/block/chiseled_bookshelf_top")
   public static final Texture chiseledBookshelfTop = new Texture();
 
-  public static final Texture[] chiseledBookshelfCombinations = new ChiseledBookshelfTexture[64];
+  public static final Texture[] chiseledBookshelfCombinations = new Texture[64];
   static {
-    for(int i = 0; i < chiseledBookshelfCombinations.length; i++) {
-      chiseledBookshelfCombinations[i] = new ChiseledBookshelfTexture(Texture.chiseledBookshelfEmpty, Texture.chiseledBookshelfOccupied,
-        i % 2 == 1, (i >> 1) % 2 == 1, (i >> 2) % 2 == 1, (i >> 3) % 2 == 1, (i >> 4) % 2 == 1, (i >> 5) % 2 == 1);
+    for (int i = 0; i < chiseledBookshelfCombinations.length; i++) {
+      chiseledBookshelfCombinations[i] = new Texture();
     }
   }
 
