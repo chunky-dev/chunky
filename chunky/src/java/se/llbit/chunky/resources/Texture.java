@@ -488,6 +488,7 @@ public class Texture {
   public static final EntityTexture skeleton = new EntityTexture();
   public static final EntityTexture wither = new EntityTexture();
   public static final EntityTexture dragon = new EntityTexture();
+  @TexturePath(value = "assets/minecraft/textures/entity/enchantment/enchanting_table_book", alternatives = {"assets/minecraft/textures/entity/enchanting_table_book"})
   public static final EntityTexture book = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/sheep/sheep")
   public static final EntityTexture sheep = new EntityTexture();
@@ -495,29 +496,29 @@ public class Texture {
   public static final EntityTexture sheepFur = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/sheep/sheep_wool_undercoat")
   public static final EntityTexture sheepUndercoat = new EntityTexture();
-  @TexturePath("assets/minecraft/textures/entity/cow/temperate_cow")
+  @TexturePath(value = "assets/minecraft/textures/entity/cow/cow_temperate", alternatives = {"assets/minecraft/textures/entity/cow/temperate_cow"})
   public static final EntityTexture cow = new EntityTexture();
-  @TexturePath("assets/minecraft/textures/entity/cow/cold_cow")
+  @TexturePath(value = "assets/minecraft/textures/entity/cow/cow_cold", alternatives = {"assets/minecraft/textures/entity/cow/cold_cow"})
   public static final EntityTexture coldCow = new EntityTexture();
-  @TexturePath("assets/minecraft/textures/entity/cow/warm_cow")
+  @TexturePath(value = "assets/minecraft/textures/entity/cow/cow_warm", alternatives = {"assets/minecraft/textures/entity/cow/warm_cow"})
   public static final EntityTexture warmCow = new EntityTexture();
-  @TexturePath("assets/minecraft/textures/entity/chicken/temperate_chicken")
+  @TexturePath(value = "assets/minecraft/textures/entity/chicken/chicken_temperate", alternatives = {"assets/minecraft/textures/entity/chicken/temperate_chicken"})
   public static final EntityTexture chicken = new EntityTexture();
-  @TexturePath("assets/minecraft/textures/entity/chicken/cold_chicken")
+  @TexturePath(value = "assets/minecraft/textures/entity/chicken/chicken_cold", alternatives = {"assets/minecraft/textures/entity/chicken/cold_chicken"})
   public static final EntityTexture coldChicken = new EntityTexture();
-  @TexturePath("assets/minecraft/textures/entity/chicken/warm_chicken")
+  @TexturePath(value = "assets/minecraft/textures/entity/chicken/chicken_warm", alternatives = {"assets/minecraft/textures/entity/chicken/warm_chicken"})
   public static final EntityTexture warmChicken = new EntityTexture();
-  @TexturePath("assets/minecraft/textures/entity/pig/temperate_pig")
+  @TexturePath(value = "assets/minecraft/textures/entity/pig/pig_temperate", alternatives = {"assets/minecraft/textures/entity/pig/temperate_pig"})
   public static final EntityTexture pig = new EntityTexture();
-  @TexturePath("assets/minecraft/textures/entity/pig/cold_pig")
+  @TexturePath(value = "assets/minecraft/textures/entity/pig/pig_cold", alternatives = {"assets/minecraft/textures/entity/pig/cold_pig"})
   public static final EntityTexture coldPig = new EntityTexture();
-  @TexturePath("assets/minecraft/textures/entity/pig/warm_pig")
+  @TexturePath(value = "assets/minecraft/textures/entity/pig/pig_warm", alternatives =  {"assets/minecraft/textures/entity/pig/warm_pig"})
   public static final EntityTexture warmPig = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/equipment/pig_saddle/saddle")
   public static final EntityTexture pigSaddle = new EntityTexture();
-  @TexturePath("assets/minecraft/textures/entity/cow/brown_mooshroom")
+  @TexturePath(value = "assets/minecraft/textures/entity/cow/mooshroom_brown", alternatives = {"assets/minecraft/textures/entity/cow/brown_mooshroom"})
   public static final EntityTexture brownMooshroom = new EntityTexture();
-  @TexturePath("assets/minecraft/textures/entity/cow/red_mooshroom")
+  @TexturePath(value = "assets/minecraft/textures/entity/cow/mooshroom_red", alternatives = {"assets/minecraft/textures/entity/cow/red_mooshroom"})
   public static final EntityTexture redMooshroom = new EntityTexture();
   @TexturePath("assets/minecraft/textures/entity/squid/squid")
   public static final EntityTexture squid = new EntityTexture();
