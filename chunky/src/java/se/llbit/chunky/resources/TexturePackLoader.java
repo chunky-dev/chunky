@@ -2448,8 +2448,6 @@ public class TexturePackLoader {
         new EntityTextureLoader("assets/minecraft/textures/entity/wither/wither", Texture.wither));
     ALL_TEXTURES.put("dragon",
         new EntityTextureLoader("assets/minecraft/textures/entity/enderdragon/dragon", Texture.dragon));
-    ALL_TEXTURES.put("book",
-        new EntityTextureLoader("assets/minecraft/textures/entity/enchanting_table_book", Texture.book));
 
     // Minecraft 1.10 blocks.
     ALL_TEXTURES.put("boneSide", new AlternateTextures(
