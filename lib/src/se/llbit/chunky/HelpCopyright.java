@@ -22,7 +22,7 @@ package se.llbit.chunky;
  * This contains the proper copyright information for various messages
  */
 public class HelpCopyright {
-  public static final String COPYRIGHT_LINE = "Copyright (c) 2010-2024 Jesper Öqvist and Chunky Contributors";
+  public static final String COPYRIGHT_LINE = "Copyright (c) 2010-2026 Jesper Öqvist and Chunky Contributors";
 
   public static final String COPYRIGHT_DISCLAIMER =
     "Chunky comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it " +
