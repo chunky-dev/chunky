@@ -40,6 +40,7 @@ import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.JsonUtil;
+import se.llbit.util.UuidUtil;
 import se.llbit.util.mojangapi.MinecraftProfile;
 import se.llbit.util.mojangapi.MinecraftSkin;
 import se.llbit.util.mojangapi.MojangApi;
@@ -94,11 +95,10 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     this.pose = pose;
   }
 
-
   public PlayerEntity(JsonObject settings) {
     super(JsonUtil.vec3FromJsonObject(settings.get("position")));
     this.model = PlayerModel.get(settings.get("model").stringValue("STEVE"));
-    this.uuid = UUID.fromString(settings.get("uuid").stringValue("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"));
+    this.uuid = UuidUtil.stringToUuid(settings.get("uuid").stringValue("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"));
     this.skin = settings.get("skin").stringValue("");
     this.showOuterLayer = settings.get("outerLayer").asBoolean(true);
     this.scale = settings.get("scale").doubleValue(1.0);
