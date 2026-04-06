@@ -15,4 +15,18 @@ public class UuidUtil {
       ((long) ints[2]) << 32 | ((long) ints[3] & 0xFFFFFFFFL)
     );
   }
+
+  public static UUID stringToUuid(String laxUuid) {
+    try {
+      return UUID.fromString(laxUuid);
+    } catch (IllegalArgumentException e) {
+      laxUuid = laxUuid.replaceAll("[^0-9A-Za-z]", "");
+      laxUuid = laxUuid.substring(0, 8) + "-" +
+        laxUuid.substring(8, 12) + "-" +
+        laxUuid.substring(12, 16) + "-" +
+        laxUuid.substring(16, 20) + "-" +
+        laxUuid.substring(20);
+      return UUID.fromString(laxUuid);
+    }
+  }
 }

@@ -3,6 +3,7 @@ package se.llbit.util.mojangapi;
 import com.google.gson.JsonParseException;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.log.Log;
+import se.llbit.util.UuidUtil;
 
 import java.util.Base64;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class MinecraftSkin {
     if (profileId != null) {
       // Select default model based on UUID, as in Minecraft (Steve for even hashes)
       try {
-        UUID uuid = UUID.fromString(profileId);
+        UUID uuid = UuidUtil.stringToUuid(profileId);
         return (uuid.hashCode() & 1) == 0 ? PlayerModel.STEVE : PlayerModel.ALEX;
       } catch (IllegalArgumentException e) {
         // ignore
