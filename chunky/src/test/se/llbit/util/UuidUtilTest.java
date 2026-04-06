@@ -7,6 +7,20 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UuidUtilTest {
+
+  @Test
+  void intsToUuid() {
+    assertEquals(
+      UUID.fromString("61699b2e-d327-4a01-9f1e-0ea8c3f06bc6"),
+      UuidUtil.intsToUuid(new int[]{
+        1634310958,
+        -752399871,
+        -1625420120,
+        -1007653946
+      })
+    );
+  }
+
   @Test
   void stringToUuid() {
     assertEquals(
