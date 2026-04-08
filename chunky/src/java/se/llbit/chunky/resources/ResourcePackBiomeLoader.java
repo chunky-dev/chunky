@@ -46,6 +46,7 @@ public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
 
   protected static class BiomeEffects {
     public JsonElement foliage_color = null;
+    public JsonElement dry_foliage_color = null;
     public JsonElement grass_color = null;
     public JsonElement water_color = null;
     public String grass_color_modifier = null;
@@ -86,6 +87,7 @@ public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
 
           BiomeBuilder builder = Biome.create(biome.getNamespacedName(), biome.name(), json.temperature, json.downfall);
           Optional.ofNullable(parseColor(json.effects.foliage_color)).ifPresent(builder::foliageColor);
+          Optional.ofNullable(parseColor(json.effects.dry_foliage_color)).ifPresent(builder::dryFoliageColor);
           Optional.ofNullable(parseColor(json.effects.grass_color)).ifPresent(builder::grassColor);
           Optional.ofNullable(parseColor(json.effects.water_color)).ifPresent(builder::waterColor);
           Optional.ofNullable(json.effects.grass_color_modifier).ifPresent(modifier -> {
