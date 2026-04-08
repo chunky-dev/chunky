@@ -17,12 +17,13 @@
  */
 package se.llbit.chunky.resources;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomeBuilder;
 import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.log.Log;
+import se.llbit.math.ColorUtil;
+import se.llbit.math.Vector3;
 
 import java.io.Reader;
 import java.nio.file.Files;
@@ -44,10 +45,36 @@ public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
   }
 
   protected static class BiomeEffects {
-    public Integer foliage_color = null;
-    public Integer grass_color = null;
-    public Integer water_color = null;
+    public JsonElement foliage_color = null;
+    public JsonElement grass_color = null;
+    public JsonElement water_color = null;
     public String grass_color_modifier = null;
+  }
+
+  private static Integer parseColor(JsonElement element) {
+    if (element == null || element.isJsonNull()) {
+      return null;
+    }
+    try {
+      if (element.isJsonPrimitive()) {
+        JsonPrimitive primitive = element.getAsJsonPrimitive();
+        if (primitive.isNumber()) {
+          return primitive.getAsInt();
+        }
+        if (primitive.isString()) {
+          Vector3 color = new Vector3();
+          ColorUtil.fromHexString(primitive.getAsString(), color);
+          return ColorUtil.getRGB(color);
+        }
+        if (primitive.isJsonArray()) {
+          JsonArray array = primitive.getAsJsonArray();
+          return ColorUtil.getRGB(array.get(0).getAsFloat(), array.get(1).getAsFloat(), array.get(2).getAsFloat());
+        }
+      }
+    } catch (Exception e) {
+      Log.warnf("Unsupported biome color value: %s", element.toString());
+    }
+    return null;
   }
 
   @Override
@@ -58,9 +85,9 @@ public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
           BiomeJson json = GSON.fromJson(f, BiomeJson.class);
 
           BiomeBuilder builder = Biome.create(biome.getNamespacedName(), biome.name(), json.temperature, json.downfall);
-          Optional.ofNullable(json.effects.foliage_color).ifPresent(builder::foliageColor);
-          Optional.ofNullable(json.effects.grass_color).ifPresent(builder::grassColor);
-          Optional.ofNullable(json.effects.water_color).ifPresent(builder::waterColor);
+          Optional.ofNullable(parseColor(json.effects.foliage_color)).ifPresent(builder::foliageColor);
+          Optional.ofNullable(parseColor(json.effects.grass_color)).ifPresent(builder::grassColor);
+          Optional.ofNullable(parseColor(json.effects.water_color)).ifPresent(builder::waterColor);
           Optional.ofNullable(json.effects.grass_color_modifier).ifPresent(modifier -> {
             switch (modifier.toLowerCase()) {
               case "none":
