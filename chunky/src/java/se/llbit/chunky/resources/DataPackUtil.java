@@ -28,7 +28,7 @@ public class DataPackUtil {
                 if (name.toLowerCase().endsWith(".json")) {
                   name = name.substring(0, name.length() - ".json".length());
                 }
-                consumer.accept(new DataRegistryEntry(namespace, name, file));
+                consumer.accept(new DataRegistryEntry(namespace, name, file, data.getPack()));
               });
           } catch (IOException ignored) {
           }
@@ -39,7 +39,7 @@ public class DataPackUtil {
     }
   }
 
-  public record DataRegistryEntry(String namespace, String name, Path path) {
+  public record DataRegistryEntry(String namespace, String name, Path path, LayeredResourcePacks.ResourcePack resourcePack) {
     public String getNamespacedName() {
       return namespace + ":" + name;
     }
