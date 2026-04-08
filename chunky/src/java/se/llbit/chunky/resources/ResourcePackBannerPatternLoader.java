@@ -6,7 +6,6 @@ import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.log.Log;
 import se.llbit.util.Pair;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 
@@ -33,8 +32,8 @@ public class ResourcePackBannerPatternLoader implements ResourcePackLoader.PackL
         try (Reader f = Files.newBufferedReader(pattern.path())) {
           BannerPatternJson json = GSON.fromJson(f, BannerPatternJson.class);
           BannerDesign.registerPattern(pattern.getNamespacedName(), new BannerDesign.Pattern(json.asset_id));
-        } catch (IOException ignored) {
-          Log.warnf("Failed to load banner pattern: %s", pattern.getNamespacedName());
+        } catch (Exception e) {
+          Log.warn("Failed to load banner pattern " + pattern.getNamespacedName() + " from " + pattern.resourcePack().getFile().getAbsolutePath(), e);
         }
       }
     });

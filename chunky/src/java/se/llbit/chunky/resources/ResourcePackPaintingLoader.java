@@ -7,7 +7,6 @@ import se.llbit.chunky.resources.texturepack.SimpleTexture;
 import se.llbit.log.Log;
 import se.llbit.util.Pair;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 
@@ -40,11 +39,11 @@ public class ResourcePackPaintingLoader implements ResourcePackLoader.PackLoader
           if (!ResourcePackLoader.loadResources(
             ResourcePackTextureLoader.singletonLoader(json.asset_id, new SimpleTexture("assets/" + asset.thing1 + "/textures/painting/" + asset.thing2, paintingTexture)))
           ) {
-            Log.warnf("Failed to load painting texture: %s", json.asset_id);
+            Log.warnf("Failed to load painting texture %s of %s", json.asset_id, paintingVariant.getNamespacedName());
           }
           PaintingEntity.registerPainting(paintingVariant.getNamespacedName(), new PaintingEntity.Painting(paintingTexture, json.width, json.height));
-        } catch (IOException ignored) {
-          Log.warnf("Failed to load painting variant: %s", paintingVariant.getNamespacedName());
+        } catch (Exception e) {
+          Log.warn("Failed to load painting " + paintingVariant.getNamespacedName() + " from " + paintingVariant.resourcePack().getFile().getAbsolutePath(), e);
         }
       }
     });
