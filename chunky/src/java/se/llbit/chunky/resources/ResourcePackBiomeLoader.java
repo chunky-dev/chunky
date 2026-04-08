@@ -24,7 +24,6 @@ import se.llbit.chunky.world.biome.BiomeBuilder;
 import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.log.Log;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.util.Optional;
@@ -77,9 +76,9 @@ public class ResourcePackBiomeLoader implements ResourcePackLoader.PackLoader {
             }
           });
           // TODO Custom fog colors
-
           Biomes.register(builder);
-        } catch (IOException ignored) {
+        } catch (Exception e) {
+          Log.warn("Failed to load biome " + biome.getNamespacedName() + " from " + biome.resourcePack().getFile().getAbsolutePath(), e);
         }
       }
     });
