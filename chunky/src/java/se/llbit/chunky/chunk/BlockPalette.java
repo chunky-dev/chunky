@@ -64,6 +64,7 @@ public class BlockPalette {
 
   private final Map<BlockSpec, Integer> blockMap;
   private List<Block> palette;
+  private final Set<String> unsupportedBlocks = ConcurrentHashMap.newKeySet();
 
   private ReentrantLock lock = new ReentrantLock();
 
@@ -131,12 +132,23 @@ public class BlockPalette {
       id = palette.size();
       blockMap.put(spec, id);
       Block block = spec.toBlock();
+      if (block instanceof UnknownBlock) {
+        unsupportedBlocks.add(block.name);
+      }
       applyMaterial(block);
       palette.add(block);
       return id;
     } finally {
       lock.unlock();
     }
+  }
+
+  /**
+   * Returns the set of block names that were not recognized by any block provider.
+   * These blocks are rendered as {@link UnknownBlock}.
+   */
+  public Set<String> getUnsupportedBlocks() {
+    return Collections.unmodifiableSet(unsupportedBlocks);
   }
 
   public Block get(int id) {
