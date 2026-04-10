@@ -575,13 +575,6 @@ public class Scene implements JsonSerializable {
           Log.warn("Could not load chunks (no world found for scene)");
         } else {
           loadChunks(taskTracker, loadedWorld, chunksToLoadByRegion);
-          if (palette != null) {
-            Set<String> unsupported = palette.getUnsupportedBlocks();
-            if (!unsupported.isEmpty()) {
-              Log.warn("Unsupported blocks found: " + String.join(", ", unsupported)
-                  + ". Consider updating Chunky or check https://github.com/chunky-dev/chunky/labels/minecraft for known issues.");
-            }
-          }
         }
       }
 
@@ -1472,6 +1465,14 @@ public class Scene implements JsonSerializable {
     Log.info(String.format("Loaded %d chunks", numChunks));
 
     importMaterials();
+
+    if (palette != null) {
+      Set<String> unsupported = palette.getUnsupportedBlocks();
+      if (!unsupported.isEmpty()) {
+        Log.warn("Unsupported blocks found: " + String.join(", ", unsupported)
+            + ". Consider updating Chunky or check https://github.com/chunky-dev/chunky/labels/minecraft for known issues.");
+      }
+    }
 
     isLoading = false;
   }

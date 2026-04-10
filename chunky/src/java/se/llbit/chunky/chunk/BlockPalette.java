@@ -64,7 +64,7 @@ public class BlockPalette {
 
   private final Map<BlockSpec, Integer> blockMap;
   private List<Block> palette;
-  private final Set<String> unsupportedBlocks = ConcurrentHashMap.newKeySet();
+  private final Set<String> unsupportedBlocks = new HashSet<>();
 
   private ReentrantLock lock = new ReentrantLock();
 
