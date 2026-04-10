@@ -310,7 +310,6 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/blocks/beacon", Texture.beacon),
         new SimpleTexture("textures/blocks/beacon", Texture.beacon),
         new IndexedTexture(0x29, Texture.beacon)));
-    ALL_TEXTURES.put("beacon_beam", new SimpleTexture("assets/minecraft/textures/entity/beacon_beam", Texture.beaconBeam));
     ALL_TEXTURES.put("crafting_table_top", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/crafting_table_top",
             Texture.workbenchTop),
@@ -3017,9 +3016,6 @@ public class TexturePackLoader {
 
     ALL_TEXTURES.put("banner_base",
         new SimpleTexture("assets/minecraft/textures/entity/banner_base", Texture.bannerBase));
-
-    ALL_TEXTURES.put("armor_stand",
-        new SimpleTexture("assets/minecraft/textures/entity/armorstand/wood", Texture.armorStand));
 
     // Minecraft 1.13
     ALL_TEXTURES.put("stripped_oak_log",
