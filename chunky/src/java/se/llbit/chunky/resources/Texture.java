@@ -1737,6 +1737,7 @@ public class Texture {
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 
+  @TexturePath(value = "assets/minecraft/textures/entity/armorstand/armorstand", alternatives = {"assets/minecraft/textures/entity/armorstand/wood"})
   public static final Texture armorStand = new Texture();
 
   protected static boolean useAverageColor = PersistentSettings.getSingleColorTextures();
