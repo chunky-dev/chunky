@@ -321,6 +321,7 @@ public class Texture {
   public static final Texture potatoes2 = new Texture();
   public static final Texture potatoes3 = new Texture();
   public static final Texture beacon = new Texture();
+  @TexturePath(value = "assets/minecraft/textures/entity/beacon/beacon_beam", alternatives = {"assets/minecraft/textures/entity/beacon_beam"})
   public static final Texture beaconBeam = new Texture();
   public static final Texture anvilSide = new Texture();
   public static final Texture anvilTop = new Texture();
