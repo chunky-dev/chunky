@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer;
 
+import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
 
@@ -25,7 +26,19 @@ import java.util.Random;
  * State for a render worker.
  */
 public class WorkerState {
-  public Ray ray;
+  public Ray ray = new Ray();
   public Vector4 attenuation = new Vector4();
   public Random random;
+
+  public void reset() {
+    ray.distance = 0;
+    ray.setPrevMaterial(Air.INSTANCE, 0);
+    ray.setCurrentMaterial(Air.INSTANCE, 0);
+    ray.depth = 0;
+    ray.t = 0;
+    ray.tNext = 0;
+    ray.specular = false;
+
+    attenuation.set(0, 0, 0, 0);
+  }
 }
