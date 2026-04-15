@@ -181,6 +181,7 @@ public abstract class QuadModel implements BlockModel {
     for (Quad quad : quads) {
       if (quad.closestIntersection(ray, intersectionTest)) {
         hit = true;
+        intersectionTest.setNormal(quad.n);
       }
     }
     if (hit) {
