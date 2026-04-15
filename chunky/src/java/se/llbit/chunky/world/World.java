@@ -62,7 +62,7 @@ public class World implements Comparable<World> {
   /** Timestamp for level.dat when player data was last loaded. */
   private long timestamp;
 
-  private Optional<UUID> singleplayerPlayerUuid;
+  private UUID singleplayerPlayerUuid;
 
   /**
    * @param levelName name of the world (not the world directory).
@@ -136,9 +136,9 @@ public class World implements Comparable<World> {
       world.gameMode = gameType.intValue(0);
       world.versionId = versionId.intValue();
       if (singleplayerUuid.isIntArray(4)) {
-        world.singleplayerPlayerUuid = Optional.of(UuidUtil.intsToUuid(singleplayerUuid.intArray()));
+        world.singleplayerPlayerUuid = UuidUtil.intsToUuid(singleplayerUuid.intArray());
       } else if (!player.isError()) {
-        world.singleplayerPlayerUuid = Optional.of(PlayerEntityData.getUuid(player));
+        world.singleplayerPlayerUuid = PlayerEntityData.getUuid(player);
       }
 
       Dimension dimension = loadDimension(world, worldDirectory, dimensionId, playerEntities);
@@ -221,9 +221,9 @@ public class World implements Comparable<World> {
       Tag player = result.get(".Data.Player");
       Tag singleplayerUuid = result.get(".Data.singleplayer_uuid");
       if (singleplayerUuid.isIntArray(4)) {
-        singleplayerPlayerUuid = Optional.of(UuidUtil.intsToUuid(singleplayerUuid.intArray()));
+        singleplayerPlayerUuid = UuidUtil.intsToUuid(singleplayerUuid.intArray());
       } else if (!player.isError()) {
-        singleplayerPlayerUuid = Optional.of(PlayerEntityData.getUuid(player));
+        singleplayerPlayerUuid = PlayerEntityData.getUuid(player);
       }
 
       currentDimension.setPlayerEntities(getPlayerEntityData(worldDirectory, currentDimension.getDimensionId(), player));
@@ -264,7 +264,7 @@ public class World implements Comparable<World> {
   }
 
   public Optional<UUID> getSingleplayerPlayerUuid() {
-    return singleplayerPlayerUuid;
+    return Optional.of(singleplayerPlayerUuid);
   }
 
   /**
