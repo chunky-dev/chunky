@@ -2483,7 +2483,7 @@ public class Scene implements JsonSerializable {
    * @return Foliage color for the given coordinates
    */
   public float[] getDryFoliageColor(int x, int y, int z) {
-    if (biomeColors) {
+    if (biomeColors && dryFoliageTexture != null) { // older scenes don't have a dry foliage color
       float[] color = dryFoliageTexture.get(x, y, z);
       if (color != null) {
         return color;
