@@ -496,6 +496,9 @@ public class Octree implements Intersectable {
 
     // Check if we are in-bounds
     if (!isInside(ray.o)) {
+      if (ray.getCurrentMedium() != Void.INSTANCE) {
+        return false;
+      }
       double dist = enterOctree(ray, intersectionRecord);
       if (Double.isNaN(dist)) {
         return false;
