@@ -264,7 +264,7 @@ public class World implements Comparable<World> {
   }
 
   public Optional<UUID> getSingleplayerPlayerUuid() {
-    return Optional.of(singleplayerPlayerUuid);
+    return Optional.ofNullable(singleplayerPlayerUuid);
   }
 
   /**
