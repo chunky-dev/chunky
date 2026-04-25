@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -57,6 +58,7 @@ public class Dialogs {
       dialogStage.getIcons().addAll(mainWindowStage.getIcons());
     }
     dialog.initOwner(mainWindow);
+    dialog.initModality(Modality.WINDOW_MODAL);
   }
 
   /**
