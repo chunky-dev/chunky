@@ -1730,9 +1730,32 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/entity/copper_golem/oxidized_copper_golem")
   public static final Texture copperGolemOxidized = new Texture();
 
-  // [26.1 (2026 Spring Drop)]
+  // [26.1 (Tiny Takeover)]
   @TexturePath("assets/minecraft/textures/block/golden_dandelion")
   public static final Texture goldenDandelion = new Texture();
+
+  // [26.2 (Chaos Cubed)]
+  @TexturePath("assets/minecraft/textures/block/chiseled_cinnabar")
+  public static final Texture chiseledCinnabar = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cinnabar")
+  public static final Texture cinnabar = new Texture();
+  @TexturePath("assets/minecraft/textures/block/cinnabar_bricks")
+  public static final Texture cinnabarBricks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/polished_cinnabar")
+  public static final Texture polishedCinnabar = new Texture();
+  @TexturePath("assets/minecraft/textures/block/chiseled_sulfur")
+  public static final Texture chiseledSulfur = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur")
+  public static final Texture sulfur = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_bricks")
+  public static final Texture sulfurBricks = new Texture();
+  @TexturePath("assets/minecraft/textures/block/potent_sulfur")
+  public static final Texture potentSulfur = new Texture();
+  @TexturePath("assets/minecraft/textures/block/polished_sulfur")
+  public static final Texture polishedSulfur = new Texture();
+
+  @TexturePath("assets/minecraft/textures/entity/equipment/wings/elytra")
+  public static final Texture elytra = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
