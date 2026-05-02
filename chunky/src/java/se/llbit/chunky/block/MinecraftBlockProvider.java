@@ -1234,9 +1234,38 @@ public class MinecraftBlockProvider implements BlockProvider {
       "copper_golem_statue", "waxed_copper_golem_statue", "exposed_copper_golem_statue", "waxed_exposed_copper_golem_statue",
       "weathered_copper_golem_statue", "waxed_weathered_copper_golem_statue", "oxidized_copper_golem_statue", "waxed_oxidized_copper_golem_statue");
 
-    // 26.1 (2026 Spring Drop)
+    // 26.1 (Tiny Takeover)
     addBlock("golden_dandelion", (name, tag) -> new SpriteBlock(name, Texture.goldenDandelion));
     addBlock("potted_golden_dandelion", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.GOLDEN_DANDELION));
+
+    // 26.2 (Chaos Cubed)
+    addBlock("chiseled_cinnabar", (name, tag) -> new MinecraftBlock(name, Texture.chiseledCinnabar));
+    addBlock("cinnabar", (name, tag) -> new MinecraftBlock(name, Texture.cinnabar));
+    addBlock("cinnabar_slab", (name, tag) -> slab(tag, Texture.cinnabar));
+    addBlock("cinnabar_stairs", (name, tag) -> stairs(tag, Texture.cinnabar));
+    addBlock("cinnabar_wall", (name, tag) -> wall(tag, Texture.cinnabar));
+    addBlock("cinnabar_bricks", (name, tag) -> new MinecraftBlock(name, Texture.cinnabarBricks));
+    addBlock("cinnabar_brick_slab", (name, tag) -> slab(tag, Texture.cinnabarBricks));
+    addBlock("cinnabar_brick_stairs", (name, tag) -> stairs(tag, Texture.cinnabarBricks));
+    addBlock("cinnabar_brick_wall", (name, tag) -> wall(tag, Texture.cinnabarBricks));
+    addBlock("polished_cinnabar", (name, tag) -> new MinecraftBlock(name, Texture.polishedCinnabar));
+    addBlock("polished_cinnabar_slab", (name, tag) -> slab(tag, Texture.polishedCinnabar));
+    addBlock("polished_cinnabar_stairs", (name, tag) -> stairs(tag, Texture.polishedCinnabar));
+    addBlock("polished_cinnabar_wall", (name, tag) -> wall(tag, Texture.polishedCinnabar));
+    addBlock("chiseled_sulfur", (name, tag) -> new MinecraftBlock(name, Texture.chiseledSulfur));
+    addBlock("sulfur", (name, tag) -> new MinecraftBlock(name, Texture.sulfur));
+    addBlock("sulfur_slab", (name, tag) -> slab(tag, Texture.sulfur));
+    addBlock("sulfur_stairs", (name, tag) -> stairs(tag, Texture.sulfur));
+    addBlock("sulfur_wall", (name, tag) -> wall(tag, Texture.sulfur));
+    addBlock("sulfur_bricks", (name, tag) -> new MinecraftBlock(name, Texture.sulfurBricks));
+    addBlock("sulfur_brick_slab", (name, tag) -> slab(tag, Texture.sulfurBricks));
+    addBlock("sulfur_brick_stairs", (name, tag) -> stairs(tag, Texture.sulfurBricks));
+    addBlock("sulfur_brick_wall", (name, tag) -> wall(tag, Texture.sulfurBricks));
+    addBlock("potent_sulfur", (name, tag) -> new MinecraftBlock(name, Texture.potentSulfur));
+    addBlock("polished_sulfur", (name, tag) -> new MinecraftBlock(name, Texture.polishedSulfur));
+    addBlock("polished_sulfur_slab", (name, tag) -> slab(tag, Texture.polishedSulfur));
+    addBlock("polished_sulfur_stairs", (name, tag) -> stairs(tag, Texture.polishedSulfur));
+    addBlock("polished_sulfur_wall", (name, tag) -> wall(tag, Texture.polishedSulfur));
   }
 
   @Override
