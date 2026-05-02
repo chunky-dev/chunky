@@ -150,6 +150,7 @@ public class Biomes {
   private static final Biome mangroveSwamp = register(Biome.create("minecraft:mangrove_swamp", "Mangrove Swamp", 0.8, 0.9).defaultColors(0x6A7039, 0x8DB127, 0xA36946).waterColor(0x3A7A6A).mapColor(0x07F9B2).swamp());
   private static final Biome cherryGrove = register(Biome.create("minecraft:cherry_grove", "Cherry Grove", 0.5, 0.8).mapColor(0xFCCBE7).defaultColors(0xB6DB61, 0xB6DB61, 0xA17148).grassColor(0xB6DB61).foliageColor(0xB6DB61));
   private static final Biome paleGarden = register(Biome.create("minecraft:pale_garden", "Pale Garden", 0.7, 0.8).mapColor(0xB9B9B9).grassColor(0x778272).foliageColor(0x878D76).dryFoliageColor(0xA0A69C).waterColor(0x76889D));
+  private static final Biome sulfurCaves = register(Biome.create("minecraft:sulfur_caves", "Sulfur Caves", 0.8, 0.4).mapColor(0xE5E533).defaultColors(0x91BD59, 0x77AB2F, 0xA37546).waterColor(0x34BF89));
 
   /**
    * Pre-1.18 biomes, i.e. before the biomes palette was introduced.
