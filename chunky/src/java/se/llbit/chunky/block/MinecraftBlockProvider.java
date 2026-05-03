@@ -1266,6 +1266,9 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("polished_sulfur_slab", (name, tag) -> slab(tag, Texture.polishedSulfur));
     addBlock("polished_sulfur_stairs", (name, tag) -> stairs(tag, Texture.polishedSulfur));
     addBlock("polished_sulfur_wall", (name, tag) -> wall(tag, Texture.polishedSulfur));
+    addBlock("sulfur_spike", (name, tag) -> new SulfurSpike(
+      tag.get("Properties").get("thickness").stringValue("tip"),
+      tag.get("Properties").get("vertical_direction").stringValue("up")));
   }
 
   @Override

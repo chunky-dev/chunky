@@ -1753,6 +1753,26 @@ public class Texture {
   public static final Texture potentSulfur = new Texture();
   @TexturePath("assets/minecraft/textures/block/polished_sulfur")
   public static final Texture polishedSulfur = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_down_base")
+  public static final Texture sulfurSpikeDownBase = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_down_frustum")
+  public static final Texture sulfurSpikeDownFrustum = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_down_middle")
+  public static final Texture sulfurSpikeDownMiddle = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_down_tip")
+  public static final Texture sulfurSpikeDownTip = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_down_tip_merge")
+  public static final Texture sulfurSpikeDownTipMerge = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_up_base")
+  public static final Texture sulfurSpikeUpBase = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_up_frustum")
+  public static final Texture sulfurSpikeUpFrustum = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_up_middle")
+  public static final Texture sulfurSpikeUpMiddle = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_up_tip")
+  public static final Texture sulfurSpikeUpTip = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_up_tip_merge")
+  public static final Texture sulfurSpikeUpTipMerge = new Texture();
 
   @TexturePath("assets/minecraft/textures/entity/equipment/wings/elytra")
   public static final Texture elytra = new Texture();
