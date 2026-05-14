@@ -10,6 +10,7 @@ import se.llbit.chunky.model.Tint;
 import se.llbit.chunky.model.minecraft.FlowerPotModel;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texturepack.BedTexture;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
 
@@ -2485,7 +2486,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "gray_bed":
         return bed(tag, Texture.bedGray);
       case "light_gray_bed":
-        return bed(tag, Texture.bedSilver);
+        return bed(tag, Texture.bedLightGray);
       case "cyan_bed":
         return bed(tag, Texture.bedCyan);
       case "purple_bed":
@@ -3283,7 +3284,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new GlazedTerracotta(name, texture, facing);
   }
 
-  private static Block bed(Tag tag, Texture texture) {
+  private static Block bed(Tag tag, BedTexture.Textures texture) {
     String name = BlockProvider.blockName(tag);
     String part = tag.get("Properties").get("part").stringValue("head");
     String facing = BlockProvider.facing(tag, "south");

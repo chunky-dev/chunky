@@ -20,6 +20,7 @@ import javafx.scene.image.Image;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.texturepack.BedTexture;
 import se.llbit.chunky.resources.texturepack.ChestTexture;
 import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.TexturePath;
@@ -670,22 +671,22 @@ public class Texture {
   public static final Texture strippedAcaciaLog = new Texture();
   public static final Texture strippedAcaciaLogTop = new Texture();
 
-  public static final Texture bedWhite = new Texture();
-  public static final Texture bedOrange = new Texture();
-  public static final Texture bedMagenta = new Texture();
-  public static final Texture bedLightBlue = new Texture();
-  public static final Texture bedYellow = new Texture();
-  public static final Texture bedLime = new Texture();
-  public static final Texture bedPink = new Texture();
-  public static final Texture bedGray = new Texture();
-  public static final Texture bedSilver = new Texture();
-  public static final Texture bedCyan = new Texture();
-  public static final Texture bedPurple = new Texture();
-  public static final Texture bedBlue = new Texture();
-  public static final Texture bedBrown = new Texture();
-  public static final Texture bedGreen = new Texture();
-  public static final Texture bedRed = new Texture();
-  public static final Texture bedBlack = new Texture();
+  public static final BedTexture.Textures bedWhite = new BedTexture.Textures();
+  public static final BedTexture.Textures bedOrange = new BedTexture.Textures();
+  public static final BedTexture.Textures bedMagenta = new BedTexture.Textures();
+  public static final BedTexture.Textures bedLightBlue = new BedTexture.Textures();
+  public static final BedTexture.Textures bedYellow = new BedTexture.Textures();
+  public static final BedTexture.Textures bedLime = new BedTexture.Textures();
+  public static final BedTexture.Textures bedPink = new BedTexture.Textures();
+  public static final BedTexture.Textures bedGray = new BedTexture.Textures();
+  public static final BedTexture.Textures bedLightGray = new BedTexture.Textures();
+  public static final BedTexture.Textures bedCyan = new BedTexture.Textures();
+  public static final BedTexture.Textures bedPurple = new BedTexture.Textures();
+  public static final BedTexture.Textures bedBlue = new BedTexture.Textures();
+  public static final BedTexture.Textures bedBrown = new BedTexture.Textures();
+  public static final BedTexture.Textures bedGreen = new BedTexture.Textures();
+  public static final BedTexture.Textures bedRed = new BedTexture.Textures();
+  public static final BedTexture.Textures bedBlack = new BedTexture.Textures();
 
   // [1.13]
   public static final Texture kelp = new Texture();

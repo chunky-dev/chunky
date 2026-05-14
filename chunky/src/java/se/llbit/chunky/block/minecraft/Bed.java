@@ -19,34 +19,37 @@
 package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
-import se.llbit.chunky.model.minecraft.BedModel;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.model.minecraft.BedFootModel;
+import se.llbit.chunky.model.minecraft.BedHeadModel;
+import se.llbit.chunky.resources.texturepack.BedTexture;
 
 public class Bed extends AbstractModelBlock {
 
   private final String description;
 
-  public Bed(String name, Texture texture, String part, String facing) {
-    super(name, texture);
+  public Bed(String name, BedTexture.Textures texture, String part, String facing) {
+    super(name, part.equals("head") ? texture.headUp : texture.footUp);
     this.description = String.format("part=%s, facing=%s", part, facing);
     boolean head = part.equals("head");
     int direction;
     switch (facing) {
       default:
       case "north":
-        direction = 2;
-        break;
-      case "east":
-        direction = 3;
-        break;
-      case "south":
         direction = 0;
         break;
-      case "west":
+      case "east":
         direction = 1;
         break;
+      case "south":
+        direction = 2;
+        break;
+      case "west":
+        direction = 3;
+        break;
     }
-    model = new BedModel(head, direction, texture);
+    model = head
+      ? new BedHeadModel(direction, texture)
+      : new BedFootModel(direction, texture);
     solid = false;
   }
 
