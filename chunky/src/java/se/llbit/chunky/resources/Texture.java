@@ -1088,7 +1088,6 @@ public class Texture {
   public static final Texture strippedMangroveLog = new Texture();
   @TexturePath("assets/minecraft/textures/block/stripped_mangrove_log_top")
   public static final Texture strippedMangroveLogTop = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/mangrove")
   public static final Texture mangroveSignPost = new Texture();
   @TexturePath("assets/minecraft/textures/block/mangrove_trapdoor")
   public static final Texture mangroveTrapdoor = new Texture();
@@ -1142,7 +1141,6 @@ public class Texture {
   public static final Texture strippedBambooBlock = new Texture();
   @TexturePath("assets/minecraft/textures/block/stripped_bamboo_block_top")
   public static final Texture strippedBambooBlockTop = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/bamboo")
   public static final Texture bambooSignPost = new Texture();
   @TexturePath("assets/minecraft/textures/block/bamboo_trapdoor")
   public static final Texture bambooTrapdoor = new Texture();
@@ -1163,7 +1161,6 @@ public class Texture {
   public static final Texture strippedCherryLog = new Texture();
   @TexturePath("assets/minecraft/textures/block/stripped_cherry_log_top")
   public static final Texture strippedCherryLogTop = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/cherry")
   public static final Texture cherrySignPost = new Texture();
   @TexturePath("assets/minecraft/textures/block/cherry_trapdoor")
   public static final Texture cherryTrapdoor = new Texture();
@@ -1538,7 +1535,6 @@ public class Texture {
   public static final Texture strippedPaleOakLogTop = new Texture();
   @TexturePath("assets/minecraft/textures/block/pale_oak_sapling")
   public static final Texture paleOakSapling = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/pale_oak")
   public static final Texture paleOakSignPost = new Texture();
   @TexturePath("assets/minecraft/textures/entity/signs/hanging/pale_oak")
   public static final Texture paleOakHangingSign = new Texture();
