@@ -151,8 +151,8 @@ public class SignTexture extends Texture {
   @Override
   public float[] getColor(double u, double v) {
     if (textColor != null) {
-      int x = (int) (u * textColor.width - Ray.EPSILON);
-      int y = (int) ((1 - v) * textColor.height - Ray.EPSILON);
+      int x = (int) ((1 - u) * textColor.width - Ray.EPSILON);
+      int y = (int) (v * textColor.height - Ray.EPSILON);
       if (textMask != null && textMask.getPixel(x, y)) {
         Color characterColor = Color.get(textColor.getPixel(x, y));
         return characterColor.linearColor;
@@ -166,6 +166,6 @@ public class SignTexture extends Texture {
         return dyeColor.getGlowingOutlineColor().linearColor;
       }
     }
-    return signTexture.getColor(u * ww + u0, v * hh + v0);
+    return signTexture.getColor((1 - u) * ww + u0, 1 - (v * hh + v0));
   }
 }
