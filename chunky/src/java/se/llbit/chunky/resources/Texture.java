@@ -1311,27 +1311,16 @@ public class Texture {
   public static final Texture calibratedSculkSensorTop = new Texture();
   @TexturePath("assets/minecraft/textures/block/calibrated_sculk_sensor_input_side")
   public static final Texture calibratedSculkSensorInputSide = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/hanging/oak")
   public static final Texture oakHangingSign = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/hanging/spruce")
   public static final Texture spruceHangingSign = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/hanging/birch")
   public static final Texture birchHangingSign = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/hanging/jungle")
   public static final Texture jungleHangingSign = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/hanging/acacia")
   public static final Texture acaciaHangingSign = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/hanging/dark_oak")
   public static final Texture darkOakHangingSign = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/hanging/crimson")
   public static final Texture crimsonHangingSign = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/hanging/warped")
   public static final Texture warpedHangingSign = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/hanging/mangrove")
   public static final Texture mangroveHangingSign = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/hanging/bamboo")
   public static final Texture bambooHangingSign = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/hanging/cherry")
   public static final Texture cherryHangingSign = new Texture();
   @TexturePath("assets/minecraft/textures/entity/piglin/piglin")
   public static final Texture piglin = new Texture();
@@ -1536,7 +1525,6 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/pale_oak_sapling")
   public static final Texture paleOakSapling = new Texture();
   public static final Texture paleOakSignPost = new Texture();
-  @TexturePath("assets/minecraft/textures/entity/signs/hanging/pale_oak")
   public static final Texture paleOakHangingSign = new Texture();
   @TexturePath("assets/minecraft/textures/block/pale_moss_carpet")
   public static final Texture paleMossCarpet = new Texture();
