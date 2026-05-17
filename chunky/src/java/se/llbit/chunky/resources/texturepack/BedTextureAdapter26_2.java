@@ -28,7 +28,7 @@ public class BedTextureAdapter26_2 extends TextureLoader {
       return false;
     }
 
-    int scale = 1;
+    int scale = originalTexture.getWidth() / 64;
     BitmapImage headUp = new BitmapImage(16 * scale, 16 * scale);
     headUp.blit(originalTexture.getBitmap(), 0, 0, 6 * scale, 6 * scale, 22 * scale, 22 * scale);
     targetTextures.headUp.setTexture(headUp);
