@@ -19,193 +19,162 @@ import java.util.LinkedList;
 
 public class HangingSignEntity extends Entity {
   private static final Quad[] quadsAttached = new Quad[]{
-    // top
     new Quad(
-      new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
-      new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
-      new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
-      new Vector4(2 / 64., 16 / 64., 1 - 12 / 32., 1 - 14 / 32.)
+      new Vector3(1 / 16.0, 10 / 16.0, 9 / 16.0),
+      new Vector3(15 / 16.0, 10 / 16.0, 9 / 16.0),
+      new Vector3(1 / 16.0, 10 / 16.0, 7 / 16.0),
+      new Vector4(1 / 16.0, 8 / 16.0, 8 / 16.0, 9 / 16.0)
     ),
-    // bottom
     new Quad(
-      new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
-      new Vector3(7 / 16.0, 0 / 16.0, -1 / 16.0),
-      new Vector3(-7 / 16.0, 0 / 16.0, 1 / 16.0),
-      new Vector4(16 / 64., 30 / 64., 1 - 12 / 32., 1 - 14 / 32.)
+      new Vector3(1 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector3(15 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector3(1 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector4(1 / 16.0, 8 / 16.0, 2 / 16.0, 3 / 16.0)
     ),
-    // left
     new Quad(
-      new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
-      new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
-      new Vector3(-7 / 16.0, 0 / 16.0, 1 / 16.0),
-      new Vector4(0 / 64., 2 / 64.0, 1 - 14 / 32., 1 - 24 / 32.)
+      new Vector3(1 / 16.0, 10 / 16.0, 9 / 16.0),
+      new Vector3(1 / 16.0, 10 / 16.0, 7 / 16.0),
+      new Vector3(1 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector4(1 / 16.0, 0 / 16.0, 8 / 16.0, 3 / 16.0)
     ),
-    // right
     new Quad(
-      new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
-      new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
-      new Vector3(7 / 16.0, 0 / 16.0, -1 / 16.0),
-      new Vector4(16 / 64., 18 / 64.0, 1 - 14 / 32., 1 - 24 / 32.)
+      new Vector3(15 / 16.0, 10 / 16.0, 7 / 16.0),
+      new Vector3(15 / 16.0, 10 / 16.0, 9 / 16.0),
+      new Vector3(15 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector4(9 / 16.0, 8 / 16.0, 8 / 16.0, 3 / 16.0)
     ),
-    // front
     new Quad(
-      new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
-      new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
-      new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
-      new Vector4(16 / 64., 2 / 64., 1 - 14 / 32., 1 - 24 / 32.)
+      new Vector3(1 / 16.0, 10 / 16.0, 7 / 16.0),
+      new Vector3(15 / 16.0, 10 / 16.0, 7 / 16.0),
+      new Vector3(1 / 16.0, 0 / 16.0, 7 / 16.0),
+      new Vector4(16 / 16.0, 9 / 16.0, 8 / 16.0, 3 / 16.0)
     ),
-    // back
     new Quad(
-      new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
-      new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
-      new Vector3(7 / 16.0, 0 / 16.0, 1 / 16.0),
-      new Vector4(32 / 64., 18 / 64., 1 - 14 / 32., 1 - 24 / 32.)
+      new Vector3(15 / 16.0, 10 / 16.0, 9 / 16.0),
+      new Vector3(1 / 16.0, 10 / 16.0, 9 / 16.0),
+      new Vector3(15 / 16.0, 0 / 16.0, 9 / 16.0),
+      new Vector4(8 / 16.0, 1 / 16.0, 8 / 16.0, 3 / 16.0)
     ),
-    // chains front
     new Quad(
-      new Vector3(-6 / 16.0, 16 / 16.0, 0 / 16.0),
-      new Vector3(6 / 16.0, 16 / 16.0, 0 / 16.0),
-      new Vector3(-6 / 16.0, 10 / 16.0, 0 / 16.0),
-      new Vector4(13 / 64., 27 / 64., 1 - 6 / 32., 1 - 12 / 32.)
+      new Vector3(2 / 16.0, 16 / 16.0, 8 / 16.0),
+      new Vector3(14 / 16.0, 16 / 16.0, 8 / 16.0),
+      new Vector3(2 / 16.0, 10 / 16.0, 8 / 16.0),
+      new Vector4(10 / 16.0, 16 / 16.0, 16 / 16.0, 13 / 16.0)
     ),
-    // chains back
     new Quad(
-      new Vector3(6 / 16.0, 16 / 16.0, 0 / 16.0),
-      new Vector3(-6 / 16.0, 16 / 16.0, 0 / 16.0),
-      new Vector3(6 / 16.0, 10 / 16.0, 0 / 16.0),
-      new Vector4(13 / 64., 27 / 64., 1 - 6 / 32., 1 - 12 / 32.)
+      new Vector3(14 / 16.0, 16 / 16.0, 8 / 16.0),
+      new Vector3(2 / 16.0, 16 / 16.0, 8 / 16.0),
+      new Vector3(14 / 16.0, 10 / 16.0, 8 / 16.0),
+      new Vector4(16 / 16.0, 10 / 16.0, 16 / 16.0, 13 / 16.0)
     )
   };
 
   private static final Quad[] quadsNotAttached = Model.join(
     new Quad[]{
-      // top
       new Quad(
-        new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
-        new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
-        new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
-        new Vector4(2 / 64., 16 / 64., 1 - 12 / 32., 1 - 14 / 32.)
+        new Vector3(1 / 16.0, 10 / 16.0, 9 / 16.0),
+        new Vector3(15 / 16.0, 10 / 16.0, 9 / 16.0),
+        new Vector3(1 / 16.0, 10 / 16.0, 7 / 16.0),
+        new Vector4(1 / 16.0, 8 / 16.0, 8 / 16.0, 9 / 16.0)
       ),
-      // bottom
       new Quad(
-        new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
-        new Vector3(7 / 16.0, 0 / 16.0, -1 / 16.0),
-        new Vector3(-7 / 16.0, 0 / 16.0, 1 / 16.0),
-        new Vector4(16 / 64., 30 / 64., 1 - 12 / 32., 1 - 14 / 32.)
+        new Vector3(1 / 16.0, 0 / 16.0, 7 / 16.0),
+        new Vector3(15 / 16.0, 0 / 16.0, 7 / 16.0),
+        new Vector3(1 / 16.0, 0 / 16.0, 9 / 16.0),
+        new Vector4(1 / 16.0, 8 / 16.0, 2 / 16.0, 3 / 16.0)
       ),
-      // left
       new Quad(
-        new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
-        new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
-        new Vector3(-7 / 16.0, 0 / 16.0, 1 / 16.0),
-        new Vector4(0 / 64., 2 / 64.0, 1 - 14 / 32., 1 - 24 / 32.)
+        new Vector3(1 / 16.0, 10 / 16.0, 9 / 16.0),
+        new Vector3(1 / 16.0, 10 / 16.0, 7 / 16.0),
+        new Vector3(1 / 16.0, 0 / 16.0, 9 / 16.0),
+        new Vector4(1 / 16.0, 0 / 16.0, 8 / 16.0, 3 / 16.0)
       ),
-      // right
       new Quad(
-        new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
-        new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
-        new Vector3(7 / 16.0, 0 / 16.0, -1 / 16.0),
-        new Vector4(16 / 64., 18 / 64.0, 1 - 14 / 32., 1 - 24 / 32.)
+        new Vector3(15 / 16.0, 10 / 16.0, 7 / 16.0),
+        new Vector3(15 / 16.0, 10 / 16.0, 9 / 16.0),
+        new Vector3(15 / 16.0, 0 / 16.0, 7 / 16.0),
+        new Vector4(9 / 16.0, 8 / 16.0, 8 / 16.0, 3 / 16.0)
       ),
-      // front
       new Quad(
-        new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
-        new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
-        new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
-        new Vector4(16 / 64., 2 / 64., 1 - 14 / 32., 1 - 24 / 32.)
+        new Vector3(1 / 16.0, 10 / 16.0, 7 / 16.0),
+        new Vector3(15 / 16.0, 10 / 16.0, 7 / 16.0),
+        new Vector3(1 / 16.0, 0 / 16.0, 7 / 16.0),
+        new Vector4(16 / 16.0, 9 / 16.0, 8 / 16.0, 3 / 16.0)
       ),
-      // back
       new Quad(
-        new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
-        new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
-        new Vector3(7 / 16.0, 0 / 16.0, 1 / 16.0),
-        new Vector4(32 / 64., 18 / 64., 1 - 14 / 32., 1 - 24 / 32.)
-      ),
+        new Vector3(15 / 16.0, 10 / 16.0, 9 / 16.0),
+        new Vector3(1 / 16.0, 10 / 16.0, 9 / 16.0),
+        new Vector3(15 / 16.0, 0 / 16.0, 9 / 16.0),
+        new Vector4(8 / 16.0, 1 / 16.0, 8 / 16.0, 3 / 16.0)
+      )
     },
-    // chains
-    Model.transform(
+    Model.rotateY(
       new Quad[]{
         new Quad(
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(6 / 64., 9 / 64., 1 - 6 / 32., 1 - 12 / 32.)
+          new Vector3(2.96447 / 16.0, 16 / 16.0, 4.46447 / 16.0),
+          new Vector3(5.96447 / 16.0, 16 / 16.0, 4.46447 / 16.0),
+          new Vector3(2.96447 / 16.0, 10 / 16.0, 4.46447 / 16.0),
+          new Vector4(11 / 16.0, 12.5 / 16.0, 12.5 / 16.0, 9.5 / 16.0)
         ),
         new Quad(
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(6 / 64., 9 / 64., 1 - 6 / 32., 1 - 12 / 32.)
+          new Vector3(5.96447 / 16.0, 16 / 16.0, 4.46447 / 16.0),
+          new Vector3(2.96447 / 16.0, 16 / 16.0, 4.46447 / 16.0),
+          new Vector3(5.96447 / 16.0, 10 / 16.0, 4.46447 / 16.0),
+          new Vector4(12.5 / 16.0, 11 / 16.0, 12.5 / 16.0, 9.5 / 16.0)
         )
       },
-      Transform.NONE
-        .translate(0.5, 0.5, 0.5)
-        .rotateY(Math.toRadians(-45))
-        .translate(-0.5, -0.5, -0.5)
-        .translate(-5 / 16.0, 0 / 16.0, 0 / 16.0)
+      Math.toRadians(45)
     ),
-    Model.transform(
+    Model.rotateY(
       new Quad[]{
         new Quad(
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(0 / 64., 3 / 64., 1 - 6 / 32., 1 - 12 / 32.)
+          new Vector3(2.96447 / 16.0, 15 / 16.0, 11.53553 / 16.0),
+          new Vector3(5.96447 / 16.0, 15 / 16.0, 11.53553 / 16.0),
+          new Vector3(2.96447 / 16.0, 11 / 16.0, 11.53553 / 16.0),
+          new Vector4(14 / 16.0, 15.5 / 16.0, 12 / 16.0, 10 / 16.0)
         ),
         new Quad(
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(0 / 64., 3 / 64., 1 - 6 / 32., 1 - 12 / 32.)
+          new Vector3(5.96447 / 16.0, 15 / 16.0, 11.53553 / 16.0),
+          new Vector3(2.96447 / 16.0, 15 / 16.0, 11.53553 / 16.0),
+          new Vector3(5.96447 / 16.0, 11 / 16.0, 11.53553 / 16.0),
+          new Vector4(15.5 / 16.0, 14 / 16.0, 12 / 16.0, 10 / 16.0)
         )
       },
-      Transform.NONE
-        .translate(0.5, 0.5, 0.5)
-        .rotateY(Math.toRadians(45))
-        .translate(-0.5, -0.5, -0.5)
-        .translate(-5 / 16.0, 0 / 16.0, 0 / 16.0)
+      Math.toRadians(-45)
     ),
-    Model.transform(
+    Model.rotateY(
       new Quad[]{
         new Quad(
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(6 / 64., 9 / 64., 1 - 6 / 32., 1 - 12 / 32.)
+          new Vector3(10.03553 / 16.0, 16 / 16.0, 11.53553 / 16.0),
+          new Vector3(13.03553 / 16.0, 16 / 16.0, 11.53553 / 16.0),
+          new Vector3(10.03553 / 16.0, 10 / 16.0, 11.53553 / 16.0),
+          new Vector4(11 / 16.0, 12.5 / 16.0, 12.5 / 16.0, 9.5 / 16.0)
         ),
         new Quad(
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(6 / 64., 9 / 64., 1 - 6 / 32., 1 - 12 / 32.)
+          new Vector3(13.03553 / 16.0, 16 / 16.0, 11.53553 / 16.0),
+          new Vector3(10.03553 / 16.0, 16 / 16.0, 11.53553 / 16.0),
+          new Vector3(13.03553 / 16.0, 10 / 16.0, 11.53553 / 16.0),
+          new Vector4(12.5 / 16.0, 11 / 16.0, 12.5 / 16.0, 9.5 / 16.0)
         )
       },
-      Transform.NONE
-        .translate(0.5, 0.5, 0.5)
-        .rotateY(Math.toRadians(-45))
-        .translate(-0.5, -0.5, -0.5)
-        .translate(5 / 16.0, 0 / 16.0, 0 / 16.0)
+      Math.toRadians(45)
     ),
-    Model.transform(
+    Model.rotateY(
       new Quad[]{
         new Quad(
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(-1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(0 / 64., 3 / 64., 1 - 6 / 32., 1 - 12 / 32.)
+          new Vector3(10.03553 / 16.0, 15 / 16.0, 4.46447 / 16.0),
+          new Vector3(13.03553 / 16.0, 15 / 16.0, 4.46447 / 16.0),
+          new Vector3(10.03553 / 16.0, 11 / 16.0, 4.46447 / 16.0),
+          new Vector4(14 / 16.0, 15.5 / 16.0, 12 / 16.0, 10 / 16.0)
         ),
         new Quad(
-          new Vector3(1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(-1.5 / 16.0, 16 / 16.0, 0 / 16.0),
-          new Vector3(1.5 / 16.0, 10 / 16.0, 0 / 16.0),
-          new Vector4(0 / 64., 3 / 64., 1 - 6 / 32., 1 - 12 / 32.)
+          new Vector3(13.03553 / 16.0, 15 / 16.0, 4.46447 / 16.0),
+          new Vector3(10.03553 / 16.0, 15 / 16.0, 4.46447 / 16.0),
+          new Vector3(13.03553 / 16.0, 11 / 16.0, 4.46447 / 16.0),
+          new Vector4(15.5 / 16.0, 14 / 16.0, 12 / 16.0, 10 / 16.0)
         )
       },
-      Transform.NONE
-        .translate(0.5, 0.5, 0.5)
-        .rotateY(Math.toRadians(45))
-        .translate(-0.5, -0.5, -0.5)
-        .translate(5 / 16.0, 0 / 16.0, 0 / 16.0)
+      Math.toRadians(-45)
     )
   );
 
@@ -216,32 +185,22 @@ public class HangingSignEntity extends Entity {
   private static Quad[] backFaceWithText = new Quad[16];
 
   static {
-    rotatedQuadsAttached[0] = Model.translate(quadsAttached, 0.5, 0, 0.5);
-    rotatedQuadsNotAttached[0] = Model.translate(quadsNotAttached, 0.5, 0, 0.5);
+    rotatedQuadsAttached[0] = quadsAttached;
+    rotatedQuadsNotAttached[0] = quadsNotAttached;
 
     for (int i = 1; i < 16; ++i) {
       rotatedQuadsAttached[i] = Model.rotateY(rotatedQuadsAttached[0], Math.PI - i * Math.PI / 8);
       rotatedQuadsNotAttached[i] = Model.rotateY(rotatedQuadsNotAttached[0], Math.PI - i * Math.PI / 8);
     }
 
-    frontFaceWithText[0] = new Quad(
-      new Vector3(-7 / 16.0, 10 / 16.0, -1 / 16.0),
-      new Vector3(7 / 16.0, 10 / 16.0, -1 / 16.0),
-      new Vector3(-7 / 16.0, 0 / 16.0, -1 / 16.0),
-      new Vector4(1, 0, 1, 0)
-    );
-    frontFaceWithText[0] = frontFaceWithText[0].transform(Transform.NONE.translate(0.5, 0, 0.5));
+    frontFaceWithText[0] = new Quad(quadsAttached[4], Transform.NONE);
+    frontFaceWithText[0].uv.set(0, 1, 0, 1);
     for (int i = 1; i < 16; ++i) {
       frontFaceWithText[i] = frontFaceWithText[0].transform(Transform.NONE.rotateY(Math.PI - i * Math.PI / 8));
     }
 
-    backFaceWithText[0] = new Quad(
-      new Vector3(7 / 16.0, 10 / 16.0, 1 / 16.0),
-      new Vector3(-7 / 16.0, 10 / 16.0, 1 / 16.0),
-      new Vector3(7 / 16.0, 0 / 16.0, 1 / 16.0),
-      new Vector4(1, 0, 1, 0)
-    );
-    backFaceWithText[0] = backFaceWithText[0].transform(Transform.NONE.translate(0.5, 0, 0.5));
+    backFaceWithText[0] = new Quad(quadsAttached[5], Transform.NONE);
+    backFaceWithText[0].uv.set(0, 1, 0, 1);
     for (int i = 1; i < 16; ++i) {
       backFaceWithText[i] = backFaceWithText[0].transform(Transform.NONE.rotateY(Math.PI - i * Math.PI / 8));
     }
@@ -275,8 +234,8 @@ public class HangingSignEntity extends Entity {
     this.backGlowing = backGlowing;
     this.angle = rotation;
     this.attached = attached;
-    this.frontTexture = frontText != null ? new SignTexture(frontText, frontDye, frontGlowing, signTexture, 14, 10, 2 / 64., 1 - 24 / 32., 16 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
-    this.backTexture = backText != null ? new SignTexture(backText, backDye, backGlowing, signTexture, 14, 10, 18 / 64., 1 - 24 / 32., 32 / 64., 1 - 14 / 32., 4.5, 3, 9) : null;
+    this.frontTexture = frontText != null ? new SignTexture(frontText, frontDye, frontGlowing, signTexture, 14, 10, 2 / 32., 16 / 32., 16 / 32., 26 / 32., 4.5, 3, 9) : null;
+    this.backTexture = backText != null ? new SignTexture(backText, backDye, backGlowing, signTexture, 14, 10, 18 / 32., 16 / 32., 32 / 32., 26 / 32., 4.5, 3, 9) : null;
     this.texture = signTexture;
     this.material = material;
   }
