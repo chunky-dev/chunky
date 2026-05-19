@@ -30,33 +30,21 @@ public class PointedDripstone extends SpriteBlock {
 
   private static Texture getTexture(String thickness, String verticalDirection) {
     if (verticalDirection.equals("down")) {
-      switch (thickness) {
-        case "tip_merge":
-          return Texture.pointedDripstoneDownTipMerge;
-        case "frustum":
-          return Texture.pointedDripstoneDownFrustum;
-        case "middle":
-          return Texture.pointedDripstoneDownMiddle;
-        case "base":
-          return Texture.pointedDripstoneDownBase;
-        default:
-        case "tip":
-          return Texture.pointedDripstoneDownTip;
-      }
+      return switch (thickness) {
+        case "tip_merge" -> Texture.pointedDripstoneDownTipMerge;
+        case "frustum" -> Texture.pointedDripstoneDownFrustum;
+        case "middle" -> Texture.pointedDripstoneDownMiddle;
+        case "base" -> Texture.pointedDripstoneDownBase;
+        default -> Texture.pointedDripstoneDownTip; // tip
+      };
     } else {
-      switch (thickness) {
-        case "tip_merge":
-          return Texture.pointedDripstoneUpTipMerge;
-        case "frustum":
-          return Texture.pointedDripstoneUpFrustum;
-        case "middle":
-          return Texture.pointedDripstoneUpMiddle;
-        case "base":
-          return Texture.pointedDripstoneUpBase;
-        default:
-        case "tip":
-          return Texture.pointedDripstoneUpTip;
-      }
+      return switch (thickness) {
+        case "tip_merge" -> Texture.pointedDripstoneUpTipMerge;
+        case "frustum" -> Texture.pointedDripstoneUpFrustum;
+        case "middle" -> Texture.pointedDripstoneUpMiddle;
+        case "base" -> Texture.pointedDripstoneUpBase;
+        default -> Texture.pointedDripstoneUpTip; // tip
+      };
     }
   }
 

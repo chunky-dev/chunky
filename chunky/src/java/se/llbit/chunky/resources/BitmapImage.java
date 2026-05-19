@@ -78,19 +78,48 @@ public class BitmapImage {
   }
 
   /**
-   * Copies a region of the source bitmap into this bitmap at the given (x0, y0) position.
+   * Copies a region of the source bitmap into this bitmap at the given (x0, y0) position and optionally flip it.
    * @param x0 destination x position
    * @param y0 destination y position
    * @param sx0 source x start position
    * @param sy0 source y start position
-   * @param sx1 source x end position
-   * @param sy1 source y end position
+   * @param sx1 source x end position (if smaller than sx0, it will be horizontally flipped)
+   * @param sy1 source y end position (if smaller than sy0, it will be vertically flipped)
    */
   public void blit(BitmapImage source, int x0, int y0, int sx0, int sy0, int sx1, int sy1) {
-    for (int y = 0; y < sy1 - sy0; ++y) {
-      System.arraycopy(source.data, (sy0 + y) * source.width + sx0,
-          data, (y0 + y) * width + x0,
-          sx1 - sx0);
+    int w = Math.abs(sx1 - sx0);
+    int h = Math.abs(sy1 - sy0);
+
+    int xStep = (sx1 >= sx0) ? 1 : -1;
+    int yStep = (sy1 >= sy0) ? 1 : -1;
+
+    if (xStep == 1) {
+      for (int y = 0; y < h; y++) {
+        int srcY = sy0 + y * yStep;
+        if (sy0 > sy1) {
+          srcY -= 1;
+        }
+        System.arraycopy(
+          source.data,
+          srcY * source.width + sx0,
+          data,
+          (y0 + y) * width + x0,
+          w
+        );
+      }
+    } else {
+      for (int y = 0; y < h; y++) {
+        int srcY = sy0 + y * yStep;
+        if (sy0 > sy1) {
+          srcY -= 1;
+        }
+        int dstIndex = (y0 + y) * width + x0;
+        for (int x = 0; x < w; x++) {
+          int srcX = sx0 + x * xStep - 1;
+          data[dstIndex + x] =
+            source.data[srcY * source.width + srcX];
+        }
+      }
     }
   }
 

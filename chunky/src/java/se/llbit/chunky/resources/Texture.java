@@ -20,6 +20,7 @@ import javafx.scene.image.Image;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.texturepack.BedTexture;
 import se.llbit.chunky.resources.texturepack.ChestTexture;
 import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.TexturePath;
@@ -670,22 +671,22 @@ public class Texture {
   public static final Texture strippedAcaciaLog = new Texture();
   public static final Texture strippedAcaciaLogTop = new Texture();
 
-  public static final Texture bedWhite = new Texture();
-  public static final Texture bedOrange = new Texture();
-  public static final Texture bedMagenta = new Texture();
-  public static final Texture bedLightBlue = new Texture();
-  public static final Texture bedYellow = new Texture();
-  public static final Texture bedLime = new Texture();
-  public static final Texture bedPink = new Texture();
-  public static final Texture bedGray = new Texture();
-  public static final Texture bedSilver = new Texture();
-  public static final Texture bedCyan = new Texture();
-  public static final Texture bedPurple = new Texture();
-  public static final Texture bedBlue = new Texture();
-  public static final Texture bedBrown = new Texture();
-  public static final Texture bedGreen = new Texture();
-  public static final Texture bedRed = new Texture();
-  public static final Texture bedBlack = new Texture();
+  public static final BedTexture.Textures bedWhite = new BedTexture.Textures();
+  public static final BedTexture.Textures bedOrange = new BedTexture.Textures();
+  public static final BedTexture.Textures bedMagenta = new BedTexture.Textures();
+  public static final BedTexture.Textures bedLightBlue = new BedTexture.Textures();
+  public static final BedTexture.Textures bedYellow = new BedTexture.Textures();
+  public static final BedTexture.Textures bedLime = new BedTexture.Textures();
+  public static final BedTexture.Textures bedPink = new BedTexture.Textures();
+  public static final BedTexture.Textures bedGray = new BedTexture.Textures();
+  public static final BedTexture.Textures bedLightGray = new BedTexture.Textures();
+  public static final BedTexture.Textures bedCyan = new BedTexture.Textures();
+  public static final BedTexture.Textures bedPurple = new BedTexture.Textures();
+  public static final BedTexture.Textures bedBlue = new BedTexture.Textures();
+  public static final BedTexture.Textures bedBrown = new BedTexture.Textures();
+  public static final BedTexture.Textures bedGreen = new BedTexture.Textures();
+  public static final BedTexture.Textures bedRed = new BedTexture.Textures();
+  public static final BedTexture.Textures bedBlack = new BedTexture.Textures();
 
   // [1.13]
   public static final Texture kelp = new Texture();
@@ -1753,6 +1754,26 @@ public class Texture {
   public static final Texture potentSulfur = new Texture();
   @TexturePath("assets/minecraft/textures/block/polished_sulfur")
   public static final Texture polishedSulfur = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_down_base")
+  public static final Texture sulfurSpikeDownBase = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_down_frustum")
+  public static final Texture sulfurSpikeDownFrustum = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_down_middle")
+  public static final Texture sulfurSpikeDownMiddle = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_down_tip")
+  public static final Texture sulfurSpikeDownTip = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_down_tip_merge")
+  public static final Texture sulfurSpikeDownTipMerge = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_up_base")
+  public static final Texture sulfurSpikeUpBase = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_up_frustum")
+  public static final Texture sulfurSpikeUpFrustum = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_up_middle")
+  public static final Texture sulfurSpikeUpMiddle = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_up_tip")
+  public static final Texture sulfurSpikeUpTip = new Texture();
+  @TexturePath("assets/minecraft/textures/block/sulfur_spike_up_tip_merge")
+  public static final Texture sulfurSpikeUpTipMerge = new Texture();
 
   @TexturePath("assets/minecraft/textures/entity/equipment/wings/elytra")
   public static final Texture elytra = new Texture();

@@ -2977,42 +2977,22 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/blocks/beetroots_stage_3",
             Texture.beets3)));
 
-    ALL_TEXTURES.put("bed_white",
-        new SimpleTexture("assets/minecraft/textures/entity/bed/white", Texture.bedWhite));
-    ALL_TEXTURES.put("bed_orange",
-        new SimpleTexture("assets/minecraft/textures/entity/bed/orange", Texture.bedOrange));
-    ALL_TEXTURES.put("bed_magenta",
-        new SimpleTexture("assets/minecraft/textures/entity/bed/magenta", Texture.bedMagenta));
-    ALL_TEXTURES.put("bed_light_blue",
-        new SimpleTexture("assets/minecraft/textures/entity/bed/light_blue", Texture.bedLightBlue));
-    ALL_TEXTURES.put("bed_yellow",
-        new SimpleTexture("assets/minecraft/textures/entity/bed/yellow", Texture.bedYellow));
-    ALL_TEXTURES.put("bed_lime",
-        new SimpleTexture("assets/minecraft/textures/entity/bed/lime", Texture.bedLime));
-    ALL_TEXTURES.put("bed_pink",
-        new SimpleTexture("assets/minecraft/textures/entity/bed/pink", Texture.bedPink));
-    ALL_TEXTURES.put("bed_gray",
-        new SimpleTexture("assets/minecraft/textures/entity/bed/gray", Texture.bedGray));
-    ALL_TEXTURES.put("bed_silver", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/entity/bed/light_gray", Texture.bedSilver),
-        new SimpleTexture("assets/minecraft/textures/entity/bed/silver", Texture.bedSilver)));
-    ALL_TEXTURES.put("bed_cyan",
-        new SimpleTexture("assets/minecraft/textures/entity/bed/cyan", Texture.bedCyan));
-    ALL_TEXTURES.put("bed_purple",
-        new SimpleTexture("assets/minecraft/textures/entity/bed/purple", Texture.bedPurple));
-    ALL_TEXTURES.put("bed_blue",
-        new SimpleTexture("assets/minecraft/textures/entity/bed/blue", Texture.bedBlue));
-    ALL_TEXTURES.put("bed_brown",
-        new SimpleTexture("assets/minecraft/textures/entity/bed/brown", Texture.bedBrown));
-    ALL_TEXTURES.put("bed_green",
-        new SimpleTexture("assets/minecraft/textures/entity/bed/green", Texture.bedGreen));
-    ALL_TEXTURES.put("bed_red",
-        new AlternateTextures(
-            new SimpleTexture("assets/minecraft/textures/entity/bed/red", Texture.bedRed),
-            new BedTextureAdapter()
-        ));
-    ALL_TEXTURES.put("bed_black",
-        new SimpleTexture("assets/minecraft/textures/entity/bed/black", Texture.bedBlack));
+    ALL_TEXTURES.put("bed_white", BedTexture.createTextureLoader("white", Texture.bedWhite));
+    ALL_TEXTURES.put("bed_orange", BedTexture.createTextureLoader("orange", Texture.bedOrange));
+    ALL_TEXTURES.put("bed_magenta", BedTexture.createTextureLoader("magenta", Texture.bedMagenta));
+    ALL_TEXTURES.put("bed_light_blue", BedTexture.createTextureLoader("light_blue", Texture.bedLightBlue));
+    ALL_TEXTURES.put("bed_yellow", BedTexture.createTextureLoader("yellow", Texture.bedYellow));
+    ALL_TEXTURES.put("bed_lime", BedTexture.createTextureLoader("lime", Texture.bedLime));
+    ALL_TEXTURES.put("bed_pink", BedTexture.createTextureLoader("pink", Texture.bedPink));
+    ALL_TEXTURES.put("bed_gray", BedTexture.createTextureLoader("gray", Texture.bedGray));
+    ALL_TEXTURES.put("bed_light_gray", BedTexture.createTextureLoader("light_gray", Texture.bedLightGray));
+    ALL_TEXTURES.put("bed_cyan", BedTexture.createTextureLoader("cyan", Texture.bedCyan));
+    ALL_TEXTURES.put("bed_purple", BedTexture.createTextureLoader("purple", Texture.bedPurple));
+    ALL_TEXTURES.put("bed_blue", BedTexture.createTextureLoader("blue", Texture.bedBlue));
+    ALL_TEXTURES.put("bed_brown", BedTexture.createTextureLoader("brown", Texture.bedBrown));
+    ALL_TEXTURES.put("bed_green", BedTexture.createTextureLoader("green", Texture.bedGreen));
+    ALL_TEXTURES.put("bed_red", BedTexture.createTextureLoader("red", Texture.bedRed));
+    ALL_TEXTURES.put("bed_black", BedTexture.createTextureLoader("black", Texture.bedBlack));
 
     ALL_TEXTURES.put("banner_base",
         new SimpleTexture("assets/minecraft/textures/entity/banner_base", Texture.bannerBase));
@@ -3632,8 +3612,17 @@ public class TexturePackLoader {
       "assets/minecraft/textures/block/chiseled_bookshelf_empty",
       "assets/minecraft/textures/block/chiseled_bookshelf_occupied"));
 
-    for (Field field : Texture.class.getFields()) {
-      if (Texture.class.isAssignableFrom(field.getType())) {
+    registerTextureFields(Texture.class);
+  }
+
+  /**
+   * Register all public static fields annotated with {@link TexturePath} to be loaded.
+   * @param clazz Class to register
+   * @param <T> Type of the class
+   */
+  public static <T> void registerTextureFields(Class<T> clazz) {
+    for (Field field : clazz.getFields()) {
+      if (clazz.isAssignableFrom(field.getType())) {
         addTextureLoader(field);
       }
     }
