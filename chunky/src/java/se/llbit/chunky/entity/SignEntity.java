@@ -235,58 +235,77 @@ public class SignEntity extends Entity {
   }
 
   // Facing south.
-  protected static Quad[] sides = {
-    // Front face.
-    new Quad(new Vector3(0, 9 / 16., 9 / 16.), new Vector3(1, 9 / 16., 9 / 16.),
-      new Vector3(0, 17 / 16., 9 / 16.), new Vector4(2 / 64., 26 / 64., 18 / 32., 30 / 32.)),
-
-    // Back face.
-    new Quad(new Vector3(1, 9 / 16., 7 / 16.), new Vector3(0, 9 / 16., 7 / 16.),
-      new Vector3(1, 17 / 16., 7 / 16.), new Vector4(28 / 64., 52 / 64., 18 / 32., 30 / 32.)),
-
-    // Left face.
-    new Quad(new Vector3(0, 9 / 16., 7 / 16.), new Vector3(0, 9 / 16., 9 / 16.),
-      new Vector3(0, 17 / 16., 7 / 16.), new Vector4(0, 2 / 64., 18 / 32., 30 / 32.)),
-
-    // Right face.
-    new Quad(new Vector3(1, 9 / 16., 9 / 16.), new Vector3(1, 9 / 16., 7 / 16.),
-      new Vector3(1, 17 / 16., 9 / 16.), new Vector4(26 / 64., 28 / 64., 18 / 32., 30 / 32.)),
-
-    // Top face.
-    new Quad(new Vector3(1, 17 / 16., 7 / 16.), new Vector3(0, 17 / 16., 7 / 16.),
-      new Vector3(1, 17 / 16., 9 / 16.), new Vector4(2 / 64., 26 / 64., 1, 30 / 32.)),
-
-    // Bottom face.
-    new Quad(new Vector3(0, 9 / 16., 7 / 16.), new Vector3(1, 9 / 16., 7 / 16.),
-      new Vector3(0, 9 / 16., 9 / 16.), new Vector4(26 / 64., 50 / 64., 1, 30 / 32.)),
-
-    // Post front.
-    new Quad(new Vector3(7 / 16., 0, 9 / 16.), new Vector3(9 / 16., 0, 9 / 16.),
-      new Vector3(7 / 16., 9 / 16., 9 / 16.),
-      new Vector4(2 / 64., 4 / 64., 2 / 32., 16 / 32.)),
-
-    // Post back.
-    new Quad(new Vector3(9 / 16., 0, 7 / 16.), new Vector3(7 / 16., 0, 7 / 16.),
-      new Vector3(9 / 16., 9 / 16., 7 / 16.),
-      new Vector4(4 / 64., 6 / 64., 2 / 32., 16 / 32.)),
-
-    // Post left.
-    new Quad(new Vector3(7 / 16., 0, 7 / 16.), new Vector3(7 / 16., 0, 9 / 16.),
-      new Vector3(7 / 16., 9 / 16., 7 / 16.), new Vector4(0, 2 / 64., 2 / 32., 16 / 32.)),
-
-    // Post right.
-    new Quad(new Vector3(9 / 16., 0, 9 / 16.), new Vector3(9 / 16., 0, 7 / 16.),
-      new Vector3(9 / 16., 9 / 16., 9 / 16.),
-      new Vector4(6 / 64., 8 / 64., 2 / 32., 16 / 32.)),
-
-    // Post bottom.
-    new Quad(new Vector3(7 / 16., 0, 7 / 16.), new Vector3(9 / 16., 0, 7 / 16.),
-      new Vector3(7 / 16., 0, 9 / 16.), new Vector4(4 / 64., 6 / 64., 16 / 32., 18 / 32.)),
-
+  protected static Quad[] sides = new Quad[]{
+    new Quad( // sign back face
+      new Vector3(16 / 16.0, 17.33333 / 16.0, 8.66667 / 16.0),
+      new Vector3(0 / 16.0, 17.33333 / 16.0, 8.66667 / 16.0),
+      new Vector3(16 / 16.0, 9.33333 / 16.0, 8.66667 / 16.0),
+      new Vector4(12 / 16.0, 0 / 16.0, 15 / 16.0, 9 / 16.0)
+    ),
+    new Quad( // sign front face
+      new Vector3(0 / 16.0, 17.33333 / 16.0, 7.33333 / 16.0),
+      new Vector3(16 / 16.0, 17.33333 / 16.0, 7.33333 / 16.0),
+      new Vector3(0 / 16.0, 9.33333 / 16.0, 7.33333 / 16.0),
+      new Vector4(12 / 16.0, 0 / 16.0, 8 / 16.0, 2 / 16.0)
+    ),
+    new Quad(
+      new Vector3(7.33333 / 16.0, 0 / 16.0, 7.33333 / 16.0),
+      new Vector3(8.66667 / 16.0, 0 / 16.0, 7.33333 / 16.0),
+      new Vector3(7.33333 / 16.0, 0 / 16.0, 8.66667 / 16.0),
+      new Vector4(14 / 16.0, 15 / 16.0, 0 / 16.0, 1 / 16.0)
+    ),
+    new Quad(
+      new Vector3(7.33333 / 16.0, 9.33333 / 16.0, 8.66667 / 16.0),
+      new Vector3(7.33333 / 16.0, 9.33333 / 16.0, 7.33333 / 16.0),
+      new Vector3(7.33333 / 16.0, 0 / 16.0, 8.66667 / 16.0),
+      new Vector4(16 / 16.0, 15 / 16.0, 8 / 16.0, 1 / 16.0)
+    ),
+    new Quad(
+      new Vector3(8.66667 / 16.0, 9.33333 / 16.0, 7.33333 / 16.0),
+      new Vector3(8.66667 / 16.0, 9.33333 / 16.0, 8.66667 / 16.0),
+      new Vector3(8.66667 / 16.0, 0 / 16.0, 7.33333 / 16.0),
+      new Vector4(16 / 16.0, 15 / 16.0, 16 / 16.0, 9 / 16.0)
+    ),
+    new Quad(
+      new Vector3(7.33333 / 16.0, 9.33333 / 16.0, 7.33333 / 16.0),
+      new Vector3(8.66667 / 16.0, 9.33333 / 16.0, 7.33333 / 16.0),
+      new Vector3(7.33333 / 16.0, 0 / 16.0, 7.33333 / 16.0),
+      new Vector4(15 / 16.0, 14 / 16.0, 8 / 16.0, 1 / 16.0)
+    ),
+    new Quad(
+      new Vector3(8.66667 / 16.0, 9.33333 / 16.0, 8.66667 / 16.0),
+      new Vector3(7.33333 / 16.0, 9.33333 / 16.0, 8.66667 / 16.0),
+      new Vector3(8.66667 / 16.0, 0 / 16.0, 8.66667 / 16.0),
+      new Vector4(15 / 16.0, 14 / 16.0, 16 / 16.0, 9 / 16.0)
+    ),
+    new Quad(
+      new Vector3(0 / 16.0, 17.33333 / 16.0, 8.66667 / 16.0),
+      new Vector3(16 / 16.0, 17.33333 / 16.0, 8.66667 / 16.0),
+      new Vector3(0 / 16.0, 17.33333 / 16.0, 7.33333 / 16.0),
+      new Vector4(0 / 16.0, 12 / 16.0, 15 / 16.0, 16 / 16.0)
+    ),
+    new Quad(
+      new Vector3(0 / 16.0, 9.33333 / 16.0, 7.33333 / 16.0),
+      new Vector3(16 / 16.0, 9.33333 / 16.0, 7.33333 / 16.0),
+      new Vector3(0 / 16.0, 9.33333 / 16.0, 8.66667 / 16.0),
+      new Vector4(0 / 16.0, 12 / 16.0, 1 / 16.0, 2 / 16.0)
+    ),
+    new Quad(
+      new Vector3(0 / 16.0, 17.33333 / 16.0, 8.66667 / 16.0),
+      new Vector3(0 / 16.0, 17.33333 / 16.0, 7.33333 / 16.0),
+      new Vector3(0 / 16.0, 9.33333 / 16.0, 8.66667 / 16.0),
+      new Vector4(13 / 16.0, 12 / 16.0, 8 / 16.0, 2 / 16.0)
+    ),
+    new Quad(
+      new Vector3(16 / 16.0, 17.33333 / 16.0, 7.33333 / 16.0),
+      new Vector3(16 / 16.0, 17.33333 / 16.0, 8.66667 / 16.0),
+      new Vector3(16 / 16.0, 9.33333 / 16.0, 7.33333 / 16.0),
+      new Vector4(13 / 16.0, 12 / 16.0, 15 / 16.0, 9 / 16.0)
+    )
   };
 
-  private static Quad[] frontFaceWithText = new Quad[16];
-  private static Quad[] backFaceWithText = new Quad[16];
+  private static final Quad[] frontFaceWithText = new Quad[16];
+  private static final Quad[] backFaceWithText = new Quad[16];
 
   private static final Quad[][] rot = new Quad[16][];
 
@@ -297,14 +316,14 @@ public class SignEntity extends Entity {
       rot[i] = Model.rotateY(sides, -i * Math.PI / 8);
     }
 
-    frontFaceWithText[0] = new Quad(new Vector3(0, 9 / 16., 9 / 16.), new Vector3(1, 9 / 16., 9 / 16.),
-      new Vector3(0, 17 / 16., 9 / 16.), new Vector4(0, 1, 0, 1));
+    frontFaceWithText[0] = new Quad(rot[0][0], Transform.NONE);
+    frontFaceWithText[0].uv.set(0, 1, 0, 1);
     for (int i = 1; i < 16; ++i) {
       frontFaceWithText[i] = frontFaceWithText[0].transform(Transform.NONE.rotateY(-i * Math.PI / 8));
     }
 
-    backFaceWithText[0] = new Quad(new Vector3(1, 9 / 16., 7 / 16.), new Vector3(0, 9 / 16., 7 / 16.),
-      new Vector3(1, 17 / 16., 7 / 16.), new Vector4(0, 1, 0, 1));
+    backFaceWithText[0] = new Quad(rot[0][1], Transform.NONE);
+    backFaceWithText[0].uv.set(0, 1, 0, 1);
     for (int i = 1; i < 16; ++i) {
       backFaceWithText[i] = backFaceWithText[0].transform(Transform.NONE.rotateY(-i * Math.PI / 8));
     }
@@ -336,8 +355,8 @@ public class SignEntity extends Entity {
     this.frontGlowing = frontGlowing;
     this.backGlowing = backGlowing;
     this.angle = direction;
-    this.frontTexture = frontText != null ? new SignTexture(frontText, frontDye, frontGlowing, signTexture, 24, 12, 2 / 64., 18 / 32., 26 / 64., 30 / 32., 4, 1, 10) : null;
-    this.backTexture = backText != null ? new SignTexture(backText, backDye, backGlowing, signTexture, 24, 12, 28 / 64., 18 / 32., 52 / 64., 30 / 32., 4, 1, 10) : null;
+    this.frontTexture = frontText != null ? new SignTexture(frontText, frontDye, frontGlowing, signTexture, 24, 12, 0 / 32., 2 / 32., 24 / 32., 14 / 32., 4, 1, 10) : null;
+    this.backTexture = backText != null ? new SignTexture(backText, backDye, backGlowing, signTexture, 24, 12, 0 / 32., 16 / 32., 24 / 32., 28 / 32., 4, 1, 10) : null;
     this.texture = signTexture;
     this.material = material;
   }

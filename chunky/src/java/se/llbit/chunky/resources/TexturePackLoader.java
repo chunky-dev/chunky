@@ -19,10 +19,12 @@ package se.llbit.chunky.resources;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.sky.Sun;
 import se.llbit.chunky.resources.texturepack.*;
+import se.llbit.chunky.resources.texturepack.SignTexture;
 import se.llbit.log.Log;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utility methods to load Minecraft texture packs.
@@ -3231,20 +3233,31 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/block/loom_top",
             Texture.loomTop));
 
-    ALL_TEXTURES.put("sign_acacia",
-        new SimpleTexture("assets/minecraft/textures/entity/signs/acacia", Texture.acaciaSignPost));
-    ALL_TEXTURES.put("sign_birch",
-        new SimpleTexture("assets/minecraft/textures/entity/signs/birch", Texture.birchSignPost));
-    ALL_TEXTURES.put("sign_dark_oak",
-        new SimpleTexture("assets/minecraft/textures/entity/signs/dark_oak", Texture.darkOakSignPost));
-    ALL_TEXTURES.put("sign_jungle",
-        new SimpleTexture("assets/minecraft/textures/entity/signs/jungle", Texture.jungleSignPost));
-    ALL_TEXTURES.put("sign_oak", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/entity/signs/oak", Texture.oakSignPost),// MC 1.14
-        new SimpleTexture("assets/minecraft/textures/entity/sign", Texture.oakSignPost),// MC 1.6
-        new SimpleTexture("item/sign", Texture.oakSignPost)));
-    ALL_TEXTURES.put("sign_spruce",
-        new SimpleTexture("assets/minecraft/textures/entity/signs/spruce", Texture.spruceSignPost));
+    ALL_TEXTURES.put("sign_acacia", SignTexture.createSignTextureLoader("acacia", Texture.acaciaSignPost));
+    ALL_TEXTURES.put("sign_birch", SignTexture.createSignTextureLoader("birch", Texture.birchSignPost));
+    ALL_TEXTURES.put("sign_dark_oak", SignTexture.createSignTextureLoader("dark_oak", Texture.darkOakSignPost));
+    ALL_TEXTURES.put("sign_jungle", SignTexture.createSignTextureLoader("jungle", Texture.jungleSignPost));
+    ALL_TEXTURES.put("sign_oak", SignTexture.createSignTextureLoader("oak", Texture.oakSignPost));
+    ALL_TEXTURES.put("sign_spruce", SignTexture.createSignTextureLoader("spruce", Texture.spruceSignPost));
+    ALL_TEXTURES.put("sign_crimson", SignTexture.createSignTextureLoader("crimson", Texture.crimsonSignPost));
+    ALL_TEXTURES.put("sign_warped", SignTexture.createSignTextureLoader("warped", Texture.warpedSignPost));
+    ALL_TEXTURES.put("sign_mangrove", SignTexture.createSignTextureLoader("mangrove", Texture.mangroveSignPost));
+    ALL_TEXTURES.put("sign_bamboo", SignTexture.createSignTextureLoader("bamboo", Texture.bambooSignPost));
+    ALL_TEXTURES.put("sign_cherry", SignTexture.createSignTextureLoader("cherry", Texture.cherrySignPost));
+    ALL_TEXTURES.put("sign_pale_oak", SignTexture.createSignTextureLoader("pale_oak", Texture.paleOakSignPost));
+
+    ALL_TEXTURES.put("hanging_sign_acacia", SignTexture.createHangingSignTextureLoader("acacia", Texture.acaciaHangingSign));
+    ALL_TEXTURES.put("hanging_sign_birch", SignTexture.createHangingSignTextureLoader("birch", Texture.birchHangingSign));
+    ALL_TEXTURES.put("hanging_sign_dark_oak", SignTexture.createHangingSignTextureLoader("dark_oak", Texture.darkOakHangingSign));
+    ALL_TEXTURES.put("hanging_sign_jungle", SignTexture.createHangingSignTextureLoader("jungle", Texture.jungleHangingSign));
+    ALL_TEXTURES.put("hanging_sign_oak", SignTexture.createHangingSignTextureLoader("oak", Texture.oakHangingSign));
+    ALL_TEXTURES.put("hanging_sign_spruce", SignTexture.createHangingSignTextureLoader("spruce", Texture.spruceHangingSign));
+    ALL_TEXTURES.put("hanging_sign_crimson", SignTexture.createHangingSignTextureLoader("crimson", Texture.crimsonHangingSign));
+    ALL_TEXTURES.put("hanging_sign_warped", SignTexture.createHangingSignTextureLoader("warped", Texture.warpedHangingSign));
+    ALL_TEXTURES.put("hanging_sign_mangrove", SignTexture.createHangingSignTextureLoader("mangrove", Texture.mangroveHangingSign));
+    ALL_TEXTURES.put("hanging_sign_bamboo", SignTexture.createHangingSignTextureLoader("bamboo", Texture.bambooHangingSign));
+    ALL_TEXTURES.put("hanging_sign_cherry", SignTexture.createHangingSignTextureLoader("cherry", Texture.cherryHangingSign));
+    ALL_TEXTURES.put("hanging_sign_pale_oak", SignTexture.createHangingSignTextureLoader("pale_oak", Texture.paleOakHangingSign));
 
     ALL_TEXTURES.put("cartography_table_side1",
         new SimpleTexture("assets/minecraft/textures/block/cartography_table_side1",
@@ -3433,8 +3446,6 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side2", Texture.respawnAnchorSide2);
     addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side3", Texture.respawnAnchorSide3);
     addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side4", Texture.respawnAnchorSide4);
-    addSimpleTexture("assets/minecraft/textures/entity/signs/crimson", Texture.crimsonSignPost);
-    addSimpleTexture("assets/minecraft/textures/entity/signs/warped", Texture.warpedSignPost);
     addSimpleTexture("assets/minecraft/textures/block/crimson_planks", Texture.crimsonPlanks);
     addSimpleTexture("assets/minecraft/textures/block/warped_planks", Texture.warpedPlanks);
     addSimpleTexture("assets/minecraft/textures/block/crimson_door_top", Texture.crimsonDoorTop);
