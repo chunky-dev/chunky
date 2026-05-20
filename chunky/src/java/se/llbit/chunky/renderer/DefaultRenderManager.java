@@ -226,7 +226,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
         frameCompletionListener.accept(bufferedScene, bufferedScene.spp);
         updateRenderProgress();
 
-        if (bufferedScene.spp > bufferedScene.getTargetSpp()) {
+        if (bufferedScene.spp >= bufferedScene.getTargetSpp()) {
           renderCompletionListener.accept(bufferedScene.renderTime, samplesPerSecond());
           return true;
         }
