@@ -1488,6 +1488,8 @@ public class TexturePackLoader {
             Texture.quartzChiseledTop),
         new SimpleTexture("textures/blocks/quartzblock_chiseled_top", Texture.quartzChiseledTop)));
     ALL_TEXTURES.put("quartz_pillar", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/block/quartz_pillar_side",
+            Texture.quartzPillar), // since 26.2-pre-1
         new SimpleTexture("assets/minecraft/textures/block/quartz_pillar",
             Texture.quartzPillar),
         new SimpleTexture("assets/minecraft/textures/blocks/quartz_pillar",
@@ -2355,6 +2357,8 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/block/purpur_block", Texture.purpurBlock),
         new SimpleTexture("assets/minecraft/textures/blocks/purpur_block", Texture.purpurBlock)));
     ALL_TEXTURES.put("purpur_pillar", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/block/purpur_pillar_side",
+            Texture.purpurPillarSide), // since 26.2-pre-1
         new SimpleTexture("assets/minecraft/textures/block/purpur_pillar",
             Texture.purpurPillarSide),
         new SimpleTexture("assets/minecraft/textures/blocks/purpur_pillar",
