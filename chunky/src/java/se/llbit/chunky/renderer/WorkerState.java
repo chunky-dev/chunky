@@ -28,4 +28,5 @@ public class WorkerState {
   public Ray ray;
   public Vector4 attenuation = new Vector4();
   public Random random;
+  public boolean hit = false;
 }

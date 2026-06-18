@@ -75,6 +75,8 @@ public class PreviewRenderer extends TileBasedRenderer {
     int ty = (int) Math.floor(target.o.y + target.d.y * Ray.OFFSET);
     int tz = (int) Math.floor(target.o.z + target.d.z * Ray.OFFSET);
 
+    resetTiles(manager); // reset previously skipped tiles
+
     double[] sampleBuffer = scene.getSampleBuffer();
 
     for (int i = 0; i < 2; i++) {
