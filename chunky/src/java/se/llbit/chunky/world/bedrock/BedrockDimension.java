@@ -26,6 +26,7 @@ public class BedrockDimension extends Dimension implements Closeable {
   protected final ConcurrentHashMap<RegionPosition, Region> regionMap = new ConcurrentHashMap<>();
 
   private final LevelDB db;
+  private final ReadOptions readOptions;
 
   private final Map<ChunkPosition, Chunk> chunks = new ConcurrentHashMap<>();
 
@@ -40,10 +41,12 @@ public class BedrockDimension extends Dimension implements Closeable {
     } catch (LevelDBException e) {
       throw new RuntimeException(e);
     }
+    readOptions = ReadOptions.create();
+    readOptions.setFillCache(false); // almost all reads happen only once
   }
 
   public Optional<byte[]> getDbValue(byte[] key) throws LevelDBException {
-    return this.db.get(ReadOptions.create(), key);
+    return this.db.get(readOptions, key); // leveldb is thread safe for N readers so no synchronization required
   }
 
   @Override
