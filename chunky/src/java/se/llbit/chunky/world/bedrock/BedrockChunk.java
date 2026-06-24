@@ -5,10 +5,14 @@ import org.cloudburstmc.nbt.NBTInputStream;
 import org.cloudburstmc.nbt.NbtMap;
 import org.cloudburstmc.nbt.NbtUtils;
 import se.llbit.chunky.chunk.*;
+import se.llbit.chunky.map.BiomeLayer;
+import se.llbit.chunky.map.SurfaceLayer;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Dimension;
+import se.llbit.chunky.world.biome.ArrayBiomePalette;
 import se.llbit.chunky.world.biome.BiomePalette;
+import se.llbit.log.Log;
 import se.llbit.nbt.*;
 import se.llbit.util.Mutable;
 import se.llbit.util.annotation.NotNull;
@@ -17,18 +21,54 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class BedrockChunk extends Chunk {
+  private boolean renderedToMap = false;
 
   public BedrockChunk(ChunkPosition pos, BedrockDimension dimension) {
     super(pos, dimension);
   }
 
   @Override
-  public boolean loadChunk(@NotNull Mutable<ChunkData> chunkData, int yMin, int yMax) {
-    return false;
+  public boolean loadChunk(@NotNull Mutable<ChunkData> chunkDataMutable, int yMin, int yMax) {
+    if (renderedToMap) {
+      return false;
+    }
+    renderedToMap = true;
+
+    BlockPalette palette = new BlockPalette();
+    palette.unsynchronize();
+    BiomePalette biomePalette = new ArrayBiomePalette();
+
+    chunkDataMutable.set(this.dimension.createChunkData(chunkDataMutable.get(), 0, 256));
+    try {
+      ChunkData chunkData = chunkDataMutable.get();
+      boolean readData = readChunkData(chunkData, palette, biomePalette, yMin, yMax);
+      if (!readData) {
+        return false;
+      }
+      readBiomeData(chunkData, biomePalette, yMin, yMax);
+
+      int[] heightmapData = new int[Chunk.X_MAX * Chunk.Z_MAX];
+      Arrays.fill(heightmapData, 256);
+
+      biomes = new BiomeLayer(chunkData, biomePalette);
+      surface = new SurfaceLayer(dimension.getDimensionId(), chunkData, palette, biomePalette, yMin, yMax, heightmapData);
+      updateHeightmap(dimension.getHeightmap(), this.position, chunkData, heightmapData, palette, yMax);
+      queueTopography();
+    } catch (ChunkLoadingException e) {
+      Log.warn(String.format("Failed to load chunk %s", position), e);
+    }
+
+    return true;
+  }
+
+  private void readBiomeData(ChunkData chunkData, BiomePalette biomePalette, int yMin, int yMax) {
+    byte Data3D = 0x2B;
+
+    // TODO: biome data
+
   }
 
   public static int ceilDiv(int x, int y) {
@@ -48,30 +88,40 @@ public class BedrockChunk extends Chunk {
       reuseChunkData.get().clear();
     }
 
+    readChunkData(reuseChunkData.get(), palette, biomePalette, minY, maxY);
+  }
+
+  public Optional<byte[]> readSubChunk(ChunkPosition pos, byte subChunkIdx) throws LevelDBException {
+    // Create subchunk key
+    boolean dimensionIsOverworld = dimension.getDimensionId().equals(Dimension.Identifier.OVERWORLD);
+    int subChunkKeySize = dimensionIsOverworld ? 10 : 14;
+    ByteBuffer byteBuffer = ByteBuffer.allocate(subChunkKeySize).order(ByteOrder.LITTLE_ENDIAN)
+      .putInt(pos.x)
+      .putInt(pos.z);
+
+    if (!dimensionIsOverworld) {
+      byteBuffer.putInt(switch (dimension.getDimensionId().getNamespacedName()) {
+        case "minecraft:the_nether" -> 1;
+        case "minecraft:the_end" -> 2;
+        default -> throw new RuntimeException("Unsupported dimension in Bedrock world"); // TODO: should this throw?
+      });
+    }
+    byteBuffer.put((byte) 0x2f);
+    byteBuffer.put(subChunkIdx);
+    return ((BedrockDimension) dimension).getDbValue(byteBuffer.array());
+  }
+
+  private boolean readChunkData(ChunkData chunkData, BlockPalette palette, BiomePalette biomePalette, int minY, int maxY) throws ChunkLoadingException {
     // A great resource on bedrock's binary formats: https://github.com/Team-Lodestone/Documentation/tree/main/Bedrock/LevelDB_Output_Array_Formats
 
+    boolean dataPresent = false;
     for (byte subchunkIdx = 0; subchunkIdx < 16; subchunkIdx++) {
-      // Create subchunk key
-      boolean dimensionIsOverworld = this.dimension.getDimensionId().equals(Dimension.Identifier.OVERWORLD);
-      int subChunkKeySize = dimensionIsOverworld ? 10 : 14;
-      ByteBuffer byteBuffer = ByteBuffer.allocate(subChunkKeySize).order(ByteOrder.LITTLE_ENDIAN)
-        .putInt(this.position.x).putInt(this.position.z);
-      if (!dimensionIsOverworld) {
-        byteBuffer.putInt(switch (this.dimension.getDimensionId().getNamespacedName()) { // TODO in Java 21+ we can use `switch (dimensionId)` here
-          case "minecraft:the_nether" -> 1;
-          case "minecraft:the_end" -> 2;
-          default -> throw new RuntimeException("Unsupported dimension in Bedrock world"); // TODO: should this throw?
-        });
-      }
-      byteBuffer.put((byte) 0x2f);
-      byteBuffer.put(subchunkIdx);
-
       try {
-        BedrockDimension dim = (BedrockDimension) this.dimension;
-        Optional<byte[]> dbValue = dim.getDbValue(byteBuffer.array());
+        Optional<byte[]> dbValue = readSubChunk(this.position, subchunkIdx);
         if (dbValue.isEmpty()) {
-          return;
+          continue;
         }
+        dataPresent = true;
         ByteBuffer value = ByteBuffer.wrap(dbValue.get()).order(ByteOrder.LITTLE_ENDIAN);
 
         // Parse subchunk
@@ -91,17 +141,10 @@ public class BedrockChunk extends Chunk {
 
           ByteBuffer blockData = value.slice().order(ByteOrder.LITTLE_ENDIAN);
           value.position(value.position() + wordCount * 4);
-          ChunkData chunkData = reuseChunkData.get();
 
           int b = value.getInt();
 
           Tag[] subpalette = new Tag[b];
-//          int bufPos = value.position();
-//          ByteBuffer allocate = ByteBuffer.allocate(value.capacity()).order(ByteOrder.LITTLE_ENDIAN);
-//          allocate.put(value);
-//          allocate.position(bufPos);
-//          value.position(bufPos);
-//          Tag tag = NamedTag.read(new LittleEndianDataInputStream(new DataInputStream(new BedrockDimension.ByteBufferBackedInputStream(value))));
           NBTInputStream tags = NbtUtils.createReaderLE(new BedrockDimension.ByteBufferBackedInputStream(value));
 
           for (int i = 0; i < b; i++) {
@@ -135,6 +178,7 @@ public class BedrockChunk extends Chunk {
         throw new ChunkLoadingException("Exception thrown when loading chunk " + this.position, e);
       }
     }
+    return dataPresent;
   }
 
   public static Tag read(DataInputStream in) {

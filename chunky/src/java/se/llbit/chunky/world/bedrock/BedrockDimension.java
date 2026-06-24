@@ -4,6 +4,7 @@ import io.github.notstirred.leveldb_ffi.*;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.world.*;
+import se.llbit.chunky.world.region.EmptyRegion;
 import se.llbit.chunky.world.region.Region;
 import se.llbit.chunky.world.region.RegionChangeWatcher;
 import se.llbit.math.Vector3;
@@ -17,12 +18,16 @@ import java.lang.ref.Cleaner;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BedrockDimension extends Dimension implements Closeable {
   private static final Cleaner cleaner = Cleaner.create(); // TODO: move this to Chunky class or something usable by all.
 
+  protected final ConcurrentHashMap<RegionPosition, Region> regionMap = new ConcurrentHashMap<>();
+
   private final LevelDB db;
-  private final Map<ChunkPosition, BedrockChunk> chunks = new HashMap<>();
+
+  private final Map<ChunkPosition, Chunk> chunks = new ConcurrentHashMap<>();
 
   protected BedrockDimension(BedrockWorld world, Identifier dimensionId, Path dimensionDirectory, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
     super(dimensionId, dimensionDirectory, playerEntities, null);
@@ -94,7 +99,7 @@ public class BedrockDimension extends Dimension implements Closeable {
 
   @Override
   public Region createRegion(RegionPosition pos) {
-    return null;
+    return new VirtualBedrockRegion(pos, this);
   }
 
   @Override
@@ -113,18 +118,19 @@ public class BedrockDimension extends Dimension implements Closeable {
   }
 
   @Override
-  public Region getRegion(RegionPosition pos) {
-    return null;
+  public synchronized Region getRegion(RegionPosition pos) {
+    // Unconditionally create virtual regions when requested, as bedrock has no concept of a region
+    return regionMap.computeIfAbsent(pos, this::createRegion);
   }
 
   @Override
   public Region getRegionWithinRange(RegionPosition pos, HeightRange heightRange) {
-    return null;
+    return getRegion(pos);
   }
 
   @Override
   public boolean hasRegion(RegionPosition pos) {
-    return false;
+    return !(regionMap.get(pos) instanceof EmptyRegion);
   }
 
   @Override
