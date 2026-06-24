@@ -10,6 +10,7 @@ import se.llbit.chunky.map.SurfaceLayer;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Dimension;
+import se.llbit.chunky.world.EmptyChunk;
 import se.llbit.chunky.world.biome.ArrayBiomePalette;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.log.Log;
@@ -46,6 +47,7 @@ public class BedrockChunk extends Chunk {
       ChunkData chunkData = chunkDataMutable.get();
       boolean readData = readChunkData(chunkData, palette, biomePalette, yMin, yMax);
       if (!readData) {
+        ((BedrockDimension) dimension).setChunk(position, EmptyChunk.INSTANCE);
         return false;
       }
       readBiomeData(chunkData, biomePalette, yMin, yMax);

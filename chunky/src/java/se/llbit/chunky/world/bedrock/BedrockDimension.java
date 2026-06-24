@@ -61,6 +61,11 @@ public class BedrockDimension extends Dimension implements Closeable {
     this.db.close();
   }
 
+  public void setChunk(ChunkPosition position, Chunk chunk) {
+    this.chunks.put(position, chunk);
+    chunkUpdated(position);
+  }
+
   static class ByteBufferBackedInputStream extends InputStream {
     private final ByteBuffer buf;
 
