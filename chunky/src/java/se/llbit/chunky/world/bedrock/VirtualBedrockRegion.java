@@ -21,7 +21,7 @@ public class VirtualBedrockRegion implements Region {
 
   @Override
   public Chunk getChunk(int x, int z) {
-    return this.dimension.getChunk(new ChunkPosition(x, z));
+    return this.dimension.getChunk(this.position.asChunkPosition(x, z));
   }
 
   @Override
