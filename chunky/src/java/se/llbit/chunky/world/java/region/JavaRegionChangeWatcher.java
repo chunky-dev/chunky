@@ -14,25 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.world.region;
+package se.llbit.chunky.world.java.region;
 
 import javafx.application.Platform;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
-import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.Dimension;
 import se.llbit.chunky.world.RegionPosition;
 import se.llbit.chunky.world.java.JavaDimension;
+import se.llbit.chunky.world.region.Region;
+import se.llbit.chunky.world.region.RegionChangeWatcher;
 
 /**
  * Monitors filesystem for changes to region files.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class MCRegionChangeWatcher extends RegionChangeWatcher {
-  public MCRegionChangeWatcher(WorldMapLoader loader, MapView mapView) {
+public class JavaRegionChangeWatcher extends RegionChangeWatcher {
+  public JavaRegionChangeWatcher(WorldMapLoader loader, MapView mapView) {
     super(loader, mapView, "Region Refresher");
   }
 

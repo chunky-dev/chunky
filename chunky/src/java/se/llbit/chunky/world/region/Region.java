@@ -7,6 +7,15 @@ import se.llbit.chunky.world.RegionPosition;
 
 public interface Region extends Iterable<Chunk> {
   /**
+   * Region X chunk width
+   */
+  int CHUNKS_X = 32;
+  /**
+   * Region Z chunk width
+   */
+  int CHUNKS_Z = 32;
+
+  /**
    * @return Chunk at (x, z)
    */
   @PluginApi

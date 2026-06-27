@@ -13,7 +13,7 @@ import se.llbit.chunky.map.SurfaceLayer;
 import se.llbit.chunky.world.*;
 import se.llbit.chunky.world.biome.ArrayBiomePalette;
 import se.llbit.chunky.world.biome.BiomePalette;
-import se.llbit.chunky.world.region.MCRegion;
+import se.llbit.chunky.world.java.region.JavaRegion;
 import se.llbit.chunky.world.region.Region;
 import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
@@ -42,7 +42,7 @@ public class JavaChunk extends Chunk {
    * @return loaded data, or null if something went wrong
    */
   private Map<String, Tag> getChunkTags(Set<String> request) throws ChunkLoadingException {
-    MCRegion region = (MCRegion) dimension.getRegion(position.getRegionPosition());
+    JavaRegion region = (JavaRegion) dimension.getRegion(position.getRegionPosition());
     Mutable<Integer> timestamp = new Mutable<>(dataTimestamp);
     Map<String, Tag> chunkTags = region.getChunkTags(this.position, request, timestamp);
     this.dataTimestamp = timestamp.get();
@@ -54,7 +54,7 @@ public class JavaChunk extends Chunk {
    * @return loaded data, or null if something went wrong
    */
   private Map<String, Tag> getEntityTags(Set<String> request) throws ChunkLoadingException {
-    MCRegion region = (MCRegion) dimension.getRegion(position.getRegionPosition());
+    JavaRegion region = (JavaRegion) dimension.getRegion(position.getRegionPosition());
     return region.getEntityTags(this.position, request);
   }
 
