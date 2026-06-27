@@ -14,33 +14,22 @@ import se.llbit.util.annotation.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.Cleaner;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BedrockDimension extends Dimension implements Closeable {
-  private static final Cleaner cleaner = Cleaner.create(); // TODO: move this to Chunky class or something usable by all.
-
   protected final ConcurrentHashMap<RegionPosition, Region> regionMap = new ConcurrentHashMap<>();
 
-  private final LevelDB db;
+  private final BedrockDB db;
   private final ReadOptions readOptions;
 
   private final Map<ChunkPosition, Chunk> chunks = new ConcurrentHashMap<>();
 
   protected BedrockDimension(BedrockWorld world, Identifier dimensionId, Path dimensionDirectory, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
     super(dimensionId, dimensionDirectory, playerEntities, null);
-    Options options = Options.create();
-    options.setCompression(Compressor.ZLIB_RAW);
-    options.setCreateIfMissing(false);
-    try {
-      this.db = LevelDB.open(options, dimensionDirectory.resolve("db").toAbsolutePath());
-      cleaner.register(this, this.db::close);
-    } catch (LevelDBException e) {
-      throw new RuntimeException(e);
-    }
+    this.db = BedrockDB.getOrOpen(dimensionDirectory.resolve("db").toAbsolutePath());
     readOptions = ReadOptions.create();
     readOptions.setFillCache(false); // almost all reads happen only once
   }
