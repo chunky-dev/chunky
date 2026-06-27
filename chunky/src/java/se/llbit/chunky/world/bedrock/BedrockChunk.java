@@ -163,6 +163,11 @@ public class BedrockChunk extends Chunk {
           int bitsPerBlock = packed >> 1;
           int mask = (1 << bitsPerBlock)-1;
 
+          if (bitsPerBlock == 0) { // all-same subchunk
+            value.position(value.position() + 4); // no palette or other data exists, guessing this means an all-air chunk
+            continue;
+          }
+
           int blocksPerWord = 32 / bitsPerBlock;
           int wordCount = ceilDiv(4096, blocksPerWord);
 
