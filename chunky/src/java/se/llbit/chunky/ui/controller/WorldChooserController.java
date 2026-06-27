@@ -33,9 +33,8 @@ import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.ResourcePackLoader;
 import se.llbit.chunky.ui.TableSortConfigSerializer;
 import se.llbit.chunky.world.EmptyWorld;
-import se.llbit.chunky.world.Dimension;
 import se.llbit.chunky.world.World;
-import se.llbit.chunky.world.worldformat.WorldFormat;
+import se.llbit.chunky.world.worldformat.WorldFormats;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.json.JsonArray;
 import se.llbit.log.Log;
@@ -135,7 +134,7 @@ public class WorldChooserController implements Initializable {
       File directory = chooser.showDialog(stage);
       if (directory != null) {
         if (directory.isDirectory()) {
-          this.loadWorld(WorldFormat.loadWorld(directory).orElse(EmptyWorld.INSTANCE), mapLoader);
+          this.loadWorld(WorldFormats.createWorld(directory).orElse(EmptyWorld.INSTANCE), mapLoader);
           stage.close();
         } else {
           Log.warn("Non-directory selected.");
@@ -196,7 +195,7 @@ public class WorldChooserController implements Initializable {
           File[] worldDirs = worldSavesDir.listFiles();
           if (worldDirs != null) {
             for (File dir : worldDirs) {
-              WorldFormat.loadWorld(dir).ifPresent(worlds::add);
+              WorldFormats.createWorld(dir).ifPresent(worlds::add);
             }
           }
         }
