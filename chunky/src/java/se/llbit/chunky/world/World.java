@@ -16,20 +16,8 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.chunky.world.java.JavaWorld;
-import se.llbit.log.Log;
-import se.llbit.math.Vector3i;
-import se.llbit.nbt.NamedTag;
-import se.llbit.nbt.Tag;
-import se.llbit.util.MinecraftText;
-import se.llbit.util.UuidUtil;
-import se.llbit.util.annotation.NotNull;
-
 import java.io.*;
-import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.zip.GZIPInputStream;
 
 /**
  * The World class contains information about the currently viewed world.
@@ -72,7 +60,7 @@ public abstract class World implements Comparable<World> {
   }
 
   /**
-   * The dimensions returned here are later provided to {@link #loadDimension(String)} when requesting a dimension be
+   * The dimensions returned here are later provided to {@link #loadDimension(Dimension.Identifier)} when requesting a dimension be
    * loaded.
    *
    * @return List the viewable dimensions within the world.
@@ -86,7 +74,7 @@ public abstract class World implements Comparable<World> {
   public abstract Optional<Dimension.Identifier> defaultDimension();
 
   /**
-   * @param dimension The dimension to load, guaranteed to be one of the dimensions previously returned by {@link #availableDimensions()}
+   * @param dimensionId The dimension to load, guaranteed to be one of the dimensions previously returned by {@link #availableDimensions()}
    * @return The loaded dimension
    */
   public abstract Dimension loadDimension(Dimension.Identifier dimensionId);
