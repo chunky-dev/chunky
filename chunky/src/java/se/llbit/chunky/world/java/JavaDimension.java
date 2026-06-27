@@ -7,6 +7,8 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.world.*;
+import se.llbit.chunky.world.java.region.JavaRegion;
+import se.llbit.chunky.world.java.region.JavaRegionChangeWatcher;
 import se.llbit.chunky.world.region.*;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
@@ -34,12 +36,12 @@ public class JavaDimension extends Dimension {
 
   @Override
   public RegionChangeWatcher createRegionChangeWatcher(WorldMapLoader worldMapLoader, MapView mapView) {
-    return new MCRegionChangeWatcher(worldMapLoader, mapView);
+    return new JavaRegionChangeWatcher(worldMapLoader, mapView);
   }
 
   @Override
   public Region createRegion(RegionPosition pos) {
-    return new MCRegion(pos, this);
+    return new JavaRegion(pos, this);
   }
 
   /**

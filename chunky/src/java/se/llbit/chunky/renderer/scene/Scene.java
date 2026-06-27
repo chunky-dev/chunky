@@ -53,8 +53,8 @@ import se.llbit.chunky.world.biome.ArrayBiomePalette;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.biome.Biomes;
+import se.llbit.chunky.world.region.Region;
 import se.llbit.chunky.world.worldformat.WorldFormats;
-import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.json.*;
 import se.llbit.log.Log;
 import se.llbit.math.*;
@@ -864,8 +864,8 @@ public class Scene implements JsonSerializable {
 
       ExecutorService executor = Executors.newSingleThreadExecutor();
 
-      ChunkData[] regionParsingDataArray = new ChunkData[MCRegion.CHUNKS_X * MCRegion.CHUNKS_Z];
-      ChunkData[] chunkLoadingDataArray = new ChunkData[MCRegion.CHUNKS_X * MCRegion.CHUNKS_Z];
+      ChunkData[] regionParsingDataArray = new ChunkData[Region.CHUNKS_X * Region.CHUNKS_Z];
+      ChunkData[] chunkLoadingDataArray = new ChunkData[Region.CHUNKS_X * Region.CHUNKS_Z];
 
       BiFunction<RegionPosition, ChunkData[], Future<List<ObjectObjectImmutablePair<ChunkPosition, ChunkData>>>> createRegionDataFuture = (regionPosition, chunkDataArray) -> executor.submit(() -> {
         List<ChunkPosition> chunkPositionsToLoad = chunksToLoadByRegion.get(regionPosition);

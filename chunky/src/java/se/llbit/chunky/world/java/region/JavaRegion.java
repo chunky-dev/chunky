@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.world.region;
+package se.llbit.chunky.world.java.region;
 
 import java.io.*;
 import java.util.Iterator;
@@ -26,6 +26,8 @@ import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.world.*;
 import se.llbit.chunky.world.java.JavaChunk;
 import se.llbit.chunky.world.java.JavaDimension;
+import se.llbit.chunky.world.region.ChunkReadException;
+import se.llbit.chunky.world.region.Region;
 import se.llbit.log.Log;
 import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.NamedTag;
@@ -44,19 +46,8 @@ import se.llbit.util.annotation.Nullable;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class MCRegion implements Region {
-
-  /**
-   * Region X chunk width
-   */
-  public static final int CHUNKS_X = 32;
-
-  /**
-   * Region Z chunk width
-   */
-  public static final int CHUNKS_Z = 32;
-
-  private static final int NUM_CHUNKS = CHUNKS_X * CHUNKS_Z;
+public class JavaRegion implements Region {
+  private static final int NUM_CHUNKS = Region.CHUNKS_X * Region.CHUNKS_Z;
 
   /**
    * Sector size in bytes.
@@ -82,12 +73,12 @@ public class MCRegion implements Region {
    *
    * @param pos the region position
    */
-  public MCRegion(RegionPosition pos, JavaDimension dimension) {
+  public JavaRegion(RegionPosition pos, JavaDimension dimension) {
     this.dimension = dimension;
     fileName = pos.getMcaName();
     position = pos;
-    for (int z = 0; z < CHUNKS_Z; ++z) {
-      for (int x = 0; x < CHUNKS_X; ++x) {
+    for (int z = 0; z < Region.CHUNKS_Z; ++z) {
+      for (int x = 0; x < Region.CHUNKS_X; ++x) {
         chunks[getMCAChunkIndex(x, z)] = EmptyChunk.INSTANCE;
       }
     }
