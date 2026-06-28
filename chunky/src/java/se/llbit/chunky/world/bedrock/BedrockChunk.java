@@ -215,6 +215,9 @@ public class BedrockChunk extends Chunk {
 
   private void readData3D(ChunkData chunkData, BlockPalette palette, BiomePalette biomePalette, int maxY) {
     try {
+      BiomeData biomeDataStorage = new GenericBiomeData3d();
+      chunkData.setBiomeData(biomeDataStorage);
+
       Optional<byte[]> bytes = readDBValue(position, Data3D_KEY);
       if (bytes.isEmpty()) {
         return;
@@ -231,8 +234,6 @@ public class BedrockChunk extends Chunk {
       updateHeightmap(this.dimension.getHeightmap(), position, chunkData, heightmapData, palette, maxY);
 
       // BIOMES:
-      BiomeData biomeDataStorage = new GenericBiomeData3d();
-      chunkData.setBiomeData(biomeDataStorage);
       for (int paletteIdx = 0; paletteIdx < 24; paletteIdx++) {
         int packed = data3d.get() & 0xff; // & because java and unsigned is dumb.
         int isRuntime = (packed & 1);
