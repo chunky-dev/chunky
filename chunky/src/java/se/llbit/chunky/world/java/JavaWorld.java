@@ -42,6 +42,9 @@ public class JavaWorld extends World {
     return Optional.ofNullable(singleplayerPlayerUuid);
   }
 
+  /** Timestamp of when player data was last loaded. */
+  protected long playerDataTimestamp;
+
   /**
    * @param levelName      name of the world (not the world directory).
    * @param worldDirectory Minecraft world directory.
@@ -49,10 +52,11 @@ public class JavaWorld extends World {
    * @param timestamp
    */
   protected JavaWorld(String levelName, File worldDirectory, long seed, long timestamp, int versionId, Set<PlayerEntityData> playerEntities, Vector3i spawnPos) {
-    super(levelName, worldDirectory, seed, timestamp);
+    super(levelName, worldDirectory, seed);
     this.versionId = versionId;
     this.playerEntities = playerEntities;
     this.spawnPos = spawnPos;
+    this.playerDataTimestamp = timestamp;
   }
 
   /**
@@ -216,11 +220,11 @@ public class JavaWorld extends World {
     }
     File worldFile = new File(worldDirectory, "level.dat");
     long lastModified = worldFile.lastModified();
-    if (lastModified == timestamp) {
+    if (lastModified == playerDataTimestamp) {
       return false;
     }
     Log.infof("world %s: timestamp updated: reading player data", levelName);
-    timestamp = lastModified;
+    playerDataTimestamp = lastModified;
 
     try (FileInputStream fin = new FileInputStream(worldFile);
          InputStream gzin = new GZIPInputStream(fin);

@@ -31,7 +31,7 @@ public class EmptyWorld extends World {
   public static final EmptyWorld INSTANCE = new EmptyWorld();
 
   private EmptyWorld() {
-    super("[empty world]", null, 0, -1);
+    super("[empty world]", null, 0);
     this.currentDimension = EmptyDimension.INSTANCE;
   }
 
