@@ -53,7 +53,7 @@ public class ImposterCubicChunk extends JavaChunk {
    */
   @Override
   public synchronized boolean loadChunk(@NotNull Mutable<ChunkData> mutableChunkData, int yMin, int yMax) {
-    if (!shouldReloadChunk()) {
+    if (!shouldReload()) {
       return false;
     }
 

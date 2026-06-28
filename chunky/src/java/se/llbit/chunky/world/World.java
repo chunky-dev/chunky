@@ -65,16 +65,16 @@ public abstract class World implements Comparable<World> {
    *
    * @return List the viewable dimensions within the world.
    */
-  public abstract Set<Dimension.Identifier> availableDimensions();
+  public abstract Set<Dimension.Identifier> getAvailableDimensions();
 
   /**
-   * <b>MUST</b> be one of {@link #availableDimensions()}
+   * <b>MUST</b> be one of {@link #getAvailableDimensions()}
    * @return The preferred default dimension of this world (typically the overworld)
    */
-  public abstract Optional<Dimension.Identifier> defaultDimension();
+  public abstract Optional<Dimension.Identifier> getDefaultDimension();
 
   /**
-   * @param dimensionId The dimension to load, guaranteed to be one of the dimensions previously returned by {@link #availableDimensions()}
+   * @param dimensionId The dimension to load, guaranteed to be one of the dimensions previously returned by {@link #getAvailableDimensions()}
    * @return The loaded dimension
    */
   public abstract Dimension loadDimension(Dimension.Identifier dimensionId);
