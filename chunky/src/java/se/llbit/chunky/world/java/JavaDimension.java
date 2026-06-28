@@ -54,7 +54,7 @@ public class JavaDimension extends Dimension {
     return regionMap.computeIfAbsent(pos.getLong(), p -> {
       // check if the region is present in the world directory
       Region region = EmptyRegion.instance;
-      if (regionExists(pos)) {
+      if (hasRegion(pos)) {
         region = createRegion(pos);
       }
       return region;

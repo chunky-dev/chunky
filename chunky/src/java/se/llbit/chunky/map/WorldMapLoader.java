@@ -85,9 +85,9 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
 
     Optional<Dimension.Identifier> dimensionToLoad = Optional.of(world.currentDimension())
       .map(Dimension::getDimensionId)
-      .filter(dimension -> newWorld.availableDimensions().contains(dimension))
-      .or(newWorld::defaultDimension)
-      .or(() -> newWorld.availableDimensions().stream().findFirst());
+      .filter(dimension -> newWorld.getAvailableDimensions().contains(dimension))
+      .or(newWorld::getDefaultDimension)
+      .or(() -> newWorld.getAvailableDimensions().stream().findFirst());
 
     if (dimensionToLoad.isEmpty()) {
       Log.infof("No dimension loaded for world %s", newWorld.toString());
@@ -192,7 +192,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   /**
    * Set the current dimension.
    *
-   * @param value Must be a valid dimension see {@link World#availableDimensions()}
+   * @param value Must be a valid dimension see {@link World#getAvailableDimensions()}
    */
   public void setDimension(Dimension.Identifier value) {
     if (value != currentDimensionId) {

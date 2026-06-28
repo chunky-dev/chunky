@@ -59,7 +59,7 @@ public class JavaChunk extends Chunk {
 
   @Override
   public synchronized boolean loadChunk(@NotNull Mutable<ChunkData> chunkData, int yMin, int yMax) {
-    if (!shouldReloadChunk()) {
+    if (!shouldReload()) {
       return false;
     }
 
@@ -85,7 +85,7 @@ public class JavaChunk extends Chunk {
     Tag data = tagFromMap(dataMap);
 
     surfaceTimestamp = dataTimestamp;
-    version = chunkVersion(data);
+    version = getChunkVersion(data);
     HeightRange chunkBounds = inclusiveChunkBounds(data);
     chunkData.set(this.dimension.createChunkData(chunkData.get(), chunkBounds.min(), chunkBounds.max()));
     loadSurface(data, chunkData.get(), yMin, yMax);
@@ -137,7 +137,7 @@ public class JavaChunk extends Chunk {
     }
   }
 
-  protected boolean shouldReloadChunk() {
+  protected boolean shouldReload() {
     int timestamp = Integer.MAX_VALUE;
     timestamp = Math.min(timestamp, surfaceTimestamp);
     timestamp = Math.min(timestamp, biomesTimestamp);
@@ -149,7 +149,7 @@ public class JavaChunk extends Chunk {
   }
 
   /** Detect Minecraft version that generated the chunk. */
-  private static ChunkVersion chunkVersion(@NotNull Tag data) {
+  private static ChunkVersion getChunkVersion(@NotNull Tag data) {
     Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
     if (sections.isList()) {
       for (SpecificTag section : sections.asList()) {
@@ -297,7 +297,7 @@ public class JavaChunk extends Chunk {
     }
     ChunkData chunkData = reuseChunkData.get(); //unwrap mutable, for ease of use
 
-    version = chunkVersion(data);
+    version = getChunkVersion(data);
     Tag sections = getTagFromNames(data, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
     Tag entitiesTag = data.get(LEVEL_ENTITIES);
     Tag tileEntitiesTag = getTagFromNames(data, LEVEL_TILEENTITIES, BLOCK_ENTITIES_POST_21W43A);

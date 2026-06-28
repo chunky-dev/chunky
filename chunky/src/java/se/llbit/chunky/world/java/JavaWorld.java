@@ -129,7 +129,7 @@ public class JavaWorld extends World {
   }
 
   @Override
-  public Set<Dimension.Identifier> availableDimensions() {
+  public Set<Dimension.Identifier> getAvailableDimensions() {
     return Set.of(Dimension.Identifier.OVERWORLD,
       Dimension.Identifier.THE_NETHER,
       Dimension.Identifier.THE_END
@@ -137,7 +137,7 @@ public class JavaWorld extends World {
   }
 
   @Override
-  public Optional<Dimension.Identifier> defaultDimension() {
+  public Optional<Dimension.Identifier> getDefaultDimension() {
     return Optional.empty();
   }
 
@@ -246,7 +246,7 @@ public class JavaWorld extends World {
     return true;
   }
 
-  public static boolean isWorldDir(File worldDir) {
+  public static boolean isWorldDirectory(File worldDir) {
     if (worldDir != null && worldDir.isDirectory()) {
       File levelDat = new File(worldDir, "level.dat");
       return levelDat.exists() && levelDat.isFile();

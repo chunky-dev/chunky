@@ -24,7 +24,7 @@ public class JavaWorldFormat implements WorldFormat {
 
   @Override
   public boolean isValid(Path path) {
-    return JavaWorld.isWorldDir(path.toFile());
+    return JavaWorld.isWorldDirectory(path.toFile());
   }
 
   @Override

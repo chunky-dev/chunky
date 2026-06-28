@@ -36,12 +36,12 @@ public class EmptyWorld extends World {
   }
 
   @Override
-  public Set<Dimension.Identifier> availableDimensions() {
+  public Set<Dimension.Identifier> getAvailableDimensions() {
     return Collections.emptySet();
   }
 
   @Override
-  public Optional<Dimension.Identifier> defaultDimension() {
+  public Optional<Dimension.Identifier> getDefaultDimension() {
     return Optional.empty();
   }
 
