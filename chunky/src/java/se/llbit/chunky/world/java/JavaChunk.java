@@ -1,6 +1,5 @@
 package se.llbit.chunky.world.java;
 
-import it.unimi.dsi.fastutil.ints.IntIntImmutablePair;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
@@ -87,8 +86,8 @@ public class JavaChunk extends Chunk {
 
     surfaceTimestamp = dataTimestamp;
     version = chunkVersion(data);
-    IntIntImmutablePair chunkBounds = inclusiveChunkBounds(data);
-    chunkData.set(this.dimension.createChunkData(chunkData.get(), chunkBounds.leftInt(), chunkBounds.rightInt()));
+    HeightRange chunkBounds = inclusiveChunkBounds(data);
+    chunkData.set(this.dimension.createChunkData(chunkData.get(), chunkBounds.min(), chunkBounds.max()));
     loadSurface(data, chunkData.get(), yMin, yMax);
     biomesTimestamp = dataTimestamp;
 
@@ -289,10 +288,10 @@ public class JavaChunk extends Chunk {
 
     int dataVersion = data.get(DATAVERSION).intValue();
 
-    IntIntImmutablePair chunkBounds = inclusiveChunkBounds(data);
+    HeightRange chunkBounds = inclusiveChunkBounds(data);
 
     if(reuseChunkData.get() == null || reuseChunkData.get() instanceof EmptyChunkData) {
-      reuseChunkData.set(dimension.createChunkData(reuseChunkData.get(), chunkBounds.leftInt(), chunkBounds.rightInt()));
+      reuseChunkData.set(dimension.createChunkData(reuseChunkData.get(), chunkBounds.min(), chunkBounds.max()));
     } else {
       reuseChunkData.get().clear();
     }
@@ -343,7 +342,7 @@ public class JavaChunk extends Chunk {
   /**
    * @return The min and max blockY for a given section array
    */
-  private IntIntImmutablePair inclusiveChunkBounds(Tag chunkData) {
+  private HeightRange inclusiveChunkBounds(Tag chunkData) {
     Tag sections = getTagFromNames(chunkData, LEVEL_SECTIONS, SECTIONS_POST_21W39A);
     int minSectionY = Integer.MAX_VALUE;
     int maxSectionY = Integer.MIN_VALUE;
@@ -359,7 +358,7 @@ public class JavaChunk extends Chunk {
       }
     }
 
-    return new IntIntImmutablePair(minSectionY << 4, (maxSectionY << 4) + 15);
+    return new HeightRange(minSectionY << 4, (maxSectionY << 4) + 15);
   }
 
 }

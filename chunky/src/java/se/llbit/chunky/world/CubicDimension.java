@@ -53,11 +53,11 @@ public class CubicDimension extends JavaDimension {
     return new ImposterCubicRegion(pos, this);
   }
 
-  public synchronized Region getRegionWithinRange(RegionPosition pos, int minY, int maxY) {
+  public synchronized Region getRegionWithinRange(RegionPosition pos, HeightRange heightRange) {
     return regionMap.computeIfAbsent(pos.getLong(), p -> {
       // check if the region is present in the world directory
       Region region = EmptyRegion.instance;
-      if (regionExistsWithinRange(pos, minY, maxY)) {
+      if (this.hasRegionWithinRange(pos, heightRange)) {
         region = createRegion(pos);
       }
       return region;
@@ -66,7 +66,7 @@ public class CubicDimension extends JavaDimension {
 
   /** no choice but to iterate over every file in the directory */
   @Override
-  public boolean regionExists(RegionPosition pos) {
+  public boolean hasRegion(RegionPosition pos) {
     File regionDirectory = getRegionDirectory();
     try (Stream<Path> list = Files.list(regionDirectory.toPath())) {
       return list.anyMatch(path -> {
@@ -86,13 +86,13 @@ public class CubicDimension extends JavaDimension {
   }
 
   @Override
-  public boolean regionExistsWithinRange(RegionPosition pos, int minY, int maxY) {
+  public boolean hasRegionWithinRange(RegionPosition pos, HeightRange heightRange) {
     int cubicRegionX = pos.x << 1;
     int cubicRegionZ = pos.z << 1;
 
     File regionDirectory = getRegionDirectory();
-    int minRegionY = cubeToCubicRegion(blockToCube(minY));
-    int maxRegionY = cubeToCubicRegion(blockToCube(maxY - 1));
+    int minRegionY = cubeToCubicRegion(blockToCube(heightRange().min()));
+    int maxRegionY = cubeToCubicRegion(blockToCube(heightRange.max() - 1));
     for (int y = minRegionY; y <= maxRegionY; y++) {
       for (int localX = 0; localX < ImposterCubicRegion.DIAMETER_IN_CUBIC_REGIONS; localX++) {
         for (int localZ = 0; localZ < ImposterCubicRegion.DIAMETER_IN_CUBIC_REGIONS; localZ++) {
