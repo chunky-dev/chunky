@@ -24,7 +24,7 @@ public class JavaWorld extends World {
   public static final int VERSION_21W06A = 2694;
   public static final int VERSION_1_12_2 = 1343;
 
-  protected int versionId;
+  protected final int versionId;
 
   /**
    * In a java world spawn position is per-world and not per-dimension, so we store it here.
@@ -37,10 +37,6 @@ public class JavaWorld extends World {
   protected final Collection<PlayerEntityData> playerEntities;
 
   protected UUID singleplayerPlayerUuid;
-
-  public Optional<UUID> getSingleplayerPlayerUuid() {
-    return Optional.ofNullable(singleplayerPlayerUuid);
-  }
 
   /** Timestamp of when player data was last loaded. */
   protected long playerDataTimestamp;
@@ -176,6 +172,10 @@ public class JavaWorld extends World {
     } else {
       return new JavaDimension(world, dimensionId, dimensionDirectory, playerEntities, spawnPos);
     }
+  }
+
+  public Optional<UUID> getSingleplayerPlayerUuid() {
+    return Optional.ofNullable(singleplayerPlayerUuid);
   }
 
   @NotNull

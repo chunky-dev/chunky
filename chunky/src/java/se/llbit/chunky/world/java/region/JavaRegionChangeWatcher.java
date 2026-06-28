@@ -41,7 +41,7 @@ public class JavaRegionChangeWatcher extends RegionChangeWatcher {
     try {
       while (!isInterrupted()) {
         sleep(3000);
-        // MCRegionChangeWatcher is only created by JavaDimension, so this cast is always safe.
+        // RegionChangeWatcher is only created by JavaDimension, so this cast is always safe.
         JavaDimension dimension = (JavaDimension) mapLoader.getWorld().currentDimension();
         if (dimension.reloadPlayerData()) {
           if (PersistentSettings.getFollowPlayer()) {
