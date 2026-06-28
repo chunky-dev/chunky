@@ -21,6 +21,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.world.ChunkView;
+import se.llbit.chunky.world.HeightRange;
 import se.llbit.chunky.world.RegionPosition;
 import se.llbit.chunky.world.java.JavaDimension;
 import se.llbit.chunky.world.region.Region;
@@ -51,9 +52,10 @@ public class JavaRegionChangeWatcher extends RegionChangeWatcher {
         for (int rx = theView.prx0; rx <= theView.prx1; ++rx) {
           for (int rz = theView.prz0; rz <= theView.prz1; ++rz) {
             RegionPosition pos = new RegionPosition(rx, rz);
-            Region region = dimension.getRegionWithinRange(pos, theView.yMin, theView.yMax);
+            HeightRange heightRange = new HeightRange(theView.yMin, theView.yMax);
+            Region region = dimension.getRegionWithinRange(pos, heightRange);
             if (region.isEmpty()) {
-              if (dimension.regionExistsWithinRange(pos, theView.yMin, theView.yMax)) {
+              if (dimension.hasRegionWithinRange(pos, heightRange)) {
                 region = dimension.createRegion(pos);
               }
               dimension.setRegion(pos, region);

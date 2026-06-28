@@ -460,9 +460,9 @@ public class ChunkyFxController
                 }
                 if (!reloaded) {
                   ignoreYUpdate.set(true);
-                  IntIntPair heightRange = mapLoader.getWorld().currentDimension().heightRange();
-                  int min = heightRange.firstInt();
-                  int max = heightRange.secondInt();
+                  HeightRange heightRange = mapLoader.getWorld().currentDimension().heightRange();
+                  int min = heightRange.min();
+                  int max = heightRange.max();
                   yMin.setRange(min, max);
                   yMin.set(min);
                   yMax.setRange(min, max);
@@ -653,9 +653,9 @@ public class ChunkyFxController
     mapOverlay.setOnKeyReleased(map::onKeyReleased);
 
     mapLoader.loadWorldFromDirectory(PersistentSettings.getLastWorld());
-    IntIntPair heightRange = mapLoader.getWorld().currentDimension().heightRange();
-    mapView.setYMin(heightRange.firstInt());
-    mapView.setYMax(heightRange.secondInt());
+    HeightRange heightRange = mapLoader.getWorld().currentDimension().heightRange();
+    mapView.setYMin(heightRange.min());
+    mapView.setYMax(heightRange.max());
 
     canvas = new RenderCanvasFx(this, chunky.getSceneManager().getScene(),
         chunky.getRenderController().getRenderManager());

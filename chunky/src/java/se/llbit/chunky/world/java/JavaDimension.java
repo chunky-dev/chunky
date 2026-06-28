@@ -1,7 +1,5 @@
 package se.llbit.chunky.world.java;
 
-import it.unimi.dsi.fastutil.ints.IntIntImmutablePair;
-import it.unimi.dsi.fastutil.ints.IntIntPair;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import se.llbit.chunky.map.MapView;
@@ -64,26 +62,26 @@ public class JavaDimension extends Dimension {
   }
 
   @Override
-  public Region getRegionWithinRange(RegionPosition pos, int yMin, int yMax) {
+  public Region getRegionWithinRange(RegionPosition pos, HeightRange heightRange) {
     return getRegion(pos);
   }
 
   @Override
-  public boolean regionExists(RegionPosition pos) {
+  public boolean hasRegion(RegionPosition pos) {
     File regionFile = new File(getRegionDirectory(), pos.getMcaName());
     return regionFile.exists();
   }
 
   @Override
-  public boolean regionExistsWithinRange(RegionPosition pos, int minY, int maxY) {
-    return this.regionExists(pos);
+  public boolean hasRegionWithinRange(RegionPosition pos, HeightRange heightRange) {
+    return this.hasRegion(pos);
   }
 
   @Override
-  public IntIntPair heightRange() {
+  public HeightRange heightRange() {
     return this.world.versionId >= JavaWorld.VERSION_21W06A ?
-      new IntIntImmutablePair(-64, 320) :
-      new IntIntImmutablePair(0, 256);
+      new HeightRange(-64, 320) :
+      new HeightRange(0, 256);
   }
 
 

@@ -48,6 +48,7 @@ import se.llbit.chunky.ui.dialogs.SettingsExport;
 import se.llbit.chunky.ui.elements.SizeInput;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.EmptyWorld;
+import se.llbit.chunky.world.HeightRange;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
 import se.llbit.fxutil.Dialogs;
@@ -594,9 +595,9 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
 
   private void updateYClipSlidersRanges(World world) {
     if (world != null) {
-      IntIntPair heightRange = world.currentDimension().heightRange();
-      int min = heightRange.firstInt();
-      int max = heightRange.secondInt();
+      HeightRange heightRange = world.currentDimension().heightRange();
+      int min = heightRange.min();
+      int max = heightRange.max();
       yMin.setRange(min, max);
       yMin.set(min);
       yMax.setRange(min, max);

@@ -1,8 +1,5 @@
 package se.llbit.chunky.world;
 
-import it.unimi.dsi.fastutil.ints.IntIntPair;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
@@ -138,21 +135,20 @@ public abstract class Dimension {
    */
   public abstract Region getRegion(RegionPosition pos);
 
-  public abstract Region getRegionWithinRange(RegionPosition pos, int yMin, int yMax);
+  public abstract Region getRegionWithinRange(RegionPosition pos, HeightRange heightRange);
 
   /**
    * @param pos region position
    * @return {@code true} if a region file exists for the given position
    */
-  public abstract boolean regionExists(RegionPosition pos);
+  public abstract boolean hasRegion(RegionPosition pos);
 
   /**
    * @param pos  Position of the region to load
-   * @param minY Minimum block Y (inclusive)
-   * @param maxY Maximum block Y (exclusive)
+   * @param heightRange The height range of the request
    * @return Whether the region exists
    */
-  public abstract boolean regionExistsWithinRange(RegionPosition pos, int minY, int maxY);
+  public abstract boolean hasRegionWithinRange(RegionPosition pos, HeightRange heightRange);
 
   /**
    * WARNING: In some dimensions this could be from {@link Integer#MIN_VALUE} to {@link Integer#MAX_VALUE}
@@ -161,7 +157,7 @@ public abstract class Dimension {
    *
    * @return The height range of the dimension.
    */
-  public abstract IntIntPair heightRange();
+  public abstract HeightRange heightRange();
 
   /**
    * @return The chunk heightmap

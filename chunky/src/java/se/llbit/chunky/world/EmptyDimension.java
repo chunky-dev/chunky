@@ -43,23 +43,23 @@ public class EmptyDimension extends Dimension {
   }
 
   @Override
-  public Region getRegionWithinRange(RegionPosition pos, int yMin, int yMax) {
+  public Region getRegionWithinRange(RegionPosition pos, HeightRange heightRange) {
     return EmptyRegion.instance;
   }
 
   @Override
-  public boolean regionExists(RegionPosition pos) {
+  public boolean hasRegion(RegionPosition pos) {
     return false;
   }
 
   @Override
-  public boolean regionExistsWithinRange(RegionPosition pos, int minY, int maxY) {
+  public boolean hasRegionWithinRange(RegionPosition pos, HeightRange heightRange) {
     return false;
   }
 
   @Override
-  public IntIntPair heightRange() {
-    return new IntIntImmutablePair(0, 0);
+  public HeightRange heightRange() {
+    return new HeightRange(0, 0);
   }
 
   @Override public String getName() {
