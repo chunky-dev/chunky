@@ -4,6 +4,7 @@ import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.worldformat.WorldFormat;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class JavaWorldFormat implements WorldFormat {
@@ -24,7 +25,11 @@ public class JavaWorldFormat implements WorldFormat {
 
   @Override
   public boolean isValid(Path path) {
-    return JavaWorld.isWorldDirectory(path.toFile());
+    if (Files.isDirectory(path)) {
+      Path levelDat = path.resolve("level.dat");
+      return Files.exists(levelDat) && Files.isRegularFile(levelDat);
+    }
+    return false;
   }
 
   @Override

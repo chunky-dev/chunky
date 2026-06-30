@@ -249,12 +249,4 @@ public class JavaWorld extends World {
     }
     return true;
   }
-
-  public static boolean isWorldDirectory(File worldDir) {
-    if (worldDir != null && worldDir.isDirectory()) {
-      File levelDat = new File(worldDir, "level.dat");
-      return levelDat.exists() && levelDat.isFile();
-    }
-    return false;
-  }
 }
