@@ -2,6 +2,7 @@ package se.llbit.chunky.world.worldformat;
 
 import se.llbit.chunky.world.World;
 import se.llbit.util.Registerable;
+import se.llbit.util.annotation.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -27,7 +28,7 @@ public interface WorldFormat extends Registerable {
    * @param path The path to the world.
    * @return Whether this is a valid world under this world format.
    */
-  boolean isValid(Path path);
+  boolean isValid(@NotNull Path path);
 
   /**
    * Load the world at the given path.
@@ -39,5 +40,5 @@ public interface WorldFormat extends Registerable {
    * @return The loaded world
    * @throws IOException When something goes wrong when loading the world.
    */
-  World loadWorld(Path path) throws IOException;
+  World loadWorld(@NotNull Path path) throws IOException;
 }
