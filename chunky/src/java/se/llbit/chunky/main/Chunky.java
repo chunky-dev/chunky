@@ -43,6 +43,7 @@ import se.llbit.chunky.ui.ChunkyFx;
 import se.llbit.chunky.ui.controller.CreditsController;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.chunky.world.MaterialStore;
+import se.llbit.chunky.world.bedrock.BedrockPlugin;
 import se.llbit.json.JsonArray;
 import se.llbit.log.ConsoleReceiver;
 import se.llbit.log.Level;
@@ -205,6 +206,9 @@ public class Chunky {
     }
   }
 
+  // FIXME: inbuilt plugins
+  BedrockPlugin bedrockPlugin = new BedrockPlugin();
+
   /**
    * Main entry point for Chunky. Chunky should normally be started via the launcher which sets up
    * the classpath with all dependencies.
@@ -262,6 +266,7 @@ public class Chunky {
   private void shutdown(int timeout, TimeUnit unit) {
     if (ChunkyThread.interruptAndJoinAll(timeout, unit)) {
       pluginManager.shutdownPlugins(plugin -> plugin.shutdown(this));
+      bedrockPlugin.shutdown(this);
     } else {
       Log.error("Not all threads were joined before shutting down."); // FIXME: list all alive threads? ThreadGroups are annoying.
     }
@@ -280,6 +285,7 @@ public class Chunky {
       SettingsDirectory.getPluginsDirectory(),
       (plugin, manifest) -> plugin.attach(this)
     );
+    bedrockPlugin.attach(this);
   }
 
   /**
