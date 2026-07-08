@@ -20,13 +20,14 @@ import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.world.ChunkView;
+import se.llbit.util.concurrent.ChunkyThread;
 
 /**
  * Monitors filesystem for changes to region files.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public abstract class RegionChangeWatcher extends Thread implements ChunkViewListener {
+public abstract class RegionChangeWatcher extends ChunkyThread implements ChunkViewListener {
   protected final WorldMapLoader mapLoader;
   protected final MapView mapView;
   protected volatile ChunkView view = ChunkView.EMPTY;

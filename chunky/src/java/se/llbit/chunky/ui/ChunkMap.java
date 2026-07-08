@@ -52,6 +52,7 @@ import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.chunky.world.region.MCRegion;
 import se.llbit.log.Log;
 import se.llbit.math.*;
+import se.llbit.util.concurrent.ChunkyThread;
 
 import java.awt.*;
 import java.io.File;
@@ -115,7 +116,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   private volatile boolean scheduledUpdate = false;
   private volatile long lastRedraw = 0;
   private Runnable onViewDragged = () -> {};
-  private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+  private final ScheduledExecutorService executor = ChunkyThread.addExecutorService(Executors::newSingleThreadScheduledExecutor);
 
   private boolean shouldDrawPlayers = true;
 

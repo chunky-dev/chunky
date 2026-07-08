@@ -82,7 +82,6 @@ public class ChunkyFx extends Application {
     if(mainStage != null) {
       PersistentSettings.setWindowPosition(new WindowPosition(mainStage));
     }
-    System.exit(0);
   }
 
   public static void startChunkyUI(Chunky chunkyInstance) {
