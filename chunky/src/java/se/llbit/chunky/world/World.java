@@ -16,37 +16,44 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.world.worldformat.WorldFormat;
+import se.llbit.util.annotation.NotNull;
+
 import java.io.*;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
- * The World class contains information about the currently viewed world.
- * It has a map of all chunks in the world and is responsible for parsing
- * chunks when needed. All rendering is done through the WorldRenderer class.
+ * The World class contains {@link Info metadata} about itself, and methods for querying and loading its dimensions.
+ * It also contains the {@link #currentDimension() currently loaded dimension} if there is one.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public abstract class World implements Comparable<World> {
+public abstract class World {
+  /**
+   * Metadata about a world.
+   */
+  public record Info(String name, Path path, long lastModified, long seed, String gameMode, WorldFormat worldFormat) {
+    /**
+     * Chunky sees each valid {@link Info#path()} and {@link Info#worldFormat()} combination as a distinct world which
+     * can be selected by the user.
+     */
+    public boolean isSameWorld(Info other) {
+      return this.worldFormat == other.worldFormat && this.path.equals(other.path);
+    }
+  }
+
   /** Default sea water level. */
   public static final int SEA_LEVEL = 63;
 
-  protected final File worldDirectory;
+  private final Info info;
 
+  @NotNull
   protected Dimension currentDimension;
 
-  protected final String levelName;
-  protected int gameMode = 0;
-  protected final long seed;
-
-  /**
-   * @param levelName name of the world (not the world directory).
-   * @param worldDirectory Minecraft world directory.
-   * @param seed
-   */
-  protected World(String levelName, File worldDirectory, long seed) {
-    this.levelName = levelName;
-    this.worldDirectory = worldDirectory;
-    this.seed = seed;
+  protected World(Info info) {
+    this.info = info;
+    this.currentDimension = EmptyDimension.INSTANCE;
   }
 
   public enum LoggedWarnings {
@@ -55,8 +62,8 @@ public abstract class World implements Comparable<World> {
   }
 
   /**
-   * The dimensions returned here are later provided to {@link #loadDimension(Dimension.Identifier)} when requesting a dimension be
-   * loaded.
+   * The dimensions returned here are later provided to {@link #loadDimension(Dimension.Identifier)} when requesting a
+   * dimension be loaded.
    *
    * @return List the viewable dimensions within the world.
    */
@@ -75,50 +82,19 @@ public abstract class World implements Comparable<World> {
   public abstract Dimension loadDimension(Dimension.Identifier dimensionId);
 
   /**
-   * @return The current dimension
+   * @return The current dimension or {@link EmptyDimension#INSTANCE} if there isn't one.
    */
+  @NotNull
   public synchronized Dimension currentDimension() {
     return this.currentDimension;
   }
 
-  /**
-   * @return The world directory
-   */
-  public File getWorldDirectory() {
-    return worldDirectory;
+  public Info getInfo() {
+    return this.info;
   }
 
   @Override public String toString() {
-    return levelName + " (" + worldDirectory.getName() + ")";
-  }
-
-  /** The name of this world (not the world directory name). */
-  public String levelName() {
-    return levelName;
-  }
-
-  /**
-   * @return String describing the game-mode of this world
-   */
-  public String gameMode() {
-    return switch (gameMode) {
-      case 0 -> "Survival";
-      case 1 -> "Creative";
-      case 2 -> "Adventure";
-      default -> "Unknown";
-    };
-  }
-  @Override public int compareTo(World o) {
-    // Compares world names and directories.
-    return toString().compareToIgnoreCase(o.toString());
-  }
-
-  public long getSeed() {
-    return seed;
-  }
-
-  public Date getLastModified() {
-    return new Date(this.worldDirectory.lastModified());
+    return info.name + " (" + info.path.getFileName() + ")";
   }
 
   /**
@@ -127,7 +103,7 @@ public abstract class World implements Comparable<World> {
    * @return Resource pack file/directory or empty optional if this world has no bundled resource pack
    */
   public Optional<File> getResourcePack() {
-    for (File resourcepacksDirectory : new File[]{getWorldDirectory(), new File(getWorldDirectory(), "resourcepacks")}) {
+    for (File resourcepacksDirectory : new File[]{ info.path.toFile(), new File(info.path.toFile(), "resourcepacks")}) {
       if (resourcepacksDirectory.isDirectory()) {
         File resourcePack = new File(resourcepacksDirectory, "resources.zip");
     if (resourcePack.isFile()) {

@@ -6,6 +6,7 @@ import se.llbit.util.annotation.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * A {@link WorldFormat} determines whether paths on disk are valid for its world type, and can then load that
@@ -29,14 +30,22 @@ public interface WorldFormat extends Registerable {
   boolean isValid(@NotNull Path path);
 
   /**
-   * Load the world at the given path.
+   * Load metadata about a world
    *
    * <p>Calls to this method do not indicate that any blocks will be loaded from the world. As such implementations
    * should do <b><u>minimal</u></b> work to load the metadata for a world.</p>
    *
-   * @param path The path to the world.
-   * @return The loaded world
-   * @throws IOException When something goes wrong when loading the world.
+   * @param path The path to the world
+   * @return The {@link World.Info}, if it was created successfully.
    */
-  World loadWorld(@NotNull Path path) throws IOException;
+  @NotNull Optional<World.Info> getWorldInfo(@NotNull Path path);
+
+  /**
+   * Load the world represented by the given world info.
+   *
+   * @param info The world info.
+   * @return The loaded world, or an empty world if the world was not loadable.
+   * @throws IOException When something goes wrong when loading the world. Will be reported to the user.
+   */
+  @NotNull World loadWorld(@NotNull World.Info info) throws IOException;
 }

@@ -13,6 +13,7 @@ import se.llbit.math.Vector3i;
 import se.llbit.util.annotation.Nullable;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,7 +28,7 @@ public class JavaDimension extends Dimension {
    * @param dimensionDirectory Minecraft world directory.
    * @param playerEntities
    */
-  protected JavaDimension(JavaWorld world, Identifier dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
+  protected JavaDimension(JavaWorld world, Identifier dimensionId, Path dimensionDirectory, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
     super(dimensionId, dimensionDirectory, playerEntities, spawnPos);
     this.world = world;
   }
@@ -128,11 +129,11 @@ public class JavaDimension extends Dimension {
    * @return File object pointing to the region file directory
    */
   public synchronized File getRegionDirectory() {
-    return new File(getDimensionDirectory(), "region");
+    return dimensionDirectory.resolve("region").toFile();
   }
 
   @Override
   public String getName() {
-    return dimensionDirectory.getName() ;
+    return dimensionDirectory.getFileName().toString();
   }
 }

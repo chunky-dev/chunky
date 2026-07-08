@@ -23,16 +23,10 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import it.unimi.dsi.fastutil.ints.IntIntPair;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -287,7 +281,7 @@ public class ChunkyFxController
     fileChooser.setTitle("Export PNG");
     fileChooser
         .getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG image", "*.png"));
-    mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.levelName() + ".png"));
+    mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.getInfo().name() + ".png"));
     if (prevPngDir != null) {
       fileChooser.setInitialDirectory(prevPngDir.toFile());
     }
@@ -327,7 +321,7 @@ public class ChunkyFxController
         World newWorld = scene.getWorld();
         World currentWorld = mapLoader.getWorld();
         boolean isSameWorld = currentWorld != EmptyWorld.INSTANCE &&
-          currentWorld.getWorldDirectory().equals(newWorld.getWorldDirectory());
+          currentWorld.getInfo().isSameWorld(newWorld.getInfo());
 
         if (isSameWorld) {
           getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
@@ -341,7 +335,7 @@ public class ChunkyFxController
               "This scene shows a different world than the one that is currently loaded. Do you want to load the world of this scene?");
             Dialogs.stayOnTop(loadWorldConfirm);
             if (loadWorldConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
-              mapLoader.loadWorld(newWorld);
+              mapLoader.setWorld(newWorld);
               getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
             }
           }
@@ -473,7 +467,7 @@ public class ChunkyFxController
                   ignoreYUpdate.set(false);
                 }
                 map.redrawMap();
-                mapName.setText(world.levelName());
+                mapName.setText(world.getInfo().name());
                 showWorldMap();
               });
         });
@@ -652,7 +646,7 @@ public class ChunkyFxController
     mapOverlay.setOnKeyPressed(map::onKeyPressed);
     mapOverlay.setOnKeyReleased(map::onKeyReleased);
 
-    mapLoader.loadWorldFromDirectory(PersistentSettings.getLastWorld());
+    mapLoader.loadWorldFromDirectory(PersistentSettings.getLastWorld(), PersistentSettings.getLastWorldFormat());
     HeightRange heightRange = mapLoader.getWorld().currentDimension().heightRange();
     mapView.setYMin(heightRange.min());
     mapView.setYMax(heightRange.max());

@@ -11,8 +11,11 @@ import se.llbit.util.annotation.NotNull;
 import se.llbit.util.annotation.Nullable;
 
 import java.io.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
@@ -41,96 +44,65 @@ public class JavaWorld extends World {
   /** Timestamp of when player data was last loaded. */
   protected long playerDataTimestamp;
 
-  /**
-   * @param levelName      name of the world (not the world directory).
-   * @param worldDirectory Minecraft world directory.
-   * @param seed
-   * @param timestamp
-   */
-  protected JavaWorld(String levelName, File worldDirectory, long seed, long timestamp, int versionId, Set<PlayerEntityData> playerEntities, Vector3i spawnPos) {
-    super(levelName, worldDirectory, seed);
+  protected JavaWorld(Info info, long timestamp, int versionId, Set<PlayerEntityData> playerEntities, Vector3i spawnPos) {
+    super(info);
     this.versionId = versionId;
     this.playerEntities = playerEntities;
     this.spawnPos = spawnPos;
     this.playerDataTimestamp = timestamp;
   }
 
-  /**
-   * Parse player location and level name.
-   *
-   * @return {@code true} if the world data was loaded
-   */
-  public static World loadWorld(File worldDirectory, LoggedWarnings warnings) {
-    if (worldDirectory == null) {
-      return EmptyWorld.INSTANCE;
-    }
-    String levelName = worldDirectory.getName(); // Default level name.
-    File worldFile = new File(worldDirectory, "level.dat");
-    long modtime = worldFile.lastModified();
-    try (FileInputStream fin = new FileInputStream(worldFile);
-         InputStream gzin = new GZIPInputStream(fin);
-         DataInputStream in = new DataInputStream(gzin)) {
-      Set<String> request = new HashSet<>();
-      request.add(".Data.version");
-      request.add(".Data.Version.Id");
-      request.add(".Data.RandomSeed");
-      request.add(".Data.Player");
-      request.add(".Data.singleplayer_uuid");
-      request.add(".Data.LevelName");
-      request.add(".Data.GameType");
-      request.add(".Data.isCubicWorld");
-      Map<String, Tag> result = NamedTag.quickParse(in, request);
+  public static Optional<World.Info> loadWorldInfo(@NotNull Path worldDirectory, LoggedWarnings warnings, JavaWorldFormat format) {
+    return readWorldData(worldDirectory, warnings, data -> {
+      Tag gameType = data.tags.get(".Data.GameType");
+      String gameMode = switch (gameType.intValue(0)) {
+        case 0 -> "Survival";
+        case 1 -> "Creative";
+        case 2 -> "Adventure";
+        default -> "Unknown";
+      };
+      Tag randomSeed = data.tags.get(".Data.RandomSeed");
 
-      Tag version = result.get(".Data.version");
-      if (warnings == LoggedWarnings.NORMAL && version.intValue() != NBT_VERSION) {
-        Log.warnf("The world format for the world %s is not supported by Chunky.\n" + "Will attempt to load the world anyway.",
-          levelName);
-      }
-      Tag versionId = result.get(".Data.Version.Id");
-      Tag player = result.get(".Data.Player");
-      Tag spawnX = player.get("SpawnX");
-      Tag spawnY = player.get("SpawnY");
-      Tag spawnZ = player.get("SpawnZ");
-      Tag singleplayerUuid = result.get(".Data.singleplayer_uuid");
-      Tag gameType = result.get(".Data.GameType");
-      Tag randomSeed = result.get(".Data.RandomSeed");
-      levelName = MinecraftText.removeFormatChars(result.get(".Data.LevelName").stringValue(levelName));
+      String levelName = MinecraftText.removeFormatChars(data.tags.get(".Data.LevelName").stringValue(data.levelName));
 
       long seed = randomSeed.longValue(0);
 
-      Set<PlayerEntityData> playerEntities = getPlayerEntityData(worldDirectory, player);
+      return new Info(levelName, worldDirectory, data.modTime, seed, gameMode, format);
+    });
+  }
 
-      boolean haveSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
+  public static World loadWorld(Info info, LoggedWarnings warnings) {
+    return readWorldData(info.path(), warnings, data -> {
+      Tag versionId = data.tags.get(".Data.Version.Id");
+
+      Tag player = data.tags.get(".Data.Player");
+      Set<PlayerEntityData> playerEntities = getPlayerEntityData(info.path(), player);
+
+      Tag spawnX = player.get("SpawnX");
+      Tag spawnY = player.get("SpawnY");
+      Tag spawnZ = player.get("SpawnZ");
+      boolean hasSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
       Vector3i spawnPos = new Vector3i();
-      if (haveSpawnPos) {
+      if (hasSpawnPos) {
         spawnPos = new Vector3i(spawnX.intValue(0), spawnY.intValue(0), spawnZ.intValue(0));
       }
 
-      JavaWorld world = new JavaWorld(levelName, worldDirectory, seed, modtime, versionId.intValue(), playerEntities, spawnPos);
-      world.gameMode = gameType.intValue(0);
+      JavaWorld world = new JavaWorld(info, data.modTime, versionId.intValue(), playerEntities, spawnPos);
 
+      Tag singleplayerUuid = data.tags.get(".Data.singleplayer_uuid");
       if (singleplayerUuid.isIntArray(4)) {
         world.singleplayerPlayerUuid = UuidUtil.intsToUuid(singleplayerUuid.intArray());
       } else if (!player.isError()) {
         world.singleplayerPlayerUuid = PlayerEntityData.getUuid(player);
       }
 
-      return world;
-    } catch (FileNotFoundException e) {
-      if (warnings == LoggedWarnings.NORMAL) {
-        Log.infof("Could not find level.dat file for world %s!", levelName);
-      }
-    } catch (IOException e) {
-      if (warnings == LoggedWarnings.NORMAL) {
-        Log.infof("Could not read the level.dat file for world %s!", levelName);
-      }
-    }
-    return EmptyWorld.INSTANCE;
+      return (World) world;
+    }).orElse(EmptyWorld.INSTANCE);
   }
 
   @Override
   public Set<Dimension.Identifier> getAvailableDimensions() {
-    return Set.of(Dimension.Identifier.OVERWORLD,
+    return Set.of(Dimension.Identifier.OVERWORLD, // TODO: return the actual set of dimensions on disk.
       Dimension.Identifier.THE_NETHER,
       Dimension.Identifier.THE_END
     );
@@ -145,7 +117,7 @@ public class JavaWorld extends World {
   public Dimension loadDimension(Dimension.Identifier dimensionId) {
     currentDimension = loadDimension(
       this,
-      this.worldDirectory,
+      getInfo().path(),
       dimensionId,
       this.playerEntities.stream().filter(player -> player.dimension.equals(dimensionId)).collect(Collectors.toSet()),
       this.spawnPos
@@ -155,19 +127,19 @@ public class JavaWorld extends World {
   }
 
   @NotNull
-  private static Dimension loadDimension(JavaWorld world, File worldDirectory, Dimension.Identifier dimensionId, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
-    File dimensionDirectory = Path.of(worldDirectory.getPath(), "dimensions", dimensionId.namespace(), dimensionId.name()).toFile();
-    if (dimensionDirectory.exists()) {
+  private static Dimension loadDimension(JavaWorld world, Path worldDirectory, Dimension.Identifier dimensionId, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
+    Path dimensionDirectory = worldDirectory.resolve("dimensions", dimensionId.namespace(), dimensionId.name());
+    if (Files.exists(dimensionDirectory)) {
       // 26.1-snapshot-6 or later
       return new JavaDimension(world, dimensionId, dimensionDirectory, playerEntities, spawnPos);
     }
 
     dimensionDirectory = switch (dimensionId.getNamespacedName()) { // TODO in Java 21+ we can use `switch (dimensionId)` here
-      case "minecraft:the_nether" -> new File(worldDirectory, "DIM-1");
-      case "minecraft:the_end" -> new File(worldDirectory, "DIM1");
+      case "minecraft:the_nether" -> worldDirectory.resolve("DIM-1");
+      case "minecraft:the_end" -> worldDirectory.resolve("DIM1");
       default -> worldDirectory;
     };
-    if (new File(dimensionDirectory, "region3d").exists()) {
+    if (Files.isDirectory(dimensionDirectory.resolve("region3d"))) {
       return new CubicDimension(world, dimensionId, dimensionDirectory, playerEntities, spawnPos);
     } else {
       return new JavaDimension(world, dimensionId, dimensionDirectory, playerEntities, spawnPos);
@@ -179,7 +151,7 @@ public class JavaWorld extends World {
   }
 
   @NotNull
-  private static Set<PlayerEntityData> getPlayerEntityData(File worldDirectory, Tag player) {
+  private static Set<PlayerEntityData> getPlayerEntityData(Path worldDirectory, Tag player) {
     Set<PlayerEntityData> playerEntities = new HashSet<>();
     if (!player.isError()) {
       playerEntities.add(new PlayerEntityData(player));
@@ -188,24 +160,25 @@ public class JavaWorld extends World {
     return playerEntities;
   }
 
-  private static void loadAdditionalPlayers(File worldDirectory, Set<PlayerEntityData> playerEntities) {
-    loadPlayerData(new File(worldDirectory, "players"), playerEntities);
-    loadPlayerData(new File(worldDirectory, "playerdata"), playerEntities);
-    loadPlayerData(new File(new File(worldDirectory, "players"), "data"), playerEntities); // 26.1-snapshot-6 or later
+  private static void loadAdditionalPlayers(Path worldDirectory, Set<PlayerEntityData> playerEntities) {
+    loadPlayerData(worldDirectory.resolve("players"), playerEntities);
+    loadPlayerData(worldDirectory.resolve("playerdata"), playerEntities);
+    loadPlayerData(worldDirectory.resolve("players").resolve("data"), playerEntities); // 26.1-snapshot-6 or later
   }
 
-  private static void loadPlayerData(File playerdata, Set<PlayerEntityData> playerEntities) {
-    if (playerdata.isDirectory()) {
-      File[] players = playerdata.listFiles();
-      if (players != null) {
-        for (File player : players) {
+  private static void loadPlayerData(Path playerDataDirectory, Set<PlayerEntityData> playerEntities) {
+    if (Files.isDirectory(playerDataDirectory)) {
+      try (DirectoryStream<Path> paths = Files.newDirectoryStream(playerDataDirectory)) {
+        for (Path player : paths) {
           try (DataInputStream in = new DataInputStream(
-            new GZIPInputStream(new FileInputStream(player)))) {
+            new GZIPInputStream(new FileInputStream(player.toFile())))) {
             playerEntities.add(new PlayerEntityData(NamedTag.read(in).unpack()));
           } catch (IOException e) {
-            Log.infof("Could not read player data file '%s'", player.getAbsolutePath());
+            Log.infof("Could not read player data file '%s'", player.toAbsolutePath());
           }
         }
+      } catch (IOException e) {
+        Log.infof("Could not list player data directory '%s'", playerDataDirectory.toAbsolutePath());
       }
     }
   }
@@ -215,18 +188,20 @@ public class JavaWorld extends World {
    * @return {@code true} if player data was reloaded.
    */
   synchronized boolean reloadPlayerData() {
-    if (worldDirectory == null) {
+    Path worldFile = getInfo().path().resolve("level.dat");
+    long lastModified;
+    try {
+      lastModified = Files.getLastModifiedTime(worldFile).toMillis();
+    } catch (IOException e) {
       return false;
     }
-    File worldFile = new File(worldDirectory, "level.dat");
-    long lastModified = worldFile.lastModified();
     if (lastModified == playerDataTimestamp) {
       return false;
     }
-    Log.infof("world %s: timestamp updated: reading player data", levelName);
+    Log.infof("world %s: timestamp updated: reading player data", getInfo().name());
     playerDataTimestamp = lastModified;
 
-    try (FileInputStream fin = new FileInputStream(worldFile);
+    try (FileInputStream fin = new FileInputStream(worldFile.toFile());
          InputStream gzin = new GZIPInputStream(fin);
          DataInputStream in = new DataInputStream(gzin)) {
       Set<String> request = new HashSet<>();
@@ -242,11 +217,49 @@ public class JavaWorld extends World {
       }
 
       this.playerEntities.clear();
-      this.playerEntities.addAll(getPlayerEntityData(worldDirectory, player));
+      this.playerEntities.addAll(getPlayerEntityData(getInfo().path(), player));
     } catch (IOException e) {
-      Log.infof("Could not read the level.dat file for world %s while trying to reload player data!", levelName);
+      Log.infof("Could not read the level.dat file for world %s while trying to reload player data!", getInfo().name());
       return false;
     }
     return true;
+  }
+
+  private record WorldData(String levelName, long modTime, Map<String, Tag> tags) {}
+  private static <T> Optional<T> readWorldData(@NotNull Path worldDirectory, LoggedWarnings warnings, Function<WorldData, T> consumer) {
+    String levelName = worldDirectory.getFileName().toString();
+    Path levelDat = worldDirectory.resolve("level.dat");
+    try (FileInputStream fin = new FileInputStream(levelDat.toFile());
+         InputStream gzin = new GZIPInputStream(fin);
+         DataInputStream in = new DataInputStream(gzin)) {
+      long modtime = Files.getLastModifiedTime(levelDat).toMillis();
+      Set<String> request = new HashSet<>();
+      request.add(".Data.version");
+      request.add(".Data.Version.Id");
+      request.add(".Data.RandomSeed");
+      request.add(".Data.Player");
+      request.add(".Data.singleplayer_uuid");
+      request.add(".Data.LevelName");
+      request.add(".Data.GameType");
+
+      Map<String, Tag> result = NamedTag.quickParse(in, request);
+
+      Tag version = result.get(".Data.version");
+      if (warnings == LoggedWarnings.NORMAL && version.intValue() != NBT_VERSION) {
+        Log.warnf("The world format for the world %s is not supported by Chunky.\n" + "Will attempt to load the world anyway.",
+          levelName);
+      }
+
+      return Optional.of(consumer.apply(new WorldData(levelName, modtime, result)));
+    } catch (FileNotFoundException e) {
+      if (warnings == LoggedWarnings.NORMAL) {
+        Log.infof("Could not find level.dat file for world %s!", levelName);
+      }
+    } catch (IOException e) {
+      if (warnings == LoggedWarnings.NORMAL) {
+        Log.infof("Could not read the level.dat file for world %s!", levelName);
+      }
+    }
+    return Optional.empty();
   }
 }

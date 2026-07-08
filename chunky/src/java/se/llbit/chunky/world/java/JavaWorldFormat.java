@@ -4,14 +4,17 @@ import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.worldformat.WorldFormat;
 import se.llbit.util.annotation.NotNull;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 public class JavaWorldFormat implements WorldFormat {
+  public static final String NAME = "Java (Anvil)";
+  public static final String ID = "JAVA_ANVIL";
+
   @Override
   public String getName() {
-    return "Java (Anvil)";
+    return NAME;
   }
 
   @Override
@@ -21,7 +24,7 @@ public class JavaWorldFormat implements WorldFormat {
 
   @Override
   public String getId() {
-    return "JAVA_ANVIL";
+    return ID;
   }
 
   @Override
@@ -33,8 +36,23 @@ public class JavaWorldFormat implements WorldFormat {
     return false;
   }
 
+  @NotNull
   @Override
-  public World loadWorld(@NotNull Path path) throws IOException {
-    return JavaWorld.loadWorld(path.toFile(), World.LoggedWarnings.SILENT);
+  public Optional<World.Info> getWorldInfo(@NotNull Path path) {
+    if (!Files.isDirectory(path)) {
+      return Optional.empty();
+    }
+    Path levelDat = path.resolve("level.dat");
+    if (!Files.exists(levelDat) || !Files.isRegularFile(levelDat)) {
+      return Optional.empty();
+    }
+
+    return JavaWorld.loadWorldInfo(path, World.LoggedWarnings.SILENT, this);
+  }
+
+  @NotNull
+  @Override
+  public World loadWorld(@NotNull World.Info info) {
+    return JavaWorld.loadWorld(info, World.LoggedWarnings.NORMAL);
   }
 }

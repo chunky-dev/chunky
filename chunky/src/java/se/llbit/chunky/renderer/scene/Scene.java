@@ -53,6 +53,7 @@ import se.llbit.chunky.world.biome.ArrayBiomePalette;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.biome.Biomes;
+import se.llbit.chunky.world.java.JavaWorldFormat;
 import se.llbit.chunky.world.region.Region;
 import se.llbit.chunky.world.worldformat.WorldFormats;
 import se.llbit.json.*;
@@ -68,6 +69,7 @@ import se.llbit.util.io.ZipExport;
 import se.llbit.util.mojangapi.MinecraftProfile;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -193,6 +195,7 @@ public class Scene implements JsonSerializable {
    */
   protected int rayDepth = PersistentSettings.getRayDepthDefault();
   protected String worldPath = "";
+  protected String worldFormat = JavaWorldFormat.ID;
   protected Dimension.Identifier worldDimension = Dimension.Identifier.OVERWORLD;
   protected RenderMode mode = RenderMode.PREVIEW;
   protected int dumpFrequency = DEFAULT_DUMP_FREQUENCY;
@@ -405,6 +408,7 @@ public class Scene implements JsonSerializable {
     if (copyChunks) {
       loadedWorld = other.loadedWorld;
       worldPath = other.worldPath;
+      worldFormat = other.worldFormat;
       worldDimension = other.worldDimension;
 
       // The octree reference is overwritten to save time.
@@ -547,14 +551,17 @@ public class Scene implements JsonSerializable {
 
       loadedWorld = EmptyWorld.INSTANCE;
       if (!worldPath.isEmpty()) {
-        File worldDirectory = new File(worldPath);
-        Optional<World> newWorld = WorldFormats.createWorld(worldDirectory);
-        if (newWorld.isPresent()) {
-          loadedWorld = newWorld.get();
+        Path worldDirectory = Path.of(worldPath);
+        Optional<World.Info> info = WorldFormats.getWorldFormat(worldFormat) // only try to load the world as its known world format.
+          .flatMap(format -> format.getWorldInfo(worldDirectory));
+
+        if (info.isPresent()) {
+          World newWorld = WorldFormats.createWorld(info.get());
+          loadedWorld = newWorld;
           loadedWorld.loadDimension(this.worldDimension);
-        } else {
-          Log.info("Could not load world: " + worldPath);
-          loadedWorld = EmptyWorld.INSTANCE;
+          if (newWorld == EmptyWorld.INSTANCE) {
+            Log.info("Could not load world: " + worldPath);
+          }
         }
       }
 
@@ -807,7 +814,8 @@ public class Scene implements JsonSerializable {
       task.update(2, 1);
 
       loadedWorld = world;
-      worldPath = loadedWorld.getWorldDirectory().getAbsolutePath();
+      worldPath = loadedWorld.getInfo().path().toAbsolutePath().toString();
+      worldFormat = world.getInfo().worldFormat().getId();
       worldDimension = world.currentDimension().getDimensionId();
 
       if (chunksToLoadByRegion.isEmpty()) {
@@ -2690,6 +2698,7 @@ public class Scene implements JsonSerializable {
       // Save world info.
       JsonObject world = new JsonObject();
       world.add("path", worldPath);
+      world.add("worldType", loadedWorld.getInfo().worldFormat().getId());
       world.add("dimension", worldDimension.getNamespacedName());
       json.add("world", world);
     }
@@ -3012,7 +3021,7 @@ public class Scene implements JsonSerializable {
     if (json.get("world").isObject()) {
       JsonObject world = json.get("world").object();
       worldPath = world.get("path").stringValue(worldPath);
-
+      worldFormat = world.get("worldFormat").stringValue(JavaWorldFormat.ID);
       if (world.get("dimension") instanceof JsonString) {
         // dimension already is a string (or undefined)
         worldDimension = Dimension.Identifier.fromNamespacedName(world.get("dimension").stringValue("minecraft:overworld"));

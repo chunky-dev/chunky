@@ -16,6 +16,10 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.world.worldformat.WorldFormat;
+import se.llbit.util.annotation.NotNull;
+
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -31,8 +35,39 @@ public class EmptyWorld extends World {
   public static final EmptyWorld INSTANCE = new EmptyWorld();
 
   private EmptyWorld() {
-    super("[empty world]", null, 0);
-    this.currentDimension = EmptyDimension.INSTANCE;
+    super(new World.Info("[empty world]", Path.of(""), 0, 0, "Survival", new WorldFormat() {
+      @Override
+      public boolean isValid(@NotNull Path path) {
+        return false;
+      }
+
+      @NotNull
+      @Override
+      public Optional<Info> getWorldInfo(@NotNull Path path) {
+        return Optional.empty();
+      }
+
+      @NotNull
+      @Override
+      public World loadWorld(@NotNull Info info) {
+        return EmptyWorld.INSTANCE;
+      }
+
+      @Override
+      public String getName() {
+        return "Empty World Format";
+      }
+
+      @Override
+      public String getDescription() {
+        return "";
+      }
+
+      @Override
+      public String getId() {
+        return "";
+      }
+    }));
   }
 
   @Override

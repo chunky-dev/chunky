@@ -190,6 +190,16 @@ public final class PersistentSettings {
     return lastWorld.isEmpty() ? null : new File(lastWorld);
   }
 
+  public static void setLastWorldFormat(String worldFormat) {
+    settings.setString("lastWorldFormat", worldFormat);
+    save();
+  }
+
+  /** @return the world format of the previously loaded world. */
+  public static String getLastWorldFormat() {
+    return settings.getString("lastWorldFormat", "");
+  }
+
   public static void setSkinDirectory(File directory) {
     settings.setString("skinDirectory", directory.getAbsolutePath());
     save();

@@ -22,6 +22,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.world.*;
+import se.llbit.chunky.world.java.JavaWorldFormat;
 import se.llbit.chunky.world.region.RegionChangeWatcher;
 import se.llbit.chunky.world.region.RegionParser;
 import se.llbit.chunky.world.region.RegionQueue;
@@ -68,20 +69,27 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
     topographyUpdater.start();
   }
 
-  public void loadWorldFromDirectory(@Nullable File worldLocation) {
-    if (worldLocation == null) {
+  public void loadWorldFromDirectory(@Nullable File worldLocation, @Nullable String worldFormatId) {
+    if (worldLocation != null) {
+      if (worldFormatId == null || worldFormatId.isEmpty()) {
+        worldFormatId = JavaWorldFormat.ID;
+      }
+      Optional<World.Info> info = WorldFormats.getWorldFormat(worldFormatId)
+        .flatMap(format -> format.getWorldInfo(worldLocation.toPath())) // attempt to get the given format
+        .or(() -> WorldFormats.getInfos(worldLocation.toPath()).stream().findFirst()); // get any format
+      info.ifPresent(this::loadWorld);
       return;
     }
-    this.loadWorld(WorldFormats.createWorld(worldLocation).orElse(EmptyWorld.INSTANCE));
+    setWorld(EmptyWorld.INSTANCE);
   }
+
   /**
-   * This is called when a new world is loaded
+   * Load the world referred to by the {@link World.Info}
+   *
+   * @return The loaded world. May be {@link EmptyWorld} if loading failed.
    */
-  public void loadWorld(World newWorld) {
-    if (this.world != null) {
-      this.world.currentDimension().removeChunkTopographyListener(this);
-    }
-    boolean isSameWorld = !(this.world instanceof EmptyWorld) && newWorld.getWorldDirectory().equals(this.world.getWorldDirectory());
+  public World loadWorld(World.Info info) {
+    World newWorld = WorldFormats.createWorld(info);
 
     Optional<Dimension.Identifier> dimensionToLoad = Optional.of(world.currentDimension())
       .map(Dimension::getDimensionId)
@@ -89,21 +97,45 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
       .or(newWorld::getDefaultDimension)
       .or(() -> newWorld.getAvailableDimensions().stream().findFirst());
 
-    if (dimensionToLoad.isEmpty()) {
-      Log.infof("No dimension loaded for world %s", newWorld.toString());
-      return;
+    if (dimensionToLoad.isPresent()) {
+      newWorld.loadDimension(dimensionToLoad.get());
+    } else {
+      Log.infof("No dimension loaded for world %s", info.toString());
     }
 
-    Dimension loadedDim = newWorld.loadDimension(dimensionToLoad.get());
+    setWorld(newWorld);
+    return this.world;
+  }
+
+  /**
+   * Sets the map view world.
+   * <p>This is intended to be called with worlds with a dimension already loaded, as it will not trigger dimension
+   * loading.</p>
+   *
+   * @param newWorld The world to set
+   */
+  public void setWorld(World newWorld) {
+    if (this.world != null) {
+      this.world.currentDimension().removeChunkTopographyListener(this);
+    }
+
+    boolean isSameWorld = !(this.world instanceof EmptyWorld) && newWorld.getInfo().path().equals(this.world.getInfo().path());
+
+    Dimension loadedDim = newWorld.currentDimension();
+    if (loadedDim == EmptyDimension.INSTANCE) {
+      Log.warn("Map view world was set but it has no dimension!");
+    }
+
     loadedDim.addChunkTopographyListener(this);
     synchronized (this) {
       this.world = newWorld;
       updateRegionChangeWatcher(loadedDim);
 
-      File newWorldDir = this.world.getWorldDirectory();
+      File newWorldDir = this.world.getInfo().path().toFile();
       if (!newWorldDir.equals(PersistentSettings.getLastWorld())) {
         PersistentSettings.setLastWorld(newWorldDir);
       }
+      PersistentSettings.setLastWorldFormat(newWorld.getInfo().worldFormat().getId());
     }
     worldLoadListeners.forEach(listener -> listener.accept(newWorld, isSameWorld));
   }
