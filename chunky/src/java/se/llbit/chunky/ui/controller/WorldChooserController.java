@@ -171,7 +171,7 @@ public class WorldChooserController implements Initializable {
 
           if (loadTexturesConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
             // add world resource pack with highest priority
-            currentlyLoadedPacks.addFirst(worldResourcePack);
+            currentlyLoadedPacks.add(0, worldResourcePack);
             ResourcePackLoader.loadAndPersistResourcePacks(currentlyLoadedPacks);
           }
         }

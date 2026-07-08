@@ -128,7 +128,7 @@ public class JavaWorld extends World {
 
   @NotNull
   private static Dimension loadDimension(JavaWorld world, Path worldDirectory, Dimension.Identifier dimensionId, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
-    Path dimensionDirectory = worldDirectory.resolve("dimensions", dimensionId.namespace(), dimensionId.name());
+    Path dimensionDirectory = worldDirectory.resolve("dimensions").resolve(dimensionId.namespace()).resolve(dimensionId.name());
     if (Files.exists(dimensionDirectory)) {
       // 26.1-snapshot-6 or later
       return new JavaDimension(world, dimensionId, dimensionDirectory, playerEntities, spawnPos);
