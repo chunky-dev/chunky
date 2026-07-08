@@ -8,15 +8,13 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * A {@link WorldFormat} represents a path on disk that can be loaded into chunky as a {@link World}
+ * A {@link WorldFormat} determines whether paths on disk are valid for its world type, and can then load that
+ * {@link World} into chunky.
  *
  * <p>Implementations should be <b><u>stateless</u></b>, and never cache world validity.</p>
  *
  * <p>Implementations will be queried for many different paths via {@link #isValid(Path)}.
  * The same {@link Path} is likely to be checked more than once over the lifetime of the {@link WorldFormat}</p>
- *
- * <p>Impls. are guaranteed that paths given to {@link #loadWorld(Path)} will already be validated
- * through their {@link #isValid(Path)}</p>
  */
 public interface WorldFormat extends Registerable {
   /**
