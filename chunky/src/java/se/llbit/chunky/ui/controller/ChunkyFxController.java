@@ -23,12 +23,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -286,7 +281,7 @@ public class ChunkyFxController
     fileChooser.setTitle("Export PNG");
     fileChooser
         .getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG image", "*.png"));
-    mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.levelName() + ".png"));
+    mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.getInfo().name() + ".png"));
     if (prevPngDir != null) {
       fileChooser.setInitialDirectory(prevPngDir.toFile());
     }
@@ -326,7 +321,7 @@ public class ChunkyFxController
         World newWorld = scene.getWorld();
         World currentWorld = mapLoader.getWorld();
         boolean isSameWorld = currentWorld != EmptyWorld.INSTANCE &&
-          currentWorld.getWorldDirectory().equals(newWorld.getWorldDirectory());
+          currentWorld.getInfo().isSameWorld(newWorld.getInfo());
 
         if (isSameWorld) {
           getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
@@ -340,7 +335,7 @@ public class ChunkyFxController
               "This scene shows a different world than the one that is currently loaded. Do you want to load the world of this scene?");
             Dialogs.stayOnTop(loadWorldConfirm);
             if (loadWorldConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
-              mapLoader.loadWorld(newWorld.getWorldDirectory());
+              mapLoader.setWorld(newWorld);
               getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
             }
           }
@@ -459,25 +454,20 @@ public class ChunkyFxController
                 }
                 if (!reloaded) {
                   ignoreYUpdate.set(true);
-                  if (mapLoader.getWorld().getVersionId() >= World.VERSION_21W06A) {
-                    yMin.setRange(-64, 320);
-                    yMin.set(-64);
-                    yMax.setRange(-64, 320);
-                    yMax.set(320);
-                    mapView.setYMinMax(-64, 320);
-                  } else {
-                    yMin.setRange(0, 256);
-                    yMin.set(0);
-                    yMax.setRange(0, 256);
-                    yMax.set(256);
-                    mapView.setYMinMax(0, 256);
-                  }
+                  HeightRange heightRange = mapLoader.getWorld().currentDimension().heightRange();
+                  int min = heightRange.min();
+                  int max = heightRange.max();
+                  yMin.setRange(min, max);
+                  yMin.set(min);
+                  yMax.setRange(min, max);
+                  yMax.set(max);
+                  mapView.setYMinMax(min, max);
                   yMin.getStyleClass().removeAll("invalid");
                   yMax.getStyleClass().removeAll("invalid");
                   ignoreYUpdate.set(false);
                 }
                 map.redrawMap();
-                mapName.setText(world.levelName());
+                mapName.setText(world.getInfo().name());
                 showWorldMap();
               });
         });
@@ -656,14 +646,10 @@ public class ChunkyFxController
     mapOverlay.setOnKeyPressed(map::onKeyPressed);
     mapOverlay.setOnKeyReleased(map::onKeyReleased);
 
-    mapLoader.loadWorld(PersistentSettings.getLastWorld());
-    if (mapLoader.getWorld().getVersionId() >= World.VERSION_21W06A) {
-      mapView.setYMin(-64);
-      mapView.setYMax(320);
-    } else {
-      mapView.setYMin(0);
-      mapView.setYMax(256);
-    }
+    mapLoader.loadWorldFromDirectory(PersistentSettings.getLastWorld(), PersistentSettings.getLastWorldFormat());
+    HeightRange heightRange = mapLoader.getWorld().currentDimension().heightRange();
+    mapView.setYMin(heightRange.min());
+    mapView.setYMax(heightRange.max());
 
     canvas = new RenderCanvasFx(this, chunky.getSceneManager().getScene(),
         chunky.getRenderController().getRenderManager());

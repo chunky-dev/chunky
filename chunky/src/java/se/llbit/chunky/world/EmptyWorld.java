@@ -16,6 +16,14 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.world.worldformat.WorldFormat;
+import se.llbit.util.annotation.NotNull;
+
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+
 /**
  * Represents an empty or non-existent world.
  *
@@ -27,12 +35,57 @@ public class EmptyWorld extends World {
   public static final EmptyWorld INSTANCE = new EmptyWorld();
 
   private EmptyWorld() {
-    super("[empty world]", null, 0, -1);
-    this.currentDimension = EmptyDimension.INSTANCE;
+    super(new World.Info("[empty world]", Path.of(""), 0, 0, "Survival", new WorldFormat() {
+      @Override
+      public boolean isValid(@NotNull Path path) {
+        return false;
+      }
+
+      @NotNull
+      @Override
+      public Optional<Info> getWorldInfo(@NotNull Path path) {
+        return Optional.empty();
+      }
+
+      @NotNull
+      @Override
+      public World loadWorld(@NotNull Info info) {
+        return EmptyWorld.INSTANCE;
+      }
+
+      @Override
+      public String getName() {
+        return "Empty World Format";
+      }
+
+      @Override
+      public String getDescription() {
+        return "";
+      }
+
+      @Override
+      public String getId() {
+        return "";
+      }
+    }));
+  }
+
+  @Override
+  public Set<Dimension.Identifier> getAvailableDimensions() {
+    return Collections.emptySet();
+  }
+
+  @Override
+  public Optional<Dimension.Identifier> getDefaultDimension() {
+    return Optional.empty();
+  }
+
+  @Override
+  public Dimension loadDimension(Dimension.Identifier dimensionId) {
+    return EmptyDimension.INSTANCE;
   }
 
   @Override public String toString() {
     return "[empty world]";
   }
-
 }

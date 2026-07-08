@@ -18,7 +18,7 @@ package se.llbit.chunky.world.listeners;
 
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.RegionPosition;
-import se.llbit.chunky.world.region.MCRegion;
+import se.llbit.chunky.world.region.Region;
 
 import java.util.Collection;
 
@@ -33,8 +33,8 @@ public interface ChunkUpdateListener {
   default void regionChunksUpdated(RegionPosition region) {
     int minChunkX = region.x << 5;
     int minChunkZ = region.z << 5;
-    for (int chunkX = minChunkX; chunkX < minChunkX + MCRegion.CHUNKS_X; chunkX++) {
-      for (int chunkZ = minChunkZ; chunkZ < minChunkZ + MCRegion.CHUNKS_Z; chunkZ++) {
+    for (int chunkX = minChunkX; chunkX < minChunkX + Region.CHUNKS_X; chunkX++) {
+      for (int chunkZ = minChunkZ; chunkZ < minChunkZ + Region.CHUNKS_Z; chunkZ++) {
         this.chunkUpdated(new ChunkPosition(chunkX, chunkZ));
       }
     }

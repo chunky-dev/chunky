@@ -20,7 +20,7 @@ package se.llbit.chunky.world;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import se.llbit.chunky.world.listeners.ChunkDeletionListener;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
-import se.llbit.chunky.world.region.MCRegion;
+import se.llbit.chunky.world.region.Region;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,7 +42,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
    */
   private boolean setChunk(ChunkPosition pos, boolean selected) {
     long regionPosLong = ChunkPosition.positionToLong(pos.x >> 5, pos.z >> 5);
-    BitSet selectedChunksForRegion = selectedChunksByRegion.computeIfAbsent(regionPosLong, p -> new BitSet(MCRegion.CHUNKS_X * MCRegion.CHUNKS_Z));
+    BitSet selectedChunksForRegion = selectedChunksByRegion.computeIfAbsent(regionPosLong, p -> new BitSet(Region.CHUNKS_X * Region.CHUNKS_Z));
     int bitIndex = (pos.x & 31) + ((pos.z & 31) << 5);
     boolean previousValue = selectedChunksForRegion.get(bitIndex);
     if(previousValue != selected) {
@@ -75,7 +75,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
    * @return Whether the selection changed
    */
   private boolean setChunksWithinRegion(Dimension dimension, RegionPosition regionPos, int minX, int maxX, int minZ, int maxZ, boolean selected) {
-    BitSet selectedChunksForRegion = selectedChunksByRegion.computeIfAbsent(regionPos.getLong(), p -> new BitSet(MCRegion.CHUNKS_X * MCRegion.CHUNKS_Z));
+    BitSet selectedChunksForRegion = selectedChunksByRegion.computeIfAbsent(regionPos.getLong(), p -> new BitSet(Region.CHUNKS_X * Region.CHUNKS_Z));
 
     Collection<ChunkPosition> changedChunks = new ArrayList<>();
     boolean selectionChanged = false;
@@ -249,15 +249,15 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
     boolean selectionChanged = false;
 
     // If selection area must contain complete regions
-    if(maxChunkX - minChunkX >= MCRegion.CHUNKS_X*2 && maxChunkZ - minChunkZ >= MCRegion.CHUNKS_Z*2) {
+    if(maxChunkX - minChunkX >= Region.CHUNKS_X*2 && maxChunkZ - minChunkZ >= Region.CHUNKS_Z*2) {
       // All full regions are set first, then any chunks on the borders are set, top and bottom include corners, left and right don't
 
       // left, right, top, bottom are unrelated to the actual map view, and are just treating XZ as if they were XY on traditional cartesian coordinate axes
-      int leftBorder = MCRegion.CHUNKS_X - (minChunkX & (MCRegion.CHUNKS_X-1)); // want the border from minimum region corner to minimum chunk corner, so 32 - borderSize
-      int rightBorder = maxChunkX & (MCRegion.CHUNKS_X-1);
+      int leftBorder = Region.CHUNKS_X - (minChunkX & (Region.CHUNKS_X-1)); // want the border from minimum region corner to minimum chunk corner, so 32 - borderSize
+      int rightBorder = maxChunkX & (Region.CHUNKS_X-1);
 
-      int bottomBorder = MCRegion.CHUNKS_Z - (minChunkZ & (MCRegion.CHUNKS_Z-1));
-      int topBorder = maxChunkZ & (MCRegion.CHUNKS_Z-1);
+      int bottomBorder = Region.CHUNKS_Z - (minChunkZ & (Region.CHUNKS_Z-1));
+      int topBorder = maxChunkZ & (Region.CHUNKS_Z-1);
 
       int minInnerRegionX = (minChunkX + leftBorder) >> 5;
       int maxInnerRegionX = (maxChunkX - rightBorder) >> 5;
@@ -397,9 +397,9 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
     selectedChunksByRegion.forEach((regionPosition, selectedChunksBitSet) -> {
       RegionPosition regionPos = new RegionPosition(regionPosition);
       List<ChunkPosition> positions = new ArrayList<>();
-      for (int localX = 0; localX < MCRegion.CHUNKS_X; localX++) {
-        for (int localZ = 0; localZ < MCRegion.CHUNKS_Z; localZ++) {
-          int idx = localX + (localZ * MCRegion.CHUNKS_X);
+      for (int localX = 0; localX < Region.CHUNKS_X; localX++) {
+        for (int localZ = 0; localZ < Region.CHUNKS_Z; localZ++) {
+          int idx = localX + (localZ * Region.CHUNKS_X);
           if(selectedChunksBitSet.get(idx)) {
             positions.add(regionPos.asChunkPosition(localX, localZ));
           }
