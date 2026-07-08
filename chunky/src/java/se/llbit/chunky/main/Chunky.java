@@ -48,6 +48,7 @@ import se.llbit.log.Level;
 import se.llbit.log.Log;
 import se.llbit.log.Receiver;
 import se.llbit.util.TaskTracker;
+import se.llbit.util.concurrent.ChunkyThread;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -241,6 +242,12 @@ public class Chunky {
         exitCode = 2;
       }
     }
+
+    ChunkyThread.interruptAndJoinAll();
+    ForkJoinPool commonThreads = Chunky.getCommonThreads();
+    commonThreads.shutdownNow(); // ForkJoinPool doesn't return any tasks that were awaiting execution (all canceled).
+    // We don't use the ForkJoinPool commonPool in chunky, but if we did there is no shutdown available so nothing changes.
+
     if (exitCode != 0) {
       System.exit(exitCode);
     }
