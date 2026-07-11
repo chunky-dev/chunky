@@ -3,8 +3,6 @@ package se.llbit.chunky.world.bedrock;
 import io.github.notstirred.leveldb_ffi.*;
 import se.llbit.log.Log;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.lang.foreign.Arena;
 import java.lang.ref.Cleaner;
 import java.nio.file.Path;
@@ -19,14 +17,11 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * <p>Callers are guaranteed that if they hold a {@link BedrockDB} it is not closed.</p> TODO: this isn't necessarily true during a shutdown hook
  *
- * <h2>Closure</h2>
- * <p>Callers can call {@link #close()} to release their hold on a DB. If this DB is being used elsewhere it will not be closed immediately.
- *
- * <h3>Automatic closure</h3>
- * <p>If a DB is not closed by the caller it will be cleaned up automatically at an unknown time later.</p>
- * <p>A DB is automatically closed on a non-termination stop of the JVM as according to the {@link Runtime Runtime's Shutdown Sequence}</p>
+ * <h2>Automatic closure</h2>
+ * <p>DBs are cleaned up automatically at an unknown time after all references are dropped.</p>
+ * <p>All DBs are automatically closed on a non-termination stop of the JVM as according to the {@link Runtime Runtime's Shutdown Sequence}</p>
  */
-public class BedrockDB implements Closeable {
+public class BedrockDB {
   /*
    * This class keeps track of currently open LevelDB objects
    *
@@ -43,7 +38,6 @@ public class BedrockDB implements Closeable {
   private static final Map<Path, DBRef> openDBs = new HashMap<>();
 
   private final DBRef ref;
-  private Cleaner.Cleanable cleanable;
 
   /**
    * Only safe to call after ALL threads interacting with ALL dbs are stopped.
@@ -113,7 +107,7 @@ public class BedrockDB implements Closeable {
       assert existing == null;
 
       BedrockDB bedrockDB = new BedrockDB(ref);
-      bedrockDB.cleanable = cleaner.register(bedrockDB, ref::release);
+      cleaner.register(bedrockDB, ref::release);
 
       return bedrockDB;
     } finally {
@@ -129,13 +123,11 @@ public class BedrockDB implements Closeable {
   }
 
   /**
-   * Triggers db close immediately. If the db is already closed then invoking this method has no effect.
+   * Holds leveldb references and frees them when appropriate.
+   *
+   * <p>It is only safe for {@link DBRef#references} to reach zero when no more references to this {@link DBRef} exist.</p>
+   * <p>As such callers must only call {@link DBRef#release()} from a {@link Cleaner}'s cleanup action</p>
    */
-  @Override
-  public void close() throws IOException {
-    this.cleanable.clean();
-  }
-
   private static class DBRef {
     private final Path path;
     private LevelDB db;

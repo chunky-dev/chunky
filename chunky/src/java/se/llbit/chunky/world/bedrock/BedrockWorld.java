@@ -37,13 +37,6 @@ public class BedrockWorld extends World {
 
   @Override
   public Dimension loadDimension(Dimension.Identifier dimensionId) {
-    try {
-      if (this.currentDimension != EmptyWorld.INSTANCE.currentDimension()) {
-        ((BedrockDimension) this.currentDimension).close(); // close early to avoid cleaner
-      }
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
     BedrockDimension dimension = new BedrockDimension(this, dimensionId, this.getInfo().path(), Collections.emptySet(), new Vector3i(0, 0, 0));
 
     this.currentDimension = dimension;

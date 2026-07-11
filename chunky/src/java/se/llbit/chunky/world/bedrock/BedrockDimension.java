@@ -11,7 +11,6 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
 import se.llbit.util.annotation.Nullable;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -19,7 +18,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class BedrockDimension extends Dimension implements Closeable {
+public class BedrockDimension extends Dimension {
   protected final ConcurrentHashMap<RegionPosition, Region> regionMap = new ConcurrentHashMap<>();
 
   private final BedrockDB db;
@@ -46,11 +45,6 @@ public class BedrockDimension extends Dimension implements Closeable {
   @Override
   public Optional<Vector3> getPlayerPos() {
     return Optional.empty();
-  }
-
-  @Override
-  public void close() throws IOException {
-    this.db.close();
   }
 
   public void setChunk(ChunkPosition position, Chunk chunk) {
