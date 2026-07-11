@@ -1,13 +1,14 @@
 package se.llbit.util.concurrent;
 
 import se.llbit.chunky.main.Chunky;
+import se.llbit.log.Log;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 /**
@@ -31,7 +32,7 @@ public class ChunkyThread extends Thread {
    * When interruptAndJoinAll is called, additional threads/executors can't be added preventing later joins from
    * waiting on threads that have not been interrupted.
    */
-  private static final AtomicBoolean isShutdown = new AtomicBoolean(false);
+  private static final CountDownLatch shutdownLatch = new CountDownLatch(1);
   private static final Collection<Thread> threads = new ArrayList<>();
   private static final Collection<ExecutorService> executorServices = new ArrayList<>();
 
@@ -41,7 +42,7 @@ public class ChunkyThread extends Thread {
    * @throws IllegalStateException When calling after {@link #interruptAndJoinAll()} has been called.
    */
   public synchronized static <T extends Thread> T addThread(T thread) {
-    if (isShutdown.get()) {
+    if (shutdownLatch.getCount() == 0) {
       throw new IllegalStateException("Creating a thread as chunky is stopping.");
     }
     threads.add(thread);
@@ -54,7 +55,7 @@ public class ChunkyThread extends Thread {
     @throws IllegalStateException When calling after {@link #interruptAndJoinAll()} has been called.
    */
   public synchronized static <E extends ExecutorService> E addExecutorService(Function<ThreadFactory, E> executorServiceSupplier) {
-    if (isShutdown.get()) {
+    if (shutdownLatch.getCount() == 0) {
       throw new IllegalStateException("Creating an executor service as chunky is stopping.");
     }
     E e = executorServiceSupplier.apply(ChunkyThread::new);
@@ -70,19 +71,36 @@ public class ChunkyThread extends Thread {
    * <p><b><i>WARNING: calling this from any thread registered with {@link #addThread(Thread)} may <u>deadlock</u>.</i></b></p>
    */
   public synchronized static void joinAll() {
+    boolean interrupted = false;
+
+    while (true) {
+      try {
+        // must wait for the latch as hitting the for loop below first causes immediate evaluation of the
+        // for loop iterator, potentially missing new threads.
+        shutdownLatch.await();
+        break;
+      } catch (InterruptedException e) {
+        interrupted = true;
+      }
+    }
+
     for (Thread thread : threads) {
       try {
         thread.join();
       } catch (InterruptedException e) {
-        // ignored
+        interrupted = true;
       }
     }
     for (ExecutorService executorService : executorServices) {
       try {
         executorService.awaitTermination(1, TimeUnit.MINUTES);
       } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
+        interrupted = true;
       }
+    }
+
+    if (interrupted) {
+      Thread.currentThread().interrupt();
     }
   }
 
@@ -96,7 +114,7 @@ public class ChunkyThread extends Thread {
    */
   public synchronized static void interruptAndJoinAll() {
     assert Thread.currentThread().getName().equals("main");
-    isShutdown.set(true);
+    shutdownLatch.countDown();
 
     // shut down executorServices BEFORE threads because they recreate their threads when they are interrupted and stop
     // causing an infinite hang.
