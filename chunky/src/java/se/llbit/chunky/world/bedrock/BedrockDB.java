@@ -56,6 +56,7 @@ public class BedrockDB {
           dbRef.db.close(); // Don't need to free the arena as we're shutting down anyway.
           dbRef.arena = null; // null to prevent cleaner double free through leveldb_ffi_close
           dbRef.db = null;
+          Log.info("Closed Bedrock DB on shutdown " + dbRef.path.toString());
         } catch (Throwable t) {
           // Nothing we can do in the middle of closing.
         }
@@ -92,6 +93,7 @@ public class BedrockDB {
 
       DBRef dbRef = openDBs.get(dbPath);
       if (dbRef != null) {
+        Log.info("Reused open Bedrock DB " + dbRef.path.toString());
         return new BedrockDB(dbRef);
       }
 
@@ -110,6 +112,7 @@ public class BedrockDB {
       BedrockDB bedrockDB = new BedrockDB(ref);
       cleaner.register(bedrockDB, ref::release);
 
+      Log.info("Opened Bedrock DB " + ref.path.toString());
       return bedrockDB;
     } finally {
       lock.unlock();
@@ -165,6 +168,7 @@ public class BedrockDB {
           removed.arena.close();
           removed.db = null; // db lifetime is tied to arena.
           removed.arena = null;
+          Log.info("Closed Bedrock DB " + this.path.toString());
         }
       } finally {
         lock.unlock();
