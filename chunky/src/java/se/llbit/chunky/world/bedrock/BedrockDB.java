@@ -138,6 +138,12 @@ public class BedrockDB {
     private Arena arena;
     private int references = 0;
 
+    /**
+     * @param path The path to the db
+     * @param db   The db
+     * @param arena <u>Must</u> be an arena that supports {@link Arena#close()}.
+     *              The lifetime of the {@link LevelDB db} <u>must</u> be tied to the arena.
+     */
     private DBRef(Path path, LevelDB db, Arena arena) {
       this.path = path;
       this.db = db;
