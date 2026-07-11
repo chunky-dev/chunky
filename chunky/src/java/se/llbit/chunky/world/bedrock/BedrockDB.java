@@ -54,7 +54,8 @@ public class BedrockDB {
       openDBs.values().forEach(dbRef -> {
         try {
           dbRef.db.close(); // Don't need to free the arena as we're shutting down anyway.
-          Log.info("Shutdown hook closed Bedrock DB " + dbRef.path.toString());
+          dbRef.arena = null; // null to prevent cleaner double free through leveldb_ffi_close
+          dbRef.db = null;
         } catch (Throwable t) {
           // Nothing we can do in the middle of closing.
         }
