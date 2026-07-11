@@ -5,6 +5,7 @@ import se.llbit.log.Log;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.lang.foreign.Arena;
 import java.lang.ref.Cleaner;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -88,30 +89,43 @@ public class BedrockDB implements Closeable {
     try {
       lock.lock();
 
-      Options options = Options.create();
+      Arena arena = Arena.ofShared();
+
+      Options options = Options.create(arena);
       options.setCompression(Compressor.ZLIB_RAW);
       options.setCreateIfMissing(false);
+
+      DBRef dbRef = openDBs.get(dbPath);
+      if (dbRef != null) {
+        return new BedrockDB(dbRef);
+      }
+
+      LevelDB db;
       try {
-        DBRef dbRef = openDBs.get(dbPath);
-        if (dbRef != null) {
-          return new BedrockDB(dbRef);
-        }
-
-        DBRef ref = new DBRef(dbPath,
-          LevelDB.open(options, dbPath.toAbsolutePath().toString())
-        );
-        openDBs.put(dbPath, ref);
-
-        BedrockDB bedrockDB = new BedrockDB(ref);
-        bedrockDB.cleanable = cleaner.register(bedrockDB, ref::release);
-
-        return bedrockDB;
+        db = LevelDB.open(arena, options, dbPath.toAbsolutePath().toString());
       } catch (LevelDBException e) {
+        arena.close(); // something threw, we are responsible for the arena
         throw new RuntimeException(e);
       }
+
+      DBRef ref = new DBRef(dbPath, db, arena); // DBRef is responsible for the arena
+      DBRef existing = openDBs.put(dbPath, ref);
+      assert existing == null;
+
+      BedrockDB bedrockDB = new BedrockDB(ref);
+      bedrockDB.cleanable = cleaner.register(bedrockDB, ref::release);
+
+      return bedrockDB;
     } finally {
       lock.unlock();
     }
+  }
+
+  /**
+   * @return An arena whose lifetime is at least as long as the underlying {@link LevelDB}
+   */
+  public Arena getArena() {
+    return this.ref.arena;
   }
 
   /**
@@ -124,12 +138,14 @@ public class BedrockDB implements Closeable {
 
   private static class DBRef {
     private final Path path;
-    private final LevelDB db;
+    private LevelDB db;
+    private Arena arena;
     private int references = 0;
 
-    private DBRef(Path path, LevelDB db) {
+    private DBRef(Path path, LevelDB db, Arena arena) {
       this.path = path;
       this.db = db;
+      this.arena = arena;
     }
 
     private void acquire() {
@@ -146,10 +162,16 @@ public class BedrockDB implements Closeable {
       Lock lock = BedrockDB.lock;
       try {
         lock.lock();
+        assert references > 0;
         references--;
         if (references == 0) {
           DBRef removed = openDBs.remove(this.path);
-          removed.db.close();
+          assert this == removed;
+          // We are not concerned with what the chunky threads are doing here (different to the shutdown hook)
+          // Here we are guaranteed that no reference to this DBRef exist, so we instantly close.
+          removed.arena.close();
+          removed.db = null; // db lifetime is tied to arena.
+          removed.arena = null;
         }
       } finally {
         lock.unlock();

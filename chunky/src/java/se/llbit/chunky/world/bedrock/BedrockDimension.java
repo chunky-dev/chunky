@@ -28,9 +28,9 @@ public class BedrockDimension extends Dimension implements Closeable {
   private final Map<ChunkPosition, Chunk> chunks = new ConcurrentHashMap<>();
 
   protected BedrockDimension(BedrockWorld world, Identifier dimensionId, Path dimensionDirectory, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
-    super(dimensionId, dimensionDirectory, playerEntities, null);
+    super(dimensionId, dimensionDirectory, playerEntities, spawnPos);
     this.db = BedrockDB.getOrOpen(dimensionDirectory.resolve("db").toAbsolutePath());
-    readOptions = ReadOptions.create();
+    readOptions = ReadOptions.create(this.db.getArena());
     readOptions.setFillCache(false); // almost all reads happen only once
   }
 
