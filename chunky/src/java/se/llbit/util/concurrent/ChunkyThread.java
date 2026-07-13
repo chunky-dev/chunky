@@ -19,8 +19,11 @@ import java.util.function.Function;
  * </ul>
  *
  * <h2>Usage</h2>
- * <p>{@link Thread Threads} in chunky should extend this class, and {@link ExecutorService executor services} should
- * be created with {@link #addExecutorService(Function)} to allow chunky to interrupt and join them before chunky closes.</p>
+ * <ul>
+ *   <li>{@link Thread Threads} in chunky should extend this class</li>
+ *   <li>{@link ExecutorService Executor Services} should be created with {@link #addExecutorService(Function)}</li>
+ *   <li>{@link ForkJoinPool Fork Join Pools} should be created with {@link #addForkJoinPool(ForkJoinPool)}</li>
+ * </ul>
  *
  */
 public class ChunkyThread extends Thread {
@@ -53,6 +56,19 @@ public class ChunkyThread extends Thread {
     E e = executorServiceSupplier.apply(ChunkyThread::new);
     executorServices.add(e);
     return e;
+  }
+
+  /**
+   * Add a {@link ForkJoinPool} to be interrupted and joined by chunky on shutdown
+   *
+   * @throws IllegalStateException When calling after {@link #interruptAndJoinAll(long, TimeUnit)} has been called.
+   */
+  public synchronized static ForkJoinPool addForkJoinPool(ForkJoinPool pool) {
+    if (shutdownLatch.getCount() == 0) {
+      throw new IllegalStateException("Creating a fork join pool as chunky is stopping.");
+    }
+    executorServices.add(pool);
+    return pool;
   }
 
   /**

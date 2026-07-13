@@ -245,9 +245,6 @@ public class Chunky {
     }
 
     ChunkyThread.interruptAndJoinAll(5, TimeUnit.SECONDS);
-    ForkJoinPool commonThreads = Chunky.getCommonThreads();
-    commonThreads.shutdownNow(); // ForkJoinPool doesn't return any tasks that were awaiting execution (all canceled).
-    // We don't use the ForkJoinPool commonPool in chunky, but if we did there is no shutdown available so nothing changes.
 
     if (exitCode != 0) {
       System.exit(exitCode);
@@ -350,7 +347,7 @@ public class Chunky {
   public static ForkJoinPool getCommonThreads() {
     if (commonThreads == null) {
       // use at least two threads to prevent deadlocks in some java versions (see #1631)
-      commonThreads = new ForkJoinPool(Math.max(PersistentSettings.getNumThreads(), 2));
+      commonThreads = ChunkyThread.addForkJoinPool(new ForkJoinPool(Math.max(PersistentSettings.getNumThreads(), 2)));
     }
     return commonThreads;
   }
@@ -361,7 +358,7 @@ public class Chunky {
    */
   public static void setCommonThreadsCount(int threads) {
     ForkJoinPool t = getCommonThreads();
-    commonThreads = new ForkJoinPool(threads);
+    commonThreads = ChunkyThread.addForkJoinPool(new ForkJoinPool(threads));
     t.shutdown();
   }
 
