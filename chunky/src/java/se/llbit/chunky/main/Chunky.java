@@ -217,34 +217,38 @@ public class Chunky {
     if (cmdline.mode == CommandLineOptions.Mode.CLI_OPERATION) {
       exitCode = cmdline.exitCode;
     } else {
-      // Initialize the common thread pool.
-      getCommonThreads();
-
-      Chunky chunky = new Chunky(cmdline.options);
-      chunky.headless = cmdline.mode == Mode.HEADLESS_RENDER || cmdline.mode == Mode.CREATE_SNAPSHOT;
-      chunky.loadPlugins();
-
       try {
-        switch (cmdline.mode) {
-          case HEADLESS_RENDER:
-            exitCode = chunky.doHeadlessRender();
-            break;
-          case CREATE_SNAPSHOT:
-            exitCode = chunky.doSnapshot();
-            break;
-          case START_GUI:
-            ChunkyFx.startChunkyUI(chunky);
-            break;
+        // Initialize the common thread pool.
+        getCommonThreads();
+
+        Chunky chunky = new Chunky(cmdline.options);
+        chunky.headless = cmdline.mode == Mode.HEADLESS_RENDER || cmdline.mode == Mode.CREATE_SNAPSHOT;
+        chunky.loadPlugins();
+
+        try {
+          switch (cmdline.mode) {
+            case HEADLESS_RENDER:
+              exitCode = chunky.doHeadlessRender();
+              break;
+            case CREATE_SNAPSHOT:
+              exitCode = chunky.doSnapshot();
+              break;
+            case START_GUI:
+              ChunkyFx.startChunkyUI(chunky);
+              break;
+          }
+        } catch (Throwable t) {
+          // set receiver in case an exception was thrown before it was set in one of the start modes.
+          Log.setReceiver(ConsoleReceiver.INSTANCE, Level.INFO, Level.WARNING, Level.ERROR);
+          Log.error("Unchecked exception caused Chunky to close.", t);
+          exitCode = 2;
         }
-      } catch (Throwable t) {
-        // set receiver in case an exception was thrown before it was set in one of the start modes.
-        Log.setReceiver(ConsoleReceiver.INSTANCE, Level.INFO, Level.WARNING, Level.ERROR);
-        Log.error("Unchecked exception caused Chunky to close.", t);
-        exitCode = 2;
+      } finally {
+        if (!ChunkyThread.interruptAndJoinAll(5, TimeUnit.SECONDS)) {
+          Log.warn("Not all Chunky threads stopped before exiting.");
+        }
       }
     }
-
-    ChunkyThread.interruptAndJoinAll(5, TimeUnit.SECONDS);
 
     if (exitCode != 0) {
       System.exit(exitCode);
