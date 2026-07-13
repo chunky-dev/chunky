@@ -32,6 +32,13 @@ public class ChunkyThread extends Thread {
   private static final Collection<Thread> threads = new ArrayList<>();
   private static final Collection<ExecutorService> executorServices = new ArrayList<>();
 
+  static {
+    // If anyone calls System.exit() we still want to attempt to stop all threads
+    Runtime.getRuntime().addShutdownHook(
+      new Thread(() -> ChunkyThread.interruptAndJoinAll(0, TimeUnit.SECONDS)) // intentionally not ChunkyThread
+    );
+  }
+
   /**
    * Add a {@link Thread} to be interrupted and joined by chunky on shutdown
    *
