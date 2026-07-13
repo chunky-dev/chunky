@@ -57,6 +57,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -243,7 +244,7 @@ public class Chunky {
       }
     }
 
-    ChunkyThread.interruptAndJoinAll();
+    ChunkyThread.interruptAndJoinAll(5, TimeUnit.SECONDS);
     ForkJoinPool commonThreads = Chunky.getCommonThreads();
     commonThreads.shutdownNow(); // ForkJoinPool doesn't return any tasks that were awaiting execution (all canceled).
     // We don't use the ForkJoinPool commonPool in chunky, but if we did there is no shutdown available so nothing changes.
