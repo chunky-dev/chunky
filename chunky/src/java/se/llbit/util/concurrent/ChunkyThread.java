@@ -53,7 +53,11 @@ public class ChunkyThread extends Thread {
     if (shutdownLatch.getCount() == 0) {
       throw new IllegalStateException("Creating an executor service as chunky is stopping.");
     }
-    E e = executorServiceSupplier.apply(ChunkyThread::new);
+    E e = executorServiceSupplier.apply(r -> { // executor shutdown interrupts its own threads, so they don't need to be ChunkyThreads
+      Thread t = new Thread(r);
+      t.setDaemon(true);
+      return t;
+    });
     executorServices.add(e);
     return e;
   }
@@ -159,8 +163,6 @@ public class ChunkyThread extends Thread {
     synchronized (ChunkyThread.class) {
       shutdownLatch.countDown();
 
-      // shut down executorServices BEFORE threads because they recreate their threads when they are interrupted and stop
-      // causing an infinite hang.
       for (ExecutorService executorService : executorServices) {
         executorService.shutdownNow();
       }
