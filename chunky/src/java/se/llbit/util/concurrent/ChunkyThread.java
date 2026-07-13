@@ -1,6 +1,7 @@
 package se.llbit.util.concurrent;
 
 import se.llbit.chunky.main.Chunky;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.util.annotation.NotNull;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class ChunkyThread extends Thread {
    *
    * @throws IllegalStateException When calling after {@link #interruptAndJoinAll(long, TimeUnit)} has been called.
    */
+  @PluginApi
   public synchronized static <T extends Thread> T addThread(T thread) {
     if (shutdownLatch.getCount() == 0) {
       throw new IllegalStateException("Creating a thread as chunky is stopping.");
@@ -49,6 +51,7 @@ public class ChunkyThread extends Thread {
    *
    * @throws IllegalStateException When calling after {@link #interruptAndJoinAll(long, TimeUnit)} has been called.
    */
+  @PluginApi
   public synchronized static <E extends ExecutorService> E addExecutorService(Function<ThreadFactory, E> executorServiceSupplier) {
     if (shutdownLatch.getCount() == 0) {
       throw new IllegalStateException("Creating an executor service as chunky is stopping.");
@@ -67,6 +70,7 @@ public class ChunkyThread extends Thread {
    *
    * @throws IllegalStateException When calling after {@link #interruptAndJoinAll(long, TimeUnit)} has been called.
    */
+  @PluginApi
   public synchronized static ForkJoinPool addForkJoinPool(ForkJoinPool pool) {
     if (shutdownLatch.getCount() == 0) {
       throw new IllegalStateException("Creating a fork join pool as chunky is stopping.");
@@ -87,6 +91,7 @@ public class ChunkyThread extends Thread {
    * @param unit the time unit of the timeout argument
    * @return Whether all threads were joined before returning
    */
+  @PluginApi
   public static boolean joinAll(long timeout, @NotNull TimeUnit unit) {
     /*
      * This method should not be synchronized because:
