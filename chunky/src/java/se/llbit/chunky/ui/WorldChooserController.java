@@ -34,6 +34,7 @@ import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.resources.MinecraftFinder;
+import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.World;
 import se.llbit.log.Log;
 
@@ -159,8 +160,10 @@ public class WorldChooserController implements Initializable {
           if (worldDirs != null) {
             for (File dir : worldDirs) {
               if (World.isWorldDir(dir)) {
-                worlds.add(World.loadWorld(dir, World.OVERWORLD_DIMENSION,
-                    World.LoggedWarnings.SILENT));
+                World world = World.loadWorld(dir, World.OVERWORLD_DIMENSION, World.LoggedWarnings.SILENT);
+                if (world != EmptyWorld.INSTANCE) {
+                  worlds.add(world);
+                }
               }
             }
           }
