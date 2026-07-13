@@ -70,7 +70,13 @@ public class ChunkyThread extends Thread {
    *
    * <p><b><i>WARNING: calling this from any thread registered with {@link #addThread(Thread)} may <u>deadlock</u>.</i></b></p>
    */
-  public synchronized static void joinAll() {
+  public static void joinAll() {
+    /*
+     * This method should not be synchronized because:
+     *   1. Calls to this method that happen before interruptAndJoinAll will lock the latter interrupting thread, deadlocking.
+     *   2. shutdownLatch.await is at least acquire memory ordering, and modification is disabled after the latch is zero.
+     *      As such we are guaranteed that no threads can modify the state.
+     */
     boolean interrupted = false;
 
     while (true) {
