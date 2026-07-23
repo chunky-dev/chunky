@@ -72,18 +72,18 @@ public class PluginManager {
     while (!pluginsToLoad.isEmpty() && loadCycles < MAX_CYCLES) {
       Log.infof("Cycle %d", loadCycles);
       loadCycles++;
-      // new list to avoid CME due to removing inside iteration.
-      new ArrayList<>(pluginsToLoad).forEach(plugin -> {
+      for (Iterator<ResolvedPlugin> iterator = pluginsToLoad.iterator(); iterator.hasNext(); ) {
+        ResolvedPlugin plugin = iterator.next();
         if (plugin.allDependenciesLoaded(loadedPlugins)) {
           loadedPlugins.add(plugin);
-          pluginsToLoad.remove(plugin);
+          iterator.remove();
           Log.infof("  Loading plugin %s with deps { %s }, resolved { %s }%n", plugin,
             plugin.getManifest().getDependencies().stream().map(PluginDependency::toString).collect(Collectors.joining(", ")),
             plugin.getDependencies().stream().map(ResolvedPlugin::toString).collect(Collectors.joining(", "))
           );
           pluginLoader.load(onLoad, plugin.getManifest());
         }
-      });
+      }
     }
 
     // report if any unloaded plugins remain (their dependencies never got loaded)
