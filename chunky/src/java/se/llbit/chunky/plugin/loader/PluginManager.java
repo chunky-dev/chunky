@@ -35,8 +35,6 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 public class PluginManager {
-  private static final int MAX_CYCLES = Integer.parseInt(System.getProperty("chunky.plugins.maxLoadCycles", "100"));
-
   private final PluginLoader pluginLoader;
 
   public PluginManager(PluginLoader pluginLoader) {
@@ -64,12 +62,13 @@ public class PluginManager {
     Set<ResolvedPlugin> pluginsToLoad = pluginsByName.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
     pluginsToLoad.forEach(plugin -> plugin.resolveDependencies(pluginsByName));
 
-    // load plugins in dependency-first order, cyclic dependencies will never be loaded and will hit MAX_CYCLES cap.
-    // this was so trivial to implement using cycles that I decided against any kind of dependency tree structure,
-    // in the worst case this approach requires one cycle per plugin (if every plugin depended on the previous one in the list).
+    int maxCycles = pluginsToLoad.size();
+    // Load plugins in dependency-first order, cyclic dependencies will never be loaded and will hit the maxCycles cap.
+    // This was so trivial to implement using cycles that I decided against any kind of dependency tree structure.
+    // In the worst case this approach requires one cycle per plugin (if every plugin depended on the previous one in the list).
     Set<ResolvedPlugin> loadedPlugins = new HashSet<>();
     int loadCycles = 0;
-    while (!pluginsToLoad.isEmpty() && loadCycles < MAX_CYCLES) {
+    while (!pluginsToLoad.isEmpty() && loadCycles < maxCycles) {
       Log.infof("Cycle %d", loadCycles);
       loadCycles++;
       for (Iterator<ResolvedPlugin> iterator = pluginsToLoad.iterator(); iterator.hasNext(); ) {
@@ -89,8 +88,9 @@ public class PluginManager {
     // report if any unloaded plugins remain (their dependencies never got loaded)
     if (!pluginsToLoad.isEmpty()) {
       Log.errorf(
-        "Reached maximum cycles (%d) when loading plugins. Failed to load plugins: (%s)",
-        MAX_CYCLES,
+        "Reached maximum cycles %d when loading %d plugins. Failed to load plugins: (%s)",
+        maxCycles,
+        pluginManifests.size(),
         pluginsToLoad.stream().map(ResolvedPlugin::toString).collect(Collectors.joining(", "))
       );
     }
