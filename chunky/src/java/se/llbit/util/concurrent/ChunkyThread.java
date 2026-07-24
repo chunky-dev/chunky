@@ -89,6 +89,7 @@ public class ChunkyThread extends Thread {
    *
    * @param timeout The maximum time to wait <b><u>AFTER</u></b> a shutdown is initiated
    * @param unit the time unit of the timeout argument
+   *
    * @return Whether all threads were joined before returning
    */
   public static boolean joinAll(long timeout, @NotNull TimeUnit unit) {
@@ -102,8 +103,9 @@ public class ChunkyThread extends Thread {
 
     while (true) {
       try {
-        // must wait for the latch as hitting the for loop below first causes immediate evaluation of the
-        // for loop iterator, potentially missing new threads.
+        // Must wait for the latch as hitting the for loop below first causes immediate evaluation of:
+        // - The for loop iterator, potentially missing new threads.
+        // - The end time, meaning waiting starts before shutdown begins.
         shutdownLatch.await();
         break;
       } catch (InterruptedException e) {
@@ -111,46 +113,25 @@ public class ChunkyThread extends Thread {
       }
     }
 
-    long startTime = System.nanoTime();
-    long endTime = startTime + unit.toNanos(timeout);
-
-    boolean anyAlive = false;
-
+    long endTime = System.nanoTime() + unit.toNanos(timeout);
     try {
-      for (ExecutorService executorService : executorServices) {
-        while (System.nanoTime() < endTime) {
-          try {
-            long waitTime = endTime - startTime;
-            if (waitTime > 0) {
-              executorService.awaitTermination(waitTime, TimeUnit.NANOSECONDS);
-            }
-            break;
-          } catch (InterruptedException e) {
-            interrupted = true;
+      while (System.nanoTime() < endTime) {
+        try {
+          if (joinAllInterruptable(endTime)) {
+            // All threads are joined, skip the rest of the wait time.
+            return true;
           }
+        } catch (InterruptedException e) {
+          interrupted = true;
         }
-        anyAlive |= !executorService.isTerminated();
       }
-      for (Thread thread : ChunkyThread.threads) {
-        while (System.nanoTime() < endTime) {
-          try {
-            long waitTimeMillis = TimeUnit.NANOSECONDS.toMillis(endTime - startTime);
-            if (waitTimeMillis > 0) {
-              thread.join(waitTimeMillis);
-            }
-            break;
-          } catch (InterruptedException e) {
-            interrupted = true;
-          }
-        }
-        anyAlive |= thread.isAlive();
-      }
+      // Got to the end of the wait time without joining everything, can give no guarantees
+      return false;
     } finally {
       if (interrupted) {
         Thread.currentThread().interrupt();
       }
     }
-    return !anyAlive;
   }
 
   /**
@@ -176,6 +157,43 @@ public class ChunkyThread extends Thread {
     }
 
     return joinAll(timeout, unit);
+  }
+
+  /**
+   * Await the joining of all threads managed by chunky.
+   *
+   * <p>This method is only safe to call if the {@link ChunkyThread#shutdownLatch} has been set.</p>
+   *
+   * <p><b><i>WARNING: calling this from any thread registered with {@link #addThread(Thread)} may <u>deadlock</u>.</i></b></p>
+   *
+   * @param endTimeNanos The time at which to stop waiting.
+   *
+   * @return Whether all threads were joined before returning
+   *
+   * @throws InterruptedException Propagates up when interrupted. The caller has no guarantee that shutdown has begun,
+   *                              or that any of the inner threads have been joined.
+   */
+  private static boolean joinAllInterruptable(long endTimeNanos) throws InterruptedException {
+    // The intention here whether we return true or false, is to give the caller the most complete acquire load possible.
+    // Even if we reach the timeout given by the caller, we still establish a happens-before with every dead thread.
+
+    boolean anyAlive = false;
+    for (ExecutorService executorService : executorServices) {
+      long waitTime = endTimeNanos - System.nanoTime();
+      anyAlive |= !executorService.awaitTermination(waitTime, TimeUnit.NANOSECONDS);
+    }
+    for (Thread thread : threads) {
+      long waitTime = endTimeNanos - System.nanoTime();
+      if (waitTime > 0) {
+        thread.join(waitTime); // joining with 0 is infinite wait time, very intuitive.
+      }
+      // Thread.isAlive() establishes a happens-before with the thread. As such the following are non-issues:
+      // - Not joining the thread, if waitTime <= 0
+      // - The thread stopping between Thread.join() and Thread.isAlive().
+      anyAlive |= thread.isAlive();
+    }
+
+    return !anyAlive;
   }
 
   private void setDefaults() {
