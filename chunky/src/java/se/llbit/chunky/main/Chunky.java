@@ -213,45 +213,52 @@ public class Chunky {
       System.exit(1);
     }
 
-    int exitCode = 0;
     if (cmdline.mode == CommandLineOptions.Mode.CLI_OPERATION) {
-      exitCode = cmdline.exitCode;
+      System.exit(cmdline.exitCode);
     } else {
+      // Initialize the common thread pool.
+      getCommonThreads();
+
+      Chunky chunky = new Chunky(cmdline.options);
+      chunky.headless = cmdline.mode == Mode.HEADLESS_RENDER || cmdline.mode == Mode.CREATE_SNAPSHOT;
+      chunky.loadPlugins();
+
+      Runtime.getRuntime().addShutdownHook(
+        new Thread(() -> { // intentionally not a ChunkyThread
+          // Within a shutdown hook we need to close quickly, otherwise we  risk the user/OS escalating to KILL
+          chunky.shutdown(1, TimeUnit.SECONDS);
+        })
+      );
+
+      int exitCode = 0;
       try {
-        // Initialize the common thread pool.
-        getCommonThreads();
-
-        Chunky chunky = new Chunky(cmdline.options);
-        chunky.headless = cmdline.mode == Mode.HEADLESS_RENDER || cmdline.mode == Mode.CREATE_SNAPSHOT;
-        chunky.loadPlugins();
-
-        try {
-          switch (cmdline.mode) {
-            case HEADLESS_RENDER:
-              exitCode = chunky.doHeadlessRender();
-              break;
-            case CREATE_SNAPSHOT:
-              exitCode = chunky.doSnapshot();
-              break;
-            case START_GUI:
-              ChunkyFx.startChunkyUI(chunky);
-              break;
-          }
-        } catch (Throwable t) {
-          // set receiver in case an exception was thrown before it was set in one of the start modes.
-          Log.setReceiver(ConsoleReceiver.INSTANCE, Level.INFO, Level.WARNING, Level.ERROR);
-          Log.error("Unchecked exception caused Chunky to close.", t);
-          exitCode = 2;
+        switch (cmdline.mode) {
+          case HEADLESS_RENDER:
+            exitCode = chunky.doHeadlessRender();
+            break;
+          case CREATE_SNAPSHOT:
+            exitCode = chunky.doSnapshot();
+            break;
+          case START_GUI:
+            ChunkyFx.startChunkyUI(chunky);
+            break;
         }
-      } finally {
-        if (!ChunkyThread.interruptAndJoinAll(5, TimeUnit.SECONDS)) {
-          Log.warn("Not all Chunky threads stopped before exiting.");
-        }
+      } catch (Throwable t) {
+        // set receiver in case an exception was thrown before it was set in one of the start modes.
+        Log.setReceiver(ConsoleReceiver.INSTANCE, Level.INFO, Level.WARNING, Level.ERROR);
+        Log.error("Unchecked exception caused Chunky to close.", t);
+        exitCode = 2;
       }
-    }
-
-    if (exitCode != 0) {
+      chunky.shutdown(5, TimeUnit.SECONDS);
+      // Always exit, we've done all shutdown necessary and want to exit whether non-daemon threads exist or not.
+      // This should prevent hangs if threads aren't cooperating.
       System.exit(exitCode);
+    }
+  }
+
+  private void shutdown(int timeout, TimeUnit unit) {
+    if (!ChunkyThread.interruptAndJoinAll(timeout, unit)) {
+      Log.error("Not all threads were joined before shutting down."); // FIXME: list all alive threads? ThreadGroups are annoying.
     }
   }
 
