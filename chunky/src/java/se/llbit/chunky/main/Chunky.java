@@ -18,6 +18,7 @@
 package se.llbit.chunky.main;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.Plugin;
 import se.llbit.chunky.block.BlockProvider;
 import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.MinecraftBlockProvider;
@@ -87,6 +88,7 @@ public class Chunky {
   };
 
   public final ChunkyOptions options;
+  private final PluginManager pluginManager;
   private RenderController renderController;
   private SceneFactory sceneFactory = SceneFactory.DEFAULT;
   private RenderContextFactory renderContextFactory = RenderContext::new;
@@ -108,6 +110,7 @@ public class Chunky {
 
   public Chunky(ChunkyOptions options) {
     this.options = options;
+    this.pluginManager = new PluginManager(new JarPluginLoader());
     registerBlockProvider(new MinecraftBlockProvider());
     registerBlockProvider(new LegacyMinecraftBlockProvider());
   }
@@ -257,7 +260,9 @@ public class Chunky {
   }
 
   private void shutdown(int timeout, TimeUnit unit) {
-    if (!ChunkyThread.interruptAndJoinAll(timeout, unit)) {
+    if (ChunkyThread.interruptAndJoinAll(timeout, unit)) {
+      pluginManager.shutdownPlugins(plugin -> plugin.shutdown(this));
+    } else {
       Log.error("Not all threads were joined before shutting down."); // FIXME: list all alive threads? ThreadGroups are annoying.
     }
   }
@@ -271,40 +276,10 @@ public class Chunky {
   }
 
   private void loadPlugins() {
-    File pluginsDirectory = SettingsDirectory.getPluginsDirectory();
-    if (!pluginsDirectory.isDirectory()) {
-      Log.infof("Plugins directory does not exist: %s", pluginsDirectory.getAbsolutePath());
-      return;
-    }
-    Path pluginsPath = pluginsDirectory.toPath();
-    JsonArray plugins = PersistentSettings.getPlugins();
-    // TODO: allow plugins to implement a custom plugin loader.
-    PluginManager pluginManager = new PluginManager(new JarPluginLoader());
-
-    // Parse plugin manifests
-    Set<PluginManifest> pluginManifests = plugins.elements.stream()
-      .map(value -> value.asString(""))
-      .filter(jarName -> !jarName.isEmpty())
-      .map(jarName -> pluginsPath.resolve(jarName).toAbsolutePath().toFile())
-      .map(PluginManager::parsePluginManifest)
-      .flatMap(Optional::stream)
-      .collect(Collectors.toSet());
-
-    // Load plugins
-    pluginManager.load(pluginManifests, (plugin, manifest) -> {
-      String jarName = manifest.pluginJar.getName();
-      Log.infof("Loading plugin: %s", jarName);
-      if (!isHeadless()) {
-        CreditsController.addPlugin(manifest.name, manifest.version.toString(), manifest.author, manifest.description);
-      }
-
-      try {
-        plugin.attach(this);
-      } catch (Throwable t) {
-        Log.error("Plugin " + jarName + " failed to load.", t);
-      }
-      Log.infof("Plugin loaded: %s %s", manifest.name, manifest.version);
-    });
+    this.pluginManager.loadPluginsFromDirectory(
+      SettingsDirectory.getPluginsDirectory(),
+      (plugin, manifest) -> plugin.attach(this)
+    );
   }
 
   /**
