@@ -91,7 +91,6 @@ public class ChunkyThread extends Thread {
    * @param unit the time unit of the timeout argument
    * @return Whether all threads were joined before returning
    */
-  @PluginApi
   public static boolean joinAll(long timeout, @NotNull TimeUnit unit) {
     /*
      * This method should not be synchronized because:
