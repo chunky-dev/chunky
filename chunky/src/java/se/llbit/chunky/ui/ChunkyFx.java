@@ -29,6 +29,8 @@ import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.fxutil.WindowPosition;
+import se.llbit.log.ConsoleReceiver;
+import se.llbit.log.Level;
 import se.llbit.log.Log;
 
 import java.io.File;
@@ -79,6 +81,8 @@ public class ChunkyFx extends Application {
 
   @Override
   public void stop() throws Exception {
+    // UI is closing so we need to replace the receivers
+    Log.setReceiver(ConsoleReceiver.INSTANCE, Level.INFO, Level.WARNING, Level.ERROR);
     if(mainStage != null) {
       PersistentSettings.setWindowPosition(new WindowPosition(mainStage));
     }
