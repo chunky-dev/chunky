@@ -32,7 +32,7 @@ subprojects {
 
     java {
         toolchain {
-            // default java version for the project, some subprojects are pinned to java 8 for backwards compatibility (see their configs).
+            // default java version for the project
             languageVersion = JavaLanguageVersion.of(17)
         }
     }

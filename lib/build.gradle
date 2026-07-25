@@ -1,3 +1,5 @@
+apply plugin: 'org.openjfx.javafxplugin'
+
 sourceSets.main.java {
     srcDir 'src'
 }
@@ -8,7 +10,13 @@ configurations {
 
 java {
   toolchain {
-    languageVersion = JavaLanguageVersion.of(8) // pinned to java 8 for backwards compatibility
-    vendor = JvmVendorSpec.AMAZON // using corretto as it's one of few jdks to include jfx (on windows+linux) and isn't oracle
+    // keep this pinned to java 17 for backwards compatibility even if we update to Java 25 in Chunky 2.6
+    languageVersion = JavaLanguageVersion.of(17)
   }
+}
+
+javafx {
+  version = '17'
+  configuration = 'implementation'
+  modules = ['javafx.base', 'javafx.controls', 'javafx.fxml']
 }
