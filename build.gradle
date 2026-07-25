@@ -45,7 +45,7 @@ subprojects {
         finalizedBy jacocoTestReport // report is always generated after tests run (it's very cheap)
     }
     jacoco {
-        toolVersion = "0.8.11"
+        toolVersion = "0.8.15"
     }
     jacocoTestReport {
         dependsOn test // tests are required to run before generating the report
