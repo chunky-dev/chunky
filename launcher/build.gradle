@@ -1,7 +1,9 @@
 apply plugin: 'application'
 apply plugin: 'org.openjfx.javafxplugin'
 
-mainClassName = 'se.llbit.chunky.launcher.ChunkyLauncher'
+application {
+  mainClass = 'se.llbit.chunky.launcher.ChunkyLauncher'
+}
 
 configurations {
     bundled
@@ -51,7 +53,7 @@ sourceSets {
 }
 
 jar {
-    manifest.attributes 'Main-Class': mainClassName
+    manifest.attributes 'Main-Class': application.mainClass
 
     // Include classes from the common library.
     from project(':lib').configurations.archives.allArtifacts.files.collect {
