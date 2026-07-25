@@ -33,19 +33,19 @@ subprojects {
     java {
         toolchain {
             // default java version for the project
-            languageVersion = JavaLanguageVersion.of(17)
+            languageVersion = JavaLanguageVersion.of(25)
         }
     }
     compileTestJava {
         // compile tests using more recent features
         javaCompiler = javaToolchains.compilerFor {
-            languageVersion = JavaLanguageVersion.of(21)
+            languageVersion = JavaLanguageVersion.of(27)
         }
     }
     test {
         // run tests using more recent features
         javaLauncher = javaToolchains.launcherFor {
-            languageVersion = JavaLanguageVersion.of(21)
+            languageVersion = JavaLanguageVersion.of(27)
         }
         useJUnitPlatform()
 
