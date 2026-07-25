@@ -224,10 +224,6 @@ public class ResourcePackLoader {
         ? FileSystems.getDefault()
         // for resource packs in jar or zip files
         : FileSystems.newFileSystem(URI.create("jar:" + pack.toURI()), Collections.emptyMap());
-    } catch (ZipError e) {
-      // This catch is required for Java 8. This error appears safe to catch.
-      // https://stackoverflow.com/a/51715939
-      throw new IOException(e);
     } catch (FileSystemAlreadyExistsException e) {
       // for resource packs in jar or zip files (re-use existing fs)
       return FileSystems.getFileSystem(URI.create("jar:" + pack.toURI()));
