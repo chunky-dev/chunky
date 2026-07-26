@@ -28,7 +28,7 @@ public class EmptyWorld extends World {
 
   private EmptyWorld() {
     super("[empty world]", null, 0, -1);
-    this.currentDimension = EmptyDimension.INSTANCE;
+    this.currentDimension = new EmptyDimension();
   }
 
   @Override public String toString() {
