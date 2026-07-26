@@ -14,7 +14,7 @@ import java.util.Optional;
 
 public class EmptyDimension extends Dimension {
   EmptyDimension() {
-    super(Dimension.Identifier.OVERWORLD, null, Collections.emptySet());
+    super(Dimension.Identifier.OVERWORLD, null, Collections.emptySet(), null);
   }
 
   @Override

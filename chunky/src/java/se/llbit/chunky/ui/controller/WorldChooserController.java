@@ -31,16 +31,18 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.ResourcePackLoader;
-import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.TableSortConfigSerializer;
+import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Dimension;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.World;
+import se.llbit.chunky.world.worldformat.WorldFormat;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.json.JsonArray;
 import se.llbit.log.Log;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.*;
@@ -188,7 +190,7 @@ public class WorldChooserController implements Initializable {
     statusLabel.setText("Loading worlds list...");
     disableControls(true);
 
-    Task<List<World>> loadWorldsTask = new Task<List<World>>() {
+    Task<List<World>> loadWorldsTask = new Task<>() {
       @Override
       protected List<World> call() {
         List<World> worlds = new ArrayList<>();
@@ -196,10 +198,16 @@ public class WorldChooserController implements Initializable {
           File[] worldDirs = worldSavesDir.listFiles();
           if (worldDirs != null) {
             for (File dir : worldDirs) {
-              if (World.isWorldDir(dir)) {
-                World world = World.loadWorld(dir, Dimension.Identifier.OVERWORLD, World.LoggedWarnings.SILENT);
-                if (world != EmptyWorld.INSTANCE) {
-                  worlds.add(world);
+              for (WorldFormat worldFormat : WorldFormat.worldFormats) {
+                if (worldFormat.isValid(dir.toPath())) {
+                  try {
+                    World world = worldFormat.loadWorld(dir.toPath(), Dimension.Identifier.OVERWORLD);
+                    if (world != EmptyWorld.INSTANCE) {
+                      worlds.add(world);
+                    }
+                  } catch (IOException e) {
+                    throw new RuntimeException(e);
+                  }
                 }
               }
             }

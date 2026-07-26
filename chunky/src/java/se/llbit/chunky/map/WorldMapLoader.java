@@ -21,6 +21,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.world.*;
+import se.llbit.chunky.world.java.JavaWorld;
 import se.llbit.chunky.world.region.RegionChangeWatcher;
 import se.llbit.chunky.world.region.RegionParser;
 import se.llbit.chunky.world.region.RegionQueue;
@@ -68,7 +69,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
    * This is called when a new world is loaded
    */
   public void loadWorld(File worldDir) {
-    if (World.isWorldDir(worldDir)) {
+    if (JavaWorld.isWorldDir(worldDir)) {
       if (world != null) {
         world.currentDimension().removeChunkTopographyListener(this);
       }

@@ -8,6 +8,7 @@ import se.llbit.nbt.Tag;
 import se.llbit.util.MinecraftText;
 import se.llbit.util.UuidUtil;
 import se.llbit.util.annotation.NotNull;
+import se.llbit.util.annotation.Nullable;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -23,7 +24,18 @@ public class JavaWorld extends World {
   public static final int VERSION_21W06A = 2694;
   public static final int VERSION_1_12_2 = 1343;
 
-  protected final int versionId;
+  protected int versionId;
+
+  /**
+   * In a java world spawn position is per-world and not per-dimension, so we store it here.
+   */
+  protected final Vector3i spawnPos;
+
+  /**
+   * In a java world player data is per-world and not per-dimension, so we store it here.
+   */
+  protected final Collection<PlayerEntityData> playerEntities;
+
   protected UUID singleplayerPlayerUuid;
 
   public Optional<UUID> getSingleplayerPlayerUuid() {
@@ -36,9 +48,11 @@ public class JavaWorld extends World {
    * @param seed
    * @param timestamp
    */
-  protected JavaWorld(String levelName, File worldDirectory, long seed, long timestamp, int versionId) {
+  protected JavaWorld(String levelName, File worldDirectory, long seed, long timestamp, int versionId, Set<PlayerEntityData> playerEntities, Vector3i spawnPos) {
     super(levelName, worldDirectory, seed, timestamp);
     this.versionId = versionId;
+    this.playerEntities = playerEntities;
+    this.spawnPos = spawnPos;
   }
 
   /**
@@ -84,9 +98,15 @@ public class JavaWorld extends World {
 
       long seed = randomSeed.longValue(0);
 
-      Set<PlayerEntityData> playerEntities = getPlayerEntityData(worldDirectory, dimensionId, player);
+      Set<PlayerEntityData> playerEntities = getPlayerEntityData(worldDirectory, player);
 
-      JavaWorld world = new JavaWorld(levelName, worldDirectory, seed, modtime, versionId.intValue());
+      boolean haveSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
+      Vector3i spawnPos = new Vector3i();
+      if (haveSpawnPos) {
+        spawnPos = new Vector3i(spawnX.intValue(0), spawnY.intValue(0), spawnZ.intValue(0));
+      }
+
+      JavaWorld world = new JavaWorld(levelName, worldDirectory, seed, modtime, versionId.intValue(), playerEntities, spawnPos);
       world.gameMode = gameType.intValue(0);
       if (singleplayerUuid.isIntArray(4)) {
         world.singleplayerPlayerUuid = UuidUtil.intsToUuid(singleplayerUuid.intArray());
@@ -94,14 +114,7 @@ public class JavaWorld extends World {
         world.singleplayerPlayerUuid = PlayerEntityData.getUuid(player);
       }
 
-      JavaDimension dimension = (JavaDimension) loadDimension(world, worldDirectory, dimensionId, playerEntities);
-
-      boolean haveSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
-      if (haveSpawnPos) {
-        dimension.setSpawnPos(new Vector3i(spawnX.intValue(0), spawnY.intValue(0), spawnZ.intValue(0)));
-      }
-
-      world.currentDimension = dimension;
+      world.currentDimension = loadDimension(world, worldDirectory, dimensionId, playerEntities, spawnPos);
 
       return world;
     } catch (FileNotFoundException e) {
@@ -117,17 +130,32 @@ public class JavaWorld extends World {
   }
 
   @Override
-  public void loadDimension(Dimension.Identifier dimensionId) {
-    currentDimension = loadDimension(this, this.worldDirectory, dimensionId, Collections.emptySet());
+  public Set<Dimension.Identifier> listDimensions() {
+    return Set.of(Dimension.Identifier.OVERWORLD,
+      Dimension.Identifier.THE_NETHER,
+      Dimension.Identifier.THE_END
+    );
+  }
+
+  @Override
+  public Dimension loadDimension(Dimension.Identifier dimensionId) {
+    currentDimension = loadDimension(
+      this,
+      this.worldDirectory,
+      dimensionId,
+      this.playerEntities.stream().filter(player -> player.dimension.equals(dimensionId)).collect(Collectors.toSet()),
+      this.spawnPos
+    );
     currentDimension.reloadPlayerData();
+    return currentDimension;
   }
 
   @NotNull
-  private static Dimension loadDimension(JavaWorld world, File worldDirectory, Dimension.Identifier dimensionId, Set<PlayerEntityData> playerEntities) {
+  private static Dimension loadDimension(JavaWorld world, File worldDirectory, Dimension.Identifier dimensionId, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
     File dimensionDirectory = Path.of(worldDirectory.getPath(), "dimensions", dimensionId.namespace(), dimensionId.name()).toFile();
     if (dimensionDirectory.exists()) {
       // 26.1-snapshot-6 or later
-      return new JavaDimension(world, dimensionId, dimensionDirectory, playerEntities);
+      return new JavaDimension(world, dimensionId, dimensionDirectory, playerEntities, spawnPos);
     }
 
     dimensionDirectory = switch (dimensionId.getNamespacedName()) { // TODO in Java 21+ we can use `switch (dimensionId)` here
@@ -136,21 +164,19 @@ public class JavaWorld extends World {
       default -> worldDirectory;
     };
     if (new File(dimensionDirectory, "region3d").exists()) {
-      return new CubicDimension(world, dimensionId, dimensionDirectory, playerEntities);
+      return new CubicDimension(world, dimensionId, dimensionDirectory, playerEntities, spawnPos);
     } else {
-      return new JavaDimension(world, dimensionId, dimensionDirectory, playerEntities);
+      return new JavaDimension(world, dimensionId, dimensionDirectory, playerEntities, spawnPos);
     }
   }
 
   @NotNull
-  private static Set<PlayerEntityData> getPlayerEntityData(File worldDirectory, Dimension.Identifier dimensionId, Tag player) {
+  private static Set<PlayerEntityData> getPlayerEntityData(File worldDirectory, Tag player) {
     Set<PlayerEntityData> playerEntities = new HashSet<>();
     if (!player.isError()) {
       playerEntities.add(new PlayerEntityData(player));
     }
     loadAdditionalPlayers(worldDirectory, playerEntities);
-    // Filter for the players only within the requested dimension
-    playerEntities = playerEntities.stream().filter(playerData -> playerData.dimension.equals(dimensionId)).collect(Collectors.toSet());
     return playerEntities;
   }
 
@@ -207,11 +233,20 @@ public class JavaWorld extends World {
         singleplayerPlayerUuid = PlayerEntityData.getUuid(player);
       }
 
-      currentDimension.setPlayerEntities(getPlayerEntityData(worldDirectory, currentDimension.getDimensionId(), player));
+      this.playerEntities.clear();
+      this.playerEntities.addAll(getPlayerEntityData(worldDirectory, player));
     } catch (IOException e) {
       Log.infof("Could not read the level.dat file for world %s while trying to reload player data!", levelName);
       return false;
     }
     return true;
+  }
+
+  public static boolean isWorldDir(File worldDir) {
+    if (worldDir != null && worldDir.isDirectory()) {
+      File levelDat = new File(worldDir, "level.dat");
+      return levelDat.exists() && levelDat.isFile();
+    }
+    return false;
   }
 }

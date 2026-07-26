@@ -76,6 +76,7 @@ public abstract class World implements Comparable<World> {
    *
    * @return {@code true} if the world data was loaded
    */
+  @Deprecated
   public static World loadWorld(File worldDirectory, Dimension.Identifier dimensionId, LoggedWarnings warnings) {
     if (worldDirectory == null) {
       return EmptyWorld.INSTANCE;
@@ -83,8 +84,15 @@ public abstract class World implements Comparable<World> {
     return JavaWorld.loadWorld(worldDirectory, dimensionId, warnings);
   }
 
-  public abstract void loadDimension(Dimension.Identifier dimensionId);
+  /**
+   * The dimensions returned here are later provided to {@link #loadDimension(Dimension.Identifier)} when requesting a dimension be
+   * loaded.
+   *
+   * @return List the viewable dimensions within the world.
+   */
+  public abstract Set<Dimension.Identifier> listDimensions();
 
+  public abstract Dimension loadDimension(Dimension.Identifier dimensionId);
 
   /**
    * @return The current dimension
@@ -107,18 +115,6 @@ public abstract class World implements Comparable<World> {
   /** The name of this world (not the world directory name). */
   public String levelName() {
     return levelName;
-  }
-
-  /**
-   * @return <code>true</code> if the given directory exists and
-   * contains a level.dat file
-   */
-  public static boolean isWorldDir(File worldDir) {
-    if (worldDir != null && worldDir.isDirectory()) {
-      File levelDat = new File(worldDir, "level.dat");
-      return levelDat.exists() && levelDat.isFile();
-    }
-    return false;
   }
 
   /**

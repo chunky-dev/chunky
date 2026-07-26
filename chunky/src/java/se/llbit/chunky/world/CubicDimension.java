@@ -8,6 +8,8 @@ import se.llbit.chunky.world.java.JavaWorld;
 import se.llbit.chunky.world.region.EmptyRegion;
 import se.llbit.chunky.world.region.ImposterCubicRegion;
 import se.llbit.chunky.world.region.Region;
+import se.llbit.math.Vector3i;
+import se.llbit.util.annotation.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +26,8 @@ public class CubicDimension extends JavaDimension {
   /**
    * @param dimensionDirectory Minecraft world directory.
    */
-  public CubicDimension(JavaWorld world, Dimension.Identifier dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities) {
-    super(world, dimensionId, dimensionDirectory, playerEntities);
+  public CubicDimension(JavaWorld world, Dimension.Identifier dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
+    super(world, dimensionId, dimensionDirectory, playerEntities, spawnPos);
   }
 
   /**
