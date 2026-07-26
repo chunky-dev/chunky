@@ -31,7 +31,13 @@ public class EmptyWorld extends World {
     this.currentDimension = new EmptyDimension();
   }
 
-  @Override public String toString() {
+  @Override
+  public void loadDimension(Dimension.Identifier dimensionId) {
+    // no-op
+  }
+
+  @Override
+  public String toString() {
     return "[empty world]";
   }
 
