@@ -53,6 +53,7 @@ import se.llbit.chunky.world.biome.ArrayBiomePalette;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.biome.Biomes;
+import se.llbit.chunky.world.java.JavaDimension;
 import se.llbit.chunky.world.java.JavaWorldFormat;
 import se.llbit.chunky.world.region.Region;
 import se.llbit.chunky.world.worldformat.WorldFormats;
@@ -838,8 +839,10 @@ public class Scene implements JsonSerializable {
       if(emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
         emitterGrid = new Grid(gridSize);
 
-      for (RegionPosition region : chunksToLoadByRegion.keySet()) {
-        dimension.getRegion(region).parse(yMin, yMax);
+      if (dimension instanceof JavaDimension) {
+        for (RegionPosition region : chunksToLoadByRegion.keySet()) {
+          dimension.getRegion(region).parse(yMin, yMax);
+        }
       }
     }
 

@@ -2,6 +2,7 @@ package se.llbit.chunky.world.worldformat;
 
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.World;
+import se.llbit.chunky.world.bedrock.BedrockWorldFormat;
 import se.llbit.chunky.world.java.JavaWorldFormat;
 import se.llbit.log.Log;
 import se.llbit.util.annotation.NotNull;
@@ -31,6 +32,7 @@ public class WorldFormats {
 
   static {
     addWorldFormat(new JavaWorldFormat());
+    addWorldFormat(new BedrockWorldFormat());
   }
 
   @NotNull

@@ -4,7 +4,11 @@ println "Building version ${projectVersion}"
 allprojects {
     repositories {
         mavenCentral()
-        mavenLocal()
+        // FIXME @NotStirred: DO NOT RELY ON SNAPSHOT LEVELDB-FFI
+        maven {
+          name = "Maven Central SNAPSHOT"
+          url = "https://central.sonatype.com/repository/maven-snapshots/"
+        }
     }
 }
 
