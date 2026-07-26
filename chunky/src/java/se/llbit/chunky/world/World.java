@@ -38,20 +38,15 @@ public abstract class World implements Comparable<World> {
   protected int gameMode = 0;
   protected final long seed;
 
-  /** Timestamp for level.dat when player data was last loaded. */
-  protected long timestamp;
-
   /**
    * @param levelName name of the world (not the world directory).
    * @param worldDirectory Minecraft world directory.
    * @param seed
-   * @param timestamp
    */
-  protected World(String levelName, File worldDirectory, long seed, long timestamp) {
+  protected World(String levelName, File worldDirectory, long seed) {
     this.levelName = levelName;
     this.worldDirectory = worldDirectory;
     this.seed = seed;
-    this.timestamp = timestamp;
   }
 
   public enum LoggedWarnings {
