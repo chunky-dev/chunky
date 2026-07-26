@@ -44,7 +44,7 @@ public class EmptyRegionChunk extends Chunk {
   }
 
   private EmptyRegionChunk() {
-    super(new ChunkPosition(0, 0), EmptyDimension.INSTANCE);
+    super(new ChunkPosition(0, 0), EmptyWorld.INSTANCE.currentDimension());
     surface = IconLayer.CORRUPT;
   }
 
