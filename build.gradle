@@ -10,6 +10,9 @@ allprojects {
           url = "https://central.sonatype.com/repository/maven-snapshots/"
         }
     }
+    configurations.configureEach { // FIXME: Remove, this makes gradle never cache snapshot jars (leveldb-ffi snapshots are changing throughout dev)
+      it.resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
 }
 
 buildscript {
