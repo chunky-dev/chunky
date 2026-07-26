@@ -3,6 +3,8 @@ package se.llbit.chunky.world;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.chunk.biome.BiomeData2d;
+import se.llbit.chunky.world.java.JavaDimension;
+import se.llbit.chunky.world.java.JavaWorld;
 import se.llbit.chunky.world.region.EmptyRegion;
 import se.llbit.chunky.world.region.ImposterCubicRegion;
 import se.llbit.chunky.world.region.Region;
@@ -17,12 +19,12 @@ import java.util.stream.Stream;
 import static se.llbit.chunky.world.region.ImposterCubicRegion.blockToCube;
 import static se.llbit.chunky.world.region.ImposterCubicRegion.cubeToCubicRegion;
 
-public class CubicDimension extends Dimension {
+public class CubicDimension extends JavaDimension {
 
   /**
    * @param dimensionDirectory Minecraft world directory.
    */
-  protected CubicDimension(World world, Dimension.Identifier dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities) {
+  public CubicDimension(JavaWorld world, Dimension.Identifier dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities) {
     super(world, dimensionId, dimensionDirectory, playerEntities);
   }
 
@@ -64,8 +66,7 @@ public class CubicDimension extends Dimension {
   @Override
   public boolean regionExists(RegionPosition pos) {
     File regionDirectory = getRegionDirectory();
-    try {
-      Stream<Path> list = Files.list(regionDirectory.toPath());
+    try (Stream<Path> list = Files.list(regionDirectory.toPath())) {
       return list.anyMatch(path -> {
         String[] split = path.getFileName().toString().split("[.]");
         if(split.length == 4) {

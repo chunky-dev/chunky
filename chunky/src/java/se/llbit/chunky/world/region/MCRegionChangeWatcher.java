@@ -24,6 +24,7 @@ import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.Dimension;
 import se.llbit.chunky.world.RegionPosition;
+import se.llbit.chunky.world.java.JavaDimension;
 
 /**
  * Monitors filesystem for changes to region files.
@@ -39,7 +40,8 @@ public class MCRegionChangeWatcher extends RegionChangeWatcher {
     try {
       while (!isInterrupted()) {
         sleep(3000);
-        Dimension dimension = mapLoader.getWorld().currentDimension();
+        // MCRegionChangeWatcher is only created by JavaDimension, so this cast is always safe.
+        JavaDimension dimension = (JavaDimension) mapLoader.getWorld().currentDimension();
         if (dimension.reloadPlayerData()) {
           if (PersistentSettings.getFollowPlayer()) {
             Platform.runLater(() -> dimension.getPlayerPos().ifPresent(mapView::panTo));

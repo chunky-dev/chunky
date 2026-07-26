@@ -9,6 +9,7 @@ import se.llbit.chunky.map.SurfaceLayer;
 import se.llbit.chunky.world.biome.ArrayBiomePalette;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.biome.Biomes;
+import se.llbit.chunky.world.java.JavaChunk;
 import se.llbit.chunky.world.region.ImposterCubicRegion;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
@@ -26,7 +27,7 @@ import java.util.Set;
  *
  * Represents an infinitely tall column of 16x16x16 Cubes
  */
-public class ImposterCubicChunk extends Chunk {
+public class ImposterCubicChunk extends JavaChunk {
   private final CubicDimension dimension;
 
   public ImposterCubicChunk(ChunkPosition pos, Dimension dimension) {
