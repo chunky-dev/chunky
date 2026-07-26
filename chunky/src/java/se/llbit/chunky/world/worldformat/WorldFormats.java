@@ -1,17 +1,21 @@
 package se.llbit.chunky.world.worldformat;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.java.JavaWorldFormat;
 import se.llbit.log.Log;
+import se.llbit.util.annotation.NotNull;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class WorldFormats {
-  private static final Map<String, WorldFormat> worldFormatsById = new Object2ObjectOpenHashMap<>();
+  /**
+   * Uses an ordered hashmap to guarantee a consistent encounter order (and that {@link JavaWorldFormat} is checked first)
+   */
+  private static final LinkedHashMap<String, WorldFormat> worldFormatsById = new LinkedHashMap<>();
 
   public static void addWorldFormat(WorldFormat worldFormat) {
     worldFormatsById.put(worldFormat.getId(), worldFormat);
@@ -21,35 +25,32 @@ public class WorldFormats {
     return Collections.unmodifiableMap(worldFormatsById);
   }
 
-  public static WorldFormat getWorldFormat(String id) {
-    return worldFormatsById.get(id);
+  public static Optional<WorldFormat> getWorldFormat(String id) {
+    return Optional.ofNullable(worldFormatsById.get(id));
   }
 
   static {
     addWorldFormat(new JavaWorldFormat());
   }
 
-  public static Optional<World> createWorld(File dir) {
-    Map<String, World> providedWorlds = new Object2ObjectOpenHashMap<>();
+  @NotNull
+  public static Collection<World.Info> getInfos(Path path) {
+    return getWorldFormats().values().stream()
+      .filter(format -> format.isValid(path))
+      .map(format -> format.getWorldInfo(path))
+      .flatMap(Optional::stream)
+      .collect(Collectors.toList());
+  }
 
-    getWorldFormats().forEach((id, format) -> {
-      if (format.isValid(dir.toPath())) {
-        try {
-          World world = format.loadWorld(dir.toPath());
-          if (world != EmptyWorld.INSTANCE) {
-            providedWorlds.put(format.getId(), world);
-          }
-        } catch (IOException e) {
-          Log.error(String.format("An error occurred when trying to load a world using format `%s` from %s", format.getName(), dir.getAbsolutePath()), e);
-        }
-      }
-    });
-
-    if (providedWorlds.size() > 1) {
-      // Maybe allow the user to select which?
-      // This method is called from a variety of different popup/menu situations, is this ^ possible?
-      Log.warn(String.format("The directory %s has multiple valid world formats: %s", dir.getAbsolutePath(), String.join(", ", providedWorlds.keySet())));
+  @NotNull
+  public static World createWorld(@NotNull World.Info info) {
+    try {
+      return info.worldFormat().loadWorld(info);
+    } catch (IOException e) {
+      Log.error(String.format("An error occurred when trying to load a world using format `%s` from %s",
+        info.worldFormat().getName(), info.path().toAbsolutePath()), e
+      );
     }
-    return providedWorlds.values().stream().findFirst();
+    return EmptyWorld.INSTANCE;
   }
 }

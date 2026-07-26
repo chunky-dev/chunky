@@ -26,7 +26,7 @@ public class CubicDimension extends JavaDimension {
   /**
    * @param dimensionDirectory Minecraft world directory.
    */
-  public CubicDimension(JavaWorld world, Dimension.Identifier dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
+  public CubicDimension(JavaWorld world, Dimension.Identifier dimensionId, Path dimensionDirectory, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
     super(world, dimensionId, dimensionDirectory, playerEntities, spawnPos);
   }
 
@@ -35,7 +35,7 @@ public class CubicDimension extends JavaDimension {
    */
   @Override
   public synchronized File getRegionDirectory() {
-    return new File(dimensionDirectory, "region3d");
+    return dimensionDirectory.resolve("region3d").toFile();
   }
 
   @Override

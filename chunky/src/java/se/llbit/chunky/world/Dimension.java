@@ -15,7 +15,7 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
 import se.llbit.util.annotation.Nullable;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -61,7 +61,7 @@ public abstract class Dimension {
     }
   }
 
-  protected final File dimensionDirectory;
+  protected final Path dimensionDirectory;
 
   protected final Heightmap heightmap = new Heightmap();
 
@@ -77,7 +77,7 @@ public abstract class Dimension {
   /**
    * @param dimensionDirectory Minecraft world directory.
    */
-  protected Dimension(Identifier dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
+  protected Dimension(Identifier dimensionId, Path dimensionDirectory, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
     this.dimensionId = dimensionId;
     this.playerEntities = playerEntities;
     this.dimensionDirectory = dimensionDirectory;
@@ -95,10 +95,11 @@ public abstract class Dimension {
 
   /**
    * Get the data directory for the given dimension.
+   * <p>This may be the same as the world directory for some dimensions</p>
    *
-   * @return File object pointing to the data directory
+   * @return The path to the dimension
    */
-  protected synchronized File getDimensionDirectory() {
+  protected synchronized Path getDimensionPath() {
     return dimensionDirectory;
   }
 
@@ -168,10 +169,6 @@ public abstract class Dimension {
 
   public Optional<Vector3i> getSpawnPosition() {
     return Optional.ofNullable(this.spawnPos);
-  }
-
-  public Date getLastModified() {
-    return new Date(this.dimensionDirectory.lastModified());
   }
 
   /**
