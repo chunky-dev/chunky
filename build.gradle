@@ -1,5 +1,5 @@
-project.version = getVersion()
-println "Building version ${project.version}"
+def projectVersion = getVersion().toString()
+println "Building version ${projectVersion}"
 
 allprojects {
     repositories {
@@ -15,7 +15,7 @@ buildscript {
         }
     }
     dependencies {
-      classpath 'org.openjfx:javafx-plugin:0.0.13'
+      classpath 'org.openjfx:javafx-plugin:0.1.0'
       classpath 'com.github.ben-manes:gradle-versions-plugin:0.46.0'
     }
 }
@@ -33,20 +33,10 @@ subprojects {
     java {
         toolchain {
             // default java version for the project
-            languageVersion = JavaLanguageVersion.of(17)
-        }
-    }
-    compileTestJava {
-        // compile tests using more recent features
-        javaCompiler = javaToolchains.compilerFor {
-            languageVersion = JavaLanguageVersion.of(21)
+            languageVersion = JavaLanguageVersion.of(25)
         }
     }
     test {
-        // run tests using more recent features
-        javaLauncher = javaToolchains.launcherFor {
-            languageVersion = JavaLanguageVersion.of(21)
-        }
         useJUnitPlatform()
 
         // Always run tests, even when nothing changed.
@@ -55,7 +45,7 @@ subprojects {
         finalizedBy jacocoTestReport // report is always generated after tests run (it's very cheap)
     }
     jacoco {
-        toolVersion = "0.8.11"
+        toolVersion = "0.8.15"
     }
     jacocoTestReport {
         dependsOn test // tests are required to run before generating the report
@@ -113,19 +103,37 @@ defaultTasks 'release'
 
 task releaseVersion {
   doLast {
-    tryCommand([ 'git', 'tag', '-a', "${project.version}", '-m', "Version ${project.version}" ], true)
+    tryCommand([ 'git', 'tag', '-a', "${projectVersion}", '-m', "Version ${projectVersion}" ], true)
   }
+}
+
+task prepareReleaseLibraries {
+    dependsOn ':chunky:copyExternalDependencies'
+    outputs.upToDateWhen { false }
+
+    doLast {
+        def libDir = file('chunky/lib')
+        libDir.mkdirs()
+        copy {
+            from project(':chunky').tasks.named('copyExternalDependencies').get().outputs.files
+            into libDir
+        }
+    }
 }
 
 task versionInfo(type: JavaExec) {
     dependsOn 'copyArtifacts'
+    dependsOn 'prepareReleaseLibraries'
     outputs.upToDateWhen { false }
 
-    outputs.files file("build/chunky-${project.version}.jar")
-    description 'Writes build/chunky-VERSION.jar, latest.json and updates chunky-core-VERSION.jar/version.json'
+    outputs.file(layout.buildDirectory.file("chunky-${projectVersion}.jar"))
+
+    description = 'Writes build/chunky-VERSION.jar, latest.json and updates chunky-core-VERSION.jar/version.json'
+
     classpath = project(':releasetools').sourceSets.main.runtimeClasspath
     mainClass.set('releasetools.ReleaseBuilder')
-    args "${project.version}", "release_notes-${project.version}.txt"
+
+    args projectVersion, "release_notes-${projectVersion}.txt"
 }
 
 task release {
@@ -138,30 +146,34 @@ task release {
         destinationDirectory.mkdirs()
         file("./latest.json").renameTo("${destinationDirectory}/latest.json")
         fileTree(buildDir).matching {
-            include "*-${project.version}.*"
+            include "*-${projectVersion}.*"
         }.each {
             it.renameTo("${destinationDirectory}/${it.name}")
         }
     }
 }
 
+def launcherArchives = project(':launcher').configurations.archives
+
 task buildReleaseJar(type: Jar) {
     dependsOn ':launcher:assembleDist'
+    dependsOn 'prepareReleaseLibraries'
     dependsOn 'versionInfo'
 
-    archiveFileName = "chunky-${project.version}.jar"
+    archiveFileName = "chunky-${projectVersion}.jar"
     destinationDirectory = file('build/installer')
     manifest {
         attributes('Main-Class': 'se.llbit.chunky.launcher.ChunkyLauncher')
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 
     into('lib') {
         from fileTree('chunky/lib').include('*.jar')
-        from file("build/chunky-core-${project.version}.jar")
+        from file("build/chunky-core-${projectVersion}.jar")
     }
 
     from {
-        project(':launcher').configurations.archives.allArtifacts.files.collect {
+        launcherArchives.allArtifacts.files.collect {
             zipTree(it)
         }
     }
@@ -170,10 +182,20 @@ task buildReleaseJar(type: Jar) {
     rename "latest.json", "version.json"
 }
 
-task copyArtifacts(type: Copy) {
+task copyArtifacts {
     dependsOn subprojects.jar
-    from subprojects.jar
-    into buildDir
+    dependsOn ':chunky:jar'
+    outputs.upToDateWhen { false }
+
+    doLast {
+        def sourceJar = project(':chunky').tasks.named('jar').get().archiveFile.get().asFile
+        def rootJar = file("build/chunky-core-${projectVersion}.jar")
+        copy {
+            from sourceJar
+            into rootJar.parentFile
+            rename { rootJar.name }
+        }
+    }
 }
 
 /** Helper function to run a command. Returns the command output if the command succeeded. */
