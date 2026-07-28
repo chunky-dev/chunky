@@ -107,8 +107,23 @@ task releaseVersion {
   }
 }
 
+task prepareReleaseLibraries {
+    dependsOn ':chunky:copyExternalDependencies'
+    outputs.upToDateWhen { false }
+
+    doLast {
+        def libDir = file('chunky/lib')
+        libDir.mkdirs()
+        copy {
+            from project(':chunky').tasks.named('copyExternalDependencies').get().outputs.files
+            into libDir
+        }
+    }
+}
+
 task versionInfo(type: JavaExec) {
     dependsOn 'copyArtifacts'
+    dependsOn 'prepareReleaseLibraries'
     outputs.upToDateWhen { false }
 
     outputs.file(layout.buildDirectory.file("chunky-${projectVersion}.jar"))
@@ -142,6 +157,7 @@ def launcherArchives = project(':launcher').configurations.archives
 
 task buildReleaseJar(type: Jar) {
     dependsOn ':launcher:assembleDist'
+    dependsOn 'prepareReleaseLibraries'
     dependsOn 'versionInfo'
 
     archiveFileName = "chunky-${projectVersion}.jar"
@@ -166,10 +182,20 @@ task buildReleaseJar(type: Jar) {
     rename "latest.json", "version.json"
 }
 
-task copyArtifacts(type: Copy) {
+task copyArtifacts {
     dependsOn subprojects.jar
-    from subprojects.jar
-    into buildDir
+    dependsOn ':chunky:jar'
+    outputs.upToDateWhen { false }
+
+    doLast {
+        def sourceJar = project(':chunky').tasks.named('jar').get().archiveFile.get().asFile
+        def rootJar = file("build/chunky-core-${projectVersion}.jar")
+        copy {
+            from sourceJar
+            into rootJar.parentFile
+            rename { rootJar.name }
+        }
+    }
 }
 
 /** Helper function to run a command. Returns the command output if the command succeeded. */
