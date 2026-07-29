@@ -17,17 +17,18 @@
  */
 package se.llbit.chunky.launcher;
 
+import se.llbit.json.JsonParser;
+import se.llbit.json.JsonParser.SyntaxError;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import se.llbit.json.JsonParser;
-import se.llbit.json.JsonParser.SyntaxError;
 
 /**
  * Check for update and run update dialog (or just update in headless mode).
@@ -37,12 +38,31 @@ import se.llbit.json.JsonParser.SyntaxError;
 public class UpdateChecker extends Thread {
   private final LauncherSettings settings;
   private final UpdateListener listener;
-  private final String path;
+  private final ReleaseChannel channel;
 
   public UpdateChecker(LauncherSettings settings, ReleaseChannel channel, UpdateListener listener) {
     this.settings = settings;
     this.listener = listener;
-    this.path = channel.path;
+    this.channel = channel;
+  }
+
+  public UpdateChecker(LauncherSettings settings, ReleaseChannel channel) {
+    this(settings, channel, new UpdateListener() {
+      @Override
+      public void updateError(String message) {
+        // ignore
+      }
+
+      @Override
+      public void updateAvailable(VersionInfo latest) {
+        // ignore
+      }
+
+      @Override
+      public void noUpdateAvailable() {
+        // ignore
+      }
+    });
   }
 
   @Override
@@ -58,9 +78,7 @@ public class UpdateChecker extends Thread {
   }
 
   private boolean tryUpdate() {
-    List<VersionInfo> candidates = new LinkedList<>();
-
-    getVersion(candidates, settings.getResourceUrl(path));
+    List<VersionInfo> candidates = getVersions();
 
     // Filter out corrupt versions.
     Iterator<VersionInfo> iter = candidates.iterator();
@@ -96,6 +114,12 @@ public class UpdateChecker extends Thread {
     // Install the candidate!
     listener.updateAvailable(latest);
     return true;
+  }
+
+  public List<VersionInfo> getVersions() {
+    List<VersionInfo> candidates = new LinkedList<>();
+    getVersion(candidates, settings.getResourceUrl(channel.path));
+    return Collections.unmodifiableList(candidates);
   }
 
   private void getVersion(List<VersionInfo> candidates, String url) {
