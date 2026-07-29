@@ -164,7 +164,7 @@ public class PluginManagerTest {
       loadedPlugins.add(pluginManifest.name);
     });
 
-    pluginLoader.load(manifests, (plugin, manifest) -> {});
+    pluginLoader.loadPlugins(manifests, (plugin, manifest) -> {});
     assertEquals(expectedPlugins, loadedPlugins);
   }
 }
