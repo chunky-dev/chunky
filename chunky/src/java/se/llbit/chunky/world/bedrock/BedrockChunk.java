@@ -142,7 +142,7 @@ public class BedrockChunk extends Chunk {
     // A great resource on bedrock's binary formats: https://github.com/Team-Lodestone/Documentation/tree/main/Bedrock/LevelDB_Output_Array_Formats
 
     boolean dataPresent = false;
-    for (byte subchunkIdx = 0; subchunkIdx < 16; subchunkIdx++) {
+    for (byte subchunkIdx = -4; subchunkIdx < 20; subchunkIdx++) { // FIXME: subchunk indices range
       try {
         Optional<byte[]> dbValue = readSubChunk(this.position, subchunkIdx);
         if (dbValue.isEmpty()) {
