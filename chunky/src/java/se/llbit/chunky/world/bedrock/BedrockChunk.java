@@ -156,6 +156,8 @@ public class BedrockChunk extends Chunk {
         int numStorages = value.get();
         int yIndex = value.get();
 
+        // Each yIndex can have many overlapping storages. Typically the first storage is the "main" storage with most blocks.
+        // Other storages are for things like waterlogged state, which in bedrock can apply to any block due to this "layering" system.
         for (int storage = 0; storage < numStorages; storage++) {
           int packed = value.get();
           boolean isRuntime = (packed & 1) != 0;
@@ -179,10 +181,16 @@ public class BedrockChunk extends Chunk {
           Tag[] subpalette = new Tag[b];
           NBTInputStream tags = NbtUtils.createReaderLE(new BedrockDimension.ByteBufferBackedInputStream(value));
 
+          int airSubpaletteIdx = -1;
           for (int i = 0; i < b; i++) {
             NbtMap compound = (NbtMap) tags.readTag();
             String name = compound.getString("name");
             subpalette[i] = new CompoundTag(List.of(new NamedTag("Name", new StringTag(name))));
+
+            if (name.equals("minecraft:air")) {
+              assert airSubpaletteIdx == -1 : "There is more than one air block in the palette?"; // I assume this isn't possible
+              airSubpaletteIdx = i;
+            }
           }
 
           int u = 0;
@@ -193,17 +201,19 @@ public class BedrockChunk extends Chunk {
               int x = (u >> 8) & 0xf;
               int y = u & 0xf;
               int z = (u >> 4) & 0xf;
-              int pos = x + 16 * y + 256 * z;
 
               int subpaletteIdx = (temp & mask);
               chunkData.setBlockAt(x, 16 * yIndex + y, z, palette.put(subpalette[subpaletteIdx]));
+
+              // For non-main storages we don't want to overwrite an existing block with an air block.
+              if (subpaletteIdx != airSubpaletteIdx) {
+                chunkData.setBlockAt(x, 16 * yIndex + y, z, palette.put(subpalette[subpaletteIdx]));
+              }
 
               temp >>= bitsPerBlock;
               u++;
             }
           }
-
-          yIndex += 1;
         }
 
       } catch (LevelDBException | IOException e) {
