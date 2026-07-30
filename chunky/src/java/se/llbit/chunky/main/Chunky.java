@@ -18,6 +18,7 @@
 package se.llbit.chunky.main;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.Plugin;
 import se.llbit.chunky.block.BlockProvider;
 import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.MinecraftBlockProvider;
@@ -42,12 +43,14 @@ import se.llbit.chunky.ui.ChunkyFx;
 import se.llbit.chunky.ui.controller.CreditsController;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.chunky.world.MaterialStore;
+import se.llbit.chunky.world.bedrock.BedrockPlugin;
 import se.llbit.json.JsonArray;
 import se.llbit.log.ConsoleReceiver;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
 import se.llbit.log.Receiver;
 import se.llbit.util.TaskTracker;
+import se.llbit.util.concurrent.ChunkyThread;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -56,6 +59,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -85,6 +89,7 @@ public class Chunky {
   };
 
   public final ChunkyOptions options;
+  private final PluginManager pluginManager;
   private RenderController renderController;
   private SceneFactory sceneFactory = SceneFactory.DEFAULT;
   private RenderContextFactory renderContextFactory = RenderContext::new;
@@ -106,6 +111,7 @@ public class Chunky {
 
   public Chunky(ChunkyOptions options) {
     this.options = options;
+    this.pluginManager = new PluginManager(new JarPluginLoader());
     registerBlockProvider(new MinecraftBlockProvider());
     registerBlockProvider(new LegacyMinecraftBlockProvider());
   }
@@ -200,6 +206,9 @@ public class Chunky {
     }
   }
 
+  // FIXME: inbuilt plugins
+  BedrockPlugin bedrockPlugin = new BedrockPlugin();
+
   /**
    * Main entry point for Chunky. Chunky should normally be started via the launcher which sets up
    * the classpath with all dependencies.
@@ -211,9 +220,8 @@ public class Chunky {
       System.exit(1);
     }
 
-    int exitCode = 0;
     if (cmdline.mode == CommandLineOptions.Mode.CLI_OPERATION) {
-      exitCode = cmdline.exitCode;
+      System.exit(cmdline.exitCode);
     } else {
       // Initialize the common thread pool.
       getCommonThreads();
@@ -222,6 +230,14 @@ public class Chunky {
       chunky.headless = cmdline.mode == Mode.HEADLESS_RENDER || cmdline.mode == Mode.CREATE_SNAPSHOT;
       chunky.loadPlugins();
 
+      Runtime.getRuntime().addShutdownHook(
+        new Thread(() -> { // intentionally not a ChunkyThread
+          // Within a shutdown hook we need to close quickly, otherwise we  risk the user/OS escalating to KILL
+          chunky.shutdown(1, TimeUnit.SECONDS);
+        })
+      );
+
+      int exitCode = 0;
       try {
         switch (cmdline.mode) {
           case HEADLESS_RENDER:
@@ -240,9 +256,19 @@ public class Chunky {
         Log.error("Unchecked exception caused Chunky to close.", t);
         exitCode = 2;
       }
-    }
-    if (exitCode != 0) {
+      chunky.shutdown(5, TimeUnit.SECONDS);
+      // Always exit, we've done all shutdown necessary and want to exit whether non-daemon threads exist or not.
+      // This should prevent hangs if threads aren't cooperating.
       System.exit(exitCode);
+    }
+  }
+
+  private void shutdown(int timeout, TimeUnit unit) {
+    if (ChunkyThread.interruptAndJoinAll(timeout, unit)) {
+      pluginManager.shutdownPlugins(plugin -> plugin.shutdown(this));
+      bedrockPlugin.shutdown(this);
+    } else {
+      Log.error("Not all threads were joined before shutting down."); // FIXME: list all alive threads? ThreadGroups are annoying.
     }
   }
 
@@ -255,40 +281,11 @@ public class Chunky {
   }
 
   private void loadPlugins() {
-    File pluginsDirectory = SettingsDirectory.getPluginsDirectory();
-    if (!pluginsDirectory.isDirectory()) {
-      Log.infof("Plugins directory does not exist: %s", pluginsDirectory.getAbsolutePath());
-      return;
-    }
-    Path pluginsPath = pluginsDirectory.toPath();
-    JsonArray plugins = PersistentSettings.getPlugins();
-    // TODO: allow plugins to implement a custom plugin loader.
-    PluginManager pluginManager = new PluginManager(new JarPluginLoader());
-
-    // Parse plugin manifests
-    Set<PluginManifest> pluginManifests = plugins.elements.stream()
-      .map(value -> value.asString(""))
-      .filter(jarName -> !jarName.isEmpty())
-      .map(jarName -> pluginsPath.resolve(jarName).toAbsolutePath().toFile())
-      .map(PluginManager::parsePluginManifest)
-      .flatMap(Optional::stream)
-      .collect(Collectors.toSet());
-
-    // Load plugins
-    pluginManager.load(pluginManifests, (plugin, manifest) -> {
-      String jarName = manifest.pluginJar.getName();
-      Log.infof("Loading plugin: %s", jarName);
-      if (!isHeadless()) {
-        CreditsController.addPlugin(manifest.name, manifest.version.toString(), manifest.author, manifest.description);
-      }
-
-      try {
-        plugin.attach(this);
-      } catch (Throwable t) {
-        Log.error("Plugin " + jarName + " failed to load.", t);
-      }
-      Log.infof("Plugin loaded: %s %s", manifest.name, manifest.version);
-    });
+    this.pluginManager.loadPluginsFromDirectory(
+      SettingsDirectory.getPluginsDirectory(),
+      (plugin, manifest) -> plugin.attach(this)
+    );
+    bedrockPlugin.attach(this);
   }
 
   /**
@@ -342,7 +339,7 @@ public class Chunky {
   public static ForkJoinPool getCommonThreads() {
     if (commonThreads == null) {
       // use at least two threads to prevent deadlocks in some java versions (see #1631)
-      commonThreads = new ForkJoinPool(Math.max(PersistentSettings.getNumThreads(), 2));
+      commonThreads = ChunkyThread.addForkJoinPool(new ForkJoinPool(Math.max(PersistentSettings.getNumThreads(), 2)));
     }
     return commonThreads;
   }
@@ -353,7 +350,7 @@ public class Chunky {
    */
   public static void setCommonThreadsCount(int threads) {
     ForkJoinPool t = getCommonThreads();
-    commonThreads = new ForkJoinPool(threads);
+    commonThreads = ChunkyThread.addForkJoinPool(new ForkJoinPool(threads));
     t.shutdown();
   }
 

@@ -18,6 +18,7 @@
 package se.llbit.chunky.renderer;
 
 import se.llbit.log.Log;
+import se.llbit.util.concurrent.ChunkyThread;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -39,7 +40,7 @@ public class RenderWorkerPool {
     RenderWorkerPool create(int threads, long seed);
   }
 
-  public static class RenderWorker extends Thread {
+  public static class RenderWorker extends ChunkyThread {
     private final RenderWorkerPool pool;
 
     public final Random random;

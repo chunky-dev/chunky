@@ -16,6 +16,8 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.util.concurrent.ChunkyThread;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -25,7 +27,7 @@ import java.util.Set;
  *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
-public class ChunkTopographyUpdater extends Thread {
+public class ChunkTopographyUpdater extends ChunkyThread {
 
   private final Set<Chunk> queue = new HashSet<>();
 
