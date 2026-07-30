@@ -153,8 +153,9 @@ public class BedrockChunk extends Chunk {
 
         // Parse subchunk
         int version = value.get();
+        assert version >= 8 && version <= 9 : "Currently only bedrock subchunk versions 8 & 9 are supported";
         int numStorages = value.get();
-        int yIndex = value.get();
+        int yIndex = version == 9 ? value.get() : subchunkIdx;
 
         // Each yIndex can have many overlapping storages. Typically the first storage is the "main" storage with most blocks.
         // Other storages are for things like waterlogged state, which in bedrock can apply to any block due to this "layering" system.
@@ -203,8 +204,6 @@ public class BedrockChunk extends Chunk {
               int z = (u >> 4) & 0xf;
 
               int subpaletteIdx = (temp & mask);
-              chunkData.setBlockAt(x, 16 * yIndex + y, z, palette.put(subpalette[subpaletteIdx]));
-
               // For non-main storages we don't want to overwrite an existing block with an air block.
               if (subpaletteIdx != airSubpaletteIdx) {
                 chunkData.setBlockAt(x, 16 * yIndex + y, z, palette.put(subpalette[subpaletteIdx]));
