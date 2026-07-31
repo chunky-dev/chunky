@@ -18,7 +18,6 @@
 package se.llbit.chunky.main;
 
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.Plugin;
 import se.llbit.chunky.block.BlockProvider;
 import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.MinecraftBlockProvider;
@@ -27,7 +26,6 @@ import se.llbit.chunky.main.CommandLineOptions.Mode;
 import se.llbit.chunky.plugin.*;
 import se.llbit.chunky.plugin.loader.PluginManager;
 import se.llbit.chunky.plugin.loader.JarPluginLoader;
-import se.llbit.chunky.plugin.manifest.PluginManifest;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.export.PictureExportFormat;
@@ -40,10 +38,8 @@ import se.llbit.chunky.renderer.scene.biome.BiomeStructure;
 import se.llbit.chunky.resources.ResourcePackLoader;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.ui.ChunkyFx;
-import se.llbit.chunky.ui.controller.CreditsController;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.chunky.world.MaterialStore;
-import se.llbit.json.JsonArray;
 import se.llbit.log.ConsoleReceiver;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
@@ -55,11 +51,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * Chunky is a Minecraft mapping and rendering tool created byJesper Öqvist (jesper@llbit.se).
@@ -110,7 +104,7 @@ public class Chunky {
 
   public Chunky(ChunkyOptions options) {
     this.options = options;
-    this.pluginManager = new PluginManager(new JarPluginLoader());
+    this.pluginManager = new PluginManager(BuiltInPlugins.PLUGINS, new JarPluginLoader());
     registerBlockProvider(new MinecraftBlockProvider());
     registerBlockProvider(new LegacyMinecraftBlockProvider());
   }

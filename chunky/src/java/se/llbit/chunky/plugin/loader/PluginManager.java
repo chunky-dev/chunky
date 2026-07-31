@@ -43,7 +43,10 @@ public class PluginManager {
   private final LinkedList<PluginEntry> plugins = new LinkedList<>();
   private final AtomicBoolean isShutdown = new AtomicBoolean(false);
 
-  public PluginManager(PluginLoader pluginLoader) {
+  private final Collection<PluginManifest> builtInPlugins;
+
+  public PluginManager(Collection<PluginManifest> builtInPlugins, PluginLoader pluginLoader) {
+    this.builtInPlugins = builtInPlugins;
     this.pluginLoader = pluginLoader;
   }
 
@@ -64,6 +67,7 @@ public class PluginManager {
       .map(PluginManager::parsePluginManifest)
       .flatMap(Optional::stream)
       .collect(Collectors.toSet());
+    pluginManifests.addAll(this.builtInPlugins);
 
     loadPlugins(pluginManifests, onLoad);
   }
@@ -71,12 +75,12 @@ public class PluginManager {
   public void loadPlugins(Set<PluginManifest> pluginManifests, BiConsumer<Plugin, PluginManifest> onLoad) {
     // Load plugins
     this.load(pluginManifests, (plugin, manifest) -> {
-      String jarName = manifest.pluginJar.getName();
-      Log.infof("Loading plugin: %s", jarName);
+      String source = manifest.pluginJar.map(File::getName).orElse("Chunky Inbuilt Plugins");
+      Log.infof("Loading plugin from: %s", source);
       try {
         onLoad.accept(plugin, manifest);
       } catch (Throwable t) {
-        Log.error("Plugin " + jarName + " failed to load.", t);
+        Log.error("Plugin " + source + " failed to load.", t);
       }
       Log.infof("Plugin loaded: %s %s", manifest.name, manifest.version);
     });
@@ -114,7 +118,13 @@ public class PluginManager {
     pluginsByName.forEach((name, plugins) -> {
       if (plugins.size() > 1) {
         // we report the error and hope it goes ok
-        Log.errorf("There are %d plugins with the name %s, this is extremely likely to break, proceeding anyway.", plugins.size(), name);
+        Log.errorf("There are %d plugins with the name %s, this is extremely likely to break, proceeding anyway. From: %s",
+          plugins.size(),
+          name,
+          plugins.stream().map(plugin ->
+            plugin.getManifest().getNameVersionString()).collect(Collectors.joining(", ")
+          )
+        );
       }
     });
 
@@ -137,7 +147,7 @@ public class PluginManager {
           loadedPlugins.add(plugin);
           iterator.remove();
           Log.infof("  Loading plugin %s with deps { %s }, resolved { %s }%n", plugin,
-            plugin.getManifest().getDependencies().stream().map(PluginDependency::toString).collect(Collectors.joining(", ")),
+            plugin.getManifest().dependencies.stream().map(PluginDependency::toString).collect(Collectors.joining(", ")),
             plugin.getDependencies().stream().map(ResolvedPlugin::toString).collect(Collectors.joining(", "))
           );
           pluginLoader.load((loadedPlugin, manifest) -> {
