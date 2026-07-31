@@ -19,7 +19,7 @@ public class ResolvedPlugin {
    */
   public void resolveDependencies(Map<String, List<ResolvedPlugin>> pluginsByName) {
     // Adds any plugin as a resolved dependency if it matches an unresolved dependency's name and version.
-    this.manifest.getDependencies().forEach(unresolvedDep -> {
+    this.manifest.dependencies.forEach(unresolvedDep -> {
       List<ResolvedPlugin> resolvedDeps = pluginsByName.get(unresolvedDep.name);
       boolean resolved = false;
       for (ResolvedPlugin resolvedDep : resolvedDeps) {
@@ -52,6 +52,6 @@ public class ResolvedPlugin {
 
   @Override
   public String toString() {
-    return this.manifest.name + ":" + this.manifest.version;
+    return this.manifest.getNameVersionString();
   }
 }
