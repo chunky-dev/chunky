@@ -25,15 +25,15 @@ public class PluginManagerTest {
     // create 10 dependencies, each depending on the previous one
     HashSet<PluginManifest> manifests = new HashSet<>();
     for (int i = 1; i < 10; i++) {
-      manifests.add(new PluginManifest(null, "test" + i, "author" + i, "desc" + i,
-        new DefaultArtifactVersion(i + ".0"), chunkyVersion, "test1.Main",
+      manifests.add(new PluginManifest(Optional.empty(), "test1.Main", "test" + i, "author" + i, "desc" + i,
+        new DefaultArtifactVersion(i + ".0"), chunkyVersion,
         Set.of(
           new PluginDependency("test" + (i + 1), VersionRange.createFromVersionSpec("[" + (i + 1) + ".0]"))
         )
       ));
     }
-    manifests.add(new PluginManifest(null, "test10", "author10", "desc10",
-      new DefaultArtifactVersion("10.0"), chunkyVersion, "test10.Main", Collections.emptySet()
+    manifests.add(new PluginManifest(Optional.empty(), "test10.Main", "test10", "author10", "desc10",
+      new DefaultArtifactVersion("10.0"), chunkyVersion, Collections.emptySet()
     ));
 
     Set<String> expectedLoadedPlugins = Set.of("test1", "test2", "test3", "test4", "test5", "test6", "test7", "test8", "test9", "test10");
@@ -51,16 +51,16 @@ public class PluginManagerTest {
     // create 10 dependencies, each depending on the previous one
     HashSet<PluginManifest> manifests = new HashSet<>();
     for (int i = 1; i < 10; i++) {
-      manifests.add(new PluginManifest(null, "test" + i, "author" + i, "desc" + i,
-        new DefaultArtifactVersion(i + ".0"), chunkyVersion, "test1.Main",
+      manifests.add(new PluginManifest(Optional.empty(), "test1.Main", "test" + i, "author" + i, "desc" + i,
+        new DefaultArtifactVersion(i + ".0"), chunkyVersion,
         Set.of(
           new PluginDependency("test" + (i + 1), VersionRange.createFromVersionSpec("[" + (i + 1) + ".0]"))
         )
       ));
     }
     // The last one depends on the first. A loop!
-    manifests.add(new PluginManifest(null, "test10", "author10", "desc10",
-      new DefaultArtifactVersion("10.0"), chunkyVersion, "test10.Main",
+    manifests.add(new PluginManifest(Optional.empty(), "test10.Main", "test10", "author10", "desc10",
+      new DefaultArtifactVersion("10.0"), chunkyVersion,
       Set.of(
         new PluginDependency("test1", VersionRange.createFromVersionSpec("[1.0]"))
       )
@@ -82,63 +82,63 @@ public class PluginManagerTest {
          3 > 2 > 10 <┘
     */
     Set<PluginManifest> manifests = new HashSet<>();
-    manifests.add(new PluginManifest(null, "test10", "author10", "desc10",
-      new DefaultArtifactVersion("10.0"), chunkyVersion, "test10.Main",
+    manifests.add(new PluginManifest(Optional.empty(), "test10.Main", "test10", "author10", "desc10",
+      new DefaultArtifactVersion("10.0"), chunkyVersion,
       Collections.emptySet()
     ));
-    manifests.add(new PluginManifest(null, "test9", "author9", "desc9",
-      new DefaultArtifactVersion("9.0"), chunkyVersion, "test9.Main",
+    manifests.add(new PluginManifest(Optional.empty(), "test9.Main", "test9", "author9", "desc9",
+      new DefaultArtifactVersion("9.0"), chunkyVersion,
       Set.of(
         new PluginDependency("test8", VersionRange.createFromVersionSpec("[8.0]")),
         new PluginDependency("test7", VersionRange.createFromVersionSpec("[7.0]"))
       )
     ));
-    manifests.add(new PluginManifest(null, "test8", "author8", "desc8",
-      new DefaultArtifactVersion("8.0"), chunkyVersion, "test8.Main",
+    manifests.add(new PluginManifest(Optional.empty(), "test8.Main", "test8", "author8", "desc8",
+      new DefaultArtifactVersion("8.0"), chunkyVersion,
       Set.of(
         new PluginDependency("test5", VersionRange.createFromVersionSpec("[5.0]"))
       )
     ));
-    manifests.add(new PluginManifest(null, "test7", "author7", "desc7",
-      new DefaultArtifactVersion("7.0"), chunkyVersion, "test7.Main",
+    manifests.add(new PluginManifest(Optional.empty(), "test7.Main", "test7", "author7", "desc7",
+      new DefaultArtifactVersion("7.0"), chunkyVersion,
       Set.of(
         new PluginDependency("test4", VersionRange.createFromVersionSpec("[4.0]")),
         new PluginDependency("test2", VersionRange.createFromVersionSpec("[2.0]"))
       )
     ));
-    manifests.add(new PluginManifest(null, "test6", "author6", "desc6",
-      new DefaultArtifactVersion("6.0"), chunkyVersion, "test6.Main",
+    manifests.add(new PluginManifest(Optional.empty(), "test6.Main", "test6", "author6", "desc6",
+      new DefaultArtifactVersion("6.0"), chunkyVersion,
       Set.of(
         new PluginDependency("test7", VersionRange.createFromVersionSpec("[7.0]")),
         new PluginDependency("test3", VersionRange.createFromVersionSpec("[3.0]"))
       )
     ));
-    manifests.add(new PluginManifest(null, "test5", "author5", "desc5",
-      new DefaultArtifactVersion("5.0"), chunkyVersion, "test5.Main",
+    manifests.add(new PluginManifest(Optional.empty(), "test5.Main", "test5", "author5", "desc5",
+      new DefaultArtifactVersion("5.0"), chunkyVersion,
       Set.of(
         new PluginDependency("test4", VersionRange.createFromVersionSpec("[4.0]"))
       )
     ));
-    manifests.add(new PluginManifest(null, "test4", "author4", "desc4",
-      new DefaultArtifactVersion("4.0"), chunkyVersion, "test4.Main",
+    manifests.add(new PluginManifest(Optional.empty(), "test4.Main", "test4", "author4", "desc4",
+      new DefaultArtifactVersion("4.0"), chunkyVersion,
       Set.of(
         new PluginDependency("test10", VersionRange.createFromVersionSpec("[10.0]"))
       )
     ));
-    manifests.add(new PluginManifest(null, "test3", "author3", "desc3",
-      new DefaultArtifactVersion("3.0"), chunkyVersion, "test3.Main",
+    manifests.add(new PluginManifest(Optional.empty(), "test3.Main", "test3", "author3", "desc3",
+      new DefaultArtifactVersion("3.0"), chunkyVersion,
       Set.of(
         new PluginDependency("test2", VersionRange.createFromVersionSpec("[2.0]"))
       )
     ));
-    manifests.add(new PluginManifest(null, "test2", "author2", "desc2",
-      new DefaultArtifactVersion("2.0"), chunkyVersion, "test2.Main",
+    manifests.add(new PluginManifest(Optional.empty(), "test2.Main", "test2", "author2", "desc2",
+      new DefaultArtifactVersion("2.0"), chunkyVersion,
       Set.of(
         new PluginDependency("test10", VersionRange.createFromVersionSpec("[10.0]"))
       )
     ));
-    manifests.add(new PluginManifest(null, "test1", "author1", "desc1",
-      new DefaultArtifactVersion("1.0"), chunkyVersion, "test1.Main",
+    manifests.add(new PluginManifest(Optional.empty(), "test1.Main", "test1", "author1", "desc1",
+      new DefaultArtifactVersion("1.0"), chunkyVersion,
       Set.of(
         new PluginDependency("test9", VersionRange.createFromVersionSpec("[9.0]")),
         new PluginDependency("test6", VersionRange.createFromVersionSpec("[6.0]"))
@@ -157,14 +157,14 @@ public class PluginManagerTest {
    */
   private static void assertLoadOrder(Set<PluginManifest> manifests, Set<String> expectedPlugins) {
     Set<String> loadedPlugins = new HashSet<>();
-    PluginManager pluginLoader = new PluginManager((onLoad, pluginManifest) -> {
-      System.out.println("Loaded " + pluginManifest.name + ":\n\tWith dependencies: " + String.join(", ", pluginManifest.getDependencies().stream().map(p -> p.name).toList()));
+    PluginManager pluginLoader = new PluginManager(Set.of(), (onLoad, pluginManifest) -> {
+      System.out.println("Loaded " + pluginManifest.name + ":\n\tWith dependencies: " + String.join(", ", pluginManifest.dependencies.stream().map(p -> p.name).toList()));
 
-      assertTrue(pluginManifest.getDependencies().stream().map(p -> p.name).allMatch(loadedPlugins::contains), () -> "Plugin " + pluginManifest.name + " does not have all dependencies loaded");
+      assertTrue(pluginManifest.dependencies.stream().map(p -> p.name).allMatch(loadedPlugins::contains), () -> "Plugin " + pluginManifest.name + " does not have all dependencies loaded");
       loadedPlugins.add(pluginManifest.name);
     });
 
-    pluginLoader.load(manifests, (plugin, manifest) -> {});
+    pluginLoader.loadPlugins(manifests, (plugin, manifest) -> {});
     assertEquals(expectedPlugins, loadedPlugins);
   }
 }

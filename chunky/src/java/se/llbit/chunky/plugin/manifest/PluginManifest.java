@@ -17,35 +17,37 @@ import java.util.Set;
 /**
  * An immutable class representing the manifest file (plugin.json) of a plugin.
  */
-public class PluginManifest {
-  public final File pluginJar;
+public final class PluginManifest {
+  public final Optional<File> pluginJar;
+  public final String mainClass;
   public final String name;
   public final String author;
   public final String description;
   public final ArtifactVersion version;
   public final VersionRange targetVersion;
-  public final String main;
-  private final Set<PluginDependency> dependencies;
+  public final Set<PluginDependency> dependencies;
 
   /**
-   * @param pluginJar Location of a valid plugin .jar file
-   * @param name The name of the plugin
-   * @param author The author of the plugin
-   * @param description The description of the plugin
-   * @param version The version of the plugin
+   * @param pluginJar     Location of a valid plugin .jar file. If not present the plugin class must already be loaded.
+   * @param mainClass     The main class of the plugin within its .jar
+   * @param name          The name of the plugin
+   * @param author        The author of the plugin
+   * @param description   The description of the plugin
+   * @param version       The version of the plugin
    * @param targetVersion The target chunky version range of the plugin
-   * @param main The main class of the plugin within its .jar
-   * @param dependencies The required dependencies of the plugin
+   * @param dependencies  The required dependencies of the plugin
    */
-  public PluginManifest(File pluginJar, String name, String author, String description, ArtifactVersion version,
-                        VersionRange targetVersion, String main, Set<PluginDependency> dependencies) {
+  public PluginManifest(Optional<File> pluginJar, String mainClass,
+                        String name, String author, String description,
+                        ArtifactVersion version, VersionRange targetVersion,
+                        Set<PluginDependency> dependencies) {
     this.pluginJar = pluginJar;
+    this.mainClass = mainClass;
     this.name = name;
     this.author = author;
     this.description = description;
     this.version = version;
     this.targetVersion = targetVersion;
-    this.main = main;
     this.dependencies = dependencies;
   }
 
@@ -106,15 +108,15 @@ public class PluginManifest {
 
     VersionRange targetVersionRange;
     try {
-        targetVersionRange = VersionRange.createFromVersionSpec(targetVersion);
+      targetVersionRange = VersionRange.createFromVersionSpec(targetVersion);
     } catch (InvalidVersionSpecificationException e) {
-        Log.error(String.format("Failed to parse plugin %s targetVersion %s into version range.", name, targetVersion), e);
-        targetVersionRange = VersionRange.createFromVersion(targetVersion);
+      Log.error(String.format("Failed to parse plugin %s targetVersion %s into version range.", name, targetVersion), e);
+      targetVersionRange = VersionRange.createFromVersion(targetVersion);
     }
-    return Optional.of(new PluginManifest(pluginJar, name, author, description, new DefaultArtifactVersion(version), targetVersionRange, main, dependencies));
+    return Optional.of(new PluginManifest(Optional.of(pluginJar), main, name, author, description, new DefaultArtifactVersion(version), targetVersionRange, dependencies));
   }
 
-  public Set<PluginDependency> getDependencies() {
-    return dependencies;
+  public String getNameVersionString() {
+    return this.name + ":" + this.version;
   }
 }
