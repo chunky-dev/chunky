@@ -34,6 +34,7 @@ import se.llbit.nbt.Tag;
 import se.llbit.util.JsonUtil;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 public class ArmorStand extends Entity implements Poseable, Geared {

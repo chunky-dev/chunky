@@ -33,6 +33,7 @@ import se.llbit.nbt.CompoundTag;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Collections;
 
 public class WallSignEntity extends Entity {
 

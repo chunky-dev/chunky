@@ -5,6 +5,8 @@ import se.llbit.chunky.model.minecraft.SporeBlossomModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
+import java.util.Collections;
+
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Transform;

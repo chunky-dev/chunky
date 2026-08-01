@@ -33,6 +33,7 @@ import se.llbit.math.primitive.Box;
 import se.llbit.math.primitive.Primitive;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 /**

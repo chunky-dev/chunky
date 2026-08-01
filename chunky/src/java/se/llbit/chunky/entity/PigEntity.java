@@ -17,6 +17,7 @@ import se.llbit.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 public class PigEntity extends Entity implements Poseable, Variant, Saddleable {
 
@@ -217,7 +218,7 @@ public class PigEntity extends Entity implements Poseable, Variant, Saddleable {
     return json;
   }
 
-  public static PigEntity fromJson(JsonObject json) {
+  public static Entity fromJson(JsonObject json) {
     return new PigEntity(json);
   }
 

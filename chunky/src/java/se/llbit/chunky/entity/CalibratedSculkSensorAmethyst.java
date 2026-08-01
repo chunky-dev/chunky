@@ -13,6 +13,7 @@ import se.llbit.math.primitive.Primitive;
 import se.llbit.util.JsonUtil;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 public class CalibratedSculkSensorAmethyst extends Entity {

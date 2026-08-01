@@ -30,6 +30,7 @@ import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 /**

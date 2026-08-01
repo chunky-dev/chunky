@@ -25,6 +25,8 @@ import se.llbit.chunky.model.minecraft.CakeWithCandleModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Vector3;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
 
 public class CakeWithCandle extends AbstractModelBlock {
@@ -51,18 +53,18 @@ public class CakeWithCandle extends AbstractModelBlock {
   }
 
   @Override
-  public boolean isEntity() {
+  public boolean hasEntities() {
     return isLit();
   }
 
   @Override
-  public boolean isBlockWithEntity() {
-    return true;
+  public boolean isReplacedByEntities() {
+    return false;
   }
 
   @Override
-  public Entity toEntity(Vector3 position) {
-    return new FlameParticles(position, entity);
+  public Collection<Entity> createEntities(Vector3 position) {
+    return Collections.singleton(new FlameParticles(position, entity));
   }
 
   @Override
