@@ -157,11 +157,11 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
       return primitives;
     }
 
-    public static Collection<Entity> fromJson(JsonObject json) {
-      return Collections.singleton(new DecoratedPotSpoutEntity(
+    public static Entity fromJson(JsonObject json) {
+      return new DecoratedPotSpoutEntity(
         JsonUtil.vec3FromJsonObject(json.get("position")),
         json.get("facing").stringValue("north")
-      ));
+      );
     }
 
     @Override

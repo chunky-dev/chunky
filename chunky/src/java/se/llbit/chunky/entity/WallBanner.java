@@ -144,10 +144,10 @@ public class WallBanner extends Entity {
     return json;
   }
 
-  public static Collection<Entity> fromJson(JsonObject json) {
+  public static Entity fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     int rotation = json.get("rotation").intValue(0);
-    return Collections.singleton(new WallBanner(position, rotation, json.get("design").object()));
+    return new WallBanner(position, rotation, json.get("design").object());
   }
 }

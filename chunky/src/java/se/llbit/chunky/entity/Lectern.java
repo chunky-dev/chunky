@@ -196,18 +196,8 @@ public class Lectern extends Entity {
     return json;
   }
 
-  public static Collection<Entity> fromJson(JsonObject json) {
-    Lectern lectern = new Lectern(json);
-
-    Collection<Entity> entities = new ArrayList<>();
-    entities.add(lectern);
-    if (json.get("book").isObject()) { // we still get the book from the lectern json to be compatible with the old format
-      entities.addAll(Book.fromJson(json.get("book").object()));
-    } else if (json.get("hasBook").asBoolean(false)) {
-      entities.add(createBookEntity(lectern.getPosition(), lectern.facing));
-    }
-
-    return entities;
+  public static Entity fromJson(JsonObject json) {
+    return new Lectern(json);
   }
 
   private static int getOrientationIndex(String facing) {

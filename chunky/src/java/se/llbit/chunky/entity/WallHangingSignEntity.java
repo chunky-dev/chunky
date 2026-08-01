@@ -273,7 +273,7 @@ public class WallHangingSignEntity extends Entity {
   /**
    * Unmarshalls a sign entity from JSON data.
    */
-  public static Collection<Entity> fromJson(JsonObject json) {
+  public static Entity fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     JsonArray[] frontText = null;
@@ -290,6 +290,6 @@ public class WallHangingSignEntity extends Entity {
     boolean glowing = json.get("glowing").boolValue(false);
     SignEntity.Color backDye = SignEntity.Color.getFromDyedSign(json.get("backDye").stringValue(null));
     boolean backGlowing = json.get("backGlowing").boolValue(false);
-    return Collections.singleton(new WallHangingSignEntity(position, frontText, dye, glowing, backText, backDye, backGlowing, direction, material));
+    return new WallHangingSignEntity(position, frontText, dye, glowing, backText, backDye, backGlowing, direction, material);
   }
 }

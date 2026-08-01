@@ -90,11 +90,11 @@ public class LilyPadEntity extends Entity {
   /**
    * Unmarshall a lily pad entity from JSON data.
    */
-  public static Collection<Entity> fromJson(JsonObject json) {
+  public static Entity fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
     int rotation = json.get("rotation").intValue(0);
-    return Collections.singleton(new LilyPadEntity(position, rotation));
+    return new LilyPadEntity(position, rotation);
   }
 
 }

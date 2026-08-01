@@ -218,8 +218,8 @@ public class PigEntity extends Entity implements Poseable, Variant, Saddleable {
     return json;
   }
 
-  public static Collection<Entity> fromJson(JsonObject json) {
-    return Collections.singleton(new PigEntity(json));
+  public static Entity fromJson(JsonObject json) {
+    return new PigEntity(json);
   }
 
   @Override

@@ -113,8 +113,8 @@ public class CalibratedSculkSensorAmethyst extends Entity {
     return json;
   }
 
-  public static Collection<Entity> fromJson(JsonObject json) {
-    return Collections.singleton(new CalibratedSculkSensorAmethyst(json));
+  public static Entity fromJson(JsonObject json) {
+    return new CalibratedSculkSensorAmethyst(json);
   }
 
   @Override

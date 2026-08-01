@@ -239,8 +239,8 @@ public class ChickenEntity extends Entity implements Poseable, Variant {
     return json;
   }
 
-  public static Collection<Entity> fromJson(JsonObject json) {
-    return Collections.singleton(new ChickenEntity(json));
+  public static Entity fromJson(JsonObject json) {
+    return new ChickenEntity(json);
   }
 
   @Override

@@ -274,8 +274,8 @@ public class CowEntity extends Entity implements Poseable, Variant {
     return json;
   }
 
-  public static Collection<Entity> fromJson(JsonObject json) {
-    return Collections.singleton(new CowEntity(json));
+  public static Entity fromJson(JsonObject json) {
+    return new CowEntity(json);
   }
 
   @Override

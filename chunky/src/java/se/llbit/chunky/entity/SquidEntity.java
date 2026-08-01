@@ -188,8 +188,8 @@ public class SquidEntity extends Entity implements Poseable {
     return json;
   }
 
-  public static Collection<Entity> fromJson(JsonObject json) {
-    return Collections.singleton(new SquidEntity(json));
+  public static Entity fromJson(JsonObject json) {
+    return new SquidEntity(json);
   }
 
   @Override

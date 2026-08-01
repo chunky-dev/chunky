@@ -362,8 +362,8 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
     return json;
   }
 
-  public static Collection<Entity> fromJson(JsonObject json) {
-    return Collections.singleton(new SheepEntity(json));
+  public static Entity fromJson(JsonObject json) {
+    return new SheepEntity(json);
   }
 
   @Override

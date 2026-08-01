@@ -120,8 +120,8 @@ public class FlameParticles extends Entity {
     return json;
   }
 
-  public static Collection<Entity> fromJson(JsonObject json) {
-    return Collections.singleton(new FlameParticles(json));
+  public static Entity fromJson(JsonObject json) {
+    return new FlameParticles(json);
   }
 
   @Override

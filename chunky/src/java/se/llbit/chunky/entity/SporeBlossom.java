@@ -39,7 +39,7 @@ public class SporeBlossom extends Entity {
     return json;
   }
 
-  public static Collection<Entity> fromJson(JsonObject json) {
-    return Collections.singleton(new SporeBlossom(json));
+  public static Entity fromJson(JsonObject json) {
+    return new SporeBlossom(json);
   }
 }

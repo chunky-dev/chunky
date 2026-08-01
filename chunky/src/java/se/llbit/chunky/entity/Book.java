@@ -296,8 +296,8 @@ public class Book extends Entity implements Poseable {
     return json;
   }
 
-  public static Collection<Entity> fromJson(JsonObject json) {
-    return Collections.singleton(new Book(json));
+  public static Entity fromJson(JsonObject json) {
+    return new Book(json);
   }
 
   @Override

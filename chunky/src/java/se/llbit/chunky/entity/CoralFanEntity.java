@@ -107,10 +107,10 @@ public class CoralFanEntity extends Entity {
     return json;
   }
 
-  public static Collection<Entity> fromJson(JsonObject json) {
+  public static Entity fromJson(JsonObject json) {
     Vector3 position = new Vector3();
     position.fromJson(json.get("position").object());
-    return Collections.singleton(new CoralFanEntity(position, json.get("coral_type").stringValue("tube")));
+    return new CoralFanEntity(position, json.get("coral_type").stringValue("tube"));
   }
 
 

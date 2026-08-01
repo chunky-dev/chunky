@@ -250,8 +250,8 @@ public class MooshroomEntity extends Entity implements Poseable, Variant {
     return json;
   }
 
-  public static Collection<Entity> fromJson(JsonObject json) {
-    return Collections.singleton(new MooshroomEntity(json));
+  public static Entity fromJson(JsonObject json) {
+    return new MooshroomEntity(json);
   }
 
   @Override
