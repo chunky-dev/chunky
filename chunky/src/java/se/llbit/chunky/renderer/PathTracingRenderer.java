@@ -66,6 +66,8 @@ public class PathTracingRenderer extends TileBasedRenderer {
     double halfWidth = fullWidth / (2.0 * fullHeight);
     double invHeight = 1.0 / fullHeight;
 
+    resetTiles(manager); // reset previously skipped tiles
+
     double[] sampleBuffer = scene.getSampleBuffer();
 
     while (scene.spp < scene.getTargetSpp()) {
