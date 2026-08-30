@@ -22,6 +22,7 @@ import se.llbit.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -226,7 +227,7 @@ public class BeaconBeam extends Entity implements Poseable {
     return json;
   }
 
-  public static BeaconBeam fromJson(JsonObject json) {
+  public static Entity fromJson(JsonObject json) {
     return new BeaconBeam(json);
   }
 

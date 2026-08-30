@@ -21,6 +21,7 @@ import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.model.minecraft.DecoratedPotModel;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.log.Log;
 import se.llbit.math.Grid;
 import se.llbit.math.Octree;
 import se.llbit.math.Vector3;
@@ -28,6 +29,7 @@ import se.llbit.math.Vector3i;
 import se.llbit.math.primitive.Primitive;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * Represents Minecraft entities that are not stored in the octree.
@@ -68,72 +70,52 @@ abstract public class Entity {
   /**
    * Unmarshalls an entity object from JSON data.
    *
+   * <p>This method only returns a {@link Collection} to support legacy scenes.</p>
+   *
    * @param json json data.
-   * @return unmarshalled entity, or {@code null} if it was not a valid entity.
+   * @return The entities, or an empty collection if no entity was found.
    */
-  public static Entity fromJson(JsonObject json) {
+  public static Collection<Entity> entitiesFromJson(JsonObject json) {
     String kind = json.get("kind").stringValue("");
+    Collection<Entity> entities = new LinkedList<>();
     switch (kind) {
-      case "painting":
-        return PaintingEntity.fromJson(json);
-      case "sign":
-        return SignEntity.fromJson(json);
-      case "wallsign":
-        return WallSignEntity.fromJson(json);
-      case "skull":
-        return SkullEntity.fromJson(json);
-      case "head":
-        return HeadEntity.fromJson(json);
-      case "player":
-        return PlayerEntity.fromJson(json);
-      case "standing_banner":
-        return StandingBanner.fromJson(json);
-      case "wall_banner":
-        return WallBanner.fromJson(json);
-      case "armor_stand":
-        return ArmorStand.fromJson(json);
-      case "lily_pad":
-        return LilyPadEntity.fromJson(json);
-      case "coral_fan":
-        return CoralFanEntity.fromJson(json);
-      case "wall_coral_fan":
-        return WallCoralFanEntity.fromJson(json);
-      case "lectern":
-        return Lectern.fromJson(json);
-      case "campfire":
-        return Campfire.fromJson(json);
-      case "book":
-        return Book.fromJson(json);
-      case "flameParticles":
-        return FlameParticles.fromJson(json);
-      case "beaconBeam":
-        return BeaconBeam.fromJson(json);
-      case "sporeBlossom":
-        return SporeBlossom.fromJson(json);
-      case "decoratedPotSpout":
-        return DecoratedPotModel.DecoratedPotSpoutEntity.fromJson(json);
-      case "calibratedSculkSensorAmethyst":
-        return CalibratedSculkSensorAmethyst.fromJson(json);
-      case "hangingSign":
-        return HangingSignEntity.fromJson(json);
-      case "wallHangingSign":
-        return WallHangingSignEntity.fromJson(json);
-      case "sheep":
-        return SheepEntity.fromJson(json);
-      case "cow":
-        return CowEntity.fromJson(json);
-      case "chicken":
-        return ChickenEntity.fromJson(json);
-      case "pig":
-        return PigEntity.fromJson(json);
-      case "mooshroom":
-        return MooshroomEntity.fromJson(json);
-      case "squid":
-        return SquidEntity.fromJson(json);
-      case "copperGolemStatue":
-        return CopperGolemStatueEntity.fromJson(json);
+      case "painting" -> entities.add(PaintingEntity.fromJson(json));
+      case "sign" -> entities.add(SignEntity.fromJson(json));
+      case "wallsign" -> entities.add(WallSignEntity.fromJson(json));
+      case "skull" -> entities.add(SkullEntity.fromJson(json));
+      case "head" -> entities.add(HeadEntity.fromJson(json));
+      case "player" -> entities.add(PlayerEntity.fromJson(json));
+      case "standing_banner" -> entities.add(StandingBanner.fromJson(json));
+      case "wall_banner" -> entities.add(WallBanner.fromJson(json));
+      case "armor_stand" -> entities.add(ArmorStand.fromJson(json));
+      case "lily_pad" -> entities.add(LilyPadEntity.fromJson(json));
+      case "coral_fan" -> entities.add(CoralFanEntity.fromJson(json));
+      case "wall_coral_fan" -> entities.add(WallCoralFanEntity.fromJson(json));
+      case "lectern" -> {
+        if (json.get("book").isObject()) { // we still get the book from the lectern json to be compatible with the old format
+          entities.add(Book.fromJson(json.get("book").object()));
+        }
+        entities.add(Lectern.fromJson(json));
+      }
+      case "campfire" -> entities.add(Campfire.fromJson(json));
+      case "book" -> entities.add(Book.fromJson(json));
+      case "flameParticles" -> entities.add(FlameParticles.fromJson(json));
+      case "beaconBeam" -> entities.add(BeaconBeam.fromJson(json));
+      case "sporeBlossom" -> entities.add(SporeBlossom.fromJson(json));
+      case "decoratedPotSpout" -> entities.add(DecoratedPotModel.DecoratedPotSpoutEntity.fromJson(json));
+      case "calibratedSculkSensorAmethyst" -> entities.add(CalibratedSculkSensorAmethyst.fromJson(json));
+      case "hangingSign" -> entities.add(HangingSignEntity.fromJson(json));
+      case "wallHangingSign" -> entities.add(WallHangingSignEntity.fromJson(json));
+      case "sheep" -> entities.add(SheepEntity.fromJson(json));
+      case "cow" -> entities.add(CowEntity.fromJson(json));
+      case "chicken" -> entities.add(ChickenEntity.fromJson(json));
+      case "pig" -> entities.add(PigEntity.fromJson(json));
+      case "mooshroom" -> entities.add(MooshroomEntity.fromJson(json));
+      case "squid" -> entities.add(SquidEntity.fromJson(json));
+      case "copperGolemStatue" -> entities.add(CopperGolemStatueEntity.fromJson(json));
+      default -> Log.errorf("Found unknown entity %s when loading from scene.", kind);
     }
-    return null;
+    return entities;
   }
 
   public Vector3 getPosition() {

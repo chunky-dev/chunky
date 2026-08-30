@@ -27,6 +27,7 @@ import se.llbit.math.primitive.TexturedTriangle;
 import se.llbit.util.MinecraftPRNG;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 public class LilyPadEntity extends Entity {

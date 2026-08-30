@@ -35,6 +35,7 @@ import se.llbit.nbt.SpecificTag;
 import se.llbit.util.NbtUtil;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 /**
