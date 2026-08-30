@@ -20,10 +20,12 @@ package se.llbit.chunky.renderer;
 public class RenderStatus {
 
   private final long renderTime;
+  private final long lastPassTime;
   private final int spp;
 
-  public RenderStatus(long time, int spp) {
+  public RenderStatus(long time, long lastPassTime, int spp) {
     this.renderTime = time;
+    this.lastPassTime = lastPassTime;
     this.spp = spp;
   }
 
@@ -32,6 +34,13 @@ public class RenderStatus {
    */
   public long getRenderTime() {
     return renderTime;
+  }
+
+  /**
+   * @return time of the last render pass in nanoseconds
+   */
+  public long getLastPassTime() {
+    return lastPassTime;
   }
 
   /**

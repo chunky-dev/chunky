@@ -174,6 +174,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       // Copy render status over from the renderManager.
       RenderStatus status = renderManager.getRenderStatus();
       scene.renderTime = status.getRenderTime();
+      scene.lastPassTime = status.getLastPassTime();
       scene.spp = status.getSpp();
       scene.saveScene(ioContext, taskTracker);
       Log.info("Scene saved");
