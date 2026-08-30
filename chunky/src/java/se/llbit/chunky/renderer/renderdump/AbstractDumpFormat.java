@@ -31,26 +31,25 @@ abstract class AbstractDumpFormat implements DumpFormat {
    * Read samples from the stream.
    *
    * @param inputStream   Stream to read samples from.
-   * @param scene         Scene this dump is a part of. Do not modify.
+   * @param header        Header of the dump that is being read.
    * @param consumer      Pixel consumer. Does not need to be in order.
    * @param pixelProgress Progress consumer. Inputs to this must be increasing and end at
    *                      {@code scene.width * scene.height}.
    */
-  protected abstract void readSamples(DataInputStream inputStream, Scene scene,
+  protected abstract void readSamples(DataInputStream inputStream, DumpMetadata header,
                                       PixelConsumer consumer, IntConsumer pixelProgress)
-      throws IOException;
+    throws IOException;
 
   /**
    * Write sample buffer to the stream.
    *
    * @param outputStream  Stream to write to.
-   * @param scene         Scene to take the sample buffer from. Do not modify.
+   * @param dump          Render dump.
    * @param pixelProgress Progress consumer. Inputs must be increasing and end at
    *                      {@code scene.width * scene.height}.
    */
-  protected abstract void writeSamples(DataOutputStream outputStream, Scene scene,
-                                       IntConsumer pixelProgress)
-      throws IOException;
+  protected abstract void writeSamples(DataOutputStream outputStream, RenderDump dump, IntConsumer pixelProgress)
+    throws IOException;
 
   public abstract int getVersion();
 
@@ -62,71 +61,85 @@ abstract class AbstractDumpFormat implements DumpFormat {
 
   @Override
   public void load(DataInputStream inputStream, Scene scene, TaskTracker taskTracker)
-      throws IOException, IllegalStateException {
+    throws IOException, IllegalStateException {
     double[] samples = scene.getSampleBuffer();
-
-    try (TaskTracker.Task task = taskTracker.task("Loading render dump", scene.canvasConfig.getPixelCount())) {
-      readHeader(inputStream, scene);
-      readSamples(inputStream, scene, (index, r, g, b) -> {
+    try (TaskTracker.Task task = taskTracker.task("Loading render dump", samples.length / 3)) {
+      DumpMetadata header = readHeader(inputStream);
+      if (header.width() != scene.canvasConfig.getWidth() || header.height() != scene.canvasConfig.getHeight()) {
+        throw new IllegalStateException("Scene size does not match dump size");
+      }
+      scene.spp = header.spp();
+      scene.renderTime = header.renderTime();
+      readSamples(inputStream, header, (index, r, g, b) -> {
         int offset = index * 3;
         samples[offset + 0] = r;
         samples[offset + 1] = g;
         samples[offset + 2] = b;
-      }, i -> task.updateInterval(i, scene.canvasConfig.getWidth()));
+      }, i -> task.updateInterval(i, header.width()));
     }
   }
 
   @Override
-  public void save(DataOutputStream outputStream, Scene scene, TaskTracker taskTracker)
-      throws IOException {
-    try (TaskTracker.Task task = taskTracker.task("Saving render dump", scene.canvasConfig.getPixelCount())) {
-      writeHeader(outputStream, scene);
-      writeSamples(outputStream, scene, i -> task.updateInterval(i, scene.canvasConfig.getWidth()));
+  public RenderDump load(DataInputStream inputStream, TaskTracker taskTracker) throws IOException {
+    DumpMetadata header = readHeader(inputStream);
+    double[] samples = new double[header.width() * header.height() * 3];
+    try (TaskTracker.Task task = taskTracker.task("Loading render dump", header.width() * header.height())) {
+      readSamples(inputStream, header, (index, r, g, b) -> {
+        int offset = index * 3;
+        samples[offset + 0] = r;
+        samples[offset + 1] = g;
+        samples[offset + 2] = b;
+      }, i -> task.updateInterval(i, header.width()));
+    }
+    return new RenderDump(header, samples);
+  }
+
+  @Override
+  public void save(DataOutputStream outputStream, RenderDump dump, TaskTracker taskTracker)
+    throws IOException {
+    try (TaskTracker.Task task = taskTracker.task("Saving render dump", dump.getMetadata().width() * dump.getMetadata().height())) {
+      writeHeader(outputStream, dump.getMetadata());
+      writeSamples(outputStream, dump, i -> task.updateInterval(i, dump.getMetadata().width()));
     }
   }
 
   @Override
   public void merge(DataInputStream inputStream, Scene scene, TaskTracker taskTracker)
-      throws IOException, IllegalStateException {
+    throws IOException, IllegalStateException {
     try (TaskTracker.Task task = taskTracker.task("Merging render dump", scene.canvasConfig.getPixelCount())) {
       int sceneSpp = scene.spp;
-      long previousRenderTime = scene.renderTime;
 
       double[] samples = scene.getSampleBuffer();
 
-      readHeader(inputStream, scene);
+      DumpMetadata header = readHeader(inputStream);
 
-      double dumpSpp = scene.spp;
+      double dumpSpp = header.spp();
       double sinv = 1.0 / (sceneSpp + dumpSpp);
 
-      readSamples(inputStream, scene, (index, r, g, b) -> {
+      readSamples(inputStream, header, (index, r, g, b) -> {
         int offset = index * 3;
         samples[offset + 0] = (samples[offset + 0] * sceneSpp + r * dumpSpp) * sinv;
         samples[offset + 1] = (samples[offset + 1] * sceneSpp + g * dumpSpp) * sinv;
         samples[offset + 2] = (samples[offset + 2] * sceneSpp + b * dumpSpp) * sinv;
       }, i -> task.updateInterval(i, scene.canvasConfig.getWidth()));
 
-      scene.spp += sceneSpp;
-      scene.renderTime += previousRenderTime;
+      scene.spp += header.spp();
+      scene.renderTime += header.renderTime();
     }
   }
 
-  protected void readHeader(DataInputStream inputStream, Scene scene) throws IOException, IllegalStateException {
-    int width = inputStream.readInt();
-    int height = inputStream.readInt();
-
-    if (width != scene.canvasConfig.getWidth() || height != scene.canvasConfig.getHeight()) {
-      throw new IllegalStateException("Scene size does not match dump size");
-    }
-
-    scene.spp = inputStream.readInt();
-    scene.renderTime = inputStream.readLong();
+  protected DumpMetadata readHeader(DataInputStream inputStream) throws IOException {
+    return new DumpMetadata(
+      inputStream.readInt(),
+      inputStream.readInt(),
+      inputStream.readInt(),
+      inputStream.readLong());
   }
 
-  protected void writeHeader(DataOutputStream outputStream, Scene scene) throws IOException {
-    outputStream.writeInt(scene.canvasConfig.getWidth());
-    outputStream.writeInt(scene.canvasConfig.getHeight());
-    outputStream.writeInt(scene.spp);
-    outputStream.writeLong(scene.renderTime);
+  protected void writeHeader(DataOutputStream outputStream, DumpMetadata header) throws IOException {
+    outputStream.writeInt(header.width());
+    outputStream.writeInt(header.height());
+    outputStream.writeInt(header.spp());
+    outputStream.writeLong(header.renderTime());
   }
 }
