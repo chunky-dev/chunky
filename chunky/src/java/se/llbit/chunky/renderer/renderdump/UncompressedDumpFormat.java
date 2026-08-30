@@ -1,7 +1,5 @@
 package se.llbit.chunky.renderer.renderdump;
 
-import se.llbit.chunky.renderer.scene.Scene;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -10,7 +8,8 @@ import java.util.function.IntConsumer;
 public class UncompressedDumpFormat extends AbstractDumpFormat {
   public static final UncompressedDumpFormat INSTANCE = new UncompressedDumpFormat();
 
-  private UncompressedDumpFormat() {}
+  private UncompressedDumpFormat() {
+  }
 
   @Override
   public int getVersion() {
@@ -33,10 +32,8 @@ public class UncompressedDumpFormat extends AbstractDumpFormat {
   }
 
   @Override
-  protected void readSamples(DataInputStream inputStream, Scene scene,
-                             PixelConsumer consumer, IntConsumer pixelProgress)
-      throws IOException {
-    int numPixels = scene.getSampleBuffer().length / 3;
+  protected void readSamples(DataInputStream inputStream, DumpMetadata header, PixelConsumer consumer, IntConsumer pixelProgress) throws IOException {
+    int numPixels = header.width() * header.height();
     for (int pixelIndex = 0; pixelIndex < numPixels; pixelIndex++) {
       double r = inputStream.readDouble();
       double g = inputStream.readDouble();
@@ -47,10 +44,8 @@ public class UncompressedDumpFormat extends AbstractDumpFormat {
   }
 
   @Override
-  protected void writeSamples(DataOutputStream outputStream, Scene scene,
-                              IntConsumer pixelProgress)
-      throws IOException {
-    double[] samples = scene.getSampleBuffer();
+  protected void writeSamples(DataOutputStream outputStream, RenderDump dump, IntConsumer pixelProgress) throws IOException {
+    double[] samples = dump.getSampleBuffer();
     int numPixels = samples.length / 3;
     for (int pixelIndex = 0; pixelIndex < numPixels; pixelIndex++) {
       int offset = pixelIndex * 3;

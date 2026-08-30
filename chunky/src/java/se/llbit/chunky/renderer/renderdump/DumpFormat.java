@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * A dump format reads a render dump from a DataInputStream into the scene/ writes a render dump from the scene into a
  * DataOutputStream.
- *
+ * <p>
  * The input stream
  * The input stream is expected to <i>not</i> contain the magic number and version number - they should have been read
  * before calling load (logic for that in RenderDump class). The output stream is expected to contain the magic number
@@ -38,15 +38,33 @@ public interface DumpFormat extends Registerable {
    *
    * @throws IllegalStateException If the render dump is invalid.
    */
-  void load(DataInputStream inputStream, Scene scene, TaskTracker taskTracker)
-      throws IOException, IllegalStateException;
+  void load(DataInputStream inputStream, Scene scene, TaskTracker taskTracker) throws IOException, IllegalStateException;
+
+  /**
+   * Read a render dump from an input stream. The stream will only contain the payload of the Chunky render dump
+   * container format.
+   * <p>
+   * Most render dumps will contain a "header" containing the width, height, spp, and renderTime followed by
+   * the sample buffer in some compressed format.
+   *
+   * @return The loaded render dump
+   */
+  RenderDump load(DataInputStream inputStream, TaskTracker taskTracker) throws IOException;
 
   /**
    * Save a render dump to the output stream. This should only write the payload of the Chunky render dump
    * container format.
    */
-  void save(DataOutputStream outputStream, Scene scene, TaskTracker taskTracker)
-      throws IOException;
+  default void save(DataOutputStream outputStream, Scene scene, TaskTracker taskTracker)
+    throws IOException {
+    save(outputStream, new RenderDump(scene), taskTracker);
+  }
+
+  /**
+   * Save a render dump to the output stream. This should only write the payload of the Chunky render dump
+   * container format.
+   */
+  void save(DataOutputStream outputStream, RenderDump dump, TaskTracker taskTracker) throws IOException;
 
   /**
    * Merge a render dump into the provided scene.
@@ -54,5 +72,5 @@ public interface DumpFormat extends Registerable {
    * @throws IllegalStateException If the render dump is invalid.
    */
   void merge(DataInputStream inputStream, Scene scene, TaskTracker taskTracker)
-      throws IOException, IllegalStateException;
+    throws IOException, IllegalStateException;
 }

@@ -16,8 +16,6 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
-import se.llbit.chunky.renderer.scene.Scene;
-
 import java.io.*;
 import java.util.function.IntConsumer;
 
@@ -29,7 +27,8 @@ import java.util.function.IntConsumer;
 public class FloatingPointCompressorDumpFormat extends AbstractDumpFormat {
   public static final FloatingPointCompressorDumpFormat INSTANCE = new FloatingPointCompressorDumpFormat();
 
-  private FloatingPointCompressorDumpFormat() {}
+  private FloatingPointCompressorDumpFormat() {
+  }
 
   @Override
   public int getVersion() {
@@ -52,17 +51,13 @@ public class FloatingPointCompressorDumpFormat extends AbstractDumpFormat {
   }
 
   @Override
-  protected void readSamples(DataInputStream inputStream, Scene scene,
-                             PixelConsumer consumer, IntConsumer pixelProgress)
-      throws IOException {
-    decompress(inputStream, scene.getSampleBuffer().length, consumer, pixelProgress);
+  protected void readSamples(DataInputStream inputStream, DumpMetadata header, PixelConsumer consumer, IntConsumer pixelProgress) throws IOException {
+    decompress(inputStream, header.width() * header.height() * 3, consumer, pixelProgress);
   }
 
   @Override
-  protected void writeSamples(DataOutputStream outputStream, Scene scene,
-                              IntConsumer pixelProgress)
-      throws IOException {
-    double[] samples = scene.getSampleBuffer();
+  protected void writeSamples(DataOutputStream outputStream, RenderDump dump, IntConsumer pixelProgress) throws IOException {
+    double[] samples = dump.getSampleBuffer();
     assert samples.length % 3 == 0;
 
     int pixels = samples.length / 3;
@@ -92,7 +87,7 @@ public class FloatingPointCompressorDumpFormat extends AbstractDumpFormat {
 
   private void decompress(InputStream inputStream, int bufferLength,
                           PixelConsumer consumer, IntConsumer pixelProgress)
-      throws IOException {
+    throws IOException {
     assert bufferLength % 3 == 0;
 
     int pixels = bufferLength / 3;
@@ -122,7 +117,7 @@ public class FloatingPointCompressorDumpFormat extends AbstractDumpFormat {
       double b2 = bDecoder.decodeSingle(bSecondHeader, inputStream);
 
       consumer.consume(i, r1, g1, b1);
-      consumer.consume(i+1, r2,  g2, b2);
+      consumer.consume(i + 1, r2, g2, b2);
       pixelProgress.accept(i);
     }
 

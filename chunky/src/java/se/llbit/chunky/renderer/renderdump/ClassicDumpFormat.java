@@ -17,8 +17,8 @@
 package se.llbit.chunky.renderer.renderdump;
 
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.util.io.IsolatedOutputStream;
 import se.llbit.util.TaskTracker;
+import se.llbit.util.io.IsolatedOutputStream;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -38,7 +38,8 @@ import java.util.zip.GZIPOutputStream;
 public class ClassicDumpFormat extends AbstractDumpFormat {
   public static final ClassicDumpFormat INSTANCE = new ClassicDumpFormat();
 
-  private ClassicDumpFormat() {}
+  private ClassicDumpFormat() {
+  }
 
   @Override
   public int getVersion() {
@@ -61,17 +62,17 @@ public class ClassicDumpFormat extends AbstractDumpFormat {
   }
 
   @Override
-  protected void readSamples(DataInputStream inputStream, Scene scene,
+  protected void readSamples(DataInputStream inputStream, DumpMetadata header,
                              PixelConsumer consumer, IntConsumer pixelProgress)
-      throws IOException {
+    throws IOException {
     int pixelIndex;
     int done = 0;
     double r, g, b;
 
     // Warning: This format writes in column major order
-    for (int x = 0; x < scene.canvasConfig.getWidth(); x++) {
-      for (int y = 0; y < scene.canvasConfig.getHeight(); y++) {
-        pixelIndex = (y * scene.canvasConfig.getWidth() + x);
+    for (int x = 0; x < header.width(); x++) {
+      for (int y = 0; y < header.height(); y++) {
+        pixelIndex = (y * header.width() + x);
         r = inputStream.readDouble();
         g = inputStream.readDouble();
         b = inputStream.readDouble();
@@ -82,17 +83,16 @@ public class ClassicDumpFormat extends AbstractDumpFormat {
   }
 
   @Override
-  protected void writeSamples(DataOutputStream outputStream, Scene scene,
-                              IntConsumer pixelProgress)
-      throws IOException {
-    double[] samples = scene.getSampleBuffer();
+  protected void writeSamples(DataOutputStream outputStream, RenderDump dump, IntConsumer pixelProgress) throws IOException {
+    DumpMetadata header = dump.getMetadata();
+    double[] samples = dump.getSampleBuffer();
     int offset;
     int done = 0;
 
     // Warning: This format writes in column major order
-    for (int x = 0; x < scene.canvasConfig.getWidth(); ++x) {
-      for (int y = 0; y < scene.canvasConfig.getHeight(); ++y) {
-        offset = (y * scene.canvasConfig.getWidth() + x) * 3;
+    for (int x = 0; x < header.width(); ++x) {
+      for (int y = 0; y < header.height(); ++y) {
+        offset = (y * header.width() + x) * 3;
         outputStream.writeDouble(samples[offset + 0]);
         outputStream.writeDouble(samples[offset + 1]);
         outputStream.writeDouble(samples[offset + 2]);
@@ -103,7 +103,7 @@ public class ClassicDumpFormat extends AbstractDumpFormat {
 
   @Override
   public void load(DataInputStream inputStream, Scene scene, TaskTracker taskTracker)
-      throws IOException, IllegalStateException {
+    throws IOException, IllegalStateException {
     DataInputStream stream = new DataInputStream(new GZIPInputStream(inputStream));
     super.load(stream, scene, taskTracker);
   }
@@ -117,7 +117,7 @@ public class ClassicDumpFormat extends AbstractDumpFormat {
 
   @Override
   public void merge(DataInputStream inputStream, Scene scene, TaskTracker taskTracker)
-      throws IOException, IllegalStateException {
+    throws IOException, IllegalStateException {
     DataInputStream stream = new DataInputStream(new GZIPInputStream(inputStream));
     super.merge(stream, scene, taskTracker);
   }
