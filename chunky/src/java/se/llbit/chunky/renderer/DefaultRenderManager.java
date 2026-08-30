@@ -216,7 +216,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
       sendSceneStatus(bufferedScene.sceneStatus());
 
       renderStatusListeners.forEach(listener -> {
-        listener.setRenderTime((System.nanoTime() - frameStart) / 1000);
+        listener.setRenderTime((System.nanoTime() - frameStart) / 1_000_000);
         listener.setSamplesPerSecond(0);
         listener.setSpp(0);
       });
@@ -239,7 +239,7 @@ public class DefaultRenderManager extends Thread implements RenderManager {
       });
 
       synchronized (bufferedScene) {
-        bufferedScene.renderTime += elapsedTime / 1000;
+        bufferedScene.renderTime += elapsedTime / 1_000_000;
         bufferedScene.lastPassTime = elapsedTime;
 
         this.finalizeFrame(getRenderer().autoPostProcess() && finalizeAllFrames);

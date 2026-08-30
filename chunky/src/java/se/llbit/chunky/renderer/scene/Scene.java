@@ -178,7 +178,7 @@ public class Scene implements JsonSerializable {
    */
   public long renderTime;
   /**
-   * Last render pass time in milliseconds
+   * Last render pass time in nanoseconds
    */
   public long lastPassTime;
   /**
