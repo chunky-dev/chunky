@@ -71,8 +71,9 @@ public class MapTile {
       }
     } else {
       RegionPosition regionPos = new RegionPosition(pos.x, pos.z); // intentionally don't convert, this position represented a region already.
-      boolean isValid = mapLoader.getWorld().currentDimension().regionExistsWithinRange(regionPos, view.yMin, view.yMax);
-      Region region = mapLoader.getWorld().currentDimension().getRegionWithinRange(regionPos, view.yMin, view.yMax);
+      HeightRange heightRange = new HeightRange(view.yMin, view.yMax);
+      boolean isValid = mapLoader.getWorld().currentDimension().hasRegionWithinRange(regionPos, heightRange);
+      Region region = mapLoader.getWorld().currentDimension().getRegionWithinRange(regionPos, heightRange);
       int pixelOffset = 0;
       for (int z = 0; z < 32; ++z) {
         for (int x = 0; x < 32; ++x) {

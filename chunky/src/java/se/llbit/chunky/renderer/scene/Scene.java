@@ -53,7 +53,10 @@ import se.llbit.chunky.world.biome.ArrayBiomePalette;
 import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
 import se.llbit.chunky.world.biome.Biomes;
-import se.llbit.chunky.world.region.MCRegion;
+import se.llbit.chunky.world.java.JavaDimension;
+import se.llbit.chunky.world.java.JavaWorldFormat;
+import se.llbit.chunky.world.region.Region;
+import se.llbit.chunky.world.worldformat.WorldFormats;
 import se.llbit.json.*;
 import se.llbit.log.Log;
 import se.llbit.math.*;
@@ -62,11 +65,13 @@ import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.*;
 import se.llbit.util.annotation.NotNull;
+import se.llbit.util.concurrent.ChunkyThread;
 import se.llbit.util.io.PositionalInputStream;
 import se.llbit.util.io.ZipExport;
 import se.llbit.util.mojangapi.MinecraftProfile;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -199,6 +204,7 @@ public class Scene implements JsonSerializable {
    */
   protected int rayDepth = PersistentSettings.getRayDepthDefault();
   protected String worldPath = "";
+  protected String worldFormat = JavaWorldFormat.ID;
   protected Dimension.Identifier worldDimension = Dimension.Identifier.OVERWORLD;
   protected RenderMode mode = RenderMode.PREVIEW;
   protected int dumpFrequency = DEFAULT_DUMP_FREQUENCY;
@@ -411,6 +417,7 @@ public class Scene implements JsonSerializable {
     if (copyChunks) {
       loadedWorld = other.loadedWorld;
       worldPath = other.worldPath;
+      worldFormat = other.worldFormat;
       worldDimension = other.worldDimension;
 
       // The octree reference is overwritten to save time.
@@ -554,11 +561,17 @@ public class Scene implements JsonSerializable {
 
       loadedWorld = EmptyWorld.INSTANCE;
       if (!worldPath.isEmpty()) {
-        File worldDirectory = new File(worldPath);
-        if (World.isWorldDir(worldDirectory)) {
-          loadedWorld = World.loadWorld(worldDirectory, worldDimension, World.LoggedWarnings.NORMAL);
-        } else {
-          Log.info("Could not load world: " + worldPath);
+        Path worldDirectory = Path.of(worldPath);
+        Optional<World.Info> info = WorldFormats.getWorldFormat(worldFormat) // only try to load the world as its known world format.
+          .flatMap(format -> format.getWorldInfo(worldDirectory));
+
+        if (info.isPresent()) {
+          World newWorld = WorldFormats.createWorld(info.get());
+          loadedWorld = newWorld;
+          loadedWorld.loadDimension(this.worldDimension);
+          if (newWorld == EmptyWorld.INSTANCE) {
+            Log.info("Could not load world: " + worldPath);
+          }
         }
       }
 
@@ -775,7 +788,7 @@ public class Scene implements JsonSerializable {
       Log.warn("Can not reload chunks for scene - world directory not found!");
       return;
     }
-    loadedWorld = World.loadWorld(loadedWorld.getWorldDirectory(), worldDimension, World.LoggedWarnings.NORMAL);
+    loadedWorld.loadDimension(worldDimension);
     loadChunks(taskTracker, loadedWorld, ChunkSelectionTracker.selectionByRegion(chunks));
     refresh();
   }
@@ -811,7 +824,8 @@ public class Scene implements JsonSerializable {
       task.update(2, 1);
 
       loadedWorld = world;
-      worldPath = loadedWorld.getWorldDirectory().getAbsolutePath();
+      worldPath = loadedWorld.getInfo().path().toAbsolutePath().toString();
+      worldFormat = world.getInfo().worldFormat().getId();
       worldDimension = world.currentDimension().getDimensionId();
 
       if (chunksToLoadByRegion.isEmpty()) {
@@ -833,8 +847,10 @@ public class Scene implements JsonSerializable {
       if(emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
         emitterGrid = new Grid(gridSize);
 
-      for (RegionPosition region : chunksToLoadByRegion.keySet()) {
-        dimension.getRegion(region).parse(yMin, yMax);
+      if (dimension instanceof JavaDimension) {
+        for (RegionPosition region : chunksToLoadByRegion.keySet()) {
+          dimension.getRegion(region).parse(yMin, yMax);
+        }
       }
     }
 
@@ -866,10 +882,10 @@ public class Scene implements JsonSerializable {
       int[] cubeWorldBlocks = new int[16*16*16];
       int[] cubeWaterBlocks = new int[16*16*16];
 
-      ExecutorService executor = Executors.newSingleThreadExecutor();
+      ExecutorService executor = ChunkyThread.addExecutorService(Executors::newSingleThreadExecutor);
 
-      ChunkData[] regionParsingDataArray = new ChunkData[MCRegion.CHUNKS_X * MCRegion.CHUNKS_Z];
-      ChunkData[] chunkLoadingDataArray = new ChunkData[MCRegion.CHUNKS_X * MCRegion.CHUNKS_Z];
+      ChunkData[] regionParsingDataArray = new ChunkData[Region.CHUNKS_X * Region.CHUNKS_Z];
+      ChunkData[] chunkLoadingDataArray = new ChunkData[Region.CHUNKS_X * Region.CHUNKS_Z];
 
       BiFunction<RegionPosition, ChunkData[], Future<List<ObjectObjectImmutablePair<ChunkPosition, ChunkData>>>> createRegionDataFuture = (regionPosition, chunkDataArray) -> executor.submit(() -> {
         List<ChunkPosition> chunkPositionsToLoad = chunksToLoadByRegion.get(regionPosition);
@@ -2681,6 +2697,7 @@ public class Scene implements JsonSerializable {
       // Save world info.
       JsonObject world = new JsonObject();
       world.add("path", worldPath);
+      world.add("worldType", loadedWorld.getInfo().worldFormat().getId());
       world.add("dimension", worldDimension.getNamespacedName());
       json.add("world", world);
     }
@@ -3003,7 +3020,7 @@ public class Scene implements JsonSerializable {
     if (json.get("world").isObject()) {
       JsonObject world = json.get("world").object();
       worldPath = world.get("path").stringValue(worldPath);
-
+      worldFormat = world.get("worldFormat").stringValue(JavaWorldFormat.ID);
       if (world.get("dimension") instanceof JsonString) {
         // dimension already is a string (or undefined)
         worldDimension = Dimension.Identifier.fromNamespacedName(world.get("dimension").stringValue("minecraft:overworld"));

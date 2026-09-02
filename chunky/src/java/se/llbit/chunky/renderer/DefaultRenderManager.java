@@ -28,6 +28,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
+import se.llbit.util.concurrent.ChunkyThread;
 import se.llbit.util.TaskTracker;
 
 import java.time.Duration;
@@ -52,7 +53,7 @@ import java.util.function.Consumer;
  * <p>All available final renderers are stored in {@code renderers} and preview renderers
  * are stored in {@code previewRenderers}.
  */
-public class DefaultRenderManager extends Thread implements RenderManager {
+public class DefaultRenderManager extends ChunkyThread implements RenderManager {
   /**
    * Map containing all the final render {@code Renderer}s. The renderer corresponding to
    * {@code getRendererName()} is used when a render is requested.
