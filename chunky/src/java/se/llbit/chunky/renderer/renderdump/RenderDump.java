@@ -115,22 +115,22 @@ public class RenderDump {
 
   @PluginApi
   public static void save(OutputStream outputStream, Scene scene, TaskTracker taskTracker, int version) throws IOException {
-    save(outputStream, new RenderDump(scene), taskTracker, version);
+    new RenderDump(scene).save(outputStream, taskTracker, version);
   }
 
   @PluginApi
-  public static void save(OutputStream outputStream, RenderDump dump, TaskTracker taskTracker, int version) throws IOException {
-    save(outputStream, dump, taskTracker, getDumpFormat(version));
+  public void save(OutputStream outputStream, TaskTracker taskTracker, int version) throws IOException {
+    save(outputStream, taskTracker, getDumpFormat(version));
   }
 
   @PluginApi
-  public static void save(OutputStream outputStream, RenderDump dump, TaskTracker taskTracker, DumpFormat format) throws IOException {
+  public void save(OutputStream outputStream, TaskTracker taskTracker, DumpFormat format) throws IOException {
     DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(outputStream));
     if (format.getVersion() != 0) {
       dataOutputStream.write(DUMP_FORMAT_MAGIC_NUMBER);
       dataOutputStream.writeInt(format.getVersion());
     }
-    format.save(dataOutputStream, dump, taskTracker);
+    format.save(dataOutputStream, this, taskTracker);
     dataOutputStream.flush();
   }
 
