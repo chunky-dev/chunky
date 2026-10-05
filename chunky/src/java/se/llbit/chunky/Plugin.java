@@ -18,6 +18,7 @@
 package se.llbit.chunky;
 
 import se.llbit.chunky.main.Chunky;
+import se.llbit.util.concurrent.ChunkyThread;
 
 /**
  * The plugin interface for Chunky plugins.
@@ -33,4 +34,17 @@ public interface Plugin {
    * @param chunky Chunky instance which the plugin should attach to
    */
   void attach(Chunky chunky);
+
+  /**
+   * Called when chunky shuts down, allowing the plugin to close critical resources. Most plugins do not need to do
+   * anything here.
+   *
+   * <p>This function will be called after all {@link ChunkyThread}s have shut down. Chunky's UI thread may still
+   * be running.</p>
+   * <p>This method will not be called if any {@link ChunkyThread} does not shut down within its given time limit</p>
+   * <p>This method may not be called if chunky terminates in a non-normal way, such as through {@link Runtime#halt},
+   * the user killing the process (<code>SIGKILL</code> & <code>TerminateProcess</code>), or an error within a native
+   * function.</p>
+   */
+  default void shutdown(Chunky chunky) { }
 }

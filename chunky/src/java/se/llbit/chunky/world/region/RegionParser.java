@@ -23,6 +23,7 @@ import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.world.*;
 import se.llbit.log.Log;
+import se.llbit.util.concurrent.ChunkyThread;
 import se.llbit.util.Mutable;
 
 /**
@@ -34,7 +35,7 @@ import se.llbit.util.Mutable;
  *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
-public class RegionParser extends Thread {
+public class RegionParser extends ChunkyThread {
 
   private final WorldMapLoader mapLoader;
   private final RegionQueue queue;

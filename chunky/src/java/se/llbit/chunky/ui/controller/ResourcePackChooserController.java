@@ -49,6 +49,7 @@ import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.log.Log;
 import se.llbit.util.MinecraftText;
+import se.llbit.util.concurrent.ChunkyThread;
 
 import java.awt.*;
 import java.io.File;
@@ -451,7 +452,7 @@ public class ResourcePackChooserController implements Initializable {
 
   private static class PackListItem {
 
-    private final static Executor PACK_PARSER_EXECUTOR = Executors.newSingleThreadExecutor();
+    private final static Executor PACK_PARSER_EXECUTOR = ChunkyThread.addExecutorService(Executors::newSingleThreadExecutor);
 
     private static PackListItem DEFAULT = null;
 
