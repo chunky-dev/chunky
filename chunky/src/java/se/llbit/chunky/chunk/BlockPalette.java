@@ -73,11 +73,11 @@ public class BlockPalette {
     this.palette = initialList;
     this.materialProperties = getDefaultMaterialProperties();
     CompoundTag airTag = new CompoundTag();
-    airTag.add("Name", new StringTag("minecraft:air"));
+    airTag.add("id", new StringTag("minecraft:air"));
     CompoundTag stoneTag = new CompoundTag();
-    stoneTag.add("Name", new StringTag("minecraft:stone"));
+    stoneTag.add("id", new StringTag("minecraft:stone"));
     CompoundTag waterTag = new CompoundTag();
-    waterTag.add("Name", new StringTag("minecraft:water"));
+    waterTag.add("id", new StringTag("minecraft:water"));
     airId = put(airTag);
     stoneId = put(stoneTag);
     waterId = put(waterTag);
@@ -186,7 +186,7 @@ public class BlockPalette {
       throw new IllegalArgumentException("Invalid water level " + level);
     }
     CompoundTag tag = new CompoundTag();
-    tag.add("Name", new StringTag("minecraft:water$chunky"));
+    tag.add("id", new StringTag("minecraft:water$chunky"));
     tag.add("level", new IntTag(level));
     tag.add("data", new IntTag(data));
     BlockSpec spec = new BlockSpec(tag);
@@ -207,7 +207,7 @@ public class BlockPalette {
       throw new IllegalArgumentException("Invalid lava level " + level);
     }
     CompoundTag tag = new CompoundTag();
-    tag.add("Name", new StringTag("minecraft:lava$chunky"));
+    tag.add("id", new StringTag("minecraft:lava$chunky"));
     tag.add("level", new IntTag(level));
     tag.add("data", new IntTag(data));
     BlockSpec spec = new BlockSpec(tag);
