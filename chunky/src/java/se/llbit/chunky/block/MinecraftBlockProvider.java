@@ -1021,7 +1021,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("cherry_sapling", (name, tag) -> new SpriteBlock(name, Texture.cherrySapling));
     addBlock("potted_cherry_sapling", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.CHERRY_SAPLING));
     addBlock("torchflower", (name, tag) -> new SpriteBlock(name, Texture.torchflower));
-    addBlock("torchflower_crop", (name, tag) -> new TorchflowerCrop(BlockProvider.stringToInt(tag.get("Properties").get("age"), 2)));
+    addBlock("torchflower_crop", (name, tag) -> new TorchflowerCrop(BlockProvider.stringToInt(tag.get("Properties").get("age"), 0)));
     addBlock("potted_torchflower", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.TORCHFLOWER));
     addBlock("suspicious_sand", (name, tag) -> suspiciousSand(tag));
     addBlock("suspicious_gravel", (name, tag) -> suspiciousGravel(tag));
@@ -1046,8 +1046,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       return new PitcherCrop(age, half);
     });
     addBlock("calibrated_sculk_sensor", (name, tag) -> new CalibratedSculkSensor(
-      tag.get("Properties").get("sculk_sensor_phase").stringValue("cooldown"),
-      tag.get("Properties").get("facing").stringValue("north")));
+      tag.get("Properties").get("sculk_sensor_phase").stringValue("inactive"),
+      BlockProvider.facing(tag)));
     addBlock("oak_hanging_sign", (name, tag) -> hangingSign(tag, "oak"));
     addBlock("oak_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "oak"));
     addBlock("spruce_hanging_sign", (name, tag) -> hangingSign(tag, "spruce"));
@@ -1088,42 +1088,42 @@ public class MinecraftBlockProvider implements BlockProvider {
     for (String s : new String[]{"", "waxed_"}) {
       addBlock(s + "chiseled_copper", Texture.chiseledCopper);
       addBlock(s + "copper_grate", (name, tag) -> new SolidNonOpaqueBlock(name, Texture.copperGrate));
-      addBlock(s + "copper_bulb", (name, tag) -> new CopperBulb(name, tag.get("Properties").get("lit").stringValue().equals("true"), tag.get("Properties").get("powered").stringValue().equals("true"),
+      addBlock(s + "copper_bulb", (name, tag) -> new CopperBulb(name, isLit(tag), tag.get("Properties").get("powered").stringValue("false").equals("true"),
         Texture.copperBulbLitPowered, Texture.copperBulbLit, Texture.copperBulbPowered, Texture.copperBulb));
       addBlock(s + "copper_door", (name, tag) -> door(tag, Texture.copperDoorTop, Texture.copperDoorBottom));
       addBlock(s + "copper_trapdoor", (name, tag) -> trapdoor(tag, Texture.copperTrapdoor));
       addBlock(s + "exposed_chiseled_copper", Texture.exposedChiseledCopper);
       addBlock(s + "exposed_copper_grate", (name, tag) -> new SolidNonOpaqueBlock(name, Texture.exposedCopperGrate));
-      addBlock(s + "exposed_copper_bulb", (name, tag) -> new CopperBulb(name, tag.get("Properties").get("lit").stringValue().equals("true"), tag.get("Properties").get("powered").stringValue().equals("true"),
+      addBlock(s + "exposed_copper_bulb", (name, tag) -> new CopperBulb(name, isLit(tag), tag.get("Properties").get("powered").stringValue("false").equals("true"),
         Texture.exposedCopperBulbLitPowered, Texture.exposedCopperBulbLit, Texture.exposedCopperBulbPowered, Texture.exposedCopperBulb));
       addBlock(s + "exposed_copper_door", (name, tag) -> door(tag, Texture.exposedCopperDoorTop, Texture.exposedCopperDoorBottom));
       addBlock(s + "exposed_copper_trapdoor", (name, tag) -> trapdoor(tag, Texture.exposedCopperTrapdoor));
       addBlock(s + "weathered_chiseled_copper", Texture.weatheredChiseledCopper);
       addBlock(s + "weathered_copper_grate", (name, tag) -> new SolidNonOpaqueBlock(name, Texture.weatheredCopperGrate));
-      addBlock(s + "weathered_copper_bulb", (name, tag) -> new CopperBulb(name, tag.get("Properties").get("lit").stringValue().equals("true"), tag.get("Properties").get("powered").stringValue().equals("true"),
+      addBlock(s + "weathered_copper_bulb", (name, tag) -> new CopperBulb(name, isLit(tag), tag.get("Properties").get("powered").stringValue("false").equals("true"),
         Texture.weatheredCopperBulbLitPowered, Texture.weatheredCopperBulbLit, Texture.weatheredCopperBulbPowered, Texture.weatheredCopperBulb));
       addBlock(s + "weathered_copper_door", (name, tag) -> door(tag, Texture.weatheredCopperDoorTop, Texture.weatheredCopperDoorBottom));
       addBlock(s + "weathered_copper_trapdoor", (name, tag) -> trapdoor(tag, Texture.weatheredCopperTrapdoor));
       addBlock(s + "oxidized_chiseled_copper", Texture.oxidizedChiseledCopper);
       addBlock(s + "oxidized_copper_grate", (name, tag) -> new SolidNonOpaqueBlock(name, Texture.oxidizedCopperGrate));
-      addBlock(s + "oxidized_copper_bulb", (name, tag) -> new CopperBulb(name, tag.get("Properties").get("lit").stringValue().equals("true"), tag.get("Properties").get("powered").stringValue().equals("true"),
+      addBlock(s + "oxidized_copper_bulb", (name, tag) -> new CopperBulb(name, isLit(tag), tag.get("Properties").get("powered").stringValue("false").equals("true"),
         Texture.oxidizedCopperBulbLitPowered, Texture.oxidizedCopperBulbLit, Texture.oxidizedCopperBulbPowered, Texture.oxidizedCopperBulb));
       addBlock(s + "oxidized_copper_door", (name, tag) -> door(tag, Texture.oxidizedCopperDoorTop, Texture.oxidizedCopperDoorBottom));
       addBlock(s + "oxidized_copper_trapdoor", (name, tag) -> trapdoor(tag, Texture.oxidizedCopperTrapdoor));
     }
-    addBlock("crafter", (name, tag) -> new Crafter(name, tag.get("Properties").get("orientation").stringValue(), tag.get("Properties").get("crafting").stringValue().equals("true"), tag.get("Properties").get("triggered").stringValue().equals("true"),
+    addBlock("crafter", (name, tag) -> new Crafter(name, tag.get("Properties").get("orientation").stringValue("north_up"), tag.get("Properties").get("crafting").stringValue("false").equals("true"), tag.get("Properties").get("triggered").stringValue("false").equals("true"),
       Texture.crafterNorth, Texture.crafterNorthCrafting, Texture.crafterEast, Texture.crafterEastCrafting, Texture.crafterEastTriggered,
       Texture.crafterSouth, Texture.crafterSouthTriggered, Texture.crafterWest, Texture.crafterWestCrafting, Texture.crafterWestTriggered,
       Texture.crafterTop, Texture.crafterTopCrafting, Texture.crafterTopTriggered, Texture.crafterBottom));
-    addBlock("vault", (name, tag) -> new Vault(tag.get("Properties").get("facing").stringValue("north"), tag.get("Properties").get("ominous").stringValue().equals("true"), tag.get("Properties").get("vault_state").stringValue("active")));
+    addBlock("vault", (name, tag) -> new Vault(BlockProvider.facing(tag), tag.get("Properties").get("ominous").stringValue("false").equals("true"), tag.get("Properties").get("vault_state").stringValue("inactive")));
     addBlock("heavy_core", (name, tag) -> new HeavyCore());
-    addBlock("trial_spawner", (name, tag) -> new TrialSpawner(tag.get("Properties").get("ominous").stringValue().equals("true"), tag.get("Properties").get("trial_spawner_state").stringValue("active")));
+    addBlock("trial_spawner", (name, tag) -> new TrialSpawner(tag.get("Properties").get("ominous").stringValue("false").equals("true"), tag.get("Properties").get("trial_spawner_state").stringValue("inactive")));
 
     //1.21.4 (Winter Drop)
     addBlock("pale_moss_block", Texture.paleMossBlock);
     addBlock("pale_oak_leaves", (name, tag) -> new UntintedLeaves(name, Texture.paleOakLeaves));
     addBlock("pale_oak_log", (name, tag) -> log(tag, Texture.paleOakLog, Texture.paleOakLogTop));
-    addBlock("pale_hanging_moss", (name, tag) -> new SpriteBlock(name, tag.get("Properties").get("tip").stringValue().equals("true") ? Texture.paleHangingMossTip : Texture.paleHangingMoss));
+    addBlock("pale_hanging_moss", (name, tag) -> new SpriteBlock(name, tag.get("Properties").get("tip").stringValue("true").equals("true") ? Texture.paleHangingMossTip : Texture.paleHangingMoss));
     addBlock("pale_oak_button", (name, tag) -> button(tag, Texture.paleOakPlanks));
     addBlock("pale_oak_planks", Texture.paleOakPlanks);
     addBlock("pale_oak_slab", (name, tag) -> slab(tag, Texture.paleOakPlanks));
@@ -1143,7 +1143,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("pale_oak_hanging_sign", (name, tag) -> hangingSign(tag, "pale_oak"));
     addBlock("pale_oak_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "pale_oak"));
     addBlock("pale_moss_carpet", (name, tag) -> new PaleMossCarpet(name,
-      tag.get("Properties").get("bottom").stringValue("false").equals("true"),
+      tag.get("Properties").get("bottom").stringValue("true").equals("true"),
       tag.get("Properties").get("north").stringValue("none"),
       tag.get("Properties").get("east").stringValue("none"),
       tag.get("Properties").get("south").stringValue("none"),
@@ -1822,8 +1822,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "end_stone_bricks":
         return new MinecraftBlock(name, Texture.endBricks);
       case "redstone_lamp": {
-        String lit = tag.get("Properties").get("lit").stringValue("false");
-        return new RedstoneLamp(lit.equals("true"));
+        return new RedstoneLamp(isLit(tag));
       }
       case "cocoa":
         return cocoa(tag);
@@ -1897,7 +1896,7 @@ public class MinecraftBlockProvider implements BlockProvider {
         return rail(tag, straightTrack);
       }
       case "dropper":
-        return new Dropper(BlockProvider.facing(tag, "south"));
+        return new Dropper(BlockProvider.facing(tag));
       case "white_terracotta":
         return new MinecraftBlock(name, Texture.whiteClay);
       case "orange_terracotta":
@@ -2425,7 +2424,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "fire":
         return new Fire();
       case "wheat":
-        return new Wheat(BlockProvider.stringToInt(tag.get("Properties").get("age"), 7));
+        return new Wheat(BlockProvider.stringToInt(tag.get("Properties").get("age"), 0));
       case "sign":
       case "oak_sign":
         return sign(tag, "oak");
@@ -2503,12 +2502,12 @@ public class MinecraftBlockProvider implements BlockProvider {
         return bed(tag, Texture.bedBlack);
       case "pumpkin_stem":
       case "melon_stem":
-        return new Stem(name, BlockProvider.stringToInt(tag.get("Properties").get("age"), 7));
+        return new Stem(name, BlockProvider.stringToInt(tag.get("Properties").get("age"), 0));
       case "attached_pumpkin_stem":
       case "attached_melon_stem":
         return new AttachedStem(name, BlockProvider.facing(tag));
       case "nether_wart":
-        return new NetherWart(BlockProvider.stringToInt(tag.get("Properties").get("age"), 3));
+        return new NetherWart(BlockProvider.stringToInt(tag.get("Properties").get("age"), 0));
       case "brewing_stand": {
         Tag properties = tag.get("Properties");
         String bottle0 = properties.get("has_bottle_0").stringValue("false");
@@ -2519,7 +2518,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       }
       case "cauldron":
       case "water_cauldron":
-        return new Cauldron(name, BlockProvider.stringToInt(tag.get("Properties").get("level"), 3));
+        return new Cauldron(name, BlockProvider.stringToInt(tag.get("Properties").get("level"), 1));
       case "flower_pot":
         return new FlowerPot(name, FlowerPotModel.Kind.NONE);
       case "potted_poppy":
@@ -2585,9 +2584,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "potted_flowering_azalea_bush":
         return new FlowerPot(name, FlowerPotModel.Kind.FLOWERING_AZALEA_BUSH);
       case "carrots":
-        return new Carrots(BlockProvider.stringToInt(tag.get("Properties").get("age"), 7));
+        return new Carrots(BlockProvider.stringToInt(tag.get("Properties").get("age"), 0));
       case "potatoes":
-        return new Potatoes(BlockProvider.stringToInt(tag.get("Properties").get("age"), 7));
+        return new Potatoes(BlockProvider.stringToInt(tag.get("Properties").get("age"), 0));
       case "skeleton_skull":
         return skull(tag, Texture.skeleton, SkullEntity.Kind.SKELETON);
       case "skeleton_wall_skull":
@@ -2679,7 +2678,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "black_wall_banner":
         return wallBanner(tag, Texture.blackWool, BannerDesign.Color.BLACK);
       case "beetroots":
-        return new Beetroots(BlockProvider.stringToInt(tag.get("Properties").get("age"), 3));
+        return new Beetroots(BlockProvider.stringToInt(tag.get("Properties").get("age"), 0));
       case "loom":
         return new TopBottomOrientedTexturedBlock(
           name,
@@ -2689,7 +2688,8 @@ public class MinecraftBlockProvider implements BlockProvider {
           Texture.loomTop,
           Texture.loomBottom);
       case "barrel":
-        return new Barrel(tag.get("Properties").get("facing").stringValue(), tag.get("Properties").get("open").stringValue());
+        return new Barrel(tag.get("Properties").get("facing").stringValue(),
+          tag.get("Properties").get("open").stringValue("false"));
       case "smoker":
         return smoker(tag);
       case "blast_furnace":
@@ -2714,7 +2714,7 @@ public class MinecraftBlockProvider implements BlockProvider {
           Texture.birchPlanks);
       case "grindstone":
         return new Grindstone(
-          tag.get("Properties").get("face").stringValue("floor"), BlockProvider.facing(tag));
+          tag.get("Properties").get("face").stringValue("wall"), BlockProvider.facing(tag));
       case "lectern":
         return new Lectern(
           BlockProvider.facing(tag),
@@ -2737,19 +2737,19 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "lantern":
         return lantern(tag, Texture.lantern);
       case "sweet_berry_bush":
-        return new SweetBerryBush(BlockProvider.stringToInt(tag.get("Properties").get("age"), 3));
+        return new SweetBerryBush(BlockProvider.stringToInt(tag.get("Properties").get("age"), 0));
       case "campfire":
         return new Campfire(
           "campfire",
           se.llbit.chunky.entity.Campfire.Kind.CAMPFIRE,
           BlockProvider.facing(tag),
-          isLit(tag));
+          tag.get("Properties").get("lit").stringValue("true").equals("true"));
       case "cut_sandstone_slab":
         return slab(tag, Texture.sandstoneCut, Texture.sandstoneTop);
       case "cut_red_sandstone_slab":
         return slab(tag, Texture.redSandstoneCut, Texture.redSandstoneTop);
       case "frosted_ice":
-        return new FrostedIce(BlockProvider.stringToInt(tag.get("Properties").get("age"), 3));
+        return new FrostedIce(BlockProvider.stringToInt(tag.get("Properties").get("age"), 0));
       case "honey_block":
         return new Honey();
       case "bee_nest":
@@ -2771,19 +2771,17 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "command_block": {
         Tag properties = tag.get("Properties");
         String conditional = properties.get("conditional").stringValue("false");
-        return new CommandBlock(BlockProvider.facing(tag, "south"), conditional.equals("true"));
+        return new CommandBlock(BlockProvider.facing(tag), conditional.equals("true"));
       }
       case "chain_command_block": {
         Tag properties = tag.get("Properties");
-        String facing = BlockProvider.facing(tag, "south");
         String conditional = properties.get("conditional").stringValue("false");
-        return new ChainCommandBlock(facing, conditional.equals("true"));
+        return new ChainCommandBlock(BlockProvider.facing(tag), conditional.equals("true"));
       }
       case "repeating_command_block": {
         Tag properties = tag.get("Properties");
-        String facing = BlockProvider.facing(tag, "south");
         String conditional = properties.get("conditional").stringValue("false");
-        return new RepeatingCommandBlock(facing, conditional.equals("true"));
+        return new RepeatingCommandBlock(BlockProvider.facing(tag), conditional.equals("true"));
       }
       case "structure_block":
         return structureBlock(tag);
@@ -2936,7 +2934,7 @@ public class MinecraftBlockProvider implements BlockProvider {
           "soul_campfire",
           se.llbit.chunky.entity.Campfire.Kind.SOUL_CAMPFIRE,
           BlockProvider.facing(tag),
-          isLit(tag));
+          tag.get("Properties").get("lit").stringValue("true").equals("true"));
       case "polished_blackstone":
         return new MinecraftBlock("polished_blackstone", Texture.polishedBlackstone);
       case "polished_blackstone_slab":
@@ -3110,7 +3108,7 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.powderSnow);
       case "powder_snow_cauldron":
         return new PowderSnowCauldron(
-          BlockProvider.stringToInt(tag.get("Properties").get("level"), 3));
+          BlockProvider.stringToInt(tag.get("Properties").get("level"), 1));
       case "dripstone_block":
         return new MinecraftBlock(name, Texture.dripstoneBlock);
       case "pointed_dripstone":
@@ -3118,7 +3116,7 @@ public class MinecraftBlockProvider implements BlockProvider {
           tag.get("Properties").get("thickness").stringValue("tip"),
           tag.get("Properties").get("vertical_direction").stringValue("up"));
       case "sculk_sensor":
-        return new SculkSensor(tag.get("Properties").get("sculk_sensor_phase").stringValue("cooldown"));
+        return new SculkSensor(tag.get("Properties").get("sculk_sensor_phase").stringValue("inactive"));
       case "glow_lichen":
         return new GlowLichen(
           tag.get("Properties").get("north").stringValue("false").equals("true"),
@@ -3149,11 +3147,11 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "rooted_dirt":
         return new MinecraftBlock(name, Texture.rootedDirt);
       case "big_dripleaf_stem":
-        return new BigDripleafStem(BlockProvider.facing(tag, "north"));
+        return new BigDripleafStem(BlockProvider.facing(tag));
       case "big_dripleaf":
-        return new BigDripleaf(BlockProvider.facing(tag, "north"), tag.get("Properties").get("tilt").stringValue("none"));
+        return new BigDripleaf(BlockProvider.facing(tag), tag.get("Properties").get("tilt").stringValue("none"));
       case "small_dripleaf":
-        return new SmallDripleaf(BlockProvider.facing(tag, "north"), tag.get("Properties").get("half").stringValue("lower"));
+        return new SmallDripleaf(BlockProvider.facing(tag), tag.get("Properties").get("half").stringValue("lower"));
       case "spore_blossom":
         return new SporeBlossom();
       case "deepslate":
@@ -3265,7 +3263,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     Tag properties = tag.get("Properties");
     String half = properties.get("half").stringValue("bottom");
     String shape = properties.get("shape").stringValue("straight");
-    String facing = BlockProvider.facing(tag, "south");
+    String facing = BlockProvider.facing(tag);
     return new Stairs(name, texture, half, shape, facing);
   }
 
@@ -3274,20 +3272,20 @@ public class MinecraftBlockProvider implements BlockProvider {
     Tag properties = tag.get("Properties");
     String half = properties.get("half").stringValue("bottom");
     String shape = properties.get("shape").stringValue("straight");
-    String facing = BlockProvider.facing(tag, "south");
+    String facing = BlockProvider.facing(tag);
     return new Stairs(name, side, top, bottom, half, shape, facing);
   }
 
   private static Block glazedTerracotta(Tag tag, Texture texture) {
     String name = BlockProvider.blockName(tag);
-    String facing = BlockProvider.facing(tag, "south");
+    String facing = BlockProvider.facing(tag);
     return new GlazedTerracotta(name, texture, facing);
   }
 
   private static Block bed(Tag tag, BedTexture.Textures texture) {
     String name = BlockProvider.blockName(tag);
-    String part = tag.get("Properties").get("part").stringValue("head");
-    String facing = BlockProvider.facing(tag, "south");
+    String part = tag.get("Properties").get("part").stringValue("foot");
+    String facing = BlockProvider.facing(tag);
     return new Bed(name, texture, part, facing);
   }
 
@@ -3450,8 +3448,8 @@ public class MinecraftBlockProvider implements BlockProvider {
     Tag properties = tag.get("Properties");
     String name = BlockProvider.blockName(tag);
     String facing = BlockProvider.facing(tag);
-    String half = properties.get("half").stringValue("upper");
-    String hinge = properties.get("hinge").stringValue("right");
+    String half = properties.get("half").stringValue("lower");
+    String hinge = properties.get("hinge").stringValue("left");
     String open = properties.get("open").stringValue("false");
     return new Door(
       name, half.equals("upper") ? upper : lower, facing, half, hinge, open.equals("true"));
@@ -3500,7 +3498,7 @@ public class MinecraftBlockProvider implements BlockProvider {
 
   private static Block lever(Tag tag) {
     Tag properties = tag.get("Properties");
-    String face = properties.get("face").stringValue("floor");
+    String face = properties.get("face").stringValue("wall");
     String facing = BlockProvider.facing(tag);
     String powered = properties.get("powered").stringValue("false");
     return new Lever(face, facing, powered.equals("true"));
@@ -3509,7 +3507,7 @@ public class MinecraftBlockProvider implements BlockProvider {
   private static Block button(Tag tag, Texture texture) {
     String name = BlockProvider.blockName(tag);
     Tag properties = tag.get("Properties");
-    String face = properties.get("face").stringValue("floor");
+    String face = properties.get("face").stringValue("wall");
     String facing = BlockProvider.facing(tag);
     String powered = properties.get("powered").stringValue("false");
     return new Button(name, texture, face, facing, powered.equals("true"));
@@ -3557,7 +3555,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new FenceGate(name, texture, facing, in_wall.equals("true"), open.equals("true"));
   }
 
-  private Block glassPane(Tag tag, Texture side, Texture top) {
+  private static Block glassPane(Tag tag, Texture side, Texture top) {
     String name = BlockProvider.blockName(tag);
     Tag properties = tag.get("Properties");
     String north = properties.get("north").stringValue("false");
@@ -3574,7 +3572,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       west.equals("true"));
   }
 
-  private Block ironBars(Tag tag) {
+  private static Block ironBars(Tag tag) {
     Tag properties = tag.get("Properties");
     String north = properties.get("north").stringValue("false");
     String south = properties.get("south").stringValue("false");
@@ -3602,7 +3600,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new OrientableTrapdoor(name, texture, half, facing, open.equals("true"));
   }
 
-  private Block vine(Tag tag) {
+  private static Block vine(Tag tag) {
     Tag properties = tag.get("Properties");
     String north = properties.get("north").stringValue("false");
     String south = properties.get("south").stringValue("false");
@@ -3617,7 +3615,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       up.equals("true"));
   }
 
-  private Block tripwire(Tag tag) {
+  private static Block tripwire(Tag tag) {
     Tag properties = tag.get("Properties");
     return new Tripwire(
       BlockProvider.stringToBoolean(properties.get("attached")),
@@ -3628,7 +3626,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     );
   }
 
-  private Block tripwireHook(Tag tag) {
+  private static Block tripwireHook(Tag tag) {
     Tag properties = tag.get("Properties");
     String facing = BlockProvider.facing(tag);
     String attached = properties.get("attached").stringValue("false");
@@ -3636,10 +3634,10 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new TripwireHook(facing, attached.equals("true"), powered.equals("true"));
   }
 
-  private Block cocoa(Tag tag) {
+  private static Block cocoa(Tag tag) {
     Tag properties = tag.get("Properties");
     String facing = BlockProvider.facing(tag);
-    int age = BlockProvider.stringToInt(properties.get("age"), 2);
+    int age = BlockProvider.stringToInt(properties.get("age"), 0);
     return new Cocoa(facing, age);
   }
 
@@ -3654,19 +3652,19 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new Wall(name, texture, north, south, east, west, up.equals("true"));
   }
 
-  private Block skull(Tag tag, Texture texture, SkullEntity.Kind type) {
+  private static Block skull(Tag tag, Texture texture, SkullEntity.Kind type) {
     String name = BlockProvider.blockName(tag);
     int rotation = BlockProvider.stringToInt(tag.get("Properties").get("rotation"), 0);
     return new Head(name, texture, type, rotation);
   }
 
-  private Block wallSkull(Tag tag, Texture texture, SkullEntity.Kind type) {
+  private static Block wallSkull(Tag tag, Texture texture, SkullEntity.Kind type) {
     String name = BlockProvider.blockName(tag);
     String facing = BlockProvider.facing(tag);
     return new WallHead(name, texture, type, facing);
   }
 
-  private Block anvil(Tag tag, int damage) {
+  private static Block anvil(Tag tag, int damage) {
     String name = BlockProvider.blockName(tag);
     String facing = BlockProvider.facing(tag);
     return new Anvil(name, facing, damage);
@@ -3687,7 +3685,7 @@ public class MinecraftBlockProvider implements BlockProvider {
 
   private static Block structureBlock(Tag tag) {
     Tag properties = tag.get("Properties");
-    String mode = properties.get("mode").stringValue("");
+    String mode = properties.get("mode").stringValue("data");
     Texture texture = switch (mode) {
       case "corner" -> Texture.structureBlockCorner;
       case "data" -> Texture.structureBlockData;
