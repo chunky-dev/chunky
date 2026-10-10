@@ -19,7 +19,6 @@ package se.llbit.chunky.chunk;
 import se.llbit.chunky.block.*;
 import se.llbit.chunky.block.minecraft.*;
 import se.llbit.chunky.plugin.PluginApi;
-import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Octree;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.IntTag;
