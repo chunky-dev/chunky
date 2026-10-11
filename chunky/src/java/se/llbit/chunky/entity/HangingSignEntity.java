@@ -15,7 +15,6 @@ import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 
 public class HangingSignEntity extends Entity {
