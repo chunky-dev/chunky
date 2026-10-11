@@ -58,18 +58,15 @@ public class BlockSpec {
     String name;
     if (tag instanceof StringTag) {
       name = tag.stringValue("unknown:unknown");
-    } else if (tag instanceof CompoundTag compoundTag) {
+    } else {
       Tag idTag = tag.get("Name");
       if (idTag.isError()) {
         idTag = tag.get("id");
-        if (idTag.isError()) {
-          idTag = tag.get("");
-          compoundTag.add("Properties", (SpecificTag) tag.get("properties"));
-        }
+      }
+      if (idTag.isError()) {
+        idTag = tag.get("");
       }
       name = idTag.stringValue("unknown:unknown");
-    } else {
-      name = "unknown:unknown";
     }
     for (BlockProvider provider : blockProviders) {
       Block block = provider.getBlockByTag(name, tag);
@@ -81,7 +78,7 @@ public class BlockSpec {
   }
 
   private Block maybeWaterlogged(Block block) {
-    if (tag.get("Properties").get("waterlogged").stringValue("").equals("true")) {
+    if (getPropertiesTag(tag).get("waterlogged").stringValue("").equals("true")) {
       return block.applyWaterlogging();
     }
     return block;
@@ -89,5 +86,13 @@ public class BlockSpec {
 
   public Tag getTag() {
     return tag;
+  }
+
+  public static Tag getPropertiesTag(Tag tag) {
+    Tag properties = tag.get("properties");
+    if (properties.isError()) {
+      return tag.get("Properties");
+    }
+    return properties;
   }
 }

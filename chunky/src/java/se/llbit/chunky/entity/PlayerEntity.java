@@ -18,6 +18,7 @@
  */
 package se.llbit.chunky.entity;
 
+import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.minecraft.Head;
 import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.PlayerModel;
@@ -130,7 +131,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       int damage = tag.get("Damage").shortValue();
       item.add("type", damage);
     } else if (id.equals("minecraft:player_head")) {
-      Tag skinTag = tag.get("tag").get("SkullOwner").get("Properties").get("textures").get(0).get("Value");
+      Tag skinTag = BlockSpec.getPropertiesTag(tag.get("tag").get("SkullOwner")).get("textures").get(0).get("Value");
       if (!skinTag.isError()) {
         try {
           String skinUrl = Head.getTextureUrl(tag.get("tag").asCompound());
