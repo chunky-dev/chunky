@@ -657,6 +657,8 @@ public class SignEntity extends Entity {
         return Texture.cherrySignPost;
       case "pale_oak":
         return Texture.paleOakSignPost;
+      case "poplar":
+        return Texture.poplarSignPost;
       default:
         throw new IllegalArgumentException("Unknown sign material: " + material);
     }

@@ -336,6 +336,8 @@ public class HangingSignEntity extends Entity {
         return Texture.cherryHangingSign;
       case "pale_oak":
         return Texture.paleOakHangingSign;
+      case "poplar":
+        return Texture.poplarHangingSign;
       default:
         throw new IllegalArgumentException("Unknown hanging sign material: " + material);
     }

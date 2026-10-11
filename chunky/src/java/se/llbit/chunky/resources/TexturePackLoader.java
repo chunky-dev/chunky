@@ -3249,6 +3249,7 @@ public class TexturePackLoader {
     ALL_TEXTURES.put("sign_bamboo", SignTexture.createSignTextureLoader("bamboo", Texture.bambooSignPost));
     ALL_TEXTURES.put("sign_cherry", SignTexture.createSignTextureLoader("cherry", Texture.cherrySignPost));
     ALL_TEXTURES.put("sign_pale_oak", SignTexture.createSignTextureLoader("pale_oak", Texture.paleOakSignPost));
+    ALL_TEXTURES.put("sign_poplar", SignTexture.createSignTextureLoader("poplar", Texture.poplarSignPost));
 
     ALL_TEXTURES.put("hanging_sign_acacia", SignTexture.createHangingSignTextureLoader("acacia", Texture.acaciaHangingSign));
     ALL_TEXTURES.put("hanging_sign_birch", SignTexture.createHangingSignTextureLoader("birch", Texture.birchHangingSign));
@@ -3262,6 +3263,7 @@ public class TexturePackLoader {
     ALL_TEXTURES.put("hanging_sign_bamboo", SignTexture.createHangingSignTextureLoader("bamboo", Texture.bambooHangingSign));
     ALL_TEXTURES.put("hanging_sign_cherry", SignTexture.createHangingSignTextureLoader("cherry", Texture.cherryHangingSign));
     ALL_TEXTURES.put("hanging_sign_pale_oak", SignTexture.createHangingSignTextureLoader("pale_oak", Texture.paleOakHangingSign));
+    ALL_TEXTURES.put("hanging_sign_poplar", SignTexture.createHangingSignTextureLoader("poplar", Texture.poplarHangingSign));
 
     ALL_TEXTURES.put("cartography_table_side1",
         new SimpleTexture("assets/minecraft/textures/block/cartography_table_side1",
