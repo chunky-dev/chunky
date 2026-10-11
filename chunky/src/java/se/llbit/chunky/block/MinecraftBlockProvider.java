@@ -1344,7 +1344,8 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("blue_wool_stairs", (name, tag) -> stairs(tag, Texture.blueWool));
     addBlock("purple_wool_stairs", (name, tag) -> stairs(tag, Texture.purpleWool));
     addBlock("magenta_wool_stairs", (name, tag) -> stairs(tag, Texture.magentaWool));
-    addBlock("pink_wool_slab", (name, tag) -> slab(tag, Texture.pinkWool));
+    addBlock("pink_wool_stairs", (name, tag) -> stairs(tag, Texture.pinkWool));
+
     addBlock("white_wool_slab", (name, tag) -> slab(tag, Texture.whiteWool));
     addBlock("light_gray_wool_slab", (name, tag) -> slab(tag, Texture.lightGrayWool));
     addBlock("gray_wool_slab", (name, tag) -> slab(tag, Texture.grayWool));
