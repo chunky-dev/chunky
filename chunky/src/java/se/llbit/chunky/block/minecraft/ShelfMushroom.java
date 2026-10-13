@@ -10,7 +10,7 @@ public class ShelfMushroom extends AbstractModelBlock {
   public ShelfMushroom(String name, Texture texture, String facing, int age) {
     super(name, texture);
     solid = false;
-    this.description = String.format("facing=%s", facing);
+    this.description = String.format("facing=%s, age=%d", facing, age);
     this.model = new ShelfMushroomModel(texture, facing, age);
   }
 
