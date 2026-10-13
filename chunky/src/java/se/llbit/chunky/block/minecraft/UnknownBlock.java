@@ -18,6 +18,7 @@
 
 package se.llbit.chunky.block.minecraft;
 
+import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
@@ -36,7 +37,7 @@ public class UnknownBlock extends SpriteBlock {
   public UnknownBlock(String name, Tag tag) {
     super(name, Texture.unknown);
     StringBuilder descriptionBuilder = new StringBuilder();
-    for (NamedTag property : tag.get("Properties").asCompound()) {
+    for (NamedTag property : BlockSpec.getPropertiesTag(tag).asCompound()) {
       if (!descriptionBuilder.isEmpty()) {
         descriptionBuilder.append(", ");
       }

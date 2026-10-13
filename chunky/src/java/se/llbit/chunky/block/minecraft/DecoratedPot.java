@@ -19,6 +19,7 @@
 package se.llbit.chunky.block.minecraft;
 
 import se.llbit.chunky.block.AbstractModelBlock;
+import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.model.minecraft.DecoratedPotModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.entity.Entity;
@@ -71,11 +72,11 @@ public class DecoratedPot extends AbstractModelBlock {
     CompoundTag newBlockTag = new CompoundTag();
     // create a copy of the block tag
     StreamSupport.stream(blockTag.asCompound().spliterator(), false)
-      .filter(namedTag -> !namedTag.name.equals("Properties"))
+      .filter(namedTag -> !namedTag.name.equalsIgnoreCase("Properties"))
       .forEach(newBlockTag::add);
     CompoundTag properties = new CompoundTag();
     newBlockTag.add("Properties", properties); // because set is not implemented
-    blockTag.get("Properties").asCompound().iterator().forEachRemaining(properties::add);
+    BlockSpec.getPropertiesTag(blockTag).asCompound().iterator().forEachRemaining(properties::add);
 
     properties.add("blockEntity#sherds", entityTag.get("sherds").asList());
     properties.add("chunky#debugCoordinates", new StringTag(

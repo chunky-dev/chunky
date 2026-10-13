@@ -15,7 +15,7 @@ public interface BlockProvider {
   Collection<String> getSupportedBlocks();
 
   static String facing(Tag tag, String defaultValue) {
-    return tag.get("Properties").get("facing").stringValue(defaultValue);
+    return BlockSpec.getPropertiesTag(tag).get("facing").stringValue(defaultValue);
   }
 
   static String facing(Tag tag) {
@@ -51,7 +51,20 @@ public interface BlockProvider {
   }
 
   static String blockName(Tag tag) {
-    String name = tag.get("Name").stringValue();
+    // See BlockSpec#toBlock for why this is needed.
+    String name;
+    if (tag instanceof StringTag) {
+      name = tag.stringValue();
+    } else {
+      Tag idTag = tag.get("Name");
+      if (idTag.isError()) {
+        idTag = tag.get("id");
+      }
+      if (idTag.isError()) {
+        idTag = tag.get("");
+      }
+      name = idTag.stringValue();
+    }
     if (name.startsWith("minecraft:")) {
       name = name.substring(10); // Remove "minecraft:" prefix.
     }

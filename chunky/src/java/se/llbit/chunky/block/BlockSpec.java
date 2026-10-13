@@ -8,6 +8,8 @@ import java.util.List;
 
 import se.llbit.chunky.block.minecraft.UnknownBlock;
 import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.SpecificTag;
+import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.NbtUtil;
 import se.llbit.util.annotation.NotNull;
@@ -48,7 +50,24 @@ public class BlockSpec {
    * Converts NBT block data to Chunky block object.
    */
   public Block toBlock() {
-    String name = tag.get("Name").stringValue("unknown:unknown");
+    // Versions before 26.3 snapshot 7 used "Name" for the block name and "Properties" for the block state data.
+    // Versions 26.3 snapshot 7 and following use a StringTag for a block with default block state information, or
+    // a CompoundTag containing a NamedTag with an empty name to store the block name if the block is in a list with
+    // other CompundTags. If the block has non-default block state data, then "id" is used for the block name, and
+    // "properties" is used for the block state information.
+    String name;
+    if (tag instanceof StringTag) {
+      name = tag.stringValue("unknown:unknown");
+    } else {
+      Tag idTag = tag.get("Name");
+      if (idTag.isError()) {
+        idTag = tag.get("id");
+      }
+      if (idTag.isError()) {
+        idTag = tag.get("");
+      }
+      name = idTag.stringValue("unknown:unknown");
+    }
     for (BlockProvider provider : blockProviders) {
       Block block = provider.getBlockByTag(name, tag);
       if (block != null) {
@@ -59,7 +78,7 @@ public class BlockSpec {
   }
 
   private Block maybeWaterlogged(Block block) {
-    if (tag.get("Properties").get("waterlogged").stringValue("").equals("true")) {
+    if (getPropertiesTag(tag).get("waterlogged").stringValue("").equals("true")) {
       return block.applyWaterlogging();
     }
     return block;
@@ -67,5 +86,13 @@ public class BlockSpec {
 
   public Tag getTag() {
     return tag;
+  }
+
+  public static Tag getPropertiesTag(Tag tag) {
+    Tag properties = tag.get("properties");
+    if (properties.isError()) {
+      return tag.get("Properties");
+    }
+    return properties;
   }
 }

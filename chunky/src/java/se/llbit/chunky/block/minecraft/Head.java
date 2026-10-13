@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.block.minecraft;
 
+import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.HeadEntity;
@@ -98,7 +99,7 @@ public class Head extends MinecraftBlockTranslucent {
       ownerTag = entityTag.get("SkullOwner"); // used by player heads (1.20 or earlier)
     }
     if (ownerTag.isCompoundTag()) {
-      String textureBase64 = ownerTag.get("Properties").get("textures").get(0)
+      String textureBase64 = BlockSpec.getPropertiesTag(ownerTag).get("textures").get(0)
         .get("Value").stringValue();
       if (!textureBase64.isEmpty()) {
         return MinecraftSkin.getSkinFromEncodedTextures(textureBase64).map(MinecraftSkin::getSkinUrl).orElse(null);
