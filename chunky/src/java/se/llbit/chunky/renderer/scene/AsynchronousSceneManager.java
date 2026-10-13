@@ -26,6 +26,7 @@ import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.RegionPosition;
 import se.llbit.chunky.world.World;
 import se.llbit.log.Log;
+import se.llbit.util.concurrent.ChunkyThread;
 import se.llbit.util.TaskTracker;
 
 import java.io.File;
@@ -41,7 +42,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class AsynchronousSceneManager extends Thread implements SceneManager {
+public class AsynchronousSceneManager extends ChunkyThread implements SceneManager {
 
   private final SynchronousSceneManager sceneManager;
   private final LinkedBlockingQueue<Runnable> taskQueue;

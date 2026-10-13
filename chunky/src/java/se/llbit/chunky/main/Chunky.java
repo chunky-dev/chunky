@@ -48,6 +48,7 @@ import se.llbit.log.Level;
 import se.llbit.log.Log;
 import se.llbit.log.Receiver;
 import se.llbit.util.TaskTracker;
+import se.llbit.util.concurrent.ChunkyThread;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -56,6 +57,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -211,9 +213,8 @@ public class Chunky {
       System.exit(1);
     }
 
-    int exitCode = 0;
     if (cmdline.mode == CommandLineOptions.Mode.CLI_OPERATION) {
-      exitCode = cmdline.exitCode;
+      System.exit(cmdline.exitCode);
     } else {
       // Initialize the common thread pool.
       getCommonThreads();
@@ -222,6 +223,14 @@ public class Chunky {
       chunky.headless = cmdline.mode == Mode.HEADLESS_RENDER || cmdline.mode == Mode.CREATE_SNAPSHOT;
       chunky.loadPlugins();
 
+      Runtime.getRuntime().addShutdownHook(
+        new Thread(() -> { // intentionally not a ChunkyThread
+          // Within a shutdown hook we need to close quickly, otherwise we  risk the user/OS escalating to KILL
+          chunky.shutdown(1, TimeUnit.SECONDS);
+        })
+      );
+
+      int exitCode = 0;
       try {
         switch (cmdline.mode) {
           case HEADLESS_RENDER:
@@ -240,9 +249,16 @@ public class Chunky {
         Log.error("Unchecked exception caused Chunky to close.", t);
         exitCode = 2;
       }
-    }
-    if (exitCode != 0) {
+      chunky.shutdown(5, TimeUnit.SECONDS);
+      // Always exit, we've done all shutdown necessary and want to exit whether non-daemon threads exist or not.
+      // This should prevent hangs if threads aren't cooperating.
       System.exit(exitCode);
+    }
+  }
+
+  private void shutdown(int timeout, TimeUnit unit) {
+    if (!ChunkyThread.interruptAndJoinAll(timeout, unit)) {
+      Log.error("Not all threads were joined before shutting down."); // FIXME: list all alive threads? ThreadGroups are annoying.
     }
   }
 
@@ -342,7 +358,7 @@ public class Chunky {
   public static ForkJoinPool getCommonThreads() {
     if (commonThreads == null) {
       // use at least two threads to prevent deadlocks in some java versions (see #1631)
-      commonThreads = new ForkJoinPool(Math.max(PersistentSettings.getNumThreads(), 2));
+      commonThreads = ChunkyThread.addForkJoinPool(new ForkJoinPool(Math.max(PersistentSettings.getNumThreads(), 2)));
     }
     return commonThreads;
   }
@@ -353,7 +369,7 @@ public class Chunky {
    */
   public static void setCommonThreadsCount(int threads) {
     ForkJoinPool t = getCommonThreads();
-    commonThreads = new ForkJoinPool(threads);
+    commonThreads = ChunkyThread.addForkJoinPool(new ForkJoinPool(threads));
     t.shutdown();
   }
 
