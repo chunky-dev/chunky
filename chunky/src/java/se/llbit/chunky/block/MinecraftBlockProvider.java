@@ -1143,7 +1143,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("pale_oak_planks", Texture.paleOakPlanks);
     addBlock("pale_oak_slab", (name, tag) -> slab(tag, Texture.paleOakPlanks));
     addBlock("pale_oak_stairs", (name, tag) -> stairs(tag, Texture.paleOakPlanks));
-    addBlock("pale_oak_pressure_plate", (name, tag) -> pressurePlate(tag, Texture.sprucePlanks));
+    addBlock("pale_oak_pressure_plate", (name, tag) -> pressurePlate(tag, Texture.paleOakPlanks));
     addBlock("pale_oak_fence", (name, tag) -> fence(tag, Texture.paleOakPlanks));
     addBlock("pale_oak_fence_gate", (name, tag) -> fenceGate(tag, Texture.paleOakPlanks));
     addBlock("pale_oak_trapdoor", (name, tag) -> orientableTrapdoor(tag, Texture.paleOakTrapdoor));
@@ -1297,6 +1297,70 @@ public class MinecraftBlockProvider implements BlockProvider {
         propertiesTag.get("thickness").stringValue("tip"),
         propertiesTag.get("vertical_direction").stringValue("up"));
     });
+
+    // 26.3 Wilderness Bound
+    addBlock("poplar_sapling", (name, tag) -> new SpriteBlock(name, Texture.poplarSapling));
+    addBlock("potted_poplar_sapling", (name, tag) -> new FlowerPot(name, FlowerPotModel.Kind.POPLAR_SAPLING));
+    addBlock("red_poplar_leaves", (name, tag) -> new UntintedLeaves(name, Texture.redPoplarLeaves));
+    addBlock("orange_poplar_leaves", (name, tag) -> new UntintedLeaves(name, Texture.orangePoplarLeaves));
+    addBlock("yellow_poplar_leaves", (name, tag) -> new UntintedLeaves(name, Texture.yellowPoplarLeaves));
+    addBlock("poplar_log", (name, tag) -> log(tag, Texture.poplarLog, Texture.poplarLogTop));
+    addBlock("stripped_poplar_log", (name, tag) -> log(tag, Texture.strippedPoplarLog, Texture.strippedPoplarLogTop));
+    addBlock("poplar_wood", (name, tag) -> log(tag, Texture.poplarLog, Texture.poplarLog));
+    addBlock("stripped_poplar_wood", (name, tag) -> log(tag, Texture.strippedPoplarLog, Texture.strippedPoplarLog));
+    addBlock("poplar_planks", Texture.poplarPlanks);
+    addBlock("poplar_stairs", (name, tag) -> stairs(tag, Texture.poplarPlanks));
+    addBlock("poplar_slab", (name, tag) -> slab(tag, Texture.poplarPlanks));
+    addBlock("poplar_sign", (name, tag) -> sign(tag, "poplar"));
+    addBlock("poplar_wall_sign", (name, tag) -> wallSign(tag, "poplar"));
+    addBlock("poplar_hanging_sign", (name, tag) -> hangingSign(tag, "poplar"));
+    addBlock("poplar_wall_hanging_sign", (name, tag) -> wallHangingSign(tag, "poplar"));
+    addBlock("poplar_button", (name, tag) -> button(tag, Texture.poplarPlanks));
+    addBlock("poplar_pressure_plate", (name, tag) -> pressurePlate(tag, Texture.poplarPlanks));
+    addBlock("poplar_door", (name, tag) -> door(tag, Texture.poplarDoorTop, Texture.poplarDoorBottom));
+    addBlock("poplar_fence", (name, tag) -> fence(tag, Texture.poplarPlanks));
+    addBlock("poplar_fence_gate", (name, tag) -> fenceGate(tag, Texture.poplarPlanks));
+    addBlock("poplar_trapdoor", (name, tag) -> orientableTrapdoor(tag, Texture.poplarTrapdoor));
+    addBlock("poplar_shelf", (name, tag) -> shelf(tag, Texture.poplarShelf));
+    addBlock("red_shrub", (name, tag) -> new SpriteBlock(name, Texture.redShrub));
+    addBlock("shelf_mushroom", (name, tag) -> {
+      Tag propertiesTag = BlockSpec.getPropertiesTag(tag);
+      int age = BlockProvider.stringToInt(propertiesTag.get("age"), 0);
+      return new ShelfMushroom(name, BlockProvider.facing(tag), age);
+    });
+    addBlock("white_wool_stairs", (name, tag) -> stairs(tag, Texture.whiteWool));
+    addBlock("light_gray_wool_stairs", (name, tag) -> stairs(tag, Texture.lightGrayWool));
+    addBlock("gray_wool_stairs", (name, tag) -> stairs(tag, Texture.grayWool));
+    addBlock("black_wool_stairs", (name, tag) -> stairs(tag, Texture.blackWool));
+    addBlock("brown_wool_stairs", (name, tag) -> stairs(tag, Texture.brownWool));
+    addBlock("red_wool_stairs", (name, tag) -> stairs(tag, Texture.redWool));
+    addBlock("orange_wool_stairs", (name, tag) -> stairs(tag, Texture.orangeWool));
+    addBlock("yellow_wool_stairs", (name, tag) -> stairs(tag, Texture.yellowWool));
+    addBlock("lime_wool_stairs", (name, tag) -> stairs(tag, Texture.limeWool));
+    addBlock("green_wool_stairs", (name, tag) -> stairs(tag, Texture.greenWool));
+    addBlock("cyan_wool_stairs", (name, tag) -> stairs(tag, Texture.cyanWool));
+    addBlock("light_blue_wool_stairs", (name, tag) -> stairs(tag, Texture.lightBlueWool));
+    addBlock("blue_wool_stairs", (name, tag) -> stairs(tag, Texture.blueWool));
+    addBlock("purple_wool_stairs", (name, tag) -> stairs(tag, Texture.purpleWool));
+    addBlock("magenta_wool_stairs", (name, tag) -> stairs(tag, Texture.magentaWool));
+    addBlock("pink_wool_stairs", (name, tag) -> stairs(tag, Texture.pinkWool));
+
+    addBlock("white_wool_slab", (name, tag) -> slab(tag, Texture.whiteWool));
+    addBlock("light_gray_wool_slab", (name, tag) -> slab(tag, Texture.lightGrayWool));
+    addBlock("gray_wool_slab", (name, tag) -> slab(tag, Texture.grayWool));
+    addBlock("black_wool_slab", (name, tag) -> slab(tag, Texture.blackWool));
+    addBlock("brown_wool_slab", (name, tag) -> slab(tag, Texture.brownWool));
+    addBlock("red_wool_slab", (name, tag) -> slab(tag, Texture.redWool));
+    addBlock("orange_wool_slab", (name, tag) -> slab(tag, Texture.orangeWool));
+    addBlock("yellow_wool_slab", (name, tag) -> slab(tag, Texture.yellowWool));
+    addBlock("lime_wool_slab", (name, tag) -> slab(tag, Texture.limeWool));
+    addBlock("green_wool_slab", (name, tag) -> slab(tag, Texture.greenWool));
+    addBlock("cyan_wool_slab", (name, tag) -> slab(tag, Texture.cyanWool));
+    addBlock("light_blue_wool_slab", (name, tag) -> slab(tag, Texture.lightBlueWool));
+    addBlock("blue_wool_slab", (name, tag) -> slab(tag, Texture.blueWool));
+    addBlock("purple_wool_slab", (name, tag) -> slab(tag, Texture.purpleWool));
+    addBlock("magenta_wool_slab", (name, tag) -> slab(tag, Texture.magentaWool));
+    addBlock("pink_wool_slab", (name, tag) -> slab(tag, Texture.pinkWool));
   }
 
   @Override

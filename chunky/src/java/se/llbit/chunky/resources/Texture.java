@@ -1759,6 +1759,42 @@ public class Texture {
   @TexturePath("assets/minecraft/textures/block/sulfur_spike_up_tip_merge")
   public static final Texture sulfurSpikeUpTipMerge = new Texture();
 
+  // [26.3 (Wilderness Bound)]
+  @TexturePath("assets/minecraft/textures/block/poplar_sapling")
+  public static final Texture poplarSapling = new Texture();
+  @TexturePath("assets/minecraft/textures/block/red_poplar_leaves")
+  public static final Texture redPoplarLeaves = new Texture();
+  @TexturePath("assets/minecraft/textures/block/orange_poplar_leaves")
+  public static final Texture orangePoplarLeaves = new Texture();
+  @TexturePath("assets/minecraft/textures/block/yellow_poplar_leaves")
+  public static final Texture yellowPoplarLeaves = new Texture();
+  @TexturePath("assets/minecraft/textures/block/poplar_log")
+  public static final Texture poplarLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/poplar_log_top")
+  public static final Texture poplarLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_poplar_log")
+  public static final Texture strippedPoplarLog = new Texture();
+  @TexturePath("assets/minecraft/textures/block/stripped_poplar_log_top")
+  public static final Texture strippedPoplarLogTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/poplar_planks")
+  public static final Texture poplarPlanks = new Texture();
+  public static final Texture poplarSignPost = new Texture();
+  public static final Texture poplarHangingSign = new Texture();
+  @TexturePath("assets/minecraft/textures/block/poplar_door_top")
+  public static final Texture poplarDoorTop = new Texture();
+  @TexturePath("assets/minecraft/textures/block/poplar_door_bottom")
+  public static final Texture poplarDoorBottom = new Texture();
+  @TexturePath("assets/minecraft/textures/block/poplar_trapdoor")
+  public static final Texture poplarTrapdoor = new Texture();
+  @TexturePath("assets/minecraft/textures/block/poplar_shelf")
+  public static final Texture poplarShelf = new Texture();
+  @TexturePath("assets/minecraft/textures/block/red_shrub")
+  public static final Texture redShrub = new Texture();
+  @TexturePath("assets/minecraft/textures/block/shelf_mushroom_stage0")
+  public static final Texture shelfMushroomStage0 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/shelf_mushroom_stage1")
+  public static final Texture shelfMushroomStage1 = new Texture();
+
   @TexturePath("assets/minecraft/textures/entity/equipment/wings/elytra")
   public static final Texture elytra = new Texture();
 
