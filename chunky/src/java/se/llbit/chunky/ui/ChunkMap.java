@@ -19,22 +19,16 @@ package se.llbit.chunky.ui;
 
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.MenuItem;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.GridPane;
 import javafx.stage.PopupWindow;
 import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.MapView;
@@ -45,11 +39,10 @@ import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
 import se.llbit.chunky.ui.dialogs.SelectChunksInRadiusDialog;
-import se.llbit.chunky.ui.elements.TextFieldLabelWrapper;
 import se.llbit.chunky.world.*;
 import se.llbit.chunky.world.Dimension;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
-import se.llbit.chunky.world.region.MCRegion;
+import se.llbit.chunky.world.region.Region;
 import se.llbit.log.Log;
 import se.llbit.math.*;
 
@@ -57,7 +50,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -227,8 +219,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     if (view.chunkScale >= 16) {
       int minChunkX = region.x << 5;
       int minChunkZ = region.z << 5;
-      for (int chunkX = minChunkX; chunkX < minChunkX + MCRegion.CHUNKS_X; chunkX++) {
-        for (int chunkZ = minChunkZ; chunkZ < minChunkZ + MCRegion.CHUNKS_Z; chunkZ++) {
+      for (int chunkX = minChunkX; chunkX < minChunkX + Region.CHUNKS_X; chunkX++) {
+        for (int chunkZ = minChunkZ; chunkZ < minChunkZ + Region.CHUNKS_Z; chunkZ++) {
           mapBuffer.drawTile(mapLoader, new ChunkPosition(chunkX, chunkZ), chunkSelection);
         }
       }
@@ -596,18 +588,16 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     World world = mapLoader.getWorld();
     double blockScale = mapView.scale / 16.;
     for (PlayerEntityData player : world.currentDimension().getPlayerPositions()) {
-      if (player.dimension.equals(world.currentDimension().getDimensionId())) {
-        int px = (int) QuickMath.floor(player.x * blockScale);
-        int py = (int) QuickMath.floor(player.y);
-        int pz = (int) QuickMath.floor(player.z * blockScale);
-        int ppx = px - (int) QuickMath.floor(mapView.x0 * mapView.scale);
-        int ppy = pz - (int) QuickMath.floor(mapView.z0 * mapView.scale);
-        int pw = (int) QuickMath.max(16, QuickMath.min(32, blockScale * 4));
-        ppx = Math.min(mapView.width - pw, Math.max(0, ppx - pw / 2));
-        ppy = Math.min(mapView.height - pw, Math.max(0, ppy - pw / 2));
+      int px = (int) QuickMath.floor(player.x * blockScale);
+      int py = (int) QuickMath.floor(player.y);
+      int pz = (int) QuickMath.floor(player.z * blockScale);
+      int ppx = px - (int) QuickMath.floor(mapView.x0 * mapView.scale);
+      int ppy = pz - (int) QuickMath.floor(mapView.z0 * mapView.scale);
+      int pw = (int) QuickMath.max(16, QuickMath.min(32, blockScale * 4));
+      ppx = Math.min(mapView.width - pw, Math.max(0, ppx - pw / 2));
+      ppy = Math.min(mapView.height - pw, Math.max(0, ppy - pw / 2));
 
-        gc.drawImage(Icon.player.fxImage(), ppx, ppy, pw, pw);
-      }
+      gc.drawImage(Icon.player.fxImage(), ppx, ppy, pw, pw);
     }
   }
 

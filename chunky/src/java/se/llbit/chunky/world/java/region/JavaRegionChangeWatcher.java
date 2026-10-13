@@ -14,24 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.world.region;
+package se.llbit.chunky.world.java.region;
 
 import javafx.application.Platform;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
-import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.Dimension;
+import se.llbit.chunky.world.HeightRange;
 import se.llbit.chunky.world.RegionPosition;
+import se.llbit.chunky.world.java.JavaDimension;
+import se.llbit.chunky.world.region.Region;
+import se.llbit.chunky.world.region.RegionChangeWatcher;
 
 /**
  * Monitors filesystem for changes to region files.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class MCRegionChangeWatcher extends RegionChangeWatcher {
-  public MCRegionChangeWatcher(WorldMapLoader loader, MapView mapView) {
+public class JavaRegionChangeWatcher extends RegionChangeWatcher {
+  public JavaRegionChangeWatcher(WorldMapLoader loader, MapView mapView) {
     super(loader, mapView, "Region Refresher");
   }
 
@@ -39,7 +41,8 @@ public class MCRegionChangeWatcher extends RegionChangeWatcher {
     try {
       while (!isInterrupted()) {
         sleep(3000);
-        Dimension dimension = mapLoader.getWorld().currentDimension();
+        // RegionChangeWatcher is only created by JavaDimension, so this cast is always safe.
+        JavaDimension dimension = (JavaDimension) mapLoader.getWorld().currentDimension();
         if (dimension.reloadPlayerData()) {
           if (PersistentSettings.getFollowPlayer()) {
             Platform.runLater(() -> dimension.getPlayerPos().ifPresent(mapView::panTo));
@@ -49,9 +52,10 @@ public class MCRegionChangeWatcher extends RegionChangeWatcher {
         for (int rx = theView.prx0; rx <= theView.prx1; ++rx) {
           for (int rz = theView.prz0; rz <= theView.prz1; ++rz) {
             RegionPosition pos = new RegionPosition(rx, rz);
-            Region region = dimension.getRegionWithinRange(pos, theView.yMin, theView.yMax);
+            HeightRange heightRange = new HeightRange(theView.yMin, theView.yMax);
+            Region region = dimension.getRegionWithinRange(pos, heightRange);
             if (region.isEmpty()) {
-              if (dimension.regionExistsWithinRange(pos, theView.yMin, theView.yMax)) {
+              if (dimension.hasRegionWithinRange(pos, heightRange)) {
                 region = dimension.createRegion(pos);
               }
               dimension.setRegion(pos, region);

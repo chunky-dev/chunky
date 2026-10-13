@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.ui.render.tabs;
 
+import it.unimi.dsi.fastutil.ints.IntIntPair;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
@@ -47,6 +48,7 @@ import se.llbit.chunky.ui.dialogs.SettingsExport;
 import se.llbit.chunky.ui.elements.SizeInput;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.world.EmptyWorld;
+import se.llbit.chunky.world.HeightRange;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
 import se.llbit.fxutil.Dialogs;
@@ -592,12 +594,14 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   }
 
   private void updateYClipSlidersRanges(World world) {
-    if (world != null && world.getVersionId() >= World.VERSION_21W06A) {
-      yMin.setRange(-64, 320);
-      yMax.setRange(-64, 320);
-    } else {
-      yMin.setRange(0, 256);
-      yMax.setRange(0, 256);
+    if (world != null) {
+      HeightRange heightRange = world.currentDimension().heightRange();
+      int min = heightRange.min();
+      int max = heightRange.max();
+      yMin.setRange(min, max);
+      yMin.set(min);
+      yMax.setRange(min, max);
+      yMax.set(max);
     }
   }
 }

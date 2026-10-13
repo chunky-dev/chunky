@@ -93,7 +93,7 @@ public class PlayerEntityData {
     }
   }
 
-  static UUID getUuid(Tag playerTag) {
+  public static UUID getUuid(Tag playerTag) {
     final UUID uuid;
     long uuidHi;
     long uuidLo;
