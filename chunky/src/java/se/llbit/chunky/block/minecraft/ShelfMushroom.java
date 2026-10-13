@@ -7,11 +7,11 @@ import se.llbit.chunky.resources.Texture;
 public class ShelfMushroom extends AbstractModelBlock {
   private final String description;
 
-  public ShelfMushroom(String name, Texture texture, String facing, int age) {
-    super(name, texture);
+  public ShelfMushroom(String name, String facing, int age) {
+    super(name, Texture.shelfMushroomStage1);
     solid = false;
     this.description = String.format("facing=%s, age=%d", facing, age);
-    this.model = new ShelfMushroomModel(texture, facing, age);
+    this.model = new ShelfMushroomModel(facing, age);
   }
 
   @Override

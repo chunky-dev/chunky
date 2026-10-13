@@ -1326,8 +1326,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("shelf_mushroom", (name, tag) -> {
       Tag propertiesTag = BlockSpec.getPropertiesTag(tag);
       int age = BlockProvider.stringToInt(propertiesTag.get("age"), 0);
-      Texture texture = (age == 1) ? Texture.shelfMushroomStage1 : Texture.shelfMushroomStage0;
-      return new ShelfMushroom(name, texture, BlockProvider.facing(tag), age);
+      return new ShelfMushroom(name, BlockProvider.facing(tag), age);
     });
     addBlock("white_wool_stairs", (name, tag) -> stairs(tag, Texture.whiteWool));
     addBlock("light_gray_wool_stairs", (name, tag) -> stairs(tag, Texture.lightGrayWool));

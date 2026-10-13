@@ -171,7 +171,7 @@ public class ShelfMushroomModel extends QuadModel {
   private final Quad[] quads;
   private final Texture[] textures;
 
-  public ShelfMushroomModel(Texture texture, String facing, int age) {
+  public ShelfMushroomModel(String facing, int age) {
     switch (facing) {
       case "east" -> quads = Model.rotateY(mushroom[age], FastMath.toRadians(-90));
       case "south" -> quads = Model.rotateY(mushroom[age], FastMath.toRadians(180));
@@ -180,7 +180,7 @@ public class ShelfMushroomModel extends QuadModel {
     }
 
     textures = new Texture[quads.length];
-    Arrays.fill(textures, texture);
+    Arrays.fill(textures, age == 1 ? Texture.shelfMushroomStage1 : Texture.shelfMushroomStage0);
   }
 
   @Override
