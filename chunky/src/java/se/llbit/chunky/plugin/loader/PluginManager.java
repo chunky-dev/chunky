@@ -16,9 +16,11 @@
  */
 package se.llbit.chunky.plugin.loader;
 
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.Plugin;
 import se.llbit.chunky.plugin.manifest.PluginDependency;
 import se.llbit.chunky.plugin.manifest.PluginManifest;
+import se.llbit.json.JsonArray;
 import se.llbit.json.JsonParser;
 import se.llbit.log.Log;
 
@@ -31,19 +33,75 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class PluginManager {
-  private static final int MAX_CYCLES = Integer.parseInt(System.getProperty("chunky.plugins.maxLoadCycles", "100"));
-
   private final PluginLoader pluginLoader;
+  private final LinkedList<PluginEntry> plugins = new LinkedList<>();
+  private final AtomicBoolean isShutdown = new AtomicBoolean(false);
 
   public PluginManager(PluginLoader pluginLoader) {
     this.pluginLoader = pluginLoader;
   }
 
-  public void load(Set<PluginManifest> pluginManifests, BiConsumer<Plugin, PluginManifest> onLoad) {
+  public void loadPluginsFromDirectory(File pluginsDirectory, BiConsumer<Plugin, PluginManifest> onLoad) {
+    if (!pluginsDirectory.isDirectory()) {
+      Log.infof("Plugins directory does not exist: %s", pluginsDirectory.getAbsolutePath());
+      return;
+    }
+    Path pluginsPath = pluginsDirectory.toPath();
+    JsonArray plugins = PersistentSettings.getPlugins();
+    // TODO: allow plugins to implement a custom plugin loader?.
+
+    // Parse plugin manifests
+    Set<PluginManifest> pluginManifests = plugins.elements.stream()
+      .map(value -> value.asString(""))
+      .filter(jarName -> !jarName.isEmpty())
+      .map(jarName -> pluginsPath.resolve(jarName).toAbsolutePath().toFile())
+      .map(PluginManager::parsePluginManifest)
+      .flatMap(Optional::stream)
+      .collect(Collectors.toSet());
+
+    loadPlugins(pluginManifests, onLoad);
+  }
+
+  public void loadPlugins(Set<PluginManifest> pluginManifests, BiConsumer<Plugin, PluginManifest> onLoad) {
+    // Load plugins
+    this.load(pluginManifests, (plugin, manifest) -> {
+      String jarName = manifest.pluginJar.getName();
+      Log.infof("Loading plugin: %s", jarName);
+      try {
+        onLoad.accept(plugin, manifest);
+      } catch (Throwable t) {
+        Log.error("Plugin " + jarName + " failed to load.", t);
+      }
+      Log.infof("Plugin loaded: %s %s", manifest.name, manifest.version);
+    });
+  }
+
+  /**
+   * Calls shutdown on every plugin.
+   * <p>Has no effect if already shutdown.</p>
+   */
+  public void shutdownPlugins(Consumer<Plugin> onShutdown) {
+    if (this.isShutdown.getAndSet(true)) {
+      return;
+    }
+
+    // Iterates backwards to shut down plugins in the reverse of the order they were attached
+    this.plugins.descendingIterator().forEachRemaining(plugin -> {
+      try {
+        onShutdown.accept(plugin.plugin);
+      } catch (Throwable t) {
+        Log.error(String.format("The plugin %s threw when shutting down", plugin.manifest.name), t);
+      }
+    });
+  }
+
+  private void load(Set<PluginManifest> pluginManifests, BiConsumer<Plugin, PluginManifest> onLoad) {
     // create plugin objects
     Map<String, List<ResolvedPlugin>> pluginsByName = new HashMap<>();
     pluginManifests.forEach(manifest -> {
@@ -64,33 +122,38 @@ public class PluginManager {
     Set<ResolvedPlugin> pluginsToLoad = pluginsByName.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
     pluginsToLoad.forEach(plugin -> plugin.resolveDependencies(pluginsByName));
 
-    // load plugins in dependency-first order, cyclic dependencies will never be loaded and will hit MAX_CYCLES cap.
-    // this was so trivial to implement using cycles that I decided against any kind of dependency tree structure,
-    // in the worst case this approach requires one cycle per plugin (if every plugin depended on the previous one in the list).
+    int maxCycles = pluginsToLoad.size();
+    // Load plugins in dependency-first order, cyclic dependencies will never be loaded and will hit the maxCycles cap.
+    // This was so trivial to implement using cycles that I decided against any kind of dependency tree structure.
+    // In the worst case this approach requires one cycle per plugin (if every plugin depended on the previous one in the list).
     Set<ResolvedPlugin> loadedPlugins = new HashSet<>();
     int loadCycles = 0;
-    while (!pluginsToLoad.isEmpty() && loadCycles < MAX_CYCLES) {
+    while (!pluginsToLoad.isEmpty() && loadCycles < maxCycles) {
       Log.infof("Cycle %d", loadCycles);
       loadCycles++;
-      // new list to avoid CME due to removing inside iteration.
-      new ArrayList<>(pluginsToLoad).forEach(plugin -> {
+      for (Iterator<ResolvedPlugin> iterator = pluginsToLoad.iterator(); iterator.hasNext(); ) {
+        ResolvedPlugin plugin = iterator.next();
         if (plugin.allDependenciesLoaded(loadedPlugins)) {
           loadedPlugins.add(plugin);
-          pluginsToLoad.remove(plugin);
+          iterator.remove();
           Log.infof("  Loading plugin %s with deps { %s }, resolved { %s }%n", plugin,
             plugin.getManifest().getDependencies().stream().map(PluginDependency::toString).collect(Collectors.joining(", ")),
             plugin.getDependencies().stream().map(ResolvedPlugin::toString).collect(Collectors.joining(", "))
           );
-          pluginLoader.load(onLoad, plugin.getManifest());
+          pluginLoader.load((loadedPlugin, manifest) -> {
+            this.plugins.add(new PluginEntry(manifest, loadedPlugin));
+            onLoad.accept(loadedPlugin, manifest);
+          }, plugin.getManifest());
         }
-      });
+      }
     }
 
     // report if any unloaded plugins remain (their dependencies never got loaded)
     if (!pluginsToLoad.isEmpty()) {
       Log.errorf(
-        "Reached maximum cycles (%d) when loading plugins. Failed to load plugins: (%s)",
-        MAX_CYCLES,
+        "Reached maximum cycles %d when loading %d plugins. Failed to load plugins: (%s)",
+        maxCycles,
+        pluginManifests.size(),
         pluginsToLoad.stream().map(ResolvedPlugin::toString).collect(Collectors.joining(", "))
       );
     }
@@ -118,4 +181,6 @@ public class PluginManager {
     }
     return Optional.empty();
   }
+
+  private record PluginEntry(PluginManifest manifest, Plugin plugin) {}
 }
