@@ -1,7 +1,5 @@
 package se.llbit.chunky.world;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
@@ -17,13 +15,13 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
 import se.llbit.util.annotation.Nullable;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
  *
  */
-public class Dimension {
+public abstract class Dimension {
   public record Identifier(String namespace, String name) {
     public static Identifier OVERWORLD = new Identifier("minecraft", "overworld");
     public static Identifier THE_NETHER = new Identifier("minecraft", "the_nether");
@@ -63,77 +61,52 @@ public class Dimension {
     }
   }
 
-  private final World world;
+  protected final Path dimensionDirectory;
 
-  protected final Long2ObjectMap<Region> regionMap = new Long2ObjectOpenHashMap<>();
+  protected final Heightmap heightmap = new Heightmap();
 
-  protected final File dimensionDirectory;
-  private Set<PlayerEntityData> playerEntities;
+  protected final Identifier dimensionId;
 
-  private final Heightmap heightmap = new Heightmap();
+  @Nullable protected final Vector3i spawnPos;
+  protected final Set<PlayerEntityData> playerEntities;
 
-  private final Identifier dimensionId;
-
-  private final Collection<ChunkDeletionListener> chunkDeletionListeners = new LinkedList<>();
-  private final Collection<ChunkTopographyListener> chunkTopographyListeners = new LinkedList<>();
-  private final Collection<ChunkUpdateListener> chunkUpdateListeners = new LinkedList<>();
-
-  private Vector3i spawnPos = null;
+  protected final Collection<ChunkDeletionListener> chunkDeletionListeners = new LinkedList<>();
+  protected final Collection<ChunkTopographyListener> chunkTopographyListeners = new LinkedList<>();
+  protected final Collection<ChunkUpdateListener> chunkUpdateListeners = new LinkedList<>();
 
   /**
    * @param dimensionDirectory Minecraft world directory.
    */
-  protected Dimension(World world, Identifier dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities) {
-    this.world = world;
+  protected Dimension(Identifier dimensionId, Path dimensionDirectory, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
     this.dimensionId = dimensionId;
-    this.dimensionDirectory = dimensionDirectory;
     this.playerEntities = playerEntities;
+    this.dimensionDirectory = dimensionDirectory;
+    this.spawnPos = spawnPos;
   }
+
+  /**
+   * @return A user presentable name of the dimension
+   */
+  public abstract String getName();
 
   public Identifier getDimensionId() {
     return dimensionId;
   }
 
   /**
-   * Reload player data.
+   * Get the data directory for the given dimension.
+   * <p>This may be the same as the world directory for some dimensions</p>
    *
-   * @return {@code true} if player data was reloaded.
+   * @return The path to the dimension
    */
-  public synchronized boolean reloadPlayerData() {
-    return this.world.reloadPlayerData();
-  }
-
-  /**
-   * Add a chunk deletion listener.
-   */
-  public void addChunkDeletionListener(ChunkDeletionListener listener) {
-    synchronized (chunkDeletionListeners) {
-      chunkDeletionListeners.add(listener);
-    }
-  }
-
-  /**
-   * Add a region discovery listener.
-   */
-  public void addChunkUpdateListener(ChunkUpdateListener listener) {
-    synchronized (chunkUpdateListeners) {
-      chunkUpdateListeners.add(listener);
-    }
-  }
-
-  private void fireChunkDeleted(ChunkPosition chunk) {
-    synchronized (chunkDeletionListeners) {
-      for (ChunkDeletionListener listener : chunkDeletionListeners)
-        listener.chunkDeleted(chunk);
-    }
+  protected synchronized Path getDimensionPath() {
+    return dimensionDirectory;
   }
 
   /**
    * @return The chunk at the given position
    */
-  public synchronized Chunk getChunk(ChunkPosition pos) {
-    return getRegion(pos.getRegionPosition()).getChunk(pos);
-  }
+  public abstract Chunk getChunk(ChunkPosition pos);
 
   /**
    * Returns a ChunkData instance that is compatible with the given chunk version.
@@ -153,91 +126,39 @@ public class Dimension {
     return new GenericChunkData();
   }
 
-  public Region createRegion(RegionPosition pos) {
-    return new MCRegion(pos, this);
-  }
+  public abstract Region createRegion(RegionPosition pos);
 
-  public RegionChangeWatcher createRegionChangeWatcher(WorldMapLoader worldMapLoader, MapView mapView) {
-    return new MCRegionChangeWatcher(worldMapLoader, mapView);
-  }
+  public abstract RegionChangeWatcher createRegionChangeWatcher(WorldMapLoader worldMapLoader, MapView mapView);
 
   /**
    * @param pos Region position
    * @return The region at the given position
    */
-  public synchronized Region getRegion(RegionPosition pos) {
-    return regionMap.computeIfAbsent(pos.getLong(), p -> {
-      // check if the region is present in the world directory
-      Region region = EmptyRegion.instance;
-      if (regionExists(pos)) {
-        region = createRegion(pos);
-      }
-      return region;
-    });
-  }
+  public abstract Region getRegion(RegionPosition pos);
 
-  public Region getRegionWithinRange(RegionPosition pos, int yMin, int yMax) {
-    return getRegion(pos);
-  }
-
-  /**
-   * Set the region for the given position.
-   */
-  public synchronized void setRegion(RegionPosition pos, Region region) {
-    regionMap.put(pos.getLong(), region);
-  }
+  public abstract Region getRegionWithinRange(RegionPosition pos, HeightRange heightRange);
 
   /**
    * @param pos region position
    * @return {@code true} if a region file exists for the given position
    */
-  public boolean regionExists(RegionPosition pos) {
-    File regionFile = new File(getRegionDirectory(), pos.getMcaName());
-    return regionFile.exists();
-  }
+  public abstract boolean hasRegion(RegionPosition pos);
 
   /**
    * @param pos  Position of the region to load
-   * @param minY Minimum block Y (inclusive)
-   * @param maxY Maximum block Y (exclusive)
+   * @param heightRange The height range of the request
    * @return Whether the region exists
    */
-  public boolean regionExistsWithinRange(RegionPosition pos, int minY, int maxY) {
-    return this.regionExists(pos);
-  }
+  public abstract boolean hasRegionWithinRange(RegionPosition pos, HeightRange heightRange);
 
   /**
-   * Get the data directory for the given dimension.
+   * WARNING: In some dimensions this could be from {@link Integer#MIN_VALUE} to {@link Integer#MAX_VALUE}
+   * <p>
+   * Lower bound is inclusive, upper is exclusive
    *
-   * @return File object pointing to the data directory
+   * @return The height range of the dimension.
    */
-  protected synchronized File getDimensionDirectory() {
-    return dimensionDirectory;
-  }
-
-  /**
-   * @return File object pointing to the region file directory
-   */
-  public synchronized File getRegionDirectory() {
-    return new File(getDimensionDirectory(), "region");
-  }
-
-  /**
-   * Get the current player position as an optional vector.
-   *
-   * <p>The result is empty if this is not a single player world.
-   */
-  public synchronized Optional<Vector3> getPlayerPos() {
-    if (!playerEntities.isEmpty()) {
-      return world.getSingleplayerPlayerUuid()
-        .flatMap(uuid -> playerEntities.stream()
-          .filter(player -> player.uuid.equals(uuid))
-          .map(pos -> new Vector3(pos.x, pos.y, pos.z))
-          .findFirst());
-    } else {
-      return Optional.empty();
-    }
-  }
+  public abstract HeightRange heightRange();
 
   /**
    * @return The chunk heightmap
@@ -246,19 +167,77 @@ public class Dimension {
     return heightmap;
   }
 
+  public Optional<Vector3i> getSpawnPosition() {
+    return Optional.ofNullable(this.spawnPos);
+  }
+
   /**
-   * Called when a new region has been discovered by the region parser.
+   * Reload player data.
+   *
+   * @return {@code true} if player data was reloaded.
    */
-  public void regionDiscovered(RegionPosition pos) {
-    synchronized (this) {
-      regionMap.computeIfAbsent(pos.getLong(), p -> createRegion(pos));
+  public abstract boolean reloadPlayerData();
+
+  /**
+   * Get the current player position as an optional vector.
+   *
+   * <p>The result is empty if this is not a single player world.
+   */
+  public abstract Optional<Vector3> getPlayerPos();
+
+  /**
+   * Load entities from world the file.
+   * This is usually the single player entity in a local save.
+   */
+  public synchronized Collection<PlayerEntity> getPlayerEntities() {
+    Collection<PlayerEntity> list = new LinkedList<>();
+    if (PersistentSettings.getLoadPlayers()) {
+      for (PlayerEntityData data : playerEntities) {
+        list.add(new PlayerEntity(data));
+      }
+    }
+    return list;
+  }
+
+  public synchronized Collection<PlayerEntityData> getPlayerPositions() {
+    return Collections.unmodifiableSet(playerEntities);
+  }
+
+  /**
+   * Add a chunk deletion listener.
+   */
+  public void addChunkDeletionListener(ChunkDeletionListener listener) {
+    synchronized (chunkDeletionListeners) {
+      chunkDeletionListeners.add(listener);
     }
   }
 
   /**
-   * Notify region update listeners.
+   * Called when chunks have been deleted from this world.
+   * Triggers the chunk deletion listeners.
+   *
+   * @param pos Position of deleted chunk
    */
-  private void fireChunkUpdated(ChunkPosition chunk) {
+  public void chunkDeleted(ChunkPosition pos) {
+    synchronized (chunkDeletionListeners) {
+      for (ChunkDeletionListener listener : chunkDeletionListeners)
+        listener.chunkDeleted(pos);
+    }
+  }
+
+  /**
+   * Add a region discovery listener.
+   */
+  public void addChunkUpdateListener(ChunkUpdateListener listener) {
+    synchronized (chunkUpdateListeners) {
+      chunkUpdateListeners.add(listener);
+    }
+  }
+
+  /**
+   * Called when a chunk has been updated.
+   */
+  public void chunkUpdated(ChunkPosition chunk) {
     synchronized (chunkUpdateListeners) {
       for (ChunkUpdateListener listener : chunkUpdateListeners) {
         listener.chunkUpdated(chunk);
@@ -267,33 +246,14 @@ public class Dimension {
   }
 
   /**
-   * Notify region update listeners.
+   * Called when a chunk has been updated.
    */
-  private void fireRegionUpdated(RegionPosition region) {
+  public void regionUpdated(RegionPosition region) {
     synchronized (chunkUpdateListeners) {
       for (ChunkUpdateListener listener : chunkUpdateListeners) {
         listener.regionUpdated(region);
       }
     }
-  }
-
-  @Override
-  public String toString() {
-    return dimensionDirectory.getName();
-  }
-
-  /**
-   * Called when a chunk has been updated.
-   */
-  public void chunkUpdated(ChunkPosition chunk) {
-    fireChunkUpdated(chunk);
-  }
-
-  /**
-   * Called when a chunk has been updated.
-   */
-  public void regionUpdated(RegionPosition region) {
-    fireRegionUpdated(region);
   }
 
   /**
@@ -323,49 +283,5 @@ public class Dimension {
     for (ChunkTopographyListener listener : chunkTopographyListeners) {
       listener.chunksTopographyUpdated(chunk);
     }
-  }
-
-  public Optional<Vector3i> getSpawnPosition() {
-    return Optional.ofNullable(this.spawnPos);
-  }
-
-  public void setSpawnPos(@Nullable Vector3i spawnPos) {
-    this.spawnPos = spawnPos;
-  }
-
-  /**
-   * Called when chunks have been deleted from this world.
-   * Triggers the chunk deletion listeners.
-   *
-   * @param pos Position of deleted chunk
-   */
-  public void chunkDeleted(ChunkPosition pos) {
-    fireChunkDeleted(pos);
-  }
-
-  public Date getLastModified() {
-    return new Date(this.dimensionDirectory.lastModified());
-  }
-
-  /**
-   * Load entities from world the file.
-   * This is usually the single player entity in a local save.
-   */
-  public synchronized Collection<PlayerEntity> getPlayerEntities() {
-    Collection<PlayerEntity> list = new LinkedList<>();
-    if (PersistentSettings.getLoadPlayers()) {
-      for (PlayerEntityData data : playerEntities) {
-        list.add(new PlayerEntity(data));
-      }
-    }
-    return list;
-  }
-
-  public synchronized Collection<PlayerEntityData> getPlayerPositions() {
-    return Collections.unmodifiableSet(playerEntities);
-  }
-
-  public synchronized void setPlayerEntities(Set<PlayerEntityData> playerEntities) {
-    this.playerEntities = playerEntities;
   }
 }

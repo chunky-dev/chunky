@@ -31,11 +31,12 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.ResourcePackLoader;
-import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.TableSortConfigSerializer;
+import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Dimension;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.World;
+import se.llbit.chunky.world.worldformat.WorldFormats;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.json.JsonArray;
 import se.llbit.log.Log;
@@ -48,17 +49,17 @@ import java.util.*;
 public class WorldChooserController implements Initializable {
   @FXML private Label statusLabel;
 
-  @FXML private TableView<World> worldTbl;
+  @FXML private TableView<World.Info> worldTbl;
 
-  @FXML private TableColumn<World, String> worldNameCol;
+  @FXML private TableColumn<World.Info, String> worldNameCol;
 
-  @FXML private TableColumn<World, String> worldDirCol;
+  @FXML private TableColumn<World.Info, String> worldDirCol;
 
-  @FXML private TableColumn<World, String> gameModeCol;
+  @FXML private TableColumn<World.Info, String> gameModeCol;
 
-  @FXML private TableColumn<World, Number> seedCol;
+  @FXML private TableColumn<World.Info, Number> seedCol;
 
-  @FXML public TableColumn<World, Date> modifiedCol;
+  @FXML public TableColumn<World.Info, Date> modifiedCol;
 
   @FXML private Button changeWorldDirBtn;
 
@@ -69,15 +70,15 @@ public class WorldChooserController implements Initializable {
 
   @Override public void initialize(URL location, ResourceBundle resources) {
     worldNameCol
-        .setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().levelName()));
+        .setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().name()));
     worldDirCol.setCellValueFactory(
-        data -> new ReadOnlyStringWrapper(data.getValue().getWorldDirectory().getName()));
+        data -> new ReadOnlyStringWrapper(data.getValue().path().getFileName().toString()));
     gameModeCol.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().gameMode()));
-    seedCol.setCellValueFactory(data -> new ReadOnlyLongWrapper(data.getValue().getSeed()));
+    seedCol.setCellValueFactory(data -> new ReadOnlyLongWrapper(data.getValue().seed()));
 
     DateFormat localeFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
-    modifiedCol.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue().getLastModified()));
-    modifiedCol.setCellFactory(col -> new TableCell<World, Date>() {
+    modifiedCol.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(new Date(data.getValue().lastModified())));
+    modifiedCol.setCellFactory(col -> new TableCell<>() {
       public void updateItem(Date item, boolean empty) {
         if (item == this.getItem()) return;
         super.updateItem(item, empty);
@@ -96,7 +97,7 @@ public class WorldChooserController implements Initializable {
    */
   public void populate(WorldMapLoader mapLoader) {
     worldTbl.setRowFactory(tbl -> {
-      TableRow<World> row = new TableRow<>();
+      TableRow<World.Info> row = new TableRow<>();
       row.setOnMouseClicked(e -> {
         if (e.getClickCount() == 2 && !row.isEmpty()) {
           this.loadWorld(row.getItem(), mapLoader);
@@ -135,7 +136,12 @@ public class WorldChooserController implements Initializable {
       File directory = chooser.showDialog(stage);
       if (directory != null) {
         if (directory.isDirectory()) {
-          this.loadWorld(World.loadWorld(directory, mapLoader.getDimension(), World.LoggedWarnings.NORMAL), mapLoader);
+          Optional<World.Info> info = WorldFormats.getInfos(directory.toPath()).stream().findFirst(); // TODO: could ask which world format to load as
+          if (info.isPresent()) {
+            this.loadWorld(info.get(), mapLoader);
+          } else {
+            mapLoader.setWorld(EmptyWorld.INSTANCE);
+          }
           stage.close();
         } else {
           Log.warn("Non-directory selected.");
@@ -150,8 +156,9 @@ public class WorldChooserController implements Initializable {
     });
   }
 
-  private void loadWorld(World world, WorldMapLoader mapLoader) {
-    world.getResourcePack()
+  private void loadWorld(World.Info info, WorldMapLoader mapLoader) {
+    mapLoader.loadWorld(info)
+      .getResourcePack()
       .ifPresent(worldResourcePack -> {
         List<File> currentlyLoadedPacks = new ArrayList<>(ResourcePackLoader.getLoadedResourcePacks());
 
@@ -161,7 +168,7 @@ public class WorldChooserController implements Initializable {
           loadTexturesConfirm.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
           loadTexturesConfirm.setTitle("Bundled resource pack");
           loadTexturesConfirm.setContentText(
-                  "The world \"" + world.levelName() + "\" contains a resource pack. Do you want to load it now?");
+            "The world \"" + info.name() + "\" contains a resource pack. Do you want to load it now?");
           Dialogs.stayOnTop(loadTexturesConfirm);
 
           if (loadTexturesConfirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
@@ -171,7 +178,6 @@ public class WorldChooserController implements Initializable {
           }
         }
       });
-    mapLoader.loadWorld(world.getWorldDirectory());
   }
 
   /**
@@ -188,20 +194,15 @@ public class WorldChooserController implements Initializable {
     statusLabel.setText("Loading worlds list...");
     disableControls(true);
 
-    Task<List<World>> loadWorldsTask = new Task<List<World>>() {
+    Task<List<World.Info>> loadWorldsTask = new Task<>() {
       @Override
-      protected List<World> call() {
-        List<World> worlds = new ArrayList<>();
+      protected List<World.Info> call() {
+        List<World.Info> worlds = new ArrayList<>();
         if (worldSavesDir != null) {
           File[] worldDirs = worldSavesDir.listFiles();
           if (worldDirs != null) {
             for (File dir : worldDirs) {
-              if (World.isWorldDir(dir)) {
-                World world = World.loadWorld(dir, Dimension.Identifier.OVERWORLD, World.LoggedWarnings.SILENT);
-                if (world != EmptyWorld.INSTANCE) {
-                  worlds.add(world);
-                }
-              }
+              worlds.addAll(WorldFormats.getInfos(dir.toPath()));
             }
           }
         }
@@ -210,7 +211,7 @@ public class WorldChooserController implements Initializable {
     };
 
     loadWorldsTask.setOnSucceeded((WorkerStateEvent event) -> {
-      List<World> worlds = loadWorldsTask.getValue();
+      List<World.Info> worlds = loadWorldsTask.getValue();
 
       worldTbl.setItems(FXCollections.observableArrayList(worlds));
       if (!worlds.isEmpty()) {

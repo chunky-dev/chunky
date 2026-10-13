@@ -2,8 +2,13 @@ apply plugin: 'application'
 apply plugin: 'maven-publish'
 apply plugin: 'org.openjfx.javafxplugin'
 
-mainClassName = 'se.llbit.chunky.main.Chunky'
-archivesBaseName = 'chunky-core'
+application {
+  mainClass = 'se.llbit.chunky.main.Chunky'
+}
+
+base {
+  archivesName = 'chunky-core'
+}
 
 configurations {
   implementation.extendsFrom configurations.jsonlib
@@ -25,11 +30,13 @@ dependencies {
   implementation 'com.google.code.gson:gson:2.9.0'
   implementation 'org.lz4:lz4-java:1.8.0'
   implementation 'org.apache.maven:maven-artifact:3.9.9'
+  implementation 'io.github.notstirred:leveldb-ffi:0.1.0-SNAPSHOT'
+  implementation 'org.cloudburstmc:nbt:3.0.0.Final'
   implementation project(':lib')
 }
 
 javafx {
-  version = '17.0.11'
+  version = '25'
   configuration = 'implementation'
   modules = ['javafx.base', 'javafx.controls', 'javafx.fxml']
 }
@@ -52,7 +59,7 @@ jar {
     zipTree(it)
   }
   manifest {
-    attributes('Main-Class': mainClassName)
+    attributes('Main-Class': application.mainClass)
   }
   into('se/llbit/chunky/main') {
     from file("src/gen-res/Version.properties")
@@ -78,25 +85,35 @@ sourceSets {
 
 processResources.dependsOn 'updateVersionString'
 
+def projectVersion = providers.provider {
+    version.toString()
+}
+
 task updateVersionString {
-  description 'Store the current version string in src/gen-res/Version.properties'
+  description = 'Store the current version string in src/gen-res/Version.properties'
+
+  def versionFile = layout.projectDirectory.file('src/gen-res/Version.properties')
 
   outputs.upToDateWhen {
     def props = new Properties()
-    def output = file('src/gen-res/Version.properties')
-    if (output.isFile()) {
-      output.withInputStream { stream -> props.load(stream) }
+    if (versionFile.asFile.isFile()) {
+      versionFile.asFile.withInputStream { stream ->
+        props.load(stream)
+      }
     }
-    props['version'] == project.version
+    props['version'] == projectVersion.get()
   }
 
   doLast {
-    file('src/gen-res').mkdirs()
-    def date = new Date()
-    def versionFile = file('src/gen-res/Version.properties')
-    ant.propertyfile(file: versionFile) {
-      entry(key: 'version', value: project.version)
-      entry(key: 'gitSha', value: tryCommand(['git', 'rev-parse', 'HEAD']).trim())
+    versionFile.asFile.parentFile.mkdirs()
+
+    def gitSha = rootProject.tryCommand(
+      ['git', 'rev-parse', 'HEAD']
+    ).trim()
+
+    ant.propertyfile(file: versionFile.asFile) {
+      entry(key: 'version', value: projectVersion.get())
+      entry(key: 'gitSha', value: gitSha)
     }
   }
 }
@@ -112,12 +129,13 @@ task sourcesJar(type: Jar) {
 }
 
 task copyExternalDependencies(type: Copy) {
-  into "${buildDir}/${libsDirName}"
+  into layout.buildDirectory.dir("libs")
   from configurations.externalDependencies
 }
 
-artifacts {
-  archives javadocJar, sourcesJar
+tasks.named("assemble") {
+    dependsOn(javadocJar)
+    dependsOn(sourcesJar)
 }
 
 publishing {
@@ -129,7 +147,7 @@ publishing {
         packaging = "jar"
         description = "Minecraft mapping and rendering tool"
         url = "http://chunky.llbit.se"
-        artifactId = archivesBaseName
+        artifactId = base.archivesName
         version = "2.5.0-SNAPSHOT"
 
         licenses {
@@ -156,22 +174,20 @@ publishing {
 
     // fix dependency scopes (see https://discuss.gradle.org/t/maven-publish-plugin-generated-pom-making-dependency-scope-runtime/7494/9)
     // and filter dependencies
+    def implementationDependencies = configurations.implementation.allDependencies
     publishing.publications.all {
       pom.withXml {
-        asNode().dependencies.'*'.findAll() {
-          it.scope.text() == 'runtime' && project.configurations.implementation.allDependencies.find { dep ->
+        asNode().dependencies.'*'.findAll {
+          it.scope.text() == 'runtime' &&
+          implementationDependencies.find { dep ->
             dep.name == it.artifactId.text()
           }
-        }.each() {
+        }.each {
           if (it.groupId.text() == "org.openjfx") {
-            // remove javafx dependencies for now (maybe make them optional in the future?)
             it.parent().remove(it)
-            // it.appendNode('optional', 'true')
           } else if (it.groupId.text() == "se.llbit") {
-            // se.llbit dependencies are included in chunky-core
             it.parent().remove(it)
           } else {
-            // everything else is a dependency as usual
             it.scope*.value = 'compile'
           }
         }
@@ -181,8 +197,8 @@ publishing {
 
   repositories {
     maven {
-      name 'Build'
-      url layout.buildDirectory.dir('maven')
+      name = 'Build'
+      url = layout.buildDirectory.dir('maven')
     }
   }
 }

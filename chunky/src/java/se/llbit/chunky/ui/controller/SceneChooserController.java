@@ -36,6 +36,7 @@ import se.llbit.fxutil.Dialogs;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.log.Log;
+import se.llbit.util.concurrent.ChunkyThread;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,6 +64,8 @@ public class SceneChooserController implements Initializable {
   @FXML private Button deleteBtn;
 
   private Stage stage;
+
+  private static final Executor loadExecutor = ChunkyThread.addExecutorService(Executors::newSingleThreadExecutor);
 
   private ChunkyFxController controller;
 
@@ -219,7 +222,6 @@ public class SceneChooserController implements Initializable {
 
   private void populateSceneTable(File sceneDir) {
     this.sceneTbl.setPlaceholder(new Label("Loading scenes…"));
-    Executor loadExecutor = Executors.newSingleThreadExecutor();
 
     loadExecutor.execute(() -> {
       List<SceneListItem> scenes = new ArrayList<>();

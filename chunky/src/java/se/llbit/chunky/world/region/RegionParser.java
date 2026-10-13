@@ -17,12 +17,11 @@
 package se.llbit.chunky.world.region;
 
 import se.llbit.chunky.chunk.ChunkData;
-import se.llbit.chunky.chunk.GenericChunkData;
-import se.llbit.chunky.chunk.SimpleChunkData;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.world.*;
 import se.llbit.log.Log;
+import se.llbit.util.concurrent.ChunkyThread;
 import se.llbit.util.Mutable;
 
 /**
@@ -34,7 +33,7 @@ import se.llbit.util.Mutable;
  *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
-public class RegionParser extends Thread {
+public class RegionParser extends ChunkyThread {
 
   private final WorldMapLoader mapLoader;
   private final RegionQueue queue;
@@ -61,7 +60,7 @@ public class RegionParser extends Thread {
         ChunkView map = mapView.getMapView();
         if (map.isRegionVisible(position)) {
           Dimension dimension = mapLoader.getWorld().currentDimension();
-          Region region = dimension.getRegionWithinRange(position, mapView.getYMin(), mapView.getYMax());
+          Region region = dimension.getRegionWithinRange(position, new HeightRange(mapView.getYMin(), mapView.getYMax()));
           region.parse(mapView.getYMin(), mapView.getYMax());
           Mutable<ChunkData> chunkData = new Mutable<>(null);
           for (Chunk chunk : region) {
