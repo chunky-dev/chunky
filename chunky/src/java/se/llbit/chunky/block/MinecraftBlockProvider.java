@@ -1361,6 +1361,40 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("purple_wool_slab", (name, tag) -> slab(tag, Texture.purpleWool));
     addBlock("magenta_wool_slab", (name, tag) -> slab(tag, Texture.magentaWool));
     addBlock("pink_wool_slab", (name, tag) -> slab(tag, Texture.pinkWool));
+
+    addBlock("white_concrete_stairs", (name, tag) -> stairs(tag, Texture.concreteWhite));
+    addBlock("light_gray_concrete_stairs", (name, tag) -> stairs(tag, Texture.concreteSilver));
+    addBlock("gray_concrete_stairs", (name, tag) -> stairs(tag, Texture.concreteGray));
+    addBlock("black_concrete_stairs", (name, tag) -> stairs(tag, Texture.concreteBlack));
+    addBlock("brown_concrete_stairs", (name, tag) -> stairs(tag, Texture.concreteBrown));
+    addBlock("red_concrete_stairs", (name, tag) -> stairs(tag, Texture.concreteRed));
+    addBlock("orange_concrete_stairs", (name, tag) -> stairs(tag, Texture.concreteOrange));
+    addBlock("yellow_concrete_stairs", (name, tag) -> stairs(tag, Texture.concreteYellow));
+    addBlock("lime_concrete_stairs", (name, tag) -> stairs(tag, Texture.concreteLime));
+    addBlock("green_concrete_stairs", (name, tag) -> stairs(tag, Texture.concreteGreen));
+    addBlock("cyan_concrete_stairs", (name, tag) -> stairs(tag, Texture.concreteCyan));
+    addBlock("light_blue_concrete_stairs", (name, tag) -> stairs(tag, Texture.concreteLightBlue));
+    addBlock("blue_concrete_stairs", (name, tag) -> stairs(tag, Texture.concreteBlue));
+    addBlock("purple_concrete_stairs", (name, tag) -> stairs(tag, Texture.concretePurple));
+    addBlock("magenta_concrete_stairs", (name, tag) -> stairs(tag, Texture.concreteMagenta));
+    addBlock("pink_concrete_stairs", (name, tag) -> stairs(tag, Texture.concretePink));
+
+    addBlock("white_concrete_slab", (name, tag) -> slab(tag, Texture.concreteWhite));
+    addBlock("light_gray_concrete_slab", (name, tag) -> slab(tag, Texture.concreteSilver));
+    addBlock("gray_concrete_slab", (name, tag) -> slab(tag, Texture.concreteGray));
+    addBlock("black_concrete_slab", (name, tag) -> slab(tag, Texture.concreteBlack));
+    addBlock("brown_concrete_slab", (name, tag) -> slab(tag, Texture.concreteBrown));
+    addBlock("red_concrete_slab", (name, tag) -> slab(tag, Texture.concreteRed));
+    addBlock("orange_concrete_slab", (name, tag) -> slab(tag, Texture.concreteOrange));
+    addBlock("yellow_concrete_slab", (name, tag) -> slab(tag, Texture.concreteYellow));
+    addBlock("lime_concrete_slab", (name, tag) -> slab(tag, Texture.concreteLime));
+    addBlock("green_concrete_slab", (name, tag) -> slab(tag, Texture.concreteGreen));
+    addBlock("cyan_concrete_slab", (name, tag) -> slab(tag, Texture.concreteCyan));
+    addBlock("light_blue_concrete_slab", (name, tag) -> slab(tag, Texture.concreteLightBlue));
+    addBlock("blue_concrete_slab", (name, tag) -> slab(tag, Texture.concreteBlue));
+    addBlock("purple_concrete_slab", (name, tag) -> slab(tag, Texture.concretePurple));
+    addBlock("magenta_concrete_slab", (name, tag) -> slab(tag, Texture.concreteMagenta));
+    addBlock("pink_concrete_slab", (name, tag) -> slab(tag, Texture.concretePink));
   }
 
   @Override
