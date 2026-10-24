@@ -113,6 +113,7 @@ abstract public class Entity {
       case "mooshroom" -> entities.add(MooshroomEntity.fromJson(json));
       case "squid" -> entities.add(SquidEntity.fromJson(json));
       case "copperGolemStatue" -> entities.add(CopperGolemStatueEntity.fromJson(json));
+      case "strawBedFrills" -> entities.add(StrawBedFrills.fromJson(json));
       default -> Log.errorf("Found unknown entity %s when loading from scene.", kind);
     }
     return entities;

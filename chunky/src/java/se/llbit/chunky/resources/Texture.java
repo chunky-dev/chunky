@@ -1794,6 +1794,8 @@ public class Texture {
   public static final Texture shelfMushroomStage0 = new Texture();
   @TexturePath("assets/minecraft/textures/block/shelf_mushroom_stage1")
   public static final Texture shelfMushroomStage1 = new Texture();
+  @TexturePath("assets/minecraft/textures/block/straw_bed")
+  public static final Texture strawBed = new Texture();
 
   @TexturePath("assets/minecraft/textures/entity/equipment/wings/elytra")
   public static final Texture elytra = new Texture();
