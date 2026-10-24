@@ -1395,6 +1395,10 @@ public class MinecraftBlockProvider implements BlockProvider {
     addBlock("purple_concrete_slab", (name, tag) -> slab(tag, Texture.concretePurple));
     addBlock("magenta_concrete_slab", (name, tag) -> slab(tag, Texture.concreteMagenta));
     addBlock("pink_concrete_slab", (name, tag) -> slab(tag, Texture.concretePink));
+
+    addBlock("straw_bed", (name, tag) -> new StrawBed(
+      BlockSpec.getPropertiesTag(tag).get("part").stringValue("foot"),
+      BlockProvider.facing(tag)));
   }
 
   @Override
