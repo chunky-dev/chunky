@@ -18,12 +18,12 @@ public class JarPluginLoader implements PluginLoader {
   public void load(BiConsumer<Plugin, PluginManifest> onLoad, PluginManifest pluginManifest) {
     try {
       Class<?> pluginClass;
-      if (pluginManifest.pluginJar.isPresent()) {
-        File pluginJar = pluginManifest.pluginJar.get();
-        pluginClass = loadPluginClass(pluginManifest.mainClass, pluginJar);
+      if (pluginManifest.pluginJar().isPresent()) {
+        File pluginJar = pluginManifest.pluginJar().get();
+        pluginClass = loadPluginClass(pluginManifest.mainClass(), pluginJar);
       } else {
         // No plugin jar is present, class must already be loaded.
-        pluginClass = Class.forName(pluginManifest.mainClass);
+        pluginClass = Class.forName(pluginManifest.mainClass());
       }
       Plugin plugin = (Plugin) pluginClass.getDeclaredConstructor().newInstance();
       onLoad.accept(plugin, pluginManifest);

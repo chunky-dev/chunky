@@ -158,10 +158,10 @@ public class PluginManagerTest {
   private static void assertLoadOrder(Set<PluginManifest> manifests, Set<String> expectedPlugins) {
     Set<String> loadedPlugins = new HashSet<>();
     PluginManager pluginLoader = new PluginManager(Set.of(), (onLoad, pluginManifest) -> {
-      System.out.println("Loaded " + pluginManifest.name + ":\n\tWith dependencies: " + String.join(", ", pluginManifest.dependencies.stream().map(p -> p.name).toList()));
+      System.out.println("Loaded " + pluginManifest.name() + ":\n\tWith dependencies: " + String.join(", ", pluginManifest.dependencies().stream().map(p -> p.name()).toList()));
 
-      assertTrue(pluginManifest.dependencies.stream().map(p -> p.name).allMatch(loadedPlugins::contains), () -> "Plugin " + pluginManifest.name + " does not have all dependencies loaded");
-      loadedPlugins.add(pluginManifest.name);
+      assertTrue(pluginManifest.dependencies().stream().map(p -> p.name()).allMatch(loadedPlugins::contains), () -> "Plugin " + pluginManifest.name() + " does not have all dependencies loaded");
+      loadedPlugins.add(pluginManifest.name());
     });
 
     pluginLoader.loadPlugins(manifests, (plugin, manifest) -> {});

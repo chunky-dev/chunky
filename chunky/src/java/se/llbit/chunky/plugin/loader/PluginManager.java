@@ -75,14 +75,14 @@ public class PluginManager {
   public void loadPlugins(Set<PluginManifest> pluginManifests, BiConsumer<Plugin, PluginManifest> onLoad) {
     // Load plugins
     this.load(pluginManifests, (plugin, manifest) -> {
-      String source = manifest.pluginJar.map(File::getName).orElse("Chunky Inbuilt Plugins");
+      String source = manifest.pluginJar().map(File::getName).orElse("Chunky Inbuilt Plugins");
       Log.infof("Loading plugin from: %s", source);
       try {
         onLoad.accept(plugin, manifest);
       } catch (Throwable t) {
         Log.error("Plugin " + source + " failed to load.", t);
       }
-      Log.infof("Plugin loaded: %s %s", manifest.name, manifest.version);
+      Log.infof("Plugin loaded: %s %s", manifest.name(), manifest.version());
     });
   }
 
@@ -100,7 +100,7 @@ public class PluginManager {
       try {
         onShutdown.accept(plugin.plugin);
       } catch (Throwable t) {
-        Log.error(String.format("The plugin %s threw when shutting down", plugin.manifest.name), t);
+        Log.error(String.format("The plugin %s threw when shutting down", plugin.manifest.name()), t);
       }
     });
   }
@@ -109,7 +109,7 @@ public class PluginManager {
     // create plugin objects
     Map<String, List<ResolvedPlugin>> pluginsByName = new HashMap<>();
     pluginManifests.forEach(manifest -> {
-      pluginsByName.computeIfAbsent(manifest.name, n -> new ArrayList<>()).add(
+      pluginsByName.computeIfAbsent(manifest.name(), n -> new ArrayList<>()).add(
         new ResolvedPlugin(manifest)
       );
     });
@@ -147,7 +147,7 @@ public class PluginManager {
           loadedPlugins.add(plugin);
           iterator.remove();
           Log.infof("  Loading plugin %s with deps { %s }, resolved { %s }%n", plugin,
-            plugin.getManifest().dependencies.stream().map(PluginDependency::toString).collect(Collectors.joining(", ")),
+            plugin.getManifest().dependencies().stream().map(PluginDependency::toString).collect(Collectors.joining(", ")),
             plugin.getDependencies().stream().map(ResolvedPlugin::toString).collect(Collectors.joining(", "))
           );
           pluginLoader.load((loadedPlugin, manifest) -> {

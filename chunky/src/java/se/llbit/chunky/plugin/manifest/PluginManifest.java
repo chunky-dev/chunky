@@ -16,44 +16,21 @@ import java.util.Set;
 
 /**
  * An immutable class representing the manifest file (plugin.json) of a plugin.
+ * @param pluginJar     Location of a valid plugin .jar file. If not present the plugin class must already be loaded.
+ * @param mainClass     The main class of the plugin within its .jar
+ * @param name          The name of the plugin
+ * @param author        The author of the plugin
+ * @param description   The description of the plugin
+ * @param version       The version of the plugin
+ * @param targetVersion The target chunky version range of the plugin
+ * @param dependencies  The required dependencies of the plugin
  */
-public final class PluginManifest {
-  public final Optional<File> pluginJar;
-  public final String mainClass;
-  public final String name;
-  public final String author;
-  public final String description;
-  public final ArtifactVersion version;
-  public final VersionRange targetVersion;
-  public final Set<PluginDependency> dependencies;
-
-  /**
-   * @param pluginJar     Location of a valid plugin .jar file. If not present the plugin class must already be loaded.
-   * @param mainClass     The main class of the plugin within its .jar
-   * @param name          The name of the plugin
-   * @param author        The author of the plugin
-   * @param description   The description of the plugin
-   * @param version       The version of the plugin
-   * @param targetVersion The target chunky version range of the plugin
-   * @param dependencies  The required dependencies of the plugin
-   */
-  public PluginManifest(Optional<File> pluginJar, String mainClass,
-                        String name, String author, String description,
-                        ArtifactVersion version, VersionRange targetVersion,
-                        Set<PluginDependency> dependencies) {
-    this.pluginJar = pluginJar;
-    this.mainClass = mainClass;
-    this.name = name;
-    this.author = author;
-    this.description = description;
-    this.version = version;
-    this.targetVersion = targetVersion;
-    this.dependencies = dependencies;
-  }
-
+public record PluginManifest(Optional<File> pluginJar, String mainClass, String name, String author, String description,
+                             ArtifactVersion version, VersionRange targetVersion, Set<PluginDependency> dependencies) {
   /**
    * Parse a json object into a PluginManifest if possible
-   * @param manifest The manifest json data
+   *
+   * @param manifest  The manifest json data
    * @param pluginJar The plugin jar to associate with the manifest
    * @return The PluginManifest if it could be created.
    */
