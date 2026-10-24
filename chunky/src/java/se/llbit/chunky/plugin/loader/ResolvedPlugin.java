@@ -19,17 +19,17 @@ public class ResolvedPlugin {
    */
   public void resolveDependencies(Map<String, List<ResolvedPlugin>> pluginsByName) {
     // Adds any plugin as a resolved dependency if it matches an unresolved dependency's name and version.
-    this.manifest.getDependencies().forEach(unresolvedDep -> {
-      List<ResolvedPlugin> resolvedDeps = pluginsByName.get(unresolvedDep.name);
+    this.manifest.dependencies().forEach(unresolvedDep -> {
+      List<ResolvedPlugin> resolvedDeps = pluginsByName.get(unresolvedDep.name());
       boolean resolved = false;
       for (ResolvedPlugin resolvedDep : resolvedDeps) {
-        if (unresolvedDep.version.containsVersion(resolvedDep.manifest.version)) {
+        if (unresolvedDep.version().containsVersion(resolvedDep.manifest.version())) {
           this.dependencies.add(resolvedDep);
           resolved = true;
         }
       }
       if (!resolved) {
-        Log.errorf("Could not find required dependency %s for plugin %s.", unresolvedDep, this.manifest.name);
+        Log.errorf("Could not find required dependency %s for plugin %s.", unresolvedDep, this.manifest.name());
       }
     });
   }
@@ -52,6 +52,6 @@ public class ResolvedPlugin {
 
   @Override
   public String toString() {
-    return this.manifest.name + ":" + this.manifest.version;
+    return this.manifest.getNameVersionString();
   }
 }
