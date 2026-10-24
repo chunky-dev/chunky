@@ -20,10 +20,7 @@ import se.llbit.chunky.block.*;
 import se.llbit.chunky.block.minecraft.*;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.math.Octree;
-import se.llbit.nbt.CompoundTag;
-import se.llbit.nbt.IntTag;
-import se.llbit.nbt.StringTag;
-import se.llbit.nbt.Tag;
+import se.llbit.nbt.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -50,7 +47,7 @@ import java.util.function.Consumer;
  * After <code>{@link BlockPalette#unsynchronize()}</code> is called, it is only safe to be read by multiple threads concurrently.
  */
 public class BlockPalette {
-  private static final int BLOCK_PALETTE_VERSION = 4;
+  private static final int BLOCK_PALETTE_VERSION = 5;
   public final int airId, stoneId, waterId;
   public static final int ANY_ID = Octree.ANY_TYPE;
 
@@ -685,20 +682,26 @@ public class BlockPalette {
     }
     out.writeInt(specs.length);
     for (BlockSpec spec : specs) {
+      out.writeByte(((SpecificTag) spec.getTag()).tagType());
       spec.serialize(out);
     }
   }
 
   public static BlockPalette read(DataInputStream in) throws IOException {
     int version = in.readInt();
-    if (version != BLOCK_PALETTE_VERSION) {
+    if (version < 4 || version > BLOCK_PALETTE_VERSION) {
       throw new IOException("Incompatible block palette format.");
     }
     int numBlocks = in.readInt();
     Map<BlockSpec, Integer> blockMap = new HashMap<>(numBlocks);
     List<Block> blocks = new ArrayList<>(numBlocks);
     for (int i = 0; i < numBlocks; ++i) {
-      BlockSpec spec = BlockSpec.deserialize(in);
+      byte type = Tag.TAG_COMPOUND;
+      if (version == 5) {
+        type = in.readByte();
+      }
+
+      BlockSpec spec = BlockSpec.deserialize(type, in);
       blockMap.put(spec, i);
       blocks.add(spec.toBlock());
     }

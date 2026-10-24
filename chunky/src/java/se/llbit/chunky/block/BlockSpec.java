@@ -24,8 +24,8 @@ public class BlockSpec {
     this.tag = tag;
   }
 
-  public static BlockSpec deserialize(DataInputStream in) throws IOException {
-    Tag tag = CompoundTag.read(in);
+  public static BlockSpec deserialize(byte type, DataInputStream in) throws IOException {
+    Tag tag = SpecificTag.read(type, in);
     if (tag.isError()) {
       throw new IOException("Error while reading block palette: " + tag.error());
     }
