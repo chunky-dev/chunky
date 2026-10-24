@@ -1033,7 +1033,7 @@ public class Scene implements JsonSerializable {
                         }
                       }
 
-                      if (!block.isReplacedByEntities()) {
+                      if (block.isReplacedByEntities()) {
                         if (block.isWaterlogged()) {
                           block = palette.water;
                           octNode = palette.waterId;
