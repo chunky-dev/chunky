@@ -1178,6 +1178,7 @@ public class Texture {
   public static final Texture chiseledBookshelfTop = new Texture();
 
   public static final Texture[] chiseledBookshelfCombinations = new Texture[64];
+
   static {
     for (int i = 0; i < chiseledBookshelfCombinations.length; i++) {
       chiseledBookshelfCombinations[i] = new Texture();
@@ -1796,6 +1797,38 @@ public class Texture {
   public static final Texture shelfMushroomStage1 = new Texture();
   @TexturePath("assets/minecraft/textures/block/straw_bed")
   public static final Texture strawBed = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/white_cushion")
+  public static final Texture whiteCushion = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/orange_cushion")
+  public static final Texture orangeCushion = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/magenta_cushion")
+  public static final Texture magentaCushion = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/light_blue_cushion")
+  public static final Texture lightBlueCushion = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/yellow_cushion")
+  public static final Texture yellowCushion = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/lime_cushion")
+  public static final Texture limeCushion = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/pink_cushion")
+  public static final Texture pinkCushion = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/gray_cushion")
+  public static final Texture grayCushion = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/light_gray_cushion")
+  public static final Texture lightGrayCushion = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/cyan_cushion")
+  public static final Texture cyanCushion = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/purple_cushion")
+  public static final Texture purpleCushion = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/blue_cushion")
+  public static final Texture blueCushion = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/brown_cushion")
+  public static final Texture brownCushion = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/green_cushion")
+  public static final Texture greenCushion = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/red_cushion")
+  public static final Texture redCushion = new Texture();
+  @TexturePath("assets/minecraft/textures/entity/cushion/black_cushion")
+  public static final Texture blackCushion = new Texture();
 
   @TexturePath("assets/minecraft/textures/entity/equipment/wings/elytra")
   public static final Texture elytra = new Texture();
