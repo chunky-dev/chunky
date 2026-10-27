@@ -36,9 +36,7 @@ public class WallBanner extends MinecraftBlockTranslucent {
 
   public WallBanner(String name, Texture texture, String facing, BannerDesign.Color color) {
     super(name, texture);
-    invisible = true;
     opaque = false;
-    localIntersect = true;
     switch (facing) {
       default:
       case "north":
@@ -55,10 +53,6 @@ public class WallBanner extends MinecraftBlockTranslucent {
         break;
     }
     this.color = color;
-  }
-
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override public boolean isBlockEntity() {

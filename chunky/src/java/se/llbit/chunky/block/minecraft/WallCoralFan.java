@@ -37,13 +37,7 @@ public class WallCoralFan extends MinecraftBlockTranslucent {
     super(name, CoralFan.coralTexture(coralType));
     this.coralType = coralType;
     this.facing = facing;
-    localIntersect = true;
     solid = false;
-    invisible = true;
-  }
-
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override public boolean hasEntities() {

@@ -35,17 +35,10 @@ public class Campfire extends MinecraftBlockTranslucent {
 
     public Campfire(String name, se.llbit.chunky.entity.Campfire.Kind kind, String facing, boolean lit) {
         super(name, Texture.campfireLog);
-        invisible = true;
         opaque = false;
-        localIntersect = true;
         this.kind = kind;
         this.facing = facing;
         this.isLit = lit;
-    }
-
-    @Override
-    public boolean intersect(Ray ray, Scene scene) {
-        return false;
     }
 
     @Override

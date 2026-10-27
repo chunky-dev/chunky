@@ -36,9 +36,7 @@ public class CoralFan extends MinecraftBlockTranslucent {
   public CoralFan(String name, String coralType) {
     super(name, coralTexture(coralType));
     this.coralType = coralType;
-    localIntersect = true;
     solid = false;
-    invisible = true;
   }
 
   public static Texture coralTexture(String coralType) {
@@ -65,10 +63,6 @@ public class CoralFan extends MinecraftBlockTranslucent {
       case "dead_fire":
         return Texture.deadFireCoralFan;
     }
-  }
-
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override public boolean hasEntities() {

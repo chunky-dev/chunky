@@ -1231,6 +1231,16 @@ public class Scene implements JsonSerializable {
                     }
                   }
                 }
+
+                if (block.isReplacedByEntities()) {
+                  if (block.isWaterlogged()) {
+                    block = palette.water;
+                    worldOctree.set(palette.waterId, cp.x * 16 + x - origin.x, y - origin.y, cp.z * 16 + z - origin.z);
+                  } else {
+                    block = Air.INSTANCE;
+                    worldOctree.set(palette.airId, cp.x * 16 + x - origin.x, y - origin.y, cp.z * 16 + z - origin.z);
+                  }
+                }
               }
             }
           }

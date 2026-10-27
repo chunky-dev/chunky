@@ -41,8 +41,6 @@ public class WallHead extends MinecraftBlockTranslucent {
 
   public WallHead(String name, Texture texture, SkullEntity.Kind type, String facing) {
     super(name, texture);
-    localIntersect = true;
-    invisible = true;
     description = "facing=" + facing;
     this.type = type;
     switch (facing) {
@@ -63,11 +61,6 @@ public class WallHead extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return false;
-  }
-
-  @Override
   public String description() {
     return description;
   }
@@ -84,7 +77,7 @@ public class WallHead extends MinecraftBlockTranslucent {
 
   @Override
   public boolean isBlockEntity() {
-    return true;//return type == Kind.PLAYER;
+    return type == Kind.PLAYER;
   }
 
   @Override
