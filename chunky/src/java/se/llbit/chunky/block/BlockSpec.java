@@ -1,18 +1,12 @@
 package se.llbit.chunky.block;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-
 import se.llbit.chunky.block.minecraft.UnknownBlock;
-import se.llbit.nbt.CompoundTag;
-import se.llbit.nbt.SpecificTag;
 import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
-import se.llbit.util.NbtUtil;
 import se.llbit.util.annotation.NotNull;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class BlockSpec {
 
@@ -22,18 +16,6 @@ public class BlockSpec {
 
   public BlockSpec(@NotNull Tag tag) {
     this.tag = tag;
-  }
-
-  public static BlockSpec deserialize(byte type, DataInputStream in) throws IOException {
-    Tag tag = SpecificTag.read(type, in);
-    if (tag.isError()) {
-      throw new IOException("Error while reading block palette: " + tag.error());
-    }
-    return new BlockSpec(tag);
-  }
-
-  public void serialize(DataOutputStream out) throws IOException {
-    NbtUtil.safeSerialize(out, tag);
   }
 
   @Override
