@@ -37,6 +37,8 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Background;
@@ -49,14 +51,16 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.PopupWindow;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.*;
-import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.controller.ChunkyFxController;
+import se.llbit.chunky.ui.dialogs.EditMaterialDialog;
+import se.llbit.chunky.world.Material;
 import se.llbit.math.Vector2;
 
 import java.nio.IntBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
+import se.llbit.math.Vector3;
 
 /**
  * Shows the current render preview.
@@ -236,6 +240,25 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     MenuItem copyFrame = new MenuItem("Copy image to clipboard");
     copyFrame.setOnAction(e -> chunkyFxController.copyCurrentFrame());
     contextMenu.getItems().add(copyFrame);
+
+    MenuItem editMaterial = new MenuItem("Edit material");
+    editMaterial.setOnAction(e -> {
+      Material material = scene.getTargetMaterial(target.x, target.y);
+      EditMaterialDialog dialog = new EditMaterialDialog(material, scene);
+      dialog.showAndWait();
+      dialog = null;
+    });
+    contextMenu.getItems().add(editMaterial);
+
+    MenuItem copyColor = new MenuItem("Copy color");
+    copyColor.setOnAction(e -> {
+      Vector3 color = scene.getTargetColor(target.x, target.y);
+      String s = String.format("#%02X%02X%02X", (int) (color.x * 255), (int) (color.y * 255), (int) (color.z * 255));
+      ClipboardContent content = new ClipboardContent();
+      content.putString(s);
+      Clipboard.getSystemClipboard().setContent(content);
+    });
+    contextMenu.getItems().add(copyColor);
 
     chunkyFxController.getChunky()
       .getRenderContextMenuTransformers()

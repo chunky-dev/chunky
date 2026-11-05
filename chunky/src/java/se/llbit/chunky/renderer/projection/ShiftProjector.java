@@ -1,6 +1,7 @@
 package se.llbit.chunky.renderer.projection;
 
 import java.util.Random;
+
 import se.llbit.math.Vector3;
 
 public class ShiftProjector implements Projector {

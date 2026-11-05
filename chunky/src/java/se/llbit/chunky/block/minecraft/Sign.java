@@ -18,29 +18,20 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.SignEntity;
-import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
-public class Sign extends MinecraftBlockTranslucent {
+public class Sign extends EmptyModelBlock {
   private final int rotation;
   private final String material;
 
   public Sign(String name, String material, int rotation) {
     super(name, SignEntity.textureFromMaterial(material));
     invisible = true;
-    solid = false;
-    localIntersect = true;
     this.rotation = rotation % 16;
     this.material = material;
-  }
-
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override public boolean isBlockEntity() {

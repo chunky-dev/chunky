@@ -20,6 +20,7 @@ import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.minecraft.Lava;
 import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.model.minecraft.WaterModel;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.Octree;
@@ -43,7 +44,7 @@ public class OctreeFinalizer {
    * @param origin    Origin of the octree
    * @param cp        Position of the chunk to finalize
    */
-  public static void finalizeChunk(Octree worldTree, Octree waterTree, BlockPalette palette,
+  public static void finalizeChunk(Octree worldTree, BlockPalette palette,
       Set<ChunkPosition> loadedChunks, Vector3i origin, ChunkPosition cp, int yMin, int yMax) {
     for (int cy = yMin; cy < yMax; ++cy) {
       for (int cz = 0; cz < 16; ++cz) {
@@ -53,7 +54,7 @@ public class OctreeFinalizer {
           // process blocks that are at the edge of the chunk, the other should have be taken care of during the loading
           if (cy == yMin || cy == yMax - 1 || cz == 0 || cz == 15 || cx == 0 || cx == 15) {
             hideBlocks(worldTree, palette, x, cy, z, yMin, yMax, origin);
-            processBlock(worldTree, waterTree, palette, loadedChunks, x, cy, z, origin);
+            processBlock(worldTree, palette, loadedChunks, x, cy, z, origin);
           }
         }
       }
@@ -78,15 +79,14 @@ public class OctreeFinalizer {
     }
   }
 
-  private static void processBlock(Octree worldTree, Octree waterTree, BlockPalette palette,
+  private static void processBlock(Octree worldTree, BlockPalette palette,
       Set<ChunkPosition> loadedChunks, int x, int cy, int z, Vector3i origin) {
     int y = cy - origin.y;
     Block mat = worldTree.getBlock(x, y, z, palette);
-    Block wmat = waterTree.getBlock(x, y, z, palette);
 
-    if (wmat instanceof Water) {
-      Block above = waterTree.getBlock(x, y + 1, z, palette);
-      int level0 = 8 - ((Water) wmat).level;
+    if (mat instanceof Water) {
+      Block above = worldTree.getBlock(x, y + 1, z, palette);
+      int level0 = 8 - ((Water) mat).level;
       if (!above.isWaterFilled()) {
         int cornerSW = level0;
         int cornerSE = level0;
@@ -94,39 +94,39 @@ public class OctreeFinalizer {
         int cornerNW = level0;
 
         // west
-        int level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x - 1, y, z, level0);
+        int level = waterLevelAt(worldTree, palette, loadedChunks, x - 1, y, z, level0);
         cornerNW += level;
         cornerSW += level;
 
         // south west
-        level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x - 1, y, z + 1, level0);
+        level = waterLevelAt(worldTree, palette, loadedChunks, x - 1, y, z + 1, level0);
         cornerSW += level;
 
         // south
-        level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x, y, z + 1, level0);
+        level = waterLevelAt(worldTree, palette, loadedChunks, x, y, z + 1, level0);
         cornerSW += level;
         cornerSE += level;
 
         // south east
-        level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x + 1, y, z + 1, level0);
+        level = waterLevelAt(worldTree, palette, loadedChunks, x + 1, y, z + 1, level0);
         cornerSE += level;
 
         // east
-        level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x + 1, y, z, level0);
+        level = waterLevelAt(worldTree, palette, loadedChunks, x + 1, y, z, level0);
         cornerSE += level;
         cornerNE += level;
 
         // north east
-        level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x + 1, y, z - 1, level0);
+        level = waterLevelAt(worldTree, palette, loadedChunks, x + 1, y, z - 1, level0);
         cornerNE += level;
 
         // north
-        level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x, y, z - 1, level0);
+        level = waterLevelAt(worldTree, palette, loadedChunks, x, y, z - 1, level0);
         cornerNE += level;
         cornerNW += level;
 
         // north west
-        level = waterLevelAt(worldTree, waterTree, palette, loadedChunks, x - 1, y, z - 1, level0);
+        level = waterLevelAt(worldTree, palette, loadedChunks, x - 1, y, z - 1, level0);
         cornerNW += level;
 
         cornerSW = Math.min(7, 8 - (cornerSW / 4));
@@ -134,77 +134,77 @@ public class OctreeFinalizer {
         cornerNE = Math.min(7, 8 - (cornerNE / 4));
         cornerNW = Math.min(7, 8 - (cornerNW / 4));
 
-        waterTree.set(palette.getWaterId(((Water) wmat).level, (cornerSW << Water.CORNER_SW)
-            | (cornerSE << Water.CORNER_SE)
-            | (cornerNE << Water.CORNER_NE)
-            | (cornerNW << Water.CORNER_NW)), x, y, z);
-      } else {
-        waterTree.set(palette.getWaterId(0, 1 << Water.FULL_BLOCK), x, y, z);
+        worldTree.set(palette.getWaterId(((Water) mat).level, (cornerSW << WaterModel.CORNER_SW)
+            | (cornerSE << WaterModel.CORNER_SE)
+            | (cornerNE << WaterModel.CORNER_NE)
+            | (cornerNW << WaterModel.CORNER_NW)), x, y, z);
+      } else if (above.isWaterFilled()) {
+        worldTree.set(palette.getWaterId(0, 1 << Water.FULL_BLOCK_DATA), x, y, z);
       }
     } else if (mat instanceof Lava) {
-      Material above = worldTree.getBlock(x, y + 1, z, palette);
+      Block above = worldTree.getBlock(x, y + 1, z, palette);
       if (!(above instanceof Lava)) {
         Lava lava = (Lava) mat;
 
         int level0 = 8 - lava.level;
-        int corner0 = level0;
-        int corner1 = level0;
-        int corner2 = level0;
-        int corner3 = level0;
+        int cornerSW = level0;
+        int cornerSE = level0;
+        int cornerNE = level0;
+        int cornerNW = level0;
 
         int level = lavaLevelAt(worldTree, palette, loadedChunks, x - 1, y, z, level0);
-        corner3 += level;
-        corner0 += level;
+        cornerNW += level;
+        cornerSW += level;
 
         level = lavaLevelAt(worldTree, palette, loadedChunks, x - 1, y, z + 1, level0);
-        corner0 += level;
+        cornerSW += level;
 
         level = lavaLevelAt(worldTree, palette, loadedChunks, x, y, z + 1, level0);
-        corner0 += level;
-        corner1 += level;
+        cornerSW += level;
+        cornerSE += level;
 
         level = lavaLevelAt(worldTree, palette, loadedChunks, x + 1, y, z + 1, level0);
-        corner1 += level;
+        cornerSE += level;
 
         level = lavaLevelAt(worldTree, palette, loadedChunks, x + 1, y, z, level0);
-        corner1 += level;
-        corner2 += level;
+        cornerSE += level;
+        cornerNE += level;
 
         level = lavaLevelAt(worldTree, palette, loadedChunks, x + 1, y, z - 1, level0);
-        corner2 += level;
+        cornerNE += level;
 
         level = lavaLevelAt(worldTree, palette, loadedChunks, x, y, z - 1, level0);
-        corner2 += level;
-        corner3 += level;
+        cornerNE += level;
+        cornerNW += level;
 
         level = lavaLevelAt(worldTree, palette, loadedChunks, x - 1, y, z - 1, level0);
-        corner3 += level;
+        cornerNW += level;
 
-        corner0 = Math.min(7, 8 - (corner0 / 4));
-        corner1 = Math.min(7, 8 - (corner1 / 4));
-        corner2 = Math.min(7, 8 - (corner2 / 4));
-        corner3 = Math.min(7, 8 - (corner3 / 4));
+        cornerSW = Math.min(7, 8 - (cornerSW / 4));
+        cornerSE = Math.min(7, 8 - (cornerSE / 4));
+        cornerNE = Math.min(7, 8 - (cornerNE / 4));
+        cornerNW = Math.min(7, 8 - (cornerNW / 4));
         worldTree.set(palette.getLavaId(
             lava.level,
-            (corner0 << Water.CORNER_SW)
-                | (corner1 << Water.CORNER_SE)
-                | (corner2 << Water.CORNER_NE)
-                | (corner3 << Water.CORNER_NW)
+            (cornerSW << WaterModel.CORNER_SW)
+                | (cornerSE << WaterModel.CORNER_SE)
+                | (cornerNE << WaterModel.CORNER_NE)
+                | (cornerNW << WaterModel.CORNER_NW)
         ), x, y, z);
       }
     }
   }
 
-  private static int waterLevelAt(Octree worldTree, Octree waterTree, BlockPalette palette,
+  private static int waterLevelAt(Octree worldTree, BlockPalette palette,
       Set<ChunkPosition> loadedChunks, int x, int cy, int z, int baseLevel) {
     // If the position isn't in a loaded chunk, return the baseLevel to make the edge-of-world water flat
     if (!loadedChunks.contains(new ChunkPosition(x >> 4, z >> 4))) {
       return baseLevel;
     }
 
-    Block corner = waterTree.getBlock(x, cy, z, palette);
+    Block corner = worldTree.getBlock(x, cy, z, palette);
     if (corner.isWater()) {
-      Block above = waterTree.getBlock(x, cy + 1, z, palette);
+      Block above = worldTree.getBlock(x, cy + 1, z, palette);
       boolean isFullBlock = above.isWaterFilled();
       return isFullBlock ? 8 : 8 - ((Water) corner).level;
     } else if (corner.isWaterlogged()) {

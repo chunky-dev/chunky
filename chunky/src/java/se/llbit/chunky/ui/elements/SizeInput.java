@@ -35,7 +35,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
-import javafx.scene.shape.Shape;
 import se.llbit.chunky.ui.Icons;
 import se.llbit.chunky.ui.IntegerTextField;
 import se.llbit.chunky.ui.ValidatingNumberStringConverter;

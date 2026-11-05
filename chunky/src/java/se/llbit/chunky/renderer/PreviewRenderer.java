@@ -20,6 +20,8 @@ package se.llbit.chunky.renderer;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.RayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.math.Constants;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
 import se.llbit.util.TaskTracker;
 
@@ -70,10 +72,11 @@ public class PreviewRenderer extends TileBasedRenderer {
     double invHeight = 1.0 / fullHeight;
 
     Ray target = new Ray();
-    boolean hit = scene.traceTarget(target);
-    int tx = (int) Math.floor(target.o.x + target.d.x * Ray.OFFSET);
-    int ty = (int) Math.floor(target.o.y + target.d.y * Ray.OFFSET);
-    int tz = (int) Math.floor(target.o.z + target.d.z * Ray.OFFSET);
+    IntersectionRecord intersectionRecord = new IntersectionRecord();
+    boolean hit = scene.traceTarget(target, intersectionRecord);
+    int tx = (int) Math.floor(target.o.x + intersectionRecord.n.x * -2 * Constants.OFFSET);
+    int ty = (int) Math.floor(target.o.y + intersectionRecord.n.y * -2 * Constants.OFFSET);
+    int tz = (int) Math.floor(target.o.z + intersectionRecord.n.z * -2 * Constants.OFFSET);
 
     double[] sampleBuffer = scene.getSampleBuffer();
 
@@ -94,7 +97,7 @@ public class PreviewRenderer extends TileBasedRenderer {
         // Draw crosshairs
         if (x == fullWidth / 2 && (y >= fullHeight / 2 - 5 && y <= fullHeight / 2 + 5) || y == fullHeight / 2 && (
             x >= fullWidth / 2 - 5 && x <= fullWidth / 2 + 5)) {
-          sampleBuffer[offset + 0] = 0xFF;
+          sampleBuffer[offset]     = 0xFF;
           sampleBuffer[offset + 1] = 0xFF;
           sampleBuffer[offset + 2] = 0xFF;
           return;
@@ -106,24 +109,24 @@ public class PreviewRenderer extends TileBasedRenderer {
         scene.rayTrace(tracer, state);
 
         // Target highlighting.
-        int rx = (int) Math.floor(state.ray.o.x + state.ray.d.x * Ray.OFFSET);
-        int ry = (int) Math.floor(state.ray.o.y + state.ray.d.y * Ray.OFFSET);
-        int rz = (int) Math.floor(state.ray.o.z + state.ray.d.z * Ray.OFFSET);
+        int rx = (int) Math.floor(state.ray.o.x + state.intersectionRecord.n.x * -2 * Constants.OFFSET);
+        int ry = (int) Math.floor(state.ray.o.y + state.intersectionRecord.n.y * -2 * Constants.OFFSET);
+        int rz = (int) Math.floor(state.ray.o.z + state.intersectionRecord.n.z * -2 * Constants.OFFSET);
         if (hit && tx == rx && ty == ry && tz == rz) {
-          state.ray.color.x = 1 - state.ray.color.x;
-          state.ray.color.y = 1 - state.ray.color.y;
-          state.ray.color.z = 1 - state.ray.color.z;
-          state.ray.color.w = 1;
+          state.color.x = 1 - state.color.x;
+          state.color.y = 1 - state.color.y;
+          state.color.z = 1 - state.color.z;
+          state.color.w = 1;
         }
 
-        sampleBuffer[offset + 0] = state.ray.color.x;
-        sampleBuffer[offset + 1] = state.ray.color.y;
-        sampleBuffer[offset + 2] = state.ray.color.z;
+        sampleBuffer[offset + 0] = state.color.x;
+        sampleBuffer[offset + 1] = state.color.y;
+        sampleBuffer[offset + 2] = state.color.z;
 
         if (sampleNum == 0 && x < (width - 1)) {
-          sampleBuffer[offset + 3] = state.ray.color.x;
-          sampleBuffer[offset + 4] = state.ray.color.y;
-          sampleBuffer[offset + 5] = state.ray.color.z;
+          sampleBuffer[offset + 3] = state.color.x;
+          sampleBuffer[offset + 4] = state.color.y;
+          sampleBuffer[offset + 5] = state.color.z;
         }
       });
 

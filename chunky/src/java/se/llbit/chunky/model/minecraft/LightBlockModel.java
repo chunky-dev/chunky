@@ -20,10 +20,11 @@ package se.llbit.chunky.model.minecraft;
 
 import se.llbit.chunky.model.AABBModel;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.SolidColorTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector4;
 
 public class LightBlockModel extends AABBModel {
   public static final AABB[] aabb = { new AABB(0.125, 0.875, 0.125, 0.875, 0.125, 0.875) };
@@ -35,28 +36,20 @@ public class LightBlockModel extends AABBModel {
     Texture.light, Texture.light, Texture.light
   }};
 
-  private final Vector4 color;
-
-  public LightBlockModel(Vector4 color) {
-    this.color = color;
-  }
-
   @Override
   public AABB[] getBoxes() {
     return box;
   }
 
   @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    boolean hit = false;
-    AABB[] boxes = getBoxes();
-    ray.t = Double.POSITIVE_INFINITY;
-    if (boxes[0].intersect(ray)) {
-      ray.color.set(color);
-      hit = true;
-      ray.t = ray.tNext;
+  public boolean intersect(Ray ray, IntersectionRecord intersectionRecord, Scene scene) {
+    if (ray.isIndirect()) {
+      if (getBoxes()[0].closestIntersection(ray, intersectionRecord)) {
+        SolidColorTexture.EMPTY.getColor(intersectionRecord);
+        return true;
+      }
     }
-    return hit;
+    return false;
   }
 
   @Override

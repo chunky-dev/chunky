@@ -57,6 +57,8 @@ public class ButtonModel extends QuadModel {
   private final Texture[] textures;
 
   public ButtonModel(String face, String facing, Texture tex) {
+    refractive = true;
+
     textures = new Texture[attachedSouth.length];
     Arrays.fill(textures, tex);
 

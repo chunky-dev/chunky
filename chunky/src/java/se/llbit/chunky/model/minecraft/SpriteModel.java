@@ -21,7 +21,6 @@ import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.QuadModel;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
@@ -73,54 +72,6 @@ public class SpriteModel extends QuadModel {
   @Override
   public Texture[] getTextures() {
     return textures;
-  }
-
-  public static boolean intersect(Ray ray, Texture material) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (Quad quad : quads) {
-      if (quad.intersect(ray)) {
-        float[] color = material.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          if (quad.doubleSided)
-            ray.orientNormal(quad.n);
-          else
-            ray.setNormal(quad.n);
-          hit = true;
-        }
-      }
-    }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
-  }
-
-  public static boolean intersect(Ray ray, Texture material, String facing) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (Quad quad : orientedQuads[getOrientationIndex(facing)]) {
-      if (quad.intersect(ray)) {
-        float[] color = material.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          if (quad.doubleSided)
-            ray.orientNormal(quad.n);
-          else
-            ray.setNormal(quad.n);
-          hit = true;
-        }
-      }
-    }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
   }
 
   private static int getOrientationIndex(String facing) {

@@ -1,19 +1,10 @@
 package se.llbit.chunky.chunk.biome;
 
 import se.llbit.chunky.chunk.ChunkData;
-import se.llbit.chunky.world.biome.Biome;
 import se.llbit.chunky.world.biome.BiomePalette;
-import se.llbit.chunky.world.biome.Biomes;
-import se.llbit.log.Log;
-import se.llbit.math.QuickMath;
-import se.llbit.nbt.ListTag;
-import se.llbit.nbt.SpecificTag;
-import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
-import se.llbit.util.BitBuffer;
 
 import static se.llbit.chunky.world.Chunk.*;
-import static se.llbit.util.NbtUtil.getTagFromNames;
 
 public class BiomeDataFactory {
   //TODO: Ideally we would have registered factory impls with an isValidFor(Tag chunkTag), but this messy if chain works for now

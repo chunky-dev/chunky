@@ -100,6 +100,7 @@ public class JigsawModel extends QuadModel {
   private final Texture[] textures;
 
   public JigsawModel(String orientation) {
+    refractive = true;
     switch (orientation) {
       case "up":
         textures = textureNoLock;

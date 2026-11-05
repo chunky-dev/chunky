@@ -18,20 +18,15 @@
 package se.llbit.chunky.world.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.resources.TextureCache;
-import se.llbit.chunky.resources.TexturePackLoader;
-import se.llbit.chunky.resources.texturepack.SimpleTexture;
-import se.llbit.chunky.resources.texturepack.TextureLoader;
 import se.llbit.log.Log;
+import se.llbit.math.Constants;
 import se.llbit.math.Quad;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -84,7 +79,7 @@ public class CubeModel {
                 new int[][] { { 0, 0 }, { 0, 1 } },
                 new int[][] { { 2, 1 }, { 2, 0 } },
                 uv,
-                Math.abs(cube.start.y - cube.end.y) > Ray.EPSILON);
+                Math.abs(cube.start.y - cube.end.y) > Constants.EPSILON);
             break;
           case "down":
             addFace(theFaces, face,
@@ -93,7 +88,7 @@ public class CubeModel {
                 new int[][] { { 0, 0 }, { 0, 1 } },
                 new int[][] { { 2, 0 }, { 2, 1 } },
                 uv,
-                Math.abs(cube.start.y - cube.end.y) > Ray.EPSILON);
+                Math.abs(cube.start.y - cube.end.y) > Constants.EPSILON);
             break;
           case "north":
             addFace(theFaces, face,
@@ -102,7 +97,7 @@ public class CubeModel {
                 new int[][] { { 0, 1 }, { 0, 0 } },
                 new int[][] { { 1, 0 }, { 1, 1 } },
                 uv,
-                Math.abs(cube.start.z - cube.end.z) > Ray.EPSILON);
+                Math.abs(cube.start.z - cube.end.z) > Constants.EPSILON);
             break;
           case "south":
             addFace(theFaces, face,
@@ -111,7 +106,7 @@ public class CubeModel {
                 new int[][] { { 0, 0 }, { 0, 1 } },
                 new int[][] { { 1, 0 }, { 1, 1 } },
                 uv,
-                Math.abs(cube.start.z - cube.end.z) > Ray.EPSILON);
+                Math.abs(cube.start.z - cube.end.z) > Constants.EPSILON);
             break;
           case "east":
             addFace(theFaces, face,
@@ -120,7 +115,7 @@ public class CubeModel {
                 new int[][] { { 2, 1 }, { 2, 0 } },
                 new int[][] { { 1, 0 }, { 1, 1 } },
                 uv,
-                Math.abs(cube.start.x - cube.end.x) > Ray.EPSILON);
+                Math.abs(cube.start.x - cube.end.x) > Constants.EPSILON);
             break;
           case "west":
             addFace(theFaces, face,
@@ -129,7 +124,7 @@ public class CubeModel {
                 new int[][] { { 2, 0 }, { 2, 1 } },
                 new int[][] { { 1, 0 }, { 1, 1 } },
                 uv,
-                Math.abs(cube.start.x - cube.end.x) > Ray.EPSILON);
+                Math.abs(cube.start.x - cube.end.x) > Constants.EPSILON);
             break;
         }
       }

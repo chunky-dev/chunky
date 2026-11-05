@@ -3,6 +3,7 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
+import se.llbit.math.Constants;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
 
@@ -66,13 +67,29 @@ public class Tint {
       case CONSTANT:
         return this.tint;
       case BIOME_FOLIAGE:
-        return ray.getBiomeFoliageColor(scene);
+        return scene.getFoliageColor(
+          (int) (ray.o.x + ray.d.x * Constants.OFFSET),
+          (int) (ray.o.y + ray.d.y * Constants.OFFSET),
+          (int) (ray.o.z + ray.d.z * Constants.OFFSET)
+        );
       case BIOME_DRY_FOLIAGE:
-        return ray.getBiomeDryFoliageColor(scene);
+        return scene.getDryFoliageColor(
+            (int) (ray.o.x + ray.d.x * Constants.OFFSET),
+            (int) (ray.o.y + ray.d.y * Constants.OFFSET),
+            (int) (ray.o.z + ray.d.z * Constants.OFFSET)
+        );
       case BIOME_GRASS:
-        return ray.getBiomeGrassColor(scene);
+        return scene.getGrassColor(
+          (int) (ray.o.x + ray.d.x * Constants.OFFSET),
+          (int) (ray.o.y + ray.d.y * Constants.OFFSET),
+          (int) (ray.o.z + ray.d.z * Constants.OFFSET)
+        );
       case BIOME_WATER:
-        return ray.getBiomeWaterColor(scene);
+        return scene.getWaterColor(
+          (int) (ray.o.x + ray.d.x * Constants.OFFSET),
+          (int) (ray.o.y + ray.d.y * Constants.OFFSET),
+          (int) (ray.o.z + ray.d.z * Constants.OFFSET)
+        );
       default:
         Log.warn("Unsupported tint type " + type);
         return null;

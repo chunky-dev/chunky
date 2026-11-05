@@ -23,7 +23,7 @@ import java.util.Random;
 import se.llbit.chunky.renderer.ApertureShape;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
-import se.llbit.math.Ray;
+import se.llbit.math.Constants;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 import se.llbit.resources.ImageLoader;
@@ -44,8 +44,8 @@ public class ApertureProjector implements Projector {
 
   public ApertureProjector(Projector wrapped, double apertureSize, double subjectDistance) {
     this.wrapped = wrapped;
-    this.aperture = Math.max(apertureSize, Ray.EPSILON);
-    this.subjectDistance = Math.max(subjectDistance, Ray.EPSILON);
+    this.aperture = Math.max(apertureSize, Constants.EPSILON);
+    this.subjectDistance = Math.max(subjectDistance, Constants.EPSILON);
     this.apertureMask = null;
   }
 

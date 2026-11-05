@@ -246,14 +246,4 @@ public class DecoratedPotModel extends TopBottomOrientedTexturedBlockModel {
         return Texture.decoratedPotSide;
     }
   }
-
-  @Override
-  public Quad[] getQuads() {
-    return quads;
-  }
-
-  @Override
-  public Texture[] getTextures() {
-    return textures;
-  }
 }

@@ -50,7 +50,7 @@ public class AngleAdjuster extends Adjuster<Double> {
     dimple.setDisable(true);
     StackPane stackPane = new StackPane();
     stackPane.getChildren().addAll(knob, dimple);
-    getChildren().setAll(nameLbl, valueField, stackPane);
+    getChildren().setAll(stackPane, valueField, nameLbl);
     angle.bindBidirectional(value);
     angle.addListener((observable, oldValue, newValue) -> {
       double angle = newValue.doubleValue();

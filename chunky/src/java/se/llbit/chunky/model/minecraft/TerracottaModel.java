@@ -78,6 +78,7 @@ public class TerracottaModel extends QuadModel {
   private final Texture[] textures;
 
   public TerracottaModel(Texture texture, int direction) {
+    refractive = true;
     quads = faces[direction];
     textures = new Texture[quads.length];
     Arrays.fill(textures, texture);

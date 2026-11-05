@@ -14,29 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package se.llbit.chunky.renderer.scene.sky;
 
+import javafx.scene.layout.VBox;
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.render.RenderControlsTab;
+import se.llbit.json.JsonObject;
+import se.llbit.math.*;
 
 import static java.lang.Math.PI;
 
 public class PreethamSky implements SimulatedSky {
-  private static final double xZenithChroma[][] =
+  private static final double[][] xZenithChroma =
       {{0.00166, -0.00375, 0.00209, 0}, {-0.02903, 0.06377, -0.03203, 0.00394},
           {0.11693, -0.21196, 0.06052, 0.25886},};
-  private static final double yZenithChroma[][] =
+  private static final double[][] yZenithChroma =
       {{0.00275, -0.00610, 0.00317, 0}, {-0.04214, 0.08970, -0.04153, 0.00516},
           {0.15346, -0.26756, 0.06670, 0.26688},};
-  private static final double mdx[][] =
+  private static final double[][] mdx =
       {{-0.0193, -0.2592}, {-0.0665, 0.0008}, {-0.0004, 0.2125}, {-0.0641, -0.8989},
           {-0.0033, 0.0452}};
-  private static final double mdy[][] =
+  private static final double[][] mdy =
       {{-0.0167, -0.2608}, {-0.0950, 0.0092}, {-0.0079, 0.2102}, {-0.0441, -1.6537},
           {-0.0109, 0.0529}};
-  private static final double mdY[][] =
+  private static final double[][] mdY =
       {{0.1787, -1.4630}, {-0.3554, 0.4275}, {-0.0227, 5.3251}, {0.1206, -2.5771},
           {-0.0670, 0.3703}};
 
@@ -93,21 +97,19 @@ public class PreethamSky implements SimulatedSky {
   }
 
   @Override
-  public boolean updateSun(Sun sun, double horizonOffset) {
+  public boolean updateSun(Sun sun) {
     // Clamp sky to be above horizon and follow sun properly
     double alt = QuickMath.clamp(sun.getAltitude(), 0, PI);
     if (alt > PI/2) {
       alt = PI - alt;
     }
 
-    if (theta != sun.getAzimuth() || phi != alt || this.horizonOffset != horizonOffset) {
+    if (theta != sun.getAzimuth() || phi != alt) {
       theta = sun.getAzimuth();
       phi = alt;
       double r = QuickMath.abs(FastMath.cos(phi));
       sw.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
       updateSkylightValues(alt);
-
-      this.horizonOffset = horizonOffset;
 
       return true;
     }
@@ -136,7 +138,7 @@ public class PreethamSky implements SimulatedSky {
     double x = zenith_x * perezF(cosTheta, gamma, cos2Gamma, A.x, B.x, C.x, D.x, E.x) * f0_x;
     double y = zenith_y * perezF(cosTheta, gamma, cos2Gamma, A.y, B.y, C.y, D.y, E.y) * f0_y;
     double z = zenith_Y * perezF(cosTheta, gamma, cos2Gamma, A.z, B.z, C.z, D.z, E.z) * f0_Y;
-    if (y <= Ray.EPSILON) {
+    if (y <= Constants.EPSILON) {
       return new Vector3(0, 0, 0);
     } else {
       double f = (z / y);
@@ -183,5 +185,45 @@ public class PreethamSky implements SimulatedSky {
   private static double perezF(double cosTheta, double gamma, double cos2Gamma, double A, double B,
                  double C, double D, double E) {
     return (1 + A * FastMath.exp(B / cosTheta)) * (1 + C * FastMath.exp(D * gamma) + E * cos2Gamma);
+  }
+
+  @Override
+  public void fromJson(JsonObject json) {
+    horizonOffset = json.get("horizonOffset").doubleValue(horizonOffset);
+  }
+
+  @Override
+  public JsonObject toJson() {
+    JsonObject json = new JsonObject();
+    json.add("horizonOffset", horizonOffset);
+    return json;
+  }
+
+  @Override
+  public void reset() {
+
+  }
+
+  @Override
+  public VBox getControls(RenderControlsTab parent) {
+    Scene scene = parent.getChunkyScene();
+
+    VBox controls = new VBox();
+
+    DoubleAdjuster horizonOffsetAdjuster = new DoubleAdjuster();
+    horizonOffsetAdjuster.setName("Horizon offset");
+    horizonOffsetAdjuster.setRange(0, 1);
+    horizonOffsetAdjuster.clampBoth();
+    horizonOffsetAdjuster.set(this.horizonOffset);
+    horizonOffsetAdjuster.onValueChange(value -> {
+      this.horizonOffset = value;
+      scene.sky().updateSimulatedSky(scene.sun());
+      scene.refresh();
+    });
+    controls.getChildren().add(horizonOffsetAdjuster);
+
+    controls.setSpacing(6);
+
+    return controls;
   }
 }

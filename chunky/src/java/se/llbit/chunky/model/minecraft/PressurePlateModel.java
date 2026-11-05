@@ -108,6 +108,7 @@ public class PressurePlateModel extends QuadModel {
   private final Texture[] textures;
 
   public PressurePlateModel(Texture texture, boolean powered) {
+    refractive = true;
     quads = powered ? quadsDown : quadsUp;
     textures = new Texture[quads.length];
     Arrays.fill(textures, texture);

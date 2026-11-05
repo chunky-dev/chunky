@@ -41,7 +41,7 @@ public class ForwardDisplacementProjector implements Projector {
 
     d.normalize();
     d.scale(displacementValue);
-    o.scaleAdd(displacementSign, d);
+    o.add(d.x * displacementSign, d.y * displacementSign, d.z * displacementSign);
   }
 
   @Override public void apply(double x, double y, Vector3 o, Vector3 d) {

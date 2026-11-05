@@ -80,6 +80,7 @@ public class ObserverModel extends QuadModel {
   private final Texture[] textures;
 
   public ObserverModel(String facing, boolean powered) {
+    refractive = true;
     quads = switch (facing) {
       case "down" -> Model.rotateNegX(quadsNorth);
       case "east" -> Model.rotateY(quadsNorth);

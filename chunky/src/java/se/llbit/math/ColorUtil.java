@@ -21,6 +21,7 @@ import javafx.scene.paint.Color;
 import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.json.JsonObject;
 
 /**
  * Collection of utility methods for converting between different color representations.
@@ -234,7 +235,7 @@ public final class ColorUtil {
    * Transform from xyY colorspace to XYZ colorspace.
    */
   public static void xyYtoXYZ(Vector3 in, Vector3 out) {
-    if (in.y <= Ray.EPSILON) {
+    if (in.y <= Constants.EPSILON) {
       out.set(0, 0, 0);
       return;
     }
@@ -293,7 +294,7 @@ public final class ColorUtil {
       hue = (((r - g) / delta) + 4) / 6.0;
     }
 
-    hsl.set(hue, delta < Ray.EPSILON ? 0 : delta / (1 - FastMath.abs(2*lightness - 1)), lightness);
+    hsl.set(hue, delta < Constants.EPSILON ? 0 : delta / (1 - FastMath.abs(2*lightness - 1)), lightness);
   }
 
   public static Vector3 RGBtoHSL(double r, double g, double b) {
@@ -434,5 +435,29 @@ public final class ColorUtil {
    */
   public static float RGBComponentToLinear(byte value) {
     return toLinearLut[value & 0xFF];
+  }
+
+  public static JsonObject rgbToJson(Vector3 color) {
+    JsonObject jsonObject = new JsonObject();
+    jsonObject.add("red", color.x);
+    jsonObject.add("green", color.y);
+    jsonObject.add("blue", color.z);
+    return jsonObject;
+  }
+
+  public static Vector3 jsonToRGB(JsonObject json) {
+    Vector3 color = new Vector3();
+    color.x = json.get("red").doubleValue(1);
+    color.y = json.get("green").doubleValue(1);
+    color.z = json.get("blue").doubleValue(1);
+    return color;
+  }
+
+  public static Vector3 jsonToRGB(JsonObject json, Vector3 undefined) {
+    Vector3 color = new Vector3();
+    color.x = json.get("red").doubleValue(undefined.x);
+    color.y = json.get("green").doubleValue(undefined.y);
+    color.z = json.get("blue").doubleValue(undefined.z);
+    return color;
   }
 }

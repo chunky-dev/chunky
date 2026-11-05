@@ -18,16 +18,13 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.HangingSignEntity;
 import se.llbit.chunky.entity.WallHangingSignEntity;
-import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
-public class WallHangingSign extends MinecraftBlockTranslucent {
+public class WallHangingSign extends EmptyModelBlock {
   private final String material;
   private final Facing facing;
 
@@ -36,13 +33,6 @@ public class WallHangingSign extends MinecraftBlockTranslucent {
     this.material = material;
     this.facing = Facing.fromString(facing);
     invisible = true;
-    solid = false;
-    localIntersect = true;
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override

@@ -1,16 +1,15 @@
 package se.llbit.chunky.entity;
 
 import se.llbit.chunky.model.builder.BoxModelBuilder;
-import se.llbit.chunky.model.builder.UVMapHelper;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.material.DyedTextureMaterial;
 import se.llbit.chunky.world.material.DyedTextureMaterial.DyeColor;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.math.Constants;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.primitive.Primitive;
@@ -204,7 +203,7 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
       quad.addTriangles(faces, skinMaterial, transform);
     }
 
-    double inflateOffset = 1.0 + Ray.OFFSET;
+    double inflateOffset = 1.0 + Constants.OFFSET;
 
     if (sheared) {
       // The sheared overlay needs some specific translations and scaling to prevent z-fighting because of their rotation points.
@@ -220,7 +219,7 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
       }
 
       transform = Transform.NONE
-        .translate(0, Ray.OFFSET, 0)
+        .translate(0, Constants.OFFSET, 0)
         .scale(inflateOffset)
         .rotateX(frontRightLegPose.x)
         .rotateY(frontRightLegPose.y)
@@ -232,7 +231,7 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
       }
 
       transform = Transform.NONE
-        .translate(0, Ray.OFFSET, 0)
+        .translate(0, Constants.OFFSET, 0)
         .scale(inflateOffset)
         .rotateX(frontLeftLegPose.x)
         .rotateY(frontLeftLegPose.y)
@@ -244,7 +243,7 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
       }
 
       transform = Transform.NONE
-        .translate(0, Ray.OFFSET, 0)
+        .translate(0, Constants.OFFSET, 0)
         .scale(inflateOffset)
         .rotateX(backRightLegPose.x)
         .rotateY(backRightLegPose.y)
@@ -256,7 +255,7 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
       }
 
       transform = Transform.NONE
-        .translate(0, Ray.OFFSET, 0)
+        .translate(0, Constants.OFFSET, 0)
         .scale(inflateOffset)
         .rotateX(backLeftLegPose.x)
         .rotateY(backLeftLegPose.y)
@@ -268,7 +267,7 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
       }
 
       transform = Transform.NONE
-        .translate(0, 0, Ray.OFFSET)
+        .translate(0, 0, Constants.OFFSET)
         .scale(inflateOffset)
         .rotateX(headPose.x)
         .rotateY(headPose.y)
@@ -354,10 +353,7 @@ public class SheepEntity extends Entity implements Poseable, Dyeable {
     json.add("headScale", headScale);
     json.add("pose", pose);
 
-    JsonObject furMatData = new JsonObject();
-    materialFur.saveMaterialProperties(furMatData);
-
-    json.add("furMaterial", furMatData);
+    json.add("furMaterial", materialFur.saveMaterialProperties());
     json.add("sheared", sheared);
     return json;
   }

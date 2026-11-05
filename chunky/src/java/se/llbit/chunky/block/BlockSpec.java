@@ -8,19 +8,12 @@ import se.llbit.util.annotation.NotNull;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BlockSpec {
+public record BlockSpec(Tag tag) implements Comparable<BlockSpec> {
 
   public static final List<BlockProvider> blockProviders = new LinkedList<>();
 
-  private final Tag tag;
-
   public BlockSpec(@NotNull Tag tag) {
     this.tag = tag;
-  }
-
-  @Override
-  public int hashCode() {
-    return tag.hashCode();
   }
 
   @Override
@@ -76,5 +69,20 @@ public class BlockSpec {
       return tag.get("Properties");
     }
     return properties;
+  }
+
+  public String details() {
+    return tag.dumpTree();
+  }
+
+  @Override
+  public String toString() {
+    return tag.get("Name").stringValue("unknown:unknown");
+  }
+
+  @Override
+  public int compareTo(BlockSpec o) {
+    return tag.get("Name").stringValue("unknown:unknown")
+        .compareTo(o.tag.get("Name").stringValue("unknown:unknown"));
   }
 }

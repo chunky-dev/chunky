@@ -17,7 +17,6 @@
  */
 package se.llbit.chunky.entity;
 
-import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;

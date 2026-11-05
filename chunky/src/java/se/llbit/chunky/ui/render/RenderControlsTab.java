@@ -16,17 +16,20 @@
  */
 package se.llbit.chunky.ui.render;
 
-import javafx.scene.Node;
+import javafx.scene.layout.VBox;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.controller.RenderControlsFxController;
 
 /**
- * Tabs in the Render Controls dialog implement this interface.
+ * Tabs in the Render Controls dialog extend this class.
  *
  * <p>The update method is called to update the active tab with the
  * current scene state.
  */
-public interface RenderControlsTab {
+public abstract class RenderControlsTab extends VBox {
+  protected Scene scene;
+  protected RenderControlsFxController controller;
+
   /**
    * Called when the tab should update itself because something in the
    * scene state changed.
@@ -35,21 +38,35 @@ public interface RenderControlsTab {
    *
    * @param scene the current scene state
    */
-  void update(Scene scene);
+  public abstract void update(Scene scene);
 
-  String getTabTitle();
+  public abstract String getTabTitle();
 
   /**
    * @return the JavaFX tab component for this render controls tab
    */
-  Node getTabContent();
+  public abstract VBox getTabContent();
 
   /**
    * Called after chunks have been loaded.
    */
-  default void onChunksLoaded() {
+  public void onChunksLoaded() {
   }
 
-  default void setController(RenderControlsFxController controller) {
+  public final void setController(RenderControlsFxController controller) {
+    this.controller = controller;
+    scene = controller.getRenderController().getSceneManager().getScene();
+    onSetController(controller);
+  }
+
+  protected void onSetController(RenderControlsFxController controller) {
+  }
+
+  public final Scene getChunkyScene() {
+    return this.scene;
+  }
+
+  public final RenderControlsFxController getController() {
+    return this.controller;
   }
 }

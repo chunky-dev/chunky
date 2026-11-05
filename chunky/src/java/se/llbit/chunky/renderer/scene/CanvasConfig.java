@@ -177,7 +177,8 @@ public class CanvasConfig implements Configurable {
   }
 
   @Override
-  public void storeConfiguration(JsonObject json) {
+  public JsonObject toJson() {
+    JsonObject json = new JsonObject();
     json.add("width", width);
     json.add("height", height);
 
@@ -187,10 +188,12 @@ public class CanvasConfig implements Configurable {
 
     json.add("cropX", cropX);
     json.add("cropY", cropY);
+
+    return json;
   }
 
   @Override
-  public void loadConfiguration(JsonObject json) {
+  public void fromJson(JsonObject json) {
     width = json.get("width").intValue(width);
     height = json.get("height").intValue(height);
 

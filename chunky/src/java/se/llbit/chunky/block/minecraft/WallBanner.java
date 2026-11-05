@@ -18,27 +18,22 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.entity.BannerDesign;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.StandingBanner;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.Json;
 import se.llbit.json.JsonObject;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
-public class WallBanner extends MinecraftBlockTranslucent {
+public class WallBanner extends EmptyModelBlock {
   private final int facing;
   private final BannerDesign.Color color;
 
   public WallBanner(String name, Texture texture, String facing, BannerDesign.Color color) {
     super(name, texture);
     invisible = true;
-    opaque = false;
-    localIntersect = true;
     switch (facing) {
       default:
       case "north":
@@ -55,10 +50,6 @@ public class WallBanner extends MinecraftBlockTranslucent {
         break;
     }
     this.color = color;
-  }
-
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override public boolean isBlockEntity() {

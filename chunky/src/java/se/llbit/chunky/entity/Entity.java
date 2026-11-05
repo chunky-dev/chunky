@@ -19,6 +19,7 @@ package se.llbit.chunky.entity;
 
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.model.minecraft.DecoratedPotModel;
+import se.llbit.chunky.renderer.HasPrimitives;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
@@ -27,6 +28,7 @@ import se.llbit.math.Octree;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
 import se.llbit.math.primitive.Primitive;
+import se.llbit.util.HasControls;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -36,15 +38,13 @@ import java.util.LinkedList;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-abstract public class Entity {
+public abstract class Entity implements HasPrimitives, HasControls {
 
   public final Vector3 position;
 
   protected Entity(Vector3 position) {
     this.position = new Vector3(position);
   }
-
-  abstract public Collection<Primitive> primitives(Vector3 offset);
 
   public Grid.EmitterPosition[] getEmitterPosition() {
     return new Grid.EmitterPosition[0];
@@ -106,6 +106,7 @@ abstract public class Entity {
       case "calibratedSculkSensorAmethyst" -> entities.add(CalibratedSculkSensorAmethyst.fromJson(json));
       case "hangingSign" -> entities.add(HangingSignEntity.fromJson(json));
       case "wallHangingSign" -> entities.add(WallHangingSignEntity.fromJson(json));
+      case "sphere" -> entities.add(SphereEntity.fromJson(json));
       case "sheep" -> entities.add(SheepEntity.fromJson(json));
       case "cow" -> entities.add(CowEntity.fromJson(json));
       case "chicken" -> entities.add(ChickenEntity.fromJson(json));

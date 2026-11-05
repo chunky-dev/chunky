@@ -25,6 +25,5 @@ public class TintedGlass extends MinecraftBlockTranslucent {
 
   public TintedGlass() {
     super("tinted_glass", Texture.tintedGlass);
-    ior = 1.52f;
   }
 }

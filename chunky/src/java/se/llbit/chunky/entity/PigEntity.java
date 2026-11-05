@@ -1,7 +1,6 @@
 package se.llbit.chunky.entity;
 
 import se.llbit.chunky.model.builder.BoxModelBuilder;
-import se.llbit.chunky.model.builder.UVMapHelper;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;

@@ -17,8 +17,10 @@
  */
 package se.llbit.math.bvh;
 
-import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.plugin.PluginApi;
+import se.llbit.chunky.renderer.HasPrimitives;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.math.IntersectionRecord;
 import se.llbit.log.Log;
 import se.llbit.math.Intersectable;
 import se.llbit.math.Ray;
@@ -28,25 +30,26 @@ import se.llbit.util.TaskTracker;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Bounding Volume Hierarchy based on AABBs.
  */
 public interface BVH extends Intersectable {
-  BVH EMPTY = ray -> false;
+  BVH EMPTY = (ray, intersectionRecord, scene, random) -> false;
 
   /**
-   * Find closest intersection between the ray and any object in the BVH
+   * Find the closest intersection between the ray and any object in the BVH
    *
    * @return {@code true} if there exists any intersection
    */
   @Override
-  boolean closestIntersection(Ray ray);
+  boolean closestIntersection(Ray ray, IntersectionRecord intersectionRecord, Scene scene, Random random);
 
   final class Factory {
 
     public interface BVHBuilder {
-      BVH create(Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task);
+      BVH create(Collection<HasPrimitives> entities, Vector3 worldOffset, TaskTracker.Task task);
 
       String getName();
       String getDescription();
@@ -95,7 +98,7 @@ public interface BVH extends Intersectable {
      * Construct a new BVH containing the given entities. This will generate the BVH using the
      * persistent BVH method (default is SAH_MA).
      */
-    public static BVH create(String implementation, Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task) {
+    public static BVH create(String implementation, Collection<HasPrimitives> entities, Vector3 worldOffset, TaskTracker.Task task) {
       if (entities.isEmpty()) {
         return BVH.EMPTY;
       } else {

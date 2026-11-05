@@ -937,6 +937,7 @@ public class MinecraftBlockProvider implements BlockProvider {
   }
 
   static {
+    addBlock("void", (name, tag) -> Void.INSTANCE);
     addBlocks((name, tag) -> Air.INSTANCE, "air", "cave_air", "void_air", "structure_void", "barrier");
     addBlocks((name, tag) -> new MinecraftBlock(name, Texture.stone), "infested_stone", "stone");
 

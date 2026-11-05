@@ -85,6 +85,10 @@ public class CreditsController implements Initializable {
   @FXML
   private Hyperlink apacheCliLicense;
   @FXML
+  private Hyperlink controlsfx;
+  @FXML
+  private Hyperlink controlsFXLicense;
+  @FXML
   private VBox pluginBox;
   @FXML
   private ImageView logoImage;
@@ -190,6 +194,11 @@ public class CreditsController implements Initializable {
     apacheCli.setOnAction(e -> launchAndReset(apacheCli, "https://commons.apache.org/proper/commons-cli/"));
     apacheCliLicense.setBorder(Border.EMPTY);
     apacheCliLicense.setOnAction(e -> launchAndReset(apacheCliLicense, "http://www.apache.org/licenses/LICENSE-2.0"));
+
+    controlsfx.setBorder(Border.EMPTY);
+    controlsfx.setOnAction(e -> launchAndReset(controlsfx, "https://controlsfx.github.io/"));
+    controlsFXLicense.setBorder(Border.EMPTY);
+    controlsFXLicense.setOnAction(e -> launchAndReset(controlsFXLicense, "https://github.com/controlsfx/controlsfx/blob/master/license.txt"));
 
     if (!plugins.isEmpty()) {
       plugins.forEach((key, item) -> pluginBox.getChildren().addAll(buildBox(item)));

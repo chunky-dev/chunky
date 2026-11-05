@@ -31,7 +31,6 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.ResourcePackLoader;
-import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.TableSortConfigSerializer;
 import se.llbit.chunky.world.Dimension;
 import se.llbit.chunky.world.EmptyWorld;

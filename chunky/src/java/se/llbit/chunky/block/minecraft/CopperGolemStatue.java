@@ -12,7 +12,7 @@ import se.llbit.math.Vector3;
 import java.util.Collection;
 import java.util.Collections;
 
-public class CopperGolemStatue extends MinecraftBlockTranslucent {
+public class CopperGolemStatue extends EmptyModelBlock {
   private final String facing;
   private final String pose;
   private final CopperGolemEntity.Oxidation oxidation;
@@ -31,11 +31,6 @@ public class CopperGolemStatue extends MinecraftBlockTranslucent {
     invisible = true;
     opaque = false;
     localIntersect = true;
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override

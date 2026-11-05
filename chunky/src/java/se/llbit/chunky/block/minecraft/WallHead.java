@@ -18,15 +18,12 @@
 
 package se.llbit.chunky.block.minecraft;
 
-import se.llbit.chunky.block.MinecraftBlockTranslucent;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.HeadEntity;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.entity.SkullEntity.Kind;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.log.Log;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
@@ -34,14 +31,13 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
-public class WallHead extends MinecraftBlockTranslucent {
+public class WallHead extends EmptyModelBlock {
   private final String description;
   private final int facing;
   private final SkullEntity.Kind type;
 
   public WallHead(String name, Texture texture, SkullEntity.Kind type, String facing) {
     super(name, texture);
-    localIntersect = true;
     invisible = true;
     description = "facing=" + facing;
     this.type = type;
@@ -60,11 +56,6 @@ public class WallHead extends MinecraftBlockTranslucent {
         this.facing = 5;
         break;
     }
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override

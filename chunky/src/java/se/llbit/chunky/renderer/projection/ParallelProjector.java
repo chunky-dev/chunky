@@ -19,6 +19,7 @@ package se.llbit.chunky.renderer.projection;
 import java.util.Random;
 
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.math.Constants;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
@@ -63,15 +64,15 @@ public class ParallelProjector implements Projector {
     Vector3 d = ray.d;
     double t = 0;
     // simplified intersection test with the 6 planes that form the bounding box of the octree
-    if(Math.abs(d.x) > Ray.EPSILON) {
+    if(Math.abs(d.x) > Constants.EPSILON) {
       t = Math.min(t, -o.x / d.x);
       t = Math.min(t, (limit - o.x) / d.x);
     }
-    if(Math.abs(d.y) > Ray.EPSILON) {
+    if(Math.abs(d.y) > Constants.EPSILON) {
       t = Math.min(t, -o.y / d.y);
       t = Math.min(t, (limit - o.y) / d.y);
     }
-    if(Math.abs(d.z) > Ray.EPSILON) {
+    if(Math.abs(d.z) > Constants.EPSILON) {
       t = Math.min(t, -o.z / d.z);
       t = Math.min(t, (limit - o.z) / d.z);
     }
@@ -79,6 +80,6 @@ public class ParallelProjector implements Projector {
     // In theory, we only would need to set it to the closest intersection point behind
     // but this doesn't matter because the Octree.enterOctree function
     // will do the same amount of math for the same result no matter what the exact point is
-    ray.o.scaleAdd(t, d);
+    ray.o.add(d.x * t, d.y * t, d.z * t);
   }
 }
