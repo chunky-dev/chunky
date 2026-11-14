@@ -1000,17 +1000,17 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     double rightLegPose = -leftLegPose;
     double leftArmPose = (random.nextFloat() - 0.5) * QuickMath.HALF_PI;
     double rightArmPose = -leftArmPose;
-    pose.add("leftArm", JsonUtil.vec3ToJson(new Vector3(leftArmPose, 0, 0)));
-    pose.add("rightArm", JsonUtil.vec3ToJson(new Vector3(rightArmPose, 0, 0)));
-    pose.add("leftLeg", JsonUtil.vec3ToJson(new Vector3(leftLegPose, 0, 0)));
-    pose.add("rightLeg", JsonUtil.vec3ToJson(new Vector3(rightLegPose, 0, 0)));
+    pose.set("leftArm", JsonUtil.vec3ToJson(new Vector3(leftArmPose, 0, 0)));
+    pose.set("rightArm", JsonUtil.vec3ToJson(new Vector3(rightArmPose, 0, 0)));
+    pose.set("leftLeg", JsonUtil.vec3ToJson(new Vector3(leftLegPose, 0, 0)));
+    pose.set("rightLeg", JsonUtil.vec3ToJson(new Vector3(rightLegPose, 0, 0)));
   }
 
   private void randomLook(Random random) {
     pose.set("rotation", Json.of((random.nextFloat() - 0.5) * QuickMath.TAU));
     double headYaw = 0.4 * (random.nextFloat() - 0.5) * QuickMath.HALF_PI;
     double pitch = (random.nextFloat() - 0.5) * QuickMath.HALF_PI;
-    pose.add("head", JsonUtil.vec3ToJson(new Vector3(pitch, headYaw, 0)));
+    pose.set("head", JsonUtil.vec3ToJson(new Vector3(pitch, headYaw, 0)));
   }
 
   @Override
