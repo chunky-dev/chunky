@@ -2958,8 +2958,6 @@ public class Scene implements JsonSerializable {
         Log.infof("Unknown water shader %s, using SIMPLEX", waterShader);
         waterShadingStrategy = WaterShadingStrategy.SIMPLEX;
       }
-    } else {
-      waterShadingStrategy = WaterShadingStrategy.TILED_NORMALMAP;
     }
     if (!json.get("stillWater").isUnknown()) {
       if (json.get("stillWater").boolValue(false)) {
