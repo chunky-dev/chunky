@@ -141,7 +141,9 @@ public class RenderDump {
     this.metadata = metadata;
     this.sampleBuffer = sampleBuffer;
     if (sampleBuffer.length != metadata.width() * metadata.height() * 3) {
-      throw new IllegalArgumentException("Sample buffer size mismatch");
+      throw new IllegalArgumentException(String.format(
+        "Sample buffer size mismatch: expected %d values for a %dx%d render dump, got %d",
+        metadata.width() * metadata.height() * 3, metadata.width(), metadata.height(), sampleBuffer.length));
     }
   }
 

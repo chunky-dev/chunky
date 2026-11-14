@@ -545,9 +545,11 @@ public class Scene implements JsonSerializable {
       }
 
       if (sdfVersion < SDF_VERSION) {
-        Log.warn("Old scene version detected! The scene may not have been loaded correctly.");
+        Log.warn("Scene " + sceneName + " uses older scene format version " + sdfVersion
+          + " (current version: " + SDF_VERSION + "). The scene may not have been loaded correctly.");
       } else if (sdfVersion > SDF_VERSION) {
-        Log.warn("This scene was created with a newer version of Chunky! The scene may not have been loaded correctly.");
+        Log.warn("Scene " + sceneName + " uses newer scene format version " + sdfVersion
+          + " (current version: " + SDF_VERSION + "). The scene may not have been loaded correctly.");
       }
 
       // Load the configured skymap file.
@@ -2850,7 +2852,7 @@ public class Scene implements JsonSerializable {
       JsonObject json = parser.parse().object();
       fromJson(json);
     } catch (JsonParser.SyntaxError e) {
-      throw new IOException("JSON syntax error");
+      throw new IOException("Invalid JSON in scene description: " + e.getMessage(), e);
     }
   }
 

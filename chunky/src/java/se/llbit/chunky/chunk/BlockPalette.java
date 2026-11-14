@@ -691,7 +691,7 @@ public class BlockPalette {
   public static BlockPalette read(DataInputStream in) throws IOException {
     int version = in.readInt();
     if (version < 4 || version > BLOCK_PALETTE_VERSION) {
-      throw new IOException("Incompatible block palette format.");
+      throw new IOException("Incompatible block palette format: " + version);
     }
     int numBlocks = in.readInt();
     Map<BlockSpec, Integer> blockMap = new HashMap<>(numBlocks);

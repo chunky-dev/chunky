@@ -127,7 +127,7 @@ public class Octree {
   static private ImplementationFactory getImplementationFactory(String implementation) {
     if(factories.containsKey(implementation))
       return factories.get(implementation);
-    Log.warn(String.format("Unknown octree implementation specified, using %s", DEFAULT_IMPLEMENTATION));
+    Log.warn(String.format("Unknown octree implementation: %s, using %s", implementation, DEFAULT_IMPLEMENTATION));
     return factories.get(DEFAULT_IMPLEMENTATION);
   }
 
