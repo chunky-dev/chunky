@@ -174,10 +174,10 @@ public class PluginManager {
       try (InputStream in = Files.newInputStream(manifestPath); JsonParser parser = new JsonParser(in)) {
         return PluginManifest.parse(parser.parse().object(), pluginJar);
       } catch (JsonParser.SyntaxError e) {
-        Log.error("Could not parse the plugin manifest file", e);
+        Log.error("Could not parse plugin manifest (plugin.json) in " + pluginJar, e);
       }
     } catch (IOException e) {
-      Log.error("Could not load the plugin", e);
+      Log.error("Could not load plugin from " + pluginJar, e);
     }
     return Optional.empty();
   }

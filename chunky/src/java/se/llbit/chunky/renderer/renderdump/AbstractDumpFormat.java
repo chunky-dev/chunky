@@ -66,7 +66,8 @@ abstract class AbstractDumpFormat implements DumpFormat {
     try (TaskTracker.Task task = taskTracker.task("Loading render dump", samples.length / 3)) {
       DumpMetadata header = readHeader(inputStream);
       if (header.width() != scene.canvasConfig.getWidth() || header.height() != scene.canvasConfig.getHeight()) {
-        throw new IllegalStateException("Scene size does not match dump size");
+        throw new IllegalStateException(String.format("Scene size %dx%d does not match render dump size %dx%d",
+          scene.canvasConfig.getWidth(), scene.canvasConfig.getHeight(), header.width(), header.height()));
       }
       scene.spp = header.spp();
       scene.renderTime = header.renderTime();

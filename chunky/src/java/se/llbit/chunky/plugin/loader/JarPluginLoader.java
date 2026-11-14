@@ -21,11 +21,14 @@ public class JarPluginLoader implements PluginLoader {
       Plugin plugin = (Plugin) pluginClass.getDeclaredConstructor().newInstance();
       onLoad.accept(plugin, pluginManifest);
     } catch (IOException | ClassNotFoundException e) {
-      Log.error("Could not load the plugin", e);
+      Log.error("Could not load plugin " + pluginManifest.name + " (main class " + pluginManifest.main
+        + ") from " + pluginManifest.pluginJar, e);
     } catch (ClassCastException e) {
-      Log.error("Plugin main class has wrong type (must implement se.llbit.chunky.Plugin)", e);
+      Log.error("Plugin " + pluginManifest.name + " main class " + pluginManifest.main
+        + " has wrong type (must implement se.llbit.chunky.Plugin)", e);
     } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-      Log.error("Could not create plugin instance", e);
+      Log.error("Could not create instance of plugin " + pluginManifest.name
+        + " (main class " + pluginManifest.main + ")", e);
     }
   }
 

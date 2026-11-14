@@ -270,7 +270,7 @@ public class Grid {
   public static Grid load(DataInputStream in, Scene scene) throws IOException {
     int version = in.readInt();
     if(version > GRID_FORMAT_VERSION) {
-      throw new RuntimeException("Unknown grid format version, can't load the grid");
+      throw new RuntimeException(String.format("Unsupported grid format version: %d (latest supported version: %d)", version, GRID_FORMAT_VERSION));
     }
 
     Grid grid;
