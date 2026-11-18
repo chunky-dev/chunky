@@ -46,7 +46,6 @@ public class LegacyBanner extends MinecraftBlockTranslucent {
   public LegacyBanner(String name, CompoundTag tag) {
     super(name, Texture.whiteWool);
     localIntersect = true;
-    invisible = true;
     rotation = tag.get("Data").intValue(0);
   }
 
@@ -58,11 +57,6 @@ public class LegacyBanner extends MinecraftBlockTranslucent {
   @Override
   public Entity createBlockEntity(Vector3 position, CompoundTag entityTag) {
     return new StandingBanner(position, rotation, parseDesign(entityTag));
-  }
-
-  @Override
-  public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   /**

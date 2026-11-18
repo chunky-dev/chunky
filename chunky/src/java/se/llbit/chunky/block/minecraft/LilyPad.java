@@ -32,13 +32,7 @@ import java.util.Collections;
 public class LilyPad extends MinecraftBlockTranslucent {
   public LilyPad() {
     super("lily_pad", Texture.lilyPad);
-    invisible = true;
     opaque = false;
-    localIntersect = true;
-  }
-
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return false;
   }
 
   @Override public boolean hasEntities() {
