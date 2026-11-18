@@ -55,10 +55,7 @@ public class RegionParser extends ChunkyThread {
     while (!isInterrupted()) {
       try {
         RegionPosition position = queue.poll();
-        if (position == null) {
-          Log.warn("Region parser shutting down abnormally.");
-          return;
-        }
+
         ChunkView map = mapView.getMapView();
         if (map.isRegionVisible(position)) {
           Dimension dimension = mapLoader.getWorld().currentDimension();
@@ -73,6 +70,8 @@ public class RegionParser extends ChunkyThread {
             }
           }
         }
+      } catch (InterruptedException e) {
+        return; // normal exit
       } catch (Throwable t) {
         Log.warn("Region Parser Error", t);
       }
