@@ -64,6 +64,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private IntegerAdjuster renderThreads;
   @FXML private IntegerAdjuster cpuLoad;
   @FXML private IntegerAdjuster rayDepth;
+  @FXML private IntegerAdjuster minRayDepth;
   @FXML private IntegerAdjuster branchCount;
   @FXML private Button mergeRenderDump;
   @FXML private CheckBox shutdown;
@@ -104,10 +105,15 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       controller.getRenderManager().setCPULoad(value);
     });
     rayDepth.setName("Ray depth");
-    rayDepth.setTooltip("Sets the minimum recursive ray depth.");
+    rayDepth.setTooltip("Sets the maximum recursive ray depth.");
     rayDepth.setRange(1, 25);
     rayDepth.clampMin();
     rayDepth.onValueChange(value -> scene.setRayDepth(value));
+    minRayDepth.setName("Min ray depth");
+    minRayDepth.setTooltip("Sets the minimum recursive ray depth before Russian Roulette is applied.");
+    minRayDepth.setRange(1, 25);
+    minRayDepth.clampMin();
+    minRayDepth.onValueChange(value -> scene.setMinRayDepth(value));
 
     branchCount.setName("Branch count");
     branchCount.setTooltip("Sets the number of rays cast after the first intersection, effectively reusing the first ray that many times." +
@@ -339,6 +345,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     renderThreads.set(PersistentSettings.getNumThreads());
     cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());
+    minRayDepth.set(scene.getMinRayDepth());
     branchCount.set(scene.getBranchCount());
     octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
     bvhMethod.getSelectionModel().select(scene.getBvhImplementation());
