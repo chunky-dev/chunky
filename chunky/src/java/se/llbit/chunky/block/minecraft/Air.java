@@ -30,6 +30,7 @@ public class Air extends MinecraftBlock {
     solid = false;
     opaque = false;
     invisible = true;
+    refractive = true;
   }
 
   @Override
