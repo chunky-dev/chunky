@@ -3782,7 +3782,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     String south = properties.get("south").stringValue("false");
     String east = properties.get("east").stringValue("false");
     String west = properties.get("west").stringValue("false");
-    String up = properties.get("up").stringValue("false");
+    String up = properties.get("up").stringValue("true");
     return new Wall(name, texture, north, south, east, west, up.equals("true"));
   }
 
