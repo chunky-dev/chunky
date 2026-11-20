@@ -3,9 +3,13 @@ package se.llbit.chunky.world;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.chunk.biome.BiomeData2d;
+import se.llbit.chunky.world.java.JavaDimension;
+import se.llbit.chunky.world.java.JavaWorld;
 import se.llbit.chunky.world.region.EmptyRegion;
 import se.llbit.chunky.world.region.ImposterCubicRegion;
 import se.llbit.chunky.world.region.Region;
+import se.llbit.math.Vector3i;
+import se.llbit.util.annotation.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,13 +21,13 @@ import java.util.stream.Stream;
 import static se.llbit.chunky.world.region.ImposterCubicRegion.blockToCube;
 import static se.llbit.chunky.world.region.ImposterCubicRegion.cubeToCubicRegion;
 
-public class CubicDimension extends Dimension {
+public class CubicDimension extends JavaDimension {
 
   /**
    * @param dimensionDirectory Minecraft world directory.
    */
-  protected CubicDimension(World world, Dimension.Identifier dimensionId, File dimensionDirectory, Set<PlayerEntityData> playerEntities) {
-    super(world, dimensionId, dimensionDirectory, playerEntities);
+  public CubicDimension(JavaWorld world, Dimension.Identifier dimensionId, Path dimensionDirectory, Set<PlayerEntityData> playerEntities, @Nullable Vector3i spawnPos) {
+    super(world, dimensionId, dimensionDirectory, playerEntities, spawnPos);
   }
 
   /**
@@ -31,7 +35,7 @@ public class CubicDimension extends Dimension {
    */
   @Override
   public synchronized File getRegionDirectory() {
-    return new File(dimensionDirectory, "region3d");
+    return dimensionDirectory.resolve("region3d").toFile();
   }
 
   @Override
@@ -49,11 +53,11 @@ public class CubicDimension extends Dimension {
     return new ImposterCubicRegion(pos, this);
   }
 
-  public synchronized Region getRegionWithinRange(RegionPosition pos, int minY, int maxY) {
+  public synchronized Region getRegionWithinRange(RegionPosition pos, HeightRange heightRange) {
     return regionMap.computeIfAbsent(pos.getLong(), p -> {
       // check if the region is present in the world directory
       Region region = EmptyRegion.instance;
-      if (regionExistsWithinRange(pos, minY, maxY)) {
+      if (this.hasRegionWithinRange(pos, heightRange)) {
         region = createRegion(pos);
       }
       return region;
@@ -62,10 +66,9 @@ public class CubicDimension extends Dimension {
 
   /** no choice but to iterate over every file in the directory */
   @Override
-  public boolean regionExists(RegionPosition pos) {
+  public boolean hasRegion(RegionPosition pos) {
     File regionDirectory = getRegionDirectory();
-    try {
-      Stream<Path> list = Files.list(regionDirectory.toPath());
+    try (Stream<Path> list = Files.list(regionDirectory.toPath())) {
       return list.anyMatch(path -> {
         String[] split = path.getFileName().toString().split("[.]");
         if(split.length == 4) {
@@ -83,13 +86,13 @@ public class CubicDimension extends Dimension {
   }
 
   @Override
-  public boolean regionExistsWithinRange(RegionPosition pos, int minY, int maxY) {
+  public boolean hasRegionWithinRange(RegionPosition pos, HeightRange heightRange) {
     int cubicRegionX = pos.x << 1;
     int cubicRegionZ = pos.z << 1;
 
     File regionDirectory = getRegionDirectory();
-    int minRegionY = cubeToCubicRegion(blockToCube(minY));
-    int maxRegionY = cubeToCubicRegion(blockToCube(maxY - 1));
+    int minRegionY = cubeToCubicRegion(blockToCube(heightRange().min()));
+    int maxRegionY = cubeToCubicRegion(blockToCube(heightRange.max() - 1));
     for (int y = minRegionY; y <= maxRegionY; y++) {
       for (int localX = 0; localX < ImposterCubicRegion.DIAMETER_IN_CUBIC_REGIONS; localX++) {
         for (int localZ = 0; localZ < ImposterCubicRegion.DIAMETER_IN_CUBIC_REGIONS; localZ++) {
