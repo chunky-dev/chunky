@@ -1,20 +1,13 @@
 package se.llbit.chunky.plugin.manifest;
 
 import org.apache.maven.artifact.versioning.VersionRange;
+import se.llbit.util.annotation.NotNull;
 
 /**
  * An unresolved plugin dependency within a plugin manifest.
  */
-public class PluginDependency {
-  public final String name;
-  public final VersionRange version;
-
-  public PluginDependency(String name, VersionRange version) {
-    this.name = name;
-    this.version = version;
-  }
-
-  @Override
+public record PluginDependency(String name, VersionRange version) {
+  @Override @NotNull
   public String toString() {
     return name + ":" + version;
   }
