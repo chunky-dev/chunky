@@ -60,8 +60,6 @@ public class PathTracingRenderer extends TileBasedRenderer {
     int cropX = scene.canvasConfig.getCropX();
     int cropY = scene.canvasConfig.getCropY();
 
-    int sppPerPass = manager.context.sppPerPass();
-
     Camera cam = scene.camera();
     double halfWidth = fullWidth / (2.0 * fullHeight);
     double invHeight = 1.0 / fullHeight;
@@ -71,6 +69,8 @@ public class PathTracingRenderer extends TileBasedRenderer {
     while (scene.spp < scene.getTargetSpp()) {
       int spp = scene.spp;
       int branchCount = (tracer instanceof PathTracer) ? scene.getCurrentBranchCount() : 1;
+      int sppPerPass = Math.min(manager.context.sppPerPass(),
+          (scene.getTargetSpp() - spp) / branchCount);
       double sinv = 1.0 / (sppPerPass * branchCount + spp);
 
       submitTiles(manager, (state, pixel) -> {

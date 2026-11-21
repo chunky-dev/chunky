@@ -1999,19 +1999,21 @@ public class Scene implements JsonSerializable {
   }
 
   /**
-   * Usually the same as getBranchCount, but reduces branch count to 1 for first few SPP.
+   * Usually the same as getBranchCount, but reduces branch count to 1 for first few SPP
+   * and limits it to the samples remaining at the end to not overshoot the target.
    *
    * @return The current "true" branch count
    */
   public int getCurrentBranchCount() {
+    int remaining = Math.max(1, sppTarget - spp);
     if(spp < branchCount) {
       if(spp <= Math.sqrt(branchCount)) { // This is arbitrary, but should be a good compromise in most cases
         return 1;
       } else {
-        return branchCount - spp;
+        return Math.min(branchCount - spp, remaining);
       }
     } else {
-      return branchCount;
+      return Math.min(branchCount, remaining);
     }
   }
 
