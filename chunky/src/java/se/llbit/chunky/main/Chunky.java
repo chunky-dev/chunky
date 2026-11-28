@@ -44,6 +44,7 @@ import se.llbit.chunky.ui.controller.CreditsController;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.chunky.world.MaterialStore;
 import se.llbit.json.JsonArray;
+import se.llbit.json.JsonObject;
 import se.llbit.log.ConsoleReceiver;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
@@ -173,6 +174,10 @@ public class Chunky {
       if (options.target != -1) {
         sceneManager.getScene().setTargetSpp(options.target);
       }
+      if ((options.cameraName != null || options.cameraIndex != -1)
+          && !loadCameraPreset(sceneManager.getScene(), options)) {
+        return 1;
+      }
       if (logger.getNumErrors() > 0) {
         if (!options.force) {
           System.err.println("\rAborting render due to errors while loading the scene.");
@@ -202,6 +207,38 @@ public class Chunky {
       return 1;
     } finally {
       renderManager.shutdown();
+    }
+  }
+
+  /**
+   * Load the camera preset selected by the -camera or -camera-index option.
+   *
+   * @return {@code false} if the scene has no such camera preset
+   */
+  static boolean loadCameraPreset(Scene scene, ChunkyOptions options) {
+    JsonObject presets = scene.getCameraPresets();
+    String name = options.cameraName;
+    if (options.cameraIndex != -1) {
+      if (options.cameraIndex >= presets.size()) {
+        System.err.format("Camera preset index %d is out of range, the scene has %d camera presets.%n",
+            options.cameraIndex, presets.size());
+        printCameraPresets(presets);
+        return false;
+      }
+      name = presets.get(options.cameraIndex).name;
+    } else if (!presets.get(name).isObject()) {
+      System.err.format("Camera preset \"%s\" not found.%n", name);
+      printCameraPresets(presets);
+      return false;
+    }
+    scene.loadCameraPreset(name);
+    return true;
+  }
+
+  private static void printCameraPresets(JsonObject presets) {
+    System.err.println("Available camera presets:");
+    for (int i = 0; i < presets.size(); ++i) {
+      System.err.format("  %d: %s%n", i, presets.get(i).name);
     }
   }
 

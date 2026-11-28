@@ -50,6 +50,12 @@ public class ChunkyOptions {
   /** Reload chunks with headless render */
   public boolean reloadChunks;
 
+  /** Name of the camera preset to use for a headless render. */
+  public String cameraName = null;
+
+  /** Index of the camera preset to use for a headless render. */
+  public int cameraIndex = -1;
+
   private ChunkyOptions() {
   }
 

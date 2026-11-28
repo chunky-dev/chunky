@@ -97,6 +97,8 @@ public class CommandLineOptions {
           "  -tile-width <NUM>      use the specified tile width for rendering",
           "  -spp-per-pass <NUM>    use the specified samples per pixel per pass for rendering",
           "  -target <NUM>          override target SPP to be NUM in headless mode",
+          "  -camera <NAME>         use the camera preset NAME in headless mode",
+          "  -camera-index <NUM>    use the camera preset at index NUM (starting at 0) in headless mode",
           "  -reload-chunks         reload the selected chunks before rendering the scene",
           "  -f                     render the scene even if loading the scene fails (e.g. ignore missing octree)",
           "  -set <NAME> <VALUE>    set a global configuration option and exit",
@@ -294,6 +296,16 @@ public class CommandLineOptions {
 
     registerOption("-target", new Range(1),
         arguments -> options.target = Math.max(1, Integer.parseInt(arguments.get(0))));
+
+    registerOption(new String[] {"-camera", "-camera-name"}, new Range(1), arguments -> {
+      options.cameraName = arguments.get(0);
+      options.cameraIndex = -1;
+    });
+
+    registerOption("-camera-index", new Range(1), arguments -> {
+      options.cameraIndex = Integer.parseInt(arguments.get(0));
+      options.cameraName = null;
+    });
 
     registerOption("-threads", new Range(1),
         arguments -> options.renderThreads = Math.max(1, Integer.parseInt(arguments.get(0))));
